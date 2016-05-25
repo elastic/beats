@@ -1,13 +1,16 @@
 {
-    "@timestamp": "2016-05-11T23:25:32.317Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+   "@timestamp": "2016-05-11T23:25:32.317Z",
+   "beat": {
+     "hostname": "host.example.com",
+     "name": "host.example.com"
     },
-    "metricset": "disk",
-    "module": "system",
-    "rtt": 17082,
-    "system-disk": {
+   "metricset": {
+      "module": "system",
+      "name": "disk",
+      "rtt": 17082,
+   },
+   "system": {
+     "disk": {
         "io_time": 21110,
         "name": "sda2",
         "read_bytes": 160079872,
@@ -16,6 +19,7 @@
         "write_bytes": 799186944,
         "write_count": 3208,
         "write_time": 90070
+      }
     },
     "type": "metricsets"
 }

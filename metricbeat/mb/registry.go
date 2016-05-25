@@ -99,6 +99,7 @@ func (r *Register) AddMetricSet(module string, name string, factory MetricSetFac
 
 	r.metricSets[module][name] = factory
 	logp.Info("MetricSet registered: %s/%s", module, name)
+	fmt.Printf("MetricSet registered: %s/%s", module, name)
 	return nil
 }
 
