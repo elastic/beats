@@ -25,7 +25,7 @@ Every event sent has the same base structure. It contains the following fields:
 * metricset: Name of the metricset that the data is from
 * module: Name of the module that the data is from
 * rtt: Round trip time of the request in microseconds
-* type: This is always "metricset" and the same for all metricset events
+* type: This is always "metricsets" and the same for all metricset events
 
 An example of an event can be seen below:
 ```
@@ -80,7 +80,7 @@ all metric events.
 Metricbeat is structured in modules and metricsets. Each module can contain one
 more multiple metricsets. The module is responsible for providing the basic
 logic for the specific service and the metricset for fetching the data from the
-service on the predefined period. An even is fetched on the predefined period
+service on the predefined period. An event is fetched on the predefined period
 not taking into account any delay. Depending on the metricset implementation it
 can happen that multiple requests are happening at the same time. Normally each
 metricset should exit after `timeout` to make sure not multiple events run in
