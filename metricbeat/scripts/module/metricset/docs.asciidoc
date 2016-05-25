@@ -1,0 +1,3 @@
+=== {module} {metricset} MetricSet
+
+This is the {metricset} Metricset of the module {module}.

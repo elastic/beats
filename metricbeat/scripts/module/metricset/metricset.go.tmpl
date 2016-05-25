@@ -1,0 +1,37 @@
+package {metricset}
+
+import (
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
+)
+
+func init() {
+	if err := mb.Registry.AddMetricSet("{module}", "{metricset}", New); err != nil {
+		panic(err)
+	}
+}
+
+type MetricSet struct {
+	mb.BaseMetricSet
+}
+
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+
+	config := struct{}{}
+
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	return &MetricSet{
+		BaseMetricSet: base,
+	}, nil
+}
+
+func (m *MetricSet) Fetch() (common.MapStr, error) {
+
+	event := common.MapStr{
+		"example": "{metricset} example",
+	}
+	return event, nil
+}
