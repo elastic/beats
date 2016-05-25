@@ -1,0 +1,7 @@
+<?page_header <b>PLEASE NOTE:</b> These docs are for a pre-GA version of Metricbeat, {version}.?>
+
+<abstract>
+    <simpara role="page_header">
+      These docs are for Metricbeat {version}, which has not yet reached GA.
+    </simpara>
+</abstract>
