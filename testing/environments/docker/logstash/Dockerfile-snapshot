@@ -3,7 +3,7 @@ FROM java:8-jre
 ENV LS_VERSION 5
 
 # As all snapshot builds have the same url, the image is cached. The date at then can be used to invalidate the image
-ENV DEB_URL https://s3-eu-west-1.amazonaws.com/build-eu.elasticsearch.org/logstash/master/nightly/JDK8/logstash-latest-SNAPSHOT.deb?20160421
+ENV DEB_URL https://s3-eu-west-1.amazonaws.com/build-eu.elasticsearch.org/logstash/master/nightly/JDK8/logstash-latest-SNAPSHOT.deb?20160525
 
 ENV PATH $PATH:/opt/logstash/bin:/opt/logstash/vendor/jruby/bin
 
