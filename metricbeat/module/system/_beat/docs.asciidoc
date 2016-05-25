@@ -1,2 +1,41 @@
 == System Module
 
+The system modules allows to monitor your servers. As the system modules always applies to the local
+server the `hosts` config option is not needed.
+
+[float]
+== Additional Config options
+
+The system module offers two additional config options.
+
+
+[float]
+=== processes
+
+The config option `processes: ['.*']` can be used if the `process` MetricSet is enabled. It allows to define a list
+of regexp expressions to filter the processes which are reported. By default all processes are reported.
+For more complex filtering, the filters configuration option should be used. An example config can look as following:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: system
+  metricsets: ["process"]
+  processes: ['.*']
+----
+
+
+[float]
+=== cpu_ticks
+
+For config option `cpu_ticks: false` can be used if the `cpu` or `core` MetricSet is enabled. If the config option
+`cpu_ticks` is enabled, not only cpu precentages stats will be reported but also the cpu ticks. An example config can
+be found below:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: system
+  metricsets: ["cpu", "core"]
+  cpu_ticks: true
+----

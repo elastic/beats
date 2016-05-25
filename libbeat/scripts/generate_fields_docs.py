@@ -9,6 +9,10 @@ def document_fields(output, section, sections, path):
     if "prefix" in section:
         output.write("{}\n".format(section["prefix"]))
 
+    # Intermediate level titles
+    if "description" in section and "prefix" not in section and "anchor" not in section:
+        output.write("[float]\n")
+
     if "description" in section:
         output.write("=== {} Fields\n\n".format(section["name"]))
         output.write("{}\n\n".format(section["description"]))
