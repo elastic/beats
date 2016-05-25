@@ -22,34 +22,49 @@ topbeat.procs: [".*"]
 include::../../libbeat/docs/filtering.asciidoc[]
 
 
-For example, the following filter configuration reduces the exported fields to include only `load`, `memory`,
-`swap`, and `cpu.user_p`, the percentage of CPU time spent in user space:
+For example, the following filters configuration reduces the exported fields to include only `load`, `memory`,
+`swap`, and `cpu`:
 
-[source, yaml]
+[source,yaml]
 -----------------------------------------------------
 filters:
  - include_fields:
-     fields: ["load", "mem", "swap", "cpu.user_p"]
+     fields: ["load", "mem", "swap", "cpu"]
 -----------------------------------------------------
 
-The following filter configuration drops all the swap information:
+The following filters configuration drops all the cpu information if cpu.user_p is lower than 50%.
 
-[source, yaml]
+[source,yaml]
 -----------------------------------------------------
 filters:
  - drop_fields:
-     fields: ["swap"]
------------------------------------------------------
-
-The following filter configuration uses multiple actions to keep the fields that contain CPU load percentages, but remove the fields that contain CPU ticks values:
-
-[source, yaml]
------------------------------------------------------
-filters:
- - include_fields:
+     range:
+       lt:
+         cpu.user_p: 0.5
      fields: ["cpu"]
- - drop_fields:
-     fields: ["cpu.user", "cpu.system"]
 -----------------------------------------------------
+
+You can drop the core information details if it's coming from a certain host:
+
+[source,yaml]
+---------
+filters:
+ - drop_fields:
+     equals:
+       host.hostname: "test"
+     fields["core"]
+---------
+
+To reduce the volume of `process` type documents, you can filter to export only those that have `proc.cpu.total_p >
+70%`:
+
+[source,yaml]
+--------
+filters:
+ - drop_event:
+     range:
+       gt:
+         proc.cpu.total_p: 0.7
+--------
 
 See <<configuration-filter,filter configuration options>> for more information.
