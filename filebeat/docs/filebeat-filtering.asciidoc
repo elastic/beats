@@ -29,14 +29,24 @@ See <<configuration-filebeat-options,Filebeat configuration options>> for more i
 
 include::../../libbeat/docs/filtering.asciidoc[]
 
-For example, the following filter configuration exports fewer fields (in this case, `message` and `source`) along
-with the mandatory fields.
+For example, the following filter configuration drops all the DEBUG messages.
 
-[source, yaml]
+[source,yaml]
 -----------------------------------------------------
 filters:
- - include_fields:
-     fields: ["message", "source"]
+ - drop_event:
+    regexp:
+      message: "^DBG:"
 -----------------------------------------------------
+
+To drop all the log messages coming from a certain log file:
+
+[source,yaml]
+----------------
+filters:
+ - drop_avent:
+    contains:
+     source: "test"
+----------------
 
 See <<configuration-filter,filter configuration options>> for more information.
