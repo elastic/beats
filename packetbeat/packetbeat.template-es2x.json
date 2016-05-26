@@ -93,7 +93,9 @@
               "type": "string"
             },
             "delivery-mode": {
-              "type": "integer"
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
             },
             "delivery-tag": {
               "type": "integer"
@@ -182,7 +184,9 @@
               "type": "string"
             },
             "routing-key": {
-              "type": "integer"
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
             },
             "timestamp": {
               "ignore_above": 1024,

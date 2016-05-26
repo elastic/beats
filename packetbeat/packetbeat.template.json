@@ -82,7 +82,8 @@
               "type": "keyword"
             },
             "delivery-mode": {
-              "type": "integer"
+              "ignore_above": 1024,
+              "type": "keyword"
             },
             "delivery-tag": {
               "type": "integer"
@@ -164,7 +165,8 @@
               "type": "keyword"
             },
             "routing-key": {
-              "type": "integer"
+              "ignore_above": 1024,
+              "type": "keyword"
             },
             "timestamp": {
               "ignore_above": 1024,
