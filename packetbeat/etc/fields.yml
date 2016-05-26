@@ -703,7 +703,7 @@
             The number of consumers of a queue.
 
         - name: routing-key
-          type: integer
+          type: keyword
           description: >
             Message routing key.
 
@@ -778,7 +778,7 @@
             Message header field table.
 
         - name: delivery-mode
-          type: integer
+          type: keyword
           description: >
             Non-persistent (1) or persistent (2).
 
@@ -1449,4 +1449,3 @@
         DOM to be loaded. In terms of the W3 Navigation Timing API, this is
         the difference between `domContentLoadedEnd` and
         `domContentLoadedStart`.
-
