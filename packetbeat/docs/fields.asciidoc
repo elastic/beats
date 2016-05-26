@@ -143,7 +143,7 @@ The number of consumers of a queue.
 
 ==== amqp.routing-key
 
-type: integer
+type: keyword
 
 Message routing key.
 
@@ -243,7 +243,7 @@ Message header field table.
 
 ==== amqp.delivery-mode
 
-type: integer
+type: keyword
 
 Non-persistent (1) or persistent (2).
 
