@@ -5,7 +5,7 @@ ENV ELASTICSEARCH_VERSION master
 
 
 COPY setup.sh /
-RUN bash setup.sh http://download.elastic.co/elasticsearch/staging/5.0.0-alpha3-b3a8c54/org/elasticsearch/distribution/deb/elasticsearch/5.0.0-alpha3/elasticsearch-5.0.0-alpha3.deb
+RUN bash setup.sh http://download.elastic.co/elasticsearch/staging/5.0.0-alpha3-cad959b/org/elasticsearch/distribution/deb/elasticsearch/5.0.0-alpha3/elasticsearch-5.0.0-alpha3.deb
 
 ENV PATH /usr/share/elasticsearch/bin:$PATH
 
@@ -16,7 +16,7 @@ VOLUME /usr/share/elasticsearch/data
 ENV ES_JAVA_OPTS="-Xms512m -Xmx512m"
 
 # Shield currently not enabled
-#RUN elasticsearch-plugin install -Des.plugins.staging=true x-pack
+#ES_JAVA_OPTS="-Des.plugins.staging=true" elasticsearch-plugin install x-pack
 
 COPY docker-entrypoint.sh /
 
