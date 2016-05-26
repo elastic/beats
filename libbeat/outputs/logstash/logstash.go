@@ -68,14 +68,23 @@ func (lj *logstash) init(cfg *common.Config) error {
 		Proxy:   &config.Proxy,
 		TLS:     tls,
 	}
-	clients, err := modeutil.MakeClients(cfg, makeClientFactory(&config, transp))
-	if err != nil {
-		return err
-	}
 
 	logp.Info("Max Retries set to: %v", sendRetries)
-	m, err := modeutil.NewConnectionMode(clients, !config.LoadBalance,
-		maxAttempts, defaultWaitRetry, config.Timeout, defaultMaxWaitRetry)
+	var m mode.ConnectionMode
+	if config.Pipelining == 0 {
+		clients, err := modeutil.MakeClients(cfg, makeClientFactory(&config, transp))
+		if err == nil {
+			m, err = modeutil.NewConnectionMode(clients, !config.LoadBalance,
+				maxAttempts, defaultWaitRetry, config.Timeout, defaultMaxWaitRetry)
+		}
+	} else {
+		clients, err := modeutil.MakeAsyncClients(cfg,
+			makeAsyncClientFactory(&config, transp))
+		if err == nil {
+			m, err = modeutil.NewAsyncConnectionMode(clients, !config.LoadBalance,
+				maxAttempts, defaultWaitRetry, config.Timeout, defaultMaxWaitRetry)
+		}
+	}
 	if err != nil {
 		return err
 	}
@@ -100,6 +109,24 @@ func makeClientFactory(
 			return nil, err
 		}
 		return newLumberjackClient(t, compressLvl, maxBulkSz, to, cfg.Index)
+	}
+}
+
+func makeAsyncClientFactory(
+	cfg *logstashConfig,
+	tcfg *transport.Config,
+) modeutil.AsyncClientFactory {
+	compressLvl := cfg.CompressionLevel
+	maxBulkSz := cfg.BulkMaxSize
+	queueSize := cfg.Pipelining - 1
+	to := cfg.Timeout
+
+	return func(host string) (mode.AsyncProtocolClient, error) {
+		t, err := transport.NewClient(tcfg, "tcp", host, cfg.Port)
+		if err != nil {
+			return nil, err
+		}
+		return newAsyncLumberjackClient(t, queueSize, compressLvl, maxBulkSz, to, cfg.Index)
 	}
 }
 
