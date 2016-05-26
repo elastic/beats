@@ -23,6 +23,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/system/filesystem"
 	_ "github.com/elastic/beats/metricbeat/module/system/fsstat"
 	_ "github.com/elastic/beats/metricbeat/module/system/memory"
+	_ "github.com/elastic/beats/metricbeat/module/system/network"
 	_ "github.com/elastic/beats/metricbeat/module/system/process"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper/mntr"

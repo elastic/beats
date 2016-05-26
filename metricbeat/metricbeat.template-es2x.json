@@ -914,6 +914,39 @@
                 }
               }
             },
+            "network": {
+              "properties": {
+                "bytes_recv": {
+                  "type": "long"
+                },
+                "bytes_sent": {
+                  "type": "long"
+                },
+                "dropin": {
+                  "type": "long"
+                },
+                "dropout": {
+                  "type": "long"
+                },
+                "errin": {
+                  "type": "long"
+                },
+                "errout": {
+                  "type": "long"
+                },
+                "name": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "packets_recv": {
+                  "type": "long"
+                },
+                "packets_sent": {
+                  "type": "long"
+                }
+              }
+            },
             "process": {
               "properties": {
                 "cmdline": {
