@@ -47,5 +47,9 @@ The following MetricSets are available:
 
 * <<metricbeat-metricset-redis-info,info>>
 
+* <<metricbeat-metricset-redis-keyspace,keyspace>>
+
 include::redis/info.asciidoc[]
+
+include::redis/keyspace.asciidoc[]
 

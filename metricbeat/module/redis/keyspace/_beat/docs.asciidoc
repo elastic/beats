@@ -1,0 +1,5 @@
+=== Redis Keyspace MetricSet
+
+The Redis Keyspace MetricSet collects information about the Redis keyspaces.
+For each keyspace and event is sent to elasticsearch.
+The keyspace information is fetched from the http://redis.io/commands/INFO[`INFO`] command.

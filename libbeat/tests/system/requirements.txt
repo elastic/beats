@@ -3,3 +3,4 @@ nose
 jinja2
 PyYAML
 nose-timer
+redis
