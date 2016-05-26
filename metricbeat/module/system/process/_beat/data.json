@@ -1,32 +1,33 @@
 {
-    "@timestamp":"2016-05-11T07:14:09.051Z",
-    "beat":{
-        "hostname":"host.example.com",
-        "name":"host.example.com"
-    },
-    "metricset":"process",
-    "module":"system",
-    "rtt":10319,
-    "system-process":{
-        "cmdline":"/Applications/Docker.app/Contents/Resources/bin/http2client {\"action\":\"vmstateevent\",\"args\":{\"vmstate\":\"running\"}}",
-        "cpu":{
-            "start_time":"09:14",
-            "system":7,
-            "total":10,
-            "total_p":0,
-            "user":3
-        },
-        "mem":{
-            "rss":3756032,
-            "rss_p":0.0002,
-            "share":0,
-            "size":587175944192
-        },
-        "name":"http2client",
-        "pid":46325,
-        "ppid":67118,
-        "state":"running",
-        "username":"ruflin"
-    },
-    "type":"metricsets"
+  "@timestamp": "2016-05-25T20:57:51.854Z",
+  "beat": {
+    "hostname": "host.example.com",
+    "name": "host.example.com"
+  },
+  "metricset": {
+    "module": "system",
+    "name": "process",
+    "rtt": 12269
+  },
+  "system": {
+    "process": {
+      "cmdline": "/System/Library/CoreServices/ReportCrash",
+      "cpu": {
+        "start_time": "22:57",
+        "total_p": 0
+      },
+      "mem": {
+        "rss": 27123712,
+        "rss_p": 0.0016,
+        "share": 0,
+        "size": 2577522688
+      },
+      "name": "ReportCrash",
+      "pid": 97801,
+      "ppid": 1,
+      "state": "running",
+      "username": "elastic"
+    }
+  },
+  "type": "metricsets"
 }
