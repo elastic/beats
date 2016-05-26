@@ -26,7 +26,7 @@ func (w *window) get() int {
 // (window size grows exponentially)
 // TODO: use duration until ACK to estimate an ok max window size value
 func (w *window) tryGrowWindow(batchSize int) {
-	windowSize := int(w.windowSize)
+	windowSize := w.get()
 
 	if windowSize <= batchSize {
 		if w.maxOkWindowSize < windowSize {
@@ -62,7 +62,7 @@ func (w *window) tryGrowWindow(batchSize int) {
 }
 
 func (w *window) shrinkWindow() {
-	windowSize := int(w.windowSize)
+	windowSize := w.get()
 	orig := windowSize
 
 	windowSize = windowSize / 2

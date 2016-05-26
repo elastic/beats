@@ -218,6 +218,10 @@ output.elasticsearch:
   # Optional load balance the events between the Logstash hosts
   #loadbalance: true
 
+  # Number of batches to be send asynchronously to logstash while processing
+  # new batches.
+  #pipelining: 0
+
   # Optional index name. The default index name is set to name of the beat
   # in all lowercase.
   #index: topbeat

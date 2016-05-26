@@ -8,6 +8,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type encoder struct {
@@ -16,6 +17,44 @@ type encoder struct {
 }
 
 var hex = "0123456789abcdef"
+
+func makeLogstashEventEncoder(beat string) (func(interface{}) ([]byte, error), error) {
+	enc := encoder{buf: bytes.NewBuffer(nil)}
+
+	beatName, err := json.Marshal(beat)
+	if err != nil {
+		return nil, err
+	}
+
+	cb := func(rawEvent interface{}) ([]byte, error) {
+		event := rawEvent.(common.MapStr)
+		buf := enc.buf
+		buf.Reset()
+
+		buf.WriteRune('{')
+		if _, hasMeta := event["@metadata"]; !hasMeta {
+			typ := event["type"].(string)
+			buf.WriteString(`"@metadata":{"type":`)
+			encodeString(buf, typ)
+		}
+
+		buf.WriteString(`,"beat":`)
+		buf.Write(beatName)
+		buf.WriteString(`},`)
+		err := enc.encodeKeyValues(event)
+		if err != nil {
+			logp.Err("jsonEncode failed with: %v", err)
+			return nil, err
+		}
+
+		b := buf.Bytes()
+		b[len(b)-1] = '}'
+
+		return buf.Bytes(), nil
+	}
+
+	return cb, nil
+}
 
 func (enc *encoder) encodeKeyValues(event common.MapStr) error {
 	buf := enc.buf
