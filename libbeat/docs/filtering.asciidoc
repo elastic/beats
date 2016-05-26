@@ -13,5 +13,4 @@ Generic filtering is available to all Beats through libbeat. With generic filter
 fields that are exported by the Beat by defining a list of filter actions that are applied to each event before it's
 sent to the defined output. The filter actions are executed in the order that they are defined in the config file.
 
-The supported actions are <<include-fields,`include_fields`>> and <<drop-fields,`drop_fields`>>. You set these actions in the `filters` section of
-the {beatname_uc} config file.
+You can define the filter actions under the `filters` section of the {beatname_uc} configuration file.

@@ -26,7 +26,8 @@ metricbeat.modules:
   hosts: ["127.0.0.1:6379"]
   enabled: true
   filters:
-    - include_fields.fields: ['redis.info.memory']
+    - include_fields:
+       fields: ['redis.info.memory']
 ----
 
 [[generic-filtering-overview-metricbeat]]
@@ -34,13 +35,14 @@ metricbeat.modules:
 
 include::../../libbeat/docs/filtering.asciidoc[]
 
-For example, the following filter configuration reduces the exported fields by
-dropping the `beat.name` field from all documents.
+For example, the following filters configuration reduces the exported fields by
+dropping the `beat.name` and `beat.hostname` fields under `beat`, from all documents.
 
 [source, yaml]
 ----
 filters:
- - drop_fields.fields: ['beat.name']
+ - drop_fields:
+    fields: ['beat']
 ----
 
 See <<configuration-filter,filter configuration options>> for more information.

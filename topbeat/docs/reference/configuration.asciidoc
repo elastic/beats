@@ -20,6 +20,7 @@ configuration settings, you need to restart Topbeat to pick up the changes.
 * <<configuration-path>>
 * <<configuration-logging>>
 * <<configuration-run-options>>
+* <<filtering-data>>
 
 include::configuration/topbeat-options.asciidoc[]
 

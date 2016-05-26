@@ -13,55 +13,190 @@
 [[configuration-filter]]
 === Filter
 
-You can set options in the `filters` section of the {beatname_uc} config file to reduce the number of fields that are
-exported by the Beat. See <<exported-fields>> for the full list of possible fields.
+You can set a list of filter actions in the `filters` section of the {beatname_uc} config file to reduce the number of fields that are
+exported by the Beat. 
 
-The filter actions that you specify are applied to each event before it's sent to the defined output. You can define
-multiple filter actions. The filter actions are executed in the order that they're defined in the config file.
+If more filtering rules are defined, then they are executed in the order they are defined. The initial event is passed to the first filtering rule and what results from it is passed to the second filtering rule until all the filtering rules are applied. The condition that is used in the following filtering rules is running against the event that is received as input and it might defer from the original event.
 
-==== Filter Options
+[source,yaml]
+-------
+event -> filter action 1 -> event1 -> filter action 2 -> event2 ...
+-------
 
-You can specify the following options under the `filters` section:
+See <<exported-fields>> for the full list of possible fields.
+
+Each filter action receives a condition and optionally a set of arguments. The action is executed only if the condition
+is fulfilled.
+
+[source,yaml]
+------
+filters:
+ - action1:
+     condition1
+     [arguments]
+ - action2:
+     condition2
+	 [arguments]
+...
+
+------
+
+See <<filtering-data>> for specific {beatname_uc} examples.
+
+[[filtering-condition]]
+==== Filtering condition
+
+Each condition receives a field to compare or multiple fields under the same condition and then `AND` is used between
+them. You can see a list of the <<exported-fields,`exported fields`>>. 
+
+For each field, you can specify a simple field name or a nested map, for example `dns.question.name`.
+
+[source,yaml]
+----
+condition:
+  field1: value1
+  [field2: value2]
+  ...
+----
+
+Supported conditions are:
+
+* <<condition-equals,`equals`>>
+* <<condition-contains,`contains`>>
+* <<condition-regexp,`regexp`>>
+* <<condition-range, `range`>>
+
+
+[[condition-equals]]
+===== equals
+
+With the `equals` condition, you can compare if a field have a certain value. It accepts only an integer or a string
+value.
+
+For example, the following condition checks if the response code of the HTTP transaction is 200:
+
+[source,yaml]
+-------
+equals:
+  http.code: 200
+-------
+
+[[condition-contains]]
+===== contains
+
+The `contains` condition checks if value is part of the field. It accepts only a string as value.
+
+For example, the following condition checks if an error is part of the transaction status:
+
+[source,yaml]
+------
+contains:
+  status: "Specific error"
+------
+
+
+[[condition-regexp]]
+===== regexp
+
+The `regexp` condition checks the field against a regular expression. It accepts only strings.
+
+For example, the following condition checks if the process name contains `foo`:
+
+[source,yaml]]
+-----
+reqexp:
+  proc.name: "foo.*"
+-----
+
+[[condition-range]]
+===== range
+
+The `range` condition checks if the field is in a certain range frame. It supports `lt`, `lte`, `gt` and `gte`. As
+values, it accepts integers or float.
+
+For example, the following condition checks for the status of the transaction by comparing the `proc.code` field with
+300.
+
+
+[source,yaml]
+------
+range:
+  gte:
+    proc.code: 300
+------
+
+NOTE: The `range` condition accepts only one `gte`, one `gt`, one `lt` and one `lte` condition.
+
+For example, the following condition checks if the CPU usage in percentage has a value between 0.5 and 0.8.
+
+[source,yaml]
+------
+range:
+  gte:
+    cpu.user_p: 0.5
+  lt:
+    cpu.user_p: 0.8
+------
+
+==== Filtering Actions
+
+The supported filter actions are:
+
+ * <<include-fields,`include_fields`>>
+ * <<drop-fields,`drop_fields`>>
+ * <<drop-event,`drop_event`>>
+
 
 [[include-fields]]
 ===== include_fields
 
-The `include_fields` action specifies the list of fields to export. For each field, you can specify a simple field
-name, or a nested map. For example, if you specify `dns.question.name`, the Beat exports only the `name` field
-because it's a simple field. If you specify `dns.question`, the Beat exports all the fields nested under
-`dns.question`.
+The `include_fields` action specifies what fields to export if a certain condition is fulfilled. The condition is
+optional and if it's missing then the defined fields are always exported. The `@timestamp` and
+`type` fields are always exported, even if they are not defined in the `include_fields` list.
 
-Example configuration:
-
-[source, yaml]
------------------------------------------------------
+[source,yaml]
+-------
 filters:
  - include_fields:
-     fields: ["field_A", "field_B", "field_C"]
------------------------------------------------------
+     [condition]
+     fields: ["field1", "field2", ...]
+-------
 
-If `include_fields` is not specified, all fields are exported by default.
+You can specify more `include_fields` actions under the filtering section.
 
-See <<filtering-data>> for specific {beatname_uc} examples.
 
-NOTE: If you specify an empty list for `include_fields`, only the required fields, `@timestamp` and `type`, are
+NOTE: If you define an empty list of fields under `include_fields`, then only the required fields, `@timestamp` and `type`, are
 exported.
+
 
 [[drop-fields]]
 ===== drop_fields
 
-The `drop_fields` action defines a list of fields to drop. For each field, you can specify a simple field name, or a
-nested map. For example, if you specify `dns.question.name`, the Beat drops only the `name` field because it's a
-simple field. If you specify `dns.question`, the Beat drops all the fields nested under `dns.question`. Some fields,
-such as `@timestamp` and `type`, are mandatory and cannot be removed because they are required by the outputs.
+The `drop_fields` action specifies what fields to drop if a certain condition is fulfilled. The condition is optional
+and if it's missing then the defined fields are always dropped. The `@timestamp` and `type` fields cannot be dropped,
+even if they show up in the `drop_fields` list.
 
-Example configuration:
-
-[source, yaml]
+[source,yaml]
 -----------------------------------------------------
 filters:
  - drop_fields:
-     fields: ["field_A"]
+     [condition]
+     fields: ["field1", "field2", ...]
 -----------------------------------------------------
 
-See <<filtering-data>> for specific {beatname_uc} examples.
+NOTE: If you define an empty list of fields under `drop_fields`, then no fields are dropped.
+
+
+[[drop-event]]
+===== drop_event
+
+The `drop_event` action drops the entire event if the associated condition is fulfilled. The condition is mandatory, as
+without one all the events are dropped.
+
+[source,yaml]
+------
+filters:
+ - drop_event:
+     condition
+------
+
