@@ -62,8 +62,6 @@ on what should be documented, check the existing documented modules.
 TODO: Add details on how to create dashboards
 
 
-
-
 include::./create-metricset.asciidoc[]
 
 include::./testing.asciidoc[]
