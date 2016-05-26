@@ -198,7 +198,7 @@ testsuite:
 	# Runs system tests if SYSTEM_TESTS is set to true
 	if [ $(SYSTEM_TESTS) = true ]; then \
 		if [ $(TEST_ENVIRONMENT) = true ]; then \
-			${DOCKER_COMPOSE} run beat make system-tests; \
+			$(MAKE) system-tests-environment; \
 		else \
 			$(MAKE) system-tests; \
 		fi \
