@@ -33,7 +33,7 @@ For example, the following filter configuration drops all the DEBUG messages.
 
 [source,yaml]
 -----------------------------------------------------
-filter:
+filters:
  - drop_event:
     regexp:
       message: "^DBG:"
@@ -43,7 +43,7 @@ To drop all the log messages coming from a certain log file:
 
 [source,yaml]
 ----------------
-filter:
+filters:
  - drop_avent:
     contains:
      source: "test"
