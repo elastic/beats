@@ -1,27 +1,32 @@
 /*
-Package fsstats provides a MetricSet for fetching aggregated filesystem stats.
+Package fsstat provides a MetricSet for fetching aggregated filesystem stats.
 
 An example event looks as following:
 
-	{
-	  "@timestamp": "2016-05-03T15:11:04.610Z",
-	  "beat": {
-	    "hostname": "ruflin",
-	    "name": "ruflin"
-	  },
-	  "metricset": "fsstats",
-	  "module": "system",
-	  "rtt": 84,
-	  "system-fsstats": {
-	    "count": 4,
-	    "total_files": 60982450,
-	    "total_size": {
-	      "free": 32586960896,
-	      "total": 249779548160,
-	      "used": 217192587264
-	    }
-	  },
-	  "type": "metricsets"
-	}
+{
+  "@timestamp": "2016-05-25T19:47:57.216Z",
+  "beat": {
+    "hostname": "host.example.com",
+    "name": "host.example.com"
+  },
+  "metricset": {
+    "module": "system",
+    "name": "fsstat",
+    "rtt": 119
+  },
+  "system": {
+    "fsstat": {
+      "count": 4,
+      "total_files": 60982408,
+      "total_size": {
+        "free": 14127017984,
+        "total": 249779535360,
+        "used": 235652517376
+      }
+    }
+  },
+  "type": "metricsets"
+}
+
 */
 package fsstat
