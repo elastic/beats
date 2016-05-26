@@ -125,8 +125,7 @@ range:
     proc.code: 300
 ------
 
-NOTE: You cannot define two operators of the same time (like `gte`), but you can define two different operators under
-the same `range` in order to define an interval.
+NOTE: The `range` condition accepts only one `gte`, one `gt`, one `lt` and one `lte` condition.
 
 For example, the following condition checks if the CPU usage in percentage has a value between 0.5 and 0.8.
 

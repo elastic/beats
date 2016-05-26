@@ -46,7 +46,7 @@ If you would like to drop all the successful transactions, you can use the follo
 [source,yaml]
 ------------
 filters:
-  - drop_event:
+ - drop_event:
      equals:
        http.code: 200
 -----------
@@ -56,7 +56,7 @@ If you don't want to export raw data for the successful transactions:
 [source,yaml]
 ------------
 filters:
-  - drop_fields:
+ - drop_fields:
      equals:
        http.code: 200
      fields: ["request", "response"]
