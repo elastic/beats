@@ -8,7 +8,71 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.0.0-alpha2...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Topbeat*
+
+*Filebeat*
+
+*Winlogbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Topbeat*
+
+*Filebeat*
+
+*Winlogbeat*
+
+==== Added
+
+
+*Affecting all Beats*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Topbeat*
+
+*Filebeat*
+
+*Winlogbeat*
+
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+*Packetbeat*
+
+*Topbeat*
+
+*Filebeat*
+
+*Winlogbeat*
+
+////////////////////////////////////////////////////////////
+
+[[release-notes-5.0.0-alpha3]]
+=== Beats version 5.0.0-alpha3
+https://github.com/elastic/beats/compare/v5.0.0alpha2...v5.0.0-alpha3[View commits]
 
 ==== Breaking changes
 
@@ -20,27 +84,19 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha2...master[Check the HEAD d
 *Packetbeat*
 
 *Topbeat*
+
 - Export CPU stats per core in type=core documents instead of type=system documents. {pull}1705[1705]
 - Export CPU usage in percentage and optionally the values in ticks if `cpu_ticks` option is enabled. {pull}1705[1705]
 
 *Filebeat*
 
-- The state for files which fall under ignore_older is not stored anymore. This has the consequence, that if a file which fell under ignore_older is updated, the hole file will be crawled.
-
-*Winlogbeat*
-
+- The state for files which fall under ignore_older is not stored anymore. This has the consequence, that if a file which fell under ignore_older is updated, the whole file will be crawled.
 
 ==== Bugfixes
-
-*Affecting all Beats*
-
-*Packetbeat*
 
 *Topbeat*
 
 - Fixed high CPU usage when using filtering under Windows. {pull}1562[1562]
-
-*Filebeat*
 
 *Winlogbeat*
 
@@ -50,34 +106,21 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Add conditions to generic filtering {pull}1623[1623]
+- Add conditions to generic filtering. {pull}1623[1623]
 
-*Packetbeat*
+*Metricbeat*
 
-*Topbeat*
+- First public release, containing the following modules: apache, mysql, nginx, redis, system and zookeeper
 
 *Filebeat*
+
 - The registry format was changed to an array instead of dict. The migration to the new format will happen automatically at the first startup. {pull}1703[1703]
-
-*Winlogbeat*
-
-
 
 ==== Deprecated
 
 *Affecting all Beats*
 
 - The support for doing GeoIP lookups is deprecated and will be removed in version 6.0. {pull}1601[1601]
-
-*Packetbeat*
-
-*Topbeat*
-
-*Filebeat*
-
-*Winlogbeat*
-
-////////////////////////////////////////////////////////////
 
 [[release-notes-1.2.3]]
 === Beats version 1.2.3
