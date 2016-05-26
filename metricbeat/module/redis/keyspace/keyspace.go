@@ -1,4 +1,4 @@
-package info
+package keyspace
 
 import (
 	"time"
@@ -6,17 +6,17 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/redis"
 
+	"github.com/elastic/beats/metricbeat/module/redis"
 	rd "github.com/garyburd/redigo/redis"
 )
 
 var (
-	debugf = logp.MakeDebug("redis-info")
+	debugf = logp.MakeDebug("redis-keyspace")
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("redis", "info", New); err != nil {
+	if err := mb.Registry.AddMetricSet("redis", "keyspace", New); err != nil {
 		panic(err)
 	}
 }
@@ -53,13 +53,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches metrics from Redis by issuing the INFO command.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	// Fetch default INFO.
-	info, err := redis.FetchRedisInfo("default", m.pool.Get())
+	info, err := redis.FetchRedisInfo("keyspace", m.pool.Get())
 	if err != nil {
 		return nil, err
 	}
 
 	debugf("Redis INFO from %s: %+v", m.Host(), info)
-	return eventMapping(info), nil
+	return eventsMapping(info), nil
 }

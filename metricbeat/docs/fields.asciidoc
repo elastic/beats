@@ -1173,6 +1173,39 @@ type: integer
 
 None
 
+=== keyspace Fields
+
+`keyspace` contains the information about the keyspaces returned by the `INFO` command.
+
+
+
+==== redis.keyspace.id
+
+type: keyword
+
+Keyspace identifier
+
+
+==== redis.keyspace.avg_ttl
+
+type: long
+
+Average ttl
+
+
+==== redis.keyspace.keys
+
+type: long
+
+Number of keys in the keyspace
+
+
+==== redis.keyspace.expires
+
+type: long
+
+
+
 [[exported-fields-system]]
 === System Status Fields
 

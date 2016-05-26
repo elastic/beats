@@ -651,6 +651,24 @@
                   }
                 }
               }
+            },
+            "keyspace": {
+              "properties": {
+                "avg_ttl": {
+                  "type": "long"
+                },
+                "expires": {
+                  "type": "long"
+                },
+                "id": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "keys": {
+                  "type": "long"
+                }
+              }
             }
           }
         },
