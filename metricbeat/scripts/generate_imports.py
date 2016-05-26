@@ -15,7 +15,7 @@ import (
 """
 
 
-def generate():
+def generate(go_beat_path):
 
     base_dir = "module"
     path = os.path.abspath("module")
@@ -27,14 +27,14 @@ def generate():
         if os.path.isfile(path + "/" + module) or module == "_beat":
             continue
 
-        list_file += '	_ "github.com/elastic/beats/metricbeat/module/' + module + '"\n'
+        list_file += '	_ "' + go_beat_path + '/module/' + module + '"\n'
 
         # Fetch all metricsets
         for metricset in os.listdir(base_dir + "/" + module):
             if os.path.isfile(base_dir + "/" + module + "/" + metricset) or metricset == "_beat" or metricset == "vendor":
                 continue
 
-            list_file += '	_ "github.com/elastic/beats/metricbeat/module/' + module + '/' + metricset + '"\n'
+            list_file += '	_ "' + go_beat_path + '/module/' + module + '/' + metricset + '"\n'
 
 
     list_file += ")"
@@ -43,7 +43,13 @@ def generate():
     print list_file
 
 if __name__ == "__main__":
-    generate()
 
+    # Fetches GOPATH and current execution directory. It is expected to run this script from the Makefile.
+    gopath = os.environ['GOPATH']
+    path = os.path.abspath("./")
 
+    # Removes the gopath + /src/ from the directory name to fetch the path
+    go_beat_path = path[len(gopath)+5:]
 
+    #print go_beat_path
+    generate(go_beat_path)
