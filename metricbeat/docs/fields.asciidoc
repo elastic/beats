@@ -1619,14 +1619,14 @@ type: long
 The total disk space in bytes.
 
 
-==== system.filesystem.used
+==== system.filesystem.used.bytes
 
 type: long
 
 The used disk space in bytes.
 
 
-==== system.filesystem.used_p
+==== system.filesystem.used.pct
 
 type: float
 

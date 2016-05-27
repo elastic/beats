@@ -19,8 +19,8 @@ SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
                       "write.bytes", "read.time", "write.time", "io.time"]
 
 SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
-                            "free_files", "mount_point", "total", "used",
-                            "used_p"]
+                            "free_files", "mount_point", "total", "used.bytes",
+                            "used.pct"]
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
@@ -194,7 +194,7 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             filesystem = evt["system"]["filesystem"]
-            self.assertItemsEqual(SYSTEM_FILESYSTEM_FIELDS, filesystem.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_FILESYSTEM_FIELDS), filesystem.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
     def test_fsstat(self):

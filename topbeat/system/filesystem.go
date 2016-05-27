@@ -78,12 +78,14 @@ func GetFilesystemEvent(fsStat *FileSystemStat) common.MapStr {
 		"device_name": fsStat.DevName,
 		"mount_point": fsStat.Mount,
 		"total":       fsStat.Total,
-		"used":        fsStat.Used,
 		"free":        fsStat.Free,
 		"avail":       fsStat.Avail,
 		"files":       fsStat.Files,
 		"free_files":  fsStat.FreeFiles,
-		"used_p":      fsStat.UsedPercent,
+		"used": common.MapStr{
+			"pct":   fsStat.UsedPercent,
+			"bytes": fsStat.Used,
+		},
 	}
 }
 
