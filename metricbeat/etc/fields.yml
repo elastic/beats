@@ -1055,11 +1055,11 @@
               type: long
               description: >
                 The total disk space in bytes.
-            - name: used
+            - name: used.bytes
               type: long
               description: >
                 The used disk space in bytes.
-            - name: used_p
+            - name: used.pct
               type: float
               description: >
                 The percentage of used disk space.
