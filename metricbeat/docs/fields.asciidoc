@@ -1514,49 +1514,49 @@ type: keyword
 The disk's serial number. This may not be provided by all operating systems.
 
 
-==== system.disk.read_count
+==== system.disk.read.count
 
 type: long
 
 This is the total number of reads completed successfully.
 
 
-==== system.disk.write_count
+==== system.disk.write.count
 
 type: long
 
 This is the total number of writes completed successfully.
 
 
-==== system.disk.read_bytes
+==== system.disk.read.bytes
 
 type: long
 
 This is the total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
 
 
-==== system.disk.write_bytes
+==== system.disk.write.bytes
 
 type: long
 
 This is the total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
 
 
-==== system.disk.read_time
+==== system.disk.read.time
 
 type: long
 
 This is the total number of milliseconds spent by all reads.
 
 
-==== system.disk.write_time
+==== system.disk.write.time
 
 type: long
 
 This is the total number of milliseconds spent by all writes.
 
 
-==== system.disk.io_time
+==== system.disk.io.time
 
 type: long
 

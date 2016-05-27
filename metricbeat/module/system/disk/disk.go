@@ -36,14 +36,20 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	events := make([]common.MapStr, 0, len(stats))
 	for _, counters := range stats {
 		event := common.MapStr{
-			"name":        counters.Name,
-			"read_count":  counters.ReadCount,
-			"write_count": counters.WriteCount,
-			"read_bytes":  counters.ReadBytes,
-			"write_bytes": counters.WriteBytes,
-			"read_time":   counters.ReadTime,
-			"write_time":  counters.WriteTime,
-			"io_time":     counters.IoTime,
+			"name": counters.Name,
+			"read": common.MapStr{
+				"count": counters.ReadCount,
+				"time":  counters.ReadTime,
+				"bytes": counters.ReadBytes,
+			},
+			"write": common.MapStr{
+				"count": counters.WriteCount,
+				"time":  counters.WriteTime,
+				"bytes": counters.WriteBytes,
+			},
+			"io": common.MapStr{
+				"time": counters.IoTime,
+			},
 		}
 		events = append(events, event)
 

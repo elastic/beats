@@ -15,8 +15,8 @@ SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
 SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
                "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks"]
 
-SYSTEM_DISK_FIELDS = ["name", "read_count", "write_count", "read_bytes",
-                      "write_bytes", "read_time", "write_time", "io_time"]
+SYSTEM_DISK_FIELDS = ["name", "read.count", "write.count", "read.bytes",
+                      "write.bytes", "read.time", "write.time", "io.time"]
 
 SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
                             "free_files", "mount_point", "total", "used",
@@ -168,7 +168,7 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             disk = evt["system"]["disk"]
-            self.assertItemsEqual(SYSTEM_DISK_FIELDS, disk.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_DISK_FIELDS), disk.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
     def test_filesystem(self):
