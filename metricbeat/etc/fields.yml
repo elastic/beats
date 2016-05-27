@@ -1103,7 +1103,7 @@
               description: >
                 Total memory.
 
-            - name: used
+            - name: used.bytes
               type: long
               description: >
                 Used memory.
@@ -1113,12 +1113,12 @@
               description: >
                 Available memory.
 
-            - name: used_pct
+            - name: used.pct
               type: float
               description: >
                 The percentage of used memory.
 
-            - name: actual.used
+            - name: actual.used.bytes
               type: long
               description: >
                 Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
@@ -1130,7 +1130,7 @@
                 Actual available memory. This value is the "free" memory plus the memory used for disk caches and
                 buffers. Available only on Unix.
 
-            - name: actual.used_pct
+            - name: actual.used.pct
               type: float
               description: >
                 The percentage of actual used memory.
@@ -1145,7 +1145,7 @@
                   description: >
                     Total swap memory.
 
-                - name: used
+                - name: used.bytes
                   type: long
                   description: >
                     Used swap memory.
@@ -1155,7 +1155,7 @@
                   description: >
                     Available swap memory.
 
-                - name: used_pct
+                - name: used.pct
                   type: float
                   description: >
                     The percentage of used swap memory.
@@ -1252,7 +1252,7 @@
                   type: long
                   description: >
                     The amount of CPU time the process spent in user space.
-                - name: total_pct
+                - name: total.pct
                   type: float
                   description: >
                     The percentage of CPU time spent by the process since the last update. Its value is similar with the
@@ -1261,7 +1261,7 @@
                   type: long
                   description: >
                     The amount of CPU time the process spent in kernel space.
-                - name: total
+                - name: total.ticks
                   type: long
                   description: >
                     The total CPU time spent by the process.
@@ -1269,7 +1269,7 @@
                   type: keyword
                   description: >
                     The time when the process was started. Example: "17:45".
-            - name: mem
+            - name: memory
               type: group
               description: Memory-specific statistics per process.
               prefix: "[float]"
@@ -1278,11 +1278,11 @@
                   type: long
                   description: >
                     The total virtual memory the process has.
-                - name: rss
+                - name: rss.bytes
                   type: long
                   description: >
                     The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
-                - name: rss_pct
+                - name: rss.pct
                   type: float
                   description: >
                     The percentage of memory the process occupied in main memory (RAM).

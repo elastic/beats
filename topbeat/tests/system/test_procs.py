@@ -44,8 +44,8 @@ class Test(BaseTest):
             assert type(output[key]) is int
 
         for key in [
-            "proc.cpu.total_pct",
-            "proc.mem.rss_pct",
+            "proc.cpu.total.pct",
+            "proc.mem.rss.pct",
         ]:
             assert type(output[key]) in [int, float]
 
@@ -69,8 +69,8 @@ class Test(BaseTest):
         for key in [
             "proc.pid",
             "proc.ppid",
-            "proc.cpu.total_pct",
-            "proc.cpu.total",
+            "proc.cpu.total.pct",
+            "proc.cpu.total.ticks",
             "proc.cpu.user",
             "proc.cpu.system",
             "proc.cpu.start_time",

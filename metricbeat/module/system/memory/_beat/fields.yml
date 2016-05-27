@@ -8,7 +8,7 @@
       description: >
         Total memory.
 
-    - name: used
+    - name: used.bytes
       type: long
       description: >
         Used memory.
@@ -18,12 +18,12 @@
       description: >
         Available memory.
 
-    - name: used_pct
+    - name: used.pct
       type: float
       description: >
         The percentage of used memory.
 
-    - name: actual.used
+    - name: actual.used.bytes
       type: long
       description: >
         Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
@@ -35,7 +35,7 @@
         Actual available memory. This value is the "free" memory plus the memory used for disk caches and
         buffers. Available only on Unix.
 
-    - name: actual.used_pct
+    - name: actual.used.pct
       type: float
       description: >
         The percentage of actual used memory.
@@ -50,7 +50,7 @@
           description: >
             Total swap memory.
 
-        - name: used
+        - name: used.bytes
           type: long
           description: >
             Used swap memory.
@@ -60,7 +60,7 @@
           description: >
             Available swap memory.
 
-        - name: used_pct
+        - name: used.pct
           type: float
           description: >
             The percentage of used swap memory.

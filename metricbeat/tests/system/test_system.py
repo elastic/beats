@@ -24,12 +24,12 @@ SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
-SYSTEM_MEMORY_FIELDS = ["swap", "actual", "free", "total", "used", "used_pct"]
+SYSTEM_MEMORY_FIELDS = ["swap", "actual", "free", "total", "used.bytes", "used.pct"]
 
 SYSTEM_NETWORK_FIELDS = ["name", "sent.bytes", "received.bytes", "sent.packets",
                          "received.packets", "in.error", "out.error", "in.dropeed", "out.dropped"]
 
-SYSTEM_PROCESS_FIELDS = ["cmdline", "cpu", "mem", "name", "pid", "ppid",
+SYSTEM_PROCESS_FIELDS = ["cmdline", "cpu", "memory", "name", "pid", "ppid",
                          "state", "username"]
 
 
@@ -246,21 +246,21 @@ class SystemTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         memory = evt["system"]["memory"]
-        self.assertItemsEqual(SYSTEM_MEMORY_FIELDS, memory.keys())
+        self.assertItemsEqual(self.de_dot(SYSTEM_MEMORY_FIELDS), memory.keys())
 
         # Check that percentages are calculated.
         mem = memory
         if mem["total"] != 0:
-            used_p = float(mem["used"]) / mem["total"]
-            self.assertAlmostEqual(mem["used_pct"], used_p, places=4)
+            used_p = float(mem["used"]["bytes"]) / mem["total"]
+            self.assertAlmostEqual(mem["used"]["pct"], used_p, places=4)
 
-            used_p = float(mem["actual"]["used"]) / mem["total"]
-            self.assertAlmostEqual(mem["actual"]["used_pct"], used_p, places=4)
+            used_p = float(mem["actual"]["used"]["bytes"]) / mem["total"]
+            self.assertAlmostEqual(mem["actual"]["used"]["pct"], used_p, places=4)
 
         swap = memory["swap"]
         if swap["total"] != 0:
-            used_p = float(swap["used"]) / swap["total"]
-            self.assertAlmostEqual(swap["used_pct"], used_p, places=4)
+            used_p = float(swap["used"]["bytes"]) / swap["total"]
+            self.assertAlmostEqual(swap["used"]["pct"], used_p, places=4)
 
     @unittest.skipUnless(re.match("(?i)darwin|win|linux|freebsd", sys.platform), "os")
     def test_network(self):

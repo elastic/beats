@@ -29,7 +29,7 @@ class Test(BaseTest):
 
         for key in [
             "proc.cpu.start_time",
-            "proc.cpu.total_pct",
+            "proc.cpu.total.pct",
             "proc.name",
             "proc.state",
             "proc.pid",
@@ -46,7 +46,7 @@ class Test(BaseTest):
             filesystem_stats=False,
             drop_fields={
                 "fields": ["proc.mem"],
-                "condition": "range.proc.cpu.total_pct.lt: 0.5",
+                "condition": "range.proc.cpu.total.pct.lt: 0.5",
             },
         )
         topbeat = self.start_beat()
@@ -61,7 +61,7 @@ class Test(BaseTest):
         )
 
         for event in output:
-            if float(event["proc.cpu.total_pct"]) < 0.5:
+            if float(event["proc.cpu.total.pct"]) < 0.5:
                 assert "proc.mem.size" not in event
             else:
                 assert "proc.mem.size" in event
@@ -75,7 +75,7 @@ class Test(BaseTest):
             process_stats=True,
             filesystem_stats=False,
             drop_event={
-                "condition": "range.proc.cpu.total_pct.lt: 0.001",
+                "condition": "range.proc.cpu.total.pct.lt: 0.001",
             },
         )
         topbeat = self.start_beat()
@@ -89,7 +89,7 @@ class Test(BaseTest):
             required_fields=["@timestamp", "type"],
         )
         for event in output:
-            assert float(event["proc.cpu.total_pct"]) >= 0.001
+            assert float(event["proc.cpu.total.pct"]) >= 0.001
 
     def test_include_fields(self):
         """
@@ -99,7 +99,7 @@ class Test(BaseTest):
             system_stats=False,
             process_stats=True,
             filesystem_stats=False,
-            include_fields={"fields": ["proc.cpu", "proc.mem"]},
+            include_fields={"fields": ["proc.cpu", "proc.memory"]},
         )
         topbeat = self.start_beat()
         self.wait_until(
@@ -115,10 +115,10 @@ class Test(BaseTest):
 
         for key in [
             "proc.cpu.start_time",
-            "proc.cpu.total_pct",
-            "proc.mem.size",
-            "proc.mem.rss",
-            "proc.mem.rss_pct"
+            "proc.cpu.total.pct",
+            "proc.memory.size",
+            "proc.memory.rss.bytes",
+            "proc.memory.rss.pct"
         ]:
             assert key in output
 
@@ -138,7 +138,7 @@ class Test(BaseTest):
             process_stats=True,
             filesystem_stats=False,
             include_fields={"fields": ["proc"]},
-            drop_fields={"fields": ["proc.mem"]},
+            drop_fields={"fields": ["proc.memory"]},
         )
         topbeat = self.start_beat()
         self.wait_until(
@@ -153,16 +153,16 @@ class Test(BaseTest):
 
         for key in [
             "proc.cpu.start_time",
-            "proc.cpu.total_pct",
+            "proc.cpu.total.pct",
             "proc.name",
             "proc.pid",
         ]:
             assert key in output
 
         for key in [
-            "proc.mem.size",
-            "proc.mem.rss",
-            "proc.mem.rss_pct"
+            "proc.memory.size",
+            "proc.memory.rss.bytes",
+            "proc.memory.rss.pct"
         ]:
             assert key not in output
 
@@ -174,8 +174,8 @@ class Test(BaseTest):
             system_stats=False,
             process_stats=True,
             filesystem_stats=False,
-            include_fields={"fields": ["proc.mem.size", "proc.mem.rss_pct"]},
-            drop_fields={"fields": ["proc.mem.size", "proc.mem.rss_pct"]},
+            include_fields={"fields": ["proc.memory.size", "proc.memory.rss.pct"]},
+            drop_fields={"fields": ["proc.memory.size", "proc.memory.rss.pct"]},
         )
         topbeat = self.start_beat()
         self.wait_until(
@@ -188,12 +188,12 @@ class Test(BaseTest):
         )[0]
 
         for key in [
-            "proc.mem.size",
-            "proc.mem.rss",
+            "proc.memory.size",
+            "proc.memory.rss",
             "proc.cpu.start_time",
-            "proc.cpu.total_pct",
+            "proc.cpu.total.pct",
             "proc.name",
             "proc.pid",
-            "proc.mem.rss_pct"
+            "proc.memory.rss.pct"
         ]:
             assert key not in output

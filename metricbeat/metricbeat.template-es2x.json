@@ -970,10 +970,10 @@
                     "free": {
                       "type": "long"
                     },
-                    "used": {
+                    "used.bytes": {
                       "type": "long"
                     },
-                    "used_pct": {
+                    "used.pct": {
                       "type": "float"
                     }
                   }
@@ -990,10 +990,14 @@
                       "type": "long"
                     },
                     "used": {
-                      "type": "long"
-                    },
-                    "used_pct": {
-                      "type": "float"
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        },
+                        "pct": {
+                          "type": "float"
+                        }
+                      }
                     }
                   }
                 },
@@ -1001,10 +1005,14 @@
                   "type": "long"
                 },
                 "used": {
-                  "type": "long"
-                },
-                "used_pct": {
-                  "type": "float"
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "pct": {
+                      "type": "float"
+                    }
+                  }
                 }
               }
             },
@@ -1075,23 +1083,31 @@
                       "type": "long"
                     },
                     "total": {
-                      "type": "long"
-                    },
-                    "total_pct": {
-                      "type": "float"
+                      "properties": {
+                        "pct": {
+                          "type": "float"
+                        },
+                        "ticks": {
+                          "type": "long"
+                        }
+                      }
                     },
                     "user": {
                       "type": "long"
                     }
                   }
                 },
-                "mem": {
+                "memory": {
                   "properties": {
                     "rss": {
-                      "type": "long"
-                    },
-                    "rss_pct": {
-                      "type": "float"
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        },
+                        "pct": {
+                          "type": "float"
+                        }
+                      }
                     },
                     "share": {
                       "type": "long"

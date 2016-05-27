@@ -42,28 +42,29 @@ func (m *MetricSet) Fetch() (event common.MapStr, err error) {
 
 	memory := common.MapStr{
 		"total": memStat.Total,
-		"used":  memStat.Used,
-		"free":  memStat.Free,
-		"actual": common.MapStr{
-			"used":     memStat.ActualUsed,
-			"free":     memStat.ActualFree,
-			"used_pct": memStat.ActualUsedPercent,
+		"used": common.MapStr{
+			"bytes": memStat.Used,
+			"pct":   memStat.UsedPercent,
 		},
-		"used_pct": memStat.UsedPercent,
+		"free": memStat.Free,
+		"actual": common.MapStr{
+			"free": memStat.ActualFree,
+			"used": common.MapStr{
+				"pct":   memStat.ActualUsedPercent,
+				"bytes": memStat.ActualUsed,
+			},
+		},
 	}
 
 	swap := common.MapStr{
-		"total":    swapStat.Total,
-		"used":     swapStat.Used,
-		"free":     swapStat.Free,
-		"used_pct": swapStat.UsedPercent,
+		"total": swapStat.Total,
+		"used": common.MapStr{
+			"bytes": swapStat.Used,
+			"pct":   swapStat.UsedPercent,
+		},
+		"free": swapStat.Free,
 	}
 
 	memory["swap"] = swap
 	return memory, nil
-
-	/*return common.MapStr{
-		"memory": memory,
-		"swap":   swap,
-	}, nil*/
 }
