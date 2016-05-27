@@ -23,7 +23,7 @@ An example event looks as following:
       },
       "mem": {
         "rss": 27123712,
-        "rss_p": 0.0016,
+        "rss_pct": 0.0016,
         "share": 0,
         "size": 2577522688
       },

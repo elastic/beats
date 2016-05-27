@@ -1235,110 +1235,111 @@ type: integer
 CPU Core number.
 
 
-==== system.core.user_p
+==== system.core.user.pct
 
 type: float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
-==== system.core.system_p
-
-type: float
-
-The percentage of CPU time spent in kernel space.
-
-
-==== system.core.nice_p
-
-type: float
-
-The percentage of CPU time spent on low-priority processes.
-
-
-==== system.core.idle_p
-
-type: float
-
-The percentage of CPU time spent idle.
-
-
-==== system.core.iowait_p
-
-type: float
-
-The percentage of CPU time spent in wait (on disk).
-
-
-==== system.core.irq_p
-
-type: float
-
-The percentage of CPU time spent servicing and handling hardware interrupts.
-
-
-==== system.core.softirq_p
-
-type: float
-
-The percentage of CPU time spent servicing and handling software interrupts.
-
-==== system.core.steal_p
-
-type: float
-
-The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
-
-
-==== system.core.user
+==== system.core.user.ticks
 
 type: long
 
 The amount of CPU time spent in user space.
 
 
-==== system.core.system
+==== system.core.system.pct
+
+type: float
+
+The percentage of CPU time spent in kernel space.
+
+
+==== system.core.system.ticks
 
 type: long
 
 The amount of CPU time spent in kernel space.
 
 
-==== system.core.nice
+==== system.core.nice.pct
+
+type: float
+
+The percentage of CPU time spent on low-priority processes.
+
+
+==== system.core.nice.ticks
 
 type: long
 
 The amount of CPU time spent on low-priority processes.
 
 
-==== system.core.idle
+==== system.core.idle.pct
+
+type: float
+
+The percentage of CPU time spent idle.
+
+
+==== system.core.idle.ticks
 
 type: long
 
 The amount of CPU time spent idle.
 
 
-==== system.core.iowait
+==== system.core.iowait.pct
+
+type: float
+
+The percentage of CPU time spent in wait (on disk).
+
+
+==== system.core.iowait.ticks
 
 type: long
 
 The amount of CPU time spent in wait (on disk).
 
 
-==== system.core.irq
+==== system.core.irq.pct
+
+type: float
+
+The percentage of CPU time spent servicing and handling hardware interrupts.
+
+
+==== system.core.irq.ticks
 
 type: long
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system.core.softirq
+==== system.core.softirq.pct
+
+type: float
+
+The percentage of CPU time spent servicing and handling software interrupts.
+
+==== system.core.softirq.ticks
 
 type: long
 
 The amount of CPU time spent servicing and handling software interrupts.
 
-==== system.core.steal
+
+==== system.core.steal.pct
+
+type: float
+
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+==== system.core.steal.ticks
 
 type: long
 
@@ -1352,110 +1353,110 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 
 
-==== system.cpu.user_p
+==== system.cpu.user.pct
 
 type: float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
-==== system.cpu.system_p
+==== system.cpu.system.pct
 
 type: float
 
 The percentage of CPU time spent in kernel space.
 
 
-==== system.cpu.nice_p
+==== system.cpu.nice.pct
 
 type: float
 
 The percentage of CPU time spent on low-priority processes.
 
 
-==== system.cpu.idle_p
+==== system.cpu.idle.pct
 
 type: float
 
 The percentage of CPU time spent idle.
 
 
-==== system.cpu.iowait_p
+==== system.cpu.iowait.pct
 
 type: float
 
 The percentage of CPU time spent in wait (on disk).
 
 
-==== system.cpu.irq_p
+==== system.cpu.irq.pct
 
 type: float
 
 The percentage of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system.cpu.softirq_p
+==== system.cpu.softirq.pct
 
 type: float
 
 The percentage of CPU time spent servicing and handling software interrupts.
 
-==== system.cpu.steal_p
+==== system.cpu.steal.pct
 
 type: float
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
 
-==== system.cpu.user
+==== system.cpu.user.ticks
 
 type: long
 
 The amount of CPU time spent in user space.
 
 
-==== system.cpu.system
+==== system.cpu.system.ticks
 
 type: long
 
 The amount of CPU time spent in kernel space.
 
 
-==== system.cpu.nice
+==== system.cpu.nice.ticks
 
 type: long
 
 The amount of CPU time spent on low-priority processes.
 
 
-==== system.cpu.idle
+==== system.cpu.idle.ticks
 
 type: long
 
 The amount of CPU time spent idle.
 
 
-==== system.cpu.iowait
+==== system.cpu.iowait.ticks
 
 type: long
 
 The amount of CPU time spent in wait (on disk).
 
 
-==== system.cpu.irq
+==== system.cpu.irq.ticks
 
 type: long
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system.cpu.softirq
+==== system.cpu.softirq.ticks
 
 type: long
 
 The amount of CPU time spent servicing and handling software interrupts.
 
-==== system.cpu.steal
+==== system.cpu.steal.ticks
 
 type: long
 
@@ -1469,21 +1470,21 @@ Load averages.
 
 
 
-==== system.cpu.load.load1
+==== system.cpu.load.1
 
 type: float
 
 Load average for the last minute.
 
 
-==== system.cpu.load.load5
+==== system.cpu.load.5
 
 type: float
 
 Load average for the last 5 minutes.
 
 
-==== system.cpu.load.load15
+==== system.cpu.load.15
 
 type: float
 
@@ -1513,49 +1514,49 @@ type: keyword
 The disk's serial number. This may not be provided by all operating systems.
 
 
-==== system.disk.read_count
+==== system.disk.read.count
 
 type: long
 
 This is the total number of reads completed successfully.
 
 
-==== system.disk.write_count
+==== system.disk.write.count
 
 type: long
 
 This is the total number of writes completed successfully.
 
 
-==== system.disk.read_bytes
+==== system.disk.read.bytes
 
 type: long
 
 This is the total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
 
 
-==== system.disk.write_bytes
+==== system.disk.write.bytes
 
 type: long
 
 This is the total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
 
 
-==== system.disk.read_time
+==== system.disk.read.time
 
 type: long
 
 This is the total number of milliseconds spent by all reads.
 
 
-==== system.disk.write_time
+==== system.disk.write.time
 
 type: long
 
 This is the total number of milliseconds spent by all writes.
 
 
-==== system.disk.io_time
+==== system.disk.io.time
 
 type: long
 
@@ -1685,55 +1686,49 @@ Total space (used plus free).
 
 
 
-[float]
-=== mem Fields
-
-This group contains statistics related to the memory usage on the system.
-
-
-==== system.memory.mem.total
+==== system.memory.total
 
 type: long
 
 Total memory.
 
 
-==== system.memory.mem.used
+==== system.memory.used.bytes
 
 type: long
 
 Used memory.
 
 
-==== system.memory.mem.free
+==== system.memory.free
 
 type: long
 
 Available memory.
 
 
-==== system.memory.mem.used_p
+==== system.memory.used.pct
 
 type: float
 
 The percentage of used memory.
 
 
-==== system.memory.mem.actual_used
+==== system.memory.actual.used.bytes
 
 type: long
 
 Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== system.memory.mem.actual_free
+==== system.memory.actual.free
 
 type: long
 
 Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== system.memory.mem.actual_used_p
+==== system.memory.actual.used.pct
 
 type: float
 
@@ -1753,7 +1748,7 @@ type: long
 Total swap memory.
 
 
-==== system.memory.swap.used
+==== system.memory.swap.used.bytes
 
 type: long
 
@@ -1767,7 +1762,7 @@ type: long
 Available swap memory.
 
 
-==== system.memory.swap.used_p
+==== system.memory.swap.used.pct
 
 type: float
 
@@ -1790,56 +1785,56 @@ example: eth0
 The network interface name.
 
 
-==== system.network.bytes_sent
+==== system.network.out.bytes
 
 type: long
 
 The number of bytes sent.
 
 
-==== system.network.bytes_recv
+==== system.network.in.bytes
 
 type: long
 
 The number of bytes received.
 
 
-==== system.network.packets_sent
+==== system.network.out.packets
 
 type: long
 
 The number of packets sent.
 
 
-==== system.network.packets_recv
+==== system.network.in.packets
 
 type: long
 
 The number or packets received.
 
 
-==== system.network.errin
+==== system.network.in.errors
 
 type: long
 
 The number of errors while receiving.
 
 
-==== system.network.errout
+==== system.network.out.errors
 
 type: long
 
 The number of errors while sending.
 
 
-==== system.network.dropin
+==== system.network.in.dropped
 
 type: long
 
 The number of incoming packets that were dropped.
 
 
-==== system.network.dropout
+==== system.network.out.dropped
 
 type: long
 
@@ -1908,7 +1903,7 @@ type: long
 The amount of CPU time the process spent in user space.
 
 
-==== system.process.cpu.total_p
+==== system.process.cpu.total.pct
 
 type: float
 
@@ -1922,7 +1917,7 @@ type: long
 The amount of CPU time the process spent in kernel space.
 
 
-==== system.process.cpu.total
+==== system.process.cpu.total.ticks
 
 type: long
 
@@ -1937,33 +1932,33 @@ The time when the process was started. Example: "17:45".
 
 
 [float]
-=== mem Fields
+=== memory Fields
 
 Memory-specific statistics per process.
 
 
-==== system.process.mem.size
+==== system.process.memory.size
 
 type: long
 
 The total virtual memory the process has.
 
 
-==== system.process.mem.rss
+==== system.process.memory.rss.bytes
 
 type: long
 
 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
 
-==== system.process.mem.rss_p
+==== system.process.memory.rss.pct
 
 type: float
 
 The percentage of memory the process occupied in main memory (RAM).
 
 
-==== system.process.mem.share
+==== system.process.memory.share
 
 type: long
 

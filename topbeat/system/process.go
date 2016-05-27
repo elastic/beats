@@ -131,10 +131,12 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 		"name":     process.Name,
 		"state":    process.State,
 		"username": process.Username,
-		"mem": common.MapStr{
-			"size":  process.Mem.Size,
-			"rss":   process.Mem.Resident,
-			"rss_p": GetProcMemPercentage(process, 0 /* read total mem usage */),
+		"memory": common.MapStr{
+			"size": process.Mem.Size,
+			"rss": common.MapStr{
+				"bytes": process.Mem.Resident,
+				"pct":   GetProcMemPercentage(process, 0 /* read total mem usage */),
+			},
 			"share": process.Mem.Share,
 		},
 	}
@@ -145,15 +147,19 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 
 	if procStats.CpuTicks {
 		proc["cpu"] = common.MapStr{
-			"user":       process.Cpu.User,
-			"system":     process.Cpu.Sys,
-			"total":      process.Cpu.Total,
-			"total_p":    GetProcCpuPercentage(last, process),
+			"user":   process.Cpu.User,
+			"system": process.Cpu.Sys,
+			"total": common.MapStr{
+				"ticks": process.Cpu.Total,
+				"pct":   GetProcCpuPercentage(last, process),
+			},
 			"start_time": process.Cpu.FormatStartTime(),
 		}
 	} else {
 		proc["cpu"] = common.MapStr{
-			"total_p":    GetProcCpuPercentage(last, process),
+			"total": common.MapStr{
+				"pct": GetProcCpuPercentage(last, process),
+			},
 			"start_time": process.Cpu.FormatStartTime(),
 		}
 	}

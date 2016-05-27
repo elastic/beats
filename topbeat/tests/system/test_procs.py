@@ -37,15 +37,15 @@ class Test(BaseTest):
         for key in [
             "proc.pid",
             "proc.ppid",
-            "proc.mem.size",
-            "proc.mem.rss",
-            "proc.mem.share",
+            "proc.memory.size",
+            "proc.memory.rss.bytes",
+            "proc.memory.share",
         ]:
             assert type(output[key]) is int
 
         for key in [
-            "proc.cpu.total_p",
-            "proc.mem.rss_p",
+            "proc.cpu.total.pct",
+            "proc.memory.rss.pct",
         ]:
             assert type(output[key]) in [int, float]
 
@@ -69,14 +69,14 @@ class Test(BaseTest):
         for key in [
             "proc.pid",
             "proc.ppid",
-            "proc.cpu.total_p",
-            "proc.cpu.total",
+            "proc.cpu.total.pct",
+            "proc.cpu.total.ticks",
             "proc.cpu.user",
             "proc.cpu.system",
             "proc.cpu.start_time",
-            "proc.mem.size",
-            "proc.mem.rss",
-            "proc.mem.share",
+            "proc.memory.size",
+            "proc.memory.rss.bytes",
+            "proc.memory.share",
         ]:
             assert key in output
 

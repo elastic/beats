@@ -12,21 +12,43 @@
     },
     "system": {
         "cpu": {
-            "idle": 78268018,
-            "iowait": 0,
-            "irq": 0,
-            "load": {
-                "load1": 2.68603515625,
-                "load5": 2.72705078125,
-                "load15": 2.7685546875
+            "idle": {
+                "pct": 0.6891,
+                "ticks": 114154803
             },
-            "nice": 0,
-            "softirq": 0,
-            "steal": 0,
-            "system": 15825484,
-            "system_p": 0,
-            "user": 15390193,
-            "user_p": 0
+            "iowait": {
+                "pct": 0,
+                "ticks": 0
+            },
+            "irq": {
+                "pct": 0,
+                "ticks": 0
+            },
+            "load": {
+                "1": 4.09326171875,
+                "15": 5.39697265625,
+                "5": 3.64794921875
+            },
+            "nice": {
+                "pct": 0,
+                "ticks": 0
+            },
+            "softirq": {
+                "pct": 0,
+                "ticks": 0
+            },
+            "steal": {
+                "pct": 0,
+                "ticks": 0
+            },
+            "system": {
+                "pct": 0.1119,
+                "ticks": 21915151
+            },
+            "user": {
+                "pct": 0.199,
+                "ticks": 22876517
+            }
         }
     },
     "type": "metricsets"

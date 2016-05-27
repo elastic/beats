@@ -3,17 +3,20 @@ import sys
 import unittest
 import metricbeat
 
-SYSTEM_CPU_FIELDS = ["idle_p", "iowait_p", "irq_p", "load", "nice_p",
-                     "softirq_p", "steal_p", "system_p", "user_p"]
+SYSTEM_CPU_FIELDS = ["idle.pct", "iowait.pct", "irq.pct", "load", "nice.pct",
+                     "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
-SYSTEM_CPU_ALL_FIELDS = ["idle_p", "idle", "iowait_p", "iowait", "irq_p", "irq", "load", "nice_p", "nice",
-                     "softirq_p", "softirq", "steal_p", "steal", "system_p", "system", "user_p", "user"]
+SYSTEM_CPU_FIELDS_ALL = ["idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "load", "nice.pct", "nice.ticks",
+                     "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks"]
 
-SYSTEM_CORE = ["id", "idle_p", "iowait_p", "irq_p", "nice_p",
-               "softirq_p", "steal_p", "system_p", "user_p"]
+SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
+               "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
-SYSTEM_DISK_FIELDS = ["name", "read_count", "write_count", "read_bytes",
-                      "write_bytes", "read_time", "write_time", "io_time"]
+SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
+               "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks"]
+
+SYSTEM_DISK_FIELDS = ["name", "read.count", "write.count", "read.bytes",
+                      "write.bytes", "read.time", "write.time", "io.time"]
 
 SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
                             "free_files", "mount_point", "total", "used",
@@ -21,12 +24,12 @@ SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
-SYSTEM_MEMORY_FIELDS = ["swap", "mem"]
+SYSTEM_MEMORY_FIELDS = ["swap", "actual", "free", "total", "used.bytes", "used.pct"]
 
-SYSTEM_NETWORK_FIELDS = ["name", "bytes_sent", "bytes_recv", "packets_sent",
-                         "packets_recv", "errin", "errout", "dropin", "dropout"]
+SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
+                         "in.packets", "in.error", "out.error", "in.dropeed", "out.dropped"]
 
-SYSTEM_PROCESS_FIELDS = ["cmdline", "cpu", "mem", "name", "pid", "ppid",
+SYSTEM_PROCESS_FIELDS = ["cmdline", "cpu", "memory", "name", "pid", "ppid",
                          "state", "username"]
 
 
@@ -55,7 +58,7 @@ class SystemTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         cpu = evt["system"]["cpu"]
-        self.assertItemsEqual(SYSTEM_CPU_FIELDS, cpu.keys())
+        self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS), cpu.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
     def test_cpu_ticks_option(self):
@@ -84,7 +87,7 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             cpuStats = evt["system"]["cpu"]
-            self.assertItemsEqual(SYSTEM_CPU_ALL_FIELDS, cpuStats.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS_ALL), cpuStats.keys())
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|openbsd", sys.platform), "os")
     def test_core(self):
@@ -110,7 +113,36 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             core = evt["system"]["core"]
-            self.assertItemsEqual(SYSTEM_CORE, core.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_CORE_FIELDS), core.keys())
+
+    @unittest.skipUnless(re.match("(?i)linux|darwin|openbsd", sys.platform), "os")
+    def test_core(self):
+        """
+        Test core system output.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["core"],
+            "period": "5s",
+            "extras": {
+                "cpu_ticks": True,
+            },
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+
+        # Ensure no errors or warnings exist in the log.
+        log = self.get_log()
+        self.assertNotRegexpMatches(log, "ERR|WARN")
+
+        output = self.read_output_json()
+        self.assertGreater(len(output), 0)
+
+        for evt in output:
+            self.assert_fields_are_documented(evt)
+            core = evt["system"]["core"]
+            self.assertItemsEqual(self.de_dot(SYSTEM_CORE_FIELDS_ALL), core.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|freebsd", sys.platform), "os")
     def test_disk(self):
@@ -136,7 +168,7 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             disk = evt["system"]["disk"]
-            self.assertItemsEqual(SYSTEM_DISK_FIELDS, disk.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_DISK_FIELDS), disk.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
     def test_filesystem(self):
@@ -214,21 +246,21 @@ class SystemTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         memory = evt["system"]["memory"]
-        self.assertItemsEqual(SYSTEM_MEMORY_FIELDS, memory.keys())
+        self.assertItemsEqual(self.de_dot(SYSTEM_MEMORY_FIELDS), memory.keys())
 
         # Check that percentages are calculated.
-        mem = memory["mem"]
+        mem = memory
         if mem["total"] != 0:
-            used_p = float(mem["used"]) / mem["total"]
-            self.assertAlmostEqual(mem["used_p"], used_p, places=4)
+            used_p = float(mem["used"]["bytes"]) / mem["total"]
+            self.assertAlmostEqual(mem["used"]["pct"], used_p, places=4)
 
-            used_p = float(mem["actual_used"]) / mem["total"]
-            self.assertAlmostEqual(mem["actual_used_p"], used_p, places=4)
+            used_p = float(mem["actual"]["used"]["bytes"]) / mem["total"]
+            self.assertAlmostEqual(mem["actual"]["used"]["pct"], used_p, places=4)
 
         swap = memory["swap"]
         if swap["total"] != 0:
-            used_p = float(swap["used"]) / swap["total"]
-            self.assertAlmostEqual(swap["used_p"], used_p, places=4)
+            used_p = float(swap["used"]["bytes"]) / swap["total"]
+            self.assertAlmostEqual(swap["used"]["pct"], used_p, places=4)
 
     @unittest.skipUnless(re.match("(?i)darwin|win|linux|freebsd", sys.platform), "os")
     def test_network(self):
@@ -254,7 +286,7 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             network = evt["system"]["network"]
-            self.assertItemsEqual(SYSTEM_NETWORK_FIELDS, network.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_NETWORK_FIELDS), network.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin", sys.platform), "os")
     def test_process(self):
