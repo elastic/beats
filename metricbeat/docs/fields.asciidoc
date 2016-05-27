@@ -1173,6 +1173,7 @@ type: integer
 
 None
 
+[float]
 === keyspace Fields
 
 `keyspace` contains the information about the keyspaces returned by the `INFO` command.
@@ -1234,110 +1235,111 @@ type: integer
 CPU Core number.
 
 
-==== system.core.user_p
+==== system.core.user.pct
 
 type: float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
-==== system.core.system_p
-
-type: float
-
-The percentage of CPU time spent in kernel space.
-
-
-==== system.core.nice_p
-
-type: float
-
-The percentage of CPU time spent on low-priority processes.
-
-
-==== system.core.idle_p
-
-type: float
-
-The percentage of CPU time spent idle.
-
-
-==== system.core.iowait_p
-
-type: float
-
-The percentage of CPU time spent in wait (on disk).
-
-
-==== system.core.irq_p
-
-type: float
-
-The percentage of CPU time spent servicing and handling hardware interrupts.
-
-
-==== system.core.softirq_p
-
-type: float
-
-The percentage of CPU time spent servicing and handling software interrupts.
-
-==== system.core.steal_p
-
-type: float
-
-The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
-
-
-==== system.core.user
+==== system.core.user.ticks
 
 type: long
 
 The amount of CPU time spent in user space.
 
 
-==== system.core.system
+==== system.core.system.pct
+
+type: float
+
+The percentage of CPU time spent in kernel space.
+
+
+==== system.core.system.ticks
 
 type: long
 
 The amount of CPU time spent in kernel space.
 
 
-==== system.core.nice
+==== system.core.nice.pct
+
+type: float
+
+The percentage of CPU time spent on low-priority processes.
+
+
+==== system.core.nice.ticks
 
 type: long
 
 The amount of CPU time spent on low-priority processes.
 
 
-==== system.core.idle
+==== system.core.idle.pct
+
+type: float
+
+The percentage of CPU time spent idle.
+
+
+==== system.core.idle.ticks
 
 type: long
 
 The amount of CPU time spent idle.
 
 
-==== system.core.iowait
+==== system.core.iowait.pct
+
+type: float
+
+The percentage of CPU time spent in wait (on disk).
+
+
+==== system.core.iowait.ticks
 
 type: long
 
 The amount of CPU time spent in wait (on disk).
 
 
-==== system.core.irq
+==== system.core.irq.pct
+
+type: float
+
+The percentage of CPU time spent servicing and handling hardware interrupts.
+
+
+==== system.core.irq.ticks
 
 type: long
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system.core.softirq
+==== system.core.softirq.pct
+
+type: float
+
+The percentage of CPU time spent servicing and handling software interrupts.
+
+==== system.core.softirq.ticks
 
 type: long
 
 The amount of CPU time spent servicing and handling software interrupts.
 
-==== system.core.steal
+
+==== system.core.steal.pct
+
+type: float
+
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+==== system.core.steal.ticks
 
 type: long
 
@@ -1351,110 +1353,110 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 
 
-==== system.cpu.user_p
+==== system.cpu.user.pct
 
 type: float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
-==== system.cpu.system_p
+==== system.cpu.system.pct
 
 type: float
 
 The percentage of CPU time spent in kernel space.
 
 
-==== system.cpu.nice_p
+==== system.cpu.nice.pct
 
 type: float
 
 The percentage of CPU time spent on low-priority processes.
 
 
-==== system.cpu.idle_p
+==== system.cpu.idle.pct
 
 type: float
 
 The percentage of CPU time spent idle.
 
 
-==== system.cpu.iowait_p
+==== system.cpu.iowait.pct
 
 type: float
 
 The percentage of CPU time spent in wait (on disk).
 
 
-==== system.cpu.irq_p
+==== system.cpu.irq.pct
 
 type: float
 
 The percentage of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system.cpu.softirq_p
+==== system.cpu.softirq.pct
 
 type: float
 
 The percentage of CPU time spent servicing and handling software interrupts.
 
-==== system.cpu.steal_p
+==== system.cpu.steal.pct
 
 type: float
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
 
-==== system.cpu.user
+==== system.cpu.user.ticks
 
 type: long
 
 The amount of CPU time spent in user space.
 
 
-==== system.cpu.system
+==== system.cpu.system.ticks
 
 type: long
 
 The amount of CPU time spent in kernel space.
 
 
-==== system.cpu.nice
+==== system.cpu.nice.ticks
 
 type: long
 
 The amount of CPU time spent on low-priority processes.
 
 
-==== system.cpu.idle
+==== system.cpu.idle.ticks
 
 type: long
 
 The amount of CPU time spent idle.
 
 
-==== system.cpu.iowait
+==== system.cpu.iowait.ticks
 
 type: long
 
 The amount of CPU time spent in wait (on disk).
 
 
-==== system.cpu.irq
+==== system.cpu.irq.ticks
 
 type: long
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system.cpu.softirq
+==== system.cpu.softirq.ticks
 
 type: long
 
 The amount of CPU time spent servicing and handling software interrupts.
 
-==== system.cpu.steal
+==== system.cpu.steal.ticks
 
 type: long
 
@@ -1468,21 +1470,21 @@ Load averages.
 
 
 
-==== system.cpu.load.load1
+==== system.cpu.load.1
 
 type: float
 
 Load average for the last minute.
 
 
-==== system.cpu.load.load5
+==== system.cpu.load.5
 
 type: float
 
 Load average for the last 5 minutes.
 
 
-==== system.cpu.load.load15
+==== system.cpu.load.15
 
 type: float
 

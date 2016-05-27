@@ -680,117 +680,181 @@
                   "type": "integer"
                 },
                 "idle": {
-                  "type": "long"
-                },
-                "idle_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "iowait": {
-                  "type": "long"
-                },
-                "iowait_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "irq": {
-                  "type": "long"
-                },
-                "irq_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "nice": {
-                  "type": "long"
-                },
-                "nice_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "softirq": {
-                  "type": "long"
-                },
-                "softirq_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "steal": {
-                  "type": "long"
-                },
-                "steal_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "system": {
-                  "type": "long"
-                },
-                "system_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "user": {
-                  "type": "long"
-                },
-                "user_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
             "cpu": {
               "properties": {
                 "idle": {
-                  "type": "long"
-                },
-                "idle_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "iowait": {
-                  "type": "long"
-                },
-                "iowait_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "irq": {
-                  "type": "long"
-                },
-                "irq_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "load": {
                   "properties": {
-                    "load1": {
+                    "1": {
                       "type": "float"
                     },
-                    "load15": {
+                    "15": {
                       "type": "float"
                     },
-                    "load5": {
+                    "5": {
                       "type": "float"
                     }
                   }
                 },
                 "nice": {
-                  "type": "long"
-                },
-                "nice_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "softirq": {
-                  "type": "long"
-                },
-                "softirq_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "steal": {
-                  "type": "long"
-                },
-                "steal_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "system": {
-                  "type": "long"
-                },
-                "system_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "user": {
-                  "type": "long"
-                },
-                "user_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
