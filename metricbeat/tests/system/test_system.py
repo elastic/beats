@@ -15,7 +15,7 @@ SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
 SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
                "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks"]
 
-SYSTEM_DISK_FIELDS = ["name", "read.count", "write.count", "read.bytes",
+SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
                       "write.bytes", "read.time", "write.time", "io.time"]
 
 SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
@@ -145,13 +145,13 @@ class SystemTest(metricbeat.BaseTest):
             self.assertItemsEqual(self.de_dot(SYSTEM_CORE_FIELDS_ALL), core.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|freebsd", sys.platform), "os")
-    def test_disk(self):
+    def test_diskio(self):
         """
-        Test system/disk output.
+        Test system/diskio output.
         """
         self.render_config_template(modules=[{
             "name": "system",
-            "metricsets": ["disk"],
+            "metricsets": ["diskio"],
             "period": "5s"
         }])
         proc = self.start_beat()
@@ -167,8 +167,8 @@ class SystemTest(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            disk = evt["system"]["disk"]
-            self.assertItemsEqual(self.de_dot(SYSTEM_DISK_FIELDS), disk.keys())
+            diskio = evt["system"]["diskio"]
+            self.assertItemsEqual(self.de_dot(SYSTEM_DISKIO_FIELDS), diskio.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
     def test_filesystem(self):

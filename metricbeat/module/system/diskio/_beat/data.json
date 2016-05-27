@@ -10,7 +10,7 @@
       "rtt": 17082,
    },
    "system": {
-     "disk": {
+     "diskio": {
         "io_time": 21110,
         "name": "sda2",
         "read_bytes": 160079872,

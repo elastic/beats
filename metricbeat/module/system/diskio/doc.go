@@ -5,4 +5,4 @@ linux, and windows.
 Detailed descriptions of IO stats provided by Linux can be found here:
 https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/iostats.txt?id=refs/tags/v4.6-rc7
 */
-package disk
+package diskio

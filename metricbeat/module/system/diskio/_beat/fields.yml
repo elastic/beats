@@ -1,4 +1,4 @@
-- name: disk
+- name: diskio
   type: group
   description: >
     `disk` contains disk IO metrics collected from the operating system.
