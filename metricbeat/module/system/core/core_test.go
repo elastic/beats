@@ -1,4 +1,4 @@
-package cpu
+package core
 
 import (
 	"testing"
@@ -9,13 +9,13 @@ import (
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig())
+	f := mbtest.NewEventsFetcher(t, getConfig())
 
-	// Do a first fetch to have precentages
+	// Fetch once in advance to have percentage values
 	f.Fetch()
 	time.Sleep(1 * time.Second)
 
-	err := mbtest.WriteEvent(f, t)
+	err := mbtest.WriteEvents(f, t)
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -24,7 +24,7 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "system",
-		"metricsets": []string{"cpu"},
+		"metricsets": []string{"core"},
 		"cpu_ticks":  true,
 	}
 }
