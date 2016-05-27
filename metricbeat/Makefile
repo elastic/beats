@@ -44,6 +44,7 @@ configs:
 # Generates imports for all modules and metricsets
 .PHONY: imports
 imports:
+	mkdir -p include
 	python ${ES_BEATS}/metricbeat/scripts/generate_imports.py > include/list.go
 
 # This is called by the beats packer before building starts
