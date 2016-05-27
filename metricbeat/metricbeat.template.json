@@ -1047,7 +1047,7 @@
                     "total": {
                       "type": "long"
                     },
-                    "total_p": {
+                    "total_pct": {
                       "type": "float"
                     },
                     "user": {
@@ -1060,7 +1060,7 @@
                     "rss": {
                       "type": "long"
                     },
-                    "rss_p": {
+                    "rss_pct": {
                       "type": "float"
                     },
                     "share": {

@@ -40,7 +40,7 @@
           type: long
           description: >
             The amount of CPU time the process spent in user space.
-        - name: total_p
+        - name: total_pct
           type: float
           description: >
             The percentage of CPU time spent by the process since the last update. Its value is similar with the
@@ -70,7 +70,7 @@
           type: long
           description: >
             The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
-        - name: rss_p
+        - name: rss_pct
           type: float
           description: >
             The percentage of memory the process occupied in main memory (RAM).

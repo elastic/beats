@@ -1909,7 +1909,7 @@ type: long
 The amount of CPU time the process spent in user space.
 
 
-==== system.process.cpu.total_p
+==== system.process.cpu.total_pct
 
 type: float
 
@@ -1957,7 +1957,7 @@ type: long
 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
 
-==== system.process.mem.rss_p
+==== system.process.mem.rss_pct
 
 type: float
 

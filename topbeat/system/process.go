@@ -132,10 +132,10 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 		"state":    process.State,
 		"username": process.Username,
 		"mem": common.MapStr{
-			"size":  process.Mem.Size,
-			"rss":   process.Mem.Resident,
-			"rss_p": GetProcMemPercentage(process, 0 /* read total mem usage */),
-			"share": process.Mem.Share,
+			"size":    process.Mem.Size,
+			"rss":     process.Mem.Resident,
+			"rss_pct": GetProcMemPercentage(process, 0 /* read total mem usage */),
+			"share":   process.Mem.Share,
 		},
 	}
 
@@ -148,12 +148,12 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 			"user":       process.Cpu.User,
 			"system":     process.Cpu.Sys,
 			"total":      process.Cpu.Total,
-			"total_p":    GetProcCpuPercentage(last, process),
+			"total_pct":  GetProcCpuPercentage(last, process),
 			"start_time": process.Cpu.FormatStartTime(),
 		}
 	} else {
 		proc["cpu"] = common.MapStr{
-			"total_p":    GetProcCpuPercentage(last, process),
+			"total_pct":  GetProcCpuPercentage(last, process),
 			"start_time": process.Cpu.FormatStartTime(),
 		}
 	}
