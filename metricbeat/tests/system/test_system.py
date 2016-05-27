@@ -26,8 +26,8 @@ SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
 SYSTEM_MEMORY_FIELDS = ["swap", "actual", "free", "total", "used.bytes", "used.pct"]
 
-SYSTEM_NETWORK_FIELDS = ["name", "sent.bytes", "received.bytes", "sent.packets",
-                         "received.packets", "in.error", "out.error", "in.dropeed", "out.dropped"]
+SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
+                         "in.packets", "in.error", "out.error", "in.dropeed", "out.dropped"]
 
 SYSTEM_PROCESS_FIELDS = ["cmdline", "cpu", "memory", "name", "pid", "ppid",
                          "state", "username"]

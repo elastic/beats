@@ -1785,28 +1785,28 @@ example: eth0
 The network interface name.
 
 
-==== system.network.sent.bytes
+==== system.network.out.bytes
 
 type: long
 
 The number of bytes sent.
 
 
-==== system.network.received.bytes
+==== system.network.in.bytes
 
 type: long
 
 The number of bytes received.
 
 
-==== system.network.sent.packets
+==== system.network.out.packets
 
 type: long
 
 The number of packets sent.
 
 
-==== system.network.received.packets
+==== system.network.in.packets
 
 type: long
 

@@ -9,22 +9,22 @@
       description: >
         The network interface name.
 
-    - name: sent.bytes
+    - name: out.bytes
       type: long
       description: >
         The number of bytes sent.
 
-    - name: received.bytes
+    - name: in.bytes
       type: long
       description: >
         The number of bytes received.
 
-    - name: sent.packets
+    - name: out.packets
       type: long
       description: >
         The number of packets sent.
 
-    - name: received.packets
+    - name: in.packets
       type: long
       description: >
         The number or packets received.

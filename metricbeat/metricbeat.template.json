@@ -989,10 +989,16 @@
               "properties": {
                 "in": {
                   "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
                     "dropped": {
                       "type": "long"
                     },
                     "errors": {
+                      "type": "long"
+                    },
+                    "packets": {
                       "type": "long"
                     }
                   }
@@ -1003,27 +1009,13 @@
                 },
                 "out": {
                   "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
                     "dropped": {
                       "type": "long"
                     },
                     "errors": {
-                      "type": "long"
-                    }
-                  }
-                },
-                "received": {
-                  "properties": {
-                    "bytes": {
-                      "type": "long"
-                    },
-                    "packets": {
-                      "type": "long"
-                    }
-                  }
-                },
-                "sent": {
-                  "properties": {
-                    "bytes": {
                       "type": "long"
                     },
                     "packets": {
