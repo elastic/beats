@@ -15,7 +15,7 @@ class GlobalFiltering(metricbeat.BaseTest):
                 "period": "5s"
             }],
             drop_fields={
-                "condition": "range.system.cpu.system_p.lt: 0.1",
+                "condition": "range.system.cpu.system.pct.lt: 0.1",
                 "fields": ["system.cpu.load"],
             },
         )
@@ -36,7 +36,7 @@ class GlobalFiltering(metricbeat.BaseTest):
         ]), evt.keys())
         cpu = evt["system"]["cpu"]
         print(cpu.keys())
-        self.assertItemsEqual([
-            "system_p", "user_p", "softirq_p", "iowait_p",
-            "idle_p", "irq_p", "steal_p", "nice_p"
-        ], cpu.keys())
+        self.assertItemsEqual(self.de_dot([
+            "system", "user", "softirq", "iowait",
+            "idle", "irq", "steal", "nice"
+        ]), cpu.keys())

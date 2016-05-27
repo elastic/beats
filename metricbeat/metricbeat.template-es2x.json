@@ -680,152 +680,228 @@
                   "type": "integer"
                 },
                 "idle": {
-                  "type": "long"
-                },
-                "idle_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "iowait": {
-                  "type": "long"
-                },
-                "iowait_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "irq": {
-                  "type": "long"
-                },
-                "irq_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "nice": {
-                  "type": "long"
-                },
-                "nice_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "softirq": {
-                  "type": "long"
-                },
-                "softirq_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "steal": {
-                  "type": "long"
-                },
-                "steal_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "system": {
-                  "type": "long"
-                },
-                "system_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "user": {
-                  "type": "long"
-                },
-                "user_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
             "cpu": {
               "properties": {
                 "idle": {
-                  "type": "long"
-                },
-                "idle_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "iowait": {
-                  "type": "long"
-                },
-                "iowait_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "irq": {
-                  "type": "long"
-                },
-                "irq_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "load": {
                   "properties": {
-                    "load1": {
+                    "1": {
                       "type": "float"
                     },
-                    "load15": {
+                    "15": {
                       "type": "float"
                     },
-                    "load5": {
+                    "5": {
                       "type": "float"
                     }
                   }
                 },
                 "nice": {
-                  "type": "long"
-                },
-                "nice_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "softirq": {
-                  "type": "long"
-                },
-                "softirq_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "steal": {
-                  "type": "long"
-                },
-                "steal_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "system": {
-                  "type": "long"
-                },
-                "system_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "user": {
-                  "type": "long"
-                },
-                "user_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
             "disk": {
               "properties": {
-                "io_time": {
-                  "type": "long"
+                "io": {
+                  "properties": {
+                    "time": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "name": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
                 },
-                "read_bytes": {
-                  "type": "long"
-                },
-                "read_count": {
-                  "type": "long"
-                },
-                "read_time": {
-                  "type": "long"
+                "read": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "count": {
+                      "type": "long"
+                    },
+                    "time": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "serial_number": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
                 },
-                "write_bytes": {
-                  "type": "long"
-                },
-                "write_count": {
-                  "type": "long"
-                },
-                "write_time": {
-                  "type": "long"
+                "write": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "count": {
+                      "type": "long"
+                    },
+                    "time": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
@@ -889,30 +965,21 @@
             },
             "memory": {
               "properties": {
-                "mem": {
+                "actual": {
                   "properties": {
-                    "actual_free": {
-                      "type": "long"
-                    },
-                    "actual_used": {
-                      "type": "long"
-                    },
-                    "actual_used_p": {
-                      "type": "float"
-                    },
                     "free": {
                       "type": "long"
                     },
-                    "total": {
+                    "used.bytes": {
                       "type": "long"
                     },
-                    "used": {
-                      "type": "long"
-                    },
-                    "used_p": {
+                    "used.pct": {
                       "type": "float"
                     }
                   }
+                },
+                "free": {
+                  "type": "long"
                 },
                 "swap": {
                   "properties": {
@@ -923,9 +990,26 @@
                       "type": "long"
                     },
                     "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        },
+                        "pct": {
+                          "type": "float"
+                        }
+                      }
+                    }
+                  }
+                },
+                "total": {
+                  "type": "long"
+                },
+                "used": {
+                  "properties": {
+                    "bytes": {
                       "type": "long"
                     },
-                    "used_p": {
+                    "pct": {
                       "type": "float"
                     }
                   }
@@ -934,34 +1018,42 @@
             },
             "network": {
               "properties": {
-                "bytes_recv": {
-                  "type": "long"
-                },
-                "bytes_sent": {
-                  "type": "long"
-                },
-                "dropin": {
-                  "type": "long"
-                },
-                "dropout": {
-                  "type": "long"
-                },
-                "errin": {
-                  "type": "long"
-                },
-                "errout": {
-                  "type": "long"
+                "in": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "dropped": {
+                      "type": "long"
+                    },
+                    "errors": {
+                      "type": "long"
+                    },
+                    "packets": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "name": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
                 },
-                "packets_recv": {
-                  "type": "long"
-                },
-                "packets_sent": {
-                  "type": "long"
+                "out": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "dropped": {
+                      "type": "long"
+                    },
+                    "errors": {
+                      "type": "long"
+                    },
+                    "packets": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
@@ -983,23 +1075,31 @@
                       "type": "long"
                     },
                     "total": {
-                      "type": "long"
-                    },
-                    "total_p": {
-                      "type": "float"
+                      "properties": {
+                        "pct": {
+                          "type": "float"
+                        },
+                        "ticks": {
+                          "type": "long"
+                        }
+                      }
                     },
                     "user": {
                       "type": "long"
                     }
                   }
                 },
-                "mem": {
+                "memory": {
                   "properties": {
                     "rss": {
-                      "type": "long"
-                    },
-                    "rss_p": {
-                      "type": "float"
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        },
+                        "pct": {
+                          "type": "float"
+                        }
+                      }
                     },
                     "share": {
                       "type": "long"

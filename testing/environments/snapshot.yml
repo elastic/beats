@@ -7,7 +7,7 @@ elasticsearch:
 
 logstash:
   build: ./docker/logstash
-  dockerfile: Dockerfile-snapshot
+  dockerfile: Dockerfile-5.0.0-alpha2
 
 kibana:
   build: ./docker/kibana

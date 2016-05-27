@@ -542,54 +542,54 @@ The percentage of CPU time spent in involuntary wait by the virtual CPU while th
 
 
 [float]
-=== mem Fields
+=== memory Fields
 
 This group contains statistics related to the memory usage on the system.
 
 
-==== mem.total
+==== memory.total
 
 type: long
 
 Total memory.
 
 
-==== mem.used
+==== memory.used
 
 type: long
 
 Used memory.
 
 
-==== mem.free
+==== memory.free
 
 type: long
 
 Available memory.
 
 
-==== mem.used_p
+==== memory.used_p
 
 type: float
 
 The percentage of used memory.
 
 
-==== mem.actual_used
+==== memory.actual_used
 
 type: long
 
 Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== mem.actual_free
+==== memory.actual_free
 
 type: long
 
 Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== mem.actual_used_p
+==== memory.actual_used_p
 
 type: float
 

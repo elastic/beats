@@ -145,7 +145,7 @@
             }
           }
         },
-        "mem": {
+        "memory": {
           "properties": {
             "actual_free": {
               "type": "long"
