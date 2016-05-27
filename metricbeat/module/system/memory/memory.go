@@ -59,8 +59,11 @@ func (m *MetricSet) Fetch() (event common.MapStr, err error) {
 		"used_pct": swapStat.UsedPercent,
 	}
 
-	return common.MapStr{
+	memory["swap"] = swap
+	return memory, nil
+
+	/*return common.MapStr{
 		"memory": memory,
 		"swap":   swap,
-	}, nil
+	}, nil*/
 }

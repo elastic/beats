@@ -3,47 +3,42 @@
   description: >
     `memory` contains local memory stats.
   fields:
-    - name: memory
-      type: group
-      prefix: "[float]"
-      description: This group contains statistics related to the memory usage on the system.
-      fields:
-        - name: total
-          type: long
-          description: >
-            Total memory.
+    - name: total
+      type: long
+      description: >
+        Total memory.
 
-        - name: used
-          type: long
-          description: >
-            Used memory.
+    - name: used
+      type: long
+      description: >
+        Used memory.
 
-        - name: free
-          type: long
-          description: >
-            Available memory.
+    - name: free
+      type: long
+      description: >
+        Available memory.
 
-        - name: used_pct
-          type: float
-          description: >
-            The percentage of used memory.
+    - name: used_pct
+      type: float
+      description: >
+        The percentage of used memory.
 
-        - name: actual.used
-          type: long
-          description: >
-            Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
-            Available only on Unix.
+    - name: actual.used
+      type: long
+      description: >
+        Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
+        Available only on Unix.
 
-        - name: actual.free
-          type: long
-          description: >
-            Actual available memory. This value is the "free" memory plus the memory used for disk caches and
-            buffers. Available only on Unix.
+    - name: actual.free
+      type: long
+      description: >
+        Actual available memory. This value is the "free" memory plus the memory used for disk caches and
+        buffers. Available only on Unix.
 
-        - name: actual.used_pct
-          type: float
-          description: >
-            The percentage of actual used memory.
+    - name: actual.used_pct
+      type: float
+      description: >
+        The percentage of actual used memory.
 
     - name: swap
       type: group

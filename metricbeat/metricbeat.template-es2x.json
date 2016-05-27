@@ -965,25 +965,9 @@
             },
             "memory": {
               "properties": {
-                "memory": {
+                "actual": {
                   "properties": {
-                    "actual": {
-                      "properties": {
-                        "free": {
-                          "type": "long"
-                        },
-                        "used": {
-                          "type": "long"
-                        },
-                        "used_pct": {
-                          "type": "float"
-                        }
-                      }
-                    },
                     "free": {
-                      "type": "long"
-                    },
-                    "total": {
                       "type": "long"
                     },
                     "used": {
@@ -993,6 +977,9 @@
                       "type": "float"
                     }
                   }
+                },
+                "free": {
+                  "type": "long"
                 },
                 "swap": {
                   "properties": {
@@ -1009,6 +996,15 @@
                       "type": "float"
                     }
                   }
+                },
+                "total": {
+                  "type": "long"
+                },
+                "used": {
+                  "type": "long"
+                },
+                "used_pct": {
+                  "type": "float"
                 }
               }
             },

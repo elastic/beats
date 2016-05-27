@@ -1686,55 +1686,49 @@ Total space (used plus free).
 
 
 
-[float]
-=== memory Fields
-
-This group contains statistics related to the memory usage on the system.
-
-
-==== system.memory.memory.total
+==== system.memory.total
 
 type: long
 
 Total memory.
 
 
-==== system.memory.memory.used
+==== system.memory.used
 
 type: long
 
 Used memory.
 
 
-==== system.memory.memory.free
+==== system.memory.free
 
 type: long
 
 Available memory.
 
 
-==== system.memory.memory.used_pct
+==== system.memory.used_pct
 
 type: float
 
 The percentage of used memory.
 
 
-==== system.memory.memory.actual.used
+==== system.memory.actual.used
 
 type: long
 
 Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== system.memory.memory.actual.free
+==== system.memory.actual.free
 
 type: long
 
 Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== system.memory.memory.actual.used_pct
+==== system.memory.actual.used_pct
 
 type: float
 

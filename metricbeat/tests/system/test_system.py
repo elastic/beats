@@ -24,7 +24,7 @@ SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
-SYSTEM_MEMORY_FIELDS = ["swap", "memory"]
+SYSTEM_MEMORY_FIELDS = ["swap", "actual", "free", "total", "used", "used_pct"]
 
 SYSTEM_NETWORK_FIELDS = ["name", "sent.bytes", "received.bytes", "sent.packets",
                          "received.packets", "in.error", "out.error", "in.dropeed", "out.dropped"]
@@ -249,7 +249,7 @@ class SystemTest(metricbeat.BaseTest):
         self.assertItemsEqual(SYSTEM_MEMORY_FIELDS, memory.keys())
 
         # Check that percentages are calculated.
-        mem = memory["memory"]
+        mem = memory
         if mem["total"] != 0:
             used_p = float(mem["used"]) / mem["total"]
             self.assertAlmostEqual(mem["used_pct"], used_p, places=4)
