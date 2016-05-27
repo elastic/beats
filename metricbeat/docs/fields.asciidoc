@@ -1714,6 +1714,13 @@ type: float
 The percentage of used memory.
 
 
+[float]
+=== actual Fields
+
+Actual memory fields.
+
+
+
 ==== system.memory.actual.used.bytes
 
 type: long
