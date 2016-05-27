@@ -45,7 +45,7 @@ class Test(BaseTest):
             process_stats=True,
             filesystem_stats=False,
             drop_fields={
-                "fields": ["proc.mem"],
+                "fields": ["proc.memory"],
                 "condition": "range.proc.cpu.total.pct.lt: 0.5",
             },
         )
@@ -62,9 +62,9 @@ class Test(BaseTest):
 
         for event in output:
             if float(event["proc.cpu.total.pct"]) < 0.5:
-                assert "proc.mem.size" not in event
+                assert "proc.memory.size" not in event
             else:
-                assert "proc.mem.size" in event
+                assert "proc.memory.size" in event
 
     def test_dropevent_with_condition(self):
         """

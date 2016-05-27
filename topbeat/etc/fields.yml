@@ -164,7 +164,7 @@
           type: float
           description: >
             The percentage of CPU time spent idle.
- 
+
         - name: iowait
           type: long
           description: >
@@ -210,7 +210,7 @@
             Available only on Unix.
 
 
-    - name: mem
+    - name: memory
       type: group
       prefix: "[float]"
       description: This group contains statistics related to the memory usage on the system.
