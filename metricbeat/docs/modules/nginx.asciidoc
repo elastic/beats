@@ -25,7 +25,6 @@ metricbeat.modules:
 
   # Nginx hosts
   hosts: ["http://127.0.0.1/"]
-
 ----
 
 [float]

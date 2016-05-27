@@ -45,8 +45,14 @@ def collect(beat_path, full=False):
     else:
         config_yml = header_short
 
-    # Iterate over all modules
+    # Read the modules list but put "system" first
+    modules = ["system"]
     for module in os.listdir(base_dir):
+        if module != "system":
+            modules.append(module)
+
+    # Iterate over all modules
+    for module in modules:
 
         beat_path = path + "/" + module + "/_beat"
 
