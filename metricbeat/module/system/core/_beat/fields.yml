@@ -8,87 +8,88 @@
       description: >
         CPU Core number.
 
-    - name: user_p
+    - name: user.pct
       type: float
       description: >
         The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
         For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
-    - name: system_p
+    - name: user.ticks
+      type: long
+      description: >
+       The amount of CPU time spent in user space.
+
+    - name: system.pct
       type: float
       description: >
         The percentage of CPU time spent in kernel space.
 
-    - name: nice_p
+    - name: system.ticks
+      type: long
+      description: >
+        The amount of CPU time spent in kernel space.
+
+    - name: nice.pct
       type: float
       description: >
         The percentage of CPU time spent on low-priority processes.
 
-    - name: idle_p
+    - name: nice.ticks
+      type: long
+      description: >
+        The amount of CPU time spent on low-priority processes.
+
+    - name: idle.pct
       type: float
       description: >
         The percentage of CPU time spent idle.
 
-    - name: iowait_p
+    - name: idle.ticks
+      type: long
+      description: >
+        The amount of CPU time spent idle.
+
+    - name: iowait.pct
       type: float
       description: >
         The percentage of CPU time spent in wait (on disk).
 
-    - name: irq_p
+    - name: iowait.ticks
+      type: long
+      description: >
+        The amount of CPU time spent in wait (on disk).
+
+    - name: irq.pct
       type: float
       description: >
         The percentage of CPU time spent servicing and handling hardware interrupts.
 
-    - name: softirq_p
+    - name: irq.ticks
+      type: long
+      description: >
+        The amount of CPU time spent servicing and handling hardware interrupts.
+
+    - name: softirq.pct
       type: float
       description:
         The percentage of CPU time spent servicing and handling software interrupts.
 
-    - name: steal_p
+    - name: softirq.ticks
+      type: long
+      description: >
+        The amount of CPU time spent servicing and handling software interrupts.
+
+    - name: steal.pct
       type: float
       description: >
         The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
         was servicing another processor.
         Available only on Unix.
 
-    - name: user
-      type: long
-      description: >
-       The amount of CPU time spent in user space.
-
-    - name: system
-      type: long
-      description: >
-        The amount of CPU time spent in kernel space.
-
-    - name: nice
-      type: long
-      description: >
-        The amount of CPU time spent on low-priority processes.
-
-    - name: idle
-      type: long
-      description: >
-        The amount of CPU time spent idle.
-
-    - name: iowait
-      type: long
-      description: >
-        The amount of CPU time spent in wait (on disk).
-
-    - name: irq
-      type: long
-      description: >
-        The amount of CPU time spent servicing and handling hardware interrupts.
-
-    - name: softirq
-      type: long
-      description:
-        The amount of CPU time spent servicing and handling software interrupts.
-
-    - name: steal
+    - name: steal.ticks
       type: long
       description: >
         The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
         was servicing another processor.
         Available only on Unix.
+
