@@ -58,7 +58,7 @@ metricbeat.modules:
 
 #---------------------------- Redis Status Module ----------------------------
 - module: redis
-  metricsets: ["info"]
+  metricsets: ["info", "keyspace"]
   enabled: true
   period: 1s
 
