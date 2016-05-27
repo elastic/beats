@@ -27,6 +27,24 @@ func WriteEvent(f mb.EventFetcher, t *testing.T) error {
 		return err
 	}
 
+	return createEvent(event, f)
+}
+
+func WriteEvents(f mb.EventsFetcher, t *testing.T) error {
+
+	if !*dataFlag {
+		t.Skip("Skip data generation tests")
+	}
+	events, err := f.Fetch()
+	if err != nil {
+		return err
+	}
+
+	return createEvent(events[0], f)
+}
+
+func createEvent(event common.MapStr, m mb.MetricSet) error {
+
 	path, err := os.Getwd()
 	if err != nil {
 		return err
@@ -35,17 +53,17 @@ func WriteEvent(f mb.EventFetcher, t *testing.T) error {
 	fullEvent := common.MapStr{
 		"@timestamp": "2016-05-23T08:05:34.853Z",
 		"beat": common.MapStr{
-			"hostname": "beathost",
-			"name":     "beathost",
+			"hostname": "host.example.com",
+			"name":     "host.example.com",
 		},
 		"metricset": common.MapStr{
 			"host":   "localhost",
-			"module": f.Module().Name(),
-			"name":   f.Name(),
+			"module": m.Module().Name(),
+			"name":   m.Name(),
 			"rtt":    115,
 		},
-		f.Module().Name(): common.MapStr{
-			f.Name(): event,
+		m.Module().Name(): common.MapStr{
+			m.Name(): event,
 		},
 		"type": "metricsets",
 	}
@@ -56,6 +74,5 @@ func WriteEvent(f mb.EventFetcher, t *testing.T) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
 }

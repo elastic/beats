@@ -9,8 +9,11 @@ SYSTEM_CPU_FIELDS = ["idle_p", "iowait_p", "irq_p", "load", "nice_p",
 SYSTEM_CPU_ALL_FIELDS = ["idle_p", "idle", "iowait_p", "iowait", "irq_p", "irq", "load", "nice_p", "nice",
                      "softirq_p", "softirq", "steal_p", "steal", "system_p", "system", "user_p", "user"]
 
-SYSTEM_CORE = ["id", "idle_p", "iowait_p", "irq_p", "nice_p",
-               "softirq_p", "steal_p", "system_p", "user_p"]
+SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
+               "softirq.pct", "steal.pct", "system.pct", "user.pct"]
+
+SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
+               "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks"]
 
 SYSTEM_DISK_FIELDS = ["name", "read_count", "write_count", "read_bytes",
                       "write_bytes", "read_time", "write_time", "io_time"]
@@ -110,7 +113,36 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             core = evt["system"]["core"]
-            self.assertItemsEqual(SYSTEM_CORE, core.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_CORE_FIELDS), core.keys())
+
+    @unittest.skipUnless(re.match("(?i)linux|darwin|openbsd", sys.platform), "os")
+    def test_core(self):
+        """
+        Test core system output.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["core"],
+            "period": "5s",
+            "extras": {
+                "cpu_ticks": True,
+            },
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+
+        # Ensure no errors or warnings exist in the log.
+        log = self.get_log()
+        self.assertNotRegexpMatches(log, "ERR|WARN")
+
+        output = self.read_output_json()
+        self.assertGreater(len(output), 0)
+
+        for evt in output:
+            self.assert_fields_are_documented(evt)
+            core = evt["system"]["core"]
+            self.assertItemsEqual(self.de_dot(SYSTEM_CORE_FIELDS_ALL), core.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|freebsd", sys.platform), "os")
     def test_disk(self):
