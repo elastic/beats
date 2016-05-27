@@ -2,6 +2,7 @@
   title: "Apache"
   description: >
     Apache HTTPD server metric sets collected from the apache web server.
+  short_config: false
   fields:
     - name: apache
       type: group

@@ -2,6 +2,7 @@
   title: "Nginx Status"
   description: >
     Nginx server status metrics collected from various modules.
+  short_config: false
   fields:
     - name: nginx
       type: group
