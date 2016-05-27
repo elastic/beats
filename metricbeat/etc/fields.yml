@@ -1114,24 +1114,24 @@
                   description: >
                     Available memory.
 
-                - name: used_p
+                - name: used_pct
                   type: float
                   description: >
                     The percentage of used memory.
 
-                - name: actual_used
+                - name: actual.used
                   type: long
                   description: >
                     Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
                     Available only on Unix.
 
-                - name: actual_free
+                - name: actual.free
                   type: long
                   description: >
                     Actual available memory. This value is the "free" memory plus the memory used for disk caches and
                     buffers. Available only on Unix.
 
-                - name: actual_used_p
+                - name: actual.used_pct
                   type: float
                   description: >
                     The percentage of actual used memory.
@@ -1156,7 +1156,7 @@
                   description: >
                     Available swap memory.
 
-                - name: used_p
+                - name: used_pct
                   type: float
                   description: >
                     The percentage of used swap memory.

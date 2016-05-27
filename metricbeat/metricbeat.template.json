@@ -936,14 +936,18 @@
               "properties": {
                 "mem": {
                   "properties": {
-                    "actual_free": {
-                      "type": "long"
-                    },
-                    "actual_used": {
-                      "type": "long"
-                    },
-                    "actual_used_p": {
-                      "type": "float"
+                    "actual": {
+                      "properties": {
+                        "free": {
+                          "type": "long"
+                        },
+                        "used": {
+                          "type": "long"
+                        },
+                        "used_pct": {
+                          "type": "float"
+                        }
+                      }
                     },
                     "free": {
                       "type": "long"
@@ -954,7 +958,7 @@
                     "used": {
                       "type": "long"
                     },
-                    "used_p": {
+                    "used_pct": {
                       "type": "float"
                     }
                   }
@@ -970,7 +974,7 @@
                     "used": {
                       "type": "long"
                     },
-                    "used_p": {
+                    "used_pct": {
                       "type": "float"
                     }
                   }

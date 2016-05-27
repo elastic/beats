@@ -1713,28 +1713,28 @@ type: long
 Available memory.
 
 
-==== system.memory.mem.used_p
+==== system.memory.mem.used_pct
 
 type: float
 
 The percentage of used memory.
 
 
-==== system.memory.mem.actual_used
+==== system.memory.mem.actual.used
 
 type: long
 
 Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== system.memory.mem.actual_free
+==== system.memory.mem.actual.free
 
 type: long
 
 Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== system.memory.mem.actual_used_p
+==== system.memory.mem.actual.used_pct
 
 type: float
 
@@ -1768,7 +1768,7 @@ type: long
 Available swap memory.
 
 
-==== system.memory.swap.used_p
+==== system.memory.swap.used_pct
 
 type: float
 

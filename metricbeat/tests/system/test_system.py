@@ -252,15 +252,15 @@ class SystemTest(metricbeat.BaseTest):
         mem = memory["mem"]
         if mem["total"] != 0:
             used_p = float(mem["used"]) / mem["total"]
-            self.assertAlmostEqual(mem["used_p"], used_p, places=4)
+            self.assertAlmostEqual(mem["used_pct"], used_p, places=4)
 
-            used_p = float(mem["actual_used"]) / mem["total"]
-            self.assertAlmostEqual(mem["actual_used_p"], used_p, places=4)
+            used_p = float(mem["actual"]["used"]) / mem["total"]
+            self.assertAlmostEqual(mem["actual"]["used_pct"], used_p, places=4)
 
         swap = memory["swap"]
         if swap["total"] != 0:
             used_p = float(swap["used"]) / swap["total"]
-            self.assertAlmostEqual(swap["used_p"], used_p, places=4)
+            self.assertAlmostEqual(swap["used_pct"], used_p, places=4)
 
     @unittest.skipUnless(re.match("(?i)darwin|win|linux|freebsd", sys.platform), "os")
     def test_network(self):
