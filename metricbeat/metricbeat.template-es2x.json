@@ -680,152 +680,228 @@
                   "type": "integer"
                 },
                 "idle": {
-                  "type": "long"
-                },
-                "idle_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "iowait": {
-                  "type": "long"
-                },
-                "iowait_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "irq": {
-                  "type": "long"
-                },
-                "irq_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "nice": {
-                  "type": "long"
-                },
-                "nice_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "softirq": {
-                  "type": "long"
-                },
-                "softirq_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "steal": {
-                  "type": "long"
-                },
-                "steal_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "system": {
-                  "type": "long"
-                },
-                "system_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "user": {
-                  "type": "long"
-                },
-                "user_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
             "cpu": {
               "properties": {
                 "idle": {
-                  "type": "long"
-                },
-                "idle_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "iowait": {
-                  "type": "long"
-                },
-                "iowait_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "irq": {
-                  "type": "long"
-                },
-                "irq_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "load": {
                   "properties": {
-                    "load1": {
+                    "1": {
                       "type": "float"
                     },
-                    "load15": {
+                    "15": {
                       "type": "float"
                     },
-                    "load5": {
+                    "5": {
                       "type": "float"
                     }
                   }
                 },
                 "nice": {
-                  "type": "long"
-                },
-                "nice_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "softirq": {
-                  "type": "long"
-                },
-                "softirq_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "steal": {
-                  "type": "long"
-                },
-                "steal_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "system": {
-                  "type": "long"
-                },
-                "system_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "user": {
-                  "type": "long"
-                },
-                "user_p": {
-                  "type": "float"
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
             "disk": {
               "properties": {
-                "io_time": {
-                  "type": "long"
+                "io": {
+                  "properties": {
+                    "time": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "name": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
                 },
-                "read_bytes": {
-                  "type": "long"
-                },
-                "read_count": {
-                  "type": "long"
-                },
-                "read_time": {
-                  "type": "long"
+                "read": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "count": {
+                      "type": "long"
+                    },
+                    "time": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "serial_number": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
                 },
-                "write_bytes": {
-                  "type": "long"
-                },
-                "write_count": {
-                  "type": "long"
-                },
-                "write_time": {
-                  "type": "long"
+                "write": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "count": {
+                      "type": "long"
+                    },
+                    "time": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
@@ -891,14 +967,18 @@
               "properties": {
                 "mem": {
                   "properties": {
-                    "actual_free": {
-                      "type": "long"
-                    },
-                    "actual_used": {
-                      "type": "long"
-                    },
-                    "actual_used_p": {
-                      "type": "float"
+                    "actual": {
+                      "properties": {
+                        "free": {
+                          "type": "long"
+                        },
+                        "used": {
+                          "type": "long"
+                        },
+                        "used_pct": {
+                          "type": "float"
+                        }
+                      }
                     },
                     "free": {
                       "type": "long"
@@ -909,7 +989,7 @@
                     "used": {
                       "type": "long"
                     },
-                    "used_p": {
+                    "used_pct": {
                       "type": "float"
                     }
                   }
@@ -925,7 +1005,7 @@
                     "used": {
                       "type": "long"
                     },
-                    "used_p": {
+                    "used_pct": {
                       "type": "float"
                     }
                   }

@@ -50,13 +50,15 @@ func GetMemory() (*MemStat, error) {
 
 func GetMemoryEvent(memStat *MemStat) common.MapStr {
 	return common.MapStr{
-		"total":         memStat.Total,
-		"used":          memStat.Used,
-		"free":          memStat.Free,
-		"actual_used":   memStat.ActualUsed,
-		"actual_free":   memStat.ActualFree,
-		"used_p":        memStat.UsedPercent,
-		"actual_used_p": memStat.ActualUsedPercent,
+		"total": memStat.Total,
+		"used":  memStat.Used,
+		"free":  memStat.Free,
+		"actual": common.MapStr{
+			"used":     memStat.ActualUsed,
+			"free":     memStat.ActualFree,
+			"used_pct": memStat.ActualUsedPercent,
+		},
+		"used_pct": memStat.UsedPercent,
 	}
 }
 
@@ -74,10 +76,10 @@ func GetSwap() (*SwapStat, error) {
 
 func GetSwapEvent(swapStat *SwapStat) common.MapStr {
 	return common.MapStr{
-		"total":  swapStat.Total,
-		"used":   swapStat.Used,
-		"free":   swapStat.Free,
-		"used_p": swapStat.UsedPercent,
+		"total":    swapStat.Total,
+		"used":     swapStat.Used,
+		"free":     swapStat.Free,
+		"used_pct": swapStat.UsedPercent,
 	}
 }
 

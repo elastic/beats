@@ -772,175 +772,175 @@
               description: >
                 CPU Core number.
 
-            - name: user_p
+            - name: user.pct
               type: float
               description: >
                 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
                 For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
-            - name: system_p
+            - name: user.ticks
+              type: long
+              description: >
+               The amount of CPU time spent in user space.
+
+            - name: system.pct
               type: float
               description: >
                 The percentage of CPU time spent in kernel space.
 
-            - name: nice_p
+            - name: system.ticks
+              type: long
+              description: >
+                The amount of CPU time spent in kernel space.
+
+            - name: nice.pct
               type: float
               description: >
                 The percentage of CPU time spent on low-priority processes.
 
-            - name: idle_p
+            - name: nice.ticks
+              type: long
+              description: >
+                The amount of CPU time spent on low-priority processes.
+
+            - name: idle.pct
               type: float
               description: >
                 The percentage of CPU time spent idle.
 
-            - name: iowait_p
+            - name: idle.ticks
+              type: long
+              description: >
+                The amount of CPU time spent idle.
+
+            - name: iowait.pct
               type: float
               description: >
                 The percentage of CPU time spent in wait (on disk).
 
-            - name: irq_p
+            - name: iowait.ticks
+              type: long
+              description: >
+                The amount of CPU time spent in wait (on disk).
+
+            - name: irq.pct
               type: float
               description: >
                 The percentage of CPU time spent servicing and handling hardware interrupts.
 
-            - name: softirq_p
+            - name: irq.ticks
+              type: long
+              description: >
+                The amount of CPU time spent servicing and handling hardware interrupts.
+
+            - name: softirq.pct
               type: float
               description:
                 The percentage of CPU time spent servicing and handling software interrupts.
 
-            - name: steal_p
+            - name: softirq.ticks
+              type: long
+              description: >
+                The amount of CPU time spent servicing and handling software interrupts.
+
+            - name: steal.pct
               type: float
               description: >
                 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
                 Available only on Unix.
 
-            - name: user
-              type: long
-              description: >
-               The amount of CPU time spent in user space.
-
-            - name: system
-              type: long
-              description: >
-                The amount of CPU time spent in kernel space.
-
-            - name: nice
-              type: long
-              description: >
-                The amount of CPU time spent on low-priority processes.
-
-            - name: idle
-              type: long
-              description: >
-                The amount of CPU time spent idle.
-
-            - name: iowait
-              type: long
-              description: >
-                The amount of CPU time spent in wait (on disk).
-
-            - name: irq
-              type: long
-              description: >
-                The amount of CPU time spent servicing and handling hardware interrupts.
-
-            - name: softirq
-              type: long
-              description:
-                The amount of CPU time spent servicing and handling software interrupts.
-
-            - name: steal
+            - name: steal.ticks
               type: long
               description: >
                 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
                 Available only on Unix.
+
         - name: cpu
           type: group
           description: >
             `cpu` contains local cpu stats.
           fields:
-            - name: user_p
+            - name: user.pct
               type: float
               description: >
                 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
                 For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
-            - name: system_p
+            - name: system.pct
               type: float
               description: >
                 The percentage of CPU time spent in kernel space.
 
-            - name: nice_p
+            - name: nice.pct
               type: float
               description: >
                 The percentage of CPU time spent on low-priority processes.
 
-            - name: idle_p
+            - name: idle.pct
               type: float
               description: >
                 The percentage of CPU time spent idle.
 
-            - name: iowait_p
+            - name: iowait.pct
               type: float
               description: >
                 The percentage of CPU time spent in wait (on disk).
 
-            - name: irq_p
+            - name: irq.pct
               type: float
               description: >
                 The percentage of CPU time spent servicing and handling hardware interrupts.
 
-            - name: softirq_p
+            - name: softirq.pct
               type: float
               description:
                 The percentage of CPU time spent servicing and handling software interrupts.
 
-            - name: steal_p
+            - name: steal.pct
               type: float
               description: >
                 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
                 Available only on Unix.
 
-
-            - name: user
+            - name: user.ticks
               type: long
               description: >
                The amount of CPU time spent in user space.
 
-            - name: system
+            - name: system.ticks
               type: long
               description: >
                 The amount of CPU time spent in kernel space.
 
-            - name: nice
+            - name: nice.ticks
               type: long
               description: >
                 The amount of CPU time spent on low-priority processes.
 
-            - name: idle
+            - name: idle.ticks
               type: long
               description: >
                 The amount of CPU time spent idle.
 
-            - name: iowait
+            - name: iowait.ticks
               type: long
               description: >
                 The amount of CPU time spent in wait (on disk).
 
-            - name: irq
+            - name: irq.ticks
               type: long
               description: >
                 The amount of CPU time spent servicing and handling hardware interrupts.
 
-            - name: softirq
+            - name: softirq.ticks
               type: long
               description:
                 The amount of CPU time spent servicing and handling software interrupts.
 
-            - name: steal
+            - name: steal.ticks
               type: long
               description: >
                 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
@@ -952,15 +952,15 @@
               description: >
                 Load averages.
               fields:
-                - name: load1
+                - name: "1"
                   type: float
                   description: >
                     Load average for the last minute.
-                - name: load5
+                - name: "5"
                   type: float
                   description: >
                     Load average for the last 5 minutes.
-                - name: load15
+                - name: "15"
                   type: float
                   description: >
                     Load average for the last 15 minutes.
@@ -981,40 +981,40 @@
                 The disk's serial number. This may not be provided by all operating
                 systems.
 
-            - name: read_count
+            - name: read.count
               type: long
               description: >
                 This is the total number of reads completed successfully.
 
-            - name: write_count
+            - name: write.count
               type: long
               description: >
                 This is the total number of writes completed successfully.
 
-            - name: read_bytes
+            - name: read.bytes
               type: long
               description: >
                 This is the total number of bytes read successfully. On Linux this is
                 the number of sectors read multiplied by an assumed sector size of 512.
 
-            - name: write_bytes
+            - name: write.bytes
               type: long
               description: >
                 This is the total number of bytes written successfully. On Linux this is
                 the number of sectors written multiplied by an assumed sector size of
                 512.
 
-            - name: read_time
+            - name: read.time
               type: long
               description: >
                 This is the total number of milliseconds spent by all reads.
 
-            - name: write_time
+            - name: write.time
               type: long
               description: >
                 This is the total number of milliseconds spent by all writes.
 
-            - name: io_time
+            - name: io.time
               type: long
               description: >
                 This is the total number of of milliseconds spent doing I/Os.
@@ -1114,24 +1114,24 @@
                   description: >
                     Available memory.
 
-                - name: used_p
+                - name: used_pct
                   type: float
                   description: >
                     The percentage of used memory.
 
-                - name: actual_used
+                - name: actual.used
                   type: long
                   description: >
                     Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
                     Available only on Unix.
 
-                - name: actual_free
+                - name: actual.free
                   type: long
                   description: >
                     Actual available memory. This value is the "free" memory plus the memory used for disk caches and
                     buffers. Available only on Unix.
 
-                - name: actual_used_p
+                - name: actual.used_pct
                   type: float
                   description: >
                     The percentage of actual used memory.
@@ -1156,7 +1156,7 @@
                   description: >
                     Available swap memory.
 
-                - name: used_p
+                - name: used_pct
                   type: float
                   description: >
                     The percentage of used swap memory.
