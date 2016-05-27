@@ -3,11 +3,11 @@ import sys
 import unittest
 import metricbeat
 
-SYSTEM_CPU_FIELDS = ["idle_p", "iowait_p", "irq_p", "load", "nice_p",
-                     "softirq_p", "steal_p", "system_p", "user_p"]
+SYSTEM_CPU_FIELDS = ["idle.pct", "iowait.pct", "irq.pct", "load", "nice.pct",
+                     "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
-SYSTEM_CPU_ALL_FIELDS = ["idle_p", "idle", "iowait_p", "iowait", "irq_p", "irq", "load", "nice_p", "nice",
-                     "softirq_p", "softirq", "steal_p", "steal", "system_p", "system", "user_p", "user"]
+SYSTEM_CPU_FIELDS_ALL = ["idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "load", "nice.pct", "nice.ticks",
+                     "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks"]
 
 SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                "softirq.pct", "steal.pct", "system.pct", "user.pct"]
@@ -58,7 +58,7 @@ class SystemTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         cpu = evt["system"]["cpu"]
-        self.assertItemsEqual(SYSTEM_CPU_FIELDS, cpu.keys())
+        self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS), cpu.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
     def test_cpu_ticks_option(self):
@@ -87,7 +87,7 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             cpuStats = evt["system"]["cpu"]
-            self.assertItemsEqual(SYSTEM_CPU_ALL_FIELDS, cpuStats.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS_ALL), cpuStats.keys())
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|openbsd", sys.platform), "os")
     def test_core(self):
