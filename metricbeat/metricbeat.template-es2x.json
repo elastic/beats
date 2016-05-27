@@ -933,10 +933,14 @@
                   "type": "long"
                 },
                 "used": {
-                  "type": "long"
-                },
-                "used_p": {
-                  "type": "float"
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "pct": {
+                      "type": "float"
+                    }
+                  }
                 }
               }
             },

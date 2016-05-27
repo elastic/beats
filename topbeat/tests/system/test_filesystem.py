@@ -32,7 +32,7 @@ class Test(BaseTest):
             assert isinstance(output[key], basestring)
 
         for key in [
-            "fs.used_p",
+            "fs.used.pct",
         ]:
             assert isinstance(output[key], numbers.Number)
 
@@ -41,6 +41,6 @@ class Test(BaseTest):
             "fs.files",
             "fs.free_files",
             "fs.total",
-            "fs.used",
+            "fs.used.bytes",
         ]:
             assert type(output[key]) is int or type(output[key]) is long
