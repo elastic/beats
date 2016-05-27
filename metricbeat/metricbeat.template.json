@@ -943,11 +943,15 @@
                     "free": {
                       "type": "long"
                     },
-                    "used.bytes": {
-                      "type": "long"
-                    },
-                    "used.pct": {
-                      "type": "float"
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        },
+                        "pct": {
+                          "type": "float"
+                        }
+                      }
                     }
                   }
                 },

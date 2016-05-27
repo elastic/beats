@@ -23,22 +23,27 @@
       description: >
         The percentage of used memory.
 
-    - name: actual.used.bytes
-      type: long
+    - name: actual
+      type: group
       description: >
-        Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
-        Available only on Unix.
+        Actual memory fields.
+      fields:
+        - name: used.bytes
+          type: long
+          description: >
+            Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
+            Available only on Unix.
 
-    - name: actual.free
-      type: long
-      description: >
-        Actual available memory. This value is the "free" memory plus the memory used for disk caches and
-        buffers. Available only on Unix.
+        - name: free
+          type: long
+          description: >
+            Actual available memory. This value is the "free" memory plus the memory used for disk caches and
+            buffers. Available only on Unix.
 
-    - name: actual.used.pct
-      type: float
-      description: >
-        The percentage of actual used memory.
+        - name: used.pct
+          type: float
+          description: >
+            The percentage of actual used memory.
 
     - name: swap
       type: group
