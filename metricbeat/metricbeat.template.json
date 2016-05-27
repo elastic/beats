@@ -831,7 +831,7 @@
                 }
               }
             },
-            "disk": {
+            "diskio": {
               "properties": {
                 "io": {
                   "properties": {
