@@ -1492,13 +1492,13 @@ Load average for the last 15 minutes.
 
 
 [float]
-=== disk Fields
+=== diskio Fields
 
 `disk` contains disk IO metrics collected from the operating system.
 
 
 
-==== system.disk.name
+==== system.diskio.name
 
 type: keyword
 
@@ -1507,56 +1507,56 @@ example: sda1
 The disk name.
 
 
-==== system.disk.serial_number
+==== system.diskio.serial_number
 
 type: keyword
 
 The disk's serial number. This may not be provided by all operating systems.
 
 
-==== system.disk.read.count
+==== system.diskio.read.count
 
 type: long
 
 This is the total number of reads completed successfully.
 
 
-==== system.disk.write.count
+==== system.diskio.write.count
 
 type: long
 
 This is the total number of writes completed successfully.
 
 
-==== system.disk.read.bytes
+==== system.diskio.read.bytes
 
 type: long
 
 This is the total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
 
 
-==== system.disk.write.bytes
+==== system.diskio.write.bytes
 
 type: long
 
 This is the total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
 
 
-==== system.disk.read.time
+==== system.diskio.read.time
 
 type: long
 
 This is the total number of milliseconds spent by all reads.
 
 
-==== system.disk.write.time
+==== system.diskio.write.time
 
 type: long
 
 This is the total number of milliseconds spent by all writes.
 
 
-==== system.disk.io.time
+==== system.diskio.io.time
 
 type: long
 

@@ -1,6 +1,6 @@
 // +build freebsd linux windows
 
-package disk
+package diskio
 
 import (
 	"github.com/elastic/beats/libbeat/common"
@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "disk", New); err != nil {
+	if err := mb.Registry.AddMetricSet("system", "diskio", New); err != nil {
 		panic(err)
 	}
 }

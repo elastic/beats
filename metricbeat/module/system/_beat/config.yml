@@ -18,6 +18,9 @@
     # Memory stats
     - memory
 
+    # Network stats
+    - network
+
     # Per process stats
     - process
   enabled: true
