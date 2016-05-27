@@ -1,8 +1,28 @@
 - module: system
-  metricsets: ["cpu", "core", "filesystem", "fsstat", "memory", "process"]
+  metricsets:
+    # CPU stats
+    - cpu
+
+    # Per CPU core stats
+    #- core
+
+    # IO stats
+    #- disk
+
+    # Per filesystem stats
+    - filesystem
+
+    # File system summary stats
+    #- fsstat
+
+    # Memory stats
+    - memory
+
+    # Per process stats
+    - process
   enabled: true
-  period: 2s
+  period: 10s
   processes: ['.*']
-  
+
   # if true, exports the CPU usage in ticks, together with the percentage values
   cpu_ticks: false

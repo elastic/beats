@@ -2,6 +2,7 @@
   title: "Redis Status"
   description: >
     Redis metrics collected from the Redis
+  short_config: false
   fields:
     - name: redis
       type: group

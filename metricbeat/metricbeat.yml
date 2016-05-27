@@ -10,51 +10,33 @@
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
-#------------------------------- Apache Module -------------------------------
-- module: apache
-  metricsets: ["status"]
-  enabled: true
-  period: 1s
-
-  # Apache hosts
-  hosts: ["http://127.0.0.1/"]
-
-#---------------------------- MySQL Status Module ----------------------------
-- module: mysql
-  metricsets: ["status"]
-  enabled: true
-  period: 2s
-
-  # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
-  # The username and password can either be set in the DSN or for all hosts in username and password config option
-  hosts: ["root@tcp(127.0.0.1:3306)/"]
-
-#---------------------------- Nginx Status Module ----------------------------
-- module: nginx
-  metricsets: ["stubstatus"]
-  enabled: true
-  period: 1s
-
-  # Nginx hosts
-  hosts: ["http://127.0.0.1/"]
-
-
-#---------------------------- Redis Status Module ----------------------------
-- module: redis
-  metricsets: ["info"]
-  enabled: true
-  period: 1s
-
-  # Redis hosts
-  hosts: ["127.0.0.1:6379"]
-
 #---------------------------- System Status Module ---------------------------
 - module: system
-  metricsets: ["cpu", "core", "filesystem", "fsstat", "memory", "process"]
+  metricsets:
+    # CPU stats
+    - cpu
+
+    # Per CPU core stats
+    #- core
+
+    # IO stats
+    #- disk
+
+    # Per filesystem stats
+    - filesystem
+
+    # File system summary stats
+    #- fsstat
+
+    # Memory stats
+    - memory
+
+    # Per process stats
+    - process
   enabled: true
-  period: 2s
+  period: 10s
   processes: ['.*']
-  
+
   # if true, exports the CPU usage in ticks, together with the percentage values
   cpu_ticks: false
 

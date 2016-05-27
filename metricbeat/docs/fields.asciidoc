@@ -1173,6 +1173,7 @@ type: integer
 
 None
 
+[float]
 === keyspace Fields
 
 `keyspace` contains the information about the keyspaces returned by the `INFO` command.

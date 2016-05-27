@@ -32,6 +32,7 @@
   title: "Apache"
   description: >
     Apache HTTPD server metric sets collected from the apache web server.
+  short_config: false
   fields:
     - name: apache
       type: group
@@ -208,6 +209,7 @@
   title: "MySQL Status"
   description: >
     MySQL server status metrics collected from MySQL
+  short_config: false
   fields:
     - name: mysql
       type: group
@@ -329,6 +331,7 @@
   title: "Nginx Status"
   description: >
     Nginx server status metrics collected from various modules.
+  short_config: false
   fields:
     - name: nginx
       type: group
@@ -384,6 +387,7 @@
   title: "Redis Status"
   description: >
     Redis metrics collected from the Redis
+  short_config: false
   fields:
     - name: redis
       type: group

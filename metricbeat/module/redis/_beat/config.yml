@@ -1,7 +1,7 @@
 - module: redis
   metricsets: ["info"]
   enabled: true
-  period: 1s
+  period: 10s
 
   # Redis hosts
   hosts: ["127.0.0.1:6379"]

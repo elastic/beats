@@ -21,11 +21,10 @@ metricbeat.modules:
 - module: nginx
   metricsets: ["stubstatus"]
   enabled: true
-  period: 1s
+  period: 10s
 
   # Nginx hosts
   hosts: ["http://127.0.0.1/"]
-
 ----
 
 [float]
