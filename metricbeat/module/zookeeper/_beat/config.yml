@@ -1,5 +1,5 @@
 #- module: zookeeper
   #metricsets: ["mntr"]
   #enabled: true
-  #period: 5s
+  #period: 10s
   #hosts: ["localhost:2181"]

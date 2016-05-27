@@ -44,7 +44,7 @@ metricbeat.modules:
 #- module: apache
   #metricsets: ["status"]
   #enabled: true
-  #period: 1s
+  #period: 10s
 
   # Apache hosts
   #hosts: ["http://127.0.0.1/"]
@@ -62,7 +62,7 @@ metricbeat.modules:
 #- module: mysql
   #metricsets: ["status"]
   #enabled: true
-  #period: 2s
+  #period: 10s
 
   # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
   # The username and password can either be set in the DSN or for all hosts in username and password config option
@@ -78,7 +78,7 @@ metricbeat.modules:
 #- module: nginx
   #metricsets: ["stubstatus"]
   #enabled: true
-  #period: 1s
+  #period: 10s
 
   # Nginx hosts
   #hosts: ["http://127.0.0.1/"]
@@ -90,7 +90,7 @@ metricbeat.modules:
 #- module: redis
   #metricsets: ["info", "keyspace"]
   #enabled: true
-  #period: 1s
+  #period: 10s
 
   # Redis hosts
   #hosts: ["127.0.0.1:6379"]
@@ -125,7 +125,7 @@ metricbeat.modules:
 #- module: zookeeper
   #metricsets: ["mntr"]
   #enabled: true
-  #period: 5s
+  #period: 10s
   #hosts: ["localhost:2181"]
 
 
