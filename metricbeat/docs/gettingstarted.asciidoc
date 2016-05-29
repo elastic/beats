@@ -197,5 +197,4 @@ Elasticsearch instance.
 On Windows, if you don't have cURL installed, simply point your browser to the
 URL.
 
-
 Enjoy!
