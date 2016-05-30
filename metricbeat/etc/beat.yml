@@ -20,7 +20,7 @@ metricbeat.modules:
     #- core
 
     # IO stats
-    #- disk
+    #- diskio
 
     # Per filesystem stats
     - filesystem
