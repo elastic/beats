@@ -119,11 +119,8 @@ A description of each field in the MetricSet can be found in the
 
                 metricset_file += "[source,json]\n"
                 metricset_file += "----\n"
-
-                with file(data_file) as f:
-                    metricset_file += f.read()
-
-                metricset_file += "\n----\n"
+                metricset_file += "include::../../../module/" + module + "/" + metricset + "/_beat/data.json[]\n"
+                metricset_file += "----\n"
 
             # Write metricset docs
             with open(os.path.abspath("docs") + "/modules/" + module + "/" + metricset + ".asciidoc", 'w') as f:
