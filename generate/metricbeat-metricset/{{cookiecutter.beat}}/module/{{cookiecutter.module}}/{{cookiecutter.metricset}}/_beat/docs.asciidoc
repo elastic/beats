@@ -1,0 +1,3 @@
+=== {{cookiecutter.metricset}} MetricSet
+
+Increments a counter and sends it to elasticsearch.

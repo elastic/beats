@@ -1,0 +1,10 @@
+- key: {{cookiecutter.module}}
+  title: "{{cookiecutter.module}}"
+  description: >
+    {{cookiecutter.module}} metrics
+  fields:
+    - name: {{cookiecutter.module}}
+      type: group
+      description: >
+        {{cookiecutter.module}} contains statistics
+      fields:

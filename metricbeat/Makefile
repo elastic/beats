@@ -25,6 +25,7 @@ kibana:
 # Collects all module and metricset fields
 .PHONY: fields
 fields:
+	mkdir -p etc/
 	cat ${ES_BEATS}/metricbeat/etc/_beat/fields_base.yml > etc/fields.yml
 	python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> etc/fields.yml
 
