@@ -1,0 +1,9 @@
+package: .
+import:
+- package: github.com/elastic/beats
+  version: 40146f0616ff4bce05acbc0435c9828aa435bfd3
+  subpackages:
+  - /libbeat/beat
+  - libbeat/cfgfile
+  - libbeat/common
+  - libbeat/logp
