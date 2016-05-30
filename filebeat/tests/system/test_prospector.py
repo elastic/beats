@@ -531,7 +531,11 @@ class Test(BaseTest):
         with open(testfile, 'a') as file:
             file.write("Hello world\n")
 
-        os.symlink(testfile, symlink_file)
+        if os.name == "nt":
+            import win32file
+            win32file.CreateSymbolicLink(testfile, symlink_file, 1)
+        else:
+            os.symlink(testfile, symlink_file)
 
         filebeat = self.start_beat()
 
