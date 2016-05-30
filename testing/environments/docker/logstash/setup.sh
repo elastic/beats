@@ -10,4 +10,4 @@ set -x && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-#logstash-plugin install logstash-input-beats
+logstash-plugin install logstash-input-beats
