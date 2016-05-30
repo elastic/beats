@@ -79,9 +79,13 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 			}
 
 			// Stat the file, following any symlinks.
-			fileinfo, err := os.Stat(file)
+			fileinfo, err := os.Lstat(file)
 			if err != nil {
 				logp.Debug("prospector", "stat(%s) failed: %s", file, err)
+				continue
+			}
+			if fileinfo.Mode()&os.ModeSymlink != 0 {
+				logp.Debug("prospector", "File %s skipped as it is a symlink.", file)
 				continue
 			}
 
