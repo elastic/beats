@@ -1,0 +1,6 @@
+CHANGELOG.md  merge=union
+CHANGELOG.asciidoc  merge=union
+
+# Keep these file types as CRLF (Windows).
+*.bat    text eol=crlf
+*.cmd    text eol=crlf

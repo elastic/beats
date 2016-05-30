@@ -1,0 +1,7 @@
+/.idea
+/build
+
+.DS_Store
+/{{cookiecutter.beat}}
+/{{cookiecutter.beat}}.test
+*.pyc

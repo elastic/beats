@@ -1,0 +1,5 @@
+= {{cookiecutter.beat|capitalize}} Docs
+
+Welcome to the {{cookiecutter.beat|capitalize}} documentation.
+
+
