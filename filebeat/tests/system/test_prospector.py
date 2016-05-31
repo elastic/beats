@@ -533,7 +533,7 @@ class Test(BaseTest):
 
         if os.name == "nt":
             import win32file
-            win32file.CreateSymbolicLink(symlink_file, testfile, 1)
+            win32file.CreateSymbolicLink(symlink_file, testfile, 0)
         else:
             os.symlink(testfile, symlink_file)
 
