@@ -7,6 +7,7 @@ This file is generated! See scripts/docs_collector.py
 
 This module periodically fetches metrics from http://redis.io/[Redis] servers.
 
+[float]
 === Configuration Options
 
 Redis has two additional config options:
@@ -20,6 +21,13 @@ Redis has two additional config options:
   `tcp`.
 * `maxconn` - Maximum number of concurrent connections to Redis. The default value
   is 10.
+
+
+[float]
+=== Compatibility
+
+The redis MetricSets were tested with redis 3.2 and are expected to work with all version
+>= 3.0.
 
 
 [float]

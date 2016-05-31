@@ -8,6 +8,11 @@ This file is generated! See scripts/docs_collector.py
 This module periodically fetches metrics from https://httpd.apache.org/[Apache
 HTTPD] servers.
 
+[float]
+=== Compatibility
+
+The apache MetricSets were tested with apache 2.4.20 and are expected to work with all version
+>= 2.2.31 and >= 2.4.16.
 
 
 [float]
