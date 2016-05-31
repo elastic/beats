@@ -16,13 +16,12 @@ A Metricbeat configuration contains a list of modules. Each module contains the 
 
 * module: Name of the module to run
 * metricsets: List of metricsets of the module which should be executed
-* hosts: List of hosts that the metricsets should connected to. For some modules this is not required (e.g. system). For the details how to define the hosts string for each module, please check the documentation of the module.
-* period: Period how often the metricsets are executed. If a system is not reachable it will return an error for each period.
-* enabled: Enabled is by default set to true and is not required. It can be set to false to disable a module
+* hosts: List of hosts that the metricsets should connected to. For some modules, such as the system module, this is not required. For the details how to define the hosts string for each module, please check the documentation of the module.
+* period: How often in seconds the metricsets are executed. If a system is not reachable it will return an error for each period.
+* enabled: Modules are enabled (set to `enabled: true`) by default. To disable a module, specify `enabled: false`.
 * fields: Fields is optional. Here you can define additional fields which should be sent with the metricset event
 * tags: Tags is optional. Here you can define additional tags which should be sent with the metricset event
 * filters: With filters you can reduce the amount of data is sent. For details on the available filter options check (link to filters).
-
 
 [source,yaml]
 ----
@@ -44,8 +43,7 @@ metricbeat:
 [float]
 == Configuration Combinations
 
-This configuration allows to create different combinations of module, metricsets, period, hosts and selectors. In the example below, the same hosts is crawled for the `stats` information every second as this is critical data, and the full list of metricsets is only fetched every 30 seconds as it is less critical.
-
+This configuration allows you to create different combinations of module, metricsets, period, hosts, and selectors. In the following example, the same hosts is crawled for the `stats` information every second as this is critical data, and the full list of metricsets is only fetched every 30 seconds as it is less critical.
 
 [source,yaml]
 ----

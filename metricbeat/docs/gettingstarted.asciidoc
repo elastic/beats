@@ -21,6 +21,14 @@ After you have installed these products, you can start
 [[metricbeat-installation]]
 === Step 1: Installing Metricbeat
 
+You should install Metricbeat as close as possible to the service you want to
+monitor. For example, if you have four servers with MySQL running, it's
+recommended that you run Metricbeat on each service. This allows Metricbeat to
+access your service from localhost and does not cause any additional network
+traffic or prevent Metricbeat from collecting metrics when there are network
+problems. Metrics from multiple Metricbeat instances will be combined on the
+Elasticsearch server.
+
 To download and install Metricbeat, use the commands that work with your system
 (<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
 mac>> for OS X, and <<win, win>> for Windows).
@@ -196,6 +204,5 @@ Elasticsearch instance.
 
 On Windows, if you don't have cURL installed, simply point your browser to the
 URL.
-
 
 Enjoy!
