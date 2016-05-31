@@ -51,7 +51,7 @@ This file is generated! See scripts/docs_collector.py
 === Example Configuration
 
 The """ + title + """ module supports the standard configuration options which can be found
-here (add link). Below is an example of a configuration option:
+<<configuration-metricbeat,here>>. Below is an example of a configuration option:
 
 [source,yaml]
 ----

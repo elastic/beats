@@ -16,7 +16,8 @@ That means as a contributor you have different options on how to use metricbeat
 and how to contribute.
 
 If you are looking to contribute in general to beats or the foundation of
-metricbeat, also have a look at the general contributor guide (add link here).
+metricbeat, also have a look at the
+https://github.com/elastic/beats/blob/master/CONTRIBUTING.md[general contributor guide].
 
 --
 

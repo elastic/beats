@@ -26,7 +26,7 @@ Redis has two additional config options:
 === Example Configuration
 
 The Redis Status module supports the standard configuration options which can be found
-here (add link). Below is an example of a configuration option:
+<<configuration-metricbeat,here>>. Below is an example of a configuration option:
 
 [source,yaml]
 ----
