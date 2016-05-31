@@ -12,6 +12,8 @@ include::./gettingstarted.asciidoc[]
 
 include::./command-line.asciidoc[]
 
+include::./how-metricbeat-works.asciidoc[]
+
 include::./configuring-howto.asciidoc[]
 
 include::./metricbeat-filtering.asciidoc[]
