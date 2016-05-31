@@ -5,7 +5,7 @@
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/master
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/master
 :elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/master/
-:version: 5.0.0-alpha2
+:version: 5.0.0-alpha3
 :beatname_lc: packetbeat
 :beatname_uc: Packetbeat
 :security: X-Pack Security
