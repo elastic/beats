@@ -3,9 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-cpu]]
-=== System CPU MetricSet
-
-The System CPU MetricSet provides CPU statistics.
+include::../../../module/system/cpu/_beat/docs.asciidoc[]
 
 
 ==== Fields

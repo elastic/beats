@@ -50,7 +50,7 @@ metricbeat.modules:
 === Example Configuration
 
 The System Status module supports the standard configuration options which can be found
-here (add link). Below is an example of a configuration option:
+here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
 
 [source,yaml]
 ----
