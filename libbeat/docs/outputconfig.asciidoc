@@ -228,7 +228,7 @@ API errors, killed connections, timed-out publishing requests, and, ultimately, 
 throughput.
 
 Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. When buffering is disabled,
-Beats that publish single events (such as Packetbeat and Topbeat) send each event directly to
+Beats that publish single events (such as Packetbeat) send each event directly to
 Elasticsearch. Beats that publish data in batches (such as Filebeat) send events in batches based on the
 spooler size.
 
@@ -345,8 +345,8 @@ output.logstash:
 
   # index configures '@metadata.beat' field to be used by Logstash for
   # indexing. The default index name depends on the each beat.
-  # For Packetbeat, the default is set to packetbeat, for Topbeat to
-  # topbeat and for Filebeat to filebeat.
+  # For Packetbeat, the default is set to packetbeat, for Metricbeat to
+  # metricbeat and for Filebeat to filebeat.
   index: {beatname_lc}
 ------------------------------------------------------------------------------
 
@@ -475,7 +475,7 @@ API errors, killed connections, timed-out publishing requests, and, ultimately, 
 throughput.
 
 Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. When buffering is disabled,
-Beats that publish single events (such as Packetbeat and Topbeat) send each event directly to
+Beats that publish single events (such as Packetbeat) send each event directly to
 Elasticsearch. Beats that publish data in batches (such as Filebeat) send events in batches based on the
 spooler size.
 
@@ -598,7 +598,7 @@ requests, and, ultimately, lower throughput.
 
 Setting `bulk_max_size` to values less than or equal to 0 disables buffering in
 libbeat. When buffering is disabled, Beats that publish single events (such as
-Packetbeat and Topbeat) send each event directly to Redis. Beats that publish
+Packetbeat) send each event directly to Redis. Beats that publish
 data in batches (such as Filebeat) send events in batches based on the spooler
 size.
 
