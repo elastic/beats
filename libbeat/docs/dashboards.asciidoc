@@ -10,7 +10,7 @@ NOTE: The Beats dashboards require Kibana 4 or later.
 
 Each Beat comes packaged with a script that you can use to import the example dashboards,
 visualizations, and searches for that Beat. The script also creates index patterns, such as 
-`packetbeat-*` for Packetbeat, `topbeat-*` for Topbeat, and so on. 
+`packetbeat-*` for Packetbeat, `metricbeat-*` for Metricbeat, and so on. 
 
 Use the following commands to run the script:
 

@@ -96,7 +96,7 @@ need to create an environment that contains all the required Python packages. Se
 https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for more info.
 
 NOTE: Dashboard names must be **prefixed** with the name of the beat in order to work correctly. For example:
-Topbeat-Dashboard.
+Packetbeat-Dashboard.
 
 For example, to export all Packetbeat dashboards, you can run the following command from the `packetbeat` directory in
 the `beats` repository:
@@ -120,8 +120,8 @@ and index pattern
 optional arguments:
   -h, --help       Show this help message and exit
   --url URL        Elasticsearch URL. E.g. http://localhost:9200
-  --beat BEAT      Beat name e.g. topbeat
-  --index INDEX    Elasticsearch index for the Beat data. E.g. topbeat-*
+  --beat BEAT      Beat name e.g. packetbeat
+  --index INDEX    Elasticsearch index for the Beat data. E.g. packetbeat-*
   --kibana KIBANA  Elasticsearch index for the Kibana dashboards. E.g. .kibana
   --dir DIR        Output directory. E.g. output
 
