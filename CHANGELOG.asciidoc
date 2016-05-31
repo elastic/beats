@@ -81,8 +81,6 @@ https://github.com/elastic/beats/compare/v5.0.0alpha2...v5.0.0-alpha3[View commi
 - All configuration settings under `shipper:` are moved to be top level configuration settings. I.e.
   `shipper.name:` becomes `name:` in the configuration file. #1570
 
-*Packetbeat*
-
 *Topbeat*
 
 - Topbeat is replaced by Metricbeat.
