@@ -46,6 +46,9 @@ if __name__ == "__main__":
 
     # Fetches GOPATH and current execution directory. It is expected to run this script from the Makefile.
     gopath = os.environ['GOPATH']
+    # Normalise go path
+    gopath = os.path.abspath(gopath)
+
     path = os.path.abspath("./")
 
     # Removes the gopath + /src/ from the directory name to fetch the path
