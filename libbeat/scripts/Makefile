@@ -236,7 +236,7 @@ update: python-env
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME} ${ES_BEATS}
 
 ### KIBANA FILES HANDLING ###
-ES_URL?=http://localhost:9200/
+ES_URL?=http://localhost:9200
 
 .PHONY: export-dashboards
 export-dashboards:
