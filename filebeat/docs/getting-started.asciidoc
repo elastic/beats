@@ -30,8 +30,8 @@ See our https://www.elastic.co/downloads/beats/filebeat[download page] for other
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/filebeat/filebeat_{version}_amd64.deb
-sudo dpkg -i filebeat_{version}_amd64.deb
+curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-amd64.deb
+sudo dpkg -i filebeat-{version}-amd64.deb
 ------------------------------------------------
 
 [[rpm]]
@@ -48,8 +48,8 @@ sudo rpm -vi filebeat-{version}-x86_64.rpm
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-darwin.tgz
-tar xzvf filebeat-{version}-darwin.tgz
+curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-darwin-x64.tar.gz
+tar xzvf filebeat-{version}-darwin-x64.tar.gz
 ------------------------------------------------
 
 [[win]]
