@@ -26,7 +26,7 @@ def fields_to_es_template(args, input, output, index):
 
     # No fields defined, can't generate template
     if docs is None:
-        print "fields.yml is empty. Cannot generate template."
+        print("fields.yml is empty. Cannot generate template.")
         return
 
     # Each template needs defaults
@@ -272,7 +272,7 @@ if __name__ == "__main__":
         fields = f.read()
 
         # Prepend beat fields from libbeat
-        with file(args.es_beats + "/libbeat/_beat/fields.yml") as f:
+        with open(args.es_beats + "/libbeat/_beat/fields.yml") as f:
             fields = f.read() + fields
 
         with open(target, 'w') as output:
