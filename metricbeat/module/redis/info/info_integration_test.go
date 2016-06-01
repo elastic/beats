@@ -28,6 +28,15 @@ func TestFetch(t *testing.T) {
 	assert.Equal(t, "standalone", server["mode"])
 }
 
+func TestData(t *testing.T) {
+	f := mbtest.NewEventFetcher(t, getConfig(""))
+
+	err := mbtest.WriteEvent(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
+}
+
 // +build integration
 const (
 	password = "foobared"
