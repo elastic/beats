@@ -76,7 +76,7 @@ grouped in the following categories:
 
     # fields file is empty
     if docs is None:
-        print "fields.yml file is empty. fields.asciidoc cannot be generated."
+        print("fields.yml file is empty. fields.asciidoc cannot be generated.")
         return
 
     # Create sections from available fields
@@ -111,11 +111,11 @@ if __name__ == "__main__":
     es_beats = args.es_beats
 
     # Read fields.yml
-    with file(beat_path + "/etc/fields.yml") as f:
+    with open(beat_path + "/etc/fields.yml") as f:
         fields = f.read()
 
     # Prepends beat fields from libbeat
-    with file(es_beats + "/libbeat/_beat/fields.yml") as f:
+    with open(es_beats + "/libbeat/_beat/fields.yml") as f:
         fields = f.read() + fields
 
     output = open(beat_path + "/docs/fields.asciidoc", 'w')
