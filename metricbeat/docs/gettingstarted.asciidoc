@@ -48,8 +48,8 @@ other installation options, such as 32-bit images.
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat_{version}_amd64.deb
-sudo dpkg -i metricbeat_{version}_amd64.deb
+curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-amd64.deb
+sudo dpkg -i metricbeat-{version}-amd64.deb
 ------------------------------------------------
 
 [[rpm]]
@@ -66,8 +66,8 @@ sudo rpm -vi metricbeat-{version}-x86_64.rpm
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-darwin.tgz
-tar xzvf metricbeat-{version}-darwin.tgz
+curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-darwin-x64.tar.gz
+tar xzvf metricbeat-{version}-darwin-x64.tar.gz
 ------------------------------------------------
 
 [[win]]
