@@ -141,6 +141,7 @@ func (s *SingleConnectionMode) publish(
 		if resetFail {
 			debug("reset fails")
 			fails = 0
+			backoffCount = 0
 		}
 
 		if !guaranteed && (s.maxAttempts > 0 && fails == s.maxAttempts) {
