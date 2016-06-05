@@ -14,19 +14,19 @@
 packetbeat.interfaces.device: any
 
 # Packetbeat supports three sniffer types:
-# * pcap, which uses the libpcap library and works on most platforms, but it’s
+# * pcap, which uses the libpcap library and works on most platforms, but it's
 # not the fastest option.
 # * af_packet, which uses memory-mapped sniffing. This option is faster than
-# libpcap and doesn’t require a kernel module, but it’s Linux-specific.
+# libpcap and doesn't require a kernel module, but it's Linux-specific.
 # * pf_ring, which makes use of an ntop.org project. This setting provides the
-# best sniffing speed, but it requires a kernel module, and it’s Linux-specific.
+# best sniffing speed, but it requires a kernel module, and it's Linux-specific.
 # The default sniffer type is pcap.
 #packetbeat.interfaces.type: pcap
 
 # The maximum size of the packets to capture. The default is 65535, which is
 # large enough for almost all networks and interface types. If you sniff on a
 # physical network interface, the optimal setting is the MTU size. On virtual
-# interfaces, however, it’s safer to accept the default value.
+# interfaces, however, it's safer to accept the default value.
 #packetbeat.interfaces.snaplen: 65535
 
 # The maximum size of the shared memory buffer to use between the kernel and

@@ -407,7 +407,7 @@ output.elasticsearch:
 
   # The maximum permitted size of JSON-encoded messages. Bigger messages will be
   # dropped. The default value is 1000000 (bytes). This value should be equal to
-  # or less than the broker’s message.max.bytes.
+  # or less than the broker's message.max.bytes.
   #max_message_bytes: 1000000
 
   # The ACK reliability level required from broker. 0=no response, 1=wait for
@@ -589,7 +589,7 @@ output.elasticsearch:
 #path.data:
 
 # The logs path for a metricbeat installation. This is the default location for
-# the Beat’s log files. If not set by a CLI flag or in the configuration file,
+# the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs:
 
