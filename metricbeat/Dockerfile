@@ -16,7 +16,6 @@ RUN set -x \
 
 # Setup work environment
 ENV METRICBEAT_PATH /go/src/github.com/elastic/beats/metricbeat
-ENV GO15VENDOREXPERIMENT=1
 
 RUN mkdir -p $METRICBEAT_PATH/build/coverage
 WORKDIR $METRICBEAT_PATH

@@ -12,15 +12,17 @@
     },
     "system": {
         "filesystem": {
-            "avail": 93670899712,
-            "device_name": "/dev/disk1",
-            "files": 60981246,
-            "free": 93933043712,
-            "free_files": 22868872,
+            "avail": 44886921216,
+            "device_name": "none",
+            "files": 3940352,
+            "free": 48129642496,
+            "free_files": 3399857,
             "mount_point": "/",
-            "total": 249779191808,
-            "used": 155846148096,
-            "used_p": 0.6239
+            "total": 63371726848,
+            "used": {
+                "bytes": 15242084352,
+                "pct": 0.2405
+            }
         }
     },
     "type": "metricsets"
