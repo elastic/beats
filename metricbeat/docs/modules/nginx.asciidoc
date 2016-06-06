@@ -30,7 +30,7 @@ metricbeat.modules:
   period: 10s
 
   # Nginx hosts
-  hosts: ["http://127.0.0.1/"]
+  hosts: ["http://127.0.0.1"]
 ----
 
 [float]

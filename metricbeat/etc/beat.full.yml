@@ -50,7 +50,7 @@ metricbeat.modules:
   #period: 10s
 
   # Apache hosts
-  #hosts: ["http://127.0.0.1/"]
+  #hosts: ["http://127.0.0.1"]
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
@@ -84,7 +84,7 @@ metricbeat.modules:
   #period: 10s
 
   # Nginx hosts
-  #hosts: ["http://127.0.0.1/"]
+  #hosts: ["http://127.0.0.1"]
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
