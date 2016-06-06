@@ -1,58 +1,66 @@
 {
-    "@timestamp":"2016-05-11T07:25:22.343Z",
-    "apache-status":{
-        "busyWorkers":0,
-        "bytesPerReq":0,
-        "bytesPerSec":0,
-        "connections":{
-            "connsAsyncClosing":0,
-            "connsAsyncKeepAlive":0,
-            "connsAsyncWriting":0,
-            "connsTotal":0
-        },
-        "cpu":{
-            "cpuChildrenSystem":0,
-            "cpuChildrenUser":0,
-            "cpuLoad":0,
-            "cpuSystem":0,
-            "cpuUser":0
-        },
-        "hostname":"http://apache/",
-        "idleWorkers":0,
-        "load":{
-            "load1":0,
-            "load15":0,
-            "load5":0
-        },
-        "reqPerSec":0,
-        "scoreboard":{
-            "closingConnection":0,
-            "dnsLookup":0,
-            "gracefullyFinishing":0,
-            "idleCleanup":0,
-            "keepalive":0,
-            "logging":0,
-            "openSlot":0,
-            "readingRequest":0,
-            "sendingReply":0,
-            "startingUp":0,
-            "total":0,
-            "waitingForConnection":0
-        },
-        "totalAccesses":0,
-        "totalKBytes":0,
-        "uptime":{
-            "serverUptimeSeconds":0,
-            "uptime":0
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "apache": {
+        "status": {
+            "bytes_per_request": 916.211,
+            "bytes_per_sec": 10.921,
+            "connections": {
+                "async": {
+                    "closing": 0,
+                    "keep_alive": 0,
+                    "writing": 0
+                },
+                "total": 0
+            },
+            "cpu": {
+                "children_system": 0,
+                "children_user": 0,
+                "load": 0.0890841,
+                "system": 0.77,
+                "user": 0.65
+            },
+            "hostname": "apache",
+            "load": {
+                "1": 1.53,
+                "15": 0.53,
+                "5": 0.92
+            },
+            "requests_per_sec": 0.0119197,
+            "scoreboard": {
+                "closing_connection": 0,
+                "dns_lookup": 0,
+                "gracefully_finishing": 0,
+                "idle_cleanup": 0,
+                "keepalive": 0,
+                "logging": 0,
+                "open_slot": 325,
+                "reading_request": 0,
+                "sending_reply": 1,
+                "starting_up": 0,
+                "total": 400,
+                "waiting_for_connection": 74
+            },
+            "total_accesses": 19,
+            "total_kbytes": 17,
+            "uptime": {
+                "server_uptime": 1594,
+                "uptime": 1594
+            },
+            "workers": {
+                "busy": 1,
+                "idle": 74
+            }
         }
     },
-    "beat":{
-        "hostname":"9447b637514b",
-        "name":"9447b637514b"
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":"status",
-    "metricset-host":"http://apache/",
-    "module":"apache",
-    "rtt":8564,
-    "type":"metricsets"
+    "metricset": {
+        "host": "localhost",
+        "module": "apache",
+        "name": "status",
+        "rtt": 115
+    },
+    "type": "metricsets"
 }

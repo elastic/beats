@@ -1,18 +1,21 @@
 {
-    "@timestamp": "2016-05-19T14:29:47.087Z",
+    "@timestamp": "2016-05-23T08:05:34.853Z",
     "beat": {
-        "hostname": "ruflin",
-        "name": "ruflin"
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset": "info",
-    "metricset-host": "localhost:6379",
-    "module": "redis",
+    "metricset": {
+        "host": "localhost",
+        "module": "redis",
+        "name": "info",
+        "rtt": 115
+    },
     "redis": {
         "info": {
             "clients": {
                 "biggest_input_buf": 0,
                 "blocked": 0,
-                "connected": 1,
+                "connected": 2,
                 "longest_output_list": 0
             },
             "cluster": {
@@ -20,33 +23,30 @@
             },
             "cpu": {
                 "used": {
-                    "sys": 0.55,
+                    "sys": 1.49,
                     "sys_children": 0,
-                    "user": 0.33,
+                    "user": 0.59,
                     "user_children": 0
                 }
             },
-            "keyspace": {
-
-            },
             "memory": {
-                "allocator": "libc",
+                "allocator": "jemalloc-4.0.3",
                 "used": {
                     "lua": 37888,
-                    "peak": 1008048,
-                    "rss": 2002944,
-                    "value": 1007024
+                    "peak": 1010736,
+                    "rss": 9601024,
+                    "value": 886048
                 }
             },
             "persistence": {
                 "loading": false,
                 "rdb": {
                     "bgsave_in_progress": false,
-                    "changes_since_last_save": 0,
+                    "changes_since_last_save": 4,
                     "current_bgsave_time_sec": -1,
                     "last_bgsave_status": "ok",
                     "last_bgsave_time_sec": -1,
-                    "last_save_time": 1463666588
+                    "last_save_time": 1464763800
                 },
                 "used": {
                     "current_rewrite_time_sec": -1,
@@ -71,30 +71,30 @@
             },
             "server": {
                 "arch_bits": "64",
-                "build_id": "dd22954a73c7ae64",
+                "build_id": "5382f69a4e75566b",
                 "config_file": "",
-                "gcc_version": "4.2.1",
+                "gcc_version": "4.9.2",
                 "git_dirty": "0",
                 "git_sha1": "00000000",
                 "hz": 10,
-                "lru_clock": 4050395,
+                "lru_clock": 5147609,
                 "mode": "standalone",
-                "multiplexing_api": "kqueue",
-                "os": "Darwin 15.4.0 x86_64",
-                "process_id": 65144,
-                "run_id": "32619dd64fa7bca5341472c56e09ab88f7568638",
+                "multiplexing_api": "epoll",
+                "os": "Linux 4.4.11-moby x86_64",
+                "process_id": 1,
+                "run_id": "8c07c362f21cffca73bc37b462e4183d67ae9a0c",
                 "tcp_port": 6379,
-                "uptime": 1599,
+                "uptime": 1601,
                 "version": "3.2.0"
             },
             "stats": {
                 "connections": {
-                    "received": 46,
+                    "received": 61,
                     "rejected": 0
                 },
-                "instantaneous_input_kbps": 0.02,
+                "instantaneous_input_kbps": 0,
                 "instantaneous_ops_per_sec": 0,
-                "instantaneous_output_kbps": 1.23,
+                "instantaneous_output_kbps": 0,
                 "keys": {
                     "evicted": 0,
                     "expired": 0
@@ -112,12 +112,11 @@
                     "partial_err": 0,
                     "partial_ok": 0
                 },
-                "total_commands_processed": 45,
-                "total_net_input_bytes": 1242,
-                "total_net_output_bytes": 94898
+                "total_commands_processed": 55,
+                "total_net_input_bytes": 2000,
+                "total_net_output_bytes": 37007
             }
         }
     },
-    "rtt": 5113,
     "type": "metricsets"
 }

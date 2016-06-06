@@ -13,16 +13,16 @@
     "system": {
         "network": {
             "in": {
-                "bytes": 8696843,
+                "bytes": 0,
                 "dropped": 0,
-                "errors": 847922222,
+                "errors": 0,
                 "packets": 0
             },
-            "name": "lo0",
+            "name": "sit0",
             "out": {
                 "bytes": 0,
                 "dropped": 0,
-                "errors": 847922222,
+                "errors": 0,
                 "packets": 0
             }
         }
