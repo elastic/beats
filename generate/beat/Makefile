@@ -1,6 +1,6 @@
 BUILD_DIR?=build
 PWD=$(shell pwd)
-PYTHON_ENV=${BUILD_DIR}/python-env/
+PYTHON_ENV?=${BUILD_DIR}/python-env/
 
 # Runs test build for mock beat
 .PHONY: test
