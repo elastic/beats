@@ -132,6 +132,7 @@ func (s *SingleConnectionMode) publish(
 			goto sendFail
 		}
 
+		backoffCount = 0
 		debug("send completed")
 		outputs.SignalCompleted(signaler)
 		return nil
