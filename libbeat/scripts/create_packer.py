@@ -1,9 +1,7 @@
 import os
 import argparse
 
-# Creates a new metricset with all the necessary file
-# In case the module does not exist, also the module is created
-
+# Adds dev-tools/packer directory with the necessary files to a beat
 
 def generate_packer(es_beats, abs_path, beat, beat_path, version):
 
