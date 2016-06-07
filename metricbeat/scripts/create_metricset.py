@@ -5,9 +5,9 @@ import argparse
 # In case the module does not exist, also the module is created
 
 
-def generate_metricset(base_path, module, metricset):
+def generate_metricset(base_path, metricbeat_path, module, metricset):
 
-    generate_module(base_path, module)
+    generate_module(base_path, metricbeat_path, module, metricset)
     metricset_path = base_path + "/module/" + module + "/" + metricset
     meta_path = metricset_path + "/_beat"
 
@@ -17,11 +17,11 @@ def generate_metricset(base_path, module, metricset):
 
     os.makedirs(meta_path)
 
-    templates = base_path + "/scripts/module/metricset/"
+    templates = metricbeat_path + "/scripts/module/metricset/"
 
 
     content = load_file(templates + "metricset.go.tmpl", module, metricset)
-    with open(metricset_path + "/metricset.go", "w") as f:
+    with open(metricset_path + "/" + metricset + ".go", "w") as f:
         f.write(content)
 
     content = load_file(templates + "fields.yml", module, metricset)
@@ -36,10 +36,10 @@ def generate_metricset(base_path, module, metricset):
     with open(meta_path + "/data.json", "w") as f:
         f.write(content)
 
-    print "Metricset " + metricset + " created.\n"
+    print "Metricset " + metricset + " created."
 
 
-def generate_module(base_path, module):
+def generate_module(base_path, metricbeat_path, module, metricset):
 
     module_path = base_path + "/module/" + module
     meta_path = module_path + "/_beat"
@@ -50,7 +50,7 @@ def generate_module(base_path, module):
 
     os.makedirs(meta_path)
 
-    templates = base_path + "/scripts/module/"
+    templates = metricbeat_path + "/scripts/module/"
 
     content = load_file(templates + "fields.yml", module, "")
     with open(meta_path + "/fields.yml", "w") as f:
@@ -60,7 +60,7 @@ def generate_module(base_path, module):
     with open(meta_path + "/docs.asciidoc", "w") as f:
         f.write(content)
 
-    content = load_file(templates + "config.yml", module, "")
+    content = load_file(templates + "config.yml", module, metricset)
     with open(meta_path + "/config.yml", "w") as f:
         f.write(content)
 
@@ -68,7 +68,7 @@ def generate_module(base_path, module):
     with open(module_path + "/doc.go", "w") as f:
         f.write(content)
 
-    print "Module " + module + " created.\n"
+    print "Module " + module + " created."
 
 
 def load_file(file, module, metricset):
@@ -80,12 +80,30 @@ def load_file(file, module, metricset):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(
-        description="Creates a metricset")
-    parser.add_argument("module", help="Module name")
-    parser.add_argument("metricset", help="Metricset name")
+    parser = argparse.ArgumentParser(description="Creates a metricset")
+    parser.add_argument("--module", help="Module name")
+    parser.add_argument("--metricset", help="Metricset name")
+
+    parser.add_argument("--path", help="Beat path")
+    parser.add_argument("--es_beats", help="The path to the general beats folder")
 
     args = parser.parse_args()
 
-    path = os.path.abspath("./")
-    generate_metricset(path, args.module.lower(), args.metricset.lower())
+    if args.path is None:
+        args.path = './'
+        print "Set default path for beat path: " + args.path
+
+    if args.es_beats is None:
+        args.es_beats = '../'
+        print "Set default path for es_beats path: " + args.es_beats
+
+    if args.module is None or args.module == '':
+        args.module = raw_input("Module name: ")
+
+    if args.metricset is None or args.metricset == '':
+        args.metricset = raw_input("Metricset name: ")
+
+    path = os.path.abspath(args.path)
+    metricbeat_path = os.path.abspath(args.es_beats + "/metricbeat")
+
+    generate_metricset(path, metricbeat_path, args.module.lower(), args.metricset.lower())
