@@ -27,20 +27,20 @@ kibana:
 fields:
 	mkdir -p etc/
 	cat ${ES_BEATS}/metricbeat/etc/_beat/fields_base.yml > etc/fields.yml
-	python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> etc/fields.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> etc/fields.yml
 
 # Collects all module docs
 .PHONY: docs
-docs:
+docs: python-env
 	-rm -r docs/modules
 	mkdir -p docs/modules
-	python ${ES_BEATS}/metricbeat/scripts/docs_collector.py
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/docs_collector.py
 
 # Collects all module configs
 .PHONY: configs
-configs:
-	python ${ES_BEATS}/metricbeat/scripts/config_collector.py $(PWD) > etc/beat.yml
-	python ${ES_BEATS}/metricbeat/scripts/config_collector.py --full $(PWD) > etc/beat.full.yml
+configs: python-env
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py $(PWD) > etc/beat.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --full $(PWD) > etc/beat.full.yml
 
 # Generates imports for all modules and metricsets
 .PHONY: imports
@@ -59,7 +59,8 @@ collect: fields docs configs update imports
 # Creates a new metricset. Requires the params MODULE and METRICSET
 .PHONY: create-metricset
 create-metricset:
-	python ${ES_BEATS}/metricbeat/scripts/create_metricset.py $(MODULE) $(METRICSET)
+	python ${ES_BEATS}/metricbeat/scripts/create_metricset.py --path=$(PWD) --es_beats=$(ES_BEATS) --module=$(MODULE) --metricset=$(METRICSET)
+
 
 # Generates the data.json example documents
 .PHONY: generate-json
