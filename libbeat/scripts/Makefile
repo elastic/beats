@@ -288,3 +288,7 @@ install-home:
 	fi
 	install -d -m 755 ${HOME_PREFIX}/scripts/
 	install -m 755 ${ES_BEATS}/libbeat/scripts/migrate_beat_config_1_x_to_5_0.py ${HOME_PREFIX}/scripts/
+
+.PHONY: create-packer
+create-packer:
+	python ${ES_BEATS}/libbeat/scripts/create_packer.py --es_beats=${ES_BEATS} --beat_path=${BEAT_DIR} --beat=${BEATNAME}
