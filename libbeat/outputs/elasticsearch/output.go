@@ -216,7 +216,7 @@ func makeClientFactory(
 		client := NewClient(
 			esURL, config.Index, proxyURL, tls,
 			config.Username, config.Password,
-			params, onConnected)
+			params, config.Timeout, onConnected)
 		return client, nil
 	}
 }

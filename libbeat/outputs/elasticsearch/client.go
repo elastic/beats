@@ -18,13 +18,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/mode"
-)
-
-// Metrics that can retrieved through the expvar web interface.
-var (
-	ackedEvents            = expvar.NewInt("libbeatEsPublishedAndAckedEvents")
-	eventsNotAcked         = expvar.NewInt("libbeatEsPublishedButNotAckedEvents")
-	publishEventsCallCount = expvar.NewInt("libbeatEsPublishEventsCallCount")
+	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 type Client struct {
@@ -47,6 +41,18 @@ type Connection struct {
 	onConnectCallback func() error
 }
 
+// Metrics that can retrieved through the expvar web interface.
+var (
+	ackedEvents            = expvar.NewInt("libbeatEsPublishedAndAckedEvents")
+	eventsNotAcked         = expvar.NewInt("libbeatEsPublishedButNotAckedEvents")
+	publishEventsCallCount = expvar.NewInt("libbeatEsPublishEventsCallCount")
+
+	statReadBytes   = expvar.NewInt("libbeatEsPublishReadBytes")
+	statWriteBytes  = expvar.NewInt("libbeatEsPublishWriteBytes")
+	statReadErrors  = expvar.NewInt("libbeatEsPublishReadErrors")
+	statWriteErrors = expvar.NewInt("libbeatEsPublishWriteErrors")
+)
+
 var (
 	nameItems  = []byte("items")
 	nameStatus = []byte("status")
@@ -64,6 +70,7 @@ func NewClient(
 	esURL, index string, proxyURL *url.URL, tls *tls.Config,
 	username, password string,
 	params map[string]string,
+	timeout time.Duration,
 	onConnectCallback connectCallback,
 ) *Client {
 	proxy := http.ProxyFromEnvironment
@@ -73,6 +80,14 @@ func NewClient(
 
 	logp.Info("Elasticsearch url: %s", esURL)
 
+	dialer := transport.NetDialer(timeout)
+	dialer = transport.StatsDialer(dialer, &transport.IOStats{
+		Read:        statReadBytes,
+		Write:       statWriteBytes,
+		ReadErrors:  statReadErrors,
+		WriteErrors: statWriteErrors,
+	})
+
 	client := &Client{
 		Connection: Connection{
 			URL:      esURL,
@@ -80,9 +95,11 @@ func NewClient(
 			Password: password,
 			http: &http.Client{
 				Transport: &http.Transport{
+					Dial:            dialer.Dial,
 					TLSClientConfig: tls,
 					Proxy:           proxy,
 				},
+				Timeout: timeout,
 			},
 		},
 		index:  index,

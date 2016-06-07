@@ -21,6 +21,7 @@ type Config struct {
 	Proxy   *ProxyConfig
 	TLS     *tls.Config
 	Timeout time.Duration
+	Stats   *IOStats
 }
 
 func MakeDialer(c *Config) (Dialer, error) {
@@ -29,6 +30,9 @@ func MakeDialer(c *Config) (Dialer, error) {
 	dialer, err = ProxyDialer(c.Proxy, dialer)
 	if err != nil {
 		return nil, err
+	}
+	if c.Stats != nil {
+		dialer = StatsDialer(dialer, c.Stats)
 	}
 	dialer = TLSDialer(c.TLS, c.Timeout, dialer)
 	return dialer, nil
