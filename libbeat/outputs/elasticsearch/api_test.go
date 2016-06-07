@@ -4,6 +4,7 @@ package elasticsearch
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -36,7 +37,7 @@ func GetTestingElasticsearch() *Client {
 	var address = "http://" + GetEsHost() + ":" + GetEsPort()
 	username := os.Getenv("ES_USER")
 	pass := os.Getenv("ES_PASS")
-	return NewClient(address, "", nil, nil, username, pass, nil, nil)
+	return newTestClientAuth(address, username, pass)
 }
 
 func GetValidQueryResult() QueryResult {
@@ -161,4 +162,12 @@ func TestReadSearchResult_invalid(t *testing.T) {
 	results, err := readSearchResult(json)
 	assert.Nil(t, results)
 	assert.Error(t, err)
+}
+
+func newTestClient(url string) *Client {
+	return newTestClientAuth(url, "", "")
+}
+
+func newTestClientAuth(url, user, pass string) *Client {
+	return NewClient(url, "", nil, nil, user, pass, nil, 60*time.Second, nil)
 }

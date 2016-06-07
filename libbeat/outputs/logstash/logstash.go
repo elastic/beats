@@ -4,6 +4,7 @@ package logstash
 // registered with all output plugins
 
 import (
+	"expvar"
 	"time"
 
 	"github.com/urso/go-lumber/log"
@@ -18,6 +19,18 @@ import (
 )
 
 var debug = logp.MakeDebug("logstash")
+
+// Metrics that can retrieved through the expvar web interface.
+var (
+	ackedEvents            = expvar.NewInt("libbeatLogstashPublishedAndAckedEvents")
+	eventsNotAcked         = expvar.NewInt("libbeatLogstashPublishedButNotAckedEvents")
+	publishEventsCallCount = expvar.NewInt("libbeatLogstashPublishEventsCallCount")
+
+	statReadBytes   = expvar.NewInt("libbeatLogstashPublishReadBytes")
+	statWriteBytes  = expvar.NewInt("libbeatLogstashPublishWriteBytes")
+	statReadErrors  = expvar.NewInt("libbeatLogstashPublishReadErrors")
+	statWriteErrors = expvar.NewInt("libbeatLogstashPublishWriteErrors")
+)
 
 const (
 	defaultWaitRetry = 1 * time.Second
@@ -67,6 +80,12 @@ func (lj *logstash) init(cfg *common.Config) error {
 		Timeout: config.Timeout,
 		Proxy:   &config.Proxy,
 		TLS:     tls,
+		Stats: &transport.IOStats{
+			Read:        statReadBytes,
+			Write:       statWriteBytes,
+			ReadErrors:  statReadErrors,
+			WriteErrors: statWriteErrors,
+		},
 	}
 
 	logp.Info("Max Retries set to: %v", sendRetries)
