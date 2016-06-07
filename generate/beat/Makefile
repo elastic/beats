@@ -12,16 +12,18 @@ test: python-env
 	cookiecutter --no-input -o build/src/beatpath -f  build ; \
 	cd build/src/beatpath/testbeat ; \
 	export GOPATH=${PWD}/build ; \
-	export GO15VENDOREXPERIMENT=1; \
 	export PATH=${PATH}:${PWD}/build/bin; \
 	make init ; \
 	make check ; \
 	make ; \
-	make testsuite ; \
+	make testsuite
+
+# Runs test build for the created beat
+.PHONY: test-build
+test-build:
 	cd dev-tools/packer ; \
 	make deps ; \
-	make images ; \
-	make
+	make images
 
 # Sets up the virtual python environment
 .PHONY: python-env

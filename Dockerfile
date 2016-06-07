@@ -16,8 +16,6 @@ RUN set -x \
 
 COPY libbeat/scripts/docker-entrypoint.sh /entrypoint.sh
 
-ENV GO15VENDOREXPERIMENT=1
-
 RUN mkdir -p /etc/pki/tls/certs
 COPY testing/environments/docker/logstash/pki/tls/certs/logstash.crt /etc/pki/tls/certs/logstash.crt
 
