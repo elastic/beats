@@ -143,13 +143,14 @@ func (s *Mode) publish(
 
 	sendFail:
 		logp.Info("send fail")
-		s.backoff.Wait()
 
 		fails++
 		if resetFail {
 			debugf("reset fails")
+			s.backoff.Reset()
 			fails = 0
 		}
+		s.backoff.Wait()
 
 		if !guaranteed && (s.maxAttempts > 0 && fails == s.maxAttempts) {
 			// max number of attempts reached
