@@ -40,6 +40,8 @@ type LoadBalancerMode struct {
 	// block until event has been successfully published.
 	maxAttempts int
 
+	backoffCount uint // number of consecutive failed retry attempts.
+
 	// waitGroup + signaling channel for handling shutdown
 	wg   sync.WaitGroup
 	done chan struct{}
@@ -191,7 +193,6 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 	} else {
 		events := msg.events
 		total := len(events)
-		var backoffCount uint
 
 		for len(events) > 0 {
 			var err error
@@ -222,11 +223,11 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 				}
 
 				// wait before retry
-				backoff := time.Duration(int64(m.waitRetry) * (1 << backoffCount))
+				backoff := time.Duration(int64(m.waitRetry) * (1 << m.backoffCount))
 				if backoff > m.maxWaitRetry {
 					backoff = m.maxWaitRetry
 				} else {
-					backoffCount++
+					m.backoffCount++
 				}
 				select {
 				case <-m.done: // shutdown
@@ -240,6 +241,8 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 			}
 		}
 	}
+
+	m.backoffCount = 0
 	outputs.SignalCompleted(msg.signaler)
 }
 

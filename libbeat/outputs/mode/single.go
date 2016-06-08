@@ -19,6 +19,7 @@ type SingleConnectionMode struct {
 	timeout      time.Duration // connection timeout
 	waitRetry    time.Duration // wait time until reconnect
 	maxWaitRetry time.Duration // Maximum send/retry timeout in backoff case.
+	backoffCount uint          // number of consecutive failed retry attempts.
 
 	// maximum number of configured send attempts. If set to 0, publisher will
 	// block until event has been successfully published.
@@ -113,7 +114,6 @@ func (s *SingleConnectionMode) publish(
 	send func() (ok bool, resetFail bool),
 ) error {
 	fails := 0
-	var backoffCount uint
 	var err error
 
 	guaranteed := opts.Guaranteed || s.maxAttempts == 0
@@ -132,8 +132,8 @@ func (s *SingleConnectionMode) publish(
 			goto sendFail
 		}
 
-		backoffCount = 0
 		debug("send completed")
+		s.backoffCount = 0
 		outputs.SignalCompleted(signaler)
 		return nil
 
@@ -142,7 +142,7 @@ func (s *SingleConnectionMode) publish(
 		if resetFail {
 			debug("reset fails")
 			fails = 0
-			backoffCount = 0
+			s.backoffCount = 0
 		}
 
 		if !guaranteed && (s.maxAttempts > 0 && fails == s.maxAttempts) {
@@ -152,11 +152,11 @@ func (s *SingleConnectionMode) publish(
 		}
 
 		logp.Info("send fail")
-		backoff := time.Duration(int64(s.waitRetry) * (1 << backoffCount))
+		backoff := time.Duration(int64(s.waitRetry) * (1 << s.backoffCount))
 		if backoff > s.maxWaitRetry {
 			backoff = s.maxWaitRetry
 		} else {
-			backoffCount++
+			s.backoffCount++
 		}
 		logp.Info("backoff retry: %v", backoff)
 		time.Sleep(backoff)
