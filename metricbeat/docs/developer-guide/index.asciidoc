@@ -1,5 +1,4 @@
 
-
 [[metricbeat-developer-guide]]
 = Metricbeat Developer Guide
 
@@ -9,17 +8,19 @@
 Metricbeat is periodically interrogating other services to fetch key metrics
 information. As a developer Metricbeat can be used in two different ways:
 
-* As application to extend
-* As library
+* Extend Metricbeat directly
+* Create your own beat and use Metricbeat as a library
 
-That means as a contributor you have different options on how to use metricbeat
-and how to contribute.
+We recommend to start with your own beat as it keeps the development of your own module / metricset indepent.
+If it should be added a later stage as a module in Metricbeat, the same code can be reused and not additional
+changes are needed.
 
 If you are looking to contribute in general to beats or the foundation of
 metricbeat, also have a look at the
 https://github.com/elastic/beats/blob/master/CONTRIBUTING.md[general contributor guide].
 
 --
+
 
 == Overview
 
@@ -29,17 +30,16 @@ mysql, ...). Each module can contain multiple metricsets. A metricset represents
 multiple metrics which are normally retrieved with one request from the remote
 system (e.g. redis-info, mysql-status).
 
-
+[float]
 == Module & Metricsets Requirements
 
 It is important for us that only high quality modules are part of metricbeat to
 guarantee the best user experience. Modules and Metricsets which are contributed
 must fulfill the following requirements:
 
-* Elasticsearch templates
-* Kibana Dashboard
-* Documentation
-* Integration tests with docker environment
+* Complete fields.yml to generate docs and elasticsearch templates
+* Documentation files
+* Integration tests
 * 80% test coverage (unit, integration, system tests combined)
 
 Metricbeat allows to build a wide variety of modules and metricset on top of it.
@@ -51,18 +51,9 @@ possible to the service which should be monitored.
 
 
 
-== Documentation
-
-Each module must be documented. The documentation is based on asciidoc and is in
-the file \{module-name}.asciidoc in your module folder. This file contains the
-documentation for the module itself and the containing metricsets. For details
-on what should be documented, check the existing documented modules.
-
-== Dashboards
-
-TODO: Add details on how to create dashboards
-
 
 include::./create-metricset.asciidoc[]
 
-include::./testing.asciidoc[]
+include::./create-module.asciidoc[]
+
+include::../../../generate/metricbeat/metricset/README.asciidoc[]
