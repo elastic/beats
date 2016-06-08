@@ -1,284 +1,77 @@
-== Creating a metricbeat module
+== Creating a Metricbeat module
 
-When creating a module, there are three options:
+Metricbeat modules are used to group multiple metricsets together and to implement shared functionality
+of the MetricSets. In most cases, no implementation of the module is needed and the default module
+implementation is automatically picked.
 
-* Create an independent beat based on metricbeat library with only our module
-* Create an independent beat based on metricbeat library but including all
-  existing metricbeat modules
-* Create a module based on metricbeat and contribute it to metricbeat
+It is important to complete the configuration and documentation files for a module. All these files are in the `_beat`
+directory and a default version is generate when using `make create-metricset`.
 
-When creating a new module it is recommend to go through all three phases above
-as this allows you to develop, test and run your module independent of
-metricbeat in the beginning.
+[float]
+=== Module files
 
-Independent which way you choose, make sure to add tests to your module and
-metricset. More details on testing can be found below (add anker).
+* config.yml and config.full.yml
+* docs.asciidoc
+* fields.yml
 
-=== Create a module based on metricbeat library
-
-If you plan to create your module, have a look at
-https://github.com/ruflin/df2beat[df2beat]. df2beat is a very simple example
-module which reads out the `df` command for file system stats.
-
-To start your module, create the following files:
-
-* main.go
-* glide.yaml
-* Makefile
-* etc/beat.yml (contains your config options)
-* module/\{module-name}/\{module-name}.go
-* module/\{module-name}/\{module-name}/\{metricset-name}/\{metricset-name}.go
-
-The content of the files should be as following:
-
-main.go
-[source,go]
-----
-package main
-
-import (
-	"os"
-
-	"github.com/elastic/beats/metricbeat/beater"
-	# Make sure that all your modules and metricsets are linked here
-	_ "github.com/{github-name}/{module-name}/module/{module-name}"
-	_ "github.com/{github-name}/{module-name}/module/{module-name}/{metricset-name}"
-
-	"github.com/elastic/beats/libbeat/beat"
-)
-
-var Name = "{module-name}"
-
-func main() {
-	if err := beat.Run(Name, "", beater.New()); err != nil {
-		os.Exit(1)
-	}
-}
-----
+Make sure that after updating any of these files to run `make collect` in your beat directory so all
+ generated files will be updated.
 
 
-glide.yaml
+[float]
+==== config.yml and config.full.yml
+
+The `config.yml` contains the basic configuration option and looks as following:
+
 [source,yaml]
 ----
-package: github.com/ruflin/df2beat
-import:
-- package: github.com/elastic/beats
-  subpackages:
-  - /libbeat/beat
-  - metricbeat/beater
-  - metricbeat/helper
-  - metricbeat/include
+include::../../scripts/module/config.yml[]
 ----
 
-Makefile
-[source,makefile]
-----
-BEATNAME=df2beat
-BEAT_DIR=github.com/ruflin
-SYSTEM_TESTS=false
-TEST_ENVIRONMENT=false
-ES_BEATS=./vendor/github.com/elastic/beats
-GOPACKAGES=$(shell glide novendor)
-PREFIX?=.
+It contains the module name, your metricset and the default period. In case you have multiple
+metricsets in your module, make sure to extend the metricset array:
 
-# Path to the libbeat Makefile
-include $(ES_BEATS)/libbeat/scripts/Makefile
-----
-
-etc/beat.yml
 [source,yaml]
 ----
-metricbeat:
-  modules:
-    - module: {module-name}
-      metricsets: ["{metricset-name}"]
-      period: 1s
-      enabled: true
+  metricsets: ["{metricset1}", "{metricset2}"]
 ----
 
-The moduler file looks as following. More details can be found under Moduler
-Details (add link)
+The `full.config.yml` is optional and by default has the same content as the `config.yml`. It is used
+to add and document more advance configuration options which should not part of the minimal
+config file which is shipped by default.
 
-module/\{module-name}/\{module-name}.go
-[source,go]
+[float]
+==== docs.asciidoc
+
+The `dosc.asciidoc` contains the documentation about your module. By default during generation of the
+documentation the default config file will be appended to the docs. Use this file to describe your
+module more in detail and more specific configuration options.
+
+[source,asciidoc]
 ----
-package {module-name}
-
-import (
-	"github.com/elastic/beats/metricbeat/helper"
-)
-
-func init() {
-	if err := helper.Registry.AddModuler("{module-name}", New); err != nil {
-        panic(err)
-	}
-}
-
-// New creates new instance of Moduler
-func New() helper.Moduler {
-	return &Moduler{}
-}
-
-type Moduler struct{}
-
-func (m *Moduler) Setup(mo *helper.Module) error {
-	return nil
-}
+include::../../scripts/module/docs.asciidoc[]
 ----
 
-The metricseter files looks as following. More details can be found under
-Metricseter Details (add link)
+[float]
+==== fields.yml
 
-module/\{module-name}/\{module-name}/\{metricset-name}/\{metricset-name}.go
-[source,go]
+The `fields.yml` contains the top level structure of all your metricset. In combination with the fields.yml
+in each metricset it is used to generate the template and the documentation for the fields.
+
+The default file looks as following:
+
+[source,yaml]
 ----
-package {metricset-name}
-
-import (
-	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/elastic/beats/metricbeat/helper"
-)
-
-func init() {
-	if err := helper.Registry.AddMetricSeter("{module-name}", "{metricset-name}", New); err != nil {
-        panic(err)
-	}
-}
-
-// New creates new instance of MetricSeter
-func New() helper.MetricSeter {
-	return &MetricSeter{}
-}
-
-type MetricSeter struct {}
-
-// Setup Metricset
-func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
-	return nil
-}
-
-func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (events common.MapStr, err error) {
-	event := common.MapStr{"hello": "world"}
-	return event
-}
+include::../../scripts/module/fields.yml[]
 ----
 
-
-After creating the files, run `glide update` to retrieve the most recent version
-of metricbeat. Then run `make update` to generate all the necessary files. The
-above assumes, the beat is named the same as your module. We use glide for the
-dependency versioning.
-
-Now running `make` already creates your new beat and you can run. It is now your
-task to implement the fetching of the metricset from a service in
-{metricset-name}.go. For some examples, have a look at existing metricsets.
-
-Note: We hope to simplify these steps in the future with a generator.
+Make sure to update at least the description of the module.
 
 
-=== Create an independent beat based on metricbeat library but including all existing metricbeat modules
+[float]
+=== Testing
 
-Creating a metricbeat module but actually including all existing modules and
-metricsets requires only two changes from creating your independent beat. The
-following files have to be adjusted:
+It is a common pattern to use a `testing.go` file in the module package to share some testing functionality among
+the metricsets. This file does not have `_test.go` in the name as otherwise it would not be compiled for sub packages.
 
-* main.go: Add link to metricbeat modules and metricsets
-* etc/beat.yml: Add configuration options
-
-Only one line has to be added to `main.go`: `_
-"github.com/elastic/beats/metricbeat/include"`. Including this package includes
-all official modules and metricsets.
-
-main.go
-[source,go]
-----
-package main
-
-import (
-	"os"
-
-	"github.com/elastic/beats/metricbeat/beater"
-
-	// Uncomment the following line to include all official metricbeat module and metricsets
-	_ "github.com/elastic/beats/metricbeat/include"
-
-	// Make sure all your modules and metricsets are linked here
-	_ "github.com/ruflin/df2beat/module/disk/space"
-	_ "github.com/ruflin/df2beat/module/disk"
-
-	"github.com/elastic/beats/libbeat/beat"
-)
-
-var Name = "df2beat"
-
-func main() {
-	if err := beat.Run(Name, "", beater.New()); err != nil {
-		os.Exit(1)
-	}
-}
-----
-
-To enable the modules and metricsets copy over the configuration options from
-the metricbeat repository `etc/beat.yml` and paste it into your own `beat.yml`
-below your configuration options. Run `make update` to create the new complete
-configuration.
-
-If you only want to include a few modules you can also link to them directly.
-This also allows to link modules from other repositories and use them in your
-beat.
-
-
-=== Create a module based on metricbeat and contribute it to metricbeat
-
-As soon as you have a running version of your own module and beat and you would
-like to see this module as part of the standard metricbeat distribution, start a
-conversation with the beats team under
-https://discuss.elastic.co/c/beats[discuss] to see if your module could fit into
-the standard distribution. Be aware that not necessarly every module can be
-accepted into metricbeat.
-
-To contribute your module and metricsets, fork the beat repository and copy your
-module over to the metricbeat repository. Add your config options to the
-beat.yml file and update the `include/list.go` with your module and metricset.
-
-
-
-== Moduler details
-
-As described before, a module looks as following:
-
-module/\{module-name}/\{module-name}.go
-[source,go]
-----
-package {module-name}
-
-import (
-	"github.com/elastic/beats/metricbeat/helper"
-)
-
-func init() {
-	if err := helper.Registry.AddModuler("{module-name}", New); err != nil {
-        panic(err)
-	}
-}
-
-// New creates new instance of Moduler
-func New() helper.Moduler {
-	return &Moduler{}
-}
-
-type Moduler struct{}
-
-func (m *Moduler) Setup(mo *helper.Module) error {
-	return nil
-}
-----
-
-Each moduler consists of three parts:
-
-* Registration of moduler
-* Type definition
-* Interface methods
-
-TODO: Describe file in detail
+For example of the `testing.go` file is is best to check out the https://github.com/elastic/beats/tree/master/metricbeat/module/mysql[mysql module].
