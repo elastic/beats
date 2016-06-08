@@ -15,20 +15,6 @@ setup:
 	make create-metricset
 	make collect
 
-# Helper to add all files to a git repository
-.PHONY: git
-git:
-	git init
-	git add README.md CONTRIBUTING.md
-	git commit -m "Initial commit"
-	git add LICENSE
-	git commit -m "Add the LICENSE"
-	git add .gitignore
-	git commit -m "Add git settings"
-	git add .
-	git reset -- .travis.yml
-	git commit -m "Add {{cookiecutter.beat}}"
-
 .PHONY: update-deps
 update-deps:
 	glide update --no-recursive --strip-vcs
@@ -36,3 +22,7 @@ update-deps:
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
+
+# Create binary packages for the beat
+pack: create-packer
+	cd dev-tools/packer; make deps images {{cookiecutter.beat}}

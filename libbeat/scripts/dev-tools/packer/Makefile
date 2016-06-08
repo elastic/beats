@@ -20,7 +20,7 @@ include $(ES_BEATS)/dev-tools/packer/scripts/Makefile
 		-e SOURCE=/source \
 		-e BUILDID=${BUILDID} \
 		tudorg/beats-builder \
-		{beat_path}//{beat}
+		{beat_path}
 	# linux builds on debian 6
 	docker run --rm \
 		-v $(abspath build):/build \
@@ -31,4 +31,4 @@ include $(ES_BEATS)/dev-tools/packer/scripts/Makefile
 		-e SOURCE=/source \
 		-e BUILDID=${BUILDID} \
 		tudorg/beats-builder-deb6 \
-		{beat_path}//{beat}
+		{beat_path}

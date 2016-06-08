@@ -41,7 +41,6 @@ install:
   - set PATH=C:\tools\mingw64\bin;%GOROOT%\bin;%PATH%
   - set PATH=%GOPATH%\bin;%PATH%
   - go get github.com/pierrre/gotestcover
-  - set GO15VENDOREXPERIMENT=1
   - go version
   - go env
   # Download the PyWin32 installer if it is not cached.

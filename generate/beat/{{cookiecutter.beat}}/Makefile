@@ -11,7 +11,7 @@ PREFIX?=.
 
 .PHONY: init
 init:
-	glide update  --no-recursive
+	glide update --no-recursive
 	make update
 	git init
 
@@ -21,7 +21,7 @@ commit:
 	git commit -m "Initial commit"
 	git add LICENSE
 	git commit -m "Add the LICENSE"
-	git add .gitignore .gitattributes
+	git add .gitignore
 	git commit -m "Add git settings"
 	git add .
 	git reset -- .travis.yml
@@ -36,3 +36,7 @@ update-deps:
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
+
+# Create binary packages for the beat
+pack: create-packer
+	cd dev-tools/packer; make deps images {{cookiecutter.beat}}

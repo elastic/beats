@@ -24,6 +24,7 @@ env:
     - TARGETS="-C metricbeat crosscompile"
     - TARGETS="-C winlogbeat crosscompile"
     - TARGETS="-C generate/metricbeat/metricset test"
+    - TARGETS="-C generate/beat test"
   global:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
@@ -45,6 +46,10 @@ matrix:
       env: TARGETS="-C libbeat testsuite"
     - os: osx
       env: TARGETS="-C metricbeat testsuite"
+    - os: osx
+      env: TARGETS="-C generate/metricbeat/metricset test"
+    - os: osx
+      env: TARGETS="-C generate/beat test"
   fast_finish: true
   allow_failures:
     - env: TARGETS="-C libbeat crosscompile"
@@ -61,7 +66,7 @@ addons:
 before_script:
   - wget https://github.com/Masterminds/glide/releases/download/0.10.2/glide-0.10.2-linux-386.tar.gz -O /tmp/glide.tar.gz
   - tar -xvf /tmp/glide.tar.gz
-  - export PATH=$PATH:$PWD/linux-386/
+  - export PATH=$PATH:$PWD/linux-386
 
 before_install:
   # Update to most recent docker version
