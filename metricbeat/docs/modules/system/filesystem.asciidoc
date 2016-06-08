@@ -3,9 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-filesystem]]
-=== System Filesystem MetricSet
-
-The System Filesystem MetricSet provides Filesystem statistics. For each file system one document is provided.
+include::../../../module/system/filesystem/_beat/docs.asciidoc[]
 
 
 ==== Fields

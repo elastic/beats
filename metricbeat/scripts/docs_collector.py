@@ -51,7 +51,7 @@ This file is generated! See scripts/docs_collector.py
 === Example Configuration
 
 The """ + title + """ module supports the standard configuration options which can be found
-here (add link). Below is an example of a configuration option:
+here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
 
 [source,yaml]
 ----
@@ -92,13 +92,11 @@ metricbeat.modules:
 
             module_includes += "include::" + module + "/" + metricset + ".asciidoc[]\n\n"
 
-
             metricset_file = generated_note
-            # Add reference to metricset file
-            metricset_file += reference + "\n"
 
-            with file(metricset_docs) as f:
-                metricset_file += f.read()
+            # Add reference to metricset file and include file
+            metricset_file += reference + "\n"
+            metricset_file += 'include::../../../module/' + module + '/' + metricset + '/_beat/docs.asciidoc[]' + "\n"
 
             # TODO: This should point directly to the exported fields of the metricset, not the whole module
             metricset_file += """

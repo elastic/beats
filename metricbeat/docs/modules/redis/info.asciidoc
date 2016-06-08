@@ -3,10 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-redis-info]]
-=== Redis Info MetricSet
-
-The Redis Info MetricSet collects information and statistics from Redis by running the
-http://redis.io/commands/INFO[`INFO`] command and parsing the returned result.
+include::../../../module/redis/info/_beat/docs.asciidoc[]
 
 
 ==== Fields

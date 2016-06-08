@@ -3,9 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-process]]
-=== System Process MetricSet
-
-The System Process MetricSet provides process statistics. One document is provided for each process.
+include::../../../module/system/process/_beat/docs.asciidoc[]
 
 
 ==== Fields

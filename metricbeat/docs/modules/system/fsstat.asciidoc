@@ -3,9 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-fsstat]]
-=== System Fsstat MetricSet
-
-The System FsStats MetricSet provides overall Filesystem statistics.
+include::../../../module/system/fsstat/_beat/docs.asciidoc[]
 
 
 ==== Fields

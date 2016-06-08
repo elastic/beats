@@ -3,9 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-zookeeper-mntr]]
-=== Zookeeper mntr MetricSet
-
-The Zookeeper mntr MetricSet collects Zookeeper monitoring statistics.
+include::../../../module/zookeeper/mntr/_beat/docs.asciidoc[]
 
 
 ==== Fields
