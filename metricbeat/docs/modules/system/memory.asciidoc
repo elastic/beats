@@ -3,9 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-memory]]
-=== System Memory MetricSet
-
-The System Memory MetricSet provides memory statistics.
+include::../../../module/system/memory/_beat/docs.asciidoc[]
 
 
 ==== Fields

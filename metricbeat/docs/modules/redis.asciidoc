@@ -34,7 +34,7 @@ The redis MetricSets were tested with redis 3.2 and are expected to work with al
 === Example Configuration
 
 The Redis Status module supports the standard configuration options which can be found
-here (add link). Below is an example of a configuration option:
+here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
 
 [source,yaml]
 ----

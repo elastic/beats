@@ -3,9 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-core]]
-=== System Core MetricSet
-
-The System Core MetricSet provides load statistics for each CPU core.
+include::../../../module/system/core/_beat/docs.asciidoc[]
 
 
 ==== Fields

@@ -19,7 +19,7 @@ The nginx MetricSets were tested with nginx 1.9 and are expected to work with al
 === Example Configuration
 
 The Nginx Status module supports the standard configuration options which can be found
-here (add link). Below is an example of a configuration option:
+here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
 
 [source,yaml]
 ----
