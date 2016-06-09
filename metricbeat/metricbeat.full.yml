@@ -61,6 +61,17 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
+#--------------------------- MongoDB Status Module ---------------------------
+- module: mongodb
+  metricsets: ["status"]
+  enabled: true
+  period: 10s
+
+  # The hosts must be passed as MongoDB URLs in the format:
+  # [mongodb://][user:pass@]host[:port]
+  hosts: ["localhost:27017"]
+
+
 #---------------------------- MySQL Status Module ----------------------------
 #- module: mysql
   #metricsets: ["status"]
