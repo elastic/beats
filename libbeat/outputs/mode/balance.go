@@ -162,14 +162,20 @@ func (m *LoadBalancerMode) start(clients []ProtocolClient) {
 			}
 
 			// receive and process messages
-			var msg eventsMessage
 			select {
-			case <-m.done:
-				return
-			case msg = <-m.retries: // receive message from other failed worker
-			case msg = <-m.work: // receive message from publisher
+			case msg := <-m.retries:
+				m.onMessage(client, msg)
+
+			default:
+				var msg eventsMessage
+				select {
+				case <-m.done:
+					return
+				case msg = <-m.retries: // receive message from other failed worker
+				case msg = <-m.work: // receive message from publisher
+				}
+				m.onMessage(client, msg)
 			}
-			m.onMessage(client, msg)
 		}
 	}
 
