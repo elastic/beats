@@ -28,6 +28,13 @@ https://github.com/elastic/beats/compare/v1.2.3...1.3[Check the HEAD diff]
 *Affecting all Beats*
 - Fix output modes backoff counter reset. {issue}1803[1803] {pull}1814[1814] {pull}1818[1818]
 
+- Drain response buffers when pipelining is used by redis output. {pull}1353[1353]
+- Unterminated environment variable expressions in config files will now cause an error {pull}1389[1389]
+- Fix issue with the automatic template loading when Elasticsearch is not available on Beat start. {issue}1321[1321]
+- Fix bug affecting -cpuprofile, -memprofile, and -httpprof CLI flags {pull}1415[1415]
+- Fix race when multiple outputs access the same event with logstash output manipulating event {issue}1410[1410] {pull}1428[1428]
+- Seed random number generator using crypto.rand package. {pull}1503{1503]
+
 *Packetbeat*
 
 *Topbeat*
