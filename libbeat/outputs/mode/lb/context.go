@@ -120,6 +120,15 @@ func (ctx *context) forwardEvent(ch chan eventsMessage, msg eventsMessage) bool 
 
 func (ctx *context) receive() (eventsMessage, bool) {
 	var msg eventsMessage
+
+	select {
+	case msg = <-ctx.retries: // receive message from other failed worker
+		debugf("events from retries queue")
+		return msg, true
+	default:
+		break
+	}
+
 	select {
 	case <-ctx.done:
 		return msg, false
