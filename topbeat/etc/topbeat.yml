@@ -137,6 +137,10 @@ output:
     # Number of workers per Logstash host.
     #worker: 1
 
+    # The maximum number of events to bulk into a single batch window. The
+    # default is 2048.
+    #bulk_max_size: 2048
+
     # Set gzip compression level.
     #compression_level: 3
 
