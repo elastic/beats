@@ -73,13 +73,16 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	username := os.Getenv("ES_USER")
 	password := os.Getenv("ES_PASS")
-	client := elasticsearch.NewClient(host, "", nil, nil, username, password,
-		nil, 60*time.Second, nil)
+	client, err := elasticsearch.NewClient(host, "", nil, nil, username, password,
+		nil, 60*time.Second, 0, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// try to drop old index if left over from failed test
 	_, _, _ = client.Delete(index, "", "", nil) // ignore error
 
-	_, _, err := client.CreateIndex(index, common.MapStr{
+	_, _, err = client.CreateIndex(index, common.MapStr{
 		"settings": common.MapStr{
 			"number_of_shards":   1,
 			"number_of_replicas": 0,
