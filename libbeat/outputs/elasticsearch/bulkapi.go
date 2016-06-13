@@ -56,8 +56,14 @@ func (conn *Connection) BulkWith(
 	metaBuilder MetaBuilder,
 	body []interface{},
 ) (*QueryResult, error) {
+	if len(body) == 0 {
+		return nil, nil
+	}
+
 	bulkBody := newJSONBulkBody(nil)
-	bulkEncode(bulkBody, metaBuilder, body)
+	if err := bulkEncode(bulkBody, metaBuilder, body); err != nil {
+		return nil, err
+	}
 
 	requ, err := newBulkRequest(conn.URL, index, docType, params, bulkBody)
 	if err != nil {
@@ -149,6 +155,11 @@ func (b *jsonBulkBody) Reader() io.Reader {
 	return b.buf
 }
 
+func (b *jsonBulkBody) AddRaw(raw interface{}) error {
+	enc := json.NewEncoder(b.buf)
+	return enc.Encode(raw)
+}
+
 func (b *jsonBulkBody) Add(meta, obj interface{}) error {
 	enc := json.NewEncoder(b.buf)
 	pos := b.buf.Len()
@@ -163,18 +174,12 @@ func (b *jsonBulkBody) Add(meta, obj interface{}) error {
 	}
 	return nil
 }
-func bulkEncode(out *jsonBulkBody, metaBuilder MetaBuilder, body []interface{}) {
+func bulkEncode(out *jsonBulkBody, metaBuilder MetaBuilder, body []interface{}) error {
 	if metaBuilder == nil {
-		if len(body)%2 != 0 {
-			body = body[:len(body)-1]
-			// TODO report error
-		}
-
-		for i := 0; i < len(body); i += 2 {
-			meta := body[i]
-			obj := body[i+1]
-			if err := out.Add(meta, obj); err != nil {
+		for _, obj := range body {
+			if err := out.AddRaw(obj); err != nil {
 				debug("Failed to encode message: %s", err)
+				return err
 			}
 		}
 	} else {
@@ -185,4 +190,5 @@ func bulkEncode(out *jsonBulkBody, metaBuilder MetaBuilder, body []interface{}) 
 			}
 		}
 	}
+	return nil
 }
