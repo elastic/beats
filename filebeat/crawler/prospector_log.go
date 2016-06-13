@@ -146,8 +146,9 @@ func (p *ProspectorLog) harvestExistingFile(newState input.FileState, oldState i
 	logp.Debug("prospector", "Update existing file for harvesting: %s, offset: %v", newState.Source, oldState.Offset)
 
 	// No harvester is running for the file, start a new harvester
-	if oldState.Finished {
-		// TODO: should we check if modtime old / new is the same -> no harvester has to be started -> prevent duplicates?
+	// It is important here that only the size is checked and not modification time, as modification time could be incorrect on windows
+	// https://blogs.technet.microsoft.com/asiasupp/2010/12/14/file-date-modified-property-are-not-updating-while-modifying-a-file-without-closing-it/
+	if oldState.Finished && newState.Fileinfo.Size() > newState.Offset {
 		// Resume harvesting of an old file we've stopped harvesting from
 		// This could also be an issue with force_close_older that a new harvester is started after each scan but not needed?
 		// One problem with comparing modTime is that it is in seconds, and scans can happen more then once a second
@@ -155,15 +156,18 @@ func (p *ProspectorLog) harvestExistingFile(newState input.FileState, oldState i
 		p.Prospector.startHarvester(newState, oldState.Offset)
 
 	} else if oldState.Source != "" && oldState.Source != newState.Source {
+		// This does not start a new harvester as it is assume that the older harvester is still running
+		// or no new lines were detected. It sends only an event status update to make sure the new name is persisted.
 		logp.Debug("prospector", "File rename was detected, updating state: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
 
 		h, _ := p.Prospector.createHarvester(newState)
 		h.SetOffset(oldState.Offset)
+
 		// Update state because of file rotation
 		h.SendStateUpdate()
 	} else {
-		// TODO: It could be that a harvester is still harvesting the file?
-		logp.Debug("prospector", "Not harvesting, file didn't change: %s", newState.Source)
+		// Nothing to do. Harvester is still running and file was not renamed
+		logp.Debug("prospector", "No updates needed, file %s is already harvested.", newState.Source)
 	}
 }
 
