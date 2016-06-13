@@ -33,9 +33,9 @@ func (h *Harvester) Harvest() {
 	cfg := h.Config
 	readerConfig := logFileReaderConfig{
 		forceClose:         cfg.ForceCloseFiles,
-		closeOlder:         cfg.CloseOlderDuration,
-		backoffDuration:    cfg.BackoffDuration,
-		maxBackoffDuration: cfg.MaxBackoffDuration,
+		closeOlder:         cfg.CloseOlder,
+		backoffDuration:    cfg.Backoff,
+		maxBackoffDuration: cfg.MaxBackoff,
 		backoffFactor:      cfg.BackoffFactor,
 	}
 

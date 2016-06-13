@@ -1,10 +1,11 @@
 package crawler
 
 import (
+	"fmt"
 	"regexp"
 	"time"
 
-	"github.com/elastic/beats/filebeat/harvester"
+	cfg "github.com/elastic/beats/filebeat/config"
 )
 
 const (
@@ -16,15 +17,22 @@ var (
 	defaultConfig = prospectorConfig{
 		IgnoreOlder:   DefaultIgnoreOlder,
 		ScanFrequency: DefaultScanFrequency,
+		InputType:     cfg.DefaultInputType,
 	}
 )
 
 type prospectorConfig struct {
-	ExcludeFiles  []*regexp.Regexp          `config:"exclude_files"`
-	Harvester     harvester.HarvesterConfig `config:",inline"`
-	IgnoreOlder   time.Duration             `config:"ignore_older"`
-	Paths         []string                  `config:"paths"`
-	ScanFrequency time.Duration             `config:"scan_frequency"`
+	ExcludeFiles  []*regexp.Regexp `config:"exclude_files"`
+	IgnoreOlder   time.Duration    `config:"ignore_older"`
+	Paths         []string         `config:"paths"`
+	ScanFrequency time.Duration    `config:"scan_frequency"`
+	InputType     string           `config:"input_type"`
 }
 
-func (p *prospectorConfig) Validate() error { return nil }
+func (config *prospectorConfig) Validate() error {
+
+	if config.InputType == cfg.LogInputType && len(config.Paths) == 0 {
+		return fmt.Errorf("No paths were defined for prospector")
+	}
+	return nil
+}
