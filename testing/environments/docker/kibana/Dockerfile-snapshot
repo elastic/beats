@@ -27,7 +27,6 @@ ENV PATH /opt/kibana/bin:$PATH
 
 COPY ./docker-entrypoint.sh /
 
-# There is no compatible Sense plugin for Kibana 5.0-alpha1.
 RUN gosu kibana kibana-plugin install timelion
 
 EXPOSE 5601
