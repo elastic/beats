@@ -6,6 +6,7 @@ out some of them here:
 
 [horizontal]
 https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache HTTPD server-status.
+https://github.com/aidan-/cloudtrailbeat[cloudtrailbeat]:: Reads events from Amazon Web Services' https://aws.amazon.com/cloudtrail/[CloudTrail].
 https://github.com/Ingensi/dockerbeat[dockerbeat]:: Reads Docker container
 statistics and indexes them in Elasticsearch.
 https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from an Elasticsearch cluster and indexes them in Elasticsearch.
@@ -18,8 +19,8 @@ https://github.com/christiangalsterer/httpbeat[httpbeat]:: Polls multiple HTTP(S
 Logstash or Elasticsearch. Supports all HTTP methods and proxies.
 https://github.com/jasperla/hwsensorsbeat[hwsensorsbeat]:: Reads sensors information from OpenBSD.
 https://github.com/radoondas/jmxproxybeat[jmxproxybeat]:: Reads Tomcat JMX metrics exposed over 'JMX Proxy Servlet' to HTTP.
-https://github.com/eskibars/lmsensorsbeat[lmsensorsbeat]:: Collects data from lm-sensors (such as CPU temperatures, fan speeds, and voltages from i2c and smbus)
-https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Logstash monitoring API (v5 onwards) and indexes them in Elasticsearch
+https://github.com/eskibars/lmsensorsbeat[lmsensorsbeat]:: Collects data from lm-sensors (such as CPU temperatures, fan speeds, and voltages from i2c and smbus).
+https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Logstash monitoring API (v5 onwards) and indexes them in Elasticsearch.
 https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and send results to Elasticsearch.
 https://github.com/PhaedrusTheGreek/nagioscheckbeat[nagioscheckbeat]:: For Nagios checks and performance data.
 https://github.com/mrkschan/nginxbeat[nginxbeat]:: Reads status from Nginx.
@@ -39,7 +40,7 @@ https://github.com/eskibars/wmibeat[wmibeat]:: Uses WMI to grab your favorite, c
 
 
 
-Have you created a Beat that's not listed? If so, add the name and description of your Beat to the source document for     
+Have you created a Beat that's not listed? If so, add the name and description of your Beat to the source document for
 https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository] to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/annoucements[announce] your new Beat in the Elastic
 discussion forum.
 
