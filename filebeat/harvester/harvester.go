@@ -18,8 +18,6 @@ import (
 	"regexp"
 	"sync"
 
-	"time"
-
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/input"
@@ -28,7 +26,7 @@ import (
 
 type Harvester struct {
 	Path               string /* the file path to harvest */
-	Config             *HarvesterConfig
+	Config             harvesterConfig
 	offset             int64
 	State              input.FileState
 	stateMutex         sync.Mutex
@@ -40,53 +38,39 @@ type Harvester struct {
 	done               chan struct{}
 }
 
-type HarvesterConfig struct {
-	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
-
-	BufferSize         int    `config:"harvester_buffer_size"`
-	DocumentType       string `config:"document_type"`
-	Encoding           string `config:"encoding"`
-	InputType          string `config:"input_type"`
-	TailFiles          bool   `config:"tail_files"`
-	Backoff            string `config:"backoff"`
-	BackoffDuration    time.Duration
-	BackoffFactor      int    `config:"backoff_factor"`
-	MaxBackoff         string `config:"max_backoff"`
-	MaxBackoffDuration time.Duration
-	CloseOlder         string `config:"close_older"`
-	CloseOlderDuration time.Duration
-	ForceCloseFiles    bool                   `config:"force_close_files"`
-	ExcludeLines       []*regexp.Regexp       `config:"exclude_lines"`
-	IncludeLines       []*regexp.Regexp       `config:"include_lines"`
-	MaxBytes           int                    `config:"max_bytes"`
-	Multiline          *input.MultilineConfig `config:"multiline"`
-	JSON               *input.JSONConfig      `config:"json"`
-}
-
 func NewHarvester(
-	cfg *HarvesterConfig,
+	cfg *common.Config,
 	path string,
 	state input.FileState,
 	spooler chan *input.FileEvent,
 	offset int64,
 	done chan struct{},
 ) (*Harvester, error) {
-	encoding, ok := encoding.FindEncoding(cfg.Encoding)
-	if !ok || encoding == nil {
-		return nil, fmt.Errorf("unknown encoding('%v')", cfg.Encoding)
-	}
 
 	h := &Harvester{
 		Path:        path,
-		Config:      cfg,
+		Config:      defaultConfig,
 		State:       state,
 		SpoolerChan: spooler,
-		encoding:    encoding,
 		offset:      offset,
 		done:        done,
 	}
-	h.ExcludeLinesRegexp = cfg.ExcludeLines
-	h.IncludeLinesRegexp = cfg.IncludeLines
+
+	if err := cfg.Unpack(&h.Config); err != nil {
+		return nil, err
+	}
+	if err := h.Config.Validate(); err != nil {
+		return nil, err
+	}
+
+	encoding, ok := encoding.FindEncoding(h.Config.Encoding)
+	if !ok || encoding == nil {
+		return nil, fmt.Errorf("unknown encoding('%v')", h.Config.Encoding)
+	}
+	h.encoding = encoding
+
+	h.ExcludeLinesRegexp = h.Config.ExcludeLines
+	h.IncludeLinesRegexp = h.Config.IncludeLines
 	return h, nil
 }
 
