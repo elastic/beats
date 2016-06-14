@@ -226,7 +226,6 @@ func (amqp *Amqp) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 
 func (amqp *Amqp) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
-	//TODO
 	return private
 }
 
