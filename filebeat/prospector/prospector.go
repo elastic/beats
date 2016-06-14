@@ -1,4 +1,4 @@
-package crawler
+package prospector
 
 import (
 	"fmt"
@@ -13,6 +13,7 @@ import (
 )
 
 type Prospector struct {
+	cfg           *common.Config // Raw config
 	config        prospectorConfig
 	prospectorer  Prospectorer
 	spoolerChan   chan *input.FileEvent
@@ -29,6 +30,7 @@ type Prospectorer interface {
 
 func NewProspector(cfg *common.Config, states input.States, spoolerChan chan *input.FileEvent) (*Prospector, error) {
 	prospector := &Prospector{
+		cfg:           cfg,
 		config:        defaultConfig,
 		spoolerChan:   spoolerChan,
 		harvesterChan: make(chan *input.FileEvent),
@@ -38,6 +40,9 @@ func NewProspector(cfg *common.Config, states input.States, spoolerChan chan *in
 	}
 
 	if err := cfg.Unpack(&prospector.config); err != nil {
+		return nil, err
+	}
+	if err := prospector.config.Validate(); err != nil {
 		return nil, err
 	}
 
@@ -54,29 +59,30 @@ func NewProspector(cfg *common.Config, states input.States, spoolerChan chan *in
 // Init sets up default config for prospector
 func (p *Prospector) Init() error {
 
-	err := p.setupProspectorConfig()
-	if err != nil {
-		return err
-	}
-
-	err = p.setupHarvesterConfig()
-	if err != nil {
-		return err
-	}
-
 	var prospectorer Prospectorer
+	var err error
 
-	switch p.config.Harvester.InputType {
+	switch p.config.InputType {
 	case cfg.StdinInputType:
 		prospectorer, err = NewProspectorStdin(p)
 	case cfg.LogInputType:
 		prospectorer, err = NewProspectorLog(p)
 	default:
-		return fmt.Errorf("Invalid prospector type: %v", p.config.Harvester.InputType)
+		return fmt.Errorf("Invalid input type: %v", p.config.InputType)
+	}
+
+	if err != nil {
+		return err
 	}
 
 	prospectorer.Init()
 	p.prospectorer = prospectorer
+
+	// Create empty harvester to check if configs are fine
+	_, err = p.createHarvester(input.FileState{})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -84,7 +90,7 @@ func (p *Prospector) Init() error {
 // Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
 func (p *Prospector) Run() {
 
-	logp.Info("Starting prospector of type: %v", p.config.Harvester.InputType)
+	logp.Info("Starting prospector of type: %v", p.config.InputType)
 	p.wg.Add(2)
 	defer p.wg.Done()
 
@@ -135,7 +141,7 @@ func (p *Prospector) Stop(wg *sync.WaitGroup) {
 func (p *Prospector) createHarvester(state input.FileState) (*harvester.Harvester, error) {
 
 	h, err := harvester.NewHarvester(
-		&p.config.Harvester,
+		p.cfg,
 		state.Source,
 		state,
 		p.harvesterChan,
@@ -162,108 +168,6 @@ func (p *Prospector) startHarvester(state input.FileState, offset int64) (*harve
 	}()
 
 	return h, nil
-}
-
-// Setup Prospector Config
-func (p *Prospector) setupProspectorConfig() error {
-	config := &p.config
-
-	if config.Harvester.InputType == cfg.LogInputType && len(config.Paths) == 0 {
-		return fmt.Errorf("No paths were defined for prospector")
-	}
-
-	if config.Harvester.JSON != nil && len(config.Harvester.JSON.MessageKey) == 0 &&
-		config.Harvester.Multiline != nil {
-
-		return fmt.Errorf("When using the JSON decoder and multiline together, you need to specify a message_key value")
-	}
-
-	if config.Harvester.JSON != nil && len(config.Harvester.JSON.MessageKey) == 0 &&
-		(len(config.Harvester.IncludeLines) > 0 || len(config.Harvester.ExcludeLines) > 0) {
-
-		return fmt.Errorf("When using the JSON decoder and line filtering together, you need to specify a message_key value")
-	}
-
-	return nil
-}
-
-// Setup Harvester Config
-func (p *Prospector) setupHarvesterConfig() error {
-
-	var err error
-	config := &p.config.Harvester
-
-	// Setup Buffer Size
-	if config.BufferSize <= 0 {
-		config.BufferSize = cfg.DefaultHarvesterBufferSize
-	}
-	logp.Info("buffer_size set to: %v", config.BufferSize)
-
-	// Setup DocumentType
-	if config.DocumentType == "" {
-		config.DocumentType = cfg.DefaultDocumentType
-	}
-	logp.Info("document_type set to: %v", config.DocumentType)
-
-	// Setup InputType
-	if _, ok := cfg.ValidInputType[config.InputType]; !ok {
-		logp.Info("Invalid input type set: %v", config.InputType)
-		config.InputType = cfg.DefaultInputType
-	}
-	logp.Info("input_type set to: %v", config.InputType)
-
-	config.BackoffDuration, err = getConfigDuration(config.Backoff, cfg.DefaultBackoff, "backoff")
-	if err != nil {
-		return err
-	}
-
-	// Setup Backoff factor
-	if config.BackoffFactor <= 0 {
-		config.BackoffFactor = cfg.DefaultBackoffFactor
-	}
-	logp.Info("backoff_factor set to: %v", config.BackoffFactor)
-
-	config.MaxBackoffDuration, err = getConfigDuration(config.MaxBackoff, cfg.DefaultMaxBackoff, "max_backoff")
-	if err != nil {
-		return err
-	}
-
-	if config.ForceCloseFiles {
-		logp.Info("force_close_file is enabled")
-	} else {
-		logp.Info("force_close_file is disabled")
-	}
-
-	config.CloseOlderDuration, err = getConfigDuration(config.CloseOlder, cfg.DefaultCloseOlder, "close_older")
-	if err != nil {
-		return err
-	}
-
-	if config.MaxBytes <= 0 {
-		config.MaxBytes = cfg.DefaultMaxBytes
-	}
-	logp.Info("max_bytes set to: %v", config.MaxBytes)
-
-	return nil
-}
-
-// getConfigDuration builds the duration based on the input string.
-// Returns error if an invalid string duration is passed
-// In case no duration is set, default duration will be used.
-func getConfigDuration(config string, duration time.Duration, name string) (time.Duration, error) {
-
-	// Setup Ignore Older
-	if config != "" {
-		var err error
-		duration, err = time.ParseDuration(config)
-		if err != nil {
-			logp.Warn("Failed to parse %s value '%s'. Error was: %s\n", name, config)
-			return 0, err
-		}
-	}
-	logp.Info("Set %s duration to %s", name, duration)
-
-	return duration, nil
 }
 
 // isIgnoreOlder checks if the given state reached ignore_older
