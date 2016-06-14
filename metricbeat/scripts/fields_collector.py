@@ -14,7 +14,7 @@ def collect():
     # Iterate over all modules
     for module in os.listdir(base_dir):
 
-        module_fields = path + "/" + module + "/_beat/fields.yml"
+        module_fields = path + "/" + module + "/_meta/fields.yml"
 
         # Only check folders where fields.yml exists
         if os.path.isfile(module_fields) == False:
@@ -29,7 +29,7 @@ def collect():
         # Iterate over all metricsets
         for metricset in os.listdir(base_dir + "/" + module):
 
-            metricset_fields = path + "/" + module + "/" + metricset + "/_beat/fields.yml"
+            metricset_fields = path + "/" + module + "/" + metricset + "/_meta/fields.yml"
 
             # Only check folders where fields.yml exists
             if os.path.isfile(metricset_fields) == False:

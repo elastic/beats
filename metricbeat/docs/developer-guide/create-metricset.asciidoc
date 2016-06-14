@@ -52,11 +52,10 @@ in debug mode with
 The MetricSet which was generated with its files can be found under `module/{module}/{metricset}`. This directory contains
 the following files:
 
-
 * \{metricset}.go
-* _beat/docs.asciidoc
-* _beat/data.json
-* _beat/fields.yml
+* _meta/docs.asciidoc
+* _meta/data.json
+* _meta/fields.yml
 
 We will looking at each file in more detail below.
 

@@ -54,7 +54,7 @@ def collect(beat_path, full=False):
     # Iterate over all modules
     for module in modules:
 
-        beat_path = path + "/" + module + "/_beat"
+        beat_path = path + "/" + module + "/_meta"
 
         module_configs = beat_path + "/config.yml"
 

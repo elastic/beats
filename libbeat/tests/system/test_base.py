@@ -44,7 +44,7 @@ class Test(BaseTest):
         """
         Checks if -configtest works as expected
         """
-        shutil.copy("../../_beat/config.yml",
+        shutil.copy("../../_meta/config.yml",
                     os.path.join(self.working_dir, "libbeat.yml"))
         with open(self.working_dir + "/beatname.template.json", "w") as f:
             f.write('{"template": true}')
