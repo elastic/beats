@@ -692,9 +692,6 @@ class Test(BaseTest):
             lambda: self.output_has(40),
             max_timeout=15)
 
-        # TODO: Find better solution when filebeat did crawl the file
-        # Idea: Special flag to filebeat so that filebeat is only doing and
-        # crawl and then finishes
         filebeat.check_kill_and_wait()
 
         output = self.read_output()
@@ -732,9 +729,6 @@ class Test(BaseTest):
             lambda: self.output_has(60),
             max_timeout=15)
 
-        # TODO: Find better solution when filebeat did crawl the file
-        # Idea: Special flag to filebeat so that filebeat is only doing and
-        # crawl and then finishes
         filebeat.check_kill_and_wait()
 
         output = self.read_output()
@@ -773,9 +767,6 @@ class Test(BaseTest):
             lambda: self.output_has(40),
             max_timeout=15)
 
-        # TODO: Find better solution when filebeat did crawl the file
-        # Idea: Special flag to filebeat so that filebeat is only doing and
-        # crawl and then finishes
         filebeat.check_kill_and_wait()
 
         output = self.read_output()
@@ -815,9 +806,6 @@ class Test(BaseTest):
             lambda: self.output_has(20),
             max_timeout=15)
 
-        # TODO: Find better solution when filebeat did crawl the file
-        # Idea: Special flag to filebeat so that filebeat is only doing and
-        # crawl and then finishes
         filebeat.check_kill_and_wait()
 
         output = self.read_output()

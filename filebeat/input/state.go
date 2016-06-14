@@ -46,12 +46,11 @@ func (s *States) Update(newState FileState) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	index, oldState := s.findPrevious(newState)
+	index, _ := s.findPrevious(newState)
 	newState.LastSeen = time.Now()
 
 	if index >= 0 {
 		s.states[index] = newState
-		logp.Debug("prospector", "Old state overwritten for %s", oldState.Source)
 	} else {
 		// No existing state found, add new one
 		s.states = append(s.states, newState)
