@@ -16,7 +16,7 @@ def ExportDashboards(es, beat, kibana_index, output_directory):
     for doc in res['hits']['hits']:
 
         if not reg_exp.match(doc["_source"]["title"]):
-            print "Ignore dashboard", doc["_source"]["title"]
+            print("Ignore dashboard", doc["_source"]["title"])
             continue
 
         # save dashboard
