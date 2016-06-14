@@ -13,8 +13,7 @@ import (
 	"net/url"
 	"time"
 
-	humanize "github.com/dustin/go-humanize"
-
+	"github.com/dustin/go-humanize"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/mode"
@@ -26,6 +25,11 @@ type Client struct {
 	index  string
 	params map[string]string
 
+	// buffered bulk requests
+	bulkBody *jsonBulkBody
+	bulkRequ *bulkRequest
+
+	// buffered json response reader
 	json jsonReader
 }
 
@@ -88,6 +92,11 @@ func NewClient(
 		WriteErrors: statWriteErrors,
 	})
 
+	bulkRequ, err := newBulkRequest(esURL, "", "", params, nil)
+	if err != nil {
+		logp.Critical("Elasticsearch output not correctly initialized: %v", err)
+	}
+
 	client := &Client{
 		Connection: Connection{
 			URL:      esURL,
@@ -104,6 +113,9 @@ func NewClient(
 		},
 		index:  index,
 		params: params,
+
+		bulkBody: newJSONBulkBody(nil),
+		bulkRequ: bulkRequ,
 	}
 
 	client.Connection.onConnectCallback = func() error {
@@ -137,48 +149,57 @@ func (client *Client) Clone() *Client {
 func (client *Client) PublishEvents(
 	events []common.MapStr,
 ) ([]common.MapStr, error) {
-
 	begin := time.Now()
 	publishEventsCallCount.Add(1)
+
+	if len(events) == 0 {
+		return nil, nil
+	}
 
 	if !client.connected {
 		return events, ErrNotConnected
 	}
 
-	// new request to store all events into
-	request, err := client.startBulkRequest("", "", client.params)
-	if err != nil {
-		logp.Err("Failed to perform any bulk index operations: %s", err)
-		return events, err
-	}
+	body := client.bulkBody
+	body.Reset()
+
+	requ := client.bulkRequ
+	requ.Reset(body)
 
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
-	events = bulkEncodePublishRequest(request, client.index, events)
+	events = bulkEncodePublishRequest(body, client.index, events)
 	if len(events) == 0 {
 		return nil, nil
 	}
 
-	// send bulk request
-	bufferSize := request.buf.Len()
-	_, res, err := request.Flush()
-	if err != nil {
-		logp.Err("Failed to perform any bulk index operations: %s", err)
-		return events, err
+	status, result, sendErr := client.sendBulkRequest(requ)
+	if sendErr != nil {
+		logp.Err("Failed to perform any bulk index operations: %s", sendErr)
+		return events, sendErr
 	}
 
 	logp.Debug("elasticsearch", "PublishEvents: %d metrics have been packed into a buffer of %s and published to elasticsearch in %v.",
 		len(events),
-		humanize.Bytes(uint64(bufferSize)),
+		humanize.Bytes(uint64(body.buf.Len())),
 		time.Now().Sub(begin))
 
 	// check response for transient errors
-	client.json.init(res.raw)
-	failed_events := bulkCollectPublishFails(&client.json, events)
-	ackedEvents.Add(int64(len(events) - len(failed_events)))
-	eventsNotAcked.Add(int64(len(failed_events)))
-	if len(failed_events) > 0 {
-		return failed_events, mode.ErrTempBulkFailure
+	var failedEvents []common.MapStr
+	if status != 200 {
+		failedEvents = events
+	} else {
+		client.json.init(result.raw)
+		failedEvents = bulkCollectPublishFails(&client.json, events)
+	}
+
+	ackedEvents.Add(int64(len(events) - len(failedEvents)))
+	eventsNotAcked.Add(int64(len(failedEvents)))
+	if len(failedEvents) > 0 {
+		if sendErr == nil {
+			sendErr = mode.ErrTempBulkFailure
+		}
+		return failedEvents, sendErr
 	}
 
 	return nil, nil
@@ -187,14 +208,14 @@ func (client *Client) PublishEvents(
 // fillBulkRequest encodes all bulk requests and returns slice of events
 // successfully added to bulk request.
 func bulkEncodePublishRequest(
-	requ *bulkRequest,
+	body *jsonBulkBody,
 	index string,
 	events []common.MapStr,
 ) []common.MapStr {
 	okEvents := events[:0]
 	for _, event := range events {
 		meta := eventBulkMeta(index, event)
-		err := requ.Send(meta, event)
+		err := body.Add(meta, event)
 		if err != nil {
 			logp.Err("Failed to encode event: %s", err)
 			continue
@@ -206,7 +227,6 @@ func bulkEncodePublishRequest(
 }
 
 func eventBulkMeta(index string, event common.MapStr) bulkMeta {
-
 	index = getIndex(event, index)
 	meta := bulkMeta{
 		Index: bulkMetaIndex{
@@ -520,7 +540,10 @@ func (conn *Connection) execRequest(
 		logp.Warn("Failed to create request", err)
 		return 0, nil, err
 	}
+	return conn.execHTTPRequest(req)
+}
 
+func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) {
 	req.Header.Add("Accept", "application/json")
 	if conn.Username != "" || conn.Password != "" {
 		req.SetBasicAuth(conn.Username, conn.Password)
