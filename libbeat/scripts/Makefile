@@ -238,8 +238,8 @@ update: python-env
 ES_URL?=http://localhost:9200
 
 .PHONY: export-dashboards
-export-dashboards:
-	python ${ES_BEATS}/dev-tools//export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
+export-dashboards: python-env
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
 
 .PHONY: import-dashboards
 import-dashboards:
