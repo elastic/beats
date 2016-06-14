@@ -131,6 +131,9 @@ output:
 +
 If you are sending output to Logstash, see <<config-topbeat-logstash>> instead.
 
+TIP: To test your configuration file, run Topbeat in the foreground with the following options specified:
++./topbeat -configtest -e+.
+
 [[topbeat-template]]
 === Step 3: Loading the Index Template in Elasticsearch
 
