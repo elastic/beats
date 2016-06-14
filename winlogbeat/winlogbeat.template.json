@@ -142,7 +142,7 @@
           }
         },
         "version": {
-          "type": "integer"
+          "type": "long"
         },
         "xml": {
           "norms": false,

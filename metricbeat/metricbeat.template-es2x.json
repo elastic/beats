@@ -38,18 +38,18 @@
                     "async": {
                       "properties": {
                         "closing": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "keep_alive": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "writing": {
-                          "type": "integer"
+                          "type": "long"
                         }
                       }
                     },
                     "total": {
-                      "type": "integer"
+                      "type": "long"
                     }
                   }
                 },
@@ -96,66 +96,66 @@
                 "scoreboard": {
                   "properties": {
                     "closing_connection": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "dns_lookup": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "gracefully_finishing": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "idle_cleanup": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "keepalive": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "logging": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "open_slot": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "reading_request": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "sending_reply": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "starting_up": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "total": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "waiting_for_connection": {
-                      "type": "integer"
+                      "type": "long"
                     }
                   }
                 },
                 "total_accesses": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "total_kbytes": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "uptime": {
                   "properties": {
                     "server_uptime": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "uptime": {
-                      "type": "integer"
+                      "type": "long"
                     }
                   }
                 },
                 "workers": {
                   "properties": {
                     "busy": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "idle": {
-                      "type": "integer"
+                      "type": "long"
                     }
                   }
                 }
@@ -206,10 +206,10 @@
                 "aborted": {
                   "properties": {
                     "clients": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "connects": {
-                      "type": "integer"
+                      "type": "long"
                     }
                   }
                 },
@@ -218,10 +218,10 @@
                     "cache": {
                       "properties": {
                         "disk_use": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "use": {
-                          "type": "integer"
+                          "type": "long"
                         }
                       }
                     }
@@ -230,28 +230,28 @@
                 "bytes": {
                   "properties": {
                     "received": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "sent": {
-                      "type": "integer"
+                      "type": "long"
                     }
                   }
                 },
                 "connections": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "created": {
                   "properties": {
                     "tmp": {
                       "properties": {
                         "disk_tables": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "files": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "tables": {
-                          "type": "integer"
+                          "type": "long"
                         }
                       }
                     }
@@ -260,37 +260,37 @@
                 "delayed": {
                   "properties": {
                     "errors": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "insert_threads": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "writes": {
-                      "type": "integer"
+                      "type": "long"
                     }
                   }
                 },
                 "flush_commands": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "max_used_connections": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "open": {
                   "properties": {
                     "files": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "streams": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "tables": {
-                      "type": "integer"
+                      "type": "long"
                     }
                   }
                 },
                 "opened_tables": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             }
@@ -301,19 +301,19 @@
             "stubstatus": {
               "properties": {
                 "accepts": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "active": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "current": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "dropped": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "handled": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "hostname": {
                   "ignore_above": 1024,
@@ -321,16 +321,16 @@
                   "type": "string"
                 },
                 "reading": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "requests": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "waiting": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "writing": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             }
@@ -343,16 +343,16 @@
                 "clients": {
                   "properties": {
                     "biggest_input_buf": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "blocked": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "connected": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "longest_output_list": {
-                      "type": "integer"
+                      "type": "long"
                     }
                   }
                 },
@@ -393,16 +393,16 @@
                     "used": {
                       "properties": {
                         "lua": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "peak": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "rss": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "value": {
-                          "type": "integer"
+                          "type": "long"
                         }
                       }
                     }
@@ -419,10 +419,10 @@
                           "type": "boolean"
                         },
                         "changes_since_last_save": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "current_bgsave_time_sec": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "last_bgsave_status": {
                           "ignore_above": 1024,
@@ -430,17 +430,17 @@
                           "type": "string"
                         },
                         "last_bgsave_time_sec": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "last_save_time": {
-                          "type": "integer"
+                          "type": "long"
                         }
                       }
                     },
                     "used": {
                       "properties": {
                         "current_rewrite_time_sec": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "enabled": {
                           "type": "boolean"
@@ -451,7 +451,7 @@
                           "type": "string"
                         },
                         "last_rewrite_time_sec": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "last_write_status": {
                           "ignore_above": 1024,
@@ -473,24 +473,24 @@
                     "backlog": {
                       "properties": {
                         "active": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "first_byte_offset": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "histlen": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "size": {
-                          "type": "integer"
+                          "type": "long"
                         }
                       }
                     },
                     "connected_slaves": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "master_offset": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "role": {
                       "ignore_above": 1024,
@@ -532,10 +532,10 @@
                       "type": "string"
                     },
                     "hz": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "lru_clock": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "mode": {
                       "ignore_above": 1024,
@@ -553,7 +553,7 @@
                       "type": "string"
                     },
                     "process_id": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "run_id": {
                       "ignore_above": 1024,
@@ -561,10 +561,10 @@
                       "type": "string"
                     },
                     "tcp_port": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "uptime": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "version": {
                       "ignore_above": 1024,
@@ -578,10 +578,10 @@
                     "connections": {
                       "properties": {
                         "received": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "rejected": {
-                          "type": "integer"
+                          "type": "long"
                         }
                       }
                     },
@@ -589,7 +589,7 @@
                       "type": "float"
                     },
                     "instantaneous_ops_per_sec": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "instantaneous_output_kbps": {
                       "type": "float"
@@ -597,56 +597,56 @@
                     "keys": {
                       "properties": {
                         "evicted": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "expired": {
-                          "type": "integer"
+                          "type": "long"
                         }
                       }
                     },
                     "keyspace": {
                       "properties": {
                         "hits": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "misses": {
-                          "type": "integer"
+                          "type": "long"
                         }
                       }
                     },
                     "latest_fork_usec": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "migrate_cached_sockets": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "pubsub_channels": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "pubsub_patterns": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "sync": {
                       "properties": {
                         "full": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "partial_err": {
-                          "type": "integer"
+                          "type": "long"
                         },
                         "partial_ok": {
-                          "type": "integer"
+                          "type": "long"
                         }
                       }
                     },
                     "total_commands_processed": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "total_net_input_bytes": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "total_net_output_bytes": {
-                      "type": "integer"
+                      "type": "long"
                     }
                   }
                 }
@@ -677,7 +677,7 @@
             "core": {
               "properties": {
                 "id": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "idle": {
                   "properties": {
@@ -1123,10 +1123,10 @@
                   "type": "string"
                 },
                 "pid": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "ppid": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "state": {
                   "ignore_above": 1024,
@@ -1160,10 +1160,10 @@
                   "type": "long"
                 },
                 "ephemerals_count": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "followers": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "hostname": {
                   "ignore_above": 1024,
@@ -1173,32 +1173,32 @@
                 "latency": {
                   "properties": {
                     "avg": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "max": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "min": {
-                      "type": "integer"
+                      "type": "long"
                     }
                   }
                 },
                 "max_file_descriptor_count": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "num_alive_connections": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "open_file_descriptor_count": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "outstanding_requests": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "packets": {
                   "properties": {
                     "received": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "sent": {
                       "type": "long"
@@ -1206,7 +1206,7 @@
                   }
                 },
                 "pending_syncs": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "server_state": {
                   "ignore_above": 1024,
@@ -1214,7 +1214,7 @@
                   "type": "string"
                 },
                 "synced_followers": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "version": {
                   "ignore_above": 1024,
@@ -1222,10 +1222,10 @@
                   "type": "string"
                 },
                 "watch_count": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "znode_count": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             }

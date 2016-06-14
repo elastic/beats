@@ -170,7 +170,7 @@
           }
         },
         "version": {
-          "type": "integer"
+          "type": "long"
         },
         "xml": {
           "index": "analyzed",
