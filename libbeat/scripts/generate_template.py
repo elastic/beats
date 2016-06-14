@@ -179,6 +179,10 @@ def fill_field_properties(args, field, defaults, path):
 
     elif field["type"] in ["geo_point", "date", "long", "integer",
                            "double", "float", "boolean"]:
+        # Convert all integer fields to long
+        if field["type"] == "integer":
+            field["type"] = "long"
+
         properties[field["name"]] = {
             "type": field.get("type")
         }

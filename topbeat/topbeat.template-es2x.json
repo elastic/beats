@@ -125,7 +125,7 @@
           }
         },
         "id": {
-          "type": "integer"
+          "type": "long"
         },
         "idle": {
           "type": "long"
@@ -233,10 +233,10 @@
               "type": "string"
             },
             "pid": {
-              "type": "integer"
+              "type": "long"
             },
             "ppid": {
-              "type": "integer"
+              "type": "long"
             },
             "state": {
               "ignore_above": 1024,
