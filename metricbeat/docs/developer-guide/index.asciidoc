@@ -54,6 +54,10 @@ possible to the service which should be monitored.
 
 include::./create-metricset.asciidoc[]
 
+include::./metricset-details.asciidoc[]
+
 include::./create-module.asciidoc[]
 
 include::../../../generate/metricbeat/metricset/README.asciidoc[]
+
+include::./faq.asciidoc[]

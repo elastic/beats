@@ -7,6 +7,9 @@ This guide should help you to create your own MetricSet. It will focus on the de
 of the MetricSet creation itself. If you want to create your own beat using Metricbeat
 as a library, have a look here.
 
+In general when creating a MetricSet for the first time, it helps before to have a look at the
+implementation of the existing MetricSets as inspiration.
+
 
 [float]
 == Create Metricset Files
@@ -50,7 +53,7 @@ The MetricSet which was generated with its files can be found under `module/{mod
 the following files:
 
 
-* {metricset}.go
+* \{metricset}.go
 * _beat/docs.asciidoc
 * _beat/data.json
 * _beat/fields.yml
@@ -155,15 +158,66 @@ to elasticsearch. That means metricbeat always sends an event, also on failure.
 It must made sure, that the error message helps to identify what the actual
 error is.
 
+In our example we have a counter which is increment by one for each fetch call.
+
 [source,go]
 ----
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	event := common.MapStr{
-		"example": "{metricset} example",
+		"counter": m.counter,
 	}
+	m.counter++
+
 	return event, nil
 }
 ----
 
+Fetch must return a `common.MapStr` which will be translated to the JSON content.
+The JSON output will be identical to the naming and structure you use in
+common.MapStr. More details about MapStr and its functions can be found in the API
+docs https://godoc.org/github.com/elastic/beats/libbeat/common#MapStr[here].
+
+
+[float]
+==== Multi Fetching
+Metricbeat has two different Fetch interfaces. One is to fetch a single event
+which is shown above. In some cases every fetch returns a list of events. Instead
+of using an array inside a JSON document, we recommend to create a list of events.
+
+For this kind of data the following interface can be used:
+
+[source,go]
+----
+(m *MetricSet) Fetch() ([]common.MapStr, error)
+----
+
+The only difference to the previous example is that a `[]common.MapStr` is returned.
+Metricbeat will send all events with the same timestamp and a unique identifier
+to make it possible to correlate the events.
+
+
+[float]
+==== Configuration File
+The configuration file for a MetricSet is handled by the module. In case there are
+multiple MetricSets in one module, make sure to add all MetricSets to the configuration:
+
+[source,go]
+----
+metricbeat:
+  modules:
+    - module: {module-name}
+      metricsets: ["{metricset1}", "{metricset2}"]
+----
+
+NOTE: Make sure to run `make collect` every time after you update the config file
+so it is also applied to the global configuration file and the docs.
+
+More details on the configuration file can be found here in the module docs.
+
+
+[float]
+== Next Steps
+In the above descriptions the basic steps to create a MetricSet are documented. For more in depth details about MetricSet
+and how to extend your MetricSet further, check the MetricSet details page.
 

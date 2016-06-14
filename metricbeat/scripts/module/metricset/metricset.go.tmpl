@@ -19,6 +19,7 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
+	counter int
 }
 
 // New create a new instance of the MetricSet
@@ -34,6 +35,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
+		counter:       1,
 	}, nil
 }
 
@@ -43,7 +45,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	event := common.MapStr{
-		"example": "{metricset} example",
+		"counter": m.counter,
 	}
+	m.counter++
+
 	return event, nil
 }
