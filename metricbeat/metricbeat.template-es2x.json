@@ -199,6 +199,301 @@
             }
           }
         },
+        "mongodb": {
+          "properties": {
+            "status": {
+              "properties": {
+                "asserts": {
+                  "properties": {
+                    "msg": {
+                      "type": "long"
+                    },
+                    "regular": {
+                      "type": "long"
+                    },
+                    "rollovers": {
+                      "type": "long"
+                    },
+                    "user": {
+                      "type": "long"
+                    },
+                    "warning": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "background_flushing": {
+                  "properties": {
+                    "average": {
+                      "properties": {
+                        "ms": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "flushes": {
+                      "type": "long"
+                    },
+                    "last": {
+                      "properties": {
+                        "ms": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "last_finished": {
+                      "type": "date"
+                    },
+                    "total": {
+                      "properties": {
+                        "ms": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "connections": {
+                  "properties": {
+                    "available": {
+                      "type": "long"
+                    },
+                    "current": {
+                      "type": "long"
+                    },
+                    "total_created": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "extra_info": {
+                  "properties": {
+                    "heap_usage": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "page_faults": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "journaling": {
+                  "properties": {
+                    "commits": {
+                      "type": "long"
+                    },
+                    "commits_in_write_lock": {
+                      "type": "long"
+                    },
+                    "compression": {
+                      "type": "long"
+                    },
+                    "early_commits": {
+                      "type": "long"
+                    },
+                    "journaled": {
+                      "properties": {
+                        "mb": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "times": {
+                      "properties": {
+                        "commits": {
+                          "properties": {
+                            "ms": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "commits_in_write_lock": {
+                          "properties": {
+                            "ms": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "dt": {
+                          "properties": {
+                            "ms": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "prep_log_buffer": {
+                          "properties": {
+                            "ms": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "remap_private_view": {
+                          "properties": {
+                            "ms": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "write_to_data_files": {
+                          "properties": {
+                            "ms": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "write_to_journal": {
+                          "properties": {
+                            "ms": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "write_to_data_files": {
+                      "properties": {
+                        "mb": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "local_time": {
+                  "type": "date"
+                },
+                "memory": {
+                  "properties": {
+                    "bits": {
+                      "type": "long"
+                    },
+                    "mapped": {
+                      "properties": {
+                        "mb": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "mapped_with_journal": {
+                      "properties": {
+                        "mb": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "resident": {
+                      "properties": {
+                        "mb": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "virtual": {
+                      "properties": {
+                        "mb": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "network": {
+                  "properties": {
+                    "in": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "out": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "requests": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "opcounters": {
+                  "properties": {
+                    "command": {
+                      "type": "long"
+                    },
+                    "delete": {
+                      "type": "long"
+                    },
+                    "getmore": {
+                      "type": "long"
+                    },
+                    "insert": {
+                      "type": "long"
+                    },
+                    "query": {
+                      "type": "long"
+                    },
+                    "update": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "opcounters_replicated": {
+                  "properties": {
+                    "command": {
+                      "type": "long"
+                    },
+                    "delete": {
+                      "type": "long"
+                    },
+                    "getmore": {
+                      "type": "long"
+                    },
+                    "insert": {
+                      "type": "long"
+                    },
+                    "query": {
+                      "type": "long"
+                    },
+                    "update": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "storage_engine": {
+                  "properties": {
+                    "name": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "uptime": {
+                  "properties": {
+                    "ms": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "version": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "write_backs_queued": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
         "mysql": {
           "properties": {
             "status": {

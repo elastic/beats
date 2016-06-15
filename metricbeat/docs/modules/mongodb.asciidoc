@@ -1,0 +1,75 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-mongodb]]
+== MongoDB Module
+
+This modules periodically fetches metrics from https://www.mongodb.com[MongoDB]
+servers.
+
+[float]
+=== Configuration Options
+
+A basic configuration sample for the MongoDB module can be found in the next section.
+
+==== hosts
+
+The hosts must be passed as a MongoDB URLs in the following format:
+
+-----------------------------------
+[mongodb://][user:pass@]host[:port]
+-----------------------------------
+
+It can be as simple as:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["localhost"]
+----------------------------------------------------------------------
+
+Or more complex like:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["mongodb://myuser:mypass@localhost:40001", "otherhost:40001"]
+----------------------------------------------------------------------
+
+
+[float]
+=== Compatibility
+
+The mongodb MetricSets were tested with MongoDB 3.0 are expected to work with all versions >= 2.8.
+
+
+[float]
+=== Example Configuration
+
+The MongoDB Status module supports the standard configuration options which can be found
+here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: mongodb
+  metricsets: ["status"]
+  enabled: true
+  period: 10s
+
+  # The hosts must be passed as MongoDB URLs in the format:
+  # [mongodb://][user:pass@]host[:port]
+  hosts: ["localhost:27017"]
+
+----
+
+[float]
+=== MetricSets
+
+The following MetricSets are available:
+
+* <<metricbeat-metricset-mongodb-status,status>>
+
+include::mongodb/status.asciidoc[]
+
