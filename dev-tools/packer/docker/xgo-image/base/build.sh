@@ -162,7 +162,7 @@ for TARGET in $TARGETS; do
 
 		# Build the requested windows binaries
 		if [ $XGOARCH == "." ] || [ $XGOARCH == "amd64" ]; then
-			echo "Compiling for windows-$PLATFORM/amd64..."
+			echo "Compiling $PACK for windows-$PLATFORM/amd64..."
 			CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ CFLAGS="$CGO_NTDEF" CXXFLAGS="$CGO_NTDEF" HOST=x86_64-w64-mingw32 PREFIX=/usr/x86_64-w64-mingw32 $BUILD_DEPS /deps $LIST_DEPS
 			export PKG_CONFIG_PATH=/usr/x86_64-w64-mingw32/lib/pkgconfig
 
@@ -172,7 +172,7 @@ for TARGET in $TARGETS; do
 		fi
 
 		if [ $XGOARCH == "." ] || [ $XGOARCH == "386" ]; then
-			echo "Compiling for windows-$PLATFORM/386..."
+			echo "Compiling $PACK for windows-$PLATFORM/386..."
 			CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ CFLAGS="$CGO_NTDEF" CXXFLAGS="$CGO_NTDEF" HOST=i686-w64-mingw32 PREFIX=/usr/i686-w64-mingw32 $BUILD_DEPS /deps $LIST_DEPS
 			export PKG_CONFIG_PATH=/usr/i686-w64-mingw32/lib/pkgconfig
 
