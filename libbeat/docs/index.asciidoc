@@ -1,13 +1,13 @@
 [[beats-reference]]
 = Beats Platform Reference
-:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/1.2
-:topbeat: http://www.elastic.co/guide/en/beats/topbeat/1.2
-:filebeat: http://www.elastic.co/guide/en/beats/filebeat/1.2
-:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/1.2
-:ES-version: 2.3.3
-:LS-version: 2.3.2
-:Kibana-version: 4.5.1
-:Dashboards-version: 1.2.3
+:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/1.3
+:topbeat: http://www.elastic.co/guide/en/beats/topbeat/1.3
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/1.3
+:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/1.3
+:ES-version: 2.4.0
+:LS-version: 2.4.0
+:Kibana-version: 4.6.0
+:Dashboards-version: 1.3.0
 
 
 include::./overview.asciidoc[]
