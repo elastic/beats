@@ -4,7 +4,7 @@ Metricbeat modules are used to group multiple metricsets together and to impleme
 of the MetricSets. In most cases, no implementation of the module is needed and the default module
 implementation is automatically picked.
 
-It is important to complete the configuration and documentation files for a module. All these files are in the `_beat`
+It is important to complete the configuration and documentation files for a module. All these files are in the `_meta`
 directory and a default version is generate when using `make create-metricset`.
 
 [float]

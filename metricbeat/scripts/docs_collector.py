@@ -18,7 +18,7 @@ This file is generated! See scripts/docs_collector.py
     # Iterate over all modules
     for module in os.listdir(base_dir):
 
-        module_doc = path + "/" + module + "/_beat/docs.asciidoc"
+        module_doc = path + "/" + module + "/_meta/docs.asciidoc"
 
         # Only check folders where fields.yml exists
         if os.path.isfile(module_doc) == False:
@@ -33,7 +33,7 @@ This file is generated! See scripts/docs_collector.py
         with file(module_doc) as f:
             module_file += f.read()
 
-        beat_path = path + "/" + module + "/_beat"
+        beat_path = path + "/" + module + "/_meta"
 
          # Load title from fields.yml
         with open(beat_path + "/fields.yml") as f:
@@ -78,7 +78,7 @@ metricbeat.modules:
         # Iterate over all metricsets
         for metricset in os.listdir(base_dir + "/" + module):
 
-            metricset_docs = path + "/" + module + "/" + metricset + "/_beat/docs.asciidoc"
+            metricset_docs = path + "/" + module + "/" + metricset + "/_meta/docs.asciidoc"
 
             # Only check folders where fields.yml exists
             if os.path.isfile(metricset_docs) == False:
@@ -96,7 +96,7 @@ metricbeat.modules:
 
             # Add reference to metricset file and include file
             metricset_file += reference + "\n"
-            metricset_file += 'include::../../../module/' + module + '/' + metricset + '/_beat/docs.asciidoc[]' + "\n"
+            metricset_file += 'include::../../../module/' + module + '/' + metricset + '/_meta/docs.asciidoc[]' + "\n"
 
             # TODO: This should point directly to the exported fields of the metricset, not the whole module
             metricset_file += """
@@ -108,7 +108,7 @@ A description of each field in the MetricSet can be found in the
 
 """
 
-            data_file = path + "/" + module + "/" + metricset + "/_beat/data.json"
+            data_file = path + "/" + module + "/" + metricset + "/_meta/data.json"
 
             # Add data.json example json document
             if os.path.isfile(data_file) == True:
@@ -117,7 +117,7 @@ A description of each field in the MetricSet can be found in the
 
                 metricset_file += "[source,json]\n"
                 metricset_file += "----\n"
-                metricset_file += "include::../../../module/" + module + "/" + metricset + "/_beat/data.json[]\n"
+                metricset_file += "include::../../../module/" + module + "/" + metricset + "/_meta/data.json[]\n"
                 metricset_file += "----\n"
 
             # Write metricset docs
