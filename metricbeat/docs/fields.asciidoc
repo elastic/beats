@@ -1926,25 +1926,46 @@ Load averages.
 
 
 
-==== system.cpu.load.1
+==== system.cpu.load.avg.1
 
 type: float
 
 Load average for the last minute.
 
 
-==== system.cpu.load.5
+==== system.cpu.load.avg.5
 
 type: float
 
 Load average for the last 5 minutes.
 
 
-==== system.cpu.load.15
+==== system.cpu.load.avg.15
 
 type: float
 
 Load average for the last 15 minutes.
+
+
+==== system.cpu.load.norm.1
+
+type: float
+
+Load divided by the number of cores for the last minute.
+
+
+==== system.cpu.load.norm.5
+
+type: float
+
+Load divided by the number of cores for the last 5 minutes.
+
+
+==== system.cpu.load.norm.15
+
+type: float
+
+Load divided by the number of cores for the last 15 minutes.
 
 
 [float]

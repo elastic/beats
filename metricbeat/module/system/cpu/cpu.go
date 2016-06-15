@@ -96,9 +96,16 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 	cpuStat["load"] = common.MapStr{
-		"1":  loadStat.Load1,
-		"5":  loadStat.Load5,
-		"15": loadStat.Load15,
+		"avg": common.MapStr{
+			"1":  loadStat.Load1,
+			"5":  loadStat.Load5,
+			"15": loadStat.Load15,
+		},
+		"norm": common.MapStr{
+			"1":  loadStat.LoadNorm1,
+			"5":  loadStat.LoadNorm5,
+			"15": loadStat.LoadNorm15,
+		},
 	}
 
 	return cpuStat, nil
