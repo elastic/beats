@@ -309,16 +309,11 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 
 func (mongodb *Mongodb) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-
-	// TODO
-
 	return private, true
 }
 
 func (mongodb *Mongodb) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
-
-	// TODO
 	return private
 }
 

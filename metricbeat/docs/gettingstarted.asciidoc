@@ -125,10 +125,6 @@ metricbeat.modules:
 
 To configure Metricbeat:
 
-////
-TODO: Migrate the documentation ruflin has written to here.
-////
-
 . Define the metricbeat modules that you want enabled.
 
 . If you are sending output to Elasticsearch, set the IP address and port where
