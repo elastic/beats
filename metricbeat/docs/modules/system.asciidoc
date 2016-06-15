@@ -45,6 +45,13 @@ metricbeat.modules:
   cpu_ticks: true
 ----
 
+[float]
+=== Dashboard
+
+The system module comes with its predefined dashboard. An example is shown below.
+
+image::./images/metricbeat_system_dashboard.png[]
+
 
 [float]
 === Example Configuration
