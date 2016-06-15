@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 - Fix beats load balancer deadlock if max_retries: -1 or publish_async is enabled in filebeat. {issue}1829[1829]
 
 *Metricbeat*
+- Fix the CPU values returned for each core. {issue}1863[1863]
 
 *Packetbeat*
 - Add missing nil-check to memcached GapInStream handler. {issue}1162[1162]
