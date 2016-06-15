@@ -22,16 +22,22 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 
 *Filebeat*
 
+- Stop following symlink. Symlinks are now ignored: {pull}1686[1686]
+
 *Winlogbeat*
 
 
 ==== Bugfixes
 
 *Affecting all Beats*
+- Reset backoff factor on partial ACK. {issue}1803[1803]
+- Fix beats load balancer deadlock if max_retries: -1 or publish_async is enabled in filebeat. {issue}1829[1829]
 
 *Metricbeat*
+- Fix the CPU values returned for each core. {issue}1863[1863]
 
 *Packetbeat*
+- Add missing nil-check to memcached GapInStream handler. {issue}1162[1162]
 
 *Topbeat*
 
@@ -79,7 +85,7 @@ https://github.com/elastic/beats/compare/v5.0.0alpha2...v5.0.0-alpha3[View commi
 *Affecting all Beats*
 
 - All configuration settings under `shipper:` are moved to be top level configuration settings. I.e.
-  `shipper.name:` becomes `name:` in the configuration file. #1570
+  `shipper.name:` becomes `name:` in the configuration file. {pull}1570[1570]
 
 *Topbeat*
 

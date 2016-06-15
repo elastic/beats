@@ -1,0 +1,237 @@
+== MetricSet Details
+
+This page shares additional details about the creationg of a MetricSet for developers.
+
+
+
+
+[float]
+=== Add special configuration options
+
+Each MetricSet can have it's own configuration variables defined. To make use of
+these variables, the `New` method must be extended. Assuming `password` should
+be introduced in the MetricSet, the `beat.yml` would be extended in the
+following way:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: {module}
+  metricsets: ["{metricset}"]
+  password: "test1234"
+----
+
+To read out the password config in the `New` method must be used. First a config struct must be defined with
+ the value types to be read. Second as the values of the struct, default values can be set if needed. This config
+ is then passed to the `UnpackConfig` method for loading the configuration. For the implementation details see below:
+
+[source,go]
+----
+type MetricSet struct {
+	mb.BaseMetricSet
+	password string
+}
+
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+
+	// Unpack additional configuration options.
+	config := struct {
+		Password string `config:"password"`
+	}{
+		Password: "",
+	}
+	err := base.Module().UnpackConfig(&config)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MetricSet{
+		BaseMetricSet: base,
+		password:      config.Password,
+	}, nil
+}
+----
+
+
+[float]
+=== Timeout Connections to Services
+
+As each time the Fetch method is called, it makes a request to the service, it
+is important to handle the connections correctly. It is recommended to setup the
+connections in the New method and persist them in the MetricSet object. This allows
+connections to be reused.
+
+One very important point is that connections must respect the timeout variable:
+`base.Module().Config().Timeout`. After the timeout a request must be ended and an error must
+be returned to make sure the next request can be started on time. By default the
+Timeout is set to Period, so one request gets ended when a new request is made.
+
+In case of a request must be ended or has an error, it should be make sure to
+return a good error message. This error message is also sent to Elasticesarch in
+index. This makes it possible to not only fetch metrics from the service, but
+also report potential problems / errors with the metricset.
+
+
+[float]
+=== Data Transformation
+
+In case the data transformation that has to happen in the `Fetch` method is
+extensive, we recommend to create a second file called `data.go` in the same package
+which contains a function `eventMapping(...)`. This is not required but
+currently best practice. This keeps the functionality of the MetricSet and Fetch method separate
+from the data mapping part.
+
+
+
+[float]
+=== fields.yml
+
+The `fields.yml` file is used for different for different purposes:
+
+* Creates the elasticsearch template
+* Creates the docs Fields Docs for the MetricSet
+
+To make the elasticsearch template is correct, it is important to keep this file up-to-date
+with all the changes. There is a fields.yml file under `module/{module}/_meta/fields.yml´ which contains
+the general top level structure for all MetricSets. Normally this one does not have to be modified
+except for the description:
+
+Here an example for the fields.yml from the MySQL module.
+
+[source,yaml]
+----
+include::../../module/mysql/_meta/fields.yml[]
+----
+
+The second file is under `module/{module}/{metricset}/_meta/fields.yml´ which contains all fields retrieved
+by the MetricSet. As field types, for each each field must have a core data type
+https://www.elastic.co/guide/en/elasticsearch/reference/master/mapping-types.html#_core_datatypes[supported by elasticsearch]
+must be used. A very basic file with one group from the MySQL/Status MetricSet looks as following:
+
+[source,yaml]
+----
+- name: status
+  type: group
+  description: >
+    `status` contains the metrics that were obtained by the status SQL query.
+  fields:
+    - name: aborted
+      type: group
+      description: >
+        Aborted status fields
+      fields:
+        - name: clients
+          type: integer
+          description: >
+            The number of connections that were aborted because the client died without closing the connection properly.
+
+        - name: connects
+          type: integer
+          description: >
+            The number of failed attempts to connect to the MySQL server.
+----
+
+As you can see, in case there are nested fields, the type `group` has to be used.
+
+// TODO: Add link to general fields.yml developer guide
+
+[float]
+=== Testing
+
+It is important to also add tests to your MetricSet. To test a beat there exist three different type of tests:
+
+* unit tests
+* integration tests
+* system tests
+
+When creating a MetricSet we recommend to make use of all three. Unit tests are
+written in Golang and have no dependencies. Integration tests are also written
+in Golang but require the service that is required for the module to be running.
+System-tests for Metricbeat also require the service to be running in most cases and are
+written in Python based on our small python test framework.
+
+It is recommended to use a combination of the three test types to test your MetricSets as
+each method has its advantage and disadvantages. The unit and integration tests
+can be found in the `_test.go` files under modules and metricsets. The system
+tests are under `tests/systems`. To get started with your own tests, it is best
+having a look at the existing tests.
+
+
+[float]
+==== Add test environment
+
+Integration and system tests need an environment running with the service to
+test. This is done with docker and a docker-compose file. In case you add a
+module which requires a service, you must add this to the virtual environment.
+For this two steps are required:
+
+* Update the `docker-compose.yml` file with your environment
+* Update the `docker-entrypoint.sh` script
+
+The `docker-compose.yml` file is at the root of Metricbeat. Most services have
+existing docker modules and can be added as simple as redis:
+
+[source,yaml]
+----
+redis:
+  image: redis:3.2.0
+----
+
+To also allow the beat to access your service, make sure to define the environment
+variables in the docker-compose file and add the link to the container:
+
+[source,yaml]
+----
+beat:
+  links:
+    - redis
+  environment:
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+----
+
+To make sure the service is running before the tests are started, the
+`docker-entrypoint.sh` must be modified to add a check for your service to be
+running. An example for redis looks as following:
+
+[source,shell]
+----
+waitFor ${REDIS_HOST} ${REDIS_PORT} Redis
+----
+
+This expects that your service is available as soon as it receives a response from
+the given address and port.
+
+
+[float]
+==== Run tests
+
+To run all the tests, run `make testsuite`. To only run unit tests, run `make
+unit-tests` or for integration tests `make integration-tests`. Be aware that for
+integration and system tests a running docker environment is needed.
+
+[float]
+== Documentation
+
+Each module must be documented. The documentation is based on asciidoc and is in
+the file `module/{module}/_meta/docs.asciidoc` for the module and in `module/{module}/{metricset}/_meta/docs.asciidoc`
+ for the MetricSet. A basic documentation with the config file and an example output is automatically
+ generated. Use this files to document specific configuration options or usage examples.
+
+
+
+
+////
+TODO: The following parts should be added as soon as the content exists or the implementation is completed.
+
+[float]
+== Field naming
+https://github.com/elastic/beats/blob/master/metricbeat/module/doc.go
+
+[float]
+== Dashboards
+
+Dashboards are an important part of each metricset. Data gets much more useful
+when visualized. To create dashboards for the metricset, follow the guide here
+(link to dashboard guide).
+////

@@ -1,0 +1,7 @@
+{
+  "project_name": "Countbeat",
+  "github_name": "ruflin",
+  "beat": "{{ cookiecutter.project_name|lower }}",
+  "beat_path": "beatpath",
+  "full_name": "Nicolas Ruflin"
+}

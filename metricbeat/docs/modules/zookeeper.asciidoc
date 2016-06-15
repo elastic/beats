@@ -6,13 +6,17 @@ This file is generated! See scripts/docs_collector.py
 == Zookeeper Module
 
 
+=== Compatibility
+
+The zookeeper MetricSets were tested with zookeeper 3.4.8 and are expected to work with all version
+>= 3.4.0. Versions prior to 3.4 do not support the `mntr` command.
 
 
 [float]
 === Example Configuration
 
 The Zookeeper Status module supports the standard configuration options which can be found
-here (add link). Below is an example of a configuration option:
+here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
 
 [source,yaml]
 ----

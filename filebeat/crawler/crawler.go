@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -24,7 +25,7 @@ import (
 type Crawler struct {
 	// Registrar object to persist the state
 	Registrar   *Registrar
-	prospectors []*Prospector
+	prospectors []*prospector.Prospector
 	wg          sync.WaitGroup
 }
 
@@ -42,7 +43,7 @@ func (c *Crawler) Start(prospectorConfigs []*common.Config, eventChan chan *inpu
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, prospectorConfig := range prospectorConfigs {
 
-		prospector, err := NewProspector(prospectorConfig, states, eventChan)
+		prospector, err := prospector.NewProspector(prospectorConfig, states, eventChan)
 		if err != nil {
 			return fmt.Errorf("Error in initing prospector: %s", err)
 		}
@@ -55,7 +56,7 @@ func (c *Crawler) Start(prospectorConfigs []*common.Config, eventChan chan *inpu
 	for i, p := range c.prospectors {
 		c.wg.Add(1)
 
-		go func(id int, prospector *Prospector) {
+		go func(id int, prospector *prospector.Prospector) {
 			defer func() {
 				c.wg.Done()
 				logp.Debug("crawler", "Prospector %v stopped", id)

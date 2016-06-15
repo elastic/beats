@@ -50,7 +50,7 @@ metricbeat.modules:
   #period: 10s
 
   # Apache hosts
-  #hosts: ["http://127.0.0.1/"]
+  #hosts: ["http://127.0.0.1"]
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
@@ -60,6 +60,17 @@ metricbeat.modules:
 
   # Password of hosts. Empty by default
   #password: test123
+
+#--------------------------- MongoDB Status Module ---------------------------
+- module: mongodb
+  metricsets: ["status"]
+  enabled: true
+  period: 10s
+
+  # The hosts must be passed as MongoDB URLs in the format:
+  # [mongodb://][user:pass@]host[:port]
+  hosts: ["localhost:27017"]
+
 
 #---------------------------- MySQL Status Module ----------------------------
 #- module: mysql
@@ -84,7 +95,7 @@ metricbeat.modules:
   #period: 10s
 
   # Nginx hosts
-  #hosts: ["http://127.0.0.1/"]
+  #hosts: ["http://127.0.0.1"]
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
@@ -216,6 +227,9 @@ output.elasticsearch:
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
+
+  # Set gzip compression level.
+  #compression_level: 0
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
@@ -407,7 +421,7 @@ output.elasticsearch:
 
   # The maximum permitted size of JSON-encoded messages. Bigger messages will be
   # dropped. The default value is 1000000 (bytes). This value should be equal to
-  # or less than the broker’s message.max.bytes.
+  # or less than the broker's message.max.bytes.
   #max_message_bytes: 1000000
 
   # The ACK reliability level required from broker. 0=no response, 1=wait for
@@ -589,7 +603,7 @@ output.elasticsearch:
 #path.data:
 
 # The logs path for a metricbeat installation. This is the default location for
-# the Beat’s log files. If not set by a CLI flag or in the configuration file,
+# the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs:
 

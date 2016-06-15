@@ -26,7 +26,7 @@ def fields_to_es_template(args, input, output, index):
 
     # No fields defined, can't generate template
     if docs is None:
-        print "fields.yml is empty. Cannot generate template."
+        print("fields.yml is empty. Cannot generate template.")
         return
 
     # Each template needs defaults
@@ -179,6 +179,10 @@ def fill_field_properties(args, field, defaults, path):
 
     elif field["type"] in ["geo_point", "date", "long", "integer",
                            "double", "float", "boolean"]:
+        # Convert all integer fields to long
+        if field["type"] == "integer":
+            field["type"] = "long"
+
         properties[field["name"]] = {
             "type": field.get("type")
         }
@@ -272,7 +276,7 @@ if __name__ == "__main__":
         fields = f.read()
 
         # Prepend beat fields from libbeat
-        with file(args.es_beats + "/libbeat/_beat/fields.yml") as f:
+        with open(args.es_beats + "/libbeat/_meta/fields.yml") as f:
             fields = f.read() + fields
 
         with open(target, 'w') as output:

@@ -108,7 +108,7 @@ func TestOneEvent(t *testing.T) {
 	r["response"] = "value1"
 
 	index := fmt.Sprintf("%s-%d.%02d.%02d", output.index, ts.Year(), ts.Month(), ts.Day())
-	logp.Debug("output_elasticsearch", "index = %s", index)
+	debugf("index = %s", index)
 
 	client := output.randomClient()
 	client.CreateIndex(index, common.MapStr{
@@ -148,7 +148,7 @@ func TestOneEvent(t *testing.T) {
 		t.Errorf("Failed to query elasticsearch for index(%s): %s", index, err)
 		return
 	}
-	logp.Debug("output_elasticsearch", "resp = %s", resp)
+	debugf("resp = %s", resp)
 	if resp.Hits.Total != 1 {
 		t.Errorf("Wrong number of results: %d", resp.Hits.Total)
 	}

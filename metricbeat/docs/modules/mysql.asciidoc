@@ -18,13 +18,18 @@ DSN is as following:
 [username[:password]@][protocol[(address)]]/
 ----
 
+[float]
+=== Compatibility
+
+The mysql MetricSets were tested with mysql 5.7.10 and are expected to work with all version
+>= 5.7.0.
 
 
 [float]
 === Example Configuration
 
 The MySQL Status module supports the standard configuration options which can be found
-here (add link). Below is an example of a configuration option:
+here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
 
 [source,yaml]
 ----

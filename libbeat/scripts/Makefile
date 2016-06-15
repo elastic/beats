@@ -26,7 +26,6 @@ comma:=,
 ARCH?=$(shell uname -m)
 # Hidden directory to install dependencies for jenkins
 export PATH := ./bin:$(PATH)
-export GO15VENDOREXPERIMENT=1
 GOFILES = $(shell find . -type f -name '*.go')
 GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*")
 SHELL=bash
@@ -222,9 +221,9 @@ update: python-env
 	# Update config
 	echo "Update config file"
 	-rm -f etc/${BEATNAME}.yml
-	cat etc/beat.yml ${ES_BEATS}/libbeat/_beat/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
+	cat etc/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
 	-rm -f etc/${BEATNAME}.full.yml
-	cat etc/beat.full.yml ${ES_BEATS}/libbeat/_beat/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml
+	cat etc/beat.full.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml
 
 	# Update fields
 	echo "Update fields"
@@ -239,8 +238,8 @@ update: python-env
 ES_URL?=http://localhost:9200
 
 .PHONY: export-dashboards
-export-dashboards:
-	python ${ES_BEATS}/dev-tools//export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
+export-dashboards: python-env
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
 
 .PHONY: import-dashboards
 import-dashboards:
@@ -288,3 +287,7 @@ install-home:
 	fi
 	install -d -m 755 ${HOME_PREFIX}/scripts/
 	install -m 755 ${ES_BEATS}/libbeat/scripts/migrate_beat_config_1_x_to_5_0.py ${HOME_PREFIX}/scripts/
+
+.PHONY: create-packer
+create-packer:
+	python ${ES_BEATS}/libbeat/scripts/create_packer.py --es_beats=${ES_BEATS} --beat_path=${BEAT_DIR} --beat=${BEATNAME}

@@ -6,21 +6,26 @@ packer_absdir=$(shell dirname ${makefile_abspath})
 
 
 %/deb: % build/god-linux-386 build/god-linux-amd64 fpm-image
+	echo Creating DEB packages for $(@D)
 	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
 	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
 
 %/rpm: % build/god-linux-386 build/god-linux-amd64 fpm-image
+	echo Creating RPM packages for $(@D)
 	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
 	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
 
 %/darwin: %
+	echo Creating Darwin packages for $(@D)
 	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/darwin/build.sh
 
 %/win: %
+	echo Creating Darwin packages for $(@D)
 	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
 	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
 
 %/bin: %
+	echo Creating Linux packages for $(@D)
 	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
 	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
 

@@ -10,18 +10,18 @@ if [ "$SNAPSHOT" = "yes" ]; then
     VERSION="${VERSION}-SNAPSHOT"
 fi
 
-mkdir /{{.beat_name}}-${VERSION}-darwin-x64
-cp -a homedirs/{{.beat_name}}/. /{{.beat_name}}-${VERSION}-darwin-x64/
-cp {{.beat_name}}-darwin-amd64 /{{.beat_name}}-${VERSION}-darwin-x64/{{.beat_name}}
-cp {{.beat_name}}-darwin.yml /{{.beat_name}}-${VERSION}-darwin-x64/{{.beat_name}}.yml
-cp {{.beat_name}}-darwin.full.yml /{{.beat_name}}-${VERSION}-darwin-x64/{{.beat_name}}.full.yml
-cp {{.beat_name}}.template.json /{{.beat_name}}-${VERSION}-darwin-x64/
-cp {{.beat_name}}.template-es2x.json /{{.beat_name}}-${VERSION}-darwin-x64/
+mkdir /{{.beat_name}}-${VERSION}-darwin-x86_64
+cp -a homedirs/{{.beat_name}}/. /{{.beat_name}}-${VERSION}-darwin-x86_64/
+cp {{.beat_name}}-darwin-amd64 /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}
+cp {{.beat_name}}-darwin.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}.yml
+cp {{.beat_name}}-darwin.full.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}.full.yml
+cp {{.beat_name}}.template.json /{{.beat_name}}-${VERSION}-darwin-x86_64/
+cp {{.beat_name}}.template-es2x.json /{{.beat_name}}-${VERSION}-darwin-x86_64/
 
 mkdir -p upload/{{.beat_name}}
-tar czvf upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-darwin-x64.tar.gz /{{.beat_name}}-${VERSION}-darwin-x64
-echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-darwin-x64.tar.gz"
+tar czvf upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz /{{.beat_name}}-${VERSION}-darwin-x86_64
+echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz"
 
 cd upload/{{.beat_name}}
-sha1sum {{.beat_name}}-${VERSION}-darwin-x64.tar.gz > {{.beat_name}}-${VERSION}-darwin-x64.tar.gz.sha1.txt
-echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-darwin-x64.tar.gz.sha1.txt"
+sha1sum {{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz > {{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz.sha1.txt
+echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz.sha1.txt"

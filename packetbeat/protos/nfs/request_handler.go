@@ -76,7 +76,11 @@ func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 		cred := common.MapStr{}
 		credXdr := Xdr{data: auth_opaque, offset: 0}
 		cred["stamp"] = credXdr.getUInt()
-		cred["machinename"] = credXdr.getString()
+		machine := credXdr.getString()
+		if machine == "" {
+			machine = src.Ip
+		}
+		cred["machinename"] = machine
 		cred["uid"] = credXdr.getUInt()
 		cred["gid"] = credXdr.getUInt()
 		cred["gids"] = credXdr.getUIntVector()

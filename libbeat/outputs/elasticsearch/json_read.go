@@ -57,7 +57,6 @@ const (
 	nullValue
 	dictStart
 	dictEnd
-	dictField
 	arrStart
 	arrEnd
 	stringEntity

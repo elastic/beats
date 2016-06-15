@@ -39,6 +39,8 @@ update:
 .PHONY: clean
 clean:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) clean || exit 1;)
+	$(MAKE) -C generate/beat clean
+	$(MAKE) -C generate/metricbeat/metricset clean
 
 .PHONY: check
 check:

@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"fmt"
+
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 	"github.com/elastic/beats/packetbeat/publish"
@@ -127,8 +128,6 @@ func (rpc *Rpc) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	defer logp.Recover("ReceivedFinRpc exception")
 
 	// forced by TCP interface
-
-	// TODO
 	return private
 }
 
@@ -140,8 +139,6 @@ func (rpc *Rpc) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	defer logp.Recover("GapInRpcStream exception")
 
 	// forced by TCP interface
-
-	// TODO
 	return private, false
 }
 

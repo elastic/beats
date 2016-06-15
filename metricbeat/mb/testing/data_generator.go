@@ -70,7 +70,7 @@ func createEvent(event common.MapStr, m mb.MetricSet) error {
 
 	output, _ := json.MarshalIndent(fullEvent, "", "    ")
 
-	err = ioutil.WriteFile(path+"/_beat/data.json", output, 0644)
+	err = ioutil.WriteFile(path+"/_meta/data.json", output, 0644)
 	if err != nil {
 		return err
 	}

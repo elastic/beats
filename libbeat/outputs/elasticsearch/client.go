@@ -3,7 +3,6 @@ package elasticsearch
 import (
 	"bytes"
 	"crypto/tls"
-	"encoding/json"
 	"errors"
 	"expvar"
 	"fmt"
@@ -13,18 +12,10 @@ import (
 	"net/url"
 	"time"
 
-	humanize "github.com/dustin/go-humanize"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/mode"
-)
-
-// Metrics that can retrieved through the expvar web interface.
-var (
-	ackedEvents            = expvar.NewInt("libbeatEsPublishedAndAckedEvents")
-	eventsNotAcked         = expvar.NewInt("libbeatEsPublishedButNotAckedEvents")
-	publishEventsCallCount = expvar.NewInt("libbeatEsPublishEventsCallCount")
+	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 type Client struct {
@@ -32,7 +23,15 @@ type Client struct {
 	index  string
 	params map[string]string
 
+	// buffered bulk requests
+	bulkRequ *bulkRequest
+
+	// buffered json response reader
 	json jsonReader
+
+	// additional configs
+	compressionLevel int
+	proxyURL         *url.URL
 }
 
 type connectCallback func(client *Client) error
@@ -45,7 +44,21 @@ type Connection struct {
 	http              *http.Client
 	connected         bool
 	onConnectCallback func() error
+
+	encoder bodyEncoder
 }
+
+// Metrics that can retrieved through the expvar web interface.
+var (
+	ackedEvents            = expvar.NewInt("libbeatEsPublishedAndAckedEvents")
+	eventsNotAcked         = expvar.NewInt("libbeatEsPublishedButNotAckedEvents")
+	publishEventsCallCount = expvar.NewInt("libbeatEsPublishEventsCallCount")
+
+	statReadBytes   = expvar.NewInt("libbeatEsPublishReadBytes")
+	statWriteBytes  = expvar.NewInt("libbeatEsPublishWriteBytes")
+	statReadErrors  = expvar.NewInt("libbeatEsPublishReadErrors")
+	statWriteErrors = expvar.NewInt("libbeatEsPublishWriteErrors")
+)
 
 var (
 	nameItems  = []byte("items")
@@ -64,14 +77,39 @@ func NewClient(
 	esURL, index string, proxyURL *url.URL, tls *tls.Config,
 	username, password string,
 	params map[string]string,
+	timeout time.Duration,
+	compression int,
 	onConnectCallback connectCallback,
-) *Client {
+) (*Client, error) {
 	proxy := http.ProxyFromEnvironment
 	if proxyURL != nil {
 		proxy = http.ProxyURL(proxyURL)
 	}
 
 	logp.Info("Elasticsearch url: %s", esURL)
+
+	dialer := transport.NetDialer(timeout)
+	dialer = transport.StatsDialer(dialer, &transport.IOStats{
+		Read:        statReadBytes,
+		Write:       statWriteBytes,
+		ReadErrors:  statReadErrors,
+		WriteErrors: statWriteErrors,
+	})
+
+	bulkRequ, err := newBulkRequest(esURL, "", "", params, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var encoder bodyEncoder
+	if compression == 0 {
+		encoder = newJSONEncoder(nil)
+	} else {
+		encoder, err = newGzipEncoder(compression, nil)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	client := &Client{
 		Connection: Connection{
@@ -80,13 +118,21 @@ func NewClient(
 			Password: password,
 			http: &http.Client{
 				Transport: &http.Transport{
+					Dial:            dialer.Dial,
 					TLSClientConfig: tls,
 					Proxy:           proxy,
 				},
+				Timeout: timeout,
 			},
+			encoder: encoder,
 		},
 		index:  index,
 		params: params,
+
+		bulkRequ: bulkRequ,
+
+		compressionLevel: compression,
+		proxyURL:         proxyURL,
 	}
 
 	client.Connection.onConnectCallback = func() error {
@@ -95,23 +141,30 @@ func NewClient(
 		}
 		return nil
 	}
-	return client
+
+	return client, nil
 }
 
 func (client *Client) Clone() *Client {
-	newClient := &Client{
-		Connection: Connection{
-			URL:      client.URL,
-			Username: client.Username,
-			Password: client.Password,
-			http: &http.Client{
-				Transport: client.http.Transport,
-			},
-			connected: false,
-		},
-		index: client.index,
-	}
-	return newClient
+	// when cloning the connection callback and params are not copied. A
+	// client's close is for example generated for topology-map support. With params
+	// most likely containing the ingest node pipeline and default callback trying to
+	// create install a template, we don't want these to be included in the clone.
+
+	transport := client.http.Transport.(*http.Transport)
+	c, _ := NewClient(
+		client.URL,
+		client.index,
+		client.proxyURL,
+		transport.TLSClientConfig,
+		client.Username,
+		client.Password,
+		nil, // XXX: do not pass params?
+		client.http.Timeout,
+		client.compressionLevel,
+		nil, // XXX: do not pass connection callback?
+	)
+	return c
 }
 
 // PublishEvents sends all events to elasticsearch. On error a slice with all
@@ -120,48 +173,55 @@ func (client *Client) Clone() *Client {
 func (client *Client) PublishEvents(
 	events []common.MapStr,
 ) ([]common.MapStr, error) {
-
 	begin := time.Now()
 	publishEventsCallCount.Add(1)
+
+	if len(events) == 0 {
+		return nil, nil
+	}
 
 	if !client.connected {
 		return events, ErrNotConnected
 	}
 
-	// new request to store all events into
-	request, err := client.startBulkRequest("", "", client.params)
-	if err != nil {
-		logp.Err("Failed to perform any bulk index operations: %s", err)
-		return events, err
-	}
+	body := client.encoder
+	body.Reset()
 
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
-	events = bulkEncodePublishRequest(request, client.index, events)
+	events = bulkEncodePublishRequest(body, client.index, events)
 	if len(events) == 0 {
 		return nil, nil
 	}
 
-	// send bulk request
-	bufferSize := request.buf.Len()
-	_, res, err := request.Flush()
-	if err != nil {
-		logp.Err("Failed to perform any bulk index operations: %s", err)
-		return events, err
+	requ := client.bulkRequ
+	requ.Reset(body)
+	status, result, sendErr := client.sendBulkRequest(requ)
+	if sendErr != nil {
+		logp.Err("Failed to perform any bulk index operations: %s", sendErr)
+		return events, sendErr
 	}
 
-	logp.Debug("elasticsearch", "PublishEvents: %d metrics have been packed into a buffer of %s and published to elasticsearch in %v.",
+	debugf("PublishEvents: %d metrics have been  published to elasticsearch in %v.",
 		len(events),
-		humanize.Bytes(uint64(bufferSize)),
 		time.Now().Sub(begin))
 
 	// check response for transient errors
-	client.json.init(res.raw)
-	failed_events := bulkCollectPublishFails(&client.json, events)
-	ackedEvents.Add(int64(len(events) - len(failed_events)))
-	eventsNotAcked.Add(int64(len(failed_events)))
-	if len(failed_events) > 0 {
-		return failed_events, mode.ErrTempBulkFailure
+	var failedEvents []common.MapStr
+	if status != 200 {
+		failedEvents = events
+	} else {
+		client.json.init(result.raw)
+		failedEvents = bulkCollectPublishFails(&client.json, events)
+	}
+
+	ackedEvents.Add(int64(len(events) - len(failedEvents)))
+	eventsNotAcked.Add(int64(len(failedEvents)))
+	if len(failedEvents) > 0 {
+		if sendErr == nil {
+			sendErr = mode.ErrTempBulkFailure
+		}
+		return failedEvents, sendErr
 	}
 
 	return nil, nil
@@ -170,14 +230,14 @@ func (client *Client) PublishEvents(
 // fillBulkRequest encodes all bulk requests and returns slice of events
 // successfully added to bulk request.
 func bulkEncodePublishRequest(
-	requ *bulkRequest,
+	body bulkWriter,
 	index string,
 	events []common.MapStr,
 ) []common.MapStr {
 	okEvents := events[:0]
 	for _, event := range events {
 		meta := eventBulkMeta(index, event)
-		err := requ.Send(meta, event)
+		err := body.Add(meta, event)
 		if err != nil {
 			logp.Err("Failed to encode event: %s", err)
 			continue
@@ -189,7 +249,6 @@ func bulkEncodePublishRequest(
 }
 
 func eventBulkMeta(index string, event common.MapStr) bulkMeta {
-
 	index = getIndex(event, index)
 	meta := bulkMeta{
 		Index: bulkMetaIndex{
@@ -376,7 +435,7 @@ func (client *Client) PublishEvent(event common.MapStr) error {
 	}
 
 	index := getIndex(event, client.index)
-	logp.Debug("output_elasticsearch", "Publish event: %s", event)
+	debugf("Publish event: %s", event)
 
 	// insert the events one by one
 	status, _, err := client.Index(
@@ -404,9 +463,10 @@ func (client *Client) PublishEvent(event common.MapStr) error {
 // LoadTemplate loads a template into Elasticsearch overwriting the existing
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
-func (client *Client) LoadTemplate(templateName string, reader *bytes.Reader) error {
+func (client *Client) LoadTemplate(templateName string, template map[string]interface{}) error {
 
-	status, _, err := client.execRequest("PUT", client.URL+"/_template/"+templateName, reader)
+	path := "/_template/" + templateName
+	status, _, err := client.request("PUT", path, nil, template)
 
 	if err != nil {
 		return fmt.Errorf("Template could not be loaded. Error: %s", err)
@@ -451,16 +511,16 @@ func (conn *Connection) Connect(timeout time.Duration) error {
 }
 
 func (conn *Connection) Ping(timeout time.Duration) (bool, error) {
-	debug("ES Ping(url=%v, timeout=%v)", conn.URL, timeout)
+	debugf("ES Ping(url=%v, timeout=%v)", conn.URL, timeout)
 
 	conn.http.Timeout = timeout
 	status, _, err := conn.execRequest("HEAD", conn.URL, nil)
 	if err != nil {
-		debug("Ping request failed with: %v", err)
+		debugf("Ping request failed with: %v", err)
 		return false, err
 	}
 
-	debug("Ping status code: %v", status)
+	debugf("Ping status code: %v", status)
 	return status < 300, nil
 }
 
@@ -479,19 +539,17 @@ func (conn *Connection) request(
 	body interface{},
 ) (int, []byte, error) {
 	url := makeURL(conn.URL, path, params)
-	logp.Debug("elasticsearch", "%s %s %v", method, url, body)
+	debugf("%s %s %v", method, url, body)
 
-	var obj []byte
-	if body != nil {
-		var err error
-		obj, err = json.Marshal(body)
-		if err != nil {
-			logp.Warn("Failed to json encode body (%v): %#v", err, body)
-			return 0, nil, ErrJSONEncodeFailed
-		}
+	if body == nil {
+		return conn.execRequest(method, url, nil)
 	}
 
-	return conn.execRequest(method, url, bytes.NewReader(obj))
+	if err := conn.encoder.Marshal(body); err != nil {
+		logp.Warn("Failed to json encode body (%v): %#v", err, body)
+		return 0, nil, ErrJSONEncodeFailed
+	}
+	return conn.execRequest(method, url, conn.encoder.Reader())
 }
 
 func (conn *Connection) execRequest(
@@ -503,7 +561,13 @@ func (conn *Connection) execRequest(
 		logp.Warn("Failed to create request", err)
 		return 0, nil, err
 	}
+	if body != nil {
+		conn.encoder.AddHeader(&req.Header)
+	}
+	return conn.execHTTPRequest(req)
+}
 
+func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) {
 	req.Header.Add("Accept", "application/json")
 	if conn.Username != "" || conn.Password != "" {
 		req.SetBasicAuth(conn.Username, conn.Password)

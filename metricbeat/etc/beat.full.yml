@@ -50,7 +50,7 @@ metricbeat.modules:
   #period: 10s
 
   # Apache hosts
-  #hosts: ["http://127.0.0.1/"]
+  #hosts: ["http://127.0.0.1"]
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
@@ -60,6 +60,17 @@ metricbeat.modules:
 
   # Password of hosts. Empty by default
   #password: test123
+
+#--------------------------- MongoDB Status Module ---------------------------
+- module: mongodb
+  metricsets: ["status"]
+  enabled: true
+  period: 10s
+
+  # The hosts must be passed as MongoDB URLs in the format:
+  # [mongodb://][user:pass@]host[:port]
+  hosts: ["localhost:27017"]
+
 
 #---------------------------- MySQL Status Module ----------------------------
 #- module: mysql
@@ -84,7 +95,7 @@ metricbeat.modules:
   #period: 10s
 
   # Nginx hosts
-  #hosts: ["http://127.0.0.1/"]
+  #hosts: ["http://127.0.0.1"]
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"

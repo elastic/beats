@@ -51,8 +51,6 @@ fi
 set -e
 
 cd $WORKING_DIRECTORY
-export GOPATH=$GOPATH:`pwd`/Godeps/_workspace
-export GO15VENDOREXPERIMENT=1
 
 # Switch over the code-base to another checkout if requested
 if [ "$REPO_REMOTE" != "" ]; then
@@ -138,7 +136,7 @@ for TARGET in $TARGETS; do
 		GOOS=linux GOARCH=386 CGO_ENABLED=${CGO_ENABLED} go get -d ./$PACK
 		sh -c "GOOS=linux GOARCH=386 CGO_ENABLED=${CGO_ENABLED} go build $V $R $LDARGS -o $NAME-linux-386$R ./$PACK"
 		built_targets=$((built_targets+1))
-	fi	
+	fi
 	if ([ $XGOOS == "." ] || [ $XGOOS == "linux" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "arm" ]); then
 		echo "Compiling $PACK for linux/arm..."
 		CC=arm-linux-gnueabi-gcc CXX=rm-linux-gnueabi-g++ HOST=arm-linux PREFIX=/usr/local/arm $BUILD_DEPS /deps $LIST_DEPS
@@ -164,7 +162,7 @@ for TARGET in $TARGETS; do
 
 		# Build the requested windows binaries
 		if [ $XGOARCH == "." ] || [ $XGOARCH == "amd64" ]; then
-			echo "Compiling for windows-$PLATFORM/amd64..."
+			echo "Compiling $PACK for windows-$PLATFORM/amd64..."
 			CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ CFLAGS="$CGO_NTDEF" CXXFLAGS="$CGO_NTDEF" HOST=x86_64-w64-mingw32 PREFIX=/usr/x86_64-w64-mingw32 $BUILD_DEPS /deps $LIST_DEPS
 			export PKG_CONFIG_PATH=/usr/x86_64-w64-mingw32/lib/pkgconfig
 
@@ -174,7 +172,7 @@ for TARGET in $TARGETS; do
 		fi
 
 		if [ $XGOARCH == "." ] || [ $XGOARCH == "386" ]; then
-			echo "Compiling for windows-$PLATFORM/386..."
+			echo "Compiling $PACK for windows-$PLATFORM/386..."
 			CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ CFLAGS="$CGO_NTDEF" CXXFLAGS="$CGO_NTDEF" HOST=i686-w64-mingw32 PREFIX=/usr/i686-w64-mingw32 $BUILD_DEPS /deps $LIST_DEPS
 			export PKG_CONFIG_PATH=/usr/i686-w64-mingw32/lib/pkgconfig
 
@@ -183,7 +181,7 @@ for TARGET in $TARGETS; do
 			built_targets=$((built_targets+1))
 		fi
 	fi
-	
+
 	# Check and build for OSX targets
 	if ([ $XGOOS == "." ] || [ $XGOOS == "darwin" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "amd64" ]); then
 		echo "Compiling $PACK for darwin/amd64..."
@@ -204,7 +202,7 @@ done
 
 # The binary files are the last created files
 echo "Moving $built_targets $PACK binaries to host folder..."
-ls -t | head -n $built_targets 
+ls -t | head -n $built_targets
 cp `ls -t | head -n $built_targets ` /build
 
 echo "Build process completed"

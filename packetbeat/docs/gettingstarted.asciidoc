@@ -34,8 +34,8 @@ See our https://www.elastic.co/downloads/beats/packetbeat[download page] for oth
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install libpcap0.8
-curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat_{version}_amd64.deb
-sudo dpkg -i packetbeat_{version}_amd64.deb
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-amd64.deb
+sudo dpkg -i packetbeat-{version}-amd64.deb
 ----------------------------------------------------------------------
 
 [[rpm]]
@@ -53,8 +53,8 @@ sudo rpm -vi packetbeat-{version}-x86_64.rpm
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-darwin.tgz
-tar xzvf packetbeat-{version}-darwin.tgz
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-darwin-x64.tar.gz
+tar xzvf packetbeat-{version}-darwin-x64.tar.gz
 ----------------------------------------------------------------------
 
 [[win]]

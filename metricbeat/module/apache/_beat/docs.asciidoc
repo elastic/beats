@@ -1,5 +1,0 @@
-== Apache Module
-
-This module periodically fetches metrics from https://httpd.apache.org/[Apache
-HTTPD] servers.
-

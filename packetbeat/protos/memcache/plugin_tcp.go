@@ -332,6 +332,11 @@ func (mc *Memcache) GapInStream(
 
 	conn := private.(*tcpConnectionData)
 	stream := conn.Streams[dir]
+	if stream == nil {
+		debug("Inactive stream. Dropping connection state.")
+		return private, true
+	}
+
 	parser := stream.parser
 	msg := parser.message
 
