@@ -79,8 +79,7 @@ func (t *topology) GetNameByIP(ip string) string {
 // Each shipper publishes a list of IPs together with its name to Elasticsearch
 func (t *topology) PublishIPs(name string, localAddrs []string) error {
 	if !t.ttlEnabled {
-		logp.Debug("output_elasticsearch",
-			"Not publishing IPs because TTL was not yet confirmed to be enabled")
+		debugf("Not publishing IPs because TTL was not yet confirmed to be enabled")
 		return nil
 	}
 
@@ -89,8 +88,7 @@ func (t *topology) PublishIPs(name string, localAddrs []string) error {
 		return ErrNotConnected
 	}
 
-	logp.Debug("output_elasticsearch",
-		"Publish IPs %s with expiration time %d", localAddrs, t.TopologyExpire)
+	debugf("Publish IPs %s with expiration time %d", localAddrs, t.TopologyExpire)
 
 	params := map[string]string{
 		"ttl":     fmt.Sprintf("%dms", t.TopologyExpire),
@@ -161,6 +159,6 @@ func loadTopolgyMap(client *Client) (map[string]string, error) {
 		}
 	}
 
-	logp.Debug("output_elasticsearch", "Topology map %s", topology)
+	debugf("Topology map %s", topology)
 	return topology, nil
 }

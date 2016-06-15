@@ -102,6 +102,7 @@ func TestBulkMoreOperations(t *testing.T) {
 		{
 			"field1": "value1",
 		},
+
 		{
 			"delete": map[string]interface{}{
 				"_index": index,
@@ -109,6 +110,7 @@ func TestBulkMoreOperations(t *testing.T) {
 				"_id":    "2",
 			},
 		},
+
 		{
 			"create": map[string]interface{}{
 				"_index": index,
@@ -119,6 +121,7 @@ func TestBulkMoreOperations(t *testing.T) {
 		{
 			"field1": "value3",
 		},
+
 		{
 			"update": map[string]interface{}{
 				"_id":    "1",
