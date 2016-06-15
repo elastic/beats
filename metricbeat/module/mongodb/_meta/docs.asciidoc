@@ -1,0 +1,39 @@
+== MongoDB Module
+
+This modules periodically fetches metrics from https://www.mongodb.com[MongoDB]
+servers.
+
+[float]
+=== Configuration Options
+
+A basic configuration sample for the MongoDB module can be found in the next section.
+
+==== hosts
+
+The hosts must be passed as a MongoDB URLs in the following format:
+
+-----------------------------------
+[mongodb://][user:pass@]host[:port]
+-----------------------------------
+
+It can be as simple as:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["localhost"]
+----------------------------------------------------------------------
+
+Or more complex like:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["mongodb://myuser:mypass@localhost:40001", "otherhost:40001"]
+----------------------------------------------------------------------
+
+
+[float]
+=== Compatibility
+
+The mongodb MetricSets were tested with MongoDB 3.0 are expected to work with all versions >= 2.8.
