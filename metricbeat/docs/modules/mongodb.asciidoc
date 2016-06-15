@@ -13,6 +13,7 @@ servers.
 
 A basic configuration sample for the MongoDB module can be found in the next section.
 
+[float]
 ==== hosts
 
 The hosts must be passed as a MongoDB URLs in the following format:
