@@ -9,6 +9,7 @@ all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win packetbeat/b
 
 .PHONY: packetbeat metricbeat
 packetbeat metricbeat: build/upload
+	@echo Cross-compiling $@
 	# cross compile on ubuntu
 	docker run --rm \
 		-v $(abspath build):/build \
@@ -36,6 +37,7 @@ packetbeat metricbeat: build/upload
 
 .PHONY: filebeat
 filebeat:
+	@echo Cross-compiling $@
 	# pure go cross compiling doesn't need C compilers but
 	# we do it using the same docker instances for simplicity
 	docker run --rm \
@@ -53,6 +55,7 @@ filebeat:
 
 .PHONY: winlogbeat
 winlogbeat:
+	@echo Cross-compiling $@
 	# Winlogbeat is pure go and only needs Windows
 	docker run --rm \
 		-v $(abspath build):/build \
