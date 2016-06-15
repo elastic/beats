@@ -2,7 +2,6 @@ package elasticsearch
 
 import (
 	"bytes"
-	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -25,16 +24,8 @@ type bulkRequest struct {
 	requ *http.Request
 }
 
-type bulkBody interface {
-	Reader() io.Reader
-}
-
 type bulkResult struct {
 	raw []byte
-}
-
-type jsonBulkBody struct {
-	buf *bytes.Buffer
 }
 
 // Bulk performs many index/delete operations in a single API call.
@@ -60,12 +51,13 @@ func (conn *Connection) BulkWith(
 		return nil, nil
 	}
 
-	bulkBody := newJSONBulkBody(nil)
-	if err := bulkEncode(bulkBody, metaBuilder, body); err != nil {
+	enc := conn.encoder
+	enc.Reset()
+	if err := bulkEncode(enc, metaBuilder, body); err != nil {
 		return nil, err
 	}
 
-	requ, err := newBulkRequest(conn.URL, index, docType, params, bulkBody)
+	requ, err := newBulkRequest(conn.URL, index, docType, params, enc)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +73,7 @@ func newBulkRequest(
 	urlStr string,
 	index, docType string,
 	params map[string]string,
-	body bulkBody,
+	body bodyEncoder,
 ) (*bulkRequest, error) {
 	path, err := makePath(index, docType, "_bulk")
 	if err != nil {
@@ -100,12 +92,16 @@ func newBulkRequest(
 		return nil, err
 	}
 
+	if body != nil {
+		body.AddHeader(&requ.Header)
+	}
+
 	return &bulkRequest{
 		requ: requ,
 	}, nil
 }
 
-func (r *bulkRequest) Reset(body bulkBody) {
+func (r *bulkRequest) Reset(body bodyEncoder) {
 	bdy := body.Reader()
 
 	rc, ok := bdy.(io.ReadCloser)
@@ -124,6 +120,8 @@ func (r *bulkRequest) Reset(body bulkBody) {
 
 	r.requ.Header = http.Header{}
 	r.requ.Body = rc
+
+	body.AddHeader(&r.requ.Header)
 }
 
 func (conn *Connection) sendBulkRequest(requ *bulkRequest) (int, bulkResult, error) {
@@ -140,45 +138,11 @@ func readBulkResult(obj []byte) (bulkResult, error) {
 	return bulkResult{obj}, nil
 }
 
-func newJSONBulkBody(buf *bytes.Buffer) *jsonBulkBody {
-	if buf == nil {
-		buf = bytes.NewBuffer(nil)
-	}
-	return &jsonBulkBody{buf}
-}
-
-func (b *jsonBulkBody) Reset() {
-	b.buf.Reset()
-}
-
-func (b *jsonBulkBody) Reader() io.Reader {
-	return b.buf
-}
-
-func (b *jsonBulkBody) AddRaw(raw interface{}) error {
-	enc := json.NewEncoder(b.buf)
-	return enc.Encode(raw)
-}
-
-func (b *jsonBulkBody) Add(meta, obj interface{}) error {
-	enc := json.NewEncoder(b.buf)
-	pos := b.buf.Len()
-
-	if err := enc.Encode(meta); err != nil {
-		b.buf.Truncate(pos)
-		return err
-	}
-	if err := enc.Encode(obj); err != nil {
-		b.buf.Truncate(pos)
-		return err
-	}
-	return nil
-}
-func bulkEncode(out *jsonBulkBody, metaBuilder MetaBuilder, body []interface{}) error {
+func bulkEncode(out bulkWriter, metaBuilder MetaBuilder, body []interface{}) error {
 	if metaBuilder == nil {
 		for _, obj := range body {
 			if err := out.AddRaw(obj); err != nil {
-				debug("Failed to encode message: %s", err)
+				debugf("Failed to encode message: %s", err)
 				return err
 			}
 		}
@@ -186,7 +150,7 @@ func bulkEncode(out *jsonBulkBody, metaBuilder MetaBuilder, body []interface{}) 
 		for _, obj := range body {
 			meta := metaBuilder(obj)
 			if err := out.Add(meta, obj); err != nil {
-				debug("Failed to encode message: %s", err)
+				debugf("Failed to encode event (dropping event): %s", err)
 			}
 		}
 	}

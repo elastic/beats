@@ -120,6 +120,13 @@ output.elasticsearch:
 In the previous example, the Elasticsearch nodes are available at `https://10.45.3.2:9220/elasticsearch` and
 `https://10.45.3.1:9230/elasticsearch`.
 
+===== compression_level
+
+The gzip compression level. Setting this value to 0 disables compression.
+The compression level must be in the range of 1 (best speed) to 9 (best compression).
+
+The default value is 0.
+
 ===== worker
 
 The number of workers per configured host publishing events to Elasticsearch. This
@@ -363,7 +370,7 @@ is used as the default port number.
 
 ===== compression_level
 
-The gzip compression level. Setting this value to values less than or equal to 0 disables compression.
+The gzip compression level. Setting this value to 0 disables compression.
 The compression level must be in the range of 1 (best speed) to 9 (best compression).
 
 The default value is 3.

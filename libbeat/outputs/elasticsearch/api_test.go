@@ -169,5 +169,9 @@ func newTestClient(url string) *Client {
 }
 
 func newTestClientAuth(url, user, pass string) *Client {
-	return NewClient(url, "", nil, nil, user, pass, nil, 60*time.Second, nil)
+	client, err := NewClient(url, "", nil, nil, user, pass, nil, 60*time.Second, 3, nil)
+	if err != nil {
+		panic(err)
+	}
+	return client
 }
