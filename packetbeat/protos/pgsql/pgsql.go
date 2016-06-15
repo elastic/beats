@@ -339,8 +339,6 @@ func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 
 func (pgsql *Pgsql) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
-
-	// TODO
 	return private
 }
 
