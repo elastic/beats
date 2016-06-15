@@ -261,8 +261,7 @@ start-environment: stop-environment
 .PHONY: stop-environment
 stop-environment:
 	-${DOCKER_COMPOSE} stop
-	-${DOCKER_COMPOSE} rm -f
-	-docker ps -a  | grep ${BEATNAME} | grep Exited | awk '{print $$1}' | xargs docker rm
+	-${DOCKER_COMPOSE} rm -f -v -a
 
 .PHONY: write-environment
 write-environment:
