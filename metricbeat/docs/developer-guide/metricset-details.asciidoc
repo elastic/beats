@@ -92,7 +92,7 @@ The `fields.yml` file is used for different for different purposes:
 * Creates the docs Fields Docs for the MetricSet
 
 To make the elasticsearch template is correct, it is important to keep this file up-to-date
-with all the changes. There is a fields.yml file under `module/{module}/_beat/fields.yml´ which contains
+with all the changes. There is a fields.yml file under `module/{module}/_meta/fields.yml´ which contains
 the general top level structure for all MetricSets. Normally this one does not have to be modified
 except for the description:
 
@@ -100,10 +100,10 @@ Here an example for the fields.yml from the MySQL module.
 
 [source,yaml]
 ----
-include::../../module/mysql/_beat/fields.yml[]
+include::../../module/mysql/_meta/fields.yml[]
 ----
 
-The second file is under `module/{module}/{metricset}_beat/fields.yml´ which contains all fields retrieved
+The second file is under `module/{module}/{metricset}/_meta/fields.yml´ which contains all fields retrieved
 by the MetricSet. As field types, for each each field must have a core data type
 https://www.elastic.co/guide/en/elasticsearch/reference/master/mapping-types.html#_core_datatypes[supported by elasticsearch]
 must be used. A very basic file with one group from the MySQL/Status MetricSet looks as following:
@@ -214,7 +214,7 @@ integration and system tests a running docker environment is needed.
 == Documentation
 
 Each module must be documented. The documentation is based on asciidoc and is in
-the file `module/{module}/_beat/docs.asciidoc` for the module and in `module/{module}/{metricset}/_beat/docs.asciidoc`
+the file `module/{module}/_meta/docs.asciidoc` for the module and in `module/{module}/{metricset}/_meta/docs.asciidoc`
  for the MetricSet. A basic documentation with the config file and an example output is automatically
  generated. Use this files to document specific configuration options or usage examples.
 
