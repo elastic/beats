@@ -140,7 +140,7 @@ func TestPushed(t *testing.T) {
 	expectPushed(t, c, "PUBLISH c1 hello", redis.Message{Channel: "c1", Data: []byte("hello")})
 
 	c.Ping("hello")
-	expectPushed(t, c, `Ping("hello")`, redis.Pong{"hello"})
+	expectPushed(t, c, `Ping("hello")`, redis.Pong{Data: "hello"})
 
 	c.Conn.Send("PING")
 	c.Conn.Flush()

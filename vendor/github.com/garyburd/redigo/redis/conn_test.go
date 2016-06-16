@@ -516,20 +516,31 @@ func TestDialURLPassword(t *testing.T) {
 }
 
 func TestDialURLDatabase(t *testing.T) {
-	var buf bytes.Buffer
-	_, err := redis.DialURL("redis://localhost/3", dialTestConn(strings.NewReader("+OK\r\n"), &buf))
-	if err != nil {
-		t.Error("dial error:", err)
+	var buf3 bytes.Buffer
+	_, err3 := redis.DialURL("redis://localhost/3", dialTestConn(strings.NewReader("+OK\r\n"), &buf3))
+	if err3 != nil {
+		t.Error("dial error:", err3)
 	}
-	expected := "*2\r\n$6\r\nSELECT\r\n$1\r\n3\r\n"
-	actual := buf.String()
-	if actual != expected {
-		t.Errorf("commands = %q, want %q", actual, expected)
+	expected3 := "*2\r\n$6\r\nSELECT\r\n$1\r\n3\r\n"
+	actual3 := buf3.String()
+	if actual3 != expected3 {
+		t.Errorf("commands = %q, want %q", actual3, expected3)
+	}
+	// empty DB means 0
+	var buf0 bytes.Buffer
+	_, err0 := redis.DialURL("redis://localhost/", dialTestConn(strings.NewReader("+OK\r\n"), &buf0))
+	if err0 != nil {
+		t.Error("dial error:", err0)
+	}
+	expected0 := ""
+	actual0 := buf0.String()
+	if actual0 != expected0 {
+		t.Errorf("commands = %q, want %q", actual0, expected0)
 	}
 }
 
 // Connect to local instance of Redis running on the default port.
-func ExampleDial(x int) {
+func ExampleDial() {
 	c, err := redis.Dial("tcp", ":6379")
 	if err != nil {
 		// handle error

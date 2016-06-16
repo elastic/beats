@@ -760,7 +760,7 @@ func BenchmarkCompressionSize(b *testing.B) {
 
 		rthis := 100 - float64(len(dst))/float64(len(src))*100
 		rold := 100 - float64(len(odst))/float64(len(src))*100
-		fmt.Printf("Flat%d:\t%s\t%d\t%d\t%d\t%.2f%%\t%.2f%%\t%.2f%%\n", i, tf.label, len(src), len(dst), len(odst), rthis, rold, rthis-rold)
+		fmt.Printf("Flat%d:\t%s\t%d\t%d\t%d\t%.2f%%\t%.2f%%\t%.2f%%\n", i, tf.label, len(src), len(dst), len(odst), rthis, rthis, rthis-rold)
 	}
 	// BenchmarkCompressionSize isn't really a benchmark, in the sense of "I
 	// want to run some code b.N times and see how long it takes". Instead, it

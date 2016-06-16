@@ -23,7 +23,15 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-func ExampleScript(c redis.Conn, reply interface{}, err error) {
+var (
+	// These variables are declared at package level to remove distracting
+	// details from the examples.
+	c     redis.Conn
+	reply interface{}
+	err   error
+)
+
+func ExampleScript() {
 	// Initialize a package-level variable with a script.
 	var getScript = redis.NewScript(1, `return redis.call('get', KEYS[1])`)
 

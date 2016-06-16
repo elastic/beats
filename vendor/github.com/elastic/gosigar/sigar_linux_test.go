@@ -218,6 +218,107 @@ DirectMap2M:      333824 kB
 	}
 }
 
+func TestFDUsage(t *testing.T) {
+	setUp(t)
+	defer tearDown(t)
+
+	// There is no Uint63 until  2.0
+	open := uint64(rand.Uint32())
+	unused := uint64(rand.Uint32())
+	max := uint64(rand.Uint32())
+	fileNRContents := fmt.Sprintf("%d    %d       %d", open, unused, max)
+
+	fileNRPath := procd + "/sys/fs"
+	os.MkdirAll(fileNRPath, 0755)
+	fileNRFile := fileNRPath + "/file-nr"
+	err := ioutil.WriteFile(fileNRFile, []byte(fileNRContents), 0444)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fd := sigar.FDUsage{}
+	if assert.NoError(t, fd.Get()) {
+		assert.Equal(t, open, fd.Open)
+		assert.Equal(t, unused, fd.Unused)
+		assert.Equal(t, max, fd.Max)
+	}
+}
+
+func TestProcFDUsage(t *testing.T) {
+	setUp(t)
+	defer tearDown(t)
+
+	pid := rand.Intn(32768)
+	pidDir := fmt.Sprintf("%s/%d", procd, pid)
+	err := os.Mkdir(pidDir, 0755)
+	if err != nil {
+		t.Fatal(err)
+	}
+	soft := uint64(rand.Uint32())
+	// subtract to prevent the posibility of overflow
+	if soft != 0 {
+		soft -= 1
+	}
+	// max sure hard is always bigger than soft
+	hard := soft + uint64(rand.Uint32())
+
+	limitsContents := `Limit                     Soft Limit           Hard Limit           Units
+Max cpu time              unlimited            unlimited            seconds
+Max file size             unlimited            unlimited            bytes
+Max data size             unlimited            unlimited            bytes
+Max stack size            8388608              unlimited            bytes
+Max core file size        0                    unlimited            bytes
+Max resident set          unlimited            unlimited            bytes
+Max processes             29875                29875                processes
+Max open files            %d                 %d                 files
+Max locked memory         65536                65536                bytes
+Max address space         unlimited            unlimited            bytes
+Max file locks            unlimited            unlimited            locks
+Max pending signals       29875                29875                signals
+Max msgqueue size         819200               819200               bytes
+Max nice priority         0                    0
+Max realtime priority     0                    0
+Max realtime timeout      unlimited            unlimited            us
+`
+
+	limitsContents = fmt.Sprintf(limitsContents, soft, hard)
+
+	limitsFile := pidDir + "/limits"
+	err = ioutil.WriteFile(limitsFile, []byte(limitsContents), 0444)
+	if err != nil {
+		t.Fatal(err)
+	}
+	open := rand.Intn(32768)
+	if err = writeFDs(pid, open); err != nil {
+		t.Fatal(err)
+	}
+
+	procFD := sigar.ProcFDUsage{}
+	if assert.NoError(t, procFD.Get(pid)) {
+		assert.Equal(t, uint64(open), procFD.Open)
+		assert.Equal(t, soft, procFD.SoftLimit)
+		assert.Equal(t, hard, procFD.HardLimit)
+	}
+}
+
+func writeFDs(pid int, count int) error {
+	fdDir := fmt.Sprintf("%s/%d/fd", procd, pid)
+	err := os.Mkdir(fdDir, 0755)
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < count; i++ {
+		fdPath := fmt.Sprintf("%s/%d", fdDir, i)
+		f, err := os.Create(fdPath)
+		if err != nil {
+			return err
+		}
+		f.Close()
+	}
+	return nil
+}
+
 func writePidStats(pid int, procName string, path string) error {
 	stats := "S 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 " +
 		"20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 " +
