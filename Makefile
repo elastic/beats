@@ -34,3 +34,8 @@ fmt:
 
 simplify:
 	$(foreach var,$(PROJECTS),make -C $(var) simplify || exit 1;)
+
+# Builds the documents for each beat
+.PHONY: docs
+docs:
+	sh libbeat/scripts/build_docs.sh ${PROJECTS}
