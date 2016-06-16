@@ -101,6 +101,15 @@ Running the testsuite has the following requirements:
 * Docker >=1.10.0
 * Docker-compose >= 1.7.0
 
+
+## Documentation
+
+The documentation for each beat can be found in {beatname}/docs and are based on asciidoc. After every change of the
+docs it should be verified that the docs are still building to not break the automated docs build. To build the docs
+run `make docs`. In case you want to preview the docs for a beat, run `make docs-preview` inside the beats folder.
+This will automatically open your browser with the docs for preview.
+
+
 ## Dependencies
 
 To manage the `vendor/` folder we use
