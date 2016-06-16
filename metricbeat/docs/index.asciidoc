@@ -12,7 +12,11 @@ include::./gettingstarted.asciidoc[]
 
 include::./command-line.asciidoc[]
 
+include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+
 include::./how-metricbeat-works.asciidoc[]
+
+include::./fields.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
@@ -28,19 +32,11 @@ include::./configuring-logstash.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
-include::../../libbeat/docs/shared-directory-layout.asciidoc[]
-
 include::reference/configuration.asciidoc[]
 
 include::./modules.asciidoc[]
 
 include::./securing-metricbeat.asciidoc[]
-
-include::../../libbeat/docs/https.asciidoc[]
-
-include::../../libbeat/docs/shared-tls-logstash-config.asciidoc[]
-
-include::./fields.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 

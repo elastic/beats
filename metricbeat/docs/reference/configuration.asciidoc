@@ -1,5 +1,5 @@
 [[metricbeat-configuration-options]]
-== Configuration Options
+== Configuration Options (Reference)
 
 Before modifying configuration settings, make sure you've completed the
 <<metricbeat-configuration,configuration steps>> in the Getting Started.
