@@ -3,11 +3,12 @@ COVERAGE_DIR=${BUILD_DIR}/coverage
 BEATS=packetbeat topbeat filebeat winlogbeat metricbeat
 PROJECTS=libbeat ${BEATS}
 
-# Runs complete testsuites (unit, system, integration) for all beats,
-# with coverage and race detection.
+# Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
+# Also it builds the docs and the generators
 .PHONY: testsuite
 testsuite:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
+	#$(MAKE) -C generate test
 
 # Runs unit and system tests without coverage and race detection.
 .PHONY: test
@@ -38,9 +39,9 @@ update:
 
 .PHONY: clean
 clean:
+	rm -rf build
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) clean || exit 1;)
-	$(MAKE) -C generate/beat clean
-	$(MAKE) -C generate/metricbeat/metricset clean
+	$(MAKE) -C generate clean
 
 .PHONY: check
 check:
@@ -60,3 +61,7 @@ beats-dashboards:
 	mkdir -p build
 	$(foreach var,$(PROJECTS),cp -r $(var)/etc/kibana/ build/dashboards  || exit 1;)
 
+# Builds the documents for each beat
+.PHONY: docs
+docs:
+	sh libbeat/scripts/build_docs.sh ${PROJECTS}
