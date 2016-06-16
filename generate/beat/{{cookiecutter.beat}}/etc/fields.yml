@@ -1,46 +1,9 @@
-defaults:
-  type: keyword
-  required: false
-  index: true
-
-env:
-  type: group
-  description: >
-    Contains common fields available in all event types.
-  fields:
-    - type: group
-      name: beat
-      fields:
-      - name: name
-        description: >
-          The name of the Beat sending the log messages. If the shipper name is set
-          in the configuration file, then that value is used. If it is not set,
-          the hostname is used.
-      - name: hostname
-        description: >
-          The hostname as returned by the operating system on which the Beat is
-          running.
-    - name: "@timestamp"
-      type: date
-      required: true
-      format: YYYY-MM-DDTHH:MM:SS.milliZ
-      example: 2015-01-24T14:06:05.071Z
-      description: >
-        The timestamp when the log line was read. The precision is in
-        milliseconds. The timezone is UTC.
-    - name: type
-      required: true
-      description: >
-        PLEASE UPDATE DOCUMENTATION
-
-{{ cookiecutter.beat }}:
+- key: {{ cookiecutter.beat }}
+  title: {{ cookiecutter.beat }}
+  description:
   fields:
     - name: counter
-      type: integer
+      type: long
       required: true
       description: >
         PLEASE UPDATE DOCUMENTATION
-
-sections:
-  - ["env", "Common"]
-  - ["{{ cookiecutter.beat }}", "{{ cookiecutter.beat | capitalize }}"]
