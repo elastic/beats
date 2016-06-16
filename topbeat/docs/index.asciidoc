@@ -1,5 +1,6 @@
 = Topbeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/1.2
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/1.2
 :version: 1.2.3
 :beatname_lc: topbeat
 :beatname_uc: Topbeat
