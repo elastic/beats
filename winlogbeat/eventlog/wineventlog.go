@@ -29,11 +29,12 @@ const (
 )
 
 var winEventLogConfigKeys = append(commonConfigKeys, "ignore_older", "include_xml",
-	"event_id", "level", "provider")
+	"event_id", "forwarded", "level", "provider")
 
 type winEventLogConfig struct {
 	ConfigCommon `config:",inline"`
 	IncludeXML   bool                   `config:"include_xml"`
+	Forwarded    *bool                  `config:"forwarded"`
 	SimpleQuery  query                  `config:",inline"`
 	Raw          map[string]interface{} `config:",inline"`
 }
@@ -70,8 +71,9 @@ type winEventLog struct {
 	subscription win.EvtHandle // Handle to the subscription.
 	maxRead      int           // Maximum number returned in one Read.
 
-	renderBuf []byte             // Buffer used for rendering event.
-	cache     *messageFilesCache // Cached mapping of source name to event message file handles.
+	render    func(event win.EvtHandle) (string, error) // Function for rendering the event to XML.
+	renderBuf []byte                                    // Buffer used for rendering event.
+	cache     *messageFilesCache                        // Cached mapping of source name to event message file handles.
 
 	logPrefix     string               // String to prefix on log messages.
 	eventMetadata common.EventMetadata // Field and tags to add to each event.
@@ -131,12 +133,12 @@ func (l *winEventLog) Read() ([]Record, error) {
 
 	var records []Record
 	for _, h := range handles {
-		x, err := win.RenderEvent(h, 0, l.renderBuf, l.cache.get)
+		x, err := l.render(h)
 		if bufErr, ok := err.(sys.InsufficientBufferError); ok {
 			detailf("%s Increasing render buffer size to %d", l.logPrefix,
 				bufErr.RequiredSize)
 			l.renderBuf = make([]byte, bufErr.RequiredSize)
-			x, err = win.RenderEvent(h, 0, l.renderBuf, l.cache.get)
+			x, err = l.render(h)
 		}
 		if err != nil && x == "" {
 			logp.Err("%s Dropping event with rendering error. %v", l.logPrefix, err)
@@ -248,7 +250,7 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 		return win.Close(win.EvtHandle(handle))
 	}
 
-	return &winEventLog{
+	l := &winEventLog{
 		config:        c,
 		query:         query,
 		channelName:   c.Name,
@@ -257,7 +259,24 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 		cache:         newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
 		logPrefix:     fmt.Sprintf("WinEventLog[%s]", c.Name),
 		eventMetadata: c.EventMetadata,
-	}, nil
+	}
+
+	// Forwarded events should be rendered using RenderEventXML. It is more
+	// efficient and does not attempt to use local message files for rendering
+	// the event's message.
+	switch {
+	case c.Forwarded == nil && c.Name == "ForwardedEvents",
+		c.Forwarded != nil && *c.Forwarded == true:
+		l.render = func(event win.EvtHandle) (string, error) {
+			return win.RenderEventXML(event, l.renderBuf)
+		}
+	default:
+		l.render = func(event win.EvtHandle) (string, error) {
+			return win.RenderEvent(event, 0, l.renderBuf, l.cache.get)
+		}
+	}
+
+	return l, nil
 }
 
 func init() {
