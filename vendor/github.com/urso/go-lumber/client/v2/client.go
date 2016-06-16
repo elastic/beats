@@ -136,7 +136,7 @@ func (c *Client) Send(data []interface{}) error {
 
 	// 3. send buffer
 	if err := c.setWriteDeadline(); err != nil {
-		return nil
+		return err
 	}
 	payload := c.wb.Bytes()
 	for len(payload) > 0 {

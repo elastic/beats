@@ -74,3 +74,16 @@ func TestConcreteFileSystemUsage(t *testing.T) {
 	fsusage, err = concreteSigar.GetFileSystemUsage("T O T A L L Y B O G U S")
 	assert.Error(t, err)
 }
+
+func TestConcreteGetFDUsage(t *testing.T) {
+	concreteSigar := &sigar.ConcreteSigar{}
+	fdUsage, err := concreteSigar.GetFDUsage()
+	// if it's not implemented, don't test
+	if _, ok := err.(*sigar.ErrNotImplemented); ok {
+		t.Skipf("Skipping *ConcreteSigar.GetFDUsage test because it is not implemented for " + runtime.GOOS)
+	}
+	if assert.NoError(t, err) {
+		assert.True(t, fdUsage.Open > 0)
+		assert.True(t, fdUsage.Open <= fdUsage.Max)
+	}
+}

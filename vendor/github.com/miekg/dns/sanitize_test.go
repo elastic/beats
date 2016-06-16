@@ -70,16 +70,15 @@ func TestNormalizedString(t *testing.T) {
 	for tc, expected := range tests {
 		n := normalizedString(tc)
 		if n != expected {
-			t.Logf("expected %s, got %s", expected, n)
-			t.Fail()
+			t.Errorf("expected %s, got %s", expected, n)
 		}
 	}
 }
 
 func newRR(t *testing.T, s string) RR {
-	r, e := NewRR(s)
-	if e != nil {
-		t.Logf("newRR: %s", e)
+	r, err := NewRR(s)
+	if err != nil {
+		t.Logf("newRR: %v", err)
 	}
 	return r
 }

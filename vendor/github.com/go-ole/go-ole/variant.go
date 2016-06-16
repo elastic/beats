@@ -26,9 +26,7 @@ func (v *VARIANT) ToIDispatch() *IDispatch {
 // ToArray converts variant to SafeArray helper.
 func (v *VARIANT) ToArray() *SafeArrayConversion {
 	if v.VT != VT_SAFEARRAY {
-		if v.VT&VT_ARRAY == 0 {
-			return nil
-		}
+		return nil
 	}
 	var safeArray *SafeArray = (*SafeArray)(unsafe.Pointer(uintptr(v.Val)))
 	return &SafeArrayConversion{safeArray}

@@ -52,7 +52,7 @@ func TestBrokerAccessors(t *testing.T) {
 }
 
 func TestSimpleBrokerCommunication(t *testing.T) {
-	mb := newMockBroker(t, 0)
+	mb := NewMockBroker(t, 0)
 	defer mb.Close()
 
 	broker := NewBroker(mb.Addr())

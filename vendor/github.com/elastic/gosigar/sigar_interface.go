@@ -10,6 +10,15 @@ type Sigar interface {
 	GetMem() (Mem, error)
 	GetSwap() (Swap, error)
 	GetFileSystemUsage(string) (FileSystemUsage, error)
+	GetFDUsage() (FDUsage, error)
+}
+
+type ErrNotImplemented struct {
+	OS string
+}
+
+func (e ErrNotImplemented) Error() string {
+	return "not implemented on " + e.OS
 }
 
 type Cpu struct {
@@ -65,6 +74,12 @@ type Swap struct {
 
 type CpuList struct {
 	List []Cpu
+}
+
+type FDUsage struct {
+	Open   uint64
+	Unused uint64
+	Max    uint64
 }
 
 type FileSystem struct {
@@ -140,4 +155,10 @@ type ProcExe struct {
 	Name string
 	Cwd  string
 	Root string
+}
+
+type ProcFDUsage struct {
+	Open      uint64
+	SoftLimit uint64
+	HardLimit uint64
 }

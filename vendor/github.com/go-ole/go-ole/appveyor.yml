@@ -4,14 +4,13 @@
 #   - All section names are case-sensitive.
 #   - Section names should be unique on each level.
 
-version: "1.3.0.{build}-alpha-{branch}"
+version: "1.2.0.{build}-alpha-{branch}"
 
 os: Windows Server 2012 R2
 
 branches:
   only:
     - master
-    - v1.2
     - v1.1
     - v1.0
 
@@ -26,6 +25,18 @@ environment:
     GOVERSION: 1.4
     GOROOT: c:\go
     DOWNLOADPLATFORM: "x64"
+  - GOARCH: 386
+    GOVERSION: 1.4
+    GOROOT: c:\go
+    DOWNLOADPLATFORM: "x86"
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - GOARCH: 386
+      GOVERSION: 1.4
+      GOROOT: c:\go
+      DOWNLOADPLATFORM: "x86"
 
 install:
   - choco install mingw

@@ -224,6 +224,60 @@ func TestFromString(t *testing.T) {
 	}
 }
 
+func TestFromStringShort(t *testing.T) {
+	// Invalid 35-character UUID string
+	s1 := "6ba7b810-9dad-11d1-80b4-00c04fd430c"
+
+	for i := len(s1); i >= 0; i-- {
+		_, err := FromString(s1[:i])
+		if err == nil {
+			t.Errorf("Should return error trying to parse too short string, got %s", err)
+		}
+	}
+}
+
+func TestFromStringLong(t *testing.T) {
+	// Invalid 37+ character UUID string
+	s := []string{
+		"6ba7b810-9dad-11d1-80b4-00c04fd430c8=",
+		"6ba7b810-9dad-11d1-80b4-00c04fd430c8}",
+		"{6ba7b810-9dad-11d1-80b4-00c04fd430c8}f",
+		"6ba7b810-9dad-11d1-80b4-00c04fd430c800c04fd430c8",
+	}
+
+	for _, str := range s {
+		_, err := FromString(str)
+		if err == nil {
+			t.Errorf("Should return error trying to parse too long string, passed %s", str)
+		}
+	}
+}
+
+func TestFromStringInvalid(t *testing.T) {
+	// Invalid UUID string formats
+	s := []string{
+		"6ba7b8109dad11d180b400c04fd430c8",
+		"6ba7b8109dad11d180b400c04fd430c86ba7b8109dad11d180b400c04fd430c8",
+		"urn:uuid:{6ba7b810-9dad-11d1-80b4-00c04fd430c8}",
+		"6ba7b8109-dad-11d1-80b4-00c04fd430c8",
+		"6ba7b810-9dad1-1d1-80b4-00c04fd430c8",
+		"6ba7b810-9dad-11d18-0b4-00c04fd430c8",
+		"6ba7b810-9dad-11d1-80b40-0c04fd430c8",
+		"6ba7b810+9dad+11d1+80b4+00c04fd430c8",
+		"6ba7b810-9dad11d180b400c04fd430c8",
+		"6ba7b8109dad-11d180b400c04fd430c8",
+		"6ba7b8109dad11d1-80b400c04fd430c8",
+		"6ba7b8109dad11d180b4-00c04fd430c8",
+	}
+
+	for _, str := range s {
+		_, err := FromString(str)
+		if err == nil {
+			t.Errorf("Should return error trying to parse invalid string, passed %s", str)
+		}
+	}
+}
+
 func TestFromStringOrNil(t *testing.T) {
 	u := FromStringOrNil("")
 	if u != Nil {
@@ -289,6 +343,32 @@ func TestValue(t *testing.T) {
 
 	if val != u.String() {
 		t.Errorf("Wrong value returned, should be equal: %s and %s", val, u)
+	}
+}
+
+func TestValueNil(t *testing.T) {
+	u := UUID{}
+
+	val, err := u.Value()
+	if err != nil {
+		t.Errorf("Error getting UUID value: %s", err)
+	}
+
+	if val != Nil.String() {
+		t.Errorf("Wrong value returned, should be equal to UUID.Nil: %s", val)
+	}
+}
+
+func TestNullUUIDValueNil(t *testing.T) {
+	u := NullUUID{}
+
+	val, err := u.Value()
+	if err != nil {
+		t.Errorf("Error getting UUID value: %s", err)
+	}
+
+	if val != nil {
+		t.Errorf("Wrong value returned, should be nil: %s", val)
 	}
 }
 
@@ -367,6 +447,51 @@ func TestScanUnsupported(t *testing.T) {
 	err := u.Scan(true)
 	if err == nil {
 		t.Errorf("Should return error trying to unmarshal from bool")
+	}
+}
+
+func TestScanNil(t *testing.T) {
+	u := UUID{0x6b, 0xa7, 0xb8, 0x10, 0x9d, 0xad, 0x11, 0xd1, 0x80, 0xb4, 0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8}
+
+	err := u.Scan(nil)
+	if err == nil {
+		t.Errorf("Error UUID shouldn't allow unmarshalling from nil")
+	}
+}
+
+func TestNullUUIDScanValid(t *testing.T) {
+	u := UUID{0x6b, 0xa7, 0xb8, 0x10, 0x9d, 0xad, 0x11, 0xd1, 0x80, 0xb4, 0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8}
+	s1 := "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+
+	u1 := NullUUID{}
+	err := u1.Scan(s1)
+	if err != nil {
+		t.Errorf("Error unmarshaling NullUUID: %s", err)
+	}
+
+	if !u1.Valid {
+		t.Errorf("NullUUID should be valid")
+	}
+
+	if !Equal(u, u1.UUID) {
+		t.Errorf("UUIDs should be equal: %s and %s", u, u1.UUID)
+	}
+}
+
+func TestNullUUIDScanNil(t *testing.T) {
+	u := NullUUID{UUID{0x6b, 0xa7, 0xb8, 0x10, 0x9d, 0xad, 0x11, 0xd1, 0x80, 0xb4, 0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8}, true}
+
+	err := u.Scan(nil)
+	if err != nil {
+		t.Errorf("Error unmarshaling NullUUID: %s", err)
+	}
+
+	if u.Valid {
+		t.Errorf("NullUUID should not be valid")
+	}
+
+	if !Equal(u.UUID, Nil) {
+		t.Errorf("NullUUID value should be equal to Nil: %s", u)
 	}
 }
 

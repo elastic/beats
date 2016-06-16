@@ -159,6 +159,18 @@ func (self *FileSystemList) Get() error {
 	return err
 }
 
+func (self *FDUsage) Get() error {
+	return readFile(Procd+"/sys/fs/file-nr", func(line string) bool {
+		fields := strings.Fields(line)
+		if len(fields) == 3 {
+			self.Open, _ = strconv.ParseUint(fields[0], 10, 64)
+			self.Unused, _ = strconv.ParseUint(fields[1], 10, 64)
+			self.Max, _ = strconv.ParseUint(fields[2], 10, 64)
+		}
+		return false
+	})
+}
+
 func (self *ProcList) Get() error {
 	dir, err := os.Open(Procd)
 	if err != nil {
@@ -336,6 +348,29 @@ func (self *ProcExe) Get(pid int) error {
 		*field = val
 	}
 
+	return nil
+}
+
+func (self *ProcFDUsage) Get(pid int) error {
+	err := readFile(procFileName(pid, "limits"), func(line string) bool {
+		if strings.HasPrefix(line, "Max open files") {
+			fields := strings.Fields(line)
+			if len(fields) == 6 {
+				self.SoftLimit, _ = strconv.ParseUint(fields[3], 10, 64)
+				self.HardLimit, _ = strconv.ParseUint(fields[4], 10, 64)
+			}
+			return false
+		}
+		return true
+	})
+	if err != nil {
+		return err
+	}
+	fds, err := ioutil.ReadDir(procFileName(pid, "fd"))
+	if err != nil {
+		return err
+	}
+	self.Open = uint64(len(fds))
 	return nil
 }
 
