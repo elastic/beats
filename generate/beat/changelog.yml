@@ -1,0 +1,17 @@
+project: beat-generator
+changes:
+- type: added
+  description: >
+    Add dev-tools/packer to package the beat for all supported platforms
+
+- type: changed
+  description: The registry format was changed to an array instead of dict. The migration to the new format will happen automatically at the first startup.
+
+- type: changed
+  description: Use ucfg.Unpack() instead of cfgfile.Read() in Beater.Config method.
+
+- type: changed
+  description: Rename `Configuration` variable in beat struct to `beatConfig` as generalization from @buehler.
+
+- type: changed
+  description: Update Golang dependency to 1.6.0

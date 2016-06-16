@@ -35,7 +35,7 @@ coverage-report:
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 
 .PHONY: update
-update:
+update: changelog
 	$(foreach var,$(BEATS),$(MAKE) -C $(var) update || exit 1;)
 
 .PHONY: clean
@@ -109,3 +109,8 @@ upload-package:
 .PHONY: release-upload
 upload-release:
 	aws s3 cp --recursive --acl public-read build/upload s3://download.elasticsearch.org/beats/
+
+# Builds the changelog
+.PHONY: changelog
+changelog:
+	python ./scripts/changelog.py $(shell find . -name changelog.yml) > CHANGELOG2.asciidoc

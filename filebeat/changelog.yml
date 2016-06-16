@@ -1,0 +1,335 @@
+project: filebeat
+changes:
+- type: release
+  version: master
+  parent: v5.0.0-rc1
+  date: ""
+
+- type: bug
+  issue: 2792
+  description: >
+    Fix issue where upgrading a 1.x registry file resulted in duplicate state entries.
+
+
+- type: bug
+  issue: 2818
+  description: >
+    Fix registry cleanup issue when files falling under ignore_older after restart.
+
+
+- type: added
+  issue: 2456
+  description: >
+    Add command line option -once to run filebeat only once and then close.
+
+
+- type: release
+  version: v5.0.0-rc1
+  parent: v5.0.0-beta1
+  date: ""
+
+- type: bug
+  issue: 2416
+  description: >
+    Fix input buffer on encoding problem.
+
+
+- type: release
+  version: v5.0.0-beta1
+  parent: v5.0.0-alpha5
+  date: ""
+
+- type: bug
+  issue: 2178
+  description: >
+    Fix processor failure in Filebeat when using regex, contain, or equals with the message field.
+
+
+- type: bug
+  issue: 2455
+  description: >
+    Fix async publisher sending empty events
+
+
+- type: bug
+  issue: 2541
+  description: >
+    Fix potential issue with multiple harvester per file on large file numbers or slow output
+
+
+- type: added
+  issue: 1926
+  description: >
+    Introduce close_timeout harvester options
+
+
+- type: added
+  issue: 2351
+  description: >
+    Strip BOM from first message in case of BOM files
+
+
+- type: added
+  issue: 2417
+  description: >
+    Add harvester_limit option
+
+
+- type: release
+  version: v5.0.0-alpha5
+  parent: v5.0.0-alpha4
+  date: ""
+
+- type: bug
+  issue: 2041
+  description: >
+    Fix potential data loss between Filebeat restarts, reporting unpublished lines as published.
+
+
+- type: bug
+  issue: 2020
+  description: >
+    Fix open file handler issue. {issue}2028[2028]
+
+
+- type: bug
+  issue: 2038
+  description: >
+    Fix filtering of JSON events when using integers in conditions.
+
+
+- type: added
+  issue: 1600
+  description: >
+    Introduce `close_removed` and `close_renamed` harvester options.
+
+
+- type: added
+  issue: 1600
+  description: >
+    Introduce `close_eof` harvester option.
+
+
+- type: added
+  issue: 1600
+  description: >
+    Add `clean_removed` and `clean_inactive` config option.
+
+
+- type: deprecated
+  issue: 2051
+  description: >
+    Deprecate `close_older` option and replace it with `close_inactive`.
+
+
+- type: deprecated
+  issue: 1600
+  description: >
+    Deprecate `force_close_files` option and replace it with `close_removed` and `close_renamed`.
+
+
+- type: release
+  version: v5.0.0-alpha4
+  parent: v5.0.0-alpha3
+  date: ""
+
+- type: breaking
+  issue: 1686
+  description: >
+    Stop following symlink. Symlinks are now ignored:
+
+
+- type: release
+  version: v5.0.0-alpha3
+  parent: v5.0.0-alpha2
+  date: ""
+
+- type: added
+  issue: 1703
+  description: >
+    The registry format was changed to an array instead of dict. The migration to the new format will happen automatically at the first startup.
+
+
+- type: release
+  version: v1.2.3
+  parent: v1.2.2
+  date: ""
+
+- type: bug
+  issue: 1528
+  description: >
+    Fix rotation issue with ignore_older.
+
+
+- type: added
+  issue: 1649
+  description: >
+    Prevent file opening for files which reached ignore_older.
+
+
+- type: release
+  version: v5.0.0-alpha2
+  parent: v5.0.0-alpha1
+  date: ""
+
+- type: bug
+  issue: 1281
+  description: >
+    Improvements in registrar dealing with file rotation.
+
+
+- type: bug
+  issue: 1466
+  description: >
+    Fix issue with JSON decoding where values having `null` as values could crash Filebeat.
+
+
+- type: bug
+  issue: 1552
+  description: >
+    Multiline reader normalizing newline to use `\n`.
+
+
+- type: release
+  version: v1.2.2
+  parent: v1.2.0
+  date: ""
+
+- type: bug
+  issue: 1281
+  description: >
+    Improvements in registrar dealing with file rotation.
+
+
+- type: release
+  version: v1.2.1
+  parent: v1.2.0
+  date: ""
+
+- type: release
+  version: v5.0.0-alpha1
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 1092
+  description: >
+    Scalar values in used in the `fields` configuration setting are no longer automatically converted to strings.
+
+
+- type: breaking
+  issue: 778
+  description: >
+    Count field was removed from event as not used in filebeat
+
+
+- type: bug
+  issue: 647
+  description: >
+    Stop filebeat if started without any prospectors defined or empty prospectors {pull}644[644]
+
+
+- type: bug
+  issue: 720
+  description: >
+    Improve shutdown of crawler and prospector to wait for clean completion
+
+
+- type: bug
+  issue: 899
+  description: >
+    Omit `fields` from Filebeat events when null
+
+
+- type: added
+  issue: 1092
+  description: >
+    Add the ability to set a list of tags for each prospector
+
+
+- type: added
+  issue: 1143
+  description: >
+    Add JSON decoding support
+
+
+- type: release
+  version: v1.2.0
+  parent: v1.1.2
+  date: ""
+
+- type: release
+  version: v1.1.2
+  parent: v1.1.1
+  date: ""
+
+- type: bug
+  issue: 1010
+  description: >
+    Fix registrar bug for rotated files
+
+
+- type: release
+  version: v1.1.1
+  parent: v1.1.0
+  date: ""
+
+- type: release
+  version: v1.1.0
+  parent: v1.0.1
+  date: ""
+
+- type: bug
+  issue: 628
+  description: >
+    Set spool_size default value to 2048
+
+
+- type: added
+  issue: 461
+  description: >
+    Add multiline support for combining multiple related lines into one event.
+
+
+- type: added
+  issue: 430
+  description: >
+    Add `exclude_lines` and `include_lines` options for regexp based line filtering.
+
+
+- type: added
+  issue: 563
+  description: >
+    Add `exclude_files` configuration option.
+
+
+- type: added
+  issue: 782
+  description: >
+    Add experimental option to enable filebeat publisher pipeline to operate asynchonrously
+
+
+- type: release
+  version: v1.0.1
+  parent: v1.0.0
+  date: ""
+
+- type: release
+  version: 1.0.0
+  parent: 1.0.0-rc2
+  date: ""
+
+- type: release
+  version: 1.0.0-rc2
+  parent: 1.0.0-rc1
+  date: ""
+
+- type: release
+  version: 1.0.0-rc1
+  parent: 1.0.0-beta4
+  date: ""
+
+- type: release
+  version: 1.0.0-beta4
+  parent: 1.0.0-beta3
+  date: ""

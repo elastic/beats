@@ -51,3 +51,8 @@ python-env:
 .PHONY: clean
 clean:
 	rm -rf build
+
+# Cleans up environment
+.PHONY: changelog
+changelog:
+	python ../../scripts/changelog.py changelog.yml > CHANGELOG.asciidoc

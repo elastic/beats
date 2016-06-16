@@ -1,0 +1,543 @@
+project: filebeat
+changes:
+- type: bug
+  issue: 1598
+  description: Fix high CPU usage when using filtering under Windows.
+
+
+- type: added
+  issue: 1403
+  description: Updated elastic/gosigar version so Topbeat can compile on OpenBSD.
+
+
+- type: release
+  version: v1.2.2
+  parent: v1.2.0
+  date: ""
+
+- type: bug
+  issue: 1410
+  description: Fix race when multiple outputs access the same event with Logstash output manipulating event.
+
+
+- type: bug
+  issue: 1394
+  description: Fix go-daemon (supervisor used in init scripts) hanging when executed over SSH.
+
+
+- type: breaking
+  issue: 1343
+  description: Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.
+
+
+- type: breaking
+  issue: 1128
+  description: Fix issue with cpu.system_p being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: Add username to processes
+
+
+- type: release
+  version: v5.0.0-alpha1
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 631
+  description: Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space
+
+
+- type: breaking
+  issue: 1207
+  description: Remove `count` field from the exported fields
+
+
+- type: bug
+  issue: 1128
+  description: Fix issue with `cpu.system_p` being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: Add `username` to processes
+
+
+- type: added
+  issue: 533
+  description: Add the command line used to start processes
+
+
+- type: added
+  issue: 496
+  description: Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured
+
+
+- type: bug
+  issue: 1598
+  description: Fix high CPU usage when using filtering under Windows.
+
+
+- type: added
+  issue: 1403
+  description: Updated elastic/gosigar version so Topbeat can compile on OpenBSD.
+
+
+- type: release
+  version: v1.2.2
+  parent: v1.2.0
+  date: ""
+
+- type: bug
+  issue: 1410
+  description: Fix race when multiple outputs access the same event with Logstash output manipulating event.
+
+
+- type: bug
+  issue: 1394
+  description: Fix go-daemon (supervisor used in init scripts) hanging when executed over SSH.
+
+
+- type: breaking
+  issue: 1343
+  description: Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.
+
+
+- type: breaking
+  issue: 1128
+  description: Fix issue with cpu.system_p being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: Add username to processes
+
+
+- type: release
+  version: v5.0.0-alpha1
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 631
+  description: Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space
+
+
+- type: breaking
+  issue: 1207
+  description: Remove `count` field from the exported fields
+
+
+- type: bug
+  issue: 1128
+  description: Fix issue with `cpu.system_p` being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: Add `username` to processes
+
+
+- type: added
+  issue: 533
+  description: Add the command line used to start processes
+
+
+- type: added
+  issue: 496
+  description: Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured
+
+
+- type: bug
+  issue: 1598
+  description: Fix high CPU usage when using filtering under Windows.
+
+
+- type: added
+  issue: 1403
+  description: Updated elastic/gosigar version so Topbeat can compile on OpenBSD.
+
+
+- type: release
+  version: v1.2.2
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 1343
+  description: Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.
+
+
+- type: breaking
+  issue: 1128
+  description: Fix issue with cpu.system_p being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: Add username to processes
+
+
+- type: release
+  version: v5.0.0-alpha1
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 631
+  description: Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space
+
+
+- type: breaking
+  issue: 1207
+  description: Remove `count` field from the exported fields
+
+
+- type: bug
+  issue: 1128
+  description: Fix issue with `cpu.system_p` being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: Add `username` to processes
+
+
+- type: added
+  issue: 533
+  description: Add the command line used to start processes
+
+
+- type: added
+  issue: 496
+  description: Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured
+
+
+- type: bug
+  issue: 1598
+  description: Fix high CPU usage when using filtering under Windows.
+
+
+- type: added
+  issue: 1403
+  description: Updated elastic/gosigar version so Topbeat can compile on OpenBSD.
+
+
+- type: release
+  version: v1.2.2
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 1343
+  description: Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.
+
+
+- type: breaking
+  issue: 1128
+  description: Fix issue with cpu.system_p being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: Add username to processes
+
+
+- type: release
+  version: v5.0.0-alpha1
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 631
+  description: Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space
+
+
+- type: breaking
+  issue: 1207
+  description: Remove `count` field from the exported fields
+
+
+- type: bug
+  issue: 1128
+  description: Fix issue with `cpu.system_p` being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: Add `username` to processes
+
+
+- type: added
+  issue: 533
+  description: Add the command line used to start processes
+
+
+- type: added
+  issue: 496
+  description: Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured
+
+
+- type: bug
+  issue: 1598
+  description: Fix high CPU usage when using filtering under Windows.
+
+
+- type: added
+  issue: 1403
+  description: Updated elastic/gosigar version so Topbeat can compile on OpenBSD.
+
+
+- type: release
+  version: v1.2.2
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 1343
+  description: Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.
+
+
+- type: breaking
+  issue: 1128
+  description: Fix issue with cpu.system_p being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: Add username to processes
+
+
+- type: release
+  version: v5.0.0-alpha1
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 631
+  description: Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space
+
+
+- type: breaking
+  issue: 1207
+  description: Remove `count` field from the exported fields
+
+
+- type: bug
+  issue: 1128
+  description: Fix issue with `cpu.system_p` being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: Add `username` to processes
+
+
+- type: bug
+  issue: 1598
+  description: Fix high CPU usage when using filtering under Windows.
+
+
+- type: added
+  issue: 1403
+  description: Updated elastic/gosigar version so Topbeat can compile on OpenBSD.
+
+
+- type: release
+  version: v1.2.2
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 1343
+  description: Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.
+
+
+- type: breaking
+  issue: 1128
+  description: Fix issue with cpu.system_p being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: Add username to processes
+
+
+- type: release
+  version: v5.0.0-alpha1
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 631
+  description: Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space
+
+
+- type: breaking
+  issue: 1207
+  description: Remove `count` field from the exported fields
+
+
+- type: bug
+  issue: 1128
+  description: Fix issue with `cpu.system_p` being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: Add `username` to processes
+
+
+- type: added
+  issue: 533
+  description: Add the command line used to start processes
+
+
+- type: added
+  issue: 496
+  description: Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured
+
+
+- type: bug
+  issue: 1598
+  description: >
+    Fix high CPU usage when using filtering under Windows.
+
+
+- type: added
+  issue: 1403
+  description: >
+    Updated elastic/gosigar version so Topbeat can compile on OpenBSD.
+
+
+- type: release
+  version: v1.2.2
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 1343
+  description: >
+    Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.
+
+
+- type: breaking
+  issue: 1128
+  description: >
+    Fix issue with cpu.system_p being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: >
+    Add username to processes
+
+
+- type: release
+  version: v5.0.0-alpha1
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 631
+  description: >
+    Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space
+
+
+- type: breaking
+  issue: 1207
+  description: >
+    Remove `count` field from the exported fields
+
+
+- type: bug
+  issue: 1128
+  description: >
+    Fix issue with `cpu.system_p` being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: >
+    Add `username` to processes
+
+
+- type: added
+  issue: 533
+  description: >
+    Add the command line used to start processes
+
+
+- type: added
+  issue: 496
+  description: >
+    Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured
+
+
+- type: bug
+  issue: 1598
+  description: >
+    Fix high CPU usage when using filtering under Windows.
+
+
+- type: added
+  issue: 1403
+  description: >
+    Updated elastic/gosigar version so Topbeat can compile on OpenBSD.
+
+
+- type: breaking
+  issue: 1343
+  description: >
+    Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.
+
+
+- type: breaking
+  issue: 1128
+  description: >
+    Fix issue with cpu.system_p being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: >
+    Add username to processes
+
+
+- type: breaking
+  issue: 631
+  description: >
+    Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space
+
+
+- type: breaking
+  issue: 1207
+  description: >
+    Remove `count` field from the exported fields
+
+
+- type: bug
+  issue: 1128
+  description: >
+    Fix issue with `cpu.system_p` being greater than 1 on Windows
+
+
+- type: added
+  issue: 845
+  description: >
+    Add `username` to processes
+
+
+- type: added
+  issue: 533
+  description: >
+    Add the command line used to start processes
+
+
+- type: added
+  issue: 496
+  description: >
+    Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured
+

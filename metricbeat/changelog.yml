@@ -1,0 +1,239 @@
+project: metricbeat
+changes:
+- type: release
+  version: master
+  parent: v5.0.0-rc1
+  date: ""
+
+- type: bug
+  issue: 2747
+  description: >
+    Fix high CPU usage on macOS when encountering processes with long command lines.
+
+
+- type: bug
+  issue: 2653
+  description: >
+    Fix high value of `system.memory.actual.free` and `system.memory.actual.used`.
+
+
+- type: bug
+  issue: 1897
+  description: >
+    Change several `OpenProcess` calls on Windows to request the lowest possible access provilege. 
+
+
+- type: bug
+  issue: 2653
+  description: >
+    Fix system.memory.actual.free high value on Windows.
+
+
+- type: bug
+  issue: 2777
+  description: >
+    Calculate the fsstat values per mounting point, and not filesystem.
+
+
+- type: added
+  issue: 2297
+  description: >
+    Add experimental filebeat metricset in the beats module.
+
+
+- type: added
+  issue: 2339
+  description: >
+    Add experimental libbeat metricset in the beats module.
+
+
+- type: release
+  version: v5.0.0-rc1
+  parent: v5.0.0-beta1
+  date: ""
+
+- type: bug
+  issue: 2632
+  description: >
+    Fix default configuration file on Windows to not enabled the `load` metricset.
+
+
+- type: release
+  version: v5.0.0-beta1
+  parent: v5.0.0-alpha5
+  date: ""
+
+- type: breaking
+  issue: 1565
+  description: >
+    Change field type system.process.cpu.start_time from keyword to date.
+
+
+- type: bug
+  issue: 2249
+  description: >
+    Fix module filters to work properly with drop_event filter.
+
+
+- type: added
+  issue: 2156
+  description: >
+    Use the new scaled_float Elasticsearch type for the percentage values.
+
+
+- type: added
+  issue: 2184
+  description: >
+    Add experimental cgroup metrics to the system/process MetricSet.
+
+
+- type: added
+  issue: 2253
+  description: >
+    Added a PostgreSQL module.
+
+
+- type: added
+  issue: 2430
+  description: >
+    Improve mapping by converting half_float to scaled_float and integers to long.
+
+
+- type: added
+  issue: 2384
+  description: >
+    Add experimental haproxy module.
+
+
+- type: added
+  issue: 2555
+  description: >
+    Add Kibana dashboard for cgroups data
+
+
+- type: release
+  version: v5.0.0-alpha5
+  parent: v5.0.0-alpha4
+  date: ""
+
+- type: breaking
+  issue: 2101
+  description: >
+    Create a separate metricSet for load under the system module and remove load information from CPU stats.
+
+
+- type: breaking
+  issue: 2101
+  description: >
+    Add `system.load.norm.1`, `system.load.norm.5` and `system.load.norm.15`.
+
+
+- type: breaking
+  issue: 2484
+  description: >
+    Add threads fields to mysql module.
+
+
+- type: bug
+  issue: 1972
+  description: >
+    Do not send zero values when no value was present in the source.
+
+
+- type: added
+  issue: 
+  description: >
+    Add pgid field to process information.
+
+
+- type: release
+  version: v5.0.0-alpha4
+  parent: v5.0.0-alpha3
+  date: ""
+
+- type: bug
+  issue: 1863
+  description: >
+    Fix the CPU values returned for each core.
+
+
+- type: added
+  issue: 1837
+  description: >
+    Add MongoDB module.
+
+
+- type: release
+  version: v5.0.0-alpha3
+  parent: v5.0.0-alpha2
+  date: ""
+
+- type: release
+  version: v1.2.3
+  parent: v1.2.2
+  date: ""
+
+- type: release
+  version: v5.0.0-alpha2
+  parent: v5.0.0-alpha1
+  date: ""
+
+- type: release
+  version: v1.2.2
+  parent: v1.2.0
+  date: ""
+
+- type: release
+  version: v1.2.1
+  parent: v1.2.0
+  date: ""
+
+- type: release
+  version: v5.0.0-alpha1
+  parent: v1.2.0
+  date: ""
+
+- type: release
+  version: v1.2.0
+  parent: v1.1.2
+  date: ""
+
+- type: release
+  version: v1.1.2
+  parent: v1.1.1
+  date: ""
+
+- type: release
+  version: v1.1.1
+  parent: v1.1.0
+  date: ""
+
+- type: release
+  version: v1.1.0
+  parent: v1.0.1
+  date: ""
+
+- type: release
+  version: v1.0.1
+  parent: v1.0.0
+  date: ""
+
+- type: release
+  version: 1.0.0
+  parent: 1.0.0-rc2
+  date: ""
+
+- type: release
+  version: 1.0.0-rc2
+  parent: 1.0.0-rc1
+  date: ""
+
+- type: release
+  version: 1.0.0-rc1
+  parent: 1.0.0-beta4
+  date: ""
+
+- type: release
+  version: 1.0.0-beta4
+  parent: 1.0.0-beta3
+  date: ""

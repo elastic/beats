@@ -1,0 +1,791 @@
+project: libbeat
+changes:
+- type: release
+  version: master
+  parent: v5.0.0-rc1
+  date: ""
+
+- type: bug
+  issue: 2735
+  description: >
+    Fix kafka output re-trying batches with too large events.
+
+
+- type: bug
+  issue: 2651
+  description: >
+    Fix kafka output protocol error if `version: 0.10` is configured.
+
+
+- type: bug
+  issue: 2717
+  description: >
+    Fix kafka output connection closed by broker on SASL/PLAIN.
+
+
+- type: added
+  issue: 2728
+  description: >
+    Add add_cloud_metadata processor for collecting cloud provider metadata.
+
+
+- type: release
+  version: v5.0.0-rc1
+  parent: v5.0.0-beta1
+  date: ""
+
+- type: breaking
+  issue: 2688
+  description: >
+    A dynamic mapping rule is added to the default Elasticsearch template to treat strings as keywords by default.
+
+
+- type: bug
+  issue: 2627
+  description: >
+    Make sure Beats sent always float values when they are defined as float by sending 5.00000 instead of 5.
+
+
+- type: bug
+  issue: 2685
+  description: >
+    Fix ignoring all fields from drop_fields in case the first field is unknown.
+
+
+- type: bug
+  issue: 2698
+  description: >
+    Fix dynamic configuration int/uint to float type conversion.
+
+
+- type: bug
+  issue: 2698
+  description: >
+    Fix primitive types conversion if values are read from environment variables.
+
+
+- type: deprecated
+  issue: 2620
+  description: >
+    Setting `port` has been deprecated in Redis and Logstash outputs.
+
+
+- type: release
+  version: v5.0.0-beta1
+  parent: v5.0.0-alpha5
+  date: ""
+
+- type: breaking
+  issue: 2119
+  description: >
+    Change Elasticsearch output index configuration to be based on format strings. If index has been configured, no date will be appended anymore to the index name.
+
+
+- type: breaking
+  issue: 2188
+  description: >
+    Replace `output.kafka.use_type` by `output.kafka.topic` accepting a format string.
+
+
+- type: breaking
+  issue: 2330
+  description: >
+    rename `tls` configurations section to `ssl`.
+
+
+- type: breaking
+  issue: 2330
+  description: >
+    rename `certificate_key` configuration to `key`.
+
+
+- type: breaking
+  issue: 2330
+  description: >
+    replace `tls.insecure` with `ssl.verification_mode` setting.
+
+
+- type: breaking
+  issue: 2330
+  description: >
+    replace `tls.min/max_version` with `ssl.supported_protocols` setting requiring full protocol name.
+
+
+- type: bug
+  issue: 2441
+  description: >
+    Fix logstash output handles error twice when asynchronous sending fails.
+
+
+- type: bug
+  issue: 2229
+  description: >
+    Fix Elasticsearch structured error response parsing error.
+
+
+- type: bug
+  issue: 2171
+  description: >
+    Fixed the run script to allow the overriding of the configuration file.
+
+
+- type: bug
+  issue: 2325
+  description: >
+    Fix logstash output crash if no hosts are configured.
+
+
+- type: bug
+  issue: 2521
+  description: >
+    Fix array value support in -E CLI flag.
+
+
+- type: bug
+  issue: 2521
+  description: >
+    Fix merging array values if -c CLI flag is used multiple times.
+
+
+- type: bug
+  issue: 2521
+  description: >
+    Fix beats failing to start due to invalid duplicate key error in configuration file.
+
+
+- type: bug
+  issue: 2571
+  description: >
+    Fix panic on non writable logging directory.
+
+
+- type: added
+  issue: 2122
+  description: >
+    Add script to generate the Kibana index-pattern from fields.yml.
+
+
+- type: added
+  issue: 2169
+  description: >
+    Enhance Redis output key selection based on format string.
+
+
+- type: added
+  issue: 2169
+  description: >
+    Configurable Redis `keys` using filters and format strings.
+
+
+- type: added
+  issue: 2188
+  description: >
+    Add format string support to `output.kafka.topic`.
+
+
+- type: added
+  issue: 2188
+  description: >
+    Add `output.kafka.topics` for more advanced kafka topic selection per event.
+
+
+- type: added
+  issue: 2190
+  description: >
+    Add support for Kafka 0.10.
+
+
+- type: added
+  issue: 2190
+  description: >
+    Add SASL/PLAIN authentication support to kafka output.
+
+
+- type: added
+  issue: 2190
+  description: >
+    Make Kafka metadata update configurable.
+
+
+- type: added
+  issue: 2190
+  description: >
+    Add Kafka version setting (optional) enabling kafka broker version support.
+
+
+- type: added
+  issue: 2190
+  description: >
+    Add Kafka message timestamp if at least version 0.10 is configured.
+
+
+- type: added
+  issue: 2284
+  description: >
+    Add configurable Kafka event key setting.
+
+
+- type: added
+  issue: 2284
+  description: >
+    Add settings for configuring the kafka partitioning strategy.
+
+
+- type: added
+  issue: 2284
+  description: >
+    Add partitioner settings `reachable_only` to ignore partitions not reachable by network.
+
+
+- type: added
+  issue: 2237
+  description: >
+    Enhance contains condition to work on fields that are arrays of strings.
+
+
+- type: added
+  issue: 2245
+  description: >
+    Lookup the configuration file relative to the `-path.config` CLI flag.
+
+
+- type: added
+  issue: 2155
+  description: >
+    Re-write import_dashboards.sh in Golang.
+
+
+- type: added
+  issue: 2306
+  description: >
+    Update to Go 1.7.
+
+
+- type: added
+  issue: 2349
+  description: >
+    Log total non-zero internal metrics on shutdown.
+
+
+- type: added
+  issue: 2330
+  description: >
+    Add support for encrypted private key files by introducing `ssl.key_passphrase` setting.
+
+
+- type: added
+  issue: 2478
+  description: >
+    Add experimental symlink support with `symlinks` config
+
+
+- type: release
+  version: v5.0.0-alpha5
+  parent: v5.0.0-alpha4
+  date: ""
+
+- type: breaking
+  issue: 1944
+  description: >
+    Rename the `filters` section to `processors`.
+
+
+- type: breaking
+  issue: 1949
+  description: >
+    Introduce the condition with `when` in the processor configuration.
+
+
+- type: breaking
+  issue: 1993
+  description: >
+    The Elasticsearch template is now loaded by default.
+
+
+- type: breaking
+  issue: 2077
+  description: >
+    The Redis output `index` setting is renamed to `key`. `index` still works but it's deprecated.
+
+
+- type: breaking
+  issue: 2077
+  description: >
+    The undocumented file output `index` setting was removed. Use `filename` instead.
+
+
+- type: bug
+  issue: 2046
+  description: >
+    Fix sync publisher `PublishEvents` return value if client is closed concurrently.
+
+
+- type: added
+  issue: 1955
+  description: >
+    Periodically log internal metrics.
+
+
+- type: added
+  issue: 1987
+  description: >
+    Add enabled setting to all output modules.
+
+
+- type: added
+  issue: 1985
+  description: >
+    Command line flag `-c` can be used multiple times.
+
+
+- type: added
+  issue: 1983
+  description: >
+    Add OR/AND/NOT to the condition associated with the processors.
+
+
+- type: added
+  issue: 1986
+  description: >
+    Add `-E` CLI flag for overwriting single config options via command line.
+
+
+- type: added
+  issue: 1993
+  description: >
+    Choose the mapping template file based on the Elasticsearch version.
+
+
+- type: added
+  issue: 2035
+  description: >
+    Check stdout being available when console output is configured.
+
+
+- type: release
+  version: v5.0.0-alpha4
+  parent: v5.0.0-alpha3
+  date: ""
+
+- type: breaking
+  issue: 1907
+  description: >
+    The topology_expire option of the Elasticserach output was removed.
+
+
+- type: bug
+  issue: 1803
+  description: >
+    Reset backoff factor on partial ACK.
+
+
+- type: bug
+  issue: 1829
+  description: >
+    Fix beats load balancer deadlock if max_retries: -1 or publish_async is enabled in filebeat.
+
+
+- type: bug
+  issue: 1876
+  description: >
+    Fix logstash output with pipelining mode enabled not reconnecting.
+
+
+- type: bug
+  issue: 1900
+  description: >
+    Empty configuration sections become merge-able with variables containing full path.
+
+
+- type: bug
+  issue: 1900
+  description: >
+    Fix error message about required fields missing not printing the missing field name.
+
+
+- type: added
+  issue: 1900
+  description: >
+    Improve error message if compiling regular expression from config files fails.
+
+
+- type: added
+  issue: 1835
+  description: >
+    Compression support in the Elasticsearch output.
+
+
+- type: release
+  version: v5.0.0-alpha3
+  parent: v5.0.0-alpha2
+  date: ""
+
+- type: added
+  issue: 1623
+  description: >
+    Add conditions to generic filtering.
+
+
+- type: deprecated
+  issue: 1601
+  description: >
+    The support for doing GeoIP lookups is deprecated and will be removed in version 6.0.
+
+
+- type: release
+  version: v1.2.3
+  parent: v1.2.2
+  date: ""
+
+- type: release
+  version: v5.0.0-alpha2
+  parent: v5.0.0-alpha1
+  date: ""
+
+- type: breaking
+  issue: 1385
+  description: >
+    On DEB/RPM installations, the binary files are now found under `/usr/share/{{beat_name}}/bin`, not in `/usr/bin`.
+
+
+- type: breaking
+  issue: 1371
+  description: >
+    The logs are written by default to self rotating files, instead of syslog.
+
+
+- type: breaking
+  issue: 1474
+  description: >
+    Remove deprecated `host` option from elasticsearch, logstash and redis outputs.
+
+
+- type: bug
+  issue: 1353
+  description: >
+    Drain response buffers when pipelining is used by Redis output.
+
+
+- type: bug
+  issue: 1389
+  description: >
+    Unterminated environment variable expressions in config files will now cause an error
+
+
+- type: bug
+  issue: 1321
+  description: >
+    Fix issue with the automatic template loading when Elasticsearch is not available on Beat start.
+
+
+- type: bug
+  issue: 1415
+  description: >
+    Fix bug affecting -cpuprofile, -memprofile, and -httpprof CLI flags
+
+
+- type: bug
+  issue: 1428
+  description: >
+    Fix race when multiple outputs access the same event with logstash output manipulating event {issue}1410[1410]
+
+
+- type: bug
+  issue: 1503
+  description: >
+    Seed random number generator using crypto.rand package.
+
+
+- type: bug
+  issue: 1213
+  description: >
+    Fix beats hanging in -configtest
+
+
+- type: bug
+  issue: 1516
+  description: >
+    Fix kafka log message output
+
+
+- type: added
+  issue: 1353
+  description: >
+    Add support for TLS to Redis output.
+
+
+- type: added
+  issue: 1353
+  description: >
+    Add SOCKS5 proxy support to Redis output.
+
+
+- type: added
+  issue: 1353
+  description: >
+    Failover and load balancing support in redis output.
+
+
+- type: added
+  issue: 1353
+  description: >
+    Multiple-worker per host support for redis output.
+
+
+- type: added
+  issue: 1389
+  description: >
+    Added ability to escape `${x}` in config files to avoid environment variable expansion
+
+
+- type: added
+  issue: 1373
+  description: >
+    Configuration options and CLI flags for setting the home, data and config paths.
+
+
+- type: added
+  issue: 1437
+  description: >
+    Configuration options and CLI flags for setting the default logs path.
+
+
+- type: added
+  issue: 1447
+  description: >
+    Update to Go 1.6.2
+
+
+- type: added
+  issue: 1501
+  description: >
+    Add Elasticsearch template files compatible with Elasticsearch 2.x.
+
+
+- type: added
+  issue: 1359
+  description: >
+    Add scripts for managing the dashboards of a single Beat
+
+
+- type: release
+  version: v1.2.2
+  parent: v1.2.0
+  date: ""
+
+- type: bug
+  issue: 1410
+  description: >
+    Fix race when multiple outputs access the same event with Logstash output manipulating event.
+
+
+- type: bug
+  issue: 1394
+  description: >
+    Fix go-daemon (supervisor used in init scripts) hanging when executed over SSH.
+
+
+- type: release
+  version: v1.2.1
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 1304
+  description: >
+    Require braces for environment variable expansion in config files
+
+
+- type: breaking
+  issue: 1282
+  description: >
+    Removed deprecation warning for the Redis output.
+
+
+- type: release
+  version: v5.0.0-alpha1
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 771
+  description: >
+    Run function to start a Beat now returns an error instead of directly exiting.
+
+
+- type: breaking
+  issue: 1249
+  description: >
+    The method signature of HandleFlags() was changed to allow returning an error
+
+
+- type: breaking
+  issue: 1304
+  description: >
+    Require braces for environment variable expansion in config files
+
+
+- type: bug
+  issue: 927
+  description: >
+    Logstash output will not retry events that are not JSON-encodable
+
+
+- type: added
+  issue: 805
+  description: >
+    Add option to Elasticsearch output to pass http parameters in index operations
+
+
+- type: added
+  issue: 927
+  description: >
+    Improve Logstash and Elasticsearch backoff behavior.
+
+
+- type: added
+  issue: 942
+  description: >
+    Add experimental Kafka output.
+
+
+- type: added
+  issue: 969
+  description: >
+    Add config file option to configure GOMAXPROCS.
+
+
+- type: added
+  issue: 1075
+  description: >
+    Improve shutdown handling in libbeat.
+
+
+- type: added
+  issue: 1092
+  description: >
+    Add `fields` and `fields_under_root` options under the `shipper` configuration
+
+
+- type: added
+  issue: 823
+  description: >
+    Add the ability to use a SOCKS5 proxy with the Logstash output
+
+
+- type: added
+  issue: 1249
+  description: >
+    The `-configtest` flag will now print "Config OK" to stdout on success
+
+
+- type: release
+  version: v1.2.0
+  parent: v1.1.2
+  date: ""
+
+- type: added
+  issue: 114
+  description: >
+    Add ability to override configuration settings using environment variables
+
+
+- type: added
+  issue: 736
+  description: >
+    Libbeat now always exits through a single exit method for proper cleanup and control
+
+
+- type: added
+  issue: 639
+  description: >
+    Add ability to create Elasticsearch mapping on startup
+
+
+- type: release
+  version: v1.1.2
+  parent: v1.1.1
+  date: ""
+
+- type: release
+  version: v1.1.1
+  parent: v1.1.0
+  date: ""
+
+- type: bug
+  issue: 944
+  description: >
+    Fix logstash output loop hanging in infinite loop on too many output errors.
+
+
+- type: bug
+  issue: 953
+  description: >
+    Fix critical bug in filebeat and winlogbeat potentially dropping events.
+
+
+- type: release
+  version: v1.1.0
+  parent: v1.0.1
+  date: ""
+
+- type: bug
+  issue: 516
+  description: >
+    Reduce memory usage by separate queue sizes for single events and bulk events. {pull}649[649]
+
+
+- type: bug
+  issue: 628
+  description: >
+    Set default default bulk_max_size value to 2048
+
+
+- type: added
+  issue: 1120
+  description: >
+    Add include_fields and drop_fields as part of generic filtering
+
+
+- type: added
+  issue: 630
+  description: >
+    Make logstash output compression level configurable.
+
+
+- type: added
+  issue: 684
+  description: >
+    Some publisher options refactoring in libbeat
+
+
+- type: added
+  issue: 772
+  description: >
+    Move event preprocessor applying GeoIP to packetbeat
+
+
+- type: release
+  version: v1.0.1
+  parent: v1.0.0
+  date: ""
+
+- type: release
+  version: 1.0.0
+  parent: 1.0.0-rc2
+  date: ""
+
+- type: release
+  version: 1.0.0-rc2
+  parent: 1.0.0-rc1
+  date: ""
+
+- type: release
+  version: 1.0.0-rc1
+  parent: 1.0.0-beta4
+  date: ""
+
+- type: release
+  version: 1.0.0-beta4
+  parent: 1.0.0-beta3
+  date: ""
