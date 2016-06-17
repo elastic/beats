@@ -142,6 +142,6 @@ The Elasticsearch index pattern where Kibana saves its configuration. The defaul
 ==== dir
 The output directory where the dashboards and all dependencies will be saved. The default value is `output`.
 
-NOTE: To make made it even easier for you to import and export the dashboards, we've also added support for running the
+NOTE: To make it even easier for you to import and export the dashboards, we've also added support for running the
 following commands in the Beats repository: `make import-dashboards` and `make export-dashboards`.
 
