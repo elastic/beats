@@ -32,8 +32,6 @@ include::./configuring-logstash.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
-include::reference/configuration.asciidoc[]
-
 include::./modules.asciidoc[]
 
 include::./securing-metricbeat.asciidoc[]

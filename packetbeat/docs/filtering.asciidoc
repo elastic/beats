@@ -1,8 +1,9 @@
-=== Kibana Queries and Filters
+== Kibana Queries and Filters
 
 In Kibana, you can filter transactions either by entering a search query or by clicking on elements within a visualization. 
 
-==== Creating Queries
+[float]
+=== Creating Queries
 
 The search field on the *Discover* page provides a way to query 
 a specific subset of transactions from the selected time frame.
@@ -14,7 +15,8 @@ you want to find the HTTP redirects, you can search for
 
 image:./images/kibana-query-filtering.png[Kibana query]
 
-===== String Queries
+[float]
+==== String Queries
 
 A query may consist of one or more words or a phrase. A phrase is a
 group of words surrounded by double quotation marks, such as `"test search"`.
@@ -43,7 +45,8 @@ To search for all transactions with the "chunked" encoding:
 "Transfer-Encoding: chunked"
 -----------------------------
 
-===== Field-Based Queries
+[float]
+==== Field-Based Queries
 
 Kibana allows you to search specific fields.
 
@@ -69,7 +72,8 @@ To view MySQL INSERT queries only:
 mysql.method: INSERT
 ---------------------
 
-===== Regexp Queries
+[float]
+==== Regexp Queries
 
 Kibana supports regular expression for filters and expressions. For example,
 to search for all HTTP responses with JSON as the returned value type: 
@@ -83,8 +87,8 @@ See
 http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html[Elasticsearch regexp query]
 for more details about the syntax.
 
-
-===== Range Queries
+[float]
+==== Range Queries
 
 Range queries allow a field to have values between the lower and upper bounds.
 The interval can include or exclude the bounds depending on the type of
@@ -104,7 +108,8 @@ To search for slow transactions with a response time greater than 10ms:
 responsetime: {10 TO *}
 -------------------------
 
-===== Boolean Queries
+[float]
+==== Boolean Queries
 
 Boolean operators (AND, OR, NOT) allow combining multiple sub-queries through logic operators.
 
@@ -135,7 +140,8 @@ To search for either INSERT or UPDATE MySQL queries with a response time greater
 (mysql.method: INSERT OR mysql.method: UPDATE) AND responsetime: [30 TO *]
 ---------------------------------------------------------------------------
 
-==== Creating Filters
+[float]
+=== Creating Filters
 
 In Kibana, you can also filter transactions by clicking on
 elements within a visualization. For example, to filter for all the HTTP redirects that are coming from a specific

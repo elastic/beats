@@ -10,18 +10,18 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[yaml-tips]]
-=== YAML Tips and Gotchas
+== YAML Tips and Gotchas
 
 The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax. When you edit the
 file to modify configuration settings, there are a few things that you should know.
 
 [float]
-==== Use Spaces for Indentation
+=== Use Spaces for Indentation
 
 Indentation is meaningful in YAML. Make sure that you use spaces, rather than tab characters, to indent sections. 
 
 [float]
-==== Look at the Default Config File for Structure
+=== Look at the Default Config File for Structure
 
 The best way to understand where to define a configuration option is by looking at
 the {beatname_lc}.yml configuration file. The configuration file contains most of the
@@ -29,7 +29,7 @@ configuration options that are available for {beatname_uc}. To change a configur
 simply uncomment the line and change the setting.
 
 [float]
-==== Test Your Config File
+=== Test Your Config File
 
 You can test your configuration file to verify that the structure is valid. Simply run
 {beatname_uc} in the foreground with the `-configtest` flag specified. For example: 
@@ -42,7 +42,7 @@ You can test your configuration file to verify that the structure is valid. Simp
 You'll see a message if {beatname_uc} finds an error in the file.
 
 [float]
-==== Wrap Regular Expressions in Single Quotation Marks
+=== Wrap Regular Expressions in Single Quotation Marks
 
 If you need to specify a regular expression in a YAML file, it's a good idea to wrap the regular expression in single quotation marks to work around YAML's tricky rules for string escaping. 
 

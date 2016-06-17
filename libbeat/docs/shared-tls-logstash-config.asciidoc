@@ -70,6 +70,7 @@ input {
 For more information about these options, see the
 https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[documentation] for the Beats input plugin.
 
+[float]
 [[testing-tls-logstash]]
 === Validating the Logstash Server's Certificate
 
@@ -122,6 +123,7 @@ curl: (51) SSL: certificate verification failed (result: 5)
 
 See the <<ssl-client-fails,troubleshooting docs>> for info about resolving this issue.
 
+[float]
 === Testing the Beats to Logstash Connection
 
 If you have {beatname_uc} running as a service, first stop the service. Then test your setup by running {beatname_uc} in 

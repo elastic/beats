@@ -1,13 +1,14 @@
 [[configuring-howto-metricbeat]]
-== Configuring {beatname_uc}
+= Configuring {beatname_uc}
 
+[partintro]
+--
 After following the <<metricbeat-configuration,configuration steps>> in the
 Getting Started, you might want to fine tune the behavior of {beatname_uc}.
 This section describes some common use cases for changing configuration options.
 
 For a complete description of all {beatname_uc} configuration options, see
 <<metricbeat-configuration-options>>.
-
 
 [float]
 == Basic Configuration
@@ -78,3 +79,7 @@ metricbeat:
       hosts: ["host1"]
       period: 2m
 ----
+
+--
+
+include::reference/configuration.asciidoc[]

@@ -18,6 +18,8 @@ include::./command-line.asciidoc[]
 
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
+include::./fields.asciidoc[]
+
 include::./configuring-howto.asciidoc[]
 
 include::../../libbeat/docs/yaml.asciidoc[]
@@ -28,15 +30,7 @@ include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
-include::reference/configuration.asciidoc[]
-
 include::./securing-winlogbeat.asciidoc[]
-
-include::../../libbeat/docs/https.asciidoc[]
-
-include::../../libbeat/docs/shared-tls-logstash-config.asciidoc[]
-
-include::./fields.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
