@@ -2,7 +2,6 @@ package harvester
 
 import (
 	"errors"
-	"io"
 	"os"
 
 	"golang.org/x/text/transform"
@@ -64,17 +63,9 @@ func (h *Harvester) Harvest() {
 		ts, text, bytesRead, jsonFields, err := readLine(reader)
 		if err != nil {
 			if err == errFileTruncate {
-				seeker, ok := h.file.(io.Seeker)
-				if !ok {
-					logp.Err("can not seek source")
-					return
-				}
-
 				logp.Info("File was truncated. Begin reading file from offset 0: %s", h.Path)
-
 				h.SetOffset(0)
-				seeker.Seek(h.getOffset(), os.SEEK_SET)
-				continue
+				return
 			}
 
 			logp.Info("Read line error: %s", err)

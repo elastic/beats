@@ -11,10 +11,9 @@ import (
 )
 
 type logFileReader struct {
-	fs        FileSource
-	offset    int64
-	config    logFileReaderConfig
-	truncated bool
+	fs     FileSource
+	offset int64
+	config logFileReaderConfig
 
 	lastTimeRead time.Time
 	backoff      time.Duration
@@ -60,18 +59,6 @@ func newLogFileReader(
 }
 
 func (r *logFileReader) Read(buf []byte) (int, error) {
-	if r.truncated {
-		var offset int64
-		if seeker, ok := r.fs.(io.Seeker); ok {
-			var err error
-			offset, err = seeker.Seek(0, os.SEEK_CUR)
-			if err != nil {
-				return 0, err
-			}
-		}
-		r.offset = offset
-		r.truncated = false
-	}
 
 	for {
 		select {
@@ -114,9 +101,8 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 		// handle fails if file was truncated
 		if info.Size() < r.offset {
 			logp.Debug("harvester",
-				"File was truncated as offset (%s) > size (%s). Begin reading file from offset 0: %s",
+				"File was truncated as offset (%s) > size (%s): %s",
 				r.offset, info.Size(), r.fs.Name())
-			r.truncated = true
 			return n, errFileTruncate
 		}
 
