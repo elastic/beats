@@ -31,6 +31,7 @@ List of standardised words and units across all metricsets. On the left are the 
 * day: days, d
 * max: maximumg
 * min: minimum
+* norm: normalized
 * pct: precentage
 * request: req
 * sec: seconds, second, s

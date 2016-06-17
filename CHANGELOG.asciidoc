@@ -15,6 +15,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 *Affecting all Beats*
 
 *Metricbeat*
+- Export load averages under load.avg instead of load. {issue}1868[1868]
 
 *Packetbeat*
 
@@ -51,6 +52,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 *Affecting all Beats*
 
 *Metricbeat*
+- Export load / cores under load.norm. {issue}1868[1868]
 
 *Packetbeat*
 

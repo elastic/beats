@@ -1061,14 +1061,31 @@
                 },
                 "load": {
                   "properties": {
-                    "1": {
-                      "type": "float"
+                    "avg": {
+                      "properties": {
+                        "1": {
+                          "type": "float"
+                        },
+                        "15": {
+                          "type": "float"
+                        },
+                        "5": {
+                          "type": "float"
+                        }
+                      }
                     },
-                    "15": {
-                      "type": "float"
-                    },
-                    "5": {
-                      "type": "float"
+                    "norm": {
+                      "properties": {
+                        "1": {
+                          "type": "float"
+                        },
+                        "15": {
+                          "type": "float"
+                        },
+                        "5": {
+                          "type": "float"
+                        }
+                      }
                     }
                   }
                 },

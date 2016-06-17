@@ -93,15 +93,27 @@
       description: >
         Load averages.
       fields:
-        - name: "1"
+        - name: "avg.1"
           type: float
           description: >
             Load average for the last minute.
-        - name: "5"
+        - name: "avg.5"
           type: float
           description: >
             Load average for the last 5 minutes.
-        - name: "15"
+        - name: "avg.15"
           type: float
           description: >
             Load average for the last 15 minutes.
+        - name: "norm.1"
+          type: float
+          description: >
+            Load divided by the number of cores for the last minute.
+        - name: "norm.5"
+          type: float
+          description: >
+            Load divided by the number of cores for the last 5 minutes.
+        - name: "norm.15"
+          type: float
+          description: >
+            Load divided by the number of cores for the last 15 minutes.
