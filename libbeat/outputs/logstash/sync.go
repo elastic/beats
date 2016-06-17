@@ -3,7 +3,7 @@ package logstash
 import (
 	"time"
 
-	"github.com/urso/go-lumber/client/v2"
+	"github.com/elastic/go-lumber/client/v2"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"

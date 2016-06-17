@@ -4,10 +4,11 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/elastic/go-lumber/client/v2"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/urso/go-lumber/client/v2"
 )
 
 type asyncClient struct {
