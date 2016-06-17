@@ -18,8 +18,6 @@ include::./command-line.asciidoc[]
 
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
-include::./fields.asciidoc[]
-
 include::./configuring-howto.asciidoc[]
 
 include::../../libbeat/docs/yaml.asciidoc[]
@@ -37,6 +35,8 @@ include::./capturing.asciidoc[]
 include::./thrift.asciidoc[]
 
 include::./maintaining-topology.asciidoc[]
+
+include::./fields.asciidoc[]
 
 include::./securing-packetbeat.asciidoc[]
 

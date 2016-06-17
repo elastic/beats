@@ -18,8 +18,6 @@ include::./command-line.asciidoc[]
 
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
-include::./fields.asciidoc[]
-
 include::./configuring-howto.asciidoc[]
 
 include::../../libbeat/docs/yaml.asciidoc[]
@@ -35,6 +33,8 @@ include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
 include::./multiple-prospectors.asciidoc[]
+
+include::./fields.asciidoc[]
 
 include::./securing-filebeat.asciidoc[]
 

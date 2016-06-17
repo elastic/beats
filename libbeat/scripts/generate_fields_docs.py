@@ -14,7 +14,7 @@ def document_fields(output, section, sections, path):
         output.write("[float]\n")
 
     if "description" in section:
-        output.write("=== {} Fields\n\n".format(section["name"]))
+        output.write("== {} Fields\n\n".format(section["name"]))
         output.write("{}\n\n".format(section["description"]))
 
     if "fields" not in section or not section["fields"]:
@@ -39,7 +39,7 @@ def document_field(output, field, path):
     if "path" not in field:
         field["path"] = path
 
-    output.write("==== {}\n\n".format(field["path"]))
+    output.write("[float]\n=== {}\n\n".format(field["path"]))
 
     if "type" in field:
         output.write("type: {}\n\n".format(field["type"]))
@@ -64,8 +64,11 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-== Exported Fields
+= Exported Fields
 
+[partintro]
+
+--
 This document describes the fields that are exported by {beat}. They are
 grouped in the following categories:
 
@@ -86,14 +89,13 @@ grouped in the following categories:
 
     for key in sorted(sections):
         output.write("* <<exported-fields-{}>>\n".format(key))
-    output.write("\n")
+    output.write("\n--\n")
 
     # Sort alphabetically by key
     for section in sorted(docs["fields"], key=lambda field: field["key"]):
         section["name"] = section["title"]
         section["anchor"] = section["key"]
         document_fields(output, section, sections, "")
-
 
 if __name__ == "__main__":
 
