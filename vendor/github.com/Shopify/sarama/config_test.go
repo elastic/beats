@@ -8,3 +8,11 @@ func TestDefaultConfigValidates(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestClientIDValidates(t *testing.T) {
+	config := NewConfig()
+	config.ClientID = "foo:bar"
+	if err := config.Validate(); string(err.(ConfigurationError)) != "ClientID is invalid" {
+		t.Error("Expected invalid ClientID, got ", err)
+	}
+}

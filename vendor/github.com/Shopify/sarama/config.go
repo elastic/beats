@@ -2,8 +2,11 @@ package sarama
 
 import (
 	"crypto/tls"
+	"regexp"
 	"time"
 )
+
+var validID *regexp.Regexp = regexp.MustCompile(`\A[A-Za-z0-9._-]*\z`)
 
 // Config is used to pass multiple configuration options to Sarama's constructors.
 type Config struct {
@@ -28,6 +31,17 @@ type Config struct {
 			// The TLS configuration to use for secure connections if
 			// enabled (defaults to nil).
 			Config *tls.Config
+		}
+
+		// SASL based authentication with broker. While there are multiple SASL authentication methods
+		// the current implementation is limited to plaintext (SASL/PLAIN) authentication
+		SASL struct {
+			// Whether or not to use SASL authentication when connecting to the broker
+			// (defaults to false).
+			Enable bool
+			//username and password for SASL/PLAIN authentication
+			User     string
+			Password string
 		}
 
 		// KeepAlive specifies the keep-alive period for an active network connection.
@@ -121,6 +135,13 @@ type Config struct {
 
 	// Consumer is the namespace for configuration related to consuming messages,
 	// used by the Consumer.
+	//
+	// Note that Sarama's Consumer type does not currently support automatic
+	// consumer-group rebalancing and offset tracking.  For Zookeeper-based
+	// tracking (Kafka 0.8.2 and earlier), the https://github.com/wvanbergen/kafka
+	// library builds on Sarama to add this support. For Kafka-based tracking
+	// (Kafka 0.9 and later), the https://github.com/bsm/sarama-cluster library
+	// builds on Sarama to add this support.
 	Consumer struct {
 		Retry struct {
 			// How long to wait after a failing to read from a partition before
@@ -183,6 +204,14 @@ type Config struct {
 			// The initial offset to use if no offset was previously committed.
 			// Should be OffsetNewest or OffsetOldest. Defaults to OffsetNewest.
 			Initial int64
+
+			// The retention duration for committed offsets. If zero, disabled
+			// (in which case the `offsets.retention.minutes` option on the
+			// broker will be used).  Kafka only supports precision up to
+			// milliseconds; nanoseconds will be truncated. Requires Kafka
+			// broker version 0.9.0 or later.
+			// (default is 0: disabled).
+			Retention time.Duration
 		}
 	}
 
@@ -239,6 +268,14 @@ func (c *Config) Validate() error {
 	if c.Net.TLS.Enable == false && c.Net.TLS.Config != nil {
 		Logger.Println("Net.TLS is disabled but a non-nil configuration was provided.")
 	}
+	if c.Net.SASL.Enable == false {
+		if c.Net.SASL.User != "" {
+			Logger.Println("Net.SASL is disabled but a non-empty username was provided.")
+		}
+		if c.Net.SASL.Password != "" {
+			Logger.Println("Net.SASL is disabled but a non-empty password was provided.")
+		}
+	}
 	if c.Producer.RequiredAcks > 1 {
 		Logger.Println("Producer.RequiredAcks > 1 is deprecated and will raise an exception with kafka >= 0.8.2.0.")
 	}
@@ -257,6 +294,9 @@ func (c *Config) Validate() error {
 	if c.Consumer.MaxWaitTime%time.Millisecond != 0 {
 		Logger.Println("Consumer.MaxWaitTime only supports millisecond precision; nanoseconds will be truncated.")
 	}
+	if c.Consumer.Offsets.Retention%time.Millisecond != 0 {
+		Logger.Println("Consumer.Offsets.Retention only supports millisecond precision; nanoseconds will be truncated.")
+	}
 	if c.ClientID == "sarama" {
 		Logger.Println("ClientID is the default of 'sarama', you should consider setting it to something application-specific.")
 	}
@@ -273,6 +313,10 @@ func (c *Config) Validate() error {
 		return ConfigurationError("Net.WriteTimeout must be > 0")
 	case c.Net.KeepAlive < 0:
 		return ConfigurationError("Net.KeepAlive must be >= 0")
+	case c.Net.SASL.Enable == true && c.Net.SASL.User == "":
+		return ConfigurationError("Net.SASL.User must not be empty when SASL is enabled")
+	case c.Net.SASL.Enable == true && c.Net.SASL.Password == "":
+		return ConfigurationError("Net.SASL.Password must not be empty when SASL is enabled")
 	}
 
 	// validate the Metadata values
@@ -336,6 +380,8 @@ func (c *Config) Validate() error {
 	switch {
 	case c.ChannelBufferSize < 0:
 		return ConfigurationError("ChannelBufferSize must be >= 0")
+	case !validID.MatchString(c.ClientID):
+		return ConfigurationError("ClientID is invalid")
 	}
 
 	return nil

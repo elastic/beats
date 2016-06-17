@@ -5,14 +5,21 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/urso/go-lumber/server"
 )
+
+type rateLimiter struct {
+	ticker *time.Ticker
+	ch     chan time.Time
+}
 
 func main() {
 	bind := flag.String("bind", ":5044", "[host]:port to listen on")
 	v1 := flag.Bool("v1", false, "Enable protocol version v1")
 	v2 := flag.Bool("v2", false, "Enable protocol version v2")
+	limit := flag.Int("rate", 0, "max batch ack rate")
 	flag.Parse()
 
 	s, err := server.ListenAndServe(*bind,
@@ -24,15 +31,59 @@ func main() {
 
 	log.Println("tcp server up")
 
+	var rl *rateLimiter
+	if *limit > 0 {
+		rl = newRateLimiter(*limit, (*limit)*2, time.Second)
+	}
+
 	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, os.Interrupt)
+	signal.Notify(sig, os.Interrupt, os.Kill)
 	go func() {
 		<-sig
+		if rl != nil {
+			rl.Stop()
+		}
 		_ = s.Close()
+		os.Exit(0)
 	}()
 
-	for batch := range s.ReceiveChan() {
-		log.Printf("Received batch of %v events\n", len(batch.Events))
-		batch.ACK()
+	if rl == nil {
+		for batch := range s.ReceiveChan() {
+			log.Printf("Received batch of %v events\n", len(batch.Events))
+			batch.ACK()
+		}
+	} else {
+		for batch := range s.ReceiveChan() {
+			if !rl.Wait() {
+				break
+			}
+			log.Printf("Received batch of %v events\n", len(batch.Events))
+			batch.ACK()
+		}
 	}
+}
+
+func newRateLimiter(limit, burstLimit int, unit time.Duration) *rateLimiter {
+	interval := time.Duration(uint64(unit) / uint64(limit))
+	ticker := time.NewTicker(interval)
+	ch := make(chan time.Time, burstLimit)
+	r := &rateLimiter{ticker: ticker, ch: ch}
+
+	go func() {
+		defer close(ch)
+		for t := range ticker.C {
+			ch <- t
+		}
+	}()
+
+	return r
+}
+
+func (r *rateLimiter) Stop() {
+	r.ticker.Stop()
+}
+
+func (r *rateLimiter) Wait() bool {
+	_, ok := <-r.ch
+	return ok
 }

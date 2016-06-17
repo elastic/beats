@@ -58,6 +58,9 @@ func TestSI(t *testing.T) {
 		// special case
 		{"1F", 1000 * 1000, "1 MF"},
 		{"1F", 1e6, "1 MF"},
+
+		// negative number
+		{"-100 F", -100, "-100 F"},
 	}
 
 	for _, test := range tests {

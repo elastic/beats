@@ -94,8 +94,8 @@ func (f flakyEncoder) Encode() ([]byte, error) {
 }
 
 func TestAsyncProducer(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader := newMockBroker(t, 2)
+	seedBroker := NewMockBroker(t, 1)
+	leader := NewMockBroker(t, 2)
 
 	metadataResponse := new(MetadataResponse)
 	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
@@ -140,8 +140,8 @@ func TestAsyncProducer(t *testing.T) {
 }
 
 func TestAsyncProducerMultipleFlushes(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader := newMockBroker(t, 2)
+	seedBroker := NewMockBroker(t, 1)
+	leader := NewMockBroker(t, 2)
 
 	metadataResponse := new(MetadataResponse)
 	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
@@ -175,9 +175,9 @@ func TestAsyncProducerMultipleFlushes(t *testing.T) {
 }
 
 func TestAsyncProducerMultipleBrokers(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader0 := newMockBroker(t, 2)
-	leader1 := newMockBroker(t, 3)
+	seedBroker := NewMockBroker(t, 1)
+	leader0 := NewMockBroker(t, 2)
+	leader1 := NewMockBroker(t, 3)
 
 	metadataResponse := new(MetadataResponse)
 	metadataResponse.AddBroker(leader0.Addr(), leader0.BrokerID())
@@ -215,8 +215,8 @@ func TestAsyncProducerMultipleBrokers(t *testing.T) {
 }
 
 func TestAsyncProducerCustomPartitioner(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader := newMockBroker(t, 2)
+	seedBroker := NewMockBroker(t, 1)
+	leader := NewMockBroker(t, 2)
 
 	metadataResponse := new(MetadataResponse)
 	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
@@ -257,9 +257,9 @@ func TestAsyncProducerCustomPartitioner(t *testing.T) {
 }
 
 func TestAsyncProducerFailureRetry(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader1 := newMockBroker(t, 2)
-	leader2 := newMockBroker(t, 3)
+	seedBroker := NewMockBroker(t, 1)
+	leader1 := NewMockBroker(t, 2)
+	leader2 := NewMockBroker(t, 3)
 
 	metadataLeader1 := new(MetadataResponse)
 	metadataLeader1.AddBroker(leader1.Addr(), leader1.BrokerID())
@@ -305,8 +305,8 @@ func TestAsyncProducerFailureRetry(t *testing.T) {
 }
 
 func TestAsyncProducerEncoderFailures(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader := newMockBroker(t, 2)
+	seedBroker := NewMockBroker(t, 1)
+	leader := NewMockBroker(t, 2)
 
 	metadataResponse := new(MetadataResponse)
 	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
@@ -344,8 +344,8 @@ func TestAsyncProducerEncoderFailures(t *testing.T) {
 // producer reconnects to it and continues sending messages.
 func TestAsyncProducerBrokerBounce(t *testing.T) {
 	// Given
-	seedBroker := newMockBroker(t, 1)
-	leader := newMockBroker(t, 2)
+	seedBroker := NewMockBroker(t, 1)
+	leader := NewMockBroker(t, 2)
 	leaderAddr := leader.Addr()
 
 	metadataResponse := new(MetadataResponse)
@@ -370,7 +370,7 @@ func TestAsyncProducerBrokerBounce(t *testing.T) {
 
 	// When: a broker connection gets reset by a broker (network glitch, restart, you name it).
 	leader.Close()                               // producer should get EOF
-	leader = newMockBrokerAddr(t, 2, leaderAddr) // start it up again right away for giggles
+	leader = NewMockBrokerAddr(t, 2, leaderAddr) // start it up again right away for giggles
 	seedBroker.Returns(metadataResponse)         // tell it to go to broker 2 again
 
 	// Then: a produced message goes through the new broker connection.
@@ -384,9 +384,9 @@ func TestAsyncProducerBrokerBounce(t *testing.T) {
 }
 
 func TestAsyncProducerBrokerBounceWithStaleMetadata(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader1 := newMockBroker(t, 2)
-	leader2 := newMockBroker(t, 3)
+	seedBroker := NewMockBroker(t, 1)
+	leader1 := NewMockBroker(t, 2)
+	leader2 := NewMockBroker(t, 3)
 
 	metadataLeader1 := new(MetadataResponse)
 	metadataLeader1.AddBroker(leader1.Addr(), leader1.BrokerID())
@@ -427,9 +427,9 @@ func TestAsyncProducerBrokerBounceWithStaleMetadata(t *testing.T) {
 }
 
 func TestAsyncProducerMultipleRetries(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader1 := newMockBroker(t, 2)
-	leader2 := newMockBroker(t, 3)
+	seedBroker := NewMockBroker(t, 1)
+	leader1 := NewMockBroker(t, 2)
+	leader2 := NewMockBroker(t, 3)
 
 	metadataLeader1 := new(MetadataResponse)
 	metadataLeader1.AddBroker(leader1.Addr(), leader1.BrokerID())
@@ -484,8 +484,8 @@ func TestAsyncProducerMultipleRetries(t *testing.T) {
 func TestAsyncProducerOutOfRetries(t *testing.T) {
 	t.Skip("Enable once bug #294 is fixed.")
 
-	seedBroker := newMockBroker(t, 1)
-	leader := newMockBroker(t, 2)
+	seedBroker := NewMockBroker(t, 1)
+	leader := NewMockBroker(t, 2)
 
 	metadataResponse := new(MetadataResponse)
 	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
@@ -539,8 +539,8 @@ func TestAsyncProducerOutOfRetries(t *testing.T) {
 }
 
 func TestAsyncProducerRetryWithReferenceOpen(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader := newMockBroker(t, 2)
+	seedBroker := NewMockBroker(t, 1)
+	leader := NewMockBroker(t, 2)
 	leaderAddr := leader.Addr()
 
 	metadataResponse := new(MetadataResponse)
@@ -575,7 +575,7 @@ func TestAsyncProducerRetryWithReferenceOpen(t *testing.T) {
 
 	// reboot the broker (the producer will get EOF on its existing connection)
 	leader.Close()
-	leader = newMockBrokerAddr(t, 2, leaderAddr)
+	leader = NewMockBrokerAddr(t, 2, leaderAddr)
 
 	// send another message on partition 0 to trigger the EOF and retry
 	producer.Input() <- &ProducerMessage{Topic: "my_topic", Key: nil, Value: StringEncoder(TestMessage)}
@@ -596,8 +596,8 @@ func TestAsyncProducerRetryWithReferenceOpen(t *testing.T) {
 }
 
 func TestAsyncProducerFlusherRetryCondition(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader := newMockBroker(t, 2)
+	seedBroker := NewMockBroker(t, 1)
+	leader := NewMockBroker(t, 2)
 
 	metadataResponse := new(MetadataResponse)
 	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
@@ -638,7 +638,7 @@ func TestAsyncProducerFlusherRetryCondition(t *testing.T) {
 	time.Sleep(50 * time.Millisecond)
 
 	leader.SetHandlerByMap(map[string]MockResponse{
-		"ProduceRequest": newMockProduceResponse(t).
+		"ProduceRequest": NewMockProduceResponse(t).
 			SetError("my_topic", 0, ErrNoError),
 	})
 
@@ -661,8 +661,8 @@ func TestAsyncProducerFlusherRetryCondition(t *testing.T) {
 }
 
 func TestAsyncProducerRetryShutdown(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader := newMockBroker(t, 2)
+	seedBroker := NewMockBroker(t, 1)
+	leader := NewMockBroker(t, 2)
 
 	metadataLeader := new(MetadataResponse)
 	metadataLeader.AddBroker(leader.Addr(), leader.BrokerID())

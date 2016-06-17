@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"syscall"
 	"time"
 	"unsafe"
@@ -207,6 +208,10 @@ func (self *FileSystemList) Get() error {
 		self.List = append(self.List, d)
 	}
 	return nil
+}
+
+func (self *FDUsage) Get() error {
+	return &ErrNotImplemented{runtime.GOOS}
 }
 
 // Retrieves the process identifier for each process object in the system.
@@ -464,6 +469,10 @@ func (self *ProcArgs) Get(pid int) error {
 
 func (self *ProcExe) Get(pid int) error {
 	return notImplemented()
+}
+
+func (self *ProcFDUsage) Get(pid int) error {
+	return &ErrNotImplemented{runtime.GOOS}
 }
 
 func (self *FileSystemUsage) Get(path string) error {

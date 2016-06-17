@@ -2,6 +2,7 @@ Redigo
 ======
 
 [![Build Status](https://travis-ci.org/garyburd/redigo.svg?branch=master)](https://travis-ci.org/garyburd/redigo)
+[![GoDoc](https://godoc.org/github.com/garyburd/redigo/redis?status.svg)](https://godoc.org/github.com/garyburd/redigo/redis)
 
 Redigo is a [Go](http://golang.org/) client for the [Redis](http://redis.io/) database.
 
@@ -35,13 +36,13 @@ Related Projects
 
 - [rafaeljusto/redigomock](https://godoc.org/github.com/rafaeljusto/redigomock) - A mock library for Redigo.
 - [chasex/redis-go-cluster](https://github.com/chasex/redis-go-cluster) - A Redis cluster client implementation.
+- [FZambia/go-sentinel](https://github.com/FZambia/go-sentinel) - Redis Sentinel support for Redigo
+- [PuerkitoBio/redisc](https://github.com/PuerkitoBio/redisc) - Redis Cluster client built on top of Redigo
 
 Contributing
 ------------
 
-Gary is looking for someone to take over maintenance of this project. If you are interested, contact Gary at the email address listed on his GitHub profile page.
-
-PRs for major features will not be accepted until a new maintainer is found.  Bug reports and PRs for bug fixes are welcome.
+Send email to Gary Burd (address in GitHub profile) before doing any work on Redigo.
 
 License
 -------
