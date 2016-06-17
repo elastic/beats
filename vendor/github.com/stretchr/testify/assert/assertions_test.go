@@ -571,6 +571,7 @@ func Test_isEmpty(t *testing.T) {
 	True(t, isEmpty(false))
 	True(t, isEmpty(map[string]string{}))
 	True(t, isEmpty(new(time.Time)))
+	True(t, isEmpty(time.Time{}))
 	True(t, isEmpty(make(chan struct{})))
 	False(t, isEmpty("something"))
 	False(t, isEmpty(errors.New("something")))
@@ -587,7 +588,8 @@ func TestEmpty(t *testing.T) {
 	mockT := new(testing.T)
 	chWithValue := make(chan struct{}, 1)
 	chWithValue <- struct{}{}
-	var ti *time.Time
+	var tiP *time.Time
+	var tiNP time.Time
 	var s *string
 	var f *os.File
 
@@ -599,7 +601,8 @@ func TestEmpty(t *testing.T) {
 	True(t, Empty(mockT, make(chan struct{})), "Channel without values is empty")
 	True(t, Empty(mockT, s), "Nil string pointer is empty")
 	True(t, Empty(mockT, f), "Nil os.File pointer is empty")
-	True(t, Empty(mockT, ti), "Nil time.Time pointer is empty")
+	True(t, Empty(mockT, tiP), "Nil time.Time pointer is empty")
+	True(t, Empty(mockT, tiNP), "time.Time is empty")
 
 	False(t, Empty(mockT, "something"), "Non Empty string is not empty")
 	False(t, Empty(mockT, errors.New("something")), "Non nil object is not empty")
@@ -827,10 +830,11 @@ func TestInEpsilon(t *testing.T) {
 		{-2.2, -2.1, 0.1},
 		{uint64(100), uint8(101), 0.01},
 		{0.1, -0.1, 2},
+		{0.1, 0, 2},
 	}
 
 	for _, tc := range cases {
-		True(t, InEpsilon(mockT, tc.a, tc.b, tc.epsilon, "Expected %V and %V to have a relative difference of %v", tc.a, tc.b, tc.epsilon))
+		True(t, InEpsilon(t, tc.a, tc.b, tc.epsilon, "Expected %V and %V to have a relative difference of %v", tc.a, tc.b, tc.epsilon), "test: %q", tc)
 	}
 
 	cases = []struct {
@@ -844,6 +848,7 @@ func TestInEpsilon(t *testing.T) {
 		{2.1, -2.2, 1},
 		{2.1, "bla-bla", 0},
 		{0.1, -0.1, 1.99},
+		{0, 0.1, 2}, // expected must be different to zero
 	}
 
 	for _, tc := range cases {
@@ -1086,4 +1091,32 @@ func TestDiffEmptyCases(t *testing.T) {
 	Equal(t, "", diff(1, 2))
 	Equal(t, "", diff(1, 2))
 	Equal(t, "", diff([]int{1}, []bool{true}))
+}
+
+type mockTestingT struct {
+}
+
+func (m *mockTestingT) Errorf(format string, args ...interface{}) {}
+
+func TestFailNowWithPlainTestingT(t *testing.T) {
+	mockT := &mockTestingT{}
+
+	Panics(t, func() {
+		FailNow(mockT, "failed")
+	}, "should panic since mockT is missing FailNow()")
+}
+
+type mockFailNowTestingT struct {
+}
+
+func (m *mockFailNowTestingT) Errorf(format string, args ...interface{}) {}
+
+func (m *mockFailNowTestingT) FailNow() {}
+
+func TestFailNowWithFullTestingT(t *testing.T) {
+	mockT := &mockFailNowTestingT{}
+
+	NotPanics(t, func() {
+		FailNow(mockT, "failed")
+	}, "should call mockT.FailNow() rather than panicking")
 }

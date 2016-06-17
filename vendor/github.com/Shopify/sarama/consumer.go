@@ -41,9 +41,10 @@ func (ce ConsumerErrors) Error() string {
 // on a consumer to avoid leaks, it will not be garbage-collected automatically when it passes out of
 // scope.
 //
-// Sarama's Consumer type does not currently support automatic consumer group rebalancing and offset tracking,
-// however the https://github.com/wvanbergen/kafka library builds on Sarama to add this support. We plan
-// to properly integrate this functionality at a later date.
+// Sarama's Consumer type does not currently support automatic consumer-group rebalancing and offset tracking.
+// For Zookeeper-based tracking (Kafka 0.8.2 and earlier), the https://github.com/wvanbergen/kafka library
+// builds on Sarama to add this support. For Kafka-based tracking (Kafka 0.9 and later), the
+// https://github.com/bsm/sarama-cluster library builds on Sarama to add this support.
 type Consumer interface {
 
 	// Topics returns the set of available topics as retrieved from the cluster
@@ -642,7 +643,7 @@ func (bc *brokerConsumer) handleResponses() {
 			Logger.Printf("consumer/%s/%d shutting down because %s\n", child.topic, child.partition, result)
 			close(child.trigger)
 			delete(bc.subscriptions, child)
-		case ErrUnknownTopicOrPartition, ErrNotLeaderForPartition, ErrLeaderNotAvailable:
+		case ErrUnknownTopicOrPartition, ErrNotLeaderForPartition, ErrLeaderNotAvailable, ErrReplicaNotAvailable:
 			// not an error, but does need redispatching
 			Logger.Printf("consumer/broker/%d abandoned subscription to %s/%d because %s\n",
 				bc.broker.ID(), child.topic, child.partition, result)

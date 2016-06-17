@@ -169,9 +169,10 @@ func (d *compressor) writeBlockSkip(tok tokens, index int, eof bool) error {
 	if index > 0 || eof {
 		if d.blockStart <= index {
 			window := d.window[d.blockStart:index]
-			// If we removed less than a 64th of all literals
-			// we huffman compress the block.
-			if tok.n > len(window)-(tok.n>>6) {
+			if tok.n == len(window) && !eof {
+				d.writeStoredBlock(window)
+				// If we removed less than 10 literals, huffman compress the block.
+			} else if tok.n > len(window)-10 {
 				d.w.writeBlockHuff(eof, window)
 			} else {
 				// Write a dynamic huffman block.

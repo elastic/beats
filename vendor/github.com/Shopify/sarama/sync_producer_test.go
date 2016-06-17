@@ -7,8 +7,8 @@ import (
 )
 
 func TestSyncProducer(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader := newMockBroker(t, 2)
+	seedBroker := NewMockBroker(t, 1)
+	leader := NewMockBroker(t, 2)
 
 	metadataResponse := new(MetadataResponse)
 	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
@@ -55,8 +55,8 @@ func TestSyncProducer(t *testing.T) {
 }
 
 func TestConcurrentSyncProducer(t *testing.T) {
-	seedBroker := newMockBroker(t, 1)
-	leader := newMockBroker(t, 2)
+	seedBroker := NewMockBroker(t, 1)
+	leader := NewMockBroker(t, 2)
 
 	metadataResponse := new(MetadataResponse)
 	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
@@ -98,7 +98,7 @@ func TestConcurrentSyncProducer(t *testing.T) {
 }
 
 func TestSyncProducerToNonExistingTopic(t *testing.T) {
-	broker := newMockBroker(t, 1)
+	broker := NewMockBroker(t, 1)
 
 	metadataResponse := new(MetadataResponse)
 	metadataResponse.AddBroker(broker.Addr(), broker.BrokerID())

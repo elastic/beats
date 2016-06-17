@@ -126,7 +126,7 @@ func (c *Consumer) SetTopicMetadata(metadata map[string][]int32) {
 
 // ExpectConsumePartition will register a topic/partition, so you can set expectations on it.
 // The registered PartitionConsumer will be returned, so you can set expectations
-// on it using method chanining. Once a topic/partition is registered, you are
+// on it using method chaining. Once a topic/partition is registered, you are
 // expected to start consuming it using ConsumePartition. If that doesn't happen,
 // an error will be written to the error reporter once the mock consumer is closed. It will
 // also expect that the

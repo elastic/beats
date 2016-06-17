@@ -6,8 +6,8 @@ os: Windows Server 2012 R2
 
 # Environment variables
 environment:
-  GOVERSION: 1.5.3
-  GOROOT: c:\go1.5.3
+  GOVERSION: 1.6.2
+  GOROOT: c:\go1.6.2
   GOPATH: c:\gopath
 
 # Custom clone folder (variables are not expanded here).
@@ -17,7 +17,7 @@ clone_folder: c:\gopath\src\github.com\elastic\gosigar
 cache:
 - C:\ProgramData\chocolatey\bin -> .appveyor.yml
 - C:\ProgramData\chocolatey\lib -> .appveyor.yml
-- C:\go1.5.3 -> .appveyor.yml
+- C:\go1.6.2 -> .appveyor.yml
 - C:\tools\mingw64 -> .appveyor.yml
 
 # Scripts that run after cloning repository
@@ -32,7 +32,6 @@ install:
       }
   - set PATH=C:\tools\mingw64\bin;%GOROOT%\bin;%PATH%
   - set PATH=%GOPATH%\bin;%PATH%
-  - set GO15VENDOREXPERIMENT=1
   - go version
   - go env
   - python --version
