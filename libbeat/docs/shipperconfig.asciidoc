@@ -11,9 +11,9 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-shipper]]
-=== Top level configuration options
+=== General Configuration
 
-The top level section contains configuration options for the Beat and some
+The general section contains configuration options for the Beat and some
 general settings that control its behaviour.
 
 Here is an example configuration:
@@ -46,7 +46,7 @@ topology_expire: 15
 
 ------------------------------------------------------------------------------
 
-==== Top Level Options
+==== General Options
 
 You can specify the following options:
 

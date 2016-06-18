@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-path]]
-=== Path
+=== Paths Configuration
 
 The `path` section contains configuration options that define where the Beat
 looks for its files. For example, all Beats look for the Elasticsearch
