@@ -7,7 +7,7 @@ import (
 	"expvar"
 	"time"
 
-	"github.com/urso/go-lumber/log"
+	"github.com/elastic/go-lumber/log"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"

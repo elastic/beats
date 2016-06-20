@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/urso/go-lumber/server/v2"
+
+	"github.com/elastic/go-lumber/server/v2"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"

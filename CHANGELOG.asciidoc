@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 *Affecting all Beats*
 - Reset backoff factor on partial ACK. {issue}1803[1803]
 - Fix beats load balancer deadlock if max_retries: -1 or publish_async is enabled in filebeat. {issue}1829[1829]
+- Fix logstash output with pipelining mode enabled not reconnecting. {issue}1876[1876]
 
 *Metricbeat*
 - Fix the CPU values returned for each core. {issue}1863[1863]

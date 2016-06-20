@@ -68,8 +68,8 @@ import:
   version: v0.7.0
 - package: github.com/shirou/gopsutil
   version: v2.0.0
-- package: github.com/urso/go-lumber
-  version: 44efc001f4d116bbbb3e135ab8f9de1a4cbbf539
+- package: github.com/elastic/go-lumber
+  version: v0.1.0
   subpackages:
   - /lj
   - /log
