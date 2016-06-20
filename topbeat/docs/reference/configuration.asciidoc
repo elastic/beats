@@ -16,7 +16,7 @@ configuration settings, you need to restart Topbeat to pick up the changes.
 * <<kafka-output>>
 * <<file-output>>
 * <<console-output>>
-* <<configuration-shipper>>
+* <<configuration-general>>
 * <<configuration-path>>
 * <<configuration-logging>>
 * <<configuration-run-options>>

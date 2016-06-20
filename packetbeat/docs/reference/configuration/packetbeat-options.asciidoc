@@ -720,7 +720,7 @@ periodically afterwards, it scans the process table for
 processes that match the values specified for this option. The match is done against the
 process' command line as read from `/proc/<pid>/cmdline`.
 
-include::../../../../libbeat/docs/shipperconfig.asciidoc[]
+include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
 include::../../../../libbeat/docs/filteringconfig.asciidoc[]
 

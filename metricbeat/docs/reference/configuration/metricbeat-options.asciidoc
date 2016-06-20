@@ -75,7 +75,7 @@ List of tags
 
 Dict of fields
 
-include::../../../../libbeat/docs/shipperconfig.asciidoc[]
+include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
 include::../../../../libbeat/docs/filteringconfig.asciidoc[]
 

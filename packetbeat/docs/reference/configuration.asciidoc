@@ -12,7 +12,7 @@ configuration settings, you need to restart Packetbeat to pick up the changes.
 * <<configuration-flows>>
 * <<configuration-protocols>>
 * <<configuration-processes>>
-* <<configuration-shipper>>
+* <<configuration-general>>
 * <<configuration-filter>>
 * <<elasticsearch-output>>
 * <<logstash-output>>
