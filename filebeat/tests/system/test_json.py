@@ -205,11 +205,12 @@ class Test(BaseTest):
         assert output[2]["json_error"] == \
             "@timestamp not overwritten (not string)"
 
-        assert output[3]["json_error"] is None, output[3]["json_error"]
-        assert output[3]["@timestamp"] == "2016-04-05T18:47:18.444+00:00", output[3]["@timestamp"]
+        assert "json_error" not in output[3]
+        assert output[3]["@timestamp"] == "2016-04-05T18:47:18.444Z", output[3]["@timestamp"]
 
-        assert output[4]["json_error"] is None, output[4]["json_error"]
-        assert output[4]["@timestamp"] == "2016-04-05T18:47:18+00:00", output[4]["@timestamp"]
+        assert "json_error" not in output[4]
+        assert output[4]["@timestamp"] == "2016-04-05T18:47:18.000Z", output[4]["@timestamp"]
+
     def test_type_in_message(self):
         """
         If overwrite_keys is true and type is in the message, we have to

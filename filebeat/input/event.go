@@ -69,14 +69,15 @@ func mergeJSONFields(f *FileEvent, event common.MapStr) {
 						event[jsonErrorKey] = "@timestamp not overwritten (not string)"
 						continue
 					}
-					// @timestamp must be of time common.Time
-					ts, err := common.ParseTime(vstr)
+
+					// @timestamp must be of format RFC3339
+					ts, err := time.Parse(time.RFC3339, vstr)
 					if err != nil {
 						logp.Err("JSON: Won't overwrite @timestamp because of parsing error: %v", err)
 						event[jsonErrorKey] = fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr)
 						continue
 					}
-					event[k] = ts
+					event[k] = common.Time(ts)
 				} else if k == "type" {
 					vstr, ok := v.(string)
 					if !ok {
