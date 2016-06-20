@@ -1,9 +1,0 @@
-name: sarama
-
-up:
-  - go: 1.6.2
-
-commands:
-  test:
-    run: make test
-    desc: 'run unit tests'
