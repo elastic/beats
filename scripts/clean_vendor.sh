@@ -3,7 +3,7 @@
 # Removes unncessary files from the vendor directories
 #
 # A list for files to be removed is used instead of excluding files.
-# The reason is that this that this makes the setup simpler and prevents
+# The reason is that this makes the setup simpler and prevents
 # from removing files by accident
 #
 # In general it should always be checked manually which files were removed.
