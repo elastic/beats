@@ -1,6 +1,6 @@
 BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
-BEATS=packetbeat topbeat filebeat winlogbeat metricbeat
+BEATS=packetbeat filebeat winlogbeat metricbeat
 PROJECTS=libbeat ${BEATS}
 
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
@@ -28,7 +28,6 @@ coverage-report:
 	# Collects all coverage files and skips top line with mode
 	-tail -q -n +2 ./filebeat/${COVERAGE_DIR}/*.cov >> ./${COVERAGE_DIR}/full.cov
 	-tail -q -n +2 ./packetbeat/${COVERAGE_DIR}/*.cov >> ./${COVERAGE_DIR}/full.cov
-	-tail -q -n +2 ./topbeat/${COVERAGE_DIR}/*.cov >> ./${COVERAGE_DIR}/full.cov
 	-tail -q -n +2 ./winlogbeat/${COVERAGE_DIR}/*.cov >> ./${COVERAGE_DIR}/full.cov
 	-tail -q -n +2 ./libbeat/${COVERAGE_DIR}/*.cov >> ./${COVERAGE_DIR}/full.cov
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html

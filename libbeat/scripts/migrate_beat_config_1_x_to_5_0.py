@@ -2,21 +2,6 @@
 import argparse
 import os
 
-
-def migrate_topbeat(content):
-    """
-    Changes top level `input:` into `topbeat:`
-    """
-    lines = content.splitlines()
-    outlines = []
-    for line in lines:
-        if line.startswith("input:"):
-            outlines.append("topbeat:")
-        else:
-            outlines.append(line)
-    return "\n".join(outlines) + "\n"
-
-
 def migrate_packetbeat(content):
     """
     Changes things like `interfaces:` to `packetbeat.interfaces:`
@@ -77,7 +62,6 @@ def main():
     with open(args.file, "r") as f:
         content = f.read()
         out = migrate_packetbeat(content)
-        out = migrate_topbeat(out)
         out = migrate_shipper(out)
 
     if args.dry:
@@ -91,28 +75,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-def test_migrate_topbeat():
-    test = """
-input:
-  # In seconds, defines how often to read server statistics
-  period: 10
-
-  # Regular expression to match the processes that are monitored
-  # By default, all the processes are monitored
-  procs: [".*"]
-"""
-    output = migrate_topbeat(test)
-    assert output == """
-topbeat:
-  # In seconds, defines how often to read server statistics
-  period: 10
-
-  # Regular expression to match the processes that are monitored
-  # By default, all the processes are monitored
-  procs: [".*"]
-"""
 
 
 def test_migrate_packetbeat():

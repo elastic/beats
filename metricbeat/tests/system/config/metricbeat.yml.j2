@@ -29,6 +29,10 @@ metricbeat.modules:
   timeout: {{ m.timeout }}
   {% endif -%}
 
+  {% if m.processes -%}
+  processes: {{ m.processes }}
+  {% endif -%}
+
   {% if m.filters is defined -%}
   filters:
     {% for f in m.filters -%}
