@@ -6,14 +6,14 @@
 //// Use the appropriate variables defined in the index.asciidoc file to
 //// resolve Beat names: beatname_uc and beatname_lc.
 //// Use the following include to pull this content into a doc file:
-//// include::../../libbeat/docs/shipperconfig.asciidoc[]
+//// include::../../libbeat/docs/generalconfig.asciidoc[]
 //// Make sure this content appears below a level 2 heading.
 //////////////////////////////////////////////////////////////////////////
 
-[[configuration-shipper]]
-=== Top level configuration options
+[[configuration-general]]
+=== General Configuration
 
-The top level section contains configuration options for the Beat and some
+The general section contains configuration options for the Beat and some
 general settings that control its behaviour.
 
 Here is an example configuration:
@@ -46,7 +46,7 @@ topology_expire: 15
 
 ------------------------------------------------------------------------------
 
-==== Top Level Options
+==== General Options
 
 You can specify the following options:
 

@@ -12,17 +12,18 @@ configuration settings, you need to restart Packetbeat to pick up the changes.
 * <<configuration-flows>>
 * <<configuration-protocols>>
 * <<configuration-processes>>
+* <<configuration-general>>
+* <<configuration-filter>>
 * <<elasticsearch-output>>
 * <<logstash-output>>
-* <<redis-output>>
 * <<kafka-output>>
+* <<redis-output>>
 * <<file-output>>
 * <<console-output>>
-* <<configuration-shipper>>
+* <<configuration-output-tls>>
 * <<configuration-path>>
 * <<configuration-logging>>
 * <<configuration-run-options>>
-* <<configuration-filter>>
 
 NOTE: Packetbeat maintains a real-time topology map of all the servers in your network.
 See <<maintaining-topology>> for more details.

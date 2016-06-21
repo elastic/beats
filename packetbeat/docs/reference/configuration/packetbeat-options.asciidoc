@@ -1,5 +1,5 @@
 [[configuration-interfaces]]
-=== Interfaces
+=== Network Device Configuration
 
 The `interfaces` section configures the sniffer. Here is an example configuration:
 
@@ -171,7 +171,7 @@ ports defined in the `protocols` section.
 
 
 [[configuration-flows]]
-=== Flows
+=== Flows Configuration
 
 The `flows` section contains configuration options for bidirectional network
 flows. If section is missing from configuration file, network flows are
@@ -202,7 +202,7 @@ disabled, flows are still reported once being timed out. The default value is
 
 
 [[configuration-protocols]]
-=== Protocols
+=== Transaction Protocols Configuration
 
 The `protocols` section contains configuration options for each supported protocol, including
 common options like `ports`, `send_request`, `send_response`, and options that are protocol-specific.
@@ -622,7 +622,7 @@ to a relatively high value. The default is 500.
 
 
 [[configuration-mongodb]]
-==== MongoDB Configuration
+==== MongoDB Configuration Options
 
 The following settings are specific to the MongoDB protocol. Here is a sample
 configuration section:
@@ -660,7 +660,7 @@ Note that limiting documents in this way means that they are no longer correctly
 formatted JSON objects.
 
 [[configuration-processes]]
-=== Processes (Optional)
+=== Monitored Processes Configuration (Optional)
 
 This section is optional, but configuring the processes enables Packetbeat
 to show you not only the servers that the traffic is flowing between, but
@@ -720,9 +720,11 @@ periodically afterwards, it scans the process table for
 processes that match the values specified for this option. The match is done against the
 process' command line as read from `/proc/<pid>/cmdline`.
 
-include::../../../../libbeat/docs/outputconfig.asciidoc[]
+include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/shipperconfig.asciidoc[]
+include::../../../../libbeat/docs/filteringconfig.asciidoc[]
+
+include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
@@ -730,4 +732,3 @@ include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
 include::../../../../libbeat/docs/runconfig.asciidoc[]
 
-include::../../../../libbeat/docs/filteringconfig.asciidoc[]

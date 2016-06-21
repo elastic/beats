@@ -1,5 +1,5 @@
 [[configuration-filebeat-options]]
-=== Filebeat
+=== Filebeat Prospectors Configuration
 
 The `filebeat` section specifies a list of `prospectors` that Filebeat
 uses to locate and process log files. Each prospector item begins with a dash (-)
@@ -44,6 +44,18 @@ The value that you specify here is used as the `input_type` for each event publi
 
 A list of glob-based paths that should be crawled and fetched. Filebeat starts a harvester for
 each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
+
+===== encoding
+
+The file encoding to use for reading files that contain international characters.
+See the encoding names http://www.w3.org/TR/encoding/[recommended by the W3C for use in HTML5].
+
+Here are some sample encodings from W3C recommendation:
+
+    * plain, latin1, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk, hz-gb-2312,
+    * euc-kr, euc-jp, iso-2022-jp, shift-jis, and so on
+
+The `plain` encoding is special, because it does not validate or transform any input.
 
 [[exclude-lines]]
 ===== exclude_lines
@@ -110,7 +122,7 @@ See <<regexp-support>> for a list of supported regexp patterns.
 A list of tags that the Beat includes in the `tags` field of each published
 event. Tags make it easy to select specific events in Kibana or apply
 conditional filtering in Logstash. These tags will be appended to the list of
-tags specified in the `shipper` configuration.
+tags specified in the general configuration.
 
 Example:
 
@@ -130,7 +142,7 @@ data. Fields can be scalar values, arrays, dictionaries, or any nested
 combination of these. By default, the fields that you specify here will be
 grouped under a `fields` sub-dictionary in the output document. To store the
 custom fields as top-level fields, set the `fields_under_root` option to true.
-If a duplicate field is declared in the `shipper` configuration, then its value
+If a duplicate field is declared in the general configuration, then its value
 will be overwritten by the value declared here.
 
 [source,yaml]
@@ -329,6 +341,13 @@ You can force Filebeat to close the file as soon as the file name changes by set
 `force_close_files` option to true. The default is false. Turning on this option can lead to loss of data on
 rotated files in case not all lines were read from the rotated file.
 
+[[configuration-global-options]]
+=== Filebeat Global Configuration
+
+You can specify configuration options that control Filebeat behavior at a global level.
+
+==== Options
+
 ===== spool_size
 
 The event count spool threshold. This setting forces a network flush if the number of events in the spooler exceeds
@@ -342,7 +361,7 @@ filebeat.spool_size: 2048
 
 ===== publish_async
 
-If enabled, the publisher pipeline in filebeat operates in async mode preparing
+If enabled, the publisher pipeline in Filebeat operates in async mode preparing
 a new batch of lines while waiting for ACK. This option can improve load-balancing
 throughput at the cost of increased memory usage. The default value is false.
 
@@ -386,27 +405,12 @@ If the specified path is not absolute, it is considered relative to the configur
 filebeat.config_dir: path/to/configs
 -------------------------------------------------------------------------------------
 
-===== encoding
+include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-The file encoding to use for reading files that contain international characters.
-See the encoding names http://www.w3.org/TR/encoding/[recommended by the W3C for use in HTML5].
-
-Here are some sample encodings from W3C recommendation:
-
-    * plain, latin1, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk, hz-gb-2312,
-    * euc-kr, euc-jp, iso-2022-jp, shift-jis, and so on
-
-The `plain` encoding is special, because it does not validate or transform any input.
+include::../../../../libbeat/docs/filteringconfig.asciidoc[]
 
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
-
-include::../../../../libbeat/docs/shipperconfig.asciidoc[]
 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
-
-include::../../../../libbeat/docs/runconfig.asciidoc[]
-
-include::../../../../libbeat/docs/filteringconfig.asciidoc[]
-
