@@ -122,6 +122,19 @@ winlogbeat.event_logs:
     ignore_older: 168h
 --------------------------------------------------------------------------------
 
+===== event_logs.forwarded
+
+A boolean flag to indicate that the log contains only events collected from
+remote hosts using the Windows Event Collector. The value defaults to true for
+the ForwardedEvents log and false for any other log. *{vista_and_newer}*
+
+This settings allows Winlogbeat to optimize reads for forwarded events that are
+already rendered. When the value is true Winlogbeat does not attempt to render
+the event using message files from the host computer. The Windows Event
+Collector subscription should be configured to use the "RenderedText" format
+(this is the default) to ensure that the events are distributed with messages
+and descriptions.
+
 ===== event_logs.event_id
 
 A whitelist and blacklist of event IDs. The value is a comma-separated list. The

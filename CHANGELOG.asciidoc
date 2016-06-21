@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 *Filebeat*
 
 *Winlogbeat*
+- Fix issue with rendering forwarded event log records. {pull}1891[1891]
 
 ==== Added
 

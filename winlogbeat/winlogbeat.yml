@@ -14,8 +14,8 @@
 # dictionaries.
 #
 # The supported keys are name (required), tags, fields, fields_under_root,
-# ignore_older, level, event_id, provider, and include_xml. Please visit the
-# documentation for the complete details of each option.
+# forwarded, ignore_older, level, event_id, provider, and include_xml. Please
+# visit the documentation for the complete details of each option.
 # https://go.es.io/WinlogbeatConfig
 winlogbeat.event_logs:
   - name: Application
