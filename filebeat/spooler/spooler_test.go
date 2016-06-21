@@ -1,6 +1,6 @@
 // +build !integration
 
-package beater
+package spooler
 
 import (
 	"testing"
@@ -30,8 +30,9 @@ func TestNewSpoolerDefaultConfig(t *testing.T) {
 	config := load(t, "")
 
 	// Read from empty yaml config
-	spooler := NewSpooler(config, nil)
+	spooler, err := New(config, nil)
 
+	assert.NoError(t, err)
 	assert.Equal(t, cfg.DefaultSpoolSize, spooler.spoolSize)
 	assert.Equal(t, cfg.DefaultIdleTimeout, spooler.idleTimeout)
 }
@@ -39,14 +40,16 @@ func TestNewSpoolerDefaultConfig(t *testing.T) {
 func TestNewSpoolerSpoolSize(t *testing.T) {
 	spoolSize := uint64(19)
 	config := cfg.FilebeatConfig{SpoolSize: spoolSize}
-	spooler := NewSpooler(config, nil)
+	spooler, err := New(config, nil)
 
+	assert.NoError(t, err)
 	assert.Equal(t, spoolSize, spooler.spoolSize)
 }
 
 func TestNewSpoolerIdleTimeout(t *testing.T) {
 	config := load(t, "idle_timeout: 10s")
-	spooler := NewSpooler(config, nil)
+	spooler, err := New(config, nil)
 
+	assert.NoError(t, err)
 	assert.Equal(t, time.Duration(10*time.Second), spooler.idleTimeout)
 }

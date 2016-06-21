@@ -1,6 +1,6 @@
 // +build !integration
 
-package beater
+package publish
 
 import (
 	"fmt"
@@ -47,7 +47,7 @@ func TestPublisherModes(t *testing.T) {
 		regChan := make(chan []*input.FileEvent, len(test.order)+1)
 		client := pubtest.NewChanClient(0)
 
-		pub := newPublisher(test.async, pubChan, regChan, client)
+		pub := New(test.async, pubChan, regChan, client)
 		pub.Start()
 
 		var events [][]*input.FileEvent

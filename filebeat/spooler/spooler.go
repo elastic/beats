@@ -1,4 +1,4 @@
-package beater
+package spooler
 
 import (
 	"sync"
@@ -29,12 +29,12 @@ type Spooler struct {
 	wg            sync.WaitGroup            // WaitGroup used to control the shutdown.
 }
 
-// NewSpooler creates and returns a new Spooler. The returned Spooler must be
+// New creates and returns a new Spooler. The returned Spooler must be
 // started by calling Start before it can be used.
-func NewSpooler(
+func New(
 	config cfg.FilebeatConfig,
 	publisher chan<- []*input.FileEvent,
-) *Spooler {
+) (*Spooler, error) {
 	spoolSize := config.SpoolSize
 	if spoolSize <= 0 {
 		spoolSize = cfg.DefaultSpoolSize
@@ -55,7 +55,7 @@ func NewSpooler(
 		nextFlushTime: time.Now().Add(idleTimeout),
 		publisher:     publisher,
 		spool:         make([]*input.FileEvent, 0, spoolSize),
-	}
+	}, nil
 }
 
 // Start starts the Spooler. Stop must be called to stop the Spooler.
