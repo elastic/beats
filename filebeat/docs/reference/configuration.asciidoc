@@ -22,7 +22,6 @@ configuration settings, you need to restart Filebeat to pick up the changes.
 * <<configuration-output-tls>>
 * <<configuration-path>>
 * <<configuration-logging>>
-* <<configuration-run-options>>
 
 include::configuration/filebeat-options.asciidoc[]
 

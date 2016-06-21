@@ -21,7 +21,6 @@ configuration settings, you need to restart Winlogbeat to pick up the changes.
 * <<configuration-output-tls>>
 * <<configuration-path>>
 * <<configuration-logging>>
-* <<configuration-run-options>>
 
 include::configuration/winlogbeat-options.asciidoc[]
 
