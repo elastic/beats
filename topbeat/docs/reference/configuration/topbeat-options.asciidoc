@@ -138,7 +138,7 @@ For more information about the exported fields, see <<exported-fields-system>>.
 
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
-include::../../../../libbeat/docs/shipperconfig.asciidoc[]
+include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
