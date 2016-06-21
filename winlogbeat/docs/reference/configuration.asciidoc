@@ -10,16 +10,17 @@ The configuration options are described in the following sections. After changin
 configuration settings, you need to restart Winlogbeat to pick up the changes.
 
 * <<configuration-winlogbeat-options>>
+* <<configuration-general>>
+* <<configuration-filter>>
 * <<elasticsearch-output>>
 * <<logstash-output>>
-* <<redis-output>>
 * <<kafka-output>>
+* <<redis-output>>
 * <<file-output>>
 * <<console-output>>
-* <<configuration-shipper>>
+* <<configuration-output-tls>>
 * <<configuration-path>>
 * <<configuration-logging>>
-* <<configuration-run-options>>
 
 include::configuration/winlogbeat-options.asciidoc[]
 

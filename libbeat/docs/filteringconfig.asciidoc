@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-filter]]
-=== Filter
+=== Filters Configuration
 
 You can set a list of filter actions in the `filters` section of the {beatname_uc} config file to reduce the number of fields that are
 exported by the Beat. 

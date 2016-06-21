@@ -2,7 +2,7 @@
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).
 
 [[configuration-winlogbeat-options]]
-=== Winlogbeat
+=== Winlogbeat Configuration
 
 The `winlogbeat` section specifies all options that are specific to Winlogbeat.
 Most importantly, it contains the list of event logs to monitor.
@@ -241,7 +241,7 @@ winlogbeat.event_logs:
 A list of tags that the Beat includes in the `tags` field of each published
 event. Tags make it easy to select specific events in Kibana or apply
 conditional filtering in Logstash. These tags will be appended to the list of
-tags specified in the `shipper` configuration.
+tags specified in the general configuration.
 
 Example:
 
@@ -261,7 +261,7 @@ data. Fields can be scalar values, arrays, dictionaries, or any nested
 combination of these. By default, the fields that you specify here will be
 grouped under a `fields` sub-dictionary in the output document. To store the
 custom fields as top-level fields, set the `fields_under_root` option to true.
-If a duplicate field is declared in the `shipper` configuration, then its value
+If a duplicate field is declared in the general configuration, then its value
 will be overwritten by the value declared here.
 
 [source,yaml]
@@ -303,14 +303,12 @@ The metrics are served as a JSON document. The metrics include:
 - total number of successfully published events
 - uptime
 
-include::../../../../libbeat/docs/outputconfig.asciidoc[]
+include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/shipperconfig.asciidoc[]
+include::../../../../libbeat/docs/filteringconfig.asciidoc[]
+
+include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
-
-include::../../../../libbeat/docs/runconfig.asciidoc[]
-
-include::../../../../libbeat/docs/filteringconfig.asciidoc[]
