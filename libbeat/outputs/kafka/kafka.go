@@ -98,8 +98,12 @@ func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
 	hosts := k.config.Hosts
 	topic := k.config.Topic
 	useType := k.config.UseType
+	sendMessageOnly := k.config.SendFieldOnly
+
+	logp.Info("SendmessageOnly is: %v", sendMessageOnly)
+
 	for i := 0; i < worker; i++ {
-		client, err := newKafkaClient(hosts, topic, useType, libCfg)
+		client, err := newKafkaClient(hosts, topic, useType, sendMessageOnly, libCfg)
 		if err != nil {
 			logp.Err("Failed to create kafka client: %v", err)
 			return nil, err
