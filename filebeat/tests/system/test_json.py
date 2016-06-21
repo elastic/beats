@@ -188,12 +188,12 @@ class Test(BaseTest):
 
         proc = self.start_beat()
         self.wait_until(
-            lambda: self.output_has(lines=3),
+            lambda: self.output_has(lines=5),
             max_timeout=10)
         proc.check_kill_and_wait()
 
         output = self.read_output()
-        assert len(output) == 3
+        assert len(output) == 5
         assert all(isinstance(o["@timestamp"], basestring) for o in output)
         assert all(isinstance(o["type"], basestring) for o in output)
         assert output[0]["@timestamp"] == "2016-04-05T18:47:18.444Z"
@@ -204,6 +204,12 @@ class Test(BaseTest):
 
         assert output[2]["json_error"] == \
             "@timestamp not overwritten (not string)"
+
+        assert "json_error" not in output[3]
+        assert output[3]["@timestamp"] == "2016-04-05T18:47:18.444Z", output[3]["@timestamp"]
+
+        assert "json_error" not in output[4]
+        assert output[4]["@timestamp"] == "2016-04-05T18:47:18.000Z", output[4]["@timestamp"]
 
     def test_type_in_message(self):
         """
