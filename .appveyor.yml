@@ -12,8 +12,6 @@ environment:
   matrix:
   - PROJ: github.com\elastic\beats\filebeat
     BEAT: filebeat
-  - PROJ: github.com\elastic\beats\topbeat
-    BEAT: topbeat
   - PROJ: github.com\elastic\beats\winlogbeat
     BEAT: winlogbeat
 

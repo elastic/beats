@@ -120,7 +120,7 @@ type BeatConfig struct {
 }
 
 // Run initializes and runs a Beater implementation. name is the name of the
-// Beat (e.g. packetbeat or topbeat). version is version number of the Beater
+// Beat (e.g. packetbeat or metricbeat). version is version number of the Beater
 // implementation. bt is Beater implementation to run.
 func Run(name, version string, bt Beater) error {
 	return newInstance(name, version, bt).launch()

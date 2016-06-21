@@ -2,6 +2,8 @@ import re
 import sys
 import unittest
 import metricbeat
+import getpass
+import os
 
 SYSTEM_CPU_FIELDS = ["idle.pct", "iowait.pct", "irq.pct", "load", "nice.pct",
                      "softirq.pct", "steal.pct", "system.pct", "user.pct"]
@@ -313,3 +315,39 @@ class SystemTest(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
             process = evt["system"]["process"]
             self.assertItemsEqual(SYSTEM_PROCESS_FIELDS, process.keys())
+
+    def test_process_metricbeat(self):
+        """
+        Checks that the per proc stats are found in the output and
+        have the expected types.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["process"],
+            "period": "5s",
+            "processes": ["(?i)metricbeat.test"]
+        }])
+
+        metricbeat = self.start_beat()
+        self.wait_until(lambda: self.output_count(lambda x: x >= 1))
+        metricbeat.check_kill_and_wait()
+
+        output = self.read_output()[0]
+
+        assert re.match("(?i)metricbeat.test(.exe)?", output["system.process.name"])
+        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["system.process.cmdline"])
+        assert isinstance(output["system.process.state"], basestring)
+        assert isinstance(output["system.process.cpu.start_time"], basestring)
+        self.check_username(output["system.process.username"])
+
+
+    def check_username(self, observed, expected = None):
+        if expected == None:
+            expected = getpass.getuser()
+
+        if os.name == 'nt':
+            parts = observed.split("\\", 2)
+            assert len(parts) == 2, "Expected proc.username to be of form DOMAIN\username, but was %s" % observed
+            observed = parts[1]
+
+        assert expected == observed, "proc.username = %s, but expected %s" % (observed, expected)
