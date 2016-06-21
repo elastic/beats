@@ -20,8 +20,6 @@ include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
-include::../../libbeat/docs/yaml.asciidoc[]
-
 include::./packetbeat-filtering.asciidoc[]
 
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
@@ -35,6 +33,8 @@ include::./capturing.asciidoc[]
 include::./thrift.asciidoc[]
 
 include::./maintaining-topology.asciidoc[]
+
+include::../../libbeat/docs/yaml.asciidoc[]
 
 include::./fields.asciidoc[]
 

@@ -18,10 +18,6 @@ include::./how-metricbeat-works.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
-include::../../libbeat/docs/yaml.asciidoc[]
-
-include::../../libbeat/docs/regexp.asciidoc[]
-
 include::./metricbeat-filtering.asciidoc[]
 
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
@@ -29,6 +25,10 @@ include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 include::./configuring-logstash.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
+
+include::../../libbeat/docs/yaml.asciidoc[]
+
+include::../../libbeat/docs/regexp.asciidoc[]
 
 include::./modules.asciidoc[]
 

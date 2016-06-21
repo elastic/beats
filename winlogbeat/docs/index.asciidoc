@@ -20,13 +20,13 @@ include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
-include::../../libbeat/docs/yaml.asciidoc[]
-
 include::./winlogbeat-filtering.asciidoc[]
 
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
+
+include::../../libbeat/docs/yaml.asciidoc[]
 
 include::./fields.asciidoc[]
 
