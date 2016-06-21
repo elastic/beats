@@ -1,4 +1,0 @@
-[[config-topbeat-logstash]]
-=== Configuring Topbeat to Use Logstash
-
-include::../../libbeat/docs/shared-logstash-config.asciidoc[]

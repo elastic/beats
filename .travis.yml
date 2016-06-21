@@ -16,7 +16,6 @@ env:
   matrix:
     - TARGETS="check"
     - TARGETS="-C libbeat testsuite"
-    - TARGETS="-C topbeat testsuite"
     - TARGETS="-C filebeat testsuite"
     - TARGETS="-C packetbeat testsuite"
     - TARGETS="-C metricbeat testsuite"
@@ -101,6 +100,5 @@ after_success:
   # Copy full.cov to coverage.txt because codecov.io requires this file
   - test -f filebeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f filebeat/build/coverage/full.cov
   - test -f packetbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f packetbeat/build/coverage/full.cov
-  - test -f topbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f topbeat/build/coverage/full.cov
   - test -f libbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f libbeat/build/coverage/full.cov
   - test -f metricbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f metricbeat/build/coverage/full.cov

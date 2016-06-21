@@ -6,7 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/topbeat/system"
+	system "github.com/elastic/beats/metricbeat/module/system/common"
 
 	"github.com/pkg/errors"
 )
