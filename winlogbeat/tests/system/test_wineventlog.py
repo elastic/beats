@@ -279,6 +279,7 @@ class Test(WriteReadTest):
                 {
                     "name": self.providerName,
                     "api": self.api,
+                    "forwarded": False,
                     "invalid": "garbage"}
             ]
         )
