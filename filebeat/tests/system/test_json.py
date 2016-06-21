@@ -188,12 +188,12 @@ class Test(BaseTest):
 
         proc = self.start_beat()
         self.wait_until(
-            lambda: self.output_has(lines=3),
+            lambda: self.output_has(lines=5),
             max_timeout=10)
         proc.check_kill_and_wait()
 
         output = self.read_output()
-        assert len(output) == 3
+        assert len(output) == 5
         assert all(isinstance(o["@timestamp"], basestring) for o in output)
         assert all(isinstance(o["type"], basestring) for o in output)
         assert output[0]["@timestamp"] == "2016-04-05T18:47:18.444Z"
@@ -205,6 +205,11 @@ class Test(BaseTest):
         assert output[2]["json_error"] == \
             "@timestamp not overwritten (not string)"
 
+        assert output[3]["json_error"] is None, output[3]["json_error"]
+        assert output[3]["@timestamp"] == "2016-04-05T18:47:18.444+00:00", output[3]["@timestamp"]
+
+        assert output[4]["json_error"] is None, output[4]["json_error"]
+        assert output[4]["@timestamp"] == "2016-04-05T18:47:18+00:00", output[4]["@timestamp"]
     def test_type_in_message(self):
         """
         If overwrite_keys is true and type is in the message, we have to
