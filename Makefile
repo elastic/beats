@@ -43,6 +43,12 @@ clean:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) clean || exit 1;)
 	$(MAKE) -C generate clean
 
+# Cleans up the vendor directory from unnecessary files
+# This should always be run after updating the dependencies
+.PHONY: clean-vendor
+clean-vendor:
+	sh scripts/clean_vendor.sh
+
 .PHONY: check
 check:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
