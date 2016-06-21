@@ -16,6 +16,7 @@ type ProcsMap map[int]*Process
 type Process struct {
 	Pid      int    `json:"pid"`
 	Ppid     int    `json:"ppid"`
+	Pgid     int    `json:"pgid"`
 	Name     string `json:"name"`
 	Username string `json:"username"`
 	State    string `json:"state"`
@@ -44,6 +45,7 @@ func newProcess(pid int) (*Process, error) {
 	proc := Process{
 		Pid:      pid,
 		Ppid:     state.Ppid,
+		Pgid:     state.Pgid,
 		Name:     state.Name,
 		State:    getProcState(byte(state.State)),
 		Username: state.Username,
@@ -128,6 +130,7 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 	proc := common.MapStr{
 		"pid":      process.Pid,
 		"ppid":     process.Ppid,
+		"pgid":     process.Pgid,
 		"name":     process.Name,
 		"state":    process.State,
 		"username": process.Username,
