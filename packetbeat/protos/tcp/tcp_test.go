@@ -213,6 +213,59 @@ func TestTCSeqPayload(t *testing.T) {
 			10,
 			[]byte{5, 6, 7, 8},
 		},
+		{"ACK same sequence number",
+			[]segment{
+				{0, []byte{1, 2}},
+				{2, nil},
+				{2, []byte{3, 4}},
+				{4, []byte{5, 6}},
+			},
+			0,
+			[]byte{1, 2, 3, 4, 5, 6},
+		},
+		{"ACK same sequence number 2",
+			[]segment{
+				{0, nil},
+				{1, nil},
+				{1, []byte{1, 2}},
+				{3, nil},
+				{3, []byte{3, 4}},
+				{5, []byte{5, 6}},
+				{7, []byte{7, 8}},
+				{9, nil},
+			},
+			0,
+			[]byte{1, 2, 3, 4, 5, 6, 7, 8},
+		},
+		{"Overlap, first segment bigger",
+			[]segment{
+				{0, []byte{1, 2}},
+				{2, []byte{3, 4}},
+				{2, []byte{3}},
+				{4, []byte{5, 6}},
+			},
+			0,
+			[]byte{1, 2, 3, 4, 5, 6},
+		},
+		{"Overlap, second segment bigger",
+			[]segment{
+				{0, []byte{1, 2}},
+				{2, []byte{3}},
+				{2, []byte{3, 4}},
+				{4, []byte{5, 6}},
+			},
+			0,
+			[]byte{1, 2, 3, 4, 5, 6},
+		},
+		{"Overlap, covered",
+			[]segment{
+				{0, []byte{1, 2, 3, 4}},
+				{1, []byte{2, 3}},
+				{4, []byte{5, 6}},
+			},
+			0,
+			[]byte{1, 2, 3, 4, 5, 6},
+		},
 	}
 
 	for i, test := range tests {
@@ -248,6 +301,10 @@ func TestTCSeqPayload(t *testing.T) {
 		}
 
 		assert.Equal(t, test.expectedGaps, gap)
+		if len(test.expectedState) != len(state) {
+			assert.Equal(t, len(test.expectedState), len(state))
+			continue
+		}
 		assert.Equal(t, test.expectedState, state)
 	}
 }
@@ -309,7 +366,7 @@ func makeCollectPayload(
 		priv protos.ProtocolData,
 	) protos.ProtocolData {
 		if resetOnNil && priv == nil {
-			*state = nil
+			(*state) = nil
 		}
 		*state = append(*state, p.Payload...)
 		return *state

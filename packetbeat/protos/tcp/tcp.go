@@ -119,28 +119,36 @@ func (tcp *Tcp) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 	// protocol modules.
 	defer logp.Recover("Process tcp exception")
 
-	debugf("tcp flow id: %p", id)
-
 	stream, created := tcp.getStream(pkt)
 	if stream.conn == nil {
 		return
 	}
 
+	conn := stream.conn
 	if id != nil {
 		id.AddConnectionID(uint64(stream.conn.id))
 	}
-	conn := stream.conn
 
-	tcp_start_seq := tcphdr.Seq
-	tcp_seq := tcp_start_seq + uint32(len(pkt.Payload))
+	if isDebug {
+		debugf("tcp flow id: %p", id)
+	}
+
+	if len(pkt.Payload) == 0 && !tcphdr.FIN {
+		// return early if packet is not interesting. Still need to find/create
+		// stream first in order to update the TCP stream timer
+		return
+	}
+
+	tcpStartSeq := tcphdr.Seq
+	tcpSeq := tcpStartSeq + uint32(len(pkt.Payload))
 	lastSeq := conn.lastSeq[stream.dir]
 	if isDebug {
 		debugf("pkt.start_seq=%v pkt.last_seq=%v stream.last_seq=%v (len=%d)",
-			tcp_start_seq, tcp_seq, lastSeq, len(pkt.Payload))
+			tcpStartSeq, tcpSeq, lastSeq, len(pkt.Payload))
 	}
 
-	if len(pkt.Payload) > 0 && lastSeq != 0 {
-		if tcpSeqBeforeEq(tcp_seq, lastSeq) {
+	if lastSeq != 0 {
+		if tcpSeqBeforeEq(tcpSeq, lastSeq) {
 			if isDebug {
 				debugf("Ignoring retransmitted segment. pkt.seq=%v len=%v stream.seq=%v",
 					tcphdr.Seq, len(pkt.Payload), lastSeq)
@@ -148,10 +156,10 @@ func (tcp *Tcp) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 			return
 		}
 
-		if tcpSeqBefore(lastSeq, tcp_start_seq) {
+		if tcpSeqBefore(lastSeq, tcpStartSeq) {
 			if !created {
-				gap := int(tcp_start_seq - lastSeq)
-				logp.Warn("Gap in tcp stream. last_seq: %d, seq: %d, gap: %d", lastSeq, tcp_start_seq, gap)
+				gap := int(tcpStartSeq - lastSeq)
+				logp.Warn("Gap in tcp stream. last_seq: %d, seq: %d, gap: %d", lastSeq, tcpStartSeq, gap)
 				drop := stream.gapInStream(gap)
 				if drop {
 					if isDebug {
@@ -165,9 +173,25 @@ func (tcp *Tcp) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 				}
 			}
 		}
+
+		// cut away packet overlap
+		if tcpSeqBefore(tcpStartSeq, lastSeq) {
+			delta := lastSeq - tcpStartSeq
+
+			// if 'overlap' already covered by previous packet -> return
+			if int(delta) >= len(pkt.Payload) {
+				return
+			}
+
+			pkt.Payload = pkt.Payload[delta:]
+			tcphdr.Seq += delta
+			if len(pkt.Payload) == 0 && !tcphdr.FIN {
+				return
+			}
+		}
 	}
 
-	conn.lastSeq[stream.dir] = tcp_seq
+	conn.lastSeq[stream.dir] = tcpSeq
 	stream.addPacket(pkt, tcphdr)
 }
 
