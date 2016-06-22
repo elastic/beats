@@ -165,20 +165,36 @@ func (nfs *Nfs) eatData(op int, xdr *Xdr) {
 	}
 }
 
-func (nfs *Nfs) getV4Opcode(xdr *Xdr) string {
+// findV4MainOpcode finds the main operation in a compound call. If no main operation can be found, the last operation
+// in compound call is returned.
+//
+// Compound requests group multiple nfs operations into a single request. Nevertheless, all compound requests are
+// triggered by end-user activity, like 'ls', 'open', 'stat' and IO calls. Depending on which operations are combined
+// the main operation can be different. For example, in compound:
+//
+// PUTFH + READDIR + GETATTR
+//
+// READDIR is the main operation. while in
+//
+// PUTFH + GETATTR
+//
+// GETATTR is the main operation.
+func (nfs *Nfs) findV4MainOpcode(xdr *Xdr) string {
+
+	// did we find a main operation opcode?
+	found := false
 
 	// default op code
 	current_opname := "ILLEGAL"
 
 	opcount := int(xdr.getUInt())
-	for i := 0; i < opcount; i++ {
+	for i := 0; !found && i < opcount; i++ {
 		op := int(xdr.getUInt())
 		opname, ok := nfs_opnum4[op]
 
 		if !ok {
 			return fmt.Sprintf("ILLEGAL (%d)", op)
 		}
-
 		current_opname = opname
 
 		switch op {
@@ -232,7 +248,7 @@ func (nfs *Nfs) getV4Opcode(xdr *Xdr) string {
 			OP_WANT_DELEGATION,
 			OP_WRITE:
 
-			break
+			found = true
 		default:
 			nfs.eatData(op, xdr)
 		}
