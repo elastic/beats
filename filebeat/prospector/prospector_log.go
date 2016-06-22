@@ -132,7 +132,7 @@ func (p *ProspectorLog) scan() {
 // harvestNewFile harvest a new file
 func (p *ProspectorLog) harvestNewFile(state input.FileState) {
 
-	if !p.Prospector.isIgnoreOlder(state) {
+	if !p.isIgnoreOlder(state) {
 		logp.Debug("prospector", "Start harvester for new file: %s", state.Source)
 		p.Prospector.startHarvester(state, 0)
 	} else {
@@ -175,4 +175,21 @@ func (p *ProspectorLog) harvestExistingFile(newState input.FileState, oldState i
 func (p *ProspectorLog) isFileExcluded(file string) bool {
 	patterns := p.config.ExcludeFiles
 	return len(patterns) > 0 && harvester.MatchAnyRegexps(patterns, file)
+}
+
+// isIgnoreOlder checks if the given state reached ignore_older
+func (p *ProspectorLog) isIgnoreOlder(state input.FileState) bool {
+
+	// ignore_older is disable
+	if p.config.IgnoreOlder == 0 {
+		return false
+	}
+
+	modTime := state.Fileinfo.ModTime()
+
+	if time.Since(modTime) > p.config.IgnoreOlder {
+		return true
+	}
+
+	return false
 }

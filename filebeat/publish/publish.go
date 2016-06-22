@@ -1,4 +1,4 @@
-package beater
+package publish
 
 import (
 	"sync"
@@ -11,7 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/publisher"
 )
 
-type logPublisher interface {
+type LogPublisher interface {
 	Start()
 	Stop()
 }
@@ -61,11 +61,11 @@ const (
 	batchCanceled
 )
 
-func newPublisher(
+func New(
 	async bool,
 	in, out chan []*input.FileEvent,
 	client publisher.Client,
-) logPublisher {
+) LogPublisher {
 	if async {
 		return newAsyncLogPublisher(in, out, client)
 	}

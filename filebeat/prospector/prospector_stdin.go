@@ -8,16 +8,15 @@ import (
 )
 
 type ProspectorStdin struct {
-	Prospector *Prospector
-	harvester  *harvester.Harvester
-	started    bool
+	harvester *harvester.Harvester
+	started   bool
 }
 
+// NewProspectorStdin creates a new stdin prospector
+// This prospector contains one harvester which is reading from stdin
 func NewProspectorStdin(p *Prospector) (*ProspectorStdin, error) {
 
-	prospectorer := &ProspectorStdin{
-		Prospector: p,
-	}
+	prospectorer := &ProspectorStdin{}
 
 	var err error
 

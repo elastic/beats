@@ -1,4 +1,4 @@
-package crawler
+package registrar
 
 import (
 	"encoding/json"
@@ -20,16 +20,16 @@ type Registrar struct {
 	Channel      chan []*FileEvent
 	done         chan struct{}
 	registryFile string        // Path to the Registry File
-	state        *input.States // Map with all file paths inside and the corresponding state
+	states       *input.States // Map with all file paths inside and the corresponding state
 	wg           sync.WaitGroup
 }
 
-func NewRegistrar(registryFile string) (*Registrar, error) {
+func New(registryFile string) (*Registrar, error) {
 
 	r := &Registrar{
 		registryFile: registryFile,
 		done:         make(chan struct{}),
-		state:        input.NewStates(),
+		states:       input.NewStates(),
 		Channel:      make(chan []*FileEvent, 1),
 		wg:           sync.WaitGroup{},
 	}
@@ -62,9 +62,14 @@ func (r *Registrar) Init() error {
 	return nil
 }
 
-// loadState fetches the previous reading state from the configure RegistryFile file
+// GetStates return the registrar states
+func (r *Registrar) GetStates() input.States {
+	return *r.states
+}
+
+// loadStates fetches the previous reading state from the configure RegistryFile file
 // The default file is `registry` in the data path.
-func (r *Registrar) LoadState() error {
+func (r *Registrar) loadStates() error {
 
 	// Check if files exists
 	_, err := os.Stat(r.registryFile)
@@ -97,7 +102,7 @@ func (r *Registrar) LoadState() error {
 	states := []input.FileState{}
 	decoder.Decode(&states)
 
-	r.state.SetStates(states)
+	r.states.SetStates(states)
 	logp.Info("States Loaded from registrar: %+v", len(states))
 
 	return nil
@@ -134,7 +139,7 @@ func (r *Registrar) loadAndConvertOldState(file *os.File) bool {
 		counter++
 	}
 
-	r.state.SetStates(states)
+	r.states.SetStates(states)
 
 	// Rewrite registry in new format
 	r.writeRegistry()
@@ -144,9 +149,19 @@ func (r *Registrar) loadAndConvertOldState(file *os.File) bool {
 	return true
 }
 
-func (r *Registrar) Start() {
+func (r *Registrar) Start() error {
+
+	// Load the previous log file locations now, for use in prospector
+	err := r.loadStates()
+	if err != nil {
+		logp.Err("Error loading state: %v", err)
+		return err
+	}
+
 	r.wg.Add(1)
 	go r.Run()
+
+	return nil
 }
 
 func (r *Registrar) Run() {
@@ -183,7 +198,7 @@ func (r *Registrar) processEventStates(events []*FileEvent) {
 		if event.InputType == cfg.StdinInputType {
 			continue
 		}
-		r.state.Update(event.FileState)
+		r.states.Update(event.FileState)
 	}
 }
 
@@ -205,7 +220,7 @@ func (r *Registrar) writeRegistry() error {
 		return e
 	}
 
-	states := r.state.GetStates()
+	states := r.states.GetStates()
 
 	encoder := json.NewEncoder(file)
 	encoder.Encode(states)

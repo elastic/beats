@@ -5,17 +5,14 @@ package crawler
 import (
 	"testing"
 
-	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCrawlerStartError(t *testing.T) {
-	crawler := Crawler{}
-	channel := make(chan *input.FileEvent, 1)
+func TestNewCrawlerNoProspectorsError(t *testing.T) {
 	prospectorConfigs := []*common.Config{}
 
-	error := crawler.Start(prospectorConfigs, channel)
+	_, error := New(nil, prospectorConfigs)
 
 	assert.Error(t, error)
 }
