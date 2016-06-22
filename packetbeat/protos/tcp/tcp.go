@@ -31,6 +31,14 @@ type Processor interface {
 	Process(flow *flows.FlowID, hdr *layers.TCP, pkt *protos.Packet)
 }
 
+type seqCompare int
+
+const (
+	seqLT seqCompare = -1
+	seqEq seqCompare = 0
+	seqGT seqCompare = 1
+)
+
 var (
 	debugf  = logp.MakeDebug("tcp")
 	isDebug = false
@@ -126,7 +134,7 @@ func (tcp *Tcp) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 
 	conn := stream.conn
 	if id != nil {
-		id.AddConnectionID(uint64(stream.conn.id))
+		id.AddConnectionID(uint64(conn.id))
 	}
 
 	if isDebug {
@@ -147,7 +155,7 @@ func (tcp *Tcp) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 			tcpStartSeq, tcpSeq, lastSeq, len(pkt.Payload))
 	}
 
-	if lastSeq != 0 {
+	if len(pkt.Payload) > 0 && lastSeq != 0 {
 		if tcpSeqBeforeEq(tcpSeq, lastSeq) {
 			if isDebug {
 				debugf("Ignoring retransmitted segment. pkt.seq=%v len=%v stream.seq=%v",
@@ -156,38 +164,37 @@ func (tcp *Tcp) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 			return
 		}
 
-		if tcpSeqBefore(lastSeq, tcpStartSeq) {
-			if !created {
-				gap := int(tcpStartSeq - lastSeq)
-				logp.Warn("Gap in tcp stream. last_seq: %d, seq: %d, gap: %d", lastSeq, tcpStartSeq, gap)
-				drop := stream.gapInStream(gap)
-				if drop {
-					if isDebug {
-						debugf("Dropping connection state because of gap")
-					}
-
-					// drop application layer connection state and
-					// update stream_id for app layer analysers using stream_id for lookups
-					conn.id = tcp.getId()
-					conn.data = nil
-				}
+		switch tcpSeqCompare(lastSeq, tcpStartSeq) {
+		case seqLT: // lastSeq < tcpStartSeq => Gap in tcp stream detected
+			if created {
+				break
 			}
-		}
 
-		// cut away packet overlap
-		if tcpSeqBefore(tcpStartSeq, lastSeq) {
+			gap := int(tcpStartSeq - lastSeq)
+			logp.Warn("Gap in tcp stream. last_seq: %d, seq: %d, gap: %d", lastSeq, tcpStartSeq, gap)
+			drop := stream.gapInStream(gap)
+			if drop {
+				if isDebug {
+					debugf("Dropping connection state because of gap")
+				}
+
+				// drop application layer connection state and
+				// update stream_id for app layer analysers using stream_id for lookups
+				conn.id = tcp.getId()
+				conn.data = nil
+			}
+
+		case seqGT:
+			// lastSeq > tcpStartSeq => overlapping TCP segment detected. shrink packet
 			delta := lastSeq - tcpStartSeq
 
-			// if 'overlap' already covered by previous packet -> return
-			if int(delta) >= len(pkt.Payload) {
-				return
+			if isDebug {
+				debugf("Overlapping tcp segment. last_seq %d, seq: %d, delta: %d",
+					lastSeq, tcpStartSeq, delta)
 			}
 
 			pkt.Payload = pkt.Payload[delta:]
 			tcphdr.Seq += delta
-			if len(pkt.Payload) == 0 && !tcphdr.FIN {
-				return
-			}
 		}
 	}
 
@@ -231,6 +238,18 @@ func (tcp *Tcp) getStream(pkt *protos.Packet) (stream TcpStream, created bool) {
 	conn.tcptuple = common.TcpTupleFromIpPort(conn.tuple, conn.id)
 	tcp.streams.PutWithTimeout(pkt.Tuple.Hashable(), conn, timeout)
 	return TcpStream{conn: conn, dir: TcpDirectionOriginal}, true
+}
+
+func tcpSeqCompare(seq1, seq2 uint32) seqCompare {
+	i := int32(seq1 - seq2)
+	switch {
+	case i == 0:
+		return seqEq
+	case i < 0:
+		return seqLT
+	default:
+		return seqGT
+	}
 }
 
 func tcpSeqBefore(seq1 uint32, seq2 uint32) bool {
