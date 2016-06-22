@@ -90,7 +90,7 @@ output.elasticsearch:
 
 ==== Elasticsearch Output Options
 
-You can specify the following options in the `elasticsearch` section:
+You can specify the following options in the `elasticsearch` section of the +{beatname_lc}.yml+ config file:
 
 [[hosts-option]]
 ===== hosts
@@ -359,7 +359,8 @@ output.logstash:
 
 ==== Logstash Output Options
 
-You can specify the following options in the `logstash` section:
+You can specify the following options in the `logstash` section of the
++{beatname_lc}.yml+ config file:
 
 [[hosts]]
 ===== hosts
@@ -493,7 +494,7 @@ The Kafka output sends the events to Apache Kafka.
 
 ==== Kafka Output Options
 
-You can specify the following options in the `kafka` section:
+You can specify the following options in the `kafka` section of the +{beatname_lc}.yml+ config file:
 
 ===== hosts
 
@@ -604,7 +605,7 @@ output.redis:
 
 ==== Redis Output Options
 
-You can specify the following options in the `redis` section:
+You can specify the following options in the `redis` section of the +{beatname_lc}.yml+ config file:
 
 ===== hosts
 
@@ -748,7 +749,7 @@ output.file:
 
 ==== File Output Options
 
-You can specify the following options in the `file` section:
+You can specify the following options in the `file` section of the +{beatname_lc}.yml+ config file:
 
 [[path]]
 ===== path
@@ -785,7 +786,7 @@ output.console:
 
 ==== Console Output Options
 
-You can specify the following options in the `console` section:
+You can specify the following options in the `console` section of the +{beatname_lc}.yml+ config file:
 
 ===== pretty
 
@@ -825,7 +826,7 @@ output.elasticsearch:
 
 ==== TLS Options
 
-You can specify the following options under the `tls` section:
+You can specify the following options in the `tls` section of the +{beatname_lc}.yml+ config file:
 
 ===== certificate_authorities
 

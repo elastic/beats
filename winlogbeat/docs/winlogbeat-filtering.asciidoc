@@ -1,5 +1,5 @@
 [[filtering-data]]
-=== Filtering the Exported Data
+== Filtering the Exported Data
 
 include::../../libbeat/docs/filtering.asciidoc[]
 

@@ -26,16 +26,12 @@ include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
+include::../../libbeat/docs/yaml.asciidoc[]
+
+include::./fields.asciidoc[]
+
 include::./securing-winlogbeat.asciidoc[]
-
-include::../../libbeat/docs/https.asciidoc[]
-
-include::../../libbeat/docs/shared-tls-logstash-config.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
-
-include::./reference.asciidoc[]
-
-include::./fields.asciidoc[]

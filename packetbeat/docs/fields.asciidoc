@@ -4,8 +4,11 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-== Exported Fields
+= Exported Fields
 
+[partintro]
+
+--
 This document describes the fields that are exported by Packetbeat. They are
 grouped in the following categories:
 
@@ -27,14 +30,16 @@ grouped in the following categories:
 * <<exported-fields-trans_event>>
 * <<exported-fields-trans_measurements>>
 
+--
 [[exported-fields-amqp]]
-=== AMQP Fields
+== AMQP Fields
 
 AMQP specific event fields.
 
 
 
-==== amqp.reply-code
+[float]
+=== amqp.reply-code
 
 type: integer
 
@@ -43,35 +48,40 @@ example: 404
 AMQP reply code to an error, similar to http reply-code
 
 
-==== amqp.reply-text
+[float]
+=== amqp.reply-text
 
 type: keyword
 
 Text explaining the error.
 
 
-==== amqp.class-id
+[float]
+=== amqp.class-id
 
 type: integer
 
 Failing method class.
 
 
-==== amqp.method-id
+[float]
+=== amqp.method-id
 
 type: integer
 
 Failing method ID.
 
 
-==== amqp.exchange
+[float]
+=== amqp.exchange
 
 type: keyword
 
 Name of the exchange.
 
 
-==== amqp.exchange-type
+[float]
+=== amqp.exchange-type
 
 type: keyword
 
@@ -80,145 +90,166 @@ example: fanout
 Exchange type.
 
 
-==== amqp.passive
+[float]
+=== amqp.passive
 
 type: boolean
 
 If set, do not create exchange/queue.
 
 
-==== amqp.durable
+[float]
+=== amqp.durable
 
 type: boolean
 
 If set, request a durable exchange/queue.
 
 
-==== amqp.exclusive
+[float]
+=== amqp.exclusive
 
 type: boolean
 
 If set, request an exclusive queue.
 
 
-==== amqp.auto-delete
+[float]
+=== amqp.auto-delete
 
 type: boolean
 
 If set, auto-delete queue when unused.
 
 
-==== amqp.no-wait
+[float]
+=== amqp.no-wait
 
 type: boolean
 
 If set, the server will not respond to the method.
 
 
-==== amqp.consumer-tag
+[float]
+=== amqp.consumer-tag
 
 Identifier for the consumer, valid within the current channel.
 
 
-==== amqp.delivery-tag
+[float]
+=== amqp.delivery-tag
 
 type: integer
 
 The server-assigned and channel-specific delivery tag.
 
 
-==== amqp.message-count
+[float]
+=== amqp.message-count
 
 type: integer
 
 The number of messages in the queue, which will be zero for newly-declared queues.
 
 
-==== amqp.consumer-count
+[float]
+=== amqp.consumer-count
 
 type: integer
 
 The number of consumers of a queue.
 
 
-==== amqp.routing-key
+[float]
+=== amqp.routing-key
 
 type: keyword
 
 Message routing key.
 
 
-==== amqp.no-ack
+[float]
+=== amqp.no-ack
 
 type: boolean
 
 If set, the server does not expect acknowledgements for messages.
 
 
-==== amqp.no-local
+[float]
+=== amqp.no-local
 
 type: boolean
 
 If set, the server will not send messages to the connection that published them.
 
 
-==== amqp.if-unused
+[float]
+=== amqp.if-unused
 
 type: boolean
 
 Delete only if unused.
 
 
-==== amqp.if-empty
+[float]
+=== amqp.if-empty
 
 type: boolean
 
 Delete only if empty.
 
 
-==== amqp.queue
+[float]
+=== amqp.queue
 
 type: keyword
 
 The queue name identifies the queue within the vhost.
 
 
-==== amqp.redelivered
+[float]
+=== amqp.redelivered
 
 type: boolean
 
 Indicates that the message has been previously delivered to this or another client.
 
 
-==== amqp.multiple
+[float]
+=== amqp.multiple
 
 type: boolean
 
 Acknowledge multiple messages.
 
 
-==== amqp.arguments
+[float]
+=== amqp.arguments
 
 type: dict
 
 Optional additional arguments passed to some methods. Can be of various types.
 
 
-==== amqp.mandatory
+[float]
+=== amqp.mandatory
 
 type: boolean
 
 Indicates mandatory routing.
 
 
-==== amqp.immediate
+[float]
+=== amqp.immediate
 
 type: boolean
 
 Request immediate delivery.
 
 
-==== amqp.content-type
+[float]
+=== amqp.content-type
 
 type: keyword
 
@@ -227,84 +258,96 @@ example: text/plain
 MIME content type.
 
 
-==== amqp.content-encoding
+[float]
+=== amqp.content-encoding
 
 type: keyword
 
 MIME content encoding.
 
 
-==== amqp.headers
+[float]
+=== amqp.headers
 
 type: dict
 
 Message header field table.
 
 
-==== amqp.delivery-mode
+[float]
+=== amqp.delivery-mode
 
 type: keyword
 
 Non-persistent (1) or persistent (2).
 
 
-==== amqp.priority
+[float]
+=== amqp.priority
 
 type: integer
 
 Message priority, 0 to 9.
 
 
-==== amqp.correlation-id
+[float]
+=== amqp.correlation-id
 
 type: keyword
 
 Application correlation identifier.
 
 
-==== amqp.reply-to
+[float]
+=== amqp.reply-to
 
 type: keyword
 
 Address to reply to.
 
 
-==== amqp.expiration
+[float]
+=== amqp.expiration
 
 type: keyword
 
 Message expiration specification.
 
 
-==== amqp.message-id
+[float]
+=== amqp.message-id
 
 type: keyword
 
 Application message identifier.
 
 
-==== amqp.timestamp
+[float]
+=== amqp.timestamp
 
 type: keyword
 
 Message timestamp.
 
 
-==== amqp.type
+[float]
+=== amqp.type
 
 type: keyword
 
 Message type name.
 
 
-==== amqp.user-id
+[float]
+=== amqp.user-id
 
 type: keyword
 
 Creating user id.
 
 
-==== amqp.app-id
+[float]
+=== amqp.app-id
 
 type: keyword
 
@@ -312,23 +355,26 @@ Creating application id.
 
 
 [[exported-fields-beat]]
-=== Beat Fields
+== Beat Fields
 
 Contains common beat fields available in all event types.
 
 
 
-==== beat.name
+[float]
+=== beat.name
 
 The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
 
 
-==== beat.hostname
+[float]
+=== beat.hostname
 
 The hostname as returned by the operating system on which the Beat is running.
 
 
-==== @timestamp
+[float]
+=== @timestamp
 
 type: date
 
@@ -341,12 +387,14 @@ required: True
 The timestamp when the event log record was generated.
 
 
-==== tags
+[float]
+=== tags
 
 Arbitrary tags that can be set per Beat and per transaction type.
 
 
-==== fields
+[float]
+=== fields
 
 type: dict
 
@@ -354,47 +402,54 @@ Contains user configurable fields.
 
 
 [[exported-fields-common]]
-=== Common Fields
+== Common Fields
 
 These fields contain data about the environment in which the transaction or flow was captured.
 
 
 
-==== server
+[float]
+=== server
 
 The name of the server that served the transaction.
 
 
-==== client_server
+[float]
+=== client_server
 
 The name of the server that initiated the transaction.
 
 
-==== service
+[float]
+=== service
 
 The name of the logical service that served the transaction.
 
 
-==== client_service
+[float]
+=== client_service
 
 The name of the logical service that initiated the transaction.
 
 
-==== ip
+[float]
+=== ip
 
 format: dotted notation.
 
 The IP address of the server that served the transaction.
 
 
-==== client_ip
+[float]
+=== client_ip
 
 format: dotted notation.
 
 The IP address of the server that initiated the transaction.
 
 
-==== real_ip
+[float]
+=== real_ip
 
 format: Dotted notation.
 
@@ -402,7 +457,8 @@ If the server initiating the transaction is a proxy, this field contains the ori
 Unless this field is disabled, it always has a value, and it matches the `client_ip` for non proxy clients.
 
 
-==== client_location
+[float]
+=== client_location
 
 type: geo_point
 
@@ -411,300 +467,345 @@ example: 40.715, -74.011
 The GeoIP location of the `real_ip` IP address or of the `client_ip` address if the `real_ip` is disabled. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== client_port
+[float]
+=== client_port
 
 format: dotted notation.
 
 The layer 4 port of the process that initiated the transaction.
 
 
-==== transport
+[float]
+=== transport
 
 example: udp
 
 The transport protocol used for the transaction. If not specified, then tcp is assumed.
 
 
-==== port
+[float]
+=== port
 
 format: dotted notation.
 
 The layer 4 port of the process that served the transaction.
 
 
-==== proc
+[float]
+=== proc
 
 The name of the process that served the transaction.
 
 
-==== client_proc
+[float]
+=== client_proc
 
 The name of the process that initiated the transaction.
 
 
-==== release
+[float]
+=== release
 
 The software release of the service serving the transaction. This can be the commit id or a semantic version.
 
 
 [[exported-fields-dns]]
-=== DNS Fields
+== DNS Fields
 
 DNS-specific event fields.
 
 
 
-==== dns.id
+[float]
+=== dns.id
 
 type: integer
 
 The DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
 
 
-==== dns.op_code
+[float]
+=== dns.op_code
 
 example: QUERY
 
 The DNS operation code that specifies the kind of query in the message. This value is set by the originator of a query and copied into the response.
 
 
-==== dns.flags.authoritative
+[float]
+=== dns.flags.authoritative
 
 type: boolean
 
 A DNS flag specifying that the responding server is an authority for the domain name used in the question.
 
 
-==== dns.flags.recursion_available
+[float]
+=== dns.flags.recursion_available
 
 type: boolean
 
 A DNS flag specifying whether recursive query support is available in the name server.
 
 
-==== dns.flags.recursion_desired
+[float]
+=== dns.flags.recursion_desired
 
 type: boolean
 
 A DNS flag specifying that the client directs the server to pursue a query recursively. Recursive query support is optional.
 
 
-==== dns.flags.authentic_data
+[float]
+=== dns.flags.authentic_data
 
 type: boolean
 
 A DNS flag specifying that the recursive server considers the response authentic.
 
 
-==== dns.flags.checking_disabled
+[float]
+=== dns.flags.checking_disabled
 
 type: boolean
 
 A DNS flag specifying that the client disables the server signature validation of the query.
 
 
-==== dns.flags.truncated_response
+[float]
+=== dns.flags.truncated_response
 
 type: boolean
 
 A DNS flag specifying that only the first 512 bytes of the reply were returned.
 
 
-==== dns.response_code
+[float]
+=== dns.response_code
 
 example: NOERROR
 
 The DNS status code.
 
-==== dns.question.name
+[float]
+=== dns.question.name
 
 example: www.google.com.
 
 The domain name being queried. If the name field contains non-printable characters (below 32 or above 126), then those characters are represented as escaped base 10 integers (\DDD). Back slashes and quotes are escaped. Tabs, carriage returns, and line feeds are converted to \t, \r, and \n respectively.
 
 
-==== dns.question.type
+[float]
+=== dns.question.type
 
 example: AAAA
 
 The type of records being queried.
 
-==== dns.question.class
+[float]
+=== dns.question.class
 
 example: IN
 
 The class of of records being queried.
 
-==== dns.question.etld_plus_one
+[float]
+=== dns.question.etld_plus_one
 
 example: amazon.co.uk.
 
 The effective top-level domain (eTLD) plus one more label. For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.". The data for determining the eTLD comes from an embedded copy of the data from http://publicsuffix.org.
 
-==== dns.answers_count
+[float]
+=== dns.answers_count
 
 type: integer
 
 The number of resource records contained in the `dns.answers` field.
 
 
-==== dns.answers.name
+[float]
+=== dns.answers.name
 
 example: example.com.
 
 The domain name to which this resource record pertains.
 
-==== dns.answers.type
+[float]
+=== dns.answers.type
 
 example: MX
 
 The type of data contained in this resource record.
 
-==== dns.answers.class
+[float]
+=== dns.answers.class
 
 example: IN
 
 The class of DNS data contained in this resource record.
 
-==== dns.answers.ttl
+[float]
+=== dns.answers.ttl
 
 type: integer
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
 
-==== dns.answers.data
+[float]
+=== dns.answers.data
 
 The data describing the resource. The meaning of this data depends on the type and class of the resource record.
 
 
-==== dns.authorities
+[float]
+=== dns.authorities
 
 type: dict
 
 An array containing a dictionary for each authority section from the answer.
 
 
-==== dns.authorities_count
+[float]
+=== dns.authorities_count
 
 type: integer
 
 The number of resource records contained in the `dns.authorities` field. The `dns.authorities` field may or may not be included depending on the configuration of Packetbeat.
 
 
-==== dns.authorities.name
+[float]
+=== dns.authorities.name
 
 example: example.com.
 
 The domain name to which this resource record pertains.
 
-==== dns.authorities.type
+[float]
+=== dns.authorities.type
 
 example: NS
 
 The type of data contained in this resource record.
 
-==== dns.authorities.class
+[float]
+=== dns.authorities.class
 
 example: IN
 
 The class of DNS data contained in this resource record.
 
-==== dns.answers
+[float]
+=== dns.answers
 
 type: dict
 
 An array containing a dictionary about each answer section returned by the server.
 
 
-==== dns.answers.ttl
+[float]
+=== dns.answers.ttl
 
 type: integer
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
 
-==== dns.answers.data
+[float]
+=== dns.answers.data
 
 The data describing the resource. The meaning of this data depends on the type and class of the resource record.
 
 
-==== dns.additionals
+[float]
+=== dns.additionals
 
 type: dict
 
 An array containing a dictionary for each additional section from the answer.
 
 
-==== dns.additionals_count
+[float]
+=== dns.additionals_count
 
 type: integer
 
 The number of resource records contained in the `dns.additionals` field. The `dns.additionals` field may or may not be included depending on the configuration of Packetbeat.
 
 
-==== dns.additionals.name
+[float]
+=== dns.additionals.name
 
 example: example.com.
 
 The domain name to which this resource record pertains.
 
-==== dns.additionals.type
+[float]
+=== dns.additionals.type
 
 example: NS
 
 The type of data contained in this resource record.
 
-==== dns.additionals.class
+[float]
+=== dns.additionals.class
 
 example: IN
 
 The class of DNS data contained in this resource record.
 
-==== dns.additionals.ttl
+[float]
+=== dns.additionals.ttl
 
 type: integer
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
 
-==== dns.additionals.data
+[float]
+=== dns.additionals.data
 
 The data describing the resource. The meaning of this data depends on the type and class of the resource record.
 
 
-==== dns.opt.version
+[float]
+=== dns.opt.version
 
 example: 0
 
 The EDNS version.
 
-==== dns.opt.do
+[float]
+=== dns.opt.do
 
 type: boolean
 
 If set, the transaction uses DNSSEC.
 
-==== dns.opt.ext_rcode
+[float]
+=== dns.opt.ext_rcode
 
 example: BADVERS
 
 Extended response code field.
 
-==== dns.opt.udp_size
+[float]
+=== dns.opt.udp_size
 
 type: integer
 
 Requestor's UDP payload size (in bytes).
 
 [[exported-fields-flows_event]]
-=== Flow Event Fields
+== Flow Event Fields
 
 These fields contain data about the flow itself.
 
 
 
-==== @timestamp
+[float]
+=== @timestamp
 
 type: date
 
@@ -717,7 +818,8 @@ required: True
 The timestamp of the event, as measured by the Beat. The precision is in milliseconds. The timezone is UTC.
 
 
-==== start_time
+[float]
+=== start_time
 
 type: date
 
@@ -730,7 +832,8 @@ required: True
 The time, the first packet for the flow has been seen.
 
 
-==== last_time
+[float]
+=== last_time
 
 type: date
 
@@ -743,51 +846,59 @@ required: True
 The time, the most recent processed packet for the flow has been seen.
 
 
-==== type
+[float]
+=== type
 
 required: True
 
 Indicates the event to be a flow event. This field is always set to "flow".
 
 
-==== final
+[float]
+=== final
 
 Indicates if event is last event in flow. If final is false, the event reports an intermediate flow state only.
 
 
-==== flow_id
+[float]
+=== flow_id
 
 Internal flow id based on connection meta data and address.
 
 
-==== vlan
+[float]
+=== vlan
 
 Innermost VLAN address used in network packets.
 
 
-==== outer_vlan
+[float]
+=== outer_vlan
 
 Second innermost VLAN address used in network packets.
 
 
 [float]
-=== source Fields
+== source Fields
 
 Properties of the source host
 
 
 
-==== source.mac
+[float]
+=== source.mac
 
 Source MAC address as indicated by first packet seen for the current flow.
 
 
-==== source.ip
+[float]
+=== source.ip
 
 Innermost IPv4 source address as indicated by first packet seen for the current flow.
 
 
-==== source.ip_location
+[float]
+=== source.ip_location
 
 type: geo_point
 
@@ -796,12 +907,14 @@ example: 40.715, -74.011
 The GeoIP location of the `ip_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== source.outer_ip
+[float]
+=== source.outer_ip
 
 Second innermost IPv4 source address as indicated by first packet seen for the current flow.
 
 
-==== source.outer_ip_location
+[float]
+=== source.outer_ip_location
 
 type: geo_point
 
@@ -810,12 +923,14 @@ example: 40.715, -74.011
 The GeoIP location of the `outer_ip_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== source.ipv6
+[float]
+=== source.ipv6
 
 Innermost IPv6 source address as indicated by first packet seen for the current flow.
 
 
-==== source.ipv6_location
+[float]
+=== source.ipv6_location
 
 type: geo_point
 
@@ -824,12 +939,14 @@ example: 60.715, -76.011
 The GeoIP location of the `ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== source.outer_ipv6
+[float]
+=== source.outer_ipv6
 
 Second innermost IPv6 source address as indicated by first packet seen for the current flow.
 
 
-==== source.outer_ipv6_location
+[float]
+=== source.outer_ipv6_location
 
 type: geo_point
 
@@ -838,46 +955,52 @@ example: 60.715, -76.011
 The GeoIP location of the `outer_ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== source.port
+[float]
+=== source.port
 
 Source port number as indicated by first packet seen for the current flow.
 
 
 [float]
-=== stats Fields
+== stats Fields
 
 Object with source to destination flow measurements.
 
 
 
-==== source.stats.net_packets_total
+[float]
+=== source.stats.net_packets_total
 
 Total number of packets
 
 
-==== source.stats.net_bytes_total
+[float]
+=== source.stats.net_bytes_total
 
 Total number of bytes
 
 
 [float]
-=== dest Fields
+== dest Fields
 
 Properties of the destination host
 
 
 
-==== dest.mac
+[float]
+=== dest.mac
 
 Destination MAC address as indicated by first packet seen for the current flow.
 
 
-==== dest.ip
+[float]
+=== dest.ip
 
 Innermost IPv4 destination address as indicated by first packet seen for the current flow.
 
 
-==== dest.ip_location
+[float]
+=== dest.ip_location
 
 type: geo_point
 
@@ -886,12 +1009,14 @@ example: 40.715, -74.011
 The GeoIP location of the `ip_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== dest.outer_ip
+[float]
+=== dest.outer_ip
 
 Second innermost IPv4 destination address as indicated by first packet seen for the current flow.
 
 
-==== dest.outer_ip_location
+[float]
+=== dest.outer_ip_location
 
 type: geo_point
 
@@ -900,12 +1025,14 @@ example: 40.715, -74.011
 The GeoIP location of the `outer_ip_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== dest.ipv6
+[float]
+=== dest.ipv6
 
 Innermost IPv6 destination address as indicated by first packet seen for the current flow.
 
 
-==== dest.ipv6_location
+[float]
+=== dest.ipv6_location
 
 type: geo_point
 
@@ -914,12 +1041,14 @@ example: 60.715, -76.011
 The GeoIP location of the `ipv6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== dest.outer_ipv6
+[float]
+=== dest.outer_ipv6
 
 Second innermost IPv6 destination address as indicated by first packet seen for the current flow.
 
 
-==== dest.outer_ipv6_location
+[float]
+=== dest.outer_ipv6_location
 
 type: geo_point
 
@@ -928,77 +1057,88 @@ example: 60.715, -76.011
 The GeoIP location of the `outer_ipv6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== dest.port
+[float]
+=== dest.port
 
 Destination port number as indicated by first packet seen for the current flow.
 
 
 [float]
-=== stats Fields
+== stats Fields
 
 Object with destination to source flow measurements.
 
 
 
-==== dest.stats.net_packets_total
+[float]
+=== dest.stats.net_packets_total
 
 Total number of packets
 
 
-==== dest.stats.net_bytes_total
+[float]
+=== dest.stats.net_bytes_total
 
 Total number of bytes
 
 
-==== icmp_id
+[float]
+=== icmp_id
 
 ICMP id used in ICMP based flow.
 
 
-==== transport
+[float]
+=== transport
 
 The transport protocol used by the flow. If known, one of "udp" or "tcp".
 
 
-==== connection_id
+[float]
+=== connection_id
 
 optional TCP connection id
 
 
 [[exported-fields-http]]
-=== HTTP Fields
+== HTTP Fields
 
 HTTP-specific event fields.
 
 
 
-==== http.code
+[float]
+=== http.code
 
 example: 404
 
 The HTTP status code.
 
-==== http.phrase
+[float]
+=== http.phrase
 
 example: Not found.
 
 The HTTP status phrase.
 
-==== http.request_headers
+[float]
+=== http.request_headers
 
 type: dict
 
 A map containing the captured header fields from the request. Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
 
 
-==== http.response_headers
+[float]
+=== http.response_headers
 
 type: dict
 
 A map containing the captured header fields from the response. Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
 
 
-==== http.content_length
+[float]
+=== http.content_length
 
 type: long
 
@@ -1006,348 +1146,397 @@ The value of the Content-Length header if present.
 
 
 [[exported-fields-icmp]]
-=== ICMP Fields
+== ICMP Fields
 
 ICMP specific event fields.
 
 
 
 
-==== icmp.version
+[float]
+=== icmp.version
 
 The version of the ICMP protocol.
 
-==== icmp.request.message
+[float]
+=== icmp.request.message
 
 type: keyword
 
 A human readable form of the request.
 
-==== icmp.request.type
+[float]
+=== icmp.request.type
 
 type: integer
 
 The request type.
 
-==== icmp.request.code
+[float]
+=== icmp.request.code
 
 type: integer
 
 The request code.
 
-==== icmp.response.message
+[float]
+=== icmp.response.message
 
 type: keyword
 
 A human readable form of the response.
 
-==== icmp.response.type
+[float]
+=== icmp.response.type
 
 type: integer
 
 The response type.
 
-==== icmp.response.code
+[float]
+=== icmp.response.code
 
 type: integer
 
 The response code.
 
 [[exported-fields-memcache]]
-=== Memcache Fields
+== Memcache Fields
 
 Memcached-specific event fields
 
 
 
-==== memcache.protocol_type
+[float]
+=== memcache.protocol_type
 
 type: keyword
 
 The memcache protocol implementation. The value can be "binary" for binary-based, "text" for text-based, or "unknown" for an unknown memcache protocol type.
 
 
-==== memcache.request.line
+[float]
+=== memcache.request.line
 
 type: keyword
 
 The raw command line for unknown commands ONLY.
 
 
-==== memcache.request.command
+[float]
+=== memcache.request.command
 
 type: keyword
 
 The memcache command being requested in the memcache text protocol. For example "set" or "get". The binary protocol opcodes are translated into memcache text protocol commands.
 
 
-==== memcache.response.command
+[float]
+=== memcache.response.command
 
 type: keyword
 
 Either the text based protocol response message type or the name of the originating request if binary protocol is used.
 
 
-==== memcache.request.type
+[float]
+=== memcache.request.type
 
 type: keyword
 
 The memcache command classification. This value can be "UNKNOWN", "Load", "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler", "Stats", "Success", "Fail", or "Auth".
 
 
-==== memcache.response.type
+[float]
+=== memcache.response.type
 
 type: keyword
 
 The memcache command classification. This value can be "UNKNOWN", "Load", "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler", "Stats", "Success", "Fail", or "Auth". The text based protocol will employ any of these, whereas the binary based protocol will mirror the request commands only (see `memcache.response.status` for binary protocol).
 
 
-==== memcache.response.error_msg
+[float]
+=== memcache.response.error_msg
 
 type: keyword
 
 The optional error message in the memcache response (text based protocol only).
 
 
-==== memcache.request.opcode
+[float]
+=== memcache.request.opcode
 
 type: keyword
 
 The binary protocol message opcode name.
 
 
-==== memcache.response.opcode
+[float]
+=== memcache.response.opcode
 
 type: keyword
 
 The binary protocol message opcode name.
 
 
-==== memcache.request.opcode_value
+[float]
+=== memcache.request.opcode_value
 
 type: integer
 
 The binary protocol message opcode value.
 
 
-==== memcache.response.opcode_value
+[float]
+=== memcache.response.opcode_value
 
 type: integer
 
 The binary protocol message opcode value.
 
 
-==== memcache.request.opaque
+[float]
+=== memcache.request.opaque
 
 type: integer
 
 The binary protocol opaque header value used for correlating request with response messages.
 
 
-==== memcache.response.opaque
+[float]
+=== memcache.response.opaque
 
 type: integer
 
 The binary protocol opaque header value used for correlating request with response messages.
 
 
-==== memcache.request.vbucket
+[float]
+=== memcache.request.vbucket
 
 type: integer
 
 The vbucket index sent in the binary message.
 
 
-==== memcache.response.status
+[float]
+=== memcache.response.status
 
 type: keyword
 
 The textual representation of the response error code (binary protocol only).
 
 
-==== memcache.response.status_code
+[float]
+=== memcache.response.status_code
 
 type: integer
 
 The status code value returned in the response (binary protocol only).
 
 
-==== memcache.request.keys
+[float]
+=== memcache.request.keys
 
 type: list
 
 The list of keys sent in the store or load commands.
 
 
-==== memcache.response.keys
+[float]
+=== memcache.response.keys
 
 type: list
 
 The list of keys returned for the load command (if present).
 
 
-==== memcache.request.count_values
+[float]
+=== memcache.request.count_values
 
 type: integer
 
 The number of values found in the memcache request message. If the command does not send any data, this field is missing.
 
 
-==== memcache.response.count_values
+[float]
+=== memcache.response.count_values
 
 type: integer
 
 The number of values found in the memcache response message. If the command does not send any data, this field is missing.
 
 
-==== memcache.request.values
+[float]
+=== memcache.request.values
 
 type: list
 
 The list of base64 encoded values sent with the request (if present).
 
 
-==== memcache.response.values
+[float]
+=== memcache.response.values
 
 type: list
 
 The list of base64 encoded values sent with the response (if present).
 
 
-==== memcache.request.bytes
+[float]
+=== memcache.request.bytes
 
 type: long
 
 The byte count of the values being transfered.
 
 
-==== memcache.response.bytes
+[float]
+=== memcache.response.bytes
 
 type: long
 
 The byte count of the values being transfered.
 
 
-==== memcache.request.delta
+[float]
+=== memcache.request.delta
 
 type: integer
 
 The counter increment/decrement delta value.
 
 
-==== memcache.request.initial
+[float]
+=== memcache.request.initial
 
 type: integer
 
 The counter increment/decrement initial value parameter (binary protocol only).
 
 
-==== memcache.request.verbosity
+[float]
+=== memcache.request.verbosity
 
 type: integer
 
 The value of the memcache "verbosity" command.
 
 
-==== memcache.request.raw_args
+[float]
+=== memcache.request.raw_args
 
 type: keyword
 
 The text protocol raw arguments for the "stats ..." and "lru crawl ..." commands.
 
 
-==== memcache.request.source_class
+[float]
+=== memcache.request.source_class
 
 type: integer
 
 The source class id in 'slab reassign' command.
 
 
-==== memcache.request.dest_class
+[float]
+=== memcache.request.dest_class
 
 type: integer
 
 The destination class id in 'slab reassign' command.
 
 
-==== memcache.request.automove
+[float]
+=== memcache.request.automove
 
 type: keyword
 
 The automove mode in the 'slab automove' command expressed as a string. This value can be "standby"(=0), "slow"(=1), "aggressive"(=2), or the raw value if the value is unknown.
 
 
-==== memcache.request.flags
+[float]
+=== memcache.request.flags
 
 type: long
 
 The memcache command flags sent in the request (if present).
 
 
-==== memcache.response.flags
+[float]
+=== memcache.response.flags
 
 type: long
 
 The memcache message flags sent in the response (if present).
 
 
-==== memcache.request.exptime
+[float]
+=== memcache.request.exptime
 
 type: integer
 
 The data expiry time in seconds sent with the memcache command (if present). If the value is <30 days, the expiry time is relative to "now", or else it is an absolute Unix time in seconds (32-bit).
 
 
-==== memcache.request.sleep_us
+[float]
+=== memcache.request.sleep_us
 
 type: long
 
 The sleep setting in microseconds for the 'lru_crawler sleep' command.
 
 
-==== memcache.response.value
+[float]
+=== memcache.response.value
 
 type: long
 
 The counter value returned by a counter operation.
 
 
-==== memcache.request.noreply
+[float]
+=== memcache.request.noreply
 
 type: boolean
 
 Set to true if noreply was set in the request. The `memcache.response` field will be missing.
 
 
-==== memcache.request.quiet
+[float]
+=== memcache.request.quiet
 
 type: boolean
 
 Set to true if the binary protocol message is to be treated as a quiet message.
 
 
-==== memcache.request.cas_unique
+[float]
+=== memcache.request.cas_unique
 
 type: long
 
 The CAS (compare-and-swap) identifier if present.
 
 
-==== memcache.response.cas_unique
+[float]
+=== memcache.response.cas_unique
 
 type: long
 
 The CAS (compare-and-swap) identifier to be used with CAS-based updates (if present).
 
 
-==== memcache.response.stats
+[float]
+=== memcache.response.stats
 
 type: list
 
 The list of statistic values returned. Each entry is a dictionary with the fields "name" and "value".
 
 
-==== memcache.response.version
+[float]
+=== memcache.response.version
 
 type: keyword
 
@@ -1355,284 +1544,329 @@ The returned memcache version string.
 
 
 [[exported-fields-mongodb]]
-=== MongoDb Fields
+== MongoDb Fields
 
 MongoDB-specific event fields. These fields mirror closely the fields for the MongoDB wire protocol. The higher level fields (for example, `query` and `resource`) apply to MongoDB events as well.
 
 
 
 
-==== mongodb.error
+[float]
+=== mongodb.error
 
 If the MongoDB request has resulted in an error, this field contains the error message returned by the server.
 
 
-==== mongodb.fullCollectionName
+[float]
+=== mongodb.fullCollectionName
 
 The full collection name. The full collection name is the concatenation of the database name with the collection name, using a dot (.) for the concatenation. For example, for the database foo and the collection bar, the full collection name is foo.bar.
 
 
-==== mongodb.numberToSkip
+[float]
+=== mongodb.numberToSkip
 
 type: integer
 
 Sets the number of documents to omit - starting from the first document in the resulting dataset - when returning the result of the query.
 
 
-==== mongodb.numberToReturn
+[float]
+=== mongodb.numberToReturn
 
 type: integer
 
 The requested maximum number of documents to be returned.
 
 
-==== mongodb.numberReturned
+[float]
+=== mongodb.numberReturned
 
 type: integer
 
 The number of documents in the reply.
 
 
-==== mongodb.startingFrom
+[float]
+=== mongodb.startingFrom
 
 Where in the cursor this reply is starting.
 
 
-==== mongodb.query
+[float]
+=== mongodb.query
 
 A JSON document that represents the query. The query will contain one or more elements, all of which must match for a document to be included in the result set. Possible elements include $query, $orderby, $hint, $explain, and $snapshot.
 
 
-==== mongodb.returnFieldsSelector
+[float]
+=== mongodb.returnFieldsSelector
 
 A JSON document that limits the fields in the returned documents. The returnFieldsSelector contains one or more elements, each of which is the name of a field that should be returned, and the integer value 1.
 
 
-==== mongodb.selector
+[float]
+=== mongodb.selector
 
 A BSON document that specifies the query for selecting the document to update or delete.
 
 
-==== mongodb.update
+[float]
+=== mongodb.update
 
 A BSON document that specifies the update to be performed. For information on specifying updates, see the Update Operations documentation from the MongoDB Manual.
 
 
-==== mongodb.cursorId
+[float]
+=== mongodb.cursorId
 
 The cursor identifier returned in the OP_REPLY. This must be the value that was returned from the database.
 
 
 [float]
-=== rpc Fields
+== rpc Fields
 
 OncRPC specific event fields.
 
 
-==== rpc.xid
+[float]
+=== rpc.xid
 
 RPC message transaction identifier.
 
-==== rpc.call_size
+[float]
+=== rpc.call_size
 
 type: integer
 
 RPC call size with argument.
 
-==== rpc.reply_size
+[float]
+=== rpc.reply_size
 
 type: integer
 
 RPC reply size with argument.
 
-==== rpc.status
+[float]
+=== rpc.status
 
 RPC message reply status.
 
-==== rpc.time
+[float]
+=== rpc.time
 
 type: long
 
 RPC message processing time.
 
-==== rpc.time_str
+[float]
+=== rpc.time_str
 
 RPC message processing time in human readable form.
 
-==== rpc.auth_flavor
+[float]
+=== rpc.auth_flavor
 
 RPC authentication flavor.
 
-==== rpc.cred.uid
+[float]
+=== rpc.cred.uid
 
 type: integer
 
 RPC caller's user id, in case of auth-unix.
 
-==== rpc.cred.gid
+[float]
+=== rpc.cred.gid
 
 type: integer
 
 RPC caller's group id, in case of auth-unix.
 
-==== rpc.cred.gids
+[float]
+=== rpc.cred.gids
 
 RPC caller's secondary group ids, in case of auth-unix.
 
-==== rpc.cred.stamp
+[float]
+=== rpc.cred.stamp
 
 type: integer
 
 Arbitrary ID which the caller machine may generate.
 
-==== rpc.cred.machinename
+[float]
+=== rpc.cred.machinename
 
 The name of the caller's machine.
 
 [[exported-fields-mysql]]
-=== MySQL Fields
+== MySQL Fields
 
 MySQL-specific event fields.
 
 
 
 
-==== mysql.iserror
+[float]
+=== mysql.iserror
 
 type: boolean
 
 If the MySQL query returns an error, this field is set to true.
 
 
-==== mysql.affected_rows
+[float]
+=== mysql.affected_rows
 
 type: integer
 
 If the MySQL command is successful, this field contains the affected number of rows of the last statement.
 
 
-==== mysql.insert_id
+[float]
+=== mysql.insert_id
 
 If the INSERT query is successful, this field contains the id of the newly inserted row.
 
 
-==== mysql.num_fields
+[float]
+=== mysql.num_fields
 
 If the SELECT query is successful, this field is set to the number of fields returned.
 
 
-==== mysql.num_rows
+[float]
+=== mysql.num_rows
 
 If the SELECT query is successful, this field is set to the number of rows returned.
 
 
-==== mysql.query
+[float]
+=== mysql.query
 
 The row mysql query as read from the transaction's request.
 
 
-==== mysql.error_code
+[float]
+=== mysql.error_code
 
 type: integer
 
 The error code returned by MySQL.
 
 
-==== mysql.error_message
+[float]
+=== mysql.error_message
 
 The error info message returned by MySQL.
 
 
 [[exported-fields-nfs]]
-=== NFS Fields
+== NFS Fields
 
 NFS v4/3 specific event fields.
 
 
 
-==== nfs.version
+[float]
+=== nfs.version
 
 type: integer
 
 NFS protocol version number.
 
-==== nfs.minor_version
+[float]
+=== nfs.minor_version
 
 type: integer
 
 NFS protocol minor version number.
 
-==== nfs.tag
+[float]
+=== nfs.tag
 
 NFS v4 COMPOUND operation tag.
 
-==== nfs.opcode
+[float]
+=== nfs.opcode
 
 NFS operation name, or main operation name, in case of COMPOUND calls.
 
 
-==== nfs.status
+[float]
+=== nfs.status
 
 NFS operation reply status.
 
 [[exported-fields-pgsql]]
-=== PostgreSQL Fields
+== PostgreSQL Fields
 
 PostgreSQL-specific event fields.
 
 
 
 
-==== pgsql.query
+[float]
+=== pgsql.query
 
 The row pgsql query as read from the transaction's request.
 
 
-==== pgsql.iserror
+[float]
+=== pgsql.iserror
 
 type: boolean
 
 If the PgSQL query returns an error, this field is set to true.
 
 
-==== pgsql.error_code
+[float]
+=== pgsql.error_code
 
 type: integer
 
 The PostgreSQL error code.
 
-==== pgsql.error_message
+[float]
+=== pgsql.error_message
 
 The PostgreSQL error message.
 
-==== pgsql.error_severity
+[float]
+=== pgsql.error_severity
 
 The PostgreSQL error severity.
 
-==== pgsql.num_fields
+[float]
+=== pgsql.num_fields
 
 If the SELECT query if successful, this field is set to the number of fields returned.
 
 
-==== pgsql.num_rows
+[float]
+=== pgsql.num_rows
 
 If the SELECT query if successful, this field is set to the number of rows returned.
 
 
 [[exported-fields-raw]]
-=== Raw Fields
+== Raw Fields
 
 These fields contain the raw transaction data.
 
 
-==== request
+[float]
+=== request
 
 type: text
 
 For text protocols, this is the request as seen on the wire (application layer only). For binary protocols this is our representation of the request.
 
 
-==== response
+[float]
+=== response
 
 type: text
 
@@ -1640,59 +1874,66 @@ For text protocols, this is the response as seen on the wire (application layer 
 
 
 [[exported-fields-redis]]
-=== Redis Fields
+== Redis Fields
 
 Redis-specific event fields.
 
 
 
 
-==== redis.return_value
+[float]
+=== redis.return_value
 
 The return value of the Redis command in a human readable format.
 
 
-==== redis.error
+[float]
+=== redis.error
 
 If the Redis command has resulted in an error, this field contains the error message returned by the Redis server.
 
 
 [[exported-fields-thrift]]
-=== Thrift-RPC Fields
+== Thrift-RPC Fields
 
 Thrift-RPC specific event fields.
 
 
 
 
-==== thrift.params
+[float]
+=== thrift.params
 
 The RPC method call parameters in a human readable format. If the IDL files are available, the parameters use names whenever possible. Otherwise, the IDs from the message are used.
 
 
-==== thrift.service
+[float]
+=== thrift.service
 
 The name of the Thrift-RPC service as defined in the IDL files.
 
 
-==== thrift.return_value
+[float]
+=== thrift.return_value
 
 The value returned by the Thrift-RPC call. This is encoded in a human readable format.
 
 
-==== thrift.exceptions
+[float]
+=== thrift.exceptions
 
 If the call resulted in exceptions, this field contains the exceptions in a human readable format.
 
 
 [[exported-fields-trans_event]]
-=== Transaction Event Fields
+== Transaction Event Fields
 
 These fields contain data about the transaction itself.
 
 
 
-==== @timestamp
+[float]
+=== @timestamp
 
 type: date
 
@@ -1705,119 +1946,136 @@ required: True
 The timestamp of the event, as measured either by the Beat or by a common collector point. The precision is in milliseconds. The timezone is UTC.
 
 
-==== type
+[float]
+=== type
 
 required: True
 
 The type of the transaction (for example, HTTP, MySQL, Redis, or RUM).
 
 
-==== direction
+[float]
+=== direction
 
 required: True
 
 Indicates whether the transaction is inbound (emitted by server) or outbound (emitted by the client). Values can be in or out. No defaults.
 
 
-==== status
+[float]
+=== status
 
 required: True
 
 The high level status of the transaction. The way to compute this value depends on the protocol, but the result has a meaning independent of the protocol.
 
 
-==== method
+[float]
+=== method
 
 The command/verb/method of the transaction. For HTTP, this is the method name (GET, POST, PUT, and so on), for SQL this is the verb (SELECT, UPDATE, DELETE, and so on).
 
 
-==== resource
+[float]
+=== resource
 
 The logical resource that this transaction refers to. For HTTP, this is the URL path up to the last slash (/). For example, if the URL is `/users/1`, the resource is `/users`. For databases, the resource is typically the table name. The field is not filled for all transaction types.
 
 
-==== path
+[float]
+=== path
 
 required: True
 
 The path the transaction refers to. For HTTP, this is the URL. For SQL databases, this is the table name. For key-value stores, this is the key.
 
 
-==== query
+[float]
+=== query
 
 type: keyword
 
 The query in a human readable format. For HTTP, it will typically be something like `GET /users/_search?name=test`. For MySQL, it is something like `SELECT id from users where name=test`.
 
 
-==== params
+[float]
+=== params
 
 type: text
 
 The request parameters. For HTTP, these are the POST or GET parameters. For Thrift-RPC, these are the parameters from the request.
 
 
-==== notes
+[float]
+=== notes
 
 Messages from Packetbeat itself. This field usually contains error messages for interpreting the raw data. This information can be helpful for troubleshooting.
 
 
 [[exported-fields-trans_measurements]]
-=== Measurements (Transactions) Fields
+== Measurements (Transactions) Fields
 
 These fields contain measurements related to the transaction.
 
 
 
-==== responsetime
+[float]
+=== responsetime
 
 type: long
 
 The wall clock time it took to complete the transaction. The precision is in milliseconds.
 
 
-==== cpu_time
+[float]
+=== cpu_time
 
 type: long
 
 The CPU time it took to complete the transaction.
 
-==== bytes_in
+[float]
+=== bytes_in
 
 type: long
 
 The number of bytes of the request. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 
 
-==== bytes_out
+[float]
+=== bytes_out
 
 type: long
 
 The number of bytes of the response. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 
 
-==== dnstime
+[float]
+=== dnstime
 
 type: long
 
 The time it takes to query the name server for a given request. This is typically used for RUM (real-user-monitoring) but can also have values for server-to-server communication when DNS is used for service discovery. The precision is in microseconds.
 
 
-==== connecttime
+[float]
+=== connecttime
 
 type: long
 
 The time it takes for the TCP connection to be established for the given transaction. The precision is in microseconds.
 
 
-==== loadtime
+[float]
+=== loadtime
 
 type: long
 
 The time it takes for the content to be loaded. This is typically used for RUM (real-user-monitoring) but it can make sense in other cases as well. The precision is in microseconds.
 
 
-==== domloadtime
+[float]
+=== domloadtime
 
 type: long
 

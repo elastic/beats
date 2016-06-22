@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[using-environ-vars]]
-=== Using Environment Variables in the Configuration
+== Using Environment Variables in the Configuration
 
 experimental[]
 
@@ -37,7 +37,8 @@ If you need to use a literal `${` in your configuration file then you can write
 After changing the value of an environment variable, you need to restart
 {beatname_uc} to pick up the new value.
 
-==== Examples
+[float]
+=== Examples
 
 Here are some examples of configurations that use environment variables
 and what each configuration looks like after replacement:

@@ -1,10 +1,10 @@
 [[metricbeat-configuration-options]]
-== Configuration Options
+== Configuration Options (Reference)
 
 Before modifying configuration settings, make sure you've completed the
 <<metricbeat-configuration,configuration steps>> in the Getting Started.
 
-The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax.
+The {beatname_uc} configuration file, +{beatname_lc}.yml+, uses http://yaml.org/[YAML] for its syntax.
 The configuration options are described in the following sections. After changing
 configuration settings, you need to restart {beatname_uc} to pick up the changes.
 
