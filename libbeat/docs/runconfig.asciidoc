@@ -23,7 +23,7 @@ WARNING: On Linux, Setuid doesn't change the uid of all threads, so the Go
          garbage collector will continue to run as root. Also note that process
          monitoring only works when running as root.
 
-Example configuration:
+Example configuration for the `runoptions` section of the +{beatname_lc}.yml+ config file:
 
 [source,yaml]
 ------------------------------------------------------------------------------

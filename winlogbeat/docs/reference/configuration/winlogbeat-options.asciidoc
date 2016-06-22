@@ -4,7 +4,7 @@
 [[configuration-winlogbeat-options]]
 === Winlogbeat Configuration
 
-The `winlogbeat` section specifies all options that are specific to Winlogbeat.
+The `winlogbeat` section of the +{beatname_lc}.yml+ config file specifies all options that are specific to Winlogbeat.
 Most importantly, it contains the list of event logs to monitor.
 
 Here is a sample configuration:
@@ -20,7 +20,7 @@ winlogbeat.event_logs:
 
 ==== Winlogbeat Options
 
-You can specify the following options in the `winlogbeat` section:
+You can specify the following options in the `winlogbeat` section of the +{beatname_lc}.yml+ config file:
 
 ===== registry_file
 
