@@ -1,4 +1,4 @@
-package input
+package file
 
 import (
 	"os"
@@ -6,15 +6,11 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-const (
-	jsonErrorKey = "json_error"
-)
-
 type File struct {
-	File      *os.File
-	FileInfo  os.FileInfo
-	Path      string
-	FileState *FileState
+	File     *os.File
+	FileInfo os.FileInfo
+	Path     string
+	State    *State
 }
 
 // Check that the file isn't a symlink, mode is regular or file is nil

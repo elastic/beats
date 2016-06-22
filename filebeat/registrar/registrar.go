@@ -10,8 +10,8 @@ import (
 	"time"
 
 	cfg "github.com/elastic/beats/filebeat/config"
-	"github.com/elastic/beats/filebeat/input"
 	. "github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
 )
@@ -19,8 +19,8 @@ import (
 type Registrar struct {
 	Channel      chan []*FileEvent
 	done         chan struct{}
-	registryFile string        // Path to the Registry File
-	states       *input.States // Map with all file paths inside and the corresponding state
+	registryFile string       // Path to the Registry File
+	states       *file.States // Map with all file paths inside and the corresponding state
 	wg           sync.WaitGroup
 }
 
@@ -29,7 +29,7 @@ func New(registryFile string) (*Registrar, error) {
 	r := &Registrar{
 		registryFile: registryFile,
 		done:         make(chan struct{}),
-		states:       input.NewStates(),
+		states:       file.NewStates(),
 		Channel:      make(chan []*FileEvent, 1),
 		wg:           sync.WaitGroup{},
 	}
@@ -63,7 +63,7 @@ func (r *Registrar) Init() error {
 }
 
 // GetStates return the registrar states
-func (r *Registrar) GetStates() input.States {
+func (r *Registrar) GetStates() file.States {
 	return *r.states
 }
 
@@ -83,24 +83,28 @@ func (r *Registrar) loadStates() error {
 		return nil
 	}
 
-	file, err := os.Open(r.registryFile)
+	f, err := os.Open(r.registryFile)
 	if err != nil {
 		return err
 	}
 
-	defer file.Close()
+	defer f.Close()
 
 	logp.Info("Loading registrar data from %s", r.registryFile)
 
 	// DEPRECATED: This should be removed in 6.0
-	oldStates := r.loadAndConvertOldState(file)
+	oldStates := r.loadAndConvertOldState(f)
 	if oldStates {
 		return nil
 	}
 
-	decoder := json.NewDecoder(file)
-	states := []input.FileState{}
-	decoder.Decode(&states)
+	decoder := json.NewDecoder(f)
+	states := []file.State{}
+	err = decoder.Decode(&states)
+	if err != nil {
+		logp.Err("Error decoding states: %s", err)
+		return err
+	}
 
 	r.states.SetStates(states)
 	logp.Info("States Loaded from registrar: %+v", len(states))
@@ -110,12 +114,12 @@ func (r *Registrar) loadStates() error {
 
 // loadAndConvertOldState loads the old state file and converts it to the new state
 // This is designed so it can be easily removed in later versions
-func (r *Registrar) loadAndConvertOldState(file *os.File) bool {
+func (r *Registrar) loadAndConvertOldState(f *os.File) bool {
 	// Make sure file reader is reset afterwards
-	defer file.Seek(0, 0)
+	defer f.Seek(0, 0)
 
-	decoder := json.NewDecoder(file)
-	oldStates := map[string]FileState{}
+	decoder := json.NewDecoder(f)
+	oldStates := map[string]file.State{}
 	err := decoder.Decode(&oldStates)
 
 	if err != nil {
@@ -129,7 +133,7 @@ func (r *Registrar) loadAndConvertOldState(file *os.File) bool {
 	}
 
 	// Convert old states to new states
-	states := make([]input.FileState, len(oldStates))
+	states := make([]file.State, len(oldStates))
 	logp.Info("Old registry states found: %v", len(oldStates))
 	counter := 0
 	for _, state := range oldStates {
@@ -214,21 +218,25 @@ func (r *Registrar) writeRegistry() error {
 	logp.Debug("registrar", "Write registry file: %s", r.registryFile)
 
 	tempfile := r.registryFile + ".new"
-	file, e := os.Create(tempfile)
-	if e != nil {
-		logp.Err("Failed to create tempfile (%s) for writing: %s", tempfile, e)
-		return e
+	f, err := os.Create(tempfile)
+	if err != nil {
+		logp.Err("Failed to create tempfile (%s) for writing: %s", tempfile, err)
+		return err
 	}
 
 	states := r.states.GetStates()
 
-	encoder := json.NewEncoder(file)
-	encoder.Encode(states)
+	encoder := json.NewEncoder(f)
+	err = encoder.Encode(states)
+	if err != nil {
+		logp.Err("Error when encoding the states: %s", err)
+		return err
+	}
 
 	// Directly close file because of windows
-	file.Close()
+	f.Close()
 
 	logp.Info("Registry file updated. %d states written.", len(states))
 
-	return SafeFileRotate(r.registryFile, tempfile)
+	return file.SafeFileRotate(r.registryFile, tempfile)
 }

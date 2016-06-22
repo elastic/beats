@@ -8,6 +8,7 @@ import (
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -19,7 +20,7 @@ type Prospector struct {
 	spoolerChan   chan *input.FileEvent
 	harvesterChan chan *input.FileEvent
 	done          chan struct{}
-	states        *input.States
+	states        *file.States
 	wg            sync.WaitGroup
 }
 
@@ -28,7 +29,7 @@ type Prospectorer interface {
 	Run()
 }
 
-func NewProspector(cfg *common.Config, states input.States, spoolerChan chan *input.FileEvent) (*Prospector, error) {
+func NewProspector(cfg *common.Config, states file.States, spoolerChan chan *input.FileEvent) (*Prospector, error) {
 	prospector := &Prospector{
 		cfg:           cfg,
 		config:        defaultConfig,
@@ -79,7 +80,7 @@ func (p *Prospector) Init() error {
 	p.prospectorer = prospectorer
 
 	// Create empty harvester to check if configs are fine
-	_, err = p.createHarvester(input.FileState{})
+	_, err = p.createHarvester(file.State{})
 	if err != nil {
 		return err
 	}
@@ -137,7 +138,7 @@ func (p *Prospector) Stop() {
 }
 
 // createHarvester creates a new harvester instance from the given state
-func (p *Prospector) createHarvester(state input.FileState) (*harvester.Harvester, error) {
+func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, error) {
 
 	h, err := harvester.NewHarvester(
 		p.cfg,
@@ -151,7 +152,7 @@ func (p *Prospector) createHarvester(state input.FileState) (*harvester.Harveste
 	return h, err
 }
 
-func (p *Prospector) startHarvester(state input.FileState, offset int64) (*harvester.Harvester, error) {
+func (p *Prospector) startHarvester(state file.State, offset int64) (*harvester.Harvester, error) {
 	state.Offset = offset
 	// Create harvester with state
 	h, err := p.createHarvester(state)

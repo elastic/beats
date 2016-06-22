@@ -14,19 +14,10 @@ import (
 
 // Defaults for config variables which are not set
 const (
-	DefaultRegistryFile                      = "registry"
-	DefaultCloseOlder          time.Duration = 1 * time.Hour
-	DefaultSpoolSize           uint64        = 2048
-	DefaultIdleTimeout         time.Duration = 5 * time.Second
-	DefaultHarvesterBufferSize int           = 16 << 10 // 16384
-	DefaultInputType                         = "log"
-	DefaultDocumentType                      = "log"
-	DefaultTailFiles                         = false
-	DefaultBackoff                           = 1 * time.Second
-	DefaultBackoffFactor                     = 2
-	DefaultMaxBackoff                        = 10 * time.Second
-	DefaultForceCloseFiles                   = false
-	DefaultMaxBytes                          = 10 * (1 << 20) // 10MB
+	DefaultRegistryFile string        = "registry"
+	DefaultSpoolSize    uint64        = 2048
+	DefaultIdleTimeout  time.Duration = 5 * time.Second
+	DefaultInputType                  = "log"
 )
 
 type Config struct {
@@ -122,7 +113,6 @@ func (config *Config) FetchConfigs() {
 	}
 
 	err = mergeConfigFiles(configFiles, config)
-
 	if err != nil {
 		log.Fatal("Error merging config files: ", err)
 	}

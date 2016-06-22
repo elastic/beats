@@ -6,7 +6,6 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -61,7 +60,7 @@ func NewMultiline(
 	r LineProcessor,
 	separator string,
 	maxBytes int,
-	config *input.MultilineConfig,
+	config *MultilineConfig,
 ) (*MultiLine, error) {
 	types := map[string]func(*regexp.Regexp) (matcher, error){
 		"before": beforeMatcher,

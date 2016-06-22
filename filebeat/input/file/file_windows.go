@@ -1,4 +1,4 @@
-package input
+package file
 
 import (
 	"fmt"
@@ -9,14 +9,14 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-type FileStateOS struct {
+type StateOS struct {
 	IdxHi uint64 `json:"idxhi,"`
 	IdxLo uint64 `json:"idxlo,"`
 	Vol   uint64 `json:"vol,"`
 }
 
-// GetOSFileState returns the platform specific FileStateOS
-func GetOSFileState(info os.FileInfo) FileStateOS {
+// GetOSState returns the platform specific StateOS
+func GetOSState(info os.FileInfo) StateOS {
 
 	// os.SameFile must be called to populate the id fields. Otherwise in case for example
 	// os.Stat(file) is used to get the fileInfo, the ids are empty.
@@ -31,7 +31,7 @@ func GetOSFileState(info os.FileInfo) FileStateOS {
 	// More details can be found here: https://msdn.microsoft.com/en-us/library/aa363788(v=vs.85).aspx
 	// Uint should already return uint64, but making sure this is the case
 	// The required fiels can be found here: https://github.com/golang/go/blob/master/src/os/types_windows.go#L78
-	fileState := FileStateOS{
+	fileState := StateOS{
 		IdxHi: uint64(fileStat.FieldByName("idxhi").Uint()),
 		IdxLo: uint64(fileStat.FieldByName("idxlo").Uint()),
 		Vol:   uint64(fileStat.FieldByName("vol").Uint()),
@@ -41,7 +41,7 @@ func GetOSFileState(info os.FileInfo) FileStateOS {
 }
 
 // IsSame file checks if the files are identical
-func (fs FileStateOS) IsSame(state FileStateOS) bool {
+func (fs StateOS) IsSame(state StateOS) bool {
 	return fs.IdxHi == state.IdxHi && fs.IdxLo == state.IdxLo && fs.Vol == state.Vol
 }
 
