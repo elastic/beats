@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/input/file"
 )
 
 type ProspectorStdin struct {
@@ -20,7 +20,7 @@ func NewProspectorStdin(p *Prospector) (*ProspectorStdin, error) {
 
 	var err error
 
-	prospectorer.harvester, err = p.createHarvester(input.FileState{Source: "-"})
+	prospectorer.harvester, err = p.createHarvester(file.State{Source: "-"})
 	if err != nil {
 		return nil, fmt.Errorf("Error initializing stdin harvester: %v", err)
 	}

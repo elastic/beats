@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester/encoding"
-	"github.com/elastic/beats/filebeat/input"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,7 +25,7 @@ func (p bufferSource) Continuable() bool          { return false }
 
 func TestMultilineAfterOK(t *testing.T) {
 	testMultilineOK(t,
-		input.MultilineConfig{
+		MultilineConfig{
 			Pattern: regexp.MustCompile(`^[ \t] +`), // next line is indented by spaces
 			Match:   "after",
 		},
@@ -37,7 +36,7 @@ func TestMultilineAfterOK(t *testing.T) {
 
 func TestMultilineBeforeOK(t *testing.T) {
 	testMultilineOK(t,
-		input.MultilineConfig{
+		MultilineConfig{
 			Pattern: regexp.MustCompile(`\\$`), // previous line ends with \
 			Match:   "before",
 		},
@@ -48,7 +47,7 @@ func TestMultilineBeforeOK(t *testing.T) {
 
 func TestMultilineAfterNegateOK(t *testing.T) {
 	testMultilineOK(t,
-		input.MultilineConfig{
+		MultilineConfig{
 			Pattern: regexp.MustCompile(`^-`), // first line starts with '-' at beginning of line
 			Negate:  true,
 			Match:   "after",
@@ -60,7 +59,7 @@ func TestMultilineAfterNegateOK(t *testing.T) {
 
 func TestMultilineBeforeNegateOK(t *testing.T) {
 	testMultilineOK(t,
-		input.MultilineConfig{
+		MultilineConfig{
 			Pattern: regexp.MustCompile(`;$`), // last line ends with ';'
 			Negate:  true,
 			Match:   "before",
@@ -70,7 +69,7 @@ func TestMultilineBeforeNegateOK(t *testing.T) {
 	)
 }
 
-func testMultilineOK(t *testing.T, cfg input.MultilineConfig, expected ...string) {
+func testMultilineOK(t *testing.T, cfg MultilineConfig, expected ...string) {
 	_, buf := createLineBuffer(expected...)
 	reader := createMultilineTestReader(t, buf, cfg)
 
@@ -96,7 +95,7 @@ func testMultilineOK(t *testing.T, cfg input.MultilineConfig, expected ...string
 	}
 }
 
-func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg input.MultilineConfig) LineProcessor {
+func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg MultilineConfig) LineProcessor {
 	encFactory, ok := encoding.FindEncoding("plain")
 	if !ok {
 		t.Fatalf("unable to find 'plain' encoding")
@@ -108,7 +107,7 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg input.Multili
 	}
 
 	var reader LineProcessor
-	reader, err = NewLineSource(in, enc, 4096)
+	reader, err = NewLineEncoder(in, enc, 4096)
 	if err != nil {
 		t.Fatalf("Failed to initialize line reader: %v", err)
 	}

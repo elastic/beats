@@ -1,6 +1,6 @@
 // +build !integration
 
-package input
+package file
 
 import (
 	"io/ioutil"
@@ -10,28 +10,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetOSFileState(t *testing.T) {
+func TestGetOSState(t *testing.T) {
 	file, err := ioutil.TempFile("", "")
 	assert.Nil(t, err)
 
 	fileinfo, err := file.Stat()
 	assert.Nil(t, err)
 
-	state := GetOSFileState(fileinfo)
+	state := GetOSState(fileinfo)
 
 	assert.True(t, state.IdxHi > 0)
 	assert.True(t, state.IdxLo > 0)
 	assert.True(t, state.Vol > 0)
 }
 
-func TestGetOSFileStateStat(t *testing.T) {
+func TestGetOSStateStat(t *testing.T) {
 	file, err := ioutil.TempFile("", "")
 	assert.Nil(t, err)
 
 	fileinfo, err := os.Stat(file.Name())
 	assert.Nil(t, err)
 
-	state := GetOSFileState(fileinfo)
+	state := GetOSState(fileinfo)
 
 	assert.True(t, state.IdxHi > 0)
 	assert.True(t, state.IdxLo > 0)
