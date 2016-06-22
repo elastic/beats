@@ -344,7 +344,7 @@ rotated files in case not all lines were read from the rotated file.
 [[configuration-global-options]]
 === Filebeat Global Configuration
 
-You can specify configuration options in the +{beatname_lc}.yml+ config file that control Filebeat behavior at a global level.
+You can specify configuration options in the +{beatname_lc}.yml+ config file to control Filebeat behavior at a global level.
 
 ==== Options
 

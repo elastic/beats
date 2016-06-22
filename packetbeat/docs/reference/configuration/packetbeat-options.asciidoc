@@ -731,5 +731,5 @@ include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
-include::../../../../libbeat/docs/runconfig.asciidoc[]
+include::./runconfig.asciidoc[]
 
