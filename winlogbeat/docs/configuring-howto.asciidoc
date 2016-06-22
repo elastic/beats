@@ -1,9 +1,19 @@
 [[configuring-howto-filebeat]]
-== Configuring Winlogbeat
+= Configuring Winlogbeat
 
+[partintro]
+--
 After following the <<winlogbeat-configuration,configuration steps>> in the
 Getting Started, you might want to fine tune the behavior of Winlogbeat. This
 section describes some common use cases for changing configuration options. 
 
+To configure {beatname_uc}, you edit the configuration file. You’ll find the configuration file, 
++{beatname_lc}.yml+, in the archive that you extracted.
+
 For a complete description of all Winlogbeat configuration options, see
 <<winlogbeat-configuration-details>>.
+
+--
+
+include::reference/configuration.asciidoc[]
+

@@ -1,7 +1,7 @@
 [[configuration-filebeat-options]]
 === Filebeat Prospectors Configuration
 
-The `filebeat` section specifies a list of `prospectors` that Filebeat
+The `filebeat` section of the +{beatname_lc}.yml+ config file specifies a list of `prospectors` that Filebeat
 uses to locate and process log files. Each prospector item begins with a dash (-)
 and specifies prospector-specific configuration options, including
 the list of paths that are crawled to locate log files.
@@ -344,7 +344,7 @@ rotated files in case not all lines were read from the rotated file.
 [[configuration-global-options]]
 === Filebeat Global Configuration
 
-You can specify configuration options that control Filebeat behavior at a global level.
+You can specify configuration options in the +{beatname_lc}.yml+ config file to control Filebeat behavior at a global level.
 
 ==== Options
 

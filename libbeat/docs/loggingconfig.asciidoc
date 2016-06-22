@@ -13,10 +13,10 @@
 [[configuration-logging]]
 === Logging Configuration (Optional)
 
-The `logging` section contains options for configuring the Beats logging output.
-The logging system can write logs to syslog or rotate log files. If logging is
-not explicitly configured, file output is used on Windows systems, and syslog
-output is used on Linux and OS X.
+The `logging` section of the +{beatname_lc}.yml+ config file contains options
+for configuring the Beats logging output. The logging system can write logs to
+syslog or rotate log files. If logging is not explicitly configured, file output
+is used on Windows systems, and syslog output is used on Linux and OS X.
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ modified from the command line.
 
 ==== Logging Options
 
-You can specify the following options under the `logging` section:
+You can specify the following options in the `logging` section of the +{beatname_lc}.yml+ config file:
 
 ===== to_syslog
 

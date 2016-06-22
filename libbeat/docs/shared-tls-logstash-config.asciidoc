@@ -9,9 +9,6 @@
 //// include::../../libbeat/docs/shared-tls-logstash-config.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
-[[configuring-tls-logstash]]
-=== Securing Communication With Logstash by Using TLS
-
 You can use TLS mutual authentication to secure connections between {beatname_uc} and Logstash. This ensures that
 {beatname_uc} sends encrypted data to trusted Logstash servers only, and that the Logstash server receives data from
 trusted {beatname_uc} clients only.
@@ -73,8 +70,9 @@ input {
 For more information about these options, see the
 https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[documentation] for the Beats input plugin.
 
+[float]
 [[testing-tls-logstash]]
-==== Validating the Logstash Server's Certificate
+=== Validating the Logstash Server's Certificate
 
 Before running {beatname_uc}, you should validate the Logstash server's certificate. You can use `curl` to validate the certificate even though the protocol used to communicate with Logstash is not based on HTTP. For example:
 
@@ -125,7 +123,8 @@ curl: (51) SSL: certificate verification failed (result: 5)
 
 See the <<ssl-client-fails,troubleshooting docs>> for info about resolving this issue.
 
-==== Testing the Beats to Logstash Connection
+[float]
+=== Testing the Beats to Logstash Connection
 
 If you have {beatname_uc} running as a service, first stop the service. Then test your setup by running {beatname_uc} in 
 the foreground so you can quickly see any errors that occur: 

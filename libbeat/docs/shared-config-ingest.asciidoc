@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuring-ingest-node]]
-=== Configuring {beatname_uc} to Use Ingest Node
+== Configuring {beatname_uc} to Use Ingest Node
 
 When you use Elasticsearch for output, you can configure {beatname_uc} to use
 https://www.elastic.co/guide/en/elasticsearch/reference/master/ingest.html[ingest node] to pre-process documents

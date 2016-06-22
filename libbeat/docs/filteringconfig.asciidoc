@@ -13,8 +13,8 @@
 [[configuration-filter]]
 === Filters Configuration
 
-You can set a list of filter actions in the `filters` section of the {beatname_uc} config file to reduce the number of fields that are
-exported by the Beat. 
+You can set a list of filter actions in the `filters` section of the +{beatname_lc}.yml+ config file to reduce the number
+of fields that are exported by the Beat. 
 
 If more filtering rules are defined, then they are executed in the order they are defined. The initial event is passed to the first filtering rule and what results from it is passed to the second filtering rule until all the filtering rules are applied. The condition that is used in the following filtering rules is running against the event that is received as input and it might defer from the original event.
 

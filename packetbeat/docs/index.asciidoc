@@ -34,11 +34,11 @@ include::./thrift.asciidoc[]
 
 include::./maintaining-topology.asciidoc[]
 
+include::../../libbeat/docs/yaml.asciidoc[]
+
+include::./fields.asciidoc[]
+
 include::./securing-packetbeat.asciidoc[]
-
-include::../../libbeat/docs/https.asciidoc[]
-
-include::../../libbeat/docs/shared-tls-logstash-config.asciidoc[]
 
 include::./visualizing-data-packetbeat.asciidoc[]
 
@@ -47,9 +47,5 @@ include::./filtering.asciidoc[]
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
-
-include::./reference.asciidoc[]
-
-include::./fields.asciidoc[]
 
 include::./new_protocol.asciidoc[]

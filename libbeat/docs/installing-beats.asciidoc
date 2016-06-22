@@ -12,7 +12,6 @@
 ///// include::../../libbeat/docs/outputconfig.asciidoc[]
 ///// include::../../libbeat/docs/generalconfig.asciidoc[]
 ///// include::../../libbeat/docs/loggingconfig.asciidoc[]
-///// include::../../libbeat/docs/runconfig.asciidoc[]
 ////////////////////////////////////////////////////////////////////
 
 [[installing-beats]]

@@ -1,13 +1,17 @@
 [[configuring-howto-metricbeat]]
-== Configuring {beatname_uc}
+= Configuring {beatname_uc}
 
+[partintro]
+--
 After following the <<metricbeat-configuration,configuration steps>> in the
 Getting Started, you might want to fine tune the behavior of {beatname_uc}.
 This section describes some common use cases for changing configuration options.
 
+To configure {beatname_uc}, you edit the configuration file. For rpm and deb, you’ll find the configuration file at
++/etc/{beatname_lc}/{beatname_lc}.yml+. For mac and win, look in the archive that you extracted.
+
 For a complete description of all {beatname_uc} configuration options, see
 <<metricbeat-configuration-options>>.
-
 
 [float]
 == Basic Configuration
@@ -78,3 +82,7 @@ metricbeat:
       hosts: ["host1"]
       period: 2m
 ----
+
+--
+
+include::reference/configuration.asciidoc[]

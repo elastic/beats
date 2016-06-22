@@ -10,9 +10,6 @@
 //// This content is structured to be included as a whole file.
 //////////////////////////////////////////////////////////////////////////
 
-[[securing-communication-elasticsearch]]
-=== Securing Communication With Elasticsearch
-
 To secure the communication between {beatname_uc} and Elasticsearch, you can use HTTPS
 and basic authentication. Here is a sample configuration:
 

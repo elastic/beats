@@ -1,7 +1,7 @@
 [[configuration-metricbeat]]
 === Modules Configuration
 
-The `metricbeat.modules` section contains an array with the enabled modules.
+The `metricbeat.modules` section of the +{beatname_lc}.yml+ config file contains an array with the enabled modules.
 Please see the <<metricbeat-modules>> section for details about the available
 modules and their configuration options.
 
@@ -34,7 +34,7 @@ metricbeat.modules:
 
 ==== Metricbeat Options
 
-You can specify the following options in the `metricbeat` section. These options
+You can specify the following options in the `metricbeat` section of the +{beatname_lc}.yml+ config file. These options
 are the same for all modules. Each module can have its specific additional configurations.
 For more details check the docs of each module.
 
