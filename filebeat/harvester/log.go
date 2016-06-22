@@ -63,7 +63,7 @@ func (h *Harvester) Harvest() {
 		ts, text, bytesRead, jsonFields, err := readLine(reader)
 		if err != nil {
 			if err == errFileTruncate {
-				logp.Info("File was truncated. Begin reading file from offset 0: %s", h.Path)
+				logp.Warn("File was truncated. Begin reading file from offset 0: %s", h.Path)
 				h.SetOffset(0)
 				return
 			}

@@ -130,11 +130,10 @@ func (p *Prospector) Run() {
 	}
 }
 
-func (p *Prospector) Stop(wg *sync.WaitGroup) {
+func (p *Prospector) Stop() {
 	logp.Info("Stopping Prospector")
 	close(p.done)
 	p.wg.Wait()
-	wg.Done()
 }
 
 // createHarvester creates a new harvester instance from the given state
@@ -168,21 +167,4 @@ func (p *Prospector) startHarvester(state input.FileState, offset int64) (*harve
 	}()
 
 	return h, nil
-}
-
-// isIgnoreOlder checks if the given state reached ignore_older
-func (p *Prospector) isIgnoreOlder(state input.FileState) bool {
-
-	// ignore_older is disable
-	if p.config.IgnoreOlder == 0 {
-		return false
-	}
-
-	modTime := state.Fileinfo.ModTime()
-
-	if time.Since(modTime) > p.config.IgnoreOlder {
-		return true
-	}
-
-	return false
 }
