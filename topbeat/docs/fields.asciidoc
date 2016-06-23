@@ -269,7 +269,7 @@ Per-process statistics that you can get by running the *top* or *ps* command on 
 [float]
 === proc Fields
 
-Contains per-process statistics like memory usage, CPU usage, and details about each process, such as state, name, pid, and ppid.
+Contains per-process statistics like memory usage, CPU usage, and details about each process, such as state, name, pid, parend pid, and process group id.
 
 
 
@@ -299,6 +299,13 @@ The process pid.
 type: integer
 
 The process parent pid.
+
+
+==== proc.pgid
+
+type: integer
+
+The process group id.
 
 
 ==== proc.cmdline
