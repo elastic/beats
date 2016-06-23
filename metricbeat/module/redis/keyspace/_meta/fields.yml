@@ -6,17 +6,17 @@
     - name: id
       type: keyword
       description: >
-        Keyspace identifier
+        Keyspace identifier.
 
     - name: avg_ttl
       type: long
       description: >
-        Average ttl
+        Average ttl.
 
     - name: keys
       type: long
       description: >
-        Number of keys in the keyspace
+        Number of keys in the keyspace.
 
     - name: expires
       type: long

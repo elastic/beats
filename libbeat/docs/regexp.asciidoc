@@ -12,9 +12,7 @@
 [[regexp-support]]
 == Regular Expression Support
 
-coming[5.0.0-alpha3]
-
-{beatname_uc} regular expression support is based on https://godoc.org/regexp/syntax[RE2].
+{beatname_uc} regular expression support is based on https://godoc.org/regexp/syntax[RE2]. coming[5.0.0-alpha3,Support is added for previously unsupported patterns]
 
 NOTE: We recommend that you wrap regular expressions in single quotation marks to work around YAML's string escaping rules. For example, `'^\[?[0-9][0-9]:?[0-9][0-9]|^[[:graph:]]+'`.
 

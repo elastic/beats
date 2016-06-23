@@ -6,7 +6,7 @@
     - name: aborted
       type: group
       description: >
-        Aborted status fields
+        Aborted status fields.
       fields:
         - name: clients
           type: integer
@@ -33,7 +33,7 @@
     - name: bytes
       type: group
       description: >
-        Bytes stats
+        Bytes stats.
       fields:
         - name: received
           type: integer

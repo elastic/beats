@@ -6,5 +6,5 @@ This module periodically fetches metrics from https://nginx.org/[Nginx] servers.
 [float]
 === Compatibility
 
-The nginx MetricSets were tested with nginx 1.9 and are expected to work with all version
+The Nginx metricsets were tested with Nginx 1.9 and are expected to work with all version
 >= 1.9.

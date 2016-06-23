@@ -26,21 +26,21 @@ grouped in the following categories:
 [[exported-fields-apache]]
 == Apache Fields
 
-Apache HTTPD server metric sets collected from the apache web server.
+Apache HTTPD server metricsets collected from the Apache web server.
 
 
 
 [float]
 == apache Fields
 
-Apache contains the metrics that were scraped from apache.
+`apache` contains the metrics that were scraped from Apache.
 
 
 
 [float]
 == status Fields
 
-`status` contains the metrics that were scraped from the apache status page.
+`status` contains the metrics that were scraped from the Apache status page.
 
 
 
@@ -324,7 +324,7 @@ Gracefully finishing.
 
 type: integer
 
-Idle cleanups
+Idle cleanups.
 
 
 [float]
@@ -430,7 +430,7 @@ type: long
 
 required: True
 
-Event round trip time in microseconds
+Event round trip time in microseconds.
 
 
 [float]
@@ -444,7 +444,7 @@ The document type. Always set to "metricsets".
 
 
 [[exported-fields-mongodb]]
-== MongoDB Status Fields
+== MongoDB Fields
 
 Metrics collected from MongoDB servers.
 
@@ -469,7 +469,7 @@ MongoDB server status metrics.
 
 type: keyword
 
-Instance version
+Instance version.
 
 
 [float]
@@ -548,7 +548,7 @@ A counter that collects the number of times the database has flushed all writes 
 
 type: long
 
-The total number of milliseconds (ms) that the mongod processes have spent writing (i.e. flushing) data to disk. Because this is an absolute value, consider the value of flushes and average_ms to provide better context for this datum.
+The total number of milliseconds (ms) that the mongod processes have spent writing (i.e. flushing) data to disk. Because this is an absolute value, consider the value of `flushes` and `average_ms` to provide better context for this datum.
 
 
 [float]
@@ -587,7 +587,7 @@ Data regarding the current status of incoming connections and availability of th
 
 type: long
 
-The number of connections to the database server from clients. This number includes the current shell session. Consider the value of available to add more context to this datum.
+The number of connections to the database server from clients. This number includes the current shell session. Consider the value of `available` to add more context to this datum.
 
 
 [float]
@@ -744,7 +744,7 @@ The total size in bytes of heap space used by the database process. Only availab
 
 type: long
 
-The total number of page faults that require disk operations. Page faults refer to operations that require the database server to access data which isn't available in active memory.
+The total number of page faults that require disk operations. Page faults refer to operations that require the database server to access data that isn't available in active memory.
 
 
 [float]
@@ -775,7 +775,7 @@ The amount of network traffic, in bytes, sent from this database.
 
 type: long
 
-The amount of network traffic, in bytes, sent from this database.
+The total number of requests received by the server.
 
 
 [float]
@@ -900,7 +900,7 @@ Data about the current memory usage of the mongod server.
 
 type: long
 
-Either 64 or 32, depending on which target architecture specified during the mongod compilation process.
+Either 64 or 32, depending on which target architecture was specified during the mongod compilation process.
 
 
 [float]
@@ -924,7 +924,7 @@ The amount, in megabytes (MB), of virtual memory used by the mongod process.
 
 type: long
 
-The amount of mapped memory, in megabytes (MB), by the database. Because MongoDB uses memory-mapped files, this value is likely to be to be roughly equivalent to the total size of your database or databases.
+The amount of mapped memory, in megabytes (MB), used by the database. Because MongoDB uses memory-mapped files, this value is likely to be to be roughly equivalent to the total size of your database or databases.
 
 
 [float]
@@ -952,16 +952,16 @@ A string that represents the name of the current storage engine.
 
 
 [[exported-fields-mysql]]
-== MySQL Status Fields
+== MySQL Fields
 
-MySQL server status metrics collected from MySQL
+MySQL server status metrics collected from MySQL.
 
 
 
 [float]
 == mysql Fields
 
-mysql contains the metrics that were obtained from MySQL query.
+`mysql` contains the metrics that were obtained from MySQL query.
 
 
 
@@ -975,7 +975,7 @@ mysql contains the metrics that were obtained from MySQL query.
 [float]
 == aborted Fields
 
-Aborted status fields
+Aborted status fields.
 
 
 
@@ -1018,7 +1018,7 @@ type: integer
 [float]
 == bytes Fields
 
-Bytes stats
+Bytes stats.
 
 
 
@@ -1148,7 +1148,7 @@ type: integer
 
 
 [[exported-fields-nginx]]
-== Nginx Status Fields
+== Nginx Fields
 
 Nginx server status metrics collected from various modules.
 
@@ -1157,7 +1157,7 @@ Nginx server status metrics collected from various modules.
 [float]
 == nginx Fields
 
-nginx contains the metrics that were scraped from nginx.
+`nginx` contains the metrics that were scraped from nginx.
 
 
 
@@ -1173,7 +1173,7 @@ nginx contains the metrics that were scraped from nginx.
 
 type: keyword
 
-Nginx hostname
+Nginx hostname.
 
 
 [float]
@@ -1229,7 +1229,7 @@ The current number of client requests.
 
 type: integer
 
-The current number of connections where nginx is reading the request header.
+The current number of connections where Nginx is reading the request header.
 
 
 [float]
@@ -1237,7 +1237,7 @@ The current number of connections where nginx is reading the request header.
 
 type: integer
 
-The current number of connections where nginx is writing the response back to the client.
+The current number of connections where Nginx is writing the response back to the client.
 
 
 [float]
@@ -1249,16 +1249,16 @@ The current number of idle client connections waiting for a request.
 
 
 [[exported-fields-redis]]
-== Redis Status Fields
+== Redis Fields
 
-Redis metrics collected from the Redis
+Redis metrics collected from Redis.
 
 
 
 [float]
 == redis Fields
 
-`redis` contains the information and statistics from Redis
+`redis` contains the information and statistics from Redis.
 
 
 
@@ -1272,7 +1272,7 @@ Redis metrics collected from the Redis
 [float]
 == clients Fields
 
-Redis client stats
+Redis client stats.
 
 
 
@@ -1281,7 +1281,7 @@ Redis client stats
 
 type: integer
 
-Number of client connections (excluding connections from slaves)
+Number of client connections (excluding connections from slaves).
 
 
 [float]
@@ -1297,7 +1297,7 @@ Longest output list among current client connections.
 
 type: integer
 
-Biggest input buffer among current client connections
+Biggest input buffer among current client connections.
 
 
 [float]
@@ -1305,13 +1305,13 @@ Biggest input buffer among current client connections
 
 type: integer
 
-Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH)
+Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH).
 
 
 [float]
 == cluster Fields
 
-Redis cluster information
+Redis cluster information.
 
 
 
@@ -1320,7 +1320,7 @@ Redis cluster information
 
 type: boolean
 
-Indicate Redis cluster is enabled
+Indicates that the Redis cluster is enabled.
 
 
 [float]
@@ -1335,7 +1335,7 @@ Redis CPU stats
 
 type: float
 
-System CPU consumed by the Redis server
+System CPU consumed by the Redis server.
 
 
 [float]
@@ -1343,7 +1343,7 @@ System CPU consumed by the Redis server
 
 type: float
 
-User CPU consumed by the Redis server
+User CPU consumed by the Redis server.
 
 
 [float]
@@ -1351,7 +1351,7 @@ User CPU consumed by the Redis server
 
 type: float
 
-System CPU consumed by the background processes
+System CPU consumed by the background processes.
 
 
 [float]
@@ -1359,13 +1359,13 @@ System CPU consumed by the background processes
 
 type: float
 
-User CPU consumed by the background processes
+User CPU consumed by the background processes.
 
 
 [float]
 == memory Fields
 
-Redis CPU stats
+Redis CPU stats.
 
 
 
@@ -1374,7 +1374,7 @@ Redis CPU stats
 
 type: integer
 
-Used memory
+Used memory.
 
 
 [float]
@@ -1382,7 +1382,7 @@ Used memory
 
 type: integer
 
-Used memory rss
+Used memory rss.
 
 
 [float]
@@ -1390,7 +1390,7 @@ Used memory rss
 
 type: integer
 
-Used memory peak
+Used memory peak.
 
 
 [float]
@@ -1398,7 +1398,7 @@ Used memory peak
 
 type: integer
 
-Used memory lua
+Used memory lua.
 
 
 [float]
@@ -1406,13 +1406,13 @@ Used memory lua
 
 type: keyword
 
-Memory allocator
+Memory allocator.
 
 
 [float]
 == persistence Fields
 
-Redis CPU stats
+Redis CPU stats.
 
 
 
@@ -1692,7 +1692,7 @@ None
 [float]
 == stats Fields
 
-Redis stats
+Redis stats.
 
 
 
@@ -1841,7 +1841,7 @@ None
 
 type: keyword
 
-Keyspace identifier
+Keyspace identifier.
 
 
 [float]
@@ -1849,7 +1849,7 @@ Keyspace identifier
 
 type: long
 
-Average ttl
+Average ttl.
 
 
 [float]
@@ -1857,7 +1857,7 @@ Average ttl
 
 type: long
 
-Number of keys in the keyspace
+Number of keys in the keyspace.
 
 
 [float]
@@ -1868,7 +1868,7 @@ type: long
 
 
 [[exported-fields-system]]
-== System Status Fields
+== System Fields
 
 System status metrics, like CPU and memory usage, that are collected from the operating system.
 
@@ -1877,14 +1877,14 @@ System status metrics, like CPU and memory usage, that are collected from the op
 [float]
 == system Fields
 
-`system` contains local system metrics
+`system` contains local system metrics.
 
 
 
 [float]
 == core Fields
 
-`system-core` contains local cpu core stats.
+`system-core` contains local CPU core stats.
 
 
 
@@ -1999,6 +1999,7 @@ type: float
 
 The percentage of CPU time spent servicing and handling software interrupts.
 
+
 [float]
 === system.core.softirq.ticks
 
@@ -2026,7 +2027,7 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 [float]
 == cpu Fields
 
-`cpu` contains local cpu stats.
+`cpu` contains local CPU stats.
 
 
 
@@ -2084,6 +2085,7 @@ The percentage of CPU time spent servicing and handling hardware interrupts.
 type: float
 
 The percentage of CPU time spent servicing and handling software interrupts.
+
 
 [float]
 === system.cpu.steal.pct
@@ -2147,6 +2149,7 @@ The amount of CPU time spent servicing and handling hardware interrupts.
 type: long
 
 The amount of CPU time spent servicing and handling software interrupts.
+
 
 [float]
 === system.cpu.steal.ticks
@@ -2217,7 +2220,7 @@ The disk's serial number. This may not be provided by all operating systems.
 
 type: long
 
-This is the total number of reads completed successfully.
+The total number of reads completed successfully.
 
 
 [float]
@@ -2225,7 +2228,7 @@ This is the total number of reads completed successfully.
 
 type: long
 
-This is the total number of writes completed successfully.
+The total number of writes completed successfully.
 
 
 [float]
@@ -2233,7 +2236,7 @@ This is the total number of writes completed successfully.
 
 type: long
 
-This is the total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
+The total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
 
 
 [float]
@@ -2241,7 +2244,7 @@ This is the total number of bytes read successfully. On Linux this is the number
 
 type: long
 
-This is the total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
+The total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
 
 
 [float]
@@ -2249,7 +2252,7 @@ This is the total number of bytes written successfully. On Linux this is the num
 
 type: long
 
-This is the total number of milliseconds spent by all reads.
+The total number of milliseconds spent by all reads.
 
 
 [float]
@@ -2257,7 +2260,7 @@ This is the total number of milliseconds spent by all reads.
 
 type: long
 
-This is the total number of milliseconds spent by all writes.
+The total number of milliseconds spent by all writes.
 
 
 [float]
@@ -2265,13 +2268,13 @@ This is the total number of milliseconds spent by all writes.
 
 type: long
 
-This is the total number of of milliseconds spent doing I/Os.
+The total number of of milliseconds spent doing I/Os.
 
 
 [float]
 == filesystem Fields
 
-`filesystem` contains local filesystem stats
+`filesystem` contains local filesystem stats.
 
 
 
@@ -2607,7 +2610,7 @@ The process name.
 
 type: keyword
 
-The process state. For example: "running"
+The process state. For example: "running".
 
 
 [float]
@@ -2639,7 +2642,7 @@ The full command-line used to start the process, including the arguments separat
 
 type: keyword
 
-The username of the user that created the process. If the username can not be determined then the the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
+The username of the user that created the process. If the username cannot be determined, the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
 
 
 [float]
@@ -2661,7 +2664,7 @@ The amount of CPU time the process spent in user space.
 
 type: float
 
-The percentage of CPU time spent by the process since the last update. Its value is similar with the %CPU value of the process displayed by the top command on unix systems.
+The percentage of CPU time spent by the process since the last update. Its value is similar to the %CPU value of the process displayed by the top command on Unix systems.
 
 
 [float]
@@ -2727,7 +2730,7 @@ The shared memory the process uses.
 
 
 [[exported-fields-zookeeper]]
-== Zookeeper Status Fields
+== ZooKeeper Fields
 
 ZooKeeper metrics collected by the four-letter monitoring commands.
 
@@ -2736,7 +2739,7 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 [float]
 == zookeeper Fields
 
-`zookeeper` contains the metrics reported by zookeeper command.
+`zookeeper` contains the metrics reported by ZooKeeper commands.
 
 
 
@@ -2752,7 +2755,7 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 
 type: keyword
 
-Zookeeper hostname.
+ZooKeeper hostname.
 
 
 [float]
@@ -2760,7 +2763,7 @@ Zookeeper hostname.
 
 type: long
 
-Approximate size of zookeeper data.
+Approximate size of ZooKeeper data.
 
 
 [float]
@@ -2792,7 +2795,7 @@ Number of followers seen by the current host.
 
 type: integer
 
-Maximum number of file descriptors allowed for the zookeeper process.
+Maximum number of file descriptors allowed for the ZooKeeper process.
 
 
 [float]
@@ -2816,7 +2819,7 @@ Minimum latency in milliseconds.
 
 type: integer
 
-Number of connections to zookeeper that are currently alive.
+Number of connections to ZooKeeper that are currently alive.
 
 
 [float]
@@ -2824,7 +2827,7 @@ Number of connections to zookeeper that are currently alive.
 
 type: integer
 
-Number of file descriptors open by the zookeeper process.
+Number of file descriptors open by the ZooKeeper process.
 
 
 [float]
@@ -2840,7 +2843,7 @@ Number of outstanding requests that need to be processed by the cluster.
 
 type: integer
 
-Number zookeeper network packets received.
+Number of ZooKeeper network packets received.
 
 
 [float]
@@ -2848,7 +2851,7 @@ Number zookeeper network packets received.
 
 type: long
 
-Number zookeeper network packets sent.
+Number of ZooKeeper network packets sent.
 
 
 [float]
@@ -2856,7 +2859,7 @@ Number zookeeper network packets sent.
 
 type: integer
 
-Number of pending syncs to carry out to zookeeper ensemble followers.
+Number of pending syncs to carry out to ZooKeeper ensemble followers.
 
 
 [float]
@@ -2864,7 +2867,7 @@ Number of pending syncs to carry out to zookeeper ensemble followers.
 
 type: keyword
 
-Role in the zookeeper ensemble.
+Role in the ZooKeeper ensemble.
 
 
 [float]
@@ -2880,7 +2883,7 @@ Number of synced followers reported when a node server_state is leader.
 
 type: keyword
 
-Zookeeper version and build string reported.
+ZooKeeper version and build string reported.
 
 
 [float]
@@ -2888,7 +2891,7 @@ Zookeeper version and build string reported.
 
 type: integer
 
-Number of watches currently set on the local zookeeper process.
+Number of watches currently set on the local ZooKeeper process.
 
 
 [float]
@@ -2896,6 +2899,6 @@ Number of watches currently set on the local zookeeper process.
 
 type: integer
 
-Number of znodes reported by the local zookeeper process.
+Number of znodes reported by the local ZooKeeper process.
 
 

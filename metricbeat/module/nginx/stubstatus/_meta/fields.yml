@@ -6,7 +6,7 @@
     - name: hostname
       type: keyword
       description: >
-        Nginx hostname
+        Nginx hostname.
     - name: active
       type: integer
       description: >
@@ -34,11 +34,11 @@
     - name: reading
       type: integer
       description: >
-        The current number of connections where nginx is reading the request header.
+        The current number of connections where Nginx is reading the request header.
     - name: writing
       type: integer
       description: >
-        The current number of connections where nginx is writing the response back to the client.
+        The current number of connections where Nginx is writing the response back to the client.
     - name: waiting
       type: integer
       description: >

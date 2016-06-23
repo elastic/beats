@@ -8,33 +8,33 @@ This file is generated! See scripts/docs_collector.py
 This module periodically fetches metrics from http://redis.io/[Redis] servers.
 
 [float]
-=== Configuration Options
+=== Module-Specific Configuration Notes
 
-Redis has two additional config options:
+The Redis module has these additional config options:
 
-* `idle_timeout` - Close connections after remaining idle for this duration. If
+*`idle_timeout`*:: The duration to remain idle before closing connections. If
   the value is zero, then idle connections are not closed. The default value
   is 2 times the module period to allow a connection to be reused across
-  fetches. The `idle_timeout` should be set less than the server's connection
+  fetches. The `idle_timeout` should be set to less than the server's connection
   timeout.
-* `network` - Network type to be used for redis connection. The default value is
+*`network`*:: The network type to be used for the Redis connection. The default value is
   `tcp`.
-* `maxconn` - Maximum number of concurrent connections to Redis. The default value
+*`maxconn`*:: The maximum number of concurrent connections to Redis. The default value
   is 10.
 
 
 [float]
 === Compatibility
 
-The redis MetricSets were tested with redis 3.2 and are expected to work with all version
+The Redis metricsets were tested with Redis 3.2 and are expected to work with all version
 >= 3.0.
 
 
 [float]
 === Example Configuration
 
-The Redis Status module supports the standard configuration options which can be found
-here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
+The Redis module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
 ----
@@ -49,9 +49,9 @@ metricbeat.modules:
 ----
 
 [float]
-=== MetricSets
+=== Metricsets
 
-The following MetricSets are available:
+The following metricsets are available:
 
 * <<metricbeat-metricset-redis-info,info>>
 

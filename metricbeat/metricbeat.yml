@@ -10,7 +10,7 @@
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
-#---------------------------- System Status Module ---------------------------
+#------------------------------- System Module -------------------------------
 - module: system
   metricsets:
     # CPU stats
