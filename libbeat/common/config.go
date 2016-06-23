@@ -1,8 +1,8 @@
 package common
 
 import (
-	"github.com/urso/ucfg"
-	"github.com/urso/ucfg/yaml"
+	"github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/yaml"
 )
 
 type Config ucfg.Config
