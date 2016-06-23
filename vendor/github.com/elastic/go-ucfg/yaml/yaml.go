@@ -3,7 +3,7 @@ package yaml
 import (
 	"io/ioutil"
 
-	"github.com/urso/ucfg"
+	"github.com/elastic/go-ucfg"
 	"gopkg.in/yaml.v2"
 )
 

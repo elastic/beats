@@ -179,10 +179,11 @@ func raiseMissingArr(ctx context, meta *Meta, idx int) Error {
 	return raisePathErr(ErrMissing, meta, message, ctx.path("."))
 }
 
-func raiseIndexOutOfBounds(value value, idx int) Error {
+func raiseIndexOutOfBounds(opts *options, value value, idx int) Error {
 	reason := ErrIndexOutOfRange
 	ctx := value.Context()
-	message := fmt.Sprintf("index '%v' out of range (length=%v)", idx, value.Len())
+	len, _ := value.Len(opts)
+	message := fmt.Sprintf("index '%v' out of range (length=%v)", idx, len)
 	return raisePathErr(reason, value.meta(), message, ctx.path("."))
 }
 
@@ -208,7 +209,7 @@ func raiseKeyInvalidTypeMerge(cfg *Config, t reflect.Type) Error {
 	return raiseCritical(reason, messagePath(reason, cfg.metadata, message, ctx.path(".")))
 }
 
-func raiseSquashNeedsObject(cfg *Config, opts options, f string, t reflect.Type) Error {
+func raiseSquashNeedsObject(cfg *Config, opts *options, f string, t reflect.Type) Error {
 	reason := ErrTypeMismatch
 	message := fmt.Sprintf("require map or struct when squash merging '%v' (%v)", f, t)
 
@@ -240,9 +241,11 @@ func raisePointerRequired(v reflect.Value) Error {
 	return raiseCritical(ErrPointerRequired, "")
 }
 
-func raiseToTypeNotSupported(v value, t reflect.Type) Error {
+func raiseToTypeNotSupported(opts *options, v value, goT reflect.Type) Error {
 	reason := ErrTypeMismatch
-	message := fmt.Sprintf("value of type '%v' not convertible into unsupported go type '%v'", v.typeName(), t)
+	t, _ := v.typ(opts)
+	message := fmt.Sprintf("value of type '%v' not convertible into unsupported go type '%v'",
+		t.name, goT)
 	ctx := v.Context()
 
 	return raiseCritical(reason, messagePath(reason, v.meta(), message, ctx.path(".")))
@@ -256,18 +259,20 @@ func raiseArraySize(ctx context, meta *Meta, n int, to int) Error {
 	return raisePathErr(reason, meta, message, ctx.path("."))
 }
 
-func raiseConversion(v value, err error, to string) Error {
+func raiseConversion(opts *options, v value, err error, to string) Error {
 	ctx := v.Context()
 	path := ctx.path(".")
-	message := fmt.Sprintf("can not convert '%v' into '%v'", v.typeName(), to)
+	t, _ := v.typ(opts)
+	message := fmt.Sprintf("can not convert '%v' into '%v'", t.name, to)
 	return raisePathErr(err, v.meta(), message, path)
 }
 
-func raiseExpectedObject(v value) Error {
+func raiseExpectedObject(opts *options, v value) Error {
 	ctx := v.Context()
 	path := ctx.path(".")
+	t, _ := v.typ(opts)
 	message := fmt.Sprintf("required 'object', but found '%v' in field '%v'",
-		v.typeName(), path)
+		t.name, path)
 
 	return raiseErr(ErrExpectedObject, messageMeta(message, v.meta()))
 }
@@ -278,8 +283,14 @@ func raiseInvalidDuration(v value, err error) Error {
 	return raisePathErr(err, v.meta(), "", path)
 }
 
-func raiseValidation(ctx context, meta *Meta, err error) Error {
-	return raiseErr(err, messagePath(err, meta, err.Error(), ctx.path(".")))
+func raiseValidation(ctx context, meta *Meta, field string, err error) Error {
+	path := ""
+	if field == "" {
+		path = ctx.path(".")
+	} else {
+		path = ctx.pathOf(field, ".")
+	}
+	return raiseErr(err, messagePath(err, meta, err.Error(), path))
 }
 
 func raiseInvalidRegexp(v value, err error) Error {
@@ -287,4 +298,9 @@ func raiseInvalidRegexp(v value, err error) Error {
 	path := ctx.path(".")
 	message := fmt.Sprintf("Failed to compile regular expression with '%v'", err)
 	return raisePathErr(err, v.meta(), message, path)
+}
+
+func raiseParseSplice(ctx context, meta *Meta, err error) Error {
+	message := fmt.Sprintf("%v parsing splice", err)
+	return raisePathErr(err, meta, message, ctx.path("."))
 }

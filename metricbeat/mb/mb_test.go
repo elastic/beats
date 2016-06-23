@@ -27,13 +27,13 @@ func TestModuleConfig(t *testing.T) {
 	}{
 		{
 			in:  map[string]interface{}{},
-			err: "missing required field accessing config",
+			err: "missing required field accessing 'module'",
 		},
 		{
 			in: map[string]interface{}{
 				"module": "example",
 			},
-			err: "missing required field accessing config",
+			err: "missing required field accessing 'metricsets'",
 		},
 		{
 			in: map[string]interface{}{
@@ -171,8 +171,8 @@ func TestNewBaseModuleFromModuleConfigStruct(t *testing.T) {
 	assert.Equal(t, moduleName, baseModule.Name())
 	assert.Equal(t, moduleName, baseModule.Config().Module)
 	assert.Equal(t, true, baseModule.Config().Enabled)
-	//assert.Equal(t, time.Second, baseModule.Config().Period)  // TODO (urso/ucfg#25)
-	//assert.Equal(t, time.Second, baseModule.Config().Timeout) // TODO (urso/ucfg#25)
+	assert.Equal(t, time.Second, baseModule.Config().Period)
+	assert.Equal(t, time.Second, baseModule.Config().Timeout)
 	assert.Empty(t, baseModule.Config().Hosts)
 }
 

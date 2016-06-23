@@ -13,8 +13,8 @@ type cfgPath struct {
 
 type field interface {
 	String() string
-	SetValue(elem value, v value) Error
-	GetValue(elem value) (value, Error)
+	SetValue(opt *options, elem value, v value) Error
+	GetValue(opt *options, elem value) (value, Error)
 }
 
 type namedField struct {
@@ -91,13 +91,13 @@ func (i idxField) String() string {
 	return fmt.Sprintf("%d", i.i)
 }
 
-func (p cfgPath) GetValue(cfg *Config) (value, Error) {
+func (p cfgPath) GetValue(cfg *Config, opt *options) (value, Error) {
 	fields := p.fields
 
 	cur := value(cfgSub{cfg})
 	for ; len(fields) > 1; fields = fields[1:] {
 		field := fields[0]
-		next, err := field.GetValue(cur)
+		next, err := field.GetValue(opt, cur)
 		if err != nil {
 			return nil, err
 		}
@@ -110,30 +110,30 @@ func (p cfgPath) GetValue(cfg *Config) (value, Error) {
 	}
 
 	field := fields[0]
-	v, err := field.GetValue(cur)
+	v, err := field.GetValue(opt, cur)
 	if err != nil {
 		return nil, raiseMissing(cfg, field.String())
 	}
 	return v, nil
 }
 
-func (n namedField) GetValue(elem value) (value, Error) {
-	cfg, err := elem.toConfig()
+func (n namedField) GetValue(opts *options, elem value) (value, Error) {
+	cfg, err := elem.toConfig(opts)
 	if err != nil {
-		return nil, raiseExpectedObject(elem)
+		return nil, raiseExpectedObject(opts, elem)
 	}
 
 	return cfg.fields.fields[n.name], nil
 }
 
-func (i idxField) GetValue(elem value) (value, Error) {
-	cfg, err := elem.toConfig()
+func (i idxField) GetValue(opts *options, elem value) (value, Error) {
+	cfg, err := elem.toConfig(opts)
 	if err != nil {
 		if i.i == 0 {
 			return elem, nil
 		}
 
-		return nil, raiseExpectedObject(elem)
+		return nil, raiseExpectedObject(opts, elem)
 	}
 
 	if i.i >= len(cfg.fields.arr) {
@@ -143,14 +143,14 @@ func (i idxField) GetValue(elem value) (value, Error) {
 	return cfg.fields.arr[i.i], nil
 }
 
-func (p cfgPath) SetValue(cfg *Config, val value) Error {
+func (p cfgPath) SetValue(cfg *Config, opt *options, val value) Error {
 	fields := p.fields
 	node := value(cfgSub{cfg})
 
 	// 1. iterate until intermediate node not having some required child node
 	for ; len(fields) > 1; fields = fields[1:] {
 		field := fields[0]
-		v, err := field.GetValue(node)
+		v, err := field.GetValue(opt, node)
 		if err != nil {
 			if err.Reason() == ErrMissing {
 				break
@@ -158,33 +158,34 @@ func (p cfgPath) SetValue(cfg *Config, val value) Error {
 			return err
 		}
 
-		if v == nil {
+		if _, isNil := v.(*cfgNil); v == nil || isNil {
 			break
 		}
 		node = v
 	}
 
 	// 2. build intermediate nodes from bottom up
+
 	for ; len(fields) > 1; fields = fields[:len(fields)-1] {
 		field := fields[len(fields)-1]
 
 		next := New()
 		next.metadata = val.meta()
 		v := cfgSub{next}
-		if err := field.SetValue(v, val); err != nil {
+		if err := field.SetValue(opt, v, val); err != nil {
 			return err
 		}
 		val = v
 	}
 
 	// 3. insert new sub-tree into config
-	return fields[0].SetValue(node, val)
+	return fields[0].SetValue(opt, node, val)
 }
 
-func (n namedField) SetValue(elem value, v value) Error {
+func (n namedField) SetValue(opts *options, elem value, v value) Error {
 	sub, ok := elem.(cfgSub)
 	if !ok {
-		return raiseExpectedObject(elem)
+		return raiseExpectedObject(opts, elem)
 	}
 
 	sub.c.fields.fields[n.name] = v
@@ -192,10 +193,10 @@ func (n namedField) SetValue(elem value, v value) Error {
 	return nil
 }
 
-func (i idxField) SetValue(elem value, v value) Error {
+func (i idxField) SetValue(opts *options, elem value, v value) Error {
 	sub, ok := elem.(cfgSub)
 	if !ok {
-		return raiseExpectedObject(elem)
+		return raiseExpectedObject(opts, elem)
 	}
 
 	if i.i >= len(sub.c.fields.arr) {

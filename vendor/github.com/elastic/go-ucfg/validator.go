@@ -72,11 +72,21 @@ func parseValidatorTags(tag string) ([]validatorTag, error) {
 	return tags, nil
 }
 
-func tryValidate(val interface{}) error {
-	if v, ok := val.(Validator); ok {
-		return v.Validate()
+func tryValidate(val reflect.Value) error {
+	t := val.Type()
+	var validator Validator
+
+	if t.Implements(tValidator) {
+		validator = val.Interface().(Validator)
+	} else if reflect.PtrTo(t).Implements(tValidator) {
+		val = pointerize(reflect.PtrTo(t), t, val)
+		validator = val.Interface().(Validator)
 	}
-	return nil
+
+	if validator == nil {
+		return nil
+	}
+	return validator.Validate()
 }
 
 func runValidators(val interface{}, validators []validatorTag) error {
