@@ -7,7 +7,7 @@ ENV PATH $PATH:/usr/share/logstash/bin
 COPY setup.sh /
 
 # As all snapshot builds have the same url, the image is cached. The date at then can be used to invalidate the image
-RUN bash setup.sh https://s3-eu-west-1.amazonaws.com/build-eu.elasticsearch.org/logstash/master/nightly/JDK8/logstash-latest-SNAPSHOT.deb?20160613
+RUN bash setup.sh https://s3-eu-west-1.amazonaws.com/build-eu.elasticsearch.org/logstash/master/nightly/JDK8/logstash-latest-SNAPSHOT.deb?20160723
 
 COPY logstash.conf.2.tmpl /logstash.conf.2.tmpl
 COPY docker-entrypoint.sh /entrypoint.sh
@@ -16,4 +16,6 @@ COPY pki /etc/pki
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD logstash --path.settings=/etc/logstash -f /logstash.conf
+EXPOSE 5044 5055
+
+CMD logstash --path.settings=/etc/logstash -f /logstash.conf --log.level=debug
