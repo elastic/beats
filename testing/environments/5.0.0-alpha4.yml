@@ -3,14 +3,14 @@
 
 elasticsearch:
   build: ./docker/elasticsearch
-  dockerfile: Dockerfile-5.0.0-alpha1    # still using alpha1 because alpha2 doesn't work fine in docker
+  dockerfile: Dockerfile-5.0.0-alpha4
   command: elasticsearch -Enetwork.host=0.0.0.0 -Ediscovery.zen.minimum_master_nodes=1
 
 logstash:
   build: ./docker/logstash
-  dockerfile: Dockerfile-5.0.0-alpha2
+  dockerfile: Dockerfile-5.0.0-alpha4
 
 kibana:
   build: ./docker/kibana
-  dockerfile: Dockerfile-5.0.0-alpha2
+  dockerfile: Dockerfile-5.0.0-alpha4
 
