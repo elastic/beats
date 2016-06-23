@@ -33,6 +33,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 - Reset backoff factor on partial ACK. {issue}1803[1803]
 - Fix beats load balancer deadlock if max_retries: -1 or publish_async is enabled in filebeat. {issue}1829[1829]
 - Fix logstash output with pipelining mode enabled not reconnecting. {issue}1876[1876]
+- Empty configuration sections become merge-able with variables containing full path. {pull}1900[1900]
+- Fix error message about required fields missing not printing the missing field name. {pull}1900[1900]
 
 *Metricbeat*
 - Fix the CPU values returned for each core. {issue}1863[1863]
@@ -51,6 +53,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 
 
 *Affecting all Beats*
+- Improve error message if compiling regular expression from config files fails. {pull}1900[1900]
+
 
 *Metricbeat*
 

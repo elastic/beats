@@ -13,7 +13,7 @@ type Config struct {
 }
 
 type fieldOptions struct {
-	opts       options
+	opts       *options
 	tag        tagOptions
 	validators []validatorTag
 }

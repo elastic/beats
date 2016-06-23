@@ -7,13 +7,27 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 ### Changed
-- Report error message from regexp.Compile if compilation fails #21
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+## [0.3.0]
+
+### Added
+- Added CLI flag support. #15
+- Added variable expansion support. #14
+
+### Changed
+- Report error message from regexp.Compile if compilation fails #21
+
+### Fixed
+- Nil values become merge-able with concrete types. #26
+- Fix merging types `time.Duration` and `*regexp.Regexp`. #25
+- Fix Validate-method not being run for structs. #32
+- Fix field validation errors on structs fields does not contain missing or failed configuration variable. #31
 
 ## [0.2.1]
 
@@ -59,8 +73,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/urso/ucfg/compare/v0.2.1...HEAD
-[0.2.1]: https://github.com/urso/ucfg/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/urso/ucfg/compare/v0.1.1...v0.2.0
-[0.1.1]: https://github.com/urso/ucfg/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/urso/ucfg/compare/v0.0.0...v0.1.0
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/elastic/go-ucfg/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/elastic/go-ucfg/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/elastic/go-ucfg/compare/v0.1.1...v0.2.0
+[0.1.1]: https://github.com/elastic/go-ucfg/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/elastic/go-ucfg/compare/v0.0.0...v0.1.0
