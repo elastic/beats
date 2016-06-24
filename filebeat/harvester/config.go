@@ -8,11 +8,13 @@ import (
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/processor"
 	"github.com/elastic/beats/libbeat/common"
+
+	"github.com/dustin/go-humanize"
 )
 
 var (
 	defaultConfig = harvesterConfig{
-		BufferSize:      16 << 10, // 16384
+		BufferSize:      16 * humanize.KiByte,
 		DocumentType:    "log",
 		InputType:       cfg.DefaultInputType,
 		TailFiles:       false,

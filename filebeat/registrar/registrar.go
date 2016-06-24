@@ -41,11 +41,6 @@ func New(registryFile string) (*Registrar, error) {
 // Init sets up the Registrar and make sure the registry file is setup correctly
 func (r *Registrar) Init() error {
 
-	// Set to default in case it is not set
-	if r.registryFile == "" {
-		r.registryFile = cfg.DefaultRegistryFile
-	}
-
 	// The registry file is opened in the data path
 	r.registryFile = paths.Resolve(paths.Data, r.registryFile)
 

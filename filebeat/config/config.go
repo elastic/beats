@@ -14,10 +14,17 @@ import (
 
 // Defaults for config variables which are not set
 const (
-	DefaultRegistryFile string        = "registry"
-	DefaultSpoolSize    uint64        = 2048
-	DefaultIdleTimeout  time.Duration = 5 * time.Second
-	DefaultInputType                  = "log"
+	DefaultInputType = "log"
+)
+
+var (
+	DefaultConfig = Config{
+		FilebeatConfig{
+			RegistryFile: "registry",
+			SpoolSize:    2048,
+			IdleTimeout:  5 * time.Second,
+		},
+	}
 )
 
 type Config struct {
@@ -26,9 +33,9 @@ type Config struct {
 
 type FilebeatConfig struct {
 	Prospectors  []*common.Config `config:"prospectors"`
-	SpoolSize    uint64           `config:"spool_size"`
+	SpoolSize    uint64           `config:"spool_size" validate:"min=1"`
 	PublishAsync bool             `config:"publish_async"`
-	IdleTimeout  time.Duration    `config:"idle_timeout"`
+	IdleTimeout  time.Duration    `config:"idle_timeout" validate:"nonzero,min=0s"`
 	RegistryFile string           `config:"registry_file"`
 	ConfigDir    string           `config:"config_dir"`
 }
