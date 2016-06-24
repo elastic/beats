@@ -34,8 +34,8 @@ var (
 	procSafeArrayPutElement, _        = modoleaut32.FindProc("SafeArrayPutElement")
 	//procSafeArrayRedim, _             = modoleaut32.FindProc("SafeArrayRedim") // TODO
 	//procSafeArraySetIID, _            = modoleaut32.FindProc("SafeArraySetIID") // TODO
-	procSafeArrayGetRecordInfo, _     = modoleaut32.FindProc("SafeArrayGetRecordInfo")
-	procSafeArraySetRecordInfo, _     = modoleaut32.FindProc("SafeArraySetRecordInfo")
+	procSafeArrayGetRecordInfo, _ = modoleaut32.FindProc("SafeArrayGetRecordInfo")
+	procSafeArraySetRecordInfo, _ = modoleaut32.FindProc("SafeArraySetRecordInfo")
 )
 
 // safeArrayAccessData returns raw array pointer.

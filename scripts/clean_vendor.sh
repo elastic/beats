@@ -40,3 +40,6 @@ find $DIR_LIST -type f -name "*.txt" -a ! \( -iname "LICENSE.*" -o -iname "CHANG
 
 ## Removing all *.cfg files
 find $DIR_LIST -type f -name "*.cfg" -exec rm -r {} \;
+
+## Removing all *.bat files
+find $DIR_LIST -type f -name "*.bat" -exec rm -r {} \;
