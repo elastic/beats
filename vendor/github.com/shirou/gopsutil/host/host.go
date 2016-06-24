@@ -10,9 +10,9 @@ type InfoStat struct {
 	Hostname             string `json:"hostname"`
 	Uptime               uint64 `json:"uptime"`
 	BootTime             uint64 `json:"bootTime"`
-	Procs                uint64 `json:"procs"`           // number of processes
-	OS                   string `json:"os"`              // ex: freebsd, linux
-	Platform             string `json:"platform"`        // ex: ubuntu, linuxmint
+	Procs                uint64 `json:"procs"`          // number of processes
+	OS                   string `json:"os"`             // ex: freebsd, linux
+	Platform             string `json:"platform"`       // ex: ubuntu, linuxmint
 	PlatformFamily       string `json:"platformFamily"` // ex: debian, rhel
 	PlatformVersion      string `json:"platformVersion"`
 	VirtualizationSystem string `json:"virtualizationSystem"`
