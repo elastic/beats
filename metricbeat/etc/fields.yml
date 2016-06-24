@@ -209,6 +209,7 @@
   title: "MongoDB Status"
   description: >
     Metrics collected from MongoDB servers.
+  short_config: false
   fields:
     - name: mongodb
       type: group
