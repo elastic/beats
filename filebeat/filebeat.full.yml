@@ -236,7 +236,9 @@ filebeat.prospectors:
 
 # Expiration time (in seconds) of the IPs published by a shipper to the topology map.
 # All the IPs will be deleted afterwards. Note, that the value must be higher than
-# refresh_topology_freq. The default is 15 seconds.
+# refresh_topology_freq. This setting is used only by the Redis output. The other
+# outputs don't support expiring entries.
+# The default is 15 seconds.
 #topology_expire: 15
 
 # Internal queue size for single events in processing pipeline
@@ -332,10 +334,6 @@ output.elasticsearch:
   # Boolean that sets if the topology is kept in Elasticsearch. The default is
   # false. This option makes sense only for Packetbeat.
   #save_topology: false
-
-  # The time to live in seconds for the topology information that is stored in
-  # Elasticsearch. The default is 15 seconds.
-  #topology_expire: 15
 
   # A template is used to set the mapping in Elasticsearch
   # By default template loading is enabled and the template is loaded.
