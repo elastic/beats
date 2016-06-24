@@ -1,12 +1,13 @@
 // +build !integration
 
-package encoding
+package reader
 
 import (
 	"bytes"
 	"math/rand"
 	"testing"
 
+	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/stretchr/testify/assert"
 
 	"golang.org/x/text/transform"
@@ -31,7 +32,7 @@ func TestReaderEncodings(t *testing.T) {
 	for _, test := range tests {
 		t.Logf("test codec: %v", test.encoding)
 
-		codecFactory, ok := FindEncoding(test.encoding)
+		codecFactory, ok := encoding.FindEncoding(test.encoding)
 		if !ok {
 			t.Errorf("can not find encoding '%v'", test.encoding)
 			continue
@@ -50,7 +51,7 @@ func TestReaderEncodings(t *testing.T) {
 		}
 
 		// create line reader
-		reader, err := NewLineReader(buffer, codec, 1024)
+		reader, err := NewLine(buffer, codec, 1024)
 		if err != nil {
 			t.Errorf("failed to initialize reader: %v", err)
 			continue
@@ -140,8 +141,8 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 
 	// initialize reader
 	buffer := bytes.NewBuffer(inputStream)
-	codec, _ := Plain(buffer)
-	reader, err := NewLineReader(buffer, codec, buffer.Len())
+	codec, _ := encoding.Plain(buffer)
+	reader, err := NewLine(buffer, codec, buffer.Len())
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}

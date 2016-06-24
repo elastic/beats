@@ -19,5 +19,4 @@ func TestExampleTest(t *testing.T) {
 	}
 
 	assert.Equal(t, "/var/log/", h.Path)
-
 }

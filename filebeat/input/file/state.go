@@ -1,4 +1,4 @@
-package input
+package file
 
 import (
 	"os"
@@ -8,41 +8,41 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// FileState is used to communicate the reading state of a file
-type FileState struct {
+// State is used to communicate the reading state of a file
+type State struct {
 	Source      string      `json:"source"`
 	Offset      int64       `json:"offset"`
 	Finished    bool        `json:"-"` // harvester state
 	Fileinfo    os.FileInfo `json:"-"` // the file info
-	FileStateOS FileStateOS
+	FileStateOS StateOS
 	LastSeen    time.Time `json:"last_seen"`
 }
 
-// NewFileState creates a new file state
-func NewFileState(fileInfo os.FileInfo, path string) FileState {
-	return FileState{
+// NewState creates a new file state
+func NewState(fileInfo os.FileInfo, path string) State {
+	return State{
 		Fileinfo:    fileInfo,
 		Source:      path,
 		Finished:    false,
-		FileStateOS: GetOSFileState(fileInfo),
+		FileStateOS: GetOSState(fileInfo),
 		LastSeen:    time.Now(),
 	}
 }
 
 // States handles list of FileState
 type States struct {
-	states []FileState
+	states []State
 	mutex  sync.Mutex
 }
 
 func NewStates() *States {
 	return &States{
-		states: []FileState{},
+		states: []State{},
 	}
 }
 
 // Update updates a state. If previous state didn't exist, new one is created
-func (s *States) Update(newState FileState) {
+func (s *States) Update(newState State) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -58,7 +58,7 @@ func (s *States) Update(newState FileState) {
 	}
 }
 
-func (s *States) FindPrevious(newState FileState) (int, FileState) {
+func (s *States) FindPrevious(newState State) (int, State) {
 	// TODO: This currently blocks writing updates every time state is fetched. Should be improved for performance
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -67,7 +67,7 @@ func (s *States) FindPrevious(newState FileState) (int, FileState) {
 
 // findPreviousState returns the previous state fo the file
 // In case no previous state exists, index -1 is returned
-func (s *States) findPrevious(newState FileState) (int, FileState) {
+func (s *States) findPrevious(newState State) (int, State) {
 
 	// TODO: This could be made potentially more performance by using an index (harvester id) and only use iteration as fall back
 	for index, oldState := range s.states {
@@ -77,7 +77,7 @@ func (s *States) findPrevious(newState FileState) (int, FileState) {
 		}
 	}
 
-	return -1, FileState{}
+	return -1, State{}
 }
 
 // Cleanup cleans up the state array. All states which are older then `older` are removed
@@ -104,18 +104,18 @@ func (s *States) Count() int {
 }
 
 // Returns a copy of the file states
-func (s *States) GetStates() []FileState {
+func (s *States) GetStates() []State {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	newStates := make([]FileState, len(s.states))
+	newStates := make([]State, len(s.states))
 	copy(newStates, s.states)
 
 	return newStates
 }
 
 // SetStates overwrites all internal states with the given states array
-func (s *States) SetStates(states []FileState) {
+func (s *States) SetStates(states []State) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	s.states = states

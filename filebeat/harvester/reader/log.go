@@ -1,4 +1,4 @@
-package harvester
+package reader
 
 import (
 	"errors"
@@ -6,37 +6,37 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/harvester/source"
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-type logFileReader struct {
-	fs     FileSource
-	offset int64
-	config logFileReaderConfig
+var (
+	ErrFileTruncate = errors.New("detected file being truncated")
+	ErrForceClose   = errors.New("file must be closed")
+	ErrInactive     = errors.New("file inactive")
+)
 
+type logFileReader struct {
+	fs           source.FileSource
+	offset       int64
+	config       LogFileReaderConfig
 	lastTimeRead time.Time
 	backoff      time.Duration
 	done         chan struct{}
 }
 
-type logFileReaderConfig struct {
-	forceClose         bool
-	closeOlder         time.Duration
-	backoffDuration    time.Duration
-	maxBackoffDuration time.Duration
-	backoffFactor      int
+type LogFileReaderConfig struct {
+	ForceClose         bool
+	CloseOlder         time.Duration
+	BackoffDuration    time.Duration
+	MaxBackoffDuration time.Duration
+	BackoffFactor      int
 }
 
-var (
-	errFileTruncate = errors.New("detected file being truncated")
-	errForceClose   = errors.New("file must be closed")
-	errInactive     = errors.New("file inactive")
-)
-
-func newLogFileReader(
-	fs FileSource,
-	config logFileReaderConfig,
+func NewLogFileReader(
+	fs source.FileSource,
+	config LogFileReaderConfig,
 	done chan struct{},
 ) (*logFileReader, error) {
 	var offset int64
@@ -53,7 +53,7 @@ func newLogFileReader(
 		offset:       offset,
 		config:       config,
 		lastTimeRead: time.Now(),
-		backoff:      config.backoffDuration,
+		backoff:      config.BackoffDuration,
 		done:         done,
 	}, nil
 }
@@ -74,7 +74,7 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 		}
 		if err == nil {
 			// reset backoff
-			r.backoff = r.config.backoffDuration
+			r.backoff = r.config.BackoffDuration
 			return n, nil
 		}
 
@@ -103,26 +103,26 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 			logp.Debug("harvester",
 				"File was truncated as offset (%s) > size (%s): %s",
 				r.offset, info.Size(), r.fs.Name())
-			return n, errFileTruncate
+			return n, ErrFileTruncate
 		}
 
 		age := time.Since(r.lastTimeRead)
-		if age > r.config.closeOlder {
+		if age > r.config.CloseOlder {
 			// If the file hasn't change for longer then maxInactive, harvester stops
 			// and file handle will be closed.
-			return n, errInactive
+			return n, ErrInactive
 		}
 
-		if r.config.forceClose {
+		if r.config.ForceClose {
 			// Check if the file name exists (see #93)
 			_, statErr := os.Stat(r.fs.Name())
 
 			// Error means file does not exist. If no error, check if same file. If
 			// not close as rotated.
-			if statErr != nil || !input.IsSameFile(r.fs.Name(), info) {
+			if statErr != nil || !file.IsSameFile(r.fs.Name(), info) {
 				logp.Info("Force close file: %s; error: %s", r.fs.Name(), statErr)
 				// Return directly on windows -> file is closing
-				return n, errForceClose
+				return n, ErrForceClose
 			}
 		}
 
@@ -144,10 +144,10 @@ func (r *logFileReader) wait() {
 	time.Sleep(r.backoff)
 
 	// Increment backoff up to maxBackoff
-	if r.backoff < r.config.maxBackoffDuration {
-		r.backoff = r.backoff * time.Duration(r.config.backoffFactor)
-		if r.backoff > r.config.maxBackoffDuration {
-			r.backoff = r.config.maxBackoffDuration
+	if r.backoff < r.config.MaxBackoffDuration {
+		r.backoff = r.backoff * time.Duration(r.config.BackoffFactor)
+		if r.backoff > r.config.MaxBackoffDuration {
+			r.backoff = r.config.MaxBackoffDuration
 		}
 	}
 }

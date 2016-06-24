@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -108,12 +108,12 @@ func (p *ProspectorLog) scan() {
 
 	// TODO: Track harvesters to prevent any file from being harvested twice. Finished state could be delayed?
 	// Now let's do one quick scan to pick up new files
-	for file, fileinfo := range p.getFiles() {
+	for f, fileinfo := range p.getFiles() {
 
-		logp.Debug("prospector", "Check file for harvesting: %s", file)
+		logp.Debug("prospector", "Check file for harvesting: %s", f)
 
 		// Create new state for comparison
-		newState := input.NewFileState(fileinfo, file)
+		newState := file.NewState(fileinfo, f)
 
 		// Load last state
 		index, lastState := p.Prospector.states.FindPrevious(newState)
@@ -130,7 +130,7 @@ func (p *ProspectorLog) scan() {
 }
 
 // harvestNewFile harvest a new file
-func (p *ProspectorLog) harvestNewFile(state input.FileState) {
+func (p *ProspectorLog) harvestNewFile(state file.State) {
 
 	if !p.isIgnoreOlder(state) {
 		logp.Debug("prospector", "Start harvester for new file: %s", state.Source)
@@ -141,7 +141,7 @@ func (p *ProspectorLog) harvestNewFile(state input.FileState) {
 }
 
 // harvestExistingFile continues harvesting a file with a known state if needed
-func (p *ProspectorLog) harvestExistingFile(newState input.FileState, oldState input.FileState) {
+func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.State) {
 
 	logp.Debug("prospector", "Update existing file for harvesting: %s, offset: %v", newState.Source, oldState.Offset)
 
@@ -178,7 +178,7 @@ func (p *ProspectorLog) isFileExcluded(file string) bool {
 }
 
 // isIgnoreOlder checks if the given state reached ignore_older
-func (p *ProspectorLog) isIgnoreOlder(state input.FileState) bool {
+func (p *ProspectorLog) isIgnoreOlder(state file.State) bool {
 
 	// ignore_older is disable
 	if p.config.IgnoreOlder == 0 {

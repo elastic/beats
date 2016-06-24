@@ -1,108 +1,13 @@
-// +build !integration
-
 package input
 
 import (
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/filebeat/harvester/processor"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestIsSameFile(t *testing.T) {
-	absPath, err := filepath.Abs("../tests/files/")
-
-	assert.NotNil(t, absPath)
-	assert.Nil(t, err)
-
-	fileInfo1, err := os.Stat(absPath + "/logs/test.log")
-	fileInfo2, err := os.Stat(absPath + "/logs/system.log")
-
-	assert.Nil(t, err)
-	assert.NotNil(t, fileInfo1)
-	assert.NotNil(t, fileInfo2)
-
-	file1 := &File{
-		FileInfo: fileInfo1,
-	}
-
-	file2 := &File{
-		FileInfo: fileInfo2,
-	}
-
-	file3 := &File{
-		FileInfo: fileInfo2,
-	}
-
-	assert.False(t, file1.IsSameFile(file2))
-	assert.False(t, file2.IsSameFile(file1))
-
-	assert.True(t, file1.IsSameFile(file1))
-	assert.True(t, file2.IsSameFile(file2))
-
-	assert.True(t, file3.IsSameFile(file2))
-	assert.True(t, file2.IsSameFile(file3))
-}
-
-func TestSafeFileRotateExistingFile(t *testing.T) {
-
-	tempdir, err := ioutil.TempDir("", "")
-	assert.NoError(t, err)
-	defer func() {
-		assert.NoError(t, os.RemoveAll(tempdir))
-	}()
-
-	// create an existing registry file
-	err = ioutil.WriteFile(filepath.Join(tempdir, "registry"),
-		[]byte("existing filebeat"), 0x777)
-	assert.NoError(t, err)
-
-	// create a new registry.new file
-	err = ioutil.WriteFile(filepath.Join(tempdir, "registry.new"),
-		[]byte("new filebeat"), 0x777)
-	assert.NoError(t, err)
-
-	// rotate registry.new into registry
-	err = SafeFileRotate(filepath.Join(tempdir, "registry"),
-		filepath.Join(tempdir, "registry.new"))
-	assert.NoError(t, err)
-
-	contents, err := ioutil.ReadFile(filepath.Join(tempdir, "registry"))
-	assert.NoError(t, err)
-	assert.Equal(t, []byte("new filebeat"), contents)
-
-	// do it again to make sure we deal with deleting the old file
-
-	err = ioutil.WriteFile(filepath.Join(tempdir, "registry.new"),
-		[]byte("new filebeat 1"), 0x777)
-	assert.NoError(t, err)
-
-	err = SafeFileRotate(filepath.Join(tempdir, "registry"),
-		filepath.Join(tempdir, "registry.new"))
-	assert.NoError(t, err)
-
-	contents, err = ioutil.ReadFile(filepath.Join(tempdir, "registry"))
-	assert.NoError(t, err)
-	assert.Equal(t, []byte("new filebeat 1"), contents)
-
-	// and again for good measure
-
-	err = ioutil.WriteFile(filepath.Join(tempdir, "registry.new"),
-		[]byte("new filebeat 2"), 0x777)
-	assert.NoError(t, err)
-
-	err = SafeFileRotate(filepath.Join(tempdir, "registry"),
-		filepath.Join(tempdir, "registry.new"))
-	assert.NoError(t, err)
-
-	contents, err = ioutil.ReadFile(filepath.Join(tempdir, "registry"))
-	assert.NoError(t, err)
-	assert.Equal(t, []byte("new filebeat 2"), contents)
-}
 
 func TestFileEventToMapStr(t *testing.T) {
 	// Test 'fields' is not present when it is nil.
@@ -129,7 +34,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
-				JSONConfig:   &JSONConfig{KeysUnderRoot: true},
+				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type": "test_type",
@@ -142,7 +47,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
-				JSONConfig:   &JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type": "test",
@@ -155,7 +60,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
-				JSONConfig:   &JSONConfig{},
+				JSONConfig:   &processor.JSONConfig{},
 			},
 			ExpectedItems: common.MapStr{
 				"json": common.MapStr{"type": "test", "text": "hello"},
@@ -168,7 +73,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hi"},
-				JSONConfig:   &JSONConfig{MessageKey: "text"},
+				JSONConfig:   &processor.JSONConfig{MessageKey: "text"},
 			},
 			ExpectedItems: common.MapStr{
 				"json": common.MapStr{"type": "test", "text": "hello"},
@@ -183,7 +88,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.444Z"},
-				JSONConfig:   &JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"@timestamp": common.MustParseTime("2016-04-05T18:47:18.444Z"),
@@ -198,7 +103,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.44XX4Z"},
-				JSONConfig:   &JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"@timestamp": common.Time(now),
@@ -214,7 +119,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "@timestamp": 42},
-				JSONConfig:   &JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"@timestamp": common.Time(now),
@@ -228,7 +133,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": 42},
-				JSONConfig:   &JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type":       "test_type",
@@ -241,7 +146,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": ""},
-				JSONConfig:   &JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type":       "test_type",
@@ -254,7 +159,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "_type"},
-				JSONConfig:   &JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type":       "test_type",
