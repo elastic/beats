@@ -1,4 +1,4 @@
-package encoding
+package reader
 
 import (
 	"io"
@@ -12,7 +12,7 @@ import (
 // lineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
-type LineReader struct {
+type Line struct {
 	rawInput   io.Reader
 	codec      encoding.Encoding
 	bufferSize int
@@ -25,12 +25,12 @@ type LineReader struct {
 	decoder   transform.Transformer
 }
 
-func NewLineReader(
+func NewLine(
 	input io.Reader,
 	codec encoding.Encoding,
 	bufferSize int,
-) (*LineReader, error) {
-	l := &LineReader{}
+) (*Line, error) {
+	l := &Line{}
 
 	if err := l.init(input, codec, bufferSize); err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func NewLineReader(
 	return l, nil
 }
 
-func (l *LineReader) init(
+func (l *Line) init(
 	input io.Reader,
 	codec encoding.Encoding,
 	bufferSize int,
@@ -61,7 +61,7 @@ func (l *LineReader) init(
 	return nil
 }
 
-func (l *LineReader) Next() ([]byte, int, error) {
+func (l *Line) Next() ([]byte, int, error) {
 	for {
 		// read next 'potential' line from input buffer/reader
 		err := l.advance()
@@ -91,7 +91,7 @@ func (l *LineReader) Next() ([]byte, int, error) {
 	return bytes, sz, nil
 }
 
-func (l *LineReader) advance() error {
+func (l *Line) advance() error {
 	var idx int
 	var err error
 
@@ -146,7 +146,7 @@ func (l *LineReader) advance() error {
 	return err
 }
 
-func (l *LineReader) decode(end int) (int, error) {
+func (l *Line) decode(end int) (int, error) {
 	var err error
 	buffer := make([]byte, 1024)
 	inBytes := l.inBuffer.Bytes()

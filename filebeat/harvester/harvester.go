@@ -20,7 +20,9 @@ import (
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -28,11 +30,11 @@ type Harvester struct {
 	Path               string /* the file path to harvest */
 	Config             harvesterConfig
 	offset             int64
-	State              input.FileState
+	State              file.State
 	stateMutex         sync.Mutex
 	SpoolerChan        chan *input.FileEvent
 	encoding           encoding.EncodingFactory
-	file               FileSource /* the file being watched */
+	file               source.FileSource /* the file being watched */
 	ExcludeLinesRegexp []*regexp.Regexp
 	IncludeLinesRegexp []*regexp.Regexp
 	done               chan struct{}
@@ -41,7 +43,7 @@ type Harvester struct {
 func NewHarvester(
 	cfg *common.Config,
 	path string,
-	state input.FileState,
+	state file.State,
 	spooler chan *input.FileEvent,
 	offset int64,
 	done chan struct{},

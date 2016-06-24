@@ -1,6 +1,6 @@
 // +build !windows
 
-package input
+package file
 
 import (
 	"os"
@@ -9,18 +9,18 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-type FileStateOS struct {
+type StateOS struct {
 	Inode  uint64 `json:"inode,"`
 	Device uint64 `json:"device,"`
 }
 
-// GetOSFileState returns the FileStateOS for non windows systems
-func GetOSFileState(info os.FileInfo) FileStateOS {
+// GetOSState returns the FileStateOS for non windows systems
+func GetOSState(info os.FileInfo) StateOS {
 
 	stat := info.Sys().(*syscall.Stat_t)
 
 	// Convert inode and dev to uint64 to be cross platform compatible
-	fileState := FileStateOS{
+	fileState := StateOS{
 		Inode:  uint64(stat.Ino),
 		Device: uint64(stat.Dev),
 	}
@@ -29,7 +29,7 @@ func GetOSFileState(info os.FileInfo) FileStateOS {
 }
 
 // IsSame file checks if the files are identical
-func (fs FileStateOS) IsSame(state FileStateOS) bool {
+func (fs StateOS) IsSame(state StateOS) bool {
 	return fs.Inode == state.Inode && fs.Device == state.Device
 }
 

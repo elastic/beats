@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/spooler"
 	"github.com/elastic/beats/libbeat/common"
@@ -42,7 +42,7 @@ func New(spooler *spooler.Spooler, prospectorConfigs []*common.Config) (*Crawler
 	}, nil
 }
 
-func (c *Crawler) Start(states input.States) error {
+func (c *Crawler) Start(states file.States) error {
 
 	logp.Info("Loading Prospectors: %v", len(c.prospectorConfigs))
 
