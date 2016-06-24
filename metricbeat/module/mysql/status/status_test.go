@@ -22,7 +22,7 @@ func TestConfigValidation(t *testing.T) {
 				"module":     "mysql",
 				"metricsets": []string{"status"},
 			},
-			err: "missing required field accessing config",
+			err: "missing required field accessing 'hosts'",
 		},
 		{
 			// Invalid DSN

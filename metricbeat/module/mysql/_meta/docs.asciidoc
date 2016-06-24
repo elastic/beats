@@ -16,5 +16,5 @@ DSN is as following:
 [float]
 === Compatibility
 
-The mysql MetricSets were tested with mysql 5.7.10 and are expected to work with all version
+The mysql MetricSets were tested with mysql 5.7.12 and are expected to work with all version
 >= 5.7.0.
