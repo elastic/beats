@@ -103,29 +103,6 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
-	if config.SaveTopology {
-		err := out.EnableTTL()
-		if err != nil {
-			logp.Err("Fail to set _ttl mapping: %s", err)
-			// keep trying in the background
-			go func() {
-				for {
-					err := out.EnableTTL()
-					if err == nil {
-						break
-					}
-					logp.Err("Fail to set _ttl mapping: %s", err)
-					time.Sleep(5 * time.Second)
-				}
-			}()
-		}
-	}
-
-	out.TopologyExpire = 15000
-	if topologyExpire != 0 {
-		out.TopologyExpire = topologyExpire * 1000 // millisec
-	}
-
 	out.mode = m
 	out.index = config.Index
 

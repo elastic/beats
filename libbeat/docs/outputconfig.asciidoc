@@ -227,7 +227,7 @@ The maximum number of events to bulk in a single Elasticsearch bulk API index re
 
 If the Beat sends single events, the events are collected into batches. If the Beat publishes
 a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
-split. 
+split.
 
 Specifying a larger batch size can improve performance by lowering the overhead of sending events. 
 However big batch sizes can also increase processing times, which might result in
@@ -256,11 +256,6 @@ A Boolean that specifies whether the topology is kept in Elasticsearch. The defa
 false.
 
 This option is relevant for Packetbeat only.
-
-===== topology_expire
-
-The time to live in seconds for the topology information that is stored in
-Elasticsearch. The default is 15 seconds.
 
 ===== tls
 

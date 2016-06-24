@@ -14,6 +14,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- The topology_expire option of the Elasticserach output was removed. {pull}1907[1907]
+
 *Metricbeat*
 
 *Packetbeat*
