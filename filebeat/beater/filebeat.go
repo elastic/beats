@@ -22,7 +22,10 @@ type Filebeat struct {
 
 // New creates a new Filebeat pointer instance.
 func New() *Filebeat {
-	return &Filebeat{}
+	config := cfg.DefaultConfig
+	return &Filebeat{
+		config: &config,
+	}
 }
 
 // Config setups up the filebeat configuration by fetch all additional config files

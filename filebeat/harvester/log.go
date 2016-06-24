@@ -162,7 +162,7 @@ func (h *Harvester) openFile() (encoding.Encoding, error) {
 	f, err := file.ReadOpen(h.Path)
 	if err == nil {
 		// Check we are not following a rabbit hole (symlinks, etc.)
-		if !file.IsRegularFile(f) {
+		if !file.IsRegular(f) {
 			return nil, errors.New("Given file is not a regular file.")
 		}
 
