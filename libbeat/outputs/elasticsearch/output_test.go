@@ -45,8 +45,6 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 
 func TestTopologyInES(t *testing.T) {
 
-	t.Skip("This tests is skipped because it currently fails with 5.0.0-alpha4. Probably because _ttl was removed")
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch"})
 	}
@@ -309,26 +307,4 @@ func TestBulkEvents(t *testing.T) {
 
 	output = createElasticsearchConnection(50, 5)
 	testBulkWithParams(t, output)
-}
-
-func TestEnableTTL(t *testing.T) {
-
-	t.Skip("This tests is skipped as ttl is not compatible with 5.0.0-alpha4 as _ttl was removed")
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch", "elasticsearch"})
-	}
-
-	output := createElasticsearchConnection(0, 0)
-	output.randomClient().Delete(".packetbeat-topology", "", "", nil)
-
-	err := output.EnableTTL()
-	if err != nil {
-		t.Errorf("Fail to enable TTL: %s", err)
-	}
-
-	// should succeed also when index already exists
-	err = output.EnableTTL()
-	if err != nil {
-		t.Errorf("Fail to enable TTL: %s", err)
-	}
 }
