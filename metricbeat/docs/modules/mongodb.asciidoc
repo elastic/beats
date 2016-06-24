@@ -54,14 +54,14 @@ here <<configuration-metricbeat,here>>. Below is an example of a configuration o
 [source,yaml]
 ----
 metricbeat.modules:
-- module: mongodb
-  metricsets: ["status"]
-  enabled: true
-  period: 10s
+#- module: mongodb
+  #metricsets: ["status"]
+  #enabled: true
+  #period: 10s
 
   # The hosts must be passed as MongoDB URLs in the format:
   # [mongodb://][user:pass@]host[:port]
-  hosts: ["localhost:27017"]
+  #hosts: ["localhost:27017"]
 
 ----
 
