@@ -14,3 +14,7 @@ stop:
 clean:
 	docker stop $(shell docker ps -a -q)
 	docker rm -v $(shell docker ps -a -q)
+
+# Tails the environment log files
+logs:
+	${BASE_COMMAND} logs -f

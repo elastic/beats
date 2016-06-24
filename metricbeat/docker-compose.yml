@@ -41,7 +41,7 @@ mongodb:
   image: mongo:3.0
 
 mysql:
-  image: mysql:5.7.10
+  image: mysql:5.7.12
   environment:
     - MYSQL_ROOT_PASSWORD=test
 
