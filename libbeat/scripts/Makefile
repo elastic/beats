@@ -135,9 +135,7 @@ integration-tests: prepare-tests
 
 # Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 .PHONY: integration-tests-environment
-integration-tests-environment:
-	$(MAKE) prepare-tests
-	$(MAKE) build-image
+integration-tests-environment: prepare-tests build-image
 	${DOCKER_COMPOSE} run beat make integration-tests RACE_DETECTOR=$(RACE_DETECTOR)
 
 # Runs the system tests
@@ -148,9 +146,7 @@ system-tests: buildbeat.test prepare-tests python-env
 
 # Runs the system tests
 .PHONY: system-tests-environment
-system-tests-environment:
-	$(MAKE) prepare-tests
-	$(MAKE) build-image
+system-tests-environment: prepare-tests build-image
 	${DOCKER_COMPOSE} run beat make system-tests;
 
 # Runs system tests without coverage reports and in parallel
@@ -282,6 +278,12 @@ write-environment:
 	echo "ES_PORT=9200" >> ${BUILD_DIR}/test.env
 	echo "ES_USER=beats" >> ${BUILD_DIR}/test.env
 	echo "ES_PASS=testing" >> ${BUILD_DIR}/test.env
+
+# Tails the environment logs
+.PHONY: env-logs
+env-logs:
+	${DOCKER_COMPOSE} logs -f
+
 
 ### Packaging targets ####
 
