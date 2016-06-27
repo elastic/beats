@@ -70,7 +70,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 
 [[release-notes-5.0.0-alpha4]]
 === Beats version 5.0.0-alpha4
-https://github.com/elastic/beats/compare/v5.0.0alpha3...v5.0.0-alpha4[View commits]
+https://github.com/elastic/beats/compare/v5.0.0-alpha3...v5.0.0-alpha4[View commits]
 
 ==== Breaking changes
 
@@ -120,7 +120,7 @@ https://github.com/elastic/beats/compare/v5.0.0alpha3...v5.0.0-alpha4[View commi
 
 [[release-notes-5.0.0-alpha3]]
 === Beats version 5.0.0-alpha3
-https://github.com/elastic/beats/compare/v5.0.0alpha2...v5.0.0-alpha3[View commits]
+https://github.com/elastic/beats/compare/v5.0.0-alpha2...v5.0.0-alpha3[View commits]
 
 ==== Breaking changes
 
@@ -190,7 +190,7 @@ https://github.com/elastic/beats/compare/v1.2.2...v1.2.3[View commits]
 
 [[release-notes-5.0.0-alpha2]]
 === Beats version 5.0.0-alpha2
-https://github.com/elastic/beats/compare/v5.0.0alpha1...v5.0.0-alpha2[View commits]
+https://github.com/elastic/beats/compare/v5.0.0-alpha1...v5.0.0-alpha2[View commits]
 
 ==== Breaking changes
 
