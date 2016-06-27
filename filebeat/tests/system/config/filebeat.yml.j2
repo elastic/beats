@@ -21,6 +21,7 @@ filebeat.prospectors:
   max_backoff: 0.1s
   close_removed: {{close_removed}}
   close_renamed: {{close_renamed}}
+  close_eof: {{close_eof}}
 
   {% if fields %}
   fields:
