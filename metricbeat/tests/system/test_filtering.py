@@ -12,7 +12,7 @@ class GlobalFiltering(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["cpu"],
-                "period": "5s"
+                "period": "1s"
             }],
             drop_fields={
                 "condition": "range.system.cpu.system.pct.lt: 0.1",
@@ -50,7 +50,7 @@ class GlobalFiltering(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "5s"
+                "period": "1s"
             }],
             drop_fields={
                 "fields": ["system.process.memory"],
@@ -82,7 +82,7 @@ class GlobalFiltering(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "5s"
+                "period": "1s"
             }],
             drop_event={
                 "condition": "range.system.process.cpu.total.pct.lt: 0.001",
@@ -109,7 +109,7 @@ class GlobalFiltering(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "5s"
+                "period": "1s"
             }],
             include_fields={"fields": ["system.process.cpu", "system.process.memory"]},
         )
@@ -149,7 +149,7 @@ class GlobalFiltering(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "5s"
+                "period": "1s"
             }],
             include_fields={"fields": ["system.process"]},
             drop_fields={"fields": ["system.process.memory"]},
@@ -188,7 +188,7 @@ class GlobalFiltering(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "5s"
+                "period": "1s"
             }],
             include_fields={"fields": ["system.process.memory.size", "proc.memory.rss.pct"]},
             drop_fields={"fields": ["system.process.memory.size", "proc.memory.rss.pct"]},
