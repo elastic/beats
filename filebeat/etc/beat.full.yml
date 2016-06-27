@@ -176,6 +176,11 @@ filebeat.prospectors:
   # Note: Potential data loss if file reading was not finished when file was removed.
   #close_removed: false
 
+  # Closes the file handler as soon as the harvesters reaches then end of the file.
+  # The file will be picked up again by the harvester at previous known state
+  # after scan_frequency in case the file can still be discovered by the prospector.
+  #close_eof: false
+
 #----------------------------- Stdin prospector -------------------------------
 # Configuration to use stdin input
 #- input_type: stdin

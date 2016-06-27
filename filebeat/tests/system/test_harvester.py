@@ -104,3 +104,45 @@ class Test(BaseTest):
 
         # Make sure the state for the file was persisted
         assert len(data) == 1
+
+
+    def test_close_eof(self):
+        """
+        Checks that a file is closed if eof is reached
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+            close_eof="true",
+            scan_frequency="0.1s"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile1 = self.working_dir + "/log/test.log"
+        file = open(testfile1, 'w')
+
+        iterations1 = 5
+        for n in range(0, iterations1):
+            file.write("rotation file")
+            file.write("\n")
+
+        file.close()
+
+        filebeat = self.start_beat()
+
+        # Let it read the file
+        self.wait_until(
+            lambda: self.output_has(lines=iterations1), max_timeout=10)
+
+
+        # Wait until error shows up on windows
+        self.wait_until(
+            lambda: self.log_contains(
+                "Closing because close_eof is enabled"),
+            max_timeout=15)
+
+        filebeat.check_kill_and_wait()
+
+        data = self.get_registry()
+
+        # Make sure the state for the file was persisted
+        assert len(data) == 1
