@@ -1,14 +1,16 @@
 [[beats-reference]]
 = Beats Platform Reference
+
+include::./version.asciidoc[]
+
 :packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/master
 :metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/master
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/master
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/master
 :security: X-Pack Security
-:ES-version: 5.0.0-alpha3
-:LS-version: 5.0.0-alpha3
-:Kibana-version: 5.0.0-alpha3
-:Dashboards-version: 5.0.0-alpha3
+:ES-version: {stack-version}
+:LS-version: {stack-version}
+:Kibana-version: {stack-version}
 
 include::./overview.asciidoc[]
 
