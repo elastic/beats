@@ -1,11 +1,14 @@
 = Filebeat Reference
+
+include::./version.asciidoc[]
+
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
 :packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/master
 :metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/master
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/master
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/master
 :elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/master/
-:version: 5.0.0-alpha3
+:version: {stack-version}
 :beatname_lc: filebeat
 :beatname_uc: Filebeat
 :security: X-Pack Security
