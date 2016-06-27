@@ -39,7 +39,7 @@ class BaseTest(TestCase):
                 if tmp_entry == None:
                     tmp_entry = entry
                 else:
-                    if tmp_entry["last_seen"] < entry["last_seen"]:
+                    if tmp_entry["timestamp"] < entry["timestamp"]:
                         tmp_entry = entry
 
         return tmp_entry
