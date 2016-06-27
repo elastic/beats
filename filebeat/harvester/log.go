@@ -37,7 +37,8 @@ func (h *Harvester) Harvest() {
 	//       don't require 'complicated' logic.
 	cfg := h.Config
 	readerConfig := reader.LogFileReaderConfig{
-		ForceClose:         cfg.ForceCloseFiles,
+		CloseRemoved:       cfg.CloseRemoved,
+		CloseRenamed:       cfg.CloseRenamed,
 		CloseOlder:         cfg.CloseOlder,
 		BackoffDuration:    cfg.Backoff,
 		MaxBackoffDuration: cfg.MaxBackoff,
@@ -68,9 +69,20 @@ func (h *Harvester) Harvest() {
 		// Partial lines return error and are only read on completion
 		ts, text, bytesRead, jsonFields, err := readLine(processor)
 		if err != nil {
+
 			if err == reader.ErrFileTruncate {
 				logp.Info("File was truncated. Begin reading file from offset 0: %s", h.Path)
 				h.SetOffset(0)
+				return
+			}
+
+			if err == reader.ErrRemoved {
+				logp.Info("File was removed: %s. Closing because close_removed is enabled.", h.Path)
+				return
+			}
+
+			if err == reader.ErrRenamed {
+				logp.Info("File was renamed: %s Closing because close_renamed is enabled.", h.Path)
 				return
 			}
 

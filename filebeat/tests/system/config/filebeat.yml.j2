@@ -19,7 +19,8 @@ filebeat.prospectors:
   backoff: 0.1s
   backoff_factor: 1
   max_backoff: 0.1s
-  force_close_files: {{force_close_files}}
+  close_removed: {{close_removed}}
+  close_renamed: {{close_renamed}}
 
   {% if fields %}
   fields:
