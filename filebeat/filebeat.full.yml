@@ -166,22 +166,22 @@ filebeat.prospectors:
   # The backoff value will be multiplied each time with the backoff_factor until max_backoff is reached
   #backoff_factor: 2
 
-  # This option closes a file, as soon as the file name changes.
-  # This config option is recommended on windows only. Filebeat keeps the files it's reading open. This can cause
-  # issues when the file is removed, as the file will not be fully removed until also Filebeat closes
-  # the reading. Filebeat closes the file handler after ignore_older. During this time no new file with the
-  # same name can be created. Turning this feature on the other hand can lead to loss of data
-  # on rotate files. It can happen that after file rotation the beginning of the new
-  # file is skipped, as the reading starts at the end. We recommend to leave this option on false
-  # but lower the ignore_older value to release files faster.
-  #force_close_files: false
+  # Close renamed means a file handler is close when a file is renamed / rotated. In case the harvester was
+  # not finished reading the roated file, the file will be picked up again after scan_frequency in case it
+  # also matches the prospector patterns.
+  #close_renamed: false
+
+  # When enabling this option, a file handler is closed immidiately in case a file can't be found
+  # any more. In case the file shows up again later, harvesting will continue at the last position
+  # after scan_frequency
+  #close_removed: false
 
 #----------------------------- Stdin prospector -------------------------------
 # Configuration to use stdin input
 #- input_type: stdin
 
 #========================= Filebeat global options ============================
-  
+
 # Event count spool threshold - forces network flush if exceeded
 #filebeat.spool_size: 2048
 

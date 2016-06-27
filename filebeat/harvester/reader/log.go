@@ -13,7 +13,8 @@ import (
 
 var (
 	ErrFileTruncate = errors.New("detected file being truncated")
-	ErrForceClose   = errors.New("file must be closed")
+	ErrRenamed      = errors.New("file was renamed")
+	ErrRemoved      = errors.New("file was removed")
 	ErrInactive     = errors.New("file inactive")
 )
 
@@ -27,11 +28,12 @@ type logFileReader struct {
 }
 
 type LogFileReaderConfig struct {
-	ForceClose         bool
 	CloseOlder         time.Duration
 	BackoffDuration    time.Duration
 	MaxBackoffDuration time.Duration
 	BackoffFactor      int
+	CloseRenamed       bool
+	CloseRemoved       bool
 }
 
 func NewLogFileReader(
@@ -72,8 +74,9 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 			r.offset += int64(n)
 			r.lastTimeRead = time.Now()
 		}
+
+		// reset backoff
 		if err == nil {
-			// reset backoff
 			r.backoff = r.config.BackoffDuration
 			return n, nil
 		}
@@ -113,16 +116,19 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 			return n, ErrInactive
 		}
 
-		if r.config.ForceClose {
-			// Check if the file name exists (see #93)
+		if r.config.CloseRenamed {
+			if !file.IsSameFile(r.fs.Name(), info) {
+				return n, ErrRenamed
+			}
+		}
+
+		if r.config.CloseRemoved {
+			// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
 			_, statErr := os.Stat(r.fs.Name())
 
-			// Error means file does not exist. If no error, check if same file. If
-			// not close as rotated.
-			if statErr != nil || !file.IsSameFile(r.fs.Name(), info) {
-				logp.Info("Force close file: %s; error: %s", r.fs.Name(), statErr)
-				// Return directly on windows -> file is closing
-				return n, ErrForceClose
+			// Error means file does not exist.
+			if statErr != nil {
+				return n, ErrRemoved
 			}
 		}
 
