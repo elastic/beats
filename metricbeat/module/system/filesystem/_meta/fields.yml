@@ -1,7 +1,7 @@
 - name: filesystem
   type: group
   description: >
-    `filesystem` contains local filesystem stats
+    `filesystem` contains local filesystem stats.
   fields:
     - name: avail
       type: long

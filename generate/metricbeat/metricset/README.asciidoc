@@ -1,17 +1,18 @@
-== Create Beat based on Metricbeat
+[[creating-beat-from-metricbeat]]
+== Creating a Beat Based on Metricbeat
 
-This Metricset beat generator allows to create a beat based on Metricbeat as a library with your
-own Metricsets.
+The metricset Beat generator enables you to create a Beat that uses Metricbeat as a library and has your
+own metricsets.
 
 [float]
 === Requirements
 
-To create your own beat, it is required that Golang 1.6.2 or later are installed, the `$GOPATH` is setup correctly. In
-addition it requires https://www.python.org/downloads/[python] and https://github.com/audreyr/cookiecutter[cookiecutter]
-to be installed. More details on how to install cookiecutter can be found http://cookiecutter.readthedocs.io/en/latest/installation.html[here].
+To create your own Beat, you must have Golang 1.6.2 or later installed, and the `$GOPATH`
+must be set up correctly. You must also have https://www.python.org/downloads/[python] and https://github.com/audreyr/cookiecutter[cookiecutter] installed. For more details on how to install cookiecutter,
+see the http://cookiecutter.readthedocs.io/en/latest/installation.html[cookiecutter installation docs].
 
 [float]
-=== Step 1 - Clone Beats repository
+=== Step 1 - Clone the beats repository
 
 The first step is to clone the beats repository:
 
@@ -20,32 +21,34 @@ The first step is to clone the beats repository:
 git clone https://github.com/elastic/beats $GOPATH/src/github.com/elastic/beats
 ----
 
-After having cloned the beat repository into the `GOPATH`, change to the directory where you want to create the beat.
- This is normally under `$GOPATH/src/github.com/{your-github-com}`. Inside this directory run the command:
+After cloning the beats repository into the `GOPATH`, change to the directory where you want to create the beat.
+This directory is normally located under `$GOPATH/src/github.com/{your-github-com}`. Inside this directory, run the command to create the beat.
 
 
 [float]
-=== Step 2 - Create Beat
+=== Step 2 - Create the Beat
+
+Run the command:
 
 [source,bash]
 ----
 cookiecutter $GOPATH/src/github.com/elastic/beats/generate/metricbeat/metricset
 ----
 
-This will ask you some question about the beat name and path. Complete it accordingly.
+When prompted, enter the Beat name and path.
 
 
 [float]
-=== Step 3 - Init and Create MetricSet
+=== Step 3 - Init and create the metricset
 
-After having created the beat, change into the beat directory and run:
+After creating the Beat, change the directory to `$GOPATH/src/github.com/{your-github-com}/{beat}` and run:
 
 [source,bash]
 ----
 make setup
 ----
 
-This will do the initial setup for your beat and also run `make create-metricset`, which will ask you for the
-module name and metricset name of your beat.
+This will do the initial setup for your Beat and also run `make create-metricset`, which will ask you for the
+module name and metricset name of your Beat.
 
-For all further details on creating a metricset, check out the https://www.elastic.co/guide/en/beats/metricbeat/current/_create_a_metricset.html[create a MetricSet] docs.
+For more details about creating a metricset, see the docs about https://www.elastic.co/guide/en/beats/metricbeat/current/creating-metricsets.html[creating a metricset].

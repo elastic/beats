@@ -21,7 +21,7 @@
       type: long
       required: true
       description: >
-        Event round trip time in microseconds
+        Event round trip time in microseconds.
 
     - name: type
       required: true

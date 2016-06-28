@@ -1,7 +1,7 @@
 - name: cpu
   type: group
   description: >
-    `cpu` contains local cpu stats.
+    `cpu` contains local CPU stats.
   fields:
     - name: user.pct
       type: float
@@ -36,7 +36,7 @@
 
     - name: softirq.pct
       type: float
-      description:
+      description: >
         The percentage of CPU time spent servicing and handling software interrupts.
 
     - name: steal.pct
@@ -78,7 +78,7 @@
 
     - name: softirq.ticks
       type: long
-      description:
+      description: >
         The amount of CPU time spent servicing and handling software interrupts.
 
     - name: steal.ticks

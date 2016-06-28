@@ -1,7 +1,7 @@
 - name: status
   type: group
   description: >
-    `status` contains the metrics that were scraped from the apache status page.
+    `status` contains the metrics that were scraped from the Apache status page.
   fields:
     - name: hostname
       type: keyword
@@ -151,7 +151,7 @@
         - name: idle_cleanup
           type: integer
           description: >
-            Idle cleanups
+            Idle cleanups.
         - name: open_slot
           type: integer
           description: >

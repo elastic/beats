@@ -109,9 +109,29 @@ To configure Metricbeat, you edit the configuration file. For rpm and deb,
 you'll find the configuration file at `/etc/metricbeat/metricbeat.yml`. For mac
 and win, look in the archive that you just extracted.
 
-Here is a sample of the `metricbeat.yml` file. Metricbeat uses modules to
-collect metrics, and each module must be individually configured. The example
-below shows how to configure the Apache HTTPD module.
+Metricbeat uses <<metricbeat-modules,modules>> to collect metrics. You configure
+each module individually. The following example shows the default configuration
+in the `metricbeat.yml` file. The system status module is enabled by default to
+collect metrics about your server, such as CPU usage, memory usage, network IO
+metrics, and process statistics:
+
+[source, shell]
+-------------------------------------
+metricbeat.modules:
+- module: system
+  metricsets:
+    - cpu
+    - filesystem
+    - memory
+    - network
+    - process
+  enabled: true
+  period: 10s
+  processes: ['.*']
+  cpu_ticks: false  
+-------------------------------------
+
+The following example shows how to configure the Apache HTTPD module:
 
 [source, shell]
 -------------------------------------
@@ -125,18 +145,19 @@ metricbeat.modules:
 
 To configure Metricbeat:
 
-. Define the metricbeat modules that you want enabled.
+. Define the Metricbeat modules that you want to enable. For each module, specify
+the metricsets that you want to collect. See <<configuring-howto-metricbeat>> for
+more details about configuring modules.
++
+If you accept the default configuration without specifying additional modules,
+Metricbeat will collect system metrics only.
 
 . If you are sending output to Elasticsearch, set the IP address and port where
 Metricbeat can find the Elasticsearch installation:
 +
 [source,yaml]
 ----------------------------------------------------------------------
-# Configure what outputs to use when sending the data collected by the beat.
-# Multiple outputs may be used.
-
 output.elasticsearch:
-  # Array of hosts to connect to.
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
@@ -201,4 +222,16 @@ Elasticsearch instance.
 On Windows, if you don't have cURL installed, simply point your browser to the
 URL.
 
-Enjoy!
+[[metricbeat-sample-dashboards]]
+=== Step 5: Loading Sample Kibana Dashboards
+
+To make it easier for you to start monitoring your servers in Kibana,
+we have created a sample Metricbeat dashboard. This dashboard is provided as
+an example. We recommend that you
+http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] it
+to meet your needs.
+
+For more information, see
+{libbeat}/load-kibana-dashboards.html[Loading the Beats Dashboards].
+
+image:./images/metricbeat_system_dashboard.png[Metricbeat Dashboard]

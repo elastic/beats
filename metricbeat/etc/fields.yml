@@ -21,7 +21,7 @@
       type: long
       required: true
       description: >
-        Event round trip time in microseconds
+        Event round trip time in microseconds.
 
     - name: type
       required: true
@@ -31,18 +31,18 @@
 - key: apache
   title: "Apache"
   description: >
-    Apache HTTPD server metric sets collected from the apache web server.
+    Apache HTTPD server metricsets collected from the Apache web server.
   short_config: false
   fields:
     - name: apache
       type: group
       description: >
-        Apache contains the metrics that were scraped from apache.
+        `apache` contains the metrics that were scraped from Apache.
       fields:
         - name: status
           type: group
           description: >
-            `status` contains the metrics that were scraped from the apache status page.
+            `status` contains the metrics that were scraped from the Apache status page.
           fields:
             - name: hostname
               type: keyword
@@ -192,7 +192,7 @@
                 - name: idle_cleanup
                   type: integer
                   description: >
-                    Idle cleanups
+                    Idle cleanups.
                 - name: open_slot
                   type: integer
                   description: >
@@ -206,7 +206,7 @@
                   description: >
                     Total.
 - key: mongodb
-  title: "MongoDB Status"
+  title: "MongoDB"
   description: >
     Metrics collected from MongoDB servers.
   short_config: false
@@ -224,7 +224,7 @@
             - name: version
               type: keyword
               description: >
-                Instance version
+                Instance version.
             - name: uptime.ms
               type: long
               description: >
@@ -271,7 +271,7 @@
                   description: >
                     The total number of milliseconds (ms) that the mongod processes have
                     spent writing (i.e. flushing) data to disk. Because this is an
-                    absolute value, consider the value of flushes and average_ms to
+                    absolute value, consider the value of `flushes` and `average_ms` to
                     provide better context for this datum.
                 - name: average.ms
                   type: long
@@ -298,7 +298,7 @@
                   description: >
                     The number of connections to the database server from clients. This
                     number includes the current shell session. Consider the value of
-                    available to add more context to this datum.
+                    `available` to add more context to this datum.
                 - name: available
                   type: long
                   description: >
@@ -404,7 +404,7 @@
                   description: >
                     The total number of page faults that require disk operations. Page
                     faults refer to operations that require the database server to
-                    access data which isn't available in active memory.
+                    access data that isn't available in active memory.
 
             - name: network
               type: group
@@ -422,7 +422,7 @@
                 - name: requests
                   type: long
                   description: >
-                    The amount of network traffic, in bytes, sent from this database.
+                    The total number of requests received by the server.
 
             - name: opcounters
               type: group
@@ -504,7 +504,7 @@
                 - name: bits
                   type: long
                   description: >
-                    Either 64 or 32, depending on which target architecture specified
+                    Either 64 or 32, depending on which target architecture was specified
                     during the mongod compilation process.
                 - name: resident.mb
                   type: long
@@ -519,7 +519,7 @@
                 - name: mapped.mb
                   type: long
                   description: >
-                    The amount of mapped memory, in megabytes (MB), by the database.
+                    The amount of mapped memory, in megabytes (MB), used by the database.
                     Because MongoDB uses memory-mapped files, this value is likely to be
                     to be roughly equivalent to the total size of your database or
                     databases.
@@ -545,15 +545,15 @@
 
 
 - key: mysql
-  title: "MySQL Status"
+  title: "MySQL"
   description: >
-    MySQL server status metrics collected from MySQL
+    MySQL server status metrics collected from MySQL.
   short_config: false
   fields:
     - name: mysql
       type: group
       description: >
-        mysql contains the metrics that were obtained from MySQL
+        `mysql` contains the metrics that were obtained from MySQL
         query.
       fields:
         - name: status
@@ -564,7 +564,7 @@
             - name: aborted
               type: group
               description: >
-                Aborted status fields
+                Aborted status fields.
               fields:
                 - name: clients
                   type: integer
@@ -591,7 +591,7 @@
             - name: bytes
               type: group
               description: >
-                Bytes stats
+                Bytes stats.
               fields:
                 - name: received
                   type: integer
@@ -667,7 +667,7 @@
               type: integer
               description: >
 - key: nginx
-  title: "Nginx Status"
+  title: "Nginx"
   description: >
     Nginx server status metrics collected from various modules.
   short_config: false
@@ -675,7 +675,7 @@
     - name: nginx
       type: group
       description: >
-        nginx contains the metrics that were scraped from nginx.
+        `nginx` contains the metrics that were scraped from nginx.
       fields:
         - name: stubstatus
           type: group
@@ -685,7 +685,7 @@
             - name: hostname
               type: keyword
               description: >
-                Nginx hostname
+                Nginx hostname.
             - name: active
               type: integer
               description: >
@@ -713,25 +713,25 @@
             - name: reading
               type: integer
               description: >
-                The current number of connections where nginx is reading the request header.
+                The current number of connections where Nginx is reading the request header.
             - name: writing
               type: integer
               description: >
-                The current number of connections where nginx is writing the response back to the client.
+                The current number of connections where Nginx is writing the response back to the client.
             - name: waiting
               type: integer
               description: >
                 The current number of idle client connections waiting for a request.
 - key: redis
-  title: "Redis Status"
+  title: "Redis"
   description: >
-    Redis metrics collected from the Redis
+    Redis metrics collected from Redis.
   short_config: false
   fields:
     - name: redis
       type: group
       description: >
-        `redis` contains the information and statistics from Redis
+        `redis` contains the information and statistics from Redis.
       fields:
         - name: info
           type: group
@@ -741,12 +741,12 @@
             - name: clients
               type: group
               description: >
-                Redis client stats
+                Redis client stats.
               fields:
                 - name: connected
                   type: integer
                   description: >
-                    Number of client connections (excluding connections from slaves)
+                    Number of client connections (excluding connections from slaves).
 
                 - name: longest_output_list
                   type: integer
@@ -756,22 +756,22 @@
                 - name: biggest_input_buf
                   type: integer
                   description: >
-                    Biggest input buffer among current client connections
+                    Biggest input buffer among current client connections.
 
                 - name: blocked
                   type: integer
                   description: >
-                    Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH)
+                    Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH).
 
             - name: cluster
               type: group
               description: >
-                Redis cluster information
+                Redis cluster information.
               fields:
                 - name: enabled
                   type: boolean
                   description: >
-                    Indicate Redis cluster is enabled
+                    Indicates that the Redis cluster is enabled.
 
             - name: cpu
               type: group
@@ -781,57 +781,57 @@
                 - name: used.sys
                   type: float
                   description: >
-                    System CPU consumed by the Redis server
+                    System CPU consumed by the Redis server.
 
                 - name: used.sys_children
                   type: float
                   description: >
-                    User CPU consumed by the Redis server
+                    User CPU consumed by the Redis server.
 
                 - name: used.user
                   type: float
                   description: >
-                    System CPU consumed by the background processes
+                    System CPU consumed by the background processes.
 
                 - name: used.user_children
                   type: float
                   description: >
-                    User CPU consumed by the background processes
+                    User CPU consumed by the background processes.
 
             - name: memory
               type: group
               description: >
-                Redis CPU stats
+                Redis CPU stats.
               fields:
                 - name: used.value
                   type: integer
                   description: >
-                    Used memory
+                    Used memory.
 
                 - name: used.rss
                   type: integer
                   description: >
-                    Used memory rss
+                    Used memory rss.
 
                 - name: used.peak
                   type: integer
                   description: >
-                    Used memory peak
+                    Used memory peak.
 
                 - name: used.lua
                   type: integer
                   description: >
-                    Used memory lua
+                    Used memory lua.
 
                 - name: allocator
                   type: keyword
                   description: >
-                    Memory allocator
+                    Memory allocator.
 
             - name: persistence
               type: group
               description: >
-                Redis CPU stats
+                Redis CPU stats.
               fields:
                 - name: loading
                   type: boolean
@@ -994,7 +994,7 @@
             - name: stats
               type: group
               description: >
-                Redis stats
+                Redis stats.
               fields:
                 - name: connections.received
                   type: integer
@@ -1080,35 +1080,35 @@
             - name: id
               type: keyword
               description: >
-                Keyspace identifier
+                Keyspace identifier.
 
             - name: avg_ttl
               type: long
               description: >
-                Average ttl
+                Average ttl.
 
             - name: keys
               type: long
               description: >
-                Number of keys in the keyspace
+                Number of keys in the keyspace.
 
             - name: expires
               type: long
               description: >
 - key: system
-  title: "System Status"
+  title: "System"
   description: >
     System status metrics, like CPU and memory usage, that are collected from the operating system.
   fields:
     - name: system
       type: group
       description: >
-        `system` contains local system metrics
+        `system` contains local system metrics.
       fields:
         - name: core
           type: group
           description: >
-            `system-core` contains local cpu core stats.
+            `system-core` contains local CPU core stats.
           fields:
             - name: id
               type: integer
@@ -1178,7 +1178,7 @@
 
             - name: softirq.pct
               type: float
-              description:
+              description: >
                 The percentage of CPU time spent servicing and handling software interrupts.
 
             - name: softirq.ticks
@@ -1203,7 +1203,7 @@
         - name: cpu
           type: group
           description: >
-            `cpu` contains local cpu stats.
+            `cpu` contains local CPU stats.
           fields:
             - name: user.pct
               type: float
@@ -1238,7 +1238,7 @@
 
             - name: softirq.pct
               type: float
-              description:
+              description: >
                 The percentage of CPU time spent servicing and handling software interrupts.
 
             - name: steal.pct
@@ -1280,7 +1280,7 @@
 
             - name: softirq.ticks
               type: long
-              description:
+              description: >
                 The amount of CPU time spent servicing and handling software interrupts.
 
             - name: steal.ticks
@@ -1327,44 +1327,44 @@
             - name: read.count
               type: long
               description: >
-                This is the total number of reads completed successfully.
+                The total number of reads completed successfully.
 
             - name: write.count
               type: long
               description: >
-                This is the total number of writes completed successfully.
+                The total number of writes completed successfully.
 
             - name: read.bytes
               type: long
               description: >
-                This is the total number of bytes read successfully. On Linux this is
+                The total number of bytes read successfully. On Linux this is
                 the number of sectors read multiplied by an assumed sector size of 512.
 
             - name: write.bytes
               type: long
               description: >
-                This is the total number of bytes written successfully. On Linux this is
+                The total number of bytes written successfully. On Linux this is
                 the number of sectors written multiplied by an assumed sector size of
                 512.
 
             - name: read.time
               type: long
               description: >
-                This is the total number of milliseconds spent by all reads.
+                The total number of milliseconds spent by all reads.
 
             - name: write.time
               type: long
               description: >
-                This is the total number of milliseconds spent by all writes.
+                The total number of milliseconds spent by all writes.
 
             - name: io.time
               type: long
               description: >
-                This is the total number of of milliseconds spent doing I/Os.
+                The total number of of milliseconds spent doing I/Os.
         - name: filesystem
           type: group
           description: >
-            `filesystem` contains local filesystem stats
+            `filesystem` contains local filesystem stats.
           fields:
             - name: avail
               type: long
@@ -1566,7 +1566,7 @@
             - name: state
               type: keyword
               description: >
-                The process state. For example: "running"
+                The process state. For example: "running".
             - name: pid
               type: integer
               description: >
@@ -1584,7 +1584,7 @@
               type: keyword
               description: >
                 The username of the user that created the process. If the username
-                can not be determined then the the field will contain the user's
+                cannot be determined, the field will contain the user's
                 numeric identifier (UID). On Windows, this field includes the user's
                 domain and is formatted as `domain\username`.
             - name: cpu
@@ -1599,8 +1599,8 @@
                 - name: total.pct
                   type: float
                   description: >
-                    The percentage of CPU time spent by the process since the last update. Its value is similar with the
-                    %CPU value of the process displayed by the top command on unix systems.
+                    The percentage of CPU time spent by the process since the last update. Its value is similar to the
+                    %CPU value of the process displayed by the top command on Unix systems.
                 - name: system
                   type: long
                   description: >
@@ -1635,7 +1635,7 @@
                   description: >
                     The shared memory the process uses.
 - key: zookeeper
-  title: "Zookeeper Status"
+  title: "ZooKeeper"
   description: >
     ZooKeeper metrics collected by the four-letter monitoring commands.
   short_config: false
@@ -1643,8 +1643,8 @@
     - name: zookeeper
       type: group
       description: >
-        `zookeeper` contains the metrics reported by zookeeper
-        command.
+        `zookeeper` contains the metrics reported by ZooKeeper
+        commands.
       fields:
         - name: mntr
           type: group
@@ -1655,11 +1655,11 @@
             - name: hostname
               type: keyword
               description: >
-                Zookeeper hostname.
+                ZooKeeper hostname.
             - name: approximate_data_size
               type: long
               description: >
-                Approximate size of zookeeper data.
+                Approximate size of ZooKeeper data.
             - name: latency.avg
               type: integer
               description: >
@@ -1675,7 +1675,7 @@
             - name: max_file_descriptor_count
               type: integer
               description: >
-                Maximum number of file descriptors allowed for the zookeeper process.
+                Maximum number of file descriptors allowed for the ZooKeeper process.
             - name: latency.max
               type: integer
               description: >
@@ -1687,11 +1687,11 @@
             - name: num_alive_connections
               type: integer
               description: >
-                Number of connections to zookeeper that are currently alive.
+                Number of connections to ZooKeeper that are currently alive.
             - name: open_file_descriptor_count
               type: integer
               description: >
-                Number of file descriptors open by the zookeeper process.
+                Number of file descriptors open by the ZooKeeper process.
             - name: outstanding_requests
               type: integer
               description: >
@@ -1699,19 +1699,19 @@
             - name: packets.received
               type: integer
               description: >
-                Number zookeeper network packets received.
+                Number of ZooKeeper network packets received.
             - name: packets.sent
               type: long
               description: >
-                Number zookeeper network packets sent.
+                Number of ZooKeeper network packets sent.
             - name: pending_syncs
               type: integer
               description: >
-                Number of pending syncs to carry out to zookeeper ensemble followers.
+                Number of pending syncs to carry out to ZooKeeper ensemble followers.
             - name: server_state
               type: keyword
               description: >
-                Role in the zookeeper ensemble.
+                Role in the ZooKeeper ensemble.
             - name: synced_followers
               type: integer
               description: >
@@ -1719,13 +1719,13 @@
             - name: version
               type: keyword
               description: >
-                Zookeeper version and build string reported.
+                ZooKeeper version and build string reported.
             - name: watch_count
               type: integer
               description: >
-                Number of watches currently set on the local zookeeper process.
+                Number of watches currently set on the local ZooKeeper process.
             - name: znode_count
               type: integer
               description: >
-                Number of znodes reported by the local zookeeper process.
+                Number of znodes reported by the local ZooKeeper process.
 
