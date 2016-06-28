@@ -152,8 +152,8 @@ func TestFetchTimeout(t *testing.T) {
 		assert.Contains(t, err.Error(), "request canceled (Client.Timeout exceeded")
 	}
 
-	// Elapsed should be ~50ms.
-	assert.True(t, elapsed < 100*time.Millisecond, "elapsed time: %s", elapsed.String())
+	// Elapsed should be ~50ms, sometimes it can be up to 1s
+	assert.True(t, elapsed < 5*time.Second, "elapsed time: %s", elapsed.String())
 }
 
 // TestMultipleFetches verifies that the server connection is reused when HTTP
