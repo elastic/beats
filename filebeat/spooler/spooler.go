@@ -36,23 +36,13 @@ func New(
 	publisher chan<- []*input.FileEvent,
 ) (*Spooler, error) {
 	spoolSize := config.SpoolSize
-	if spoolSize <= 0 {
-		spoolSize = cfg.DefaultSpoolSize
-		debugf("Spooler will use the default spool_size of %d", spoolSize)
-	}
-
-	idleTimeout := config.IdleTimeout
-	if idleTimeout <= 0 {
-		idleTimeout = cfg.DefaultIdleTimeout
-		debugf("Spooler will use the default idle_timeout of %s", idleTimeout)
-	}
 
 	return &Spooler{
 		Channel:       make(chan *input.FileEvent, channelSize),
-		idleTimeout:   idleTimeout,
+		idleTimeout:   config.IdleTimeout,
 		spoolSize:     spoolSize,
 		exit:          make(chan struct{}),
-		nextFlushTime: time.Now().Add(idleTimeout),
+		nextFlushTime: time.Now().Add(config.IdleTimeout),
 		publisher:     publisher,
 		spool:         make([]*input.FileEvent, 0, spoolSize),
 	}, nil
