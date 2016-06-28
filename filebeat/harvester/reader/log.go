@@ -34,6 +34,7 @@ type LogFileReaderConfig struct {
 	BackoffFactor      int
 	CloseRenamed       bool
 	CloseRemoved       bool
+	CloseEOF           bool
 }
 
 func NewLogFileReader(
@@ -81,13 +82,12 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 			return n, nil
 		}
 
-		continuable := r.fs.Continuable()
-		if err == io.EOF && !continuable {
-			logp.Info("Reached end of file: %s", r.fs.Name())
+		if err == io.EOF && r.config.CloseEOF {
 			return n, err
 		}
 
-		if err != io.EOF || !continuable {
+		// Stdin is not continuable
+		if err != io.EOF || !r.fs.Continuable() {
 			logp.Err("Unexpected state reading from %s; error: %s", r.fs.Name(), err)
 			return n, err
 		}

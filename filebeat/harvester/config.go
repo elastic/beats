@@ -26,6 +26,7 @@ var (
 		MaxBytes:        10 * (1 << 20), // 10MB
 		CloseRemoved:    false,
 		CloseRenamed:    false,
+		CloseEOF:        false,
 		ForceCloseFiles: false,
 	}
 )
@@ -43,6 +44,7 @@ type harvesterConfig struct {
 	CloseOlder           time.Duration              `config:"close_older"`
 	CloseRemoved         bool                       `config:"close_removed"`
 	CloseRenamed         bool                       `config:"close_renamed"`
+	CloseEOF             bool                       `config:"close_eof"`
 	ForceCloseFiles      bool                       `config:"force_close_files"`
 	ExcludeLines         []*regexp.Regexp           `config:"exclude_lines"`
 	IncludeLines         []*regexp.Regexp           `config:"include_lines"`
@@ -53,7 +55,7 @@ type harvesterConfig struct {
 
 func (config *harvesterConfig) Validate() error {
 
-	// TODO: remove in 7.0
+	// DEPRECATED: remove in 6.0
 	if config.ForceCloseFiles {
 		config.CloseRemoved = true
 		config.CloseRenamed = true
