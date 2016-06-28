@@ -10,7 +10,7 @@
     - name: state
       type: keyword
       description: >
-        The process state. For example: "running"
+        The process state. For example: "running".
     - name: pid
       type: integer
       description: >
@@ -28,7 +28,7 @@
       type: keyword
       description: >
         The username of the user that created the process. If the username
-        can not be determined then the the field will contain the user's
+        cannot be determined, the field will contain the user's
         numeric identifier (UID). On Windows, this field includes the user's
         domain and is formatted as `domain\username`.
     - name: cpu
@@ -43,8 +43,8 @@
         - name: total.pct
           type: float
           description: >
-            The percentage of CPU time spent by the process since the last update. Its value is similar with the
-            %CPU value of the process displayed by the top command on unix systems.
+            The percentage of CPU time spent by the process since the last update. Its value is similar to the
+            %CPU value of the process displayed by the top command on Unix systems.
         - name: system
           type: long
           description: >

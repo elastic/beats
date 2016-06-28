@@ -6,12 +6,12 @@
     - name: clients
       type: group
       description: >
-        Redis client stats
+        Redis client stats.
       fields:
         - name: connected
           type: integer
           description: >
-            Number of client connections (excluding connections from slaves)
+            Number of client connections (excluding connections from slaves).
 
         - name: longest_output_list
           type: integer
@@ -21,22 +21,22 @@
         - name: biggest_input_buf
           type: integer
           description: >
-            Biggest input buffer among current client connections
+            Biggest input buffer among current client connections.
 
         - name: blocked
           type: integer
           description: >
-            Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH)
+            Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH).
 
     - name: cluster
       type: group
       description: >
-        Redis cluster information
+        Redis cluster information.
       fields:
         - name: enabled
           type: boolean
           description: >
-            Indicate Redis cluster is enabled
+            Indicates that the Redis cluster is enabled.
 
     - name: cpu
       type: group
@@ -46,57 +46,57 @@
         - name: used.sys
           type: float
           description: >
-            System CPU consumed by the Redis server
+            System CPU consumed by the Redis server.
 
         - name: used.sys_children
           type: float
           description: >
-            User CPU consumed by the Redis server
+            User CPU consumed by the Redis server.
 
         - name: used.user
           type: float
           description: >
-            System CPU consumed by the background processes
+            System CPU consumed by the background processes.
 
         - name: used.user_children
           type: float
           description: >
-            User CPU consumed by the background processes
+            User CPU consumed by the background processes.
 
     - name: memory
       type: group
       description: >
-        Redis CPU stats
+        Redis CPU stats.
       fields:
         - name: used.value
           type: integer
           description: >
-            Used memory
+            Used memory.
 
         - name: used.rss
           type: integer
           description: >
-            Used memory rss
+            Used memory rss.
 
         - name: used.peak
           type: integer
           description: >
-            Used memory peak
+            Used memory peak.
 
         - name: used.lua
           type: integer
           description: >
-            Used memory lua
+            Used memory lua.
 
         - name: allocator
           type: keyword
           description: >
-            Memory allocator
+            Memory allocator.
 
     - name: persistence
       type: group
       description: >
-        Redis CPU stats
+        Redis CPU stats.
       fields:
         - name: loading
           type: boolean
@@ -259,7 +259,7 @@
     - name: stats
       type: group
       description: >
-        Redis stats
+        Redis stats.
       fields:
         - name: connections.received
           type: integer

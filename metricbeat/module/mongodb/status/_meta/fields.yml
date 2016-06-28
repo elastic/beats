@@ -6,7 +6,7 @@
     - name: version
       type: keyword
       description: >
-        Instance version
+        Instance version.
     - name: uptime.ms
       type: long
       description: >
@@ -53,7 +53,7 @@
           description: >
             The total number of milliseconds (ms) that the mongod processes have
             spent writing (i.e. flushing) data to disk. Because this is an
-            absolute value, consider the value of flushes and average_ms to
+            absolute value, consider the value of `flushes` and `average_ms` to
             provide better context for this datum.
         - name: average.ms
           type: long
@@ -80,7 +80,7 @@
           description: >
             The number of connections to the database server from clients. This
             number includes the current shell session. Consider the value of
-            available to add more context to this datum.
+            `available` to add more context to this datum.
         - name: available
           type: long
           description: >
@@ -186,7 +186,7 @@
           description: >
             The total number of page faults that require disk operations. Page
             faults refer to operations that require the database server to
-            access data which isn't available in active memory.
+            access data that isn't available in active memory.
 
     - name: network
       type: group
@@ -204,7 +204,7 @@
         - name: requests
           type: long
           description: >
-            The amount of network traffic, in bytes, sent from this database.
+            The total number of requests received by the server.
 
     - name: opcounters
       type: group
@@ -286,7 +286,7 @@
         - name: bits
           type: long
           description: >
-            Either 64 or 32, depending on which target architecture specified
+            Either 64 or 32, depending on which target architecture was specified
             during the mongod compilation process.
         - name: resident.mb
           type: long
@@ -301,7 +301,7 @@
         - name: mapped.mb
           type: long
           description: >
-            The amount of mapped memory, in megabytes (MB), by the database.
+            The amount of mapped memory, in megabytes (MB), used by the database.
             Because MongoDB uses memory-mapped files, this value is likely to be
             to be roughly equivalent to the total size of your database or
             databases.

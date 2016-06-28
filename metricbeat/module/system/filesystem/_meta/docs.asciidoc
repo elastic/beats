@@ -1,3 +1,3 @@
-=== System Filesystem MetricSet
+=== System Filesystem Metricset
 
-The System Filesystem MetricSet provides Filesystem statistics. For each file system one document is provided.
+The System `filesystem` metricset provides file system statistics. For each file system, one document is provided.

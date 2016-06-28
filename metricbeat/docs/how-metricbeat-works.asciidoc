@@ -9,10 +9,10 @@ how often to collect metrics, and which metrics to collect.
 Each module has one or more metricsets. A _metricset_ is the part of the module
 that fetches and structures the data. Rather than collecting each metric as a
 separate event, metricsets retrieve a list of multiple related metrics in a single request
-to the remote system. So, for example, the Redis module provides a `redis-info`
+to the remote system. So, for example, the Redis module provides an `info`
 metricset that collects information and statistics from Redis by running the
 http://redis.io/commands/INFO[`INFO`] command and parsing the returned result.
-Likewise, the MySQL module provides a `mysql-status` metricset that collects data
+Likewise, the MySQL module provides a `status` metricset that collects data
 from MySQL by running a http://dev.mysql.com/doc/refman/5.7/en/show-status.html[`SHOW GLOBAL STATUS`]
 SQL query. 
 
@@ -26,7 +26,7 @@ on the `period` value that you specify when you configure the module. Because mu
 metricsets can send requests to the same service, Metricbeat reuses connections
 whenever possible. If Metricbeat cannot connect to the host system within the time
 specified by the `timeout` config setting, it returns an error. Metricbeat sends
-the events asynchronously, which means the event retrieval is not acknowledge. If
+the events asynchronously, which means the event retrieval is not acknowledged. If
 the configured output is not available, events may be lost. 
 
 When Metricbeat encounters an error (for example, when it cannot connect to the host
@@ -44,9 +44,9 @@ Every event sent by Metricbeat has the same basic structure. It contains the fol
 *`@timestamp`*:: Time when the event was captured
 *`beat.hostname`*:: Hostname of the server on which the Beat is running
 *`beat.name`*:: Name given to the Beat
-*`metricset`*:: Name of the metricset that the data is from
-*`module`*:: Name of the module that the data is from
-*`rtt`*:: Round trip time of the request in microseconds
+*`metricset.module`*:: Name of the module that the data is from
+*`metricset.name`*:: Name of the metricset that the data is from
+*`metricset.rtt`*:: Round trip time of the request in microseconds
 *`type`*:: This is always "metricsets"
 
 For example:
@@ -54,15 +54,20 @@ For example:
 [source,json]
 ----
 {
-  "@timestamp": "2016-03-18T12:18:57.124Z",
-  "apache-status": {},
+  "@timestamp": "2016-06-22T22:05:53.291Z",
   "beat": {
-    "hostname": "myhostname",
-    "name": "beatname"
+    "hostname": "host.example.com",
+    "name": "host.example.com"
   },
-  "metricset": "status",
-  "module": "apache",
-  "rtt": 1082,
+  "metricset": {
+    "module": "system",
+    "name": "process",
+    "rtt": 7419
+  },
+  .
+  .
+  .
+  
   "type": "metricsets"
 }
 ----
@@ -86,15 +91,20 @@ reachable:
   "@timestamp": "2016-03-18T12:18:57.124Z",
   "apache-status": {},
   "beat": {
-    "hostname": "myhostname",
-    "name": "beatname"
+    "hostname": "host.example.com",
+    "name": "host.example.com"
   },
   "error": "Get http://127.0.0.1/server-status?auto: dial tcp 127.0.0.1:80: getsockopt: connection refused",
-  "metricset": "status",
-  "module": "apache",
-  "rtt": 1082,
+  "metricset": {
+    "module": "apache",
+    "name": "status",
+    "rtt": 1082
+  },
+  .
+  .
+  .
+  
   "type": "metricsets"
-}
 ----
 
 [[key-features]]

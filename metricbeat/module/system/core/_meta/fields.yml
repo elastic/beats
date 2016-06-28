@@ -1,7 +1,7 @@
 - name: core
   type: group
   description: >
-    `system-core` contains local cpu core stats.
+    `system-core` contains local CPU core stats.
   fields:
     - name: id
       type: integer
@@ -71,7 +71,7 @@
 
     - name: softirq.pct
       type: float
-      description:
+      description: >
         The percentage of CPU time spent servicing and handling software interrupts.
 
     - name: softirq.ticks

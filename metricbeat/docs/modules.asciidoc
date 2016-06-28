@@ -13,7 +13,7 @@ about each module can be found under the links below.
   * <<metricbeat-module-nginx,Nginx>>
   * <<metricbeat-module-redis,Redis>>
   * <<metricbeat-module-system,System>>
-  * <<metricbeat-module-zookeeper,Zookeeper>>
+  * <<metricbeat-module-zookeeper,ZooKeeper>>
 
 --
 

@@ -10,7 +10,7 @@ Metricbeat should be installed as local as possible so it can fetch metrics dire
 
 ## Contributions
 
-Contributions of new modules and metricsets to Metricbeat are highly welcome. To guarantee the quality of all metricsets we defined the following requirements for each Metricset:
+Contributions of new modules and metricsets to Metricbeat are highly welcome. To guarantee the quality of all metricsets we defined the following requirements for each metricset:
 
 * Unit tests
 * Integration tests

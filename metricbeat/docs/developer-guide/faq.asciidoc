@@ -1,20 +1,20 @@
 == Metricbeat Developer Guide FAQ
 
-This is a list of common questions when creating a MetricSet and the potential answers to it.
+This is a list of common questions when creating a metricset and the potential answers.
 
 [float]
-=== MetricSet is not Complie
+=== Metricset is not compiled
 
-You are compiling your Beat but the newly created MetricSet is not compiled?
+You are compiling your Beat, but the newly created metricset is not compiled?
 
-Make sure that the path to your module and MetricSet are added as an import path either in your `main.go`
-file or your `include/list.go` file. This can be done manually or by running `make imports`.
+Make sure that the path to your module and metricset are added as an import path either in your `main.go`
+file or your `include/list.go` file. You can do this manually or by running `make imports`.
 
 [float]
-=== MetricSet is not started
+=== Metricset is not started
 
-The MetricSet is compiled but not started when starting MetricBeat?
+The metricset is compiled, but not started when starting Metricbeat?
 
-After creating your MetricSet, make sure to run `make collect`. This will add the configuration
-of your MetricSet to the default configuration. In case it still does not start, check your
-default configuration file if it is listed there.
+After creating your metricset, make sure you run `make collect`. This command adds the configuration
+of your metricset to the default configuration. If the metricset still doesn't start, check your
+default configuration file to see if the metricset is listed there.

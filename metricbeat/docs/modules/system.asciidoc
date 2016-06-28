@@ -5,22 +5,20 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-system]]
 == System Module
 
-The system modules allows to monitor your servers. As the system modules always applies to the local
-server the `hosts` config option is not needed.
+The System module allows you to monitor your servers. Because the System module always applies to the local
+server, the `hosts` config option is not needed.
 
 [float]
-== Additional Config options
+=== Module-Specific Configuration Notes
 
-The system module offers two additional config options.
+The System module has these additional config options:
 
-
-[float]
-=== processes
-
-The config option `processes: ['.*']` can be used if the `process` MetricSet is enabled. It allows to define a list
-of regexp expressions to filter the processes which are reported. By default all processes are reported.
-For more complex filtering, the filters configuration option should be used. An example config can look as following:
-
+*`processes`*:: When the `process` metricset is enabled, you can use the `processes` option to define a list of
+regexp expressions to filter the processes that are reported. For more complex filtering, you should use the
+`filters` configuration option.
++
+The following example config returns metrics for all processes: 
++
 [source,yaml]
 ----
 metricbeat.modules:
@@ -28,15 +26,8 @@ metricbeat.modules:
   metricsets: ["process"]
   processes: ['.*']
 ----
-
-
-[float]
-=== cpu_ticks
-
-For config option `cpu_ticks: false` can be used if the `cpu` or `core` MetricSet is enabled. If the config option
-`cpu_ticks` is enabled, not only cpu precentages stats will be reported but also the cpu ticks. An example config can
-be found below:
-
+*`cpu_ticks`*:: When the `cpu` or `core` metricset is enabled, you can specify `cpu_ticks: true` to report CPU ticks in addition to CPU percentages stats. For example:
++
 [source,yaml]
 ----
 metricbeat.modules:
@@ -48,7 +39,7 @@ metricbeat.modules:
 [float]
 === Dashboard
 
-The system module comes with its predefined dashboard. An example is shown below.
+The System module comes with a predefined dashboard. For example:
 
 image::./images/metricbeat_system_dashboard.png[]
 
@@ -56,8 +47,8 @@ image::./images/metricbeat_system_dashboard.png[]
 [float]
 === Example Configuration
 
-The System Status module supports the standard configuration options which can be found
-here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
+The System module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
 ----
@@ -96,9 +87,9 @@ metricbeat.modules:
 ----
 
 [float]
-=== MetricSets
+=== Metricsets
 
-The following MetricSets are available:
+The following metricsets are available:
 
 * <<metricbeat-metricset-system-core,core>>
 
