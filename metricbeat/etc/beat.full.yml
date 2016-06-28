@@ -61,7 +61,7 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
-#--------------------------- MongoDB Status Module ---------------------------
+#------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
   #metricsets: ["status"]
   #enabled: true

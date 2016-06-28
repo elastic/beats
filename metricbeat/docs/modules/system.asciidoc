@@ -5,13 +5,13 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-system]]
 == System Module
 
-The system module allows you to monitor your servers. Because the system module always applies to the local
+The System module allows you to monitor your servers. Because the System module always applies to the local
 server, the `hosts` config option is not needed.
 
 [float]
 === Module-Specific Configuration Notes
 
-The system module has these additional config options:
+The System module has these additional config options:
 
 *`processes`*:: When the `process` metricset is enabled, you can use the `processes` option to define a list of
 regexp expressions to filter the processes that are reported. For more complex filtering, you should use the
@@ -39,7 +39,7 @@ metricbeat.modules:
 [float]
 === Dashboard
 
-The system module comes with a predefined dashboard. For example:
+The System module comes with a predefined dashboard. For example:
 
 image::./images/metricbeat_system_dashboard.png[]
 

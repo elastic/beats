@@ -1,7 +1,7 @@
 [[creating-beat-from-metricbeat]]
 == Creating a Beat Based on Metricbeat
 
-The Metricset Beat generator enables you to create a Beat that uses Metricbeat as a library and has your
+The metricset Beat generator enables you to create a Beat that uses Metricbeat as a library and has your
 own metricsets.
 
 [float]
@@ -41,9 +41,7 @@ When prompted, enter the Beat name and path.
 [float]
 === Step 3 - Init and create the metricset
 
-After creating the Beat, change to the directory for your Beat and run:
-
-//REVIEWERS: The exact directory was unclear in the original. Let me know if this isn't correct.
+After creating the Beat, change the directory to `$GOPATH/src/github.com/{your-github-com}/{beat}` and run:
 
 [source,bash]
 ----

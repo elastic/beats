@@ -72,8 +72,6 @@ For example:
 }
 ----
 
-//REVIEWERS: Please confirm the structure of the above event. It's based on what I see in alpha3.
-
 For more information about the exported fields, see <<exported-fields>>.
 
 [[error-event-structure]]
@@ -108,11 +106,6 @@ reachable:
   
   "type": "metricsets"
 ----
-
-//REVIEWERS: Please confirm the structure of the above event. I modified the example based on the event structure in alpha3, but I don't know if it's 100% correct. 
-
-//REVIEWERS: Should beat.name show the beat name or the hostname? It seems to show the hostname.
-
 
 [[key-features]]
 === Key Metricbeat Features

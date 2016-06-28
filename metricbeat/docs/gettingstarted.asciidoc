@@ -112,7 +112,7 @@ and win, look in the archive that you just extracted.
 Metricbeat uses <<metricbeat-modules,modules>> to collect metrics. You configure
 each module individually. The following example shows the default configuration
 in the `metricbeat.yml` file. The system status module is enabled by default to
-collect metrics about your server, such CPU usage, memory usage, network IO
+collect metrics about your server, such as CPU usage, memory usage, network IO
 metrics, and process statistics:
 
 [source, shell]

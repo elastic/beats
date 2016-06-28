@@ -2,54 +2,50 @@
 == Creating a Metricset
 
 A metricset is the part of a Metricbeat module that fetches and structures the
-data from the remote service. Each module can have multiple metricsets.
-
-In this guide, you learn how to create your own metricset. If you want to create
+data from the remote service. Each module can have multiple metricsets. In this guide, you learn how to create your own metricset. If you want to create
 your own Beat that uses Metricbeat as a library, see <<creating-beat-from-metricbeat>>.
 
 When creating a metricset for the first time, it generally helps to look at the
 implementation of existing metricsets for inspiration.
 
+To create a new metricset:
 
-[float]
-=== Creating Metricset Files
-Creating a new metricset is simple. Run the following command inside your beat directory:
-
+. Run the following command inside your beat directory:
++
 [source,bash]
 ----
 make create-metricset
 ----
-
++
 You'll be prompted to enter a module and metricset name. Only use characters `[a-z]` 
 and, if required, underscores (`_`). No other characters are allowed.
-
++
 When you run `make create-metricset`, it creates all the basic files for your metricset, along with the required module
 files if the module does not already exist. See <<creating-metricbeat-module>> for more details about the module files.
-
++
 NOTE: We use `{metricset}`, `{module}`, and `{beat}` in this guide as placeholders. You need to replace these with
 the actual names of your metricset, module, and beat. 
-
-The metricset that you created is already a functioning metricset and can be compiled. To compile your new metricset, run the following:
-
++
+The metricset that you created is already a functioning metricset and can be compiled. 
++
+. Compile your new metricset by running the following command:
++
 [source,bash]
 ----
 make collect
 make
 ----
-
-The first command, `make collect`, updates all generated files with the most recent metricset. The second command,
++
+The first command, `make collect`, updates all generated files with the most recent files, data, and meta information from the metricset. The second command,
 `make`, compiles your source code and provides you with a binary called `{beat}` in the beat folder. You can run the
 binary in debug mode with the following command:
-
++
 [source,bash]
 ----
 ./{beat} -e -d "*"
 ----
 
-
-[float]
-== Metricset Files
-You'll find the metricset, along with its generated files, under `module/{module}/{metricset}`. This directory
+After running the make commands, you'll find the metricset, along with its generated files, under `module/{module}/{metricset}`. This directory
 contains the following files:
 
 * `\{metricset}.go`
@@ -57,7 +53,7 @@ contains the following files:
 * `_meta/data.json`
 * `_meta/fields.yml`
 
-Let's look at each file in more detail next.
+Let's look at the files in more detail next.
 
 [float]
 === \{metricset}.go File
@@ -147,13 +143,12 @@ called once for each host. The frequency of calling `Fetch` is based on the `per
 defined in the configuration file.
 
 `Fetch` must return a `common.MapStr` object, which is then sent to Elasticsearch.
-If an error happens, the error must be returned and then sent instead
+If an error happens, the error must be returned and then is sent instead
 to Elasticsearch. This means that Metricbeat always sends an event, even on failure.
 You must make sure that the error message helps to identify the actual error.
 
-The following example shows a counter that is incremented by one for each `Fetch` call:
-
-//REVIEWERS: Wondering if there is something missing here. The previous sentence seems like a non sequitur.
+The following example shows a metricset `Fetch` method with a counter that is
+incremented for each `Fetch` call:
 
 [source,go]
 ----
@@ -188,12 +183,11 @@ For this kind of data, you can use the following `Fetch` interface:
 ----
 
 The only difference between this and the previous example is that the second example returns `[]common.MapStr`.
-Metricbeat will send all events with the same timestamp and a unique identifier
-to make it possible to correlate the events.
+Metricbeat will add the same timestamp to all the events in the list to make it possible to correlate the events.
 
 
 [float]
-==== Configuration File
+=== Configuration File
 The configuration file for a metricset is handled by the module. If there are 
 multiple metricsets in one module, make sure you add all metricsets to the configuration.
 For example:
@@ -213,7 +207,7 @@ For more details about the configuration file, see <<configuration-metricbeat>>.
 
 
 [float]
-== Next Steps
+=== What to Do Next
 This topic provides basic steps for creating a metricset. For more details about metricsets
 and how to extend your metricset further, see <<metricset-details>>.
 

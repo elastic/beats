@@ -22,12 +22,10 @@ A Metricbeat configuration contains a list of modules. Each module contains the 
 * `metricsets`: A list of metricsets to execute. For a list of available metricsets, see the documentation for the module.
 * `enabled`: Specifies whether the module is enabled. 
 * `period`: How often the metricsets are executed. 
-* `hosts`: A list of hosts to fetch information from. For some modules, such as the system module, this setting is not required.
+* `hosts`: A list of hosts to fetch information from. For some modules, such as the System module, this setting is not required.
 * `fields`: A dictionary of fields that will be sent with the metricset event. This setting is optional. 
+* `tags`: A list of tags that will be sent with the metricset event. This setting is optional.
 * `filters`: With filters you can reduce the amount of data that is sent in the event. For more about the available filter options, see <<filtering-data>>. This setting is optional. 
-* `tags`: A list of tags that will be sent with the metricset event. This setting is optional. 
-
-//REVIEWERS: I've shortened these descriptions a bit because I feel users should look at the full reference if they want more detail. This should just be a quick summary, or we are duplicating info.
 
 The following example shows a basic configuration for the Apache module:
 
@@ -40,7 +38,6 @@ metricbeat:
       hosts: ["http://127.0.0.1/"]
       period: 10s
       enabled: true
-      selectors: []
       fields:
         dc: west
       tags: ["tag"]
@@ -51,7 +48,7 @@ metricbeat:
 [float]
 == Configuration Combinations
 
-You can specify a configuration that uses different combinations of modules, metricsets, periods, hosts, and selectors. In the following example, the Redis host is crawled for `stats` information every second because this is critical data, but the full list of Apache metricsets is only fetched every 30 seconds because the metrics are less critical.
+You can specify a configuration that uses different combinations of modules, metricsets, periods, and hosts. In the following example, the Redis host is crawled for `stats` information every second because this is critical data, but the full list of Apache metricsets is only fetched every 30 seconds because the metrics are less critical.
 
 [source,yaml]
 ----
@@ -62,13 +59,11 @@ metricbeat:
       hosts: ["host1"]
       period: 1s
       enabled: true
-      selectors: ["stats"]
     - module: apache
       metricsets: ["info"]
       hosts: ["host1"]
       period: 30s
       enabled: true
-      selectors: []
 ----
 
 For a module with multiple metricsets defined, it's possible to define the module twice and specify 

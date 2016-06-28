@@ -65,12 +65,12 @@ One very important point is that connections must respect the timeout variable:
 `base.Module().Config().Timeout`. If the timeout elapses before the request completes,
 the request must be ended and an error must be returned to make sure the next request
 can be started on time. By default the Timeout is set to Period, so one request gets
-ended when a new request is made.
+ended before a new request is made.
 
-If a request must be ended or has an error, make sure that you return a good error
-message. This error message is also sent to Elasticsearch, making it possible to
-not only fetch metrics from the service, but also report potential problems or errors
-with the metricset.
+If a request must be ended or has an error, make sure that you return a useful error
+message. This error message is also sent to Elasticsearch, making it possible to not
+only fetch metrics from the service, but also report potential problems or errors with
+the metricset.
 
 
 [float]
@@ -201,14 +201,11 @@ waitFor ${REDIS_HOST} ${REDIS_PORT} Redis
 The environment expects your service to be available as soon as it receives a response from
 the given address and port.
 
-//REVIEWERS: Not sure about the above edit, but the original sentence was too vague.
-
-
 [float]
 ==== Running the Tests
 
 To run all the tests, run `make testsuite`. To only run unit tests, run 
-`makeunit-tests` or for integration tests `make integration-tests`. Be aware that
+`make unit-tests` or for integration tests `make integration-tests-environment`. Be aware that
 a running Docker environment is needed for integration and system tests.
 
 [float]

@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-zookeeper]]
 == ZooKeeper Module
 
-//REVEWIERS: We need to add a description here. What would you suggest? 
+The ZooKeeper module fetches statistics from the ZooKeeper service.
 
 [float]
 === Compatibility
