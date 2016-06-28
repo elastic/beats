@@ -66,8 +66,8 @@ sudo rpm -vi metricbeat-{version}-x86_64.rpm
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-darwin-x64.tar.gz
-tar xzvf metricbeat-{version}-darwin-x64.tar.gz
+curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-darwin-x86_64.tar.gz
+tar xzvf metricbeat-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 
 [[win]]

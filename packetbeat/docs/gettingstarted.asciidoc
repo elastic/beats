@@ -53,8 +53,8 @@ sudo rpm -vi packetbeat-{version}-x86_64.rpm
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-darwin-x64.tar.gz
-tar xzvf packetbeat-{version}-darwin-x64.tar.gz
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-darwin-x86_64.tar.gz
+tar xzvf packetbeat-{version}-darwin-x86_64.tar.gz
 ----------------------------------------------------------------------
 
 [[win]]
