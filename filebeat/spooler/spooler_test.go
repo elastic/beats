@@ -17,13 +17,13 @@ func load(t *testing.T, in string) cfg.FilebeatConfig {
 		t.Fatalf("Failed to parse config input: %v", err)
 	}
 
-	var config cfg.FilebeatConfig
+	config := cfg.DefaultConfig
 	err = yaml.Unpack(&config)
 	if err != nil {
 		t.Fatalf("Failed to unpack config: %v", err)
 	}
 
-	return config
+	return config.Filebeat
 }
 
 func TestNewSpoolerDefaultConfig(t *testing.T) {
@@ -33,8 +33,8 @@ func TestNewSpoolerDefaultConfig(t *testing.T) {
 	spooler, err := New(config, nil)
 
 	assert.NoError(t, err)
-	assert.Equal(t, cfg.DefaultSpoolSize, spooler.spoolSize)
-	assert.Equal(t, cfg.DefaultIdleTimeout, spooler.idleTimeout)
+	assert.Equal(t, cfg.DefaultConfig.Filebeat.SpoolSize, spooler.spoolSize)
+	assert.Equal(t, cfg.DefaultConfig.Filebeat.IdleTimeout, spooler.idleTimeout)
 }
 
 func TestNewSpoolerSpoolSize(t *testing.T) {
@@ -47,7 +47,7 @@ func TestNewSpoolerSpoolSize(t *testing.T) {
 }
 
 func TestNewSpoolerIdleTimeout(t *testing.T) {
-	config := load(t, "idle_timeout: 10s")
+	config := load(t, "filebeat.idle_timeout: 10s")
 	spooler, err := New(config, nil)
 
 	assert.NoError(t, err)

@@ -14,7 +14,7 @@ type File struct {
 }
 
 // Check that the file isn't a symlink, mode is regular or file is nil
-func (f *File) IsRegularFile() bool {
+func (f *File) IsRegular() bool {
 	if f.File == nil {
 		logp.Critical("Harvester: BUG: f arg is nil")
 		return false
@@ -50,7 +50,7 @@ func IsSameFile(path string, info os.FileInfo) bool {
 	return os.SameFile(fileInfo, info)
 }
 
-func IsRegularFile(file *os.File) bool {
+func IsRegular(file *os.File) bool {
 	f := &File{File: file}
-	return f.IsRegularFile()
+	return f.IsRegular()
 }
