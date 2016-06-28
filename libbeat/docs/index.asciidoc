@@ -3,10 +3,10 @@
 
 include::./version.asciidoc[]
 
-:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/master
-:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/master
-:filebeat: http://www.elastic.co/guide/en/beats/filebeat/master
-:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/master
+:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
+:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
+:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
 :security: X-Pack Security
 :ES-version: {stack-version}
 :LS-version: {stack-version}
