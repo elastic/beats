@@ -272,7 +272,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*.log",
-            force_close_files="true",
+            close_removed="true",
             scan_frequency="0.1s"
         )
         os.mkdir(self.working_dir + "/log/")
@@ -301,7 +301,7 @@ class Test(BaseTest):
         # Wait until error shows up on windows
         self.wait_until(
             lambda: self.log_contains(
-                "Force close file"),
+                "Closing because close_removed is enabled"),
             max_timeout=15)
 
         # Move file to old file name
@@ -331,64 +331,6 @@ class Test(BaseTest):
         # from scratch
         output = self.read_output()
         assert len(output) == 5 + 6
-
-    def test_force_close(self):
-        """
-        Checks that a file is closed in case it is rotated
-        """
-
-        self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/test.log",
-            force_close_files="true",
-            scan_frequency="0.1s"
-        )
-        os.mkdir(self.working_dir + "/log/")
-
-        testfile1 = self.working_dir + "/log/test.log"
-        testfile2 = self.working_dir + "/log/test.log.rotated"
-        file = open(testfile1, 'w')
-
-        iterations1 = 5
-        for n in range(0, iterations1):
-            file.write("rotation file")
-            file.write("\n")
-
-        file.close()
-
-        filebeat = self.start_beat()
-
-        # Let it read the file
-        self.wait_until(
-            lambda: self.output_has(lines=iterations1), max_timeout=10)
-
-        os.rename(testfile1, testfile2)
-
-        file = open(testfile1, 'w', 0)
-        file.write("Hello World\n")
-        file.close()
-
-        # Wait until error shows up on windows
-        self.wait_until(
-            lambda: self.log_contains(
-                "Force close file"),
-            max_timeout=15)
-
-        # Let it read the file
-        self.wait_until(
-            lambda: self.output_has(lines=iterations1 + 1), max_timeout=10)
-
-        filebeat.check_kill_and_wait()
-
-        data = self.get_registry()
-
-        # Make sure new file was picked up. As it has the same file name,
-        # one entry for the new and one for the old should exist
-        assert len(data) == 2
-
-        # Make sure output has 11 entries, the new file was started
-        # from scratch
-        output = self.read_output()
-        #assert len(output) == 5 + 6
 
     def test_new_line_on_existing_file(self):
         """
