@@ -166,14 +166,14 @@ filebeat.prospectors:
   # The backoff value will be multiplied each time with the backoff_factor until max_backoff is reached
   #backoff_factor: 2
 
-  # Close renamed means a file handler is close when a file is renamed / rotated. In case the harvester was
-  # not finished reading the roated file, the file will be picked up again after scan_frequency in case it
-  # also matches the prospector patterns.
+  # Close renamed ensures a file handler is closed when the file is renamed or rotated.
+  # Note: Potential data loss if renamed file is not picked up by prospector.
   #close_renamed: false
 
   # When enabling this option, a file handler is closed immidiately in case a file can't be found
-  # any more. In case the file shows up again later, harvesting will continue at the last position
-  # after scan_frequency
+  # any more. In case the file shows up again later, harvesting will continue at the last known position
+  # after scan_frequency.
+  # Note: Potential data loss if file reading was not finished when file was removed.
   #close_removed: false
 
 #----------------------------- Stdin prospector -------------------------------

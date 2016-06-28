@@ -117,6 +117,7 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 		}
 
 		if r.config.CloseRenamed {
+			// Check if the file can still be found under the same path
 			if !file.IsSameFile(r.fs.Name(), info) {
 				return n, ErrRenamed
 			}
