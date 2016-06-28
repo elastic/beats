@@ -56,7 +56,21 @@ func (p *ProspectorLog) Run() {
 		p.Prospector.states.Cleanup()
 		logp.Debug("prospector", "Prospector states cleaned up.")
 	}
-	p.lastScan = time.Now()
+
+	// Cleanup of removed files will only happen after next scan. Otherwise it can happen that not all states
+	// were updated before cleanup is called
+	if p.config.CleanRemoved {
+		for _, state := range p.Prospector.states.GetStates() {
+			// os.Stat will return an error in case the file does not exist
+			_, err := os.Stat(state.Source)
+			if err != nil {
+				state.TTL = 0
+				h, _ := p.Prospector.createHarvester(state)
+				h.SendStateUpdate()
+				logp.Debug("prospector", "Cleanup state for file as file removed: %s", state.Source)
+			}
+		}
+	}
 }
 
 // getFiles returns all files which have to be harvested
@@ -131,6 +145,7 @@ func (p *ProspectorLog) scan() {
 		}
 	}
 
+	// Only update lastScan timestamp after scan is completed
 	p.lastScan = newLastScan
 }
 

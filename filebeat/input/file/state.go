@@ -93,7 +93,7 @@ func (s *States) Cleanup() {
 
 	for _, state := range s.states {
 		ttl := state.TTL
-		if ttl >= 0 && currentTime.Sub(state.Timestamp) > ttl {
+		if ttl == 0 || (ttl > 0 && currentTime.Sub(state.Timestamp) > ttl) {
 			logp.Debug("state", "State removed for %v because of older: %v", state.Source, ttl)
 			continue // drop state
 		}
