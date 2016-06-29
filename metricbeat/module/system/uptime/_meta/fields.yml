@@ -1,0 +1,9 @@
+- name: uptime
+  type: group
+  description: >
+    `uptime` contains the operating system uptime metric.
+  fields:
+    - name: uptime_ms
+      type: long
+      description: >
+        The OS uptime in milliseconds.

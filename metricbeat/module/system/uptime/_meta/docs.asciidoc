@@ -1,0 +1,9 @@
+=== System Uptime Metricset
+
+The System `uptime` metricset provides the uptime of the host operating system.
+
+This metricset is available on:
+
+- Darwin
+- Linux
+- OpenBSD

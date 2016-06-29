@@ -1,0 +1,18 @@
+{
+    "@timestamp": "2016-06-29T19:25:08.155Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "module": "system",
+        "name": "uptime",
+        "rtt": 33
+    },
+    "system": {
+        "uptime": {
+            "uptime_ms": 789306155
+        }
+    },
+    "type": "metricsets"
+}
