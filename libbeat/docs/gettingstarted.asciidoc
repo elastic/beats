@@ -109,17 +109,17 @@ On Windows, if you don't have cURL installed, simply point your browser to the U
 
 You should see a response similar to this:
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 {
   "name" : "Angela Del Toro",
   "cluster_name" : "elasticsearch",
   "version" : {
-    "number" : "2.2.0",
+    "number" : "{ES-version}",
     "build_hash" : "8ff36d139e16f8720f2947ef62c8167a888992fe",
     "build_timestamp" : "2016-01-27T13:32:39Z",
     "build_snapshot" : false,
-    "lucene_version" : "5.4.1"
+    "lucene_version" : "6.1.0"
   },
   "tagline" : "You Know, for Search"
 }
