@@ -181,6 +181,10 @@ filebeat.prospectors:
   # after scan_frequency in case the file can still be discovered by the prospector.
   #close_eof: false
 
+  # Files for the modification data is older then clean_older the state from the registry is removed
+  # By default this is disabled.
+  #clean_older: 0
+
 #----------------------------- Stdin prospector -------------------------------
 # Configuration to use stdin input
 #- input_type: stdin

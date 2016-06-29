@@ -12,8 +12,9 @@ import (
 
 type ProspectorLog struct {
 	Prospector *Prospector
-	lastscan   time.Time
 	config     prospectorConfig
+	lastScan   time.Time
+	lastClean  time.Time
 }
 
 func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
@@ -40,6 +41,7 @@ func (p *ProspectorLog) Init() {
 
 	// Overwrite prospector states
 	p.Prospector.states.SetStates(fileStates)
+	p.lastClean = time.Now()
 
 	logp.Info("Previous states loaded: %v", p.Prospector.states.Count())
 }
@@ -48,10 +50,13 @@ func (p *ProspectorLog) Run() {
 	logp.Debug("prospector", "Start next scan")
 
 	p.scan()
-	// Only cleanup states if enabled
-	if p.config.IgnoreOlder != 0 {
-		p.Prospector.states.Cleanup(p.config.IgnoreOlder)
+
+	// It is important that a first scan is run before cleanup to make sure all new states are read first
+	if p.config.CleanOlder > 0 {
+		p.Prospector.states.Cleanup()
+		logp.Debug("prospector", "Prospector states cleaned up.")
 	}
+	p.lastScan = time.Now()
 }
 
 // getFiles returns all files which have to be harvested
@@ -104,7 +109,7 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 // Scan starts a scanGlob for each provided path/glob
 func (p *ProspectorLog) scan() {
 
-	newlastscan := time.Now()
+	newLastScan := time.Now()
 
 	// TODO: Track harvesters to prevent any file from being harvested twice. Finished state could be delayed?
 	// Now let's do one quick scan to pick up new files
@@ -126,7 +131,7 @@ func (p *ProspectorLog) scan() {
 		}
 	}
 
-	p.lastscan = newlastscan
+	p.lastScan = newLastScan
 }
 
 // harvestNewFile harvest a new file
@@ -145,10 +150,12 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 
 	logp.Debug("prospector", "Update existing file for harvesting: %s, offset: %v", newState.Source, oldState.Offset)
 
+	// TODO: check for ignore_older reached? or should that happen in scan already?
+
 	// No harvester is running for the file, start a new harvester
 	// It is important here that only the size is checked and not modification time, as modification time could be incorrect on windows
 	// https://blogs.technet.microsoft.com/asiasupp/2010/12/14/file-date-modified-property-are-not-updating-while-modifying-a-file-without-closing-it/
-	if oldState.Finished && newState.Fileinfo.Size() > newState.Offset {
+	if oldState.Finished && newState.Fileinfo.Size() > oldState.Offset {
 		// Resume harvesting of an old file we've stopped harvesting from
 		// This could also be an issue with force_close_older that a new harvester is started after each scan but not needed?
 		// One problem with comparing modTime is that it is in seconds, and scans can happen more then once a second
@@ -166,6 +173,7 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 		// Update state because of file rotation
 		h.SendStateUpdate()
 	} else {
+		// TODO: improve logging depedent on what the exact reason is that harvesting does not continue
 		// Nothing to do. Harvester is still running and file was not renamed
 		logp.Debug("prospector", "No updates needed, file %s is already harvested.", newState.Source)
 	}
