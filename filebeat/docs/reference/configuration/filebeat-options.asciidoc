@@ -233,6 +233,17 @@ WARNING: Only use this options if you understand that data loss is a potential s
 
 Close eof closes a file as soon as the end of a file is reached. This is useful in case your files are only written once and not updated from time to time. This case can happen in case you are writing every single log event to a new file.
 
+===== close_timeout
+
+WARNING: Only use this options if you understand the potential side affects with potential data loss. In addition it can happen that multiline events are not sent completely on timeout.
+
+Close timeout gives every harvester a predefined lifetime. Independent of the location of the reader, it will stop the reader after `close_timeout`. This option can be useful, if only a predefine time should be spent on older log files. Using this option in combination with `ignore_older` == `close_timeout` means the file is not picked up again in case it wasn't modified in between. This normally leads to data loss and not the complete file is sent.
+
+In case close_timeout is used in combination with multiline events, it can happen that the harvester will be stopped in the middle of a multiline event, means only parts of the event will be sent. In case the harvester is continued at a later stage again and the file still exists, only the second part of the event will be sent.
+
+Close timeout will not apply, in case your output is stuck and no further events can be sent. At least one event must be sent after close_timeout kicks in so the harvester can be closed afterwards.
+
+
 [[clean-options]]
 ===== clean_*
 

@@ -27,6 +27,7 @@ var (
 		CloseRemoved:    false,
 		CloseRenamed:    false,
 		CloseEOF:        false,
+		CloseTimeout:    0,
 		ForceCloseFiles: false,
 	}
 )
@@ -46,6 +47,7 @@ type harvesterConfig struct {
 	CloseRemoved         bool                    `config:"close_removed"`
 	CloseRenamed         bool                    `config:"close_renamed"`
 	CloseEOF             bool                    `config:"close_eof"`
+	CloseTimeout         time.Duration           `config:"close_timeout" validate:"min=0"`
 	ForceCloseFiles      bool                    `config:"force_close_files"`
 	ExcludeLines         []*regexp.Regexp        `config:"exclude_lines"`
 	IncludeLines         []*regexp.Regexp        `config:"include_lines"`
