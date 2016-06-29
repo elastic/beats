@@ -8,16 +8,12 @@ import (
 	cfg "github.com/elastic/beats/filebeat/config"
 )
 
-const (
-	DefaultIgnoreOlder   time.Duration = 0
-	DefaultScanFrequency time.Duration = 10 * time.Second
-)
-
 var (
 	defaultConfig = prospectorConfig{
-		IgnoreOlder:   DefaultIgnoreOlder,
-		ScanFrequency: DefaultScanFrequency,
+		IgnoreOlder:   0,
+		ScanFrequency: 10 * time.Second,
 		InputType:     cfg.DefaultInputType,
+		CleanOlder:    0,
 	}
 )
 
@@ -27,6 +23,7 @@ type prospectorConfig struct {
 	Paths         []string         `config:"paths"`
 	ScanFrequency time.Duration    `config:"scan_frequency"`
 	InputType     string           `config:"input_type"`
+	CleanOlder    time.Duration    `config:"clean_older" validate:"min=0"`
 }
 
 func (config *prospectorConfig) Validate() error {

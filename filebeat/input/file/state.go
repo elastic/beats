@@ -15,7 +15,8 @@ type State struct {
 	Finished    bool        `json:"-"` // harvester state
 	Fileinfo    os.FileInfo `json:"-"` // the file info
 	FileStateOS StateOS
-	LastSeen    time.Time `json:"last_seen"`
+	Timestamp   time.Time     `json:"timestamp"`
+	TTL         time.Duration `json:"ttl"`
 }
 
 // NewState creates a new file state
@@ -25,7 +26,8 @@ func NewState(fileInfo os.FileInfo, path string) State {
 		Source:      path,
 		Finished:    false,
 		FileStateOS: GetOSState(fileInfo),
-		LastSeen:    time.Now(),
+		Timestamp:   time.Now(),
+		TTL:         -1 * time.Second, // By default, state does have an infinit ttl
 	}
 }
 
@@ -47,7 +49,7 @@ func (s *States) Update(newState State) {
 	defer s.mutex.Unlock()
 
 	index, _ := s.findPrevious(newState)
-	newState.LastSeen = time.Now()
+	newState.Timestamp = time.Now()
 
 	if index >= 0 {
 		s.states[index] = newState
@@ -81,25 +83,30 @@ func (s *States) findPrevious(newState State) (int, State) {
 }
 
 // Cleanup cleans up the state array. All states which are older then `older` are removed
-func (s *States) Cleanup(older time.Duration) {
+func (s *States) Cleanup() {
+
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	for i, state := range s.states {
+	currentTime := time.Now()
+	states := s.states[:0]
 
-		// File wasn't seen for longer then older -> remove state
-		if time.Since(state.LastSeen) > older {
-			logp.Debug("prospector", "State removed for %s because of older: %s", state.Source)
-			s.states = append(s.states[:i], s.states[i+1:]...)
+	for _, state := range s.states {
+		ttl := state.TTL
+		if ttl >= 0 && currentTime.Sub(state.Timestamp) > ttl {
+			logp.Debug("state", "State removed for %v because of older: %v", state.Source, ttl)
+			continue // drop state
 		}
+		states = append(states, state) // in-place copy old state
 	}
-
+	s.states = states
 }
 
 // Count returns number of states
 func (s *States) Count() int {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
+
 	return len(s.states)
 }
 
