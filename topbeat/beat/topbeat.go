@@ -470,7 +470,7 @@ func (t *Topbeat) addProcCpuPercentage(proc *Process) {
 	oproc, ok := t.procsMap[proc.Pid]
 	if ok {
 
-		delta_proc := (proc.Cpu.User - oproc.Cpu.User) + (proc.Cpu.System - oproc.Cpu.System)
+		delta_proc := int64(proc.Cpu.User-oproc.Cpu.User) + int64(proc.Cpu.System-oproc.Cpu.System)
 		delta_time := proc.ctime.Sub(oproc.ctime).Nanoseconds() / 1e6 // in milliseconds
 		perc := float64(delta_proc) / float64(delta_time)
 
