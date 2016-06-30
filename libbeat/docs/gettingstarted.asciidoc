@@ -151,8 +151,8 @@ with your system:
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-8-jre
-curl -L -O https://download.elastic.co/logstash/logstash/packages/debian/logstash-{LS-version}_all.deb
-sudo dpkg -i logstash-{LS-version}_all.deb
+curl -L -O https://download.elastic.co/logstash/logstash/packages/debian/logstash-{LS-version}.deb
+sudo dpkg -i logstash-{LS-version}.deb
 ----------------------------------------------------------------------
 
 *rpm:*
@@ -160,8 +160,8 @@ sudo dpkg -i logstash-{LS-version}_all.deb
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo yum install java-1.8.0-openjdk
-curl -L -O https://download.elastic.co/logstash/logstash/packages/centos/logstash-{LS-version}.noarch.rpm
-sudo rpm -i logstash-{LS-version}.noarch.rpm
+curl -L -O https://download.elastic.co/logstash/logstash/packages/centos/logstash-{LS-version}.rpm
+sudo rpm -i logstash-{LS-version}.rpm
 ----------------------------------------------------------------------
 
 *mac:*
