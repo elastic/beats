@@ -10,20 +10,20 @@ if [ "$SNAPSHOT" = "yes" ]; then
     VERSION="${VERSION}-SNAPSHOT"
 fi
 
-mkdir /{{.beat_name}}-${VERSION}-windows
-cp -a homedirs/{{.beat_name}}/. /{{.beat_name}}-${VERSION}-windows/
-cp {{.beat_name}}-windows-{{.arch}}.exe /{{.beat_name}}-${VERSION}-windows/{{.beat_name}}.exe
+mkdir /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}
+cp -a homedirs/{{.beat_name}}/. /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
+cp {{.beat_name}}-windows-{{.arch}}.exe /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/{{.beat_name}}.exe
 unix2dos {{.beat_name}}-win.yml
-cp {{.beat_name}}-win.yml /{{.beat_name}}-${VERSION}-windows/{{.beat_name}}.yml
-cp {{.beat_name}}-win.full.yml /{{.beat_name}}-${VERSION}-windows/{{.beat_name}}.full.yml
-cp {{.beat_name}}.template.json /{{.beat_name}}-${VERSION}-windows/
-cp {{.beat_name}}.template-es2x.json /{{.beat_name}}-${VERSION}-windows/
-cp install-service-{{.beat_name}}.ps1 /{{.beat_name}}-${VERSION}-windows/
-cp uninstall-service-{{.beat_name}}.ps1 /{{.beat_name}}-${VERSION}-windows/
+cp {{.beat_name}}-win.yml /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/{{.beat_name}}.yml
+cp {{.beat_name}}-win.full.yml /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/{{.beat_name}}.full.yml
+cp {{.beat_name}}.template.json /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
+cp {{.beat_name}}.template-es2x.json /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
+cp install-service-{{.beat_name}}.ps1 /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
+cp uninstall-service-{{.beat_name}}.ps1 /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
 
 mkdir -p upload/{{.beat_name}}
-zip -r upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip /{{.beat_name}}-${VERSION}-windows
-echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-windows.zip"
+zip -r upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}
+echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip"
 
 cd upload/{{.beat_name}}
 sha1sum {{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip > {{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip.sha1.txt
