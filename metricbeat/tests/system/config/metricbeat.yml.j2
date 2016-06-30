@@ -104,8 +104,8 @@ geoip:
 
 {%- if drop_fields or drop_event or include_fields %}
 
-#================================ Filters =====================================
-filters:
+#================================ Processors =====================================
+processors:
 
   {%- if include_fields %}
   - include_fields:

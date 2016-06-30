@@ -43,10 +43,10 @@ import (
 
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/filter"
-	_ "github.com/elastic/beats/libbeat/filter/rules"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/libbeat/processors"
+	_ "github.com/elastic/beats/libbeat/processors/actions"
 	"github.com/elastic/beats/libbeat/publisher"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/satori/go.uuid"
@@ -107,16 +107,16 @@ type Beat struct {
 	Config    BeatConfig           // Common Beat configuration data.
 	Publisher *publisher.Publisher // Publisher
 
-	filters *filter.Filters // Filters
+	processors *processors.Processors // Processors
 }
 
 // BeatConfig struct contains the basic configuration of every beat
 type BeatConfig struct {
-	Shipper publisher.ShipperConfig   `config:",inline"`
-	Output  map[string]*common.Config `config:"output"`
-	Logging logp.Logging              `config:"logging"`
-	Filters filter.FilterPluginConfig `config:"filters"`
-	Path    paths.Path                `config:"path"`
+	Shipper    publisher.ShipperConfig   `config:",inline"`
+	Output     map[string]*common.Config `config:"output"`
+	Logging    logp.Logging              `config:"logging"`
+	Processors processors.PluginConfig   `config:"processors"`
+	Path       paths.Path                `config:"path"`
 }
 
 // Run initializes and runs a Beater implementation. name is the name of the
@@ -223,9 +223,9 @@ func (bc *instance) config() error {
 	// log paths values to help with troubleshooting
 	logp.Info(paths.Paths.String())
 
-	bc.data.filters, err = filter.New(bc.data.Config.Filters)
+	bc.data.processors, err = processors.New(bc.data.Config.Processors)
 	if err != nil {
-		return fmt.Errorf("error initializing filters: %v", err)
+		return fmt.Errorf("error initializing processors: %v", err)
 	}
 
 	if bc.data.Config.Shipper.MaxProcs != nil {
@@ -251,7 +251,7 @@ func (bc *instance) setup() error {
 		return fmt.Errorf("error initializing publisher: %v", err)
 	}
 
-	bc.data.Publisher.RegisterFilter(bc.data.filters)
+	bc.data.Publisher.RegisterProcessors(bc.data.processors)
 	err = bc.beater.Setup(bc.data)
 	if err != nil {
 		return err

@@ -9,9 +9,9 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
-	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/processors"
 	"github.com/nranchev/go-libGeoIP"
 
 	// load supported output plugins
@@ -57,7 +57,7 @@ type Publisher struct {
 	TopologyOutput outputs.TopologyOutputer
 	IgnoreOutgoing bool
 	GeoLite        *libgeo.GeoIP
-	Filters        *filter.Filters
+	Processors     *processors.Processors
 
 	globalEventMetadata common.EventMetadata // Fields and tags to add to each event.
 
@@ -172,9 +172,9 @@ func (publisher *Publisher) PublishTopology(params ...string) error {
 	return nil
 }
 
-func (publisher *Publisher) RegisterFilter(filters *filter.Filters) error {
+func (publisher *Publisher) RegisterProcessors(list *processors.Processors) error {
 
-	publisher.Filters = filters
+	publisher.Processors = list
 	return nil
 }
 
