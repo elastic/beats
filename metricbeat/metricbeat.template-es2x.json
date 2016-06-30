@@ -1434,6 +1434,13 @@
                   "type": "string"
                 }
               }
+            },
+            "uptime": {
+              "properties": {
+                "uptime_ms": {
+                  "type": "long"
+                }
+              }
             }
           }
         },
