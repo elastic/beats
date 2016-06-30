@@ -1,2 +1,2 @@
-:stack-version: 5.0.0-alpha3
+:stack-version: 5.0.0-alpha4
 :doc-branch: master
