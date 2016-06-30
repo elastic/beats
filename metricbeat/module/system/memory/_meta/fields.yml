@@ -19,7 +19,7 @@
         Available memory.
 
     - name: used.pct
-      type: float
+      type: half_float
       description: >
         The percentage of used memory.
 
@@ -41,7 +41,7 @@
             buffers. Available only on Unix.
 
         - name: used.pct
-          type: float
+          type: half_float
           description: >
             The percentage of actual used memory.
 
@@ -66,6 +66,6 @@
             Available swap memory.
 
         - name: used.pct
-          type: float
+          type: half_float
           description: >
             The percentage of used swap memory.

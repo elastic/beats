@@ -9,7 +9,7 @@
         CPU Core number.
 
     - name: user.pct
-      type: float
+      type: half_float
       description: >
         The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
         For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
@@ -20,7 +20,7 @@
        The amount of CPU time spent in user space.
 
     - name: system.pct
-      type: float
+      type: half_float
       description: >
         The percentage of CPU time spent in kernel space.
 
@@ -30,7 +30,7 @@
         The amount of CPU time spent in kernel space.
 
     - name: nice.pct
-      type: float
+      type: half_float
       description: >
         The percentage of CPU time spent on low-priority processes.
 
@@ -40,7 +40,7 @@
         The amount of CPU time spent on low-priority processes.
 
     - name: idle.pct
-      type: float
+      type: half_float
       description: >
         The percentage of CPU time spent idle.
 
@@ -50,7 +50,7 @@
         The amount of CPU time spent idle.
 
     - name: iowait.pct
-      type: float
+      type: half_float
       description: >
         The percentage of CPU time spent in wait (on disk).
 
@@ -60,7 +60,7 @@
         The amount of CPU time spent in wait (on disk).
 
     - name: irq.pct
-      type: float
+      type: half_float
       description: >
         The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -70,7 +70,7 @@
         The amount of CPU time spent servicing and handling hardware interrupts.
 
     - name: softirq.pct
-      type: float
+      type: half_float
       description: >
         The percentage of CPU time spent servicing and handling software interrupts.
 
@@ -80,7 +80,7 @@
         The amount of CPU time spent servicing and handling software interrupts.
 
     - name: steal.pct
-      type: float
+      type: half_float
       description: >
         The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
         was servicing another processor.
