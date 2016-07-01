@@ -46,7 +46,7 @@ To drop all the log messages coming from a certain log file:
 [source,yaml]
 ----------------
 filters:
- - drop_avent:
+ - drop_event:
     contains:
      source: "test"
 ----------------
