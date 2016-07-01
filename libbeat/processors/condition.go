@@ -1,4 +1,4 @@
-package filter
+package processors
 
 import (
 	"fmt"
@@ -68,7 +68,7 @@ func NewCondition(config ConditionConfig) (*Condition, error) {
 	return &c, nil
 }
 
-func (c *Condition) setEquals(cfg *ConditionFilter) error {
+func (c *Condition) setEquals(cfg *ConditionFields) error {
 
 	c.equals = map[string]EqualsValue{}
 
@@ -88,7 +88,7 @@ func (c *Condition) setEquals(cfg *ConditionFilter) error {
 	return nil
 }
 
-func (c *Condition) setContains(cfg *ConditionFilter) error {
+func (c *Condition) setContains(cfg *ConditionFields) error {
 
 	c.contains = map[string]string{}
 
@@ -104,7 +104,7 @@ func (c *Condition) setContains(cfg *ConditionFilter) error {
 	return nil
 }
 
-func (c *Condition) setRegexp(cfg *ConditionFilter) error {
+func (c *Condition) setRegexp(cfg *ConditionFields) error {
 
 	var err error
 
@@ -124,7 +124,7 @@ func (c *Condition) setRegexp(cfg *ConditionFilter) error {
 	return nil
 }
 
-func (c *Condition) setRange(cfg *ConditionFilter) error {
+func (c *Condition) setRange(cfg *ConditionFields) error {
 
 	c.rangexp = map[string]RangeValue{}
 

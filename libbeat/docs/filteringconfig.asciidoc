@@ -11,26 +11,28 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-filter]]
-=== Filters Configuration
+=== Processors
 
-You can set a list of filter actions in the `filters` section of the +{beatname_lc}.yml+ config file to reduce the number
+You can define a set of `processors` in the +{beatname_lc}.yml+ config file to reduce the number
 of fields that are exported by the Beat. 
 
-If more filtering rules are defined, then they are executed in the order they are defined. The initial event is passed to the first filtering rule and what results from it is passed to the second filtering rule until all the filtering rules are applied. The condition that is used in the following filtering rules is running against the event that is received as input and it might defer from the original event.
+If more processors are defined, then they are executed in the order they are defined. The initial event is passed to the
+first processor and what results from it is passed to the second processor until all processors are applied. The
+condition is checked against the event that is received as input and it might defer from the original event.
 
 [source,yaml]
 -------
-event -> filter action 1 -> event1 -> filter action 2 -> event2 ...
+event -> processor 1 -> event1 -> processor 2 -> event2 ...
 -------
 
 See <<exported-fields>> for the full list of possible fields.
 
-Each filter action receives a condition and optionally a set of arguments. The action is executed only if the condition
+Each processor receives a condition and optionally a set of arguments. The action is executed only if the condition
 is fulfilled.
 
 [source,yaml]
 ------
-filters:
+processors:
  - action1:
      condition1
      [arguments]
@@ -44,7 +46,7 @@ filters:
 See <<filtering-data>> for specific {beatname_uc} examples.
 
 [[filtering-condition]]
-==== Filtering condition
+==== Condition
 
 Each condition receives a field to compare or multiple fields under the same condition and then `AND` is used between
 them. You can see a list of the <<exported-fields,`exported fields`>>. 
@@ -138,7 +140,7 @@ range:
     cpu.user_p: 0.8
 ------
 
-==== Filtering Actions
+==== Actions
 
 The supported filter actions are:
 
@@ -156,7 +158,7 @@ optional and if it's missing then the defined fields are always exported. The `@
 
 [source,yaml]
 -------
-filters:
+processors:
  - include_fields:
      [condition]
      fields: ["field1", "field2", ...]
@@ -178,7 +180,7 @@ even if they show up in the `drop_fields` list.
 
 [source,yaml]
 -----------------------------------------------------
-filters:
+processors:
  - drop_fields:
      [condition]
      fields: ["field1", "field2", ...]
@@ -195,7 +197,7 @@ without one all the events are dropped.
 
 [source,yaml]
 ------
-filters:
+processors:
  - drop_event:
      condition
 ------
