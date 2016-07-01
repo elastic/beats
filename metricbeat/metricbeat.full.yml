@@ -213,7 +213,8 @@ metricbeat.modules:
 #
 #filters:
 #- drop_event:
-#    equals:
+#   when:
+#     equals:
 #       http.code: 200
 #
 

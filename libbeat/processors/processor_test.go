@@ -43,8 +43,10 @@ func TestBadConfig(t *testing.T) {
 	yml := []map[string]interface{}{
 		map[string]interface{}{
 			"include_fields": map[string]interface{}{
-				"contains": map[string]string{
-					"proc.name": "test",
+				"when": map[string]interface{}{
+					"contains": map[string]string{
+						"proc.name": "test",
+					},
 				},
 				"fields": []string{"proc.cpu.total_p", "proc.mem", "dd"},
 			},
@@ -82,8 +84,10 @@ func TestIncludeFields(t *testing.T) {
 	yml := []map[string]interface{}{
 		map[string]interface{}{
 			"include_fields": map[string]interface{}{
-				"contains": map[string]string{
-					"proc.name": "test",
+				"when": map[string]interface{}{
+					"contains": map[string]string{
+						"proc.name": "test",
+					},
 				},
 				"fields": []string{"proc.cpu.total_p", "proc.mem", "dd"},
 			},
@@ -148,8 +152,10 @@ func TestIncludeFields1(t *testing.T) {
 	yml := []map[string]interface{}{
 		map[string]interface{}{
 			"include_fields": map[string]interface{}{
-				"regexp": map[string]string{
-					"proc.cmdline": "launchd",
+				"when": map[string]interface{}{
+					"regexp": map[string]string{
+						"proc.cmdline": "launchd",
+					},
 				},
 				"fields": []string{"proc.cpu.total_add"},
 			},
@@ -199,8 +205,10 @@ func TestDropFields(t *testing.T) {
 	yml := []map[string]interface{}{
 		map[string]interface{}{
 			"drop_fields": map[string]interface{}{
-				"equals": map[string]string{
-					"beat.hostname": "mar",
+				"when": map[string]interface{}{
+					"equals": map[string]string{
+						"beat.hostname": "mar",
+					},
 				},
 				"fields": []string{"proc.cpu.start_time", "mem", "proc.cmdline", "beat", "dd"},
 			},
@@ -262,8 +270,10 @@ func TestMultipleIncludeFields(t *testing.T) {
 	yml := []map[string]interface{}{
 		map[string]interface{}{
 			"include_fields": map[string]interface{}{
-				"contains": map[string]string{
-					"beat.name": "my-shipper",
+				"when": map[string]interface{}{
+					"contains": map[string]string{
+						"beat.name": "my-shipper",
+					},
 				},
 				"fields": []string{"proc"},
 			},
@@ -357,9 +367,11 @@ func TestDropEvent(t *testing.T) {
 	yml := []map[string]interface{}{
 		map[string]interface{}{
 			"drop_event": map[string]interface{}{
-				"range": map[string]interface{}{
-					"proc.cpu.total_p": map[string]float64{
-						"lt": 0.5,
+				"when": map[string]interface{}{
+					"range": map[string]interface{}{
+						"proc.cpu.total_p": map[string]float64{
+							"lt": 0.5,
+						},
 					},
 				},
 			},
@@ -453,8 +465,10 @@ func TestBadCondition(t *testing.T) {
 	yml := []map[string]interface{}{
 		map[string]interface{}{
 			"drop_event": map[string]interface{}{
-				"equal": map[string]string{
-					"type": "process",
+				"when": map[string]interface{}{
+					"equal": map[string]string{
+						"type": "process",
+					},
 				},
 			},
 		},
@@ -488,9 +502,49 @@ func TestMissingFields(t *testing.T) {
 	yml := []map[string]interface{}{
 		map[string]interface{}{
 			"include_fields": map[string]interface{}{
-				"equals": map[string]string{
-					"type": "process",
+				"when": map[string]interface{}{
+					"equals": map[string]string{
+						"type": "process",
+					},
 				},
+			},
+		},
+	}
+
+	config := processors.PluginConfig{}
+
+	for _, action := range yml {
+		c := map[string]common.Config{}
+
+		for name, actionYml := range action {
+			actionConfig, err := common.NewConfigFrom(actionYml)
+			assert.Nil(t, err)
+
+			c[name] = *actionConfig
+		}
+		config = append(config, c)
+	}
+
+	_, err := processors.New(config)
+	assert.NotNil(t, err)
+
+}
+
+func TestBadConditionConfig(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+
+	yml := []map[string]interface{}{
+		map[string]interface{}{
+			"include_fields": map[string]interface{}{
+				"when": map[string]interface{}{
+					"fake": map[string]string{
+						"type": "process",
+					},
+				},
+				"fields": []string{"proc.cpu.start_time", "proc.cpu.total_p", "proc.mem.rss_p", "proc.cmdline"},
 			},
 		},
 	}

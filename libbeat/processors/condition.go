@@ -30,19 +30,14 @@ type Condition struct {
 	rangexp  map[string]RangeValue
 }
 
-func AvailableCondition(name string) bool {
-
-	switch name {
-	case "equals", "contains", "range", "regexp":
-		return true
-	default:
-		return false
-	}
-}
-
-func NewCondition(config ConditionConfig) (*Condition, error) {
+func NewCondition(config *ConditionConfig) (*Condition, error) {
 
 	c := Condition{}
+
+	if config == nil {
+		// empty condition
+		return nil, nil
+	}
 
 	if config.Equals != nil {
 		if err := c.setEquals(config.Equals); err != nil {
@@ -61,8 +56,7 @@ func NewCondition(config ConditionConfig) (*Condition, error) {
 			return nil, err
 		}
 	} else {
-		// empty condition
-		return nil, nil
+		return nil, fmt.Errorf("missing condition")
 	}
 
 	return &c, nil

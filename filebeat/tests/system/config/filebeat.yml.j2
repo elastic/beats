@@ -114,20 +114,23 @@ processors:
 
     {%- if include_fields %}
     - include_fields:
-        {{include_fields.condition | default()}}
+        when:
+            {{include_fields.condition | default()}}
         fields: {{include_fields.fields | default([])}}
     {%- endif %}
 
     {%- if drop_fields %}
     - drop_fields:
-        {{drop_fields.condition | default()}}
+        when:
+            {{drop_fields.condition | default()}}
         fields: {{drop_fields.fields | default([])}}
     {%- endif %}
 
 
     {%- if drop_event %}
     - drop_event:
-        {{ drop_event.condition | default()}}
+        when:
+            {{ drop_event.condition | default()}}
     {%- endif %}
 
 {%- endif %}

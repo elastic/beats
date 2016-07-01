@@ -15,8 +15,8 @@ type DropFields struct {
 }
 
 type DropFieldsConfig struct {
-	Fields                     []string `config:"fields"`
-	processors.ConditionConfig `config:",inline"`
+	Fields []string                    `config:"fields"`
+	Cond   *processors.ConditionConfig `config:"when"`
 }
 
 func init() {
@@ -50,7 +50,7 @@ func newDropFields(c common.Config) (processors.Processor, error) {
 	}
 	f.Fields = config.Fields
 
-	cond, err := processors.NewCondition(config.ConditionConfig)
+	cond, err := processors.NewCondition(config.Cond)
 	if err != nil {
 		return nil, err
 	}
@@ -64,10 +64,8 @@ func (f *DropFields) CheckConfig(c common.Config) error {
 	complete := false
 
 	for _, field := range c.GetFields() {
-		if !processors.AvailableCondition(field) {
-			if field != "fields" {
-				return fmt.Errorf("unexpected %s option in the drop_fields configuration", field)
-			}
+		if field != "fields" && field != "when" {
+			return fmt.Errorf("unexpected %s option in the drop_fields configuration", field)
 		}
 		if field == "fields" {
 			complete = true

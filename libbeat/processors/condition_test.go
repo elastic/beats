@@ -40,7 +40,7 @@ func TestBadCondition(t *testing.T) {
 	}
 
 	for _, config := range configs {
-		_, err := NewCondition(config)
+		_, err := NewCondition(&config)
 		assert.NotNil(t, err)
 	}
 }
@@ -50,7 +50,7 @@ func GetConditions(t *testing.T, configs []ConditionConfig) []Condition {
 
 	for _, config := range configs {
 
-		cond, err := NewCondition(config)
+		cond, err := NewCondition(&config)
 		assert.Nil(t, err)
 		conds = append(conds, *cond)
 	}
