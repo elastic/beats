@@ -37,7 +37,7 @@ For more information, see:
 
 By default, {beatname_uc} automatically loads the recommended template file, +{beatname_lc}.template.json+,
 if elasticsearch output is enabled. You can configure {beatname_lc} to load a different template
-by adjusting the `name` and `path` options under `template` in +{beatname_lc}.yml+ file:
+by adjusting the `template.name` and `template.path` options in +{beatname_lc}.yml+ file:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
