@@ -190,20 +190,21 @@ metricbeat.modules:
 # default is the number of logical CPUs available in the system.
 #max_procs:
 
-#================================ Filters =====================================
+#================================ Processors =====================================
 
-# This section defines a list of filtering rules that are applied one by one
-# starting with the exported event:
+# Processors are used to reduce the number of fields in the exported event or to 
+# enhance the event with external meta data. This section defines a list of processors 
+# that are applied one by one and the first one receives the initial event:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# Supported actions: drop_fields, drop_event, include_fields
+# Supported processors: drop_fields, drop_event, include_fields
 #
-# For example, the following filter configuration uses multiple actions to keep
+# For example, you can use the following processors to keep
 # the fields that contain CPU load percentages, but remove the fields that
 # contain CPU ticks values:
 #
-#filters:
+#processors:
 #- include_fields:
 #    fields: ["cpu"]
 #- drop_fields:
@@ -211,10 +212,11 @@ metricbeat.modules:
 #
 # The following example drops the events that have the HTTP response code 200:
 #
-#filters:
+#processors:
 #- drop_event:
-#    equals:
-#       http.code: 200
+#    when:
+#       equals:
+#           http.code: 200
 #
 
 #================================ Outputs =====================================

@@ -12,7 +12,7 @@ type DropEvent struct {
 }
 
 type DropEventConfig struct {
-	processors.ConditionConfig `config:",inline"`
+	Cond *processors.ConditionConfig `config:"when"`
 }
 
 func init() {
@@ -36,7 +36,7 @@ func newDropEvent(c common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the drop_event configuration: %s", err)
 	}
 
-	cond, err := processors.NewCondition(config.ConditionConfig)
+	cond, err := processors.NewCondition(config.Cond)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func newDropEvent(c common.Config) (processors.Processor, error) {
 func (f *DropEvent) CheckConfig(c common.Config) error {
 
 	for _, field := range c.GetFields() {
-		if !processors.AvailableCondition(field) {
+		if field != "when" {
 			return fmt.Errorf("unexpected %s option in the drop_event configuration", field)
 		}
 	}
