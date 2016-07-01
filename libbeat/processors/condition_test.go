@@ -1,4 +1,4 @@
-package filter
+package processors
 
 import (
 	"testing"
@@ -16,24 +16,24 @@ func TestBadCondition(t *testing.T) {
 
 	configs := []ConditionConfig{
 		ConditionConfig{
-			Equals: &ConditionFilter{fields: map[string]interface{}{
+			Equals: &ConditionFields{fields: map[string]interface{}{
 				"proc.pid": 0.08,
 			}},
 		},
 
 		ConditionConfig{
-			Range: &ConditionFilter{fields: map[string]interface{}{
+			Range: &ConditionFields{fields: map[string]interface{}{
 				"gtr": 0.3,
 			}},
 		},
 
 		ConditionConfig{
-			Range: &ConditionFilter{fields: map[string]interface{}{
+			Range: &ConditionFields{fields: map[string]interface{}{
 				"gt": "fdfdd",
 			}},
 		},
 		ConditionConfig{
-			Regexp: &ConditionFilter{fields: map[string]interface{}{
+			Regexp: &ConditionFields{fields: map[string]interface{}{
 				"proc.name": "58gdhsga-=kw++w00",
 			}},
 		},
@@ -67,20 +67,20 @@ func TestEqualsCondition(t *testing.T) {
 
 	configs := []ConditionConfig{
 		ConditionConfig{
-			Equals: &ConditionFilter{fields: map[string]interface{}{
+			Equals: &ConditionFields{fields: map[string]interface{}{
 				"type": "process",
 			}},
 		},
 
 		ConditionConfig{
-			Equals: &ConditionFilter{fields: map[string]interface{}{
+			Equals: &ConditionFields{fields: map[string]interface{}{
 				"type":     "process",
 				"proc.pid": 305,
 			}},
 		},
 
 		ConditionConfig{
-			Range: &ConditionFilter{fields: map[string]interface{}{
+			Range: &ConditionFields{fields: map[string]interface{}{
 				"proc.cpu.total_p.gt": 0.5,
 			}},
 		},
@@ -121,14 +121,14 @@ func TestContainsCondition(t *testing.T) {
 
 	configs := []ConditionConfig{
 		ConditionConfig{
-			Contains: &ConditionFilter{fields: map[string]interface{}{
+			Contains: &ConditionFields{fields: map[string]interface{}{
 				"proc.name":     "sec",
 				"proc.username": "monica",
 			}},
 		},
 
 		ConditionConfig{
-			Contains: &ConditionFilter{fields: map[string]interface{}{
+			Contains: &ConditionFields{fields: map[string]interface{}{
 				"type":      "process",
 				"proc.name": "secddd",
 			}},
@@ -169,19 +169,19 @@ func TestRegexpCondition(t *testing.T) {
 
 	configs := []ConditionConfig{
 		ConditionConfig{
-			Regexp: &ConditionFilter{fields: map[string]interface{}{
+			Regexp: &ConditionFields{fields: map[string]interface{}{
 				"source": "apache2/error.*",
 			}},
 		},
 
 		ConditionConfig{
-			Regexp: &ConditionFilter{fields: map[string]interface{}{
+			Regexp: &ConditionFields{fields: map[string]interface{}{
 				"source": "apache2/access.*",
 			}},
 		},
 
 		ConditionConfig{
-			Regexp: &ConditionFilter{fields: map[string]interface{}{
+			Regexp: &ConditionFields{fields: map[string]interface{}{
 				"source":  "apache2/error.*",
 				"message": "[client 1.2.3.4]",
 			}},
@@ -224,27 +224,27 @@ func TestRangeCondition(t *testing.T) {
 
 	configs := []ConditionConfig{
 		ConditionConfig{
-			Range: &ConditionFilter{fields: map[string]interface{}{
+			Range: &ConditionFields{fields: map[string]interface{}{
 				"http.code.gte": 400,
 				"http.code.lt":  500,
 			}},
 		},
 
 		ConditionConfig{
-			Range: &ConditionFilter{fields: map[string]interface{}{
+			Range: &ConditionFields{fields: map[string]interface{}{
 				"bytes_out.gte": 2800,
 			}},
 		},
 
 		ConditionConfig{
-			Range: &ConditionFilter{fields: map[string]interface{}{
+			Range: &ConditionFields{fields: map[string]interface{}{
 				"bytes_out.gte":   2800,
 				"responsetime.gt": 30,
 			}},
 		},
 
 		ConditionConfig{
-			Range: &ConditionFilter{fields: map[string]interface{}{
+			Range: &ConditionFields{fields: map[string]interface{}{
 				"proc.cpu.total_p.gte": 0.5,
 			}},
 		},

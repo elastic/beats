@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/joeshaw/multierror"
@@ -34,7 +34,7 @@ var (
 // Use NewModuleWrapper or NewModuleWrappers to construct new ModuleWrappers.
 type ModuleWrapper struct {
 	mb.Module
-	filters    *filter.Filters
+	filters    *processors.Processors
 	metricSets []*metricSetWrapper // List of pointers to its associated MetricSets.
 }
 
@@ -76,7 +76,7 @@ func NewModuleWrappers(modulesConfig []*common.Config, r *mb.Register) ([]*Modul
 	var errs multierror.Errors
 	for k, v := range modules {
 		debugf("Initializing Module type '%s': %T=%+v", k.Name(), k, k)
-		f, err := filter.New(k.Config().Filters)
+		f, err := processors.New(k.Config().Filters)
 		if err != nil {
 			errs = append(errs, errors.Wrapf(err, "module %s", k.Name()))
 			continue

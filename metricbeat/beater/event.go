@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/processors"
 )
 
 const (
@@ -23,7 +23,7 @@ type eventBuilder struct {
 	fetchDuration time.Duration
 	event         common.MapStr
 	fetchErr      error
-	filters       *filter.Filters
+	filters       *processors.Processors
 	metadata      common.EventMetadata
 }
 
@@ -43,7 +43,7 @@ func (b eventBuilder) build() (common.MapStr, error) {
 
 	// Apply filters.
 	if b.filters != nil {
-		event = b.filters.Filter(event)
+		event = b.filters.Run(event)
 	}
 
 	event = common.MapStr{

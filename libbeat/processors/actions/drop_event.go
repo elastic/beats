@@ -1,27 +1,27 @@
-package rules
+package actions
 
 import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/filter"
+	"github.com/elastic/beats/libbeat/processors"
 )
 
 type DropEvent struct {
-	Cond *filter.Condition
+	Cond *processors.Condition
 }
 
 type DropEventConfig struct {
-	filter.ConditionConfig `config:",inline"`
+	processors.ConditionConfig `config:",inline"`
 }
 
 func init() {
-	if err := filter.RegisterPlugin("drop_event", newDropEvent); err != nil {
+	if err := processors.RegisterPlugin("drop_event", newDropEvent); err != nil {
 		panic(err)
 	}
 }
 
-func newDropEvent(c common.Config) (filter.FilterRule, error) {
+func newDropEvent(c common.Config) (processors.Processor, error) {
 
 	f := DropEvent{}
 
@@ -36,7 +36,7 @@ func newDropEvent(c common.Config) (filter.FilterRule, error) {
 		return nil, fmt.Errorf("fail to unpack the drop_event configuration: %s", err)
 	}
 
-	cond, err := filter.NewCondition(config.ConditionConfig)
+	cond, err := processors.NewCondition(config.ConditionConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -48,14 +48,14 @@ func newDropEvent(c common.Config) (filter.FilterRule, error) {
 func (f *DropEvent) CheckConfig(c common.Config) error {
 
 	for _, field := range c.GetFields() {
-		if !filter.AvailableCondition(field) {
+		if !processors.AvailableCondition(field) {
 			return fmt.Errorf("unexpected %s option in the drop_event configuration", field)
 		}
 	}
 	return nil
 }
 
-func (f *DropEvent) Filter(event common.MapStr) (common.MapStr, error) {
+func (f *DropEvent) Run(event common.MapStr) (common.MapStr, error) {
 
 	if f.Cond != nil && !f.Cond.Check(event) {
 		return event, nil

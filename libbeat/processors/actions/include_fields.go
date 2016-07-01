@@ -1,31 +1,31 @@
-package rules
+package actions
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/filter"
+	"github.com/elastic/beats/libbeat/processors"
 )
 
 type IncludeFields struct {
 	Fields []string
 	// condition
-	Cond *filter.Condition
+	Cond *processors.Condition
 }
 
 type IncludeFieldsConfig struct {
-	Fields                 []string `config:"fields"`
-	filter.ConditionConfig `config:",inline"`
+	Fields                     []string `config:"fields"`
+	processors.ConditionConfig `config:",inline"`
 }
 
 func init() {
-	if err := filter.RegisterPlugin("include_fields", newIncludeFields); err != nil {
+	if err := processors.RegisterPlugin("include_fields", newIncludeFields); err != nil {
 		panic(err)
 	}
 }
 
-func newIncludeFields(c common.Config) (filter.FilterRule, error) {
+func newIncludeFields(c common.Config) (processors.Processor, error) {
 
 	f := IncludeFields{}
 
@@ -41,7 +41,7 @@ func newIncludeFields(c common.Config) (filter.FilterRule, error) {
 	}
 
 	/* add read only fields if they are not yet */
-	for _, readOnly := range filter.MandatoryExportedFields {
+	for _, readOnly := range processors.MandatoryExportedFields {
 		found := false
 		for _, field := range config.Fields {
 			if readOnly == field {
@@ -54,7 +54,7 @@ func newIncludeFields(c common.Config) (filter.FilterRule, error) {
 	}
 	f.Fields = config.Fields
 
-	cond, err := filter.NewCondition(config.ConditionConfig)
+	cond, err := processors.NewCondition(config.ConditionConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (f *IncludeFields) CheckConfig(c common.Config) error {
 	complete := false
 
 	for _, field := range c.GetFields() {
-		if !filter.AvailableCondition(field) {
+		if !processors.AvailableCondition(field) {
 			if field != "fields" {
 				return fmt.Errorf("unexpected %s option in the include_fields configuration", field)
 			}
@@ -84,7 +84,7 @@ func (f *IncludeFields) CheckConfig(c common.Config) error {
 	return nil
 }
 
-func (f *IncludeFields) Filter(event common.MapStr) (common.MapStr, error) {
+func (f *IncludeFields) Run(event common.MapStr) (common.MapStr, error) {
 
 	if f.Cond != nil && !f.Cond.Check(event) {
 		return event, nil

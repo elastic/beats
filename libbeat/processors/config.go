@@ -1,4 +1,4 @@
-package filter
+package processors
 
 import (
 	"fmt"
@@ -9,22 +9,22 @@ import (
 )
 
 type ConditionConfig struct {
-	Equals   *ConditionFilter `config:"equals"`
-	Contains *ConditionFilter `config:"contains"`
-	Regexp   *ConditionFilter `config:"regexp"`
-	Range    *ConditionFilter `config:"range"`
+	Equals   *ConditionFields `config:"equals"`
+	Contains *ConditionFields `config:"contains"`
+	Regexp   *ConditionFields `config:"regexp"`
+	Range    *ConditionFields `config:"range"`
 }
 
-type ConditionFilter struct {
+type ConditionFields struct {
 	fields map[string]interface{}
 }
 
-type FilterPluginConfig []map[string]common.Config
+type PluginConfig []map[string]common.Config
 
 // fields that should be always exported
 var MandatoryExportedFields = []string{"@timestamp", "type"}
 
-func (f *ConditionFilter) Unpack(to interface{}) error {
+func (f *ConditionFields) Unpack(to interface{}) error {
 	m, ok := to.(map[string]interface{})
 	if !ok {
 		return fmt.Errorf("wrong type, expect map")

@@ -9,8 +9,9 @@
 //// include::../../libbeat/docs/filtering.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
-Generic filtering is available to all Beats through libbeat. With generic filtering, you can reduce the number of
-fields that are exported by the Beat by defining a list of filter actions that are applied to each event before it's
-sent to the defined output. The filter actions are executed in the order that they are defined in the config file.
+You can defined processors in any Beat as it is part of libbeat. Processors are used to reduce the number of
+the exported fields, but also to enhance them with additional meta data.
+Each processor receives an event, applies a defined action to the event and returns it. In case you define a list of
+processors, then they are executed in the order they are defined in the configuration file.
 
-You can define the filter actions under the `filters` section of the {beatname_uc} configuration file.
+The processors are defined in the {beatname_uc} configuration file.
