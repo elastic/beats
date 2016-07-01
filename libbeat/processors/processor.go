@@ -14,7 +14,7 @@ type Processors struct {
 
 func New(config PluginConfig) (*Processors, error) {
 
-	processors := Processors{}
+	procs := Processors{}
 
 	for _, processor := range config {
 
@@ -35,24 +35,24 @@ func New(config PluginConfig) (*Processors, error) {
 				return nil, err
 			}
 
-			processors.addProcessor(plugin)
+			procs.addProcessor(plugin)
 		}
 	}
 
-	logp.Debug("processors", "Processors: %v", processors)
-	return &processors, nil
+	logp.Debug("processors", "Processors: %v", procs)
+	return &procs, nil
 }
 
-func (processors *Processors) addProcessor(p Processor) {
+func (procs *Processors) addProcessor(p Processor) {
 
-	processors.list = append(processors.list, p)
+	procs.list = append(procs.list, p)
 }
 
 // Applies a sequence of processing rules and returns the filtered event
-func (processors *Processors) Run(event common.MapStr) common.MapStr {
+func (procs *Processors) Run(event common.MapStr) common.MapStr {
 
 	// Check if processors are set, just return event if not
-	if len(processors.list) == 0 {
+	if len(procs.list) == 0 {
 		return event
 	}
 
@@ -60,7 +60,7 @@ func (processors *Processors) Run(event common.MapStr) common.MapStr {
 	filtered := event.Clone()
 	var err error
 
-	for _, p := range processors.list {
+	for _, p := range procs.list {
 		filtered, err = p.Run(filtered)
 		if err != nil {
 			logp.Debug("filter", "fail to apply processor %s: %s", p, err)
@@ -74,10 +74,10 @@ func (processors *Processors) Run(event common.MapStr) common.MapStr {
 	return filtered
 }
 
-func (processors Processors) String() string {
+func (procs Processors) String() string {
 	s := []string{}
 
-	for _, p := range processors.list {
+	for _, p := range procs.list {
 
 		s = append(s, p.String())
 	}
