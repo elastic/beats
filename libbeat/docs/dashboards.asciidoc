@@ -87,6 +87,16 @@ If Kibana shows a `No default index pattern` warning, you must select or create
 an index pattern to continue. To resolve the issue, select one of the
 predefined index patterns and set it as the default.
 
+[NOTE]
+.Known Issue in 5.0.0-alpha4
+====
+There is a known issue in the 5.0.0-alpha4 release of Kibana that affects
+the loading process of our sample dashboards. It only affects brand new
+installations of Kibana 5.0.0-alpha4 that don’t yet have any indices defined. 
+To resolve this error, see the "Known issue and workaround" section
+https://www.elastic.co/blog/beats-5-0-0-alpha4-released[here].
+====
+
 image:./images/kibana-created-indexes.png[Kibana configured indexes]
 
 To open the loaded dashboards, go to the *Dashboard* page and click *Open*.
