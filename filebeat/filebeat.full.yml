@@ -283,8 +283,9 @@ filebeat.prospectors:
 #
 #processors:
 #- drop_event:
-#    equals:
-#       http.code: 200
+#    when:
+#       equals:
+#           http.code: 200
 #
 
 #================================ Outputs =====================================
