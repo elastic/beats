@@ -28,16 +28,18 @@ event -> processor 1 -> event1 -> processor 2 -> event2 ...
 See <<exported-fields>> for the full list of possible fields.
 
 Each processor receives a condition and optionally a set of arguments. The action is executed only if the condition
-is fulfilled.
+is fulfilled. If no condition is passed then the action is always executed.
 
 [source,yaml]
 ------
 processors:
  - action1:
-     condition1
+     when:
+        condition1
      [arguments]
  - action2:
-     condition2
+     when:
+        condition2
 	 [arguments]
 ...
 
@@ -160,7 +162,8 @@ optional and if it's missing then the defined fields are always exported. The `@
 -------
 processors:
  - include_fields:
-     [condition]
+     when:
+        condition
      fields: ["field1", "field2", ...]
 -------
 
@@ -182,7 +185,8 @@ even if they show up in the `drop_fields` list.
 -----------------------------------------------------
 processors:
  - drop_fields:
-     [condition]
+     when:
+        condition
      fields: ["field1", "field2", ...]
 -----------------------------------------------------
 
@@ -199,6 +203,7 @@ without one all the events are dropped.
 ------
 processors:
  - drop_event:
-     condition
+     when:
+        condition
 ------
 
