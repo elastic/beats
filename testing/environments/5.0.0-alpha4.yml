@@ -4,7 +4,7 @@
 elasticsearch:
   build: ./docker/elasticsearch
   dockerfile: Dockerfile-5.0.0-alpha4
-  command: elasticsearch -Enetwork.host=0.0.0.0 -Ediscovery.zen.minimum_master_nodes=1
+  command: elasticsearch -Enetwork.host=0.0.0.0 -Ediscovery.zen.minimum_master_nodes=1 -Ebootstrap.ignore_system_bootstrap_checks=true
 
 logstash:
   build: ./docker/logstash
