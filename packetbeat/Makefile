@@ -14,9 +14,13 @@ with_pfring:
 before-build:
 	sed -i.bk 's/device: any/device: en0/' $(PREFIX)/packetbeat-darwin.yml
 	rm $(PREFIX)/packetbeat-darwin.yml.bk
+	sed -i.bk 's/device: any/device: en0/' $(PREFIX)/packetbeat-darwin.full.yml
+	rm $(PREFIX)/packetbeat-darwin.full.yml.bk
 	# win
 	sed -i.bk 's/device: any/device: 0/' $(PREFIX)/packetbeat-win.yml
 	rm $(PREFIX)/packetbeat-win.yml.bk
+	sed -i.bk 's/device: any/device: 0/' $(PREFIX)/packetbeat-win.full.yml
+	rm $(PREFIX)/packetbeat-win.full.yml.bk
 
 .PHONY: benchmark
 benchmark:
