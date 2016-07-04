@@ -124,7 +124,7 @@ func SetStderr() {
 
 func getLogLevel(config *Logging) (Priority, error) {
 	if config == nil || config.Level == "" {
-		return LOG_ERR, nil
+		return LOG_INFO, nil
 	}
 
 	levels := map[string]Priority{
