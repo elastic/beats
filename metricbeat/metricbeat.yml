@@ -99,3 +99,8 @@ output.elasticsearch:
 # Sets log level. The default log level is error.
 # Available log levels are: critical, error, warning, info, debug
 #logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]

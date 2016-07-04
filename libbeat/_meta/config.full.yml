@@ -472,7 +472,7 @@ output.elasticsearch:
 #logging.level: error
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are beat, publish, service
+# Other available selectors are "beat", "publish", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
