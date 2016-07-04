@@ -71,7 +71,7 @@ Total number of kilobytes served.
 [float]
 === apache.status.requests_per_sec
 
-type: float
+type: half_float
 
 Requests per second.
 
@@ -87,7 +87,7 @@ Bytes per second.
 [float]
 === apache.status.bytes_per_request
 
-type: float
+type: half_float
 
 Bytes per request.
 
@@ -141,7 +141,7 @@ CPU stats.
 [float]
 === apache.status.cpu.load
 
-type: float
+type: half_float
 
 CPU Load.
 
@@ -149,7 +149,7 @@ CPU Load.
 [float]
 === apache.status.cpu.user
 
-type: float
+type: half_float
 
 CPU user load.
 
@@ -157,7 +157,7 @@ CPU user load.
 [float]
 === apache.status.cpu.system
 
-type: float
+type: half_float
 
 System cpu.
 
@@ -165,7 +165,7 @@ System cpu.
 [float]
 === apache.status.cpu.children_user
 
-type: float
+type: half_float
 
 CPU of children user.
 
@@ -173,7 +173,7 @@ CPU of children user.
 [float]
 === apache.status.cpu.children_system
 
-type: float
+type: half_float
 
 CPU of children system.
 
@@ -227,7 +227,7 @@ Load averages.
 [float]
 === apache.status.load.1
 
-type: float
+type: half_float
 
 Load average for the last minute.
 
@@ -235,7 +235,7 @@ Load average for the last minute.
 [float]
 === apache.status.load.5
 
-type: float
+type: half_float
 
 Load average for the last 5 minutes.
 
@@ -243,7 +243,7 @@ Load average for the last 5 minutes.
 [float]
 === apache.status.load.15
 
-type: float
+type: half_float
 
 Load average for the last 15 minutes.
 
@@ -1333,7 +1333,7 @@ Redis CPU stats
 [float]
 === redis.info.cpu.used.sys
 
-type: float
+type: half_float
 
 System CPU consumed by the Redis server.
 
@@ -1341,7 +1341,7 @@ System CPU consumed by the Redis server.
 [float]
 === redis.info.cpu.used.sys_children
 
-type: float
+type: half_float
 
 User CPU consumed by the Redis server.
 
@@ -1349,7 +1349,7 @@ User CPU consumed by the Redis server.
 [float]
 === redis.info.cpu.used.user
 
-type: float
+type: half_float
 
 System CPU consumed by the background processes.
 
@@ -1357,7 +1357,7 @@ System CPU consumed by the background processes.
 [float]
 === redis.info.cpu.used.user_children
 
-type: float
+type: half_float
 
 User CPU consumed by the background processes.
 
@@ -1899,7 +1899,7 @@ CPU Core number.
 [float]
 === system.core.user.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
@@ -1915,7 +1915,7 @@ The amount of CPU time spent in user space.
 [float]
 === system.core.system.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in kernel space.
 
@@ -1931,7 +1931,7 @@ The amount of CPU time spent in kernel space.
 [float]
 === system.core.nice.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent on low-priority processes.
 
@@ -1947,7 +1947,7 @@ The amount of CPU time spent on low-priority processes.
 [float]
 === system.core.idle.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent idle.
 
@@ -1963,7 +1963,7 @@ The amount of CPU time spent idle.
 [float]
 === system.core.iowait.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in wait (on disk).
 
@@ -1979,7 +1979,7 @@ The amount of CPU time spent in wait (on disk).
 [float]
 === system.core.irq.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -1995,7 +1995,7 @@ The amount of CPU time spent servicing and handling hardware interrupts.
 [float]
 === system.core.softirq.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent servicing and handling software interrupts.
 
@@ -2011,7 +2011,7 @@ The amount of CPU time spent servicing and handling software interrupts.
 [float]
 === system.core.steal.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
@@ -2034,7 +2034,7 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 [float]
 === system.cpu.user.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
@@ -2042,7 +2042,7 @@ The percentage of CPU time spent in user space. On multi-core systems, you can h
 [float]
 === system.cpu.system.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in kernel space.
 
@@ -2050,7 +2050,7 @@ The percentage of CPU time spent in kernel space.
 [float]
 === system.cpu.nice.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent on low-priority processes.
 
@@ -2058,7 +2058,7 @@ The percentage of CPU time spent on low-priority processes.
 [float]
 === system.cpu.idle.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent idle.
 
@@ -2066,7 +2066,7 @@ The percentage of CPU time spent idle.
 [float]
 === system.cpu.iowait.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in wait (on disk).
 
@@ -2074,7 +2074,7 @@ The percentage of CPU time spent in wait (on disk).
 [float]
 === system.cpu.irq.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -2082,7 +2082,7 @@ The percentage of CPU time spent servicing and handling hardware interrupts.
 [float]
 === system.cpu.softirq.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent servicing and handling software interrupts.
 
@@ -2090,7 +2090,7 @@ The percentage of CPU time spent servicing and handling software interrupts.
 [float]
 === system.cpu.steal.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
@@ -2169,7 +2169,7 @@ Load averages.
 [float]
 === system.cpu.load.1
 
-type: float
+type: half_float
 
 Load average for the last minute.
 
@@ -2177,7 +2177,7 @@ Load average for the last minute.
 [float]
 === system.cpu.load.5
 
-type: float
+type: half_float
 
 Load average for the last 5 minutes.
 
@@ -2185,7 +2185,7 @@ Load average for the last 5 minutes.
 [float]
 === system.cpu.load.15
 
-type: float
+type: half_float
 
 Load average for the last 15 minutes.
 
@@ -2345,7 +2345,7 @@ The used disk space in bytes.
 [float]
 === system.filesystem.used.pct
 
-type: float
+type: half_float
 
 The percentage of used disk space.
 
@@ -2435,7 +2435,7 @@ Available memory.
 [float]
 === system.memory.used.pct
 
-type: float
+type: half_float
 
 The percentage of used memory.
 
@@ -2466,7 +2466,7 @@ Actual available memory. This value is the "free" memory plus the memory used fo
 [float]
 === system.memory.actual.used.pct
 
-type: float
+type: half_float
 
 The percentage of actual used memory.
 
@@ -2504,7 +2504,7 @@ Available swap memory.
 [float]
 === system.memory.swap.used.pct
 
-type: float
+type: half_float
 
 The percentage of used swap memory.
 
@@ -2662,7 +2662,7 @@ The amount of CPU time the process spent in user space.
 [float]
 === system.process.cpu.total.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent by the process since the last update. Its value is similar to the %CPU value of the process displayed by the top command on Unix systems.
 
@@ -2716,7 +2716,7 @@ The Resident Set Size. The amount of memory the process occupied in main memory 
 [float]
 === system.process.memory.rss.pct
 
-type: float
+type: half_float
 
 The percentage of memory the process occupied in main memory (RAM).
 

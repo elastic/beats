@@ -57,7 +57,7 @@
               description: >
                 Total number of kilobytes served.
             - name: requests_per_sec
-              type: float
+              type: half_float
               description: >
                 Requests per second.
             - name: bytes_per_sec
@@ -65,7 +65,7 @@
               description: >
                 Bytes per second.
             - name: bytes_per_request
-              type: float
+              type: half_float
               description: >
                 Bytes per request.
             - name: workers.busy
@@ -95,23 +95,23 @@
                 CPU stats.
               fields:
                 - name: load
-                  type: float
+                  type: half_float
                   description: >
                     CPU Load.
                 - name: user
-                  type: float
+                  type: half_float
                   description: >
                     CPU user load.
                 - name: system
-                  type: float
+                  type: half_float
                   description: >
                     System cpu.
                 - name: children_user
-                  type: float
+                  type: half_float
                   description: >
                     CPU of children user.
                 - name: children_system
-                  type: float
+                  type: half_float
                   description: >
                     CPU of children system.
             - name: connections
@@ -141,15 +141,15 @@
                 Load averages.
               fields:
                 - name: "1"
-                  type: float
+                  type: half_float
                   description: >
                     Load average for the last minute.
                 - name: "5"
-                  type: float
+                  type: half_float
                   description: >
                     Load average for the last 5 minutes.
                 - name: "15"
-                  type: float
+                  type: half_float
                   description: >
                     Load average for the last 15 minutes.
             - name: scoreboard
@@ -779,22 +779,22 @@
                 Redis CPU stats
               fields:
                 - name: used.sys
-                  type: float
+                  type: half_float
                   description: >
                     System CPU consumed by the Redis server.
 
                 - name: used.sys_children
-                  type: float
+                  type: half_float
                   description: >
                     User CPU consumed by the Redis server.
 
                 - name: used.user
-                  type: float
+                  type: half_float
                   description: >
                     System CPU consumed by the background processes.
 
                 - name: used.user_children
-                  type: float
+                  type: half_float
                   description: >
                     User CPU consumed by the background processes.
 
@@ -1116,7 +1116,7 @@
                 CPU Core number.
 
             - name: user.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
                 For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
@@ -1127,7 +1127,7 @@
                The amount of CPU time spent in user space.
 
             - name: system.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent in kernel space.
 
@@ -1137,7 +1137,7 @@
                 The amount of CPU time spent in kernel space.
 
             - name: nice.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent on low-priority processes.
 
@@ -1147,7 +1147,7 @@
                 The amount of CPU time spent on low-priority processes.
 
             - name: idle.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent idle.
 
@@ -1157,7 +1157,7 @@
                 The amount of CPU time spent idle.
 
             - name: iowait.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent in wait (on disk).
 
@@ -1167,7 +1167,7 @@
                 The amount of CPU time spent in wait (on disk).
 
             - name: irq.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -1177,7 +1177,7 @@
                 The amount of CPU time spent servicing and handling hardware interrupts.
 
             - name: softirq.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent servicing and handling software interrupts.
 
@@ -1187,7 +1187,7 @@
                 The amount of CPU time spent servicing and handling software interrupts.
 
             - name: steal.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
@@ -1206,43 +1206,43 @@
             `cpu` contains local CPU stats.
           fields:
             - name: user.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
                 For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
             - name: system.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent in kernel space.
 
             - name: nice.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent on low-priority processes.
 
             - name: idle.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent idle.
 
             - name: iowait.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent in wait (on disk).
 
             - name: irq.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent servicing and handling hardware interrupts.
 
             - name: softirq.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent servicing and handling software interrupts.
 
             - name: steal.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
@@ -1296,15 +1296,15 @@
                 Load averages.
               fields:
                 - name: "1"
-                  type: float
+                  type: half_float
                   description: >
                     Load average for the last minute.
                 - name: "5"
-                  type: float
+                  type: half_float
                   description: >
                     Load average for the last 5 minutes.
                 - name: "15"
-                  type: float
+                  type: half_float
                   description: >
                     Load average for the last 15 minutes.
         - name: diskio
@@ -1399,7 +1399,7 @@
               description: >
                 The used disk space in bytes.
             - name: used.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of used disk space.
 
@@ -1453,7 +1453,7 @@
                 Available memory.
 
             - name: used.pct
-              type: float
+              type: half_float
               description: >
                 The percentage of used memory.
 
@@ -1475,7 +1475,7 @@
                     buffers. Available only on Unix.
 
                 - name: used.pct
-                  type: float
+                  type: half_float
                   description: >
                     The percentage of actual used memory.
 
@@ -1500,7 +1500,7 @@
                     Available swap memory.
 
                 - name: used.pct
-                  type: float
+                  type: half_float
                   description: >
                     The percentage of used swap memory.
         - name: network
@@ -1597,7 +1597,7 @@
                   description: >
                     The amount of CPU time the process spent in user space.
                 - name: total.pct
-                  type: float
+                  type: half_float
                   description: >
                     The percentage of CPU time spent by the process since the last update. Its value is similar to the
                     %CPU value of the process displayed by the top command on Unix systems.
@@ -1627,7 +1627,7 @@
                   description: >
                     The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
                 - name: rss.pct
-                  type: float
+                  type: half_float
                   description: >
                     The percentage of memory the process occupied in main memory (RAM).
                 - name: share
