@@ -16,7 +16,7 @@
       description: >
         Total number of kilobytes served.
     - name: requests_per_sec
-      type: float
+      type: half_float
       description: >
         Requests per second.
     - name: bytes_per_sec
@@ -24,7 +24,7 @@
       description: >
         Bytes per second.
     - name: bytes_per_request
-      type: float
+      type: half_float
       description: >
         Bytes per request.
     - name: workers.busy
@@ -54,23 +54,23 @@
         CPU stats.
       fields:
         - name: load
-          type: float
+          type: half_float
           description: >
             CPU Load.
         - name: user
-          type: float
+          type: half_float
           description: >
             CPU user load.
         - name: system
-          type: float
+          type: half_float
           description: >
             System cpu.
         - name: children_user
-          type: float
+          type: half_float
           description: >
             CPU of children user.
         - name: children_system
-          type: float
+          type: half_float
           description: >
             CPU of children system.
     - name: connections
@@ -100,15 +100,15 @@
         Load averages.
       fields:
         - name: "1"
-          type: float
+          type: half_float
           description: >
             Load average for the last minute.
         - name: "5"
-          type: float
+          type: half_float
           description: >
             Load average for the last 5 minutes.
         - name: "15"
-          type: float
+          type: half_float
           description: >
             Load average for the last 15 minutes.
     - name: scoreboard

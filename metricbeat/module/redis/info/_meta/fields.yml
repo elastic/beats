@@ -44,22 +44,22 @@
         Redis CPU stats
       fields:
         - name: used.sys
-          type: float
+          type: half_float
           description: >
             System CPU consumed by the Redis server.
 
         - name: used.sys_children
-          type: float
+          type: half_float
           description: >
             User CPU consumed by the Redis server.
 
         - name: used.user
-          type: float
+          type: half_float
           description: >
             System CPU consumed by the background processes.
 
         - name: used.user_children
-          type: float
+          type: half_float
           description: >
             User CPU consumed by the background processes.
 
