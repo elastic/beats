@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"expvar"
 	"fmt"
 	"net/url"
 	"strings"
@@ -29,6 +30,10 @@ const (
 	stateBodyChunkedStart
 	stateBodyChunked
 	stateBodyChunkedWaitFinalCRLF
+)
+
+var (
+	unmatchedResponses = expvar.NewInt("httpUnmatchedResponses")
 )
 
 type stream struct {
@@ -407,7 +412,8 @@ func (http *HTTP) correlate(conn *httpConnectionData) {
 	// drop responses with missing requests
 	if conn.requests.empty() {
 		for !conn.responses.empty() {
-			logp.Warn("Response from unknown transaction. Ingoring.")
+			debugf("Response from unknown transaction. Ingoring.")
+			unmatchedResponses.Add(1)
 			conn.responses.pop()
 		}
 		return
@@ -437,7 +443,7 @@ func (http *HTTP) newTransaction(requ, resp *message) common.MapStr {
 
 	path, params, err := http.extractParameters(requ, requ.Raw)
 	if err != nil {
-		logp.Warn("http", "Fail to parse HTTP parameters: %v", err)
+		logp.Warn("Fail to parse HTTP parameters: %v", err)
 	}
 
 	src := common.Endpoint{
