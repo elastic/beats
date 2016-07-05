@@ -97,3 +97,8 @@ import:
   - zlib
 - package: github.com/klauspost/cpuid
   version: v1.0
+- package: https://github.com/go-inf/inf
+  version: v0.9.0
+- package: github.com/golang/snappy
+  version: d9eb7a3d35ec988b8585d4a0068e462c27d28380
+

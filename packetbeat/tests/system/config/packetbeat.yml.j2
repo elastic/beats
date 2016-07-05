@@ -118,6 +118,13 @@ packetbeat.protocols.mongodb:
 {% if mongodb_max_docs is not none %}  max_docs: {{mongodb_max_docs}}{% endif %}
 {% if mongodb_max_doc_length is not none %}  max_doc_length: {{mongodb_max_doc_length}}{% endif %}
 
+packetbeat.protocols.cassandra:
+  ports: [{{ cassandra_ports|default([9042])|join(", ") }}]
+{% if cassandra_send_request %}  send_request: true{%endif %}
+{% if cassandra_send_response %}  send_response: true{% endif %}
+{% if cassandra_send_request_header %}  send_request_header: true{% endif %}
+{% if cassandra_send_response_header %}  send_response_header: true{% endif %}
+
 
 {% if procs_enabled %}
 #=========================== Monitored processes ==============================

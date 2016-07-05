@@ -416,3 +416,22 @@ packetbeat.protocols.nfs:
 #
 #    - process: app
 #      cmdline_grep: gunicorn
+
+packetbeat.protocols.cassandra:
+  #Cassandra port for traffic monitoring.
+  ports: [9042]
+  # If this option is enabled, the raw message of the request (`cassandra_request` field)
+  # is sent to Elasticsearch. The default is false.
+  send_request: true
+  # If this option is enabled, the raw message of the response (`cassandra_response` field)
+  # is sent to Elasticsearch. The default is false.
+  send_response: true
+  # If this option is enabled, the raw message of the response (`cassandra_request_header` field)
+  # is sent to Elasticsearch. The default is false.
+  send_request_header: true
+  # If this option is enabled, the raw message of the response (`cassandra_response_header` field)
+  # is sent to Elasticsearch. The default is false.
+  send_response_header: true
+  # If this option is enabled, and also the flag indicates that the frame body was compressed, and
+  # the stream will decode by the compressor, currently support: `snappy` , The default is `nil`.
+  compressor: "snappy"
