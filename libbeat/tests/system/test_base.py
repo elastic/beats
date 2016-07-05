@@ -115,3 +115,13 @@ class Test(BaseTest):
         self.wait_until(lambda: self.log_contains("Mockbeat is alive"),
                         max_timeout=2)
         proc.check_kill_and_wait()
+
+    def test_logging_metrics(self):
+        self.render_config_template(
+            metrics_period="0.1s"
+        )
+        proc = self.start_beat(logging_args=["-e"])
+        self.wait_until(
+            lambda: self.log_contains("No non-zero metrics in the last 100ms"),
+            max_timeout=2)
+        proc.check_kill_and_wait()

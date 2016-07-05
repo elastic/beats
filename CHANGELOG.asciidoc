@@ -48,6 +48,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Periodically log internal metrics. {pull}1955[1955]
+
 *Metricbeat*
 
 *Packetbeat*
