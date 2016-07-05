@@ -11,14 +11,18 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-filter]]
-=== Processors
+=== Processors Configuration (was Filters)
+
+//TODO: Remove was Filters from the above title and remove extra sections that show the alpha4 configuration
+
+coming[5.0.0-beta1,Filters are being renamed to "processors" to better reflect the capabilities they provide. If you are using 5.0.0-alpha4 or earlier, these are still called "filters" even though the documentation refers to "processors"]
 
 You can define a set of `processors` in the +{beatname_lc}.yml+ config file to reduce the number
 of fields that are exported by the Beat. 
 
-If more processors are defined, then they are executed in the order they are defined. The initial event is passed to the
+If multiple processors are defined, they are executed in the order they are defined. The initial event is passed to the
 first processor and what results from it is passed to the second processor until all processors are applied. The
-condition is checked against the event that is received as input and it might defer from the original event.
+condition is checked against the event that is received as input and it might differ from the original event.
 
 [source,yaml]
 -------
@@ -30,17 +34,33 @@ See <<exported-fields>> for the full list of possible fields.
 Each processor receives a condition and optionally a set of arguments. The action is executed only if the condition
 is fulfilled. If no condition is passed then the action is always executed.
 
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+
+[source,yaml]
+------
+filters:
+ - action1:
+     condition1
+         [arguments]
+ - action2:
+     condition2
+         [arguments]
+...
+------
+
+coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+
 [source,yaml]
 ------
 processors:
  - action1:
      when:
         condition1
-     [arguments]
+           [arguments]
  - action2:
      when:
         condition2
-	 [arguments]
+           [arguments]
 ...
 
 ------
@@ -74,7 +94,7 @@ Supported conditions are:
 [[condition-equals]]
 ===== equals
 
-With the `equals` condition, you can compare if a field have a certain value. It accepts only an integer or a string
+With the `equals` condition, you can compare if a field has a certain value. The condition accepts only an integer or a string
 value.
 
 For example, the following condition checks if the response code of the HTTP transaction is 200:
@@ -88,7 +108,7 @@ equals:
 [[condition-contains]]
 ===== contains
 
-The `contains` condition checks if value is part of the field. It accepts only a string as value.
+The `contains` condition checks if a value is part of the field. The condition accepts only a string value.
 
 For example, the following condition checks if an error is part of the transaction status:
 
@@ -102,7 +122,7 @@ contains:
 [[condition-regexp]]
 ===== regexp
 
-The `regexp` condition checks the field against a regular expression. It accepts only strings.
+The `regexp` condition checks the field against a regular expression. The condition accepts only strings.
 
 For example, the following condition checks if the process name contains `foo`:
 
@@ -115,8 +135,8 @@ reqexp:
 [[condition-range]]
 ===== range
 
-The `range` condition checks if the field is in a certain range frame. It supports `lt`, `lte`, `gt` and `gte`. As
-values, it accepts integers or float.
+The `range` condition checks if the field is in a certain range of values. The condition supports `lt`, `lte`, `gt` and `gte`. The
+condition accepts only integer or float values.
 
 For example, the following condition checks for the status of the transaction by comparing the `proc.code` field with
 300.
@@ -158,6 +178,18 @@ The `include_fields` action specifies what fields to export if a certain conditi
 optional and if it's missing then the defined fields are always exported. The `@timestamp` and
 `type` fields are always exported, even if they are not defined in the `include_fields` list.
 
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+
+[source,yaml]
+-------
+filters:
+ - include_fields:
+     [condition]
+     fields: ["field1", "field2", ...]
+-------
+
+coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+
 [source,yaml]
 -------
 processors:
@@ -167,7 +199,7 @@ processors:
      fields: ["field1", "field2", ...]
 -------
 
-You can specify more `include_fields` actions under the filtering section.
+You can specify multiple `include_fields` actions under the `processors` section.
 
 
 NOTE: If you define an empty list of fields under `include_fields`, then only the required fields, `@timestamp` and `type`, are
@@ -180,6 +212,18 @@ exported.
 The `drop_fields` action specifies what fields to drop if a certain condition is fulfilled. The condition is optional
 and if it's missing then the defined fields are always dropped. The `@timestamp` and `type` fields cannot be dropped,
 even if they show up in the `drop_fields` list.
+
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+
+[source,yaml]
+-----------------------------------------------------
+filters:
+ - drop_fields:
+     [condition]
+     fields: ["field1", "field2", ...]
+-----------------------------------------------------
+
+coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
 
 [source,yaml]
 -----------------------------------------------------
@@ -198,6 +242,17 @@ NOTE: If you define an empty list of fields under `drop_fields`, then no fields 
 
 The `drop_event` action drops the entire event if the associated condition is fulfilled. The condition is mandatory, as
 without one all the events are dropped.
+
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+
+[source,yaml]
+------
+filters:
+ - drop_event:
+     condition
+------
+
+coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
 
 [source,yaml]
 ------

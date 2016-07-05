@@ -1,7 +1,7 @@
 [[filtering-data]]
-== Filtering the Exported Data
+== Filtering and Enhancing the Exported Data
 
-When your use case requires only a subset of the data exported by Filebeat, you can <<filebeat-filtering-overview,use Filebeat config options to filter the data>>, or you can <<generic-filtering-overview-filebeat,use the generic filtering provided by libbeat>>.
+When your use case requires only a subset of the data exported by Filebeat or you need to add metadata, you can <<filebeat-filtering-overview,use Filebeat config options to filter the data>>, or you can  <<defining-processors,define processors>>.
 
 [float]
 [[filebeat-filtering-overview]]
@@ -26,12 +26,14 @@ The disadvantage of this approach is that you need to implement a configuration 
 See <<configuration-filebeat-options,Filebeat configuration options>> for more information about each option.
 
 [float]
-[[generic-filtering-overview-filebeat]]
-=== Generic Filtering
+[[defining-processors]]
+=== Defining Processors
 
 include::../../libbeat/docs/filtering.asciidoc[]
 
-For example, the following filter configuration drops all the DEBUG messages.
+For example, the following configuration drops all the DEBUG messages.
+
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
 
 [source,yaml]
 -----------------------------------------------------
@@ -41,14 +43,38 @@ filters:
       message: "^DBG:"
 -----------------------------------------------------
 
+coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - drop_event:
+     when:
+        regexp:
+           message: "^DBG:"
+-----------------------------------------------------
+
 To drop all the log messages coming from a certain log file:
+
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
 
 [source,yaml]
 ----------------
 filters:
  - drop_event:
-    contains:
-     source: "test"
+     contains:
+        source: "test"
 ----------------
 
-See <<configuration-filter,filter configuration options>> for more information.
+coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+
+[source,yaml]
+----------------
+processors:
+ - drop_event:
+     when:
+        contains:
+           source: "test"
+----------------
+
+See <<configuration-filter>> for more information.

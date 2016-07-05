@@ -1,5 +1,5 @@
 [[filtering-data]]
-== Filtering the Exported Data
+== Filtering and Enhancing the Exported Data
 
 include::../../libbeat/docs/filtering.asciidoc[]
 
@@ -12,4 +12,4 @@ filters:
       fields: [provider_guid, process_id, thread_id, version, event_data.ErrorSourceTable]
 -----------------------------------------------------
 
-See <<configuration-filter,filter configuration options>> for more information.
+See <<configuration-filter>> for more information.
