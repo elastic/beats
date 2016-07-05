@@ -19,6 +19,21 @@ func TestSnapshotExpvars(t *testing.T) {
 	assert.Equal(t, vals["test"], int64(42))
 }
 
+func TestSnapshotExpvarsMap(t *testing.T) {
+	test := expvar.NewMap("testMap")
+	test.Add("hello", 42)
+
+	map2 := new(expvar.Map).Init()
+	map2.Add("test", 5)
+	test.Set("map2", map2)
+
+	vals := map[string]int64{}
+	snapshotExpvars(vals)
+
+	assert.Equal(t, vals["testMap.hello"], int64(42))
+	assert.Equal(t, vals["testMap.map2.test"], int64(5))
+}
+
 func TestBuildMetricsOutput(t *testing.T) {
 	test := expvar.NewInt("testLog")
 	test.Add(1)
