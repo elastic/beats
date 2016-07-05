@@ -4,6 +4,17 @@
 This section contains frequently asked questions about Filebeat. Also check out the
 https://discuss.elastic.co/c/beats/filebeat[Filebeat discussion forum].
 
+* <<filebeat-network-volumes>>
+* <<filebeat-not-collecting-lines>>
+* <<filebeat-cpu>>
+* <<dashboard-fields-incorrect-filebeat>>
+* <<newline-character-required-eof>>
+* <<connection-problem>>
+* <<metadata-missing>>
+* <<diff-logstash-beats>>
+* <<ssl-client-fails>>
+
+
 [[filebeat-network-volumes]]
 === Why can't I read log files from network volumes?
 
@@ -11,6 +22,7 @@ We do not recommend reading log files from network volumes. Whenever possible, i
 send the log files directly from there. Reading files from network volumes (especially on Windows) can have unexpected side
 effects. For example, changed file identifiers may result in Filebeat reading a log file from scratch again.
 
+[[filebeat-not-collecting-lines]]
 === Why isn’t Filebeat collecting lines from my file?
 
 Filebeat might be incorrectly configured or unable to send events to the output. To resolve the issue:
@@ -40,5 +52,12 @@ config file. Setting `scan_frequency` to less than 1s may cause Filebeat to scan
 === Why is the dashboard in Kibana breaking up my data fields incorrectly?
 
 The index template might not be loaded correctly. See <<filebeat-template>>.
+
+[[newline-character-required-eof]]
+=== Why isn't Filebeat shipping the last line of my file?
+
+Filebeat uses a newline character to detect the end of an event. If lines are added incrementally to a file that's being
+harvested, a newline character is required after the last line, or Filebeat will not read the last line of
+the file.
 
 include::../../libbeat/docs/shared-faq.asciidoc[]
