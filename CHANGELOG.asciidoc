@@ -58,8 +58,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 
 *Filebeat*
 - Introduce close_removed and close_renamed harvester options {issue}1600[1600]
-- Introduce close_eof harvester options {issue}1600[1600]
-
+- Introduce close_eof harvester option {issue}1600[1600]
+- Add clean_removed config option {issue}1600[1600]
 
 *Winlogbeat*
 

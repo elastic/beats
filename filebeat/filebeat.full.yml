@@ -170,7 +170,7 @@ filebeat.prospectors:
   # Note: Potential data loss if renamed file is not picked up by prospector.
   #close_renamed: false
 
-  # When enabling this option, a file handler is closed immidiately in case a file can't be found
+  # When enabling this option, a file handler is closed immediately in case a file can't be found
   # any more. In case the file shows up again later, harvesting will continue at the last known position
   # after scan_frequency.
   # Note: Potential data loss if file reading was not finished when file was removed.
@@ -186,6 +186,10 @@ filebeat.prospectors:
   # Files for the modification data is older then clean_older the state from the registry is removed
   # By default this is disabled.
   #clean_older: 0
+
+  # Removes the state for file which cannot be found on disk anymore immediately
+  #clean_removed: false
+
 
 #----------------------------- Stdin prospector -------------------------------
 # Configuration to use stdin input
