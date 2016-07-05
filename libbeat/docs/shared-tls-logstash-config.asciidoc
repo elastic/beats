@@ -22,7 +22,8 @@ To use TLS mutual authentication:
 {beatname_uc} and Logstash. Creating a correct SSL/TLS infrastructure is outside the scope of this
 document. There are many online resources available that describe how to create certificates.
 +
-NOTE: Certificates must be signed by your root CA. Intermediate CAs are currently not supported. 
+NOTE: Certificates must be signed by your root CA. Intermediate CAs are currently not supported. You may be able to
+use intermediate CAs by merging all the certificates in the chain into one file.
 
 . Configure {beatname_uc} to use TLS. In the +{beatname_lc}.yml+ config file, specify the following settings under
 `tls`: 
