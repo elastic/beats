@@ -693,6 +693,14 @@ output.elasticsearch:
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: true
 
+# If enabled, filebeat periodically logs its internal metrics that have changed
+# in the last period. For each metric that changed, the delta from the value at
+# the beginning of the period is logged. The default is true.
+#logging.metrics.enabled: true
+
+# The period after which to log the internal metrics. The default is 30s.
+#logging.metrics.period: 30s
+
 # Logging to rotating files files. Set logging.to_files to false to disable logging to
 # files.
 logging.to_files: true
