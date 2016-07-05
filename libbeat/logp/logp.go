@@ -157,14 +157,28 @@ func getLogLevel(config *Logging) (Priority, error) {
 	return level, nil
 }
 
-// snapshotExpvars iterates through all the defined expvars, and for the top
-// level vars that are integers it snapshots the name and value in a separate
-// map.
+// snapshotMap recursively walks expvar Maps and records their integer expvars
+// in a separate flat map.
+func snapshotMap(varsMap map[string]int64, path string, mp *expvar.Map) {
+	mp.Do(func(kv expvar.KeyValue) {
+		switch kv.Value.(type) {
+		case *expvar.Int:
+			varsMap[path+"."+kv.Key], _ = strconv.ParseInt(kv.Value.String(), 10, 64)
+		case *expvar.Map:
+			snapshotMap(varsMap, path+"."+kv.Key, kv.Value.(*expvar.Map))
+		}
+	})
+}
+
+// snapshotExpvars iterates through all the defined expvars, and for the vars
+// that are integers it snapshots the name and value in a separate (flat) map.
 func snapshotExpvars(varsMap map[string]int64) {
 	expvar.Do(func(kv expvar.KeyValue) {
 		switch kv.Value.(type) {
 		case *expvar.Int:
 			varsMap[kv.Key], _ = strconv.ParseInt(kv.Value.String(), 10, 64)
+		case *expvar.Map:
+			snapshotMap(varsMap, kv.Key, kv.Value.(*expvar.Map))
 		}
 	})
 }
