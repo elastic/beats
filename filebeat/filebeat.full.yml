@@ -83,9 +83,9 @@ filebeat.prospectors:
   # in. Default: log
   #document_type: log
 
-  # Scan frequency in seconds.
-  # How often these files should be checked for changes. In case it is set
-  # to 0s, it is done as often as possible. Default: 10s
+  # How often the prospector checks for new files in the paths that are specified
+  # for harvesting. Specify 1s to scan the directory as frequently as possible
+  # without causing Filebeat to scan too frequently. Default: 10s.
   #scan_frequency: 10s
 
   # Defines the buffer size every harvester uses when fetching the file
