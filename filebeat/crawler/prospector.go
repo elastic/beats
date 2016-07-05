@@ -301,7 +301,16 @@ func (p *Prospector) scan(path string, output chan *input.FileEvent) {
 		newInfo := harvester.NewFileStat(fileinfo, p.iteration)
 
 		// Call crawler if there if there exists a state for the given file
-		offset, resuming := p.registrar.fetchState(file, newInfo.Fileinfo)
+		foundState, resuming := p.registrar.fetchState(file, newInfo.Fileinfo)
+		for foundState != nil && !foundState.FileStateOS.IsSame(input.GetOSFileState(&newInfo.Fileinfo)) {
+			logp.Debug("prospector", "Refetching state")
+			foundState, resuming = p.registrar.fetchState(file, newInfo.Fileinfo)
+		}
+
+		var offset int64 = 0
+		if foundState != nil {
+			offset = foundState.Offset
+		}
 
 		p.oldStates[file] = oldState{
 			fileinfo: fileinfo,
