@@ -1,0 +1,43 @@
+== How Filebeat works
+
+This page intends to explain what the key building blocks of Filebeat are and how they work together. The goal is that the available configuration options can be better understood and more informed decisions can be made about the optimal configuration options for the different use cases.
+
+[float]
+=== What is a harvester?
+
+A harvester is responsible to read the content of a single file. This is done by reading each file line by line and send the content to the output. For each file one harvester is started. The harvester is responsible to open and close files. That means, as long as a harvester is running, the file descriptor stays open. Even if a file is removed or renamed, filebeat will keep reading the file. This has the side affect that the space on your disk will be reserved until the harvester is stopped.
+
+Stopping a harvester has the following consequences:
+
+* The file handler is closed, freeing up the underlying resources if the file was deleted
+* The harvesting of the file will only be started again after `scan_frequency`
+* In case the file was moved / removed, harvesting the file will not continue
+
+To define more in detail when a harvester is closed, use the <<close-options>> configuration options.
+
+[float]
+=== What is a prospector?
+
+A prospector is reponsible to manage the harvesters.  The responsibility of the prospector is to find all sources it should read from. In case of the log input type it is to find all files on the drive based on the defined paths and start a harvester for each file that was found. Each prospector runs in its own go routine and is responsible to manage the harvesters. Each prospector configuration looks as following:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /var/log/*.log
+    - /var/path2/*.log
+-------------------------------------------------------------------------------------
+
+Filebeat currently supports two `prospector` types: `log` and `stdin`. Each prospector type can be defined multiple times. The log prospector checks for each file if a harvester has to be started, if one is already running or the file can be ignored because of configuration options which were set. New files are only picked up, if the offset / size of the file changed since the harvester was closed.
+
+[float]
+=== What is a state?
+
+Filebeat keeps the state of each file and frequently flushes the state to disk to the registry file. The state is used to remember the last offset a harvester was reading from and to ensure all log lines are sent. In case Elasticsearch/Logstash are not reachable, Filebeat will keep track of the last lines sent and will continue reading the files as soon Elasicsearch/Logstash becomes available again. As long as filebeat is running, the state information is also kept in memory by each prospector. In case of a filebeat restart, the data from the registry file is used to rebuild the state and filebeat continues each harvester at the last known position.
+
+Each prospector keeps a state for each file it finds. As files can be renamed or moved, the filename and path are not enough to identify a file. For each file unique identifiers are stored to detect if a file the same file that was harvested previously.
+
+For more details on how to configure the state, checkout out the <<reduce-registry-size>> troubleshooting guide.
+
+
