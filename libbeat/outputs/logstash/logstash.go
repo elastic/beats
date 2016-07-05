@@ -22,14 +22,14 @@ var debug = logp.MakeDebug("logstash")
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	ackedEvents            = expvar.NewInt("libbeatLogstashPublishedAndAckedEvents")
-	eventsNotAcked         = expvar.NewInt("libbeatLogstashPublishedButNotAckedEvents")
-	publishEventsCallCount = expvar.NewInt("libbeatLogstashPublishEventsCallCount")
+	ackedEvents            = expvar.NewInt("libbeat.logstash.published_and_acked_events")
+	eventsNotAcked         = expvar.NewInt("libbeat.logstash.published_but_not_acked_events")
+	publishEventsCallCount = expvar.NewInt("libbeat.logstash.call_count.PublishEvents")
 
-	statReadBytes   = expvar.NewInt("libbeatLogstashPublishReadBytes")
-	statWriteBytes  = expvar.NewInt("libbeatLogstashPublishWriteBytes")
-	statReadErrors  = expvar.NewInt("libbeatLogstashPublishReadErrors")
-	statWriteErrors = expvar.NewInt("libbeatLogstashPublishWriteErrors")
+	statReadBytes   = expvar.NewInt("libbeat.logstash.publish.read_bytes")
+	statWriteBytes  = expvar.NewInt("libbeat.logstash.publish.write_bytes")
+	statReadErrors  = expvar.NewInt("libbeat.logstash.publish.read_errors")
+	statWriteErrors = expvar.NewInt("libbeat.logstash.publish.write_errors")
 )
 
 const (

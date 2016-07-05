@@ -99,7 +99,7 @@ var (
 )
 
 var (
-	unmatchedResponses = expvar.NewInt("pgsqlUnmatchedResponses")
+	unmatchedResponses = expvar.NewInt("pgsql.unmatched_responses")
 )
 
 type Pgsql struct {

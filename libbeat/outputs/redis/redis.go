@@ -24,10 +24,10 @@ var debugf = logp.MakeDebug("redis")
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	statReadBytes   = expvar.NewInt("libbeatRedisPublishReadBytes")
-	statWriteBytes  = expvar.NewInt("libbeatRedisPublishWriteBytes")
-	statReadErrors  = expvar.NewInt("libbeatRedisPublishReadErrors")
-	statWriteErrors = expvar.NewInt("libbeatRedisPublishWriteErrors")
+	statReadBytes   = expvar.NewInt("libbeat.redis.publish.read_bytes")
+	statWriteBytes  = expvar.NewInt("libbeat.redis.publish.write_bytes")
+	statReadErrors  = expvar.NewInt("libbeat.redis.publish.read_errors")
+	statWriteErrors = expvar.NewInt("libbeat.redis.publish.write_errors")
 )
 
 const (

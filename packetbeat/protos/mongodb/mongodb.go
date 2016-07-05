@@ -37,7 +37,7 @@ type transactionKey struct {
 }
 
 var (
-	unmatchedRequests = expvar.NewInt("mongodbUnmatchedRequests")
+	unmatchedRequests = expvar.NewInt("mongodb.unmatched_requests")
 )
 
 func init() {

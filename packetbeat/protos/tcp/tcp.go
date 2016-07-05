@@ -33,7 +33,7 @@ type Processor interface {
 }
 
 var (
-	droppedBecauseOfGaps = expvar.NewInt("tcpDroppedBecauseOfGaps")
+	droppedBecauseOfGaps = expvar.NewInt("tcp.dropped_because_of_gaps")
 )
 
 type seqCompare int
