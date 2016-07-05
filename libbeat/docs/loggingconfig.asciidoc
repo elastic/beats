@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-logging]]
-=== Logging Configuration (Optional)
+=== Logging Configuration
 
 The `logging` section of the +{beatname_lc}.yml+ config file contains options
 for configuring the Beats logging output. The logging system can write logs to
