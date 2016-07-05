@@ -14,6 +14,7 @@ var (
 		ScanFrequency: 10 * time.Second,
 		InputType:     cfg.DefaultInputType,
 		CleanOlder:    0,
+		CleanRemoved:  false,
 	}
 )
 
@@ -24,6 +25,7 @@ type prospectorConfig struct {
 	ScanFrequency time.Duration    `config:"scan_frequency"`
 	InputType     string           `config:"input_type"`
 	CleanOlder    time.Duration    `config:"clean_older" validate:"min=0"`
+	CleanRemoved  bool             `config:"clean_removed"`
 }
 
 func (config *prospectorConfig) Validate() error {
