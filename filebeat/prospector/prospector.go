@@ -129,7 +129,7 @@ func (p *Prospector) Run() {
 			logp.Info("Prospector ticker stopped")
 			return
 		case <-time.After(p.config.ScanFrequency):
-			logp.Info("Run prospector")
+			logp.Debug("prospector", "Run prospector")
 			p.prospectorer.Run()
 		}
 	}
