@@ -1,10 +1,10 @@
 [[filtering-data]]
-== Filtering the Exported Data
+== Filtering and Enhancing the Exported Data
 
-When your use case requires only a subset of the data exported by Metricbeat,
+When your use case requires only a subset of the data exported by Metricbeat or you need to add metadata,
 you can <<metricbeat-filtering-overview,use Metricbeat config options to filter
-the data>>, or you can <<generic-filtering-overview-metricbeat,use the generic
-filtering provided by libbeat>>.
+the data>>, or you can  <<defining-processors,define processors>>.
+
 
 [float]
 [[metricbeat-filtering-overview]]
@@ -32,8 +32,8 @@ metricbeat.modules:
 ----
 
 [float]
-[[generic-filtering-overview-metricbeat]]
-=== Generic Filtering
+[[defining-processors]]
+=== Defining Processors
 
 include::../../libbeat/docs/filtering.asciidoc[]
 
@@ -47,4 +47,4 @@ filters:
     fields: ['beat']
 ----
 
-See <<configuration-filter,filter configuration options>> for more information.
+See <<configuration-filter>> for more information.
