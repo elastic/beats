@@ -374,7 +374,7 @@ func (this ErrType) String() string {
 		return "errUnauthorized"
 	}
 
-	return fmt.Sprintf("ErrUnknown: 0x%x", this)
+	return "ErrUnknown"
 }
 
 const (
