@@ -81,7 +81,7 @@ func ReadOpen(path string) (*os.File, error) {
 	// This is mostly the code from syscall_windows::Open. Only difference is passing the Delete flag
 	// TODO: Open pull request to Golang so also Delete flag can be set
 	if len(path) == 0 {
-		return nil, fmt.Errorf("File '%s' not found. Error: %v", syscall.ERROR_FILE_NOT_FOUND)
+		return nil, fmt.Errorf("File '%s' not found. Error: %v", path, syscall.ERROR_FILE_NOT_FOUND)
 	}
 
 	pathp, err := syscall.UTF16PtrFromString(path)

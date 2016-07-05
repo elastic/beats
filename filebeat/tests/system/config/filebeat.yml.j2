@@ -144,7 +144,7 @@ processors:
 output.file:
   path: {{ output_file_path|default(beat.working_dir + "/output") }}
   filename: "{{ output_file_filename|default("filebeat") }}"
-  rotate_every_kb: 1000
+  rotate_every_kb: {{ rotate_every_kb | default(1000) }}
   #number_of_files: 7
 
 {% if path_data %}

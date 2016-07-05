@@ -170,25 +170,34 @@ func (h *Harvester) openFile() (encoding.Encoding, error) {
 	var encoding encoding.Encoding
 
 	f, err := file.ReadOpen(h.Path)
-	if err == nil {
-		// Check we are not following a rabbit hole (symlinks, etc.)
-		if !file.IsRegular(f) {
-			return nil, errors.New("Given file is not a regular file.")
-		}
-
-		encoding, err = h.encoding(f)
-		if err != nil {
-
-			if err == transform.ErrShortSrc {
-				logp.Info("Initialising encoding for '%v' failed due to file being too short", f)
-			} else {
-				logp.Err("Initialising encoding for '%v' failed: %v", f, err)
-			}
-			return nil, err
-		}
-
-	} else {
+	if err != nil {
 		logp.Err("Failed opening %s: %s", h.Path, err)
+		return nil, err
+	}
+
+	// Check we are not following a rabbit hole (symlinks, etc.)
+	if !file.IsRegular(f) {
+		return nil, errors.New("Given file is not a regular file.")
+	}
+
+	info, err := f.Stat()
+	if err != nil {
+		logp.Err("Failed getting stats for file %s: %s", h.Path, err)
+		return nil, err
+	}
+	// Compares the stat of the opened file to the state given by the prospector. Abort if not match.
+	if !os.SameFile(h.State.Fileinfo, info) {
+		return nil, errors.New("File info is not identical with opened file. Aborting harvesting and retrying file later again.")
+	}
+
+	encoding, err = h.encoding(f)
+	if err != nil {
+
+		if err == transform.ErrShortSrc {
+			logp.Info("Initialising encoding for '%v' failed due to file being too short", f)
+		} else {
+			logp.Err("Initialising encoding for '%v' failed: %v", f, err)
+		}
 		return nil, err
 	}
 
@@ -273,12 +282,12 @@ func (h *Harvester) close() {
 	logp.Debug("harvester", "Stopping harvester for file: %s", h.Path)
 
 	// Make sure file is closed as soon as harvester exits
-	// If file was never properly opened, it can't be closed
+	// If file was never opened, it can't be closed
 	if h.file != nil {
 		h.file.Close()
 		logp.Debug("harvester", "Stopping harvester, closing file: %s", h.Path)
 	} else {
-		logp.Warn("harvester", "Stopping harvester, NOT closing file as file info not available: %s", h.Path)
+		logp.Warn("Stopping harvester, NOT closing file as file info not available: %s", h.Path)
 	}
 }
 
