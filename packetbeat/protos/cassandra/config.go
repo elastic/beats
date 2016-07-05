@@ -7,8 +7,8 @@ import (
 
 type cassandraConfig struct {
 	config.ProtocolCommon `config:",inline"`
-	SendRequestHeader     bool `config:"send_request_header"`
-	SendResponseHeader    bool `config:"send_response_header"`
+	SendRequestHeader     bool   `config:"send_request_header"`
+	SendResponseHeader    bool   `config:"send_response_header"`
 	Compressor            string `config:"compressor"`
 }
 

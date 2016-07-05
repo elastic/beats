@@ -10,13 +10,12 @@ type Compressor interface {
 	Decode(data []byte) ([]byte, error)
 }
 
-const Snappy  string =  "snappy"
+const Snappy string = "snappy"
 
 // SnappyCompressor implements the Compressor interface and can be used to
 // compress incoming and outgoing frames. The snappy compression algorithm
 // aims for very high speeds and reasonable compression.
 type SnappyCompressor struct{}
-
 
 func (s SnappyCompressor) Name() string {
 	return Snappy
@@ -30,14 +29,14 @@ func (s SnappyCompressor) Decode(data []byte) ([]byte, error) {
 	return snappy.Decode(nil, data)
 }
 
-const LZ4  string =  "lz4"
+const LZ4 string = "lz4"
 
-type LZ4Compressor struct{
+type LZ4Compressor struct {
 	//TODO
 }
 
-const Deflate  string =  "deflate"
+const Deflate string = "deflate"
 
-type DeflateCompressor struct{
+type DeflateCompressor struct {
 	//TODO
 }

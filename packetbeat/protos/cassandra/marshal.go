@@ -11,9 +11,9 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"gopkg.in/inf.v0"
 	"strings"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // TypeInfo describes a Cassandra specific data type.
