@@ -5,7 +5,7 @@ package memory
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	system "github.com/elastic/beats/metricbeat/module/system/common"
+	"github.com/elastic/beats/metricbeat/module/system"
 
 	"github.com/pkg/errors"
 )

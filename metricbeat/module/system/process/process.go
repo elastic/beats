@@ -5,7 +5,6 @@ package process
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	system "github.com/elastic/beats/metricbeat/module/system/common"
 
 	"github.com/pkg/errors"
 )
@@ -19,7 +18,7 @@ func init() {
 // MetricSet that fetches process metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	stats *system.ProcStats
+	stats *ProcStats
 }
 
 // New creates and returns a new MetricSet.
@@ -36,7 +35,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	m := &MetricSet{
 		BaseMetricSet: base,
-		stats: &system.ProcStats{
+		stats: &ProcStats{
 			ProcStats: true,
 			Procs:     config.Procs,
 		},

@@ -1,6 +1,6 @@
 // +build !integration
 
-package common
+package cpu
 
 import (
 	"testing"

@@ -5,7 +5,7 @@ package core
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	system "github.com/elastic/beats/metricbeat/module/system/common"
+	"github.com/elastic/beats/metricbeat/module/system/cpu"
 
 	"github.com/pkg/errors"
 )
@@ -19,7 +19,7 @@ func init() {
 // MetricSet for fetching system core metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	cpu *system.CPU
+	cpu *cpu.CPU
 }
 
 // New is a mb.MetricSetFactory that returns a cores.MetricSet.
@@ -37,7 +37,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		cpu: &system.CPU{
+		cpu: &cpu.CPU{
 			CpuPerCore: true,
 			CpuTicks:   config.CpuTicks,
 		},
@@ -47,7 +47,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches CPU core metrics from the OS.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
-	cpuCoreStat, err := system.GetCpuTimesList()
+	cpuCoreStat, err := cpu.GetCpuTimesList()
 	if err != nil {
 		return nil, errors.Wrap(err, "cpu core times")
 	}

@@ -1,4 +1,4 @@
-package common
+package process
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/module/system"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -84,7 +85,7 @@ func GetProcMemPercentage(proc *Process, total_phymem uint64) float64 {
 	// in unit tests, total_phymem is set to a value greater than zero
 
 	if total_phymem == 0 {
-		memStat, err := GetMemory()
+		memStat, err := system.GetMemory()
 		if err != nil {
 			logp.Warn("Getting memory details: %v", err)
 			return 0
@@ -94,7 +95,7 @@ func GetProcMemPercentage(proc *Process, total_phymem uint64) float64 {
 
 	perc := (float64(proc.Mem.Resident) / float64(total_phymem))
 
-	return Round(perc, .5, 4)
+	return system.Round(perc, .5, 4)
 }
 
 func Pids() ([]int, error) {
@@ -175,7 +176,7 @@ func GetProcCpuPercentage(last *Process, current *Process) float64 {
 		delta_time := float64(current.Ctime.Sub(last.Ctime).Nanoseconds()) / float64(1e6) // in milliseconds
 		perc := float64(delta_proc) / delta_time
 
-		return Round(perc, .5, 4)
+		return system.Round(perc, .5, 4)
 	}
 	return 0
 }

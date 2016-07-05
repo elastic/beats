@@ -31,7 +31,7 @@ def generate(go_beat_path):
 
         # Fetch all metricsets
         for metricset in os.listdir(base_dir + "/" + module):
-            if os.path.isfile(base_dir + "/" + module + "/" + metricset) or metricset == "_meta" or metricset == "vendor"  or metricset == "common":
+            if os.path.isfile(base_dir + "/" + module + "/" + metricset) or metricset == "_meta" or metricset == "vendor":
                 continue
 
             list_file += '	_ "' + go_beat_path + '/module/' + module + '/' + metricset + '"\n'

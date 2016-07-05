@@ -1,6 +1,6 @@
 // +build !integration
 
-package common
+package filesystem
 
 import (
 	"os"

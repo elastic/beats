@@ -1,10 +1,11 @@
-package common
+package cpu
 
 import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/module/system"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -70,7 +71,7 @@ func GetCpuPercentage(last *CpuTimes, current *CpuTimes) *CpuTimes {
 			perc := 0.0
 			delta := int64(field2 - field1)
 			perc = float64(delta) / float64(all_delta)
-			return Round(perc, .5, 4)
+			return system.Round(perc, .5, 4)
 		}
 
 		current.UserPercent = calculate(current.Cpu.User, last.Cpu.User)
@@ -95,7 +96,7 @@ func GetCpuPercentageList(last, current []CpuTimes) []CpuTimes {
 			perc := 0.0
 			delta := int64(field2 - field1)
 			perc = float64(delta) / float64(all_delta)
-			return Round(perc, .5, 4)
+			return system.Round(perc, .5, 4)
 		}
 
 		for i := 0; i < len(last); i++ {
@@ -154,7 +155,7 @@ func (cpu *CPU) AddCpuPercentageList(t2 []CpuTimes) {
 }
 
 func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
-	loadStat, err := GetSystemLoad()
+	loadStat, err := system.GetSystemLoad()
 	if err != nil {
 		logp.Warn("Getting load statistics: %v", err)
 		return nil, err
@@ -167,27 +168,27 @@ func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
 
 	cpu.AddCpuPercentage(cpuStat)
 
-	memStat, err := GetMemory()
+	memStat, err := system.GetMemory()
 	if err != nil {
 		logp.Warn("Getting memory details: %v", err)
 		return nil, err
 	}
-	AddMemPercentage(memStat)
+	system.AddMemPercentage(memStat)
 
-	swapStat, err := GetSwap()
+	swapStat, err := system.GetSwap()
 	if err != nil {
 		logp.Warn("Getting swap details: %v", err)
 		return nil, err
 	}
-	AddSwapPercentage(swapStat)
+	system.AddSwapPercentage(swapStat)
 
 	event := common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"type":       "system",
 		"load":       loadStat,
 		"cpu":        cpu.GetCpuStatEvent(cpuStat),
-		"mem":        GetMemoryEvent(memStat),
-		"swap":       GetSwapEvent(swapStat),
+		"mem":        system.GetMemoryEvent(memStat),
+		"swap":       system.GetSwapEvent(swapStat),
 	}
 
 	return event, nil

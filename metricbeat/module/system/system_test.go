@@ -1,6 +1,6 @@
 // +build !integration
 
-package common
+package system
 
 import (
 	"runtime"
