@@ -141,15 +141,16 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	flushInterval := 0
 	bulkSize := 0
 	config, _ := common.NewConfigFrom(map[string]interface{}{
-		"hosts":          []string{getElasticsearchHost()},
-		"index":          index,
-		"flush_interval": &flushInterval,
-		"bulk_max_size":  &bulkSize,
-		"username":       os.Getenv("ES_USER"),
-		"password":       os.Getenv("ES_PASS"),
+		"hosts":            []string{getElasticsearchHost()},
+		"index":            index,
+		"flush_interval":   &flushInterval,
+		"bulk_max_size":    &bulkSize,
+		"username":         os.Getenv("ES_USER"),
+		"password":         os.Getenv("ES_PASS"),
+		"template.enabled": false,
 	})
 
-	output, err := plugin(config, 10)
+	output, err := plugin("libbeat", config, 10)
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}

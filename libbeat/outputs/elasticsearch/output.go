@@ -21,11 +21,13 @@ import (
 )
 
 type elasticsearchOutput struct {
-	index string
-	mode  mode.ConnectionMode
+	index    string
+	beatName string
+	mode     mode.ConnectionMode
 	topology
 
 	template      map[string]interface{}
+	template2x    map[string]interface{}
 	templateMutex sync.Mutex
 }
 
@@ -49,12 +51,12 @@ var (
 )
 
 // New instantiates a new output plugin instance publishing to elasticsearch.
-func New(cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
+func New(beatName string, cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
 	if !cfg.HasField("bulk_max_size") {
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
 
-	output := &elasticsearchOutput{}
+	output := &elasticsearchOutput{beatName: beatName}
 	err := output.init(cfg, topologyExpire)
 	if err != nil {
 		return nil, err
@@ -76,7 +78,7 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
-	err = out.readTemplate(config.Template)
+	err = out.readTemplate(&config.Template)
 	if err != nil {
 		return err
 	}
@@ -110,19 +112,40 @@ func (out *elasticsearchOutput) init(
 }
 
 // readTemplates reads the ES mapping template from the disk, if configured.
-func (out *elasticsearchOutput) readTemplate(config Template) error {
-	if len(config.Name) > 0 {
+func (out *elasticsearchOutput) readTemplate(config *Template) error {
+	if config.Enabled {
+		// Set the defaults that depend on the beat name
+		if config.Name == "" {
+			config.Name = out.beatName
+		}
+		if config.Path == "" {
+			config.Path = fmt.Sprintf("%s.template.json", out.beatName)
+		}
+		if config.Versions.Es2x.Path == "" {
+			config.Versions.Es2x.Path = fmt.Sprintf("%s.template-es2x.json", out.beatName)
+		}
+
 		// Look for the template in the configuration path, if it's not absolute
 		templatePath := paths.Resolve(paths.Config, config.Path)
-
 		logp.Info("Loading template enabled. Reading template file: %v", templatePath)
 
 		template, err := readTemplate(templatePath)
 		if err != nil {
 			return fmt.Errorf("Error loading template %s: %v", templatePath, err)
 		}
-
 		out.template = template
+
+		if config.Versions.Es2x.Enabled {
+			// Read the version of the template compatible with ES 2.x
+			templatePath := paths.Resolve(paths.Config, config.Versions.Es2x.Path)
+			logp.Info("Loading template enabled for Elasticsearch 2.x. Reading template file: %v", templatePath)
+
+			template, err := readTemplate(templatePath)
+			if err != nil {
+				return fmt.Errorf("Error loading template %s: %v", templatePath, err)
+			}
+			out.template2x = template
+		}
 	}
 	return nil
 }
@@ -161,7 +184,13 @@ func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) er
 			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
 		}
 
-		err := client.LoadTemplate(config.Name, out.template)
+		template := out.template
+		if config.Versions.Es2x.Enabled && strings.HasPrefix(client.Connection.version, "2.") {
+			logp.Info("Detected Elasticsearch 2.x. Automatically selecting the 2.x version of the template")
+			template = out.template2x
+		}
+
+		err := client.LoadTemplate(config.Name, template)
 		if err != nil {
 			return fmt.Errorf("Could not load template: %v", err)
 		}

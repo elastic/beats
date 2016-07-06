@@ -3,6 +3,7 @@ package elasticsearch
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"expvar"
 	"fmt"
@@ -46,6 +47,7 @@ type Connection struct {
 	onConnectCallback func() error
 
 	encoder bodyEncoder
+	version string
 }
 
 // Metrics that can retrieved through the expvar web interface.
@@ -495,7 +497,7 @@ func (client *Client) CheckTemplate(templateName string) bool {
 
 func (conn *Connection) Connect(timeout time.Duration) error {
 	var err error
-	conn.connected, err = conn.Ping(timeout)
+	conn.connected, conn.version, err = conn.Ping(timeout)
 	if err != nil {
 		return err
 	}
@@ -510,18 +512,35 @@ func (conn *Connection) Connect(timeout time.Duration) error {
 	return nil
 }
 
-func (conn *Connection) Ping(timeout time.Duration) (bool, error) {
+// Ping sends a GET request to the Elasticsearch
+func (conn *Connection) Ping(timeout time.Duration) (bool, string, error) {
 	debugf("ES Ping(url=%v, timeout=%v)", conn.URL, timeout)
 
 	conn.http.Timeout = timeout
-	status, _, err := conn.execRequest("HEAD", conn.URL, nil)
+	status, body, err := conn.execRequest("GET", conn.URL, nil)
 	if err != nil {
 		debugf("Ping request failed with: %v", err)
-		return false, err
+		return false, "", err
+	}
+
+	if status >= 300 {
+		return false, "", fmt.Errorf("Non 2xx response code: %d", status)
+	}
+
+	var response struct {
+		Version struct {
+			Number string
+		}
+	}
+
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return false, "", fmt.Errorf("Failed to parse JSON response: %v", err)
 	}
 
 	debugf("Ping status code: %v", status)
-	return status < 300, nil
+	logp.Info("Connected to Elasticsearch version %s", response.Version.Number)
+	return true, response.Version.Number, nil
 }
 
 func (conn *Connection) IsConnected() bool {

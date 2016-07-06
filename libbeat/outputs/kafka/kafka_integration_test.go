@@ -69,7 +69,7 @@ func newTestKafkaOutput(t *testing.T, topic string, useType bool) outputs.Output
 		t.Fatal(err)
 	}
 
-	output, err := New(cfg, 0)
+	output, err := New("libbeat", cfg, 0)
 	if err != nil {
 		t.Fatal(err)
 	}

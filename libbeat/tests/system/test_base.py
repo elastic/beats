@@ -68,7 +68,9 @@ class Test(BaseTest):
         """
         shutil.copy("../../_meta/config.yml",
                     os.path.join(self.working_dir, "libbeat.yml"))
-        with open(self.working_dir + "/beatname.template.json", "w") as f:
+        with open(self.working_dir + "/mockbeat.template.json", "w") as f:
+            f.write('{"template": true}')
+        with open(self.working_dir + "/mockbeat.template-es2x.json", "w") as f:
             f.write('{"template": true}')
 
         exit_code = self.run_beat(
