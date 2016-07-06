@@ -1,3 +1,6 @@
+// +build !integration
+// +build darwin freebsd linux openbsd
+
 package core
 
 import (

@@ -1,4 +1,4 @@
-// +build darwin linux windows
+// +build darwin freebsd linux windows
 
 package process
 
