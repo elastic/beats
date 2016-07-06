@@ -1,5 +1,5 @@
 [[configuration-run-options]]
-=== Run Options Configuration (Optional)
+=== Run Options Configuration
 
 The Beat can drop privileges after creating the sniffing socket.
 Root access is required for opening the socket, but everything else requires no
