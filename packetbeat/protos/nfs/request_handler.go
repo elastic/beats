@@ -22,7 +22,7 @@ var ACCEPT_STATUS = [...]string{
 }
 
 var (
-	unmatchedRequests = expvar.NewInt("nfsUnmatchedRequests")
+	unmatchedRequests = expvar.NewInt("nfs.unmatched_requests")
 )
 
 // called by Cache, when re reply seen within expected time window

@@ -33,7 +33,7 @@ const (
 )
 
 var (
-	unmatchedResponses = expvar.NewInt("httpUnmatchedResponses")
+	unmatchedResponses = expvar.NewInt("http.unmatched_responses")
 )
 
 type stream struct {

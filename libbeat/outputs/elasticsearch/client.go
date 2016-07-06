@@ -50,14 +50,14 @@ type Connection struct {
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	ackedEvents            = expvar.NewInt("libbeatEsPublishedAndAckedEvents")
-	eventsNotAcked         = expvar.NewInt("libbeatEsPublishedButNotAckedEvents")
-	publishEventsCallCount = expvar.NewInt("libbeatEsPublishEventsCallCount")
+	ackedEvents            = expvar.NewInt("libbeat.es.published_and_acked_events")
+	eventsNotAcked         = expvar.NewInt("libbeat.es.published_but_not_acked_events")
+	publishEventsCallCount = expvar.NewInt("libbeat.es.call_count.PublishEvents")
 
-	statReadBytes   = expvar.NewInt("libbeatEsPublishReadBytes")
-	statWriteBytes  = expvar.NewInt("libbeatEsPublishWriteBytes")
-	statReadErrors  = expvar.NewInt("libbeatEsPublishReadErrors")
-	statWriteErrors = expvar.NewInt("libbeatEsPublishWriteErrors")
+	statReadBytes   = expvar.NewInt("libbeat.es.publish.read_bytes")
+	statWriteBytes  = expvar.NewInt("libbeat.es.publish.write_bytes")
+	statReadErrors  = expvar.NewInt("libbeat.es.publish.read_errors")
+	statWriteErrors = expvar.NewInt("libbeat.es.publish.write_errors")
 )
 
 var (

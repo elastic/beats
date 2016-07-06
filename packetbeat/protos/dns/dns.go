@@ -43,8 +43,8 @@ const (
 type Transport uint8
 
 var (
-	unmatchedRequests  = expvar.NewInt("dnsUnmatchedRequests")
-	unmatchedResponses = expvar.NewInt("dnsUnmatchedResponses")
+	unmatchedRequests  = expvar.NewInt("dns.unmatched_requests")
+	unmatchedResponses = expvar.NewInt("dns.unmatched_responses")
 )
 
 const (
