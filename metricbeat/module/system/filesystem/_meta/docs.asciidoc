@@ -1,3 +1,12 @@
 === System Filesystem Metricset
 
-The System `filesystem` metricset provides file system statistics. For each file system, one document is provided.
+The System `filesystem` metricset provides file system statistics. For each file
+system, one document is provided.
+
+This metricset is available on:
+
+- Darwin
+- FreeBSD
+- Linux
+- OpenBSD
+- Windows

@@ -10,7 +10,7 @@ ES_BEATS?=..
 # Metricbeat can only be cross-compiled on platforms not requiring CGO which
 # are the same platforms where the system metrics (cpu, memory) are not
 # implemented.
-GOX_OS=solaris freebsd netbsd
+GOX_OS=solaris netbsd
 GOX_FLAGS='-arch=amd64'
 
 include ${ES_BEATS}/libbeat/scripts/Makefile

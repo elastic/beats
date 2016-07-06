@@ -31,12 +31,14 @@ SYSTEM_MEMORY_FIELDS = ["swap", "actual", "free", "total", "used.bytes", "used.p
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
                          "in.packets", "in.error", "out.error", "in.dropeed", "out.dropped"]
 
-SYSTEM_PROCESS_FIELDS = ["cmdline", "cpu", "memory", "name", "pid", "ppid",
-                         "state", "username"]
+# cmdline is also part of the system process fields, but it may not be present
+# for some kernel level processes.
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "state",
+                         "username"]
 
 
 class SystemTest(metricbeat.BaseTest):
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu(self):
         """
         Test cpu system output.
@@ -62,7 +64,7 @@ class SystemTest(metricbeat.BaseTest):
         cpu = evt["system"]["cpu"]
         self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS), cpu.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu_ticks_option(self):
         """
         Test cpu_ticks configuration option.
@@ -91,7 +93,7 @@ class SystemTest(metricbeat.BaseTest):
             cpuStats = evt["system"]["cpu"]
             self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS_ALL), cpuStats.keys())
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|openbsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core(self):
         """
         Test core system output.
@@ -117,8 +119,8 @@ class SystemTest(metricbeat.BaseTest):
             core = evt["system"]["core"]
             self.assertItemsEqual(self.de_dot(SYSTEM_CORE_FIELDS), core.keys())
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|openbsd", sys.platform), "os")
-    def test_core(self):
+    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
+    def test_core_with_cpu_ticks(self):
         """
         Test core system output.
         """
@@ -172,7 +174,7 @@ class SystemTest(metricbeat.BaseTest):
             diskio = evt["system"]["diskio"]
             self.assertItemsEqual(self.de_dot(SYSTEM_DISKIO_FIELDS), diskio.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
         """
         Test system/filesystem output.
@@ -198,7 +200,7 @@ class SystemTest(metricbeat.BaseTest):
             filesystem = evt["system"]["filesystem"]
             self.assertItemsEqual(self.de_dot(SYSTEM_FILESYSTEM_FIELDS), filesystem.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_fsstat(self):
         """
         Test system/fsstat output.
@@ -224,7 +226,7 @@ class SystemTest(metricbeat.BaseTest):
         fsstat = evt["system"]["fsstat"]
         self.assertItemsEqual(SYSTEM_FSSTAT_FIELDS, fsstat.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_memory(self):
         """
         Test system memory output.
@@ -290,7 +292,7 @@ class SystemTest(metricbeat.BaseTest):
             network = evt["system"]["network"]
             self.assertItemsEqual(self.de_dot(SYSTEM_NETWORK_FIELDS), network.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
         """
         Test system/process output.
@@ -311,11 +313,18 @@ class SystemTest(metricbeat.BaseTest):
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
 
+        found_cmdline = False
         for evt in output:
             self.assert_fields_are_documented(evt)
             process = evt["system"]["process"]
+            cmdline = process.pop("cmdline", None)
+            if cmdline is not None:
+                found_cmdline = True
             self.assertItemsEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
+        self.assertTrue(found_cmdline, "cmdline not found in any process events")
+
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_metricbeat(self):
         """
         Checks that the per proc stats are found in the output and
@@ -339,7 +348,6 @@ class SystemTest(metricbeat.BaseTest):
         assert isinstance(output["system.process.state"], basestring)
         assert isinstance(output["system.process.cpu.start_time"], basestring)
         self.check_username(output["system.process.username"])
-
 
     def check_username(self, observed, expected = None):
         if expected == None:
