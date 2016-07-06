@@ -1,4 +1,4 @@
-[[filtering-data]]
+[[filtering-and-enhancing-data]]
 == Filtering and Enhancing the Exported Data
 
 When your use case requires only a subset of the data exported by Metricbeat or you need to add metadata,
@@ -35,7 +35,7 @@ metricbeat.modules:
 [[defining-processors]]
 === Defining Processors
 
-include::../../libbeat/docs/filtering.asciidoc[]
+include::../../libbeat/docs/processors.asciidoc[]
 
 For example, the following filters configuration reduces the exported fields by
 dropping the `beat.name` and `beat.hostname` fields under `beat`, from all documents.
@@ -47,4 +47,4 @@ filters:
     fields: ['beat']
 ----
 
-See <<configuration-filter>> for more information.
+See <<configuration-processors>> for more information.

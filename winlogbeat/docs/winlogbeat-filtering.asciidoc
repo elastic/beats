@@ -1,7 +1,7 @@
-[[filtering-data]]
+[[filtering-and-enhancing-data]]
 == Filtering and Enhancing the Exported Data
 
-include::../../libbeat/docs/filtering.asciidoc[]
+include::../../libbeat/docs/processors.asciidoc[]
 
 For example, the following filter configuration drops a few fields that are rarely used (`provider_guid`, `process_id`, `thread_id`, and `version`) and one nested field, `event_data.ErrorSourceTable`:
 
@@ -12,4 +12,4 @@ filters:
       fields: [provider_guid, process_id, thread_id, version, event_data.ErrorSourceTable]
 -----------------------------------------------------
 
-See <<configuration-filter>> for more information.
+See <<configuration-processors>> for more information.

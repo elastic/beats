@@ -10,7 +10,7 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 
 * <<configuration-metricbeat>>
 * <<configuration-general>>
-* <<configuration-filter>>
+* <<configuration-processors>>
 * <<elasticsearch-output>>
 * <<logstash-output>>
 * <<kafka-output>>

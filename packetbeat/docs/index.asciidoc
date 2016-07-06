@@ -45,7 +45,7 @@ include::./securing-packetbeat.asciidoc[]
 
 include::./visualizing-data-packetbeat.asciidoc[]
 
-include::./filtering.asciidoc[]
+include::./processors.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
