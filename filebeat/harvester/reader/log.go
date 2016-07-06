@@ -28,13 +28,13 @@ type logFileReader struct {
 }
 
 type LogFileReaderConfig struct {
-	CloseOlder         time.Duration
-	BackoffDuration    time.Duration
-	MaxBackoffDuration time.Duration
-	BackoffFactor      int
-	CloseRenamed       bool
-	CloseRemoved       bool
-	CloseEOF           bool
+	Backoff       time.Duration
+	MaxBackoff    time.Duration
+	BackoffFactor int
+	CloseEOF      bool
+	CloseOlder    time.Duration
+	CloseRenamed  bool
+	CloseRemoved  bool
 }
 
 func NewLogFileReader(
@@ -56,7 +56,7 @@ func NewLogFileReader(
 		offset:       offset,
 		config:       config,
 		lastTimeRead: time.Now(),
-		backoff:      config.BackoffDuration,
+		backoff:      config.Backoff,
 		done:         done,
 	}, nil
 }
@@ -78,63 +78,24 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 
 		// reset backoff
 		if err == nil {
-			r.backoff = r.config.BackoffDuration
+			r.backoff = r.config.Backoff
 			return n, nil
-		}
-
-		if err == io.EOF && r.config.CloseEOF {
-			return n, err
-		}
-
-		// Stdin is not continuable
-		if err != io.EOF || !r.fs.Continuable() {
-			logp.Err("Unexpected state reading from %s; error: %s", r.fs.Name(), err)
-			return n, err
-		}
-
-		// Refetch fileinfo to check if the file was truncated or disappeared.
-		// Errors if the file was removed/rotated after reading and before
-		// calling the stat function
-		info, statErr := r.fs.Stat()
-		if statErr != nil {
-			logp.Err("Unexpected error reading from %s; error: %s", r.fs.Name(), statErr)
-			return n, statErr
-		}
-
-		// handle fails if file was truncated
-		if info.Size() < r.offset {
-			logp.Debug("harvester",
-				"File was truncated as offset (%s) > size (%s): %s",
-				r.offset, info.Size(), r.fs.Name())
-			return n, ErrFileTruncate
-		}
-
-		age := time.Since(r.lastTimeRead)
-		if age > r.config.CloseOlder {
-			// If the file hasn't change for longer then maxInactive, harvester stops
-			// and file handle will be closed.
-			return n, ErrInactive
-		}
-
-		if r.config.CloseRenamed {
-			// Check if the file can still be found under the same path
-			if !file.IsSameFile(r.fs.Name(), info) {
-				return n, ErrRenamed
-			}
-		}
-
-		if r.config.CloseRemoved {
-			// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
-			_, statErr := os.Stat(r.fs.Name())
-
-			// Error means file does not exist.
-			if statErr != nil {
-				return n, ErrRemoved
-			}
 		}
 
 		if err != io.EOF {
 			logp.Err("Unexpected state reading from %s; error: %s", r.fs.Name(), err)
+			return n, err
+		}
+
+		// Stdin is not continuable
+		if !r.fs.Continuable() {
+			logp.Debug("harvester", "Source is not continuable: %s", r.fs.Name())
+			return n, err
+		}
+
+		err = r.errorChecks(err)
+		if err != nil {
+			return n, err
 		}
 
 		logp.Debug("harvester", "End of file reached: %s; Backoff now.", r.fs.Name())
@@ -146,15 +107,63 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 	}
 }
 
+// errorChecks checks how the given error should be handled based on the config options
+func (r *logFileReader) errorChecks(err error) error {
+	if err == io.EOF && r.config.CloseEOF {
+		return err
+	}
+
+	// Refetch fileinfo to check if the file was truncated or disappeared.
+	// Errors if the file was removed/rotated after reading and before
+	// calling the stat function
+	info, statErr := r.fs.Stat()
+	if statErr != nil {
+		logp.Err("Unexpected error reading from %s; error: %s", r.fs.Name(), statErr)
+		return statErr
+	}
+
+	// check if file was truncated
+	if info.Size() < r.offset {
+		logp.Debug("harvester",
+			"File was truncated as offset (%s) > size (%s): %s", r.offset, info.Size(), r.fs.Name())
+		return ErrFileTruncate
+	}
+
+	// Check file wasn't read for longer then CloseOlder
+	age := time.Since(r.lastTimeRead)
+	if age > r.config.CloseOlder {
+		return ErrInactive
+	}
+
+	if r.config.CloseRenamed {
+		// Check if the file can still be found under the same path
+		if !file.IsSameFile(r.fs.Name(), info) {
+			return ErrRenamed
+		}
+	}
+
+	if r.config.CloseRemoved {
+		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
+		_, statErr := os.Stat(r.fs.Name())
+
+		// Error means file does not exist.
+		if statErr != nil {
+			return ErrRemoved
+		}
+	}
+
+	return nil
+}
+
 func (r *logFileReader) wait() {
 	// Wait before trying to read file wr.ch reached EOF again
 	time.Sleep(r.backoff)
 
 	// Increment backoff up to maxBackoff
-	if r.backoff < r.config.MaxBackoffDuration {
+	if r.backoff < r.config.MaxBackoff {
 		r.backoff = r.backoff * time.Duration(r.config.BackoffFactor)
-		if r.backoff > r.config.MaxBackoffDuration {
-			r.backoff = r.config.MaxBackoffDuration
+		if r.backoff > r.config.MaxBackoff {
+			r.backoff = r.config.MaxBackoff
 		}
 	}
 }

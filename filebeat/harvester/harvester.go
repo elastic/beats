@@ -31,11 +31,12 @@ type Harvester struct {
 	offset             int64
 	state              file.State
 	prospectorChan     chan *input.FileEvent
-	encoding           encoding.EncodingFactory
 	file               source.FileSource /* the file being watched */
 	ExcludeLinesRegexp []*regexp.Regexp
 	IncludeLinesRegexp []*regexp.Regexp
 	done               chan struct{}
+	encodingFactory    encoding.EncodingFactory
+	encoding           encoding.Encoding
 }
 
 func NewHarvester(
@@ -59,23 +60,18 @@ func NewHarvester(
 	if err := cfg.Unpack(&h.config); err != nil {
 		return nil, err
 	}
-	if err := h.config.Validate(); err != nil {
-		return nil, err
-	}
 
-	encoding, ok := encoding.FindEncoding(h.config.Encoding)
-	if !ok || encoding == nil {
+	encodingFactory, ok := encoding.FindEncoding(h.config.Encoding)
+	if !ok || encodingFactory == nil {
 		return nil, fmt.Errorf("unknown encoding('%v')", h.config.Encoding)
 	}
-	h.encoding = encoding
+	h.encodingFactory = encodingFactory
 
-	h.ExcludeLinesRegexp = h.config.ExcludeLines
-	h.IncludeLinesRegexp = h.config.IncludeLines
 	return h, nil
 }
 
 // open does open the file given under h.Path and assigns the file handler to h.file
-func (h *Harvester) open() (encoding.Encoding, error) {
+func (h *Harvester) open() error {
 
 	switch h.config.InputType {
 	case config.StdinInputType:
@@ -83,6 +79,6 @@ func (h *Harvester) open() (encoding.Encoding, error) {
 	case config.LogInputType:
 		return h.openFile()
 	default:
-		return nil, fmt.Errorf("Invalid input type")
+		return fmt.Errorf("Invalid input type")
 	}
 }

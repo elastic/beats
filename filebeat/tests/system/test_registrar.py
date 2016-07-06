@@ -454,7 +454,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
-            ignoreOlder="2m",
+            ignore_older="2m",
             scan_frequency="1s"
         )
 
@@ -528,7 +528,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
-            ignoreOlder="2m",
+            ignore_older="2m",
             scan_frequency="1s"
         )
 
@@ -711,8 +711,8 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
             clean_older="4s",
-            ignoreOlder="2s",
-            closeOlder="0.2s",
+            ignore_older="2s",
+            close_older="0.2s",
             scan_frequency="0.1s"
         )
 
