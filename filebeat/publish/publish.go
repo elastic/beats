@@ -1,6 +1,7 @@
 package publish
 
 import (
+	"expvar"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -61,6 +62,10 @@ const (
 	batchCanceled
 )
 
+var (
+	eventsSent = expvar.NewInt("publish.events")
+)
+
 func New(
 	async bool,
 	in, out chan []*input.FileEvent,
@@ -108,7 +113,8 @@ func (p *syncLogPublisher) Start() {
 			}
 
 			p.client.PublishEvents(pubEvents, publisher.Sync, publisher.Guaranteed)
-			logp.Info("Events sent: %d", len(events))
+			logp.Debug("publish", "Events sent: %d", len(events))
+			eventsSent.Add(int64(len(events)))
 
 			// Tell the registrar that we've successfully sent these events
 			select {
