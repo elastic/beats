@@ -5,6 +5,7 @@ package file
 import (
 	"io/ioutil"
 	"os"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,7 +21,13 @@ func TestGetOSFileState(t *testing.T) {
 	state := GetOSState(fileinfo)
 
 	assert.True(t, state.Inode > 0)
-	assert.True(t, state.Device > 0)
+
+	if runtime.GOOS == "openbsd" {
+		// The first device on OpenBSD has an ID of 0 so allow this.
+		assert.True(t, state.Device >= 0, "Device %d", state.Device)
+	} else {
+		assert.True(t, state.Device > 0, "Device %d", state.Device)
+	}
 }
 
 func TestGetOSFileStateStat(t *testing.T) {
@@ -33,5 +40,11 @@ func TestGetOSFileStateStat(t *testing.T) {
 	state := GetOSState(fileinfo)
 
 	assert.True(t, state.Inode > 0)
-	assert.True(t, state.Device > 0)
+
+	if runtime.GOOS == "openbsd" {
+		// The first device on OpenBSD has an ID of 0 so allow this.
+		assert.True(t, state.Device >= 0, "Device %d", state.Device)
+	} else {
+		assert.True(t, state.Device > 0, "Device %d", state.Device)
+	}
 }
