@@ -25,7 +25,13 @@ type FileEvent struct {
 	Fileinfo     os.FileInfo
 	JSONFields   common.MapStr
 	JSONConfig   *processor.JSONConfig
-	FileState    file.State
+	State        file.State
+}
+
+func NewEvent(state file.State) *FileEvent {
+	return &FileEvent{
+		State: state,
+	}
 }
 
 func (f *FileEvent) ToMapStr() common.MapStr {
