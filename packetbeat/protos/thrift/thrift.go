@@ -159,8 +159,8 @@ type Thrift struct {
 }
 
 var (
-	unmatchedRequests  = expvar.NewInt("thriftUnmatchedRequests")
-	unmatchedResponses = expvar.NewInt("thriftUnmatchedResponses")
+	unmatchedRequests  = expvar.NewInt("thrift.unmatched_requests")
+	unmatchedResponses = expvar.NewInt("thrift.unmatched_responses")
 )
 
 func init() {

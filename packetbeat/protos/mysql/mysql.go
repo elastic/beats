@@ -24,8 +24,8 @@ const (
 const MAX_PAYLOAD_SIZE = 100 * 1024
 
 var (
-	unmatchedRequests  = expvar.NewInt("mysqlUnmatchedRequests")
-	unmatchedResponses = expvar.NewInt("mysqlUnmatchedResponses")
+	unmatchedRequests  = expvar.NewInt("mysql.unmatched_requests")
+	unmatchedResponses = expvar.NewInt("mysql.unmatched_responses")
 )
 
 type MysqlMessage struct {

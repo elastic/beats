@@ -49,7 +49,7 @@ var (
 )
 
 var (
-	unmatchedResponses = expvar.NewInt("redisUnmatchedResponses")
+	unmatchedResponses = expvar.NewInt("redis.unmatched_responses")
 )
 
 func init() {

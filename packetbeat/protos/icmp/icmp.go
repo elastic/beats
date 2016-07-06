@@ -51,9 +51,9 @@ const (
 )
 
 var (
-	unmatchedRequests  = expvar.NewInt("icmpUnmatchedRequests")
-	unmatchedResponses = expvar.NewInt("icmpUnmatchedResponses")
-	duplicateRequests  = expvar.NewInt("icmpDuplicateRequests")
+	unmatchedRequests  = expvar.NewInt("icmp.unmatched_requests")
+	unmatchedResponses = expvar.NewInt("icmp.unmatched_responses")
+	duplicateRequests  = expvar.NewInt("icmp.duplicate_requests")
 )
 
 func New(testMode bool, results publish.Transactions, cfg *common.Config) (*Icmp, error) {
