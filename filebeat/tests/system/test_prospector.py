@@ -251,7 +251,7 @@ class Test(BaseTest):
                 "Exiting"),
             max_timeout=10)
 
-        filebeat.check_kill_and_wait(exit_code=1)
+        filebeat.check_wait(exit_code=1)
 
     def test_no_paths_defined(self):
         """
@@ -274,7 +274,7 @@ class Test(BaseTest):
                 "Exiting"),
             max_timeout=10)
 
-        filebeat.check_kill_and_wait(exit_code=1)
+        filebeat.check_wait(exit_code=1)
 
 
     def test_files_added_late(self):
