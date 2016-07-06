@@ -660,7 +660,7 @@ Note that limiting documents in this way means that they are no longer correctly
 formatted JSON objects.
 
 [[configuration-processes]]
-=== Monitored Processes Configuration (Optional)
+=== Monitored Processes Configuration
 
 This section of the +{beatname_lc}.yml+ config file is optional, but configuring
 the processes enables Packetbeat to show you not only the servers that the
