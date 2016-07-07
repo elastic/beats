@@ -51,14 +51,14 @@ type bulkOutputAdapter struct {
 	Outputer
 }
 
-var enabledOutputPlugins = make(map[string]OutputBuilder)
+var outputsPlugins = make(map[string]OutputBuilder)
 
 func RegisterOutputPlugin(name string, builder OutputBuilder) {
-	enabledOutputPlugins[name] = builder
+	outputsPlugins[name] = builder
 }
 
 func FindOutputPlugin(name string) OutputBuilder {
-	return enabledOutputPlugins[name]
+	return outputsPlugins[name]
 }
 
 func InitOutputs(
@@ -67,9 +67,12 @@ func InitOutputs(
 	topologyExpire int,
 ) ([]OutputPlugin, error) {
 	var plugins []OutputPlugin = nil
-	for name, plugin := range enabledOutputPlugins {
+	for name, plugin := range outputsPlugins {
 		config, exists := configs[name]
 		if !exists {
+			continue
+		}
+		if !config.Enabled() {
 			continue
 		}
 

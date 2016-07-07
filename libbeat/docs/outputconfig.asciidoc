@@ -92,6 +92,14 @@ output.elasticsearch:
 
 You can specify the following options in the `elasticsearch` section of the +{beatname_lc}.yml+ config file:
 
+===== enable
+
+The enable config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
+
 [[hosts-option]]
 ===== hosts
 
@@ -357,6 +365,13 @@ output.logstash:
 You can specify the following options in the `logstash` section of the
 +{beatname_lc}.yml+ config file:
 
+===== enable
+
+The enable config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
 [[hosts]]
 ===== hosts
 
@@ -491,6 +506,13 @@ The Kafka output sends the events to Apache Kafka.
 
 You can specify the following options in the `kafka` section of the +{beatname_lc}.yml+ config file:
 
+===== enable
+
+The enable config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
 ===== hosts
 
 The list of Kafka broker addresses from where to fetch the cluster metadata.
@@ -601,6 +623,13 @@ output.redis:
 ==== Redis Output Options
 
 You can specify the following options in the `redis` section of the +{beatname_lc}.yml+ config file:
+
+===== enable
+
+The enable config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
 
 ===== hosts
 
@@ -746,6 +775,13 @@ output.file:
 
 You can specify the following options in the `file` section of the +{beatname_lc}.yml+ config file:
 
+===== enable
+
+The enable config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
 [[path]]
 ===== path
 
@@ -786,6 +822,13 @@ You can specify the following options in the `console` section of the +{beatname
 ===== pretty
 
 If `pretty` is set to true, events written to stdout will be nicely formatted. The default is false.
+
+===== enable
+
+The enable config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
 
 ===== bulk_max_size
 

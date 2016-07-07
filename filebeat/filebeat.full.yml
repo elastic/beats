@@ -299,6 +299,9 @@ filebeat.prospectors:
 
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
+  # Boolean flag to enable or disable the output module.
+  #enable: true
+
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
@@ -396,6 +399,9 @@ output.elasticsearch:
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
+  # Boolean flag to enable or disable the output module.
+  #enable: true
+
   # The Logstash hosts
   #hosts: ["localhost:5044"]
 
@@ -446,6 +452,9 @@ output.elasticsearch:
 
 #------------------------------- Kafka output ---------------------------------
 #output.kafka:
+  # Boolean flag to enable or disable the output module.
+  #enable: true
+
   # The list of Kafka broker addresses from where to fetch the cluster metadata.
   # The cluster metadata contain the actual Kafka brokers events are published
   # to.
@@ -534,6 +543,9 @@ output.elasticsearch:
 
 #------------------------------- Redis output ---------------------------------
 #output.redis:
+  # Boolean flag to enable or disable the output module.
+  #enable: true
+
   # The list of Redis servers to connect to. If load balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
@@ -630,6 +642,9 @@ output.elasticsearch:
 
 #------------------------------- File output ----------------------------------
 #output.file:
+  # Boolean flag to enable or disable the output module.
+  #enable: true
+
   # Path to the directory where to save the generated files. The option is
   # mandatory.
   #path: "/tmp/filebeat"
@@ -651,6 +666,9 @@ output.elasticsearch:
 
 #----------------------------- Console output ---------------------------------
 #output.console:
+  # Boolean flag to enable or disable the output module.
+  #enable: true
+
   # Pretty print json event
   #pretty: false
 
