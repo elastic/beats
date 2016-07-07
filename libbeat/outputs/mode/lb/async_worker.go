@@ -82,17 +82,18 @@ func (w *asyncWorker) run() {
 
 func (w *asyncWorker) connect() bool {
 	for {
-		debugf("try to (re-)connect client")
 		err := w.client.Connect(w.ctx.timeout)
-		if !w.backoff.WaitOnError(err) {
-			return true
-		}
-
 		if err == nil {
+			w.backoff.Reset()
 			return false
 		}
 
-		debugf("connect failed with: %v", err)
+		logp.Info("Connect failed with: %v", err)
+
+		cont := w.backoff.Wait()
+		if !cont {
+			return true
+		}
 	}
 }
 
