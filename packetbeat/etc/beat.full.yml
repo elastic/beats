@@ -45,20 +45,27 @@ packetbeat.interfaces.device: any
 
 #================================== Flows =====================================
 
-# Set network flow timeout. Flow is killed if no packet is received before being
-# timed out.
-packetbeat.flows.timeout: 30s
+packetbeat.flows:
+  # Enable Network flows. Default: true
+  #enabled: true
 
-# Configure reporting period. If set to -1, only killed flows will be reported
-packetbeat.flows.period: 10s
+  # Set network flow timeout. Flow is killed if no packet is received before being
+  # timed out.
+  timeout: 30s
+
+  # Configure reporting period. If set to -1, only killed flows will be reported
+  period: 10s
 
 #========================== Transaction protocols =============================
 
 packetbeat.protocols.icmp:
-  # Enable ICMPv4 and ICMPv6 monitoring. Default: false
-  enabled: true
+  # Enable ICMPv4 and ICMPv6 monitoring. Default: true
+  #enabled: true
 
 packetbeat.protocols.amqp:
+  # Enable AMQP monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for AMQP traffic. You can disable
   # the AMQP protocol by commenting out the list of ports.
   ports: [5672]
@@ -93,6 +100,9 @@ packetbeat.protocols.amqp:
   #transaction_timeout: 10s
 
 packetbeat.protocols.dns:
+  # Enable DNS monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for DNS traffic. You can disable
   # the DNS protocol by commenting out the list of ports.
   ports: [53]
@@ -120,6 +130,9 @@ packetbeat.protocols.dns:
   #transaction_timeout: 10s
 
 packetbeat.protocols.http:
+  # Enable HTTP monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for HTTP traffic. You can disable
   # the HTTP protocol by commenting out the list of ports.
   ports: [80, 8080, 8000, 5000, 8002]
@@ -166,6 +179,9 @@ packetbeat.protocols.http:
   #transaction_timeout: 10s
 
 packetbeat.protocols.memcache:
+  # Enable memcache monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for memcache traffic. You can disable
   # the Memcache protocol by commenting out the list of ports.
   ports: [11211]
@@ -212,6 +228,9 @@ packetbeat.protocols.memcache:
   #transaction_timeout: 10s
 
 packetbeat.protocols.mysql:
+  # Enable mysql monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for MySQL traffic. You can disable
   # the MySQL protocol by commenting out the list of ports.
   ports: [3306]
@@ -229,6 +248,9 @@ packetbeat.protocols.mysql:
   #transaction_timeout: 10s
 
 packetbeat.protocols.pgsql:
+  # Enable pgsql monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for Pgsql traffic. You can disable
   # the Pgsql protocol by commenting out the list of ports.
   ports: [5432]
@@ -246,6 +268,9 @@ packetbeat.protocols.pgsql:
   #transaction_timeout: 10s
 
 packetbeat.protocols.redis:
+  # Enable redis monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for Redis traffic. You can disable
   # the Redis protocol by commenting out the list of ports.
   ports: [6379]
@@ -263,6 +288,9 @@ packetbeat.protocols.redis:
   #transaction_timeout: 10s
 
 packetbeat.protocols.thrift:
+  # Enable thrift monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for Thrift-RPC traffic. You can disable
   # the Thrift-RPC protocol by commenting out the list of ports.
   ports: [9090]
@@ -315,6 +343,9 @@ packetbeat.protocols.thrift:
   #transaction_timeout: 10s
 
 packetbeat.protocols.mongodb:
+  # Enable mongodb monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for MongoDB traffic. You can disable
   # the MongoDB protocol by commenting out the list of ports.
   ports: [27017]
@@ -342,6 +373,9 @@ packetbeat.protocols.mongodb:
   #transaction_timeout: 10s
 
 packetbeat.protocols.nfs:
+  # Enable NFS monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for NFS traffic. You can disable
   # the NFS protocol by commenting out the list of ports.
   ports: [2049]

@@ -179,13 +179,20 @@ disabled.
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.flows.timeout: 30s
-packetbeat.flows.period: 10s
+packetbeat.flows:
+  timeout: 30s
+  period: 10s
 ------------------------------------------------------------------------------
 
 ==== Options
 
 You can specify the following options in the `flows` section of the +{beatname_lc}.yml+ config file:
+
+===== enabled
+
+Enables flows support if set to true. Set to false to disable network flows
+support without having to delete or comment out the flows section. The default
+value is true.
 
 ===== timeout
 
@@ -205,7 +212,7 @@ disabled, flows are still reported once being timed out. The default value is
 === Transaction Protocols Configuration
 
 The `protocols` section of the +{beatname_lc}.yml+ config file contains configuration options for each supported protocol,
-including common options like `ports`, `send_request`, `send_response`, and options that are protocol-specific.
+including common options like `enabled`, `ports`, `send_request`, `send_response`, and options that are protocol-specific.
 
 Currently, Packetbeat supports the following protocols:
 
@@ -247,6 +254,12 @@ packetbeat.protocols.thrift:
 
 The following options are available for all protocols:
 
+===== enabled
+
+The enabled setting is a boolean setting to enable or disable protocols without having to comment out configuration sections. If set to false, the protocol is disabled.
+
+The default value is true.
+
 ===== ports
 
 Exception: For ICMP the option `enabled` has to be used instead.
@@ -285,7 +298,7 @@ You can specify the following options in the `icmp` section of the +{beatname_lc
 
 ===== enabled
 
-The ICMP protocol can be enabled/disabled via this option. The default is false.
+The ICMP protocol can be enabled/disabled via this option. The default is true.
 
 If enabled Packetbeat will generate the following BPF filter: `"icmp or icmp6"`.
 
