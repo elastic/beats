@@ -79,3 +79,30 @@ class Test(BaseTest):
         assert "beat.name" in output
         assert "message" in output
         assert "test" in output["message"]
+
+    def test_condition(self):
+        """
+        Check condition in processors
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test*.log",
+            drop_event={
+                "condition": "not.contains.source: test",
+            },
+        )
+        with open(self.working_dir + "/test1.log", "w") as f:
+            f.write("test1 message\n")
+
+        with open(self.working_dir + "/test2.log", "w") as f:
+            f.write("test2 message\n")
+
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=2))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output(
+            required_fields=["@timestamp", "type"],
+        )[0]
+        assert "beat.name" in output
+        assert "message" in output
+        assert "test" in output["message"]

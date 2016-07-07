@@ -17,4 +17,9 @@ enhancing events with additional metadata. Each processor receives an event, app
 and returns the event. If you define a list of processors, they are executed in the order they are defined in the
 configuration file.
 
+[source,yaml]
+-------
+event -> processor 1 -> event1 -> processor 2 -> event2 ...
+-------
+
 The processors are defined in the {beatname_uc} configuration file.
