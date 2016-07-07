@@ -3,7 +3,6 @@ package cfgfile
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -60,22 +59,7 @@ func Load(path string) (*common.Config, error) {
 	if path == "" {
 		path = *configfile
 	}
-
-	fileContent, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read %s: %v", path, err)
-	}
-	fileContent, err = expandEnv(filepath.Base(path), fileContent)
-	if err != nil {
-		return nil, err
-	}
-
-	config, err := common.NewConfigWithYAML(fileContent, path)
-	if err != nil {
-		return nil, fmt.Errorf("YAML config parsing failed on %s: %v", path, err)
-	}
-
-	return config, nil
+	return common.LoadFile(path)
 }
 
 // IsTestConfig returns whether or not this is configuration used for testing
