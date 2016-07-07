@@ -1,8 +1,11 @@
 package common
 
 import (
+	"flag"
+
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
+	cfgflag "github.com/elastic/go-ucfg/flag"
 	"github.com/elastic/go-ucfg/yaml"
 )
 
@@ -32,6 +35,28 @@ func NewConfigWithYAML(in []byte, source string) (*Config, error) {
 	)
 	c, err := yaml.NewConfig(in, opts...)
 	return fromConfig(c), err
+}
+
+func NewFlagConfig(
+	set *flag.FlagSet,
+	def *Config,
+	name string,
+	usage string,
+) *Config {
+	opts := append(
+		[]ucfg.Option{
+			ucfg.MetaData(ucfg.Meta{"command line flag"}),
+		},
+		configOpts...,
+	)
+
+	var to *ucfg.Config
+	if def != nil {
+		to = def.access()
+	}
+
+	config := cfgflag.ConfigVar(set, to, name, usage, opts...)
+	return fromConfig(config)
 }
 
 func LoadFile(path string) (*Config, error) {

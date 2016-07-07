@@ -52,6 +52,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 - Add enable-setting to all output modules. {pull}1987[1987]
 - Command line flag -c can be used multiple times. {pull}1985[1985]
 - Add OR/AND/NOT to the condition associated with the processors. {pull}1983[1983]
+- Add '-E' CLI flag for overwriting single config options via command line. {pull}1986[1986]
 
 *Metricbeat*
 

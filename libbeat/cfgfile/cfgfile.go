@@ -15,6 +15,7 @@ var (
 	// when this variable is created. See ChangeDefaultCfgfileFlag which should
 	// be called prior to flags.Parse().
 	configfiles = flagArgList("c", "beat.yml", "Configuration file")
+	overwrites  = common.NewFlagConfig(nil, nil, "E", "Configuration overwrite")
 	testConfig  = flag.Bool("configtest", false, "Test configuration and exit.")
 )
 
@@ -51,10 +52,23 @@ func Read(out interface{}, path string) error {
 // this method reads from the configuration file specified by the '-c' command
 // line flag.
 func Load(path string) (*common.Config, error) {
+	var config *common.Config
+	var err error
+
 	if path == "" {
-		return common.LoadFiles(configfiles.list...)
+		config, err = common.LoadFiles(configfiles.list...)
+	} else {
+		config, err = common.LoadFile(path)
 	}
-	return common.LoadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	err = config.Merge(overwrites)
+	if err != nil {
+		return nil, err
+	}
+	return config, nil
 }
 
 // IsTestConfig returns whether or not this is configuration used for testing
