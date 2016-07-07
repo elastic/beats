@@ -142,7 +142,7 @@ func (s *Mode) publish(
 		return nil
 
 	sendFail:
-		logp.Info("send fail")
+		debugf("send fail")
 
 		fails++
 		if resetFail {
