@@ -204,7 +204,7 @@ func (r *Registrar) processEventStates(events []*FileEvent) {
 		if event.InputType == cfg.StdinInputType {
 			continue
 		}
-		r.states.Update(event.FileState)
+		r.states.Update(event.State)
 	}
 }
 
