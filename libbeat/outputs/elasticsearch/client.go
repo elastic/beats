@@ -582,7 +582,9 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 
 	status := resp.StatusCode
 	if status >= 300 {
-		conn.connected = false
+		if status >= 500 {
+			conn.connected = false
+		}
 		return status, nil, fmt.Errorf("%v", resp.Status)
 	}
 
