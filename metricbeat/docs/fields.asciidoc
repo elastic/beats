@@ -2729,6 +2729,21 @@ type: long
 The shared memory the process uses.
 
 
+[float]
+== uptime Fields
+
+`uptime` contains the operating system uptime metric.
+
+
+
+[float]
+=== system.uptime.uptime_ms
+
+type: long
+
+The OS uptime in milliseconds.
+
+
 [[exported-fields-zookeeper]]
 == ZooKeeper Fields
 
