@@ -1,4 +1,4 @@
-// +build darwin linux openbsd windows
+// +build darwin freebsd linux openbsd windows
 
 package memory
 

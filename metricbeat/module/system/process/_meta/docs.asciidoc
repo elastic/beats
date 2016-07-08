@@ -1,3 +1,11 @@
 === System Process Metricset
 
-The System `process` metricset provides process statistics. One document is provided for each process.
+The System `process` metricset provides process statistics. One document is
+provided for each process.
+
+This metricset is available on:
+
+- Darwin
+- FreeBSD
+- Linux
+- Windows

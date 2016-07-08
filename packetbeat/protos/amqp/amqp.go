@@ -35,8 +35,8 @@ type Amqp struct {
 }
 
 var (
-	unmatchedRequests  = expvar.NewInt("amqpUnmatchedRequests")
-	unmatchedResponses = expvar.NewInt("amqpUnmatchedResponses")
+	unmatchedRequests  = expvar.NewInt("amqp.unmatched_requests")
+	unmatchedResponses = expvar.NewInt("amqp.unmatched_responses")
 )
 
 func init() {

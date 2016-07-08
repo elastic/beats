@@ -15,7 +15,7 @@ import (
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	messagesDropped = expvar.NewInt("libbeatMessagesDropped")
+	messagesDropped = expvar.NewInt("libbeat.outputs.messages_dropped")
 )
 
 // ErrNoHostsConfigured indicates missing host or hosts configuration

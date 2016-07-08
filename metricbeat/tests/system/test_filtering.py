@@ -3,7 +3,7 @@ import sys
 import metricbeat
 import unittest
 
-@unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
+@unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
 class GlobalFiltering(metricbeat.BaseTest):
 
     def test_drop_fields(self):

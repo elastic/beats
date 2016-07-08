@@ -101,9 +101,9 @@ type memcacheStat struct {
 var debug = logp.MakeDebug("memcache")
 
 var (
-	unmatchedRequests      = expvar.NewInt("memcacheUnmatchedRequests")
-	unmatchedResponses     = expvar.NewInt("memcacheUnmatchedResponses")
-	unfinishedTransactions = expvar.NewInt("memcacheUnfinishedTransaction")
+	unmatchedRequests      = expvar.NewInt("memcache.unmatched_requests")
+	unmatchedResponses     = expvar.NewInt("memcache.unmatched_responses")
+	unfinishedTransactions = expvar.NewInt("memcache.unfinished_transactions")
 )
 
 func init() {

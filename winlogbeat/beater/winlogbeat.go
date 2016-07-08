@@ -25,8 +25,8 @@ import (
 // Metrics that can retrieved through the expvar web interface. Metrics must be
 // enable through configuration in order for the web service to be started.
 var (
-	publishedEvents = expvar.NewMap("publishedEvents")
-	ignoredEvents   = expvar.NewMap("ignoredEvents")
+	publishedEvents = expvar.NewMap("published_events")
+	ignoredEvents   = expvar.NewMap("ignored_events")
 )
 
 func init() {

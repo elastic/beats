@@ -5,7 +5,7 @@ from metricbeat import BaseTest
 
 
 class Test(BaseTest):
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_start_stop(self):
         """
         Metricbeat starts and stops without error.

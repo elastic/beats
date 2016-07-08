@@ -2,6 +2,7 @@ package registrar
 
 import (
 	"encoding/json"
+	"expvar"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -23,6 +24,10 @@ type Registrar struct {
 	states       *file.States // Map with all file paths inside and the corresponding state
 	wg           sync.WaitGroup
 }
+
+var (
+	statesUpdated = expvar.NewInt("registrar.state_updates")
+)
 
 func New(registryFile string) (*Registrar, error) {
 
@@ -234,7 +239,8 @@ func (r *Registrar) writeRegistry() error {
 	// Directly close file because of windows
 	f.Close()
 
-	logp.Info("Registry file updated. %d states written.", len(states))
+	logp.Debug("registrar", "Registry file updated. %d states written.", len(states))
+	statesUpdated.Add(int64(len(states)))
 
 	return file.SafeFileRotate(r.registryFile, tempfile)
 }

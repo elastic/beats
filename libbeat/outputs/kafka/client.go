@@ -35,9 +35,9 @@ type msgRef struct {
 }
 
 var (
-	ackedEvents            = expvar.NewInt("libbeatKafkaPublishedAndAckedEvents")
-	eventsNotAcked         = expvar.NewInt("libbeatKafkaPublishedButNotAckedEvents")
-	publishEventsCallCount = expvar.NewInt("libbeatKafkaPublishEventsCallCount")
+	ackedEvents            = expvar.NewInt("libbeat.kafka.published_and_acked_events")
+	eventsNotAcked         = expvar.NewInt("libbeat.kafka.published_but_not_acked_events")
+	publishEventsCallCount = expvar.NewInt("libbeat.kafka.call_count.PublishEvents")
 )
 
 func newKafkaClient(hosts []string, topic string, useType bool, cfg *sarama.Config) (*client, error) {
