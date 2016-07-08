@@ -596,9 +596,9 @@ Note that limiting documents in this way means that they are no longer correctly
 formatted JSON objects.
 
 [[configuration-processes]]
-=== Processes (Optional)
+=== Processes
 
-This section is optional, but configuring the processes enables Packetbeat
+Configuring the processes enables Packetbeat
 to show you not only the servers that the traffic is flowing between, but
 also the processes. Packetbeat can even show you the traffic between two
 processes running on the same host, which is particularly useful when you
