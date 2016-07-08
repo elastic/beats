@@ -25,7 +25,7 @@ class Test(BaseTest):
 
         assert exit_code == 1
         assert self.log_contains("error loading config file") is True
-        assert self.log_contains("failed to read") is True
+        assert self.log_contains("no such file or directory") is True
 
     def test_invalid_config(self):
         """
@@ -38,7 +38,6 @@ class Test(BaseTest):
 
         assert exit_code == 1
         assert self.log_contains("error loading config file") is True
-        assert self.log_contains("YAML config parsing failed") is True
 
     def test_config_test(self):
         """
