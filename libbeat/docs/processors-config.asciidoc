@@ -6,11 +6,11 @@
 //// Use the appropriate variables defined in the index.asciidoc file to
 //// resolve Beat names: beatname_uc and beatname_lc.
 //// Use the following include to pull this content into a doc file:
-//// include::../../libbeat/docs/filteringconfig.asciidoc[]
+//// include::../../libbeat/docs/processors-config.asciidoc[]
 //// Make sure this content appears below a level 2 heading.
 //////////////////////////////////////////////////////////////////////////
 
-[[configuration-filter]]
+[[configuration-processors]]
 === Processors Configuration (was Filters)
 
 //TODO: Remove was Filters from the above title and remove extra sections that show the alpha4 configuration
@@ -65,7 +65,7 @@ processors:
 
 ------
 
-See <<filtering-data>> for specific {beatname_uc} examples.
+See <<filtering-and-enhancing-data>> for specific {beatname_uc} examples.
 
 [[filtering-condition]]
 ==== Condition
