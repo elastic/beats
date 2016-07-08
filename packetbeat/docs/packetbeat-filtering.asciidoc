@@ -1,7 +1,7 @@
-[[filtering-data]]
+[[filtering-and-enhancing-data]]
 == Filtering and Enhancing the Exported Data
 
-include::../../libbeat/docs/filtering.asciidoc[]
+include::../../libbeat/docs/processors.asciidoc[]
 
 For example, the following filters configuration includes a subset of the Packetbeat DNS fields so that only the
 requests and their response codes are reported:
@@ -57,7 +57,7 @@ coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-b
 
 [source,yaml]
 ------------
-filters:
+processors:
  - drop_event:
      when:
         equals:
@@ -82,7 +82,7 @@ coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-b
 
 [source,yaml]
 ------------
-filters:
+processors:
  - drop_fields:
      when:
         equals:
@@ -90,4 +90,4 @@ filters:
      fields: ["request", "response"]
 ------------
 
-See <<configuration-filter>> for more information.
+See <<configuration-processors>> for more information.

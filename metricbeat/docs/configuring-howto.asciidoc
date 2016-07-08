@@ -25,7 +25,7 @@ A Metricbeat configuration contains a list of modules. Each module contains the 
 * `hosts`: A list of hosts to fetch information from. For some modules, such as the System module, this setting is not required.
 * `fields`: A dictionary of fields that will be sent with the metricset event. This setting is optional. 
 * `tags`: A list of tags that will be sent with the metricset event. This setting is optional.
-* `filters`: With filters you can reduce the amount of data that is sent in the event. For more about the available filter options, see <<filtering-data>>. This setting is optional. 
+* `filters`: With filters you can reduce the amount of data that is sent in the event. For more about the available filter options, see <<filtering-and-enhancing-data>>. This setting is optional. 
 
 The following example shows a basic configuration for the Apache module:
 
