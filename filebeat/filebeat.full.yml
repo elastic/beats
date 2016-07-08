@@ -118,6 +118,9 @@ filebeat.prospectors:
   # be used.
   #json.add_error_key: false
 
+  # If this setting is enabled, Filebeat don't add beats related meta data to JSON.
+  #json.plain: false
+
   ### Multiline options
 
   # Mutiline can be used for log messages spanning multiple lines. This is common
@@ -265,8 +268,8 @@ filebeat.prospectors:
 
 #================================ Processors =====================================
 
-# Processors are used to reduce the number of fields in the exported event or to 
-# enhance the event with external meta data. This section defines a list of processors 
+# Processors are used to reduce the number of fields in the exported event or to
+# enhance the event with external meta data. This section defines a list of processors
 # that are applied one by one and the first one receives the initial event:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...

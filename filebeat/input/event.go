@@ -29,18 +29,33 @@ type FileEvent struct {
 }
 
 func (f *FileEvent) ToMapStr() common.MapStr {
-	event := common.MapStr{
-		common.EventMetadataKey: f.EventMetadata,
-		"@timestamp":            common.Time(f.ReadTime),
-		"source":                f.Source,
-		"offset":                f.Offset, // Offset here is the offset before the starting char.
-		"type":                  f.DocumentType,
-		"input_type":            f.InputType,
-	}
-
+	var event common.MapStr = nil
 	if f.JSONConfig != nil && len(f.JSONFields) > 0 {
-		mergeJSONFields(f, event)
+		if f.JSONConfig.Plain {
+			event = common.MapStr{}
+			for k, v := range f.JSONFields {
+				event[k] = v;
+			}
+		} else {
+			event = common.MapStr{
+				common.EventMetadataKey: f.EventMetadata,
+				"@timestamp":            common.Time(f.ReadTime),
+				"source":                f.Source,
+				"offset":                f.Offset, // Offset here is the offset before the starting char.
+				"type":                  f.DocumentType,
+				"input_type":            f.InputType,
+			}
+			mergeJSONFields(f, event)
+		}
 	} else {
+		event = common.MapStr{
+			common.EventMetadataKey: f.EventMetadata,
+			"@timestamp":            common.Time(f.ReadTime),
+			"source":                f.Source,
+			"offset":                f.Offset, // Offset here is the offset before the starting char.
+			"type":                  f.DocumentType,
+			"input_type":            f.InputType,
+		}
 		event["message"] = f.Text
 	}
 
