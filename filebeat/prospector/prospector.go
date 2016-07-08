@@ -107,14 +107,14 @@ func (p *Prospector) Run() {
 			case event := <-p.harvesterChan:
 				// Add ttl if cleanOlder is enabled
 				if p.config.CleanOlder > 0 {
-					event.FileState.TTL = p.config.CleanOlder
+					event.State.TTL = p.config.CleanOlder
 				}
 				select {
 				case <-p.done:
 					logp.Info("Prospector channel stopped")
 					return
 				case p.spoolerChan <- event:
-					p.states.Update(event.FileState)
+					p.states.Update(event.State)
 				}
 			}
 		}
