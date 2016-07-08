@@ -103,6 +103,18 @@ func (c *Config) SetChild(name string, idx int, value *Config) error {
 	return c.access().SetChild(name, idx, value.access(), configOpts...)
 }
 
+func (c *Config) Enabled() bool {
+	testEnabled := struct {
+		Enabled bool `config:"enable"`
+	}{true}
+
+	if err := c.Unpack(&testEnabled); err != nil {
+		// if unpacking fails, expect 'enable' being set to default value
+		return true
+	}
+	return testEnabled.Enabled
+}
+
 func fromConfig(in *ucfg.Config) *Config {
 	return (*Config)(in)
 }
