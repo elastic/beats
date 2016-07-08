@@ -2,6 +2,7 @@ package common
 
 import (
 	"github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/cfgutil"
 	"github.com/elastic/go-ucfg/yaml"
 )
 
@@ -36,6 +37,17 @@ func NewConfigWithYAML(in []byte, source string) (*Config, error) {
 func LoadFile(path string) (*Config, error) {
 	c, err := yaml.NewConfigWithFile(path, configOpts...)
 	return fromConfig(c), err
+}
+
+func LoadFiles(paths ...string) (*Config, error) {
+	merger := cfgutil.NewCollector(nil, configOpts...)
+	for _, path := range paths {
+		err := merger.Add(yaml.NewConfigWithFile(path, configOpts...))
+		if err != nil {
+			return nil, err
+		}
+	}
+	return fromConfig(merger.Config()), nil
 }
 
 func (c *Config) Merge(from interface{}) error {
