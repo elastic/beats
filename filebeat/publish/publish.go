@@ -127,8 +127,8 @@ func (p *syncLogPublisher) Start() {
 }
 
 func (p *syncLogPublisher) Stop() {
-	close(p.done)
 	p.client.Close()
+	close(p.done)
 	p.wg.Wait()
 }
 
@@ -182,8 +182,8 @@ func (p *asyncLogPublisher) Start() {
 }
 
 func (p *asyncLogPublisher) Stop() {
-	close(p.done)
 	p.client.Close()
+	close(p.done)
 	p.wg.Wait()
 }
 

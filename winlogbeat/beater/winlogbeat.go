@@ -53,52 +53,44 @@ type Winlogbeat struct {
 }
 
 // New returns a new Winlogbeat.
-func New() *Winlogbeat {
-	return &Winlogbeat{}
-}
-
-// Config sets up the necessary configuration to use the winlogbeat
-func (eb *Winlogbeat) Config(b *beat.Beat) error {
+func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	// Read configuration.
-	err := b.RawConfig.Unpack(&eb.config)
+	config := config.DefaultSettings
+	err := rawConfig.Unpack(&config)
 	if err != nil {
-		return fmt.Errorf("Error reading configuration file. %v", err)
+		return nil, fmt.Errorf("Error reading configuration file. %v", err)
 	}
 
-	// Validate configuration.
-	err = eb.config.Validate()
-	if err != nil {
-		return fmt.Errorf("Error validating configuration file. %v", err)
-	}
-	debugf("Configuration validated. config=%v", eb.config)
-
-	// Registry file grooming.
-	if eb.config.Winlogbeat.RegistryFile == "" {
-		eb.config.Winlogbeat.RegistryFile = config.DefaultRegistryFile
-	}
-	eb.config.Winlogbeat.RegistryFile = paths.Resolve(paths.Data, eb.config.Winlogbeat.RegistryFile)
+	// reslove registry file path
+	config.Winlogbeat.RegistryFile = paths.Resolve(
+		paths.Data, config.Winlogbeat.RegistryFile)
 	logp.Info("State will be read from and persisted to %s",
-		eb.config.Winlogbeat.RegistryFile)
+		config.Winlogbeat.RegistryFile)
 
-	return nil
+	eb := &Winlogbeat{
+		beat:   b,
+		config: &config,
+		done:   make(chan struct{}),
+	}
+
+	return eb, nil
 }
 
 // Setup uses the loaded config and creates necessary markers and environment
 // settings to allow the beat to be used.
 func (eb *Winlogbeat) Setup(b *beat.Beat) error {
-	eb.beat = b
+	config := &eb.config.Winlogbeat
+
 	eb.client = b.Publisher.Connect()
-	eb.done = make(chan struct{})
 
 	var err error
-	eb.checkpoint, err = checkpoint.NewCheckpoint(
-		eb.config.Winlogbeat.RegistryFile, 10, 5*time.Second)
+	eb.checkpoint, err = checkpoint.NewCheckpoint(config.RegistryFile, 10, 5*time.Second)
 	if err != nil {
 		return err
 	}
 
-	if eb.config.Winlogbeat.Metrics.BindAddress != "" {
-		bindAddress := eb.config.Winlogbeat.Metrics.BindAddress
+	if config.Metrics.BindAddress != "" {
+		bindAddress := config.Metrics.BindAddress
 		sock, err := net.Listen("tcp", bindAddress)
 		if err != nil {
 			return err
@@ -114,8 +106,8 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 
 	// Create the event logs. This will validate the event log specific
 	// configuration.
-	eb.eventLogs = make([]eventlog.EventLog, 0, len(eb.config.Winlogbeat.EventLogs))
-	for _, config := range eb.config.Winlogbeat.EventLogs {
+	eb.eventLogs = make([]eventlog.EventLog, 0, len(config.EventLogs))
+	for _, config := range config.EventLogs {
 		eventLog, err := eventlog.New(config)
 		if err != nil {
 			return fmt.Errorf("Failed to create new event log. %v", err)
@@ -130,6 +122,11 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 
 // Run is used within the beats interface to execute the Winlogbeat workers.
 func (eb *Winlogbeat) Run(b *beat.Beat) error {
+	if err := eb.Setup(b); err != nil {
+		return err
+	}
+	defer eb.Cleanup(b)
+
 	persistedState := eb.checkpoint.States()
 
 	// Initialize metrics.
@@ -173,8 +170,8 @@ func (eb *Winlogbeat) Cleanup(b *beat.Beat) error {
 func (eb *Winlogbeat) Stop() {
 	logp.Info("Stopping Winlogbeat")
 	if eb.done != nil {
-		close(eb.done)
 		eb.client.Close()
+		close(eb.done)
 	}
 }
 

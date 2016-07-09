@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"log"
 	"os"
 	"path/filepath"
@@ -98,13 +99,13 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 }
 
 // Fetches and merges all config files given by configDir. All are put into one config object
-func (config *Config) FetchConfigs() {
+func (config *Config) FetchConfigs() error {
 
 	configDir := config.Filebeat.ConfigDir
 
 	// If option not set, do nothing
 	if configDir == "" {
-		return
+		return nil
 	}
 
 	// If configDir is relative, consider it relative to the config path
@@ -117,14 +118,20 @@ func (config *Config) FetchConfigs() {
 
 	if err != nil {
 		log.Fatal("Could not use config_dir of: ", configDir, err)
+		return err
 	}
 
 	err = mergeConfigFiles(configFiles, config)
 	if err != nil {
 		log.Fatal("Error merging config files: ", err)
+		return err
 	}
 
 	if len(config.Filebeat.Prospectors) == 0 {
-		log.Fatalf("No paths given. What files do you want me to watch?")
+		err := errors.New("No paths given. What files do you want me to watch?")
+		log.Fatalf("%v", err)
+		return err
 	}
+
+	return nil
 }
