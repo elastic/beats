@@ -256,6 +256,12 @@ func eventBulkMeta(index string, event common.MapStr) bulkMeta {
 			DocType: event["type"].(string),
 		},
 	}
+	if id, ok := event["id"]; ok {
+		meta.Index.ID, ok = id.(string)
+		if !ok {
+			logp.Err("id is not a string")
+		}
+	}
 	return meta
 }
 

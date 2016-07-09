@@ -13,6 +13,11 @@ const TsLayout = "2006-01-02T15:04:05.000Z"
 // Time is an abstraction for the time.Time type
 type Time time.Time
 
+// String returns a string representation of Time.
+func (t Time) String() string {
+	return time.Time(t).UTC().String()
+}
+
 // MarshalJSON implements json.Marshaler interface.
 // The time is a quoted string in the JsTsLayout format.
 func (t Time) MarshalJSON() ([]byte, error) {

@@ -15,6 +15,7 @@ type bulkMeta struct {
 type bulkMetaIndex struct {
 	Index   string `json:"_index"`
 	DocType string `json:"_type"`
+	ID      string `json:"_id,omitempty"`
 }
 
 // MetaBuilder creates meta data for bulk requests
