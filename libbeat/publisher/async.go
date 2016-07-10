@@ -7,7 +7,7 @@ import (
 
 type asyncPipeline struct {
 	outputs []worker
-	pub     *Publisher
+	pub     *BeatPublisher
 }
 
 const (
@@ -15,7 +15,7 @@ const (
 )
 
 func newAsyncPipeline(
-	pub *Publisher,
+	pub *BeatPublisher,
 	hwm, bulkHWM int,
 	ws *workerSignal,
 ) *asyncPipeline {

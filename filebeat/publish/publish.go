@@ -18,7 +18,7 @@ type LogPublisher interface {
 }
 
 type syncLogPublisher struct {
-	pub     *publisher.Publisher
+	pub     publisher.Publisher
 	client  publisher.Client
 	in, out chan []*input.FileEvent
 
@@ -27,7 +27,7 @@ type syncLogPublisher struct {
 }
 
 type asyncLogPublisher struct {
-	pub     *publisher.Publisher
+	pub     publisher.Publisher
 	client  publisher.Client
 	in, out chan []*input.FileEvent
 
@@ -71,7 +71,7 @@ var (
 func New(
 	async bool,
 	in, out chan []*input.FileEvent,
-	pub *publisher.Publisher,
+	pub publisher.Publisher,
 ) LogPublisher {
 	if async {
 		return newAsyncLogPublisher(in, out, pub)
@@ -81,7 +81,7 @@ func New(
 
 func newSyncLogPublisher(
 	in, out chan []*input.FileEvent,
-	pub *publisher.Publisher,
+	pub publisher.Publisher,
 ) *syncLogPublisher {
 	return &syncLogPublisher{
 		in:   in,
@@ -138,7 +138,7 @@ func (p *syncLogPublisher) Stop() {
 
 func newAsyncLogPublisher(
 	in, out chan []*input.FileEvent,
-	pub *publisher.Publisher,
+	pub publisher.Publisher,
 ) *asyncLogPublisher {
 	return &asyncLogPublisher{
 		in:   in,

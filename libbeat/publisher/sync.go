@@ -3,10 +3,10 @@ package publisher
 import "github.com/elastic/beats/libbeat/common/op"
 
 type syncPipeline struct {
-	pub *Publisher
+	pub *BeatPublisher
 }
 
-func newSyncPipeline(pub *Publisher, hwm, bulkHWM int) *syncPipeline {
+func newSyncPipeline(pub *BeatPublisher, hwm, bulkHWM int) *syncPipeline {
 	return &syncPipeline{pub: pub}
 }
 
