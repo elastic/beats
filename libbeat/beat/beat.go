@@ -164,7 +164,10 @@ func (b *Beat) launch(bt Creator) error {
 	if err != nil {
 		return fmt.Errorf("error initializing publisher: %v", err)
 	}
-	defer publisher.Stop()
+
+	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
+	//       but refine publisher to disconnect clients on stop automatically
+	// defer publisher.Stop()
 
 	b.Publisher = publisher
 	beater, err := bt(b, b.RawConfig)
