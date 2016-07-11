@@ -13,10 +13,9 @@ import (
 )
 
 type {{cookiecutter.beat|capitalize}} struct {
-	beatConfig *config.Config
-	done       chan struct{}
-	period     time.Duration
-	client     publisher.Client
+	config config.Config
+	done   chan struct{}
+	client publisher.Client
 }
 
 // Creates beater
@@ -30,8 +29,10 @@ func New() *{{cookiecutter.beat|capitalize}} {
 
 func (bt *{{cookiecutter.beat|capitalize}}) Config(b *beat.Beat) error {
 
-	// Load beater beatConfig
-	err := b.RawConfig.Unpack(&bt.beatConfig)
+	bt.config = config.DefaultConfig
+
+	// Load beater config
+	err := b.RawConfig.Unpack(&bt.config)
 	if err != nil {
 		return fmt.Errorf("Error reading config file: %v", err)
 	}
@@ -41,26 +42,14 @@ func (bt *{{cookiecutter.beat|capitalize}}) Config(b *beat.Beat) error {
 
 func (bt *{{cookiecutter.beat|capitalize}}) Setup(b *beat.Beat) error {
 
-	// Setting default period if not set
-	if bt.beatConfig.{{cookiecutter.beat|capitalize}}.Period == "" {
-		bt.beatConfig.{{cookiecutter.beat|capitalize}}.Period = "1s"
-	}
-
 	bt.client = b.Publisher.Connect()
-
-	var err error
-	bt.period, err = time.ParseDuration(bt.beatConfig.{{cookiecutter.beat|capitalize}}.Period)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
 func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
 	logp.Info("{{cookiecutter.beat}} is running! Hit CTRL-C to stop it.")
 
-	ticker := time.NewTicker(bt.period)
+	ticker := time.NewTicker(bt.config.{{cookiecutter.beat|capitalize}}.Period)
 	counter := 1
 	for {
 		select {
