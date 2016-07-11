@@ -2,7 +2,7 @@ BEATNAME={{cookiecutter.beat}}
 BEAT_DIR={{cookiecutter.beat_path}}
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
-ES_BEATS=${GOPATH}/src/github.com/elastic/beats
+ES_BEATS?=${GOPATH}/src/github.com/elastic/beats
 GOPACKAGES=$(shell glide novendor)
 PREFIX?=.
 
