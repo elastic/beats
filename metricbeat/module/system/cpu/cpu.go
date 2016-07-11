@@ -5,7 +5,6 @@ package cpu
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/system"
 
 	"github.com/pkg/errors"
 )
@@ -52,7 +51,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 	m.cpu.AddCpuPercentage(stat)
 
-	loadStat, err := system.GetSystemLoad()
+	loadStat, err := GetSystemLoad()
 	if err != nil {
 		return nil, errors.Wrap(err, "load statistics")
 	}

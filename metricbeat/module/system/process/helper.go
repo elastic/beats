@@ -1,3 +1,5 @@
+// +build darwin freebsd linux windows
+
 package process
 
 import (
@@ -9,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/system"
+	"github.com/elastic/beats/metricbeat/module/system/memory"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -85,7 +88,7 @@ func GetProcMemPercentage(proc *Process, total_phymem uint64) float64 {
 	// in unit tests, total_phymem is set to a value greater than zero
 
 	if total_phymem == 0 {
-		memStat, err := system.GetMemory()
+		memStat, err := memory.GetMemory()
 		if err != nil {
 			logp.Warn("Getting memory details: %v", err)
 			return 0

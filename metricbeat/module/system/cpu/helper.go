@@ -1,3 +1,5 @@
+// +build darwin freebsd linux openbsd windows
+
 package cpu
 
 import (
@@ -6,6 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/system"
+	"github.com/elastic/beats/metricbeat/module/system/memory"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -155,7 +158,7 @@ func (cpu *CPU) AddCpuPercentageList(t2 []CpuTimes) {
 }
 
 func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
-	loadStat, err := system.GetSystemLoad()
+	loadStat, err := GetSystemLoad()
 	if err != nil {
 		logp.Warn("Getting load statistics: %v", err)
 		return nil, err
@@ -168,27 +171,27 @@ func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
 
 	cpu.AddCpuPercentage(cpuStat)
 
-	memStat, err := system.GetMemory()
+	memStat, err := memory.GetMemory()
 	if err != nil {
 		logp.Warn("Getting memory details: %v", err)
 		return nil, err
 	}
-	system.AddMemPercentage(memStat)
+	memory.AddMemPercentage(memStat)
 
-	swapStat, err := system.GetSwap()
+	swapStat, err := memory.GetSwap()
 	if err != nil {
 		logp.Warn("Getting swap details: %v", err)
 		return nil, err
 	}
-	system.AddSwapPercentage(swapStat)
+	memory.AddSwapPercentage(swapStat)
 
 	event := common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"type":       "system",
 		"load":       loadStat,
 		"cpu":        cpu.GetCpuStatEvent(cpuStat),
-		"mem":        system.GetMemoryEvent(memStat),
-		"swap":       system.GetSwapEvent(swapStat),
+		"mem":        memory.GetMemoryEvent(memStat),
+		"swap":       memory.GetSwapEvent(swapStat),
 	}
 
 	return event, nil
@@ -218,4 +221,25 @@ func (cpu *CPU) GetCoreStats() ([]common.MapStr, error) {
 	}
 
 	return events, nil
+}
+
+type SystemLoad struct {
+	Load1  float64 `json:"load1"`
+	Load5  float64 `json:"load5"`
+	Load15 float64 `json:"load15"`
+}
+
+func GetSystemLoad() (*SystemLoad, error) {
+
+	concreteSigar := sigar.ConcreteSigar{}
+	avg, err := concreteSigar.GetLoadAverage()
+	if err != nil {
+		return nil, err
+	}
+
+	return &SystemLoad{
+		Load1:  avg.One,
+		Load5:  avg.Five,
+		Load15: avg.Fifteen,
+	}, nil
 }
