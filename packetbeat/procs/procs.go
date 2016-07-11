@@ -246,7 +246,7 @@ func (proc *ProcessesWatcher) FindProc(port uint16) (procname string) {
 }
 
 func hex_to_ipv4(word string) (net.IP, error) {
-	ip, err := strconv.ParseInt(word, 16, 32)
+	ip, err := strconv.ParseInt(word, 16, 64)
 	if err != nil {
 		return nil, err
 	}
@@ -358,7 +358,6 @@ func Parse_Proc_Net_Tcp(input io.Reader, ipv6 bool) ([]*SocketInfo, error) {
 			logp.Err("Error reading /proc/net/tcp: %s", err)
 			return nil, err
 		}
-
 		words := bytes.Fields(line)
 		if len(words) < 10 || bytes.Equal(words[0], []byte("sl")) {
 			logp.Debug("procs", "Less then 10 words (%d) or starting with 'sl': %s", len(words), words)

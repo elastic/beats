@@ -206,3 +206,23 @@ func TestFindSocketsOfPid(t *testing.T) {
 
 	AssertInt64ArraysAreEqual(t, []int64{7619, 7620}, inodes)
 }
+
+func TestParse_Proc_Net_Tcp(t *testing.T) {
+	file, err := os.Open("../tests/files/proc_net_tcp.txt")
+	if err != nil {
+		t.Fatalf("Opening ../tests/files/proc_net_tcp.txt: %s", err)
+	}
+	socketInfo, err := Parse_Proc_Net_Tcp(file, false)
+	if err != nil {
+		t.Fatalf("Parse_Proc_Net_Tcp: %s", err)
+	}
+	if len(socketInfo) != 32 {
+		t.Error("expected socket information on 32 sockets but got", len(socketInfo))
+	}
+	if socketInfo[31].Src_ip.String() != "192.168.2.243" {
+		t.Error("Failed to parse source IP address 192.168.2.243")
+	}
+	if socketInfo[31].Src_port != 41622 {
+		t.Error("Failed to parse source port 41622")
+	}
+}
