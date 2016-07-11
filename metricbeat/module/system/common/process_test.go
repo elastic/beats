@@ -38,6 +38,7 @@ func TestGetProcess(t *testing.T) {
 
 		assert.True(t, (process.Pid > 0))
 		assert.True(t, (process.Ppid >= 0))
+		assert.True(t, (process.Pgid >= 0))
 		assert.True(t, (len(process.Name) > 0))
 		assert.True(t, (len(process.Username) > 0))
 		assert.NotEqual(t, "unknown", process.State)
