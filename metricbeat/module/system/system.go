@@ -1,8 +1,6 @@
-package common
+package system
 
-import (
-	"math"
-)
+import "math"
 
 func Round(val float64, roundOn float64, places int) (newVal float64) {
 	var round float64
