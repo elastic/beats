@@ -5,7 +5,6 @@ package cpu
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	system "github.com/elastic/beats/metricbeat/module/system/common"
 
 	"github.com/pkg/errors"
 )
@@ -19,7 +18,7 @@ func init() {
 // MetricSet for fetching system CPU metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	cpu *system.CPU
+	cpu *CPU
 }
 
 // New is a mb.MetricSetFactory that returns a cpu.MetricSet.
@@ -37,7 +36,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		cpu: &system.CPU{
+		cpu: &CPU{
 			CpuTicks: config.CpuTicks,
 		},
 	}, nil
@@ -46,13 +45,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches CPU metrics from the OS.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 
-	stat, err := system.GetCpuTimes()
+	stat, err := GetCpuTimes()
 	if err != nil {
 		return nil, errors.Wrap(err, "cpu times")
 	}
 	m.cpu.AddCpuPercentage(stat)
 
-	loadStat, err := system.GetSystemLoad()
+	loadStat, err := GetSystemLoad()
 	if err != nil {
 		return nil, errors.Wrap(err, "load statistics")
 	}

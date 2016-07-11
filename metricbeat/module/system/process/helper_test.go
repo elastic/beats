@@ -1,7 +1,7 @@
 // +build !integration
 // +build darwin freebsd linux windows
 
-package common
+package process
 
 import (
 	"testing"

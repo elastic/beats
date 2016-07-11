@@ -1,6 +1,7 @@
 // +build !integration
+// +build darwin freebsd linux openbsd windows
 
-package common
+package filesystem
 
 import (
 	"os"

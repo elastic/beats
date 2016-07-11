@@ -6,7 +6,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	system "github.com/elastic/beats/metricbeat/module/system/common"
 
 	"github.com/pkg/errors"
 )
@@ -34,20 +33,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches filesystem metrics for all mounted filesystems and returns
 // an event for each mount point.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	fss, err := system.GetFileSystemList()
+	fss, err := GetFileSystemList()
 	if err != nil {
 		return nil, errors.Wrap(err, "filesystem list")
 	}
 
 	filesSystems := make([]common.MapStr, 0, len(fss))
 	for _, fs := range fss {
-		fsStat, err := system.GetFileSystemStat(fs)
+		fsStat, err := GetFileSystemStat(fs)
 		if err != nil {
 			debugf("error getting filesystem stats for '%s': %v", fs.DirName, err)
 			continue
 		}
-		system.AddFileSystemUsedPercentage(fsStat)
-		filesSystems = append(filesSystems, system.GetFilesystemEvent(fsStat))
+		AddFileSystemUsedPercentage(fsStat)
+		filesSystems = append(filesSystems, GetFilesystemEvent(fsStat))
 	}
 
 	return filesSystems, nil

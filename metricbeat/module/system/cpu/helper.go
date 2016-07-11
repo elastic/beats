@@ -1,10 +1,14 @@
-package common
+// +build darwin freebsd linux openbsd windows
+
+package cpu
 
 import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/module/system"
+	"github.com/elastic/beats/metricbeat/module/system/memory"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -70,7 +74,7 @@ func GetCpuPercentage(last *CpuTimes, current *CpuTimes) *CpuTimes {
 			perc := 0.0
 			delta := int64(field2 - field1)
 			perc = float64(delta) / float64(all_delta)
-			return Round(perc, .5, 4)
+			return system.Round(perc, .5, 4)
 		}
 
 		current.UserPercent = calculate(current.Cpu.User, last.Cpu.User)
@@ -95,7 +99,7 @@ func GetCpuPercentageList(last, current []CpuTimes) []CpuTimes {
 			perc := 0.0
 			delta := int64(field2 - field1)
 			perc = float64(delta) / float64(all_delta)
-			return Round(perc, .5, 4)
+			return system.Round(perc, .5, 4)
 		}
 
 		for i := 0; i < len(last); i++ {
@@ -167,27 +171,27 @@ func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
 
 	cpu.AddCpuPercentage(cpuStat)
 
-	memStat, err := GetMemory()
+	memStat, err := memory.GetMemory()
 	if err != nil {
 		logp.Warn("Getting memory details: %v", err)
 		return nil, err
 	}
-	AddMemPercentage(memStat)
+	memory.AddMemPercentage(memStat)
 
-	swapStat, err := GetSwap()
+	swapStat, err := memory.GetSwap()
 	if err != nil {
 		logp.Warn("Getting swap details: %v", err)
 		return nil, err
 	}
-	AddSwapPercentage(swapStat)
+	memory.AddSwapPercentage(swapStat)
 
 	event := common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"type":       "system",
 		"load":       loadStat,
 		"cpu":        cpu.GetCpuStatEvent(cpuStat),
-		"mem":        GetMemoryEvent(memStat),
-		"swap":       GetSwapEvent(swapStat),
+		"mem":        memory.GetMemoryEvent(memStat),
+		"swap":       memory.GetSwapEvent(swapStat),
 	}
 
 	return event, nil
@@ -217,4 +221,25 @@ func (cpu *CPU) GetCoreStats() ([]common.MapStr, error) {
 	}
 
 	return events, nil
+}
+
+type SystemLoad struct {
+	Load1  float64 `json:"load1"`
+	Load5  float64 `json:"load5"`
+	Load15 float64 `json:"load15"`
+}
+
+func GetSystemLoad() (*SystemLoad, error) {
+
+	concreteSigar := sigar.ConcreteSigar{}
+	avg, err := concreteSigar.GetLoadAverage()
+	if err != nil {
+		return nil, err
+	}
+
+	return &SystemLoad{
+		Load1:  avg.One,
+		Load5:  avg.Five,
+		Load15: avg.Fifteen,
+	}, nil
 }
