@@ -9,10 +9,13 @@ import (
 )
 
 type ConditionConfig struct {
-	Equals   *ConditionFields `config:"equals"`
-	Contains *ConditionFields `config:"contains"`
-	Regexp   *ConditionFields `config:"regexp"`
-	Range    *ConditionFields `config:"range"`
+	Equals   *ConditionFields  `config:"equals"`
+	Contains *ConditionFields  `config:"contains"`
+	Regexp   *ConditionFields  `config:"regexp"`
+	Range    *ConditionFields  `config:"range"`
+	OR       []ConditionConfig `config:"or"`
+	AND      []ConditionConfig `config:"and"`
+	NOT      *ConditionConfig  `config:"not"`
 }
 
 type ConditionFields struct {

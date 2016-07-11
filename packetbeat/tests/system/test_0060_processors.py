@@ -304,3 +304,68 @@ class Test(BaseTest):
 
         assert "http.request_headers" in objs[1]
         assert "http.response_headers" in objs[1]
+
+    def test_condition_and(self):
+
+        self.render_config_template(
+            http_send_all_headers=True,
+            include_fields={
+                "fields": ["http"],
+                "condition": """
+                and:
+                    - equals.type: http
+                    - equals.http.code: 200
+                """
+            },
+        )
+
+        self.run_packetbeat(pcap="http_minitwit.pcap",
+                            debug_selectors=["http", "httpdetailed", "processors"])
+        objs = self.read_output(
+            required_fields=["@timestamp", "type"],
+        )
+
+        assert len(objs) == 3
+        assert all([o["type"] == "http" for o in objs])
+
+        assert "method" not in objs[0]
+
+    def test_condition_or(self):
+
+        self.render_config_template(
+            http_send_all_headers=True,
+            drop_event={
+                "condition": """
+                or:
+                    - equals.http.code: 404
+                    - equals.http.code: 200
+                """
+            },
+        )
+
+        self.run_packetbeat(pcap="http_minitwit.pcap",
+                            debug_selectors=["http", "httpdetailed", "processors"])
+        objs = self.read_output(
+            required_fields=["@timestamp", "type"],
+        )
+
+        assert len(objs) == 1
+        assert all([o["type"] == "http" for o in objs])
+
+    def test_condition_not(self):
+
+        self.render_config_template(
+            http_send_all_headers=True,
+            drop_event={
+                "condition": "not.equals.http.code: 200",
+            },
+        )
+
+        self.run_packetbeat(pcap="http_minitwit.pcap",
+                            debug_selectors=["http", "httpdetailed", "processors"])
+        objs = self.read_output(
+            required_fields=["@timestamp", "type"],
+        )
+
+        assert len(objs) == 1
+        assert all([o["type"] == "http" for o in objs])

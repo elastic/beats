@@ -4,7 +4,7 @@ import metricbeat
 import unittest
 
 @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
-class GlobalFiltering(metricbeat.BaseTest):
+class TestProcessors(metricbeat.BaseTest):
 
     def test_drop_fields(self):
 
@@ -100,6 +100,34 @@ class GlobalFiltering(metricbeat.BaseTest):
         )
         for event in output:
             assert float(event["system.process.cpu.total.pct"]) >= 0.001
+
+
+    def test_dropevent_with_complex_condition(self):
+        """
+        Check drop_event action works when a complex condition is associated.
+        """
+        self.render_config_template(
+            modules=[{
+                "name": "system",
+                "metricsets": ["process"],
+                "period": "1s"
+            }],
+            drop_event={
+                "condition": "not.contains.system.process.cmdline: metricbeat.test",
+            },
+        )
+        metricbeat = self.start_beat()
+        self.wait_until(
+            lambda: self.output_count(lambda x: x >= 1),
+            max_timeout=15)
+
+        metricbeat.kill_and_wait()
+
+        output = self.read_output(
+            required_fields=["@timestamp", "type"],
+        )
+        assert len(output) == 1
+
 
     def test_include_fields(self):
         """

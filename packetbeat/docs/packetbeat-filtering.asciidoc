@@ -3,7 +3,7 @@
 
 include::../../libbeat/docs/processors.asciidoc[]
 
-For example, the following filters configuration includes a subset of the Packetbeat DNS fields so that only the
+For example, the following configuration includes a subset of the Packetbeat DNS fields so that only the
 requests and their response codes are reported:
 
 [source, yaml]

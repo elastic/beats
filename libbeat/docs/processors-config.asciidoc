@@ -15,36 +15,23 @@
 
 //TODO: Remove was Filters from the above title and remove extra sections that show the alpha4 configuration
 
-coming[5.0.0-beta1,Filters are being renamed to "processors" to better reflect the capabilities they provide. If you are using 5.0.0-alpha4 or earlier, these are still called "filters" even though the documentation refers to "processors"]
+include::../../libbeat/docs/processors.asciidoc[]
 
-You can define a set of `processors` in the +{beatname_lc}.yml+ config file to reduce the number
-of fields that are exported by the Beat. 
-
-If multiple processors are defined, they are executed in the order they are defined. The initial event is passed to the
-first processor and what results from it is passed to the second processor until all processors are applied. The
-condition is checked against the event that is received as input and it might differ from the original event.
-
-[source,yaml]
--------
-event -> processor 1 -> event1 -> processor 2 -> event2 ...
--------
-
-See <<exported-fields>> for the full list of possible fields.
-
-Each processor receives a condition and optionally a set of arguments. The action is executed only if the condition
+Each processor has associated an action with a set of parameters and optionally a condition. If the condition is
+present, then the action is executed only if the condition
 is fulfilled. If no condition is passed then the action is always executed.
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+deprecated[5.0.0-alpha4,The `filters` configuration option is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
 
 [source,yaml]
 ------
 filters:
- - action1:
-     condition1
-         [arguments]
- - action2:
-     condition2
-         [arguments]
+ - <action>:
+     <condition>
+     <parameters>
+ - <action>:
+     <condition>
+     <parameters>
 ...
 ------
 
@@ -53,17 +40,20 @@ coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-b
 [source,yaml]
 ------
 processors:
- - action1:
+ - <action>:
      when:
-        condition1
-           [arguments]
- - action2:
+        <condition>
+     <parameters>
+ - <action>:
      when:
-        condition2
-           [arguments]
+        <condition>
+     <parameters>
 ...
 
 ------
+
+where <action> can be a way to select the fields that are exported or a way to add meta data to the event , <condition> contains the definition of the condition.
+and <parameters> is the list of parameters passed along the <action>. 
 
 See <<filtering-and-enhancing-data>> for specific {beatname_uc} examples.
 
@@ -75,20 +65,17 @@ them. You can see a list of the <<exported-fields,`exported fields`>>.
 
 For each field, you can specify a simple field name or a nested map, for example `dns.question.name`.
 
-[source,yaml]
-----
-condition:
-  field1: value1
-  [field2: value2]
-  ...
-----
 
-Supported conditions are:
+A condition can be:
 
 * <<condition-equals,`equals`>>
 * <<condition-contains,`contains`>>
 * <<condition-regexp,`regexp`>>
 * <<condition-range, `range`>>
+* <<condition-or, `or`>>
+* <<condition-and, `and`>>
+* <<condition-not, `not`>>
+
 
 
 [[condition-equals]]
@@ -126,7 +113,7 @@ The `regexp` condition checks the field against a regular expression. The condit
 
 For example, the following condition checks if the process name contains `foo`:
 
-[source,yaml]]
+[source,yaml]
 -----
 reqexp:
   proc.name: "foo.*"
@@ -162,6 +149,97 @@ range:
     cpu.user_p: 0.8
 ------
 
+
+coming[5.0.0-beta1, You can combine multiple conditions with the `or`, `and` or `not` operators]
+
+[[condition-or]]
+===== OR
+
+The `or` operator receives a list of conditions. 
+
+[source,yaml]
+-------
+or:
+  - <condition1>
+  - <condition2>
+  - <condition3>
+  ...
+
+-------
+
+For example the condition `http.code = 304 OR http.code = 404` translates to: 
+
+[source,yaml]
+------
+or:
+  - equals:
+      http.code: 304
+  - equals:
+      http.code: 404
+------
+
+
+[[condition-and]]
+===== AND
+
+The `and` operator receives a list of conditions. 
+
+[source,yaml]
+-------
+and:
+  - <condition1>
+  - <condition2>
+  - <condition3>
+  ...
+
+-------
+
+For example the condition `http.code = 200 AND status = OK` translates to: 
+
+[source,yaml]
+------
+and:
+  - equals:
+      http.code: 200
+  - equals:
+      status: OK
+------
+
+To configure a condition like `<condition1> OR <condition2> AND <condition3>`:
+
+[source,yaml]
+------
+or:
+ - <condition1>
+ - and:
+    - <condition2>
+    - <condition3>
+
+------
+
+[[condition-not]]
+===== NOT
+
+The `not` operator receives the condition to negate.
+
+[source,yaml]
+-------
+not:
+  <condition>
+
+-------
+
+For example the condition `NOT status = OK` translates to: 
+
+[source,yaml]
+------
+not:
+  equals:
+    status: OK
+------
+
+
+
 ==== Actions
 
 The supported filter actions are:
@@ -170,6 +248,7 @@ The supported filter actions are:
  * <<drop-fields,`drop_fields`>>
  * <<drop-event,`drop_event`>>
 
+See <<exported-fields>> for the full list of possible fields.
 
 [[include-fields]]
 ===== include_fields
