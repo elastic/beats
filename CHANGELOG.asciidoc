@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 - Periodically log internal metrics. {pull}1955[1955]
 - Add enable-setting to all output modules. {pull}1987[1987]
 - Command line flag -c can be used multiple times. {pull}1985[1985]
+- Add OR/AND/NOT to the condition associated with the processors. {pull}1983[1983]
 
 *Metricbeat*
 
