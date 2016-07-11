@@ -87,15 +87,6 @@ type Beater interface {
 	Stop()               // Stop is invoked to signal that the Run method should finish its execution. It will be invoked at most once.
 }
 
-// FlagsHandler is an interface that can optionally be implemented by a Beat
-// if it needs to process command line flags on startup. If implemented, the
-// HandleFlags method will be invoked after parsing the command line flags
-// and before any of the Beater interface methods are invoked. There will be
-// no callback when '-help' or '-version' are specified.
-type FlagsHandler interface {
-	HandleFlags(*Beat) error // Handle any custom command line arguments.
-}
-
 // Beat contains the basic beat data and the publisher client used to publish
 // events.
 type Beat struct {
@@ -185,12 +176,7 @@ func (bc *instance) handleFlags() error {
 		return GracefulExit
 	}
 
-	// Invoke HandleFlags if FlagsHandler is implemented.
-	if flagsHandler, ok := bc.beater.(FlagsHandler); ok {
-		err = flagsHandler.HandleFlags(bc.data)
-	}
-
-	return err
+	return handleFlags(bc.data)
 }
 
 // config reads the configuration file from disk, parses the common options

@@ -3,7 +3,6 @@ package beater
 import (
 	"flag"
 	"fmt"
-	"runtime"
 	"sync"
 	"time"
 
@@ -44,7 +43,6 @@ type CmdLineArgs struct {
 	OneAtAtime   *bool
 	TopSpeed     *bool
 	Dumpfile     *string
-	PrintDevices *bool
 	WaitShutdown *int
 }
 
@@ -62,7 +60,6 @@ func init() {
 		OneAtAtime:   flag.Bool("O", false, "Read packets one at a time (press Enter)"),
 		TopSpeed:     flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
 		Dumpfile:     flag.String("dump", "", "Write all captured packets to this libpcap file"),
-		PrintDevices: flag.Bool("devices", false, "Print the list of devices and exit"),
 		WaitShutdown: flag.Int("waitstop", 0, "Additional seconds to wait before shutting down"),
 	}
 }
@@ -73,30 +70,6 @@ func New() *Packetbeat {
 	pb.CmdLineArgs = cmdLineArgs
 
 	return pb
-}
-
-// Handle custom command line flags
-func (pb *Packetbeat) HandleFlags(b *beat.Beat) error {
-	// -devices CLI flag
-	if *pb.CmdLineArgs.PrintDevices {
-		devs, err := sniffer.ListDeviceNames(true)
-		if err != nil {
-			return fmt.Errorf("Error getting devices list: %v\n", err)
-		}
-		if len(devs) == 0 {
-			fmt.Printf("No devices found.")
-			if runtime.GOOS != "windows" {
-				fmt.Printf(" You might need sudo?\n")
-			} else {
-				fmt.Printf("\n")
-			}
-		}
-		for i, dev := range devs {
-			fmt.Printf("%d: %s\n", i, dev)
-		}
-		return beat.GracefulExit
-	}
-	return nil
 }
 
 // Loads the beat specific config and overwrites params based on cmd line
