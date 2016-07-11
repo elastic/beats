@@ -32,6 +32,7 @@ type Config struct {
 }
 
 type FilebeatConfig struct {
+	Inputs       []*common.Config `config:"inputs"`
 	Prospectors  []*common.Config `config:"prospectors"`
 	SpoolSize    uint64           `config:"spool_size" validate:"min=1"`
 	PublishAsync bool             `config:"publish_async"`
@@ -91,6 +92,9 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 		tmpConfig := &Config{}
 		cfgfile.Read(tmpConfig, file)
 
+		config.Filebeat.Inputs = append(config.Filebeat.Inputs, tmpConfig.Filebeat.Inputs...)
+
+		// DEPRECATED: Should be removed in 6.0
 		config.Filebeat.Prospectors = append(config.Filebeat.Prospectors, tmpConfig.Filebeat.Prospectors...)
 	}
 
@@ -124,7 +128,7 @@ func (config *Config) FetchConfigs() {
 		log.Fatal("Error merging config files: ", err)
 	}
 
-	if len(config.Filebeat.Prospectors) == 0 {
+	if len(config.Filebeat.Inputs) == 0 {
 		log.Fatalf("No paths given. What files do you want me to watch?")
 	}
 }

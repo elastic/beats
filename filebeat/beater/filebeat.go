@@ -40,6 +40,11 @@ func (fb *Filebeat) Config(b *beat.Beat) error {
 	// Check if optional config_dir is set to fetch additional prospector config files
 	fb.config.FetchConfigs()
 
+	if len(fb.config.Filebeat.Prospectors) > 0 {
+		fb.config.Filebeat.Inputs = fb.config.Filebeat.Prospectors
+		logp.Err("DEPRECATED: prospectors config is depreated, used inputs instead")
+	}
+
 	return nil
 }
 
@@ -76,7 +81,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	crawler, err := crawler.New(spooler, config.Prospectors)
+	crawler, err := crawler.New(spooler, config.Inputs)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err
