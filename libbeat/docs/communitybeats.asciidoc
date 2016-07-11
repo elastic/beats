@@ -37,6 +37,7 @@ https://github.com/cleesmith/unifiedbeat[unifiedbeat]:: Reads records from Unifi
 network intrusion detection software and indexes the records in Elasticsearch.
 https://github.com/mrkschan/uwsgibeat[uwsgibeat]:: Reads stats from uWSGI.
 https://github.com/eskibars/wmibeat[wmibeat]:: Uses WMI to grab your favorite, configurable Windows metrics.
+https://github.com/martinhoefling/saltbeat[saltbeat]:: Reads events from salt master event bus
 
 
 
