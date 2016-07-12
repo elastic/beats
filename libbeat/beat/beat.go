@@ -134,6 +134,10 @@ func Run(name, version string, bt Creator) error {
 
 // newBeat creates a new beat instance
 func newBeat(name, version string) *Beat {
+	if version == "" {
+		version = defaultBeatVersion
+	}
+
 	return &Beat{
 		Name:    name,
 		Version: version,
