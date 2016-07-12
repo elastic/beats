@@ -99,8 +99,8 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 func (pb *Packetbeat) init(b *beat.Beat) error {
 
 	cfg := &pb.Config.Packetbeat
-
-	if err := procs.ProcWatcher.Init(cfg.Procs); err != nil {
+	err := procs.ProcWatcher.Init(cfg.Procs)
+	if err != nil {
 		logp.Critical(err.Error())
 		return err
 	}
@@ -113,16 +113,20 @@ func (pb *Packetbeat) init(b *beat.Beat) error {
 	if b.Config.Shipper.BulkQueueSize != nil {
 		bulkQueueSize = *b.Config.Shipper.BulkQueueSize
 	}
-	pb.Pub = publish.NewPublisher(b.Publisher, queueSize, bulkQueueSize)
+	pb.Pub, err = publish.NewPublisher(b.Publisher, queueSize, bulkQueueSize)
+	if err != nil {
+		return fmt.Errorf("Initializing publisher failed: %v", err)
+	}
 
 	logp.Debug("main", "Initializing protocol plugins")
-	err := protos.Protos.Init(false, pb.Pub, cfg.Protocols)
+	err = protos.Protos.Init(false, pb.Pub, cfg.Protocols)
 	if err != nil {
 		return fmt.Errorf("Initializing protocol analyzers failed: %v", err)
 	}
 
 	logp.Debug("main", "Initializing sniffer")
-	if err := pb.setupSniffer(); err != nil {
+	err = pb.setupSniffer()
+	if err != nil {
 		return fmt.Errorf("Initializing sniffer failed: %v", err)
 	}
 

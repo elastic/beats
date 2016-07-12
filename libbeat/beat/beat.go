@@ -80,12 +80,12 @@ type Creator func(*Beat, *common.Config) (Beater, error)
 // Beat contains the basic beat data and the publisher client used to publish
 // events.
 type Beat struct {
-	Name      string               // Beat name.
-	Version   string               // Beat version number. Defaults to the libbeat version when an implementation does not set a version.
-	UUID      uuid.UUID            // ID assigned to a Beat instance.
-	RawConfig *common.Config       // Raw config that can be unpacked to get Beat specific config data.
-	Config    BeatConfig           // Common Beat configuration data.
-	Publisher *publisher.Publisher // Publisher
+	Name      string              // Beat name.
+	Version   string              // Beat version number. Defaults to the libbeat version when an implementation does not set a version.
+	UUID      uuid.UUID           // ID assigned to a Beat instance.
+	RawConfig *common.Config      // Raw config that can be unpacked to get Beat specific config data.
+	Config    BeatConfig          // Common Beat configuration data.
+	Publisher publisher.Publisher // Publisher
 }
 
 // BeatConfig struct contains the basic configuration of every beat

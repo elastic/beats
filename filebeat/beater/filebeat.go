@@ -55,7 +55,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Publishes event to output
 	publisher := publish.New(config.PublishAsync,
-		publisherChan, registrar.Channel, b.Publisher.Connect())
+		publisherChan, registrar.Channel, b.Publisher)
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
 	spooler, err := spooler.New(config, publisherChan)
