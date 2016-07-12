@@ -23,7 +23,7 @@ func TestReadConfig2(t *testing.T) {
 	err = cfgfile.Read(config, absPath+"/config2.yml")
 	assert.Nil(t, err)
 
-	assert.Equal(t, uint64(0), config.Filebeat.SpoolSize)
+	assert.Equal(t, uint64(0), config.SpoolSize)
 }
 
 func TestGetConfigFiles_File(t *testing.T) {
@@ -94,5 +94,5 @@ func TestMergeConfigFiles(t *testing.T) {
 	config := &Config{}
 	mergeConfigFiles(files, config)
 
-	assert.Equal(t, 4, len(config.Filebeat.Prospectors))
+	assert.Equal(t, 4, len(config.Prospectors))
 }

@@ -83,10 +83,12 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 	for _, file := range configFiles {
 		logp.Info("Additional configs loaded from: %s", file)
 
-		tmpConfig := &Config{}
-		cfgfile.Read(tmpConfig, file)
+		tmpConfig := struct {
+			Filebeat Config
+		}{}
+		cfgfile.Read(&tmpConfig, file)
 
-		config.Prospectors = append(config.Prospectors, tmpConfig.Prospectors...)
+		config.Prospectors = append(config.Prospectors, tmpConfig.Filebeat.Prospectors...)
 	}
 
 	return nil
