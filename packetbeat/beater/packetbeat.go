@@ -144,6 +144,7 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 	}()
 
 	pb.Pub.Start()
+	b.Done.OnStop.Stop(pb.Pub)
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
 	if err := droppriv.DropPrivileges(pb.Config.RunOptions); err != nil {
@@ -168,6 +169,14 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 		}
 	}()
 
+	// add sniffer stop handler
+	b.Done.OnStop.Exec(func() {
+		err := pb.Sniff.Stop()
+		if err != nil {
+			logp.Errorf("Sniffer loop stop failed: %v", err)
+		}
+	})
+
 	logp.Debug("main", "Waiting for the sniffer to finish")
 	wg.Wait()
 	select {
@@ -187,13 +196,6 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 	}
 
 	return nil
-}
-
-// Called by the Beat stop function
-func (pb *Packetbeat) Stop() {
-	logp.Info("Packetbeat send stop signal")
-	pb.Sniff.Stop()
-	pb.Pub.Stop()
 }
 
 func (pb *Packetbeat) setupSniffer() error {

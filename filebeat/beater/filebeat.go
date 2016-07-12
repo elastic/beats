@@ -18,7 +18,6 @@ import (
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
 	config *cfg.Config
-	done   chan struct{}
 }
 
 // New creates a new Filebeat pointer instance.
@@ -32,7 +31,6 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	}
 
 	fb := &Filebeat{
-		done:   make(chan struct{}),
 		config: &config,
 	}
 	return fb, nil
@@ -99,16 +97,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Stop crawler -> stop prospectors -> stop harvesters
 	defer crawler.Stop()
 
-	// Blocks progressing. As soon as channel is closed, all defer statements come into play
-	<-fb.done
+	// Blocks until beat receives stop signal
+	b.Done.Wait()
 
 	return nil
-}
-
-// Stop is called on exit to stop the crawling, spooling and registration processes.
-func (fb *Filebeat) Stop() {
-	logp.Info("Stopping filebeat")
-
-	// Stop Filebeat
-	close(fb.done)
 }
