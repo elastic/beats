@@ -33,8 +33,8 @@ func TestNewSpoolerDefaultConfig(t *testing.T) {
 	spooler, err := New(config, nil)
 
 	assert.NoError(t, err)
-	assert.Equal(t, cfg.DefaultConfig.Filebeat.SpoolSize, spooler.spoolSize)
-	assert.Equal(t, cfg.DefaultConfig.Filebeat.IdleTimeout, spooler.idleTimeout)
+	assert.Equal(t, cfg.DefaultConfig.Filebeat.SpoolSize, spooler.config.spoolSize)
+	assert.Equal(t, cfg.DefaultConfig.Filebeat.IdleTimeout, spooler.config.idleTimeout)
 }
 
 func TestNewSpoolerSpoolSize(t *testing.T) {
@@ -43,7 +43,7 @@ func TestNewSpoolerSpoolSize(t *testing.T) {
 	spooler, err := New(config, nil)
 
 	assert.NoError(t, err)
-	assert.Equal(t, spoolSize, spooler.spoolSize)
+	assert.Equal(t, spoolSize, spooler.config.spoolSize)
 }
 
 func TestNewSpoolerIdleTimeout(t *testing.T) {
@@ -51,5 +51,5 @@ func TestNewSpoolerIdleTimeout(t *testing.T) {
 	spooler, err := New(config, nil)
 
 	assert.NoError(t, err)
-	assert.Equal(t, time.Duration(10*time.Second), spooler.idleTimeout)
+	assert.Equal(t, time.Duration(10*time.Second), spooler.config.idleTimeout)
 }
