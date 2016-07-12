@@ -113,15 +113,12 @@ ci:
 .PHONY: prepare-tests
 prepare-tests:
 	mkdir -p ${COVERAGE_DIR}
-	# gotestcover is needed to fetch coverage for multiple packages
-	go get github.com/pierrre/gotestcover
 
 # Runs the unit tests with coverage
 # Race is not enabled for unit tests because tests run much slower.
 .PHONY: unit-tests
 unit-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
-
+	echo 'mode: atomic' > ${COVERAGE_DIR}/unit.cov && go list ${GOPACKAGES} | xargs -n1 -I{} sh -c 'go test $(RACE) -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> ${COVERAGE_DIR}/unit.cov' && rm coverage.tmp
 
 # Runs the unit tests without coverage reports.
 .PHONY: unit
@@ -131,7 +128,7 @@ unit:
 # Run integration tests. Unit tests are run as part of the integration tests.
 .PHONY: integration-tests
 integration-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov  ${GOPACKAGES}
+	echo 'mode: atomic' > ${COVERAGE_DIR}/integration.cov && go list ${GOPACKAGES} | xargs -n1 -I{} sh -c 'go test -tags=integration $(RACE) -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> ${COVERAGE_DIR}/integration.cov' && rm coverage.tmp
 
 # Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 .PHONY: integration-tests-environment
