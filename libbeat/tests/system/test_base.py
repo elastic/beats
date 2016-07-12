@@ -39,6 +39,29 @@ class Test(BaseTest):
         assert exit_code == 1
         assert self.log_contains("error loading config file") is True
 
+    def test_invalid_config_cli_param(self):
+        """
+        Checks CLI overwrite actually overwrites some config variable by
+        writing an invalid value.
+        """
+
+        self.render_config_template(
+            console={"pretty": "false"}
+        )
+
+        # first run with default config, validating config being
+        # actually correct.
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("Setup Beat"))
+        proc.check_kill_and_wait()
+
+        # start beat with invalid config setting on command line
+        exit_code = self.run_beat(
+            extra_args=["-E", "output.console=invalid"])
+
+        assert exit_code == 1
+        assert self.log_contains("error unpacking config data") is True
+
     def test_config_test(self):
         """
         Checks if -configtest works as expected
