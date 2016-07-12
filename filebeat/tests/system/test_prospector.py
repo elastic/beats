@@ -247,8 +247,7 @@ class Test(BaseTest):
             max_timeout=10)
 
         self.wait_until(
-            lambda: self.log_contains(
-                "Exiting"),
+            lambda: self.log_contains("No prospectors defined"),
             max_timeout=10)
 
         filebeat.check_wait(exit_code=1)
