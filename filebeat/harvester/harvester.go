@@ -15,7 +15,6 @@ package harvester
 
 import (
 	"fmt"
-	"regexp"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
@@ -26,34 +25,26 @@ import (
 )
 
 type Harvester struct {
-	path               string /* the file path to harvest */
-	config             harvesterConfig
-	offset             int64
-	state              file.State
-	prospectorChan     chan *input.FileEvent
-	file               source.FileSource /* the file being watched */
-	ExcludeLinesRegexp []*regexp.Regexp
-	IncludeLinesRegexp []*regexp.Regexp
-	done               chan struct{}
-	encodingFactory    encoding.EncodingFactory
-	encoding           encoding.Encoding
+	config          harvesterConfig
+	state           file.State
+	prospectorChan  chan *input.FileEvent
+	file            source.FileSource /* the file being watched */
+	done            chan struct{}
+	encodingFactory encoding.EncodingFactory
+	encoding        encoding.Encoding
 }
 
 func NewHarvester(
 	cfg *common.Config,
-	path string,
 	state file.State,
 	prospectorChan chan *input.FileEvent,
-	offset int64,
 	done chan struct{},
 ) (*Harvester, error) {
 
 	h := &Harvester{
-		path:           path,
 		config:         defaultConfig,
 		state:          state,
 		prospectorChan: prospectorChan,
-		offset:         offset,
 		done:           done,
 	}
 
