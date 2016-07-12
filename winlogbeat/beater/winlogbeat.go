@@ -73,12 +73,35 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		done:   make(chan struct{}),
 	}
 
+	if err := eb.init(b); err != nil {
+		return nil, err
+	}
+
 	return eb, nil
+}
+
+func (eb *Winlogbeat) init(b *beat.Beat) error {
+	config := &eb.config.Winlogbeat
+
+	// Create the event logs. This will validate the event log specific
+	// configuration.
+	eb.eventLogs = make([]eventlog.EventLog, 0, len(config.EventLogs))
+	for _, config := range config.EventLogs {
+		eventLog, err := eventlog.New(config)
+		if err != nil {
+			return fmt.Errorf("Failed to create new event log. %v", err)
+		}
+		debugf("Initialized EventLog[%s]", eventLog.Name())
+
+		eb.eventLogs = append(eb.eventLogs, eventLog)
+	}
+
+	return nil
 }
 
 // Setup uses the loaded config and creates necessary markers and environment
 // settings to allow the beat to be used.
-func (eb *Winlogbeat) Setup(b *beat.Beat) error {
+func (eb *Winlogbeat) setup(b *beat.Beat) error {
 	config := &eb.config.Winlogbeat
 
 	eb.client = b.Publisher.Connect()
@@ -104,28 +127,15 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 		}()
 	}
 
-	// Create the event logs. This will validate the event log specific
-	// configuration.
-	eb.eventLogs = make([]eventlog.EventLog, 0, len(config.EventLogs))
-	for _, config := range config.EventLogs {
-		eventLog, err := eventlog.New(config)
-		if err != nil {
-			return fmt.Errorf("Failed to create new event log. %v", err)
-		}
-		debugf("Initialized EventLog[%s]", eventLog.Name())
-
-		eb.eventLogs = append(eb.eventLogs, eventLog)
-	}
-
 	return nil
 }
 
 // Run is used within the beats interface to execute the Winlogbeat workers.
 func (eb *Winlogbeat) Run(b *beat.Beat) error {
-	if err := eb.Setup(b); err != nil {
+	if err := eb.setup(b); err != nil {
 		return err
 	}
-	defer eb.Cleanup(b)
+	defer eb.cleanup(b)
 
 	persistedState := eb.checkpoint.States()
 
@@ -151,9 +161,9 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	return nil
 }
 
-// Cleanup attempts to remove any files or data it may have created which should
+// cleanup attempts to remove any files or data it may have created which should
 // not be persisted.
-func (eb *Winlogbeat) Cleanup(b *beat.Beat) error {
+func (eb *Winlogbeat) cleanup(b *beat.Beat) {
 	logp.Info("Dumping runtime metrics...")
 	expvar.Do(func(kv expvar.KeyValue) {
 		logf := logp.Info
@@ -163,7 +173,6 @@ func (eb *Winlogbeat) Cleanup(b *beat.Beat) error {
 
 		logf("%s=%s", kv.Key, kv.Value.String())
 	})
-	return nil
 }
 
 // Stop is used to tell the winlogbeat that it should cease executing.
