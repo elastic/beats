@@ -39,6 +39,7 @@ import (
 	"math/rand"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -157,6 +158,12 @@ func (b *Beat) launch(bt Creator) error {
 		return err
 	}
 
+	// load the beats config section
+	sub, err := b.RawConfig.Child(strings.ToLower(b.Name), -1)
+	if err != nil {
+		return err
+	}
+
 	logp.Info("Setup Beat: %s; Version: %s", b.Name, b.Version)
 	processors, err := processors.New(b.Config.Processors)
 	if err != nil {
@@ -174,7 +181,7 @@ func (b *Beat) launch(bt Creator) error {
 	// defer publisher.Stop()
 
 	b.Publisher = publisher
-	beater, err := bt(b, b.RawConfig)
+	beater, err := bt(b, sub)
 	if err != nil {
 		return err
 	}
