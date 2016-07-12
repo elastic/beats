@@ -18,6 +18,7 @@ type LogPublisher interface {
 }
 
 type syncLogPublisher struct {
+	pub     publisher.Publisher
 	client  publisher.Client
 	in, out chan []*input.FileEvent
 
@@ -26,6 +27,7 @@ type syncLogPublisher struct {
 }
 
 type asyncLogPublisher struct {
+	pub     publisher.Publisher
 	client  publisher.Client
 	in, out chan []*input.FileEvent
 
@@ -69,27 +71,29 @@ var (
 func New(
 	async bool,
 	in, out chan []*input.FileEvent,
-	client publisher.Client,
+	pub publisher.Publisher,
 ) LogPublisher {
 	if async {
-		return newAsyncLogPublisher(in, out, client)
+		return newAsyncLogPublisher(in, out, pub)
 	}
-	return newSyncLogPublisher(in, out, client)
+	return newSyncLogPublisher(in, out, pub)
 }
 
 func newSyncLogPublisher(
 	in, out chan []*input.FileEvent,
-	client publisher.Client,
+	pub publisher.Publisher,
 ) *syncLogPublisher {
 	return &syncLogPublisher{
-		in:     in,
-		out:    out,
-		client: client,
-		done:   make(chan struct{}),
+		in:   in,
+		out:  out,
+		pub:  pub,
+		done: make(chan struct{}),
 	}
 }
 
 func (p *syncLogPublisher) Start() {
+	p.client = p.pub.Connect()
+
 	p.wg.Add(1)
 	go func() {
 		defer p.wg.Done()
@@ -134,17 +138,19 @@ func (p *syncLogPublisher) Stop() {
 
 func newAsyncLogPublisher(
 	in, out chan []*input.FileEvent,
-	client publisher.Client,
+	pub publisher.Publisher,
 ) *asyncLogPublisher {
 	return &asyncLogPublisher{
-		in:     in,
-		out:    out,
-		client: client,
-		done:   make(chan struct{}),
+		in:   in,
+		out:  out,
+		pub:  pub,
+		done: make(chan struct{}),
 	}
 }
 
 func (p *asyncLogPublisher) Start() {
+	p.client = p.pub.Connect()
+
 	p.wg.Add(1)
 	go func() {
 		defer p.wg.Done()

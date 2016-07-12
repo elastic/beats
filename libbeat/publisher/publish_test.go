@@ -37,7 +37,7 @@ func (topo testTopology) GetNameByIP(ip string) string {
 
 // Test GetServerName.
 func TestPublisherTypeGetServerName(t *testing.T) {
-	pt := &Publisher{name: shipperName}
+	pt := &BeatPublisher{name: shipperName}
 	assert.Equal(t, shipperName, pt.GetServerName("127.0.0.1"))
 
 	// Unknown hosts return empty string.
@@ -57,7 +57,7 @@ func TestPublisherTypeUpdateTopologyPeriodically(t *testing.T) {
 		publishName:       make(chan string, 1),
 		publishLocalAddrs: make(chan []string, 1),
 	}
-	pt := &Publisher{
+	pt := &BeatPublisher{
 		name:                 shipperName,
 		RefreshTopologyTimer: c,
 		TopologyOutput:       topo,
