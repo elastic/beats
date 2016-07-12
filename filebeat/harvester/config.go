@@ -23,7 +23,7 @@ var (
 		BackoffFactor:   2,
 		MaxBackoff:      10 * time.Second,
 		CloseOlder:      1 * time.Hour,
-		MaxBytes:        10 * (1 << 20), // 10MB
+		MaxBytes:        10 * humanize.MiByte,
 		CloseRemoved:    false,
 		CloseRenamed:    false,
 		CloseEOF:        false,

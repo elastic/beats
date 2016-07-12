@@ -11,11 +11,11 @@ filebeat.prospectors:
     - {{ path }}{% endif %}
   # Type of the files. Annotated in every documented
   scan_frequency: {{scan_frequency | default("0.1s") }}
-  ignore_older: {{ignoreOlder}}
-  close_older: {{closeOlder}}
+  ignore_older: {{ignore_older}}
+  close_older: {{close_older}}
   harvester_buffer_size:
   encoding: {{encoding | default("utf-8") }}
-  tail_files: {{tailFiles}}
+  tail_files: {{tail_files}}
   backoff: 0.1s
   backoff_factor: 1
   max_backoff: 0.1s

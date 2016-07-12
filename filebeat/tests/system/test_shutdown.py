@@ -25,7 +25,7 @@ class Test(BaseTest):
 
         self.render_config_template(
                 path=os.path.abspath(self.working_dir) + "/log/*",
-                ignoreOlder="1h"
+                ignore_older="1h"
         )
 
         os.mkdir(self.working_dir + "/log/")
