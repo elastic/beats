@@ -4,7 +4,7 @@ BUILDID=$(shell git rev-parse HEAD)
 all: {beat}/deb {beat}/rpm {beat}/darwin {beat}/win {beat}/bin \
 	build/upload/build_id.txt
 
-ES_BEATS=../../vendor/github.com/elastic/beats
+ES_BEATS?=../../vendor/github.com/elastic/beats
 include $(ES_BEATS)/dev-tools/packer/scripts/Makefile
 
 
