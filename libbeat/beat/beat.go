@@ -4,20 +4,20 @@ It provides the standard mechanism for launching a Beat. It manages
 configuration, logging, and publisher initialization and registers a signal
 handler to gracefully stop the process.
 
-Each Beat implementation must implement the Beater interface and may optionally
-implement the FlagsHandler interface. See the Beater interface documentation for
-more details.
+Each Beat implementation must implement the `Beater` interface and a `Creator`
+to create and initialize the Beater instance. See the `Beater` interface and `Creator`
+documentation for more details.
 
 To use this package, create a simple main that invokes the Run() function.
 
   func main() {
-  	if err := beat.Run("mybeat", myVersion, beater.New()); err != nil {
+  	if err := beat.Run("mybeat", myVersion, beater.New); err != nil {
   		os.Exit(1)
   	}
   }
 
 In the example above, the beater package contains the implementation of the
-Beater interface and the New() method returns a new instance of Beater. The
+Beater interface and the New method returns a new instance of Beater. The
 Beater implementation is placed into its own package so that it can be reused
 or combined with other Beats.
 
