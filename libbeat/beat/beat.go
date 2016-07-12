@@ -147,7 +147,8 @@ func newBeat(name, version string) *Beat {
 }
 
 func (b *Beat) launch(bt Creator) error {
-	if err := b.handleFlags(); err != nil {
+	err := b.handleFlags()
+	if err != nil {
 		return err
 	}
 
@@ -159,9 +160,15 @@ func (b *Beat) launch(bt Creator) error {
 	}
 
 	// load the beats config section
-	sub, err := b.RawConfig.Child(strings.ToLower(b.Name), -1)
-	if err != nil {
-		return err
+	var sub *common.Config
+	configName := strings.ToLower(b.Name)
+	if b.RawConfig.HasField(configName) {
+		sub, err = b.RawConfig.Child(configName, -1)
+		if err != nil {
+			return err
+		}
+	} else {
+		sub = common.NewConfig()
 	}
 
 	logp.Info("Setup Beat: %s; Version: %s", b.Name, b.Version)
