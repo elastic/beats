@@ -31,6 +31,14 @@ type Settings struct {
 	Raw        map[string]interface{} `config:",inline"`
 }
 
+var (
+	DefaultSettings = Settings{
+		Winlogbeat: WinlogbeatConfig{
+			RegistryFile: DefaultRegistryFile,
+		},
+	}
+)
+
 // Validate validates the Settings data and returns an error describing
 // all problems or nil if there are none.
 func (s Settings) Validate() error {

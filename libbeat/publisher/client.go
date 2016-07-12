@@ -82,6 +82,10 @@ func newClient(pub *Publisher) *client {
 }
 
 func (c *client) Close() error {
+	if c == nil {
+		return nil
+	}
+
 	c.canceler.Cancel()
 
 	// atomic decrement clients counter

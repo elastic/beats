@@ -13,42 +13,29 @@ import (
 )
 
 type {{cookiecutter.beat|capitalize}} struct {
-	config config.Config
-	done   chan struct{}
-	client publisher.Client
+	done       chan struct{}
+	config     config.Config
+	client     publisher.Client
 }
 
 // Creates beater
-func New() *{{cookiecutter.beat|capitalize}} {
-	return &{{cookiecutter.beat|capitalize}}{
+func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+	config := config.DefaultConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, fmt.Errorf("Error reading config file: %v", err)
+	}
+
+	bt := &{{cookiecutter.beat|capitalize}}{
 		done: make(chan struct{}),
+		config: config,
 	}
-}
-
-/// *** Beater interface methods ***///
-
-func (bt *{{cookiecutter.beat|capitalize}}) Config(b *beat.Beat) error {
-
-	bt.config = config.DefaultConfig
-
-	// Load beater config
-	err := b.RawConfig.Unpack(&bt.config)
-	if err != nil {
-		return fmt.Errorf("Error reading config file: %v", err)
-	}
-
-	return nil
-}
-
-func (bt *{{cookiecutter.beat|capitalize}}) Setup(b *beat.Beat) error {
-
-	bt.client = b.Publisher.Connect()
-	return nil
+	return bt, nil
 }
 
 func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
 	logp.Info("{{cookiecutter.beat}} is running! Hit CTRL-C to stop it.")
 
+	bt.client = b.Publisher.Connect()
 	ticker := time.NewTicker(bt.config.{{cookiecutter.beat|capitalize}}.Period)
 	counter := 1
 	for {
@@ -69,10 +56,7 @@ func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
 	}
 }
 
-func (bt *{{cookiecutter.beat|capitalize}}) Cleanup(b *beat.Beat) error {
-	return nil
-}
-
 func (bt *{{cookiecutter.beat|capitalize}}) Stop() {
+	bt.client.Close()
 	close(bt.done)
 }

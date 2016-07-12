@@ -99,8 +99,8 @@ func (t *PacketbeatPublisher) Start() {
 }
 
 func (t *PacketbeatPublisher) Stop() {
-	close(t.done)
 	t.client.Close()
+	close(t.done)
 	t.wg.Wait()
 }
 

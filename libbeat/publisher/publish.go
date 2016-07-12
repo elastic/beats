@@ -172,21 +172,16 @@ func (publisher *Publisher) PublishTopology(params ...string) error {
 	return nil
 }
 
-func (publisher *Publisher) RegisterProcessors(list *processors.Processors) error {
-
-	publisher.Processors = list
-	return nil
-}
-
 // Create new PublisherType
 func New(
 	beatName string,
 	configs map[string]*common.Config,
 	shipper ShipperConfig,
+	processors *processors.Processors,
 ) (*Publisher, error) {
 
 	publisher := Publisher{}
-	err := publisher.init(beatName, configs, shipper)
+	err := publisher.init(beatName, configs, shipper, processors)
 	if err != nil {
 		return nil, err
 	}
@@ -197,9 +192,11 @@ func (publisher *Publisher) init(
 	beatName string,
 	configs map[string]*common.Config,
 	shipper ShipperConfig,
+	processors *processors.Processors,
 ) error {
 	var err error
 	publisher.IgnoreOutgoing = shipper.Ignore_outgoing
+	publisher.Processors = processors
 
 	publisher.disabled = *publishDisabled
 	if publisher.disabled {
