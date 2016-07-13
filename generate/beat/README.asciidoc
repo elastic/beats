@@ -1,8 +1,7 @@
-[[creating-beat-from-metricbeat]]
-== Creating a Beat Based on Metricbeat
+[[creating-your-beat]]
+== Creating your own Beat
 
-The metricset Beat generator enables you to create a Beat that uses Metricbeat as a library and has your
-own metricsets.
+The Beat generator enables you to create your own Beat in a few steps.
 
 [float]
 === Requirements
@@ -17,14 +16,15 @@ must be set up correctly. In addition, the following tools are quired:
 Virtualenv and Cookiecutter are easiest installed with your package manager or https://pip.pypa.io/en/stable/[pip]. For more details on how to
 install cookiecutter, see the http://cookiecutter.readthedocs.io/en/latest/installation.html[cookiecutter installation docs].
 
-[float]
-=== Step 1 - Get the metricbeat source code
 
-The first step is to get the metricbeat source code:
+[float]
+=== Step 1 - Get the libbeat source code
+
+The first step is to get the libbeat source code:
 
 [source,bash]
 ----
-go get github.com/elastic/beats/metricbeat
+go get github.com/elastic/beats/libbeat
 ----
 
 This will clone the beats repository into `GOPATH`. Now change to the directory where you want to create the beat.
@@ -38,7 +38,7 @@ Run the command:
 
 [source,bash]
 ----
-cookiecutter $GOPATH/src/github.com/elastic/beats/generate/metricbeat/metricset
+cookiecutter $GOPATH/src/github.com/elastic/beats/generate/beat
 ----
 
 When prompted, enter the Beat name and path.
@@ -54,10 +54,9 @@ After creating the Beat, change the directory to `$GOPATH/src/github.com/{your-g
 make setup
 ----
 
-This will do the initial setup for your Beat and also run `make create-metricset`, which will ask you for the
-module name and metricset name of your Beat.
+This will do the initial setup for your Beat.
 
-For more details about creating a metricset, see the docs about https://www.elastic.co/guide/en/beats/metricbeat/current/creating-metricsets.html[creating a metricset].
+For more details about creating a beat, see the https://www.elastic.co/guide/en/beats/libbeat/current/new-beat.html[beat developer docs].
 
 
 [float]
@@ -87,4 +86,5 @@ make package
 
 This will fetch the most recent packaging tools and start the packaging of your beat. This can take a little bit longer.
 
-For more details about creating a metricset, see the docs about https://www.elastic.co/guide/en/beats/metricbeat/current/creating-metricsets.html[creating a metricset].
+
+For more details about creating a beat, see the https://www.elastic.co/guide/en/beats/libbeat/current/new-beat.html[beat developer docs].

@@ -309,6 +309,13 @@ install-home:
 	install -d -m 755 ${HOME_PREFIX}/scripts/
 	install -m 755 ${ES_BEATS}/libbeat/scripts/migrate_beat_config_1_x_to_5_0.py ${HOME_PREFIX}/scripts/
 
+# Creates packer files in a beat
 .PHONY: create-packer
 create-packer:
 	python ${ES_BEATS}/libbeat/scripts/create_packer.py --es_beats=${ES_BEATS} --beat_path=${BEAT_DIR} --beat=${BEATNAME}
+
+# Create binary packages for the beat
+package: create-packer
+	cd dev-tools/packer; \
+	export ES_BEATS=${ES_BEATS} ; \
+	make deps images ${BEATNAME}
