@@ -102,6 +102,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...v5.0.0-alpha4[View comm
 *Metricbeat*
 
 - Fix the CPU values returned for each core. {issue}1863[1863]
+- Add pgid field to process information.
 
 *Packetbeat*
 
