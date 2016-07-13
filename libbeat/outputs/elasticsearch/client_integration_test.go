@@ -17,9 +17,7 @@ func TestClientConnect(t *testing.T) {
 
 	client := GetTestingElasticsearch()
 	err := client.Connect(5 * time.Second)
-
-	assert.Nil(t, err)
-	assert.True(t, client.IsConnected())
+	assert.NoError(t, err)
 }
 
 func TestCheckTemplate(t *testing.T) {
