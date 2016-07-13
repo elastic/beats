@@ -36,7 +36,7 @@ func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
 	logp.Info("{{cookiecutter.beat}} is running! Hit CTRL-C to stop it.")
 
 	bt.client = b.Publisher.Connect()
-	ticker := time.NewTicker(bt.config.{{cookiecutter.beat|capitalize}}.Period)
+	ticker := time.NewTicker(bt.config.Period)
 	counter := 1
 	for {
 		select {

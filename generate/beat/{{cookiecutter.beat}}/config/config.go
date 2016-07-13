@@ -6,15 +6,9 @@ package config
 import "time"
 
 type Config struct {
-	{{cookiecutter.beat|capitalize}} {{cookiecutter.beat|capitalize}}Config
-}
-
-type {{cookiecutter.beat|capitalize}}Config struct {
 	Period time.Duration `config:"period"`
 }
 
 var DefaultConfig = Config{
-	{{cookiecutter.beat|capitalize}}: {{cookiecutter.beat|capitalize}}Config{
-		Period: 1 * time.Second,
-	},
+	Period: 1 * time.Second,
 }

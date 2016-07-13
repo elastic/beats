@@ -11,19 +11,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func load(t *testing.T, in string) cfg.FilebeatConfig {
+func load(t *testing.T, in string) *cfg.Config {
 	yaml, err := common.NewConfigWithYAML([]byte(in), "")
 	if err != nil {
 		t.Fatalf("Failed to parse config input: %v", err)
 	}
 
-	config := cfg.DefaultConfig
-	err = yaml.Unpack(&config)
+	tmpConfig := struct {
+		Filebeat cfg.Config
+	}{cfg.DefaultConfig}
+	err = yaml.Unpack(&tmpConfig)
 	if err != nil {
 		t.Fatalf("Failed to unpack config: %v", err)
 	}
 
-	return config.Filebeat
+	return &tmpConfig.Filebeat
 }
 
 func TestNewSpoolerDefaultConfig(t *testing.T) {
@@ -33,13 +35,13 @@ func TestNewSpoolerDefaultConfig(t *testing.T) {
 	spooler, err := New(config, nil)
 
 	assert.NoError(t, err)
-	assert.Equal(t, cfg.DefaultConfig.Filebeat.SpoolSize, spooler.config.spoolSize)
-	assert.Equal(t, cfg.DefaultConfig.Filebeat.IdleTimeout, spooler.config.idleTimeout)
+	assert.Equal(t, cfg.DefaultConfig.SpoolSize, spooler.config.spoolSize)
+	assert.Equal(t, cfg.DefaultConfig.IdleTimeout, spooler.config.idleTimeout)
 }
 
 func TestNewSpoolerSpoolSize(t *testing.T) {
 	spoolSize := uint64(19)
-	config := cfg.FilebeatConfig{SpoolSize: spoolSize}
+	config := &cfg.Config{SpoolSize: spoolSize}
 	spooler, err := New(config, nil)
 
 	assert.NoError(t, err)

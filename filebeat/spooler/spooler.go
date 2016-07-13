@@ -33,7 +33,7 @@ type spoolerConfig struct {
 // New creates and returns a new Spooler. The returned Spooler must be
 // started by calling Start before it can be used.
 func New(
-	config cfg.FilebeatConfig,
+	config *cfg.Config,
 	publisher chan<- []*input.FileEvent,
 ) (*Spooler, error) {
 

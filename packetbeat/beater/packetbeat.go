@@ -67,14 +67,12 @@ func init() {
 
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	config := config.Config{
-		Packetbeat: config.PacketbeatConfig{
-			Interfaces: config.InterfacesConfig{
-				File:       *cmdLineArgs.File,
-				Loop:       *cmdLineArgs.Loop,
-				TopSpeed:   *cmdLineArgs.TopSpeed,
-				OneAtATime: *cmdLineArgs.OneAtAtime,
-				Dumpfile:   *cmdLineArgs.Dumpfile,
-			},
+		Interfaces: config.InterfacesConfig{
+			File:       *cmdLineArgs.File,
+			Loop:       *cmdLineArgs.Loop,
+			TopSpeed:   *cmdLineArgs.TopSpeed,
+			OneAtATime: *cmdLineArgs.OneAtAtime,
+			Dumpfile:   *cmdLineArgs.Dumpfile,
 		},
 	}
 	err := rawConfig.Unpack(&config)
@@ -98,7 +96,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // init packetbeat components
 func (pb *Packetbeat) init(b *beat.Beat) error {
 
-	cfg := &pb.Config.Packetbeat
+	cfg := &pb.Config
 	err := procs.ProcWatcher.Init(cfg.Procs)
 	if err != nil {
 		logp.Critical(err.Error())
@@ -148,7 +146,7 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 	pb.Pub.Start()
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
-	if err := droppriv.DropPrivileges(pb.Config.Packetbeat.RunOptions); err != nil {
+	if err := droppriv.DropPrivileges(pb.Config.RunOptions); err != nil {
 		return err
 	}
 
@@ -199,7 +197,7 @@ func (pb *Packetbeat) Stop() {
 }
 
 func (pb *Packetbeat) setupSniffer() error {
-	cfg := &pb.Config.Packetbeat
+	cfg := &pb.Config
 
 	withVlans := cfg.Interfaces.With_vlans
 	_, withICMP := cfg.Protocols["icmp"]
@@ -217,8 +215,8 @@ func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
 		var f *flows.Flows
 		var err error
 
-		if pb.Config.Packetbeat.Flows != nil {
-			f, err = flows.NewFlows(pb.Pub, pb.Config.Packetbeat.Flows)
+		if pb.Config.Flows != nil {
+			f, err = flows.NewFlows(pb.Pub, pb.Config.Flows)
 			if err != nil {
 				return nil, "", err
 			}
@@ -226,7 +224,7 @@ func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
 
 		var icmp4 icmp.ICMPv4Processor
 		var icmp6 icmp.ICMPv6Processor
-		if cfg, exists := pb.Config.Packetbeat.Protocols["icmp"]; exists {
+		if cfg, exists := pb.Config.Protocols["icmp"]; exists {
 			icmp, err := icmp.New(false, pb.Pub, cfg)
 			if err != nil {
 				return nil, "", err

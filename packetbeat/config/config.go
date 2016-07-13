@@ -9,14 +9,10 @@ import (
 )
 
 type Config struct {
-	Packetbeat PacketbeatConfig
-}
-
-type PacketbeatConfig struct {
-	Interfaces InterfacesConfig
-	Flows      *Flows
-	Protocols  map[string]*common.Config
-	Procs      procs.ProcsConfig
+	Interfaces InterfacesConfig          `config:"interfaces"`
+	Flows      *Flows                    `config:"flows"`
+	Protocols  map[string]*common.Config `config:"protocols"`
+	Procs      procs.ProcsConfig         `config:"procs"`
 	RunOptions droppriv.RunOptions
 }
 
