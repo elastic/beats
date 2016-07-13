@@ -61,11 +61,6 @@ func newAsyncWorker(
 
 func (w *asyncWorker) run() {
 	client := w.client
-	defer func() {
-		if client.IsConnected() {
-			_ = client.Close()
-		}
-	}()
 
 	debugf("load balancer: start client loop")
 	defer debugf("load balancer: stop client loop")
@@ -74,9 +69,10 @@ func (w *asyncWorker) run() {
 	for !done {
 		if done = w.connect(); !done {
 			done = w.sendLoop()
+
+			debugf("close client (done=%v)", done)
+			client.Close()
 		}
-		debugf("close client (done=%v)", done)
-		client.Close()
 	}
 }
 

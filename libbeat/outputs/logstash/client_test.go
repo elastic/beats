@@ -186,10 +186,6 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 
 		// read batch + never ACK in order to enforce timeout
 		server.Receive()
-
-		// close client
-		for transp.IsConnected() {
-		}
 	}
 
 	client.Stop()

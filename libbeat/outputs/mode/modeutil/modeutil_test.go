@@ -14,7 +14,6 @@ type dummyClient struct{}
 
 func (dummyClient) Connect(timeout time.Duration) error { return nil }
 func (dummyClient) Close() error                        { return nil }
-func (dummyClient) IsConnected() bool                   { return false }
 func (dummyClient) PublishEvents(events []common.MapStr) (nextEvents []common.MapStr, err error) {
 	return nil, nil
 }

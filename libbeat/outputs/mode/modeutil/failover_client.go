@@ -49,10 +49,6 @@ func (f *failOverClient) Connect(to time.Duration) error {
 	return connect(f, to)
 }
 
-func (f *failOverClient) IsConnected() bool {
-	return f.active >= 0 && f.conns[f.active].IsConnected()
-}
-
 func (f *failOverClient) Close() error {
 	return closeActive(f)
 }
@@ -87,10 +83,6 @@ func (f *asyncFailOverClient) Activate(i int)             { f.active = i }
 
 func (f *asyncFailOverClient) Connect(to time.Duration) error {
 	return connect(f, to)
-}
-
-func (f *asyncFailOverClient) IsConnected() bool {
-	return f.active >= 0 && f.conns[f.active].IsConnected()
 }
 
 func (f *asyncFailOverClient) Close() error {
@@ -143,10 +135,6 @@ func connect(lst clientList, to time.Duration) error {
 
 	conn := lst.Get(next)
 	lst.Activate(next)
-	if conn.IsConnected() {
-		return nil
-	}
-
 	return conn.Connect(to)
 }
 
