@@ -1,6 +1,7 @@
 package publish
 
 import (
+	"expvar"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -17,6 +18,7 @@ type LogPublisher interface {
 }
 
 type syncLogPublisher struct {
+	pub     publisher.Publisher
 	client  publisher.Client
 	in, out chan []*input.FileEvent
 
@@ -25,6 +27,7 @@ type syncLogPublisher struct {
 }
 
 type asyncLogPublisher struct {
+	pub     publisher.Publisher
 	client  publisher.Client
 	in, out chan []*input.FileEvent
 
@@ -61,30 +64,36 @@ const (
 	batchCanceled
 )
 
+var (
+	eventsSent = expvar.NewInt("publish.events")
+)
+
 func New(
 	async bool,
 	in, out chan []*input.FileEvent,
-	client publisher.Client,
+	pub publisher.Publisher,
 ) LogPublisher {
 	if async {
-		return newAsyncLogPublisher(in, out, client)
+		return newAsyncLogPublisher(in, out, pub)
 	}
-	return newSyncLogPublisher(in, out, client)
+	return newSyncLogPublisher(in, out, pub)
 }
 
 func newSyncLogPublisher(
 	in, out chan []*input.FileEvent,
-	client publisher.Client,
+	pub publisher.Publisher,
 ) *syncLogPublisher {
 	return &syncLogPublisher{
-		in:     in,
-		out:    out,
-		client: client,
-		done:   make(chan struct{}),
+		in:   in,
+		out:  out,
+		pub:  pub,
+		done: make(chan struct{}),
 	}
 }
 
 func (p *syncLogPublisher) Start() {
+	p.client = p.pub.Connect()
+
 	p.wg.Add(1)
 	go func() {
 		defer p.wg.Done()
@@ -108,7 +117,8 @@ func (p *syncLogPublisher) Start() {
 			}
 
 			p.client.PublishEvents(pubEvents, publisher.Sync, publisher.Guaranteed)
-			logp.Info("Events sent: %d", len(events))
+			logp.Debug("publish", "Events sent: %d", len(events))
+			eventsSent.Add(int64(len(events)))
 
 			// Tell the registrar that we've successfully sent these events
 			select {
@@ -121,24 +131,26 @@ func (p *syncLogPublisher) Start() {
 }
 
 func (p *syncLogPublisher) Stop() {
-	close(p.done)
 	p.client.Close()
+	close(p.done)
 	p.wg.Wait()
 }
 
 func newAsyncLogPublisher(
 	in, out chan []*input.FileEvent,
-	client publisher.Client,
+	pub publisher.Publisher,
 ) *asyncLogPublisher {
 	return &asyncLogPublisher{
-		in:     in,
-		out:    out,
-		client: client,
-		done:   make(chan struct{}),
+		in:   in,
+		out:  out,
+		pub:  pub,
+		done: make(chan struct{}),
 	}
 }
 
 func (p *asyncLogPublisher) Start() {
+	p.client = p.pub.Connect()
+
 	p.wg.Add(1)
 	go func() {
 		defer p.wg.Done()
@@ -176,8 +188,8 @@ func (p *asyncLogPublisher) Start() {
 }
 
 func (p *asyncLogPublisher) Stop() {
-	close(p.done)
 	p.client.Close()
+	close(p.done)
 	p.wg.Wait()
 }
 

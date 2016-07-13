@@ -660,7 +660,7 @@ Note that limiting documents in this way means that they are no longer correctly
 formatted JSON objects.
 
 [[configuration-processes]]
-=== Monitored Processes Configuration (Optional)
+=== Monitored Processes Configuration
 
 This section of the +{beatname_lc}.yml+ config file is optional, but configuring
 the processes enables Packetbeat to show you not only the servers that the
@@ -723,7 +723,7 @@ process' command line as read from `/proc/<pid>/cmdline`.
 
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/filteringconfig.asciidoc[]
+include::../../../../libbeat/docs/processors-config.asciidoc[]
 
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 

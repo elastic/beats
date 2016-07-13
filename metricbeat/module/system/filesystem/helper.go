@@ -1,10 +1,13 @@
-package common
+// +build darwin freebsd linux openbsd windows
+
+package filesystem
 
 import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/module/system"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -50,7 +53,7 @@ func AddFileSystemUsedPercentage(f *FileSystemStat) {
 	}
 
 	perc := float64(f.Used) / float64(f.Total)
-	f.UsedPercent = Round(perc, .5, 4)
+	f.UsedPercent = system.Round(perc, .5, 4)
 }
 
 func CollectFileSystemStats(fss []sigar.FileSystem) []common.MapStr {

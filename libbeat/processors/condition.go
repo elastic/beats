@@ -28,21 +28,19 @@ type Condition struct {
 	contains map[string]string
 	regexp   map[string]*regexp.Regexp
 	rangexp  map[string]RangeValue
+	or       []Condition
+	and      []Condition
+	not      *Condition
 }
 
-func AvailableCondition(name string) bool {
-
-	switch name {
-	case "equals", "contains", "range", "regexp":
-		return true
-	default:
-		return false
-	}
-}
-
-func NewCondition(config ConditionConfig) (*Condition, error) {
+func NewCondition(config *ConditionConfig) (*Condition, error) {
 
 	c := Condition{}
+
+	if config == nil {
+		// empty condition
+		return nil, nil
+	}
 
 	if config.Equals != nil {
 		if err := c.setEquals(config.Equals); err != nil {
@@ -60,11 +58,33 @@ func NewCondition(config ConditionConfig) (*Condition, error) {
 		if err := c.setRange(config.Range); err != nil {
 			return nil, err
 		}
+	} else if len(config.OR) > 0 {
+		for _, cond_config := range config.OR {
+			cond, err := NewCondition(&cond_config)
+			if err != nil {
+				return nil, err
+			}
+			c.or = append(c.or, *cond)
+		}
+	} else if len(config.AND) > 0 {
+		for _, cond_config := range config.AND {
+			cond, err := NewCondition(&cond_config)
+			if err != nil {
+				return nil, err
+			}
+			c.and = append(c.and, *cond)
+		}
+	} else if config.NOT != nil {
+		cond, err := NewCondition(config.NOT)
+		if err != nil {
+			return nil, err
+		}
+		c.not = cond
 	} else {
-		// empty condition
-		return nil, nil
+		return nil, fmt.Errorf("missing condition")
 	}
 
+	logp.Debug("processors", "New condition %s", c)
 	return &c, nil
 }
 
@@ -171,6 +191,18 @@ func (c *Condition) setRange(cfg *ConditionFields) error {
 }
 
 func (c *Condition) Check(event common.MapStr) bool {
+
+	if len(c.or) > 0 {
+		return c.checkOR(event)
+	}
+
+	if len(c.and) > 0 {
+		return c.checkAND(event)
+	}
+
+	if c.not != nil {
+		return c.checkNOT(event)
+	}
 
 	if !c.checkEquals(event) {
 		return false
@@ -329,6 +361,34 @@ func (c *Condition) checkRange(event common.MapStr) bool {
 	return true
 }
 
+func (c *Condition) checkOR(event common.MapStr) bool {
+
+	for _, cond := range c.or {
+		if cond.Check(event) {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *Condition) checkAND(event common.MapStr) bool {
+
+	for _, cond := range c.and {
+		if !cond.Check(event) {
+			return false
+		}
+	}
+	return true
+}
+
+func (c *Condition) checkNOT(event common.MapStr) bool {
+
+	if c.not.Check(event) {
+		return false
+	}
+	return true
+}
+
 func (c Condition) String() string {
 
 	s := ""
@@ -345,6 +405,22 @@ func (c Condition) String() string {
 	if len(c.rangexp) > 0 {
 		s = s + fmt.Sprintf("range: %v", c.rangexp)
 	}
+	if len(c.or) > 0 {
+		for _, cond := range c.or {
+			s = s + cond.String() + " or "
+		}
+		s = s[:len(s)-len(" or ")] //delete the last or
+	}
+	if len(c.and) > 0 {
+		for _, cond := range c.and {
+			s = s + cond.String() + " and "
+		}
+		s = s[:len(s)-len(" and ")] //delete the last and
+	}
+	if c.not != nil {
+		s = s + "not " + c.not.String()
+	}
+
 	return s
 }
 

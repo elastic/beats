@@ -1,6 +1,7 @@
 package mongodb
 
 import (
+	"expvar"
 	"fmt"
 	"strings"
 	"time"
@@ -34,6 +35,10 @@ type transactionKey struct {
 	tcp common.HashableTcpTuple
 	id  int
 }
+
+var (
+	unmatchedRequests = expvar.NewInt("mongodb.unmatched_requests")
+)
 
 func init() {
 	protos.Register("mongodb", New)
@@ -120,7 +125,7 @@ func ensureMongodbConnection(private protos.ProtocolData) *mongodbConnectionData
 		return &mongodbConnectionData{}
 	}
 	if priv == nil {
-		logp.Warn("Unexpected: mongodb connection data not set, create new one")
+		debugf("Unexpected: mongodb connection data not set, create new one")
 		return &mongodbConnectionData{}
 	}
 
@@ -226,7 +231,8 @@ func (mongodb *Mongodb) onRequest(conn *mongodbConnectionData, msg *mongodbMessa
 	// insert into cache for correlation
 	old := mongodb.requests.Put(key, msg)
 	if old != nil {
-		logp.Warn("Two requests without a Response. Dropping old request")
+		debugf("Two requests without a Response. Dropping old request")
+		unmatchedRequests.Add(1)
 	}
 }
 

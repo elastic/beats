@@ -18,7 +18,7 @@ import (
 var Name = "winlogbeat"
 
 func main() {
-	if err := beat.Run(Name, "", beater.New()); err != nil {
+	if err := beat.Run(Name, "", beater.New); err != nil {
 		os.Exit(1)
 	}
 }

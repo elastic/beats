@@ -61,11 +61,6 @@ func newSyncWorker(
 
 func (w *syncWorker) run() {
 	client := w.client
-	defer func() {
-		if client.IsConnected() {
-			_ = client.Close()
-		}
-	}()
 
 	debugf("load balancer: start client loop")
 	defer debugf("load balancer: stop client loop")
@@ -74,25 +69,27 @@ func (w *syncWorker) run() {
 	for !done {
 		if done = w.connect(); !done {
 			done = w.sendLoop()
+
+			debugf("close client (done=%v)", done)
+			client.Close()
 		}
-		debugf("close client (done=%v)", done)
-		client.Close()
 	}
 }
 
 func (w *syncWorker) connect() bool {
 	for {
-		debugf("try to (re-)connect client")
 		err := w.client.Connect(w.ctx.timeout)
-		if !w.backoff.WaitOnError(err) {
-			return true
-		}
-
 		if err == nil {
+			w.backoff.Reset()
 			return false
 		}
 
-		debugf("connect failed with: %v", err)
+		logp.Info("Connect failed with: %v", err)
+
+		cont := w.backoff.Wait()
+		if !cont {
+			return true
+		}
 	}
 }
 

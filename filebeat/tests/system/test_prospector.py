@@ -17,7 +17,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            ignoreOlder="1s"
+            ignore_older="1s"
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -50,7 +50,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            ignoreOlder="15s"
+            ignore_older="15s"
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -112,8 +112,8 @@ class Test(BaseTest):
     def test_rotating_close_older_larger_write_rate(self):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            ignoreOlder="10s",
-            closeOlder="1s",
+            ignore_older="10s",
+            close_older="1s",
             scan_frequency="0.1s",
         )
 
@@ -175,8 +175,8 @@ class Test(BaseTest):
     def test_rotating_close_older_low_write_rate(self):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            ignoreOlder="10s",
-            closeOlder="1s",
+            ignore_older="10s",
+            close_older="1s",
             scan_frequency="0.1s",
         )
 
@@ -247,11 +247,10 @@ class Test(BaseTest):
             max_timeout=10)
 
         self.wait_until(
-            lambda: self.log_contains(
-                "Exiting"),
+            lambda: self.log_contains("No prospectors defined"),
             max_timeout=10)
 
-        filebeat.check_kill_and_wait(exit_code=1)
+        filebeat.check_wait(exit_code=1)
 
     def test_no_paths_defined(self):
         """
@@ -274,7 +273,7 @@ class Test(BaseTest):
                 "Exiting"),
             max_timeout=10)
 
-        filebeat.check_kill_and_wait(exit_code=1)
+        filebeat.check_wait(exit_code=1)
 
 
     def test_files_added_late(self):
@@ -314,8 +313,8 @@ class Test(BaseTest):
         """
         self.render_config_template(
                 path=os.path.abspath(self.working_dir) + "/log/*",
-                ignoreOlder="1h",
-                closeOlder="1s",
+                ignore_older="1h",
+                close_older="1s",
                 scan_frequency="0.1s",
         )
 
@@ -366,8 +365,8 @@ class Test(BaseTest):
         """
         self.render_config_template(
                 path=os.path.abspath(self.working_dir) + "/log/*",
-                ignoreOlder="1h",
-                closeOlder="3s",
+                ignore_older="1h",
+                close_older="3s",
                 scan_frequency="0.1s",
         )
 
@@ -411,8 +410,8 @@ class Test(BaseTest):
         """
         self.render_config_template(
                 path=os.path.abspath(self.working_dir) + "/log/test.log",
-                ignoreOlder="1h",
-                closeOlder="3s",
+                ignore_older="1h",
+                close_older="3s",
                 scan_frequency="0.1s",
         )
 
@@ -460,8 +459,8 @@ class Test(BaseTest):
         """
         self.render_config_template(
                 path=os.path.abspath(self.working_dir) + "/log/test.log",
-                ignoreOlder="1h",
-                closeOlder="3s",
+                ignore_older="1h",
+                close_older="3s",
                 scan_frequency="0.1s",
         )
 

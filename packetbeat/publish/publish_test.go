@@ -63,6 +63,7 @@ func TestFilterEvent(t *testing.T) {
 
 func TestDirectionOut(t *testing.T) {
 	publisher := newTestPublisher([]string{"192.145.2.4"})
+	ppub, _ := NewPublisher(publisher, 1000, 1)
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
@@ -81,13 +82,14 @@ func TestDirectionOut(t *testing.T) {
 		},
 	}
 
-	assert.True(t, normalizeTransAddr(publisher, event))
+	assert.True(t, ppub.normalizeTransAddr(event))
 	assert.True(t, event["client_ip"] == "192.145.2.4")
 	assert.True(t, event["direction"] == "out")
 }
 
 func TestDirectionIn(t *testing.T) {
 	publisher := newTestPublisher([]string{"192.145.2.5"})
+	ppub, _ := NewPublisher(publisher, 1000, 1)
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
@@ -106,19 +108,20 @@ func TestDirectionIn(t *testing.T) {
 		},
 	}
 
-	assert.True(t, normalizeTransAddr(publisher, event))
+	assert.True(t, ppub.normalizeTransAddr(event))
 	assert.True(t, event["client_ip"] == "192.145.2.4")
 	assert.True(t, event["direction"] == "in")
 }
 
-func newTestPublisher(ips []string) *publisher.Publisher {
-	p := &publisher.Publisher{}
+func newTestPublisher(ips []string) *publisher.BeatPublisher {
+	p := &publisher.BeatPublisher{}
 	p.IpAddrs = ips
 	return p
 }
 
 func TestNoDirection(t *testing.T) {
 	publisher := newTestPublisher([]string{"192.145.2.6"})
+	ppub, _ := NewPublisher(publisher, 1000, 1)
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
@@ -137,7 +140,7 @@ func TestNoDirection(t *testing.T) {
 		},
 	}
 
-	assert.True(t, normalizeTransAddr(publisher, event))
+	assert.True(t, ppub.normalizeTransAddr(event))
 	assert.True(t, event["client_ip"] == "192.145.2.4")
 	_, ok := event["direction"]
 	assert.False(t, ok)

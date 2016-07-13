@@ -407,7 +407,7 @@ filebeat.config_dir: path/to/configs
 
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/filteringconfig.asciidoc[]
+include::../../../../libbeat/docs/processors-config.asciidoc[]
 
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 

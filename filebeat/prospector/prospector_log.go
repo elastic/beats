@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -13,7 +14,6 @@ import (
 type ProspectorLog struct {
 	Prospector *Prospector
 	config     prospectorConfig
-	lastScan   time.Time
 	lastClean  time.Time
 }
 
@@ -56,7 +56,21 @@ func (p *ProspectorLog) Run() {
 		p.Prospector.states.Cleanup()
 		logp.Debug("prospector", "Prospector states cleaned up.")
 	}
-	p.lastScan = time.Now()
+
+	// Cleanup of removed files will only happen after next scan. Otherwise it can happen that not all states
+	// were updated before cleanup is called
+	if p.config.CleanRemoved {
+		for _, state := range p.Prospector.states.GetStates() {
+			// os.Stat will return an error in case the file does not exist
+			_, err := os.Stat(state.Source)
+			if err != nil {
+				state.TTL = 0
+				event := input.NewEvent(state)
+				p.Prospector.harvesterChan <- event
+				logp.Debug("prospector", "Cleanup state for file as file removed: %s", state.Source)
+			}
+		}
+	}
 }
 
 // getFiles returns all files which have to be harvested
@@ -109,8 +123,6 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 // Scan starts a scanGlob for each provided path/glob
 func (p *ProspectorLog) scan() {
 
-	newLastScan := time.Now()
-
 	// TODO: Track harvesters to prevent any file from being harvested twice. Finished state could be delayed?
 	// Now let's do one quick scan to pick up new files
 	for f, fileinfo := range p.getFiles() {
@@ -130,8 +142,6 @@ func (p *ProspectorLog) scan() {
 			p.harvestExistingFile(newState, lastState)
 		}
 	}
-
-	p.lastScan = newLastScan
 }
 
 // harvestNewFile harvest a new file
@@ -167,11 +177,11 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 		// or no new lines were detected. It sends only an event status update to make sure the new name is persisted.
 		logp.Debug("prospector", "File rename was detected, updating state: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
 
-		h, _ := p.Prospector.createHarvester(newState)
-		h.SetOffset(oldState.Offset)
-
 		// Update state because of file rotation
-		h.SendStateUpdate()
+		newState.Offset = oldState.Offset
+		event := input.NewEvent(newState)
+		p.Prospector.harvesterChan <- event
+
 	} else {
 		// TODO: improve logging depedent on what the exact reason is that harvesting does not continue
 		// Nothing to do. Harvester is still running and file was not renamed

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
@@ -15,8 +16,8 @@ type IncludeFields struct {
 }
 
 type IncludeFieldsConfig struct {
-	Fields                     []string `config:"fields"`
-	processors.ConditionConfig `config:",inline"`
+	Fields []string                    `config:"fields"`
+	Cond   *processors.ConditionConfig `config:"when"`
 }
 
 func init() {
@@ -54,7 +55,7 @@ func newIncludeFields(c common.Config) (processors.Processor, error) {
 	}
 	f.Fields = config.Fields
 
-	cond, err := processors.NewCondition(config.ConditionConfig)
+	cond, err := processors.NewCondition(config.Cond)
 	if err != nil {
 		return nil, err
 	}
@@ -67,11 +68,10 @@ func (f *IncludeFields) CheckConfig(c common.Config) error {
 
 	complete := false
 
+	logp.Info("include_fields: %v", c)
 	for _, field := range c.GetFields() {
-		if !processors.AvailableCondition(field) {
-			if field != "fields" {
-				return fmt.Errorf("unexpected %s option in the include_fields configuration", field)
-			}
+		if field != "fields" && field != "when" {
+			return fmt.Errorf("unexpected %s option in the include_fields configuration", field)
 		}
 		if field == "fields" {
 			complete = true

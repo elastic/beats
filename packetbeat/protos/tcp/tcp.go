@@ -1,6 +1,7 @@
 package tcp
 
 import (
+	"expvar"
 	"fmt"
 	"time"
 
@@ -30,6 +31,10 @@ type Tcp struct {
 type Processor interface {
 	Process(flow *flows.FlowID, hdr *layers.TCP, pkt *protos.Packet)
 }
+
+var (
+	droppedBecauseOfGaps = expvar.NewInt("tcp.dropped_because_of_gaps")
+)
 
 type seqCompare int
 
@@ -171,12 +176,13 @@ func (tcp *Tcp) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 			}
 
 			gap := int(tcpStartSeq - lastSeq)
-			logp.Warn("Gap in tcp stream. last_seq: %d, seq: %d, gap: %d", lastSeq, tcpStartSeq, gap)
+			debugf("Gap in tcp stream. last_seq: %d, seq: %d, gap: %d", lastSeq, tcpStartSeq, gap)
 			drop := stream.gapInStream(gap)
 			if drop {
 				if isDebug {
 					debugf("Dropping connection state because of gap")
 				}
+				droppedBecauseOfGaps.Add(1)
 
 				// drop application layer connection state and
 				// update stream_id for app layer analysers using stream_id for lookups

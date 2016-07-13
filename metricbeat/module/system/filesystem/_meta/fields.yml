@@ -36,7 +36,7 @@
       description: >
         The used disk space in bytes.
     - name: used.pct
-      type: float
+      type: half_float
       description: >
         The percentage of used disk space.
 

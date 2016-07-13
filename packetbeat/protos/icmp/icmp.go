@@ -1,6 +1,7 @@
 package icmp
 
 import (
+	"expvar"
 	"net"
 	"time"
 
@@ -47,6 +48,12 @@ const (
 	duplicateRequestMsg = "Another request with the same Id and Seq was received so this request was closed without receiving a response."
 	orphanedRequestMsg  = "Request was received without an associated response."
 	orphanedResponseMsg = "Response was received without an associated request."
+)
+
+var (
+	unmatchedRequests  = expvar.NewInt("icmp.unmatched_requests")
+	unmatchedResponses = expvar.NewInt("icmp.unmatched_responses")
+	duplicateRequests  = expvar.NewInt("icmp.duplicate_requests")
 )
 
 func New(testMode bool, results publish.Transactions, cfg *common.Config) (*Icmp, error) {
@@ -175,6 +182,7 @@ func (icmp *Icmp) processRequest(tuple *icmpTuple, msg *icmpMessage) {
 	if trans != nil {
 		trans.Notes = append(trans.Notes, duplicateRequestMsg)
 		logp.Debug("icmp", duplicateRequestMsg+" %s", tuple)
+		duplicateRequests.Add(1)
 		icmp.publishTransaction(trans)
 	}
 
@@ -197,6 +205,7 @@ func (icmp *Icmp) processResponse(tuple *icmpTuple, msg *icmpMessage) {
 		trans = &icmpTransaction{Ts: msg.Ts, Tuple: revTuple}
 		trans.Notes = append(trans.Notes, orphanedResponseMsg)
 		logp.Debug("icmp", orphanedResponseMsg+" %s", tuple)
+		unmatchedResponses.Add(1)
 	}
 
 	trans.Response = msg
@@ -246,6 +255,7 @@ func (icmp *Icmp) deleteTransaction(k hashableIcmpTuple) *icmpTransaction {
 func (icmp *Icmp) expireTransaction(tuple hashableIcmpTuple, trans *icmpTransaction) {
 	trans.Notes = append(trans.Notes, orphanedRequestMsg)
 	logp.Debug("icmp", orphanedRequestMsg+" %s", &trans.Tuple)
+	unmatchedRequests.Add(1)
 	icmp.publishTransaction(trans)
 }
 

@@ -1,11 +1,12 @@
-// +build darwin linux openbsd windows
+// +build darwin freebsd linux openbsd windows
+
+// +build darwin freebsd linux openbsd windows
 
 package memory
 
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	system "github.com/elastic/beats/metricbeat/module/system/common"
 
 	"github.com/pkg/errors"
 )
@@ -28,17 +29,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches memory metrics from the OS.
 func (m *MetricSet) Fetch() (event common.MapStr, err error) {
-	memStat, err := system.GetMemory()
+	memStat, err := GetMemory()
 	if err != nil {
 		return nil, errors.Wrap(err, "memory")
 	}
-	system.AddMemPercentage(memStat)
+	AddMemPercentage(memStat)
 
-	swapStat, err := system.GetSwap()
+	swapStat, err := GetSwap()
 	if err != nil {
 		return nil, errors.Wrap(err, "swap")
 	}
-	system.AddSwapPercentage(swapStat)
+	AddSwapPercentage(swapStat)
 
 	memory := common.MapStr{
 		"total": memStat.Total,

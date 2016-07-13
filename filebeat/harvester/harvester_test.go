@@ -14,9 +14,9 @@ import (
 func TestExampleTest(t *testing.T) {
 
 	h := Harvester{
-		Path:   "/var/log/",
+		path:   "/var/log/",
 		offset: 0,
 	}
 
-	assert.Equal(t, "/var/log/", h.Path)
+	assert.Equal(t, "/var/log/", h.path)
 }

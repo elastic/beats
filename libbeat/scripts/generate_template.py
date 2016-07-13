@@ -178,10 +178,14 @@ def fill_field_properties(args, field, defaults, path):
             }
 
     elif field["type"] in ["geo_point", "date", "long", "integer",
-                           "double", "float", "boolean"]:
+                           "double", "float", "half_float", "boolean"]:
         # Convert all integer fields to long
         if field["type"] == "integer":
             field["type"] = "long"
+
+        if args.es2x and field["type"] == "half_float":
+            # ES 2.x doesn't support half floats, so convert to floats
+            field["type"] = "float"
 
         properties[field["name"]] = {
             "type": field.get("type")

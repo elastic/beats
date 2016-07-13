@@ -16,7 +16,6 @@ package harvester
 import (
 	"fmt"
 	"regexp"
-	"sync"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
@@ -27,64 +26,59 @@ import (
 )
 
 type Harvester struct {
-	Path               string /* the file path to harvest */
-	Config             harvesterConfig
+	path               string /* the file path to harvest */
+	config             harvesterConfig
 	offset             int64
-	State              file.State
-	stateMutex         sync.Mutex
-	SpoolerChan        chan *input.FileEvent
-	encoding           encoding.EncodingFactory
+	state              file.State
+	prospectorChan     chan *input.FileEvent
 	file               source.FileSource /* the file being watched */
 	ExcludeLinesRegexp []*regexp.Regexp
 	IncludeLinesRegexp []*regexp.Regexp
 	done               chan struct{}
+	encodingFactory    encoding.EncodingFactory
+	encoding           encoding.Encoding
 }
 
 func NewHarvester(
 	cfg *common.Config,
 	path string,
 	state file.State,
-	spooler chan *input.FileEvent,
+	prospectorChan chan *input.FileEvent,
 	offset int64,
 	done chan struct{},
 ) (*Harvester, error) {
 
 	h := &Harvester{
-		Path:        path,
-		Config:      defaultConfig,
-		State:       state,
-		SpoolerChan: spooler,
-		offset:      offset,
-		done:        done,
+		path:           path,
+		config:         defaultConfig,
+		state:          state,
+		prospectorChan: prospectorChan,
+		offset:         offset,
+		done:           done,
 	}
 
-	if err := cfg.Unpack(&h.Config); err != nil {
-		return nil, err
-	}
-	if err := h.Config.Validate(); err != nil {
+	if err := cfg.Unpack(&h.config); err != nil {
 		return nil, err
 	}
 
-	encoding, ok := encoding.FindEncoding(h.Config.Encoding)
-	if !ok || encoding == nil {
-		return nil, fmt.Errorf("unknown encoding('%v')", h.Config.Encoding)
+	encodingFactory, ok := encoding.FindEncoding(h.config.Encoding)
+	if !ok || encodingFactory == nil {
+		return nil, fmt.Errorf("unknown encoding('%v')", h.config.Encoding)
 	}
-	h.encoding = encoding
+	h.encodingFactory = encodingFactory
 
-	h.ExcludeLinesRegexp = h.Config.ExcludeLines
-	h.IncludeLinesRegexp = h.Config.IncludeLines
 	return h, nil
 }
 
 // open does open the file given under h.Path and assigns the file handler to h.file
-func (h *Harvester) open() (encoding.Encoding, error) {
+func (h *Harvester) open() error {
 
-	switch h.Config.InputType {
+	switch h.config.InputType {
 	case config.StdinInputType:
 		return h.openStdin()
 	case config.LogInputType:
 		return h.openFile()
 	default:
-		return nil, fmt.Errorf("Invalid input type")
+		return fmt.Errorf("Invalid input type")
 	}
 }

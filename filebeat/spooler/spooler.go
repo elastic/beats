@@ -16,12 +16,8 @@ const channelSize = 16
 
 // Spooler aggregates the events and sends the aggregated data to the publisher.
 type Spooler struct {
-	Channel chan *input.FileEvent // Channel is the input to the Spooler.
-
-	// Config
-	idleTimeout time.Duration // How often to flush the spooler if spoolSize is not reached.
-	spoolSize   uint64        // Maximum number of events that are stored before a flush occurs.
-
+	Channel       chan *input.FileEvent // Channel is the input to the Spooler.
+	config        spoolerConfig
 	exit          chan struct{}             // Channel used to signal shutdown.
 	nextFlushTime time.Time                 // Scheduled time of the next flush.
 	publisher     chan<- []*input.FileEvent // Channel used to publish events.
@@ -29,22 +25,28 @@ type Spooler struct {
 	wg            sync.WaitGroup            // WaitGroup used to control the shutdown.
 }
 
+type spoolerConfig struct {
+	idleTimeout time.Duration // How often to flush the spooler if spoolSize is not reached.
+	spoolSize   uint64        // Maximum number of events that are stored before a flush occurs.
+}
+
 // New creates and returns a new Spooler. The returned Spooler must be
 // started by calling Start before it can be used.
 func New(
-	config cfg.FilebeatConfig,
+	config *cfg.Config,
 	publisher chan<- []*input.FileEvent,
 ) (*Spooler, error) {
-	spoolSize := config.SpoolSize
 
 	return &Spooler{
-		Channel:       make(chan *input.FileEvent, channelSize),
-		idleTimeout:   config.IdleTimeout,
-		spoolSize:     spoolSize,
+		Channel: make(chan *input.FileEvent, channelSize),
+		config: spoolerConfig{
+			idleTimeout: config.IdleTimeout,
+			spoolSize:   config.SpoolSize,
+		},
 		exit:          make(chan struct{}),
 		nextFlushTime: time.Now().Add(config.IdleTimeout),
 		publisher:     publisher,
-		spool:         make([]*input.FileEvent, 0, spoolSize),
+		spool:         make([]*input.FileEvent, 0, config.SpoolSize),
 	}, nil
 }
 
@@ -59,10 +61,10 @@ func (s *Spooler) Start() {
 func (s *Spooler) run() {
 	defer s.wg.Done()
 
-	ticker := time.NewTicker(s.idleTimeout / 2)
+	ticker := time.NewTicker(s.config.idleTimeout / 2)
 
 	logp.Info("Starting spooler: spool_size: %v; idle_timeout: %s",
-		s.spoolSize, s.idleTimeout)
+		s.config.spoolSize, s.config.idleTimeout)
 
 loop:
 	for {
@@ -139,5 +141,5 @@ func (s *Spooler) flush() {
 		case s.publisher <- tmpCopy: // send
 		}
 	}
-	s.nextFlushTime = time.Now().Add(s.idleTimeout)
+	s.nextFlushTime = time.Now().Add(s.config.idleTimeout)
 }

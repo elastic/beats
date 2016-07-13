@@ -83,9 +83,9 @@ filebeat.prospectors:
   # in. Default: log
   #document_type: log
 
-  # Scan frequency in seconds.
-  # How often these files should be checked for changes. In case it is set
-  # to 0s, it is done as often as possible. Default: 10s
+  # How often the prospector checks for new files in the paths that are specified
+  # for harvesting. Specify 1s to scan the directory as frequently as possible
+  # without causing Filebeat to scan too frequently. Default: 10s.
   #scan_frequency: 10s
 
   # Defines the buffer size every harvester uses when fetching the file
@@ -170,7 +170,7 @@ filebeat.prospectors:
   # Note: Potential data loss if renamed file is not picked up by prospector.
   #close_renamed: false
 
-  # When enabling this option, a file handler is closed immidiately in case a file can't be found
+  # When enabling this option, a file handler is closed immediately in case a file can't be found
   # any more. In case the file shows up again later, harvesting will continue at the last known position
   # after scan_frequency.
   # Note: Potential data loss if file reading was not finished when file was removed.
@@ -186,6 +186,10 @@ filebeat.prospectors:
   # Files for the modification data is older then clean_older the state from the registry is removed
   # By default this is disabled.
   #clean_older: 0
+
+  # Removes the state for file which cannot be found on disk anymore immediately
+  #clean_removed: false
+
 
 #----------------------------- Stdin prospector -------------------------------
 # Configuration to use stdin input
@@ -283,8 +287,9 @@ filebeat.prospectors:
 #
 #processors:
 #- drop_event:
-#    equals:
-#       http.code: 200
+#    when:
+#       equals:
+#           http.code: 200
 #
 
 #================================ Outputs =====================================
@@ -294,6 +299,9 @@ filebeat.prospectors:
 
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
+  # Boolean flag to enable or disable the output module.
+  #enable: true
+
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
@@ -305,8 +313,8 @@ output.elasticsearch:
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
-  #username: "admin"
-  #password: "s3cr3t"
+  #username: "elastic"
+  #password: "changeme"
 
   # Dictionary of HTTP parameters to pass within the url with index operations.
   #parameters:
@@ -349,16 +357,28 @@ output.elasticsearch:
 
   # A template is used to set the mapping in Elasticsearch
   # By default template loading is enabled and the template is loaded.
-  # These settings can be adjusted to load your own template or overwrite existing ones
+  # These settings can be adjusted to load your own template or overwrite existing ones.
+
+  # Set to false to disable template loading.
+  #template.enabled: true
 
   # Template name. By default the template name is filebeat.
-  template.name: "filebeat"
+  #template.name: "filebeat"
 
   # Path to template file
-  template.path: "filebeat.template.json"
+  #template.path: "filebeat.template.json"
 
   # Overwrite existing template
-  template.overwrite: false
+  #template.overwrite: false
+
+  # If set to true, filebeat checks the Elasticsearch version at connect time, and if it
+  # is 2.x, it loads the file specified by the template.versions.2x.path setting. The 
+  # default is true.
+  #template.versions.2x.enabled: true
+
+  # Path to the Elasticsearch 2.x version of the template file.
+  #template.versions.2x.path: "filebeat.template-es2x.json"
+
 
   # TLS configuration. By default is off.
   # List of root certificates for HTTPS server verifications
@@ -391,6 +411,9 @@ output.elasticsearch:
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
+  # Boolean flag to enable or disable the output module.
+  #enable: true
+
   # The Logstash hosts
   #hosts: ["localhost:5044"]
 
@@ -441,6 +464,9 @@ output.elasticsearch:
 
 #------------------------------- Kafka output ---------------------------------
 #output.kafka:
+  # Boolean flag to enable or disable the output module.
+  #enable: true
+
   # The list of Kafka broker addresses from where to fetch the cluster metadata.
   # The cluster metadata contain the actual Kafka brokers events are published
   # to.
@@ -529,6 +555,9 @@ output.elasticsearch:
 
 #------------------------------- Redis output ---------------------------------
 #output.redis:
+  # Boolean flag to enable or disable the output module.
+  #enable: true
+
   # The list of Redis servers to connect to. If load balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
@@ -625,6 +654,9 @@ output.elasticsearch:
 
 #------------------------------- File output ----------------------------------
 #output.file:
+  # Boolean flag to enable or disable the output module.
+  #enable: true
+
   # Path to the directory where to save the generated files. The option is
   # mandatory.
   #path: "/tmp/filebeat"
@@ -646,6 +678,9 @@ output.elasticsearch:
 
 #----------------------------- Console output ---------------------------------
 #output.console:
+  # Boolean flag to enable or disable the output module.
+  #enable: true
+
   # Pretty print json event
   #pretty: false
 
@@ -685,12 +720,20 @@ output.elasticsearch:
 #logging.level: error
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are beat, publish, service
+# Other available selectors are "beat", "publish", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: true
+
+# If enabled, filebeat periodically logs its internal metrics that have changed
+# in the last period. For each metric that changed, the delta from the value at
+# the beginning of the period is logged. The default is true.
+#logging.metrics.enabled: true
+
+# The period after which to log the internal metrics. The default is 30s.
+#logging.metrics.period: 30s
 
 # Logging to rotating files files. Set logging.to_files to false to disable logging to
 # files.

@@ -55,18 +55,30 @@ func TestReadLine(t *testing.T) {
 	defer readFile.Close()
 	assert.Nil(t, err)
 
-	h := Harvester{}
+	f := source.File{readFile}
+
+	h := Harvester{
+		config: harvesterConfig{
+			CloseOlder:    500 * time.Millisecond,
+			Backoff:       100 * time.Millisecond,
+			MaxBackoff:    1 * time.Second,
+			BackoffFactor: 2,
+			BufferSize:    100,
+			MaxBytes:      1000,
+		},
+		file: f,
+	}
 	assert.NotNil(t, h)
 
-	// Read only 10 bytes which is not the end of the file
-	codec, _ := encoding.Plain(file)
-	readConfig := reader.LogFileReaderConfig{
-		CloseOlder:         500 * time.Millisecond,
-		BackoffDuration:    100 * time.Millisecond,
-		MaxBackoffDuration: 1 * time.Second,
-		BackoffFactor:      2,
-	}
-	r, _ := createLineProcessor(source.File{readFile}, codec, 100, 1000, readConfig, nil, nil, nil)
+	var ok bool
+	h.encodingFactory, ok = encoding.FindEncoding(h.config.Encoding)
+	assert.True(t, ok)
+
+	h.encoding, err = h.encodingFactory(readFile)
+	assert.NoError(t, err)
+
+	r, err := h.newLineProcessor()
+	assert.NoError(t, err)
 
 	// Read third line
 	_, text, bytesread, _, err := readLine(r)

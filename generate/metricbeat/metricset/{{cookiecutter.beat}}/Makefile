@@ -2,7 +2,7 @@ BEATNAME={{cookiecutter.beat}}
 BEAT_DIR={{cookiecutter.beat_path}}
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
-ES_BEATS=${GOPATH}/src/github.com/elastic/beats
+ES_BEATS?=${GOPATH}/src/github.com/elastic/beats
 GOPACKAGES=$(shell glide novendor)
 PREFIX?=.
 
@@ -22,7 +22,3 @@ update-deps:
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
-
-# Create binary packages for the beat
-pack: create-packer
-	cd dev-tools/packer; make deps images {{cookiecutter.beat}}
