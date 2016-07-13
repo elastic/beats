@@ -174,16 +174,28 @@ output.elasticsearch:
 
   # A template is used to set the mapping in Elasticsearch
   # By default template loading is enabled and the template is loaded.
-  # These settings can be adjusted to load your own template or overwrite existing ones
+  # These settings can be adjusted to load your own template or overwrite existing ones.
+
+  # Set to false to disable template loading.
+  #template.enabled: true
 
   # Template name. By default the template name is winlogbeat.
-  template.name: "winlogbeat"
+  #template.name: "winlogbeat"
 
   # Path to template file
-  template.path: "winlogbeat.template.json"
+  #template.path: "winlogbeat.template.json"
 
   # Overwrite existing template
-  template.overwrite: false
+  #template.overwrite: false
+
+  # If set to true, winlogbeat checks the Elasticsearch version at connect time, and if it
+  # is 2.x, it loads the file specified by the template.versions.2x.path setting. The 
+  # default is true.
+  #template.versions.2x.enabled: true
+
+  # Path to the Elasticsearch 2.x version of the template file.
+  #template.versions.2x.path: "winlogbeat.template-es2x.json"
+
 
   # TLS configuration. By default is off.
   # List of root certificates for HTTPS server verifications

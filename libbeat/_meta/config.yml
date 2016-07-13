@@ -24,15 +24,6 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Template name. By default the template name is beatname.
-  template.name: "beatname"
-
-  # Path to template file
-  template.path: "beatname.template.json"
-
-  # Overwrite existing template
-  template.overwrite: false
-
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts

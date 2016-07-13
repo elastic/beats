@@ -24,8 +24,8 @@ output.elasticsearch:
   # The Elasticsearch cluster
   hosts: ["http://localhost:9200"]
 
-  # Template name. By default the template name is {beatname_lc}.
-  template.name: "{beatname_lc}"
+  # Load the Elasticsearch template.
+  template.enabled: true
 
   # Path to template file
   template.path: "{beatname_lc}.template.json"
@@ -195,6 +195,9 @@ enabled.
 
 You can adjust the following settings to load your own template or overwrite an existing one:
 
+*`enabled`*:: Set to false to disable template loading. If set this to false,
+you must <<load-template-manually,load the template manually>>.
+
 *`name`*:: The name of the template. The default is +{beatname_lc}+.
 
 *`path`*:: The path to the template file. The default is +{beatname_lc}.template.json+. If a relative
@@ -215,8 +218,28 @@ output.elasticsearch:
   template.overwrite: false
 ----------------------------------------------------------------------
 
-To disable automatic template loading, comment out the template part under elasticsearch output.
-If you disable this option, you must <<load-template-manually,load the template manually>>. 
+===== template.versions
+
+In the default configuration, {beatname_uc} automatically checks the
+Elasticsearch version and loads the recommended template file for the particular
+version. This behaviour can be controlled from the following options:
+
+*`2x.path`*:: The path to the template file to load for
+Elasticsearch versions 2.x.y. The default is +{beatname_lc}.template-es2x.json+.
+
+*`2x.enabled`*:: If set to +false+, the +2x.path+ option is ignored and the
+default template is loaded regardless of the Elasticsearch version.
+
+For example:
+
+["source","yaml",subs="attributes,callouts"]
+----------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  template.path: "{beatname_lc}.template.json"
+  template.overwrite: false
+  template.versions.2x.path: "{beatname_lc}.template-es2x.json
+----------------------------------------------------------------------
 
 ===== max_retries
 
