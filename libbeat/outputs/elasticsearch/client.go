@@ -43,7 +43,6 @@ type Connection struct {
 	Password string
 
 	http              *http.Client
-	connected         bool
 	onConnectCallback func() error
 
 	encoder bodyEncoder
@@ -180,10 +179,6 @@ func (client *Client) PublishEvents(
 
 	if len(events) == 0 {
 		return nil, nil
-	}
-
-	if !client.connected {
-		return events, ErrNotConnected
 	}
 
 	body := client.encoder
@@ -432,10 +427,6 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 }
 
 func (client *Client) PublishEvent(event common.MapStr) error {
-	if !client.connected {
-		return ErrNotConnected
-	}
-
 	index := getIndex(event, client.index)
 	debugf("Publish event: %s", event)
 
@@ -497,12 +488,9 @@ func (client *Client) CheckTemplate(templateName string) bool {
 
 func (conn *Connection) Connect(timeout time.Duration) error {
 	var err error
-	conn.connected, conn.version, err = conn.Ping(timeout)
+	conn.version, err = conn.Ping(timeout)
 	if err != nil {
 		return err
-	}
-	if !conn.connected {
-		return ErrNotConnected
 	}
 
 	err = conn.onConnectCallback()
@@ -513,18 +501,18 @@ func (conn *Connection) Connect(timeout time.Duration) error {
 }
 
 // Ping sends a GET request to the Elasticsearch
-func (conn *Connection) Ping(timeout time.Duration) (bool, string, error) {
+func (conn *Connection) Ping(timeout time.Duration) (string, error) {
 	debugf("ES Ping(url=%v, timeout=%v)", conn.URL, timeout)
 
 	conn.http.Timeout = timeout
 	status, body, err := conn.execRequest("GET", conn.URL, nil)
 	if err != nil {
 		debugf("Ping request failed with: %v", err)
-		return false, "", err
+		return "", err
 	}
 
 	if status >= 300 {
-		return false, "", fmt.Errorf("Non 2xx response code: %d", status)
+		return "", fmt.Errorf("Non 2xx response code: %d", status)
 	}
 
 	var response struct {
@@ -535,20 +523,15 @@ func (conn *Connection) Ping(timeout time.Duration) (bool, string, error) {
 
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		return false, "", fmt.Errorf("Failed to parse JSON response: %v", err)
+		return "", fmt.Errorf("Failed to parse JSON response: %v", err)
 	}
 
 	debugf("Ping status code: %v", status)
 	logp.Info("Connected to Elasticsearch version %s", response.Version.Number)
-	return true, response.Version.Number, nil
-}
-
-func (conn *Connection) IsConnected() bool {
-	return conn.connected
+	return response.Version.Number, nil
 }
 
 func (conn *Connection) Close() error {
-	conn.connected = false
 	return nil
 }
 
@@ -594,20 +577,17 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 
 	resp, err := conn.http.Do(req)
 	if err != nil {
-		conn.connected = false
 		return 0, nil, err
 	}
 	defer closing(resp.Body)
 
 	status := resp.StatusCode
 	if status >= 300 {
-		conn.connected = false
 		return status, nil, fmt.Errorf("%v", resp.Status)
 	}
 
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		conn.connected = false
 		return status, nil, err
 	}
 	return status, obj, nil
