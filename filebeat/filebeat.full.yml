@@ -313,8 +313,8 @@ output.elasticsearch:
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
-  #username: "admin"
-  #password: "s3cr3t"
+  #username: "elastic"
+  #password: "changeme"
 
   # Dictionary of HTTP parameters to pass within the url with index operations.
   #parameters:
