@@ -53,9 +53,12 @@ type Winlogbeat struct {
 }
 
 // New returns a new Winlogbeat.
-func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
 	// Read configuration.
+	// XXX: winlogbeat validates top-level config -> ignore beater config and
+	//      parse complete top-level config
 	config := config.DefaultSettings
+	rawConfig := b.RawConfig
 	err := rawConfig.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading configuration file. %v", err)

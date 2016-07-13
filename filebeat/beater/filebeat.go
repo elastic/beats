@@ -41,7 +41,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // Run allows the beater to be run as a beat.
 func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
-	config := fb.config.Filebeat
+	config := fb.config
 
 	// Setup registrar to persist state
 	registrar, err := registrar.New(config.RegistryFile)

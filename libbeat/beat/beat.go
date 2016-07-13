@@ -39,6 +39,7 @@ import (
 	"math/rand"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -146,7 +147,8 @@ func newBeat(name, version string) *Beat {
 }
 
 func (b *Beat) launch(bt Creator) error {
-	if err := b.handleFlags(); err != nil {
+	err := b.handleFlags()
+	if err != nil {
 		return err
 	}
 
@@ -155,6 +157,18 @@ func (b *Beat) launch(bt Creator) error {
 
 	if err := b.configure(); err != nil {
 		return err
+	}
+
+	// load the beats config section
+	var sub *common.Config
+	configName := strings.ToLower(b.Name)
+	if b.RawConfig.HasField(configName) {
+		sub, err = b.RawConfig.Child(configName, -1)
+		if err != nil {
+			return err
+		}
+	} else {
+		sub = common.NewConfig()
 	}
 
 	logp.Info("Setup Beat: %s; Version: %s", b.Name, b.Version)
@@ -174,7 +188,7 @@ func (b *Beat) launch(bt Creator) error {
 	// defer publisher.Stop()
 
 	b.Publisher = publisher
-	beater, err := bt(b, b.RawConfig)
+	beater, err := bt(b, sub)
 	if err != nil {
 		return err
 	}
