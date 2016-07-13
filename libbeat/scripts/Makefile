@@ -216,10 +216,16 @@ coverage-report:
 update: python-env
 	# Update config
 	echo "Update config file"
-	-rm -f etc/${BEATNAME}.yml
+	-rm -f ${BEATNAME}.yml
 	cat etc/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
-	-rm -f etc/${BEATNAME}.full.yml
-	cat etc/beat.full.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml
+	-rm -f ${BEATNAME}.full.yml
+	cat etc/beat.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml
+
+	# Check if also a full config exist (optional)
+	if [ -a etc/beat.full.yml ] ; \
+    then \
+		cat etc/beat.full.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml ; \
+	fi;
 
 	# Update fields
 	echo "Update fields"
@@ -242,7 +248,7 @@ docs:
 .PHONY: docs-preview
 docs-preview:
 	if [ ! -d "build/docs" ]; then $(MAKE) docs; fi;
-	${BUILD_DIR}/docs/build_docs.pl --chunk=1 --web -open chunk=1 -open --doc ${GOPATH}/src/github.com/elastic/beats/${BEATNAME}/docs/index.asciidoc -out ${BUILD_DIR}/html_docs
+	${BUILD_DIR}/docs/build_docs.pl --chunk=1 -open chunk=1 -open --doc ${GOPATH}/src/github.com/elastic/beats/${BEATNAME}/docs/index.asciidoc -out ${BUILD_DIR}/html_docs
 
 
 ### KIBANA FILES HANDLING ###
