@@ -55,11 +55,13 @@ func parseKeyspaceStats(keyspaceMap map[string]string) map[string]common.MapStr 
 					db[stats[0]] = stats[1]
 				}
 			}
+			errs := map[string]error{}
 			keyspace[k] = common.MapStr{
-				"keys":    h.ToInt("keys", db),
-				"expires": h.ToInt("expires", db),
-				"avg_ttl": h.ToInt("avg_ttl", db),
+				"keys":    h.ToInt("keys", db, errs, "keys"),
+				"expires": h.ToInt("expires", db, errs, "expires"),
+				"avg_ttl": h.ToInt("avg_ttl", db, errs, "avg_ttl"),
 			}
+			h.RemoveErroredKeys(keyspace[k], errs)
 		}
 	}
 	return keyspace

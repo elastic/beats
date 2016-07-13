@@ -88,40 +88,41 @@ func eventMapping(body io.ReadCloser, hostname string) common.MapStr {
 		}
 	}
 
+	errs := map[string]error{}
 	event := common.MapStr{
 		"hostname":          hostname,
-		"total_accesses":    h.ToInt("Total Accesses", fullEvent),
-		"total_kbytes":      h.ToInt("Total kBytes", fullEvent),
-		"requests_per_sec":  h.ToFloat("ReqPerSec", fullEvent),
-		"bytes_per_sec":     h.ToFloat("BytesPerSec", fullEvent),
-		"bytes_per_request": h.ToFloat("BytesPerReq", fullEvent),
+		"total_accesses":    h.ToInt("Total Accesses", fullEvent, errs, "total_accesses"),
+		"total_kbytes":      h.ToInt("Total kBytes", fullEvent, errs, "total_kbytes"),
+		"requests_per_sec":  h.ToFloat("ReqPerSec", fullEvent, errs, "requests_per_sec"),
+		"bytes_per_sec":     h.ToFloat("BytesPerSec", fullEvent, errs, "bytes_per_sec"),
+		"bytes_per_request": h.ToFloat("BytesPerReq", fullEvent, errs, "bytes_per_request"),
 		"workers": common.MapStr{
-			"busy": h.ToInt("BusyWorkers", fullEvent),
-			"idle": h.ToInt("IdleWorkers", fullEvent),
+			"busy": h.ToInt("BusyWorkers", fullEvent, errs, "workers.busy"),
+			"idle": h.ToInt("IdleWorkers", fullEvent, errs, "workers.idle"),
 		},
 		"uptime": common.MapStr{
-			"server_uptime": h.ToInt("ServerUptimeSeconds", fullEvent),
-			"uptime":        h.ToInt("Uptime", fullEvent),
+			"server_uptime": h.ToInt("ServerUptimeSeconds", fullEvent, errs, "uptime.server_uptime"),
+			"uptime":        h.ToInt("Uptime", fullEvent, errs, "uptime.uptime"),
 		},
 		"cpu": common.MapStr{
-			"load":            h.ToFloat("CPULoad", fullEvent),
-			"user":            h.ToFloat("CPUUser", fullEvent),
-			"system":          h.ToFloat("CPUSystem", fullEvent),
-			"children_user":   h.ToFloat("CPUChildrenUser", fullEvent),
-			"children_system": h.ToFloat("CPUChildrenSystem", fullEvent),
+			"load":            h.ToFloat("CPULoad", fullEvent, errs, "cpu.load"),
+			"user":            h.ToFloat("CPUUser", fullEvent, errs, "cpu.user"),
+			"system":          h.ToFloat("CPUSystem", fullEvent, errs, "cpu.system"),
+			"children_user":   h.ToFloat("CPUChildrenUser", fullEvent, errs, "cpu.children_user"),
+			"children_system": h.ToFloat("CPUChildrenSystem", fullEvent, errs, "cpu.children_system"),
 		},
 		"connections": common.MapStr{
-			"total": h.ToInt("ConnsTotal", fullEvent),
+			"total": h.ToInt("ConnsTotal", fullEvent, errs, "connections.total"),
 			"async": common.MapStr{
-				"writing":    h.ToInt("ConnsAsyncWriting", fullEvent),
-				"keep_alive": h.ToInt("ConnsAsyncKeepAlive", fullEvent),
-				"closing":    h.ToInt("ConnsAsyncClosing", fullEvent),
+				"writing":    h.ToInt("ConnsAsyncWriting", fullEvent, errs, "connections.async.writing"),
+				"keep_alive": h.ToInt("ConnsAsyncKeepAlive", fullEvent, errs, "connections.async.keep_alive"),
+				"closing":    h.ToInt("ConnsAsyncClosing", fullEvent, errs, "connections.async.closing"),
 			},
 		},
 		"load": common.MapStr{
-			"1":  h.ToFloat("Load1", fullEvent),
-			"5":  h.ToFloat("Load5", fullEvent),
-			"15": h.ToFloat("Load15", fullEvent),
+			"1":  h.ToFloat("Load1", fullEvent, errs, "load.1"),
+			"5":  h.ToFloat("Load5", fullEvent, errs, "load.5"),
+			"15": h.ToFloat("Load15", fullEvent, errs, "load.15"),
 		},
 		"scoreboard": common.MapStr{
 			"starting_up":            totalS,
@@ -138,6 +139,7 @@ func eventMapping(body io.ReadCloser, hostname string) common.MapStr {
 			"total":                  totalAll,
 		},
 	}
+	h.RemoveErroredKeys(event, errs)
 
 	return event
 }

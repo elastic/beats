@@ -7,23 +7,25 @@ is returned.
 package helper
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 // ToBool converts value to bool. In case of error, returns false
-func ToBool(key string, data map[string]string) bool {
+func ToBool(key string, data map[string]string, errs map[string]error, path string) bool {
 
-	exists := checkExist(key, data)
-	if !exists {
-		logp.Err("Key does not exist in in data: %s", key)
+	if !checkExist(key, data) {
+		errs[path] = fmt.Errorf("Key %s not found", key)
 		return false
 	}
 
 	value, err := strconv.ParseBool(data[key])
 	if err != nil {
-		logp.Err("Error converting param to bool: %s", key)
+		errs[path] = fmt.Errorf("Error converting value to bool: '%s'", data[key])
 		return false
 	}
 
@@ -31,17 +33,16 @@ func ToBool(key string, data map[string]string) bool {
 }
 
 // ToFloat converts value to float64. In case of error, returns 0.0
-func ToFloat(key string, data map[string]string) float64 {
+func ToFloat(key string, data map[string]string, errs map[string]error, path string) float64 {
 
-	exists := checkExist(key, data)
-	if !exists {
-		logp.Err("Key does not exist in in data: %s", key)
+	if !checkExist(key, data) {
+		errs[path] = fmt.Errorf("Key %s not found", key)
 		return 0.0
 	}
 
 	value, err := strconv.ParseFloat(data[key], 64)
 	if err != nil {
-		logp.Err("Error converting param to float: %s", key)
+		errs[path] = fmt.Errorf("Error converting value to float: '%s'", data[key])
 		value = 0.0
 	}
 
@@ -49,17 +50,16 @@ func ToFloat(key string, data map[string]string) float64 {
 }
 
 // ToInt converts value to int. In case of error, returns 0
-func ToInt(key string, data map[string]string) int64 {
+func ToInt(key string, data map[string]string, errs map[string]error, path string) int64 {
 
-	exists := checkExist(key, data)
-	if !exists {
-		logp.Err("Key does not exist in in data: %s", key)
+	if !checkExist(key, data) {
+		errs[path] = fmt.Errorf("Key %s not found", key)
 		return 0
 	}
 
 	value, err := strconv.ParseInt(data[key], 10, 64)
 	if err != nil {
-		logp.Err("Error converting param to int: %s", key)
+		errs[path] = fmt.Errorf("Error converting value to int: '%s'", data[key])
 		return 0
 	}
 
@@ -67,19 +67,44 @@ func ToInt(key string, data map[string]string) int64 {
 }
 
 // ToStr converts value to str. In case of error, returns ""
-func ToStr(key string, data map[string]string) string {
+func ToStr(key string, data map[string]string, errs map[string]error, path string) string {
 
-	exists := checkExist(key, data)
-	if !exists {
-		logp.Err("Key does not exist in in data: %s", key)
+	if !checkExist(key, data) {
+		errs[path] = fmt.Errorf("Key %s not found", key)
 		return ""
 	}
 
 	return data[key]
 }
 
+func RemoveErroredKeys(event common.MapStr, errs map[string]error) {
+	for key, err := range errs {
+		logp.Err("Error on field `%s`: %v", key, err)
+		if err_ := deleteKey(event, key); err_ != nil {
+			logp.Err("Error when trying to remove errored key %s: %v", key, err_)
+		}
+	}
+}
+
 // checkExists checks if a key exists in the given data set
 func checkExist(key string, data map[string]string) bool {
 	_, ok := data[key]
 	return ok
+}
+
+func deleteKey(event common.MapStr, key string) error {
+	path := strings.Split(key, ".")
+	ev := event
+	for i, pathEl := range path {
+		if i == len(path)-1 {
+			delete(ev, pathEl)
+		} else {
+			var ok bool
+			ev, ok = ev[pathEl].(common.MapStr)
+			if !ok {
+				return fmt.Errorf("Error accessing field %s", pathEl)
+			}
+		}
+	}
+	return nil
 }
