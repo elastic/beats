@@ -47,10 +47,6 @@ func NewMockClient(template *MockClient) *MockClient {
 	return mc
 }
 
-func (c *MockClient) IsConnected() bool {
-	return c.Connected
-}
-
 func (c *MockClient) Connect(timeout time.Duration) error {
 	err := c.CBConnect(timeout)
 	c.Connected = err == nil
