@@ -24,6 +24,11 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
+
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts
