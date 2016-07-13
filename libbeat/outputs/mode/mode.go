@@ -45,12 +45,6 @@ type Connectable interface {
 
 	// Close closes the established connection.
 	Close() error
-
-	// IsConnected indicates the clients connection state. If connection has
-	// been lost while publishing events, IsConnected must return false. As long as
-	// IsConnected returns false, an output plugin might try to re-establish the
-	// connection by calling Connect.
-	IsConnected() bool
 }
 
 // ProtocolClient interface is a output plugin specific client implementation
@@ -61,8 +55,7 @@ type ProtocolClient interface {
 	Connectable
 
 	// PublishEvents sends events to the clients sink. On failure or timeout err
-	// must be set. If connection has been lost, IsConnected must return false
-	// in future calls.
+	// must be set.
 	// PublishEvents is free to publish only a subset of given events, even in
 	// error case. On return nextEvents contains all events not yet published.
 	PublishEvents(events []common.MapStr) (nextEvents []common.MapStr, err error)
