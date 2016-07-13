@@ -82,15 +82,6 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Template name. By default the template name is filebeat.
-  template.name: "filebeat"
-
-  # Path to template file
-  template.path: "filebeat.template.json"
-
-  # Overwrite existing template
-  template.overwrite: false
-
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts

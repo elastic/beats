@@ -39,7 +39,7 @@ func init() {
 	outputs.RegisterOutputPlugin("redis", new)
 }
 
-func new(cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
+func new(beatName string, cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
 	r := &redisOut{}
 	if err := r.init(cfg, expireTopo); err != nil {
 		return nil, err

@@ -15,6 +15,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 *Affecting all Beats*
 - Rename the `filters` section to `processors`. {pull}1944[1944]
 - Introduce the condition with `when` in the processor configuration. {pull}1949[1949]
+- The Elasticsearch template is now loaded by default. {pull}1993[1993]
 
 *Metricbeat*
 
@@ -53,6 +54,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 - Command line flag -c can be used multiple times. {pull}1985[1985]
 - Add OR/AND/NOT to the condition associated with the processors. {pull}1983[1983]
 - Add '-E' CLI flag for overwriting single config options via command line. {pull}1986[1986]
+- Choose the mapping template file based on the Elasticsearch version. {pull}1993[1993]
 
 *Metricbeat*
 

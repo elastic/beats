@@ -26,16 +26,17 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 	}
 
 	config, _ := common.NewConfigFrom(map[string]interface{}{
-		"save_topology":  true,
-		"hosts":          []string{GetEsHost()},
-		"port":           esPort,
-		"username":       os.Getenv("ES_USER"),
-		"password":       os.Getenv("ES_PASS"),
-		"path":           "",
-		"index":          index,
-		"protocol":       "http",
-		"flush_interval": flushInterval,
-		"bulk_max_size":  bulkSize,
+		"save_topology":    true,
+		"hosts":            []string{GetEsHost()},
+		"port":             esPort,
+		"username":         os.Getenv("ES_USER"),
+		"password":         os.Getenv("ES_PASS"),
+		"path":             "",
+		"index":            index,
+		"protocol":         "http",
+		"flush_interval":   flushInterval,
+		"bulk_max_size":    bulkSize,
+		"template.enabled": false,
 	})
 
 	var output elasticsearchOutput
@@ -46,7 +47,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 func TestTopologyInES(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
 	elasticsearchOutput1 := createElasticsearchConnection(0, 0)

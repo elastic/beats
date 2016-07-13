@@ -48,15 +48,6 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Template name. By default the template name is winlogbeat.
-  template.name: "winlogbeat"
-
-  # Path to template file
-  template.path: "winlogbeat.template.json"
-
-  # Overwrite existing template
-  template.overwrite: false
-
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts

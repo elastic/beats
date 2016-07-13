@@ -46,7 +46,7 @@ func init() {
 	outputs.RegisterOutputPlugin("logstash", new)
 }
 
-func new(cfg *common.Config, _ int) (outputs.Outputer, error) {
+func new(beatName string, cfg *common.Config, _ int) (outputs.Outputer, error) {
 	output := &logstash{}
 	if err := output.init(cfg); err != nil {
 		return nil, err

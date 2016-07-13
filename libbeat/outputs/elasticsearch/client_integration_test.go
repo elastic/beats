@@ -152,8 +152,9 @@ func TestOutputLoadTemplate(t *testing.T) {
 	config := map[string]interface{}{
 		"hosts": GetEsHost(),
 		"template": map[string]interface{}{
-			"name": "libbeat",
-			"path": tPath,
+			"name":                "libbeat",
+			"path":                tPath,
+			"versions.2x.enabled": false,
 		},
 	}
 
@@ -162,7 +163,7 @@ func TestOutputLoadTemplate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	output, err := New(cfg, 0)
+	output, err := New("libbeat", cfg, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
