@@ -22,7 +22,3 @@ update-deps:
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
-
-# Create binary packages for the beat
-pack: create-packer
-	cd dev-tools/packer; make deps images {{cookiecutter.beat}}
