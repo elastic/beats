@@ -8,7 +8,7 @@ os: Windows Server 2012 R2
 environment:
   GOROOT: c:\go1.6.2
   GOPATH: c:\gopath
-  PYWIN_DL: https://downloads.sourceforge.net/project/pywin32/pywin32/Build%20219/pywin32-219.win32-py2.7.exe
+  PYWIN_DL: https://beats-files.s3.amazonaws.com/deps/pywin32-220.win32-py2.7.exe
   matrix:
   - PROJ: github.com\elastic\beats\filebeat
     BEAT: filebeat
