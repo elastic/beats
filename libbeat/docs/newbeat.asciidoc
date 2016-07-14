@@ -22,24 +22,22 @@ original Packetbeat authors.
 After you have https://golang.org/doc/install[installed Go] and set up the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
 your preferred workspace location, a simple way of getting the source code for 
-Beats, including Lsbeat and libbeat, and compiling them at the same time is to do:
+Beats, including libbeat, and compiling them at the same time is to do:
 
 [source,shell]
 ----------------------------------------------------------------------
 go get github.com/elastic/beats
 ----------------------------------------------------------------------
 
-In this guide, we use working examples from the Lsbeat source code in https://github.com/kimjmin/lsbeat[GitHub]
-to demonstrate how to implement a Beat. Lsbeat is similar to
-the `ls` command line tool, but instead of printing the files and subdirectories to the screen,
-Lsbeat periodically ships them to Elasticsearch for storage.
-
-You can use Lsbeat as an example implementation for creating a new Beat. Just copy
+In this guide, we use working examples from the Testbeat source code in
+https://github.com/monicasarbu/testbeat[GitHub]
+to demonstrate how to implement a Beat. Just copy
 the source files and modify them as necessary for your Beat.
+
 
 === Overview
 
-At the high level, a simple Beat like Lsbeat has two main components:
+At the high level, a simple Beat has two main components:
 
 * a component that collects the actual data, and
 * a publisher that sends the data to the specified output, such as Elasticsearch or
@@ -100,7 +98,7 @@ To generate your own beat we use the `beat-generator`. First you must install
 https://github.com/audreyr/cookiecutter[cookiecutter]. Check out the
 http://cookiecutter.readthedocs.io/en/latest/installation.html[installation
 guide]. After having installed cookiecutter, we must decide on a name for our beat. 
-The name must be one word all lowercase. In our example is lsbeat.
+The name must be one word all lowercase. In our example is Testbeat.
 
 To create the Beat skeleton, you should download Beats generator package,available in the beats repository. 
 Once you installed GoLang, you can download the Beats generator package using
@@ -119,27 +117,26 @@ $ cd $GOPATH/src/github.com/{user}
 $ cookiecutter $GOPATH/src/github.com/elastic/beats/generate/beat
 --------------------
 
-Cookiecutter will ask you several questions. For your project_name enter lsbeat, for github_user - your github id. The next two question with for beat and beat_path should already be automatically set correct. For the last one your can insert your Firstname Lastname.
+Cookiecutter will ask you several questions. For your project_name enter testbeat, for github_user - your github id. The next two question with for beat and beat_path should already be automatically set correct. For the last one your can insert your Firstname Lastname.
 
 [source,shell]
 ---------
-project_name [Examplebeat]: lsbeat
+project_name [Examplebeat]: testbeat
 github_name [your-github-name]: {username}
-beat [lsbeat]:
+beat [testbeat]:
 beat_path [github.com/{github id}]:
 full_name [Firstname Lastname]: {Full Name}
 ---------
 
-This should now have created a directory `lsbeat` inside our folder with several files. 
+This should now have created a directory `testbeat` inside our folder with several files. 
 
 We now have a raw template of the Beat, but still need to fetch the dependencies and setup the git repository.
 
 
+[[beater-interface]]
+=== The Beater interface
 
-=== Developing the Beat-Specific Code
-
-The Beat-specific code should implement the `Beater` interface defined
-in libbeat.
+Each Beat needs to implement the Beater interface defined in libbeat.
 
 [source,go]
 ----------------------------------------------------------------------
@@ -165,23 +162,52 @@ type Beater interface {
 }
 ----------------------------------------------------------------------
 
+To implement the Beater interface, you need to define a Beat object that
+implements two methods `Run()` and `Stop()`. 
 
-Besides the `Run()` and the `Stop()` functions, each Beat needs to implement
-the `New()` function to be able to create the Beat object that implements the
-Beater interface.
+[source,go]
+--------------
+type Testbeat struct {
+	done   chan struct{}
+	config config.Config
+	client publisher.Client
+
+	...
+}
+
+func (bt *Testbeat) Run(b *beat.Beat) error {
+	...
+}
+
+
+func (bt *Testbeat) Stop() {
+	...
+}
+
+--------------
+
+By default, the Beat object contains the following:
+
+- `done`: Channel used by the `Run()` function to stop when the `Stop()` function is called.
+- `config`: Configuration options for the Beat
+- `client`: Publisher that takes care of sending the events to the
+  defined output.
+
+The `Beat` parameter received by the `Run` method contains data about the
+Beat, such as the name, version, and common configuration options.
+
+The implementation of these functions is available under `beater/testbeat.go`.
+
+In addition, each Beat needs to implement the `New()` function to create the Beat
+object.
 
 This means your Beat should implement the following functions:
 
 [horizontal]
 <<new-function, New>>:: Creates the Beat object
 <<run-method, Run>>:: Contains the main application loop that captures data
-and sends it to the publisher
+and sends it to the defined output using the publisher
 <<stop-method, Stop>>:: Contains logic that is called when the Beat is signaled to stop
-
-The `Beat` parameter received by the `Run` method contains data about the
-Beat, such as the name, version, and common configuration options.
-
-The implementation of these functions is available under `beater/lsbeat.go`.
 
 For more complex Beats, the optional `FlagsHandler` interface is available.
 
@@ -219,52 +245,26 @@ sample implementation.
 
 
 The `New()` function receives the configuration options defined for the Beat and
-creates a Beat object based on them. In our case the `Lsbeat` object has the following signature:
+creates a Beat object based on them. 
 
-[source,go]
-----------
-type Lsbeat struct {
-	done   chan struct{}
-	config config.Config
-	client publisher.Client
-}
-----------
-
-- `done`: Channel used by the `Run()` function to stop when the `Stop()` function is called.
-- `config`: Configuration options for the Beat
-- `client`: Publisher that takes care of sending the events to the
-  defined output.
-
-The configuration file of Lsbeat is `lsbeat.yml` and it's generated in the
+The configuration file of the Beat is `testbeat.yml` and it's generated in the
 previous step:
 
 [source,yaml]
 ------------
-lsbeat:
+testbeat:
   # Defines how often an event is sent to the output
   period: 10s
 ------------
 
  - `period`: Defines how often to send out events
 
-In the case of `Lsbeat` there are two configuration options needed:
- - `path`: The path of the directory to monitor
- - `period`: How often should read the content of the directory
-
-
-[source,yaml]
-----------------------------------------------------------------------
-lsbeat:
-  # Defines how often an event is sent to the output
-  period: 10s
-  path: "."
-----------------------------------------------------------------------
 
 The recommended way of handling the configuration is to create a
 `Config` structure with the configuration options and a `DefaultConfig` with
 the default configuration options. 
 
-And here are the corresponding Go structures, which are defined in `config.go`:
+And here are the corresponding Go structures, which are defined in `config/config.go`:
 
 [source,go]
 ----------------------------------------------------------------------
@@ -274,12 +274,10 @@ import "time"
 
 type Config struct {
 	Period time.Duration `config:"period"`
-	Path   string        `config:"path"`
 }
 
 var DefaultConfig = Config{
 	Period: 1 * time.Second,
-	Path:   ".",
 }
 ----------------------------------------------------------------------
 
@@ -287,7 +285,7 @@ Pointers are used to distinguish between when the setting is completely
 missing from the configuration file and when it has a value that matches the
 type's default value.
 
-`Lsbeat` has the following `New()` function: 
+The generated `New()` function:
 
 [source,go]
 ----------
@@ -297,7 +295,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	ls := &Lsbeat{
+	ls := &Testbeat{
 		done:   make(chan struct{}),
 		config: config,
 	}
@@ -309,81 +307,42 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 [[run-method]]
 ==== Run Method
 
-The `Run` method should contain your main application loop. For `Lsbeat` it looks
-like this:
+The `Run` method contains your main application loop. 
 
 [source,go]
 ----------------------------------------------------------------------
-func (bt *Lsbeat) Run(b *beat.Beat) error {
-	logp.Info("lsbeat is running! Hit CTRL-C to stop it.")
+func (bt *Testbeat) Run(b *beat.Beat) error {
+	logp.Info("testbeat is running! Hit CTRL-C to stop it.")
 
 	bt.client = b.Publisher.Connect()
-
-	bt.listDir(bt.config.Path, b.Name, true) // init directory
-	bt.lastIndexTime = time.Now()            // init indexing timestamp
-
 	ticker := time.NewTicker(bt.config.Period)
+	counter := 1
 	for {
-
 		select {
 		case <-bt.done:
 			return nil
 		case <-ticker.C:
 		}
 
-		now := time.Now()
-		bt.listDir(bt.config.Path, b.Name, false) // call lsDir
-		bt.lastIndexTime = now                    // mark Timestamp
-
-		logp.Info("Event sent")
-	}
-
-}
-----------------------------------------------------------------------
-
-Inside the loop, `Lsbeat` sleeps for a configurable period of time and then
-captures the required data and sends it to the publisher. The publisher client is available as part of the Beat object
-through the `client` variable.
-
-The actual sending is done inside the `listDir()` method:
-
-[source,go]
-----------------------------------------------------------------------
-
-func (bt *Lsbeat) listDir(dirFile string, beatname string, init bool) {
-	files, _ := ioutil.ReadDir(dirFile)
-	for _, f := range files {
-		t := f.ModTime()
-
 		event := common.MapStr{ <1>
 			"@timestamp": common.Time(time.Now()), <2>
-			"type":       beatname,
-			"modtime":    common.Time(t),
-			"filename":   f.Name(),
-			"path":       dirFile + "/" + f.Name(),
-			"directory":  f.IsDir(),
-			"filesize":   f.Size(),
+			"type":       b.Name,
+			"counter":    counter,
 		}
-		if init {
-			// index all files and directories on init
-			bt.client.PublishEvent(event) <3>
-		} else {
-			// Index only changed files since last run.
-			if t.After(bt.lastIndexTime) {
-				bt.client.PublishEvent(event)
-			}
-		}
-
-		if f.IsDir() {
-			bt.listDir(dirFile+"/"+f.Name(), beatname, init)
-		}
+		bt.client.PublishEvent(event) <3>
+		logp.Info("Event sent")
+		counter++
 	}
 }
 ----------------------------------------------------------------------
-
 <1> Create the event object.
 <2> Specify a `@timestamp` field of time `common.Time`.
 <3> Use the publisher to send the event out to the defined output
+
+
+Inside the loop, the Beat sleeps for a configurable period of time and then
+captures the required data and sends it to the publisher. The publisher client is available as part of the Beat object
+through the `client` variable.
 
 For more details about how the fields should be named, please check
 <<event-conventions, Event conventions>>.
@@ -393,12 +352,12 @@ For more details about how the fields should be named, please check
 
 The `Stop` method is called when the Beat is signaled to stop, for
 example through the SIGTERM signal on Unix systems or the service control
-interface on Windows. For `Lsbeat`, this method simply closes the channel 
+interface on Windows. This method simply closes the channel 
 which breaks the main loop.
 
 [source,go]
 ----------------------------------------------------------------------
-func (bt *Lsbeat) Stop() {
+func (bt *Testbeat) Stop() {
 	bt.client.Close()
 	close(bt.done)
 }
@@ -406,7 +365,7 @@ func (bt *Lsbeat) Stop() {
 
 ==== The main Function
 
-If you follow the `Lsbeat` model and put your Beat-specific code in its own type
+If you follow the `Testbeat` model and put your Beat-specific code in its own type
 that implements the `Beater` interface, the code from your main package is
 very simple:
 
@@ -419,16 +378,23 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 
-	"github.com/kimjmin/lsbeat/beater"
+	"github.com/kimjmin/testbeat/beater"
 )
 
 func main() {
-	err := beat.Run("lsbeat", "", beater.New)
+	err := beat.Run("testbeat", "", beater.New)
 	if err != nil {
 		os.Exit(1)
 	}
 }
 ----------------------------------------------------------------------
+
+[[ls-beat]]
+=== How to build Lsbeat from scratch
+
+Lsbeat is similar to the `ls` command line tool, but instead of printing the files and subdirectories to the screen,
+Lsbeat periodically ships them to Elasticsearch for storage.
+The http://elastic.co//blog/build-your-own-beat[blogpost] describes how to build from scratch `Lsbeat`.
 
 
 === Sharing Your Beat with the Community
