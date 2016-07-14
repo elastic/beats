@@ -12,16 +12,11 @@ Ensure that this folder is at the following location:
 * [Golang](https://golang.org/dl/) 1.6.2
 
 ### Init Project
-To get running with {{cookiecutter.beat|capitalize}}, run the following command:
+To get running with {{cookiecutter.beat|capitalize}} and also install the
+dependencies, run the following command:
 
 ```
-make init
-```
-
-To commit the first version before you modify it, run:
-
-```
-make commit
+make setup
 ```
 
 It will create a clean git history for each major step. Note that you can always rewrite the history if you wish before pushing your changes.
