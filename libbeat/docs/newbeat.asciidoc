@@ -339,10 +339,12 @@ func (bt *Testbeat) Run(b *beat.Beat) error {
 <2> Specify a `@timestamp` field of time `common.Time`.
 <3> Use the publisher to send the event out to the defined output
 
-
 Inside the loop, the Beat sleeps for a configurable period of time and then
 captures the required data and sends it to the publisher. The publisher client is available as part of the Beat object
 through the `client` variable.
+
+The event := common.MapStr{} stores the event in a json format, and bt.client.PublishEvent(event) ispublishing data to Elasticsearch. 
+In the generated Beat, there are three fields in the event, which is @timestamp, type and counter. 
 
 For more details about how the fields should be named, please check
 <<event-conventions, Event conventions>>.
