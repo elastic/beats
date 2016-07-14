@@ -26,11 +26,9 @@ include::./visualizing-data.asciidoc[]
 
 include::./dashboards.asciidoc[]
 
-pass::[<?page_header <b>PLEASE NOTE:</b><br/>We are working on updating this section. Some content might be out of date. While you're waiting for updates, you might want to try out the Beat generator at https://github.com/elastic/beat-generator.?>]
-
 include::./newbeat.asciidoc[]
 
-pass::[<?page_header ?>]
+include::./event-conventions.asciidoc[]
 
 include::./newdashboards.asciidoc[]
 
