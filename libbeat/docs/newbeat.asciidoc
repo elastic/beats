@@ -343,8 +343,9 @@ Inside the loop, the Beat sleeps for a configurable period of time and then
 captures the required data and sends it to the publisher. The publisher client is available as part of the Beat object
 through the `client` variable.
 
-The event := common.MapStr{} stores the event in a json format, and bt.client.PublishEvent(event) ispublishing data to Elasticsearch. 
-In the generated Beat, there are three fields in the event, which is @timestamp, type and counter. 
+The `event := common.MapStr{}` stores the event in a json format, and `bt.client.PublishEvent(event)` is publishing data to Elasticsearch. 
+In the generated Beat, there are three fields in the event, which is
+@timestamp, type, and counter. 
 
 For more details about how the fields should be named, please check
 <<event-conventions, Event conventions>>.
@@ -394,9 +395,9 @@ func main() {
 [[ls-beat]]
 === How to build Lsbeat from scratch
 
-Lsbeat is similar to the `ls` command line tool, but instead of printing the files and subdirectories to the screen,
+github.com/kimjmin/lsbeat[Lsbeat] is similar to the `ls` command line tool, but instead of printing the files and subdirectories to the screen,
 Lsbeat periodically ships them to Elasticsearch for storage.
-The http://elastic.co//blog/build-your-own-beat[blogpost] describes how to build from scratch `Lsbeat`.
+The http://elastic.co//blog/build-your-own-beat[blog post] describes how to build from scratch `Lsbeat`.
 
 
 === Sharing Your Beat with the Community
