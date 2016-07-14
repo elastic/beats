@@ -37,6 +37,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 
 *Metricbeat*
 
+- Do not send zero values when no value was present in the source. {issue}1972[1972]
+
 *Packetbeat*
 
 *Topbeat*

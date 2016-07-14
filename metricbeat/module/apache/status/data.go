@@ -15,6 +15,42 @@ var (
 
 	// This should match: "CPUSystem: .01"
 	matchNumber = regexp.MustCompile("(^[0-9a-zA-Z ]+):\\s+(\\d*\\.?\\d+)")
+
+	schema = h.NewSchema(common.MapStr{
+		"total_accesses":    h.Int("Total Accesses"),
+		"total_kbytes":      h.Int("Total kBytes"),
+		"requests_per_sec":  h.Float("ReqPerSec", h.Optional),
+		"bytes_per_sec":     h.Float("BytesPerSec", h.Optional),
+		"bytes_per_request": h.Float("BytesPerReq", h.Optional),
+		"workers": common.MapStr{
+			"busy": h.Int("BusyWorkers"),
+			"idle": h.Int("IdleWorkers"),
+		},
+		"uptime": common.MapStr{
+			"server_uptime": h.Int("ServerUptimeSeconds"),
+			"uptime":        h.Int("Uptime"),
+		},
+		"cpu": common.MapStr{
+			"load":            h.Float("CPULoad", h.Optional),
+			"user":            h.Float("CPUUser"),
+			"system":          h.Float("CPUSystem"),
+			"children_user":   h.Float("CPUChildrenUser"),
+			"children_system": h.Float("CPUChildrenSystem"),
+		},
+		"connections": common.MapStr{
+			"total": h.Int("ConnsTotal"),
+			"async": common.MapStr{
+				"writing":    h.Int("ConnsAsyncWriting"),
+				"keep_alive": h.Int("ConnsAsyncKeepAlive"),
+				"closing":    h.Int("ConnsAsyncClosing"),
+			},
+		},
+		"load": common.MapStr{
+			"1":  h.Float("Load1"),
+			"5":  h.Float("Load5"),
+			"15": h.Float("Load15"),
+		},
+	})
 )
 
 // Map body to MapStr
@@ -89,40 +125,7 @@ func eventMapping(body io.ReadCloser, hostname string) common.MapStr {
 	}
 
 	event := common.MapStr{
-		"hostname":          hostname,
-		"total_accesses":    h.ToInt("Total Accesses", fullEvent),
-		"total_kbytes":      h.ToInt("Total kBytes", fullEvent),
-		"requests_per_sec":  h.ToFloat("ReqPerSec", fullEvent),
-		"bytes_per_sec":     h.ToFloat("BytesPerSec", fullEvent),
-		"bytes_per_request": h.ToFloat("BytesPerReq", fullEvent),
-		"workers": common.MapStr{
-			"busy": h.ToInt("BusyWorkers", fullEvent),
-			"idle": h.ToInt("IdleWorkers", fullEvent),
-		},
-		"uptime": common.MapStr{
-			"server_uptime": h.ToInt("ServerUptimeSeconds", fullEvent),
-			"uptime":        h.ToInt("Uptime", fullEvent),
-		},
-		"cpu": common.MapStr{
-			"load":            h.ToFloat("CPULoad", fullEvent),
-			"user":            h.ToFloat("CPUUser", fullEvent),
-			"system":          h.ToFloat("CPUSystem", fullEvent),
-			"children_user":   h.ToFloat("CPUChildrenUser", fullEvent),
-			"children_system": h.ToFloat("CPUChildrenSystem", fullEvent),
-		},
-		"connections": common.MapStr{
-			"total": h.ToInt("ConnsTotal", fullEvent),
-			"async": common.MapStr{
-				"writing":    h.ToInt("ConnsAsyncWriting", fullEvent),
-				"keep_alive": h.ToInt("ConnsAsyncKeepAlive", fullEvent),
-				"closing":    h.ToInt("ConnsAsyncClosing", fullEvent),
-			},
-		},
-		"load": common.MapStr{
-			"1":  h.ToFloat("Load1", fullEvent),
-			"5":  h.ToFloat("Load5", fullEvent),
-			"15": h.ToFloat("Load15", fullEvent),
-		},
+		"hostname": hostname,
 		"scoreboard": common.MapStr{
 			"starting_up":            totalS,
 			"reading_request":        totalR,
@@ -138,6 +141,7 @@ func eventMapping(body io.ReadCloser, hostname string) common.MapStr {
 			"total":                  totalAll,
 		},
 	}
+	schema.ApplyTo(event, fullEvent)
 
 	return event
 }
