@@ -12,7 +12,7 @@ Ensure that this folder is at the following location:
 * [Golang](https://golang.org/dl/) 1.6.2
 
 ### Init Project
-To get running with {{cookiecutter.beat|capitalize}} and install also the
+To get running with {{cookiecutter.beat|capitalize}} and also install the
 dependencies, run the following command:
 
 ```
