@@ -11,6 +11,12 @@ import (
 
 type Config ucfg.Config
 
+type flagOverwrite struct {
+	config *ucfg.Config
+	path   string
+	value  string
+}
+
 var configOpts = []ucfg.Option{
 	ucfg.PathSep("."),
 	ucfg.ResolveEnv,
@@ -24,6 +30,16 @@ func NewConfig() *Config {
 func NewConfigFrom(from interface{}) (*Config, error) {
 	c, err := ucfg.NewFrom(from, configOpts...)
 	return fromConfig(c), err
+}
+
+func MergeConfigs(cfgs ...*Config) (*Config, error) {
+	config := NewConfig()
+	for _, c := range cfgs {
+		if err := config.Merge(c); err != nil {
+			return nil, err
+		}
+	}
+	return config, nil
 }
 
 func NewConfigWithYAML(in []byte, source string) (*Config, error) {
@@ -57,6 +73,40 @@ func NewFlagConfig(
 
 	config := cfgflag.ConfigVar(set, to, name, usage, opts...)
 	return fromConfig(config)
+}
+
+func NewFlagOverwrite(
+	set *flag.FlagSet,
+	config *Config,
+	name, path, def, usage string,
+) *string {
+	if config == nil {
+		panic("Missing configuration")
+	}
+	if path == "" {
+		panic("empty path")
+	}
+
+	if def != "" {
+		err := config.SetString(path, -1, def)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	f := &flagOverwrite{
+		config: config.access(),
+		path:   path,
+		value:  def,
+	}
+
+	if set == nil {
+		flag.Var(f, name, usage)
+	} else {
+		set.Var(f, name, usage)
+	}
+
+	return &f.value
 }
 
 func LoadFile(path string) (*Config, error) {
@@ -162,4 +212,28 @@ func (c *Config) access() *ucfg.Config {
 
 func (c *Config) GetFields() []string {
 	return c.access().GetFields()
+}
+
+func (f *flagOverwrite) String() string {
+	return f.value
+}
+
+func (f *flagOverwrite) Set(v string) error {
+	opts := append(
+		[]ucfg.Option{
+			ucfg.MetaData(ucfg.Meta{"command line flag"}),
+		},
+		configOpts...,
+	)
+
+	err := f.config.SetString(f.path, -1, v, opts...)
+	if err != nil {
+		return err
+	}
+	f.value = v
+	return nil
+}
+
+func (f *flagOverwrite) Get() interface{} {
+	return f.value
 }
