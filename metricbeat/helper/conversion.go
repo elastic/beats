@@ -59,6 +59,8 @@ func applySchemaToEvent(event common.MapStr, data map[string]string, conversions
 			subEvent := common.MapStr{}
 			applySchemaToEvent(subEvent, data, conversion.(common.MapStr))
 			event[key] = subEvent
+		default:
+			logp.Err("Unexpected type for '%s' in schema: %T", key, conversion)
 		}
 	}
 }
