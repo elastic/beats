@@ -1,97 +1,98 @@
 package status
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	s "github.com/elastic/beats/metricbeat/schema"
+	c "github.com/elastic/beats/metricbeat/schema/mapstriface"
+)
 
-var schema = NewMSchema(common.MapStr{
-	"version": String("version"),
-	"uptime": common.MapStr{
-		"ms": Int("uptimeMillis"),
+var schema = s.Schema{
+	"version": c.Str("version"),
+	"uptime": s.Object{
+		"ms": c.Int("uptimeMillis"),
 	},
-	"local_time":         Time("localTime"),
-	"write_backs_queued": Bool("writeBacksQueued"),
-	"asserts": Map("asserts", common.MapStr{
-		"regular":   Int("regular"),
-		"warning":   Int("warning"),
-		"msg":       Int("msg"),
-		"user":      Int("user"),
-		"rollovers": Int("rollovers"),
+	"local_time":         c.Time("localTime"),
+	"write_backs_queued": c.Bool("writeBacksQueued"),
+	"asserts": c.Dict("asserts", s.Schema{
+		"regular":   c.Int("regular"),
+		"warning":   c.Int("warning"),
+		"msg":       c.Int("msg"),
+		"user":      c.Int("user"),
+		"rollovers": c.Int("rollovers"),
 	}),
-	"background_flushing": Map("backgroundFlushing", common.MapStr{
-		"flushes": Int("flushes"),
-		"total": common.MapStr{
-			"ms": Int("total_ms"),
+	"background_flushing": c.Dict("backgroundFlushing", s.Schema{
+		"flushes": c.Int("flushes"),
+		"total": s.Object{
+			"ms": c.Int("total_ms"),
 		},
-		"average": common.MapStr{
-			"ms": Int("average_ms"),
+		"average": s.Object{
+			"ms": c.Int("average_ms"),
 		},
-		"last": common.MapStr{
-			"ms": Int("last_ms"),
+		"last": s.Object{
+			"ms": c.Int("last_ms"),
 		},
-		"last_finished": Time("last_finished"),
+		"last_finished": c.Time("last_finished"),
 	}),
-	"connections": Map("connections", common.MapStr{
-		"current":       Int("current"),
-		"available":     Int("available"),
-		"total_created": Int("totalCreated"),
+	"connections": c.Dict("connections", s.Schema{
+		"current":       c.Int("current"),
+		"available":     c.Int("available"),
+		"total_created": c.Int("totalCreated"),
 	}),
-	"journaling": Map("dur", common.MapStr{
-		"commits": Int("commits"),
-		"journaled": common.MapStr{
-			"mb": Int("journaledMB"),
+	"journaling": c.Dict("dur", s.Schema{
+		"commits": c.Int("commits"),
+		"journaled": s.Object{
+			"mb": c.Int("journaledMB"),
 		},
-		"write_to_data_files": common.MapStr{
-			"mb": Int("writeToDataFilesMB"),
+		"write_to_data_files": s.Object{
+			"mb": c.Int("writeToDataFilesMB"),
 		},
-		"compression":           Int("compression"),
-		"commits_in_write_lock": Int("commitsInWriteLock"),
-		"early_commits":         Int("earlyCommits"),
-		"times": Map("timeMs", common.MapStr{
-			"dt":                    common.MapStr{"ms": Int("dt")},
-			"prep_log_buffer":       common.MapStr{"ms": Int("prepLogBuffer")},
-			"write_to_journal":      common.MapStr{"ms": Int("writeToJournal")},
-			"write_to_data_files":   common.MapStr{"ms": Int("writeToDataFiles")},
-			"remap_private_view":    common.MapStr{"ms": Int("remapPrivateView")},
-			"commits":               common.MapStr{"ms": Int("commits")},
-			"commits_in_write_lock": common.MapStr{"ms": Int("commitsInWriteLock")},
+		"compression":           c.Int("compression"),
+		"commits_in_write_lock": c.Int("commitsInWriteLock"),
+		"early_commits":         c.Int("earlyCommits"),
+		"times": c.Dict("timeMs", s.Schema{
+			"dt":                    s.Object{"ms": c.Int("dt")},
+			"prep_log_buffer":       s.Object{"ms": c.Int("prepLogBuffer")},
+			"write_to_journal":      s.Object{"ms": c.Int("writeToJournal")},
+			"write_to_data_files":   s.Object{"ms": c.Int("writeToDataFiles")},
+			"remap_private_view":    s.Object{"ms": c.Int("remapPrivateView")},
+			"commits":               s.Object{"ms": c.Int("commits")},
+			"commits_in_write_lock": s.Object{"ms": c.Int("commitsInWriteLock")},
 		}),
 	}),
-	"extra_info": Map("extra_info", common.MapStr{
-		"heap_usage":  common.MapStr{"bytes": Int("heap_usage_bytes")},
-		"page_faults": Int("page_faults"),
+	"extra_info": c.Dict("extra_info", s.Schema{
+		"heap_usage":  s.Object{"bytes": c.Int("heap_usage_bytes")},
+		"page_faults": c.Int("page_faults"),
 	}),
-	"network": Map("network", common.MapStr{
-		"in":       common.MapStr{"bytes": Int("bytesIn")},
-		"out":      common.MapStr{"bytes": Int("bytesOut")},
-		"requests": Int("numRequests"),
+	"network": c.Dict("network", s.Schema{
+		"in":       s.Object{"bytes": c.Int("bytesIn")},
+		"out":      s.Object{"bytes": c.Int("bytesOut")},
+		"requests": c.Int("numRequests"),
 	}),
-	"memory": Map("mem", common.MapStr{
-		"bits":                Int("bits"),
-		"resident":            common.MapStr{"mb": Int("resident")},
-		"virtual":             common.MapStr{"mb": Int("virtual")},
-		"mapped":              common.MapStr{"mb": Int("mapped")},
-		"mapped_with_journal": common.MapStr{"mb": Int("mappedWithJournal")},
+	"memory": c.Dict("mem", s.Schema{
+		"bits":                c.Int("bits"),
+		"resident":            s.Object{"mb": c.Int("resident")},
+		"virtual":             s.Object{"mb": c.Int("virtual")},
+		"mapped":              s.Object{"mb": c.Int("mapped")},
+		"mapped_with_journal": s.Object{"mb": c.Int("mappedWithJournal")},
 	}),
-	"opcounters": Map("opcounters", common.MapStr{
-		"insert":  Int("insert"),
-		"query":   Int("query"),
-		"update":  Int("update"),
-		"delete":  Int("delete"),
-		"getmore": Int("getmore"),
-		"command": Int("command"),
+	"opcounters": c.Dict("opcounters", s.Schema{
+		"insert":  c.Int("insert"),
+		"query":   c.Int("query"),
+		"update":  c.Int("update"),
+		"delete":  c.Int("delete"),
+		"getmore": c.Int("getmore"),
+		"command": c.Int("command"),
 	}),
-	"opcounters_replicated": Map("opcountersRepl", common.MapStr{
-		"insert":  Int("insert"),
-		"query":   Int("query"),
-		"update":  Int("update"),
-		"delete":  Int("delete"),
-		"getmore": Int("getmore"),
-		"command": Int("command"),
+	"opcounters_replicated": c.Dict("opcountersRepl", s.Schema{
+		"insert":  c.Int("insert"),
+		"query":   c.Int("query"),
+		"update":  c.Int("update"),
+		"delete":  c.Int("delete"),
+		"getmore": c.Int("getmore"),
+		"command": c.Int("command"),
 	}),
-	"storage_engine": Map("storageEngine", common.MapStr{
-		"name": String("name"),
+	"storage_engine": c.Dict("storageEngine", s.Schema{
+		"name": c.Str("name"),
 	}),
-})
-
-func eventMapping(status map[string]interface{}) common.MapStr {
-	return schema.Apply(status)
 }
+
+var eventMapping = schema.Apply

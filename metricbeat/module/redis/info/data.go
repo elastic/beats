@@ -2,121 +2,125 @@ package info
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	h "github.com/elastic/beats/metricbeat/helper"
+	s "github.com/elastic/beats/metricbeat/schema"
+	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
 )
 
 var (
-	schema = h.NewSchema(common.MapStr{
-		"clients": common.MapStr{
-			"connected":           h.Int("connected_clients"),
-			"longest_output_list": h.Int("client_longest_output_list"),
-			"biggest_input_buf":   h.Int("client_biggest_input_buf"),
-			"blocked":             h.Int("blocked_clients"),
+	schema = s.Schema{
+		"clients": s.Object{
+			"connected":           c.Int("connected_clients"),
+			"longest_output_list": c.Int("client_longest_output_list"),
+			"biggest_input_buf":   c.Int("client_biggest_input_buf"),
+			"blocked":             c.Int("blocked_clients"),
 		},
-		"cluster": common.MapStr{
-			"enabled": h.Bool("cluster_enabled"),
+		"cluster": s.Object{
+			"enabled": c.Bool("cluster_enabled"),
 		},
-		"cpu": common.MapStr{
-			"used": common.MapStr{
-				"sys":           h.Float("used_cpu_sys"),
-				"user":          h.Float("used_cpu_user"),
-				"sys_children":  h.Float("used_cpu_sys_children"),
-				"user_children": h.Float("used_cpu_user_children"),
-			},
-		},
-		"memory": common.MapStr{
-			"used": common.MapStr{
-				"value": h.Int("used_memory"), // As it is a top key, this goes into value
-				"rss":   h.Int("used_memory_rss"),
-				"peak":  h.Int("used_memory_peak"),
-				"lua":   h.Int("used_memory_lua"),
-			},
-			"allocator": h.Str("mem_allocator"), // Could be moved to server as it rarely changes
-		},
-		"persistence": common.MapStr{
-			"loading": h.Bool("loading"),
-			"rdb": common.MapStr{
-				"changes_since_last_save": h.Int("rdb_changes_since_last_save"),
-				"bgsave_in_progress":      h.Bool("rdb_bgsave_in_progress"),
-				"last_save_time":          h.Int("rdb_last_save_time"),
-				"last_bgsave_status":      h.Str("rdb_last_bgsave_status"),
-				"last_bgsave_time_sec":    h.Int("rdb_last_bgsave_time_sec"),
-				"current_bgsave_time_sec": h.Int("rdb_current_bgsave_time_sec"),
-			},
-			"used": common.MapStr{
-				"enabled":                  h.Bool("aof_enabled"),
-				"rewrite_in_progress":      h.Bool("aof_rewrite_in_progress"),
-				"rewrite_scheduled":        h.Bool("aof_rewrite_scheduled"),
-				"last_rewrite_time_sec":    h.Int("aof_last_rewrite_time_sec"),
-				"current_rewrite_time_sec": h.Int("aof_current_rewrite_time_sec"),
-				"last_bgrewrite_status":    h.Str("aof_last_bgrewrite_status"),
-				"last_write_status":        h.Str("aof_last_write_status"),
+		"cpu": s.Object{
+			"used": s.Object{
+				"sys":           c.Float("used_cpu_sys"),
+				"user":          c.Float("used_cpu_user"),
+				"sys_children":  c.Float("used_cpu_sys_children"),
+				"user_children": c.Float("used_cpu_user_children"),
 			},
 		},
-		"replication": common.MapStr{
-			"role":             h.Str("role"),
-			"connected_slaves": h.Int("connected_slaves"),
-			"master_offset":    h.Int("master_repl_offset"),
-			"backlog": common.MapStr{
-				"active":            h.Int("repl_backlog_active"),
-				"size":              h.Int("repl_backlog_size"),
-				"first_byte_offset": h.Int("repl_backlog_first_byte_offset"),
-				"histlen":           h.Int("repl_backlog_histlen"),
+		"memory": s.Object{
+			"used": s.Object{
+				"value": c.Int("used_memory"), // As it is a top key, this goes into value
+				"rss":   c.Int("used_memory_rss"),
+				"peak":  c.Int("used_memory_peak"),
+				"lua":   c.Int("used_memory_lua"),
+			},
+			"allocator": c.Str("mem_allocator"), // Could be moved to server as it rarely changes
+		},
+		"persistence": s.Object{
+			"loading": c.Bool("loading"),
+			"rdb": s.Object{
+				"changes_since_last_save": c.Int("rdb_changes_since_last_save"),
+				"bgsave_in_progress":      c.Bool("rdb_bgsave_in_progress"),
+				"last_save_time":          c.Int("rdb_last_save_time"),
+				"last_bgsave_status":      c.Str("rdb_last_bgsave_status"),
+				"last_bgsave_time_sec":    c.Int("rdb_last_bgsave_time_sec"),
+				"current_bgsave_time_sec": c.Int("rdb_current_bgsave_time_sec"),
+			},
+			"used": s.Object{
+				"enabled":                  c.Bool("aof_enabled"),
+				"rewrite_in_progress":      c.Bool("aof_rewrite_in_progress"),
+				"rewrite_scheduled":        c.Bool("aof_rewrite_scheduled"),
+				"last_rewrite_time_sec":    c.Int("aof_last_rewrite_time_sec"),
+				"current_rewrite_time_sec": c.Int("aof_current_rewrite_time_sec"),
+				"last_bgrewrite_status":    c.Str("aof_last_bgrewrite_status"),
+				"last_write_status":        c.Str("aof_last_write_status"),
 			},
 		},
-		"server": common.MapStr{
-			"version":          h.Str("redis_version"),
-			"git_sha1":         h.Str("redis_git_sha1"),
-			"git_dirty":        h.Str("redis_git_dirty"),
-			"build_id":         h.Str("redis_build_id"),
-			"mode":             h.Str("redis_mode"),
-			"os":               h.Str("os"),
-			"arch_bits":        h.Str("arch_bits"),
-			"multiplexing_api": h.Str("multiplexing_api"),
-			"gcc_version":      h.Str("gcc_version"),
-			"process_id":       h.Int("process_id"),
-			"run_id":           h.Str("run_id"),
-			"tcp_port":         h.Int("tcp_port"),
-			"uptime":           h.Int("uptime_in_seconds"), // Uptime days was removed as duplicate
-			"hz":               h.Int("hz"),
-			"lru_clock":        h.Int("lru_clock"),
-			"config_file":      h.Str("config_file"),
+		"replication": s.Object{
+			"role":             c.Str("role"),
+			"connected_slaves": c.Int("connected_slaves"),
+			"master_offset":    c.Int("master_repl_offset"),
+			"backlog": s.Object{
+				"active":            c.Int("repl_backlog_active"),
+				"size":              c.Int("repl_backlog_size"),
+				"first_byte_offset": c.Int("repl_backlog_first_byte_offset"),
+				"histlen":           c.Int("repl_backlog_histlen"),
+			},
 		},
-		"stats": common.MapStr{
-			"connections": common.MapStr{
-				"received": h.Int("total_connections_received"),
-				"rejected": h.Int("rejected_connections"),
-			},
-			"total_commands_processed":  h.Int("total_commands_processed"),
-			"total_net_input_bytes":     h.Int("total_net_input_bytes"),
-			"total_net_output_bytes":    h.Int("total_net_output_bytes"),
-			"instantaneous_ops_per_sec": h.Int("instantaneous_ops_per_sec"),
-			"instantaneous_input_kbps":  h.Float("instantaneous_input_kbps"),
-			"instantaneous_output_kbps": h.Float("instantaneous_output_kbps"),
-			"sync": common.MapStr{
-				"full":        h.Int("sync_full"),
-				"partial_ok":  h.Int("sync_partial_ok"),
-				"partial_err": h.Int("sync_partial_err"),
-			},
-			"keys": common.MapStr{
-				"expired": h.Int("expired_keys"),
-				"evicted": h.Int("evicted_keys"),
-			},
-			"keyspace": common.MapStr{
-				"hits":   h.Int("keyspace_hits"),
-				"misses": h.Int("keyspace_misses"),
-			},
-			"pubsub_channels":        h.Int("pubsub_channels"),
-			"pubsub_patterns":        h.Int("pubsub_patterns"),
-			"latest_fork_usec":       h.Int("latest_fork_usec"),
-			"migrate_cached_sockets": h.Int("migrate_cached_sockets"),
+		"server": s.Object{
+			"version":          c.Str("redis_version"),
+			"git_sha1":         c.Str("redis_git_sha1"),
+			"git_dirty":        c.Str("redis_git_dirty"),
+			"build_id":         c.Str("redis_build_id"),
+			"mode":             c.Str("redis_mode"),
+			"os":               c.Str("os"),
+			"arch_bits":        c.Str("arch_bits"),
+			"multiplexing_api": c.Str("multiplexing_api"),
+			"gcc_version":      c.Str("gcc_version"),
+			"process_id":       c.Int("process_id"),
+			"run_id":           c.Str("run_id"),
+			"tcp_port":         c.Int("tcp_port"),
+			"uptime":           c.Int("uptime_in_seconds"), // Uptime days was removed as duplicate
+			"hz":               c.Int("hz"),
+			"lru_clock":        c.Int("lru_clock"),
+			"config_file":      c.Str("config_file"),
 		},
-	})
+		"stats": s.Object{
+			"connections": s.Object{
+				"received": c.Int("total_connections_received"),
+				"rejected": c.Int("rejected_connections"),
+			},
+			"total_commands_processed":  c.Int("total_commands_processed"),
+			"total_net_input_bytes":     c.Int("total_net_input_bytes"),
+			"total_net_output_bytes":    c.Int("total_net_output_bytes"),
+			"instantaneous_ops_per_sec": c.Int("instantaneous_ops_per_sec"),
+			"instantaneous_input_kbps":  c.Float("instantaneous_input_kbps"),
+			"instantaneous_output_kbps": c.Float("instantaneous_output_kbps"),
+			"sync": s.Object{
+				"full":        c.Int("sync_full"),
+				"partial_ok":  c.Int("sync_partial_ok"),
+				"partial_err": c.Int("sync_partial_err"),
+			},
+			"keys": s.Object{
+				"expired": c.Int("expired_keys"),
+				"evicted": c.Int("evicted_keys"),
+			},
+			"keyspace": s.Object{
+				"hits":   c.Int("keyspace_hits"),
+				"misses": c.Int("keyspace_misses"),
+			},
+			"pubsub_channels":        c.Int("pubsub_channels"),
+			"pubsub_patterns":        c.Int("pubsub_patterns"),
+			"latest_fork_usec":       c.Int("latest_fork_usec"),
+			"migrate_cached_sockets": c.Int("migrate_cached_sockets"),
+		},
+	}
 )
 
 // Map data to MapStr
 func eventMapping(info map[string]string) common.MapStr {
-
 	// Full mapping from info
-	return schema.Apply(info)
+	source := map[string]interface{}{}
+	for key, val := range info {
+		source[key] = val
+	}
+	return schema.Apply(source)
 }
