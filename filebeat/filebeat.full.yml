@@ -217,7 +217,7 @@ filebeat.prospectors:
 
 # Name of the registry file. If a relative path is used, it is considered relative to the
 # data path.
-#filebeat.registry_file: registry
+#filebeat.registry_file: ${path.data}/registry
 
 #
 # These config files must have the full filebeat config part inside, but only
@@ -374,7 +374,7 @@ output.elasticsearch:
   #template.name: "filebeat"
 
   # Path to template file
-  #template.path: "filebeat.template.json"
+  #template.path: "${path.config}/filebeat.template.json"
 
   # Overwrite existing template
   #template.overwrite: false
@@ -385,7 +385,7 @@ output.elasticsearch:
   #template.versions.2x.enabled: true
 
   # Path to the Elasticsearch 2.x version of the template file.
-  #template.versions.2x.path: "filebeat.template-es2x.json"
+  #template.versions.2x.path: "${path.config}/filebeat.template-es2x.json"
 
 
   # TLS configuration. By default is off.
@@ -705,18 +705,18 @@ output.elasticsearch:
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
-#path.config:
+#path.config: ${path.home}
 
 # The data path for the filebeat installation. This is the default base path
 # for all the files in which filebeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
-#path.data:
+#path.data: ${path.home}/data
 
 # The logs path for a filebeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
-#path.logs:
+#path.logs: ${path.home}/logs
 
 #================================ Logging =====================================
 # There are three options for the log output: syslog, file, stderr.
