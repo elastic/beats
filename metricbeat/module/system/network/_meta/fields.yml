@@ -9,6 +9,11 @@
       description: >
         The network interface name.
 
+    - name: total.bytes
+      type: long
+      description: >
+        The total number of bytes received and sent.
+
     - name: out.bytes
       type: long
       description: >
@@ -18,6 +23,11 @@
       type: long
       description: >
         The number of bytes received.
+
+    - name: total.packets
+      type: long
+      description: >
+        The total number of packets received and sent.
 
     - name: out.packets
       type: long
@@ -29,6 +39,11 @@
       description: >
         The number or packets received.
 
+    - name: total.errors
+      type: long
+      description: >
+        The total number of errors while receiving and sending.
+
     - name: in.errors
       type: long
       description: >
@@ -38,6 +53,11 @@
       type: long
       description: >
         The number of errors while sending.
+
+    - name: total.dropped
+      type: long
+      description: >
+        The total number of packets that were dropped.
 
     - name: in.dropped
       type: long

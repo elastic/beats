@@ -14,7 +14,7 @@ metricbeat.modules:
 - module: system
   metricsets:
     # CPU stats
-    - cpu
+    #- cpu
 
     # Per CPU core stats
     #- core
@@ -23,19 +23,19 @@ metricbeat.modules:
     #- diskio
 
     # Per filesystem stats
-    - filesystem
+    #- filesystem
 
     # File system summary stats
     #- fsstat
 
     # Memory stats
-    - memory
+    #- memory
 
     # Network stats
     - network
 
     # Per process stats
-    - process
+    #- process
   enabled: true
   period: 10s
   processes: ['.*']

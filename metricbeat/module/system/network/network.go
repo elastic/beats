@@ -95,5 +95,11 @@ func ioCountersToMapStr(counters net.IOCountersStat) common.MapStr {
 			"packets": counters.PacketsSent,
 			"bytes":   counters.BytesSent,
 		},
+		"total": common.MapStr{
+			"errors":  counters.Errin + counters.Errout,
+			"dropped": counters.Dropin + counters.Dropout,
+			"packets": counters.BytesRecv + counters.PacketsSent,
+			"bytes":   counters.PacketsRecv + counters.BytesSent,
+		},
 	}
 }
