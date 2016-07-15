@@ -37,6 +37,12 @@ func findKeyspaceStats(info map[string]string) map[string]string {
 	return keyspace
 }
 
+var schema = h.NewSchema(common.MapStr{
+	"keys":    h.Int("keys"),
+	"expires": h.Int("expires"),
+	"avg_ttl": h.Int("avg_ttl"),
+})
+
 // parseKeyspaceStats resolves the overloaded value string that Redis returns for keyspace
 func parseKeyspaceStats(keyspaceMap map[string]string) map[string]common.MapStr {
 	keyspace := map[string]common.MapStr{}
@@ -55,11 +61,7 @@ func parseKeyspaceStats(keyspaceMap map[string]string) map[string]common.MapStr 
 					db[stats[0]] = stats[1]
 				}
 			}
-			keyspace[k] = common.MapStr{
-				"keys":    h.ToInt("keys", db),
-				"expires": h.ToInt("expires", db),
-				"avg_ttl": h.ToInt("avg_ttl", db),
-			}
+			keyspace[k] = schema.Apply(db)
 		}
 	}
 	return keyspace
