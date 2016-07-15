@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
+- Fix sync publisher PublishEvents return value if client is closed concurrently. {pull}2046[2046]
 
 *Metricbeat*
 
@@ -44,8 +45,10 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 *Topbeat*
 
 *Filebeat*
+- Fix potential data loss between filebeat restarts, reporting unpublished lines as published. {issue}2041[2041]
 
 *Winlogbeat*
+- Fix potential data loss between winlogbeat restarts, reporting unpublished lines as published. {issue}2041[2041]
 
 ==== Added
 
