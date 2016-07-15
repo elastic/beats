@@ -116,7 +116,13 @@ func (p *syncLogPublisher) Start() {
 				}
 			}
 
-			p.client.PublishEvents(pubEvents, publisher.Sync, publisher.Guaranteed)
+			ok := p.client.PublishEvents(pubEvents, publisher.Sync, publisher.Guaranteed)
+			if !ok {
+				// PublishEvents will only returns false, if p.client has been closed.
+				logp.Debug("publish", "Shutting down publisher")
+				return
+			}
+
 			logp.Debug("publish", "Events sent: %d", len(events))
 			eventsSent.Add(int64(len(events)))
 
