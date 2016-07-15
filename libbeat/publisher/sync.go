@@ -34,7 +34,7 @@ func (p *syncPipeline) publish(m message) bool {
 	// ignore any signal and drop events no matter if send or not.
 	select {
 	case <-client.canceler.Done():
-		return true
+		return false // return false, indicating events potentially not being send
 	case sig := <-sync.C:
 		sig.Apply(signal)
 		return sig == op.SignalCompleted
