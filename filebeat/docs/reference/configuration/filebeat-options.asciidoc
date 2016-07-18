@@ -80,8 +80,8 @@ NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes
 
 [source,yaml]
 -------------------------------------------------------------------------------------
- include_lines: ["apache"]
  exclude_lines: ["^DBG"]
+ include_lines: ["apache"]
 -------------------------------------------------------------------------------------
 
 See <<regexp-support>> for a list of supported regexp patterns.
