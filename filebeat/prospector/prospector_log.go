@@ -52,7 +52,7 @@ func (p *ProspectorLog) Run() {
 	p.scan()
 
 	// It is important that a first scan is run before cleanup to make sure all new states are read first
-	if p.config.CleanOlder > 0 {
+	if p.config.CleanInactive > 0 {
 		p.Prospector.states.Cleanup()
 		logp.Debug("prospector", "Prospector states cleaned up.")
 	}

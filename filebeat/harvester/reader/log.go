@@ -32,7 +32,7 @@ type LogFileReaderConfig struct {
 	MaxBackoff    time.Duration
 	BackoffFactor int
 	CloseEOF      bool
-	CloseOlder    time.Duration
+	CloseInactive time.Duration
 	CloseRenamed  bool
 	CloseRemoved  bool
 }
@@ -129,9 +129,9 @@ func (r *logFileReader) errorChecks(err error) error {
 		return ErrFileTruncate
 	}
 
-	// Check file wasn't read for longer then CloseOlder
+	// Check file wasn't read for longer then CloseInactive
 	age := time.Since(r.lastTimeRead)
-	if age > r.config.CloseOlder {
+	if age > r.config.CloseInactive {
 		return ErrInactive
 	}
 

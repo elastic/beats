@@ -13,7 +13,7 @@ var (
 		IgnoreOlder:   0,
 		ScanFrequency: 10 * time.Second,
 		InputType:     cfg.DefaultInputType,
-		CleanOlder:    0,
+		CleanInactive: 0,
 		CleanRemoved:  false,
 	}
 )
@@ -24,7 +24,7 @@ type prospectorConfig struct {
 	Paths         []string         `config:"paths"`
 	ScanFrequency time.Duration    `config:"scan_frequency"`
 	InputType     string           `config:"input_type"`
-	CleanOlder    time.Duration    `config:"clean_older" validate:"min=0"`
+	CleanInactive time.Duration    `config:"clean_inactive" validate:"min=0"`
 	CleanRemoved  bool             `config:"clean_removed"`
 }
 
