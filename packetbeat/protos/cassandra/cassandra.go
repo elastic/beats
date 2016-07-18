@@ -68,7 +68,7 @@ func (cassandra *cassandra) init(results publish.Transactions, config *cassandra
 	}
 	cassandra.pub.results = results
 
-	isDebug = logp.IsDebug("http")
+	isDebug = logp.IsDebug("cassandra")
 	return nil
 }
 
