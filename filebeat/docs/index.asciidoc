@@ -17,6 +17,8 @@ include::./overview.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
+include::./how-filebeat-works.asciidoc[]
+
 include::./command-line.asciidoc[]
 
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
