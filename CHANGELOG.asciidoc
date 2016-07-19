@@ -28,6 +28,9 @@ https://github.com/elastic/beats/compare/v1.3.0...1.3[Check the HEAD diff]
 *Affecting all Beats*
 
 *Packetbeat*
+- Add missing nil-check to memcached GapInStream handler. {issue}1162[1162]
+- Fix NFSv4 Operation returning the first found first-class operation available in compound requests. {pull}1821[1821]
+- Fix TCP overlapping segments not being handled correctly. {pull}1917[1917]
 
 *Topbeat*
 
