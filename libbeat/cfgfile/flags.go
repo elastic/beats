@@ -8,6 +8,7 @@ import (
 type argList struct {
 	list      []string
 	isDefault bool
+	f         *flag.Flag
 }
 
 func flagArgList(name string, def string, usage string) *argList {
@@ -16,10 +17,15 @@ func flagArgList(name string, def string, usage string) *argList {
 		isDefault: true,
 	}
 	flag.Var(l, name, usage)
+	l.f = flag.Lookup(name)
+	if l.f == nil {
+		panic("Failed to lookup registered flag")
+	}
 	return l
 }
 
 func (l *argList) SetDefault(v string) {
+	l.f.DefValue = v
 	l.list = []string{v}
 	l.isDefault = true
 }
