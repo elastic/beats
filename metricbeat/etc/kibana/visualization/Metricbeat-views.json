@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Metricbeat views\",\"type\":\"markdown\",\"params\":{\"markdown\":\"# Metricbeat\\n\\n### System\\n- [Network statistics](/#/dashboard/Network)\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Metricbeat views", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

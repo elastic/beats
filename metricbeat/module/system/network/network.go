@@ -86,14 +86,20 @@ func ioCountersToMapStr(counters net.IOCountersStat) common.MapStr {
 		"in": common.MapStr{
 			"errors":  counters.Errin,
 			"dropped": counters.Dropin,
-			"bytes":   counters.BytesRecv,
 			"packets": counters.PacketsRecv,
+			"bytes":   counters.BytesRecv,
 		},
 		"out": common.MapStr{
 			"errors":  counters.Errout,
 			"dropped": counters.Dropout,
 			"packets": counters.PacketsSent,
 			"bytes":   counters.BytesSent,
+		},
+		"total": common.MapStr{
+			"errors":  counters.Errin + counters.Errout,
+			"dropped": counters.Dropin + counters.Dropout,
+			"packets": counters.PacketsRecv + counters.PacketsSent,
+			"bytes":   counters.BytesRecv + counters.BytesSent,
 		},
 	}
 }
