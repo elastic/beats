@@ -45,7 +45,7 @@ func TestEventBuilder(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, defaultType, event["type"])
+	assert.Equal(t, moduleName+"."+metricSetName, event["type"])
 	assert.Equal(t, common.Time(startTime), event["@timestamp"])
 
 	metricset := event["metricset"].(common.MapStr)
@@ -53,7 +53,7 @@ func TestEventBuilder(t *testing.T) {
 	assert.Equal(t, metricSetName, metricset["name"])
 	assert.Equal(t, int64(500000), metricset["rtt"])
 	assert.Equal(t, host, metricset["host"])
-	assert.Equal(t, common.MapStr{}, event[moduleName].(common.MapStr)[metricSetName])
+	assert.Equal(t, common.MapStr{}, event[moduleName])
 	assert.Nil(t, event["error"])
 }
 

@@ -8,10 +8,6 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 )
 
-const (
-	defaultType = "metricsets"
-)
-
 // eventBuilder is used for building MetricSet events. MetricSets generate a
 // data in the form of a common.MapStr. This builder transforms that data into
 // a complete event and applies any Module-level filtering.
@@ -38,7 +34,7 @@ func (b eventBuilder) build() (common.MapStr, error) {
 
 	// Get and remove meta fields from the event created by the MetricSet.
 	indexName := getIndex(event, "")
-	typeName := getType(event, defaultType)
+	typeName := getType(event, b.moduleName+"."+b.metricSetName)
 	timestamp := getTimestamp(event, common.Time(b.startTime))
 
 	// Apply filters.
@@ -51,9 +47,7 @@ func (b eventBuilder) build() (common.MapStr, error) {
 		"type":       typeName,
 
 		common.EventMetadataKey: b.metadata,
-		b.moduleName: common.MapStr{
-			b.metricSetName: event,
-		},
+		b.moduleName:            event,
 		"metricset": common.MapStr{
 			"module": b.moduleName,
 			"name":   b.metricSetName,

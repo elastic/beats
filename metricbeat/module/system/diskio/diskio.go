@@ -35,7 +35,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	events := make([]common.MapStr, 0, len(stats))
 	for _, counters := range stats {
-		event := common.MapStr{
+		diskio := common.MapStr{
 			"name": counters.Name,
 			"read": common.MapStr{
 				"count": counters.ReadCount,
@@ -51,11 +51,15 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 				"time": counters.IoTime,
 			},
 		}
+		if counters.SerialNumber != "" {
+			diskio["serial_number"] = counters.SerialNumber
+		}
+
+		event := common.MapStr{
+			"diskio": diskio,
+		}
 		events = append(events, event)
 
-		if counters.SerialNumber != "" {
-			event["serial_number"] = counters.SerialNumber
-		}
 	}
 
 	return events, nil

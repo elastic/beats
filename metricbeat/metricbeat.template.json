@@ -1059,19 +1059,6 @@
                     }
                   }
                 },
-                "load": {
-                  "properties": {
-                    "1": {
-                      "type": "half_float"
-                    },
-                    "15": {
-                      "type": "half_float"
-                    },
-                    "5": {
-                      "type": "half_float"
-                    }
-                  }
-                },
                 "nice": {
                   "properties": {
                     "pct": {
@@ -1171,7 +1158,7 @@
             },
             "filesystem": {
               "properties": {
-                "avail": {
+                "available": {
                   "type": "long"
                 },
                 "device_name": {
@@ -1229,47 +1216,38 @@
                 }
               }
             },
+            "load": {
+              "properties": {
+                "1": {
+                  "type": "half_float"
+                },
+                "15": {
+                  "type": "half_float"
+                },
+                "5": {
+                  "type": "half_float"
+                }
+              }
+            },
             "memory": {
               "properties": {
-                "actual": {
-                  "properties": {
-                    "free": {
-                      "type": "long"
-                    },
-                    "used": {
-                      "properties": {
-                        "bytes": {
-                          "type": "long"
-                        },
-                        "pct": {
-                          "type": "half_float"
-                        }
-                      }
-                    }
-                  }
+                "active": {
+                  "type": "long"
+                },
+                "available": {
+                  "type": "long"
+                },
+                "buffers": {
+                  "type": "long"
+                },
+                "cached": {
+                  "type": "long"
                 },
                 "free": {
                   "type": "long"
                 },
-                "swap": {
-                  "properties": {
-                    "free": {
-                      "type": "long"
-                    },
-                    "total": {
-                      "type": "long"
-                    },
-                    "used": {
-                      "properties": {
-                        "bytes": {
-                          "type": "long"
-                        },
-                        "pct": {
-                          "type": "half_float"
-                        }
-                      }
-                    }
-                  }
+                "inactive": {
+                  "type": "long"
                 },
                 "total": {
                   "type": "long"
@@ -1283,6 +1261,9 @@
                       "type": "half_float"
                     }
                   }
+                },
+                "wired": {
+                  "type": "long"
                 }
               }
             },
@@ -1393,6 +1374,32 @@
                 "username": {
                   "ignore_above": 1024,
                   "type": "keyword"
+                }
+              }
+            },
+            "swap": {
+              "properties": {
+                "free": {
+                  "type": "long"
+                },
+                "in": {
+                  "type": "long"
+                },
+                "out": {
+                  "type": "long"
+                },
+                "total": {
+                  "type": "long"
+                },
+                "used": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "pct": {
+                      "type": "half_float"
+                    }
+                  }
                 }
               }
             }

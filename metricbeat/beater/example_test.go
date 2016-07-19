@@ -77,7 +77,7 @@ func ExampleModuleWrapper() {
 	//     "name": "status",
 	//     "rtt": 111
 	//   },
-	//   "type": "metricsets"
+	//   "type": "fake.status"
 	// }
 }
 
