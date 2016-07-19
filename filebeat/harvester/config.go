@@ -22,7 +22,7 @@ var (
 		Backoff:         1 * time.Second,
 		BackoffFactor:   2,
 		MaxBackoff:      10 * time.Second,
-		CloseOlder:      1 * time.Hour,
+		CloseInactive:   1 * time.Hour,
 		MaxBytes:        10 * humanize.MiByte,
 		CloseRemoved:    false,
 		CloseRenamed:    false,
@@ -41,6 +41,7 @@ type harvesterConfig struct {
 	Backoff              time.Duration              `config:"backoff" validate:"min=0,nonzero"`
 	BackoffFactor        int                        `config:"backoff_factor" validate:"min=1"`
 	MaxBackoff           time.Duration              `config:"max_backoff" validate:"min=0,nonzero"`
+	CloseInactive        time.Duration              `config:"close_inactive"`
 	CloseOlder           time.Duration              `config:"close_older"`
 	CloseRemoved         bool                       `config:"close_removed"`
 	CloseRenamed         bool                       `config:"close_renamed"`
@@ -60,6 +61,12 @@ func (config *harvesterConfig) Validate() error {
 		config.CloseRemoved = true
 		config.CloseRenamed = true
 		logp.Warn("DEPRECATED: force_close_files was set to true. Use close_removed + close_rename")
+	}
+
+	// DEPRECATED: remove in 6.0
+	if config.CloseOlder > 0 {
+		config.CloseInactive = config.CloseOlder
+		logp.Warn("DEPRECATED: close_older is deprecated. Use close_inactive")
 	}
 
 	// Check input type

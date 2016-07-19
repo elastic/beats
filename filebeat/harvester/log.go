@@ -277,7 +277,7 @@ func (h *Harvester) newLogFileReaderConfig() reader.LogFileReaderConfig {
 	return reader.LogFileReaderConfig{
 		CloseRemoved:  h.config.CloseRemoved,
 		CloseRenamed:  h.config.CloseRenamed,
-		CloseOlder:    h.config.CloseOlder,
+		CloseInactive: h.config.CloseInactive,
 		CloseEOF:      h.config.CloseEOF,
 		Backoff:       h.config.Backoff,
 		MaxBackoff:    h.config.MaxBackoff,

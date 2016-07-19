@@ -163,10 +163,10 @@ filebeat.prospectors:
 
   ### Harvester closing options
 
-  # Close idle closes the file handler after the predefined period.
+  # Close inactive closes the file handler after the predefined period.
   # The period starts when the last line of the file was, not the file ModTime.
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
-  #close_idle: 1h
+  #close_inactive: 1h
 
   # Close renamed closes a file handler when the file is renamed or rotated.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
@@ -191,9 +191,9 @@ filebeat.prospectors:
 
   ### State options
 
-  # Files for the modification data is older then clean_older the state from the registry is removed
+  # Files for the modification data is older then clean_inactive the state from the registry is removed
   # By default this is disabled.
-  #clean_idle: 0
+  #clean_inactive: 0
 
   # Removes the state for file which cannot be found on disk anymore immediately
   #clean_removed: false
@@ -273,8 +273,8 @@ filebeat.prospectors:
 
 #================================ Processors =====================================
 
-# Processors are used to reduce the number of fields in the exported event or to 
-# enhance the event with external meta data. This section defines a list of processors 
+# Processors are used to reduce the number of fields in the exported event or to
+# enhance the event with external meta data. This section defines a list of processors
 # that are applied one by one and the first one receives the initial event:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
@@ -380,7 +380,7 @@ output.elasticsearch:
   #template.overwrite: false
 
   # If set to true, filebeat checks the Elasticsearch version at connect time, and if it
-  # is 2.x, it loads the file specified by the template.versions.2x.path setting. The 
+  # is 2.x, it loads the file specified by the template.versions.2x.path setting. The
   # default is true.
   #template.versions.2x.enabled: true
 

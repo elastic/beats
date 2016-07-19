@@ -26,7 +26,6 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 *Filebeat*
 
 - Stop following symlink. Symlinks are now ignored: {pull}1686[1686]
-- Deprecate force_close_files option and replace it with close_removed and close_renamed {issue}1600[1600]
 
 *Winlogbeat*
 
@@ -85,6 +84,9 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 *Topbeat*
 
 *Filebeat*
+- Deprecate close_older option and replace it with close_inactive {issue}2051[2051]
+- Deprecate force_close_files option and replace it with close_removed and close_renamed {issue}1600[1600]
+
 
 *Winlogbeat*
 
