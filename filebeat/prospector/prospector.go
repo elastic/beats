@@ -106,8 +106,8 @@ func (p *Prospector) Run() {
 				return
 			case event := <-p.harvesterChan:
 				// Add ttl if cleanOlder is enabled
-				if p.config.CleanOlder > 0 {
-					event.State.TTL = p.config.CleanOlder
+				if p.config.CleanInactive > 0 {
+					event.State.TTL = p.config.CleanInactive
 				}
 				select {
 				case <-p.done:

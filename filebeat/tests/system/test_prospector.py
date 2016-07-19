@@ -109,11 +109,11 @@ class Test(BaseTest):
         objs = self.read_output()
         assert len(objs) == iterations1 + iterations2
 
-    def test_rotating_close_older_larger_write_rate(self):
+    def test_rotating_close_inactive_larger_write_rate(self):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             ignore_older="10s",
-            close_older="1s",
+            close_inactive="1s",
             scan_frequency="0.1s",
         )
 
@@ -172,11 +172,11 @@ class Test(BaseTest):
         assert 1 == len(output)
         assert output[0]["message"] == "line in log file"
 
-    def test_rotating_close_older_low_write_rate(self):
+    def test_rotating_close_inactive_low_write_rate(self):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             ignore_older="10s",
-            close_older="1s",
+            close_inactive="1s",
             scan_frequency="0.1s",
         )
 
@@ -207,7 +207,7 @@ class Test(BaseTest):
         os.rename(testfile, testfile + ".1")
         open(testfile, 'w').close()
 
-        # wait for file to be closed due to close_older
+        # wait for file to be closed due to close_inactive
         self.wait_until(
             lambda: self.log_contains(
                 "Stopping harvester, closing file: {}\n".format(os.path.abspath(testfile))),
@@ -306,16 +306,16 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-    def test_close_older(self):
+    def test_close_inactive(self):
         """
-        Test that close_older closes the file but reading
+        Test that close_inactive closes the file but reading
         is picked up again after scan_frequency
         """
         self.render_config_template(
-                path=os.path.abspath(self.working_dir) + "/log/*",
-                ignore_older="1h",
-                close_older="1s",
-                scan_frequency="0.1s",
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            ignore_older="1h",
+            close_inactive="1s",
+            scan_frequency="0.1s",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -341,7 +341,7 @@ class Test(BaseTest):
                 lambda: self.output_has(lines=lines),
                 max_timeout=15)
 
-        # wait for file to be closed due to close_older
+        # wait for file to be closed due to close_inactive
         self.wait_until(
                 lambda: self.log_contains(
                         "Stopping harvester, closing file: {}\n".format(os.path.abspath(testfile))),
@@ -359,15 +359,15 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-    def test_close_older_file_removal(self):
+    def test_close_inactive_file_removal(self):
         """
-        Test that close_older still applies also if the file to close was removed
+        Test that close_inactive still applies also if the file to close was removed
         """
         self.render_config_template(
-                path=os.path.abspath(self.working_dir) + "/log/*",
-                ignore_older="1h",
-                close_older="3s",
-                scan_frequency="0.1s",
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            ignore_older="1h",
+            close_inactive="3s",
+            scan_frequency="0.1s",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -395,7 +395,7 @@ class Test(BaseTest):
 
         os.remove(testfile)
 
-        # wait for file to be closed due to close_older
+        # wait for file to be closed due to close_inactive
         self.wait_until(
                 lambda: self.log_contains(
                         "Stopping harvester, closing file: {}\n".format(os.path.abspath(testfile))),
@@ -404,15 +404,15 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
 
-    def test_close_older_file_rotation_and_removal(self):
+    def test_close_inactive_file_rotation_and_removal(self):
         """
-        Test that close_older still applies also if the file to close was removed
+        Test that close_inactive still applies also if the file to close was removed
         """
         self.render_config_template(
-                path=os.path.abspath(self.working_dir) + "/log/test.log",
-                ignore_older="1h",
-                close_older="3s",
-                scan_frequency="0.1s",
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+            ignore_older="1h",
+            close_inactive="3s",
+            scan_frequency="0.1s",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -442,7 +442,7 @@ class Test(BaseTest):
         os.rename(testfile, renamed_file)
         os.remove(renamed_file)
 
-        # wait for file to be closed due to close_older
+        # wait for file to be closed due to close_inactive
         self.wait_until(
                 lambda: self.log_contains(
                     # Still checking for old file name as filename does not change in harvester
@@ -452,16 +452,16 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
 
-    def test_close_older_file_rotation_and_removal(self):
+    def test_close_inactive_file_rotation_and_removal(self):
         """
-        Test that close_older still applies also if file was rotated,
+        Test that close_inactive still applies also if file was rotated,
         new file created, and rotated file removed.
         """
         self.render_config_template(
-                path=os.path.abspath(self.working_dir) + "/log/test.log",
-                ignore_older="1h",
-                close_older="3s",
-                scan_frequency="0.1s",
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+            ignore_older="1h",
+            close_inactive="3s",
+            scan_frequency="0.1s",
         )
 
         os.mkdir(self.working_dir + "/log/")

@@ -12,7 +12,7 @@ filebeat.prospectors:
   # Type of the files. Annotated in every documented
   scan_frequency: {{scan_frequency | default("0.1s") }}
   ignore_older: {{ignore_older}}
-  close_older: {{close_older}}
+  close_inactive: {{close_inactive}}
   harvester_buffer_size:
   encoding: {{encoding | default("utf-8") }}
   tail_files: {{tail_files}}
@@ -23,7 +23,7 @@ filebeat.prospectors:
   close_renamed: {{close_renamed}}
   close_eof: {{close_eof}}
   force_close_files: {{force_close_files}}
-  clean_older: {{clean_older}}
+  clean_inactive: {{clean_inactive}}
   clean_removed: {{clean_removed}}
 
   {% if fields %}

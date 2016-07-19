@@ -704,18 +704,17 @@ class Test(BaseTest):
         assert len(data) == 2
 
 
-    def test_clean_older(self):
+    def test_clean_inactive(self):
         """
-        Checks that states are properly removed after clean_older
+        Checks that states are properly removed after clean_inactive
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
-            clean_older="4s",
+            clean_inactive="4s",
             ignore_older="2s",
-            close_older="0.2s",
+            close_inactive="0.2s",
             scan_frequency="0.1s"
         )
-
 
         os.mkdir(self.working_dir + "/log/")
         testfile1 = self.working_dir + "/log/input1"

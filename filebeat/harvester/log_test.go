@@ -59,7 +59,7 @@ func TestReadLine(t *testing.T) {
 
 	h := Harvester{
 		config: harvesterConfig{
-			CloseOlder:    500 * time.Millisecond,
+			CloseInactive: 500 * time.Millisecond,
 			Backoff:       100 * time.Millisecond,
 			MaxBackoff:    1 * time.Second,
 			BackoffFactor: 2,
