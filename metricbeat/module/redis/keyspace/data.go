@@ -4,8 +4,9 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	h "github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/module/redis"
+	s "github.com/elastic/beats/metricbeat/schema"
+	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
 )
 
 // Map data to MapStr
@@ -37,11 +38,11 @@ func findKeyspaceStats(info map[string]string) map[string]string {
 	return keyspace
 }
 
-var schema = h.NewSchema(common.MapStr{
-	"keys":    h.Int("keys"),
-	"expires": h.Int("expires"),
-	"avg_ttl": h.Int("avg_ttl"),
-})
+var schema = s.Schema{
+	"keys":    c.Int("keys"),
+	"expires": c.Int("expires"),
+	"avg_ttl": c.Int("avg_ttl"),
+}
 
 // parseKeyspaceStats resolves the overloaded value string that Redis returns for keyspace
 func parseKeyspaceStats(keyspaceMap map[string]string) map[string]common.MapStr {
@@ -53,7 +54,7 @@ func parseKeyspaceStats(keyspaceMap map[string]string) map[string]common.MapStr 
 		dbInfo := redis.ParseRedisLine(v, ",")
 
 		if len(dbInfo) == 3 {
-			db := map[string]string{}
+			db := map[string]interface{}{}
 			for _, dbEntry := range dbInfo {
 				stats := redis.ParseRedisLine(dbEntry, "=")
 

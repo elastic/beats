@@ -7,7 +7,8 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	h "github.com/elastic/beats/metricbeat/helper"
+	s "github.com/elastic/beats/metricbeat/schema"
+	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
 )
 
 var (
@@ -16,41 +17,41 @@ var (
 	// This should match: "CPUSystem: .01"
 	matchNumber = regexp.MustCompile("(^[0-9a-zA-Z ]+):\\s+(\\d*\\.?\\d+)")
 
-	schema = h.NewSchema(common.MapStr{
-		"total_accesses":    h.Int("Total Accesses"),
-		"total_kbytes":      h.Int("Total kBytes"),
-		"requests_per_sec":  h.Float("ReqPerSec", h.Optional),
-		"bytes_per_sec":     h.Float("BytesPerSec", h.Optional),
-		"bytes_per_request": h.Float("BytesPerReq", h.Optional),
-		"workers": common.MapStr{
-			"busy": h.Int("BusyWorkers"),
-			"idle": h.Int("IdleWorkers"),
+	schema = s.Schema{
+		"total_accesses":    c.Int("Total Accesses"),
+		"total_kbytes":      c.Int("Total kBytes"),
+		"requests_per_sec":  c.Float("ReqPerSec", s.Optional),
+		"bytes_per_sec":     c.Float("BytesPerSec", s.Optional),
+		"bytes_per_request": c.Float("BytesPerReq", s.Optional),
+		"workers": s.Object{
+			"busy": c.Int("BusyWorkers"),
+			"idle": c.Int("IdleWorkers"),
 		},
-		"uptime": common.MapStr{
-			"server_uptime": h.Int("ServerUptimeSeconds"),
-			"uptime":        h.Int("Uptime"),
+		"uptime": s.Object{
+			"server_uptime": c.Int("ServerUptimeSeconds"),
+			"uptime":        c.Int("Uptime"),
 		},
-		"cpu": common.MapStr{
-			"load":            h.Float("CPULoad", h.Optional),
-			"user":            h.Float("CPUUser"),
-			"system":          h.Float("CPUSystem"),
-			"children_user":   h.Float("CPUChildrenUser"),
-			"children_system": h.Float("CPUChildrenSystem"),
+		"cpu": s.Object{
+			"load":            c.Float("CPULoad", s.Optional),
+			"user":            c.Float("CPUUser"),
+			"system":          c.Float("CPUSystem"),
+			"children_user":   c.Float("CPUChildrenUser"),
+			"children_system": c.Float("CPUChildrenSystem"),
 		},
-		"connections": common.MapStr{
-			"total": h.Int("ConnsTotal"),
-			"async": common.MapStr{
-				"writing":    h.Int("ConnsAsyncWriting"),
-				"keep_alive": h.Int("ConnsAsyncKeepAlive"),
-				"closing":    h.Int("ConnsAsyncClosing"),
+		"connections": s.Object{
+			"total": c.Int("ConnsTotal"),
+			"async": s.Object{
+				"writing":    c.Int("ConnsAsyncWriting"),
+				"keep_alive": c.Int("ConnsAsyncKeepAlive"),
+				"closing":    c.Int("ConnsAsyncClosing"),
 			},
 		},
-		"load": common.MapStr{
-			"1":  h.Float("Load1"),
-			"5":  h.Float("Load5"),
-			"15": h.Float("Load15"),
+		"load": s.Object{
+			"1":  c.Float("Load1"),
+			"5":  c.Float("Load5"),
+			"15": c.Float("Load15"),
 		},
-	})
+	}
 )
 
 // Map body to MapStr
@@ -70,7 +71,7 @@ func eventMapping(body io.ReadCloser, hostname string) common.MapStr {
 		totalAll        int
 	)
 
-	fullEvent := map[string]string{}
+	fullEvent := map[string]interface{}{}
 	scanner := bufio.NewScanner(body)
 
 	// Iterate through all events to gather data
