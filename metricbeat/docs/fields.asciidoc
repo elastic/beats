@@ -2630,6 +2630,14 @@ The process parent pid.
 
 
 [float]
+=== system.process.pgid
+
+type: integer
+
+The process group id.
+
+
+[float]
 === system.process.cmdline
 
 type: keyword

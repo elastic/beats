@@ -33,7 +33,7 @@ SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
 
 # cmdline is also part of the system process fields, but it may not be present
 # for some kernel level processes.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "state",
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "pgid", "state",
                          "username"]
 
 
