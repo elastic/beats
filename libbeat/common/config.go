@@ -192,11 +192,14 @@ func (c *Config) SetChild(name string, idx int, value *Config) error {
 
 func (c *Config) Enabled() bool {
 	testEnabled := struct {
-		Enabled bool `config:"enable"`
+		Enabled bool `config:"enabled"`
 	}{true}
 
+	if c == nil {
+		return false
+	}
 	if err := c.Unpack(&testEnabled); err != nil {
-		// if unpacking fails, expect 'enable' being set to default value
+		// if unpacking fails, expect 'enabled' being set to default value
 		return true
 	}
 	return testEnabled.Enabled

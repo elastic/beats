@@ -31,8 +31,9 @@ type InterfacesConfig struct {
 }
 
 type Flows struct {
-	Timeout string
-	Period  string
+	Enabled *bool  `config:"enabled"`
+	Timeout string `config:"timeout"`
+	Period  string `config:"period"`
 }
 
 type ProtocolCommon struct {
@@ -40,4 +41,8 @@ type ProtocolCommon struct {
 	SendRequest        bool          `config:"send_request"`
 	SendResponse       bool          `config:"send_response"`
 	TransactionTimeout time.Duration `config:"transaction_timeout"`
+}
+
+func (f *Flows) IsEnabled() bool {
+	return f != nil && (f.Enabled == nil || *f.Enabled)
 }

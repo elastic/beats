@@ -197,26 +197,28 @@ func (pb *Packetbeat) Stop() {
 }
 
 func (pb *Packetbeat) setupSniffer() error {
-	cfg := &pb.Config
+	config := &pb.Config
 
-	withVlans := cfg.Interfaces.With_vlans
-	_, withICMP := cfg.Protocols["icmp"]
-	filter := cfg.Interfaces.Bpf_filter
-	if filter == "" && cfg.Flows == nil {
+	withVlans := config.Interfaces.With_vlans
+	withICMP := config.Protocols["icmp"].Enabled()
+
+	filter := config.Interfaces.Bpf_filter
+	if filter == "" && !config.Flows.IsEnabled() {
 		filter = protos.Protos.BpfFilter(withVlans, withICMP)
 	}
 
 	pb.Sniff = &sniffer.SnifferSetup{}
-	return pb.Sniff.Init(false, pb.makeWorkerFactory(filter), &cfg.Interfaces)
+	return pb.Sniff.Init(false, pb.makeWorkerFactory(filter), &config.Interfaces)
 }
 
 func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
 	return func(dl layers.LinkType) (sniffer.Worker, string, error) {
 		var f *flows.Flows
 		var err error
+		config := &pb.Config
 
-		if pb.Config.Flows != nil {
-			f, err = flows.NewFlows(pb.Pub, pb.Config.Flows)
+		if config.Flows.IsEnabled() {
+			f, err = flows.NewFlows(pb.Pub, config.Flows)
 			if err != nil {
 				return nil, "", err
 			}
@@ -224,7 +226,7 @@ func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
 
 		var icmp4 icmp.ICMPv4Processor
 		var icmp6 icmp.ICMPv6Processor
-		if cfg, exists := pb.Config.Protocols["icmp"]; exists {
+		if cfg := config.Protocols["icmp"]; cfg.Enabled() {
 			icmp, err := icmp.New(false, pb.Pub, cfg)
 			if err != nil {
 				return nil, "", err
