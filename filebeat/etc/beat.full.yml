@@ -217,7 +217,7 @@ filebeat.prospectors:
 
 # Name of the registry file. If a relative path is used, it is considered relative to the
 # data path.
-#filebeat.registry_file: registry
+#filebeat.registry_file: ${path.data}/registry
 
 #
 # These config files must have the full filebeat config part inside, but only

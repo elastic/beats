@@ -21,17 +21,9 @@
 package paths
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
-)
-
-var (
-	homePath   = flag.String("path.home", "", "Home path")
-	configPath = flag.String("path.config", "", "Configuration path")
-	dataPath   = flag.String("path.data", "", "Data path")
-	logsPath   = flag.String("path.logs", "", "Logs path")
 )
 
 type Path struct {
@@ -89,47 +81,20 @@ func InitPaths(cfg *Path) error {
 // initPaths sets the default paths in the configuration based on CLI flags,
 // configuration file and default values.
 func (paths *Path) initPaths(cfg *Path) error {
-	paths.Home = cfg.Home
-	paths.Config = cfg.Config
-	paths.Data = cfg.Data
-	paths.Logs = cfg.Logs
-
-	// overwrite paths from CLI flags
-	if homePath != nil && len(*homePath) > 0 {
-		paths.Home = *homePath
-	}
-	if configPath != nil && len(*configPath) > 0 {
-		paths.Config = *configPath
-	}
-	if dataPath != nil && len(*dataPath) > 0 {
-		paths.Data = *dataPath
-	}
-	if logsPath != nil && len(*logsPath) > 0 {
-		paths.Logs = *logsPath
-	}
-
-	// default for the home path is the binary location
-	if len(paths.Home) == 0 {
-		var err error
-		paths.Home, err = filepath.Abs(filepath.Dir(os.Args[0]))
-		if err != nil {
-			return fmt.Errorf("The absolute path to %s could not be obtained. %v",
-				os.Args[0], err)
-		}
-	}
+	*paths = *cfg
 
 	// default for config path
-	if len(paths.Config) == 0 {
+	if paths.Config == "" {
 		paths.Config = paths.Home
 	}
 
 	// default for data path
-	if len(paths.Data) == 0 {
+	if paths.Data == "" {
 		paths.Data = filepath.Join(paths.Home, "data")
 	}
 
 	// default for logs path
-	if len(paths.Logs) == 0 {
+	if paths.Logs == "" {
 		paths.Logs = filepath.Join(paths.Home, "logs")
 	}
 
