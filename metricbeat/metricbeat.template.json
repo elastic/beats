@@ -692,33 +692,7 @@
                 },
                 "persistence": {
                   "properties": {
-                    "loading": {
-                      "type": "boolean"
-                    },
-                    "rdb": {
-                      "properties": {
-                        "bgsave_in_progress": {
-                          "type": "boolean"
-                        },
-                        "changes_since_last_save": {
-                          "type": "long"
-                        },
-                        "current_bgsave_time_sec": {
-                          "type": "long"
-                        },
-                        "last_bgsave_status": {
-                          "ignore_above": 1024,
-                          "type": "keyword"
-                        },
-                        "last_bgsave_time_sec": {
-                          "type": "long"
-                        },
-                        "last_save_time": {
-                          "type": "long"
-                        }
-                      }
-                    },
-                    "used": {
+                    "aof": {
                       "properties": {
                         "current_rewrite_time_sec": {
                           "type": "long"
@@ -742,6 +716,32 @@
                         },
                         "rewrite_scheduled": {
                           "type": "boolean"
+                        }
+                      }
+                    },
+                    "loading": {
+                      "type": "boolean"
+                    },
+                    "rdb": {
+                      "properties": {
+                        "bgsave_in_progress": {
+                          "type": "boolean"
+                        },
+                        "changes_since_last_save": {
+                          "type": "long"
+                        },
+                        "current_bgsave_time_sec": {
+                          "type": "long"
+                        },
+                        "last_bgsave_status": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "last_bgsave_time_sec": {
+                          "type": "long"
+                        },
+                        "last_save_time": {
+                          "type": "long"
                         }
                       }
                     }

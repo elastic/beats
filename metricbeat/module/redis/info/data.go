@@ -44,7 +44,7 @@ var (
 				"last_bgsave_time_sec":    c.Int("rdb_last_bgsave_time_sec"),
 				"current_bgsave_time_sec": c.Int("rdb_current_bgsave_time_sec"),
 			},
-			"used": s.Object{
+			"aof": s.Object{
 				"enabled":                  c.Bool("aof_enabled"),
 				"rewrite_in_progress":      c.Bool("aof_rewrite_in_progress"),
 				"rewrite_scheduled":        c.Bool("aof_rewrite_scheduled"),
