@@ -78,6 +78,7 @@ https://github.com/elastic/beats/compare/v1.2.3...v1.3.0[View commits]
 - Fix output modes backoff counter reset. {issue}1803[1803] {pull}1814[1814] {pull}1818[1818]
 - Set logstash output default bulk_max_size to 2048. {issue}1662[1662]
 - Seed random number generator using crypto.rand package. {pull}1503[1503]
+- Check stdout being available when console output is configured. {issue}2063[2063]
 
 *Packetbeat*
 
