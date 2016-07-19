@@ -293,7 +293,7 @@ output.elasticsearch:
   #template.name: "metricbeat"
 
   # Path to template file
-  #template.path: "metricbeat.template.json"
+  #template.path: "${path.config}/metricbeat.template.json"
 
   # Overwrite existing template
   #template.overwrite: false
@@ -304,7 +304,7 @@ output.elasticsearch:
   #template.versions.2x.enabled: true
 
   # Path to the Elasticsearch 2.x version of the template file.
-  #template.versions.2x.path: "metricbeat.template-es2x.json"
+  #template.versions.2x.path: "${path.config}/metricbeat.template-es2x.json"
 
 
   # TLS configuration. By default is off.
@@ -624,18 +624,18 @@ output.elasticsearch:
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
-#path.config:
+#path.config: ${path.home}
 
 # The data path for the metricbeat installation. This is the default base path
 # for all the files in which metricbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
-#path.data:
+#path.data: ${path.home}/data
 
 # The logs path for a metricbeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
-#path.logs:
+#path.logs: ${path.home}/logs
 
 #================================ Logging =====================================
 # There are three options for the log output: syslog, file, stderr.

@@ -224,6 +224,9 @@ func (b *Beat) handleFlags() error {
 		return GracefulExit
 	}
 
+	if err := cfgfile.HandleFlags(); err != nil {
+		return err
+	}
 	return handleFlags(b)
 }
 
