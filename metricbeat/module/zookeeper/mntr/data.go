@@ -7,44 +7,45 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	h "github.com/elastic/beats/metricbeat/helper"
+	s "github.com/elastic/beats/metricbeat/schema"
+	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
 )
 
 var (
 	// Matches first the variable name, second the param itself
 	paramMatcher = regexp.MustCompile("([^\\s]+)\\s+(.*$)")
-	schema       = h.NewSchema(common.MapStr{
-		"version": h.Str("zk_version"),
-		"latency": common.MapStr{
-			"avg": h.Int("zk_avg_latency"),
-			"min": h.Int("zk_min_latency"),
-			"max": h.Int("zk_max_latency"),
+	schema_      = s.Schema{
+		"version": c.Str("zk_version"),
+		"latency": s.Object{
+			"avg": c.Int("zk_avg_latency"),
+			"min": c.Int("zk_min_latency"),
+			"max": c.Int("zk_max_latency"),
 		},
-		"packets": common.MapStr{
-			"received": h.Int("zk_packets_received"),
-			"sent":     h.Int("zk_packets_sent"),
+		"packets": s.Object{
+			"received": c.Int("zk_packets_received"),
+			"sent":     c.Int("zk_packets_sent"),
 		},
-		"num_alive_connections": h.Int("zk_num_alive_connections"),
-		"outstanding_requests":  h.Int("zk_outstanding_requests"),
-		"server_state":          h.Str("zk_server_state"),
-		"znode_count":           h.Int("zk_znode_count"),
-		"watch_count":           h.Int("zk_watch_count"),
-		"ephemerals_count":      h.Int("zk_ephemerals_count"),
-		"approximate_data_size": h.Int("zk_approximate_data_size"),
-	})
-	schemaLeader = h.NewSchema(common.MapStr{
-		"followers":        h.Int("zk_followers"),
-		"synced_followers": h.Int("zk_synced_followers"),
-		"pending_syncs":    h.Int("zk_pending_syncs"),
-	})
-	schemaUnix = h.NewSchema(common.MapStr{
-		"open_file_descriptor_count": h.Int("zk_open_file_descriptor_count"),
-		"max_file_descriptor_count":  h.Int("zk_max_file_descriptor_count"),
-	})
+		"num_alive_connections": c.Int("zk_num_alive_connections"),
+		"outstanding_requests":  c.Int("zk_outstanding_requests"),
+		"server_state":          c.Str("zk_server_state"),
+		"znode_count":           c.Int("zk_znode_count"),
+		"watch_count":           c.Int("zk_watch_count"),
+		"ephemerals_count":      c.Int("zk_ephemerals_count"),
+		"approximate_data_size": c.Int("zk_approximate_data_size"),
+	}
+	schemaLeader = s.Schema{
+		"followers":        c.Int("zk_followers"),
+		"synced_followers": c.Int("zk_synced_followers"),
+		"pending_syncs":    c.Int("zk_pending_syncs"),
+	}
+	schemaUnix = s.Schema{
+		"open_file_descriptor_count": c.Int("zk_open_file_descriptor_count"),
+		"max_file_descriptor_count":  c.Int("zk_max_file_descriptor_count"),
+	}
 )
 
 func eventMapping(response io.Reader) common.MapStr {
-	fullEvent := map[string]string{}
+	fullEvent := map[string]interface{}{}
 	scanner := bufio.NewScanner(response)
 
 	// Iterate through all events to gather data
@@ -56,7 +57,7 @@ func eventMapping(response io.Reader) common.MapStr {
 		}
 	}
 
-	event := schema.Apply(fullEvent)
+	event := schema_.Apply(fullEvent)
 
 	// only exposed by the Leader
 	if _, ok := fullEvent["zk_followers"]; ok {
