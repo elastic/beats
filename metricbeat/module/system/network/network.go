@@ -86,8 +86,8 @@ func ioCountersToMapStr(counters net.IOCountersStat) common.MapStr {
 		"in": common.MapStr{
 			"errors":  counters.Errin,
 			"dropped": counters.Dropin,
-			"bytes":   counters.BytesRecv,
 			"packets": counters.PacketsRecv,
+			"bytes":   counters.BytesRecv,
 		},
 		"out": common.MapStr{
 			"errors":  counters.Errout,
@@ -98,8 +98,8 @@ func ioCountersToMapStr(counters net.IOCountersStat) common.MapStr {
 		"total": common.MapStr{
 			"errors":  counters.Errin + counters.Errout,
 			"dropped": counters.Dropin + counters.Dropout,
-			"packets": counters.BytesRecv + counters.PacketsSent,
-			"bytes":   counters.PacketsRecv + counters.BytesSent,
+			"packets": counters.PacketsRecv + counters.PacketsSent,
+			"bytes":   counters.BytesRecv + counters.BytesSent,
 		},
 	}
 }
