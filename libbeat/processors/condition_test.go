@@ -1,12 +1,24 @@
 package processors
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
 )
+
+type countFilter struct {
+	N int
+}
+
+func (c *countFilter) Run(e common.MapStr) (common.MapStr, error) {
+	c.N++
+	return e, nil
+}
+
+func (c *countFilter) String() string { return "count" }
 
 func TestBadCondition(t *testing.T) {
 
@@ -533,4 +545,72 @@ func TestCombinedCondition(t *testing.T) {
 
 	assert.True(t, conds[0].Check(event))
 
+}
+
+func TestWhenProcessor(t *testing.T) {
+	type config map[string]interface{}
+
+	tests := []struct {
+		title    string
+		filter   config
+		events   []common.MapStr
+		expected int
+	}{
+		{
+			"condition_matches",
+			config{"when.equals.i": 10},
+			[]common.MapStr{{"i": 10}},
+			1,
+		},
+		{
+			"condition_fails",
+			config{"when.equals.i": 11},
+			[]common.MapStr{{"i": 10}},
+			0,
+		},
+		{
+			"no_condition",
+			config{},
+			[]common.MapStr{{"i": 10}},
+			1,
+		},
+	}
+
+	for i, test := range tests {
+		t.Logf("run test (%v): %v", i, test.title)
+
+		config, err := common.NewConfigFrom(test.filter)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		cf := &countFilter{}
+		filter, err := NewConditional(func(_ common.Config) (Processor, error) {
+			return cf, nil
+		})(*config)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		for _, event := range test.events {
+			_, err := filter.Run(event)
+			if err != nil {
+				t.Error(err)
+			}
+		}
+
+		assert.Equal(t, test.expected, cf.N)
+	}
+}
+
+func TestConditionRuleInitErrorPropagates(t *testing.T) {
+	testErr := errors.New("test")
+	filter, err := NewConditional(func(_ common.Config) (Processor, error) {
+		return nil, testErr
+	})(common.Config{})
+
+	assert.Equal(t, testErr, err)
+	assert.Nil(t, filter)
 }
