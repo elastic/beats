@@ -19,6 +19,10 @@
       type: integer
       description: >
         The process parent pid.
+    - name: pgid
+      type: integer
+      description: >
+        The process group id.
     - name: cmdline
       type: keyword
       description: >

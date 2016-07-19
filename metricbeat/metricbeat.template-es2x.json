@@ -1417,6 +1417,9 @@
                   "index": "not_analyzed",
                   "type": "string"
                 },
+                "pgid": {
+                  "type": "long"
+                },
                 "pid": {
                   "type": "long"
                 },
