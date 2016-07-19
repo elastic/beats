@@ -44,7 +44,7 @@ Exception in thread "main" java.lang.NullPointerException
 
 To consolidate these lines into a single event in Filebeat, use the following multiline configuration:
 
-[source,json]
+[source,yaml]
 -------------------------------------------------------------------------------------
 multiline:
   pattern: '^[[:space:]]'
@@ -69,7 +69,7 @@ Caused by: java.lang.NullPointerException
 
 To consolidate these lines into a single event in Filebeat, use the following multiline configuration:
 
-["source","sh",subs="attributes,callouts"]
+[source,yaml]
 -------------------------------------------------------------------------------------
 multiline:
     pattern: '^[[:space:]]+|^Caused by:'
@@ -96,7 +96,7 @@ printf ("%10.10ld  \t %10.10ld \t %s\
 
 To consolidate these lines into a single event in Filebeat, use the following multiline configuration:
 
-[source,json]
+[source,yaml]
 -------------------------------------------------------------------------------------
 multiline:
   pattern: '\\$'
@@ -119,7 +119,6 @@ specific activity, as in this example:
 
 To consolidate these lines into a single event in Filebeat, use the following multiline configuration:
 
-[source,json]
 [source,yaml]
 -------------------------------------------------------------------------------------
 multiline:
