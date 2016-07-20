@@ -66,7 +66,7 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 
 	if pub.sendRequest {
 		if pub.sendRequestHeader {
-			requ.data["request_headers"] = requ.header.toMap()
+			requ.data["request_headers"] = requ.header
 		}
 
 		event["cassandra_request"] = requ.data
@@ -74,13 +74,13 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 
 	if pub.sendResponse {
 		if pub.sendResponseHeader {
-			resp.data["response_headers"] = resp.header.toMap()
+			resp.data["response_headers"] = resp.header
 		}
 
 		event["cassandra_response"] = resp.data
 	}
 
-	if logp.IsDebug("cassandra") {
+	if isDebug {
 		logp.Debug("cassandra", fmt.Sprint(event))
 	}
 

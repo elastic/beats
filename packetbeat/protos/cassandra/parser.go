@@ -4,11 +4,11 @@ import (
 	"errors"
 	"time"
 
-	"bytes"
 	"fmt"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
+	. "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
 )
 
 type parser struct {
@@ -32,7 +32,7 @@ type message struct {
 
 	failed bool
 	data   map[string]interface{}
-	header frameHeader
+	header map[string]interface{}
 	// list element use by 'transactions' for correlation
 	next *message
 
@@ -55,6 +55,9 @@ func (p *parser) init(
 		config:    cfg,
 		onMessage: onMessage,
 	}
+
+	isDebug = logp.IsDebug("cassandra")
+
 }
 
 func (p *parser) append(data []byte) error {
@@ -111,45 +114,42 @@ func (p *parser) newMessage(ts time.Time) *message {
 
 func (p *parser) parse() (*message, error) {
 
-	r := bytes.NewReader(p.buf.Bytes())
-	head, err := readHeader(r, make([]byte, 9))
-	if err != nil {
-		logp.Err(err.Error())
+	if(!p.buf.Avail(9)){
+		logp.Err("not enough bytes, ignore")
 		return nil, nil
 	}
 
-	if logp.IsDebug("cassandra") {
+	head, err := ReadHeader(&p.buf)
+	if err != nil {
+		logp.Err("%v", err)
+		return nil, nil
+	}
+
+	if isDebug {
 		logp.Debug("cassandra", fmt.Sprint(head))
 	}
 
-	framer := newFramer(r, p.config.compressor, byte(head.version))
-	err = framer.readFrame(&head)
+	framer := NewFramer(&p.buf, p.config.compressor, byte(head.Version))
+	err = framer.ReadFrame(head)
 	if err != nil {
-		logp.Err(err.Error())
+		logp.Err("%v", err)
 		return nil, nil
 	}
 	msg := p.message
 
-	data, err := framer.parseFrame(msg)
+	data, err := framer.ParseFrame()
 
 	if err != nil {
-		logp.Err(err.Error())
+		logp.Err("%v", err)
 		return nil, nil
 	}
 
 	dir := applayer.NetOriginalDirection
 
 	isRequest := true
-	if head.version.response() {
+	if head.Version.IsResponse() {
 		dir = applayer.NetReverseDirection
 		isRequest = false
-	}
-
-	//collect and wait for enough stream
-	_, err = p.buf.Collect(head.length + 9)
-
-	if err == streambuf.ErrNoMoreBytes {
-		return nil, nil
 	}
 
 	msg.Size = uint64(p.buf.BufferConsumed())
@@ -157,7 +157,7 @@ func (p *parser) parse() (*message, error) {
 	msg.Direction = dir
 
 	msg.data = data
-	msg.header = head
+	msg.header = head.ToMap()
 
 	if msg.IsRequest {
 		p.message.results.requests.append(msg)
@@ -165,8 +165,8 @@ func (p *parser) parse() (*message, error) {
 		p.message.results.responses.append(msg)
 	}
 
-	if logp.IsDebug("cassandra") {
-		logp.Debug("cassandra", fmt.Sprint(msg))
+	if isDebug {
+		logp.Debug("cassandra", "%v",msg)
 	}
 
 	return msg, nil

@@ -1,8 +1,10 @@
 package cassandra
 
 import (
+	"fmt"
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/pkg/errors"
 )
 
 type cassandraConfig struct {
@@ -23,5 +25,8 @@ var (
 )
 
 func (c *cassandraConfig) Validate() error {
+	if !(c.Compressor == "" || c.Compressor == "snappy") {
+		return errors.New(fmt.Sprintf("invalid compressor config: %s, only snappy supported", c.Compressor))
+	}
 	return nil
 }

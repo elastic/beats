@@ -31,6 +31,7 @@ import (
 	"net"
 	"runtime"
 	"sync"
+	"github.com/elastic/beats/libbeat/common/streambuf"
 )
 
 var (
@@ -38,26 +39,26 @@ var (
 )
 
 type frameHeader struct {
-	version       protoVersion
-	flags         byte
-	stream        int
-	op            frameOp
-	length        int
-	customPayload map[string][]byte
+	Version       protoVersion
+	Flags         byte
+	Stream        int
+	Op            frameOp
+	Length        int
+	CustomPayload map[string][]byte
 }
 
-func (f frameHeader) toMap() map[string]interface{} {
+func (f frameHeader) ToMap() map[string]interface{} {
 	data := make(map[string]interface{})
-	data["version"] = fmt.Sprintf("%d", f.version.version())
-	data["flags"] = f.flags
-	data["stream"] = f.stream
-	data["op"] = f.op.String()
-	data["length"] = f.length
+	data["version"] = fmt.Sprintf("%d", f.Version.version())
+	data["flags"] = f.Flags
+	data["stream"] = f.Stream
+	data["op"] = f.Op.String()
+	data["length"] = f.Length
 	return data
 }
 
 func (f frameHeader) String() string {
-	return fmt.Sprintf("[header version=%s flags=0x%x stream=%d op=%s length=%d]", f.version.String(), f.flags, f.stream, f.op.String(), f.length)
+	return fmt.Sprintf("[header version=%s flags=0x%x stream=%d op=%s length=%d]", f.Version.String(), f.Flags, f.Stream, f.Op.String(), f.Length)
 }
 
 func (f frameHeader) Header() frameHeader {
@@ -96,7 +97,7 @@ type framer struct {
 	rbuf []byte
 }
 
-func newFramer(r io.Reader, compressor Compressor, version byte) *framer {
+func NewFramer(r *streambuf.Buffer, compressor Compressor, version byte) *framer {
 	f := framerPool.Get().(*framer)
 	var flags byte
 	if compressor != nil {
@@ -128,85 +129,95 @@ type frame interface {
 	Header() frameHeader
 }
 
-func readHeader(r io.Reader, p []byte) (head frameHeader, err error) {
-	_, err = io.ReadFull(r, p[:1])
+func ReadHeader(r *streambuf.Buffer) (head *frameHeader, err error) {
+	v,err:=r.ReadByte()
 	if err != nil {
-		return frameHeader{}, err
+		return nil, err
 	}
-
-	version := p[0] & protoVersionMask
+	version := v & protoVersionMask
 
 	if version < protoVersion1 || version > protoVersion4 {
-		return frameHeader{}, fmt.Errorf("unsupported response version: %d", version)
+		return nil, fmt.Errorf("unsupported response version: %d", version)
 	}
 
-	headSize := 9
-	if version < protoVersion3 {
-		headSize = 8
-	}
+	head = &frameHeader{}
 
-	_, err = io.ReadFull(r, p[1:headSize])
-	if err != nil {
-		return frameHeader{}, err
-	}
+	head.Version = protoVersion(v)
 
-	p = p[:headSize]
-
-	v := p[0]
-
-	head.version = protoVersion(v)
-
-	head.flags = p[1]
+	head.Flags,err = r.ReadByte()
 
 	if version > protoVersion2 {
-		if len(p) != 9 {
-			return frameHeader{}, fmt.Errorf("not enough bytes to read header require 9 got: %d", len(p))
+		stream,err := r.ReadNetUint16()
+		if err != nil {
+			return nil, err
+		}
+		head.Stream=int(stream)
+
+		b,err := r.ReadByte()
+		if err != nil {
+			return nil, err
 		}
 
-		head.stream = int(int16(p[2])<<8 | int16(p[3]))
-		head.op = frameOp(p[4])
-		head.length = int(readInt(p[5:]))
+		head.Op = frameOp(b)
+		l,err := r.ReadNetUint32()
+		if err != nil {
+			return nil, err
+		}
+		head.Length=int(l)
 	} else {
-		if len(p) != 8 {
-			return frameHeader{}, fmt.Errorf("not enough bytes to read header require 8 got: %d", len(p))
+		stream,err := r.ReadNetUint8()
+		if err != nil {
+			return nil, err
+		}
+		head.Stream=int(stream)
+
+
+		b,err := r.ReadByte()
+		if err != nil {
+			return nil, err
 		}
 
-		head.stream = int(int8(p[2]))
-		head.op = frameOp(p[3])
-		head.length = int(readInt(p[4:]))
+		head.Op = frameOp(b)
+		l,err := r.ReadNetUint32()
+		if err != nil {
+			return nil, err
+		}
+		head.Length=int(l)
 	}
+
+	logp.Debug("cassandra","header: %v", head)
 
 	return head, nil
 }
 
 // reads a frame form the wire into the framers buffer
-func (f *framer) readFrame(head *frameHeader) error {
-	if head.length < 0 {
-		return fmt.Errorf("frame body length can not be less than 0: %d", head.length)
-	} else if head.length > maxFrameSize {
+func (f *framer) ReadFrame(head *frameHeader) error {
+	if head.Length < 0 {
+		return fmt.Errorf("frame body length can not be less than 0: %d", head.Length)
+	} else if head.Length > maxFrameSize {
 		// need to free up the connection to be used again
-		_, err := io.CopyN(ioutil.Discard, f.r, int64(head.length))
+		_, err := io.CopyN(ioutil.Discard, f.r, int64(head.Length))
 		if err != nil {
 			return fmt.Errorf("error whilst trying to discard frame with invalid length: %v", err)
 		}
 		return ErrFrameTooBig
 	}
 
-	if cap(f.readBuffer) >= head.length {
-		f.rbuf = f.readBuffer[:head.length]
+	if cap(f.readBuffer) >= head.Length {
+		f.rbuf = f.readBuffer[:head.Length]
 	} else {
-		f.readBuffer = make([]byte, head.length)
+		f.readBuffer = make([]byte, head.Length)
 		f.rbuf = f.readBuffer
 	}
 
 	// assume the underlying reader takes care of timeouts and retries
 	n, err := io.ReadFull(f.r, f.rbuf)
 	if err != nil {
-		return fmt.Errorf("unable to read frame body: read %d/%d bytes: %v", n, head.length, err)
+		return fmt.Errorf("unable to read frame body: read %d/%d bytes: %v", n, head.Length, err)
 	}
 
 	// dealing with compressed frame body
-	if head.flags&flagCompress == flagCompress {
+	if head.Flags &flagCompress == flagCompress {
 		if f.compres == nil {
 			return errors.New("no compressor available with compressed frame body")
 		}
@@ -221,7 +232,7 @@ func (f *framer) readFrame(head *frameHeader) error {
 	return nil
 }
 
-func (f *framer) parseFrame(msg *message) (data map[string]interface{}, err error) {
+func (f *framer) ParseFrame() (data map[string]interface{}, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			if _, ok := r.(runtime.Error); ok {
@@ -233,9 +244,9 @@ func (f *framer) parseFrame(msg *message) (data map[string]interface{}, err erro
 
 	data = make(map[string]interface{})
 
-	data["request_type"] = f.header.op.String()
+	data["request_type"] = f.header.Op.String()
 
-	if f.header.flags&flagTracing == flagTracing {
+	if f.header.Flags &flagTracing == flagTracing {
 		uuid, err := f.readUUID()
 		if err != nil {
 			f.traceID = uuid.Bytes()
@@ -245,18 +256,18 @@ func (f *framer) parseFrame(msg *message) (data map[string]interface{}, err erro
 
 	}
 
-	if f.header.flags&flagWarning == flagWarning {
+	if f.header.Flags &flagWarning == flagWarning {
 		warnings := f.readStringList()
 		// dealing with warnings
 		data["warnings"] = warnings
 	}
 
-	if f.header.flags&flagCustomPayload == flagCustomPayload {
-		f.header.customPayload = f.readBytesMap()
+	if f.header.Flags &flagCustomPayload == flagCustomPayload {
+		f.header.CustomPayload = f.readBytesMap()
 	}
 
 	// assumes that the frame body has been read into rbuf
-	switch f.header.op {
+	switch f.header.Op {
 	case opError:
 		data = f.parseErrorFrame()
 	case opReady:

@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 	"github.com/elastic/beats/packetbeat/publish"
+	. "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
 )
 
 // cassandra application level protocol analyzer plugin
@@ -40,6 +41,7 @@ var (
 
 func init() {
 	protos.Register("cassandra", New)
+	isDebug = logp.IsDebug("cassandra")
 }
 
 // New create and initializes a new cassandra protocol analyzer instance.
@@ -67,8 +69,6 @@ func (cassandra *cassandra) init(results publish.Transactions, config *cassandra
 		return err
 	}
 	cassandra.pub.results = results
-
-	isDebug = logp.IsDebug("cassandra")
 	return nil
 }
 

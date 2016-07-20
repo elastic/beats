@@ -1,5 +1,4 @@
 package cassandra
-
 // Copyright (c) 2012 The gocql Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -390,7 +389,7 @@ const (
 
 type protoVersion byte
 
-func (p protoVersion) request() bool {
+func (p protoVersion) IsRequest() bool {
 	v := p.version()
 
 	if v < protoVersion1 || v > protoVersion4 {
@@ -408,7 +407,7 @@ func (p protoVersion) request() bool {
 	return p == 0x00
 }
 
-func (p protoVersion) response() bool {
+func (p protoVersion) IsResponse() bool {
 	v := p.version()
 
 	if v < protoVersion1 || v > protoVersion4 {
@@ -432,7 +431,7 @@ func (p protoVersion) version() byte {
 
 func (p protoVersion) String() string {
 	dir := "REQ"
-	if p.response() {
+	if p.IsResponse() {
 		dir = "RESP"
 	}
 
