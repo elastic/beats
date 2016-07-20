@@ -13,11 +13,10 @@ type dropFields struct {
 }
 
 func init() {
-	constructor := configChecked(newDropFields,
-		requireFields("fields"), allowedFields("fields", "when"))
-	if err := processors.RegisterPlugin("drop_fields", constructor); err != nil {
-		panic(err)
-	}
+	processors.RegisterPlugin("drop_fields",
+		configChecked(newDropFields,
+			requireFields("fields"),
+			allowedFields("fields", "when")))
 }
 
 func newDropFields(c common.Config) (processors.Processor, error) {

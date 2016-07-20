@@ -25,17 +25,18 @@ func New(config PluginConfig) (*Processors, error) {
 
 		for processorName, cfg := range processor {
 
-			constructor, exists := constructors[processorName]
+			gen, exists := registry.reg[processorName]
 			if !exists {
 				return nil, fmt.Errorf("the processor %s doesn't exist", processorName)
 			}
 
+			constructor := gen.Plugin()
 			plugin, err := constructor(cfg)
 			if err != nil {
 				return nil, err
 			}
 
-			procs.addProcessor(plugin)
+			procs.add(plugin)
 		}
 	}
 
@@ -43,8 +44,7 @@ func New(config PluginConfig) (*Processors, error) {
 	return &procs, nil
 }
 
-func (procs *Processors) addProcessor(p Processor) {
-
+func (procs *Processors) add(p Processor) {
 	procs.list = append(procs.list, p)
 }
 
