@@ -171,7 +171,9 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 		}
 	}
 
-	return proc
+	return common.MapStr{
+		"process": proc,
+	}
 }
 
 func GetProcCpuPercentage(last *Process, current *Process) float64 {

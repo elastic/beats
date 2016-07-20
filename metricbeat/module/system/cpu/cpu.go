@@ -94,11 +94,14 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		cpuStat["steal"].(common.MapStr)["ticks"] = stat.Stolen
 	}
 
-	cpuStat["load"] = common.MapStr{
-		"1":  loadStat.Load1,
-		"5":  loadStat.Load5,
-		"15": loadStat.Load15,
+	event := common.MapStr{
+		"load": common.MapStr{
+			"1":  loadStat.Load1,
+			"5":  loadStat.Load5,
+			"15": loadStat.Load15,
+		},
+		"cpu": cpuStat,
 	}
 
-	return cpuStat, nil
+	return event, nil
 }

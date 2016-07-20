@@ -32,7 +32,7 @@ type fakeMetricSet struct {
 
 func (ms *fakeMetricSet) Fetch() (common.MapStr, error) {
 	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
-	return common.MapStr{"@timestamp": common.Time(t), "metric": 1}, nil
+	return common.MapStr{"@timestamp": common.Time(t), metricSetName: common.MapStr{"metric": 1}}, nil
 }
 
 func newFakeMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {

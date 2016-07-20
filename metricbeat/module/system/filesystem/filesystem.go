@@ -38,7 +38,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, errors.Wrap(err, "filesystem list")
 	}
 
-	filesSystems := make([]common.MapStr, 0, len(fss))
+	events := make([]common.MapStr, 0, len(fss))
 	for _, fs := range fss {
 		fsStat, err := GetFileSystemStat(fs)
 		if err != nil {
@@ -46,8 +46,12 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			continue
 		}
 		AddFileSystemUsedPercentage(fsStat)
-		filesSystems = append(filesSystems, GetFilesystemEvent(fsStat))
+
+		event := common.MapStr{
+			"filesystem": GetFilesystemEvent(fsStat),
+		}
+		events = append(events, event)
 	}
 
-	return filesSystems, nil
+	return events, nil
 }

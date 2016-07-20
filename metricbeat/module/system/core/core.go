@@ -54,7 +54,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	m.cpu.AddCpuPercentageList(cpuCoreStat)
 
-	cores := []common.MapStr{}
+	events := []common.MapStr{}
 
 	for core, stat := range cpuCoreStat {
 
@@ -97,8 +97,11 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		}
 
 		coreStat["id"] = core
-		cores = append(cores, coreStat)
+		event := common.MapStr{
+			"core": coreStat,
+		}
+		events = append(events, event)
 	}
 
-	return cores, nil
+	return events, nil
 }

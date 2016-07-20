@@ -2167,7 +2167,7 @@ Load averages.
 
 
 [float]
-=== system.cpu.load.1
+=== system.load.1
 
 type: half_float
 
@@ -2175,7 +2175,7 @@ Load average for the last minute.
 
 
 [float]
-=== system.cpu.load.5
+=== system.load.5
 
 type: half_float
 
@@ -2183,7 +2183,7 @@ Load average for the last 5 minutes.
 
 
 [float]
-=== system.cpu.load.15
+=== system.load.15
 
 type: half_float
 
@@ -2279,7 +2279,7 @@ The total number of of milliseconds spent doing I/Os.
 
 
 [float]
-=== system.filesystem.avail
+=== system.filesystem.available
 
 type: long
 
@@ -2404,8 +2404,7 @@ Total space (used plus free).
 [float]
 == memory Fields
 
-`memory` contains local memory stats.
-
+This group contains statistics related to the virtual memory usage on the system.
 
 
 [float]
@@ -2425,14 +2424,6 @@ Used memory.
 
 
 [float]
-=== system.memory.free
-
-type: long
-
-Available memory.
-
-
-[float]
 === system.memory.used.pct
 
 type: half_float
@@ -2441,34 +2432,59 @@ The percentage of used memory.
 
 
 [float]
-== actual Fields
-
-Actual memory fields.
-
-
-
-[float]
-=== system.memory.actual.used.bytes
+=== system.memory.free
 
 type: long
 
-Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
+Free memory. For a human readable value use Available.
 
 
 [float]
-=== system.memory.actual.free
+=== system.memory.available
 
 type: long
 
-Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
+Available memory is what it matters. It is calculated based on the OS. On Linux it is a sum of free memory and caches and buffers. On OSX consists of free and inactive memory.
 
 
 [float]
-=== system.memory.actual.used.pct
+=== system.memory.active
 
-type: half_float
+type: long
 
-The percentage of actual used memory.
+Specific for OSX/BSD systems. 
+
+
+[float]
+=== system.memory.inactive
+
+type: long
+
+Specific for OSX/BSD systems. 
+
+
+[float]
+=== system.memory.wired
+
+type: long
+
+Specific for OSX/BSD systems. 
+
+
+[float]
+=== system.memory.buffers
+
+type: long
+
+Specific for Linux systems. 
+
+
+[float]
+=== system.memory.cached
+
+type: long
+
+Specific for Linux systems. 
 
 
 [float]
@@ -2478,7 +2494,7 @@ This group contains statistics related to the swap memory usage on the system.
 
 
 [float]
-=== system.memory.swap.total
+=== system.swap.total
 
 type: long
 
@@ -2486,7 +2502,7 @@ Total swap memory.
 
 
 [float]
-=== system.memory.swap.used.bytes
+=== system.swap.used.bytes
 
 type: long
 
@@ -2494,19 +2510,35 @@ Used swap memory.
 
 
 [float]
-=== system.memory.swap.free
-
-type: long
-
-Available swap memory.
-
-
-[float]
-=== system.memory.swap.used.pct
+=== system.swap.used.pct
 
 type: half_float
 
 The percentage of used swap memory.
+
+
+[float]
+=== system.swap.free
+
+type: long
+
+Free swap memory.
+
+
+[float]
+=== system.swap.in
+
+type: long
+
+Swaps-in 
+
+
+[float]
+=== system.swap.out
+
+type: long
+
+Swaps-out 
 
 
 [float]

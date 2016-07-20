@@ -1,7 +1,6 @@
 - name: memory
   type: group
-  description: >
-    `memory` contains local memory stats.
+  description: This group contains statistics related to the virtual memory usage on the system.
   fields:
     - name: total
       type: long
@@ -13,59 +12,79 @@
       description: >
         Used memory.
 
-    - name: free
-      type: long
-      description: >
-        Available memory.
-
     - name: used.pct
       type: half_float
       description: >
         The percentage of used memory.
 
-    - name: actual
-      type: group
+    - name: free
+      type: long
       description: >
-        Actual memory fields.
-      fields:
-        - name: used.bytes
-          type: long
-          description: >
-            Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
-            Available only on Unix.
+        Free memory. For a human readable value use Available.
 
-        - name: free
-          type: long
-          description: >
-            Actual available memory. This value is the "free" memory plus the memory used for disk caches and
-            buffers. Available only on Unix.
+    - name: available
+      type: long
+      description: >
+        Available memory is what it matters. It is calculated based on the OS. On Linux it is a sum of free memory
+        and caches and buffers. On OSX consists of free and inactive memory.
 
-        - name: used.pct
-          type: half_float
-          description: >
-            The percentage of actual used memory.
+    - name: active
+      type: long
+      description: >
+        Specific for OSX/BSD systems. 
 
-    - name: swap
-      type: group
-      prefix: "[float]"
-      description: This group contains statistics related to the swap memory usage on the system.
-      fields:
-        - name: total
-          type: long
-          description: >
-            Total swap memory.
+    - name: inactive
+      type: long
+      description: >
+        Specific for OSX/BSD systems. 
 
-        - name: used.bytes
-          type: long
-          description: >
-            Used swap memory.
+    - name: wired
+      type: long
+      description: >
+        Specific for OSX/BSD systems. 
 
-        - name: free
-          type: long
-          description: >
-            Available swap memory.
+    - name: buffers
+      type: long
+      description: >
+        Specific for Linux systems. 
 
-        - name: used.pct
-          type: half_float
-          description: >
-            The percentage of used swap memory.
+    - name: cached
+      type: long
+      description: >
+        Specific for Linux systems. 
+
+
+- name: swap
+  type: group
+  description: This group contains statistics related to the swap memory usage on the system.
+  fields:
+    - name: total
+      type: long
+      description: >
+        Total swap memory.
+
+    - name: used.bytes
+      type: long
+      description: >
+        Used swap memory.
+
+    - name: used.pct
+      type: half_float
+      description: >
+        The percentage of used swap memory.
+
+    - name: free
+      type: long
+      description: >
+        Free swap memory.
+
+    - name: in
+      type: long
+      description: >
+        Swaps-in 
+
+    - name: out
+      type: long
+      description: >
+        Swaps-out 
+

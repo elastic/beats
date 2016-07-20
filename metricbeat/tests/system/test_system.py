@@ -5,31 +5,36 @@ import metricbeat
 import getpass
 import os
 
-SYSTEM_CPU_FIELDS = ["idle.pct", "iowait.pct", "irq.pct", "load", "nice.pct",
+SYSTEM_CPU_FIELDS = ["idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                      "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
-SYSTEM_CPU_FIELDS_ALL = ["idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "load", "nice.pct", "nice.ticks",
+SYSTEM_CPU_FIELDS_ALL = ["idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
                      "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks"]
+
+SYSTEM_LOAD_FIELDS = ["1", "5", "15"]
 
 SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
 SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
-               "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks"]
+                        "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks"]
 
 SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
-                      "write.bytes", "read.time", "write.time", "io.time"]
+                        "write.bytes", "read.time", "write.time", "io.time"]
 
-SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
+SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "files", "free",
                             "free_files", "mount_point", "total", "used.bytes",
                             "used.pct"]
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
-SYSTEM_MEMORY_FIELDS = ["swap", "actual", "free", "total", "used.bytes", "used.pct"]
+SYSTEM_MEMORY_FIELDS = ["available", "free", "total", "used.bytes", "used.pct", 
+                        "inactive", "active", "wired", "buffers", "cached"]
+
+SYSTEM_SWAP_FIELDS = ["total", "free", "used.bytes", "used.pct", "in", "out"]
 
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
-                         "in.packets", "in.error", "out.error", "in.dropeed", "out.dropped"]
+                         "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
 
 # cmdline is also part of the system process fields, but it may not be present
 # for some kernel level processes.
@@ -64,6 +69,10 @@ class SystemTest(metricbeat.BaseTest):
         cpu = evt["system"]["cpu"]
         self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS), cpu.keys())
 
+        load = evt["system"]["load"]
+        self.assertItemsEqual(self.de_dot(SYSTEM_LOAD_FIELDS), load.keys())
+
+
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu_ticks_option(self):
         """
@@ -92,6 +101,9 @@ class SystemTest(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
             cpuStats = evt["system"]["cpu"]
             self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS_ALL), cpuStats.keys())
+
+            loadStats = evt["system"]["load"]
+            self.assertItemsEqual(self.de_dot(SYSTEM_LOAD_FIELDS), loadStats.keys())
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core(self):
@@ -249,19 +261,16 @@ class SystemTest(metricbeat.BaseTest):
         evt = output[0]
         self.assert_fields_are_documented(evt)
 
-        memory = evt["system"]["memory"]
-        self.assertItemsEqual(self.de_dot(SYSTEM_MEMORY_FIELDS), memory.keys())
+        mem = evt["system"]["memory"]
+        self.assertOptionalItemsEqual(self.de_dot(SYSTEM_MEMORY_FIELDS), mem.keys())
 
         # Check that percentages are calculated.
-        mem = memory
         if mem["total"] != 0:
             used_p = float(mem["used"]["bytes"]) / mem["total"]
             self.assertAlmostEqual(mem["used"]["pct"], used_p, places=4)
 
-            used_p = float(mem["actual"]["used"]["bytes"]) / mem["total"]
-            self.assertAlmostEqual(mem["actual"]["used"]["pct"], used_p, places=4)
-
-        swap = memory["swap"]
+        swap = evt["system"]["swap"]
+        self.assertItemsEqual(self.de_dot(SYSTEM_SWAP_FIELDS), swap.keys())
         if swap["total"] != 0:
             used_p = float(swap["used"]["bytes"]) / swap["total"]
             self.assertAlmostEqual(swap["used"]["pct"], used_p, places=4)
