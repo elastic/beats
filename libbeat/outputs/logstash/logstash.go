@@ -47,6 +47,11 @@ func init() {
 }
 
 func new(beatName string, cfg *common.Config, _ int) (outputs.Outputer, error) {
+
+	if !cfg.HasField("index") {
+		cfg.SetString("index", -1, beatName)
+	}
+
 	output := &logstash{}
 	if err := output.init(cfg); err != nil {
 		return nil, err

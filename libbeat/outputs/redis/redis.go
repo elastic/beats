@@ -3,7 +3,6 @@ package redis
 import (
 	"errors"
 	"expvar"
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -18,6 +17,7 @@ import (
 type redisOut struct {
 	mode mode.ConnectionMode
 	topology
+	beatName string
 }
 
 var debugf = logp.MakeDebug("redis")
@@ -40,7 +40,7 @@ func init() {
 }
 
 func new(beatName string, cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
-	r := &redisOut{}
+	r := &redisOut{beatName: beatName}
 	if err := r.init(cfg, expireTopo); err != nil {
 		return nil, err
 	}
@@ -69,9 +69,9 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		return errors.New("Bad Redis data type")
 	}
 
-	index := []byte(config.Index)
-	if len(index) == 0 {
-		return fmt.Errorf("missing %v", cfg.PathOf("index"))
+	key := []byte(config.Key)
+	if len(key) == 0 {
+		key = []byte(r.beatName)
 	}
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
@@ -105,7 +105,7 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		if err != nil {
 			return nil, err
 		}
-		return newClient(t, config.Password, config.Db, index, dataType), nil
+		return newClient(t, config.Password, config.Db, key, dataType), nil
 	})
 	if err != nil {
 		return err

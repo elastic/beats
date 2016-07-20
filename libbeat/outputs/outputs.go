@@ -76,10 +76,6 @@ func InitOutputs(
 			continue
 		}
 
-		if !config.HasField("index") {
-			config.SetString("index", -1, beatName)
-		}
-
 		output, err := plugin(beatName, config, topologyExpire)
 		if err != nil {
 			logp.Err("failed to initialize %s plugin as output: %s", name, err)
