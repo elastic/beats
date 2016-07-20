@@ -14,10 +14,12 @@ class TestProcessors(metricbeat.BaseTest):
                 "metricsets": ["cpu"],
                 "period": "1s"
             }],
-            drop_fields={
-                "condition": "range.system.cpu.system.pct.lt: 0.1",
-                "fields": ["system.cpu.load"],
-            },
+            processors=[{
+                "drop_fields":{
+                    "when": "range.system.cpu.system.pct.lt: 0.1",
+                    "fields": ["system.cpu.load"],
+                },
+            }]
         )
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
@@ -52,10 +54,12 @@ class TestProcessors(metricbeat.BaseTest):
                 "metricsets": ["process"],
                 "period": "1s"
             }],
-            drop_fields={
-                "fields": ["system.process.memory"],
-                "condition": "range.system.process.cpu.total.pct.lt: 0.5",
-            },
+            processors=[{
+                "drop_fields":{
+                    "fields": ["system.process.memory"],
+                    "when": "range.system.process.cpu.total.pct.lt: 0.5",
+                },
+            }]
         )
         metricbeat = self.start_beat()
         self.wait_until(
@@ -84,9 +88,11 @@ class TestProcessors(metricbeat.BaseTest):
                 "metricsets": ["process"],
                 "period": "1s"
             }],
-            drop_event={
-                "condition": "range.system.process.cpu.total.pct.lt: 0.001",
-            },
+            processors=[{
+                "drop_event":{
+                    "when": "range.system.process.cpu.total.pct.lt: 0.001",
+                },
+            }]
         )
         metricbeat = self.start_beat()
         self.wait_until(
@@ -112,9 +118,11 @@ class TestProcessors(metricbeat.BaseTest):
                 "metricsets": ["process"],
                 "period": "1s"
             }],
-            drop_event={
-                "condition": "not.contains.system.process.cmdline: metricbeat.test",
-            },
+            processors=[{
+                "drop_event":{
+                    "when.not": "contains.system.process.cmdline: metricbeat.test",
+                },
+            }]
         )
         metricbeat = self.start_beat()
         self.wait_until(
@@ -139,7 +147,9 @@ class TestProcessors(metricbeat.BaseTest):
                 "metricsets": ["process"],
                 "period": "1s"
             }],
-            include_fields={"fields": ["system.process.cpu", "system.process.memory"]},
+            processors=[{
+                "include_fields":{"fields": ["system.process.cpu", "system.process.memory"]},
+            }]
         )
         metricbeat = self.start_beat()
         self.wait_until(
@@ -179,8 +189,11 @@ class TestProcessors(metricbeat.BaseTest):
                 "metricsets": ["process"],
                 "period": "1s"
             }],
-            include_fields={"fields": ["system.process"]},
-            drop_fields={"fields": ["system.process.memory"]},
+            processors=[{
+                "include_fields":{"fields": ["system.process"]},
+            }, {
+                "drop_fields": {"fields": ["system.process.memory"]},
+            }]
         )
         metricbeat = self.start_beat()
         self.wait_until(
@@ -218,8 +231,15 @@ class TestProcessors(metricbeat.BaseTest):
                 "metricsets": ["process"],
                 "period": "1s"
             }],
-            include_fields={"fields": ["system.process.memory.size", "proc.memory.rss.pct"]},
-            drop_fields={"fields": ["system.process.memory.size", "proc.memory.rss.pct"]},
+            processors=[{
+                "include_fields":{
+                    "fields": ["system.process.memory.size", "proc.memory.rss.pct"],
+                },
+            }, {
+                "drop_fields": {
+                    "fields": ["system.process.memory.size", "proc.memory.rss.pct"],
+                },
+            }]
         )
         metricbeat = self.start_beat()
         self.wait_until(
