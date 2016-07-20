@@ -33,13 +33,8 @@ func (m *MetricSet) Fetch() (event common.MapStr, err error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "memory")
 	}
-	AddMemPercentage(memStat)
 
-	swapStat, err := GetSwap()
-	if err != nil {
-		return nil, errors.Wrap(err, "swap")
-	}
-	AddSwapPercentage(swapStat)
+	AddMemPercentage(memStat)
 
 	memory := common.MapStr{
 		"total": memStat.Total,
@@ -47,25 +42,9 @@ func (m *MetricSet) Fetch() (event common.MapStr, err error) {
 			"bytes": memStat.Used,
 			"pct":   memStat.UsedPercent,
 		},
-		"free": memStat.Free,
-		"actual": common.MapStr{
-			"free": memStat.ActualFree,
-			"used": common.MapStr{
-				"pct":   memStat.ActualUsedPercent,
-				"bytes": memStat.ActualUsed,
-			},
-		},
+		"free":      memStat.Free,
+		"available": memStat.ActualFree,
 	}
 
-	swap := common.MapStr{
-		"total": swapStat.Total,
-		"used": common.MapStr{
-			"bytes": swapStat.Used,
-			"pct":   swapStat.UsedPercent,
-		},
-		"free": swapStat.Free,
-	}
-
-	memory["swap"] = swap
 	return memory, nil
 }
