@@ -47,6 +47,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 *Filebeat*
 - Fix potential data loss between filebeat restarts, reporting unpublished lines as published. {issue}2041[2041]
 
+- Fix open file handler issue {issue}2028[2028] {pull}2020[2020]
+
 *Winlogbeat*
 - Fix potential data loss between winlogbeat restarts, reporting unpublished lines as published. {issue}2041[2041]
 

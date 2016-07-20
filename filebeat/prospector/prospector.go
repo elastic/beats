@@ -146,10 +146,8 @@ func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, er
 
 	h, err := harvester.NewHarvester(
 		p.cfg,
-		state.Source,
 		state,
 		p.harvesterChan,
-		state.Offset,
 		p.done,
 	)
 
