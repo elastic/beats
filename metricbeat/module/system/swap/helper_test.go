@@ -1,15 +1,20 @@
 // +build !integration
-// +build darwin freebsd linux openbsd
+// +build darwin freebsd linux openbsd windows
 
 package swap
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetSwap(t *testing.T) {
+
+	if runtime.GOOS == "windows" {
+		return //no swap data on windows
+	}
 
 	swap, err := GetSwap()
 
