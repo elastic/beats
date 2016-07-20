@@ -1,6 +1,6 @@
-=== System Memory Metricset
+=== System Swap Metricset
 
-The System `memory` metricset provides memory statistics.
+The System `swap` metricset provides memory statistics.
 
 This metricset is available on:
 
@@ -8,4 +8,3 @@ This metricset is available on:
 - FreeBSD
 - Linux
 - OpenBSD
-- Windows

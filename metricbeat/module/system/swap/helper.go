@@ -1,4 +1,4 @@
-// +build darwin freebsd linux openbsd windows
+// +build darwin freebsd linux openbsd
 
 package swap
 
