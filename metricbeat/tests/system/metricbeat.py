@@ -47,8 +47,3 @@ class BaseTest(TestCase):
                 fields[key] = self.de_dot(fields[key])
 
         return fields
-
-    def assertOptionalItemsEqual(self, items, fields):
-        for field in fields:
-            if field not in items:
-                raise Exception("Field '{}' not expected".format(field))

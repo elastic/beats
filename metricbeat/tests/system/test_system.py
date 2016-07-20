@@ -28,13 +28,12 @@ SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
-SYSTEM_MEMORY_FIELDS = ["available", "free", "total", "used.bytes", "used.pct", "active", "inactive", "wired",
-                        "buffers", "cached"]
+SYSTEM_MEMORY_FIELDS = ["available", "free", "total", "used.bytes", "used.pct"]
 
-SYSTEM_SWAP_FIELDS = ["total", "used.bytes", "used.pct", "free", "in", "out"]
+SYSTEM_SWAP_FIELDS = ["total", "used.bytes", "used.pct", "free"]
 
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
-                         "in.packets", "in.error", "out.error", "in.dropeed", "out.dropped"]
+                         "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
 
 # cmdline is also part of the system process fields, but it may not be present
 # for some kernel level processes.
@@ -282,7 +281,7 @@ class SystemTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         memory = evt["system"]["memory"]
-        self.assertOptionalItemsEqual(self.de_dot(SYSTEM_MEMORY_FIELDS), memory.keys())
+        self.assertItemsEqual(self.de_dot(SYSTEM_MEMORY_FIELDS), memory.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_swap(self):
@@ -308,7 +307,7 @@ class SystemTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         swap = evt["system"]["swap"]
-        self.assertOptionalItemsEqual(self.de_dot(SYSTEM_SWAP_FIELDS), swap.keys())
+        self.assertItemsEqual(self.de_dot(SYSTEM_SWAP_FIELDS), swap.keys())
 
         if swap["total"] != 0:
             used_p = float(swap["used"]["bytes"]) / swap["total"]
