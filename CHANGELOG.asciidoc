@@ -13,9 +13,12 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 ==== Breaking changes
 
 *Affecting all Beats*
+
 - Rename the `filters` section to `processors`. {pull}1944[1944]
 - Introduce the condition with `when` in the processor configuration. {pull}1949[1949]
 - The Elasticsearch template is now loaded by default. {pull}1993[1993]
+- The Redis output `index` setting is renamed to `key`. `index` still works but it's deprecated. {pull}2077[2077]
+- The undocumented file output `index` setting was removed. Use `filename` instead. {pull}2077[2077]
 
 *Metricbeat*
 
