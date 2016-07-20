@@ -438,5 +438,5 @@ packetbeat.protocols.cassandra:
   #send_response_header: true
 
   # If this option is enabled, and also the flag indicates that the frame body was compressed, and
-  # the stream will decode by the compressor, currently support: `snappy` , The default is `nil`.
+  # the stream will decode by the compressor, currently support: `snappy` , The default is empty.
   #compressor: "snappy"
