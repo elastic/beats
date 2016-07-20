@@ -126,31 +126,31 @@
           type: integer
           description:
 
-        - name: used.enabled
+        - name: aof.enabled
           type: boolean
           description:
 
-        - name: used.rewrite_in_progress
+        - name: aof.rewrite_in_progress
           type: boolean
           description:
 
-        - name: used.rewrite_scheduled
+        - name: aof.rewrite_scheduled
           type: boolean
           description:
 
-        - name: used.last_rewrite_time_sec
+        - name: aof.last_rewrite_time_sec
           type: integer
           description:
 
-        - name: used.current_rewrite_time_sec
+        - name: aof.current_rewrite_time_sec
           type: integer
           description:
 
-        - name: used.last_bgrewrite_status
+        - name: aof.last_bgrewrite_status
           type: keyword
           description:
 
-        - name: used.last_write_status
+        - name: aof.last_write_status
           type: keyword
           description:
 

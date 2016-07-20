@@ -1466,49 +1466,49 @@ type: integer
 None
 
 [float]
-=== redis.info.persistence.used.enabled
+=== redis.info.persistence.aof.enabled
 
 type: boolean
 
 None
 
 [float]
-=== redis.info.persistence.used.rewrite_in_progress
+=== redis.info.persistence.aof.rewrite_in_progress
 
 type: boolean
 
 None
 
 [float]
-=== redis.info.persistence.used.rewrite_scheduled
+=== redis.info.persistence.aof.rewrite_scheduled
 
 type: boolean
 
 None
 
 [float]
-=== redis.info.persistence.used.last_rewrite_time_sec
+=== redis.info.persistence.aof.last_rewrite_time_sec
 
 type: integer
 
 None
 
 [float]
-=== redis.info.persistence.used.current_rewrite_time_sec
+=== redis.info.persistence.aof.current_rewrite_time_sec
 
 type: integer
 
 None
 
 [float]
-=== redis.info.persistence.used.last_bgrewrite_status
+=== redis.info.persistence.aof.last_bgrewrite_status
 
 type: keyword
 
 None
 
 [float]
-=== redis.info.persistence.used.last_write_status
+=== redis.info.persistence.aof.last_write_status
 
 type: keyword
 
