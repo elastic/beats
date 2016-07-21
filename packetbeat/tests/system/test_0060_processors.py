@@ -7,9 +7,11 @@ class Test(BaseTest):
 
         self.render_config_template(
             http_send_all_headers=True,
-            drop_fields={"fields": ["http.request_headers"]},
-            # export all fields
-            include_fields=None,
+            processors=[{
+                "drop_fields": {
+                    "fields": ["http.request_headers"]
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -30,10 +32,12 @@ class Test(BaseTest):
 
         self.render_config_template(
             http_send_all_headers=True,
-            drop_fields={
-                "fields": ["http.request_headers", "http.response_headers"],
-                "condition": "equals.http.code: 200",
-            },
+            processors=[{
+                "drop_fields": {
+                    "fields": ["http.request_headers", "http.response_headers"],
+                    "when": "equals.http.code: 200",
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -60,10 +64,12 @@ class Test(BaseTest):
         self.render_config_template(
             http_send_request=True,
             http_send_response=True,
-            include_fields={
-                "fields": ["http"],
-                "condition": "equals.http.code: 200",
-            },
+            processors=[{
+                "include_fields": {
+                    "fields": ["http"],
+                    "when": "equals.http.code: 200",
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -92,10 +98,12 @@ class Test(BaseTest):
         self.render_config_template(
             http_send_request=True,
             http_send_response=True,
-            drop_fields={
-                "fields": ["request", "response"],
-                "condition": "range.http.code.lt: 300",
-            },
+            processors=[{
+                "drop_fields": {
+                    "fields": ["request", "response"],
+                    "when": "range.http.code.lt: 300",
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -120,9 +128,11 @@ class Test(BaseTest):
     def test_drop_event_with_cond(self):
 
         self.render_config_template(
-            drop_event={
-                "condition": "range.http.code.lt: 300",
-            },
+            processors=[{
+                "drop_event": {
+                    "when": "range.http.code.lt: 300",
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -138,11 +148,11 @@ class Test(BaseTest):
 
         self.render_config_template(
             http_send_all_headers=True,
-            drop_fields={
-                "fields": ["http.response_headers.transfer-encoding"]
-            },
-            # export all fields
-            include_fields=None,
+            processors=[{
+                "drop_fields": {
+                    "fields": ["http.response_headers.transfer-encoding"]
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -167,11 +177,11 @@ class Test(BaseTest):
 
         self.render_config_template(
             http_send_all_headers=True,
-            drop_fields={
-                "fields": ["http.response_headers.transfer-encoding-test"]
-            },
-            # export all fields
-            include_fields=None,
+            processors=[{
+                "drop_fields": {
+                    "fields": ["http.response_headers.transfer-encoding-test"]
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -196,9 +206,11 @@ class Test(BaseTest):
 
         self.render_config_template(
             http_send_all_headers=True,
-            drop_event={
-                "condition": "equals.status: OK",
-            },
+            processors=[{
+                "drop_event": {
+                    "when": "equals.status: OK",
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -212,9 +224,11 @@ class Test(BaseTest):
         self.render_config_template(
             http_send_all_headers=True,
             # export all mandatory fields
-            include_fields={
-                "fields": [],
-            },
+            processors=[{
+                "include_fields": {
+                    "fields": [],
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -228,14 +242,14 @@ class Test(BaseTest):
         assert "http.response_headers" not in objs[0]
 
     def test_drop_no_fields(self):
-
         self.render_config_template(
             http_send_all_headers=True,
-            drop_fields={
-                "fields": [],
-            },
-            # export all fields
-            include_fields=None,
+            processors=[{
+                "drop_fields": {
+                    "fields": [],
+                },
+                # export all fields
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -250,16 +264,18 @@ class Test(BaseTest):
         assert objs[2]["status"] == "Error"
 
     def test_drop_and_include_fields_failed_cond(self):
-
         self.render_config_template(
             http_send_all_headers=True,
-            include_fields={
-                "fields": ["http"],
-            },
-            drop_fields={
-                "fields": ["http.request_headers", "http.response_headers"],
-                "condition": "equals.status: OK",
-            },
+            processors=[{
+                "include_fields": {
+                    "fields": ["http"],
+                },
+            }, {
+                "drop_fields": {
+                    "fields": ["http.request_headers", "http.response_headers"],
+                    "when": "equals.status: OK",
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -281,13 +297,16 @@ class Test(BaseTest):
 
         self.render_config_template(
             http_send_all_headers=True,
-            include_fields={
-                "fields": ["http"],
-            },
-            drop_fields={
-                "fields": ["http.request_headers", "http.response_headers"],
-                "condition": "equals.http.code: 200",
-            },
+            processors=[{
+                "include_fields": {
+                    "fields": ["http"],
+                },
+            }, {
+                "drop_fields": {
+                    "fields": ["http.request_headers", "http.response_headers"],
+                    "when": "equals.http.code: 200",
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -309,14 +328,16 @@ class Test(BaseTest):
 
         self.render_config_template(
             http_send_all_headers=True,
-            include_fields={
-                "fields": ["http"],
-                "condition": """
-                and:
-                    - equals.type: http
-                    - equals.http.code: 200
-                """
-            },
+            processors=[{
+                "include_fields": {
+                    "fields": ["http"],
+                    "when": """
+                    and:
+                      - equals.type: http
+                      - equals.http.code: 200
+                    """
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -334,13 +355,15 @@ class Test(BaseTest):
 
         self.render_config_template(
             http_send_all_headers=True,
-            drop_event={
-                "condition": """
-                or:
-                    - equals.http.code: 404
-                    - equals.http.code: 200
-                """
-            },
+            processors=[{
+                "drop_event": {
+                    "when": """
+                      or:
+                        - equals.http.code: 404
+                        - equals.http.code: 200
+                    """
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
@@ -356,9 +379,11 @@ class Test(BaseTest):
 
         self.render_config_template(
             http_send_all_headers=True,
-            drop_event={
-                "condition": "not.equals.http.code: 200",
-            },
+            processors=[{
+                "drop_event": {
+                    "when.not": "equals.http.code: 200",
+                },
+            }]
         )
 
         self.run_packetbeat(pcap="http_minitwit.pcap",
