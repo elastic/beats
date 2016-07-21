@@ -481,7 +481,9 @@ func TestBadCondition(t *testing.T) {
 
 		for name, actionYml := range action {
 			actionConfig, err := common.NewConfigFrom(actionYml)
-			assert.Nil(t, err)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			c[name] = *actionConfig
 		}
@@ -489,7 +491,7 @@ func TestBadCondition(t *testing.T) {
 	}
 
 	_, err := processors.New(config)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 }
 

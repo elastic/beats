@@ -23,6 +23,6 @@ func RegisterPlugin(name string, constructor Constructor) error {
 	if _, exists := constructors[name]; exists {
 		return fmt.Errorf("plugin %s already registered", name)
 	}
-	constructors[name] = constructor
+	constructors[name] = NewConditional(constructor)
 	return nil
 }

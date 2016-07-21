@@ -263,9 +263,11 @@ class Test(BaseTest):
                 overwrite_keys=True,
                 add_error_key=True,
                 ),
-            drop_fields={
-                "fields": ["headers.request-id"],
-            },
+            processors=[{
+                "drop_fields": {
+                    "fields": ["headers.request-id"],
+                },
+            }]
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -303,9 +305,11 @@ class Test(BaseTest):
                 overwrite_keys=True,
                 add_error_key=True,
                 ),
-            drop_fields={
-                "fields": ["headers", "res"],
-            },
+            processors=[{
+                "drop_fields": {
+                    "fields": ["headers", "res"],
+                },
+            }]
         )
 
         os.mkdir(self.working_dir + "/log/")
