@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"System Navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"## System Overview\\n\\n- [Network statistics](/#/dashboard/Network)\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "System Navigation", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}
