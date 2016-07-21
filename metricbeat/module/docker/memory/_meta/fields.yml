@@ -1,0 +1,9 @@
+- name: memory
+  type: group
+  description: >
+    memory
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

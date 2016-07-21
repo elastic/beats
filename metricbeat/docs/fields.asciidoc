@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-beat>>
 * <<exported-fields-common>>
+* <<exported-fields-docker>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
@@ -441,6 +442,49 @@ example: metricsets
 required: True
 
 The document type. Always set to "metricsets".
+
+
+[[exported-fields-docker]]
+== docker Fields
+
+docker Module
+
+
+
+[float]
+== docker Fields
+
+
+
+
+[float]
+== cpu Fields
+
+cpu
+
+
+
+[float]
+=== docker.cpu.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== memory Fields
+
+memory
+
+
+
+[float]
+=== docker.memory.example
+
+type: keyword
+
+Example field
 
 
 [[exported-fields-mongodb]]
@@ -1882,146 +1926,274 @@ System status metrics, like CPU and memory usage, that are collected from the op
 
 
 [float]
-== core Fields
+== diskio Fields
 
-`system-core` contains local CPU core stats.
+`disk` contains disk IO metrics collected from the operating system.
 
 
 
 [float]
-=== system.core.id
+=== system.diskio.name
+
+type: keyword
+
+example: sda1
+
+The disk name.
+
+
+[float]
+=== system.diskio.serial_number
+
+type: keyword
+
+The disk's serial number. This may not be provided by all operating systems.
+
+
+[float]
+=== system.diskio.read.count
+
+type: long
+
+The total number of reads completed successfully.
+
+
+[float]
+=== system.diskio.write.count
+
+type: long
+
+The total number of writes completed successfully.
+
+
+[float]
+=== system.diskio.read.bytes
+
+type: long
+
+The total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
+
+
+[float]
+=== system.diskio.write.bytes
+
+type: long
+
+The total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
+
+
+[float]
+=== system.diskio.read.time
+
+type: long
+
+The total number of milliseconds spent by all reads.
+
+
+[float]
+=== system.diskio.write.time
+
+type: long
+
+The total number of milliseconds spent by all writes.
+
+
+[float]
+=== system.diskio.io.time
+
+type: long
+
+The total number of of milliseconds spent doing I/Os.
+
+
+[float]
+== fsstat Fields
+
+`system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
+
+
+
+[float]
+=== system.fsstat.count
+
+type: long
+
+Number of file systems found.
+
+[float]
+=== system.fsstat.total_files
+
+type: long
+
+Total number of files.
+
+[float]
+== total_size Fields
+
+Nested file system docs.
+
+
+[float]
+=== system.fsstat.total_size.free
+
+type: long
+
+Total free space.
+
+
+[float]
+=== system.fsstat.total_size.used
+
+type: long
+
+Total used space.
+
+
+[float]
+=== system.fsstat.total_size.total
+
+type: long
+
+Total space (used plus free).
+
+
+[float]
+== process Fields
+
+`process` contains process metadata, CPU metrics, and memory metrics.
+
+
+
+[float]
+=== system.process.name
+
+type: keyword
+
+The process name.
+
+
+[float]
+=== system.process.state
+
+type: keyword
+
+The process state. For example: "running".
+
+
+[float]
+=== system.process.pid
 
 type: integer
 
-CPU Core number.
+The process pid.
 
 
 [float]
-=== system.core.user.pct
+=== system.process.ppid
 
-type: half_float
+type: integer
 
-The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+The process parent pid.
 
 
 [float]
-=== system.core.user.ticks
+=== system.process.cmdline
+
+type: keyword
+
+The full command-line used to start the process, including the arguments separated by space.
+
+
+[float]
+=== system.process.username
+
+type: keyword
+
+The username of the user that created the process. If the username cannot be determined, the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
+
+
+[float]
+== cpu Fields
+
+CPU-specific statistics per process.
+
+
+[float]
+=== system.process.cpu.user
 
 type: long
 
-The amount of CPU time spent in user space.
+The amount of CPU time the process spent in user space.
 
 
 [float]
-=== system.core.system.pct
+=== system.process.cpu.total.pct
 
 type: half_float
 
-The percentage of CPU time spent in kernel space.
+The percentage of CPU time spent by the process since the last update. Its value is similar to the %CPU value of the process displayed by the top command on Unix systems.
 
 
 [float]
-=== system.core.system.ticks
+=== system.process.cpu.system
 
 type: long
 
-The amount of CPU time spent in kernel space.
+The amount of CPU time the process spent in kernel space.
 
 
 [float]
-=== system.core.nice.pct
+=== system.process.cpu.total.ticks
+
+type: long
+
+The total CPU time spent by the process.
+
+
+[float]
+=== system.process.cpu.start_time
+
+type: keyword
+
+The time when the process was started. Example: "17:45".
+
+
+[float]
+== memory Fields
+
+Memory-specific statistics per process.
+
+
+[float]
+=== system.process.memory.size
+
+type: long
+
+The total virtual memory the process has.
+
+
+[float]
+=== system.process.memory.rss.bytes
+
+type: long
+
+The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
+
+
+[float]
+=== system.process.memory.rss.pct
 
 type: half_float
 
-The percentage of CPU time spent on low-priority processes.
+The percentage of memory the process occupied in main memory (RAM).
 
 
 [float]
-=== system.core.nice.ticks
+=== system.process.memory.share
 
 type: long
 
-The amount of CPU time spent on low-priority processes.
-
-
-[float]
-=== system.core.idle.pct
-
-type: half_float
-
-The percentage of CPU time spent idle.
-
-
-[float]
-=== system.core.idle.ticks
-
-type: long
-
-The amount of CPU time spent idle.
-
-
-[float]
-=== system.core.iowait.pct
-
-type: half_float
-
-The percentage of CPU time spent in wait (on disk).
-
-
-[float]
-=== system.core.iowait.ticks
-
-type: long
-
-The amount of CPU time spent in wait (on disk).
-
-
-[float]
-=== system.core.irq.pct
-
-type: half_float
-
-The percentage of CPU time spent servicing and handling hardware interrupts.
-
-
-[float]
-=== system.core.irq.ticks
-
-type: long
-
-The amount of CPU time spent servicing and handling hardware interrupts.
-
-
-[float]
-=== system.core.softirq.pct
-
-type: half_float
-
-The percentage of CPU time spent servicing and handling software interrupts.
-
-
-[float]
-=== system.core.softirq.ticks
-
-type: long
-
-The amount of CPU time spent servicing and handling software interrupts.
-
-
-[float]
-=== system.core.steal.pct
-
-type: half_float
-
-The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
-
-
-[float]
-=== system.core.steal.ticks
-
-type: long
-
-The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+The shared memory the process uses.
 
 
 [float]
@@ -2191,214 +2363,227 @@ Load average for the last 15 minutes.
 
 
 [float]
-== diskio Fields
+== core Fields
 
-`disk` contains disk IO metrics collected from the operating system.
-
-
-
-[float]
-=== system.diskio.name
-
-type: keyword
-
-example: sda1
-
-The disk name.
-
-
-[float]
-=== system.diskio.serial_number
-
-type: keyword
-
-The disk's serial number. This may not be provided by all operating systems.
-
-
-[float]
-=== system.diskio.read.count
-
-type: long
-
-The total number of reads completed successfully.
-
-
-[float]
-=== system.diskio.write.count
-
-type: long
-
-The total number of writes completed successfully.
-
-
-[float]
-=== system.diskio.read.bytes
-
-type: long
-
-The total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
-
-
-[float]
-=== system.diskio.write.bytes
-
-type: long
-
-The total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
-
-
-[float]
-=== system.diskio.read.time
-
-type: long
-
-The total number of milliseconds spent by all reads.
-
-
-[float]
-=== system.diskio.write.time
-
-type: long
-
-The total number of milliseconds spent by all writes.
-
-
-[float]
-=== system.diskio.io.time
-
-type: long
-
-The total number of of milliseconds spent doing I/Os.
-
-
-[float]
-== filesystem Fields
-
-`filesystem` contains local filesystem stats.
+`system-core` contains local CPU core stats.
 
 
 
 [float]
-=== system.filesystem.avail
+=== system.core.id
 
-type: long
+type: integer
 
-The disk space available to an unprivileged user in bytes.
-
-
-[float]
-=== system.filesystem.device_name
-
-type: keyword
-
-The disk name. For example: `/dev/disk1`
+CPU Core number.
 
 
 [float]
-=== system.filesystem.mount_point
-
-type: keyword
-
-The mounting point. For example: `/`
-
-
-[float]
-=== system.filesystem.files
-
-type: long
-
-The total number of file nodes in the file system.
-
-
-[float]
-=== system.filesystem.free
-
-type: long
-
-The disk space available in bytes.
-
-
-[float]
-=== system.filesystem.free_files
-
-type: long
-
-The number of free file nodes in the file system.
-
-
-[float]
-=== system.filesystem.total
-
-type: long
-
-The total disk space in bytes.
-
-
-[float]
-=== system.filesystem.used.bytes
-
-type: long
-
-The used disk space in bytes.
-
-
-[float]
-=== system.filesystem.used.pct
+=== system.core.user.pct
 
 type: half_float
 
-The percentage of used disk space.
+The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
 [float]
-== fsstat Fields
-
-`system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
-
-
-
-[float]
-=== system.fsstat.count
+=== system.core.user.ticks
 
 type: long
 
-Number of file systems found.
+The amount of CPU time spent in user space.
+
 
 [float]
-=== system.fsstat.total_files
+=== system.core.system.pct
+
+type: half_float
+
+The percentage of CPU time spent in kernel space.
+
+
+[float]
+=== system.core.system.ticks
 
 type: long
 
-Total number of files.
-
-[float]
-== total_size Fields
-
-Nested file system docs.
+The amount of CPU time spent in kernel space.
 
 
 [float]
-=== system.fsstat.total_size.free
+=== system.core.nice.pct
+
+type: half_float
+
+The percentage of CPU time spent on low-priority processes.
+
+
+[float]
+=== system.core.nice.ticks
 
 type: long
 
-Total free space.
+The amount of CPU time spent on low-priority processes.
 
 
 [float]
-=== system.fsstat.total_size.used
+=== system.core.idle.pct
 
-type: long
+type: half_float
 
-Total used space.
+The percentage of CPU time spent idle.
 
 
 [float]
-=== system.fsstat.total_size.total
+=== system.core.idle.ticks
 
 type: long
 
-Total space (used plus free).
+The amount of CPU time spent idle.
+
+
+[float]
+=== system.core.iowait.pct
+
+type: half_float
+
+The percentage of CPU time spent in wait (on disk).
+
+
+[float]
+=== system.core.iowait.ticks
+
+type: long
+
+The amount of CPU time spent in wait (on disk).
+
+
+[float]
+=== system.core.irq.pct
+
+type: half_float
+
+The percentage of CPU time spent servicing and handling hardware interrupts.
+
+
+[float]
+=== system.core.irq.ticks
+
+type: long
+
+The amount of CPU time spent servicing and handling hardware interrupts.
+
+
+[float]
+=== system.core.softirq.pct
+
+type: half_float
+
+The percentage of CPU time spent servicing and handling software interrupts.
+
+
+[float]
+=== system.core.softirq.ticks
+
+type: long
+
+The amount of CPU time spent servicing and handling software interrupts.
+
+
+[float]
+=== system.core.steal.pct
+
+type: half_float
+
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+[float]
+=== system.core.steal.ticks
+
+type: long
+
+The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+[float]
+== network Fields
+
+`network` contains network IO metrics for a single network interface.
+
+
+
+[float]
+=== system.network.name
+
+type: keyword
+
+example: eth0
+
+The network interface name.
+
+
+[float]
+=== system.network.out.bytes
+
+type: long
+
+The number of bytes sent.
+
+
+[float]
+=== system.network.in.bytes
+
+type: long
+
+The number of bytes received.
+
+
+[float]
+=== system.network.out.packets
+
+type: long
+
+The number of packets sent.
+
+
+[float]
+=== system.network.in.packets
+
+type: long
+
+The number or packets received.
+
+
+[float]
+=== system.network.in.errors
+
+type: long
+
+The number of errors while receiving.
+
+
+[float]
+=== system.network.out.errors
+
+type: long
+
+The number of errors while sending.
+
+
+[float]
+=== system.network.in.dropped
+
+type: long
+
+The number of incoming packets that were dropped.
+
+
+[float]
+=== system.network.out.dropped
+
+type: long
+
+The number of outgoing packets that were dropped. This value is always 0 on Darwin and BSD because it is not reported by the operating system.
 
 
 [float]
@@ -2510,223 +2695,82 @@ The percentage of used swap memory.
 
 
 [float]
-== network Fields
+== filesystem Fields
 
-`network` contains network IO metrics for a single network interface.
+`filesystem` contains local filesystem stats.
 
 
 
 [float]
-=== system.network.name
+=== system.filesystem.avail
+
+type: long
+
+The disk space available to an unprivileged user in bytes.
+
+
+[float]
+=== system.filesystem.device_name
 
 type: keyword
 
-example: eth0
-
-The network interface name.
+The disk name. For example: `/dev/disk1`
 
 
 [float]
-=== system.network.out.bytes
-
-type: long
-
-The number of bytes sent.
-
-
-[float]
-=== system.network.in.bytes
-
-type: long
-
-The number of bytes received.
-
-
-[float]
-=== system.network.out.packets
-
-type: long
-
-The number of packets sent.
-
-
-[float]
-=== system.network.in.packets
-
-type: long
-
-The number or packets received.
-
-
-[float]
-=== system.network.in.errors
-
-type: long
-
-The number of errors while receiving.
-
-
-[float]
-=== system.network.out.errors
-
-type: long
-
-The number of errors while sending.
-
-
-[float]
-=== system.network.in.dropped
-
-type: long
-
-The number of incoming packets that were dropped.
-
-
-[float]
-=== system.network.out.dropped
-
-type: long
-
-The number of outgoing packets that were dropped. This value is always 0 on Darwin and BSD because it is not reported by the operating system.
-
-
-[float]
-== process Fields
-
-`process` contains process metadata, CPU metrics, and memory metrics.
-
-
-
-[float]
-=== system.process.name
+=== system.filesystem.mount_point
 
 type: keyword
 
-The process name.
+The mounting point. For example: `/`
 
 
 [float]
-=== system.process.state
-
-type: keyword
-
-The process state. For example: "running".
-
-
-[float]
-=== system.process.pid
-
-type: integer
-
-The process pid.
-
-
-[float]
-=== system.process.ppid
-
-type: integer
-
-The process parent pid.
-
-
-[float]
-=== system.process.cmdline
-
-type: keyword
-
-The full command-line used to start the process, including the arguments separated by space.
-
-
-[float]
-=== system.process.username
-
-type: keyword
-
-The username of the user that created the process. If the username cannot be determined, the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
-
-
-[float]
-== cpu Fields
-
-CPU-specific statistics per process.
-
-
-[float]
-=== system.process.cpu.user
+=== system.filesystem.files
 
 type: long
 
-The amount of CPU time the process spent in user space.
+The total number of file nodes in the file system.
 
 
 [float]
-=== system.process.cpu.total.pct
+=== system.filesystem.free
+
+type: long
+
+The disk space available in bytes.
+
+
+[float]
+=== system.filesystem.free_files
+
+type: long
+
+The number of free file nodes in the file system.
+
+
+[float]
+=== system.filesystem.total
+
+type: long
+
+The total disk space in bytes.
+
+
+[float]
+=== system.filesystem.used.bytes
+
+type: long
+
+The used disk space in bytes.
+
+
+[float]
+=== system.filesystem.used.pct
 
 type: half_float
 
-The percentage of CPU time spent by the process since the last update. Its value is similar to the %CPU value of the process displayed by the top command on Unix systems.
-
-
-[float]
-=== system.process.cpu.system
-
-type: long
-
-The amount of CPU time the process spent in kernel space.
-
-
-[float]
-=== system.process.cpu.total.ticks
-
-type: long
-
-The total CPU time spent by the process.
-
-
-[float]
-=== system.process.cpu.start_time
-
-type: keyword
-
-The time when the process was started. Example: "17:45".
-
-
-[float]
-== memory Fields
-
-Memory-specific statistics per process.
-
-
-[float]
-=== system.process.memory.size
-
-type: long
-
-The total virtual memory the process has.
-
-
-[float]
-=== system.process.memory.rss.bytes
-
-type: long
-
-The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
-
-
-[float]
-=== system.process.memory.rss.pct
-
-type: half_float
-
-The percentage of memory the process occupied in main memory (RAM).
-
-
-[float]
-=== system.process.memory.share
-
-type: long
-
-The shared memory the process uses.
+The percentage of used disk space.
 
 
 [[exported-fields-zookeeper]]
