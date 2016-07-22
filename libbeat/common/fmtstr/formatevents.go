@@ -63,6 +63,16 @@ var (
 	errConvertString = errors.New("can not convert to string")
 )
 
+// MustCompileEvent copmiles an event format string into an runnable
+// EventFormatString. Generates a panic if compilation fails.
+func MustCompileEvent(in string) *EventFormatString {
+	fs, err := CompileEvent(in)
+	if err != nil {
+		panic(err)
+	}
+	return fs
+}
+
 // CompileEvent compiles an event format string into an runnable
 // EventFormatString. Returns error if parsing or compilation fails.
 func CompileEvent(in string) (*EventFormatString, error) {
@@ -93,6 +103,26 @@ func CompileEvent(in string) (*EventFormatString, error) {
 		fields:    keys,
 	}
 	return efs, nil
+}
+
+// Unpack tries to initialize the EventFormatString from provided value
+// (which must be a string). Unpack method satisfies go-ucfg.Unpacker interface
+// required by common.Config, in order to use EventFormatString with
+// `common.(*Config).Unpack()`.
+func (fs *EventFormatString) Unpack(v interface{}) error {
+	s, err := tryConvString(v)
+	if err != nil {
+		return err
+	}
+
+	tmp, err := CompileEvent(s)
+	if err != nil {
+		return err
+	}
+
+	// init fs from tmp
+	*fs = *tmp
+	return nil
 }
 
 // NumFields returns number of unique event fields used by the format string.
@@ -243,13 +273,21 @@ func parseEventPath(field string) (string, error) {
 
 // TODO: move to libbeat/common?
 func fieldString(event common.MapStr, field string) (string, error) {
-	type stringer interface {
-		String() string
-	}
-
 	v, err := event.GetValue(field)
 	if err != nil {
 		return "", err
+	}
+
+	s, err := tryConvString(v)
+	if err != nil {
+		logp.Warn("Can not convert key '%v' value to string", v)
+	}
+	return s, err
+}
+
+func tryConvString(v interface{}) (string, error) {
+	type stringer interface {
+		String() string
 	}
 
 	switch s := v.(type) {
@@ -259,6 +297,11 @@ func fieldString(event common.MapStr, field string) (string, error) {
 		return string(s), nil
 	case stringer:
 		return s.String(), nil
+	case bool:
+		if s {
+			return "true", nil
+		}
+		return "false", nil
 	case int8, int16, int32, int64, int:
 		i := reflect.ValueOf(s).Int()
 		return strconv.FormatInt(i, 10), nil
@@ -270,7 +313,6 @@ func fieldString(event common.MapStr, field string) (string, error) {
 	case float64:
 		return strconv.FormatFloat(s, 'g', -1, 64), nil
 	default:
-		logp.Warn("Can not convert key '%v' value to string", v)
 		return "", errConvertString
 	}
 }
