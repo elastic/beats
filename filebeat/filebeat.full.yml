@@ -73,19 +73,14 @@ filebeat.prospectors:
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
   #ignore_older: 0
 
-  # Close older closes the file handler for which were not modified
-  # for longer then close_older
-  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
-  #close_older: 1h
-
   # Type to be published in the 'type' field. For Elasticsearch output,
   # the type defines the document type these entries should be stored
   # in. Default: log
   #document_type: log
 
-  # Scan frequency in seconds.
-  # How often these files should be checked for changes. In case it is set
-  # to 0s, it is done as often as possible. Default: 10s
+  # How often the prospector checks for new files in the paths that are specified
+  # for harvesting. Specify 1s to scan the directory as frequently as possible
+  # without causing Filebeat to scan too frequently. Default: 10s.
   #scan_frequency: 10s
 
   # Defines the buffer size every harvester uses when fetching the file
@@ -166,22 +161,50 @@ filebeat.prospectors:
   # The backoff value will be multiplied each time with the backoff_factor until max_backoff is reached
   #backoff_factor: 2
 
-  # This option closes a file, as soon as the file name changes.
-  # This config option is recommended on windows only. Filebeat keeps the files it's reading open. This can cause
-  # issues when the file is removed, as the file will not be fully removed until also Filebeat closes
-  # the reading. Filebeat closes the file handler after ignore_older. During this time no new file with the
-  # same name can be created. Turning this feature on the other hand can lead to loss of data
-  # on rotate files. It can happen that after file rotation the beginning of the new
-  # file is skipped, as the reading starts at the end. We recommend to leave this option on false
-  # but lower the ignore_older value to release files faster.
-  #force_close_files: false
+  ### Harvester closing options
+
+  # Close inactive closes the file handler after the predefined period.
+  # The period starts when the last line of the file was, not the file ModTime.
+  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  #close_inactive: 1h
+
+  # Close renamed closes a file handler when the file is renamed or rotated.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_renamed: false
+
+  # When enabling this option, a file handler is closed immediately in case a file can't be found
+  # any more. In case the file shows up again later, harvesting will continue at the last known position
+  # after scan_frequency.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_removed: false
+
+  # Closes the file handler as soon as the harvesters reaches the end of the file.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_eof: false
+
+  # Close timeout closes the harvester after the predefined time.
+  # This is independent if the harvester did finish reading the file or not.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_timeout: 0
+
+  ### State options
+
+  # Files for the modification data is older then clean_inactive the state from the registry is removed
+  # By default this is disabled.
+  #clean_inactive: 0
+
+  # Removes the state for file which cannot be found on disk anymore immediately
+  #clean_removed: false
+
 
 #----------------------------- Stdin prospector -------------------------------
 # Configuration to use stdin input
 #- input_type: stdin
 
 #========================= Filebeat global options ============================
-  
+
 # Event count spool threshold - forces network flush if exceeded
 #filebeat.spool_size: 2048
 
@@ -194,7 +217,7 @@ filebeat.prospectors:
 
 # Name of the registry file. If a relative path is used, it is considered relative to the
 # data path.
-#filebeat.registry_file: registry
+#filebeat.registry_file: ${path.data}/registry
 
 #
 # These config files must have the full filebeat config part inside, but only
@@ -236,7 +259,9 @@ filebeat.prospectors:
 
 # Expiration time (in seconds) of the IPs published by a shipper to the topology map.
 # All the IPs will be deleted afterwards. Note, that the value must be higher than
-# refresh_topology_freq. The default is 15 seconds.
+# refresh_topology_freq. This setting is used only by the Redis output. The other
+# outputs don't support expiring entries.
+# The default is 15 seconds.
 #topology_expire: 15
 
 # Internal queue size for single events in processing pipeline
@@ -246,20 +271,21 @@ filebeat.prospectors:
 # default is the number of logical CPUs available in the system.
 #max_procs:
 
-#================================ Filters =====================================
+#================================ Processors =====================================
 
-# This section defines a list of filtering rules that are applied one by one
-# starting with the exported event:
+# Processors are used to reduce the number of fields in the exported event or to 
+# enhance the event with external meta data. This section defines a list of processors 
+# that are applied one by one and the first one receives the initial event:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# Supported actions: drop_fields, drop_event, include_fields
+# Supported processors: drop_fields, drop_event, include_fields
 #
-# For example, the following filter configuration uses multiple actions to keep
+# For example, you can use the following processors to keep
 # the fields that contain CPU load percentages, but remove the fields that
 # contain CPU ticks values:
 #
-#filters:
+#processors:
 #- include_fields:
 #    fields: ["cpu"]
 #- drop_fields:
@@ -267,10 +293,11 @@ filebeat.prospectors:
 #
 # The following example drops the events that have the HTTP response code 200:
 #
-#filters:
+#processors:
 #- drop_event:
-#    equals:
-#       http.code: 200
+#    when:
+#       equals:
+#           http.code: 200
 #
 
 #================================ Outputs =====================================
@@ -280,16 +307,22 @@ filebeat.prospectors:
 
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
 
+  # Set gzip compression level.
+  #compression_level: 0
+
   # Optional protocol and basic auth credentials.
   #protocol: "https"
-  #username: "admin"
-  #password: "s3cr3t"
+  #username: "elastic"
+  #password: "changeme"
 
   # Dictionary of HTTP parameters to pass within the url with index operations.
   #parameters:
@@ -330,22 +363,30 @@ output.elasticsearch:
   # false. This option makes sense only for Packetbeat.
   #save_topology: false
 
-  # The time to live in seconds for the topology information that is stored in
-  # Elasticsearch. The default is 15 seconds.
-  #topology_expire: 15
-
   # A template is used to set the mapping in Elasticsearch
   # By default template loading is enabled and the template is loaded.
-  # These settings can be adjusted to load your own template or overwrite existing ones
+  # These settings can be adjusted to load your own template or overwrite existing ones.
+
+  # Set to false to disable template loading.
+  #template.enabled: true
 
   # Template name. By default the template name is filebeat.
-  template.name: "filebeat"
+  #template.name: "filebeat"
 
   # Path to template file
-  template.path: "filebeat.template.json"
+  #template.path: "${path.config}/filebeat.template.json"
 
   # Overwrite existing template
-  template.overwrite: false
+  #template.overwrite: false
+
+  # If set to true, filebeat checks the Elasticsearch version at connect time, and if it
+  # is 2.x, it loads the file specified by the template.versions.2x.path setting. The 
+  # default is true.
+  #template.versions.2x.enabled: true
+
+  # Path to the Elasticsearch 2.x version of the template file.
+  #template.versions.2x.path: "${path.config}/filebeat.template-es2x.json"
+
 
   # TLS configuration. By default is off.
   # List of root certificates for HTTPS server verifications
@@ -378,6 +419,9 @@ output.elasticsearch:
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # The Logstash hosts
   #hosts: ["localhost:5044"]
 
@@ -428,6 +472,9 @@ output.elasticsearch:
 
 #------------------------------- Kafka output ---------------------------------
 #output.kafka:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # The list of Kafka broker addresses from where to fetch the cluster metadata.
   # The cluster metadata contain the actual Kafka brokers events are published
   # to.
@@ -476,7 +523,7 @@ output.elasticsearch:
 
   # The maximum permitted size of JSON-encoded messages. Bigger messages will be
   # dropped. The default value is 1000000 (bytes). This value should be equal to
-  # or less than the broker’s message.max.bytes.
+  # or less than the broker's message.max.bytes.
   #max_message_bytes: 1000000
 
   # The ACK reliability level required from broker. 0=no response, 1=wait for
@@ -516,6 +563,9 @@ output.elasticsearch:
 
 #------------------------------- Redis output ---------------------------------
 #output.redis:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # The list of Redis servers to connect to. If load balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
@@ -612,6 +662,9 @@ output.elasticsearch:
 
 #------------------------------- File output ----------------------------------
 #output.file:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # Path to the directory where to save the generated files. The option is
   # mandatory.
   #path: "/tmp/filebeat"
@@ -633,6 +686,9 @@ output.elasticsearch:
 
 #----------------------------- Console output ---------------------------------
 #output.console:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # Pretty print json event
   #pretty: false
 
@@ -649,18 +705,18 @@ output.elasticsearch:
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
-#path.config:
+#path.config: ${path.home}
 
 # The data path for the filebeat installation. This is the default base path
 # for all the files in which filebeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
-#path.data:
+#path.data: ${path.home}/data
 
 # The logs path for a filebeat installation. This is the default location for
-# the Beat’s log files. If not set by a CLI flag or in the configuration file,
+# the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
-#path.logs:
+#path.logs: ${path.home}/logs
 
 #================================ Logging =====================================
 # There are three options for the log output: syslog, file, stderr.
@@ -672,12 +728,20 @@ output.elasticsearch:
 #logging.level: error
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are beat, publish, service
+# Other available selectors are "beat", "publish", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: true
+
+# If enabled, filebeat periodically logs its internal metrics that have changed
+# in the last period. For each metric that changed, the delta from the value at
+# the beginning of the period is logged. The default is true.
+#logging.metrics.enabled: true
+
+# The period after which to log the internal metrics. The default is 30s.
+#logging.metrics.period: 30s
 
 # Logging to rotating files files. Set logging.to_files to false to disable logging to
 # files.

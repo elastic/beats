@@ -1,0 +1,43 @@
+- name: filesystem
+  type: group
+  description: >
+    `filesystem` contains local filesystem stats.
+  fields:
+    - name: avail
+      type: long
+      description: >
+        The disk space available to an unprivileged user in bytes.
+    - name: device_name
+      type: keyword
+      description: >
+        The disk name. For example: `/dev/disk1`
+    - name: mount_point
+      type: keyword
+      description: >
+        The mounting point. For example: `/`
+    - name: files
+      type: long
+      description: >
+        The total number of file nodes in the file system.
+    - name: free
+      type: long
+      description: >
+        The disk space available in bytes.
+    - name: free_files
+      type: long
+      description: >
+        The number of free file nodes in the file system.
+    - name: total
+      type: long
+      description: >
+        The total disk space in bytes.
+    - name: used.bytes
+      type: long
+      description: >
+        The used disk space in bytes.
+    - name: used.pct
+      type: half_float
+      description: >
+        The percentage of used disk space.
+
+

@@ -26,16 +26,17 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 	}
 
 	config, _ := common.NewConfigFrom(map[string]interface{}{
-		"save_topology":  true,
-		"hosts":          []string{GetEsHost()},
-		"port":           esPort,
-		"username":       os.Getenv("ES_USER"),
-		"password":       os.Getenv("ES_PASS"),
-		"path":           "",
-		"index":          index,
-		"protocol":       "http",
-		"flush_interval": flushInterval,
-		"bulk_max_size":  bulkSize,
+		"save_topology":    true,
+		"hosts":            []string{GetEsHost()},
+		"port":             esPort,
+		"username":         os.Getenv("ES_USER"),
+		"password":         os.Getenv("ES_PASS"),
+		"path":             "",
+		"index":            index,
+		"protocol":         "http",
+		"flush_interval":   flushInterval,
+		"bulk_max_size":    bulkSize,
+		"template.enabled": false,
 	})
 
 	var output elasticsearchOutput
@@ -46,7 +47,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 func TestTopologyInES(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
 	elasticsearchOutput1 := createElasticsearchConnection(0, 0)
@@ -108,7 +109,7 @@ func TestOneEvent(t *testing.T) {
 	r["response"] = "value1"
 
 	index := fmt.Sprintf("%s-%d.%02d.%02d", output.index, ts.Year(), ts.Month(), ts.Day())
-	logp.Debug("output_elasticsearch", "index = %s", index)
+	debugf("index = %s", index)
 
 	client := output.randomClient()
 	client.CreateIndex(index, common.MapStr{
@@ -148,7 +149,7 @@ func TestOneEvent(t *testing.T) {
 		t.Errorf("Failed to query elasticsearch for index(%s): %s", index, err)
 		return
 	}
-	logp.Debug("output_elasticsearch", "resp = %s", resp)
+	debugf("resp = %s", resp)
 	if resp.Hits.Total != 1 {
 		t.Errorf("Wrong number of results: %d", resp.Hits.Total)
 	}
@@ -307,25 +308,4 @@ func TestBulkEvents(t *testing.T) {
 
 	output = createElasticsearchConnection(50, 5)
 	testBulkWithParams(t, output)
-}
-
-func TestEnableTTL(t *testing.T) {
-
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch", "elasticsearch"})
-	}
-
-	output := createElasticsearchConnection(0, 0)
-	output.randomClient().Delete(".packetbeat-topology", "", "", nil)
-
-	err := output.EnableTTL()
-	if err != nil {
-		t.Errorf("Fail to enable TTL: %s", err)
-	}
-
-	// should succeed also when index already exists
-	err = output.EnableTTL()
-	if err != nil {
-		t.Errorf("Fail to enable TTL: %s", err)
-	}
 }

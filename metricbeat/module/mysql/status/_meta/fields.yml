@@ -1,0 +1,110 @@
+- name: status
+  type: group
+  description: >
+    `status` contains the metrics that were obtained by the status SQL query.
+  fields:
+    - name: aborted
+      type: group
+      description: >
+        Aborted status fields.
+      fields:
+        - name: clients
+          type: integer
+          description: >
+            The number of connections that were aborted because the client died without closing the connection properly.
+
+        - name: connects
+          type: integer
+          description: >
+            The number of failed attempts to connect to the MySQL server.
+
+    - name: binlog
+      type: group
+      description: >
+      fields:
+        - name: cache.disk_use
+          type: integer
+          description: >
+
+        - name: cache.use
+          type: integer
+          description: >
+
+    - name: bytes
+      type: group
+      description: >
+        Bytes stats.
+      fields:
+        - name: received
+          type: integer
+          description: >
+            The number of bytes received from all clients.
+
+        - name: sent
+          type: integer
+          description: >
+            The number of bytes sent to all clients.
+
+    - name: connections
+      type: integer
+      description: >
+
+    - name: created
+      type: group
+      description: >
+      fields:
+        - name: tmp.disk_tables
+          type: integer
+          description: >
+
+        - name: tmp.files
+          type: integer
+          description: >
+
+        - name: tmp.tables
+          type: integer
+          description: >
+
+    - name: delayed
+      type: group
+      description: >
+      fields:
+        - name: errors
+          type: integer
+          description: >
+
+        - name: insert_threads
+          type: integer
+          description: >
+
+        - name: writes
+          type: integer
+          description: >
+
+    - name: flush_commands
+      type: integer
+      description: >
+
+    - name: max_used_connections
+      type: integer
+      description: >
+
+    - name: open
+      type: group
+      description: >
+      fields:
+        - name: files
+          type: integer
+          description: >
+
+        - name: streams
+          type: integer
+          description: >
+
+        - name: tables
+          type: integer
+          description: >
+
+    - name: opened_tables
+      type: integer
+      description: >

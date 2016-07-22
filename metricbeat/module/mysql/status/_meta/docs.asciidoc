@@ -1,0 +1,5 @@
+=== MySQL Status Metricset
+
+The MySQL `status` metricset collects data from MySQL by running a
+http://dev.mysql.com/doc/refman/5.7/en/show-status.html[`SHOW GLOBAL STATUS;`]
+SQL query. This query returns a large number of metrics.

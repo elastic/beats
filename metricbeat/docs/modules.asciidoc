@@ -8,15 +8,17 @@ contained in {beatname_uc}. Each module contains one or multiple metricsets. Mor
 about each module can be found under the links below.
 
   * <<metricbeat-module-apache,Apache>>
+  * <<metricbeat-module-mongodb,MongoDB>>
   * <<metricbeat-module-mysql,MySQL>>
   * <<metricbeat-module-nginx,Nginx>>
   * <<metricbeat-module-redis,Redis>>
   * <<metricbeat-module-system,System>>
-  * <<metricbeat-module-zookeeper,Zookeeper>>
+  * <<metricbeat-module-zookeeper,ZooKeeper>>
 
 --
 
 include::modules/apache.asciidoc[]
+include::modules/mongodb.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nginx.asciidoc[]
 include::modules/redis.asciidoc[]

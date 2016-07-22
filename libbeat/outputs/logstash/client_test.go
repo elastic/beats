@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/urso/go-lumber/server/v2"
+	"github.com/elastic/go-lumber/server/v2"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -186,10 +186,6 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 
 		// read batch + never ACK in order to enforce timeout
 		server.Receive()
-
-		// close client
-		for transp.IsConnected() {
-		}
 	}
 
 	client.Stop()

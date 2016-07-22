@@ -1,0 +1,22 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "redis",
+        "name": "keyspace",
+        "rtt": 115
+    },
+    "redis": {
+        "keyspace": {
+            "avg_ttl": 0,
+            "expires": 0,
+            "id": "db0",
+            "keys": 1
+        }
+    },
+    "type": "metricsets"
+}

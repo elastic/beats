@@ -2,9 +2,9 @@
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).
 
 [[configuration-winlogbeat-options]]
-=== Winlogbeat
+=== Winlogbeat Configuration
 
-The `winlogbeat` section specifies all options that are specific to Winlogbeat.
+The `winlogbeat` section of the +{beatname_lc}.yml+ config file specifies all options that are specific to Winlogbeat.
 Most importantly, it contains the list of event logs to monitor.
 
 Here is a sample configuration:
@@ -20,7 +20,7 @@ winlogbeat.event_logs:
 
 ==== Winlogbeat Options
 
-You can specify the following options in the `winlogbeat` section:
+You can specify the following options in the `winlogbeat` section of the +{beatname_lc}.yml+ config file:
 
 ===== registry_file
 
@@ -121,6 +121,19 @@ winlogbeat.event_logs:
   - name: Application
     ignore_older: 168h
 --------------------------------------------------------------------------------
+
+===== event_logs.forwarded
+
+A boolean flag to indicate that the log contains only events collected from
+remote hosts using the Windows Event Collector. The value defaults to true for
+the ForwardedEvents log and false for any other log. *{vista_and_newer}*
+
+This settings allows Winlogbeat to optimize reads for forwarded events that are
+already rendered. When the value is true Winlogbeat does not attempt to render
+the event using message files from the host computer. The Windows Event
+Collector subscription should be configured to use the "RenderedText" format
+(this is the default) to ensure that the events are distributed with messages
+and descriptions.
 
 ===== event_logs.event_id
 
@@ -228,7 +241,7 @@ winlogbeat.event_logs:
 A list of tags that the Beat includes in the `tags` field of each published
 event. Tags make it easy to select specific events in Kibana or apply
 conditional filtering in Logstash. These tags will be appended to the list of
-tags specified in the `shipper` configuration.
+tags specified in the general configuration.
 
 Example:
 
@@ -248,7 +261,7 @@ data. Fields can be scalar values, arrays, dictionaries, or any nested
 combination of these. By default, the fields that you specify here will be
 grouped under a `fields` sub-dictionary in the output document. To store the
 custom fields as top-level fields, set the `fields_under_root` option to true.
-If a duplicate field is declared in the `shipper` configuration, then its value
+If a duplicate field is declared in the general configuration, then its value
 will be overwritten by the value declared here.
 
 [source,yaml]
@@ -290,14 +303,12 @@ The metrics are served as a JSON document. The metrics include:
 - total number of successfully published events
 - uptime
 
-include::../../../../libbeat/docs/outputconfig.asciidoc[]
+include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/shipperconfig.asciidoc[]
+include::../../../../libbeat/docs/processors-config.asciidoc[]
+
+include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
-
-include::../../../../libbeat/docs/runconfig.asciidoc[]
-
-include::../../../../libbeat/docs/filteringconfig.asciidoc[]

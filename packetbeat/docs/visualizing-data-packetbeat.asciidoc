@@ -1,10 +1,14 @@
 [[visualizing-data-packetbeat]]
-== Visualizing Packetbeat Data in Kibana
+= Visualizing Packetbeat Data in Kibana
 
+[partintro]
+--
 Before trying to visualize Packetbeat data in Kibana, we recommend that you load the sample dashboards {libbeat}/visualizing-data.html[described here]. Then read the topics in this
 section to learn how to work with Packetbeat data in Kibana. 
 
-=== Customizing the Discover Page
+--
+
+== Customizing the Discover Page
 
 To make it easier for you to search and discover Packetbeat data in Kibana, the sample dashboards contain
 predefined searches.

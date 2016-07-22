@@ -16,13 +16,14 @@ env:
   matrix:
     - TARGETS="check"
     - TARGETS="-C libbeat testsuite"
-    - TARGETS="-C topbeat testsuite"
     - TARGETS="-C filebeat testsuite"
     - TARGETS="-C packetbeat testsuite"
     - TARGETS="-C metricbeat testsuite"
     - TARGETS="-C libbeat crosscompile"
     - TARGETS="-C metricbeat crosscompile"
     - TARGETS="-C winlogbeat crosscompile"
+    - TARGETS="-C generate/metricbeat/metricset test"
+    - TARGETS="-C generate/beat test"
   global:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
@@ -44,6 +45,10 @@ matrix:
       env: TARGETS="-C libbeat testsuite"
     - os: osx
       env: TARGETS="-C metricbeat testsuite"
+    - os: osx
+      env: TARGETS="-C generate/metricbeat/metricset test"
+    - os: osx
+      env: TARGETS="-C generate/beat test"
   fast_finish: true
   allow_failures:
     - env: TARGETS="-C libbeat crosscompile"
@@ -56,6 +61,11 @@ addons:
       - python-virtualenv
       - libpcap-dev
       - geoip-database
+
+before_script:
+  - wget https://github.com/Masterminds/glide/releases/download/0.10.2/glide-0.10.2-linux-386.tar.gz -O /tmp/glide.tar.gz
+  - tar -xvf /tmp/glide.tar.gz
+  - export PATH=$PATH:$PWD/linux-386
 
 before_install:
   # Update to most recent docker version
@@ -90,6 +100,5 @@ after_success:
   # Copy full.cov to coverage.txt because codecov.io requires this file
   - test -f filebeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f filebeat/build/coverage/full.cov
   - test -f packetbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f packetbeat/build/coverage/full.cov
-  - test -f topbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f topbeat/build/coverage/full.cov
   - test -f libbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f libbeat/build/coverage/full.cov
   - test -f metricbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f metricbeat/build/coverage/full.cov

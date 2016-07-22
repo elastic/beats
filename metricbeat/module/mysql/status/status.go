@@ -6,13 +6,6 @@ http://dev.mysql.com/doc/refman/5.7/en/show-status.html
 */
 package status
 
-/*
-TODO @ruflin, 20160315
- * Complete fields read
- * Complete template
- * Complete dashboards
-*/
-
 import (
 	"database/sql"
 

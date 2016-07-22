@@ -6,8 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"bytes"
-	"io/ioutil"
 	"path/filepath"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -19,9 +17,7 @@ func TestClientConnect(t *testing.T) {
 
 	client := GetTestingElasticsearch()
 	err := client.Connect(5 * time.Second)
-
-	assert.Nil(t, err)
-	assert.True(t, client.IsConnected())
+	assert.NoError(t, err)
 }
 
 func TestCheckTemplate(t *testing.T) {
@@ -42,8 +38,7 @@ func TestLoadTemplate(t *testing.T) {
 	assert.Nil(t, err)
 
 	templatePath := absPath + "/template.json"
-	content, err := ioutil.ReadFile(templatePath)
-	reader := bytes.NewReader(content)
+	content, err := readTemplate(templatePath)
 	assert.Nil(t, err)
 
 	// Setup ES
@@ -54,7 +49,7 @@ func TestLoadTemplate(t *testing.T) {
 	templateName := "testbeat"
 
 	// Load template
-	err = client.LoadTemplate(templateName, reader)
+	err = client.LoadTemplate(templateName, content)
 	assert.Nil(t, err)
 
 	// Make sure template was loaded
@@ -71,7 +66,9 @@ func TestLoadTemplate(t *testing.T) {
 func TestLoadInvalidTemplate(t *testing.T) {
 
 	// Invalid Template
-	reader := bytes.NewReader([]byte("{json:invalid}"))
+	template := map[string]interface{}{
+		"json": "invalid",
+	}
 
 	// Setup ES
 	client := GetTestingElasticsearch()
@@ -81,7 +78,7 @@ func TestLoadInvalidTemplate(t *testing.T) {
 	templateName := "invalidtemplate"
 
 	// Try to load invalid template
-	err = client.LoadTemplate(templateName, reader)
+	err = client.LoadTemplate(templateName, template)
 	assert.Error(t, err)
 
 	// Make sure template was not loaded
@@ -92,7 +89,6 @@ func TestLoadInvalidTemplate(t *testing.T) {
 func TestLoadBeatsTemplate(t *testing.T) {
 
 	beats := []string{
-		"topbeat",
 		"filebeat",
 		"packetbeat",
 		"metricbeat",
@@ -106,8 +102,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		assert.Nil(t, err)
 
 		templatePath := absPath + "/" + beat + ".template.json"
-		content, err := ioutil.ReadFile(templatePath)
-		reader := bytes.NewReader(content)
+		content, err := readTemplate(templatePath)
 		assert.Nil(t, err)
 
 		// Setup ES
@@ -118,7 +113,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		templateName := beat
 
 		// Load template
-		err = client.LoadTemplate(templateName, reader)
+		err = client.LoadTemplate(templateName, content)
 		assert.Nil(t, err)
 
 		// Make sure template was loaded
@@ -148,15 +143,16 @@ func TestOutputLoadTemplate(t *testing.T) {
 	// Make sure template is not yet there
 	assert.False(t, client.CheckTemplate("libbeat"))
 
-	tPath, err := filepath.Abs("../../../topbeat/topbeat.template.json")
+	tPath, err := filepath.Abs("../../../packetbeat/packetbeat.template.json")
 	if err != nil {
 		t.Fatal(err)
 	}
 	config := map[string]interface{}{
 		"hosts": GetEsHost(),
 		"template": map[string]interface{}{
-			"name": "libbeat",
-			"path": tPath,
+			"name":                "libbeat",
+			"path":                tPath,
+			"versions.2x.enabled": false,
 		},
 	}
 
@@ -165,7 +161,7 @@ func TestOutputLoadTemplate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	output, err := New(cfg, 0)
+	output, err := New("libbeat", cfg, 0)
 	if err != nil {
 		t.Fatal(err)
 	}

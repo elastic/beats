@@ -11,15 +11,15 @@ This module periodically fetches metrics from https://nginx.org/[Nginx] servers.
 [float]
 === Compatibility
 
-The nginx MetricSets were tested with nginx 1.9 and are expected to work with all version
+The Nginx metricsets were tested with Nginx 1.9 and are expected to work with all version
 >= 1.9.
 
 
 [float]
 === Example Configuration
 
-The Nginx Status module supports the standard configuration options which can be found
-here (add link). Below is an example of a configuration option:
+The Nginx module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
 ----
@@ -30,13 +30,13 @@ metricbeat.modules:
   period: 10s
 
   # Nginx hosts
-  hosts: ["http://127.0.0.1/"]
+  hosts: ["http://127.0.0.1"]
 ----
 
 [float]
-=== MetricSets
+=== Metricsets
 
-The following MetricSets are available:
+The following metricsets are available:
 
 * <<metricbeat-metricset-nginx-stubstatus,stubstatus>>
 

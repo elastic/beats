@@ -10,7 +10,7 @@
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
-#---------------------------- System Status Module ---------------------------
+#------------------------------- System Module -------------------------------
 - module: system
   metricsets:
     # CPU stats
@@ -70,14 +70,10 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Template name. By default the template name is metricbeat.
-  template.name: "metricbeat"
-
-  # Path to template file
-  template.path: "metricbeat.template.json"
-
-  # Overwrite existing template
-  template.overwrite: false
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
@@ -99,3 +95,8 @@ output.elasticsearch:
 # Sets log level. The default log level is error.
 # Available log levels are: critical, error, warning, info, debug
 #logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]

@@ -1,4 +1,4 @@
-# Humane Units
+# Humane Units [![Build Status](https://travis-ci.org/dustin/go-humanize.svg?branch=master)](https://travis-ci.org/dustin/go-humanize) [![GoDoc](https://godoc.org/github.com/dustin/go-humanize?status.svg)](https://godoc.org/github.com/dustin/go-humanize)
 
 Just a few functions for helping humanize times and sizes.
 

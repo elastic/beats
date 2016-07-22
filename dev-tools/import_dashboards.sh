@@ -122,7 +122,7 @@ if [ -f ${BEAT_CONFIG} ]; then
 fi
 # Failsafe
 if [ -z ${SED_STRING} ]; then
-  SED_STRING="s/packetbeat-/packetbeat-/g;s/filebeat-/filebeat-/g;s/topbeat-/topbeat-/g;s/winlogonbeat-/winlogonbeat-/g"
+  SED_STRING="s/packetbeat-/packetbeat-/g;s/filebeat-/filebeat-/g;s/metricbeat-/metricbeat-/g;s/winlogonbeat-/winlogonbeat-/g"
 fi
 
 if [ -d /tmp ]; then

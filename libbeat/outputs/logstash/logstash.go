@@ -4,9 +4,10 @@ package logstash
 // registered with all output plugins
 
 import (
+	"expvar"
 	"time"
 
-	"github.com/urso/go-lumber/log"
+	"github.com/elastic/go-lumber/log"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
@@ -18,6 +19,18 @@ import (
 )
 
 var debug = logp.MakeDebug("logstash")
+
+// Metrics that can retrieved through the expvar web interface.
+var (
+	ackedEvents            = expvar.NewInt("libbeat.logstash.published_and_acked_events")
+	eventsNotAcked         = expvar.NewInt("libbeat.logstash.published_but_not_acked_events")
+	publishEventsCallCount = expvar.NewInt("libbeat.logstash.call_count.PublishEvents")
+
+	statReadBytes   = expvar.NewInt("libbeat.logstash.publish.read_bytes")
+	statWriteBytes  = expvar.NewInt("libbeat.logstash.publish.write_bytes")
+	statReadErrors  = expvar.NewInt("libbeat.logstash.publish.read_errors")
+	statWriteErrors = expvar.NewInt("libbeat.logstash.publish.write_errors")
+)
 
 const (
 	defaultWaitRetry = 1 * time.Second
@@ -33,7 +46,7 @@ func init() {
 	outputs.RegisterOutputPlugin("logstash", new)
 }
 
-func new(cfg *common.Config, _ int) (outputs.Outputer, error) {
+func new(beatName string, cfg *common.Config, _ int) (outputs.Outputer, error) {
 	output := &logstash{}
 	if err := output.init(cfg); err != nil {
 		return nil, err
@@ -67,6 +80,12 @@ func (lj *logstash) init(cfg *common.Config) error {
 		Timeout: config.Timeout,
 		Proxy:   &config.Proxy,
 		TLS:     tls,
+		Stats: &transport.IOStats{
+			Read:        statReadBytes,
+			Write:       statWriteBytes,
+			ReadErrors:  statReadErrors,
+			WriteErrors: statWriteErrors,
+		},
 	}
 
 	logp.Info("Max Retries set to: %v", sendRetries)

@@ -12,7 +12,7 @@ import (
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	publishedEvents = expvar.NewInt("libbeatPublishedEvents")
+	publishedEvents = expvar.NewInt("libbeat.publisher.published_events")
 )
 
 var (
@@ -62,12 +62,12 @@ type Client interface {
 type client struct {
 	canceler *op.Canceler
 
-	publisher           *Publisher
+	publisher           *BeatPublisher
 	beatMeta            common.MapStr        // Beat metadata that is added to all events.
 	globalEventMetadata common.EventMetadata // Fields and tags that are added to all events.
 }
 
-func newClient(pub *Publisher) *client {
+func newClient(pub *BeatPublisher) *client {
 	c := &client{
 		canceler: op.NewCanceler(),
 
@@ -82,6 +82,10 @@ func newClient(pub *Publisher) *client {
 }
 
 func (c *client) Close() error {
+	if c == nil {
+		return nil
+	}
+
 	c.canceler.Cancel()
 
 	// atomic decrement clients counter
@@ -165,8 +169,8 @@ func (c *client) filterEvent(event common.MapStr) *common.MapStr {
 
 	}
 
-	// filter the event by applying the configured rules
-	publishEvent := c.publisher.Filters.Filter(event)
+	// process the event by applying the configured actions
+	publishEvent := c.publisher.Processors.Run(event)
 	if publishEvent == nil {
 		// the event is dropped
 		logp.Debug("publish", "Drop event %s", event.StringToPrint())

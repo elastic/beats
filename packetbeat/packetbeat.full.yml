@@ -14,19 +14,19 @@
 packetbeat.interfaces.device: any
 
 # Packetbeat supports three sniffer types:
-# * pcap, which uses the libpcap library and works on most platforms, but it’s
+# * pcap, which uses the libpcap library and works on most platforms, but it's
 # not the fastest option.
 # * af_packet, which uses memory-mapped sniffing. This option is faster than
-# libpcap and doesn’t require a kernel module, but it’s Linux-specific.
+# libpcap and doesn't require a kernel module, but it's Linux-specific.
 # * pf_ring, which makes use of an ntop.org project. This setting provides the
-# best sniffing speed, but it requires a kernel module, and it’s Linux-specific.
+# best sniffing speed, but it requires a kernel module, and it's Linux-specific.
 # The default sniffer type is pcap.
 #packetbeat.interfaces.type: pcap
 
 # The maximum size of the packets to capture. The default is 65535, which is
 # large enough for almost all networks and interface types. If you sniff on a
 # physical network interface, the optimal setting is the MTU size. On virtual
-# interfaces, however, it’s safer to accept the default value.
+# interfaces, however, it's safer to accept the default value.
 #packetbeat.interfaces.snaplen: 65535
 
 # The maximum size of the shared memory buffer to use between the kernel and
@@ -45,20 +45,27 @@ packetbeat.interfaces.device: any
 
 #================================== Flows =====================================
 
-# Set network flow timeout. Flow is killed if no packet is received before being
-# timed out.
-packetbeat.flows.timeout: 30s
+packetbeat.flows:
+  # Enable Network flows. Default: true
+  #enabled: true
 
-# Configure reporting period. If set to -1, only killed flows will be reported
-packetbeat.flows.period: 10s
+  # Set network flow timeout. Flow is killed if no packet is received before being
+  # timed out.
+  timeout: 30s
+
+  # Configure reporting period. If set to -1, only killed flows will be reported
+  period: 10s
 
 #========================== Transaction protocols =============================
 
 packetbeat.protocols.icmp:
-  # Enable ICMPv4 and ICMPv6 monitoring. Default: false
-  enabled: true
+  # Enable ICMPv4 and ICMPv6 monitoring. Default: true
+  #enabled: true
 
 packetbeat.protocols.amqp:
+  # Enable AMQP monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for AMQP traffic. You can disable
   # the AMQP protocol by commenting out the list of ports.
   ports: [5672]
@@ -93,6 +100,9 @@ packetbeat.protocols.amqp:
   #transaction_timeout: 10s
 
 packetbeat.protocols.dns:
+  # Enable DNS monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for DNS traffic. You can disable
   # the DNS protocol by commenting out the list of ports.
   ports: [53]
@@ -120,6 +130,9 @@ packetbeat.protocols.dns:
   #transaction_timeout: 10s
 
 packetbeat.protocols.http:
+  # Enable HTTP monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for HTTP traffic. You can disable
   # the HTTP protocol by commenting out the list of ports.
   ports: [80, 8080, 8000, 5000, 8002]
@@ -166,6 +179,9 @@ packetbeat.protocols.http:
   #transaction_timeout: 10s
 
 packetbeat.protocols.memcache:
+  # Enable memcache monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for memcache traffic. You can disable
   # the Memcache protocol by commenting out the list of ports.
   ports: [11211]
@@ -212,6 +228,9 @@ packetbeat.protocols.memcache:
   #transaction_timeout: 10s
 
 packetbeat.protocols.mysql:
+  # Enable mysql monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for MySQL traffic. You can disable
   # the MySQL protocol by commenting out the list of ports.
   ports: [3306]
@@ -229,6 +248,9 @@ packetbeat.protocols.mysql:
   #transaction_timeout: 10s
 
 packetbeat.protocols.pgsql:
+  # Enable pgsql monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for Pgsql traffic. You can disable
   # the Pgsql protocol by commenting out the list of ports.
   ports: [5432]
@@ -246,6 +268,9 @@ packetbeat.protocols.pgsql:
   #transaction_timeout: 10s
 
 packetbeat.protocols.redis:
+  # Enable redis monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for Redis traffic. You can disable
   # the Redis protocol by commenting out the list of ports.
   ports: [6379]
@@ -263,6 +288,9 @@ packetbeat.protocols.redis:
   #transaction_timeout: 10s
 
 packetbeat.protocols.thrift:
+  # Enable thrift monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for Thrift-RPC traffic. You can disable
   # the Thrift-RPC protocol by commenting out the list of ports.
   ports: [9090]
@@ -315,6 +343,9 @@ packetbeat.protocols.thrift:
   #transaction_timeout: 10s
 
 packetbeat.protocols.mongodb:
+  # Enable mongodb monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for MongoDB traffic. You can disable
   # the MongoDB protocol by commenting out the list of ports.
   ports: [27017]
@@ -342,6 +373,9 @@ packetbeat.protocols.mongodb:
   #transaction_timeout: 10s
 
 packetbeat.protocols.nfs:
+  # Enable NFS monitoring. Default: true
+  #enabled: true
+
   # Configure the ports where to listen for NFS traffic. You can disable
   # the NFS protocol by commenting out the list of ports.
   ports: [2049]
@@ -417,7 +451,9 @@ packetbeat.protocols.nfs:
 
 # Expiration time (in seconds) of the IPs published by a shipper to the topology map.
 # All the IPs will be deleted afterwards. Note, that the value must be higher than
-# refresh_topology_freq. The default is 15 seconds.
+# refresh_topology_freq. This setting is used only by the Redis output. The other
+# outputs don't support expiring entries.
+# The default is 15 seconds.
 #topology_expire: 15
 
 # Internal queue size for single events in processing pipeline
@@ -427,20 +463,21 @@ packetbeat.protocols.nfs:
 # default is the number of logical CPUs available in the system.
 #max_procs:
 
-#================================ Filters =====================================
+#================================ Processors =====================================
 
-# This section defines a list of filtering rules that are applied one by one
-# starting with the exported event:
+# Processors are used to reduce the number of fields in the exported event or to 
+# enhance the event with external meta data. This section defines a list of processors 
+# that are applied one by one and the first one receives the initial event:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# Supported actions: drop_fields, drop_event, include_fields
+# Supported processors: drop_fields, drop_event, include_fields
 #
-# For example, the following filter configuration uses multiple actions to keep
+# For example, you can use the following processors to keep
 # the fields that contain CPU load percentages, but remove the fields that
 # contain CPU ticks values:
 #
-#filters:
+#processors:
 #- include_fields:
 #    fields: ["cpu"]
 #- drop_fields:
@@ -448,10 +485,11 @@ packetbeat.protocols.nfs:
 #
 # The following example drops the events that have the HTTP response code 200:
 #
-#filters:
+#processors:
 #- drop_event:
-#    equals:
-#       http.code: 200
+#    when:
+#       equals:
+#           http.code: 200
 #
 
 #================================ Outputs =====================================
@@ -461,16 +499,22 @@ packetbeat.protocols.nfs:
 
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
 
+  # Set gzip compression level.
+  #compression_level: 0
+
   # Optional protocol and basic auth credentials.
   #protocol: "https"
-  #username: "admin"
-  #password: "s3cr3t"
+  #username: "elastic"
+  #password: "changeme"
 
   # Dictionary of HTTP parameters to pass within the url with index operations.
   #parameters:
@@ -511,22 +555,30 @@ output.elasticsearch:
   # false. This option makes sense only for Packetbeat.
   #save_topology: false
 
-  # The time to live in seconds for the topology information that is stored in
-  # Elasticsearch. The default is 15 seconds.
-  #topology_expire: 15
-
   # A template is used to set the mapping in Elasticsearch
   # By default template loading is enabled and the template is loaded.
-  # These settings can be adjusted to load your own template or overwrite existing ones
+  # These settings can be adjusted to load your own template or overwrite existing ones.
+
+  # Set to false to disable template loading.
+  #template.enabled: true
 
   # Template name. By default the template name is packetbeat.
-  template.name: "packetbeat"
+  #template.name: "packetbeat"
 
   # Path to template file
-  template.path: "packetbeat.template.json"
+  #template.path: "${path.config}/packetbeat.template.json"
 
   # Overwrite existing template
-  template.overwrite: false
+  #template.overwrite: false
+
+  # If set to true, packetbeat checks the Elasticsearch version at connect time, and if it
+  # is 2.x, it loads the file specified by the template.versions.2x.path setting. The 
+  # default is true.
+  #template.versions.2x.enabled: true
+
+  # Path to the Elasticsearch 2.x version of the template file.
+  #template.versions.2x.path: "${path.config}/packetbeat.template-es2x.json"
+
 
   # TLS configuration. By default is off.
   # List of root certificates for HTTPS server verifications
@@ -559,6 +611,9 @@ output.elasticsearch:
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # The Logstash hosts
   #hosts: ["localhost:5044"]
 
@@ -609,6 +664,9 @@ output.elasticsearch:
 
 #------------------------------- Kafka output ---------------------------------
 #output.kafka:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # The list of Kafka broker addresses from where to fetch the cluster metadata.
   # The cluster metadata contain the actual Kafka brokers events are published
   # to.
@@ -657,7 +715,7 @@ output.elasticsearch:
 
   # The maximum permitted size of JSON-encoded messages. Bigger messages will be
   # dropped. The default value is 1000000 (bytes). This value should be equal to
-  # or less than the broker’s message.max.bytes.
+  # or less than the broker's message.max.bytes.
   #max_message_bytes: 1000000
 
   # The ACK reliability level required from broker. 0=no response, 1=wait for
@@ -697,6 +755,9 @@ output.elasticsearch:
 
 #------------------------------- Redis output ---------------------------------
 #output.redis:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # The list of Redis servers to connect to. If load balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
@@ -793,6 +854,9 @@ output.elasticsearch:
 
 #------------------------------- File output ----------------------------------
 #output.file:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # Path to the directory where to save the generated files. The option is
   # mandatory.
   #path: "/tmp/packetbeat"
@@ -814,6 +878,9 @@ output.elasticsearch:
 
 #----------------------------- Console output ---------------------------------
 #output.console:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # Pretty print json event
   #pretty: false
 
@@ -830,18 +897,18 @@ output.elasticsearch:
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
-#path.config:
+#path.config: ${path.home}
 
 # The data path for the packetbeat installation. This is the default base path
 # for all the files in which packetbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
-#path.data:
+#path.data: ${path.home}/data
 
 # The logs path for a packetbeat installation. This is the default location for
-# the Beat’s log files. If not set by a CLI flag or in the configuration file,
+# the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
-#path.logs:
+#path.logs: ${path.home}/logs
 
 #================================ Logging =====================================
 # There are three options for the log output: syslog, file, stderr.
@@ -853,12 +920,20 @@ output.elasticsearch:
 #logging.level: error
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are beat, publish, service
+# Other available selectors are "beat", "publish", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: true
+
+# If enabled, packetbeat periodically logs its internal metrics that have changed
+# in the last period. For each metric that changed, the delta from the value at
+# the beginning of the period is logged. The default is true.
+#logging.metrics.enabled: true
+
+# The period after which to log the internal metrics. The default is 30s.
+#logging.metrics.period: 30s
 
 # Logging to rotating files files. Set logging.to_files to false to disable logging to
 # files.

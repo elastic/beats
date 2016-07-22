@@ -14,11 +14,12 @@ func init() {
 }
 
 type fileOutput struct {
-	rotator logp.FileRotator
+	beatName string
+	rotator  logp.FileRotator
 }
 
 // New instantiates a new file output instance.
-func New(cfg *common.Config, _ int) (outputs.Outputer, error) {
+func New(beatName string, cfg *common.Config, _ int) (outputs.Outputer, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -28,7 +29,7 @@ func New(cfg *common.Config, _ int) (outputs.Outputer, error) {
 	cfg.SetInt("flush_interval", -1, -1)
 	cfg.SetInt("bulk_max_size", -1, -1)
 
-	output := &fileOutput{}
+	output := &fileOutput{beatName: beatName}
 	if err := output.init(config); err != nil {
 		return nil, err
 	}
@@ -39,7 +40,7 @@ func (out *fileOutput) init(config config) error {
 	out.rotator.Path = config.Path
 	out.rotator.Name = config.Filename
 	if out.rotator.Name == "" {
-		out.rotator.Name = config.Index
+		out.rotator.Name = out.beatName
 	}
 	logp.Info("File output path set to: %v", out.rotator.Path)
 	logp.Info("File output base filename set to: %v", out.rotator.Name)

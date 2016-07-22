@@ -7,7 +7,8 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	h "github.com/elastic/beats/metricbeat/helper"
+	s "github.com/elastic/beats/metricbeat/schema"
+	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
 )
 
 var (
@@ -15,6 +16,42 @@ var (
 
 	// This should match: "CPUSystem: .01"
 	matchNumber = regexp.MustCompile("(^[0-9a-zA-Z ]+):\\s+(\\d*\\.?\\d+)")
+
+	schema = s.Schema{
+		"total_accesses":    c.Int("Total Accesses"),
+		"total_kbytes":      c.Int("Total kBytes"),
+		"requests_per_sec":  c.Float("ReqPerSec", s.Optional),
+		"bytes_per_sec":     c.Float("BytesPerSec", s.Optional),
+		"bytes_per_request": c.Float("BytesPerReq", s.Optional),
+		"workers": s.Object{
+			"busy": c.Int("BusyWorkers"),
+			"idle": c.Int("IdleWorkers"),
+		},
+		"uptime": s.Object{
+			"server_uptime": c.Int("ServerUptimeSeconds"),
+			"uptime":        c.Int("Uptime"),
+		},
+		"cpu": s.Object{
+			"load":            c.Float("CPULoad", s.Optional),
+			"user":            c.Float("CPUUser"),
+			"system":          c.Float("CPUSystem"),
+			"children_user":   c.Float("CPUChildrenUser"),
+			"children_system": c.Float("CPUChildrenSystem"),
+		},
+		"connections": s.Object{
+			"total": c.Int("ConnsTotal"),
+			"async": s.Object{
+				"writing":    c.Int("ConnsAsyncWriting"),
+				"keep_alive": c.Int("ConnsAsyncKeepAlive"),
+				"closing":    c.Int("ConnsAsyncClosing"),
+			},
+		},
+		"load": s.Object{
+			"1":  c.Float("Load1"),
+			"5":  c.Float("Load5"),
+			"15": c.Float("Load15"),
+		},
+	}
 )
 
 // Map body to MapStr
@@ -34,7 +71,7 @@ func eventMapping(body io.ReadCloser, hostname string) common.MapStr {
 		totalAll        int
 	)
 
-	fullEvent := map[string]string{}
+	fullEvent := map[string]interface{}{}
 	scanner := bufio.NewScanner(body)
 
 	// Iterate through all events to gather data
@@ -89,40 +126,7 @@ func eventMapping(body io.ReadCloser, hostname string) common.MapStr {
 	}
 
 	event := common.MapStr{
-		"hostname":          hostname,
-		"total_accesses":    h.ToInt("Total Accesses", fullEvent),
-		"total_kbytes":      h.ToInt("Total kBytes", fullEvent),
-		"requests_per_sec":  h.ToFloat("ReqPerSec", fullEvent),
-		"bytes_per_sec":     h.ToFloat("BytesPerSec", fullEvent),
-		"bytes_per_request": h.ToFloat("BytesPerReq", fullEvent),
-		"workers": common.MapStr{
-			"busy": h.ToInt("BusyWorkers", fullEvent),
-			"idle": h.ToInt("IdleWorkers", fullEvent),
-		},
-		"uptime": common.MapStr{
-			"server_uptime": h.ToInt("ServerUptimeSeconds", fullEvent),
-			"uptime":        h.ToInt("Uptime", fullEvent),
-		},
-		"cpu": common.MapStr{
-			"load":            h.ToFloat("CPULoad", fullEvent),
-			"user":            h.ToFloat("CPUUser", fullEvent),
-			"system":          h.ToFloat("CPUSystem", fullEvent),
-			"children_user":   h.ToFloat("CPUChildrenUser", fullEvent),
-			"children_system": h.ToFloat("CPUChildrenSystem", fullEvent),
-		},
-		"connections": common.MapStr{
-			"total": h.ToInt("ConnsTotal", fullEvent),
-			"async": common.MapStr{
-				"writing":    h.ToInt("ConnsAsyncWriting", fullEvent),
-				"keep_alive": h.ToInt("ConnsAsyncKeepAlive", fullEvent),
-				"closing":    h.ToInt("ConnsAsyncClosing", fullEvent),
-			},
-		},
-		"load": common.MapStr{
-			"1":  h.ToFloat("Load1", fullEvent),
-			"5":  h.ToFloat("Load5", fullEvent),
-			"15": h.ToFloat("Load15", fullEvent),
-		},
+		"hostname": hostname,
 		"scoreboard": common.MapStr{
 			"starting_up":            totalS,
 			"reading_request":        totalR,
@@ -138,6 +142,7 @@ func eventMapping(body io.ReadCloser, hostname string) common.MapStr {
 			"total":                  totalAll,
 		},
 	}
+	schema.ApplyTo(event, fullEvent)
 
 	return event
 }

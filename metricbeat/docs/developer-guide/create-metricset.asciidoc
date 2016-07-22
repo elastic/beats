@@ -1,250 +1,280 @@
-== Create a Metricset for a Metricbeat Module
+[[creating-metricsets]]
+== Creating a Metricset
 
-A Metricset is the part of a metricbeat module that fetches and structures the
-data from the remote service. Each module can have multiple metricsets.
+A metricset is the part of a Metricbeat module that fetches and structures the
+data from the remote service. Each module can have multiple metricsets. In this guide, you learn how to create your own metricset. If you want to create
+your own Beat that uses Metricbeat as a library, see <<creating-beat-from-metricbeat>>.
 
-This guide should help you to create your own metricset. This assumes you have
-an existing metricbeat Module where you want to add one more metricset.
+When creating a metricset for the first time, it generally helps to look at the
+implementation of existing metricsets for inspiration.
 
-== Create the basic metricset
+To create a new metricset:
 
-To get started with a new metricset, you must first decide for a name of your
-metricset. This name can only contain lower case letters oder underline. In the
-examples below, you have to replace \{metricset-name} with the name you decided
-for.
-
-The first step is to create the Go file needed for your metricset code.
-Create this file under:
-
+. Run the following command inside your beat directory:
++
+[source,bash]
 ----
-module/{module-name}/{metricset-name}/{metricset-name}.go
+make create-metricset
+----
++
+You'll be prompted to enter a module and metricset name. Only use characters `[a-z]` 
+and, if required, underscores (`_`). No other characters are allowed.
++
+When you run `make create-metricset`, it creates all the basic files for your metricset, along with the required module
+files if the module does not already exist. See <<creating-metricbeat-module>> for more details about the module files.
++
+NOTE: We use `{metricset}`, `{module}`, and `{beat}` in this guide as placeholders. You need to replace these with
+the actual names of your metricset, module, and beat. 
++
+The metricset that you created is already a functioning metricset and can be compiled. 
++
+. Compile your new metricset by running the following command:
++
+[source,bash]
+----
+make collect
+make
+----
++
+The first command, `make collect`, updates all generated files with the most recent files, data, and meta information from the metricset. The second command,
+`make`, compiles your source code and provides you with a binary called `{beat}` in the beat folder. You can run the
+binary in debug mode with the following command:
++
+[source,bash]
+----
+./{beat} -e -d "*"
 ----
 
-Replace \{module-name} with the name of the module you are extending.
+After running the make commands, you'll find the metricset, along with its generated files, under `module/{module}/{metricset}`. This directory
+contains the following files:
 
-The following is a basic example of a metricset. Again you have to replace
-\{module-name} and \{metricset-name}. We will discuss in the following all parts
-of this example in detail.
+* `\{metricset}.go`
+* `_meta/docs.asciidoc`
+* `_meta/data.json`
+* `_meta/fields.yml`
 
-Each metricseter consists 3 parts:
+Let's look at the files in more detail next.
 
-* Registration of metricseter
-* MetricSeter Type definition and setup
-* MetricSeter Interface method
+[float]
+=== \{metricset}.go File
+
+The first file is `{metricset}.go`. It contains the logic on how to fetch data from the service and convert it for sending to the output.
+
+The generated file looks like this:
 
 [source,go]
 ----
 include::../../scripts/module/metricset/metricset.go.tmpl[]
 ----
 
-This adds a working metricset do your module which reports the event
-`"hello": "world"`.
+The `package` clause and `import` declaration are part of the base structure of each Golang file. You should only
+modify this part of the file if your implementation requires more imports. 
 
-The first few lines of the metricset are to define the package name which is
-identical with the \{metricset-name}. In addition, the minimal required packages
-are imported. `common` contains the `MapStr` object which is used for the events
-and `helper` is required to register the metricset.
+[float]
+==== Initialisation
 
-[source,go]
-----
-package {metricset-name}
+The init method registers the metricset with the central registry. In Golang the `init()` function is called
+before the execution of all other code. This means the module will be automatically registered with the global registry.
 
-import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-)
-----
-
-Then we have the init function. This is called directly when metricbeat is
-started on all files before execution. This registers the metricset in a central
-registry with the given module and makes sure it is run later as expected.
+The `New` method, which is passed to `AddMetricSet`, will be called after the setup of the module and before starting to fetch data. You normally don't need to change this part of the file. 
 
 [source,go]
 ----
 func init() {
-	if err := helper.Registry.AddMetricSeter("{module-name}", "{metricset-name}", New); err != nil {
-        panic(err)
+	if err := mb.Registry.AddMetricSet("{module}", "{metricset}", New); err != nil {
+		panic(err)
 	}
 }
 ----
 
-The New function is used to created a new MetricSet object. The example below
-is an struct with the base metricset only, but the MetricSet can also be used to store local variables
-(state) of the MetricSet. This can be useful to store information between two
-calls. These variables must be defined as part of MetricSet and initiated in
-the `New` function. The `New` function is called when a module instantiates a
-module.
+[float]
+==== Definition
 
-The `New` method method must also be used to load specific local configuration variables (more on this here)
-or setting up connections to the hosts.
+The MetricSet type defines all fields of the metricset. As a minimum it must inherit the `mb.BaseMetricSet` fields,
+but can be extended with additional entries. These variables can be used to persist data or configuration between
+multiple fetch calls.
 
-[source,go]
-----
-// MetricSet for fetching metrics.
-type MetricSet struct {
-	mb.BaseMetricSet
-}
-
-// New is a mb.MetricSetFactory that returns a cpu.MetricSet.
-func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &MetricSet{base}, nil
-}
-----
-
-
-The `Fetch` method is the central part of the metricset. Fetch is called every
-time new data is retrieved. In case more then one host is defined, fetch is
-called for each host once. The frequency of calling fetch is based on the Period
-defined in the configuration.
-
-Fetch must return a `common.MapStr` object which is then sent to elasticsearch.
-In case an error happens, an error must be returned which is then sent instead
-to elasticsearch. That means metricbeat always sends an event, also on failure.
-It must made sure, that the error message helps to identify what the actual
-error is.
-
-[source,go]
-----
-func (m *MetricSet) Fetch() (common.MapStr, error) {
-	event := common.MapStr{"hello": "world"}
-	return event, nil
-}
-----
-
-There exist two flavors of the Fetch interface. In case your implementation returns multiple events
-per Fetch request, you can alternatively use the following Fetch method:
-
-[source,go]
-----
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-    events := []common.MapStr{}
-	events = append(events, common.MapStr{"hello": "world"})
-	return events, nil
-}
-----
-
-The second last step is updating `include/list.go` with an import for your
-metricset. This makes sure the metricset is compiled and registered. This import
-can also happen at an other place in your repo, you just must make sure this
-line is compiled.
-
-[source,go]
-----
-import (
-	_ "github.com/elastic/beats/metricbeat/module/{module-name}/{metricset-name}"
-)
-----
-
-To use the new metricset, it must be added to the configuration file `beat.yml`.
-
-[source,go]
-----
-metricbeat:
-  modules:
-    - module: {module-name}
-      metricsets: ["{metricset-name}"]
-----
-
-Now if your run `make collect` to update all files and `make` to compile the
-binary, you can start `./metricbeat -e -d "*"` and you should see your new
-metricset sending data.
-
-In general it helps before creating your own metricset, to have a look at the
-implementation of the existing metricsets as inspiration.
-
-== Add special configuration options
-
-Each metricset can have it's own configuration variables defined. To make use of
-these variables, the Setup method must be extended. Assuming `password` should
-be introduced in the metricset, the `beat.yml` would be first extended in the
-following way:
-
-[source,yaml]
-----
-metricbeat:
-  modules:
-    - module: {module-name}
-      metricsets: ["{metricset-name}"]
-      password: "test1234"
-----
-
-To read out the password config in the Setup method, the `ProcessConfig` method
-should be used. A config struct must be defined with the value types to be read.
-Second as the values of the struct, default values can be set if needed.
+You can add more fields to the MetricSet type, as you can see in the following example where the `username` and `password` string fields are added:
 
 [source,go]
 ----
 type MetricSet struct {
 	mb.BaseMetricSet
-	password string
+	username    string
+	password    string
 }
+----
+
+
+[float]
+==== Creation
+
+The `New` function creates a new instance of the MetricSet. The setup process
+of the MetricSet is also part of `New`. This method will be called before `Fetch`
+is called the first time.
+
+
+The `New` function also sets up the configuration by processing additional
+configuration entries, if needed.
+
+[source,go]
+----
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
-	// Unpack additional configuration options.
-	config := struct {
-		Password string `config:"password"`
-	}{
-		Password: "",
-	}
-	err := base.Module().UnpackConfig(&config)
-	if err != nil {
+	config := struct{}{}
+
+	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		password:      Password,
 	}, nil
 }
 ----
 
-== Connections to Services
+[float]
+==== Fetching
 
-As each time the Fetch method is called, it makes a request to the service, it
-is important to handle the connections correctly. It is recommended to setup the
-connections in the Setup methods and keep them in the MetricSeter object. Like
-this connections can be reused.
+The `Fetch` method is the central part of the metricset. `Fetch` is called every
+time new data is retrieved. If more than one host is defined, `Fetch` is
+called once for each host. The frequency of calling `Fetch` is based on the `period`
+defined in the configuration file.
 
-One very important thing is that connections must respect the timeout variable:
-`ms.Module.Timeout`. After the timeout a request must be ended and an error must
-be returned. If this does not happen, it can happen that multiple requests are
-queuing up and putting pressure on the service from the Metricbeat side which
-should not happen. By default the Timeout is set to Period, so one request gets
-ended when a new request is made.
+`Fetch` must return a `common.MapStr` object, which is then sent to Elasticsearch.
+If an error happens, the error must be returned and then is sent instead
+to Elasticsearch. This means that Metricbeat always sends an event, even on failure.
+You must make sure that the error message helps to identify the actual error.
 
-In case of a request must be ended or has an error, it should be make sure to
-return a good error message. This error message is also sent to Elasticesarch in
-index. This makes it possible to not only fetch metrics from the service, but
-also report potential problems / errors with the metricset.
+The following example shows a metricset `Fetch` method with a counter that is
+incremented for each `Fetch` call:
 
-== Data Transformation
+[source,go]
+----
+func (m *MetricSet) Fetch() (common.MapStr, error) {
 
-In case the data transformation that has to happen in the `Fetch` method is
-large, we recommend to create a second file called `data.go` in the same package
-which contains a function `eventMapping(...)`. This is not required but
-currently best practice. This keeps the functionality of the metricset separate
-from the data mapping part.
+	event := common.MapStr{
+		"counter": m.counter,
+	}
+	m.counter++
 
-== Dashboards
+	return event, nil
+}
+----
 
-Dashboards are an important part of each metricset. Data gets much more useful
-when visualized. To create dashboards for the metricset, follow the guide here
-(link to dashboard guide).
+`Fetch` must return a `common.MapStr`, which will be translated to the JSON content.
+The JSON output will be identical to the naming and structure you use in
+`common.MapStr`. For more details about `MapStr` and its functions, see the
+https://godoc.org/github.com/elastic/beats/libbeat/common#MapStr[MapStr API docs].
 
-== fields.yml
 
-Must be created
+[float]
+==== Multi Fetching
+Metricbeat has two different `Fetch` interfaces. One of the interfaces, which you saw in the
+previous example, fetches a single event. In some cases, every fetch returns a list of events.
+Instead of using an array inside a JSON document, we recommend that you create a list of events.
 
-* Creates the template
-* Creates the docs
-* How should this file be used -> generic guide?
-* Define all types in details
-* Link to common fields.yml guide
-* Note to add it in fields_base.yml
+For this kind of data, you can use the following `Fetch` interface:
 
-== Testing
+[source,go]
+----
+(m *MetricSet) Fetch() ([]common.MapStr, error)
+----
 
-It is important to also add tests to your metricset. To find out more about how
-to add tests for your metricset, follow the <<developerguide-testing,general
-testing guide>>.
+The only difference between this and the previous example is that the second example returns `[]common.MapStr`.
+Metricbeat will add the same timestamp to all the events in the list to make it possible to correlate the events.
+
+[float]
+==== Parsing and normalizing fields
+
+In Metricbeat we aim to normalize the metric names from all Metricsets to
+respect a common {libbeat}/event-conventions.html[set of conventions]. This
+makes it easy for users to find and interpret metrics. To simplify parsing,
+converting, renaming, and restructuring of the object read from the monitored
+system to the Metricbeat format, we have created the
+https://godoc.org/github.com/elastic/beats/metricbeat/schema[schema] package
+that allows to declaratively define transformations.
+
+For example, assuming this input object:
+
+[source,go]
+----
+input := map[string]interface{}{
+	"testString":     "hello",
+	"testInt":        "42",
+	"testBool":       "true",
+	"testFloat":      "42.1",
+	"testObjString":  "hello, object",
+}
+----
+
+And the requirement to transform it into this one:
+
+[source,go]
+----
+common.MapStr{
+	"test_string": "hello",
+	"test_int":    int64(42),
+	"test_bool":   true,
+	"test_float":  42.1,
+	"test_obj": common.MapStr{
+		"test_obj_string": "hello, object",
+	},
+}
+----
+
+You can use the following code to make the transformations:
+
+[source,go]
+----
+import (
+	s "github.com/elastic/beats/metricbeat/schema"
+	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
+)
+
+var (
+	schema = s.Schema{
+		"test_string": c.Str("testString"),
+		"test_int":    c.Int("testInt"),
+		"test_bool":   c.Bool("testBool"),
+		"test_float":  c.Float("testFloat"),
+		"test_obj": s.Object{
+			"test_obj_string": c.Str("testObjString"),
+		},
+	}
+)
+
+func eventMapping(input map[string]interface{}) common.MapStr {
+	return schema.Apply(input)
+}
+----
+
+In the above example, note that it is possible to create the schema object once
+but to apply to all events.
+
+[float]
+=== Configuration File
+The configuration file for a metricset is handled by the module. If there are 
+multiple metricsets in one module, make sure you add all metricsets to the configuration.
+For example:
+
+[source,go]
+----
+metricbeat:
+  modules:
+    - module: {module-name}
+      metricsets: ["{metricset1}", "{metricset2}"]
+----
+
+NOTE: Make sure that you run `make collect` after updating the config file
+so that your changes are also applied to the global configuration file and the docs.
+
+For more details about the configuration file, see <<configuration-metricbeat>>.
+
+
+[float]
+=== What to Do Next
+This topic provides basic steps for creating a metricset. For more details about metricsets
+and how to extend your metricset further, see <<metricset-details>>.
+

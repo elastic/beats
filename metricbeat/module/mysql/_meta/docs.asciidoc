@@ -1,0 +1,19 @@
+== MySQL Module
+
+This module periodically fetches metrics from https://www.mysql.com/[MySQL]
+servers.
+
+[float]
+=== Module-Specific Configuration Notes
+
+When configuring the `hosts` option, you must use a MySQL Data Source Name (DSN) of the
+following format:
+
+----
+[username[:password]@][protocol[(address)]]/
+----
+
+[float]
+=== Compatibility
+
+The mysql MetricSets were tested with mysql 5.7.12 and are expected to work with all versions >= 5.7.0.

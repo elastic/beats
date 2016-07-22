@@ -18,7 +18,6 @@ type mockClient struct {
 	publish      func([]common.MapStr) ([]common.MapStr, error)
 	asyncPublish func(func([]common.MapStr, error), []common.MapStr) error
 	close        func() error
-	connected    bool
 	connect      func(time.Duration) error
 }
 
@@ -34,10 +33,6 @@ func (c *mockClient) Connect(timeout time.Duration) error {
 
 func (c *mockClient) Close() error {
 	return c.close()
-}
-
-func (c *mockClient) IsConnected() bool {
-	return c.connected
 }
 
 func (c *mockClient) PublishEvents(events []common.MapStr) ([]common.MapStr, error) {

@@ -22,24 +22,22 @@ original Packetbeat authors.
 After you have https://golang.org/doc/install[installed Go] and set up the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
 your preferred workspace location, a simple way of getting the source code for 
-Beats, including Topbeat and libbeat, and compiling them at the same time is to do:
+Beats, including libbeat, and compiling them at the same time is to do:
 
 [source,shell]
 ----------------------------------------------------------------------
 go get github.com/elastic/beats
 ----------------------------------------------------------------------
 
-In this guide, we use working examples from the Topbeat source code in https://github.com/elastic/beats[GitHub]
-to demonstrate how to implement a Beat. Topbeat is similar to
-the `top` command line tool, but instead of printing the statistics to the screen,
-Topbeat periodically ships them to Elasticsearch for storage.
-
-You can use Topbeat as an example implementation for creating a new Beat. Just copy
+In this guide, we use working examples from the Testbeat source code in
+https://github.com/monicasarbu/testbeat[GitHub]
+to demonstrate how to implement a Beat. Just copy
 the source files and modify them as necessary for your Beat.
+
 
 === Overview
 
-At the high level, a simple Beat like Topbeat has two main components:
+At the high level, a simple Beat has two main components:
 
 * a component that collects the actual data, and
 * a publisher that sends the data to the specified output, such as Elasticsearch or
@@ -48,7 +46,7 @@ Logstash.
 The publisher is already implemented in libbeat, so you typically only have to worry about the logic
 specific to your Beat (the code that creates the event and sends it to the publisher).
 Libbeat also offers common services like configuration management, logging,
-daemonizing, and Windows service handling, and in the future, will offer data processing modules,
+daemonzing, and Windows service handling, and in the future, will offer data processing modules,
 such as filtering or sampling.
 
 image:./images/beat_overview.png[Beat overview architecture]
@@ -59,73 +57,169 @@ must contain a `@timestamp` field and a `type` field. Beyond
 that, events can contain any additional fields, and they can be created as often
 as necessary.
 
-The following example shows an event object in Topbeat:
+The following example shows an event object in Lsbeat:
 
 [source,json]
 ----------------------------------------------------------------------
 {
-  count":1,
-  "proc.cpu":{
-    "user":20,
-    "percent":0.983284169124877,
-    "system":0,
-    "total":20,
-    "start_time":"20:20"
+  "@timestamp": "2016-07-13T21:33:58.355Z",
+  "beat": {
+    "hostname": "mar.local",
+    "name": "mar.local"
   },
-  "proc.mem":{
-    "size":333772,
-    "rss":6316,
-    "share":2996
+  "directory": false,
+  "filename": "winlogbeat.yml",
+  "filesize": 2895,
+  "modtime": "2016-07-13T20:56:21.000Z",
+  "path": "./vendor/github.com/elastic/beats/winlogbeat/winlogbeat.yml",
+  "type": "lsbeat"
+}
+
+{
+  "@timestamp": "2016-07-13T21:33:58.354Z",
+  "beat": {
+    "hostname": "mar.local",
+    "name": "mar.local"
   },
-  "proc.name":"topbeat",
-  "proc.pid":13954,
-  "proc.ppid":10027,
-  "proc.state":"sleeping",
-  "shipper":"vagrant-ubuntu-trusty-64",
-  "@timestamp":"2015-08-06T20:20:34.089Z",
-  "type":"proc"
+  "directory": true,
+  "filename": "system",
+  "filesize": 238,
+  "modtime": "2016-07-13T20:56:21.000Z",
+  "path": "./vendor/github.com/elastic/beats/winlogbeat/tests/system",
+  "type": "lsbeat"
 }
 ----------------------------------------------------------------------
 
 Now that you have the big picture, let's dig into the code.
 
-=== Developing the Beat-Specific Code
+=== Generate your Beat
 
-The Beat-specific code should implement the `Beater` interface defined
-in libbeat.
+To generate your own beat we use the `beat-generator`. First you must install
+https://github.com/audreyr/cookiecutter[cookiecutter]. Check out the
+http://cookiecutter.readthedocs.io/en/latest/installation.html[installation
+guide]. After having installed cookiecutter, we must decide on a name for our beat. 
+The name must be one word all lowercase. In our example is Testbeat.
+
+To create the Beat skeleton, you should download Beats generator package,available in the beats repository. 
+Once you installed GoLang, you can download the Beats generator package using
+go get command. Once you run the command, all source files will be downloaded under the $GOPATH/src path.
+
+[source,shell]
+--------------------
+$ go get github.com/elastic/beats
+--------------------------------
+
+Now create and move to your own repository under GOPATH, and run cookiecutter with Beat Generator path.
+
+[source,shell]
+--------------------
+$ cd $GOPATH/src/github.com/{user}
+$ cookiecutter $GOPATH/src/github.com/elastic/beats/generate/beat
+--------------------
+
+Cookiecutter will ask you several questions. For your project_name enter testbeat, for github_user - your github id. The next two question with for beat and beat_path should already be automatically set correct. For the last one your can insert your Firstname Lastname.
+
+[source,shell]
+---------
+project_name [Examplebeat]: testbeat
+github_name [your-github-name]: {username}
+beat [testbeat]:
+beat_path [github.com/{github id}]:
+full_name [Firstname Lastname]: {Full Name}
+---------
+
+This should now have created a directory `testbeat` inside our folder with several files. 
+
+We now have a raw template of the Beat, but still need to fetch the dependencies and setup the git repository.
+
+
+[[beater-interface]]
+=== The Beater interface
+
+Each Beat needs to implement the Beater interface defined in libbeat.
 
 [source,go]
 ----------------------------------------------------------------------
+// Beater is the interface that must be implemented by every Beat. A Beater
+// provides the main Run-loop and a Stop method to break the Run-loop.
+// Instantiation and Configuration is normally provided by a Beat-`Creator`.
+//
+// Once the beat is fully configured, the Run() method is invoked. The
+// Run()-method implements the beat its run-loop. Once the Run()-method returns,
+// the beat shuts down.
+//
+// The Stop() method is invoked the first time (and only the first time) a
+// shutdown signal is received. The Stop()-method normally will stop the Run()-loop,
+// such that the beat can gracefully shutdown.
 type Beater interface {
-	Config(*Beat) error
-	Setup(*Beat) error
-	Run(*Beat) error
-	Cleanup(*Beat) error
+	// The main event loop. This method should block until signalled to stop by an
+	// invocation of the Stop() method.
+	Run(b *Beat) error
+
+	// Stop is invoked to signal that the Run method should finish its execution.
+	// It will be invoked at most once.
 	Stop()
 }
 ----------------------------------------------------------------------
 
-This means your Beat should implement the following methods:
+To implement the Beater interface, you need to define a Beat object that
+implements two methods `Run()` and `Stop()`. 
+
+[source,go]
+--------------
+type Testbeat struct {
+	done   chan struct{}
+	config config.Config
+	client publisher.Client
+
+	...
+}
+
+func (bt *Testbeat) Run(b *beat.Beat) error {
+	...
+}
+
+
+func (bt *Testbeat) Stop() {
+	...
+}
+
+--------------
+
+By default, the Beat object contains the following:
+
+- `done`: Channel used by the `Run()` function to stop when the `Stop()` function is called.
+- `config`: Configuration options for the Beat
+- `client`: Publisher that takes care of sending the events to the
+  defined output.
+
+The `Beat` parameter received by the `Run` method contains data about the
+Beat, such as the name, version, and common configuration options.
+
+The implementation of these functions is available under `beater/testbeat.go`.
+
+In addition, each Beat needs to implement the `New()` function to create the Beat
+object.
+
+This means your Beat should implement the following functions:
 
 [horizontal]
-<<config-method, Config>>:: Deals with the configuration file and optionally with
-custom CLI flags
-<<setup-method, Setup>>:: Contains logic that executes before the main loop, usually for initialization
+<<new-function, New>>:: Creates the Beat object
 <<run-method, Run>>:: Contains the main application loop that captures data
-and sends it to the publisher
-<<cleanup-method, Cleanup>>:: Contains logic that executes after the main loop finishes
-(or is interrupted)
+and sends it to the defined output using the publisher
 <<stop-method, Stop>>:: Contains logic that is called when the Beat is signaled to stop
-
-The `Beat` parameter received by most of these methods contains data about the
-Beat, such as the name, version, and common configuration options.
 
 For more complex Beats, the optional `FlagsHandler` interface is available.
 
 [source,go]
 ----------------------------------------------------------------------
+// FlagsHandler is an interface that can optionally be implemented by a Beat
+// if it needs to process command line flags on startup. If implemented, the
+// HandleFlags method will be invoked after parsing the command line flags
+// and before any of the Beater interface methods are invoked. There will be
+// no callback when '-help' or '-version' are specified.
 type FlagsHandler interface {
-	HandleFlags(*Beat)
+	HandleFlags(*Beat) error // Handle any custom command line arguments.
 }
 ----------------------------------------------------------------------
 
@@ -146,35 +240,44 @@ NOTE: To be consistent with other Beats, you should append `beat` to your Beat n
 Let's go through each of the methods in the `Beater` interface and look at a
 sample implementation.
 
-[[config-method]]
-==== Config Method
+[[new-function]]
+==== New function
 
-The `Config` method deals with the configuration file and optionally with
-custom CLI flags.
 
-The recommended way of handling the configuration is to create a
-`ConfigSettings` type that matches the structure of the expected configuration
-file. Here is an example configuration section for Topbeat:
+The `New()` function receives the configuration options defined for the Beat and
+creates a Beat object based on them. 
+
+The configuration file of the Beat is `testbeat.yml` and it's generated in the
+previous step:
 
 [source,yaml]
-----------------------------------------------------------------------
-input:
-  period: 1
+------------
+testbeat:
+  # Defines how often an event is sent to the output
+  period: 10s
+------------
 
-  procs: [".*"]
-----------------------------------------------------------------------
+ - `period`: Defines how often to send out events
 
-And here are the corresponding Go structures, which are defined in `config.go`:
+
+The recommended way of handling the configuration is to create a
+`Config` structure with the configuration options and a `DefaultConfig` with
+the default configuration options. 
+
+And here are the corresponding Go structures, which are defined in `config/config.go`:
 
 [source,go]
 ----------------------------------------------------------------------
-type TopConfig struct {
-	Period *int64
-	Procs  *[]string
+package config
+
+import "time"
+
+type Config struct {
+	Period time.Duration `config:"period"`
 }
 
-type ConfigSettings struct {
-	Input TopConfig
+var DefaultConfig = Config{
+	Period: 1 * time.Second,
 }
 ----------------------------------------------------------------------
 
@@ -182,167 +285,120 @@ Pointers are used to distinguish between when the setting is completely
 missing from the configuration file and when it has a value that matches the
 type's default value.
 
-With these structures defined, the `Config` method looks like this:
-
-
-[source,go]
-----------------------------------------------------------------------
-func (tb *Topbeat) Config(b *beat.Beat) error {
-
-	err := cfgfile.Read(&tb.TbConfig, "") <1>
-	if err != nil {
-		logp.Err("Error reading configuration file: %v", err)
-		return err
-	}
-
-	if tb.TbConfig.Input.Period != nil { <2>
-		tb.period = time.Duration(*tb.TbConfig.Input.Period) * time.Second
-	} else {
-		tb.period = 1 * time.Second
-	}
-
-	[...]
-
-	return nil
-}
-----------------------------------------------------------------------
-
-<1> Read the configuration.
-<2> Set default values for options that are not present in the configuration
-    file.
-
-[[setup-method]]
-==== Setup Method
-
-The `Setup` method enables you to execute logic before the main
-loop, usually for initialization. In the Topbeat implementation, this method
-only assigns the Beat object to the Topbeat object, so it doesn't have to be
-passed to all sub-functions.
+The generated `New()` function:
 
 [source,go]
-----------------------------------------------------------------------
-func (tb *Topbeat) Setup(b *beat.Beat) error {
+----------
+func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+	config := config.DefaultConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, fmt.Errorf("Error reading config file: %v", err)
+	}
 
-	tb.Beat = b
-	return nil
+	ls := &Testbeat{
+		done:   make(chan struct{}),
+		config: config,
+	}
+	return ls, nil
 }
-----------------------------------------------------------------------
+-----------
+
 
 [[run-method]]
 ==== Run Method
 
-The `Run` method should contain your main application loop. For Topbeat it looks
-like this:
+The `Run` method contains your main application loop. 
 
 [source,go]
 ----------------------------------------------------------------------
-func (t *Topbeat) Run(b *beat.Beat) error {
+func (bt *Testbeat) Run(b *beat.Beat) error {
+	logp.Info("testbeat is running! Hit CTRL-C to stop it.")
 
-	t.isAlive = true
-
-	t.initProcStats()
-
-	var err error
-
-	for t.isAlive {
-		time.Sleep(t.period)
-
-		err = t.exportSystemStats()
-		if err != nil {
-			logp.Err("Error reading system stats: %v", err)
+	bt.client = b.Publisher.Connect()
+	ticker := time.NewTicker(bt.config.Period)
+	counter := 1
+	for {
+		select {
+		case <-bt.done:
+			return nil
+		case <-ticker.C:
 		}
-		[...]
-	}
 
-	return err
+		event := common.MapStr{ <1>
+			"@timestamp": common.Time(time.Now()), <2>
+			"type":       b.Name,
+			"counter":    counter,
+		}
+		bt.client.PublishEvent(event) <3>
+		logp.Info("Event sent")
+		counter++
+	}
 }
 ----------------------------------------------------------------------
-
-Inside the loop, Topbeat sleeps for a configurable period of time and then
-captures the required data and sends it to the publisher via the `events`
-publisher client. The publisher client is available as part of the Beat object
-through the `Beat.Events` variable.
-
-The actual sending is done inside the `exportSystemStats()` method:
-
-[source,go]
-----------------------------------------------------------------------
-
-func (t *Topbeat) exportSystemStats() error {
-
-	load_stat, err := GetSystemLoad()
-	if err != nil {
-		logp.Warn("Getting load statistics: %v", err)
-		return err
-	}
-
-	[...]
-
-	event := common.MapStr{ <1>
-		"@timestamp": common.Time(time.Now()), <2>
-		"type":      "system",
-		"load":      load_stat,
-		"cpu":       cpu_stat,
-		"mem":       mem_stat,
-		"swap":      swap_stat,
-	}
-
-	t.Beat.Events.PublishEvent(event) <3>
-
-	return nil
-}
-----------------------------------------------------------------------
-
 <1> Create the event object.
 <2> Specify a `@timestamp` field of time `common.Time`.
-<3> Send the event.
+<3> Use the publisher to send the event out to the defined output
 
-[[cleanup-method]]
-==== Cleanup Method
+Inside the loop, the Beat sleeps for a configurable period of time and then
+captures the required data and sends it to the publisher. The publisher client is available as part of the Beat object
+through the `client` variable.
 
-The `Cleanup` method is executed after the main loop finishes (or is interrupted)
-and gives you the opportunity to release any resources you might use. For
-Topbeat, the method is completely empty:
+The `event := common.MapStr{}` stores the event in a json format, and `bt.client.PublishEvent(event)` is publishing data to Elasticsearch. 
+In the generated Beat, there are three fields in the event, which is
+@timestamp, type, and counter. 
 
-[source,go]
-----------------------------------------------------------------------
-func (tb *Topbeat) Cleanup(b *beat.Beat) error {
-	return nil
-}
-----------------------------------------------------------------------
+For more details about how the fields should be named, please check
+<<event-conventions, Event conventions>>.
 
 [[stop-method]]
 ==== Stop Method
 
 The `Stop` method is called when the Beat is signaled to stop, for
 example through the SIGTERM signal on Unix systems or the service control
-interface on Windows. For Topbeat, this method simply sets `isAlive` to
-`false`, which breaks the main loop.
+interface on Windows. This method simply closes the channel 
+which breaks the main loop.
 
 [source,go]
 ----------------------------------------------------------------------
-func (t *Topbeat) Stop() {
-	t.isAlive = false
+func (bt *Testbeat) Stop() {
+	bt.client.Close()
+	close(bt.done)
 }
 ----------------------------------------------------------------------
 
 ==== The main Function
 
-If you follow the Topbeat model and put your Beat-specific code in its own type
+If you follow the `Testbeat` model and put your Beat-specific code in its own type
 that implements the `Beater` interface, the code from your main package is
 very simple:
 
 [source,go]
 ----------------------------------------------------------------------
-var Version = "1.0.0"
-var Name = "topbeat"
+package main
+
+import (
+	"os"
+
+	"github.com/elastic/beats/libbeat/beat"
+
+	"github.com/kimjmin/testbeat/beater"
+)
 
 func main() {
-	beat.Run(Name, Version, topbeat.New())
+	err := beat.Run("testbeat", "", beater.New)
+	if err != nil {
+		os.Exit(1)
+	}
 }
 ----------------------------------------------------------------------
 
-We recommend that you implement a `New` function that creates your Beats object.
+[[ls-beat]]
+=== How to build Lsbeat from scratch
+
+github.com/kimjmin/lsbeat[Lsbeat] is similar to the `ls` command line tool, but instead of printing the files and subdirectories to the screen,
+Lsbeat periodically ships them to Elasticsearch for storage.
+The http://elastic.co//blog/build-your-own-beat[blog post] describes how to build from scratch `Lsbeat`.
+
 
 === Sharing Your Beat with the Community
 

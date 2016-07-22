@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"os/user"
+	"runtime"
 	"strconv"
 	"syscall"
 	"time"
@@ -162,6 +163,10 @@ func (self *CpuList) Get() error {
 	}
 
 	return nil
+}
+
+func (self *FDUsage) Get() error {
+	return &ErrNotImplemented{runtime.GOOS}
 }
 
 func (self *FileSystemList) Get() error {
@@ -327,6 +332,10 @@ func (self *ProcExe) Get(pid int) error {
 	}
 
 	return kern_procargs(pid, exe, nil, nil)
+}
+
+func (self *ProcFDUsage) Get(pid int) error {
+	return &ErrNotImplemented{runtime.GOOS}
 }
 
 // wrapper around sysctl KERN_PROCARGS2

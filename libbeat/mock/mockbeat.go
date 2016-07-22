@@ -5,6 +5,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 )
 
@@ -19,24 +20,17 @@ type Mockbeat struct {
 }
 
 // Creates beater
-func New() *Mockbeat {
+func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
 	return &Mockbeat{
 		done: make(chan struct{}),
-	}
+	}, nil
 }
 
 /// *** Beater interface methods ***///
 
-func (mb *Mockbeat) Config(b *beat.Beat) error {
-	return nil
-}
-
-func (mb *Mockbeat) Setup(b *beat.Beat) error {
-	mb.client = b.Publisher.Connect()
-	return nil
-}
-
 func (mb *Mockbeat) Run(b *beat.Beat) error {
+	mb.client = b.Publisher.Connect()
+
 	// Wait until mockbeat is done
 	mb.client.PublishEvent(common.MapStr{
 		"@timestamp": common.Time(time.Now()),
@@ -47,11 +41,9 @@ func (mb *Mockbeat) Run(b *beat.Beat) error {
 	return nil
 }
 
-func (mb *Mockbeat) Cleanup(b *beat.Beat) error {
-	return nil
-}
-
 func (mb *Mockbeat) Stop() {
-	close(mb.done)
+	logp.Info("Mockbeat Stop")
+
 	mb.client.Close()
+	close(mb.done)
 }

@@ -8,15 +8,19 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
+- Rename the `filters` section to `processors`. {pull}1944[1944]
+- Introduce the condition with `when` in the processor configuration. {pull}1949[1949]
+- The Elasticsearch template is now loaded by default. {pull}1993[1993]
 
 *Metricbeat*
 
 *Packetbeat*
+- Set `enabled` ` in `packetbeat.protocols.icmp` configuration to `true` by default. {pull}1988[1988]
 
 *Topbeat*
 
@@ -30,32 +34,51 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
+- Fix sync publisher PublishEvents return value if client is closed concurrently. {pull}2046[2046]
 
 *Metricbeat*
+
+- Do not send zero values when no value was present in the source. {issue}1972[1972]
 
 *Packetbeat*
 
 *Topbeat*
 
 *Filebeat*
+- Fix potential data loss between filebeat restarts, reporting unpublished lines as published. {issue}2041[2041]
+
+- Fix open file handler issue {issue}2028[2028] {pull}2020[2020]
 
 *Winlogbeat*
+- Fix potential data loss between winlogbeat restarts, reporting unpublished lines as published. {issue}2041[2041]
 
 ==== Added
 
-
 *Affecting all Beats*
 
+- Periodically log internal metrics. {pull}1955[1955]
+- Add enabled setting to all output modules. {pull}1987[1987]
+- Command line flag -c can be used multiple times. {pull}1985[1985]
+- Add OR/AND/NOT to the condition associated with the processors. {pull}1983[1983]
+- Add '-E' CLI flag for overwriting single config options via command line. {pull}1986[1986]
+- Choose the mapping template file based on the Elasticsearch version. {pull}1993[1993]
+- Check stdout being available when console output is configured. {issue}2035[2035]
+- Add enabled setting to packetbeat protocols. {pull}1988[1988]
+- Add enabled setting to packetbeat network flows configuration. {pull}1988[1988]
+
 *Metricbeat*
+- Add pgid field to process information. {pull} 2021[2021]
 
 *Packetbeat*
 
 *Topbeat*
 
 *Filebeat*
+- Introduce close_removed and close_renamed harvester options {issue}1600[1600]
+- Introduce close_eof harvester option {issue}1600[1600]
+- Add clean_removed config option {issue}1600[1600]
 
 *Winlogbeat*
-
 
 
 ==== Deprecated
@@ -67,14 +90,67 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...master[Check the HEAD d
 *Topbeat*
 
 *Filebeat*
+- Deprecate close_older option and replace it with close_inactive {issue}2051[2051]
+- Deprecate force_close_files option and replace it with close_removed and close_renamed {issue}1600[1600]
+
 
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
 
+[[release-notes-5.0.0-alpha4]]
+=== Beats version 5.0.0-alpha4
+https://github.com/elastic/beats/compare/v5.0.0-alpha3...v5.0.0-alpha4[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The topology_expire option of the Elasticserach output was removed. {pull}1907[1907]
+
+*Filebeat*
+
+- Stop following symlink. Symlinks are now ignored: {pull}1686[1686]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Reset backoff factor on partial ACK. {issue}1803[1803]
+- Fix beats load balancer deadlock if max_retries: -1 or publish_async is enabled in filebeat. {issue}1829[1829]
+- Fix logstash output with pipelining mode enabled not reconnecting. {issue}1876[1876]
+- Empty configuration sections become merge-able with variables containing full path. {pull}1900[1900]
+- Fix error message about required fields missing not printing the missing field name. {pull}1900[1900]
+
+*Metricbeat*
+
+- Fix the CPU values returned for each core. {issue}1863[1863]
+
+*Packetbeat*
+
+- Add missing nil-check to memcached GapInStream handler. {issue}1162[1162]
+- Fix NFSv4 Operation returning the first found first-class operation available in compound requests. {pull}1821[1821]
+- Fix TCP overlapping segments not being handled correctly. {pull}1898[1898]
+
+*Winlogbeat*
+
+- Fix issue with rendering forwarded event log records. {pull}1891[1891]
+
+==== Added
+
+*Affecting all Beats*
+
+- Improve error message if compiling regular expression from config files fails. {pull}1900[1900]
+- Compression support in the Elasticsearch output. {pull}1835[1835]
+
+*Metricbeat*
+
+- Add MongoDB module. {pull}1837[1837]
+
+
 [[release-notes-5.0.0-alpha3]]
 === Beats version 5.0.0-alpha3
-https://github.com/elastic/beats/compare/v5.0.0alpha2...v5.0.0-alpha3[View commits]
+https://github.com/elastic/beats/compare/v5.0.0-alpha2...v5.0.0-alpha3[View commits]
 
 ==== Breaking changes
 
@@ -144,7 +220,7 @@ https://github.com/elastic/beats/compare/v1.2.2...v1.2.3[View commits]
 
 [[release-notes-5.0.0-alpha2]]
 === Beats version 5.0.0-alpha2
-https://github.com/elastic/beats/compare/v5.0.0alpha1...v5.0.0-alpha2[View commits]
+https://github.com/elastic/beats/compare/v5.0.0-alpha1...v5.0.0-alpha2[View commits]
 
 ==== Breaking changes
 

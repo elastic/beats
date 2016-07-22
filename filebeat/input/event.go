@@ -1,11 +1,13 @@
 package input
 
 import (
-	"fmt"
 	"os"
-	"regexp"
 	"time"
 
+	"fmt"
+
+	"github.com/elastic/beats/filebeat/harvester/processor"
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -22,83 +24,13 @@ type FileEvent struct {
 	Text         *string
 	Fileinfo     os.FileInfo
 	JSONFields   common.MapStr
-	JSONConfig   *JSONConfig
-	FileState    FileState
+	JSONConfig   *processor.JSONConfig
+	State        file.State
 }
 
-type JSONConfig struct {
-	MessageKey    string `config:"message_key"`
-	KeysUnderRoot bool   `config:"keys_under_root"`
-	OverwriteKeys bool   `config:"overwrite_keys"`
-	AddErrorKey   bool   `config:"add_error_key"`
-}
-
-type MultilineConfig struct {
-	Negate   bool           `config:"negate"`
-	Match    string         `config:"match"       validate:"required"`
-	MaxLines *int           `config:"max_lines"`
-	Pattern  *regexp.Regexp `config:"pattern"`
-	Timeout  *time.Duration `config:"timeout"     validate:"positive"`
-}
-
-func (c *MultilineConfig) Validate() error {
-	if c.Match != "after" && c.Match != "before" {
-		return fmt.Errorf("unknown matcher type: %s", c.Match)
-	}
-	return nil
-}
-
-// mergeJSONFields writes the JSON fields in the event map,
-// respecting the KeysUnderRoot and OverwriteKeys configuration options.
-// If MessageKey is defined, the Text value from the event always
-// takes precedence.
-func mergeJSONFields(f *FileEvent, event common.MapStr) {
-
-	// The message key might have been modified by multiline
-	if len(f.JSONConfig.MessageKey) > 0 && f.Text != nil {
-		f.JSONFields[f.JSONConfig.MessageKey] = *f.Text
-	}
-
-	if f.JSONConfig.KeysUnderRoot {
-		for k, v := range f.JSONFields {
-			if f.JSONConfig.OverwriteKeys {
-				if k == "@timestamp" {
-					vstr, ok := v.(string)
-					if !ok {
-						logp.Err("JSON: Won't overwrite @timestamp because value is not string")
-						event[jsonErrorKey] = "@timestamp not overwritten (not string)"
-						continue
-					}
-					// @timestamp must be of time common.Time
-					ts, err := common.ParseTime(vstr)
-					if err != nil {
-						logp.Err("JSON: Won't overwrite @timestamp because of parsing error: %v", err)
-						event[jsonErrorKey] = fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr)
-						continue
-					}
-					event[k] = ts
-				} else if k == "type" {
-					vstr, ok := v.(string)
-					if !ok {
-						logp.Err("JSON: Won't overwrite type because value is not string")
-						event[jsonErrorKey] = "type not overwritten (not string)"
-						continue
-					}
-					if len(vstr) == 0 || vstr[0] == '_' {
-						logp.Err("JSON: Won't overwrite type because value is empty or starts with an underscore")
-						event[jsonErrorKey] = fmt.Sprintf("type not overwritten (invalid value [%s])", vstr)
-						continue
-					}
-					event[k] = vstr
-				} else {
-					event[k] = v
-				}
-			} else if _, exists := event[k]; !exists {
-				event[k] = v
-			}
-		}
-	} else {
-		event["json"] = f.JSONFields
+func NewEvent(state file.State) *FileEvent {
+	return &FileEvent{
+		State: state,
 	}
 }
 
@@ -119,4 +51,59 @@ func (f *FileEvent) ToMapStr() common.MapStr {
 	}
 
 	return event
+}
+
+// mergeJSONFields writes the JSON fields in the event map,
+// respecting the KeysUnderRoot and OverwriteKeys configuration options.
+// If MessageKey is defined, the Text value from the event always
+// takes precedence.
+func mergeJSONFields(f *FileEvent, event common.MapStr) {
+
+	// The message key might have been modified by multiline
+	if len(f.JSONConfig.MessageKey) > 0 && f.Text != nil {
+		f.JSONFields[f.JSONConfig.MessageKey] = *f.Text
+	}
+
+	if f.JSONConfig.KeysUnderRoot {
+		for k, v := range f.JSONFields {
+			if f.JSONConfig.OverwriteKeys {
+				if k == "@timestamp" {
+					vstr, ok := v.(string)
+					if !ok {
+						logp.Err("JSON: Won't overwrite @timestamp because value is not string")
+						event[processor.JsonErrorKey] = "@timestamp not overwritten (not string)"
+						continue
+					}
+
+					// @timestamp must be of format RFC3339
+					ts, err := time.Parse(time.RFC3339, vstr)
+					if err != nil {
+						logp.Err("JSON: Won't overwrite @timestamp because of parsing error: %v", err)
+						event[processor.JsonErrorKey] = fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr)
+						continue
+					}
+					event[k] = common.Time(ts)
+				} else if k == "type" {
+					vstr, ok := v.(string)
+					if !ok {
+						logp.Err("JSON: Won't overwrite type because value is not string")
+						event[processor.JsonErrorKey] = "type not overwritten (not string)"
+						continue
+					}
+					if len(vstr) == 0 || vstr[0] == '_' {
+						logp.Err("JSON: Won't overwrite type because value is empty or starts with an underscore")
+						event[processor.JsonErrorKey] = fmt.Sprintf("type not overwritten (invalid value [%s])", vstr)
+						continue
+					}
+					event[k] = vstr
+				} else {
+					event[k] = v
+				}
+			} else if _, exists := event[k]; !exists {
+				event[k] = v
+			}
+		}
+	} else {
+		event["json"] = f.JSONFields
+	}
 }

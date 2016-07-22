@@ -1,0 +1,166 @@
+- name: status
+  type: group
+  description: >
+    `status` contains the metrics that were scraped from the Apache status page.
+  fields:
+    - name: hostname
+      type: keyword
+      description: >
+        Apache hostname.
+    - name: total_accesses
+      type: integer
+      description: >
+        Total number of access requests.
+    - name: total_kbytes
+      type: integer
+      description: >
+        Total number of kilobytes served.
+    - name: requests_per_sec
+      type: half_float
+      description: >
+        Requests per second.
+    - name: bytes_per_sec
+      type: float
+      description: >
+        Bytes per second.
+    - name: bytes_per_request
+      type: half_float
+      description: >
+        Bytes per request.
+    - name: workers.busy
+      type: integer
+      description: >
+        Number of busy workers.
+    - name: workers.idle
+      type: integer
+      description: >
+        Number of idle workers.
+    - name: uptime
+      type: group
+      description: >
+        Uptime stats.
+      fields:
+        - name: server_uptime
+          type: integer
+          description: >
+            Server uptime in seconds.
+        - name: uptime
+          type: integer
+          description: >
+            Server uptime.
+    - name: cpu
+      type: group
+      description: >
+        CPU stats.
+      fields:
+        - name: load
+          type: half_float
+          description: >
+            CPU Load.
+        - name: user
+          type: half_float
+          description: >
+            CPU user load.
+        - name: system
+          type: half_float
+          description: >
+            System cpu.
+        - name: children_user
+          type: half_float
+          description: >
+            CPU of children user.
+        - name: children_system
+          type: half_float
+          description: >
+            CPU of children system.
+    - name: connections
+      type: group
+      description: >
+        Connection stats.
+      fields:
+        - name: total
+          type: integer
+          description: >
+            Total connections.
+        - name: async.writing
+          type: integer
+          description: >
+            Async connection writing.
+        - name: async.keep_alive
+          type: integer
+          description: >
+            Async keeped alive connections.
+        - name: async.closing
+          type: integer
+          description: >
+            Async closed connections.
+    - name: load
+      type: group
+      description: >
+        Load averages.
+      fields:
+        - name: "1"
+          type: half_float
+          description: >
+            Load average for the last minute.
+        - name: "5"
+          type: half_float
+          description: >
+            Load average for the last 5 minutes.
+        - name: "15"
+          type: half_float
+          description: >
+            Load average for the last 15 minutes.
+    - name: scoreboard
+      type: group
+      description: >
+        Scoreboard metrics.
+      fields:
+        - name: starting_up
+          type: integer
+          description: >
+            Starting up.
+        - name: reading_request
+          type: integer
+          description: >
+            Reading requests.
+        - name: sending_reply
+          type: integer
+          description: >
+            Sending Reply.
+        - name: keepalive
+          type: integer
+          description: >
+            Keep alive.
+        - name: dns_lookup
+          type: integer
+          description: >
+            Dns Lookups.
+        - name: closing_connection
+          type: integer
+          description: >
+            Closing connections.
+        - name: logging
+          type: integer
+          description: >
+            Logging
+        - name: gracefully_finishing
+          type: integer
+          description: >
+            Gracefully finishing.
+        - name: idle_cleanup
+          type: integer
+          description: >
+            Idle cleanups.
+        - name: open_slot
+          type: integer
+          description: >
+            Open slots.
+        - name: waiting_for_connection
+          type: integer
+          description: >
+            Waiting for connections.
+        - name: total
+          type: integer
+          description: >
+            Total.

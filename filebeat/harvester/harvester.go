@@ -15,90 +15,61 @@ package harvester
 
 import (
 	"fmt"
-	"regexp"
-	"sync"
-
-	"time"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 )
 
 type Harvester struct {
-	Path               string /* the file path to harvest */
-	Config             *HarvesterConfig
-	offset             int64
-	State              input.FileState
-	stateMutex         sync.Mutex
-	SpoolerChan        chan *input.FileEvent
-	encoding           encoding.EncodingFactory
-	file               FileSource /* the file being watched */
-	ExcludeLinesRegexp []*regexp.Regexp
-	IncludeLinesRegexp []*regexp.Regexp
-	done               chan struct{}
-}
-
-type HarvesterConfig struct {
-	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
-
-	BufferSize         int    `config:"harvester_buffer_size"`
-	DocumentType       string `config:"document_type"`
-	Encoding           string `config:"encoding"`
-	InputType          string `config:"input_type"`
-	TailFiles          bool   `config:"tail_files"`
-	Backoff            string `config:"backoff"`
-	BackoffDuration    time.Duration
-	BackoffFactor      int    `config:"backoff_factor"`
-	MaxBackoff         string `config:"max_backoff"`
-	MaxBackoffDuration time.Duration
-	CloseOlder         string `config:"close_older"`
-	CloseOlderDuration time.Duration
-	ForceCloseFiles    bool                   `config:"force_close_files"`
-	ExcludeLines       []*regexp.Regexp       `config:"exclude_lines"`
-	IncludeLines       []*regexp.Regexp       `config:"include_lines"`
-	MaxBytes           int                    `config:"max_bytes"`
-	Multiline          *input.MultilineConfig `config:"multiline"`
-	JSON               *input.JSONConfig      `config:"json"`
+	config          harvesterConfig
+	state           file.State
+	prospectorChan  chan *input.FileEvent
+	file            source.FileSource /* the file being watched */
+	done            chan struct{}
+	encodingFactory encoding.EncodingFactory
+	encoding        encoding.Encoding
 }
 
 func NewHarvester(
-	cfg *HarvesterConfig,
-	path string,
-	state input.FileState,
-	spooler chan *input.FileEvent,
-	offset int64,
+	cfg *common.Config,
+	state file.State,
+	prospectorChan chan *input.FileEvent,
 	done chan struct{},
 ) (*Harvester, error) {
-	encoding, ok := encoding.FindEncoding(cfg.Encoding)
-	if !ok || encoding == nil {
-		return nil, fmt.Errorf("unknown encoding('%v')", cfg.Encoding)
-	}
 
 	h := &Harvester{
-		Path:        path,
-		Config:      cfg,
-		State:       state,
-		SpoolerChan: spooler,
-		encoding:    encoding,
-		offset:      offset,
-		done:        done,
+		config:         defaultConfig,
+		state:          state,
+		prospectorChan: prospectorChan,
+		done:           done,
 	}
-	h.ExcludeLinesRegexp = cfg.ExcludeLines
-	h.IncludeLinesRegexp = cfg.IncludeLines
+
+	if err := cfg.Unpack(&h.config); err != nil {
+		return nil, err
+	}
+
+	encodingFactory, ok := encoding.FindEncoding(h.config.Encoding)
+	if !ok || encodingFactory == nil {
+		return nil, fmt.Errorf("unknown encoding('%v')", h.config.Encoding)
+	}
+	h.encodingFactory = encodingFactory
+
 	return h, nil
 }
 
 // open does open the file given under h.Path and assigns the file handler to h.file
-func (h *Harvester) open() (encoding.Encoding, error) {
+func (h *Harvester) open() error {
 
-	switch h.Config.InputType {
+	switch h.config.InputType {
 	case config.StdinInputType:
 		return h.openStdin()
 	case config.LogInputType:
 		return h.openFile()
 	default:
-		return nil, fmt.Errorf("Invalid input type")
+		return fmt.Errorf("Invalid input type")
 	}
 }

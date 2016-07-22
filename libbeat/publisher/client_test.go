@@ -13,7 +13,7 @@ import (
 // ClientOptions.
 func TestGetClient(t *testing.T) {
 	c := &client{
-		publisher: &Publisher{},
+		publisher: &BeatPublisher{},
 	}
 	c.publisher.pipelines.async = &asyncPipeline{}
 	c.publisher.pipelines.sync = &syncPipeline{}

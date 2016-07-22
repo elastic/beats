@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Network Out Bytes\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.network.out.bytes\",\"customLabel\":\"Out Bytes\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Network Out Bytes", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Network-data", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

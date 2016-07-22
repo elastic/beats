@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-This script generates the ES template file (topbeat.template.json) from
+This script generates the ES template file (packetbeat.template.json) from
 the etc/fields.yml file.
 
 Example usage:
@@ -178,7 +178,15 @@ def fill_field_properties(args, field, defaults, path):
             }
 
     elif field["type"] in ["geo_point", "date", "long", "integer",
-                           "double", "float", "boolean"]:
+                           "double", "float", "half_float", "boolean"]:
+        # Convert all integer fields to long
+        if field["type"] == "integer":
+            field["type"] = "long"
+
+        if args.es2x and field["type"] == "half_float":
+            # ES 2.x doesn't support half floats, so convert to floats
+            field["type"] = "float"
+
         properties[field["name"]] = {
             "type": field.get("type")
         }
@@ -272,7 +280,7 @@ if __name__ == "__main__":
         fields = f.read()
 
         # Prepend beat fields from libbeat
-        with open(args.es_beats + "/libbeat/_beat/fields.yml") as f:
+        with open(args.es_beats + "/libbeat/_meta/fields.yml") as f:
             fields = f.read() + fields
 
         with open(target, 'w') as output:

@@ -104,6 +104,12 @@ func (protocols ProtocolsStruct) Init(
 		plugin, exists := protocolPlugins[proto]
 		if !exists {
 			logp.Err("Protocol plugin '%v' not registered (%v).", name, proto.String())
+			continue
+		}
+
+		if !config.Enabled() {
+			logp.Info("Protocol plugin '%v' disabled by config", name)
+			continue
 		}
 
 		inst, err := plugin(testMode, results, config)

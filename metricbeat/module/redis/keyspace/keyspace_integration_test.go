@@ -17,13 +17,7 @@ var host = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
 
 func TestFetch(t *testing.T) {
 
-	// Insert at least one event to make sure db exists
-	c, err := rd.Dial("tcp", host)
-	if err != nil {
-		t.Fatal("connect", err)
-	}
-	defer c.Close()
-	_, err = c.Do("SET", "foo", "bar")
+	addEntry(t)
 
 	// Fetch data
 	f := mbtest.NewEventsFetcher(t, getConfig())
@@ -43,6 +37,28 @@ func TestFetch(t *testing.T) {
 	assert.True(t, keyspace["expires"].(int64) >= 0)
 	assert.True(t, keyspace["keys"].(int64) >= 0)
 	assert.True(t, strings.Contains(keyspace["id"].(string), "db"))
+}
+
+func TestData(t *testing.T) {
+	addEntry(t)
+
+	f := mbtest.NewEventsFetcher(t, getConfig())
+
+	err := mbtest.WriteEvents(f, t)
+	if err != nil {
+		t.Fatal("write", err)
+	}
+}
+
+// addEntry adds an entry to redis
+func addEntry(t *testing.T) {
+	// Insert at least one event to make sure db exists
+	c, err := rd.Dial("tcp", host)
+	if err != nil {
+		t.Fatal("connect", err)
+	}
+	defer c.Close()
+	_, err = c.Do("SET", "foo", "bar")
 }
 
 func getConfig() map[string]interface{} {

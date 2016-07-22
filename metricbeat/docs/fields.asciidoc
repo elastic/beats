@@ -4,91 +4,104 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-== Exported Fields
+= Exported Fields
 
+[partintro]
+
+--
 This document describes the fields that are exported by Metricbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-apache>>
 * <<exported-fields-beat>>
 * <<exported-fields-common>>
+* <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
 * <<exported-fields-zookeeper>>
 
+--
 [[exported-fields-apache]]
-=== Apache Fields
+== Apache Fields
 
-Apache HTTPD server metric sets collected from the apache web server.
-
-
-
-[float]
-=== apache Fields
-
-Apache contains the metrics that were scraped from apache.
+Apache HTTPD server metricsets collected from the Apache web server.
 
 
 
 [float]
-=== status Fields
+== apache Fields
 
-`status` contains the metrics that were scraped from the apache status page.
+`apache` contains the metrics that were scraped from Apache.
 
 
 
-==== apache.status.hostname
+[float]
+== status Fields
+
+`status` contains the metrics that were scraped from the Apache status page.
+
+
+
+[float]
+=== apache.status.hostname
 
 type: keyword
 
 Apache hostname.
 
 
-==== apache.status.total_accesses
+[float]
+=== apache.status.total_accesses
 
 type: integer
 
 Total number of access requests.
 
 
-==== apache.status.total_kbytes
+[float]
+=== apache.status.total_kbytes
 
 type: integer
 
 Total number of kilobytes served.
 
 
-==== apache.status.requests_per_sec
+[float]
+=== apache.status.requests_per_sec
 
-type: float
+type: half_float
 
 Requests per second.
 
 
-==== apache.status.bytes_per_sec
+[float]
+=== apache.status.bytes_per_sec
 
 type: float
 
 Bytes per second.
 
 
-==== apache.status.bytes_per_request
+[float]
+=== apache.status.bytes_per_request
 
-type: float
+type: half_float
 
 Bytes per request.
 
 
-==== apache.status.workers.busy
+[float]
+=== apache.status.workers.busy
 
 type: integer
 
 Number of busy workers.
 
 
-==== apache.status.workers.idle
+[float]
+=== apache.status.workers.idle
 
 type: integer
 
@@ -96,20 +109,22 @@ Number of idle workers.
 
 
 [float]
-=== uptime Fields
+== uptime Fields
 
 Uptime stats.
 
 
 
-==== apache.status.uptime.server_uptime
+[float]
+=== apache.status.uptime.server_uptime
 
 type: integer
 
 Server uptime in seconds.
 
 
-==== apache.status.uptime.uptime
+[float]
+=== apache.status.uptime.uptime
 
 type: integer
 
@@ -117,76 +132,85 @@ Server uptime.
 
 
 [float]
-=== cpu Fields
+== cpu Fields
 
 CPU stats.
 
 
 
-==== apache.status.cpu.load
+[float]
+=== apache.status.cpu.load
 
-type: float
+type: half_float
 
 CPU Load.
 
 
-==== apache.status.cpu.user
+[float]
+=== apache.status.cpu.user
 
-type: float
+type: half_float
 
 CPU user load.
 
 
-==== apache.status.cpu.system
+[float]
+=== apache.status.cpu.system
 
-type: float
+type: half_float
 
 System cpu.
 
 
-==== apache.status.cpu.children_user
+[float]
+=== apache.status.cpu.children_user
 
-type: float
+type: half_float
 
 CPU of children user.
 
 
-==== apache.status.cpu.children_system
+[float]
+=== apache.status.cpu.children_system
 
-type: float
+type: half_float
 
 CPU of children system.
 
 
 [float]
-=== connections Fields
+== connections Fields
 
 Connection stats.
 
 
 
-==== apache.status.connections.total
+[float]
+=== apache.status.connections.total
 
 type: integer
 
 Total connections.
 
 
-==== apache.status.connections.async.writing
+[float]
+=== apache.status.connections.async.writing
 
 type: integer
 
 Async connection writing.
 
 
-==== apache.status.connections.async.keep_alive
+[float]
+=== apache.status.connections.async.keep_alive
 
 type: integer
 
 Async keeped alive connections.
 
 
-==== apache.status.connections.async.closing
+[float]
+=== apache.status.connections.async.closing
 
 type: integer
 
@@ -194,118 +218,133 @@ Async closed connections.
 
 
 [float]
-=== load Fields
+== load Fields
 
 Load averages.
 
 
 
-==== apache.status.load.1
+[float]
+=== apache.status.load.1
 
-type: float
+type: half_float
 
 Load average for the last minute.
 
 
-==== apache.status.load.5
+[float]
+=== apache.status.load.5
 
-type: float
+type: half_float
 
 Load average for the last 5 minutes.
 
 
-==== apache.status.load.15
+[float]
+=== apache.status.load.15
 
-type: float
+type: half_float
 
 Load average for the last 15 minutes.
 
 
 [float]
-=== scoreboard Fields
+== scoreboard Fields
 
 Scoreboard metrics.
 
 
 
-==== apache.status.scoreboard.starting_up
+[float]
+=== apache.status.scoreboard.starting_up
 
 type: integer
 
 Starting up.
 
 
-==== apache.status.scoreboard.reading_request
+[float]
+=== apache.status.scoreboard.reading_request
 
 type: integer
 
 Reading requests.
 
 
-==== apache.status.scoreboard.sending_reply
+[float]
+=== apache.status.scoreboard.sending_reply
 
 type: integer
 
 Sending Reply.
 
 
-==== apache.status.scoreboard.keepalive
+[float]
+=== apache.status.scoreboard.keepalive
 
 type: integer
 
 Keep alive.
 
 
-==== apache.status.scoreboard.dns_lookup
+[float]
+=== apache.status.scoreboard.dns_lookup
 
 type: integer
 
 Dns Lookups.
 
 
-==== apache.status.scoreboard.closing_connection
+[float]
+=== apache.status.scoreboard.closing_connection
 
 type: integer
 
 Closing connections.
 
 
-==== apache.status.scoreboard.logging
+[float]
+=== apache.status.scoreboard.logging
 
 type: integer
 
 Logging
 
 
-==== apache.status.scoreboard.gracefully_finishing
+[float]
+=== apache.status.scoreboard.gracefully_finishing
 
 type: integer
 
 Gracefully finishing.
 
 
-==== apache.status.scoreboard.idle_cleanup
+[float]
+=== apache.status.scoreboard.idle_cleanup
 
 type: integer
 
-Idle cleanups
+Idle cleanups.
 
 
-==== apache.status.scoreboard.open_slot
+[float]
+=== apache.status.scoreboard.open_slot
 
 type: integer
 
 Open slots.
 
 
-==== apache.status.scoreboard.waiting_for_connection
+[float]
+=== apache.status.scoreboard.waiting_for_connection
 
 type: integer
 
 Waiting for connections.
 
 
-==== apache.status.scoreboard.total
+[float]
+=== apache.status.scoreboard.total
 
 type: integer
 
@@ -313,23 +352,26 @@ Total.
 
 
 [[exported-fields-beat]]
-=== Beat Fields
+== Beat Fields
 
 Contains common beat fields available in all event types.
 
 
 
-==== beat.name
+[float]
+=== beat.name
 
 The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
 
 
-==== beat.hostname
+[float]
+=== beat.hostname
 
 The hostname as returned by the operating system on which the Beat is running.
 
 
-==== @timestamp
+[float]
+=== @timestamp
 
 type: date
 
@@ -342,12 +384,14 @@ required: True
 The timestamp when the event log record was generated.
 
 
-==== tags
+[float]
+=== tags
 
 Arbitrary tags that can be set per Beat and per transaction type.
 
 
-==== fields
+[float]
+=== fields
 
 type: dict
 
@@ -355,37 +399,42 @@ Contains user configurable fields.
 
 
 [[exported-fields-common]]
-=== Common Fields
+== Common Fields
 
 Contains common fields available in all event types.
 
 
 
-==== metricset.module
+[float]
+=== metricset.module
 
 The name of the module that generated the event.
 
 
-==== metricset.name
+[float]
+=== metricset.name
 
 The name of the metricset that generated the event.
 
 
-==== metricset.host
+[float]
+=== metricset.host
 
 Hostname of the machine from which the metricset was collected. This field may not be present when the data was collected locally.
 
 
-==== metricset.rtt
+[float]
+=== metricset.rtt
 
 type: long
 
 required: True
 
-Event round trip time in microseconds
+Event round trip time in microseconds.
 
 
-==== type
+[float]
+=== type
 
 example: metricsets
 
@@ -394,42 +443,552 @@ required: True
 The document type. Always set to "metricsets".
 
 
+[[exported-fields-mongodb]]
+== MongoDB Fields
+
+Metrics collected from MongoDB servers.
+
+
+
+[float]
+== mongodb Fields
+
+MongoDB metrics.
+
+
+
+[float]
+== status Fields
+
+MongoDB server status metrics.
+
+
+
+[float]
+=== mongodb.status.version
+
+type: keyword
+
+Instance version.
+
+
+[float]
+=== mongodb.status.uptime.ms
+
+type: long
+
+Instance uptime in milliseconds.
+
+
+[float]
+=== mongodb.status.local_time
+
+type: date
+
+Local time as reported by the MongoDB instance.
+
+
+[float]
+=== mongodb.status.asserts.regular
+
+type: long
+
+Number of regular assertions produced by the server.
+
+
+[float]
+=== mongodb.status.asserts.warning
+
+type: long
+
+Number of warning assertions produced by the server.
+
+
+[float]
+=== mongodb.status.asserts.msg
+
+type: long
+
+Number of msg assertions produced by the server.
+
+
+[float]
+=== mongodb.status.asserts.user
+
+type: long
+
+Number of user assertions produced by the server.
+
+
+[float]
+=== mongodb.status.asserts.rollovers
+
+type: long
+
+Number of rollovers assertions produced by the server.
+
+
+[float]
+== background_flushing Fields
+
+Data about the process MongoDB uses to write data to disk. This data is only available for instances that use the MMAPv1 storage engine.
+
+
+
+[float]
+=== mongodb.status.background_flushing.flushes
+
+type: long
+
+A counter that collects the number of times the database has flushed all writes to disk.
+
+
+[float]
+=== mongodb.status.background_flushing.total.ms
+
+type: long
+
+The total number of milliseconds (ms) that the mongod processes have spent writing (i.e. flushing) data to disk. Because this is an absolute value, consider the value of `flushes` and `average_ms` to provide better context for this datum.
+
+
+[float]
+=== mongodb.status.background_flushing.average.ms
+
+type: long
+
+The average time spent flushing to disk per flush event.
+
+
+[float]
+=== mongodb.status.background_flushing.last.ms
+
+type: long
+
+The amount of time, in milliseconds, that the last flush operation took to complete.
+
+
+[float]
+=== mongodb.status.background_flushing.last_finished
+
+type: date
+
+A timestamp of the last completed flush operation.
+
+
+[float]
+== connections Fields
+
+Data regarding the current status of incoming connections and availability of the database server.
+
+
+
+[float]
+=== mongodb.status.connections.current
+
+type: long
+
+The number of connections to the database server from clients. This number includes the current shell session. Consider the value of `available` to add more context to this datum.
+
+
+[float]
+=== mongodb.status.connections.available
+
+type: long
+
+The number of unused available incoming connections the database can provide.
+
+
+[float]
+=== mongodb.status.connections.total_created
+
+type: long
+
+A count of all incoming connections created to the server. This number includes connections that have since closed.
+
+
+[float]
+== journaling Fields
+
+Data about the journaling-related operations and performance. Journaling information only appears for mongod instances that use the MMAPv1 storage engine and have journaling enabled.
+
+
+
+[float]
+=== mongodb.status.journaling.commits
+
+type: long
+
+The number of transactions written to the journal during the last journal group commit interval.
+
+
+[float]
+=== mongodb.status.journaling.journaled.mb
+
+type: long
+
+The amount of data in megabytes (MB) written to journal during the last journal group commit interval.
+
+
+[float]
+=== mongodb.status.journaling.write_to_data_files.mb
+
+type: long
+
+The amount of data in megabytes (MB) written from journal to the data files during the last journal group commit interval.
+
+
+[float]
+=== mongodb.status.journaling.compression
+
+type: long
+
+The compression ratio of the data written to the journal.
+
+
+[float]
+=== mongodb.status.journaling.commits_in_write_lock
+
+type: long
+
+Count of the commits that occurred while a write lock was held. Commits in a write lock indicate a MongoDB node under a heavy write load and call for further diagnosis.
+
+
+[float]
+=== mongodb.status.journaling.early_commits
+
+type: long
+
+The number of times MongoDB requested a commit before the scheduled journal group commit interval.
+
+
+[float]
+== times Fields
+
+Information about the performance of the mongod instance during the various phases of journaling in the last journal group commit interval.
+
+
+
+[float]
+=== mongodb.status.journaling.times.dt.ms
+
+type: long
+
+The amount of time over which MongoDB collected the times data. Use this field to provide context to the other times field values.
+
+
+[float]
+=== mongodb.status.journaling.times.prep_log_buffer.ms
+
+type: long
+
+The amount of time spent preparing to write to the journal. Smaller values indicate better journal performance.
+
+
+[float]
+=== mongodb.status.journaling.times.write_to_journal.ms
+
+type: long
+
+The amount of time spent actually writing to the journal. File system speeds and device interfaces can affect performance.
+
+
+[float]
+=== mongodb.status.journaling.times.write_to_data_files.ms
+
+type: long
+
+The amount of time spent writing to data files after journaling. File system speeds and device interfaces can affect performance.
+
+
+[float]
+=== mongodb.status.journaling.times.remap_private_view.ms
+
+type: long
+
+The amount of time spent remapping copy-on-write memory mapped views. Smaller values indicate better journal performance.
+
+
+[float]
+=== mongodb.status.journaling.times.commits.ms
+
+type: long
+
+The amount of time spent for commits.
+
+
+[float]
+=== mongodb.status.journaling.times.commits_in_write_lock.ms
+
+type: long
+
+The amount of time spent for commits that occurred while a write lock was held.
+
+
+[float]
+== extra_info Fields
+
+Platform specific data.
+
+
+
+[float]
+=== mongodb.status.extra_info.heap_usage.bytes
+
+type: long
+
+The total size in bytes of heap space used by the database process. Only available on Unix/Linux.
+
+
+[float]
+=== mongodb.status.extra_info.page_faults
+
+type: long
+
+The total number of page faults that require disk operations. Page faults refer to operations that require the database server to access data that isn't available in active memory.
+
+
+[float]
+== network Fields
+
+Platform specific data.
+
+
+
+[float]
+=== mongodb.status.network.in.bytes
+
+type: long
+
+The amount of network traffic, in bytes, received by this database.
+
+
+[float]
+=== mongodb.status.network.out.bytes
+
+type: long
+
+The amount of network traffic, in bytes, sent from this database.
+
+
+[float]
+=== mongodb.status.network.requests
+
+type: long
+
+The total number of requests received by the server.
+
+
+[float]
+== opcounters Fields
+
+An overview of database operations by type.
+
+
+
+[float]
+=== mongodb.status.opcounters.insert
+
+type: long
+
+The total number of insert operations received since the mongod instance last started.
+
+
+[float]
+=== mongodb.status.opcounters.query
+
+type: long
+
+The total number of queries received since the mongod instance last started.
+
+
+[float]
+=== mongodb.status.opcounters.update
+
+type: long
+
+The total number of update operations received since the mongod instance last started.
+
+
+[float]
+=== mongodb.status.opcounters.delete
+
+type: long
+
+The total number of delete operations received since the mongod instance last started.
+
+
+[float]
+=== mongodb.status.opcounters.getmore
+
+type: long
+
+The total number of getmore operations received since the mongod instance last started.
+
+
+[float]
+=== mongodb.status.opcounters.command
+
+type: long
+
+The total number of commands issued to the database since the mongod instance last started.
+
+
+[float]
+== opcounters_replicated Fields
+
+An overview of database replication operations by type.
+
+
+
+[float]
+=== mongodb.status.opcounters_replicated.insert
+
+type: long
+
+The total number of replicated insert operations received since the mongod instance last started.
+
+
+[float]
+=== mongodb.status.opcounters_replicated.query
+
+type: long
+
+The total number of replicated queries received since the mongod instance last started.
+
+
+[float]
+=== mongodb.status.opcounters_replicated.update
+
+type: long
+
+The total number of replicated update operations received since the mongod instance last started.
+
+
+[float]
+=== mongodb.status.opcounters_replicated.delete
+
+type: long
+
+The total number of replicated delete operations received since the mongod instance last started.
+
+
+[float]
+=== mongodb.status.opcounters_replicated.getmore
+
+type: long
+
+The total number of replicated getmore operations received since the mongod instance last started.
+
+
+[float]
+=== mongodb.status.opcounters_replicated.command
+
+type: long
+
+The total number of replicated commands issued to the database since the mongod instance last started.
+
+
+[float]
+== memory Fields
+
+Data about the current memory usage of the mongod server.
+
+
+
+[float]
+=== mongodb.status.memory.bits
+
+type: long
+
+Either 64 or 32, depending on which target architecture was specified during the mongod compilation process.
+
+
+[float]
+=== mongodb.status.memory.resident.mb
+
+type: long
+
+The amount of RAM, in megabytes (MB), currently used by the database process.
+
+
+[float]
+=== mongodb.status.memory.virtual.mb
+
+type: long
+
+The amount, in megabytes (MB), of virtual memory used by the mongod process.
+
+
+[float]
+=== mongodb.status.memory.mapped.mb
+
+type: long
+
+The amount of mapped memory, in megabytes (MB), used by the database. Because MongoDB uses memory-mapped files, this value is likely to be to be roughly equivalent to the total size of your database or databases.
+
+
+[float]
+=== mongodb.status.memory.mapped_with_journal.mb
+
+type: long
+
+The amount of mapped memory, in megabytes (MB), including the memory used for journaling.
+
+
+[float]
+=== mongodb.status.write_backs_queued
+
+type: boolean
+
+True when there are operations from a mongos instance queued for retrying.
+
+
+[float]
+=== mongodb.status.storage_engine.name
+
+type: keyword
+
+A string that represents the name of the current storage engine.
+
+
 [[exported-fields-mysql]]
-=== MySQL Status Fields
+== MySQL Fields
 
-MySQL server status metrics collected from MySQL
-
-
-
-[float]
-=== mysql Fields
-
-mysql contains the metrics that were obtained from MySQL query.
+MySQL server status metrics collected from MySQL.
 
 
 
 [float]
-=== status Fields
+== mysql Fields
+
+`mysql` contains the metrics that were obtained from MySQL query.
+
+
+
+[float]
+== status Fields
 
 `status` contains the metrics that were obtained by the status SQL query.
 
 
 
 [float]
-=== aborted Fields
+== aborted Fields
 
-Aborted status fields
+Aborted status fields.
 
 
 
-==== mysql.status.aborted.clients
+[float]
+=== mysql.status.aborted.clients
 
 type: integer
 
 The number of connections that were aborted because the client died without closing the connection properly.
 
 
-==== mysql.status.aborted.connects
+[float]
+=== mysql.status.aborted.connects
 
 type: integer
 
@@ -437,225 +996,252 @@ The number of failed attempts to connect to the MySQL server.
 
 
 [float]
-=== binlog Fields
+== binlog Fields
 
 
 
 
-==== mysql.status.binlog.cache.disk_use
-
-type: integer
-
-
-
-==== mysql.status.binlog.cache.use
+[float]
+=== mysql.status.binlog.cache.disk_use
 
 type: integer
 
 
 
 [float]
-=== bytes Fields
+=== mysql.status.binlog.cache.use
 
-Bytes stats
+type: integer
 
 
 
-==== mysql.status.bytes.received
+[float]
+== bytes Fields
+
+Bytes stats.
+
+
+
+[float]
+=== mysql.status.bytes.received
 
 type: integer
 
 The number of bytes received from all clients.
 
 
-==== mysql.status.bytes.sent
+[float]
+=== mysql.status.bytes.sent
 
 type: integer
 
 The number of bytes sent to all clients.
 
 
-==== mysql.status.connections
+[float]
+=== mysql.status.connections
 
 type: integer
 
 
 
 [float]
-=== created Fields
+== created Fields
 
 
 
 
-==== mysql.status.created.tmp.disk_tables
-
-type: integer
-
-
-
-==== mysql.status.created.tmp.files
-
-type: integer
-
-
-
-==== mysql.status.created.tmp.tables
+[float]
+=== mysql.status.created.tmp.disk_tables
 
 type: integer
 
 
 
 [float]
-=== delayed Fields
-
-
-
-
-==== mysql.status.delayed.errors
-
-type: integer
-
-
-
-==== mysql.status.delayed.insert_threads
-
-type: integer
-
-
-
-==== mysql.status.delayed.writes
-
-type: integer
-
-
-
-==== mysql.status.flush_commands
-
-type: integer
-
-
-
-==== mysql.status.max_used_connections
+=== mysql.status.created.tmp.files
 
 type: integer
 
 
 
 [float]
-=== open Fields
-
-
-
-
-==== mysql.status.open.files
+=== mysql.status.created.tmp.tables
 
 type: integer
 
 
 
-==== mysql.status.open.streams
+[float]
+== delayed Fields
+
+
+
+
+[float]
+=== mysql.status.delayed.errors
 
 type: integer
 
 
 
-==== mysql.status.open.tables
+[float]
+=== mysql.status.delayed.insert_threads
 
 type: integer
 
 
 
-==== mysql.status.opened_tables
+[float]
+=== mysql.status.delayed.writes
+
+type: integer
+
+
+
+[float]
+=== mysql.status.flush_commands
+
+type: integer
+
+
+
+[float]
+=== mysql.status.max_used_connections
+
+type: integer
+
+
+
+[float]
+== open Fields
+
+
+
+
+[float]
+=== mysql.status.open.files
+
+type: integer
+
+
+
+[float]
+=== mysql.status.open.streams
+
+type: integer
+
+
+
+[float]
+=== mysql.status.open.tables
+
+type: integer
+
+
+
+[float]
+=== mysql.status.opened_tables
 
 type: integer
 
 
 
 [[exported-fields-nginx]]
-=== Nginx Status Fields
+== Nginx Fields
 
 Nginx server status metrics collected from various modules.
 
 
 
 [float]
-=== nginx Fields
+== nginx Fields
 
-nginx contains the metrics that were scraped from nginx.
+`nginx` contains the metrics that were scraped from nginx.
 
 
 
 [float]
-=== stubstatus Fields
+== stubstatus Fields
 
 `stubstatus` contains the metrics that were scraped from the ngx_http_stub_status_module status page.
 
 
 
-==== nginx.stubstatus.hostname
+[float]
+=== nginx.stubstatus.hostname
 
 type: keyword
 
-Nginx hostname
+Nginx hostname.
 
 
-==== nginx.stubstatus.active
+[float]
+=== nginx.stubstatus.active
 
 type: integer
 
 The current number of active client connections including Waiting connections.
 
 
-==== nginx.stubstatus.accepts
+[float]
+=== nginx.stubstatus.accepts
 
 type: integer
 
 The total number of accepted client connections.
 
 
-==== nginx.stubstatus.handled
+[float]
+=== nginx.stubstatus.handled
 
 type: integer
 
 The total number of handled client connections.
 
 
-==== nginx.stubstatus.dropped
+[float]
+=== nginx.stubstatus.dropped
 
 type: integer
 
 The total number of dropped client connections.
 
 
-==== nginx.stubstatus.requests
+[float]
+=== nginx.stubstatus.requests
 
 type: integer
 
 The total number of client requests.
 
 
-==== nginx.stubstatus.current
+[float]
+=== nginx.stubstatus.current
 
 type: integer
 
 The current number of client requests.
 
 
-==== nginx.stubstatus.reading
+[float]
+=== nginx.stubstatus.reading
 
 type: integer
 
-The current number of connections where nginx is reading the request header.
+The current number of connections where Nginx is reading the request header.
 
 
-==== nginx.stubstatus.writing
+[float]
+=== nginx.stubstatus.writing
 
 type: integer
 
-The current number of connections where nginx is writing the response back to the client.
+The current number of connections where Nginx is writing the response back to the client.
 
 
-==== nginx.stubstatus.waiting
+[float]
+=== nginx.stubstatus.waiting
 
 type: integer
 
@@ -663,683 +1249,775 @@ The current number of idle client connections waiting for a request.
 
 
 [[exported-fields-redis]]
-=== Redis Status Fields
+== Redis Fields
 
-Redis metrics collected from the Redis
-
-
-
-[float]
-=== redis Fields
-
-`redis` contains the information and statistics from Redis
+Redis metrics collected from Redis.
 
 
 
 [float]
-=== info Fields
+== redis Fields
+
+`redis` contains the information and statistics from Redis.
+
+
+
+[float]
+== info Fields
 
 `info` contains the information and statistics returned by the `INFO` command.
 
 
 
 [float]
-=== clients Fields
+== clients Fields
 
-Redis client stats
+Redis client stats.
 
 
 
-==== redis.info.clients.connected
+[float]
+=== redis.info.clients.connected
 
 type: integer
 
-Number of client connections (excluding connections from slaves)
+Number of client connections (excluding connections from slaves).
 
 
-==== redis.info.clients.longest_output_list
+[float]
+=== redis.info.clients.longest_output_list
 
 type: integer
 
 Longest output list among current client connections.
 
 
-==== redis.info.clients.biggest_input_buf
+[float]
+=== redis.info.clients.biggest_input_buf
 
 type: integer
 
-Biggest input buffer among current client connections
-
-
-==== redis.info.clients.blocked
-
-type: integer
-
-Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH)
+Biggest input buffer among current client connections.
 
 
 [float]
-=== cluster Fields
+=== redis.info.clients.blocked
 
-Redis cluster information
+type: integer
+
+Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH).
+
+
+[float]
+== cluster Fields
+
+Redis cluster information.
 
 
 
-==== redis.info.cluster.enabled
+[float]
+=== redis.info.cluster.enabled
 
 type: boolean
 
-Indicate Redis cluster is enabled
+Indicates that the Redis cluster is enabled.
 
 
 [float]
-=== cpu Fields
+== cpu Fields
 
 Redis CPU stats
 
 
 
-==== redis.info.cpu.used.sys
+[float]
+=== redis.info.cpu.used.sys
 
-type: float
+type: half_float
 
-System CPU consumed by the Redis server
-
-
-==== redis.info.cpu.used.sys_children
-
-type: float
-
-User CPU consumed by the Redis server
-
-
-==== redis.info.cpu.used.user
-
-type: float
-
-System CPU consumed by the background processes
-
-
-==== redis.info.cpu.used.user_children
-
-type: float
-
-User CPU consumed by the background processes
+System CPU consumed by the Redis server.
 
 
 [float]
-=== memory Fields
+=== redis.info.cpu.used.sys_children
 
-Redis CPU stats
+type: half_float
 
-
-
-==== redis.info.memory.used.value
-
-type: integer
-
-Used memory
-
-
-==== redis.info.memory.used.rss
-
-type: integer
-
-Used memory rss
-
-
-==== redis.info.memory.used.peak
-
-type: integer
-
-Used memory peak
-
-
-==== redis.info.memory.used.lua
-
-type: integer
-
-Used memory lua
-
-
-==== redis.info.memory.allocator
-
-type: keyword
-
-Memory allocator
+User CPU consumed by the Redis server.
 
 
 [float]
-=== persistence Fields
+=== redis.info.cpu.used.user
 
-Redis CPU stats
+type: half_float
+
+System CPU consumed by the background processes.
+
+
+[float]
+=== redis.info.cpu.used.user_children
+
+type: half_float
+
+User CPU consumed by the background processes.
+
+
+[float]
+== memory Fields
+
+Redis CPU stats.
 
 
 
-==== redis.info.persistence.loading
-
-type: boolean
-
-None
-
-==== redis.info.persistence.rdb.changes_since_last_save
+[float]
+=== redis.info.memory.used.value
 
 type: integer
 
-None
+Used memory.
 
-==== redis.info.persistence.rdb.bgsave_in_progress
 
-type: boolean
-
-None
-
-==== redis.info.persistence.rdb.last_save_time
+[float]
+=== redis.info.memory.used.rss
 
 type: integer
 
-None
+Used memory rss.
 
-==== redis.info.persistence.rdb.last_bgsave_status
+
+[float]
+=== redis.info.memory.used.peak
+
+type: integer
+
+Used memory peak.
+
+
+[float]
+=== redis.info.memory.used.lua
+
+type: integer
+
+Used memory lua.
+
+
+[float]
+=== redis.info.memory.allocator
 
 type: keyword
 
-None
+Memory allocator.
 
-==== redis.info.persistence.rdb.last_bgsave_time_sec
 
-type: integer
+[float]
+== persistence Fields
 
-None
+Redis CPU stats.
 
-==== redis.info.persistence.rdb.current_bgsave_time_sec
 
-type: integer
 
-None
-
-==== redis.info.persistence.used.enabled
+[float]
+=== redis.info.persistence.loading
 
 type: boolean
 
 None
 
-==== redis.info.persistence.used.rewrite_in_progress
-
-type: boolean
-
-None
-
-==== redis.info.persistence.used.rewrite_scheduled
-
-type: boolean
-
-None
-
-==== redis.info.persistence.used.last_rewrite_time_sec
+[float]
+=== redis.info.persistence.rdb.changes_since_last_save
 
 type: integer
 
 None
 
-==== redis.info.persistence.used.current_rewrite_time_sec
+[float]
+=== redis.info.persistence.rdb.bgsave_in_progress
+
+type: boolean
+
+None
+
+[float]
+=== redis.info.persistence.rdb.last_save_time
 
 type: integer
 
 None
 
-==== redis.info.persistence.used.last_bgrewrite_status
-
-type: keyword
-
-None
-
-==== redis.info.persistence.used.last_write_status
+[float]
+=== redis.info.persistence.rdb.last_bgsave_status
 
 type: keyword
 
 None
 
 [float]
-=== replication Fields
+=== redis.info.persistence.rdb.last_bgsave_time_sec
+
+type: integer
+
+None
+
+[float]
+=== redis.info.persistence.rdb.current_bgsave_time_sec
+
+type: integer
+
+None
+
+[float]
+=== redis.info.persistence.aof.enabled
+
+type: boolean
+
+None
+
+[float]
+=== redis.info.persistence.aof.rewrite_in_progress
+
+type: boolean
+
+None
+
+[float]
+=== redis.info.persistence.aof.rewrite_scheduled
+
+type: boolean
+
+None
+
+[float]
+=== redis.info.persistence.aof.last_rewrite_time_sec
+
+type: integer
+
+None
+
+[float]
+=== redis.info.persistence.aof.current_rewrite_time_sec
+
+type: integer
+
+None
+
+[float]
+=== redis.info.persistence.aof.last_bgrewrite_status
+
+type: keyword
+
+None
+
+[float]
+=== redis.info.persistence.aof.last_write_status
+
+type: keyword
+
+None
+
+[float]
+== replication Fields
 
 Replication
 
 
 
-==== redis.info.replication.role
+[float]
+=== redis.info.replication.role
 
 type: keyword
 
 None
 
-==== redis.info.replication.connected_slaves
-
-type: integer
-
-None
-
-==== redis.info.replication.master_offset
-
-type: integer
-
-None
-
-==== redis.info.replication.backlog.active
-
-type: integer
-
-None
-
-==== redis.info.replication.backlog.size
-
-type: integer
-
-None
-
-==== redis.info.replication.backlog.first_byte_offset
-
-type: integer
-
-None
-
-==== redis.info.replication.backlog.histlen
+[float]
+=== redis.info.replication.connected_slaves
 
 type: integer
 
 None
 
 [float]
-=== server Fields
+=== redis.info.replication.master_offset
+
+type: integer
+
+None
+
+[float]
+=== redis.info.replication.backlog.active
+
+type: integer
+
+None
+
+[float]
+=== redis.info.replication.backlog.size
+
+type: integer
+
+None
+
+[float]
+=== redis.info.replication.backlog.first_byte_offset
+
+type: integer
+
+None
+
+[float]
+=== redis.info.replication.backlog.histlen
+
+type: integer
+
+None
+
+[float]
+== server Fields
 
 Server info
 
 
 
-==== redis.info.server.version
-
-type: keyword
-
-None
-
-==== redis.info.server.git_sha1
-
-type: keyword
-
-None
-
-==== redis.info.server.git_dirty
-
-type: keyword
-
-None
-
-==== redis.info.server.build_id
-
-type: keyword
-
-None
-
-==== redis.info.server.mode
-
-type: keyword
-
-None
-
-==== redis.info.server.os
-
-type: keyword
-
-None
-
-==== redis.info.server.arch_bits
-
-type: keyword
-
-None
-
-==== redis.info.server.multiplexing_api
-
-type: keyword
-
-None
-
-==== redis.info.server.gcc_version
-
-type: keyword
-
-None
-
-==== redis.info.server.process_id
-
-type: integer
-
-None
-
-==== redis.info.server.run_id
-
-type: keyword
-
-None
-
-==== redis.info.server.tcp_port
-
-type: integer
-
-None
-
-==== redis.info.server.uptime
-
-type: integer
-
-None
-
-==== redis.info.server.hz
-
-type: integer
-
-None
-
-==== redis.info.server.lru_clock
-
-type: integer
-
-None
-
-==== redis.info.server.config_file
+[float]
+=== redis.info.server.version
 
 type: keyword
 
 None
 
 [float]
-=== stats Fields
+=== redis.info.server.git_sha1
 
-Redis stats
-
-
-
-==== redis.info.stats.connections.received
-
-type: integer
+type: keyword
 
 None
 
-==== redis.info.stats.connections.rejected
+[float]
+=== redis.info.server.git_dirty
 
-type: integer
-
-None
-
-==== redis.info.stats.total_commands_processed
-
-type: integer
+type: keyword
 
 None
 
-==== redis.info.stats.total_net_input_bytes
+[float]
+=== redis.info.server.build_id
 
-type: integer
-
-None
-
-==== redis.info.stats.total_net_output_bytes
-
-type: integer
+type: keyword
 
 None
 
-==== redis.info.stats.instantaneous_ops_per_sec
+[float]
+=== redis.info.server.mode
 
-type: integer
-
-None
-
-==== redis.info.stats.instantaneous_input_kbps
-
-type: float
+type: keyword
 
 None
 
-==== redis.info.stats.instantaneous_output_kbps
+[float]
+=== redis.info.server.os
 
-type: float
-
-None
-
-==== redis.info.stats.sync.full
-
-type: integer
+type: keyword
 
 None
 
-==== redis.info.stats.sync.partial_ok
+[float]
+=== redis.info.server.arch_bits
 
-type: integer
-
-None
-
-==== redis.info.stats.sync.partial_err
-
-type: integer
+type: keyword
 
 None
 
-==== redis.info.stats.keys.expired
+[float]
+=== redis.info.server.multiplexing_api
 
-type: integer
-
-None
-
-==== redis.info.stats.keys.evicted
-
-type: integer
+type: keyword
 
 None
 
-==== redis.info.stats.keyspace.hits
+[float]
+=== redis.info.server.gcc_version
 
-type: integer
-
-None
-
-==== redis.info.stats.keyspace.misses
-
-type: integer
+type: keyword
 
 None
 
-==== redis.info.stats.pubsub_channels
-
-type: integer
-
-None
-
-==== redis.info.stats.pubsub_patterns
-
-type: integer
-
-None
-
-==== redis.info.stats.latest_fork_usec
-
-type: integer
-
-None
-
-==== redis.info.stats.migrate_cached_sockets
+[float]
+=== redis.info.server.process_id
 
 type: integer
 
 None
 
 [float]
-=== keyspace Fields
+=== redis.info.server.run_id
+
+type: keyword
+
+None
+
+[float]
+=== redis.info.server.tcp_port
+
+type: integer
+
+None
+
+[float]
+=== redis.info.server.uptime
+
+type: integer
+
+None
+
+[float]
+=== redis.info.server.hz
+
+type: integer
+
+None
+
+[float]
+=== redis.info.server.lru_clock
+
+type: integer
+
+None
+
+[float]
+=== redis.info.server.config_file
+
+type: keyword
+
+None
+
+[float]
+== stats Fields
+
+Redis stats.
+
+
+
+[float]
+=== redis.info.stats.connections.received
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.connections.rejected
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.total_commands_processed
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.total_net_input_bytes
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.total_net_output_bytes
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.instantaneous_ops_per_sec
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.instantaneous_input_kbps
+
+type: float
+
+None
+
+[float]
+=== redis.info.stats.instantaneous_output_kbps
+
+type: float
+
+None
+
+[float]
+=== redis.info.stats.sync.full
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.sync.partial_ok
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.sync.partial_err
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.keys.expired
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.keys.evicted
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.keyspace.hits
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.keyspace.misses
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.pubsub_channels
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.pubsub_patterns
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.latest_fork_usec
+
+type: integer
+
+None
+
+[float]
+=== redis.info.stats.migrate_cached_sockets
+
+type: integer
+
+None
+
+[float]
+== keyspace Fields
 
 `keyspace` contains the information about the keyspaces returned by the `INFO` command.
 
 
 
-==== redis.keyspace.id
+[float]
+=== redis.keyspace.id
 
 type: keyword
 
-Keyspace identifier
+Keyspace identifier.
 
 
-==== redis.keyspace.avg_ttl
-
-type: long
-
-Average ttl
-
-
-==== redis.keyspace.keys
+[float]
+=== redis.keyspace.avg_ttl
 
 type: long
 
-Number of keys in the keyspace
+Average ttl.
 
 
-==== redis.keyspace.expires
+[float]
+=== redis.keyspace.keys
+
+type: long
+
+Number of keys in the keyspace.
+
+
+[float]
+=== redis.keyspace.expires
 
 type: long
 
 
 
 [[exported-fields-system]]
-=== System Status Fields
+== System Fields
 
 System status metrics, like CPU and memory usage, that are collected from the operating system.
 
 
 
 [float]
-=== system Fields
+== system Fields
 
-`system` contains local system metrics
+`system` contains local system metrics.
 
 
 
 [float]
-=== core Fields
+== core Fields
 
-`system-core` contains local cpu core stats.
+`system-core` contains local CPU core stats.
 
 
 
-==== system.core.id
+[float]
+=== system.core.id
 
 type: integer
 
 CPU Core number.
 
 
-==== system.core.user.pct
+[float]
+=== system.core.user.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
-==== system.core.user.ticks
+[float]
+=== system.core.user.ticks
 
 type: long
 
 The amount of CPU time spent in user space.
 
 
-==== system.core.system.pct
+[float]
+=== system.core.system.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in kernel space.
 
 
-==== system.core.system.ticks
+[float]
+=== system.core.system.ticks
 
 type: long
 
 The amount of CPU time spent in kernel space.
 
 
-==== system.core.nice.pct
+[float]
+=== system.core.nice.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent on low-priority processes.
 
 
-==== system.core.nice.ticks
+[float]
+=== system.core.nice.ticks
 
 type: long
 
 The amount of CPU time spent on low-priority processes.
 
 
-==== system.core.idle.pct
+[float]
+=== system.core.idle.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent idle.
 
 
-==== system.core.idle.ticks
+[float]
+=== system.core.idle.ticks
 
 type: long
 
 The amount of CPU time spent idle.
 
 
-==== system.core.iowait.pct
+[float]
+=== system.core.iowait.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in wait (on disk).
 
 
-==== system.core.iowait.ticks
+[float]
+=== system.core.iowait.ticks
 
 type: long
 
 The amount of CPU time spent in wait (on disk).
 
 
-==== system.core.irq.pct
+[float]
+=== system.core.irq.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system.core.irq.ticks
+[float]
+=== system.core.irq.ticks
 
 type: long
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system.core.softirq.pct
+[float]
+=== system.core.softirq.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent servicing and handling software interrupts.
 
-==== system.core.softirq.ticks
+
+[float]
+=== system.core.softirq.ticks
 
 type: long
 
 The amount of CPU time spent servicing and handling software interrupts.
 
 
-==== system.core.steal.pct
+[float]
+=== system.core.steal.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
 
-==== system.core.steal.ticks
+[float]
+=== system.core.steal.ticks
 
 type: long
 
@@ -1347,116 +2025,134 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 
 [float]
-=== cpu Fields
+== cpu Fields
 
-`cpu` contains local cpu stats.
+`cpu` contains local CPU stats.
 
 
 
-==== system.cpu.user.pct
+[float]
+=== system.cpu.user.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
-==== system.cpu.system.pct
+[float]
+=== system.cpu.system.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in kernel space.
 
 
-==== system.cpu.nice.pct
+[float]
+=== system.cpu.nice.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent on low-priority processes.
 
 
-==== system.cpu.idle.pct
+[float]
+=== system.cpu.idle.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent idle.
 
 
-==== system.cpu.iowait.pct
+[float]
+=== system.cpu.iowait.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent in wait (on disk).
 
 
-==== system.cpu.irq.pct
+[float]
+=== system.cpu.irq.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system.cpu.softirq.pct
+[float]
+=== system.cpu.softirq.pct
 
-type: float
+type: half_float
 
 The percentage of CPU time spent servicing and handling software interrupts.
 
-==== system.cpu.steal.pct
 
-type: float
+[float]
+=== system.cpu.steal.pct
+
+type: half_float
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
 
-==== system.cpu.user.ticks
+[float]
+=== system.cpu.user.ticks
 
 type: long
 
 The amount of CPU time spent in user space.
 
 
-==== system.cpu.system.ticks
+[float]
+=== system.cpu.system.ticks
 
 type: long
 
 The amount of CPU time spent in kernel space.
 
 
-==== system.cpu.nice.ticks
+[float]
+=== system.cpu.nice.ticks
 
 type: long
 
 The amount of CPU time spent on low-priority processes.
 
 
-==== system.cpu.idle.ticks
+[float]
+=== system.cpu.idle.ticks
 
 type: long
 
 The amount of CPU time spent idle.
 
 
-==== system.cpu.iowait.ticks
+[float]
+=== system.cpu.iowait.ticks
 
 type: long
 
 The amount of CPU time spent in wait (on disk).
 
 
-==== system.cpu.irq.ticks
+[float]
+=== system.cpu.irq.ticks
 
 type: long
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system.cpu.softirq.ticks
+[float]
+=== system.cpu.softirq.ticks
 
 type: long
 
 The amount of CPU time spent servicing and handling software interrupts.
 
-==== system.cpu.steal.ticks
+
+[float]
+=== system.cpu.steal.ticks
 
 type: long
 
@@ -1464,41 +2160,45 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 
 [float]
-=== load Fields
+== load Fields
 
 Load averages.
 
 
 
-==== system.cpu.load.1
+[float]
+=== system.cpu.load.1
 
-type: float
+type: half_float
 
 Load average for the last minute.
 
 
-==== system.cpu.load.5
+[float]
+=== system.cpu.load.5
 
-type: float
+type: half_float
 
 Load average for the last 5 minutes.
 
 
-==== system.cpu.load.15
+[float]
+=== system.cpu.load.15
 
-type: float
+type: half_float
 
 Load average for the last 15 minutes.
 
 
 [float]
-=== diskio Fields
+== diskio Fields
 
 `disk` contains disk IO metrics collected from the operating system.
 
 
 
-==== system.diskio.name
+[float]
+=== system.diskio.name
 
 type: keyword
 
@@ -1507,172 +2207,194 @@ example: sda1
 The disk name.
 
 
-==== system.diskio.serial_number
+[float]
+=== system.diskio.serial_number
 
 type: keyword
 
 The disk's serial number. This may not be provided by all operating systems.
 
 
-==== system.diskio.read.count
+[float]
+=== system.diskio.read.count
 
 type: long
 
-This is the total number of reads completed successfully.
-
-
-==== system.diskio.write.count
-
-type: long
-
-This is the total number of writes completed successfully.
-
-
-==== system.diskio.read.bytes
-
-type: long
-
-This is the total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
-
-
-==== system.diskio.write.bytes
-
-type: long
-
-This is the total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
-
-
-==== system.diskio.read.time
-
-type: long
-
-This is the total number of milliseconds spent by all reads.
-
-
-==== system.diskio.write.time
-
-type: long
-
-This is the total number of milliseconds spent by all writes.
-
-
-==== system.diskio.io.time
-
-type: long
-
-This is the total number of of milliseconds spent doing I/Os.
+The total number of reads completed successfully.
 
 
 [float]
-=== filesystem Fields
+=== system.diskio.write.count
 
-`filesystem` contains local filesystem stats
+type: long
+
+The total number of writes completed successfully.
+
+
+[float]
+=== system.diskio.read.bytes
+
+type: long
+
+The total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
+
+
+[float]
+=== system.diskio.write.bytes
+
+type: long
+
+The total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
+
+
+[float]
+=== system.diskio.read.time
+
+type: long
+
+The total number of milliseconds spent by all reads.
+
+
+[float]
+=== system.diskio.write.time
+
+type: long
+
+The total number of milliseconds spent by all writes.
+
+
+[float]
+=== system.diskio.io.time
+
+type: long
+
+The total number of of milliseconds spent doing I/Os.
+
+
+[float]
+== filesystem Fields
+
+`filesystem` contains local filesystem stats.
 
 
 
-==== system.filesystem.avail
+[float]
+=== system.filesystem.avail
 
 type: long
 
 The disk space available to an unprivileged user in bytes.
 
 
-==== system.filesystem.device_name
+[float]
+=== system.filesystem.device_name
 
 type: keyword
 
 The disk name. For example: `/dev/disk1`
 
 
-==== system.filesystem.mount_point
+[float]
+=== system.filesystem.mount_point
 
 type: keyword
 
 The mounting point. For example: `/`
 
 
-==== system.filesystem.files
+[float]
+=== system.filesystem.files
 
 type: long
 
 The total number of file nodes in the file system.
 
 
-==== system.filesystem.free
+[float]
+=== system.filesystem.free
 
 type: long
 
 The disk space available in bytes.
 
 
-==== system.filesystem.free_files
+[float]
+=== system.filesystem.free_files
 
 type: long
 
 The number of free file nodes in the file system.
 
 
-==== system.filesystem.total
+[float]
+=== system.filesystem.total
 
 type: long
 
 The total disk space in bytes.
 
 
-==== system.filesystem.used.bytes
+[float]
+=== system.filesystem.used.bytes
 
 type: long
 
 The used disk space in bytes.
 
 
-==== system.filesystem.used.pct
+[float]
+=== system.filesystem.used.pct
 
-type: float
+type: half_float
 
 The percentage of used disk space.
 
 
 [float]
-=== fsstat Fields
+== fsstat Fields
 
 `system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
 
 
 
-==== system.fsstat.count
+[float]
+=== system.fsstat.count
 
 type: long
 
 Number of file systems found.
 
-==== system.fsstat.total_files
+[float]
+=== system.fsstat.total_files
 
 type: long
 
 Total number of files.
 
 [float]
-=== total_size Fields
+== total_size Fields
 
 Nested file system docs.
 
 
-==== system.fsstat.total_size.free
+[float]
+=== system.fsstat.total_size.free
 
 type: long
 
 Total free space.
 
 
-==== system.fsstat.total_size.used
+[float]
+=== system.fsstat.total_size.used
 
 type: long
 
 Total used space.
 
 
-==== system.fsstat.total_size.total
+[float]
+=== system.fsstat.total_size.total
 
 type: long
 
@@ -1680,110 +2402,122 @@ Total space (used plus free).
 
 
 [float]
-=== memory Fields
+== memory Fields
 
 `memory` contains local memory stats.
 
 
 
-==== system.memory.total
+[float]
+=== system.memory.total
 
 type: long
 
 Total memory.
 
 
-==== system.memory.used.bytes
+[float]
+=== system.memory.used.bytes
 
 type: long
 
 Used memory.
 
 
-==== system.memory.free
+[float]
+=== system.memory.free
 
 type: long
 
 Available memory.
 
 
-==== system.memory.used.pct
+[float]
+=== system.memory.used.pct
 
-type: float
+type: half_float
 
 The percentage of used memory.
 
 
 [float]
-=== actual Fields
+== actual Fields
 
 Actual memory fields.
 
 
 
-==== system.memory.actual.used.bytes
+[float]
+=== system.memory.actual.used.bytes
 
 type: long
 
 Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== system.memory.actual.free
+[float]
+=== system.memory.actual.free
 
 type: long
 
 Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== system.memory.actual.used.pct
+[float]
+=== system.memory.actual.used.pct
 
-type: float
+type: half_float
 
 The percentage of actual used memory.
 
 
 [float]
-=== swap Fields
+== swap Fields
 
 This group contains statistics related to the swap memory usage on the system.
 
 
-==== system.memory.swap.total
+[float]
+=== system.memory.swap.total
 
 type: long
 
 Total swap memory.
 
 
-==== system.memory.swap.used.bytes
+[float]
+=== system.memory.swap.used.bytes
 
 type: long
 
 Used swap memory.
 
 
-==== system.memory.swap.free
+[float]
+=== system.memory.swap.free
 
 type: long
 
 Available swap memory.
 
 
-==== system.memory.swap.used.pct
+[float]
+=== system.memory.swap.used.pct
 
-type: float
+type: half_float
 
 The percentage of used swap memory.
 
 
 [float]
-=== network Fields
+== network Fields
 
 `network` contains network IO metrics for a single network interface.
 
 
 
-==== system.network.name
+[float]
+=== system.network.name
 
 type: keyword
 
@@ -1792,56 +2526,64 @@ example: eth0
 The network interface name.
 
 
-==== system.network.out.bytes
+[float]
+=== system.network.out.bytes
 
 type: long
 
 The number of bytes sent.
 
 
-==== system.network.in.bytes
+[float]
+=== system.network.in.bytes
 
 type: long
 
 The number of bytes received.
 
 
-==== system.network.out.packets
+[float]
+=== system.network.out.packets
 
 type: long
 
 The number of packets sent.
 
 
-==== system.network.in.packets
+[float]
+=== system.network.in.packets
 
 type: long
 
 The number or packets received.
 
 
-==== system.network.in.errors
+[float]
+=== system.network.in.errors
 
 type: long
 
 The number of errors while receiving.
 
 
-==== system.network.out.errors
+[float]
+=== system.network.out.errors
 
 type: long
 
 The number of errors while sending.
 
 
-==== system.network.in.dropped
+[float]
+=== system.network.in.dropped
 
 type: long
 
 The number of incoming packets that were dropped.
 
 
-==== system.network.out.dropped
+[float]
+=== system.network.out.dropped
 
 type: long
 
@@ -1849,89 +2591,108 @@ The number of outgoing packets that were dropped. This value is always 0 on Darw
 
 
 [float]
-=== process Fields
+== process Fields
 
 `process` contains process metadata, CPU metrics, and memory metrics.
 
 
 
-==== system.process.name
+[float]
+=== system.process.name
 
 type: keyword
 
 The process name.
 
 
-==== system.process.state
+[float]
+=== system.process.state
 
 type: keyword
 
-The process state. For example: "running"
+The process state. For example: "running".
 
 
-==== system.process.pid
+[float]
+=== system.process.pid
 
 type: integer
 
 The process pid.
 
 
-==== system.process.ppid
+[float]
+=== system.process.ppid
 
 type: integer
 
 The process parent pid.
 
 
-==== system.process.cmdline
+[float]
+=== system.process.pgid
+
+type: integer
+
+The process group id.
+
+
+[float]
+=== system.process.cmdline
 
 type: keyword
 
 The full command-line used to start the process, including the arguments separated by space.
 
 
-==== system.process.username
+[float]
+=== system.process.username
 
 type: keyword
 
-The username of the user that created the process. If the username can not be determined then the the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
+The username of the user that created the process. If the username cannot be determined, the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
 
 
 [float]
-=== cpu Fields
+== cpu Fields
 
 CPU-specific statistics per process.
 
 
-==== system.process.cpu.user
+[float]
+=== system.process.cpu.user
 
 type: long
 
 The amount of CPU time the process spent in user space.
 
 
-==== system.process.cpu.total.pct
+[float]
+=== system.process.cpu.total.pct
 
-type: float
+type: half_float
 
-The percentage of CPU time spent by the process since the last update. Its value is similar with the %CPU value of the process displayed by the top command on unix systems.
+The percentage of CPU time spent by the process since the last update. Its value is similar to the %CPU value of the process displayed by the top command on Unix systems.
 
 
-==== system.process.cpu.system
+[float]
+=== system.process.cpu.system
 
 type: long
 
 The amount of CPU time the process spent in kernel space.
 
 
-==== system.process.cpu.total.ticks
+[float]
+=== system.process.cpu.total.ticks
 
 type: long
 
 The total CPU time spent by the process.
 
 
-==== system.process.cpu.start_time
+[float]
+=== system.process.cpu.start_time
 
 type: keyword
 
@@ -1939,33 +2700,37 @@ The time when the process was started. Example: "17:45".
 
 
 [float]
-=== memory Fields
+== memory Fields
 
 Memory-specific statistics per process.
 
 
-==== system.process.memory.size
+[float]
+=== system.process.memory.size
 
 type: long
 
 The total virtual memory the process has.
 
 
-==== system.process.memory.rss.bytes
+[float]
+=== system.process.memory.rss.bytes
 
 type: long
 
 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
 
-==== system.process.memory.rss.pct
+[float]
+=== system.process.memory.rss.pct
 
-type: float
+type: half_float
 
 The percentage of memory the process occupied in main memory (RAM).
 
 
-==== system.process.memory.share
+[float]
+=== system.process.memory.share
 
 type: long
 
@@ -1973,156 +2738,175 @@ The shared memory the process uses.
 
 
 [[exported-fields-zookeeper]]
-=== Zookeeper Status Fields
+== ZooKeeper Fields
 
 ZooKeeper metrics collected by the four-letter monitoring commands.
 
 
 
 [float]
-=== zookeeper Fields
+== zookeeper Fields
 
-`zookeeper` contains the metrics reported by zookeeper command.
+`zookeeper` contains the metrics reported by ZooKeeper commands.
 
 
 
 [float]
-=== mntr Fields
+== mntr Fields
 
 `mntr` contains the metrics reported by the four-letter `mntr` command.
 
 
 
-==== zookeeper.mntr.hostname
+[float]
+=== zookeeper.mntr.hostname
 
 type: keyword
 
-Zookeeper hostname.
+ZooKeeper hostname.
 
 
-==== zookeeper.mntr.approximate_data_size
+[float]
+=== zookeeper.mntr.approximate_data_size
 
 type: long
 
-Approximate size of zookeeper data.
+Approximate size of ZooKeeper data.
 
 
-==== zookeeper.mntr.latency.avg
+[float]
+=== zookeeper.mntr.latency.avg
 
 type: integer
 
 Average latency between ensemble hosts in milliseconds.
 
 
-==== zookeeper.mntr.ephemerals_count
+[float]
+=== zookeeper.mntr.ephemerals_count
 
 type: integer
 
 Number of ephemeral znodes.
 
 
-==== zookeeper.mntr.followers
+[float]
+=== zookeeper.mntr.followers
 
 type: integer
 
 Number of followers seen by the current host.
 
 
-==== zookeeper.mntr.max_file_descriptor_count
+[float]
+=== zookeeper.mntr.max_file_descriptor_count
 
 type: integer
 
-Maximum number of file descriptors allowed for the zookeeper process.
+Maximum number of file descriptors allowed for the ZooKeeper process.
 
 
-==== zookeeper.mntr.latency.max
+[float]
+=== zookeeper.mntr.latency.max
 
 type: integer
 
 Maximum latency in milliseconds.
 
 
-==== zookeeper.mntr.latency.min
+[float]
+=== zookeeper.mntr.latency.min
 
 type: integer
 
 Minimum latency in milliseconds.
 
 
-==== zookeeper.mntr.num_alive_connections
+[float]
+=== zookeeper.mntr.num_alive_connections
 
 type: integer
 
-Number of connections to zookeeper that are currently alive.
+Number of connections to ZooKeeper that are currently alive.
 
 
-==== zookeeper.mntr.open_file_descriptor_count
+[float]
+=== zookeeper.mntr.open_file_descriptor_count
 
 type: integer
 
-Number of file descriptors open by the zookeeper process.
+Number of file descriptors open by the ZooKeeper process.
 
 
-==== zookeeper.mntr.outstanding_requests
+[float]
+=== zookeeper.mntr.outstanding_requests
 
 type: integer
 
 Number of outstanding requests that need to be processed by the cluster.
 
 
-==== zookeeper.mntr.packets.received
+[float]
+=== zookeeper.mntr.packets.received
 
 type: integer
 
-Number zookeeper network packets received.
+Number of ZooKeeper network packets received.
 
 
-==== zookeeper.mntr.packets.sent
+[float]
+=== zookeeper.mntr.packets.sent
 
 type: long
 
-Number zookeeper network packets sent.
+Number of ZooKeeper network packets sent.
 
 
-==== zookeeper.mntr.pending_syncs
+[float]
+=== zookeeper.mntr.pending_syncs
 
 type: integer
 
-Number of pending syncs to carry out to zookeeper ensemble followers.
+Number of pending syncs to carry out to ZooKeeper ensemble followers.
 
 
-==== zookeeper.mntr.server_state
+[float]
+=== zookeeper.mntr.server_state
 
 type: keyword
 
-Role in the zookeeper ensemble.
+Role in the ZooKeeper ensemble.
 
 
-==== zookeeper.mntr.synced_followers
+[float]
+=== zookeeper.mntr.synced_followers
 
 type: integer
 
 Number of synced followers reported when a node server_state is leader.
 
 
-==== zookeeper.mntr.version
+[float]
+=== zookeeper.mntr.version
 
 type: keyword
 
-Zookeeper version and build string reported.
+ZooKeeper version and build string reported.
 
 
-==== zookeeper.mntr.watch_count
-
-type: integer
-
-Number of watches currently set on the local zookeeper process.
-
-
-==== zookeeper.mntr.znode_count
+[float]
+=== zookeeper.mntr.watch_count
 
 type: integer
 
-Number of znodes reported by the local zookeeper process.
+Number of watches currently set on the local ZooKeeper process.
+
+
+[float]
+=== zookeeper.mntr.znode_count
+
+type: integer
+
+Number of znodes reported by the local ZooKeeper process.
 
 

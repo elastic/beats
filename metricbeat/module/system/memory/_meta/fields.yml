@@ -1,0 +1,71 @@
+- name: memory
+  type: group
+  description: >
+    `memory` contains local memory stats.
+  fields:
+    - name: total
+      type: long
+      description: >
+        Total memory.
+
+    - name: used.bytes
+      type: long
+      description: >
+        Used memory.
+
+    - name: free
+      type: long
+      description: >
+        Available memory.
+
+    - name: used.pct
+      type: half_float
+      description: >
+        The percentage of used memory.
+
+    - name: actual
+      type: group
+      description: >
+        Actual memory fields.
+      fields:
+        - name: used.bytes
+          type: long
+          description: >
+            Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
+            Available only on Unix.
+
+        - name: free
+          type: long
+          description: >
+            Actual available memory. This value is the "free" memory plus the memory used for disk caches and
+            buffers. Available only on Unix.
+
+        - name: used.pct
+          type: half_float
+          description: >
+            The percentage of actual used memory.
+
+    - name: swap
+      type: group
+      prefix: "[float]"
+      description: This group contains statistics related to the swap memory usage on the system.
+      fields:
+        - name: total
+          type: long
+          description: >
+            Total swap memory.
+
+        - name: used.bytes
+          type: long
+          description: >
+            Used swap memory.
+
+        - name: free
+          type: long
+          description: >
+            Available swap memory.
+
+        - name: used.pct
+          type: half_float
+          description: >
+            The percentage of used swap memory.

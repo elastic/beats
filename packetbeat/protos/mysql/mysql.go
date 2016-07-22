@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"errors"
+	"expvar"
 	"fmt"
 	"strings"
 	"time"
@@ -21,6 +22,11 @@ const (
 )
 
 const MAX_PAYLOAD_SIZE = 100 * 1024
+
+var (
+	unmatchedRequests  = expvar.NewInt("mysql.unmatched_requests")
+	unmatchedResponses = expvar.NewInt("mysql.unmatched_responses")
+)
 
 type MysqlMessage struct {
 	start int
@@ -261,7 +267,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
 			} else {
 				// something else, not expected
-				logp.Warn("Unexpected MySQL message of type %d received.", m.Typ)
+				logp.Debug("mysql", "Unexpected MySQL message of type %d received.", m.Typ)
 				return false, false
 			}
 			break
@@ -586,6 +592,7 @@ func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
 	if trans != nil {
 		if trans.Mysql != nil {
 			logp.Debug("mysql", "Two requests without a Response. Dropping old request: %s", trans.Mysql)
+			unmatchedRequests.Add(1)
 		}
 	} else {
 		trans = &MysqlTransaction{Type: "mysql", tuple: tuple}
@@ -635,12 +642,14 @@ func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
 func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
 	trans := mysql.getTransaction(msg.TcpTuple.Hashable())
 	if trans == nil {
-		logp.Warn("Response from unknown transaction. Ignoring.")
+		logp.Debug("mysql", "Response from unknown transaction. Ignoring.")
+		unmatchedResponses.Add(1)
 		return
 	}
 	// check if the request was received
 	if trans.Mysql == nil {
-		logp.Warn("Response from unknown transaction. Ignoring.")
+		logp.Debug("mysql", "Response from unknown transaction. Ignoring.")
+		unmatchedResponses.Add(1)
 		return
 
 	}

@@ -1,0 +1,30 @@
+- key: common
+  title: Common
+  description: >
+    Contains common fields available in all event types.
+  fields:
+
+    - name: metricset.module
+      description: >
+        The name of the module that generated the event.
+
+    - name: metricset.name
+      description: >
+        The name of the metricset that generated the event.
+
+    - name: metricset.host
+      description: >
+        Hostname of the machine from which the metricset was collected. This
+        field may not be present when the data was collected locally.
+
+    - name: metricset.rtt
+      type: long
+      required: true
+      description: >
+        Event round trip time in microseconds.
+
+    - name: type
+      required: true
+      example: metricsets
+      description: >
+        The document type. Always set to "metricsets".

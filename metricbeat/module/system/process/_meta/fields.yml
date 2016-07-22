@@ -1,0 +1,84 @@
+- name: process
+  type: group
+  description: >
+    `process` contains process metadata, CPU metrics, and memory metrics.
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        The process name.
+    - name: state
+      type: keyword
+      description: >
+        The process state. For example: "running".
+    - name: pid
+      type: integer
+      description: >
+        The process pid.
+    - name: ppid
+      type: integer
+      description: >
+        The process parent pid.
+    - name: pgid
+      type: integer
+      description: >
+        The process group id.
+    - name: cmdline
+      type: keyword
+      description: >
+        The full command-line used to start the process, including the
+        arguments separated by space.
+    - name: username
+      type: keyword
+      description: >
+        The username of the user that created the process. If the username
+        cannot be determined, the field will contain the user's
+        numeric identifier (UID). On Windows, this field includes the user's
+        domain and is formatted as `domain\username`.
+    - name: cpu
+      type: group
+      prefix: "[float]"
+      description: CPU-specific statistics per process.
+      fields:
+        - name: user
+          type: long
+          description: >
+            The amount of CPU time the process spent in user space.
+        - name: total.pct
+          type: half_float
+          description: >
+            The percentage of CPU time spent by the process since the last update. Its value is similar to the
+            %CPU value of the process displayed by the top command on Unix systems.
+        - name: system
+          type: long
+          description: >
+            The amount of CPU time the process spent in kernel space.
+        - name: total.ticks
+          type: long
+          description: >
+            The total CPU time spent by the process.
+        - name: start_time
+          type: keyword
+          description: >
+            The time when the process was started. Example: "17:45".
+    - name: memory
+      type: group
+      description: Memory-specific statistics per process.
+      prefix: "[float]"
+      fields:
+        - name: size
+          type: long
+          description: >
+            The total virtual memory the process has.
+        - name: rss.bytes
+          type: long
+          description: >
+            The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
+        - name: rss.pct
+          type: half_float
+          description: >
+            The percentage of memory the process occupied in main memory (RAM).
+        - name: share
+          type: long
+          description: >
+            The shared memory the process uses.

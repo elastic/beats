@@ -4,8 +4,11 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-== Exported Fields
+= Exported Fields
 
+[partintro]
+
+--
 This document describes the fields that are exported by Winlogbeat. They are
 grouped in the following categories:
 
@@ -13,24 +16,28 @@ grouped in the following categories:
 * <<exported-fields-common>>
 * <<exported-fields-eventlog>>
 
+--
 [[exported-fields-beat]]
-=== Beat Fields
+== Beat Fields
 
 Contains common beat fields available in all event types.
 
 
 
-==== beat.name
+[float]
+=== beat.name
 
 The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
 
 
-==== beat.hostname
+[float]
+=== beat.hostname
 
 The hostname as returned by the operating system on which the Beat is running.
 
 
-==== @timestamp
+[float]
+=== @timestamp
 
 type: date
 
@@ -43,12 +50,14 @@ required: True
 The timestamp when the event log record was generated.
 
 
-==== tags
+[float]
+=== tags
 
 Arbitrary tags that can be set per Beat and per transaction type.
 
 
-==== fields
+[float]
+=== fields
 
 type: dict
 
@@ -56,13 +65,14 @@ Contains user configurable fields.
 
 
 [[exported-fields-common]]
-=== Common Winlogbeat Fields
+== Common Winlogbeat Fields
 
 Contains common fields available in all event types.
 
 
 
-==== type
+[float]
+=== type
 
 required: True
 
@@ -71,13 +81,14 @@ The Event Logging API was designed for Windows Server 2003, Windows XP, or Windo
 
 
 [[exported-fields-eventlog]]
-=== Event Log Record Fields
+== Event Log Record Fields
 
 Contains data from a Windows event log record.
 
 
 
-==== activity_id
+[float]
+=== activity_id
 
 type: keyword
 
@@ -86,7 +97,8 @@ required: False
 A globally unique identifier that identifies the current activity. The events that are published with this identifier are part of the same activity.
 
 
-==== computer_name
+[float]
+=== computer_name
 
 type: keyword
 
@@ -95,7 +107,8 @@ required: True
 The name of the computer that generated the record. When using Windows event forwarding, this name can differ from the `beat.hostname`.
 
 
-==== event_data
+[float]
+=== event_data
 
 type: dict
 
@@ -104,7 +117,8 @@ required: False
 The event specific data. This field is mutually exclusive with `user_data`.
 
 
-==== event_id
+[float]
+=== event_id
 
 type: long
 
@@ -113,7 +127,8 @@ required: True
 The event identifier. The value is specific to the source of the event.
 
 
-==== keywords
+[float]
+=== keywords
 
 type: keyword
 
@@ -122,7 +137,8 @@ required: False
 The keywords are used to classify an event.
 
 
-==== log_name
+[float]
+=== log_name
 
 type: keyword
 
@@ -131,7 +147,8 @@ required: True
 The name of the event log from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
 
 
-==== level
+[float]
+=== level
 
 type: keyword
 
@@ -140,7 +157,8 @@ required: False
 The level of the event. There are five levels of events that can be logged: Success, Information, Warning, Error, Audit Success, and Audit Failure.
 
 
-==== message
+[float]
+=== message
 
 type: text
 
@@ -149,7 +167,8 @@ required: False
 The message from the event log record.
 
 
-==== message_error
+[float]
+=== message_error
 
 type: keyword
 
@@ -158,7 +177,8 @@ required: False
 The error that occurred while reading and formatting the message from the log.
 
 
-==== record_number
+[float]
+=== record_number
 
 type: keyword
 
@@ -167,7 +187,8 @@ required: True
 The record number of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (2^32^ for the Event Logging API and 2^64^ for the Windows Event Log API), the next record number will be 0.
 
 
-==== related_activity_id
+[float]
+=== related_activity_id
 
 type: keyword
 
@@ -176,7 +197,8 @@ required: False
 A globally unique identifier that identifies the activity to which control was transferred to. The related events would then have this identifier as their `activity_id` identifier.
 
 
-==== opcode
+[float]
+=== opcode
 
 type: keyword
 
@@ -185,7 +207,8 @@ required: False
 The opcode defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged.
 
 
-==== provider_guid
+[float]
+=== provider_guid
 
 type: keyword
 
@@ -194,7 +217,8 @@ required: False
 A globally unique identifier that identifies the provider that logged the event.
 
 
-==== process_id
+[float]
+=== process_id
 
 type: long
 
@@ -203,7 +227,8 @@ required: False
 The process_id identifies the process that generated the event.
 
 
-==== source_name
+[float]
+=== source_name
 
 type: keyword
 
@@ -212,7 +237,8 @@ required: True
 The source of the event log record (the application or service that logged the record).
 
 
-==== task
+[float]
+=== task
 
 type: keyword
 
@@ -221,7 +247,8 @@ required: False
 The task defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged. The category used by the Event Logging API (on pre Windows Vista operating systems) is written to this field.
 
 
-==== thread_id
+[float]
+=== thread_id
 
 type: long
 
@@ -230,7 +257,8 @@ required: False
 The thread_id identifies the thread that generated the event.
 
 
-==== user_data
+[float]
+=== user_data
 
 type: dict
 
@@ -239,7 +267,8 @@ required: False
 The event specific data. This field is mutually exclusive with `event_data`.
 
 
-==== user.identifier
+[float]
+=== user.identifier
 
 type: keyword
 
@@ -252,7 +281,8 @@ The Windows security identifier (SID) of the account associated with this event.
 If Winlogbeat cannot resolve the SID to a name, then the `user.name`, `user.domain`, and `user.type` fields will be omitted from the event. If you discover Winlogbeat not resolving SIDs, review the log for clues as to what the problem may be.
 
 
-==== user.name
+[float]
+=== user.name
 
 type: keyword
 
@@ -261,7 +291,8 @@ required: False
 The name of the account associated with this event.
 
 
-==== user.domain
+[float]
+=== user.domain
 
 type: keyword
 
@@ -270,7 +301,8 @@ required: False
 The domain that the account associated with this event is a member of.
 
 
-==== user.type
+[float]
+=== user.type
 
 type: keyword
 
@@ -279,7 +311,8 @@ required: False
 The type of account associated with this event.
 
 
-==== version
+[float]
+=== version
 
 type: integer
 
@@ -287,7 +320,8 @@ required: False
 
 The version number of the event's definition.
 
-==== xml
+[float]
+=== xml
 
 type: text
 

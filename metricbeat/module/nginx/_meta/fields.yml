@@ -1,0 +1,11 @@
+- key: nginx
+  title: "Nginx"
+  description: >
+    Nginx server status metrics collected from various modules.
+  short_config: false
+  fields:
+    - name: nginx
+      type: group
+      description: >
+        `nginx` contains the metrics that were scraped from nginx.
+      fields:

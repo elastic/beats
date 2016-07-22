@@ -10,7 +10,7 @@
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
-#---------------------------- System Status Module ---------------------------
+#------------------------------- System Module -------------------------------
 - module: system
   metricsets:
     # CPU stats
@@ -50,7 +50,7 @@ metricbeat.modules:
   #period: 10s
 
   # Apache hosts
-  #hosts: ["http://127.0.0.1/"]
+  #hosts: ["http://127.0.0.1"]
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
@@ -61,7 +61,18 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
-#---------------------------- MySQL Status Module ----------------------------
+#------------------------------- MongoDB Module ------------------------------
+#- module: mongodb
+  #metricsets: ["status"]
+  #enabled: true
+  #period: 10s
+
+  # The hosts must be passed as MongoDB URLs in the format:
+  # [mongodb://][user:pass@]host[:port]
+  #hosts: ["localhost:27017"]
+
+
+#-------------------------------- MySQL Module -------------------------------
 #- module: mysql
   #metricsets: ["status"]
   #enabled: true
@@ -77,19 +88,19 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test
 
-#---------------------------- Nginx Status Module ----------------------------
+#-------------------------------- Nginx Module -------------------------------
 #- module: nginx
   #metricsets: ["stubstatus"]
   #enabled: true
   #period: 10s
 
   # Nginx hosts
-  #hosts: ["http://127.0.0.1/"]
+  #hosts: ["http://127.0.0.1"]
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
 
-#---------------------------- Redis Status Module ----------------------------
+#-------------------------------- Redis Module -------------------------------
 #- module: redis
   #metricsets: ["info", "keyspace"]
   #enabled: true
@@ -124,7 +135,7 @@ metricbeat.modules:
   # Redis AUTH password. Empty by default.
   #password: foobared
 
-#-------------------------- Zookeeper Status Module --------------------------
+#------------------------------ ZooKeeper Module -----------------------------
 #- module: zookeeper
   #metricsets: ["mntr"]
   #enabled: true

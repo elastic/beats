@@ -4,127 +4,110 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/crawler"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/publish"
+	"github.com/elastic/beats/filebeat/registrar"
+	"github.com/elastic/beats/filebeat/spooler"
 )
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
-	FbConfig *cfg.Config
-	// Channel from harvesters to spooler
-	publisherChan chan []*input.FileEvent
-	spooler       *Spooler
-	registrar     *crawler.Registrar
-	crawler       *crawler.Crawler
-	pub           logPublisher
-	done          chan struct{}
+	config *cfg.Config
+	done   chan struct{}
 }
 
 // New creates a new Filebeat pointer instance.
-func New() *Filebeat {
-	return &Filebeat{}
-}
-
-// Config setups up the filebeat configuration by fetch all additional config files
-func (fb *Filebeat) Config(b *beat.Beat) error {
-
-	// Load Base config
-	err := b.RawConfig.Unpack(&fb.FbConfig)
-
-	if err != nil {
-		return fmt.Errorf("Error reading config file: %v", err)
+func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+	config := cfg.DefaultConfig
+	if err := rawConfig.Unpack(&config); err != nil {
+		return nil, fmt.Errorf("Error reading config file: %v", err)
+	}
+	if err := config.FetchConfigs(); err != nil {
+		return nil, err
 	}
 
-	// Check if optional config_dir is set to fetch additional prospector config files
-	fb.FbConfig.FetchConfigs()
-
-	return nil
-}
-
-// Setup applies the minimum required setup to a new Filebeat instance for use.
-func (fb *Filebeat) Setup(b *beat.Beat) error {
-	fb.done = make(chan struct{})
-
-	return nil
+	fb := &Filebeat{
+		done:   make(chan struct{}),
+		config: &config,
+	}
+	return fb, nil
 }
 
 // Run allows the beater to be run as a beat.
 func (fb *Filebeat) Run(b *beat.Beat) error {
-
 	var err error
-
-	// Init channels
-	fb.publisherChan = make(chan []*input.FileEvent, 1)
+	config := fb.config
 
 	// Setup registrar to persist state
-	fb.registrar, err = crawler.NewRegistrar(fb.FbConfig.Filebeat.RegistryFile)
+	registrar, err := registrar.New(config.RegistryFile)
 	if err != nil {
 		logp.Err("Could not init registrar: %v", err)
 		return err
 	}
 
-	fb.crawler = &crawler.Crawler{
-		Registrar: fb.registrar,
-	}
+	// Channel from harvesters to spooler
+	publisherChan := make(chan []*input.FileEvent, 1)
 
-	// Load the previous log file locations now, for use in prospector
-	err = fb.registrar.LoadState()
-	if err != nil {
-		logp.Err("Error loading state: %v", err)
-		return err
-	}
+	// Publishes event to output
+	publisher := publish.New(config.PublishAsync,
+		publisherChan, registrar.Channel, b.Publisher)
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
-	fb.spooler = NewSpooler(fb.FbConfig.Filebeat, fb.publisherChan)
-
+	spooler, err := spooler.New(config, publisherChan)
 	if err != nil {
 		logp.Err("Could not init spooler: %v", err)
 		return err
 	}
 
-	fb.registrar.Start()
-	fb.spooler.Start()
-
-	err = fb.crawler.Start(fb.FbConfig.Filebeat.Prospectors, fb.spooler.Channel)
+	crawler, err := crawler.New(spooler, config.Prospectors)
 	if err != nil {
+		logp.Err("Could not init crawler: %v", err)
 		return err
 	}
 
-	// Publishes event to output
-	fb.pub = newPublisher(fb.FbConfig.Filebeat.PublishAsync,
-		fb.publisherChan, fb.registrar.Channel, b.Publisher.Connect())
-	fb.pub.Start()
+	// The order of starting and stopping is important. Stopping is inverted to the starting order.
+	// The current order is: registrar, publisher, spooler, crawler
+	// That means, crawler is stopped first.
 
-	// Blocks progressing
+	// Start the registrar
+	err = registrar.Start()
+	if err != nil {
+		logp.Err("Could not start registrar: %v", err)
+	}
+	// Stopping registrar will write last state
+	defer registrar.Stop()
+
+	// Start publisher
+	publisher.Start()
+	// Stopping publisher (might potentially drop items)
+	defer publisher.Stop()
+
+	// Starting spooler
+	spooler.Start()
+	// Stopping spooler will flush items
+	defer spooler.Stop()
+
+	err = crawler.Start(registrar.GetStates())
+	if err != nil {
+		return err
+	}
+	// Stop crawler -> stop prospectors -> stop harvesters
+	defer crawler.Stop()
+
+	// Blocks progressing. As soon as channel is closed, all defer statements come into play
 	<-fb.done
 
 	return nil
 }
 
-// Cleanup removes any temporary files, data, or other items that were created by the Beat.
-func (fb *Filebeat) Cleanup(b *beat.Beat) error {
-	return nil
-}
-
 // Stop is called on exit to stop the crawling, spooling and registration processes.
 func (fb *Filebeat) Stop() {
-
 	logp.Info("Stopping filebeat")
-
-	// Stop crawler -> stop prospectors -> stop harvesters
-	fb.crawler.Stop()
-
-	// Stopping spooler will flush items
-	fb.spooler.Stop()
-
-	// stopping publisher (might potentially drop items)
-	fb.pub.Stop()
-
-	// Stopping registrar will write last state
-	fb.registrar.Stop()
 
 	// Stop Filebeat
 	close(fb.done)

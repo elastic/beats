@@ -15,7 +15,8 @@ import (
 // not available, the output plugin blocks until the connection is either available
 // again or the connection mode is closed by Close.
 type Mode struct {
-	conn mode.ProtocolClient
+	conn        mode.ProtocolClient
+	isConnected bool
 
 	closed bool // mode closed flag to break publisher loop
 
@@ -52,16 +53,25 @@ func New(
 }
 
 func (s *Mode) connect() error {
-	if s.conn.IsConnected() {
+	if s.isConnected {
 		return nil
 	}
-	return s.conn.Connect(s.timeout)
+
+	err := s.conn.Connect(s.timeout)
+	s.isConnected = err == nil
+	return err
 }
 
 // Close closes the underlying connection.
 func (s *Mode) Close() error {
 	s.closed = true
-	return s.conn.Close()
+	return s.closeClient()
+}
+
+func (s *Mode) closeClient() error {
+	err := s.conn.Close()
+	s.isConnected = false
+	return err
 }
 
 // PublishEvents tries to publish the events with retries if connection becomes
@@ -133,6 +143,7 @@ func (s *Mode) publish(
 
 		ok, resetFail = send()
 		if !ok {
+			s.closeClient()
 			goto sendFail
 		}
 
@@ -142,14 +153,15 @@ func (s *Mode) publish(
 		return nil
 
 	sendFail:
-		logp.Info("send fail")
-		s.backoff.Wait()
+		debugf("send fail")
 
 		fails++
 		if resetFail {
 			debugf("reset fails")
+			s.backoff.Reset()
 			fails = 0
 		}
+		s.backoff.Wait()
 
 		if !guaranteed && (s.maxAttempts > 0 && fails == s.maxAttempts) {
 			// max number of attempts reached

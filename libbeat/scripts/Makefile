@@ -26,7 +26,6 @@ comma:=,
 ARCH?=$(shell uname -m)
 # Hidden directory to install dependencies for jenkins
 export PATH := ./bin:$(PATH)
-export GO15VENDOREXPERIMENT=1
 GOFILES = $(shell find . -type f -name '*.go')
 GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*")
 SHELL=bash
@@ -136,9 +135,7 @@ integration-tests: prepare-tests
 
 # Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 .PHONY: integration-tests-environment
-integration-tests-environment:
-	$(MAKE) prepare-tests
-	$(MAKE) build-image
+integration-tests-environment: prepare-tests build-image
 	${DOCKER_COMPOSE} run beat make integration-tests RACE_DETECTOR=$(RACE_DETECTOR)
 
 # Runs the system tests
@@ -149,9 +146,7 @@ system-tests: buildbeat.test prepare-tests python-env
 
 # Runs the system tests
 .PHONY: system-tests-environment
-system-tests-environment:
-	$(MAKE) prepare-tests
-	$(MAKE) build-image
+system-tests-environment: prepare-tests build-image
 	${DOCKER_COMPOSE} run beat make system-tests;
 
 # Runs system tests without coverage reports and in parallel
@@ -221,10 +216,16 @@ coverage-report:
 update: python-env
 	# Update config
 	echo "Update config file"
-	-rm -f etc/${BEATNAME}.yml
-	cat etc/beat.yml ${ES_BEATS}/libbeat/_beat/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
-	-rm -f etc/${BEATNAME}.full.yml
-	cat etc/beat.full.yml ${ES_BEATS}/libbeat/_beat/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml
+	-rm -f ${BEATNAME}.yml
+	cat etc/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
+	-rm -f ${BEATNAME}.full.yml
+	cat etc/beat.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml
+
+	# Check if also a full config exist (optional)
+	if [ -a etc/beat.full.yml ] ; \
+    then \
+		cat etc/beat.full.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml ; \
+	fi;
 
 	# Update fields
 	echo "Update fields"
@@ -235,12 +236,27 @@ update: python-env
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME} ${ES_BEATS}
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME} ${ES_BEATS}
 
+	# Update docs version
+	cp ${ES_BEATS}/libbeat/docs/version.asciidoc docs/version.asciidoc
+
+# Builds the documents for the beat
+.PHONY: docs
+docs:
+	sh ${ES_BEATS}/libbeat/scripts/build_docs.sh ${BEATNAME}
+
+# Preview the documents for the beat in the browser
+.PHONY: docs-preview
+docs-preview:
+	if [ ! -d "build/docs" ]; then $(MAKE) docs; fi;
+	${BUILD_DIR}/docs/build_docs.pl --chunk=1 -open chunk=1 -open --doc ${GOPATH}/src/github.com/elastic/beats/${BEATNAME}/docs/index.asciidoc -out ${BUILD_DIR}/html_docs
+
+
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200
 
 .PHONY: export-dashboards
-export-dashboards:
-	python ${ES_BEATS}/dev-tools//export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
+export-dashboards: python-env
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
 
 .PHONY: import-dashboards
 import-dashboards:
@@ -262,8 +278,7 @@ start-environment: stop-environment
 .PHONY: stop-environment
 stop-environment:
 	-${DOCKER_COMPOSE} stop
-	-${DOCKER_COMPOSE} rm -f
-	-docker ps -a  | grep ${BEATNAME} | grep Exited | awk '{print $$1}' | xargs docker rm
+	-${DOCKER_COMPOSE} rm -f -v -a
 
 .PHONY: write-environment
 write-environment:
@@ -272,6 +287,11 @@ write-environment:
 	echo "ES_PORT=9200" >> ${BUILD_DIR}/test.env
 	echo "ES_USER=beats" >> ${BUILD_DIR}/test.env
 	echo "ES_PASS=testing" >> ${BUILD_DIR}/test.env
+
+# Tails the environment logs
+.PHONY: env-logs
+env-logs:
+	${DOCKER_COMPOSE} logs -f
 
 
 ### Packaging targets ####
@@ -288,3 +308,14 @@ install-home:
 	fi
 	install -d -m 755 ${HOME_PREFIX}/scripts/
 	install -m 755 ${ES_BEATS}/libbeat/scripts/migrate_beat_config_1_x_to_5_0.py ${HOME_PREFIX}/scripts/
+
+# Creates packer files in a beat
+.PHONY: create-packer
+create-packer:
+	python ${ES_BEATS}/libbeat/scripts/create_packer.py --es_beats=${ES_BEATS} --beat_path=${BEAT_DIR} --beat=${BEATNAME}
+
+# Create binary packages for the beat
+package: create-packer
+	cd dev-tools/packer; \
+	export ES_BEATS=${ES_BEATS} ; \
+	make deps images ${BEATNAME}

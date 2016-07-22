@@ -1,21 +1,13 @@
 package logstash
 
 import (
-	"expvar"
 	"time"
 
-	"github.com/urso/go-lumber/client/v2"
+	"github.com/elastic/go-lumber/client/v2"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-)
-
-// Metrics that can retrieved through the expvar web interface.
-var (
-	ackedEvents            = expvar.NewInt("libbeatLogstashPublishedAndAckedEvents")
-	eventsNotAcked         = expvar.NewInt("libbeatLogstashPublishedButNotAckedEvents")
-	publishEventsCallCount = expvar.NewInt("libbeatLogstashPublishEventsCallCount")
 )
 
 const (

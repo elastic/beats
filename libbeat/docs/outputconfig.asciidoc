@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[elasticsearch-output]]
-=== Elasticsearch Output
+=== Elasticsearch Output Configuration
 
 When you specify Elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
 
@@ -24,8 +24,8 @@ output.elasticsearch:
   # The Elasticsearch cluster
   hosts: ["http://localhost:9200"]
 
-  # Template name. By default the template name is {beatname_lc}.
-  template.name: "{beatname_lc}"
+  # Load the Elasticsearch template.
+  template.enabled: true
 
   # Path to template file
   template.path: "{beatname_lc}.template.json"
@@ -90,7 +90,15 @@ output.elasticsearch:
 
 ==== Elasticsearch Output Options
 
-You can specify the following options in the `elasticsearch` section:
+You can specify the following options in the `elasticsearch` section of the +{beatname_lc}.yml+ config file:
+
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
 
 [[hosts-option]]
 ===== hosts
@@ -119,6 +127,13 @@ output.elasticsearch:
 
 In the previous example, the Elasticsearch nodes are available at `https://10.45.3.2:9220/elasticsearch` and
 `https://10.45.3.1:9230/elasticsearch`.
+
+===== compression_level
+
+The gzip compression level. Setting this value to 0 disables compression.
+The compression level must be in the range of 1 (best speed) to 9 (best compression).
+
+The default value is 0.
 
 ===== worker
 
@@ -180,6 +195,9 @@ enabled.
 
 You can adjust the following settings to load your own template or overwrite an existing one:
 
+*`enabled`*:: Set to false to disable template loading. If set this to false,
+you must <<load-template-manually,load the template manually>>.
+
 *`name`*:: The name of the template. The default is +{beatname_lc}+.
 
 *`path`*:: The path to the template file. The default is +{beatname_lc}.template.json+. If a relative
@@ -200,8 +218,28 @@ output.elasticsearch:
   template.overwrite: false
 ----------------------------------------------------------------------
 
-To disable automatic template loading, comment out the template part under elasticsearch output.
-If you disable this option, you must <<load-template-manually,load the template manually>>. 
+===== template.versions
+
+In the default configuration, {beatname_uc} automatically checks the
+Elasticsearch version and loads the recommended template file for the particular
+version. This behaviour can be controlled from the following options:
+
+*`2x.path`*:: The path to the template file to load for
+Elasticsearch versions 2.x.y. The default is +{beatname_lc}.template-es2x.json+.
+
+*`2x.enabled`*:: If set to +false+, the +2x.path+ option is ignored and the
+default template is loaded regardless of the Elasticsearch version.
+
+For example:
+
+["source","yaml",subs="attributes,callouts"]
+----------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  template.path: "{beatname_lc}.template.json"
+  template.overwrite: false
+  template.versions.2x.path: "{beatname_lc}.template-es2x.json
+----------------------------------------------------------------------
 
 ===== max_retries
 
@@ -220,7 +258,7 @@ The maximum number of events to bulk in a single Elasticsearch bulk API index re
 
 If the Beat sends single events, the events are collected into batches. If the Beat publishes
 a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
-split. 
+split.
 
 Specifying a larger batch size can improve performance by lowering the overhead of sending events. 
 However big batch sizes can also increase processing times, which might result in
@@ -250,11 +288,6 @@ false.
 
 This option is relevant for Packetbeat only.
 
-===== topology_expire
-
-The time to live in seconds for the topology information that is stored in
-Elasticsearch. The default is 15 seconds.
-
 ===== tls
 
 Configuration options for TLS parameters like the certificate authority to use
@@ -265,7 +298,7 @@ See <<configuration-output-tls>> for more information.
 
 
 [[logstash-output]]
-=== Logstash Output
+=== Logstash Output Configuration
 
 The Logstash output sends the events directly to Logstash by using the lumberjack
 protocol, which runs over TCP. To use this option, you must
@@ -352,7 +385,15 @@ output.logstash:
 
 ==== Logstash Output Options
 
-You can specify the following options in the `logstash` section:
+You can specify the following options in the `logstash` section of the
++{beatname_lc}.yml+ config file:
+
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
 
 [[hosts]]
 ===== hosts
@@ -363,7 +404,7 @@ is used as the default port number.
 
 ===== compression_level
 
-The gzip compression level. Setting this value to values less than or equal to 0 disables compression.
+The gzip compression level. Setting this value to 0 disables compression.
 The compression level must be in the range of 1 (best speed) to 9 (best compression).
 
 The default value is 3.
@@ -479,8 +520,100 @@ Beats that publish single events (such as Packetbeat) send each event directly t
 Elasticsearch. Beats that publish data in batches (such as Filebeat) send events in batches based on the
 spooler size.
 
+[[kafka-output]]
+=== Kafka Output Configuration
+
+The Kafka output sends the events to Apache Kafka.
+
+==== Kafka Output Options
+
+You can specify the following options in the `kafka` section of the +{beatname_lc}.yml+ config file:
+
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
+===== hosts
+
+The list of Kafka broker addresses from where to fetch the cluster metadata.
+The cluster metadata contain the actual Kafka brokers events are published to.
+
+===== topic
+
+The Kafka topic used for produced events. If `use_type` is set to true, the topic will not be used.
+
+===== use_type
+
+Set Kafka topic by event type. If `use_type` is false, the `topic` option must be configured. The default is false.
+
+===== client_id
+
+The configurable ClientID used for logging, debugging, and auditing purposes. The default is "beats".
+
+===== worker
+
+The number of concurrent load-balanced Kafka output workers.
+
+===== max_retries
+
+The number of times to retry publishing an event after a publishing failure.
+After the specified number of retries, the events are typically dropped.
+Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
+events are published.
+
+Set `max_retries` to a value less than 0 to retry until all events are published. 
+
+The default is 3.
+
+===== bulk_max_size
+
+The maximum number of events to bulk in a single Kafka request. The default is 2048.
+
+===== timeout
+
+The number of seconds to wait for responses from the Kafka brokers before timing
+out. The default is 30 (seconds).
+
+===== broker_timeout
+
+The maximum duration a broker will wait for number of required ACKs. The default is 10s.
+
+===== channel_buffer_size
+
+Per Kafka broker number of messages buffered in output pipeline. The default is 256.
+
+===== keep_alive
+
+The keep-alive period for an active network connection. If 0s, keep-alives are disabled. The default is 0 seconds.
+
+===== compression
+
+Sets the output compression codec. Must be one of `none`, `snappy` and `gzip`. The default is `gzip`.
+
+===== max_message_bytes
+
+The maximum permitted size of JSON-encoded messages. Bigger messages will be dropped. The default value is 1000000 (bytes). This value should be equal to or less than the broker's `message.max.bytes`.
+
+===== required_acks
+
+The ACK reliability level required from broker. 0=no response, 1=wait for local commit, -1=wait for all replicas to commit. The default is 1.
+
+Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silently on error.
+
+===== flush_interval
+
+The number of seconds to wait for new events between two producer API calls.
+
+===== tls
+
+Configuration options for TLS parameters like the root CA for Kibana connections. See
+<<configuration-output-tls>> for more information.
+
 [[redis-output]]
-=== Redis Output
+=== Redis Output Configuration
 
 The Redis output inserts the events into a Redis list or a Redis channel.
 This output plugin is compatible with
@@ -512,7 +645,14 @@ output.redis:
 
 ==== Redis Output Options
 
-You can specify the following options in the `redis` section:
+You can specify the following options in the `redis` section of the +{beatname_lc}.yml+ config file:
+
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
 
 ===== hosts
 
@@ -627,94 +767,8 @@ client. You can change this behavior by setting the
 This option determines whether Redis hostnames are resolved locally when using a proxy.
 The default value is false, which means that name resolution occurs on the proxy server.
 
-
-[[kafka-output]]
-=== Kafka Output
-
-The Kafka output sends the events to Apache Kafka.
-
-==== Kafka Output Options
-
-You can specify the following options in the `kafka` section:
-
-===== hosts
-
-The list of Kafka broker addresses from where to fetch the cluster metadata.
-The cluster metadata contain the actual Kafka brokers events are published to.
-
-===== topic
-
-The Kafka topic used for produced events. If `use_type` is set to true, the topic will not be used.
-
-===== use_type
-
-Set Kafka topic by event type. If `use_type` is false, the `topic` option must be configured. The default is false.
-
-===== client_id
-
-The configurable ClientID used for logging, debugging, and auditing purposes. The default is "beats".
-
-===== worker
-
-The number of concurrent load-balanced Kafka output workers.
-
-===== max_retries
-
-The number of times to retry publishing an event after a publishing failure.
-After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
-
-Set `max_retries` to a value less than 0 to retry until all events are published. 
-
-The default is 3.
-
-===== bulk_max_size
-
-The maximum number of events to bulk in a single Kafka request. The default is 2048.
-
-===== timeout
-
-The number of seconds to wait for responses from the Kafka brokers before timing
-out. The default is 30 (seconds).
-
-===== broker_timeout
-
-The maximum duration a broker will wait for number of required ACKs. The default is 10s.
-
-===== channel_buffer_size
-
-Per Kafka broker number of messages buffered in output pipeline. The default is 256.
-
-===== keep_alive
-
-The keep-alive period for an active network connection. If 0s, keep-alives are disabled. The default is 0 seconds.
-
-===== compression
-
-Sets the output compression codec. Must be one of `none`, `snappy` and `gzip`. The default is `gzip`.
-
-===== max_message_bytes
-
-The maximum permitted size of JSON-encoded messages. Bigger messages will be dropped. The default value is 1000000 (bytes). This value should be equal to or less than the broker's `message.max.bytes`.
-
-===== required_acks
-
-The ACK reliability level required from broker. 0=no response, 1=wait for local commit, -1=wait for all replicas to commit. The default is 1.
-
-Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silently on error.
-
-===== flush_interval
-
-The number of seconds to wait for new events between two producer API calls.
-
-===== tls
-
-Configuration options for TLS parameters like the root CA for Kibana connections. See
-<<configuration-output-tls>> for more information.
-
 [[file-output]]
-=== File Output
+=== File Output Configuration
 
 The File output dumps the transactions into a file where each transaction is in a JSON format.
 Currently, this output is used for testing, but it can be used as input for
@@ -742,7 +796,14 @@ output.file:
 
 ==== File Output Options
 
-You can specify the following options in the `file` section:
+You can specify the following options in the `file` section of the +{beatname_lc}.yml+ config file:
+
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
 
 [[path]]
 ===== path
@@ -767,7 +828,7 @@ oldest file is deleted, and the rest of the files are shifted from last to first
 is 7 files.
 
 [[console-output]]
-=== Console Output
+=== Console Output Configuration
 
 The Console output writes events in JSON format to stdout.
 
@@ -779,11 +840,18 @@ output.console:
 
 ==== Console Output Options
 
-You can specify the following options in the `console` section:
+You can specify the following options in the `console` section of the +{beatname_lc}.yml+ config file:
 
 ===== pretty
 
 If `pretty` is set to true, events written to stdout will be nicely formatted. The default is false.
+
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
 
 ===== bulk_max_size
 
@@ -796,7 +864,7 @@ Setting `bulk_max_size` to values less than or equal to 0 disables buffering in 
 
 [[configuration-output-tls]]
 
-=== TLS Options
+=== TLS Configuration
 
 You can specify TLS options for any output that supports TLS. 
 
@@ -819,7 +887,7 @@ output.elasticsearch:
 
 ==== TLS Options
 
-You can specify the following options under the `tls` section:
+You can specify the following options in the `tls` section of the +{beatname_lc}.yml+ config file:
 
 ===== certificate_authorities
 

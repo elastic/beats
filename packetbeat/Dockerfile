@@ -14,7 +14,6 @@ RUN set -x \
 	github.com/tsg/goautotest \
 	golang.org/x/tools/cmd/vet
 
-ENV GO15VENDOREXPERIMENT=1
 ENV PYTHON_ENV=/tmp/python-env
 
 

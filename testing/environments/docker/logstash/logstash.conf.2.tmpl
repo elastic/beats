@@ -16,11 +16,12 @@ input {
 output {
   elasticsearch {
       hosts => []
-      user => "beats"
-      password => "testing"
+      #user => "beats"
+      #password => "testing"
       index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
       document_type => "%{[@metadata][type]}"
   }
 
-  # stdout{}
+  # Uncomment for logging purpose
+  #stdout { codec => rubydebug { metadata => true } }
 }

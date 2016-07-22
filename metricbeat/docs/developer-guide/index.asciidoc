@@ -1,67 +1,61 @@
 
-
 [[metricbeat-developer-guide]]
 = Metricbeat Developer Guide
 
 [partintro]
 --
 
-Metricbeat is periodically interrogating other services to fetch key metrics
-information. As a developer Metricbeat can be used in two different ways:
+Metricbeat periodically interrogates other services to fetch key metrics
+information. As a developer, you can use Metricbeat in two different ways:
 
-* As application to extend
-* As library
+* Extend Metricbeat directly
+* Create your own Beat and use Metricbeat as a library
 
-That means as a contributor you have different options on how to use metricbeat
-and how to contribute.
+We recommend that you start by creating your own Beat to keep the development of your own module or metricset
+independent of Metricbeat. At a later stage, if you decide to add a module to Metricbeat, you can reuse
+the code without making additional changes.
 
-If you are looking to contribute in general to beats or the foundation of
-metricbeat, also have a look at the general contributor guide (add link here).
+If you would like to contribute to Metricbeat or the Beats project, also see the
+https://github.com/elastic/beats/blob/master/CONTRIBUTING.md[general contributor guide].
 
 --
 
+
 == Overview
 
-Metricbeat consists of modules and metricsets. A metricbeat module is normally
-called the same as the service the metrics should be fetch from (e.g. redis,
-mysql, ...). Each module can contain multiple metricsets. A metricset represents
-multiple metrics which are normally retrieved with one request from the remote
-system (e.g. redis-info, mysql-status).
+Metricbeat consists of modules and metricsets. A Metricbeat module is typically 
+named after the service the metrics are fetched from, such as redis,
+mysql, and so on. Each module can contain multiple metricsets. A metricset represents
+multiple metrics that are normally retrieved with one request from the remote
+system. For example, the Redis `info` metricset retrieves info that you get when you
+run the Redis `INFO` command, and the MySQL `status` metricset retrieves
+info that you get when you issue the MySQL `SHOW GLOBAL STATUS` query. 
 
+[float]
+== Module and Metricsets Requirements
 
-== Module & Metricsets Requirements
+To guarantee the best user experience, it's important to us that only high quality
+modules are part of Metricbeat. The modules and metricsets that are contributed
+must meet the following requirements:
 
-It is important for us that only high quality modules are part of metricbeat to
-guarantee the best user experience. Modules and Metricsets which are contributed
-must fulfill the following requirements:
+* Complete `fields.yml` file to generate docs and Elasticsearch templates
+* Documentation files
+* Integration tests
+* 80% test coverage (unit, integration, and system tests combined)
 
-* Elasticsearch templates
-* Kibana Dashboard
-* Documentation
-* Integration tests with docker environment
-* 80% test coverage (unit, integration, system tests combined)
-
-Metricbeat allows to build a wide variety of modules and metricset on top of it.
-The module which will be accepted should be focused on fetching service metrics
-directly from a service itself and not via a third party tool. The goal is to
-have as few movable parts as possible and that metricbeat runs as close as
-possible to the service which should be monitored.
-
-
-
-
-== Documentation
-
-Each module must be documented. The documentation is based on asciidoc and is in
-the file \{module-name}.asciidoc in your module folder. This file contains the
-documentation for the module itself and the containing metricsets. For details
-on what should be documented, check the existing documented modules.
-
-== Dashboards
-
-TODO: Add details on how to create dashboards
+Metricbeat allows you to build a wide variety of modules and metricsets on top of it.
+For a module to be accepted, it should focus on fetching service metrics
+directly from the service itself and not via a third-party tool. The goal is to
+have as few movable parts as possible and for Metricbeat to run as close as
+possible to the service that it needs to monitor.
 
 
 include::./create-metricset.asciidoc[]
 
-include::./testing.asciidoc[]
+include::./metricset-details.asciidoc[]
+
+include::./create-module.asciidoc[]
+
+include::../../../generate/metricbeat/metricset/README.asciidoc[]
+
+include::./faq.asciidoc[]

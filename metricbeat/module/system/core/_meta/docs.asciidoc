@@ -1,0 +1,10 @@
+=== System Core Metricset
+
+The System `core` metricset provides load statistics for each CPU core.
+
+This metricset is available on:
+
+- Darwin
+- FreeBSD
+- Linux
+- OpenBSD

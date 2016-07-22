@@ -2,6 +2,7 @@ package redis
 
 import (
 	"errors"
+	"expvar"
 	"fmt"
 	"time"
 
@@ -19,8 +20,14 @@ type redisOut struct {
 	topology
 }
 
+var debugf = logp.MakeDebug("redis")
+
+// Metrics that can retrieved through the expvar web interface.
 var (
-	debugf = logp.MakeDebug("redis")
+	statReadBytes   = expvar.NewInt("libbeat.redis.publish.read_bytes")
+	statWriteBytes  = expvar.NewInt("libbeat.redis.publish.write_bytes")
+	statReadErrors  = expvar.NewInt("libbeat.redis.publish.read_errors")
+	statWriteErrors = expvar.NewInt("libbeat.redis.publish.write_errors")
 )
 
 const (
@@ -32,7 +39,7 @@ func init() {
 	outputs.RegisterOutputPlugin("redis", new)
 }
 
-func new(cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
+func new(beatName string, cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
 	r := &redisOut{}
 	if err := r.init(cfg, expireTopo); err != nil {
 		return nil, err
@@ -76,6 +83,12 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		Timeout: config.Timeout,
 		Proxy:   &config.Proxy,
 		TLS:     tls,
+		Stats: &transport.IOStats{
+			Read:        statReadBytes,
+			Write:       statWriteBytes,
+			ReadErrors:  statReadErrors,
+			WriteErrors: statWriteErrors,
+		},
 	}
 
 	// configure topology support

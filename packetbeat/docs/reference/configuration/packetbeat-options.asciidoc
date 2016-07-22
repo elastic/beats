@@ -1,7 +1,7 @@
 [[configuration-interfaces]]
-=== Interfaces
+=== Network Device Configuration
 
-The `interfaces` section configures the sniffer. Here is an example configuration:
+The `interfaces` section of the +{beatname_lc}.yml+ config file configures the sniffer. Here is an example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ packetbeat.interfaces.buffer_size_mb: 100
 
 ==== Sniffing Options
 
-You can specify the following options in the `interfaces` section:
+You can specify the following options in the `interfaces` section of the +{beatname_lc}.yml+ config file:
 
 ===== device
 
@@ -171,21 +171,28 @@ ports defined in the `protocols` section.
 
 
 [[configuration-flows]]
-=== Flows
+=== Flows Configuration
 
-The `flows` section contains configuration options for bidirectional network
+The `flows` section of the +{beatname_lc}.yml+ config file contains configuration options for bidirectional network
 flows. If section is missing from configuration file, network flows are
 disabled.
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.flows.timeout: 30s
-packetbeat.flows.period: 10s
+packetbeat.flows:
+  timeout: 30s
+  period: 10s
 ------------------------------------------------------------------------------
 
 ==== Options
 
-You can specify the following options in the `flows` section:
+You can specify the following options in the `flows` section of the +{beatname_lc}.yml+ config file:
+
+===== enabled
+
+Enables flows support if set to true. Set to false to disable network flows
+support without having to delete or comment out the flows section. The default
+value is true.
 
 ===== timeout
 
@@ -202,10 +209,10 @@ disabled, flows are still reported once being timed out. The default value is
 
 
 [[configuration-protocols]]
-=== Protocols
+=== Transaction Protocols Configuration
 
-The `protocols` section contains configuration options for each supported protocol, including
-common options like `ports`, `send_request`, `send_response`, and options that are protocol-specific.
+The `protocols` section of the +{beatname_lc}.yml+ config file contains configuration options for each supported protocol,
+including common options like `enabled`, `ports`, `send_request`, `send_response`, and options that are protocol-specific.
 
 Currently, Packetbeat supports the following protocols:
 
@@ -247,6 +254,12 @@ packetbeat.protocols.thrift:
 
 The following options are available for all protocols:
 
+===== enabled
+
+The enabled setting is a boolean setting to enable or disable protocols without having to comment out configuration sections. If set to false, the protocol is disabled.
+
+The default value is true.
+
 ===== ports
 
 Exception: For ICMP the option `enabled` has to be used instead.
@@ -281,17 +294,17 @@ The per protocol transaction timeout. Expired transactions will no longer be cor
 
 ==== ICMP Configuration Options
 
-You can specify the following options in the `icmp` section for the ICMP protocol:
+You can specify the following options in the `icmp` section of the +{beatname_lc}.yml+ config file:
 
 ===== enabled
 
-The ICMP protocol can be enabled/disabled via this option. The default is false.
+The ICMP protocol can be enabled/disabled via this option. The default is true.
 
 If enabled Packetbeat will generate the following BPF filter: `"icmp or icmp6"`.
 
 ==== DNS Configuration Options
 
-The `dns` section specifies configuration options for the DNS protocol. The DNS protocol supports processing DNS messages on UDP. Here is a sample configuration section for DNS:
+The `dns` section of the +{beatname_lc}.yml+ config file specifies configuration options for the DNS protocol. The DNS protocol supports processing DNS messages on UDP. Here is a sample configuration section for DNS:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -322,7 +335,7 @@ The default is false.
 ==== HTTP Configuration Options
 
 The HTTP protocol has several specific configuration options. Here is a
-sample configuration section:
+sample configuration for the `http` section of the +{beatname_lc}.yml+ config file:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -448,7 +461,7 @@ fields.
 
 ==== AMQP Configuration Options
 
-The `amqp` section specifies configuration options for the AMQP 0.9.1
+The `amqp` section of the +{beatname_lc}.yml+ config file specifies configuration options for the AMQP 0.9.1
 protocol. Here is a sample configuration:
 
 [source,yaml]
@@ -488,7 +501,7 @@ or the quality of service negotiation. The default is true.
 
 ==== Memcache Configuration Options
 
-The `memcache` section specifies configuration options for the memcache
+The `memcache` section of the +{beatname_lc}.yml+ config file specifies configuration options for the memcache
 protocol. Here is a sample configuration section for memcache:
 
 [source,yaml]
@@ -538,7 +551,7 @@ quiet requests with an error response are published immediately.
 
 ==== MySQL and PgSQL Configuration Options
 
-You can specify the following options in the `mysql` or `pgsql` sections:
+You can specify the following options in the `mysql` or `pgsql` sections of the +{beatname_lc}.yml+ config file:
 
 ===== max_rows
 
@@ -555,7 +568,7 @@ Elasticsearch. The default is 1024 bytes.
 ==== Thrift Configuration Options
 
 The Thrift protocol has several specific configuration options. Here is a
-sample configuration section:
+sample configuration for the `thrift` section of the +{beatname_lc}.yml+ config file:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -622,10 +635,10 @@ to a relatively high value. The default is 500.
 
 
 [[configuration-mongodb]]
-==== MongoDB Configuration
+==== MongoDB Configuration Options
 
 The following settings are specific to the MongoDB protocol. Here is a sample
-configuration section:
+configuration for the `mongodb` section of the +{beatname_lc}.yml+ config file:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -660,14 +673,14 @@ Note that limiting documents in this way means that they are no longer correctly
 formatted JSON objects.
 
 [[configuration-processes]]
-=== Processes (Optional)
+=== Monitored Processes Configuration
 
-This section is optional, but configuring the processes enables Packetbeat
-to show you not only the servers that the traffic is flowing between, but
-also the processes. Packetbeat can even show you the traffic between two
-processes running on the same host, which is particularly useful when you
-have many services running on the same server. By default, process matching
-is disabled.
+This section of the +{beatname_lc}.yml+ config file is optional, but configuring
+the processes enables Packetbeat to show you not only the servers that the
+traffic is flowing between, but also the processes. Packetbeat can even show you
+the traffic between two processes running on the same host, which is particularly
+useful when you have many services running on the same server. By default,
+process matching is disabled.
 
 When Packetbeat starts, and then periodically afterwards, it scans the process table for
 processes that match the configuration file. For each of these processes, it
@@ -705,7 +718,8 @@ packetbeat.procs:
 
 ==== Process Monitoring Options
 
-You can specify the following process monitoring options in the `monitored` section:
+You can specify the following process monitoring options in the `monitored` section
+of the +{beatname_lc}.yml+ config file:
 
 ===== process
 
@@ -720,14 +734,15 @@ periodically afterwards, it scans the process table for
 processes that match the values specified for this option. The match is done against the
 process' command line as read from `/proc/<pid>/cmdline`.
 
-include::../../../../libbeat/docs/outputconfig.asciidoc[]
+include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/shipperconfig.asciidoc[]
+include::../../../../libbeat/docs/processors-config.asciidoc[]
+
+include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
-include::../../../../libbeat/docs/runconfig.asciidoc[]
+include::./runconfig.asciidoc[]
 
-include::../../../../libbeat/docs/filteringconfig.asciidoc[]
