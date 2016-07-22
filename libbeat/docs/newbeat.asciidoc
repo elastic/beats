@@ -133,7 +133,7 @@ You can use the `FlagsHandler` interface to add additional command line flags to
 your Beat. The `HandleFlags` callback is called after the Beat parses the
 command line arguments inherited from libbeat and handles the `--help` and
 `--version` flags. For an example of how to implement `HandleFlags`, take a look
-at the https://github.com/elastic/beats/blob/master/packetbeat/beat/packetbeat.go[Packetbeat]
+at the https://github.com/elastic/beats/blob/master/packetbeat/beater/packetbeat.go[Packetbeat]
 code.
 
 We strongly recommend that you create a main package that contains only the main
