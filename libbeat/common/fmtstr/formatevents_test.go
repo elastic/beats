@@ -154,3 +154,61 @@ func TestEventFormatStringErrors(t *testing.T) {
 		assert.Error(t, err)
 	}
 }
+
+func TestEventFormatStringFromConfig(t *testing.T) {
+	tests := []struct {
+		v        interface{}
+		event    common.MapStr
+		expected string
+	}{
+		{
+			"plain string",
+			common.MapStr{},
+			"plain string",
+		},
+		{
+			100,
+			common.MapStr{},
+			"100",
+		},
+		{
+			true,
+			common.MapStr{},
+			"true",
+		},
+		{
+			"%{[key]}",
+			common.MapStr{"key": "value"},
+			"value",
+		},
+	}
+
+	for i, test := range tests {
+		t.Logf("run (%v): %v -> %v", i, test.v, test.expected)
+
+		config, err := common.NewConfigFrom(common.MapStr{
+			"test": test.v,
+		})
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		testConfig := struct {
+			Test *EventFormatString `config:"test"`
+		}{}
+		err = config.Unpack(&testConfig)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		actual, err := testConfig.Test.Run(test.event)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		assert.Equal(t, test.expected, actual)
+	}
+}
