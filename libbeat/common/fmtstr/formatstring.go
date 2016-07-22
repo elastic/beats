@@ -11,7 +11,7 @@ import (
 type FormatEvaler interface {
 	// Eval will execute the format and writes the results into
 	// the provided output buffer. Returns error on failure.
-	Eval(out *bytes.Buffer) error
+	Eval(ctx interface{}, out *bytes.Buffer) error
 }
 
 // StringFormatter interface extends FormatEvaler adding support for querying
@@ -20,7 +20,7 @@ type StringFormatter interface {
 	FormatEvaler
 
 	// Run execute the formatter returning the generated string.
-	Run() (string, error)
+	Run(ctx interface{}) (string, error)
 
 	// IsConst returns true, if execution of formatter will always return the
 	// same constant string.
@@ -42,7 +42,6 @@ type constStringFormatter struct {
 }
 
 type execStringFormatter struct {
-	buf     *bytes.Buffer
 	evalers []FormatEvaler
 }
 
@@ -145,7 +144,6 @@ func compile(ctx *compileCtx, in string) (StringFormatter, error) {
 	// create executable string formatter
 	fmt := execStringFormatter{
 		evalers: evalers,
-		buf:     bytes.NewBuffer(nil),
 	}
 	return fmt, nil
 }
@@ -184,12 +182,12 @@ func optimize(in []FormatEvaler) []FormatEvaler {
 	return out
 }
 
-func (f constStringFormatter) Eval(out *bytes.Buffer) error {
+func (f constStringFormatter) Eval(_ interface{}, out *bytes.Buffer) error {
 	_, err := out.WriteString(f.s)
 	return err
 }
 
-func (f constStringFormatter) Run() (string, error) {
+func (f constStringFormatter) Run(_ interface{}) (string, error) {
 	return f.s, nil
 }
 
@@ -197,21 +195,21 @@ func (f constStringFormatter) IsConst() bool {
 	return true
 }
 
-func (f execStringFormatter) Eval(out *bytes.Buffer) error {
+func (f execStringFormatter) Eval(ctx interface{}, out *bytes.Buffer) error {
 	for _, evaler := range f.evalers {
-		if err := evaler.Eval(out); err != nil {
+		if err := evaler.Eval(ctx, out); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (f execStringFormatter) Run() (string, error) {
-	f.buf.Reset()
-	if err := f.Eval(f.buf); err != nil {
+func (f execStringFormatter) Run(ctx interface{}) (string, error) {
+	buf := bytes.NewBuffer(nil)
+	if err := f.Eval(ctx, buf); err != nil {
 		return "", err
 	}
-	return f.buf.String(), nil
+	return buf.String(), nil
 }
 
 func (f execStringFormatter) IsConst() bool {
@@ -224,7 +222,7 @@ func (e StringElement) compile(ctx *compileCtx) (FormatEvaler, error) {
 
 // Eval write the string elements constant string value into
 // output buffer.
-func (e StringElement) Eval(out *bytes.Buffer) error {
+func (e StringElement) Eval(_ interface{}, out *bytes.Buffer) error {
 	_, err := out.WriteString(e.s)
 	return err
 }

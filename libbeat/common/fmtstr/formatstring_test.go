@@ -123,7 +123,7 @@ func TestFormatString(t *testing.T) {
 		}
 
 		// run string formatter
-		actual, err := sf.Run()
+		actual, err := sf.Run(nil)
 
 		// test validation
 		if test.dyn == nil {
