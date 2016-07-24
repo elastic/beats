@@ -22,6 +22,7 @@ type JSONConfig struct {
 	KeysUnderRoot bool   `config:"keys_under_root"`
 	OverwriteKeys bool   `config:"overwrite_keys"`
 	AddErrorKey   bool   `config:"add_error_key"`
+	Plain         bool   `config:"plain"`
 }
 
 // NewJSONProcessor creates a new processor that can decode JSON.

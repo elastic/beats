@@ -113,6 +113,9 @@ filebeat.prospectors:
   # be used.
   #json.add_error_key: false
 
+  # If this setting is enabled, Filebeat don't add beats related meta data to JSON.
+  #json.plain: false
+
   ### Multiline options
 
   # Mutiline can be used for log messages spanning multiple lines. This is common
