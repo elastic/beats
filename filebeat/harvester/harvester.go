@@ -71,3 +71,8 @@ func (h *Harvester) open() error {
 		return fmt.Errorf("Invalid input type")
 	}
 }
+
+func (h *Harvester) Copy() *Harvester {
+	copy := *h
+	return &copy
+}

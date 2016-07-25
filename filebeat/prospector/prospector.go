@@ -156,7 +156,9 @@ func (p *Prospector) createHarvester() (*harvester.Harvester, error) {
 
 func (p *Prospector) startHarvester(state file.State, offset int64) (*harvester.Harvester, error) {
 	state.Offset = offset
-	h := *p.harvester
+
+	// Create a copy of the harvester
+	h := p.harvester.Copy()
 
 	p.wg.Add(1)
 	go func() {
@@ -165,5 +167,5 @@ func (p *Prospector) startHarvester(state file.State, offset int64) (*harvester.
 		h.Harvest(state)
 	}()
 
-	return &h, nil
+	return h, nil
 }
