@@ -9,17 +9,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFileEventToMapStr(t *testing.T) {
+func TestEventToMapStr(t *testing.T) {
 	// Test 'fields' is not present when it is nil.
-	event := FileEvent{}
+	event := Event{}
 	mapStr := event.ToMapStr()
 	_, found := mapStr["fields"]
 	assert.False(t, found)
 }
 
-func TestFileEventToMapStrJSON(t *testing.T) {
+func TestEventToMapStrJSON(t *testing.T) {
 	type io struct {
-		Event         FileEvent
+		Event         Event
 		ExpectedItems common.MapStr
 	}
 
@@ -30,7 +30,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 	tests := []io{
 		{
 			// by default, don't overwrite keys
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
@@ -43,7 +43,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		},
 		{
 			// overwrite keys if asked
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
@@ -56,7 +56,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		},
 		{
 			// without keys_under_root, put everything in a json key
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
@@ -69,7 +69,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		},
 		{
 			// when MessageKey is defined, the Text overwrites the value of that key
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hi"},
@@ -83,7 +83,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		{
 			// when @timestamp is in JSON and overwrite_keys is true, parse it
 			// in a common.Time
-			Event: FileEvent{
+			Event: Event{
 				ReadTime:     now,
 				DocumentType: "test_type",
 				Text:         &text,
@@ -98,7 +98,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		{
 			// when the parsing on @timestamp fails, leave the existing value and add an error key
 			// in a common.Time
-			Event: FileEvent{
+			Event: Event{
 				ReadTime:     now,
 				DocumentType: "test_type",
 				Text:         &text,
@@ -114,7 +114,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		{
 			// when the @timestamp has the wrong type, leave the existing value and add an error key
 			// in a common.Time
-			Event: FileEvent{
+			Event: Event{
 				ReadTime:     now,
 				DocumentType: "test_type",
 				Text:         &text,
@@ -129,7 +129,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		},
 		{
 			// if overwrite_keys is true, but the `type` key in json is not a string, ignore it
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": 42},
@@ -142,7 +142,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		},
 		{
 			// if overwrite_keys is true, but the `type` key in json is empty, ignore it
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": ""},
@@ -155,7 +155,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		},
 		{
 			// if overwrite_keys is true, but the `type` key in json starts with _, ignore it
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "_type"},

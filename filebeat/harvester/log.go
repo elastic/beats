@@ -44,7 +44,8 @@ func (h *Harvester) Harvest() {
 
 	logp.Info("Harvester started for file: %s", h.state.Source)
 
-	r, err := h.newLineReader()
+	r, err := h.newLogFileReader()
+
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
 		return
@@ -63,8 +64,7 @@ func (h *Harvester) Harvest() {
 		default:
 		}
 
-		// Partial lines return error and are only read on completion
-		ts, text, bytesRead, jsonFields, err := readLine(r)
+		message, err := r.Next()
 		if err != nil {
 			switch err {
 			case reader.ErrFileTruncate:
@@ -83,16 +83,24 @@ func (h *Harvester) Harvest() {
 			return
 		}
 
-		// Update offset if complete line has been processed
-		h.state.Offset += int64(bytesRead)
+		// Update offset
+		h.state.Offset += int64(message.Bytes)
 
-		event := h.createEvent()
+		// Create state event
+		event := input.NewEvent(h.getState())
 
+		text := string(message.Content)
+
+		// Check if data should be added to event
 		if h.shouldExportLine(text) {
-			event.ReadTime = ts
-			event.Bytes = bytesRead
+			event.ReadTime = message.Ts
+			event.Bytes = message.Bytes
 			event.Text = &text
-			event.JSONFields = jsonFields
+			event.JSONFields = message.Fields
+			event.EventMetadata = h.config.EventMetadata
+			event.InputType = h.config.InputType
+			event.DocumentType = h.config.DocumentType
+			event.JSONConfig = h.config.JSON
 		}
 
 		// Always send event to update state, also if lines was skipped
@@ -103,29 +111,9 @@ func (h *Harvester) Harvest() {
 	}
 }
 
-// createEvent creates and empty event.
-// By default the offset is set to 0, means no bytes read. This can be used to report the status
-// of a harvester
-func (h *Harvester) createEvent() *input.FileEvent {
-
-	event := &input.FileEvent{
-		EventMetadata: h.config.EventMetadata,
-		Source:        h.state.Source,
-		InputType:     h.config.InputType,
-		DocumentType:  h.config.DocumentType,
-		Offset:        h.state.Offset,
-		Bytes:         0,
-		Fileinfo:      h.state.Fileinfo,
-		JSONConfig:    h.config.JSON,
-		State:         h.getState(),
-	}
-
-	return event
-}
-
 // sendEvent sends event to the spooler channel
 // Return false if event was not sent
-func (h *Harvester) sendEvent(event *input.FileEvent) bool {
+func (h *Harvester) sendEvent(event *input.Event) bool {
 	select {
 	case <-h.done:
 		return false
@@ -297,7 +285,7 @@ func (h *Harvester) newLogFileReaderConfig() reader.LogFileConfig {
 	}
 }
 
-func (h *Harvester) newLineReader() (reader.Reader, error) {
+func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 
 	readerConfig := h.newLogFileReaderConfig()
 

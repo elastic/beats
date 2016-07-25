@@ -17,8 +17,8 @@ type Prospector struct {
 	cfg           *common.Config // Raw config
 	config        prospectorConfig
 	prospectorer  Prospectorer
-	spoolerChan   chan *input.FileEvent
-	harvesterChan chan *input.FileEvent
+	spoolerChan   chan *input.Event
+	harvesterChan chan *input.Event
 	done          chan struct{}
 	states        *file.States
 	wg            sync.WaitGroup
@@ -29,12 +29,12 @@ type Prospectorer interface {
 	Run()
 }
 
-func NewProspector(cfg *common.Config, states file.States, spoolerChan chan *input.FileEvent) (*Prospector, error) {
+func NewProspector(cfg *common.Config, states file.States, spoolerChan chan *input.Event) (*Prospector, error) {
 	prospector := &Prospector{
 		cfg:           cfg,
 		config:        defaultConfig,
 		spoolerChan:   spoolerChan,
-		harvesterChan: make(chan *input.FileEvent),
+		harvesterChan: make(chan *input.Event),
 		done:          make(chan struct{}),
 		states:        states.Copy(),
 		wg:            sync.WaitGroup{},
