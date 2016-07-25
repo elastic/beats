@@ -5,7 +5,10 @@
 //go:generate go run gen.go gen_common.go -output tables.go
 
 // Package currency contains currency-related functionality.
-package currency
+//
+// NOTE: the formatting functionality is currently under development and may
+// change without notice.
+package currency // import "golang.org/x/text/currency"
 
 import (
 	"errors"
@@ -50,8 +53,8 @@ var (
 // Rounding reports the rounding characteristics for the given currency, where
 // scale is the number of fractional decimals and increment is the number of
 // units in terms of 10^(-scale) to which to round to.
-func (k Kind) Rounding(c Currency) (scale, increment int) {
-	info := currency.Elem(int(c.index))[3]
+func (k Kind) Rounding(cur Unit) (scale, increment int) {
+	info := currency.Elem(int(cur.index))[3]
 	switch k.rounding {
 	case standard:
 		info &= roundMask
@@ -61,23 +64,23 @@ func (k Kind) Rounding(c Currency) (scale, increment int) {
 	return int(roundings[info].scale), int(roundings[info].increment)
 }
 
-// Currency is an ISO 4217 currency designator.
-type Currency struct {
+// Unit is an ISO 4217 currency designator.
+type Unit struct {
 	index uint16
 }
 
-// String returns the ISO code of c.
-func (c Currency) String() string {
-	if c.index == 0 {
+// String returns the ISO code of u.
+func (u Unit) String() string {
+	if u.index == 0 {
 		return "XXX"
 	}
-	return currency.Elem(int(c.index))[:3]
+	return currency.Elem(int(u.index))[:3]
 }
 
-// Value creates a Value for the given currency and amount.
-func (c Currency) Value(amount interface{}) Value {
+// Amount creates an Amount for the given currency unit and amount.
+func (u Unit) Amount(amount interface{}) Amount {
 	// TODO: verify amount is a supported number type
-	return Value{amount: amount, currency: c}
+	return Amount{amount: amount, currency: u}
 }
 
 var (
@@ -85,23 +88,26 @@ var (
 	errValue  = errors.New("currency: tag is not a recognized currency")
 )
 
-// ParseISO parses a 3-letter ISO 4217 code. It returns an error if s not
-// well-formed or not a recognized currency code.
-func ParseISO(s string) (Currency, error) {
+// ParseISO parses a 3-letter ISO 4217 currency code. It returns an error if s
+// is not well-formed or not a recognized currency code.
+func ParseISO(s string) (Unit, error) {
 	var buf [4]byte // Take one byte more to detect oversize keys.
 	key := buf[:copy(buf[:], s)]
 	if !tag.FixCase("XXX", key) {
-		return Currency{}, errSyntax
+		return Unit{}, errSyntax
 	}
 	if i := currency.Index(key); i >= 0 {
-		return Currency{uint16(i)}, nil
+		if i == xxx {
+			return Unit{}, nil
+		}
+		return Unit{uint16(i)}, nil
 	}
-	return Currency{}, errValue
+	return Unit{}, errValue
 }
 
-// MustParseISO is like ParseISO, but panics if the given currency
-// cannot be parsed. It simplifies safe initialization of Currency values.
-func MustParseISO(s string) Currency {
+// MustParseISO is like ParseISO, but panics if the given currency unit
+// cannot be parsed. It simplifies safe initialization of Unit values.
+func MustParseISO(s string) Unit {
 	c, err := ParseISO(s)
 	if err != nil {
 		panic(err)
@@ -109,75 +115,71 @@ func MustParseISO(s string) Currency {
 	return c
 }
 
-// FromRegion reports the Currency that is currently legal tender in the given
-// region according to CLDR. It will return false if region currently does not
-// have a legal tender.
-func FromRegion(r language.Region) (tender Currency, ok bool) {
+// FromRegion reports the currency unit that is currently legal tender in the
+// given region according to CLDR. It will return false if region currently does
+// not have a legal tender.
+func FromRegion(r language.Region) (currency Unit, ok bool) {
 	x := regionToCode(r)
 	i := sort.Search(len(regionToCurrency), func(i int) bool {
 		return regionToCurrency[i].region >= x
 	})
 	if i < len(regionToCurrency) && regionToCurrency[i].region == x {
-		return Currency{regionToCurrency[i].code}, true
+		return Unit{regionToCurrency[i].code}, true
 	}
-	return Currency{0}, false
+	return Unit{}, false
 }
 
 // FromTag reports the most likely currency for the given tag. It considers the
 // currency defined in the -u extension and infers the region if necessary.
-func FromTag(t language.Tag) (Currency, language.Confidence) {
+func FromTag(t language.Tag) (Unit, language.Confidence) {
 	if cur := t.TypeForKey("cu"); len(cur) == 3 {
-		var buf [3]byte
-		copy(buf[:], cur)
-		tag.FixCase("XXX", buf[:])
-		if x := currency.Index(buf[:]); x > 0 {
-			return Currency{uint16(x)}, language.Exact
-		}
+		c, _ := ParseISO(cur)
+		return c, language.Exact
 	}
 	r, conf := t.Region()
 	if cur, ok := FromRegion(r); ok {
 		return cur, conf
 	}
-	return Currency{}, language.No
+	return Unit{}, language.No
 }
 
 var (
 	// Undefined and testing.
-	XXX Currency = Currency{xxx}
-	XTS Currency = Currency{xts}
+	XXX Unit = Unit{}
+	XTS Unit = Unit{xts}
 
 	// G10 currencies https://en.wikipedia.org/wiki/G10_currencies.
-	USD Currency = Currency{usd}
-	EUR Currency = Currency{eur}
-	JPY Currency = Currency{jpy}
-	GBP Currency = Currency{gbp}
-	CHF Currency = Currency{chf}
-	AUD Currency = Currency{aud}
-	NZD Currency = Currency{nzd}
-	CAD Currency = Currency{cad}
-	SEK Currency = Currency{sek}
-	NOK Currency = Currency{nok}
+	USD Unit = Unit{usd}
+	EUR Unit = Unit{eur}
+	JPY Unit = Unit{jpy}
+	GBP Unit = Unit{gbp}
+	CHF Unit = Unit{chf}
+	AUD Unit = Unit{aud}
+	NZD Unit = Unit{nzd}
+	CAD Unit = Unit{cad}
+	SEK Unit = Unit{sek}
+	NOK Unit = Unit{nok}
 
 	// Additional common currencies as defined by CLDR.
-	BRL Currency = Currency{brl}
-	CNY Currency = Currency{cny}
-	DKK Currency = Currency{dkk}
-	INR Currency = Currency{inr}
-	RUB Currency = Currency{rub}
-	HKD Currency = Currency{hkd}
-	IDR Currency = Currency{idr}
-	KRW Currency = Currency{krw}
-	MXN Currency = Currency{mxn}
-	PLN Currency = Currency{pln}
-	SAR Currency = Currency{sar}
-	THB Currency = Currency{thb}
-	TRY Currency = Currency{try}
-	TWD Currency = Currency{twd}
-	ZAR Currency = Currency{zar}
+	BRL Unit = Unit{brl}
+	CNY Unit = Unit{cny}
+	DKK Unit = Unit{dkk}
+	INR Unit = Unit{inr}
+	RUB Unit = Unit{rub}
+	HKD Unit = Unit{hkd}
+	IDR Unit = Unit{idr}
+	KRW Unit = Unit{krw}
+	MXN Unit = Unit{mxn}
+	PLN Unit = Unit{pln}
+	SAR Unit = Unit{sar}
+	THB Unit = Unit{thb}
+	TRY Unit = Unit{try}
+	TWD Unit = Unit{twd}
+	ZAR Unit = Unit{zar}
 
 	// Precious metals.
-	XAG Currency = Currency{xag}
-	XAU Currency = Currency{xau}
-	XPT Currency = Currency{xpt}
-	XPD Currency = Currency{xpd}
+	XAG Unit = Unit{xag}
+	XAU Unit = Unit{xau}
+	XPT Unit = Unit{xpt}
+	XPD Unit = Unit{xpd}
 )

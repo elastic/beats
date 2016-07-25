@@ -6,13 +6,19 @@
 
 package main
 
-import "golang.org/x/text/language"
+import (
+	"time"
+
+	"golang.org/x/text/language"
+)
 
 // This file contains code common to gen.go and the package code.
 
 const (
 	cashShift = 3
 	roundMask = 0x7
+
+	nonTenderBit = 0x8000
 )
 
 // currencyInfo contains information about a currency.
@@ -45,4 +51,20 @@ func regionToCode(r language.Region) uint16 {
 		return uint16(s[0])<<8 | uint16(s[1])
 	}
 	return 0
+}
+
+func toDate(t time.Time) uint32 {
+	y := t.Year()
+	if y == 1 {
+		return 0
+	}
+	date := uint32(y) << 4
+	date |= uint32(t.Month())
+	date <<= 5
+	date |= uint32(t.Day())
+	return date
+}
+
+func fromDate(date uint32) time.Time {
+	return time.Date(int(date>>9), time.Month((date>>5)&0xf), int(date&0x1f), 0, 0, 0, 0, time.UTC)
 }

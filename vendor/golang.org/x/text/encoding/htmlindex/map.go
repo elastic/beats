@@ -7,7 +7,6 @@ package htmlindex
 import (
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/charmap"
-	"golang.org/x/text/encoding/internal"
 	"golang.org/x/text/encoding/internal/identifier"
 	"golang.org/x/text/encoding/japanese"
 	"golang.org/x/text/encoding/korean"
@@ -50,20 +49,20 @@ var mibMap = map[identifier.MIB]htmlEncoding{
 	identifier.Windows1257:       windows1257,
 	identifier.Windows1258:       windows1258,
 	identifier.XUserDefined:      xUserDefined,
+	identifier.GBK:               gbk,
 	identifier.GB18030:           gb18030,
-	identifier.HZGB2312:          hzgb2312,
 	identifier.Big5:              big5,
 	identifier.EUCPkdFmtJapanese: eucjp,
 	identifier.ISO2022JP:         iso2022jp,
 	identifier.ShiftJIS:          shiftJIS,
 	identifier.EUCKR:             euckr,
+	identifier.Replacement:       replacement,
 }
 
 // encodings maps the internal htmlEncoding to an Encoding.
 // TODO: consider using a reusable index in encoding/internal.
 var encodings = [numEncodings]encoding.Encoding{
-	// TODO: replace with proper UTF-8 encoding.
-	utf8:              &internal.Encoding{encoding.Nop, "UTF-8", identifier.UTF8},
+	utf8:              unicode.UTF8,
 	ibm866:            charmap.CodePage866,
 	iso8859_2:         charmap.ISO8859_2,
 	iso8859_3:         charmap.ISO8859_3,
@@ -92,8 +91,8 @@ var encodings = [numEncodings]encoding.Encoding{
 	windows1257:       charmap.Windows1257,
 	windows1258:       charmap.Windows1258,
 	macintoshCyrillic: charmap.MacintoshCyrillic,
+	gbk:               simplifiedchinese.GBK,
 	gb18030:           simplifiedchinese.GB18030,
-	hzgb2312:          simplifiedchinese.HZGB2312,
 	big5:              traditionalchinese.Big5,
 	eucjp:             japanese.EUCJP,
 	iso2022jp:         japanese.ISO2022JP,

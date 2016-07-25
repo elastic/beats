@@ -82,6 +82,8 @@ func (d *Decoder) decode(dir, id string, r io.Reader) error {
 		return nil
 	case dir == "bcp47":
 		v = cldr.bcp47
+	case dir == "validity":
+		return nil
 	default:
 		ok := false
 		if v, ok = cldr.locale[id]; !ok {
