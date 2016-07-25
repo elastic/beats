@@ -7,8 +7,10 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/dtfmt"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -25,6 +27,7 @@ type EventFormatString struct {
 	formatter StringFormatter
 	ctx       *eventEvalContext
 	fields    []fieldInfo
+	timestamp bool
 }
 
 type eventFieldEvaler struct {
@@ -38,10 +41,16 @@ type defaultEventFieldEvaler struct {
 	defaultValue string
 }
 
+type eventTimestampEvaler struct {
+	ctx       *eventEvalContext
+	formatter *dtfmt.Formatter
+}
+
 type eventFieldCompiler struct {
-	ctx   *eventEvalContext
-	keys  map[string]keyInfo
-	index int
+	ctx       *eventEvalContext
+	keys      map[string]keyInfo
+	timestamp bool
+	index     int
 }
 
 type fieldInfo struct {
@@ -56,6 +65,7 @@ type keyInfo struct {
 
 type eventEvalContext struct {
 	keys []string
+	ts   time.Time
 }
 
 var (
@@ -78,12 +88,13 @@ func MustCompileEvent(in string) *EventFormatString {
 func CompileEvent(in string) (*EventFormatString, error) {
 	ctx := &eventEvalContext{}
 	efComp := &eventFieldCompiler{
-		ctx:   ctx,
-		keys:  map[string]keyInfo{},
-		index: 0,
+		ctx:       ctx,
+		keys:      map[string]keyInfo{},
+		index:     0,
+		timestamp: false,
 	}
 
-	sf, err := Compile(in, efComp.compileEventField)
+	sf, err := Compile(in, efComp.compileExpression)
 	if err != nil {
 		return nil, err
 	}
@@ -101,6 +112,7 @@ func CompileEvent(in string) (*EventFormatString, error) {
 		formatter: sf,
 		ctx:       ctx,
 		fields:    keys,
+		timestamp: efComp.timestamp,
 	}
 	return efs, nil
 }
@@ -174,7 +186,41 @@ func (fs *EventFormatString) collectFields(event common.MapStr) error {
 		fs.ctx.keys[i] = s
 	}
 
+	if fs.timestamp {
+		timestamp, found := event["@timestamp"]
+		if !found {
+			return errors.New("missing timestamp")
+		}
+
+		switch t := timestamp.(type) {
+		case common.Time:
+			fs.ctx.ts = time.Time(t)
+		case time.Time:
+			fs.ctx.ts = t
+		default:
+			return errors.New("unknown timestamp type")
+		}
+	}
+
 	return nil
+}
+
+func (e *eventFieldCompiler) compileExpression(
+	s string,
+	opts []VariableOp,
+) (FormatEvaler, error) {
+	if len(s) == 0 {
+		return nil, errors.New("empty expression")
+	}
+
+	switch s[0] {
+	case '[':
+		return e.compileEventField(s, opts)
+	case '+':
+		return e.compileTimestamp(s, opts)
+	default:
+		return nil, fmt.Errorf(`unsupported format expression "%v"`, s)
+	}
 }
 
 func (e *eventFieldCompiler) compileEventField(
@@ -221,6 +267,23 @@ func (e *eventFieldCompiler) compileEventField(
 	return &defaultEventFieldEvaler{e.ctx, idx, defaultValue}, nil
 }
 
+func (e *eventFieldCompiler) compileTimestamp(
+	expression string,
+	ops []VariableOp,
+) (FormatEvaler, error) {
+	if expression[0] != '+' {
+		return nil, errors.New("No timestamp expression")
+	}
+
+	formatter, err := dtfmt.NewFormatter(expression[1:])
+	if err != nil {
+		return nil, fmt.Errorf("%v in timestamp expression", err)
+	}
+
+	e.timestamp = true
+	return &eventTimestampEvaler{e.ctx, formatter}, nil
+}
+
 func (e *eventFieldEvaler) Eval(out *bytes.Buffer) error {
 	type stringer interface {
 		String() string
@@ -241,6 +304,11 @@ func (e *defaultEventFieldEvaler) Eval(out *bytes.Buffer) error {
 		s = e.defaultValue
 	}
 	_, err := out.WriteString(s)
+	return err
+}
+
+func (e *eventTimestampEvaler) Eval(out *bytes.Buffer) error {
+	_, err := e.formatter.Write(out, e.ctx.ts)
 	return err
 }
 
