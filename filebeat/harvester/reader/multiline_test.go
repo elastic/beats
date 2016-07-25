@@ -1,6 +1,6 @@
 // +build !integration
 
-package processor
+package reader
 
 import (
 	"bytes"
@@ -73,29 +73,29 @@ func testMultilineOK(t *testing.T, cfg MultilineConfig, expected ...string) {
 	_, buf := createLineBuffer(expected...)
 	reader := createMultilineTestReader(t, buf, cfg)
 
-	var lines []Line
+	var messages []Message
 	for {
-		line, err := reader.Next()
+		message, err := reader.Next()
 		if err != nil {
 			break
 		}
-		lines = append(lines, line)
+		messages = append(messages, message)
 	}
 
-	if len(lines) != len(expected) {
-		t.Fatalf("expected %v lines, read only %v line(s)", len(expected), len(lines))
+	if len(messages) != len(expected) {
+		t.Fatalf("expected %v lines, read only %v line(s)", len(expected), len(messages))
 	}
 
-	for i, line := range lines {
+	for i, message := range messages {
 		var tsZero time.Time
 
-		assert.NotEqual(t, tsZero, line.Ts)
-		assert.Equal(t, strings.TrimRight(expected[i], "\r\n "), string(line.Content))
-		assert.Equal(t, len(expected[i]), int(line.Bytes))
+		assert.NotEqual(t, tsZero, message.Ts)
+		assert.Equal(t, strings.TrimRight(expected[i], "\r\n "), string(message.Content))
+		assert.Equal(t, len(expected[i]), int(message.Bytes))
 	}
 }
 
-func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg MultilineConfig) LineProcessor {
+func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg MultilineConfig) Reader {
 	encFactory, ok := encoding.FindEncoding("plain")
 	if !ok {
 		t.Fatalf("unable to find 'plain' encoding")
@@ -106,8 +106,8 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg MultilineConf
 		t.Fatalf("failed to initialize encoding: %v", err)
 	}
 
-	var reader LineProcessor
-	reader, err = NewLineEncoder(in, enc, 4096)
+	var reader Reader
+	reader, err = NewEncode(in, enc, 4096)
 	if err != nil {
 		t.Fatalf("Failed to initialize line reader: %v", err)
 	}

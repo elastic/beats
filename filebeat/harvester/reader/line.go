@@ -16,13 +16,12 @@ type Line struct {
 	rawInput   io.Reader
 	codec      encoding.Encoding
 	bufferSize int
-
-	nl        []byte
-	inBuffer  *streambuf.Buffer
-	outBuffer *streambuf.Buffer
-	inOffset  int // input buffer read offset
-	byteCount int // number of bytes decoded from input buffer into output buffer
-	decoder   transform.Transformer
+	nl         []byte
+	inBuffer   *streambuf.Buffer
+	outBuffer  *streambuf.Buffer
+	inOffset   int // input buffer read offset
+	byteCount  int // number of bytes decoded from input buffer into output buffer
+	decoder    transform.Transformer
 }
 
 func NewLine(

@@ -4,14 +4,14 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/elastic/beats/filebeat/harvester/processor"
+	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/libbeat/common"
 )
 
 // readLine reads a full line into buffer and returns it.
 // In case of partial lines, readLine does return and error and en empty string
 // This could potentialy be improved / replaced by https://github.com/elastic/beats/libbeat/tree/master/common/streambuf
-func readLine(reader processor.LineProcessor) (time.Time, string, int, common.MapStr, error) {
+func readLine(reader reader.Reader) (time.Time, string, int, common.MapStr, error) {
 	l, err := reader.Next()
 
 	// Full line read to be returned
