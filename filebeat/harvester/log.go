@@ -9,7 +9,6 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/filebeat/config"
-	"github.com/elastic/beats/filebeat/harvester/processor"
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/elastic/beats/filebeat/input"
@@ -45,7 +44,7 @@ func (h *Harvester) Harvest() {
 
 	logp.Info("Harvester started for file: %s", h.state.Source)
 
-	processor, err := h.newLineProcessor()
+	r, err := h.newLineReader()
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
 		return
@@ -65,7 +64,7 @@ func (h *Harvester) Harvest() {
 		}
 
 		// Partial lines return error and are only read on completion
-		ts, text, bytesRead, jsonFields, err := readLine(processor)
+		ts, text, bytesRead, jsonFields, err := readLine(r)
 		if err != nil {
 			switch err {
 			case reader.ErrFileTruncate:
@@ -283,11 +282,11 @@ func (h *Harvester) close() {
 	harvesterClosed.Add(1)
 }
 
-func (h *Harvester) newLogFileReaderConfig() reader.LogFileReaderConfig {
+func (h *Harvester) newLogFileReaderConfig() reader.LogFileConfig {
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
 	//       don't require 'complicated' logic.
-	return reader.LogFileReaderConfig{
+	return reader.LogFileConfig{
 		CloseRemoved:  h.config.CloseRemoved,
 		CloseRenamed:  h.config.CloseRenamed,
 		CloseInactive: h.config.CloseInactive,
@@ -298,34 +297,35 @@ func (h *Harvester) newLogFileReaderConfig() reader.LogFileReaderConfig {
 	}
 }
 
-func (h *Harvester) newLineProcessor() (processor.LineProcessor, error) {
+func (h *Harvester) newLineReader() (reader.Reader, error) {
 
 	readerConfig := h.newLogFileReaderConfig()
 
-	var p processor.LineProcessor
+	var r reader.Reader
 	var err error
 
-	fileReader, err := reader.NewLogFileReader(h.file, readerConfig, h.done)
+	fileReader, err := reader.NewLogFile(h.file, readerConfig, h.done)
 	if err != nil {
 		return nil, err
 	}
 
-	p, err = processor.NewLineEncoder(fileReader, h.encoding, h.config.BufferSize)
+	r, err = reader.NewEncode(fileReader, h.encoding, h.config.BufferSize)
 	if err != nil {
 		return nil, err
 	}
 
 	if h.config.JSON != nil {
-		p = processor.NewJSONProcessor(p, h.config.JSON)
+		r = reader.NewJSON(r, h.config.JSON)
 	}
 
-	p = processor.NewStripNewline(p)
+	r = reader.NewStripNewline(r)
+
 	if h.config.Multiline != nil {
-		p, err = processor.NewMultiline(p, "\n", h.config.MaxBytes, h.config.Multiline)
+		r, err = reader.NewMultiline(r, "\n", h.config.MaxBytes, h.config.Multiline)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return processor.NewLimitProcessor(p, h.config.MaxBytes), nil
+	return reader.NewLimit(r, h.config.MaxBytes), nil
 }

@@ -1,4 +1,4 @@
-package processor
+package reader
 
 import (
 	"errors"
@@ -11,30 +11,29 @@ var (
 
 // timeoutProcessor will signal some configurable timeout error if no
 // new line can be returned in time.
-type timeoutProcessor struct {
-	reader  LineProcessor
+type Timeout struct {
+	reader  Reader
 	timeout time.Duration
 	signal  error
-
 	running bool
 	ch      chan lineMessage
 }
 
 type lineMessage struct {
-	line Line
+	line Message
 	err  error
 }
 
-// newTimeoutProcessor returns a new timeoutProcessor from an input line processor.
-func newTimeoutProcessor(in LineProcessor, signal error, timeout time.Duration) *timeoutProcessor {
+// NewTimeout returns a new timeout reader from an input line reader.
+func NewTimeout(reader Reader, signal error, t time.Duration) *Timeout {
 	if signal == nil {
 		signal = errTimeout
 	}
 
-	return &timeoutProcessor{
-		reader:  in,
+	return &Timeout{
+		reader:  reader,
 		signal:  signal,
-		timeout: timeout,
+		timeout: t,
 		ch:      make(chan lineMessage, 1),
 	}
 }
@@ -42,9 +41,9 @@ func newTimeoutProcessor(in LineProcessor, signal error, timeout time.Duration) 
 // Next returns the next line. If no line was returned before timeout, the
 // configured timeout error is returned.
 // For handline timeouts a goroutine is started for reading lines from
-// configured line processor. Only when underlying processor returns an error, the
+// configured line reader. Only when underlying reader returns an error, the
 // goroutine will be finished.
-func (p *timeoutProcessor) Next() (Line, error) {
+func (p *Timeout) Next() (Message, error) {
 	if !p.running {
 		p.running = true
 		go func() {
@@ -65,6 +64,6 @@ func (p *timeoutProcessor) Next() (Line, error) {
 		}
 		return msg.line, msg.err
 	case <-time.After(p.timeout):
-		return Line{}, p.signal
+		return Message{}, p.signal
 	}
 }

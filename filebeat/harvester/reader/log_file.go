@@ -18,16 +18,16 @@ var (
 	ErrInactive     = errors.New("file inactive")
 )
 
-type logFileReader struct {
+type LogFile struct {
 	fs           source.FileSource
 	offset       int64
-	config       LogFileReaderConfig
+	config       LogFileConfig
 	lastTimeRead time.Time
 	backoff      time.Duration
 	done         chan struct{}
 }
 
-type LogFileReaderConfig struct {
+type LogFileConfig struct {
 	Backoff       time.Duration
 	MaxBackoff    time.Duration
 	BackoffFactor int
@@ -37,11 +37,11 @@ type LogFileReaderConfig struct {
 	CloseRemoved  bool
 }
 
-func NewLogFileReader(
+func NewLogFile(
 	fs source.FileSource,
-	config LogFileReaderConfig,
+	config LogFileConfig,
 	done chan struct{},
-) (*logFileReader, error) {
+) (*LogFile, error) {
 	var offset int64
 	if seeker, ok := fs.(io.Seeker); ok {
 		var err error
@@ -51,7 +51,7 @@ func NewLogFileReader(
 		}
 	}
 
-	return &logFileReader{
+	return &LogFile{
 		fs:           fs,
 		offset:       offset,
 		config:       config,
@@ -61,7 +61,7 @@ func NewLogFileReader(
 	}, nil
 }
 
-func (r *logFileReader) Read(buf []byte) (int, error) {
+func (r *LogFile) Read(buf []byte) (int, error) {
 
 	for {
 		select {
@@ -108,7 +108,7 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 }
 
 // errorChecks checks how the given error should be handled based on the config options
-func (r *logFileReader) errorChecks(err error) error {
+func (r *LogFile) errorChecks(err error) error {
 	if err == io.EOF && r.config.CloseEOF {
 		return err
 	}
@@ -155,7 +155,7 @@ func (r *logFileReader) errorChecks(err error) error {
 	return nil
 }
 
-func (r *logFileReader) wait() {
+func (r *LogFile) wait() {
 	// Wait before trying to read file wr.ch reached EOF again
 	time.Sleep(r.backoff)
 

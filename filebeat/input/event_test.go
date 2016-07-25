@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/filebeat/harvester/processor"
+	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
@@ -34,7 +34,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type": "test_type",
@@ -47,7 +47,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type": "test",
@@ -60,7 +60,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
-				JSONConfig:   &processor.JSONConfig{},
+				JSONConfig:   &reader.JSONConfig{},
 			},
 			ExpectedItems: common.MapStr{
 				"json": common.MapStr{"type": "test", "text": "hello"},
@@ -73,7 +73,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hi"},
-				JSONConfig:   &processor.JSONConfig{MessageKey: "text"},
+				JSONConfig:   &reader.JSONConfig{MessageKey: "text"},
 			},
 			ExpectedItems: common.MapStr{
 				"json": common.MapStr{"type": "test", "text": "hello"},
@@ -88,7 +88,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.444Z"},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"@timestamp": common.MustParseTime("2016-04-05T18:47:18.444Z"),
@@ -103,7 +103,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.44XX4Z"},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"@timestamp": common.Time(now),
@@ -119,7 +119,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "@timestamp": 42},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"@timestamp": common.Time(now),
@@ -133,7 +133,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": 42},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type":       "test_type",
@@ -146,7 +146,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": ""},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type":       "test_type",
@@ -159,7 +159,7 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "_type"},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type":       "test_type",

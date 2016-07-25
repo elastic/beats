@@ -6,7 +6,7 @@ import (
 	"time"
 
 	cfg "github.com/elastic/beats/filebeat/config"
-	"github.com/elastic/beats/filebeat/harvester/processor"
+	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/dustin/go-humanize"
@@ -32,26 +32,26 @@ var (
 )
 
 type harvesterConfig struct {
-	common.EventMetadata `config:",inline"`         // Fields and tags to add to events.
-	BufferSize           int                        `config:"harvester_buffer_size"`
-	DocumentType         string                     `config:"document_type"`
-	Encoding             string                     `config:"encoding"`
-	InputType            string                     `config:"input_type"`
-	TailFiles            bool                       `config:"tail_files"`
-	Backoff              time.Duration              `config:"backoff" validate:"min=0,nonzero"`
-	BackoffFactor        int                        `config:"backoff_factor" validate:"min=1"`
-	MaxBackoff           time.Duration              `config:"max_backoff" validate:"min=0,nonzero"`
-	CloseInactive        time.Duration              `config:"close_inactive"`
-	CloseOlder           time.Duration              `config:"close_older"`
-	CloseRemoved         bool                       `config:"close_removed"`
-	CloseRenamed         bool                       `config:"close_renamed"`
-	CloseEOF             bool                       `config:"close_eof"`
-	ForceCloseFiles      bool                       `config:"force_close_files"`
-	ExcludeLines         []*regexp.Regexp           `config:"exclude_lines"`
-	IncludeLines         []*regexp.Regexp           `config:"include_lines"`
-	MaxBytes             int                        `config:"max_bytes" validate:"min=0,nonzero"`
-	Multiline            *processor.MultilineConfig `config:"multiline"`
-	JSON                 *processor.JSONConfig      `config:"json"`
+	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
+	BufferSize           int                     `config:"harvester_buffer_size"`
+	DocumentType         string                  `config:"document_type"`
+	Encoding             string                  `config:"encoding"`
+	InputType            string                  `config:"input_type"`
+	TailFiles            bool                    `config:"tail_files"`
+	Backoff              time.Duration           `config:"backoff" validate:"min=0,nonzero"`
+	BackoffFactor        int                     `config:"backoff_factor" validate:"min=1"`
+	MaxBackoff           time.Duration           `config:"max_backoff" validate:"min=0,nonzero"`
+	CloseInactive        time.Duration           `config:"close_inactive"`
+	CloseOlder           time.Duration           `config:"close_older"`
+	CloseRemoved         bool                    `config:"close_removed"`
+	CloseRenamed         bool                    `config:"close_renamed"`
+	CloseEOF             bool                    `config:"close_eof"`
+	ForceCloseFiles      bool                    `config:"force_close_files"`
+	ExcludeLines         []*regexp.Regexp        `config:"exclude_lines"`
+	IncludeLines         []*regexp.Regexp        `config:"include_lines"`
+	MaxBytes             int                     `config:"max_bytes" validate:"min=0,nonzero"`
+	Multiline            *reader.MultilineConfig `config:"multiline"`
+	JSON                 *reader.JSONConfig      `config:"json"`
 }
 
 func (config *harvesterConfig) Validate() error {

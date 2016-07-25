@@ -1,4 +1,4 @@
-package processor
+package reader
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// MultiLine processor combining multiple line events into one multi-line event.
+// MultiLine reader combining multiple line events into one multi-line event.
 //
 // Lines to be combined are matched by some configurable predicate using
 // regular expression.
@@ -18,24 +18,22 @@ import (
 // Even if limits are reached subsequent lines are matched, until event is
 // fully finished.
 //
-// Errors will force the multiline processor to return the currently active
+// Errors will force the multiline reader to return the currently active
 // multiline event first and finally return the actual error on next call to Next.
-type MultiLine struct {
-	reader    LineProcessor
+type Multiline struct {
+	reader    Reader
 	pred      matcher
 	maxBytes  int // bytes stored in content
 	maxLines  int
 	separator []byte
-
 	ts        time.Time
 	content   []byte
 	last      []byte
 	readBytes int // bytes as read from input source
 	numLines  int
 	fields    common.MapStr
-
-	err   error // last seen error
-	state func(*MultiLine) (Line, error)
+	err       error // last seen error
+	state     func(*Multiline) (Message, error)
 }
 
 const (
@@ -54,14 +52,14 @@ var (
 	errMultilineTimeout = errors.New("multline timeout")
 )
 
-// NewMultiline creates a new multi-line processor combining stream of
+// NewMultiline creates a new multi-line reader combining stream of
 // line events into stream of multi-line events.
 func NewMultiline(
-	r LineProcessor,
+	r Reader,
 	separator string,
 	maxBytes int,
 	config *MultilineConfig,
-) (*MultiLine, error) {
+) (*Multiline, error) {
 	types := map[string]func(*regexp.Regexp) (matcher, error){
 		"before": beforeMatcher,
 		"after":  afterMatcher,
@@ -95,13 +93,13 @@ func NewMultiline(
 	}
 
 	if timeout > 0 {
-		r = newTimeoutProcessor(r, errMultilineTimeout, timeout)
+		r = NewTimeout(r, errMultilineTimeout, timeout)
 	}
 
-	mlr := &MultiLine{
+	mlr := &Multiline{
 		reader:    r,
 		pred:      matcher,
-		state:     (*MultiLine).readFirst,
+		state:     (*Multiline).readFirst,
 		maxBytes:  maxBytes,
 		maxLines:  maxLines,
 		separator: []byte(separator),
@@ -110,20 +108,20 @@ func NewMultiline(
 }
 
 // Next returns next multi-line event.
-func (mlr *MultiLine) Next() (Line, error) {
+func (mlr *Multiline) Next() (Message, error) {
 	return mlr.state(mlr)
 }
 
-func (mlr *MultiLine) readFirst() (Line, error) {
+func (mlr *Multiline) readFirst() (Message, error) {
 	for {
-		l, err := mlr.reader.Next()
+		p, err := mlr.reader.Next()
 		if err == nil {
-			if l.Bytes == 0 {
+			if p.Bytes == 0 {
 				continue
 			}
 
-			mlr.startNewLine(l)
-			mlr.state = (*MultiLine).readNext
+			mlr.startNewLine(p)
+			mlr.state = (*Multiline).readNext
 			return mlr.readNext()
 		}
 
@@ -133,14 +131,13 @@ func (mlr *MultiLine) readFirst() (Line, error) {
 		}
 
 		// something is wrong here
-		return l, err
+		return p, err
 	}
-
 }
 
-func (mlr *MultiLine) readNext() (Line, error) {
+func (mlr *Multiline) readNext() (Message, error) {
 	for {
-		l, err := mlr.reader.Next()
+		p, err := mlr.reader.Next()
 
 		if err != nil {
 			// handle multiline timeout signal
@@ -152,64 +149,64 @@ func (mlr *MultiLine) readNext() (Line, error) {
 
 				// return collected multiline event and
 				// empty buffer for new multiline event
-				l := mlr.pushLine()
+				p := mlr.pushLine()
 				mlr.reset()
-				return l, nil
+				return p, nil
 			}
 
 			// handle error without any bytes returned from reader
-			if l.Bytes == 0 {
+			if p.Bytes == 0 {
 				// no lines buffered -> return error
 				if mlr.numLines == 0 {
-					return Line{}, err
+					return Message{}, err
 				}
 
 				// lines buffered, return multiline and error on next read
-				l := mlr.pushLine()
+				p := mlr.pushLine()
 				mlr.err = err
-				mlr.state = (*MultiLine).readFailed
-				return l, nil
+				mlr.state = (*Multiline).readFailed
+				return p, nil
 			}
 
 			// handle error with some content being returned by reader and
 			// line matching multiline criteria or no multiline started yet
-			if mlr.readBytes == 0 || mlr.pred(mlr.last, l.Content) {
-				mlr.addLine(l)
+			if mlr.readBytes == 0 || mlr.pred(mlr.last, p.Content) {
+				mlr.addLine(p)
 
 				// return multiline and error on next read
 				l := mlr.pushLine()
 				mlr.err = err
-				mlr.state = (*MultiLine).readFailed
+				mlr.state = (*Multiline).readFailed
 				return l, nil
 			}
 
 			// no match, return current multline and retry with current line on next
 			// call to readNext awaiting the error being reproduced (or resolved)
 			// in next call to Next
-			l := mlr.startNewLine(l)
+			l := mlr.startNewLine(p)
 			return l, nil
 		}
 
 		// if predicate does not match current multiline -> return multiline event
-		if mlr.readBytes > 0 && !mlr.pred(mlr.last, l.Content) {
-			l := mlr.startNewLine(l)
+		if mlr.readBytes > 0 && !mlr.pred(mlr.last, p.Content) {
+			l := mlr.startNewLine(p)
 			return l, nil
 		}
 
 		// add line to current multiline event
-		mlr.addLine(l)
+		mlr.addLine(p)
 	}
 }
 
-func (mlr *MultiLine) readFailed() (Line, error) {
+func (mlr *Multiline) readFailed() (Message, error) {
 	// return error and reset line reader
 	err := mlr.err
 	mlr.err = nil
 	mlr.reset()
-	return Line{}, err
+	return Message{}, err
 }
 
-func (mlr *MultiLine) startNewLine(l Line) Line {
+func (mlr *Multiline) startNewLine(l Message) Message {
 	retLine := mlr.pushLine()
 	mlr.addLine(l)
 	mlr.ts = l.Ts
@@ -217,7 +214,7 @@ func (mlr *MultiLine) startNewLine(l Line) Line {
 	return retLine
 }
 
-func (mlr *MultiLine) pushLine() Line {
+func (mlr *Multiline) pushLine() Message {
 	content := mlr.content
 	sz := mlr.readBytes
 	fields := mlr.fields
@@ -229,11 +226,11 @@ func (mlr *MultiLine) pushLine() Line {
 	mlr.err = nil
 	mlr.fields = nil
 
-	return Line{Ts: mlr.ts, Content: content, Fields: fields, Bytes: sz}
+	return Message{Ts: mlr.ts, Content: content, Fields: fields, Bytes: sz}
 }
 
-func (mlr *MultiLine) addLine(l Line) {
-	if l.Bytes <= 0 {
+func (mlr *Multiline) addLine(m Message) {
+	if m.Bytes <= 0 {
 		return
 	}
 
@@ -247,24 +244,24 @@ func (mlr *MultiLine) addLine(l Line) {
 	spaceLeft := (mlr.maxBytes <= 0 || space > 0) &&
 		(mlr.maxLines <= 0 || mlr.numLines < mlr.maxLines)
 	if spaceLeft {
-		if space < 0 || space > len(l.Content) {
-			space = len(l.Content)
+		if space < 0 || space > len(m.Content) {
+			space = len(m.Content)
 		}
 
 		tmp := mlr.content
 		if addSeparator {
 			tmp = append(tmp, mlr.separator...)
 		}
-		mlr.content = append(tmp, l.Content[:space]...)
+		mlr.content = append(tmp, m.Content[:space]...)
 		mlr.numLines++
 	}
 
-	mlr.last = l.Content
-	mlr.readBytes += l.Bytes
+	mlr.last = m.Content
+	mlr.readBytes += m.Bytes
 }
 
-func (mlr *MultiLine) reset() {
-	mlr.state = (*MultiLine).readFirst
+func (mlr *Multiline) reset() {
+	mlr.state = (*Multiline).readFirst
 }
 
 // matchers
