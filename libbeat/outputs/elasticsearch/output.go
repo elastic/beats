@@ -56,6 +56,10 @@ func New(beatName string, cfg *common.Config, topologyExpire int) (outputs.Outpu
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
 
+	if !cfg.HasField("index") {
+		cfg.SetString("index", -1, beatName)
+	}
+
 	output := &elasticsearchOutput{beatName: beatName}
 	err := output.init(cfg, topologyExpire)
 	if err != nil {
