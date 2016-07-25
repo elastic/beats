@@ -1,26 +1,26 @@
-package processor
+package reader
 
-// StripNewline processor removes the last trailing newline characters from
+// StripNewline reader removes the last trailing newline characters from
 // read lines.
 type StripNewline struct {
-	reader LineProcessor
+	reader Reader
 }
 
 // NewStripNewline creates a new line reader stripping the last tailing newline.
-func NewStripNewline(r LineProcessor) *StripNewline {
+func NewStripNewline(r Reader) *StripNewline {
 	return &StripNewline{r}
 }
 
 // Next returns the next line.
-func (p *StripNewline) Next() (Line, error) {
-	line, err := p.reader.Next()
+func (p *StripNewline) Next() (Message, error) {
+	message, err := p.reader.Next()
 	if err != nil {
-		return line, err
+		return message, err
 	}
 
-	L := line.Content
-	line.Content = L[:len(L)-lineEndingChars(L)]
-	return line, err
+	L := message.Content
+	message.Content = L[:len(L)-lineEndingChars(L)]
+	return message, err
 }
 
 // isLine checks if the given byte array is a line, means has a line ending \n

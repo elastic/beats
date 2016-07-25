@@ -77,7 +77,7 @@ func TestReadLine(t *testing.T) {
 	h.encoding, err = h.encodingFactory(readFile)
 	assert.NoError(t, err)
 
-	r, err := h.newLineProcessor()
+	r, err := h.newLineReader()
 	assert.NoError(t, err)
 
 	// Read third line
