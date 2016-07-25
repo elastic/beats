@@ -2,6 +2,7 @@ package fmtstr
 
 import (
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
@@ -78,6 +79,18 @@ func TestEventFormatString(t *testing.T) {
 			"value - value",
 			[]string{"key"},
 		},
+		{
+			"test timestamp formatter",
+			"%{[key]}: %{+YYYY.MM.dd}",
+			common.MapStr{
+				"@timestamp": common.Time(
+					time.Date(2015, 5, 1, 20, 12, 34, 0, time.Local),
+				),
+				"key": "timestamp",
+			},
+			"timestamp: 2015.05.01",
+			[]string{"key"},
+		},
 	}
 
 	for i, test := range tests {
@@ -127,6 +140,11 @@ func TestEventFormatStringErrors(t *testing.T) {
 		{
 			"too many operators",
 			"%{[field]:a:b}",
+			false, nil,
+		},
+		{
+			"invalid timestamp formatter",
+			"%{+abc}",
 			false, nil,
 		},
 		{
