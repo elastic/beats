@@ -20,7 +20,7 @@ func NewProspectorStdin(p *Prospector) (*ProspectorStdin, error) {
 
 	var err error
 
-	prospectorer.harvester, err = p.createHarvester(file.State{Source: "-"})
+	prospectorer.harvester, err = p.createHarvester()
 	if err != nil {
 		return nil, fmt.Errorf("Error initializing stdin harvester: %v", err)
 	}
@@ -36,7 +36,7 @@ func (p *ProspectorStdin) Run() {
 
 	// Make sure stdin harvester is only started once
 	if !p.started {
-		go p.harvester.Harvest()
+		go p.harvester.Harvest(file.State{Source: "-"})
 		p.started = true
 	}
 }

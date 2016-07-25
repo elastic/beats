@@ -22,6 +22,7 @@ type Prospector struct {
 	done          chan struct{}
 	states        *file.States
 	wg            sync.WaitGroup
+	harvester     *harvester.Harvester
 }
 
 type Prospectorer interface {
@@ -80,7 +81,7 @@ func (p *Prospector) Init() error {
 	p.prospectorer = prospectorer
 
 	// Create empty harvester to check if configs are fine
-	_, err = p.createHarvester(file.State{})
+	p.harvester, err = p.createHarvester()
 	if err != nil {
 		return err
 	}
@@ -142,11 +143,10 @@ func (p *Prospector) Stop() {
 }
 
 // createHarvester creates a new harvester instance from the given state
-func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, error) {
+func (p *Prospector) createHarvester() (*harvester.Harvester, error) {
 
 	h, err := harvester.NewHarvester(
 		p.cfg,
-		state,
 		p.harvesterChan,
 		p.done,
 	)
@@ -156,18 +156,14 @@ func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, er
 
 func (p *Prospector) startHarvester(state file.State, offset int64) (*harvester.Harvester, error) {
 	state.Offset = offset
-	// Create harvester with state
-	h, err := p.createHarvester(state)
-	if err != nil {
-		return nil, err
-	}
+	h := *p.harvester
 
 	p.wg.Add(1)
 	go func() {
 		defer p.wg.Done()
 		// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
-		h.Harvest()
+		h.Harvest(state)
 	}()
 
-	return h, nil
+	return &h, nil
 }

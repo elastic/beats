@@ -36,14 +36,12 @@ type Harvester struct {
 
 func NewHarvester(
 	cfg *common.Config,
-	state file.State,
 	prospectorChan chan *input.Event,
 	done chan struct{},
 ) (*Harvester, error) {
 
 	h := &Harvester{
 		config:         defaultConfig,
-		state:          state,
 		prospectorChan: prospectorChan,
 		done:           done,
 	}
