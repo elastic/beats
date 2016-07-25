@@ -577,7 +577,7 @@ output.elasticsearch:
 
   # The name of the Redis list or channel the events are published to. The
   # default is filebeat.
-  #index: filebeat
+  #key: filebeat
 
   # The password to authenticate with. The default is no authentication.
   #password:
