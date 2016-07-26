@@ -18,7 +18,7 @@ and `type` so they can only be used to filter fields from the module.
 The following example reduces the exported fields of the Redis module to
 include only the `redis.info.memory` fields.
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
 
 [source,yaml]
 ----
@@ -33,7 +33,7 @@ metricbeat.modules:
        fields: ['redis.info.memory']
 ----
 
-coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
 
 [source,yaml]
 ----
@@ -57,7 +57,7 @@ include::../../libbeat/docs/processors.asciidoc[]
 For example, the following filters configuration reduces the exported fields by
 dropping the `beat.name` and `beat.hostname` fields under `beat`, from all documents.
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
 
 [source, yaml]
 ----
@@ -66,7 +66,7 @@ filters:
     fields: ['beat']
 ----
 
-coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
 
 [source, yaml]
 ----
