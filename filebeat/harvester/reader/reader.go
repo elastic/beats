@@ -1,10 +1,13 @@
 package reader
 
 import (
+	"errors"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 )
+
+var ErrReaderStopped = errors.New("reader was stopped")
 
 // Message represents a reader event with timestamp, content and actual number
 // of bytes read from input before decoding.
@@ -21,5 +24,5 @@ type Message struct {
 // if reader will not return any new message on subsequent calls.
 type Reader interface {
 	Next() (Message, error)
-	Stop() error
+	Close() error
 }

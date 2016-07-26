@@ -50,6 +50,12 @@ func (h *Harvester) Harvest() {
 		return
 	}
 
+	// Waits for harvester channel to be closed to close reader
+	go func() {
+		<-h.done
+		h.reader.Close()
+	}()
+
 	// Always report the state before starting a harvester
 	// This is useful in case the file was renamed
 	if !h.sendStateUpdate() {
@@ -59,7 +65,6 @@ func (h *Harvester) Harvest() {
 	for {
 		select {
 		case <-h.done:
-			h.reader.Stop()
 			return
 		default:
 		}
@@ -292,7 +297,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	var r reader.Reader
 	var err error
 
-	logInput, err := NewLogFile(h.file, readerConfig, h.done)
+	logInput, err := NewLogFile(h.file, readerConfig)
 	if err != nil {
 		return nil, err
 	}

@@ -21,6 +21,6 @@ func (p *Limit) Next() (Message, error) {
 	return message, err
 }
 
-func (r *Limit) Stop() error {
-	return r.reader.Stop()
+func (r *Limit) Close() error {
+	return r.reader.Close()
 }

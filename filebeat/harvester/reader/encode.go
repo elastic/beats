@@ -16,7 +16,7 @@ type Encode struct {
 // NewEncode creates a new Encode reader from input reader by applying
 // the given codec.
 func NewEncode(
-	in io.Reader,
+	in io.ReadCloser,
 	codec encoding.Encoding,
 	bufferSize int,
 ) (*Encode, error) {
@@ -34,6 +34,6 @@ func (r *Encode) Next() (Message, error) {
 	}, err
 }
 
-func (r *Encode) Stop() error {
-	return r.reader.Stop()
+func (r *Encode) Close() error {
+	return r.reader.Close()
 }

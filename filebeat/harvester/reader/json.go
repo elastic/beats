@@ -60,8 +60,8 @@ func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
 	return []byte(textString), jsonFields
 }
 
-func (r *JSON) Stop() error {
-	return r.reader.Stop()
+func (r *JSON) Close() error {
+	return r.reader.Close()
 }
 
 // unmarshal is equivalent with json.Unmarshal but it converts numbers

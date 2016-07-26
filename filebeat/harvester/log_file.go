@@ -40,8 +40,8 @@ type LogFileConfig struct {
 func NewLogFile(
 	fs source.FileSource,
 	config LogFileConfig,
-	done chan struct{},
 ) (*LogFile, error) {
+
 	var offset int64
 	if seeker, ok := fs.(io.Seeker); ok {
 		var err error
@@ -57,7 +57,7 @@ func NewLogFile(
 		config:       config,
 		lastTimeRead: time.Now(),
 		backoff:      config.Backoff,
-		done:         done,
+		done:         make(chan struct{}),
 	}, nil
 }
 
@@ -107,7 +107,8 @@ func (r *LogFile) Read(buf []byte) (int, error) {
 	}
 }
 
-func (r *LogFile) Stop() error {
+func (r *LogFile) Close() error {
+	close(r.done)
 	return nil
 }
 
@@ -160,8 +161,15 @@ func (r *LogFile) errorChecks(err error) error {
 }
 
 func (r *LogFile) wait() {
+
 	// Wait before trying to read file wr.ch reached EOF again
-	time.Sleep(r.backoff)
+	timer := time.NewTimer(r.backoff)
+
+	select {
+	case <-r.done:
+		return
+	case <-timer.C:
+	}
 
 	// Increment backoff up to maxBackoff
 	if r.backoff < r.config.MaxBackoff {

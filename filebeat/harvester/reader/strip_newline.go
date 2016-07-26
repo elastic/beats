@@ -23,8 +23,8 @@ func (p *StripNewline) Next() (Message, error) {
 	return message, err
 }
 
-func (r *StripNewline) Stop() error {
-	return r.reader.Stop()
+func (r *StripNewline) Close() error {
+	return r.reader.Close()
 }
 
 // isLine checks if the given byte array is a line, means has a line ending \n
