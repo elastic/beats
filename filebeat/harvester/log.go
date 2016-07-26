@@ -91,8 +91,9 @@ func (h *Harvester) Harvest() {
 
 		text := string(message.Content)
 
-		// Check if data should be added to event
-		if h.shouldExportLine(text) {
+		// Check if data should be added to event. Only export events where Bytes > 0
+		// Content length cannot be checked because of JSON
+		if message.Bytes > 0 && h.shouldExportLine(text) {
 			event.ReadTime = message.Ts
 			event.Bytes = message.Bytes
 			event.Text = &text
