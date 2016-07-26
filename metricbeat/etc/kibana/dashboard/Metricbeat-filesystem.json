@@ -3,11 +3,11 @@
   "timeRestore": false, 
   "description": "", 
   "title": "Metricbeat-filesystem", 
-  "uiStateJSON": "{}", 
-  "panelsJSON": "[{\"id\":\"System-Navigation\",\"type\":\"visualization\",\"panelIndex\":1,\"size_x\":2,\"size_y\":5,\"col\":1,\"row\":1},{\"id\":\"Disk-utilization-over-time\",\"type\":\"visualization\",\"panelIndex\":2,\"size_x\":5,\"size_y\":5,\"col\":3,\"row\":1},{\"id\":\"Filesystem-overview\",\"type\":\"visualization\",\"panelIndex\":3,\"size_x\":5,\"size_y\":5,\"col\":8,\"row\":1}]", 
+  "uiStateJSON": "{\"P-5\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"System-Navigation\",\"panelIndex\":1,\"row\":1,\"size_x\":2,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Top-hosts-by-disk-size\",\"panelIndex\":5,\"row\":10,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Disk-space-overview\",\"panelIndex\":6,\"row\":1,\"size_x\":9,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Free-disk-space-over-days\",\"panelIndex\":7,\"row\":5,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Total-files-over-days\",\"panelIndex\":8,\"row\":5,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"}]", 
   "optionsJSON": "{\"darkTheme\":false}", 
   "version": 1, 
   "kibanaSavedObjectMeta": {
-    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
   }
 }

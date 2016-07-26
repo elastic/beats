@@ -1,5 +1,5 @@
 {
-  "visState": "{\"title\":\"System Load\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"system.load.1\",\"customLabel\":\"Last sec\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"system.load.5\",\"customLabel\":\"Last 5 secs\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"system.load.15\",\"customLabel\":\"Last 15 secs\"}}],\"listeners\":{}}", 
+  "visState": "{\"title\":\"System Load\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"system.cpu.load.1\",\"customLabel\":\"Last sec\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"system.cpu.load.5\",\"customLabel\":\"Last 5 secs\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"system.cpu.load.15\",\"customLabel\":\"Last 15 secs\"}}],\"listeners\":{}}", 
   "description": "", 
   "title": "System Load", 
   "uiStateJSON": "{}", 
