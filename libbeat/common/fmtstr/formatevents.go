@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -25,29 +26,24 @@ import (
 // `%{[field.name]:default value}`.
 type EventFormatString struct {
 	formatter StringFormatter
-	ctx       *eventEvalContext
 	fields    []fieldInfo
 	timestamp bool
 }
 
 type eventFieldEvaler struct {
-	ctx   *eventEvalContext
 	index int
 }
 
 type defaultEventFieldEvaler struct {
-	ctx          *eventEvalContext
 	index        int
 	defaultValue string
 }
 
 type eventTimestampEvaler struct {
-	ctx       *eventEvalContext
 	formatter *dtfmt.Formatter
 }
 
 type eventFieldCompiler struct {
-	ctx       *eventEvalContext
 	keys      map[string]keyInfo
 	timestamp bool
 	index     int
@@ -66,12 +62,32 @@ type keyInfo struct {
 type eventEvalContext struct {
 	keys []string
 	ts   time.Time
+	buf  *bytes.Buffer
 }
 
 var (
 	errMissingKeys   = errors.New("missing keys")
 	errConvertString = errors.New("can not convert to string")
 )
+
+var eventCtxPool = &sync.Pool{
+	New: func() interface{} { return &eventEvalContext{} },
+}
+
+func newEventCtx(sz int) *eventEvalContext {
+	ctx := eventCtxPool.Get().(*eventEvalContext)
+	if ctx.keys == nil || cap(ctx.keys) < sz {
+		ctx.keys = make([]string, 0, sz)
+	} else {
+		ctx.keys = ctx.keys[:0]
+	}
+
+	return ctx
+}
+
+func releaseCtx(c *eventEvalContext) {
+	eventCtxPool.Put(c)
+}
 
 // MustCompileEvent copmiles an event format string into an runnable
 // EventFormatString. Generates a panic if compilation fails.
@@ -88,7 +104,6 @@ func MustCompileEvent(in string) *EventFormatString {
 func CompileEvent(in string) (*EventFormatString, error) {
 	ctx := &eventEvalContext{}
 	efComp := &eventFieldCompiler{
-		ctx:       ctx,
 		keys:      map[string]keyInfo{},
 		index:     0,
 		timestamp: false,
@@ -110,7 +125,6 @@ func CompileEvent(in string) (*EventFormatString, error) {
 	ctx.keys = make([]string, len(keys))
 	efs := &EventFormatString{
 		formatter: sf,
-		ctx:       ctx,
 		fields:    keys,
 		timestamp: efComp.timestamp,
 	}
@@ -157,24 +171,43 @@ func (fs *EventFormatString) Fields() []string {
 // Run executes the format string returning a new expanded string or an error
 // if execution or event field expansion fails.
 func (fs *EventFormatString) Run(event common.MapStr) (string, error) {
-	if err := fs.collectFields(event); err != nil {
+	ctx := newEventCtx(len(fs.fields))
+	defer releaseCtx(ctx)
+
+	if ctx.buf == nil {
+		ctx.buf = bytes.NewBuffer(nil)
+	} else {
+		ctx.buf.Reset()
+	}
+
+	if err := fs.collectFields(ctx, event); err != nil {
 		return "", err
 	}
-	return fs.formatter.Run()
+	err := fs.formatter.Eval(ctx, ctx.buf)
+	if err != nil {
+		return "", err
+	}
+	return ctx.buf.String(), nil
 }
 
 // Eval executes the format string, writing the resulting string into the provided output buffer. Returns error if execution or event field expansion fails.
 func (fs *EventFormatString) Eval(out *bytes.Buffer, event common.MapStr) error {
-	if err := fs.collectFields(event); err != nil {
+	ctx := newEventCtx(len(fs.fields))
+	defer releaseCtx(ctx)
+
+	if err := fs.collectFields(ctx, event); err != nil {
 		return err
 	}
-	return fs.formatter.Eval(out)
+	return fs.formatter.Eval(ctx, out)
 }
 
 // collectFields tries to extract and convert all required fields into an array
 // of strings.
-func (fs *EventFormatString) collectFields(event common.MapStr) error {
-	for i, fi := range fs.fields {
+func (fs *EventFormatString) collectFields(
+	ctx *eventEvalContext,
+	event common.MapStr,
+) error {
+	for _, fi := range fs.fields {
 		s, err := fieldString(event, fi.path)
 		if err != nil {
 			if fi.required {
@@ -183,7 +216,7 @@ func (fs *EventFormatString) collectFields(event common.MapStr) error {
 
 			s = ""
 		}
-		fs.ctx.keys[i] = s
+		ctx.keys = append(ctx.keys, s)
 	}
 
 	if fs.timestamp {
@@ -194,9 +227,9 @@ func (fs *EventFormatString) collectFields(event common.MapStr) error {
 
 		switch t := timestamp.(type) {
 		case common.Time:
-			fs.ctx.ts = time.Time(t)
+			ctx.ts = time.Time(t)
 		case time.Time:
-			fs.ctx.ts = t
+			ctx.ts = t
 		default:
 			return errors.New("unknown timestamp type")
 		}
@@ -261,10 +294,10 @@ func (e *eventFieldCompiler) compileEventField(
 	idx := info.index
 
 	if len(ops) == 0 {
-		return &eventFieldEvaler{e.ctx, idx}, nil
+		return &eventFieldEvaler{idx}, nil
 	}
 
-	return &defaultEventFieldEvaler{e.ctx, idx, defaultValue}, nil
+	return &defaultEventFieldEvaler{idx, defaultValue}, nil
 }
 
 func (e *eventFieldCompiler) compileTimestamp(
@@ -281,25 +314,27 @@ func (e *eventFieldCompiler) compileTimestamp(
 	}
 
 	e.timestamp = true
-	return &eventTimestampEvaler{e.ctx, formatter}, nil
+	return &eventTimestampEvaler{formatter}, nil
 }
 
-func (e *eventFieldEvaler) Eval(out *bytes.Buffer) error {
+func (e *eventFieldEvaler) Eval(c interface{}, out *bytes.Buffer) error {
 	type stringer interface {
 		String() string
 	}
 
-	s := e.ctx.keys[e.index]
+	ctx := c.(*eventEvalContext)
+	s := ctx.keys[e.index]
 	_, err := out.WriteString(s)
 	return err
 }
 
-func (e *defaultEventFieldEvaler) Eval(out *bytes.Buffer) error {
+func (e *defaultEventFieldEvaler) Eval(c interface{}, out *bytes.Buffer) error {
 	type stringer interface {
 		String() string
 	}
 
-	s := e.ctx.keys[e.index]
+	ctx := c.(*eventEvalContext)
+	s := ctx.keys[e.index]
 	if s == "" {
 		s = e.defaultValue
 	}
@@ -307,8 +342,9 @@ func (e *defaultEventFieldEvaler) Eval(out *bytes.Buffer) error {
 	return err
 }
 
-func (e *eventTimestampEvaler) Eval(out *bytes.Buffer) error {
-	_, err := e.formatter.Write(out, e.ctx.ts)
+func (e *eventTimestampEvaler) Eval(c interface{}, out *bytes.Buffer) error {
+	ctx := c.(*eventEvalContext)
+	_, err := e.formatter.Write(out, ctx.ts)
 	return err
 }
 
