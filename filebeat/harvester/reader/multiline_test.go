@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"io"
+
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/stretchr/testify/assert"
 )
@@ -95,7 +97,7 @@ func testMultilineOK(t *testing.T, cfg MultilineConfig, expected ...string) {
 	}
 }
 
-func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg MultilineConfig) Reader {
+func createMultilineTestReader(t *testing.T, in io.ReadCloser, cfg MultilineConfig) Reader {
 	encFactory, ok := encoding.FindEncoding("plain")
 	if !ok {
 		t.Fatalf("unable to find 'plain' encoding")
@@ -120,8 +122,9 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg MultilineConf
 	return reader
 }
 
-func createLineBuffer(lines ...string) ([]string, *bytes.Buffer) {
-	buf := bytes.NewBuffer(nil)
+func createLineBuffer(lines ...string) ([]string, io.ReadCloser) {
+	buf := &TestBuffer{}
+
 	for _, line := range lines {
 		buf.WriteString(line)
 	}
