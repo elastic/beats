@@ -11,6 +11,7 @@ type config struct {
 	Filename      string `config:"filename"`
 	RotateEveryKb int    `config:"rotate_every_kb" validate:"min=1"`
 	NumberOfFiles int    `config:"number_of_files"`
+	Format        string `config:"format"`
 }
 
 var (

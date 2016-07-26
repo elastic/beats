@@ -46,9 +46,9 @@ func event(k, v string) common.MapStr {
 	return common.MapStr{k: v}
 }
 
-func run(pretty bool, events ...common.MapStr) (string, error) {
+func run(pretty bool, format string, events ...common.MapStr) (string, error) {
 	return withStdout(func() {
-		c := newConsole(pretty)
+		c := newConsole(pretty, format)
 		for _, event := range events {
 			c.PublishEvent(nil, outputs.Options{}, event)
 		}
@@ -56,21 +56,21 @@ func run(pretty bool, events ...common.MapStr) (string, error) {
 }
 
 func TestConsoleOneEvent(t *testing.T) {
-	lines, err := run(false, event("event", "myevent"))
+	lines, err := run(false, "", event("event", "myevent"))
 	assert.Nil(t, err)
 	expected := "{\"event\":\"myevent\"}\n"
 	assert.Equal(t, expected, lines)
 }
 
 func TestConsoleOneEventIndented(t *testing.T) {
-	lines, err := run(true, event("event", "myevent"))
+	lines, err := run(true, "", event("event", "myevent"))
 	assert.Nil(t, err)
 	expected := "{\n  \"event\": \"myevent\"\n}\n"
 	assert.Equal(t, expected, lines)
 }
 
 func TestConsoleMultipleEvents(t *testing.T) {
-	lines, err := run(false,
+	lines, err := run(false, "",
 		event("event", "event1"),
 		event("event", "event2"),
 		event("event", "event3"),
@@ -82,7 +82,7 @@ func TestConsoleMultipleEvents(t *testing.T) {
 }
 
 func TestConsoleMultipleEventsIndented(t *testing.T) {
-	lines, err := run(true,
+	lines, err := run(true, "",
 		event("event", "event1"),
 		event("event", "event2"),
 		event("event", "event3"),
@@ -92,5 +92,19 @@ func TestConsoleMultipleEventsIndented(t *testing.T) {
 	expected := "{\n  \"event\": \"event1\"\n}\n" +
 		"{\n  \"event\": \"event2\"\n}\n" +
 		"{\n  \"event\": \"event3\"\n}\n"
+	assert.Equal(t, expected, lines)
+}
+
+func TestConsoleOneEventFormatted(t *testing.T) {
+	lines, err := run(true, "%{event} test", event("event", "myevent"))
+	assert.Nil(t, err)
+	expected := "myevent test\n"
+	assert.Equal(t, expected, lines)
+}
+
+func TestConsoleOneEventFormattedWithAtCharacter(t *testing.T) {
+	lines, err := run(true, "%{@timestamp} bla", event("@timestamp", "myevent"))
+	assert.Nil(t, err)
+	expected := "myevent bla\n"
 	assert.Equal(t, expected, lines)
 }

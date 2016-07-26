@@ -20,6 +20,7 @@ type redisConfig struct {
 	MaxRetries  int                   `config:"max_retries"`
 	TLS         *outputs.TLSConfig    `config:"tls"`
 	Proxy       transport.ProxyConfig `config:",inline"`
+	Format      string                `config:"format"`
 
 	Db       int    `config:"db"`
 	DataType string `config:"datatype"`
@@ -41,6 +42,7 @@ var (
 		HostTopology:     "",
 		PasswordTopology: "",
 		DbTopology:       1,
+		Format:           "",
 	}
 )
 
