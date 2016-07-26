@@ -44,8 +44,7 @@ func (h *Harvester) Harvest() {
 
 	logp.Info("Harvester started for file: %s", h.state.Source)
 
-	r, err := h.newLogFileReader()
-
+	h.reader, err = h.newLogFileReader()
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
 		return
@@ -60,11 +59,12 @@ func (h *Harvester) Harvest() {
 	for {
 		select {
 		case <-h.done:
+			h.reader.Stop()
 			return
 		default:
 		}
 
-		message, err := r.Next()
+		message, err := h.reader.Next()
 		if err != nil {
 			switch err {
 			case ErrFileTruncate:
