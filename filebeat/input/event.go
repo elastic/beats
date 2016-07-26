@@ -2,7 +2,6 @@ package input
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester/reader"
@@ -11,34 +10,31 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// FileEvent is sent to the output and must contain all relevant information
-type FileEvent struct {
+// Event is sent to the output and must contain all relevant information
+type Event struct {
 	common.EventMetadata
 	ReadTime     time.Time
-	Source       string
 	InputType    string
 	DocumentType string
-	Offset       int64
 	Bytes        int
 	Text         *string
-	Fileinfo     os.FileInfo
 	JSONFields   common.MapStr
 	JSONConfig   *reader.JSONConfig
 	State        file.State
 }
 
-func NewEvent(state file.State) *FileEvent {
-	return &FileEvent{
+func NewEvent(state file.State) *Event {
+	return &Event{
 		State: state,
 	}
 }
 
-func (f *FileEvent) ToMapStr() common.MapStr {
+func (f *Event) ToMapStr() common.MapStr {
 	event := common.MapStr{
 		common.EventMetadataKey: f.EventMetadata,
 		"@timestamp":            common.Time(f.ReadTime),
-		"source":                f.Source,
-		"offset":                f.Offset, // Offset here is the offset before the starting char.
+		"source":                f.State.Source,
+		"offset":                f.State.Offset, // Offset here is the offset before the starting char.
 		"type":                  f.DocumentType,
 		"input_type":            f.InputType,
 	}
@@ -56,7 +52,7 @@ func (f *FileEvent) ToMapStr() common.MapStr {
 // respecting the KeysUnderRoot and OverwriteKeys configuration options.
 // If MessageKey is defined, the Text value from the event always
 // takes precedence.
-func mergeJSONFields(f *FileEvent, event common.MapStr) {
+func mergeJSONFields(f *Event, event common.MapStr) {
 
 	// The message key might have been modified by multiline
 	if len(f.JSONConfig.MessageKey) > 0 && f.Text != nil {

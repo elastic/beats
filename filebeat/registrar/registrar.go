@@ -18,7 +18,7 @@ import (
 )
 
 type Registrar struct {
-	Channel      chan []*FileEvent
+	Channel      chan []*Event
 	done         chan struct{}
 	registryFile string       // Path to the Registry File
 	states       *file.States // Map with all file paths inside and the corresponding state
@@ -36,7 +36,7 @@ func New(registryFile string) (*Registrar, error) {
 		registryFile: registryFile,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
-		Channel:      make(chan []*FileEvent, 1),
+		Channel:      make(chan []*Event, 1),
 		wg:           sync.WaitGroup{},
 	}
 	err := r.Init()
@@ -197,7 +197,7 @@ func (r *Registrar) Run() {
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
-func (r *Registrar) processEventStates(events []*FileEvent) {
+func (r *Registrar) processEventStates(events []*Event) {
 	logp.Debug("registrar", "Processing %d events", len(events))
 
 	// Take the last event found for each file source

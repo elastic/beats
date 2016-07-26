@@ -20,7 +20,7 @@ type LogPublisher interface {
 type syncLogPublisher struct {
 	pub     publisher.Publisher
 	client  publisher.Client
-	in, out chan []*input.FileEvent
+	in, out chan []*input.Event
 
 	done chan struct{}
 	wg   sync.WaitGroup
@@ -29,7 +29,7 @@ type syncLogPublisher struct {
 type asyncLogPublisher struct {
 	pub     publisher.Publisher
 	client  publisher.Client
-	in, out chan []*input.FileEvent
+	in, out chan []*input.Event
 
 	// list of in-flight batches
 	active   batchList
@@ -44,7 +44,7 @@ type asyncLogPublisher struct {
 type eventsBatch struct {
 	next   *eventsBatch
 	flag   int32
-	events []*input.FileEvent
+	events []*input.Event
 }
 
 type batchList struct {
@@ -70,7 +70,7 @@ var (
 
 func New(
 	async bool,
-	in, out chan []*input.FileEvent,
+	in, out chan []*input.Event,
 	pub publisher.Publisher,
 ) LogPublisher {
 	if async {
@@ -80,7 +80,7 @@ func New(
 }
 
 func newSyncLogPublisher(
-	in, out chan []*input.FileEvent,
+	in, out chan []*input.Event,
 	pub publisher.Publisher,
 ) *syncLogPublisher {
 	return &syncLogPublisher{
@@ -101,7 +101,7 @@ func (p *syncLogPublisher) Start() {
 		logp.Info("Start sending events to output")
 
 		for {
-			var events []*input.FileEvent
+			var events []*input.Event
 			select {
 			case <-p.done:
 				return
@@ -143,7 +143,7 @@ func (p *syncLogPublisher) Stop() {
 }
 
 func newAsyncLogPublisher(
-	in, out chan []*input.FileEvent,
+	in, out chan []*input.Event,
 	pub publisher.Publisher,
 ) *asyncLogPublisher {
 	return &asyncLogPublisher{
