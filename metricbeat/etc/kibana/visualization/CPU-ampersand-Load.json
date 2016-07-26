@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"CPU & Load\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.cpu.load.1\",\"customLabel\":\"Load\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.cpu.user.pct\",\"customLabel\":\"CPU Usage\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "CPU & Load", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Cpu-stats", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}
