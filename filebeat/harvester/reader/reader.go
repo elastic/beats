@@ -21,4 +21,5 @@ type Message struct {
 // if reader will not return any new message on subsequent calls.
 type Reader interface {
 	Next() (Message, error)
+	Stop() error
 }

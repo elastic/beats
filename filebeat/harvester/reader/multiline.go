@@ -112,6 +112,10 @@ func (mlr *Multiline) Next() (Message, error) {
 	return mlr.state(mlr)
 }
 
+func (r *Multiline) Stop() error {
+	return r.reader.Stop()
+}
+
 func (mlr *Multiline) readFirst() (Message, error) {
 	for {
 		p, err := mlr.reader.Next()

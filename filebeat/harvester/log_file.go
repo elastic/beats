@@ -1,4 +1,4 @@
-package reader
+package harvester
 
 import (
 	"errors"
@@ -105,6 +105,10 @@ func (r *LogFile) Read(buf []byte) (int, error) {
 		}
 		r.wait()
 	}
+}
+
+func (r *LogFile) Stop() error {
+	return nil
 }
 
 // errorChecks checks how the given error should be handled based on the config options

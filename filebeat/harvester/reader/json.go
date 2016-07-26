@@ -60,6 +60,10 @@ func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
 	return []byte(textString), jsonFields
 }
 
+func (r *JSON) Stop() error {
+	return r.reader.Stop()
+}
+
 // unmarshal is equivalent with json.Unmarshal but it converts numbers
 // to int64 where possible, instead of using always float64.
 func unmarshal(text []byte, fields *map[string]interface{}) error {

@@ -67,13 +67,13 @@ func (h *Harvester) Harvest() {
 		message, err := r.Next()
 		if err != nil {
 			switch err {
-			case reader.ErrFileTruncate:
+			case ErrFileTruncate:
 				logp.Info("File was truncated. Begin reading file from offset 0: %s", h.state.Source)
 				h.state.Offset = 0
 				filesTruncated.Add(1)
-			case reader.ErrRemoved:
+			case ErrRemoved:
 				logp.Info("File was removed: %s. Closing because close_removed is enabled.", h.state.Source)
-			case reader.ErrRenamed:
+			case ErrRenamed:
 				logp.Info("File was renamed: %s. Closing because close_renamed is enabled.", h.state.Source)
 			case io.EOF:
 				logp.Info("End of file reached: %s. Closing because close_eof is enabled.", h.state.Source)
@@ -270,11 +270,11 @@ func (h *Harvester) close() {
 	harvesterClosed.Add(1)
 }
 
-func (h *Harvester) newLogFileReaderConfig() reader.LogFileConfig {
+func (h *Harvester) newLogFileReaderConfig() LogFileConfig {
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
 	//       don't require 'complicated' logic.
-	return reader.LogFileConfig{
+	return LogFileConfig{
 		CloseRemoved:  h.config.CloseRemoved,
 		CloseRenamed:  h.config.CloseRenamed,
 		CloseInactive: h.config.CloseInactive,
@@ -292,12 +292,12 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	var r reader.Reader
 	var err error
 
-	fileReader, err := reader.NewLogFile(h.file, readerConfig, h.done)
+	logInput, err := NewLogFile(h.file, readerConfig, h.done)
 	if err != nil {
 		return nil, err
 	}
 
-	r, err = reader.NewEncode(fileReader, h.encoding, h.config.BufferSize)
+	r, err = reader.NewEncode(logInput, h.encoding, h.config.BufferSize)
 	if err != nil {
 		return nil, err
 	}

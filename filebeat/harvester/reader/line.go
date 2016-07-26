@@ -90,6 +90,10 @@ func (l *Line) Next() ([]byte, int, error) {
 	return bytes, sz, nil
 }
 
+func (r *Line) Stop() error {
+	return nil
+}
+
 func (l *Line) advance() error {
 	var idx int
 	var err error

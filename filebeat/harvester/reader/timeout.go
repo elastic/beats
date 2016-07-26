@@ -67,3 +67,8 @@ func (p *Timeout) Next() (Message, error) {
 		return Message{}, p.signal
 	}
 }
+
+func (r *Timeout) Stop() error {
+	// TODO: Introduce done channel to stop this reader
+	return r.reader.Stop()
+}
