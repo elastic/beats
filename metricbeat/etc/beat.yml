@@ -43,4 +43,17 @@ metricbeat.modules:
   # if true, exports the CPU usage in ticks, together with the percentage values
   cpu_ticks: false
 
+#------------------------------- docker Module -------------------------------
+- module: docker
+  metricsets: ["memory"]
+  enabled: true
+  period: 5s
+  hosts: ["localhost"]
+  socket: unix:///var/run/docker.sock
+
+         # If dockerbeat has to deal with a TLS-enabled docker daemon, you need to enable TLS and configure path for key and certificates.
+  tls:
+           # By default, TLS is disabled
+          enable: false
+
 

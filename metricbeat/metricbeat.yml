@@ -45,9 +45,9 @@ metricbeat.modules:
 
 #------------------------------- docker Module -------------------------------
 - module: docker
-  metricsets: ["memory","cpu"]
+  metricsets: ["memory"]
   enabled: true
-  period: 1s
+  period: 5s
   hosts: ["localhost"]
   socket: unix:///var/run/docker.sock
 

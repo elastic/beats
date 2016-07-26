@@ -61,9 +61,9 @@ metricbeat.modules:
 
 #------------------------------- docker Module -------------------------------
 - module: docker
-  metricsets: ["memory","cpu"]
+  metricsets: ["memory"]
   enabled: true
-  period: 1s
+  period: 5s
   hosts: ["localhost"]
   socket: unix:///var/run/docker.sock
 
@@ -205,8 +205,8 @@ metricbeat.modules:
 
 #================================ Processors =====================================
 
-# Processors are used to reduce the number of fields in the exported event or to
-# enhance the event with external meta data. This section defines a list of processors
+# Processors are used to reduce the number of fields in the exported event or to 
+# enhance the event with external meta data. This section defines a list of processors 
 # that are applied one by one and the first one receives the initial event:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
@@ -312,7 +312,7 @@ output.elasticsearch:
   #template.overwrite: false
 
   # If set to true, metricbeat checks the Elasticsearch version at connect time, and if it
-  # is 2.x, it loads the file specified by the template.versions.2x.path setting. The
+  # is 2.x, it loads the file specified by the template.versions.2x.path setting. The 
   # default is true.
   #template.versions.2x.enabled: true
 

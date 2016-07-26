@@ -28,6 +28,694 @@
       example: metricsets
       description: >
         The document type. Always set to "metricsets".
+- key: system
+  title: "System"
+  description: >
+    System status metrics, like CPU and memory usage, that are collected from the operating system.
+  fields:
+    - name: system
+      type: group
+      description: >
+        `system` contains local system metrics.
+      fields:
+        - name: diskio
+          type: group
+          description: >
+            `disk` contains disk IO metrics collected from the operating system.
+          fields:
+            - name: name
+              type: keyword
+              example: sda1
+              description: >
+                The disk name.
+
+            - name: serial_number
+              type: keyword
+              description: >
+                The disk's serial number. This may not be provided by all operating
+                systems.
+
+            - name: read.count
+              type: long
+              description: >
+                The total number of reads completed successfully.
+
+            - name: write.count
+              type: long
+              description: >
+                The total number of writes completed successfully.
+
+            - name: read.bytes
+              type: long
+              description: >
+                The total number of bytes read successfully. On Linux this is
+                the number of sectors read multiplied by an assumed sector size of 512.
+
+            - name: write.bytes
+              type: long
+              description: >
+                The total number of bytes written successfully. On Linux this is
+                the number of sectors written multiplied by an assumed sector size of
+                512.
+
+            - name: read.time
+              type: long
+              description: >
+                The total number of milliseconds spent by all reads.
+
+            - name: write.time
+              type: long
+              description: >
+                The total number of milliseconds spent by all writes.
+
+            - name: io.time
+              type: long
+              description: >
+                The total number of of milliseconds spent doing I/Os.
+        - name: fsstat
+          type: group
+          description: >
+            `system.fsstat` contains filesystem metrics aggregated from all mounted
+            filesystems.
+          fields:
+            - name: count
+              type: long
+              description: Number of file systems found.
+            - name: total_files
+              type: long
+              description: Total number of files.
+            - name: total_size
+              type: group
+              description: Nested file system docs.
+              fields:
+                - name: free
+                  type: long
+                  description: >
+                    Total free space.
+                - name: used
+                  type: long
+                  description: >
+                    Total used space.
+                - name: total
+                  type: long
+                  description: >
+                    Total space (used plus free).
+        - name: process
+          type: group
+          description: >
+            `process` contains process metadata, CPU metrics, and memory metrics.
+          fields:
+            - name: name
+              type: keyword
+              description: >
+                The process name.
+            - name: state
+              type: keyword
+              description: >
+                The process state. For example: "running".
+            - name: pid
+              type: integer
+              description: >
+                The process pid.
+            - name: ppid
+              type: integer
+              description: >
+                The process parent pid.
+            - name: cmdline
+              type: keyword
+              description: >
+                The full command-line used to start the process, including the
+                arguments separated by space.
+            - name: username
+              type: keyword
+              description: >
+                The username of the user that created the process. If the username
+                cannot be determined, the field will contain the user's
+                numeric identifier (UID). On Windows, this field includes the user's
+                domain and is formatted as `domain\username`.
+            - name: cpu
+              type: group
+              prefix: "[float]"
+              description: CPU-specific statistics per process.
+              fields:
+                - name: user
+                  type: long
+                  description: >
+                    The amount of CPU time the process spent in user space.
+                - name: total.pct
+                  type: half_float
+                  description: >
+                    The percentage of CPU time spent by the process since the last update. Its value is similar to the
+                    %CPU value of the process displayed by the top command on Unix systems.
+                - name: system
+                  type: long
+                  description: >
+                    The amount of CPU time the process spent in kernel space.
+                - name: total.ticks
+                  type: long
+                  description: >
+                    The total CPU time spent by the process.
+                - name: start_time
+                  type: keyword
+                  description: >
+                    The time when the process was started. Example: "17:45".
+            - name: memory
+              type: group
+              description: Memory-specific statistics per process.
+              prefix: "[float]"
+              fields:
+                - name: size
+                  type: long
+                  description: >
+                    The total virtual memory the process has.
+                - name: rss.bytes
+                  type: long
+                  description: >
+                    The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
+                - name: rss.pct
+                  type: half_float
+                  description: >
+                    The percentage of memory the process occupied in main memory (RAM).
+                - name: share
+                  type: long
+                  description: >
+                    The shared memory the process uses.
+        - name: cpu
+          type: group
+          description: >
+            `cpu` contains local CPU stats.
+          fields:
+            - name: user.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
+                For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+
+            - name: system.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent in kernel space.
+
+            - name: nice.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent on low-priority processes.
+
+            - name: idle.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent idle.
+
+            - name: iowait.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent in wait (on disk).
+
+            - name: irq.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent servicing and handling hardware interrupts.
+
+            - name: softirq.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent servicing and handling software interrupts.
+
+            - name: steal.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+                was servicing another processor.
+                Available only on Unix.
+
+            - name: user.ticks
+              type: long
+              description: >
+               The amount of CPU time spent in user space.
+
+            - name: system.ticks
+              type: long
+              description: >
+                The amount of CPU time spent in kernel space.
+
+            - name: nice.ticks
+              type: long
+              description: >
+                The amount of CPU time spent on low-priority processes.
+
+            - name: idle.ticks
+              type: long
+              description: >
+                The amount of CPU time spent idle.
+
+            - name: iowait.ticks
+              type: long
+              description: >
+                The amount of CPU time spent in wait (on disk).
+
+            - name: irq.ticks
+              type: long
+              description: >
+                The amount of CPU time spent servicing and handling hardware interrupts.
+
+            - name: softirq.ticks
+              type: long
+              description: >
+                The amount of CPU time spent servicing and handling software interrupts.
+
+            - name: steal.ticks
+              type: long
+              description: >
+                The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+                was servicing another processor.
+                Available only on Unix.
+
+            - name: load
+              type: group
+              description: >
+                Load averages.
+              fields:
+                - name: "1"
+                  type: half_float
+                  description: >
+                    Load average for the last minute.
+                - name: "5"
+                  type: half_float
+                  description: >
+                    Load average for the last 5 minutes.
+                - name: "15"
+                  type: half_float
+                  description: >
+                    Load average for the last 15 minutes.
+        - name: core
+          type: group
+          description: >
+            `system-core` contains local CPU core stats.
+          fields:
+            - name: id
+              type: integer
+              description: >
+                CPU Core number.
+
+            - name: user.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
+                For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+
+            - name: user.ticks
+              type: long
+              description: >
+               The amount of CPU time spent in user space.
+
+            - name: system.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent in kernel space.
+
+            - name: system.ticks
+              type: long
+              description: >
+                The amount of CPU time spent in kernel space.
+
+            - name: nice.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent on low-priority processes.
+
+            - name: nice.ticks
+              type: long
+              description: >
+                The amount of CPU time spent on low-priority processes.
+
+            - name: idle.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent idle.
+
+            - name: idle.ticks
+              type: long
+              description: >
+                The amount of CPU time spent idle.
+
+            - name: iowait.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent in wait (on disk).
+
+            - name: iowait.ticks
+              type: long
+              description: >
+                The amount of CPU time spent in wait (on disk).
+
+            - name: irq.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent servicing and handling hardware interrupts.
+
+            - name: irq.ticks
+              type: long
+              description: >
+                The amount of CPU time spent servicing and handling hardware interrupts.
+
+            - name: softirq.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent servicing and handling software interrupts.
+
+            - name: softirq.ticks
+              type: long
+              description: >
+                The amount of CPU time spent servicing and handling software interrupts.
+
+            - name: steal.pct
+              type: half_float
+              description: >
+                The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+                was servicing another processor.
+                Available only on Unix.
+
+            - name: steal.ticks
+              type: long
+              description: >
+                The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+                was servicing another processor.
+                Available only on Unix.
+
+        - name: network
+          type: group
+          description: >
+            `network` contains network IO metrics for a single network interface.
+          fields:
+            - name: name
+              type: keyword
+              example: eth0
+              description: >
+                The network interface name.
+
+            - name: out.bytes
+              type: long
+              description: >
+                The number of bytes sent.
+
+            - name: in.bytes
+              type: long
+              description: >
+                The number of bytes received.
+
+            - name: out.packets
+              type: long
+              description: >
+                The number of packets sent.
+
+            - name: in.packets
+              type: long
+              description: >
+                The number or packets received.
+
+            - name: in.errors
+              type: long
+              description: >
+                The number of errors while receiving.
+
+            - name: out.errors
+              type: long
+              description: >
+                The number of errors while sending.
+
+            - name: in.dropped
+              type: long
+              description: >
+                The number of incoming packets that were dropped.
+
+            - name: out.dropped
+              type: long
+              description: >
+                The number of outgoing packets that were dropped. This value is always
+                0 on Darwin and BSD because it is not reported by the operating system.
+        - name: memory
+          type: group
+          description: >
+            `memory` contains local memory stats.
+          fields:
+            - name: total
+              type: long
+              description: >
+                Total memory.
+
+            - name: used.bytes
+              type: long
+              description: >
+                Used memory.
+
+            - name: free
+              type: long
+              description: >
+                Available memory.
+
+            - name: used.pct
+              type: half_float
+              description: >
+                The percentage of used memory.
+
+            - name: actual
+              type: group
+              description: >
+                Actual memory fields.
+              fields:
+                - name: used.bytes
+                  type: long
+                  description: >
+                    Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
+                    Available only on Unix.
+
+                - name: free
+                  type: long
+                  description: >
+                    Actual available memory. This value is the "free" memory plus the memory used for disk caches and
+                    buffers. Available only on Unix.
+
+                - name: used.pct
+                  type: half_float
+                  description: >
+                    The percentage of actual used memory.
+
+            - name: swap
+              type: group
+              prefix: "[float]"
+              description: This group contains statistics related to the swap memory usage on the system.
+              fields:
+                - name: total
+                  type: long
+                  description: >
+                    Total swap memory.
+
+                - name: used.bytes
+                  type: long
+                  description: >
+                    Used swap memory.
+
+                - name: free
+                  type: long
+                  description: >
+                    Available swap memory.
+
+                - name: used.pct
+                  type: half_float
+                  description: >
+                    The percentage of used swap memory.
+        - name: filesystem
+          type: group
+          description: >
+            `filesystem` contains local filesystem stats.
+          fields:
+            - name: avail
+              type: long
+              description: >
+                The disk space available to an unprivileged user in bytes.
+            - name: device_name
+              type: keyword
+              description: >
+                The disk name. For example: `/dev/disk1`
+            - name: mount_point
+              type: keyword
+              description: >
+                The mounting point. For example: `/`
+            - name: files
+              type: long
+              description: >
+                The total number of file nodes in the file system.
+            - name: free
+              type: long
+              description: >
+                The disk space available in bytes.
+            - name: free_files
+              type: long
+              description: >
+                The number of free file nodes in the file system.
+            - name: total
+              type: long
+              description: >
+                The total disk space in bytes.
+            - name: used.bytes
+              type: long
+              description: >
+                The used disk space in bytes.
+            - name: used.pct
+              type: half_float
+              description: >
+                The percentage of used disk space.
+
+
+- key: mysql
+  title: "MySQL"
+  description: >
+    MySQL server status metrics collected from MySQL.
+  short_config: false
+  fields:
+    - name: mysql
+      type: group
+      description: >
+        `mysql` contains the metrics that were obtained from MySQL
+        query.
+      fields:
+        - name: status
+          type: group
+          description: >
+            `status` contains the metrics that were obtained by the status SQL query.
+          fields:
+            - name: aborted
+              type: group
+              description: >
+                Aborted status fields.
+              fields:
+                - name: clients
+                  type: integer
+                  description: >
+                    The number of connections that were aborted because the client died without closing the connection properly.
+
+                - name: connects
+                  type: integer
+                  description: >
+                    The number of failed attempts to connect to the MySQL server.
+
+            - name: binlog
+              type: group
+              description: >
+              fields:
+                - name: cache.disk_use
+                  type: integer
+                  description: >
+
+                - name: cache.use
+                  type: integer
+                  description: >
+
+            - name: bytes
+              type: group
+              description: >
+                Bytes stats.
+              fields:
+                - name: received
+                  type: integer
+                  description: >
+                    The number of bytes received from all clients.
+
+                - name: sent
+                  type: integer
+                  description: >
+                    The number of bytes sent to all clients.
+
+            - name: connections
+              type: integer
+              description: >
+
+            - name: created
+              type: group
+              description: >
+              fields:
+                - name: tmp.disk_tables
+                  type: integer
+                  description: >
+
+                - name: tmp.files
+                  type: integer
+                  description: >
+
+                - name: tmp.tables
+                  type: integer
+                  description: >
+
+            - name: delayed
+              type: group
+              description: >
+              fields:
+                - name: errors
+                  type: integer
+                  description: >
+
+                - name: insert_threads
+                  type: integer
+                  description: >
+
+                - name: writes
+                  type: integer
+                  description: >
+
+            - name: flush_commands
+              type: integer
+              description: >
+
+            - name: max_used_connections
+              type: integer
+              description: >
+
+            - name: open
+              type: group
+              description: >
+              fields:
+                - name: files
+                  type: integer
+                  description: >
+
+                - name: streams
+                  type: integer
+                  description: >
+
+                - name: tables
+                  type: integer
+                  description: >
+
+            - name: opened_tables
+              type: integer
+              description: >
+- key: docker
+  title: "docker"
+  description: >
+    docker Module
+  fields:
+    - name: docker
+      type: group
+      description: >
+      fields:
+        - name: cpu
+          type: group
+          description: >
+            cpu
+          fields:
+            - name: example
+              type: keyword
+              description: >
+                Example field
+        - name: memory
+          type: group
+          description: >
+            memory
+          fields:
+            - name: example
+              type: keyword
+              description: >
+                Example field
 - key: apache
   title: "Apache"
   description: >
@@ -544,128 +1232,6 @@
 
 
 
-- key: mysql
-  title: "MySQL"
-  description: >
-    MySQL server status metrics collected from MySQL.
-  short_config: false
-  fields:
-    - name: mysql
-      type: group
-      description: >
-        `mysql` contains the metrics that were obtained from MySQL
-        query.
-      fields:
-        - name: status
-          type: group
-          description: >
-            `status` contains the metrics that were obtained by the status SQL query.
-          fields:
-            - name: aborted
-              type: group
-              description: >
-                Aborted status fields.
-              fields:
-                - name: clients
-                  type: integer
-                  description: >
-                    The number of connections that were aborted because the client died without closing the connection properly.
-
-                - name: connects
-                  type: integer
-                  description: >
-                    The number of failed attempts to connect to the MySQL server.
-
-            - name: binlog
-              type: group
-              description: >
-              fields:
-                - name: cache.disk_use
-                  type: integer
-                  description: >
-
-                - name: cache.use
-                  type: integer
-                  description: >
-
-            - name: bytes
-              type: group
-              description: >
-                Bytes stats.
-              fields:
-                - name: received
-                  type: integer
-                  description: >
-                    The number of bytes received from all clients.
-
-                - name: sent
-                  type: integer
-                  description: >
-                    The number of bytes sent to all clients.
-
-            - name: connections
-              type: integer
-              description: >
-
-            - name: created
-              type: group
-              description: >
-              fields:
-                - name: tmp.disk_tables
-                  type: integer
-                  description: >
-
-                - name: tmp.files
-                  type: integer
-                  description: >
-
-                - name: tmp.tables
-                  type: integer
-                  description: >
-
-            - name: delayed
-              type: group
-              description: >
-              fields:
-                - name: errors
-                  type: integer
-                  description: >
-
-                - name: insert_threads
-                  type: integer
-                  description: >
-
-                - name: writes
-                  type: integer
-                  description: >
-
-            - name: flush_commands
-              type: integer
-              description: >
-
-            - name: max_used_connections
-              type: integer
-              description: >
-
-            - name: open
-              type: group
-              description: >
-              fields:
-                - name: files
-                  type: integer
-                  description: >
-
-                - name: streams
-                  type: integer
-                  description: >
-
-                - name: tables
-                  type: integer
-                  description: >
-
-            - name: opened_tables
-              type: integer
-              description: >
 - key: nginx
   title: "Nginx"
   description: >
@@ -1095,545 +1661,6 @@
             - name: expires
               type: long
               description: >
-- key: system
-  title: "System"
-  description: >
-    System status metrics, like CPU and memory usage, that are collected from the operating system.
-  fields:
-    - name: system
-      type: group
-      description: >
-        `system` contains local system metrics.
-      fields:
-        - name: core
-          type: group
-          description: >
-            `system-core` contains local CPU core stats.
-          fields:
-            - name: id
-              type: integer
-              description: >
-                CPU Core number.
-
-            - name: user.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
-                For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
-
-            - name: user.ticks
-              type: long
-              description: >
-               The amount of CPU time spent in user space.
-
-            - name: system.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent in kernel space.
-
-            - name: system.ticks
-              type: long
-              description: >
-                The amount of CPU time spent in kernel space.
-
-            - name: nice.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent on low-priority processes.
-
-            - name: nice.ticks
-              type: long
-              description: >
-                The amount of CPU time spent on low-priority processes.
-
-            - name: idle.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent idle.
-
-            - name: idle.ticks
-              type: long
-              description: >
-                The amount of CPU time spent idle.
-
-            - name: iowait.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent in wait (on disk).
-
-            - name: iowait.ticks
-              type: long
-              description: >
-                The amount of CPU time spent in wait (on disk).
-
-            - name: irq.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent servicing and handling hardware interrupts.
-
-            - name: irq.ticks
-              type: long
-              description: >
-                The amount of CPU time spent servicing and handling hardware interrupts.
-
-            - name: softirq.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent servicing and handling software interrupts.
-
-            - name: softirq.ticks
-              type: long
-              description: >
-                The amount of CPU time spent servicing and handling software interrupts.
-
-            - name: steal.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
-                was servicing another processor.
-                Available only on Unix.
-
-            - name: steal.ticks
-              type: long
-              description: >
-                The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
-                was servicing another processor.
-                Available only on Unix.
-
-        - name: cpu
-          type: group
-          description: >
-            `cpu` contains local CPU stats.
-          fields:
-            - name: user.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
-                For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
-
-            - name: system.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent in kernel space.
-
-            - name: nice.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent on low-priority processes.
-
-            - name: idle.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent idle.
-
-            - name: iowait.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent in wait (on disk).
-
-            - name: irq.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent servicing and handling hardware interrupts.
-
-            - name: softirq.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent servicing and handling software interrupts.
-
-            - name: steal.pct
-              type: half_float
-              description: >
-                The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
-                was servicing another processor.
-                Available only on Unix.
-
-            - name: user.ticks
-              type: long
-              description: >
-               The amount of CPU time spent in user space.
-
-            - name: system.ticks
-              type: long
-              description: >
-                The amount of CPU time spent in kernel space.
-
-            - name: nice.ticks
-              type: long
-              description: >
-                The amount of CPU time spent on low-priority processes.
-
-            - name: idle.ticks
-              type: long
-              description: >
-                The amount of CPU time spent idle.
-
-            - name: iowait.ticks
-              type: long
-              description: >
-                The amount of CPU time spent in wait (on disk).
-
-            - name: irq.ticks
-              type: long
-              description: >
-                The amount of CPU time spent servicing and handling hardware interrupts.
-
-            - name: softirq.ticks
-              type: long
-              description: >
-                The amount of CPU time spent servicing and handling software interrupts.
-
-            - name: steal.ticks
-              type: long
-              description: >
-                The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
-                was servicing another processor.
-                Available only on Unix.
-
-            - name: load
-              type: group
-              description: >
-                Load averages.
-              fields:
-                - name: "1"
-                  type: half_float
-                  description: >
-                    Load average for the last minute.
-                - name: "5"
-                  type: half_float
-                  description: >
-                    Load average for the last 5 minutes.
-                - name: "15"
-                  type: half_float
-                  description: >
-                    Load average for the last 15 minutes.
-        - name: diskio
-          type: group
-          description: >
-            `disk` contains disk IO metrics collected from the operating system.
-          fields:
-            - name: name
-              type: keyword
-              example: sda1
-              description: >
-                The disk name.
-
-            - name: serial_number
-              type: keyword
-              description: >
-                The disk's serial number. This may not be provided by all operating
-                systems.
-
-            - name: read.count
-              type: long
-              description: >
-                The total number of reads completed successfully.
-
-            - name: write.count
-              type: long
-              description: >
-                The total number of writes completed successfully.
-
-            - name: read.bytes
-              type: long
-              description: >
-                The total number of bytes read successfully. On Linux this is
-                the number of sectors read multiplied by an assumed sector size of 512.
-
-            - name: write.bytes
-              type: long
-              description: >
-                The total number of bytes written successfully. On Linux this is
-                the number of sectors written multiplied by an assumed sector size of
-                512.
-
-            - name: read.time
-              type: long
-              description: >
-                The total number of milliseconds spent by all reads.
-
-            - name: write.time
-              type: long
-              description: >
-                The total number of milliseconds spent by all writes.
-
-            - name: io.time
-              type: long
-              description: >
-                The total number of of milliseconds spent doing I/Os.
-        - name: filesystem
-          type: group
-          description: >
-            `filesystem` contains local filesystem stats.
-          fields:
-            - name: avail
-              type: long
-              description: >
-                The disk space available to an unprivileged user in bytes.
-            - name: device_name
-              type: keyword
-              description: >
-                The disk name. For example: `/dev/disk1`
-            - name: mount_point
-              type: keyword
-              description: >
-                The mounting point. For example: `/`
-            - name: files
-              type: long
-              description: >
-                The total number of file nodes in the file system.
-            - name: free
-              type: long
-              description: >
-                The disk space available in bytes.
-            - name: free_files
-              type: long
-              description: >
-                The number of free file nodes in the file system.
-            - name: total
-              type: long
-              description: >
-                The total disk space in bytes.
-            - name: used.bytes
-              type: long
-              description: >
-                The used disk space in bytes.
-            - name: used.pct
-              type: half_float
-              description: >
-                The percentage of used disk space.
-
-
-        - name: fsstat
-          type: group
-          description: >
-            `system.fsstat` contains filesystem metrics aggregated from all mounted
-            filesystems.
-          fields:
-            - name: count
-              type: long
-              description: Number of file systems found.
-            - name: total_files
-              type: long
-              description: Total number of files.
-            - name: total_size
-              type: group
-              description: Nested file system docs.
-              fields:
-                - name: free
-                  type: long
-                  description: >
-                    Total free space.
-                - name: used
-                  type: long
-                  description: >
-                    Total used space.
-                - name: total
-                  type: long
-                  description: >
-                    Total space (used plus free).
-        - name: memory
-          type: group
-          description: >
-            `memory` contains local memory stats.
-          fields:
-            - name: total
-              type: long
-              description: >
-                Total memory.
-
-            - name: used.bytes
-              type: long
-              description: >
-                Used memory.
-
-            - name: free
-              type: long
-              description: >
-                Available memory.
-
-            - name: used.pct
-              type: half_float
-              description: >
-                The percentage of used memory.
-
-            - name: actual
-              type: group
-              description: >
-                Actual memory fields.
-              fields:
-                - name: used.bytes
-                  type: long
-                  description: >
-                    Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
-                    Available only on Unix.
-
-                - name: free
-                  type: long
-                  description: >
-                    Actual available memory. This value is the "free" memory plus the memory used for disk caches and
-                    buffers. Available only on Unix.
-
-                - name: used.pct
-                  type: half_float
-                  description: >
-                    The percentage of actual used memory.
-
-            - name: swap
-              type: group
-              prefix: "[float]"
-              description: This group contains statistics related to the swap memory usage on the system.
-              fields:
-                - name: total
-                  type: long
-                  description: >
-                    Total swap memory.
-
-                - name: used.bytes
-                  type: long
-                  description: >
-                    Used swap memory.
-
-                - name: free
-                  type: long
-                  description: >
-                    Available swap memory.
-
-                - name: used.pct
-                  type: half_float
-                  description: >
-                    The percentage of used swap memory.
-        - name: network
-          type: group
-          description: >
-            `network` contains network IO metrics for a single network interface.
-          fields:
-            - name: name
-              type: keyword
-              example: eth0
-              description: >
-                The network interface name.
-
-            - name: out.bytes
-              type: long
-              description: >
-                The number of bytes sent.
-
-            - name: in.bytes
-              type: long
-              description: >
-                The number of bytes received.
-
-            - name: out.packets
-              type: long
-              description: >
-                The number of packets sent.
-
-            - name: in.packets
-              type: long
-              description: >
-                The number or packets received.
-
-            - name: in.errors
-              type: long
-              description: >
-                The number of errors while receiving.
-
-            - name: out.errors
-              type: long
-              description: >
-                The number of errors while sending.
-
-            - name: in.dropped
-              type: long
-              description: >
-                The number of incoming packets that were dropped.
-
-            - name: out.dropped
-              type: long
-              description: >
-                The number of outgoing packets that were dropped. This value is always
-                0 on Darwin and BSD because it is not reported by the operating system.
-        - name: process
-          type: group
-          description: >
-            `process` contains process metadata, CPU metrics, and memory metrics.
-          fields:
-            - name: name
-              type: keyword
-              description: >
-                The process name.
-            - name: state
-              type: keyword
-              description: >
-                The process state. For example: "running".
-            - name: pid
-              type: integer
-              description: >
-                The process pid.
-            - name: ppid
-              type: integer
-              description: >
-                The process parent pid.
-            - name: cmdline
-              type: keyword
-              description: >
-                The full command-line used to start the process, including the
-                arguments separated by space.
-            - name: username
-              type: keyword
-              description: >
-                The username of the user that created the process. If the username
-                cannot be determined, the field will contain the user's
-                numeric identifier (UID). On Windows, this field includes the user's
-                domain and is formatted as `domain\username`.
-            - name: cpu
-              type: group
-              prefix: "[float]"
-              description: CPU-specific statistics per process.
-              fields:
-                - name: user
-                  type: long
-                  description: >
-                    The amount of CPU time the process spent in user space.
-                - name: total.pct
-                  type: half_float
-                  description: >
-                    The percentage of CPU time spent by the process since the last update. Its value is similar to the
-                    %CPU value of the process displayed by the top command on Unix systems.
-                - name: system
-                  type: long
-                  description: >
-                    The amount of CPU time the process spent in kernel space.
-                - name: total.ticks
-                  type: long
-                  description: >
-                    The total CPU time spent by the process.
-                - name: start_time
-                  type: keyword
-                  description: >
-                    The time when the process was started. Example: "17:45".
-            - name: memory
-              type: group
-              description: Memory-specific statistics per process.
-              prefix: "[float]"
-              fields:
-                - name: size
-                  type: long
-                  description: >
-                    The total virtual memory the process has.
-                - name: rss.bytes
-                  type: long
-                  description: >
-                    The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
-                - name: rss.pct
-                  type: half_float
-                  description: >
-                    The percentage of memory the process occupied in main memory (RAM).
-                - name: share
-                  type: long
-                  description: >
-                    The shared memory the process uses.
 - key: zookeeper
   title: "ZooKeeper"
   description: >
