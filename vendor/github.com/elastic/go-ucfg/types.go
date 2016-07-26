@@ -251,7 +251,6 @@ func (c *cfgString) reflect(*options) (reflect.Value, error) {
 func (c *cfgString) reify(*options) (interface{}, error) { return c.s, nil }
 func (c *cfgString) typ(*options) (typeInfo, error)      { return typeInfo{"string", tString}, nil }
 
-func (cfgSub) Len(*options) (int, error)            { return 1, nil }
 func (c cfgSub) Context() context                   { return c.c.ctx }
 func (cfgSub) toBool(*options) (bool, error)        { return false, ErrTypeMismatch }
 func (cfgSub) toString(*options) (string, error)    { return "", ErrTypeMismatch }
@@ -259,6 +258,15 @@ func (cfgSub) toInt(*options) (int64, error)        { return 0, ErrTypeMismatch 
 func (cfgSub) toUint(*options) (uint64, error)      { return 0, ErrTypeMismatch }
 func (cfgSub) toFloat(*options) (float64, error)    { return 0, ErrTypeMismatch }
 func (c cfgSub) toConfig(*options) (*Config, error) { return c.c, nil }
+
+func (c cfgSub) Len(*options) (int, error) {
+	arr := c.c.fields.array()
+	if arr != nil {
+		return len(arr), nil
+	}
+
+	return 1, nil
+}
 
 func (c cfgSub) typ(*options) (typeInfo, error) {
 	return typeInfo{"object", reflect.PtrTo(tConfig)}, nil
@@ -274,18 +282,23 @@ func (c cfgSub) cpy(ctx context) value {
 		c: &Config{ctx: ctx, metadata: c.c.metadata},
 	}
 
-	fields := &fields{
-		fields: map[string]value{},
-		arr:    make([]value, len(c.c.fields.arr)),
+	dict := c.c.fields.dict()
+	arr := c.c.fields.array()
+	fields := &fields{}
+
+	for name, f := range dict {
+		ctx := f.Context()
+		v := f.cpy(context{field: ctx.field, parent: newC})
+		fields.set(name, v)
 	}
 
-	for name, f := range c.c.fields.fields {
-		ctx := f.Context()
-		fields.fields[name] = f.cpy(context{field: ctx.field, parent: newC})
-	}
-	for i, f := range c.c.fields.arr {
-		ctx := f.Context()
-		fields.arr[i] = f.cpy(context{field: ctx.field, parent: newC})
+	if arr != nil {
+		fields.a = make([]value, len(arr))
+		for i, f := range arr {
+			ctx := f.Context()
+			v := f.cpy(context{field: ctx.field, parent: newC})
+			fields.setAt(i, v)
+		}
 	}
 
 	newC.c.fields = fields
@@ -304,15 +317,15 @@ func (c cfgSub) SetContext(ctx context) {
 }
 
 func (c cfgSub) reify(opts *options) (interface{}, error) {
-	fields := c.c.fields.fields
-	arr := c.c.fields.arr
+	fields := c.c.fields.dict()
+	arr := c.c.fields.array()
 
 	switch {
 	case len(fields) == 0 && len(arr) == 0:
 		return nil, nil
 	case len(fields) > 0 && len(arr) == 0:
 		m := make(map[string]interface{})
-		for k, v := range c.c.fields.fields {
+		for k, v := range fields {
 			var err error
 			if m[k], err = v.reify(opts); err != nil {
 				return nil, err
@@ -330,7 +343,7 @@ func (c cfgSub) reify(opts *options) (interface{}, error) {
 		return m, nil
 	default:
 		m := make(map[string]interface{})
-		for k, v := range c.c.fields.fields {
+		for k, v := range fields {
 			var err error
 			if m[k], err = v.reify(opts); err != nil {
 				return nil, err
