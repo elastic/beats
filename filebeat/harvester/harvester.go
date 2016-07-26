@@ -27,7 +27,7 @@ import (
 type Harvester struct {
 	config          harvesterConfig
 	state           file.State
-	prospectorChan  chan *input.FileEvent
+	prospectorChan  chan *input.Event
 	file            source.FileSource /* the file being watched */
 	done            chan struct{}
 	encodingFactory encoding.EncodingFactory
@@ -37,7 +37,7 @@ type Harvester struct {
 func NewHarvester(
 	cfg *common.Config,
 	state file.State,
-	prospectorChan chan *input.FileEvent,
+	prospectorChan chan *input.Event,
 	done chan struct{},
 ) (*Harvester, error) {
 
