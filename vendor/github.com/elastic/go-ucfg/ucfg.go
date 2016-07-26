@@ -19,8 +19,8 @@ type fieldOptions struct {
 }
 
 type fields struct {
-	fields map[string]value
-	arr    []value
+	d map[string]value
+	a []value
 }
 
 // Meta holds additional meta data per config value
@@ -54,7 +54,7 @@ var (
 
 func New() *Config {
 	return &Config{
-		fields: &fields{map[string]value{}, nil},
+		fields: &fields{nil, nil},
 	}
 }
 
@@ -66,16 +66,24 @@ func NewFrom(from interface{}, opts ...Option) (*Config, error) {
 	return c, nil
 }
 
+func (c *Config) IsDict() bool {
+	return c.fields.dict() != nil
+}
+
+func (c *Config) IsArray() bool {
+	return c.fields.array() != nil
+}
+
 func (c *Config) GetFields() []string {
 	var names []string
-	for k := range c.fields.fields {
+	for k := range c.fields.dict() {
 		names = append(names, k)
 	}
 	return names
 }
 
 func (c *Config) HasField(name string) bool {
-	_, ok := c.fields.fields[name]
+	_, ok := c.fields.get(name)
 	return ok
 }
 
@@ -101,4 +109,40 @@ func (c *Config) Parent() *Config {
 			return nil
 		}
 	}
+}
+
+func (f *fields) get(name string) (value, bool) {
+	if f.d == nil {
+		return nil, false
+	}
+	v, found := f.d[name]
+	return v, found
+}
+
+func (f *fields) dict() map[string]value {
+	return f.d
+}
+
+func (f *fields) array() []value {
+	return f.a
+}
+
+func (f *fields) set(name string, v value) {
+	if f.d == nil {
+		f.d = map[string]value{}
+	}
+	f.d[name] = v
+}
+
+func (f *fields) add(v value) {
+	f.a = append(f.a, v)
+}
+
+func (f *fields) setAt(idx int, v value) {
+	if idx >= len(f.a) {
+		tmp := make([]value, idx+1)
+		copy(tmp, f.a)
+		f.a = tmp
+	}
+	f.a[idx] = v
 }
