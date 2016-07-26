@@ -16,6 +16,9 @@ metricbeat.modules:
     # CPU stats
     - cpu
 
+    # System Load stats
+    - load
+
     # Per CPU core stats
     #- core
 

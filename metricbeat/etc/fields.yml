@@ -1289,24 +1289,6 @@
                 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
                 Available only on Unix.
-
-            - name: load
-              type: group
-              description: >
-                Load averages.
-              fields:
-                - name: "1"
-                  type: half_float
-                  description: >
-                    Load average for the last minute.
-                - name: "5"
-                  type: half_float
-                  description: >
-                    Load average for the last 5 minutes.
-                - name: "15"
-                  type: half_float
-                  description: >
-                    Load average for the last 15 minutes.
         - name: diskio
           type: group
           description: >
@@ -1366,7 +1348,7 @@
           description: >
             `filesystem` contains local filesystem stats.
           fields:
-            - name: avail
+            - name: available
               type: long
               description: >
                 The disk space available to an unprivileged user in bytes.
@@ -1432,6 +1414,38 @@
                   type: long
                   description: >
                     Total space (used plus free).
+        - name: load
+          type: group
+          description: >
+            Load averages.
+          fields:
+            - name: "1"
+              type: half_float
+              description: >
+                Load average for the last minute.
+            - name: "5"
+              type: half_float
+              description: >
+                Load average for the last 5 minutes.
+            - name: "15"
+              type: half_float
+              description: >
+                Load average for the last 15 minutes.
+
+            - name: "norm.1"
+              type: half_float
+              description: >
+                Load divided by the number of cores for the last minute.
+
+            - name: "norm.5"
+              type: half_float
+              description: >
+                Load divided by the number of cores for the last 5 minutes.
+
+            - name: "norm.15"
+              type: half_float
+              description: >
+                Load divided by the number of cores for the last 15 minutes.
         - name: memory
           type: group
           description: >
@@ -1450,34 +1464,18 @@
             - name: free
               type: long
               description: >
-                Available memory.
+                The total amount of free memory in bytes. This value does not include memory consumed by system caches and buffers (see system.memory.available).
 
             - name: used.pct
               type: half_float
               description: >
                 The percentage of used memory.
 
-            - name: actual
-              type: group
+            - name: available
+              type: long
               description: >
-                Actual memory fields.
-              fields:
-                - name: used.bytes
-                  type: long
-                  description: >
-                    Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
-                    Available only on Unix.
-
-                - name: free
-                  type: long
-                  description: >
-                    Actual available memory. This value is the "free" memory plus the memory used for disk caches and
-                    buffers. Available only on Unix.
-
-                - name: used.pct
-                  type: half_float
-                  description: >
-                    The percentage of actual used memory.
+                Available memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory
+                plus caches and buffers. On OSX it is a sum of free memory and the inactive memory.
 
             - name: swap
               type: group

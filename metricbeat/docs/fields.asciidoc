@@ -2160,37 +2160,6 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 
 [float]
-== load Fields
-
-Load averages.
-
-
-
-[float]
-=== system.cpu.load.1
-
-type: half_float
-
-Load average for the last minute.
-
-
-[float]
-=== system.cpu.load.5
-
-type: half_float
-
-Load average for the last 5 minutes.
-
-
-[float]
-=== system.cpu.load.15
-
-type: half_float
-
-Load average for the last 15 minutes.
-
-
-[float]
 == diskio Fields
 
 `disk` contains disk IO metrics collected from the operating system.
@@ -2279,7 +2248,7 @@ The total number of of milliseconds spent doing I/Os.
 
 
 [float]
-=== system.filesystem.avail
+=== system.filesystem.available
 
 type: long
 
@@ -2402,6 +2371,61 @@ Total space (used plus free).
 
 
 [float]
+== load Fields
+
+Load averages.
+
+
+
+[float]
+=== system.load.1
+
+type: half_float
+
+Load average for the last minute.
+
+
+[float]
+=== system.load.5
+
+type: half_float
+
+Load average for the last 5 minutes.
+
+
+[float]
+=== system.load.15
+
+type: half_float
+
+Load average for the last 15 minutes.
+
+
+[float]
+=== system.load.norm.1
+
+type: half_float
+
+Load divided by the number of cores for the last minute.
+
+
+[float]
+=== system.load.norm.5
+
+type: half_float
+
+Load divided by the number of cores for the last 5 minutes.
+
+
+[float]
+=== system.load.norm.15
+
+type: half_float
+
+Load divided by the number of cores for the last 15 minutes.
+
+
+[float]
 == memory Fields
 
 `memory` contains local memory stats.
@@ -2429,7 +2453,7 @@ Used memory.
 
 type: long
 
-Available memory.
+The total amount of free memory in bytes. This value does not include memory consumed by system caches and buffers (see system.memory.available).
 
 
 [float]
@@ -2441,34 +2465,11 @@ The percentage of used memory.
 
 
 [float]
-== actual Fields
-
-Actual memory fields.
-
-
-
-[float]
-=== system.memory.actual.used.bytes
+=== system.memory.available
 
 type: long
 
-Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
-
-
-[float]
-=== system.memory.actual.free
-
-type: long
-
-Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
-
-
-[float]
-=== system.memory.actual.used.pct
-
-type: half_float
-
-The percentage of actual used memory.
+Available memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory.
 
 
 [float]
