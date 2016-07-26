@@ -14,6 +14,7 @@
 package harvester
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/filebeat/config"
@@ -22,6 +23,14 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
+)
+
+var (
+	ErrFileTruncate = errors.New("detected file being truncated")
+	ErrRenamed      = errors.New("file was renamed")
+	ErrRemoved      = errors.New("file was removed")
+	ErrInactive     = errors.New("file inactive")
+	ErrClosed       = errors.New("reader closed")
 )
 
 type Harvester struct {
