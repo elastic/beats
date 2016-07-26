@@ -98,11 +98,18 @@ func (s *States) Cleanup() {
 	states := s.states[:0]
 
 	for _, state := range s.states {
+
 		ttl := state.TTL
+
 		if ttl == 0 || (ttl > 0 && currentTime.Sub(state.Timestamp) > ttl) {
-			logp.Debug("state", "State removed for %v because of older: %v", state.Source, ttl)
-			continue // drop state
+			if state.Finished {
+				logp.Debug("state", "State removed for %v because of older: %v", state.Source, ttl)
+				continue // drop state
+			} else {
+				logp.Err("State for %s should have been dropped, but couldn't as state is not finished.", state.Source)
+			}
 		}
+
 		states = append(states, state) // in-place copy old state
 	}
 	s.states = states
