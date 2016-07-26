@@ -201,6 +201,11 @@ func (fs *EventFormatString) Eval(out *bytes.Buffer, event common.MapStr) error 
 	return fs.formatter.Eval(ctx, out)
 }
 
+// IsConst checks the format string always returning the same constant string
+func (fs *EventFormatString) IsConst() bool {
+	return fs.formatter.IsConst()
+}
+
 // collectFields tries to extract and convert all required fields into an array
 // of strings.
 func (fs *EventFormatString) collectFields(
