@@ -2,33 +2,36 @@ package cpu
 import (
 	"github.com/elastic/beats/libbeat/common"
 	//"fmt"
-	"github.com/elastic/beats/metricbeat/module/docker/services/config"
 )
 
-func eventsMapping( cpuDatas []config.CPUData) [] common.MapStr {
+func eventsMapping( cpuStatsList []CPUStats) [] common.MapStr {
 	myEvents := [] common.MapStr{}
-	//fmt.Printf(" Taille est  CPUDATA:" ,len(cpuDatas))
-	for _, cpuData := range cpuDatas {
-		myEvents = append(myEvents, eventMapping(cpuData))
+	//fmt.Printf(" Taille cpuStatsList : ",len(cpuStatsList),"\n")
+	for _, cpuStats := range cpuStatsList {
+		myEvents = append(myEvents, eventMapping(cpuStats))
 	}
+	//fmt.Printf(" Taille events : ",len(myEvents),"\n")
 	return myEvents
 }
-func eventMapping(cpuData config.CPUData) common.MapStr{
+func eventMapping( mycpuStats CPUStats) common.MapStr{
+
+	//fmt.Printf(" From data : Nom du container : ",mycpuStats.MyContainer.Name,"\n")
+	//fmt.Printf(" ID du container : ",mycpuStats.MyContainer.Id,"\n")
 
 	event := common.MapStr{
-		"@timestamp":      cpuData.MyContainer.Time,
+		"@timestamp":      mycpuStats.Time,
 		"type":            "cpu",
 		"container": common.MapStr{
-			"id":  cpuData.MyContainer.Id,
-			"name": cpuData.MyContainer.Name,
-			"labels": cpuData.MyContainer.Labels,
+			"id":  mycpuStats.MyContainer.Id,
+			"name": mycpuStats.MyContainer.Name,
+			"labels": mycpuStats.MyContainer.Labels,
 		},
-		"dockerSocket": cpuData.MyContainer.Socket,
+		//"dockerSocket": mycpuStats.MyContainer.Socket,
 		"cpu": common.MapStr{
-			"percpuUsage":       cpuData.PerCpuUsage,
-			"totalUsage":        cpuData.TotalUsage,
-			"usageInKernelmode": cpuData.UsageInKernelmode,
-			"usageInUsermode":   cpuData.UsageInUsermode,
+			"percpuUsage":       mycpuStats.PerCpuUsage,
+			"totalUsage":        mycpuStats.TotalUsage,
+			"usageInKernelmode": mycpuStats.UsageInKernelmode,
+			"usageInUsermode":   mycpuStats.UsageInUsermode,
 		},
 	}
 	return event

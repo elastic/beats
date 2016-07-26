@@ -1,16 +1,14 @@
-package memory
+package network
+
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-
-	dc"github.com/fsouza/go-dockerclient"
-	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("docker", "memory", New); err != nil {
+	if err := mb.Registry.AddMetricSet("docker", "network", New); err != nil {
 		panic(err)
 	}
 }
@@ -21,36 +19,35 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	memoryService *MEMORYService
-	dockerClient *dc.Client
+	counter int
 }
 
 // New create a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := docker.GetDefaultConf()
+
+	config := struct{}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
-		memoryService: NewMemoryService(),
-		dockerClient: docker.CreateDockerCLient(config),
+		counter:       1,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch() (common.MapStr, error) {
 
-	rawStats,err:= docker.FetchDockerStats(m.dockerClient)
-
-	if err == nil {
-		formatedStats := m.memoryService.GetMemorystatsList(rawStats)
-		return eventsMapping(formatedStats), nil
+	event := common.MapStr{
+		"counter": m.counter,
 	}
-	return nil, nil
+	m.counter++
+
+	return event, nil
 }

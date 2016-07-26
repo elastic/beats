@@ -1,28 +1,27 @@
 package memory
 import (
 	"github.com/elastic/beats/libbeat/common"
-	//"fmt"
-	"github.com/elastic/beats/metricbeat/module/docker/services/config"
+
 )
 
-func eventsMapping( memoryDatas []config.MEMORYData) [] common.MapStr {
+func eventsMapping( memoryDataList []MEMORYData) [] common.MapStr {
 	myEvents := [] common.MapStr{}
-	for _, memoryData := range memoryDatas {
+	for _, memoryData := range memoryDataList {
 		myEvents = append(myEvents, eventMapping(memoryData))
 	}
 	return myEvents
 }
-func eventMapping(memoryData config.MEMORYData) common.MapStr{
+func eventMapping(memoryData MEMORYData) common.MapStr{
 
 	event := common.MapStr{
-		"@timestamp":	memoryData.MyContainer.Time,
+		"@timestamp":	memoryData.Time,
 		"type": "memory",
 		"container": 	common.MapStr{
 			"id":  memoryData.MyContainer.Id,
 			"name": memoryData.MyContainer.Name,
 			"labels": memoryData.MyContainer.Labels,
 		},
-		"dockerSocket": memoryData.MyContainer.Socket,
+		//"dockerSocket": memoryData.MyContainer.Socket,
 		"memory": common.MapStr{
 			"failcnt":    memoryData.Failcnt,
 			"limit":      memoryData.Limit,
