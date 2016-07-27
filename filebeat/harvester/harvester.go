@@ -36,14 +36,12 @@ type Harvester struct {
 
 func NewHarvester(
 	cfg *common.Config,
-	state file.State,
 	prospectorChan chan *input.Event,
 	done chan struct{},
 ) (*Harvester, error) {
 
 	h := &Harvester{
 		config:         defaultConfig,
-		state:          state,
 		prospectorChan: prospectorChan,
 		done:           done,
 	}
@@ -72,4 +70,9 @@ func (h *Harvester) open() error {
 	default:
 		return fmt.Errorf("Invalid input type")
 	}
+}
+
+func (h *Harvester) Copy() *Harvester {
+	copy := *h
+	return &copy
 }

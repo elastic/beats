@@ -25,7 +25,7 @@ var (
 )
 
 // Log harvester reads files line by line and sends events to the defined output
-func (h *Harvester) Harvest() {
+func (h *Harvester) Harvest(state file.State) {
 
 	harvesterStarted.Add(1)
 	harvesterRunning.Add(1)
@@ -34,6 +34,7 @@ func (h *Harvester) Harvest() {
 	// Makes sure file is properly closed when the harvester is stopped
 	defer h.close()
 
+	h.state = state
 	h.state.Finished = false
 
 	err := h.open()
