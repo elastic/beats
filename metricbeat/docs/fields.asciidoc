@@ -2402,6 +2402,37 @@ Total space (used plus free).
 
 
 [float]
+== load Fields
+
+Load averages.
+
+
+
+[float]
+=== system.load.1
+
+type: half_float
+
+Load average for the last minute.
+
+
+[float]
+=== system.load.5
+
+type: half_float
+
+Load average for the last 5 minutes.
+
+
+[float]
+=== system.load.15
+
+type: half_float
+
+Load average for the last 15 minutes.
+
+
+[float]
 == memory Fields
 
 `memory` contains local memory stats.
@@ -2425,14 +2456,6 @@ Used memory.
 
 
 [float]
-=== system.memory.free
-
-type: long
-
-Available memory.
-
-
-[float]
 === system.memory.used.pct
 
 type: half_float
@@ -2441,72 +2464,19 @@ The percentage of used memory.
 
 
 [float]
-== actual Fields
-
-Actual memory fields.
-
-
-
-[float]
-=== system.memory.actual.used.bytes
+=== system.memory.free
 
 type: long
 
-Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
+Free memory. For a human readable value use Available.
 
 
 [float]
-=== system.memory.actual.free
+=== system.memory.available
 
 type: long
 
-Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
-
-
-[float]
-=== system.memory.actual.used.pct
-
-type: half_float
-
-The percentage of actual used memory.
-
-
-[float]
-== swap Fields
-
-This group contains statistics related to the swap memory usage on the system.
-
-
-[float]
-=== system.memory.swap.total
-
-type: long
-
-Total swap memory.
-
-
-[float]
-=== system.memory.swap.used.bytes
-
-type: long
-
-Used swap memory.
-
-
-[float]
-=== system.memory.swap.free
-
-type: long
-
-Available swap memory.
-
-
-[float]
-=== system.memory.swap.used.pct
-
-type: half_float
-
-The percentage of used swap memory.
+Available memory is what it matters. It is calculated based on the OS. On Linux it is a sum of free memory and caches and buffers. On OSX consists of free and inactive memory.
 
 
 [float]
@@ -2735,6 +2705,44 @@ The percentage of memory the process occupied in main memory (RAM).
 type: long
 
 The shared memory the process uses.
+
+
+[float]
+== swap Fields
+
+This group contains statistics related to the swap memory usage on the system.
+
+
+[float]
+=== system.swap.total
+
+type: long
+
+Total swap memory.
+
+
+[float]
+=== system.swap.used.bytes
+
+type: long
+
+Used swap memory.
+
+
+[float]
+=== system.swap.free
+
+type: long
+
+Available swap memory.
+
+
+[float]
+=== system.swap.used.pct
+
+type: half_float
+
+The percentage of used swap memory.
 
 
 [[exported-fields-zookeeper]]

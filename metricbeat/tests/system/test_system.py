@@ -5,11 +5,13 @@ import metricbeat
 import getpass
 import os
 
-SYSTEM_CPU_FIELDS = ["idle.pct", "iowait.pct", "irq.pct", "load", "nice.pct",
+SYSTEM_CPU_FIELDS = ["idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                      "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
-SYSTEM_CPU_FIELDS_ALL = ["idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "load", "nice.pct", "nice.ticks",
+SYSTEM_CPU_FIELDS_ALL = ["idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
                      "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks"]
+
+SYSTEM_LOAD_FIELDS = ["1", "5", "15"]
 
 SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                "softirq.pct", "steal.pct", "system.pct", "user.pct"]
@@ -26,10 +28,12 @@ SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
-SYSTEM_MEMORY_FIELDS = ["swap", "actual", "free", "total", "used.bytes", "used.pct"]
+SYSTEM_MEMORY_FIELDS = ["available", "free", "total", "used.bytes", "used.pct"]
+
+SYSTEM_SWAP_FIELDS = ["total", "used.bytes", "used.pct", "free"]
 
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
-                         "in.packets", "in.error", "out.error", "in.dropeed", "out.dropped"]
+                         "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
 
 # cmdline is also part of the system process fields, but it may not be present
 # for some kernel level processes.
@@ -92,6 +96,33 @@ class SystemTest(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
             cpuStats = evt["system"]["cpu"]
             self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS_ALL), cpuStats.keys())
+
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    def test_load(self):
+        """
+        Test cpu system output.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["load"],
+            "period": "5s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+
+        # Ensure no errors or warnings exist in the log.
+        log = self.get_log()
+        self.assertNotRegexpMatches(log, "ERR|WARN")
+
+        output = self.read_output_json()
+        self.assertEqual(len(output), 1)
+        evt = output[0]
+        self.assert_fields_are_documented(evt)
+
+        cpu = evt["system"]["load"]
+        self.assertItemsEqual(self.de_dot(SYSTEM_LOAD_FIELDS), cpu.keys())
+
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core(self):
@@ -252,16 +283,32 @@ class SystemTest(metricbeat.BaseTest):
         memory = evt["system"]["memory"]
         self.assertItemsEqual(self.de_dot(SYSTEM_MEMORY_FIELDS), memory.keys())
 
-        # Check that percentages are calculated.
-        mem = memory
-        if mem["total"] != 0:
-            used_p = float(mem["used"]["bytes"]) / mem["total"]
-            self.assertAlmostEqual(mem["used"]["pct"], used_p, places=4)
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    def test_swap(self):
+        """
+        Test system swap output.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["swap"],
+            "period": "5s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
 
-            used_p = float(mem["actual"]["used"]["bytes"]) / mem["total"]
-            self.assertAlmostEqual(mem["actual"]["used"]["pct"], used_p, places=4)
+        # Ensure no errors or warnings exist in the log.
+        log = self.get_log()
+        self.assertNotRegexpMatches(log, "ERR|WARN")
 
-        swap = memory["swap"]
+        output = self.read_output_json()
+        self.assertEqual(len(output), 1)
+        evt = output[0]
+        self.assert_fields_are_documented(evt)
+
+        swap = evt["system"]["swap"]
+        self.assertItemsEqual(self.de_dot(SYSTEM_SWAP_FIELDS), swap.keys())
+
         if swap["total"] != 0:
             used_p = float(swap["used"]["bytes"]) / swap["total"]
             self.assertAlmostEqual(swap["used"]["pct"], used_p, places=4)

@@ -1262,47 +1262,26 @@
                 }
               }
             },
+            "load": {
+              "properties": {
+                "1": {
+                  "type": "float"
+                },
+                "15": {
+                  "type": "float"
+                },
+                "5": {
+                  "type": "float"
+                }
+              }
+            },
             "memory": {
               "properties": {
-                "actual": {
-                  "properties": {
-                    "free": {
-                      "type": "long"
-                    },
-                    "used": {
-                      "properties": {
-                        "bytes": {
-                          "type": "long"
-                        },
-                        "pct": {
-                          "type": "float"
-                        }
-                      }
-                    }
-                  }
+                "available": {
+                  "type": "long"
                 },
                 "free": {
                   "type": "long"
-                },
-                "swap": {
-                  "properties": {
-                    "free": {
-                      "type": "long"
-                    },
-                    "total": {
-                      "type": "long"
-                    },
-                    "used": {
-                      "properties": {
-                        "bytes": {
-                          "type": "long"
-                        },
-                        "pct": {
-                          "type": "float"
-                        }
-                      }
-                    }
-                  }
                 },
                 "total": {
                   "type": "long"
@@ -1435,6 +1414,26 @@
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
+                }
+              }
+            },
+            "swap": {
+              "properties": {
+                "free": {
+                  "type": "long"
+                },
+                "total": {
+                  "type": "long"
+                },
+                "used": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "pct": {
+                      "type": "float"
+                    }
+                  }
                 }
               }
             }

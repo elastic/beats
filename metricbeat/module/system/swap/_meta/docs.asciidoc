@@ -1,0 +1,10 @@
+=== System Swap Metricset
+
+The System `swap` metricset provides memory statistics.
+
+This metricset is available on:
+
+- Darwin
+- FreeBSD
+- Linux
+- OpenBSD

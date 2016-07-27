@@ -3,6 +3,9 @@
     # CPU stats
     - cpu
 
+    # Load stats
+    - load
+
     # Per CPU core stats
     #- core
 
@@ -14,9 +17,12 @@
 
     # File system summary stats
     #- fsstat
-
+    
     # Memory stats
     - memory
+
+    # Swap stats
+    - swap
 
     # Network stats
     - network

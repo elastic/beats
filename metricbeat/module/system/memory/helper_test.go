@@ -4,7 +4,6 @@
 package memory
 
 import (
-	"runtime"
 	"testing"
 
 	"github.com/elastic/gosigar"
@@ -22,22 +21,6 @@ func TestGetMemory(t *testing.T) {
 	assert.True(t, (mem.Free >= 0))
 	assert.True(t, (mem.ActualFree >= 0))
 	assert.True(t, (mem.ActualUsed > 0))
-}
-
-func TestGetSwap(t *testing.T) {
-
-	if runtime.GOOS == "windows" {
-		return //no load data on windows
-	}
-
-	swap, err := GetSwap()
-
-	assert.NotNil(t, swap)
-	assert.Nil(t, err)
-
-	assert.True(t, (swap.Total >= 0))
-	assert.True(t, (swap.Used >= 0))
-	assert.True(t, (swap.Free >= 0))
 }
 
 func TestMemPercentage(t *testing.T) {

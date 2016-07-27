@@ -1,0 +1,24 @@
+- name: swap
+  type: group
+  prefix: "[float]"
+  description: This group contains statistics related to the swap memory usage on the system.
+  fields:
+    - name: total
+      type: long
+      description: >
+        Total swap memory.
+
+    - name: used.bytes
+      type: long
+      description: >
+        Used swap memory.
+
+    - name: free
+      type: long
+      description: >
+        Available swap memory.
+
+    - name: used.pct
+      type: half_float
+      description: >
+        The percentage of used swap memory.
