@@ -196,3 +196,43 @@ class Test(BaseTest):
 
         # Make sure the state for the file was persisted
         assert len(data) == 1
+
+
+    def test_empty_lines_only(self):
+        """
+        Checks that no empty events are sent for a file with only empty lines
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        logfile = self.working_dir + "/log/test.log"
+
+        filebeat = self.start_beat()
+
+        with open(logfile, 'w') as f:
+            f.write("\n")
+            f.write("\n")
+            f.write("\n")
+
+        expectedOffset = 3
+
+        if os.name == "nt":
+            # Two additional newline chars
+            expectedOffset += 3
+
+        # Wait until offset for new line is updated
+        self.wait_until(
+            lambda: self.log_contains(
+                "offset: " + str(expectedOffset)),
+            max_timeout=15)
+
+        assert os.path.isfile(self.working_dir + "/output/filebeat") == False
+
+        filebeat.check_kill_and_wait()
+
+        data = self.get_registry()
+
+        # Make sure the state for the file was persisted
+        assert len(data) == 1

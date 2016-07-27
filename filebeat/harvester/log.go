@@ -31,10 +31,10 @@ func (h *Harvester) Harvest() {
 	harvesterRunning.Add(1)
 	defer harvesterRunning.Add(-1)
 
+	h.state.Finished = false
+
 	// Makes sure file is properly closed when the harvester is stopped
 	defer h.close()
-
-	h.state.Finished = false
 
 	err := h.open()
 	if err != nil {
@@ -45,7 +45,6 @@ func (h *Harvester) Harvest() {
 	logp.Info("Harvester started for file: %s", h.state.Source)
 
 	r, err := h.newLogFileReader()
-
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
 		return
@@ -91,9 +90,8 @@ func (h *Harvester) Harvest() {
 
 		text := string(message.Content)
 
-		// Check if data should be added to event. Only export events where Bytes > 0
-		// Content length cannot be checked because of JSON
-		if message.Bytes > 0 && h.shouldExportLine(text) {
+		// Check if data should be added to event. Only export non empty events.
+		if !message.IsEmpty() && h.shouldExportLine(text) {
 			event.ReadTime = message.Ts
 			event.Bytes = message.Bytes
 			event.Text = &text
@@ -257,13 +255,13 @@ func (h *Harvester) close() {
 	// If file was never opened, it can't be closed
 	if h.file != nil {
 
-		// On completion, push offset so we can continue where we left off if we relaunch on the same file
-		// Only send offset if file object was created successfully
-		h.sendStateUpdate()
-
 		h.file.Close()
 		logp.Debug("harvester", "Stopping harvester, closing file: %s", h.state.Source)
 		harvesterOpenFiles.Add(-1)
+
+		// On completion, push offset so we can continue where we left off if we relaunch on the same file
+		// Only send offset if file object was created successfully
+		h.sendStateUpdate()
 	} else {
 		logp.Warn("Stopping harvester, NOT closing file as file info not available: %s", h.state.Source)
 	}
