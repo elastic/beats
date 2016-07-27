@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester/encoding"
-	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/stretchr/testify/assert"
 )
@@ -99,7 +98,7 @@ func TestReadLine(t *testing.T) {
 	fmt.Printf("received line: '%s'\n", text)
 	assert.Equal(t, "", text)
 	assert.Equal(t, bytesread, 0)
-	assert.Equal(t, err, reader.ErrInactive)
+	assert.Equal(t, err, ErrInactive)
 }
 
 func TestExcludeLine(t *testing.T) {
