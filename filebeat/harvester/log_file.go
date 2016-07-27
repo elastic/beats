@@ -1,7 +1,6 @@
-package reader
+package harvester
 
 import (
-	"errors"
 	"io"
 	"os"
 	"time"
@@ -11,35 +10,18 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-var (
-	ErrFileTruncate = errors.New("detected file being truncated")
-	ErrRenamed      = errors.New("file was renamed")
-	ErrRemoved      = errors.New("file was removed")
-	ErrInactive     = errors.New("file inactive")
-)
-
 type LogFile struct {
 	fs           source.FileSource
 	offset       int64
-	config       LogFileConfig
+	config       harvesterConfig
 	lastTimeRead time.Time
 	backoff      time.Duration
 	done         chan struct{}
 }
 
-type LogFileConfig struct {
-	Backoff       time.Duration
-	MaxBackoff    time.Duration
-	BackoffFactor int
-	CloseEOF      bool
-	CloseInactive time.Duration
-	CloseRenamed  bool
-	CloseRemoved  bool
-}
-
 func NewLogFile(
 	fs source.FileSource,
-	config LogFileConfig,
+	config harvesterConfig,
 	done chan struct{},
 ) (*LogFile, error) {
 	var offset int64
@@ -66,7 +48,7 @@ func (r *LogFile) Read(buf []byte) (int, error) {
 	for {
 		select {
 		case <-r.done:
-			return 0, nil
+			return 0, ErrClosed
 		default:
 		}
 
@@ -156,8 +138,13 @@ func (r *LogFile) errorChecks(err error) error {
 }
 
 func (r *LogFile) wait() {
-	// Wait before trying to read file wr.ch reached EOF again
-	time.Sleep(r.backoff)
+
+	// Wait before trying to read file again. File reached EOF.
+	select {
+	case <-r.done:
+		return
+	case <-time.After(r.backoff):
+	}
 
 	// Increment backoff up to maxBackoff
 	if r.backoff < r.config.MaxBackoff {
