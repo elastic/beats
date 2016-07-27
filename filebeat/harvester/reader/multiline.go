@@ -34,6 +34,7 @@ type Multiline struct {
 	fields    common.MapStr
 	err       error // last seen error
 	state     func(*Multiline) (Message, error)
+	done      chan struct{}
 }
 
 const (
@@ -103,6 +104,7 @@ func NewMultiline(
 		maxBytes:  maxBytes,
 		maxLines:  maxLines,
 		separator: []byte(separator),
+		done:      make(chan struct{}),
 	}
 	return mlr, nil
 }
@@ -112,8 +114,18 @@ func (mlr *Multiline) Next() (Message, error) {
 	return mlr.state(mlr)
 }
 
+func (r *Multiline) Close() error {
+	close(r.done)
+	return r.reader.Close()
+}
+
 func (mlr *Multiline) readFirst() (Message, error) {
 	for {
+		select {
+		case <-mlr.done:
+			return Message{}, ErrReaderStopped
+		default:
+		}
 		p, err := mlr.reader.Next()
 		if err == nil {
 			if p.Bytes == 0 {
@@ -137,6 +149,11 @@ func (mlr *Multiline) readFirst() (Message, error) {
 
 func (mlr *Multiline) readNext() (Message, error) {
 	for {
+		select {
+		case <-mlr.done:
+			return Message{}, ErrReaderStopped
+		default:
+		}
 		p, err := mlr.reader.Next()
 
 		if err != nil {

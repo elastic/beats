@@ -5,6 +5,7 @@ The interface used is:
 
 	type Reader interface {
 		Next() (Message, error)
+		Close() error
 	}
 
 Each time Next is called on a reader, a Message object is returned.

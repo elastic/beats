@@ -18,6 +18,7 @@ import (
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
@@ -32,6 +33,7 @@ type Harvester struct {
 	done            chan struct{}
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
+	reader          reader.Reader
 }
 
 func NewHarvester(

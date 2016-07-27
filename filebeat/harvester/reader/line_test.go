@@ -3,7 +3,6 @@
 package reader
 
 import (
-	"bytes"
 	"math/rand"
 	"testing"
 
@@ -38,7 +37,7 @@ func TestReaderEncodings(t *testing.T) {
 			continue
 		}
 
-		buffer := bytes.NewBuffer(nil)
+		buffer := &TestBuffer{}
 		codec, _ := codecFactory(buffer)
 
 		// write with encoding to buffer
@@ -139,8 +138,8 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 		inputStream = append(inputStream, line...)
 	}
 
-	// initialize reader
-	buffer := bytes.NewBuffer(inputStream)
+	buffer := &TestBuffer{}
+	buffer.Write(inputStream)
 	codec, _ := encoding.Plain(buffer)
 	reader, err := NewLine(buffer, codec, buffer.Len())
 	if err != nil {

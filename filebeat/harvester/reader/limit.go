@@ -20,3 +20,7 @@ func (p *Limit) Next() (Message, error) {
 	}
 	return message, err
 }
+
+func (r *Limit) Close() error {
+	return r.reader.Close()
+}

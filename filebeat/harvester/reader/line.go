@@ -13,7 +13,7 @@ import (
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
 type Line struct {
-	rawInput   io.Reader
+	rawInput   io.ReadCloser
 	codec      encoding.Encoding
 	bufferSize int
 	nl         []byte
@@ -22,14 +22,17 @@ type Line struct {
 	inOffset   int // input buffer read offset
 	byteCount  int // number of bytes decoded from input buffer into output buffer
 	decoder    transform.Transformer
+	done       chan struct{}
 }
 
 func NewLine(
-	input io.Reader,
+	input io.ReadCloser,
 	codec encoding.Encoding,
 	bufferSize int,
 ) (*Line, error) {
-	l := &Line{}
+	l := &Line{
+		done: make(chan struct{}),
+	}
 
 	if err := l.init(input, codec, bufferSize); err != nil {
 		return nil, err
@@ -39,7 +42,7 @@ func NewLine(
 }
 
 func (l *Line) init(
-	input io.Reader,
+	input io.ReadCloser,
 	codec encoding.Encoding,
 	bufferSize int,
 ) error {
@@ -62,6 +65,11 @@ func (l *Line) init(
 
 func (l *Line) Next() ([]byte, int, error) {
 	for {
+		select {
+		case <-l.done:
+			return nil, 0, ErrReaderStopped
+		default:
+		}
 		// read next 'potential' line from input buffer/reader
 		err := l.advance()
 		if err != nil {
@@ -90,12 +98,22 @@ func (l *Line) Next() ([]byte, int, error) {
 	return bytes, sz, nil
 }
 
+func (r *Line) Close() error {
+	close(r.done)
+	return r.rawInput.Close()
+}
+
 func (l *Line) advance() error {
 	var idx int
 	var err error
 
 	// fill inBuffer until '\n' sequence has been found in input buffer
 	for {
+		select {
+		case <-l.done:
+			return ErrReaderStopped
+		default:
+		}
 		idx = l.inBuffer.IndexFrom(l.inOffset, l.nl)
 		if idx >= 0 {
 			break

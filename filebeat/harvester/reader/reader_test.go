@@ -5,8 +5,18 @@ package reader
 import (
 	"testing"
 
+	"bytes"
+
 	"github.com/stretchr/testify/assert"
 )
+
+type TestBuffer struct {
+	bytes.Buffer
+}
+
+func (b *TestBuffer) Close() error {
+	return nil
+}
 
 func TestIsLine(t *testing.T) {
 	notLine := []byte("This is not a line")
