@@ -258,6 +258,9 @@ output.elasticsearch:
   # and generates [metricbeat-]YYYY.MM.DD keys.
   #index: "metricbeat-%{+yyyy.MM.dd}"
 
+  # Optional ingest node pipeline. By default no pipeline will be used.
+  #pipeline: ""
+
   # Optional HTTP Path
   #path: "/elasticsearch"
 
