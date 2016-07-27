@@ -21,7 +21,7 @@ Each processor has associated an action with a set of parameters and optionally 
 present, then the action is executed only if the condition
 is fulfilled. If no condition is passed then the action is always executed.
 
-deprecated[5.0.0-alpha4,The `filters` configuration option is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+deprecated[5.0.0-alpha4,The `filters` configuration option is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
 
 [source,yaml]
 ------
@@ -35,7 +35,7 @@ filters:
 ...
 ------
 
-coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
 
 [source,yaml]
 ------
@@ -150,7 +150,7 @@ range:
 ------
 
 
-coming[5.0.0-beta1, You can combine multiple conditions with the `or`, `and` or `not` operators]
+added[5.0.0-alpha5, You can combine multiple conditions with the `or`, `and` or `not` operators]
 
 [[condition-or]]
 ===== OR
@@ -257,7 +257,7 @@ The `include_fields` action specifies what fields to export if a certain conditi
 optional and if it's missing then the defined fields are always exported. The `@timestamp` and
 `type` fields are always exported, even if they are not defined in the `include_fields` list.
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
 
 [source,yaml]
 -------
@@ -267,7 +267,7 @@ filters:
      fields: ["field1", "field2", ...]
 -------
 
-coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
 
 [source,yaml]
 -------
@@ -292,7 +292,7 @@ The `drop_fields` action specifies what fields to drop if a certain condition is
 and if it's missing then the defined fields are always dropped. The `@timestamp` and `type` fields cannot be dropped,
 even if they show up in the `drop_fields` list.
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
 
 [source,yaml]
 -----------------------------------------------------
@@ -302,7 +302,7 @@ filters:
      fields: ["field1", "field2", ...]
 -----------------------------------------------------
 
-coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
 
 [source,yaml]
 -----------------------------------------------------
@@ -322,7 +322,7 @@ NOTE: If you define an empty list of fields under `drop_fields`, then no fields 
 The `drop_event` action drops the entire event if the associated condition is fulfilled. The condition is mandatory, as
 without one all the events are dropped.
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
 
 [source,yaml]
 ------
@@ -331,7 +331,7 @@ filters:
      condition
 ------
 
-coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
 
 [source,yaml]
 ------
