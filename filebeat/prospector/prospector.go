@@ -8,6 +8,7 @@ import (
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -16,10 +17,10 @@ type Prospector struct {
 	cfg           *common.Config // Raw config
 	config        prospectorConfig
 	prospectorer  Prospectorer
-	spoolerChan   chan *input.FileEvent
-	harvesterChan chan *input.FileEvent
+	spoolerChan   chan *input.Event
+	harvesterChan chan *input.Event
 	done          chan struct{}
-	states        *input.States
+	states        *file.States
 	wg            sync.WaitGroup
 }
 
@@ -28,12 +29,12 @@ type Prospectorer interface {
 	Run()
 }
 
-func NewProspector(cfg *common.Config, states input.States, spoolerChan chan *input.FileEvent) (*Prospector, error) {
+func NewProspector(cfg *common.Config, states file.States, spoolerChan chan *input.Event) (*Prospector, error) {
 	prospector := &Prospector{
 		cfg:           cfg,
 		config:        defaultConfig,
 		spoolerChan:   spoolerChan,
-		harvesterChan: make(chan *input.FileEvent),
+		harvesterChan: make(chan *input.Event),
 		done:          make(chan struct{}),
 		states:        states.Copy(),
 		wg:            sync.WaitGroup{},
@@ -79,7 +80,7 @@ func (p *Prospector) Init() error {
 	p.prospectorer = prospectorer
 
 	// Create empty harvester to check if configs are fine
-	_, err = p.createHarvester(input.FileState{})
+	_, err = p.createHarvester(file.State{})
 	if err != nil {
 		return err
 	}
@@ -104,12 +105,16 @@ func (p *Prospector) Run() {
 				logp.Info("Prospector channel stopped")
 				return
 			case event := <-p.harvesterChan:
+				// Add ttl if cleanOlder is enabled
+				if p.config.CleanInactive > 0 {
+					event.State.TTL = p.config.CleanInactive
+				}
 				select {
 				case <-p.done:
 					logp.Info("Prospector channel stopped")
 					return
 				case p.spoolerChan <- event:
-					p.states.Update(event.FileState)
+					p.states.Update(event.State)
 				}
 			}
 		}
@@ -124,35 +129,32 @@ func (p *Prospector) Run() {
 			logp.Info("Prospector ticker stopped")
 			return
 		case <-time.After(p.config.ScanFrequency):
-			logp.Info("Run prospector")
+			logp.Debug("prospector", "Run prospector")
 			p.prospectorer.Run()
 		}
 	}
 }
 
-func (p *Prospector) Stop(wg *sync.WaitGroup) {
+func (p *Prospector) Stop() {
 	logp.Info("Stopping Prospector")
 	close(p.done)
 	p.wg.Wait()
-	wg.Done()
 }
 
 // createHarvester creates a new harvester instance from the given state
-func (p *Prospector) createHarvester(state input.FileState) (*harvester.Harvester, error) {
+func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, error) {
 
 	h, err := harvester.NewHarvester(
 		p.cfg,
-		state.Source,
 		state,
 		p.harvesterChan,
-		state.Offset,
 		p.done,
 	)
 
 	return h, err
 }
 
-func (p *Prospector) startHarvester(state input.FileState, offset int64) (*harvester.Harvester, error) {
+func (p *Prospector) startHarvester(state file.State, offset int64) (*harvester.Harvester, error) {
 	state.Offset = offset
 	// Create harvester with state
 	h, err := p.createHarvester(state)
@@ -168,21 +170,4 @@ func (p *Prospector) startHarvester(state input.FileState, offset int64) (*harve
 	}()
 
 	return h, nil
-}
-
-// isIgnoreOlder checks if the given state reached ignore_older
-func (p *Prospector) isIgnoreOlder(state input.FileState) bool {
-
-	// ignore_older is disable
-	if p.config.IgnoreOlder == 0 {
-		return false
-	}
-
-	modTime := state.Fileinfo.ModTime()
-
-	if time.Since(modTime) > p.config.IgnoreOlder {
-		return true
-	}
-
-	return false
 }

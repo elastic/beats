@@ -2,6 +2,7 @@
 package nfs
 
 import (
+	"expvar"
 	"fmt"
 	"time"
 
@@ -20,10 +21,15 @@ var ACCEPT_STATUS = [...]string{
 	"system_err",
 }
 
+var (
+	unmatchedRequests = expvar.NewInt("nfs.unmatched_requests")
+)
+
 // called by Cache, when re reply seen within expected time window
 func (rpc *Rpc) handleExpiredPacket(nfs *Nfs) {
 	nfs.event["status"] = "NO_REPLY"
 	rpc.results.PublishTransaction(nfs.event)
+	unmatchedRequests.Add(1)
 }
 
 // called when we process a RPC call

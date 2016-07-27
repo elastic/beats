@@ -3,7 +3,6 @@ package redis
 import (
 	"errors"
 	"expvar"
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -18,16 +17,17 @@ import (
 type redisOut struct {
 	mode mode.ConnectionMode
 	topology
+	beatName string
 }
 
 var debugf = logp.MakeDebug("redis")
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	statReadBytes   = expvar.NewInt("libbeatRedisPublishReadBytes")
-	statWriteBytes  = expvar.NewInt("libbeatRedisPublishWriteBytes")
-	statReadErrors  = expvar.NewInt("libbeatRedisPublishReadErrors")
-	statWriteErrors = expvar.NewInt("libbeatRedisPublishWriteErrors")
+	statReadBytes   = expvar.NewInt("libbeat.redis.publish.read_bytes")
+	statWriteBytes  = expvar.NewInt("libbeat.redis.publish.write_bytes")
+	statReadErrors  = expvar.NewInt("libbeat.redis.publish.read_errors")
+	statWriteErrors = expvar.NewInt("libbeat.redis.publish.write_errors")
 )
 
 const (
@@ -39,8 +39,8 @@ func init() {
 	outputs.RegisterOutputPlugin("redis", new)
 }
 
-func new(cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
-	r := &redisOut{}
+func new(beatName string, cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
+	r := &redisOut{beatName: beatName}
 	if err := r.init(cfg, expireTopo); err != nil {
 		return nil, err
 	}
@@ -69,9 +69,9 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		return errors.New("Bad Redis data type")
 	}
 
-	index := []byte(config.Index)
-	if len(index) == 0 {
-		return fmt.Errorf("missing %v", cfg.PathOf("index"))
+	key := []byte(config.Key)
+	if len(key) == 0 {
+		key = []byte(r.beatName)
 	}
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
@@ -105,7 +105,7 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		if err != nil {
 			return nil, err
 		}
-		return newClient(t, config.Password, config.Db, index, dataType), nil
+		return newClient(t, config.Password, config.Db, key, dataType), nil
 	})
 	if err != nil {
 		return err

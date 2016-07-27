@@ -1,10 +1,9 @@
-//+build !noasm
-//+build !appengine
+//+build !noasm !appengine
 
 // Copyright 2015, Klaus Post, see LICENSE for details.
 
 // func matchLenSSE4(a, b []byte, max int) int
-TEXT ·matchLenSSE4(SB), 4, $0
+TEXT ·matchLenSSE4(SB), 7, $0
 	MOVQ  a+0(FP), SI        // RSI: &a
 	MOVQ  b+24(FP), DI       // RDI: &b
 	MOVQ  max+48(FP), R10    // R10: max

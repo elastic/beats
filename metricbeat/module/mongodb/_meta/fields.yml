@@ -1,7 +1,8 @@
 - key: mongodb
-  title: "MongoDB Status"
+  title: "MongoDB"
   description: >
     Metrics collected from MongoDB servers.
+  short_config: false
   fields:
     - name: mongodb
       type: group

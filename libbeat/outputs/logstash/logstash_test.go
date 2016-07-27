@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/urso/go-lumber/server/v2"
+
+	"github.com/elastic/go-lumber/server/v2"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
@@ -73,7 +74,7 @@ func newTestLumberjackOutput(
 	}
 
 	cfg, _ := common.NewConfigFrom(config)
-	output, err := plugin(cfg, 0)
+	output, err := plugin("", cfg, 0)
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)
 	}

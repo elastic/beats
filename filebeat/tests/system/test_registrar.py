@@ -454,7 +454,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
-            ignoreOlder="2m",
+            ignore_older="2m",
             scan_frequency="1s"
         )
 
@@ -528,7 +528,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
-            ignoreOlder="2m",
+            ignore_older="2m",
             scan_frequency="1s"
         )
 
@@ -636,13 +636,15 @@ class Test(BaseTest):
         # Compare first entry
         oldJson = json.loads('{"source":"logs/hello.log","offset":4,"FileStateOS":{"inode":30178938,"device":16777220}}')
         newJson = self.get_registry_entry_by_path("logs/hello.log")
-        del newJson["last_seen"]
+        del newJson["timestamp"]
+        del newJson["ttl"]
         assert newJson == oldJson
 
         # Compare second entry
         oldJson = json.loads('{"source":"logs/log2.log","offset":6,"FileStateOS":{"inode":30178958,"device":16777220}}')
         newJson = self.get_registry_entry_by_path("logs/log2.log")
-        del newJson["last_seen"]
+        del newJson["timestamp"]
+        del newJson["ttl"]
         assert newJson == oldJson
 
         # Make sure the right number of entries is in
@@ -686,15 +688,141 @@ class Test(BaseTest):
         # Compare first entry
         oldJson = json.loads('{"source":"logs/hello.log","offset":4,"FileStateOS":{"idxhi":1,"idxlo":12,"vol":34}}')
         newJson = self.get_registry_entry_by_path("logs/hello.log")
-        del newJson["last_seen"]
+        del newJson["timestamp"]
+        del newJson["ttl"]
         assert newJson == oldJson
 
         # Compare second entry
         oldJson = json.loads('{"source":"logs/log2.log","offset":6,"FileStateOS":{"idxhi":67,"idxlo":44,"vol":12}}')
         newJson = self.get_registry_entry_by_path("logs/log2.log")
-        del newJson["last_seen"]
+        del newJson["timestamp"]
+        del newJson["ttl"]
         assert newJson == oldJson
 
         # Make sure the right number of entries is in
         data = self.get_registry()
         assert len(data) == 2
+
+
+    def test_clean_inactive(self):
+        """
+        Checks that states are properly removed after clean_inactive
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/input*",
+            clean_inactive="4s",
+            ignore_older="2s",
+            close_inactive="0.2s",
+            scan_frequency="0.1s"
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile1 = self.working_dir + "/log/input1"
+        testfile2 = self.working_dir + "/log/input2"
+        testfile3 = self.working_dir + "/log/input3"
+
+        with open(testfile1, 'w') as f:
+            f.write("first file\n")
+
+        with open(testfile2, 'w') as f:
+            f.write("second file\n")
+
+        filebeat = self.start_beat()
+
+        self.wait_until(
+            lambda: self.output_has(lines=2),
+            max_timeout=10)
+
+        data = self.get_registry()
+        assert len(data) == 2
+
+        # Wait until states are removed from prospectors
+        self.wait_until(
+            lambda: self.log_contains_count(
+                "State removed for") == 2,
+            max_timeout=15)
+
+        with open(testfile3, 'w') as f:
+            f.write("2\n")
+
+        # Write new file to make sure registrar is flushed again
+        self.wait_until(
+            lambda: self.output_has(lines=3),
+            max_timeout=30)
+
+        # Wait until states are removed from prospectors
+        self.wait_until(
+            lambda: self.log_contains_count(
+                "State removed for") == 4,
+            max_timeout=15)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that the first to files were removed from the registry
+        data = self.get_registry()
+        assert len(data) == 1
+
+        # Make sure the last file in the registry is the correct one and has the correct offset
+        if os.name == "nt":
+            assert data[0]["offset"] == 3
+        else:
+            assert data[0]["offset"] == 2
+
+
+    def test_clean_removed(self):
+        """
+        Checks that files which were removed, the state is removed
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/input*",
+            scan_frequency="0.1s",
+            clean_removed=True,
+            close_removed=True
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile1 = self.working_dir + "/log/input1"
+        testfile2 = self.working_dir + "/log/input2"
+
+        with open(testfile1, 'w') as f:
+            f.write("file to be removed\n")
+
+        with open(testfile2, 'w') as f:
+            f.write("2\n")
+
+        filebeat = self.start_beat()
+
+        self.wait_until(
+            lambda: self.output_has(lines=2),
+            max_timeout=10)
+
+        data = self.get_registry()
+        assert len(data) == 2
+
+        os.remove(testfile1)
+
+        # Wait until states are removed from prospectors
+        self.wait_until(
+            lambda: self.log_contains(
+                "Remove state for file as file removed"),
+            max_timeout=15)
+
+        # Add one more line to make sure registry is written
+        with open(testfile2, 'a') as f:
+            f.write("make sure registry is written\n")
+
+        self.wait_until(
+            lambda: self.output_has(lines=3),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that the first to files were removed from the registry
+        data = self.get_registry()
+        assert len(data) == 1
+
+        # Make sure the last file in the registry is the correct one and has the correct offset
+        if os.name == "nt":
+            assert data[0]["offset"] == len("make sure registry is written\n" + "2\n") + 2
+        else:
+            assert data[0]["offset"] == len("make sure registry is written\n" + "2\n")

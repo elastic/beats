@@ -26,7 +26,7 @@ func (nfs *Nfs) getRequestInfo(xdr *Xdr) common.MapStr {
 			tag := xdr.getDynamicOpaque()
 			nfsInfo["tag"] = string(tag)
 			nfsInfo["minor_version"] = xdr.getUInt()
-			nfsInfo["opcode"] = nfs.getV4Opcode(xdr)
+			nfsInfo["opcode"] = nfs.findV4MainOpcode(xdr)
 		}
 	}
 	return nfsInfo

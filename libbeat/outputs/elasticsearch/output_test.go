@@ -26,16 +26,17 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 	}
 
 	config, _ := common.NewConfigFrom(map[string]interface{}{
-		"save_topology":  true,
-		"hosts":          []string{GetEsHost()},
-		"port":           esPort,
-		"username":       os.Getenv("ES_USER"),
-		"password":       os.Getenv("ES_PASS"),
-		"path":           "",
-		"index":          index,
-		"protocol":       "http",
-		"flush_interval": flushInterval,
-		"bulk_max_size":  bulkSize,
+		"save_topology":    true,
+		"hosts":            []string{GetEsHost()},
+		"port":             esPort,
+		"username":         os.Getenv("ES_USER"),
+		"password":         os.Getenv("ES_PASS"),
+		"path":             "",
+		"index":            index,
+		"protocol":         "http",
+		"flush_interval":   flushInterval,
+		"bulk_max_size":    bulkSize,
+		"template.enabled": false,
 	})
 
 	var output elasticsearchOutput
@@ -46,7 +47,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 func TestTopologyInES(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
 	elasticsearchOutput1 := createElasticsearchConnection(0, 0)
@@ -307,25 +308,4 @@ func TestBulkEvents(t *testing.T) {
 
 	output = createElasticsearchConnection(50, 5)
 	testBulkWithParams(t, output)
-}
-
-func TestEnableTTL(t *testing.T) {
-
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch", "elasticsearch"})
-	}
-
-	output := createElasticsearchConnection(0, 0)
-	output.randomClient().Delete(".packetbeat-topology", "", "", nil)
-
-	err := output.EnableTTL()
-	if err != nil {
-		t.Errorf("Fail to enable TTL: %s", err)
-	}
-
-	// should succeed also when index already exists
-	err = output.EnableTTL()
-	if err != nil {
-		t.Errorf("Fail to enable TTL: %s", err)
-	}
 }

@@ -12,9 +12,7 @@ It offers slightly better compression at lower compression settings, and up to 3
 [![Build Status](https://travis-ci.org/klauspost/compress.svg?branch=master)](https://travis-ci.org/klauspost/compress)
 
 # changelog
-* Mar 24, 2016: Always attempt Huffman encoding on level 4-7. This improves base 64 encoded data compression.
-* Mar 24, 2016: Small speedup for level 1-3.
-* Feb 19, 2016: Faster bit writer, level -2 is 15% faster, level 1 is 4% faster.
+* Feb 19. 2016: Faster bit writer, level -2 is 15% faster, level 1 is 4% faster.
 * Feb 19, 2016: Handle small payloads faster in level 1-3.
 * Feb 19, 2016: Added faster level 2 + 3 compression modes.
 * Feb 19, 2016: [Rebalanced compression levels](https://blog.klauspost.com/rebalancing-deflate-compression-levels/), so there is a more even progresssion in terms of compression. New default level is 5.

@@ -14,8 +14,8 @@
 # dictionaries.
 #
 # The supported keys are name (required), tags, fields, fields_under_root,
-# ignore_older, level, event_id, provider, and include_xml. Please visit the
-# documentation for the complete details of each option.
+# forwarded, ignore_older, level, event_id, provider, and include_xml. Please
+# visit the documentation for the complete details of each option.
 # https://go.es.io/WinlogbeatConfig
 winlogbeat.event_logs:
   - name: Application
@@ -48,14 +48,10 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Template name. By default the template name is winlogbeat.
-  template.name: "winlogbeat"
-
-  # Path to template file
-  template.path: "winlogbeat.template.json"
-
-  # Overwrite existing template
-  template.overwrite: false
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
@@ -77,3 +73,8 @@ output.elasticsearch:
 # Sets log level. The default log level is error.
 # Available log levels are: critical, error, warning, info, debug
 #logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]

@@ -72,4 +72,10 @@ output:
     rotate_every_kb: 1000
     #number_of_files: 7
 
+#================================ Logging =====================================
+
+{% if metrics_period -%}
+logging.metrics.period: {{ metrics_period }}
+{%- endif %}
+
 # vim: set ft=jinja:

@@ -4,6 +4,7 @@ package memcache
 
 import (
 	"encoding/json"
+	"expvar"
 	"math"
 	"time"
 
@@ -98,6 +99,12 @@ type memcacheStat struct {
 }
 
 var debug = logp.MakeDebug("memcache")
+
+var (
+	unmatchedRequests      = expvar.NewInt("memcache.unmatched_requests")
+	unmatchedResponses     = expvar.NewInt("memcache.unmatched_responses")
+	unfinishedTransactions = expvar.NewInt("memcache.unfinished_transactions")
+)
 
 func init() {
 	protos.Register("memcache", New)

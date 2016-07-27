@@ -73,19 +73,14 @@ filebeat.prospectors:
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
   #ignore_older: 0
 
-  # Close older closes the file handler for which were not modified
-  # for longer then close_older
-  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
-  #close_older: 1h
-
   # Type to be published in the 'type' field. For Elasticsearch output,
   # the type defines the document type these entries should be stored
   # in. Default: log
   #document_type: log
 
-  # Scan frequency in seconds.
-  # How often these files should be checked for changes. In case it is set
-  # to 0s, it is done as often as possible. Default: 10s
+  # How often the prospector checks for new files in the paths that are specified
+  # for harvesting. Specify 1s to scan the directory as frequently as possible
+  # without causing Filebeat to scan too frequently. Default: 10s.
   #scan_frequency: 10s
 
   # Defines the buffer size every harvester uses when fetching the file
@@ -166,22 +161,50 @@ filebeat.prospectors:
   # The backoff value will be multiplied each time with the backoff_factor until max_backoff is reached
   #backoff_factor: 2
 
-  # This option closes a file, as soon as the file name changes.
-  # This config option is recommended on windows only. Filebeat keeps the files it's reading open. This can cause
-  # issues when the file is removed, as the file will not be fully removed until also Filebeat closes
-  # the reading. Filebeat closes the file handler after ignore_older. During this time no new file with the
-  # same name can be created. Turning this feature on the other hand can lead to loss of data
-  # on rotate files. It can happen that after file rotation the beginning of the new
-  # file is skipped, as the reading starts at the end. We recommend to leave this option on false
-  # but lower the ignore_older value to release files faster.
-  #force_close_files: false
+  ### Harvester closing options
+
+  # Close inactive closes the file handler after the predefined period.
+  # The period starts when the last line of the file was, not the file ModTime.
+  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  #close_inactive: 1h
+
+  # Close renamed closes a file handler when the file is renamed or rotated.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_renamed: false
+
+  # When enabling this option, a file handler is closed immediately in case a file can't be found
+  # any more. In case the file shows up again later, harvesting will continue at the last known position
+  # after scan_frequency.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_removed: false
+
+  # Closes the file handler as soon as the harvesters reaches the end of the file.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_eof: false
+
+  # Close timeout closes the harvester after the predefined time.
+  # This is independent if the harvester did finish reading the file or not.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_timeout: 0
+
+  ### State options
+
+  # Files for the modification data is older then clean_inactive the state from the registry is removed
+  # By default this is disabled.
+  #clean_inactive: 0
+
+  # Removes the state for file which cannot be found on disk anymore immediately
+  #clean_removed: false
+
 
 #----------------------------- Stdin prospector -------------------------------
 # Configuration to use stdin input
 #- input_type: stdin
 
 #========================= Filebeat global options ============================
-  
+
 # Event count spool threshold - forces network flush if exceeded
 #filebeat.spool_size: 2048
 
@@ -194,7 +217,7 @@ filebeat.prospectors:
 
 # Name of the registry file. If a relative path is used, it is considered relative to the
 # data path.
-#filebeat.registry_file: registry
+#filebeat.registry_file: ${path.data}/registry
 
 #
 # These config files must have the full filebeat config part inside, but only

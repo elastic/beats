@@ -1,14 +1,16 @@
 [[beats-reference]]
 = Beats Platform Reference
-:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/master
-:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/master
-:filebeat: http://www.elastic.co/guide/en/beats/filebeat/master
-:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/master
+
+include::./version.asciidoc[]
+
+:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
+:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
+:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
 :security: X-Pack Security
-:ES-version: 5.0.0-alpha3
-:LS-version: 5.0.0-alpha3
-:Kibana-version: 5.0.0-alpha3
-:Dashboards-version: 5.0.0-alpha3
+:ES-version: {stack-version}
+:LS-version: {stack-version}
+:Kibana-version: {stack-version}
 
 include::./overview.asciidoc[]
 
@@ -24,11 +26,9 @@ include::./visualizing-data.asciidoc[]
 
 include::./dashboards.asciidoc[]
 
-pass::[<?page_header <b>PLEASE NOTE:</b><br/>We are working on updating this section. Some content might be out of date. While you're waiting for updates, you might want to try out the Beat generator at https://github.com/elastic/beat-generator.?>]
-
 include::./newbeat.asciidoc[]
 
-pass::[<?page_header ?>]
+include::./event-conventions.asciidoc[]
 
 include::./newdashboards.asciidoc[]
 

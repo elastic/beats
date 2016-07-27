@@ -33,7 +33,7 @@ var builder = eventBuilder{
 	fetchDuration: elapsed,
 	// event
 	// fetchErr
-	// filters
+	// processors
 	// metadata
 }
 

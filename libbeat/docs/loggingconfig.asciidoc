@@ -11,12 +11,12 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-logging]]
-=== Logging (Optional)
+=== Logging Configuration
 
-The `logging` section contains options for configuring the Beats logging output.
-The logging system can write logs to syslog or rotate log files. If logging is
-not explicitly configured, file output is used on Windows systems, and syslog
-output is used on Linux and OS X.
+The `logging` section of the +{beatname_lc}.yml+ config file contains options
+for configuring the Beats logging output. The logging system can write logs to
+syslog or rotate log files. If logging is not explicitly configured, file output
+is used on Windows systems, and syslog output is used on Linux and OS X.
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ modified from the command line.
 
 ==== Logging Options
 
-You can specify the following options under the `logging` section:
+You can specify the following options in the `logging` section of the +{beatname_lc}.yml+ config file:
 
 ===== to_syslog
 
@@ -64,6 +64,27 @@ to enable debug output for all components. For example add `publish` to display
 all the debug messages related to event publishing. When starting the Beat,
 selectors can be overwritten using the `-d` command line option (`-d` also sets
 the debug log level).
+
+===== metrics.enabled
+
+If enabled, {beatname_uc} periodically logs its internal metrics that have
+changed in the last period. For each metric that changed, the delta from the
+value at the beginning of the period is logged. The default is true.
+
+Here is an example log line:
+
+[source,shell]
+----------------------------------------------------------------------------------------------------------------------------------------------------
+2016/07/04 12:16:10.821047 logp.go:194: INFO Non-zero metrics in the last 30s:  libbeatEsPublishedAndAckedEvents=18 libbeatEsPublishWriteBytes=10045
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Note that we currently offer no backwards compatible guarantees for the internal
+metrics and for this reason they are also not documented.
+
+
+===== metrics.period
+
+The period after which to log the internal metrics. The default is 30s.
 
 ===== files.path
 

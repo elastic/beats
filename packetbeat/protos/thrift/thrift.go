@@ -3,6 +3,7 @@ package thrift
 import (
 	"encoding/binary"
 	"encoding/hex"
+	"expvar"
 	"fmt"
 	"math"
 	"strconv"
@@ -156,6 +157,11 @@ type Thrift struct {
 	results      publish.Transactions
 	Idl          *ThriftIdl
 }
+
+var (
+	unmatchedRequests  = expvar.NewInt("thrift.unmatched_requests")
+	unmatchedResponses = expvar.NewInt("thrift.unmatched_responses")
+)
 
 func init() {
 	protos.Register("thrift", New)
@@ -973,6 +979,7 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 	trans := thrift.getTransaction(tuple.Hashable())
 	if trans != nil {
 		logp.Debug("thrift", "Two requests without reply, assuming the old one is oneway")
+		unmatchedRequests.Add(1)
 		thrift.PublishQueue <- trans
 	}
 
@@ -1011,12 +1018,14 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	trans := thrift.getTransaction(tuple.Hashable())
 	if trans == nil {
 		logp.Debug("thrift", "Response from unknown transaction. Ignoring: %v", tuple)
+		unmatchedResponses.Add(1)
 		return
 	}
 
 	if trans.Request.Method != msg.Method {
 		logp.Debug("thrift", "Response from another request received '%s' '%s'"+
 			". Ignoring.", trans.Request.Method, msg.Method)
+		unmatchedResponses.Add(1)
 		return
 	}
 

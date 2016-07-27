@@ -1,5 +1,5 @@
 [[maintaining-topology]]
-=== Maintaining the Real-Time State of the Network Topology
+== Maintaining the Real-Time State of the Network Topology
 
 One important feature of Packetbeat is that it knows the name of the source and
 destination servers for each transaction. It does this without needing to maintain

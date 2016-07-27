@@ -1,6 +1,7 @@
 package amqp
 
 import (
+	"expvar"
 	"strconv"
 	"strings"
 	"time"
@@ -32,6 +33,11 @@ type Amqp struct {
 	//map containing functions associated with different method numbers
 	MethodMap map[codeClass]map[codeMethod]AmqpMethod
 }
+
+var (
+	unmatchedRequests  = expvar.NewInt("amqp.unmatched_requests")
+	unmatchedResponses = expvar.NewInt("amqp.unmatched_responses")
+)
 
 func init() {
 	protos.Register("amqp", New)
@@ -237,6 +243,7 @@ func (amqp *Amqp) handleAmqpRequest(msg *AmqpMessage) {
 	if trans != nil {
 		if trans.Amqp != nil {
 			debugf("Two requests without a Response. Dropping old request: %s", trans.Amqp)
+			unmatchedRequests.Add(1)
 		}
 	} else {
 		trans = &AmqpTransaction{Type: "amqp", tuple: tuple}
@@ -295,7 +302,8 @@ func (amqp *Amqp) handleAmqpResponse(msg *AmqpMessage) {
 	tuple := msg.TcpTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 	if trans == nil || trans.Amqp == nil {
-		logp.Warn("Response from unknown transaction. Ignoring.")
+		debugf("Response from unknown transaction. Ignoring.")
+		unmatchedResponses.Add(1)
 		return
 	}
 

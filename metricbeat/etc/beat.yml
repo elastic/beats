@@ -10,7 +10,7 @@
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
-#---------------------------- System Status Module ---------------------------
+#------------------------------- System Module -------------------------------
 - module: system
   metricsets:
     # CPU stats
@@ -42,16 +42,5 @@ metricbeat.modules:
 
   # if true, exports the CPU usage in ticks, together with the percentage values
   cpu_ticks: false
-
-#--------------------------- MongoDB Status Module ---------------------------
-- module: mongodb
-  metricsets: ["status"]
-  enabled: true
-  period: 10s
-
-  # The hosts must be passed as MongoDB URLs in the format:
-  # [mongodb://][user:pass@]host[:port]
-  hosts: ["localhost:27017"]
-
 
 

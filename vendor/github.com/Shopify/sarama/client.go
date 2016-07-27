@@ -9,8 +9,9 @@ import (
 
 // Client is a generic Kafka client. It manages connections to one or more Kafka brokers.
 // You MUST call Close() on a client to avoid leaks, it will not be garbage-collected
-// automatically when it passes out of scope. A single client can be safely shared by
-// multiple concurrent Producers and Consumers.
+// automatically when it passes out of scope. It is safe to share a client amongst many
+// users, however Kafka will process requests from a single client strictly in serial,
+// so it is generally more efficient to use the default one client per producer/consumer.
 type Client interface {
 	// Config returns the Config struct of the client. This struct should not be
 	// altered after it has been created.
@@ -631,7 +632,7 @@ func (client *client) updateMetadata(data *MetadataResponse) (retry bool, err er
 		switch topic.Err {
 		case ErrNoError:
 			break
-		case ErrInvalidTopic: // don't retry, don't store partial results
+		case ErrInvalidTopic, ErrTopicAuthorizationFailed: // don't retry, don't store partial results
 			err = topic.Err
 			continue
 		case ErrUnknownTopicOrPartition: // retry, do not store partial partition results

@@ -9,6 +9,7 @@ package dns
 
 import (
 	"bytes"
+	"expvar"
 	"fmt"
 	"net"
 	"sort"
@@ -40,6 +41,11 @@ const (
 
 // Transport protocol.
 type Transport uint8
+
+var (
+	unmatchedRequests  = expvar.NewInt("dns.unmatched_requests")
+	unmatchedResponses = expvar.NewInt("dns.unmatched_responses")
+)
 
 const (
 	TransportTcp = iota
@@ -313,6 +319,7 @@ func (dns *Dns) receivedDnsResponse(tuple *DnsTuple, msg *DnsMessage) {
 			Src: msg.CmdlineTuple.Dst, Dst: msg.CmdlineTuple.Src})
 		trans.Notes = append(trans.Notes, OrphanedResponse.Error())
 		debugf("%s %s", OrphanedResponse.Error(), tuple.String())
+		unmatchedResponses.Add(1)
 	}
 
 	trans.Response = msg
@@ -422,6 +429,7 @@ func (dns *Dns) expireTransaction(t *DnsTransaction) {
 	t.Notes = append(t.Notes, NoResponse.Error())
 	debugf("%s %s", NoResponse.Error(), t.tuple.String())
 	dns.publishTransaction(t)
+	unmatchedRequests.Add(1)
 }
 
 // Adds the DNS message data to the supplied MapStr.

@@ -1,7 +1,0 @@
-[[securing-topbeat]]
-== Securing Topbeat
-
-The following topics describe how to secure communication between Topbeat and other products in the Elastic stack:
-
-* <<securing-communication-elasticsearch>>
-* <<configuring-tls-logstash>>

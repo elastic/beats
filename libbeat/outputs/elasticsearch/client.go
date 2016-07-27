@@ -3,6 +3,7 @@ package elasticsearch
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"expvar"
 	"fmt"
@@ -42,22 +43,22 @@ type Connection struct {
 	Password string
 
 	http              *http.Client
-	connected         bool
 	onConnectCallback func() error
 
 	encoder bodyEncoder
+	version string
 }
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	ackedEvents            = expvar.NewInt("libbeatEsPublishedAndAckedEvents")
-	eventsNotAcked         = expvar.NewInt("libbeatEsPublishedButNotAckedEvents")
-	publishEventsCallCount = expvar.NewInt("libbeatEsPublishEventsCallCount")
+	ackedEvents            = expvar.NewInt("libbeat.es.published_and_acked_events")
+	eventsNotAcked         = expvar.NewInt("libbeat.es.published_but_not_acked_events")
+	publishEventsCallCount = expvar.NewInt("libbeat.es.call_count.PublishEvents")
 
-	statReadBytes   = expvar.NewInt("libbeatEsPublishReadBytes")
-	statWriteBytes  = expvar.NewInt("libbeatEsPublishWriteBytes")
-	statReadErrors  = expvar.NewInt("libbeatEsPublishReadErrors")
-	statWriteErrors = expvar.NewInt("libbeatEsPublishWriteErrors")
+	statReadBytes   = expvar.NewInt("libbeat.es.publish.read_bytes")
+	statWriteBytes  = expvar.NewInt("libbeat.es.publish.write_bytes")
+	statReadErrors  = expvar.NewInt("libbeat.es.publish.read_errors")
+	statWriteErrors = expvar.NewInt("libbeat.es.publish.write_errors")
 )
 
 var (
@@ -178,10 +179,6 @@ func (client *Client) PublishEvents(
 
 	if len(events) == 0 {
 		return nil, nil
-	}
-
-	if !client.connected {
-		return events, ErrNotConnected
 	}
 
 	body := client.encoder
@@ -430,10 +427,6 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 }
 
 func (client *Client) PublishEvent(event common.MapStr) error {
-	if !client.connected {
-		return ErrNotConnected
-	}
-
 	index := getIndex(event, client.index)
 	debugf("Publish event: %s", event)
 
@@ -495,12 +488,9 @@ func (client *Client) CheckTemplate(templateName string) bool {
 
 func (conn *Connection) Connect(timeout time.Duration) error {
 	var err error
-	conn.connected, err = conn.Ping(timeout)
+	conn.version, err = conn.Ping(timeout)
 	if err != nil {
 		return err
-	}
-	if !conn.connected {
-		return ErrNotConnected
 	}
 
 	err = conn.onConnectCallback()
@@ -510,26 +500,38 @@ func (conn *Connection) Connect(timeout time.Duration) error {
 	return nil
 }
 
-func (conn *Connection) Ping(timeout time.Duration) (bool, error) {
+// Ping sends a GET request to the Elasticsearch
+func (conn *Connection) Ping(timeout time.Duration) (string, error) {
 	debugf("ES Ping(url=%v, timeout=%v)", conn.URL, timeout)
 
 	conn.http.Timeout = timeout
-	status, _, err := conn.execRequest("HEAD", conn.URL, nil)
+	status, body, err := conn.execRequest("GET", conn.URL, nil)
 	if err != nil {
 		debugf("Ping request failed with: %v", err)
-		return false, err
+		return "", err
+	}
+
+	if status >= 300 {
+		return "", fmt.Errorf("Non 2xx response code: %d", status)
+	}
+
+	var response struct {
+		Version struct {
+			Number string
+		}
+	}
+
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return "", fmt.Errorf("Failed to parse JSON response: %v", err)
 	}
 
 	debugf("Ping status code: %v", status)
-	return status < 300, nil
-}
-
-func (conn *Connection) IsConnected() bool {
-	return conn.connected
+	logp.Info("Connected to Elasticsearch version %s", response.Version.Number)
+	return response.Version.Number, nil
 }
 
 func (conn *Connection) Close() error {
-	conn.connected = false
 	return nil
 }
 
@@ -575,20 +577,17 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 
 	resp, err := conn.http.Do(req)
 	if err != nil {
-		conn.connected = false
 		return 0, nil, err
 	}
 	defer closing(resp.Body)
 
 	status := resp.StatusCode
 	if status >= 300 {
-		conn.connected = false
 		return status, nil, fmt.Errorf("%v", resp.Status)
 	}
 
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		conn.connected = false
 		return status, nil, err
 	}
 	return status, obj, nil

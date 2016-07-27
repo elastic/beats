@@ -19,6 +19,7 @@ import "C"
 //import "github.com/davecgh/go-spew/spew"
 
 import (
+	"runtime"
 	"syscall"
 	"time"
 	"unsafe"
@@ -185,6 +186,10 @@ func (self *FileSystemUsage) Get(path string) error {
 	self.FreeFiles = stat.F_ffree
 
 	return nil
+}
+
+func (self *FDUsage) Get() error {
+	return &ErrNotImplemented{runtime.GOOS}
 }
 
 func (self *LoadAverage) Get() error {
@@ -366,6 +371,10 @@ func (self *ProcTime) Get(pid int) error {
 
 func (self *ProcExe) Get(pid int) error {
 	return nil
+}
+
+func (self *ProcFDUsage) Get(pid int) error {
+	return &ErrNotImplemented{runtime.GOOS}
 }
 
 func fillCpu(cpu *Cpu, load [C.CPUSTATES]C.long) {

@@ -22,8 +22,6 @@ type client struct {
 	producer sarama.AsyncProducer
 
 	wg sync.WaitGroup
-
-	isConnected int32
 }
 
 type msgRef struct {
@@ -35,9 +33,9 @@ type msgRef struct {
 }
 
 var (
-	ackedEvents            = expvar.NewInt("libbeatKafkaPublishedAndAckedEvents")
-	eventsNotAcked         = expvar.NewInt("libbeatKafkaPublishedButNotAckedEvents")
-	publishEventsCallCount = expvar.NewInt("libbeatKafkaPublishEventsCallCount")
+	ackedEvents            = expvar.NewInt("libbeat.kafka.published_and_acked_events")
+	eventsNotAcked         = expvar.NewInt("libbeat.kafka.published_but_not_acked_events")
+	publishEventsCallCount = expvar.NewInt("libbeat.kafka.call_count.PublishEvents")
 )
 
 func newKafkaClient(hosts []string, topic string, useType bool, cfg *sarama.Config) (*client, error) {
@@ -67,25 +65,17 @@ func (c *client) Connect(timeout time.Duration) error {
 	c.wg.Add(2)
 	go c.successWorker(producer.Successes())
 	go c.errorWorker(producer.Errors())
-	atomic.StoreInt32(&c.isConnected, 1)
 
 	return nil
 }
 
 func (c *client) Close() error {
-	if c.IsConnected() {
-		debugf("closed kafka client")
+	debugf("closed kafka client")
 
-		c.producer.AsyncClose()
-		c.wg.Wait()
-		atomic.StoreInt32(&c.isConnected, 0)
-		c.producer = nil
-	}
+	c.producer.AsyncClose()
+	c.wg.Wait()
+	c.producer = nil
 	return nil
-}
-
-func (c *client) IsConnected() bool {
-	return atomic.LoadInt32(&c.isConnected) != 0
 }
 
 func (c *client) AsyncPublishEvent(

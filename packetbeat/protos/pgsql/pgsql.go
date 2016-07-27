@@ -2,6 +2,7 @@ package pgsql
 
 import (
 	"errors"
+	"expvar"
 	"strings"
 	"time"
 
@@ -95,6 +96,10 @@ var (
 var (
 	debugf    = logp.MakeDebug("pgsql")
 	detailedf = logp.MakeDebug("pgsqldetailed")
+)
+
+var (
+	unmatchedResponses = expvar.NewInt("pgsql.unmatched_responses")
 )
 
 type Pgsql struct {
@@ -411,7 +416,8 @@ func (pgsql *Pgsql) receivedPgsqlResponse(msg *PgsqlMessage) {
 	tuple := msg.TcpTuple
 	transList := pgsql.getTransaction(tuple.Hashable())
 	if transList == nil || len(transList) == 0 {
-		logp.Warn("Response from unknown transaction. Ignoring.")
+		debugf("Response from unknown transaction. Ignoring.")
+		unmatchedResponses.Add(1)
 		return
 	}
 
@@ -420,7 +426,8 @@ func (pgsql *Pgsql) receivedPgsqlResponse(msg *PgsqlMessage) {
 
 	// check if the request was received
 	if trans.Pgsql == nil {
-		logp.Warn("Response from unknown transaction. Ignoring.")
+		debugf("Response from unknown transaction. Ignoring.")
+		unmatchedResponses.Add(1)
 		return
 	}
 

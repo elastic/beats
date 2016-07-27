@@ -1,7 +1,7 @@
 - name: filesystem
   type: group
   description: >
-    `filesystem` contains local filesystem stats
+    `filesystem` contains local filesystem stats.
   fields:
     - name: avail
       type: long
@@ -36,7 +36,7 @@
       description: >
         The used disk space in bytes.
     - name: used.pct
-      type: float
+      type: half_float
       description: >
         The percentage of used disk space.
 

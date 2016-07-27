@@ -129,7 +129,7 @@ func testEvent() common.MapStr {
 }
 
 type testPublisher struct {
-	pub              *Publisher
+	pub              *BeatPublisher
 	outputMsgHandler *testMessageHandler
 	client           *client
 }
@@ -147,7 +147,7 @@ const (
 )
 
 func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
-	pub := &Publisher{}
+	pub := &BeatPublisher{}
 	pub.wsOutput.Init()
 	pub.wsPublisher.Init()
 

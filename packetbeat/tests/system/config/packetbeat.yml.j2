@@ -174,28 +174,22 @@ geoip:
   ]
 {%- endif %}
 
-{%- if drop_fields or drop_event or include_fields %}
+{%- if processors %}
 
 #================================ Filters =====================================
-filters:
 
-    {%- if include_fields %}
-    - include_fields:
-        {{include_fields.condition | default()}}
-        fields: {{include_fields.fields | default([])}}
-    {%- endif %}
-
-    {%- if drop_fields %}
-    - drop_fields:
-        {{drop_fields.condition | default()}}
-        fields: {{drop_fields.fields | default([])}}
-    {%- endif %}
-
-
-    {%- if drop_event %}
-    - drop_event:
-        {{ drop_event.condition | default()}}
-    {%- endif %}
+processors:
+{%- for processor in processors %}
+{%- for name, settings in processor.iteritems() %}
+- {{name}}:
+  {%- if settings %}
+  {%- for k, v in settings.iteritems() %}
+    {{k}}:
+      {{v | default([])}}
+  {%- endfor %}
+  {%- endif %}
+{%- endfor %}
+{%- endfor %}
 
 {%- endif %}
 

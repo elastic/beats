@@ -7,11 +7,11 @@
     - name: hostname
       type: keyword
       description: >
-        Zookeeper hostname.
+        ZooKeeper hostname.
     - name: approximate_data_size
       type: long
       description: >
-        Approximate size of zookeeper data.
+        Approximate size of ZooKeeper data.
     - name: latency.avg
       type: integer
       description: >
@@ -27,7 +27,7 @@
     - name: max_file_descriptor_count
       type: integer
       description: >
-        Maximum number of file descriptors allowed for the zookeeper process.
+        Maximum number of file descriptors allowed for the ZooKeeper process.
     - name: latency.max
       type: integer
       description: >
@@ -39,11 +39,11 @@
     - name: num_alive_connections
       type: integer
       description: >
-        Number of connections to zookeeper that are currently alive.
+        Number of connections to ZooKeeper that are currently alive.
     - name: open_file_descriptor_count
       type: integer
       description: >
-        Number of file descriptors open by the zookeeper process.
+        Number of file descriptors open by the ZooKeeper process.
     - name: outstanding_requests
       type: integer
       description: >
@@ -51,19 +51,19 @@
     - name: packets.received
       type: integer
       description: >
-        Number zookeeper network packets received.
+        Number of ZooKeeper network packets received.
     - name: packets.sent
       type: long
       description: >
-        Number zookeeper network packets sent.
+        Number of ZooKeeper network packets sent.
     - name: pending_syncs
       type: integer
       description: >
-        Number of pending syncs to carry out to zookeeper ensemble followers.
+        Number of pending syncs to carry out to ZooKeeper ensemble followers.
     - name: server_state
       type: keyword
       description: >
-        Role in the zookeeper ensemble.
+        Role in the ZooKeeper ensemble.
     - name: synced_followers
       type: integer
       description: >
@@ -71,12 +71,12 @@
     - name: version
       type: keyword
       description: >
-        Zookeeper version and build string reported.
+        ZooKeeper version and build string reported.
     - name: watch_count
       type: integer
       description: >
-        Number of watches currently set on the local zookeeper process.
+        Number of watches currently set on the local ZooKeeper process.
     - name: znode_count
       type: integer
       description: >
-        Number of znodes reported by the local zookeeper process.
+        Number of znodes reported by the local ZooKeeper process.

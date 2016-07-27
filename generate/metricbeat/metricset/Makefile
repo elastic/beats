@@ -18,7 +18,7 @@ test: python-env
 
 	# Makes sure to use current version of beats for testing
 	mkdir -p ${BUILD_DIR}/src/github.com/elastic/beats/
-	cp -r ${PWD}/../../../metricbeat ${PWD}/../../../libbeat ${PWD}/../../../topbeat ${PWD}/../../../vendor ${BUILD_DIR}/src/github.com/elastic/beats/
+	cp -r ${PWD}/../../../metricbeat ${PWD}/../../../libbeat ${PWD}/../../../vendor ${BUILD_DIR}/src/github.com/elastic/beats/
 
 	. ${PYTHON_ENV}/bin/activate; \
 	export GOPATH=${PWD}/build ; \

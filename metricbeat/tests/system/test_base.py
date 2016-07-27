@@ -5,7 +5,7 @@ from metricbeat import BaseTest
 
 
 class Test(BaseTest):
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_start_stop(self):
         """
         Metricbeat starts and stops without error.
@@ -24,8 +24,6 @@ class Test(BaseTest):
         self.assertNotRegexpMatches(log, "ERR|WARN")
 
         # Ensure all Beater stages are used.
-        self.assertRegexpMatches(log, re.compile("(?i).*".join([
-            "Setup Beat: metricbeat",
-            "metricbeat start running",
-            "metricbeat cleanup"
-        ]), re.DOTALL))
+        assert self.log_contains("Setup Beat: metricbeat")
+        assert self.log_contains("metricbeat start running")
+        assert self.log_contains("metricbeat stopped")

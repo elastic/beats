@@ -17,9 +17,7 @@ func TestClientConnect(t *testing.T) {
 
 	client := GetTestingElasticsearch()
 	err := client.Connect(5 * time.Second)
-
-	assert.Nil(t, err)
-	assert.True(t, client.IsConnected())
+	assert.NoError(t, err)
 }
 
 func TestCheckTemplate(t *testing.T) {
@@ -91,7 +89,6 @@ func TestLoadInvalidTemplate(t *testing.T) {
 func TestLoadBeatsTemplate(t *testing.T) {
 
 	beats := []string{
-		"topbeat",
 		"filebeat",
 		"packetbeat",
 		"metricbeat",
@@ -146,15 +143,16 @@ func TestOutputLoadTemplate(t *testing.T) {
 	// Make sure template is not yet there
 	assert.False(t, client.CheckTemplate("libbeat"))
 
-	tPath, err := filepath.Abs("../../../topbeat/topbeat.template.json")
+	tPath, err := filepath.Abs("../../../packetbeat/packetbeat.template.json")
 	if err != nil {
 		t.Fatal(err)
 	}
 	config := map[string]interface{}{
 		"hosts": GetEsHost(),
 		"template": map[string]interface{}{
-			"name": "libbeat",
-			"path": tPath,
+			"name":                "libbeat",
+			"path":                tPath,
+			"versions.2x.enabled": false,
 		},
 	}
 
@@ -163,7 +161,7 @@ func TestOutputLoadTemplate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	output, err := New(cfg, 0)
+	output, err := New("libbeat", cfg, 0)
 	if err != nil {
 		t.Fatal(err)
 	}

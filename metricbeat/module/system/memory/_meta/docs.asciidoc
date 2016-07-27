@@ -1,3 +1,11 @@
-=== System Memory MetricSet
+=== System Memory Metricset
 
-The System Memory MetricSet provides memory statistics.
+The System `memory` metricset provides memory statistics.
+
+This metricset is available on:
+
+- Darwin
+- FreeBSD
+- Linux
+- OpenBSD
+- Windows

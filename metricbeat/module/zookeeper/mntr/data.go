@@ -7,16 +7,45 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	h "github.com/elastic/beats/metricbeat/helper"
+	s "github.com/elastic/beats/metricbeat/schema"
+	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
 )
 
 var (
 	// Matches first the variable name, second the param itself
 	paramMatcher = regexp.MustCompile("([^\\s]+)\\s+(.*$)")
+	schema_      = s.Schema{
+		"version": c.Str("zk_version"),
+		"latency": s.Object{
+			"avg": c.Int("zk_avg_latency"),
+			"min": c.Int("zk_min_latency"),
+			"max": c.Int("zk_max_latency"),
+		},
+		"packets": s.Object{
+			"received": c.Int("zk_packets_received"),
+			"sent":     c.Int("zk_packets_sent"),
+		},
+		"num_alive_connections": c.Int("zk_num_alive_connections"),
+		"outstanding_requests":  c.Int("zk_outstanding_requests"),
+		"server_state":          c.Str("zk_server_state"),
+		"znode_count":           c.Int("zk_znode_count"),
+		"watch_count":           c.Int("zk_watch_count"),
+		"ephemerals_count":      c.Int("zk_ephemerals_count"),
+		"approximate_data_size": c.Int("zk_approximate_data_size"),
+	}
+	schemaLeader = s.Schema{
+		"followers":        c.Int("zk_followers"),
+		"synced_followers": c.Int("zk_synced_followers"),
+		"pending_syncs":    c.Int("zk_pending_syncs"),
+	}
+	schemaUnix = s.Schema{
+		"open_file_descriptor_count": c.Int("zk_open_file_descriptor_count"),
+		"max_file_descriptor_count":  c.Int("zk_max_file_descriptor_count"),
+	}
 )
 
 func eventMapping(response io.Reader) common.MapStr {
-	fullEvent := map[string]string{}
+	fullEvent := map[string]interface{}{}
 	scanner := bufio.NewScanner(response)
 
 	// Iterate through all events to gather data
@@ -28,38 +57,16 @@ func eventMapping(response io.Reader) common.MapStr {
 		}
 	}
 
-	// Manually convert and select fields which are used
-	event := common.MapStr{
-		"version": h.ToStr("zk_version", fullEvent),
-		"latency": common.MapStr{
-			"avg": h.ToInt("zk_avg_latency", fullEvent),
-			"min": h.ToInt("zk_min_latency", fullEvent),
-			"max": h.ToInt("zk_max_latency", fullEvent),
-		},
-		"packets": common.MapStr{
-			"received": h.ToInt("zk_packets_received", fullEvent),
-			"sent":     h.ToInt("zk_packets_sent", fullEvent),
-		},
-		"num_alive_connections": h.ToInt("zk_num_alive_connections", fullEvent),
-		"outstanding_requests":  h.ToInt("zk_outstanding_requests", fullEvent),
-		"server_state":          h.ToStr("zk_server_state", fullEvent),
-		"znode_count":           h.ToInt("zk_znode_count", fullEvent),
-		"watch_count":           h.ToInt("zk_watch_count", fullEvent),
-		"ephemerals_count":      h.ToInt("zk_ephemerals_count", fullEvent),
-		"approximate_data_size": h.ToInt("zk_approximate_data_size", fullEvent),
-	}
+	event := schema_.Apply(fullEvent)
 
 	// only exposed by the Leader
 	if _, ok := fullEvent["zk_followers"]; ok {
-		event["followers"] = h.ToInt("zk_followers", fullEvent)
-		event["synced_followers"] = h.ToInt("zk_synced_followers", fullEvent)
-		event["pending_syncs"] = h.ToInt("zk_pending_syncs", fullEvent)
+		schemaLeader.ApplyTo(event, fullEvent)
 	}
 
 	// only available on Unix platforms
 	if _, ok := fullEvent["open_file_descriptor_count"]; ok {
-		event["open_file_descriptor_count"] = h.ToInt("zk_open_file_descriptor_count", fullEvent)
-		event["max_file_descriptor_count"] = h.ToInt("zk_max_file_descriptor_count", fullEvent)
+		schemaUnix.ApplyTo(event, fullEvent)
 	}
 
 	return event

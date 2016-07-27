@@ -3,7 +3,6 @@
 package tcp
 
 import (
-	"fmt"
 	"math/rand"
 	"net"
 	"testing"
@@ -186,45 +185,128 @@ func (p protocols) GetAllTcp() map[protos.Protocol]protos.TcpPlugin      { retur
 func (p protocols) GetAllUdp() map[protos.Protocol]protos.UdpPlugin      { return nil }
 func (p protocols) Register(proto protos.Protocol, plugin protos.Plugin) { return }
 
-func TestGapInStreamShouldDropState(t *testing.T) {
-	gap := 0
-	var state []byte
-
-	data1 := []byte{1, 2, 3, 4}
-	data2 := []byte{5, 6, 7, 8}
-
-	tp := &TestProtocol{Ports: []int{ServerPort}}
-	tp.gap = func(t *common.TcpTuple, d uint8, n int, p protos.ProtocolData) (protos.ProtocolData, bool) {
-		fmt.Printf("lost: %v\n", n)
-		gap += n
-		return p, true // drop state
+func TestTCSeqPayload(t *testing.T) {
+	type segment struct {
+		seq     uint32
+		payload []byte
 	}
-	tp.parse = func(p *protos.Packet, t *common.TcpTuple, d uint8, priv protos.ProtocolData) protos.ProtocolData {
-		if priv == nil {
-			state = nil
+
+	tests := []struct {
+		name          string
+		segments      []segment
+		expectedGaps  int
+		expectedState []byte
+	}{
+		{"No overlap",
+			[]segment{
+				{1, []byte{1, 2, 3, 4, 5}},
+				{6, []byte{6, 7, 8, 9, 10}},
+			},
+			0,
+			[]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+		},
+		{"Gap drop state",
+			[]segment{
+				{1, []byte{1, 2, 3, 4}},
+				{15, []byte{5, 6, 7, 8}},
+			},
+			10,
+			[]byte{5, 6, 7, 8},
+		},
+		{"ACK same sequence number",
+			[]segment{
+				{1, []byte{1, 2}},
+				{3, nil},
+				{3, []byte{3, 4}},
+				{5, []byte{5, 6}},
+			},
+			0,
+			[]byte{1, 2, 3, 4, 5, 6},
+		},
+		{"ACK same sequence number 2",
+			[]segment{
+				{1, nil},
+				{2, nil},
+				{2, []byte{1, 2}},
+				{4, nil},
+				{4, []byte{3, 4}},
+				{6, []byte{5, 6}},
+				{8, []byte{7, 8}},
+				{10, nil},
+			},
+			0,
+			[]byte{1, 2, 3, 4, 5, 6, 7, 8},
+		},
+		{"Overlap, first segment bigger",
+			[]segment{
+				{1, []byte{1, 2}},
+				{3, []byte{3, 4}},
+				{3, []byte{3}},
+				{5, []byte{5, 6}},
+			},
+			0,
+			[]byte{1, 2, 3, 4, 5, 6},
+		},
+		{"Overlap, second segment bigger",
+			[]segment{
+				{1, []byte{1, 2}},
+				{3, []byte{3}},
+				{3, []byte{3, 4}},
+				{5, []byte{5, 6}},
+			},
+			0,
+			[]byte{1, 2, 3, 4, 5, 6},
+		},
+		{"Overlap, covered",
+			[]segment{
+				{1, []byte{1, 2, 3, 4}},
+				{2, []byte{2, 3}},
+				{5, []byte{5, 6}},
+			},
+			0,
+			[]byte{1, 2, 3, 4, 5, 6},
+		},
+	}
+
+	for i, test := range tests {
+		t.Logf("Test (%v): %v", i, test.name)
+
+		gap := 0
+		var state []byte
+		tcp, err := NewTcp(protocols{
+			tcp: map[protos.Protocol]protos.TcpPlugin{
+				httpProtocol: &TestProtocol{
+					Ports: []int{ServerPort},
+					gap:   makeCountGaps(nil, &gap),
+					parse: makeCollectPayload(&state, true),
+				},
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
 		}
-		state = append(state, p.Payload...)
-		return state
+
+		addr := common.NewIpPortTuple(4,
+			net.ParseIP(ServerIp), ServerPort,
+			net.ParseIP(ClientIp), uint16(rand.Intn(65535)))
+
+		for _, segment := range test.segments {
+			hdr := &layers.TCP{Seq: segment.seq}
+			pkt := &protos.Packet{
+				Ts:      time.Now(),
+				Tuple:   addr,
+				Payload: segment.payload,
+			}
+			tcp.Process(nil, hdr, pkt)
+		}
+
+		assert.Equal(t, test.expectedGaps, gap)
+		if len(test.expectedState) != len(state) {
+			assert.Equal(t, len(test.expectedState), len(state))
+			continue
+		}
+		assert.Equal(t, test.expectedState, state)
 	}
-
-	p := protocols{}
-	p.tcp = map[protos.Protocol]protos.TcpPlugin{
-		httpProtocol: tp,
-	}
-	tcp, _ := NewTcp(p)
-
-	addr := common.NewIpPortTuple(4,
-		net.ParseIP(ServerIp), ServerPort,
-		net.ParseIP(ClientIp), uint16(rand.Intn(65535)))
-
-	hdr := &layers.TCP{}
-	tcp.Process(nil, hdr, &protos.Packet{Ts: time.Now(), Tuple: addr, Payload: data1})
-	hdr.Seq += uint32(len(data1) + 10)
-	tcp.Process(nil, hdr, &protos.Packet{Ts: time.Now(), Tuple: addr, Payload: data2})
-
-	// validate
-	assert.Equal(t, 10, gap)
-	assert.Equal(t, data2, state)
 }
 
 // Benchmark that runs with parallelism to help find concurrency related
@@ -250,4 +332,43 @@ func BenchmarkParallelProcess(b *testing.B) {
 			tcp.Process(nil, &layers.TCP{}, pkt)
 		}
 	})
+}
+
+func makeCountGaps(
+	counter *int,
+	bytes *int,
+) func(*common.TcpTuple, uint8, int, protos.ProtocolData) (protos.ProtocolData, bool) {
+	return func(
+		t *common.TcpTuple,
+		d uint8,
+		n int,
+		p protos.ProtocolData,
+	) (protos.ProtocolData, bool) {
+		if counter != nil {
+			(*counter)++
+		}
+		if bytes != nil {
+			*bytes += n
+		}
+
+		return p, true // drop state
+	}
+}
+
+func makeCollectPayload(
+	state *[]byte,
+	resetOnNil bool,
+) func(*protos.Packet, *common.TcpTuple, uint8, protos.ProtocolData) protos.ProtocolData {
+	return func(
+		p *protos.Packet,
+		t *common.TcpTuple,
+		d uint8,
+		priv protos.ProtocolData,
+	) protos.ProtocolData {
+		if resetOnNil && priv == nil {
+			(*state) = nil
+		}
+		*state = append(*state, p.Payload...)
+		return *state
+	}
 }

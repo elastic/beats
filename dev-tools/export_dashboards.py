@@ -104,11 +104,11 @@ def main():
                         help="Elasticsearch URL. E.g. http://localhost:9200",
                         default="http://localhost:9200")
     parser.add_argument("--beat",
-                        help="Beat name e.g. topbeat",
+                        help="Beat name e.g. metricbeat",
                         required=True)
     parser.add_argument("--index",
                         help="Elasticsearch index for the Beat data. "
-                        "E.g. topbeat-*")
+                        "E.g. metricbeat-*")
     parser.add_argument("--kibana",
                         help="Elasticsearch index for the Kibana dashboards. "
                         "E.g. .kibana",

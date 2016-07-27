@@ -17,7 +17,6 @@ following folders:
 Folder  | Description
 --- | ---
 [libbeat](https://github.com/elastic/beats/tree/master/libbeat) | The Go framework for creating new Beats
-[Topbeat](https://github.com/elastic/beats/tree/master/topbeat) | Like 'top' but inserting the data into Elasticsearch
 [Packetbeat](https://github.com/elastic/beats/tree/master/packetbeat) | Tap into your wire data
 [Filebeat](https://github.com/elastic/beats/tree/master/filebeat) | Lightweight log forwarder to Logstash & Elasticsearch
 [Winlogbeat](https://github.com/elastic/beats/tree/master/winlogbeat) | Sends Windows Event logs
