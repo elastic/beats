@@ -65,17 +65,21 @@ func (p *ProspectorLog) Run() {
 		logp.Debug("prospector", "Prospector states cleaned up. Before: %d, After: %d", beforeCount, p.Prospector.states.Count())
 	}
 
-	// Cleanup of removed files will only happen after next scan. Otherwise it can happen that not all states
-	// were updated before cleanup is called
+	// Marking removed files to be cleaned up. Cleanup happens after next scan to make sure all states are updated first
 	if p.config.CleanRemoved {
 		for _, state := range p.Prospector.states.GetStates() {
 			// os.Stat will return an error in case the file does not exist
 			_, err := os.Stat(state.Source)
 			if err != nil {
-				state.TTL = 0
-				event := input.NewEvent(state)
-				p.Prospector.harvesterChan <- event
-				logp.Debug("prospector", "Remove state for file as file removed: %s", state.Source)
+				// Only clean up files where state is Finished
+				if state.Finished {
+					state.TTL = 0
+					event := input.NewEvent(state)
+					p.Prospector.harvesterChan <- event
+					logp.Debug("prospector", "Remove state for file as file removed: %s", state.Source)
+				} else {
+					logp.Debug("prospector", "State for file not removed because not finished: %s", state.Source)
+				}
 			}
 		}
 	}
