@@ -66,6 +66,10 @@ func (s Selector) Select(evt common.MapStr) (string, error) {
 	return s.sel.sel(evt)
 }
 
+func (s Selector) IsEmpty() bool {
+	return s.sel == nilSelector || s.sel == nil
+}
+
 func BuildSelector(cfg *common.Config, settings Settings) (Selector, error) {
 	var sel []selector
 
