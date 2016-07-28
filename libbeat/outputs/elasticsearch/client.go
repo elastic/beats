@@ -16,12 +16,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 type Client struct {
 	Connection
-	index  string
+	index  outil.Selector
 	params map[string]string
 
 	// buffered bulk requests
@@ -75,7 +76,10 @@ var (
 )
 
 func NewClient(
-	esURL, index string, proxyURL *url.URL, tls *tls.Config,
+	esURL string,
+	index outil.Selector,
+	proxyURL *url.URL,
+	tls *tls.Config,
 	username, password string,
 	params map[string]string,
 	timeout time.Duration,
@@ -228,7 +232,7 @@ func (client *Client) PublishEvents(
 // successfully added to bulk request.
 func bulkEncodePublishRequest(
 	body bulkWriter,
-	index string,
+	index outil.Selector,
 	events []common.MapStr,
 ) []common.MapStr {
 	okEvents := events[:0]
@@ -245,11 +249,10 @@ func bulkEncodePublishRequest(
 	return okEvents
 }
 
-func eventBulkMeta(index string, event common.MapStr) bulkMeta {
-	index = getIndex(event, index)
+func eventBulkMeta(index outil.Selector, event common.MapStr) bulkMeta {
 	meta := bulkMeta{
 		Index: bulkMetaIndex{
-			Index:   index,
+			Index:   getIndex(event, index),
 			DocType: event["type"].(string),
 		},
 	}
@@ -259,29 +262,27 @@ func eventBulkMeta(index string, event common.MapStr) bulkMeta {
 // getIndex returns the full index name
 // Index is either defined in the config as part of the output
 // or can be overload by the event through setting index
-func getIndex(event common.MapStr, index string) string {
+func getIndex(event common.MapStr, index outil.Selector) string {
 
 	ts := time.Time(event["@timestamp"].(common.Time)).UTC()
 
 	// Check for dynamic index
+	// XXX: is this used/needed?
 	if _, ok := event["beat"]; ok {
 		beatMeta, ok := event["beat"].(common.MapStr)
 		if ok {
 			// Check if index is set dynamically
 			if dynamicIndex, ok := beatMeta["index"]; ok {
-				dynamicIndexValue, ok := dynamicIndex.(string)
-				if ok {
-					index = dynamicIndexValue
+				if dynamicIndexValue, ok := dynamicIndex.(string); ok {
+					return fmt.Sprintf("%s-%d.%02d.%02d",
+						dynamicIndexValue, ts.Year(), ts.Month(), ts.Day())
 				}
 			}
 		}
 	}
 
-	// Append timestamp to index
-	index = fmt.Sprintf("%s-%d.%02d.%02d", index,
-		ts.Year(), ts.Month(), ts.Day())
-
-	return index
+	str, _ := index.Select(event)
+	return str
 }
 
 // bulkCollectPublishFails checks per item errors returning all events

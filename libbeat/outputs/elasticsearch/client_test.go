@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -128,7 +130,11 @@ func TestGetIndexStandard(t *testing.T) {
 		"field":      1,
 	}
 
-	index := getIndex(event, "beatname")
+	pattern := "beatname-%{+yyyy.MM.dd}"
+	fmtstr := fmtstr.MustCompileEvent(pattern)
+	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(fmtstr, ""))
+
+	index := getIndex(event, indexSel)
 	assert.Equal(t, index, "beatname-"+extension)
 }
 
@@ -145,7 +151,12 @@ func TestGetIndexOverwrite(t *testing.T) {
 			"index": "dynamicindex",
 		},
 	}
-	index := getIndex(event, "beatname")
+
+	pattern := "beatname-%%{+yyyy.MM.dd}"
+	fmtstr := fmtstr.MustCompileEvent(pattern)
+	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(fmtstr, ""))
+
+	index := getIndex(event, indexSel)
 	assert.Equal(t, index, "dynamicindex-"+extension)
 }
 
