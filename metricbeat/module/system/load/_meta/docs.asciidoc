@@ -1,0 +1,10 @@
+=== system load MetricSet
+
+The System `load` metricset provides load statistics.
+
+This metricset is available on:
+
+ - Darwin
+ - FreeBSD
+ - Linux
+ - OpenBSD

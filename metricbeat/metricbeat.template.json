@@ -1059,19 +1059,6 @@
                     }
                   }
                 },
-                "load": {
-                  "properties": {
-                    "1": {
-                      "type": "half_float"
-                    },
-                    "15": {
-                      "type": "half_float"
-                    },
-                    "5": {
-                      "type": "half_float"
-                    }
-                  }
-                },
                 "nice": {
                   "properties": {
                     "pct": {
@@ -1171,7 +1158,7 @@
             },
             "filesystem": {
               "properties": {
-                "avail": {
+                "available": {
                   "type": "long"
                 },
                 "device_name": {
@@ -1229,24 +1216,36 @@
                 }
               }
             },
-            "memory": {
+            "load": {
               "properties": {
-                "actual": {
+                "1": {
+                  "type": "half_float"
+                },
+                "15": {
+                  "type": "half_float"
+                },
+                "5": {
+                  "type": "half_float"
+                },
+                "norm": {
                   "properties": {
-                    "free": {
-                      "type": "long"
+                    "1": {
+                      "type": "half_float"
                     },
-                    "used": {
-                      "properties": {
-                        "bytes": {
-                          "type": "long"
-                        },
-                        "pct": {
-                          "type": "half_float"
-                        }
-                      }
+                    "15": {
+                      "type": "half_float"
+                    },
+                    "5": {
+                      "type": "half_float"
                     }
                   }
+                }
+              }
+            },
+            "memory": {
+              "properties": {
+                "available": {
+                  "type": "long"
                 },
                 "free": {
                   "type": "long"

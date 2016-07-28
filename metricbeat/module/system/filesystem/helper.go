@@ -82,7 +82,7 @@ func GetFilesystemEvent(fsStat *FileSystemStat) common.MapStr {
 		"mount_point": fsStat.Mount,
 		"total":       fsStat.Total,
 		"free":        fsStat.Free,
-		"avail":       fsStat.Avail,
+		"available":   fsStat.Avail,
 		"files":       fsStat.Files,
 		"free_files":  fsStat.FreeFiles,
 		"used": common.MapStr{
