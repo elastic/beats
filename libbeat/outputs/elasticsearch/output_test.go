@@ -17,7 +17,7 @@ import (
 var testOptions = outputs.Options{}
 
 func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearchOutput {
-	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
+	index := fmt.Sprintf("packetbeat-int-test-%d", os.Getpid())
 
 	esPort, err := strconv.Atoi(GetEsPort())
 
@@ -32,7 +32,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 		"username":         os.Getenv("ES_USER"),
 		"password":         os.Getenv("ES_PASS"),
 		"path":             "",
-		"index":            index,
+		"index":            fmt.Sprintf("%v-%%{+yyyy.MM.dd}", index),
 		"protocol":         "http",
 		"flush_interval":   flushInterval,
 		"bulk_max_size":    bulkSize,
@@ -95,7 +95,7 @@ func TestOneEvent(t *testing.T) {
 	output := createElasticsearchConnection(0, 0)
 
 	event := common.MapStr{}
-	event["@timestamp"] = common.Time(time.Now())
+	event["@timestamp"] = common.Time(ts)
 	event["type"] = "redis"
 	event["status"] = "OK"
 	event["responsetime"] = 34
@@ -108,7 +108,7 @@ func TestOneEvent(t *testing.T) {
 	r["request"] = "MGET key1"
 	r["response"] = "value1"
 
-	index := fmt.Sprintf("%s-%d.%02d.%02d", output.index, ts.Year(), ts.Month(), ts.Day())
+	index, _ := output.index.Select(event)
 	debugf("index = %s", index)
 
 	client := output.randomClient()
@@ -167,7 +167,7 @@ func TestEvents(t *testing.T) {
 	output := createElasticsearchConnection(0, 0)
 
 	event := common.MapStr{}
-	event["@timestamp"] = common.Time(time.Now())
+	event["@timestamp"] = common.Time(ts)
 	event["type"] = "redis"
 	event["status"] = "OK"
 	event["responsetime"] = 34
@@ -181,7 +181,7 @@ func TestEvents(t *testing.T) {
 	r["response"] = "value1"
 	event["redis"] = r
 
-	index := fmt.Sprintf("%s-%d.%02d.%02d", output.index, ts.Year(), ts.Month(), ts.Day())
+	index, _ := output.index.Select(event)
 	output.randomClient().CreateIndex(index, common.MapStr{
 		"settings": common.MapStr{
 			"number_of_shards":   1,
@@ -233,7 +233,9 @@ func TestEvents(t *testing.T) {
 
 func testBulkWithParams(t *testing.T, output elasticsearchOutput) {
 	ts := time.Now()
-	index := fmt.Sprintf("%s-%d.%02d.%02d", output.index, ts.Year(), ts.Month(), ts.Day())
+	index, _ := output.index.Select(common.MapStr{
+		"@timestamp": common.Time(ts),
+	})
 
 	output.randomClient().CreateIndex(index, common.MapStr{
 		"settings": common.MapStr{
