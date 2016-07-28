@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Swap usage\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.memory.swap.used.bytes\",\"customLabel\":\"Swap usage\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Swap usage", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Memory-stats", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}
