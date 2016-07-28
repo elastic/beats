@@ -1088,19 +1088,6 @@
                     }
                   }
                 },
-                "load": {
-                  "properties": {
-                    "1": {
-                      "type": "float"
-                    },
-                    "15": {
-                      "type": "float"
-                    },
-                    "5": {
-                      "type": "float"
-                    }
-                  }
-                },
                 "nice": {
                   "properties": {
                     "pct": {
@@ -1202,7 +1189,7 @@
             },
             "filesystem": {
               "properties": {
-                "avail": {
+                "available": {
                   "type": "long"
                 },
                 "device_name": {
@@ -1262,24 +1249,36 @@
                 }
               }
             },
-            "memory": {
+            "load": {
               "properties": {
-                "actual": {
+                "1": {
+                  "type": "float"
+                },
+                "15": {
+                  "type": "float"
+                },
+                "5": {
+                  "type": "float"
+                },
+                "norm": {
                   "properties": {
-                    "free": {
-                      "type": "long"
+                    "1": {
+                      "type": "float"
                     },
-                    "used": {
-                      "properties": {
-                        "bytes": {
-                          "type": "long"
-                        },
-                        "pct": {
-                          "type": "float"
-                        }
-                      }
+                    "15": {
+                      "type": "float"
+                    },
+                    "5": {
+                      "type": "float"
                     }
                   }
+                }
+              }
+            },
+            "memory": {
+              "properties": {
+                "available": {
+                  "type": "long"
                 },
                 "free": {
                   "type": "long"
