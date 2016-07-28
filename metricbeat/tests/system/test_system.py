@@ -28,7 +28,8 @@ SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "files", "free",
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
-SYSTEM_MEMORY_FIELDS = ["swap", "available", "free", "total", "used.bytes", "used.pct"]
+SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "used.pct", "actual.used.bytes",
+                        "actual.used.pct"]
 
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
                          "in.packets", "in.error", "out.error", "in.dropeed", "out.dropped"]
