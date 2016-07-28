@@ -44,6 +44,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 ==== Added
 
 *Affecting all Beats*
+- Add script to generate the Kibana index-pattern from fields.yml. {pull}2122[2122]
 
 *Metricbeat*
 

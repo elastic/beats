@@ -1002,11 +1002,13 @@
 
         - name: request.bytes
           type: long
+          format: bytes
           description: >
             The byte count of the values being transfered.
 
         - name: response.bytes
           type: long
+          format: bytes
           description: >
             The byte count of the values being transfered.
 
@@ -1410,6 +1412,7 @@
         the application layer message length, without the length of the IP or
         TCP headers.
       type: long
+      format: bytes
 
     - name: bytes_out
       description: >
@@ -1417,6 +1420,7 @@
         the application layer message length, without the length of the IP or
         TCP headers.
       type: long
+      format: bytes
 
     - name: dnstime
       type: long

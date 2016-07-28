@@ -396,6 +396,7 @@
               fields:
                 - name: heap_usage.bytes
                   type: long
+                  format: bytes
                   description: >
                     The total size in bytes of heap space used by the database process.
                     Only available on Unix/Linux.
@@ -413,10 +414,12 @@
               fields:
                 - name: in.bytes
                   type: long
+                  format: bytes
                   description: >
                     The amount of network traffic, in bytes, received by this database.
                 - name: out.bytes
                   type: long
+                  format: bytes
                   description: >
                     The amount of network traffic, in bytes, sent from this database.
                 - name: requests
@@ -594,12 +597,14 @@
                 Bytes stats.
               fields:
                 - name: received
+                  format: bytes
                   type: integer
                   description: >
                     The number of bytes received from all clients.
 
                 - name: sent
                   type: integer
+                  format: bytes
                   description: >
                     The number of bytes sent to all clients.
 
@@ -1117,6 +1122,7 @@
 
             - name: user.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
                 For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
@@ -1128,6 +1134,7 @@
 
             - name: system.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in kernel space.
 
@@ -1138,6 +1145,7 @@
 
             - name: nice.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent on low-priority processes.
 
@@ -1148,6 +1156,7 @@
 
             - name: idle.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent idle.
 
@@ -1158,6 +1167,7 @@
 
             - name: iowait.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in wait (on disk).
 
@@ -1168,6 +1178,7 @@
 
             - name: irq.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -1178,6 +1189,7 @@
 
             - name: softirq.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent servicing and handling software interrupts.
 
@@ -1188,6 +1200,7 @@
 
             - name: steal.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
@@ -1207,42 +1220,50 @@
           fields:
             - name: user.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
                 For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
             - name: system.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in kernel space.
 
             - name: nice.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent on low-priority processes.
 
             - name: idle.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent idle.
 
             - name: iowait.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in wait (on disk).
 
             - name: irq.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent servicing and handling hardware interrupts.
 
             - name: softirq.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent servicing and handling software interrupts.
 
             - name: steal.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
@@ -1318,12 +1339,14 @@
 
             - name: read.bytes
               type: long
+              format: bytes
               description: >
                 The total number of bytes read successfully. On Linux this is
                 the number of sectors read multiplied by an assumed sector size of 512.
 
             - name: write.bytes
               type: long
+              format: bytes
               description: >
                 The total number of bytes written successfully. On Linux this is
                 the number of sectors written multiplied by an assumed sector size of
@@ -1350,6 +1373,7 @@
           fields:
             - name: available
               type: long
+              format: bytes
               description: >
                 The disk space available to an unprivileged user in bytes.
             - name: device_name
@@ -1366,6 +1390,7 @@
                 The total number of file nodes in the file system.
             - name: free
               type: long
+              format: bytes
               description: >
                 The disk space available in bytes.
             - name: free_files
@@ -1374,14 +1399,17 @@
                 The number of free file nodes in the file system.
             - name: total
               type: long
+              format: bytes
               description: >
                 The total disk space in bytes.
             - name: used.bytes
               type: long
+              format: bytes
               description: >
                 The used disk space in bytes.
             - name: used.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of used disk space.
 
@@ -1399,19 +1427,23 @@
               type: long
               description: Total number of files.
             - name: total_size
+              format: bytes
               type: group
               description: Nested file system docs.
               fields:
                 - name: free
                   type: long
+                  format: bytes
                   description: >
                     Total free space.
                 - name: used
                   type: long
+                  format: bytes
                   description: >
                     Total used space.
                 - name: total
                   type: long
+                  format: bytes
                   description: >
                     Total space (used plus free).
         - name: load
@@ -1459,22 +1491,26 @@
           fields:
             - name: total
               type: long
+              format: bytes
               description: >
                 Total memory.
 
             - name: used.bytes
               type: long
+              format: bytes
               description: >
                 Used memory.
 
             - name: free
               type: long
+              format: bytes
               description: >
                 The total amount of free memory in bytes. This value does not include memory consumed by system caches and
                 buffers (see system.memory.actual.free).
 
             - name: used.pct
               type: scaled_float
+              format: percent
               description: >
                 The percentage of used memory.
 
@@ -1510,21 +1546,25 @@
               fields:
                 - name: total
                   type: long
+                  format: bytes
                   description: >
                     Total swap memory.
 
                 - name: used.bytes
                   type: long
+                  format: bytes
                   description: >
                     Used swap memory.
 
                 - name: free
                   type: long
+                  format: bytes
                   description: >
                     Available swap memory.
 
                 - name: used.pct
                   type: scaled_float
+                  format: percent
                   description: >
                     The percentage of used swap memory.
         - name: network
@@ -1540,11 +1580,13 @@
 
             - name: out.bytes
               type: long
+              format: bytes
               description: >
                 The number of bytes sent.
 
             - name: in.bytes
               type: long
+              format: bytes
               description: >
                 The number of bytes received.
 
@@ -1626,6 +1668,7 @@
                     The amount of CPU time the process spent in user space.
                 - name: total.pct
                   type: scaled_float
+                  format: percent
                   description: >
                     The percentage of CPU time spent by the process since the last update. Its value is similar to the
                     %CPU value of the process displayed by the top command on Unix systems.
@@ -1648,18 +1691,22 @@
               fields:
                 - name: size
                   type: long
+                  format: bytes
                   description: >
                     The total virtual memory the process has.
                 - name: rss.bytes
                   type: long
+                  format: bytes
                   description: >
                     The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
                 - name: rss.pct
                   type: scaled_float
+                  format: percent
                   description: >
                     The percentage of memory the process occupied in main memory (RAM).
                 - name: share
                   type: long
+                  format: bytes
                   description: >
                     The shared memory the process uses.
 - key: zookeeper

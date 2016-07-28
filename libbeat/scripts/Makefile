@@ -239,6 +239,10 @@ update: python-env
 	# Update docs version
 	cp ${ES_BEATS}/libbeat/docs/version.asciidoc docs/version.asciidoc
 
+	# Generate index-pattern
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index ${BEATNAME}-* --libbeat ${ES_BEATS}/libbeat --beat $(PWD)
+
+
 # Builds the documents for the beat
 .PHONY: docs
 docs:

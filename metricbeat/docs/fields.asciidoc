@@ -736,6 +736,8 @@ Platform specific data.
 
 type: long
 
+format: bytes
+
 The total size in bytes of heap space used by the database process. Only available on Unix/Linux.
 
 
@@ -759,6 +761,8 @@ Platform specific data.
 
 type: long
 
+format: bytes
+
 The amount of network traffic, in bytes, received by this database.
 
 
@@ -766,6 +770,8 @@ The amount of network traffic, in bytes, received by this database.
 === mongodb.status.network.out.bytes
 
 type: long
+
+format: bytes
 
 The amount of network traffic, in bytes, sent from this database.
 
@@ -1027,6 +1033,8 @@ Bytes stats.
 
 type: integer
 
+format: bytes
+
 The number of bytes received from all clients.
 
 
@@ -1034,6 +1042,8 @@ The number of bytes received from all clients.
 === mysql.status.bytes.sent
 
 type: integer
+
+format: bytes
 
 The number of bytes sent to all clients.
 
@@ -1901,6 +1911,8 @@ CPU Core number.
 
 type: scaled_float
 
+format: percent
+
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
@@ -1916,6 +1928,8 @@ The amount of CPU time spent in user space.
 === system.core.system.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in kernel space.
 
@@ -1933,6 +1947,8 @@ The amount of CPU time spent in kernel space.
 
 type: scaled_float
 
+format: percent
+
 The percentage of CPU time spent on low-priority processes.
 
 
@@ -1948,6 +1964,8 @@ The amount of CPU time spent on low-priority processes.
 === system.core.idle.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent idle.
 
@@ -1965,6 +1983,8 @@ The amount of CPU time spent idle.
 
 type: scaled_float
 
+format: percent
+
 The percentage of CPU time spent in wait (on disk).
 
 
@@ -1980,6 +2000,8 @@ The amount of CPU time spent in wait (on disk).
 === system.core.irq.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -1997,6 +2019,8 @@ The amount of CPU time spent servicing and handling hardware interrupts.
 
 type: scaled_float
 
+format: percent
+
 The percentage of CPU time spent servicing and handling software interrupts.
 
 
@@ -2012,6 +2036,8 @@ The amount of CPU time spent servicing and handling software interrupts.
 === system.core.steal.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
@@ -2036,6 +2062,8 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 type: scaled_float
 
+format: percent
+
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
@@ -2043,6 +2071,8 @@ The percentage of CPU time spent in user space. On multi-core systems, you can h
 === system.cpu.system.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in kernel space.
 
@@ -2052,6 +2082,8 @@ The percentage of CPU time spent in kernel space.
 
 type: scaled_float
 
+format: percent
+
 The percentage of CPU time spent on low-priority processes.
 
 
@@ -2059,6 +2091,8 @@ The percentage of CPU time spent on low-priority processes.
 === system.cpu.idle.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent idle.
 
@@ -2068,6 +2102,8 @@ The percentage of CPU time spent idle.
 
 type: scaled_float
 
+format: percent
+
 The percentage of CPU time spent in wait (on disk).
 
 
@@ -2075,6 +2111,8 @@ The percentage of CPU time spent in wait (on disk).
 === system.cpu.irq.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -2084,6 +2122,8 @@ The percentage of CPU time spent servicing and handling hardware interrupts.
 
 type: scaled_float
 
+format: percent
+
 The percentage of CPU time spent servicing and handling software interrupts.
 
 
@@ -2091,6 +2131,8 @@ The percentage of CPU time spent servicing and handling software interrupts.
 === system.cpu.steal.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
@@ -2205,6 +2247,8 @@ The total number of writes completed successfully.
 
 type: long
 
+format: bytes
+
 The total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
 
 
@@ -2212,6 +2256,8 @@ The total number of bytes read successfully. On Linux this is the number of sect
 === system.diskio.write.bytes
 
 type: long
+
+format: bytes
 
 The total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
 
@@ -2252,6 +2298,8 @@ The total number of of milliseconds spent doing I/Os.
 
 type: long
 
+format: bytes
+
 The disk space available to an unprivileged user in bytes.
 
 
@@ -2284,6 +2332,8 @@ The total number of file nodes in the file system.
 
 type: long
 
+format: bytes
+
 The disk space available in bytes.
 
 
@@ -2300,6 +2350,8 @@ The number of free file nodes in the file system.
 
 type: long
 
+format: bytes
+
 The total disk space in bytes.
 
 
@@ -2308,6 +2360,8 @@ The total disk space in bytes.
 
 type: long
 
+format: bytes
+
 The used disk space in bytes.
 
 
@@ -2315,6 +2369,8 @@ The used disk space in bytes.
 === system.filesystem.used.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of used disk space.
 
@@ -2351,6 +2407,8 @@ Nested file system docs.
 
 type: long
 
+format: bytes
+
 Total free space.
 
 
@@ -2359,6 +2417,8 @@ Total free space.
 
 type: long
 
+format: bytes
+
 Total used space.
 
 
@@ -2366,6 +2426,8 @@ Total used space.
 === system.fsstat.total_size.total
 
 type: long
+
+format: bytes
 
 Total space (used plus free).
 
@@ -2437,6 +2499,8 @@ Load divided by the number of cores for the last 15 minutes.
 
 type: long
 
+format: bytes
+
 Total memory.
 
 
@@ -2444,6 +2508,8 @@ Total memory.
 === system.memory.used.bytes
 
 type: long
+
+format: bytes
 
 Used memory.
 
@@ -2453,6 +2519,8 @@ Used memory.
 
 type: long
 
+format: bytes
+
 The total amount of free memory in bytes. This value does not include memory consumed by system caches and buffers (see system.memory.actual.free).
 
 
@@ -2460,6 +2528,8 @@ The total amount of free memory in bytes. This value does not include memory con
 === system.memory.used.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of used memory.
 
@@ -2506,6 +2576,8 @@ This group contains statistics related to the swap memory usage on the system.
 
 type: long
 
+format: bytes
+
 Total swap memory.
 
 
@@ -2513,6 +2585,8 @@ Total swap memory.
 === system.memory.swap.used.bytes
 
 type: long
+
+format: bytes
 
 Used swap memory.
 
@@ -2522,6 +2596,8 @@ Used swap memory.
 
 type: long
 
+format: bytes
+
 Available swap memory.
 
 
@@ -2529,6 +2605,8 @@ Available swap memory.
 === system.memory.swap.used.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of used swap memory.
 
@@ -2555,6 +2633,8 @@ The network interface name.
 
 type: long
 
+format: bytes
+
 The number of bytes sent.
 
 
@@ -2562,6 +2642,8 @@ The number of bytes sent.
 === system.network.in.bytes
 
 type: long
+
+format: bytes
 
 The number of bytes received.
 
@@ -2696,6 +2778,8 @@ The amount of CPU time the process spent in user space.
 
 type: scaled_float
 
+format: percent
+
 The percentage of CPU time spent by the process since the last update. Its value is similar to the %CPU value of the process displayed by the top command on Unix systems.
 
 
@@ -2734,6 +2818,8 @@ Memory-specific statistics per process.
 
 type: long
 
+format: bytes
+
 The total virtual memory the process has.
 
 
@@ -2741,6 +2827,8 @@ The total virtual memory the process has.
 === system.process.memory.rss.bytes
 
 type: long
+
+format: bytes
 
 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
@@ -2750,6 +2838,8 @@ The Resident Set Size. The amount of memory the process occupied in main memory 
 
 type: scaled_float
 
+format: percent
+
 The percentage of memory the process occupied in main memory (RAM).
 
 
@@ -2757,6 +2847,8 @@ The percentage of memory the process occupied in main memory (RAM).
 === system.process.memory.share
 
 type: long
+
+format: bytes
 
 The shared memory the process uses.
 
