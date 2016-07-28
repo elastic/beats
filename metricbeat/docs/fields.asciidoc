@@ -2220,6 +2220,8 @@ type: scaled_float
 
 format: percent
 
+format: percent
+
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
@@ -2235,6 +2237,8 @@ The amount of CPU time spent in user space.
 === system.core.system.pct
 
 type: scaled_float
+
+format: percent
 
 format: percent
 
@@ -2256,6 +2260,8 @@ type: scaled_float
 
 format: percent
 
+format: percent
+
 The percentage of CPU time spent on low-priority processes.
 
 
@@ -2271,6 +2277,8 @@ The amount of CPU time spent on low-priority processes.
 === system.core.idle.pct
 
 type: scaled_float
+
+format: percent
 
 format: percent
 
@@ -2292,6 +2300,8 @@ type: scaled_float
 
 format: percent
 
+format: percent
+
 The percentage of CPU time spent in wait (on disk).
 
 
@@ -2307,6 +2317,8 @@ The amount of CPU time spent in wait (on disk).
 === system.core.irq.pct
 
 type: scaled_float
+
+format: percent
 
 format: percent
 
@@ -2328,6 +2340,8 @@ type: scaled_float
 
 format: percent
 
+format: percent
+
 The percentage of CPU time spent servicing and handling software interrupts.
 
 
@@ -2343,6 +2357,8 @@ The amount of CPU time spent servicing and handling software interrupts.
 === system.core.steal.pct
 
 type: scaled_float
+
+format: percent
 
 format: percent
 
@@ -2371,6 +2387,8 @@ type: scaled_float
 
 format: percent
 
+format: percent
+
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
@@ -2378,6 +2396,8 @@ The percentage of CPU time spent in user space. On multi-core systems, you can h
 === system.cpu.system.pct
 
 type: scaled_float
+
+format: percent
 
 format: percent
 
@@ -2391,6 +2411,8 @@ type: scaled_float
 
 format: percent
 
+format: percent
+
 The percentage of CPU time spent on low-priority processes.
 
 
@@ -2398,6 +2420,8 @@ The percentage of CPU time spent on low-priority processes.
 === system.cpu.idle.pct
 
 type: scaled_float
+
+format: percent
 
 format: percent
 
@@ -2411,6 +2435,8 @@ type: scaled_float
 
 format: percent
 
+format: percent
+
 The percentage of CPU time spent in wait (on disk).
 
 
@@ -2418,6 +2444,8 @@ The percentage of CPU time spent in wait (on disk).
 === system.cpu.irq.pct
 
 type: scaled_float
+
+format: percent
 
 format: percent
 
@@ -2431,6 +2459,8 @@ type: scaled_float
 
 format: percent
 
+format: percent
+
 The percentage of CPU time spent servicing and handling software interrupts.
 
 
@@ -2438,6 +2468,8 @@ The percentage of CPU time spent servicing and handling software interrupts.
 === system.cpu.steal.pct
 
 type: scaled_float
+
+format: percent
 
 format: percent
 
@@ -2679,6 +2711,8 @@ type: scaled_float
 
 format: percent
 
+format: percent
+
 The percentage of used disk space.
 
 
@@ -2838,6 +2872,8 @@ type: scaled_float
 
 format: percent
 
+format: percent
+
 The percentage of used memory.
 
 
@@ -2912,6 +2948,8 @@ Available swap memory.
 === system.memory.swap.used.pct
 
 type: scaled_float
+
+format: percent
 
 format: percent
 
@@ -3087,6 +3125,8 @@ type: scaled_float
 
 format: percent
 
+format: percent
+
 The percentage of CPU time spent by the process since the last update. Its value is similar to the %CPU value of the process displayed by the top command on Unix systems.
 
 
@@ -3144,6 +3184,8 @@ The Resident Set Size. The amount of memory the process occupied in main memory 
 === system.process.memory.rss.pct
 
 type: scaled_float
+
+format: percent
 
 format: percent
 
