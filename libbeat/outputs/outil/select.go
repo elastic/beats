@@ -141,7 +141,7 @@ func BuildSelector(cfg *common.Config, settings Settings) (Selector, error) {
 func buildSingle(cfg *common.Config, key string) (selector, error) {
 	// TODO: check for unknown fields
 
-	// 3. extract required key-word handler
+	// 1. extract required key-word handler
 	if !cfg.HasField(key) {
 		return nil, fmt.Errorf("missing %v", cfg.PathOf(key))
 	}
