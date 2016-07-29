@@ -3,7 +3,7 @@
   description: >
     `filesystem` contains local filesystem stats.
   fields:
-    - name: avail
+    - name: available
       type: long
       description: >
         The disk space available to an unprivileged user in bytes.

@@ -51,11 +51,6 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 	m.cpu.AddCpuPercentage(stat)
 
-	loadStat, err := GetSystemLoad()
-	if err != nil {
-		return nil, errors.Wrap(err, "load statistics")
-	}
-
 	cpuStat := common.MapStr{
 		"user": common.MapStr{
 			"pct": stat.UserPercent,
@@ -92,12 +87,6 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		cpuStat["irq"].(common.MapStr)["ticks"] = stat.Irq
 		cpuStat["softirq"].(common.MapStr)["ticks"] = stat.SoftIrq
 		cpuStat["steal"].(common.MapStr)["ticks"] = stat.Stolen
-	}
-
-	cpuStat["load"] = common.MapStr{
-		"1":  loadStat.Load1,
-		"5":  loadStat.Load5,
-		"15": loadStat.Load15,
 	}
 
 	return cpuStat, nil

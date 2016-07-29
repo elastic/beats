@@ -1059,19 +1059,6 @@
                     }
                   }
                 },
-                "load": {
-                  "properties": {
-                    "1": {
-                      "type": "half_float"
-                    },
-                    "15": {
-                      "type": "half_float"
-                    },
-                    "5": {
-                      "type": "half_float"
-                    }
-                  }
-                },
                 "nice": {
                   "properties": {
                     "pct": {
@@ -1171,7 +1158,7 @@
             },
             "filesystem": {
               "properties": {
-                "avail": {
+                "available": {
                   "type": "long"
                 },
                 "device_name": {
@@ -1224,6 +1211,32 @@
                     },
                     "used": {
                       "type": "long"
+                    }
+                  }
+                }
+              }
+            },
+            "load": {
+              "properties": {
+                "1": {
+                  "type": "half_float"
+                },
+                "15": {
+                  "type": "half_float"
+                },
+                "5": {
+                  "type": "half_float"
+                },
+                "norm": {
+                  "properties": {
+                    "1": {
+                      "type": "half_float"
+                    },
+                    "15": {
+                      "type": "half_float"
+                    },
+                    "5": {
+                      "type": "half_float"
                     }
                   }
                 }

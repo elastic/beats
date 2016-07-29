@@ -3,12 +3,7 @@
 package cpu
 
 import (
-	"time"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/system"
-	"github.com/elastic/beats/metricbeat/module/system/memory"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -120,126 +115,10 @@ func GetCpuPercentageList(last, current []CpuTimes) []CpuTimes {
 	return current
 }
 
-func (cpu *CPU) GetCpuStatEvent(cpuStat *CpuTimes) common.MapStr {
-	result := common.MapStr{
-		"user_p":    cpuStat.UserPercent,
-		"system_p":  cpuStat.SystemPercent,
-		"idle_p":    cpuStat.IdlePercent,
-		"iowait_p":  cpuStat.IOwaitPercent,
-		"irq_p":     cpuStat.IrqPercent,
-		"nice_p":    cpuStat.NicePercent,
-		"softirq_p": cpuStat.SoftIrqPercent,
-		"steal_p":   cpuStat.StealPercent,
-	}
-
-	if cpu.CpuTicks {
-		m := common.MapStr{
-			"user":    cpuStat.User,
-			"system":  cpuStat.Sys,
-			"nice":    cpuStat.Nice,
-			"idle":    cpuStat.Idle,
-			"iowait":  cpuStat.Wait,
-			"irq":     cpuStat.Irq,
-			"softirq": cpuStat.SoftIrq,
-			"steal":   cpuStat.Stolen,
-		}
-		return common.MapStrUnion(result, m)
-	}
-	return result
-
-}
-
 func (cpu *CPU) AddCpuPercentage(t2 *CpuTimes) {
 	cpu.LastCpuTimes = GetCpuPercentage(cpu.LastCpuTimes, t2)
 }
 
 func (cpu *CPU) AddCpuPercentageList(t2 []CpuTimes) {
 	cpu.LastCpuTimesList = GetCpuPercentageList(cpu.LastCpuTimesList, t2)
-}
-
-func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
-	loadStat, err := GetSystemLoad()
-	if err != nil {
-		logp.Warn("Getting load statistics: %v", err)
-		return nil, err
-	}
-	cpuStat, err := GetCpuTimes()
-	if err != nil {
-		logp.Warn("Getting cpu times: %v", err)
-		return nil, err
-	}
-
-	cpu.AddCpuPercentage(cpuStat)
-
-	memStat, err := memory.GetMemory()
-	if err != nil {
-		logp.Warn("Getting memory details: %v", err)
-		return nil, err
-	}
-	memory.AddMemPercentage(memStat)
-
-	swapStat, err := memory.GetSwap()
-	if err != nil {
-		logp.Warn("Getting swap details: %v", err)
-		return nil, err
-	}
-	memory.AddSwapPercentage(swapStat)
-
-	event := common.MapStr{
-		"@timestamp": common.Time(time.Now()),
-		"type":       "system",
-		"load":       loadStat,
-		"cpu":        cpu.GetCpuStatEvent(cpuStat),
-		"mem":        memory.GetMemoryEvent(memStat),
-		"swap":       memory.GetSwapEvent(swapStat),
-	}
-
-	return event, nil
-}
-
-func (cpu *CPU) GetCoreStats() ([]common.MapStr, error) {
-
-	events := []common.MapStr{}
-
-	cpuCoreStat, err := GetCpuTimesList()
-	if err != nil {
-		logp.Warn("Getting cpu core times: %v", err)
-		return nil, err
-	}
-	cpu.AddCpuPercentageList(cpuCoreStat)
-
-	for coreNumber, stat := range cpuCoreStat {
-		coreStat := cpu.GetCpuStatEvent(&stat)
-		coreStat["id"] = coreNumber
-
-		event := common.MapStr{
-			"@timestamp": common.Time(time.Now()),
-			"type":       "core",
-			"core":       coreStat,
-		}
-		events = append(events, event)
-	}
-
-	return events, nil
-}
-
-type SystemLoad struct {
-	Load1  float64 `json:"load1"`
-	Load5  float64 `json:"load5"`
-	Load15 float64 `json:"load15"`
-}
-
-func GetSystemLoad() (*SystemLoad, error) {
-
-	concreteSigar := sigar.ConcreteSigar{}
-	avg, err := concreteSigar.GetLoadAverage()
-	if err != nil {
-		return nil, err
-	}
-
-	return &SystemLoad{
-		Load1:  avg.One,
-		Load5:  avg.Five,
-		Load15: avg.Fifteen,
-	}, nil
 }
