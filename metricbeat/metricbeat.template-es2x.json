@@ -1277,8 +1277,22 @@
             },
             "memory": {
               "properties": {
-                "available": {
-                  "type": "long"
+                "actual": {
+                  "properties": {
+                    "free": {
+                      "type": "long"
+                    },
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        },
+                        "pct": {
+                          "type": "float"
+                        }
+                      }
+                    }
+                  }
                 },
                 "free": {
                   "type": "long"

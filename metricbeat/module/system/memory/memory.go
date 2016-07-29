@@ -47,8 +47,14 @@ func (m *MetricSet) Fetch() (event common.MapStr, err error) {
 			"bytes": memStat.Used,
 			"pct":   memStat.UsedPercent,
 		},
-		"free":      memStat.Free,
-		"available": memStat.ActualFree,
+		"free": memStat.Free,
+		"actual": common.MapStr{
+			"free": memStat.ActualFree,
+			"used": common.MapStr{
+				"pct":   memStat.ActualUsedPercent,
+				"bytes": memStat.ActualUsed,
+			},
+		},
 	}
 
 	swap := common.MapStr{
