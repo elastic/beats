@@ -1,0 +1,4 @@
+beat_name: {{cookiecutter.beat}}
+beat_url: 'https://{{cookiecutter.beat_path}}/{{cookiecutter.beat}}'
+beat_repo: '{{cookiecutter.beat_path}}/{{cookiecutter.beat}}'
+beat_description: {{cookiecutter.beat|capitalize}}
