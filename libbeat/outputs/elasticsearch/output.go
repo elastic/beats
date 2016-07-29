@@ -77,6 +77,10 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
+	if config.Index == "" {
+		config.Index = out.beatName + "-%{+2006.01.02}"
+	}
+
 	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return err

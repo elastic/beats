@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -21,8 +22,8 @@ import (
 
 type Client struct {
 	Connection
-	index  string
-	params map[string]string
+	indexPattern string
+	params       map[string]string
 
 	// buffered bulk requests
 	bulkRequ *bulkRequest
@@ -75,7 +76,7 @@ var (
 )
 
 func NewClient(
-	esURL, index string, proxyURL *url.URL, tls *tls.Config,
+	esURL, indexPattern string, proxyURL *url.URL, tls *tls.Config,
 	username, password string,
 	params map[string]string,
 	timeout time.Duration,
@@ -127,8 +128,8 @@ func NewClient(
 			},
 			encoder: encoder,
 		},
-		index:  index,
-		params: params,
+		indexPattern: indexPattern,
+		params:       params,
 
 		bulkRequ: bulkRequ,
 
@@ -155,7 +156,7 @@ func (client *Client) Clone() *Client {
 	transport := client.http.Transport.(*http.Transport)
 	c, _ := NewClient(
 		client.URL,
-		client.index,
+		client.indexPattern,
 		client.proxyURL,
 		transport.TLSClientConfig,
 		client.Username,
@@ -186,7 +187,7 @@ func (client *Client) PublishEvents(
 
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
-	events = bulkEncodePublishRequest(body, client.index, events)
+	events = bulkEncodePublishRequest(body, client.indexPattern, events)
 	if len(events) == 0 {
 		return nil, nil
 	}
@@ -224,16 +225,16 @@ func (client *Client) PublishEvents(
 	return nil, nil
 }
 
-// fillBulkRequest encodes all bulk requests and returns slice of events
+// bulkEncodePublishRequest encodes all bulk requests and returns slice of events
 // successfully added to bulk request.
 func bulkEncodePublishRequest(
 	body bulkWriter,
-	index string,
+	indexPattern string,
 	events []common.MapStr,
 ) []common.MapStr {
 	okEvents := events[:0]
 	for _, event := range events {
-		meta := eventBulkMeta(index, event)
+		meta := eventBulkMeta(indexPattern, event)
 		err := body.Add(meta, event)
 		if err != nil {
 			logp.Err("Failed to encode event: %s", err)
@@ -245,8 +246,8 @@ func bulkEncodePublishRequest(
 	return okEvents
 }
 
-func eventBulkMeta(index string, event common.MapStr) bulkMeta {
-	index = getIndex(event, index)
+func eventBulkMeta(indexPattern string, event common.MapStr) bulkMeta {
+	index := getIndex(event, indexPattern)
 	meta := bulkMeta{
 		Index: bulkMetaIndex{
 			Index:   index,
@@ -259,11 +260,12 @@ func eventBulkMeta(index string, event common.MapStr) bulkMeta {
 // getIndex returns the full index name
 // Index is either defined in the config as part of the output
 // or can be overload by the event through setting index
-func getIndex(event common.MapStr, index string) string {
+func getIndex(event common.MapStr, indexPattern string) string {
 
 	ts := time.Time(event["@timestamp"].(common.Time)).UTC()
 
 	// Check for dynamic index
+	// XXX: is this used/needed?
 	if _, ok := event["beat"]; ok {
 		beatMeta, ok := event["beat"].(common.MapStr)
 		if ok {
@@ -271,17 +273,49 @@ func getIndex(event common.MapStr, index string) string {
 			if dynamicIndex, ok := beatMeta["index"]; ok {
 				dynamicIndexValue, ok := dynamicIndex.(string)
 				if ok {
-					index = dynamicIndexValue
+					// Form the index by appending the timestamp to the
+					// dynamicIndexValue
+					return fmt.Sprintf("%s-%d.%02d.%02d", dynamicIndexValue,
+						ts.Year(), ts.Month(), ts.Day())
 				}
 			}
 		}
 	}
 
-	// Append timestamp to index
-	index = fmt.Sprintf("%s-%d.%02d.%02d", index,
-		ts.Year(), ts.Month(), ts.Day())
+	return formatIndex(indexPattern, ts)
+}
 
+// formatIndex applies a timestamp in a pattern like beatname-%{+2006.01.02}
+func formatIndex(indexPattern string, ts time.Time) string {
+
+	index := indexPattern
+	for {
+		// find %{+...}
+		start := strings.Index(index, "%{+")
+		if start == -1 {
+			break
+		}
+		length := strings.Index(index[start:], "}") + 1
+		if length == 0 {
+			break
+		}
+
+		patternStart := start + 3
+		patternEnd := start + length - 1
+
+		formattedTs := formatTs(index[patternStart:patternEnd], ts)
+
+		index = index[0:start] + formattedTs + index[start+length:]
+	}
 	return index
+}
+
+func formatTs(layout string, ts time.Time) string {
+	if layout == "isoweek" {
+		year, week := ts.ISOWeek()
+		return fmt.Sprintf("%04d.%02d", year, week)
+	}
+	return ts.Format(layout)
 }
 
 // bulkCollectPublishFails checks per item errors returning all events
@@ -427,7 +461,7 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 }
 
 func (client *Client) PublishEvent(event common.MapStr) error {
-	index := getIndex(event, client.index)
+	index := getIndex(event, client.indexPattern)
 	debugf("Publish event: %s", event)
 
 	// insert the events one by one

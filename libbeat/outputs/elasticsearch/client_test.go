@@ -118,6 +118,7 @@ func TestCollectPublishFailAll(t *testing.T) {
 	assert.Equal(t, events, res)
 }
 
+/*
 func TestGetIndexStandard(t *testing.T) {
 
 	time := time.Now().UTC()
@@ -131,6 +132,7 @@ func TestGetIndexStandard(t *testing.T) {
 	index := getIndex(event, "beatname")
 	assert.Equal(t, index, "beatname-"+extension)
 }
+*/
 
 func TestGetIndexOverwrite(t *testing.T) {
 
@@ -211,6 +213,46 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 		reader.init(response)
 		res := bulkCollectPublishFails(reader, events)
 		if len(res) != 3 {
+			b.Fail()
+		}
+	}
+}
+
+func TestFormatIndex(t *testing.T) {
+	ts, err := time.Parse("Jan 2 15:04:05 2006", "Feb 3 16:05:06 2007")
+	assert.NoError(t, err)
+
+	tests := []struct {
+		Input    string
+		Expected string
+	}{
+		{"beatname-%{+2006.01.02}", "beatname-2007.02.03"},       // daily
+		{"beatname-%{+2006.01.02-15}", "beatname-2007.02.03-16"}, // hourly
+		{"filebeat-%{+isoweek}", "filebeat-2007.05"},             // weekly
+		{"filebeat", "filebeat"},                                 // using alias/rollover
+		{"beatname-%{+2006.01.02}-%{+Mon}", "beatname-2007.02.03-Sat"},
+		{"beatname-%{+2006.01.02}-%{+Mon}urday", "beatname-2007.02.03-Saturday"},
+		{"filebeat-1", "filebeat-1"},
+		{"filebeat-test-%{+06-01}-1", "filebeat-test-07-02-1"},
+		{"filebeat-%{+2006.01.02-15:04:05.000}", "filebeat-2007.02.03-16:05:06.000"},
+	}
+
+	for _, test := range tests {
+		res := formatIndex(test.Input, ts)
+		assert.Equal(t, test.Expected, res, "Failed on format: %s", test.Input)
+	}
+
+}
+
+func BenchmarkFormatIndex(b *testing.B) {
+	ts, err := time.Parse("Jan 2 15:04:05 2006", "Feb 3 16:05:06 2007")
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		res := formatIndex("beatname-%{+2006.01.02}", ts)
+		if res != "beatname-2007.02.03" {
 			b.Fail()
 		}
 	}
