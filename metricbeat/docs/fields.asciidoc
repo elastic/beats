@@ -2453,7 +2453,7 @@ Used memory.
 
 type: long
 
-The total amount of free memory in bytes. This value does not include memory consumed by system caches and buffers (see system.memory.available).
+The total amount of free memory in bytes. This value does not include memory consumed by system caches and buffers (see system.memory.actual.free).
 
 
 [float]
@@ -2465,11 +2465,34 @@ The percentage of used memory.
 
 
 [float]
-=== system.memory.available
+== actual Fields
+
+Actual memory used and free.
+
+
+
+[float]
+=== system.memory.actual.used.bytes
 
 type: long
 
-Available memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory.
+Actual used memory in bytes. It represents the difference between the total and the available memory. The available memory depends on the OS. For more details, please check `system.actual.free`.
+
+
+[float]
+=== system.memory.actual.free
+
+type: long
+
+Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is the  amount of unreserved and uncommitted memory currently in the user-mode portion of the virtual address space of the calling process.
+
+
+[float]
+=== system.memory.actual.used.pct
+
+type: half_float
+
+The percentage of actual used memory.
 
 
 [float]
