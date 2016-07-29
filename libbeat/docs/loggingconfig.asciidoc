@@ -43,7 +43,7 @@ You can specify the following options in the `logging` section of the +{beatname
 
 ===== to_syslog
 
-If enabled, sends all logging output to syslog (on non-Windows systems only). The default
+If enabled, sends all logging output to syslog. The default
 value is false. 
 
 ===== to_files
