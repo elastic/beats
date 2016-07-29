@@ -93,7 +93,11 @@ filebeat.prospectors:
   include_lines: ["^ERR", "^WARN"]
 -------------------------------------------------------------------------------------
 
-NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes `include_lines` first and then executes `exclude_lines`. So, for example, to export all Apache log lines except the debugging messages (DBGs), you can use:
+NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes `include_lines` first and then executes `exclude_lines`. 
+The order in which the two options are defined doesn't matter. The `include_lines` option will always be executed
+before the `exclude_lines` option, even if `exclude_lines` appears before `include_lines` in the config file. 
+
+The following example exports all Apache log lines except the debugging messages (DBGs):
 
 [source,yaml]
 -------------------------------------------------------------------------------------
