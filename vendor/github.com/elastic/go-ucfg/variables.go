@@ -279,18 +279,26 @@ func makeOpExpansion(l, r varEvaler, op, pathSep string) varEvaler {
 
 func parseSplice(in, pathSep string) (varEvaler, error) {
 	lex, errs := lexer(in)
-	defer func() {
-		// on parser error drain lexer so go-routine won't leak
+	drainLex := func() {
 		for range lex {
 		}
-	}()
+	}
+
+	// drain lexer on return so go-routine won't leak
+	defer drainLex()
 
 	pieces, perr := parseVarExp(lex, pathSep)
+	if perr != nil {
+		return nil, perr
+	}
 
 	// check for lexer errors
-	err := <-errs
-	if err != nil {
-		return nil, err
+	select {
+	case err := <-errs:
+		if err != nil {
+			return nil, err
+		}
+	default:
 	}
 
 	// return parser result
@@ -362,14 +370,14 @@ func lexer(in string) (<-chan token, <-chan error) {
 				}
 
 				switch content[off] {
-				case '$': // escape '$' symbol
-					content = content[:off] + content[off+1:]
-					continue
 				case '{': // start variable
 					strToken(content[:idx])
 					lex <- openToken
 					off++
 					varcount++
+				default: // escape any symbol
+					content = content[:idx] + content[off:]
+					continue
 				}
 			}
 
@@ -409,15 +417,17 @@ func parseVarExp(lex <-chan token, pathSep string) (varEvaler, error) {
 				return nil, errors.New("default separator not within expansion")
 			}
 			if st.st == stRight {
-				return nil, errors.New("unexpected ':'")
+				st.pieces[st.st] = addString(st.pieces[st.st], tok.val)
+			} else {
+				// switch to 'right'
+				st.st = stRight
+				st.op = tok.val
 			}
-			st.st = stRight
-			st.op = tok.val
 
 		case tokString:
 			// append raw string
 			st := &stack[len(stack)-1]
-			st.pieces[st.st] = append(st.pieces[st.st], constExp(tok.val))
+			st.pieces[st.st] = addString(st.pieces[st.st], tok.val)
 		}
 	}
 
@@ -449,4 +459,37 @@ func cfgRoot(cfg *Config) *Config {
 
 		cfg = p
 	}
+}
+
+func addString(ps []varEvaler, s string) []varEvaler {
+	if len(ps) == 0 {
+		return []varEvaler{constExp(s)}
+	}
+
+	last := ps[len(ps)-1]
+	c, ok := last.(constExp)
+	if !ok {
+		return append(ps, constExp(s))
+	}
+
+	ps[len(ps)-1] = constExp(string(c) + s)
+	return ps
+}
+
+func (t tokenType) String() string {
+	switch t {
+	case tokOpen:
+		return "<open>"
+	case tokClose:
+		return "<close>"
+	case tokSep:
+		return "<sep>"
+	case tokString:
+		return "<str>"
+	}
+	return "<unknown>"
+}
+
+func (t token) String() string {
+	return fmt.Sprintf("(%v, %v)", t.typ, t.val)
 }
