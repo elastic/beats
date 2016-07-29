@@ -29,6 +29,7 @@ func TestMultilineAfterOK(t *testing.T) {
 			Pattern: regexp.MustCompile(`^[ \t] +`), // next line is indented by spaces
 			Match:   "after",
 		},
+		2,
 		"line1\n  line1.1\n  line1.2\n",
 		"line2\n  line2.1\n  line2.2\n",
 	)
@@ -40,6 +41,7 @@ func TestMultilineBeforeOK(t *testing.T) {
 			Pattern: regexp.MustCompile(`\\$`), // previous line ends with \
 			Match:   "before",
 		},
+		2,
 		"line1 \\\nline1.1 \\\nline1.2\n",
 		"line2 \\\nline2.1 \\\nline2.2\n",
 	)
@@ -52,6 +54,7 @@ func TestMultilineAfterNegateOK(t *testing.T) {
 			Negate:  true,
 			Match:   "after",
 		},
+		2,
 		"-line1\n  - line1.1\n  - line1.2\n",
 		"-line2\n  - line2.1\n  - line2.2\n",
 	)
@@ -64,12 +67,26 @@ func TestMultilineBeforeNegateOK(t *testing.T) {
 			Negate:  true,
 			Match:   "before",
 		},
+		2,
 		"line1\nline1.1\nline1.2;\n",
 		"line2\nline2.1\nline2.2;\n",
 	)
 }
 
-func testMultilineOK(t *testing.T, cfg MultilineConfig, expected ...string) {
+func TestMultilineBeforeNegateOKWithEmptyLine(t *testing.T) {
+	testMultilineOK(t,
+		MultilineConfig{
+			Pattern: regexp.MustCompile(`;$`), // last line ends with ';'
+			Negate:  true,
+			Match:   "before",
+		},
+		2,
+		"line1\n\n\nline1.2;\n",
+		"line2\nline2.1\nline2.2;\n",
+	)
+}
+
+func testMultilineOK(t *testing.T, cfg MultilineConfig, events int, expected ...string) {
 	_, buf := createLineBuffer(expected...)
 	reader := createMultilineTestReader(t, buf, cfg)
 
@@ -82,7 +99,7 @@ func testMultilineOK(t *testing.T, cfg MultilineConfig, expected ...string) {
 		messages = append(messages, message)
 	}
 
-	if len(messages) != len(expected) {
+	if len(messages) != events {
 		t.Fatalf("expected %v lines, read only %v line(s)", len(expected), len(messages))
 	}
 
