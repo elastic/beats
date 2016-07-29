@@ -170,7 +170,7 @@ func TestSelector(t *testing.T) {
 			continue
 		}
 
-		sel, err := BuildSelector(cfg, Settings{
+		sel, err := BuildSelectorFromConfig(cfg, Settings{
 			Key:              "key",
 			MultiKey:         "keys",
 			EnableSingleOnly: true,
@@ -255,7 +255,7 @@ func TestSelectorInitFail(t *testing.T) {
 			continue
 		}
 
-		_, err = BuildSelector(cfg, Settings{
+		_, err = BuildSelectorFromConfig(cfg, Settings{
 			Key:              "key",
 			MultiKey:         "keys",
 			EnableSingleOnly: true,
