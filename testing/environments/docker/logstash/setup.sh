@@ -10,4 +10,5 @@ set -x && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+export PATH=$PATH:/usr/share/logstash/bin
 logstash-plugin install logstash-input-beats
