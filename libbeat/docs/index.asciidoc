@@ -22,6 +22,8 @@ include::./installing-beats.asciidoc[]
 
 include::./repositories.asciidoc[]
 
+include::./config-file-format.asciidoc[]
+
 include::./visualizing-data.asciidoc[]
 
 include::./dashboards.asciidoc[]
