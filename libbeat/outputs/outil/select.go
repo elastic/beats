@@ -9,7 +9,7 @@ import (
 )
 
 type Selector struct {
-	sel selector
+	sel SelectorExpr
 }
 
 type Settings struct {
@@ -26,18 +26,18 @@ type Settings struct {
 	FailEmpty bool
 }
 
-type selector interface {
+type SelectorExpr interface {
 	sel(evt common.MapStr) (string, error)
 }
 
 type emptySelector struct{}
 
 type listSelector struct {
-	selectors []selector
+	selectors []SelectorExpr
 }
 
 type condSelector struct {
-	s    selector
+	s    SelectorExpr
 	cond *processors.Condition
 }
 
@@ -51,12 +51,23 @@ type fmtSelector struct {
 }
 
 type mapSelector struct {
-	from      selector
+	from      SelectorExpr
 	otherwise string
 	to        map[string]string
 }
 
-var nilSelector selector = &emptySelector{}
+var nilSelector SelectorExpr = &emptySelector{}
+
+func MakeSelector(es ...SelectorExpr) Selector {
+	switch len(es) {
+	case 0:
+		return Selector{nilSelector}
+	case 1:
+		return Selector{es[0]}
+	default:
+		return Selector{ConcatSelectorExpr(es...)}
+	}
+}
 
 // Select runs configured selector against the current event.
 // If no matching selector is found, an empty string is returned.
@@ -66,8 +77,15 @@ func (s Selector) Select(evt common.MapStr) (string, error) {
 	return s.sel.sel(evt)
 }
 
-func BuildSelector(cfg *common.Config, settings Settings) (Selector, error) {
-	var sel []selector
+func (s Selector) IsEmpty() bool {
+	return s.sel == nilSelector || s.sel == nil
+}
+
+func BuildSelectorFromConfig(
+	cfg *common.Config,
+	settings Settings,
+) (Selector, error) {
+	var sel []SelectorExpr
 
 	key := settings.Key
 	multiKey := settings.MultiKey
@@ -111,7 +129,18 @@ func BuildSelector(cfg *common.Config, settings Settings) (Selector, error) {
 			return Selector{}, fmt.Errorf("%v in %v", err, cfg.PathOf(key))
 		}
 
-		sel = append(sel, &fmtSelector{f: *fmtstr})
+		if fmtstr.IsConst() {
+			str, err := fmtstr.Run(common.MapStr{})
+			if err != nil {
+				return Selector{}, err
+			}
+
+			if str != "" {
+				sel = append(sel, ConstSelectorExpr(str))
+			}
+		} else {
+			sel = append(sel, FmtSelectorExpr(fmtstr, ""))
+		}
 	}
 
 	if settings.FailEmpty && !found {
@@ -124,20 +153,44 @@ func BuildSelector(cfg *common.Config, settings Settings) (Selector, error) {
 			multiKey, cfg.Path())
 	}
 
-	switch len(sel) {
-	case 0:
-		return Selector{nilSelector}, nil
-	case 1:
-		return Selector{sel[0]}, nil
-	default:
-		return Selector{&listSelector{sel}}, nil
-	}
+	return MakeSelector(sel...), nil
 }
 
-func buildSingle(cfg *common.Config, key string) (selector, error) {
+func EmptySelectorExpr() SelectorExpr {
+	return nilSelector
+}
+
+func ConstSelectorExpr(s string) SelectorExpr {
+	return &constSelector{s}
+}
+
+func FmtSelectorExpr(fmt *fmtstr.EventFormatString, fallback string) SelectorExpr {
+	return &fmtSelector{*fmt, fallback}
+}
+
+func ConcatSelectorExpr(s ...SelectorExpr) SelectorExpr {
+	return &listSelector{s}
+}
+
+func ConditionalSelectorExpr(
+	s SelectorExpr,
+	cond *processors.Condition,
+) SelectorExpr {
+	return &condSelector{s, cond}
+}
+
+func LookupSelectorExpr(
+	s SelectorExpr,
+	table map[string]string,
+	fallback string,
+) SelectorExpr {
+	return &mapSelector{s, fallback, table}
+}
+
+func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
 	// TODO: check for unknown fields
 
-	// 3. extract required key-word handler
+	// 1. extract required key-word handler
 	if !cfg.HasField(key) {
 		return nil, fmt.Errorf("missing %v", cfg.PathOf(key))
 	}
@@ -194,7 +247,7 @@ func buildSingle(cfg *common.Config, key string) (selector, error) {
 	}
 
 	// 5. build selector from available fields
-	var sel selector
+	var sel SelectorExpr
 	if len(mapping.Table) > 0 {
 		if evtfmt.IsConst() {
 			str, err := evtfmt.Run(common.MapStr{})
@@ -210,11 +263,11 @@ func buildSingle(cfg *common.Config, key string) (selector, error) {
 			if str == "" {
 				sel = nilSelector
 			} else {
-				sel = &constSelector{str}
+				sel = ConstSelectorExpr(str)
 			}
 		} else {
 			sel = &mapSelector{
-				from:      &fmtSelector{f: *evtfmt},
+				from:      FmtSelectorExpr(evtfmt, ""),
 				to:        mapping.Table,
 				otherwise: otherwise,
 			}
@@ -225,13 +278,18 @@ func buildSingle(cfg *common.Config, key string) (selector, error) {
 			if err != nil {
 				return nil, err
 			}
-			sel = &constSelector{str}
+
+			if str == "" {
+				sel = nilSelector
+			} else {
+				sel = ConstSelectorExpr(str)
+			}
 		} else {
-			sel = &fmtSelector{f: *evtfmt, otherwise: otherwise}
+			sel = FmtSelectorExpr(evtfmt, otherwise)
 		}
 	}
 	if cond != nil && sel != nilSelector {
-		sel = &condSelector{s: sel, cond: cond}
+		sel = ConditionalSelectorExpr(sel, cond)
 	}
 
 	return sel, nil
