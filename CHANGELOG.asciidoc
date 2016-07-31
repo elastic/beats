@@ -8,30 +8,19 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
 
-- Rename the `filters` section to `processors`. {pull}1944[1944]
-- Introduce the condition with `when` in the processor configuration. {pull}1949[1949]
-- The Elasticsearch template is now loaded by default. {pull}1993[1993]
-- The Redis output `index` setting is renamed to `key`. `index` still works but it's deprecated. {pull}2077[2077]
-- The undocumented file output `index` setting was removed. Use `filename` instead. {pull}2077[2077]
-
 *Metricbeat*
-- Create a separate metricSet for load under the system module and remove load information from CPU stats. {pull}2101[2101]
-- Add `system.load.norm.1`, `system.load.norm.5` and `system.load.norm.15`. {pull}2101[2101]
 
 *Packetbeat*
-- Set `enabled` ` in `packetbeat.protocols.icmp` configuration to `true` by default. {pull}1988[1988]
 
 *Topbeat*
 
 *Filebeat*
-
-- Stop following symlink. Symlinks are now ignored: {pull}1686[1686]
 
 *Winlogbeat*
 
@@ -39,11 +28,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix sync publisher PublishEvents return value if client is closed concurrently. {pull}2046[2046]
 
 *Metricbeat*
-
-- Do not send zero values when no value was present in the source. {issue}1972[1972]
 
 *Packetbeat*
 
@@ -51,38 +37,19 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 
 *Filebeat*
 
-- Fix potential data loss between filebeat restarts, reporting unpublished lines as published. {issue}2041[2041]
-- Fix open file handler issue {issue}2028[2028] {pull}2020[2020]
-- Fix filtering of JSON events when using integers in conditions {issue}2038[2038]
-
 *Winlogbeat*
-- Fix potential data loss between winlogbeat restarts, reporting unpublished lines as published. {issue}2041[2041]
 
 ==== Added
 
 *Affecting all Beats*
 
-- Periodically log internal metrics. {pull}1955[1955]
-- Add enabled setting to all output modules. {pull}1987[1987]
-- Command line flag -c can be used multiple times. {pull}1985[1985]
-- Add OR/AND/NOT to the condition associated with the processors. {pull}1983[1983]
-- Add '-E' CLI flag for overwriting single config options via command line. {pull}1986[1986]
-- Choose the mapping template file based on the Elasticsearch version. {pull}1993[1993]
-- Check stdout being available when console output is configured. {issue}2035[2035]
-- Add enabled setting to packetbeat protocols. {pull}1988[1988]
-- Add enabled setting to packetbeat network flows configuration. {pull}1988[1988]
-
 *Metricbeat*
-- Add pgid field to process information. {pull} 2021[2021]
 
 *Packetbeat*
 
 *Topbeat*
 
 *Filebeat*
-- Introduce close_removed and close_renamed harvester options {issue}1600[1600]
-- Introduce close_eof harvester option {issue}1600[1600]
-- Add clean_removed config option {issue}1600[1600]
 
 *Winlogbeat*
 
@@ -96,13 +63,87 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...master[Check the HEAD d
 *Topbeat*
 
 *Filebeat*
-- Deprecate close_older option and replace it with close_inactive {issue}2051[2051]
-- Deprecate force_close_files option and replace it with close_removed and close_renamed {issue}1600[1600]
-
 
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.0.0-alpha5]]
+=== Beats version 5.0.0-alpha5
+https://github.com/elastic/beats/compare/v5.0.0-alpha4...v5.0.0-alpha5[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Rename the `filters` section to `processors`. {pull}1944[1944]
+- Introduce the condition with `when` in the processor configuration. {pull}1949[1949]
+- The Elasticsearch template is now loaded by default. {pull}1993[1993]
+- The Redis output `index` setting is renamed to `key`. `index` still works but it's deprecated. {pull}2077[2077]
+- The undocumented file output `index` setting was removed. Use `filename` instead. {pull}2077[2077]
+
+*Metricbeat*
+
+- Create a separate metricSet for load under the system module and remove load information from CPU stats. {pull}2101[2101]
+- Add `system.load.norm.1`, `system.load.norm.5` and `system.load.norm.15`. {pull}2101[2101]
+
+*Packetbeat*
+
+- Set `enabled` ` in `packetbeat.protocols.icmp` configuration to `true` by default. {pull}1988[1988]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix sync publisher `PublishEvents` return value if client is closed concurrently. {pull}2046[2046]
+
+*Metricbeat*
+
+- Do not send zero values when no value was present in the source. {issue}1972[1972]
+
+*Filebeat*
+
+- Fix potential data loss between Filebeat restarts, reporting unpublished lines as published. {issue}2041[2041]
+- Fix open file handler issue. {issue}2028[2028] {pull}2020[2020]
+- Fix filtering of JSON events when using integers in conditions. {issue}2038[2038]
+
+*Winlogbeat*
+
+- Fix potential data loss between Winlogbeat restarts, reporting unpublished lines as published. {issue}2041[2041]
+
+==== Added
+
+*Affecting all Beats*
+
+- Periodically log internal metrics. {pull}1955[1955]
+- Add enabled setting to all output modules. {pull}1987[1987]
+- Command line flag `-c` can be used multiple times. {pull}1985[1985]
+- Add OR/AND/NOT to the condition associated with the processors. {pull}1983[1983]
+- Add `-E` CLI flag for overwriting single config options via command line. {pull}1986[1986]
+- Choose the mapping template file based on the Elasticsearch version. {pull}1993[1993]
+- Check stdout being available when console output is configured. {issue}2035[2035]
+
+*Metricbeat*
+
+- Add pgid field to process information. {pull} 2021[2021]
+
+*Packetbeat*
+
+- Add enabled setting to Packetbeat protocols. {pull}1988[1988]
+- Add enabled setting to Packetbeat network flows configuration. {pull}1988[1988]
+
+*Filebeat*
+
+- Introduce `close_removed` and `close_renamed` harvester options. {issue}1600[1600]
+- Introduce `close_eof` harvester option. {issue}1600[1600]
+- Add `clean_removed` config option. {issue}1600[1600]
+
+==== Deprecated
+
+*Filebeat*
+
+- Deprecate `close_older` option and replace it with `close_inactive`. {issue}2051[2051]
+- Deprecate `force_close_files` option and replace it with `close_removed` and `close_renamed`. {issue}1600[1600]
 
 [[release-notes-5.0.0-alpha4]]
 === Beats version 5.0.0-alpha4
