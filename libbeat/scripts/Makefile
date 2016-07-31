@@ -318,4 +318,4 @@ create-packer:
 package: create-packer
 	cd dev-tools/packer; \
 	export ES_BEATS=${ES_BEATS} ; \
-	make deps images ${BEATNAME}
+	make deps images all
