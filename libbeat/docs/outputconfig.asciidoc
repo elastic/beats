@@ -949,7 +949,7 @@ Here is a list of allowed cipher suites and their meanings.
 * 3DES:
   Cipher suites using triple DES
 
-* AES128/256:
+* AES-128/256:
   Cipher suites using AES with 128/256-bit keys.
 
 * CBC:
@@ -977,19 +977,19 @@ The following cipher suites are available:
 
 * RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
 * RSA-3DES-CBC3-SHA
-* RSA-AES128-CBC-SHA
-* RSA-AES256-CBC-SHA
+* RSA-AES-128-CBC-SHA
+* RSA-AES-256-CBC-SHA
 * ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-* ECDHE-ECDSA-AES128-CBC-SHA
-* ECDHE-ECDSA-AES256-CBC-SHA
+* ECDHE-ECDSA-AES-128-CBC-SHA
+* ECDHE-ECDSA-AES-256-CBC-SHA
 * ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
 * ECDHE-RSA-3DES-CBC3-SHA
-* ECDHE-RSA-AES128-CBC-SHA
-* ECDHE-RSA-AES256-CBC-SHA
-* ECDHE-RSA-AES128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-ECDSA-AES128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-RSA-AES256-GCM-SHA384 (TLS 1.2 only)
-* ECDHE-ECDSA-AES256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-RSA-AES-128-CBC-SHA
+* ECDHE-RSA-AES-256-CBC-SHA
+* ECDHE-RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
 
 ===== curve_types
 
