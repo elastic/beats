@@ -13,11 +13,10 @@ type includeFields struct {
 }
 
 func init() {
-	constructor := configChecked(newIncludeFields,
-		requireFields("fields"), allowedFields("fields", "when"))
-	if err := processors.RegisterPlugin("include_fields", constructor); err != nil {
-		panic(err)
-	}
+	processors.RegisterPlugin("include_fields",
+		configChecked(newIncludeFields,
+			requireFields("fields"),
+			allowedFields("fields", "when")))
 }
 
 func newIncludeFields(c common.Config) (processors.Processor, error) {

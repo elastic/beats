@@ -8,10 +8,8 @@ import (
 type dropEvent struct{}
 
 func init() {
-	constructor := configChecked(newDropEvent, allowedFields("when"))
-	if err := processors.RegisterPlugin("drop_event", constructor); err != nil {
-		panic(err)
-	}
+	processors.RegisterPlugin("drop_event",
+		configChecked(newDropEvent, allowedFields("when")))
 }
 
 func newDropEvent(c common.Config) (processors.Processor, error) {
