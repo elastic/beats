@@ -404,10 +404,15 @@ send all headers by setting this option to true. The default is false.
 
 ===== include_body_for
 
-The list of content types for which Packetbeat includes the full HTTP payload in
-the `response` field. This option should be used together with the <<send-response-option>> option.
+The list of content types for which Packetbeat exports the full HTTP payload. The HTTP body is available under
+`http.request.body` and `http.response.body` for these Content-Types.
 
-Example configuration:
+In addition, if <<send-response-option>> option is enabled, then the HTTP body is exported together with the HTTP
+headers under `response` and if
+<<send-request-option>> enabled, then `request` contains the entire HTTP message including the body.
+
+In the following example, the HTML attachments of the HTTP responses are exported under the `response` field and under
+`http.request.body` or `http.response.body`:
 
 [source,yml]
 ------------------------------------------------------------------------------
@@ -416,6 +421,7 @@ packetbeat.protocols.http:
   send_response: true
   include_body_for: ["text/html"]
 ------------------------------------------------------------------------------
+
 
 
 ===== split_cookie
