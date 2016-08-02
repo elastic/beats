@@ -93,9 +93,9 @@ filebeat.prospectors:
   include_lines: ["^ERR", "^WARN"]
 -------------------------------------------------------------------------------------
 
-NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes `include_lines` first and then executes `exclude_lines`. 
+NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes `include_lines` first and then executes `exclude_lines`.
 The order in which the two options are defined doesn't matter. The `include_lines` option will always be executed
-before the `exclude_lines` option, even if `exclude_lines` appears before `include_lines` in the config file. 
+before the `exclude_lines` option, even if `exclude_lines` appears before `include_lines` in the config file.
 
 The following example exports all Apache log lines except the debugging messages (DBGs):
 
@@ -234,11 +234,6 @@ WARNING: Only use this options if you understand the potential side affects with
 
 Close eof closes a file as soon as the end of a file is reached. This is useful in case your files are only written once and not updated from time to time. This case can happen in case you are writing every single log event to a new file.
 
-===== close_timeout
-
-WARNING: Only use this options if you understand the potential side affects with potential data loss.
-
-Close timeout gives every harvester a predefined lifetime. Independent of the location of the reader, it will stop the reader after `close_timeout`. This option can be useful, if only a predefine time should be spent on older log files. Using this option in combination with `ignore_older` == `close_timeout` means the file is not picked up again in case it wasn't modified in between. This normally leads to data loss and not the complete file is sent.
 
 [[clean-options]]
 ===== clean_*
