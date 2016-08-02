@@ -22,7 +22,7 @@ var (
 		Backoff:         1 * time.Second,
 		BackoffFactor:   2,
 		MaxBackoff:      10 * time.Second,
-		CloseInactive:   1 * time.Hour,
+		CloseInactive:   5 * time.Minute,
 		MaxBytes:        10 * humanize.MiByte,
 		CloseRemoved:    false,
 		CloseRenamed:    false,
