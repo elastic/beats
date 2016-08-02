@@ -9,6 +9,18 @@ import (
 	"syscall"
 )
 
+func newProcAttributes(config execRunnerConfig) (*syscall.SysProcAttr, error) {
+	creds, err := loadCredentials(config.User)
+	if err != nil {
+		return nil, err
+	}
+
+	return &syscall.SysProcAttr{
+		Chroot:     config.Chroot,
+		Credential: creds,
+	}, nil
+}
+
 func loadCredentials(username string) (*syscall.Credential, error) {
 	if username == "" {
 		return nil, nil
