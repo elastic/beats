@@ -183,12 +183,6 @@ filebeat.prospectors:
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_eof: false
 
-  # Close timeout closes the harvester after the predefined time.
-  # This is independent if the harvester did finish reading the file or not.
-  # By default this option is disabled.
-  # Note: Potential data loss. Make sure to read and understand the docs for this option.
-  #close_timeout: 0
-
   ### State options
 
   # Files for the modification data is older then clean_inactive the state from the registry is removed
