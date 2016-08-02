@@ -10,7 +10,6 @@ RUN set -x && \
 ## Install go package dependencies
 RUN set -x \
   go get \
-	github.com/pierrre/gotestcover \
 	github.com/tsg/goautotest \
 	golang.org/x/tools/cmd/vet
 
