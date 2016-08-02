@@ -22,9 +22,9 @@ import (
 )
 
 type execRunner struct {
-	formatter   *fmtstr.EventFormatString
-	config      execRunnerConfig
-	credentials *syscall.Credential
+	formatter *fmtstr.EventFormatString
+	config    execRunnerConfig
+	procAttr  *syscall.SysProcAttr
 }
 
 func init() {
@@ -67,15 +67,15 @@ func newExecRunner(config execRunnerConfig) (*execRunner, error) {
 		return nil, errors.New("no arguments")
 	}
 
-	credential, err := loadCredentials(config.User)
+	attr, err := newProcAttributes(config)
 	if err != nil {
 		return nil, err
 	}
 
 	runner := &execRunner{
-		formatter:   fs,
-		credentials: credential,
-		config:      config,
+		formatter: fs,
+		procAttr:  attr,
+		config:    config,
 	}
 	return runner, nil
 }
@@ -104,10 +104,7 @@ func (r *execRunner) Exec(event common.MapStr) (common.MapStr, error) {
 	// TODO: add support for event being pushed on stdin instead of passing arguments
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Dir = r.config.WorkingDir
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Chroot:     r.config.Chroot,
-		Credential: r.credentials,
-	}
+	cmd.SysProcAttr = r.procAttr
 	cmd.Env = r.config.Env
 
 	// read and capture output
@@ -154,11 +151,15 @@ func (r *execRunner) Exec(event common.MapStr) (common.MapStr, error) {
 		}
 	}()
 
+	// wait for readers to finish processing input
+	// (stdout/stderr being closed by process)
+	wg.Wait()
+
+	// wait for finish and properly release resources acquired by exec
 	err = cmd.Wait()
 	if timer != nil {
 		timer.Stop()
 	}
-	wg.Wait()
 	if err != nil {
 		// something bad happened, let's try to generate some error message
 		if stderrBuf.Len() == 0 {
