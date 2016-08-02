@@ -8,6 +8,9 @@ language: go
 go:
   - 1.6.2
 
+# Make sure project can also be built on travis for clones of the repo
+go_import_path: github.com/elastic/beats
+
 os:
   - linux
   - osx
@@ -54,18 +57,12 @@ matrix:
     - env: TARGETS="-C libbeat crosscompile"
     - env: TARGETS="-C filebeat crosscompile"
 
-
 addons:
   apt:
     packages:
       - python-virtualenv
       - libpcap-dev
       - geoip-database
-
-before_script:
-  - wget https://github.com/Masterminds/glide/releases/download/0.10.2/glide-0.10.2-linux-386.tar.gz -O /tmp/glide.tar.gz
-  - tar -xvf /tmp/glide.tar.gz
-  - export PATH=$PATH:$PWD/linux-386
 
 before_install:
   # Update to most recent docker version
@@ -74,11 +71,6 @@ before_install:
       sudo apt-cache search docker;
       sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine;
     fi
-  # Redo the travis setup but with the elastic/beats path. This is needed so the package path is correct also for forks
-  - mkdir -p $HOME/gopath/src/github.com/elastic/beats/
-  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/beats/
-  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/elastic/beats/
-  - cd $HOME/gopath/src/github.com/elastic/beats/
   # Docker-compose installation
   - sudo rm /usr/local/bin/docker-compose || true
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
