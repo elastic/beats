@@ -95,23 +95,23 @@
                 CPU stats.
               fields:
                 - name: load
-                  type: half_float
+                  type: scaled_float
                   description: >
                     CPU Load.
                 - name: user
-                  type: half_float
+                  type: scaled_float
                   description: >
                     CPU user load.
                 - name: system
-                  type: half_float
+                  type: scaled_float
                   description: >
                     System cpu.
                 - name: children_user
-                  type: half_float
+                  type: scaled_float
                   description: >
                     CPU of children user.
                 - name: children_system
-                  type: half_float
+                  type: scaled_float
                   description: >
                     CPU of children system.
             - name: connections
@@ -1116,7 +1116,7 @@
                 CPU Core number.
 
             - name: user.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
                 For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
@@ -1127,7 +1127,7 @@
                The amount of CPU time spent in user space.
 
             - name: system.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent in kernel space.
 
@@ -1137,7 +1137,7 @@
                 The amount of CPU time spent in kernel space.
 
             - name: nice.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent on low-priority processes.
 
@@ -1147,7 +1147,7 @@
                 The amount of CPU time spent on low-priority processes.
 
             - name: idle.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent idle.
 
@@ -1157,7 +1157,7 @@
                 The amount of CPU time spent idle.
 
             - name: iowait.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent in wait (on disk).
 
@@ -1167,7 +1167,7 @@
                 The amount of CPU time spent in wait (on disk).
 
             - name: irq.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -1177,7 +1177,7 @@
                 The amount of CPU time spent servicing and handling hardware interrupts.
 
             - name: softirq.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent servicing and handling software interrupts.
 
@@ -1187,7 +1187,7 @@
                 The amount of CPU time spent servicing and handling software interrupts.
 
             - name: steal.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
@@ -1206,43 +1206,43 @@
             `cpu` contains local CPU stats.
           fields:
             - name: user.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
                 For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
             - name: system.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent in kernel space.
 
             - name: nice.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent on low-priority processes.
 
             - name: idle.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent idle.
 
             - name: iowait.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent in wait (on disk).
 
             - name: irq.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent servicing and handling hardware interrupts.
 
             - name: softirq.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent servicing and handling software interrupts.
 
             - name: steal.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
@@ -1381,7 +1381,7 @@
               description: >
                 The used disk space in bytes.
             - name: used.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of used disk space.
 
@@ -1420,30 +1420,36 @@
             Load averages.
           fields:
             - name: "1"
-              type: half_float
+              type: scaled_float
+              scaling_factor: 100
               description: >
                 Load average for the last minute.
             - name: "5"
-              type: half_float
+              type: scaled_float
+              scaling_factor: 100
               description: >
                 Load average for the last 5 minutes.
             - name: "15"
-              type: half_float
+              type: scaled_float
+              scaling_factor: 100
               description: >
                 Load average for the last 15 minutes.
 
             - name: "norm.1"
-              type: half_float
+              type: scaled_float
+              scaling_factor: 100
               description: >
                 Load divided by the number of cores for the last minute.
 
             - name: "norm.5"
-              type: half_float
+              type: scaled_float
+              scaling_factor: 100
               description: >
                 Load divided by the number of cores for the last 5 minutes.
 
             - name: "norm.15"
-              type: half_float
+              type: scaled_float
+              scaling_factor: 100
               description: >
                 Load divided by the number of cores for the last 15 minutes.
         - name: memory
@@ -1468,7 +1474,7 @@
                 buffers (see system.memory.actual.free).
 
             - name: used.pct
-              type: half_float
+              type: scaled_float
               description: >
                 The percentage of used memory.
 
@@ -1493,7 +1499,7 @@
                     of the calling process.
 
                 - name: used.pct
-                  type: half_float
+                  type: scaled_float
                   description: >
                     The percentage of actual used memory.
 
@@ -1518,7 +1524,7 @@
                     Available swap memory.
 
                 - name: used.pct
-                  type: half_float
+                  type: scaled_float
                   description: >
                     The percentage of used swap memory.
         - name: network
@@ -1619,7 +1625,7 @@
                   description: >
                     The amount of CPU time the process spent in user space.
                 - name: total.pct
-                  type: half_float
+                  type: scaled_float
                   description: >
                     The percentage of CPU time spent by the process since the last update. Its value is similar to the
                     %CPU value of the process displayed by the top command on Unix systems.
@@ -1649,7 +1655,7 @@
                   description: >
                     The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
                 - name: rss.pct
-                  type: half_float
+                  type: scaled_float
                   description: >
                     The percentage of memory the process occupied in main memory (RAM).
                 - name: share

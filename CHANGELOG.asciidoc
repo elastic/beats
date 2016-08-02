@@ -46,6 +46,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 
 *Metricbeat*
 
+- Use the new scaled_float Elasticsearch type for the percentage values. {pull}2156[2156]
+
 *Packetbeat*
 
 *Topbeat*
