@@ -3,6 +3,7 @@ package reader
 import (
 	"errors"
 	"fmt"
+	"io"
 	"regexp"
 	"time"
 )
@@ -109,28 +110,20 @@ func (mlr *Multiline) Next() (Message, error) {
 }
 
 func (mlr *Multiline) readFirst() (Message, error) {
-	for {
-		message, err := mlr.reader.Next()
-		if err != nil {
-			// no lines buffered -> ignore timeout
-			if err == sigMultilineTimeout {
-				continue
-			}
-
+	message, err := mlr.reader.Next()
+	if err != nil {
+		// no lines buffered -> ignore timeout
+		if err != sigMultilineTimeout {
 			// pass error to caller (next layer) for handling
 			return message, err
 		}
-
-		if message.Bytes == 0 {
-			continue
-		}
-
-		// Start new multiline event
-		mlr.clear()
-		mlr.load(message)
-		mlr.setState((*Multiline).readNext)
-		return mlr.readNext()
 	}
+
+	// Start new multiline event
+	mlr.clear()
+	mlr.load(message)
+	mlr.setState((*Multiline).readNext)
+	return mlr.readNext()
 }
 
 func (mlr *Multiline) readNext() (Message, error) {
@@ -138,11 +131,11 @@ func (mlr *Multiline) readNext() (Message, error) {
 		message, err := mlr.reader.Next()
 		if err != nil {
 			// handle multiline timeout signal
-			if err == sigMultilineTimeout {
+			if err == sigMultilineTimeout || err == io.EOF {
 				// no lines buffered -> ignore timeout
-				if mlr.numLines == 0 {
-					continue
-				}
+				//if mlr.numLines == 0 {
+				//	continue
+				//}
 
 				// return collected multiline event and
 				// empty buffer for new multiline event
@@ -152,37 +145,38 @@ func (mlr *Multiline) readNext() (Message, error) {
 			}
 
 			// handle error without any bytes returned from reader
-			if message.Bytes == 0 {
-				// no lines buffered -> return error
-				if mlr.numLines == 0 {
-					return Message{}, err
-				}
-
-				// lines buffered, return multiline and error on next read
-				msg := mlr.finalize()
-				mlr.err = err
-				mlr.setState((*Multiline).readFailed)
-				return msg, nil
-			}
+			//if message.Bytes == 0 {
+			//	// no lines buffered -> return error
+			//	if mlr.numLines == 0 {
+			//		return Message{}, err
+			//	}
+			//
+			//	// lines buffered, return multiline and error on next read
+			//	m := mlr.finalize()
+			//	mlr.err = err
+			//	mlr.setState((*Multiline).readFailed)
+			//	return m, nil
+			//}
 
 			// handle error with some content being returned by reader and
 			// line matching multiline criteria or no multiline started yet
-			if mlr.message.Bytes == 0 || mlr.pred(mlr.last, message.Content) {
-				mlr.addLine(message)
+			//if mlr.readBytes == 0 || mlr.pred(mlr.last, message.Content) {
+			//	mlr.addLine(message)
+			//
+			//	// return multiline and error on next read
+			//	m := mlr.finalize()
+			//	mlr.err = err
+			//	mlr.setState((*Multiline).readFailed)
+			//	return m, nil
+			//}
 
-				// return multiline and error on next read
-				msg := mlr.finalize()
-				mlr.err = err
-				mlr.setState((*Multiline).readFailed)
-				return msg, nil
-			}
-
-			// no match, return current multline and retry with current line on next
+			// no match, return current multiline and retry with current line on next
 			// call to readNext awaiting the error being reproduced (or resolved)
 			// in next call to Next
-			msg := mlr.finalize()
+			m := mlr.finalize()
 			mlr.load(message)
-			return msg, nil
+			return m, err
+
 		}
 
 		// if predicate does not match current multiline -> return multiline event
