@@ -20,7 +20,7 @@
         buffers (see system.memory.actual.free).
 
     - name: used.pct
-      type: half_float
+      type: scaled_float
       description: >
         The percentage of used memory.
 
@@ -45,7 +45,7 @@
             of the calling process.
 
         - name: used.pct
-          type: half_float
+          type: scaled_float
           description: >
             The percentage of actual used memory.
 
@@ -70,6 +70,6 @@
             Available swap memory.
 
         - name: used.pct
-          type: half_float
+          type: scaled_float
           description: >
             The percentage of used swap memory.

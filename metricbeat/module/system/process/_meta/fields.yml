@@ -45,7 +45,7 @@
           description: >
             The amount of CPU time the process spent in user space.
         - name: total.pct
-          type: half_float
+          type: scaled_float
           description: >
             The percentage of CPU time spent by the process since the last update. Its value is similar to the
             %CPU value of the process displayed by the top command on Unix systems.
@@ -75,7 +75,7 @@
           description: >
             The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
         - name: rss.pct
-          type: half_float
+          type: scaled_float
           description: >
             The percentage of memory the process occupied in main memory (RAM).
         - name: share
