@@ -6,10 +6,12 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
+	"fmt"
 	"github.com/elastic/beats/packetbeat/protos"
+	. "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 	"github.com/elastic/beats/packetbeat/publish"
-	. "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
+	"strings"
 )
 
 // cassandra application level protocol analyzer plugin
@@ -88,6 +90,27 @@ func (cassandra *cassandra) setFromConfig(config *cassandraConfig) error {
 		parser.compressor = SnappyCompressor{}
 	} else {
 		parser.compressor = nil
+	}
+
+	// parsed ignored ops
+	if len(config.IgnoredOPs) > 0 {
+		maps := make(map[string]interface{})
+
+		if strings.Contains(config.IgnoredOPs, ",") {
+			array := strings.Split(config.IgnoredOPs, ",")
+			for i := 0; i < len(array); i++ {
+				str := array[i]
+				if len(str) > 0 {
+					maps[strings.ToUpper(strings.TrimSpace(str))] = str
+				}
+			}
+		} else {
+			maps[strings.ToUpper(strings.TrimSpace(config.IgnoredOPs))] = config.IgnoredOPs
+		}
+		parser.ignoredOps = maps
+		if isDebug {
+			logp.Debug("cassandra", fmt.Sprintf("parsed config IgnoredOPs: %v ", parser.ignoredOps))
+		}
 	}
 
 	// set transaction correlator configuration

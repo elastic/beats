@@ -13,6 +13,7 @@ type transPub struct {
 	sendResponse       bool
 	sendRequestHeader  bool
 	sendResponseHeader bool
+	ignoredOps         string
 
 	results publish.Transactions
 }

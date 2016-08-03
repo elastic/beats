@@ -1,48 +1,28 @@
-/**
-https://github.com/apache/cassandra/blob/trunk/doc/native_protocol_v4.spec
+// Copyright (c) 2012 The gocql Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
-  The CQL binary protocol is a frame based protocol. Frames are defined as:
-
-      0         8        16        24        32         40
-      +---------+---------+---------+---------+---------+
-      | version |  flags  |      stream       | opcode  |
-      +---------+---------+---------+---------+---------+
-      |                length                 |
-      +---------+---------+---------+---------+
-      |                                       |
-      .            ...  body ...              .
-      .                                       .
-      .                                       .
-      +----------------------------------------
-
-  The protocol is big-endian (network byte order).
-
-  some code derived from https://github.com/gocql/gocql
-
-*/
 package cassandra
 
 import (
 	"errors"
 	"fmt"
-	"github.com/elastic/beats/libbeat/logp"
-	"io"
-	"io/ioutil"
-	"net"
-	"runtime"
-	"sync"
 	"github.com/elastic/beats/libbeat/common/streambuf"
+	"github.com/elastic/beats/libbeat/logp"
+	"sync"
 )
 
 var (
+	ErrFrameLength = errors.New("frame body length can not be less than 0")
 	ErrFrameTooBig = errors.New("frame length is bigger than the maximum allowed")
+	isDebug        = false
 )
 
 type frameHeader struct {
 	Version       protoVersion
 	Flags         byte
 	Stream        int
-	Op            frameOp
+	Op            FrameOp
 	Length        int
 	CustomPayload map[string][]byte
 }
@@ -77,30 +57,133 @@ var framerPool = sync.Pool{
 
 // a framer is responsible for reading, writing and parsing frames on a single stream
 type framer struct {
-	r io.Reader
-
 	proto byte
+
 	// flags are for outgoing flags, enabling compression and tracing etc
-	flags    byte
-	compres  Compressor
+	flags byte
+
+	compres Compressor
+
+	isCompressed bool
+
 	headSize int
 	// if this frame was read then the header will be here
 	header *frameHeader
-
-	// if tracing flag is set this is not nil
-	traceID []byte
 
 	// holds a ref to the whole byte slice for rbuf so that it can be reset to
 	// 0 after a read.
 	readBuffer []byte
 
-	rbuf []byte
+	r *streambuf.Buffer
+
+	decoder Decoder
 }
 
-func NewFramer(r *streambuf.Buffer, compressor Compressor, version byte) *framer {
+func NewFramer(r *streambuf.Buffer, compressor Compressor) *framer {
+
 	f := framerPool.Get().(*framer)
+	f.compres = compressor
+	f.r = r
+
+	return f
+}
+
+// read header frame from stream
+func (f *framer) ReadHeader() (head *frameHeader, err error) {
+	v, err := f.r.ReadByte()
+	if err != nil {
+		return nil, err
+	}
+	version := v & protoVersionMask
+
+	if version < protoVersion1 || version > protoVersion4 {
+		return nil, fmt.Errorf("unsupported response version: %d", version)
+	}
+	//fmt.Printf("Version Byte: %x \n",v)
+
+	head = &frameHeader{}
+
+	head.Version = protoVersion(v)
+
+	head.Flags, err = f.r.ReadByte()
+
+	if version > protoVersion2 {
+		stream, err := f.r.ReadNetUint16()
+		if err != nil {
+			return nil, err
+		}
+		head.Stream = int(stream)
+
+		b, err := f.r.ReadByte()
+		if err != nil {
+			return nil, err
+		}
+
+		head.Op = FrameOp(b)
+		l, err := f.r.ReadNetUint32()
+		if err != nil {
+			return nil, err
+		}
+		head.Length = int(l)
+	} else {
+		stream, err := f.r.ReadNetUint8()
+		if err != nil {
+			return nil, err
+		}
+		head.Stream = int(stream)
+
+		b, err := f.r.ReadByte()
+		if err != nil {
+			return nil, err
+		}
+
+		head.Op = FrameOp(b)
+		l, err := f.r.ReadNetUint32()
+		if err != nil {
+			return nil, err
+		}
+		head.Length = int(l)
+	}
+
+	if head.Length < 0 {
+		return nil, fmt.Errorf("frame body length can not be less than 0: %d", head.Length)
+	} else if head.Length > maxFrameSize {
+		// need to free up the connection to be used again
+		logp.Err("head length is too large")
+		return nil, ErrFrameTooBig
+	}
+
+	if !f.r.Avail(head.Length) {
+		return nil, errors.New(fmt.Sprintf("frame length is not enough as expected length: %v", head.Length))
+	}
+
+	logp.Debug("cassandra", "header: %v", head)
+	f.header = head
+	return head, nil
+}
+
+// reads a frame form the wire into the framers buffer
+func (f *framer) ReadFrame() (data map[string]interface{}, err error) {
+
+	//defer func() {
+	//	if r := recover(); r != nil {
+	//		if _, ok := r.(runtime.Error); ok {
+	//			panic(r)
+	//		}
+	//		err = r.(error)
+	//	}
+	//}()
+
+	if f.header.Length < 0 {
+		return nil, ErrFrameLength
+	} else if f.header.Length > maxFrameSize {
+		return nil, ErrFrameTooBig
+	}
+
 	var flags byte
-	if compressor != nil {
+	version := byte(f.header.Version)
+
+	if f.compres != nil {
 		flags |= flagCompress
 	}
 
@@ -111,160 +194,43 @@ func NewFramer(r *streambuf.Buffer, compressor Compressor, version byte) *framer
 		headSize = 9
 	}
 
-	f.compres = compressor
 	f.proto = version
 	f.flags = flags
 	f.headSize = headSize
 
-	f.r = r
-	f.rbuf = f.readBuffer[:0]
-
-	f.header = nil
-	f.traceID = nil
-
-	return f
-}
-
-type frame interface {
-	Header() frameHeader
-}
-
-func ReadHeader(r *streambuf.Buffer) (head *frameHeader, err error) {
-	v,err:=r.ReadByte()
-	if err != nil {
-		return nil, err
-	}
-	version := v & protoVersionMask
-
-	if version < protoVersion1 || version > protoVersion4 {
-		return nil, fmt.Errorf("unsupported response version: %d", version)
-	}
-
-	head = &frameHeader{}
-
-	head.Version = protoVersion(v)
-
-	head.Flags,err = r.ReadByte()
-
-	if version > protoVersion2 {
-		stream,err := r.ReadNetUint16()
-		if err != nil {
-			return nil, err
-		}
-		head.Stream=int(stream)
-
-		b,err := r.ReadByte()
-		if err != nil {
-			return nil, err
-		}
-
-		head.Op = frameOp(b)
-		l,err := r.ReadNetUint32()
-		if err != nil {
-			return nil, err
-		}
-		head.Length=int(l)
-	} else {
-		stream,err := r.ReadNetUint8()
-		if err != nil {
-			return nil, err
-		}
-		head.Stream=int(stream)
-
-
-		b,err := r.ReadByte()
-		if err != nil {
-			return nil, err
-		}
-
-		head.Op = frameOp(b)
-		l,err := r.ReadNetUint32()
-		if err != nil {
-			return nil, err
-		}
-		head.Length=int(l)
-	}
-
-	logp.Debug("cassandra","header: %v", head)
-
-	return head, nil
-}
-
-// reads a frame form the wire into the framers buffer
-func (f *framer) ReadFrame(head *frameHeader) error {
-	if head.Length < 0 {
-		return fmt.Errorf("frame body length can not be less than 0: %d", head.Length)
-	} else if head.Length > maxFrameSize {
-		// need to free up the connection to be used again
-		_, err := io.CopyN(ioutil.Discard, f.r, int64(head.Length))
-		if err != nil {
-			return fmt.Errorf("error whilst trying to discard frame with invalid length: %v", err)
-		}
-		return ErrFrameTooBig
-	}
-
-	if cap(f.readBuffer) >= head.Length {
-		f.rbuf = f.readBuffer[:head.Length]
-	} else {
-		f.readBuffer = make([]byte, head.Length)
-		f.rbuf = f.readBuffer
-	}
-
-	// assume the underlying reader takes care of timeouts and retries
-	n, err := io.ReadFull(f.r, f.rbuf)
-	if err != nil {
-		return fmt.Errorf("unable to read frame body: read %d/%d bytes: %v", n, head.Length, err)
-	}
-
-	// dealing with compressed frame body
-	if head.Flags &flagCompress == flagCompress {
-		if f.compres == nil {
-			return errors.New("no compressor available with compressed frame body")
-		}
-
-		f.rbuf, err = f.compres.Decode(f.rbuf)
-		if err != nil {
-			return err
-		}
-	}
-
-	f.header = head
-	return nil
-}
-
-func (f *framer) ParseFrame() (data map[string]interface{}, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			if _, ok := r.(runtime.Error); ok {
-				panic(r)
-			}
-			err = r.(error)
-		}
-	}()
+	decoder := &StreamDecoder{}
+	decoder.r = f.r
+	f.decoder = decoder
 
 	data = make(map[string]interface{})
 
-	data["request_type"] = f.header.Op.String()
+	//Only QUERY, PREPARE and EXECUTE queries support tracing
+	//If a response frame has the tracing flag set, its body contains
+	//a tracing ID. The tracing ID is a [uuid] and is the first thing in
+	//the frame body. The rest of the body will then be the usual body
+	//corresponding to the response opcode.
+	if f.header.Flags&flagTracing == flagTracing && (f.header.Op == opQuery || f.header.Op == opExecute || f.header.Op == opPrepare) {
 
-	if f.header.Flags &flagTracing == flagTracing {
-		uuid, err := f.readUUID()
-		if err != nil {
-			f.traceID = uuid.Bytes()
-			// dealing with traceId
-			data["trace_id"] = uuid.String()
-		}
+		logp.Debug("cassandra", "tracing enabled")
 
+		uid := f.decoder.ReadUUID()
+
+		logp.Debug("cassandra", uid.String())
+
+		data["trace_id"] = uid.String()
 	}
 
-	if f.header.Flags &flagWarning == flagWarning {
-		warnings := f.readStringList()
+	if f.header.Flags&flagWarning == flagWarning {
+		warnings := f.decoder.ReadStringList()
 		// dealing with warnings
 		data["warnings"] = warnings
 	}
 
-	if f.header.Flags &flagCustomPayload == flagCustomPayload {
-		f.header.CustomPayload = f.readBytesMap()
+	if f.header.Flags&flagCustomPayload == flagCustomPayload {
+		f.header.CustomPayload = f.decoder.ReadBytesMap()
 	}
+
+	data["request_type"] = f.header.Op.String()
 
 	// assumes that the frame body has been read into rbuf
 	switch f.header.Op {
@@ -297,8 +263,8 @@ func (f *framer) ParseFrame() (data map[string]interface{}, err error) {
 
 func (f *framer) parseErrorFrame() (data map[string]interface{}) {
 
-	code := f.readInt()
-	msg := f.readString()
+	code := f.decoder.ReadInt()
+	msg := f.decoder.ReadString()
 
 	errT := ErrType(code)
 
@@ -309,18 +275,18 @@ func (f *framer) parseErrorFrame() (data map[string]interface{}) {
 
 	switch errT {
 	case errUnavailable:
-		cl := f.readConsistency()
-		required := f.readInt()
-		alive := f.readInt()
+		cl := f.decoder.ReadConsistency()
+		required := f.decoder.ReadInt()
+		alive := f.decoder.ReadInt()
 		data["read_consistency"] = cl.String()
 		data["required"] = required
 		data["alive"] = alive
 
 	case errWriteTimeout:
-		cl := f.readConsistency()
-		received := f.readInt()
-		blockfor := f.readInt()
-		writeType := f.readString()
+		cl := f.decoder.ReadConsistency()
+		received := f.decoder.ReadInt()
+		blockfor := f.decoder.ReadInt()
+		writeType := f.decoder.ReadString()
 
 		data["read_consistency"] = cl.String()
 		data["received"] = received
@@ -328,10 +294,10 @@ func (f *framer) parseErrorFrame() (data map[string]interface{}) {
 		data["write_type"] = writeType
 
 	case errReadTimeout:
-		cl := f.readConsistency()
-		received := f.readInt()
-		blockfor := f.readInt()
-		dataPresent := f.readByte()
+		cl := f.decoder.ReadConsistency()
+		received := f.decoder.ReadInt()
+		blockfor := f.decoder.ReadInt()
+		dataPresent := f.decoder.ReadByte()
 
 		data["read_consistency"] = cl.String()
 		data["received"] = received
@@ -339,34 +305,34 @@ func (f *framer) parseErrorFrame() (data map[string]interface{}) {
 		data["data_present"] = dataPresent
 
 	case errAlreadyExists:
-		ks := f.readString()
-		table := f.readString()
+		ks := f.decoder.ReadString()
+		table := f.decoder.ReadString()
 
 		data["keyspace"] = ks
 		data["table"] = table
 
 	case errUnprepared:
-		stmtId := f.readShortBytes()
+		stmtId := f.decoder.ReadShortBytes()
 
 		data["stmt_id"] = copyBytes(stmtId)
 
 	case errReadFailure:
-		data["read_consistency"] = f.readConsistency().String()
-		data["received"] = f.readInt()
-		data["blockfor"] = f.readInt()
-		data["data_present"] = f.readByte() != 0
+		data["read_consistency"] = f.decoder.ReadConsistency().String()
+		data["received"] = f.decoder.ReadInt()
+		data["blockfor"] = f.decoder.ReadInt()
+		data["data_present"] = f.decoder.ReadByte() != 0
 
 	case errWriteFailure:
-		data["read_consistency"] = f.readConsistency().String()
-		data["received"] = f.readInt()
-		data["blockfor"] = f.readInt()
-		data["num_failures"] = f.readInt()
-		data["write_type"] = f.readString()
+		data["read_consistency"] = f.decoder.ReadConsistency().String()
+		data["received"] = f.decoder.ReadInt()
+		data["blockfor"] = f.decoder.ReadInt()
+		data["num_failures"] = f.decoder.ReadInt()
+		data["write_type"] = f.decoder.ReadString()
 
 	case errFunctionFailure:
-		data["keyspace"] = f.readString()
-		data["function"] = f.readString()
-		data["arg_types"] = f.readStringList()
+		data["keyspace"] = f.decoder.ReadString()
+		data["function"] = f.decoder.ReadString()
+		data["arg_types"] = f.decoder.ReadStringList()
 
 	case errInvalid, errBootstrapping, errConfig, errCredentials, errOverloaded,
 		errProtocol, errServer, errSyntax, errTruncate, errUnauthorized:
@@ -379,33 +345,33 @@ func (f *framer) parseErrorFrame() (data map[string]interface{}) {
 func (f *framer) parseSupportedFrame() (data map[string]interface{}) {
 
 	data = make(map[string]interface{})
-	data["supported"] = f.readStringMultiMap()
+	data["supported"] = f.decoder.ReadStringMultiMap()
 	return data
 }
 
 func (f *framer) parseResultMetadata(getPKinfo bool) map[string]interface{} {
 
 	meta := make(map[string]interface{})
-	flags := f.readInt()
+	flags := f.decoder.ReadInt()
 	meta["flags"] = flags
-	colCount := f.readInt()
+	colCount := f.decoder.ReadInt()
 	meta["col_count"] = colCount
 
 	if getPKinfo {
 
 		//only for prepared result
 		if f.proto >= protoVersion4 {
-			pkeyCount := f.readInt()
+			pkeyCount := f.decoder.ReadInt()
 			pkeys := make([]int, pkeyCount)
 			for i := 0; i < pkeyCount; i++ {
-				pkeys[i] = int(f.readShort())
+				pkeys[i] = int(f.decoder.ReadShort())
 			}
 			meta["pkey_columns"] = pkeys
 		}
 	}
 
 	if flags&flagHasMorePages == flagHasMorePages {
-		meta["paging_state"] = fmt.Sprintf("%X", f.readBytes())
+		meta["paging_state"] = fmt.Sprintf("%X", f.decoder.ReadBytes())
 	}
 
 	if flags&flagNoMetaData == flagNoMetaData {
@@ -415,8 +381,8 @@ func (f *framer) parseResultMetadata(getPKinfo bool) map[string]interface{} {
 	var keyspace, table string
 	globalSpec := flags&flagGlobalTableSpec == flagGlobalTableSpec
 	if globalSpec {
-		keyspace = f.readString()
-		table = f.readString()
+		keyspace = f.decoder.ReadString()
+		table = f.decoder.ReadString()
 		meta["keyspace"] = keyspace
 		meta["table"] = table
 	}
@@ -444,13 +410,13 @@ func (f *framer) parseResultMetadata(getPKinfo bool) map[string]interface{} {
 
 func (f *framer) parseQueryFrame() (data map[string]interface{}) {
 	data = make(map[string]interface{})
-	data["query"] = string(f.readBytes())
+	data["query"] = f.decoder.ReadLongString()
 	return data
 }
 
 func (f *framer) parseResultFrame() (data map[string]interface{}) {
 
-	kind := f.readInt()
+	kind := f.decoder.ReadInt()
 
 	data = make(map[string]interface{})
 	switch kind {
@@ -461,7 +427,7 @@ func (f *framer) parseResultFrame() (data map[string]interface{}) {
 		data["rows"] = f.parseResultRows()
 	case resultKindSetKeyspace:
 		data["result_type"] = "set_keyspace"
-		data["keyspace"] = f.readString()
+		data["keyspace"] = f.decoder.ReadString()
 	case resultKindPrepared:
 		data["result_type"] = "prepared"
 		data["result"] = f.parseResultPrepared()
@@ -477,7 +443,7 @@ func (f *framer) parseResultRows() map[string]interface{} {
 
 	result := make(map[string]interface{})
 	result["meta"] = f.parseResultMetadata(false)
-	result["num_rows"] = f.readInt()
+	result["num_rows"] = f.decoder.ReadInt()
 
 	return result
 }
@@ -486,7 +452,7 @@ func (f *framer) parseResultPrepared() map[string]interface{} {
 
 	result := make(map[string]interface{})
 
-	result["prepared_id"] = string(f.readShortBytes())
+	result["prepared_id"] = string(f.decoder.ReadShortBytes())
 	result["req_meta"] = f.parseResultMetadata(true)
 
 	if f.proto < protoVersion2 {
@@ -502,32 +468,32 @@ func (f *framer) parseResultSchemaChange() (data map[string]interface{}) {
 	data = make(map[string]interface{})
 
 	if f.proto <= protoVersion2 {
-		change := f.readString()
-		keyspace := f.readString()
-		table := f.readString()
+		change := f.decoder.ReadString()
+		keyspace := f.decoder.ReadString()
+		table := f.decoder.ReadString()
 
 		data["change"] = change
 		data["keyspace"] = keyspace
 		data["table"] = table
 	} else {
-		change := f.readString()
-		target := f.readString()
+		change := f.decoder.ReadString()
+		target := f.decoder.ReadString()
 
 		data["change"] = change
 		data["type"] = target
 
 		switch target {
 		case "KEYSPACE":
-			data["keyspace"] = f.readString()
+			data["keyspace"] = f.decoder.ReadString()
 
 		case "TABLE", "TYPE":
-			data["keyspace"] = f.readString()
-			data["object"] = f.readString()
+			data["keyspace"] = f.decoder.ReadString()
+			data["object"] = f.decoder.ReadString()
 
 		case "FUNCTION", "AGGREGATE":
-			data["keyspace"] = f.readString()
-			data["name"] = f.readString()
-			data["args"] = f.readStringList()
+			data["keyspace"] = f.decoder.ReadString()
+			data["name"] = f.decoder.ReadString()
+			data["args"] = f.decoder.ReadStringList()
 
 		default:
 			logp.Warn("unknown SCHEMA_CHANGE target: %q change: %q", target, change)
@@ -538,19 +504,19 @@ func (f *framer) parseResultSchemaChange() (data map[string]interface{}) {
 
 func (f *framer) parseAuthenticateFrame() (data map[string]interface{}) {
 	data = make(map[string]interface{})
-	data["class"] = f.readString()
+	data["class"] = f.decoder.ReadString()
 	return data
 }
 
 func (f *framer) parseAuthSuccessFrame() (data map[string]interface{}) {
 	data = make((map[string]interface{}))
-	data["data"] = fmt.Sprintf("%q", f.readBytes())
+	data["data"] = fmt.Sprintf("%q", f.decoder.ReadBytes())
 	return data
 }
 
 func (f *framer) parseAuthChallengeFrame() (data map[string]interface{}) {
 	data = make((map[string]interface{}))
-	data["data"] = fmt.Sprintf("%q", f.readBytes())
+	data["data"] = fmt.Sprintf("%q", f.decoder.ReadBytes())
 	return data
 }
 
@@ -558,19 +524,19 @@ func (f *framer) parseEventFrame() (data map[string]interface{}) {
 
 	data = make((map[string]interface{}))
 
-	eventType := f.readString()
+	eventType := f.decoder.ReadString()
 	data["event_type"] = eventType
 
 	switch eventType {
 	case "TOPOLOGY_CHANGE":
-		data["change"] = f.readString()
-		host, port := f.readInet()
+		data["change"] = f.decoder.ReadString()
+		host, port := f.decoder.ReadInet()
 		data["host"] = host
 		data["port"] = port
 
 	case "STATUS_CHANGE":
-		data["change"] = f.readString()
-		host, port := f.readInet()
+		data["change"] = f.decoder.ReadString()
+		host, port := f.decoder.ReadInet()
 		data["host"] = host
 		data["port"] = port
 
@@ -641,20 +607,20 @@ type ColumnInfo struct {
 
 func (f *framer) readCol(col *ColumnInfo, globalSpec bool, keyspace, table string) {
 	if !globalSpec {
-		col.Keyspace = f.readString()
-		col.Table = f.readString()
+		col.Keyspace = f.decoder.ReadString()
+		col.Table = f.decoder.ReadString()
 	} else {
 		col.Keyspace = keyspace
 		col.Table = table
 	}
 
-	col.Name = f.readString()
+	col.Name = f.decoder.ReadString()
 	col.TypeInfo = f.readTypeInfo()
 }
 
 func (f *framer) readTypeInfo() TypeInfo {
 
-	id := f.readShort()
+	id := f.decoder.ReadShort()
 
 	simple := NativeType{
 		proto: f.proto,
@@ -662,7 +628,7 @@ func (f *framer) readTypeInfo() TypeInfo {
 	}
 
 	if simple.typ == TypeCustom {
-		simple.custom = f.readString()
+		simple.custom = f.decoder.ReadString()
 		if cassType := getApacheCassandraType(simple.custom); cassType != TypeCustom {
 			simple.typ = cassType
 		}
@@ -670,7 +636,7 @@ func (f *framer) readTypeInfo() TypeInfo {
 
 	switch simple.typ {
 	case TypeTuple:
-		n := f.readShort()
+		n := f.decoder.ReadShort()
 		tuple := TupleTypeInfo{
 			NativeType: simple,
 			Elems:      make([]TypeInfo, n),
@@ -686,14 +652,14 @@ func (f *framer) readTypeInfo() TypeInfo {
 		udt := UDTTypeInfo{
 			NativeType: simple,
 		}
-		udt.KeySpace = f.readString()
-		udt.Name = f.readString()
+		udt.KeySpace = f.decoder.ReadString()
+		udt.Name = f.decoder.ReadString()
 
-		n := f.readShort()
+		n := f.decoder.ReadShort()
 		udt.Elements = make([]UDTField, n)
 		for i := 0; i < int(n); i++ {
 			field := &udt.Elements[i]
-			field.Name = f.readString()
+			field.Name = f.decoder.ReadString()
 			field.Type = f.readTypeInfo()
 		}
 
@@ -713,193 +679,6 @@ func (f *framer) readTypeInfo() TypeInfo {
 	}
 
 	return simple
-}
-
-func (f *framer) readByte() byte {
-	if len(f.rbuf) < 1 {
-		panic(fmt.Errorf("not enough bytes in buffer to read byte require 1 got: %d", len(f.rbuf)))
-	}
-
-	b := f.rbuf[0]
-	f.rbuf = f.rbuf[1:]
-	return b
-}
-
-func (f *framer) readInt() (n int) {
-	if len(f.rbuf) < 4 {
-		panic(fmt.Errorf("not enough bytes in buffer to read int require 4 got: %d", len(f.rbuf)))
-	}
-
-	n = int(int32(f.rbuf[0])<<24 | int32(f.rbuf[1])<<16 | int32(f.rbuf[2])<<8 | int32(f.rbuf[3]))
-	f.rbuf = f.rbuf[4:]
-	return
-}
-
-func (f *framer) readShort() (n uint16) {
-	if len(f.rbuf) < 2 {
-		panic(fmt.Errorf("not enough bytes in buffer to read short require 2 got: %d", len(f.rbuf)))
-	}
-	n = uint16(f.rbuf[0])<<8 | uint16(f.rbuf[1])
-	f.rbuf = f.rbuf[2:]
-	return
-}
-
-func (f *framer) readLong() (n int64) {
-	if len(f.rbuf) < 8 {
-		panic(fmt.Errorf("not enough bytes in buffer to read long require 8 got: %d", len(f.rbuf)))
-	}
-	n = int64(f.rbuf[0])<<56 | int64(f.rbuf[1])<<48 | int64(f.rbuf[2])<<40 | int64(f.rbuf[3])<<32 |
-		int64(f.rbuf[4])<<24 | int64(f.rbuf[5])<<16 | int64(f.rbuf[6])<<8 | int64(f.rbuf[7])
-	f.rbuf = f.rbuf[8:]
-	return
-}
-
-func (f *framer) readString() (s string) {
-	size := f.readShort()
-
-	if len(f.rbuf) < int(size) {
-		panic(fmt.Errorf("not enough bytes in buffer to read string require %d got: %d", size, len(f.rbuf)))
-	}
-
-	s = string(f.rbuf[:size])
-	f.rbuf = f.rbuf[size:]
-	return
-}
-
-func (f *framer) readLongString() (s string) {
-	size := f.readInt()
-
-	if len(f.rbuf) < size {
-		panic(fmt.Errorf("not enough bytes in buffer to read long string require %d got: %d", size, len(f.rbuf)))
-	}
-
-	s = string(f.rbuf[:size])
-	f.rbuf = f.rbuf[size:]
-	return
-}
-
-func (f *framer) readUUID() (*UUID, error) {
-	if len(f.rbuf) < 16 {
-		return nil, fmt.Errorf("not enough bytes in buffer to read uuid require %d got: %d", 16, len(f.rbuf))
-	}
-
-	u, _ := UUIDFromBytes(f.rbuf[:16])
-	f.rbuf = f.rbuf[16:]
-	return &u, nil
-}
-
-func (f *framer) readStringList() []string {
-	size := f.readShort()
-
-	l := make([]string, size)
-	for i := 0; i < int(size); i++ {
-		l[i] = f.readString()
-	}
-
-	return l
-}
-
-func (f *framer) readBytesInternal() ([]byte, error) {
-	size := f.readInt()
-	if size < 0 {
-		return nil, nil
-	}
-
-	if len(f.rbuf) < size {
-		return nil, fmt.Errorf("not enough bytes in buffer to read bytes require %d got: %d", size, len(f.rbuf))
-	}
-
-	l := f.rbuf[:size]
-	f.rbuf = f.rbuf[size:]
-
-	return l, nil
-}
-
-func (f *framer) readBytes() []byte {
-	l, err := f.readBytesInternal()
-	if err != nil {
-		panic(err)
-	}
-
-	return l
-}
-
-func (f *framer) readShortBytes() []byte {
-	size := f.readShort()
-	if len(f.rbuf) < int(size) {
-		panic(fmt.Errorf("not enough bytes in buffer to read short bytes: require %d got %d", size, len(f.rbuf)))
-	}
-
-	l := f.rbuf[:size]
-	f.rbuf = f.rbuf[size:]
-
-	return l
-}
-
-func (f *framer) readInet() (net.IP, int) {
-	if len(f.rbuf) < 1 {
-		panic(fmt.Errorf("not enough bytes in buffer to read inet size require %d got: %d", 1, len(f.rbuf)))
-	}
-
-	size := f.rbuf[0]
-	f.rbuf = f.rbuf[1:]
-
-	if !(size == 4 || size == 16) {
-		panic(fmt.Errorf("invalid IP size: %d", size))
-	}
-
-	if len(f.rbuf) < 1 {
-		panic(fmt.Errorf("not enough bytes in buffer to read inet require %d got: %d", size, len(f.rbuf)))
-	}
-
-	ip := make([]byte, size)
-	copy(ip, f.rbuf[:size])
-	f.rbuf = f.rbuf[size:]
-
-	port := f.readInt()
-	return net.IP(ip), port
-}
-
-func (f *framer) readConsistency() Consistency {
-	return Consistency(f.readShort())
-}
-
-func (f *framer) readStringMap() map[string]string {
-	size := f.readShort()
-	m := make(map[string]string)
-
-	for i := 0; i < int(size); i++ {
-		k := f.readString()
-		v := f.readString()
-		m[k] = v
-	}
-
-	return m
-}
-
-func (f *framer) readBytesMap() map[string][]byte {
-	size := f.readShort()
-	m := make(map[string][]byte)
-
-	for i := 0; i < int(size); i++ {
-		k := f.readString()
-		v := f.readBytes()
-		m[k] = v
-	}
-
-	return m
-}
-
-func (f *framer) readStringMultiMap() map[string][]string {
-	size := f.readShort()
-	m := make(map[string][]string)
-
-	for i := 0; i < int(size); i++ {
-		k := f.readString()
-		v := f.readStringList()
-		m[k] = v
-	}
-	return m
 }
 
 func readInt(p []byte) int32 {

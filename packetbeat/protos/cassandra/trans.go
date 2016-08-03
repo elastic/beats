@@ -72,9 +72,6 @@ func (trans *transactions) onRequest(
 		return err
 	}
 	if merged {
-		if isDebug {
-			debugf("request message got merged")
-		}
 		msg = prev
 	} else {
 		trans.requests.append(msg)
@@ -82,10 +79,6 @@ func (trans *transactions) onRequest(
 
 	if !msg.isComplete {
 		return nil
-	}
-
-	if isDebug {
-		debugf("request message complete")
 	}
 
 	return trans.correlate()
@@ -104,9 +97,6 @@ func (trans *transactions) onResponse(
 		return err
 	}
 	if merged {
-		if isDebug {
-			debugf("response message got merged")
-		}
 		msg = prev
 	} else {
 		trans.responses.append(msg)
@@ -114,10 +104,6 @@ func (trans *transactions) onResponse(
 
 	if !msg.isComplete {
 		return nil
-	}
-
-	if isDebug {
-		debugf("response message complete")
 	}
 
 	return trans.correlate()

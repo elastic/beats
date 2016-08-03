@@ -1,7 +1,8 @@
-package cassandra
 // Copyright (c) 2012 The gocql Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
+package cassandra
 
 import (
 	"bytes"
@@ -438,29 +439,29 @@ func (p protoVersion) String() string {
 	return fmt.Sprintf("[version=%d direction=%s]", p.version(), dir)
 }
 
-type frameOp byte
+type FrameOp byte
 
 const (
 	// header ops
-	opError         frameOp = 0x00
-	opStartup       frameOp = 0x01
-	opReady         frameOp = 0x02
-	opAuthenticate  frameOp = 0x03
-	opOptions       frameOp = 0x05
-	opSupported     frameOp = 0x06
-	opQuery         frameOp = 0x07
-	opResult        frameOp = 0x08
-	opPrepare       frameOp = 0x09
-	opExecute       frameOp = 0x0A
-	opRegister      frameOp = 0x0B
-	opEvent         frameOp = 0x0C
-	opBatch         frameOp = 0x0D
-	opAuthChallenge frameOp = 0x0E
-	opAuthResponse  frameOp = 0x0F
-	opAuthSuccess   frameOp = 0x10
+	opError         FrameOp = 0x00
+	opStartup       FrameOp = 0x01
+	opReady         FrameOp = 0x02
+	opAuthenticate  FrameOp = 0x03
+	opOptions       FrameOp = 0x05
+	opSupported     FrameOp = 0x06
+	opQuery         FrameOp = 0x07
+	opResult        FrameOp = 0x08
+	opPrepare       FrameOp = 0x09
+	opExecute       FrameOp = 0x0A
+	opRegister      FrameOp = 0x0B
+	opEvent         FrameOp = 0x0C
+	opBatch         FrameOp = 0x0D
+	opAuthChallenge FrameOp = 0x0E
+	opAuthResponse  FrameOp = 0x0F
+	opAuthSuccess   FrameOp = 0x10
 )
 
-func (f frameOp) String() string {
+func (f FrameOp) String() string {
 	switch f {
 	case opError:
 		return "ERROR"

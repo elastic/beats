@@ -12,6 +12,7 @@ type cassandraConfig struct {
 	SendRequestHeader     bool   `config:"send_request_header"`
 	SendResponseHeader    bool   `config:"send_response_header"`
 	Compressor            string `config:"compressor"`
+	IgnoredOPs            string `config:"ignored_ops"`
 }
 
 var (

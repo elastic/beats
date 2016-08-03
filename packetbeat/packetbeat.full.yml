@@ -441,6 +441,10 @@ packetbeat.protocols.cassandra:
   # the stream will decode by the compressor, currently support: `snappy` , The default is empty.
   #compressor: "snappy"
 
+  # This option indicates which Operator/Operators will be ignored,
+  # multi value can be sperated by `,`
+  #ignored_ops: "SUPPORTED,OPTIONS"
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group

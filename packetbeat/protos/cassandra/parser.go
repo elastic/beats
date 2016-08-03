@@ -21,6 +21,7 @@ type parser struct {
 type parserConfig struct {
 	maxBytes   int
 	compressor Compressor
+	ignoredOps map[string]interface{}
 }
 
 type message struct {
@@ -114,34 +115,51 @@ func (p *parser) newMessage(ts time.Time) *message {
 
 func (p *parser) parse() (*message, error) {
 
-	if(!p.buf.Avail(9)){
+	if !p.buf.Avail(9) {
 		logp.Err("not enough bytes, ignore")
+		p.message = nil
 		return nil, nil
 	}
 
-	head, err := ReadHeader(&p.buf)
+	framer := NewFramer(&p.buf, p.config.compressor)
+	head, err := framer.ReadHeader()
 	if err != nil {
+		logp.Err("%v", err)
+		p.message = nil
+		return nil, nil
+	}
+
+	//check if the ops already ignored
+	if p.config.ignoredOps != nil && len(p.config.ignoredOps) > 0 {
+
+		v := p.config.ignoredOps[head.Op.String()]
+		if v != nil {
+			logp.Debug("cassandra", fmt.Sprintf("Ops: %s was marked to be ignored, ignoring", head.Op.String()))
+			p.message = nil
+			return nil, nil
+		}
+	}
+
+	if !p.buf.Avail(head.Length) {
+		logp.Err("not enough bytes for frame body, ignore")
+		p.message = nil
+		return nil, nil
+	}
+
+	data, err := framer.ReadFrame()
+
+	frameLength := p.buf.BufferConsumed()
+	if err != nil {
+		p.message = nil
 		logp.Err("%v", err)
 		return nil, nil
 	}
 
-	if isDebug {
-		logp.Debug("cassandra", fmt.Sprint(head))
-	}
+	// collect leftover
+	leftDataSize := head.Length + 9 - frameLength
+	if leftDataSize > 0 {
+		p.buf.Collect(leftDataSize)
 
-	framer := NewFramer(&p.buf, p.config.compressor, byte(head.Version))
-	err = framer.ReadFrame(head)
-	if err != nil {
-		logp.Err("%v", err)
-		return nil, nil
-	}
-	msg := p.message
-
-	data, err := framer.ParseFrame()
-
-	if err != nil {
-		logp.Err("%v", err)
-		return nil, nil
 	}
 
 	dir := applayer.NetOriginalDirection
@@ -152,6 +170,7 @@ func (p *parser) parse() (*message, error) {
 		isRequest = false
 	}
 
+	msg := p.message
 	msg.Size = uint64(p.buf.BufferConsumed())
 	msg.IsRequest = isRequest
 	msg.Direction = dir
@@ -163,10 +182,6 @@ func (p *parser) parse() (*message, error) {
 		p.message.results.requests.append(msg)
 	} else {
 		p.message.results.responses.append(msg)
-	}
-
-	if isDebug {
-		logp.Debug("cassandra", "%v",msg)
 	}
 
 	return msg, nil
