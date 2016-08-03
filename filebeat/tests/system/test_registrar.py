@@ -801,6 +801,11 @@ class Test(BaseTest):
             lambda: self.output_has(lines=2),
             max_timeout=10)
 
+        # Wait until registry file is created
+        self.wait_until(
+            lambda: self.log_contains("Registry file updated"),
+            max_timeout=15)
+
         data = self.get_registry()
         assert len(data) == 2
 
