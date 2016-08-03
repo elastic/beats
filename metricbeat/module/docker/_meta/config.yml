@@ -1,5 +1,5 @@
 - module: docker
-  metricsets: ["memory","cpu"]
+  metricsets: ["cpu","memory","network"]
   enabled: true
   period: 5s
   hosts: ["localhost"]

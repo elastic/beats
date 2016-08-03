@@ -473,6 +473,21 @@ Example field
 
 
 [float]
+== network Fields
+
+network
+
+
+
+[float]
+=== docker.network.example
+
+type: keyword
+
+Example field
+
+
+[float]
 == memory Fields
 
 memory

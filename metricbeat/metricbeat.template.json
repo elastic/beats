@@ -188,6 +188,14 @@
                   "type": "keyword"
                 }
               }
+            },
+            "network": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
             }
           }
         },

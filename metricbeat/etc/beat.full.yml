@@ -61,7 +61,7 @@ metricbeat.modules:
 
 #------------------------------- docker Module -------------------------------
 - module: docker
-  metricsets: ["memory"]
+  metricsets: ["cpu","memory","network"]
   enabled: true
   period: 5s
   hosts: ["localhost"]

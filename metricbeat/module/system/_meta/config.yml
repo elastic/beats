@@ -23,7 +23,7 @@
 
     # Per process stats
     - process
-  enabled: true
+  enabled: false
   period: 10s
   processes: ['.*']
 

@@ -707,6 +707,15 @@
               type: keyword
               description: >
                 Example field
+        - name: network
+          type: group
+          description: >
+            network
+          fields:
+            - name: example
+              type: keyword
+              description: >
+                Example field
         - name: memory
           type: group
           description: >
