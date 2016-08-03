@@ -362,7 +362,7 @@ output.elasticsearch:
 
   # Optional index name. The default index name is set to name of the beat
   # in all lowercase.
-  #index: metricbeat
+  #index: 'metricbeat-%{+yyyy.MM.dd}'
 
   # SOCKS5 proxy server URL
   #proxy_url: socks5://user:password@socks5-server:2233

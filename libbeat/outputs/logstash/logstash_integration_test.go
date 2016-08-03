@@ -10,9 +10,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -68,12 +70,15 @@ func esConnect(t *testing.T, index string) *esConnection {
 	ts := time.Now().UTC()
 
 	host := getElasticsearchHost()
-	index = fmt.Sprintf("%s-%02d.%02d.%02d",
-		index, ts.Year(), ts.Month(), ts.Day())
+	indexFmt := fmtstr.MustCompileEvent(fmt.Sprintf("%s-%%{+yyyy.MM.dd}", index))
+	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(indexFmt, ""))
+	index, _ = indexSel.Select(common.MapStr{
+		"@timestamp": common.Time(ts),
+	})
 
 	username := os.Getenv("ES_USER")
 	password := os.Getenv("ES_PASS")
-	client, err := elasticsearch.NewClient(host, "", nil, nil, username, password,
+	client, err := elasticsearch.NewClient(host, indexSel, nil, nil, username, password,
 		nil, 60*time.Second, 0, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -142,7 +147,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	bulkSize := 0
 	config, _ := common.NewConfigFrom(map[string]interface{}{
 		"hosts":            []string{getElasticsearchHost()},
-		"index":            index,
+		"index":            connection.index,
 		"flush_interval":   &flushInterval,
 		"bulk_max_size":    &bulkSize,
 		"username":         os.Getenv("ES_USER"),
