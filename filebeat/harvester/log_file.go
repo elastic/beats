@@ -74,14 +74,11 @@ func (r *LogFile) Read(buf []byte) (int, error) {
 		// Move buffer forward for next read
 		buf = buf[n:]
 
-		// Buffer is full. Cannot continue reading. Return.
+		// Checks if an error happened or buffer is full
+		// If buffer is full, cannot continue reading.
 		// Can happen if n == bufferSize + io.EOF error
-		if len(buf) == 0 {
-			return totalN, err
-		}
-
 		err = r.errorChecks(err)
-		if err != nil {
+		if err != nil || len(buf) == 0 {
 			return totalN, err
 		}
 
