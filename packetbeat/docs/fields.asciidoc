@@ -1388,6 +1388,8 @@ The list of base64 encoded values sent with the response (if present).
 
 type: long
 
+format: bytes
+
 The byte count of the values being transfered.
 
 
@@ -1395,6 +1397,8 @@ The byte count of the values being transfered.
 === memcache.response.bytes
 
 type: long
+
+format: bytes
 
 The byte count of the values being transfered.
 
@@ -2039,6 +2043,8 @@ The CPU time it took to complete the transaction.
 
 type: long
 
+format: bytes
+
 The number of bytes of the request. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 
 
@@ -2046,6 +2052,8 @@ The number of bytes of the request. Note that this size is the application layer
 === bytes_out
 
 type: long
+
+format: bytes
 
 The number of bytes of the response. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 

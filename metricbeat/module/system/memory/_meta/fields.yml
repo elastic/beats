@@ -5,22 +5,26 @@
   fields:
     - name: total
       type: long
+      format: bytes
       description: >
         Total memory.
 
     - name: used.bytes
       type: long
+      format: bytes
       description: >
         Used memory.
 
     - name: free
       type: long
+      format: bytes
       description: >
         The total amount of free memory in bytes. This value does not include memory consumed by system caches and
         buffers (see system.memory.actual.free).
 
     - name: used.pct
       type: scaled_float
+      format: percent
       description: >
         The percentage of used memory.
 
@@ -56,20 +60,24 @@
       fields:
         - name: total
           type: long
+          format: bytes
           description: >
             Total swap memory.
 
         - name: used.bytes
           type: long
+          format: bytes
           description: >
             Used swap memory.
 
         - name: free
           type: long
+          format: bytes
           description: >
             Available swap memory.
 
         - name: used.pct
           type: scaled_float
+          format: percent
           description: >
             The percentage of used swap memory.
