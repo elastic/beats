@@ -98,8 +98,12 @@ func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
 	hosts := k.config.Hosts
 	topic := k.config.Topic
 	useType := k.config.UseType
+	format := k.config.Format
+
+	logp.Info("Message format is: %v", format)
+
 	for i := 0; i < worker; i++ {
-		client, err := newKafkaClient(hosts, topic, useType, libCfg)
+		client, err := newKafkaClient(hosts, topic, useType, format, libCfg)
 		if err != nil {
 			logp.Err("Failed to create kafka client: %v", err)
 			return nil, err

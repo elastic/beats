@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 type client struct {
@@ -18,6 +19,7 @@ type client struct {
 	topic   string
 	useType bool
 	config  sarama.Config
+	format  string
 
 	producer sarama.AsyncProducer
 
@@ -38,12 +40,13 @@ var (
 	publishEventsCallCount = expvar.NewInt("libbeat.kafka.call_count.PublishEvents")
 )
 
-func newKafkaClient(hosts []string, topic string, useType bool, cfg *sarama.Config) (*client, error) {
+func newKafkaClient(hosts []string, topic string, useType bool, format string, cfg *sarama.Config) (*client, error) {
 	c := &client{
 		hosts:   hosts,
 		useType: useType,
 		topic:   topic,
 		config:  *cfg,
+		format:  format,
 	}
 	return c, nil
 }
@@ -105,19 +108,28 @@ func (c *client) AsyncPublishEvents(
 	for _, event := range events {
 		topic := c.topic
 		if c.useType {
-			topic = event["type"].(string)
+			topic = (event["type"].(string))
 		}
 
-		jsonEvent, err := json.Marshal(event)
+		var serializedEvent []byte
+		var err error
+
+		if c.format != "" {
+			serializedEvent, err = outputs.FormatEvent(event, c.format)
+		} else {
+			serializedEvent, err = json.Marshal(event)
+		}
+
 		if err != nil {
 			ref.done()
 			continue
 		}
 
+		debugf("Message to send: %s", serializedEvent)
 		msg := &sarama.ProducerMessage{
 			Metadata: ref,
 			Topic:    topic,
-			Value:    sarama.ByteEncoder(jsonEvent),
+			Value:    sarama.ByteEncoder(serializedEvent),
 		}
 
 		ch <- msg

@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -27,6 +28,7 @@ type client struct {
 	list     []byte
 	password string
 	publish  publishFn
+	format   string
 }
 
 type redisDataType uint16
@@ -36,13 +38,14 @@ const (
 	redisChannelType
 )
 
-func newClient(tc *transport.Client, pass string, db int, dest []byte, dt redisDataType) *client {
+func newClient(tc *transport.Client, pass string, db int, dest []byte, dt redisDataType, format string) *client {
 	return &client{
 		Client:   tc,
 		password: pass,
 		db:       db,
 		dataType: dt,
 		list:     dest,
+		format:   format,
 	}
 }
 
@@ -61,7 +64,7 @@ func (c *client) Connect(to time.Duration) error {
 	}()
 
 	if err = initRedisConn(conn, c.password, c.db); err == nil {
-		c.publish, err = makePublish(conn, c.dataType)
+		c.publish, err = makePublish(conn, c.dataType, c.format)
 	}
 	return err
 }
@@ -100,14 +103,14 @@ func (c *client) PublishEvents(events []common.MapStr) ([]common.MapStr, error) 
 	return c.publish(c.list, events)
 }
 
-func makePublish(conn redis.Conn, dt redisDataType) (publishFn, error) {
+func makePublish(conn redis.Conn, dt redisDataType, format string) (publishFn, error) {
 	if dt == redisChannelType {
-		return makePublishPUBLISH(conn)
+		return makePublishPUBLISH(conn, format)
 	}
-	return makePublishRPUSH(conn)
+	return makePublishRPUSH(conn, format)
 }
 
-func makePublishRPUSH(conn redis.Conn) (publishFn, error) {
+func makePublishRPUSH(conn redis.Conn, format string) (publishFn, error) {
 	var major, minor int
 	var versionRaw [][]byte
 
@@ -144,21 +147,21 @@ func makePublishRPUSH(conn redis.Conn) (publishFn, error) {
 	// See: http://redis.io/commands/rpush
 	multiValue := major > 2 || (major == 2 && minor >= 4)
 	if multiValue {
-		return publishEventsBulk(conn, "RPUSH"), nil
+		return publishEventsBulk(conn, "RPUSH", format), nil
 	}
-	return publishEventsPipeline(conn, "RPUSH"), nil
+	return publishEventsPipeline(conn, "RPUSH", format), nil
 }
 
-func makePublishPUBLISH(conn redis.Conn) (publishFn, error) {
-	return publishEventsPipeline(conn, "PUBLISH"), nil
+func makePublishPUBLISH(conn redis.Conn, format string) (publishFn, error) {
+	return publishEventsPipeline(conn, "PUBLISH", format), nil
 }
 
-func publishEventsBulk(conn redis.Conn, command string) publishFn {
+func publishEventsBulk(conn redis.Conn, command string, format string) publishFn {
 	return func(dest []byte, events []common.MapStr) ([]common.MapStr, error) {
 		args := make([]interface{}, 1, len(events)+1)
 		args[0] = dest
 
-		events, args = serializeEvents(args, 1, events)
+		events, args = serializeEvents(args, 1, events, format)
 		if (len(args) - 1) == 0 {
 			return nil, nil
 		}
@@ -174,13 +177,13 @@ func publishEventsBulk(conn redis.Conn, command string) publishFn {
 	}
 }
 
-func publishEventsPipeline(conn redis.Conn, command string) publishFn {
+func publishEventsPipeline(conn redis.Conn, command string, format string) publishFn {
 	return func(dest []byte, events []common.MapStr) ([]common.MapStr, error) {
 		var args [2]interface{}
 		args[0] = dest
 
 		serialized := make([]interface{}, 0, len(events))
-		events, serialized = serializeEvents(serialized, 0, events)
+		events, serialized = serializeEvents(serialized, 0, events, format)
 		if len(serialized) == 0 {
 			return nil, nil
 		}
@@ -224,15 +227,29 @@ func serializeEvents(
 	to []interface{},
 	i int,
 	events []common.MapStr,
+	format string,
 ) ([]common.MapStr, []interface{}) {
 	okEvents := events
 	for _, event := range events {
-		jsonEvent, err := json.Marshal(event)
-		if err != nil {
-			logp.Err("Failed to convert the event to JSON (%v): %#v", err, event)
-			goto failLoop
+		var serializedEvent []byte
+		var err error
+
+		if format != "" {
+			serializedEvent, err = outputs.FormatEvent(event, format)
+			if err != nil {
+				logp.Err("Failed to convert the event based on the formatter (%v): %#v", err, event)
+				goto failLoop
+			}
+
+		} else {
+			serializedEvent, err = json.Marshal(event)
+			if err != nil {
+				logp.Err("Failed to convert the event to JSON (%v): %#v", err, event)
+				goto failLoop
+			}
+
 		}
-		to = append(to, jsonEvent)
+		to = append(to, serializedEvent)
 		i++
 	}
 	return okEvents, to
@@ -241,13 +258,26 @@ failLoop:
 	okEvents = events[:i]
 	restEvents := events[i+1:]
 	for _, event := range restEvents {
-		jsonEvent, err := json.Marshal(event)
-		if err != nil {
-			logp.Err("Failed to convert the event to JSON (%v): %#v", err, event)
-			i++
-			continue
+		var serializedEvent []byte
+		var err error
+
+		if format != "" {
+			serializedEvent, err = outputs.FormatEvent(event, format)
+			if err != nil {
+				logp.Err("Failed to convert the event based on the formatter (%v): %#v", err, event)
+				i++
+				continue
+			}
+		} else {
+			serializedEvent, err = json.Marshal(event)
+			if err != nil {
+				logp.Err("Failed to convert the event to JSON (%v): %#v", err, event)
+				i++
+				continue
+			}
 		}
-		to = append(to, jsonEvent)
+
+		to = append(to, serializedEvent)
 		i++
 	}
 

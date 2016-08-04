@@ -30,6 +30,11 @@ func (t *Time) UnmarshalJSON(data []byte) (err error) {
 	return
 }
 
+//String implements Stringer interface.
+func (t Time) String() string {
+	return time.Time(t).UTC().Format(TsLayout)
+}
+
 // ParseTime parses a time in the TsLayout format.
 func ParseTime(timespec string) (Time, error) {
 	t, err := time.Parse(TsLayout, timespec)

@@ -47,7 +47,7 @@ func newTestKafkaClient(t *testing.T, topic string) *client {
 	hosts := []string{getTestKafkaHost()}
 	t.Logf("host: %v", hosts)
 
-	client, err := newKafkaClient(hosts, topic, false, nil)
+	client, err := newKafkaClient(hosts, topic, false, "", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,13 +55,14 @@ func newTestKafkaClient(t *testing.T, topic string) *client {
 	return client
 }
 
-func newTestKafkaOutput(t *testing.T, topic string, useType bool) outputs.Outputer {
+func newTestKafkaOutput(t *testing.T, topic string, useType bool, format string) outputs.Outputer {
 
 	config := map[string]interface{}{
 		"hosts":    []string{getTestKafkaHost()},
 		"timeout":  "1s",
 		"topic":    topic,
 		"use_type": useType,
+		"format":   format,
 	}
 
 	cfg, err := common.NewConfigFrom(config)
@@ -128,7 +129,7 @@ func TestOneMessageToKafka(t *testing.T) {
 	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
 	topic := fmt.Sprintf("test-libbeat-%s", id)
 
-	kafka := newTestKafkaOutput(t, topic, false)
+	kafka := newTestKafkaOutput(t, topic, false, "")
 	event := common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"host":       "test-host",
@@ -158,7 +159,7 @@ func TestUseType(t *testing.T) {
 	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
 	logType := fmt.Sprintf("log-type-%s", id)
 
-	kafka := newTestKafkaOutput(t, "", true)
+	kafka := newTestKafkaOutput(t, "", true, "")
 	event := common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"host":       "test-host",
@@ -174,5 +175,36 @@ func TestUseType(t *testing.T) {
 		msg := messages[0]
 		logp.Debug("kafka", "%s: %s", msg.Key, msg.Value)
 		assert.Contains(t, string(msg.Value), id)
+	}
+}
+
+func TestSendStringFieldAsMessageToKafka(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping in short mode. Requires Kafka")
+	}
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"kafka"})
+	}
+
+	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	format := "%{@timestamp} %{message}"
+	topic := fmt.Sprintf("test-libbeat-%s", id)
+    curTime:= common.Time(time.Now())
+	kafka := newTestKafkaOutput(t, topic, false, format)
+	event := common.MapStr{
+		"@timestamp": curTime,
+		"host":       "test-host",
+		"type":       "log",
+		"message":    &id,
+	}
+	if err := kafka.PublishEvent(nil, testOptions, event); err != nil {
+		t.Fatal(err)
+	}
+
+	messages := testReadFromKafkaTopic(t, topic, 1, 5*time.Second)
+	if assert.Len(t, messages, 1) {
+		msg := messages[0]
+		logp.Debug("kafka", "%s: %s", msg.Key, msg.Value)
+		assert.Equal(t, fmt.Sprintf("%s %s", curTime, id), string(msg.Value))
 	}
 }

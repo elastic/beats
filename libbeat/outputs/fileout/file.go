@@ -16,6 +16,7 @@ func init() {
 type fileOutput struct {
 	beatName string
 	rotator  logp.FileRotator
+	format   string
 }
 
 // New instantiates a new file output instance.
@@ -42,6 +43,9 @@ func (out *fileOutput) init(config config) error {
 	if out.rotator.Name == "" {
 		out.rotator.Name = out.beatName
 	}
+
+	out.format = config.Format
+
 	logp.Info("File output path set to: %v", out.rotator.Path)
 	logp.Info("File output base filename set to: %v", out.rotator.Name)
 
@@ -76,16 +80,31 @@ func (out *fileOutput) PublishEvent(
 	opts outputs.Options,
 	event common.MapStr,
 ) error {
-	jsonEvent, err := json.Marshal(event)
-	if err != nil {
-		// mark as success so event is not sent again.
-		op.SigCompleted(sig)
+	var serializedEvent []byte
+	var err error
 
-		logp.Err("Fail to json encode event(%v): %#v", err, event)
-		return err
+	if out.format != "" {
+		serializedEvent, err = outputs.FormatEvent(event, out.format)
+
+		if err != nil {
+			// mark as success so event is not sent again.
+			op.SigCompleted(sig)
+
+			logp.Err("Fail to convert event based on the formatter (%v): %#v", err, event)
+			return err
+		}
+
+	} else {
+		serializedEvent, err = json.Marshal(event)
+		if err != nil {
+			// mark as success so event is not sent again.
+			op.SigCompleted(sig)
+
+			logp.Err("Fail to json encode event(%v): %#v", err, event)
+			return err
+		}
 	}
-
-	err = out.rotator.WriteLine(jsonEvent)
+	err = out.rotator.WriteLine(serializedEvent)
 	if err != nil {
 		if opts.Guaranteed {
 			logp.Critical("Unable to write events to file: %s", err)
