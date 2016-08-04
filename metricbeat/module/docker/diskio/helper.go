@@ -54,7 +54,7 @@ func (io *BLkioService) getBlkioEvent (myRawStat *docker.DockerStat) BlkioStats{
 			Time: myRawStat.Stats.Read,
 			MyContainer: docker.InitCurrentContainer(&myRawStat.Container),
 			reads: 0,
-			writes:5656,
+			writes:0,
 			totals: 0,
 		}
 	}
@@ -100,7 +100,6 @@ func (io *BLkioService)getWritePs(old *BlkioRaw, new *BlkioRaw) float64 {
 
 func (io *BLkioService) getTotalPs(old *BlkioRaw, new *BlkioRaw) float64 {
 	duration := new.Time.Sub(old.Time)
-	fmt.Printf(" duration : ",duration,"\n")
 	return io.calculatePerSecond(duration,old.totals, new.totals)
 }
 
