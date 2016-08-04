@@ -20,6 +20,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/mysql"
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
 	_ "github.com/elastic/beats/metricbeat/module/docker"
+	_ "github.com/elastic/beats/metricbeat/module/docker/diskio"
 	_ "github.com/elastic/beats/metricbeat/module/docker/cpu"
 	_ "github.com/elastic/beats/metricbeat/module/docker/network"
 	_ "github.com/elastic/beats/metricbeat/module/docker/memory"

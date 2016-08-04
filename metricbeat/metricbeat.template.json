@@ -181,6 +181,14 @@
                 }
               }
             },
+            "diskio": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
             "memory": {
               "properties": {
                 "example": {

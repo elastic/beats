@@ -36,11 +36,15 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-docker-diskio,diskio>>
+
 * <<metricbeat-metricset-docker-cpu,cpu>>
 
 * <<metricbeat-metricset-docker-network,network>>
 
 * <<metricbeat-metricset-docker-memory,memory>>
+
+include::docker/diskio.asciidoc[]
 
 include::docker/cpu.asciidoc[]
 

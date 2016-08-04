@@ -458,6 +458,21 @@ docker Module
 
 
 [float]
+== diskio Fields
+
+diskio
+
+
+
+[float]
+=== docker.diskio.example
+
+type: keyword
+
+Example field
+
+
+[float]
 == cpu Fields
 
 cpu
