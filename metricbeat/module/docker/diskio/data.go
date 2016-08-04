@@ -1,7 +1,6 @@
 package diskio
 import (
 	"github.com/elastic/beats/libbeat/common"
-	//"fmt"
 )
 
 func eventsMapping( blkioStatsList []BlkioStats) [] common.MapStr {
@@ -20,7 +19,6 @@ func eventMapping( myBlkioStats *BlkioStats) common.MapStr{
 			"name": myBlkioStats.MyContainer.Name,
 			"labels": myBlkioStats.MyContainer.Labels,
 		},
-		//"dockerSocket": mycpuStats.MyContainer.Socket,
 		"blkio": common.MapStr{
 			"readsPS":       myBlkioStats.reads,
 			"writesPS":        myBlkioStats.writes,

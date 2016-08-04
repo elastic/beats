@@ -92,12 +92,10 @@ func (io *BLkioService) getReadPs(old *BlkioRaw, new *BlkioRaw ) float64 {
 	duration := new.Time.Sub(old.Time)
 	return io.calculatePerSecond(duration,old.reads,new.reads)
 }
-
 func (io *BLkioService)getWritePs(old *BlkioRaw, new *BlkioRaw) float64 {
 	duration := new.Time.Sub(old.Time)
 	return io.calculatePerSecond(duration,old.writes,new.writes)
 }
-
 func (io *BLkioService) getTotalPs(old *BlkioRaw, new *BlkioRaw) float64 {
 	duration := new.Time.Sub(old.Time)
 	return io.calculatePerSecond(duration,old.totals, new.totals)
