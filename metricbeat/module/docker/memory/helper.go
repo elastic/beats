@@ -25,7 +25,7 @@ func NewMemoryService() *MEMORYService{
 	return &MEMORYService{}
 }
 
-func (c MEMORYService) GetMemorystatsList(rawStats []docker.DockerStat)[]MEMORYData{
+func (c *MEMORYService) GetMemorystatsList(rawStats []docker.DockerStat)[]MEMORYData{
 	formatedStats :=[]MEMORYData{}
 	if len(rawStats) !=0 {
 		for _, myRawStats := range rawStats {
@@ -41,7 +41,7 @@ func (c MEMORYService) GetMemorystatsList(rawStats []docker.DockerStat)[]MEMORYD
 	return formatedStats
 }
 
-func (ms MEMORYService) getMEMData(myRawStat docker.DockerStat) MEMORYData {
+func (ms *MEMORYService) getMEMData(myRawStat docker.DockerStat) MEMORYData {
 
 	return MEMORYData{
 		Time: common.Time(myRawStat.Stats.Read),

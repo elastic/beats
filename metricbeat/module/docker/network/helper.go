@@ -36,7 +36,7 @@ type NETstats struct {
 	TxPackets float64
 }
 
-func (NT NETService) GetNetworkStatsPerContainer( rawStats []docker.DockerStat) []NETstats{
+func (NT *NETService) GetNetworkStatsPerContainer( rawStats []docker.DockerStat) []NETstats{
 	formatedStats := []NETstats{}
 	if len(rawStats) !=0 {
 		for _,myStats := range rawStats {
@@ -49,7 +49,7 @@ func (NT NETService) GetNetworkStatsPerContainer( rawStats []docker.DockerStat) 
 	}
 	return formatedStats
 }
-func (NT NETService) getNetworkStats (nameInterface string, rawNetStats *dc.NetworkStats, myRawstats *docker.DockerStat) NETstats{
+func (NT *NETService) getNetworkStats (nameInterface string, rawNetStats *dc.NetworkStats, myRawstats *docker.DockerStat) NETstats{
 
 	 myNETstats := NETstats{}
 	newNetworkStats := getNewNetRAw(myRawstats.Stats.Read, rawNetStats)
@@ -107,7 +107,7 @@ func getNewNetRAw(time  time.Time, stats *dc.NetworkStats) NETRaw{
 
 
 }
-func (NT NETService) checkStats (containerID string, nameInterface string) bool{
+func (NT *NETService) checkStats (containerID string, nameInterface string) bool{
 	if _, exist := NT.NetworkStatPerContainer[containerID][nameInterface]; exist{
 		return true
 	}
@@ -115,40 +115,40 @@ func (NT NETService) checkStats (containerID string, nameInterface string) bool{
 
 }
 
-func (NT NETService) getRxBytesPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
+func (NT *NETService) getRxBytesPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
 	duration := newStats.Time.Sub(oldStats.Time)
 	return NT.calculatePerSecond(duration, oldStats.RxBytes, newStats.RxBytes)
 }
-func (NT NETService) getRxDroppedPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
+func (NT *NETService) getRxDroppedPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
 	duration := newStats.Time.Sub(oldStats.Time)
 	return NT.calculatePerSecond(duration, oldStats.RxDropped, newStats.RxDropped)
 }
-func (NT NETService) getRxErrorsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
+func (NT *NETService) getRxErrorsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
 	duration := newStats.Time.Sub(oldStats.Time)
 	return NT.calculatePerSecond(duration, oldStats.RxErrors, newStats.RxErrors)
 }
-func (NT NETService) getRxPacketsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
+func (NT *NETService) getRxPacketsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
 	duration := newStats.Time.Sub(oldStats.Time)
 	return NT.calculatePerSecond(duration,oldStats.RxPackets, newStats.RxPackets)
 }
-func (NT NETService) getTxBytesPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
+func (NT *NETService) getTxBytesPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
 	duration := newStats.Time.Sub(oldStats.Time)
 	return NT.calculatePerSecond(duration, oldStats.TxBytes, newStats.TxBytes)
 }
-func (NT NETService) getTxDroppedPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
+func (NT *NETService) getTxDroppedPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
 	duration := newStats.Time.Sub(oldStats.Time)
 	return NT.calculatePerSecond(duration, oldStats.TxDropped, newStats.TxDropped)
 }
-func (NT NETService) getTxErrorsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
+func (NT *NETService) getTxErrorsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
 	duration := newStats.Time.Sub(oldStats.Time)
 	return NT.calculatePerSecond(duration, oldStats.TxErrors, newStats.TxErrors)
 }
-func (NT NETService) getTxPacketsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
+func (NT *NETService) getTxPacketsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
 	duration := newStats.Time.Sub(oldStats.Time)
 	return NT.calculatePerSecond(duration ,oldStats.TxPackets, newStats.TxPackets)
 }
 
-func (NT NETService) calculatePerSecond(duration time.Duration ,oldValue uint64, newValue uint64) float64 {
+func (NT *NETService) calculatePerSecond(duration time.Duration ,oldValue uint64, newValue uint64) float64 {
 	//duration := newValue.Time.Sub(oldValue.Time)
 	return float64((newValue - oldValue)) / duration.Seconds()
 }

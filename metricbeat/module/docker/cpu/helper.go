@@ -33,11 +33,11 @@ type CPUStats struct {
 type CPUService struct{}
 
 
-func (c CPUService) GetCPUstatsList(rawStats []docker.DockerStat)[]CPUStats{
+func (c *CPUService) GetCPUstatsList(rawStats []docker.DockerStat)[]CPUStats{
 	 formatedStats :=[]CPUStats{}
 	if len(rawStats) !=0 {
 		for _, myRawStats := range rawStats {
-			formatedStats = append(formatedStats, c.getCpuStats(myRawStats))
+			formatedStats = append(formatedStats, c.getCpuStats(&myRawStats))
 		}
 	}else{
 		fmt.Printf("No container is running \n")
@@ -48,7 +48,7 @@ func (c CPUService) GetCPUstatsList(rawStats []docker.DockerStat)[]CPUStats{
 	}*/
 	return formatedStats
 }
-func (c CPUService) getCpuStats(myRawStat docker.DockerStat)  CPUStats {
+func (c *CPUService) getCpuStats(myRawStat *docker.DockerStat)  CPUStats {
 
 	return CPUStats{
 		Time: common.Time(myRawStat.Stats.Read),
@@ -80,7 +80,7 @@ func getNewCpu( stats *dc.Stats) CPURaw{
 	}
 }
 
-func (c CPUService) perCpuUsage(stats *dc.Stats) common.MapStr {
+func (c *CPUService) perCpuUsage(stats *dc.Stats) common.MapStr {
 	var output common.MapStr
 	if cap(getNewCpu(stats).PerCpuUsage) == cap(getOLdCpu(stats).PerCpuUsage) {
 		output = common.MapStr{}
@@ -90,16 +90,16 @@ func (c CPUService) perCpuUsage(stats *dc.Stats) common.MapStr {
 	}
 	return output
 }
-func (c CPUService) totalUsage(stats *dc.Stats) float64 {
+func (c *CPUService) totalUsage(stats *dc.Stats) float64 {
 	return c.calculateLoad(getNewCpu(stats).TotalUsage - getOLdCpu(stats).TotalUsage)
 }
-func (c CPUService) usageInKernelmode(stats *dc.Stats) float64 {
+func (c *CPUService) usageInKernelmode(stats *dc.Stats) float64 {
 	return c.calculateLoad(getNewCpu(stats).UsageInKernelmode - getOLdCpu(stats).UsageInKernelmode)
 }
-func (c CPUService) usageInUsermode(stats *dc.Stats) float64 {
+func (c *CPUService) usageInUsermode(stats *dc.Stats) float64 {
 	return c.calculateLoad(getNewCpu(stats).UsageInUsermode - getOLdCpu(stats).UsageInUsermode)
 }
-func (c CPUService) calculateLoad(value uint64) float64 {
+func (c *CPUService) calculateLoad(value uint64) float64 {
 	// value is the count of CPU nanosecond in 1sec
 	// TODO save the old stat timestamp and reuse here in case of docker read time changes...
 	// 1s = 1000000000 ns

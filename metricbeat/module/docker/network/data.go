@@ -24,15 +24,15 @@ func eventMapping( myNetStats NETstats) common.MapStr{
 		},
 		//"dockerSocket": myNetStats.MyContainer.Socket,
 		myNetStats.NameInterface: common.MapStr{
-		 "rxBytes":   myNetStats.RxBytes  ,
-		 "rxDropped":  myNetStats.RxDropped  ,
-		 "rxErrors":   myNetStats.RxErrors,
-		 "rxPackets":  myNetStats.RxPackets,
-		 "txBytes":    myNetStats.TxBytes,
-		 "txDropped":   myNetStats.TxDropped,
-		 "txErrors":   myNetStats.TxErrors,
-		 "txPackets":   myNetStats.TxPackets,
-		 },
-}
+			"rxBytes":   myNetStats.RxBytes,
+			"rxDropped":  myNetStats.RxDropped,
+			"rxErrors":   myNetStats.RxErrors,
+			"rxPackets":  myNetStats.RxPackets,
+			"txBytes":    myNetStats.TxBytes,
+			"txDropped":   myNetStats.TxDropped,
+			"txErrors":   myNetStats.TxErrors,
+			"txPackets":   myNetStats.TxPackets,
+		},
+	}
 return event
 }
