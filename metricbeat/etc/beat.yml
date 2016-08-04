@@ -36,7 +36,7 @@ metricbeat.modules:
 
     # Per process stats
     - process
-  enabled: true
+  enabled: false
   period: 10s
   processes: ['.*']
 
@@ -45,7 +45,7 @@ metricbeat.modules:
 
 #------------------------------- docker Module -------------------------------
 - module: docker
-  metricsets: ["cpu","memory","network"]
+  metricsets: ["cpu","memory","network","diskio"]
   enabled: true
   period: 5s
   hosts: ["localhost"]
