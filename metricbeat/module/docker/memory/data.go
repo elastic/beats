@@ -7,11 +7,11 @@ import (
 func eventsMapping( memoryDataList []MEMORYData) [] common.MapStr {
 	myEvents := [] common.MapStr{}
 	for _, memoryData := range memoryDataList {
-		myEvents = append(myEvents, eventMapping(memoryData))
+		myEvents = append(myEvents, eventMapping(&memoryData))
 	}
 	return myEvents
 }
-func eventMapping(memoryData MEMORYData) common.MapStr{
+func eventMapping(memoryData *MEMORYData) common.MapStr{
 
 	event := common.MapStr{
 		"@timestamp":	memoryData.Time,

@@ -39,7 +39,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		dockerClient: docker.CreateDockerCLient(config),
-		blkioService: &BLkioService{},
+		blkioService: &BLkioService{
+			BlkioSTatsPerContainer:make(map[string]BlkioRaw),
+		},
 	}, nil
 }
 

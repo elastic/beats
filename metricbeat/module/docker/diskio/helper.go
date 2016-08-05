@@ -4,7 +4,6 @@ import (
 	dc"github.com/fsouza/go-dockerclient"
 	"github.com/elastic/beats/metricbeat/module/docker"
 	"github.com/elastic/beats/libbeat/logp"
-	"fmt"
 )
 
 type BlkioStats struct{
@@ -92,7 +91,7 @@ func (io *BLkioService) getReadPs(old *BlkioRaw, new *BlkioRaw ) float64 {
 	duration := new.Time.Sub(old.Time)
 	return io.calculatePerSecond(duration,old.reads,new.reads)
 }
-func (io *BLkioService)getWritePs(old *BlkioRaw, new *BlkioRaw) float64 {
+func (io *BLkioService) getWritePs(old *BlkioRaw, new *BlkioRaw) float64 {
 	duration := new.Time.Sub(old.Time)
 	return io.calculatePerSecond(duration,old.writes,new.writes)
 }

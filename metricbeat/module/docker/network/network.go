@@ -40,7 +40,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		dockerClient: docker.CreateDockerCLient(config),
-		netService: &NETService{},
+		netService: &NETService{
+			NetworkStatPerContainer: make(map[string]map[string]NETRaw),
+		},
 	}, nil
 }
 

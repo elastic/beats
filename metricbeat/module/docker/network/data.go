@@ -9,11 +9,11 @@ func eventsMapping( netsStatsList []NETstats) [] common.MapStr {
 	myEvents := [] common.MapStr{}
 	//fmt.Printf(" Taille cpuStatsList : ",len(cpuStatsList),"\n")
 	for _, netsStats := range netsStatsList {
-	myEvents = append(myEvents, eventMapping(netsStats))
+	myEvents = append(myEvents, eventMapping(&netsStats))
 	}
 	return myEvents
 }
-func eventMapping( myNetStats NETstats) common.MapStr{
+func eventMapping( myNetStats *NETstats) common.MapStr{
 	event := common.MapStr{
 		"@timestamp":      myNetStats.Time,
 		"type":            "net",
