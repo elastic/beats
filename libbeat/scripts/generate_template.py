@@ -116,7 +116,7 @@ def dedot(group):
         else:
             fields.append(field)
     for _, field in dedotted.items():
-        fields.append(field)
+        fields.append(dedot(field))
     group["fields"] = fields
     return group
 
