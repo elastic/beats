@@ -128,10 +128,33 @@ func (trans *transactions) correlate() error {
 	requests := &trans.requests
 	responses := &trans.responses
 
+
+
 	// drop responses with missing requests
 	if requests.empty() {
 		for !responses.empty() {
-			logp.Warn("Response from unknown transaction. Ignoring.")
+
+			//if the response is EVENT, which pushed from server, we can accept that
+			resp := responses.first()
+			if !resp.isComplete {
+				break
+			}
+
+			if(resp.header["op"]=="EVENT"){
+				if(isDebug){
+					logp.Debug("cassandra","server pushed message,%v",resp.header)
+				}
+
+				responses.pop()
+
+				if err := trans.onTransaction(nil, resp); err != nil {
+					return err
+				}
+
+				return nil
+			}
+
+			logp.Warn("Response from unknown transaction. Ignoring. %v", resp.header)
 			responses.pop()
 		}
 		return nil

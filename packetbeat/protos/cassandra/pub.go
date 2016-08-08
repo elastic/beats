@@ -1,9 +1,7 @@
 package cassandra
 
 import (
-	"fmt"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/publish"
 )
 
@@ -35,43 +33,61 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		status = common.ERROR_STATUS
 	}
 
-	// resp_time in milliseconds
-	responseTime := int32(resp.Ts.Sub(requ.Ts).Nanoseconds() / 1e6)
-
-	src := &common.Endpoint{
-		Ip:   requ.Tuple.Src_ip.String(),
-		Port: requ.Tuple.Src_port,
-		Proc: string(requ.CmdlineTuple.Src),
-	}
-	dst := &common.Endpoint{
-		Ip:   requ.Tuple.Dst_ip.String(),
-		Port: requ.Tuple.Dst_port,
-		Proc: string(requ.CmdlineTuple.Dst),
-	}
-
 	event := common.MapStr{
-		"@timestamp":   common.Time(requ.Ts),
-		"type":         "cassandra",
-		"status":       status,
-		"responsetime": responseTime,
-		"bytes_in":     requ.Size,
-		"bytes_out":    resp.Size,
-		"src":          src,
-		"dst":          dst,
+		"type":   "cassandra",
+		"status": status,
 	}
 
-	// add processing notes/errors to event
-	if len(requ.Notes)+len(resp.Notes) > 0 {
-		event["notes"] = append(requ.Notes, resp.Notes...)
-	}
+	//requ can be null, if the message is a PUSHed message
+	if requ != nil {
+		// resp_time in milliseconds
+		responseTime := int32(resp.Ts.Sub(requ.Ts).Nanoseconds() / 1e6)
 
-	if pub.sendRequest {
-		if pub.sendRequestHeader {
-			requ.data["request_headers"] = requ.header
+		src := &common.Endpoint{
+			Ip:   requ.Tuple.Src_ip.String(),
+			Port: requ.Tuple.Src_port,
+			Proc: string(requ.CmdlineTuple.Src),
 		}
 
-		event["cassandra_request"] = requ.data
+		event["@timestamp"] = common.Time(requ.Ts)
+		event["responsetime"] = responseTime
+		event["bytes_in"] = requ.Size
+		event["src"] = src
+
+		// add processing notes/errors to event
+		if len(requ.Notes)+len(resp.Notes) > 0 {
+			event["notes"] = append(requ.Notes, resp.Notes...)
+		}
+
+		if pub.sendRequest {
+			if pub.sendRequestHeader {
+				requ.data["request_headers"] = requ.header
+			}
+
+			event["cassandra_request"] = requ.data
+		}
+
+		dst := &common.Endpoint{
+			Ip:   requ.Tuple.Dst_ip.String(),
+			Port: requ.Tuple.Dst_port,
+			Proc: string(requ.CmdlineTuple.Dst),
+		}
+		event["dst"] = dst
+
+	} else {
+		//dealing with PUSH message
+		event["no_request"] = true
+		event["@timestamp"] = common.Time(resp.Ts)
+
+		dst := &common.Endpoint{
+			Ip:   resp.Tuple.Dst_ip.String(),
+			Port: resp.Tuple.Dst_port,
+			Proc: string(resp.CmdlineTuple.Dst),
+		}
+		event["dst"] = dst
 	}
+
+	event["bytes_out"] = resp.Size
 
 	if pub.sendResponse {
 		if pub.sendResponseHeader {
@@ -79,10 +95,6 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		}
 
 		event["cassandra_response"] = resp.data
-	}
-
-	if isDebug {
-		logp.Debug("cassandra", fmt.Sprint(event))
 	}
 
 	return event

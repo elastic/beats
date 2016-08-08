@@ -14,6 +14,7 @@ import (
 type parser struct {
 	buf       streambuf.Buffer
 	config    *parserConfig
+	framer    *Framer
 	message   *message
 	onMessage func(m *message) error
 }
@@ -115,74 +116,115 @@ func (p *parser) newMessage(ts time.Time) *message {
 
 func (p *parser) parse() (*message, error) {
 
-	if !p.buf.Avail(9) {
-		logp.Err("not enough bytes, ignore")
-		p.message = nil
-		return nil, nil
+	// if p.frame is nil then create a new framer, or continue to process the last message
+	if p.framer == nil {
+		p.framer = NewFramer(&p.buf, p.config.compressor)
 	}
 
-	framer := NewFramer(&p.buf, p.config.compressor)
-	head, err := framer.ReadHeader()
-	if err != nil {
-		logp.Err("%v", err)
-		p.message = nil
-		return nil, nil
-	}
-
-	//check if the ops already ignored
-	if p.config.ignoredOps != nil && len(p.config.ignoredOps) > 0 {
-
-		v := p.config.ignoredOps[head.Op.String()]
-		if v != nil {
-			logp.Debug("cassandra", fmt.Sprintf("Ops: %s was marked to be ignored, ignoring", head.Op.String()))
-			p.message = nil
+	// check if the frame header were parsed or not
+	if p.framer.Header == nil {
+		if isDebug {
+			logp.Debug("cassandra", "start to parse header")
+		}
+		if !p.buf.Avail(9) {
+			logp.Err("not enough head bytes, ignore")
 			return nil, nil
+		}
+
+		_, err := p.framer.ReadHeader()
+		if err != nil {
+			logp.Err("%v", err)
+			p.framer = nil
+			return nil, err
 		}
 	}
 
-	if !p.buf.Avail(head.Length) {
-		logp.Err("not enough bytes for frame body, ignore")
-		p.message = nil
-		return nil, nil
-	}
+	msg := p.message
+	msg.data = make(map[string]interface{})
 
-	data, err := framer.ReadFrame()
+	if p.framer.Header.BodyLength > 0 {
 
-	frameLength := p.buf.BufferConsumed()
-	if err != nil {
-		p.message = nil
-		logp.Err("%v", err)
-		return nil, nil
-	}
+		//let's wait for enough buf
+		if !p.buf.Avail(p.framer.Header.BodyLength) {
+			if isDebug {
+				logp.Debug("cassandra", " buf not enough for body, waiting for more, return")
+			}
+			return nil, nil
+		} else {
+			//check if the ops already ignored
+			if p.config.ignoredOps != nil && len(p.config.ignoredOps) > 0 {
+				v := p.config.ignoredOps[p.framer.Header.Op.String()]
+				if v != nil {
+					if isDebug {
+						logp.Debug("cassandra", fmt.Sprintf("Ops: %s was marked to be ignored, ignoring", p.framer.Header.Op.String()))
+					}
+					p.buf.Collect(p.framer.Header.BodyLength)
+					return nil, nil
+				}
+			} else {
 
-	// collect leftover
-	leftDataSize := head.Length + 9 - frameLength
-	if leftDataSize > 0 {
-		p.buf.Collect(leftDataSize)
+				// start to prase body
+				data, err := p.framer.ReadFrame()
+				if err != nil {
+					// if the frame parsed failed, should ignore the whole message
+					p.framer = nil
+					return nil, err
+				}
+
+				msg.data = data
+
+				// dealing with un-parsed content
+				frameParsedLength := p.buf.BufferConsumed()
+
+				// collect leftover
+				unParsedSize := p.framer.Header.BodyLength + p.framer.Header.HeadLength - frameParsedLength
+				if unParsedSize > 0 {
+
+					// double check the buf size
+					if p.buf.Avail(unParsedSize) {
+						p.buf.Collect(unParsedSize)
+						consumedSize := p.buf.BufferConsumed()
+						if consumedSize-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
+							logp.Err("cassandra", "wrong, body_lenght:%d, body_read:%d, more collected:%d, only collect:%d", p.framer.Header.BodyLength, frameParsedLength, unParsedSize, consumedSize)
+						}
+					} else {
+						logp.Err("cassandra", " should be enough bytes for cleanup,but not enough")
+						return nil, errors.New("should be enough bytes,but not enough")
+					}
+				}
+
+				finalCollectedFrameLength := p.buf.BufferConsumed()
+				if finalCollectedFrameLength-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
+					logp.Err("cassandra", "wrong,body_length:%d, body_read:%d, all_consumed:%d", p.framer.Header.BodyLength, frameParsedLength, finalCollectedFrameLength)
+					return nil, errors.New("data messed while parse frame body")
+				}
+
+			}
+
+		}
 
 	}
 
 	dir := applayer.NetOriginalDirection
 
 	isRequest := true
-	if head.Version.IsResponse() {
+	if p.framer.Header.Version.IsResponse() {
 		dir = applayer.NetReverseDirection
 		isRequest = false
 	}
 
-	msg := p.message
 	msg.Size = uint64(p.buf.BufferConsumed())
 	msg.IsRequest = isRequest
 	msg.Direction = dir
 
-	msg.data = data
-	msg.header = head.ToMap()
+	msg.header = p.framer.Header.ToMap()
 
+	//? how to make sure the two pair an added to the same result ?
 	if msg.IsRequest {
 		p.message.results.requests.append(msg)
 	} else {
 		p.message.results.responses.append(msg)
 	}
-
+	p.framer = nil
 	return msg, nil
 }

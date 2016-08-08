@@ -11,6 +11,7 @@ import (
 	"reflect"
 	"time"
 
+	"errors"
 	"github.com/elastic/beats/libbeat/logp"
 	"gopkg.in/inf.v0"
 	"strings"
@@ -529,6 +530,34 @@ const (
 	flagWarning       byte = 0x08
 )
 
+func getHeadFlagString(f byte) string {
+	switch f {
+	case flagCompress:
+		return "Compress"
+	case flagTracing:
+		return "Tracing"
+	case flagCustomPayload:
+		return "CustomPayload"
+	case flagWarning:
+		return "Warning"
+	default:
+		return fmt.Sprintf("FLAG_%d", f)
+	}
+}
+
+func getRowFlagString(f int) string {
+	switch f {
+	case flagGlobalTableSpec:
+		return "GlobalTableSpec"
+	case flagHasMorePages:
+		return "HasMorePages"
+	case flagNoMetaData:
+		return "NoMetaData"
+	default:
+		return fmt.Sprintf("FLAG_%d", f)
+	}
+}
+
 type Consistency uint16
 
 const (
@@ -584,4 +613,48 @@ func (s SerialConsistency) String() string {
 	default:
 		return fmt.Sprintf("UNKNOWN_SERIAL_CONS_0x%x", uint16(s))
 	}
+}
+
+type UUID [16]byte
+
+// Bytes returns the raw byte slice for this UUID. A UUID is always 128 bits
+// (16 bytes) long.
+func (u UUID) Bytes() []byte {
+	return u[:]
+}
+
+// String returns the UUID in it's canonical form, a 32 digit hexadecimal
+// number in the form of xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.
+func (u UUID) String() string {
+	var offsets = [...]int{0, 2, 4, 6, 9, 11, 14, 16, 19, 21, 24, 26, 28, 30, 32, 34}
+	const hexString = "0123456789abcdef"
+	r := make([]byte, 36)
+	for i, b := range u {
+		r[offsets[i]] = hexString[b>>4]
+		r[offsets[i]+1] = hexString[b&0xF]
+	}
+	r[8] = '-'
+	r[13] = '-'
+	r[18] = '-'
+	r[23] = '-'
+	return string(r)
+
+}
+
+// UUIDFromBytes converts a raw byte slice to an UUID.
+func UUIDFromBytes(input []byte) (UUID, error) {
+	var u UUID
+	if len(input) != 16 {
+		return u, errors.New("UUIDs must be exactly 16 bytes long")
+	}
+
+	copy(u[:], input)
+	return u, nil
+}
+
+type ColumnInfo struct {
+	Keyspace string
+	Table    string
+	Name     string
+	TypeInfo TypeInfo
 }

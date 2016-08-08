@@ -1,87 +1,13 @@
 package cassandra
 
 import (
-	"errors"
 	"fmt"
 	"github.com/elastic/beats/libbeat/common/streambuf"
-	"github.com/elastic/beats/libbeat/logp"
 	"net"
 )
 
 type StreamDecoder struct {
 	r *streambuf.Buffer
-}
-
-func (f StreamDecoder) ReadHeader(r *streambuf.Buffer) (head *frameHeader, err error) {
-	v, err := r.ReadByte()
-	if err != nil {
-		return nil, err
-	}
-	version := v & protoVersionMask
-
-	if version < protoVersion1 || version > protoVersion4 {
-		return nil, fmt.Errorf("unsupported response version: %d", version)
-	}
-
-	head = &frameHeader{}
-
-	head.Version = protoVersion(v)
-
-	head.Flags, err = r.ReadByte()
-
-	if version > protoVersion2 {
-		stream, err := r.ReadNetUint16()
-		if err != nil {
-			return nil, err
-		}
-		head.Stream = int(stream)
-
-		b, err := r.ReadByte()
-		if err != nil {
-			return nil, err
-		}
-
-		head.Op = FrameOp(b)
-		l, err := r.ReadNetUint32()
-		if err != nil {
-			return nil, err
-		}
-		head.Length = int(l)
-	} else {
-		stream, err := r.ReadNetUint8()
-		if err != nil {
-			return nil, err
-		}
-		head.Stream = int(stream)
-
-		b, err := r.ReadByte()
-		if err != nil {
-			return nil, err
-		}
-
-		head.Op = FrameOp(b)
-		l, err := r.ReadNetUint32()
-		if err != nil {
-			return nil, err
-		}
-		head.Length = int(l)
-	}
-
-	if head.Length < 0 {
-		return nil, fmt.Errorf("frame body length can not be less than 0: %d", head.Length)
-	} else if head.Length > maxFrameSize {
-		// need to free up the connection to be used again
-		logp.Err("head length is too large")
-		return nil, ErrFrameTooBig
-	}
-
-	if !r.Avail(head.Length) {
-		return nil, errors.New(fmt.Sprintf("frame length is not enough as expected length: %v", head.Length))
-	}
-
-	logp.Debug("cassandra", "header: %v", head)
-
-	return head, nil
 }
 
 func (f StreamDecoder) ReadByte() byte {

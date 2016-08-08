@@ -2,7 +2,6 @@ package cassandra
 
 import (
 	"fmt"
-	"github.com/elastic/beats/libbeat/common/streambuf"
 	"io"
 	"net"
 )
@@ -11,28 +10,33 @@ type ByteArrayDecoder struct {
 	Data []byte
 }
 
-func (f ByteArrayDecoder) ReadHeader(r *streambuf.Buffer) (head *frameHeader, err error) {
+func readInt(p []byte) int32 {
+	return int32(p[0])<<24 | int32(p[1])<<16 | int32(p[2])<<8 | int32(p[3])
+}
+
+func (f *Framer) ReadHeader1() (head *frameHeader, err error) {
 	p := make([]byte, 9)
-	header := &frameHeader{}
-	_, err = io.ReadFull(r, p[:1])
+	head = &frameHeader{}
+	_, err = io.ReadFull(f.r, p[:1])
 	if err != nil {
-		return header, err
+		return head, err
 	}
 
 	version := p[0] & protoVersionMask
 
 	if version < protoVersion1 || version > protoVersion4 {
-		return header, fmt.Errorf("unsupported response version: %d", version)
+		return head, fmt.Errorf("unsupported response version: %d", version)
 	}
+	f.proto = version
 
 	headSize := 9
 	if version < protoVersion3 {
 		headSize = 8
 	}
 
-	_, err = io.ReadFull(r, p[1:headSize])
+	_, err = io.ReadFull(f.r, p[1:headSize])
 	if err != nil {
-		return header, err
+		return head, err
 	}
 
 	p = p[:headSize]
@@ -45,22 +49,22 @@ func (f ByteArrayDecoder) ReadHeader(r *streambuf.Buffer) (head *frameHeader, er
 
 	if version > protoVersion2 {
 		if len(p) != 9 {
-			return header, fmt.Errorf("not enough bytes to read header require 9 got: %d", len(p))
+			return head, fmt.Errorf("not enough bytes to read header require 9 got: %d", len(p))
 		}
 
 		head.Stream = int(int16(p[2])<<8 | int16(p[3]))
 		head.Op = FrameOp(p[4])
-		head.Length = int(readInt(p[5:]))
+		head.BodyLength = int(readInt(p[5:]))
 	} else {
 		if len(p) != 8 {
-			return header, fmt.Errorf("not enough bytes to read header require 8 got: %d", len(p))
+			return head, fmt.Errorf("not enough bytes to read header require 8 got: %d", len(p))
 		}
 
 		head.Stream = int(int8(p[2]))
 		head.Op = FrameOp(p[3])
-		head.Length = int(readInt(p[4:]))
+		head.BodyLength = int(readInt(p[4:]))
 	}
-
+	f.Header = head
 	return head, nil
 }
 
@@ -79,11 +83,8 @@ func (f ByteArrayDecoder) ReadInt() (n int) {
 		panic(fmt.Errorf("not enough bytes in buffer to Read int require 4 got: %d", len(f.Data)))
 	}
 
-	fmt.Println(f.Data)
-
 	n = int(int32(f.Data[0])<<24 | int32(f.Data[1])<<16 | int32(f.Data[2])<<8 | int32(f.Data[3]))
 	f.Data = f.Data[4:]
-	fmt.Println(f.Data)
 
 	return
 }
@@ -120,20 +121,14 @@ func (f ByteArrayDecoder) ReadString() (s string) {
 }
 
 func (f ByteArrayDecoder) ReadLongString() (s string) {
-	fmt.Println(f.Data)
 	size := f.ReadInt()
-	fmt.Println(f.Data)
 
 	if len(f.Data) < size {
 		panic(fmt.Errorf("not enough bytes in buffer to Read long string require %d got: %d", size, len(f.Data)))
 	}
-	fmt.Println(f.Data)
 
 	s = string(f.Data[:size])
 	f.Data = f.Data[size:]
-	fmt.Println(f.Data)
-
-	fmt.Println(size)
 	return
 }
 
