@@ -219,7 +219,6 @@ func (p *parser) parse() (*message, error) {
 
 	msg.header = p.framer.Header.ToMap()
 
-	//? how to make sure the two pair an added to the same result ?
 	if msg.IsRequest {
 		p.message.results.requests.append(msg)
 	} else {

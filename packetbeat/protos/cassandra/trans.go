@@ -128,8 +128,6 @@ func (trans *transactions) correlate() error {
 	requests := &trans.requests
 	responses := &trans.responses
 
-
-
 	// drop responses with missing requests
 	if requests.empty() {
 		for !responses.empty() {
@@ -140,9 +138,9 @@ func (trans *transactions) correlate() error {
 				break
 			}
 
-			if(resp.header["op"]=="EVENT"){
-				if(isDebug){
-					logp.Debug("cassandra","server pushed message,%v",resp.header)
+			if resp.header["op"] == "EVENT" {
+				if isDebug {
+					logp.Debug("cassandra", "server pushed message,%v", resp.header)
 				}
 
 				responses.pop()
