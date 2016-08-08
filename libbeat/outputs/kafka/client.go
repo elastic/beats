@@ -108,6 +108,19 @@ func (c *client) AsyncPublishEvents(
 	for _, event := range events {
 		topic, err := c.topic.Select(event)
 
+		var ts time.Time
+
+		// message timestamps have been added to kafka with version 0.10.0.0
+		if c.config.Version.IsAtLeast(sarama.V0_10_0_0) {
+			if tsRaw, ok := event["@timestamp"]; ok {
+				if tmp, ok := tsRaw.(common.Time); ok {
+					ts = time.Time(tmp)
+				} else if tmp, ok := tsRaw.(time.Time); ok {
+					ts = tmp
+				}
+			}
+		}
+
 		jsonEvent, err := json.Marshal(event)
 		if err != nil {
 			ref.done()
@@ -115,9 +128,10 @@ func (c *client) AsyncPublishEvents(
 		}
 
 		msg := &sarama.ProducerMessage{
-			Metadata: ref,
-			Topic:    topic,
-			Value:    sarama.ByteEncoder(jsonEvent),
+			Metadata:  ref,
+			Topic:     topic,
+			Value:     sarama.ByteEncoder(jsonEvent),
+			Timestamp: ts,
 		}
 
 		ch <- msg
