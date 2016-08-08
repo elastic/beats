@@ -13,16 +13,15 @@ import (
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
 type Line struct {
-	rawInput   io.Reader
+	reader     io.Reader
 	codec      encoding.Encoding
 	bufferSize int
-
-	nl        []byte
-	inBuffer  *streambuf.Buffer
-	outBuffer *streambuf.Buffer
-	inOffset  int // input buffer read offset
-	byteCount int // number of bytes decoded from input buffer into output buffer
-	decoder   transform.Transformer
+	nl         []byte
+	inBuffer   *streambuf.Buffer
+	outBuffer  *streambuf.Buffer
+	inOffset   int // input buffer read offset
+	byteCount  int // number of bytes decoded from input buffer into output buffer
+	decoder    transform.Transformer
 }
 
 func NewLine(
@@ -40,11 +39,11 @@ func NewLine(
 }
 
 func (l *Line) init(
-	input io.Reader,
+	reader io.Reader,
 	codec encoding.Encoding,
 	bufferSize int,
 ) error {
-	l.rawInput = input
+	l.reader = reader
 	l.codec = codec
 	l.bufferSize = bufferSize
 
@@ -97,6 +96,7 @@ func (l *Line) advance() error {
 
 	// fill inBuffer until '\n' sequence has been found in input buffer
 	for {
+		// Check if buffer has newLine character
 		idx = l.inBuffer.IndexFrom(l.inOffset, l.nl)
 		if idx >= 0 {
 			break
@@ -115,7 +115,7 @@ func (l *Line) advance() error {
 		// try to read more bytes into buffer
 		n := 0
 		buf := make([]byte, l.bufferSize)
-		n, err := l.rawInput.Read(buf)
+		n, err := l.reader.Read(buf)
 		l.inBuffer.Append(buf[:n])
 		if n == 0 && err != nil {
 			// return error only if no bytes have been received. Otherwise try to

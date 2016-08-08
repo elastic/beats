@@ -14,8 +14,8 @@
 package harvester
 
 import (
+	"errors"
 	"fmt"
-	"regexp"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
@@ -25,35 +25,35 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+var (
+	ErrFileTruncate = errors.New("detected file being truncated")
+	ErrRenamed      = errors.New("file was renamed")
+	ErrRemoved      = errors.New("file was removed")
+	ErrInactive     = errors.New("file inactive")
+	ErrClosed       = errors.New("reader closed")
+)
+
 type Harvester struct {
-	path               string /* the file path to harvest */
-	config             harvesterConfig
-	offset             int64
-	state              file.State
-	prospectorChan     chan *input.FileEvent
-	file               source.FileSource /* the file being watched */
-	ExcludeLinesRegexp []*regexp.Regexp
-	IncludeLinesRegexp []*regexp.Regexp
-	done               chan struct{}
-	encodingFactory    encoding.EncodingFactory
-	encoding           encoding.Encoding
+	config          harvesterConfig
+	state           file.State
+	prospectorChan  chan *input.Event
+	file            source.FileSource /* the file being watched */
+	done            chan struct{}
+	encodingFactory encoding.EncodingFactory
+	encoding        encoding.Encoding
 }
 
 func NewHarvester(
 	cfg *common.Config,
-	path string,
 	state file.State,
-	prospectorChan chan *input.FileEvent,
-	offset int64,
+	prospectorChan chan *input.Event,
 	done chan struct{},
 ) (*Harvester, error) {
 
 	h := &Harvester{
-		path:           path,
 		config:         defaultConfig,
 		state:          state,
 		prospectorChan: prospectorChan,
-		offset:         offset,
 		done:           done,
 	}
 

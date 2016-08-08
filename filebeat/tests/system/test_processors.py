@@ -13,9 +13,11 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
-            drop_fields={
-                "fields": ["beat"],
-            },
+            processors=[{
+                "drop_fields": {
+                    "fields": ["beat"],
+                },
+            }]
         )
         with open(self.working_dir + "/test.log", "w") as f:
             f.write("test message\n")
@@ -36,9 +38,11 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
-            include_fields={
-                "fields": ["source", "offset", "message"],
-            },
+            processors=[{
+                "include_fields": {
+                    "fields": ["source", "offset", "message"],
+                },
+            }]
         )
         with open(self.working_dir + "/test.log", "w") as f:
             f.write("test message\n")
@@ -59,9 +63,11 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test*.log",
-            drop_event={
-                "condition": "contains.source: test1",
-            },
+            processors=[{
+                "drop_event": {
+                    "when": "contains.source: test1",
+                },
+            }]
         )
         with open(self.working_dir + "/test1.log", "w") as f:
             f.write("test1 message\n")
@@ -86,9 +92,11 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test*.log",
-            drop_event={
-                "condition": "not.contains.source: test",
-            },
+            processors=[{
+                "drop_event": {
+                    "when": "not.contains.source: test",
+                },
+            }]
         )
         with open(self.working_dir + "/test1.log", "w") as f:
             f.write("test1 message\n")

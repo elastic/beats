@@ -17,11 +17,12 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
 type elasticsearchOutput struct {
-	index    string
+	index    outil.Selector
 	beatName string
 	mode     mode.ConnectionMode
 	topology
@@ -56,6 +57,11 @@ func New(beatName string, cfg *common.Config, topologyExpire int) (outputs.Outpu
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
 
+	if !cfg.HasField("index") {
+		pattern := fmt.Sprintf("%v-%%{+yyyy.MM.dd}", beatName)
+		cfg.SetString("index", -1, pattern)
+	}
+
 	output := &elasticsearchOutput{beatName: beatName}
 	err := output.init(cfg, topologyExpire)
 	if err != nil {
@@ -73,6 +79,16 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
+	index, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "index",
+		MultiKey:         "indices",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+	})
+	if err != nil {
+		return err
+	}
+
 	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return err
@@ -83,6 +99,7 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
+	out.index = index
 	clients, err := modeutil.MakeClients(cfg, makeClientFactory(tlsConfig, &config, out))
 	if err != nil {
 		return err
@@ -106,7 +123,6 @@ func (out *elasticsearchOutput) init(
 	}
 
 	out.mode = m
-	out.index = config.Index
 
 	return nil
 }
@@ -237,7 +253,7 @@ func makeClientFactory(
 		}
 
 		return NewClient(
-			esURL, config.Index, proxyURL, tls,
+			esURL, out.index, proxyURL, tls,
 			config.Username, config.Password,
 			params, config.Timeout,
 			config.CompressionLevel,

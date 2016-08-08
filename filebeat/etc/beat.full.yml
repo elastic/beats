@@ -166,7 +166,7 @@ filebeat.prospectors:
   # Close inactive closes the file handler after the predefined period.
   # The period starts when the last line of the file was, not the file ModTime.
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
-  #close_inactive: 1h
+  #close_inactive: 5m
 
   # Close renamed closes a file handler when the file is renamed or rotated.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.

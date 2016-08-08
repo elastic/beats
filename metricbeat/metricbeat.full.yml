@@ -16,6 +16,9 @@ metricbeat.modules:
     # CPU stats
     - cpu
 
+    # System Load stats
+    - load
+
     # Per CPU core stats
     #- core
 
@@ -264,9 +267,9 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "metricbeat" and generates
-  # [metricbeat-]YYYY.MM.DD keys.
-  #index: "metricbeat"
+  # Optional index name. The default is "metricbeat" plus date
+  # and generates [metricbeat-]YYYY.MM.DD keys.
+  #index: "metricbeat-%{+yyyy.MM.dd}"
 
   # Optional HTTP Path
   #path: "/elasticsearch"
@@ -372,7 +375,7 @@ output.elasticsearch:
 
   # Optional index name. The default index name is set to name of the beat
   # in all lowercase.
-  #index: metricbeat
+  #index: 'metricbeat'
 
   # SOCKS5 proxy server URL
   #proxy_url: socks5://user:password@socks5-server:2233
@@ -509,7 +512,7 @@ output.elasticsearch:
 
   # The name of the Redis list or channel the events are published to. The
   # default is metricbeat.
-  #index: metricbeat
+  #key: metricbeat
 
   # The password to authenticate with. The default is no authentication.
   #password:

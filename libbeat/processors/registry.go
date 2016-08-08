@@ -1,8 +1,6 @@
 package processors
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -14,15 +12,13 @@ type Processor interface {
 
 type Constructor func(config common.Config) (Processor, error)
 
-var constructors = map[string]Constructor{}
+var registry = NewNamespace()
 
-func RegisterPlugin(name string, constructor Constructor) error {
-
+func RegisterPlugin(name string, constructor Constructor) {
 	logp.Debug("processors", "Register plugin %s", name)
 
-	if _, exists := constructors[name]; exists {
-		return fmt.Errorf("plugin %s already registered", name)
+	err := registry.Register(name, constructor)
+	if err != nil {
+		panic(err)
 	}
-	constructors[name] = constructor
-	return nil
 }

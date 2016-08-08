@@ -4,22 +4,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/filebeat/harvester/processor"
+	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFileEventToMapStr(t *testing.T) {
+func TestEventToMapStr(t *testing.T) {
 	// Test 'fields' is not present when it is nil.
-	event := FileEvent{}
+	event := Event{}
 	mapStr := event.ToMapStr()
 	_, found := mapStr["fields"]
 	assert.False(t, found)
 }
 
-func TestFileEventToMapStrJSON(t *testing.T) {
+func TestEventToMapStrJSON(t *testing.T) {
 	type io struct {
-		Event         FileEvent
+		Event         Event
 		ExpectedItems common.MapStr
 	}
 
@@ -30,11 +30,11 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 	tests := []io{
 		{
 			// by default, don't overwrite keys
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type": "test_type",
@@ -43,11 +43,11 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		},
 		{
 			// overwrite keys if asked
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type": "test",
@@ -56,11 +56,11 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		},
 		{
 			// without keys_under_root, put everything in a json key
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
-				JSONConfig:   &processor.JSONConfig{},
+				JSONConfig:   &reader.JSONConfig{},
 			},
 			ExpectedItems: common.MapStr{
 				"json": common.MapStr{"type": "test", "text": "hello"},
@@ -69,11 +69,11 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		},
 		{
 			// when MessageKey is defined, the Text overwrites the value of that key
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hi"},
-				JSONConfig:   &processor.JSONConfig{MessageKey: "text"},
+				JSONConfig:   &reader.JSONConfig{MessageKey: "text"},
 			},
 			ExpectedItems: common.MapStr{
 				"json": common.MapStr{"type": "test", "text": "hello"},
@@ -83,12 +83,12 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		{
 			// when @timestamp is in JSON and overwrite_keys is true, parse it
 			// in a common.Time
-			Event: FileEvent{
+			Event: Event{
 				ReadTime:     now,
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.444Z"},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"@timestamp": common.MustParseTime("2016-04-05T18:47:18.444Z"),
@@ -98,12 +98,12 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		{
 			// when the parsing on @timestamp fails, leave the existing value and add an error key
 			// in a common.Time
-			Event: FileEvent{
+			Event: Event{
 				ReadTime:     now,
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.44XX4Z"},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"@timestamp": common.Time(now),
@@ -114,12 +114,12 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		{
 			// when the @timestamp has the wrong type, leave the existing value and add an error key
 			// in a common.Time
-			Event: FileEvent{
+			Event: Event{
 				ReadTime:     now,
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "@timestamp": 42},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"@timestamp": common.Time(now),
@@ -129,11 +129,11 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		},
 		{
 			// if overwrite_keys is true, but the `type` key in json is not a string, ignore it
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": 42},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type":       "test_type",
@@ -142,11 +142,11 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		},
 		{
 			// if overwrite_keys is true, but the `type` key in json is empty, ignore it
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": ""},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type":       "test_type",
@@ -155,11 +155,11 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 		},
 		{
 			// if overwrite_keys is true, but the `type` key in json starts with _, ignore it
-			Event: FileEvent{
+			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "_type"},
-				JSONConfig:   &processor.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
 				"type":       "test_type",

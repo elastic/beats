@@ -733,6 +733,11 @@ class Test(BaseTest):
             lambda: self.output_has(lines=2),
             max_timeout=10)
 
+        # Wait until registry file is created
+        self.wait_until(
+            lambda: self.log_contains("Registry file updated"),
+            max_timeout=15)
+
         data = self.get_registry()
         assert len(data) == 2
 
@@ -804,7 +809,7 @@ class Test(BaseTest):
         # Wait until states are removed from prospectors
         self.wait_until(
             lambda: self.log_contains(
-                "Cleanup state for file as file removed"),
+                "Remove state for file as file removed"),
             max_timeout=15)
 
         # Add one more line to make sure registry is written

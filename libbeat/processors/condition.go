@@ -33,6 +33,24 @@ type Condition struct {
 	not      *Condition
 }
 
+type WhenProcessor struct {
+	condition *Condition
+	p         Processor
+}
+
+func NewConditional(
+	ruleFactory Constructor,
+) Constructor {
+	return func(cfg common.Config) (Processor, error) {
+		rule, err := ruleFactory(cfg)
+		if err != nil {
+			return nil, err
+		}
+
+		return addCondition(cfg, rule)
+	}
+}
+
 func NewCondition(config *ConditionConfig) (*Condition, error) {
 
 	c := Condition{}
@@ -459,4 +477,51 @@ func (e EqualsValue) String() string {
 		return e.Str
 	}
 	return strconv.Itoa(int(e.Int))
+}
+
+func NewConditionRule(
+	config ConditionConfig,
+	p Processor,
+) (Processor, error) {
+	cond, err := NewCondition(&config)
+	if err != nil {
+		logp.Err("Failed to initialize lookup condition: %v", err)
+		return nil, err
+	}
+
+	if cond == nil {
+		return p, nil
+	}
+	return &WhenProcessor{cond, p}, nil
+}
+
+func (r *WhenProcessor) Run(event common.MapStr) (common.MapStr, error) {
+	if !r.condition.Check(event) {
+		return event, nil
+	}
+	return r.p.Run(event)
+}
+
+func (r *WhenProcessor) String() string {
+	return fmt.Sprintf("%v, condition=%v", r.p.String(), r.condition.String())
+}
+
+func addCondition(
+	cfg common.Config,
+	p Processor,
+) (Processor, error) {
+	if !cfg.HasField("when") {
+		return p, nil
+	}
+	sub, err := cfg.Child("when", -1)
+	if err != nil {
+		return nil, err
+	}
+
+	condConfig := ConditionConfig{}
+	if err := sub.Unpack(&condConfig); err != nil {
+		return nil, err
+	}
+
+	return NewConditionRule(condConfig, p)
 }

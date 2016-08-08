@@ -31,6 +31,11 @@ func NewState(fileInfo os.FileInfo, path string) State {
 	}
 }
 
+// IsEmpty returns true if the state is empty
+func (s *State) IsEmpty() bool {
+	return *s == State{}
+}
+
 // States handles list of FileState
 type States struct {
 	states []State
@@ -60,11 +65,12 @@ func (s *States) Update(newState State) {
 	}
 }
 
-func (s *States) FindPrevious(newState State) (int, State) {
+func (s *States) FindPrevious(newState State) State {
 	// TODO: This currently blocks writing updates every time state is fetched. Should be improved for performance
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	return s.findPrevious(newState)
+	_, state := s.findPrevious(newState)
+	return state
 }
 
 // findPreviousState returns the previous state fo the file
@@ -92,11 +98,18 @@ func (s *States) Cleanup() {
 	states := s.states[:0]
 
 	for _, state := range s.states {
+
 		ttl := state.TTL
+
 		if ttl == 0 || (ttl > 0 && currentTime.Sub(state.Timestamp) > ttl) {
-			logp.Debug("state", "State removed for %v because of older: %v", state.Source, ttl)
-			continue // drop state
+			if state.Finished {
+				logp.Debug("state", "State removed for %v because of older: %v", state.Source, ttl)
+				continue // drop state
+			} else {
+				logp.Err("State for %s should have been dropped, but couldn't as state is not finished.", state.Source)
+			}
 		}
+
 		states = append(states, state) // in-place copy old state
 	}
 	s.states = states

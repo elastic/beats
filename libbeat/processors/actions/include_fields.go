@@ -5,37 +5,24 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
-type IncludeFields struct {
+type includeFields struct {
 	Fields []string
-	// condition
-	Cond *processors.Condition
-}
-
-type IncludeFieldsConfig struct {
-	Fields []string                    `config:"fields"`
-	Cond   *processors.ConditionConfig `config:"when"`
 }
 
 func init() {
-	if err := processors.RegisterPlugin("include_fields", newIncludeFields); err != nil {
-		panic(err)
-	}
+	processors.RegisterPlugin("include_fields",
+		configChecked(newIncludeFields,
+			requireFields("fields"),
+			allowedFields("fields", "when")))
 }
 
 func newIncludeFields(c common.Config) (processors.Processor, error) {
-
-	f := IncludeFields{}
-
-	if err := f.CheckConfig(c); err != nil {
-		return nil, err
-	}
-
-	config := IncludeFieldsConfig{}
-
+	config := struct {
+		Fields []string `config:"fields"`
+	}{}
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("fail to unpack the include_fields configuration: %s", err)
@@ -53,43 +40,12 @@ func newIncludeFields(c common.Config) (processors.Processor, error) {
 			config.Fields = append(config.Fields, readOnly)
 		}
 	}
-	f.Fields = config.Fields
 
-	cond, err := processors.NewCondition(config.Cond)
-	if err != nil {
-		return nil, err
-	}
-	f.Cond = cond
-
+	f := includeFields{Fields: config.Fields}
 	return &f, nil
 }
 
-func (f *IncludeFields) CheckConfig(c common.Config) error {
-
-	complete := false
-
-	logp.Info("include_fields: %v", c)
-	for _, field := range c.GetFields() {
-		if field != "fields" && field != "when" {
-			return fmt.Errorf("unexpected %s option in the include_fields configuration", field)
-		}
-		if field == "fields" {
-			complete = true
-		}
-	}
-
-	if !complete {
-		return fmt.Errorf("missing fields option in the include_fields configuration")
-	}
-	return nil
-}
-
-func (f *IncludeFields) Run(event common.MapStr) (common.MapStr, error) {
-
-	if f.Cond != nil && !f.Cond.Check(event) {
-		return event, nil
-	}
-
+func (f includeFields) Run(event common.MapStr) (common.MapStr, error) {
 	filtered := common.MapStr{}
 
 	for _, field := range f.Fields {
@@ -109,10 +65,6 @@ func (f *IncludeFields) Run(event common.MapStr) (common.MapStr, error) {
 	return filtered, nil
 }
 
-func (f IncludeFields) String() string {
-
-	if f.Cond != nil {
-		return "include_fields=" + strings.Join(f.Fields, ", ") + ", condition=" + f.Cond.String()
-	}
+func (f includeFields) String() string {
 	return "include_fields=" + strings.Join(f.Fields, ", ")
 }

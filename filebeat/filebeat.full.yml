@@ -166,7 +166,7 @@ filebeat.prospectors:
   # Close inactive closes the file handler after the predefined period.
   # The period starts when the last line of the file was, not the file ModTime.
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
-  #close_inactive: 1h
+  #close_inactive: 5m
 
   # Close renamed closes a file handler when the file is renamed or rotated.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
@@ -332,9 +332,9 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "filebeat" and generates
-  # [filebeat-]YYYY.MM.DD keys.
-  #index: "filebeat"
+  # Optional index name. The default is "filebeat" plus date
+  # and generates [filebeat-]YYYY.MM.DD keys.
+  #index: "filebeat-%{+yyyy.MM.dd}"
 
   # Optional HTTP Path
   #path: "/elasticsearch"
@@ -440,7 +440,7 @@ output.elasticsearch:
 
   # Optional index name. The default index name is set to name of the beat
   # in all lowercase.
-  #index: filebeat
+  #index: 'filebeat'
 
   # SOCKS5 proxy server URL
   #proxy_url: socks5://user:password@socks5-server:2233
@@ -577,7 +577,7 @@ output.elasticsearch:
 
   # The name of the Redis list or channel the events are published to. The
   # default is filebeat.
-  #index: filebeat
+  #key: filebeat
 
   # The password to authenticate with. The default is no authentication.
   #password:

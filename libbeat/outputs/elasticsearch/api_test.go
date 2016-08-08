@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -169,7 +170,8 @@ func newTestClient(url string) *Client {
 }
 
 func newTestClientAuth(url, user, pass string) *Client {
-	client, err := NewClient(url, "", nil, nil, user, pass, nil, 60*time.Second, 3, nil)
+	index := outil.MakeSelector()
+	client, err := NewClient(url, index, nil, nil, user, pass, nil, 60*time.Second, 3, nil)
 	if err != nil {
 		panic(err)
 	}

@@ -19,6 +19,10 @@
       type: integer
       description: >
         The process parent pid.
+    - name: pgid
+      type: integer
+      description: >
+        The process group id.
     - name: cmdline
       type: keyword
       description: >
@@ -41,7 +45,8 @@
           description: >
             The amount of CPU time the process spent in user space.
         - name: total.pct
-          type: half_float
+          type: scaled_float
+          format: percent
           description: >
             The percentage of CPU time spent by the process since the last update. Its value is similar to the
             %CPU value of the process displayed by the top command on Unix systems.
@@ -64,17 +69,21 @@
       fields:
         - name: size
           type: long
+          format: bytes
           description: >
             The total virtual memory the process has.
         - name: rss.bytes
           type: long
+          format: bytes
           description: >
             The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
         - name: rss.pct
-          type: half_float
+          type: scaled_float
+          format: percent
           description: >
             The percentage of memory the process occupied in main memory (RAM).
         - name: share
           type: long
+          format: bytes
           description: >
             The shared memory the process uses.

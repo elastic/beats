@@ -17,27 +17,27 @@ func (c *Config) Merge(from interface{}, options ...Option) error {
 }
 
 func mergeConfig(opts *options, to, from *Config) Error {
-	for k, v := range from.fields.fields {
+	for k, v := range from.fields.dict() {
 		ctx := context{
 			parent: cfgSub{to},
 			field:  k,
 		}
 
-		old, ok := to.fields.fields[k]
+		old, ok := to.fields.get(k)
 		if !ok {
-			to.fields.fields[k] = v.cpy(ctx)
+			to.fields.set(k, v.cpy(ctx))
 			continue
 		}
 
 		subOld, err := old.toConfig(opts)
 		if err != nil {
-			to.fields.fields[k] = v.cpy(ctx)
+			to.fields.set(k, v.cpy(ctx))
 			continue
 		}
 
 		subFrom, err := v.toConfig(opts)
 		if err != nil {
-			to.fields.fields[k] = v.cpy(ctx)
+			to.fields.set(k, v.cpy(ctx))
 			continue
 		}
 
@@ -223,7 +223,7 @@ func normalizeArray(
 		out = append(out, tmp)
 	}
 
-	cfg.fields.arr = out
+	cfg.fields.a = out
 	return val, nil
 }
 

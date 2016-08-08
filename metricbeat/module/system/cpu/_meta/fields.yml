@@ -4,43 +4,51 @@
     `cpu` contains local CPU stats.
   fields:
     - name: user.pct
-      type: half_float
+      type: scaled_float
+      format: percent
       description: >
         The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
         For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
     - name: system.pct
-      type: half_float
+      type: scaled_float
+      format: percent
       description: >
         The percentage of CPU time spent in kernel space.
 
     - name: nice.pct
-      type: half_float
+      type: scaled_float
+      format: percent
       description: >
         The percentage of CPU time spent on low-priority processes.
 
     - name: idle.pct
-      type: half_float
+      type: scaled_float
+      format: percent
       description: >
         The percentage of CPU time spent idle.
 
     - name: iowait.pct
-      type: half_float
+      type: scaled_float
+      format: percent
       description: >
         The percentage of CPU time spent in wait (on disk).
 
     - name: irq.pct
-      type: half_float
+      type: scaled_float
+      format: percent
       description: >
         The percentage of CPU time spent servicing and handling hardware interrupts.
 
     - name: softirq.pct
-      type: half_float
+      type: scaled_float
+      format: percent
       description: >
         The percentage of CPU time spent servicing and handling software interrupts.
 
     - name: steal.pct
-      type: half_float
+      type: scaled_float
+      format: percent
       description: >
         The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
         was servicing another processor.
@@ -87,21 +95,3 @@
         The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
         was servicing another processor.
         Available only on Unix.
-
-    - name: load
-      type: group
-      description: >
-        Load averages.
-      fields:
-        - name: "1"
-          type: half_float
-          description: >
-            Load average for the last minute.
-        - name: "5"
-          type: half_float
-          description: >
-            Load average for the last 5 minutes.
-        - name: "15"
-          type: half_float
-          description: >
-            Load average for the last 15 minutes.

@@ -53,19 +53,24 @@
                 "cpu": {
                   "properties": {
                     "children_system": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "children_user": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "load": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "system": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "user": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     }
                   }
                 },
@@ -728,33 +733,7 @@
                 },
                 "persistence": {
                   "properties": {
-                    "loading": {
-                      "type": "boolean"
-                    },
-                    "rdb": {
-                      "properties": {
-                        "bgsave_in_progress": {
-                          "type": "boolean"
-                        },
-                        "changes_since_last_save": {
-                          "type": "long"
-                        },
-                        "current_bgsave_time_sec": {
-                          "type": "long"
-                        },
-                        "last_bgsave_status": {
-                          "ignore_above": 1024,
-                          "type": "keyword"
-                        },
-                        "last_bgsave_time_sec": {
-                          "type": "long"
-                        },
-                        "last_save_time": {
-                          "type": "long"
-                        }
-                      }
-                    },
-                    "used": {
+                    "aof": {
                       "properties": {
                         "current_rewrite_time_sec": {
                           "type": "long"
@@ -778,6 +757,32 @@
                         },
                         "rewrite_scheduled": {
                           "type": "boolean"
+                        }
+                      }
+                    },
+                    "loading": {
+                      "type": "boolean"
+                    },
+                    "rdb": {
+                      "properties": {
+                        "bgsave_in_progress": {
+                          "type": "boolean"
+                        },
+                        "changes_since_last_save": {
+                          "type": "long"
+                        },
+                        "current_bgsave_time_sec": {
+                          "type": "long"
+                        },
+                        "last_bgsave_status": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "last_bgsave_time_sec": {
+                          "type": "long"
+                        },
+                        "last_save_time": {
+                          "type": "long"
                         }
                       }
                     }
@@ -984,7 +989,8 @@
                 "idle": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -994,7 +1000,8 @@
                 "iowait": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1004,7 +1011,8 @@
                 "irq": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1014,7 +1022,8 @@
                 "nice": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1024,7 +1033,8 @@
                 "softirq": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1034,7 +1044,8 @@
                 "steal": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1044,7 +1055,8 @@
                 "system": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1054,7 +1066,8 @@
                 "user": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1068,7 +1081,8 @@
                 "idle": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1078,7 +1092,8 @@
                 "iowait": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1088,30 +1103,19 @@
                 "irq": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
                     }
                   }
                 },
-                "load": {
-                  "properties": {
-                    "1": {
-                      "type": "half_float"
-                    },
-                    "15": {
-                      "type": "half_float"
-                    },
-                    "5": {
-                      "type": "half_float"
-                    }
-                  }
-                },
                 "nice": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1121,7 +1125,8 @@
                 "softirq": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1131,7 +1136,8 @@
                 "steal": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1141,7 +1147,8 @@
                 "system": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1151,7 +1158,8 @@
                 "user": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1207,7 +1215,7 @@
             },
             "filesystem": {
               "properties": {
-                "avail": {
+                "available": {
                   "type": "long"
                 },
                 "device_name": {
@@ -1236,7 +1244,8 @@
                       "type": "long"
                     },
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     }
                   }
                 }
@@ -1265,6 +1274,38 @@
                 }
               }
             },
+            "load": {
+              "properties": {
+                "1": {
+                  "scaling_factor": 100,
+                  "type": "scaled_float"
+                },
+                "15": {
+                  "scaling_factor": 100,
+                  "type": "scaled_float"
+                },
+                "5": {
+                  "scaling_factor": 100,
+                  "type": "scaled_float"
+                },
+                "norm": {
+                  "properties": {
+                    "1": {
+                      "scaling_factor": 100,
+                      "type": "scaled_float"
+                    },
+                    "15": {
+                      "scaling_factor": 100,
+                      "type": "scaled_float"
+                    },
+                    "5": {
+                      "scaling_factor": 100,
+                      "type": "scaled_float"
+                    }
+                  }
+                }
+              }
+            },
             "memory": {
               "properties": {
                 "actual": {
@@ -1278,7 +1319,8 @@
                           "type": "long"
                         },
                         "pct": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         }
                       }
                     }
@@ -1301,7 +1343,8 @@
                           "type": "long"
                         },
                         "pct": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         }
                       }
                     }
@@ -1316,7 +1359,8 @@
                       "type": "long"
                     },
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     }
                   }
                 }
@@ -1380,7 +1424,8 @@
                     "total": {
                       "properties": {
                         "pct": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         },
                         "ticks": {
                           "type": "long"
@@ -1400,7 +1445,8 @@
                           "type": "long"
                         },
                         "pct": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         }
                       }
                     },
@@ -1415,6 +1461,9 @@
                 "name": {
                   "ignore_above": 1024,
                   "type": "keyword"
+                },
+                "pgid": {
+                  "type": "long"
                 },
                 "pid": {
                   "type": "long"
