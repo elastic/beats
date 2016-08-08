@@ -111,11 +111,11 @@ func (p *hashPartitioner) Partition(message *ProducerMessage, numPartitions int3
 	if err != nil {
 		return -1, err
 	}
-	hash := int32(p.hasher.Sum32())
-	if hash < 0 {
-		hash = -hash
+	partition := int32(p.hasher.Sum32()) % numPartitions
+	if partition < 0 {
+		partition = -partition
 	}
-	return hash % numPartitions, nil
+	return partition, nil
 }
 
 func (p *hashPartitioner) RequiresConsistency() bool {

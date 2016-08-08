@@ -60,7 +60,7 @@ type MockBroker struct {
 
 // RequestResponse represents a Request/Response pair processed by MockBroker.
 type RequestResponse struct {
-	Request  requestBody
+	Request  protocolBody
 	Response encoder
 }
 

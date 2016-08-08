@@ -6,7 +6,9 @@ import (
 	"time"
 )
 
-var validID *regexp.Regexp = regexp.MustCompile(`\A[A-Za-z0-9._-]*\z`)
+const defaultClientID = "sarama"
+
+var validID = regexp.MustCompile(`\A[A-Za-z0-9._-]+\z`)
 
 // Config is used to pass multiple configuration options to Sarama's constructors.
 type Config struct {
@@ -189,7 +191,7 @@ type Config struct {
 		// Return specifies what channels will be populated. If they are set to true,
 		// you must read from them to prevent deadlock.
 		Return struct {
-			// If enabled, any errors that occured while consuming are returned on
+			// If enabled, any errors that occurred while consuming are returned on
 			// the Errors channel (default disabled).
 			Errors bool
 		}
@@ -224,6 +226,13 @@ type Config struct {
 	// in the background while user code is working, greatly improving throughput.
 	// Defaults to 256.
 	ChannelBufferSize int
+	// The version of Kafka that Sarama will assume it is running against.
+	// Defaults to the oldest supported stable version. Since Kafka provides
+	// backwards-compatibility, setting it to a version older than you have
+	// will not break anything, although it may prevent you from using the
+	// latest features. Setting it to a version greater than you are actually
+	// running may lead to random breakage.
+	Version KafkaVersion
 }
 
 // NewConfig returns a new configuration instance with sane defaults.
@@ -256,7 +265,9 @@ func NewConfig() *Config {
 	c.Consumer.Offsets.CommitInterval = 1 * time.Second
 	c.Consumer.Offsets.Initial = OffsetNewest
 
+	c.ClientID = defaultClientID
 	c.ChannelBufferSize = 256
+	c.Version = minVersion
 
 	return c
 }
@@ -297,7 +308,7 @@ func (c *Config) Validate() error {
 	if c.Consumer.Offsets.Retention%time.Millisecond != 0 {
 		Logger.Println("Consumer.Offsets.Retention only supports millisecond precision; nanoseconds will be truncated.")
 	}
-	if c.ClientID == "sarama" {
+	if c.ClientID == defaultClientID {
 		Logger.Println("ClientID is the default of 'sarama', you should consider setting it to something application-specific.")
 	}
 
