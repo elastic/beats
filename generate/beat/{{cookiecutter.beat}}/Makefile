@@ -1,5 +1,5 @@
 BEATNAME={{cookiecutter.beat}}
-BEAT_DIR={{cookiecutter.beat_path}}
+BEAT_DIR={{cookiecutter.beat_path}}/{{cookiecutter.beat}}
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
 ES_BEATS?=./vendor/github.com/elastic/beats

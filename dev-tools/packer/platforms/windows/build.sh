@@ -8,14 +8,14 @@ ARCHDIR=${BASEDIR}/../..
 # executed from the top directory
 runid=windows-$BEAT-$ARCH
 
-cat beats/$BEAT.yml ${ARCHDIR}/archs/$ARCH.yml version.yml > build/settings-$runid.yml
-gotpl ${BASEDIR}/run.sh.j2 < build/settings-$runid.yml > build/run-$runid.sh
-gotpl ${BASEDIR}/install-service.ps1.j2 < build/settings-$runid.yml > build/install-service-$BEAT.ps1
-gotpl ${BASEDIR}/uninstall-service.ps1.j2 < build/settings-$runid.yml > build/uninstall-service-$BEAT.ps1
-chmod +x build/run-$runid.sh
+cat ${BUILD_DIR}/package.yml ${ARCHDIR}/archs/$ARCH.yml ${ARCHDIR}/version.yml > ${BUILD_DIR}/settings-$runid.yml
+gotpl ${BASEDIR}/run.sh.j2 < ${BUILD_DIR}/settings-$runid.yml > ${BUILD_DIR}/run-$runid.sh
+gotpl ${BASEDIR}/install-service.ps1.j2 < ${BUILD_DIR}/settings-$runid.yml > ${BUILD_DIR}/install-service-$BEAT.ps1
+gotpl ${BASEDIR}/uninstall-service.ps1.j2 < ${BUILD_DIR}/settings-$runid.yml > ${BUILD_DIR}/uninstall-service-$BEAT.ps1
+chmod +x ${BUILD_DIR}/run-$runid.sh
 
-docker run --rm -v `pwd`/build:/build \
+docker run --rm -v ${BUILD_DIR}:/build \
     -e BUILDID=$BUILDID -e SNAPSHOT=$SNAPSHOT -e RUNID=$runid \
     tudorg/fpm /build/run-$runid.sh
 
-rm build/settings-$runid.yml build/run-$runid.sh
+rm ${BUILD_DIR}/settings-$runid.yml ${BUILD_DIR}/run-$runid.sh
