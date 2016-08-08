@@ -137,7 +137,7 @@ func (s *Mode) publish(
 		resetFail := false
 
 		if err := s.connect(); err != nil {
-			logp.Info("Connecting error publishing events (retrying): %s", err)
+			logp.Err("Connecting error publishing events (retrying): %s", err)
 			goto sendFail
 		}
 
