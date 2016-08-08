@@ -1,9 +1,9 @@
 package memory
 
 import (
-	"fmt"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type MEMORYData struct {
@@ -31,7 +31,7 @@ func (c *MEMORYService) GetMemorystatsList(rawStats []docker.DockerStat) []MEMOR
 			formatedStats = append(formatedStats, c.getMEMData(myRawStats))
 		}
 	} else {
-		fmt.Printf("No container is running \n")
+		logp.Info("No container is running \n")
 	}
 	/*fmt.Printf("From helper/getCPUStatsList \n")
 	for _, event := range myEvents{

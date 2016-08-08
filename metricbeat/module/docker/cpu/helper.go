@@ -1,11 +1,11 @@
 package cpu
 
 import (
-	"fmt"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/docker"
 	dc "github.com/fsouza/go-dockerclient"
 	"strconv"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type CPURaw struct {
@@ -37,7 +37,7 @@ func (c *CPUService) GetCPUstatsList(rawStats []docker.DockerStat) []CPUStats {
 			formatedStats = append(formatedStats, c.getCpuStats(&myRawStats))
 		}
 	} else {
-		fmt.Printf("No container is running \n")
+		logp.Info("No container is running \n")
 	}
 	/*fmt.Printf("From helper/getCPUStatsList \n")
 	for _, event := range myEvents{
