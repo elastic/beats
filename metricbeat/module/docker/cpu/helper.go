@@ -1,13 +1,12 @@
 package cpu
 
 import (
-	"strconv"
-	dc"github.com/fsouza/go-dockerclient"
-	"github.com/elastic/beats/metricbeat/module/docker"
-	"github.com/elastic/beats/libbeat/common"
 	"fmt"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/module/docker"
+	dc "github.com/fsouza/go-dockerclient"
+	"strconv"
 )
-
 
 type CPURaw struct {
 	PerCpuUsage       []uint64
@@ -22,24 +21,22 @@ type CPUCalculator interface {
 	UsageInUsermode() float64
 }
 type CPUStats struct {
-	Time common.Time
-	MyContainer 	*docker.Container
+	Time              common.Time
+	MyContainer       *docker.Container
 	PerCpuUsage       common.MapStr
 	TotalUsage        float64
 	UsageInKernelmode float64
 	UsageInUsermode   float64
-
 }
 type CPUService struct{}
 
-
-func (c *CPUService) GetCPUstatsList(rawStats []docker.DockerStat)[]CPUStats{
-	 formatedStats :=[]CPUStats{}
-	if len(rawStats) !=0 {
+func (c *CPUService) GetCPUstatsList(rawStats []docker.DockerStat) []CPUStats {
+	formatedStats := []CPUStats{}
+	if len(rawStats) != 0 {
 		for _, myRawStats := range rawStats {
 			formatedStats = append(formatedStats, c.getCpuStats(&myRawStats))
 		}
-	}else{
+	} else {
 		fmt.Printf("No container is running \n")
 	}
 	/*fmt.Printf("From helper/getCPUStatsList \n")
@@ -48,35 +45,35 @@ func (c *CPUService) GetCPUstatsList(rawStats []docker.DockerStat)[]CPUStats{
 	}*/
 	return formatedStats
 }
-func (c *CPUService) getCpuStats(myRawStat *docker.DockerStat)  CPUStats {
+func (c *CPUService) getCpuStats(myRawStat *docker.DockerStat) CPUStats {
 
 	return CPUStats{
-		Time: common.Time(myRawStat.Stats.Read),
-		MyContainer: docker.InitCurrentContainer(&myRawStat.Container),
-		PerCpuUsage:c.perCpuUsage(&myRawStat.Stats),
-		TotalUsage: c.totalUsage(&myRawStat.Stats),
+		Time:              common.Time(myRawStat.Stats.Read),
+		MyContainer:       docker.InitCurrentContainer(&myRawStat.Container),
+		PerCpuUsage:       c.perCpuUsage(&myRawStat.Stats),
+		TotalUsage:        c.totalUsage(&myRawStat.Stats),
 		UsageInKernelmode: c.usageInKernelmode(&myRawStat.Stats),
-		UsageInUsermode: c.usageInUsermode(&myRawStat.Stats),
+		UsageInUsermode:   c.usageInUsermode(&myRawStat.Stats),
 	}
 }
 
-func NewCpuService() *CPUService{
+func NewCpuService() *CPUService {
 	return &CPUService{}
 }
-func getOLdCpu(stats *dc.Stats ) CPURaw{
+func getOLdCpu(stats *dc.Stats) CPURaw {
 	return CPURaw{
-		PerCpuUsage: stats.PreCPUStats.CPUUsage.PercpuUsage,
-		TotalUsage: stats.PreCPUStats.CPUUsage.TotalUsage,
+		PerCpuUsage:       stats.PreCPUStats.CPUUsage.PercpuUsage,
+		TotalUsage:        stats.PreCPUStats.CPUUsage.TotalUsage,
 		UsageInKernelmode: stats.PreCPUStats.CPUUsage.UsageInKernelmode,
-		UsageInUsermode: stats.PreCPUStats.CPUUsage.UsageInUsermode,
+		UsageInUsermode:   stats.PreCPUStats.CPUUsage.UsageInUsermode,
 	}
 }
-func getNewCpu( stats *dc.Stats) CPURaw{
+func getNewCpu(stats *dc.Stats) CPURaw {
 	return CPURaw{
-		PerCpuUsage: stats.CPUStats.CPUUsage.PercpuUsage,
-		TotalUsage: stats.CPUStats.CPUUsage.TotalUsage,
+		PerCpuUsage:       stats.CPUStats.CPUUsage.PercpuUsage,
+		TotalUsage:        stats.CPUStats.CPUUsage.TotalUsage,
 		UsageInKernelmode: stats.CPUStats.CPUUsage.UsageInKernelmode,
-		UsageInUsermode: stats.CPUStats.CPUUsage.UsageInUsermode,
+		UsageInUsermode:   stats.CPUStats.CPUUsage.UsageInUsermode,
 	}
 }
 

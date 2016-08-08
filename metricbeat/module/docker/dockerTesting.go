@@ -1,14 +1,13 @@
 package docker
 
 import (
-"os"
+	"os"
 )
 
-
-func GetDockerSocketFromEnv() string{
+func GetDockerSocketFromEnv() string {
 	socket := os.Getenv("DOCKER_SOCKET")
-	if len(socket)==0 {
-		socket= "unix:///var/run/docker.sock"
+	if len(socket) == 0 {
+		socket = "unix:///var/run/docker.sock"
 	}
 	return socket
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
-	dc"github.com/fsouza/go-dockerclient"
+	dc "github.com/fsouza/go-dockerclient"
 )
 
 // init registers the MetricSet with the central registry.
@@ -30,7 +30,7 @@ type MetricSet struct {
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
-	config :=docker.GetDefaultConf()
+	config := docker.GetDefaultConf()
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -38,9 +38,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		dockerClient: docker.CreateDockerCLient(config),
+		dockerClient:  docker.CreateDockerCLient(config),
 		blkioService: &BLkioService{
-			BlkioSTatsPerContainer:make(map[string]BlkioRaw),
+			BlkioSTatsPerContainer: make(map[string]BlkioRaw),
 		},
 	}, nil
 }
@@ -50,7 +50,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
-	rawStats,err:= docker.FetchDockerStats(m.dockerClient)
+	rawStats, err := docker.FetchDockerStats(m.dockerClient)
 
 	if err == nil {
 		formatedStats := m.blkioService.GetBlkioStats(rawStats)

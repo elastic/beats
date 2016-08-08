@@ -3,7 +3,7 @@ package network
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	dc"github.com/fsouza/go-dockerclient"
+	dc "github.com/fsouza/go-dockerclient"
 
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
@@ -22,7 +22,7 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	netService *NETService
+	netService   *NETService
 	dockerClient *dc.Client
 }
 
@@ -39,7 +39,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		dockerClient: docker.CreateDockerCLient(config),
+		dockerClient:  docker.CreateDockerCLient(config),
 		netService: &NETService{
 			NetworkStatPerContainer: make(map[string]map[string]NETRaw),
 		},
@@ -51,7 +51,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
-	rawStats,err:= docker.FetchDockerStats(m.dockerClient)
+	rawStats, err := docker.FetchDockerStats(m.dockerClient)
 
 	if err == nil {
 		formatedStats := m.netService.GetNetworkStatsPerContainer(rawStats)

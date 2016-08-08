@@ -1,9 +1,9 @@
 package docker
 
 import (
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/fsouza/go-dockerclient"
 	"sync"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type DockerStat struct {
@@ -11,7 +11,7 @@ type DockerStat struct {
 	Stats     docker.Stats
 }
 
-func CreateDockerCLient(config *Config) (*docker.Client) {
+func CreateDockerCLient(config *Config) *docker.Client {
 	var client *docker.Client
 	var err error
 	if config.Tls.Enable == true {
@@ -51,9 +51,9 @@ func exportContainerStats(client *docker.Client, container *docker.APIContainers
 	errC := make(chan error, 1)
 	var event DockerStat
 	statsOptions := docker.StatsOptions{
-		ID: container.ID,
-		Stats: statsC,
-		Stream: false,
+		ID:      container.ID,
+		Stats:   statsC,
+		Stream:  false,
 		Timeout: -1,
 	}
 	wg.Add(2)

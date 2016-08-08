@@ -1,10 +1,11 @@
 package memory
+
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 
-	dc"github.com/fsouza/go-dockerclient"
 	"github.com/elastic/beats/metricbeat/module/docker"
+	dc "github.com/fsouza/go-dockerclient"
 )
 
 // init registers the MetricSet with the central registry.
@@ -22,7 +23,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	memoryService *MEMORYService
-	dockerClient *dc.Client
+	dockerClient  *dc.Client
 }
 
 // New create a new instance of the MetricSet
@@ -37,7 +38,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		memoryService: NewMemoryService(),
-		dockerClient: docker.CreateDockerCLient(config),
+		dockerClient:  docker.CreateDockerCLient(config),
 	}, nil
 }
 
@@ -46,7 +47,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
-	rawStats,err:= docker.FetchDockerStats(m.dockerClient)
+	rawStats, err := docker.FetchDockerStats(m.dockerClient)
 
 	if err == nil {
 		formatedStats := m.memoryService.GetMemorystatsList(rawStats)

@@ -64,7 +64,7 @@ metricbeat.modules:
 
 #------------------------------- docker Module -------------------------------
 - module: docker
-  metricsets: ["diskio"]
+  metricsets: ["cpu","memory","network","diskio"]
   enabled: true
   period: 5s
   hosts: ["localhost"]

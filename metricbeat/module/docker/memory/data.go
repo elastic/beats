@@ -1,24 +1,24 @@
 package memory
+
 import (
 	"github.com/elastic/beats/libbeat/common"
-
 )
 
-func eventsMapping( memoryDataList []MEMORYData) [] common.MapStr {
-	myEvents := [] common.MapStr{}
+func eventsMapping(memoryDataList []MEMORYData) []common.MapStr {
+	myEvents := []common.MapStr{}
 	for _, memoryData := range memoryDataList {
 		myEvents = append(myEvents, eventMapping(&memoryData))
 	}
 	return myEvents
 }
-func eventMapping(memoryData *MEMORYData) common.MapStr{
+func eventMapping(memoryData *MEMORYData) common.MapStr {
 
 	event := common.MapStr{
-		"@timestamp":	memoryData.Time,
-		"type": "memory",
-		"container": 	common.MapStr{
-			"id":  memoryData.MyContainer.Id,
-			"name": memoryData.MyContainer.Name,
+		"@timestamp": memoryData.Time,
+		"type":       "memory",
+		"container": common.MapStr{
+			"id":     memoryData.MyContainer.Id,
+			"name":   memoryData.MyContainer.Name,
 			"labels": memoryData.MyContainer.Labels,
 		},
 		//"dockerSocket": memoryData.MyContainer.Socket,
@@ -29,7 +29,7 @@ func eventMapping(memoryData *MEMORYData) common.MapStr{
 			"totalRss":   memoryData.TotalRss,
 			"totalRss_p": memoryData.TotalRss_p,
 			"usage":      memoryData.Usage,
-			"usage_p":   memoryData.Usage_p,
+			"usage_p":    memoryData.Usage_p,
 		},
 	}
 	return event

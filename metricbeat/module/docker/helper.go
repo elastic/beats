@@ -1,22 +1,22 @@
 package docker
 
 import (
-	"strings"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/fsouza/go-dockerclient"
+	"strings"
 )
 
-type Container struct{
-	Id string
-	Name string
+type Container struct {
+	Id     string
+	Name   string
 	Labels []common.MapStr
 	//Socket *string
 }
 
-func InitCurrentContainer(container *docker.APIContainers) *Container{
+func InitCurrentContainer(container *docker.APIContainers) *Container {
 	return &Container{
-		Id: container.ID,
-		Name: extractContainerName(container.Names),
+		Id:     container.ID,
+		Name:   extractContainerName(container.Names),
 		Labels: buildLabelArray(container.Labels),
 		//Socket: d.Socket,
 	}

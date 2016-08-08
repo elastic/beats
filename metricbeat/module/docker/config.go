@@ -1,6 +1,5 @@
 package docker
 
-
 type TlsConfig struct {
 	Enable   bool   `config:"enable"`
 	CaPath   string `config:"ca_path"`
@@ -9,14 +8,14 @@ type TlsConfig struct {
 }
 
 type Config struct {
-	Socket string  `config:"socket"`
+	Socket string `config:"socket"`
 	Tls    TlsConfig
 }
 
 func GetDefaultConf() *Config {
 	return &Config{
 		Socket: "",
-		Tls : TlsConfig{
+		Tls: TlsConfig{
 			Enable: false,
 		},
 	}

@@ -1,40 +1,41 @@
 package diskio
+
 import (
-	"time"
-	dc"github.com/fsouza/go-dockerclient"
-	"github.com/elastic/beats/metricbeat/module/docker"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/module/docker"
+	dc "github.com/fsouza/go-dockerclient"
+	"time"
 )
 
-type BlkioStats struct{
-	Time time.Time
+type BlkioStats struct {
+	Time        time.Time
 	MyContainer *docker.Container
-	reads float64
-	writes float64
-	totals float64
+	reads       float64
+	writes      float64
+	totals      float64
 }
 type BlkioRaw struct {
-	Time time.Time
-	reads uint64
+	Time   time.Time
+	reads  uint64
 	writes uint64
 	totals uint64
 }
-type BLkioService struct{
- BlkioSTatsPerContainer map[string]BlkioRaw
+type BLkioService struct {
+	BlkioSTatsPerContainer map[string]BlkioRaw
 }
 
-func (io *BLkioService) GetBlkioStats(rawStats []docker.DockerStat) []BlkioStats{
+func (io *BLkioService) GetBlkioStats(rawStats []docker.DockerStat) []BlkioStats {
 	formatedStats := []BlkioStats{}
-	if len(rawStats) !=0{
-		for _,myRawStats := range rawStats{
+	if len(rawStats) != 0 {
+		for _, myRawStats := range rawStats {
 			formatedStats = append(formatedStats, io.getBlkioEvent(&myRawStats))
 		}
-	}else {
+	} else {
 		logp.Info(" No container is running")
 	}
 	return formatedStats
 }
-func (io *BLkioService) getBlkioEvent (myRawStat *docker.DockerStat) BlkioStats{
+func (io *BLkioService) getBlkioEvent(myRawStat *docker.DockerStat) BlkioStats {
 
 	myBlkioStats := BlkioStats{}
 	newBlkioStats := io.getNewStats(myRawStat.Stats.Read, myRawStat.Stats.BlkioStats.IOServicedRecursive)
@@ -42,64 +43,64 @@ func (io *BLkioService) getBlkioEvent (myRawStat *docker.DockerStat) BlkioStats{
 
 	if exist {
 		myBlkioStats = BlkioStats{
-			Time: myRawStat.Stats.Read,
+			Time:        myRawStat.Stats.Read,
 			MyContainer: docker.InitCurrentContainer(&myRawStat.Container),
-			reads: io.getReadPs(&oldBlkioStats,&newBlkioStats),
-			writes: io.getWritePs(&oldBlkioStats,&newBlkioStats),
-			totals: io.getReadPs(&oldBlkioStats,&newBlkioStats),
+			reads:       io.getReadPs(&oldBlkioStats, &newBlkioStats),
+			writes:      io.getWritePs(&oldBlkioStats, &newBlkioStats),
+			totals:      io.getReadPs(&oldBlkioStats, &newBlkioStats),
 		}
-	}else {
+	} else {
 		myBlkioStats = BlkioStats{
-			Time: myRawStat.Stats.Read,
+			Time:        myRawStat.Stats.Read,
 			MyContainer: docker.InitCurrentContainer(&myRawStat.Container),
-			reads: 0,
-			writes:0,
-			totals: 0,
+			reads:       0,
+			writes:      0,
+			totals:      0,
 		}
 	}
-	if _,exist := io.BlkioSTatsPerContainer[myRawStat.Container.ID]; !exist{
-		io.BlkioSTatsPerContainer= make(map[string]BlkioRaw)
+	if _, exist := io.BlkioSTatsPerContainer[myRawStat.Container.ID]; !exist {
+		io.BlkioSTatsPerContainer = make(map[string]BlkioRaw)
 	}
-	io.BlkioSTatsPerContainer[myRawStat.Container.ID]= newBlkioStats
+	io.BlkioSTatsPerContainer[myRawStat.Container.ID] = newBlkioStats
 
 	return myBlkioStats
 }
 
-func (io *BLkioService) getNewStats( time time.Time, blkioEntry []dc.BlkioStatsEntry) BlkioRaw{
+func (io *BLkioService) getNewStats(time time.Time, blkioEntry []dc.BlkioStatsEntry) BlkioRaw {
 	stats := BlkioRaw{
-		Time:time,
-		reads: 0,
+		Time:   time,
+		reads:  0,
 		writes: 0,
 		totals: 0,
 	}
-	for _,myEntry := range blkioEntry{
-		if myEntry.Op =="Write" {
+	for _, myEntry := range blkioEntry {
+		if myEntry.Op == "Write" {
 			stats.writes = myEntry.Value
 			//fmt.Printf("tats.writes = ",myEntry.Value,"\n")
-		}else if myEntry.Op == "Read"{
-			stats.reads= myEntry.Value
+		} else if myEntry.Op == "Read" {
+			stats.reads = myEntry.Value
 			//fmt.Printf("tats.reads = ",myEntry.Value,"\n")
-		}else if myEntry.Op == "Total"{
-			stats.totals= myEntry.Value
+		} else if myEntry.Op == "Total" {
+			stats.totals = myEntry.Value
 			//fmt.Printf("tats.total = ",myEntry.Value,"\n")
 		}
 	}
 	return stats
 }
 
-func (io *BLkioService) getReadPs(old *BlkioRaw, new *BlkioRaw ) float64 {
+func (io *BLkioService) getReadPs(old *BlkioRaw, new *BlkioRaw) float64 {
 	duration := new.Time.Sub(old.Time)
-	return io.calculatePerSecond(duration,old.reads,new.reads)
+	return io.calculatePerSecond(duration, old.reads, new.reads)
 }
 func (io *BLkioService) getWritePs(old *BlkioRaw, new *BlkioRaw) float64 {
 	duration := new.Time.Sub(old.Time)
-	return io.calculatePerSecond(duration,old.writes,new.writes)
+	return io.calculatePerSecond(duration, old.writes, new.writes)
 }
 func (io *BLkioService) getTotalPs(old *BlkioRaw, new *BlkioRaw) float64 {
 	duration := new.Time.Sub(old.Time)
-	return io.calculatePerSecond(duration,old.totals, new.totals)
+	return io.calculatePerSecond(duration, old.totals, new.totals)
 }
 
-func (io *BLkioService) calculatePerSecond(duration time.Duration,old uint64,new  uint64) float64 {
+func (io *BLkioService) calculatePerSecond(duration time.Duration, old uint64, new uint64) float64 {
 	return float64(new-old) / duration.Seconds()
 }

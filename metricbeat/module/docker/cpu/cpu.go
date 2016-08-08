@@ -3,7 +3,7 @@ package cpu
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	dc"github.com/fsouza/go-dockerclient"
+	dc "github.com/fsouza/go-dockerclient"
 
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
@@ -22,7 +22,7 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	cpuService *CPUService
+	cpuService   *CPUService
 	dockerClient *dc.Client
 }
 
@@ -37,8 +37,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
-		dockerClient: docker.CreateDockerCLient(config),
-		cpuService: NewCpuService(),
+		dockerClient:  docker.CreateDockerCLient(config),
+		cpuService:    NewCpuService(),
 	}, nil
 }
 
@@ -47,13 +47,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
-	rawStats,err:= docker.FetchDockerStats(m.dockerClient)
+	rawStats, err := docker.FetchDockerStats(m.dockerClient)
 
 	if err == nil {
 		formatedStats := m.cpuService.GetCPUstatsList(rawStats)
 		return eventsMapping(formatedStats), nil
 	}
 	return nil, nil
-
 
 }
