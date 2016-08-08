@@ -100,11 +100,11 @@ To consolidate these lines into a single event in Filebeat, use the following mu
 -------------------------------------------------------------------------------------
 multiline:
   pattern: '\\$'
-  negate: false
+  negate: true
   match: after
 -------------------------------------------------------------------------------------
 
-This configuration merges any line that ends with the `\` character with the line that follows.
+This configuration merges any line that ends with the `\` character with the line that follows. The `negate: true` setting means that the pattern matches the lines that aren't a continuation line but the start of a new multiline event.
 
 ===== Timestamps
 
