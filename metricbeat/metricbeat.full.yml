@@ -405,13 +405,9 @@ output.elasticsearch:
   # to.
   #hosts: ["localhost:9092"]
 
-  # The Kafka topic used for produced events. If use_type is set to true, the
-  # topic will not be used.
+  # The Kafka topic used for produced events. The setting can be a format string
+  # using any event field. To set the topic from document type use `%{[type]}`.
   #topic: beats
-
-  # Set Kafka topic by event type. If use_type is false, the topic option must
-  # be configured. The default is false.
-  #use_type: false
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1

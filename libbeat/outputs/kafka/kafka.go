@@ -14,10 +14,12 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
 type kafka struct {
 	config kafkaConfig
+	topic  outil.Selector
 
 	modeRetry      mode.ConnectionMode
 	modeGuaranteed mode.ConnectionMode
@@ -71,7 +73,18 @@ func (k *kafka) init(cfg *common.Config) error {
 		return err
 	}
 
-	_, err := newKafkaConfig(&k.config)
+	var err error
+	k.topic, err = outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "topic",
+		MultiKey:         "topics",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = newKafkaConfig(&k.config)
 	if err != nil {
 		return err
 	}
@@ -96,10 +109,9 @@ func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
 
 	var clients []mode.AsyncProtocolClient
 	hosts := k.config.Hosts
-	topic := k.config.Topic
-	useType := k.config.UseType
+	topic := k.topic
 	for i := 0; i < worker; i++ {
-		client, err := newKafkaClient(hosts, topic, useType, libCfg)
+		client, err := newKafkaClient(hosts, topic, libCfg)
 		if err != nil {
 			logp.Err("Failed to create kafka client: %v", err)
 			return nil, err
