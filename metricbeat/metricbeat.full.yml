@@ -409,6 +409,27 @@ output.elasticsearch:
   # using any event field. To set the topic from document type use `%{[type]}`.
   #topic: beats
 
+  # Authentication details. Password is required if username is set.
+  #username: ''
+  #password: ''
+
+  # Kafka version metricbeat is assumed to run against. Defaults to the oldest
+  # supported stable version (currently version 0.8.2.0)
+  #version: 0.8.2
+
+  # Metadata update configuration. Metadata do contain leader information
+  # deciding which broker to use when publishing.
+  #metadata:
+    # Max metadata request retry attempts when cluster is in middle of leader
+    # election. Defaults to 3 retries.
+    #retry.max: 3
+
+    # Waiting time between retries during leader elections. Default is 250ms.
+    #retry.backoff: 250ms
+
+    # Refresh metadata interval. Defaults to every 10 minutes.
+    #refresh_frequency: 10m
+
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
 
