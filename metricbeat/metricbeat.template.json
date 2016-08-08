@@ -1379,8 +1379,7 @@
                 "cpu": {
                   "properties": {
                     "start_time": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
+                      "type": "date"
                     },
                     "system": {
                       "type": "long"
