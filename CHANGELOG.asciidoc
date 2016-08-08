@@ -54,6 +54,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Add format string support to `output.kafka.topic`. {pull}2188[2188]
 - Add `output.kafka.topics` for more advanced kafka topic selection per event. {pull}2188[2188]
 
+- Add support for kafka 0.10.
 
 *Metricbeat*
 
