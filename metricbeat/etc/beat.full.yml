@@ -39,12 +39,41 @@ metricbeat.modules:
 
     # Per process stats
     - process
-  enabled: true
+  enabled: false
   period: 10s
   processes: ['.*']
 
   # if true, exports the CPU usage in ticks, together with the percentage values
   cpu_ticks: false
+
+#-------------------------------- MySQL Module -------------------------------
+#- module: mysql
+  #metricsets: ["status"]
+  #enabled: true
+  #period: 10s
+
+  # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
+  # The username and password can either be set in the DSN or for all hosts in username and password config option
+  #hosts: ["root@tcp(127.0.0.1:3306)/"]
+
+  # Username of hosts. Empty by default
+  #username: root
+
+  # Password of hosts. Empty by default
+  #password: test
+
+#------------------------------- docker Module -------------------------------
+- module: docker
+  metricsets: ["cpu","memory","network","diskio"]
+  enabled: true
+  period: 5s
+  hosts: ["localhost"]
+  socket: unix:///var/run/docker.sock
+
+         # If dockerbeat has to deal with a TLS-enabled docker daemon, you need to enable TLS and configure path for key and certificates.
+  tls:
+           # By default, TLS is disabled
+          enable: false
 
 #------------------------------- Apache Module -------------------------------
 #- module: apache
@@ -74,22 +103,6 @@ metricbeat.modules:
   # [mongodb://][user:pass@]host[:port]
   #hosts: ["localhost:27017"]
 
-
-#-------------------------------- MySQL Module -------------------------------
-#- module: mysql
-  #metricsets: ["status"]
-  #enabled: true
-  #period: 10s
-
-  # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
-  # The username and password can either be set in the DSN or for all hosts in username and password config option
-  #hosts: ["root@tcp(127.0.0.1:3306)/"]
-
-  # Username of hosts. Empty by default
-  #username: root
-
-  # Password of hosts. Empty by default
-  #password: test
 
 #-------------------------------- Nginx Module -------------------------------
 #- module: nginx

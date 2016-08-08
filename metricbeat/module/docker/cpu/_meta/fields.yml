@@ -1,0 +1,9 @@
+- name: cpu
+  type: group
+  description: >
+    cpu
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

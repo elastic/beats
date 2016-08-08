@@ -177,6 +177,46 @@
             }
           }
         },
+        "docker": {
+          "properties": {
+            "cpu": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            },
+            "diskio": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            },
+            "memory": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            },
+            "network": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
         "metricset": {
           "properties": {
             "host": {

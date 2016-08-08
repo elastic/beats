@@ -1,0 +1,9 @@
+- key: docker
+  title: "docker"
+  description: >
+    docker Module
+  fields:
+    - name: docker
+      type: group
+      description: >
+      fields:
