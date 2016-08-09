@@ -55,7 +55,7 @@ default value is true.
 
 Minimum log level. One of debug, info, warning, error or critical. If debug is
 used, but no selectors are configured, the `*` selector will be used.
-The default log level is error.
+The default log level is "info".
 
 ===== selectors
 
