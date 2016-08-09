@@ -17,6 +17,13 @@ var (
 	ErrInvalidFormat = errors.New("error invalid key/value format")
 )
 
+// mountinfo represents a subset of the fields containing /proc/[pid]/mountinfo.
+type mountinfo struct {
+	mountpoint     string
+	filesystemType string
+	superOptions   []string
+}
+
 // Parses a cgroup param and returns the key name and value.
 func parseCgroupParamKeyValue(t string) (string, uint64, error) {
 	parts := strings.Fields(t)
@@ -60,6 +67,44 @@ func parseUint(value []byte) (uint64, error) {
 	}
 
 	return uintValue, nil
+}
+
+// parseMountinfoLine parses a line from the /proc/[pid]/mountinfo file on
+// Linux. The format of the line is specified in section 3.5 of
+// https://www.kernel.org/doc/Documentation/filesystems/proc.txt.
+func parseMountinfoLine(line string) (mountinfo, error) {
+	mount := mountinfo{}
+
+	fields := strings.Fields(line)
+	if len(fields) < 10 {
+		return mount, fmt.Errorf("invalid mountinfo line, expected at least "+
+			"10 fields but got %d from line='%s'", len(fields), line)
+	}
+
+	mount.mountpoint = fields[4]
+
+	var seperatorIndex int
+	for i, value := range fields {
+		if value == "-" {
+			seperatorIndex = i
+			break
+		}
+	}
+	if fields[seperatorIndex] != "-" {
+		return mount, fmt.Errorf("invalid mountinfo line, separator ('-') not "+
+			"found in line='%s'", line)
+	}
+
+	if len(fields)-seperatorIndex-1 < 3 {
+		return mount, fmt.Errorf("invalid mountinfo line, expected at least "+
+			"3 fields after seperator but got %d from line='%s'",
+			len(fields)-seperatorIndex-1, line)
+	}
+
+	fields = fields[seperatorIndex+1:]
+	mount.filesystemType = fields[0]
+	mount.superOptions = strings.Split(fields[2], ",")
+	return mount, nil
 }
 
 // SupportedSubsystems returns the subsystems that are supported by the
@@ -115,25 +160,32 @@ func SubsystemMountpoints(rootfsMountpoint string, subsystems map[string]struct{
 		// https://www.kernel.org/doc/Documentation/filesystems/proc.txt
 		// Example:
 		// 25 21 0:20 / /cgroup/cpu rw,relatime - cgroup cgroup rw,cpu
-		line := sc.Text()
-		fields := strings.Fields(line)
-		if len(fields) != 10 || fields[6] != "-" {
-			return nil, fmt.Errorf("invalid mountinfo data")
-		}
-
-		if fields[7] != "cgroup" {
+		line := strings.TrimSpace(sc.Text())
+		if line == "" {
 			continue
 		}
 
-		mountpoint := fields[4]
-		opts := strings.Split(fields[9], ",")
-		for _, opt := range opts {
-			// XXX(akroh): May need to handle options prepended with 'name='.
+		mount, err := parseMountinfoLine(line)
+		if err != nil {
+			return nil, err
+		}
+
+		if mount.filesystemType != "cgroup" {
+			continue
+		}
+
+		for _, opt := range mount.superOptions {
+			// Sometimes the subsystem name is written like "name=blkio".
+			fields := strings.SplitN(opt, "=", 2)
+			if len(fields) > 1 {
+				opt = fields[1]
+			}
+
 			// Test if option is a subsystem name.
 			if _, found := subsystems[opt]; found {
 				// Add the subsystem mount if it does not already exist.
 				if _, exists := mounts[opt]; !exists {
-					mounts[opt] = mountpoint
+					mounts[opt] = mount.mountpoint
 				}
 			}
 		}
