@@ -17,13 +17,13 @@ include::../../libbeat/docs/getting-help.asciidoc[]
 
 Filebeat keeps the file handler open in case it reaches the end of a file to read new log lines in near real time. If filebeat is harvesting a large number of files, the number of open files can be become an issue. In most environments, the number of files which are actively updated is low. The configuration `close_inactive` should be set accordingly to close files which are not active any more.
 
-There are 4 more configuration options which can be used to close file handlers, but all of them should be used carefully as they can side affects. The options are:
+There are more configuration options which can be used to close file handlers, but all of them should be used carefully as they can side affects. The options are:
 
 * close_renamed
 * close_removed
 * close_eof
 
-`close_renamed` and `close_removed` can be useful on Windows and issues related to file rotation, see <<windows-file-rotation>>. `close_eof` can be useful in environments with a large number of files with only very few entries. `close_timeout` in environments where it is more important to close file handlers then to send all log lines. More details can be found in config options, see <<configuration-filebeat-options>>.
+`close_renamed` and `close_removed` can be useful on Windows and issues related to file rotation, see <<windows-file-rotation>>. `close_eof` can be useful in environments with a large number of files with only very few entries. More details can be found in config options, see <<configuration-filebeat-options>>.
 
 Before using any of these variables, make sure to study the documentation on each.
 
