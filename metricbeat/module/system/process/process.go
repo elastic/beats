@@ -15,6 +15,7 @@ import (
 )
 
 var debugf = logp.MakeDebug("system-process")
+var Experimental = true
 
 func init() {
 	if err := mb.Registry.AddMetricSet("system", "process", New); err != nil {
