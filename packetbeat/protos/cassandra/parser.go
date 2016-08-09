@@ -32,7 +32,9 @@ type message struct {
 	// (if false) to be merged to generate full message.
 	isComplete bool
 
-	failed bool
+	failed  bool
+	ignored bool
+
 	data   map[string]interface{}
 	header map[string]interface{}
 	// list element use by 'transactions' for correlation
@@ -46,6 +48,7 @@ type message struct {
 // Error code if stream exceeds max allowed size on append.
 var (
 	ErrStreamTooLarge = errors.New("Stream data too large")
+	isDebug           = false
 )
 
 func (p *parser) init(
@@ -118,6 +121,9 @@ func (p *parser) parse() (*message, error) {
 
 	// if p.frame is nil then create a new framer, or continue to process the last message
 	if p.framer == nil {
+		if isDebug {
+			logp.Debug("cassandra", "start new framer")
+		}
 		p.framer = NewFramer(&p.buf, p.config.compressor)
 	}
 
@@ -153,17 +159,30 @@ func (p *parser) parse() (*message, error) {
 		} else {
 			//check if the ops already ignored
 			if p.config.ignoredOps != nil && len(p.config.ignoredOps) > 0 {
+				if isDebug {
+					logp.Debug("cassandra", "ignoreOPS configed, let's check")
+				}
 				v := p.config.ignoredOps[p.framer.Header.Op.String()]
 				if v != nil {
 					if isDebug {
-						logp.Debug("cassandra", fmt.Sprintf("Ops: %s was marked to be ignored, ignoring", p.framer.Header.Op.String()))
+						logp.Debug("cassandra", fmt.Sprintf("Ops: %s was marked to be ignored, ignoring, request:%v", p.framer.Header.Op.String(), p.framer.Header.Version.IsRequest()))
 					}
 					p.buf.Collect(p.framer.Header.BodyLength)
-					return nil, nil
-				}
-			} else {
 
-				// start to prase body
+					finalCollectedFrameLength := p.buf.BufferConsumed()
+					if finalCollectedFrameLength-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
+						return nil, errors.New("data messed while parse frame body")
+					}
+					// as we already igore the content, we now mark the result is completed
+					p.message.ignored = true
+				}
+			}
+
+			// start to parse body
+			if !p.message.ignored {
+				if isDebug {
+					logp.Debug("cassandra", "start read frame")
+				}
 				data, err := p.framer.ReadFrame()
 				if err != nil {
 					// if the frame parsed failed, should ignore the whole message
@@ -185,22 +204,20 @@ func (p *parser) parse() (*message, error) {
 						p.buf.Collect(unParsedSize)
 						consumedSize := p.buf.BufferConsumed()
 						if consumedSize-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
-							logp.Err("cassandra", "wrong, body_lenght:%d, body_read:%d, more collected:%d, only collect:%d", p.framer.Header.BodyLength, frameParsedLength, unParsedSize, consumedSize)
+							logp.Err("body_lenght:%d, body_read:%d, more collected:%d, only collect:%d", p.framer.Header.BodyLength, frameParsedLength, unParsedSize, consumedSize)
 						}
 					} else {
-						logp.Err("cassandra", " should be enough bytes for cleanup,but not enough")
+						logp.Err("should be enough bytes for cleanup,but not enough")
 						return nil, errors.New("should be enough bytes,but not enough")
 					}
 				}
 
 				finalCollectedFrameLength := p.buf.BufferConsumed()
 				if finalCollectedFrameLength-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
-					logp.Err("cassandra", "wrong,body_length:%d, body_read:%d, all_consumed:%d", p.framer.Header.BodyLength, frameParsedLength, finalCollectedFrameLength)
+					logp.Err("body_length:%d, body_read:%d, all_consumed:%d", p.framer.Header.BodyLength, frameParsedLength, finalCollectedFrameLength)
 					return nil, errors.New("data messed while parse frame body")
 				}
-
 			}
-
 		}
 
 	}

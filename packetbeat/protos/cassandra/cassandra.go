@@ -6,7 +6,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
-	"fmt"
 	"github.com/elastic/beats/packetbeat/protos"
 	. "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -35,15 +34,10 @@ type stream struct {
 
 var (
 	debugf = logp.MakeDebug("cassandra")
-
-	// use isDebug/isDetailed to guard debugf/detailedf to minimize allocations
-	// (garbage collection) when debug log is disabled.
-	isDebug = false
 )
 
 func init() {
 	protos.Register("cassandra", New)
-	isDebug = logp.IsDebug("cassandra")
 }
 
 // New create and initializes a new cassandra protocol analyzer instance.
@@ -108,9 +102,7 @@ func (cassandra *cassandra) setFromConfig(config *cassandraConfig) error {
 			maps[strings.ToUpper(strings.TrimSpace(config.IgnoredOPs))] = config.IgnoredOPs
 		}
 		parser.ignoredOps = maps
-		if isDebug {
-			logp.Debug("cassandra", fmt.Sprintf("parsed config IgnoredOPs: %v ", parser.ignoredOps))
-		}
+		debugf("parsed config IgnoredOPs: %v ", parser.ignoredOps)
 	}
 
 	// set transaction correlator configuration

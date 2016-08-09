@@ -22,7 +22,9 @@ func (pub *transPub) onTransaction(requ, resp *message) error {
 	}
 
 	event := pub.createEvent(requ, resp)
-	pub.results.PublishTransaction(event)
+	if event != nil {
+		pub.results.PublishTransaction(event)
+	}
 	return nil
 }
 
@@ -31,6 +33,11 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 
 	if resp.failed {
 		status = common.ERROR_STATUS
+	}
+
+	//ignore
+	if (resp != nil && resp.ignored) || (requ != nil && requ.ignored) {
+		return nil
 	}
 
 	event := common.MapStr{

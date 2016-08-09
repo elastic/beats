@@ -15,7 +15,6 @@ import (
 
 var (
 	ErrFrameTooBig = errors.New("frame length is bigger than the maximum allowed")
-	isDebug        = logp.IsDebug("cassandra")
 )
 
 type frameHeader struct {
@@ -146,9 +145,8 @@ func (f *Framer) ReadHeader() (head *frameHeader, err error) {
 	headSize := f.r.BufferConsumed()
 	head.HeadLength = headSize
 
-	if isDebug {
-		logp.Debug("cassandra", "header: %v", head)
-	}
+	logp.Debug("cassandra", "header: %v", head)
+
 	f.Header = head
 	return head, nil
 }
@@ -178,30 +176,25 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	//corresponding to the response opcode.
 	if f.Header.Flags&flagTracing == flagTracing && (f.Header.Op&opQuery == opQuery || f.Header.Op&opExecute == opExecute || f.Header.Op&opPrepare == opPrepare) {
 
-		if isDebug {
-			logp.Debug("cassandra", "tracing enabled")
-		}
+		logp.Debug("cassandra", "tracing enabled")
 
 		uid := f.decoder.ReadUUID()
-		if isDebug {
-			logp.Debug("cassandra", uid.String())
-		}
+		logp.Debug("cassandra", uid.String())
+
 		data["trace_id"] = uid.String()
 	}
 
 	if f.Header.Flags&flagWarning == flagWarning {
-		if isDebug {
-			logp.Debug("cassandra", "hit warning flags")
-		}
+		logp.Debug("cassandra", "hit warning flags")
+
 		warnings := f.decoder.ReadStringList()
 		// dealing with warnings
 		data["warnings"] = warnings
 	}
 
 	if f.Header.Flags&flagCustomPayload == flagCustomPayload {
-		if isDebug {
-			logp.Debug("cassandra", "hit custom payload flags")
-		}
+		logp.Debug("cassandra", "hit custom payload flags")
+
 		f.Header.CustomPayload = f.decoder.ReadBytesMap()
 	}
 
@@ -213,9 +206,8 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 		//decoder.Data = buf
 		//f.decoder = decoder
 
-		if isDebug {
-			logp.Debug("cassandra", "hit compress flags")
-		}
+		logp.Debug("cassandra", "hit compress flags")
+
 		return nil, errors.New("Compressed content not supported yet")
 	}
 
@@ -245,9 +237,8 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 		//ignore
 	default:
 		//ignore
-		if isDebug {
-			logp.Debug("cassandra", "unknow ops, not processed, %v", f.Header)
-		}
+		logp.Debug("cassandra", "unknow ops, not processed, %v", f.Header)
+
 	}
 
 	return data, nil
