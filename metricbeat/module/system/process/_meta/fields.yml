@@ -59,9 +59,9 @@
           description: >
             The total CPU time spent by the process.
         - name: start_time
-          type: keyword
+          type: date
           description: >
-            The time when the process was started. Example: "17:45".
+            The time when the process was started.
     - name: memory
       type: group
       description: Memory-specific statistics per process.

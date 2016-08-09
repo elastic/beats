@@ -16,6 +16,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Change Elasticsearch output index configuration to be based on format strings. If index has been configured, no date will be appended anymore to the index name. {pull}2119[2119]
 
 *Metricbeat*
+- Change field type system.process.cpu.start_time from keyword to date. {issue}1565[1565]
 
 *Packetbeat*
 
