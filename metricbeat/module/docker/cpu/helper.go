@@ -2,10 +2,10 @@ package cpu
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/docker"
 	dc "github.com/fsouza/go-dockerclient"
 	"strconv"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type CPURaw struct {
@@ -15,6 +15,7 @@ type CPURaw struct {
 	UsageInUsermode   uint64
 }
 type CPUCalculator interface {
+	GetCPU
 	PerCpuUsage() common.MapStr
 	TotalUsage() float64
 	UsageInKernelmode() float64
@@ -30,19 +31,15 @@ type CPUStats struct {
 }
 type CPUService struct{}
 
-func (c *CPUService) GetCPUstatsList(rawStats []docker.DockerStat) []CPUStats {
+func (c *CPUService) GetCPUStatsList(rawStats []docker.DockerStat) []CPUStats {
 	formatedStats := []CPUStats{}
 	if len(rawStats) != 0 {
 		for _, myRawStats := range rawStats {
 			formatedStats = append(formatedStats, c.getCpuStats(&myRawStats))
 		}
 	} else {
-		logp.Info("No container is running \n")
+		logp.Info("No container is running")
 	}
-	/*fmt.Printf("From helper/getCPUStatsList \n")
-	for _, event := range myEvents{
-		fmt.Printf(" container's name ", event.MyContainer.Name,"\n")
-	}*/
 	return formatedStats
 }
 func (c *CPUService) getCpuStats(myRawStat *docker.DockerStat) CPUStats {

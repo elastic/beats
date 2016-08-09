@@ -14,16 +14,15 @@ func eventsMapping(blkioStatsList []BlkioStats) []common.MapStr {
 func eventMapping(myBlkioStats *BlkioStats) common.MapStr {
 	event := common.MapStr{
 		"@timestamp": myBlkioStats.Time,
-		"type":       "blkio",
 		"container": common.MapStr{
 			"id":     myBlkioStats.MyContainer.Id,
 			"name":   myBlkioStats.MyContainer.Name,
 			"labels": myBlkioStats.MyContainer.Labels,
 		},
 		"blkio": common.MapStr{
-			"readsPS":  myBlkioStats.reads,
-			"writesPS": myBlkioStats.writes,
-			"TotalPS":  myBlkioStats.totals,
+			"reads":  myBlkioStats.reads,
+			"writes": myBlkioStats.writes,
+			"Total":  myBlkioStats.totals,
 		},
 	}
 	return event

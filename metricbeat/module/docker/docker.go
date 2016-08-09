@@ -14,7 +14,7 @@ type DockerStat struct {
 func CreateDockerCLient(config *Config) *docker.Client {
 	var client *docker.Client
 	var err error
-	if config.Tls.Enable == true {
+	if config.Tls.Enabled == true {
 		client, err = docker.NewTLSClient(
 			config.Socket,
 			config.Tls.CertPath,

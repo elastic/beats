@@ -16,7 +16,6 @@ func eventsMapping(netsStatsList []NETstats) []common.MapStr {
 func eventMapping(myNetStats *NETstats) common.MapStr {
 	event := common.MapStr{
 		"@timestamp": myNetStats.Time,
-		"type":       "net",
 		"container": common.MapStr{
 			"id":     myNetStats.MyContainer.Id,
 			"name":   myNetStats.MyContainer.Name,

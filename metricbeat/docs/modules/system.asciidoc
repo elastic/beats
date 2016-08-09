@@ -17,7 +17,7 @@ The System module has these additional config options:
 regexp expressions to filter the processes that are reported. For more complex filtering, you should use the
 `filters` configuration option.
 +
-The following example config returns metrics for all processes:
+The following example config returns metrics for all processes: 
 +
 [source,yaml]
 ----
@@ -81,7 +81,7 @@ metricbeat.modules:
 
     # Per process stats
     - process
-  enabled: true
+  enabled: false
   period: 10s
   processes: ['.*']
 

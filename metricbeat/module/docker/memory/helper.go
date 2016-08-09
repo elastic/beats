@@ -2,11 +2,11 @@ package memory
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/docker"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
-type MEMORYData struct {
+type MemoryData struct {
 	Time        common.Time
 	MyContainer *docker.Container
 	Failcnt     uint64
@@ -17,15 +17,15 @@ type MEMORYData struct {
 	Usage       uint64
 	Usage_p     float64
 }
-type MEMORYService struct {
+type MemoryService struct {
 }
 
-func NewMemoryService() *MEMORYService {
-	return &MEMORYService{}
+func NewMemoryService() *MemoryService {
+	return &MemoryService{}
 }
 
-func (c *MEMORYService) GetMemorystatsList(rawStats []docker.DockerStat) []MEMORYData {
-	formatedStats := []MEMORYData{}
+func (c *MemoryService) GetMemoryStatsList(rawStats []docker.DockerStat) []MemoryData {
+	formatedStats := []MemoryData{}
 	if len(rawStats) != 0 {
 		for _, myRawStats := range rawStats {
 			formatedStats = append(formatedStats, c.getMEMData(myRawStats))
@@ -33,16 +33,12 @@ func (c *MEMORYService) GetMemorystatsList(rawStats []docker.DockerStat) []MEMOR
 	} else {
 		logp.Info("No container is running \n")
 	}
-	/*fmt.Printf("From helper/getCPUStatsList \n")
-	for _, event := range myEvents{
-		fmt.Printf(" container's name ", event.MyContainer.Name,"\n")
-	}*/
 	return formatedStats
 }
 
-func (ms *MEMORYService) getMEMData(myRawStat docker.DockerStat) MEMORYData {
+func (ms *MemoryService) getMemoryStats(myRawStat docker.DockerStat) MemoryData {
 
-	return MEMORYData{
+	return MemoryData{
 		Time:        common.Time(myRawStat.Stats.Read),
 		MyContainer: docker.InitCurrentContainer(&myRawStat.Container),
 		Failcnt:     myRawStat.Stats.MemoryStats.Failcnt,

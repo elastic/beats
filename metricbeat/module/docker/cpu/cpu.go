@@ -30,7 +30,6 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	//get the configuration
 	config := docker.GetDefaultConf()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -50,9 +49,9 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	rawStats, err := docker.FetchDockerStats(m.dockerClient)
 
 	if err == nil {
-		formatedStats := m.cpuService.GetCPUstatsList(rawStats)
+		formatedStats := m.cpuService.GetCPUStatsList(rawStats)
 		return eventsMapping(formatedStats), nil
 	}
-	return nil, nil
+	return nil, err
 
 }

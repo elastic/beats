@@ -1,10 +1,12 @@
 package diskio
 
 import (
+	"time"
+
+	dc "github.com/fsouza/go-dockerclient"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/docker"
-	dc "github.com/fsouza/go-dockerclient"
-	"time"
 )
 
 type BlkioStats struct {
@@ -24,7 +26,7 @@ type BLkioService struct {
 	BlkioSTatsPerContainer map[string]BlkioRaw
 }
 
-func (io *BLkioService) GetBlkioStats(rawStats []docker.DockerStat) []BlkioStats {
+func (io *BLkioService) GetBlkioStatsList(rawStats []docker.DockerStat) []BlkioStats {
 	formatedStats := []BlkioStats{}
 	if len(rawStats) != 0 {
 		for _, myRawStats := range rawStats {
@@ -35,7 +37,7 @@ func (io *BLkioService) GetBlkioStats(rawStats []docker.DockerStat) []BlkioStats
 	}
 	return formatedStats
 }
-func (io *BLkioService) getBlkioEvent(myRawStat *docker.DockerStat) BlkioStats {
+func (io *BLkioService) getBlkioStats(myRawStat *docker.DockerStat) BlkioStats {
 
 	myBlkioStats := BlkioStats{}
 	newBlkioStats := io.getNewStats(myRawStat.Stats.Read, myRawStat.Stats.BlkioStats.IOServicedRecursive)
@@ -76,13 +78,10 @@ func (io *BLkioService) getNewStats(time time.Time, blkioEntry []dc.BlkioStatsEn
 	for _, myEntry := range blkioEntry {
 		if myEntry.Op == "Write" {
 			stats.writes = myEntry.Value
-			//fmt.Printf("tats.writes = ",myEntry.Value,"\n")
 		} else if myEntry.Op == "Read" {
 			stats.reads = myEntry.Value
-			//fmt.Printf("tats.reads = ",myEntry.Value,"\n")
 		} else if myEntry.Op == "Total" {
 			stats.totals = myEntry.Value
-			//fmt.Printf("tats.total = ",myEntry.Value,"\n")
 		}
 	}
 	return stats

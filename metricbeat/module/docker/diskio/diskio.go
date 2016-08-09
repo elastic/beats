@@ -53,7 +53,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	rawStats, err := docker.FetchDockerStats(m.dockerClient)
 
 	if err == nil {
-		formatedStats := m.blkioService.GetBlkioStats(rawStats)
+		formatedStats := m.blkioService.GetBlkioStatsList(rawStats)
 		return eventsMapping(formatedStats), nil
 	}
 	return nil, nil

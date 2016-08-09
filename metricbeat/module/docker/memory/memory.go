@@ -22,7 +22,7 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	memoryService *MEMORYService
+	memoryService *MemoryService
 	dockerClient  *dc.Client
 }
 
@@ -50,8 +50,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	rawStats, err := docker.FetchDockerStats(m.dockerClient)
 
 	if err == nil {
-		formatedStats := m.memoryService.GetMemorystatsList(rawStats)
+		formatedStats := m.memoryService.GetMemoryStatsList(rawStats)
 		return eventsMapping(formatedStats), nil
 	}
-	return nil, nil
+	return nil, err
 }
