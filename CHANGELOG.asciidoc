@@ -80,6 +80,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...v5.0.0-alpha5[View comm
 - The Elasticsearch template is now loaded by default. {pull}1993[1993]
 - The Redis output `index` setting is renamed to `key`. `index` still works but it's deprecated. {pull}2077[2077]
 - The undocumented file output `index` setting was removed. Use `filename` instead. {pull}2077[2077]
+- Change the default log level from `error` to `info`. {issue}1931[1931]
 
 *Metricbeat*
 
