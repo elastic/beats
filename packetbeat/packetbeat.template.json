@@ -274,12 +274,10 @@
             "stats": {
               "properties": {
                 "net_bytes_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 },
                 "net_packets_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 }
               }
             }
@@ -946,12 +944,10 @@
             "stats": {
               "properties": {
                 "net_bytes_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 },
                 "net_packets_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 }
               }
             }
