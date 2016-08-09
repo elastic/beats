@@ -2853,6 +2853,478 @@ format: bytes
 The shared memory the process uses.
 
 
+[float]
+== cgroup Fields
+
+Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.
+
+
+
+[float]
+=== system.process.cgroup.id
+
+type: keyword
+
+The ID common to all cgroups associated with this task. If there isn't a common ID used by all cgroups this field will be absent.
+
+
+[float]
+=== system.process.cgroup.path
+
+type: keyword
+
+The path to the cgroup relative to the cgroup subsystem's mountpoint. If there isn't a common path used by all cgroups this field will be absent.
+
+
+[float]
+== cpu Fields
+
+The cpu subsystem schedules CPU access for tasks in the cgroup. Access can be controlled by two separate schedulers, CFS and RT. CFS stands for completely fair scheduler which proportionally divides the CPU time between cgroups based on weight. RT stands for real time scheduler which sets a maximum amount of CPU time that processes in the cgroup can consume during a given period.
+
+
+
+[float]
+=== system.process.cgroup.cpu.id
+
+type: keyword
+
+ID of the cgroup.
+
+[float]
+=== system.process.cgroup.cpu.path
+
+type: keyword
+
+Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
+
+[float]
+=== system.process.cgroup.cpu.cfs.period.us
+
+type: long
+
+Period of time in microseconds for how regularly a cgroup's access to CPU resources should be reallocated.
+
+
+[float]
+=== system.process.cgroup.cpu.cfs.quota.us
+
+type: long
+
+Total amount of time in microseconds for which all tasks in a cgroup can run during one period (as defined by cfs.period.us).
+
+
+[float]
+=== system.process.cgroup.cpu.cfs.shares
+
+type: long
+
+An integer value that specifies a relative share of CPU time available to the tasks in a cgroup. The value specified in the cpu.shares file must be 2 or higher.
+
+
+[float]
+=== system.process.cgroup.cpu.rt.period.us
+
+type: long
+
+Period of time in microseconds for how regularly a cgroup's access to CPU resources is reallocated.
+
+
+[float]
+=== system.process.cgroup.cpu.rt.runtime.us
+
+type: long
+
+Period of time in microseconds for the longest continuous period in which the tasks in a cgroup have access to CPU resources.
+
+
+[float]
+=== system.process.cgroup.cpu.stats.periods
+
+type: long
+
+Number of period intervals (as specified in cpu.cfs.period.us) that have elapsed.
+
+
+[float]
+=== system.process.cgroup.cpu.stats.throttled.periods
+
+type: long
+
+Number of times tasks in a cgroup have been throttled (that is, not allowed to run because they have exhausted all of the available time as specified by their quota).
+
+
+[float]
+=== system.process.cgroup.cpu.stats.throttled.nanos
+
+type: long
+
+The total time duration (in nanoseconds) for which tasks in a cgroup have been throttled.
+
+
+[float]
+== cpuacct Fields
+
+CPU accounting metrics.
+
+
+[float]
+=== system.process.cgroup.cpuacct.id
+
+type: keyword
+
+ID of the cgroup.
+
+[float]
+=== system.process.cgroup.cpuacct.path
+
+type: keyword
+
+Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
+
+[float]
+=== system.process.cgroup.cpuacct.total.nanos
+
+type: long
+
+Total CPU time in nanoseconds consumed by all tasks in the cgroup.
+
+
+[float]
+=== system.process.cgroup.cpuacct.stats.user.nanos
+
+type: long
+
+CPU time consumed by tasks in user mode.
+
+[float]
+=== system.process.cgroup.cpuacct.stats.system.nanos
+
+type: long
+
+CPU time consumed by tasks in user (kernel) mode.
+
+[float]
+=== system.process.cgroup.cpuacct.percpu
+
+type: dict
+
+CPU time (in nanoseconds) consumed on each CPU by all tasks in this cgroup.
+
+
+[float]
+== memory Fields
+
+Memory limits and metrics.
+
+
+[float]
+=== system.process.cgroup.memory.id
+
+type: keyword
+
+ID of the cgroup.
+
+[float]
+=== system.process.cgroup.memory.path
+
+type: keyword
+
+Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
+
+[float]
+=== system.process.cgroup.memory.mem.usage.bytes
+
+type: long
+
+Total memory usage by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.mem.usage.max.bytes
+
+type: long
+
+The maximum memory used by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.mem.limit.bytes
+
+type: long
+
+The maximum amount of user memory in bytes (including file cache) that tasks in the cgroup are allowed to use.
+
+
+[float]
+=== system.process.cgroup.memory.mem.failures
+
+type: long
+
+The number of times that the memory limit (mem.limit.bytes) was reached.
+
+
+[float]
+=== system.process.cgroup.memory.memsw.usage.bytes
+
+type: long
+
+The sum of current memory usage plus swap space used by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.memsw.usage.max.bytes
+
+type: long
+
+The maximum amount of memory and swap space used by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.memsw.limit.bytes
+
+type: long
+
+The maximum amount for the sum of memory and swap usage that tasks in the cgroup are allowed to use.
+
+
+[float]
+=== system.process.cgroup.memory.memsw.failures
+
+type: long
+
+The number of times that the memory plus swap space limit (memsw.limit.bytes) was reached.
+
+
+[float]
+=== system.process.cgroup.memory.kmem.usage.bytes
+
+type: long
+
+Total kernel memory usage by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.kmem.usage.max.bytes
+
+type: long
+
+The maximum kernel memory used by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.kmem.limit.bytes
+
+type: long
+
+The maximum amount of kernel memory that tasks in the cgroup are allowed to use.
+
+
+[float]
+=== system.process.cgroup.memory.kmem.failures
+
+type: long
+
+The number of times that the memory limit (kmem.limit.bytes) was reached.
+
+
+[float]
+=== system.process.cgroup.memory.kmem_tcp.usage.bytes
+
+type: long
+
+Total memory usage for TCP buffers in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.kmem_tcp.usage.max.bytes
+
+type: long
+
+The maximum memory used for TCP buffers by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.kmem_tcp.limit.bytes
+
+type: long
+
+The maximum amount of memory for TCP buffers that tasks in the cgroup are allowed to use.
+
+
+[float]
+=== system.process.cgroup.memory.kmem_tcp.failures
+
+type: long
+
+The number of times that the memory limit (kmem_tcp.limit.bytes) was reached.
+
+
+[float]
+=== system.process.cgroup.memory.stats.active_anon.bytes
+
+type: long
+
+Anonymous and swap cache on active least-recently-used (LRU) list, including tmpfs (shmem), in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.active_file.bytes
+
+type: long
+
+File-backed memory on active LRU list, in bytes.
+
+[float]
+=== system.process.cgroup.memory.stats.cache.bytes
+
+type: long
+
+Page cache, including tmpfs (shmem), in bytes.
+
+[float]
+=== system.process.cgroup.memory.stats.hierarchical_memory_limit.bytes
+
+type: long
+
+Memory limit for the hierarchy that contains the memory cgroup, in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.hierarchical_memsw_limit.bytes
+
+type: long
+
+Memory plus swap limit for the hierarchy that contains the memory cgroup, in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.inactive_anon.bytes
+
+type: long
+
+Anonymous and swap cache on inactive LRU list, including tmpfs (shmem), in bytes
+
+
+[float]
+=== system.process.cgroup.memory.stats.inactive_file.bytes
+
+type: long
+
+File-backed memory on inactive LRU list, in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.mapped_file.bytes
+
+type: long
+
+Size of memory-mapped mapped files, including tmpfs (shmem), in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.page_faults
+
+type: long
+
+Number of times that a process in the cgroup triggered a page fault.
+
+
+[float]
+=== system.process.cgroup.memory.stats.major_page_faults
+
+type: long
+
+Number of times that a process in the cgroup triggered a major fault. "Major" faults happen when the kernel actually has to read the data from disk.
+
+
+[float]
+=== system.process.cgroup.memory.stats.pages_in
+
+type: long
+
+Number of pages paged into memory. This is a counter.
+
+
+[float]
+=== system.process.cgroup.memory.stats.pages_out
+
+type: long
+
+Number of pages paged out of memory. This is a counter.
+
+
+[float]
+=== system.process.cgroup.memory.stats.rss.bytes
+
+type: long
+
+Anonymous and swap cache (includes transparent hugepages), not including tmpfs (shmem), in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.rss_huge.bytes
+
+type: long
+
+Number of bytes of anonymous transparent hugepages.
+
+
+[float]
+=== system.process.cgroup.memory.stats.swap.bytes
+
+type: long
+
+Swap usage, in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.unevictable.bytes
+
+type: long
+
+Memory that cannot be reclaimed, in bytes.
+
+
+[float]
+== blkio Fields
+
+Block IO metrics.
+
+
+[float]
+=== system.process.cgroup.blkio.id
+
+type: keyword
+
+ID of the cgroup.
+
+[float]
+=== system.process.cgroup.blkio.path
+
+type: keyword
+
+Path to the cgroup relative to the cgroup subsystems mountpoint.
+
+
+[float]
+=== system.process.cgroup.blkio.total.bytes
+
+type: keyword
+
+Total number of bytes transferred to and from all block devices by processes in the cgroup.
+
+
+[float]
+=== system.process.cgroup.blkio.total.ios
+
+type: keyword
+
+Total number of I/O operations performed on all devices by processes in the cgroup as seen by the throttling policy.
+
+
 [[exported-fields-zookeeper]]
 == ZooKeeper Fields
 

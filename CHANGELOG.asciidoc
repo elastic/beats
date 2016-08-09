@@ -49,6 +49,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 *Metricbeat*
 
 - Use the new scaled_float Elasticsearch type for the percentage values. {pull}2156[2156]
+- Add cgroup metrics to the system/process MetricSet. {pull}2184[2184]
 
 *Packetbeat*
 
