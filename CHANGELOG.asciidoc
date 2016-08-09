@@ -24,6 +24,17 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 
 *Winlogbeat*
 
+==== Deprecated
+
+*Affecting all Beats*
+
+*Packetbeat*
+
+*Topbeat*
+
+*Filebeat*
+
+*Winlogbeat*
 
 ==== Bugfixes
 
@@ -54,18 +65,6 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 *Winlogbeat*
 
 
-==== Deprecated
-
-*Affecting all Beats*
-
-*Packetbeat*
-
-*Topbeat*
-
-*Filebeat*
-
-*Winlogbeat*
-
 ////////////////////////////////////////////////////////////
 
 [[release-notes-5.0.0-alpha5]]
@@ -90,6 +89,13 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...v5.0.0-alpha5[View comm
 *Packetbeat*
 
 - Set `enabled` ` in `packetbeat.protocols.icmp` configuration to `true` by default. {pull}1988[1988]
+
+==== Deprecated
+
+*Filebeat*
+
+- Deprecate `close_older` option and replace it with `close_inactive`. {issue}2051[2051]
+- Deprecate `force_close_files` option and replace it with `close_removed` and `close_renamed`. {issue}1600[1600]
 
 ==== Bugfixes
 
@@ -137,13 +143,6 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...v5.0.0-alpha5[View comm
 - Introduce `close_removed` and `close_renamed` harvester options. {issue}1600[1600]
 - Introduce `close_eof` harvester option. {issue}1600[1600]
 - Add `clean_removed` and `clean_inactive` config option. {issue}1600[1600]
-
-==== Deprecated
-
-*Filebeat*
-
-- Deprecate `close_older` option and replace it with `close_inactive`. {issue}2051[2051]
-- Deprecate `force_close_files` option and replace it with `close_removed` and `close_renamed`. {issue}1600[1600]
 
 [[release-notes-5.0.0-alpha4]]
 === Beats version 5.0.0-alpha4
