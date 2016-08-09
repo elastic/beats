@@ -645,7 +645,7 @@ output.elasticsearch:
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.
 
-# Sets log level. The default log level is error.
+# Sets log level. The default log level is info.
 # Available log levels are: critical, error, warning, info, debug
 #logging.level: error
 
