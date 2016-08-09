@@ -2802,9 +2802,9 @@ The total CPU time spent by the process.
 [float]
 === system.process.cpu.start_time
 
-type: keyword
+type: date
 
-The time when the process was started. Example: "17:45".
+The time when the process was started.
 
 
 [float]
