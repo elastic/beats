@@ -8,15 +8,6 @@ import (
 	"strings"
 )
 
-type bulkMeta struct {
-	Index bulkMetaIndex `json:"index"`
-}
-
-type bulkMetaIndex struct {
-	Index   string `json:"_index"`
-	DocType string `json:"_type"`
-}
-
 // MetaBuilder creates meta data for bulk requests
 type MetaBuilder func(interface{}) interface{}
 
@@ -80,7 +71,7 @@ func newBulkRequest(
 		return nil, err
 	}
 
-	url := makeURL(urlStr, path, params)
+	url := makeURL(urlStr, path, "", params)
 
 	var reader io.Reader
 	if body != nil {
