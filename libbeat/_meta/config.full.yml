@@ -110,6 +110,9 @@ output.elasticsearch:
   # and generates [beatname-]YYYY.MM.DD keys.
   #index: "beatname-%{+yyyy.MM.dd}"
 
+  # Optional ingest node pipeline. By default no pipeline will be used.
+  #pipeline: ""
+
   # Optional HTTP Path
   #path: "/elasticsearch"
 

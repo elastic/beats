@@ -22,8 +22,9 @@ import (
 
 type Client struct {
 	Connection
-	index  outil.Selector
-	params map[string]string
+	index    outil.Selector
+	pipeline *outil.Selector
+	params   map[string]string
 
 	// buffered bulk requests
 	bulkRequ *bulkRequest
@@ -34,6 +35,18 @@ type Client struct {
 	// additional configs
 	compressionLevel int
 	proxyURL         *url.URL
+}
+
+type ClientSettings struct {
+	URL                string
+	Proxy              *url.URL
+	TLS                *tls.Config
+	Username, Password string
+	Parameters         map[string]string
+	Index              outil.Selector
+	Pipeline           *outil.Selector
+	Timeout            time.Duration
+	CompressionLevel   int
 }
 
 type connectCallback func(client *Client) error
@@ -76,24 +89,22 @@ var (
 )
 
 func NewClient(
-	esURL string,
-	index outil.Selector,
-	proxyURL *url.URL,
-	tls *tls.Config,
-	username, password string,
-	params map[string]string,
-	timeout time.Duration,
-	compression int,
+	s ClientSettings,
 	onConnectCallback connectCallback,
 ) (*Client, error) {
 	proxy := http.ProxyFromEnvironment
-	if proxyURL != nil {
-		proxy = http.ProxyURL(proxyURL)
+	if s.Proxy != nil {
+		proxy = http.ProxyURL(s.Proxy)
 	}
 
-	logp.Info("Elasticsearch url: %s", esURL)
+	pipeline := s.Pipeline
+	if pipeline != nil && pipeline.IsEmpty() {
+		pipeline = nil
+	}
 
-	dialer := transport.NetDialer(timeout)
+	logp.Info("Elasticsearch url: %s", s.URL)
+
+	dialer := transport.NetDialer(s.Timeout)
 	dialer = transport.StatsDialer(dialer, &transport.IOStats{
 		Read:        statReadBytes,
 		Write:       statWriteBytes,
@@ -101,12 +112,14 @@ func NewClient(
 		WriteErrors: statWriteErrors,
 	})
 
-	bulkRequ, err := newBulkRequest(esURL, "", "", params, nil)
+	params := s.Parameters
+	bulkRequ, err := newBulkRequest(s.URL, "", "", params, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var encoder bodyEncoder
+	compression := s.CompressionLevel
 	if compression == 0 {
 		encoder = newJSONEncoder(nil)
 	} else {
@@ -118,26 +131,27 @@ func NewClient(
 
 	client := &Client{
 		Connection: Connection{
-			URL:      esURL,
-			Username: username,
-			Password: password,
+			URL:      s.URL,
+			Username: s.Username,
+			Password: s.Password,
 			http: &http.Client{
 				Transport: &http.Transport{
 					Dial:            dialer.Dial,
-					TLSClientConfig: tls,
+					TLSClientConfig: s.TLS,
 					Proxy:           proxy,
 				},
-				Timeout: timeout,
+				Timeout: s.Timeout,
 			},
 			encoder: encoder,
 		},
-		index:  index,
-		params: params,
+		index:    s.Index,
+		pipeline: pipeline,
+		params:   params,
 
 		bulkRequ: bulkRequ,
 
 		compressionLevel: compression,
-		proxyURL:         proxyURL,
+		proxyURL:         s.Proxy,
 	}
 
 	client.Connection.onConnectCallback = func() error {
@@ -158,15 +172,18 @@ func (client *Client) Clone() *Client {
 
 	transport := client.http.Transport.(*http.Transport)
 	c, _ := NewClient(
-		client.URL,
-		client.index,
-		client.proxyURL,
-		transport.TLSClientConfig,
-		client.Username,
-		client.Password,
-		nil, // XXX: do not pass params?
-		client.http.Timeout,
-		client.compressionLevel,
+		ClientSettings{
+			URL:              client.URL,
+			Index:            client.index,
+			Pipeline:         client.pipeline,
+			Proxy:            client.proxyURL,
+			TLS:              transport.TLSClientConfig,
+			Username:         client.Username,
+			Password:         client.Password,
+			Parameters:       nil, // XXX: do not pass params?
+			Timeout:          client.http.Timeout,
+			CompressionLevel: client.compressionLevel,
+		},
 		nil, // XXX: do not pass connection callback?
 	)
 	return c
@@ -190,7 +207,7 @@ func (client *Client) PublishEvents(
 
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
-	events = bulkEncodePublishRequest(body, client.index, events)
+	events = bulkEncodePublishRequest(body, client.index, client.pipeline, events)
 	if len(events) == 0 {
 		return nil, nil
 	}
@@ -203,7 +220,7 @@ func (client *Client) PublishEvents(
 		return events, sendErr
 	}
 
-	debugf("PublishEvents: %d metrics have been  published to elasticsearch in %v.",
+	debugf("PublishEvents: %d events have been  published to elasticsearch in %v.",
 		len(events),
 		time.Now().Sub(begin))
 
@@ -233,23 +250,41 @@ func (client *Client) PublishEvents(
 func bulkEncodePublishRequest(
 	body bulkWriter,
 	index outil.Selector,
+	pipeline *outil.Selector,
 	events []common.MapStr,
 ) []common.MapStr {
+	var mkMeta func(outil.Selector, *outil.Selector, common.MapStr) interface{}
+
+	mkMeta = eventBulkMeta
+	if pipeline != nil {
+		mkMeta = eventIngestBulkMeta
+	}
+
 	okEvents := events[:0]
 	for _, event := range events {
-		meta := eventBulkMeta(index, event)
-		err := body.Add(meta, event)
-		if err != nil {
+		meta := mkMeta(index, pipeline, event)
+		if err := body.Add(meta, event); err != nil {
 			logp.Err("Failed to encode event: %s", err)
 			continue
 		}
-
 		okEvents = append(okEvents, event)
 	}
 	return okEvents
 }
 
-func eventBulkMeta(index outil.Selector, event common.MapStr) bulkMeta {
+func eventBulkMeta(
+	index outil.Selector,
+	_ *outil.Selector,
+	event common.MapStr,
+) interface{} {
+	type bulkMetaIndex struct {
+		Index   string `json:"_index"`
+		DocType string `json:"_type"`
+	}
+	type bulkMeta struct {
+		Index bulkMetaIndex `json:"index"`
+	}
+
 	meta := bulkMeta{
 		Index: bulkMetaIndex{
 			Index:   getIndex(event, index),
@@ -257,6 +292,34 @@ func eventBulkMeta(index outil.Selector, event common.MapStr) bulkMeta {
 		},
 	}
 	return meta
+}
+
+func eventIngestBulkMeta(
+	index outil.Selector,
+	pipelineSel *outil.Selector,
+	event common.MapStr,
+) interface{} {
+	type bulkMetaIndex struct {
+		Index    string `json:"_index"`
+		DocType  string `json:"_type"`
+		Pipeline string `json:"pipeline"`
+	}
+	type bulkMeta struct {
+		Index bulkMetaIndex `json:"index"`
+	}
+
+	pipeline, _ := pipelineSel.Select(event)
+	if pipeline == "" {
+		return eventBulkMeta(index, nil, event)
+	}
+
+	return bulkMeta{
+		Index: bulkMetaIndex{
+			Index:    getIndex(event, index),
+			Pipeline: pipeline,
+			DocType:  event["type"].(string),
+		},
+	}
 }
 
 // getIndex returns the full index name
@@ -428,12 +491,33 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 }
 
 func (client *Client) PublishEvent(event common.MapStr) error {
+	// insert the events one by one
+
 	index := getIndex(event, client.index)
+	typ := event["type"].(string)
+
 	debugf("Publish event: %s", event)
 
-	// insert the events one by one
-	status, _, err := client.Index(
-		index, event["type"].(string), "", client.params, event)
+	pipeline := ""
+	if client.pipeline != nil {
+		var err error
+		pipeline, err = client.pipeline.Select(event)
+		if err != nil {
+			logp.Err("Failed to select pipeline: %v", err)
+			return err
+		}
+		debugf("select pipeline: %v", pipeline)
+	}
+
+	var status int
+	var err error
+	if pipeline == "" {
+		status, _, err = client.Index(index, typ, "", client.params, event)
+	} else {
+		status, _, err = client.Ingest(index, typ, pipeline, "", client.params, event)
+	}
+
+	// check indexing error
 	if err != nil {
 		logp.Warn("Fail to insert a single event: %s", err)
 		if err == ErrJSONEncodeFailed {
@@ -460,7 +544,7 @@ func (client *Client) PublishEvent(event common.MapStr) error {
 func (client *Client) LoadTemplate(templateName string, template map[string]interface{}) error {
 
 	path := "/_template/" + templateName
-	status, _, err := client.request("PUT", path, nil, template)
+	status, _, err := client.request("PUT", path, "", nil, template)
 
 	if err != nil {
 		return fmt.Errorf("Template could not be loaded. Error: %s", err)
@@ -478,7 +562,7 @@ func (client *Client) LoadTemplate(templateName string, template map[string]inte
 // and only if Elasticsearch returns with HTTP status code 200.
 func (client *Client) CheckTemplate(templateName string) bool {
 
-	status, _, _ := client.request("HEAD", "/_template/"+templateName, nil, nil)
+	status, _, _ := client.request("HEAD", "/_template/"+templateName, "", nil, nil)
 
 	if status != 200 {
 		return false
@@ -538,11 +622,12 @@ func (conn *Connection) Close() error {
 
 func (conn *Connection) request(
 	method, path string,
+	pipeline string,
 	params map[string]string,
 	body interface{},
 ) (int, []byte, error) {
-	url := makeURL(conn.URL, path, params)
-	debugf("%s %s %v", method, url, body)
+	url := makeURL(conn.URL, path, pipeline, params)
+	debugf("%s %s %s %v", method, url, pipeline, body)
 
 	if body == nil {
 		return conn.execRequest(method, url, nil)

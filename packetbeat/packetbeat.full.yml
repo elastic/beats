@@ -528,6 +528,9 @@ output.elasticsearch:
   # and generates [packetbeat-]YYYY.MM.DD keys.
   #index: "packetbeat-%{+yyyy.MM.dd}"
 
+  # Optional ingest node pipeline. By default no pipeline will be used.
+  #pipeline: ""
+
   # Optional HTTP Path
   #path: "/elasticsearch"
 

@@ -145,6 +145,9 @@ output.elasticsearch:
   # and generates [winlogbeat-]YYYY.MM.DD keys.
   #index: "winlogbeat-%{+yyyy.MM.dd}"
 
+  # Optional ingest node pipeline. By default no pipeline will be used.
+  #pipeline: ""
+
   # Optional HTTP Path
   #path: "/elasticsearch"
 

@@ -24,7 +24,9 @@ import (
 type elasticsearchOutput struct {
 	index    outil.Selector
 	beatName string
-	mode     mode.ConnectionMode
+	pipeline *outil.Selector
+
+	mode mode.ConnectionMode
 	topology
 
 	template      map[string]interface{}
@@ -100,6 +102,20 @@ func (out *elasticsearchOutput) init(
 	}
 
 	out.index = index
+	pipeline, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "pipeline",
+		MultiKey:         "pipelines",
+		EnableSingleOnly: true,
+		FailEmpty:        false,
+	})
+	if err != nil {
+		return err
+	}
+
+	if !pipeline.IsEmpty() {
+		out.pipeline = &pipeline
+	}
+
 	clients, err := modeutil.MakeClients(cfg, makeClientFactory(tlsConfig, &config, out))
 	if err != nil {
 		return err
@@ -252,12 +268,18 @@ func makeClientFactory(
 			}
 		}
 
-		return NewClient(
-			esURL, out.index, proxyURL, tls,
-			config.Username, config.Password,
-			params, config.Timeout,
-			config.CompressionLevel,
-			onConnected)
+		return NewClient(ClientSettings{
+			URL:              esURL,
+			Index:            out.index,
+			Pipeline:         out.pipeline,
+			Proxy:            proxyURL,
+			TLS:              tls,
+			Username:         config.Username,
+			Password:         config.Password,
+			Parameters:       params,
+			Timeout:          config.Timeout,
+			CompressionLevel: config.CompressionLevel,
+		}, onConnected)
 	}
 }
 

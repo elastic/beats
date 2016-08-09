@@ -78,8 +78,13 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	username := os.Getenv("ES_USER")
 	password := os.Getenv("ES_PASS")
-	client, err := elasticsearch.NewClient(host, indexSel, nil, nil, username, password,
-		nil, 60*time.Second, 0, nil)
+	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
+		URL:      host,
+		Index:    indexSel,
+		Username: username,
+		Password: password,
+		Timeout:  60 * time.Second,
+	}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -412,9 +417,9 @@ func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string,
 	}
 
 	es.PublishEvent(nil, testOptions, event)
-	waitUntilTrue(timeout, checkIndex(es, 1))
-
 	ls.PublishEvent(nil, testOptions, event)
+
+	waitUntilTrue(timeout, checkIndex(es, 1))
 	waitUntilTrue(timeout, checkIndex(ls, 1))
 
 	// search value in logstash elasticsearch index
@@ -445,6 +450,9 @@ func TestLogstashElasticOutputPluginBulkCompatibleMessageTLS(t *testing.T) {
 }
 
 func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name string, tls bool) {
+	if testing.Verbose() {
+		enableLogging([]string{"*"})
+	}
 
 	timeout := 10 * time.Second
 
@@ -463,11 +471,12 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 			"message":    "hello world",
 		},
 	}
-	es.BulkPublish(nil, testOptions, events)
-	waitUntilTrue(timeout, checkIndex(es, 1))
 
 	ls.BulkPublish(nil, testOptions, events)
+	es.BulkPublish(nil, testOptions, events)
+
 	waitUntilTrue(timeout, checkIndex(ls, 1))
+	waitUntilTrue(timeout, checkIndex(es, 1))
 
 	// search value in logstash elasticsearch index
 	lsResp, err := ls.Read()
@@ -480,9 +489,10 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 	}
 
 	// validate
-	assert.Equal(t, len(lsResp), len(esResp))
-	if len(lsResp) != 1 {
-		t.Fatalf("wrong number of results: %d", len(lsResp))
+	if len(lsResp) != len(esResp) {
+		assert.Equal(t, len(lsResp), len(esResp))
+		t.Fatalf("wrong number of results: es=%d, ls=%d",
+			len(esResp), len(lsResp))
 	}
 
 	checkEvent(t, lsResp[0], esResp[0])
