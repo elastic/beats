@@ -84,7 +84,7 @@ func (w *syncWorker) connect() bool {
 			return false
 		}
 
-		logp.Info("Connect failed with: %v", err)
+		logp.Err("Connect failed with: %v", err)
 
 		cont := w.backoff.Wait()
 		if !cont {
