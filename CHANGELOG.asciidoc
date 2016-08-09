@@ -46,6 +46,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 
 *Affecting all Beats*
 - Add script to generate the Kibana index-pattern from fields.yml. {pull}2122[2122]
+- Enhance redis output key selection based on format string. {pull}2169[2169]
+- Configurable redis `keys` using filters and format strings. {pull}2169[2169]
 
 *Metricbeat*
 
