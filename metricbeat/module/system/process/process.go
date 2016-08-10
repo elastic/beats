@@ -3,12 +3,14 @@
 package process
 
 import (
+	"fmt"
 	"runtime"
 	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/system"
 
 	"github.com/elastic/gosigar/cgroup"
 	"github.com/pkg/errors"
@@ -54,7 +56,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if runtime.GOOS == "linux" {
-		m.cgroup, err = cgroup.NewReader("", true)
+		systemModule, ok := base.Module().(*system.Module)
+		if !ok {
+			return nil, fmt.Errorf("unexpected module type")
+		}
+
+		m.cgroup, err = cgroup.NewReader(systemModule.HostFS, true)
 		if err != nil {
 			return nil, errors.Wrap(err, "error initializing cgroup reader")
 		}
