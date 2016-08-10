@@ -159,16 +159,33 @@ func (h *Harvester) openFile() error {
 
 	harvesterOpenFiles.Add(1)
 
+	defer func() {
+		if err != nil {
+			f.Close()
+			harvesterOpenFiles.Add(-1)
+		}
+	}()
+
 	// Makes sure file handler is also closed on errors
 	err = h.validateFile(f)
 	if err != nil {
-		f.Close()
-		harvesterOpenFiles.Add(-1)
 		return err
 	}
 
-	h.file = source.File{f}
-	return nil
+	h.file, err = source.NewFile(f)
+	if err != nil {
+		return err
+	}
+
+	// get file offset. Only update offset if no error
+	offset, err := h.initFileOffset(h.file)
+	if err != nil {
+		return err
+	}
+
+	logp.Debug("harvester", "Setting offset for file: %s. Offset: %d ", h.state.Source, offset)
+	h.state.Offset = offset
+	return err
 }
 
 func (h *Harvester) validateFile(f *os.File) error {
@@ -198,19 +215,10 @@ func (h *Harvester) validateFile(f *os.File) error {
 		return err
 	}
 
-	// get file offset. Only update offset if no error
-	offset, err := h.initFileOffset(f)
-	if err != nil {
-		return err
-	}
-
-	logp.Debug("harvester", "Setting offset for file: %s. Offset: %d ", h.state.Source, offset)
-	h.state.Offset = offset
-
 	return nil
 }
 
-func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
+func (h *Harvester) initFileOffset(file source.FileSource) (int64, error) {
 
 	// continue from last known offset
 	if h.state.Offset > 0 {
