@@ -114,7 +114,7 @@ ci:
 prepare-tests:
 	mkdir -p ${COVERAGE_DIR}
 	# gotestcover is needed to fetch coverage for multiple packages
-	go get github.com/pierrre/gotestcover
+	go install github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 
 # Runs the unit tests with coverage
 # Race is not enabled for unit tests because tests run much slower.
@@ -238,6 +238,10 @@ update: python-env
 
 	# Update docs version
 	cp ${ES_BEATS}/libbeat/docs/version.asciidoc docs/version.asciidoc
+
+	# Generate index-pattern
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index ${BEATNAME}-* --libbeat ${ES_BEATS}/libbeat --beat $(PWD)
+
 
 # Builds the documents for the beat
 .PHONY: docs

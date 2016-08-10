@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -69,9 +70,27 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		return errors.New("Bad Redis data type")
 	}
 
-	key := []byte(config.Key)
-	if len(key) == 0 {
-		key = []byte(r.beatName)
+	if cfg.HasField("index") && !cfg.HasField("key") {
+		s, err := cfg.String("index", -1)
+		if err != nil {
+			return err
+		}
+		if err := cfg.SetString("key", -1, s); err != nil {
+			return err
+		}
+	}
+	if !cfg.HasField("key") {
+		cfg.SetString("key", -1, r.beatName)
+	}
+
+	key, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "key",
+		MultiKey:         "keys",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+	})
+	if err != nil {
+		return err
 	}
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)

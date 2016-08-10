@@ -36,12 +36,14 @@
         Bytes stats.
       fields:
         - name: received
+          format: bytes
           type: integer
           description: >
             The number of bytes received from all clients.
 
         - name: sent
           type: integer
+          format: bytes
           description: >
             The number of bytes sent to all clients.
 

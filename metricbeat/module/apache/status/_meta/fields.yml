@@ -54,23 +54,23 @@
         CPU stats.
       fields:
         - name: load
-          type: half_float
+          type: scaled_float
           description: >
             CPU Load.
         - name: user
-          type: half_float
+          type: scaled_float
           description: >
             CPU user load.
         - name: system
-          type: half_float
+          type: scaled_float
           description: >
             System cpu.
         - name: children_user
-          type: half_float
+          type: scaled_float
           description: >
             CPU of children user.
         - name: children_system
-          type: half_float
+          type: scaled_float
           description: >
             CPU of children system.
     - name: connections

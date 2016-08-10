@@ -41,8 +41,8 @@ func (f *Event) ToMapStr() common.MapStr {
 
 	if f.JSONConfig != nil && len(f.JSONFields) > 0 {
 		mergeJSONFields(f, event)
-	} else {
-		event["message"] = f.Text
+	} else if f.Text != nil {
+		event["message"] = *f.Text
 	}
 
 	return event

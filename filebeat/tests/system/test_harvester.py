@@ -236,3 +236,35 @@ class Test(BaseTest):
 
         # Make sure the state for the file was persisted
         assert len(data) == 1
+
+    def test_exceed_buffer(self):
+        """
+        Checks that also full line is sent if lines exceeds buffer
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+            harvester_buffer_size=10,
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        logfile = self.working_dir + "/log/test.log"
+
+        filebeat = self.start_beat()
+        message = "This exceeds the buffer"
+
+        with open(logfile, 'w') as f:
+            f.write(message + "\n")
+
+        # Wait until sate is written
+        self.wait_until(
+            lambda: self.log_contains(
+                "1 states written."),
+            max_timeout=15)
+
+        filebeat.check_kill_and_wait()
+
+        data = self.get_registry()
+        assert len(data) == 1
+
+        output = self.read_output_json()
+        assert message == output[0]["message"]

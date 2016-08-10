@@ -17,13 +17,16 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
 type elasticsearchOutput struct {
-	index    string
+	index    outil.Selector
 	beatName string
-	mode     mode.ConnectionMode
+	pipeline *outil.Selector
+
+	mode mode.ConnectionMode
 	topology
 
 	template      map[string]interface{}
@@ -57,7 +60,8 @@ func New(beatName string, cfg *common.Config, topologyExpire int) (outputs.Outpu
 	}
 
 	if !cfg.HasField("index") {
-		cfg.SetString("index", -1, beatName)
+		pattern := fmt.Sprintf("%v-%%{+yyyy.MM.dd}", beatName)
+		cfg.SetString("index", -1, pattern)
 	}
 
 	output := &elasticsearchOutput{beatName: beatName}
@@ -77,6 +81,16 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
+	index, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "index",
+		MultiKey:         "indices",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+	})
+	if err != nil {
+		return err
+	}
+
 	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return err
@@ -85,6 +99,21 @@ func (out *elasticsearchOutput) init(
 	err = out.readTemplate(&config.Template)
 	if err != nil {
 		return err
+	}
+
+	out.index = index
+	pipeline, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "pipeline",
+		MultiKey:         "pipelines",
+		EnableSingleOnly: true,
+		FailEmpty:        false,
+	})
+	if err != nil {
+		return err
+	}
+
+	if !pipeline.IsEmpty() {
+		out.pipeline = &pipeline
 	}
 
 	clients, err := modeutil.MakeClients(cfg, makeClientFactory(tlsConfig, &config, out))
@@ -110,7 +139,6 @@ func (out *elasticsearchOutput) init(
 	}
 
 	out.mode = m
-	out.index = config.Index
 
 	return nil
 }
@@ -240,12 +268,18 @@ func makeClientFactory(
 			}
 		}
 
-		return NewClient(
-			esURL, config.Index, proxyURL, tls,
-			config.Username, config.Password,
-			params, config.Timeout,
-			config.CompressionLevel,
-			onConnected)
+		return NewClient(ClientSettings{
+			URL:              esURL,
+			Index:            out.index,
+			Pipeline:         out.pipeline,
+			Proxy:            proxyURL,
+			TLS:              tls,
+			Username:         config.Username,
+			Password:         config.Password,
+			Parameters:       params,
+			Timeout:          config.Timeout,
+			CompressionLevel: config.CompressionLevel,
+		}, onConnected)
 	}
 }
 
