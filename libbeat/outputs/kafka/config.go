@@ -6,26 +6,30 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
 type kafkaConfig struct {
-	Hosts           []string           `config:"hosts"               validate:"required"`
-	TLS             *outputs.TLSConfig `config:"tls"`
-	Timeout         time.Duration      `config:"timeout"             validate:"min=1"`
-	Worker          int                `config:"worker"              validate:"min=1"`
-	Metadata        metaConfig         `config:"metadata"`
-	KeepAlive       time.Duration      `config:"keep_alive"          validate:"min=0"`
-	MaxMessageBytes *int               `config:"max_message_bytes"   validate:"min=1"`
-	RequiredACKs    *int               `config:"required_acks"       validate:"min=-1"`
-	BrokerTimeout   time.Duration      `config:"broker_timeout"      validate:"min=1"`
-	Compression     string             `config:"compression"`
-	Version         string             `config:"version"`
-	MaxRetries      int                `config:"max_retries"         validate:"min=-1,nonzero"`
-	ClientID        string             `config:"client_id"`
-	ChanBufferSize  int                `config:"channel_buffer_size" validate:"min=1"`
-	Username        string             `config:"username"`
-	Password        string             `config:"password"`
+	Hosts           []string                  `config:"hosts"               validate:"required"`
+	TLS             *outputs.TLSConfig        `config:"tls"`
+	Timeout         time.Duration             `config:"timeout"             validate:"min=1"`
+	Worker          int                       `config:"worker"              validate:"min=1"`
+	Metadata        metaConfig                `config:"metadata"`
+	Key             *fmtstr.EventFormatString `config:"key"`
+	Partition       map[string]*common.Config `config:"partition"`
+	KeepAlive       time.Duration             `config:"keep_alive"          validate:"min=0"`
+	MaxMessageBytes *int                      `config:"max_message_bytes"   validate:"min=1"`
+	RequiredACKs    *int                      `config:"required_acks"       validate:"min=-1"`
+	BrokerTimeout   time.Duration             `config:"broker_timeout"      validate:"min=1"`
+	Compression     string                    `config:"compression"`
+	Version         string                    `config:"version"`
+	MaxRetries      int                       `config:"max_retries"         validate:"min=-1,nonzero"`
+	ClientID        string                    `config:"client_id"`
+	ChanBufferSize  int                       `config:"channel_buffer_size" validate:"min=1"`
+	Username        string                    `config:"username"`
+	Password        string                    `config:"password"`
 }
 
 type metaConfig struct {
