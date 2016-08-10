@@ -84,8 +84,8 @@ The following example exports all Apache log lines except the debugging messages
 
 [source,yaml]
 -------------------------------------------------------------------------------------
- include_lines: ["apache"]
  exclude_lines: ["^DBG"]
+ include_lines: ["apache"]
 -------------------------------------------------------------------------------------
 
 See <<regexp-support>> for a list of supported regexp patterns.
