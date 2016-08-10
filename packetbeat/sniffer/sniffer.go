@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"strconv"
 	"syscall"
 	"time"
@@ -129,7 +130,11 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 	}
 
 	if sniffer.config.Type == "autodetect" || sniffer.config.Type == "" {
-		sniffer.config.Type = "pcap"
+		if runtime.GOOS == "linux" {
+			sniffer.config.Type = "af_packet"
+		} else {
+			sniffer.config.Type = "pcap"
+		}
 	}
 
 	logp.Debug("sniffer", "Sniffer type: %s device: %s", sniffer.config.Type, sniffer.config.Device)
