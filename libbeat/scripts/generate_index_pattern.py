@@ -107,7 +107,7 @@ if __name__ == "__main__":
     fileName = get_index_pattern_name(args.index)
     target = args.beat + "/etc/kibana/index-pattern/" + fileName + ".json"
 
-    output = json.dumps(output)
+    output = json.dumps(output, indent=2)
 
     with open(target, 'w') as f:
         f.write(output)
