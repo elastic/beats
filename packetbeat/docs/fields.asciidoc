@@ -971,11 +971,15 @@ Object with source to destination flow measurements.
 [float]
 === source.stats.net_packets_total
 
+type: long
+
 Total number of packets
 
 
 [float]
 === source.stats.net_bytes_total
+
+type: long
 
 Total number of bytes
 
@@ -1073,11 +1077,15 @@ Object with destination to source flow measurements.
 [float]
 === dest.stats.net_packets_total
 
+type: long
+
 Total number of packets
 
 
 [float]
 === dest.stats.net_bytes_total
+
+type: long
 
 Total number of bytes
 

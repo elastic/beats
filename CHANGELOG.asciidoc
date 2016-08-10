@@ -35,6 +35,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 *Metricbeat*
 
 *Packetbeat*
+- Fix mapping for some Packetbeat flow metrics that were not marked as being longs. {issue}2177[2177]
 
 *Topbeat*
 
