@@ -1,15 +1,20 @@
 BUILDID=$(shell git rev-parse HEAD)
 
 .PHONY: all
-all: {beat}/deb {beat}/rpm {beat}/darwin {beat}/win {beat}/bin \
-	build/upload/build_id.txt
+all: {{cookiecutter.beat}}/deb \
+     {{cookiecutter.beat}}/rpm \
+	 {{cookiecutter.beat}}/darwin \
+	 {{cookiecutter.beat}}/win \
+	 {{cookiecutter.beat}}/bin \
+	 build/upload/build_id.txt
 
-ES_BEATS?=../../vendor/github.com/elastic/beats
+# The generator requires the dependencies to be in the vendor/ folder
+ES_BEATS=../../vendor/github.com/elastic/beats
 include $(ES_BEATS)/dev-tools/packer/scripts/Makefile
 
 
-.PHONY: {beat}
-{beat}: build/upload
+.PHONY: {{cookiecutter.beat}}
+{{cookiecutter.beat}}: build/upload
 	# cross compile on ubuntu
 	docker run --rm \
 		-v $(abspath build):/build \
@@ -22,4 +27,4 @@ include $(ES_BEATS)/dev-tools/packer/scripts/Makefile
 		-e TARGETS="linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64" \
 		-e BUILDID=${BUILDID} \
 		tudorg/beats-builder \
-		{beat_path}
+		{{cookiecutter.beat_path}}/{{cookiecutter.beat}}
