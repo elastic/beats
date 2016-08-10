@@ -124,6 +124,7 @@ packetbeat.protocols.cassandra:
 {% if cassandra_send_response %}  send_response: true{% endif %}
 {% if cassandra_send_request_header %}  send_request_header: true{% endif %}
 {% if cassandra_send_response_header %}  send_response_header: true{% endif %}
+{% if cassandra_ignored_ops %}  ignored_ops: {{cassandra_ignored_ops}}{% endif %}
 
 
 {% if procs_enabled %}

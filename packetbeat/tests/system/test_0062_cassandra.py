@@ -229,3 +229,157 @@ class Test(BaseTest):
         assert h2["stream"] == 262
         assert r["result_type"]=="rows"
 
+
+    def test_ops_mixed(self):
+        """
+       Some mixed operation happened in Cassandra
+       """
+        self.render_config_template(
+            cassandra_ports=[9042],
+            cassandra_send_request=True,
+            cassandra_send_response=True,
+            cassandra_send_request_header=True,
+            cassandra_send_response_header=True,
+        )
+
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_mixed_frame.pcap",debug_selectors=["*"])
+        objs = self.read_output()
+
+        o = objs[0]
+        print o
+        assert o["type"] == "cassandra"
+        assert o["port"] == 9042
+        assert o["bytes_in"] == 9
+        assert o["bytes_out"] == 61
+
+        q=o["cassandra_request"]
+        h= q["request_headers"]
+        assert h["version"] == "4"
+        assert h["op"] == "OPTIONS"
+        assert h["length"] == 0
+        assert h["flags"] == "FLAG_0"
+        assert h["stream"] == 0
+
+
+        r=o["cassandra_response"]
+        h2= r["response_headers"]
+        assert h2["version"] == "4"
+        assert h2["length"] == 52
+        assert h2["op"] == "SUPPORTED"
+        assert h2["flags"] == "FLAG_0"
+        assert h2["stream"] == 0
+
+        o = objs[1]
+        print o
+        assert o["type"] == "cassandra"
+        assert o["port"] == 9042
+        assert o["bytes_in"] == 31
+        assert o["bytes_out"] == 9
+
+        q=o["cassandra_request"]
+        h= q["request_headers"]
+        assert h["version"] == "4"
+        assert h["op"] == "STARTUP"
+        assert h["length"] == 22
+        assert h["flags"] == "FLAG_0"
+        assert h["stream"] == 1
+
+
+        r=o["cassandra_response"]
+        h2= r["response_headers"]
+        assert h2["version"] == "4"
+        assert h2["length"] == 0
+        assert h2["op"] == "READY"
+        assert h2["flags"] == "FLAG_0"
+        assert h2["stream"] == 1
+
+        o = objs[2]
+        print o
+        assert o["type"] == "cassandra"
+        assert o["port"] == 9042
+        assert o["bytes_in"] == 58
+        assert o["bytes_out"] == 9
+
+        q=o["cassandra_request"]
+        h= q["request_headers"]
+        assert h["version"] == "4"
+        assert h["op"] == "REGISTER"
+        assert h["length"] == 49
+        assert h["flags"] == "FLAG_0"
+        assert h["stream"] == 2
+
+
+        r=o["cassandra_response"]
+        h2= r["response_headers"]
+        assert h2["version"] == "4"
+        assert h2["length"] == 0
+        assert h2["op"] == "READY"
+        assert h2["flags"] == "FLAG_0"
+        assert h2["stream"] == 2
+
+
+
+    def test_ops_ignored(self):
+        """
+       Should correctly ignore OPTIONS and REGISTER operation
+       """
+        self.render_config_template(
+            cassandra_ports=[9042],
+            cassandra_send_request=True,
+            cassandra_send_response=True,
+            cassandra_send_request_header=True,
+            cassandra_send_response_header=True,
+            cassandra_ignored_ops= "OPTIONS,REGISTER",
+        )
+
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_mixed_frame.pcap",debug_selectors=["*"])
+        objs = self.read_output()
+
+        o = objs[0]
+        print o
+        assert o["type"] == "cassandra"
+        assert o["port"] == 9042
+        assert o["bytes_in"] == 31
+        assert o["bytes_out"] == 9
+
+        q=o["cassandra_request"]
+        h= q["request_headers"]
+        assert h["version"] == "4"
+        assert h["op"] == "STARTUP"
+        assert h["length"] == 22
+        assert h["flags"] == "FLAG_0"
+        assert h["stream"] == 1
+
+
+        r=o["cassandra_response"]
+        h2= r["response_headers"]
+        assert h2["version"] == "4"
+        assert h2["length"] == 0
+        assert h2["op"] == "READY"
+        assert h2["flags"] == "FLAG_0"
+        assert h2["stream"] == 1
+
+        o = objs[1]
+        print o
+        assert o["type"] == "cassandra"
+        assert o["port"] == 9042
+        assert o["bytes_in"] == 101
+        assert o["bytes_out"] == 116
+
+        q=o["cassandra_request"]
+        h= q["request_headers"]
+        assert h["version"] == "4"
+        assert h["op"] == "QUERY"
+        assert h["length"] == 92
+        assert h["flags"] == "FLAG_0"
+        assert h["stream"] == 3
+
+
+        r=o["cassandra_response"]
+        h2= r["response_headers"]
+        assert h2["version"] == "4"
+        assert h2["length"] == 107
+        assert h2["op"] == "RESULT"
+        assert h2["flags"] == "FLAG_0"
+        assert h2["stream"] == 3
+

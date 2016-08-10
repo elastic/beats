@@ -460,6 +460,7 @@ const (
 	opAuthChallenge FrameOp = 0x0E
 	opAuthResponse  FrameOp = 0x0F
 	opAuthSuccess   FrameOp = 0x10
+	opUnknown       FrameOp = 0xFF
 )
 
 func (f FrameOp) String() string {
@@ -498,6 +499,46 @@ func (f FrameOp) String() string {
 		return "AUTH_SUCCESS"
 	default:
 		return fmt.Sprintf("UNKNOWN_OP_%d", f)
+	}
+}
+
+func FrameOpFromString(str string) FrameOp {
+	switch str {
+	case "ERROR":
+		return opError
+	case "STARTUP":
+		return opStartup
+	case "READY":
+		return opReady
+	case "AUTHENTICATE":
+		return opAuthenticate
+	case "OPTIONS":
+		return opOptions
+	case "SUPPORTED":
+		return opSupported
+	case "QUERY":
+		return opQuery
+	case "RESULT":
+		return opResult
+	case "PREPARE":
+		return opPrepare
+	case "EXECUTE":
+		return opExecute
+	case "REGISTER":
+		return opRegister
+	case "EVENT":
+		return opEvent
+	case "BATCH":
+		return opBatch
+	case "AUTH_CHALLENGE":
+		return opAuthChallenge
+	case "AUTH_RESPONSE":
+		return opAuthResponse
+	case "AUTH_SUCCESS":
+		return opAuthSuccess
+	default:
+		debugf("unknown Op while convert: %s", str)
+		return opUnknown
 	}
 }
 

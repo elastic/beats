@@ -87,19 +87,22 @@ func (cassandra *cassandra) setFromConfig(config *cassandraConfig) error {
 	}
 
 	// parsed ignored ops
-	if len(config.IgnoredOPs) > 0 {
-		maps := make(map[string]interface{})
+	if len(config.OPsIgnored) > 0 {
+		maps := map[FrameOp]bool{}
 
-		if strings.Contains(config.IgnoredOPs, ",") {
-			array := strings.Split(config.IgnoredOPs, ",")
+		if strings.Contains(config.OPsIgnored, ",") {
+			array := strings.Split(config.OPsIgnored, ",")
 			for i := 0; i < len(array); i++ {
 				str := array[i]
 				if len(str) > 0 {
-					maps[strings.ToUpper(strings.TrimSpace(str))] = str
+					op := FrameOpFromString(strings.ToUpper(strings.TrimSpace(str)))
+					maps[op] = true
 				}
 			}
 		} else {
-			maps[strings.ToUpper(strings.TrimSpace(config.IgnoredOPs))] = config.IgnoredOPs
+			op := FrameOpFromString(strings.ToUpper(strings.TrimSpace(config.OPsIgnored)))
+			maps[op] = true
+
 		}
 		parser.ignoredOps = maps
 		debugf("parsed config IgnoredOPs: %v ", parser.ignoredOps)
