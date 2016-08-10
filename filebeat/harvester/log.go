@@ -271,6 +271,19 @@ func (h *Harvester) close() {
 	harvesterClosed.Add(1)
 }
 
+// newLogFileReader creates a new reader to read log files
+//
+// It creates a chain of readers which looks as following:
+//
+//   limit -> (multiline -> timeout) -> strip_newline -> json -> encode -> log_file
+//
+// Each reader on the left, contains the reader on the right and calls `Next()` to fetch more data.
+// At the base of all readers the the log_file reader. That means in the data is flowing in the opposite direction:
+//
+//   log_file -> encode -> json -> strip_newlin -> (timeout -> multiline) -> limit
+//
+// log_file implements io.Reader interface and encode reader is an adapter for io.Reader to
+// reader.Reader also handling file encodings. All other readers implement reader.Reader
 func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 
 	var r reader.Reader

@@ -13,7 +13,7 @@ filebeat.prospectors:
   scan_frequency: {{scan_frequency | default("0.1s") }}
   ignore_older: {{ignore_older}}
   close_inactive: {{close_inactive}}
-  harvester_buffer_size:
+  harvester_buffer_size: {{harvester_buffer_size}}
   encoding: {{encoding | default("utf-8") }}
   tail_files: {{tail_files}}
   backoff: 0.1s

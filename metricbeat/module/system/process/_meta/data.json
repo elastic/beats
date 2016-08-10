@@ -14,7 +14,7 @@
         "process": {
             "cmdline": "go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data",
             "cpu": {
-                "start_time": "07:16",
+                "start_time": "2016-08-08T16:39:13.040Z",
                 "total": {
                     "pct": 0.01
                 }

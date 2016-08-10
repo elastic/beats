@@ -6,14 +6,6 @@ RUN set -x && \
     apt-get install -y netcat && \
     apt-get clean
 
-
-## Install go package dependencies
-RUN set -x \
-  go get \
-	github.com/pierrre/gotestcover \
-	github.com/tsg/goautotest \
-	golang.org/x/tools/cmd/vet
-
 COPY libbeat/scripts/docker-entrypoint.sh /entrypoint.sh
 
 RUN mkdir -p /etc/pki/tls/certs

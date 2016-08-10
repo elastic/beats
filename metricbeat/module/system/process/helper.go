@@ -160,14 +160,14 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 				"ticks": process.Cpu.Total,
 				"pct":   GetProcCpuPercentage(last, process),
 			},
-			"start_time": process.Cpu.FormatStartTime(),
+			"start_time": unixTimeMsToTime(process.Cpu.StartTime),
 		}
 	} else {
 		proc["cpu"] = common.MapStr{
 			"total": common.MapStr{
 				"pct": GetProcCpuPercentage(last, process),
 			},
-			"start_time": process.Cpu.FormatStartTime(),
+			"start_time": unixTimeMsToTime(process.Cpu.StartTime),
 		}
 	}
 
@@ -303,4 +303,10 @@ func (procStats *ProcStats) GetProcStatsEvents() ([]common.MapStr, error) {
 	}
 
 	return events, nil
+}
+
+// unixTimeMsToTime converts a unix time given in milliseconds since Unix epoch
+// to a common.Time value.
+func unixTimeMsToTime(unixTimeMs uint64) common.Time {
+	return common.Time(time.Unix(0, int64(unixTimeMs*1000000)))
 }

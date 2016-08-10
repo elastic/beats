@@ -104,7 +104,7 @@ output.elasticsearch:
 
 #================================ Logging =====================================
 
-# Sets log level. The default log level is error.
+# Sets log level. The default log level is info.
 # Available log levels are: critical, error, warning, info, debug
 #logging.level: debug
 

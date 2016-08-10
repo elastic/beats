@@ -178,6 +178,7 @@
       fields:
         - name: heap_usage.bytes
           type: long
+          format: bytes
           description: >
             The total size in bytes of heap space used by the database process.
             Only available on Unix/Linux.
@@ -195,10 +196,12 @@
       fields:
         - name: in.bytes
           type: long
+          format: bytes
           description: >
             The amount of network traffic, in bytes, received by this database.
         - name: out.bytes
           type: long
+          format: bytes
           description: >
             The amount of network traffic, in bytes, sent from this database.
         - name: requests

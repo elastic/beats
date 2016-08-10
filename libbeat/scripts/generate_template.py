@@ -116,7 +116,7 @@ def dedot(group):
         else:
             fields.append(field)
     for _, field in dedotted.items():
-        fields.append(field)
+        fields.append(dedot(field))
     group["fields"] = fields
     return group
 
@@ -178,18 +178,23 @@ def fill_field_properties(args, field, defaults, path):
             }
 
     elif field["type"] in ["geo_point", "date", "long", "integer",
-                           "double", "float", "half_float", "boolean"]:
+                           "double", "float", "half_float", "scaled_float",
+                           "boolean"]:
         # Convert all integer fields to long
         if field["type"] == "integer":
             field["type"] = "long"
 
-        if args.es2x and field["type"] == "half_float":
-            # ES 2.x doesn't support half floats, so convert to floats
+        if args.es2x and field["type"] in ["half_float", "scaled_float"]:
+            # ES 2.x doesn't support half or scaled floats, so convert to float
             field["type"] = "float"
 
         properties[field["name"]] = {
             "type": field.get("type")
         }
+
+        if field["type"] == "scaled_float":
+            properties[field["name"]]["scaling_factor"] = \
+                field.get("scaling_factor", 1000)
 
     elif field["type"] in ["dict", "list"]:
         if field.get("dict-type") == "keyword":

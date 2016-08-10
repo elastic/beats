@@ -11,13 +11,13 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
 type client struct {
-	hosts   []string
-	topic   string
-	useType bool
-	config  sarama.Config
+	hosts  []string
+	topic  outil.Selector
+	config sarama.Config
 
 	producer sarama.AsyncProducer
 
@@ -38,12 +38,15 @@ var (
 	publishEventsCallCount = expvar.NewInt("libbeat.kafka.call_count.PublishEvents")
 )
 
-func newKafkaClient(hosts []string, topic string, useType bool, cfg *sarama.Config) (*client, error) {
+func newKafkaClient(
+	hosts []string,
+	topic outil.Selector,
+	cfg *sarama.Config,
+) (*client, error) {
 	c := &client{
-		hosts:   hosts,
-		useType: useType,
-		topic:   topic,
-		config:  *cfg,
+		hosts:  hosts,
+		topic:  topic,
+		config: *cfg,
 	}
 	return c, nil
 }
@@ -103,10 +106,7 @@ func (c *client) AsyncPublishEvents(
 	ch := c.producer.Input()
 
 	for _, event := range events {
-		topic := c.topic
-		if c.useType {
-			topic = event["type"].(string)
-		}
+		topic, err := c.topic.Select(event)
 
 		jsonEvent, err := json.Marshal(event)
 		if err != nil {
