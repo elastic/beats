@@ -85,6 +85,7 @@ func (p *parser) feed(ts time.Time, data []byte) error {
 		if p.message == nil {
 			// allocate new message object to be used by parser with current timestamp
 			p.message = p.newMessage(ts)
+			p.message.data = map[string]interface{}{}
 		}
 
 		msg, err := p.parse()
@@ -145,7 +146,6 @@ func (p *parser) parse() (*message, error) {
 	}
 
 	msg := p.message
-	msg.data = make(map[string]interface{})
 
 	if p.framer.Header.BodyLength > 0 {
 
@@ -155,67 +155,67 @@ func (p *parser) parse() (*message, error) {
 				debugf("buf not enough for body, waiting for more, return")
 			}
 			return nil, nil
-		} else {
-			//check if the ops already ignored
-			if p.config.ignoredOps != nil && len(p.config.ignoredOps) > 0 {
-				if isDebug {
-					debugf("ignoreOPS configed, let's check")
-				}
-				v := p.config.ignoredOps[p.framer.Header.Op.String()]
-				if v != nil {
-					if isDebug {
-						debugf("Ops: %s was marked to be ignored, ignoring, request:%v", p.framer.Header.Op.String(), p.framer.Header.Version.IsRequest())
-					}
-					p.buf.Collect(p.framer.Header.BodyLength)
+		}
 
-					finalCollectedFrameLength := p.buf.BufferConsumed()
-					if finalCollectedFrameLength-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
-						return nil, errors.New("data messed while parse frame body")
-					}
-					// as we already igore the content, we now mark the result is completed
-					p.message.ignored = true
-				}
+		//check if the ops already ignored
+		if p.config.ignoredOps != nil && len(p.config.ignoredOps) > 0 {
+			if isDebug {
+				debugf("ignoreOPS configed, let's check")
 			}
-
-			// start to parse body
-			if !p.message.ignored {
+			v := p.config.ignoredOps[p.framer.Header.Op.String()]
+			if v != nil {
 				if isDebug {
-					debugf("start read frame")
+					debugf("Ops: %s was marked to be ignored, ignoring, request:%v", p.framer.Header.Op.String(), p.framer.Header.Version.IsRequest())
 				}
-				data, err := p.framer.ReadFrame()
-				if err != nil {
-					// if the frame parsed failed, should ignore the whole message
-					p.framer = nil
-					return nil, err
-				}
-
-				msg.data = data
-
-				// dealing with un-parsed content
-				frameParsedLength := p.buf.BufferConsumed()
-
-				// collect leftover
-				unParsedSize := p.framer.Header.BodyLength + p.framer.Header.HeadLength - frameParsedLength
-				if unParsedSize > 0 {
-
-					// double check the buf size
-					if p.buf.Avail(unParsedSize) {
-						p.buf.Collect(unParsedSize)
-						consumedSize := p.buf.BufferConsumed()
-						if consumedSize-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
-							logp.Err("body_lenght:%d, body_read:%d, more collected:%d, only collect:%d", p.framer.Header.BodyLength, frameParsedLength, unParsedSize, consumedSize)
-						}
-					} else {
-						logp.Err("should be enough bytes for cleanup,but not enough")
-						return nil, errors.New("should be enough bytes,but not enough")
-					}
-				}
+				p.buf.Collect(p.framer.Header.BodyLength)
 
 				finalCollectedFrameLength := p.buf.BufferConsumed()
 				if finalCollectedFrameLength-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
-					logp.Err("body_length:%d, body_read:%d, all_consumed:%d", p.framer.Header.BodyLength, frameParsedLength, finalCollectedFrameLength)
 					return nil, errors.New("data messed while parse frame body")
 				}
+				// as we already igore the content, we now mark the result is completed
+				p.message.ignored = true
+			}
+		}
+
+		// start to parse body
+		if !p.message.ignored {
+			if isDebug {
+				debugf("start read frame")
+			}
+			data, err := p.framer.ReadFrame()
+			if err != nil {
+				// if the frame parsed failed, should ignore the whole message
+				p.framer = nil
+				return nil, err
+			}
+
+			msg.data = data
+
+			// dealing with un-parsed content
+			frameParsedLength := p.buf.BufferConsumed()
+
+			// collect leftover
+			unParsedSize := p.framer.Header.BodyLength + p.framer.Header.HeadLength - frameParsedLength
+			if unParsedSize > 0 {
+
+				// double check the buf size
+				if p.buf.Avail(unParsedSize) {
+					p.buf.Collect(unParsedSize)
+					consumedSize := p.buf.BufferConsumed()
+					if consumedSize-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
+						logp.Err("body_lenght:%d, body_read:%d, more collected:%d, only collect:%d", p.framer.Header.BodyLength, frameParsedLength, unParsedSize, consumedSize)
+					}
+				} else {
+					logp.Err("should be enough bytes for cleanup,but not enough")
+					return nil, errors.New("should be enough bytes,but not enough")
+				}
+			}
+
+			finalCollectedFrameLength := p.buf.BufferConsumed()
+			if finalCollectedFrameLength-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
+				logp.Err("body_length:%d, body_read:%d, all_consumed:%d", p.framer.Header.BodyLength, frameParsedLength, finalCollectedFrameLength)
+				return nil, errors.New("data messed while parse frame body")
 			}
 		}
 
