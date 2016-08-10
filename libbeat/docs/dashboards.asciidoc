@@ -24,6 +24,17 @@ cd kibana/
 ./import_dashboards.sh
 ----------------------------------------------------------------------
 
+[NOTE]
+.Known Issue in 5.0.0-alpha5
+====
+There is a known issue in the 5.0.0-alpha5 release of Elasticsearch that affects
+the loading process of our sample dashboards. If you get an error saying
+`curl: (52) Empty reply from server` while executing the command above, please
+edit the `import_dashboard.sh` script and edit the `CURL=curl` line to read
+`CURL="curl -H Expect:"`. See this https://github.com/elastic/beats/issues/2208[ticket]
+for details.
+====
+
 On deb and rpm, the `kibana` folder is located under the home path, which is `/usr/share/beat_name/` unless you change it.
 
 By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
