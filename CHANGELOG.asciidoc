@@ -14,6 +14,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 
 *Affecting all Beats*
 - Change Elasticsearch output index configuration to be based on format strings. If index has been configured, no date will be appended anymore to the index name. {pull}2119[2119]
+- Replace `output.kafka.use_type` by `output.kafka.topic` accepting a format string. {pull}2188[2188]
 
 *Metricbeat*
 - Change field type system.process.cpu.start_time from keyword to date. {issue}1565[1565]
@@ -50,6 +51,9 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Add script to generate the Kibana index-pattern from fields.yml. {pull}2122[2122]
 - Enhance redis output key selection based on format string. {pull}2169[2169]
 - Configurable redis `keys` using filters and format strings. {pull}2169[2169]
+- Add format string support to `output.kafka.topic`. {pull}2188[2188]
+- Add `output.kafka.topics` for more advanced kafka topic selection per event. {pull}2188[2188]
+
 
 *Metricbeat*
 
