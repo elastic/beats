@@ -145,4 +145,9 @@ If (Test-Path "$KIBANA_DIR/index-pattern") {
       echo "Import index-pattern $($name):"
       &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/index-pattern/$name" -Method PUT -Body $(Get-Content "$KIBANA_DIR/index-pattern/$file")
     }
+
+    # Temporary hack to set the index pattern as the default one.
+    # Workaround for: https://github.com/elastic/kibana/issues/7563
+    &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/config/5.0.0-alpha4/_update" -Method POST -Body "{`"doc`":{`"defaultIndex`":`"$name`"}, `"doc_as_upsert`" : true}"
+
 }

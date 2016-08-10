@@ -178,6 +178,12 @@ if [ -d "${DIR}/index-pattern" ]; then
             -d @${file} || exit 1
         echo
     done
+
+    # Temporary hack to set the index pattern as the default one.
+    # Workaround for: https://github.com/elastic/kibana/issues/7563
+    ${CURL} -XPOST ${ELASTICSEARCH}/${KIBANA_INDEX}/config/5.0.0-alpha4/_update \
+        -d "{\"doc\":{\"defaultIndex\":\"${NAME}\"}, \"doc_as_upsert\" : true}"
+
 fi
 
 
