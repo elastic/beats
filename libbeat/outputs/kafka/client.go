@@ -3,6 +3,7 @@ package kafka
 import (
 	"encoding/json"
 	"expvar"
+	"fmt"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
@@ -18,6 +20,7 @@ import (
 type client struct {
 	hosts  []string
 	topic  outil.Selector
+	key    *fmtstr.EventFormatString
 	config sarama.Config
 
 	producer sarama.AsyncProducer
@@ -41,12 +44,14 @@ var (
 
 func newKafkaClient(
 	hosts []string,
+	key *fmtstr.EventFormatString,
 	topic outil.Selector,
 	cfg *sarama.Config,
 ) (*client, error) {
 	c := &client{
 		hosts:  hosts,
 		topic:  topic,
+		key:    key,
 		config: *cfg,
 	}
 	return c, nil
@@ -106,48 +111,74 @@ func (c *client) AsyncPublishEvents(
 
 	ch := c.producer.Input()
 
-	for _, d := range data {
-		event := d.Event
-		topic, err := c.topic.Select(event)
-		var ts time.Time
+	for i := range data {
+		d := &data[i]
 
-		// message timestamps have been added to kafka with version 0.10.0.0
-		if c.config.Version.IsAtLeast(sarama.V0_10_0_0) {
-			if tsRaw, ok := event["@timestamp"]; ok {
-				if tmp, ok := tsRaw.(common.Time); ok {
-					ts = time.Time(tmp)
-				} else if tmp, ok := tsRaw.(time.Time); ok {
-					ts = tmp
-				}
-			}
-		}
-
-		jsonEvent, err := json.Marshal(event)
+		msg, err := c.getEventMessage(d)
 		if err != nil {
+			logp.Err("Dropping event: %v", err)
 			ref.done()
 			continue
 		}
+		msg.ref = ref
 
-		msg := &sarama.ProducerMessage{
-			Metadata:  ref,
-			Topic:     topic,
-			Value:     sarama.ByteEncoder(jsonEvent),
-			Timestamp: ts,
-		}
-
-		ch <- msg
+		msg.initProducerMessage()
+		ch <- &msg.msg
 	}
 
 	return nil
+}
+
+func (c *client) getEventMessage(data *outputs.Data) (*message, error) {
+	event := data.Event
+	msg := messageFromData(data)
+	if msg.topic != "" {
+		return msg, nil
+	}
+
+	msg.event = event
+
+	topic, err := c.topic.Select(event)
+	if err != nil {
+		return nil, fmt.Errorf("setting kafka topic failed with %v", err)
+	}
+	msg.topic = topic
+
+	jsonEvent, err := json.Marshal(event)
+	if err != nil {
+		return nil, fmt.Errorf("json encoding failed with %v", err)
+	}
+	msg.value = jsonEvent
+
+	// message timestamps have been added to kafka with version 0.10.0.0
+	var ts time.Time
+	if c.config.Version.IsAtLeast(sarama.V0_10_0_0) {
+		if tsRaw, ok := event["@timestamp"]; ok {
+			if tmp, ok := tsRaw.(common.Time); ok {
+				ts = time.Time(tmp)
+			} else if tmp, ok := tsRaw.(time.Time); ok {
+				ts = tmp
+			}
+		}
+	}
+	msg.ts = ts
+
+	if c.key != nil {
+		if key, err := c.key.RunBytes(event); err == nil {
+			msg.key = key
+		}
+	}
+
+	return msg, nil
 }
 
 func (c *client) successWorker(ch <-chan *sarama.ProducerMessage) {
 	defer c.wg.Done()
 	defer debugf("Stop kafka ack worker")
 
-	for msg := range ch {
-		ref := msg.Metadata.(*msgRef)
-		ref.done()
+	for libMsg := range ch {
+		msg := libMsg.Metadata.(*message)
+		msg.ref.done()
 	}
 }
 
@@ -156,9 +187,8 @@ func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 	defer debugf("Stop kafka error handler")
 
 	for errMsg := range ch {
-		msg := errMsg.Msg
-		ref := msg.Metadata.(*msgRef)
-		ref.fail(errMsg.Err)
+		msg := errMsg.Msg.Metadata.(*message)
+		msg.ref.fail(errMsg.Err)
 	}
 }
 
