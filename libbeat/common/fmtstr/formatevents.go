@@ -190,6 +190,23 @@ func (fs *EventFormatString) Run(event common.MapStr) (string, error) {
 	return ctx.buf.String(), nil
 }
 
+// RunBytes executes the format string returning a new expanded string of type
+// `[]byte` or an error if execution or event field expansion fails.
+func (fs *EventFormatString) RunBytes(event common.MapStr) ([]byte, error) {
+	ctx := newEventCtx(len(fs.fields))
+	defer releaseCtx(ctx)
+
+	buf := bytes.NewBuffer(nil)
+	if err := fs.collectFields(ctx, event); err != nil {
+		return nil, err
+	}
+	err := fs.formatter.Eval(ctx, buf)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
 // Eval executes the format string, writing the resulting string into the provided output buffer. Returns error if execution or event field expansion fails.
 func (fs *EventFormatString) Eval(out *bytes.Buffer, event common.MapStr) error {
 	ctx := newEventCtx(len(fs.fields))
