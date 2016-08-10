@@ -122,7 +122,7 @@ func (p *parser) parse() (*message, error) {
 	// if p.frame is nil then create a new framer, or continue to process the last message
 	if p.framer == nil {
 		if isDebug {
-			logp.Debug("cassandra", "start new framer")
+			debugf("start new framer")
 		}
 		p.framer = NewFramer(&p.buf, p.config.compressor)
 	}
@@ -130,10 +130,10 @@ func (p *parser) parse() (*message, error) {
 	// check if the frame header were parsed or not
 	if p.framer.Header == nil {
 		if isDebug {
-			logp.Debug("cassandra", "start to parse header")
+			debugf("start to parse header")
 		}
 		if !p.buf.Avail(9) {
-			logp.Err("not enough head bytes, ignore")
+			debugf("not enough head bytes, ignore")
 			return nil, nil
 		}
 
@@ -153,19 +153,19 @@ func (p *parser) parse() (*message, error) {
 		//let's wait for enough buf
 		if !p.buf.Avail(p.framer.Header.BodyLength) {
 			if isDebug {
-				logp.Debug("cassandra", " buf not enough for body, waiting for more, return")
+				debugf("buf not enough for body, waiting for more, return")
 			}
 			return nil, nil
 		} else {
 			//check if the ops already ignored
 			if p.config.ignoredOps != nil && len(p.config.ignoredOps) > 0 {
 				if isDebug {
-					logp.Debug("cassandra", "ignoreOPS configed, let's check")
+					debugf("ignoreOPS configed, let's check")
 				}
 				v := p.config.ignoredOps[p.framer.Header.Op.String()]
 				if v != nil {
 					if isDebug {
-						logp.Debug("cassandra", fmt.Sprintf("Ops: %s was marked to be ignored, ignoring, request:%v", p.framer.Header.Op.String(), p.framer.Header.Version.IsRequest()))
+						debugf("Ops: %s was marked to be ignored, ignoring, request:%v", p.framer.Header.Op.String(), p.framer.Header.Version.IsRequest())
 					}
 					p.buf.Collect(p.framer.Header.BodyLength)
 
@@ -181,7 +181,7 @@ func (p *parser) parse() (*message, error) {
 			// start to parse body
 			if !p.message.ignored {
 				if isDebug {
-					logp.Debug("cassandra", "start read frame")
+					debugf("start read frame")
 				}
 				data, err := p.framer.ReadFrame()
 				if err != nil {

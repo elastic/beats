@@ -15,6 +15,7 @@ import (
 
 var (
 	ErrFrameTooBig = errors.New("frame length is bigger than the maximum allowed")
+	debugf         = logp.MakeDebug("cassandra")
 )
 
 type frameHeader struct {
@@ -145,7 +146,7 @@ func (f *Framer) ReadHeader() (head *frameHeader, err error) {
 	headSize := f.r.BufferConsumed()
 	head.HeadLength = headSize
 
-	logp.Debug("cassandra", "header: %v", head)
+	debugf("header: %v", head)
 
 	f.Header = head
 	return head, nil
@@ -176,16 +177,16 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	//corresponding to the response opcode.
 	if f.Header.Flags&flagTracing == flagTracing && (f.Header.Op&opQuery == opQuery || f.Header.Op&opExecute == opExecute || f.Header.Op&opPrepare == opPrepare) {
 
-		logp.Debug("cassandra", "tracing enabled")
+		debugf("tracing enabled")
 
 		uid := f.decoder.ReadUUID()
-		logp.Debug("cassandra", uid.String())
+		debugf(uid.String())
 
 		data["trace_id"] = uid.String()
 	}
 
 	if f.Header.Flags&flagWarning == flagWarning {
-		logp.Debug("cassandra", "hit warning flags")
+		debugf("hit warning flags")
 
 		warnings := f.decoder.ReadStringList()
 		// dealing with warnings
@@ -193,7 +194,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	}
 
 	if f.Header.Flags&flagCustomPayload == flagCustomPayload {
-		logp.Debug("cassandra", "hit custom payload flags")
+		debugf("hit custom payload flags")
 
 		f.Header.CustomPayload = f.decoder.ReadBytesMap()
 	}
@@ -206,7 +207,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 		//decoder.Data = buf
 		//f.decoder = decoder
 
-		logp.Debug("cassandra", "hit compress flags")
+		debugf("hit compress flags")
 
 		return nil, errors.New("Compressed content not supported yet")
 	}
@@ -237,7 +238,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 		//ignore
 	default:
 		//ignore
-		logp.Debug("cassandra", "unknow ops, not processed, %v", f.Header)
+		debugf("unknow ops, not processed, %v", f.Header)
 
 	}
 
