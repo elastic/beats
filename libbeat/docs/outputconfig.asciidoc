@@ -543,11 +543,8 @@ The cluster metadata contain the actual Kafka brokers events are published to.
 
 ===== topic
 
-The Kafka topic used for produced events. If `use_type` is set to true, the topic will not be used.
-
-===== use_type
-
-Set Kafka topic by event type. If `use_type` is false, the `topic` option must be configured. The default is false.
+The Kafka topic used for produced events. The setting can be a format string
+using any event field. To set the topic from document type use `%{[type]}`.
 
 ===== client_id
 
