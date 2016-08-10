@@ -198,10 +198,12 @@
             Object with source to destination flow measurements.
           fields:
             - name: net_packets_total
+              type: long
               description: >
                 Total number of packets
 
             - name: net_bytes_total
+              type: long
               description: >
                 Total number of bytes
 
@@ -274,10 +276,12 @@
             Object with destination to source flow measurements.
           fields:
             - name: net_packets_total
+              type: long
               description: >
                 Total number of packets
 
             - name: net_bytes_total
+              type: long
               description: >
                 Total number of bytes
     - name: icmp_id
