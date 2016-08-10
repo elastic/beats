@@ -101,7 +101,7 @@ To consolidate these lines into a single event in Filebeat, use the following mu
 multiline:
   pattern: '\\$'
   negate: false
-  match: after
+  match: before
 -------------------------------------------------------------------------------------
 
 This configuration merges any line that ends with the `\` character with the line that follows.
