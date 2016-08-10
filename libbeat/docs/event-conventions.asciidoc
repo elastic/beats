@@ -37,4 +37,7 @@ List of standardised words and units across all Beats:
 * ms: millisecond, millis
 * mb: megabytes
 * msg: message
+* nanos: nanoseconds
+* norm: normalized
+* us: microseconds
 
