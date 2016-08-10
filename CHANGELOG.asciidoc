@@ -53,7 +53,12 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Configurable redis `keys` using filters and format strings. {pull}2169[2169]
 - Add format string support to `output.kafka.topic`. {pull}2188[2188]
 - Add `output.kafka.topics` for more advanced kafka topic selection per event. {pull}2188[2188]
-
+- Add support for kafka 0.10.
+- Add support for kafka 0.10. {pull}2190[2190]
+- Add SASL/PLAIN authentication support to kafka output. {pull}2190[2190]
+- Make Kafka metadata update configurable. {pull}2190[2190]
+- Add kafka version setting (optional) enabling kafka broker version support. {pull}2190[2190]
+- Add kafka message timestamp if at least version 0.10 is configured. {pull}2190[2190]
 
 *Metricbeat*
 
