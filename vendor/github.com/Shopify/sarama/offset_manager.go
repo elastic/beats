@@ -136,10 +136,14 @@ type PartitionOffsetManager interface {
 	// was committed for this partition yet.
 	NextOffset() (int64, string)
 
-	// MarkOffset marks the provided offset as processed, alongside a metadata string
+	// MarkOffset marks the provided offset, alongside a metadata string
 	// that represents the state of the partition consumer at that point in time. The
 	// metadata string can be used by another consumer to restore that state, so it
 	// can resume consumption.
+	//
+	// To follow upstream conventions, you are expected to mark the offset of the
+	// next message to read, not the last message read. Thus, when calling `MarkOffset`
+	// you should typically add one to the offset of the last consumed message.
 	//
 	// Note: calling MarkOffset does not necessarily commit the offset to the backend
 	// store immediately for efficiency reasons, and it may never be committed if
@@ -340,7 +344,7 @@ func (pom *partitionOffsetManager) NextOffset() (int64, string) {
 	defer pom.lock.Unlock()
 
 	if pom.offset >= 0 {
-		return pom.offset + 1, pom.metadata
+		return pom.offset, pom.metadata
 	}
 
 	return pom.parent.conf.Consumer.Offsets.Initial, ""
@@ -457,7 +461,7 @@ func (bom *brokerOffsetManager) flushToBroker() {
 		case ErrNoError:
 			block := request.blocks[s.topic][s.partition]
 			s.updateCommitted(block.offset, block.metadata)
-		case ErrUnknownTopicOrPartition, ErrNotLeaderForPartition, ErrLeaderNotAvailable,
+		case ErrNotLeaderForPartition, ErrLeaderNotAvailable,
 			ErrConsumerCoordinatorNotAvailable, ErrNotCoordinatorForConsumer:
 			// not a critical error, we just need to redispatch
 			delete(bom.subscriptions, s)
@@ -468,6 +472,12 @@ func (bom *brokerOffsetManager) flushToBroker() {
 		case ErrOffsetsLoadInProgress:
 			// nothing wrong but we didn't commit, we'll get it next time round
 			break
+		case ErrUnknownTopicOrPartition:
+			// let the user know *and* try redispatching - if topic-auto-create is
+			// enabled, redispatching should trigger a metadata request and create the
+			// topic; if not then re-dispatching won't help, but we've let the user
+			// know and it shouldn't hurt either (see https://github.com/Shopify/sarama/issues/706)
+			fallthrough
 		default:
 			// dunno, tell the user and try redispatching
 			s.handleError(err)

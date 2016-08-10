@@ -109,3 +109,42 @@ func newBufConn(conn net.Conn) *bufConn {
 func (bc *bufConn) Read(b []byte) (n int, err error) {
 	return bc.buf.Read(b)
 }
+
+// KafkaVersion instances represent versions of the upstream Kafka broker.
+type KafkaVersion struct {
+	// it's a struct rather than just typing the array directly to make it opaque and stop people
+	// generating their own arbitrary versions
+	version [4]uint
+}
+
+func newKafkaVersion(major, minor, veryMinor, patch uint) KafkaVersion {
+	return KafkaVersion{
+		version: [4]uint{major, minor, veryMinor, patch},
+	}
+}
+
+// IsAtLeast return true if and only if the version it is called on is
+// greater than or equal to the version passed in:
+//    V1.IsAtLeast(V2) // false
+//    V2.IsAtLeast(V1) // true
+func (v KafkaVersion) IsAtLeast(other KafkaVersion) bool {
+	for i := range v.version {
+		if v.version[i] > other.version[i] {
+			return true
+		} else if v.version[i] < other.version[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// Effective constants defining the supported kafka versions.
+var (
+	V0_8_2_0   = newKafkaVersion(0, 8, 2, 0)
+	V0_8_2_1   = newKafkaVersion(0, 8, 2, 1)
+	V0_8_2_2   = newKafkaVersion(0, 8, 2, 2)
+	V0_9_0_0   = newKafkaVersion(0, 9, 0, 0)
+	V0_9_0_1   = newKafkaVersion(0, 9, 0, 1)
+	V0_10_0_0  = newKafkaVersion(0, 10, 0, 0)
+	minVersion = V0_8_2_0
+)

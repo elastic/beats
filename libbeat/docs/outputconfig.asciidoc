@@ -541,6 +541,24 @@ The default value is true.
 The list of Kafka broker addresses from where to fetch the cluster metadata.
 The cluster metadata contain the actual Kafka brokers events are published to.
 
+===== version
+
+Kafka version ${beatname_lc} is assumed to run against. Defaults to oldest
+supported stable version (currently version 0.8.2.0).
+
+Event timestamps will be added, if version 0.10.0.0+ is enabled.
+
+Valid values are `0.8.2.0`, `0.8.2.1`, `0.8.2.2`, `0.8.2`, `0.8`, `0.9.0.0`,
+`0.9.0.1`, `0.9.0`, `0.9`, `0.10.0.0`, `0.10.0`, and `0.10`.
+
+===== username
+
+The username for connecting to Kafka. If username is configured, the passowrd must be configured as well. Only SASL/PLAIN is supported.
+
+===== password
+
+The password for connecting to Kafka.
+
 ===== topic
 
 The Kafka topic used for produced events. The setting can be a format string
@@ -553,6 +571,17 @@ The configurable ClientID used for logging, debugging, and auditing purposes. Th
 ===== worker
 
 The number of concurrent load-balanced Kafka output workers.
+
+===== metadata
+
+Kafka metadata update settings. The metadata do contain information about
+brokers, topics, partition, and active leaders to use for publishing.
+
+*`refresh_frequency`*:: Metadata refreash interval. Defaults to 10 minutes.
+
+*`retry.max`*:: Total number of metadata update retries when cluster is in middle of leader election. The default is 3.
+
+*`retry.backoff`*:: Waiting time between retries during leader elections. Default is 250ms.
 
 ===== max_retries
 

@@ -135,6 +135,11 @@ type ProducerMessage struct {
 	// Partition is the partition that the message was sent to. This is only
 	// guaranteed to be defined if the message was successfully delivered.
 	Partition int32
+	// Timestamp is the timestamp assigned to the message by the broker. This
+	// is only guaranteed to be defined if the message was successfully
+	// delivered, RequiredAcks is not NoResponse, and the Kafka broker is at
+	// least version 0.10.0.
+	Timestamp time.Time
 
 	retries int
 	flags   flagSet
@@ -722,6 +727,11 @@ func (bp *brokerProducer) handleSuccess(sent *produceSet, response *ProduceRespo
 		switch block.Err {
 		// Success
 		case ErrNoError:
+			if bp.parent.conf.Version.IsAtLeast(V0_10_0_0) && !block.Timestamp.IsZero() {
+				for _, msg := range msgs {
+					msg.Timestamp = block.Timestamp
+				}
+			}
 			for i, msg := range msgs {
 				msg.Offset = block.Offset + int64(i)
 			}
