@@ -7,7 +7,7 @@ ENV PATH $PATH:/opt/logstash/bin:/opt/logstash/vendor/jruby/bin
 COPY setup.sh /
 
 # As all snapshot builds have the same url, the image is cached. The date at then can be used to invalidate the image
-RUN bash setup.sh https://download.elastic.co/logstash/logstash/packages/debian/logstash-5.0.0-alpha5.deb?20160728
+RUN bash setup.sh https://download.elastic.co/logstash/logstash/packages/debian/logstash-5.0.0-alpha5.deb
 
 
 COPY logstash.conf.2.tmpl /logstash.conf.2.tmpl
