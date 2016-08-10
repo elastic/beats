@@ -14,10 +14,11 @@ import (
 )
 
 type client struct {
-	hosts   []string
-	topic   string
-	useType bool
-	config  sarama.Config
+	hosts         []string
+	topic         string
+	useType       bool
+	config        sarama.Config
+	sendFieldOnly string
 
 	producer sarama.AsyncProducer
 
@@ -38,12 +39,13 @@ var (
 	publishEventsCallCount = expvar.NewInt("libbeat.kafka.call_count.PublishEvents")
 )
 
-func newKafkaClient(hosts []string, topic string, useType bool, cfg *sarama.Config) (*client, error) {
+func newKafkaClient(hosts []string, topic string, useType bool, sendFieldOnly string, cfg *sarama.Config) (*client, error) {
 	c := &client{
-		hosts:   hosts,
-		useType: useType,
-		topic:   topic,
-		config:  *cfg,
+		hosts:         hosts,
+		useType:       useType,
+		topic:         topic,
+		config:        *cfg,
+		sendFieldOnly: sendFieldOnly,
 	}
 	return c, nil
 }
@@ -105,15 +107,40 @@ func (c *client) AsyncPublishEvents(
 	for _, event := range events {
 		topic := c.topic
 		if c.useType {
-			topic = event["type"].(string)
+			topic = (event["type"].(string))
 		}
 
-		jsonEvent, err := json.Marshal(event)
-		if err != nil {
-			ref.done()
-			continue
-		}
+		var jsonEvent []byte
 
+		if c.sendFieldOnly != "" {
+			debugf("Only sending field %s to kafka", c.sendFieldOnly)
+			value := event[c.sendFieldOnly]
+
+			if value == nil {
+				logp.Warn("Field %s does not found in event", value)
+				continue
+			}
+
+			switch value.(type) {
+			case string:
+				jsonEvent = []byte(value.(string))
+			case *string:
+				jsonEvent = []byte(*value.(*string))
+			default:
+				logp.Warn("Unexpected type %T for sending to Kafka. Only string is supported.", value)
+				continue
+			}
+
+		} else {
+			event, err := json.Marshal(event)
+			if err != nil {
+				ref.done()
+				continue
+			}
+
+			jsonEvent = event
+		}
+		debugf("Message to send: %s", jsonEvent)
 		msg := &sarama.ProducerMessage{
 			Metadata: ref,
 			Topic:    topic,

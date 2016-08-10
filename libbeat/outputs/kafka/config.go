@@ -24,6 +24,7 @@ type kafkaConfig struct {
 	MaxRetries      int                `config:"max_retries"         validate:"min=-1,nonzero"`
 	ClientID        string             `config:"client_id"`
 	ChanBufferSize  int                `config:"channel_buffer_size" validate:"min=1"`
+	SendFieldOnly   string             `config:"send_field_only"`
 }
 
 var (
@@ -42,6 +43,7 @@ var (
 		MaxRetries:      3,
 		ClientID:        "beats",
 		ChanBufferSize:  256,
+		SendFieldOnly:   "",
 	}
 )
 
