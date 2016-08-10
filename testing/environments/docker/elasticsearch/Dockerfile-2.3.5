@@ -13,9 +13,9 @@ RUN arch="$(dpkg --print-architecture)" \
 RUN apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 46095ACC8548582C1A2699A9D27D666CD88E42B4
 
 ENV ELASTICSEARCH_MAJOR 2.3
-ENV ELASTICSEARCH_VERSION 2.3.3
+ENV ELASTICSEARCH_VERSION 2.3.5
 
-RUN wget https://download.elasticsearch.org/elasticsearch/staging/2.3.3-218bdf1/org/elasticsearch/distribution/deb/elasticsearch/2.3.3/elasticsearch-2.3.3.deb
+RUN wget https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/${ELASTICSEARCH_VERSION}/elasticsearch-${ELASTICSEARCH_VERSION}.deb
 
 RUN dpkg -i elasticsearch-${ELASTICSEARCH_VERSION}.deb
 

@@ -16,8 +16,7 @@ RUN arch="$(dpkg --print-architecture)" \
 	&& chmod +x /usr/local/bin/gosu
 
 RUN set -x \
-
-	&& curl -fSL "https://download.elastic.co/kibana/staging/5.0.0-alpha4-dea1cac/kibana/kibana-5.0.0-alpha4-linux-x64.tar.gz" -o kibana.tar.gz \
+	&& curl -fSL "https://download.elastic.co/kibana/kibana/kibana-5.0.0-alpha5-linux-x86_64.tar.gz" -o kibana.tar.gz \
 	&& mkdir -p /opt/kibana \
 	&& tar -xz --strip-components=1 -C /opt/kibana -f kibana.tar.gz \
 	&& chown -R kibana:kibana /opt/kibana \

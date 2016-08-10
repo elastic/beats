@@ -15,11 +15,10 @@ RUN arch="$(dpkg --print-architecture)" \
 	&& rm /usr/local/bin/gosu.asc \
 	&& chmod +x /usr/local/bin/gosu
 
-ENV KIBANA_VERSION 4.4.0
+ENV KIBANA_VERSION 4.5.4
 
 RUN set -x \
-
-	&& curl -fSL "https://download.elastic.co/kibana/kibana/kibana-4.5.1-linux-x64.tar.gz" -o kibana.tar.gz \
+	&& curl -fSL "https://download.elastic.co/kibana/kibana/kibana-${KIBANA_VERSION}-linux-x64.tar.gz" -o kibana.tar.gz \
 	&& mkdir -p /opt/kibana \
 	&& tar -xz --strip-components=1 -C /opt/kibana -f kibana.tar.gz \
 	&& chown -R kibana:kibana /opt/kibana \
