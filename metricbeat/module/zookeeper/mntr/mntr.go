@@ -35,7 +35,7 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("zookeeper", "mntr", New); err != nil {
+	if err := mb.Registry.AddExperimentalMetricSet("zookeeper", "mntr", New); err != nil {
 		panic(err)
 	}
 }

@@ -38,6 +38,8 @@ type Register struct {
 	modules map[string]ModuleFactory
 	// A map of module name to nested map of MetricSet name to MetricSetFactory.
 	metricSets map[string]map[string]MetricSetFactory
+
+	experimentalMetricSets map[string]bool
 }
 
 // NewRegister creates and returns a new Register.
@@ -45,6 +47,7 @@ func NewRegister() *Register {
 	return &Register{
 		modules:    make(map[string]ModuleFactory, initialSize),
 		metricSets: make(map[string]map[string]MetricSetFactory, initialSize),
+		experimentalMetricSets: map[string]bool{},
 	}
 }
 
@@ -99,6 +102,16 @@ func (r *Register) AddMetricSet(module string, name string, factory MetricSetFac
 
 	r.metricSets[module][name] = factory
 	logp.Info("MetricSet registered: %s/%s", module, name)
+	return nil
+}
+
+func (r *Register) AddExperimentalMetricSet(module string, name string, factory MetricSetFactory) error {
+	err := r.AddMetricSet(module,name,factory)
+	if err != nil {
+		return err
+	}
+
+	r.experimentalMetricSets[module + " - " + name] = true
 	return nil
 }
 
