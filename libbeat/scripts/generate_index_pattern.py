@@ -10,7 +10,8 @@ import argparse
 import string
 import re
 import json
-
+import os
+import errno
 
 def fields_to_json(section, path, output):
 
@@ -106,11 +107,16 @@ if __name__ == "__main__":
 
     # dump output to a json file
     fileName = get_index_pattern_name(args.index)
-    target = args.beat + "/etc/kibana/index-pattern/" + fileName + ".json"
+    target_dir = os.path.join(args.beat, "etc", "kibana", "index-pattern")
+    target_file =os.path.join(target_dir, fileName + ".json")
+
+    try: os.makedirs(target_dir)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST: raise
 
     output = json.dumps(output, indent=2)
 
-    with open(target, 'w') as f:
+    with open(target_file, 'w') as f:
         f.write(output)
 
-    print "The index pattern was created under {}".format(target)
+    print "The index pattern was created under {}".format(target_file)
