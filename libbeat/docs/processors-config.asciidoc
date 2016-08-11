@@ -111,12 +111,12 @@ contains:
 
 The `regexp` condition checks the field against a regular expression. The condition accepts only strings.
 
-For example, the following condition checks if the process name contains `foo`:
+For example, the following condition checks if the process name starts with `foo`:
 
 [source,yaml]
 -----
 reqexp:
-  proc.name: "foo.*"
+  system.process.name: "foo.*"
 -----
 
 [[condition-range]]
@@ -125,15 +125,15 @@ reqexp:
 The `range` condition checks if the field is in a certain range of values. The condition supports `lt`, `lte`, `gt` and `gte`. The
 condition accepts only integer or float values.
 
-For example, the following condition checks for the status of the transaction by comparing the `proc.code` field with
-300.
+For example, the following condition checks for failed HTTP transaction by comparing the `http.response.code` field with
+400.
 
 
 [source,yaml]
 ------
 range:
-    proc.code: 
-        gte: 300
+    http.response.code:
+        gte: 400
 ------
 
 that can be also translated to:
@@ -141,7 +141,7 @@ that can be also translated to:
 [source,yaml]
 ----
 range:
-    proc.code.gte: 300
+    http.response.code.gte: 400
 ----
 
 For example, the following condition checks if the CPU usage in percentage has a value between 0.5 and 0.8.
@@ -149,8 +149,8 @@ For example, the following condition checks if the CPU usage in percentage has a
 [source,yaml]
 ------
 range:
-    cpu.user_p.gte: 0.5
-    cpu.user_p.lt: 0.8
+    system.cpu.user.pct.gte: 0.5
+    system.cpu.user.pct.lt: 0.8
 ------
 
 
