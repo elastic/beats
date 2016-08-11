@@ -154,12 +154,12 @@ func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, er
 	return h, err
 }
 
-func (p *Prospector) startHarvester(state file.State, offset int64) (*harvester.Harvester, error) {
+func (p *Prospector) startHarvester(state file.State, offset int64) error {
 	state.Offset = offset
 	// Create harvester with state
 	h, err := p.createHarvester(state)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	p.wg.Add(1)
@@ -169,5 +169,5 @@ func (p *Prospector) startHarvester(state file.State, offset int64) (*harvester.
 		h.Harvest()
 	}()
 
-	return h, nil
+	return nil
 }

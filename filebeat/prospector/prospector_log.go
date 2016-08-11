@@ -157,7 +157,10 @@ func (p *ProspectorLog) scan() {
 		// Decides if previous state exists
 		if lastState.IsEmpty() {
 			logp.Debug("prospector", "Start harvester for new file: %s", newState.Source)
-			p.Prospector.startHarvester(newState, 0)
+			err := p.Prospector.startHarvester(newState, 0)
+			if err != nil {
+				logp.Err("Harvester could not be started on new file: %s", err)
+			}
 		} else {
 			p.harvestExistingFile(newState, lastState)
 		}
@@ -177,14 +180,20 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 		// This could also be an issue with force_close_older that a new harvester is started after each scan but not needed?
 		// One problem with comparing modTime is that it is in seconds, and scans can happen more then once a second
 		logp.Debug("prospector", "Resuming harvesting of file: %s, offset: %v", newState.Source, oldState.Offset)
-		p.Prospector.startHarvester(newState, oldState.Offset)
+		err := p.Prospector.startHarvester(newState, oldState.Offset)
+		if err != nil {
+			logp.Err("Harvester could not be started on existing file: %s", err)
+		}
 		return
 	}
 
 	// File size was reduced -> truncated file
 	if oldState.Finished && newState.Fileinfo.Size() < oldState.Offset {
 		logp.Debug("prospector", "Old file was truncated. Starting from the beginning: %s", newState.Source)
-		p.Prospector.startHarvester(newState, 0)
+		err := p.Prospector.startHarvester(newState, 0)
+		if err != nil {
+			logp.Err("Harvester could not be started on truncated file: %s", err)
+		}
 
 		filesTrucated.Add(1)
 		return
