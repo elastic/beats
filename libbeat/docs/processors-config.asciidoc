@@ -171,15 +171,15 @@ or:
 
 -------
 
-For example the condition `http.code = 304 OR http.code = 404` translates to: 
+For example the condition `http.response.code = 304 OR http.response.code = 404` translates to: 
 
 [source,yaml]
 ------
 or:
   - equals:
-      http.code: 304
+      http.response.code: 304
   - equals:
-      http.code: 404
+      http.response.code: 404
 ------
 
 
@@ -198,13 +198,13 @@ and:
 
 -------
 
-For example the condition `http.code = 200 AND status = OK` translates to: 
+For example the condition `http.response.code = 200 AND status = OK` translates to: 
 
 [source,yaml]
 ------
 and:
   - equals:
-      http.code: 200
+      http.response.code: 200
   - equals:
       status: OK
 ------
