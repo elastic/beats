@@ -191,7 +191,7 @@ func (k *kafka) Close() error {
 func (k *kafka) PublishEvent(
 	signal op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	event outputs.Data,
 ) error {
 	mode, err := k.getMode(opts)
 	if err != nil {
@@ -203,7 +203,7 @@ func (k *kafka) PublishEvent(
 func (k *kafka) BulkPublish(
 	signal op.Signaler,
 	opts outputs.Options,
-	event []common.MapStr,
+	event []outputs.Data,
 ) error {
 	mode, err := k.getMode(opts)
 	if err != nil {

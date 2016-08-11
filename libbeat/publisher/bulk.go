@@ -3,8 +3,8 @@ package publisher
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 type bulkWorker struct {
@@ -17,8 +17,8 @@ type bulkWorker struct {
 	flushTicker *time.Ticker
 
 	maxBatchSize int
-	events       []common.MapStr // batched events
-	pending      []op.Signaler   // pending signalers for batched events
+	events       []outputs.Data // batched events
+	pending      []op.Signaler  // pending signalers for batched events
 }
 
 func newBulkWorker(
@@ -34,7 +34,7 @@ func newBulkWorker(
 		bulkQueue:    make(chan message, bulkHWM),
 		flushTicker:  time.NewTicker(flushInterval),
 		maxBatchSize: maxBatchSize,
-		events:       make([]common.MapStr, 0, maxBatchSize),
+		events:       make([]outputs.Data, 0, maxBatchSize),
 		pending:      nil,
 	}
 
@@ -70,7 +70,7 @@ func (b *bulkWorker) flush() {
 	}
 }
 
-func (b *bulkWorker) onEvent(ctx *Context, event common.MapStr) {
+func (b *bulkWorker) onEvent(ctx *Context, event outputs.Data) {
 	b.events = append(b.events, event)
 	b.guaranteed = b.guaranteed || ctx.Guaranteed
 
@@ -84,7 +84,7 @@ func (b *bulkWorker) onEvent(ctx *Context, event common.MapStr) {
 	}
 }
 
-func (b *bulkWorker) onEvents(ctx *Context, events []common.MapStr) {
+func (b *bulkWorker) onEvents(ctx *Context, events []outputs.Data) {
 	for len(events) > 0 {
 		// split up bulk to match required bulk sizes.
 		// If input events have been split up bufferFull will be set and
@@ -122,13 +122,12 @@ func (b *bulkWorker) publish() {
 			publishOptions: publishOptions{Guaranteed: b.guaranteed},
 			Signal:         op.CombineSignalers(b.pending...),
 		},
-		event:  nil,
 		events: b.events,
 	})
 
 	b.pending = nil
 	b.guaranteed = false
-	b.events = make([]common.MapStr, 0, b.maxBatchSize)
+	b.events = make([]outputs.Data, 0, b.maxBatchSize)
 }
 
 func (b *bulkWorker) shutdown() {

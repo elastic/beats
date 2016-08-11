@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 type encoder struct {
@@ -27,7 +28,7 @@ func makeLogstashEventEncoder(beat string) (func(interface{}) ([]byte, error), e
 	}
 
 	cb := func(rawEvent interface{}) ([]byte, error) {
-		event := rawEvent.(common.MapStr)
+		event := rawEvent.(outputs.Data).Event
 		buf := enc.buf
 		buf.Reset()
 

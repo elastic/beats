@@ -79,7 +79,7 @@ func (s *Mode) closeClient() error {
 func (s *Mode) PublishEvents(
 	signaler op.Signaler,
 	opts outputs.Options,
-	events []common.MapStr,
+	events []outputs.Data,
 ) error {
 	return s.publish(signaler, opts, func() (bool, bool) {
 		for len(events) > 0 {
@@ -103,7 +103,7 @@ func (s *Mode) PublishEvents(
 func (s *Mode) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	event outputs.Data,
 ) error {
 	return s.publish(signaler, opts, func() (bool, bool) {
 		if err := s.conn.PublishEvent(event); err != nil {

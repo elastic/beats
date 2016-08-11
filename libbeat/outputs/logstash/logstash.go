@@ -164,7 +164,7 @@ func (lj *logstash) Close() error {
 func (lj *logstash) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	event outputs.Data,
 ) error {
 	return lj.mode.PublishEvent(signaler, opts, event)
 }
@@ -174,7 +174,7 @@ func (lj *logstash) PublishEvent(
 func (lj *logstash) BulkPublish(
 	trans op.Signaler,
 	opts outputs.Options,
-	events []common.MapStr,
+	events []outputs.Data,
 ) error {
 	return lj.mode.PublishEvents(trans, opts, events)
 }

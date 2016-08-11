@@ -5,8 +5,8 @@ import (
 
 	"github.com/elastic/go-lumber/client/v2"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -59,16 +59,16 @@ func (c *client) Close() error {
 	return c.Client.Close()
 }
 
-func (c *client) PublishEvent(event common.MapStr) error {
-	_, err := c.PublishEvents([]common.MapStr{event})
+func (c *client) PublishEvent(event outputs.Data) error {
+	_, err := c.PublishEvents([]outputs.Data{event})
 	return err
 }
 
 // PublishEvents sends all events to logstash. On error a slice with all events
 // not published or confirmed to be processed by logstash will be returned.
 func (l *client) PublishEvents(
-	events []common.MapStr,
-) ([]common.MapStr, error) {
+	events []outputs.Data,
+) ([]outputs.Data, error) {
 	publishEventsCallCount.Add(1)
 	totalNumberOfEvents := len(events)
 	for len(events) > 0 {
@@ -96,7 +96,7 @@ func (l *client) PublishEvents(
 // publishWindowed published events with current maximum window size to logstash
 // returning the total number of events sent (due to window size, or acks until
 // failure).
-func (c *client) publishWindowed(events []common.MapStr) (int, error) {
+func (c *client) publishWindowed(events []outputs.Data) (int, error) {
 	if len(events) == 0 {
 		return 0, nil
 	}
@@ -120,7 +120,7 @@ func (c *client) publishWindowed(events []common.MapStr) (int, error) {
 	return len(events), nil
 }
 
-func (c *client) sendEvents(events []common.MapStr) (int, error) {
+func (c *client) sendEvents(events []outputs.Data) (int, error) {
 	if len(events) == 0 {
 		return 0, nil
 	}

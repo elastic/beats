@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -54,7 +54,7 @@ func TestBulkWorkerSendBatch(t *testing.T) {
 	}
 	bw := newBulkWorker(ws, queueSize, 0, mh, time.Duration(time.Hour), maxBatchSize)
 
-	events := make([]common.MapStr, maxBatchSize)
+	events := make([]outputs.Data, maxBatchSize)
 	for i := range events {
 		events[i] = testEvent()
 	}
@@ -86,7 +86,7 @@ func TestBulkWorkerSendBatchGreaterThanMaxBatchSize(t *testing.T) {
 	bw := newBulkWorker(ws, queueSize, 0, mh, flushInterval, maxBatchSize)
 
 	// Send
-	events := make([]common.MapStr, maxBatchSize+1)
+	events := make([]outputs.Data, maxBatchSize+1)
 	for i := range events {
 		events[i] = testEvent()
 	}

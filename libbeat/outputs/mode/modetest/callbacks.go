@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 type errNetTimeout struct{}
@@ -34,15 +34,15 @@ func ConnectFailN(n int, err error) func(time.Duration) error {
 	}
 }
 
-func PublishIgnore([]common.MapStr) ([]common.MapStr, error) {
+func PublishIgnore([]outputs.Data) ([]outputs.Data, error) {
 	return nil, nil
 }
 
 func PublishCollect(
-	collected *[][]common.MapStr,
-) func(events []common.MapStr) ([]common.MapStr, error) {
+	collected *[][]outputs.Data,
+) func(events []outputs.Data) ([]outputs.Data, error) {
 	mutex := sync.Mutex{}
-	return func(events []common.MapStr) ([]common.MapStr, error) {
+	return func(events []outputs.Data) ([]outputs.Data, error) {
 		mutex.Lock()
 		defer mutex.Unlock()
 
@@ -53,18 +53,18 @@ func PublishCollect(
 
 func PublishFailStart(
 	n int,
-	pub func(events []common.MapStr) ([]common.MapStr, error),
-) func(events []common.MapStr) ([]common.MapStr, error) {
+	pub func(events []outputs.Data) ([]outputs.Data, error),
+) func(events []outputs.Data) ([]outputs.Data, error) {
 	return PublishFailWith(n, errNetTimeout{}, pub)
 }
 
 func PublishFailWith(
 	n int,
 	err error,
-	pub func([]common.MapStr) ([]common.MapStr, error),
-) func([]common.MapStr) ([]common.MapStr, error) {
+	pub func([]outputs.Data) ([]outputs.Data, error),
+) func([]outputs.Data) ([]outputs.Data, error) {
 	inc := makeCounter(n, err)
-	return func(events []common.MapStr) ([]common.MapStr, error) {
+	return func(events []outputs.Data) ([]outputs.Data, error) {
 		if err := inc(); err != nil {
 			return events, err
 		}
@@ -74,28 +74,28 @@ func PublishFailWith(
 
 func PublishCollectAfterFailStart(
 	n int,
-	collected *[][]common.MapStr,
-) func(events []common.MapStr) ([]common.MapStr, error) {
+	collected *[][]outputs.Data,
+) func(events []outputs.Data) ([]outputs.Data, error) {
 	return PublishFailStart(n, PublishCollect(collected))
 }
 
 func PublishCollectAfterFailStartWith(
 	n int,
 	err error,
-	collected *[][]common.MapStr,
-) func(events []common.MapStr) ([]common.MapStr, error) {
+	collected *[][]outputs.Data,
+) func(events []outputs.Data) ([]outputs.Data, error) {
 	return PublishFailWith(n, err, PublishCollect(collected))
 }
 
-func AsyncPublishIgnore(func([]common.MapStr, error), []common.MapStr) error {
+func AsyncPublishIgnore(func([]outputs.Data, error), []outputs.Data) error {
 	return nil
 }
 
 func AsyncPublishCollect(
-	collected *[][]common.MapStr,
-) func(func([]common.MapStr, error), []common.MapStr) error {
+	collected *[][]outputs.Data,
+) func(func([]outputs.Data, error), []outputs.Data) error {
 	mutex := sync.Mutex{}
-	return func(cb func([]common.MapStr, error), events []common.MapStr) error {
+	return func(cb func([]outputs.Data, error), events []outputs.Data) error {
 		mutex.Lock()
 		defer mutex.Unlock()
 
@@ -107,18 +107,18 @@ func AsyncPublishCollect(
 
 func AsyncPublishFailStart(
 	n int,
-	pub func(func([]common.MapStr, error), []common.MapStr) error,
-) func(func([]common.MapStr, error), []common.MapStr) error {
+	pub func(func([]outputs.Data, error), []outputs.Data) error,
+) func(func([]outputs.Data, error), []outputs.Data) error {
 	return AsyncPublishFailStartWith(n, errNetTimeout{}, pub)
 }
 
 func AsyncPublishFailStartWith(
 	n int,
 	err error,
-	pub func(func([]common.MapStr, error), []common.MapStr) error,
-) func(func([]common.MapStr, error), []common.MapStr) error {
+	pub func(func([]outputs.Data, error), []outputs.Data) error,
+) func(func([]outputs.Data, error), []outputs.Data) error {
 	inc := makeCounter(n, err)
-	return func(cb func([]common.MapStr, error), events []common.MapStr) error {
+	return func(cb func([]outputs.Data, error), events []outputs.Data) error {
 		if err := inc(); err != nil {
 			return err
 		}
@@ -128,16 +128,16 @@ func AsyncPublishFailStartWith(
 
 func AsyncPublishCollectAfterFailStart(
 	n int,
-	collected *[][]common.MapStr,
-) func(func([]common.MapStr, error), []common.MapStr) error {
+	collected *[][]outputs.Data,
+) func(func([]outputs.Data, error), []outputs.Data) error {
 	return AsyncPublishFailStart(n, AsyncPublishCollect(collected))
 }
 
 func AsyncPublishCollectAfterFailStartWith(
 	n int,
 	err error,
-	collected *[][]common.MapStr,
-) func(func([]common.MapStr, error), []common.MapStr) error {
+	collected *[][]outputs.Data,
+) func(func([]outputs.Data, error), []outputs.Data) error {
 	return AsyncPublishFailStartWith(n, err, AsyncPublishCollect(collected))
 }
 

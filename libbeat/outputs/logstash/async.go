@@ -6,8 +6,8 @@ import (
 
 	"github.com/elastic/go-lumber/client/v2"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -21,9 +21,9 @@ type asyncClient struct {
 
 type msgRef struct {
 	count     int32
-	batch     []common.MapStr
+	batch     []outputs.Data
 	err       error
-	cb        func([]common.MapStr, error)
+	cb        func([]outputs.Data, error)
 	win       *window
 	batchSize int
 }
@@ -76,15 +76,15 @@ func (c *asyncClient) Close() error {
 
 func (c *asyncClient) AsyncPublishEvent(
 	cb func(error),
-	event common.MapStr,
+	event outputs.Data,
 ) error {
 	data := []interface{}{event}
 	return c.client.Send(func(seq uint32, err error) { cb(err) }, data)
 }
 
 func (c *asyncClient) AsyncPublishEvents(
-	cb func([]common.MapStr, error),
-	events []common.MapStr,
+	cb func([]outputs.Data, error),
+	events []outputs.Data,
 ) error {
 	publishEventsCallCount.Add(1)
 
@@ -126,7 +126,7 @@ func (c *asyncClient) AsyncPublishEvents(
 
 func (c *asyncClient) publishWindowed(
 	ref *msgRef,
-	events []common.MapStr,
+	events []outputs.Data,
 ) (int, error) {
 	batchSize := len(events)
 	windowSize := c.win.get()
@@ -146,7 +146,7 @@ func (c *asyncClient) publishWindowed(
 	return len(events), nil
 }
 
-func (c *asyncClient) sendEvents(ref *msgRef, events []common.MapStr) error {
+func (c *asyncClient) sendEvents(ref *msgRef, events []outputs.Data) error {
 	window := make([]interface{}, len(events))
 	for i, event := range events {
 		window[i] = event

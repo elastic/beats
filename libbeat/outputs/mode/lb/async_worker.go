@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
@@ -111,7 +112,7 @@ func (w *asyncWorker) sendLoop() (done bool) {
 
 func (w *asyncWorker) onMessage(msg eventsMessage) error {
 	var err error
-	if msg.event != nil {
+	if msg.event.Event != nil {
 		err = w.client.AsyncPublishEvent(w.handleResult(msg), msg.event)
 	} else {
 		err = w.client.AsyncPublishEvents(w.handleResults(msg), msg.events)
@@ -145,9 +146,9 @@ func (w *asyncWorker) handleResult(msg eventsMessage) func(error) {
 	}
 }
 
-func (w *asyncWorker) handleResults(msg eventsMessage) func([]common.MapStr, error) {
+func (w *asyncWorker) handleResults(msg eventsMessage) func([]outputs.Data, error) {
 	total := len(msg.events)
-	return func(events []common.MapStr, err error) {
+	return func(events []outputs.Data, err error) {
 		debugf("handleResults")
 
 		if err != nil {

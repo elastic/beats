@@ -5,8 +5,8 @@ package publisher
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,7 +32,7 @@ func TestAsyncPublishEvent(t *testing.T) {
 func TestAsyncPublishEvents(t *testing.T) {
 	// Init
 	testPub := newTestPublisherNoBulk(CompletedResponse)
-	events := []common.MapStr{testEvent(), testEvent()}
+	events := []outputs.Data{testEvent(), testEvent()}
 
 	defer testPub.Stop()
 
@@ -51,7 +51,7 @@ func TestAsyncPublishEvents(t *testing.T) {
 func TestAsyncShutdownPublishEvents(t *testing.T) {
 	// Init
 	testPub := newTestPublisherNoBulk(CompletedResponse)
-	events := []common.MapStr{testEvent(), testEvent()}
+	events := []outputs.Data{testEvent(), testEvent()}
 
 	// Execute. Async PublishEvent always immediately returns true.
 	assert.True(t, testPub.asyncPublishEvents(events))
@@ -95,7 +95,7 @@ func TestBulkAsyncPublishEvent(t *testing.T) {
 func TestBulkAsyncPublishEvents(t *testing.T) {
 	// Init
 	testPub := newTestPublisherWithBulk(CompletedResponse)
-	events := []common.MapStr{testEvent(), testEvent()}
+	events := []outputs.Data{testEvent(), testEvent()}
 
 	defer testPub.Stop()
 
@@ -113,7 +113,7 @@ func TestBulkAsyncPublishEvents(t *testing.T) {
 func TestBulkAsyncShutdownPublishEvents(t *testing.T) {
 	// Init
 	testPub := newTestPublisherWithBulk(CompletedResponse)
-	events := []common.MapStr{testEvent(), testEvent()}
+	events := []outputs.Data{testEvent(), testEvent()}
 
 	// Async PublishEvent always immediately returns true.
 	assert.True(t, testPub.asyncPublishEvents(events))

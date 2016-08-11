@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // Metrics that can retrieved through the expvar web interface.
@@ -103,19 +104,21 @@ func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
 
 	ctx, pipeline := c.getPipeline(opts)
 	publishedEvents.Add(1)
-	return pipeline.publish(message{client: c, context: ctx, event: *publishEvent})
+	return pipeline.publish(message{
+		client:  c,
+		context: ctx,
+		event:   outputs.Data{Event: *publishEvent},
+	})
 }
 
 func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
-	// optimization: shares the backing array and capacity
-	publishEvents := events[:0]
-
+	publishEvents := make([]outputs.Data, 0, len(events))
 	for _, event := range events {
 		c.annotateEvent(event)
 
 		publishEvent := c.filterEvent(event)
 		if publishEvent != nil {
-			publishEvents = append(publishEvents, *publishEvent)
+			publishEvents = append(publishEvents, outputs.Data{Event: *publishEvent})
 		}
 	}
 

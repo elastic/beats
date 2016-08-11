@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
@@ -101,7 +101,7 @@ func (t *testSyncDriver) Close() {
 	t.ch <- testDriverCommand{code: driverCmdClose}
 }
 
-func (t *testSyncDriver) Publish(events []common.MapStr) {
+func (t *testSyncDriver) Publish(events []outputs.Data) {
 	t.ch <- testDriverCommand{code: driverCmdPublish, events: events}
 }
 

@@ -4,8 +4,8 @@ import (
 	"expvar"
 	"sync"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // Metrics that can retrieved through the expvar web interface.
@@ -32,8 +32,8 @@ type workerSignal struct {
 type message struct {
 	client  *client
 	context Context
-	event   common.MapStr
-	events  []common.MapStr
+	event   outputs.Data
+	events  []outputs.Data
 }
 
 type messageHandler interface {
@@ -112,7 +112,7 @@ func stopQueue(qu chan message) {
 
 func send(qu, bulkQu chan message, m message) {
 	var ch chan message
-	if m.event != nil {
+	if m.event.Event != nil {
 		ch = qu
 	} else {
 		ch = bulkQu

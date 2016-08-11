@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
@@ -26,8 +27,8 @@ type client struct {
 
 type msgRef struct {
 	count int32
-	batch []common.MapStr
-	cb    func([]common.MapStr, error)
+	batch []outputs.Data
+	cb    func([]outputs.Data, error)
 
 	err error
 }
@@ -83,16 +84,16 @@ func (c *client) Close() error {
 
 func (c *client) AsyncPublishEvent(
 	cb func(error),
-	event common.MapStr,
+	event outputs.Data,
 ) error {
-	return c.AsyncPublishEvents(func(_ []common.MapStr, err error) {
+	return c.AsyncPublishEvents(func(_ []outputs.Data, err error) {
 		cb(err)
-	}, []common.MapStr{event})
+	}, []outputs.Data{event})
 }
 
 func (c *client) AsyncPublishEvents(
-	cb func([]common.MapStr, error),
-	events []common.MapStr,
+	cb func([]outputs.Data, error),
+	events []outputs.Data,
 ) error {
 	publishEventsCallCount.Add(1)
 	debugf("publish events")
@@ -106,13 +107,12 @@ func (c *client) AsyncPublishEvents(
 	ch := c.producer.Input()
 
 	for _, event := range events {
-		topic, err := c.topic.Select(event)
-
+		topic, err := c.topic.Select(event.Event)
 		var ts time.Time
 
 		// message timestamps have been added to kafka with version 0.10.0.0
 		if c.config.Version.IsAtLeast(sarama.V0_10_0_0) {
-			if tsRaw, ok := event["@timestamp"]; ok {
+			if tsRaw, ok := event.Event["@timestamp"]; ok {
 				if tmp, ok := tsRaw.(common.Time); ok {
 					ts = time.Time(tmp)
 				} else if tmp, ok := tsRaw.(time.Time); ok {
@@ -121,7 +121,7 @@ func (c *client) AsyncPublishEvents(
 			}
 		}
 
-		jsonEvent, err := json.Marshal(event)
+		jsonEvent, err := json.Marshal(event.Event)
 		if err != nil {
 			ref.done()
 			continue

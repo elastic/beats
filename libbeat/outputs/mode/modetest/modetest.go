@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
@@ -13,8 +12,8 @@ import (
 
 type MockClient struct {
 	Connected      bool
-	CBPublish      func([]common.MapStr) ([]common.MapStr, error)
-	CBAsyncPublish func(func([]common.MapStr, error), []common.MapStr) error
+	CBPublish      func([]outputs.Data) ([]outputs.Data, error)
+	CBAsyncPublish func(func([]outputs.Data, error), []outputs.Data) error
 	CBClose        func() error
 	CBConnect      func(time.Duration) error
 }
@@ -59,23 +58,23 @@ func (c *MockClient) Close() error {
 	return err
 }
 
-func (c *MockClient) PublishEvents(events []common.MapStr) ([]common.MapStr, error) {
+func (c *MockClient) PublishEvents(events []outputs.Data) ([]outputs.Data, error) {
 	return c.CBPublish(events)
 }
 
-func (c *MockClient) PublishEvent(event common.MapStr) error {
-	_, err := c.PublishEvents([]common.MapStr{event})
+func (c *MockClient) PublishEvent(event outputs.Data) error {
+	_, err := c.PublishEvents([]outputs.Data{event})
 	return err
 }
 
-func (c *MockClient) AsyncPublishEvents(cb func([]common.MapStr, error), events []common.MapStr) error {
+func (c *MockClient) AsyncPublishEvents(cb func([]outputs.Data, error), events []outputs.Data) error {
 	return c.CBAsyncPublish(cb, events)
 }
 
-func (c *MockClient) AsyncPublishEvent(cb func(error), event common.MapStr) error {
+func (c *MockClient) AsyncPublishEvent(cb func(error), event outputs.Data) error {
 	return c.AsyncPublishEvents(
-		func(evts []common.MapStr, err error) { cb(err) },
-		[]common.MapStr{event})
+		func(evts []outputs.Data, err error) { cb(err) },
+		[]outputs.Data{event})
 }
 
 func SyncClients(n int, tmpl *MockClient) []mode.ProtocolClient {
@@ -100,7 +99,7 @@ func TestMode(
 	opts outputs.Options,
 	events []EventInfo,
 	expectedSignals []bool,
-	collectedEvents *[][]common.MapStr,
+	collectedEvents *[][]outputs.Data,
 ) {
 	defer func() {
 		err := mode.Close()
@@ -122,7 +121,7 @@ func TestMode(
 		}
 	}
 
-	var expectedEvents [][]common.MapStr
+	var expectedEvents [][]outputs.Data
 	ch := make(chan op.SignalResponse, numSignals)
 	signal := &op.SignalChannel{ch}
 	idx := 0
@@ -131,7 +130,7 @@ func TestMode(
 			for _, event := range pubEvents.Events {
 				_ = mode.PublishEvent(signal, opts, event)
 				if expectedSignals[idx] {
-					expectedEvents = append(expectedEvents, []common.MapStr{event})
+					expectedEvents = append(expectedEvents, []outputs.Data{event})
 				}
 				idx++
 			}

@@ -5,7 +5,7 @@ package publisher
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,7 +25,7 @@ func TestSyncPublishEventSuccess(t *testing.T) {
 
 func TestSyncPublishEventsSuccess(t *testing.T) {
 	testPub := newTestPublisherNoBulk(CompletedResponse)
-	events := []common.MapStr{testEvent(), testEvent()}
+	events := []outputs.Data{testEvent(), testEvent()}
 
 	assert.True(t, testPub.syncPublishEvents(events))
 
@@ -52,7 +52,7 @@ func TestSyncPublishEventFailed(t *testing.T) {
 
 func TestSyncPublishEventsFailed(t *testing.T) {
 	testPub := newTestPublisherNoBulk(FailedResponse)
-	events := []common.MapStr{testEvent(), testEvent()}
+	events := []outputs.Data{testEvent(), testEvent()}
 
 	assert.False(t, testPub.syncPublishEvents(events))
 

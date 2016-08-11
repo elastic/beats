@@ -47,15 +47,15 @@ func (c *console) Close() error {
 func (c *console) PublishEvent(
 	s op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	event outputs.Data,
 ) error {
 	var jsonEvent []byte
 	var err error
 
 	if c.config.Pretty {
-		jsonEvent, err = json.MarshalIndent(event, "", "  ")
+		jsonEvent, err = json.MarshalIndent(event.Event, "", "  ")
 	} else {
-		jsonEvent, err = json.Marshal(event)
+		jsonEvent, err = json.Marshal(event.Event)
 	}
 	if err != nil {
 		logp.Err("Fail to convert the event to JSON (%v): %#v", err, event)

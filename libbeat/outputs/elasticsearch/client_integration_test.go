@@ -167,12 +167,12 @@ func TestOutputLoadTemplate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	event := common.MapStr{
+	event := outputs.Data{Event: common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"host":       "test-host",
 		"type":       "libbeat",
 		"message":    "Test message from libbeat",
-	}
+	}}
 
 	err = output.PublishEvent(nil, outputs.Options{Guaranteed: true}, event)
 	if err != nil {
@@ -194,11 +194,11 @@ func TestClientPublishEvent(t *testing.T) {
 	// drop old index preparing test
 	client.Delete(index, "", "", nil)
 
-	event := common.MapStr{
+	event := outputs.Data{Event: common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"type":       "libbeat",
 		"message":    "Test message from libbeat",
-	}
+	}}
 	err := output.PublishEvent(nil, outputs.Options{Guaranteed: true}, event)
 	if err != nil {
 		t.Fatal(err)
@@ -234,7 +234,8 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	client.Delete(index, "", "", nil)
 
 	publish := func(event common.MapStr) {
-		err := output.PublishEvent(nil, outputs.Options{Guaranteed: true}, event)
+		opts := outputs.Options{Guaranteed: true}
+		err := output.PublishEvent(nil, opts, outputs.Data{Event: event})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -310,8 +311,9 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	})
 	client.Delete(index, "", "", nil)
 
-	publish := func(events ...common.MapStr) {
-		err := output.BulkPublish(nil, outputs.Options{Guaranteed: true}, events)
+	publish := func(events ...outputs.Data) {
+		opts := outputs.Options{Guaranteed: true}
+		err := output.BulkPublish(nil, opts, events)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -349,19 +351,19 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	publish(
-		common.MapStr{
+		outputs.Data{Event: common.MapStr{
 			"@timestamp": common.Time(time.Now()),
 			"type":       "libbeat",
 			"message":    "Test message 1",
 			"pipeline":   pipeline,
 			"testfield":  0,
-		},
-		common.MapStr{
+		}},
+		outputs.Data{Event: common.MapStr{
 			"@timestamp": common.Time(time.Now()),
 			"type":       "libbeat",
 			"message":    "Test message 2",
 			"testfield":  0,
-		},
+		}},
 	)
 
 	_, _, err = client.Refresh(index)

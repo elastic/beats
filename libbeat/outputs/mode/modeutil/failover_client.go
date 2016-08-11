@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
@@ -53,14 +53,14 @@ func (f *failOverClient) Close() error {
 	return closeActive(f)
 }
 
-func (f *failOverClient) PublishEvents(events []common.MapStr) ([]common.MapStr, error) {
+func (f *failOverClient) PublishEvents(events []outputs.Data) ([]outputs.Data, error) {
 	if f.active < 0 {
 		return events, errNoActiveConnection
 	}
 	return f.conns[f.active].PublishEvents(events)
 }
 
-func (f *failOverClient) PublishEvent(event common.MapStr) error {
+func (f *failOverClient) PublishEvent(event outputs.Data) error {
 	if f.active < 0 {
 		return errNoActiveConnection
 	}
@@ -90,8 +90,8 @@ func (f *asyncFailOverClient) Close() error {
 }
 
 func (f *asyncFailOverClient) AsyncPublishEvents(
-	cb func([]common.MapStr, error),
-	events []common.MapStr,
+	cb func([]outputs.Data, error),
+	events []outputs.Data,
 ) error {
 	if f.active < 0 {
 		return errNoActiveConnection
@@ -101,7 +101,7 @@ func (f *asyncFailOverClient) AsyncPublishEvents(
 
 func (f *asyncFailOverClient) AsyncPublishEvent(
 	cb func(error),
-	event common.MapStr,
+	event outputs.Data,
 ) error {
 	if f.active < 0 {
 		return errNoActiveConnection

@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
@@ -21,8 +22,8 @@ var (
 
 type publishFn func(
 	keys outil.Selector,
-	events []common.MapStr,
-) ([]common.MapStr, error)
+	events []outputs.Data,
+) ([]outputs.Data, error)
 
 type client struct {
 	*transport.Client
@@ -95,12 +96,12 @@ func (c *client) Close() error {
 	return c.Client.Close()
 }
 
-func (c *client) PublishEvent(event common.MapStr) error {
-	_, err := c.PublishEvents([]common.MapStr{event})
+func (c *client) PublishEvent(event outputs.Data) error {
+	_, err := c.PublishEvents([]outputs.Data{event})
 	return err
 }
 
-func (c *client) PublishEvents(events []common.MapStr) ([]common.MapStr, error) {
+func (c *client) PublishEvents(events []outputs.Data) ([]outputs.Data, error) {
 	return c.publish(c.key, events)
 }
 
@@ -169,7 +170,7 @@ func makePublishPUBLISH(conn redis.Conn) (publishFn, error) {
 func publishEventsBulk(conn redis.Conn, key outil.Selector, command string) publishFn {
 	// XXX: requires key.IsConst() == true
 	dest, _ := key.Select(common.MapStr{})
-	return func(_ outil.Selector, events []common.MapStr) ([]common.MapStr, error) {
+	return func(_ outil.Selector, events []outputs.Data) ([]outputs.Data, error) {
 		args := make([]interface{}, 1, len(events)+1)
 		args[0] = dest
 
@@ -190,8 +191,8 @@ func publishEventsBulk(conn redis.Conn, key outil.Selector, command string) publ
 }
 
 func publishEventsPipeline(conn redis.Conn, command string) publishFn {
-	return func(key outil.Selector, events []common.MapStr) ([]common.MapStr, error) {
-		var okEvents []common.MapStr
+	return func(key outil.Selector, events []outputs.Data) ([]outputs.Data, error) {
+		var okEvents []outputs.Data
 		serialized := make([]interface{}, 0, len(events))
 		okEvents, serialized = serializeEvents(serialized, 0, events)
 		if len(serialized) == 0 {
@@ -200,7 +201,7 @@ func publishEventsPipeline(conn redis.Conn, command string) publishFn {
 
 		events = okEvents[:0]
 		for i, serializedEvent := range serialized {
-			eventKey, err := key.Select(okEvents[i])
+			eventKey, err := key.Select(okEvents[i].Event)
 			if err != nil {
 				logp.Err("Failed to set redis key: %v", err)
 				continue
@@ -243,11 +244,11 @@ func publishEventsPipeline(conn redis.Conn, command string) publishFn {
 func serializeEvents(
 	to []interface{},
 	i int,
-	events []common.MapStr,
-) ([]common.MapStr, []interface{}) {
+	events []outputs.Data,
+) ([]outputs.Data, []interface{}) {
 	okEvents := events
 	for _, event := range events {
-		jsonEvent, err := json.Marshal(event)
+		jsonEvent, err := json.Marshal(event.Event)
 		if err != nil {
 			logp.Err("Failed to convert the event to JSON (%v): %#v", err, event)
 			goto failLoop

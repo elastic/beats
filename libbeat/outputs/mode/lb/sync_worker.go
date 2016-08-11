@@ -112,7 +112,7 @@ func (w *syncWorker) sendLoop() (done bool) {
 func (w *syncWorker) onMessage(msg eventsMessage) error {
 	client := w.client
 
-	if msg.event != nil {
+	if msg.event.Event != nil {
 		err := client.PublishEvent(msg.event)
 		if err != nil {
 			if msg.attemptsLeft > 0 {

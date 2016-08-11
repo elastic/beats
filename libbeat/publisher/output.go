@@ -64,19 +64,20 @@ func (o *outputWorker) onStop() {
 }
 
 func (o *outputWorker) onMessage(m message) {
-	if m.event != nil {
+	if m.event.Event != nil {
 		o.onEvent(&m.context, m.event)
 	} else {
 		o.onBulk(&m.context, m.events)
 	}
 }
 
-func (o *outputWorker) onEvent(ctx *Context, event common.MapStr) {
+func (o *outputWorker) onEvent(ctx *Context, event outputs.Data) {
 	debug("output worker: publish single event")
-	o.out.PublishEvent(ctx.Signal, outputs.Options{Guaranteed: ctx.Guaranteed}, event)
+	opts := outputs.Options{Guaranteed: ctx.Guaranteed}
+	o.out.PublishEvent(ctx.Signal, opts, event)
 }
 
-func (o *outputWorker) onBulk(ctx *Context, events []common.MapStr) {
+func (o *outputWorker) onBulk(ctx *Context, events []outputs.Data) {
 	if len(events) == 0 {
 		debug("output worker: no events to publish")
 		op.SigCompleted(ctx.Signal)
@@ -103,7 +104,7 @@ func (o *outputWorker) onBulk(ctx *Context, events []common.MapStr) {
 
 func (o *outputWorker) sendBulk(
 	ctx *Context,
-	events []common.MapStr,
+	events []outputs.Data,
 ) {
 	debug("output worker: publish %v events", len(events))
 
