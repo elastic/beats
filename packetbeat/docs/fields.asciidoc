@@ -1114,23 +1114,26 @@ optional TCP connection id
 HTTP-specific event fields.
 
 
+[float]
+== http Fields
+
+Information about the HTTP request and response.
+
 
 [float]
-=== http.code
+== request Fields
 
-example: 404
+HTTP request
 
-The HTTP status code.
-
-[float]
-=== http.phrase
-
-example: Not found.
-
-The HTTP status phrase.
 
 [float]
-=== http.request_headers
+=== http.request.params
+
+The query parameters or form values. The query parameters are available in the Request-URI and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
+
+
+[float]
+=== http.request.headers
 
 type: dict
 
@@ -1138,7 +1141,34 @@ A map containing the captured header fields from the request. Which headers to c
 
 
 [float]
-=== http.response_headers
+=== http.request.body
+
+type: text
+
+The body of the HTTP request.
+
+[float]
+== response Fields
+
+HTTP response
+
+
+[float]
+=== http.response.code
+
+example: 404
+
+The HTTP status code.
+
+[float]
+=== http.response.phrase
+
+example: Not found.
+
+The HTTP status phrase.
+
+[float]
+=== http.response.headers
 
 type: dict
 
@@ -1146,12 +1176,9 @@ A map containing the captured header fields from the response. Which headers to 
 
 
 [float]
-=== http.content_length
+=== http.response.body
 
-type: long
-
-The value of the Content-Length header if present.
-
+The body of the HTTP response.
 
 [[exported-fields-icmp]]
 == ICMP Fields
