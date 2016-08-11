@@ -171,6 +171,18 @@
             }
           }
         },
+        "haproxy": {
+          "properties": {
+            "stat": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
         "metricset": {
           "properties": {
             "host": {

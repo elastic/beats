@@ -1,0 +1,37 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-haproxy]]
+== haproxy Module
+
+This is the haproxy Module.
+
+
+
+[float]
+=== Example Configuration
+
+The haproxy module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: haproxy
+  metricsets: ["stat"]
+  enabled: true
+  period: 1s
+  hosts: ["localhost"]
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-haproxy-stat,stat>>
+
+include::haproxy/stat.asciidoc[]
+

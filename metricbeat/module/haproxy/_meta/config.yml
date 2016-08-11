@@ -1,0 +1,6 @@
+- module: haproxy
+  metricsets: ["stat"]
+  enabled: true
+  period: 1s
+  hosts: ["localhost"]
+

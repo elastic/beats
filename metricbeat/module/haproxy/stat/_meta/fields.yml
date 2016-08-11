@@ -1,0 +1,9 @@
+- name: stat
+  type: group
+  description: >
+    stat
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

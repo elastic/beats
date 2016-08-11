@@ -43,4 +43,12 @@ metricbeat.modules:
   # if true, exports the CPU usage in ticks, together with the percentage values
   cpu_ticks: false
 
+#------------------------------- haproxy Module ------------------------------
+- module: haproxy
+  metricsets: ["stat"]
+  enabled: true
+  period: 1s
+  hosts: ["localhost"]
+
+
 

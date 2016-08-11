@@ -205,6 +205,24 @@
                   type: integer
                   description: >
                     Total.
+- key: haproxy
+  title: "haproxy"
+  description: >
+    haproxy Module
+  fields:
+    - name: haproxy
+      type: group
+      description: >
+      fields:
+        - name: stat
+          type: group
+          description: >
+            stat
+          fields:
+            - name: example
+              type: keyword
+              description: >
+                Example field
 - key: mongodb
   title: "MongoDB"
   description: >

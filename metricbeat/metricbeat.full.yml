@@ -61,6 +61,14 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
+#------------------------------- haproxy Module ------------------------------
+- module: haproxy
+  metricsets: ["stat"]
+  enabled: true
+  period: 1s
+  hosts: ["localhost"]
+
+
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
   #metricsets: ["status"]

@@ -45,6 +45,15 @@ metricbeat.modules:
 
 
 
+- module: haproxy
+  metricsets: ["stat"]
+  enabled: true
+  period: 5s
+  hosts: ["localhost"]
+  stats_method: "unix_socket"
+  stats_path: "/Users/alain.lefebvre/tmp/haproxy.sock"
+
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
