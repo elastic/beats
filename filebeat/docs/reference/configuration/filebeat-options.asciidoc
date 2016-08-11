@@ -383,6 +383,8 @@ lines are discarded. The default is 500.
 
 If this option is set to true, Filebeat starts reading new files at the end of each file instead of the beginning. When this option is used in combination with log rotation, it's possible that the first log entries in a new file might be skipped. The default setting is false.
 
+This option applies to files that Filebeat has not already processed. If you ran Filebeat previously and the state of the file was already persisted, `tail_files` will not apply. Harvesting will continue at the previous offset. To apply `tail_files` to all files, you must stop Filebeat and remove the registry file. Be aware that doing this removes ALL previous states.
+
 NOTE: You can use this setting to avoid indexing old log lines when you run Filebeat on a set of log files for the first time. After the first run, we recommend disabling this option, or you risk losing lines during file rotation.
 
 ===== backoff
