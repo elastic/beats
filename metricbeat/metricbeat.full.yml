@@ -103,6 +103,19 @@ metricbeat.modules:
   # Path to server status. Default server-status
   #server_status_path: "server-status"
 
+#----------------------------- PostgreSQL Module -----------------------------
+#- module: postgresql
+  #metricsets: ["activity"]
+  #enabled: true
+  #period: 10s
+
+  # The host must be passed as PostgreSQL DSN. Example:
+  # postgres://pqgotest:password@localhost:5432?sslmode=disable
+  # The available parameters are documented here:
+  # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
+  #hosts: ["postgres://postgres@localhost:5432"]
+
+
 #-------------------------------- Redis Module -------------------------------
 #- module: redis
   #metricsets: ["info", "keyspace"]
