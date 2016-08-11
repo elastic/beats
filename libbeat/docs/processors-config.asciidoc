@@ -89,7 +89,7 @@ For example, the following condition checks if the response code of the HTTP tra
 [source,yaml]
 -------
 equals:
-  http.code: 200
+  http.response.code: 200
 -------
 
 [[condition-contains]]
@@ -111,12 +111,12 @@ contains:
 
 The `regexp` condition checks the field against a regular expression. The condition accepts only strings.
 
-For example, the following condition checks if the process name contains `foo`:
+For example, the following condition checks if the process name starts with `foo`:
 
 [source,yaml]
 -----
 reqexp:
-  proc.name: "foo.*"
+  system.process.name: "foo.*"
 -----
 
 [[condition-range]]
@@ -125,28 +125,32 @@ reqexp:
 The `range` condition checks if the field is in a certain range of values. The condition supports `lt`, `lte`, `gt` and `gte`. The
 condition accepts only integer or float values.
 
-For example, the following condition checks for the status of the transaction by comparing the `proc.code` field with
-300.
+For example, the following condition checks for failed HTTP transaction by comparing the `http.response.code` field with
+400.
 
 
 [source,yaml]
 ------
 range:
-  gte:
-    proc.code: 300
+    http.response.code:
+        gte: 400
 ------
 
-NOTE: The `range` condition accepts only one `gte`, one `gt`, one `lt` and one `lte` condition.
+that can be also translated to:
+
+[source,yaml]
+----
+range:
+    http.response.code.gte: 400
+----
 
 For example, the following condition checks if the CPU usage in percentage has a value between 0.5 and 0.8.
 
 [source,yaml]
 ------
 range:
-  gte:
-    cpu.user_p: 0.5
-  lt:
-    cpu.user_p: 0.8
+    system.cpu.user.pct.gte: 0.5
+    system.cpu.user.pct.lt: 0.8
 ------
 
 
@@ -167,15 +171,15 @@ or:
 
 -------
 
-For example the condition `http.code = 304 OR http.code = 404` translates to: 
+For example the condition `http.response.code = 304 OR http.response.code = 404` translates to: 
 
 [source,yaml]
 ------
 or:
   - equals:
-      http.code: 304
+      http.response.code: 304
   - equals:
-      http.code: 404
+      http.response.code: 404
 ------
 
 
@@ -194,13 +198,13 @@ and:
 
 -------
 
-For example the condition `http.code = 200 AND status = OK` translates to: 
+For example the condition `http.response.code = 200 AND status = OK` translates to: 
 
 [source,yaml]
 ------
 and:
   - equals:
-      http.code: 200
+      http.response.code: 200
   - equals:
       status: OK
 ------
