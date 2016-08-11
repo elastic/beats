@@ -89,7 +89,7 @@ For example, the following condition checks if the response code of the HTTP tra
 [source,yaml]
 -------
 equals:
-  http.code: 200
+  http.response.code: 200
 -------
 
 [[condition-contains]]
@@ -132,21 +132,25 @@ For example, the following condition checks for the status of the transaction by
 [source,yaml]
 ------
 range:
-  gte:
-    proc.code: 300
+    proc.code: 
+        gte: 300
 ------
 
-NOTE: The `range` condition accepts only one `gte`, one `gt`, one `lt` and one `lte` condition.
+that can be also translated to:
+
+[source,yaml]
+----
+range:
+    proc.code.gte: 300
+----
 
 For example, the following condition checks if the CPU usage in percentage has a value between 0.5 and 0.8.
 
 [source,yaml]
 ------
 range:
-  gte:
-    cpu.user_p: 0.5
-  lt:
-    cpu.user_p: 0.8
+    cpu.user_p.gte: 0.5
+    cpu.user_p.lt: 0.8
 ------
 
 
