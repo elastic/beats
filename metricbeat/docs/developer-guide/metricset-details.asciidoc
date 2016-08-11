@@ -7,7 +7,7 @@ This topic provides additional details about creating metricsets.
 === Adding Special Configuration Options
 
 Each metricset can have its own configuration variables defined. To make use of
-these variables, you must extend the `New` method. For example, let's assume that 
+these variables, you must extend the `New` method. For example, let's assume that
 you want to add a `password` config option to the metricset. You would extend
 `beat.yml` in the following way:
 
@@ -21,9 +21,9 @@ metricbeat.modules:
 
 To read in the new `password` config option, you need to modify the `New` method. First you define a config
 struct that contains the value types to be read. You can set default values, as needed. Then you pass the config to
-the `UnpackConfig` method for loading the configuration. 
+the `UnpackConfig` method for loading the configuration.
 
-Your implementation should look something like this: 
+Your implementation should look something like this:
 
 [source,go]
 ----
@@ -153,7 +153,7 @@ You should use a combination of the three test types to test your metricsets bec
 each method has advantages and disadvantages. To get started with your own tests, it's best
 to look at the existing tests. You'll find the unit and integration tests
 in the `_test.go` files under existing modules and metricsets. The system
-tests are under `tests/systems`. 
+tests are under `tests/systems`.
 
 
 [float]
@@ -162,7 +162,7 @@ tests are under `tests/systems`.
 Integration and system tests need an environment that's running the service. You
 can create this environment by using Docker and a docker-compose file. If you add a
 module that requires a service, you must add the service to the virtual environment.
-To do this, you: 
+To do this, you:
 
 * Update the `docker-compose.yml` file with your environment
 * Update the `docker-entrypoint.sh` script
@@ -173,7 +173,7 @@ existing Docker modules and can be added as simply as Redis:
 [source,yaml]
 ----
 redis:
-  image: redis:3.2.0
+  image: redis:3.2.3
 ----
 
 To allow the Beat to access your service, make sure that you define the environment
@@ -189,9 +189,9 @@ beat:
     - REDIS_PORT=6379
 ----
 
-To make sure the service is running before the tests are started, modify the 
+To make sure the service is running before the tests are started, modify the
 `docker-entrypoint.sh` script to add a check that verifies your service is
-running. For example, the check for Redis looks like this: 
+running. For example, the check for Redis looks like this:
 
 [source,shell]
 ----
@@ -204,7 +204,7 @@ the given address and port.
 [float]
 ==== Running the Tests
 
-To run all the tests, run `make testsuite`. To only run unit tests, run 
+To run all the tests, run `make testsuite`. To only run unit tests, run
 `make unit-tests` or for integration tests `make integration-tests-environment`. Be aware that
 a running Docker environment is needed for integration and system tests.
 
