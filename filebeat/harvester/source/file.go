@@ -3,6 +3,7 @@ package source
 import (
     "os"
     "errors"
+    "math"
     "path/filepath"
     "compress/gzip"
     "github.com/elastic/beats/libbeat/logp"
@@ -25,6 +26,14 @@ func NewFile(osf *os.File) (FileSource, error) {
 }
 
 func (File) Continuable() bool { return true }
+func (f File) ActualSize() (int64, error) {
+    info, err := f.Stat()
+    if err != nil {
+        return 0, err
+    } else {
+        return info.Size(), nil
+    }
+}
 
 type GZipFile struct {
     *os.File
@@ -41,6 +50,11 @@ func newGZipFile(osf *os.File) (FileSource, error) {
 }
 
 func (GZipFile) Continuable() bool { return false }
+func (GZipFile) ActualSize() (int64, error) {
+    // We don't have a way to know the size of uncompressed data in a gzip file. So return infinity so the
+    // prospector doesn't think the file is truncated..
+    return math.MaxInt64, nil
+}
 
 func (gf GZipFile) Close() error {
     err1 := gf.gzipReader.Close()

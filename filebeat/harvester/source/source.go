@@ -15,4 +15,5 @@ type FileSource interface {
     LogSource
     Stat() (os.FileInfo, error)
     Continuable() bool // can we continue processing after EOF?
+    ActualSize() (int64, error)
 }

@@ -8,6 +8,7 @@ import (
 	"expvar"
 
 	"github.com/elastic/beats/filebeat/harvester"
+	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
@@ -164,6 +165,48 @@ func (p *ProspectorLog) scan() {
 	}
 }
 
+// TODO: Need to handle this whole thing better
+func (p *ProspectorLog) handleExistingFinishedFile(newState file.State, oldState file.State) bool {
+	f, err := file.ReadOpen(newState.Source)
+	if err != nil {
+		logp.Err("Failed opening %s: %s", newState.Source, err)
+		return false
+	}
+
+	fileSource, err := source.NewFile(f)
+	if err != nil {
+		logp.Err("Failed creating file source %s: %s", newState.Source, err)
+		return false
+	}
+
+	size, err := fileSource.ActualSize()
+	fileSource.Close()
+	if err != nil {
+		logp.Err("Failed computing actual size of file source %s: %s", newState.Source, err)
+		return false
+	}
+	
+	if size > oldState.Offset {
+		// Resume harvesting of an old file we've stopped harvesting from
+		// This could also be an issue with force_close_older that a new harvester is started after each scan but not needed?
+		// One problem with comparing modTime is that it is in seconds, and scans can happen more then once a second
+		logp.Debug("prospector", "Resuming harvesting of file: %s, offset: %v", newState.Source, oldState.Offset)
+		p.Prospector.startHarvester(newState, oldState.Offset)
+		return true
+	}
+
+	// File size was reduced -> truncated file
+	if size < oldState.Offset {
+		logp.Debug("prospector", "Old file was truncated. Starting from the beginning: %s", newState.Source)
+		p.Prospector.startHarvester(newState, 0)
+
+		filesTrucated.Add(1)
+		return true
+	}
+
+	return false
+}
+
 // harvestExistingFile continues harvesting a file with a known state if needed
 func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.State) {
 
@@ -172,21 +215,7 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 	// No harvester is running for the file, start a new harvester
 	// It is important here that only the size is checked and not modification time, as modification time could be incorrect on windows
 	// https://blogs.technet.microsoft.com/asiasupp/2010/12/14/file-date-modified-property-are-not-updating-while-modifying-a-file-without-closing-it/
-	if oldState.Finished && newState.Fileinfo.Size() > oldState.Offset {
-		// Resume harvesting of an old file we've stopped harvesting from
-		// This could also be an issue with force_close_older that a new harvester is started after each scan but not needed?
-		// One problem with comparing modTime is that it is in seconds, and scans can happen more then once a second
-		logp.Debug("prospector", "Resuming harvesting of file: %s, offset: %v", newState.Source, oldState.Offset)
-		p.Prospector.startHarvester(newState, oldState.Offset)
-		return
-	}
-
-	// File size was reduced -> truncated file
-	if oldState.Finished && newState.Fileinfo.Size() < oldState.Offset {
-		logp.Debug("prospector", "Old file was truncated. Starting from the beginning: %s", newState.Source)
-		p.Prospector.startHarvester(newState, 0)
-
-		filesTrucated.Add(1)
+	if oldState.Finished && p.handleExistingFinishedFile(newState, oldState) {
 		return
 	}
 

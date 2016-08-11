@@ -23,3 +23,11 @@ func (p Pipe) Seek(offset int64, whence int) (int64, error) {
         return 0, errors.New("Seek not supported on pipes")
     }
 }
+func (p Pipe) ActualSize() (int64, error) {
+    info, err := p.Stat()
+    if err != nil {
+        return 0, err
+    } else {
+        return info.Size(), nil
+    }
+}
