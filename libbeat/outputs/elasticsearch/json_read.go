@@ -77,6 +77,21 @@ const (
 	dictFieldStateEnd
 )
 
+var entityNames = map[entity]string{
+	failEntity:   "failEntity",
+	trueValue:    "trueValue",
+	falseValue:   "falseValue",
+	nullValue:    "nullValue",
+	dictStart:    "dictStart",
+	dictEnd:      "dictEnd",
+	arrStart:     "arrStart",
+	arrEnd:       "arrEnd",
+	stringEntity: "stringEntity",
+	mapKeyEntity: "mapKeyEntity",
+	intEntity:    "intEntity",
+	doubleEntity: "doubleEntity",
+}
+
 var stateNames = map[state]string{
 	failedState:       "failed",
 	startState:        "start",
@@ -85,6 +100,13 @@ var stateNames = map[state]string{
 	dictState:         "dict",
 	dictFieldState:    "dictValue",
 	dictFieldStateEnd: "dictNext",
+}
+
+func (e entity) String() string {
+	if name, ok := entityNames[e]; ok {
+		return name
+	}
+	return "unknown"
 }
 
 func (s state) String() string {
@@ -131,6 +153,7 @@ func (r *jsonReader) popState() {
 
 func (r *jsonReader) expectDict() error {
 	entity, _, err := r.step()
+
 	if err != nil {
 		return err
 	}
@@ -190,36 +213,17 @@ func (r *jsonReader) ignoreNext() (raw []byte, err error) {
 	snapshot := r.Snapshot()
 	before := r.Len()
 
-	var ignoreKind func(*jsonReader, entity) error
-	ignoreKind = func(r *jsonReader, kind entity) error {
-
-		for {
-			entity, _, err := r.step()
-			if err != nil {
-				return err
-			}
-
-			switch entity {
-			case kind:
-				return nil
-			case arrStart:
-				return ignoreKind(r, arrEnd)
-			case dictStart:
-				return ignoreKind(r, dictEnd)
-			}
-		}
-	}
-
 	entity, _, err := r.step()
 	if err != nil {
 		return nil, err
 	}
 
 	switch entity {
-	case dictStart:
-		err = ignoreKind(r, dictEnd)
 	case arrStart:
 		err = ignoreKind(r, arrEnd)
+	case dictStart:
+		err = ignoreKind(r, dictEnd)
+	default:
 	}
 	if err != nil {
 		return nil, err
@@ -230,6 +234,28 @@ func (r *jsonReader) ignoreNext() (raw []byte, err error) {
 
 	bytes, _ := r.Collect(before - after)
 	return bytes, nil
+}
+
+func ignoreKind(r *jsonReader, kind entity) error {
+	for {
+		entity, _, err := r.step()
+		if err != nil {
+			return err
+		}
+
+		switch entity {
+		case kind:
+			return nil
+		case arrStart:
+			if err := ignoreKind(r, arrEnd); err != nil {
+				return err
+			}
+		case dictStart:
+			if err := ignoreKind(r, dictEnd); err != nil {
+				return err
+			}
+		}
+	}
 }
 
 // step continues the JSON parser state machine until next entity has been parsed.

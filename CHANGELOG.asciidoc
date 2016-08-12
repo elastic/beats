@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
+- Fix Elasticsearch structured error response parsing error. {issue}2229[2229]
 
 *Metricbeat*
 

@@ -10,6 +10,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/stretchr/testify/assert"
 )
@@ -117,6 +118,49 @@ func TestCollectPublishFailAll(t *testing.T) {
 	reader := newJSONReader(response)
 	res := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 3, len(res))
+	assert.Equal(t, events, res)
+}
+
+func TestCollectPipelinePublishFail(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
+	}
+
+	response := []byte(`{
+      "took": 0, "ingest_took": 0, "errors": true,
+      "items": [
+        {
+          "index": {
+            "_index": "filebeat-2016.08.10",
+            "_type": "log",
+            "_id": null,
+            "status": 500,
+            "error": {
+              "type": "exception",
+              "reason": "java.lang.IllegalArgumentException: java.lang.IllegalArgumentException: field [fail_on_purpose] not present as part of path [fail_on_purpose]",
+              "caused_by": {
+                "type": "illegal_argument_exception",
+                "reason": "java.lang.IllegalArgumentException: field [fail_on_purpose] not present as part of path [fail_on_purpose]",
+                "caused_by": {
+                  "type": "illegal_argument_exception",
+                  "reason": "field [fail_on_purpose] not present as part of path [fail_on_purpose]"
+                }
+              },
+              "header": {
+                "processor_type": "lowercase"
+              }
+            }
+          }
+        }
+      ]
+    }`)
+
+	event := common.MapStr{"field": 2}
+	events := []common.MapStr{event}
+
+	reader := newJSONReader(response)
+	res := bulkCollectPublishFails(reader, events)
+	assert.Equal(t, 1, len(res))
 	assert.Equal(t, events, res)
 }
 
