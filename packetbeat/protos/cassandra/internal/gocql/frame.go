@@ -39,7 +39,7 @@ func (f frameHeader) ToMap() map[string]interface{} {
 }
 
 func (f frameHeader) String() string {
-	return fmt.Sprintf("version:%d, flags: %s, steam: %v, OP: %v, length: %v", f.Version.String(), getHeadFlagString(f.Flags), f.Stream, f.Op.String(), f.BodyLength)
+	return fmt.Sprintf("version:%s, flags: %s, steam: %v, OP: %v, length: %v", f.Version.String(), getHeadFlagString(f.Flags), f.Stream, f.Op.String(), f.BodyLength)
 }
 
 var framerPool = sync.Pool{
@@ -281,7 +281,10 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 		cl := f.decoder.ReadConsistency()
 		received := f.decoder.ReadInt()
 		blockfor := f.decoder.ReadInt()
-		dataPresent := f.decoder.ReadByte()
+		dataPresent, err := f.decoder.ReadByte()
+		if err != nil {
+			panic(err)
+		}
 
 		data["read_consistency"] = cl.String()
 		data["received"] = received
@@ -303,7 +306,11 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 		data["read_consistency"] = f.decoder.ReadConsistency().String()
 		data["received"] = f.decoder.ReadInt()
 		data["blockfor"] = f.decoder.ReadInt()
-		data["data_present"] = f.decoder.ReadByte() != 0
+		b, err := f.decoder.ReadByte()
+		if err != nil {
+			panic(err)
+		}
+		data["data_present"] = b != 0
 
 	case errWriteFailure:
 		data["read_consistency"] = f.decoder.ReadConsistency().String()

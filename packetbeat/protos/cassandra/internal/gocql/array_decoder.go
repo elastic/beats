@@ -68,14 +68,14 @@ func (f *Framer) ReadHeader1() (head *frameHeader, err error) {
 	return head, nil
 }
 
-func (f ByteArrayDecoder) ReadByte() (b byte) {
+func (f ByteArrayDecoder) ReadByte() (byte, error) {
 	if len(f.Data) < 1 {
 		panic(fmt.Errorf("not enough bytes in buffer to Read byte require 1 got: %d", len(f.Data)))
 	}
 
-	b = f.Data[0]
+	b := f.Data[0]
 	f.Data = f.Data[1:]
-	return
+	return b, nil
 }
 
 func (f ByteArrayDecoder) ReadInt() (n int) {

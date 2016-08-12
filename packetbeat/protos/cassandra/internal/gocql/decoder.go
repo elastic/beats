@@ -5,7 +5,7 @@ import (
 )
 
 type Decoder interface {
-	ReadByte() byte
+	ReadByte() (byte, error)
 
 	ReadInt() (n int)
 

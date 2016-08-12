@@ -10,14 +10,8 @@ type StreamDecoder struct {
 	r *streambuf.Buffer
 }
 
-func (f StreamDecoder) ReadByte() byte {
-
-	b, err := f.r.ReadByte()
-	if err != nil {
-		panic(err)
-	}
-	return b
-
+func (f StreamDecoder) ReadByte() (byte, error) {
+	return f.r.ReadByte()
 }
 
 func (f StreamDecoder) ReadInt() (n int) {
@@ -137,13 +131,17 @@ func (f StreamDecoder) ReadShortBytes() []byte {
 
 func (f StreamDecoder) ReadInet() (net.IP, int) {
 
-	size := f.ReadByte()
+	size, err := f.ReadByte()
+	if err != nil {
+		panic(err)
+	}
+
 	if !(size == 4 || size == 16) {
 		panic(fmt.Errorf("invalid IP size: %d", size))
 	}
 
 	ip := make([]byte, int(size))
-	_, err := f.r.Read(ip)
+	_, err = f.r.Read(ip)
 	if err != nil {
 		panic(err)
 	}
