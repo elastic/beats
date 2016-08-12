@@ -44,12 +44,16 @@ var startTime = time.Now().UTC()
 
 // Winlogbeat is used to conform to the beat interface
 type Winlogbeat struct {
-	beat       *beat.Beat             // Common beat information.
-	config     *config.Settings       // Configuration settings.
-	eventLogs  []eventlog.EventLog    // List of all event logs being monitored.
-	done       chan struct{}          // Channel to initiate shutdown of main event loop.
-	client     publisher.Client       // Interface to publish event.
-	checkpoint *checkpoint.Checkpoint // Persists event log state to disk.
+	beat      *beat.Beat          // Common beat information.
+	config    *config.Settings    // Configuration settings.
+	eventLogs []eventlog.EventLog // List of all event logs being monitored.
+}
+
+type eventLogger struct {
+	client     publisher.Client
+	api        eventlog.EventLog
+	state      checkpoint.EventLogState
+	checkpoint *checkpoint.Checkpoint
 }
 
 // New returns a new Winlogbeat.
@@ -73,7 +77,6 @@ func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
 	eb := &Winlogbeat{
 		beat:   b,
 		config: &config,
-		done:   make(chan struct{}),
 	}
 
 	if err := eb.init(b); err != nil {
@@ -107,14 +110,6 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 func (eb *Winlogbeat) setup(b *beat.Beat) error {
 	config := &eb.config.Winlogbeat
 
-	eb.client = b.Publisher.Connect()
-
-	var err error
-	eb.checkpoint, err = checkpoint.NewCheckpoint(config.RegistryFile, 10, 5*time.Second)
-	if err != nil {
-		return err
-	}
-
 	if config.Metrics.BindAddress != "" {
 		bindAddress := config.Metrics.BindAddress
 		sock, err := net.Listen("tcp", bindAddress)
@@ -140,11 +135,20 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	}
 	defer eb.cleanup(b)
 
-	persistedState := eb.checkpoint.States()
+	checkpoint, err := checkpoint.NewCheckpoint(
+		eb.config.Winlogbeat.RegistryFile, 10, 5*time.Second)
+	if err != nil {
+		return err
+	}
+	defer checkpoint.Shutdown()
+	persistedState := checkpoint.States()
 
 	// Initialize metrics.
 	publishedEvents.Add("total", 0)
 	ignoredEvents.Add("total", 0)
+
+	client := b.Publisher.Connect()
+	b.Done.OnStop.Close(client)
 
 	var wg sync.WaitGroup
 	for _, log := range eb.eventLogs {
@@ -155,12 +159,15 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 		ignoredEvents.Add(log.Name(), 0)
 
 		// Start a goroutine for each event log.
+		el := newEventLogger(client, log, state, checkpoint)
 		wg.Add(1)
-		go eb.processEventLog(&wg, log, state)
+		go func() {
+			defer wg.Done()
+			el.run(b.Done)
+		}()
 	}
 
 	wg.Wait()
-	eb.checkpoint.Shutdown()
 	return nil
 }
 
@@ -178,21 +185,26 @@ func (eb *Winlogbeat) cleanup(b *beat.Beat) {
 	})
 }
 
-// Stop is used to tell the winlogbeat that it should cease executing.
-func (eb *Winlogbeat) Stop() {
-	logp.Info("Stopping Winlogbeat")
-	if eb.done != nil {
-		eb.client.Close()
-		close(eb.done)
+func newEventLogger(
+	client publisher.Client,
+	api eventlog.EventLog,
+	state checkpoint.EventLogState,
+	checkpoint *checkpoint.Checkpoint,
+) *eventLogger {
+	// TODO: open api when creating event logger and return error?
+	//       Changes winlogbeat to: not starting if one event logger fails to init.
+
+	return &eventLogger{
+		client:     client,
+		api:        api,
+		state:      state,
+		checkpoint: checkpoint,
 	}
 }
 
-func (eb *Winlogbeat) processEventLog(
-	wg *sync.WaitGroup,
-	api eventlog.EventLog,
-	state checkpoint.EventLogState,
-) {
-	defer wg.Done()
+func (l *eventLogger) run(done beat.Done) {
+	api := l.api
+	state := l.state
 
 	err := api.Open(state.RecordNumber)
 	if err != nil {
@@ -211,12 +223,7 @@ func (eb *Winlogbeat) processEventLog(
 
 	debugf("EventLog[%s] opened successfully", api.Name())
 
-	for {
-		select {
-		case <-eb.done:
-			return
-		default:
-		}
+	for !done.Finished() {
 
 		// Read from the event.
 		records, err := api.Read()
@@ -239,7 +246,7 @@ func (eb *Winlogbeat) processEventLog(
 
 		// Publish events.
 		numEvents := int64(len(events))
-		ok := eb.client.PublishEvents(events, publisher.Sync, publisher.Guaranteed)
+		ok := l.client.PublishEvents(events, publisher.Sync, publisher.Guaranteed)
 		if !ok {
 			// due to using Sync and Guaranteed the ok will only be false on shutdown.
 			// Do not update the internal state and return in this case
@@ -251,7 +258,7 @@ func (eb *Winlogbeat) processEventLog(
 		logp.Info("EventLog[%s] Successfully published %d events",
 			api.Name(), numEvents)
 
-		eb.checkpoint.Persist(api.Name(),
+		l.checkpoint.Persist(api.Name(),
 			records[len(records)-1].RecordID,
 			records[len(records)-1].TimeCreated.SystemTime.UTC())
 	}

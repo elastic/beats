@@ -7,7 +7,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/pkg/errors"
@@ -15,9 +14,7 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done    chan struct{}    // Channel used to initiate shutdown.
 	modules []*ModuleWrapper // Active list of modules.
-	client  publisher.Client // Publisher client.
 }
 
 // New creates and returns a new Metricbeat instance.
@@ -37,7 +34,6 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	}
 
 	mb := &Metricbeat{
-		done:    make(chan struct{}),
 		modules: modules,
 	}
 	return mb, nil
@@ -51,12 +47,13 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 	defer dumpMetrics()
 
-	bt.client = b.Publisher.Connect()
+	client := b.Publisher.Connect()
+	b.Done.OnStop.Close(client)
 
 	// Start each module.
 	var cs []<-chan common.MapStr
 	for _, mw := range bt.modules {
-		c := mw.Start(bt.done)
+		c := mw.Start(b.Done.C)
 		cs = append(cs, c)
 	}
 
@@ -67,22 +64,12 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		PublishChannels(bt.client, cs...)
+		PublishChannels(client, cs...)
 	}()
 
 	// Wait for PublishChannels to stop publishing.
 	wg.Wait()
 	return nil
-}
-
-// Stop signals to Metricbeat that it should stop. It closes the "done" channel
-// and closes the publisher client associated with each Module.
-//
-// Stop should only be called a single time. Calling it more than once may
-// result in undefined behavior.
-func (bt *Metricbeat) Stop() {
-	bt.client.Close()
-	close(bt.done)
 }
 
 // dumpMetrics is used to log metrics on shutdown.

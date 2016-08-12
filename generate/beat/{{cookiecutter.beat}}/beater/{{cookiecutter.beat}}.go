@@ -13,9 +13,7 @@ import (
 )
 
 type {{cookiecutter.beat|capitalize}} struct {
-	done       chan struct{}
 	config     config.Config
-	client     publisher.Client
 }
 
 // Creates beater
@@ -26,7 +24,6 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 
 	bt := &{{cookiecutter.beat|capitalize}}{
-		done: make(chan struct{}),
 		config: config,
 	}
 	return bt, nil
@@ -35,12 +32,14 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
 	logp.Info("{{cookiecutter.beat}} is running! Hit CTRL-C to stop it.")
 
-	bt.client = b.Publisher.Connect()
+	client = b.Publisher.Connect()
+	b.Done.OnStop.Close(client)
+
 	ticker := time.NewTicker(bt.config.Period)
 	counter := 1
 	for {
 		select {
-		case <-bt.done:
+		case <-b.Done.C:
 			return nil
 		case <-ticker.C:
 		}
@@ -50,13 +49,8 @@ func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
 			"type":       b.Name,
 			"counter":    counter,
 		}
-		bt.client.PublishEvent(event)
+		client.PublishEvent(event)
 		logp.Info("Event sent")
 		counter++
 	}
-}
-
-func (bt *{{cookiecutter.beat|capitalize}}) Stop() {
-	bt.client.Close()
-	close(bt.done)
 }

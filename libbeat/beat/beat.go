@@ -65,13 +65,8 @@ import (
 // shutdown signal is received. The Stop()-method normally will stop the Run()-loop,
 // such that the beat can gracefully shutdown.
 type Beater interface {
-	// The main event loop. This method should block until signalled to stop by an
-	// invocation of the Stop() method.
+	// The main event loop. This method should block until signalled to stop.
 	Run(b *Beat) error
-
-	// Stop is invoked to signal that the Run method should finish its execution.
-	// It will be invoked at most once.
-	Stop()
 }
 
 // Creator initializes and configures a new Beater instance used to execute
@@ -87,6 +82,7 @@ type Beat struct {
 	RawConfig *common.Config      // Raw config that can be unpacked to get Beat specific config data.
 	Config    BeatConfig          // Common Beat configuration data.
 	Publisher publisher.Publisher // Publisher
+	Done      Done
 }
 
 // BeatConfig struct contains the basic configuration of every beat
@@ -155,9 +151,16 @@ func (b *Beat) launch(bt Creator) error {
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
+	stopHandler := &beatStopHandler{}
+
 	if err := b.configure(); err != nil {
 		return err
 	}
+
+	done := make(chan struct{})
+	stopHandler.Exec(func() { close(done) })
+	b.Done.C = done
+	b.Done.OnStop = stopHandler
 
 	// load the beats config section
 	var sub *common.Config
@@ -199,10 +202,18 @@ func (b *Beat) launch(bt Creator) error {
 		return GracefulExit
 	}
 
-	svc.HandleSignals(beater.Stop)
+	svc.HandleSignals(func() {
+		logp.Info("%v send stop signal", b.Name)
+		stopHandler.signal()
+	})
 
 	logp.Info("%s start running.", b.Name)
 	defer logp.Info("%s stopped.", b.Name)
+
+	// if beat implements 'Stop', call 'Stop' on signal
+	if stopper, ok := beater.(Stopper); ok {
+		stopHandler.Stop(stopper)
+	}
 
 	return beater.Run(b)
 }
