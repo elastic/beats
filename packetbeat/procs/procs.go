@@ -256,14 +256,14 @@ func hex_to_ipv4(word string) (net.IP, error) {
 func hex_to_ipv6(word string) (net.IP, error) {
 	p := make(net.IP, net.IPv6len)
 	for i := 0; i < 4; i++ {
-		part, err := strconv.ParseInt(word[i * 8:(i + 1) * 8], 16, 32)
+		part, err := strconv.ParseInt(word[i*8:(i+1)*8], 16, 32)
 		if err != nil {
 			return nil, err
 		}
 		p[i*4] = byte(part)
-		p[i*4+1] = byte(part>>8)
-		p[i*4+2] = byte(part>>16)
-		p[i*4+3] = byte(part>>24)
+		p[i*4+1] = byte(part >> 8)
+		p[i*4+2] = byte(part >> 16)
+		p[i*4+3] = byte(part >> 24)
 	}
 	return p, nil
 }
