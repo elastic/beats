@@ -1,0 +1,16 @@
+# This should test the environment with the latest snapshots
+# This is based on base.yml
+
+elasticsearch:
+  build: ./docker/elasticsearch
+  dockerfile: Dockerfile-5.0.0-alpha5
+  command: elasticsearch -Enetwork.host=0.0.0.0 -Ediscovery.zen.minimum_master_nodes=1 -Ebootstrap.ignore_system_bootstrap_checks=true
+
+logstash:
+  build: ./docker/logstash
+  dockerfile: Dockerfile-5.0.0-alpha5
+
+kibana:
+  build: ./docker/kibana
+  dockerfile: Dockerfile-5.0.0-alpha5
+

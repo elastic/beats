@@ -198,10 +198,12 @@
             Object with source to destination flow measurements.
           fields:
             - name: net_packets_total
+              type: long
               description: >
                 Total number of packets
 
             - name: net_bytes_total
+              type: long
               description: >
                 Total number of bytes
 
@@ -274,10 +276,12 @@
             Object with destination to source flow measurements.
           fields:
             - name: net_packets_total
+              type: long
               description: >
                 Total number of packets
 
             - name: net_bytes_total
+              type: long
               description: >
                 Total number of bytes
     - name: icmp_id
@@ -833,37 +837,50 @@
   fields:
     - name: http
       type: group
+      description: Information about the HTTP request and response.
       fields:
-        - name: code
-          description: The HTTP status code.
-          example: 404
+        - name: request
+          description: HTTP request
+          type: group
+          fields:
+            - name: params
+              description: >
+                The query parameters or form values. The query parameters are available in the Request-URI
+                and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
+            - name: headers
+              type: dict
+              dict-type: keyword
+              description: >
+                A map containing the captured header fields from the request.
+                Which headers to capture is configurable. If headers with the same
+                header name are present in the message, they will be separated by
+                commas.
+            - name: body
+              type: text
+              description: The body of the HTTP request.
 
-        - name: phrase
-          description: The HTTP status phrase.
-          example: Not found.
+        - name: response
+          description: HTTP response
+          type: group
+          fields:
+            - name: code
+              description: The HTTP status code.
+              example: 404
 
-        - name: request_headers
-          type: dict
-          dict-type: keyword
-          description: >
-            A map containing the captured header fields from the request.
-            Which headers to capture is configurable. If headers with the same
-            header name are present in the message, they will be separated by
-            commas.
+            - name: phrase
+              description: The HTTP status phrase.
+              example: Not found.
 
-        - name: response_headers
-          type: dict
-          dict-type: keyword
-          description: >
-            A map containing the captured header fields from the response.
-            Which headers to capture is configurable. If headers with the
-            same header name are present in the message, they will be separated
-            by commas.
-
-        - name: content_length
-          type: long
-          description: >
-            The value of the Content-Length header if present.
+            - name: headers
+              type: dict
+              dict-type: keyword
+              description: >
+                A map containing the captured header fields from the response.
+                Which headers to capture is configurable. If headers with the
+                same header name are present in the message, they will be separated
+                by commas.
+            - name: body
+              description: The body of the HTTP response.
 
 - key: memcache
   title: "Memcache"
@@ -1002,11 +1019,13 @@
 
         - name: request.bytes
           type: long
+          format: bytes
           description: >
             The byte count of the values being transfered.
 
         - name: response.bytes
           type: long
+          format: bytes
           description: >
             The byte count of the values being transfered.
 
@@ -1410,6 +1429,7 @@
         the application layer message length, without the length of the IP or
         TCP headers.
       type: long
+      format: bytes
 
     - name: bytes_out
       description: >
@@ -1417,6 +1437,7 @@
         the application layer message length, without the length of the IP or
         TCP headers.
       type: long
+      format: bytes
 
     - name: dnstime
       type: long

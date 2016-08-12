@@ -25,11 +25,11 @@ const (
 
 func TestTopologyInRedisTCP(t *testing.T) {
 	db := 1
-	index := "test_topo_tcp"
+	key := "test_topo_tcp"
 	redisHosts := []string{getRedisAddr()}
 	redisConfig := map[string]interface{}{
 		"hosts":         redisHosts,
-		"index":         index,
+		"key":           key,
 		"host_topology": redisHosts[0],
 		"db_topology":   db,
 		"timeout":       "5s",
@@ -40,11 +40,11 @@ func TestTopologyInRedisTCP(t *testing.T) {
 
 func TestTopologyInRedisTLS(t *testing.T) {
 	db := 1
-	index := "test_topo_tls"
+	key := "test_topo_tls"
 	redisHosts := []string{getSRedisAddr()}
 	redisConfig := map[string]interface{}{
 		"hosts":         redisHosts,
-		"index":         index,
+		"key":           key,
 		"host_topology": redisHosts[0],
 		"db_topology":   db,
 		"timeout":       "5s",
@@ -70,7 +70,7 @@ func testTopologyInRedis(t *testing.T, cfg map[string]interface{}) {
 	}
 
 	db := 0
-	index := cfg["index"].(string)
+	key := cfg["key"].(string)
 	if v, ok := cfg["db_topology"]; ok {
 		db = v.(int)
 	}
@@ -83,7 +83,7 @@ func testTopologyInRedis(t *testing.T, cfg map[string]interface{}) {
 		}
 		// delete old key if present
 		defer conn.Close()
-		conn.Do("DEL", index)
+		conn.Do("DEL", key)
 	}
 
 	// 1. connect
@@ -116,11 +116,11 @@ func testTopologyInRedis(t *testing.T, cfg map[string]interface{}) {
 }
 
 func TestPublishListTCP(t *testing.T) {
-	index := "test_publist_tcp"
+	key := "test_publist_tcp"
 	db := 0
 	redisConfig := map[string]interface{}{
 		"hosts":    []string{getRedisAddr()},
-		"index":    index,
+		"key":      key,
 		"db":       db,
 		"datatype": "list",
 		"timeout":  "5s",
@@ -130,11 +130,11 @@ func TestPublishListTCP(t *testing.T) {
 }
 
 func TestPublishListTLS(t *testing.T) {
-	index := "test_publist_tls"
+	key := "test_publist_tls"
 	db := 0
 	redisConfig := map[string]interface{}{
 		"hosts":    []string{getSRedisAddr()},
-		"index":    index,
+		"key":      key,
 		"db":       db,
 		"datatype": "list",
 		"timeout":  "5s",
@@ -154,7 +154,7 @@ func testPublishList(t *testing.T, cfg map[string]interface{}) {
 	total := batches & batchSize
 
 	db := 0
-	index := cfg["index"].(string)
+	key := cfg["key"].(string)
 	if v, ok := cfg["db"]; ok {
 		db = v.(int)
 	}
@@ -166,7 +166,7 @@ func testPublishList(t *testing.T, cfg map[string]interface{}) {
 
 	// delete old key if present
 	defer conn.Close()
-	conn.Do("DEL", index)
+	conn.Do("DEL", key)
 
 	out := newRedisTestingOutput(t, cfg)
 	err = sendTestEvents(out, batches, batchSize)
@@ -174,7 +174,7 @@ func testPublishList(t *testing.T, cfg map[string]interface{}) {
 
 	results := make([][]byte, total)
 	for i := range results {
-		results[i], err = redis.Bytes(conn.Do("LPOP", index))
+		results[i], err = redis.Bytes(conn.Do("LPOP", key))
 		assert.NoError(t, err)
 	}
 
@@ -188,10 +188,10 @@ func testPublishList(t *testing.T, cfg map[string]interface{}) {
 
 func TestPublishChannelTCP(t *testing.T) {
 	db := 0
-	index := "test_pubchan_tcp"
+	key := "test_pubchan_tcp"
 	redisConfig := map[string]interface{}{
 		"hosts":    []string{getRedisAddr()},
-		"index":    index,
+		"key":      key,
 		"db":       db,
 		"datatype": "channel",
 		"timeout":  "5s",
@@ -202,10 +202,10 @@ func TestPublishChannelTCP(t *testing.T) {
 
 func TestPublishChannelTLS(t *testing.T) {
 	db := 0
-	index := "test_pubchan_tls"
+	key := "test_pubchan_tls"
 	redisConfig := map[string]interface{}{
 		"hosts":    []string{getSRedisAddr()},
-		"index":    index,
+		"key":      key,
 		"db":       db,
 		"datatype": "channel",
 		"timeout":  "5s",
@@ -225,7 +225,7 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 	total := batches & batchSize
 
 	db := 0
-	index := cfg["index"].(string)
+	key := cfg["key"].(string)
 	if v, ok := cfg["db"]; ok {
 		db = v.(int)
 	}
@@ -237,14 +237,14 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 
 	// delete old key if present
 	defer conn.Close()
-	conn.Do("DEL", index)
+	conn.Do("DEL", key)
 
 	// subscribe to packetbeat channel
 	psc := redis.PubSubConn{conn}
-	if err := psc.Subscribe(index); err != nil {
+	if err := psc.Subscribe(key); err != nil {
 		t.Fatal(err)
 	}
-	defer psc.Unsubscribe(index)
+	defer psc.Unsubscribe(key)
 
 	// connect and publish events
 	var wg sync.WaitGroup
@@ -326,7 +326,7 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) *redisOut {
 		t.Fatalf("Failed to unpack topology_expire: %v", err)
 	}
 
-	out, err := plugin(config, params.Expire)
+	out, err := plugin("libbeat", config, params.Expire)
 	if err != nil {
 		t.Fatalf("Failed to initialize redis output: %v", err)
 	}

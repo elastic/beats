@@ -35,7 +35,7 @@ func (r *JoinGroupRequest) encode(pe packetEncoder) error {
 	return nil
 }
 
-func (r *JoinGroupRequest) decode(pd packetDecoder) (err error) {
+func (r *JoinGroupRequest) decode(pd packetDecoder, version int16) (err error) {
 	if r.GroupId, err = pd.getString(); err != nil {
 		return
 	}
@@ -83,6 +83,10 @@ func (r *JoinGroupRequest) key() int16 {
 
 func (r *JoinGroupRequest) version() int16 {
 	return 0
+}
+
+func (r *JoinGroupRequest) requiredVersion() KafkaVersion {
+	return V0_9_0_0
 }
 
 func (r *JoinGroupRequest) AddGroupProtocol(name string, metadata []byte) {

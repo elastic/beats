@@ -5,7 +5,7 @@ ENV ELASTICSEARCH_VERSION master
 
 
 COPY setup.sh /
-RUN bash setup.sh http://download.elastic.co/elasticsearch/staging/5.0.0-alpha4-3f5b994/org/elasticsearch/distribution/deb/elasticsearch/5.0.0-alpha4/elasticsearch-5.0.0-alpha4.deb
+RUN bash setup.sh https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/5.0.0-alpha5/elasticsearch-5.0.0-alpha5.deb
 
 ENV PATH /usr/share/elasticsearch/bin:$PATH
 

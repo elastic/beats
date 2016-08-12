@@ -13,9 +13,11 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
-            drop_fields={
-                "fields": ["beat"],
-            },
+            processors=[{
+                "drop_fields": {
+                    "fields": ["beat"],
+                },
+            }]
         )
         with open(self.working_dir + "/test.log", "w") as f:
             f.write("test message\n")
@@ -36,9 +38,11 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
-            include_fields={
-                "fields": ["source", "offset", "message"],
-            },
+            processors=[{
+                "include_fields": {
+                    "fields": ["source", "offset", "message"],
+                },
+            }]
         )
         with open(self.working_dir + "/test.log", "w") as f:
             f.write("test message\n")
@@ -59,9 +63,11 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test*.log",
-            drop_event={
-                "condition": "contains.source: test1",
-            },
+            processors=[{
+                "drop_event": {
+                    "when": "contains.source: test1",
+                },
+            }]
         )
         with open(self.working_dir + "/test1.log", "w") as f:
             f.write("test1 message\n")
@@ -71,6 +77,35 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output(
+            required_fields=["@timestamp", "type"],
+        )[0]
+        assert "beat.name" in output
+        assert "message" in output
+        assert "test" in output["message"]
+
+    def test_condition(self):
+        """
+        Check condition in processors
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test*.log",
+            processors=[{
+                "drop_event": {
+                    "when": "not.contains.message: test",
+                },
+            }]
+        )
+        with open(self.working_dir + "/test1.log", "w") as f:
+            f.write("test1 message\n")
+
+        with open(self.working_dir + "/test2.log", "w") as f:
+            f.write("test2 message\n")
+
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=2))
         filebeat.check_kill_and_wait()
 
         output = self.read_output(

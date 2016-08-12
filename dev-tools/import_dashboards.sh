@@ -8,7 +8,7 @@
 
 # The default value of the variable. Initialize your own variables here
 ELASTICSEARCH=http://localhost:9200
-CURL=curl
+CURL="curl -H Expect:"
 KIBANA_INDEX=".kibana"
 DIR=.
 BEAT_CONFIG=".beatconfig"

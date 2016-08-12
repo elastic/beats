@@ -5,15 +5,22 @@ import (
 	"path/filepath"
 	"time"
 
+	"expvar"
+
 	"github.com/elastic/beats/filebeat/harvester"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
+)
+
+var (
+	filesRenamed  = expvar.NewInt("filebeat.prospector.log.files.renamed")
+	filesTrucated = expvar.NewInt("filebeat.prospector.log.files.truncated")
 )
 
 type ProspectorLog struct {
 	Prospector *Prospector
 	config     prospectorConfig
-	lastScan   time.Time
 	lastClean  time.Time
 }
 
@@ -52,22 +59,27 @@ func (p *ProspectorLog) Run() {
 	p.scan()
 
 	// It is important that a first scan is run before cleanup to make sure all new states are read first
-	if p.config.CleanOlder > 0 {
+	if p.config.CleanInactive > 0 || p.config.CleanRemoved {
+		beforeCount := p.Prospector.states.Count()
 		p.Prospector.states.Cleanup()
-		logp.Debug("prospector", "Prospector states cleaned up.")
+		logp.Debug("prospector", "Prospector states cleaned up. Before: %d, After: %d", beforeCount, p.Prospector.states.Count())
 	}
 
-	// Cleanup of removed files will only happen after next scan. Otherwise it can happen that not all states
-	// were updated before cleanup is called
+	// Marking removed files to be cleaned up. Cleanup happens after next scan to make sure all states are updated first
 	if p.config.CleanRemoved {
 		for _, state := range p.Prospector.states.GetStates() {
 			// os.Stat will return an error in case the file does not exist
 			_, err := os.Stat(state.Source)
 			if err != nil {
-				state.TTL = 0
-				h, _ := p.Prospector.createHarvester(state)
-				h.SendStateUpdate()
-				logp.Debug("prospector", "Cleanup state for file as file removed: %s", state.Source)
+				// Only clean up files where state is Finished
+				if state.Finished {
+					state.TTL = 0
+					event := input.NewEvent(state)
+					p.Prospector.harvesterChan <- event
+					logp.Debug("prospector", "Remove state for file as file removed: %s", state.Source)
+				} else {
+					logp.Debug("prospector", "State for file not removed because not finished: %s", state.Source)
+				}
 			}
 		}
 	}
@@ -76,7 +88,6 @@ func (p *ProspectorLog) Run() {
 // getFiles returns all files which have to be harvested
 // All globs are expanded and then directory and excluded files are removed
 func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
-	// Now let's do one quick scan to pick up new files
 
 	paths := map[string]os.FileInfo{}
 
@@ -102,6 +113,7 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 				logp.Debug("prospector", "stat(%s) failed: %s", file, err)
 				continue
 			}
+
 			// Check if file is symlink
 			if fileinfo.Mode()&os.ModeSymlink != 0 {
 				logp.Debug("prospector", "File %s skipped as it is a symlink.", file)
@@ -123,40 +135,32 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 // Scan starts a scanGlob for each provided path/glob
 func (p *ProspectorLog) scan() {
 
-	newLastScan := time.Now()
+	for path, info := range p.getFiles() {
 
-	// TODO: Track harvesters to prevent any file from being harvested twice. Finished state could be delayed?
-	// Now let's do one quick scan to pick up new files
-	for f, fileinfo := range p.getFiles() {
-
-		logp.Debug("prospector", "Check file for harvesting: %s", f)
+		logp.Debug("prospector", "Check file for harvesting: %s", path)
 
 		// Create new state for comparison
-		newState := file.NewState(fileinfo, f)
+		newState := file.NewState(info, path)
 
 		// Load last state
-		index, lastState := p.Prospector.states.FindPrevious(newState)
+		lastState := p.Prospector.states.FindPrevious(newState)
+
+		// Ignores all files which fall under ignore_older
+		if p.isIgnoreOlder(newState) {
+			logp.Debug("prospector", "Ignore file because ignore_older reached: %s", newState.Source)
+			if lastState.IsEmpty() && lastState.Finished == false {
+				logp.Err("File is falling under ignore_older before harvesting is finished. Adjust your close_* settings: %s", newState.Source)
+			}
+			continue
+		}
 
 		// Decides if previous state exists
-		if index == -1 {
-			p.harvestNewFile(newState)
+		if lastState.IsEmpty() {
+			logp.Debug("prospector", "Start harvester for new file: %s", newState.Source)
+			p.Prospector.startHarvester(newState, 0)
 		} else {
 			p.harvestExistingFile(newState, lastState)
 		}
-	}
-
-	// Only update lastScan timestamp after scan is completed
-	p.lastScan = newLastScan
-}
-
-// harvestNewFile harvest a new file
-func (p *ProspectorLog) harvestNewFile(state file.State) {
-
-	if !p.isIgnoreOlder(state) {
-		logp.Debug("prospector", "Start harvester for new file: %s", state.Source)
-		p.Prospector.startHarvester(state, 0)
-	} else {
-		logp.Debug("prospector", "Ignore file because ignore_older reached: %s", state.Source)
 	}
 }
 
@@ -164,8 +168,6 @@ func (p *ProspectorLog) harvestNewFile(state file.State) {
 func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.State) {
 
 	logp.Debug("prospector", "Update existing file for harvesting: %s, offset: %v", newState.Source, oldState.Offset)
-
-	// TODO: check for ignore_older reached? or should that happen in scan already?
 
 	// No harvester is running for the file, start a new harvester
 	// It is important here that only the size is checked and not modification time, as modification time could be incorrect on windows
@@ -176,21 +178,37 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 		// One problem with comparing modTime is that it is in seconds, and scans can happen more then once a second
 		logp.Debug("prospector", "Resuming harvesting of file: %s, offset: %v", newState.Source, oldState.Offset)
 		p.Prospector.startHarvester(newState, oldState.Offset)
+		return
+	}
 
-	} else if oldState.Source != "" && oldState.Source != newState.Source {
+	// File size was reduced -> truncated file
+	if oldState.Finished && newState.Fileinfo.Size() < oldState.Offset {
+		logp.Debug("prospector", "Old file was truncated. Starting from the beginning: %s", newState.Source)
+		p.Prospector.startHarvester(newState, 0)
+
+		filesTrucated.Add(1)
+		return
+	}
+
+	// Check if file was renamed
+	if oldState.Source != "" && oldState.Source != newState.Source {
 		// This does not start a new harvester as it is assume that the older harvester is still running
 		// or no new lines were detected. It sends only an event status update to make sure the new name is persisted.
 		logp.Debug("prospector", "File rename was detected, updating state: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
 
-		h, _ := p.Prospector.createHarvester(newState)
-		h.SetOffset(oldState.Offset)
-
 		// Update state because of file rotation
-		h.SendStateUpdate()
-	} else {
-		// TODO: improve logging depedent on what the exact reason is that harvesting does not continue
+		newState.Offset = oldState.Offset
+		event := input.NewEvent(newState)
+		p.Prospector.harvesterChan <- event
+
+		filesRenamed.Add(1)
+	}
+
+	if !oldState.Finished {
 		// Nothing to do. Harvester is still running and file was not renamed
-		logp.Debug("prospector", "No updates needed, file %s is already harvested.", newState.Source)
+		logp.Debug("prospector", "Harvester for file is still running: %s", newState.Source)
+	} else {
+		logp.Debug("prospector", "File didn't change: %s", newState.Source)
 	}
 }
 
@@ -209,7 +227,6 @@ func (p *ProspectorLog) isIgnoreOlder(state file.State) bool {
 	}
 
 	modTime := state.Fileinfo.ModTime()
-
 	if time.Since(modTime) > p.config.IgnoreOlder {
 		return true
 	}

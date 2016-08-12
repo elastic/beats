@@ -11,11 +11,11 @@ filebeat.prospectors:
     - {{ path }}{% endif %}
   # Type of the files. Annotated in every documented
   scan_frequency: {{scan_frequency | default("0.1s") }}
-  ignore_older: {{ignoreOlder}}
-  close_older: {{closeOlder}}
-  harvester_buffer_size:
+  ignore_older: {{ignore_older}}
+  close_inactive: {{close_inactive}}
+  harvester_buffer_size: {{harvester_buffer_size}}
   encoding: {{encoding | default("utf-8") }}
-  tail_files: {{tailFiles}}
+  tail_files: {{tail_files}}
   backoff: 0.1s
   backoff_factor: 1
   max_backoff: 0.1s
@@ -23,7 +23,7 @@ filebeat.prospectors:
   close_renamed: {{close_renamed}}
   close_eof: {{close_eof}}
   force_close_files: {{force_close_files}}
-  clean_older: {{clean_older}}
+  clean_inactive: {{clean_inactive}}
   clean_removed: {{clean_removed}}
 
   {% if fields %}
@@ -108,31 +108,22 @@ geoip:
   ]
 {%- endif %}
 
-{%- if drop_fields or drop_event or include_fields %}
+{%- if processors %}
 
 #================================ Filters =====================================
+
 processors:
-
-    {%- if include_fields %}
-    - include_fields:
-        when:
-            {{include_fields.condition | default()}}
-        fields: {{include_fields.fields | default([])}}
-    {%- endif %}
-
-    {%- if drop_fields %}
-    - drop_fields:
-        when:
-            {{drop_fields.condition | default()}}
-        fields: {{drop_fields.fields | default([])}}
-    {%- endif %}
-
-
-    {%- if drop_event %}
-    - drop_event:
-        when:
-            {{ drop_event.condition | default()}}
-    {%- endif %}
+{%- for processor in processors %}
+{%- for name, settings in processor.iteritems() %}
+- {{name}}:
+  {%- if settings %}
+  {%- for k, v in settings.iteritems() %}
+    {{k}}:
+      {{v | default([])}}
+  {%- endfor %}
+  {%- endif %}
+{%- endfor %}
+{%- endfor %}
 
 {%- endif %}
 
@@ -152,4 +143,4 @@ output.file:
 #================================ Paths =====================================
 path:
   data: {{path_data}}
-{%endif%}
+{% endif %}

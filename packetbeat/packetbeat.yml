@@ -15,14 +15,14 @@ packetbeat.interfaces.device: any
 
 #================================== Flows =====================================
 
-# Comment out all options to disable flows reporting.
+# Set `enabled: false` or comment out all options to disable flows reporting.
+packetbeat.flows:
+  # Set network flow timeout. Flow is killed if no packet is received before being
+  # timed out.
+  timeout: 30s
 
-# Set network flow timeout. Flow is killed if no packet is received before being
-# timed out.
-packetbeat.flows.timeout: 30s
-
-# Configure reporting period. If set to -1, only killed flows will be reported
-packetbeat.flows.period: 10s
+  # Configure reporting period. If set to -1, only killed flows will be reported
+  period: 10s
 
 #========================== Transaction protocols =============================
 
@@ -113,14 +113,10 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Template name. By default the template name is packetbeat.
-  template.name: "packetbeat"
-
-  # Path to template file
-  template.path: "packetbeat.template.json"
-
-  # Overwrite existing template
-  template.overwrite: false
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
@@ -139,7 +135,7 @@ output.elasticsearch:
 
 #================================ Logging =====================================
 
-# Sets log level. The default log level is error.
+# Sets log level. The default log level is info.
 # Available log levels are: critical, error, warning, info, debug
 #logging.level: debug
 

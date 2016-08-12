@@ -62,12 +62,12 @@ type Client interface {
 type client struct {
 	canceler *op.Canceler
 
-	publisher           *Publisher
+	publisher           *BeatPublisher
 	beatMeta            common.MapStr        // Beat metadata that is added to all events.
 	globalEventMetadata common.EventMetadata // Fields and tags that are added to all events.
 }
 
-func newClient(pub *Publisher) *client {
+func newClient(pub *BeatPublisher) *client {
 	c := &client{
 		canceler: op.NewCanceler(),
 
@@ -82,6 +82,10 @@ func newClient(pub *Publisher) *client {
 }
 
 func (c *client) Close() error {
+	if c == nil {
+		return nil
+	}
+
 	c.canceler.Cancel()
 
 	// atomic decrement clients counter

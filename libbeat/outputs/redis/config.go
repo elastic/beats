@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
@@ -12,6 +13,7 @@ import (
 type redisConfig struct {
 	Password    string                `config:"password"`
 	Index       string                `config:"index"`
+	Key         string                `config:"key"`
 	Port        int                   `config:"port"`
 	LoadBalance bool                  `config:"loadbalance"`
 	Timeout     time.Duration         `config:"timeout"`
@@ -49,8 +51,14 @@ func (c *redisConfig) Validate() error {
 		return fmt.Errorf("redis data type %v not supported", c.DataType)
 	}
 
-	if c.Index == "" {
-		return errors.New("index required")
+	if c.Key != "" && c.Index != "" {
+		return errors.New("Cannot use both `output.redis.key` and `output.redis.index` configuration options." +
+			" Set only `output.redis.key`")
+	}
+
+	if c.Key == "" && c.Index != "" {
+		c.Key = c.Index
+		logp.Warn("The `output.redis.index` configuration setting is deprecated. Use `output.redis.key` instead.")
 	}
 
 	return nil

@@ -4,6 +4,16 @@
 This section contains frequently asked questions about Packetbeat. Also check out the
 https://discuss.elastic.co/c/beats/packetbeat[Packetbeat discussion forum].
 
+* <<client-server-fields-empty>>
+* <<dashboard-fields-incorrect>>
+* <<packetbeat-mirror-ports>>
+* <<packetbeat-loopback-interface>>
+* <<packetbeat-missing-transactions>>
+* <<connection-problem>>
+* <<metadata-missing>>
+* <<diff-logstash-beats>>
+* <<ssl-client-fails>>
+
 [[client-server-fields-empty]]
 === Why are the client_server and server fields empty?
 

@@ -25,6 +25,10 @@ type ErrorReporter interface {
 	Errorf(string, ...interface{})
 }
 
+// ValueChecker is a function type to be set in each expectation of the producer mocks
+// to check the value passed.
+type ValueChecker func(val []byte) error
+
 var (
 	errProduceSuccess              error = nil
 	errOutOfExpectations                 = errors.New("No more expectations set on mock")
@@ -34,7 +38,8 @@ var (
 const AnyOffset int64 = -1000
 
 type producerExpectation struct {
-	Result error
+	Result        error
+	CheckFunction ValueChecker
 }
 
 type consumerExpectation struct {

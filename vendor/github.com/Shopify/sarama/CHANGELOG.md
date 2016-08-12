@@ -1,5 +1,54 @@
 # Changelog
 
+#### Version 1.10.0 (2016-08-02)
+
+_Important:_ As of Sarama 1.10 it is necessary to tell Sarama the version of
+Kafka you are running against (via the `config.Version` value) in order to use
+features that may not be compatible with old Kafka versions. If you don't
+specify this value it will default to 0.8.2 (the minimum supported), and trying
+to use more recent features (like the offset manager) will fail with an error.
+
+_Also:_ The offset-manager's behaviour has been changed to match the upstream
+java consumer (see [#705](https://github.com/Shopify/sarama/pull/705) and
+[#713](https://github.com/Shopify/sarama/pull/713)). If you use the
+offset-manager, please ensure that you are committing one *greater* than the
+last consumed message offset or else you may end up consuming duplicate
+messages.
+
+New Features:
+ - Support for Kafka 0.10
+   ([#672](https://github.com/Shopify/sarama/pull/672),
+    [#678](https://github.com/Shopify/sarama/pull/678),
+    [#681](https://github.com/Shopify/sarama/pull/681), and others).
+ - Support for configuring the target Kafka version
+   ([#676](https://github.com/Shopify/sarama/pull/676)).
+ - Batch producing support in the SyncProducer
+   ([#677](https://github.com/Shopify/sarama/pull/677)).
+ - Extend producer mock to allow setting expectations on message contents
+   ([#667](https://github.com/Shopify/sarama/pull/667)).
+
+Improvements:
+ - Support `nil` compressed messages for deleting in compacted topics
+   ([#634](https://github.com/Shopify/sarama/pull/634)).
+ - Pre-allocate decoding errors, greatly reducing heap usage and GC time against
+   misbehaving brokers ([#690](https://github.com/Shopify/sarama/pull/690)).
+ - Re-use consumer expiry timers, removing one allocation per consumed message
+   ([#707](https://github.com/Shopify/sarama/pull/707)).
+
+Bug Fixes:
+ - Actually default the client ID to "sarama" like we say we do
+   ([#664](https://github.com/Shopify/sarama/pull/664)).
+ - Fix a rare issue where `Client.Leader` could return the wrong error
+   ([#685](https://github.com/Shopify/sarama/pull/685)).
+ - Fix a possible tight loop in the consumer
+   ([#693](https://github.com/Shopify/sarama/pull/693)).
+ - Match upstream's offset-tracking behaviour
+   ([#705](https://github.com/Shopify/sarama/pull/705)).
+ - Report UnknownTopicOrPartition errors from the offset manager
+   ([#706](https://github.com/Shopify/sarama/pull/706)).
+ - Fix possible negative partition value from the HashPartitioner
+   ([#709](https://github.com/Shopify/sarama/pull/709)).
+
 #### Version 1.9.0 (2016-05-16)
 
 New Features:

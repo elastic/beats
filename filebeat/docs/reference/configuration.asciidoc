@@ -12,7 +12,7 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 * <<configuration-filebeat-options>>
 * <<configuration-global-options>>
 * <<configuration-general>>
-* <<configuration-filter>>
+* <<configuration-processors>>
 * <<elasticsearch-output>>
 * <<logstash-output>>
 * <<kafka-output>>

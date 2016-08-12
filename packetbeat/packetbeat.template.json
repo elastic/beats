@@ -26,23 +26,23 @@
           }
         },
         {
-          "http.request_headers": {
+          "http.request.headers": {
             "mapping": {
               "ignore_above": 1024,
               "type": "keyword"
             },
             "match_mapping_type": "string",
-            "path_match": "http.request_headers.*"
+            "path_match": "http.request.headers.*"
           }
         },
         {
-          "http.response_headers": {
+          "http.response.headers": {
             "mapping": {
               "ignore_above": 1024,
               "type": "keyword"
             },
             "match_mapping_type": "string",
-            "path_match": "http.response_headers.*"
+            "path_match": "http.response.headers.*"
           }
         }
       ],
@@ -274,12 +274,10 @@
             "stats": {
               "properties": {
                 "net_bytes_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 },
                 "net_packets_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 }
               }
             }
@@ -451,16 +449,33 @@
         },
         "http": {
           "properties": {
-            "code": {
-              "ignore_above": 1024,
-              "type": "keyword"
+            "request": {
+              "properties": {
+                "body": {
+                  "norms": false,
+                  "type": "text"
+                },
+                "params": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
             },
-            "content_length": {
-              "type": "long"
-            },
-            "phrase": {
-              "ignore_above": 1024,
-              "type": "keyword"
+            "response": {
+              "properties": {
+                "body": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "code": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "phrase": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
             }
           }
         },
@@ -946,12 +961,10 @@
             "stats": {
               "properties": {
                 "net_bytes_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 },
                 "net_packets_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 }
               }
             }

@@ -9,10 +9,13 @@ import (
 )
 
 type ConditionConfig struct {
-	Equals   *ConditionFields `config:"equals"`
-	Contains *ConditionFields `config:"contains"`
-	Regexp   *ConditionFields `config:"regexp"`
-	Range    *ConditionFields `config:"range"`
+	Equals   *ConditionFields  `config:"equals"`
+	Contains *ConditionFields  `config:"contains"`
+	Regexp   *ConditionFields  `config:"regexp"`
+	Range    *ConditionFields  `config:"range"`
+	OR       []ConditionConfig `config:"or"`
+	AND      []ConditionConfig `config:"and"`
+	NOT      *ConditionConfig  `config:"not"`
 }
 
 type ConditionFields struct {
@@ -122,8 +125,10 @@ func extractInt(unk interface{}) (uint64, error) {
 func extractString(unk interface{}) (string, error) {
 	switch s := unk.(type) {
 	case string:
-		return string(s), nil
+		return s, nil
+	case *string:
+		return *s, nil
 	default:
-		return "", fmt.Errorf("unkown type %T passed to extractString", unk)
+		return "", fmt.Errorf("unknown type %T passed to extractString", unk)
 	}
 }

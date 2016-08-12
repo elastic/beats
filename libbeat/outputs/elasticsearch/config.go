@@ -13,7 +13,6 @@ type elasticsearchConfig struct {
 	Username         string             `config:"username"`
 	Password         string             `config:"password"`
 	ProxyURL         string             `config:"proxy_url"`
-	Index            string             `config:"index"`
 	LoadBalance      bool               `config:"loadbalance"`
 	CompressionLevel int                `config:"compression_level" validate:"min=0, max=9"`
 	TLS              *outputs.TLSConfig `config:"tls"`
@@ -24,9 +23,20 @@ type elasticsearchConfig struct {
 }
 
 type Template struct {
-	Name      string `config:"name"`
-	Path      string `config:"path"`
-	Overwrite bool   `config:"overwrite"`
+	Enabled   bool             `config:"enabled"`
+	Name      string           `config:"name"`
+	Path      string           `config:"path"`
+	Overwrite bool             `config:"overwrite"`
+	Versions  TemplateVersions `config:"versions"`
+}
+
+type TemplateVersions struct {
+	Es2x TemplateVersion `config:"2x"`
+}
+
+type TemplateVersion struct {
+	Enabled bool   `config:"enabled"`
+	Path    string `config:"path"`
 }
 
 const (
@@ -46,6 +56,10 @@ var (
 		CompressionLevel: 0,
 		TLS:              nil,
 		LoadBalance:      true,
+		Template: Template{
+			Enabled:  true,
+			Versions: TemplateVersions{Es2x: TemplateVersion{Enabled: true}},
+		},
 	}
 )
 

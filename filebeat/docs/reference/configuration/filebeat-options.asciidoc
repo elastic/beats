@@ -93,7 +93,11 @@ filebeat.prospectors:
   include_lines: ["^ERR", "^WARN"]
 -------------------------------------------------------------------------------------
 
-NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes `include_lines` first and then executes `exclude_lines`. So, for example, to export all Apache log lines except the debugging messages (DBGs), you can use:
+NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes `include_lines` first and then executes `exclude_lines`.
+The order in which the two options are defined doesn't matter. The `include_lines` option will always be executed
+before the `exclude_lines` option, even if `exclude_lines` appears before `include_lines` in the config file.
+
+The following example exports all Apache log lines except the debugging messages (DBGs):
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -164,38 +168,115 @@ names added by Filebeat, then the custom fields overwrite the other fields.
 [[ignore-older]]
 ===== ignore_older
 
-If this option is specified, Filebeat
-ignores any files that were modified before the specified timespan. This is disabled by default.
+If this option is specified, Filebeat ignores any files that were modified before the specified timespan. This is disabled by default.
 
 You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 0, which means disable.
 Commenting out the config has the same affect as setting it to 0.
 
-Files which were falling under ignore_older and are updated again, will start
-from the offset the file was at when it was last ignored by ignore_older. As an example:
-A file was not modified for 90 hours and the offset is at 200. Now a new line is added and
-the last modification date is updated. After scan_frequency detects the change the crawling
-starts at the offset 200. In case the file was falling under ignore_older already when filebeat
-was started, the first 200 lines are never sent. In case filebeat was started earlier, the 200
-chars were already sent and it now continues at the old offset.
+There are two different cases for files which fall under ignore_older:
+
+* Files which were never harvested
+* Files which were harvested but weren't updated for longer then ignore_older
+
+In case a file was never harvested before and is updated, the reading will start from the beginning of the file as no state was persisted so far. For files which were harvested perviously, the state still exists and in case of an update, they will be continued at the last position.
+
+For comparison, `ignore_older` relies on the modification time of the file. In case the modification time of files is not updated when its written to a file (can happen on Windows), `ignore_older` will start to ignore the file even though it could be that content was added at a later time.
+
+`ignore_older` can be especially useful if you keep log files for a long time and you start filebeat, but only want to send the newest files to elasticsearch and the old files from the last week, but not all files.
+
+To remove the state from the registry file for files which were harvested before, the `clean_inactive` configuration option has to be used.
 
 
-===== close_older
+Requirement: ignore_older > close_inactive
 
-After a file was not modified for the duration of close_older, the file handle will be closed.
-After closing the file, a file change will only be detected after scan_frequency instead of almost
-instant.
+Before a file can be ignored by the prospector, it must be closed. To ensure a file is not harvested anymore when it is ignored, ignore_older must be set to a longer duration then `close_inactive`. It can happen, that a file is still harvested but already falls under `ignore_older` as the harvester didn't finish yet. The harvester will finish reading and close it after `close_inactive` is reached.
 
-You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 1h.
+[[close-options]]
+===== close_*
+
+All `close_*` configuration options are used to close the harvester after a certain criteria or time. Closing the harvester means closing the file handler. In case a file is updated again after the harvester is closed, it will be picked up again after <<scan-frequency>>. It is important to understand, in case the file was moved away or deleted during this period, filebeat will not be able to pick up the file again and any data that the harvester didn't read so far is lost.
+
+[[close-inactive]]
+===== close_inactive
+
+After a file was not harvested for the duration of `close_inactive`, the file handle will be closed. The counter for the defined period starts when the last log line was read by the harvester, it is not based on the modification time of the file. In case the closed file changes again, a new harvester is started again, latest after `scan_frequency`.
+
+It is recommended to set `close_inactive` to a value that is larger then the least frequent updates to your log file. In case your log file gets updated every few seconds, you can safely set it to `1m`. If there are log files with very different update rates, multiple prospector configurations with different values can be used.
+
+Setting `close_inactive` to a lower value means file handles are closed faster but has the side affect that new log lines are not sent in near real time in case the harvester was closed.
+
+The timestamp for closing a file does not depend on the modification time of the file but an internal timestamp that is update when the file was last harvested. If `close_inactive` is set to 5 minutes, the countdown for the 5 minutes starts the last time the harvester read a line from the file.
+
+You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 5m.
 
 
+===== close_renamed
+
+WARNING: Only use this options if you understand the potential side affects with potential data loss.
+
+This option allows a file handler to be closed when it is renamed. This happens for example when rotating files. By default, the harvester stays open and keeps reading the file as the file handler does not depend on the file name. If this option is enabled and the file was renamed/moved in such a way that it is not part of the prospector patterns, the file will not be picked up again. Filebeat will not finish reading the file.
+
+WINDOWS: In case under windows your log rotation system shows errors because it can't rotated the files, this is the option to enabled.
+
+===== close_removed
+
+WARNING: Only use this options if you understand the potential side affects with potential data loss.
+
+Close removed can be used to close a harvester directly when a file is removed. Normally a file should only be removed after it already falls under `close_inactive`. In case files are removed early, without this option filebeat keeps the file open to make sure finishing is completed. In case the file handle should be released immediately after removal, this option can be used.
+
+
+WINDOWS: In case under windows your log rotation system shows error because it can't rotated the files, this is the option to enabled.
+
+
+===== close_eof
+
+WARNING: Only use this options if you understand the potential side affects with potential data loss.
+
+Close eof closes a file as soon as the end of a file is reached. This is useful in case your files are only written once and not updated from time to time. This case can happen in case you are writing every single log event to a new file.
+
+===== close_timeout
+
+WARNING: Only use this options if you understand the potential side affects with potential data loss.
+
+Close timeout gives every harvester a predefined lifetime. Independent of the location of the reader, it will stop the reader after `close_timeout`. This option can be useful, if only a predefine time should be spent on older log files. Using this option in combination with `ignore_older` == `close_timeout` means the file is not picked up again in case it wasn't modified in between. This normally leads to data loss and not the complete file is sent.
+
+[[clean-options]]
+===== clean_*
+
+The `clean_*` variables are used to clean up the state entries. This helps to reduce the size of the registry file and can prevent a potential <<inode-reuse-issue>>. These options are disabled by default as wrong settings can lead to data duplicatin as complete log files are sent again.
+
+===== clean_inactive
+
+WARNING: Only use this options if you understand the potential side affects with potential data loss.
+
+`clean_inactive` removes the state of the file after the given period. The state for files can only be removed if the file is already ignored by filebeat, means it's falling under `ignore_older`. The requirement for clean idle is `clean_inactive > ignore_older + scan_frequency` to make sure no states are removed when a file is still harvested. Otherwise it could lead to resending the full content constantly as `clean_inactive` removes state for files which are still detected by the prospector. In case a file is updated or appears again, the file is read from the beginning.
+
+The `clean_inactive` configuration option is useful to reduce the size of the registry file, especially if a large amount of new files are generated every day.
+
+In addition this config option is useful to prevent the <<inode-reuse-issue>>. If a file is deleted, the inode can be reused by a newly created file. If the inode is the same, filebeat assumes to know the file and continues at the old position. As this issues gets more probable over time, it is good to cleanup the old states to make sure filebeat does not assume it already knows the file.
+
+NOTE: Every time a file is renamed, the file state will be updated and the counter for `clean_inactive` will start at 0 again.
+
+===== clean_removed
+
+WARNING: Only use this options if you understand the potential side affects.
+
+
+Cleans files which cannot be found on disk anymore. This does not apply to renamed files or files which were moved to an other directory which is still visible by filebeat. Be aware that this option will remove the state for removed files immediately. In case a shared drive disappeared for a short period and appears again, all files will be read again from the beginninh. This option can only be used in combination `close_removed`.
+
+
+[[scan-frequency]]
 ===== scan_frequency
 
 How often the prospector checks for new files in the paths that are specified
 for harvesting. For example, if you specify a glob like `/var/log/*`, the
 directory is scanned for files using the frequency specified by
 `scan_frequency`. Specify 1s to scan the directory as frequently as possible
-without causing Filebeat to scan too frequently. The default setting is
-10s.
+without causing Filebeat to scan too frequently. We do not recommend to set this value `<1s`.
+
+If you require log lines to be sent in near real time do not use a very low `scan_frequency` but adjust `close_inactive` so the file handler stays open and constantly polls your files.
+
+The default setting is 10s.
 
 ===== document_type
 
@@ -302,6 +383,8 @@ lines are discarded. The default is 500.
 
 If this option is set to true, Filebeat starts reading new files at the end of each file instead of the beginning. When this option is used in combination with log rotation, it's possible that the first log entries in a new file might be skipped. The default setting is false.
 
+This option applies to files that Filebeat has not already processed. If you ran Filebeat previously and the state of the file was already persisted, `tail_files` will not apply. Harvesting will continue at the previous offset. To apply `tail_files` to all files, you must stop Filebeat and remove the registry file. Be aware that doing this removes ALL previous states.
+
 NOTE: You can use this setting to avoid indexing old log lines when you run Filebeat on a set of log files for the first time. After the first run, we recommend disabling this option, or you risk losing lines during file rotation.
 
 ===== backoff
@@ -322,6 +405,8 @@ will never exceed `max_backoff` regardless of what is specified for  `backoff_fa
 Because it takes a maximum of 10s to read a new line, specifying 10s for `max_backoff` means that, at the worst, a new line could be added to the log file if Filebeat has
 backed off multiple times. The default is 10s.
 
+Requirement: max_backoff should always be set to `max_backoff <= scan_frequency`. In case `max_backoff` should be bigger, it is recommended to close the file handler instead let the prospector pick up the file again.
+
 ===== backoff_factor
 
 This option specifies how fast the waiting time is increased. The bigger the
@@ -331,15 +416,6 @@ the backoff algorithm is disabled, and the `backoff` value is used for waiting f
 lines. The `backoff` value will be multiplied each time with the `backoff_factor` until
 `max_backoff` is reached. The default is 2.
 
-===== force_close_files
-
-By default, Filebeat keeps the files that it’s reading open until the timespan specified by `close_older` has elapsed.
-This behaviour can cause issues when a file is removed. On Windows, the file cannot be fully removed until Filebeat closes
-the file. In addition no new file with the same name can be created during this time.
-
-You can force Filebeat to close the file as soon as the file name changes by setting the
-`force_close_files` option to true. The default is false. Turning on this option can lead to loss of data on
-rotated files in case not all lines were read from the rotated file.
 
 [[configuration-global-options]]
 === Filebeat Global Configuration
@@ -407,7 +483,7 @@ filebeat.config_dir: path/to/configs
 
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/filteringconfig.asciidoc[]
+include::../../../../libbeat/docs/processors-config.asciidoc[]
 
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 

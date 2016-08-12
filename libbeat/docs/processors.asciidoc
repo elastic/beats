@@ -1,0 +1,25 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/filtering.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+added[5.0.0-alpha5,Filters are being renamed to "processors" to better reflect the capabilities they provide. If you are using 5.0.0-alpha4 or earlier, these are still called "filters" even though the documentation refers to "processors"]
+
+You can define processors in your configuration to process events before they are sent to the configured output.
+The libbeat library provides processors for reducing the number of exported fields, and processors for
+enhancing events with additional metadata. Each processor receives an event, applies a defined action to the event,
+and returns the event. If you define a list of processors, they are executed in the order they are defined in the
+configuration file.
+
+[source,yaml]
+-------
+event -> processor 1 -> event1 -> processor 2 -> event2 ...
+-------
+
+The processors are defined in the {beatname_uc} configuration file.

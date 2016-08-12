@@ -971,11 +971,15 @@ Object with source to destination flow measurements.
 [float]
 === source.stats.net_packets_total
 
+type: long
+
 Total number of packets
 
 
 [float]
 === source.stats.net_bytes_total
+
+type: long
 
 Total number of bytes
 
@@ -1073,11 +1077,15 @@ Object with destination to source flow measurements.
 [float]
 === dest.stats.net_packets_total
 
+type: long
+
 Total number of packets
 
 
 [float]
 === dest.stats.net_bytes_total
+
+type: long
 
 Total number of bytes
 
@@ -1106,23 +1114,26 @@ optional TCP connection id
 HTTP-specific event fields.
 
 
+[float]
+== http Fields
+
+Information about the HTTP request and response.
+
 
 [float]
-=== http.code
+== request Fields
 
-example: 404
+HTTP request
 
-The HTTP status code.
-
-[float]
-=== http.phrase
-
-example: Not found.
-
-The HTTP status phrase.
 
 [float]
-=== http.request_headers
+=== http.request.params
+
+The query parameters or form values. The query parameters are available in the Request-URI and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
+
+
+[float]
+=== http.request.headers
 
 type: dict
 
@@ -1130,7 +1141,34 @@ A map containing the captured header fields from the request. Which headers to c
 
 
 [float]
-=== http.response_headers
+=== http.request.body
+
+type: text
+
+The body of the HTTP request.
+
+[float]
+== response Fields
+
+HTTP response
+
+
+[float]
+=== http.response.code
+
+example: 404
+
+The HTTP status code.
+
+[float]
+=== http.response.phrase
+
+example: Not found.
+
+The HTTP status phrase.
+
+[float]
+=== http.response.headers
 
 type: dict
 
@@ -1138,12 +1176,9 @@ A map containing the captured header fields from the response. Which headers to 
 
 
 [float]
-=== http.content_length
+=== http.response.body
 
-type: long
-
-The value of the Content-Length header if present.
-
+The body of the HTTP response.
 
 [[exported-fields-icmp]]
 == ICMP Fields
@@ -1388,6 +1423,8 @@ The list of base64 encoded values sent with the response (if present).
 
 type: long
 
+format: bytes
+
 The byte count of the values being transfered.
 
 
@@ -1395,6 +1432,8 @@ The byte count of the values being transfered.
 === memcache.response.bytes
 
 type: long
+
+format: bytes
 
 The byte count of the values being transfered.
 
@@ -2039,6 +2078,8 @@ The CPU time it took to complete the transaction.
 
 type: long
 
+format: bytes
+
 The number of bytes of the request. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 
 
@@ -2046,6 +2087,8 @@ The number of bytes of the request. Note that this size is the application layer
 === bytes_out
 
 type: long
+
+format: bytes
 
 The number of bytes of the response. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 

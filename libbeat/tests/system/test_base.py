@@ -25,7 +25,7 @@ class Test(BaseTest):
 
         assert exit_code == 1
         assert self.log_contains("error loading config file") is True
-        assert self.log_contains("failed to read") is True
+        assert self.log_contains("no such file or directory") is True
 
     def test_invalid_config(self):
         """
@@ -38,7 +38,29 @@ class Test(BaseTest):
 
         assert exit_code == 1
         assert self.log_contains("error loading config file") is True
-        assert self.log_contains("YAML config parsing failed") is True
+
+    def test_invalid_config_cli_param(self):
+        """
+        Checks CLI overwrite actually overwrites some config variable by
+        writing an invalid value.
+        """
+
+        self.render_config_template(
+            console={"pretty": "false"}
+        )
+
+        # first run with default config, validating config being
+        # actually correct.
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("Setup Beat"))
+        proc.check_kill_and_wait()
+
+        # start beat with invalid config setting on command line
+        exit_code = self.run_beat(
+            extra_args=["-E", "output.console=invalid"])
+
+        assert exit_code == 1
+        assert self.log_contains("error unpacking config data") is True
 
     def test_config_test(self):
         """
@@ -46,7 +68,9 @@ class Test(BaseTest):
         """
         shutil.copy("../../_meta/config.yml",
                     os.path.join(self.working_dir, "libbeat.yml"))
-        with open(self.working_dir + "/beatname.template.json", "w") as f:
+        with open(self.working_dir + "/mockbeat.template.json", "w") as f:
+            f.write('{"template": true}')
+        with open(self.working_dir + "/mockbeat.template-es2x.json", "w") as f:
             f.write('{"template": true}')
 
         exit_code = self.run_beat(
@@ -56,6 +80,13 @@ class Test(BaseTest):
 
         assert exit_code == 0
         assert self.log_contains("Config OK") is True
+
+    def test_version_simple(self):
+        """
+        Tests -version prints a version and exits.
+        """
+        self.start_beat(extra_args=["-version"]).check_wait()
+        assert self.log_contains("beat version") is True
 
     def test_version(self):
         """

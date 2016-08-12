@@ -3,7 +3,6 @@ package redis
 import (
 	"errors"
 	"expvar"
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -12,12 +11,14 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 type redisOut struct {
 	mode mode.ConnectionMode
 	topology
+	beatName string
 }
 
 var debugf = logp.MakeDebug("redis")
@@ -39,8 +40,8 @@ func init() {
 	outputs.RegisterOutputPlugin("redis", new)
 }
 
-func new(cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
-	r := &redisOut{}
+func new(beatName string, cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
+	r := &redisOut{beatName: beatName}
 	if err := r.init(cfg, expireTopo); err != nil {
 		return nil, err
 	}
@@ -69,9 +70,27 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		return errors.New("Bad Redis data type")
 	}
 
-	index := []byte(config.Index)
-	if len(index) == 0 {
-		return fmt.Errorf("missing %v", cfg.PathOf("index"))
+	if cfg.HasField("index") && !cfg.HasField("key") {
+		s, err := cfg.String("index", -1)
+		if err != nil {
+			return err
+		}
+		if err := cfg.SetString("key", -1, s); err != nil {
+			return err
+		}
+	}
+	if !cfg.HasField("key") {
+		cfg.SetString("key", -1, r.beatName)
+	}
+
+	key, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "key",
+		MultiKey:         "keys",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+	})
+	if err != nil {
+		return err
 	}
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
@@ -105,7 +124,7 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		if err != nil {
 			return nil, err
 		}
-		return newClient(t, config.Password, config.Db, index, dataType), nil
+		return newClient(t, config.Password, config.Db, key, dataType), nil
 	})
 	if err != nil {
 		return err

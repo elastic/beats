@@ -19,22 +19,24 @@ in pure go/cgo, rather than cgo bindings for libsigar.
 
 The features vary by operating system.
 
-| Feature         | Linux | Darwin | Windows | OpenBSD |
-|-----------------|:-----:|:------:|:-------:|:-------:|
-| Cpu             |   X   |    X   |    X    |    X    |
-| CpuList         |   X   |    X   |         |    X    |
-| FileSystemList  |   X   |    X   |    X    |    X    |
-| FileSystemUsage |   X   |    X   |    X    |    X    |
-| LoadAverage     |   X   |    X   |         |    X    |
-| Mem             |   X   |    X   |    X    |    X    |
-| ProcArgs        |   X   |    X   |    X    |         |
-| ProcExe         |   X   |    X   |         |         |
-| ProcList        |   X   |    X   |    X    |         |
-| ProcMem         |   X   |    X   |    X    |         |
-| ProcState       |   X   |    X   |    X    |         |
-| ProcTime        |   X   |    X   |    X    |         |
-| Swap            |   X   |    X   |         |    X    |
-| Uptime          |   X   |    X   |         |    X    |
+| Feature         | Linux | Darwin | Windows | OpenBSD | FreeBSD |
+|-----------------|:-----:|:------:|:-------:|:-------:|:-------:|
+| Cpu             |   X   |    X   |    X    |    X    |    X    |
+| CpuList         |   X   |    X   |         |    X    |    X    |
+| FDUsage         |   X   |        |         |         |    X    |
+| FileSystemList  |   X   |    X   |    X    |    X    |    X    |
+| FileSystemUsage |   X   |    X   |    X    |    X    |    X    |
+| LoadAverage     |   X   |    X   |         |    X    |    X    |
+| Mem             |   X   |    X   |    X    |    X    |    X    |
+| ProcArgs        |   X   |    X   |    X    |         |    X    |
+| ProcExe         |   X   |    X   |         |         |    X    |
+| ProcFDUsage     |   X   |        |         |         |    X    |
+| ProcList        |   X   |    X   |    X    |         |    X    |
+| ProcMem         |   X   |    X   |    X    |         |    X    |
+| ProcState       |   X   |    X   |    X    |         |    X    |
+| ProcTime        |   X   |    X   |    X    |         |    X    |
+| Swap            |   X   |    X   |         |    X    |    X    |
+| Uptime          |   X   |    X   |         |    X    |    X    |
 
 ## License
 

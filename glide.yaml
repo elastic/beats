@@ -25,7 +25,7 @@ import:
   subpackages:
   - /difflib
 - package: github.com/elastic/gosigar
-  version: 61dfed4a9eb484b8248fe22e5ff5346dc18e4332
+  version: 24abf0d672eeb6b663ac4f931b8030788ab45b80
 - package: github.com/samuel/go-parser
   version: ca8abbf65d0e61dedf061f98bd3850f250e27539
 - package: github.com/samuel/go-thrift
@@ -59,11 +59,13 @@ import:
 - package: github.com/miekg/dns
   version: 5d001d020961ae1c184f9f8152fdc73810481677
 - package: github.com/Shopify/sarama
-  version: v1.9.0
+  version: v1.10.0
 - package: github.com/klauspost/crc32
   version: v1.0
 - package: github.com/golang/snappy
   version: d9eb7a3d35ec988b8585d4a0068e462c27d28380
+- package: github.com/eapache/go-xerial-snappy
+  version: bb955e01b9346ac19dc29eb16586c90ded99a98c
 - package: github.com/eapache/queue
   version: ded5959c0d4e360646dc9e9908cff48666781367
 - package: github.com/eapache/go-resiliency
@@ -73,7 +75,7 @@ import:
 - package: github.com/dustin/go-humanize
   version: 499693e27ee0d14ffab67c31ad065fdb3d34ea75
 - package: github.com/elastic/go-ucfg
-  version: v0.3.0
+  version: v0.3.2
 - package: github.com/armon/go-socks5
   version: 3a873e99f5400ad7706e464e905ffcc94b3ff247
 - package: github.com/pkg/errors

@@ -1,9 +1,9 @@
-[[filtering-data]]
+[[filtering-and-enhancing-data]]
 == Filtering and Enhancing the Exported Data
 
-include::../../libbeat/docs/filtering.asciidoc[]
+include::../../libbeat/docs/processors.asciidoc[]
 
-For example, the following filters configuration includes a subset of the Packetbeat DNS fields so that only the
+For example, the following configuration includes a subset of the Packetbeat DNS fields so that only the
 requests and their response codes are reported:
 
 [source, yaml]
@@ -43,7 +43,7 @@ The filtered event would look something like this:
 
 If you would like to drop all the successful transactions, you can use the following configuration:
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
 
 [source,yaml]
 ------------
@@ -53,11 +53,11 @@ filters:
        http.code: 200
 -----------
 
-coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
 
 [source,yaml]
 ------------
-filters:
+processors:
  - drop_event:
      when:
         equals:
@@ -67,7 +67,7 @@ filters:
 
 If you don't want to export raw data for the successful transactions:
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
 
 [source,yaml]
 ------------
@@ -78,11 +78,11 @@ filters:
      fields: ["request", "response"]
 ------------
 
-coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
 
 [source,yaml]
 ------------
-filters:
+processors:
  - drop_fields:
      when:
         equals:
@@ -90,4 +90,4 @@ filters:
      fields: ["request", "response"]
 ------------
 
-See <<configuration-filter>> for more information.
+See <<configuration-processors>> for more information.

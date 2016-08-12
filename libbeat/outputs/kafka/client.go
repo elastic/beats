@@ -11,19 +11,17 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
 type client struct {
-	hosts   []string
-	topic   string
-	useType bool
-	config  sarama.Config
+	hosts  []string
+	topic  outil.Selector
+	config sarama.Config
 
 	producer sarama.AsyncProducer
 
 	wg sync.WaitGroup
-
-	isConnected int32
 }
 
 type msgRef struct {
@@ -40,12 +38,15 @@ var (
 	publishEventsCallCount = expvar.NewInt("libbeat.kafka.call_count.PublishEvents")
 )
 
-func newKafkaClient(hosts []string, topic string, useType bool, cfg *sarama.Config) (*client, error) {
+func newKafkaClient(
+	hosts []string,
+	topic outil.Selector,
+	cfg *sarama.Config,
+) (*client, error) {
 	c := &client{
-		hosts:   hosts,
-		useType: useType,
-		topic:   topic,
-		config:  *cfg,
+		hosts:  hosts,
+		topic:  topic,
+		config: *cfg,
 	}
 	return c, nil
 }
@@ -67,25 +68,17 @@ func (c *client) Connect(timeout time.Duration) error {
 	c.wg.Add(2)
 	go c.successWorker(producer.Successes())
 	go c.errorWorker(producer.Errors())
-	atomic.StoreInt32(&c.isConnected, 1)
 
 	return nil
 }
 
 func (c *client) Close() error {
-	if c.IsConnected() {
-		debugf("closed kafka client")
+	debugf("closed kafka client")
 
-		c.producer.AsyncClose()
-		c.wg.Wait()
-		atomic.StoreInt32(&c.isConnected, 0)
-		c.producer = nil
-	}
+	c.producer.AsyncClose()
+	c.wg.Wait()
+	c.producer = nil
 	return nil
-}
-
-func (c *client) IsConnected() bool {
-	return atomic.LoadInt32(&c.isConnected) != 0
 }
 
 func (c *client) AsyncPublishEvent(
@@ -113,9 +106,19 @@ func (c *client) AsyncPublishEvents(
 	ch := c.producer.Input()
 
 	for _, event := range events {
-		topic := c.topic
-		if c.useType {
-			topic = event["type"].(string)
+		topic, err := c.topic.Select(event)
+
+		var ts time.Time
+
+		// message timestamps have been added to kafka with version 0.10.0.0
+		if c.config.Version.IsAtLeast(sarama.V0_10_0_0) {
+			if tsRaw, ok := event["@timestamp"]; ok {
+				if tmp, ok := tsRaw.(common.Time); ok {
+					ts = time.Time(tmp)
+				} else if tmp, ok := tsRaw.(time.Time); ok {
+					ts = tmp
+				}
+			}
 		}
 
 		jsonEvent, err := json.Marshal(event)
@@ -125,9 +128,10 @@ func (c *client) AsyncPublishEvents(
 		}
 
 		msg := &sarama.ProducerMessage{
-			Metadata: ref,
-			Topic:    topic,
-			Value:    sarama.ByteEncoder(jsonEvent),
+			Metadata:  ref,
+			Topic:     topic,
+			Value:     sarama.ByteEncoder(jsonEvent),
+			Timestamp: ts,
 		}
 
 		ch <- msg

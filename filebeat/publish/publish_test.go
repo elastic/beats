@@ -13,16 +13,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func makeEvents(name string, n int) []*input.FileEvent {
-	var events []*input.FileEvent
+func makeEvents(name string, n int) []*input.Event {
+	var events []*input.Event
 	for i := 0; i < n; i++ {
-		event := &input.FileEvent{
+		event := &input.Event{
 			ReadTime:     time.Now(),
 			InputType:    "log",
 			DocumentType: "log",
 			Bytes:        100,
-			Offset:       int64(i),
-			Source:       name,
 		}
 		events = append(events, event)
 	}
@@ -43,14 +41,14 @@ func TestPublisherModes(t *testing.T) {
 	for i, test := range tests {
 		t.Logf("run publisher test (%v): %v", i, test.title)
 
-		pubChan := make(chan []*input.FileEvent, len(test.order)+1)
-		regChan := make(chan []*input.FileEvent, len(test.order)+1)
+		pubChan := make(chan []*input.Event, len(test.order)+1)
+		regChan := make(chan []*input.Event, len(test.order)+1)
 		client := pubtest.NewChanClient(0)
 
-		pub := New(test.async, pubChan, regChan, client)
+		pub := New(test.async, pubChan, regChan, pubtest.PublisherWithClient(client))
 		pub.Start()
 
-		var events [][]*input.FileEvent
+		var events [][]*input.Event
 		for i := range test.order {
 			tmp := makeEvents(fmt.Sprintf("msg: %v", i), 1)
 			pubChan <- tmp
@@ -67,7 +65,7 @@ func TestPublisherModes(t *testing.T) {
 			op.SigCompleted(msgs[i-1].Context.Signal)
 		}
 
-		var regEvents [][]*input.FileEvent
+		var regEvents [][]*input.Event
 		for _ = range test.order {
 			regEvents = append(regEvents, <-regChan)
 		}

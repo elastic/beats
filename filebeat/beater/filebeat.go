@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
 	cfg "github.com/elastic/beats/filebeat/config"
@@ -21,39 +22,26 @@ type Filebeat struct {
 }
 
 // New creates a new Filebeat pointer instance.
-func New() *Filebeat {
+func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	config := cfg.DefaultConfig
-	return &Filebeat{
+	if err := rawConfig.Unpack(&config); err != nil {
+		return nil, fmt.Errorf("Error reading config file: %v", err)
+	}
+	if err := config.FetchConfigs(); err != nil {
+		return nil, err
+	}
+
+	fb := &Filebeat{
+		done:   make(chan struct{}),
 		config: &config,
 	}
-}
-
-// Config setups up the filebeat configuration by fetch all additional config files
-func (fb *Filebeat) Config(b *beat.Beat) error {
-
-	// Load Base config
-	err := b.RawConfig.Unpack(&fb.config)
-	if err != nil {
-		return fmt.Errorf("Error reading config file: %v", err)
-	}
-
-	// Check if optional config_dir is set to fetch additional prospector config files
-	fb.config.FetchConfigs()
-
-	return nil
-}
-
-// Setup applies the minimum required setup to a new Filebeat instance for use.
-func (fb *Filebeat) Setup(b *beat.Beat) error {
-	fb.done = make(chan struct{})
-	return nil
+	return fb, nil
 }
 
 // Run allows the beater to be run as a beat.
 func (fb *Filebeat) Run(b *beat.Beat) error {
-
 	var err error
-	config := fb.config.Filebeat
+	config := fb.config
 
 	// Setup registrar to persist state
 	registrar, err := registrar.New(config.RegistryFile)
@@ -63,11 +51,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Channel from harvesters to spooler
-	publisherChan := make(chan []*input.FileEvent, 1)
+	publisherChan := make(chan []*input.Event, 1)
 
 	// Publishes event to output
 	publisher := publish.New(config.PublishAsync,
-		publisherChan, registrar.Channel, b.Publisher.Connect())
+		publisherChan, registrar.Channel, b.Publisher)
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
 	spooler, err := spooler.New(config, publisherChan)
@@ -117,14 +105,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	return nil
 }
 
-// Cleanup removes any temporary files, data, or other items that were created by the Beat.
-func (fb *Filebeat) Cleanup(b *beat.Beat) error {
-	return nil
-}
-
 // Stop is called on exit to stop the crawling, spooling and registration processes.
 func (fb *Filebeat) Stop() {
-
 	logp.Info("Stopping filebeat")
 
 	// Stop Filebeat

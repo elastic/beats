@@ -1,12 +1,24 @@
 package processors
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
 )
+
+type countFilter struct {
+	N int
+}
+
+func (c *countFilter) Run(e common.MapStr) (common.MapStr, error) {
+	c.N++
+	return e, nil
+}
+
+func (c *countFilter) String() string { return "count" }
 
 func TestBadCondition(t *testing.T) {
 
@@ -303,4 +315,302 @@ func TestRangeCondition(t *testing.T) {
 	assert.False(t, conds[2].Check(event))
 	assert.True(t, conds[3].Check(event1))
 	assert.False(t, conds[3].Check(event))
+}
+
+func TestORCondition(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+	configs := []ConditionConfig{
+		ConditionConfig{
+			OR: []ConditionConfig{
+				ConditionConfig{
+					Range: &ConditionFields{fields: map[string]interface{}{
+						"http.code.gte": 400,
+						"http.code.lt":  500,
+					}},
+				},
+				ConditionConfig{
+					Range: &ConditionFields{fields: map[string]interface{}{
+						"http.code.gte": 200,
+						"http.code.lt":  300,
+					}},
+				},
+			},
+		},
+	}
+
+	conds := GetConditions(t, configs)
+	for _, cond := range conds {
+		logp.Debug("test", "%s", cond)
+	}
+
+	event := common.MapStr{
+		"@timestamp":    "2015-06-11T09:51:23.642Z",
+		"bytes_in":      126,
+		"bytes_out":     28033,
+		"client_ip":     "127.0.0.1",
+		"client_port":   42840,
+		"client_proc":   "",
+		"client_server": "mar.local",
+		"http": common.MapStr{
+			"code":           404,
+			"content_length": 76985,
+			"phrase":         "Not found",
+		},
+		"ip":           "127.0.0.1",
+		"method":       "GET",
+		"params":       "",
+		"path":         "/jszip.min.js",
+		"port":         8000,
+		"proc":         "",
+		"query":        "GET /jszip.min.js",
+		"responsetime": 30,
+		"server":       "mar.local",
+		"status":       "OK",
+		"type":         "http",
+	}
+
+	assert.True(t, conds[0].Check(event))
+
+}
+
+func TestANDCondition(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+	configs := []ConditionConfig{
+		ConditionConfig{
+			AND: []ConditionConfig{
+				ConditionConfig{
+					Equals: &ConditionFields{fields: map[string]interface{}{
+						"client_server": "mar.local",
+					}},
+				},
+				ConditionConfig{
+					Range: &ConditionFields{fields: map[string]interface{}{
+						"http.code.gte": 400,
+						"http.code.lt":  500,
+					}},
+				},
+			},
+		},
+	}
+
+	conds := GetConditions(t, configs)
+	for _, cond := range conds {
+		logp.Debug("test", "%s", cond)
+	}
+
+	event := common.MapStr{
+		"@timestamp":    "2015-06-11T09:51:23.642Z",
+		"bytes_in":      126,
+		"bytes_out":     28033,
+		"client_ip":     "127.0.0.1",
+		"client_port":   42840,
+		"client_proc":   "",
+		"client_server": "mar.local",
+		"http": common.MapStr{
+			"code":           404,
+			"content_length": 76985,
+			"phrase":         "Not found",
+		},
+		"ip":           "127.0.0.1",
+		"method":       "GET",
+		"params":       "",
+		"path":         "/jszip.min.js",
+		"port":         8000,
+		"proc":         "",
+		"query":        "GET /jszip.min.js",
+		"responsetime": 30,
+		"server":       "mar.local",
+		"status":       "OK",
+		"type":         "http",
+	}
+
+	assert.True(t, conds[0].Check(event))
+
+}
+
+func TestNOTCondition(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+	configs := []ConditionConfig{
+		ConditionConfig{
+			NOT: &ConditionConfig{
+				Equals: &ConditionFields{fields: map[string]interface{}{
+					"method": "GET",
+				}},
+			},
+		},
+	}
+
+	conds := GetConditions(t, configs)
+	for _, cond := range conds {
+		logp.Debug("test", "%s", cond)
+	}
+
+	event := common.MapStr{
+		"@timestamp":    "2015-06-11T09:51:23.642Z",
+		"bytes_in":      126,
+		"bytes_out":     28033,
+		"client_ip":     "127.0.0.1",
+		"client_port":   42840,
+		"client_proc":   "",
+		"client_server": "mar.local",
+		"http": common.MapStr{
+			"code":           404,
+			"content_length": 76985,
+			"phrase":         "Not found",
+		},
+		"ip":           "127.0.0.1",
+		"method":       "GET",
+		"params":       "",
+		"path":         "/jszip.min.js",
+		"port":         8000,
+		"proc":         "",
+		"query":        "GET /jszip.min.js",
+		"responsetime": 30,
+		"server":       "mar.local",
+		"status":       "OK",
+		"type":         "http",
+	}
+
+	assert.False(t, conds[0].Check(event))
+
+}
+
+func TestCombinedCondition(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+	configs := []ConditionConfig{
+		ConditionConfig{
+			OR: []ConditionConfig{
+				ConditionConfig{
+					Range: &ConditionFields{fields: map[string]interface{}{
+						"http.code.gte": 100,
+						"http.code.lt":  300,
+					}},
+				},
+				ConditionConfig{
+					AND: []ConditionConfig{
+						ConditionConfig{
+							Equals: &ConditionFields{fields: map[string]interface{}{
+								"status": 200,
+							}},
+						},
+						ConditionConfig{
+							Equals: &ConditionFields{fields: map[string]interface{}{
+								"type": "http",
+							}},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	conds := GetConditions(t, configs)
+	for _, cond := range conds {
+		logp.Debug("test", "%s", cond)
+	}
+
+	event := common.MapStr{
+		"@timestamp":    "2015-06-11T09:51:23.642Z",
+		"bytes_in":      126,
+		"bytes_out":     28033,
+		"client_ip":     "127.0.0.1",
+		"client_port":   42840,
+		"client_proc":   "",
+		"client_server": "mar.local",
+		"http": common.MapStr{
+			"code":           200,
+			"content_length": 76985,
+			"phrase":         "OK",
+		},
+		"ip":           "127.0.0.1",
+		"method":       "GET",
+		"params":       "",
+		"path":         "/jszip.min.js",
+		"port":         8000,
+		"proc":         "",
+		"query":        "GET /jszip.min.js",
+		"responsetime": 30,
+		"server":       "mar.local",
+		"status":       "OK",
+		"type":         "http",
+	}
+
+	assert.True(t, conds[0].Check(event))
+
+}
+
+func TestWhenProcessor(t *testing.T) {
+	type config map[string]interface{}
+
+	tests := []struct {
+		title    string
+		filter   config
+		events   []common.MapStr
+		expected int
+	}{
+		{
+			"condition_matches",
+			config{"when.equals.i": 10},
+			[]common.MapStr{{"i": 10}},
+			1,
+		},
+		{
+			"condition_fails",
+			config{"when.equals.i": 11},
+			[]common.MapStr{{"i": 10}},
+			0,
+		},
+		{
+			"no_condition",
+			config{},
+			[]common.MapStr{{"i": 10}},
+			1,
+		},
+	}
+
+	for i, test := range tests {
+		t.Logf("run test (%v): %v", i, test.title)
+
+		config, err := common.NewConfigFrom(test.filter)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		cf := &countFilter{}
+		filter, err := NewConditional(func(_ common.Config) (Processor, error) {
+			return cf, nil
+		})(*config)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		for _, event := range test.events {
+			_, err := filter.Run(event)
+			if err != nil {
+				t.Error(err)
+			}
+		}
+
+		assert.Equal(t, test.expected, cf.N)
+	}
+}
+
+func TestConditionRuleInitErrorPropagates(t *testing.T) {
+	testErr := errors.New("test")
+	filter, err := NewConditional(func(_ common.Config) (Processor, error) {
+		return nil, testErr
+	})(common.Config{})
+
+	assert.Equal(t, testErr, err)
+	assert.Nil(t, filter)
 }

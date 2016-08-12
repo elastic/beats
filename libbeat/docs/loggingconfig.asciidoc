@@ -43,19 +43,19 @@ You can specify the following options in the `logging` section of the +{beatname
 
 ===== to_syslog
 
-Sends all logging output to syslog if enabled. For non-Windows systems, the default
-value is true.
+If enabled, sends all logging output to syslog. The default
+value is false. 
 
 ===== to_files
 
-Writes all logging output to files subject to file rotation. On Windows systems, the
+Writes all logging output to files subject to file rotation. The
 default value is true.
 
 ===== level
 
 Minimum log level. One of debug, info, warning, error or critical. If debug is
 used, but no selectors are configured, the `*` selector will be used.
-The default log level is error.
+The default log level is "info".
 
 ===== selectors
 

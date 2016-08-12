@@ -30,25 +30,25 @@
           }
         },
         {
-          "http.request_headers": {
+          "http.request.headers": {
             "mapping": {
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
             },
             "match_mapping_type": "string",
-            "path_match": "http.request_headers.*"
+            "path_match": "http.request.headers.*"
           }
         },
         {
-          "http.response_headers": {
+          "http.response.headers": {
             "mapping": {
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
             },
             "match_mapping_type": "string",
-            "path_match": "http.response_headers.*"
+            "path_match": "http.response.headers.*"
           }
         }
       ],
@@ -311,14 +311,10 @@
             "stats": {
               "properties": {
                 "net_bytes_total": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
+                  "type": "long"
                 },
                 "net_packets_total": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
+                  "type": "long"
                 }
               }
             }
@@ -512,18 +508,40 @@
         },
         "http": {
           "properties": {
-            "code": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
+            "request": {
+              "properties": {
+                "body": {
+                  "index": "analyzed",
+                  "norms": {
+                    "enabled": false
+                  },
+                  "type": "string"
+                },
+                "params": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
             },
-            "content_length": {
-              "type": "long"
-            },
-            "phrase": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
+            "response": {
+              "properties": {
+                "body": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "code": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "phrase": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
             }
           }
         },
@@ -1083,14 +1101,10 @@
             "stats": {
               "properties": {
                 "net_bytes_total": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
+                  "type": "long"
                 },
                 "net_packets_total": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
+                  "type": "long"
                 }
               }
             }

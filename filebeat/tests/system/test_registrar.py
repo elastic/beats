@@ -454,7 +454,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
-            ignoreOlder="2m",
+            ignore_older="2m",
             scan_frequency="1s"
         )
 
@@ -528,7 +528,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
-            ignoreOlder="2m",
+            ignore_older="2m",
             scan_frequency="1s"
         )
 
@@ -704,18 +704,17 @@ class Test(BaseTest):
         assert len(data) == 2
 
 
-    def test_clean_older(self):
+    def test_clean_inactive(self):
         """
-        Checks that states are properly removed after clean_older
+        Checks that states are properly removed after clean_inactive
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
-            clean_older="4s",
-            ignoreOlder="2s",
-            closeOlder="0.2s",
+            clean_inactive="4s",
+            ignore_older="2s",
+            close_inactive="0.2s",
             scan_frequency="0.1s"
         )
-
 
         os.mkdir(self.working_dir + "/log/")
         testfile1 = self.working_dir + "/log/input1"
@@ -733,6 +732,11 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=2),
             max_timeout=10)
+
+        # Wait until registry file is created
+        self.wait_until(
+            lambda: self.log_contains("Registry file updated"),
+            max_timeout=15)
 
         data = self.get_registry()
         assert len(data) == 2
@@ -805,7 +809,7 @@ class Test(BaseTest):
         # Wait until states are removed from prospectors
         self.wait_until(
             lambda: self.log_contains(
-                "Cleanup state for file as file removed"),
+                "Remove state for file as file removed"),
             max_timeout=15)
 
         # Add one more line to make sure registry is written

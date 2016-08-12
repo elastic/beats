@@ -95,23 +95,23 @@
                 CPU stats.
               fields:
                 - name: load
-                  type: half_float
+                  type: scaled_float
                   description: >
                     CPU Load.
                 - name: user
-                  type: half_float
+                  type: scaled_float
                   description: >
                     CPU user load.
                 - name: system
-                  type: half_float
+                  type: scaled_float
                   description: >
                     System cpu.
                 - name: children_user
-                  type: half_float
+                  type: scaled_float
                   description: >
                     CPU of children user.
                 - name: children_system
-                  type: half_float
+                  type: scaled_float
                   description: >
                     CPU of children system.
             - name: connections
@@ -396,6 +396,7 @@
               fields:
                 - name: heap_usage.bytes
                   type: long
+                  format: bytes
                   description: >
                     The total size in bytes of heap space used by the database process.
                     Only available on Unix/Linux.
@@ -413,10 +414,12 @@
               fields:
                 - name: in.bytes
                   type: long
+                  format: bytes
                   description: >
                     The amount of network traffic, in bytes, received by this database.
                 - name: out.bytes
                   type: long
+                  format: bytes
                   description: >
                     The amount of network traffic, in bytes, sent from this database.
                 - name: requests
@@ -594,12 +597,14 @@
                 Bytes stats.
               fields:
                 - name: received
+                  format: bytes
                   type: integer
                   description: >
                     The number of bytes received from all clients.
 
                 - name: sent
                   type: integer
+                  format: bytes
                   description: >
                     The number of bytes sent to all clients.
 
@@ -861,31 +866,31 @@
                   type: integer
                   description:
 
-                - name: used.enabled
+                - name: aof.enabled
                   type: boolean
                   description:
 
-                - name: used.rewrite_in_progress
+                - name: aof.rewrite_in_progress
                   type: boolean
                   description:
 
-                - name: used.rewrite_scheduled
+                - name: aof.rewrite_scheduled
                   type: boolean
                   description:
 
-                - name: used.last_rewrite_time_sec
+                - name: aof.last_rewrite_time_sec
                   type: integer
                   description:
 
-                - name: used.current_rewrite_time_sec
+                - name: aof.current_rewrite_time_sec
                   type: integer
                   description:
 
-                - name: used.last_bgrewrite_status
+                - name: aof.last_bgrewrite_status
                   type: keyword
                   description:
 
-                - name: used.last_write_status
+                - name: aof.last_write_status
                   type: keyword
                   description:
 
@@ -1116,7 +1121,8 @@
                 CPU Core number.
 
             - name: user.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
                 For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
@@ -1127,7 +1133,8 @@
                The amount of CPU time spent in user space.
 
             - name: system.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in kernel space.
 
@@ -1137,7 +1144,8 @@
                 The amount of CPU time spent in kernel space.
 
             - name: nice.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent on low-priority processes.
 
@@ -1147,7 +1155,8 @@
                 The amount of CPU time spent on low-priority processes.
 
             - name: idle.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent idle.
 
@@ -1157,7 +1166,8 @@
                 The amount of CPU time spent idle.
 
             - name: iowait.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in wait (on disk).
 
@@ -1167,7 +1177,8 @@
                 The amount of CPU time spent in wait (on disk).
 
             - name: irq.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -1177,7 +1188,8 @@
                 The amount of CPU time spent servicing and handling hardware interrupts.
 
             - name: softirq.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent servicing and handling software interrupts.
 
@@ -1187,7 +1199,8 @@
                 The amount of CPU time spent servicing and handling software interrupts.
 
             - name: steal.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
@@ -1206,43 +1219,51 @@
             `cpu` contains local CPU stats.
           fields:
             - name: user.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
                 For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
             - name: system.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in kernel space.
 
             - name: nice.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent on low-priority processes.
 
             - name: idle.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent idle.
 
             - name: iowait.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in wait (on disk).
 
             - name: irq.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent servicing and handling hardware interrupts.
 
             - name: softirq.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent servicing and handling software interrupts.
 
             - name: steal.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
@@ -1289,24 +1310,6 @@
                 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
                 Available only on Unix.
-
-            - name: load
-              type: group
-              description: >
-                Load averages.
-              fields:
-                - name: "1"
-                  type: half_float
-                  description: >
-                    Load average for the last minute.
-                - name: "5"
-                  type: half_float
-                  description: >
-                    Load average for the last 5 minutes.
-                - name: "15"
-                  type: half_float
-                  description: >
-                    Load average for the last 15 minutes.
         - name: diskio
           type: group
           description: >
@@ -1336,12 +1339,14 @@
 
             - name: read.bytes
               type: long
+              format: bytes
               description: >
                 The total number of bytes read successfully. On Linux this is
                 the number of sectors read multiplied by an assumed sector size of 512.
 
             - name: write.bytes
               type: long
+              format: bytes
               description: >
                 The total number of bytes written successfully. On Linux this is
                 the number of sectors written multiplied by an assumed sector size of
@@ -1366,8 +1371,9 @@
           description: >
             `filesystem` contains local filesystem stats.
           fields:
-            - name: avail
+            - name: available
               type: long
+              format: bytes
               description: >
                 The disk space available to an unprivileged user in bytes.
             - name: device_name
@@ -1384,6 +1390,7 @@
                 The total number of file nodes in the file system.
             - name: free
               type: long
+              format: bytes
               description: >
                 The disk space available in bytes.
             - name: free_files
@@ -1392,14 +1399,17 @@
                 The number of free file nodes in the file system.
             - name: total
               type: long
+              format: bytes
               description: >
                 The total disk space in bytes.
             - name: used.bytes
               type: long
+              format: bytes
               description: >
                 The used disk space in bytes.
             - name: used.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of used disk space.
 
@@ -1417,21 +1427,63 @@
               type: long
               description: Total number of files.
             - name: total_size
+              format: bytes
               type: group
               description: Nested file system docs.
               fields:
                 - name: free
                   type: long
+                  format: bytes
                   description: >
                     Total free space.
                 - name: used
                   type: long
+                  format: bytes
                   description: >
                     Total used space.
                 - name: total
                   type: long
+                  format: bytes
                   description: >
                     Total space (used plus free).
+        - name: load
+          type: group
+          description: >
+            Load averages.
+          fields:
+            - name: "1"
+              type: scaled_float
+              scaling_factor: 100
+              description: >
+                Load average for the last minute.
+            - name: "5"
+              type: scaled_float
+              scaling_factor: 100
+              description: >
+                Load average for the last 5 minutes.
+            - name: "15"
+              type: scaled_float
+              scaling_factor: 100
+              description: >
+                Load average for the last 15 minutes.
+
+            - name: "norm.1"
+              type: scaled_float
+              scaling_factor: 100
+              description: >
+                Load divided by the number of cores for the last minute.
+
+            - name: "norm.5"
+              type: scaled_float
+              scaling_factor: 100
+              description: >
+                Load divided by the number of cores for the last 5 minutes.
+
+            - name: "norm.15"
+              type: scaled_float
+              scaling_factor: 100
+              description: >
+                Load divided by the number of cores for the last 15 minutes.
         - name: memory
           type: group
           description: >
@@ -1439,43 +1491,51 @@
           fields:
             - name: total
               type: long
+              format: bytes
               description: >
                 Total memory.
 
             - name: used.bytes
               type: long
+              format: bytes
               description: >
                 Used memory.
 
             - name: free
               type: long
+              format: bytes
               description: >
-                Available memory.
+                The total amount of free memory in bytes. This value does not include memory consumed by system caches and
+                buffers (see system.memory.actual.free).
 
             - name: used.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of used memory.
 
             - name: actual
               type: group
               description: >
-                Actual memory fields.
+                Actual memory used and free.
               fields:
+
                 - name: used.bytes
                   type: long
                   description: >
-                    Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
-                    Available only on Unix.
-
+                    Actual used memory in bytes. It represents the difference between the total and the available memory. The
+                    available memory depends on the OS. For more details, please check `system.actual.free`.
+ 
                 - name: free
                   type: long
                   description: >
-                    Actual available memory. This value is the "free" memory plus the memory used for disk caches and
-                    buffers. Available only on Unix.
+                    Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory
+                    plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is the 
+                    amount of unreserved and uncommitted memory currently in the user-mode portion of the virtual address space
+                    of the calling process.
 
                 - name: used.pct
-                  type: half_float
+                  type: scaled_float
                   description: >
                     The percentage of actual used memory.
 
@@ -1486,21 +1546,25 @@
               fields:
                 - name: total
                   type: long
+                  format: bytes
                   description: >
                     Total swap memory.
 
                 - name: used.bytes
                   type: long
+                  format: bytes
                   description: >
                     Used swap memory.
 
                 - name: free
                   type: long
+                  format: bytes
                   description: >
                     Available swap memory.
 
                 - name: used.pct
-                  type: half_float
+                  type: scaled_float
+                  format: percent
                   description: >
                     The percentage of used swap memory.
         - name: network
@@ -1516,11 +1580,13 @@
 
             - name: out.bytes
               type: long
+              format: bytes
               description: >
                 The number of bytes sent.
 
             - name: in.bytes
               type: long
+              format: bytes
               description: >
                 The number of bytes received.
 
@@ -1575,6 +1641,10 @@
               type: integer
               description: >
                 The process parent pid.
+            - name: pgid
+              type: integer
+              description: >
+                The process group id.
             - name: cmdline
               type: keyword
               description: >
@@ -1597,7 +1667,8 @@
                   description: >
                     The amount of CPU time the process spent in user space.
                 - name: total.pct
-                  type: half_float
+                  type: scaled_float
+                  format: percent
                   description: >
                     The percentage of CPU time spent by the process since the last update. Its value is similar to the
                     %CPU value of the process displayed by the top command on Unix systems.
@@ -1610,9 +1681,9 @@
                   description: >
                     The total CPU time spent by the process.
                 - name: start_time
-                  type: keyword
+                  type: date
                   description: >
-                    The time when the process was started. Example: "17:45".
+                    The time when the process was started.
             - name: memory
               type: group
               description: Memory-specific statistics per process.
@@ -1620,20 +1691,368 @@
               fields:
                 - name: size
                   type: long
+                  format: bytes
                   description: >
                     The total virtual memory the process has.
                 - name: rss.bytes
                   type: long
+                  format: bytes
                   description: >
                     The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
                 - name: rss.pct
-                  type: half_float
+                  type: scaled_float
+                  format: percent
                   description: >
                     The percentage of memory the process occupied in main memory (RAM).
                 - name: share
                   type: long
+                  format: bytes
                   description: >
                     The shared memory the process uses.
+            - name: cgroup
+              type: group
+              description: >
+                Metrics and limits from the cgroup of which the task is a member.
+                cgroup metrics are reported when the process has membership in a
+                non-root cgroup. These metrics are only available on Linux.
+              fields:
+                - name: id
+                  type: keyword
+                  description: >
+                    The ID common to all cgroups associated with this task.
+                    If there isn't a common ID used by all cgroups this field will be
+                    absent.
+
+                - name: path
+                  type: keyword
+                  description: >
+                    The path to the cgroup relative to the cgroup subsystem's mountpoint.
+                    If there isn't a common path used by all cgroups this field will be
+                    absent.
+
+                - name: cpu
+                  type: group
+                  description: >
+                    The cpu subsystem schedules CPU access for tasks in the cgroup.
+                    Access can be controlled by two separate schedulers, CFS and RT.
+                    CFS stands for completely fair scheduler which proportionally
+                    divides the CPU time between cgroups based on weight. RT stands for
+                    real time scheduler which sets a maximum amount of CPU time that
+                    processes in the cgroup can consume during a given period.
+
+                  fields:
+                    - name: id
+                      type: keyword
+                      description: ID of the cgroup.
+
+                    - name: path
+                      type: keyword
+                      description: >
+                        Path to the cgroup relative to the cgroup subsystem's
+                        mountpoint.
+
+                    - name: cfs.period.us
+                      type: long
+                      description: >
+                        Period of time in microseconds for how regularly a
+                        cgroup's access to CPU resources should be reallocated.
+
+                    - name: cfs.quota.us
+                      type: long
+                      description: >
+                        Total amount of time in microseconds for which all
+                        tasks in a cgroup can run during one period (as defined by
+                        cfs.period.us).
+
+                    - name: cfs.shares
+                      type: long
+                      description: >
+                        An integer value that specifies a relative share of CPU time
+                        available to the tasks in a cgroup. The value specified in the
+                        cpu.shares file must be 2 or higher.
+
+                    - name: rt.period.us
+                      type: long
+                      description: >
+                        Period of time in microseconds for how regularly a cgroup's
+                        access to CPU resources is reallocated.
+
+                    - name: rt.runtime.us
+                      type: long
+                      description: >
+                        Period of time in microseconds for the longest continuous period
+                        in which the tasks in a cgroup have access to CPU resources.
+
+                    - name: stats.periods
+                      type: long
+                      description: >
+                        Number of period intervals (as specified in cpu.cfs.period.us)
+                        that have elapsed.
+
+                    - name: stats.throttled.periods
+                      type: long
+                      description: >
+                        Number of times tasks in a cgroup have been throttled (that is,
+                        not allowed to run because they have exhausted all of the
+                        available time as specified by their quota).
+
+                    - name: stats.throttled.nanos
+                      type: long
+                      description: >
+                        The total time duration (in nanoseconds) for which tasks in a
+                        cgroup have been throttled.
+
+                - name: cpuacct
+                  type: group
+                  description: CPU accounting metrics.
+                  fields:
+                    - name: id
+                      type: keyword
+                      description: ID of the cgroup.
+
+                    - name: path
+                      type: keyword
+                      description: >
+                        Path to the cgroup relative to the cgroup subsystem's
+                        mountpoint.
+
+                    - name: total.nanos
+                      type: long
+                      description: >
+                        Total CPU time in nanoseconds consumed by all tasks in the
+                        cgroup.
+
+                    - name: stats.user.nanos
+                      type: long
+                      description: CPU time consumed by tasks in user mode.
+
+                    - name: stats.system.nanos
+                      type: long
+                      description: CPU time consumed by tasks in user (kernel) mode.
+
+                    - name: percpu
+                      type: dict
+                      dict-type: long
+                      description: >
+                        CPU time (in nanoseconds) consumed on each CPU by all tasks in
+                        this cgroup.
+
+                - name: memory
+                  type: group
+                  description: Memory limits and metrics.
+                  fields:
+                    - name: id
+                      type: keyword
+                      description: ID of the cgroup.
+
+                    - name: path
+                      type: keyword
+                      description: >
+                        Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
+                    - name: mem.usage.bytes
+                      type: long
+                      description: >
+                        Total memory usage by processes in the cgroup (in bytes).
+
+                    - name: mem.usage.max.bytes
+                      type: long
+                      description: >
+                        The maximum memory used by processes in the cgroup (in bytes).
+
+                    - name: mem.limit.bytes
+                      type: long
+                      description: >
+                        The maximum amount of user memory in bytes (including file
+                        cache) that tasks in the cgroup are allowed to use.
+
+                    - name: mem.failures
+                      type: long
+                      description: >
+                        The number of times that the memory limit (mem.limit.bytes) was
+                        reached.
+
+                    - name: memsw.usage.bytes
+                      type: long
+                      description: >
+                        The sum of current memory usage plus swap space used by
+                        processes in the cgroup (in bytes).
+
+                    - name: memsw.usage.max.bytes
+                      type: long
+                      description: >
+                        The maximum amount of memory and swap space used by processes in
+                        the cgroup (in bytes).
+
+                    - name: memsw.limit.bytes
+                      type: long
+                      description: >
+                        The maximum amount for the sum of memory and swap usage
+                        that tasks in the cgroup are allowed to use.
+
+                    - name: memsw.failures
+                      type: long
+                      description: >
+                        The number of times that the memory plus swap space limit
+                        (memsw.limit.bytes) was reached.
+
+                    - name: kmem.usage.bytes
+                      type: long
+                      description: >
+                        Total kernel memory usage by processes in the cgroup (in bytes).
+
+                    - name: kmem.usage.max.bytes
+                      type: long
+                      description: >
+                        The maximum kernel memory used by processes in the cgroup (in
+                        bytes).
+
+                    - name: kmem.limit.bytes
+                      type: long
+                      description: >
+                        The maximum amount of kernel memory that tasks in the cgroup are
+                        allowed to use.
+
+                    - name: kmem.failures
+                      type: long
+                      description: >
+                        The number of times that the memory limit (kmem.limit.bytes) was
+                        reached.
+
+                    - name: kmem_tcp.usage.bytes
+                      type: long
+                      description: >
+                        Total memory usage for TCP buffers in bytes.
+
+                    - name: kmem_tcp.usage.max.bytes
+                      type: long
+                      description: >
+                        The maximum memory used for TCP buffers by processes in the
+                        cgroup (in bytes).
+
+                    - name: kmem_tcp.limit.bytes
+                      type: long
+                      description: >
+                        The maximum amount of memory for TCP buffers that tasks in the
+                        cgroup are allowed to use.
+
+                    - name: kmem_tcp.failures
+                      type: long
+                      description: >
+                        The number of times that the memory limit (kmem_tcp.limit.bytes)
+                        was reached.
+
+                    - name: stats.active_anon.bytes
+                      type: long
+                      description: >
+                        Anonymous and swap cache on active least-recently-used (LRU)
+                        list, including tmpfs (shmem), in bytes.
+
+                    - name: stats.active_file.bytes
+                      type: long
+                      description: File-backed memory on active LRU list, in bytes.
+
+                    - name: stats.cache.bytes
+                      type: long
+                      description: Page cache, including tmpfs (shmem), in bytes.
+
+                    - name: stats.hierarchical_memory_limit.bytes
+                      type: long
+                      description: >
+                        Memory limit for the hierarchy that contains the memory cgroup,
+                        in bytes.
+
+                    - name: stats.hierarchical_memsw_limit.bytes
+                      type: long
+                      description: >
+                        Memory plus swap limit for the hierarchy that contains the
+                        memory cgroup, in bytes.
+
+                    - name: stats.inactive_anon.bytes
+                      type: long
+                      description: >
+                        Anonymous and swap cache on inactive LRU list, including tmpfs
+                        (shmem), in bytes
+
+                    - name: stats.inactive_file.bytes
+                      type: long
+                      description: >
+                        File-backed memory on inactive LRU list, in bytes.
+
+                    - name: stats.mapped_file.bytes
+                      type: long
+                      description: >
+                        Size of memory-mapped mapped files, including tmpfs (shmem),
+                        in bytes.
+
+                    - name: stats.page_faults
+                      type: long
+                      description: >
+                        Number of times that a process in the cgroup triggered a page
+                        fault.
+
+                    - name: stats.major_page_faults
+                      type: long
+                      description: >
+                        Number of times that a process in the cgroup triggered a major
+                        fault. "Major" faults happen when the kernel actually has to
+                        read the data from disk.
+
+                    - name: stats.pages_in
+                      type: long
+                      description: >
+                        Number of pages paged into memory. This is a counter.
+
+                    - name: stats.pages_out
+                      type: long
+                      description: >
+                        Number of pages paged out of memory. This is a counter.
+
+                    - name: stats.rss.bytes
+                      type: long
+                      description: >
+                        Anonymous and swap cache (includes transparent hugepages), not
+                        including tmpfs (shmem), in bytes.
+
+                    - name: stats.rss_huge.bytes
+                      type: long
+                      description: >
+                        Number of bytes of anonymous transparent hugepages.
+
+                    - name: stats.swap.bytes
+                      type: long
+                      description: >
+                        Swap usage, in bytes.
+
+                    - name: stats.unevictable.bytes
+                      type: long
+                      description: >
+                        Memory that cannot be reclaimed, in bytes.
+
+                - name: blkio
+                  type: group
+                  description: Block IO metrics.
+                  fields:
+                    - name: id
+                      type: keyword
+                      description: ID of the cgroup.
+
+                    - name: path
+                      type: keyword
+                      description: >
+                        Path to the cgroup relative to the cgroup subsystems mountpoint.
+
+                    - name: total.bytes
+                      type: keyword
+                      description: >
+                        Total number of bytes transferred to and from all block devices
+                        by processes in the cgroup.
+
+                    - name: total.ios
+                      type: keyword
+                      description: >
+                        Total number of I/O operations performed on all devices
+                        by processes in the cgroup as seen by the throttling policy.
 - key: zookeeper
   title: "ZooKeeper"
   description: >

@@ -123,7 +123,8 @@ func (n namedField) GetValue(opts *options, elem value) (value, Error) {
 		return nil, raiseExpectedObject(opts, elem)
 	}
 
-	return cfg.fields.fields[n.name], nil
+	v, _ := cfg.fields.get(n.name)
+	return v, nil
 }
 
 func (i idxField) GetValue(opts *options, elem value) (value, Error) {
@@ -136,11 +137,11 @@ func (i idxField) GetValue(opts *options, elem value) (value, Error) {
 		return nil, raiseExpectedObject(opts, elem)
 	}
 
-	if i.i >= len(cfg.fields.arr) {
+	arr := cfg.fields.array()
+	if i.i >= len(arr) {
 		return nil, raiseMissing(cfg, i.String())
 	}
-
-	return cfg.fields.arr[i.i], nil
+	return arr[i.i], nil
 }
 
 func (p cfgPath) SetValue(cfg *Config, opt *options, val value) Error {
@@ -188,7 +189,7 @@ func (n namedField) SetValue(opts *options, elem value, v value) Error {
 		return raiseExpectedObject(opts, elem)
 	}
 
-	sub.c.fields.fields[n.name] = v
+	sub.c.fields.set(n.name, v)
 	v.SetContext(context{parent: elem, field: n.name})
 	return nil
 }
@@ -199,13 +200,7 @@ func (i idxField) SetValue(opts *options, elem value, v value) Error {
 		return raiseExpectedObject(opts, elem)
 	}
 
-	if i.i >= len(sub.c.fields.arr) {
-		tmp := make([]value, i.i+1)
-		copy(tmp, sub.c.fields.arr)
-		sub.c.fields.arr = tmp
-	}
-
-	sub.c.fields.arr[i.i] = v
+	sub.c.fields.setAt(i.i, v)
 	v.SetContext(context{parent: elem, field: i.String()})
 	return nil
 }

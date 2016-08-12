@@ -24,8 +24,8 @@ output.elasticsearch:
   # The Elasticsearch cluster
   hosts: ["http://localhost:9200"]
 
-  # Template name. By default the template name is {beatname_lc}.
-  template.name: "{beatname_lc}"
+  # Load the Elasticsearch template.
+  template.enabled: true
 
   # Path to template file
   template.path: "{beatname_lc}.template.json"
@@ -91,6 +91,14 @@ output.elasticsearch:
 ==== Elasticsearch Output Options
 
 You can specify the following options in the `elasticsearch` section of the +{beatname_lc}.yml+ config file:
+
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
 
 [[hosts-option]]
 ===== hosts
@@ -187,6 +195,9 @@ enabled.
 
 You can adjust the following settings to load your own template or overwrite an existing one:
 
+*`enabled`*:: Set to false to disable template loading. If set this to false,
+you must <<load-template-manually,load the template manually>>.
+
 *`name`*:: The name of the template. The default is +{beatname_lc}+.
 
 *`path`*:: The path to the template file. The default is +{beatname_lc}.template.json+. If a relative
@@ -207,8 +218,28 @@ output.elasticsearch:
   template.overwrite: false
 ----------------------------------------------------------------------
 
-To disable automatic template loading, comment out the template part under elasticsearch output.
-If you disable this option, you must <<load-template-manually,load the template manually>>. 
+===== template.versions
+
+In the default configuration, {beatname_uc} automatically checks the
+Elasticsearch version and loads the recommended template file for the particular
+version. This behaviour can be controlled from the following options:
+
+*`2x.path`*:: The path to the template file to load for
+Elasticsearch versions 2.x.y. The default is +{beatname_lc}.template-es2x.json+.
+
+*`2x.enabled`*:: If set to +false+, the +2x.path+ option is ignored and the
+default template is loaded regardless of the Elasticsearch version.
+
+For example:
+
+["source","yaml",subs="attributes,callouts"]
+----------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  template.path: "{beatname_lc}.template.json"
+  template.overwrite: false
+  template.versions.2x.path: "{beatname_lc}.template-es2x.json
+----------------------------------------------------------------------
 
 ===== max_retries
 
@@ -357,6 +388,13 @@ output.logstash:
 You can specify the following options in the `logstash` section of the
 +{beatname_lc}.yml+ config file:
 
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
 [[hosts]]
 ===== hosts
 
@@ -491,18 +529,40 @@ The Kafka output sends the events to Apache Kafka.
 
 You can specify the following options in the `kafka` section of the +{beatname_lc}.yml+ config file:
 
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
 ===== hosts
 
 The list of Kafka broker addresses from where to fetch the cluster metadata.
 The cluster metadata contain the actual Kafka brokers events are published to.
 
+===== version
+
+Kafka version ${beatname_lc} is assumed to run against. Defaults to oldest
+supported stable version (currently version 0.8.2.0).
+
+Event timestamps will be added, if version 0.10.0.0+ is enabled.
+
+Valid values are `0.8.2.0`, `0.8.2.1`, `0.8.2.2`, `0.8.2`, `0.8`, `0.9.0.0`,
+`0.9.0.1`, `0.9.0`, `0.9`, `0.10.0.0`, `0.10.0`, and `0.10`.
+
+===== username
+
+The username for connecting to Kafka. If username is configured, the passowrd must be configured as well. Only SASL/PLAIN is supported.
+
+===== password
+
+The password for connecting to Kafka.
+
 ===== topic
 
-The Kafka topic used for produced events. If `use_type` is set to true, the topic will not be used.
-
-===== use_type
-
-Set Kafka topic by event type. If `use_type` is false, the `topic` option must be configured. The default is false.
+The Kafka topic used for produced events. The setting can be a format string
+using any event field. To set the topic from document type use `%{[type]}`.
 
 ===== client_id
 
@@ -511,6 +571,17 @@ The configurable ClientID used for logging, debugging, and auditing purposes. Th
 ===== worker
 
 The number of concurrent load-balanced Kafka output workers.
+
+===== metadata
+
+Kafka metadata update settings. The metadata do contain information about
+brokers, topics, partition, and active leaders to use for publishing.
+
+*`refresh_frequency`*:: Metadata refreash interval. Defaults to 10 minutes.
+
+*`retry.max`*:: Total number of metadata update retries when cluster is in middle of leader election. The default is 3.
+
+*`retry.backoff`*:: Waiting time between retries during leader elections. Default is 250ms.
 
 ===== max_retries
 
@@ -586,8 +657,8 @@ output.redis:
   # password is set.
   password: "my_password"
 
-  # Optional index name. The default is {beatname_lc} and generates {beatname_lc} keys.
-  index: "{beatname_lc}"
+  # Optional key name. The default is {beatname_lc}
+  key: "{beatname_lc}"
 
   # Optional Redis database number where the events are stored
   # The default is 0.
@@ -602,6 +673,13 @@ output.redis:
 
 You can specify the following options in the `redis` section of the +{beatname_lc}.yml+ config file:
 
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
 ===== hosts
 
 The list of Redis servers to connect to. If load balancing is enabled, the events are
@@ -615,6 +693,13 @@ don't specify a port number, the value configured by `port` is used.
 The Redis port to use if `hosts` does not contain a port number. The default is 6379.
 
 ===== index
+
+deprecated[5.0.0-alpha5,The `index` setting is renamed to `key.]
+
+The name of the Redis list or channel the events are published to. The default is
+"{beatname_lc}".
+
+===== key
 
 The name of the Redis list or channel the events are published to. The default is
 "{beatname_lc}".
@@ -746,6 +831,13 @@ output.file:
 
 You can specify the following options in the `file` section of the +{beatname_lc}.yml+ config file:
 
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
 [[path]]
 ===== path
 
@@ -786,6 +878,13 @@ You can specify the following options in the `console` section of the +{beatname
 ===== pretty
 
 If `pretty` is set to true, events written to stdout will be nicely formatted. The default is false.
+
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
 
 ===== bulk_max_size
 
@@ -876,7 +975,7 @@ Here is a list of allowed cipher suites and their meanings.
 * 3DES:
   Cipher suites using triple DES
 
-* AES128/256:
+* AES-128/256:
   Cipher suites using AES with 128/256-bit keys.
 
 * CBC:
@@ -904,19 +1003,19 @@ The following cipher suites are available:
 
 * RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
 * RSA-3DES-CBC3-SHA
-* RSA-AES128-CBC-SHA
-* RSA-AES256-CBC-SHA
+* RSA-AES-128-CBC-SHA
+* RSA-AES-256-CBC-SHA
 * ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-* ECDHE-ECDSA-AES128-CBC-SHA
-* ECDHE-ECDSA-AES256-CBC-SHA
+* ECDHE-ECDSA-AES-128-CBC-SHA
+* ECDHE-ECDSA-AES-256-CBC-SHA
 * ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
 * ECDHE-RSA-3DES-CBC3-SHA
-* ECDHE-RSA-AES128-CBC-SHA
-* ECDHE-RSA-AES256-CBC-SHA
-* ECDHE-RSA-AES128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-ECDSA-AES128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-RSA-AES256-GCM-SHA384 (TLS 1.2 only)
-* ECDHE-ECDSA-AES256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-RSA-AES-128-CBC-SHA
+* ECDHE-RSA-AES-256-CBC-SHA
+* ECDHE-RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
 
 ===== curve_types
 

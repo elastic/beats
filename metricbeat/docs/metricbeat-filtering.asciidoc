@@ -1,4 +1,4 @@
-[[filtering-data]]
+[[filtering-and-enhancing-data]]
 == Filtering and Enhancing the Exported Data
 
 When your use case requires only a subset of the data exported by Metricbeat or you need to add metadata,
@@ -18,6 +18,8 @@ and `type` so they can only be used to filter fields from the module.
 The following example reduces the exported fields of the Redis module to
 include only the `redis.info.memory` fields.
 
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
+
 [source,yaml]
 ----
 metricbeat.modules:
@@ -31,14 +33,31 @@ metricbeat.modules:
        fields: ['redis.info.memory']
 ----
 
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: redis
+  metricsets: ["info"]
+  period: 1s
+  hosts: ["127.0.0.1:6379"]
+  enabled: true
+  processors:
+    - include_fields:
+       fields: ['redis.info.memory']
+----
+
 [float]
 [[defining-processors]]
 === Defining Processors
 
-include::../../libbeat/docs/filtering.asciidoc[]
+include::../../libbeat/docs/processors.asciidoc[]
 
 For example, the following filters configuration reduces the exported fields by
 dropping the `beat.name` and `beat.hostname` fields under `beat`, from all documents.
+
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
 
 [source, yaml]
 ----
@@ -47,4 +66,13 @@ filters:
     fields: ['beat']
 ----
 
-See <<configuration-filter>> for more information.
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
+
+[source, yaml]
+----
+processors:
+ - drop_fields:
+    fields: ['beat']
+----
+
+See <<configuration-processors>> for more information.

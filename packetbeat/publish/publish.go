@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/nranchev/go-libGeoIP"
 )
 
 type Transactions interface {
@@ -19,8 +20,12 @@ type Flows interface {
 }
 
 type PacketbeatPublisher struct {
-	pub    *publisher.Publisher
+	pub    publisher.Publisher
 	client publisher.Client
+
+	topo           TopologyProvider
+	geoLite        *libgeo.GeoIP
+	ignoreOutgoing bool
 
 	wg   sync.WaitGroup
 	done chan struct{}
@@ -33,6 +38,16 @@ type ChanTransactions struct {
 	Channel chan common.MapStr
 }
 
+// XXX: currently implemented by libbeat publisher. This functionality is only
+// required by packetbeat. Source for TopologyProvider should become local to
+// packetbeat.
+type TopologyProvider interface {
+	IsPublisherIP(ip string) bool
+	GetServerName(ip string) string
+	GeoLite() *libgeo.GeoIP
+	IgnoreOutgoing() bool
+}
+
 func (t *ChanTransactions) PublishTransaction(event common.MapStr) bool {
 	t.Channel <- event
 	return true
@@ -40,14 +55,25 @@ func (t *ChanTransactions) PublishTransaction(event common.MapStr) bool {
 
 var debugf = logp.MakeDebug("publish")
 
-func NewPublisher(pub *publisher.Publisher, hwm, bulkHWM int) *PacketbeatPublisher {
-	return &PacketbeatPublisher{
-		pub:    pub,
-		client: pub.Connect(),
-		done:   make(chan struct{}),
-		trans:  make(chan common.MapStr, hwm),
-		flows:  make(chan []common.MapStr, bulkHWM),
+func NewPublisher(
+	pub publisher.Publisher,
+	hwm, bulkHWM int,
+) (*PacketbeatPublisher, error) {
+	topo, ok := pub.(TopologyProvider)
+	if !ok {
+		return nil, errors.New("Requires topology provider")
 	}
+
+	return &PacketbeatPublisher{
+		pub:            pub,
+		topo:           topo,
+		geoLite:        topo.GeoLite(),
+		ignoreOutgoing: topo.IgnoreOutgoing(),
+		client:         pub.Connect(),
+		done:           make(chan struct{}),
+		trans:          make(chan common.MapStr, hwm),
+		flows:          make(chan []common.MapStr, bulkHWM),
+	}, nil
 }
 
 func (t *PacketbeatPublisher) PublishTransaction(event common.MapStr) bool {
@@ -99,8 +125,8 @@ func (t *PacketbeatPublisher) Start() {
 }
 
 func (t *PacketbeatPublisher) Stop() {
-	close(t.done)
 	t.client.Close()
+	close(t.done)
 	t.wg.Wait()
 }
 
@@ -110,7 +136,7 @@ func (t *PacketbeatPublisher) onTransaction(event common.MapStr) {
 		return
 	}
 
-	if !normalizeTransAddr(t.pub, event) {
+	if !t.normalizeTransAddr(event) {
 		return
 	}
 
@@ -125,7 +151,7 @@ func (t *PacketbeatPublisher) onFlow(events []common.MapStr) {
 			continue
 		}
 
-		if !addGeoIPToFlow(t.pub, event) {
+		if !t.addGeoIPToFlow(event) {
 			continue
 		}
 
@@ -161,7 +187,7 @@ func validateEvent(event common.MapStr) error {
 	return nil
 }
 
-func normalizeTransAddr(pub *publisher.Publisher, event common.MapStr) bool {
+func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 	debugf("normalize address for: %v", event)
 
 	var srcServer, dstServer string
@@ -169,9 +195,9 @@ func normalizeTransAddr(pub *publisher.Publisher, event common.MapStr) bool {
 	debugf("has src: %v", ok)
 	if ok {
 		// check if it's outgoing transaction (as client)
-		isOutgoing := pub.IsPublisherIP(src.Ip)
+		isOutgoing := p.topo.IsPublisherIP(src.Ip)
 		if isOutgoing {
-			if pub.IgnoreOutgoing {
+			if p.ignoreOutgoing {
 				// duplicated transaction -> ignore it
 				debugf("Ignore duplicated transaction on: %s -> %s", srcServer, dstServer)
 				return false
@@ -181,7 +207,7 @@ func normalizeTransAddr(pub *publisher.Publisher, event common.MapStr) bool {
 			event["direction"] = "out"
 		}
 
-		srcServer = pub.GetServerName(src.Ip)
+		srcServer = p.topo.GetServerName(src.Ip)
 		event["client_ip"] = src.Ip
 		event["client_port"] = src.Port
 		event["client_proc"] = src.Proc
@@ -192,7 +218,7 @@ func normalizeTransAddr(pub *publisher.Publisher, event common.MapStr) bool {
 	dst, ok := event["dst"].(*common.Endpoint)
 	debugf("has dst: %v", ok)
 	if ok {
-		dstServer = pub.GetServerName(dst.Ip)
+		dstServer = p.topo.GetServerName(dst.Ip)
 		event["ip"] = dst.Ip
 		event["port"] = dst.Port
 		event["proc"] = dst.Proc
@@ -200,24 +226,24 @@ func normalizeTransAddr(pub *publisher.Publisher, event common.MapStr) bool {
 		delete(event, "dst")
 
 		//check if it's incoming transaction (as server)
-		if pub.IsPublisherIP(dst.Ip) {
+		if p.topo.IsPublisherIP(dst.Ip) {
 			// incoming transaction
 			event["direction"] = "in"
 		}
 
 	}
 
-	if pub.GeoLite != nil {
+	if p.geoLite != nil {
 		realIP, exists := event["real_ip"]
 		if exists && len(realIP.(common.NetString)) > 0 {
-			loc := pub.GeoLite.GetLocationByIP(string(realIP.(common.NetString)))
+			loc := p.geoLite.GetLocationByIP(string(realIP.(common.NetString)))
 			if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
 				loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
 				event["client_location"] = loc
 			}
 		} else {
 			if len(srcServer) == 0 && src != nil { // only for external IP addresses
-				loc := pub.GeoLite.GetLocationByIP(src.Ip)
+				loc := p.geoLite.GetLocationByIP(src.Ip)
 				if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
 					loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
 					event["client_location"] = loc
@@ -229,7 +255,7 @@ func normalizeTransAddr(pub *publisher.Publisher, event common.MapStr) bool {
 	return true
 }
 
-func addGeoIPToFlow(pub *publisher.Publisher, event common.MapStr) bool {
+func (p *PacketbeatPublisher) addGeoIPToFlow(event common.MapStr) bool {
 
 	getLocation := func(host common.MapStr, ip_type string) string {
 
@@ -243,7 +269,7 @@ func addGeoIPToFlow(pub *publisher.Publisher, event common.MapStr) bool {
 			logp.Warn("IP address must be string")
 			return ""
 		}
-		loc := pub.GeoLite.GetLocationByIP(str)
+		loc := p.geoLite.GetLocationByIP(str)
 		if loc == nil || loc.Latitude == 0 || loc.Longitude == 0 {
 			return ""
 		}
@@ -251,7 +277,7 @@ func addGeoIPToFlow(pub *publisher.Publisher, event common.MapStr) bool {
 		return fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
 	}
 
-	if pub.GeoLite == nil {
+	if p.geoLite == nil {
 		return true
 	}
 

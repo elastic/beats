@@ -337,9 +337,9 @@ Use the following commands to download and run Kibana.
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/kibana/kibana/kibana-{Kibana-version}-linux-x64.tar.gz
-tar xzvf kibana-{Kibana-version}-linux-x64.tar.gz
-cd kibana-{Kibana-version}-linux-x64/
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-{Kibana-version}-linux-x86_64.tar.gz
+tar xzvf kibana-{Kibana-version}-linux-x86_64.tar.gz
+cd kibana-{Kibana-version}-linux-x86_64/
 ./bin/kibana
 ----------------------------------------------------------------------
 
@@ -347,9 +347,9 @@ cd kibana-{Kibana-version}-linux-x64/
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/kibana/kibana/kibana-{Kibana-version}-darwin-x64.tar.gz
-tar xzvf kibana-{Kibana-version}-darwin-x64.tar.gz
-cd kibana-{Kibana-version}-darwin-x64/
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-{Kibana-version}-darwin-x86_64.tar.gz
+tar xzvf kibana-{Kibana-version}-darwin-x86_64.tar.gz
+cd kibana-{Kibana-version}-darwin-x86_64/
 ./bin/kibana
 ----------------------------------------------------------------------
 

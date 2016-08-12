@@ -10,9 +10,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -68,13 +70,21 @@ func esConnect(t *testing.T, index string) *esConnection {
 	ts := time.Now().UTC()
 
 	host := getElasticsearchHost()
-	index = fmt.Sprintf("%s-%02d.%02d.%02d",
-		index, ts.Year(), ts.Month(), ts.Day())
+	indexFmt := fmtstr.MustCompileEvent(fmt.Sprintf("%s-%%{+yyyy.MM.dd}", index))
+	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(indexFmt, ""))
+	index, _ = indexSel.Select(common.MapStr{
+		"@timestamp": common.Time(ts),
+	})
 
 	username := os.Getenv("ES_USER")
 	password := os.Getenv("ES_PASS")
-	client, err := elasticsearch.NewClient(host, "", nil, nil, username, password,
-		nil, 60*time.Second, 0, nil)
+	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
+		URL:      host,
+		Index:    indexSel,
+		Username: username,
+		Password: password,
+		Timeout:  60 * time.Second,
+	}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -141,15 +151,16 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	flushInterval := 0
 	bulkSize := 0
 	config, _ := common.NewConfigFrom(map[string]interface{}{
-		"hosts":          []string{getElasticsearchHost()},
-		"index":          index,
-		"flush_interval": &flushInterval,
-		"bulk_max_size":  &bulkSize,
-		"username":       os.Getenv("ES_USER"),
-		"password":       os.Getenv("ES_PASS"),
+		"hosts":            []string{getElasticsearchHost()},
+		"index":            connection.index,
+		"flush_interval":   &flushInterval,
+		"bulk_max_size":    &bulkSize,
+		"username":         os.Getenv("ES_USER"),
+		"password":         os.Getenv("ES_PASS"),
+		"template.enabled": false,
 	})
 
-	output, err := plugin(config, 10)
+	output, err := plugin("libbeat", config, 10)
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}
@@ -406,9 +417,9 @@ func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string,
 	}
 
 	es.PublishEvent(nil, testOptions, event)
-	waitUntilTrue(timeout, checkIndex(es, 1))
-
 	ls.PublishEvent(nil, testOptions, event)
+
+	waitUntilTrue(timeout, checkIndex(es, 1))
 	waitUntilTrue(timeout, checkIndex(ls, 1))
 
 	// search value in logstash elasticsearch index
@@ -439,6 +450,9 @@ func TestLogstashElasticOutputPluginBulkCompatibleMessageTLS(t *testing.T) {
 }
 
 func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name string, tls bool) {
+	if testing.Verbose() {
+		enableLogging([]string{"*"})
+	}
 
 	timeout := 10 * time.Second
 
@@ -457,11 +471,12 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 			"message":    "hello world",
 		},
 	}
-	es.BulkPublish(nil, testOptions, events)
-	waitUntilTrue(timeout, checkIndex(es, 1))
 
 	ls.BulkPublish(nil, testOptions, events)
+	es.BulkPublish(nil, testOptions, events)
+
 	waitUntilTrue(timeout, checkIndex(ls, 1))
+	waitUntilTrue(timeout, checkIndex(es, 1))
 
 	// search value in logstash elasticsearch index
 	lsResp, err := ls.Read()
@@ -474,9 +489,10 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 	}
 
 	// validate
-	assert.Equal(t, len(lsResp), len(esResp))
-	if len(lsResp) != 1 {
-		t.Fatalf("wrong number of results: %d", len(lsResp))
+	if len(lsResp) != len(esResp) {
+		assert.Equal(t, len(lsResp), len(esResp))
+		t.Fatalf("wrong number of results: es=%d, ls=%d",
+			len(esResp), len(lsResp))
 	}
 
 	checkEvent(t, lsResp[0], esResp[0])

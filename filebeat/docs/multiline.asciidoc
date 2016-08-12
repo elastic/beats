@@ -47,7 +47,7 @@ Exception in thread "main" java.lang.NullPointerException
 
 To consolidate these lines into a single event in Filebeat, use the following multiline configuration:
 
-[source,json]
+[source,yaml]
 -------------------------------------------------------------------------------------
 multiline.pattern: '^[[:space:]]'
 multiline.negate: false
@@ -71,7 +71,7 @@ Caused by: java.lang.NullPointerException
 
 To consolidate these lines into a single event in Filebeat, use the following multiline configuration:
 
-["source","sh",subs="attributes,callouts"]
+[source,yaml]
 -------------------------------------------------------------------------------------
 multiline.pattern: '^[[:space:]]+|^Caused by:'
 multiline.negate: false
@@ -97,11 +97,11 @@ printf ("%10.10ld  \t %10.10ld \t %s\
 
 To consolidate these lines into a single event in Filebeat, use the following multiline configuration:
 
-[source,json]
+[source,yaml]
 -------------------------------------------------------------------------------------
 multiline.pattern: '\\$'
 multiline.negate: false
-multiline.match: after
+multiline.match: before
 -------------------------------------------------------------------------------------
 
 This configuration merges any line that ends with the `\` character with the line that follows.
@@ -120,7 +120,6 @@ specific activity, as in this example:
 
 To consolidate these lines into a single event in Filebeat, use the following multiline configuration:
 
-[source,json]
 [source,yaml]
 -------------------------------------------------------------------------------------
 multiline.pattern: '^\[[0-9]{4}-[0-9]{2}-[0-9]{2}'

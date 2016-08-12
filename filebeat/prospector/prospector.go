@@ -17,8 +17,8 @@ type Prospector struct {
 	cfg           *common.Config // Raw config
 	config        prospectorConfig
 	prospectorer  Prospectorer
-	spoolerChan   chan *input.FileEvent
-	harvesterChan chan *input.FileEvent
+	spoolerChan   chan *input.Event
+	harvesterChan chan *input.Event
 	done          chan struct{}
 	states        *file.States
 	wg            sync.WaitGroup
@@ -29,12 +29,12 @@ type Prospectorer interface {
 	Run()
 }
 
-func NewProspector(cfg *common.Config, states file.States, spoolerChan chan *input.FileEvent) (*Prospector, error) {
+func NewProspector(cfg *common.Config, states file.States, spoolerChan chan *input.Event) (*Prospector, error) {
 	prospector := &Prospector{
 		cfg:           cfg,
 		config:        defaultConfig,
 		spoolerChan:   spoolerChan,
-		harvesterChan: make(chan *input.FileEvent),
+		harvesterChan: make(chan *input.Event),
 		done:          make(chan struct{}),
 		states:        states.Copy(),
 		wg:            sync.WaitGroup{},
@@ -106,15 +106,15 @@ func (p *Prospector) Run() {
 				return
 			case event := <-p.harvesterChan:
 				// Add ttl if cleanOlder is enabled
-				if p.config.CleanOlder > 0 {
-					event.FileState.TTL = p.config.CleanOlder
+				if p.config.CleanInactive > 0 {
+					event.State.TTL = p.config.CleanInactive
 				}
 				select {
 				case <-p.done:
 					logp.Info("Prospector channel stopped")
 					return
 				case p.spoolerChan <- event:
-					p.states.Update(event.FileState)
+					p.states.Update(event.State)
 				}
 			}
 		}
@@ -146,10 +146,8 @@ func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, er
 
 	h, err := harvester.NewHarvester(
 		p.cfg,
-		state.Source,
 		state,
 		p.harvesterChan,
-		state.Offset,
 		p.done,
 	)
 

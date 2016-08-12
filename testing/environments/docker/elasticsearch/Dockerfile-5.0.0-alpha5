@@ -1,0 +1,29 @@
+FROM java:8-jre
+
+ENV ELASTICSEARCH_MAJOR 5.0
+
+COPY setup.sh /
+
+ENV ELASTICSEARCH_VERSION 5.0.0-alpha5
+
+RUN bash setup.sh https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/${ELASTICSEARCH_VERSION}/elasticsearch-${ELASTICSEARCH_VERSION}.deb
+
+ENV PATH /usr/share/elasticsearch/bin:$PATH
+
+COPY config /usr/share/elasticsearch/config
+
+VOLUME /usr/share/elasticsearch/data
+
+ENV ES_JAVA_OPTS="-Xms512m -Xmx512m"
+
+# Shield currently not enabled
+#ES_JAVA_OPTS="-Des.plugins.staging=b0da471" elasticsearch-plugin install x-pack
+
+COPY docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+EXPOSE 9200 9300
+
+CMD ["elasticsearch"]
+

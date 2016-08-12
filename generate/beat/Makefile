@@ -1,27 +1,41 @@
 BUILD_DIR?=build
 PWD=$(shell pwd)
 PYTHON_ENV?=${BUILD_DIR}/python-env/
+BEAT_PATH=${BUILD_DIR}/src/beatpath/testbeat
+ES_BEATS=${GOPATH}/src/github.com/elastic/beats
 
 # Runs test build for mock beat
 .PHONY: test
 test: python-env
+
+	# Create copy of cookiecutter for building with defaults
 	mkdir -p build/src/beatpath
 	cp -r \{\{cookiecutter.beat\}\} build
 	cp tests/cookiecutter.json build/
+
+	mkdir -p ${BEAT_PATH}
+	. ${PYTHON_ENV}/bin/activate && cookiecutter --no-input -o build/src/beatpath -f  build ;
+
+	# Makes sure to use current version of beats for testing
+	mkdir -p ${BUILD_DIR}/src/github.com/elastic/beats/
+	cp -r ${PWD}/../../libbeat ${PWD}/../../vendor ${BUILD_DIR}/src/github.com/elastic/beats/
+
 	. ${PYTHON_ENV}/bin/activate; \
-	cookiecutter --no-input -o build/src/beatpath -f  build ; \
-	cd build/src/beatpath/testbeat ; \
 	export GOPATH=${PWD}/build ; \
 	export PATH=${PATH}:${PWD}/build/bin; \
-	make init ; \
+	cd ${BEAT_PATH} ; \
 	make check ; \
 	make ; \
-	make testsuite
+	make unit
 
 # Runs test build for the created beat
 .PHONY: test-build
-test-build:
-	cd dev-tools/packer ; \
+test-build: test
+
+	# Copy dev tools
+	cp -r ${PWD}/../../../dev-tools ${BEAT_PATH}/vendor/github.com/elastic/beats/
+
+	cd ${BEAT_PATH}/dev-tools/packer ; \
 	make deps ; \
 	make images
 

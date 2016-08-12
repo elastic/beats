@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester/encoding"
-	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/stretchr/testify/assert"
 )
@@ -55,18 +54,30 @@ func TestReadLine(t *testing.T) {
 	defer readFile.Close()
 	assert.Nil(t, err)
 
-	h := Harvester{}
+	f := source.File{readFile}
+
+	h := Harvester{
+		config: harvesterConfig{
+			CloseInactive: 500 * time.Millisecond,
+			Backoff:       100 * time.Millisecond,
+			MaxBackoff:    1 * time.Second,
+			BackoffFactor: 2,
+			BufferSize:    100,
+			MaxBytes:      1000,
+		},
+		file: f,
+	}
 	assert.NotNil(t, h)
 
-	// Read only 10 bytes which is not the end of the file
-	codec, _ := encoding.Plain(file)
-	readConfig := reader.LogFileReaderConfig{
-		CloseOlder:         500 * time.Millisecond,
-		BackoffDuration:    100 * time.Millisecond,
-		MaxBackoffDuration: 1 * time.Second,
-		BackoffFactor:      2,
-	}
-	r, _ := createLineProcessor(source.File{readFile}, codec, 100, 1000, readConfig, nil, nil, nil)
+	var ok bool
+	h.encodingFactory, ok = encoding.FindEncoding(h.config.Encoding)
+	assert.True(t, ok)
+
+	h.encoding, err = h.encodingFactory(readFile)
+	assert.NoError(t, err)
+
+	r, err := h.newLogFileReader()
+	assert.NoError(t, err)
 
 	// Read third line
 	_, text, bytesread, _, err := readLine(r)
@@ -87,7 +98,7 @@ func TestReadLine(t *testing.T) {
 	fmt.Printf("received line: '%s'\n", text)
 	assert.Equal(t, "", text)
 	assert.Equal(t, bytesread, 0)
-	assert.Equal(t, err, reader.ErrInactive)
+	assert.Equal(t, err, ErrInactive)
 }
 
 func TestExcludeLine(t *testing.T) {

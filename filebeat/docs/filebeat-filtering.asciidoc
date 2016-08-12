@@ -1,4 +1,4 @@
-[[filtering-data]]
+[[filtering-and-enhancing-data]]
 == Filtering and Enhancing the Exported Data
 
 When your use case requires only a subset of the data exported by Filebeat or you need to add metadata, you can <<filebeat-filtering-overview,use Filebeat config options to filter the data>>, or you can  <<defining-processors,define processors>>.
@@ -29,11 +29,11 @@ See <<configuration-filebeat-options,Filebeat configuration options>> for more i
 [[defining-processors]]
 === Defining Processors
 
-include::../../libbeat/docs/filtering.asciidoc[]
+include::../../libbeat/docs/processors.asciidoc[]
 
 For example, the following configuration drops all the DEBUG messages.
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
 
 [source,yaml]
 -----------------------------------------------------
@@ -43,7 +43,7 @@ filters:
       message: "^DBG:"
 -----------------------------------------------------
 
-coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
 
 [source,yaml]
 -----------------------------------------------------
@@ -56,7 +56,7 @@ processors:
 
 To drop all the log messages coming from a certain log file:
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-beta1. Therefore the following configuration is deprecated]
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
 
 [source,yaml]
 ----------------
@@ -66,7 +66,7 @@ filters:
         source: "test"
 ----------------
 
-coming[5.0.0-beta1,Begin using the following configuration starting with 5.0.0-beta1]
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
 
 [source,yaml]
 ----------------
@@ -77,4 +77,4 @@ processors:
            source: "test"
 ----------------
 
-See <<configuration-filter>> for more information.
+See <<configuration-processors>> for more information.

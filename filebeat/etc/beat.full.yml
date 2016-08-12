@@ -73,11 +73,6 @@ filebeat.prospectors:
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
   #ignore_older: 0
 
-  # Close older closes the file handler for which were not modified
-  # for longer then close_older
-  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
-  #close_older: 1h
-
   # Type to be published in the 'type' field. For Elasticsearch output,
   # the type defines the document type these entries should be stored
   # in. Default: log
@@ -166,26 +161,39 @@ filebeat.prospectors:
   # The backoff value will be multiplied each time with the backoff_factor until max_backoff is reached
   #backoff_factor: 2
 
-  # Close renamed ensures a file handler is closed when the file is renamed or rotated.
-  # Note: Potential data loss if renamed file is not picked up by prospector.
+  ### Harvester closing options
+
+  # Close inactive closes the file handler after the predefined period.
+  # The period starts when the last line of the file was, not the file ModTime.
+  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  #close_inactive: 5m
+
+  # Close renamed closes a file handler when the file is renamed or rotated.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_renamed: false
 
   # When enabling this option, a file handler is closed immediately in case a file can't be found
   # any more. In case the file shows up again later, harvesting will continue at the last known position
   # after scan_frequency.
-  # Note: Potential data loss if file reading was not finished when file was removed.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_removed: false
 
-  # Closes the file handler as soon as the harvesters reaches then end of the file.
-  # The file will be picked up again by the harvester at previous known state
-  # after scan_frequency in case the file can still be discovered by the prospector.
-  # Note: Potential data loss if file is deleted / moved before picked up again after
-  # scan_frequency by prospector
+  # Closes the file handler as soon as the harvesters reaches the end of the file.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_eof: false
 
-  # Files for the modification data is older then clean_older the state from the registry is removed
+  # Close timeout closes the harvester after the predefined time.
+  # This is independent if the harvester did finish reading the file or not.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_timeout: 0
+
+  ### State options
+
+  # Files for the modification data is older then clean_inactive the state from the registry is removed
   # By default this is disabled.
-  #clean_older: 0
+  #clean_inactive: 0
 
   # Removes the state for file which cannot be found on disk anymore immediately
   #clean_removed: false
@@ -209,7 +217,7 @@ filebeat.prospectors:
 
 # Name of the registry file. If a relative path is used, it is considered relative to the
 # data path.
-#filebeat.registry_file: registry
+#filebeat.registry_file: ${path.data}/registry
 
 #
 # These config files must have the full filebeat config part inside, but only
