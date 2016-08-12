@@ -5,6 +5,7 @@ beat:
     - mongodb
     - mysql
     - nginx
+    - postgresql
     - redis
     - zookeeper
   environment:
@@ -19,6 +20,7 @@ beat:
     - MYSQL_DSN=root:test@tcp(mysql:3306)/
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
+    - POSTGRESQL_DSN=postgres://postgres@postgresql:5432?sslmode=disable
     - ZOOKEEPER_HOST=zookeeper
     - ZOOKEEPER_PORT=2181
     - TEST_ENVIRONMENT=false
@@ -47,6 +49,9 @@ mysql:
 
 nginx:
   build: ${PWD}/module/nginx/_meta
+
+postgresql:
+  image: postgres:9.5.3
 
 redis:
   image: redis:3.2.3

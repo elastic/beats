@@ -624,6 +624,81 @@
             }
           }
         },
+        "postgresql": {
+          "properties": {
+            "activity": {
+              "properties": {
+                "application_name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "backend_start": {
+                  "type": "date"
+                },
+                "client": {
+                  "properties": {
+                    "address": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "hostname": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "port": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "database": {
+                  "properties": {
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "oid": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "query": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "query_start": {
+                  "type": "date"
+                },
+                "state": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "state_change": {
+                  "type": "date"
+                },
+                "transaction_start": {
+                  "type": "date"
+                },
+                "user": {
+                  "properties": {
+                    "id": {
+                      "type": "long"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "waiting": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
         "redis": {
           "properties": {
             "info": {
