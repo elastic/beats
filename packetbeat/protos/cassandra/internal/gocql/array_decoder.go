@@ -2,143 +2,94 @@ package cassandra
 
 import (
 	"fmt"
-	"io"
 	"net"
 )
 
 type ByteArrayDecoder struct {
-	Data []byte
+	Data *[]byte
 }
 
 func readInt(p []byte) int32 {
 	return int32(p[0])<<24 | int32(p[1])<<16 | int32(p[2])<<8 | int32(p[3])
 }
 
-func (f *Framer) ReadHeader1() (head *frameHeader, err error) {
-	p := make([]byte, 9)
-	head = &frameHeader{}
-	_, err = io.ReadFull(f.r, p[:1])
-	if err != nil {
-		return head, err
-	}
-
-	version := p[0] & protoVersionMask
-
-	if version < protoVersion1 || version > protoVersion4 {
-		return head, fmt.Errorf("unsupported response version: %d", version)
-	}
-	f.proto = version
-
-	headSize := 9
-	if version < protoVersion3 {
-		headSize = 8
-	}
-
-	_, err = io.ReadFull(f.r, p[1:headSize])
-	if err != nil {
-		return head, err
-	}
-
-	p = p[:headSize]
-
-	v := p[0]
-
-	head.Version = protoVersion(v)
-
-	head.Flags = p[1]
-
-	if version > protoVersion2 {
-		if len(p) != 9 {
-			return head, fmt.Errorf("not enough bytes to read header require 9 got: %d", len(p))
-		}
-
-		head.Stream = int(int16(p[2])<<8 | int16(p[3]))
-		head.Op = FrameOp(p[4])
-		head.BodyLength = int(readInt(p[5:]))
-	} else {
-		if len(p) != 8 {
-			return head, fmt.Errorf("not enough bytes to read header require 8 got: %d", len(p))
-		}
-
-		head.Stream = int(int8(p[2]))
-		head.Op = FrameOp(p[3])
-		head.BodyLength = int(readInt(p[4:]))
-	}
-	f.Header = head
-	return head, nil
-}
-
 func (f ByteArrayDecoder) ReadByte() (byte, error) {
-	if len(f.Data) < 1 {
-		panic(fmt.Errorf("not enough bytes in buffer to Read byte require 1 got: %d", len(f.Data)))
+	data := *f.Data
+	if len(data) < 1 {
+		panic(fmt.Errorf("not enough bytes in buffer to Read byte require 1 got: %d", len(data)))
 	}
 
-	b := f.Data[0]
-	f.Data = f.Data[1:]
+	b := data[0]
+	*f.Data = data[1:]
 	return b, nil
 }
 
 func (f ByteArrayDecoder) ReadInt() (n int) {
-	if len(f.Data) < 4 {
-		panic(fmt.Errorf("not enough bytes in buffer to Read int require 4 got: %d", len(f.Data)))
+	data := *f.Data
+	if len(data) < 4 {
+		panic(fmt.Errorf("not enough bytes in buffer to Read int require 4 got: %d", len(data)))
 	}
 
-	n = int(int32(f.Data[0])<<24 | int32(f.Data[1])<<16 | int32(f.Data[2])<<8 | int32(f.Data[3]))
-	f.Data = f.Data[4:]
+	n = int(int32(data[0])<<24 | int32(data[1])<<16 | int32(data[2])<<8 | int32(data[3]))
+	*f.Data = data[4:]
 
 	return
 }
 
 func (f ByteArrayDecoder) ReadShort() (n uint16) {
-	if len(f.Data) < 2 {
-		panic(fmt.Errorf("not enough bytes in buffer to Read short require 2 got: %d", len(f.Data)))
+	data := *f.Data
+	if len(data) < 2 {
+		panic(fmt.Errorf("not enough bytes in buffer to Read short require 2 got: %d", len(data)))
 	}
-	n = uint16(f.Data[0])<<8 | uint16(f.Data[1])
-	f.Data = f.Data[2:]
+	n = uint16(data[0])<<8 | uint16(data[1])
+	*f.Data = data[2:]
 	return
 }
 
 func (f ByteArrayDecoder) ReadLong() (n int64) {
-	if len(f.Data) < 8 {
-		panic(fmt.Errorf("not enough bytes in buffer to Read long require 8 got: %d", len(f.Data)))
+	data := *f.Data
+	if len(data) < 8 {
+		panic(fmt.Errorf("not enough bytes in buffer to Read long require 8 got: %d", len(data)))
 	}
-	n = int64(f.Data[0])<<56 | int64(f.Data[1])<<48 | int64(f.Data[2])<<40 | int64(f.Data[3])<<32 |
-		int64(f.Data[4])<<24 | int64(f.Data[5])<<16 | int64(f.Data[6])<<8 | int64(f.Data[7])
-	f.Data = f.Data[8:]
+	n = int64(data[0])<<56 | int64(data[1])<<48 | int64(data[2])<<40 | int64(data[3])<<32 |
+		int64(data[4])<<24 | int64(data[5])<<16 | int64(data[6])<<8 | int64(data[7])
+	*f.Data = data[8:]
 	return
 }
 
 func (f ByteArrayDecoder) ReadString() (s string) {
 	size := f.ReadShort()
-
-	if len(f.Data) < int(size) {
-		panic(fmt.Errorf("not enough bytes in buffer to Read string require %d got: %d", size, len(f.Data)))
+	data := *f.Data
+	if len(data) < int(size) {
+		panic(fmt.Errorf("not enough bytes in buffer to Read string require %d got: %d", size, len(data)))
 	}
 
-	s = string(f.Data[:size])
-	f.Data = f.Data[size:]
+	s = string(data[:size])
+	*f.Data = data[size:]
 	return
 }
 
 func (f ByteArrayDecoder) ReadLongString() (s string) {
 	size := f.ReadInt()
-
-	if len(f.Data) < size {
-		panic(fmt.Errorf("not enough bytes in buffer to Read long string require %d got: %d", size, len(f.Data)))
+	data := *f.Data
+	if len(data) < size {
+		panic(fmt.Errorf("not enough bytes in buffer to Read long string require %d got: %d", size, len(data)))
 	}
 
-	s = string(f.Data[:size])
-	f.Data = f.Data[size:]
+	s = string(data[:size])
+	*f.Data = data[size:]
 	return
 }
 
 func (f ByteArrayDecoder) ReadUUID() *UUID {
-	if len(f.Data) < 16 {
-		panic(fmt.Errorf("not enough bytes in buffer to Read uuid require %d got: %d", 16, len(f.Data)))
+	data := *f.Data
+
+	if len(data) < 16 {
+		panic(fmt.Errorf("not enough bytes in buffer to Read uuid require %d got: %d", 16, len(data)))
 	}
 
-	u, _ := UUIDFromBytes(f.Data[:16])
-	f.Data = f.Data[16:]
+	u, _ := UUIDFromBytes(data[:16])
+	*f.Data = data[16:]
 	return &u
 }
 
@@ -158,13 +109,14 @@ func (f ByteArrayDecoder) ReadBytesInternal() []byte {
 	if size < 0 {
 		return nil
 	}
+	data := *f.Data
 
-	if len(f.Data) < size {
-		panic(fmt.Errorf("not enough bytes in buffer to Read bytes require %d got: %d", size, len(f.Data)))
+	if len(data) < size {
+		panic(fmt.Errorf("not enough bytes in buffer to Read bytes require %d got: %d", size, len(data)))
 	}
 
-	l := f.Data[:size]
-	f.Data = f.Data[size:]
+	l := data[:size]
+	*f.Data = data[size:]
 
 	return l
 }
@@ -177,35 +129,39 @@ func (f ByteArrayDecoder) ReadBytes() []byte {
 
 func (f ByteArrayDecoder) ReadShortBytes() []byte {
 	size := f.ReadShort()
-	if len(f.Data) < int(size) {
-		panic(fmt.Errorf("not enough bytes in buffer to Read short bytes: require %d got %d", size, len(f.Data)))
+	data := *f.Data
+	if len(data) < int(size) {
+		panic(fmt.Errorf("not enough bytes in buffer to Read short bytes: require %d got %d", size, len(data)))
 	}
 
-	l := f.Data[:size]
-	f.Data = f.Data[size:]
+	l := data[:size]
+	*f.Data = data[size:]
 
 	return l
 }
 
 func (f ByteArrayDecoder) ReadInet() (net.IP, int) {
-	if len(f.Data) < 1 {
-		panic(fmt.Errorf("not enough bytes in buffer to Read inet size require %d got: %d", 1, len(f.Data)))
+	data := *f.Data
+
+	if len(data) < 1 {
+		panic(fmt.Errorf("not enough bytes in buffer to Read inet size require %d got: %d", 1, len(data)))
 	}
 
-	size := f.Data[0]
-	f.Data = f.Data[1:]
+	size := data[0]
+	*f.Data = data[1:]
 
 	if !(size == 4 || size == 16) {
 		panic(fmt.Errorf("invalid IP size: %d", size))
 	}
 
-	if len(f.Data) < 1 {
-		panic(fmt.Errorf("not enough bytes in buffer to Read inet require %d got: %d", size, len(f.Data)))
+	data = *f.Data
+	if len(data) < 1 {
+		panic(fmt.Errorf("not enough bytes in buffer to Read inet require %d got: %d", size, len(data)))
 	}
 
 	ip := make([]byte, size)
-	copy(ip, f.Data[:size])
-	f.Data = f.Data[size:]
+	copy(ip, data[:size])
+	*f.Data = data[size:]
 
 	port := f.ReadInt()
 	return net.IP(ip), port

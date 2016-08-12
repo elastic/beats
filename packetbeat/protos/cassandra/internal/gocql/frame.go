@@ -164,8 +164,14 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 		}
 	}()
 
-	decoder := &StreamDecoder{}
-	decoder.r = f.r
+	//decoder := &StreamDecoder{}
+	//decoder.r = f.r
+	//f.decoder = decoder
+
+	decoder := &ByteArrayDecoder{}
+	buf := make([]byte, f.Header.BodyLength)
+	f.r.Read(buf)
+	decoder.Data = &buf
 	f.decoder = decoder
 
 	data = make(map[string]interface{})
@@ -179,7 +185,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 
 		debugf("tracing enabled")
 
-		uid := f.decoder.ReadUUID()
+		uid := decoder.ReadUUID()
 		debugf(uid.String())
 
 		data["trace_id"] = uid.String()
@@ -188,7 +194,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	if f.Header.Flags&flagWarning == flagWarning {
 		debugf("hit warning flags")
 
-		warnings := f.decoder.ReadStringList()
+		warnings := decoder.ReadStringList()
 		// dealing with warnings
 		data["warnings"] = warnings
 	}
@@ -196,7 +202,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	if f.Header.Flags&flagCustomPayload == flagCustomPayload {
 		debugf("hit custom payload flags")
 
-		f.Header.CustomPayload = f.decoder.ReadBytesMap()
+		f.Header.CustomPayload = decoder.ReadBytesMap()
 	}
 
 	if f.Header.Flags&flagCompress == flagCompress {
@@ -247,8 +253,9 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 
 func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 
-	code := f.decoder.ReadInt()
-	msg := f.decoder.ReadString()
+	decoder := f.decoder
+	code := decoder.ReadInt()
+	msg := decoder.ReadString()
 
 	errT := ErrType(code)
 
@@ -259,18 +266,18 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 
 	switch errT {
 	case errUnavailable:
-		cl := f.decoder.ReadConsistency()
-		required := f.decoder.ReadInt()
-		alive := f.decoder.ReadInt()
+		cl := decoder.ReadConsistency()
+		required := decoder.ReadInt()
+		alive := decoder.ReadInt()
 		data["read_consistency"] = cl.String()
 		data["required"] = required
 		data["alive"] = alive
 
 	case errWriteTimeout:
-		cl := f.decoder.ReadConsistency()
-		received := f.decoder.ReadInt()
-		blockfor := f.decoder.ReadInt()
-		writeType := f.decoder.ReadString()
+		cl := decoder.ReadConsistency()
+		received := decoder.ReadInt()
+		blockfor := decoder.ReadInt()
+		writeType := decoder.ReadString()
 
 		data["read_consistency"] = cl.String()
 		data["received"] = received
@@ -278,10 +285,10 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 		data["write_type"] = writeType
 
 	case errReadTimeout:
-		cl := f.decoder.ReadConsistency()
-		received := f.decoder.ReadInt()
-		blockfor := f.decoder.ReadInt()
-		dataPresent, err := f.decoder.ReadByte()
+		cl := decoder.ReadConsistency()
+		received := decoder.ReadInt()
+		blockfor := decoder.ReadInt()
+		dataPresent, err := decoder.ReadByte()
 		if err != nil {
 			panic(err)
 		}
@@ -292,37 +299,37 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 		data["data_present"] = dataPresent
 
 	case errAlreadyExists:
-		ks := f.decoder.ReadString()
-		table := f.decoder.ReadString()
+		ks := decoder.ReadString()
+		table := decoder.ReadString()
 
 		data["keyspace"] = ks
 		data["table"] = table
 
 	case errUnprepared:
-		stmtId := f.decoder.ReadShortBytes()
+		stmtId := decoder.ReadShortBytes()
 		data["stmt_id"] = stmtId
 
 	case errReadFailure:
-		data["read_consistency"] = f.decoder.ReadConsistency().String()
-		data["received"] = f.decoder.ReadInt()
-		data["blockfor"] = f.decoder.ReadInt()
-		b, err := f.decoder.ReadByte()
+		data["read_consistency"] = decoder.ReadConsistency().String()
+		data["received"] = decoder.ReadInt()
+		data["blockfor"] = decoder.ReadInt()
+		b, err := decoder.ReadByte()
 		if err != nil {
 			panic(err)
 		}
 		data["data_present"] = b != 0
 
 	case errWriteFailure:
-		data["read_consistency"] = f.decoder.ReadConsistency().String()
-		data["received"] = f.decoder.ReadInt()
-		data["blockfor"] = f.decoder.ReadInt()
-		data["num_failures"] = f.decoder.ReadInt()
-		data["write_type"] = f.decoder.ReadString()
+		data["read_consistency"] = decoder.ReadConsistency().String()
+		data["received"] = decoder.ReadInt()
+		data["blockfor"] = decoder.ReadInt()
+		data["num_failures"] = decoder.ReadInt()
+		data["write_type"] = decoder.ReadString()
 
 	case errFunctionFailure:
-		data["keyspace"] = f.decoder.ReadString()
-		data["function"] = f.decoder.ReadString()
-		data["arg_types"] = f.decoder.ReadStringList()
+		data["keyspace"] = decoder.ReadString()
+		data["function"] = decoder.ReadString()
+		data["arg_types"] = decoder.ReadStringList()
 
 	case errInvalid, errBootstrapping, errConfig, errCredentials, errOverloaded,
 		errProtocol, errServer, errSyntax, errTruncate, errUnauthorized:
@@ -335,33 +342,34 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 func (f *Framer) parseSupportedFrame() (data map[string]interface{}) {
 
 	data = make(map[string]interface{})
-	data["supported"] = f.decoder.ReadStringMultiMap()
+	data["supported"] = (f.decoder).ReadStringMultiMap()
 	return data
 }
 
 func (f *Framer) parseResultMetadata(getPKinfo bool) map[string]interface{} {
 
+	decoder := f.decoder
 	meta := make(map[string]interface{})
-	flags := f.decoder.ReadInt()
+	flags := decoder.ReadInt()
 	meta["flags"] = getRowFlagString(flags)
-	colCount := f.decoder.ReadInt()
+	colCount := decoder.ReadInt()
 	meta["col_count"] = colCount
 
 	if getPKinfo {
 
 		//only for prepared result
 		if f.proto >= protoVersion4 {
-			pkeyCount := f.decoder.ReadInt()
+			pkeyCount := decoder.ReadInt()
 			pkeys := make([]int, pkeyCount)
 			for i := 0; i < pkeyCount; i++ {
-				pkeys[i] = int(f.decoder.ReadShort())
+				pkeys[i] = int(decoder.ReadShort())
 			}
 			meta["pkey_columns"] = pkeys
 		}
 	}
 
 	if flags&flagHasMorePages == flagHasMorePages {
-		meta["paging_state"] = fmt.Sprintf("%X", f.decoder.ReadBytes())
+		meta["paging_state"] = fmt.Sprintf("%X", decoder.ReadBytes())
 		return meta
 	}
 
@@ -372,8 +380,8 @@ func (f *Framer) parseResultMetadata(getPKinfo bool) map[string]interface{} {
 	var keyspace, table string
 	globalSpec := flags&flagGlobalTableSpec == flagGlobalTableSpec
 	if globalSpec {
-		keyspace = f.decoder.ReadString()
-		table = f.decoder.ReadString()
+		keyspace = decoder.ReadString()
+		table = decoder.ReadString()
 		meta["keyspace"] = keyspace
 		meta["table"] = table
 	}
@@ -383,13 +391,13 @@ func (f *Framer) parseResultMetadata(getPKinfo bool) map[string]interface{} {
 
 func (f *Framer) parseQueryFrame() (data map[string]interface{}) {
 	data = make(map[string]interface{})
-	data["query"] = f.decoder.ReadLongString()
+	data["query"] = (f.decoder).ReadLongString()
 	return data
 }
 
 func (f *Framer) parseResultFrame() (data map[string]interface{}) {
 
-	kind := f.decoder.ReadInt()
+	kind := (f.decoder).ReadInt()
 
 	data = make(map[string]interface{})
 	switch kind {
@@ -400,7 +408,7 @@ func (f *Framer) parseResultFrame() (data map[string]interface{}) {
 		data["rows"] = f.parseResultRows()
 	case resultKindSetKeyspace:
 		data["result_type"] = "set_keyspace"
-		data["keyspace"] = f.decoder.ReadString()
+		data["keyspace"] = (f.decoder).ReadString()
 	case resultKindPrepared:
 		data["result_type"] = "prepared"
 		data["result"] = f.parseResultPrepared()
@@ -416,7 +424,7 @@ func (f *Framer) parseResultRows() map[string]interface{} {
 
 	result := make(map[string]interface{})
 	result["meta"] = f.parseResultMetadata(false)
-	result["num_rows"] = f.decoder.ReadInt()
+	result["num_rows"] = (f.decoder).ReadInt()
 
 	return result
 }
@@ -425,7 +433,7 @@ func (f *Framer) parseResultPrepared() map[string]interface{} {
 
 	result := make(map[string]interface{})
 
-	result["prepared_id"] = string(f.decoder.ReadShortBytes())
+	result["prepared_id"] = string((f.decoder).ReadShortBytes())
 	result["req_meta"] = f.parseResultMetadata(true)
 
 	if f.proto < protoVersion2 {
@@ -439,34 +447,34 @@ func (f *Framer) parseResultPrepared() map[string]interface{} {
 
 func (f *Framer) parseResultSchemaChange() (data map[string]interface{}) {
 	data = make(map[string]interface{})
-
+	decoder := f.decoder
 	if f.proto <= protoVersion2 {
-		change := f.decoder.ReadString()
-		keyspace := f.decoder.ReadString()
-		table := f.decoder.ReadString()
+		change := decoder.ReadString()
+		keyspace := decoder.ReadString()
+		table := decoder.ReadString()
 
 		data["change"] = change
 		data["keyspace"] = keyspace
 		data["table"] = table
 	} else {
-		change := f.decoder.ReadString()
-		target := f.decoder.ReadString()
+		change := decoder.ReadString()
+		target := decoder.ReadString()
 
 		data["change"] = change
 		data["type"] = target
 
 		switch target {
 		case "KEYSPACE":
-			data["keyspace"] = f.decoder.ReadString()
+			data["keyspace"] = decoder.ReadString()
 
 		case "TABLE", "TYPE":
-			data["keyspace"] = f.decoder.ReadString()
-			data["object"] = f.decoder.ReadString()
+			data["keyspace"] = decoder.ReadString()
+			data["object"] = decoder.ReadString()
 
 		case "FUNCTION", "AGGREGATE":
-			data["keyspace"] = f.decoder.ReadString()
-			data["name"] = f.decoder.ReadString()
-			data["args"] = f.decoder.ReadStringList()
+			data["keyspace"] = decoder.ReadString()
+			data["name"] = decoder.ReadString()
+			data["args"] = decoder.ReadStringList()
 
 		default:
 			logp.Warn("unknown SCHEMA_CHANGE target: %q change: %q", target, change)
@@ -477,39 +485,39 @@ func (f *Framer) parseResultSchemaChange() (data map[string]interface{}) {
 
 func (f *Framer) parseAuthenticateFrame() (data map[string]interface{}) {
 	data = make(map[string]interface{})
-	data["class"] = f.decoder.ReadString()
+	data["class"] = (f.decoder).ReadString()
 	return data
 }
 
 func (f *Framer) parseAuthSuccessFrame() (data map[string]interface{}) {
 	data = make((map[string]interface{}))
-	data["data"] = fmt.Sprintf("%q", f.decoder.ReadBytes())
+	data["data"] = fmt.Sprintf("%q", (f.decoder).ReadBytes())
 	return data
 }
 
 func (f *Framer) parseAuthChallengeFrame() (data map[string]interface{}) {
 	data = make((map[string]interface{}))
-	data["data"] = fmt.Sprintf("%q", f.decoder.ReadBytes())
+	data["data"] = fmt.Sprintf("%q", (f.decoder).ReadBytes())
 	return data
 }
 
 func (f *Framer) parseEventFrame() (data map[string]interface{}) {
 
 	data = make((map[string]interface{}))
-
-	eventType := f.decoder.ReadString()
+	decoder := f.decoder
+	eventType := decoder.ReadString()
 	data["event_type"] = eventType
 
 	switch eventType {
 	case "TOPOLOGY_CHANGE":
-		data["change"] = f.decoder.ReadString()
-		host, port := f.decoder.ReadInet()
+		data["change"] = decoder.ReadString()
+		host, port := decoder.ReadInet()
 		data["host"] = host
 		data["port"] = port
 
 	case "STATUS_CHANGE":
-		data["change"] = f.decoder.ReadString()
-		host, port := f.decoder.ReadInet()
+		data["change"] = decoder.ReadString()
+		host, port := decoder.ReadInet()
 		data["host"] = host
 		data["port"] = port
 
