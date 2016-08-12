@@ -480,7 +480,10 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 			}
 
 		default: // ignore unknown fields
-			reader.ignoreNext()
+			_, err = reader.ignoreNext()
+			if err != nil {
+				return 0, nil, err
+			}
 		}
 	}
 
