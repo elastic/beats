@@ -2955,7 +2955,7 @@ Number of times tasks in a cgroup have been throttled (that is, not allowed to r
 
 
 [float]
-=== system.process.cgroup.cpu.stats.throttled.nanos
+=== system.process.cgroup.cpu.stats.throttled.ns
 
 type: long
 
@@ -2984,7 +2984,7 @@ Path to the cgroup relative to the cgroup subsystem's mountpoint.
 
 
 [float]
-=== system.process.cgroup.cpuacct.total.nanos
+=== system.process.cgroup.cpuacct.total.ns
 
 type: long
 
@@ -2992,14 +2992,14 @@ Total CPU time in nanoseconds consumed by all tasks in the cgroup.
 
 
 [float]
-=== system.process.cgroup.cpuacct.stats.user.nanos
+=== system.process.cgroup.cpuacct.stats.user.ns
 
 type: long
 
 CPU time consumed by tasks in user mode.
 
 [float]
-=== system.process.cgroup.cpuacct.stats.system.nanos
+=== system.process.cgroup.cpuacct.stats.system.ns
 
 type: long
 
