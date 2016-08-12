@@ -174,7 +174,7 @@
                 not allowed to run because they have exhausted all of the
                 available time as specified by their quota).
 
-            - name: stats.throttled.nanos
+            - name: stats.throttled.ns
               type: long
               description: >
                 The total time duration (in nanoseconds) for which tasks in a
@@ -194,17 +194,17 @@
                 Path to the cgroup relative to the cgroup subsystem's
                 mountpoint.
 
-            - name: total.nanos
+            - name: total.ns
               type: long
               description: >
                 Total CPU time in nanoseconds consumed by all tasks in the
                 cgroup.
 
-            - name: stats.user.nanos
+            - name: stats.user.ns
               type: long
               description: CPU time consumed by tasks in user mode.
 
-            - name: stats.system.nanos
+            - name: stats.system.ns
               type: long
               description: CPU time consumed by tasks in user (kernel) mode.
 
