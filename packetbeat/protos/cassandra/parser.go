@@ -2,12 +2,11 @@ package cassandra
 
 import (
 	"errors"
-	"time"
-
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
 	. "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
+	"time"
 )
 
 type parser struct {
@@ -130,6 +129,68 @@ func (p *parser) newMessage(ts time.Time) *message {
 	}
 }
 
+func (p *parser) parserBody() (map[string]interface{}, error) {
+
+	if p.framer.Header.BodyLength > 0 {
+		debugf("bodyLength: %d", p.framer.Header.BodyLength)
+
+		//let's wait for enough buf
+		if !p.buf.Avail(p.framer.Header.BodyLength) {
+			if isDebug {
+				debugf("buf not enough for body, waiting for more, return")
+			}
+			return nil, nil
+		}
+
+		//check if the ops already ignored
+		if p.message.ignored {
+			debugf("message marked to be ignored, let's do this")
+			p.buf.Collect(p.framer.Header.BodyLength)
+			finalCollectedFrameLength := p.buf.BufferConsumed()
+			if finalCollectedFrameLength-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
+				return nil, errors.New("data messed while parse frame body")
+			}
+
+		}
+
+		// start to parse body
+		if !p.message.ignored {
+			data, err := p.framer.ReadFrame()
+			if err != nil {
+				// if the frame parsed failed, should ignore the whole message
+				p.framer = nil
+				return nil, err
+			}
+
+			// dealing with un-parsed content
+			frameParsedLength := p.buf.BufferConsumed()
+
+			// collect leftover
+			unParsedSize := p.framer.Header.BodyLength + p.framer.Header.HeadLength - frameParsedLength
+			if unParsedSize > 0 {
+
+				// double check the buf size
+				if p.buf.Avail(unParsedSize) {
+					p.buf.Collect(unParsedSize)
+				} else {
+					logp.Err("should be enough bytes for cleanup,but not enough")
+					return nil, errors.New("should be enough bytes,but not enough")
+				}
+			}
+			return data, nil
+		}
+
+		finalCollectedFrameLength := p.buf.BufferConsumed()
+		if finalCollectedFrameLength-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
+			logp.Err("body_length:%d, head_length:%d, all_consumed:%d", p.framer.Header.BodyLength, p.framer.Header.HeadLength, finalCollectedFrameLength)
+			return nil, errors.New("data messed while parse frame body")
+		}
+
+	}
+
+	return map[string]interface{}{}, nil
+}
+
 func (p *parser) parse() (*message, error) {
 
 	// if p.frame is nil then create a new framer, or continue to process the last message
@@ -169,62 +230,17 @@ func (p *parser) parse() (*message, error) {
 
 	msg := p.message
 
-	if p.framer.Header.BodyLength > 0 {
-
-		//let's wait for enough buf
-		if !p.buf.Avail(p.framer.Header.BodyLength) {
-			if isDebug {
-				debugf("buf not enough for body, waiting for more, return")
-			}
-			return nil, nil
-		}
-
-		//check if the ops already ignored
-		if p.message.ignored {
-			p.buf.Collect(p.framer.Header.BodyLength)
-			finalCollectedFrameLength := p.buf.BufferConsumed()
-			if finalCollectedFrameLength-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
-				return nil, errors.New("data messed while parse frame body")
-			}
-
-		}
-
-		// start to parse body
-		if !p.message.ignored {
-			data, err := p.framer.ReadFrame()
-			if err != nil {
-				// if the frame parsed failed, should ignore the whole message
-				p.framer = nil
-				return nil, err
-			}
-
-			msg.data = data
-
-			// dealing with un-parsed content
-			frameParsedLength := p.buf.BufferConsumed()
-
-			// collect leftover
-			unParsedSize := p.framer.Header.BodyLength + p.framer.Header.HeadLength - frameParsedLength
-			if unParsedSize > 0 {
-
-				// double check the buf size
-				if p.buf.Avail(unParsedSize) {
-					p.buf.Collect(unParsedSize)
-				} else {
-					logp.Err("should be enough bytes for cleanup,but not enough")
-					return nil, errors.New("should be enough bytes,but not enough")
-				}
-			}
-
-		}
-
-		finalCollectedFrameLength := p.buf.BufferConsumed()
-		if finalCollectedFrameLength-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
-			logp.Err("body_length:%d, head_length:%d, all_consumed:%d", p.framer.Header.BodyLength, p.framer.Header.HeadLength, finalCollectedFrameLength)
-			return nil, errors.New("data messed while parse frame body")
-		}
-
+	data, err := p.parserBody()
+	if err != nil {
+		return nil, err
 	}
+
+	//ignore and wait for more data
+	if data == nil {
+		return nil, nil
+	}
+
+	msg.data = data
 
 	dir := applayer.NetOriginalDirection
 

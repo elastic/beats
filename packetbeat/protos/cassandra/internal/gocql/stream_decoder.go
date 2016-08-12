@@ -3,6 +3,7 @@ package cassandra
 import (
 	"fmt"
 	"github.com/elastic/beats/libbeat/common/streambuf"
+	"github.com/pkg/errors"
 	"net"
 )
 
@@ -64,6 +65,9 @@ func (f StreamDecoder) ReadLongString() (s string) {
 
 	size := f.ReadInt()
 
+	if !f.r.Avail(size) {
+		panic(errors.New(fmt.Sprintf("not enough buf to readLongString,need:%d,actual:%d", size, f.r.Len())))
+	}
 	str := make([]byte, size)
 	_, err := f.r.Read(str)
 	if err != nil {
@@ -81,6 +85,7 @@ func (f StreamDecoder) ReadUUID() *UUID {
 	if err != nil {
 		panic(err)
 	}
+
 	u, _ := UUIDFromBytes(bytes)
 	return &u
 

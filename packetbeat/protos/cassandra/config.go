@@ -19,9 +19,11 @@ var (
 	defaultConfig = cassandraConfig{
 		ProtocolCommon: config.ProtocolCommon{
 			TransactionTimeout: protos.DefaultTransactionExpiration,
+			SendRequest:        true,
+			SendResponse:       true,
 		},
-		SendRequestHeader:  false,
-		SendResponseHeader: false,
+		SendRequestHeader:  true,
+		SendResponseHeader: true,
 	}
 )
 

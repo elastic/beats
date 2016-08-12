@@ -164,14 +164,8 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 		}
 	}()
 
-	//decoder := &StreamDecoder{}
-	//decoder.r = f.r
-	//f.decoder = decoder
-
-	decoder := &ByteArrayDecoder{}
-	buf := make([]byte, f.Header.BodyLength)
-	f.r.Read(buf)
-	decoder.Data = &buf
+	decoder := &StreamDecoder{}
+	decoder.r = f.r
 	f.decoder = decoder
 
 	data = make(map[string]interface{})
@@ -185,10 +179,9 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 
 		debugf("tracing enabled")
 
-		uid := decoder.ReadUUID()
-		debugf(uid.String())
-
-		data["trace_id"] = uid.String()
+		//seems no UUID to read, protocol incorrect?
+		//uid := decoder.ReadUUID()
+		//data["trace_id"] = uid.String()
 	}
 
 	if f.Header.Flags&flagWarning == flagWarning {
@@ -206,12 +199,17 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	}
 
 	if f.Header.Flags&flagCompress == flagCompress {
-		//TODO decompress data and switch to use bytearray decoder
-		//decoder := &ByteArrayDecoder{}
-		//buf := make([]byte, f.header.BodyLength)
-		//f.r.Read(buf)
-		//decoder.Data = buf
-		//f.decoder = decoder
+		//decompress data and switch to use bytearray decoder
+		decoder := &ByteArrayDecoder{}
+		buf := make([]byte, f.Header.BodyLength)
+		f.r.Read(buf)
+		dec, err := f.compres.Decode(buf)
+		if err != nil {
+			return nil, err
+		}
+
+		decoder.Data = &dec
+		f.decoder = decoder
 
 		debugf("hit compress flags")
 
