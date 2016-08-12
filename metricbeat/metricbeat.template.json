@@ -1454,7 +1454,7 @@
                             },
                             "throttled": {
                               "properties": {
-                                "nanos": {
+                                "ns": {
                                   "type": "long"
                                 },
                                 "periods": {
@@ -1480,14 +1480,14 @@
                           "properties": {
                             "system": {
                               "properties": {
-                                "nanos": {
+                                "ns": {
                                   "type": "long"
                                 }
                               }
                             },
                             "user": {
                               "properties": {
-                                "nanos": {
+                                "ns": {
                                   "type": "long"
                                 }
                               }
@@ -1496,7 +1496,7 @@
                         },
                         "total": {
                           "properties": {
-                            "nanos": {
+                            "ns": {
                               "type": "long"
                             }
                           }

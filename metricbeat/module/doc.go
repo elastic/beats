@@ -37,7 +37,7 @@ List of standardised words and units across all metricsets. On the left are the 
 * ms: millisecond, millis
 * mb: megabytes
 * msg: message
-* nanos: nanoseconds
+* ns: nanoseconds
 * norm: normalized
 * us: microseconds
 

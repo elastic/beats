@@ -164,7 +164,7 @@ func cgroupCPUToMapStr(cpu *cgroup.CPUSubsystem) common.MapStr {
 			"periods": cpu.Stats.Periods,
 			"throttled": common.MapStr{
 				"periods": cpu.Stats.ThrottledPeriods,
-				"nanos":   cpu.Stats.ThrottledTimeNanos,
+				"ns":      cpu.Stats.ThrottledTimeNanos,
 			},
 		},
 	}
@@ -187,15 +187,15 @@ func cgroupCPUAccountingToMapStr(cpuacct *cgroup.CPUAccountingSubsystem) common.
 		"id":   cpuacct.ID,
 		"path": cpuacct.Path,
 		"total": common.MapStr{
-			"nanos": cpuacct.TotalNanos,
+			"ns": cpuacct.TotalNanos,
 		},
 		"percpu": perCPUUsage,
 		"stats": common.MapStr{
 			"system": common.MapStr{
-				"nanos": cpuacct.Stats.SystemNanos,
+				"ns": cpuacct.Stats.SystemNanos,
 			},
 			"user": common.MapStr{
-				"nanos": cpuacct.Stats.UserNanos,
+				"ns": cpuacct.Stats.UserNanos,
 			},
 		},
 	}
