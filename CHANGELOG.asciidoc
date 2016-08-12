@@ -37,6 +37,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Fix Elasticsearch structured error response parsing error. {issue}2229[2229]
 
 *Metricbeat*
+- Fix module filters to work properly with drop_event filter. {issue}2249[2249]
 
 *Packetbeat*
 - Fix mapping for some Packetbeat flow metrics that were not marked as being longs. {issue}2177[2177]
