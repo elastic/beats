@@ -269,26 +269,36 @@ func (c *Condition) checkEquals(event common.MapStr) bool {
 }
 
 func (c *Condition) checkContains(event common.MapStr) bool {
-
+outer:
 	for field, equalValue := range c.contains {
-
 		value, err := event.GetValue(field)
 		if err != nil {
 			return false
 		}
 
-		sValue, err := extractString(value)
-		if err != nil {
-			logp.Warn("unexpected type %T in contains condition as it accepts only strings. ", value)
+		switch value.(type) {
+		case string:
+			if !strings.Contains(value.(string), equalValue) {
+				return false
+			}
+		case *string:
+			if !strings.Contains(*value.(*string), equalValue) {
+				return false
+			}
+		case []string:
+			for _, s := range value.([]string) {
+				if strings.Contains(s, equalValue) {
+					continue outer
+				}
+			}
 			return false
-		}
-		if !strings.Contains(sValue, equalValue) {
+		default:
+			logp.Warn("unexpected type %T in contains condition as it accepts only strings.", value)
 			return false
 		}
 	}
 
 	return true
-
 }
 
 func (c *Condition) checkRegexp(event common.MapStr) bool {

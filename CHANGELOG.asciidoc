@@ -62,6 +62,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Make Kafka metadata update configurable. {pull}2190[2190]
 - Add kafka version setting (optional) enabling kafka broker version support. {pull}2190[2190]
 - Add kafka message timestamp if at least version 0.10 is configured. {pull}2190[2190]
+- Enhance contains condition to work on fields that are arrays of strings. {issue}2237[2237]
 
 *Metricbeat*
 
