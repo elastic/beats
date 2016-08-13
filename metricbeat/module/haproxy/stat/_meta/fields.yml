@@ -3,7 +3,259 @@
   description: >
     stat
   fields:
-    - name: example
-      type: keyword
+    - name: pxname
+      type: string
       description: >
-        Example field
+        [DESC]
+
+    - name: svname
+      type: string
+      description: >
+        [DESC]
+
+    - name: qcur
+      type: integer
+      description: >
+        Currrent queued requess
+
+    - name: qmax
+      type: integer
+      description: >
+        Max queued requests
+
+    - name: scur
+      type: integer
+      description: >
+        Current sessions
+
+    - name: smax
+      type: integer
+      description: >
+        Max sessions
+
+    - name: slim
+      type: integer
+      description: >
+        Session limit
+
+    - name: stot
+      type: string
+      description: >
+        Total sessions
+
+    - name: bin
+      type: integer
+      description: >
+        Bytes in 
+
+    - name: bout
+      type: integer
+      description: >
+        Bytes out
+
+    - name: dreq
+      type: integer
+      description: >
+        Denied Requests
+
+    - name: dresp
+      type: integer
+      description: >
+        Denied Responses
+
+    - name: ereq
+      type: integer
+      description: >
+        Request Errors
+        
+    - name: econ
+      type: string
+      description: >
+        
+    - name: eresp
+      type: integer
+      description: >
+        
+    - name: wretr
+      type: integer
+      description: >
+        
+    - name: wredis
+      type: integer
+      description: >
+        
+    - name: status
+      type: integer
+      description: >
+ 
+     - name: weight
+      type: string
+      description: >
+        
+    - name: act
+      type: integer
+      description: >
+        
+    - name: bck
+      type: integer
+      description: >
+        
+    - name: chkfail
+      type: integer
+      description: >
+        
+    - name: chkdown
+      type: integer
+      description: >
+
+    - name: lastchg
+      type: string
+      description: >
+        
+    - name: downtime
+      type: integer
+      description: >
+        
+    - name: qlimit
+      type: integer
+      description: >
+        
+    - name: pid
+      type: integer
+      description: >
+        
+    - name: iid
+      type: integer
+      description: >
+
+    - name: sid
+      type: string
+      description: >
+        
+    - name: throttle
+      type: integer
+      description: >
+        
+    - name: lbtot
+      type: integer
+      description: >
+        
+    - name: tracked
+      type: integer
+      description: >
+        
+    - name: type
+      type: integer
+      description: >
+
+    - name: rate
+      type: integer
+      description: >
+
+    - name: rate_lim
+      type: integer
+      description: >
+
+    - name: rate_max
+      type: integer
+      description: >
+
+    - name: check_status 
+      type: integer
+      description: >
+
+    - name: check_code
+      type: integer
+      description: >
+
+    - name: check_duration
+      type: integer
+      description: >
+
+    - name: hrsp_2xx
+      type: integer
+      description: >
+
+    - name: hrsp_3xx
+      type: integer
+      description: >
+
+    - name: hrsp_4xx
+      type: integer
+      description: >
+
+    - name: hrsp_5xx
+      type: integer
+      description: >
+
+    - name: hrsp_other
+      type: integer
+      description: >
+
+    - name: hanafail
+      type: integer
+      description: >
+
+    - name: req_rate
+      type: integer
+      description: >
+
+    - name: req_rate_max
+      type: integer
+      description: >
+
+    - name: req_tot
+      type: integer
+      description: >
+
+    - name: cli_abrt
+      type: integer
+      description: >
+
+    - name: srv_abrt
+      type: integer
+      description: >
+
+    - name: comp_in
+      type: integer
+      description: >
+
+    - name: comp_out
+      type: integer
+      description: >
+
+    - name: comp_byp
+      type: integer
+      description: >
+
+    - name: comp_rsp
+      type: integer
+      description: >
+
+    - name: lastsess
+      type: integer
+      description: >
+
+    - name: last_chk
+      type: integer
+      description: >
+
+    - name: last_agt
+      type: integer
+      description: >
+
+    - name: qtime
+      type: integer
+      description: >
+
+    - name: ctime
+      type: integer
+      description: >
+
+    - name: rtime
+      type: integer
+      description: >
+
+    - name: ttime
+      type: integer
+      description: >

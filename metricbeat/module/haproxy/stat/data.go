@@ -9,69 +9,124 @@ import (
 
 var (
 	schema = s.Schema{
-		"nb_proc":                        c.Int("Nbproc"),
-		"process_num":                    c.Int("Process_num"),
-		"pid":                            c.Int("Pid"),
-		"uptime_sec":                     c.Int("Uptime_sec"),
-		"mem_max_mb":                     c.Int("Memmax_MB"),
-		"ulimit_n":                       c.Int("Ulimit-n"),
-		"max_sock":                       c.Int("Maxsock"),
-		"max_conn":                       c.Int("Maxconn"),
-		"hard_max_conn":                  c.Init("Hard_maxconn"),
-		"curr_conns":                     c.Init("CurrConns"),
-		"cum_conns":                      c.Init("CumConns"),
-		"cum_req":                        c.Init("CumReq"),
-		"max_ssl_conns":                  c.Init("MaxSslConns"),
-		"curr_ssl_conns":                 c.Init("CurrSslConns"),
-		"cum_ssl_conns":                  c.Init("CumSslConns"),
-		"max_pipes":                      c.Init("Maxpipes"),
-		"pipes_used":                     c.Init("PipesUsed"),
-		"pipes_free":                     c.Init("PipesFree"),
-		"conn_rate":                      c.Init("ConnRate"),
-		"conn_rate_limit":                c.Init("ConnRateLimit"),
-		"max_conn_rate":                  c.Init("MaxConnRate"),
-		"sess_rate":                      c.Init("SessRate"),
-		"sess_rate_limit":                c.Init("SessRateLimit"),
-		"max_sess_rate":                  c.Init("MaxSessRate"),
-		"ssl_rate":                       c.Init("SslRate"),
-		"ssl_rate_limit":                 c.Init("SslRateLimit"),
-		"max_ssl_rate":                   c.Init("MaxSslRate"),
-		"ssl_frontend_key_rate":          c.Init("SslFrontendKeyRate"),
-		"ssl_frontend_max_key_rate":      c.Init("SslFrontendMaxKeyRate"),
-		"ssl_frontend_session_reuse_pct": c.Init("SslFrontendSessionReuse_pct"),
-		"ssl_babckend_key_rate":          c.Init("SslBackendKeyRate"),
-		"ssl_backend_max_key_rate":       c.Init("SslBackendMaxKeyRate"),
-		"ssl_cached_lookups":             c.Init("SslCacheLookups"),
-		"ssl_cache_misses":               c.Init("SslCacheMisses"),
-		"compress_bps_in":                c.Init("CompressBpsIn"),
-		"compress_bps_out":               c.Init("CompressBpsOut"),
-		"compress_bps_rate_limit":        c.Init("CompressBpsRateLim"),
-		"zlib_mem_usage":                 c.Init("ZlibMemUsage"),
-		"max_zlib_mem_usage":             c.Init("MaxZlibMemUsage"),
-		"tasks":                          c.Init("Tasks"),
-		"run_queue":                      c.Init("Run_queue"),
-		"idle_pct":                       c.Init("Idle_pct"),
+		"pxname":         c.Str("pxname"),
+		"svname":         c.Str("svname"),
+		"qcur":           c.Int("qcur"),
+		"qmax":           c.Int("qmax"),
+		"scur":           c.Int("scur"),
+		"smax":           c.Int("smax"),
+		"slim":           c.Int("slim"),
+		"stot":           c.Int("stot"),
+		"bin":            c.Int("bin"),
+		"bout":           c.Int("bout"),
+		"dreq":           c.Int("dreq"),
+		"dresp":          c.Int("dresp"),
+		"ereq":           c.Int("ereq"),
+		"econ":           c.Int("econ"),
+		"eresp":          c.Int("eresp"),
+		"wretr":          c.Int("wretr"),
+		"wredis":         c.Int("wredis"),
+		"status":         c.Str("status"),
+		"weight":         c.Int("weight"),
+		"act":            c.Int("act"),
+		"bck":            c.Int("bck"),
+		"chkfail":        c.Int("chkfail"),
+		"chkdown":        c.Int("chkdown"),
+		"lastchg":        c.Int("lastchg"),
+		"downtime":       c.Int("downtime"),
+		"qlimit":         c.Int("qlimit"),
+		"pid":            c.Int("pid"),
+		"iid":            c.Int("iid"),
+		"sid":            c.Int("sid"),
+		"throttle":       c.Int("throttle"),
+		"lbtot":          c.Int("lbtot"),
+		"tracked":        c.Int("tracked"),
+		"type":           c.Int("type"),
+		"rate":           c.Int("rate"),
+		"rate_lim":       c.Int("rate_lim"),
+		"rate_max":       c.Int("rate_max"),
+		"check_status":   c.Str("check_status"),
+		"check_code":     c.Int("check_code"),
+		"check_duration": c.Int("check_duration"),
+		"hrsp_1xx":       c.Int("hrsp_1xx"),
+		"hrsp_2xx":       c.Int("hrsp_2xx"),
+		"hrsp_3xx":       c.Int("hrsp_3xx"),
+		"hrsp_4xx":       c.Int("hrsp_4xx"),
+		"hrsp_5xx":       c.Int("hrsp_5xx"),
+		"hrsp_other":     c.Int("hrsp_other"),
+		"hanafail":       c.Int("hanafail"),
+		"req_rate":       c.Int("req_rate"),
+		"req_rate_max":   c.Int("req_rate_max"),
+		"req_tot":        c.Int("req_tot"),
+		"cli_abrt":       c.Int("cli_abrt"),
+		"srv_abrt":       c.Int("srv_abrt"),
+		"comp_in":        c.Int("comp_in"),
+		"comp_out":       c.Int("comp_out"),
+		"comp_byp":       c.Int("comp_byp"),
+		"comp_rsp":       c.Int("comp_rsp"),
+		"lastsess":       c.Int("lastsess"),
+		"last_chk":       c.Str("last_chk"),
+		"last_agt":       c.Int("last_agt"),
+		"qtime":          c.Int("qtime"),
+		"ctime":          c.Int("ctime"),
+		"rtime":          c.Int("rtime"),
+		"ttime":          c.Int("ttime"),
 	}
 )
 
-func parseResponse(data []byte) map[string]string {
-	resultMap := map[string]string{}
+func parseResponse(data []byte) []map[string]string {
+
+	var results []map[string]string
+
 	str := string(data)
-	for _, ln := range strings.Split(str, "\n") {
-		parts := strings.Split(strings.Trim(ln, " "), ":")
-		if parts[0] == "Name" || parts[0] == "Version" || parts[0] == "Release_date" || parts[0] == "Uptime" {
+	fieldNames := []string{}
+
+	for lnNum, ln := range strings.Split(str, "\n") {
+
+		// If the line by any chance is empty, then skip it
+		ln := strings.Trim(ln, " ")
+		if ln == "" {
 			continue
 		}
-		resultMap[parts[0]] = strings.Trim(parts[1], " ")
+
+		// Now split the line on each comma and if there isn
+		ln = strings.Trim(ln, ",")
+		parts := strings.Split(strings.Trim(ln, " "), ",")
+		if len(parts) != 62 {
+			continue
+		}
+
+		// For the first row, keep the column names and continue
+		if lnNum == 0 {
+			fieldNames = parts
+			continue
+		}
+
+		res := map[string]string{}
+		for i, v := range parts {
+			res[fieldNames[i]] = v
+		}
+
+		results = append(results, res)
+
 	}
+	return results
 }
 
 // Map data to MapStr
-func eventMapping(info map[string]string) common.MapStr {
-	// Full mapping from info
+func eventMapping(info []map[string]string) []common.MapStr {
+
+	var events []common.MapStr
+
 	source := map[string]interface{}{}
-	for key, val := range info {
-		source[key] = val
+
+	for _, evt := range info {
+		source = map[string]interface{}{}
+		for key, val := range evt {
+			source[key] = val
+		}
+		events = append(events, schema.Apply(source))
 	}
-	return schema.Apply(source)
+
+	return events
 }

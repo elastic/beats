@@ -1,4 +1,4 @@
-package stat
+package info
 
 import (
 	"errors"
@@ -10,14 +10,14 @@ import (
 
 const (
 	// defaultSocket is the default path to the unix socket tfor stats on haproxy.
-	statsMethod   = "stat"
+	statsMethod   = "info"
 	defaultSocket = "/var/lib/haproxy/stats"
 )
 
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("haproxy", statsMethod, New); err != nil {
+	if err := mb.Registry.AddMetricSet("haproxy", "info", New); err != nil {
 		panic(err)
 	}
 }
@@ -61,14 +61,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
-	//var metricSetSlice []common.MapStr
+func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	if m.statsMethod == "unix_socket" {
 
 		m.counter++
-
 		c, err := net.Dial("unix", m.statsPath)
 		if err != nil {
 			return nil, fmt.Errorf(fmt.Sprintf("HAProxy %s error: %s", statsMethod, err))
@@ -97,6 +94,6 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	}
 
-	return nil, errors.New("Error getting HAProxy stat")
+	return nil, errors.New("Error getting HAProxy info")
 
 }

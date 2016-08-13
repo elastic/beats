@@ -36,22 +36,24 @@ metricbeat.modules:
 
     # Per process stats
     - process
-  enabled: true
+  enabled: false
   period: 10s
   processes: ['.*']
 
   # if true, exports the CPU usage in ticks, together with the percentage values
   cpu_ticks: false
 
-
-
+#------------------------------- haproxy Module ------------------------------
 - module: haproxy
-  metricsets: ["stat"]
+  metricsets: 
+    - "stat"
+    - "info"
   enabled: true
-  period: 5s
-  hosts: ["localhost"]
+  period: 10s
   stats_method: "unix_socket"
   stats_path: "/Users/alain.lefebvre/tmp/haproxy.sock"
+
+
 
 
 #================================ General =====================================
