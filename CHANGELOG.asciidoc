@@ -15,6 +15,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 *Affecting all Beats*
 - Change Elasticsearch output index configuration to be based on format strings. If index has been configured, no date will be appended anymore to the index name. {pull}2119[2119]
 - Replace `output.kafka.use_type` by `output.kafka.topic` accepting a format string. {pull}2188[2188]
+- If the path specified by the `-c` flag is not absolute and `-path.config` is not specified, it
+  is considered relative to the current working directory. {pull}2245[2245]
 
 *Metricbeat*
 - Change field type system.process.cpu.start_time from keyword to date. {issue}1565[1565]
@@ -36,6 +38,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 *Affecting all Beats*
 - Fix Elasticsearch structured error response parsing error. {issue}2229[2229]
 
+- Fixed the run script to allow the overriding of the configuration file. {issue}2171[2171]
+
 *Metricbeat*
 
 *Packetbeat*
@@ -51,6 +55,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 ==== Added
 
 *Affecting all Beats*
+
 - Add script to generate the Kibana index-pattern from fields.yml. {pull}2122[2122]
 - Enhance redis output key selection based on format string. {pull}2169[2169]
 - Configurable redis `keys` using filters and format strings. {pull}2169[2169]
@@ -63,6 +68,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Add kafka version setting (optional) enabling kafka broker version support. {pull}2190[2190]
 - Add kafka message timestamp if at least version 0.10 is configured. {pull}2190[2190]
 - Enhance contains condition to work on fields that are arrays of strings. {issue}2237[2237]
+- Lookup the configuration file relative to the `-path.config` CLI flag. {pull}2245[2245]
 
 *Metricbeat*
 
