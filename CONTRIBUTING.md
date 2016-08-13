@@ -53,9 +53,6 @@ The Beats are Go programs, so install the latest version of
 [golang](http://golang.org/) if you don't have it already. The current Go version
 used for development is Golang 1.6.2.
 
-The Beats are Go programs, so install the latest version of
-[golang](http://golang.org/) if you don't have it already.
-
 The location where you clone is important. Please clone under the source
 directory of your `GOPATH`. If you don't have `GOPATH` already set, you can
 simply set it to your home directory (`export GOPATH=$HOME`).
