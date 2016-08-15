@@ -18,4 +18,5 @@ sudo mkdir -p /compat/linux/proc
 sudo mount -t linprocfs /dev/null /compat/linux/proc
 ----
 
+include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
 include::../../libbeat/docs/shared-faq.asciidoc[]
