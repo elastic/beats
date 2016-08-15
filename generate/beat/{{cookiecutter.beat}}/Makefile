@@ -2,7 +2,7 @@ BEATNAME={{cookiecutter.beat}}
 BEAT_DIR={{cookiecutter.beat_path}}
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
-ES_BEATS?=${GOPATH}/src/github.com/elastic/beats
+ES_BEATS?=./vendor/github.com/elastic/beats
 GOPACKAGES=$(shell glide novendor)
 PREFIX?=.
 
@@ -11,8 +11,15 @@ PREFIX?=.
 
 # Initial beat setup
 .PHONY: setup
-setup:
+setup: copy-vendor
 	make update
+
+# Copy beats into vendor directory
+.PHONY: copy-vendor
+copy-vendor:
+	mkdir -p vendor/github.com/elastic/
+	cp -R ${GOPATH}/src/github.com/elastic/beats vendor/github.com/elastic/
+	rm -rf vendor/github.com/elastic/beats/.git
 
 .PHONY: git-init
 git-init:
