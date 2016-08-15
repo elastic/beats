@@ -54,4 +54,5 @@ Filebeat uses a newline character to detect the end of an event. If lines are ad
 harvested, a newline character is required after the last line, or Filebeat will not read the last line of
 the file.
 
+include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
 include::../../libbeat/docs/shared-faq.asciidoc[]

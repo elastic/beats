@@ -72,4 +72,5 @@ To process long running transactions, you can specify a larger value for the <<t
 option. However, keep in mind that very large timeout values can increase memory usage if messages are lost or transaction
 response messages are not sent. 
 
+include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
 include::../../libbeat/docs/shared-faq.asciidoc[]
