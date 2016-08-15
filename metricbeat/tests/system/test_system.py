@@ -35,9 +35,10 @@ SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
                          "in.packets", "in.error", "out.error", "in.dropeed", "out.dropped"]
 
 # cmdline is also part of the system process fields, but it may not be present
-# for some kernel level processes.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "pgid", "state",
-                         "username"]
+# for some kernel level processes. fd is also part of the system process, but
+# is not available on all OSes and requires root to read for all processes.
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "pgid",
+                         "state", "username"]
 
 
 class SystemTest(metricbeat.BaseTest):
@@ -340,15 +341,22 @@ class SystemTest(metricbeat.BaseTest):
         self.assertGreater(len(output), 0)
 
         found_cmdline = False
+        found_fd = False
         for evt in output:
             self.assert_fields_are_documented(evt)
             process = evt["system"]["process"]
             cmdline = process.pop("cmdline", None)
             if cmdline is not None:
                 found_cmdline = True
+            fd = process.pop("fd", None)
+            if fd is not None:
+                found_fd = True
             self.assertItemsEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
         self.assertTrue(found_cmdline, "cmdline not found in any process events")
+
+        if sys.platform.startswith("linux") or sys.platform.startswith("freebsd"):
+            self.assertTrue(found_fd, "fd not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_metricbeat(self):

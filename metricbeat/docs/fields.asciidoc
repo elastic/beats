@@ -3002,6 +3002,36 @@ The shared memory the process uses.
 
 
 [float]
+== fd Fields
+
+File descriptor usage metrics. This set of metrics is available for Linux and FreeBSD.
+
+
+
+[float]
+=== system.process.fd.open
+
+type: long
+
+The number of file descriptors open by the process.
+
+[float]
+=== system.process.fd.limit.soft
+
+type: long
+
+The soft limit on the number of file descriptors opened by the process. The soft limit can be changed by the process at any time.
+
+
+[float]
+=== system.process.fd.limit.hard
+
+type: long
+
+The hard limit on the number of file descriptors opened by the process. The hard limit can only be raised by root.
+
+
+[float]
 == cgroup Fields
 
 Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.

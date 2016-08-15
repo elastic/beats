@@ -1862,6 +1862,23 @@
                     }
                   }
                 },
+                "fd": {
+                  "properties": {
+                    "limit": {
+                      "properties": {
+                        "hard": {
+                          "type": "long"
+                        },
+                        "soft": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "open": {
+                      "type": "long"
+                    }
+                  }
+                },
                 "memory": {
                   "properties": {
                     "rss": {

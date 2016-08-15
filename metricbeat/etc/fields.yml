@@ -1800,6 +1800,26 @@
                   format: bytes
                   description: >
                     The shared memory the process uses.
+            - name: fd
+              type: group
+              description: >
+                File descriptor usage metrics. This set of metrics is available for
+                Linux and FreeBSD.
+              prefix: "[float]"
+              fields:
+                - name: open
+                  type: long
+                  description: The number of file descriptors open by the process.
+                - name: limit.soft
+                  type: long
+                  description: >
+                    The soft limit on the number of file descriptors opened by the
+                    process. The soft limit can be changed by the process at any time.
+                - name: limit.hard
+                  type: long
+                  description: >
+                    The hard limit on the number of file descriptors opened by the
+                    process. The hard limit can only be raised by root.
             - name: cgroup
               type: group
               description: >
