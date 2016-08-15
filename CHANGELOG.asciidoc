@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Fixed the run script to allow the overriding of the configuration file. {issue}2171[2171]
 
 *Metricbeat*
+- Fix module filters to work properly with drop_event filter. {issue}2249[2249]
 
 *Packetbeat*
 - Fix mapping for some Packetbeat flow metrics that were not marked as being longs. {issue}2177[2177]
