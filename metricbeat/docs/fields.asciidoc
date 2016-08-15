@@ -1276,7 +1276,7 @@ PostgreSQL metrics.
 [float]
 == activity Fields
 
-One document per server process, showing information related to the current activity of that process, such as state and current query.
+One document per server process, showing information related to the current activity of that process, such as state and current query. Collected by querying pg_stat_activity.
 
 
 
@@ -1404,6 +1404,165 @@ Current overall state of this backend. Possible values are:
 === postgresql.activity.query
 
 Text of this backend's most recent query. If state is active this field shows the currently executing query. In all other states, it shows the last query that was executed.
+
+
+[float]
+== database Fields
+
+One row per database, showing database-wide statistics. Collected by querying pg_stat_database
+
+
+
+[float]
+=== postgresql.database.oid
+
+type: long
+
+OID of the database this backend is connected to.
+
+
+[float]
+=== postgresql.database.name
+
+type: keyword
+
+Name of the database this backend is connected to.
+
+
+[float]
+=== postgresql.database.number_of_backends
+
+type: long
+
+Number of backends currently connected to this database.
+
+
+[float]
+=== postgresql.database.transactions.commit
+
+type: long
+
+Number of transactions in this database that have been committed.
+
+
+[float]
+=== postgresql.database.transactions.rollback
+
+type: long
+
+Number of transactions in this database that have been rolled back.
+
+
+[float]
+=== postgresql.database.blocks.read
+
+type: long
+
+Number of disk blocks read in this database.
+
+
+[float]
+=== postgresql.database.blocks.hit
+
+type: long
+
+Number of times disk blocks were found already in the buffer cache, so that a read was not necessary (this only includes hits in the PostgreSQL buffer cache, not the operating system's file system cache).
+
+
+[float]
+=== postgresql.database.blocks.time.read.ms
+
+type: long
+
+Time spent reading data file blocks by backends in this database, in milliseconds.
+
+
+[float]
+=== postgresql.database.blocks.time.write.ms
+
+type: long
+
+Time spent writing data file blocks by backends in this database, in milliseconds.
+
+
+[float]
+=== postgresql.database.rows.returned
+
+type: long
+
+Number of rows returned by queries in this database.
+
+
+[float]
+=== postgresql.database.rows.fetched
+
+type: long
+
+Number of rows fetched by queries in this database.
+
+
+[float]
+=== postgresql.database.rows.inserted
+
+type: long
+
+Number of rows inserted by queries in this database.
+
+
+[float]
+=== postgresql.database.rows.updated
+
+type: long
+
+Number of rows updated by queries in this database.
+
+
+[float]
+=== postgresql.database.rows.deleted
+
+type: long
+
+Number of rows deleted by queries in this database.
+
+
+[float]
+=== postgresql.database.conflicts
+
+type: long
+
+Number of queries canceled due to conflicts with recovery in this database.
+
+
+[float]
+=== postgresql.database.temporary.files
+
+type: long
+
+Number of temporary files created by queries in this database. All temporary files are counted, regardless of why the temporary file was created (e.g., sorting or hashing), and regardless of the log_temp_files setting.
+
+
+[float]
+=== postgresql.database.temporary.bytes
+
+type: long
+
+Total amount of data written to temporary files by queries in this database. All temporary files are counted, regardless of why the temporary file was created, and regardless of the log_temp_files setting.
+
+
+[float]
+=== postgresql.database.deadlocks
+
+type: long
+
+Number of deadlocks detected in this database.
+
+
+[float]
+=== postgresql.database.stats_reset
+
+type: date
+
+Time at which these statistics were last reset.
 
 
 [[exported-fields-redis]]

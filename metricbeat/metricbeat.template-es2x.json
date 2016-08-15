@@ -710,6 +710,97 @@
                   "type": "boolean"
                 }
               }
+            },
+            "database": {
+              "properties": {
+                "blocks": {
+                  "properties": {
+                    "hit": {
+                      "type": "long"
+                    },
+                    "read": {
+                      "type": "long"
+                    },
+                    "time": {
+                      "properties": {
+                        "read": {
+                          "properties": {
+                            "ms": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "write": {
+                          "properties": {
+                            "ms": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "conflicts": {
+                  "type": "long"
+                },
+                "deadlocks": {
+                  "type": "long"
+                },
+                "name": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "number_of_backends": {
+                  "type": "long"
+                },
+                "oid": {
+                  "type": "long"
+                },
+                "rows": {
+                  "properties": {
+                    "deleted": {
+                      "type": "long"
+                    },
+                    "fetched": {
+                      "type": "long"
+                    },
+                    "inserted": {
+                      "type": "long"
+                    },
+                    "returned": {
+                      "type": "long"
+                    },
+                    "updated": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "stats_reset": {
+                  "type": "date"
+                },
+                "temporary": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "files": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "transactions": {
+                  "properties": {
+                    "commit": {
+                      "type": "long"
+                    },
+                    "rollback": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
             }
           }
         },

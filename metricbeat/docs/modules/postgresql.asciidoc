@@ -19,7 +19,12 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 #- module: postgresql
-  #metricsets: ["activity"]
+  #metricsets:
+    # Stats about every PostgreSQL database
+    #- database
+
+    # Stats about every PostgreSQL process
+    #-activity
   #enabled: true
   #period: 10s
 
@@ -38,5 +43,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-postgresql-activity,activity>>
 
+* <<metricbeat-metricset-postgresql-database,database>>
+
 include::postgresql/activity.asciidoc[]
+
+include::postgresql/database.asciidoc[]
 
