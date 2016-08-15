@@ -4,14 +4,9 @@
 This section contains frequently asked questions about Metricbeat. Also check out the
 https://discuss.elastic.co/c/beats/metricbeat[Metricbeat discussion forum].
 
-* <<freebsd-no-such-file>>
-* <<connection-problem>>
-* <<metadata-missing>>
-* <<diff-logstash-beats>>
-* <<ssl-client-fails>>
-
+[float]
 [[freebsd-no-such-file]]
-=== How do I fix the `open /compat/linux/proc: no such file or directory` error on FreeBSD?
+=== Fix for `open /compat/linux/proc: no such file or directory` error on FreeBSD?
 
 The system metricsets rely a Linux comparability layer to retrieve metrics on
 FreeBSD. You need to mount the Linux procfs filesystem using the following
