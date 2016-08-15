@@ -240,6 +240,7 @@ update: python-env
 	cp ${ES_BEATS}/libbeat/docs/version.asciidoc docs/version.asciidoc
 
 	# Generate index-pattern
+	mkdir -p $(PWD)/etc/kibana/index-pattern
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index ${BEATNAME}-* --libbeat ${ES_BEATS}/libbeat --beat $(PWD)
 
 
