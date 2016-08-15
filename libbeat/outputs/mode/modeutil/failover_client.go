@@ -53,18 +53,18 @@ func (f *failOverClient) Close() error {
 	return closeActive(f)
 }
 
-func (f *failOverClient) PublishEvents(events []outputs.Data) ([]outputs.Data, error) {
+func (f *failOverClient) PublishEvents(data []outputs.Data) ([]outputs.Data, error) {
 	if f.active < 0 {
-		return events, errNoActiveConnection
+		return data, errNoActiveConnection
 	}
-	return f.conns[f.active].PublishEvents(events)
+	return f.conns[f.active].PublishEvents(data)
 }
 
-func (f *failOverClient) PublishEvent(event outputs.Data) error {
+func (f *failOverClient) PublishEvent(data outputs.Data) error {
 	if f.active < 0 {
 		return errNoActiveConnection
 	}
-	return f.conns[f.active].PublishEvent(event)
+	return f.conns[f.active].PublishEvent(data)
 }
 
 func NewAsyncFailoverClient(clients []mode.AsyncProtocolClient) []mode.AsyncProtocolClient {
@@ -91,22 +91,22 @@ func (f *asyncFailOverClient) Close() error {
 
 func (f *asyncFailOverClient) AsyncPublishEvents(
 	cb func([]outputs.Data, error),
-	events []outputs.Data,
+	data []outputs.Data,
 ) error {
 	if f.active < 0 {
 		return errNoActiveConnection
 	}
-	return f.conns[f.active].AsyncPublishEvents(cb, events)
+	return f.conns[f.active].AsyncPublishEvents(cb, data)
 }
 
 func (f *asyncFailOverClient) AsyncPublishEvent(
 	cb func(error),
-	event outputs.Data,
+	data outputs.Data,
 ) error {
 	if f.active < 0 {
 		return errNoActiveConnection
 	}
-	return f.conns[f.active].AsyncPublishEvent(cb, event)
+	return f.conns[f.active].AsyncPublishEvent(cb, data)
 }
 
 func connect(lst clientList, to time.Duration) error {

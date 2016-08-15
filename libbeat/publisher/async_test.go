@@ -26,7 +26,7 @@ func TestAsyncPublishEvent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, event, msgs[0].event)
+	assert.Equal(t, event, msgs[0].datum)
 }
 
 func TestAsyncPublishEvents(t *testing.T) {
@@ -44,8 +44,8 @@ func TestAsyncPublishEvents(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, events[0], msgs[0].events[0])
-	assert.Equal(t, events[1], msgs[0].events[1])
+	assert.Equal(t, events[0], msgs[0].data[0])
+	assert.Equal(t, events[1], msgs[0].data[1])
 }
 
 func TestAsyncShutdownPublishEvents(t *testing.T) {
@@ -63,8 +63,8 @@ func TestAsyncShutdownPublishEvents(t *testing.T) {
 	close(msgs)
 	assert.Equal(t, 1, len(msgs))
 	msg := <-msgs
-	assert.Equal(t, events[0], msg.events[0])
-	assert.Equal(t, events[1], msg.events[1])
+	assert.Equal(t, events[0], msg.data[0])
+	assert.Equal(t, events[1], msg.data[1])
 }
 
 func TestBulkAsyncPublishEvent(t *testing.T) {
@@ -89,7 +89,7 @@ func TestBulkAsyncPublishEvent(t *testing.T) {
 
 	// Bulk outputer always sends bulk messages (even if only one event is
 	// present)
-	assert.Equal(t, event, msgs[0].event)
+	assert.Equal(t, event, msgs[0].datum)
 }
 
 func TestBulkAsyncPublishEvents(t *testing.T) {
@@ -106,8 +106,8 @@ func TestBulkAsyncPublishEvents(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, events[0], msgs[0].events[0])
-	assert.Equal(t, events[1], msgs[0].events[1])
+	assert.Equal(t, events[0], msgs[0].data[0])
+	assert.Equal(t, events[1], msgs[0].data[1])
 }
 
 func TestBulkAsyncShutdownPublishEvents(t *testing.T) {
@@ -125,6 +125,6 @@ func TestBulkAsyncShutdownPublishEvents(t *testing.T) {
 	close(msgs)
 	assert.Equal(t, 1, len(msgs))
 	msg := <-msgs
-	assert.Equal(t, events[0], msg.events[0])
-	assert.Equal(t, events[1], msg.events[1])
+	assert.Equal(t, events[0], msg.data[0])
+	assert.Equal(t, events[1], msg.data[1])
 }

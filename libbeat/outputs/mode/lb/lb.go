@@ -121,12 +121,12 @@ func (m *LB) start(makeWorkers WorkerFactory) error {
 func (m *LB) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event outputs.Data,
+	data outputs.Data,
 ) error {
 	return m.publishEventsMessage(opts, eventsMessage{
 		worker:   -1,
 		signaler: signaler,
-		event:    event,
+		datum:    data,
 	})
 }
 
@@ -134,12 +134,12 @@ func (m *LB) PublishEvent(
 func (m *LB) PublishEvents(
 	signaler op.Signaler,
 	opts outputs.Options,
-	events []outputs.Data,
+	data []outputs.Data,
 ) error {
 	return m.publishEventsMessage(opts, eventsMessage{
 		worker:   -1,
 		signaler: signaler,
-		events:   events,
+		data:     data,
 	})
 }
 

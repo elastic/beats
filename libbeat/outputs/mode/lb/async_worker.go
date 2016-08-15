@@ -112,10 +112,10 @@ func (w *asyncWorker) sendLoop() (done bool) {
 
 func (w *asyncWorker) onMessage(msg eventsMessage) error {
 	var err error
-	if msg.event.Event != nil {
-		err = w.client.AsyncPublishEvent(w.handleResult(msg), msg.event)
+	if msg.datum.Event != nil {
+		err = w.client.AsyncPublishEvent(w.handleResult(msg), msg.datum)
 	} else {
-		err = w.client.AsyncPublishEvents(w.handleResults(msg), msg.events)
+		err = w.client.AsyncPublishEvents(w.handleResults(msg), msg.data)
 	}
 
 	if err != nil {
@@ -147,8 +147,8 @@ func (w *asyncWorker) handleResult(msg eventsMessage) func(error) {
 }
 
 func (w *asyncWorker) handleResults(msg eventsMessage) func([]outputs.Data, error) {
-	total := len(msg.events)
-	return func(events []outputs.Data, err error) {
+	total := len(msg.data)
+	return func(data []outputs.Data, err error) {
 		debugf("handleResults")
 
 		if err != nil {
@@ -159,13 +159,13 @@ func (w *asyncWorker) handleResults(msg eventsMessage) func([]outputs.Data, erro
 			}
 
 			// reset attempt count if subset of messages has been processed
-			if len(events) < total && msg.attemptsLeft >= 0 {
+			if len(data) < total && msg.attemptsLeft >= 0 {
 				msg.attemptsLeft = w.ctx.maxAttempts
 			}
 
 			if err != mode.ErrTempBulkFailure {
 				// retry non-published subset of events in batch
-				msg.events = events
+				msg.data = data
 				w.onFail(msg, err)
 				return
 			}
@@ -177,16 +177,16 @@ func (w *asyncWorker) handleResults(msg eventsMessage) func([]outputs.Data, erro
 			}
 
 			// retry non-published subset of events in batch
-			msg.events = events
+			msg.data = data
 			w.onFail(msg, err)
 			return
 		}
 
 		// re-insert non-published events into pipeline
-		if len(events) != 0 {
+		if len(data) != 0 {
 			go func() {
-				debugf("add non-published events back into pipeline: %v", len(events))
-				msg.events = events
+				debugf("add non-published events back into pipeline: %v", len(data))
+				msg.data = data
 				w.ctx.pushFailed(msg)
 			}()
 			return

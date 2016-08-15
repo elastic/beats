@@ -32,8 +32,8 @@ type workerSignal struct {
 type message struct {
 	client  *client
 	context Context
-	event   outputs.Data
-	events  []outputs.Data
+	datum   outputs.Data
+	data    []outputs.Data
 }
 
 type messageHandler interface {
@@ -112,7 +112,7 @@ func stopQueue(qu chan message) {
 
 func send(qu, bulkQu chan message, m message) {
 	var ch chan message
-	if m.event.Event != nil {
+	if m.datum.Event != nil {
 		ch = qu
 	} else {
 		ch = bulkQu

@@ -28,7 +28,7 @@ type testClientDriver interface {
 	Connect()
 	Close()
 	Stop()
-	Publish(events []outputs.Data)
+	Publish([]outputs.Data)
 	Returns() []testClientReturn
 }
 
@@ -40,8 +40,8 @@ type testClientReturn struct {
 }
 
 type testDriverCommand struct {
-	code   int
-	events []outputs.Data
+	code int
+	data []outputs.Data
 }
 
 func newLumberjackTestClient(conn *transport.Client) *client {

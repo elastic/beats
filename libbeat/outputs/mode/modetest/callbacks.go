@@ -40,21 +40,21 @@ func PublishIgnore([]outputs.Data) ([]outputs.Data, error) {
 
 func PublishCollect(
 	collected *[][]outputs.Data,
-) func(events []outputs.Data) ([]outputs.Data, error) {
+) func(data []outputs.Data) ([]outputs.Data, error) {
 	mutex := sync.Mutex{}
-	return func(events []outputs.Data) ([]outputs.Data, error) {
+	return func(data []outputs.Data) ([]outputs.Data, error) {
 		mutex.Lock()
 		defer mutex.Unlock()
 
-		*collected = append(*collected, events)
+		*collected = append(*collected, data)
 		return nil, nil
 	}
 }
 
 func PublishFailStart(
 	n int,
-	pub func(events []outputs.Data) ([]outputs.Data, error),
-) func(events []outputs.Data) ([]outputs.Data, error) {
+	pub func(data []outputs.Data) ([]outputs.Data, error),
+) func(data []outputs.Data) ([]outputs.Data, error) {
 	return PublishFailWith(n, errNetTimeout{}, pub)
 }
 
@@ -64,18 +64,18 @@ func PublishFailWith(
 	pub func([]outputs.Data) ([]outputs.Data, error),
 ) func([]outputs.Data) ([]outputs.Data, error) {
 	inc := makeCounter(n, err)
-	return func(events []outputs.Data) ([]outputs.Data, error) {
+	return func(data []outputs.Data) ([]outputs.Data, error) {
 		if err := inc(); err != nil {
-			return events, err
+			return data, err
 		}
-		return pub(events)
+		return pub(data)
 	}
 }
 
 func PublishCollectAfterFailStart(
 	n int,
 	collected *[][]outputs.Data,
-) func(events []outputs.Data) ([]outputs.Data, error) {
+) func(data []outputs.Data) ([]outputs.Data, error) {
 	return PublishFailStart(n, PublishCollect(collected))
 }
 
@@ -83,7 +83,7 @@ func PublishCollectAfterFailStartWith(
 	n int,
 	err error,
 	collected *[][]outputs.Data,
-) func(events []outputs.Data) ([]outputs.Data, error) {
+) func(data []outputs.Data) ([]outputs.Data, error) {
 	return PublishFailWith(n, err, PublishCollect(collected))
 }
 
@@ -95,11 +95,11 @@ func AsyncPublishCollect(
 	collected *[][]outputs.Data,
 ) func(func([]outputs.Data, error), []outputs.Data) error {
 	mutex := sync.Mutex{}
-	return func(cb func([]outputs.Data, error), events []outputs.Data) error {
+	return func(cb func([]outputs.Data, error), data []outputs.Data) error {
 		mutex.Lock()
 		defer mutex.Unlock()
 
-		*collected = append(*collected, events)
+		*collected = append(*collected, data)
 		cb(nil, nil)
 		return nil
 	}
@@ -118,11 +118,11 @@ func AsyncPublishFailStartWith(
 	pub func(func([]outputs.Data, error), []outputs.Data) error,
 ) func(func([]outputs.Data, error), []outputs.Data) error {
 	inc := makeCounter(n, err)
-	return func(cb func([]outputs.Data, error), events []outputs.Data) error {
+	return func(cb func([]outputs.Data, error), data []outputs.Data) error {
 		if err := inc(); err != nil {
 			return err
 		}
-		return pub(cb, events)
+		return pub(cb, data)
 	}
 }
 

@@ -34,8 +34,8 @@ type eventsMessage struct {
 	worker       int
 	attemptsLeft int
 	signaler     op.Signaler
-	events       []outputs.Data
-	event        outputs.Data
+	data         []outputs.Data
+	datum        outputs.Data
 }
 
 func makeContext(nClients, maxAttempts int, timeout time.Duration) context {

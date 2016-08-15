@@ -107,29 +107,29 @@ func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
 	return pipeline.publish(message{
 		client:  c,
 		context: ctx,
-		event:   outputs.Data{Event: *publishEvent},
+		datum:   outputs.Data{Event: *publishEvent},
 	})
 }
 
 func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
-	publishEvents := make([]outputs.Data, 0, len(events))
+	data := make([]outputs.Data, 0, len(events))
 	for _, event := range events {
 		c.annotateEvent(event)
 
 		publishEvent := c.filterEvent(event)
 		if publishEvent != nil {
-			publishEvents = append(publishEvents, outputs.Data{Event: *publishEvent})
+			data = append(data, outputs.Data{Event: *publishEvent})
 		}
 	}
 
 	ctx, pipeline := c.getPipeline(opts)
-	if len(publishEvents) == 0 {
+	if len(data) == 0 {
 		logp.Debug("filter", "No events to publish")
 		return true
 	}
 
-	publishedEvents.Add(int64(len(publishEvents)))
-	return pipeline.publish(message{client: c, context: ctx, events: publishEvents})
+	publishedEvents.Add(int64(len(data)))
+	return pipeline.publish(message{client: c, context: ctx, data: data})
 }
 
 // annotateEvent adds fields that are common to all events. This adds the 'beat'

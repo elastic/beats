@@ -179,27 +179,27 @@ func (t *testPublisher) Stop() {
 	t.pub.Stop()
 }
 
-func (t *testPublisher) asyncPublishEvent(event outputs.Data) bool {
+func (t *testPublisher) asyncPublishEvent(data outputs.Data) bool {
 	ctx := Context{}
-	msg := message{client: t.client, context: ctx, event: event}
+	msg := message{client: t.client, context: ctx, datum: data}
 	return t.pub.pipelines.async.publish(msg)
 }
 
-func (t *testPublisher) asyncPublishEvents(events []outputs.Data) bool {
+func (t *testPublisher) asyncPublishEvents(data []outputs.Data) bool {
 	ctx := Context{}
-	msg := message{client: t.client, context: ctx, events: events}
+	msg := message{client: t.client, context: ctx, data: data}
 	return t.pub.pipelines.async.publish(msg)
 }
 
-func (t *testPublisher) syncPublishEvent(event outputs.Data) bool {
+func (t *testPublisher) syncPublishEvent(data outputs.Data) bool {
 	ctx := Context{publishOptions: publishOptions{Guaranteed: true}}
-	msg := message{client: t.client, context: ctx, event: event}
+	msg := message{client: t.client, context: ctx, datum: data}
 	return t.pub.pipelines.sync.publish(msg)
 }
 
-func (t *testPublisher) syncPublishEvents(events []outputs.Data) bool {
+func (t *testPublisher) syncPublishEvents(data []outputs.Data) bool {
 	ctx := Context{publishOptions: publishOptions{Guaranteed: true}}
-	msg := message{client: t.client, context: ctx, events: events}
+	msg := message{client: t.client, context: ctx, data: data}
 	return t.pub.pipelines.sync.publish(msg)
 }
 
@@ -215,10 +215,10 @@ func newTestPublisherNoBulk(response OutputResponse) *testPublisher {
 	return newTestPublisher(-1, response)
 }
 
-func testMessage(s *testSignaler, event outputs.Data) message {
-	return message{context: Context{Signal: s}, event: event}
+func testMessage(s *testSignaler, data outputs.Data) message {
+	return message{context: Context{Signal: s}, datum: data}
 }
 
-func testBulkMessage(s *testSignaler, events []outputs.Data) message {
-	return message{context: Context{Signal: s}, events: events}
+func testBulkMessage(s *testSignaler, data []outputs.Data) message {
+	return message{context: Context{Signal: s}, data: data}
 }

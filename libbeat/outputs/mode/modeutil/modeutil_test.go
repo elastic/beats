@@ -15,10 +15,10 @@ type dummyClient struct{}
 
 func (dummyClient) Connect(timeout time.Duration) error { return nil }
 func (dummyClient) Close() error                        { return nil }
-func (dummyClient) PublishEvents(events []outputs.Data) (nextEvents []outputs.Data, err error) {
+func (dummyClient) PublishEvents(data []outputs.Data) (next []outputs.Data, err error) {
 	return nil, nil
 }
-func (dummyClient) PublishEvent(event outputs.Data) error { return nil }
+func (dummyClient) PublishEvent(data outputs.Data) error { return nil }
 
 func makeTestClients(c map[string]interface{},
 	newClient func(string) (mode.ProtocolClient, error),

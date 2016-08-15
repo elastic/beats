@@ -31,7 +31,7 @@ type Data struct {
 
 type Outputer interface {
 	// Publish event
-	PublishEvent(sig op.Signaler, opts Options, event Data) error
+	PublishEvent(sig op.Signaler, opts Options, data Data) error
 
 	Close() error
 }
@@ -48,7 +48,7 @@ type TopologyOutputer interface {
 // Outputers still might loop on events or use more efficient bulk-apis if present.
 type BulkOutputer interface {
 	Outputer
-	BulkPublish(sig op.Signaler, opts Options, event []Data) error
+	BulkPublish(sig op.Signaler, opts Options, data []Data) error
 }
 
 // Create and initialize the output plugin
@@ -121,11 +121,11 @@ func CastBulkOutputer(out Outputer) BulkOutputer {
 func (b *bulkOutputAdapter) BulkPublish(
 	signal op.Signaler,
 	opts Options,
-	events []Data,
+	data []Data,
 ) error {
-	signal = op.SplitSignaler(signal, len(events))
-	for _, evt := range events {
-		err := b.PublishEvent(signal, opts, evt)
+	signal = op.SplitSignaler(signal, len(data))
+	for _, d := range data {
+		err := b.PublishEvent(signal, opts, d)
 		if err != nil {
 			return err
 		}

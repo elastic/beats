@@ -7,22 +7,22 @@ import (
 
 type EventInfo struct {
 	Single bool
-	Events []outputs.Data
+	Data   []outputs.Data
 }
 
 func SingleEvent(e common.MapStr) []EventInfo {
-	events := []outputs.Data{{Event: e}}
+	data := []outputs.Data{{Event: e}}
 	return []EventInfo{
-		{Single: true, Events: events},
+		{Single: true, Data: data},
 	}
 }
 
 func MultiEvent(n int, event common.MapStr) []EventInfo {
-	var events []outputs.Data
+	var data []outputs.Data
 	for i := 0; i < n; i++ {
-		events = append(events, outputs.Data{Event: event})
+		data = append(data, outputs.Data{Event: event})
 	}
-	return []EventInfo{{Single: false, Events: events}}
+	return []EventInfo{{Single: false, Data: data}}
 }
 
 func Repeat(n int, evt []EventInfo) []EventInfo {

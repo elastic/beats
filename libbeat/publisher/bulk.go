@@ -17,7 +17,7 @@ type bulkWorker struct {
 	flushTicker *time.Ticker
 
 	maxBatchSize int
-	events       []outputs.Data // batched events
+	data         []outputs.Data // batched events
 	pending      []op.Signaler  // pending signalers for batched events
 }
 
@@ -34,7 +34,7 @@ func newBulkWorker(
 		bulkQueue:    make(chan message, bulkHWM),
 		flushTicker:  time.NewTicker(flushInterval),
 		maxBatchSize: maxBatchSize,
-		events:       make([]outputs.Data, 0, maxBatchSize),
+		data:         make([]outputs.Data, 0, maxBatchSize),
 		pending:      nil,
 	}
 
@@ -55,9 +55,9 @@ func (b *bulkWorker) run() {
 		case <-b.ws.done:
 			return
 		case m := <-b.queue:
-			b.onEvent(&m.context, m.event)
+			b.onEvent(&m.context, m.datum)
 		case m := <-b.bulkQueue:
-			b.onEvents(&m.context, m.events)
+			b.onEvents(&m.context, m.data)
 		case <-b.flushTicker.C:
 			b.flush()
 		}
@@ -65,13 +65,13 @@ func (b *bulkWorker) run() {
 }
 
 func (b *bulkWorker) flush() {
-	if len(b.events) > 0 {
+	if len(b.data) > 0 {
 		b.publish()
 	}
 }
 
-func (b *bulkWorker) onEvent(ctx *Context, event outputs.Data) {
-	b.events = append(b.events, event)
+func (b *bulkWorker) onEvent(ctx *Context, data outputs.Data) {
+	b.data = append(b.data, data)
 	b.guaranteed = b.guaranteed || ctx.Guaranteed
 
 	signal := ctx.Signal
@@ -79,18 +79,18 @@ func (b *bulkWorker) onEvent(ctx *Context, event outputs.Data) {
 		b.pending = append(b.pending, signal)
 	}
 
-	if len(b.events) == cap(b.events) {
+	if len(b.data) == cap(b.data) {
 		b.publish()
 	}
 }
 
-func (b *bulkWorker) onEvents(ctx *Context, events []outputs.Data) {
-	for len(events) > 0 {
+func (b *bulkWorker) onEvents(ctx *Context, data []outputs.Data) {
+	for len(data) > 0 {
 		// split up bulk to match required bulk sizes.
 		// If input events have been split up bufferFull will be set and
 		// bulk request will be published.
-		spaceLeft := cap(b.events) - len(b.events)
-		consume := len(events)
+		spaceLeft := cap(b.data) - len(b.data)
+		consume := len(data)
 		bufferFull := spaceLeft <= consume
 		signal := ctx.Signal
 		b.guaranteed = b.guaranteed || ctx.Guaranteed
@@ -104,8 +104,8 @@ func (b *bulkWorker) onEvents(ctx *Context, events []outputs.Data) {
 		}
 
 		// buffer events
-		b.events = append(b.events, events[:consume]...)
-		events = events[consume:]
+		b.data = append(b.data, data[:consume]...)
+		data = data[consume:]
 		if signal != nil {
 			b.pending = append(b.pending, signal)
 		}
@@ -122,12 +122,12 @@ func (b *bulkWorker) publish() {
 			publishOptions: publishOptions{Guaranteed: b.guaranteed},
 			Signal:         op.CombineSignalers(b.pending...),
 		},
-		events: b.events,
+		data: b.data,
 	})
 
 	b.pending = nil
 	b.guaranteed = false
-	b.events = make([]outputs.Data, 0, b.maxBatchSize)
+	b.data = make([]outputs.Data, 0, b.maxBatchSize)
 }
 
 func (b *bulkWorker) shutdown() {

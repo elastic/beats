@@ -84,35 +84,36 @@ func (c *client) Close() error {
 
 func (c *client) AsyncPublishEvent(
 	cb func(error),
-	event outputs.Data,
+	data outputs.Data,
 ) error {
 	return c.AsyncPublishEvents(func(_ []outputs.Data, err error) {
 		cb(err)
-	}, []outputs.Data{event})
+	}, []outputs.Data{data})
 }
 
 func (c *client) AsyncPublishEvents(
 	cb func([]outputs.Data, error),
-	events []outputs.Data,
+	data []outputs.Data,
 ) error {
 	publishEventsCallCount.Add(1)
 	debugf("publish events")
 
 	ref := &msgRef{
-		count: int32(len(events)),
-		batch: events,
+		count: int32(len(data)),
+		batch: data,
 		cb:    cb,
 	}
 
 	ch := c.producer.Input()
 
-	for _, event := range events {
-		topic, err := c.topic.Select(event.Event)
+	for _, d := range data {
+		event := d.Event
+		topic, err := c.topic.Select(event)
 		var ts time.Time
 
 		// message timestamps have been added to kafka with version 0.10.0.0
 		if c.config.Version.IsAtLeast(sarama.V0_10_0_0) {
-			if tsRaw, ok := event.Event["@timestamp"]; ok {
+			if tsRaw, ok := event["@timestamp"]; ok {
 				if tmp, ok := tsRaw.(common.Time); ok {
 					ts = time.Time(tmp)
 				} else if tmp, ok := tsRaw.(time.Time); ok {
@@ -121,7 +122,7 @@ func (c *client) AsyncPublishEvents(
 			}
 		}
 
-		jsonEvent, err := json.Marshal(event.Event)
+		jsonEvent, err := json.Marshal(event)
 		if err != nil {
 			ref.done()
 			continue

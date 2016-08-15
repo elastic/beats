@@ -37,9 +37,9 @@ func TestInfRetryNoDeadlock(t *testing.T) {
 				break
 			}
 
-			fails := msg.event.Event["fails"].(int)
+			fails := msg.datum.Event["fails"].(int)
 			if fails < Fails {
-				msg.event.Event["fails"] = fails + 1
+				msg.datum.Event["fails"] = fails + 1
 				ctx.pushFailed(msg)
 				continue
 			}
@@ -58,7 +58,7 @@ func TestInfRetryNoDeadlock(t *testing.T) {
 	for i := 0; i < N; i++ {
 		msg := eventsMessage{
 			worker: -1,
-			event:  outputs.Data{Event: common.MapStr{"fails": int(0)}},
+			datum:  outputs.Data{Event: common.MapStr{"fails": int(0)}},
 		}
 		ok := ctx.pushEvents(msg, true)
 		assert.True(t, ok)

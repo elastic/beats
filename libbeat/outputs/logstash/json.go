@@ -27,8 +27,8 @@ func makeLogstashEventEncoder(beat string) (func(interface{}) ([]byte, error), e
 		return nil, err
 	}
 
-	cb := func(rawEvent interface{}) ([]byte, error) {
-		event := rawEvent.(outputs.Data).Event
+	cb := func(rawData interface{}) ([]byte, error) {
+		event := rawData.(outputs.Data).Event
 		buf := enc.buf
 		buf.Reset()
 

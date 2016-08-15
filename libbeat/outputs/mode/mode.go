@@ -29,10 +29,10 @@ type ConnectionMode interface {
 
 	// PublishEvents will send all events (potentially asynchronous) to its
 	// clients.
-	PublishEvents(sig op.Signaler, opts outputs.Options, events []outputs.Data) error
+	PublishEvents(sig op.Signaler, opts outputs.Options, data []outputs.Data) error
 
 	// PublishEvent will send an event to its clients.
-	PublishEvent(sig op.Signaler, opts outputs.Options, event outputs.Data) error
+	PublishEvent(sig op.Signaler, opts outputs.Options, data outputs.Data) error
 }
 
 type Connectable interface {
@@ -57,11 +57,11 @@ type ProtocolClient interface {
 	// must be set.
 	// PublishEvents is free to publish only a subset of given events, even in
 	// error case. On return nextEvents contains all events not yet published.
-	PublishEvents(events []outputs.Data) (nextEvents []outputs.Data, err error)
+	PublishEvents(data []outputs.Data) (nextEvents []outputs.Data, err error)
 
 	// PublishEvent sends one event to the clients sink. On failure and error is
 	// returned.
-	PublishEvent(event outputs.Data) error
+	PublishEvent(data outputs.Data) error
 }
 
 // AsyncProtocolClient interface is a output plugin specfic client implementation
@@ -69,9 +69,9 @@ type ProtocolClient interface {
 type AsyncProtocolClient interface {
 	Connectable
 
-	AsyncPublishEvents(cb func([]outputs.Data, error), events []outputs.Data) error
+	AsyncPublishEvents(cb func([]outputs.Data, error), data []outputs.Data) error
 
-	AsyncPublishEvent(cb func(error), event outputs.Data) error
+	AsyncPublishEvent(cb func(error), data outputs.Data) error
 }
 
 var (

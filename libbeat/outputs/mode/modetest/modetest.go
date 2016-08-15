@@ -58,23 +58,23 @@ func (c *MockClient) Close() error {
 	return err
 }
 
-func (c *MockClient) PublishEvents(events []outputs.Data) ([]outputs.Data, error) {
-	return c.CBPublish(events)
+func (c *MockClient) PublishEvents(data []outputs.Data) ([]outputs.Data, error) {
+	return c.CBPublish(data)
 }
 
-func (c *MockClient) PublishEvent(event outputs.Data) error {
-	_, err := c.PublishEvents([]outputs.Data{event})
+func (c *MockClient) PublishEvent(data outputs.Data) error {
+	_, err := c.PublishEvents([]outputs.Data{data})
 	return err
 }
 
-func (c *MockClient) AsyncPublishEvents(cb func([]outputs.Data, error), events []outputs.Data) error {
-	return c.CBAsyncPublish(cb, events)
+func (c *MockClient) AsyncPublishEvents(cb func([]outputs.Data, error), data []outputs.Data) error {
+	return c.CBAsyncPublish(cb, data)
 }
 
-func (c *MockClient) AsyncPublishEvent(cb func(error), event outputs.Data) error {
+func (c *MockClient) AsyncPublishEvent(cb func(error), data outputs.Data) error {
 	return c.AsyncPublishEvents(
 		func(evts []outputs.Data, err error) { cb(err) },
-		[]outputs.Data{event})
+		[]outputs.Data{data})
 }
 
 func SyncClients(n int, tmpl *MockClient) []mode.ProtocolClient {
@@ -97,9 +97,9 @@ func TestMode(
 	t *testing.T,
 	mode mode.ConnectionMode,
 	opts outputs.Options,
-	events []EventInfo,
+	data []EventInfo,
 	expectedSignals []bool,
-	collectedEvents *[][]outputs.Data,
+	collected *[][]outputs.Data,
 ) {
 	defer func() {
 		err := mode.Close()
@@ -108,36 +108,36 @@ func TestMode(
 		}
 	}()
 
-	if events == nil {
+	if data == nil {
 		return
 	}
 
 	numSignals := 0
-	for _, pubEvents := range events {
+	for _, pubEvents := range data {
 		if pubEvents.Single {
-			numSignals += len(pubEvents.Events)
+			numSignals += len(pubEvents.Data)
 		} else {
 			numSignals++
 		}
 	}
 
-	var expectedEvents [][]outputs.Data
+	var expectedData [][]outputs.Data
 	ch := make(chan op.SignalResponse, numSignals)
 	signal := &op.SignalChannel{ch}
 	idx := 0
-	for _, pubEvents := range events {
+	for _, pubEvents := range data {
 		if pubEvents.Single {
-			for _, event := range pubEvents.Events {
+			for _, event := range pubEvents.Data {
 				_ = mode.PublishEvent(signal, opts, event)
 				if expectedSignals[idx] {
-					expectedEvents = append(expectedEvents, []outputs.Data{event})
+					expectedData = append(expectedData, []outputs.Data{event})
 				}
 				idx++
 			}
 		} else {
-			_ = mode.PublishEvents(signal, opts, pubEvents.Events)
+			_ = mode.PublishEvents(signal, opts, pubEvents.Data)
 			if expectedSignals[idx] {
-				expectedEvents = append(expectedEvents, pubEvents.Events)
+				expectedData = append(expectedData, pubEvents.Data)
 			}
 			idx++
 		}
@@ -149,12 +149,12 @@ func TestMode(
 	}
 	assert.Equal(t, expectedSignals, results)
 
-	if collectedEvents != nil {
-		assert.Equal(t, len(expectedEvents), len(*collectedEvents))
-		if len(expectedEvents) == len(*collectedEvents) {
-			for i := range *collectedEvents {
-				expected := expectedEvents[i]
-				actual := (*collectedEvents)[i]
+	if collected != nil {
+		assert.Equal(t, len(expectedData), len(*collected))
+		if len(expectedData) == len(*collected) {
+			for i := range *collected {
+				expected := expectedData[i]
+				actual := (*collected)[i]
 				assert.Equal(t, expected, actual)
 			}
 		}
