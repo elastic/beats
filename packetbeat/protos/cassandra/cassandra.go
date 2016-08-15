@@ -10,7 +10,6 @@ import (
 	. "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 	"github.com/elastic/beats/packetbeat/publish"
-	"strings"
 )
 
 // cassandra application level protocol analyzer plugin
@@ -89,20 +88,8 @@ func (cassandra *cassandra) setFromConfig(config *cassandraConfig) error {
 	// parsed ignored ops
 	if len(config.OPsIgnored) > 0 {
 		maps := map[FrameOp]bool{}
-
-		if strings.Contains(config.OPsIgnored, ",") {
-			array := strings.Split(config.OPsIgnored, ",")
-			for i := 0; i < len(array); i++ {
-				str := array[i]
-				if len(str) > 0 {
-					op := FrameOpFromString(strings.ToUpper(strings.TrimSpace(str)))
-					maps[op] = true
-				}
-			}
-		} else {
-			op := FrameOpFromString(strings.ToUpper(strings.TrimSpace(config.OPsIgnored)))
+		for _, op := range config.OPsIgnored {
 			maps[op] = true
-
 		}
 		parser.ignoredOps = maps
 		debugf("parsed config IgnoredOPs: %v ", parser.ignoredOps)

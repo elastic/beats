@@ -438,12 +438,12 @@ packetbeat.protocols.cassandra:
   #send_response_header: true
 
   # If this option is enabled, and also the flag indicates that the frame body was compressed, and
-  # the stream will decode by the compressor, currently support: `snappy` , The default is empty.
+  # the stream will decode by the compressor, currently support: `snappy` , The default compressor is nil.
   #compressor: "snappy"
 
-  # This option indicates which Operator/Operators will be ignored,
-  # multi value can be sperated by `,`
-  #ignored_ops: "SUPPORTED,OPTIONS"
+  # This option indicates which Operator/Operators will be ignored
+  #ignored_ops: ["SUPPORTED","OPTIONS"]
+
 
 #================================ General =====================================
 

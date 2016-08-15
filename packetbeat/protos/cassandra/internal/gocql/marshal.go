@@ -502,44 +502,47 @@ func (f FrameOp) String() string {
 	}
 }
 
-func FrameOpFromString(str string) FrameOp {
-	switch str {
-	case "ERROR":
-		return opError
-	case "STARTUP":
-		return opStartup
-	case "READY":
-		return opReady
-	case "AUTHENTICATE":
-		return opAuthenticate
-	case "OPTIONS":
-		return opOptions
-	case "SUPPORTED":
-		return opSupported
-	case "QUERY":
-		return opQuery
-	case "RESULT":
-		return opResult
-	case "PREPARE":
-		return opPrepare
-	case "EXECUTE":
-		return opExecute
-	case "REGISTER":
-		return opRegister
-	case "EVENT":
-		return opEvent
-	case "BATCH":
-		return opBatch
-	case "AUTH_CHALLENGE":
-		return opAuthChallenge
-	case "AUTH_RESPONSE":
-		return opAuthResponse
-	case "AUTH_SUCCESS":
-		return opAuthSuccess
-	default:
-		debugf("unknown Op while convert: %s", str)
-		return opUnknown
+var frameOps = map[string]FrameOp{
+	"ERROR":          opError,
+	"STARTUP":        opStartup,
+	"READY":          opReady,
+	"AUTHENTICATE":   opAuthenticate,
+	"OPTIONS":        opOptions,
+	"SUPPORTED":      opSupported,
+	"QUERY":          opQuery,
+	"RESULT":         opResult,
+	"PREPARE":        opPrepare,
+	"EXECUTE":        opExecute,
+	"REGISTER":       opRegister,
+	"EVENT":          opEvent,
+	"BATCH":          opBatch,
+	"AUTH_CHALLENGE": opAuthChallenge,
+	"AUTH_RESPONSE":  opAuthResponse,
+	"AUTH_SUCCESS":   opAuthSuccess,
+}
+
+func FrameOpFromString(s string) (FrameOp, error) {
+	s = strings.ToUpper(strings.TrimSpace(s))
+	op, found := frameOps[s]
+	if !found {
+		return opUnknown, fmt.Errorf("unknown frame op: %v", s)
 	}
+	return op, nil
+}
+
+func (f *FrameOp) Unpack(in interface{}) error {
+	s, ok := in.(string)
+	if !ok {
+		return errors.New("expected string")
+	}
+
+	op, err := FrameOpFromString(s)
+	if err != nil {
+		return err
+	}
+
+	*f = op
+	return nil
 }
 
 const (

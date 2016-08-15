@@ -67,11 +67,17 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		}
 
 		if pub.sendRequest {
+			if requ.data == nil {
+				requ.data = map[string]interface{}{}
+			}
+
 			if pub.sendRequestHeader {
 				requ.data["request_headers"] = requ.header
 			}
 
-			event["cassandra_request"] = requ.data
+			if len(requ.data) > 0 {
+				event["cassandra_request"] = requ.data
+			}
 		}
 
 		dst := &common.Endpoint{
@@ -97,11 +103,18 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 	event["bytes_out"] = resp.Size
 
 	if pub.sendResponse {
+		if resp.data == nil {
+			resp.data = map[string]interface{}{}
+		}
+
 		if pub.sendResponseHeader {
 			resp.data["response_headers"] = resp.header
 		}
 
-		event["cassandra_response"] = resp.data
+		if len(resp.data) > 0 {
+			event["cassandra_response"] = resp.data
+		}
+
 	}
 
 	return event

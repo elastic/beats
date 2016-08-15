@@ -83,7 +83,6 @@ class Test(BaseTest):
         assert h2["flags"] == "FLAG_0"
         assert h2["stream"] == 49
 
-
     def test_insert_data(self):
         """
        Should correctly insert record into table in Cassandra
@@ -119,7 +118,6 @@ class Test(BaseTest):
         assert h2["op"] == "RESULT"
         assert h2["flags"] == "FLAG_0"
         assert h2["stream"] == 252
-
 
     def test_select_data(self):
         """
@@ -192,6 +190,45 @@ class Test(BaseTest):
         assert h2["flags"] == "FLAG_0"
         assert h2["stream"] == 92
 
+    def test_trace_error(self):
+        """
+       Should correctly catch a error message and trace flag was enabled
+       """
+        self.render_config_template(
+            cassandra_ports=[9042],
+            cassandra_send_request=True,
+            cassandra_send_response=True,
+            cassandra_send_request_header=True,
+            cassandra_send_response_header=True,
+        )
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_trace_err.pcap",debug_selectors=["*"])
+        objs = self.read_output()
+        o = objs[0]
+        assert o["type"] == "cassandra"
+        assert o["port"] == 9042
+
+        q=o["cassandra_request"]
+        assert o["bytes_in"] == 55
+        assert o["bytes_out"] == 62
+        assert q["query"] == "DROP KEYSPACE mykeyspace;"
+        h= q["request_headers"]
+        assert h["version"] == "4"
+        assert h["op"] == "QUERY"
+        assert h["length"] == 46
+        assert h["flags"] == "Tracing"
+        assert h["stream"] == 275
+
+        r=o["cassandra_response"]
+        assert r["err_code"]==8960
+        assert r["err_msg"]=="Cannot drop non existing keyspace 'mykeyspace'."
+        assert r["err_type"]=="errConfig"
+        h2= r["response_headers"]
+        assert h2["version"] == "4"
+        assert h2["length"] == 53
+        assert h2["op"] == "ERROR"
+        assert h2["flags"] == "FLAG_0"
+        assert h2["stream"] == 275
+
     def test_select_use_index(self):
         """
        Should correctly select record from table (use index) in Cassandra
@@ -228,7 +265,6 @@ class Test(BaseTest):
         assert h2["flags"] == "FLAG_0"
         assert h2["stream"] == 262
         assert r["result_type"]=="rows"
-
 
     def test_ops_mixed(self):
         """
@@ -317,8 +353,6 @@ class Test(BaseTest):
         assert h2["flags"] == "FLAG_0"
         assert h2["stream"] == 2
 
-
-
     def test_ops_ignored(self):
         """
        Should correctly ignore OPTIONS and REGISTER operation
@@ -329,7 +363,7 @@ class Test(BaseTest):
             cassandra_send_response=True,
             cassandra_send_request_header=True,
             cassandra_send_response_header=True,
-            cassandra_ignored_ops= "OPTIONS,REGISTER",
+            cassandra_ignored_ops= ["OPTIONS","REGISTER"]
         )
 
         self.run_packetbeat(pcap="cassandra/v4/cassandra_mixed_frame.pcap",debug_selectors=["*"])

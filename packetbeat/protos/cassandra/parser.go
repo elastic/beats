@@ -24,7 +24,7 @@ type parserConfig struct {
 }
 
 // check whether this ops is enabled or not
-func (p *parser) FrameOpsIgnored() bool {
+func (p *parser) CheckFrameOpsIgnored() bool {
 
 	if p.config.ignoredOps != nil && len(p.config.ignoredOps) > 0 {
 		//default map value is false
@@ -97,7 +97,6 @@ func (p *parser) feed(ts time.Time, data []byte) error {
 		if p.message == nil {
 			// allocate new message object to be used by parser with current timestamp
 			p.message = p.newMessage(ts)
-			p.message.data = map[string]interface{}{}
 		}
 
 		msg, err := p.parse()
@@ -129,66 +128,64 @@ func (p *parser) newMessage(ts time.Time) *message {
 	}
 }
 
-func (p *parser) parserBody() (map[string]interface{}, error) {
+func (p *parser) parserBody() (bool, error) {
 
-	if p.framer.Header.BodyLength > 0 {
-		debugf("bodyLength: %d", p.framer.Header.BodyLength)
-
-		//let's wait for enough buf
-		if !p.buf.Avail(p.framer.Header.BodyLength) {
-			if isDebug {
-				debugf("buf not enough for body, waiting for more, return")
-			}
-			return nil, nil
-		}
-
-		//check if the ops already ignored
-		if p.message.ignored {
-			debugf("message marked to be ignored, let's do this")
-			p.buf.Collect(p.framer.Header.BodyLength)
-			finalCollectedFrameLength := p.buf.BufferConsumed()
-			if finalCollectedFrameLength-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
-				return nil, errors.New("data messed while parse frame body")
-			}
-
-		}
-
-		// start to parse body
-		if !p.message.ignored {
-			data, err := p.framer.ReadFrame()
-			if err != nil {
-				// if the frame parsed failed, should ignore the whole message
-				p.framer = nil
-				return nil, err
-			}
-
-			// dealing with un-parsed content
-			frameParsedLength := p.buf.BufferConsumed()
-
-			// collect leftover
-			unParsedSize := p.framer.Header.BodyLength + p.framer.Header.HeadLength - frameParsedLength
-			if unParsedSize > 0 {
-
-				// double check the buf size
-				if p.buf.Avail(unParsedSize) {
-					p.buf.Collect(unParsedSize)
-				} else {
-					logp.Err("should be enough bytes for cleanup,but not enough")
-					return nil, errors.New("should be enough bytes,but not enough")
-				}
-			}
-			return data, nil
-		}
-
-		finalCollectedFrameLength := p.buf.BufferConsumed()
-		if finalCollectedFrameLength-p.framer.Header.HeadLength != p.framer.Header.BodyLength {
-			logp.Err("body_length:%d, head_length:%d, all_consumed:%d", p.framer.Header.BodyLength, p.framer.Header.HeadLength, finalCollectedFrameLength)
-			return nil, errors.New("data messed while parse frame body")
-		}
-
+	headLen := p.framer.Header.HeadLength
+	bdyLen := p.framer.Header.BodyLength
+	if bdyLen <= 0 {
+		return true, nil
 	}
 
-	return map[string]interface{}{}, nil
+	//let's wait for enough buf
+	debugf("bodyLength: %d", bdyLen)
+	if !p.buf.Avail(bdyLen) {
+		if isDebug {
+			debugf("buf not enough for body, waiting for more, return")
+		}
+		return false, nil
+	}
+
+	//check if the ops already ignored
+	if p.message.ignored {
+		if isDebug {
+			debugf("message marked to be ignored, let's do this")
+		}
+		p.buf.Collect(bdyLen)
+	} else {
+		// start to parse body
+		data, err := p.framer.ReadFrame()
+		if err != nil {
+			// if the frame parsed failed, should ignore the whole message
+			p.framer = nil
+			return false, err
+		}
+
+		// dealing with un-parsed content
+		frameParsedLength := p.buf.BufferConsumed()
+
+		// collect leftover
+		unParsedSize := bdyLen + headLen - frameParsedLength
+		if unParsedSize > 0 {
+			if !p.buf.Avail(unParsedSize) {
+				err := errors.New("should be enough bytes for cleanup,but not enough")
+				logp.Err("Finishing frame failed with: %v", err)
+				return false, err
+			}
+
+			p.buf.Collect(unParsedSize)
+		}
+
+		p.message.data = data
+	}
+
+	finalCollectedFrameLength := p.buf.BufferConsumed()
+	if finalCollectedFrameLength-headLen != bdyLen {
+		logp.Err("body_length:%d, head_length:%d, all_consumed:%d",
+			bdyLen, headLen, finalCollectedFrameLength)
+		return false, errors.New("data messed while parse frame body")
+	}
+
+	return true, nil
 }
 
 func (p *parser) parse() (*message, error) {
@@ -220,7 +217,7 @@ func (p *parser) parse() (*message, error) {
 	}
 
 	//check if the ops need to be ignored
-	if p.FrameOpsIgnored() {
+	if p.CheckFrameOpsIgnored() {
 		// as we already ignore the content, we now mark the result is ignored
 		p.message.ignored = true
 		if isDebug {
@@ -230,17 +227,15 @@ func (p *parser) parse() (*message, error) {
 
 	msg := p.message
 
-	data, err := p.parserBody()
+	finished, err := p.parserBody()
 	if err != nil {
 		return nil, err
 	}
 
 	//ignore and wait for more data
-	if data == nil {
+	if !finished {
 		return nil, nil
 	}
-
-	msg.data = data
 
 	dir := applayer.NetOriginalDirection
 

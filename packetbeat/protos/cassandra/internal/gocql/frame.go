@@ -212,8 +212,6 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 		f.decoder = decoder
 
 		debugf("hit compress flags")
-
-		return nil, errors.New("Compressed content not supported yet")
 	}
 
 	// assumes that the frame body has been read into rbuf

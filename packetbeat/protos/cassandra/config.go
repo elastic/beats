@@ -4,15 +4,16 @@ import (
 	"fmt"
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/protos"
+	. "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
 	"github.com/pkg/errors"
 )
 
 type cassandraConfig struct {
 	config.ProtocolCommon `config:",inline"`
-	SendRequestHeader     bool   `config:"send_request_header"`
-	SendResponseHeader    bool   `config:"send_response_header"`
-	Compressor            string `config:"compressor"`
-	OPsIgnored            string `config:"ignored_ops"`
+	SendRequestHeader     bool      `config:"send_request_header"`
+	SendResponseHeader    bool      `config:"send_response_header"`
+	Compressor            string    `config:"compressor"`
+	OPsIgnored            []FrameOp `config:"ignored_ops"`
 }
 
 var (
