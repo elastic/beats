@@ -178,6 +178,8 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 	event := common.MapStr{"type": "test", "name": "me", "line": 10}
 
 	for i := 0; i < N; i++ {
+		// reconnect client
+		client.Close()
 		client.Connect()
 
 		// publish event. With client returning on timeout, we have to send
@@ -186,6 +188,9 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 
 		// read batch + never ACK in order to enforce timeout
 		server.Receive()
+
+		// wait for max connection timeout ensuring ACK receive fails
+		time.Sleep(100 * time.Millisecond)
 	}
 
 	client.Stop()
