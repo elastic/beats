@@ -67,11 +67,10 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		}
 
 		if pub.sendRequest {
-			if requ.data == nil {
-				requ.data = map[string]interface{}{}
-			}
-
 			if pub.sendRequestHeader {
+				if requ.data == nil {
+					requ.data = map[string]interface{}{}
+				}
 				requ.data["request_headers"] = requ.header
 			}
 
@@ -103,11 +102,12 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 	event["bytes_out"] = resp.Size
 
 	if pub.sendResponse {
-		if resp.data == nil {
-			resp.data = map[string]interface{}{}
-		}
 
 		if pub.sendResponseHeader {
+			if resp.data == nil {
+				resp.data = map[string]interface{}{}
+			}
+
 			resp.data["response_headers"] = resp.header
 		}
 
