@@ -7,6 +7,7 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/libbeat/common/streambuf"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // lineReader reads lines from underlying reader, decoding the input stream
@@ -24,43 +25,33 @@ type Line struct {
 	decoder    transform.Transformer
 }
 
-func NewLine(
-	input io.Reader,
-	codec encoding.Encoding,
-	bufferSize int,
-) (*Line, error) {
-	l := &Line{}
+// NewLine creates a new Line reader object
+func NewLine(input io.Reader, codec encoding.Encoding, bufferSize int) (*Line, error) {
 
-	if err := l.init(input, codec, bufferSize); err != nil {
+	encoder := codec.NewEncoder()
+
+	// Create newline char based on encoding
+	nl, _, err := transform.Bytes(encoder, []byte{'\n'})
+	if err != nil {
 		return nil, err
 	}
 
-	return l, nil
+	return &Line{
+		reader:     input,
+		codec:      codec,
+		bufferSize: bufferSize,
+		nl:         nl,
+		decoder:    codec.NewDecoder(),
+		inBuffer:   streambuf.New(nil),
+		outBuffer:  streambuf.New(nil),
+	}, nil
 }
 
-func (l *Line) init(
-	reader io.Reader,
-	codec encoding.Encoding,
-	bufferSize int,
-) error {
-	l.reader = reader
-	l.codec = codec
-	l.bufferSize = bufferSize
-
-	l.codec.NewEncoder()
-	nl, _, err := transform.Bytes(l.codec.NewEncoder(), []byte{'\n'})
-	if err != nil {
-		return err
-	}
-
-	l.nl = nl
-	l.decoder = l.codec.NewDecoder()
-	l.inBuffer = streambuf.New(nil)
-	l.outBuffer = streambuf.New(nil)
-	return nil
-}
-
+// Next reads the next line until the new line character
 func (l *Line) Next() ([]byte, int, error) {
+
+	// This loop is need in case advance detects an line ending which turns out
+	// not to be one when decoded. If that is the case, reading continues.
 	for {
 		// read next 'potential' line from input buffer/reader
 		err := l.advance()
@@ -68,10 +59,13 @@ func (l *Line) Next() ([]byte, int, error) {
 			return nil, 0, err
 		}
 
-		// check last decoded byte really being '\n'
+		// Check last decoded byte really being '\n' also unencoded
+		// if not, continue reading
 		buf := l.outBuffer.Bytes()
 		if buf[len(buf)-1] == '\n' {
 			break
+		} else {
+			logp.Debug("line", "Line ending char found which wasn't one: %s", buf[len(buf)-1])
 		}
 	}
 
@@ -90,36 +84,28 @@ func (l *Line) Next() ([]byte, int, error) {
 	return bytes, sz, nil
 }
 
+// Reads from the buffer until a new line character is detected
+// Returns an error otherwise
 func (l *Line) advance() error {
-	var idx int
-	var err error
+
+	// Initial check if buffer has already a newLine character
+	idx := l.inBuffer.IndexFrom(l.inOffset, l.nl)
 
 	// fill inBuffer until '\n' sequence has been found in input buffer
-	for {
-		// Check if buffer has newLine character
-		idx = l.inBuffer.IndexFrom(l.inOffset, l.nl)
-		if idx >= 0 {
-			break
-		}
-		if err != nil {
-			// if no newline and last read returned error, return error now
-			return err
-		}
-
+	for idx == -1 {
 		// increase search offset to reduce iterations on buffer when looping
 		newOffset := l.inBuffer.Len() - len(l.nl)
 		if newOffset > l.inOffset {
 			l.inOffset = newOffset
 		}
 
-		// try to read more bytes into buffer
-		n := 0
 		buf := make([]byte, l.bufferSize)
+
+		// try to read more bytes into buffer
 		n, err := l.reader.Read(buf)
+		// Appends buffer also in case of err
 		l.inBuffer.Append(buf[:n])
-		if n == 0 && err != nil {
-			// return error only if no bytes have been received. Otherwise try to
-			// parse '\n' before returning the error.
+		if err != nil {
 			return err
 		}
 
@@ -127,6 +113,9 @@ func (l *Line) advance() error {
 		if n == 0 {
 			return streambuf.ErrNoMoreBytes
 		}
+
+		// Check if buffer has newLine character
+		idx = l.inBuffer.IndexFrom(l.inOffset, l.nl)
 	}
 
 	// found encoded byte sequence for '\n' in buffer
@@ -137,7 +126,8 @@ func (l *Line) advance() error {
 	err = l.inBuffer.Advance(sz)
 	l.inBuffer.Reset()
 
-	l.inOffset = idx + 1 - sz // continue scanning input buffer from last position + 1
+	// continue scanning input buffer from last position + 1
+	l.inOffset = idx + 1 - sz
 	if l.inOffset < 0 {
 		// fix inOffset if '\n' has encoding > 8bits + fill line has been decoded
 		l.inOffset = 0

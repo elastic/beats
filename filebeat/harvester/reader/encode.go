@@ -16,17 +16,19 @@ type Encode struct {
 // NewEncode creates a new Encode reader from input reader by applying
 // the given codec.
 func NewEncode(
-	in io.Reader,
+	reader io.Reader,
 	codec encoding.Encoding,
 	bufferSize int,
 ) (Encode, error) {
-	r, err := NewLine(in, codec, bufferSize)
+	r, err := NewLine(reader, codec, bufferSize)
 	return Encode{r}, err
 }
 
 // Next reads the next line from it's initial io.Reader
+// This converts a io.Reader to a reader.reader
 func (p Encode) Next() (Message, error) {
 	c, sz, err := p.reader.Next()
+	// Creating message object
 	return Message{
 		Ts:      time.Now(),
 		Content: c,
