@@ -4,18 +4,9 @@
 This section contains frequently asked questions about Packetbeat. Also check out the
 https://discuss.elastic.co/c/beats/packetbeat[Packetbeat discussion forum].
 
-* <<client-server-fields-empty>>
-* <<dashboard-fields-incorrect>>
-* <<packetbeat-mirror-ports>>
-* <<packetbeat-loopback-interface>>
-* <<packetbeat-missing-transactions>>
-* <<connection-problem>>
-* <<metadata-missing>>
-* <<diff-logstash-beats>>
-* <<ssl-client-fails>>
-
+[float]
 [[client-server-fields-empty]]
-=== Why are the client_server and server fields empty?
+=== Client_server and server fields are empty?
 
 The `client_server` and `server` fields are empty when Packetbeat is not configured
 to capture information about the network topology.
@@ -23,13 +14,15 @@ to capture information about the network topology.
 To capture information about the network topology, set the `save_topology` configuration option to true and make sure that
 you are sending the output to Elasticsearch.
 
+[float]
 [[dashboard-fields-incorrect]]
-=== Why is the dashboard in Kibana breaking up my data fields incorrectly?
+=== Dashboard in Kibana is breaking up data fields incorrectly?
 
 The index template might not be loaded correctly. See <<packetbeat-template>>.
 
+[float]
 [[packetbeat-mirror-ports]]
-=== Why doesn’t Packetbeat see any packets when using mirror ports?
+=== Packetbeat doesn't see any packets when using mirror ports?
 
 The interface needs to be set to promiscuous mode. Run the following command:
 
@@ -40,8 +33,9 @@ ip link set <device_name> promisc on
 
 For example: `ip link set enp5s0f1 promisc on`
 
+[float]
 [[packetbeat-loopback-interface]]
-=== Why can't Packetbeat capture traffic from the loopback interface on Windows?
+=== Packetbeat can't capture traffic from Windows loopback interface?
 
 Packetbeat is unable to capture traffic from the loopback device (127.0.0.1 traffic)
 because the Windows TCP/IP stack does not implement a network loopback interface, 
@@ -67,8 +61,9 @@ PS C:\Users\vagrant\Desktop\packetbeat-1.2.0-windows> .\packetbeat.exe -devices
 
 NOTE: Npcap is sponsored but not officially supported by the Nmap Project. 
 
+[float]
 [[packetbeat-missing-transactions]]
-=== Why is Packetbeat missing long running transactions?
+=== Packetbeat is missing long running transactions?
 
 Packetbeat has an internal timeout that it uses to time out transactions and TCP connections
 when no packets have been seen for a long time. 
