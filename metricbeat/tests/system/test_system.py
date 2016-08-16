@@ -32,7 +32,7 @@ SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "u
                         "actual.used.pct"]
 
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
-                         "in.packets", "in.error", "out.error", "in.dropeed", "out.dropped"]
+                         "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
 
 # cmdline is also part of the system process fields, but it may not be present
 # for some kernel level processes. fd is also part of the system process, but
