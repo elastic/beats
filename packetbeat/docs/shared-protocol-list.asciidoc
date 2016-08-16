@@ -14,4 +14,4 @@
  - Thrift-RPC
  - MongoDB
  - Memcache
- 
+ - Cassandra

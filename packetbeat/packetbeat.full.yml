@@ -422,26 +422,26 @@ packetbeat.protocols.cassandra:
   ports: [9042]
 
   # If this option is enabled, the raw message of the request (`cassandra_request` field)
-  # is included in published events. The default is false.
+  # is included in published events. The default is true.
   #send_request: true
 
-  # If this option is enabled, the raw message of the response (`cassandra_response` field)
-  # is included in published events. The default is false.
-  #send_response: true
-
-  # If this option is enabled, the raw message of the response (`cassandra_request_header` field)
-  # is sent to Elasticsearch. The default is false.
+  # If this option is enabled, the raw message of the response (`cassandra_request.request_headers` field)
+  # is included in published events. The default is true. enable `send_request` first before enable this option.
   #send_request_header: true
 
-  # If this option is enabled, the raw message of the response (`cassandra_response_header` field)
-  # is included in published events. The default is false.
+  # If this option is enabled, the raw message of the response (`cassandra_response` field)
+  # is included in published events. The default is true.
+  #send_response: true
+
+  # If this option is enabled, the raw message of the response (`cassandra_response.response_headers` field)
+  # is included in published events. The default is true. enable `send_response` first before enable this option.
   #send_response_header: true
 
   # If this option is enabled, and also the flag indicates that the frame body was compressed, and
-  # the stream will decode by the compressor, currently support: `snappy` , The default compressor is nil.
+  # the stream will decode by the compressor, currently support: `snappy` , The default is empty.
   #compressor: "snappy"
 
-  # This option indicates which Operator/Operators will be ignored
+  # This option indicates which Operator/Operators will be ignored.
   #ignored_ops: ["SUPPORTED","OPTIONS"]
 
 

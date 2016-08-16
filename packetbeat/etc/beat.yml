@@ -87,3 +87,7 @@ packetbeat.protocols.nfs:
   # Configure the ports where to listen for NFS traffic. You can disable
   # the NFS protocol by commenting out the list of ports.
   ports: [2049]
+
+packetbeat.protocols.cassandra:
+  #Cassandra port for traffic monitoring.
+  ports: [9042]
