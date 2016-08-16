@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modetest"
 )
@@ -51,7 +51,7 @@ func TestAsyncLBFailSendMultWithoutActiveConnections(t *testing.T) {
 func testAsyncLBOKSend(t *testing.T, events []modetest.EventInfo) {
 	enableLogging([]string{"*"})
 
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := NewAsync(
 		modetest.AsyncClients(1, &modetest.MockClient{
 			CBAsyncPublish: modetest.AsyncPublishCollect(&collected),
@@ -73,7 +73,7 @@ func TestAsyncLBOKSendMult(t *testing.T) {
 }
 
 func testAsyncLBFlakyConnectionOkSend(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	tmpl := &modetest.MockClient{
 		Connected:      true,
 		CBAsyncPublish: modetest.AsyncPublishCollectAfterFailStart(1, &collected),
@@ -99,7 +99,7 @@ func TestAsyncLBFlakyConnectionOkSendMult(t *testing.T) {
 func testAsyncLBFlakyFail(t *testing.T, events []modetest.EventInfo) {
 	enableLogging([]string{"*"})
 
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	err := errors.New("flaky")
 	mode, _ := NewAsync(
 		modetest.AsyncClients(2, &modetest.MockClient{
@@ -123,7 +123,7 @@ func TestAsyncLBMultiFlakyFail(t *testing.T) {
 }
 
 func testAsyncLBTemporayFailure(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := NewAsync(
 		modetest.AsyncClients(1, &modetest.MockClient{
 			Connected: true,
@@ -149,7 +149,7 @@ func TestAsyncLBTemporayFailureMutlEvents(t *testing.T) {
 func testAsyncLBTempFlakyFail(t *testing.T, events []modetest.EventInfo) {
 	enableLogging([]string{"*"})
 
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := NewAsync(
 		modetest.AsyncClients(2, &modetest.MockClient{
 			Connected: true,
@@ -177,7 +177,7 @@ func testAsyncLBFlakyInfAttempts(t *testing.T, events []modetest.EventInfo) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	err := errors.New("flaky")
 	mode, _ := NewAsync(
 		modetest.AsyncClients(2, &modetest.MockClient{
@@ -206,7 +206,7 @@ func testAsyncLBFlakyInfAttempts2(t *testing.T, events []modetest.EventInfo) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	err := errors.New("flaky")
 	mode, _ := NewAsync(
 		modetest.AsyncClients(2, &modetest.MockClient{
@@ -234,7 +234,7 @@ func testAsyncLBFlakyGuaranteed(t *testing.T, events []modetest.EventInfo) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	err := errors.New("flaky")
 	tmpl := &modetest.MockClient{
 		Connected:      true,
@@ -264,7 +264,7 @@ func testAsyncLBFlakyGuaranteed2(t *testing.T, events []modetest.EventInfo) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	err := errors.New("flaky")
 	tmpl := &modetest.MockClient{
 		Connected:      true,

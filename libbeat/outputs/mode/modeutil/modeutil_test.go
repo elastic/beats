@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,10 +15,10 @@ type dummyClient struct{}
 
 func (dummyClient) Connect(timeout time.Duration) error { return nil }
 func (dummyClient) Close() error                        { return nil }
-func (dummyClient) PublishEvents(events []common.MapStr) (nextEvents []common.MapStr, err error) {
+func (dummyClient) PublishEvents(data []outputs.Data) (next []outputs.Data, err error) {
 	return nil, nil
 }
-func (dummyClient) PublishEvent(event common.MapStr) error { return nil }
+func (dummyClient) PublishEvent(data outputs.Data) error { return nil }
 
 func makeTestClients(c map[string]interface{},
 	newClient func(string) (mode.ProtocolClient, error),

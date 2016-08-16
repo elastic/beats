@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
@@ -26,8 +27,8 @@ type client struct {
 
 type msgRef struct {
 	count int32
-	batch []common.MapStr
-	cb    func([]common.MapStr, error)
+	batch []outputs.Data
+	cb    func([]outputs.Data, error)
 
 	err error
 }
@@ -83,31 +84,31 @@ func (c *client) Close() error {
 
 func (c *client) AsyncPublishEvent(
 	cb func(error),
-	event common.MapStr,
+	data outputs.Data,
 ) error {
-	return c.AsyncPublishEvents(func(_ []common.MapStr, err error) {
+	return c.AsyncPublishEvents(func(_ []outputs.Data, err error) {
 		cb(err)
-	}, []common.MapStr{event})
+	}, []outputs.Data{data})
 }
 
 func (c *client) AsyncPublishEvents(
-	cb func([]common.MapStr, error),
-	events []common.MapStr,
+	cb func([]outputs.Data, error),
+	data []outputs.Data,
 ) error {
 	publishEventsCallCount.Add(1)
 	debugf("publish events")
 
 	ref := &msgRef{
-		count: int32(len(events)),
-		batch: events,
+		count: int32(len(data)),
+		batch: data,
 		cb:    cb,
 	}
 
 	ch := c.producer.Input()
 
-	for _, event := range events {
+	for _, d := range data {
+		event := d.Event
 		topic, err := c.topic.Select(event)
-
 		var ts time.Time
 
 		// message timestamps have been added to kafka with version 0.10.0.0
