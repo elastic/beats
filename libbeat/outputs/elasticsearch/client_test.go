@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/stretchr/testify/assert"
 )
@@ -72,9 +73,9 @@ func TestCollectPublishFailsNone(t *testing.T) {
 	response := []byte(`{"items": [` + strings.Repeat(item, N) + `]}`)
 
 	event := common.MapStr{"field": 1}
-	events := make([]common.MapStr, N)
+	events := make([]outputs.Data, N)
 	for i := 0; i < N; i++ {
-		events[i] = event
+		events[i] = outputs.Data{Event: event}
 	}
 
 	reader := newJSONReader(response)
@@ -91,9 +92,9 @@ func TestCollectPublishFailMiddle(t *testing.T) {
     ]}
   `)
 
-	event := common.MapStr{"field": 1}
-	eventFail := common.MapStr{"field": 2}
-	events := []common.MapStr{event, eventFail, event}
+	event := outputs.Data{Event: common.MapStr{"field": 1}}
+	eventFail := outputs.Data{Event: common.MapStr{"field": 2}}
+	events := []outputs.Data{event, eventFail, event}
 
 	reader := newJSONReader(response)
 	res := bulkCollectPublishFails(reader, events)
@@ -112,8 +113,8 @@ func TestCollectPublishFailAll(t *testing.T) {
     ]}
   `)
 
-	event := common.MapStr{"field": 2}
-	events := []common.MapStr{event, event, event}
+	event := outputs.Data{Event: common.MapStr{"field": 2}}
+	events := []outputs.Data{event, event, event}
 
 	reader := newJSONReader(response)
 	res := bulkCollectPublishFails(reader, events)
@@ -155,8 +156,8 @@ func TestCollectPipelinePublishFail(t *testing.T) {
       ]
     }`)
 
-	event := common.MapStr{"field": 2}
-	events := []common.MapStr{event}
+	event := outputs.Data{Event: common.MapStr{"field": 2}}
+	events := []outputs.Data{event}
 
 	reader := newJSONReader(response)
 	res := bulkCollectPublishFails(reader, events)
@@ -213,8 +214,8 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
     ]}
   `)
 
-	event := common.MapStr{"field": 1}
-	events := []common.MapStr{event, event, event}
+	event := outputs.Data{Event: common.MapStr{"field": 1}}
+	events := []outputs.Data{event, event, event}
 
 	reader := newJSONReader(nil)
 	for i := 0; i < b.N; i++ {
@@ -235,9 +236,9 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
     ]}
   `)
 
-	event := common.MapStr{"field": 1}
-	eventFail := common.MapStr{"field": 2}
-	events := []common.MapStr{event, eventFail, event}
+	event := outputs.Data{Event: common.MapStr{"field": 1}}
+	eventFail := outputs.Data{Event: common.MapStr{"field": 2}}
+	events := []outputs.Data{event, eventFail, event}
 
 	reader := newJSONReader(nil)
 	for i := 0; i < b.N; i++ {
@@ -258,8 +259,8 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
     ]}
   `)
 
-	event := common.MapStr{"field": 2}
-	events := []common.MapStr{event, event, event}
+	event := outputs.Data{Event: common.MapStr{"field": 2}}
+	events := []outputs.Data{event, event, event}
 
 	reader := newJSONReader(nil)
 	for i := 0; i < b.N; i++ {

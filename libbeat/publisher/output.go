@@ -64,51 +64,52 @@ func (o *outputWorker) onStop() {
 }
 
 func (o *outputWorker) onMessage(m message) {
-	if m.event != nil {
-		o.onEvent(&m.context, m.event)
+	if m.datum.Event != nil {
+		o.onEvent(&m.context, m.datum)
 	} else {
-		o.onBulk(&m.context, m.events)
+		o.onBulk(&m.context, m.data)
 	}
 }
 
-func (o *outputWorker) onEvent(ctx *Context, event common.MapStr) {
+func (o *outputWorker) onEvent(ctx *Context, data outputs.Data) {
 	debug("output worker: publish single event")
-	o.out.PublishEvent(ctx.Signal, outputs.Options{Guaranteed: ctx.Guaranteed}, event)
+	opts := outputs.Options{Guaranteed: ctx.Guaranteed}
+	o.out.PublishEvent(ctx.Signal, opts, data)
 }
 
-func (o *outputWorker) onBulk(ctx *Context, events []common.MapStr) {
-	if len(events) == 0 {
+func (o *outputWorker) onBulk(ctx *Context, data []outputs.Data) {
+	if len(data) == 0 {
 		debug("output worker: no events to publish")
 		op.SigCompleted(ctx.Signal)
 		return
 	}
 
-	if o.maxBulkSize < 0 || len(events) <= o.maxBulkSize {
-		o.sendBulk(ctx, events)
+	if o.maxBulkSize < 0 || len(data) <= o.maxBulkSize {
+		o.sendBulk(ctx, data)
 		return
 	}
 
 	// start splitting bulk request
-	splits := (len(events) + (o.maxBulkSize - 1)) / o.maxBulkSize
+	splits := (len(data) + (o.maxBulkSize - 1)) / o.maxBulkSize
 	ctx.Signal = op.SplitSignaler(ctx.Signal, splits)
-	for len(events) > 0 {
+	for len(data) > 0 {
 		sz := o.maxBulkSize
-		if sz > len(events) {
-			sz = len(events)
+		if sz > len(data) {
+			sz = len(data)
 		}
-		o.sendBulk(ctx, events[:sz])
-		events = events[sz:]
+		o.sendBulk(ctx, data[:sz])
+		data = data[sz:]
 	}
 }
 
 func (o *outputWorker) sendBulk(
 	ctx *Context,
-	events []common.MapStr,
+	data []outputs.Data,
 ) {
-	debug("output worker: publish %v events", len(events))
+	debug("output worker: publish %v events", len(data))
 
 	opts := outputs.Options{Guaranteed: ctx.Guaranteed}
-	err := o.out.BulkPublish(ctx.Signal, opts, events)
+	err := o.out.BulkPublish(ctx.Signal, opts, data)
 	if err != nil {
 		logp.Info("Error bulk publishing events: %s", err)
 	}

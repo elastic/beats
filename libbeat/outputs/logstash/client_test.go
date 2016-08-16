@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/go-lumber/server/v2"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
 
@@ -27,7 +28,7 @@ type testClientDriver interface {
 	Connect()
 	Close()
 	Stop()
-	Publish(events []common.MapStr)
+	Publish([]outputs.Data)
 	Returns() []testClientReturn
 }
 
@@ -39,8 +40,8 @@ type testClientReturn struct {
 }
 
 type testDriverCommand struct {
-	code   int
-	events []common.MapStr
+	code int
+	data []outputs.Data
 }
 
 func newLumberjackTestClient(conn *transport.Client) *client {
@@ -69,7 +70,7 @@ func testSendZero(t *testing.T, factory clientFactory) {
 	defer sock.Close()
 	defer transp.Close()
 
-	client.Publish(make([]common.MapStr, 0))
+	client.Publish(make([]outputs.Data, 0))
 
 	client.Stop()
 	returns := client.Returns()
@@ -95,8 +96,8 @@ func testSimpleEvent(t *testing.T, factory clientFactory) {
 	defer transp.Close()
 	defer client.Stop()
 
-	event := common.MapStr{"type": "test", "name": "me", "line": 10}
-	go client.Publish([]common.MapStr{event})
+	event := outputs.Data{Event: common.MapStr{"type": "test", "name": "me", "line": 10}}
+	go client.Publish([]outputs.Data{event})
 
 	// try to receive event from server
 	batch := server.Receive()
@@ -124,7 +125,7 @@ func testStructuredEvent(t *testing.T, factory clientFactory) {
 	defer transp.Close()
 	defer client.Stop()
 
-	event := common.MapStr{
+	event := outputs.Data{Event: common.MapStr{
 		"type": "test",
 		"name": "test",
 		"struct": common.MapStr{
@@ -142,8 +143,8 @@ func testStructuredEvent(t *testing.T, factory clientFactory) {
 				"sub1": 2,
 			},
 		},
-	}
-	go client.Publish([]common.MapStr{event})
+	}}
+	go client.Publish([]outputs.Data{event})
 	defer client.Stop()
 
 	// try to receive event from server
@@ -175,7 +176,7 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 	defer client.Stop()
 
 	N := 8
-	event := common.MapStr{"type": "test", "name": "me", "line": 10}
+	event := outputs.Data{Event: common.MapStr{"type": "test", "name": "me", "line": 10}}
 
 	for i := 0; i < N; i++ {
 		// reconnect client
@@ -184,7 +185,7 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 
 		// publish event. With client returning on timeout, we have to send
 		// messages again
-		go client.Publish([]common.MapStr{event})
+		go client.Publish([]outputs.Data{event})
 
 		// read batch + never ACK in order to enforce timeout
 		server.Receive()

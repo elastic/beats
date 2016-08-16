@@ -43,13 +43,13 @@ func getLogstashHost() string {
 	)
 }
 
-func testEvent() common.MapStr {
-	return common.MapStr{
+func testEvent() outputs.Data {
+	return outputs.Data{Event: common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"type":       "log",
 		"extra":      10,
 		"message":    "message",
-	}
+	}}
 }
 
 func testLogstashIndex(test string) string {

@@ -191,25 +191,25 @@ func (k *kafka) Close() error {
 func (k *kafka) PublishEvent(
 	signal op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
 	mode, err := k.getMode(opts)
 	if err != nil {
 		return err
 	}
-	return mode.PublishEvent(signal, opts, event)
+	return mode.PublishEvent(signal, opts, data)
 }
 
 func (k *kafka) BulkPublish(
 	signal op.Signaler,
 	opts outputs.Options,
-	event []common.MapStr,
+	data []outputs.Data,
 ) error {
 	mode, err := k.getMode(opts)
 	if err != nil {
 		return err
 	}
-	return mode.PublishEvents(signal, opts, event)
+	return mode.PublishEvents(signal, opts, data)
 }
 
 func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {

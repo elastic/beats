@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modetest"
 )
@@ -54,7 +54,7 @@ func TestLoadBalancerFailSendMultWithoutActiveConnections(t *testing.T) {
 }
 
 func testLoadBalancerOKSend(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := NewSync(
 		modetest.SyncClients(1, &modetest.MockClient{
 			Connected: false,
@@ -77,7 +77,7 @@ func TestLoadBalancerOKSendMult(t *testing.T) {
 }
 
 func testLoadBalancerFlakyConnectionOkSend(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := NewSync(
 		modetest.SyncClients(2, &modetest.MockClient{
 			Connected: true,
@@ -100,7 +100,7 @@ func TestLoadBalancerFlakyConnectionOkSendMult(t *testing.T) {
 }
 
 func testLoadBalancerFlakyFail(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := NewSync(
 		modetest.SyncClients(2, &modetest.MockClient{
 			Connected: true,
@@ -123,7 +123,7 @@ func TestLoadBalancerMultiFlakyFail(t *testing.T) {
 }
 
 func testLoadBalancerTemporayFailure(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	err := mode.ErrTempBulkFailure
 	mode, _ := NewSync(
 		modetest.SyncClients(1, &modetest.MockClient{
@@ -147,7 +147,7 @@ func TestLoadBalancerTemporayFailureMutlEvents(t *testing.T) {
 }
 
 func testLoadBalancerTempFlakyFail(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	err := mode.ErrTempBulkFailure
 	mode, _ := NewSync(
 		modetest.SyncClients(2, &modetest.MockClient{
@@ -171,7 +171,7 @@ func TestLoadBalancerMultiTempFlakyFail(t *testing.T) {
 }
 
 func testLoadBalancerFlakyInfAttempts(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := NewSync(
 		modetest.SyncClients(2, &modetest.MockClient{
 			Connected: true,
@@ -194,7 +194,7 @@ func TestLoadBalancerMultiFlakyInfAttempts(t *testing.T) {
 }
 
 func testLoadBalancerTempFlakyInfAttempts(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	err := mode.ErrTempBulkFailure
 	mode, _ := NewSync(
 		modetest.SyncClients(2, &modetest.MockClient{
@@ -218,7 +218,7 @@ func TestLoadBalancerMultiTempFlakyInfAttempts(t *testing.T) {
 }
 
 func testLoadBalancerFlakyGuaranteed(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := NewSync(
 		modetest.SyncClients(2, &modetest.MockClient{
 			Connected: true,
@@ -241,7 +241,7 @@ func TestLoadBalancerMultiFlakyGuaranteed(t *testing.T) {
 }
 
 func testLoadBalancerTempFlakyGuaranteed(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	err := mode.ErrTempBulkFailure
 	mode, _ := NewSync(
 		modetest.SyncClients(2, &modetest.MockClient{

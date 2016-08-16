@@ -148,15 +148,15 @@ func (r *redisOut) Close() error {
 func (r *redisOut) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
-	return r.mode.PublishEvent(signaler, opts, event)
+	return r.mode.PublishEvent(signaler, opts, data)
 }
 
 func (r *redisOut) BulkPublish(
 	signaler op.Signaler,
 	opts outputs.Options,
-	events []common.MapStr,
+	data []outputs.Data,
 ) error {
-	return r.mode.PublishEvents(signaler, opts, events)
+	return r.mode.PublishEvents(signaler, opts, data)
 }

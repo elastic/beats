@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -193,12 +194,12 @@ func (client *Client) Clone() *Client {
 // events not published or confirmed to be processed by elasticsearch will be
 // returned. The input slice backing memory will be reused by return the value.
 func (client *Client) PublishEvents(
-	events []common.MapStr,
-) ([]common.MapStr, error) {
+	data []outputs.Data,
+) ([]outputs.Data, error) {
 	begin := time.Now()
 	publishEventsCallCount.Add(1)
 
-	if len(events) == 0 {
+	if len(data) == 0 {
 		return nil, nil
 	}
 
@@ -207,8 +208,8 @@ func (client *Client) PublishEvents(
 
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
-	events = bulkEncodePublishRequest(body, client.index, client.pipeline, events)
-	if len(events) == 0 {
+	data = bulkEncodePublishRequest(body, client.index, client.pipeline, data)
+	if len(data) == 0 {
 		return nil, nil
 	}
 
@@ -217,23 +218,23 @@ func (client *Client) PublishEvents(
 	status, result, sendErr := client.sendBulkRequest(requ)
 	if sendErr != nil {
 		logp.Err("Failed to perform any bulk index operations: %s", sendErr)
-		return events, sendErr
+		return data, sendErr
 	}
 
 	debugf("PublishEvents: %d events have been  published to elasticsearch in %v.",
-		len(events),
+		len(data),
 		time.Now().Sub(begin))
 
 	// check response for transient errors
-	var failedEvents []common.MapStr
+	var failedEvents []outputs.Data
 	if status != 200 {
-		failedEvents = events
+		failedEvents = data
 	} else {
 		client.json.init(result.raw)
-		failedEvents = bulkCollectPublishFails(&client.json, events)
+		failedEvents = bulkCollectPublishFails(&client.json, data)
 	}
 
-	ackedEvents.Add(int64(len(events) - len(failedEvents)))
+	ackedEvents.Add(int64(len(data) - len(failedEvents)))
 	eventsNotAcked.Add(int64(len(failedEvents)))
 	if len(failedEvents) > 0 {
 		if sendErr == nil {
@@ -251,23 +252,23 @@ func bulkEncodePublishRequest(
 	body bulkWriter,
 	index outil.Selector,
 	pipeline *outil.Selector,
-	events []common.MapStr,
-) []common.MapStr {
-	var mkMeta func(outil.Selector, *outil.Selector, common.MapStr) interface{}
+	data []outputs.Data,
+) []outputs.Data {
+	var mkMeta func(outil.Selector, *outil.Selector, outputs.Data) interface{}
 
 	mkMeta = eventBulkMeta
 	if pipeline != nil {
 		mkMeta = eventIngestBulkMeta
 	}
 
-	okEvents := events[:0]
-	for _, event := range events {
-		meta := mkMeta(index, pipeline, event)
-		if err := body.Add(meta, event); err != nil {
+	okEvents := data[:0]
+	for _, datum := range data {
+		meta := mkMeta(index, pipeline, datum)
+		if err := body.Add(meta, datum.Event); err != nil {
 			logp.Err("Failed to encode event: %s", err)
 			continue
 		}
-		okEvents = append(okEvents, event)
+		okEvents = append(okEvents, datum)
 	}
 	return okEvents
 }
@@ -275,7 +276,7 @@ func bulkEncodePublishRequest(
 func eventBulkMeta(
 	index outil.Selector,
 	_ *outil.Selector,
-	event common.MapStr,
+	data outputs.Data,
 ) interface{} {
 	type bulkMetaIndex struct {
 		Index   string `json:"_index"`
@@ -285,6 +286,7 @@ func eventBulkMeta(
 		Index bulkMetaIndex `json:"index"`
 	}
 
+	event := data.Event
 	meta := bulkMeta{
 		Index: bulkMetaIndex{
 			Index:   getIndex(event, index),
@@ -297,7 +299,7 @@ func eventBulkMeta(
 func eventIngestBulkMeta(
 	index outil.Selector,
 	pipelineSel *outil.Selector,
-	event common.MapStr,
+	data outputs.Data,
 ) interface{} {
 	type bulkMetaIndex struct {
 		Index    string `json:"_index"`
@@ -308,9 +310,10 @@ func eventIngestBulkMeta(
 		Index bulkMetaIndex `json:"index"`
 	}
 
+	event := data.Event
 	pipeline, _ := pipelineSel.Select(event)
 	if pipeline == "" {
-		return eventBulkMeta(index, nil, event)
+		return eventBulkMeta(index, nil, data)
 	}
 
 	return bulkMeta{
@@ -354,8 +357,8 @@ func getIndex(event common.MapStr, index outil.Selector) string {
 // the event will be dropped.
 func bulkCollectPublishFails(
 	reader *jsonReader,
-	events []common.MapStr,
-) []common.MapStr {
+	data []outputs.Data,
+) []outputs.Data {
 	if err := reader.expectDict(); err != nil {
 		logp.Err("Failed to parse bulk respose: expected JSON object")
 		return nil
@@ -388,8 +391,8 @@ func bulkCollectPublishFails(
 		return nil
 	}
 
-	count := len(events)
-	failed := events[:0]
+	count := len(data)
+	failed := data[:0]
 	for i := 0; i < count; i++ {
 		status, msg, err := itemStatus(reader)
 		if err != nil {
@@ -407,7 +410,7 @@ func bulkCollectPublishFails(
 		}
 
 		logp.Info("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
-		failed = append(failed, events[i])
+		failed = append(failed, data[i])
 	}
 
 	return failed
@@ -493,9 +496,10 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 	return status, msg, nil
 }
 
-func (client *Client) PublishEvent(event common.MapStr) error {
+func (client *Client) PublishEvent(data outputs.Data) error {
 	// insert the events one by one
 
+	event := data.Event
 	index := getIndex(event, client.index)
 	typ := event["type"].(string)
 

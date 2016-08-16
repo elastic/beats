@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 func enableLogging(selectors []string) {
@@ -119,13 +120,13 @@ func (s *testSignaler) Canceled() {
 
 // testEvent returns a new common.MapStr with the required fields
 // populated.
-func testEvent() common.MapStr {
-	event := common.MapStr{}
-	event["@timestamp"] = common.Time(time.Now())
-	event["type"] = "test"
-	event["src"] = &common.Endpoint{}
-	event["dst"] = &common.Endpoint{}
-	return event
+func testEvent() outputs.Data {
+	return outputs.Data{Event: common.MapStr{
+		"@timestamp": common.Time(time.Now()),
+		"type":       "test",
+		"src":        &common.Endpoint{},
+		"dst":        &common.Endpoint{},
+	}}
 }
 
 type testPublisher struct {
@@ -178,27 +179,27 @@ func (t *testPublisher) Stop() {
 	t.pub.Stop()
 }
 
-func (t *testPublisher) asyncPublishEvent(event common.MapStr) bool {
+func (t *testPublisher) asyncPublishEvent(data outputs.Data) bool {
 	ctx := Context{}
-	msg := message{client: t.client, context: ctx, event: event}
+	msg := message{client: t.client, context: ctx, datum: data}
 	return t.pub.pipelines.async.publish(msg)
 }
 
-func (t *testPublisher) asyncPublishEvents(events []common.MapStr) bool {
+func (t *testPublisher) asyncPublishEvents(data []outputs.Data) bool {
 	ctx := Context{}
-	msg := message{client: t.client, context: ctx, events: events}
+	msg := message{client: t.client, context: ctx, data: data}
 	return t.pub.pipelines.async.publish(msg)
 }
 
-func (t *testPublisher) syncPublishEvent(event common.MapStr) bool {
+func (t *testPublisher) syncPublishEvent(data outputs.Data) bool {
 	ctx := Context{publishOptions: publishOptions{Guaranteed: true}}
-	msg := message{client: t.client, context: ctx, event: event}
+	msg := message{client: t.client, context: ctx, datum: data}
 	return t.pub.pipelines.sync.publish(msg)
 }
 
-func (t *testPublisher) syncPublishEvents(events []common.MapStr) bool {
+func (t *testPublisher) syncPublishEvents(data []outputs.Data) bool {
 	ctx := Context{publishOptions: publishOptions{Guaranteed: true}}
-	msg := message{client: t.client, context: ctx, events: events}
+	msg := message{client: t.client, context: ctx, data: data}
 	return t.pub.pipelines.sync.publish(msg)
 }
 
@@ -214,10 +215,10 @@ func newTestPublisherNoBulk(response OutputResponse) *testPublisher {
 	return newTestPublisher(-1, response)
 }
 
-func testMessage(s *testSignaler, event common.MapStr) message {
-	return message{context: Context{Signal: s}, event: event}
+func testMessage(s *testSignaler, data outputs.Data) message {
+	return message{context: Context{Signal: s}, datum: data}
 }
 
-func testBulkMessage(s *testSignaler, events []common.MapStr) message {
-	return message{context: Context{Signal: s}, events: events}
+func testBulkMessage(s *testSignaler, data []outputs.Data) message {
+	return message{context: Context{Signal: s}, data: data}
 }

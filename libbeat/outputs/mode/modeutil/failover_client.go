@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
@@ -53,18 +53,18 @@ func (f *failOverClient) Close() error {
 	return closeActive(f)
 }
 
-func (f *failOverClient) PublishEvents(events []common.MapStr) ([]common.MapStr, error) {
+func (f *failOverClient) PublishEvents(data []outputs.Data) ([]outputs.Data, error) {
 	if f.active < 0 {
-		return events, errNoActiveConnection
+		return data, errNoActiveConnection
 	}
-	return f.conns[f.active].PublishEvents(events)
+	return f.conns[f.active].PublishEvents(data)
 }
 
-func (f *failOverClient) PublishEvent(event common.MapStr) error {
+func (f *failOverClient) PublishEvent(data outputs.Data) error {
 	if f.active < 0 {
 		return errNoActiveConnection
 	}
-	return f.conns[f.active].PublishEvent(event)
+	return f.conns[f.active].PublishEvent(data)
 }
 
 func NewAsyncFailoverClient(clients []mode.AsyncProtocolClient) []mode.AsyncProtocolClient {
@@ -90,23 +90,23 @@ func (f *asyncFailOverClient) Close() error {
 }
 
 func (f *asyncFailOverClient) AsyncPublishEvents(
-	cb func([]common.MapStr, error),
-	events []common.MapStr,
+	cb func([]outputs.Data, error),
+	data []outputs.Data,
 ) error {
 	if f.active < 0 {
 		return errNoActiveConnection
 	}
-	return f.conns[f.active].AsyncPublishEvents(cb, events)
+	return f.conns[f.active].AsyncPublishEvents(cb, data)
 }
 
 func (f *asyncFailOverClient) AsyncPublishEvent(
 	cb func(error),
-	event common.MapStr,
+	data outputs.Data,
 ) error {
 	if f.active < 0 {
 		return errNoActiveConnection
 	}
-	return f.conns[f.active].AsyncPublishEvent(cb, event)
+	return f.conns[f.active].AsyncPublishEvent(cb, data)
 }
 
 func connect(lst clientList, to time.Duration) error {

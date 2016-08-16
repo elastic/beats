@@ -290,17 +290,17 @@ func (out *elasticsearchOutput) Close() error {
 func (out *elasticsearchOutput) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
-	return out.mode.PublishEvent(signaler, opts, event)
+	return out.mode.PublishEvent(signaler, opts, data)
 }
 
 func (out *elasticsearchOutput) BulkPublish(
 	trans op.Signaler,
 	opts outputs.Options,
-	events []common.MapStr,
+	data []outputs.Data,
 ) error {
-	return out.mode.PublishEvents(trans, opts, events)
+	return out.mode.PublishEvents(trans, opts, data)
 }
 
 func parseProxyURL(raw string) (*url.URL, error) {
