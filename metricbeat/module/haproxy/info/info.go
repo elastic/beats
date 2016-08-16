@@ -4,14 +4,21 @@ import (
 	"errors"
 	"fmt"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"net"
+	//"net/http"
+	//"net/url"
 )
 
 const (
 	// defaultSocket is the default path to the unix socket tfor stats on haproxy.
 	statsMethod   = "info"
 	defaultSocket = "/var/lib/haproxy/stats"
+)
+
+var (
+	debugf = logp.MakeDebug("haproxy-info")
 )
 
 // init registers the MetricSet with the central registry.

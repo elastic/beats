@@ -1,7 +1,7 @@
 - name: info
   type: group
   description: >
-    info
+    General infomration collected on HAProxy process
   fields:
     - name: example
       type: keyword

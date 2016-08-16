@@ -47,11 +47,12 @@ metricbeat.modules:
 - module: haproxy
   metricsets: 
     - "stat"
-    - "info"
+  #  - "info"
   enabled: true
   period: 10s
-  stats_method: "unix_socket"
-  stats_path: "/Users/alain.lefebvre/tmp/haproxy.sock"
+  #stats_method: "unix_socket"
+  stats_addr: "unix:///Users/alain.lefebvre/tmp/haproxy.sock"
+  #stats_path: "/Users/alain.lefebvre/tmp/haproxy.sock"
 
 
 
