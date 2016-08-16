@@ -724,7 +724,10 @@ is included in published events. The default is true. enable `send_response` fir
 
 ===== ignored_ops
 
-This option indicates which Operator/Operators will be ignored.
+This option indicates which Operator/Operators captured will be ignored. currently support:
+`ERROR` ,`STARTUP` ,`READY` ,`AUTHENTICATE` ,`OPTIONS` ,`SUPPORTED` ,
+`QUERY` ,`RESULT` ,`PREPARE` ,`EXECUTE` ,`REGISTER`  ,`EVENT` ,
+`BATCH` ,`AUTH_CHALLENGE`,`AUTH_RESPONSE` ,`AUTH_SUCCESS` .
 
 ===== compressor
 
