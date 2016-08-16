@@ -1,10 +1,12 @@
 from base import BaseTest
+from nose.plugins.attrib import attr
 
 import os
 import subprocess
 
 
 class Test(BaseTest):
+    @attr('integration')
     def test_load_dashboard(self):
         """
         Test loading dashboards for all beats
