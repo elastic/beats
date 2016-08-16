@@ -268,7 +268,7 @@ class Test(BaseTest):
 
     def test_ops_mixed(self):
         """
-       Some mixed operation happened in Cassandra
+       Should correctly have mixed operation happened in Cassandra
        """
         self.render_config_template(
             cassandra_ports=[9042],
@@ -416,4 +416,101 @@ class Test(BaseTest):
         assert h2["op"] == "RESULT"
         assert h2["flags"] == "FLAG_0"
         assert h2["stream"] == 3
+
+    def test_compressed_frame(self):
+        """
+       Should correctly have some compressed frame should happened in Cassandra
+       """
+        self.render_config_template(
+            cassandra_ports=[9042],
+            cassandra_send_request=True,
+            cassandra_send_response=True,
+            cassandra_send_request_header=True,
+            cassandra_send_response_header=True,
+            cassandra_compressor= "snappy",
+        )
+
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_compressed.pcap",debug_selectors=["*"])
+        objs = self.read_output()
+
+        o = objs[0]
+        print o
+        assert o["type"] == "cassandra"
+        assert o["port"] == 9042
+        assert o["bytes_in"] == 52
+        assert o["bytes_out"] == 10
+
+        q=o["cassandra_request"]
+        h= q["request_headers"]
+        assert h["version"] == "4"
+        assert h["op"] == "STARTUP"
+        assert h["length"] == 43
+        assert h["flags"] == "FLAG_0"
+        assert h["stream"] == 0
+
+
+        r=o["cassandra_response"]
+        h2= r["response_headers"]
+        assert h2["version"] == "4"
+        assert h2["length"] == 1
+        assert h2["op"] == "READY"
+        assert h2["flags"] == "Compress"
+        assert h2["stream"] == 0
+
+        o = objs[1]
+        print o
+        assert o["type"] == "cassandra"
+        assert o["port"] == 9042
+        assert o["bytes_in"] == 53
+        assert o["bytes_out"] == 10
+
+        q=o["cassandra_request"]
+        h= q["request_headers"]
+        assert h["version"] == "4"
+        assert h["op"] == "REGISTER"
+        assert h["length"] == 44
+        assert h["flags"] == "Compress"
+        assert h["stream"] == 64
+
+
+        r=o["cassandra_response"]
+        h2= r["response_headers"]
+        assert h2["version"] == "4"
+        assert h2["length"] == 1
+        assert h2["op"] == "READY"
+        assert h2["flags"] == "Compress"
+        assert h2["stream"] == 64
+
+        o = objs[2]
+        print o
+        assert o["type"] == "cassandra"
+        assert o["port"] == 9042
+        assert o["bytes_in"] == 62
+        assert o["bytes_out"] == 165
+
+        q=o["cassandra_request"]
+        assert q["query"] == "SELECT * FROM system.local WHERE key='local'"
+        h= q["request_headers"]
+        assert h["version"] == "4"
+        assert h["op"] == "QUERY"
+        assert h["length"] == 53
+        assert h["flags"] == "Compress"
+        assert h["stream"] == 0
+
+
+        r=o["cassandra_response"]
+        h2= r["response_headers"]
+        assert h2["version"] == "4"
+        assert h2["length"] == 156
+        assert h2["op"] == "RESULT"
+        assert h2["flags"] == "Compress"
+        assert h2["stream"] == 64
+        assert r["result_type"] == "rows"
+        rows=r["rows"]
+        assert rows["num_rows"] == 290917
+        meta=rows["meta"]
+        assert meta["col_count"] == 9
+        assert meta["flags"] == "GlobalTableSpec"
+        assert meta["keyspace"] == "system"
+        assert meta["table"] == "peers"
 
