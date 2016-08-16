@@ -140,6 +140,16 @@ func (h *Harvester) Harvest() {
 		return
 	}
 
+	event := &input.FileEvent{
+		Source:    h.Path,
+		InputType: h.Config.InputType,
+		Offset:    h.GetOffset(),
+		Fileinfo:  &info,
+		Bytes:     0,
+	}
+
+	h.SpoolerChan <- event
+
 	for {
 		// Partial lines return error and are only read on completion
 		ts, text, bytesRead, err := readLine(reader)

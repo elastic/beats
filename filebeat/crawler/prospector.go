@@ -392,8 +392,8 @@ func (p *Prospector) checkNewFile(newinfo *harvester.FileStat, file string, outp
 				time.Since(newinfo.Fileinfo.ModTime()),
 				file)
 			h.SetOffset(newinfo.Fileinfo.Size())
+			p.registrar.Persist <- h.GetState()
 		}
-		p.registrar.Persist <- h.GetState()
 	} else if previousFile, err := p.getPreviousFile(file, newinfo.Fileinfo); err == nil {
 		// This file was simply renamed (known inode+dev) - link the same harvester channel as the old file
 		logp.Debug("prospector", "File rename was detected, not a new file: %s -> %s", previousFile, file)
@@ -414,7 +414,6 @@ func (p *Prospector) checkNewFile(newinfo *harvester.FileStat, file string, outp
 		// Launch the harvester
 		h.SetOffset(oldState.offset)
 		h.Start()
-		p.registrar.Persist <- h.GetState()
 	}
 }
 
@@ -457,7 +456,6 @@ func (p *Prospector) checkExistingFile(newinfo *harvester.FileStat, newFile *inp
 
 			// Start a new harvester on the path
 			h.Start()
-			p.registrar.Persist <- h.GetState()
 		}
 
 		// Keep the old file in missingFiles so we don't rescan it if it was renamed and we've not yet reached the new filename
@@ -472,7 +470,6 @@ func (p *Prospector) checkExistingFile(newinfo *harvester.FileStat, newFile *inp
 		// The offset to continue from will be stored in the harvester channel - so take that to use and also clear the channel
 		h.SetOffset(<-newinfo.Return)
 		h.Start()
-		p.registrar.Persist <- h.GetState()
 	} else {
 		logp.Debug("prospector", "Not harvesting, file didn't change: %s", file)
 	}

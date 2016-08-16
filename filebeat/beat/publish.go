@@ -97,7 +97,10 @@ func (p *syncLogPublisher) Start() {
 
 			pubEvents := make([]common.MapStr, 0, len(events))
 			for _, event := range events {
-				pubEvents = append(pubEvents, event.ToMapStr())
+				// Only publish events with content
+				if event.Bytes > 0 {
+					pubEvents = append(pubEvents, event.ToMapStr())
+				}
 			}
 
 			p.client.PublishEvents(pubEvents, publisher.Sync, publisher.Guaranteed)
