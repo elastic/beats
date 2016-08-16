@@ -1,5 +1,10 @@
 #- module: postgresql
-  #metricsets: ["activity"]
+  #metricsets:
+    # Stats about every PostgreSQL database
+    #- database
+
+    # Stats about every PostgreSQL process
+    #-activity
   #enabled: true
   #period: 10s
 
