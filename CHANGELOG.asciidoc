@@ -824,6 +824,11 @@ https://github.com/elastic/beats/compare/v5.2.0...v5.2.1[View commits]
 *Packetbeat*
 
 - Fix error in the NFS sample dashboard. {pull}3548[3548]
+- Add enabled config option to prospectors. {pull}3157[3157]
+- Add target option for decoded_json_field. {pull}3169[3169]
+- Add the `pipeline` config option at the prospector level, for configuring the Ingest Node pipeline ID. {pull}3433[3433]
+- Update regular expressions used for matching file names or lines (multiline, include/exclude functionality) to new matchers improving performance of simple string matches. {pull}3469[3469]
+- Add multiline line number to filebeat event {pull}2279[2279]
 
 *Winlogbeat*
 

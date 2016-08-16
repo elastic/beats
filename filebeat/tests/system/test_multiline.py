@@ -352,3 +352,36 @@ SetAdCodeMiddleware.default_ad_code route """
         self.wait_until(lambda: self.log_contains("missing required field accessing") == 1)
 
         proc.check_kill_and_wait(exit_code=1)
+
+    def test_multiline_lines(self):
+        """
+        Test if multiline line counter is added
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            multiline=True,
+            pattern="^\[",
+            negate="true",
+            match="after",
+            close_timeout="1s",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+
+        with open(testfile, 'w', 0) as file:
+            file.write("[2015] hello world\n")
+            file.write("  First Line\n")
+            file.write("  Second Line\n")
+
+        filebeat = self.start_beat()
+
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output_json()
+        output[0]["multiline"]["lines"] = 3
