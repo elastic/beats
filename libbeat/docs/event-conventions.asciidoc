@@ -1,37 +1,47 @@
 [[event-conventions]]
-=== Event conventions
+=== Naming Conventions
 
-==== Naming conventions
+When creating events, use the following conventions for field names and abbreviations.
 
-For the field names, the Beats follow the naming conventions below:
+[[field-names]]
+==== Field Names
 
-- All fields must be lower case
-- Snake case for combining words
-- Group related fields in sub documents, which means using the . notation. Groups are mostly described by common prefixes.
-- Prevent namespace duplication. If connections appears in the namespace, it's not needed in the sub document
-- Do not use complex abbreviations. A list of standardised abbreviations can be found below.
-- Organise the documents from the general to the details, which allows namespacing. The type should always be last, like .pct.
-- If two fields are the same but with different units, remove the less granular one
+Use the following naming conventions for field names:
+
+- All fields must be lower case.
+- Use snake case (underscores) for combining words.
+- Group related fields into subdocuments, which means using the dot (.) notation. Groups are mostly described by common prefixes. 
+//QUESTION: I am not sure what you mean by common prefixes here. Perhaps examples would help?
+- Prevent namespace duplication. If connections appears in the namespace, it's not needed in the sub document 
+//QUESTION: I don't understand what you mean here. Can you clarify or give an example?
+- Do not use complex abbreviations. See <<abbreviations>>.
+//QUESTION: What do we mean by complex abbreviations? Can we just tell people to use standard abbreviations and avoid using abbreviations that aren't commonly known?
+- Organise the documents from general to specific to allow for namespacing. The type, such as `.pct`, should always be last. For example, `system.core.user.pct`
+- If two fields are the same, but with different units, remove the less granular one.
+//QUESTION: What if we want to  provide a less granular view, too? It would be useful to provide an example here.
 - In case the value correlates with the name of a nested document, use value inside the document
-- Do not use . in the names
-- Use singular and plural properly for the fields. Example: sec_per_request vs open_requests
-- Use singular names for metricsets. It easier to read the event created: system.process.load = 0.3
+//QUESTON: I don't understand what you mean here. Can you clarify?
+- Do not use dots (.) in names. 
+//QUESTION: Wouldn't it be clearer to say, "Do not use dots (.) in individual field names. Dots are reserved for grouping related fields into subdocuments." Is that why you have this restriction?
+- Use singular and plural names properly to reflect the field content. For example: `sec_per_request` vs `open_requests`. 
+//QUESTION: I wonder if we should remove this rule since we sort of violate it ourselves (especially with our  abbreviations).
+- Use singular names for metricsets. It's easier to read the event created as: `system.process.load = 0.3`. The goal is to have a similar experience across all metrics. 
+//QUESTION: This seems really specific to metricbeat. Does it really belong in the general dev guide? 
 
+[[abbreviations]]
+==== Standard Abbrevations
 
-The goal is to have a similar experience across all metrics.
+Here is a list of standardised words and units that are used across all Beats:
 
-
-==== Abbrevations
-
-List of standardised words and units across all Beats:
+//QUESTION: Are we saying here to use the word/abbreviation on the left in favor of the one on the right? If so, we need to make this more clear. Maybe we could have two columns Use... Instead of...
 
 * avg: average
-* connection: conn
+* connection: conn 
 * count:
 * day: days, d
-* max: maximumg
+* max: maximum
 * min: minimum
-* pct: precentage
+* pct: percentage
 * request: req
 * sec: seconds, second, s
 * ms: millisecond, millis

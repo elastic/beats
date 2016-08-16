@@ -10,6 +10,7 @@ handling, for logging, and more. By using this common framework, you can ensure
 that all Beats behave consistently and that they are easy to package and run
 with common tools.
 
+[[newbeat-getting-ready]]
 === Getting Ready
 
 All Beats are written in http://golang.org/[Go], so having Go installed and knowing
@@ -19,20 +20,31 @@ language, and very few people are experts in it. In fact, several
 people learned Go by contributing to Packetbeat and libbeat, including the
 original Packetbeat authors.
 
+For general information about contributing to Beats, see our
+https://github.com/elastic/beats/blob/master/CONTRIBUTING.md[Contributing Guide].
+
 After you have https://golang.org/doc/install[installed Go] and set up the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
 your preferred workspace location, a simple way of getting the source code for 
-Beats, including libbeat, and compiling them at the same time is to do:
+Beats, including libbeat and the Beat generator, is to do:
 
 [source,shell]
 ----------------------------------------------------------------------
 go get github.com/elastic/beats
 ----------------------------------------------------------------------
 
+When you run the command, all source files will be downloaded to the
+`$GOPATH/src` path. You can ignore the "no buildable Go source files" message because
+you will build the source later.
+
+//QUESTION: Wondering if adding sentence about "no buildable Go source files" is the best way to handle this. The problem is that users might be confused because the command returns the message "package github.com/elastic/beats: no buildable Go source files in /Users/dedemorton/workspace/src/github.com/elastic/beats". 
+
 In this guide, we use working examples from the Testbeat source code in
 https://github.com/monicasarbu/testbeat[GitHub]
 to demonstrate how to implement a Beat. Just copy
 the source files and modify them as necessary for your Beat.
+
+//QUESTION: Do we really want users to copy testbeat if they are using the beat generator? Don’t we want them to use the beat generator instead? If we do want them to use testbeat, then shouldn't we tell them to clone it since it's not a part of github.com/elastic/beats? 
 
 
 === Overview
@@ -92,32 +104,38 @@ The following example shows an event object in Lsbeat:
 
 Now that you have the big picture, let's dig into the code.
 
-=== Generate your Beat
+=== Generating Your Beat
 
-To generate your own beat we use the `beat-generator`. First you must install
-https://github.com/audreyr/cookiecutter[cookiecutter]. Check out the
-http://cookiecutter.readthedocs.io/en/latest/installation.html[installation
-guide]. After having installed cookiecutter, we must decide on a name for our beat. 
-The name must be one word all lowercase. In our example is Testbeat.
+To generate your own Beat, you use the Beat generator available in the beats repo on GitHub. If you haven't
+downloaded the beats repo yet, follow the instructions in <<newbeat-getting-ready>>.
 
-To create the Beat skeleton, you should download Beats generator package,available in the beats repository. 
-Once you installed GoLang, you can download the Beats generator package using
-go get command. Once you run the command, all source files will be downloaded under the $GOPATH/src path.
+//REVIEWERS: I dont' think it makes sense to repeat the steps that are already described in the Getting Started, so I removed them and added a pointer back to the GS topic. 
 
-[source,shell]
---------------------
-$ go get github.com/elastic/beats
---------------------------------
+Before running the Beat generator, you must install https://github.com/audreyr/cookiecutter[cookiecutter], a
+command-line utility that creates projects from project templates. Check out the 
+http://cookiecutter.readthedocs.io/en/latest/installation.html[installation guide]. After installing cookiecutter,
+decide on a name for your beat. The name must be one word in all lowercase. In our example, we use `testbeat`.
 
-Now create and move to your own repository under GOPATH, and run cookiecutter with Beat Generator path.
+Now create a directory under $GOPATH for your repository and change to the new directory:
 
 [source,shell]
 --------------------
-$ cd $GOPATH/src/github.com/{user}
-$ cookiecutter $GOPATH/src/github.com/elastic/beats/generate/beat
+mkdir $GOPATH/src/github.com/{user}
+cd $GOPATH/src/github.com/{user}
 --------------------
 
-Cookiecutter will ask you several questions. For your project_name enter testbeat, for github_user - your github id. The next two question with for beat and beat_path should already be automatically set correct. For the last one your can insert your Firstname Lastname.
+Run cookiecutter and specify the path to the Beat generator:
+
+[source,shell]
+--------------------
+cookiecutter $GOPATH/src/github.com/elastic/beats/generate/beat
+--------------------
+
+
+//REVIEWERS: Deleted $ in the example commands because users say it makes copying/pasting harder
+
+Cookiecutter will prompt you to enter information about your Beat. For the `project_name`, enter `testbeat`.
+For the `github_name`, enter your github id. The `beat` and `beat_path` are set to the correct values automatically (just press Enter to accept each default). For the `full_name`, enter your firstname and lastname.
 
 [source,shell]
 ---------
@@ -128,10 +146,11 @@ beat_path [github.com/{github id}]:
 full_name [Firstname Lastname]: {Full Name}
 ---------
 
-This should now have created a directory `testbeat` inside our folder with several files. 
+You should see a directory called `testbeat` inside of your project folder. 
 
-We now have a raw template of the Beat, but still need to fetch the dependencies and setup the git repository.
+You now have a raw template of the Beat, but you still need to fetch the dependencies and set up the git repository.
 
+//REVIEWERS: We don't describe how to fetch dependencies or set up the git repo anywhere in the docs. Have we decided to skip talking about the make command in the docs because we want to remove  dependencies like python and the virtualenv? I'm not entirely opposed to pointing off to Jongmin's blog for details about running make and setting up the git repo, but if we do that, we need to be more explicit and we need to agree to update the blog entry whenever it gets out-of-date.  
 
 [[beater-interface]]
 === The Beater interface
@@ -393,11 +412,16 @@ func main() {
 ----------------------------------------------------------------------
 
 [[ls-beat]]
-=== How to build Lsbeat from scratch
+=== Example: Building Lsbeat from Scratch
 
-github.com/kimjmin/lsbeat[Lsbeat] is similar to the `ls` command line tool, but instead of printing the files and subdirectories to the screen,
-Lsbeat periodically ships them to Elasticsearch for storage.
-The http://elastic.co//blog/build-your-own-beat[blog post] describes how to build from scratch `Lsbeat`.
+https://github.com/kimjmin/lsbeat[Lsbeat] is similar to the `ls` command-line tool, but instead of printing the files and subdirectories to the screen,
+Lsbeat periodically ships them to Elasticsearch for storage. 
+
+To help you learn how to build a Beat, we've created this http://elastic.co//blog/build-your-own-beat[blog post]
+that describes how to build Lsbeat from scratch. The blog post includes additional details about fetching dependencies
+and compiling the code. 
+
+//REVIEWERS: I wanted to add a little clarification here because it's initially jarring to come to this section in the doc because it talks about Lsbeat instead of the example that's used in the topics leading up to this one. I hope that flagging this section as an example makes the purpose less ambiguous.
 
 
 === Sharing Your Beat with the Community
