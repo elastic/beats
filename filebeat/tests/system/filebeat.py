@@ -19,10 +19,9 @@ class Proc(object):
     def __init__(self, args, outputfile):
         self.args = args
         self.output = open(outputfile, "wb")
+        self.stdin_read, self.stdin_write = os.pipe()
 
     def start(self):
-
-        self.stdin_read, self.stdin_write = os.pipe()
 
         self.proc = subprocess.Popen(
             self.args,

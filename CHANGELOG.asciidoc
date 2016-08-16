@@ -37,6 +37,7 @@ https://github.com/elastic/beats/compare/v1.3.0...1.3[Check the HEAD diff]
 *Filebeat*
 
 - Fix open file handler issue {issue}2028[2028]
+- Fix panic when the stdin reader encounters EOF. {pull}2268{2268]
 
 *Winlogbeat*
 
