@@ -91,6 +91,8 @@ func NewFileStat(fi os.FileInfo, lastIteration uint32) *FileStat {
 	return fs
 }
 
+// Finished returns true if harvesting is finished
+// fs.Return contains the last offset to continue reading.
 func (fs *FileStat) Finished() bool {
 	return len(fs.Return) != 0
 }

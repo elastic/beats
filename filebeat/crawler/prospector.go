@@ -302,6 +302,9 @@ func (p *Prospector) scan(path string, output chan *input.FileEvent) {
 
 		// Call crawler if there if there exists a state for the given file
 		foundState, resuming := p.registrar.fetchState(file, newInfo.Fileinfo)
+
+		// Checks if the state is the state in the file info. Keeps fetching the state until it matches.
+		// It can happen on heavy file rotation that state and fileinfo do not correlate
 		for foundState != nil && !foundState.FileStateOS.IsSame(input.GetOSFileState(&newInfo.Fileinfo)) {
 			logp.Debug("prospector", "Refetching state")
 			foundState, resuming = p.registrar.fetchState(file, newInfo.Fileinfo)
