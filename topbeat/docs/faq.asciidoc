@@ -4,9 +4,11 @@
 This section contains frequently asked questions about Topbeat. Also check out the
 https://discuss.elastic.co/c/beats/topbeat[Topbeat discussion forum].
 
+[float]
 [[dashboard-fields-incorrect-topbeat]]
-=== Why is the dashboard in Kibana breaking up my data fields incorrectly?
+=== Dashboard in Kibana is breaking up data fields incorrectly?
 
 The index template might not be loaded correctly. See <<topbeat-template>>.
 
+include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
 include::../../libbeat/docs/shared-faq.asciidoc[]
