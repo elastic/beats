@@ -120,6 +120,9 @@ func (r *JSON) Next() (Message, error) {
 	if err != nil {
 		return message, err
 	}
-	message.Content, message.Fields = r.decodeJSON(message.Content)
+
+	var fields = common.MapStr{}
+	message.Content, fields = r.decodeJSON(message.Content)
+	message.AddFields(common.MapStr{"json": fields})
 	return message, nil
 }
