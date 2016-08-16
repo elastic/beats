@@ -200,6 +200,11 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 
 	if f.Header.Flags&flagCompress == flagCompress {
 		//decompress data and switch to use bytearray decoder
+		if f.compres == nil {
+			logp.Err("hit compress flag, but comprossor was not set")
+			panic(errors.New("hit compress flag, but comprossor was not set"))
+		}
+
 		decoder := &ByteArrayDecoder{}
 		buf := make([]byte, f.Header.BodyLength)
 		f.r.Read(buf)
