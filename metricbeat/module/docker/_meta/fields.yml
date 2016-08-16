@@ -1,0 +1,10 @@
+- key: docker
+  title: "docker"
+  description: >
+    Docker stats collected from Docker.
+  fields:
+    - name: docker
+      type: group
+      description: >
+        docker contains different informations and statistics of docker's containers running
+      fields:
