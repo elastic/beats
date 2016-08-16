@@ -1,7 +1,8 @@
 from filebeat import BaseTest
 import os
 import time
-import unittest
+
+from beat.beat import Proc
 
 """
 Tests for the prospector functionality.
@@ -108,6 +109,34 @@ class Test(BaseTest):
 
         objs = self.read_output()
         assert len(objs) == iterations1 + iterations2
+
+    def test_stdin_eof(self):
+        """
+        Test that Filebeat works when stdin is closed.
+        """
+        self.render_config_template(
+            input_type="stdin"
+        )
+
+        args = [self.beat_path,
+                "-systemTest",
+                "-test.coverprofile",
+                os.path.join(self.working_dir, "coverage.cov"),
+                "-c", os.path.join(self.working_dir, "filebeat.yml"),
+                "-e", "-v", "-d", "*",
+                ]
+        proc = Proc(args, os.path.join(self.working_dir, "filebeat.log"))
+        os.write(proc.stdin_write, "Hello World\n")
+        os.close(proc.stdin_write)
+
+        proc.start()
+        self.wait_until(lambda: self.output_has(lines=1))
+
+        proc.proc.terminate()
+        proc.proc.wait()
+
+        objs = self.read_output()
+        assert objs[0]["message"] == "Hello World"
 
     def test_rotating_close_inactive_larger_write_rate(self):
         self.render_config_template(
