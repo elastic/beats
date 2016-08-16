@@ -306,6 +306,53 @@
             }
           }
         },
+        "docker": {
+          "properties": {
+            "container": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "cpu": {
+              "properties": {
+                "cpu": {
+                  "properties": {
+                    "usage_in_user_mode": {
+                      "type": "float"
+                    }
+                  }
+                }
+              }
+            },
+            "diskio": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "memory": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "network": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
         "haproxy": {
           "properties": {
             "info": {
