@@ -276,8 +276,8 @@ export-dashboards: python-env
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
 
 .PHONY: import-dashboards
-import-dashboards:
-	bash ${ES_BEATS}/dev-tools/import_dashboards.sh -url ${ES_URL} -dir $(shell pwd)/etc/kibana
+import-dashboards: build-dashboards
+	${ES_BEATS}/libbeat/dashboards/import_dashboards -es ${ES_URL} -dir $(shell pwd)/etc/kibana
 
 ### CONTAINER ENVIRONMENT ####
 
@@ -397,4 +397,4 @@ package:
 	echo "Finished packages for ${BEATNAME}"
 
 build-dashboards: ${ES_BEATS}/libbeat/dashboards/import_dashboards.go
-	go build -o ${ES_BEATS}/libbeat/dashboards/import_dashboards
+	go build -o ${ES_BEATS}/libbeat/dashboards/import_dashboards ${ES_BEATS}/libbeat/dashboards/import_dashboards.go
