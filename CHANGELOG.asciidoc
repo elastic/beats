@@ -79,6 +79,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 
 *Packetbeat*
 
+ - Add cassandra protocol analyzer to packetbeat. {pull}1959[1959]
+
 *Topbeat*
 
 *Filebeat*
