@@ -1,3 +1,4 @@
+
 BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
 BEATS=packetbeat filebeat winlogbeat metricbeat
@@ -64,8 +65,8 @@ simplify:
 # Collects all dashboards and generates dashboard folder for https://github.com/elastic/beats-dashboards/tree/master/dashboards
 .PHONY: beats-dashboards
 beats-dashboards:
-	mkdir -p build
-	$(foreach var,$(PROJECTS),cp -r $(var)/etc/kibana/ build/dashboards  || exit 1;)
+	mkdir -p build/dashboards
+	$(foreach var,$(BEATS),cp -r $(var)/etc/kibana/ build/dashboards/$(var)  || exit 1;)
 
 # Builds the documents for each beat
 .PHONY: docs

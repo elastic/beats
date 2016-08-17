@@ -70,6 +70,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Add kafka message timestamp if at least version 0.10 is configured. {pull}2190[2190]
 - Enhance contains condition to work on fields that are arrays of strings. {issue}2237[2237]
 - Lookup the configuration file relative to the `-path.config` CLI flag. {pull}2245[2245]
+- Re-write import_dashboards.sh in Golang. {pull}2155[2155]
 
 *Metricbeat*
 

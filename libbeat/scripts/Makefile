@@ -276,8 +276,8 @@ export-dashboards: python-env
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
 
 .PHONY: import-dashboards
-import-dashboards:
-	bash ${ES_BEATS}/dev-tools/import_dashboards.sh -url ${ES_URL} -dir $(shell pwd)/etc/kibana
+import-dashboards: build-dashboards
+	${ES_BEATS}/libbeat/dashboards/import_dashboards -es ${ES_URL} -dir $(shell pwd)/etc/kibana
 
 ### CONTAINER ENVIRONMENT ####
 
@@ -316,16 +316,10 @@ env-logs:
 # Installs the files that need to get to the home path on installations
 HOME_PREFIX?=/tmp/${BEATNAME}
 .PHONY: install-home
-install-home:
-	mkdir -p ${HOME_PREFIX}/kibana
-	if [ -d "etc/kibana" ]; then \
-		cp -a etc/kibana/. ${HOME_PREFIX}/kibana/; \
-		install -m 755 ${ES_BEATS}/dev-tools/import_dashboards.sh ${HOME_PREFIX}/kibana/; \
-		install -m 755 ${ES_BEATS}/dev-tools/import_dashboards.ps1 ${HOME_PREFIX}/kibana/; \
-	fi
+install-home: build-dashboards 
 	install -d -m 755 ${HOME_PREFIX}/scripts/
 	install -m 755 ${ES_BEATS}/libbeat/scripts/migrate_beat_config_1_x_to_5_0.py ${HOME_PREFIX}/scripts/
-
+	install -m 755 ${ES_BEATS}/libbeat/dashboards/import_dashboards ${HOME_PREFIX}/scripts/
 
 # Prepares for packaging. Builds binaries and creates homedir data
 .PHONY: prepare-package
@@ -401,3 +395,6 @@ package:
 	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_DIR=${BEAT_DIR} BUILD_DIR=${BUILD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${BUILD_DIR}/upload/build_id.txt
 
 	echo "Finished packages for ${BEATNAME}"
+
+build-dashboards: ${ES_BEATS}/libbeat/dashboards/import_dashboards.go
+	go build -o ${ES_BEATS}/libbeat/dashboards/import_dashboards ${ES_BEATS}/libbeat/dashboards/import_dashboards.go
