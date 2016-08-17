@@ -223,6 +223,14 @@ func (k *kafka) BulkPublish(
 	return mode.PublishEvents(signal, opts, data)
 }
 
+func (k *kafka) PublishEvents(
+	signal op.Signaler,
+	opts outputs.Options,
+	data []outputs.Data,
+) error {
+	return k.BulkPublish(signal, opts, data)
+}
+
 func (k *kafka) newKafkaConfig() (*sarama.Config, error) {
 	cfg, err := newKafkaConfig(&k.config)
 	if err != nil {
