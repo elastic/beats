@@ -1,7 +1,11 @@
 
-BEATNAME=packetbeat
+BEATNAME?=packetbeat
+BEAT_DESCRIPTION?=A network analyzer tool that sends data to Elasticsearch.
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
+TARGETS="windows/amd64 windows/386 darwin/amd64"
+TARGETS_OLD="linux/amd64 linux/386"
+CGO=true
 
 include ../libbeat/scripts/Makefile
 
@@ -24,4 +28,4 @@ before-build:
 
 .PHONY: benchmark
 benchmark:
-	$(GODEP) go test -short -bench=. ./... -cpu=2
+	go test -short -bench=. ./... -cpu=2

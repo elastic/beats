@@ -3,7 +3,6 @@ import os
 import argparse
 from subprocess import check_call
 
-
 def main():
     parser = argparse.ArgumentParser(
         description="Builds all the Beats artifacts")
@@ -12,17 +11,14 @@ def main():
     args = parser.parse_args()
 
     dir = os.path.dirname(os.path.realpath(__file__))
-    os.chdir(dir + "/packer")
+    os.chdir(dir + "/../")
     print("Getting dependencies")
-    check_call("make deps", shell=True)
     check_call("make clean", shell=True)
-    print("Start building Docker images.")
-    check_call("make images", shell=True)
     print("Done building Docker images.")
     if args.no_snapshot:
-        check_call("make SNAPSHOT=no", shell=True)
+        check_call("make SNAPSHOT=no package", shell=True)
     else:
-        check_call("make SNAPSHOT=yes", shell=True)
+        check_call("make SNAPSHOT=yes package", shell=True)
     print("All done")
 
 if __name__ == "__main__":

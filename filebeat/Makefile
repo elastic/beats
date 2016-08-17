@@ -1,6 +1,7 @@
 #!/bin/bash
 
-BEATNAME=filebeat
+BEATNAME?=filebeat
+BEAT_DESCRIPTION?=Sends log files to Logstash or directly to Elasticsearch.
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
 
