@@ -97,3 +97,5 @@ import:
   - zlib
 - package: github.com/klauspost/cpuid
   version: v1.0
+- package: https://github.com/go-inf/inf
+  version: v0.9.0

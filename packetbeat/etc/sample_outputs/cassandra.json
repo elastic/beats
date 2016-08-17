@@ -1,0 +1,49 @@
+{
+    "@timestamp": "2016-08-16T03:01:07.105Z",
+    "beat": {
+        "hostname": "Medcl.local",
+        "name": "Medcl.local"
+    },
+    "bytes_in": 111,
+    "bytes_out": 198,
+    "cassandra_request": {
+        "query": "SELECT * FROM simplex.playlists WHERE id = 2cc9ccb7-6221-4ccb-8387-f22b6a1b354d;",
+        "request_headers": {
+            "flags": "Compress",
+            "length": 102,
+            "op": "QUERY",
+            "stream": 448,
+            "version": "4"
+        }
+    },
+    "cassandra_response": {
+        "response_headers": {
+            "flags": "Compress",
+            "length": 189,
+            "op": "RESULT",
+            "stream": 448,
+            "version": "4"
+        },
+        "result_type": "rows",
+        "rows": {
+            "meta": {
+                "col_count": 5,
+                "flags": "GlobalTableSpec",
+                "keyspace": "simplex",
+                "table": "playlists"
+            },
+            "num_rows": 158052
+        }
+    },
+    "client_ip": "127.0.0.1",
+    "client_port": 50043,
+    "client_proc": "",
+    "client_server": "Medcl.local",
+    "ip": "127.0.0.1",
+    "port": 9042,
+    "proc": "",
+    "responsetime": 3,
+    "server": "Medcl.local",
+    "status": "OK",
+    "type": "cassandra"
+}

@@ -234,6 +234,9 @@ packetbeat.protocols.http:
 packetbeat.protocols.amqp:
   ports: [5672]
 
+packetbeat.protocols.cassandra:
+  ports: [9042]
+
 packetbeat.protocols.memcache:
   ports: [11211]
 
@@ -248,6 +251,8 @@ packetbeat.protocols.pgsql:
 
 packetbeat.protocols.thrift:
   ports: [9090]
+
+
 ------------------------------------------------------------------------------
 
 ==== Common Protocol Options
@@ -505,6 +510,45 @@ If set to false, the connection layer methods of the protocol are also
 displayed, such as the opening and closing of connections and channels by clients,
 or the quality of service negotiation. The default is true.
 
+
+[[configuration-cassandra]]
+==== Cassandra Configuration Options
+
+The following settings are specific to the Cassandra protocol. Here is a sample
+configuration for the `cassandra` section of the +{beatname_lc}.yml+ config file:
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.protocols.cassandra:
+  send_request_header: true
+  send_response_header: true
+  compressor: "snappy"
+  ignored_ops: ["SUPPORTED","OPTIONS"]
+------------------------------------------------------------------------------
+
+===== send_request_header
+
+If this option is enabled, the raw message of the response (`cassandra_request.request_headers` field)
+is sent to Elasticsearch. The default is true. enable `send_request` first before enable this option.
+
+===== send_response_header
+
+If this option is enabled, the raw message of the response (`cassandra_response.response_headers` field)
+is included in published events. The default is true. enable `send_response` first before enable this option.
+
+===== ignored_ops
+
+This option indicates which Operator/Operators captured will be ignored. currently support:
+`ERROR` ,`STARTUP` ,`READY` ,`AUTHENTICATE` ,`OPTIONS` ,`SUPPORTED` ,
+`QUERY` ,`RESULT` ,`PREPARE` ,`EXECUTE` ,`REGISTER`  ,`EVENT` ,
+`BATCH` ,`AUTH_CHALLENGE`,`AUTH_RESPONSE` ,`AUTH_SUCCESS` .
+
+===== compressor
+
+Configures the default compression algorithm being used to uncompress compressed frames by name. Currently only `snappy` is can be configured.
+By default no compressor is configured.
+
+
 ==== Memcache Configuration Options
 
 The `memcache` section of the +{beatname_lc}.yml+ config file specifies configuration options for the memcache
@@ -677,6 +721,7 @@ at the end of the document.
 
 Note that limiting documents in this way means that they are no longer correctly
 formatted JSON objects.
+
 
 [[configuration-processes]]
 === Monitored Processes Configuration
