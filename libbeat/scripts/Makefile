@@ -2,9 +2,10 @@
 ### VARIABLE SETUP ###
 
 BEATNAME?=libbeat
-BEAT_DIR?=github.com/elastic/beats
+BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash
+BEAT_DIR?=github.com/elastic/beats/${BEATNAME}
 ES_BEATS?=..
-GOPACKAGES?=${BEAT_DIR}/${BEATNAME}/...
+GOPACKAGES?=${BEAT_DIR}/...
 
 # Makefile for a custom beat that includes this libbeat/scripts/Makefile:
 # if glide is used to manage vendor dependencies,
@@ -43,6 +44,16 @@ DOCKER_COMPOSE?=docker-compose -f ${PWD}/../testing/environments/base.yml -f ${P
 DOCKER_CACHE?=1 # If set to 0, all docker images are created without cache
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 PYTHON_ENV?=${BUILD_DIR}/python-env
+BUILDID?=$(shell git rev-parse HEAD)
+
+CGO?=false
+
+# Cross compiling targets
+TARGETS?="linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64"
+# Cross compiling targets to be build on debian 6. This only applies if CGO is enabled
+TARGETS_OLD?=""
+PACKAGES?=${BEATNAME}/deb ${BEATNAME}/rpm ${BEATNAME}/darwin ${BEATNAME}/win ${BEATNAME}/bin
+SNAPSHOT?=yes
 
 ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
@@ -57,13 +68,13 @@ endif
 ### BUILDING ###
 
 # Builds beat
-.PHONY: build
-build: $(GOFILES)
+.PHONY: ${BEATNAME}
+${BEATNAME}: $(GOFILES)
 	go build
 
 # Create test coverage binary
-.PHONY: buildbeat.test
-buildbeat.test: $(GOFILES)
+.PHONY: ${BEATNAME}.test
+${BEATNAME}.test: $(GOFILES)
 	go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
 
 # Cross-compile beat for the OS'es specified in GOX_OS variable.
@@ -140,7 +151,7 @@ integration-tests-environment: prepare-tests build-image
 
 # Runs the system tests
 .PHONY: system-tests
-system-tests: buildbeat.test prepare-tests python-env
+system-tests: ${BEATNAME}.test prepare-tests python-env
 	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
@@ -151,7 +162,7 @@ system-tests-environment: prepare-tests build-image
 
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
-fast-system-tests: buildbeat.test python-env
+fast-system-tests: ${BEATNAME}.test python-env
 	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a '!integration'
 
 # Run benchmark tests
@@ -315,13 +326,78 @@ install-home:
 	install -d -m 755 ${HOME_PREFIX}/scripts/
 	install -m 755 ${ES_BEATS}/libbeat/scripts/migrate_beat_config_1_x_to_5_0.py ${HOME_PREFIX}/scripts/
 
-# Creates packer files in a beat
-.PHONY: create-packer
-create-packer:
-	python ${ES_BEATS}/libbeat/scripts/create_packer.py --es_beats=${ES_BEATS} --beat_path=${BEAT_DIR} --beat=${BEATNAME}
 
-# Create binary packages for the beat
-package: create-packer
-	cd dev-tools/packer; \
-	export ES_BEATS=${ES_BEATS} ; \
-	make deps images all
+# Prepares for packaging. Builds binaries and creates homedir data
+.PHONY: prepare-package
+prepare-package:
+	# cross compile on ubuntu
+	docker run --rm \
+		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
+		-v $(abspath ../):/source \
+		-v $(BUILD_DIR):/build \
+		-e PUREGO="yes" \
+		-e PACK=${BEATNAME} \
+		-e BEFORE_BUILD=before_build.sh \
+		-e SOURCE=/source \
+		-e TARGETS=${TARGETS} \
+		-e BUILDID=${BUILDID} \
+		tudorg/beats-builder \
+		${BEAT_DIR}
+
+# Prepares for packaging. Builds binaries with cgo
+.PHONY: prepare-package-cgo
+prepare-package-cgo:
+
+	# cross compile on ubuntu
+	docker run --rm \
+		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
+		-v $(abspath ../):/source \
+		-v $(BUILD_DIR):/build \
+		-e PACK=${BEATNAME} \
+		-e BEFORE_BUILD=before_build.sh \
+		-e SOURCE=/source \
+		-e TARGETS=${TARGETS} \
+		-e BUILDID=${BUILDID} \
+		tudorg/beats-builder \
+		${BEAT_DIR}
+
+	# linux builds on debian 6 for compatibility
+	docker run --rm \
+		-v ${BUILD_DIR}:/build \
+		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
+		-v $(abspath ..):/source \
+		-e PACK=${BEATNAME} \
+		-e BEFORE_BUILD=before_build.sh \
+		-e SOURCE=/source \
+		-e TARGETS=${TARGETS_OLD} \
+		-e BUILDID=${BUILDID} \
+		tudorg/beats-builder-deb6 \
+		${BEAT_DIR}
+
+# Prepares images for packaging
+package-setup:
+	$(MAKE) -C ${ES_BEATS}/dev-tools/packer deps images
+
+# Create binary packages for the beat.
+# This requires that `package-setup` was run before once.
+package:
+
+	echo "Start building packages for ${BEATNAME}"
+
+	mkdir -p ${BUILD_DIR}/upload
+
+	if [ $(CGO) = true ]; then \
+		 $(MAKE) prepare-package-cgo; \
+	else \
+		$(MAKE) prepare-package; \
+	fi
+
+	# Generates the package.yml file with all information needed to create packages
+	echo "beat_name: ${BEATNAME}" > ${BUILD_DIR}/package.yml
+	echo "beat_url: https://${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
+	echo "beat_repo: ${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
+	echo "beat_description: ${BEAT_DESCRIPTION}" >> ${BUILD_DIR}/package.yml
+
+	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_DIR=${BEAT_DIR} BUILD_DIR=${BUILD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${BUILD_DIR}/upload/build_id.txt
+
+	echo "Finished packages for ${BEATNAME}"

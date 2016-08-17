@@ -2,7 +2,7 @@
 
 set -e
 
-BEATS_PATH=/go/src/${1}
+BEAT_PATH=/go/src/${1}
 # BEATNAME is in the $PACK variable
 BEATNAME=$PACK
 
@@ -10,21 +10,16 @@ if [ $BEATNAME = "packetbeat" ]; then
 	patch -p1 < /gopacket_pcap.patch
 fi
 
-if [ $BEATS_PATH = "/go/src/github.com/elastic/beats" ]; then
-    BEAT_PATH=$BEATS_PATH/$BEATNAME
-else
-    BEAT_PATH=$BEATS_PATH
-fi
-
 cd $BEAT_PATH
 
 PREFIX=/build
 
 # Add data to the home directory
-mkdir -p $PREFIX/homedirs/$BEATNAME
-make install-home HOME_PREFIX=$PREFIX/homedirs/$BEATNAME
+mkdir -p $PREFIX/homedir
+make install-home HOME_PREFIX=$PREFIX/homedir
+
 if [ -n "BUILDID" ]; then
-    echo "$BUILDID" > $PREFIX/homedirs/$BEATNAME/.build_hash.txt
+    echo "$BUILDID" > $PREFIX/homedir/.build_hash.txt
 fi
 
 # Copy template
