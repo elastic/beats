@@ -96,12 +96,12 @@ func (r *Registrar) Run() {
 		case <-r.done:
 			logp.Info("Ending Registrar")
 			return
+		case events := <-r.Channel:
+			r.processEvents(events)
 		// Treats new log files to persist with higher priority then new events
 		case state := <-r.Persist:
 			r.setState(state)
 			logp.Debug("prospector", "Registrar will re-save state for %s", state.Source)
-		case events := <-r.Channel:
-			r.processEvents(events)
 		}
 
 		if e := r.writeRegistry(); e != nil {
@@ -222,6 +222,33 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 func (r *Registrar) setState(state *FileState) {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
+
+	prevState, ok := r.state[state.Source]
+
+	// If same state as before -> overwrite
+	if ok && prevState.FileStateOS.IsSame(state.FileStateOS) {
+		r.state[state.Source] = state
+		return
+	}
+
+	for source, s := range r.state {
+
+		if s.FileStateOS.IsSame(state.FileStateOS) {
+
+			if ok {
+				// Store previous state under old source
+				r.state[source] = prevState
+			} else {
+				// Remove old state if not needed anymore
+				delete(r.state, source)
+			}
+
+			r.state[state.Source] = state
+			return
+		}
+	}
+
+	// No previous state, just write it
 	r.state[state.Source] = state
 }
 

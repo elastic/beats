@@ -303,13 +303,6 @@ func (p *Prospector) scan(path string, output chan *input.FileEvent) {
 		// Call crawler if there if there exists a state for the given file
 		foundState, resuming := p.registrar.fetchState(file, newInfo.Fileinfo)
 
-		// Checks if the state is the state in the file info. Keeps fetching the state until it matches.
-		// It can happen on heavy file rotation that state and fileinfo do not correlate
-		for foundState != nil && !foundState.FileStateOS.IsSame(input.GetOSFileState(&newInfo.Fileinfo)) {
-			logp.Debug("prospector", "Refetching state")
-			foundState, resuming = p.registrar.fetchState(file, newInfo.Fileinfo)
-		}
-
 		var offset int64 = 0
 		if foundState != nil {
 			offset = foundState.Offset
@@ -462,7 +455,7 @@ func (p *Prospector) checkExistingFile(newinfo *harvester.FileStat, newFile *inp
 		// We only need to keep it for the remainder of this iteration then we can assume it was deleted and forget about it
 		p.missingFiles[file] = oldFile.FileInfo
 
-	} else if newinfo.Finished() && oldFile.FileInfo.ModTime() != newinfo.Fileinfo.ModTime() {
+	} else if newinfo.Finished() && oldFile.FileInfo.Size() < newinfo.Fileinfo.Size() {
 		// Resume harvesting of an old file we've stopped harvesting from
 		logp.Debug("prospector", "Resuming harvester on an old file that was just modified: %s", file)
 
@@ -472,6 +465,12 @@ func (p *Prospector) checkExistingFile(newinfo *harvester.FileStat, newFile *inp
 		h.Start()
 	} else {
 		logp.Debug("prospector", "Not harvesting, file didn't change: %s", file)
+		if newinfo.Finished() {
+			logp.Debug(",,,", "File is finished")
+		} else {
+			logp.Debug(",,,", "File is NOT finished")
+
+		}
 	}
 }
 
