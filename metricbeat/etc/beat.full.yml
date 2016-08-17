@@ -44,7 +44,10 @@ metricbeat.modules:
   processes: ['.*']
 
   # if true, exports the CPU usage in ticks, together with the percentage values
-  cpu_ticks: false
+  #cpu_ticks: false
+
+  # EXPERIMENTAL: cgroups can be enabled for the process metricset.
+  #cgroups: false
 
 #------------------------------- Apache Module -------------------------------
 #- module: apache
