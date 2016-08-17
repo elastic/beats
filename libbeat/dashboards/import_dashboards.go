@@ -21,6 +21,22 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
+const usage = `
+Usage: ./import_dashboards [options]
+
+Kibana dashboards are stored in a special index in Elasticsearch together with the searches, visualizations, and indexes that they use.
+
+You can import the dashboards, visualizations, searches, and the index pattern for any Beat:
+  1. from a local directory:
+	./import_dashboards -dir etc/kibana
+  2. from a directory of a local zip archive:
+	./import_dashboards -dir metricbeat -file beats-dashboards-1.2.3.zip
+  3. from a directory of zip archive available online:
+	./import_dashboards -dir metricbeat -url http://download.elastic.co/beats/dashboards/beats-dashboards-1.2.3.zip
+
+Options:
+`
+
 type Options struct {
 	KibanaIndex string
 	ES          string
@@ -49,25 +65,9 @@ func ParseCommandLine() (*CommandLine, error) {
 	cl.flagSet = flag.NewFlagSet("import", flag.ContinueOnError)
 
 	cl.flagSet.Usage = func() {
-		const usage = `
-Usage: ./import_dashboards [options]
-
-Kibana dashboards are stored in a special index in Elasticsearch together with the searches, visualizations, and indexes that they use.
-
-You can import the dashboards, visualizations, searches, and the index pattern for any Beat:
-  1. from a local directory:
-	./import_dashboards -dir etc/kibana
-  2. from a directory of a local zip archive:
-	./import_dashboards -dir metricbeat -file beats-dashboards-1.2.3.zip
-  3. from a directory of zip archive available online:
-	./import_dashboards -dir metricbeat -url http://download.elastic.co/beats/dashboards/beats-dashboards-1.2.3.zip
-
-Options:
-`
 
 		os.Stderr.WriteString(usage)
 		cl.flagSet.PrintDefaults()
-
 	}
 
 	cl.flagSet.StringVar(&cl.opt.KibanaIndex, "k", ".kibana", "Kibana index")
@@ -98,24 +98,27 @@ func (cl *CommandLine) Read() error {
 func New() (*Importer, error) {
 	importer := Importer{}
 
-	/* command line */
+	/* define the command line arguments */
 	cl, err := ParseCommandLine()
 	if err != nil {
 		cl.flagSet.Usage()
 		return nil, err
 	}
+	/* parse command line arguments */
 	err = cl.Read()
 	if err != nil {
 		return nil, err
 	}
 	importer.cl = cl
 
-	/* connect to Elasticsearch */
+	/* prepare the Elasticsearch index pattern */
 	fmtstr, err := fmtstr.CompileEvent(cl.opt.Index)
 	if err != nil {
-		return nil, fmt.Errorf("fail to compile the Elasticsearch index pattern: %s", err)
+		return nil, fmt.Errorf("fail to build the Elasticsearch index pattern: %s", err)
 	}
 	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(fmtstr, ""))
+
+	/* connect to Elasticsearch */
 	client, err := elasticsearch.NewClient(
 		elasticsearch.ClientSettings{
 			URL:      cl.opt.ES,
@@ -156,19 +159,19 @@ func (imp Importer) CreateIndex() error {
 	return nil
 }
 
-func (imp Importer) ImportJsonFile(_type string, file string) error {
+func (imp Importer) ImportJsonFile(fileType string, file string) error {
 
-	path := "/" + imp.cl.opt.KibanaIndex + "/" + _type
+	path := "/" + imp.cl.opt.KibanaIndex + "/" + fileType
 
 	reader, err := ioutil.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("fail to read %s. Error: %s", file, err)
 	}
-	var json_content map[string]interface{}
-	json.Unmarshal(reader, &json_content)
+	var jsonContent map[string]interface{}
+	json.Unmarshal(reader, &jsonContent)
 	fileBase := strings.TrimSuffix(filepath.Base(file), filepath.Ext(file))
 
-	err = imp.client.LoadJson(path+"/"+fileBase, json_content)
+	err = imp.client.LoadJson(path+"/"+fileBase, jsonContent)
 	if err != nil {
 		return fmt.Errorf("fail to load %s under %s/%s: %s", file, path, fileBase, err)
 	}
@@ -383,9 +386,9 @@ func (imp Importer) ImportFile(fileType string, file string) error {
 	return fmt.Errorf("unexpected file type %s", fileType)
 }
 
-func (imp Importer) ImportDir(_type string, dir string) error {
+func (imp Importer) ImportDir(dirType string, dir string) error {
 
-	dir = path.Join(dir, _type)
+	dir = path.Join(dir, dirType)
 
 	// check if the directory exists
 	if _, err := os.Stat(dir); err != nil {
@@ -404,7 +407,7 @@ func (imp Importer) ImportDir(_type string, dir string) error {
 	}
 	for _, file := range files {
 
-		err = imp.ImportFile(_type, file)
+		err = imp.ImportFile(dirType, file)
 		if err != nil {
 			fmt.Println("ERROR: ", err)
 			errors = append(errors, fmt.Sprintf("error loading %s: %s\n", file, err))
