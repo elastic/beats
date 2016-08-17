@@ -34,7 +34,7 @@ import:
 - package: gopkg.in/mgo.v2
   version: 29cc868a5ca65f401ff318143f9408d02f4799cc
 - package: github.com/tsg/gopacket
-  version: 8c16bb8f00ff46af06942df2a8767ba1cf639bdc
+  version: 8e703b9968693c15f25cabb6ba8be4370cf431d0
 - package: github.com/joeshaw/multierror
   version: 69b34d4ec901851247ae7e77d33909caf9df99ed
 - package: github.com/andrewkroh/sys
