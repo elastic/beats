@@ -32,3 +32,31 @@ func Repeat(n int, evt []EventInfo) []EventInfo {
 	}
 	return events
 }
+
+func EventsList(in []EventInfo) [][]outputs.Data {
+	var out [][]outputs.Data
+	for _, pubEvents := range in {
+		if pubEvents.Single {
+			for _, event := range pubEvents.Data {
+				out = append(out, []outputs.Data{event})
+			}
+		} else {
+			out = append(out, pubEvents.Data)
+		}
+	}
+	return out
+}
+
+func FlatEventsList(in []EventInfo) []outputs.Data {
+	return FlattenEvents(EventsList(in))
+}
+
+func FlattenEvents(data [][]outputs.Data) []outputs.Data {
+	var out []outputs.Data
+	for _, inner := range data {
+		for _, d := range inner {
+			out = append(out, d)
+		}
+	}
+	return out
+}
