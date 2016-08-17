@@ -177,6 +177,51 @@
             }
           }
         },
+        "beats": {
+          "properties": {
+            "filebeat": {
+              "properties": {
+                "harvesters": {
+                  "properties": {
+                    "closed": {
+                      "type": "long"
+                    },
+                    "files": {
+                      "properties": {
+                        "open": {
+                          "type": "long"
+                        },
+                        "truncated": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "running": {
+                      "type": "long"
+                    },
+                    "started": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "prospectors": {
+                  "properties": {
+                    "log_files": {
+                      "properties": {
+                        "renamed": {
+                          "type": "long"
+                        },
+                        "truncated": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "metricset": {
           "properties": {
             "host": {
