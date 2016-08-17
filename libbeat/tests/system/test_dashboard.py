@@ -14,11 +14,12 @@ class Test(BaseTest):
         beats = ["metricbeat", "packetbeat", "filebeat", "winlogbeat"]
 
         for beat in beats:
-            command = "../../../dev-tools/import_dashboards.sh -l http://"+ self.get_elasticsearch_host() + " -dir ../../../"+ beat + "/etc/kibana"
+            command = "go run ../../dashboards/import_dashboards.go -es http://"+ self.get_elasticsearch_host() + " -dir ../../../"+ beat + "/etc/kibana"
 
             if os.name == "nt":
-                command = "..\..\..\dev-tools\import_dashboards.ps1 -dir ..\..\..\\" + beat + "\etc\kibana"
+                command = "go run ..\..\dashboards\import_dashboards.go -es http:\\"+self.get_elasticsearch_host() + " -dir ..\..\..\\" + beat + "\etc\kibana"
 
+            print command
             p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             content, err = p.communicate()
 

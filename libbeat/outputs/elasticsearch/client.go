@@ -551,16 +551,22 @@ func (client *Client) PublishEvent(data outputs.Data) error {
 func (client *Client) LoadTemplate(templateName string, template map[string]interface{}) error {
 
 	path := "/_template/" + templateName
-	status, _, err := client.request("PUT", path, "", nil, template)
-
+	err := client.LoadJson(path, template)
 	if err != nil {
-		return fmt.Errorf("Template could not be loaded. Error: %s", err)
+		return fmt.Errorf("couldn't load template: %v", err)
 	}
-	if status != 200 {
-		return fmt.Errorf("Template could not be loaded. Status: %v", status)
-	}
-
 	logp.Info("Elasticsearch template with name '%s' loaded", templateName)
+	return nil
+}
+
+func (client *Client) LoadJson(path string, json map[string]interface{}) error {
+	status, _, err := client.request("PUT", path, "", nil, json)
+	if err != nil {
+		return fmt.Errorf("couldn't load json. Error: %s", err)
+	}
+	if status > 300 {
+		return fmt.Errorf("couldn't load json. Status: %v", status)
+	}
 
 	return nil
 }
