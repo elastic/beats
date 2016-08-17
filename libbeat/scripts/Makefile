@@ -151,7 +151,7 @@ integration-tests-environment: prepare-tests build-image
 # Runs the system tests
 .PHONY: system-tests
 system-tests: ${BEATNAME}.test prepare-tests python-env
-	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
+	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) -a '!load' --with-timer
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs the system tests
@@ -162,13 +162,18 @@ system-tests-environment: prepare-tests build-image
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
 fast-system-tests: ${BEATNAME}.test python-env
-	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a '!integration'
+	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a '!integration' -a '!load'
 
 # Run benchmark tests
 .PHONY: benchmark-tests
 benchmark-tests:
 	# No benchmark tests exist so far
 	#go test -bench=. ${GOPACKAGES}
+
+# Run load tests
+.PHONY: load-tests
+load-tests:
+	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a 'load'
 
 # Sets up the virtual python environment
 .PHONY: python-env
@@ -270,7 +275,7 @@ docs-preview:
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200
 
-.PHONY: export-dashboards 
+.PHONY: export-dashboards
 export-dashboards: python-env update
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --regex ${BEATNAME}-*
 
