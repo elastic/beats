@@ -9,8 +9,9 @@ import (
 
 // Client is a generic Kafka client. It manages connections to one or more Kafka brokers.
 // You MUST call Close() on a client to avoid leaks, it will not be garbage-collected
-// automatically when it passes out of scope. A single client can be safely shared by
-// multiple concurrent Producers and Consumers.
+// automatically when it passes out of scope. It is safe to share a client amongst many
+// users, however Kafka will process requests from a single client strictly in serial,
+// so it is generally more efficient to use the default one client per producer/consumer.
 type Client interface {
 	// Config returns the Config struct of the client. This struct should not be
 	// altered after it has been created.
@@ -289,7 +290,7 @@ func (client *client) Leader(topic string, partitionID int32) (*Broker, error) {
 	leader, err := client.cachedLeader(topic, partitionID)
 
 	if leader == nil {
-		err := client.RefreshMetadata(topic)
+		err = client.RefreshMetadata(topic)
 		if err != nil {
 			return nil, err
 		}
@@ -631,7 +632,7 @@ func (client *client) updateMetadata(data *MetadataResponse) (retry bool, err er
 		switch topic.Err {
 		case ErrNoError:
 			break
-		case ErrInvalidTopic: // don't retry, don't store partial results
+		case ErrInvalidTopic, ErrTopicAuthorizationFailed: // don't retry, don't store partial results
 			err = topic.Err
 			continue
 		case ErrUnknownTopicOrPartition: // retry, do not store partial partition results
@@ -684,7 +685,7 @@ func (client *client) getConsumerMetadata(consumerGroup string, attemptsRemainin
 	}
 
 	for broker := client.any(); broker != nil; broker = client.any() {
-		Logger.Printf("client/coordinator requesting coordinator for consumergoup %s from %s\n", consumerGroup, broker.Addr())
+		Logger.Printf("client/coordinator requesting coordinator for consumergroup %s from %s\n", consumerGroup, broker.Addr())
 
 		request := new(ConsumerMetadataRequest)
 		request.ConsumerGroup = consumerGroup
@@ -706,7 +707,7 @@ func (client *client) getConsumerMetadata(consumerGroup string, attemptsRemainin
 
 		switch response.Err {
 		case ErrNoError:
-			Logger.Printf("client/coordinator coordinator for consumergoup %s is #%d (%s)\n", consumerGroup, response.Coordinator.ID(), response.Coordinator.Addr())
+			Logger.Printf("client/coordinator coordinator for consumergroup %s is #%d (%s)\n", consumerGroup, response.Coordinator.ID(), response.Coordinator.Addr())
 			return response, nil
 
 		case ErrConsumerCoordinatorNotAvailable:

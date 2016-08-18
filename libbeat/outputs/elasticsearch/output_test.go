@@ -17,7 +17,7 @@ import (
 var testOptions = outputs.Options{}
 
 func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearchOutput {
-	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
+	index := fmt.Sprintf("packetbeat-int-test-%d", os.Getpid())
 
 	esPort, err := strconv.Atoi(GetEsPort())
 
@@ -26,16 +26,17 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 	}
 
 	config, _ := common.NewConfigFrom(map[string]interface{}{
-		"save_topology":  true,
-		"hosts":          []string{GetEsHost()},
-		"port":           esPort,
-		"username":       os.Getenv("ES_USER"),
-		"password":       os.Getenv("ES_PASS"),
-		"path":           "",
-		"index":          index,
-		"protocol":       "http",
-		"flush_interval": flushInterval,
-		"bulk_max_size":  bulkSize,
+		"save_topology":    true,
+		"hosts":            []string{GetEsHost()},
+		"port":             esPort,
+		"username":         os.Getenv("ES_USER"),
+		"password":         os.Getenv("ES_PASS"),
+		"path":             "",
+		"index":            fmt.Sprintf("%v-%%{+yyyy.MM.dd}", index),
+		"protocol":         "http",
+		"flush_interval":   flushInterval,
+		"bulk_max_size":    bulkSize,
+		"template.enabled": false,
 	})
 
 	var output elasticsearchOutput
@@ -46,7 +47,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 func TestTopologyInES(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
 	elasticsearchOutput1 := createElasticsearchConnection(0, 0)
@@ -94,7 +95,7 @@ func TestOneEvent(t *testing.T) {
 	output := createElasticsearchConnection(0, 0)
 
 	event := common.MapStr{}
-	event["@timestamp"] = common.Time(time.Now())
+	event["@timestamp"] = common.Time(ts)
 	event["type"] = "redis"
 	event["status"] = "OK"
 	event["responsetime"] = 34
@@ -107,8 +108,8 @@ func TestOneEvent(t *testing.T) {
 	r["request"] = "MGET key1"
 	r["response"] = "value1"
 
-	index := fmt.Sprintf("%s-%d.%02d.%02d", output.index, ts.Year(), ts.Month(), ts.Day())
-	logp.Debug("output_elasticsearch", "index = %s", index)
+	index, _ := output.index.Select(event)
+	debugf("index = %s", index)
 
 	client := output.randomClient()
 	client.CreateIndex(index, common.MapStr{
@@ -118,7 +119,7 @@ func TestOneEvent(t *testing.T) {
 		},
 	})
 
-	err := output.PublishEvent(nil, testOptions, event)
+	err := output.PublishEvent(nil, testOptions, outputs.Data{Event: event})
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -148,7 +149,7 @@ func TestOneEvent(t *testing.T) {
 		t.Errorf("Failed to query elasticsearch for index(%s): %s", index, err)
 		return
 	}
-	logp.Debug("output_elasticsearch", "resp = %s", resp)
+	debugf("resp = %s", resp)
 	if resp.Hits.Total != 1 {
 		t.Errorf("Wrong number of results: %d", resp.Hits.Total)
 	}
@@ -166,7 +167,7 @@ func TestEvents(t *testing.T) {
 	output := createElasticsearchConnection(0, 0)
 
 	event := common.MapStr{}
-	event["@timestamp"] = common.Time(time.Now())
+	event["@timestamp"] = common.Time(ts)
 	event["type"] = "redis"
 	event["status"] = "OK"
 	event["responsetime"] = 34
@@ -180,7 +181,7 @@ func TestEvents(t *testing.T) {
 	r["response"] = "value1"
 	event["redis"] = r
 
-	index := fmt.Sprintf("%s-%d.%02d.%02d", output.index, ts.Year(), ts.Month(), ts.Day())
+	index, _ := output.index.Select(event)
 	output.randomClient().CreateIndex(index, common.MapStr{
 		"settings": common.MapStr{
 			"number_of_shards":   1,
@@ -188,7 +189,7 @@ func TestEvents(t *testing.T) {
 		},
 	})
 
-	err := output.PublishEvent(nil, testOptions, event)
+	err := output.PublishEvent(nil, testOptions, outputs.Data{Event: event})
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -198,7 +199,7 @@ func TestEvents(t *testing.T) {
 	r["response"] = 0
 	event["redis"] = r
 
-	err = output.PublishEvent(nil, testOptions, event)
+	err = output.PublishEvent(nil, testOptions, outputs.Data{Event: event})
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -232,7 +233,9 @@ func TestEvents(t *testing.T) {
 
 func testBulkWithParams(t *testing.T, output elasticsearchOutput) {
 	ts := time.Now()
-	index := fmt.Sprintf("%s-%d.%02d.%02d", output.index, ts.Year(), ts.Month(), ts.Day())
+	index, _ := output.index.Select(common.MapStr{
+		"@timestamp": common.Time(ts),
+	})
 
 	output.randomClient().CreateIndex(index, common.MapStr{
 		"settings": common.MapStr{
@@ -258,7 +261,7 @@ func testBulkWithParams(t *testing.T, output elasticsearchOutput) {
 		r["response"] = "value" + strconv.Itoa(i)
 		event["redis"] = r
 
-		err := output.PublishEvent(nil, testOptions, event)
+		err := output.PublishEvent(nil, testOptions, outputs.Data{Event: event})
 		if err != nil {
 			t.Errorf("Failed to publish the event: %s", err)
 		}
@@ -307,25 +310,4 @@ func TestBulkEvents(t *testing.T) {
 
 	output = createElasticsearchConnection(50, 5)
 	testBulkWithParams(t, output)
-}
-
-func TestEnableTTL(t *testing.T) {
-
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch", "elasticsearch"})
-	}
-
-	output := createElasticsearchConnection(0, 0)
-	output.randomClient().Delete(".packetbeat-topology", "", "", nil)
-
-	err := output.EnableTTL()
-	if err != nil {
-		t.Errorf("Fail to enable TTL: %s", err)
-	}
-
-	// should succeed also when index already exists
-	err = output.EnableTTL()
-	if err != nil {
-		t.Errorf("Fail to enable TTL: %s", err)
-	}
 }

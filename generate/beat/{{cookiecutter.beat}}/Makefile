@@ -1,22 +1,29 @@
 BEATNAME={{cookiecutter.beat}}
-BEAT_DIR={{cookiecutter.beat_path}}
+BEAT_DIR={{cookiecutter.beat_path}}/{{cookiecutter.beat}}
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
-ES_BEATS=./vendor/github.com/elastic/beats
+ES_BEATS?=./vendor/github.com/elastic/beats
 GOPACKAGES=$(shell glide novendor)
 PREFIX?=.
 
 # Path to the libbeat Makefile
 -include $(ES_BEATS)/libbeat/scripts/Makefile
 
-.PHONY: init
-init:
-	glide update --no-recursive
+# Initial beat setup
+.PHONY: setup
+setup: copy-vendor
 	make update
-	git init
 
-.PHONY: commit
-commit:
+# Copy beats into vendor directory
+.PHONY: copy-vendor
+copy-vendor:
+	mkdir -p vendor/github.com/elastic/
+	cp -R ${GOPATH}/src/github.com/elastic/beats vendor/github.com/elastic/
+	rm -rf vendor/github.com/elastic/beats/.git
+
+.PHONY: git-init
+git-init:
+	git init
 	git add README.md CONTRIBUTING.md
 	git commit -m "Initial commit"
 	git add LICENSE
@@ -29,14 +36,6 @@ commit:
 	git add .travis.yml
 	git commit -m "Add Travis CI"
 
-.PHONY: update-deps
-update-deps:
-	glide update --no-recursive --strip-vcs
-
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
-
-# Create binary packages for the beat
-pack: create-packer
-	cd dev-tools/packer; make deps images {{cookiecutter.beat}}

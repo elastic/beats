@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"CPU Usage\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.cpu.idle.pct\",\"customLabel\":\"idle\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.cpu.system.pct\",\"customLabel\":\"sys\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.cpu.user.pct\",\"customLabel\":\"user\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "CPU Usage", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Cpu-stats", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

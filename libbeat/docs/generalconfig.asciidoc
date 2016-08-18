@@ -1,0 +1,217 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/generalconfig.asciidoc[]
+//// Make sure this content appears below a level 2 heading.
+//////////////////////////////////////////////////////////////////////////
+
+[[configuration-general]]
+=== General Configuration
+
+The general section of the +{beatname_lc}.yml+ config file contains configuration options for the Beat and some
+general settings that control its behaviour.
+
+Here is an example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+# If this options is not defined, the hostname is used.
+#name:
+
+# The tags of the shipper are included in their own field with each
+# transaction published. Tags make it easy to group servers by different
+# logical properties.
+tags: ["service-X", "web-tier"]
+
+# Uncomment the following if you want to ignore transactions created
+# by the server on which the shipper is installed. This option is useful
+# to remove duplicates if shippers are installed on multiple servers.
+ignore_outgoing: true
+
+# How often (in seconds) shippers are publishing their IPs to the topology map.
+# The default is 10 seconds.
+refresh_topology_freq: 10
+
+# Expiration time (in seconds) of the IPs published by a shipper to the topology map.
+# All the IPs will be deleted afterwards. Note, that the value must be higher than
+# refresh_topology_freq. The default is 15 seconds.
+topology_expire: 15
+
+------------------------------------------------------------------------------
+
+==== General Options
+
+You can specify the following options:
+
+===== name
+
+The name of the Beat. If this option is empty, the `hostname` of the server is
+used. The name is included as the `beat.name` field in each published transaction. You can
+use the name to group all transactions sent by a single Beat.
+
+At startup, each Beat can publish its IP, port, and name to Elasticsearch. This information
+is stored in Elasticsearch as a network topology map that maps the IP and port
+of each Beat to the name that you specify here.
+
+When a Beat receives a new request and response (called a transaction), the Beat can query
+Elasticsearch to see if the network topology includes the IP and port of the source
+and destination servers. If this information is available, the `client_server` field in the
+output is set to the name of the Beat running on the source server, and the `server` field is set to the
+name of the Beat running on the destination server.
+
+To use the topology map in Elasticsearch, you must enable Elasticsearch as output and set the
+`save_topology` option to true.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+name: "my-shipper"
+------------------------------------------------------------------------------
+
+===== tags
+
+A list of tags that the Beat includes in the `tags` field of each published
+transaction. Tags make it easy to group servers by different logical properties.
+For example, if you have a cluster of web servers, you can add the "webservers"
+tag to the Beat on each server, and then use filters and queries in the Kibana
+web interface to get visualisations for the whole group of servers.
+
+Example:
+
+[source,yaml]
+--------------------------------------------------------------------------------
+tags: ["my-service", "hardware", "test"]
+--------------------------------------------------------------------------------
+
+[[libbeat-configuration-fields]]
+===== fields
+
+Optional fields that you can specify to add additional information to the
+output. Fields can be scalar values, arrays, dictionaries, or any nested
+combination of these. By default, the fields that you specify here will be
+grouped under a `fields` sub-dictionary in the output document. To store the
+custom fields as top-level fields, set the `fields_under_root` option to true.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+fields: {project: "myproject", instance-id: "574734885120952459"}
+------------------------------------------------------------------------------
+
+===== fields_under_root
+
+If this option is set to true, the custom <<libbeat-configuration-fields>> are
+stored as top-level fields in the output document instead of being grouped under
+a `fields` sub-dictionary. If the custom field names conflict with other field
+names, then the custom fields overwrite the other fields.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+fields_under_root: true
+fields:
+  instance_id: i-10a64379
+  region: us-east-1
+------------------------------------------------------------------------------
+
+===== ignore_outgoing
+
+If the `ignore_outgoing` option is enabled, the Beat ignores all the
+transactions initiated from the server running the Beat.
+
+This is useful when two Beats publish the same transactions. Because one Beat
+sees the transaction in its outgoing queue and the other sees it in its incoming
+queue, you can end up with duplicate transactions. To remove the duplicates, you
+can enable the `ignore_outgoing` option on one of the servers.
+
+For example, in the following scenario, you see a 3-server architecture
+where a Beat is installed on each server. t1 is the transaction exchanged between
+Server1 and Server2, and t2 is the transaction between Server2 and Server3.
+
+image:./images/option_ignore_outgoing.png[Beats Architecture]
+
+By default, each transaction is indexed twice because Beat2
+sees both transactions. So you would see the following published transactions
+(when `ignore_outgoing` is false):
+
+ - Beat1: t1
+ - Beat2: t1 and t2
+ - Beat3: t2
+
+To avoid duplicates, you can force your Beats to send only the incoming
+transactions and ignore the transactions created by the local server. So you would
+see the following published transactions (when `ignore_outgoing` is true):
+
+ - Beat1: none
+ - Beat2: t1
+ - Beat3: t2
+
+===== refresh_topology_freq
+
+The refresh interval of the topology map in
+seconds. In other words, this setting specifies how often each Beat publishes its
+IP addresses to the topology map. The default is 10 seconds.
+
+===== topology_expire
+
+The expiration time for the topology in seconds. This is useful in case a Beat
+stops publishing its IP addresses. The IP addresses are removed automatically
+from the topology map after expiration.
+
+This setting is used only by the Redis output. The other outputs don't support
+expiring entries.
+
+The default is 15 seconds.
+
+===== queue_size
+
+The internal queue size for single events in the processing pipeline. The default
+value is 1000.
+
+===== bulk_queue_size
+
+(DO NOT TOUCH) The internal queue size for bulk events in the processing pipeline. The default value is 0.
+
+===== max_procs
+
+Sets the maximum number of CPUs that can be executing simultaneously. The
+default is the number of logical CPUs available in the system.
+
+===== geoip.paths
+
+deprecated[5.0.0, Please use the https://www.elastic.co/guide/en/elasticsearch/plugins/master/ingest-geoip.html[Geoip processor in Ingest Node] or the https://www.elastic.co/guide/en/logstash/current/plugins-filters-geoip.html[Logstash GeoIP filter] instead]
+
+This configuration option is currently used by Packetbeat only and it will be removed in version 6.0.
+
+The paths to search for GeoIP databases. The Beat loads the first installed GeoIP database
+that if finds. Then, for each transaction, the Beat exports the GeoIP location of the client.
+
+The recommended values for geoip.paths are `/usr/share/GeoIP/GeoLiteCity.dat`
+and `/usr/local/var/GeoIP/GeoLiteCity.dat`.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+# Configure local GeoIP database support.
+# If no paths are not configured geoip is disabled.
+geoip:
+  paths:
+    - "/usr/share/GeoIP/GeoLiteCity.dat"
+    - "/usr/local/var/GeoIP/GeoLiteCity.dat"
+------------------------------------------------------------------------------
+
+*Important*: For GeoIP support to function correctly, the
+https://dev.maxmind.com/geoip/legacy/geolite/[GeoLite City database] is required.
+
+

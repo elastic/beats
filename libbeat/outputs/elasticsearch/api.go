@@ -7,16 +7,17 @@ import (
 )
 
 type QueryResult struct {
-	Ok      bool            `json:"ok"`
-	Index   string          `json:"_index"`
-	Type    string          `json:"_type"`
-	ID      string          `json:"_id"`
-	Source  json.RawMessage `json:"_source"`
-	Version int             `json:"_version"`
-	Found   bool            `json:"found"`
-	Exists  bool            `json:"exists"`
-	Created bool            `json:"created"`
-	Matches []string        `json:"matches"`
+	Ok           bool            `json:"ok"`
+	Index        string          `json:"_index"`
+	Type         string          `json:"_type"`
+	ID           string          `json:"_id"`
+	Source       json.RawMessage `json:"_source"`
+	Version      int             `json:"_version"`
+	Found        bool            `json:"found"`
+	Exists       bool            `json:"exists"`
+	Created      bool            `json:"created"`
+	Acknowledged bool            `json:"acknowledged"`
+	Matches      []string        `json:"matches"`
 }
 
 type SearchResults struct {
@@ -43,6 +44,14 @@ func (r QueryResult) String() string {
 		return "ERROR"
 	}
 	return string(out)
+}
+
+func withQueryResult(status int, resp []byte, err error) (int, *QueryResult, error) {
+	if err != nil {
+		return status, nil, err
+	}
+	result, err := readQueryResult(resp)
+	return status, result, err
 }
 
 func readQueryResult(obj []byte) (*QueryResult, error) {
@@ -97,24 +106,25 @@ func (es *Connection) Index(
 	if id == "" {
 		method = "POST"
 	}
+	return withQueryResult(es.apiCall(method, index, docType, id, "", params, body))
+}
 
-	status, resp, err := es.apiCall(method, index, docType, id, params, body)
-	if err != nil {
-		return status, nil, err
+func (es *Connection) Ingest(
+	index, docType, pipeline, id string,
+	params map[string]string,
+	body interface{},
+) (int, *QueryResult, error) {
+	method := "PUT"
+	if id == "" {
+		method = "POST"
 	}
-	result, err := readQueryResult(resp)
-	return status, result, err
+	return withQueryResult(es.apiCall(method, index, docType, id, pipeline, params, body))
 }
 
 // Refresh an index. Call this after doing inserts or creating/deleting
 // indexes in unit tests.
 func (es *Connection) Refresh(index string) (int, *QueryResult, error) {
-	status, resp, err := es.apiCall("POST", index, "", "_refresh", nil, nil)
-	if err != nil {
-		return status, nil, err
-	}
-	result, err := readQueryResult(resp)
-	return status, result, err
+	return withQueryResult(es.apiCall("POST", index, "", "_refresh", "", nil, nil))
 }
 
 // CreateIndex creates a new index, optionally with settings and mappings passed in
@@ -122,29 +132,38 @@ func (es *Connection) Refresh(index string) (int, *QueryResult, error) {
 // Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html
 //
 func (es *Connection) CreateIndex(index string, body interface{}) (int, *QueryResult, error) {
-	status, resp, err := es.apiCall("PUT", index, "", "", nil, body)
-	if err != nil {
-		return status, nil, err
-	}
-	result, err := readQueryResult(resp)
-	return status, result, err
+	return withQueryResult(es.apiCall("PUT", index, "", "", "", nil, body))
 }
 
 // Delete deletes a typed JSON document from a specific index based on its id.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html
 func (es *Connection) Delete(index string, docType string, id string, params map[string]string) (int, *QueryResult, error) {
-	status, resp, err := es.apiCall("DELETE", index, docType, id, params, nil)
-	if err != nil {
-		return status, nil, err
-	}
-	result, err := readQueryResult(resp)
-	return status, result, err
+	return withQueryResult(es.apiCall("DELETE", index, docType, id, "", params, nil))
+}
+
+// CreatePipeline create a new ingest pipeline with name id.
+// Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/put-pipeline-api.html
+func (es *Connection) CreatePipeline(
+	id string,
+	params map[string]string,
+	body interface{},
+) (int, *QueryResult, error) {
+	return withQueryResult(es.apiCall("PUT", "_ingest", "pipeline", id, "", params, body))
+}
+
+// DeletePipeline deletes an ingest pipeline by id.
+// Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/delete-pipeline-api.html
+func (es *Connection) DeletePipeline(
+	id string,
+	params map[string]string,
+) (int, *QueryResult, error) {
+	return withQueryResult(es.apiCall("DELETE", "_ingest", "pipeline", id, "", params, nil))
 }
 
 // A search request can be executed purely using a URI by providing request parameters.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html
 func (es *Connection) SearchURI(index string, docType string, params map[string]string) (int, *SearchResults, error) {
-	status, resp, err := es.apiCall("GET", index, docType, "_search", params, nil)
+	status, resp, err := es.apiCall("GET", index, docType, "_search", "", params, nil)
 	if err != nil {
 		return status, nil, err
 	}
@@ -156,7 +175,7 @@ func (es *Connection) CountSearchURI(
 	index string, docType string,
 	params map[string]string,
 ) (int, *CountResults, error) {
-	status, resp, err := es.apiCall("GET", index, docType, "_count", params, nil)
+	status, resp, err := es.apiCall("GET", index, docType, "_count", "", params, nil)
 	if err != nil {
 		return status, nil, err
 	}
@@ -165,7 +184,7 @@ func (es *Connection) CountSearchURI(
 }
 
 func (es *Connection) apiCall(
-	method, index, docType, id string,
+	method, index, docType, id, pipeline string,
 	params map[string]string,
 	body interface{},
 ) (int, []byte, error) {
@@ -173,5 +192,5 @@ func (es *Connection) apiCall(
 	if err != nil {
 		return 0, nil, err
 	}
-	return es.request(method, path, params, body)
+	return es.request(method, path, pipeline, params, body)
 }

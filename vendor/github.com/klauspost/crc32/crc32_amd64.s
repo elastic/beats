@@ -123,7 +123,7 @@ TEXT ·ieeeCLMUL(SB), NOSPLIT, $0
 	CMPQ  CX, $64    // Less than 64 bytes left
 	JB    remain64
 
-	MOVOU r2r1kp<>+0(SB), X0
+	MOVOA r2r1kp<>+0(SB), X0
 
 loopback64:
 	MOVOA X1, X5
@@ -165,7 +165,7 @@ loopback64:
 
 	// Fold result into a single register (X1)
 remain64:
-	MOVOU r4r3kp<>+0(SB), X0
+	MOVOA r4r3kp<>+0(SB), X0
 
 	MOVOA     X1, X5
 	PCLMULQDQ $0, X0, X1
@@ -220,7 +220,7 @@ finish:
 	PCLMULQDQ $0, X0, X1
 	PXOR      X2, X1
 
-	MOVOU rupolykp<>+0(SB), X0
+	MOVOA rupolykp<>+0(SB), X0
 
 	MOVOA     X1, X2
 	PAND      X3, X1

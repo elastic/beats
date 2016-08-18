@@ -9,7 +9,7 @@ def generate_metricset(base_path, metricbeat_path, module, metricset):
 
     generate_module(base_path, metricbeat_path, module, metricset)
     metricset_path = base_path + "/module/" + module + "/" + metricset
-    meta_path = metricset_path + "/_beat"
+    meta_path = metricset_path + "/_meta"
 
     if os.path.isdir(metricset_path):
         print "MericSet already exists. Skipping creating metricset " + metricset + ".\n"
@@ -42,7 +42,7 @@ def generate_metricset(base_path, metricbeat_path, module, metricset):
 def generate_module(base_path, metricbeat_path, module, metricset):
 
     module_path = base_path + "/module/" + module
-    meta_path = module_path + "/_beat"
+    meta_path = module_path + "/_meta"
 
     if os.path.isdir(module_path):
         print "Module already exists. Skipping creating module " + module + ".\n"

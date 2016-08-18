@@ -1,7 +1,11 @@
 = Metricbeat Reference
-:libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/master/
-:version: 5.0.0-alpha3
+
+include::./version.asciidoc[]
+
+:libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}/
+:version: {stack-version}
 :beatname_lc: metricbeat
 :beatname_uc: Metricbeat
 :security: X-Pack Security
@@ -11,6 +15,8 @@ include::./overview.asciidoc[]
 include::./gettingstarted.asciidoc[]
 
 include::./command-line.asciidoc[]
+
+include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
 include::./how-metricbeat-works.asciidoc[]
 
@@ -24,22 +30,18 @@ include::./configuring-logstash.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
-include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+include::../../libbeat/docs/yaml.asciidoc[]
 
-include::./securing-metricbeat.asciidoc[]
-
-include::../../libbeat/docs/https.asciidoc[]
-
-include::../../libbeat/docs/shared-tls-logstash-config.asciidoc[]
+include::../../libbeat/docs/regexp.asciidoc[]
 
 include::./modules.asciidoc[]
+
+include::./fields.asciidoc[]
+
+include::./securing-metricbeat.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
-
-include::./reference.asciidoc[]
-
-include::./fields.asciidoc[]
 
 include::./developer-guide/index.asciidoc[]

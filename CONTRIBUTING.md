@@ -53,9 +53,6 @@ The Beats are Go programs, so install the latest version of
 [golang](http://golang.org/) if you don't have it already. The current Go version
 used for development is Golang 1.6.2.
 
-The Beats are Go programs, so install the latest version of
-[golang](http://golang.org/) if you don't have it already.
-
 The location where you clone is important. Please clone under the source
 directory of your `GOPATH`. If you don't have `GOPATH` already set, you can
 simply set it to your home directory (`export GOPATH=$HOME`).
@@ -70,13 +67,13 @@ Packetbeat:
     $ cd beats/packetbeat
     $ make
 
-Some of the Beats might have extra development requirements, in which case a
-CONTRIBUTING.md file is find in the Beat directory.
+Some of the Beats might have extra development requirements, in which case you'll find a
+CONTRIBUTING.md file in the Beat directory.
 
 ## Update scripts
 
-The beats use a variety of scripts based on python to generate configuration files
-and documentations. The command used for this is:
+The Beats use a variety of scripts based on Python to generate configuration files
+and documentation. The command used for this is:
 
     $ make update
 
@@ -86,7 +83,7 @@ This command has the following dependencies:
 * [virtualenv](https://virtualenv.pypa.io/en/latest/) for Python
 
 Virtualenv can be installed with the command `easy_install virtualenv` or `pip install virtualenv`.
-More details can be [here](https://virtualenv.pypa.io/en/latest/installation.html).
+More details can be found [here](https://virtualenv.pypa.io/en/latest/installation.html).
 
 
 ## Testing
@@ -100,6 +97,15 @@ Running the testsuite has the following requirements:
 * Python >=2.7.9
 * Docker >=1.10.0
 * Docker-compose >= 1.7.0
+
+
+## Documentation
+
+The documentation for each Beat is located under {beatname}/docs and is based on asciidoc. After changing the docs,
+you should verify that the docs are still building to avoid breaking the automated docs build. To build the docs run
+`make docs`. If you want to preview the docs for a specific Beat, run `make docs-preview`
+inside the folder for the Beat. This will automatically open your browser with the docs for preview.
+
 
 ## Dependencies
 

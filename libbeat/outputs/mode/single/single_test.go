@@ -29,7 +29,7 @@ func enableLogging(selectors []string) {
 }
 
 func testSingleSendOneEvent(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := New(
 		modetest.NewMockClient(&modetest.MockClient{
 			Connected: true,
@@ -52,7 +52,7 @@ func TestSingleSendMultiple(t *testing.T) {
 }
 
 func testSingleConnectFailConnectAndSend(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	errFail := errors.New("fail connect")
 	mode, _ := New(
 		modetest.NewMockClient(&modetest.MockClient{
@@ -77,7 +77,7 @@ func TestSingleConnectFailConnectAndSendMultiple(t *testing.T) {
 }
 
 func testSingleConnectionFail(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	errFail := errors.New("fail connect")
 	mode, _ := New(
 		modetest.NewMockClient(&modetest.MockClient{
@@ -102,7 +102,7 @@ func TestSingleConnectionFailMulti(t *testing.T) {
 }
 
 func testSingleSendFlaky(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := New(
 		modetest.NewMockClient(&modetest.MockClient{
 			CBPublish: modetest.PublishCollectAfterFailStart(2, &collected),
@@ -124,7 +124,7 @@ func TestSingleSendMultiFlaky(t *testing.T) {
 }
 
 func testSingleSendFlakyFail(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := New(
 		modetest.NewMockClient(&modetest.MockClient{
 			CBPublish: modetest.PublishCollectAfterFailStart(3, &collected),
@@ -148,7 +148,7 @@ func TestSingleSendMultiFlakyFail(t *testing.T) {
 func testSingleSendFlakyInfAttempts(t *testing.T, events []modetest.EventInfo) {
 	enableLogging([]string{"*"})
 
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := New(
 		modetest.NewMockClient(&modetest.MockClient{
 			CBPublish: modetest.PublishCollectAfterFailStart(25, &collected),
@@ -170,7 +170,7 @@ func TestSingleSendMultiFlakyInfAttempts(t *testing.T) {
 }
 
 func testSingleSendFlakyGuaranteed(t *testing.T, events []modetest.EventInfo) {
-	var collected [][]common.MapStr
+	var collected [][]outputs.Data
 	mode, _ := New(
 		modetest.NewMockClient(&modetest.MockClient{
 			CBPublish: modetest.PublishCollectAfterFailStart(25, &collected),

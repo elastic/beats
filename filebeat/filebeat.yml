@@ -82,14 +82,10 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Template name. By default the template name is filebeat.
-  template.name: "filebeat"
-
-  # Path to template file
-  template.path: "filebeat.template.json"
-
-  # Overwrite existing template
-  template.overwrite: false
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
@@ -108,6 +104,11 @@ output.elasticsearch:
 
 #================================ Logging =====================================
 
-# Sets log level. The default log level is error.
+# Sets log level. The default log level is info.
 # Available log levels are: critical, error, warning, info, debug
 #logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]

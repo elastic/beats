@@ -1,11 +1,11 @@
-// +build darwin linux openbsd windows
+// +build darwin freebsd linux openbsd
 
 package core
 
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/topbeat/system"
+	"github.com/elastic/beats/metricbeat/module/system/cpu"
 
 	"github.com/pkg/errors"
 )
@@ -19,7 +19,7 @@ func init() {
 // MetricSet for fetching system core metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	cpu *system.CPU
+	cpu *cpu.CPU
 }
 
 // New is a mb.MetricSetFactory that returns a cores.MetricSet.
@@ -37,7 +37,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		cpu: &system.CPU{
+		cpu: &cpu.CPU{
 			CpuPerCore: true,
 			CpuTicks:   config.CpuTicks,
 		},
@@ -47,10 +47,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches CPU core metrics from the OS.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
-	cpuCoreStat, err := system.GetCpuTimesList()
+	cpuCoreStat, err := cpu.GetCpuTimesList()
 	if err != nil {
 		return nil, errors.Wrap(err, "cpu core times")
 	}
+
 	m.cpu.AddCpuPercentageList(cpuCoreStat)
 
 	cores := []common.MapStr{}
@@ -59,40 +60,40 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 		coreStat := common.MapStr{
 			"user": common.MapStr{
-				"pct": &stat.UserPercent,
+				"pct": stat.UserPercent,
 			},
 			"system": common.MapStr{
-				"pct": &stat.SystemPercent,
+				"pct": stat.SystemPercent,
 			},
 			"idle": common.MapStr{
-				"pct": &stat.IdlePercent,
+				"pct": stat.IdlePercent,
 			},
 			"iowait": common.MapStr{
-				"pct": &stat.IOwaitPercent,
+				"pct": stat.IOwaitPercent,
 			},
 			"irq": common.MapStr{
-				"pct": &stat.IrqPercent,
+				"pct": stat.IrqPercent,
 			},
 			"nice": common.MapStr{
-				"pct": &stat.NicePercent,
+				"pct": stat.NicePercent,
 			},
 			"softirq": common.MapStr{
-				"pct": &stat.SoftIrqPercent,
+				"pct": stat.SoftIrqPercent,
 			},
 			"steal": common.MapStr{
-				"pct": &stat.StealPercent,
+				"pct": stat.StealPercent,
 			},
 		}
 
 		if m.cpu.CpuTicks {
-			coreStat["user"].(common.MapStr)["ticks"] = &stat.User
-			coreStat["system"].(common.MapStr)["ticks"] = &stat.Sys
-			coreStat["nice"].(common.MapStr)["ticks"] = &stat.Nice
-			coreStat["idle"].(common.MapStr)["ticks"] = &stat.Idle
-			coreStat["iowait"].(common.MapStr)["ticks"] = &stat.Wait
-			coreStat["irq"].(common.MapStr)["ticks"] = &stat.Irq
-			coreStat["softirq"].(common.MapStr)["ticks"] = &stat.SoftIrq
-			coreStat["steal"].(common.MapStr)["ticks"] = &stat.Stolen
+			coreStat["user"].(common.MapStr)["ticks"] = stat.User
+			coreStat["system"].(common.MapStr)["ticks"] = stat.Sys
+			coreStat["nice"].(common.MapStr)["ticks"] = stat.Nice
+			coreStat["idle"].(common.MapStr)["ticks"] = stat.Idle
+			coreStat["iowait"].(common.MapStr)["ticks"] = stat.Wait
+			coreStat["irq"].(common.MapStr)["ticks"] = stat.Irq
+			coreStat["softirq"].(common.MapStr)["ticks"] = stat.SoftIrq
+			coreStat["steal"].(common.MapStr)["ticks"] = stat.Stolen
 		}
 
 		coreStat["id"] = core

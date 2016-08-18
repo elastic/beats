@@ -7,7 +7,7 @@ import (
 	"expvar"
 	"time"
 
-	"github.com/urso/go-lumber/log"
+	"github.com/elastic/go-lumber/log"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
@@ -22,14 +22,14 @@ var debug = logp.MakeDebug("logstash")
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	ackedEvents            = expvar.NewInt("libbeatLogstashPublishedAndAckedEvents")
-	eventsNotAcked         = expvar.NewInt("libbeatLogstashPublishedButNotAckedEvents")
-	publishEventsCallCount = expvar.NewInt("libbeatLogstashPublishEventsCallCount")
+	ackedEvents            = expvar.NewInt("libbeat.logstash.published_and_acked_events")
+	eventsNotAcked         = expvar.NewInt("libbeat.logstash.published_but_not_acked_events")
+	publishEventsCallCount = expvar.NewInt("libbeat.logstash.call_count.PublishEvents")
 
-	statReadBytes   = expvar.NewInt("libbeatLogstashPublishReadBytes")
-	statWriteBytes  = expvar.NewInt("libbeatLogstashPublishWriteBytes")
-	statReadErrors  = expvar.NewInt("libbeatLogstashPublishReadErrors")
-	statWriteErrors = expvar.NewInt("libbeatLogstashPublishWriteErrors")
+	statReadBytes   = expvar.NewInt("libbeat.logstash.publish.read_bytes")
+	statWriteBytes  = expvar.NewInt("libbeat.logstash.publish.write_bytes")
+	statReadErrors  = expvar.NewInt("libbeat.logstash.publish.read_errors")
+	statWriteErrors = expvar.NewInt("libbeat.logstash.publish.write_errors")
 )
 
 const (
@@ -46,7 +46,12 @@ func init() {
 	outputs.RegisterOutputPlugin("logstash", new)
 }
 
-func new(cfg *common.Config, _ int) (outputs.Outputer, error) {
+func new(beatName string, cfg *common.Config, _ int) (outputs.Outputer, error) {
+
+	if !cfg.HasField("index") {
+		cfg.SetString("index", -1, beatName)
+	}
+
 	output := &logstash{}
 	if err := output.init(cfg); err != nil {
 		return nil, err
@@ -159,9 +164,9 @@ func (lj *logstash) Close() error {
 func (lj *logstash) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
-	return lj.mode.PublishEvent(signaler, opts, event)
+	return lj.mode.PublishEvent(signaler, opts, data)
 }
 
 // BulkPublish implements the BulkOutputer interface pushing a bulk of events
@@ -169,7 +174,7 @@ func (lj *logstash) PublishEvent(
 func (lj *logstash) BulkPublish(
 	trans op.Signaler,
 	opts outputs.Options,
-	events []common.MapStr,
+	data []outputs.Data,
 ) error {
-	return lj.mode.PublishEvents(trans, opts, events)
+	return lj.mode.PublishEvents(trans, opts, data)
 }

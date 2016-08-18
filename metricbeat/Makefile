@@ -2,16 +2,22 @@
 
 # Name can be overwritten, as Metricbeat is also a library
 BEATNAME?=metricbeat
+BEAT_DESCRIPTION?=Sends metrics to Elasticsearch.
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT?=true
-GOPACKAGES=$(shell go list ${BEAT_DIR}/${BEATNAME}/... | grep -v /vendor/)
+GOPACKAGES=$(shell go list ${BEAT_DIR}/... | grep -v /vendor/)
 ES_BEATS?=..
+
+TARGETS?="windows/amd64 windows/386 darwin/amd64"
+TARGETS_OLD?="linux/amd64 linux/386"
+CGO=true
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO which
 # are the same platforms where the system metrics (cpu, memory) are not
 # implemented.
-GOX_OS=solaris freebsd netbsd
+GOX_OS=solaris netbsd
 GOX_FLAGS='-arch=amd64'
+
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
 
@@ -20,18 +26,18 @@ include ${ES_BEATS}/libbeat/scripts/Makefile
 kibana:
 	-rm -r etc/kibana
 	mkdir -p etc/kibana
-	-cp -r module/*/_beat/kibana/ etc/kibana
+	-cp -r module/*/_meta/kibana/ etc/kibana
 
 # Collects all module and metricset fields
 .PHONY: fields
 fields:
 	mkdir -p etc/
-	cat ${ES_BEATS}/metricbeat/etc/_beat/fields_base.yml > etc/fields.yml
+	cat ${ES_BEATS}/metricbeat/etc/_meta/fields_base.yml > etc/fields.yml
 	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> etc/fields.yml
 
 # Collects all module docs
-.PHONY: docs
-docs: python-env
+.PHONY: collect-docs
+collect-docs: python-env
 	-rm -r docs/modules
 	mkdir -p docs/modules
 	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/docs_collector.py
@@ -54,7 +60,7 @@ before-build:
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields docs configs update imports
+collect: fields collect-docs configs update imports kibana
 
 # Creates a new metricset. Requires the params MODULE and METRICSET
 .PHONY: create-metricset
@@ -64,5 +70,5 @@ create-metricset:
 
 # Generates the data.json example documents
 .PHONY: generate-json
-generate-json:
+generate-json: build-image
 	 ${DOCKER_COMPOSE} run beat go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data

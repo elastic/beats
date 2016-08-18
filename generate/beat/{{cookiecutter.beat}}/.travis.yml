@@ -15,7 +15,7 @@ os:
 env:
   matrix:
     - TARGETS="check"
-    - TARGETS="-C {{cookiecutter.beat}} testsuite"
+    - TARGETS="testsuite"
 
   global:
     # Cross-compile for amd64 only to speed up testing.
@@ -28,10 +28,10 @@ addons:
 
 before_install:
   # Redo the travis setup but with the elastic/libbeat path. This is needed so the package path is correct
-  - mkdir -p $HOME/gopath/src/github.com/elastic/beats/
-  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/beats/
-  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/elastic/beats/
-  - cd $HOME/gopath/src/github.com/elastic/beats/
+  - mkdir -p $HOME/gopath/src/github.com/{{cookiecutter.github_name|lower}}/{{cookiecutter.beat}}/
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/{{cookiecutter.github_name|lower}}/{{cookiecutter.beat}}/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/{{cookiecutter.github_name|lower}}/{{cookiecutter.beat}}/
+  - cd $HOME/gopath/src/github.com/{{cookiecutter.github_name|lower}}/{{cookiecutter.beat}}/
 
 install:
   - true

@@ -1,0 +1,348 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/processors-config.asciidoc[]
+//// Make sure this content appears below a level 2 heading.
+//////////////////////////////////////////////////////////////////////////
+
+[[configuration-processors]]
+=== Processors Configuration (was Filters)
+
+//TODO: Remove was Filters from the above title and remove extra sections that show the alpha4 configuration
+
+include::../../libbeat/docs/processors.asciidoc[]
+
+Each processor has associated an action with a set of parameters and optionally a condition. If the condition is
+present, then the action is executed only if the condition
+is fulfilled. If no condition is passed then the action is always executed.
+
+deprecated[5.0.0-alpha4,The `filters` configuration option is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
+
+[source,yaml]
+------
+filters:
+ - <action>:
+     <condition>
+     <parameters>
+ - <action>:
+     <condition>
+     <parameters>
+...
+------
+
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
+
+[source,yaml]
+------
+processors:
+ - <action>:
+     when:
+        <condition>
+     <parameters>
+ - <action>:
+     when:
+        <condition>
+     <parameters>
+...
+
+------
+
+where <action> can be a way to select the fields that are exported or a way to add meta data to the event , <condition> contains the definition of the condition.
+and <parameters> is the list of parameters passed along the <action>. 
+
+See <<filtering-and-enhancing-data>> for specific {beatname_uc} examples.
+
+[[filtering-condition]]
+==== Condition
+
+Each condition receives a field to compare or multiple fields under the same condition and then `AND` is used between
+them. You can see a list of the <<exported-fields,`exported fields`>>. 
+
+For each field, you can specify a simple field name or a nested map, for example `dns.question.name`.
+
+
+A condition can be:
+
+* <<condition-equals,`equals`>>
+* <<condition-contains,`contains`>>
+* <<condition-regexp,`regexp`>>
+* <<condition-range, `range`>>
+* <<condition-or, `or`>>
+* <<condition-and, `and`>>
+* <<condition-not, `not`>>
+
+
+
+[[condition-equals]]
+===== equals
+
+With the `equals` condition, you can compare if a field has a certain value. The condition accepts only an integer or a string
+value.
+
+For example, the following condition checks if the response code of the HTTP transaction is 200:
+
+[source,yaml]
+-------
+equals:
+  http.response.code: 200
+-------
+
+[[condition-contains]]
+===== contains
+
+The `contains` condition checks if a value is part of a field. The field can be
+a string or an array of strings. The condition accepts only a string value.
+
+For example, the following condition checks if an error is part of the transaction status:
+
+[source,yaml]
+------
+contains:
+  status: "Specific error"
+------
+
+
+[[condition-regexp]]
+===== regexp
+
+The `regexp` condition checks the field against a regular expression. The condition accepts only strings.
+
+For example, the following condition checks if the process name starts with `foo`:
+
+[source,yaml]
+-----
+reqexp:
+  system.process.name: "foo.*"
+-----
+
+[[condition-range]]
+===== range
+
+The `range` condition checks if the field is in a certain range of values. The condition supports `lt`, `lte`, `gt` and `gte`. The
+condition accepts only integer or float values.
+
+For example, the following condition checks for failed HTTP transaction by comparing the `http.response.code` field with
+400.
+
+
+[source,yaml]
+------
+range:
+    http.response.code:
+        gte: 400
+------
+
+that can be also translated to:
+
+[source,yaml]
+----
+range:
+    http.response.code.gte: 400
+----
+
+For example, the following condition checks if the CPU usage in percentage has a value between 0.5 and 0.8.
+
+[source,yaml]
+------
+range:
+    system.cpu.user.pct.gte: 0.5
+    system.cpu.user.pct.lt: 0.8
+------
+
+
+added[5.0.0-alpha5, You can combine multiple conditions with the `or`, `and` or `not` operators]
+
+[[condition-or]]
+===== OR
+
+The `or` operator receives a list of conditions. 
+
+[source,yaml]
+-------
+or:
+  - <condition1>
+  - <condition2>
+  - <condition3>
+  ...
+
+-------
+
+For example the condition `http.response.code = 304 OR http.response.code = 404` translates to: 
+
+[source,yaml]
+------
+or:
+  - equals:
+      http.response.code: 304
+  - equals:
+      http.response.code: 404
+------
+
+
+[[condition-and]]
+===== AND
+
+The `and` operator receives a list of conditions. 
+
+[source,yaml]
+-------
+and:
+  - <condition1>
+  - <condition2>
+  - <condition3>
+  ...
+
+-------
+
+For example the condition `http.response.code = 200 AND status = OK` translates to: 
+
+[source,yaml]
+------
+and:
+  - equals:
+      http.response.code: 200
+  - equals:
+      status: OK
+------
+
+To configure a condition like `<condition1> OR <condition2> AND <condition3>`:
+
+[source,yaml]
+------
+or:
+ - <condition1>
+ - and:
+    - <condition2>
+    - <condition3>
+
+------
+
+[[condition-not]]
+===== NOT
+
+The `not` operator receives the condition to negate.
+
+[source,yaml]
+-------
+not:
+  <condition>
+
+-------
+
+For example the condition `NOT status = OK` translates to: 
+
+[source,yaml]
+------
+not:
+  equals:
+    status: OK
+------
+
+
+
+==== Actions
+
+The supported filter actions are:
+
+ * <<include-fields,`include_fields`>>
+ * <<drop-fields,`drop_fields`>>
+ * <<drop-event,`drop_event`>>
+
+See <<exported-fields>> for the full list of possible fields.
+
+[[include-fields]]
+===== include_fields
+
+The `include_fields` action specifies what fields to export if a certain condition is fulfilled. The condition is
+optional and if it's missing then the defined fields are always exported. The `@timestamp` and
+`type` fields are always exported, even if they are not defined in the `include_fields` list.
+
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
+
+[source,yaml]
+-------
+filters:
+ - include_fields:
+     [condition]
+     fields: ["field1", "field2", ...]
+-------
+
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
+
+[source,yaml]
+-------
+processors:
+ - include_fields:
+     when:
+        condition
+     fields: ["field1", "field2", ...]
+-------
+
+You can specify multiple `include_fields` actions under the `processors` section.
+
+
+NOTE: If you define an empty list of fields under `include_fields`, then only the required fields, `@timestamp` and `type`, are
+exported.
+
+
+[[drop-fields]]
+===== drop_fields
+
+The `drop_fields` action specifies what fields to drop if a certain condition is fulfilled. The condition is optional
+and if it's missing then the defined fields are always dropped. The `@timestamp` and `type` fields cannot be dropped,
+even if they show up in the `drop_fields` list.
+
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
+
+[source,yaml]
+-----------------------------------------------------
+filters:
+ - drop_fields:
+     [condition]
+     fields: ["field1", "field2", ...]
+-----------------------------------------------------
+
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - drop_fields:
+     when:
+        condition
+     fields: ["field1", "field2", ...]
+-----------------------------------------------------
+
+NOTE: If you define an empty list of fields under `drop_fields`, then no fields are dropped.
+
+
+[[drop-event]]
+===== drop_event
+
+The `drop_event` action drops the entire event if the associated condition is fulfilled. The condition is mandatory, as
+without one all the events are dropped.
+
+deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
+
+[source,yaml]
+------
+filters:
+ - drop_event:
+     condition
+------
+
+added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
+
+[source,yaml]
+------
+processors:
+ - drop_event:
+     when:
+        condition
+------
+

@@ -34,7 +34,12 @@ List of standardised words and units across all metricsets. On the left are the 
 * pct: precentage
 * request: req
 * sec: seconds, second, s
-*
+* ms: millisecond, millis
+* mb: megabytes
+* msg: message
+* ns: nanoseconds
+* norm: normalized
+* us: microseconds
 
 */
 package module

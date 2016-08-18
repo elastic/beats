@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////////////
 ///// The content about individual configuration options has been
 ///// moved to the following files:
-///// shipperconfig.asciidoc for Shipper options
+///// generalconfig.asciidoc for General options
 ///// outputconfig.asciidoc for Output options
 ///// loggingconfig.asciidoc for Logging options
 ///// runconfig.asciidoc for Run Configuration options
@@ -10,9 +10,8 @@
 ///// include the content in the guide for your Beat by using the
 ///// following asciidoc include statements:
 ///// include::../../libbeat/docs/outputconfig.asciidoc[]
-///// include::../../libbeat/docs/shipperconfig.asciidoc[]
+///// include::../../libbeat/docs/generalconfig.asciidoc[]
 ///// include::../../libbeat/docs/loggingconfig.asciidoc[]
-///// include::../../libbeat/docs/runconfig.asciidoc[]
 ////////////////////////////////////////////////////////////////////
 
 [[installing-beats]]

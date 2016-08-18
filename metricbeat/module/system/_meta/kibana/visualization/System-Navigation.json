@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"System Navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"- [Overview](/#/dashboard/Metricbeat-system-overview)\\n\\n- [Load/CPU](/#/dashboard/Metricbeat-cpu)\\n\\n- [Memory](/#/dashboard/Metricbeat-memory)\\n\\n- [Processes](/#/dashboard/Metricbeat-processes)\\n\\n- [Network](/#/dashboard/Metricbeat-network)\\n\\n- [Filesystem](/#/dashboard/Metricbeat-filesystem)\\n\\n- [Filesystem per Host](/#/dashboard/Metricbeat-filesystem-per-Host)\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "System Navigation", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

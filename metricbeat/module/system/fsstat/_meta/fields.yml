@@ -1,0 +1,32 @@
+- name: fsstat
+  type: group
+  description: >
+    `system.fsstat` contains filesystem metrics aggregated from all mounted
+    filesystems.
+  fields:
+    - name: count
+      type: long
+      description: Number of file systems found.
+    - name: total_files
+      type: long
+      description: Total number of files.
+    - name: total_size
+      format: bytes
+      type: group
+      description: Nested file system docs.
+      fields:
+        - name: free
+          type: long
+          format: bytes
+          description: >
+            Total free space.
+        - name: used
+          type: long
+          format: bytes
+          description: >
+            Total used space.
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Total space (used plus free).

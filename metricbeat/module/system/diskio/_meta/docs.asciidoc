@@ -1,0 +1,10 @@
+=== System Diskio Metricset
+
+The System `diskio` metricset provides disk IO metrics collected from the operating
+system. One event is created for each disk mounted on the system.
+
+This metricset is available on:
+
+- Linux
+- Windows
+- FreeBSD (amd64)

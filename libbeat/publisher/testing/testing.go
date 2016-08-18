@@ -6,6 +6,10 @@ import (
 	"github.com/elastic/beats/libbeat/publisher"
 )
 
+type TestPublisher struct {
+	client publisher.Client
+}
+
 // given channel only.
 type ChanClient struct {
 	done    chan struct{}
@@ -17,6 +21,14 @@ type ChanClient struct {
 type PublishMessage struct {
 	Context publisher.Context
 	Events  []common.MapStr
+}
+
+func PublisherWithClient(client publisher.Client) publisher.Publisher {
+	return &TestPublisher{client}
+}
+
+func (pub *TestPublisher) Connect() publisher.Client {
+	return pub.client
 }
 
 func NewChanClient(bufSize int) *ChanClient {

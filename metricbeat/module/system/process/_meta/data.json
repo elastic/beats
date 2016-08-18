@@ -1,0 +1,45 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "system",
+        "name": "process",
+        "rtt": 115
+    },
+    "system": {
+        "process": {
+            "cmdline": "go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data",
+            "cpu": {
+                "start_time": "2016-08-08T16:39:13.040Z",
+                "total": {
+                    "pct": 0.01
+                }
+            },
+            "fd": {
+                "limit": {
+                    "hard": 1048576,
+                    "soft": 1048576
+                },
+                "open": 4
+            },
+            "memory": {
+                "rss": {
+                    "bytes": 16572416,
+                    "pct": 0.002
+                },
+                "share": 8441856,
+                "size": 234192896
+            },
+            "name": "go",
+            "pid": 1,
+            "ppid": 0,
+            "state": "sleeping",
+            "username": "root"
+        }
+    },
+    "type": "metricsets"
+}

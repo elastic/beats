@@ -53,8 +53,8 @@ sudo rpm -vi packetbeat-{version}-x86_64.rpm
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-darwin-x64.tar.gz
-tar xzvf packetbeat-{version}-darwin-x64.tar.gz
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-darwin-x86_64.tar.gz
+tar xzvf packetbeat-{version}-darwin-x86_64.tar.gz
 ----------------------------------------------------------------------
 
 [[win]]
@@ -165,6 +165,10 @@ packetbeat.protocols.thrift:
 
 packetbeat.protocols.mongodb:
   ports: [27017]
+
+packetbeat.protocols.cassandra:
+  ports: [9042]
+
 ----------------------------------------------------------------------
 +
 . Set the IP address and port where Packetbeat can find the Elasticsearch

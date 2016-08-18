@@ -1,0 +1,23 @@
+=== System Network Metricset
+
+The System `network` metricset provides network IO metrics collected from the
+operating system. One event is created for each network interface.
+
+By default metrics are reported from all network interfaces. To select which
+interfaces metrics are reported from, use the `interfaces` configuration
+option. The value must be an array of interface names. For example:
+
+[source,yaml]
+----------------------------
+metricbeat.modules:
+- module: system
+  metricsets: [network]
+  interfaces: [eth0]
+----------------------------
+
+This metricset is available on:
+
+- Darwin
+- Linux
+- Windows
+- FreeBSD

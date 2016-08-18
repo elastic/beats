@@ -1,28 +1,29 @@
 
 [[packetbeat-configuration]]
-== Configuration Options
+== Configuration Options (Reference)
 
 Before modifying configuration settings, make sure you've completed the <<configuring-packetbeat,configuration steps>> in the Getting Started.
 
-The Packetbeat configuration file uses http://yaml.org/[YAML] for its syntax.
+The {beatname_uc} configuration file, +{beatname_lc}.yml+, uses http://yaml.org/[YAML] for its syntax.
 The configuration options are described in the following sections. After changing
-configuration settings, you need to restart Packetbeat to pick up the changes.
+configuration settings, you need to restart {beatname_uc} to pick up the changes.
 
 * <<configuration-interfaces>>
 * <<configuration-flows>>
 * <<configuration-protocols>>
 * <<configuration-processes>>
+* <<configuration-general>>
+* <<configuration-processors>>
 * <<elasticsearch-output>>
 * <<logstash-output>>
-* <<redis-output>>
 * <<kafka-output>>
+* <<redis-output>>
 * <<file-output>>
 * <<console-output>>
-* <<configuration-shipper>>
+* <<configuration-output-tls>>
 * <<configuration-path>>
 * <<configuration-logging>>
 * <<configuration-run-options>>
-* <<configuration-filter>>
 
 NOTE: Packetbeat maintains a real-time topology map of all the servers in your network.
 See <<maintaining-topology>> for more details.

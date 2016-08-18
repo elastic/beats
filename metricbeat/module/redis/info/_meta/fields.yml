@@ -1,0 +1,339 @@
+- name: info
+  type: group
+  description: >
+    `info` contains the information and statistics returned by the `INFO` command.
+  fields:
+    - name: clients
+      type: group
+      description: >
+        Redis client stats.
+      fields:
+        - name: connected
+          type: integer
+          description: >
+            Number of client connections (excluding connections from slaves).
+
+        - name: longest_output_list
+          type: integer
+          description: >
+            Longest output list among current client connections.
+
+        - name: biggest_input_buf
+          type: integer
+          description: >
+            Biggest input buffer among current client connections.
+
+        - name: blocked
+          type: integer
+          description: >
+            Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH).
+
+    - name: cluster
+      type: group
+      description: >
+        Redis cluster information.
+      fields:
+        - name: enabled
+          type: boolean
+          description: >
+            Indicates that the Redis cluster is enabled.
+
+    - name: cpu
+      type: group
+      description: >
+        Redis CPU stats
+      fields:
+        - name: used.sys
+          type: half_float
+          description: >
+            System CPU consumed by the Redis server.
+
+        - name: used.sys_children
+          type: half_float
+          description: >
+            User CPU consumed by the Redis server.
+
+        - name: used.user
+          type: half_float
+          description: >
+            System CPU consumed by the background processes.
+
+        - name: used.user_children
+          type: half_float
+          description: >
+            User CPU consumed by the background processes.
+
+    - name: memory
+      type: group
+      description: >
+        Redis CPU stats.
+      fields:
+        - name: used.value
+          type: integer
+          description: >
+            Used memory.
+
+        - name: used.rss
+          type: integer
+          description: >
+            Used memory rss.
+
+        - name: used.peak
+          type: integer
+          description: >
+            Used memory peak.
+
+        - name: used.lua
+          type: integer
+          description: >
+            Used memory lua.
+
+        - name: allocator
+          type: keyword
+          description: >
+            Memory allocator.
+
+    - name: persistence
+      type: group
+      description: >
+        Redis CPU stats.
+      fields:
+        - name: loading
+          type: boolean
+          description:
+
+        - name: rdb.changes_since_last_save
+          type: integer
+          description:
+
+        - name: rdb.bgsave_in_progress
+          type: boolean
+          description:
+
+        - name: rdb.last_save_time
+          type: integer
+          description:
+
+        - name: rdb.last_bgsave_status
+          type: keyword
+          description:
+
+        - name: rdb.last_bgsave_time_sec
+          type: integer
+          description:
+
+        - name: rdb.current_bgsave_time_sec
+          type: integer
+          description:
+
+        - name: aof.enabled
+          type: boolean
+          description:
+
+        - name: aof.rewrite_in_progress
+          type: boolean
+          description:
+
+        - name: aof.rewrite_scheduled
+          type: boolean
+          description:
+
+        - name: aof.last_rewrite_time_sec
+          type: integer
+          description:
+
+        - name: aof.current_rewrite_time_sec
+          type: integer
+          description:
+
+        - name: aof.last_bgrewrite_status
+          type: keyword
+          description:
+
+        - name: aof.last_write_status
+          type: keyword
+          description:
+
+    - name: replication
+      type: group
+      description: >
+        Replication
+      fields:
+        - name: role
+          type: keyword
+          description:
+
+        - name: connected_slaves
+          type: integer
+          description:
+
+        - name: master_offset
+          type: integer
+          description:
+
+        - name: backlog.active
+          type: integer
+          description:
+
+        - name: backlog.size
+          type: integer
+          description:
+
+        - name: backlog.first_byte_offset
+          type: integer
+          description:
+
+        - name: backlog.histlen
+          type: integer
+          description:
+
+    - name: server
+      type: group
+      description: >
+        Server info
+      fields:
+        - name: version
+          type: keyword
+          description:
+
+        - name: git_sha1
+          type: keyword
+          description:
+
+        - name: git_dirty
+          type: keyword
+          description:
+
+        - name: build_id
+          type: keyword
+          description:
+
+        - name: mode
+          type: keyword
+          description:
+
+        - name: os
+          type: keyword
+          description:
+
+        - name: arch_bits
+          type: keyword
+          description:
+
+        - name: multiplexing_api
+          type: keyword
+          description:
+
+        - name: gcc_version
+          type: keyword
+          description:
+
+        - name: process_id
+          type: integer
+          description:
+
+        - name: run_id
+          type: keyword
+          description:
+
+        - name: tcp_port
+          type: integer
+          description:
+
+        - name: uptime
+          type: integer
+          description:
+
+        - name: hz
+          type: integer
+          description:
+
+        - name: lru_clock
+          type: integer
+          description:
+
+        - name: config_file
+          type: keyword
+          description:
+
+    - name: stats
+      type: group
+      description: >
+        Redis stats.
+      fields:
+        - name: connections.received
+          type: integer
+          description:
+
+        - name: connections.rejected
+          type: integer
+          description:
+
+        - name: total_commands_processed
+          type: integer
+          description:
+
+        - name: total_net_input_bytes
+          type: integer
+          description:
+
+        - name: total_net_output_bytes
+          type: integer
+          description:
+
+        - name: instantaneous_ops_per_sec
+          type: integer
+          description:
+
+        - name: instantaneous_input_kbps
+          type: float
+          description:
+
+        - name: instantaneous_output_kbps
+          type: float
+          description:
+
+        - name: sync.full
+          type: integer
+          description:
+
+        - name: sync.partial_ok
+          type: integer
+          description:
+
+        - name: sync.partial_err
+          type: integer
+          description:
+
+        - name: keys.expired
+          type: integer
+          description:
+
+        - name: keys.evicted
+          type: integer
+          description:
+
+        - name: keyspace.hits
+          type: integer
+          description:
+
+        - name: keyspace.misses
+          type: integer
+          description:
+
+        - name: pubsub_channels
+          type: integer
+          description:
+
+        - name: pubsub_patterns
+          type: integer
+          description:
+
+        - name: latest_fork_usec
+          type: integer
+          description:
+
+        - name: migrate_cached_sockets
+          type: integer
+          description:
+

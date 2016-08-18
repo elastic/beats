@@ -1,10 +1,9 @@
-//+build !noasm
-//+build !appengine
+//+build !noasm !appengine
 
 // Copyright 2015, Klaus Post, see LICENSE for details.
 
 // func crc32sse(a []byte) hash
-TEXT ·crc32sse(SB), 4, $0
+TEXT ·crc32sse(SB), 7, $0
 	MOVQ a+0(FP), R10
 	XORQ BX, BX
 
@@ -16,7 +15,7 @@ TEXT ·crc32sse(SB), 4, $0
 	RET
 
 // func crc32sseAll(a []byte, dst []hash)
-TEXT ·crc32sseAll(SB), 4, $0
+TEXT ·crc32sseAll(SB), 7, $0
 	MOVQ  a+0(FP), R8      // R8: src
 	MOVQ  a_len+8(FP), R10 // input length
 	MOVQ  dst+24(FP), R9   // R9: dst
@@ -96,7 +95,7 @@ one_crc:
 	JMP  rem_loop
 
 // func matchLenSSE4(a, b []byte, max int) int
-TEXT ·matchLenSSE4(SB), 4, $0
+TEXT ·matchLenSSE4(SB), 7, $0
 	MOVQ  a+0(FP), SI        // RSI: &a
 	MOVQ  b+24(FP), DI       // RDI: &b
 	MOVQ  max+48(FP), R10    // R10: max
@@ -157,7 +156,7 @@ done_matchlen:
 	RET
 
 // func histogram(b []byte, h []int32)
-TEXT ·histogram(SB), 4, $0
+TEXT ·histogram(SB), 7, $0
 	MOVQ b+0(FP), SI     // SI: &b
 	MOVQ b_len+8(FP), R9 // R9: len(b)
 	MOVQ h+24(FP), DI    // DI: Histogram

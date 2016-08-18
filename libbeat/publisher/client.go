@@ -8,11 +8,12 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	publishedEvents = expvar.NewInt("libbeatPublishedEvents")
+	publishedEvents = expvar.NewInt("libbeat.publisher.published_events")
 )
 
 var (
@@ -62,12 +63,12 @@ type Client interface {
 type client struct {
 	canceler *op.Canceler
 
-	publisher           *Publisher
+	publisher           *BeatPublisher
 	beatMeta            common.MapStr        // Beat metadata that is added to all events.
 	globalEventMetadata common.EventMetadata // Fields and tags that are added to all events.
 }
 
-func newClient(pub *Publisher) *client {
+func newClient(pub *BeatPublisher) *client {
 	c := &client{
 		canceler: op.NewCanceler(),
 
@@ -82,6 +83,10 @@ func newClient(pub *Publisher) *client {
 }
 
 func (c *client) Close() error {
+	if c == nil {
+		return nil
+	}
+
 	c.canceler.Cancel()
 
 	// atomic decrement clients counter
@@ -99,30 +104,32 @@ func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
 
 	ctx, pipeline := c.getPipeline(opts)
 	publishedEvents.Add(1)
-	return pipeline.publish(message{client: c, context: ctx, event: *publishEvent})
+	return pipeline.publish(message{
+		client:  c,
+		context: ctx,
+		datum:   outputs.Data{Event: *publishEvent},
+	})
 }
 
 func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
-	// optimization: shares the backing array and capacity
-	publishEvents := events[:0]
-
+	data := make([]outputs.Data, 0, len(events))
 	for _, event := range events {
 		c.annotateEvent(event)
 
 		publishEvent := c.filterEvent(event)
 		if publishEvent != nil {
-			publishEvents = append(publishEvents, *publishEvent)
+			data = append(data, outputs.Data{Event: *publishEvent})
 		}
 	}
 
 	ctx, pipeline := c.getPipeline(opts)
-	if len(publishEvents) == 0 {
+	if len(data) == 0 {
 		logp.Debug("filter", "No events to publish")
 		return true
 	}
 
-	publishedEvents.Add(int64(len(publishEvents)))
-	return pipeline.publish(message{client: c, context: ctx, events: publishEvents})
+	publishedEvents.Add(int64(len(data)))
+	return pipeline.publish(message{client: c, context: ctx, data: data})
 }
 
 // annotateEvent adds fields that are common to all events. This adds the 'beat'
@@ -165,8 +172,8 @@ func (c *client) filterEvent(event common.MapStr) *common.MapStr {
 
 	}
 
-	// filter the event by applying the configured rules
-	publishEvent := c.publisher.Filters.Filter(event)
+	// process the event by applying the configured actions
+	publishEvent := c.publisher.Processors.Run(event)
 	if publishEvent == nil {
 		// the event is dropped
 		logp.Debug("publish", "Drop event %s", event.StringToPrint())

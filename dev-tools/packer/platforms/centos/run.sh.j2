@@ -31,7 +31,7 @@ fpm --force -s dir -t rpm \
         --rpm-init /tmp/{{.beat_name}}.init \
         --after-install /tmp/systemd-daemon-reload.sh \
         --config-files /etc/{{.beat_name}}/{{.beat_name}}.yml \
-        homedirs/{{.beat_name}}=/usr/share/ \
+        homedir=/usr/share/ \
         beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}.sh \
         {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}} \
         {{.beat_name}}-linux.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml \
@@ -43,11 +43,11 @@ fpm --force -s dir -t rpm \
 
 
 # rename so that the filename respects semver rules
-mkdir -p upload/{{.beat_name}}
-mv {{.beat_name}}-${RPM_VERSION}-1.{{.rpm_arch}}.rpm upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm
-echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm"
+mkdir -p upload
+mv {{.beat_name}}-${RPM_VERSION}-1.{{.rpm_arch}}.rpm upload/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm
+echo "Created upload/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm"
 
 # create sha1 file
-cd upload/{{.beat_name}}
+cd upload
 sha1sum {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm > {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha1.txt
-echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha1.txt"
+echo "Created upload/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha1.txt"

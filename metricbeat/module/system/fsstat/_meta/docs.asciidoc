@@ -1,0 +1,11 @@
+=== System Fsstat Metricset
+
+The System `fsstats` metricset provides overall file system statistics.
+
+This metricset is available on:
+
+- Darwin
+- FreeBSD
+- Linux
+- OpenBSD
+- Windows

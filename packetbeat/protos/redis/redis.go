@@ -2,6 +2,7 @@ package redis
 
 import (
 	"bytes"
+	"expvar"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -45,6 +46,10 @@ type Redis struct {
 var (
 	debugf  = logp.MakeDebug("redis")
 	isDebug = false
+)
+
+var (
+	unmatchedResponses = expvar.NewInt("redis.unmatched_responses")
 )
 
 func init() {
@@ -233,7 +238,8 @@ func (redis *Redis) correlate(conn *redisConnectionData) {
 	// drop responses with missing requests
 	if conn.requests.empty() {
 		for !conn.responses.empty() {
-			logp.Warn("Response from unknown transaction. Ignoring")
+			debugf("Response from unknown transaction. Ignoring")
+			unmatchedResponses.Add(1)
 			conn.responses.pop()
 		}
 		return

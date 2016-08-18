@@ -1,12 +1,14 @@
 = Packetbeat Reference
-:libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
-:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/master
-:topbeat: http://www.elastic.co/guide/en/beats/topbeat/master
-:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/master
-:filebeat: http://www.elastic.co/guide/en/beats/filebeat/master
-:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/master
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/master/
-:version: 5.0.0-alpha3
+
+include::./version.asciidoc[]
+
+:libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
+:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
+:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
+:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}/
+:version: {stack-version}
 :beatname_lc: packetbeat
 :beatname_uc: Packetbeat
 :security: X-Pack Security
@@ -35,11 +37,11 @@ include::./thrift.asciidoc[]
 
 include::./maintaining-topology.asciidoc[]
 
+include::../../libbeat/docs/yaml.asciidoc[]
+
+include::./fields.asciidoc[]
+
 include::./securing-packetbeat.asciidoc[]
-
-include::../../libbeat/docs/https.asciidoc[]
-
-include::../../libbeat/docs/shared-tls-logstash-config.asciidoc[]
 
 include::./visualizing-data-packetbeat.asciidoc[]
 
@@ -48,9 +50,5 @@ include::./filtering.asciidoc[]
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
-
-include::./reference.asciidoc[]
-
-include::./fields.asciidoc[]
 
 include::./new_protocol.asciidoc[]

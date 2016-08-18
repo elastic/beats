@@ -280,6 +280,7 @@ func (mc *Memcache) correlateTCP(conn *connection) error {
 				note := NoteNonQuietResponseOnly
 				logp.Warn("%s", note)
 				requ.AddNotes(note)
+				unmatchedRequests.Add(1)
 			}
 
 			// send request
@@ -297,6 +298,7 @@ func (mc *Memcache) correlateTCP(conn *connection) error {
 		if requ == nil {
 			debug("found orphan memcached response=%p", resp)
 			resp.AddNotes(NoteTransactionNoRequ)
+			unmatchedResponses.Add(1)
 		}
 
 		debug("merge request=%p and response=%p", requ, resp)
@@ -332,6 +334,11 @@ func (mc *Memcache) GapInStream(
 
 	conn := private.(*tcpConnectionData)
 	stream := conn.Streams[dir]
+	if stream == nil {
+		debug("Inactive stream. Dropping connection state.")
+		return private, true
+	}
+
 	parser := stream.parser
 	msg := parser.message
 
@@ -401,6 +408,7 @@ func (mc *Memcache) pushAllTCPTrans(conn *connection) {
 		msg := conn.requests.pop()
 		if !msg.isQuiet && !msg.noreply {
 			msg.AddNotes(NoteTransUnfinished)
+			unfinishedTransactions.Add(1)
 		}
 		debug("push incomplete request=%p", msg)
 		err := mc.onTCPTrans(msg, nil)

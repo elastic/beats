@@ -26,23 +26,23 @@
           }
         },
         {
-          "http.request_headers": {
+          "http.request.headers": {
             "mapping": {
               "ignore_above": 1024,
               "type": "keyword"
             },
             "match_mapping_type": "string",
-            "path_match": "http.request_headers.*"
+            "path_match": "http.request.headers.*"
           }
         },
         {
-          "http.response_headers": {
+          "http.response.headers": {
             "mapping": {
               "ignore_above": 1024,
               "type": "keyword"
             },
             "match_mapping_type": "string",
-            "path_match": "http.response_headers.*"
+            "path_match": "http.response.headers.*"
           }
         }
       ],
@@ -60,10 +60,10 @@
               "type": "boolean"
             },
             "class-id": {
-              "type": "integer"
+              "type": "long"
             },
             "consumer-count": {
-              "type": "integer"
+              "type": "long"
             },
             "consumer-tag": {
               "ignore_above": 1024,
@@ -86,7 +86,7 @@
               "type": "keyword"
             },
             "delivery-tag": {
-              "type": "integer"
+              "type": "long"
             },
             "durable": {
               "type": "boolean"
@@ -119,14 +119,14 @@
               "type": "boolean"
             },
             "message-count": {
-              "type": "integer"
+              "type": "long"
             },
             "message-id": {
               "ignore_above": 1024,
               "type": "keyword"
             },
             "method-id": {
-              "type": "integer"
+              "type": "long"
             },
             "multiple": {
               "type": "boolean"
@@ -144,7 +144,7 @@
               "type": "boolean"
             },
             "priority": {
-              "type": "integer"
+              "type": "long"
             },
             "queue": {
               "ignore_above": 1024,
@@ -154,7 +154,7 @@
               "type": "boolean"
             },
             "reply-code": {
-              "type": "integer"
+              "type": "long"
             },
             "reply-text": {
               "ignore_above": 1024,
@@ -274,12 +274,10 @@
             "stats": {
               "properties": {
                 "net_bytes_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 },
                 "net_packets_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 }
               }
             }
@@ -306,7 +304,7 @@
                   "type": "keyword"
                 },
                 "ttl": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "type": {
                   "ignore_above": 1024,
@@ -315,7 +313,7 @@
               }
             },
             "additionals_count": {
-              "type": "integer"
+              "type": "long"
             },
             "answers": {
               "properties": {
@@ -332,7 +330,7 @@
                   "type": "keyword"
                 },
                 "ttl": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "type": {
                   "ignore_above": 1024,
@@ -341,7 +339,7 @@
               }
             },
             "answers_count": {
-              "type": "integer"
+              "type": "long"
             },
             "authorities": {
               "properties": {
@@ -360,7 +358,7 @@
               }
             },
             "authorities_count": {
-              "type": "integer"
+              "type": "long"
             },
             "flags": {
               "properties": {
@@ -385,7 +383,7 @@
               }
             },
             "id": {
-              "type": "integer"
+              "type": "long"
             },
             "op_code": {
               "ignore_above": 1024,
@@ -401,7 +399,7 @@
                   "type": "keyword"
                 },
                 "udp_size": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "version": {
                   "ignore_above": 1024,
@@ -451,16 +449,33 @@
         },
         "http": {
           "properties": {
-            "code": {
-              "ignore_above": 1024,
-              "type": "keyword"
+            "request": {
+              "properties": {
+                "body": {
+                  "norms": false,
+                  "type": "text"
+                },
+                "params": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
             },
-            "content_length": {
-              "type": "long"
-            },
-            "phrase": {
-              "ignore_above": 1024,
-              "type": "keyword"
+            "response": {
+              "properties": {
+                "body": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "code": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "phrase": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
             }
           }
         },
@@ -469,28 +484,28 @@
             "request": {
               "properties": {
                 "code": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "message": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
                 "type": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             },
             "response": {
               "properties": {
                 "code": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "message": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
                 "type": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             },
@@ -537,22 +552,22 @@
                   "type": "keyword"
                 },
                 "count_values": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "delta": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "dest_class": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "exptime": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "flags": {
                   "type": "long"
                 },
                 "initial": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "line": {
                   "ignore_above": 1024,
@@ -562,14 +577,14 @@
                   "type": "boolean"
                 },
                 "opaque": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "opcode": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
                 "opcode_value": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "quiet": {
                   "type": "boolean"
@@ -582,17 +597,17 @@
                   "type": "long"
                 },
                 "source_class": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "type": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
                 "vbucket": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "verbosity": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             },
@@ -609,7 +624,7 @@
                   "type": "keyword"
                 },
                 "count_values": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "error_msg": {
                   "ignore_above": 1024,
@@ -619,21 +634,21 @@
                   "type": "long"
                 },
                 "opaque": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "opcode": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
                 "opcode_value": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "status": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
                 "status_code": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "type": {
                   "ignore_above": 1024,
@@ -669,13 +684,13 @@
               "type": "keyword"
             },
             "numberReturned": {
-              "type": "integer"
+              "type": "long"
             },
             "numberToReturn": {
-              "type": "integer"
+              "type": "long"
             },
             "numberToSkip": {
-              "type": "integer"
+              "type": "long"
             },
             "query": {
               "ignore_above": 1024,
@@ -702,10 +717,10 @@
         "mysql": {
           "properties": {
             "affected_rows": {
-              "type": "integer"
+              "type": "long"
             },
             "error_code": {
-              "type": "integer"
+              "type": "long"
             },
             "error_message": {
               "ignore_above": 1024,
@@ -735,7 +750,7 @@
         "nfs": {
           "properties": {
             "minor_version": {
-              "type": "integer"
+              "type": "long"
             },
             "opcode": {
               "ignore_above": 1024,
@@ -750,7 +765,7 @@
               "type": "keyword"
             },
             "version": {
-              "type": "integer"
+              "type": "long"
             }
           }
         },
@@ -773,7 +788,7 @@
         "pgsql": {
           "properties": {
             "error_code": {
-              "type": "integer"
+              "type": "long"
             },
             "error_message": {
               "ignore_above": 1024,
@@ -854,12 +869,12 @@
               "type": "keyword"
             },
             "call_size": {
-              "type": "integer"
+              "type": "long"
             },
             "cred": {
               "properties": {
                 "gid": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "gids": {
                   "ignore_above": 1024,
@@ -870,15 +885,15 @@
                   "type": "keyword"
                 },
                 "stamp": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "uid": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             },
             "reply_size": {
-              "type": "integer"
+              "type": "long"
             },
             "status": {
               "ignore_above": 1024,
@@ -946,12 +961,10 @@
             "stats": {
               "properties": {
                 "net_bytes_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 },
                 "net_packets_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 }
               }
             }

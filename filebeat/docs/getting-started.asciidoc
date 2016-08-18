@@ -48,8 +48,8 @@ sudo rpm -vi filebeat-{version}-x86_64.rpm
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-darwin-x64.tar.gz
-tar xzvf filebeat-{version}-darwin-x64.tar.gz
+curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-darwin-x86_64.tar.gz
+tar xzvf filebeat-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 
 [[win]]

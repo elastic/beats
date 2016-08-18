@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/joeshaw/multierror"
@@ -34,7 +34,7 @@ var (
 // Use NewModuleWrapper or NewModuleWrappers to construct new ModuleWrappers.
 type ModuleWrapper struct {
 	mb.Module
-	filters    *filter.Filters
+	filters    *processors.Processors
 	metricSets []*metricSetWrapper // List of pointers to its associated MetricSets.
 }
 
@@ -76,7 +76,7 @@ func NewModuleWrappers(modulesConfig []*common.Config, r *mb.Register) ([]*Modul
 	var errs multierror.Errors
 	for k, v := range modules {
 		debugf("Initializing Module type '%s': %T=%+v", k.Name(), k, k)
-		f, err := filter.New(k.Config().Filters)
+		f, err := processors.New(k.Config().Filters)
 		if err != nil {
 			errs = append(errs, errors.Wrapf(err, "module %s", k.Name()))
 			continue
@@ -200,8 +200,10 @@ func (msw *metricSetWrapper) fetch(done <-chan struct{}, out chan<- common.MapSt
 		if err != nil {
 			return err
 		}
-		msw.stats.Add(eventsKey, 1)
-		writeEvent(done, out, event)
+		if event != nil {
+			msw.stats.Add(eventsKey, 1)
+			writeEvent(done, out, event)
+		}
 	case mb.EventsFetcher:
 		events, err := msw.multiEventFetch(fetcher)
 		if err != nil {
@@ -232,8 +234,7 @@ func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher) (common.M
 		msw.stats.Add(failuresKey, 1)
 	}
 
-	event, err = createEvent(msw, event, err, start, elapsed)
-	if err != nil {
+	if event, err = createEvent(msw, event, err, start, elapsed); err != nil {
 		return nil, errors.Wrap(err, "createEvent failed")
 	}
 
@@ -250,11 +251,12 @@ func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher) ([]common
 		msw.stats.Add(successesKey, 1)
 
 		for _, event := range events {
-			event, err = createEvent(msw, event, nil, start, elapsed)
-			if err != nil {
+			if event, err = createEvent(msw, event, nil, start, elapsed); err != nil {
 				return nil, errors.Wrap(err, "createEvent failed")
 			}
-			rtnEvents = append(rtnEvents, event)
+			if event != nil {
+				rtnEvents = append(rtnEvents, event)
+			}
 		}
 	} else {
 		msw.stats.Add(failuresKey, 1)
@@ -263,7 +265,9 @@ func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher) ([]common
 		if err != nil {
 			return nil, errors.Wrap(err, "createEvent failed")
 		}
-		rtnEvents = append(rtnEvents, event)
+		if event != nil {
+			rtnEvents = append(rtnEvents, event)
+		}
 	}
 
 	return rtnEvents, nil

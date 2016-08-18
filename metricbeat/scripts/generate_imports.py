@@ -24,14 +24,14 @@ def generate(go_beat_path):
     # Fetch all modules
     for module in os.listdir(base_dir):
 
-        if os.path.isfile(path + "/" + module) or module == "_beat":
+        if os.path.isfile(path + "/" + module) or module == "_meta":
             continue
 
         list_file += '	_ "' + go_beat_path + '/module/' + module + '"\n'
 
         # Fetch all metricsets
         for metricset in os.listdir(base_dir + "/" + module):
-            if os.path.isfile(base_dir + "/" + module + "/" + metricset) or metricset == "_beat" or metricset == "vendor":
+            if os.path.isfile(base_dir + "/" + module + "/" + metricset) or metricset == "_meta" or metricset == "vendor":
                 continue
 
             list_file += '	_ "' + go_beat_path + '/module/' + module + '/' + metricset + '"\n'

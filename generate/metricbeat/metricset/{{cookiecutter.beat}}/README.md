@@ -73,10 +73,10 @@ git commit -m "Add {{cookiecutter.beat}}"
 
 ## Packaging
 
-The beat frameworks provides tools to crosscompile and package your beat for different platforms. This requires docker and vendoring as described above. To build packages of your beat, run the following command:
+The beat frameworks provides tools to crosscompile and package your beat for different platforms. This requires [docker](https://www.docker.com/) and vendoring as described above. To build packages of your beat, run the following command:
 
 ```
-make pack
+make package
 ```
 
-This will fetch and create all images required for the build process. The hole process to finish can take several minutes. After you will find your packages
+This will fetch and create all images required for the build process. The hole process to finish can take several minutes.

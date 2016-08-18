@@ -1,0 +1,25 @@
+== Redis Module
+
+This module periodically fetches metrics from http://redis.io/[Redis] servers.
+
+[float]
+=== Module-Specific Configuration Notes
+
+The Redis module has these additional config options:
+
+*`idle_timeout`*:: The duration to remain idle before closing connections. If
+  the value is zero, then idle connections are not closed. The default value
+  is 2 times the module period to allow a connection to be reused across
+  fetches. The `idle_timeout` should be set to less than the server's connection
+  timeout.
+*`network`*:: The network type to be used for the Redis connection. The default value is
+  `tcp`.
+*`maxconn`*:: The maximum number of concurrent connections to Redis. The default value
+  is 10.
+
+
+[float]
+=== Compatibility
+
+The Redis metricsets were tested with Redis 3.2 and are expected to work with all version
+>= 3.0.

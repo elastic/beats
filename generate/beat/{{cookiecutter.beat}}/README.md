@@ -9,20 +9,14 @@ Ensure that this folder is at the following location:
 
 ### Requirements
 
-* [Golang](https://golang.org/dl/) 1.6
-* [Glide](https://github.com/Masterminds/glide) >= 0.10.0
+* [Golang](https://golang.org/dl/) 1.6.2
 
 ### Init Project
-To get running with {{cookiecutter.beat|capitalize}}, run the following command:
+To get running with {{cookiecutter.beat|capitalize}} and also install the
+dependencies, run the following command:
 
 ```
-make init
-```
-
-To commit the first version before you modify it, run:
-
-```
-make commit
+make setup
 ```
 
 It will create a clean git history for each major step. Note that you can always rewrite the history if you wish before pushing your changes.
@@ -73,23 +67,6 @@ make coverage-report
 
 The test coverage is reported in the folder `./build/coverage/`
 
-
-### Package
-
-To be able to package {{cookiecutter.beat|capitalize}} the requirements are as follows:
-
- * [Docker Environment](https://docs.docker.com/engine/installation/) >= 1.10
- * $GOPATH/bin must be part of $PATH: `export PATH=${PATH}:${GOPATH}/bin`
-
-To cross-compile and package {{cookiecutter.beat|capitalize}} for all supported platforms, run the following commands:
-
-```
-cd dev-tools/packer
-make deps
-make images
-make
-```
-
 ### Update
 
 Each beat has a template for the mapping in elasticsearch and a documentation for the fields
@@ -129,3 +106,14 @@ git clone https://{{cookiecutter.beat_path}}/{{cookiecutter.beat}}
 
 
 For further development, check out the [beat developer guide](https://www.elastic.co/guide/en/beats/libbeat/current/new-beat.html).
+
+
+## Packaging
+
+The beat frameworks provides tools to crosscompile and package your beat for different platforms. This requires [docker](https://www.docker.com/) and vendoring as described above. To build packages of your beat, run the following command:
+
+```
+make package
+```
+
+This will fetch and create all images required for the build process. The hole process to finish can take several minutes.

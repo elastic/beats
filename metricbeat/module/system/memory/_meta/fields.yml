@@ -1,0 +1,83 @@
+- name: memory
+  type: group
+  description: >
+    `memory` contains local memory stats.
+  fields:
+    - name: total
+      type: long
+      format: bytes
+      description: >
+        Total memory.
+
+    - name: used.bytes
+      type: long
+      format: bytes
+      description: >
+        Used memory.
+
+    - name: free
+      type: long
+      format: bytes
+      description: >
+        The total amount of free memory in bytes. This value does not include memory consumed by system caches and
+        buffers (see system.memory.actual.free).
+
+    - name: used.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percentage of used memory.
+
+    - name: actual
+      type: group
+      description: >
+        Actual memory used and free.
+      fields:
+
+        - name: used.bytes
+          type: long
+          description: >
+            Actual used memory in bytes. It represents the difference between the total and the available memory. The
+            available memory depends on the OS. For more details, please check `system.actual.free`.
+ 
+        - name: free
+          type: long
+          description: >
+            Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory
+            plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is the 
+            amount of unreserved and uncommitted memory currently in the user-mode portion of the virtual address space
+            of the calling process.
+
+        - name: used.pct
+          type: scaled_float
+          description: >
+            The percentage of actual used memory.
+
+    - name: swap
+      type: group
+      prefix: "[float]"
+      description: This group contains statistics related to the swap memory usage on the system.
+      fields:
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Total swap memory.
+
+        - name: used.bytes
+          type: long
+          format: bytes
+          description: >
+            Used swap memory.
+
+        - name: free
+          type: long
+          format: bytes
+          description: >
+            Available swap memory.
+
+        - name: used.pct
+          type: scaled_float
+          format: percent
+          description: >
+            The percentage of used swap memory.

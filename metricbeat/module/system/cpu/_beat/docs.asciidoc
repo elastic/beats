@@ -1,3 +1,0 @@
-=== System CPU MetricSet
-
-The System CPU MetricSet provides CPU statistics.

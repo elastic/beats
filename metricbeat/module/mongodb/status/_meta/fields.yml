@@ -1,0 +1,331 @@
+- name: status
+  type: group
+  description: >
+    MongoDB server status metrics.
+  fields:
+    - name: version
+      type: keyword
+      description: >
+        Instance version.
+    - name: uptime.ms
+      type: long
+      description: >
+        Instance uptime in milliseconds.
+    - name: local_time
+      type: date
+      description: >
+        Local time as reported by the MongoDB instance.
+
+    - name: asserts.regular
+      type: long
+      description: >
+        Number of regular assertions produced by the server.
+    - name: asserts.warning
+      type: long
+      description: >
+        Number of warning assertions produced by the server.
+    - name: asserts.msg
+      type: long
+      description: >
+        Number of msg assertions produced by the server.
+    - name: asserts.user
+      type: long
+      description: >
+        Number of user assertions produced by the server.
+    - name: asserts.rollovers
+      type: long
+      description: >
+        Number of rollovers assertions produced by the server.
+
+    - name: background_flushing
+      type: group
+      description: >
+        Data about the process MongoDB uses to write data to disk. This data is
+        only available for instances that use the MMAPv1 storage engine.
+      fields:
+        - name: flushes
+          type: long
+          description: >
+             A counter that collects the number of times the database has
+             flushed all writes to disk.
+        - name: total.ms
+          type: long
+          description: >
+            The total number of milliseconds (ms) that the mongod processes have
+            spent writing (i.e. flushing) data to disk. Because this is an
+            absolute value, consider the value of `flushes` and `average_ms` to
+            provide better context for this datum.
+        - name: average.ms
+          type: long
+          description: >
+            The average time spent flushing to disk per flush event.
+        - name: last.ms
+          type: long
+          description: >
+            The amount of time, in milliseconds, that the last flush operation
+            took to complete.
+        - name: last_finished
+          type: date
+          description: >
+            A timestamp of the last completed flush operation.
+
+    - name: connections
+      type: group
+      description: >
+        Data regarding the current status of incoming connections and
+        availability of the database server.
+      fields:
+        - name: current
+          type: long
+          description: >
+            The number of connections to the database server from clients. This
+            number includes the current shell session. Consider the value of
+            `available` to add more context to this datum.
+        - name: available
+          type: long
+          description: >
+             The number of unused available incoming connections the database
+             can provide.
+        - name: total_created
+          type: long
+          description: >
+            A count of all incoming connections created to the server. This
+            number includes connections that have since closed.
+
+    - name: journaling
+      type: group
+      description: >
+        Data about the journaling-related operations and performance. Journaling
+        information only appears for mongod instances that use the MMAPv1
+        storage engine and have journaling enabled.
+      fields:
+        - name: commits
+          type: long
+          description: >
+            The number of transactions written to the journal during the last
+            journal group commit interval.
+        - name: journaled.mb
+          type: long
+          description: >
+            The amount of data in megabytes (MB) written to journal during the
+            last journal group commit interval.
+        - name: write_to_data_files.mb
+          type: long
+          description: >
+            The amount of data in megabytes (MB) written from journal to the
+            data files during the last journal group commit interval.
+        - name: compression
+          type: long
+          description: >
+            The compression ratio of the data written to the journal.
+        - name: commits_in_write_lock
+          type: long
+          description: >
+            Count of the commits that occurred while a write lock was held.
+            Commits in a write lock indicate a MongoDB node under a heavy write
+            load and call for further diagnosis.
+        - name: early_commits
+          type: long
+          description: >
+            The number of times MongoDB requested a commit before the scheduled
+            journal group commit interval.
+        - name: times
+          type: group
+          description: >
+            Information about the performance of the mongod instance during the
+            various phases of journaling in the last journal group commit
+            interval.
+          fields:
+            - name: dt.ms
+              type: long
+              description: >
+                The amount of time over which MongoDB collected the times data.
+                Use this field to provide context to the other times field values.
+            - name: prep_log_buffer.ms
+              type: long
+              description: >
+                The amount of time spent preparing to write to the journal.
+                Smaller values indicate better journal performance.
+            - name: write_to_journal.ms
+              type: long
+              description: >
+                The amount of time spent actually writing to the journal. File
+                system speeds and device interfaces can affect performance.
+            - name: write_to_data_files.ms
+              type: long
+              description: >
+                The amount of time spent writing to data files after journaling.
+                File system speeds and device interfaces can affect performance.
+            - name: remap_private_view.ms
+              type: long
+              description: >
+                The amount of time spent remapping copy-on-write memory mapped
+                views. Smaller values indicate better journal performance.
+            - name: commits.ms
+              type: long
+              description: >
+                The amount of time spent for commits.
+            - name: commits_in_write_lock.ms
+              type: long
+              description: >
+                The amount of time spent for commits that occurred while a write
+                lock was held.
+
+    - name: extra_info
+      type: group
+      description: >
+        Platform specific data.
+      fields:
+        - name: heap_usage.bytes
+          type: long
+          format: bytes
+          description: >
+            The total size in bytes of heap space used by the database process.
+            Only available on Unix/Linux.
+        - name: page_faults
+          type: long
+          description: >
+            The total number of page faults that require disk operations. Page
+            faults refer to operations that require the database server to
+            access data that isn't available in active memory.
+
+    - name: network
+      type: group
+      description: >
+        Platform specific data.
+      fields:
+        - name: in.bytes
+          type: long
+          format: bytes
+          description: >
+            The amount of network traffic, in bytes, received by this database.
+        - name: out.bytes
+          type: long
+          format: bytes
+          description: >
+            The amount of network traffic, in bytes, sent from this database.
+        - name: requests
+          type: long
+          description: >
+            The total number of requests received by the server.
+
+    - name: opcounters
+      type: group
+      description: >
+        An overview of database operations by type.
+      fields:
+        - name: insert
+          type: long
+          description: >
+            The total number of insert operations received since the mongod
+            instance last started.
+        - name: query
+          type: long
+          description: >
+            The total number of queries received since the mongod instance last
+            started.
+        - name: update
+          type: long
+          description: >
+            The total number of update operations received since the mongod
+            instance last started.
+        - name: delete
+          type: long
+          description: >
+            The total number of delete operations received since the mongod
+            instance last started.
+        - name: getmore
+          type: long
+          description: >
+            The total number of getmore operations received since the mongod
+            instance last started.
+        - name: command
+          type: long
+          description: >
+            The total number of commands issued to the database since the mongod
+            instance last started.
+
+    - name: opcounters_replicated
+      type: group
+      description: >
+        An overview of database replication operations by type.
+      fields:
+        - name: insert
+          type: long
+          description: >
+            The total number of replicated insert operations received since the
+            mongod instance last started.
+        - name: query
+          type: long
+          description: >
+            The total number of replicated queries received since the mongod
+            instance last started.
+        - name: update
+          type: long
+          description: >
+            The total number of replicated update operations received since the
+            mongod instance last started.
+        - name: delete
+          type: long
+          description: >
+            The total number of replicated delete operations received since the
+            mongod instance last started.
+        - name: getmore
+          type: long
+          description: >
+            The total number of replicated getmore operations received since the
+            mongod instance last started.
+        - name: command
+          type: long
+          description: >
+            The total number of replicated commands issued to the database since
+            the mongod instance last started.
+
+    - name: memory
+      type: group
+      description: >
+        Data about the current memory usage of the mongod server.
+      fields:
+        - name: bits
+          type: long
+          description: >
+            Either 64 or 32, depending on which target architecture was specified
+            during the mongod compilation process.
+        - name: resident.mb
+          type: long
+          description: >
+            The amount of RAM, in megabytes (MB), currently used by the database
+            process.
+        - name: virtual.mb
+          type: long
+          description: >
+           The amount, in megabytes (MB), of virtual memory used by the mongod
+           process.
+        - name: mapped.mb
+          type: long
+          description: >
+            The amount of mapped memory, in megabytes (MB), used by the database.
+            Because MongoDB uses memory-mapped files, this value is likely to be
+            to be roughly equivalent to the total size of your database or
+            databases.
+        - name: mapped_with_journal.mb
+          type: long
+          description: >
+            The amount of mapped memory, in megabytes (MB), including the memory
+            used for journaling.
+    - name: write_backs_queued
+      type: boolean
+      description: >
+        True when there are operations from a mongos instance queued for retrying.
+    - name: storage_engine.name
+      type: keyword
+      description: >
+        A string that represents the name of the current storage engine.
+
+
+
+
+
+
+
+

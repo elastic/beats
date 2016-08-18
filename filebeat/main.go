@@ -19,7 +19,7 @@ var Name = "filebeat"
 // determine where in each file to restart a harvester.
 
 func main() {
-	if err := beat.Run(Name, "", beater.New()); err != nil {
+	if err := beat.Run(Name, "", beater.New); err != nil {
 		os.Exit(1)
 	}
 }

@@ -25,7 +25,7 @@ var (
 
 // dropReasons contains counters for the number of dropped events for each
 // reason.
-var dropReasons = expvar.NewMap("dropReasons")
+var dropReasons = expvar.NewMap("drop_reasons")
 
 // EventLog is an interface to a Windows Event Log.
 type EventLog interface {

@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -47,7 +48,8 @@ func newTestKafkaClient(t *testing.T, topic string) *client {
 	hosts := []string{getTestKafkaHost()}
 	t.Logf("host: %v", hosts)
 
-	client, err := newKafkaClient(hosts, topic, false, nil)
+	sel := outil.MakeSelector(outil.ConstSelectorExpr(topic))
+	client, err := newKafkaClient(hosts, sel, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,11 +59,13 @@ func newTestKafkaClient(t *testing.T, topic string) *client {
 
 func newTestKafkaOutput(t *testing.T, topic string, useType bool) outputs.Outputer {
 
+	if useType {
+		topic = "%{[type]}"
+	}
 	config := map[string]interface{}{
-		"hosts":    []string{getTestKafkaHost()},
-		"timeout":  "1s",
-		"topic":    topic,
-		"use_type": useType,
+		"hosts":   []string{getTestKafkaHost()},
+		"timeout": "1s",
+		"topic":   topic,
 	}
 
 	cfg, err := common.NewConfigFrom(config)
@@ -69,7 +73,7 @@ func newTestKafkaOutput(t *testing.T, topic string, useType bool) outputs.Output
 		t.Fatal(err)
 	}
 
-	output, err := New(cfg, 0)
+	output, err := New("libbeat", cfg, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -129,12 +133,12 @@ func TestOneMessageToKafka(t *testing.T) {
 	topic := fmt.Sprintf("test-libbeat-%s", id)
 
 	kafka := newTestKafkaOutput(t, topic, false)
-	event := common.MapStr{
+	event := outputs.Data{Event: common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"host":       "test-host",
 		"type":       "log",
 		"message":    id,
-	}
+	}}
 	if err := kafka.PublishEvent(nil, testOptions, event); err != nil {
 		t.Fatal(err)
 	}
@@ -159,12 +163,12 @@ func TestUseType(t *testing.T) {
 	logType := fmt.Sprintf("log-type-%s", id)
 
 	kafka := newTestKafkaOutput(t, "", true)
-	event := common.MapStr{
+	event := outputs.Data{Event: common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"host":       "test-host",
 		"type":       logType,
 		"message":    id,
-	}
+	}}
 	if err := kafka.PublishEvent(nil, testOptions, event); err != nil {
 		t.Fatal(err)
 	}

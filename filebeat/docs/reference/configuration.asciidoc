@@ -1,25 +1,27 @@
 
 [[filebeat-configuration-details]]
-== Configuration Options
+== Configuration Options (Reference)
 
 Before modifying configuration settings, make sure you've completed the
 <<filebeat-configuration,configuration steps>> in the Getting Started.
 
-The Filebeat configuration file uses http://yaml.org/[YAML] for its syntax.
+The {beatname_uc} configuration file, +{beatname_lc}.yml+, uses http://yaml.org/[YAML] for its syntax.
 The configuration options are described in the following sections. After changing
-configuration settings, you need to restart Filebeat to pick up the changes.
+configuration settings, you need to restart {beatname_uc} to pick up the changes.
 
 * <<configuration-filebeat-options>>
+* <<configuration-global-options>>
+* <<configuration-general>>
+* <<configuration-processors>>
 * <<elasticsearch-output>>
 * <<logstash-output>>
-* <<redis-output>>
 * <<kafka-output>>
+* <<redis-output>>
 * <<file-output>>
 * <<console-output>>
-* <<configuration-shipper>>
+* <<configuration-output-tls>>
 * <<configuration-path>>
 * <<configuration-logging>>
-* <<configuration-run-options>>
 
 include::configuration/filebeat-options.asciidoc[]
 
