@@ -307,19 +307,3 @@ func randMulti(batches, n int, event common.MapStr) []modetest.EventInfo {
 	}
 	return out
 }
-
-func randString(length int) string {
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = randChar()
-	}
-	return string(b)
-}
-
-func randChar() byte {
-	start, end := 'a', 'z'
-	if rand.Int31n(2) == 1 {
-		start, end = 'A', 'Z'
-	}
-	return byte(rand.Int31n(end-start+1) + start)
-}
