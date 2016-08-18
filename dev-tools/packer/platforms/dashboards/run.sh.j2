@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# this is executed in the docker fpm image
+set -e
+cd /build
+
+# add SNAPSHOT if it was requested
+VERSION={{.version}}
+if [ "$SNAPSHOT" = "yes" ]; then
+    VERSION="${VERSION}-SNAPSHOT"
+fi
+
+mkdir /beats-dashboards-${VERSION}
+cp -a dashboards/. /beats-dashboards-${VERSION}/
+echo "$BUILDID" > /beats-dashboards-${VERSION}/.build_hash.txt
+
+mkdir -p upload
+zip -r upload/beats-dashboards-${VERSION}.zip /beats-dashboards-${VERSION}
+echo "Created upload/beats-dashboards-${VERSION}.zip"
+
+cd upload
+sha1sum beats-dashboards-${VERSION}.zip > beats-dashboards-${VERSION}.zip.sha1.txt
+echo "Created upload/beats-dashboards-${VERSION}.zip.sha1.txt"
