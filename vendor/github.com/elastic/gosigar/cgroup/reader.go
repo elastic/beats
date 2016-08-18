@@ -88,10 +88,10 @@ func (r *Reader) GetStatsForProcess(pid int) (*Stats, error) {
 
 		mounts[interestedSubsystem] = mount{
 			subsystem:  interestedSubsystem,
-			mountpoint: filepath.Join(r.rootfsMountpoint, subsystemMount),
+			mountpoint: subsystemMount,
 			path:       path,
 			id:         filepath.Base(path),
-			fullPath:   filepath.Join(r.rootfsMountpoint, subsystemMount, path),
+			fullPath:   filepath.Join(subsystemMount, path),
 		}
 	}
 
