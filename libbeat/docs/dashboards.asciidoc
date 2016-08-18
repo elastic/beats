@@ -6,8 +6,6 @@ the perfect dashboards for your needs. But this flexibility can be a bit
 overwhelming at the beginning, so we have created some sample dashboards to get you
 started and to demonstrate what is possible based on the Beats data.
 
-NOTE: The Beats dashboards require Kibana 4 or later.
-
 Each Beat comes packaged with a script that you can use to import the example dashboards,
 visualizations, and searches for that Beat. The script also creates index patterns, such as 
 `packetbeat-*` for Packetbeat, `metricbeat-*` for Metricbeat, and so on. 
@@ -95,6 +93,8 @@ the loading process of our sample dashboards. It only affects brand new
 installations of Kibana 5.0.0-alpha4 that don’t yet have any indices defined. 
 To resolve this error, see the "Known issue and workaround" section
 https://www.elastic.co/blog/beats-5-0-0-alpha4-released[here].
+
+This issue is resolved in 5.0.0-alpha5.
 ====
 
 image:./images/kibana-created-indexes.png[Kibana configured indexes]

@@ -81,6 +81,13 @@ class Test(BaseTest):
         assert exit_code == 0
         assert self.log_contains("Config OK") is True
 
+    def test_version_simple(self):
+        """
+        Tests -version prints a version and exits.
+        """
+        self.start_beat(extra_args=["-version"]).check_wait()
+        assert self.log_contains("beat version") is True
+
     def test_version(self):
         """
         Checks if version param works

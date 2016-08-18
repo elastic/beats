@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
@@ -76,13 +76,13 @@ func newAsyncTestDriver(client mode.AsyncProtocolClient) *testAsyncDriver {
 			case driverCmdClose:
 				driver.client.Close()
 			case driverCmdPublish:
-				cb := func(events []common.MapStr, err error) {
-					n := len(cmd.events) - len(events)
+				cb := func(data []outputs.Data, err error) {
+					n := len(cmd.data) - len(data)
 					ret := testClientReturn{n, err}
 					resp <- ret
 				}
 
-				err := driver.client.AsyncPublishEvents(cb, cmd.events)
+				err := driver.client.AsyncPublishEvents(cb, cmd.data)
 				if err != nil {
 					driver.returns = append(driver.returns, testClientReturn{0, err})
 				} else {
@@ -114,8 +114,8 @@ func (t *testAsyncDriver) Stop() {
 	}
 }
 
-func (t *testAsyncDriver) Publish(events []common.MapStr) {
-	t.ch <- testDriverCommand{code: driverCmdPublish, events: events}
+func (t *testAsyncDriver) Publish(data []outputs.Data) {
+	t.ch <- testDriverCommand{code: driverCmdPublish, data: data}
 }
 
 func (t *testAsyncDriver) Returns() []testClientReturn {

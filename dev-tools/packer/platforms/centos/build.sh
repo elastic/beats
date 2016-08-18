@@ -8,16 +8,16 @@ ARCHDIR=${BASEDIR}/../../
 # executed from the top directory
 runid=centos-$BEAT-$ARCH
 
-cat beats/$BEAT.yml ${ARCHDIR}/archs/$ARCH.yml version.yml > build/settings-$runid.yml
-gotpl ${BASEDIR}/run.sh.j2 < build/settings-$runid.yml > build/run-$runid.sh
-chmod +x build/run-$runid.sh
-gotpl ${BASEDIR}/init.j2 < build/settings-$runid.yml > build/$runid.init
-gotpl ${BASEDIR}/systemd.j2 < build/settings-$runid.yml > build/$runid.service
-gotpl ${BASEDIR}/beatname.sh.j2 < build/settings-$runid.yml > build/beatname-$runid.sh
-chmod +x build/beatname-$runid.sh
+cat ${BUILD_DIR}/package.yml ${ARCHDIR}/archs/$ARCH.yml ${ARCHDIR}/version.yml > ${BUILD_DIR}/settings-$runid.yml
+gotpl ${BASEDIR}/run.sh.j2 < ${BUILD_DIR}/settings-$runid.yml > ${BUILD_DIR}/run-$runid.sh
+chmod +x ${BUILD_DIR}/run-$runid.sh
+gotpl ${BASEDIR}/init.j2 < ${BUILD_DIR}/settings-$runid.yml > ${BUILD_DIR}/$runid.init
+gotpl ${BASEDIR}/systemd.j2 < ${BUILD_DIR}/settings-$runid.yml > ${BUILD_DIR}/$runid.service
+gotpl ${BASEDIR}/beatname.sh.j2 < ${BUILD_DIR}/settings-$runid.yml > ${BUILD_DIR}/beatname-$runid.sh
+chmod +x ${BUILD_DIR}/beatname-$runid.sh
 
-docker run --rm -v `pwd`/build:/build \
+docker run --rm -v ${BUILD_DIR}:/build \
     -e BUILDID=$BUILDID -e SNAPSHOT=$SNAPSHOT -e RUNID=$runid \
     tudorg/fpm /build/run-$runid.sh
 
-rm build/settings-$runid.yml build/run-$runid.sh
+rm ${BUILD_DIR}/settings-$runid.yml ${BUILD_DIR}/run-$runid.sh

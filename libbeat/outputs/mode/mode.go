@@ -7,7 +7,6 @@ import (
 	"expvar"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -30,10 +29,10 @@ type ConnectionMode interface {
 
 	// PublishEvents will send all events (potentially asynchronous) to its
 	// clients.
-	PublishEvents(sig op.Signaler, opts outputs.Options, events []common.MapStr) error
+	PublishEvents(sig op.Signaler, opts outputs.Options, data []outputs.Data) error
 
 	// PublishEvent will send an event to its clients.
-	PublishEvent(sig op.Signaler, opts outputs.Options, event common.MapStr) error
+	PublishEvent(sig op.Signaler, opts outputs.Options, data outputs.Data) error
 }
 
 type Connectable interface {
@@ -58,11 +57,11 @@ type ProtocolClient interface {
 	// must be set.
 	// PublishEvents is free to publish only a subset of given events, even in
 	// error case. On return nextEvents contains all events not yet published.
-	PublishEvents(events []common.MapStr) (nextEvents []common.MapStr, err error)
+	PublishEvents(data []outputs.Data) (nextEvents []outputs.Data, err error)
 
 	// PublishEvent sends one event to the clients sink. On failure and error is
 	// returned.
-	PublishEvent(event common.MapStr) error
+	PublishEvent(data outputs.Data) error
 }
 
 // AsyncProtocolClient interface is a output plugin specfic client implementation
@@ -70,9 +69,9 @@ type ProtocolClient interface {
 type AsyncProtocolClient interface {
 	Connectable
 
-	AsyncPublishEvents(cb func([]common.MapStr, error), events []common.MapStr) error
+	AsyncPublishEvents(cb func([]outputs.Data, error), data []outputs.Data) error
 
-	AsyncPublishEvent(cb func(error), event common.MapStr) error
+	AsyncPublishEvent(cb func(error), data outputs.Data) error
 }
 
 var (

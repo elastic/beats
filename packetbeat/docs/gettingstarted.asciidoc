@@ -165,6 +165,10 @@ packetbeat.protocols.thrift:
 
 packetbeat.protocols.mongodb:
   ports: [27017]
+
+packetbeat.protocols.cassandra:
+  ports: [9042]
+
 ----------------------------------------------------------------------
 +
 . Set the IP address and port where Packetbeat can find the Elasticsearch

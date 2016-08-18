@@ -164,9 +164,9 @@ func (lj *logstash) Close() error {
 func (lj *logstash) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
-	return lj.mode.PublishEvent(signaler, opts, event)
+	return lj.mode.PublishEvent(signaler, opts, data)
 }
 
 // BulkPublish implements the BulkOutputer interface pushing a bulk of events
@@ -174,7 +174,7 @@ func (lj *logstash) PublishEvent(
 func (lj *logstash) BulkPublish(
 	trans op.Signaler,
 	opts outputs.Options,
-	events []common.MapStr,
+	data []outputs.Data,
 ) error {
-	return lj.mode.PublishEvents(trans, opts, events)
+	return lj.mode.PublishEvents(trans, opts, data)
 }

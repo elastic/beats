@@ -205,6 +205,72 @@
                   type: integer
                   description: >
                     Total.
+- key: beats
+  title: "beats"
+  description: >
+    beats Module
+  short_config: false
+  fields:
+    - name: beats
+      type: group
+      description: >
+      fields:
+        - name: filebeat
+          type: group
+          description: >
+            experimental[]
+
+            filebeat metrics
+          fields:
+            - name: harvesters
+              type: group
+              description: >
+                Harvester metrics for all harvesters combined.
+              fields:
+                - name: started
+                  type: long
+                  description: >
+                    Total number of started harvesters
+                - name: closed
+                  type: long
+                  description: >
+                    Total number of closed harvesters
+                - name: running
+                  type: long
+                  description: >
+                    Number of currently running harvesters
+                - name: files
+                  type: group
+                  description: >
+                    File handling related statistics
+                  fields:
+                    - name: open
+                      type: long
+                      description: >
+                        Currently open files
+                    - name: truncated
+                      type: long
+                      description: >
+                        Number of files which were detected by the harvester as truncated and reading started from scratch.
+            - name: prospectors
+              type: group
+              description: >
+                Prospector metrics for all prospectors combined.
+              fields:
+                - name: log_files
+                  type: group
+                  description: >
+                    Log files related stastics.
+                  fields:
+                    - name: renamed
+                      type: long
+                      description: >
+                        Total number of files for which renaming was detected
+                    - name: truncated
+                      type: long
+                      description: >
+                        Number of files which were detected by the prospector as truncated and reading started from scratch.
+
 - key: mongodb
   title: "MongoDB"
   description: >
@@ -727,6 +793,192 @@
               type: integer
               description: >
                 The current number of idle client connections waiting for a request.
+- key: postgresql
+  title: "PostgreSQL"
+  description: >
+    Metrics collected from PostgreSQL servers.
+  short_config: false
+  fields:
+    - name: postgresql
+      type: group
+      description: >
+        PostgreSQL metrics.
+      fields:
+        - name: activity
+          type: group
+          description: >
+            One document per server process, showing information related to the current
+            activity of that process, such as state and current query. Collected by
+            querying pg_stat_activity.
+          fields:
+            - name: database.oid
+              type: long
+              description: >
+                OID of the database this backend is connected to.
+            - name: database.name
+              type: keyword
+              description: >
+                Name of the database this backend is connected to.
+            - name: pid
+              type: integer
+              description: >
+                Process ID of this backend.
+            - name: user.id
+              type: long
+              description: >
+                OID of the user logged into this backend.
+            - name: user.name
+              description: >
+                Name of the user logged into this backend.
+            - name: application_name
+              description: >
+                Name of the application that is connected to this backend.
+            - name: client.address
+              description: >
+                IP address of the client connected to this backend.
+            - name: client.hostname
+              description: >
+                Host name of the connected client, as reported by a reverse DNS lookup of client_addr.
+            - name: client.port
+              type: integer
+              description: >
+                TCP port number that the client is using for communication with this
+                backend, or -1 if a Unix socket is used.
+            - name: backend_start
+              type: date
+              description: >
+                Time when this process was started, i.e., when the client connected to
+                the server.
+            - name: transaction_start
+              type: date
+              description: >
+                Time when this process' current transaction was started.
+            - name: query_start
+              type: date
+              description: >
+                Time when the currently active query was started, or if state is not
+                active, when the last query was started.
+            - name: state_change
+              type: date
+              description: >
+                Time when the state was last changed.
+            - name: waiting
+              type: boolean
+              description: >
+                True if this backend is currently waiting on a lock.
+            - name: state
+              description: >
+                Current overall state of this backend. Possible values are:
+        
+                  * active: The backend is executing a query.
+                  * idle: The backend is waiting for a new client command.
+                  * idle in transaction: The backend is in a transaction, but is not
+                    currently executing a query.
+                  * idle in transaction (aborted): This state is similar to idle in
+                    transaction, except one of the statements in the transaction caused
+                    an error.
+                  * fastpath function call: The backend is executing a fast-path function.
+                  * disabled: This state is reported if track_activities is disabled in this backend.
+            - name: query
+              description: >
+                Text of this backend's most recent query. If state is active this field
+                shows the currently executing query. In all other states, it shows the
+                last query that was executed.
+
+        - name: database
+          type: group
+          description: >
+            One row per database, showing database-wide statistics. Collected by querying
+            pg_stat_database
+          fields:
+            - name: oid
+              type: long
+              description: >
+                OID of the database this backend is connected to.
+            - name: name
+              type: keyword
+              description: >
+                Name of the database this backend is connected to.
+            - name: number_of_backends
+              type: long
+              description: >
+                Number of backends currently connected to this database.
+            - name: transactions.commit
+              type: long
+              description: >
+                Number of transactions in this database that have been committed.
+            - name: transactions.rollback
+              type: long
+              description: >
+                Number of transactions in this database that have been rolled back.
+            - name: blocks.read
+              type: long
+              description: >
+                Number of disk blocks read in this database.
+            - name: blocks.hit
+              type: long
+              description: >
+                Number of times disk blocks were found already in the buffer cache, so
+                that a read was not necessary (this only includes hits in the PostgreSQL
+                buffer cache, not the operating system's file system cache).
+            - name: blocks.time.read.ms
+              type: long
+              description: >
+                Time spent reading data file blocks by backends in this database, in
+                milliseconds.
+            - name: blocks.time.write.ms
+              type: long
+              description: >
+                Time spent writing data file blocks by backends in this database, in
+                milliseconds.
+            - name: rows.returned
+              type: long
+              description: >
+                Number of rows returned by queries in this database.
+            - name: rows.fetched
+              type: long
+              description: >
+                Number of rows fetched by queries in this database.
+            - name: rows.inserted
+              type: long
+              description: >
+                Number of rows inserted by queries in this database.
+            - name: rows.updated
+              type: long
+              description: >
+                Number of rows updated by queries in this database.
+            - name: rows.deleted
+              type: long
+              description: >
+                Number of rows deleted by queries in this database.
+            - name: conflicts
+              type: long
+              description: >
+                Number of queries canceled due to conflicts with recovery in this
+                database.
+            - name: temporary.files
+              type: long
+              description: >
+                Number of temporary files created by queries in this database. All
+                temporary files are counted, regardless of why the temporary file was
+                created (e.g., sorting or hashing), and regardless of the log_temp_files
+                setting.
+            - name: temporary.bytes
+              type: long
+              description: >
+                Total amount of data written to temporary files by queries in this
+                database. All temporary files are counted, regardless of why the
+                temporary file was created, and regardless of the log_temp_files
+                setting.
+            - name: deadlocks
+              type: long
+              description: >
+                Number of deadlocks detected in this database.
+            - name: stats_reset
+              type: date
+              description: >
+                Time at which these statistics were last reset.
+
 - key: redis
   title: "Redis"
   description: >
@@ -1709,10 +1961,30 @@
                   format: bytes
                   description: >
                     The shared memory the process uses.
+            - name: fd
+              type: group
+              description: >
+                File descriptor usage metrics. This set of metrics is available for
+                Linux and FreeBSD.
+              prefix: "[float]"
+              fields:
+                - name: open
+                  type: long
+                  description: The number of file descriptors open by the process.
+                - name: limit.soft
+                  type: long
+                  description: >
+                    The soft limit on the number of file descriptors opened by the
+                    process. The soft limit can be changed by the process at any time.
+                - name: limit.hard
+                  type: long
+                  description: >
+                    The hard limit on the number of file descriptors opened by the
+                    process. The hard limit can only be raised by root.
             - name: cgroup
               type: group
               description: >
-                Metrics and limits from the cgroup of which the task is a member.
+                experimental[] Metrics and limits from the cgroup of which the task is a member.
                 cgroup metrics are reported when the process has membership in a
                 non-root cgroup. These metrics are only available on Linux.
               fields:
@@ -1796,7 +2068,7 @@
                         not allowed to run because they have exhausted all of the
                         available time as specified by their quota).
 
-                    - name: stats.throttled.nanos
+                    - name: stats.throttled.ns
                       type: long
                       description: >
                         The total time duration (in nanoseconds) for which tasks in a
@@ -1816,17 +2088,17 @@
                         Path to the cgroup relative to the cgroup subsystem's
                         mountpoint.
 
-                    - name: total.nanos
+                    - name: total.ns
                       type: long
                       description: >
                         Total CPU time in nanoseconds consumed by all tasks in the
                         cgroup.
 
-                    - name: stats.user.nanos
+                    - name: stats.user.ns
                       type: long
                       description: CPU time consumed by tasks in user mode.
 
-                    - name: stats.system.nanos
+                    - name: stats.system.ns
                       type: long
                       description: CPU time consumed by tasks in user (kernel) mode.
 

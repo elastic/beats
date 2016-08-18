@@ -44,7 +44,10 @@ metricbeat.modules:
   processes: ['.*']
 
   # if true, exports the CPU usage in ticks, together with the percentage values
-  cpu_ticks: false
+  #cpu_ticks: false
+
+  # EXPERIMENTAL: cgroups can be enabled for the process metricset.
+  #cgroups: false
 
 #------------------------------- Apache Module -------------------------------
 #- module: apache
@@ -63,6 +66,17 @@ metricbeat.modules:
 
   # Password of hosts. Empty by default
   #password: test123
+
+#-------------------------------- beats Module -------------------------------
+#- module: beats
+  #metricsets: ["filebeat"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:6060"]
+
+  # Path to httpprof variables
+  #vars_path: /debug/vars
+
 
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
@@ -102,6 +116,24 @@ metricbeat.modules:
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
+
+#----------------------------- PostgreSQL Module -----------------------------
+#- module: postgresql
+  #metricsets:
+    # Stats about every PostgreSQL database
+    #- database
+
+    # Stats about every PostgreSQL process
+    #-activity
+  #enabled: true
+  #period: 10s
+
+  # The host must be passed as PostgreSQL DSN. Example:
+  # postgres://pqgotest:password@localhost:5432?sslmode=disable
+  # The available parameters are documented here:
+  # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
+  #hosts: ["postgres://postgres@localhost:5432"]
+
 
 #-------------------------------- Redis Module -------------------------------
 #- module: redis

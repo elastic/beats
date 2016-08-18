@@ -112,8 +112,8 @@ func (w *syncWorker) sendLoop() (done bool) {
 func (w *syncWorker) onMessage(msg eventsMessage) error {
 	client := w.client
 
-	if msg.event != nil {
-		err := client.PublishEvent(msg.event)
+	if msg.datum.Event != nil {
+		err := client.PublishEvent(msg.datum)
 		if err != nil {
 			if msg.attemptsLeft > 0 {
 				msg.attemptsLeft--
@@ -122,7 +122,7 @@ func (w *syncWorker) onMessage(msg eventsMessage) error {
 			return err
 		}
 	} else {
-		events := msg.events
+		events := msg.data
 		total := len(events)
 
 		for len(events) > 0 {
@@ -142,7 +142,7 @@ func (w *syncWorker) onMessage(msg eventsMessage) error {
 
 				if err != mode.ErrTempBulkFailure {
 					// retry non-published subset of events in batch
-					msg.events = events
+					msg.data = events
 					w.onFail(msg, err)
 					return err
 				}

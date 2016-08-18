@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-amqp>>
 * <<exported-fields-beat>>
+* <<exported-fields-cassandra>>
 * <<exported-fields-common>>
 * <<exported-fields-dns>>
 * <<exported-fields-flows_event>>
@@ -399,6 +400,44 @@ Arbitrary tags that can be set per Beat and per transaction type.
 type: dict
 
 Contains user configurable fields.
+
+
+[[exported-fields-cassandra]]
+== Cassandra Fields
+
+Cassandra v4/3 specific event fields.
+
+
+[float]
+=== cassandra_request
+
+type: dict
+
+Cassandra request field table.
+
+
+[float]
+=== cassandra_request.request_headers
+
+type: dict
+
+Cassandra request header field table.
+
+
+[float]
+=== cassandra_response
+
+type: dict
+
+Cassandra response field table.
+
+
+[float]
+=== cassandra_response.response_headers
+
+type: dict
+
+Cassandra response header field table.
 
 
 [[exported-fields-common]]
@@ -1114,23 +1153,26 @@ optional TCP connection id
 HTTP-specific event fields.
 
 
+[float]
+== http Fields
+
+Information about the HTTP request and response.
+
 
 [float]
-=== http.code
+== request Fields
 
-example: 404
+HTTP request
 
-The HTTP status code.
-
-[float]
-=== http.phrase
-
-example: Not found.
-
-The HTTP status phrase.
 
 [float]
-=== http.request_headers
+=== http.request.params
+
+The query parameters or form values. The query parameters are available in the Request-URI and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
+
+
+[float]
+=== http.request.headers
 
 type: dict
 
@@ -1138,7 +1180,34 @@ A map containing the captured header fields from the request. Which headers to c
 
 
 [float]
-=== http.response_headers
+=== http.request.body
+
+type: text
+
+The body of the HTTP request.
+
+[float]
+== response Fields
+
+HTTP response
+
+
+[float]
+=== http.response.code
+
+example: 404
+
+The HTTP status code.
+
+[float]
+=== http.response.phrase
+
+example: Not found.
+
+The HTTP status phrase.
+
+[float]
+=== http.response.headers
 
 type: dict
 
@@ -1146,12 +1215,9 @@ A map containing the captured header fields from the response. Which headers to 
 
 
 [float]
-=== http.content_length
+=== http.response.body
 
-type: long
-
-The value of the Content-Length header if present.
-
+The body of the HTTP response.
 
 [[exported-fields-icmp]]
 == ICMP Fields

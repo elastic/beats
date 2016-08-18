@@ -1,0 +1,10 @@
+- key: beats
+  title: "beats"
+  description: >
+    beats Module
+  short_config: false
+  fields:
+    - name: beats
+      type: group
+      description: >
+      fields:

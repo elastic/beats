@@ -52,7 +52,12 @@ func (ps *produceSet) add(msg *ProducerMessage) error {
 	}
 
 	set.msgs = append(set.msgs, msg)
-	set.setToSend.addMessage(&Message{Codec: CompressionNone, Key: key, Value: val})
+	msgToSend := &Message{Codec: CompressionNone, Key: key, Value: val}
+	if ps.parent.conf.Version.IsAtLeast(V0_10_0_0) && !msg.Timestamp.IsZero() {
+		msgToSend.Timestamp = msg.Timestamp
+		msgToSend.Version = 1
+	}
+	set.setToSend.addMessage(msgToSend)
 
 	size := producerMessageOverhead + len(key) + len(val)
 	set.bufferBytes += size
@@ -66,6 +71,9 @@ func (ps *produceSet) buildRequest() *ProduceRequest {
 	req := &ProduceRequest{
 		RequiredAcks: ps.parent.conf.Producer.RequiredAcks,
 		Timeout:      int32(ps.parent.conf.Producer.Timeout / time.Millisecond),
+	}
+	if ps.parent.conf.Version.IsAtLeast(V0_10_0_0) {
+		req.Version = 2
 	}
 
 	for topic, partitionSet := range ps.msgs {

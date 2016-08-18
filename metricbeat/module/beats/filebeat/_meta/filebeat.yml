@@ -1,0 +1,11 @@
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /var/log/*.log
+
+output.file:
+  enabled: true
+  path: "/tmp/filebeat"
+
+logging.level: debug
+logging.selectors: ["*"]

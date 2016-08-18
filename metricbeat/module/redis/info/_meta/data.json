@@ -85,7 +85,7 @@
                 "run_id": "6ed624659e20543f023669f6f117db8a7a1be908",
                 "tcp_port": 6379,
                 "uptime": 488,
-                "version": "3.2.0"
+                "version": "3.2.3"
             },
             "stats": {
                 "connections": {

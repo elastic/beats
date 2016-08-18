@@ -43,6 +43,10 @@ func parseCgroupParamKeyValue(t string) (string, uint64, error) {
 func parseUintFromFile(path ...string) (uint64, error) {
 	value, err := ioutil.ReadFile(filepath.Join(path...))
 	if err != nil {
+		// Not all features are implemented/enabled by each OS.
+		if os.IsNotExist(err) {
+			return 0, nil
+		}
 		return 0, err
 	}
 
@@ -171,6 +175,10 @@ func SubsystemMountpoints(rootfsMountpoint string, subsystems map[string]struct{
 		}
 
 		if mount.filesystemType != "cgroup" {
+			continue
+		}
+
+		if !strings.HasPrefix(mount.mountpoint, rootfsMountpoint) {
 			continue
 		}
 

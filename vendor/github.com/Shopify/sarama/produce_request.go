@@ -19,17 +19,18 @@ const (
 type ProduceRequest struct {
 	RequiredAcks RequiredAcks
 	Timeout      int32
+	Version      int16 // v1 requires Kafka 0.9, v2 requires Kafka 0.10
 	msgSets      map[string]map[int32]*MessageSet
 }
 
-func (p *ProduceRequest) encode(pe packetEncoder) error {
-	pe.putInt16(int16(p.RequiredAcks))
-	pe.putInt32(p.Timeout)
-	err := pe.putArrayLength(len(p.msgSets))
+func (r *ProduceRequest) encode(pe packetEncoder) error {
+	pe.putInt16(int16(r.RequiredAcks))
+	pe.putInt32(r.Timeout)
+	err := pe.putArrayLength(len(r.msgSets))
 	if err != nil {
 		return err
 	}
-	for topic, partitions := range p.msgSets {
+	for topic, partitions := range r.msgSets {
 		err = pe.putString(topic)
 		if err != nil {
 			return err
@@ -54,13 +55,13 @@ func (p *ProduceRequest) encode(pe packetEncoder) error {
 	return nil
 }
 
-func (p *ProduceRequest) decode(pd packetDecoder) error {
+func (r *ProduceRequest) decode(pd packetDecoder, version int16) error {
 	requiredAcks, err := pd.getInt16()
 	if err != nil {
 		return err
 	}
-	p.RequiredAcks = RequiredAcks(requiredAcks)
-	if p.Timeout, err = pd.getInt32(); err != nil {
+	r.RequiredAcks = RequiredAcks(requiredAcks)
+	if r.Timeout, err = pd.getInt32(); err != nil {
 		return err
 	}
 	topicCount, err := pd.getArrayLength()
@@ -70,7 +71,7 @@ func (p *ProduceRequest) decode(pd packetDecoder) error {
 	if topicCount == 0 {
 		return nil
 	}
-	p.msgSets = make(map[string]map[int32]*MessageSet)
+	r.msgSets = make(map[string]map[int32]*MessageSet)
 	for i := 0; i < topicCount; i++ {
 		topic, err := pd.getString()
 		if err != nil {
@@ -80,7 +81,7 @@ func (p *ProduceRequest) decode(pd packetDecoder) error {
 		if err != nil {
 			return err
 		}
-		p.msgSets[topic] = make(map[int32]*MessageSet)
+		r.msgSets[topic] = make(map[int32]*MessageSet)
 		for j := 0; j < partitionCount; j++ {
 			partition, err := pd.getInt32()
 			if err != nil {
@@ -99,47 +100,58 @@ func (p *ProduceRequest) decode(pd packetDecoder) error {
 			if err != nil {
 				return err
 			}
-			p.msgSets[topic][partition] = msgSet
+			r.msgSets[topic][partition] = msgSet
 		}
 	}
 	return nil
 }
 
-func (p *ProduceRequest) key() int16 {
+func (r *ProduceRequest) key() int16 {
 	return 0
 }
 
-func (p *ProduceRequest) version() int16 {
-	return 0
+func (r *ProduceRequest) version() int16 {
+	return r.Version
 }
 
-func (p *ProduceRequest) AddMessage(topic string, partition int32, msg *Message) {
-	if p.msgSets == nil {
-		p.msgSets = make(map[string]map[int32]*MessageSet)
+func (r *ProduceRequest) requiredVersion() KafkaVersion {
+	switch r.Version {
+	case 1:
+		return V0_9_0_0
+	case 2:
+		return V0_10_0_0
+	default:
+		return minVersion
+	}
+}
+
+func (r *ProduceRequest) AddMessage(topic string, partition int32, msg *Message) {
+	if r.msgSets == nil {
+		r.msgSets = make(map[string]map[int32]*MessageSet)
 	}
 
-	if p.msgSets[topic] == nil {
-		p.msgSets[topic] = make(map[int32]*MessageSet)
+	if r.msgSets[topic] == nil {
+		r.msgSets[topic] = make(map[int32]*MessageSet)
 	}
 
-	set := p.msgSets[topic][partition]
+	set := r.msgSets[topic][partition]
 
 	if set == nil {
 		set = new(MessageSet)
-		p.msgSets[topic][partition] = set
+		r.msgSets[topic][partition] = set
 	}
 
 	set.addMessage(msg)
 }
 
-func (p *ProduceRequest) AddSet(topic string, partition int32, set *MessageSet) {
-	if p.msgSets == nil {
-		p.msgSets = make(map[string]map[int32]*MessageSet)
+func (r *ProduceRequest) AddSet(topic string, partition int32, set *MessageSet) {
+	if r.msgSets == nil {
+		r.msgSets = make(map[string]map[int32]*MessageSet)
 	}
 
-	if p.msgSets[topic] == nil {
-		p.msgSets[topic] = make(map[int32]*MessageSet)
+	if r.msgSets[topic] == nil {
+		r.msgSets[topic] = make(map[int32]*MessageSet)
 	}
 
-	p.msgSets[topic][partition] = set
+	r.msgSets[topic][partition] = set
 }
