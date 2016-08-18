@@ -67,6 +67,17 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
+#-------------------------------- beats Module -------------------------------
+#- module: beats
+  #metricsets: ["filebeat"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:6060"]
+
+  # Path to httpprof variables
+  #vars_path: /debug/vars
+
+
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
   #metricsets: ["status"]
