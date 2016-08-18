@@ -79,6 +79,7 @@ package: beats-dashboards
 	$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package || exit 1;)
 
 	# build the dashboards package
+	mkdir -p build/upload/
 	BUILD_DIR=${shell pwd}/build SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards ${shell pwd}/build/upload/build_id.txt
 	mv build/upload build/dashboards-upload
 
