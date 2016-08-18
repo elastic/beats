@@ -316,10 +316,9 @@ env-logs:
 # Installs the files that need to get to the home path on installations
 HOME_PREFIX?=/tmp/${BEATNAME}
 .PHONY: install-home
-install-home: build-dashboards 
+install-home:
 	install -d -m 755 ${HOME_PREFIX}/scripts/
 	install -m 755 ${ES_BEATS}/libbeat/scripts/migrate_beat_config_1_x_to_5_0.py ${HOME_PREFIX}/scripts/
-	install -m 755 ${ES_BEATS}/libbeat/dashboards/import_dashboards ${HOME_PREFIX}/scripts/
 
 # Prepares for packaging. Builds binaries and creates homedir data
 .PHONY: prepare-package
@@ -369,11 +368,13 @@ prepare-package-cgo:
 		${BEAT_DIR}
 
 # Prepares images for packaging
+.PHONY: package-setup
 package-setup:
 	$(MAKE) -C ${ES_BEATS}/dev-tools/packer deps images
 
 # Create binary packages for the beat.
 # This requires that `package-setup` was run before once.
+.PHONY: package
 package:
 
 	echo "Start building packages for ${BEATNAME}"
@@ -395,6 +396,3 @@ package:
 	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_DIR=${BEAT_DIR} BUILD_DIR=${BUILD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${BUILD_DIR}/upload/build_id.txt
 
 	echo "Finished packages for ${BEATNAME}"
-
-build-dashboards: ${ES_BEATS}/libbeat/dashboards/import_dashboards.go
-	go build -o ${ES_BEATS}/libbeat/dashboards/import_dashboards ${ES_BEATS}/libbeat/dashboards/import_dashboards.go

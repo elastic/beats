@@ -18,6 +18,26 @@ PREFIX=/build
 mkdir -p $PREFIX/homedir
 make install-home HOME_PREFIX=$PREFIX/homedir
 
+# Compile the import_dashboards binary for the requested targets.
+if [ -d $BEAT_PATH/../libbeat/ ]; then
+	# official Beats have libbeat in the top level folder
+	LIBBEAT_PATH=$BEAT_PATH/../libbeat/
+elif [ -d $BEAT_PATH/vendor/github.com/elastic/beats/libbeat/ ]; then
+	# community Beats have libbeat vendored
+	LIBBEAT_PATH=$BEAT_PATH/vendor/github.com/elastic/beats/libbeat/
+else
+	echo "Couldn't find the libbeat location"
+	exit 1
+fi
+
+for TARGET in $TARGETS; do
+	echo "Compiling import_dashboards for $TARGET"
+	XGOOS=`echo $TARGET | cut -d '/' -f 1`
+	XGOARCH=`echo $TARGET | cut -d '/' -f 2`
+
+	GOOS=$XGOOS GOARCH=$XGOARCH go build -o $PREFIX/import_dashboards-$XGOOS-$XGOARCH $LIBBEAT_PATH/dashboards/import_dashboards.go
+done
+
 if [ -n "BUILDID" ]; then
     echo "$BUILDID" > $PREFIX/homedir/.build_hash.txt
 fi
