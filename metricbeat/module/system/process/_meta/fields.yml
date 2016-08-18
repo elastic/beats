@@ -110,6 +110,8 @@
     - name: cgroup
       type: group
       description: >
+        experimental[]
+
         Metrics and limits from the cgroup of which the task is a member.
         cgroup metrics are reported when the process has membership in a
         non-root cgroup. These metrics are only available on Linux.

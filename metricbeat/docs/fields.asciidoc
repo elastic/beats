@@ -3193,7 +3193,7 @@ The hard limit on the number of file descriptors opened by the process. The hard
 [float]
 == cgroup Fields
 
-Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.
+experimental[] Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.
 
 
 

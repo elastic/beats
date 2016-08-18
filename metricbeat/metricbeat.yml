@@ -43,9 +43,6 @@ metricbeat.modules:
   period: 10s
   processes: ['.*']
 
-  # if true, exports the CPU usage in ticks, together with the percentage values
-  cpu_ticks: false
-
 
 
 #================================ General =====================================
