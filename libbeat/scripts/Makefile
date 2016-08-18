@@ -396,3 +396,9 @@ package:
 	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_DIR=${BEAT_DIR} BUILD_DIR=${BUILD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${BUILD_DIR}/upload/build_id.txt
 
 	echo "Finished packages for ${BEATNAME}"
+
+package-dashboards:
+	mkdir -p ${BUILD_DIR}
+	cp -r etc/kibana ${BUILD_DIR}/dashboards
+	# build the dashboards package
+	BEATNAME=${BEATNAME} BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C ${ES_BEATS}/dev-tools/packer package-dashboards ${shell pwd}/build/upload/build_id.txt
