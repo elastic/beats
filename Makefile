@@ -74,13 +74,18 @@ docs:
 	sh libbeat/scripts/build_docs.sh ${PROJECTS}
 
 .PHONY: package
-package:
+package: beats-dashboards
 	$(MAKE) -C libbeat package-setup
 	$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package || exit 1;)
+
+	# build the dashboards package
+	BUILD_DIR=${shell pwd}/build SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards ${shell pwd}/build/upload/build_id.txt
+	mv build/upload build/dashboards-upload
 
 	# Copy build files over to top build directory
 	mkdir -p build/upload/
 	$(foreach var,$(BEATS),cp -r $(var)/build/upload/ build/upload/$(var)  || exit 1;)
+	cp -r build/dashboards-upload build/upload/dashboards
 
 # Upload nightly builds to S3
 .PHONY: upload-nightlies-s3

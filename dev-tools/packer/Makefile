@@ -30,6 +30,11 @@ beat_abspath=${GOPATH}/src/${BEAT_DIR}
 	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
 	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
 
+.PHONY: package-dashboards
+package-dashboards:
+	echo Creating the Dashboards package
+	BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/dashboards/build.sh
+
 .PHONY: deps
 deps:
 	go get -u github.com/tsg/gotpl
