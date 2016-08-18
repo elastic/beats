@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-apache>>
 * <<exported-fields-beat>>
+* <<exported-fields-beats>>
 * <<exported-fields-common>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -397,6 +398,111 @@ Arbitrary tags that can be set per Beat and per transaction type.
 type: dict
 
 Contains user configurable fields.
+
+
+[[exported-fields-beats]]
+== beats Fields
+
+beats Module
+
+
+
+[float]
+== beats Fields
+
+
+
+
+[float]
+== filebeat Fields
+
+experimental[]
+filebeat metrics
+
+
+
+[float]
+== harvesters Fields
+
+Harvester metrics for all harvesters combined.
+
+
+
+[float]
+=== beats.filebeat.harvesters.started
+
+type: long
+
+Total number of started harvesters
+
+
+[float]
+=== beats.filebeat.harvesters.closed
+
+type: long
+
+Total number of closed harvesters
+
+
+[float]
+=== beats.filebeat.harvesters.running
+
+type: long
+
+Number of currently running harvesters
+
+
+[float]
+== files Fields
+
+File handling related statistics
+
+
+
+[float]
+=== beats.filebeat.harvesters.files.open
+
+type: long
+
+Currently open files
+
+
+[float]
+=== beats.filebeat.harvesters.files.truncated
+
+type: long
+
+Number of files which were detected by the harvester as truncated and reading started from scratch.
+
+
+[float]
+== prospectors Fields
+
+Prospector metrics for all prospectors combined.
+
+
+
+[float]
+== log_files Fields
+
+Log files related stastics.
+
+
+
+[float]
+=== beats.filebeat.prospectors.log_files.renamed
+
+type: long
+
+Total number of files for which renaming was detected
+
+
+[float]
+=== beats.filebeat.prospectors.log_files.truncated
+
+type: long
+
+Number of files which were detected by the prospector as truncated and reading started from scratch.
 
 
 [[exported-fields-common]]

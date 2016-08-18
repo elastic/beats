@@ -205,6 +205,72 @@
                   type: integer
                   description: >
                     Total.
+- key: beats
+  title: "beats"
+  description: >
+    beats Module
+  short_config: false
+  fields:
+    - name: beats
+      type: group
+      description: >
+      fields:
+        - name: filebeat
+          type: group
+          description: >
+            experimental[]
+
+            filebeat metrics
+          fields:
+            - name: harvesters
+              type: group
+              description: >
+                Harvester metrics for all harvesters combined.
+              fields:
+                - name: started
+                  type: long
+                  description: >
+                    Total number of started harvesters
+                - name: closed
+                  type: long
+                  description: >
+                    Total number of closed harvesters
+                - name: running
+                  type: long
+                  description: >
+                    Number of currently running harvesters
+                - name: files
+                  type: group
+                  description: >
+                    File handling related statistics
+                  fields:
+                    - name: open
+                      type: long
+                      description: >
+                        Currently open files
+                    - name: truncated
+                      type: long
+                      description: >
+                        Number of files which were detected by the harvester as truncated and reading started from scratch.
+            - name: prospectors
+              type: group
+              description: >
+                Prospector metrics for all prospectors combined.
+              fields:
+                - name: log_files
+                  type: group
+                  description: >
+                    Log files related stastics.
+                  fields:
+                    - name: renamed
+                      type: long
+                      description: >
+                        Total number of files for which renaming was detected
+                    - name: truncated
+                      type: long
+                      description: >
+                        Number of files which were detected by the prospector as truncated and reading started from scratch.
+
 - key: mongodb
   title: "MongoDB"
   description: >
