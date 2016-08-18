@@ -10,6 +10,11 @@ handling, for logging, and more. By using this common framework, you can ensure
 that all Beats behave consistently and that they are easy to package and run
 with common tools.
 
+In this guide, you learn how to use the Beat generator to create source code for
+an example Beat called Testbeat. The Beat generator creates all the files required
+for a working Beat. To create your own Beat, you modify the generated
+files and implement the custom logic needed to collect the data you want to ship.
+
 [[newbeat-getting-ready]]
 === Getting Ready
 
@@ -33,19 +38,9 @@ Beats, including libbeat and the Beat generator, is to do:
 go get github.com/elastic/beats
 ----------------------------------------------------------------------
 
-When you run the command, all source files will be downloaded to the
+When you run the command, all source files are downloaded to the
 `$GOPATH/src` path. You can ignore the "no buildable Go source files" message because
 you will build the source later.
-
-//QUESTION: Wondering if adding sentence about "no buildable Go source files" is the best way to handle this. The problem is that users might be confused because the command returns the message "package github.com/elastic/beats: no buildable Go source files in /Users/dedemorton/workspace/src/github.com/elastic/beats". 
-
-In this guide, we use working examples from the Testbeat source code in
-https://github.com/monicasarbu/testbeat[GitHub]
-to demonstrate how to implement a Beat. Just copy
-the source files and modify them as necessary for your Beat.
-
-//QUESTION: Do we really want users to copy testbeat if they are using the beat generator? Don’t we want them to use the beat generator instead? If we do want them to use testbeat, then shouldn't we tell them to clone it since it's not a part of github.com/elastic/beats? 
-
 
 === Overview
 
@@ -107,9 +102,7 @@ Now that you have the big picture, let's dig into the code.
 === Generating Your Beat
 
 To generate your own Beat, you use the Beat generator available in the beats repo on GitHub. If you haven't
-downloaded the beats repo yet, follow the instructions in <<newbeat-getting-ready>>.
-
-//REVIEWERS: I dont' think it makes sense to repeat the steps that are already described in the Getting Started, so I removed them and added a pointer back to the GS topic. 
+downloaded the Beats source code yet, follow the instructions in <<newbeat-getting-ready>>.
 
 Before running the Beat generator, you must install https://github.com/audreyr/cookiecutter[cookiecutter], a
 command-line utility that creates projects from project templates. Check out the 
@@ -131,9 +124,6 @@ Run cookiecutter and specify the path to the Beat generator:
 cookiecutter $GOPATH/src/github.com/elastic/beats/generate/beat
 --------------------
 
-
-//REVIEWERS: Deleted $ in the example commands because users say it makes copying/pasting harder
-
 Cookiecutter will prompt you to enter information about your Beat. For the `project_name`, enter `testbeat`.
 For the `github_name`, enter your github id. The `beat` and `beat_path` are set to the correct values automatically (just press Enter to accept each default). For the `full_name`, enter your firstname and lastname.
 
@@ -146,14 +136,54 @@ beat_path [github.com/{github id}]:
 full_name [Firstname Lastname]: {Full Name}
 ---------
 
-You should see a directory called `testbeat` inside of your project folder. 
+The Beat generator creates a directory called `testbeat` inside of your project folder. 
 
-You now have a raw template of the Beat, but you still need to fetch the dependencies and set up the git repository.
+You now have a raw template of the Beat, but you still need to <<setting-up-beat,fetch dependencies and set up the Beat>>.
 
-//REVIEWERS: We don't describe how to fetch dependencies or set up the git repo anywhere in the docs. Have we decided to skip talking about the make command in the docs because we want to remove  dependencies like python and the virtualenv? I'm not entirely opposed to pointing off to Jongmin's blog for details about running make and setting up the git repo, but if we do that, we need to be more explicit and we need to agree to update the blog entry whenever it gets out-of-date.  
+[[setting-up-beat]]
+=== Fetching Dependencies and Setting up the Beat
+
+First you need to install the following tools: 
+
+* https://www.python.org/downloads/[Python]
+* https://virtualenv.pypa.io/en/stable/[virtualenv]
+
+To fetch dependencies and set up the Beat, run:
+
+[source,shell]
+---------
+cd $GOPATH/src/github.com/{user}/testbeat
+make setup
+---------
+
+The Beat now contains the basic config file, `testbeat.yml`, and template files. The Beat is "complete" in the sense
+that you can compile and run it. However, to make it functionally complete, you need to add your custom logic (see <<beater-interface>>), along with any additional configuration parameters that your Beat requires.
+
+[[compiling-and-running]]
+=== Building and Running the Beat
+
+To compile the Beat, make sure you are in the Beat directory (`$GOPATH/src/github.com/{user}/testbeat`) and run:
+
+[source,shell]
+---------
+make 
+---------
+
+Running this command creates the binary called `testbeat` in `$GOPATH/src/github.com/{user}/testbeat`.
+
+Now run the Beat:
+
+[source,shell]
+---------
+./testbeat -e -d "*" 
+---------
+
+The command automatically loads the default config file, `testbeat.yml`, and sends debug output to the console.
+
+You can stop the Beat by pressing `Ctrl+C`. 
 
 [[beater-interface]]
-=== The Beater interface
+=== The Beater Interface
 
 Each Beat needs to implement the Beater interface defined in libbeat.
 
@@ -182,14 +212,14 @@ type Beater interface {
 ----------------------------------------------------------------------
 
 To implement the Beater interface, you need to define a Beat object that
-implements two methods `Run()` and `Stop()`. 
+implements two methods: <<run-method,`Run()`>> and <<stop-method,`Stop()`>>. 
 
 [source,go]
 --------------
 type Testbeat struct {
-	done   chan struct{}
-	config config.Config
-	client publisher.Client
+	done   chan struct{} <1>
+	config config.Config <2>
+	client publisher.Client <3>
 
 	...
 }
@@ -207,20 +237,16 @@ func (bt *Testbeat) Stop() {
 
 By default, the Beat object contains the following:
 
-- `done`: Channel used by the `Run()` function to stop when the `Stop()` function is called.
-- `config`: Configuration options for the Beat
-- `client`: Publisher that takes care of sending the events to the
+<1> `done`: Channel used by the `Run()` function to stop when the `Stop()` function is called.
+<2> `config`: Configuration options for the Beat
+<3> `client`: Publisher that takes care of sending the events to the
   defined output.
 
-The `Beat` parameter received by the `Run` method contains data about the
+The `Beat` parameter received by the `Run` function contains data about the
 Beat, such as the name, version, and common configuration options.
 
-The implementation of these functions is available under `beater/testbeat.go`.
-
-In addition, each Beat needs to implement the `New()` function to create the Beat
-object.
-
-This means your Beat should implement the following functions:
+Each Beat also needs to implement the <<new-function,`New()`>> function to create the Beat object. This means your
+Beat should implement the following functions:
 
 [horizontal]
 <<new-function, New>>:: Creates the Beat object
@@ -228,29 +254,11 @@ This means your Beat should implement the following functions:
 and sends it to the defined output using the publisher
 <<stop-method, Stop>>:: Contains logic that is called when the Beat is signaled to stop
 
-For more complex Beats, the optional `FlagsHandler` interface is available.
-
-[source,go]
-----------------------------------------------------------------------
-// FlagsHandler is an interface that can optionally be implemented by a Beat
-// if it needs to process command line flags on startup. If implemented, the
-// HandleFlags method will be invoked after parsing the command line flags
-// and before any of the Beater interface methods are invoked. There will be
-// no callback when '-help' or '-version' are specified.
-type FlagsHandler interface {
-	HandleFlags(*Beat) error // Handle any custom command line arguments.
-}
-----------------------------------------------------------------------
-
-You can use the `FlagsHandler` interface to add additional command line flags to
-your Beat. The `HandleFlags` callback is called after the Beat parses the
-command line arguments inherited from libbeat and handles the `--help` and
-`--version` flags. For an example of how to implement `HandleFlags`, take a look
-at the https://github.com/elastic/beats/blob/master/packetbeat/beat/packetbeat.go[Packetbeat]
-code.
+When you run the Beat generator, it adds implementations for all these functions to the source code (see
+`beater/testbeat.go`). You can modify these implementations, as required, for your Beat.
 
 We strongly recommend that you create a main package that contains only the main
-method. All your Beat-specific code should go in a separate folder and package.
+method (see `main.go`). All your Beat-specific code should go in a separate folder and package.
 This will allow other Beats to use the other parts of your Beat as a library, if
 needed.
 
@@ -262,28 +270,36 @@ sample implementation.
 [[new-function]]
 ==== New function
 
-
 The `New()` function receives the configuration options defined for the Beat and
-creates a Beat object based on them. 
+creates a Beat object based on them. Here's the `New()` function that's generated in
+`beater/testbeat.go` when you run the Beat generator:
 
-The configuration file of the Beat is `testbeat.yml` and it's generated in the
-previous step:
+[source,go]
+----------------------------------------------------------------------
+func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+	config := config.DefaultConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, fmt.Errorf("Error reading config file: %v", err)
+	}
 
-[source,yaml]
-------------
-testbeat:
-  # Defines how often an event is sent to the output
-  period: 10s
-------------
+	bt := &Testbeat{
+		done:   make(chan struct{}),
+		config: config,
+	}
+	return bt, nil
+}
 
- - `period`: Defines how often to send out events
+----------------------------------------------------------------------
 
+Pointers are used to distinguish between when the setting is completely
+missing from the configuration file and when it has a value that matches the
+type's default value.
 
-The recommended way of handling the configuration is to create a
-`Config` structure with the configuration options and a `DefaultConfig` with
+The recommended way of handling the configuration (as shown in the code example)
+is to create a `Config` structure with the configuration options and a `DefaultConfig` with
 the default configuration options. 
 
-And here are the corresponding Go structures, which are defined in `config/config.go`:
+When you use the Beat generator, the Go structures for a basic config are added to `config/config.go`:
 
 [source,go]
 ----------------------------------------------------------------------
@@ -298,30 +314,57 @@ type Config struct {
 var DefaultConfig = Config{
 	Period: 1 * time.Second,
 }
+
 ----------------------------------------------------------------------
 
-Pointers are used to distinguish between when the setting is completely
-missing from the configuration file and when it has a value that matches the
-type's default value.
 
-The generated `New()` function:
+This mirrors the config options that are defined in the config file, `testbeat.yml`. 
+
+[source,yaml]
+------------
+testbeat:
+  # Defines how often an event is sent to the output
+  period: 10s
+------------
+
+ - `period`: Defines how often to send out events
+ 
+The config file is generated when you run `make setup` to <<setting-up-beat,set up the beat>>. The file contains
+basic configuration information. To add configuration options to your Beat, you need to update the Go structures in
+`config/config.go` and add the corresponding config options to `etc/beat.yml`.
+
+For example, if you add a config option called `path` to the Go structures: 
 
 [source,go]
-----------
-func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
-	config := config.DefaultConfig
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %v", err)
-	}
-
-	ls := &Testbeat{
-		done:   make(chan struct{}),
-		config: config,
-	}
-	return ls, nil
+----------------------------------------------------------------------
+type Config struct {
+    Period time.Duration `config:"period"`
+    Path   string        `config:"path"`
 }
------------
 
+var DefaultConfig = Config{
+	Period: 1 * time.Second,
+    Path:   ".",
+}
+
+----------------------------------------------------------------------
+
+You also need to add `path` to `etc/beat.yml`: 
+
+[source,yml]
+----------------------------------------------------------------------
+testbeat:
+  # Defines how often an event is sent to the output
+  period: 10s
+  path: "."
+----------------------------------------------------------------------
+
+After modifying `beat.yml`, run the following command to apply your updates:
+
+[source,shell]
+----------------------------------------------------------------------
+make update
+----------------------------------------------------------------------
 
 [[run-method]]
 ==== Run Method
@@ -362,12 +405,27 @@ Inside the loop, the Beat sleeps for a configurable period of time and then
 captures the required data and sends it to the publisher. The publisher client is available as part of the Beat object
 through the `client` variable.
 
-The `event := common.MapStr{}` stores the event in a json format, and `bt.client.PublishEvent(event)` is publishing data to Elasticsearch. 
-In the generated Beat, there are three fields in the event, which is
-@timestamp, type, and counter. 
+The `event := common.MapStr{}` stores the event in a json format, and `bt.client.PublishEvent(event)` publishes data to Elasticsearch. 
+In the generated Beat, there are three fields in the event: @timestamp, type, and counter. 
 
-For more details about how the fields should be named, please check
-<<event-conventions, Event conventions>>.
+When you add fields to the event object, you also need to add them to the `etc/fields.yml` file:
+
+[source,yaml]
+----------------------------------------------------------------------
+- key: testbeat
+  title: testbeat
+  description:
+  fields:
+    - name: counter
+      type: long
+      required: true
+      description: >
+        PLEASE UPDATE DOCUMENTATION
+----------------------------------------------------------------------
+
+Remember to run `make update` to apply your updates.
+
+For more detail about naming the fields in an event, see <<event-conventions>>.
 
 [[stop-method]]
 ==== Stop Method
@@ -411,6 +469,7 @@ func main() {
 }
 ----------------------------------------------------------------------
 
+
 [[ls-beat]]
 === Example: Building Lsbeat from Scratch
 
@@ -418,10 +477,7 @@ https://github.com/kimjmin/lsbeat[Lsbeat] is similar to the `ls` command-line to
 Lsbeat periodically ships them to Elasticsearch for storage. 
 
 To help you learn how to build a Beat, we've created this http://elastic.co//blog/build-your-own-beat[blog post]
-that describes how to build Lsbeat from scratch. The blog post includes additional details about fetching dependencies
-and compiling the code. 
-
-//REVIEWERS: I wanted to add a little clarification here because it's initially jarring to come to this section in the doc because it talks about Lsbeat instead of the example that's used in the topics leading up to this one. I hope that flagging this section as an example makes the purpose less ambiguous.
+that describes how to build Lsbeat from scratch. You can refer to the Lsbeat implementation as a working example.
 
 
 === Sharing Your Beat with the Community
