@@ -12,6 +12,7 @@ fi
 
 mkdir /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}
 cp -a homedir/. /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/
+install -D -m 755 import_dashboards-linux-{{.arch}} /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/scripts/import_dashboards
 cp {{.beat_name}}-linux-{{.arch}} /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}
 cp {{.beat_name}}-linux.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}.yml
 cp {{.beat_name}}-linux.full.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}.full.yml
