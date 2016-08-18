@@ -285,3 +285,8 @@ func handleError(err error) error {
 	fmt.Fprintf(os.Stderr, "Exiting: %v\n", err)
 	return err
 }
+
+// GetDefaultVersion returns the current libbeat version.
+func GetDefaultVersion() string {
+	return defaultBeatVersion
+}

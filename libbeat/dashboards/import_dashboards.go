@@ -15,13 +15,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
-const usage = `
+var usage = fmt.Sprintf(`
 Usage: ./import_dashboards [options]
 
 Kibana dashboards are stored in a special index in Elasticsearch together with the searches, visualizations, and indexes that they use.
@@ -30,12 +31,12 @@ You can import the dashboards, visualizations, searches, and the index pattern f
   1. from a local directory:
 	./import_dashboards -dir etc/kibana
   2. from a directory of a local zip archive:
-	./import_dashboards -dir metricbeat -file beats-dashboards-1.2.3.zip
+	./import_dashboards -dir metricbeat -file beats-dashboards-%s.zip
   3. from a directory of zip archive available online:
-	./import_dashboards -dir metricbeat -url http://download.elastic.co/beats/dashboards/beats-dashboards-1.2.3.zip
+	./import_dashboards -dir metricbeat -url http://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip
 
 Options:
-`
+`, beat.GetDefaultVersion(), beat.GetDefaultVersion())
 
 type Options struct {
 	KibanaIndex string
@@ -77,7 +78,9 @@ func ParseCommandLine() (*CommandLine, error) {
 	cl.flagSet.StringVar(&cl.opt.Index, "i", "", "Overwrites the Elasticsearch index name. For example you can replaces metricbeat-* with custombeat-*")
 	cl.flagSet.StringVar(&cl.opt.Dir, "dir", "", "Directory containing the subdirectories: dashboard, visualization, search, index-pattern. eg. kibana/")
 	cl.flagSet.StringVar(&cl.opt.File, "file", "", "Zip archive file containing the Beats dashboards.")
-	cl.flagSet.StringVar(&cl.opt.Url, "url", "", "URL to the zip archive containing the Beats dashboards")
+	cl.flagSet.StringVar(&cl.opt.Url, "url",
+		fmt.Sprintf("https://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip", beat.GetDefaultVersion()),
+		"URL to the zip archive containing the Beats dashboards")
 
 	return &cl, nil
 }
