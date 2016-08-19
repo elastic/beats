@@ -23,6 +23,7 @@ type LDMLBCP47 struct {
 			Deprecated  string `xml:"deprecated,attr"`
 			Preferred   string `xml:"preferred,attr"`
 			Alias       string `xml:"alias,attr"`
+			ValueType   string `xml:"valueType,attr"`
 			Since       string `xml:"since,attr"`
 			Type        []*struct {
 				Common
@@ -99,6 +100,14 @@ type SupplementalData struct {
 			Status   string `xml:"status,attr"`
 		} `xml:"group"`
 	} `xml:"territoryContainment"`
+	SubdivisionContainment *struct {
+		Common
+		Subgroup []*struct {
+			Common
+			Subtype  string `xml:"subtype,attr"`
+			Contains string `xml:"contains,attr"`
+		} `xml:"subgroup"`
+	} `xml:"subdivisionContainment"`
 	LanguageData *struct {
 		Common
 		Language []*struct {
@@ -198,6 +207,19 @@ type SupplementalData struct {
 			Territories string `xml:"territories,attr"`
 		} `xml:"paperSize"`
 	} `xml:"measurementData"`
+	UnitPreferenceData *struct {
+		Common
+		UnitPreferences []*struct {
+			Common
+			Category       string `xml:"category,attr"`
+			Usage          string `xml:"usage,attr"`
+			Scope          string `xml:"scope,attr"`
+			UnitPreference []*struct {
+				Common
+				Regions string `xml:"regions,attr"`
+			} `xml:"unitPreference"`
+		} `xml:"unitPreferences"`
+	} `xml:"unitPreferenceData"`
 	TimezoneData *struct {
 		Common
 		MapTimezones []*struct {
@@ -236,13 +258,15 @@ type SupplementalData struct {
 		Common
 		Transform []*struct {
 			Common
-			Source     string    `xml:"source,attr"`
-			Target     string    `xml:"target,attr"`
-			Variant    string    `xml:"variant,attr"`
-			Direction  string    `xml:"direction,attr"`
-			Visibility string    `xml:"visibility,attr"`
-			Comment    []*Common `xml:"comment"`
-			TRule      []*Common `xml:"tRule"`
+			Source        string    `xml:"source,attr"`
+			Target        string    `xml:"target,attr"`
+			Variant       string    `xml:"variant,attr"`
+			Direction     string    `xml:"direction,attr"`
+			Alias         string    `xml:"alias,attr"`
+			BackwardAlias string    `xml:"backwardAlias,attr"`
+			Visibility    string    `xml:"visibility,attr"`
+			Comment       []*Common `xml:"comment"`
+			TRule         []*Common `xml:"tRule"`
 		} `xml:"transform"`
 	} `xml:"transforms"`
 	Metadata *struct {
@@ -267,6 +291,7 @@ type SupplementalData struct {
 			} `xml:"variable"`
 			AttributeValues []*struct {
 				Common
+				Dtds       string `xml:"dtds,attr"`
 				Elements   string `xml:"elements,attr"`
 				Attributes string `xml:"attributes,attr"`
 				Order      string `xml:"order,attr"`
@@ -289,6 +314,11 @@ type SupplementalData struct {
 				Replacement string `xml:"replacement,attr"`
 				Reason      string `xml:"reason,attr"`
 			} `xml:"territoryAlias"`
+			SubdivisionAlias []*struct {
+				Common
+				Replacement string `xml:"replacement,attr"`
+				Reason      string `xml:"reason,attr"`
+			} `xml:"subdivisionAlias"`
 			VariantAlias []*struct {
 				Common
 				Replacement string `xml:"replacement,attr"`
@@ -576,11 +606,26 @@ type SupplementalData struct {
 			Match       string `xml:"match,attr"`
 		} `xml:"coverageLevel"`
 	} `xml:"coverageLevels"`
+	IdValidity *struct {
+		Common
+		Id []*struct {
+			Common
+			IdStatus string `xml:"idStatus,attr"`
+		} `xml:"id"`
+	} `xml:"idValidity"`
+	RgScope *struct {
+		Common
+		RgPath []*struct {
+			Common
+			Path string `xml:"path,attr"`
+		} `xml:"rgPath"`
+	} `xml:"rgScope"`
 }
 
 // LDML is the top-level type for locale-specific data.
 type LDML struct {
 	Common
+	Version  string `xml:"version,attr"`
 	Identity *struct {
 		Common
 		Version *struct {
@@ -723,6 +768,10 @@ type LDML struct {
 				} `xml:"unitPattern"`
 				PerUnitPattern []*Common `xml:"perUnitPattern"`
 			} `xml:"unit"`
+			CoordinateUnit []*struct {
+				Common
+				CoordinateUnitPattern []*Common `xml:"coordinateUnitPattern"`
+			} `xml:"coordinateUnit"`
 		} `xml:"unitLength"`
 		DurationUnit []*struct {
 			Common
@@ -811,7 +860,8 @@ type LDML struct {
 			Common
 			CasingItem []*struct {
 				Common
-				Override string `xml:"override,attr"`
+				Override   string `xml:"override,attr"`
+				ForceError string `xml:"forceError,attr"`
 			} `xml:"casingItem"`
 		} `xml:"casingData"`
 	} `xml:"metadata"`
@@ -1166,6 +1216,10 @@ type LocaleDisplayNames struct {
 		Common
 		Territory []*Common `xml:"territory"`
 	} `xml:"territories"`
+	Subdivisions *struct {
+		Common
+		Subdivision []*Common `xml:"subdivision"`
+	} `xml:"subdivisions"`
 	Variants *struct {
 		Common
 		Variant []*Common `xml:"variant"`
@@ -1383,4 +1437,4 @@ type Numbers struct {
 }
 
 // Version is the version of CLDR from which the XML definitions are generated.
-const Version = "27.0.1"
+const Version = "29"

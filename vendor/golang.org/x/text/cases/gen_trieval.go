@@ -22,11 +22,14 @@ package main
 //     15..5  unsigned exception index
 //         4  unused
 //   } else {
-//     15..7  XOR pattern or index to XOR pattern for case mapping
+//     15..8  XOR pattern or index to XOR pattern for case mapping
+//            Only 13..8 are used for XOR patterns.
+//         7  inverseFold (fold to upper, not to lower)
 //         6  index: interpret the XOR pattern as an index
 //      5..4  CCC: zero (normal or break), above or other
 //   }
 //      3  exception: interpret this value as an exception index
+//         (TODO: is this bit necessary? Probably implied from case mode.)
 //   2..0  case mode
 //
 // For the non-exceptional cases, a rune must be either uncased, lowercase or
@@ -44,12 +47,14 @@ const (
 	ignorableMask  = 0x0006
 	ignorableValue = 0x0004
 
+	inverseFoldBit = 1 << 7
+
 	exceptionBit     = 1 << 3
 	exceptionShift   = 5
 	numExceptionBits = 11
 
 	xorIndexBit = 1 << 6
-	xorShift    = 7
+	xorShift    = 8
 
 	// There is no mapping if all xor bits and the exception bit are zero.
 	hasMappingMask = 0xffc0 | exceptionBit
@@ -64,7 +69,7 @@ const (
 //
 // A common pattern for scripts in the Unicode standard is for upper and lower
 // case runes to alternate for increasing rune values (e.g. the accented Latin
-// ranges starting from U+0100 and U+1E00 among others andsome Cyrillic
+// ranges starting from U+0100 and U+1E00 among others and some Cyrillic
 // characters). We use this property by defining a cXORCase mode, where the case
 // mode (always upper or lower case) is derived from the rune value. As the XOR
 // pattern for case mappings is often identical for successive runes, using
@@ -116,100 +121,22 @@ const (
 	cccMask = cccBreak | cccZero | cccAbove | cccOther
 )
 
-func (c info) cccVal() info {
-	if c&exceptionBit != 0 {
-		return cccZero
-	}
-	return c & cccMask
-}
-
-func (c info) cccType() info {
-	ccc := c.cccVal()
-	if ccc <= cccZero {
-		return cccZero
-	}
-	return ccc
-}
-
 const (
 	starter       = 0
 	above         = 230
 	iotaSubscript = 240
 )
 
-// TODO: Implement full Unicode breaking algorithm:
-// 1) Implement breaking in separate package.
-// 2) Use the breaker here.
-// 3) Compare table size and performance of using the more generic breaker.
-//
-// Note that we can extend the current algorithm to be much more accurate. This
-// only makes sense, though, if the performance and/or space penalty of using
-// the generic breaker is big. Extra data will only be needed for non-cased
-// runes, which means there are sufficient bits left in the caseType.
-// Also note that the standard breaking algorithm doesn't always make sense
-// for title casing. For example, a4a -> A4a, but a"4a -> A"4A (where " stands
-// for modifier \u0308).
-// ICU prohibits breaking in such cases as well.
-
-// For the purpose of title casing we use an approximation of the Unicode Word
-// Breaking algorithm defined in Annex #29:
-// http://www.unicode.org/reports/tr29/#Default_Grapheme_Cluster_Table.
-//
-// For our approximation, we group the Word Break types into the following
-// categories, with associated rules:
-//
-// 1) Letter:
-//    ALetter, Hebrew_Letter, Numeric, ExtendNumLet, Extend.
-//    Rule: Never break between consecutive runes of this category.
-//
-// 2) Mid:
-//    Format, MidLetter, MidNumLet, Single_Quote.
-//    (Cf. case-ignorable: MidLetter, MidNumLet or cat is Mn, Me, Cf, Lm or Sk).
-//    Rule: Don't break between Letter and Mid, but break between two Mids.
-//
-// 3) Break:
-//    Any other category, including NewLine, CR, LF and Double_Quote. These
-//    categories should always result in a break between two cased letters.
-//    Rule: Always break.
-//
-// Note 1: the Katakana and MidNum categories can, in esoteric cases, result in
-// preventing a break between two cased letters. For now we will ignore this
-// (e.g. [ALetter] [ExtendNumLet] [Katakana] [ExtendNumLet] [ALetter] and
-// [ALetter] [Numeric] [MidNum] [Numeric] [ALetter].)
-//
-// Note 2: the rule for Mid is very approximate, but works in most cases. To
-// improve, we could store the categories in the trie value and use a FA to
-// manage breaks. See TODO comment above.
-//
-// Note 3: according to the spec, it is possible for the Extend category to
-// introduce breaks between other categories grouped in Letter. However, this
-// is undesirable for our purposes. ICU prevents breaks in such cases as well.
-
-// isBreak returns whether this rune should introduce a break.
-func (c info) isBreak() bool {
-	return c.cccVal() == cccBreak
-}
-
-// isLetter returns whether the rune is of break type ALetter, Hebrew_Letter,
-// Numeric, ExtendNumLet, or Extend.
-func (c info) isLetter() bool {
-	ccc := c.cccVal()
-	if ccc == cccZero {
-		return !c.isCaseIgnorable()
-	}
-	return ccc != cccBreak
-}
-
 // The exceptions slice holds data that does not fit in a normal info entry.
 // The entry is pointed to by the exception index in an entry. It has the
 // following format:
 //
-// Header:
-// byte 0: // TODO: case folding not implemented yet.
-//      7  conditional case folding
-//      6  conditional special casing
-//   6..3  length of case folding
-//   2..0  length of closure mapping (up to 7).
+// Header
+// byte 0:
+//  7..6  unused
+//  5..4  CCC type (same bits as entry)
+//     3  unused
+//  2..0  length of fold
 //
 // byte 1:
 //   7..6  unused
@@ -225,11 +152,11 @@ func (c info) isLetter() bool {
 // A length of 0 indicates a mapping to zero-length string.
 //
 // Body bytes:
+//   case folding bytes
 //   lowercase mapping bytes
 //   uppercase mapping bytes
 //   titlecase mapping bytes
-//   case folding bytes
-//   closure mapping bytes
+//   closure mapping bytes (for NFKC_Casefold). (TODO)
 //
 // Fallbacks:
 //   missing fold  -> lower
