@@ -30,24 +30,32 @@ Kibana dashboards are stored in a special index in Elasticsearch together with t
 You can import the dashboards, visualizations, searches, and the index pattern for any Beat:
   1. from a local directory:
 	./import_dashboards -dir etc/kibana
-  2. from a directory of a local zip archive:
-	./import_dashboards -dir metricbeat -file beats-dashboards-%s.zip
-  3. from a directory of zip archive available online:
-	./import_dashboards -dir metricbeat -url http://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip
+  2. from a local zip archive:
+	./import_dashboards -beat metricbeat -file beats-dashboards-%s.zip
+  3. from a zip archive available online:
+	./import_dashboards -beat metricbeat -url http://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip
+
+If the archive contains dashboards for multiple Beats, you need to pass the Beat name in -beat option:
+	./import_dashboards -beat metricbeat -url http://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip
+
+To import only the index-pattern for a single Beat, from the same version use:
+	./import_dashboards -only-index -beat metricbeat
 
 Options:
-`, beat.GetDefaultVersion(), beat.GetDefaultVersion())
+`, beat.GetDefaultVersion(), beat.GetDefaultVersion(), beat.GetDefaultVersion())
 
 type Options struct {
-	KibanaIndex string
-	ES          string
-	Index       string
-	Dir         string
-	File        string
-	Beat        string
-	Url         string
-	User        string
-	Pass        string
+	KibanaIndex    string
+	ES             string
+	Index          string
+	Dir            string
+	File           string
+	Beat           string
+	Url            string
+	User           string
+	Pass           string
+	OnlyDashboards bool
+	OnlyIndex      bool
 }
 
 type CommandLine struct {
@@ -81,6 +89,9 @@ func ParseCommandLine() (*CommandLine, error) {
 	cl.flagSet.StringVar(&cl.opt.Url, "url",
 		fmt.Sprintf("https://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip", beat.GetDefaultVersion()),
 		"URL to the zip archive containing the Beats dashboards")
+	cl.flagSet.StringVar(&cl.opt.Beat, "beat", "", "Specify the Beat name, in case the archive contains the dashboards for multiple Beats.")
+	cl.flagSet.BoolVar(&cl.opt.OnlyDashboards, "only-dashboards", false, "Import only dashboards together with visualizations and searches. By default imports both, dashboards and the index-pattern.")
+	cl.flagSet.BoolVar(&cl.opt.OnlyIndex, "only-index", false, "Import only the index-pattern. By default imports both, dashboards and the index pattern.")
 
 	return &cl, nil
 }
@@ -490,46 +501,65 @@ func downloadFile(url string, target string) (string, error) {
 	return targetPath, nil
 }
 
-func (imp Importer) ImportArchive() (err error) {
+func (imp Importer) ImportArchive() error {
 
 	var archive string
 
 	target, err := ioutil.TempDir("", "tmp")
 	if err != nil {
-		return
+		return errors.New("fail to generate the temporary directory")
 	}
 
 	if err = os.MkdirAll(target, 0755); err != nil {
-		return
+		return fmt.Errorf("fail to create the temporary directory: %v", target)
 	}
 
-	//defer os.RemoveAll(target) // clean up
+	defer os.RemoveAll(target) // clean up
 
-	if imp.cl.opt.Url != "" {
+	fmt.Println("Create temporary directory", target)
+	if imp.cl.opt.File != "" {
+		archive = imp.cl.opt.File
+	} else if imp.cl.opt.Url != "" {
 		// it's an URL
 		archive, err = downloadFile(imp.cl.opt.Url, target)
 		if err != nil {
-			return
+			return fmt.Errorf("fail to download file: %s", imp.cl.opt.Url)
 		}
-	} else if imp.cl.opt.File != "" {
-		archive = imp.cl.opt.File
 	} else {
 		return errors.New("No archive file or URL is set. Please use -file or -url option.")
 	}
 
 	dir, err := unzip(archive, target)
 	if err != nil {
-		return
+		return fmt.Errorf("fail to unzip the archive: %s", archive)
 	}
-	err = imp.ImportDir("index-pattern", path.Join(dir, imp.cl.opt.Dir))
+	err = imp.ImportKibana(path.Join(dir, imp.cl.opt.Beat))
 	if err != nil {
-		return
+		return err
 	}
-	err = imp.ImportDir("dashboard", path.Join(dir, imp.cl.opt.Dir))
-	if err != nil {
-		return
+
+	return nil
+}
+
+// import Kibana dashboards and index-pattern or only one of these
+func (imp Importer) ImportKibana(dir string) error {
+
+	var err error
+
+	if !imp.cl.opt.OnlyDashboards {
+		err = imp.ImportDir("index-pattern", dir)
+		if err != nil {
+			return fmt.Errorf("fail to import index-pattern: %v", err)
+		}
 	}
-	return
+	if !imp.cl.opt.OnlyIndex {
+		err = imp.ImportDir("dashboard", dir)
+		if err != nil {
+			return fmt.Errorf("fail to import dashboards: %v", err)
+		}
+	}
+	return nil
+
 }
 
 func main() {
@@ -546,20 +576,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println(importer.cl.opt.Index)
-
-	if importer.cl.opt.Url != "" || importer.cl.opt.File != "" {
-		if err = importer.ImportArchive(); err != nil {
+	if importer.cl.opt.Dir != "" {
+		if err = importer.ImportKibana(importer.cl.opt.Dir); err != nil {
 			fmt.Println(err)
 		}
-
-	} else if importer.cl.opt.Dir != "." {
-		if err = importer.ImportDir("index-pattern", importer.cl.opt.Dir); err != nil {
-			fmt.Println(err)
-		}
-		if err = importer.ImportDir("dashboard", importer.cl.opt.Dir); err != nil {
-			fmt.Println(err)
+	} else {
+		if importer.cl.opt.Url != "" || importer.cl.opt.File != "" {
+			if err = importer.ImportArchive(); err != nil {
+				fmt.Println(err)
+			}
 		}
 	}
-
 }
