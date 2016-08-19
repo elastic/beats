@@ -428,7 +428,7 @@ func unzip(archive, target string) (string, error) {
 	archiveName := filepath.Base(archive)
 	dirName := archiveName[:len(archiveName)-len(filepath.Ext(archiveName))]
 	dir := path.Join(target, dirName)
-	fmt.Println("Unzip archive to ", dir)
+	fmt.Println("Unzip archive to", dir)
 
 	reader, err := zip.OpenReader(archive)
 	if err != nil {
@@ -465,7 +465,7 @@ func downloadFile(url string, target string) (string, error) {
 
 	fileName := filepath.Base(url)
 	targetPath := path.Join(target, fileName)
-	fmt.Println("Download file ", fileName, " to ", targetPath)
+	fmt.Println("Downloading", url)
 
 	// Create the file
 	out, err := os.Create(targetPath)
