@@ -831,6 +831,33 @@
           description: >
             Creating application id.
 
+
+- key: cassandra
+  title: "Cassandra"
+  description: Cassandra v4/3 specific event fields.
+  fields:
+    - name: cassandra_request
+      type: dict
+      dict-type: keyword
+      description: >
+        Cassandra request field table.
+    - name: cassandra_request.request_headers
+      type: dict
+      dict-type: keyword
+      description: >
+        Cassandra request header field table.
+    - name: cassandra_response
+      type: dict
+      dict-type: keyword
+      description: >
+        Cassandra response field table.
+    - name: cassandra_response.response_headers
+      type: dict
+      dict-type: keyword
+      description: >
+        Cassandra response header field table.
+
+
 - key: http
   title: "HTTP"
   description: HTTP-specific event fields.
@@ -1388,6 +1415,7 @@
 
         - name: status
           description: NFS operation reply status.
+
 
 
 - key: raw

@@ -4,6 +4,23 @@ import (
 	"time"
 )
 
+type ErrNotImplemented struct {
+	OS string
+}
+
+func (e ErrNotImplemented) Error() string {
+	return "not implemented on " + e.OS
+}
+
+func IsNotImplemented(err error) bool {
+	switch err.(type) {
+	case ErrNotImplemented, *ErrNotImplemented:
+		return true
+	default:
+		return false
+	}
+}
+
 type Sigar interface {
 	CollectCpuStats(collectionInterval time.Duration) (<-chan Cpu, chan<- struct{})
 	GetLoadAverage() (LoadAverage, error)
@@ -11,14 +28,6 @@ type Sigar interface {
 	GetSwap() (Swap, error)
 	GetFileSystemUsage(string) (FileSystemUsage, error)
 	GetFDUsage() (FDUsage, error)
-}
-
-type ErrNotImplemented struct {
-	OS string
-}
-
-func (e ErrNotImplemented) Error() string {
-	return "not implemented on " + e.OS
 }
 
 type Cpu struct {

@@ -50,7 +50,7 @@ func run(pretty bool, events ...common.MapStr) (string, error) {
 	return withStdout(func() {
 		c := newConsole(pretty)
 		for _, event := range events {
-			c.PublishEvent(nil, outputs.Options{}, event)
+			c.PublishEvent(nil, outputs.Options{}, outputs.Data{Event: event})
 		}
 	})
 }

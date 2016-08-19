@@ -19,9 +19,11 @@
 
 
 # Download the canonical import path (may fail, don't allow failures beyond)
-
 SRC_FOLDER=$SOURCE
-DST_FOLDER=$GOPATH/src/$1
+
+BEAT_PATH=$1
+DST_FOLDER=`dirname $GOPATH/src/$BEAT_PATH`
+GIT_REPO=$BEAT_PATH
 
 if [ "$PUREGO" == "yes" ]; then
     CGO_ENABLED=0
@@ -29,11 +31,16 @@ else
     CGO_ENABLED=1
 fi
 
-if [ $1 = "github.com/elastic/beats" ]; then
-        WORKING_DIRECTORY=$GOPATH/src/$1
-else
-        WORKING_DIRECTORY=$GOPATH/src/`dirname $1`
+# If it is an official beat, libbeat is not vendored, need special treatment
+if [[ $GIT_REPO == "github.com/elastic/beats"* ]]; then
+    echo "Overwrite directories because official beat"
+    DST_FOLDER=$GOPATH/src/github.com/elastic/beats
+    GIT_REPO=github.com/elastic/beats
 fi
+
+# It is assumed all dependencies are inside the working directory
+# The working directory is the parent of the beat directory
+WORKING_DIRECTORY=$DST_FOLDER
 
 echo "Working directory=$WORKING_DIRECTORY"
 
@@ -42,10 +49,10 @@ if [ "$SOURCE" != "" ]; then
         echo "Copying main source folder ${SRC_FOLDER} to folder ${DST_FOLDER}"
         rsync --exclude ".git"  --exclude "build/" -a ${SRC_FOLDER}/ ${DST_FOLDER}
 else
-        mkdir -p $GOPATH/src/`dirname $1`
-        cd $GOPATH/src/`dirname $1`
-        echo "Fetching main git repository $1 in folder $GOPATH/src/`dirname $1`"
-        git clone https://$1.git
+        mkdir -p $GOPATH/src/${GIT_REPO}
+        cd $GOPATH/src/${GIT_REPO}
+        echo "Fetching main git repository ${GIT_REPO} in folder $GOPATH/src/${GIT_REPO}"
+        git clone https://${GIT_REPO}.git
 fi
 
 set -e
@@ -91,7 +98,7 @@ DEPS=($DEPS) && for dep in "${DEPS[@]}"; do
 done
 
 # Configure some global build parameters
-NAME=`basename $1/$PACK`
+NAME=${PACK}
 if [ "$OUT" != "" ]; then
   NAME=$OUT
 fi
@@ -103,8 +110,8 @@ if [ "$STATIC" == "true" ]; then LDARGS=--ldflags\ \'-extldflags\ \"-static\"\';
 
 if [ -n $BEFORE_BUILD ]; then
 	chmod +x /scripts/$BEFORE_BUILD
-	echo "Execute /scripts/$BEFORE_BUILD ${1}"
-	/scripts/$BEFORE_BUILD ${1}
+	echo "Execute /scripts/$BEFORE_BUILD ${BEAT_PATH}"
+	/scripts/$BEFORE_BUILD ${BEAT_PATH}
 fi
 
 

@@ -87,9 +87,31 @@
           format: bytes
           description: >
             The shared memory the process uses.
+    - name: fd
+      type: group
+      description: >
+        File descriptor usage metrics. This set of metrics is available for
+        Linux and FreeBSD.
+      prefix: "[float]"
+      fields:
+        - name: open
+          type: long
+          description: The number of file descriptors open by the process.
+        - name: limit.soft
+          type: long
+          description: >
+            The soft limit on the number of file descriptors opened by the
+            process. The soft limit can be changed by the process at any time.
+        - name: limit.hard
+          type: long
+          description: >
+            The hard limit on the number of file descriptors opened by the
+            process. The hard limit can only be raised by root.
     - name: cgroup
       type: group
       description: >
+        experimental[]
+
         Metrics and limits from the cgroup of which the task is a member.
         cgroup metrics are reported when the process has membership in a
         non-root cgroup. These metrics are only available on Linux.
@@ -174,7 +196,7 @@
                 not allowed to run because they have exhausted all of the
                 available time as specified by their quota).
 
-            - name: stats.throttled.nanos
+            - name: stats.throttled.ns
               type: long
               description: >
                 The total time duration (in nanoseconds) for which tasks in a
@@ -194,17 +216,17 @@
                 Path to the cgroup relative to the cgroup subsystem's
                 mountpoint.
 
-            - name: total.nanos
+            - name: total.ns
               type: long
               description: >
                 Total CPU time in nanoseconds consumed by all tasks in the
                 cgroup.
 
-            - name: stats.user.nanos
+            - name: stats.user.ns
               type: long
               description: CPU time consumed by tasks in user mode.
 
-            - name: stats.system.nanos
+            - name: stats.system.ns
               type: long
               description: CPU time consumed by tasks in user (kernel) mode.
 

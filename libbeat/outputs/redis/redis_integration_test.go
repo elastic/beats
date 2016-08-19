@@ -337,9 +337,9 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) *redisOut {
 func sendTestEvents(out *redisOut, batches, N int) error {
 	i := 1
 	for b := 0; b < batches; b++ {
-		batch := make([]common.MapStr, N)
+		batch := make([]outputs.Data, N)
 		for n := range batch {
-			batch[n] = common.MapStr{"message": i}
+			batch[n] = outputs.Data{Event: common.MapStr{"message": i}}
 			i++
 		}
 

@@ -25,7 +25,7 @@ import:
   subpackages:
   - /difflib
 - package: github.com/elastic/gosigar
-  version: 24abf0d672eeb6b663ac4f931b8030788ab45b80
+  version: a6e5709f6a491f83588305c15151412c2e480fc2
 - package: github.com/samuel/go-parser
   version: ca8abbf65d0e61dedf061f98bd3850f250e27539
 - package: github.com/samuel/go-thrift
@@ -34,7 +34,7 @@ import:
 - package: gopkg.in/mgo.v2
   version: 29cc868a5ca65f401ff318143f9408d02f4799cc
 - package: github.com/tsg/gopacket
-  version: 8c16bb8f00ff46af06942df2a8767ba1cf639bdc
+  version: 8e703b9968693c15f25cabb6ba8be4370cf431d0
 - package: github.com/joeshaw/multierror
   version: 69b34d4ec901851247ae7e77d33909caf9df99ed
 - package: github.com/andrewkroh/sys
@@ -75,7 +75,7 @@ import:
 - package: github.com/dustin/go-humanize
   version: 499693e27ee0d14ffab67c31ad065fdb3d34ea75
 - package: github.com/elastic/go-ucfg
-  version: v0.3.2
+  version: v0.3.3
 - package: github.com/armon/go-socks5
   version: 3a873e99f5400ad7706e464e905ffcc94b3ff247
 - package: github.com/pkg/errors
@@ -97,3 +97,5 @@ import:
   - zlib
 - package: github.com/klauspost/cpuid
   version: v1.0
+- package: https://github.com/go-inf/inf
+  version: v0.9.0

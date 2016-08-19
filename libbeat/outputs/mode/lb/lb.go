@@ -4,7 +4,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -122,12 +121,12 @@ func (m *LB) start(makeWorkers WorkerFactory) error {
 func (m *LB) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
 	return m.publishEventsMessage(opts, eventsMessage{
 		worker:   -1,
 		signaler: signaler,
-		event:    event,
+		datum:    data,
 	})
 }
 
@@ -135,12 +134,12 @@ func (m *LB) PublishEvent(
 func (m *LB) PublishEvents(
 	signaler op.Signaler,
 	opts outputs.Options,
-	events []common.MapStr,
+	data []outputs.Data,
 ) error {
 	return m.publishEventsMessage(opts, eventsMessage{
 		worker:   -1,
 		signaler: signaler,
-		events:   events,
+		data:     data,
 	})
 }
 

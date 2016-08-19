@@ -133,12 +133,12 @@ func TestOneMessageToKafka(t *testing.T) {
 	topic := fmt.Sprintf("test-libbeat-%s", id)
 
 	kafka := newTestKafkaOutput(t, topic, false)
-	event := common.MapStr{
+	event := outputs.Data{Event: common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"host":       "test-host",
 		"type":       "log",
 		"message":    id,
-	}
+	}}
 	if err := kafka.PublishEvent(nil, testOptions, event); err != nil {
 		t.Fatal(err)
 	}
@@ -163,12 +163,12 @@ func TestUseType(t *testing.T) {
 	logType := fmt.Sprintf("log-type-%s", id)
 
 	kafka := newTestKafkaOutput(t, "", true)
-	event := common.MapStr{
+	event := outputs.Data{Event: common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"host":       "test-host",
 		"type":       logType,
 		"message":    id,
-	}
+	}}
 	if err := kafka.PublishEvent(nil, testOptions, event); err != nil {
 		t.Fatal(err)
 	}

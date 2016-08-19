@@ -1,7 +1,9 @@
+
 BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
 BEATS=packetbeat filebeat winlogbeat metricbeat
 PROJECTS=libbeat ${BEATS}
+SNAPSHOT?=yes
 
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
@@ -63,10 +65,42 @@ simplify:
 # Collects all dashboards and generates dashboard folder for https://github.com/elastic/beats-dashboards/tree/master/dashboards
 .PHONY: beats-dashboards
 beats-dashboards:
-	mkdir -p build
-	$(foreach var,$(PROJECTS),cp -r $(var)/etc/kibana/ build/dashboards  || exit 1;)
+	mkdir -p build/dashboards
+	$(foreach var,$(BEATS),cp -r $(var)/etc/kibana/ build/dashboards/$(var)  || exit 1;)
 
 # Builds the documents for each beat
 .PHONY: docs
 docs:
 	sh libbeat/scripts/build_docs.sh ${PROJECTS}
+
+.PHONY: package
+package: beats-dashboards
+	$(MAKE) -C libbeat package-setup
+	$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package || exit 1;)
+
+	# build the dashboards package
+	mkdir -p build/upload/
+	BUILD_DIR=${shell pwd}/build SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards ${shell pwd}/build/upload/build_id.txt
+	mv build/upload build/dashboards-upload
+
+	# Copy build files over to top build directory
+	mkdir -p build/upload/
+	$(foreach var,$(BEATS),cp -r $(var)/build/upload/ build/upload/$(var)  || exit 1;)
+	cp -r build/dashboards-upload build/upload/dashboards
+
+# Upload nightly builds to S3
+.PHONY: upload-nightlies-s3
+upload-nightlies-s3: all
+	aws s3 cp --recursive --acl public-read build/upload s3://beats-nightlies
+
+# Run after building to sign packages and publish to APT and YUM repos.
+.PHONY: package-upload
+upload-package:
+	$(MAKE) -C dev-tools/packer deb-rpm-s3
+	# You must export AWS_ACCESS_KEY=<AWS access> and export AWS_SECRET_KEY=<secret>
+	# before running this make target.
+	dev-tools/packer/docker/deb-rpm-s3/deb-rpm-s3.sh
+
+.PHONY: release-upload
+upload-release:
+	aws s3 cp --recursive --acl public-read build/upload s3://download.elasticsearch.org/beats/

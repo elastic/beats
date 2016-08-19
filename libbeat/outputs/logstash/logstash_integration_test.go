@@ -263,12 +263,12 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 
-	event := common.MapStr{
+	event := outputs.Data{Event: common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"host":       "test-host",
 		"type":       "log",
 		"message":    "hello world",
-	}
+	}}
 	ls.PublishEvent(nil, testOptions, event)
 
 	// wait for logstash event flush + elasticsearch
@@ -297,12 +297,12 @@ func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 	for i := 0; i < 10; i++ {
-		event := common.MapStr{
+		event := outputs.Data{Event: common.MapStr{
 			"@timestamp": common.Time(time.Now()),
 			"host":       "test-host",
 			"type":       "log",
 			"message":    fmt.Sprintf("hello world - %v", i),
-		}
+		}}
 		ls.PublishEvent(nil, testOptions, event)
 	}
 
@@ -354,16 +354,16 @@ func testSendMultipleBatchesViaLogstash(
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 
-	batches := make([][]common.MapStr, 0, numBatches)
+	batches := make([][]outputs.Data, 0, numBatches)
 	for i := 0; i < numBatches; i++ {
-		batch := make([]common.MapStr, 0, batchSize)
+		batch := make([]outputs.Data, 0, batchSize)
 		for j := 0; j < batchSize; j++ {
-			event := common.MapStr{
+			event := outputs.Data{Event: common.MapStr{
 				"@timestamp": common.Time(time.Now()),
 				"host":       "test-host",
 				"type":       "log",
 				"message":    fmt.Sprintf("batch hello world - %v", i*batchSize+j),
-			}
+			}}
 			batch = append(batch, event)
 		}
 		batches = append(batches, batch)
@@ -409,12 +409,12 @@ func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string,
 	defer es.Cleanup()
 
 	ts := time.Now()
-	event := common.MapStr{
+	event := outputs.Data{Event: common.MapStr{
 		"@timestamp": common.Time(ts),
 		"host":       "test-host",
 		"type":       "log",
 		"message":    "hello world",
-	}
+	}}
 
 	es.PublishEvent(nil, testOptions, event)
 	ls.PublishEvent(nil, testOptions, event)
@@ -463,12 +463,14 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 	defer es.Cleanup()
 
 	ts := time.Now()
-	events := []common.MapStr{
+	events := []outputs.Data{
 		{
-			"@timestamp": common.Time(ts),
-			"host":       "test-host",
-			"type":       "log",
-			"message":    "hello world",
+			Event: common.MapStr{
+				"@timestamp": common.Time(ts),
+				"host":       "test-host",
+				"type":       "log",
+				"message":    "hello world",
+			},
 		},
 	}
 

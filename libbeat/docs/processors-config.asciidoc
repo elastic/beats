@@ -95,7 +95,8 @@ equals:
 [[condition-contains]]
 ===== contains
 
-The `contains` condition checks if a value is part of the field. The condition accepts only a string value.
+The `contains` condition checks if a value is part of a field. The field can be
+a string or an array of strings. The condition accepts only a string value.
 
 For example, the following condition checks if an error is part of the transaction status:
 

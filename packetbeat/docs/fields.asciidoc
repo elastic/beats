@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-amqp>>
 * <<exported-fields-beat>>
+* <<exported-fields-cassandra>>
 * <<exported-fields-common>>
 * <<exported-fields-dns>>
 * <<exported-fields-flows_event>>
@@ -399,6 +400,44 @@ Arbitrary tags that can be set per Beat and per transaction type.
 type: dict
 
 Contains user configurable fields.
+
+
+[[exported-fields-cassandra]]
+== Cassandra Fields
+
+Cassandra v4/3 specific event fields.
+
+
+[float]
+=== cassandra_request
+
+type: dict
+
+Cassandra request field table.
+
+
+[float]
+=== cassandra_request.request_headers
+
+type: dict
+
+Cassandra request header field table.
+
+
+[float]
+=== cassandra_response
+
+type: dict
+
+Cassandra response field table.
+
+
+[float]
+=== cassandra_response.response_headers
+
+type: dict
+
+Cassandra response header field table.
 
 
 [[exported-fields-common]]
