@@ -107,7 +107,8 @@ downloaded the Beats source code yet, follow the instructions in <<newbeat-getti
 Before running the Beat generator, you must install https://github.com/audreyr/cookiecutter[cookiecutter], a
 command-line utility that creates projects from project templates. Check out the 
 http://cookiecutter.readthedocs.io/en/latest/installation.html[installation guide]. After installing cookiecutter,
-decide on a name for your beat. The name must be one word in all lowercase. In our example, we use `testbeat`.
+decide on a name for your beat. The name should be one word with the first letter capitalized. In our example,
+we use `Testbeat`.
 
 Now create a directory under $GOPATH for your repository and change to the new directory:
 
@@ -124,12 +125,12 @@ Run cookiecutter and specify the path to the Beat generator:
 cookiecutter $GOPATH/src/github.com/elastic/beats/generate/beat
 --------------------
 
-Cookiecutter will prompt you to enter information about your Beat. For the `project_name`, enter `testbeat`.
+Cookiecutter will prompt you to enter information about your Beat. For the `project_name`, enter `Testbeat`.
 For the `github_name`, enter your github id. The `beat` and `beat_path` are set to the correct values automatically (just press Enter to accept each default). For the `full_name`, enter your firstname and lastname.
 
 [source,shell]
 ---------
-project_name [Examplebeat]: testbeat
+project_name [Examplebeat]: Testbeat
 github_name [your-github-name]: {username}
 beat [testbeat]:
 beat_path [github.com/{github id}]:
