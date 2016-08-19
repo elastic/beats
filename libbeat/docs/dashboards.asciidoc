@@ -1,31 +1,36 @@
 [[load-kibana-dashboards]]
-=== Loading the Beats Dashboards
+=== Importing the Beats Dashboards
 
 Kibana has a large set of visualization types that you can combine to create
 the perfect dashboards for your needs. But this flexibility can be a bit
 overwhelming at the beginning, so we have created some sample dashboards to get you
 started and to demonstrate what is possible based on the Beats data.
 
-Each Beat comes packaged with a script that you can use to import the example dashboards,
+Each Beat comes packaged with the `scripts/import_dashboards` script that you can use to import the example dashboards,
 visualizations, and searches for that Beat. The script also creates index patterns, such as 
 `packetbeat-*` for Packetbeat, `metricbeat-*` for Metricbeat, and so on. 
 
-Use the following commands to run the script:
+
+The command line options of the script, together with more examples, are available under the
+<<import-dashboards,import_dashboards>> section.
+
+Use the following command to import the Kibana dashboards for any of the Elastic Beats:
 
 *deb, rpm, and mac:*
 
-From the directory where you installed the Beat, change to the `kibana` directory and run the `import_dashboards.sh` script. For example:
+From the directory where you installed the Beat, run the `import_dashboards` script. For example, to import the
+Metricbeat dashboards, and the index pattern, use:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-cd kibana/ 
-./import_dashboards.sh
+$ scripts/import_dashboards -beat metricbeat
 ----------------------------------------------------------------------
 
-On deb and rpm, the `kibana` folder is located under the home path, which is `/usr/share/beat_name/` unless you change it.
+On deb and rpm, the `scripts` folder is located under the home path, which is `/usr/share/{beat_name}/` unless you change it.
 
-By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
-to specify a different location. For example: `./import_dashboards.sh -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
+By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-es` option
+to specify a different location. For example: `./scripts/import_dashboards -es http://192.168.33.60:9200`. 
+
 
 *win:*
 
@@ -33,51 +38,37 @@ to specify a different location. For example: `./import_dashboards.sh -url http:
 and select *Run As Administrator*). If you are running Windows XP, you may need
 to download and install PowerShell. 
 
-. From the directory where you installed the Beat, run the following commands to load the dashboards:
+. From the directory where you installed the Beat, run the `import_dashboards`  script. For example, to import the
+Metricbeat dashboards, and the index pattern, user:
 +
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-PS > cd kibana
-PS > .\import_dashboards.ps1
+PS > scripts\import_dashboards -beat metricbeat
 ----------------------------------------------------------------------
-+
-By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
-to specify a different location. For example: `.\import_dashboards.ps1 -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
-+
-NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\import_dashboards.ps1 -url http://192.168.33.60:9200`.
 
-[[dashboard-load-options]]
-=== Other Dashboard Load Options
-When you load the Beats dashboards, you can also specify:
+By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-es` option to specify a different location. For example: `scripts\import_dashboards -es http://192.168.33.60:9200`. 
 
-* The Kibana index pattern where you want to load the dashboards in Elasticsearch. For example:
-+
+NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to
+allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File scripts\import_dashboards -es http://192.168.33.60:9200`.
+
+
+The username and password to use for authentication. There are a few ways to pass in the username and password. For example:
+
 ["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-./import_dashboards.sh -url http://test.com:9200 -index .kibana_env
-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+$ scripts/import_dashboards -es https://xyz.found.io -user user -pass password <1>
+$ scripts/import_dashboards -es https://xyz.found.io -user admin -pass $(cat ~/pass-file) <2> 
+-----------------------------------------------------------------------
 
-* The username and password to use for authentication. There are a few ways to pass in the username and password. For example:
-+
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-./import_dashboards.sh -url https://xyz.found.io -u user:password <1>
-
-./import_dashboards.sh -url https://xyz.found.io -u admin:$(cat ~/pass-file) <2> 
-
-./import_dashboards.sh -url https://user:password@xyz.found.io <3>
-----------------------------------------------------------------------
-+
-<1> Specify the username and password separated by a colon.
+<1> Specify the username and password as options.
 <2> Use a file to avoid polluting the bash history with the password.
-<3> Put the username and password in the URL.
 
-These options are also available when you run `.\import_dashboards.ps1` on Windows.
+Please see <<import-dashboards,import Kibana dashboards>> for more details about the `import_dashboards` script.
 
 [[view-kibana-dashboards]]
 === Opening the Beats Dashboards in Kibana
 
-After <<load-kibana-dashboards,loading the Beats dashboards>>,
+After <<load-kibana-dashboards,importing the Beats dashboards>>,
 launch the Kibana web interface by pointing your browser
 to port 5601. For example, http://127.0.0.1:5601[http://127.0.0.1:5601].
 
