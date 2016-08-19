@@ -1513,6 +1513,101 @@ Text of this backend's most recent query. If state is active this field shows th
 
 
 [float]
+== bgwriter Fields
+
+Statistics about the background writer process's activity. Collected using the pg_stat_bgwriter query.
+
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.scheduled
+
+type: long
+
+Number of scheduled checkpoints that have been performed.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.requested
+
+type: long
+
+Number of requested checkpoints that have been performed.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.times.write.ms
+
+type: float
+
+Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.times.sync.ms
+
+type: float
+
+Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk, in milliseconds.
+
+
+[float]
+=== postgresql.bgwriter.buffers.checkpoints
+
+type: long
+
+Number of buffers written during checkpoints.
+
+
+[float]
+=== postgresql.bgwriter.buffers.clean
+
+type: long
+
+Number of buffers written by the background writer.
+
+
+[float]
+=== postgresql.bgwriter.buffers.clean_full
+
+type: long
+
+Number of times the background writer stopped a cleaning scan because it had written too many buffers.
+
+
+[float]
+=== postgresql.bgwriter.buffers.backend
+
+type: long
+
+Number of buffers written directly by a backend.
+
+
+[float]
+=== postgresql.bgwriter.buffers.backend_fsync
+
+type: long
+
+Number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write)
+
+
+[float]
+=== postgresql.bgwriter.buffers.allocated
+
+type: long
+
+Number of buffers allocated.
+
+
+[float]
+=== postgresql.bgwriter.stats_reset
+
+type: date
+
+Time at which these statistics were last reset.
+
+
+[float]
 == database Fields
 
 One row per database, showing database-wide statistics. Collected by querying pg_stat_database
@@ -3299,7 +3394,8 @@ The hard limit on the number of file descriptors opened by the process. The hard
 [float]
 == cgroup Fields
 
-experimental[] Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.
+experimental[]
+Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.
 
 
 
