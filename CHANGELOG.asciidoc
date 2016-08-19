@@ -87,6 +87,12 @@ https://github.com/elastic/beats/compare/v1.2.3...v1.3.0[View commits]
 - Fix NFSv4 Operation returning the first found first-class operation available in compound requests. {pull}1821[1821]
 - Fix TCP overlapping segments not being handled correctly. {pull}1917[1917]
 
+==== Added
+
+*Affecting all Beats*
+
+- Updated to Go 1.7
+
 [[release-notes-1.2.3]]
 === Beats version 1.2.3
 https://github.com/elastic/beats/compare/v1.2.2...v1.2.3[View commits]
