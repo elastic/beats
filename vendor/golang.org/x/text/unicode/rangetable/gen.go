@@ -74,7 +74,8 @@ func main() {
 	for _, v := range versions {
 		assigned := []rune{}
 
-		parse(v, func(p *ucd.Parser) {
+		r := gen.Open("http://www.unicode.org/Public/", "", v+"/ucd/UnicodeData.txt")
+		ucd.Parse(r, func(p *ucd.Parser) {
 			assigned = append(assigned, p.Rune(0))
 		})
 
@@ -93,20 +94,6 @@ func main() {
 	fmt.Fprintf(w, "// Total size %d bytes (%d KiB)\n", size, size/1024)
 
 	gen.WriteGoFile("tables.go", "rangetable", w.Bytes())
-}
-
-// parse calls f for each entry in the given UCD file.
-func parse(version string, f func(p *ucd.Parser)) {
-	r := gen.Open("http://www.unicode.org/Public/", "", version+"/ucd/UnicodeData.txt")
-	defer r.Close()
-
-	p := ucd.New(r)
-	for p.Next() {
-		f(p)
-	}
-	if err := p.Err(); err != nil {
-		log.Fatal(err)
-	}
 }
 
 func print(w io.Writer, rt *unicode.RangeTable) {

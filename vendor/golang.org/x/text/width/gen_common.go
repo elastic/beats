@@ -60,7 +60,7 @@ func getWidthData(f func(r rune, tag elem, alt rune)) {
 	// We cannot reuse package norm's decomposition, as we need an unexpanded
 	// decomposition. We make use of the opportunity to verify that the
 	// decomposition type is as expected.
-	parse("UnicodeData.txt", func(p *ucd.Parser) {
+	ucd.Parse(gen.OpenUCDFile("UnicodeData.txt"), func(p *ucd.Parser) {
 		r := p.Rune(0)
 		s := strings.SplitN(p.String(ucd.DecompMapping), " ", 2)
 		if !maps[s[0]] {
@@ -78,7 +78,7 @@ func getWidthData(f func(r rune, tag elem, alt rune)) {
 	})
 
 	// <rune range>;<type>
-	parse("EastAsianWidth.txt", func(p *ucd.Parser) {
+	ucd.Parse(gen.OpenUCDFile("EastAsianWidth.txt"), func(p *ucd.Parser) {
 		tag, ok := typeMap[p.String(1)]
 		if !ok {
 			log.Fatalf("Unknown width type %q", p.String(1))
@@ -93,18 +93,4 @@ func getWidthData(f func(r rune, tag elem, alt rune)) {
 		}
 		f(r, tag, alt)
 	})
-}
-
-// parse calls f for each entry in the given UCD file.
-func parse(filename string, f func(p *ucd.Parser)) {
-	r := gen.OpenUCDFile(filename)
-	defer r.Close()
-
-	p := ucd.New(r)
-	for p.Next() {
-		f(p)
-	}
-	if err := p.Err(); err != nil {
-		log.Fatal(err)
-	}
 }

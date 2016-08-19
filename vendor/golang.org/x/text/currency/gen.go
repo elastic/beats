@@ -9,21 +9,20 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
-	"golang.org/x/text/cldr"
 	"golang.org/x/text/internal"
 	"golang.org/x/text/internal/gen"
 	"golang.org/x/text/internal/tag"
 	"golang.org/x/text/language"
+	"golang.org/x/text/unicode/cldr"
 )
 
 var (
@@ -39,7 +38,7 @@ var (
 func main() {
 	gen.Init()
 
-	rewriteCommon()
+	gen.Repackage("gen_common.go", "common.go", "currency")
 
 	// Read the CLDR zip file.
 	r := gen.OpenCLDRCoreZip()
@@ -62,22 +61,6 @@ func main() {
 	b := &builder{}
 	b.genCurrencies(w, data.Supplemental())
 	b.genSymbols(w, data)
-}
-
-func rewriteCommon() {
-	// Generate common.go
-	src, err := ioutil.ReadFile("gen_common.go")
-	if err != nil {
-		log.Fatal(err)
-	}
-	const toDelete = "// +build ignore\n\npackage main\n\n"
-	i := bytes.Index(src, []byte(toDelete))
-	if i < 0 {
-		log.Fatalf("could not find %q in gen_common.go", toDelete)
-	}
-	w := &bytes.Buffer{}
-	w.Write(src[i+len(toDelete):])
-	gen.WriteGoFile("common.go", "currency", w.Bytes())
 }
 
 var constants = []string{
@@ -109,6 +92,8 @@ func (b *builder) genCurrencies(w *gen.CodeWriter, data *cldr.SupplementalData) 
 			currencies = append(currencies, cur.Iso4217)
 		}
 	}
+	// Not included in the list for some reasons:
+	currencies = append(currencies, "MVP")
 
 	sort.Strings(currencies)
 	// Unique the elements.
@@ -186,7 +171,47 @@ func (b *builder) genCurrencies(w *gen.CodeWriter, data *cldr.SupplementalData) 
 
 	w.WriteType(toCurrency{})
 	w.WriteVar("regionToCurrency", regionToCurrency)
+
+	// Create a table that maps regions to currencies.
+	regionData := []regionInfo{}
+
+	for _, reg := range data.CurrencyData.Region {
+		if len(reg.Iso3166) != 2 {
+			log.Fatalf("Unexpected group %q in region data", reg.Iso3166)
+		}
+		for _, cur := range reg.Currency {
+			from, _ := time.Parse("2006-01-02", cur.From)
+			to, _ := time.Parse("2006-01-02", cur.To)
+			code := uint16(b.currencies.Index([]byte(cur.Iso4217)))
+			if cur.Tender == "false" {
+				code |= nonTenderBit
+			}
+			regionData = append(regionData, regionInfo{
+				region: regionToCode(language.MustParseRegion(reg.Iso3166)),
+				code:   code,
+				from:   toDate(from),
+				to:     toDate(to),
+			})
+		}
+	}
+	sort.Stable(byRegionCode(regionData))
+
+	w.WriteType(regionInfo{})
+	w.WriteVar("regionData", regionData)
 }
+
+type regionInfo struct {
+	region uint16
+	code   uint16 // 0x8000 not legal tender
+	from   uint32
+	to     uint32
+}
+
+type byRegionCode []regionInfo
+
+func (a byRegionCode) Len() int           { return len(a) }
+func (a byRegionCode) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byRegionCode) Less(i, j int) bool { return a[i].region < a[j].region }
 
 type toCurrency struct {
 	region uint16
@@ -267,8 +292,12 @@ func (b *builder) genSymbols(w *gen.CodeWriter, data *cldr.CLDR) {
 					v = ""
 				}
 				cur := b.currencies.Index([]byte(c.Type))
+				// XXX gets reassigned to 0 in the package's code.
+				if c.Type == "XXX" {
+					cur = 0
+				}
 				if cur == -1 {
-					fmt.Println("Unsupported:", c.Type) // TODO: mark MVP as supported.
+					fmt.Println("Unsupported:", c.Type)
 					continue
 				}
 

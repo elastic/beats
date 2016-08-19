@@ -56,16 +56,6 @@ func MustParseRegion(s string) Region {
 	return r
 }
 
-// MustParseCurrency is like ParseCurrency, but panics if the given currency cannot
-// be parsed. It simplifies safe initialization of Currency values.
-func MustParseCurrency(s string) Currency {
-	c, err := ParseCurrency(s)
-	if err != nil {
-		panic(err)
-	}
-	return c
-}
-
 var (
 	und = Tag{}
 
