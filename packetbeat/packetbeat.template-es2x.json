@@ -30,6 +30,50 @@
           }
         },
         {
+          "cassandra_request": {
+            "mapping": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "match_mapping_type": "string",
+            "path_match": "cassandra_request.*"
+          }
+        },
+        {
+          "cassandra_response": {
+            "mapping": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "match_mapping_type": "string",
+            "path_match": "cassandra_response.*"
+          }
+        },
+        {
+          "cassandra_request.request_headers": {
+            "mapping": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "match_mapping_type": "string",
+            "path_match": "cassandra_request.request_headers.*"
+          }
+        },
+        {
+          "cassandra_response.response_headers": {
+            "mapping": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "match_mapping_type": "string",
+            "path_match": "cassandra_response.response_headers.*"
+          }
+        },
+        {
           "http.request.headers": {
             "mapping": {
               "ignore_above": 1024,
