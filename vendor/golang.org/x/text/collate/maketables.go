@@ -25,12 +25,12 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"golang.org/x/text/cldr"
 	"golang.org/x/text/collate"
 	"golang.org/x/text/collate/build"
 	"golang.org/x/text/collate/colltab"
 	"golang.org/x/text/internal/gen"
 	"golang.org/x/text/language"
+	"golang.org/x/text/unicode/cldr"
 )
 
 var (
@@ -48,7 +48,9 @@ var (
 		"comma-separated list of languages to exclude.")
 	include = flagStringSet("include", "", "",
 		"comma-separated list of languages to include. Include trumps exclude.")
-	types = flagStringSetAllowAll("types", "", "",
+	// TODO: Not included: unihan gb2312han zhuyin big5han (for size reasons)
+	// TODO: Not included: traditional (buggy for Bengali)
+	types = flagStringSetAllowAll("types", "standard,phonebook,phonetic,reformed,pinyin,stroke", "",
 		"comma-separated list of types that should be included.")
 )
 
@@ -411,6 +413,12 @@ func parseCharacters(chars string) []string {
 
 var fileRe = regexp.MustCompile(`.*/collation/(.*)\.xml`)
 
+// typeMap translates legacy type keys to their BCP47 equivalent.
+var typeMap = map[string]string{
+	"phonebook":   "phonebk",
+	"traditional": "trad",
+}
+
 // parseCollation parses XML files in the collation directory of the CLDR core.zip file.
 func parseCollation(b *build.Builder) {
 	d := &cldr.Decoder{}
@@ -447,7 +455,11 @@ func parseCollation(b *build.Builder) {
 			// We assume tables are being built either for search or collation,
 			// but not both. For search the default is always "search".
 			if d != c.Type && c.Type != "search" {
-				id, err = id.SetTypeForKey("co", c.Type)
+				typ := c.Type
+				if len(c.Type) > 8 {
+					typ = typeMap[c.Type]
+				}
+				id, err = id.SetTypeForKey("co", typ)
 				failOnError(err)
 			}
 			t := b.Tailoring(id)

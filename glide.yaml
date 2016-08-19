@@ -47,7 +47,7 @@ import:
   - /proxy
   - /publicsuffix
 - package: golang.org/x/text
-  version: f024ad8118c1182f0c9c976f0fa8e56b39ef821b
+  version: d69c40b4be55797923cec7457fac7a244d91a9b6
   subpackages:
   - /encoding
 - package: github.com/satori/go.uuid

@@ -335,31 +335,6 @@ func (s scriptID) IsPrivateUse() bool {
 	return _Qaaa <= s && s <= _Qabx
 }
 
-type currencyID uint16
-
-func getCurrencyID(idx tag.Index, s []byte) (currencyID, error) {
-	i, err := findIndex(idx, s, "XXX")
-	return currencyID(i), err
-}
-
-// String returns the upper case representation of the currency.
-func (c currencyID) String() string {
-	if c == 0 {
-		return "XXX"
-	}
-	return currency.Elem(int(c))[:3]
-}
-
-// TODO: cash rounding and decimals.
-
-func round(index tag.Index, c currencyID) int {
-	return currencyInfo(index[c<<2+3]).round()
-}
-
-func decimals(index tag.Index, c currencyID) int {
-	return currencyInfo(index[c<<2+3]).decimals()
-}
-
 const (
 	maxAltTaglen = len("en-US-POSIX")
 	maxLen       = maxAltTaglen
@@ -404,9 +379,9 @@ var (
 		[maxLen]byte{'e', 'n', '-', 'u', 's', '-', 'p', 'o', 's', 'i', 'x'}: -7, // en_US_POSIX"
 	}
 
-	altTagIndex = [...]uint8{0, 17, 28, 42, 58, 71, 83, 99}
+	altTagIndex = [...]uint8{0, 17, 31, 45, 61, 74, 86, 102}
 
-	altTags = "xtg-x-cel-gaulishen-GB-x-oeden-x-i-defaultund-x-i-enochiansee-x-i-mingonan-x-zh-minen-US-u-va-posix"
+	altTags = "xtg-x-cel-gaulishen-GB-oxendicten-x-i-defaultund-x-i-enochiansee-x-i-mingonan-x-zh-minen-US-u-va-posix"
 )
 
 func grandfathered(s [maxAltTaglen]byte) (t Tag, ok bool) {
