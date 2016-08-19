@@ -397,7 +397,7 @@ package:
 
 	echo "Finished packages for ${BEATNAME}"
 
-package-dashboards:
+package-dashboards: package-setup
 	mkdir -p ${BUILD_DIR}
 	cp -r etc/kibana ${BUILD_DIR}/dashboards
 	# build the dashboards package
