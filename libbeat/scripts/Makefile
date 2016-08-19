@@ -29,6 +29,7 @@ ARCH?=$(shell uname -m)
 export PATH := ./bin:$(PATH)
 GOFILES = $(shell find . -type f -name '*.go')
 GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*")
+GOFILES_ALL = $(GOFILES) $(shell find $(ES_BEATS) -type f -name '*.go')
 SHELL=bash
 ES_HOST?="elasticsearch"
 PWD=$(shell pwd)
@@ -68,13 +69,11 @@ endif
 ### BUILDING ###
 
 # Builds beat
-.PHONY: ${BEATNAME}
-${BEATNAME}: $(GOFILES)
+${BEATNAME}: $(GOFILES_ALL)
 	go build
 
 # Create test coverage binary
-.PHONY: ${BEATNAME}.test
-${BEATNAME}.test: $(GOFILES)
+${BEATNAME}.test: $(GOFILES_ALL)
 	go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
 
 # Cross-compile beat for the OS'es specified in GOX_OS variable.
