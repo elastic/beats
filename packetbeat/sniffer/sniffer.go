@@ -133,7 +133,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 	}
 
 	if index, err := strconv.Atoi(sniffer.config.Device); err == nil { // Device is numeric
-		devices, err := ListDeviceNames(false)
+		devices, err := ListDeviceNames(false, false)
 		if err != nil {
 			return fmt.Errorf("Error getting devices list: %v", err)
 		}

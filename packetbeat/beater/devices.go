@@ -18,7 +18,7 @@ func init() {
 			return nil
 		}
 
-		devs, err := sniffer.ListDeviceNames(true)
+		devs, err := sniffer.ListDeviceNames(true, true)
 		if err != nil {
 			return fmt.Errorf("Error getting devices list: %v\n", err)
 		}
