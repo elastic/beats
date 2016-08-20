@@ -131,8 +131,13 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 	}
 
 	logp.Info("Max Retries set to: %v", sendRetries)
-	m, err := modeutil.NewConnectionMode(clients, !config.LoadBalance,
-		maxAttempts, defaultWaitRetry, config.Timeout, defaultMaxWaitRetry)
+	m, err := modeutil.NewConnectionMode(clients, modeutil.Settings{
+		Failover:     !config.LoadBalance,
+		MaxAttempts:  maxAttempts,
+		Timeout:      config.Timeout,
+		WaitRetry:    defaultWaitRetry,
+		MaxWaitRetry: defaultMaxWaitRetry,
+	})
 	if err != nil {
 		return err
 	}
