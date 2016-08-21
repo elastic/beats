@@ -2,8 +2,10 @@ package info
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/module/haproxy"
 	s "github.com/elastic/beats/metricbeat/schema"
 	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
+	"reflect"
 	"strings"
 )
 
@@ -80,11 +82,20 @@ func parseResponse(data []byte) map[string]string {
 }
 
 // Map data to MapStr
-func eventMapping(info map[string]string) common.MapStr {
+func eventMapping(info *haproxy.Info) common.MapStr {
 	// Full mapping from info
+
 	source := map[string]interface{}{}
-	for key, val := range info {
-		source[key] = val
+
+	st := reflect.ValueOf(info).Elem()
+	typeOfT := st.Type()
+	source = map[string]interface{}{}
+
+	for i := 0; i < st.NumField(); i++ {
+		f := st.Field(i)
+		source[typeOfT.Field(i).Name] = f.Interface()
+
 	}
+
 	return schema.Apply(source)
 }

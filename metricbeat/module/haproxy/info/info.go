@@ -1,20 +1,17 @@
 package info
 
 import (
-	"errors"
 	"fmt"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	"net"
-	//"net/http"
-	//"net/url"
+	"github.com/elastic/beats/metricbeat/module/haproxy"
 )
 
 const (
 	// defaultSocket is the default path to the unix socket tfor stats on haproxy.
-	statsMethod   = "info"
-	defaultSocket = "/var/lib/haproxy/stats"
+	statsMethod = "info"
+	defaultAddr = "unix:///var/lib/haproxy/stats"
 )
 
 var (
@@ -35,9 +32,8 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	statsMethod string
-	statsPath   string
-	counter     int
+	statsAddr string
+	counter   int
 }
 
 // New create a new instance of the MetricSet
@@ -46,11 +42,9 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config := struct {
-		StatsMethod string `config:"stats_method"`
-		StatsPath   string `config:"stats_path"`
+		StatsAddr string `config:"stats_addr"`
 	}{
-		StatsMethod: "unix_socket",
-		StatsPath:   defaultSocket,
+		StatsAddr: defaultAddr,
 	}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -59,8 +53,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		statsMethod:   config.StatsMethod,
-		statsPath:     config.StatsPath,
+		statsAddr:     config.StatsAddr,
 		counter:       1,
 	}, nil
 }
@@ -70,37 +63,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 
-	if m.statsMethod == "unix_socket" {
-
-		m.counter++
-		c, err := net.Dial("unix", m.statsPath)
-		if err != nil {
-			return nil, fmt.Errorf(fmt.Sprintf("HAProxy %s error: %s", statsMethod, err))
-		}
-		defer c.Close()
-
-		// Write the command to the socket
-		_, err = c.Write([]byte(fmt.Sprintf("show %s\n", statsMethod)))
-		if err != nil {
-			return nil, fmt.Errorf("Socket write error: %s", err)
-		}
-
-		// Now read from the socket
-		buf := make([]byte, 2048)
-		for {
-			_, err := c.Read(buf[:])
-			if err != nil {
-				return nil, err
-			}
-			return eventMapping(parseResponse(buf)), nil
-		}
-
-	} else {
-		// Get the data from the HTTP URI
-		m.counter++
-
+	hapc, err := haproxy.NewHaproxyClient(m.statsAddr)
+	if err != nil {
+		return nil, fmt.Errorf(fmt.Sprintf("HAProxy Client error: %s", err))
 	}
 
-	return nil, errors.New("Error getting HAProxy info")
+	res, err := hapc.GetInfo()
+
+	if err != nil {
+		return nil, fmt.Errorf(fmt.Sprintf("HAProxy Client error fetching %s: %s", statsMethod, err))
+	}
+	m.counter++
+
+	return eventMapping(res), nil
 
 }
