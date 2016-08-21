@@ -48,6 +48,9 @@ mysql:
 nginx:
   build: ${PWD}/module/nginx/_meta
 
+haproxy:
+  build: ${PWD}/module/haproxy/_meta
+
 redis:
   image: redis:3.2.0
 
