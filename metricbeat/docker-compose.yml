@@ -6,6 +6,7 @@ beat:
     - mysql
     - nginx
     - redis
+    - haproxy
     - zookeeper
   environment:
     - APACHE_HOST=apache
@@ -21,6 +22,7 @@ beat:
     - MYSQL_PORT=3306
     - ZOOKEEPER_HOST=zookeeper
     - ZOOKEEPER_PORT=2181
+    - HAPROXY_ADDR=/var/run/haproxy.sock
     - TEST_ENVIRONMENT=false
   working_dir: /go/src/github.com/elastic/beats/metricbeat
   volumes:

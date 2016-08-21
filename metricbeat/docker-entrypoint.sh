@@ -48,5 +48,5 @@ waitFor ${MYSQL_HOST} ${MYSQL_PORT} MySQL
 waitFor ${NGINX_HOST} ${NGINX_PORT} Nginx
 waitFor ${REDIS_HOST} ${REDIS_PORT} Redis
 waitFor ${ZOOKEEPER_HOST} ${ZOOKEEPER_PORT} Zookeeper
-waitFor ${HAPROXY_STATS_SOCKET} HAProxy
+waitFor ${HAPROXY_ADDR} HAProxy
 exec "$@"
