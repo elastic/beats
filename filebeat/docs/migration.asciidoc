@@ -208,25 +208,25 @@ output.logstash:
   # Network timeout in seconds.
   timeout: 15
 
-  # Optional TLS settings <2>
+  # Optional SSL settings <2>
   # List of root certificates for HTTPS server verifications
-  tls.certificate_authorities:
+  ssl.certificate_authorities:
     - ./logstash-forwarder.crt
 
-  # Certificate for TLS client authentication
-  tls.certificate: ./logstash-forwarder.crt
+  # Certificate for SSL client authentication
+  ssl.certificate: ./logstash-forwarder.crt
 
   # Client Certificate Key
-  tls.certificate_key: ./logstash-forwarder.key
+  ssl.key: ./logstash-forwarder.key
 -------------------------------------------------------------------------------------
 
 <1> When multiple hosts are defined, the default behavior in Filebeat is to
     pick a random host for new connections, similar to the Logstash Forwarder
     behavior. Filebeat can optionally do load balancing. For more details, see the
     <<loadbalance>> configuration option.
-<2> Note that if the `tls` settings are missing, then TLS is disabled. TLS is
-    automatically enabled when you add any of the `tls` options. For more information about
-    specific configuration options, see <<configuration-output-tls>>.
+<2> Note that if the `ssl` settings are missing, then SSL is disabled. SSL is
+    automatically enabled when you add any of the `ssl` options. For more information about
+    specific configuration options, see <<configuration-output-ssl>>.
 
 
 [[changed-configuration-options]]
@@ -442,10 +442,10 @@ Behind the scenes, Filebeat uses a sightly improved protocol for communicating
 with Logstash.
 
 [float]
-=== TLS Is Off by Default
+=== SSL Is Off by Default
 
-If you follow the section on migrating the configuration, you will have TLS
-enabled. However, you must be aware that if the `tls` section is missing from the
+If you follow the section on migrating the configuration, you will have SSL
+enabled. However, you must be aware that if the `ssl` section is missing from the
 configuration file, Filebeat uses an unencrypted connection to talk to Logstash.
 
 [float]

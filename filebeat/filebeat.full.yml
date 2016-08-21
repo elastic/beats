@@ -373,34 +373,37 @@ output.elasticsearch:
   # Path to the Elasticsearch 2.x version of the template file.
   #template.versions.2x.path: "${path.config}/filebeat.template-es2x.json"
 
+  # Use SSL settings for HTTPS. Default is true.
+  #ssl.enabled: true
 
-  # TLS configuration. By default is off.
+  # Configure SSL verification mode. If `none` is configured, all server hosts
+  # and certificates will be accepted. In this mode, SSL based connections are
+  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
+  # `full`.
+  #ssl.verification_mode: full
+
+  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # 1.2 are enabled.
+  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+  # SSL configuration. By default is off.
   # List of root certificates for HTTPS server verifications
-  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-  # Certificate for TLS client authentication
-  #tls.certificate: "/etc/pki/client/cert.pem"
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  #tls.certificate_key: "/etc/pki/client/cert.key"
+  #ssl.key: "/etc/pki/client/cert.key"
 
-  # Controls whether the client verifies server certificates and host name.
-  # If insecure is set to true, all server host names and certificates will be
-  # accepted. In this mode TLS based connections are susceptible to
-  # man-in-the-middle attacks. Use only for testing.
-  #tls.insecure: true
+  # Optional passphrase for decrypting the Certificate Key.
+  #ssl.key_passphrase: ''
 
-  # Configure cipher suites to be used for TLS connections
-  #tls.cipher_suites: []
+  # Configure cipher suites to be used for SSL connections
+  #ssl.cipher_suites: []
 
   # Configure curve types for ECDHE based cipher suites
-  #tls.curve_types: []
-
-  # Configure minimum TLS version allowed for connection to logstash
-  #tls.min_version: 1.0
-
-  # Configure maximum TLS version allowed for connection to logstash
-  #tls.max_version: 1.2
+  #ssl.curve_types: []
 
 
 #----------------------------- Logstash output --------------------------------
@@ -434,27 +437,37 @@ output.elasticsearch:
   # Resolve names locally when using a proxy server. Defaults to false.
   #proxy_use_local_resolver: false
 
-  # Optional TLS configuration options. TLS is off by default.
-  # List of root certificates for HTTPS server verifications
-  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  #ssl.enabled: true
 
-  # Certificate for TLS client authentication
-  #tls.certificate: "/etc/pki/client/cert.pem"
+  # Configure SSL verification mode. If `none` is configured, all server hosts
+  # and certificates will be accepted. In this mode, SSL based connections are
+  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
+  # `full`.
+  #ssl.verification_mode: full
+
+  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # 1.2 are enabled.
+  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+  # Optional SSL configuration options. SSL is off by default.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  #tls.certificate_key: "/etc/pki/client/cert.key"
+  #ssl.key: "/etc/pki/client/cert.key"
 
-  # Controls whether the client verifies server certificates and host name.
-  # If insecure is set to true, all server host names and certificates will be
-  # accepted. In this mode TLS based connections are susceptible to
-  # man-in-the-middle attacks. Use only for testing.
-  #tls.insecure: true
+  # Optional passphrase for decrypting the Certificate Key.
+  #ssl.key_passphrase: ''
 
-  # Configure cipher suites to be used for TLS connections
-  #tls.cipher_suites: []
+  # Configure cipher suites to be used for SSL connections
+  #ssl.cipher_suites: []
 
   # Configure curve types for ECDHE based cipher suites
-  #tls.curve_types: []
+  #ssl.curve_types: []
 
 #------------------------------- Kafka output ---------------------------------
 #output.kafka:
@@ -559,27 +572,37 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Optional TLS configuration options. TLS is off by default.
-  # List of root certificates for HTTPS server verifications
-  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  #ssl.enabled: true
 
-  # Certificate for TLS client authentication
-  #tls.certificate: "/etc/pki/client/cert.pem"
+  # Optional SSL configuration options. SSL is off by default.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Configure SSL verification mode. If `none` is configured, all server hosts
+  # and certificates will be accepted. In this mode, SSL based connections are
+  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
+  # `full`.
+  #ssl.verification_mode: full
+
+  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # 1.2 are enabled.
+  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  #tls.certificate_key: "/etc/pki/client/cert.key"
+  #ssl.key: "/etc/pki/client/cert.key"
 
-  # Controls whether the client verifies server certificates and host name.
-  # If insecure is set to true, all server host names and certificates will be
-  # accepted. In this mode TLS based connections are susceptible to
-  # man-in-the-middle attacks. Use only for testing.
-  #tls.insecure: true
+  # Optional passphrase for decrypting the Certificate Key.
+  #ssl.key_passphrase: ''
 
-  # Configure cipher suites to be used for TLS connections
-  #tls.cipher_suites: []
+  # Configure cipher suites to be used for SSL connections
+  #ssl.cipher_suites: []
 
   # Configure curve types for ECDHE based cipher suites
-  #tls.curve_types: []
+  #ssl.curve_types: []
 
 #------------------------------- Redis output ---------------------------------
 #output.redis:
@@ -646,27 +669,38 @@ output.elasticsearch:
   # occurs on the proxy server.
   #proxy_use_local_resolver: false
 
-  # Optional TLS configuration options. TLS is off by default.
-  # List of root certificates for HTTPS server verifications
-  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  #ssl.enabled: true
 
-  # Certificate for TLS client authentication
-  #tls.certificate: "/etc/pki/client/cert.pem"
+  # Configure SSL verification mode. If `none` is configured, all server hosts
+  # and certificates will be accepted. In this mode, SSL based connections are
+  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
+  # `full`.
+  #ssl.verification_mode: full
+
+  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # 1.2 are enabled.
+  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+  # Optional SSL configuration options. SSL is off by default.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  #tls.certificate_key: "/etc/pki/client/cert.key"
+  #ssl.key: "/etc/pki/client/cert.key"
 
-  # Controls whether the client verifies server certificates and host name.
-  # If insecure is set to true, all server host names and certificates will be
-  # accepted. In this mode TLS based connections are susceptible to
-  # man-in-the-middle attacks. Use only for testing.
-  #tls.insecure: true
+  # Optional passphrase for decrypting the Certificate Key.
+  #ssl.key_passphrase: ''
 
-  # Configure cipher suites to be used for TLS connections
-  #tls.cipher_suites: []
+  # Configure cipher suites to be used for SSL connections
+  #ssl.cipher_suites: []
 
   # Configure curve types for ECDHE based cipher suites
-  #tls.curve_types: []
+  #ssl.curve_types: []
+
 
 #------------------------------- File output ----------------------------------
 #output.file:

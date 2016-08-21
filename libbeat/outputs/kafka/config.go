@@ -13,7 +13,7 @@ import (
 
 type kafkaConfig struct {
 	Hosts           []string                  `config:"hosts"               validate:"required"`
-	TLS             *outputs.TLSConfig        `config:"tls"`
+	TLS             *outputs.TLSConfig        `config:"ssl"`
 	Timeout         time.Duration             `config:"timeout"             validate:"min=1"`
 	Worker          int                       `config:"worker"              validate:"min=1"`
 	Metadata        metaConfig                `config:"metadata"`

@@ -8,7 +8,7 @@ The following topics describe how to secure communication between
 {beatname_uc} and other products in the Elastic stack:
 
 * <<securing-communication-elasticsearch>>
-* <<configuring-tls-logstash>>
+* <<configuring-ssl-logstash>>
 
 --
 
@@ -16,6 +16,6 @@ The following topics describe how to secure communication between
 == Securing Communication With Elasticsearch
 include::../../libbeat/docs/https.asciidoc[]
 
-[[configuring-tls-logstash]]
-== Securing Communication With Logstash by Using TLS
-include::../../libbeat/docs/shared-tls-logstash-config.asciidoc[]
+[[configuring-ssl-logstash]]
+== Securing Communication With Logstash by Using SSL
+include::../../libbeat/docs/shared-ssl-logstash-config.asciidoc[]

@@ -117,7 +117,7 @@ func TestLogstashTLS(t *testing.T) {
 		"hosts":                       []string{server.Addr()},
 		"index":                       testLogstashIndex("logstash-conn-tls"),
 		"timeout":                     2,
-		"tls.certificate_authorities": []string{certName + ".pem"},
+		"ssl.certificate_authorities": []string{certName + ".pem"},
 	}
 	testConnectionType(t, server, testOutputerFactory(t, "", config))
 }
@@ -135,8 +135,8 @@ func TestLogstashInvalidTLSInsecure(t *testing.T) {
 		"index":                       testLogstashIndex("logstash-conn-tls-invalid"),
 		"timeout":                     2,
 		"max_retries":                 1,
-		"tls.insecure":                true,
-		"tls.certificate_authorities": []string{certName + ".pem"},
+		"ssl.verification_mode":       "none",
+		"ssl.certificate_authorities": []string{certName + ".pem"},
 	}
 	testConnectionType(t, server, testOutputerFactory(t, "", config))
 }

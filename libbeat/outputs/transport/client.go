@@ -1,7 +1,6 @@
 package transport
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net"
 	"sync"
@@ -19,7 +18,7 @@ type Client struct {
 
 type Config struct {
 	Proxy   *ProxyConfig
-	TLS     *tls.Config
+	TLS     *TLSConfig
 	Timeout time.Duration
 	Stats   *IOStats
 }
@@ -34,7 +33,10 @@ func MakeDialer(c *Config) (Dialer, error) {
 	if c.Stats != nil {
 		dialer = StatsDialer(dialer, c.Stats)
 	}
-	dialer = TLSDialer(c.TLS, c.Timeout, dialer)
+
+	if c.TLS != nil {
+		return TLSDialer(dialer, c.TLS, c.Timeout)
+	}
 	return dialer, nil
 }
 

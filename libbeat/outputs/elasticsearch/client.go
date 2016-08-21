@@ -2,7 +2,6 @@ package elasticsearch
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"expvar"
@@ -23,6 +22,8 @@ import (
 
 type Client struct {
 	Connection
+	tlsConfig *transport.TLSConfig
+
 	index    outil.Selector
 	pipeline *outil.Selector
 	params   map[string]string
@@ -41,7 +42,7 @@ type Client struct {
 type ClientSettings struct {
 	URL                string
 	Proxy              *url.URL
-	TLS                *tls.Config
+	TLS                *transport.TLSConfig
 	Username, Password string
 	Parameters         map[string]string
 	Index              outil.Selector
@@ -105,13 +106,24 @@ func NewClient(
 
 	logp.Info("Elasticsearch url: %s", s.URL)
 
-	dialer := transport.NetDialer(s.Timeout)
-	dialer = transport.StatsDialer(dialer, &transport.IOStats{
+	// TODO: add socks5 proxy support
+	var dialer, tlsDialer transport.Dialer
+	var err error
+
+	dialer = transport.NetDialer(s.Timeout)
+	tlsDialer, err = transport.TLSDialer(dialer, s.TLS, s.Timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	iostats := &transport.IOStats{
 		Read:        statReadBytes,
 		Write:       statWriteBytes,
 		ReadErrors:  statReadErrors,
 		WriteErrors: statWriteErrors,
-	})
+	}
+	dialer = transport.StatsDialer(dialer, iostats)
+	tlsDialer = transport.StatsDialer(tlsDialer, iostats)
 
 	params := s.Parameters
 	bulkRequ, err := newBulkRequest(s.URL, "", "", params, nil)
@@ -137,17 +149,18 @@ func NewClient(
 			Password: s.Password,
 			http: &http.Client{
 				Transport: &http.Transport{
-					Dial:            dialer.Dial,
-					TLSClientConfig: s.TLS,
-					Proxy:           proxy,
+					Dial:    dialer.Dial,
+					DialTLS: tlsDialer.Dial,
+					Proxy:   proxy,
 				},
 				Timeout: s.Timeout,
 			},
 			encoder: encoder,
 		},
-		index:    s.Index,
-		pipeline: pipeline,
-		params:   params,
+		tlsConfig: s.TLS,
+		index:     s.Index,
+		pipeline:  pipeline,
+		params:    params,
 
 		bulkRequ: bulkRequ,
 
@@ -171,14 +184,13 @@ func (client *Client) Clone() *Client {
 	// most likely containing the ingest node pipeline and default callback trying to
 	// create install a template, we don't want these to be included in the clone.
 
-	transport := client.http.Transport.(*http.Transport)
 	c, _ := NewClient(
 		ClientSettings{
 			URL:              client.URL,
 			Index:            client.index,
 			Pipeline:         client.pipeline,
 			Proxy:            client.proxyURL,
-			TLS:              transport.TLSClientConfig,
+			TLS:              client.tlsConfig,
 			Username:         client.Username,
 			Password:         client.Password,
 			Parameters:       nil, // XXX: do not pass params?
