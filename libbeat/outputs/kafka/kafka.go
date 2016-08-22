@@ -143,13 +143,13 @@ func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
 		maxAttempts = 0
 	}
 
-	mode, err := modeutil.NewAsyncConnectionMode(
-		clients,
-		false,
-		maxAttempts,
-		defaultWaitRetry,
-		libCfg.Net.WriteTimeout,
-		defaultMaxWaitRetry)
+	mode, err := modeutil.NewAsyncConnectionMode(clients, modeutil.Settings{
+		Failover:     false,
+		MaxAttempts:  maxAttempts,
+		WaitRetry:    defaultWaitRetry,
+		Timeout:      libCfg.Net.WriteTimeout,
+		MaxWaitRetry: defaultMaxWaitRetry,
+	})
 	if err != nil {
 		logp.Err("Failed to configure kafka connection: %v", err)
 		return nil, err

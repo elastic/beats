@@ -13,32 +13,41 @@ type ClientFactory func(host string) (mode.ProtocolClient, error)
 
 type AsyncClientFactory func(string) (mode.AsyncProtocolClient, error)
 
+type Settings struct {
+	Failover     bool
+	MaxAttempts  int
+	WaitRetry    time.Duration
+	Timeout      time.Duration
+	MaxWaitRetry time.Duration
+}
+
 func NewConnectionMode(
 	clients []mode.ProtocolClient,
-	failover bool,
-	maxAttempts int,
-	waitRetry, timeout, maxWaitRetry time.Duration,
+	s Settings,
 ) (mode.ConnectionMode, error) {
-	if failover {
+	if s.Failover {
 		clients = NewFailoverClient(clients)
 	}
 
+	maxSend := s.MaxAttempts
+	wait := s.WaitRetry
+	maxWait := s.MaxWaitRetry
+	to := s.Timeout
+
 	if len(clients) == 1 {
-		return single.New(clients[0], maxAttempts, waitRetry, timeout, maxWaitRetry)
+		return single.New(clients[0], maxSend, wait, to, maxWait)
 	}
-	return lb.NewSync(clients, maxAttempts, waitRetry, timeout, maxWaitRetry)
+	return lb.NewSync(clients, maxSend, wait, to, maxWait)
 }
 
 func NewAsyncConnectionMode(
 	clients []mode.AsyncProtocolClient,
-	failover bool,
-	maxAttempts int,
-	waitRetry, timeout, maxWaitRetry time.Duration,
+	s Settings,
 ) (mode.ConnectionMode, error) {
-	if failover {
+	if s.Failover {
 		clients = NewAsyncFailoverClient(clients)
 	}
-	return lb.NewAsync(clients, maxAttempts, waitRetry, timeout, maxWaitRetry)
+	return lb.NewAsync(clients, s.MaxAttempts, s.WaitRetry, s.Timeout, s.MaxWaitRetry)
 }
 
 // MakeClients will create a list from of ProtocolClient instances from
@@ -99,8 +108,8 @@ func MakeAsyncClients(
 
 func ReadHostList(cfg *common.Config) ([]string, error) {
 	config := struct {
-		Hosts  []string `config:"hosts"`
-		Worker int      `config:"worker"`
+		Hosts  []string `config:"hosts"  validate:"required"`
+		Worker int      `config:"worker" validate:"min=1"`
 	}{
 		Worker: 1,
 	}
