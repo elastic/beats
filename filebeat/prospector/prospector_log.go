@@ -61,8 +61,8 @@ func (p *ProspectorLog) Run() {
 	// It is important that a first scan is run before cleanup to make sure all new states are read first
 	if p.config.CleanInactive > 0 || p.config.CleanRemoved {
 		beforeCount := p.Prospector.states.Count()
-		p.Prospector.states.Cleanup()
-		logp.Debug("prospector", "Prospector states cleaned up. Before: %d, After: %d", beforeCount, p.Prospector.states.Count())
+		cleanedStates := p.Prospector.states.Cleanup()
+		logp.Debug("prospector", "Prospector states cleaned up. Before: %d, After: %d", beforeCount, beforeCount-cleanedStates)
 	}
 
 	// Marking removed files to be cleaned up. Cleanup happens after next scan to make sure all states are updated first

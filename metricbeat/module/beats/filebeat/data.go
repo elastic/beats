@@ -21,4 +21,12 @@ var schema = s.Schema{
 			"truncated": c.Int("filebeat.prospector.log.files.truncated"),
 		},
 	},
+	"registrar": s.Object{
+		"states": s.Object{
+			"update":  c.Int("registar.states.update"),
+			"cleanup": c.Int("registar.states.cleanup"),
+			"current": c.Int("registar.states.current"),
+		},
+		"writes": c.Int("registrar.writes"),
+	},
 }
