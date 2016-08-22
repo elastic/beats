@@ -756,6 +756,63 @@
                 }
               }
             },
+            "bgwriter": {
+              "properties": {
+                "buffers": {
+                  "properties": {
+                    "allocated": {
+                      "type": "long"
+                    },
+                    "backend": {
+                      "type": "long"
+                    },
+                    "backend_fsync": {
+                      "type": "long"
+                    },
+                    "checkpoints": {
+                      "type": "long"
+                    },
+                    "clean": {
+                      "type": "long"
+                    },
+                    "clean_full": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "checkpoints": {
+                  "properties": {
+                    "requested": {
+                      "type": "long"
+                    },
+                    "scheduled": {
+                      "type": "long"
+                    },
+                    "times": {
+                      "properties": {
+                        "sync": {
+                          "properties": {
+                            "ms": {
+                              "type": "float"
+                            }
+                          }
+                        },
+                        "write": {
+                          "properties": {
+                            "ms": {
+                              "type": "float"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "stats_reset": {
+                  "type": "date"
+                }
+              }
+            },
             "database": {
               "properties": {
                 "blocks": {
