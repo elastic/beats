@@ -707,6 +707,23 @@ output.elasticsearch:
   # using any event field. To set the topic from document type use `%{[type]}`.
   #topic: beats
 
+  # The Kafka event key setting. Use format string to create unique event key.
+  # By default no event key will be generated.
+  #key: ''
+
+  # The Kafka event partitioning strategy. Default hashing strategy is `hash`
+  # using the `output.kafka.key` setting or randomly distributes events if
+  # `output.kafka.key` is not configured.
+  #partition.hash:
+    # If enabled, events will only be published to partitions with reachable
+    # leaders. Default is false.
+    #reachable_only: false
+
+    # Configure alternative event field names used to compute the hash value.
+    # If empty `output.kafka.key` setting will be used.
+    # Default value is empty list.
+    #hash: []
+
   # Authentication details. Password is required if username is set.
   #username: ''
   #password: ''
