@@ -11,7 +11,7 @@ that all Beats behave consistently and that they are easy to package and run
 with common tools.
 
 In this guide, you learn how to use the Beat generator to create source code for
-an example Beat called Testbeat. The Beat generator creates all the files required
+an example Beat called Countbeat. The Beat generator creates all the files required
 for a working Beat. To create your own Beat, you modify the generated
 files and implement the custom logic needed to collect the data you want to ship.
 
@@ -39,7 +39,7 @@ go get github.com/elastic/beats
 ----------------------------------------------------------------------
 
 When you run the command, all source files are downloaded to the
-`$GOPATH/src` path. You can ignore the "no buildable Go source files" message because
+`$GOPATH/src/github.com/elastic/beats` path. You can ignore the "no buildable Go source files" message because
 you will build the source later.
 
 === Overview
@@ -108,7 +108,7 @@ Before running the Beat generator, you must install https://github.com/audreyr/c
 command-line utility that creates projects from project templates. Check out the 
 http://cookiecutter.readthedocs.io/en/latest/installation.html[installation guide]. After installing cookiecutter,
 decide on a name for your beat. The name should be one word with the first letter capitalized. In our example,
-we use `Testbeat`.
+we use `Countbeat`.
 
 Now create a directory under $GOPATH for your repository and change to the new directory:
 
@@ -125,19 +125,19 @@ Run cookiecutter and specify the path to the Beat generator:
 cookiecutter $GOPATH/src/github.com/elastic/beats/generate/beat
 --------------------
 
-Cookiecutter will prompt you to enter information about your Beat. For the `project_name`, enter `Testbeat`.
+Cookiecutter will prompt you to enter information about your Beat. For the `project_name`, enter `Countbeat`.
 For the `github_name`, enter your github id. The `beat` and `beat_path` are set to the correct values automatically (just press Enter to accept each default). For the `full_name`, enter your firstname and lastname.
 
 [source,shell]
 ---------
-project_name [Examplebeat]: Testbeat
+project_name [Examplebeat]: Countbeat
 github_name [your-github-name]: {username}
-beat [testbeat]:
+beat [countbeat]:
 beat_path [github.com/{github id}]:
 full_name [Firstname Lastname]: {Full Name}
 ---------
 
-The Beat generator creates a directory called `testbeat` inside of your project folder. 
+The Beat generator creates a directory called `countbeat` inside of your project folder. 
 
 You now have a raw template of the Beat, but you still need to <<setting-up-beat,fetch dependencies and set up the Beat>>.
 
@@ -153,33 +153,33 @@ To fetch dependencies and set up the Beat, run:
 
 [source,shell]
 ---------
-cd $GOPATH/src/github.com/{user}/testbeat
+cd $GOPATH/src/github.com/{user}/countbeat
 make setup
 ---------
 
-The Beat now contains the basic config file, `testbeat.yml`, and template files. The Beat is "complete" in the sense
+The Beat now contains the basic config file, `countbeat.yml`, and template files. The Beat is "complete" in the sense
 that you can compile and run it. However, to make it functionally complete, you need to add your custom logic (see <<beater-interface>>), along with any additional configuration parameters that your Beat requires.
 
 [[compiling-and-running]]
 === Building and Running the Beat
 
-To compile the Beat, make sure you are in the Beat directory (`$GOPATH/src/github.com/{user}/testbeat`) and run:
+To compile the Beat, make sure you are in the Beat directory (`$GOPATH/src/github.com/{user}/countbeat`) and run:
 
 [source,shell]
 ---------
 make 
 ---------
 
-Running this command creates the binary called `testbeat` in `$GOPATH/src/github.com/{user}/testbeat`.
+Running this command creates the binary called `countbeat` in `$GOPATH/src/github.com/{user}/countbeat`.
 
 Now run the Beat:
 
 [source,shell]
 ---------
-./testbeat -e -d "*" 
+./countbeat -e -d "*" 
 ---------
 
-The command automatically loads the default config file, `testbeat.yml`, and sends debug output to the console.
+The command automatically loads the default config file, `countbeat.yml`, and sends debug output to the console.
 
 You can stop the Beat by pressing `Ctrl+C`. 
 
@@ -217,7 +217,7 @@ implements two methods: <<run-method,`Run()`>> and <<stop-method,`Stop()`>>.
 
 [source,go]
 --------------
-type Testbeat struct {
+type Countbeat struct {
 	done   chan struct{} <1>
 	config config.Config <2>
 	client publisher.Client <3>
@@ -225,12 +225,12 @@ type Testbeat struct {
 	...
 }
 
-func (bt *Testbeat) Run(b *beat.Beat) error {
+func (bt *Countbeat) Run(b *beat.Beat) error {
 	...
 }
 
 
-func (bt *Testbeat) Stop() {
+func (bt *Countbeat) Stop() {
 	...
 }
 
@@ -238,12 +238,12 @@ func (bt *Testbeat) Stop() {
 
 By default, the Beat object contains the following:
 
-<1> `done`: Channel used by the `Run()` function to stop when the `Stop()` function is called.
+<1> `done`: Channel used by the `Run()` method to stop when the `Stop()` method is called.
 <2> `config`: Configuration options for the Beat
 <3> `client`: Publisher that takes care of sending the events to the
   defined output.
 
-The `Beat` parameter received by the `Run` function contains data about the
+The `Beat` parameter received by the `Run` method contains data about the
 Beat, such as the name, version, and common configuration options.
 
 Each Beat also needs to implement the <<new-function,`New()`>> function to create the Beat object. This means your
@@ -256,7 +256,7 @@ and sends it to the defined output using the publisher
 <<stop-method, Stop>>:: Contains logic that is called when the Beat is signaled to stop
 
 When you run the Beat generator, it adds implementations for all these functions to the source code (see
-`beater/testbeat.go`). You can modify these implementations, as required, for your Beat.
+`beater/countbeat.go`). You can modify these implementations, as required, for your Beat.
 
 We strongly recommend that you create a main package that contains only the main
 method (see `main.go`). All your Beat-specific code should go in a separate folder and package.
@@ -273,7 +273,7 @@ sample implementation.
 
 The `New()` function receives the configuration options defined for the Beat and
 creates a Beat object based on them. Here's the `New()` function that's generated in
-`beater/testbeat.go` when you run the Beat generator:
+`beater/countbeat.go` when you run the Beat generator:
 
 [source,go]
 ----------------------------------------------------------------------
@@ -283,7 +283,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	bt := &Testbeat{
+	bt := &Countbeat{
 		done:   make(chan struct{}),
 		config: config,
 	}
@@ -319,11 +319,11 @@ var DefaultConfig = Config{
 ----------------------------------------------------------------------
 
 
-This mirrors the config options that are defined in the config file, `testbeat.yml`. 
+This mirrors the config options that are defined in the config file, `countbeat.yml`. 
 
 [source,yaml]
 ------------
-testbeat:
+countbeat:
   # Defines how often an event is sent to the output
   period: 10s
 ------------
@@ -344,7 +344,7 @@ type Config struct {
 }
 
 var DefaultConfig = Config{
-	Period: 1 * time.Second,
+    Period: 1 * time.Second,
     Path:   ".",
 }
 
@@ -354,7 +354,7 @@ You also need to add `path` to `etc/beat.yml`:
 
 [source,yml]
 ----------------------------------------------------------------------
-testbeat:
+countbeat:
   # Defines how often an event is sent to the output
   period: 10s
   path: "."
@@ -374,8 +374,8 @@ The `Run` method contains your main application loop.
 
 [source,go]
 ----------------------------------------------------------------------
-func (bt *Testbeat) Run(b *beat.Beat) error {
-	logp.Info("testbeat is running! Hit CTRL-C to stop it.")
+func (bt *Countbeat) Run(b *beat.Beat) error {
+	logp.Info("countbeat is running! Hit CTRL-C to stop it.")
 
 	bt.client = b.Publisher.Connect()
 	ticker := time.NewTicker(bt.config.Period)
@@ -413,8 +413,8 @@ When you add fields to the event object, you also need to add them to the `etc/f
 
 [source,yaml]
 ----------------------------------------------------------------------
-- key: testbeat
-  title: testbeat
+- key: countbeat
+  title: countbeat
   description:
   fields:
     - name: counter
@@ -438,7 +438,7 @@ which breaks the main loop.
 
 [source,go]
 ----------------------------------------------------------------------
-func (bt *Testbeat) Stop() {
+func (bt *Countbeat) Stop() {
 	bt.client.Close()
 	close(bt.done)
 }
@@ -446,7 +446,7 @@ func (bt *Testbeat) Stop() {
 
 ==== The main Function
 
-If you follow the `Testbeat` model and put your Beat-specific code in its own type
+If you follow the `Countbeat` model and put your Beat-specific code in its own type
 that implements the `Beater` interface, the code from your main package is
 very simple:
 
@@ -459,11 +459,11 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 
-	"github.com/kimjmin/testbeat/beater"
+	"github.com/kimjmin/countbeat/beater"
 )
 
 func main() {
-	err := beat.Run("testbeat", "", beater.New)
+	err := beat.Run("countbeat", "", beater.New)
 	if err != nil {
 		os.Exit(1)
 	}

@@ -38,9 +38,9 @@ workers.idle
 
 
 [[abbreviations]]
-==== Standard Abbreviations
+==== Standardised Names
 
-Here is a list of standardised words and units that are used across all Beats:
+Here is a list of standardised names and units that are used across all Beats:
 
 [options="header"]
 |=======================
