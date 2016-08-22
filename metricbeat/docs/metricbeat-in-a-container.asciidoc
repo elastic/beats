@@ -6,8 +6,13 @@ examples on this page assume you are using your own Metricbeat container image.
 Metricbeat can be executed in a container and when doing so there are some
 important things to be aware of if you want to monitor the host machine or other
 containers. Let's walk-through some examples using Docker as our container
-orchestration tool. This first example highlights the changes required to make
-the system module work properly.
+orchestration tool.
+
+=== Monitoring the Host Machine
+
+This first example highlights the changes required to make the system module
+work properly inside of a container. This enables Metricbeat to monitor the
+host machine from within the container.
 
 [source,sh]
 ---
@@ -26,10 +31,10 @@ containers `/proc` is different than the host's `/proc`. To account for this you
 can mount the host's `/proc` filesystem inside of the container and tell
 Metricbeat to look inside the `/hostfs` directory when looking for `/proc` by
 using the `-system.hostfs=/hostfs` CLI flag.
-<2> If you have enabled cgroup reporting from the system process metricset then
-you need to mount the host's cgroup mountpoints within the container. They
-need to be mounted inside the directory specified by the `-system.hostfs` CLI
-flag.
+<2> If you have enabled cgroup reporting (an experimental feature) from the
+system process metricset then you need to mount the host's cgroup mountpoints
+within the container. They need to be mounted inside the directory specified by
+the `-system.hostfs` CLI flag.
 <3> If you want to be able to monitor filesystems from the host using the
 system filesystem metricset then those filesystems need to be mounted inside
 of the container. They can be mounted at any location.
@@ -38,6 +43,8 @@ of the container. They can be mounted at any location.
 to make this file contain the host's network devices is to use the `--net=host`
 flag. This is due to Linux namespacing, simply bind mounting the host's `/proc`
 to `/hostfs/proc` is not sufficient.
+
+=== Monitoring a Service in Another Container
 
 Next let's look at an example of monitoring a containerized service from a
 Metricbeat container.
