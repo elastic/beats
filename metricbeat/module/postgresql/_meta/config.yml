@@ -3,8 +3,12 @@
     # Stats about every PostgreSQL database
     #- database
 
+    # Stats about the background writer process's activity
+    #- bgwriter
+
     # Stats about every PostgreSQL process
-    #-activity
+    #- activity
+
   #enabled: true
   #period: 10s
 

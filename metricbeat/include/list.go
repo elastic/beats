@@ -20,6 +20,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/nginx/stubstatus"
 	_ "github.com/elastic/beats/metricbeat/module/postgresql"
 	_ "github.com/elastic/beats/metricbeat/module/postgresql/activity"
+	_ "github.com/elastic/beats/metricbeat/module/postgresql/bgwriter"
 	_ "github.com/elastic/beats/metricbeat/module/postgresql/database"
 	_ "github.com/elastic/beats/metricbeat/module/redis"
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
