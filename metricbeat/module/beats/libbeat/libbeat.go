@@ -1,4 +1,4 @@
-package filebeat
+package libbeat
 
 import (
 	"net/http"
@@ -9,8 +9,9 @@ import (
 	"github.com/elastic/beats/metricbeat/module/beats"
 )
 
+// init registers the MetricSet with the central registry.
 func init() {
-	if err := mb.Registry.AddMetricSet("beats", "filebeat", New); err != nil {
+	if err := mb.Registry.AddMetricSet("beats", "libbeat", New); err != nil {
 		panic(err)
 	}
 }
@@ -23,7 +24,7 @@ type MetricSet struct {
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
-	logp.Warn("EXPERIMENTAL: The filebeat metricset is experimental")
+	logp.Warn("EXPERIMENTAL: The libbeat metricset is experimental")
 
 	// Additional configuration options
 	config := struct {
