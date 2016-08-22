@@ -22,9 +22,8 @@ There are 4 more configuration options which can be used to close file handlers,
 * close_renamed
 * close_removed
 * close_eof
-* close_timeout
 
-`close_renamed` and `close_removed` can be useful on Windows and issues related to file rotation, see <<windows-file-rotation>>. `close_eof` can be useful in environments with a large number of files with only very few entries. `close_timeout` in environments where it is more important to close file handlers then to send all log lines. More details can be found in config options, see <<configuration-filebeat-options>>.
+`close_renamed` and `close_removed` can be useful on Windows and issues related to file rotation, see <<windows-file-rotation>>. `close_eof` can be useful in environments with a large number of files with only very few entries. More details can be found in config options, see <<configuration-filebeat-options>>.
 
 Before using any of these variables, make sure to study the documentation on each.
 
