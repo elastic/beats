@@ -3578,6 +3578,8 @@ Path to the cgroup relative to the cgroup subsystem's mountpoint.
 
 type: long
 
+format: bytes
+
 Total memory usage by processes in the cgroup (in bytes).
 
 
@@ -3586,6 +3588,8 @@ Total memory usage by processes in the cgroup (in bytes).
 
 type: long
 
+format: bytes
+
 The maximum memory used by processes in the cgroup (in bytes).
 
 
@@ -3593,6 +3597,8 @@ The maximum memory used by processes in the cgroup (in bytes).
 === system.process.cgroup.memory.mem.limit.bytes
 
 type: long
+
+format: bytes
 
 The maximum amount of user memory in bytes (including file cache) that tasks in the cgroup are allowed to use.
 
@@ -3610,6 +3616,8 @@ The number of times that the memory limit (mem.limit.bytes) was reached.
 
 type: long
 
+format: bytes
+
 The sum of current memory usage plus swap space used by processes in the cgroup (in bytes).
 
 
@@ -3618,6 +3626,8 @@ The sum of current memory usage plus swap space used by processes in the cgroup 
 
 type: long
 
+format: bytes
+
 The maximum amount of memory and swap space used by processes in the cgroup (in bytes).
 
 
@@ -3625,6 +3635,8 @@ The maximum amount of memory and swap space used by processes in the cgroup (in 
 === system.process.cgroup.memory.memsw.limit.bytes
 
 type: long
+
+format: bytes
 
 The maximum amount for the sum of memory and swap usage that tasks in the cgroup are allowed to use.
 
@@ -3642,6 +3654,8 @@ The number of times that the memory plus swap space limit (memsw.limit.bytes) wa
 
 type: long
 
+format: bytes
+
 Total kernel memory usage by processes in the cgroup (in bytes).
 
 
@@ -3650,6 +3664,8 @@ Total kernel memory usage by processes in the cgroup (in bytes).
 
 type: long
 
+format: bytes
+
 The maximum kernel memory used by processes in the cgroup (in bytes).
 
 
@@ -3657,6 +3673,8 @@ The maximum kernel memory used by processes in the cgroup (in bytes).
 === system.process.cgroup.memory.kmem.limit.bytes
 
 type: long
+
+format: bytes
 
 The maximum amount of kernel memory that tasks in the cgroup are allowed to use.
 
@@ -3674,6 +3692,8 @@ The number of times that the memory limit (kmem.limit.bytes) was reached.
 
 type: long
 
+format: bytes
+
 Total memory usage for TCP buffers in bytes.
 
 
@@ -3682,6 +3702,8 @@ Total memory usage for TCP buffers in bytes.
 
 type: long
 
+format: bytes
+
 The maximum memory used for TCP buffers by processes in the cgroup (in bytes).
 
 
@@ -3689,6 +3711,8 @@ The maximum memory used for TCP buffers by processes in the cgroup (in bytes).
 === system.process.cgroup.memory.kmem_tcp.limit.bytes
 
 type: long
+
+format: bytes
 
 The maximum amount of memory for TCP buffers that tasks in the cgroup are allowed to use.
 
@@ -3706,6 +3730,8 @@ The number of times that the memory limit (kmem_tcp.limit.bytes) was reached.
 
 type: long
 
+format: bytes
+
 Anonymous and swap cache on active least-recently-used (LRU) list, including tmpfs (shmem), in bytes.
 
 
@@ -3714,6 +3740,8 @@ Anonymous and swap cache on active least-recently-used (LRU) list, including tmp
 
 type: long
 
+format: bytes
+
 File-backed memory on active LRU list, in bytes.
 
 [float]
@@ -3721,12 +3749,16 @@ File-backed memory on active LRU list, in bytes.
 
 type: long
 
+format: bytes
+
 Page cache, including tmpfs (shmem), in bytes.
 
 [float]
 === system.process.cgroup.memory.stats.hierarchical_memory_limit.bytes
 
 type: long
+
+format: bytes
 
 Memory limit for the hierarchy that contains the memory cgroup, in bytes.
 
@@ -3736,6 +3768,8 @@ Memory limit for the hierarchy that contains the memory cgroup, in bytes.
 
 type: long
 
+format: bytes
+
 Memory plus swap limit for the hierarchy that contains the memory cgroup, in bytes.
 
 
@@ -3743,6 +3777,8 @@ Memory plus swap limit for the hierarchy that contains the memory cgroup, in byt
 === system.process.cgroup.memory.stats.inactive_anon.bytes
 
 type: long
+
+format: bytes
 
 Anonymous and swap cache on inactive LRU list, including tmpfs (shmem), in bytes
 
@@ -3752,6 +3788,8 @@ Anonymous and swap cache on inactive LRU list, including tmpfs (shmem), in bytes
 
 type: long
 
+format: bytes
+
 File-backed memory on inactive LRU list, in bytes.
 
 
@@ -3759,6 +3797,8 @@ File-backed memory on inactive LRU list, in bytes.
 === system.process.cgroup.memory.stats.mapped_file.bytes
 
 type: long
+
+format: bytes
 
 Size of memory-mapped mapped files, including tmpfs (shmem), in bytes.
 
@@ -3800,6 +3840,8 @@ Number of pages paged out of memory. This is a counter.
 
 type: long
 
+format: bytes
+
 Anonymous and swap cache (includes transparent hugepages), not including tmpfs (shmem), in bytes.
 
 
@@ -3807,6 +3849,8 @@ Anonymous and swap cache (includes transparent hugepages), not including tmpfs (
 === system.process.cgroup.memory.stats.rss_huge.bytes
 
 type: long
+
+format: bytes
 
 Number of bytes of anonymous transparent hugepages.
 
@@ -3816,6 +3860,8 @@ Number of bytes of anonymous transparent hugepages.
 
 type: long
 
+format: bytes
+
 Swap usage, in bytes.
 
 
@@ -3823,6 +3869,8 @@ Swap usage, in bytes.
 === system.process.cgroup.memory.stats.unevictable.bytes
 
 type: long
+
+format: bytes
 
 Memory that cannot be reclaimed, in bytes.
 
@@ -3852,6 +3900,8 @@ Path to the cgroup relative to the cgroup subsystems mountpoint.
 === system.process.cgroup.blkio.total.bytes
 
 type: keyword
+
+format: bytes
 
 Total number of bytes transferred to and from all block devices by processes in the cgroup.
 
