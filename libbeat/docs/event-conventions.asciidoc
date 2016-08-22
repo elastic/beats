@@ -1,43 +1,63 @@
 [[event-conventions]]
-=== Event conventions
+=== Naming Conventions
 
-==== Naming conventions
+When creating events, use the following conventions for field names and abbreviations.
 
-For the field names, the Beats follow the naming conventions below:
+[[field-names]]
+==== Field Names
 
-- All fields must be lower case
-- Snake case for combining words
-- Group related fields in sub documents, which means using the . notation. Groups are mostly described by common prefixes.
-- Prevent namespace duplication. If connections appears in the namespace, it's not needed in the sub document
-- Do not use complex abbreviations. A list of standardised abbreviations can be found below.
-- Organise the documents from the general to the details, which allows namespacing. The type should always be last, like .pct.
-- If two fields are the same but with different units, remove the less granular one
-- In case the value correlates with the name of a nested document, use value inside the document
-- Do not use . in the names
-- Use singular and plural properly for the fields. Example: sec_per_request vs open_requests
-- Use singular names for metricsets. It easier to read the event created: system.process.load = 0.3
+Use the following naming conventions for field names:
+
+- All fields must be lower case.
+- Use snake case (underscores) for combining words.
+- Group related fields into subdocuments by using dot (.) notation. Groups typically have common prefixes. For example, if you have fields called `CPULoad` and `CPUSystem` in a service, you would convert
+them into `cpu.load` and `cpu.system` in the event. 
+- Avoid repeating the namespace in field names. If a word or abbreviation appears in the namespace, it's not needed in the field name. For example, instead of `cpu.cpu_load`, use `cpu.load`.
+- Use <<abbreviations,standard abbreviations>> and avoid using abbreviations that aren't commonly known.
+- Organise the documents from general to specific to allow for namespacing. The type, such as `.pct`, should always be last. For example, `system.core.user.pct`.
+- If two fields are the same, but with different units, remove the less granular one. For example, include `timeout.sec`, but don't include `timeout.min`. If a less granular value is required, you can calculate it later.
+- If a field name matches the namespace used for nested fields, add `.value` to the field name. For example, instead of:
++
+[source,yaml]
+----------
+workers
+workers.busy
+workers.idle
+----------
++
+Use:
++
+[source,yaml]
+----------
+workers.value
+workers.busy
+workers.idle
+----------
+- Do not use dots (.) in individual field names. Dots are reserved for grouping related fields into subdocuments. 
+- Use singular and plural names properly to reflect the field content. For example, use `requests_per_sec` rather than `request_per_sec`. 
 
 
-The goal is to have a similar experience across all metrics.
+[[abbreviations]]
+==== Standardised Names
 
+Here is a list of standardised names and units that are used across all Beats:
 
-==== Abbrevations
-
-List of standardised words and units across all Beats:
-
-* avg: average
-* connection: conn
-* count:
-* day: days, d
-* max: maximumg
-* min: minimum
-* pct: precentage
-* request: req
-* sec: seconds, second, s
-* ms: millisecond, millis
-* mb: megabytes
-* msg: message
-* ns: nanoseconds
-* norm: normalized
-* us: microseconds
-
+[options="header"]
+|=======================
+|Use...     |Instead of... 
+|avg        |average
+|connection |conn 
+|count      | 
+|day        |days, d
+|max        |maximum
+|min        |minimum
+|pct        |percentage
+|request    |req
+|sec        |seconds, second, s
+|ms         |millisecond, millis
+|mb         |megabytes
+|msg        |message
+|ns         |nanoseconds
+|norm       |normalized
+|us         |microseconds
+|=======================
