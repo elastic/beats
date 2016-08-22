@@ -22,6 +22,7 @@ https://github.com/YaSuenag/hsbeat[hsbeat]:: Reads all performance counters in J
 https://github.com/christiangalsterer/httpbeat[httpbeat]:: Polls multiple HTTP(S) endpoints and sends the data to
 Logstash or Elasticsearch. Supports all HTTP methods and proxies.
 https://github.com/jasperla/hwsensorsbeat[hwsensorsbeat]:: Reads sensors information from OpenBSD.
+https://github.com/mheese/journalbeat[journaldbeat]:: Used for log shipping from systemd/journald based Linux systems.
 https://github.com/radoondas/jmxproxybeat[jmxproxybeat]:: Reads Tomcat JMX metrics exposed over 'JMX Proxy Servlet' to HTTP.
 https://github.com/eskibars/lmsensorsbeat[lmsensorsbeat]:: Collects data from lm-sensors (such as CPU temperatures, fan speeds, and voltages from i2c and smbus).
 https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and send results to Elasticsearch.
