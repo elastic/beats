@@ -69,7 +69,7 @@ https://github.com/elastic/beats/compare/v1.2.3...v1.3.0[View commits]
 
 *Filebeat*
 
-- Undocumented support for following symlinks is deprecated and will be removed in version 5.0. {pull}1767[1767]
+- Undocumented support for following symlinks is deprecated. Filebeat will not follow symlinks in version 5.0. {pull}1767[1767]
 
 ==== Bugfixes
 
