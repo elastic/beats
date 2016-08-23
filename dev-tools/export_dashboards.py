@@ -76,10 +76,6 @@ def ExportIndex(es, index, kibana_index, output_directory):
         doc_type="index-pattern",
         id=index)
 
-    # Fixes windows problem with files with * inside
-    # Removes it from index pattern
-    doc['_id'] = doc['_id'][:-2]
-
     # save index-pattern
     SaveJson("index-pattern", doc, output_directory)
 
@@ -119,7 +115,7 @@ def main():
     args = parser.parse_args()
 
     if args.index is None:
-        args.index = args.beat.lower() + "-*"
+        args.index = args.beat.lower()
 
     print("Export {} dashboards to {} directory".format(args.beat, args.dir))
     print("Elasticsearch URL: {}".format(args.url))
