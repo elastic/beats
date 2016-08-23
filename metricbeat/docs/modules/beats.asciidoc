@@ -19,7 +19,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 #- module: beats
-  #metricsets: ["filebeat"]
+  #metricsets: ["filebeat", "libbeat"]
   #enabled: true
   #period: 10s
   #hosts: ["localhost:6060"]
@@ -36,5 +36,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-beats-filebeat,filebeat>>
 
+* <<metricbeat-metricset-beats-libbeat,libbeat>>
+
 include::beats/filebeat.asciidoc[]
+
+include::beats/libbeat.asciidoc[]
 

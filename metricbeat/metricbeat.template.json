@@ -218,6 +218,59 @@
                   }
                 }
               }
+            },
+            "libbeat": {
+              "properties": {
+                "output": {
+                  "properties": {
+                    "elasticsearch": {
+                      "properties": {
+                        "events": {
+                          "properties": {
+                            "ack": {
+                              "type": "long"
+                            },
+                            "not_ack": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "read": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            },
+                            "errors": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "write": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            },
+                            "errors": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "publisher": {
+                  "properties": {
+                    "events": {
+                      "properties": {
+                        "published": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         },

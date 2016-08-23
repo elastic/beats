@@ -12,6 +12,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/apache/status"
 	_ "github.com/elastic/beats/metricbeat/module/beats"
 	_ "github.com/elastic/beats/metricbeat/module/beats/filebeat"
+	_ "github.com/elastic/beats/metricbeat/module/beats/libbeat"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb/status"
 	_ "github.com/elastic/beats/metricbeat/module/mysql"

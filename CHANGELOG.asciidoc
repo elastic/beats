@@ -79,6 +79,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Add experimental cgroup metrics to the system/process MetricSet. {pull}2184[2184]
 - Added a PostgreSQL module. {pull}2253[2253]
 - Add experimental filebeat metricset in the beats module. {pull}2297[2297]
+- Add experimental libbeat metricset in the beats module. {pull}2339[2339]
 
 *Packetbeat*
 
