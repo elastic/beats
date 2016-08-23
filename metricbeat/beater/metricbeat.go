@@ -1,7 +1,6 @@
 package beater
 
 import (
-	"expvar"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -49,7 +48,6 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // that a single unresponsive host cannot inadvertently block other hosts
 // within the same Module and MetricSet from collection.
 func (bt *Metricbeat) Run(b *beat.Beat) error {
-	defer dumpMetrics()
 
 	bt.client = b.Publisher.Connect()
 
@@ -83,14 +81,4 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 func (bt *Metricbeat) Stop() {
 	bt.client.Close()
 	close(bt.done)
-}
-
-// dumpMetrics is used to log metrics on shutdown.
-func dumpMetrics() {
-	logp.Info("Dumping runtime metrics...")
-	expvar.Do(func(kv expvar.KeyValue) {
-		if kv.Key != "memstats" {
-			logp.Info("%s=%s", kv.Key, kv.Value.String())
-		}
-	})
 }
