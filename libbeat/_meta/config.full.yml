@@ -543,10 +543,10 @@ logging.to_files: true
 logging.files:
   # Configure the path where the logs are written. The default is the logs directory
   # under the home path (the binary location).
-  #path: /var/log/mybeat
+  #path: /var/log/beatname
 
   # The name of the files where the logs are written to.
-  #name: mybeat
+  #name: beatname
 
   # Configure log file size limit. If limit is reached, log file will be
   # automatically rotated
