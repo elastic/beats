@@ -5,13 +5,17 @@ import json
 import re
 
 
-def ExportDashboards(es, beat, kibana_index, output_directory):
+def ExportDashboards(es, regex, kibana_index, output_directory):
     res = es.search(
         index=kibana_index,
         doc_type="dashboard",
         size=1000)
 
-    reg_exp = re.compile(beat + '*', re.IGNORECASE)
+    try:
+        reg_exp = re.compile(regex, re.IGNORECASE)
+    except:
+        print("Wrong regex {}".format(regex))
+        return
 
     for doc in res['hits']['hits']:
 
@@ -70,16 +74,6 @@ def ExportSearch(es, search, kibana_index, output_directory):
     SaveJson("search", doc, output_directory)
 
 
-def ExportIndex(es, index, kibana_index, output_directory):
-    doc = es.get(
-        index=kibana_index,
-        doc_type="index-pattern",
-        id=index)
-
-    # save index-pattern
-    SaveJson("index-pattern", doc, output_directory)
-
-
 def SaveJson(doc_type, doc, output_directory):
 
     dir = os.path.join(output_directory, doc_type)
@@ -97,35 +91,26 @@ def main():
         description="Export the Kibana dashboards together with"
                     " all used visualizations, searches and index pattern")
     parser.add_argument("--url",
-                        help="Elasticsearch URL. E.g. http://localhost:9200",
+                        help="Elasticsearch URL. By default: http://localhost:9200",
                         default="http://localhost:9200")
-    parser.add_argument("--beat",
-                        help="Beat name e.g. metricbeat",
+    parser.add_argument("--regex",
+                        help="Regular expression to match all the dashboards to be exported. For example: metricbeat*",
                         required=True)
-    parser.add_argument("--index",
-                        help="Elasticsearch index for the Beat data. "
-                        "E.g. metricbeat-*")
     parser.add_argument("--kibana",
-                        help="Elasticsearch index for the Kibana dashboards. "
-                        "E.g. .kibana",
+                        help="Elasticsearch index where to store the Kibana settings. By default: .kibana ",
                         default=".kibana")
-    parser.add_argument("--dir", help="Output directory. E.g. output",
+    parser.add_argument("--dir", help="Output directory. By default: output",
                         default="output")
 
     args = parser.parse_args()
 
-    if args.index is None:
-        args.index = args.beat.lower()
-
-    print("Export {} dashboards to {} directory".format(args.beat, args.dir))
+    print("Export {} dashboards to {} directory".format(args.regex, args.dir))
     print("Elasticsearch URL: {}".format(args.url))
-    print("Elasticsearch index to store Beat's data: {}".format(args.index))
     print("Elasticsearch index to store Kibana's"
           " dashboards: {}".format(args.kibana))
 
     es = Elasticsearch(args.url)
-    ExportIndex(es, args.index, args.kibana, args.dir)
-    ExportDashboards(es, args.beat, args.kibana, args.dir)
+    ExportDashboards(es, args.regex, args.kibana, args.dir)
 
 if __name__ == "__main__":
     main()
