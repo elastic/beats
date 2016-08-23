@@ -78,8 +78,10 @@ func (h *Harvester) Harvest() {
 				logp.Info("Reader was closed: %s. Closing.", h.state.Source)
 			case io.EOF:
 				logp.Info("End of file reached: %s. Closing because close_eof is enabled.", h.state.Source)
+			case ErrInactive:
+				logp.Info("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
 			default:
-				logp.Info("Read line error: %s", err)
+				logp.Err("Read line error: %s; File: ", err, h.state.Source)
 			}
 			return
 		}
