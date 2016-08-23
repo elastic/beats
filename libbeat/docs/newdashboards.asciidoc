@@ -89,59 +89,70 @@ The Elasticsearch index pattern where Kibana saves its configuration. The defaul
 [[export-dashboards]]
 === Exporting New and Modified Beat Dashboards
 
-To export all the dashboards for a Beat, including any new or modified dashboards and all dependencies such as
-visualizations, searches, and index patterns, you can use the Python script `export_dashboards.py` from  
-https://github.com/elastic/beats/tree/master/dev-tools[dev-tools]. Before running the script for the first time, you
-need to create an environment that contains all the required Python packages. See the dev-tools
+To export all the dashboards for any Elastic Beat or any community Beat, including any new or modified dashboards and all dependencies such as
+visualizations, searches, and index patterns, you can use the Python script `export_dashboards.py` from
+https://github.com/elastic/beats/tree/master/dev-tools[dev-tools]. See the dev-tools
 https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for more info.
 
-NOTE: Dashboard names must be **prefixed** with the name of the beat in order to work correctly. For example:
-Packetbeat-Dashboard.
 
-For example, to export all Packetbeat dashboards, you can run the following command from the `packetbeat` directory in
-the `beats` repository:
+==== Export all Beat dashboards
+
+To export all the Kibana dashboards for a Beat that start with the Beat name, you just need to run the following command from the Beat repository:
+
+[source,shell]
+-----------------------------
+make export-dashboards
+-----------------------------
+
+==== Export selected Beat dashboards
+
+To export only some Kibana dashboards for an Elastic Beat or community Beat, you can simply pass a regular expression to
+the `export_dashboards.py` script to match the selected Kibana dashboards.
+
+Before running the `export_dashboards.py` script for the first time, you
+need to create an environment that contains all the required Python packages. 
+
+[source,shell]
+-------------------------
+make python-env
+-------------------------
+
+For example, to export all Kibana dashboards that start with the **Packetbeat** name:
 
 [source,shell]
 ----------------------------------------------------------------------
-../dev-tools/export_dashboards.py --beat packetbeat
+python ../dev-tools/export_dashboards.py --regex Packetbeat*
 ----------------------------------------------------------------------
 
 The command has the following options:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ python export_dashboards.py -h
-usage: export_dashboards.py [-h] [--url URL] --beat BEAT [--index INDEX]
-                            [--kibana KIBANA] [--dir DIR]
+$ python ../dev-tools/export_dashboards.py -h
+usage: export_dashboards.py [-h] [--url URL] --regex REGEX [--kibana KIBANA]
+                            [--dir DIR]
 
 Export the Kibana dashboards together with all used visualizations, searches
 and index pattern
 
 optional arguments:
-  -h, --help       Show this help message and exit
-  --url URL        Elasticsearch URL. E.g. http://localhost:9200
-  --beat BEAT      Beat name e.g. packetbeat
-  --index INDEX    Elasticsearch index for the Beat data. E.g. packetbeat-*
-  --kibana KIBANA  Elasticsearch index for the Kibana dashboards. E.g. .kibana
-  --dir DIR        Output directory. E.g. output
-
+  -h, --help       show this help message and exit
+  --url URL        Elasticsearch URL. By default: http://localhost:9200
+  --regex REGEX    Regular expression to match all the dashboards to be
+                   exported. For example: metricbeat*
+  --kibana KIBANA  Elasticsearch index where to store the Kibana settings. By
+                   default: .kibana
+  --dir DIR        Output directory. By default: output
 ----------------------------------------------------------------------
 
 ==== url
 The Elasticsearch URL. The default value is http://localhost:9200.
 
-==== beat
-The name of the Beat. This argument is required.
-
-==== index
-The Elasticsearch index pattern where the Beat is storing the data. The default value is constructed from the Beat name + `-*` string.
+==== regex
+Regular expression to match all the Kibana dashboards to be exported. This argument is required.
 
 ==== kibana
 The Elasticsearch index pattern where Kibana saves its configuration. The default value is `.kibana`.
 
 ==== dir
 The output directory where the dashboards and all dependencies will be saved. The default value is `output`.
-
-NOTE: To make it even easier for you to import and export the dashboards, we've also added support for running the
-following commands in the Beats repository: `make import-dashboards` and `make export-dashboards`.
-

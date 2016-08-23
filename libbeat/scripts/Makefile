@@ -270,12 +270,12 @@ docs-preview:
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200
 
-.PHONY: export-dashboards
-export-dashboards: python-env
-	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
+.PHONY: export-dashboards 
+export-dashboards: python-env update
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --regex ${BEATNAME}-*
 
 .PHONY: import-dashboards
-import-dashboards:
+import-dashboards: update
 	$(MAKE) -C ${ES_BEATS}/libbeat/dashboards import_dasboards
 	${ES_BEATS}/libbeat/dashboards/import_dashboards -es ${ES_URL} -dir ${PWD}/etc/kibana
 
