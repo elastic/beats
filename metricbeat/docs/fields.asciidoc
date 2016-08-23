@@ -505,6 +505,101 @@ type: long
 Number of files which were detected by the prospector as truncated and reading started from scratch.
 
 
+[float]
+== libbeat Fields
+
+experimental[]
+libbeat metrics. This metricset can be used with all beats.
+
+
+
+[float]
+== output Fields
+
+Output related metrics
+
+
+
+[float]
+== elasticsearch Fields
+
+Elasticsearch specific metrics
+
+
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.events.ack
+
+type: long
+
+Number of acknowledged events by elasticsearch
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.events.not_ack
+
+type: long
+
+Number of not acknowledged events by elasticsearch
+
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.read.bytes
+
+type: long
+
+Number of bytes read by the output
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.read.errors
+
+type: long
+
+Number of read errors
+
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.write.bytes
+
+type: long
+
+Number of bytes written by the output
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.write.errors
+
+type: long
+
+Number of write errors
+
+
+[float]
+== publisher Fields
+
+General publisher metrics
+
+
+
+[float]
+== events Fields
+
+Log files related stastics.
+
+
+
+[float]
+=== beats.libbeat.publisher.events.published
+
+type: long
+
+Total number of events published
+
+
 [[exported-fields-common]]
 == Common Fields
 

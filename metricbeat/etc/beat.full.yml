@@ -69,7 +69,7 @@ metricbeat.modules:
 
 #-------------------------------- beats Module -------------------------------
 #- module: beats
-  #metricsets: ["filebeat"]
+  #metricsets: ["filebeat", "libbeat"]
   #enabled: true
   #period: 10s
   #hosts: ["localhost:6060"]
