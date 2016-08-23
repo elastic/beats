@@ -84,34 +84,34 @@ func ListDeviceNames(withDescription bool, withIP bool) ([]string, error) {
 
 	ret := []string{}
 	for _, dev := range devices {
-		result := dev.Name
-		
+		r := dev.Name
+
 		if withDescription {
 			desc := "No description available"
 			if len(dev.Description) > 0 {
 				desc = dev.Description
 			}
-			result += fmt.Sprintf(" (%s)", desc)
+			r += fmt.Sprintf(" (%s)", desc)
 		}
-		
+
 		if withIP {
 			ips := "Not assigned ip address"
 			if len(dev.Addresses) > 0 {
 				ips = ""
-				
-				for index, address := range []pcap.InterfaceAddress(dev.Addresses) {
-					if index > 0 {
-						// add a space between the IP address.
+
+				for i, address := range []pcap.InterfaceAddress(dev.Addresses) {
+					// Add a space between the IP address.
+					if i > 0 {
 						ips += " "
 					}
-					
+
 					ips += fmt.Sprintf("%s", address.IP.String())
 				}
 			}
-			result += fmt.Sprintf(" (%s)", ips)
+			r += fmt.Sprintf(" (%s)", ips)
 
 		}
-		ret = append(ret, result)
+		ret = append(ret, r)
 	}
 	return ret, nil
 }
