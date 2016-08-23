@@ -203,6 +203,7 @@ func (b *Beat) launch(bt Creator) error {
 
 	logp.Info("%s start running.", b.Name)
 	defer logp.Info("%s stopped.", b.Name)
+	defer logp.LogTotalExpvars(&b.Config.Logging)
 
 	return beater.Run(b)
 }

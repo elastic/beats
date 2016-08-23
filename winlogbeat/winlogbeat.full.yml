@@ -566,7 +566,8 @@ output.elasticsearch:
 
 # If enabled, winlogbeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
-# the beginning of the period is logged. The default is true.
+# the beginning of the period is logged. Also, the total values for
+# all non-zero internal metrics are logged on shutdown. The default is true.
 #logging.metrics.enabled: true
 
 # The period after which to log the internal metrics. The default is 30s.
