@@ -20,7 +20,7 @@ import (
 )
 
 type SocketInfo struct {
-	Src_ip, Dst_ip     uint32
+	Src_ip, Dst_ip     net.IP
 	Src_port, Dst_port uint16
 
 	Uid   uint16
@@ -245,41 +245,74 @@ func (proc *ProcessesWatcher) FindProc(port uint16) (procname string) {
 	return ""
 }
 
-func hex_to_ip_port(str []byte) (uint32, uint16, error) {
+func hex_to_ipv4(word string) (net.IP, error) {
+	ip, err := strconv.ParseInt(word, 16, 64)
+	if err != nil {
+		return nil, err
+	}
+	return net.IPv4(byte(ip), byte(ip>>8), byte(ip>>16), byte(ip>>24)), nil
+}
+
+func hex_to_ipv6(word string) (net.IP, error) {
+	p := make(net.IP, net.IPv6len)
+	for i := 0; i < 4; i++ {
+		part, err := strconv.ParseInt(word[i*8:(i+1)*8], 16, 32)
+		if err != nil {
+			return nil, err
+		}
+		p[i*4] = byte(part)
+		p[i*4+1] = byte(part >> 8)
+		p[i*4+2] = byte(part >> 16)
+		p[i*4+3] = byte(part >> 24)
+	}
+	return p, nil
+}
+
+func hex_to_ip(word string, ipv6 bool) (net.IP, error) {
+	if ipv6 {
+		return hex_to_ipv6(word)
+	} else {
+		return hex_to_ipv4(word)
+	}
+}
+
+func hex_to_ip_port(str []byte, ipv6 bool) (net.IP, uint16, error) {
 	words := bytes.Split(str, []byte(":"))
 	if len(words) < 2 {
-		return 0, 0, errors.New("Didn't find ':' as a separator")
+		return nil, 0, errors.New("Didn't find ':' as a separator")
 	}
 
-	ip, err := strconv.ParseInt(string(words[0]), 16, 64)
+	ip, err := hex_to_ip(string(words[0]), ipv6)
 	if err != nil {
-		return 0, 0, err
+		return nil, 0, err
 	}
 
 	port, err := strconv.ParseInt(string(words[1]), 16, 32)
 	if err != nil {
-		return 0, 0, err
+		return nil, 0, err
 	}
 
-	return uint32(ip), uint16(port), nil
+	return ip, uint16(port), nil
 }
 
 func (proc *ProcessesWatcher) UpdateMap() {
 
 	logp.Debug("procs", "UpdateMap()")
-	file, err := os.Open("/proc/net/tcp")
-	if err != nil {
-		logp.Err("Open: %s", err)
-		return
-	}
-	defer file.Close()
-	socks, err := Parse_Proc_Net_Tcp(file)
+	ipv4socks, err := sockets_From_Proc("/proc/net/tcp", false)
 	if err != nil {
 		logp.Err("Parse_Proc_Net_Tcp: %s", err)
 		return
 	}
+	ipv6socks, err := sockets_From_Proc("/proc/net/tcp6", true)
+	if err != nil {
+		logp.Err("Parse_Proc_Net_Tcp ipv6: %s", err)
+		return
+	}
 	socks_map := map[int64]*SocketInfo{}
-	for _, s := range socks {
+	for _, s := range ipv4socks {
+		socks_map[s.Inode] = s
+	}
+	for _, s := range ipv6socks {
 		socks_map[s.Inode] = s
 	}
 
@@ -303,8 +336,17 @@ func (proc *ProcessesWatcher) UpdateMap() {
 
 }
 
+func sockets_From_Proc(filename string, ipv6 bool) ([]*SocketInfo, error) {
+	file, err := os.Open("/proc/net/tcp")
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return Parse_Proc_Net_Tcp(file, false)
+}
+
 // Parses the /proc/net/tcp file
-func Parse_Proc_Net_Tcp(input io.Reader) ([]*SocketInfo, error) {
+func Parse_Proc_Net_Tcp(input io.Reader, ipv6 bool) ([]*SocketInfo, error) {
 	buf := bufio.NewReader(input)
 
 	sockets := []*SocketInfo{}
@@ -316,7 +358,6 @@ func Parse_Proc_Net_Tcp(input io.Reader) ([]*SocketInfo, error) {
 			logp.Err("Error reading /proc/net/tcp: %s", err)
 			return nil, err
 		}
-
 		words := bytes.Fields(line)
 		if len(words) < 10 || bytes.Equal(words[0], []byte("sl")) {
 			logp.Debug("procs", "Less then 10 words (%d) or starting with 'sl': %s", len(words), words)
@@ -326,13 +367,13 @@ func Parse_Proc_Net_Tcp(input io.Reader) ([]*SocketInfo, error) {
 		var sock SocketInfo
 		var err_ error
 
-		sock.Src_ip, sock.Src_port, err_ = hex_to_ip_port(words[1])
+		sock.Src_ip, sock.Src_port, err_ = hex_to_ip_port(words[1], ipv6)
 		if err_ != nil {
 			logp.Debug("procs", "Error parsing IP and port: %s", err_)
 			continue
 		}
 
-		sock.Dst_ip, sock.Dst_port, err_ = hex_to_ip_port(words[2])
+		sock.Dst_ip, sock.Dst_port, err_ = hex_to_ip_port(words[2], ipv6)
 		if err_ != nil {
 			logp.Debug("procs", "Error parsing IP and port: %s", err_)
 			continue
