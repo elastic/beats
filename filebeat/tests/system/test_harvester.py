@@ -1,5 +1,6 @@
 from filebeat import BaseTest
 import os
+import codecs
 import time
 
 """
@@ -407,3 +408,79 @@ class Test(BaseTest):
         assert self.output_lines() < 1000
         assert self.output_lines() > 0
 
+
+    def test_bom_utf8(self):
+        """
+        Test utf8 log file with bom
+        Additional test here to make sure in case generation in python is not correct
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        self.copy_files(["logs/bom8.log"],
+                        source_dir="../files",
+                        target_dir="log")
+
+        filebeat = self.start_beat()
+        self.wait_until(
+            lambda: self.output_has(lines=7),
+            max_timeout=10)
+
+        # Check that output does not cotain bom
+        output = self.read_output_json()
+        assert output[0]["message"] == "#Software: Microsoft Exchange Server"
+
+        filebeat.check_kill_and_wait()
+
+    def test_boms(self):
+
+        """
+        Test bom log files if bom is removed properly
+        """
+
+        os.mkdir(self.working_dir + "/log/")
+        os.mkdir(self.working_dir + "/output/")
+
+        message = "Hello World"
+
+        # Config array contains:
+        # filebeat encoding, python encoding name, bom
+        configs = [
+            ("utf-8", "utf-8", codecs.BOM_UTF8),
+            ("utf-16be-bom", "utf-16-be", codecs.BOM_UTF16_BE),
+            ("utf-16le-bom", "utf-16-le", codecs.BOM_UTF16_LE),
+        ]
+
+        for config in configs:
+
+            # Render config with specific encoding
+            self.render_config_template(
+                path=os.path.abspath(self.working_dir) + "/log/*",
+                encoding=config[0],
+                output_file_filename=config[0],
+            )
+
+            logfile = self.working_dir + "/log/" + config[0] + "test.log"
+
+            # Write bom to file
+            with codecs.open(logfile, 'wb') as file:
+                file.write(config[2])
+
+            # Write hello world to file
+            with codecs.open(logfile, 'a', config[1]) as file:
+                content = message + '\n'
+                file.write(content)
+
+            filebeat = self.start_beat()
+
+            self.wait_until(
+                lambda: self.output_has(lines=1, output_file="output/" + config[0]),
+                max_timeout=10)
+
+            # Verify that output does not contain bom
+            output = self.read_output_json(output_file="output/" + config[0])
+            assert output[0]["message"] == message
+
+            filebeat.kill_and_wait()
