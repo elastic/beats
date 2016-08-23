@@ -365,19 +365,17 @@ func (imp Importer) ImportIndex(file string) error {
 		return err
 	}
 	var indexContent common.MapStr
-	var indexName string
 	json.Unmarshal(reader, &indexContent)
+
+	indexName, ok := indexContent["title"].(string)
+	if !ok {
+		return errors.New("missing title in the index-pattern file")
+	}
 
 	if imp.cl.opt.Index != "" {
 		// change index pattern name
-		indexName = strings.Trim(imp.cl.opt.Index, "-*")
-		if _, ok := indexContent["title"]; ok {
-			fmt.Println("Change index in index-pattern ", indexContent["title"])
-			indexContent["title"] = imp.cl.opt.Index
-		}
-	} else {
-		// keep the index pattern file name
-		indexName = strings.TrimSuffix(filepath.Base(file), filepath.Ext(file))
+		fmt.Println("Change index in index-pattern ", indexName)
+		indexContent["title"] = imp.cl.opt.Index
 	}
 
 	path := "/" + imp.cl.opt.KibanaIndex + "/index-pattern/" + indexName
