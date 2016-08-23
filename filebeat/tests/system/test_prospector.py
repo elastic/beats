@@ -475,13 +475,13 @@ class Test(BaseTest):
         self.wait_until(
                 lambda: self.log_contains(
                     # Still checking for old file name as filename does not change in harvester
-                    "Closing file: {}\n".format(os.path.abspath(testfile))),
+                    "Stopping harvester, closing file: "),
                 max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
 
-    def test_close_inactive_file_rotation_and_removal(self):
+    def test_close_inactive_file_rotation_and_removal_while_new_file_created(self):
         """
         Test that close_inactive still applies also if file was rotated,
         new file created, and rotated file removed.
