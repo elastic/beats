@@ -71,7 +71,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Enhance contains condition to work on fields that are arrays of strings. {issue}2237[2237]
 - Lookup the configuration file relative to the `-path.config` CLI flag. {pull}2245[2245]
 - Re-write import_dashboards.sh in Golang. {pull}2155[2155]
-- Update to Go 1.7 {pull}2306[2306]
+- Update to Go 1.7. {pull}2306[2306]
+- Log total non-zero internal metrics on shutdown. {pull}2349[2349]
 
 *Metricbeat*
 

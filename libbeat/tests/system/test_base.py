@@ -156,3 +156,6 @@ class Test(BaseTest):
             lambda: self.log_contains("No non-zero metrics in the last 100ms"),
             max_timeout=2)
         proc.check_kill_and_wait()
+        self.wait_until(
+            lambda: self.log_contains("Total non-zero values:"),
+            max_timeout=2)

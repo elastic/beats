@@ -224,3 +224,14 @@ func logExpvars(metricsCfg *LoggingMetricsConfig) {
 		}
 	}
 }
+
+func LogTotalExpvars(cfg *Logging) {
+	if cfg.Metrics.Enabled != nil && *cfg.Metrics.Enabled == false {
+		return
+	}
+	vals := map[string]int64{}
+	prevVals := map[string]int64{}
+	snapshotExpvars(vals)
+	metrics := buildMetricsOutput(prevVals, vals)
+	Info("Total non-zero values: %s", metrics)
+}

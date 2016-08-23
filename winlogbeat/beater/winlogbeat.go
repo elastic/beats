@@ -138,7 +138,6 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	if err := eb.setup(b); err != nil {
 		return err
 	}
-	defer eb.cleanup(b)
 
 	persistedState := eb.checkpoint.States()
 
@@ -162,20 +161,6 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	wg.Wait()
 	eb.checkpoint.Shutdown()
 	return nil
-}
-
-// cleanup attempts to remove any files or data it may have created which should
-// not be persisted.
-func (eb *Winlogbeat) cleanup(b *beat.Beat) {
-	logp.Info("Dumping runtime metrics...")
-	expvar.Do(func(kv expvar.KeyValue) {
-		logf := logp.Info
-		if kv.Key == "memstats" {
-			logf = memstatsf
-		}
-
-		logf("%s=%s", kv.Key, kv.Value.String())
-	})
 }
 
 // Stop is used to tell the winlogbeat that it should cease executing.
