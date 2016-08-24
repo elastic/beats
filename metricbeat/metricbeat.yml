@@ -50,7 +50,8 @@ metricbeat.modules:
     - "info"
   enabled: true
   period: 10s
-  stats_addr: "unix:///tmp/haproxy-stats.sock"
+  #stats_addr: "unix:///tmp/haproxy-stats.sock"
+  stats_addr: "tcp://127.0.0.1:14567"
 
 
 
