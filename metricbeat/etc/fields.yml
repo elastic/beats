@@ -271,6 +271,32 @@
                       description: >
                         Number of files which were detected by the prospector as truncated and reading started from scratch.
 
+            - name: registrar
+              type: group
+              description: >
+                Registrar statistics
+              fields:
+                - name: states
+                  type: group
+                  description: >
+                    Registrar states metrics
+                  fields:
+                    - name: update
+                      type: long
+                      description: >
+                        Total number of states which were updated or added
+                    - name: cleanup
+                      type: long
+                      description: >
+                        Total number of states which were cleaned up (removed)
+                    - name: current
+                      type: long
+                      description: >
+                        The current number of states in the registry file
+                - name: writes
+                  type: long
+                  description: >
+                    Total number of times the registry file was written to disk
         - name: libbeat
           type: group
           description: >

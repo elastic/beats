@@ -506,6 +506,52 @@ Number of files which were detected by the prospector as truncated and reading s
 
 
 [float]
+== registrar Fields
+
+Registrar statistics
+
+
+
+[float]
+== states Fields
+
+Registrar states metrics
+
+
+
+[float]
+=== beats.filebeat.registrar.states.update
+
+type: long
+
+Total number of states which were updated or added
+
+
+[float]
+=== beats.filebeat.registrar.states.cleanup
+
+type: long
+
+Total number of states which were cleaned up (removed)
+
+
+[float]
+=== beats.filebeat.registrar.states.current
+
+type: long
+
+The current number of states in the registry file
+
+
+[float]
+=== beats.filebeat.registrar.writes
+
+type: long
+
+Total number of times the registry file was written to disk
+
+
+[float]
 == libbeat Fields
 
 experimental[]

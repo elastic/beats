@@ -217,6 +217,26 @@
                       }
                     }
                   }
+                },
+                "registrar": {
+                  "properties": {
+                    "states": {
+                      "properties": {
+                        "cleanup": {
+                          "type": "long"
+                        },
+                        "current": {
+                          "type": "long"
+                        },
+                        "update": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "writes": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },

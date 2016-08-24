@@ -26,8 +26,10 @@ type Registrar struct {
 }
 
 var (
-	statesUpdated = expvar.NewInt("registrar.state_updates")
-	statesTotal   = expvar.NewInt("registar.states.total")
+	statesUpdate   = expvar.NewInt("registrar.states.update")
+	statesCleanup  = expvar.NewInt("registrar.states.cleanup")
+	statesCurrent  = expvar.NewInt("registar.states.current")
+	registryWrites = expvar.NewInt("registrar.writes")
 )
 
 func New(registryFile string) (*Registrar, error) {
@@ -187,8 +189,9 @@ func (r *Registrar) Run() {
 		}
 
 		beforeCount := r.states.Count()
-		r.states.Cleanup()
-		logp.Debug("registrar", "Registrar states cleaned up. Before: %d , After: %d", beforeCount, r.states.Count())
+		cleanedStates := r.states.Cleanup()
+		logp.Debug("registrar", "Registrar states cleaned up. Before: %d , After: %d", beforeCount, beforeCount-cleanedStates)
+		statesCleanup.Add(int64(cleanedStates))
 		if err := r.writeRegistry(); err != nil {
 			logp.Err("Writing of registry returned error: %v. Continuing...", err)
 		}
@@ -208,6 +211,7 @@ func (r *Registrar) processEventStates(events []*Event) {
 			continue
 		}
 		r.states.Update(event.State)
+		statesUpdate.Add(1)
 	}
 }
 
@@ -243,8 +247,8 @@ func (r *Registrar) writeRegistry() error {
 	f.Close()
 
 	logp.Debug("registrar", "Registry file updated. %d states written.", len(states))
-	statesUpdated.Add(int64(len(states)))
-	statesTotal.Set(int64(len(states)))
+	registryWrites.Add(1)
+	statesCurrent.Set(int64(len(states)))
 
 	return file.SafeFileRotate(r.registryFile, tempfile)
 }
