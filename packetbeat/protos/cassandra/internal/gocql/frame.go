@@ -223,7 +223,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	switch f.Header.Op {
 
 	//below ops are requests
-	case opStartup,opAuthResponse,opOptions,opPrepare,opExecute,opBatch,opRegister:
+	case opStartup, opAuthResponse, opOptions, opPrepare, opExecute, opBatch, opRegister:
 	//ignored
 	case opQuery:
 		data = f.parseQueryFrame()
@@ -267,7 +267,7 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 	data["err_code"] = code
 	data["err_msg"] = msg
 	data["err_type"] = errT.String()
-	detail:=map[string]interface{}{}
+	detail := map[string]interface{}{}
 	switch errT {
 	case errUnavailable:
 		cl := decoder.ReadConsistency()
@@ -300,7 +300,7 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 		detail["read_consistency"] = cl.String()
 		detail["received"] = received
 		detail["blockfor"] = blockfor
-		detail["data_present"] = dataPresent!=0
+		detail["data_present"] = dataPresent != 0
 
 	case errAlreadyExists:
 		ks := decoder.ReadString()
@@ -342,8 +342,8 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 		logp.Err("unknown error code: 0x%x", code)
 	}
 
-	if(len(detail)>0){
-		data["details"]=detail
+	if len(detail) > 0 {
+		data["details"] = detail
 	}
 
 	return data
@@ -421,10 +421,10 @@ func (f *Framer) parseResultFrame() (data map[string]interface{}) {
 		data["keyspace"] = (f.decoder).ReadString()
 	case resultKindPrepared:
 		data["result_type"] = "prepared"
-		data["result"] = f.parseResultPrepared()
+		data["prepared_result"] = f.parseResultPrepared()
 	case resultKindSchemaChanged:
 		data["result_type"] = "schemaChanged"
-		data["result"] = f.parseResultSchemaChange()
+		data["event"] = f.parseResultSchemaChange()
 	}
 
 	return data
@@ -471,7 +471,7 @@ func (f *Framer) parseResultSchemaChange() (data map[string]interface{}) {
 		target := decoder.ReadString()
 
 		data["change"] = change
-		data["type"] = target
+		data["target"] = target
 
 		switch target {
 		case "KEYSPACE":

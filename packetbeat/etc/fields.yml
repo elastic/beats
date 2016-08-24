@@ -916,10 +916,44 @@
                 - name: keyspace
                   type: keyword
                   description: Indicating the name of the keyspace that has been set.
-                - name: result
-                  type: dict
-                  dict-type: keyword
-                  description: The result to a PREPARE/Schema_change message.
+                - name: event
+                  type: group
+                  description: The result to a schema_change message.
+                  fields:
+                    - name: change
+                      type: keyword
+                      description:  Representing the type of changed involved.
+                    - name: keyspace
+                      type: keyword
+                      description: This describes which keyspace has changed.
+                    - name: table
+                      type: keyword
+                      description: This describes which table has changed.
+                    - name: object
+                      type: keyword
+                      description: This describes the name of said affected object (either the table, user type, function, or aggregate name).
+                    - name: target
+                      type: keyword
+                      description: Target could be "FUNCTION" or "AGGREGATE", multiple arguments.
+                    - name: name
+                      type: keyword
+                      description: The function/aggregate name.
+                    - name: args
+                      type: keyword
+                      description: One string for each argument type (as CQL type).
+                  - name: prepared_result
+                  type: group
+                  description: The result to a PREPARE message.
+                  fields:
+                    - name: prepared_id
+                      type: keyword
+                      description: Representing the prepared query ID.
+                    - name: req_meta
+                      type: group
+                      description: This describes the request metadata.
+                    - name: resp_meta
+                      type: group
+                      description: This describes the metadata for the result set.
 
             - name: supported
               type: dict

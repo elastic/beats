@@ -568,7 +568,7 @@ const (
 	flagWithNameValues        byte = 0x40
 
 	// header flags
-	flagDefault      byte = 0x00
+	flagDefault       byte = 0x00
 	flagCompress      byte = 0x01
 	flagTracing       byte = 0x02
 	flagCustomPayload byte = 0x04
