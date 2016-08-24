@@ -164,7 +164,8 @@ class Test(BaseTest):
         Checks that the registry is properly updated after a file is rotated
         """
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            close_inactive="1s"
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -186,6 +187,14 @@ class Test(BaseTest):
 
         self.wait_until(lambda: self.output_has(lines=2),
                         max_timeout=10)
+
+        # Wait until rotation is detected
+        self.wait_until(
+            lambda: self.log_contains(
+                "Updating state for renamed file"),
+            max_timeout=10)
+
+        time.sleep(1)
 
         filebeat.check_kill_and_wait()
 
@@ -226,7 +235,8 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
-            scan_frequency="1s"
+            scan_frequency="1s",
+            close_inactive="1s",
         )
 
         if os.name == "nt":
@@ -257,7 +267,12 @@ class Test(BaseTest):
             lambda: self.output_has(lines=2),
             max_timeout=10)
 
-        # Add one second sleep as it can sometimes take a moment until state is written
+        # Wait until rotation is detected
+        self.wait_until(
+            lambda: self.log_contains_count(
+                "Updating state for renamed file") == 1,
+            max_timeout=10)
+
         time.sleep(1)
 
         data = self.get_registry()
@@ -366,7 +381,8 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
-            scan_frequency="1s"
+            scan_frequency="1s",
+            close_inactive="1s"
         )
 
         if os.name == "nt":
@@ -398,6 +414,12 @@ class Test(BaseTest):
 
         self.wait_until(
             lambda: self.output_has(lines=2),
+            max_timeout=10)
+
+        # Wait until rotation is detected
+        self.wait_until(
+            lambda: self.log_contains(
+                "Updating state for renamed file"),
             max_timeout=10)
 
         # Wait a momemt to make sure registry is completely written
@@ -455,7 +477,8 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
             ignore_older="2m",
-            scan_frequency="1s"
+            scan_frequency="1s",
+            close_inactive="1s"
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -501,7 +524,7 @@ class Test(BaseTest):
         # Now wait until rotation is detected
         self.wait_until(
             lambda: self.log_contains(
-                "File rename was detected"),
+                "Updating state for renamed file"),
             max_timeout=10)
 
         self.wait_until(
@@ -509,7 +532,7 @@ class Test(BaseTest):
                 "Registry file updated. 2 states written.") >= 1,
             max_timeout=15)
 
-        time.sleep(5)
+        time.sleep(1)
         filebeat.kill_and_wait()
 
         # Check that offsets are correct
@@ -529,7 +552,8 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
             ignore_older="2m",
-            scan_frequency="1s"
+            scan_frequency="1s",
+            close_inactive="1s"
         )
 
 
@@ -578,7 +602,7 @@ class Test(BaseTest):
         # Now wait until rotation is detected
         self.wait_until(
             lambda: self.log_contains(
-                "File rename was detected"),
+                "Updating state for renamed file"),
             max_timeout=10)
 
         self.wait_until(
@@ -586,7 +610,8 @@ class Test(BaseTest):
                 "Registry file updated. 2 states written.") >= 1,
             max_timeout=15)
 
-        time.sleep(5)
+        # Wait a momemt to make sure registry is completely written
+        time.sleep(1)
         filebeat.kill_and_wait()
 
         # Check that offsets are correct
