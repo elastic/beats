@@ -203,14 +203,19 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 	if oldState.Source != "" && oldState.Source != newState.Source {
 		// This does not start a new harvester as it is assume that the older harvester is still running
 		// or no new lines were detected. It sends only an event status update to make sure the new name is persisted.
-		logp.Debug("prospector", "File rename was detected, updating state: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
+		logp.Debug("prospector", "File rename was detected: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
 
-		// Update state because of file rotation
-		newState.Offset = oldState.Offset
-		event := input.NewEvent(newState)
-		p.Prospector.harvesterChan <- event
+		if oldState.Finished {
+			logp.Debug("prospector", "Updating state for renamed file: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
+			// Update state because of file rotation
+			newState.Offset = oldState.Offset
+			event := input.NewEvent(newState)
+			p.Prospector.harvesterChan <- event
 
-		filesRenamed.Add(1)
+			filesRenamed.Add(1)
+		} else {
+			logp.Debug("prospector", "File rename detected but harvester not finished yet.")
+		}
 	}
 
 	if !oldState.Finished {
