@@ -23,6 +23,8 @@ type kafka struct {
 
 	modeRetry      mode.ConnectionMode
 	modeGuaranteed mode.ConnectionMode
+
+	partitioner sarama.PartitionerConstructor
 }
 
 const (
@@ -87,13 +89,12 @@ func New(beatName string, cfg *common.Config, topologyExpire int) (outputs.Outpu
 func (k *kafka) init(cfg *common.Config) error {
 	debugf("initialize kafka output")
 
-	k.config = defaultConfig
-	if err := cfg.Unpack(&k.config); err != nil {
+	config := defaultConfig
+	if err := cfg.Unpack(&config); err != nil {
 		return err
 	}
 
-	var err error
-	k.topic, err = outil.BuildSelectorFromConfig(cfg, outil.Settings{
+	topic, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "topic",
 		MultiKey:         "topics",
 		EnableSingleOnly: true,
@@ -103,7 +104,17 @@ func (k *kafka) init(cfg *common.Config) error {
 		return err
 	}
 
-	_, err = newKafkaConfig(&k.config)
+	partitioner, err := makePartitioner(config.Partition)
+	if err != nil {
+		return err
+	}
+
+	k.config = config
+	k.partitioner = partitioner
+	k.topic = topic
+
+	// validate config one more time
+	_, err = k.newKafkaConfig()
 	if err != nil {
 		return err
 	}
@@ -112,7 +123,7 @@ func (k *kafka) init(cfg *common.Config) error {
 }
 
 func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
-	libCfg, err := newKafkaConfig(&k.config)
+	libCfg, err := k.newKafkaConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +141,7 @@ func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
 	hosts := k.config.Hosts
 	topic := k.topic
 	for i := 0; i < worker; i++ {
-		client, err := newKafkaClient(hosts, topic, libCfg)
+		client, err := newKafkaClient(hosts, k.config.Key, topic, libCfg)
 		if err != nil {
 			logp.Err("Failed to create kafka client: %v", err)
 			return nil, err
@@ -212,6 +223,24 @@ func (k *kafka) BulkPublish(
 	return mode.PublishEvents(signal, opts, data)
 }
 
+func (k *kafka) PublishEvents(
+	signal op.Signaler,
+	opts outputs.Options,
+	data []outputs.Data,
+) error {
+	return k.BulkPublish(signal, opts, data)
+}
+
+func (k *kafka) newKafkaConfig() (*sarama.Config, error) {
+	cfg, err := newKafkaConfig(&k.config)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.Producer.Partitioner = k.partitioner
+	return cfg, nil
+}
+
 func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	k := sarama.NewConfig()
 
@@ -251,7 +280,7 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
 
 	compressionMode, ok := compressionModes[strings.ToLower(config.Compression)]
 	if !ok {
-		return nil, fmt.Errorf("Unknown compression mode: %v", config.Compression)
+		return nil, fmt.Errorf("Unknown compression mode: '%v'", config.Compression)
 	}
 	k.Producer.Compression = compressionMode
 
