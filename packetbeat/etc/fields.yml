@@ -836,28 +836,64 @@
   title: "Cassandra"
   description: Cassandra v4/3 specific event fields.
   fields:
-    - name: cassandra_request
-      type: dict
-      dict-type: keyword
-      description: >
-        Cassandra request field table.
-    - name: cassandra_request.request_headers
-      type: dict
-      dict-type: keyword
-      description: >
-        Cassandra request header field table.
-    - name: cassandra_response
-      type: dict
-      dict-type: keyword
-      description: >
-        Cassandra response field table.
-    - name: cassandra_response.response_headers
-      type: dict
-      dict-type: keyword
-      description: >
-        Cassandra response header field table.
+    - name: cassandra
+      type: group
+      description: Information about the Cassandra request and response.
+      fields:
+        - name: request
+          type: group
+          description: Cassandra request
+          fields:
+            - name: headers
+              type: dict
+              dict-type: keyword
+              description: Cassandra request headers.
 
+            - name: query
+              type: keyword
+              description: Cassandra Query
 
+        - name: response
+          type: group
+          description: Cassandra response
+          fields:
+            - name: headers
+              type: dict
+              dict-type: keyword
+              description: Cassandra request headers
+
+            - name: result
+              type: dict
+              dict-type: keyword
+              description: Details about the returned result
+
+            - name: result_type
+              type: keyword
+              description: Cassandra result type. (eg. rows)
+
+            - name: supported
+              type: dict
+              dict-type: keyword
+              description: Supported parameters
+
+            - name: rows
+              type: dict
+              dict-type: keyword
+              description: Details about the returned rows
+
+            - name: err_code
+              type: integer
+              description: The error code of the Cassandra response
+
+            - name: err_msg
+              type: keyword
+              description: The error message of the Cassandra response
+
+            - name: err_type
+              type: keyword
+              description: The error type of the Cassandra response
+
+  
 - key: http
   title: "HTTP"
   description: HTTP-specific event fields.
