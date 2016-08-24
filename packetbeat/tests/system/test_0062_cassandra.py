@@ -26,22 +26,22 @@ class Test(BaseTest):
         assert o["port"] == 9042
 
         assert o["cassandra.request.query"] == "CREATE KEYSPACE mykeyspace WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };"
-
+        assert "cassandra.request.headers" in o
         h= o["cassandra.request.headers"]
         assert h["version"] == "4"
         assert h["op"] == "QUERY"
         assert h["length"] == 124
-        assert h["flags"] == "FLAG_0"
+        assert h["flags"] == "Default"
         assert h["stream"] == 20
 
 
-        assert o["cassandra.response.result_type"]=="schemaChanged"
+        assert o["cassandra.response.result.result_type"]=="schemaChanged"
 
         h2= o["cassandra.response.headers"]
         assert h2["version"] == "4"
         assert h2["length"] == 35
         assert h2["op"] == "RESULT"
-        assert h2["flags"] == "FLAG_0"
+        assert h2["flags"] == "Default"
         assert h2["stream"] == 20
 
     def test_create_table(self):
@@ -67,16 +67,16 @@ class Test(BaseTest):
         assert h["version"] == "4"
         assert h["op"] == "QUERY"
         assert h["length"] == 98
-        assert h["flags"] == "FLAG_0"
+        assert h["flags"] == "Default"
         assert h["stream"] == 49
 
 
-        assert o["cassandra.response.result_type"]=="schemaChanged"
+        assert o["cassandra.response.result.result_type"]=="schemaChanged"
         h2= o["cassandra.response.headers"]
         assert h2["version"] == "4"
         assert h2["length"] == 39
         assert h2["op"] == "RESULT"
-        assert h2["flags"] == "FLAG_0"
+        assert h2["flags"] == "Default"
         assert h2["stream"] == 49
 
     def test_insert_data(self):
@@ -102,15 +102,15 @@ class Test(BaseTest):
         assert h["version"] == "4"
         assert h["op"] == "QUERY"
         assert h["length"] == 97
-        assert h["flags"] == "FLAG_0"
+        assert h["flags"] == "Default"
         assert h["stream"] == 252
 
-        assert o["cassandra.response.result_type"]=="void"
+        assert o["cassandra.response.result.result_type"]=="void"
         h2= o["cassandra.response.headers"]
         assert h2["version"] == "4"
         assert h2["length"] == 4
         assert h2["op"] == "RESULT"
-        assert h2["flags"] == "FLAG_0"
+        assert h2["flags"] == "Default"
         assert h2["stream"] == 252
 
     def test_select_data(self):
@@ -135,16 +135,16 @@ class Test(BaseTest):
         assert h["version"] == "4"
         assert h["op"] == "QUERY"
         assert h["length"] == 41
-        assert h["flags"] == "FLAG_0"
+        assert h["flags"] == "Default"
         assert h["stream"] == 253
 
 
-        assert o["cassandra.response.result_type"]=="rows"
+        assert o["cassandra.response.result.result_type"]=="rows"
         h2= o["cassandra.response.headers"]
         assert h2["version"] == "4"
         assert h2["length"] == 89
         assert h2["op"] == "RESULT"
-        assert h2["flags"] == "FLAG_0"
+        assert h2["flags"] == "Default"
         assert h2["stream"] == 253
 
     def test_create_index(self):
@@ -169,15 +169,15 @@ class Test(BaseTest):
         assert h["version"] == "4"
         assert h["op"] == "QUERY"
         assert h["length"] == 51
-        assert h["flags"] == "FLAG_0"
+        assert h["flags"] == "Default"
         assert h["stream"] == 92
 
-        assert o["cassandra.response.result_type"]=="schemaChanged"
+        assert o["cassandra.response.result.result_type"]=="schemaChanged"
         h2= o["cassandra.response.headers"]
         assert h2["version"] == "4"
         assert h2["length"] == 39
         assert h2["op"] == "RESULT"
-        assert h2["flags"] == "FLAG_0"
+        assert h2["flags"] == "Default"
         assert h2["stream"] == 92
 
     def test_trace_error(self):
@@ -200,6 +200,7 @@ class Test(BaseTest):
         assert o["bytes_in"] == 55
         assert o["bytes_out"] == 62
         assert o["cassandra.request.query"] == "DROP KEYSPACE mykeyspace;"
+        print o
         h= o["cassandra.request.headers"]
         assert h["version"] == "4"
         assert h["op"] == "QUERY"
@@ -214,7 +215,7 @@ class Test(BaseTest):
         assert h2["version"] == "4"
         assert h2["length"] == 53
         assert h2["op"] == "ERROR"
-        assert h2["flags"] == "FLAG_0"
+        assert h2["flags"] == "Default"
         assert h2["stream"] == 275
 
     def test_select_use_index(self):
@@ -240,7 +241,7 @@ class Test(BaseTest):
         assert h["version"] == "4"
         assert h["op"] == "QUERY"
         assert h["length"] == 63
-        assert h["flags"] == "FLAG_0"
+        assert h["flags"] == "Default"
         assert h["stream"] == 262
 
 
@@ -248,9 +249,9 @@ class Test(BaseTest):
         assert h2["version"] == "4"
         assert h2["length"] == 89
         assert h2["op"] == "RESULT"
-        assert h2["flags"] == "FLAG_0"
+        assert h2["flags"] == "Default"
         assert h2["stream"] == 262
-        assert o["cassandra.response.result_type"] =="rows"
+        assert o["cassandra.response.result.result_type"] =="rows"
 
     def test_ops_mixed(self):
         """
@@ -278,7 +279,7 @@ class Test(BaseTest):
         assert h["version"] == "4"
         assert h["op"] == "OPTIONS"
         assert h["length"] == 0
-        assert h["flags"] == "FLAG_0"
+        assert h["flags"] == "Default"
         assert h["stream"] == 0
 
 
@@ -286,7 +287,7 @@ class Test(BaseTest):
         assert h2["version"] == "4"
         assert h2["length"] == 52
         assert h2["op"] == "SUPPORTED"
-        assert h2["flags"] == "FLAG_0"
+        assert h2["flags"] == "Default"
         assert h2["stream"] == 0
 
         o = objs[1]
@@ -300,7 +301,7 @@ class Test(BaseTest):
         assert h["version"] == "4"
         assert h["op"] == "STARTUP"
         assert h["length"] == 22
-        assert h["flags"] == "FLAG_0"
+        assert h["flags"] == "Default"
         assert h["stream"] == 1
 
 
@@ -308,7 +309,7 @@ class Test(BaseTest):
         assert h2["version"] == "4"
         assert h2["length"] == 0
         assert h2["op"] == "READY"
-        assert h2["flags"] == "FLAG_0"
+        assert h2["flags"] == "Default"
         assert h2["stream"] == 1
 
         o = objs[2]
@@ -322,7 +323,7 @@ class Test(BaseTest):
         assert h["version"] == "4"
         assert h["op"] == "REGISTER"
         assert h["length"] == 49
-        assert h["flags"] == "FLAG_0"
+        assert h["flags"] == "Default"
         assert h["stream"] == 2
 
 
@@ -330,7 +331,7 @@ class Test(BaseTest):
         assert h2["version"] == "4"
         assert h2["length"] == 0
         assert h2["op"] == "READY"
-        assert h2["flags"] == "FLAG_0"
+        assert h2["flags"] == "Default"
         assert h2["stream"] == 2
 
     def test_ops_ignored(self):
@@ -359,7 +360,7 @@ class Test(BaseTest):
         assert h["version"] == "4"
         assert h["op"] == "STARTUP"
         assert h["length"] == 22
-        assert h["flags"] == "FLAG_0"
+        assert h["flags"] == "Default"
         assert h["stream"] == 1
 
 
@@ -367,7 +368,7 @@ class Test(BaseTest):
         assert h2["version"] == "4"
         assert h2["length"] == 0
         assert h2["op"] == "READY"
-        assert h2["flags"] == "FLAG_0"
+        assert h2["flags"] == "Default"
         assert h2["stream"] == 1
 
         o = objs[1]
@@ -380,7 +381,7 @@ class Test(BaseTest):
         assert h["version"] == "4"
         assert h["op"] == "QUERY"
         assert h["length"] == 92
-        assert h["flags"] == "FLAG_0"
+        assert h["flags"] == "Default"
         assert h["stream"] == 3
 
 
@@ -388,7 +389,7 @@ class Test(BaseTest):
         assert h2["version"] == "4"
         assert h2["length"] == 107
         assert h2["op"] == "RESULT"
-        assert h2["flags"] == "FLAG_0"
+        assert h2["flags"] == "Default"
         assert h2["stream"] == 3
 
     def test_compressed_frame(self):
@@ -418,7 +419,7 @@ class Test(BaseTest):
         assert h["version"] == "4"
         assert h["op"] == "STARTUP"
         assert h["length"] == 43
-        assert h["flags"] == "FLAG_0"
+        assert h["flags"] == "Default"
         assert h["stream"] == 0
 
 
@@ -473,8 +474,8 @@ class Test(BaseTest):
         assert h2["op"] == "RESULT"
         assert h2["flags"] == "Compress"
         assert h2["stream"] == 64
-        assert o["cassandra.response.result_type"] == "rows"
-        rows=o["cassandra.response.rows"]
+        assert o["cassandra.response.result.result_type"] == "rows"
+        rows=o["cassandra.response.result.rows"]
         assert rows["num_rows"] == 290917
         meta=rows["meta"]
         assert meta["col_count"] == 9
