@@ -41,8 +41,9 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 	}
 
 	event := common.MapStr{
-		"type":   "cassandra",
-		"status": status,
+		"type":      "cassandra",
+		"status":    status,
+		"cassandra": common.MapStr{},
 	}
 
 	//requ can be null, if the message is a PUSHed message
@@ -71,11 +72,11 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 				if requ.data == nil {
 					requ.data = map[string]interface{}{}
 				}
-				requ.data["request_headers"] = requ.header
+				requ.data["headers"] = requ.header
 			}
 
 			if len(requ.data) > 0 {
-				event["cassandra_request"] = requ.data
+				event["cassandra"].(common.MapStr)["request"] = requ.data
 			}
 		}
 
@@ -108,11 +109,11 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 				resp.data = map[string]interface{}{}
 			}
 
-			resp.data["response_headers"] = resp.header
+			resp.data["headers"] = resp.header
 		}
 
 		if len(resp.data) > 0 {
-			event["cassandra_response"] = resp.data
+			event["cassandra"].(common.MapStr)["response"] = resp.data
 		}
 
 	}

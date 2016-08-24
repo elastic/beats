@@ -30,47 +30,58 @@
           }
         },
         {
-          "cassandra_request": {
+          "cassandra.request.headers": {
             "mapping": {
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
             },
             "match_mapping_type": "string",
-            "path_match": "cassandra_request.*"
+            "path_match": "cassandra.request.headers.*"
           }
         },
         {
-          "cassandra_response": {
+          "cassandra.response.headers": {
             "mapping": {
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
             },
             "match_mapping_type": "string",
-            "path_match": "cassandra_response.*"
+            "path_match": "cassandra.response.headers.*"
           }
         },
         {
-          "cassandra_request.request_headers": {
+          "cassandra.response.result": {
             "mapping": {
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
             },
             "match_mapping_type": "string",
-            "path_match": "cassandra_request.request_headers.*"
+            "path_match": "cassandra.response.result.*"
           }
         },
         {
-          "cassandra_response.response_headers": {
+          "cassandra.response.supported": {
             "mapping": {
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
             },
             "match_mapping_type": "string",
-            "path_match": "cassandra_response.response_headers.*"
+            "path_match": "cassandra.response.supported.*"
+          }
+        },
+        {
+          "cassandra.response.rows": {
+            "mapping": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "match_mapping_type": "string",
+            "path_match": "cassandra.response.rows.*"
           }
         },
         {
@@ -268,6 +279,41 @@
         },
         "bytes_out": {
           "type": "long"
+        },
+        "cassandra": {
+          "properties": {
+            "request": {
+              "properties": {
+                "query": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            },
+            "response": {
+              "properties": {
+                "err_code": {
+                  "type": "long"
+                },
+                "err_msg": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "err_type": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "result_type": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            }
+          }
         },
         "client_ip": {
           "ignore_above": 1024,
