@@ -409,36 +409,92 @@ Cassandra v4/3 specific event fields.
 
 
 [float]
-=== cassandra_request
+== cassandra Fields
 
-type: dict
-
-Cassandra request field table.
+Information about the Cassandra request and response.
 
 
 [float]
-=== cassandra_request.request_headers
+== request Fields
 
-type: dict
-
-Cassandra request header field table.
+Cassandra request
 
 
 [float]
-=== cassandra_response
+=== cassandra.request.headers
 
 type: dict
 
-Cassandra response field table.
+Cassandra request headers.
+
+[float]
+=== cassandra.request.query
+
+type: keyword
+
+Cassandra Query
+
+[float]
+== response Fields
+
+Cassandra response
 
 
 [float]
-=== cassandra_response.response_headers
+=== cassandra.response.headers
 
 type: dict
 
-Cassandra response header field table.
+Cassandra request headers
 
+[float]
+=== cassandra.response.result
+
+type: dict
+
+Details about the returned result
+
+[float]
+=== cassandra.response.result_type
+
+type: keyword
+
+Cassandra result type. (eg. rows)
+
+[float]
+=== cassandra.response.supported
+
+type: dict
+
+Supported parameters
+
+[float]
+=== cassandra.response.rows
+
+type: dict
+
+Details about the returned rows
+
+[float]
+=== cassandra.response.err_code
+
+type: integer
+
+The error code of the Cassandra response
+
+[float]
+=== cassandra.response.err_msg
+
+type: keyword
+
+The error message of the Cassandra response
+
+[float]
+=== cassandra.response.err_type
+
+type: keyword
+
+The error type of the Cassandra response
 
 [[exported-fields-common]]
 == Common Fields

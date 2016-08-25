@@ -6,18 +6,19 @@
     },
     "bytes_in": 111,
     "bytes_out": 198,
-    "cassandra_request": {
+    "cassandra": {
+      "request": {
         "query": "SELECT * FROM simplex.playlists WHERE id = 2cc9ccb7-6221-4ccb-8387-f22b6a1b354d;",
-        "request_headers": {
+        "headers": {
             "flags": "Compress",
             "length": 102,
             "op": "QUERY",
             "stream": 448,
             "version": "4"
         }
-    },
-    "cassandra_response": {
-        "response_headers": {
+      },
+      "response": {
+        "headers": {
             "flags": "Compress",
             "length": 189,
             "op": "RESULT",
@@ -34,6 +35,7 @@
             },
             "num_rows": 158052
         }
+      }
     },
     "client_ip": "127.0.0.1",
     "client_port": 50043,
