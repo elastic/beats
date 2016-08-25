@@ -24,5 +24,5 @@ tar czvf upload/{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}.tar.gz /{{.beat_na
 echo "Created upload/{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}.tar.gz"
 
 cd upload
-sha1sum {{.beat_name}}-${VERSION}-linux-{{.bin_arch}}.tar.gz > {{.beat_name}}-${VERSION}-linux-{{.bin_arch}}.tar.gz.sha1.txt
-echo "Created upload/{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}.tar.gz.sha1.txt"
+sha1sum {{.beat_name}}-${VERSION}-linux-{{.bin_arch}}.tar.gz | awk '{print $1;}' > {{.beat_name}}-${VERSION}-linux-{{.bin_arch}}.tar.gz.sha1
+echo "Created upload/{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}.tar.gz.sha1"
