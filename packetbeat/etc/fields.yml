@@ -865,7 +865,7 @@
                   description: A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
             - name: query
               type: keyword
-              description: The query send to cassandra.
+              description: The CQL query which client send to cassandra.
 
         - name: response
           type: group
