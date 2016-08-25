@@ -27,5 +27,5 @@ zip -r upload/{{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip /{{.beat_name}
 echo "Created upload/{{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip"
 
 cd upload
-sha1sum {{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip > {{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip.sha1.txt
-echo "Created upload/{{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip.sha1.txt"
+sha1sum {{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip | awk '{print $1;}' > {{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip.sha1
+echo "Created upload/{{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip.sha1"
