@@ -1,6 +1,6 @@
 from filebeat import BaseTest
 import os
-import socket
+import time
 
 """
 Test Harvesters
@@ -255,7 +255,7 @@ class Test(BaseTest):
         with open(logfile, 'w') as f:
             f.write(message + "\n")
 
-        # Wait until sate is written
+        # Wait until state is written
         self.wait_until(
             lambda: self.log_contains(
                 "1 states written."),
@@ -268,3 +268,101 @@ class Test(BaseTest):
 
         output = self.read_output_json()
         assert message == output[0]["message"]
+
+    def test_truncated_file_open(self):
+        """
+        Checks if it is correctly detected if an open file is truncated
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        logfile = self.working_dir + "/log/test.log"
+
+        message = "Hello World"
+
+        filebeat = self.start_beat()
+
+        # Write 3 lines
+        with open(logfile, 'w') as f:
+            f.write(message + "\n")
+            f.write(message + "\n")
+            f.write(message + "\n")
+
+        # wait for the "Skipping file" log message
+        self.wait_until(
+            lambda: self.output_has(lines=3),
+            max_timeout=10)
+
+        # Write 1 line -> truncation
+        with open(logfile, 'w') as f:
+            f.write(message + "\n")
+
+        # wait for the "Skipping file" log message
+        self.wait_until(
+            lambda: self.output_has(lines=4),
+            max_timeout=10)
+
+        # Test if truncation was reported properly
+        self.wait_until(
+            lambda: self.log_contains(
+                "File was truncated as offset"),
+            max_timeout=15)
+        self.wait_until(
+            lambda: self.log_contains(
+                "File was truncated. Begin reading file from offset 0"),
+            max_timeout=15)
+
+        filebeat.check_kill_and_wait()
+
+
+    def test_truncated_file_closed(self):
+        """
+        Checks if it is correctly detected if a closed file is truncated
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+            close_inactive="1s",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        logfile = self.working_dir + "/log/test.log"
+
+        message = "Hello World"
+
+        filebeat = self.start_beat()
+
+        # Write 3 lines
+        with open(logfile, 'w') as f:
+            f.write(message + "\n")
+            f.write(message + "\n")
+            f.write(message + "\n")
+
+        # wait for the "Skipping file" log message
+        self.wait_until(
+            lambda: self.output_has(lines=3),
+            max_timeout=10)
+
+        # Wait until harvester is closed
+        self.wait_until(
+            lambda: self.log_contains(
+                "Stopping harvester for file"),
+            max_timeout=15)
+
+        # Write 1 line -> truncation
+        with open(logfile, 'w') as f:
+            f.write(message + "\n")
+
+        # wait for the "Skipping file" log message
+        self.wait_until(
+            lambda: self.output_has(lines=4),
+            max_timeout=10)
+
+        # Test if truncation was reported properly
+        self.wait_until(
+            lambda: self.log_contains(
+                "Old file was truncated. Starting from the beginning"),
+            max_timeout=15)
+
+        filebeat.check_kill_and_wait()

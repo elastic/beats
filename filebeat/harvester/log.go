@@ -260,7 +260,7 @@ func (h *Harvester) close() {
 	if h.file != nil {
 
 		h.file.Close()
-		logp.Debug("harvester", "Stopping harvester, closing file: %s", h.state.Source)
+		logp.Debug("harvester", "Closing file: %s", h.state.Source)
 		harvesterOpenFiles.Add(-1)
 
 		// On completion, push offset so we can continue where we left off if we relaunch on the same file
