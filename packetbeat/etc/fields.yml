@@ -872,13 +872,28 @@
           description: Cassandra response.
           fields:
             - name: headers
-              type: dict
-              dict-type: keyword
+              type: group
               description: Cassandra response headers, the structure is as same as request's header.
+              fields:
+                - name: version
+                  type: integer
+                  description: The version of the protocol.
+                - name: flags
+                  type: keyword
+                  description: Flags applying to this frame.
+                - name: stream
+                  type: keyword
+                  description:  A frame has a stream id.  If a client sends a request message with the stream id X, it is guaranteed that the stream id of the response to that message will be X.
+                - name: op
+                  type: keyword
+                  description: An operation type that distinguishes the actual message.
+                - name: length
+                  type: integer
+                  description: A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+
 
             - name: result
-              type: dict
-              dict-type: group
+              type: group
               description: Details about the returned result.
               fields:
                 - name: result_type
@@ -941,7 +956,7 @@
                     - name: args
                       type: keyword
                       description: One string for each argument type (as CQL type).
-                  - name: prepared_result
+                - name: prepared_result
                   type: group
                   description: The result to a PREPARE message.
                   fields:
@@ -951,9 +966,47 @@
                     - name: req_meta
                       type: group
                       description: This describes the request metadata.
+                      fields:
+                        - name: keyspace
+                          type: keyword
+                          description: Only present after set Global_tables_spec, the keyspace name.
+                        - name: table
+                          type: keyword
+                          description: Only present after set Global_tables_spec, the table name.
+                        - name: flags
+                          type: keyword
+                          description: Provides information on the formatting of the remaining information.
+                        - name: col_count
+                          type: integer
+                          description: Representing the number of columns selected by the query that produced this result.
+                        - name: pkey_columns
+                          type: integer
+                          description: Representing the PK columns index and counts.
+                        - name: paging_state
+                          type: keyword
+                          description: The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
                     - name: resp_meta
                       type: group
                       description: This describes the metadata for the result set.
+                      fields:
+                        - name: keyspace
+                          type: keyword
+                          description: Only present after set Global_tables_spec, the keyspace name.
+                        - name: table
+                          type: keyword
+                          description: Only present after set Global_tables_spec, the table name.
+                        - name: flags
+                          type: keyword
+                          description: Provides information on the formatting of the remaining information.
+                        - name: col_count
+                          type: integer
+                          description: Representing the number of columns selected by the query that produced this result.
+                        - name: pkey_columns
+                          type: integer
+                          description: Representing the PK columns index and counts.
+                        - name: paging_state
+                          type: keyword
+                          description: The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
 
             - name: supported
               type: dict
@@ -961,9 +1014,13 @@
               description:  Indicates which startup options are supported by the server. This message comes as a response to an OPTIONS message.
 
             - name: authentication
-              type: dict
-              dict-type: keyword
+              type: group
               description:  Indicates that the server requires authentication, and which authentication mechanism to use.
+              fields:
+              - name: class
+                type: keyword
+                description: Indicates the full class name of the IAuthenticator in use
+
 
             - name: warnings
               type: keyword
