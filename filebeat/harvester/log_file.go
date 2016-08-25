@@ -117,7 +117,7 @@ func (r *LogFile) errorChecks(err error) error {
 	// check if file was truncated
 	if info.Size() < r.offset {
 		logp.Debug("harvester",
-			"File was truncated as offset (%s) > size (%s): %s", r.offset, info.Size(), r.fs.Name())
+			"File was truncated as offset (%d) > size (%d): %s", r.offset, info.Size(), r.fs.Name())
 		return ErrFileTruncate
 	}
 
