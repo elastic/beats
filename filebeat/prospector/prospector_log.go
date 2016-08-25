@@ -208,8 +208,8 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 		if oldState.Finished {
 			logp.Debug("prospector", "Updating state for renamed file: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
 			// Update state because of file rotation
-			newState.Offset = oldState.Offset
-			event := input.NewEvent(newState)
+			oldState.Source = newState.Source
+			event := input.NewEvent(oldState)
 			p.Prospector.harvesterChan <- event
 
 			filesRenamed.Add(1)
