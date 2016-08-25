@@ -254,6 +254,9 @@
                 },
                 "error": {
                   "properties": {
+                    "code": {
+                      "type": "long"
+                    },
                     "details": {
                       "properties": {
                         "alive": {
@@ -305,14 +308,11 @@
                         }
                       }
                     },
-                    "err_code": {
-                      "type": "long"
-                    },
-                    "err_msg": {
+                    "msg": {
                       "ignore_above": 1024,
                       "type": "keyword"
                     },
-                    "err_type": {
+                    "type": {
                       "ignore_above": 1024,
                       "type": "keyword"
                     }
@@ -320,41 +320,15 @@
                 },
                 "event": {
                   "properties": {
-                    "event_type": {
+                    "change": {
                       "ignore_above": 1024,
                       "type": "keyword"
                     },
                     "host": {
                       "ignore_above": 1024,
                       "type": "keyword"
-                    }
-                  }
-                },
-                "headers": {
-                  "properties": {
-                    "flags": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
                     },
-                    "length": {
-                      "type": "long"
-                    },
-                    "op": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "stream": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "version": {
-                      "type": "long"
-                    }
-                  }
-                },
-                "result": {
-                  "properties": {
-                    "event": {
+                    "schema_change": {
                       "properties": {
                         "args": {
                           "ignore_above": 1024,
@@ -386,11 +360,41 @@
                         }
                       }
                     },
+                    "type": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "headers": {
+                  "properties": {
+                    "flags": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "length": {
+                      "type": "long"
+                    },
+                    "op": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "stream": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "version": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "result": {
+                  "properties": {
                     "keyspace": {
                       "ignore_above": 1024,
                       "type": "keyword"
                     },
-                    "prepared_result": {
+                    "prepared": {
                       "properties": {
                         "prepared_id": {
                           "ignore_above": 1024,
@@ -450,10 +454,6 @@
                         }
                       }
                     },
-                    "result_type": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
                     "rows": {
                       "properties": {
                         "meta": {
@@ -486,6 +486,42 @@
                           "type": "long"
                         }
                       }
+                    },
+                    "schema_change": {
+                      "properties": {
+                        "args": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "change": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "keyspace": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "name": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "object": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "table": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "target": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "type": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
                     }
                   }
                 },

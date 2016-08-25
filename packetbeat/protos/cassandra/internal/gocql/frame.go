@@ -264,9 +264,9 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 	errT := ErrType(code)
 
 	data = make(map[string]interface{})
-	data["err_code"] = code
-	data["err_msg"] = msg
-	data["err_type"] = errT.String()
+	data["code"] = code
+	data["msg"] = msg
+	data["type"] = errT.String()
 	detail := map[string]interface{}{}
 	switch errT {
 	case errUnavailable:
@@ -412,19 +412,19 @@ func (f *Framer) parseResultFrame() (data map[string]interface{}) {
 	data = make(map[string]interface{})
 	switch kind {
 	case resultKindVoid:
-		data["result_type"] = "void"
+		data["type"] = "void"
 	case resultKindRows:
-		data["result_type"] = "rows"
+		data["type"] = "rows"
 		data["rows"] = f.parseResultRows()
 	case resultKindSetKeyspace:
-		data["result_type"] = "set_keyspace"
+		data["type"] = "set_keyspace"
 		data["keyspace"] = (f.decoder).ReadString()
 	case resultKindPrepared:
-		data["result_type"] = "prepared"
-		data["prepared_result"] = f.parseResultPrepared()
+		data["type"] = "prepared"
+		data["prepared"] = f.parseResultPrepared()
 	case resultKindSchemaChanged:
-		data["result_type"] = "schemaChanged"
-		data["event"] = f.parseResultSchemaChange()
+		data["type"] = "schemaChanged"
+		data["schema_change"] = f.parseResultSchemaChange()
 	}
 
 	return data
@@ -516,7 +516,7 @@ func (f *Framer) parseEventFrame() (data map[string]interface{}) {
 	data = make((map[string]interface{}))
 	decoder := f.decoder
 	eventType := decoder.ReadString()
-	data["event_type"] = eventType
+	data["type"] = eventType
 
 	switch eventType {
 	case "TOPOLOGY_CHANGE":
@@ -533,7 +533,7 @@ func (f *Framer) parseEventFrame() (data map[string]interface{}) {
 
 	case "SCHEMA_CHANGE":
 		// this should work for all versions
-		data = f.parseResultSchemaChange()
+		data["schema_change"] = f.parseResultSchemaChange()
 	default:
 		logp.Err("unknown event type: %q", eventType)
 	}

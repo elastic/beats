@@ -285,6 +285,9 @@
                 },
                 "error": {
                   "properties": {
+                    "code": {
+                      "type": "long"
+                    },
                     "details": {
                       "properties": {
                         "alive": {
@@ -344,15 +347,12 @@
                         }
                       }
                     },
-                    "err_code": {
-                      "type": "long"
-                    },
-                    "err_msg": {
+                    "msg": {
                       "ignore_above": 1024,
                       "index": "not_analyzed",
                       "type": "string"
                     },
-                    "err_type": {
+                    "type": {
                       "ignore_above": 1024,
                       "index": "not_analyzed",
                       "type": "string"
@@ -361,7 +361,7 @@
                 },
                 "event": {
                   "properties": {
-                    "event_type": {
+                    "change": {
                       "ignore_above": 1024,
                       "index": "not_analyzed",
                       "type": "string"
@@ -370,37 +370,8 @@
                       "ignore_above": 1024,
                       "index": "not_analyzed",
                       "type": "string"
-                    }
-                  }
-                },
-                "headers": {
-                  "properties": {
-                    "flags": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
                     },
-                    "length": {
-                      "type": "long"
-                    },
-                    "op": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    },
-                    "stream": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    },
-                    "version": {
-                      "type": "long"
-                    }
-                  }
-                },
-                "result": {
-                  "properties": {
-                    "event": {
+                    "schema_change": {
                       "properties": {
                         "args": {
                           "ignore_above": 1024,
@@ -439,12 +410,46 @@
                         }
                       }
                     },
+                    "type": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "headers": {
+                  "properties": {
+                    "flags": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "length": {
+                      "type": "long"
+                    },
+                    "op": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "stream": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "result": {
+                  "properties": {
                     "keyspace": {
                       "ignore_above": 1024,
                       "index": "not_analyzed",
                       "type": "string"
                     },
-                    "prepared_result": {
+                    "prepared": {
                       "properties": {
                         "prepared_id": {
                           "ignore_above": 1024,
@@ -513,11 +518,6 @@
                         }
                       }
                     },
-                    "result_type": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    },
                     "rows": {
                       "properties": {
                         "meta": {
@@ -554,6 +554,50 @@
                           "type": "long"
                         }
                       }
+                    },
+                    "schema_change": {
+                      "properties": {
+                        "args": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "change": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "keyspace": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "name": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "object": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "table": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "target": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "type": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
                     }
                   }
                 },

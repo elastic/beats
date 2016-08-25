@@ -522,7 +522,7 @@ Details about the returned result.
 
 
 [float]
-=== cassandra.response.result.result_type
+=== cassandra.response.result.type
 
 type: keyword
 
@@ -597,68 +597,68 @@ type: keyword
 Indicating the name of the keyspace that has been set.
 
 [float]
-== event Fields
+== schema_change Fields
 
 The result to a schema_change message.
 
 
 [float]
-=== cassandra.response.result.event.change
+=== cassandra.response.result.schema_change.change
 
 type: keyword
 
 Representing the type of changed involved.
 
 [float]
-=== cassandra.response.result.event.keyspace
+=== cassandra.response.result.schema_change.keyspace
 
 type: keyword
 
 This describes which keyspace has changed.
 
 [float]
-=== cassandra.response.result.event.table
+=== cassandra.response.result.schema_change.table
 
 type: keyword
 
 This describes which table has changed.
 
 [float]
-=== cassandra.response.result.event.object
+=== cassandra.response.result.schema_change.object
 
 type: keyword
 
 This describes the name of said affected object (either the table, user type, function, or aggregate name).
 
 [float]
-=== cassandra.response.result.event.target
+=== cassandra.response.result.schema_change.target
 
 type: keyword
 
 Target could be "FUNCTION" or "AGGREGATE", multiple arguments.
 
 [float]
-=== cassandra.response.result.event.name
+=== cassandra.response.result.schema_change.name
 
 type: keyword
 
 The function/aggregate name.
 
 [float]
-=== cassandra.response.result.event.args
+=== cassandra.response.result.schema_change.args
 
 type: keyword
 
 One string for each argument type (as CQL type).
 
 [float]
-== prepared_result Fields
+== prepared Fields
 
 The result to a PREPARE message.
 
 
 [float]
-=== cassandra.response.result.prepared_result.prepared_id
+=== cassandra.response.result.prepared.prepared_id
 
 type: keyword
 
@@ -671,42 +671,42 @@ This describes the request metadata.
 
 
 [float]
-=== cassandra.response.result.prepared_result.req_meta.keyspace
+=== cassandra.response.result.prepared.req_meta.keyspace
 
 type: keyword
 
 Only present after set Global_tables_spec, the keyspace name.
 
 [float]
-=== cassandra.response.result.prepared_result.req_meta.table
+=== cassandra.response.result.prepared.req_meta.table
 
 type: keyword
 
 Only present after set Global_tables_spec, the table name.
 
 [float]
-=== cassandra.response.result.prepared_result.req_meta.flags
+=== cassandra.response.result.prepared.req_meta.flags
 
 type: keyword
 
 Provides information on the formatting of the remaining information.
 
 [float]
-=== cassandra.response.result.prepared_result.req_meta.col_count
+=== cassandra.response.result.prepared.req_meta.col_count
 
 type: integer
 
 Representing the number of columns selected by the query that produced this result.
 
 [float]
-=== cassandra.response.result.prepared_result.req_meta.pkey_columns
+=== cassandra.response.result.prepared.req_meta.pkey_columns
 
 type: integer
 
 Representing the PK columns index and counts.
 
 [float]
-=== cassandra.response.result.prepared_result.req_meta.paging_state
+=== cassandra.response.result.prepared.req_meta.paging_state
 
 type: keyword
 
@@ -719,42 +719,42 @@ This describes the metadata for the result set.
 
 
 [float]
-=== cassandra.response.result.prepared_result.resp_meta.keyspace
+=== cassandra.response.result.prepared.resp_meta.keyspace
 
 type: keyword
 
 Only present after set Global_tables_spec, the keyspace name.
 
 [float]
-=== cassandra.response.result.prepared_result.resp_meta.table
+=== cassandra.response.result.prepared.resp_meta.table
 
 type: keyword
 
 Only present after set Global_tables_spec, the table name.
 
 [float]
-=== cassandra.response.result.prepared_result.resp_meta.flags
+=== cassandra.response.result.prepared.resp_meta.flags
 
 type: keyword
 
 Provides information on the formatting of the remaining information.
 
 [float]
-=== cassandra.response.result.prepared_result.resp_meta.col_count
+=== cassandra.response.result.prepared.resp_meta.col_count
 
 type: integer
 
 Representing the number of columns selected by the query that produced this result.
 
 [float]
-=== cassandra.response.result.prepared_result.resp_meta.pkey_columns
+=== cassandra.response.result.prepared.resp_meta.pkey_columns
 
 type: integer
 
 Representing the PK columns index and counts.
 
 [float]
-=== cassandra.response.result.prepared_result.resp_meta.paging_state
+=== cassandra.response.result.prepared.resp_meta.paging_state
 
 type: keyword
 
@@ -794,11 +794,18 @@ Event pushed by the server. A client will only receive events for the types it h
 
 
 [float]
-=== cassandra.response.event.event_type
+=== cassandra.response.event.type
 
 type: keyword
 
 Representing the event type.
+
+[float]
+=== cassandra.response.event.change
+
+type: keyword
+
+The message corresponding respectively to the type of change followed by the address of the new/removed node.
 
 [float]
 === cassandra.response.event.host
@@ -815,27 +822,82 @@ type: keyword
 Representing the node port.
 
 [float]
+== schema_change Fields
+
+The events details related to schema change.
+
+
+[float]
+=== cassandra.response.event.schema_change.change
+
+type: keyword
+
+Representing the type of changed involved.
+
+[float]
+=== cassandra.response.event.schema_change.keyspace
+
+type: keyword
+
+This describes which keyspace has changed.
+
+[float]
+=== cassandra.response.event.schema_change.table
+
+type: keyword
+
+This describes which table has changed.
+
+[float]
+=== cassandra.response.event.schema_change.object
+
+type: keyword
+
+This describes the name of said affected object (either the table, user type, function, or aggregate name).
+
+[float]
+=== cassandra.response.event.schema_change.target
+
+type: keyword
+
+Target could be "FUNCTION" or "AGGREGATE", multiple arguments.
+
+[float]
+=== cassandra.response.event.schema_change.name
+
+type: keyword
+
+The function/aggregate name.
+
+[float]
+=== cassandra.response.event.schema_change.args
+
+type: keyword
+
+One string for each argument type (as CQL type).
+
+[float]
 == error Fields
 
 Indicates an error processing a request. The body of the message will be an  error code followed by a error message. Then, depending on the exception, more content may follow.
 
 
 [float]
-=== cassandra.response.error.err_code
+=== cassandra.response.error.code
 
 type: integer
 
 The error code of the Cassandra response.
 
 [float]
-=== cassandra.response.error.err_msg
+=== cassandra.response.error.msg
 
 type: keyword
 
 The error message of the Cassandra response.
 
 [float]
-=== cassandra.response.error.err_type
+=== cassandra.response.error.type
 
 type: keyword
 

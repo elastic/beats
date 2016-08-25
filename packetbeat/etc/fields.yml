@@ -896,7 +896,7 @@
               type: group
               description: Details about the returned result.
               fields:
-                - name: result_type
+                - name: type
                   type: keyword
                   description: Cassandra result type.
                 - name: rows
@@ -931,7 +931,7 @@
                 - name: keyspace
                   type: keyword
                   description: Indicating the name of the keyspace that has been set.
-                - name: event
+                - name: schema_change
                   type: group
                   description: The result to a schema_change message.
                   fields:
@@ -956,7 +956,7 @@
                     - name: args
                       type: keyword
                       description: One string for each argument type (as CQL type).
-                - name: prepared_result
+                - name: prepared
                   type: group
                   description: The result to a PREPARE message.
                   fields:
@@ -1030,30 +1030,58 @@
               type: group
               description: Event pushed by the server. A client will only receive events for the types it has REGISTERed to.
               fields:
-                - name: event_type
+                - name: type
                   type: keyword
                   description: Representing the event type.
+                - name: change
+                  type: keyword
+                  description: The message corresponding respectively to the type of change followed by the address of the new/removed node.
                 - name: host
                   type: keyword
                   description: Representing the node ip.
                 - name: host
                   type: keyword
                   description: Representing the node port.
+                - name: schema_change
+                  type: group
+                  description: The events details related to schema change.
+                  fields:
+                    - name: change
+                      type: keyword
+                      description:  Representing the type of changed involved.
+                    - name: keyspace
+                      type: keyword
+                      description: This describes which keyspace has changed.
+                    - name: table
+                      type: keyword
+                      description: This describes which table has changed.
+                    - name: object
+                      type: keyword
+                      description: This describes the name of said affected object (either the table, user type, function, or aggregate name).
+                    - name: target
+                      type: keyword
+                      description: Target could be "FUNCTION" or "AGGREGATE", multiple arguments.
+                    - name: name
+                      type: keyword
+                      description: The function/aggregate name.
+                    - name: args
+                      type: keyword
+                      description: One string for each argument type (as CQL type).
 
 
             - name: error
               type: group
               description: Indicates an error processing a request. The body of the message will be an  error code followed by a error message. Then, depending on the exception, more content may follow.
               fields:
-                - name: err_code
+                - name: code
                   type: integer
                   description: The error code of the Cassandra response.
 
-                - name: err_msg
+                - name: msg
                   type: keyword
                   description: The error message of the Cassandra response.
 
-                - name: err_type
+                - name: type
                   type: keyword
                   description: The error type of the Cassandra response.
 

@@ -33,10 +33,10 @@ class Test(BaseTest):
         assert o["cassandra.request.headers.stream"] == 20
 
 
-        assert o["cassandra.response.result.result_type"]=="schemaChanged"
-        assert o["cassandra.response.result.event.change"]=="CREATED"
-        assert o["cassandra.response.result.event.keyspace"]=="mykeyspace"
-        assert o["cassandra.response.result.event.target"]=="KEYSPACE"
+        assert o["cassandra.response.result.type"]=="schemaChanged"
+        assert o["cassandra.response.result.schema_change.change"]=="CREATED"
+        assert o["cassandra.response.result.schema_change.keyspace"]=="mykeyspace"
+        assert o["cassandra.response.result.schema_change.target"]=="KEYSPACE"
 
         assert o["cassandra.response.headers.version"] == "4"
         assert o["cassandra.response.headers.length"] == 35
@@ -70,7 +70,7 @@ class Test(BaseTest):
         assert o["cassandra.request.headers.stream"] == 49
 
 
-        assert o["cassandra.response.result.result_type"]=="schemaChanged"
+        assert o["cassandra.response.result.type"]=="schemaChanged"
         assert o["cassandra.response.headers.version"] == "4"
         assert o["cassandra.response.headers.length"] == 39
         assert o["cassandra.response.headers.op"] == "RESULT"
@@ -102,7 +102,7 @@ class Test(BaseTest):
         assert o["cassandra.request.headers.flags"] == "Default"
         assert o["cassandra.request.headers.stream"] == 252
 
-        assert o["cassandra.response.result.result_type"]=="void"
+        assert o["cassandra.response.result.type"]=="void"
         assert o["cassandra.response.headers.version"] == "4"
         assert o["cassandra.response.headers.length"] == 4
         assert o["cassandra.response.headers.op"] == "RESULT"
@@ -134,7 +134,7 @@ class Test(BaseTest):
         assert o["cassandra.request.headers.stream"] == 253
 
 
-        assert o["cassandra.response.result.result_type"]=="rows"
+        assert o["cassandra.response.result.type"]=="rows"
         assert o["cassandra.response.headers.version"] == "4"
         assert o["cassandra.response.headers.length"] == 89
         assert o["cassandra.response.headers.op"] == "RESULT"
@@ -165,7 +165,7 @@ class Test(BaseTest):
         assert o["cassandra.request.headers.flags"] == "Default"
         assert o["cassandra.request.headers.stream"] == 92
 
-        assert o["cassandra.response.result.result_type"]=="schemaChanged"
+        assert o["cassandra.response.result.type"]=="schemaChanged"
 
         assert o["cassandra.response.headers.version"] == "4"
         assert o["cassandra.response.headers.length"] == 39
@@ -201,9 +201,9 @@ class Test(BaseTest):
         assert o["cassandra.request.headers.flags"] == "Tracing"
         assert o["cassandra.request.headers.stream"] == 275
 
-        assert o["cassandra.response.error.err_code"]==8960
-        assert o["cassandra.response.error.err_msg"]=="Cannot drop non existing keyspace 'mykeyspace'."
-        assert o["cassandra.response.error.err_type"]=="errConfig"
+        assert o["cassandra.response.error.code"]==8960
+        assert o["cassandra.response.error.msg"]=="Cannot drop non existing keyspace 'mykeyspace'."
+        assert o["cassandra.response.error.type"]=="errConfig"
 
         assert o["cassandra.response.headers.version"] == "4"
         assert o["cassandra.response.headers.length"] == 53
@@ -244,7 +244,7 @@ class Test(BaseTest):
         assert o["cassandra.response.headers.op"] == "RESULT"
         assert o["cassandra.response.headers.flags"] == "Default"
         assert o["cassandra.response.headers.stream"] == 262
-        assert o["cassandra.response.result.result_type"] =="rows"
+        assert o["cassandra.response.result.type"] =="rows"
 
     def test_ops_mixed(self):
         """
@@ -467,7 +467,7 @@ class Test(BaseTest):
         assert o["cassandra.response.headers.op"] == "RESULT"
         assert o["cassandra.response.headers.flags"] == "Compress"
         assert o["cassandra.response.headers.stream"] == 64
-        assert o["cassandra.response.result.result_type"] == "rows"
+        assert o["cassandra.response.result.type"] == "rows"
         assert o["cassandra.response.result.rows.num_rows"] == 290917
         assert o["cassandra.response.result.rows.meta.col_count"] == 9
         assert o["cassandra.response.result.rows.meta.flags"] == "GlobalTableSpec"
