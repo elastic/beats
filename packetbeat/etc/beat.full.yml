@@ -444,3 +444,7 @@ packetbeat.protocols.nfs:
 #    - process: app
 #      cmdline_grep: gunicorn
 
+# Uncomment the following if you want to ignore transactions created
+# by the server on which the shipper is installed. This option is useful
+# to remove duplicates if shippers are installed on multiple servers.
+#packetbeat.ignore_outgoing: true

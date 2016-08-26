@@ -7,7 +7,7 @@ def migrate_packetbeat(content):
     Changes things like `interfaces:` to `packetbeat.interfaces:`
     at the top level.
     """
-    sections = ["interfaces", "protocols", "procs", "runoptions"]
+    sections = ["interfaces", "protocols", "procs", "runoptions", "ignore_outgoing"]
     lines = content.splitlines()
     outlines = []
     for line in lines:
@@ -61,8 +61,9 @@ def main():
 
     with open(args.file, "r") as f:
         content = f.read()
-        out = migrate_packetbeat(content)
-        out = migrate_shipper(out)
+        # Shipper must be migrated first for ignore_outgoing to be applied properly
+        out = migrate_shipper(content)
+        out = migrate_packetbeat(out)
 
     if args.dry:
         print(out)
@@ -92,6 +93,7 @@ protocols:
     ports: [53]
 runoptions:
 procs:
+ignore_outgoing: true
 """
 
     output = migrate_packetbeat(test)
@@ -109,6 +111,7 @@ packetbeat.protocols:
     ports: [53]
 packetbeat.runoptions:
 packetbeat.procs:
+packetbeat.ignore_outgoing: true
 """
 
 
