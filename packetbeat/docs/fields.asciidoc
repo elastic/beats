@@ -409,36 +409,596 @@ Cassandra v4/3 specific event fields.
 
 
 [float]
-=== cassandra_request
+== cassandra Fields
 
-type: dict
-
-Cassandra request field table.
+Information about the Cassandra request and response.
 
 
 [float]
-=== cassandra_request.request_headers
+== request Fields
 
-type: dict
-
-Cassandra request header field table.
+Cassandra request.
 
 
 [float]
-=== cassandra_response
+== headers Fields
 
-type: dict
-
-Cassandra response field table.
+Cassandra request headers.
 
 
 [float]
-=== cassandra_response.response_headers
+=== cassandra.request.headers.version
+
+type: integer
+
+The version of the protocol.
+
+[float]
+=== cassandra.request.headers.flags
+
+type: keyword
+
+Flags applying to this frame.
+
+[float]
+=== cassandra.request.headers.stream
+
+type: keyword
+
+A frame has a stream id.  If a client sends a request message with the stream id X, it is guaranteed that the stream id of the response to that message will be X.
+
+[float]
+=== cassandra.request.headers.op
+
+type: keyword
+
+An operation type that distinguishes the actual message.
+
+[float]
+=== cassandra.request.headers.length
+
+type: integer
+
+A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+
+[float]
+=== cassandra.request.query
+
+type: keyword
+
+The CQL query which client send to cassandra.
+
+[float]
+== response Fields
+
+Cassandra response.
+
+
+[float]
+== headers Fields
+
+Cassandra response headers, the structure is as same as request's header.
+
+
+[float]
+=== cassandra.response.headers.version
+
+type: integer
+
+The version of the protocol.
+
+[float]
+=== cassandra.response.headers.flags
+
+type: keyword
+
+Flags applying to this frame.
+
+[float]
+=== cassandra.response.headers.stream
+
+type: keyword
+
+A frame has a stream id.  If a client sends a request message with the stream id X, it is guaranteed that the stream id of the response to that message will be X.
+
+[float]
+=== cassandra.response.headers.op
+
+type: keyword
+
+An operation type that distinguishes the actual message.
+
+[float]
+=== cassandra.response.headers.length
+
+type: integer
+
+A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+
+[float]
+== result Fields
+
+Details about the returned result.
+
+
+[float]
+=== cassandra.response.result.type
+
+type: keyword
+
+Cassandra result type.
+
+[float]
+== rows Fields
+
+Details about the rows.
+
+
+[float]
+=== cassandra.response.result.rows.num_rows
+
+type: integer
+
+Representing the number of rows present in this result.
+
+[float]
+== meta Fields
+
+Composed of result metadata.
+
+
+[float]
+=== cassandra.response.result.rows.meta.keyspace
+
+type: keyword
+
+Only present after set Global_tables_spec, the keyspace name.
+
+[float]
+=== cassandra.response.result.rows.meta.table
+
+type: keyword
+
+Only present after set Global_tables_spec, the table name.
+
+[float]
+=== cassandra.response.result.rows.meta.flags
+
+type: keyword
+
+Provides information on the formatting of the remaining information.
+
+[float]
+=== cassandra.response.result.rows.meta.col_count
+
+type: integer
+
+Representing the number of columns selected by the query that produced this result.
+
+[float]
+=== cassandra.response.result.rows.meta.pkey_columns
+
+type: integer
+
+Representing the PK columns index and counts.
+
+[float]
+=== cassandra.response.result.rows.meta.paging_state
+
+type: keyword
+
+The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
+
+[float]
+=== cassandra.response.result.keyspace
+
+type: keyword
+
+Indicating the name of the keyspace that has been set.
+
+[float]
+== schema_change Fields
+
+The result to a schema_change message.
+
+
+[float]
+=== cassandra.response.result.schema_change.change
+
+type: keyword
+
+Representing the type of changed involved.
+
+[float]
+=== cassandra.response.result.schema_change.keyspace
+
+type: keyword
+
+This describes which keyspace has changed.
+
+[float]
+=== cassandra.response.result.schema_change.table
+
+type: keyword
+
+This describes which table has changed.
+
+[float]
+=== cassandra.response.result.schema_change.object
+
+type: keyword
+
+This describes the name of said affected object (either the table, user type, function, or aggregate name).
+
+[float]
+=== cassandra.response.result.schema_change.target
+
+type: keyword
+
+Target could be "FUNCTION" or "AGGREGATE", multiple arguments.
+
+[float]
+=== cassandra.response.result.schema_change.name
+
+type: keyword
+
+The function/aggregate name.
+
+[float]
+=== cassandra.response.result.schema_change.args
+
+type: keyword
+
+One string for each argument type (as CQL type).
+
+[float]
+== prepared Fields
+
+The result to a PREPARE message.
+
+
+[float]
+=== cassandra.response.result.prepared.prepared_id
+
+type: keyword
+
+Representing the prepared query ID.
+
+[float]
+== req_meta Fields
+
+This describes the request metadata.
+
+
+[float]
+=== cassandra.response.result.prepared.req_meta.keyspace
+
+type: keyword
+
+Only present after set Global_tables_spec, the keyspace name.
+
+[float]
+=== cassandra.response.result.prepared.req_meta.table
+
+type: keyword
+
+Only present after set Global_tables_spec, the table name.
+
+[float]
+=== cassandra.response.result.prepared.req_meta.flags
+
+type: keyword
+
+Provides information on the formatting of the remaining information.
+
+[float]
+=== cassandra.response.result.prepared.req_meta.col_count
+
+type: integer
+
+Representing the number of columns selected by the query that produced this result.
+
+[float]
+=== cassandra.response.result.prepared.req_meta.pkey_columns
+
+type: integer
+
+Representing the PK columns index and counts.
+
+[float]
+=== cassandra.response.result.prepared.req_meta.paging_state
+
+type: keyword
+
+The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
+
+[float]
+== resp_meta Fields
+
+This describes the metadata for the result set.
+
+
+[float]
+=== cassandra.response.result.prepared.resp_meta.keyspace
+
+type: keyword
+
+Only present after set Global_tables_spec, the keyspace name.
+
+[float]
+=== cassandra.response.result.prepared.resp_meta.table
+
+type: keyword
+
+Only present after set Global_tables_spec, the table name.
+
+[float]
+=== cassandra.response.result.prepared.resp_meta.flags
+
+type: keyword
+
+Provides information on the formatting of the remaining information.
+
+[float]
+=== cassandra.response.result.prepared.resp_meta.col_count
+
+type: integer
+
+Representing the number of columns selected by the query that produced this result.
+
+[float]
+=== cassandra.response.result.prepared.resp_meta.pkey_columns
+
+type: integer
+
+Representing the PK columns index and counts.
+
+[float]
+=== cassandra.response.result.prepared.resp_meta.paging_state
+
+type: keyword
+
+The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
+
+[float]
+=== cassandra.response.supported
 
 type: dict
 
-Cassandra response header field table.
+Indicates which startup options are supported by the server. This message comes as a response to an OPTIONS message.
 
+[float]
+== authentication Fields
+
+Indicates that the server requires authentication, and which authentication mechanism to use.
+
+
+[float]
+=== cassandra.response.authentication.class
+
+type: keyword
+
+Indicates the full class name of the IAuthenticator in use
+
+[float]
+=== cassandra.response.warnings
+
+type: keyword
+
+The text of the warnings, only occur when Warning flag was set.
+
+[float]
+== event Fields
+
+Event pushed by the server. A client will only receive events for the types it has REGISTERed to.
+
+
+[float]
+=== cassandra.response.event.type
+
+type: keyword
+
+Representing the event type.
+
+[float]
+=== cassandra.response.event.change
+
+type: keyword
+
+The message corresponding respectively to the type of change followed by the address of the new/removed node.
+
+[float]
+=== cassandra.response.event.host
+
+type: keyword
+
+Representing the node ip.
+
+[float]
+=== cassandra.response.event.host
+
+type: keyword
+
+Representing the node port.
+
+[float]
+== schema_change Fields
+
+The events details related to schema change.
+
+
+[float]
+=== cassandra.response.event.schema_change.change
+
+type: keyword
+
+Representing the type of changed involved.
+
+[float]
+=== cassandra.response.event.schema_change.keyspace
+
+type: keyword
+
+This describes which keyspace has changed.
+
+[float]
+=== cassandra.response.event.schema_change.table
+
+type: keyword
+
+This describes which table has changed.
+
+[float]
+=== cassandra.response.event.schema_change.object
+
+type: keyword
+
+This describes the name of said affected object (either the table, user type, function, or aggregate name).
+
+[float]
+=== cassandra.response.event.schema_change.target
+
+type: keyword
+
+Target could be "FUNCTION" or "AGGREGATE", multiple arguments.
+
+[float]
+=== cassandra.response.event.schema_change.name
+
+type: keyword
+
+The function/aggregate name.
+
+[float]
+=== cassandra.response.event.schema_change.args
+
+type: keyword
+
+One string for each argument type (as CQL type).
+
+[float]
+== error Fields
+
+Indicates an error processing a request. The body of the message will be an  error code followed by a error message. Then, depending on the exception, more content may follow.
+
+
+[float]
+=== cassandra.response.error.code
+
+type: integer
+
+The error code of the Cassandra response.
+
+[float]
+=== cassandra.response.error.msg
+
+type: keyword
+
+The error message of the Cassandra response.
+
+[float]
+=== cassandra.response.error.type
+
+type: keyword
+
+The error type of the Cassandra response.
+
+[float]
+== details Fields
+
+The details of the error.
+
+
+[float]
+=== cassandra.response.error.details.read_consistency
+
+type: keyword
+
+Representing the consistency level of the query that triggered the exception.
+
+[float]
+=== cassandra.response.error.details.required
+
+type: integer
+
+Representing the number of nodes that should be alive to respect consistency level.
+
+[float]
+=== cassandra.response.error.details.alive
+
+type: integer
+
+Representing the number of replicas that were known to be alive when the request had been processed (since an unavailable exception has been triggered).
+
+[float]
+=== cassandra.response.error.details.received
+
+type: integer
+
+Representing the number of nodes having acknowledged the request.
+
+[float]
+=== cassandra.response.error.details.blockfor
+
+type: integer
+
+Representing the number of replicas whose acknowledgement is required to achieve consistency level.
+
+[float]
+=== cassandra.response.error.details.write_type
+
+type: keyword
+
+Describe the type of the write that timed out.
+
+[float]
+=== cassandra.response.error.details.data_present
+
+type: boolean
+
+It means the replica that was asked for data had responded.
+
+[float]
+=== cassandra.response.error.details.keyspace
+
+type: keyword
+
+The keyspace of the failed function.
+
+[float]
+=== cassandra.response.error.details.table
+
+type: keyword
+
+The keyspace of the failed function.
+
+[float]
+=== cassandra.response.error.details.stmt_id
+
+type: keyword
+
+Representing the unknown ID.
+
+[float]
+=== cassandra.response.error.details.num_failures
+
+type: keyword
+
+Representing the number of nodes that experience a failure while executing the request.
+
+[float]
+=== cassandra.response.error.details.function
+
+type: keyword
+
+The name of the failed function.
+
+[float]
+=== cassandra.response.error.details.arg_types
+
+type: keyword
+
+One string for each argument type (as CQL type) of the failed function.
 
 [[exported-fields-common]]
 == Common Fields
