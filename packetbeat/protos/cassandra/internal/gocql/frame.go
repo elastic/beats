@@ -221,28 +221,31 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 
 	// assumes that the frame body has been read into rbuf
 	switch f.Header.Op {
-	case opError:
-		data = f.parseErrorFrame()
+
+	//below ops are requests
+	case opStartup, opAuthResponse, opOptions, opPrepare, opExecute, opBatch, opRegister:
+	//ignored
 	case opQuery:
 		data = f.parseQueryFrame()
+
+	//below ops are responses
+	case opError:
+		data["error"] = f.parseErrorFrame()
 	case opResult:
-		data = f.parseResultFrame()
+		data["result"] = f.parseResultFrame()
 	case opSupported:
 		data = f.parseSupportedFrame()
 	case opAuthenticate:
-		data = f.parseAuthenticateFrame()
+		data["authentication"] = f.parseAuthenticateFrame()
 	case opAuthChallenge:
-		data = f.parseAuthChallengeFrame()
+		data["authentication"] = f.parseAuthChallengeFrame()
 	case opAuthSuccess:
-		data = f.parseAuthSuccessFrame()
+		data["authentication"] = f.parseAuthSuccessFrame()
 	case opEvent:
-		data = f.parseEventFrame()
+		data["event"] = f.parseEventFrame()
 	case opReady:
 		// the body should be empty
-	case opOptions:
-		//ignore
-	case opStartup:
-		//ignore
+
 	default:
 		//ignore
 		debugf("unknow ops, not processed, %v", f.Header)
@@ -261,18 +264,18 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 	errT := ErrType(code)
 
 	data = make(map[string]interface{})
-	data["err_code"] = code
-	data["err_msg"] = msg
-	data["err_type"] = errT.String()
-
+	data["code"] = code
+	data["msg"] = msg
+	data["type"] = errT.String()
+	detail := map[string]interface{}{}
 	switch errT {
 	case errUnavailable:
 		cl := decoder.ReadConsistency()
 		required := decoder.ReadInt()
 		alive := decoder.ReadInt()
-		data["read_consistency"] = cl.String()
-		data["required"] = required
-		data["alive"] = alive
+		detail["read_consistency"] = cl.String()
+		detail["required"] = required
+		detail["alive"] = alive
 
 	case errWriteTimeout:
 		cl := decoder.ReadConsistency()
@@ -280,10 +283,10 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 		blockfor := decoder.ReadInt()
 		writeType := decoder.ReadString()
 
-		data["read_consistency"] = cl.String()
-		data["received"] = received
-		data["blockfor"] = blockfor
-		data["write_type"] = writeType
+		detail["read_consistency"] = cl.String()
+		detail["received"] = received
+		detail["blockfor"] = blockfor
+		detail["write_type"] = writeType
 
 	case errReadTimeout:
 		cl := decoder.ReadConsistency()
@@ -294,49 +297,55 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 			panic(err)
 		}
 
-		data["read_consistency"] = cl.String()
-		data["received"] = received
-		data["blockfor"] = blockfor
-		data["data_present"] = dataPresent
+		detail["read_consistency"] = cl.String()
+		detail["received"] = received
+		detail["blockfor"] = blockfor
+		detail["data_present"] = dataPresent != 0
 
 	case errAlreadyExists:
 		ks := decoder.ReadString()
 		table := decoder.ReadString()
 
-		data["keyspace"] = ks
-		data["table"] = table
+		detail["keyspace"] = ks
+		detail["table"] = table
 
 	case errUnprepared:
 		stmtId := decoder.ReadShortBytes()
-		data["stmt_id"] = stmtId
+		detail["stmt_id"] = stmtId
 
 	case errReadFailure:
-		data["read_consistency"] = decoder.ReadConsistency().String()
-		data["received"] = decoder.ReadInt()
-		data["blockfor"] = decoder.ReadInt()
+		detail["read_consistency"] = decoder.ReadConsistency().String()
+		detail["received"] = decoder.ReadInt()
+		detail["blockfor"] = decoder.ReadInt()
 		b, err := decoder.ReadByte()
 		if err != nil {
 			panic(err)
 		}
-		data["data_present"] = b != 0
+		detail["data_present"] = b != 0
 
 	case errWriteFailure:
-		data["read_consistency"] = decoder.ReadConsistency().String()
-		data["received"] = decoder.ReadInt()
-		data["blockfor"] = decoder.ReadInt()
-		data["num_failures"] = decoder.ReadInt()
-		data["write_type"] = decoder.ReadString()
+		detail["read_consistency"] = decoder.ReadConsistency().String()
+		detail["received"] = decoder.ReadInt()
+		detail["blockfor"] = decoder.ReadInt()
+		detail["num_failures"] = decoder.ReadInt()
+		detail["write_type"] = decoder.ReadString()
 
 	case errFunctionFailure:
-		data["keyspace"] = decoder.ReadString()
-		data["function"] = decoder.ReadString()
-		data["arg_types"] = decoder.ReadStringList()
+		detail["keyspace"] = decoder.ReadString()
+		detail["function"] = decoder.ReadString()
+		detail["arg_types"] = decoder.ReadStringList()
 
 	case errInvalid, errBootstrapping, errConfig, errCredentials, errOverloaded,
 		errProtocol, errServer, errSyntax, errTruncate, errUnauthorized:
+		//ignored
 	default:
 		logp.Err("unknown error code: 0x%x", code)
 	}
+
+	if len(detail) > 0 {
+		data["details"] = detail
+	}
+
 	return data
 }
 
@@ -403,19 +412,19 @@ func (f *Framer) parseResultFrame() (data map[string]interface{}) {
 	data = make(map[string]interface{})
 	switch kind {
 	case resultKindVoid:
-		data["result_type"] = "void"
+		data["type"] = "void"
 	case resultKindRows:
-		data["result_type"] = "rows"
+		data["type"] = "rows"
 		data["rows"] = f.parseResultRows()
 	case resultKindSetKeyspace:
-		data["result_type"] = "set_keyspace"
+		data["type"] = "set_keyspace"
 		data["keyspace"] = (f.decoder).ReadString()
 	case resultKindPrepared:
-		data["result_type"] = "prepared"
-		data["result"] = f.parseResultPrepared()
+		data["type"] = "prepared"
+		data["prepared"] = f.parseResultPrepared()
 	case resultKindSchemaChanged:
-		data["result_type"] = "schemaChanged"
-		data["result"] = f.parseResultSchemaChange()
+		data["type"] = "schemaChanged"
+		data["schema_change"] = f.parseResultSchemaChange()
 	}
 
 	return data
@@ -462,7 +471,7 @@ func (f *Framer) parseResultSchemaChange() (data map[string]interface{}) {
 		target := decoder.ReadString()
 
 		data["change"] = change
-		data["type"] = target
+		data["target"] = target
 
 		switch target {
 		case "KEYSPACE":
@@ -507,7 +516,7 @@ func (f *Framer) parseEventFrame() (data map[string]interface{}) {
 	data = make((map[string]interface{}))
 	decoder := f.decoder
 	eventType := decoder.ReadString()
-	data["event_type"] = eventType
+	data["type"] = eventType
 
 	switch eventType {
 	case "TOPOLOGY_CHANGE":
@@ -524,7 +533,7 @@ func (f *Framer) parseEventFrame() (data map[string]interface{}) {
 
 	case "SCHEMA_CHANGE":
 		// this should work for all versions
-		data = f.parseResultSchemaChange()
+		data["schema_change"] = f.parseResultSchemaChange()
 	default:
 		logp.Err("unknown event type: %q", eventType)
 	}

@@ -568,6 +568,7 @@ const (
 	flagWithNameValues        byte = 0x40
 
 	// header flags
+	flagDefault       byte = 0x00
 	flagCompress      byte = 0x01
 	flagTracing       byte = 0x02
 	flagCustomPayload byte = 0x04
@@ -576,6 +577,8 @@ const (
 
 func getHeadFlagString(f byte) string {
 	switch f {
+	case flagDefault:
+		return "Default"
 	case flagCompress:
 		return "Compress"
 	case flagTracing:
@@ -585,7 +588,7 @@ func getHeadFlagString(f byte) string {
 	case flagWarning:
 		return "Warning"
 	default:
-		return fmt.Sprintf("FLAG_%d", f)
+		return fmt.Sprintf("UnknownFlag_%d", f)
 	}
 }
 
