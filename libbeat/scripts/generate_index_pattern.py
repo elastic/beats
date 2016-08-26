@@ -43,6 +43,8 @@ def field_to_json(desc, path, output):
             field["type"] = "number"
         elif desc["type"] in ["text", "keyword"]:
             field["type"] = "string"
+        elif desc["type"] == "date":
+            field["type"] = "date"
     else:
         field["type"] = "string"
 

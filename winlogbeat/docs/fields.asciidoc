@@ -41,9 +41,9 @@ The hostname as returned by the operating system on which the Beat is running.
 
 type: date
 
-example: 2015-01-24 14:06:05.071000
+example: August 26th 2016, 12:35:53.332
 
-format: YYYY-MM-DDTHH:MM:SS.milliZ
+format: date
 
 required: True
 

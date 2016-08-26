@@ -25,8 +25,8 @@ fields:
     - name: "@timestamp"
       type: date
       required: true
-      format: YYYY-MM-DDTHH:MM:SS.milliZ
-      example: 2015-01-24T14:06:05.071Z
+      format: date
+      example: August 26th 2016, 12:35:53.332
       description: >
         The timestamp when the event log record was generated.
 
