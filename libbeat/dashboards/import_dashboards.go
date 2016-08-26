@@ -404,7 +404,9 @@ func (imp Importer) ImportDir(dirType string, dir string) error {
 
 	// check if the directory exists
 	if _, err := os.Stat(dir); err != nil {
-		return err
+		// nothing to import
+		fmt.Println("No directory", dir)
+		return nil
 	}
 
 	fmt.Println("Import directory ", dir)
@@ -432,16 +434,13 @@ func (imp Importer) ImportDir(dirType string, dir string) error {
 
 }
 
-func unzip(archive, target string) (string, error) {
+func unzip(archive, target string) error {
 
-	archiveName := filepath.Base(archive)
-	dirName := archiveName[:len(archiveName)-len(filepath.Ext(archiveName))]
-	dir := path.Join(target, dirName)
-	fmt.Println("Unzip archive to", dir)
+	fmt.Println("Unzip archive ", target)
 
 	reader, err := zip.OpenReader(archive)
 	if err != nil {
-		return dir, err
+		return err
 	}
 
 	for _, file := range reader.File {
@@ -453,21 +452,40 @@ func unzip(archive, target string) (string, error) {
 		}
 		fileReader, err := file.Open()
 		if err != nil {
-			return dir, err
+			return err
 		}
 		defer fileReader.Close()
 
 		targetFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
 		if err != nil {
-			return dir, err
+			return err
 		}
 		defer targetFile.Close()
 
 		if _, err := io.Copy(targetFile, fileReader); err != nil {
-			return dir, err
+			return err
 		}
 	}
-	return dir, nil
+	return nil
+}
+
+func getMainDir(target string) (string, error) {
+
+	files, err := ioutil.ReadDir(target)
+	if err != nil {
+		return "", err
+	}
+	var dirs []string
+
+	for _, file := range files {
+		if file.IsDir() {
+			dirs = append(dirs, file.Name())
+		}
+	}
+	if len(dirs) != 1 {
+		return "", fmt.Errorf("too many subdirectories under %s", target)
+	}
+	return filepath.Join(target, dirs[0]), nil
 }
 
 func downloadFile(url string, target string) (string, error) {
@@ -527,10 +545,15 @@ func (imp Importer) ImportArchive() error {
 		return errors.New("No archive file or URL is set. Please use -file or -url option.")
 	}
 
-	dir, err := unzip(archive, target)
+	err = unzip(archive, target)
 	if err != nil {
 		return fmt.Errorf("fail to unzip the archive: %s", archive)
 	}
+	dir, err := getMainDir(target)
+	if err != nil {
+		return err
+	}
+
 	err = imp.ImportKibana(path.Join(dir, imp.cl.opt.Beat))
 	if err != nil {
 		return err
