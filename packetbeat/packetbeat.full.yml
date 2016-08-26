@@ -444,6 +444,10 @@ packetbeat.protocols.nfs:
 #    - process: app
 #      cmdline_grep: gunicorn
 
+# Uncomment the following if you want to ignore transactions created
+# by the server on which the shipper is installed. This option is useful
+# to remove duplicates if shippers are installed on multiple servers.
+#packetbeat.ignore_outgoing: true
 
 #================================ General =====================================
 
@@ -467,11 +471,6 @@ packetbeat.protocols.nfs:
 # fields in the output document instead of being grouped under a fields
 # sub-dictionary. Default is false.
 #fields_under_root: false
-
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-#ignore_outgoing: true
 
 # How often (in seconds) shippers are publishing their IPs to the topology map.
 # The default is 10 seconds.

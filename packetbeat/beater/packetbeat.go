@@ -111,7 +111,8 @@ func (pb *Packetbeat) init(b *beat.Beat) error {
 	if b.Config.Shipper.BulkQueueSize != nil {
 		bulkQueueSize = *b.Config.Shipper.BulkQueueSize
 	}
-	pb.Pub, err = publish.NewPublisher(b.Publisher, queueSize, bulkQueueSize)
+
+	pb.Pub, err = publish.NewPublisher(b.Publisher, queueSize, bulkQueueSize, pb.Config.IgnoreOutgoing)
 	if err != nil {
 		return fmt.Errorf("Initializing publisher failed: %v", err)
 	}

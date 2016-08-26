@@ -169,6 +169,38 @@ NOTE: This setting disables automatic generation of the BPF filter. If
 you use this setting, it's your responsibility to keep the BPF filters in sync with the
 ports defined in the `protocols` section.
 
+===== ignore_outgoing
+
+If the `ignore_outgoing` option is enabled, Packetbeat ignores all the
+transactions initiated from the server running Packetbeat.
+
+This is useful when two Packetbeat instances publish the same transactions. Because one Packetbeat
+sees the transaction in its outgoing queue and the other sees it in its incoming
+queue, you can end up with duplicate transactions. To remove the duplicates, you
+can enable the `packetbeat.ignore_outgoing` option on one of the servers.
+
+For example, in the following scenario, you see a 3-server architecture
+where a Beat is installed on each server. t1 is the transaction exchanged between
+Server1 and Server2, and t2 is the transaction between Server2 and Server3.
+
+image:./images/option_ignore_outgoing.png[Beats Architecture]
+
+By default, each transaction is indexed twice because Beat2
+sees both transactions. So you would see the following published transactions
+(when `ignore_outgoing` is false):
+
+ - Beat1: t1
+ - Beat2: t1 and t2
+ - Beat3: t2
+
+To avoid duplicates, you can force your Beats to send only the incoming
+transactions and ignore the transactions created by the local server. So you would
+see the following published transactions (when `ignore_outgoing` is true):
+
+ - Beat1: none
+ - Beat2: t1
+ - Beat3: t2
+
 
 [[configuration-flows]]
 === Flows Configuration
