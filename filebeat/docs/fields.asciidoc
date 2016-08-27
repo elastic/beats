@@ -21,8 +21,12 @@ Contains common fields available in all event types.
 
 ==== beat.name
 
-The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used. This is set under shipper sub-heading, for example :
 
+....
+shipper:
+  name: "my-shipper"
+....
 
 ==== beat.hostname
 
