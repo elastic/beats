@@ -59,8 +59,6 @@ PS C:\Users\vagrant\Desktop\packetbeat-1.2.0-windows> .\packetbeat.exe -devices
 4: \Device\NPF_{77DFFCAF-1335-4B0D-AFD4-5A4685674FAA} (MS NDIS 6.0 LoopBack Driver)
 ----------------------------------------------------------------------
 
-NOTE: Npcap is sponsored but not officially supported by the Nmap Project. 
-
 [float]
 [[packetbeat-missing-transactions]]
 === Packetbeat is missing long running transactions?
