@@ -132,7 +132,6 @@ type Info struct {
 
 // Client is an instance of the HAProxy client
 type Client struct {
-	//connection  net.Conn
 	Address     string
 	ProtoScheme string
 }
@@ -163,9 +162,7 @@ func (c *Client) run(cmd string) (*bytes.Buffer, error) {
 	if err != nil {
 		return response, err
 	}
-	//c.connection = conn
 
-	//defer c.connection.Close()
 	defer conn.Close()
 
 	_, err = conn.Write([]byte(cmd + "\n"))
@@ -220,17 +217,17 @@ func (c *Client) GetInfo() (*Info, error) {
 
 		for _, ln := range strings.Split(string(b), "\n") {
 
-			ln := strings.Trim(ln, " ")
+			ln := strings.TrimSpace(ln)
 			if ln == "" {
 				continue
 			}
 
-			parts := strings.Split(strings.Trim(ln, " "), ":")
+			parts := strings.Split(ln, ":")
 			if len(parts) != 2 {
 				continue
 			}
 
-			resultMap[parts[0]] = strings.Trim(parts[1], " ")
+			resultMap[parts[0]] = strings.TrimSpace(parts[1])
 		}
 
 		var result *Info
