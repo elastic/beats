@@ -65,13 +65,13 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	hapc, err := haproxy.NewHaproxyClient(m.statsAddr)
 	if err != nil {
-		return nil, fmt.Errorf(fmt.Sprintf("HAProxy Client error: %s", err))
+		return nil, fmt.Errorf("HAProxy Client error: %s", err)
 	}
 
 	res, err := hapc.GetInfo()
 
 	if err != nil {
-		return nil, fmt.Errorf(fmt.Sprintf("HAProxy Client error fetching %s: %s", statsMethod, err))
+		return nil, fmt.Errorf("HAProxy Client error fetching %s: %s", statsMethod, err)
 	}
 	m.counter++
 

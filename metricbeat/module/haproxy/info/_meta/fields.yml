@@ -4,191 +4,193 @@
     General infomration collected on HAProxy process
   fields:
     - name: nb_proc
-      type: intger
+      type: integer
       description: >
         Number of processes
 
     - name: process_num
-      type: intger
+      type: integer
       description: >
         Process number
 
     - name: pid
-      type: intger
+      type: integer
       description: >
         Process ID
 
     - name: uptime_sec
-      type: intger
+      type: integer
       description: >
         Current uptime in seconds
 
     - name: mem_max_mb
-      type: intger
+      type: integer
+      format: bytes
       description: >
         Max number of memory usage in MB
 
     - name: ulimit_n
-      type: intger
+      type: integer
       description: >
         Max number of open files for process
 
     - name: max_sock
-      type: intger
+      type: integer
       description: >
         
     - name: max_conn
-      type: intger
+      type: integer
       description: >
         
     - name: hard_max_conn
-      type: intger
+      type: integer
       description: >
         
     - name: curr_conns
-      type: intger
+      type: integer
       description: >
         
     - name: cum_conns
-      type: intger
+      type: integer
       description: >
         
     - name: cum_req
-      type: intger
+      type: integer
       description: >
         
     - name: max_ssl_conns
-      type: intger
+      type: integer
       description: >
         
     - name: curr_ssl_conns
-      type: intger
+      type: integer
       description: >
 
     - name: cum_ssl_conns
-      type: intger
+      type: integer
       description: >
   
     - name: max_pipes
-      type: intger
+      type: integer
       description: >
 
     - name: pipes_used
-      type: intger
+      type: integer
       description: >
         
     - name: pipes_free
-      type: intger
+      type: integer
       description: >
 
     - name: conn_rate
-      type: intger
+      type: integer
       description: >
   
     - name: conn_rate_limit
-      type: intger
+      type: integer
       description: >
 
     - name: max_conn_rate
-      type: intger
+      type: integer
       description: >
 
     - name: sess_rate
-      type: intger
+      type: integer
       description: >
 
     - name: sess_rate_limit
-      type: intger
+      type: integer
       description: >
 
     - name: max_sess_rate
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_rate
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_rate_limit
-      type: intger
+      type: integer
       description: >
 
     - name: max_ssl_rate
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_frontend_key_rate
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_frontend_max_key_rate
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_frontend_session_reuse_pct
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_babckend_key_rate
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_frontend_key_rate
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_frontend_max_key_rate
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_frontend_session_reuse_pct
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_babckend_key_rate
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_backend_max_key_rate
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_cached_lookups
-      type: intger
+      type: integer
       description: >
 
     - name: ssl_cache_misses
-      type: intger
+      type: integer
       description: >
 
     - name: compress_bps_in
-      type: intger
+      type: integer
       description: >
 
     - name: compress_bps_out
-      type: intger
+      type: integer
       description: >
 
     - name: compress_bps_rate_limit
-      type: intger
+      type: integer
       description: >
 
     - name: zlib_mem_usage
-      type: intger
+      type: integer
       description: >
 
     - name: max_zlib_mem_usage
-      type: intger
+      type: integer
       description: >
 
     - name: tasks
-      type: intger
+      type: integer
       description: >
 
     - name: run_queue
-      type: intger
+      type: integer
       description: >
 
     - name: idle_pct
-      type: intger
+      type: scaled_float
+      format: percent
       description: >

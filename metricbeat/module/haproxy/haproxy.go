@@ -132,7 +132,7 @@ type Info struct {
 
 // Client is an instance of the HAProxy client
 type Client struct {
-	connection  net.Conn
+	//connection  net.Conn
 	Address     string
 	ProtoScheme string
 }
@@ -163,16 +163,17 @@ func (c *Client) run(cmd string) (*bytes.Buffer, error) {
 	if err != nil {
 		return response, err
 	}
-	c.connection = conn
+	//c.connection = conn
 
-	defer c.connection.Close()
+	//defer c.connection.Close()
+	defer conn.Close()
 
-	_, err = c.connection.Write([]byte(cmd + "\n"))
+	_, err = conn.Write([]byte(cmd + "\n"))
 	if err != nil {
 		return response, err
 	}
 
-	_, err = io.Copy(response, c.connection)
+	_, err = io.Copy(response, conn)
 	if err != nil {
 		return response, err
 	}
@@ -185,13 +186,14 @@ func (c *Client) run(cmd string) (*bytes.Buffer, error) {
 }
 
 // GetStat returns the result from the 'show stat' command
-func (c *Client) GetStat() (statRes []*Stat, err error) {
+func (c *Client) GetStat() ([]*Stat, error) {
 
 	runResult, err := c.run("show stat")
 	if err != nil {
 		return nil, err
 	}
 
+	var statRes []*Stat
 	csvReader := csv.NewReader(runResult)
 	csvReader.TrailingComma = true
 
@@ -205,7 +207,7 @@ func (c *Client) GetStat() (statRes []*Stat, err error) {
 }
 
 // GetInfo returns the result from the 'show stat' command
-func (c *Client) GetInfo() (infoRes *Info, err error) {
+func (c *Client) GetInfo() (*Info, error) {
 
 	res, err := c.run("show info")
 	if err != nil {
@@ -234,7 +236,7 @@ func (c *Client) GetInfo() (infoRes *Info, err error) {
 		var result *Info
 		err := mapstructure.Decode(resultMap, &result)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		return result, nil
 	}

@@ -6,6 +6,7 @@ import (
 	s "github.com/elastic/beats/metricbeat/schema"
 	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -52,7 +53,7 @@ var (
 		"max_zlib_mem_usage":             c.Int("MaxZlibMemUsage"),
 		"tasks":                          c.Int("Tasks"),
 		"run_queue":                      c.Int("Run_queue"),
-		"idle_pct":                       c.Int("Idle_pct"),
+		"idle_pct":                       c.Float("Idle_pct"),
 	}
 )
 
@@ -76,7 +77,18 @@ func parseResponse(data []byte) map[string]string {
 		if parts[0] == "Name" || parts[0] == "Version" || parts[0] == "Release_date" || parts[0] == "Uptime" || parts[0] == "node" || parts[0] == "description" {
 			continue
 		}
-		resultMap[parts[0]] = strings.Trim(parts[1], " ")
+
+		if parts[0] == "Idle_pct" {
+			// Convert this value to a float between 0.0 and 1.0
+			f, _ := strconv.ParseFloat(parts[1], 64)
+			resultMap[parts[0]] = strconv.FormatFloat(f/float64(100), 'f', 2, 64)
+		} else if parts[0] == "Memmax_MB" {
+			// Convert this value to bytes
+			val, _ := strconv.Atoi(strings.Trim(parts[1], " "))
+			resultMap[parts[0]] = strconv.Itoa((val * 1024 * 1024))
+		} else {
+			resultMap[parts[0]] = strings.Trim(parts[1], " ")
+		}
 	}
 	return resultMap
 }
