@@ -171,7 +171,7 @@ names added by Filebeat, then the custom fields overwrite the other fields.
 If this option is specified, Filebeat ignores any files that were modified before the specified timespan. This is disabled by default.
 
 You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 0, which means disable.
-Commenting out the config has the same affect as setting it to 0.
+Commenting out the config has the same effect as setting it to 0.
 
 There are two different cases for files which fall under ignore_older:
 
@@ -182,7 +182,7 @@ In case a file was never harvested before and is updated, the reading will start
 
 For comparison, `ignore_older` relies on the modification time of the file. In case the modification time of files is not updated when its written to a file (can happen on Windows), `ignore_older` will start to ignore the file even though it could be that content was added at a later time.
 
-`ignore_older` can be especially useful if you keep log files for a long time and you start filebeat, but only want to send the newest files to elasticsearch and the old files from the last week, but not all files.
+`ignore_older` can be especially useful if you keep log files for a long time and you start Filebeat, but only want to send the newest files to Elasticsearch and the old files from the last week, but not all files.
 
 To remove the state from the registry file for files which were harvested before, the `clean_inactive` configuration option has to be used.
 
@@ -194,16 +194,16 @@ Before a file can be ignored by the prospector, it must be closed. To ensure a f
 [[close-options]]
 ===== close_*
 
-All `close_*` configuration options are used to close the harvester after a certain criteria or time. Closing the harvester means closing the file handler. In case a file is updated again after the harvester is closed, it will be picked up again after <<scan-frequency>>. It is important to understand, in case the file was moved away or deleted during this period, filebeat will not be able to pick up the file again and any data that the harvester didn't read so far is lost.
+All `close_*` configuration options are used to close the harvester after a certain criteria or time. Closing the harvester means closing the file handler. In case a file is updated again after the harvester is closed, it will be picked up again after <<scan-frequency>>. It is important to understand, in case the file was moved away or deleted during this period, Filebeat will not be able to pick up the file again and any data that the harvester didn't read so far is lost.
 
 [[close-inactive]]
 ===== close_inactive
 
-After a file was not harvested for the duration of `close_inactive`, the file handle will be closed. The counter for the defined period starts when the last log line was read by the harvester, it is not based on the modification time of the file. In case the closed file changes again, a new harvester is started again, latest after `scan_frequency`.
+After a file was not harvested for the duration of `close_inactive`, the file handle will be closed. The counter for the defined period starts when the last log line was read by the harvester. It is not based on the modification time of the file. In case the closed file changes again, a new harvester is started again, latest after `scan_frequency`.
 
-It is recommended to set `close_inactive` to a value that is larger then the least frequent updates to your log file. In case your log file gets updated every few seconds, you can safely set it to `1m`. If there are log files with very different update rates, multiple prospector configurations with different values can be used.
+It is recommended to set `close_inactive` to a value that is larger than the least frequent updates to your log file. In case your log file gets updated every few seconds, you can safely set it to `1m`. If there are log files with very different update rates, multiple prospector configurations with different values can be used.
 
-Setting `close_inactive` to a lower value means file handles are closed faster but has the side affect that new log lines are not sent in near real time in case the harvester was closed.
+Setting `close_inactive` to a lower value means file handles are closed faster but has the side effect that new log lines are not sent in near real time in case the harvester was closed.
 
 The timestamp for closing a file does not depend on the modification time of the file but an internal timestamp that is update when the file was last harvested. If `close_inactive` is set to 5 minutes, the countdown for the 5 minutes starts the last time the harvester read a line from the file.
 
@@ -212,7 +212,7 @@ You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 5m
 
 ===== close_renamed
 
-WARNING: Only use this options if you understand the potential side affects with potential data loss.
+WARNING: Only use this options if you understand that data loss is a potential side effect.
 
 This option allows a file handler to be closed when it is renamed. This happens for example when rotating files. By default, the harvester stays open and keeps reading the file as the file handler does not depend on the file name. If this option is enabled and the file was renamed/moved in such a way that it is not part of the prospector patterns, the file will not be picked up again. Filebeat will not finish reading the file.
 
@@ -220,9 +220,9 @@ WINDOWS: In case under windows your log rotation system shows errors because it 
 
 ===== close_removed
 
-WARNING: Only use this options if you understand the potential side affects with potential data loss.
+WARNING: Only use this options if you understand that data loss is a potential side effect.
 
-Close removed can be used to close a harvester directly when a file is removed. Normally a file should only be removed after it already falls under `close_inactive`. In case files are removed early, without this option filebeat keeps the file open to make sure finishing is completed. In case the file handle should be released immediately after removal, this option can be used.
+Close removed can be used to close a harvester directly when a file is removed. Normally a file should only be removed after it already falls under `close_inactive`. In case files are removed early, without this option Filebeat keeps the file open to make sure finishing is completed. In case the file handle should be released immediately after removal, this option can be used.
 
 
 WINDOWS: In case under windows your log rotation system shows error because it can't rotated the files, this is the option to enabled.
@@ -230,33 +230,33 @@ WINDOWS: In case under windows your log rotation system shows error because it c
 
 ===== close_eof
 
-WARNING: Only use this options if you understand the potential side affects with potential data loss.
+WARNING: Only use this options if you understand that data loss is a potential side effect.
 
 Close eof closes a file as soon as the end of a file is reached. This is useful in case your files are only written once and not updated from time to time. This case can happen in case you are writing every single log event to a new file.
 
 [[clean-options]]
 ===== clean_*
 
-The `clean_*` variables are used to clean up the state entries. This helps to reduce the size of the registry file and can prevent a potential <<inode-reuse-issue>>. These options are disabled by default as wrong settings can lead to data duplicatin as complete log files are sent again.
+The `clean_*` variables are used to clean up the state entries. This helps to reduce the size of the registry file and can prevent a potential <<inode-reuse-issue>>. These options are disabled by default as wrong settings can lead to data duplication as complete log files are sent again.
 
 ===== clean_inactive
 
-WARNING: Only use this options if you understand the potential side affects with potential data loss.
+WARNING: Only use this options if you understand that data loss is a potential side effect.
 
-`clean_inactive` removes the state of the file after the given period. The state for files can only be removed if the file is already ignored by filebeat, means it's falling under `ignore_older`. The requirement for clean idle is `clean_inactive > ignore_older + scan_frequency` to make sure no states are removed when a file is still harvested. Otherwise it could lead to resending the full content constantly as `clean_inactive` removes state for files which are still detected by the prospector. In case a file is updated or appears again, the file is read from the beginning.
+`clean_inactive` removes the state of the file after the given period. The state for files can only be removed if the file is already ignored by Filebeat, means it's falling under `ignore_older`. The requirement for clean idle is `clean_inactive > ignore_older + scan_frequency` to make sure no states are removed when a file is still harvested. Otherwise it could lead to resending the full content constantly as `clean_inactive` removes state for files which are still detected by the prospector. In case a file is updated or appears again, the file is read from the beginning.
 
 The `clean_inactive` configuration option is useful to reduce the size of the registry file, especially if a large amount of new files are generated every day.
 
-In addition this config option is useful to prevent the <<inode-reuse-issue>>. If a file is deleted, the inode can be reused by a newly created file. If the inode is the same, filebeat assumes to know the file and continues at the old position. As this issues gets more probable over time, it is good to cleanup the old states to make sure filebeat does not assume it already knows the file.
+In addition this config option is useful to prevent the <<inode-reuse-issue>>. If a file is deleted, the inode can be reused by a newly created file. If the inode is the same, Filebeat assumes to know the file and continues at the old position. As this issues gets more probable over time, it is good to cleanup the old states to make sure Filebeat does not assume it already knows the file.
 
 NOTE: Every time a file is renamed, the file state will be updated and the counter for `clean_inactive` will start at 0 again.
 
 ===== clean_removed
 
-WARNING: Only use this options if you understand the potential side affects.
+WARNING: Only use this options if you understand that data loss is a potential side effect.
 
 
-Cleans files which cannot be found on disk anymore. This does not apply to renamed files or files which were moved to an other directory which is still visible by filebeat. Be aware that this option will remove the state for removed files immediately. In case a shared drive disappeared for a short period and appears again, all files will be read again from the beginninh. This option can only be used in combination `close_removed`.
+Cleans files which cannot be found on disk anymore. This does not apply to renamed files or files which were moved to an other directory which is still visible by Filebeat. Be aware that this option will remove the state for removed files immediately. In case a shared drive disappeared for a short period and appears again, all files will be read again from the beginning. This option can only be used in combination `close_removed`.
 
 
 [[scan-frequency]]
