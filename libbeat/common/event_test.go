@@ -296,3 +296,47 @@ func TestMarshalUnmarshalArray(t *testing.T) {
 		assert.Equal(t, test.out, out, "Test case %v", i)
 	}
 }
+
+// Uses TextMarshaler interface.
+func BenchmarkConvertToGenericEventNetString(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ConvertToGenericEvent(MapStr{"key": NetString("hola")})
+	}
+}
+
+// Uses reflection.
+func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ConvertToGenericEvent(MapStr{"key": map[string]string{"greeting": "hola"}})
+	}
+}
+
+// Uses recursion to step into the nested MapStr.
+func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ConvertToGenericEvent(MapStr{"key": map[string]interface{}{"greeting": "hola"}})
+	}
+}
+
+// No reflection required.
+func BenchmarkConvertToGenericEventStringSlice(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ConvertToGenericEvent(MapStr{"key": []string{"foo", "bar"}})
+	}
+}
+
+// Uses reflection to convert the string array.
+func BenchmarkConvertToGenericEventCustomStringSlice(b *testing.B) {
+	type myString string
+	for i := 0; i < b.N; i++ {
+		ConvertToGenericEvent(MapStr{"key": []myString{"foo", "bar"}})
+	}
+}
+
+// Pointers require reflection to generically dereference.
+func BenchmarkConvertToGenericEventStringPointer(b *testing.B) {
+	val := "foo"
+	for i := 0; i < b.N; i++ {
+		ConvertToGenericEvent(MapStr{"key": &val})
+	}
+}
