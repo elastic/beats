@@ -38,7 +38,11 @@ func GetTestingElasticsearch() *Client {
 	var address = "http://" + GetEsHost() + ":" + GetEsPort()
 	username := os.Getenv("ES_USER")
 	pass := os.Getenv("ES_PASS")
-	return newTestClientAuth(address, username, pass)
+	client := newTestClientAuth(address, username, pass)
+
+	// Load version number
+	client.Connect(3 * time.Second)
+	return client
 }
 
 func GetValidQueryResult() QueryResult {

@@ -4,6 +4,7 @@ package elasticsearch
 
 import (
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -103,12 +104,18 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		assert.NotNil(t, absPath)
 		assert.Nil(t, err)
 
+		// Setup ES
+		client := GetTestingElasticsearch()
+
 		templatePath := absPath + "/" + beat + ".template.json"
+
+		if strings.HasPrefix(client.Connection.version, "2.") {
+			templatePath = absPath + "/" + beat + ".template-es2x.json"
+		}
+
 		content, err := readTemplate(templatePath)
 		assert.Nil(t, err)
 
-		// Setup ES
-		client := GetTestingElasticsearch()
 		err = client.Connect(5 * time.Second)
 		assert.Nil(t, err)
 
@@ -145,7 +152,13 @@ func TestOutputLoadTemplate(t *testing.T) {
 	// Make sure template is not yet there
 	assert.False(t, client.CheckTemplate("libbeat"))
 
-	tPath, err := filepath.Abs("../../../packetbeat/packetbeat.template.json")
+	templatePath := "../../../packetbeat/packetbeat.template.json"
+
+	if strings.HasPrefix(client.Connection.version, "2.") {
+		templatePath = "../../../packetbeat/packetbeat.template-es2x.json"
+	}
+
+	tPath, err := filepath.Abs(templatePath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -233,6 +246,11 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	})
 	client.Delete(index, "", "", nil)
 
+	// Check version
+	if strings.HasPrefix(client.Connection.version, "2.") {
+		t.Skip("Skipping tests as pipeline not available in 2.x releases")
+	}
+
 	publish := func(event common.MapStr) {
 		opts := outputs.Options{Guaranteed: true}
 		err := output.PublishEvent(nil, opts, outputs.Data{Event: event})
@@ -310,6 +328,10 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		"pipeline": "%{[pipeline]}",
 	})
 	client.Delete(index, "", "", nil)
+
+	if strings.HasPrefix(client.Connection.version, "2.") {
+		t.Skip("Skipping tests as pipeline not available in 2.x releases")
+	}
 
 	publish := func(events ...outputs.Data) {
 		opts := outputs.Options{Guaranteed: true}
@@ -403,5 +425,8 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.BulkOutputer, *Client
 
 	es := output.(*elasticsearchOutput)
 	client := es.randomClient()
+	// Load version number
+	client.Connect(3 * time.Second)
+
 	return es, client
 }
