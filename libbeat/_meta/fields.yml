@@ -16,7 +16,8 @@ fields:
       description: >
         The name of the Beat sending the log messages. If the shipper name is
         set in the configuration file, then that value is used. If it is not
-        set, the hostname is used.
+        set, the hostname is used. To set the shipper name, use the `name`
+        option in the configuration file.
     - name: beat.hostname
       description: >
         The hostname as returned by the operating system on which the Beat is
