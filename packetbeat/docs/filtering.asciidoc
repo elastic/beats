@@ -1,17 +1,17 @@
 == Kibana Queries and Filters
 
-In Kibana, you can filter transactions either by entering a search query or by clicking on elements within a visualization. 
+In Kibana, you can filter transactions either by entering a search query or by clicking on elements within a visualization.
 
 [float]
 === Creating Queries
 
-The search field on the *Discover* page provides a way to query 
+The search field on the *Discover* page provides a way to query
 a specific subset of transactions from the selected time frame.
-The query syntax is based on the 
-http://lucene.apache.org/core/3_5_0/queryparsersyntax.html[Lucene query syntax]. 
-It allows boolean operators, wildcards, and field filtering. For example, if 
+The query syntax is based on the
+http://lucene.apache.org/core/3_5_0/queryparsersyntax.html[Lucene query syntax].
+It allows boolean operators, wildcards, and field filtering. For example, if
 you want to find the HTTP redirects, you can search for
-`type: http AND http.code: 302`.
+`type: http AND http.response.code: 302`.
 
 image:./images/kibana-query-filtering.png[Kibana query]
 
@@ -35,7 +35,7 @@ To search for all the transactions that contain the following message:
 "Cannot change the info of a user"
 ------------------------------------
 
-NOTE: To search for an exact string, you need to wrap the string in double quotation 
+NOTE: To search for an exact string, you need to wrap the string in double quotation
 marks. Without quotation marks, the search in the example would match any documents containing one of the following words: "Cannot" OR "change" OR "the" OR "info" OR "a" OR "user".
 
 To search for all transactions with the "chunked" encoding:
@@ -76,11 +76,11 @@ mysql.method: INSERT
 ==== Regexp Queries
 
 Kibana supports regular expression for filters and expressions. For example,
-to search for all HTTP responses with JSON as the returned value type: 
+to search for all HTTP responses with JSON as the returned value type:
 
 [source,yaml]
 -------------------------
-http.content_type: *json
+http.response.headers["content-type"]: *json
 -------------------------
 
 See
@@ -150,7 +150,7 @@ exclude the HTTP redirects coming from the IP and port, click the icons highligh
 
 image:./images/filter_from_context.png[Filter from context]
 
-The selected filters appear under the search box. 
+The selected filters appear under the search box.
 
 image:./images/kibana-filters.png[Kibana filters]
 
