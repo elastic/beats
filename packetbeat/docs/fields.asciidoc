@@ -365,7 +365,7 @@ Contains common beat fields available in all event types.
 [float]
 === beat.name
 
-The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the shipper name, use the `name` option in the configuration file.
 
 
 [float]
