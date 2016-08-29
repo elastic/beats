@@ -14,10 +14,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.3.4]
+
+### Fixed
+- Fix error message if Unpack returns error. #56
+
 ## [0.3.3]
 
 ### Fixed
-- Fix (*FlagValue).String panic with go 1.7 #54
+- Fix `(*FlagValue).String` panic with go 1.7 #54
 
 ## [0.3.2]
 
@@ -95,7 +100,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.3.3...HEAD
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.3.4...HEAD
+[0.3.4]: https://github.com/elastic/go-ucfg/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/elastic/go-ucfg/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/elastic/go-ucfg/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/elastic/go-ucfg/compare/v0.3.0...v0.3.1
