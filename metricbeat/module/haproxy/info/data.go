@@ -2,9 +2,11 @@ package info
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	//"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/haproxy"
 	s "github.com/elastic/beats/metricbeat/schema"
 	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
+
 	"reflect"
 	"strconv"
 	"strings"
@@ -13,14 +15,14 @@ import (
 var (
 	schema = s.Schema{
 		"nb_proc":                        c.Int("Nbproc"),
-		"process_num":                    c.Int("Process_num"),
+		"process_num":                    c.Int("ProcessNum"),
 		"pid":                            c.Int("Pid"),
-		"uptime_sec":                     c.Int("Uptime_sec"),
-		"mem_max_mb":                     c.Int("Memmax_MB"),
-		"ulimit_n":                       c.Int("Ulimit-n"),
+		"uptime_sec":                     c.Int("UptimeSec"),
+		"mem_max_mb":                     c.Int("MemMaxMB"),
+		"ulimit_n":                       c.Int("UlimitN"),
 		"max_sock":                       c.Int("Maxsock"),
 		"max_conn":                       c.Int("Maxconn"),
-		"hard_max_conn":                  c.Int("Hard_maxconn"),
+		"hard_max_conn":                  c.Int("HardMaxconn"),
 		"curr_conns":                     c.Int("CurrConns"),
 		"cum_conns":                      c.Int("CumConns"),
 		"cum_req":                        c.Int("CumReq"),
@@ -41,7 +43,7 @@ var (
 		"max_ssl_rate":                   c.Int("MaxSslRate"),
 		"ssl_frontend_key_rate":          c.Int("SslFrontendKeyRate"),
 		"ssl_frontend_max_key_rate":      c.Int("SslFrontendMaxKeyRate"),
-		"ssl_frontend_session_reuse_pct": c.Int("SslFrontendSessionReuse_pct"),
+		"ssl_frontend_session_reuse_pct": c.Int("SslFrontendSessionReusePct"),
 		"ssl_babckend_key_rate":          c.Int("SslBackendKeyRate"),
 		"ssl_backend_max_key_rate":       c.Int("SslBackendMaxKeyRate"),
 		"ssl_cached_lookups":             c.Int("SslCacheLookups"),
@@ -52,46 +54,10 @@ var (
 		"zlib_mem_usage":                 c.Int("ZlibMemUsage"),
 		"max_zlib_mem_usage":             c.Int("MaxZlibMemUsage"),
 		"tasks":                          c.Int("Tasks"),
-		"run_queue":                      c.Int("Run_queue"),
-		"idle_pct":                       c.Float("Idle_pct"),
+		"run_queue":                      c.Int("RunQueue"),
+		"idle_pct":                       c.Float("IdlePct"),
 	}
 )
-
-func parseResponse(data []byte) map[string]string {
-
-	resultMap := map[string]string{}
-	str := string(data)
-
-	for _, ln := range strings.Split(str, "\n") {
-
-		ln := strings.Trim(ln, " ")
-		if ln == "" {
-			continue
-		}
-
-		parts := strings.Split(strings.Trim(ln, " "), ":")
-		if len(parts) != 2 {
-			continue
-		}
-
-		if parts[0] == "Name" || parts[0] == "Version" || parts[0] == "Release_date" || parts[0] == "Uptime" || parts[0] == "node" || parts[0] == "description" {
-			continue
-		}
-
-		if parts[0] == "Idle_pct" {
-			// Convert this value to a float between 0.0 and 1.0
-			f, _ := strconv.ParseFloat(parts[1], 64)
-			resultMap[parts[0]] = strconv.FormatFloat(f/float64(100), 'f', 2, 64)
-		} else if parts[0] == "Memmax_MB" {
-			// Convert this value to bytes
-			val, _ := strconv.Atoi(strings.Trim(parts[1], " "))
-			resultMap[parts[0]] = strconv.Itoa((val * 1024 * 1024))
-		} else {
-			resultMap[parts[0]] = strings.Trim(parts[1], " ")
-		}
-	}
-	return resultMap
-}
 
 // Map data to MapStr
 func eventMapping(info *haproxy.Info) common.MapStr {
@@ -105,7 +71,24 @@ func eventMapping(info *haproxy.Info) common.MapStr {
 
 	for i := 0; i < st.NumField(); i++ {
 		f := st.Field(i)
-		source[typeOfT.Field(i).Name] = f.Interface()
+
+		if typeOfT.Field(i).Name == "IdlePct" {
+			// Convert this value to a float between 0.0 and 1.0
+			fval, err := strconv.ParseFloat(f.Interface().(string), 64)
+			if err != nil {
+				panic(err)
+			}
+			source[typeOfT.Field(i).Name] = strconv.FormatFloat(fval/float64(100), 'f', 2, 64)
+		} else if typeOfT.Field(i).Name == "Memmax_MB" {
+			// Convert this value to bytes
+			val, err := strconv.Atoi(strings.TrimSpace(f.Interface().(string)))
+			if err != nil {
+				panic(err)
+			}
+			source[typeOfT.Field(i).Name] = strconv.Itoa((val * 1024 * 1024))
+		} else {
+			source[typeOfT.Field(i).Name] = f.Interface()
+		}
 
 	}
 

@@ -80,54 +80,54 @@ type Stat struct {
 }
 
 type Info struct {
-	Name                       string
-	Version                    string
-	ReleaseDate                string
-	Nbproc                     string
-	ProcessNum                 string
-	Pid                        string
-	Uptime                     string
-	UptimeSec                  string
-	MemMaxMB                   string
-	UlimitN                    string
-	Maxsock                    string
-	Maxconn                    string
-	HardMaxconn                string
-	CurrConns                  string
-	CumConns                   string
-	CumReq                     string
-	MaxSslConns                string
-	CurrSslConns               string
-	CumSslConns                string
-	Maxpipes                   string
-	PipesUsed                  string
-	PipesFree                  string
-	ConnRate                   string
-	ConnRateLimit              string
-	MaxConnRate                string
-	SessRate                   string
-	SessRateLimit              string
-	MaxSessRate                string
-	SslRate                    string
-	SslRateLimit               string
-	MaxSslRate                 string
-	SslFrontendKeyRate         string
-	SslFrontendMaxKeyRate      string
-	SslFrontendSessionReusePct string
-	SslBackendKeyRate          string
-	SslBackendMaxKeyRate       string
-	SslCacheLookups            string
-	SslCacheMisses             string
-	CompressBpsIn              string
-	CompressBpsOut             string
-	CompressBpsRateLim         string
-	ZlibMemUsage               string
-	MaxZlibMemUsage            string
-	Tasks                      string
-	RunQueue                   string
-	IdlePct                    string
-	Node                       string
-	Description                string
+	Name                       string `mapstructure:"Name"`
+	Version                    string `mapstructure:"Version"`
+	ReleaseDate                string `mapstructure:"Release_date"`
+	Nbproc                     string `mapstructure:"Nbproc"`
+	ProcessNum                 string `mapstructure:"Process_num"`
+	Pid                        string `mapstructure:"Pid"`
+	Uptime                     string `mapstructure:"Uptime"`
+	UptimeSec                  string `mapstructure:"Uptime_sec"`
+	MemMaxMB                   string `mapstructure:"Memmax_MB"`
+	UlimitN                    string `mapstructure:"Ulimit-n"`
+	Maxsock                    string `mapstructure:"Maxsock"`
+	Maxconn                    string `mapstructure:"Maxconn"`
+	HardMaxconn                string `mapstructure:"Hard_maxconn"`
+	CurrConns                  string `mapstructure:"CurrConns"`
+	CumConns                   string `mapstructure:"CumConns"`
+	CumReq                     string `mapstructure:"CumReq"`
+	MaxSslConns                string `mapstructure:"MaxSslConns"`
+	CurrSslConns               string `mapstructure:"CurrSslConns"`
+	CumSslConns                string `mapstructure:"CumSslConns"`
+	Maxpipes                   string `mapstructure:"Maxpipes"`
+	PipesUsed                  string `mapstructure:"PipesUsed"`
+	PipesFree                  string `mapstructure:"PipesFree"`
+	ConnRate                   string `mapstructure:"ConnRate"`
+	ConnRateLimit              string `mapstructure:"ConnRateLimit"`
+	MaxConnRate                string `mapstructure:"MaxConnRate"`
+	SessRate                   string `mapstructure:"SessRate"`
+	SessRateLimit              string `mapstructure:"SessRateLimit"`
+	MaxSessRate                string `mapstructure:"MaxSessRate"`
+	SslRate                    string `mapstructure:"SslRate"`
+	SslRateLimit               string `mapstructure:"SslRateLimit"`
+	MaxSslRate                 string `mapstructure:"MaxSslRate"`
+	SslFrontendKeyRate         string `mapstructure:"SslFrontendKeyRate"`
+	SslFrontendMaxKeyRate      string `mapstructure:"SslFrontendMaxKeyRate"`
+	SslFrontendSessionReusePct string `mapstructure:"SslFrontendSessionReuse_pct"`
+	SslBackendKeyRate          string `mapstructure:"SslBackendKeyRate"`
+	SslBackendMaxKeyRate       string `mapstructure:"SslBackendMaxKeyRate"`
+	SslCacheLookups            string `mapstructure:"SslCacheLookups"`
+	SslCacheMisses             string `mapstructure:"SslCacheMisses"`
+	CompressBpsIn              string `mapstructure:"CompressBpsIn"`
+	CompressBpsOut             string `mapstructure:"CompressBpsOut"`
+	CompressBpsRateLim         string `mapstructure:"CompressBpsRateLim"`
+	ZlibMemUsage               string `mapstructure:"ZlibMemUsage"`
+	MaxZlibMemUsage            string `mapstructure:"MaxZlibMemUsage"`
+	Tasks                      string `mapstructure:"Tasks"`
+	RunQueue                   string `mapstructure:"Run_queue"`
+	IdlePct                    string `mapstructure:"Idle_pct"`
+	Node                       string `mapstructure:"Node"`
+	Description                string `mapstructure:"Description"`
 }
 
 // Client is an instance of the HAProxy client
