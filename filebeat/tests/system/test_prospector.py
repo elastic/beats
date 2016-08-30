@@ -574,10 +574,57 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=15)
 
-        time.sleep(5)
         filebeat.check_kill_and_wait()
 
         data = self.read_output()
 
         # Make sure there is only one entry, means it didn't follow the symlink
         assert len(data) == 1
+
+    def test_harvester_limit(self):
+        """
+        Test if harvester_limit applies
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            harvester_limit=1,
+            close_inactive="1s",
+            scan_frequency="1s",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile1 = self.working_dir + "/log/test1.log"
+        testfile2 = self.working_dir + "/log/test2.log"
+        testfile3 = self.working_dir + "/log/test3.log"
+
+        with open(testfile1, 'w') as file:
+            file.write("Line1\n")
+
+        with open(testfile2, 'w') as file:
+            file.write("Line2\n")
+
+        with open(testfile3, 'w') as file:
+            file.write("Line3\n")
+
+        filebeat = self.start_beat()
+
+        # check that not all harvesters were started
+        self.wait_until(
+            lambda: self.log_contains("Harvester limit reached"),
+            max_timeout=10)
+
+        # wait for registry to be written
+        self.wait_until(
+            lambda: self.log_contains("Registry file updated"),
+            max_timeout=10)
+
+        # Make sure not all events were written so far
+        data = self.read_output()
+        assert len(data) < 3
+
+        self.wait_until(lambda: self.output_has(lines=3), max_timeout=15)
+
+        data = self.read_output()
+        assert len(data) == 3
+
+        filebeat.check_kill_and_wait()
