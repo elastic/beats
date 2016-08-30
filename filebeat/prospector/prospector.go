@@ -157,6 +157,8 @@ func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, er
 	return h, err
 }
 
+// startHarvester starts a new harvester with the given offset
+// In case the HarvesterLimit is reached, an error is returned
 func (p *Prospector) startHarvester(state file.State, offset int64) error {
 
 	if p.config.HarvesterLimit > 0 && atomic.LoadUint64(&p.harvesterCounter) >= p.config.HarvesterLimit {
@@ -171,6 +173,8 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 	}
 
 	p.wg.Add(1)
+	// startHarvester is not run concurrently, but atomic operations are need for the decrementing of the counter
+	// inside the following go routine
 	atomic.AddUint64(&p.harvesterCounter, 1)
 	go func() {
 		defer func() {
