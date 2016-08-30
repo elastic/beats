@@ -112,8 +112,6 @@ func normalizeSlice(baseKey string, v reflect.Value) (interface{}, []error) {
 }
 
 func normalizeValue(key string, value interface{}) (interface{}, []error) {
-	// Dereference pointers.
-	value = followPointer(value)
 
 	if value == nil {
 		return nil, nil
@@ -149,6 +147,9 @@ func normalizeValue(key string, value interface{}) (interface{}, []error) {
 		v := reflect.ValueOf(value)
 
 		switch v.Type().Kind() {
+		case reflect.Ptr:
+			// Dereference pointers.
+			return normalizeValue(key, followPointer(value))
 		case reflect.Bool:
 			return v.Bool(), nil
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
