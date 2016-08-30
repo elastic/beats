@@ -18,7 +18,7 @@ RUN arch="$(dpkg --print-architecture)" \
 ENV KIBANA_VERSION 4.6.0
 
 RUN set -x \
-	&& curl -fSL "https://download.elastic.co/kibana/staging/4.6.0-6b8ddde/kibana/kibana-4.6.0-linux-x86_64.tar.gz" -o kibana.tar.gz \
+	&& curl -fSL "https://download.elastic.co/kibana/staging/4.6.0-f898fba/kibana/kibana-4.6.0-linux-x86_64.tar.gz" -o kibana.tar.gz \
 	&& mkdir -p /opt/kibana \
 	&& tar -xz --strip-components=1 -C /opt/kibana -f kibana.tar.gz \
 	&& chown -R kibana:kibana /opt/kibana \
