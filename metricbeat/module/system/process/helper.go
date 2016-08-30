@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
 
@@ -99,6 +100,12 @@ func (proc *Process) getDetails(cmdline string) error {
 // data then  nil is returned with no error (/proc/[pid]/fd requires root
 // permissions). Any other errors that occur are returned.
 func getProcFDUsage(pid int) (*sigar.ProcFDUsage, error) {
+	// It's not possible to collect FD usage from other processes on FreeBSD
+	// due to linprocfs not exposing the information.
+	if runtime.GOOS == "freebsd" && pid != os.Getpid() {
+		return nil, nil
+	}
+
 	fd := sigar.ProcFDUsage{}
 	if err := fd.Get(pid); err != nil {
 		switch {
