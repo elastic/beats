@@ -131,6 +131,7 @@ func (l *Line) advance() error {
 	sz, err := l.decode(idx + len(l.nl))
 	if err != nil {
 		logp.Err("Error decoding line: %s", err)
+		sz = idx + len(l.nl)
 	}
 
 	// consume transformed bytes from input buffer
