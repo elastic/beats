@@ -209,7 +209,6 @@ The timestamp for closing a file does not depend on the modification time of the
 
 You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 5m.
 
-
 ===== close_renamed
 
 WARNING: Only use this options if you understand that data loss is a potential side effect.
@@ -410,6 +409,24 @@ the backoff algorithm is disabled, and the `backoff` value is used for waiting f
 lines. The `backoff` value will be multiplied each time with the `backoff_factor` until
 `max_backoff` is reached. The default is 2.
 
+===== harvester_limit
+
+EXPERIMENTAL
+
+harvester_limit limits the number of harvesters that are started in parallel for one prospector. This directly relates
+to the maximum number of file handlers that are opened. The default is 0 which means there is no limit. This configuration
+is useful if the number of files to be harvested exceeds the open file handler limit of the operating system.
+
+As setting a limit on harvester means that potentially not all files are opened in parallel, it is recommended to use
+this option in combination with the close_* options to make sure harvesters are stopped more often so new files can be
+picked up.
+
+Currently if a new harvester can be started again, the new harvester to be started is picked randomly. This means it can
+happen that a harvester for a file which was just closed and the file was updated again will be started instead of a
+harvester for a file which wasn't harvested for a longer period of time.
+
+This configuration option applies per prospector. This can be indirectly used to set higher priorities on certain prospectors
+by assining a higher limit of harvesters.
 
 [[configuration-global-options]]
 === Filebeat Global Configuration

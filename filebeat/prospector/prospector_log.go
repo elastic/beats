@@ -159,7 +159,7 @@ func (p *ProspectorLog) scan() {
 			logp.Debug("prospector", "Start harvester for new file: %s", newState.Source)
 			err := p.Prospector.startHarvester(newState, 0)
 			if err != nil {
-				logp.Err("Harvester could not be started on new file: %s", err)
+				logp.Err("Harvester could not be started on new file: %s, Err: %s", newState.Source, err)
 			}
 		} else {
 			p.harvestExistingFile(newState, lastState)
@@ -182,7 +182,7 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 		logp.Debug("prospector", "Resuming harvesting of file: %s, offset: %v", newState.Source, oldState.Offset)
 		err := p.Prospector.startHarvester(newState, oldState.Offset)
 		if err != nil {
-			logp.Err("Harvester could not be started on existing file: %s", err)
+			logp.Err("Harvester could not be started on existing file: %s, Err: %s", newState.Source, err)
 		}
 		return
 	}
@@ -192,7 +192,7 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 		logp.Debug("prospector", "Old file was truncated. Starting from the beginning: %s", newState.Source)
 		err := p.Prospector.startHarvester(newState, 0)
 		if err != nil {
-			logp.Err("Harvester could not be started on truncated file: %s", err)
+			logp.Err("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err)
 		}
 
 		filesTrucated.Add(1)

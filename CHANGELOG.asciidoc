@@ -87,13 +87,15 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 
 *Packetbeat*
 
- - Add cassandra protocol analyzer to packetbeat. {pull}1959[1959]
- - Match connections with IPv6 addresses to processes {pull}2254[2254]
- - Add IP address to -devices command output {pull}2327[2327]
+- Add cassandra protocol analyzer to packetbeat. {pull}1959[1959]
+- Match connections with IPv6 addresses to processes {pull}2254[2254]
+- Add IP address to -devices command output {pull}2327[2327]
 
 *Topbeat*
 
 *Filebeat*
+
+- Add harvester_limit option {pull}2417[2417]
 
 *Winlogbeat*
 
