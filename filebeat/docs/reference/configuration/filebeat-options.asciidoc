@@ -71,7 +71,7 @@ The following example configures Filebeat to drop any lines that start with "DBG
 filebeat.prospectors:
 - paths:
     - /var/log/myapp/*.log
-  exclude_lines: ["^DBG"]
+  exclude_lines: ['^DBG']
 -------------------------------------------------------------------------------------
 
 See <<regexp-support>> for a list of supported regexp patterns.
@@ -90,7 +90,7 @@ The following example configures Filebeat to export any lines that start with "E
 filebeat.prospectors:
 - paths:
     - /var/log/myapp/*.log
-  include_lines: ["^ERR", "^WARN"]
+  include_lines: ['^ERR', '^WARN']
 -------------------------------------------------------------------------------------
 
 NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes `include_lines` first and then executes `exclude_lines`.
@@ -101,8 +101,8 @@ The following example exports all Apache log lines except the debugging messages
 
 [source,yaml]
 -------------------------------------------------------------------------------------
- include_lines: ["apache"]
- exclude_lines: ["^DBG"]
+ include_lines: ['apache']
+ exclude_lines: ['^DBG']
 -------------------------------------------------------------------------------------
 
 See <<regexp-support>> for a list of supported regexp patterns.
@@ -116,7 +116,7 @@ The following example configures Filebeat to ignore all the files that have a `g
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-  exclude_files: [".gz$"]
+  exclude_files: ['\.gz$']
 -------------------------------------------------------------------------------------
 
 See <<regexp-support>> for a list of supported regexp patterns.
