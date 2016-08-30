@@ -161,6 +161,10 @@ filebeat.prospectors:
   # The backoff value will be multiplied each time with the backoff_factor until max_backoff is reached
   #backoff_factor: 2
 
+  # Experimental: Max number of harvesters that are started in parallel.
+  # Default is 0 which means unlimited
+  #harvester_limit: 0
+
   ### Harvester closing options
 
   # Close inactive closes the file handler after the predefined period.

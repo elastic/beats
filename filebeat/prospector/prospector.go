@@ -5,6 +5,8 @@ import (
 	"sync"
 	"time"
 
+	"sync/atomic"
+
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
@@ -14,14 +16,15 @@ import (
 )
 
 type Prospector struct {
-	cfg           *common.Config // Raw config
-	config        prospectorConfig
-	prospectorer  Prospectorer
-	spoolerChan   chan *input.Event
-	harvesterChan chan *input.Event
-	done          chan struct{}
-	states        *file.States
-	wg            sync.WaitGroup
+	cfg              *common.Config // Raw config
+	config           prospectorConfig
+	prospectorer     Prospectorer
+	spoolerChan      chan *input.Event
+	harvesterChan    chan *input.Event
+	done             chan struct{}
+	states           *file.States
+	wg               sync.WaitGroup
+	harvesterCounter uint64
 }
 
 type Prospectorer interface {
@@ -154,7 +157,14 @@ func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, er
 	return h, err
 }
 
+// startHarvester starts a new harvester with the given offset
+// In case the HarvesterLimit is reached, an error is returned
 func (p *Prospector) startHarvester(state file.State, offset int64) error {
+
+	if p.config.HarvesterLimit > 0 && atomic.LoadUint64(&p.harvesterCounter) >= p.config.HarvesterLimit {
+		return fmt.Errorf("Harvester limit reached.")
+	}
+
 	state.Offset = offset
 	// Create harvester with state
 	h, err := p.createHarvester(state)
@@ -163,8 +173,14 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 	}
 
 	p.wg.Add(1)
+	// startHarvester is not run concurrently, but atomic operations are need for the decrementing of the counter
+	// inside the following go routine
+	atomic.AddUint64(&p.harvesterCounter, 1)
 	go func() {
-		defer p.wg.Done()
+		defer func() {
+			atomic.AddUint64(&p.harvesterCounter, ^uint64(0))
+			p.wg.Done()
+		}()
 		// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
 		h.Harvest()
 	}()
