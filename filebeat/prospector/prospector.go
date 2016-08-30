@@ -163,8 +163,6 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 		return fmt.Errorf("Harvester limit reached.")
 	}
 
-	atomic.AddUint64(&p.harvesterCounter, 1)
-
 	state.Offset = offset
 	// Create harvester with state
 	h, err := p.createHarvester(state)
@@ -173,10 +171,11 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 	}
 
 	p.wg.Add(1)
+	atomic.AddUint64(&p.harvesterCounter, 1)
 	go func() {
 		defer func() {
-			p.wg.Done()
 			atomic.AddUint64(&p.harvesterCounter, ^uint64(0))
+			p.wg.Done()
 		}()
 		// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
 		h.Harvest()
