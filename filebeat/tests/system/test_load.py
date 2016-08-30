@@ -3,12 +3,15 @@ import os
 import logging
 import logging.handlers
 import json
+import unittest
 from nose.plugins.skip import Skip, SkipTest
 from nose.plugins.attrib import attr
 
 """
 Test filebeat under different load scenarios
 """
+
+LOAD_TESTS = os.environ.get('LOAD_TESTS', False)
 
 
 class Test(BaseTest):
@@ -98,6 +101,7 @@ class Test(BaseTest):
         assert len(entry_list) == total_lines
 
 
+    @unittest.skipUnless(LOAD_TESTS, "load test")
     @attr('load')
     def test_large_number_of_files(self):
         """

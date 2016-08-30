@@ -1,5 +1,6 @@
 import os
 import metricbeat
+import unittest
 from nose.plugins.attrib import attr
 
 ZK_FIELDS = metricbeat.COMMON_FIELDS + ["zookeeper"]
@@ -11,6 +12,7 @@ MNTR_FIELDS = ["version", "latency.avg", "latency.max",
                "approximate_data_size", "num_alive_connections"]
 
 class ZooKeeperMntrTest(metricbeat.BaseTest):
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_output(self):
         """
