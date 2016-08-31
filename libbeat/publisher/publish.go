@@ -133,6 +133,7 @@ func (publisher *BeatPublisher) GetServerName(ip string) string {
 
 	// find the shipper with the desired IP
 	if publisher.TopologyOutput != nil {
+		logp.Warn("Topology settings are deprecated.")
 		return publisher.TopologyOutput.GetNameByIP(ip)
 	}
 
