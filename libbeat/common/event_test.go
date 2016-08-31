@@ -224,7 +224,7 @@ func TestNormalizeValue(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		out, err := normalizeValue("", test.in)
+		out, err := normalizeValue(test.in)
 		if err != nil {
 			t.Error(err)
 			continue
@@ -242,7 +242,7 @@ func TestNormalizeMapError(t *testing.T) {
 	}
 
 	for i, in := range badInputs {
-		_, errs := normalizeMap("bad.type", in)
+		_, errs := normalizeMap(in, "bad.type")
 		if assert.Len(t, errs, 1) {
 			t.Log(errs[0])
 			assert.Contains(t, errs[0].Error(), "key=bad.type", "Test case %v", i)

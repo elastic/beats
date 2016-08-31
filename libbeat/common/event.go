@@ -24,7 +24,8 @@ var textMarshalerType = reflect.TypeOf((*encoding.TextMarshaler)(nil)).Elem()
 // Nil values in maps are dropped during the conversion. Any unsupported types
 // that are found in the MapStr are dropped and warnings are logged.
 func ConvertToGenericEvent(m MapStr) MapStr {
-	event, errs := normalizeMap("", m)
+	keys := make([]string, 0, 10)
+	event, errs := normalizeMap(m, keys...)
 	if len(errs) > 0 {
 		logp.Warn("Unsuccessful conversion to generic event: %v errors: %v, "+
 			"event=%#v", len(errs), errs, m)
@@ -35,13 +36,12 @@ func ConvertToGenericEvent(m MapStr) MapStr {
 // normalizeMap normalizes each element contained in the given map. If an error
 // occurs during normalization, processing of m will continue, and all errors
 // are returned at the end.
-func normalizeMap(baseKey string, m MapStr) (MapStr, []error) {
+func normalizeMap(m MapStr, keys ...string) (MapStr, []error) {
 	var errs []error
 
 	out := make(MapStr, len(m))
 	for key, value := range m {
-		fullKey := joinKeys(baseKey, key)
-		v, err := normalizeValue(fullKey, value)
+		v, err := normalizeValue(value, append(keys, key)...)
 		if len(err) > 0 {
 			errs = append(errs, err...)
 		}
@@ -49,7 +49,7 @@ func normalizeMap(baseKey string, m MapStr) (MapStr, []error) {
 		// Drop nil values from maps.
 		if v == nil {
 			if logp.IsDebug(eventDebugSelector) {
-				eventDebugf("Dropped nil value from event where key=%v", fullKey)
+				eventDebugf("Dropped nil value from event where key=%v", joinKeys(append(keys, key)...))
 			}
 			continue
 		}
@@ -61,12 +61,12 @@ func normalizeMap(baseKey string, m MapStr) (MapStr, []error) {
 }
 
 // normalizeMapStrSlice normalizes each individual MapStr.
-func normalizeMapStrSlice(baseKey string, maps []MapStr) ([]MapStr, []error) {
+func normalizeMapStrSlice(maps []MapStr, keys ...string) ([]MapStr, []error) {
 	var errs []error
 
 	out := make([]MapStr, 0, len(maps))
 	for i, m := range maps {
-		normalizedMap, err := normalizeMap(joinKeys(baseKey, strconv.Itoa(i)), m)
+		normalizedMap, err := normalizeMap(m, append(keys, strconv.Itoa(i))...)
 		if len(err) > 0 {
 			errs = append(errs, err...)
 		}
@@ -78,12 +78,12 @@ func normalizeMapStrSlice(baseKey string, maps []MapStr) ([]MapStr, []error) {
 
 // normalizeMapStringSlice normalizes each individual map[string]interface{} and
 // returns a []MapStr.
-func normalizeMapStringSlice(baseKey string, maps []map[string]interface{}) ([]MapStr, []error) {
+func normalizeMapStringSlice(maps []map[string]interface{}, keys ...string) ([]MapStr, []error) {
 	var errs []error
 
 	out := make([]MapStr, 0, len(maps))
 	for i, m := range maps {
-		normalizedMap, err := normalizeMap(joinKeys(baseKey, strconv.Itoa(i)), m)
+		normalizedMap, err := normalizeMap(m, append(keys, strconv.Itoa(i))...)
 		if len(err) > 0 {
 			errs = append(errs, err...)
 		}
@@ -94,13 +94,13 @@ func normalizeMapStringSlice(baseKey string, maps []map[string]interface{}) ([]M
 }
 
 // normalizeSlice normalizes each element of the slice and returns a []interface{}.
-func normalizeSlice(baseKey string, v reflect.Value) (interface{}, []error) {
+func normalizeSlice(v reflect.Value, keys ...string) (interface{}, []error) {
 	var errs []error
 	var sliceValues []interface{}
 
 	n := v.Len()
 	for i := 0; i < n; i++ {
-		sliceValue, err := normalizeValue(joinKeys(baseKey, strconv.Itoa(i)), v.Index(i).Interface())
+		sliceValue, err := normalizeValue(v.Index(i).Interface(), append(keys, strconv.Itoa(i))...)
 		if len(err) > 0 {
 			errs = append(errs, err...)
 		}
@@ -111,8 +111,7 @@ func normalizeSlice(baseKey string, v reflect.Value) (interface{}, []error) {
 	return sliceValues, errs
 }
 
-func normalizeValue(key string, value interface{}) (interface{}, []error) {
-
+func normalizeValue(value interface{}, keys ...string) (interface{}, []error) {
 	if value == nil {
 		return nil, nil
 	}
@@ -121,9 +120,10 @@ func normalizeValue(key string, value interface{}) (interface{}, []error) {
 	case encoding.TextMarshaler:
 		text, err := value.(encoding.TextMarshaler).MarshalText()
 		if err != nil {
-			return nil, []error{errors.Wrapf(err, "key=%v: error converting %T to string", key, value)}
+			return nil, []error{errors.Wrapf(err, "key=%v: error converting %T to string", joinKeys(keys...), value)}
 		}
 		return string(text), nil
+	case string, []string:
 	case bool, []bool:
 	case int, int8, int16, int32, int64:
 	case []int, []int8, []int16, []int32, []int64:
@@ -133,23 +133,22 @@ func normalizeValue(key string, value interface{}) (interface{}, []error) {
 	case []float32, []float64:
 	case complex64, complex128:
 	case []complex64, []complex128:
-	case string, []string:
 	case Time, []Time:
 	case MapStr:
-		return normalizeMap(key, value.(MapStr))
+		return normalizeMap(value.(MapStr), keys...)
 	case []MapStr:
-		return normalizeMapStrSlice(key, value.([]MapStr))
+		return normalizeMapStrSlice(value.([]MapStr), keys...)
 	case map[string]interface{}:
-		return normalizeMap(key, value.(map[string]interface{}))
+		return normalizeMap(value.(map[string]interface{}), keys...)
 	case []map[string]interface{}:
-		return normalizeMapStringSlice(key, value.([]map[string]interface{}))
+		return normalizeMapStringSlice(value.([]map[string]interface{}), keys...)
 	default:
 		v := reflect.ValueOf(value)
 
 		switch v.Type().Kind() {
 		case reflect.Ptr:
 			// Dereference pointers.
-			return normalizeValue(key, followPointer(value))
+			return normalizeValue(followPointer(value), keys...)
 		case reflect.Bool:
 			return v.Bool(), nil
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -163,18 +162,18 @@ func normalizeValue(key string, value interface{}) (interface{}, []error) {
 		case reflect.String:
 			return v.String(), nil
 		case reflect.Array, reflect.Slice:
-			return normalizeSlice(key, v)
+			return normalizeSlice(v, keys...)
 		case reflect.Map, reflect.Struct:
 			var m MapStr
 			err := marshalUnmarshal(value, &m)
 			if err != nil {
-				return m, []error{errors.Wrapf(err, "key=%v: error converting %T to MapStr", key, value)}
+				return m, []error{errors.Wrapf(err, "key=%v: error converting %T to MapStr", joinKeys(keys...), value)}
 			}
 			return m, nil
 		default:
 			// Drop Uintptr, UnsafePointer, Chan, Func, Interface, and any other
 			// types not specifically handled above.
-			return nil, []error{fmt.Errorf("key=%v: error unsupported type=%T value=%#v", key, value, value)}
+			return nil, []error{fmt.Errorf("key=%v: error unsupported type=%T value=%#v", joinKeys(keys...), value, value)}
 		}
 	}
 
