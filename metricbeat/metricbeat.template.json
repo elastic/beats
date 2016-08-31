@@ -198,6 +198,9 @@
                     "running": {
                       "type": "long"
                     },
+                    "skipped": {
+                      "type": "long"
+                    },
                     "started": {
                       "type": "long"
                     }

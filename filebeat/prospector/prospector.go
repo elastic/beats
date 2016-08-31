@@ -1,11 +1,11 @@
 package prospector
 
 import (
+	"expvar"
 	"fmt"
 	"sync"
-	"time"
-
 	"sync/atomic"
+	"time"
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
@@ -13,6 +13,10 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+)
+
+var (
+	harvesterSkipped = expvar.NewInt("filebeat.harvester.skipped")
 )
 
 type Prospector struct {
@@ -162,6 +166,7 @@ func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, er
 func (p *Prospector) startHarvester(state file.State, offset int64) error {
 
 	if p.config.HarvesterLimit > 0 && atomic.LoadUint64(&p.harvesterCounter) >= p.config.HarvesterLimit {
+		harvesterSkipped.Add(1)
 		return fmt.Errorf("Harvester limit reached.")
 	}
 
