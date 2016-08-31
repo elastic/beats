@@ -9,11 +9,12 @@ import (
 )
 
 type Config struct {
-	Interfaces InterfacesConfig          `config:"interfaces"`
-	Flows      *Flows                    `config:"flows"`
-	Protocols  map[string]*common.Config `config:"protocols"`
-	Procs      procs.ProcsConfig         `config:"procs"`
-	RunOptions droppriv.RunOptions
+	Interfaces     InterfacesConfig          `config:"interfaces"`
+	Flows          *Flows                    `config:"flows"`
+	Protocols      map[string]*common.Config `config:"protocols"`
+	Procs          procs.ProcsConfig         `config:"procs"`
+	IgnoreOutgoing bool                      `config:"ignore_outgoing"`
+	RunOptions     droppriv.RunOptions
 }
 
 type InterfacesConfig struct {
