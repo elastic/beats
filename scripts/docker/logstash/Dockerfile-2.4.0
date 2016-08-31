@@ -2,7 +2,7 @@ FROM java:8-jre
 
 ENV LS_VERSION 2
 
-ENV DEB_URL https://download.elastic.co/logstash/logstash/packages/debian/logstash-2.4.0.snapshot3_all.deb?c=20160829
+ENV DEB_URL https://download.elastic.co/logstash/logstash/packages/debian/logstash-2.4.0_all.deb?c=20160830
 
 ENV PATH $PATH:/opt/logstash/bin:/opt/logstash/vendor/jruby/bin
 
