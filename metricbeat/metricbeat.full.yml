@@ -206,17 +206,6 @@ metricbeat.modules:
 # sub-dictionary. Default is false.
 #fields_under_root: false
 
-# How often (in seconds) shippers are publishing their IPs to the topology map.
-# The default is 10 seconds.
-#refresh_topology_freq: 10
-
-# Expiration time (in seconds) of the IPs published by a shipper to the topology map.
-# All the IPs will be deleted afterwards. Note, that the value must be higher than
-# refresh_topology_freq. This setting is used only by the Redis output. The other
-# outputs don't support expiring entries.
-# The default is 15 seconds.
-#topology_expire: 15
-
 # Internal queue size for single events in processing pipeline
 #queue_size: 1000
 
@@ -314,10 +303,6 @@ output.elasticsearch:
   # If `bulk_max_size` is reached before this interval expires, addition bulk index
   # requests are made.
   #flush_interval: 1s
-
-  # Boolean that sets if the topology is kept in Elasticsearch. The default is
-  # false. This option makes sense only for Packetbeat.
-  #save_topology: false
 
   # A template is used to set the mapping in Elasticsearch
   # By default template loading is enabled and the template is loaded.
@@ -579,18 +564,6 @@ output.elasticsearch:
   # the Redis RPUSH command is used. If the data type is channel, the Redis
   # PUBLISH command is used. The default value is list.
   #datetype: list
-
-  # The Redis host to connect to when using topology map support. Topology map
-  # support is disabled if this option is not set.
-  #host_topology:
-
-  # The password to use for authenticating with the Redis topology server. The
-  # default is no authentication.
-  #password_topology:
-
-  # The Redis database number where the topology information is stored. The
-  # default is 1.
-  #db_topology: 1
 
   # The number of workers to use for each host configured to publish events to
   # Redis. Use this setting along with the loadbalance option. For example, if

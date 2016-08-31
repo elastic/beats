@@ -104,6 +104,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 ==== Deprecated
 
 *Affecting all Beats*
+- Topology map is deperecated. This applies to the settings: refresh_topology_freq, topology_expire, save_topology, host_topology, password_topology, db_topology
 
 *Packetbeat*
 
