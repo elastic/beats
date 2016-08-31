@@ -3,6 +3,7 @@ package harvester
 import (
 	"io"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester/source"
@@ -17,12 +18,12 @@ type LogFile struct {
 	lastTimeRead time.Time
 	backoff      time.Duration
 	done         chan struct{}
+	singleClose  sync.Once
 }
 
 func NewLogFile(
 	fs source.FileSource,
 	config harvesterConfig,
-	done chan struct{},
 ) (*LogFile, error) {
 	var offset int64
 	if seeker, ok := fs.(io.Seeker); ok {
@@ -39,7 +40,7 @@ func NewLogFile(
 		config:       config,
 		lastTimeRead: time.Now(),
 		backoff:      config.Backoff,
-		done:         done,
+		done:         make(chan struct{}),
 	}, nil
 }
 
@@ -163,4 +164,12 @@ func (r *LogFile) wait() {
 			r.backoff = r.config.MaxBackoff
 		}
 	}
+}
+
+func (r *LogFile) Close() {
+	// Make sure reader is only closed once
+	r.singleClose.Do(func() {
+		close(r.done)
+		// Note: File reader is not closed here because that leads to race conditions
+	})
 }

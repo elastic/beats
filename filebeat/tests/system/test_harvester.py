@@ -366,3 +366,44 @@ class Test(BaseTest):
             max_timeout=15)
 
         filebeat.check_kill_and_wait()
+
+    def test_close_timeout(self):
+        """
+        Checks that a file is closed after close_timeout
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+            close_timeout="1s",
+            scan_frequency="1s"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        filebeat = self.start_beat()
+
+        testfile1 = self.working_dir + "/log/test.log"
+        file = open(testfile1, 'w')
+
+        # Write 1000 lines with a sleep between each line to make sure it takes more then 1s to complete
+        iterations1 = 1000
+        for n in range(0, iterations1):
+            file.write("example data")
+            file.write("\n")
+            time.sleep(0.001)
+
+        file.close()
+
+        # Wait until harvester is closed because of ttl
+        self.wait_until(
+            lambda: self.log_contains(
+                "Closing harvester because close_timeout was reached"),
+            max_timeout=15)
+
+        filebeat.check_kill_and_wait()
+
+        data = self.get_registry()
+        assert len(data) == 1
+
+        # Check that not all but some lines were read
+        assert self.output_lines() < 1000
+        assert self.output_lines() > 0
+

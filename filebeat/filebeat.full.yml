@@ -196,6 +196,11 @@ filebeat.prospectors:
   # Removes the state for file which cannot be found on disk anymore immediately
   #clean_removed: false
 
+  # Close timeout closes the harvester after the predefined time.
+  # This is independent if the harvester did finish reading the file or not.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_timeout: 0
 
 #----------------------------- Stdin prospector -------------------------------
 # Configuration to use stdin input
