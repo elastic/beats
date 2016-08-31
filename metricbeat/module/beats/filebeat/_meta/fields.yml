@@ -1,0 +1,86 @@
+- name: filebeat
+  type: group
+  description: >
+    experimental[]
+
+    filebeat metrics
+  fields:
+    - name: harvesters
+      type: group
+      description: >
+        Harvester metrics for all harvesters combined.
+      fields:
+        - name: started
+          type: long
+          description: >
+            Total number of started harvesters.
+        - name: closed
+          type: long
+          description: >
+            Total number of closed harvesters.
+        - name: running
+          type: long
+          description: >
+            Number of currently running harvesters.
+        - name: skipped
+          type: long
+          description: >
+            Total number of harvesters starts that were skipped because of harvester_limit reached.
+        - name: files
+          type: group
+          description: >
+            File handling related statistics.
+          fields:
+            - name: open
+              type: long
+              description: >
+                Currently open files.
+            - name: truncated
+              type: long
+              description: >
+                Number of files which were detected by the harvester as truncated and reading started from scratch.
+    - name: prospectors
+      type: group
+      description: >
+        Prospector metrics for all prospectors combined.
+      fields:
+        - name: log_files
+          type: group
+          description: >
+            Log files related stastics.
+          fields:
+            - name: renamed
+              type: long
+              description: >
+                Total number of files for which renaming was detected.
+            - name: truncated
+              type: long
+              description: >
+                Number of files which were detected by the prospector as truncated and reading started from scratch.
+
+    - name: registrar
+      type: group
+      description: >
+        Registrar statistics
+      fields:
+        - name: states
+          type: group
+          description: >
+            Registrar states metrics.
+          fields:
+            - name: update
+              type: long
+              description: >
+                Total number of states which were updated or added.
+            - name: cleanup
+              type: long
+              description: >
+                Total number of states which were cleaned up (removed).
+            - name: current
+              type: long
+              description: >
+                The current number of states in the registry file.
+        - name: writes
+          type: long
+          description: >
+            Total number of times the registry file was written to disk.

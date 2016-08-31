@@ -13,9 +13,9 @@ import (
 )
 
 type {{cookiecutter.beat|capitalize}} struct {
-	done       chan struct{}
-	config     config.Config
-	client     publisher.Client
+	done   chan struct{}
+	config config.Config
+	client publisher.Client
 }
 
 // Creates beater

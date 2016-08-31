@@ -23,9 +23,9 @@
             },
             "cpu": {
                 "used": {
-                    "sys": 1.49,
+                    "sys": 0.45,
                     "sys_children": 0,
-                    "user": 0.59,
+                    "user": 0.54,
                     "user_children": 0
                 }
             },
@@ -34,21 +34,12 @@
                 "used": {
                     "lua": 37888,
                     "peak": 1010736,
-                    "rss": 9601024,
+                    "rss": 9531392,
                     "value": 886048
                 }
             },
             "persistence": {
-                "loading": false,
-                "rdb": {
-                    "bgsave_in_progress": false,
-                    "changes_since_last_save": 4,
-                    "current_bgsave_time_sec": -1,
-                    "last_bgsave_status": "ok",
-                    "last_bgsave_time_sec": -1,
-                    "last_save_time": 1464763800
-                },
-                "used": {
+                "aof": {
                     "current_rewrite_time_sec": -1,
                     "enabled": false,
                     "last_bgrewrite_status": "ok",
@@ -56,6 +47,15 @@
                     "last_write_status": "ok",
                     "rewrite_in_progress": false,
                     "rewrite_scheduled": false
+                },
+                "loading": false,
+                "rdb": {
+                    "bgsave_in_progress": false,
+                    "changes_since_last_save": 8,
+                    "current_bgsave_time_sec": -1,
+                    "last_bgsave_status": "ok",
+                    "last_bgsave_time_sec": -1,
+                    "last_save_time": 1470133208
                 }
             },
             "replication": {
@@ -77,19 +77,19 @@
                 "git_dirty": "0",
                 "git_sha1": "00000000",
                 "hz": 10,
-                "lru_clock": 5147609,
+                "lru_clock": 10515904,
                 "mode": "standalone",
                 "multiplexing_api": "epoll",
-                "os": "Linux 4.4.11-moby x86_64",
+                "os": "Linux 4.4.15-moby x86_64",
                 "process_id": 1,
-                "run_id": "8c07c362f21cffca73bc37b462e4183d67ae9a0c",
+                "run_id": "6ed624659e20543f023669f6f117db8a7a1be908",
                 "tcp_port": 6379,
-                "uptime": 1601,
-                "version": "3.2.0"
+                "uptime": 488,
+                "version": "3.2.3"
             },
             "stats": {
                 "connections": {
-                    "received": 61,
+                    "received": 51,
                     "rejected": 0
                 },
                 "instantaneous_input_kbps": 0,
@@ -112,9 +112,9 @@
                     "partial_err": 0,
                     "partial_ok": 0
                 },
-                "total_commands_processed": 55,
-                "total_net_input_bytes": 2000,
-                "total_net_output_bytes": 37007
+                "total_commands_processed": 49,
+                "total_net_input_bytes": 1702,
+                "total_net_output_bytes": 28477
             }
         }
     },

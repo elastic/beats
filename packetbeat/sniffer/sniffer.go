@@ -74,8 +74,9 @@ func deviceNameFromIndex(index int, devices []string) (string, error) {
 
 // ListDevicesNames returns the list of adapters available for sniffing on
 // this computer. If the withDescription parameter is set to true, a human
-// readable version of the adapter name is added.
-func ListDeviceNames(withDescription bool) ([]string, error) {
+// readable version of the adapter name is added. If the withIP parameter
+// is set to true, IP address of the adatper is added.
+func ListDeviceNames(withDescription bool, withIP bool) ([]string, error) {
 	devices, err := pcap.FindAllDevs()
 	if err != nil {
 		return []string{}, err
@@ -83,15 +84,34 @@ func ListDeviceNames(withDescription bool) ([]string, error) {
 
 	ret := []string{}
 	for _, dev := range devices {
+		r := dev.Name
+
 		if withDescription {
 			desc := "No description available"
 			if len(dev.Description) > 0 {
 				desc = dev.Description
 			}
-			ret = append(ret, fmt.Sprintf("%s (%s)", dev.Name, desc))
-		} else {
-			ret = append(ret, dev.Name)
+			r += fmt.Sprintf(" (%s)", desc)
 		}
+
+		if withIP {
+			ips := "Not assigned ip address"
+			if len(dev.Addresses) > 0 {
+				ips = ""
+
+				for i, address := range []pcap.InterfaceAddress(dev.Addresses) {
+					// Add a space between the IP address.
+					if i > 0 {
+						ips += " "
+					}
+
+					ips += fmt.Sprintf("%s", address.IP.String())
+				}
+			}
+			r += fmt.Sprintf(" (%s)", ips)
+
+		}
+		ret = append(ret, r)
 	}
 	return ret, nil
 }
@@ -113,7 +133,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 	}
 
 	if index, err := strconv.Atoi(sniffer.config.Device); err == nil { // Device is numeric
-		devices, err := ListDeviceNames(false)
+		devices, err := ListDeviceNames(false, false)
 		if err != nil {
 			return fmt.Errorf("Error getting devices list: %v", err)
 		}

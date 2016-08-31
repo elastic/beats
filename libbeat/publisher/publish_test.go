@@ -3,6 +3,7 @@
 package publisher
 
 import (
+	"runtime"
 	"testing"
 	"time"
 
@@ -70,5 +71,10 @@ func TestPublisherTypeUpdateTopologyPeriodically(t *testing.T) {
 
 	// Validate that PublishTopology was invoked.
 	assert.Equal(t, shipperName, <-topo.publishName)
-	assert.True(t, len(<-topo.publishLocalAddrs) > 0)
+	switch runtime.GOOS {
+	default:
+		assert.True(t, len(<-topo.publishLocalAddrs) > 0)
+	case "nacl", "plan9", "solaris":
+		t.Skipf("Golang's net.InterfaceAddrs is a stub on %s", runtime.GOOS)
+	}
 }

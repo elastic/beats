@@ -18,15 +18,15 @@ test: python-env
 
 	# Makes sure to use current version of beats for testing
 	mkdir -p ${BUILD_DIR}/src/github.com/elastic/beats/
-	cp -r ${PWD}/../../../metricbeat ${PWD}/../../../libbeat ${PWD}/../../../vendor ${BUILD_DIR}/src/github.com/elastic/beats/
+	rsync -a --exclude=generate ${PWD}/../../../* ${BUILD_DIR}/src/github.com/elastic/beats/
 
 	. ${PYTHON_ENV}/bin/activate; \
 	export GOPATH=${PWD}/build ; \
 	export PATH=${PATH}:${PWD}/build/bin; \
 	cd ${BEAT_PATH}; \
+	make copy-vendor; \
 	MODULE=elastic METRICSET=test make create-metricset ; \
 	make imports collect check ; \
-	make ; \
 	make unit
 
 # Tests the build process for the beat

@@ -38,6 +38,19 @@ The features vary by operating system.
 | Swap            |   X   |    X   |         |    X    |    X    |
 | Uptime          |   X   |    X   |         |    X    |    X    |
 
+## OS Specific Notes
+
+### FreeBSD
+
+Mount both `linprocfs` and `procfs` for compatability. Consider adding these
+mounts to your `/etc/fstab` file so they are mounted automatically at boot.
+
+```
+sudo mount -t procfs proc /proc
+sudo mkdir -p /compat/linux/proc
+sudo mount -t linprocfs /dev/null /compat/linux/proc
+```
+
 ## License
 
 Apache 2.0

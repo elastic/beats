@@ -1,4 +1,4 @@
-FROM tudorg/xgo-deb6-1.6
+FROM tudorg/xgo-deb6-1.7
 
 MAINTAINER Tudor Golubenco <tudor@elastic.co>
 

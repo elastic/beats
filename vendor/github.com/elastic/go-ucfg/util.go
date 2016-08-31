@@ -149,6 +149,10 @@ func typeIsUnpacker(t reflect.Type) (reflect.Value, bool) {
 	return reflect.Value{}, false
 }
 
-func unpackWith(v reflect.Value, with interface{}) error {
-	return v.Interface().(Unpacker).Unpack(with)
+func unpackWith(ctx context, meta *Meta, v reflect.Value, with interface{}) Error {
+	err := v.Interface().(Unpacker).Unpack(with)
+	if err != nil {
+		return raisePathErr(err, meta, "", ctx.path("."))
+	}
+	return nil
 }

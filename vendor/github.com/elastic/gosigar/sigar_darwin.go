@@ -166,7 +166,7 @@ func (self *CpuList) Get() error {
 }
 
 func (self *FDUsage) Get() error {
-	return &ErrNotImplemented{runtime.GOOS}
+	return ErrNotImplemented{runtime.GOOS}
 }
 
 func (self *FileSystemList) Get() error {
@@ -335,7 +335,7 @@ func (self *ProcExe) Get(pid int) error {
 }
 
 func (self *ProcFDUsage) Get(pid int) error {
-	return &ErrNotImplemented{runtime.GOOS}
+	return ErrNotImplemented{runtime.GOOS}
 }
 
 // wrapper around sysctl KERN_PROCARGS2

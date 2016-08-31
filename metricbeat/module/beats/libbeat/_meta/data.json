@@ -1,0 +1,39 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "beats": {
+        "libbeat": {
+            "output": {
+                "elasticsearch": {
+                    "events": {
+                        "ack": 0,
+                        "not_ack": 0
+                    },
+                    "read": {
+                        "bytes": 0,
+                        "errors": 0
+                    },
+                    "write": {
+                        "bytes": 0,
+                        "errors": 0
+                    }
+                }
+            },
+            "publisher": {
+                "events": {
+                    "published": 2128
+                }
+            }
+        }
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "beats",
+        "name": "libbeat",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

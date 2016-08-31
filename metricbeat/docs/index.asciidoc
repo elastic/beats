@@ -34,6 +34,8 @@ include::../../libbeat/docs/yaml.asciidoc[]
 
 include::../../libbeat/docs/regexp.asciidoc[]
 
+include::./metricbeat-in-a-container.asciidoc[]
+
 include::./modules.asciidoc[]
 
 include::./fields.asciidoc[]

@@ -2,14 +2,18 @@ beat:
   build: ${PWD}/.
   links:
     - apache
+    - filebeat
     - mongodb
     - mysql
     - nginx
+    - postgresql
     - redis
     - zookeeper
   environment:
     - APACHE_HOST=apache
     - APACHE_PORT=80
+    - FILEBEAT_HOST=filebeat
+    - FILEBEAT_PORT=6060
     - NGINX_HOST=nginx
     - NGINX_PORT=80
     - REDIS_HOST=redis
@@ -19,6 +23,9 @@ beat:
     - MYSQL_DSN=root:test@tcp(mysql:3306)/
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
+    - POSTGRESQL_DSN=postgres://postgres@postgresql:5432?sslmode=disable
+    - POSTGRESQL_HOST=postgresql
+    - POSTGRESQL_PORT=5432
     - ZOOKEEPER_HOST=zookeeper
     - ZOOKEEPER_PORT=2181
     - TEST_ENVIRONMENT=false
@@ -37,6 +44,9 @@ kibana:
 apache:
   build: ${PWD}/module/apache/_meta
 
+filebeat:
+  build: ${PWD}/module/beats/filebeat/_meta
+
 mongodb:
   image: mongo:3.0
 
@@ -48,8 +58,11 @@ mysql:
 nginx:
   build: ${PWD}/module/nginx/_meta
 
+postgresql:
+  image: postgres:9.5.3
+
 redis:
-  image: redis:3.2.0
+  image: redis:3.2.3
 
 zookeeper:
   image: jplock/zookeeper:3.4.8

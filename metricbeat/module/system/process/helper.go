@@ -4,7 +4,9 @@ package process
 
 import (
 	"fmt"
+	"os"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
 
@@ -28,6 +30,7 @@ type Process struct {
 	Mem      sigar.ProcMem
 	Cpu      sigar.ProcTime
 	Ctime    time.Time
+	FD       sigar.ProcFDUsage
 }
 
 type ProcStats struct {
@@ -59,7 +62,7 @@ func newProcess(pid int) (*Process, error) {
 	return &proc, nil
 }
 
-// getDetails fills in CPU, memory, and command line details for the process
+// getDetails fills in CPU, memory, FD usage, and command line details for the process.
 func (proc *Process) getDetails(cmdline string) error {
 
 	proc.Mem = sigar.ProcMem{}
@@ -82,7 +85,40 @@ func (proc *Process) getDetails(cmdline string) error {
 		proc.CmdLine = cmdline
 	}
 
+	if fd, err := getProcFDUsage(proc.Pid); err != nil {
+		return fmt.Errorf("error getting process file descriptor usage for pid=%d: %v", proc.Pid, err)
+	} else if fd != nil {
+		proc.FD = *fd
+	}
+
 	return nil
+}
+
+// getProcFDUsage returns file descriptor usage information for the process
+// identified by the given PID. If the feature is not implemented then nil
+// is returned with no error. If there is a permission error while reading the
+// data then  nil is returned with no error (/proc/[pid]/fd requires root
+// permissions). Any other errors that occur are returned.
+func getProcFDUsage(pid int) (*sigar.ProcFDUsage, error) {
+	// It's not possible to collect FD usage from other processes on FreeBSD
+	// due to linprocfs not exposing the information.
+	if runtime.GOOS == "freebsd" && pid != os.Getpid() {
+		return nil, nil
+	}
+
+	fd := sigar.ProcFDUsage{}
+	if err := fd.Get(pid); err != nil {
+		switch {
+		case sigar.IsNotImplemented(err):
+			return nil, nil
+		case os.IsPermission(err):
+			return nil, nil
+		default:
+			return nil, err
+		}
+	}
+
+	return &fd, nil
 }
 
 func GetProcMemPercentage(proc *Process, total_phymem uint64) float64 {
@@ -160,14 +196,24 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 				"ticks": process.Cpu.Total,
 				"pct":   GetProcCpuPercentage(last, process),
 			},
-			"start_time": process.Cpu.FormatStartTime(),
+			"start_time": unixTimeMsToTime(process.Cpu.StartTime),
 		}
 	} else {
 		proc["cpu"] = common.MapStr{
 			"total": common.MapStr{
 				"pct": GetProcCpuPercentage(last, process),
 			},
-			"start_time": process.Cpu.FormatStartTime(),
+			"start_time": unixTimeMsToTime(process.Cpu.StartTime),
+		}
+	}
+
+	if process.FD != (sigar.ProcFDUsage{}) {
+		proc["fd"] = common.MapStr{
+			"open": process.FD.Open,
+			"limit": common.MapStr{
+				"soft": process.FD.SoftLimit,
+				"hard": process.FD.HardLimit,
+			},
 		}
 	}
 
@@ -303,4 +349,10 @@ func (procStats *ProcStats) GetProcStatsEvents() ([]common.MapStr, error) {
 	}
 
 	return events, nil
+}
+
+// unixTimeMsToTime converts a unix time given in milliseconds since Unix epoch
+// to a common.Time value.
+func unixTimeMsToTime(unixTimeMs uint64) common.Time {
+	return common.Time(time.Unix(0, int64(unixTimeMs*1000000)))
 }

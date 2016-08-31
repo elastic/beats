@@ -13,7 +13,6 @@ type elasticsearchConfig struct {
 	Username         string             `config:"username"`
 	Password         string             `config:"password"`
 	ProxyURL         string             `config:"proxy_url"`
-	Index            string             `config:"index"`
 	LoadBalance      bool               `config:"loadbalance"`
 	CompressionLevel int                `config:"compression_level" validate:"min=0, max=9"`
 	TLS              *outputs.TLSConfig `config:"tls"`

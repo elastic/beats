@@ -1,0 +1,3 @@
+=== beats filebeat MetricSet
+
+This is the filebeat metricset of the module beats.

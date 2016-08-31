@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,9 +37,9 @@ func TestInfRetryNoDeadlock(t *testing.T) {
 				break
 			}
 
-			fails := msg.event["fails"].(int)
+			fails := msg.datum.Event["fails"].(int)
 			if fails < Fails {
-				msg.event["fails"] = fails + 1
+				msg.datum.Event["fails"] = fails + 1
 				ctx.pushFailed(msg)
 				continue
 			}
@@ -57,7 +58,7 @@ func TestInfRetryNoDeadlock(t *testing.T) {
 	for i := 0; i < N; i++ {
 		msg := eventsMessage{
 			worker: -1,
-			event:  common.MapStr{"fails": int(0)},
+			datum:  outputs.Data{Event: common.MapStr{"fails": int(0)}},
 		}
 		ok := ctx.pushEvents(msg, true)
 		assert.True(t, ok)

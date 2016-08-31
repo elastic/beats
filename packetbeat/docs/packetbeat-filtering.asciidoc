@@ -50,7 +50,7 @@ deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` i
 filters:
  - drop_event:
      equals:
-       http.code: 200
+       http.response.code: 200
 -----------
 
 added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
@@ -61,7 +61,7 @@ processors:
  - drop_event:
      when:
         equals:
-           http.code: 200
+           http.response.code: 200
 -----------
 
 
@@ -74,7 +74,7 @@ deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` i
 filters:
  - drop_fields:
      equals:
-       http.code: 200
+       http.response.code: 200
      fields: ["request", "response"]
 ------------
 
@@ -86,7 +86,7 @@ processors:
  - drop_fields:
      when:
         equals:
-           http.code: 200
+           http.response.code: 200
      fields: ["request", "response"]
 ------------
 

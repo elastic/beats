@@ -11,11 +11,13 @@
 
     - name: out.bytes
       type: long
+      format: bytes
       description: >
         The number of bytes sent.
 
     - name: in.bytes
       type: long
+      format: bytes
       description: >
         The number of bytes received.
 
