@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 *Packetbeat*
 - Group HTTP fields under `http.request` and `http.response` {pull}2167[2167]
 - Export `http.request.body` and `http.response.body` when configured under `include_body_for` {pull}2167[2167]
+- Move `ignore_outgoing` config to `packetbeat.ignore_outgoing` {pull}2393[2393]
 
 *Topbeat*
 
