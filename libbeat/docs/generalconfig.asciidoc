@@ -99,13 +99,17 @@ fields:
 
 ===== refresh_topology_freq
 
-DEPRECATED: The refresh interval of the topology map in
+deprecated[5.0.0]
+
+The refresh interval of the topology map in
 seconds. In other words, this setting specifies how often each Beat publishes its
 IP addresses to the topology map. The default is 10 seconds.
 
 ===== topology_expire
 
-DEPRECATED: The expiration time for the topology in seconds. This is useful in case a Beat
+deprecated[5.0.0]
+
+The expiration time for the topology in seconds. This is useful in case a Beat
 stops publishing its IP addresses. The IP addresses are removed automatically
 from the topology map after expiration.
 
