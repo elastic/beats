@@ -10,6 +10,7 @@ var schema = s.Schema{
 		"started": c.Int("filebeat.harvester.started"),
 		"closed":  c.Int("filebeat.harvester.closed"),
 		"running": c.Int("filebeat.harvester.running"),
+		"skipped": c.Int("filebeat.harvester.skipped"),
 		"files": s.Object{
 			"open":      c.Int("filebeat.harvester.open_files"),
 			"truncated": c.Int("filebeat.harvester.files.truncated"),
