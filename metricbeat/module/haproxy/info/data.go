@@ -2,7 +2,6 @@ package info
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	//"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/haproxy"
 	s "github.com/elastic/beats/metricbeat/schema"
 	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"

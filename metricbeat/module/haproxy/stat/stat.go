@@ -1,13 +1,11 @@
 package stat
 
 import (
-	//"errors"
 	"fmt"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/haproxy"
-	//"net"
 )
 
 const (
