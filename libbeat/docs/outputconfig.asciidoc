@@ -77,11 +77,6 @@ output.elasticsearch:
   # Optional http or https. Default is http
   protocol: "https"
 
-  # DEPRECATED: Comment this option if you don't want to store the topology in
-  # Elasticsearch. The default is false.
-  # This option makes sense only for Packetbeat
-  #save_topology: false
-
   # HTTP basic auth
   username: "admin"
   password: "s3cr3t"
@@ -283,7 +278,9 @@ requests are made.
 [[save_topology]]
 ===== save_topology
 
-DEPRECATED: A Boolean that specifies whether the topology is kept in Elasticsearch. The default is
+deprecated[5.0.0]
+
+A Boolean that specifies whether the topology is kept in Elasticsearch. The default is
 false.
 
 This option is relevant for Packetbeat only.
@@ -720,15 +717,21 @@ The default value is `list`.
 
 ===== host_topology
 
-DEPRECATED: The Redis host to connect to when using topology map support. Topology map support is disabled if this option is not set.
+deprecated[5.0.0]
+
+The Redis host to connect to when using topology map support. Topology map support is disabled if this option is not set.
 
 ===== password_topology
 
-DEPRECATED: The password to use for authenticating with the Redis topology server. The default is no authentication.
+deprecated[5.0.0]
+
+The password to use for authenticating with the Redis topology server. The default is no authentication.
 
 ===== db_topology
 
-DEPRECATED: The Redis database number where the topology information is stored. The default is 1.
+deprecated[5.0.0]
+
+The Redis database number where the topology information is stored. The default is 1.
 
 ===== worker
 
