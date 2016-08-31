@@ -433,7 +433,7 @@ Harvester metrics for all harvesters combined.
 
 type: long
 
-Total number of started harvesters
+Total number of started harvesters.
 
 
 [float]
@@ -441,7 +441,7 @@ Total number of started harvesters
 
 type: long
 
-Total number of closed harvesters
+Total number of closed harvesters.
 
 
 [float]
@@ -449,13 +449,21 @@ Total number of closed harvesters
 
 type: long
 
-Number of currently running harvesters
+Number of currently running harvesters.
+
+
+[float]
+=== beats.filebeat.harvesters.skipped
+
+type: long
+
+Total number of harvesters starts that were skipped because of harvester_limit reached.
 
 
 [float]
 == files Fields
 
-File handling related statistics
+File handling related statistics.
 
 
 
@@ -464,7 +472,7 @@ File handling related statistics
 
 type: long
 
-Currently open files
+Currently open files.
 
 
 [float]
@@ -494,7 +502,7 @@ Log files related stastics.
 
 type: long
 
-Total number of files for which renaming was detected
+Total number of files for which renaming was detected.
 
 
 [float]
@@ -515,7 +523,7 @@ Registrar statistics
 [float]
 == states Fields
 
-Registrar states metrics
+Registrar states metrics.
 
 
 
@@ -524,7 +532,7 @@ Registrar states metrics
 
 type: long
 
-Total number of states which were updated or added
+Total number of states which were updated or added.
 
 
 [float]
@@ -532,7 +540,7 @@ Total number of states which were updated or added
 
 type: long
 
-Total number of states which were cleaned up (removed)
+Total number of states which were cleaned up (removed).
 
 
 [float]
@@ -540,7 +548,7 @@ Total number of states which were cleaned up (removed)
 
 type: long
 
-The current number of states in the registry file
+The current number of states in the registry file.
 
 
 [float]
@@ -548,7 +556,7 @@ The current number of states in the registry file
 
 type: long
 
-Total number of times the registry file was written to disk
+Total number of times the registry file was written to disk.
 
 
 [float]
