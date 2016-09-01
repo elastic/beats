@@ -313,7 +313,7 @@ bin\logstash.bat -f logstash.conf
 ----------------------------------------------------------------------
 
 NOTE: The default configuration for Beats and Logstash uses plain TCP. For
-encryption you must explicitly enable TLS when you configure Beats and Logstash.
+encryption you must explicitly enable SSL when you configure Beats and Logstash.
 
 You can learn more about installing, configuring, and running Logstash
 https://www.elastic.co/guide/en/logstash/current/getting-started-with-logstash.html[here].

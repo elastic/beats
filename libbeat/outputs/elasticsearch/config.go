@@ -15,7 +15,7 @@ type elasticsearchConfig struct {
 	ProxyURL         string             `config:"proxy_url"`
 	LoadBalance      bool               `config:"loadbalance"`
 	CompressionLevel int                `config:"compression_level" validate:"min=0, max=9"`
-	TLS              *outputs.TLSConfig `config:"tls"`
+	TLS              *outputs.TLSConfig `config:"ssl"`
 	MaxRetries       int                `config:"max_retries"`
 	Timeout          time.Duration      `config:"timeout"`
 	SaveTopology     bool               `config:"save_topology"`

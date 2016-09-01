@@ -1,7 +1,6 @@
 package elasticsearch
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -18,6 +17,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
 	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
@@ -239,7 +239,7 @@ func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) er
 }
 
 func makeClientFactory(
-	tls *tls.Config,
+	tls *transport.TLSConfig,
 	config *elasticsearchConfig,
 	out *elasticsearchOutput,
 ) func(string) (mode.ProtocolClient, error) {

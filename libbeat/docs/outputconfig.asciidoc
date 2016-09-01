@@ -37,16 +37,16 @@ output.elasticsearch:
   # [{beatname_lc}-]YYYY.MM.DD keys.
   index: "{beatname_lc}"
 
-  # Optional TLS configuration options. TLS is off by default.
+  # Optional SSL configuration options. SSL is off by default.
 
   # List of root certificates for HTTPS server verifications
-  tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-  # Certificate for TLS client authentication
-  tls.certificate: "/etc/pki/client/cert.pem"
+  # Certificate for SSL client authentication
+  ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  tls.certificatekey: "/etc/pki/client/cert.key"
+  ssl.key: "/etc/pki/client/cert.key"
 
 ------------------------------------------------------------------------------
 
@@ -285,13 +285,13 @@ false.
 
 This option is relevant for Packetbeat only.
 
-===== tls
+===== ssl
 
-Configuration options for TLS parameters like the certificate authority to use
+Configuration options for SSL parameters like the certificate authority to use
 for HTTPS-based connections. If the `tls` section is missing, the host CAs are used for HTTPS connections to
 Elasticsearch.
 
-See <<configuration-output-tls>> for more information.
+See <<configuration-output-ssl>> for more information.
 
 
 [[logstash-output]]
@@ -478,10 +478,10 @@ The index root name to write events to. The default is the Beat name.
 For example "{beatname_lc}" generates "[{beatname_lc}-]YYYY.MM.DD" indexes (for example,
 "{beatname_lc}-2015.04.26").
 
-===== tls
+===== ssl
 
-Configuration options for TLS parameters like the root CA for Logstash connections. See
-<<configuration-output-tls>> for more information. To use TLS, you must also configure the
+Configuration options for SSL parameters like the root CA for Logstash connections. See
+<<configuration-output-ssl>> for more information. To use SSL, you must also configure the
 https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] to use SSL/TLS.
 
 ===== timeout
@@ -630,10 +630,10 @@ Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silentl
 
 The number of seconds to wait for new events between two producer API calls.
 
-===== tls
+===== ssl
 
-Configuration options for TLS parameters like the root CA for Kibana connections. See
-<<configuration-output-tls>> for more information.
+Configuration options for SSL parameters like the root CA for Kafka connections. See
+<<configuration-output-ssl>> for more information.
 
 [[redis-output]]
 === Redis Output Configuration
@@ -778,11 +778,11 @@ Packetbeat) send each event directly to Redis. Beats that publish
 data in batches (such as Filebeat) send events in batches based on the spooler
 size.
 
-===== tls
+===== ssl
 
-Configuration options for TLS parameters like the root CA for Redis connections
+Configuration options for SSL parameters like the root CA for Redis connections
 guarded by SSL proxies (for example https://www.stunnel.org[stunnel]). See
-<<configuration-output-tls>> for more information.
+<<configuration-output-ssl>> for more information.
 
 ===== proxy_url
 
@@ -896,13 +896,13 @@ The maximum number of events to buffer internally during publishing. The default
 Specifying a larger batch size may add some latency and buffering during publishing. However, for Console output, this
 setting does not affect how events are published.
 
-Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat.
+Setting `bulk_max_size` to 0 disables buffering in libbeat.
 
-[[configuration-output-tls]]
+[[configuration-output-ssl]]
 
-=== TLS Configuration
+=== SSL Configuration
 
-You can specify TLS options for any output that supports TLS.
+You can specify SSL options for any output that supports SSL.
 
 Example configuration:
 
@@ -912,18 +912,26 @@ output.elasticsearch:
   hosts: ["192.168.1.42:9200"]
 
   # List of root certificates for HTTPS server verifications
-  tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-  # Certificate for TLS client authentication
-  tls.certificate: "/etc/pki/client/cert.pem"
+  # Certificate for SSL client authentication
+  ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  tls.certificate_key: "/etc/pki/client/cert.key"
+  ssl.key: "/etc/pki/client/cert.key"
 ------------------------------------------------------------------------------
 
-==== TLS Options
+==== SSL Options
 
-You can specify the following options in the `tls` section of the +{beatname_lc}.yml+ config file:
+You can specify the following options in the `ssl` section of the +{beatname_lc}.yml+ config file:
+
+===== enabled
+
+The `enabled` setting can be used to disable the ssl configuration by setting
+it to `false`. The default value is `true`.
+
+Note: SSL settings are disabled if either `enabled` is set to `false` or the
+`ssl` section is missing.
 
 ===== certificate_authorities
 
@@ -933,39 +941,41 @@ The list of root certificates for server verifications. If `certificate_authorit
 
 ===== certificate: "/etc/pki/client/cert.pem"
 
-The path to the certificate for TLS client authentication. If the certificate
+The path to the certificate for SSL client authentication. If the certificate
 is not specified, client authentication is not available. The connection
-might fail if the server requests client authentication. If the TLS server does not
+might fail if the server requests client authentication. If the SSL server does not
 require client authentication, the certificate will be loaded, but not requested or used
 by the server.
 
 When this option is configured, the <<certificate_key>> option is also required.
 
 [[certificate_key]]
-===== certificate_key: "/etc/pki/client/cert.key"
+===== key: "/etc/pki/client/cert.key"
 
 The client certificate key used for client authentication. This option is required if <<certificate>> is specified.
 
-===== min_version
+===== key_passphrase
 
-The minimum SSL/TLS version allowed for the encrypted connections. The value must be one of the following:
-`SSL-3.0` for SSL 3, `1.0` for TLS 1.0, `1.1` for TLS 1.1 and `1.2` for TLS 1.2.
+The passphrase used to decrypt an encrypted key stored in the configured `key` file.
 
-The default value is `1.0`.
+===== versions
 
-===== max_version
+List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
+not configured, the connection will be dropped during or after the handshake. The
+setting is a list of allowed protocol versions:
+`SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1` and `TLSv1.2`.
 
-The maximum SSL/TLS version allowed for the encrypted connections. The value must be one of the following:
-`SSL-3.0` for SSL 3, `1.0` for TLS 1.0, `1.1` for TLS 1.1 and `1.2` for TLS 1.2.
+The default value is `[TLSv1.0, TLSv1.1, TLSv1.2]`.
 
-The default value is `1.2`.
+===== verification_mode
 
-===== insecure
+This option controls whether the client verifies server certificates and host
+names. The values `none` and `full` can be used. If `verification_mode` is set
+to `none`, all server host names and certificates are accepted. In this mode,
+TLS-based connections are susceptible to man-in-the-middle attacks. Use this
+option for testing only.
 
-This option controls whether the client verifies server certificates and host names.
-If insecure is set to true, all server host names and certificates are
-accepted. In this mode, TLS-based connections are susceptible to
-man-in-the-middle attacks. Use this option for testing only.
+The default is `full`.
 
 ===== cipher_suites
 
@@ -973,7 +983,25 @@ The list of cipher suites to use. The first entry has the highest priority.
 If this option is omitted, the Go crypto library's default
 suites are used (recommended).
 
-Here is a list of allowed cipher suites and their meanings.
+The following cipher suites are available:
+
+* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
+* RSA-3DES-CBC3-SHA
+* RSA-AES-128-CBC-SHA
+* RSA-AES-256-CBC-SHA
+* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
+* ECDHE-ECDSA-AES-128-CBC-SHA
+* ECDHE-ECDSA-AES-256-CBC-SHA
+* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
+* ECDHE-RSA-3DES-CBC3-SHA
+* ECDHE-RSA-AES-128-CBC-SHA
+* ECDHE-RSA-AES-256-CBC-SHA
+* ECDHE-RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
+
+Here is a list of acronyms used in defining the cipher suites:
 
 * 3DES:
   Cipher suites using triple DES
@@ -1002,23 +1030,6 @@ Here is a list of allowed cipher suites and their meanings.
 * SHA, SHA256, SHA384:
   Cipher suites using SHA-1, SHA-256 or SHA-384.
 
-The following cipher suites are available:
-
-* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-* RSA-3DES-CBC3-SHA
-* RSA-AES-128-CBC-SHA
-* RSA-AES-256-CBC-SHA
-* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-* ECDHE-ECDSA-AES-128-CBC-SHA
-* ECDHE-ECDSA-AES-256-CBC-SHA
-* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
-* ECDHE-RSA-3DES-CBC3-SHA
-* ECDHE-RSA-AES-128-CBC-SHA
-* ECDHE-RSA-AES-256-CBC-SHA
-* ECDHE-RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
 
 ===== curve_types
 

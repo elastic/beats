@@ -58,15 +58,15 @@ output.elasticsearch:
   # The Logstash hosts
   #hosts: ["localhost:5044"]
 
-  # Optional TLS. By default is off.
+  # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
-  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-  # Certificate for TLS client authentication
-  #tls.certificate: "/etc/pki/client/cert.pem"
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  #tls.certificate_key: "/etc/pki/client/cert.key"
+  #ssl.key: "/etc/pki/client/cert.key"
 
 #================================ Logging =====================================
 
