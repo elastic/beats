@@ -88,7 +88,7 @@ func TestUnmarshal(t *testing.T) {
 	for _, test := range tests {
 		t.Logf("Running test %s", test.Name)
 		var output map[string]interface{}
-		err := unmarshal([]byte(test.Input), &output)
+		err := unmarshal([]byte(test.Input), &output, true)
 		assert.NoError(t, err)
 		assert.Equal(t, test.Output, output)
 	}
