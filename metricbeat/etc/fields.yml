@@ -49,31 +49,31 @@
               description: >
                 Apache hostname.
             - name: total_accesses
-              type: integer
+              type: long
               description: >
                 Total number of access requests.
             - name: total_kbytes
-              type: integer
+              type: long
               description: >
                 Total number of kilobytes served.
             - name: requests_per_sec
-              type: half_float
+              type: scaled_float
               description: >
                 Requests per second.
             - name: bytes_per_sec
-              type: float
+              type: scaled_float
               description: >
                 Bytes per second.
             - name: bytes_per_request
-              type: half_float
+              type: scaled_float
               description: >
                 Bytes per request.
             - name: workers.busy
-              type: integer
+              type: long
               description: >
                 Number of busy workers.
             - name: workers.idle
-              type: integer
+              type: long
               description: >
                 Number of idle workers.
             - name: uptime
@@ -82,11 +82,11 @@
                 Uptime stats.
               fields:
                 - name: server_uptime
-                  type: integer
+                  type: long
                   description: >
                     Server uptime in seconds.
                 - name: uptime
-                  type: integer
+                  type: long
                   description: >
                     Server uptime.
             - name: cpu
@@ -120,19 +120,19 @@
                 Connection stats.
               fields:
                 - name: total
-                  type: integer
+                  type: long
                   description: >
                     Total connections.
                 - name: async.writing
-                  type: integer
+                  type: long
                   description: >
                     Async connection writing.
                 - name: async.keep_alive
-                  type: integer
+                  type: long
                   description: >
                     Async keeped alive connections.
                 - name: async.closing
-                  type: integer
+                  type: long
                   description: >
                     Async closed connections.
             - name: load
@@ -141,15 +141,18 @@
                 Load averages.
               fields:
                 - name: "1"
-                  type: half_float
+                  type: scaled_float
+                  scaling_factor: 100
                   description: >
                     Load average for the last minute.
                 - name: "5"
-                  type: half_float
+                  type: scaled_float
+                  scaling_factor: 100
                   description: >
                     Load average for the last 5 minutes.
                 - name: "15"
-                  type: half_float
+                  type: scaled_float
+                  scaling_factor: 100
                   description: >
                     Load average for the last 15 minutes.
             - name: scoreboard
@@ -158,51 +161,51 @@
                 Scoreboard metrics.
               fields:
                 - name: starting_up
-                  type: integer
+                  type: long
                   description: >
                     Starting up.
                 - name: reading_request
-                  type: integer
+                  type: long
                   description: >
                     Reading requests.
                 - name: sending_reply
-                  type: integer
+                  type: long
                   description: >
                     Sending Reply.
                 - name: keepalive
-                  type: integer
+                  type: long
                   description: >
                     Keep alive.
                 - name: dns_lookup
-                  type: integer
+                  type: long
                   description: >
                     Dns Lookups.
                 - name: closing_connection
-                  type: integer
+                  type: long
                   description: >
                     Closing connections.
                 - name: logging
-                  type: integer
+                  type: long
                   description: >
                     Logging
                 - name: gracefully_finishing
-                  type: integer
+                  type: long
                   description: >
                     Gracefully finishing.
                 - name: idle_cleanup
-                  type: integer
+                  type: long
                   description: >
                     Idle cleanups.
                 - name: open_slot
-                  type: integer
+                  type: long
                   description: >
                     Open slots.
                 - name: waiting_for_connection
-                  type: integer
+                  type: long
                   description: >
                     Waiting for connections.
                 - name: total
-                  type: integer
+                  type: long
                   description: >
                     Total.
 - key: beats
@@ -736,12 +739,12 @@
                 Aborted status fields.
               fields:
                 - name: clients
-                  type: integer
+                  type: long
                   description: >
                     The number of connections that were aborted because the client died without closing the connection properly.
 
                 - name: connects
-                  type: integer
+                  type: long
                   description: >
                     The number of failed attempts to connect to the MySQL server.
 
@@ -750,11 +753,11 @@
               description: >
               fields:
                 - name: cache.disk_use
-                  type: integer
+                  type: long
                   description: >
 
                 - name: cache.use
-                  type: integer
+                  type: long
                   description: >
 
             - name: bytes
@@ -764,18 +767,18 @@
               fields:
                 - name: received
                   format: bytes
-                  type: integer
+                  type: long
                   description: >
                     The number of bytes received from all clients.
 
                 - name: sent
-                  type: integer
+                  type: long
                   format: bytes
                   description: >
                     The number of bytes sent to all clients.
 
             - name: connections
-              type: integer
+              type: long
               description: >
 
             - name: created
@@ -783,15 +786,15 @@
               description: >
               fields:
                 - name: tmp.disk_tables
-                  type: integer
+                  type: long
                   description: >
 
                 - name: tmp.files
-                  type: integer
+                  type: long
                   description: >
 
                 - name: tmp.tables
-                  type: integer
+                  type: long
                   description: >
 
             - name: delayed
@@ -799,23 +802,23 @@
               description: >
               fields:
                 - name: errors
-                  type: integer
+                  type: long
                   description: >
 
                 - name: insert_threads
-                  type: integer
+                  type: long
                   description: >
 
                 - name: writes
-                  type: integer
+                  type: long
                   description: >
 
             - name: flush_commands
-              type: integer
+              type: long
               description: >
 
             - name: max_used_connections
-              type: integer
+              type: long
               description: >
 
             - name: open
@@ -823,19 +826,19 @@
               description: >
               fields:
                 - name: files
-                  type: integer
+                  type: long
                   description: >
 
                 - name: streams
-                  type: integer
+                  type: long
                   description: >
 
                 - name: tables
-                  type: integer
+                  type: long
                   description: >
 
             - name: opened_tables
-              type: integer
+              type: long
               description: >
 - key: nginx
   title: "Nginx"
@@ -858,39 +861,39 @@
               description: >
                 Nginx hostname.
             - name: active
-              type: integer
+              type: long
               description: >
                 The current number of active client connections including Waiting connections.
             - name: accepts
-              type: integer
+              type: long
               description: >
                 The total number of accepted client connections.
             - name: handled
-              type: integer
+              type: long
               description: >
                 The total number of handled client connections.
             - name: dropped
-              type: integer
+              type: long
               description: >
                 The total number of dropped client connections.
             - name: requests
-              type: integer
+              type: long
               description: >
                 The total number of client requests.
             - name: current
-              type: integer
+              type: long
               description: >
                 The current number of client requests.
             - name: reading
-              type: integer
+              type: long
               description: >
                 The current number of connections where Nginx is reading the request header.
             - name: writing
-              type: integer
+              type: long
               description: >
                 The current number of connections where Nginx is writing the response back to the client.
             - name: waiting
-              type: integer
+              type: long
               description: >
                 The current number of idle client connections waiting for a request.
 - key: postgresql
@@ -920,7 +923,7 @@
               description: >
                 Name of the database this backend is connected to.
             - name: pid
-              type: integer
+              type: long
               description: >
                 Process ID of this backend.
             - name: user.id
@@ -940,7 +943,7 @@
               description: >
                 Host name of the connected client, as reported by a reverse DNS lookup of client_addr.
             - name: client.port
-              type: integer
+              type: long
               description: >
                 TCP port number that the client is using for communication with this
                 backend, or -1 if a Unix socket is used.
@@ -969,7 +972,7 @@
             - name: state
               description: >
                 Current overall state of this backend. Possible values are:
-        
+
                   * active: The backend is executing a query.
                   * idle: The backend is waiting for a new client command.
                   * idle in transaction: The backend is in a transaction, but is not
@@ -1156,22 +1159,22 @@
                 Redis client stats.
               fields:
                 - name: connected
-                  type: integer
+                  type: long
                   description: >
                     Number of client connections (excluding connections from slaves).
 
                 - name: longest_output_list
-                  type: integer
+                  type: long
                   description: >
                     Longest output list among current client connections.
 
                 - name: biggest_input_buf
-                  type: integer
+                  type: long
                   description: >
                     Biggest input buffer among current client connections.
 
                 - name: blocked
-                  type: integer
+                  type: long
                   description: >
                     Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH).
 
@@ -1191,22 +1194,22 @@
                 Redis CPU stats
               fields:
                 - name: used.sys
-                  type: half_float
+                  type: scaled_float
                   description: >
                     System CPU consumed by the Redis server.
 
                 - name: used.sys_children
-                  type: half_float
+                  type: scaled_float
                   description: >
                     User CPU consumed by the Redis server.
 
                 - name: used.user
-                  type: half_float
+                  type: scaled_float
                   description: >
                     System CPU consumed by the background processes.
 
                 - name: used.user_children
-                  type: half_float
+                  type: scaled_float
                   description: >
                     User CPU consumed by the background processes.
 
@@ -1216,22 +1219,22 @@
                 Redis CPU stats.
               fields:
                 - name: used.value
-                  type: integer
+                  type: long
                   description: >
                     Used memory.
 
                 - name: used.rss
-                  type: integer
+                  type: long
                   description: >
                     Used memory rss.
 
                 - name: used.peak
-                  type: integer
+                  type: long
                   description: >
                     Used memory peak.
 
                 - name: used.lua
-                  type: integer
+                  type: long
                   description: >
                     Used memory lua.
 
@@ -1250,7 +1253,7 @@
                   description:
 
                 - name: rdb.changes_since_last_save
-                  type: integer
+                  type: long
                   description:
 
                 - name: rdb.bgsave_in_progress
@@ -1258,7 +1261,7 @@
                   description:
 
                 - name: rdb.last_save_time
-                  type: integer
+                  type: long
                   description:
 
                 - name: rdb.last_bgsave_status
@@ -1266,11 +1269,11 @@
                   description:
 
                 - name: rdb.last_bgsave_time_sec
-                  type: integer
+                  type: long
                   description:
 
                 - name: rdb.current_bgsave_time_sec
-                  type: integer
+                  type: long
                   description:
 
                 - name: aof.enabled
@@ -1286,11 +1289,11 @@
                   description:
 
                 - name: aof.last_rewrite_time_sec
-                  type: integer
+                  type: long
                   description:
 
                 - name: aof.current_rewrite_time_sec
-                  type: integer
+                  type: long
                   description:
 
                 - name: aof.last_bgrewrite_status
@@ -1311,27 +1314,27 @@
                   description:
 
                 - name: connected_slaves
-                  type: integer
+                  type: long
                   description:
 
                 - name: master_offset
-                  type: integer
+                  type: long
                   description:
 
                 - name: backlog.active
-                  type: integer
+                  type: long
                   description:
 
                 - name: backlog.size
-                  type: integer
+                  type: long
                   description:
 
                 - name: backlog.first_byte_offset
-                  type: integer
+                  type: long
                   description:
 
                 - name: backlog.histlen
-                  type: integer
+                  type: long
                   description:
 
             - name: server
@@ -1376,7 +1379,7 @@
                   description:
 
                 - name: process_id
-                  type: integer
+                  type: long
                   description:
 
                 - name: run_id
@@ -1384,19 +1387,19 @@
                   description:
 
                 - name: tcp_port
-                  type: integer
+                  type: long
                   description:
 
                 - name: uptime
-                  type: integer
+                  type: long
                   description:
 
                 - name: hz
-                  type: integer
+                  type: long
                   description:
 
                 - name: lru_clock
-                  type: integer
+                  type: long
                   description:
 
                 - name: config_file
@@ -1409,79 +1412,79 @@
                 Redis stats.
               fields:
                 - name: connections.received
-                  type: integer
+                  type: long
                   description:
 
                 - name: connections.rejected
-                  type: integer
+                  type: long
                   description:
 
                 - name: total_commands_processed
-                  type: integer
+                  type: long
                   description:
 
                 - name: total_net_input_bytes
-                  type: integer
+                  type: long
                   description:
 
                 - name: total_net_output_bytes
-                  type: integer
+                  type: long
                   description:
 
                 - name: instantaneous_ops_per_sec
-                  type: integer
+                  type: long
                   description:
 
                 - name: instantaneous_input_kbps
-                  type: float
+                  type: scaled_float
                   description:
 
                 - name: instantaneous_output_kbps
-                  type: float
+                  type: scaled_float
                   description:
 
                 - name: sync.full
-                  type: integer
+                  type: long
                   description:
 
                 - name: sync.partial_ok
-                  type: integer
+                  type: long
                   description:
 
                 - name: sync.partial_err
-                  type: integer
+                  type: long
                   description:
 
                 - name: keys.expired
-                  type: integer
+                  type: long
                   description:
 
                 - name: keys.evicted
-                  type: integer
+                  type: long
                   description:
 
                 - name: keyspace.hits
-                  type: integer
+                  type: long
                   description:
 
                 - name: keyspace.misses
-                  type: integer
+                  type: long
                   description:
 
                 - name: pubsub_channels
-                  type: integer
+                  type: long
                   description:
 
                 - name: pubsub_patterns
-                  type: integer
+                  type: long
                   description:
 
                 - name: latest_fork_usec
-                  type: integer
+                  type: long
                   description:
 
                 - name: migrate_cached_sockets
-                  type: integer
+                  type: long
                   description:
 
         - name: keyspace
@@ -1523,7 +1526,7 @@
             `system-core` contains local CPU core stats.
           fields:
             - name: id
-              type: integer
+              type: long
               description: >
                 CPU Core number.
 
@@ -2041,15 +2044,15 @@
               description: >
                 The process state. For example: "running".
             - name: pid
-              type: integer
+              type: long
               description: >
                 The process pid.
             - name: ppid
-              type: integer
+              type: long
               description: >
                 The process parent pid.
             - name: pgid
-              type: integer
+              type: long
               description: >
                 The process group id.
             - name: cmdline
@@ -2534,43 +2537,43 @@
               description: >
                 Approximate size of ZooKeeper data.
             - name: latency.avg
-              type: integer
+              type: long
               description: >
                 Average latency between ensemble hosts in milliseconds.
             - name: ephemerals_count
-              type: integer
+              type: long
               description: >
                 Number of ephemeral znodes.
             - name: followers
-              type: integer
+              type: long
               description: >
                 Number of followers seen by the current host.
             - name: max_file_descriptor_count
-              type: integer
+              type: long
               description: >
                 Maximum number of file descriptors allowed for the ZooKeeper process.
             - name: latency.max
-              type: integer
+              type: long
               description: >
                 Maximum latency in milliseconds.
             - name: latency.min
-              type: integer
+              type: long
               description: >
                 Minimum latency in milliseconds.
             - name: num_alive_connections
-              type: integer
+              type: long
               description: >
                 Number of connections to ZooKeeper that are currently alive.
             - name: open_file_descriptor_count
-              type: integer
+              type: long
               description: >
                 Number of file descriptors open by the ZooKeeper process.
             - name: outstanding_requests
-              type: integer
+              type: long
               description: >
                 Number of outstanding requests that need to be processed by the cluster.
             - name: packets.received
-              type: integer
+              type: long
               description: >
                 Number of ZooKeeper network packets received.
             - name: packets.sent
@@ -2578,7 +2581,7 @@
               description: >
                 Number of ZooKeeper network packets sent.
             - name: pending_syncs
-              type: integer
+              type: long
               description: >
                 Number of pending syncs to carry out to ZooKeeper ensemble followers.
             - name: server_state
@@ -2586,7 +2589,7 @@
               description: >
                 Role in the ZooKeeper ensemble.
             - name: synced_followers
-              type: integer
+              type: long
               description: >
                 Number of synced followers reported when a node server_state is leader.
             - name: version
@@ -2594,11 +2597,11 @@
               description: >
                 ZooKeeper version and build string reported.
             - name: watch_count
-              type: integer
+              type: long
               description: >
                 Number of watches currently set on the local ZooKeeper process.
             - name: znode_count
-              type: integer
+              type: long
               description: >
                 Number of znodes reported by the local ZooKeeper process.
 

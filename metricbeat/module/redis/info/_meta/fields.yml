@@ -9,22 +9,22 @@
         Redis client stats.
       fields:
         - name: connected
-          type: integer
+          type: long
           description: >
             Number of client connections (excluding connections from slaves).
 
         - name: longest_output_list
-          type: integer
+          type: long
           description: >
             Longest output list among current client connections.
 
         - name: biggest_input_buf
-          type: integer
+          type: long
           description: >
             Biggest input buffer among current client connections.
 
         - name: blocked
-          type: integer
+          type: long
           description: >
             Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH).
 
@@ -44,22 +44,22 @@
         Redis CPU stats
       fields:
         - name: used.sys
-          type: half_float
+          type: scaled_float
           description: >
             System CPU consumed by the Redis server.
 
         - name: used.sys_children
-          type: half_float
+          type: scaled_float
           description: >
             User CPU consumed by the Redis server.
 
         - name: used.user
-          type: half_float
+          type: scaled_float
           description: >
             System CPU consumed by the background processes.
 
         - name: used.user_children
-          type: half_float
+          type: scaled_float
           description: >
             User CPU consumed by the background processes.
 
@@ -69,22 +69,22 @@
         Redis CPU stats.
       fields:
         - name: used.value
-          type: integer
+          type: long
           description: >
             Used memory.
 
         - name: used.rss
-          type: integer
+          type: long
           description: >
             Used memory rss.
 
         - name: used.peak
-          type: integer
+          type: long
           description: >
             Used memory peak.
 
         - name: used.lua
-          type: integer
+          type: long
           description: >
             Used memory lua.
 
@@ -103,7 +103,7 @@
           description:
 
         - name: rdb.changes_since_last_save
-          type: integer
+          type: long
           description:
 
         - name: rdb.bgsave_in_progress
@@ -111,7 +111,7 @@
           description:
 
         - name: rdb.last_save_time
-          type: integer
+          type: long
           description:
 
         - name: rdb.last_bgsave_status
@@ -119,11 +119,11 @@
           description:
 
         - name: rdb.last_bgsave_time_sec
-          type: integer
+          type: long
           description:
 
         - name: rdb.current_bgsave_time_sec
-          type: integer
+          type: long
           description:
 
         - name: aof.enabled
@@ -139,11 +139,11 @@
           description:
 
         - name: aof.last_rewrite_time_sec
-          type: integer
+          type: long
           description:
 
         - name: aof.current_rewrite_time_sec
-          type: integer
+          type: long
           description:
 
         - name: aof.last_bgrewrite_status
@@ -164,27 +164,27 @@
           description:
 
         - name: connected_slaves
-          type: integer
+          type: long
           description:
 
         - name: master_offset
-          type: integer
+          type: long
           description:
 
         - name: backlog.active
-          type: integer
+          type: long
           description:
 
         - name: backlog.size
-          type: integer
+          type: long
           description:
 
         - name: backlog.first_byte_offset
-          type: integer
+          type: long
           description:
 
         - name: backlog.histlen
-          type: integer
+          type: long
           description:
 
     - name: server
@@ -229,7 +229,7 @@
           description:
 
         - name: process_id
-          type: integer
+          type: long
           description:
 
         - name: run_id
@@ -237,19 +237,19 @@
           description:
 
         - name: tcp_port
-          type: integer
+          type: long
           description:
 
         - name: uptime
-          type: integer
+          type: long
           description:
 
         - name: hz
-          type: integer
+          type: long
           description:
 
         - name: lru_clock
-          type: integer
+          type: long
           description:
 
         - name: config_file
@@ -262,78 +262,78 @@
         Redis stats.
       fields:
         - name: connections.received
-          type: integer
+          type: long
           description:
 
         - name: connections.rejected
-          type: integer
+          type: long
           description:
 
         - name: total_commands_processed
-          type: integer
+          type: long
           description:
 
         - name: total_net_input_bytes
-          type: integer
+          type: long
           description:
 
         - name: total_net_output_bytes
-          type: integer
+          type: long
           description:
 
         - name: instantaneous_ops_per_sec
-          type: integer
+          type: long
           description:
 
         - name: instantaneous_input_kbps
-          type: float
+          type: scaled_float
           description:
 
         - name: instantaneous_output_kbps
-          type: float
+          type: scaled_float
           description:
 
         - name: sync.full
-          type: integer
+          type: long
           description:
 
         - name: sync.partial_ok
-          type: integer
+          type: long
           description:
 
         - name: sync.partial_err
-          type: integer
+          type: long
           description:
 
         - name: keys.expired
-          type: integer
+          type: long
           description:
 
         - name: keys.evicted
-          type: integer
+          type: long
           description:
 
         - name: keyspace.hits
-          type: integer
+          type: long
           description:
 
         - name: keyspace.misses
-          type: integer
+          type: long
           description:
 
         - name: pubsub_channels
-          type: integer
+          type: long
           description:
 
         - name: pubsub_patterns
-          type: integer
+          type: long
           description:
 
         - name: latest_fork_usec
-          type: integer
+          type: long
           description:
 
         - name: migrate_cached_sockets
-          type: integer
+          type: long
           description:
 
