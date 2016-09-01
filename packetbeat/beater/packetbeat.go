@@ -49,11 +49,6 @@ type CmdLineArgs struct {
 
 var cmdLineArgs CmdLineArgs
 
-const (
-	defaultQueueSize     = 2048
-	defaultBulkQueueSize = 0
-)
-
 func init() {
 	cmdLineArgs = CmdLineArgs{
 		File:         flag.String("I", "", "Read packet data from specified file"),
@@ -103,16 +98,10 @@ func (pb *Packetbeat) init(b *beat.Beat) error {
 		return err
 	}
 
-	queueSize := defaultQueueSize
-	if b.Config.Shipper.QueueSize != nil {
-		queueSize = *b.Config.Shipper.QueueSize
-	}
-	bulkQueueSize := defaultBulkQueueSize
-	if b.Config.Shipper.BulkQueueSize != nil {
-		bulkQueueSize = *b.Config.Shipper.BulkQueueSize
-	}
+	// This is required as init Beat is called before the beat publisher is initialised
+	b.Config.Shipper.InitShipperConfig()
 
-	pb.Pub, err = publish.NewPublisher(b.Publisher, queueSize, bulkQueueSize, pb.Config.IgnoreOutgoing)
+	pb.Pub, err = publish.NewPublisher(b.Publisher, *b.Config.Shipper.QueueSize, *b.Config.Shipper.BulkQueueSize, pb.Config.IgnoreOutgoing)
 	if err != nil {
 		return fmt.Errorf("Initializing publisher failed: %v", err)
 	}

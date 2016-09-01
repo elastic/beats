@@ -209,6 +209,10 @@ metricbeat.modules:
 # Internal queue size for single events in processing pipeline
 #queue_size: 1000
 
+# The internal queue size for bulk events in the processing pipeline.
+# Do not modify this value.
+#bulk_queue_size: 0
+
 # Sets the maximum number of CPUs that can be executing simultaneously. The
 # default is the number of logical CPUs available in the system.
 #max_procs:
