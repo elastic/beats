@@ -101,8 +101,8 @@ type Topology struct {
 }
 
 const (
-	defaultChanSize     = 1000
-	defaultBulkChanSize = 0
+	DefaultQueueSize     = 1000
+	DefaultBulkQueueSize = 0
 )
 
 func init() {
@@ -209,15 +209,7 @@ func (publisher *BeatPublisher) init(
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
-	hwm := defaultChanSize
-	if shipper.QueueSize != nil && *shipper.QueueSize > 0 {
-		hwm = *shipper.QueueSize
-	}
-
-	bulkHWM := defaultBulkChanSize
-	if shipper.BulkQueueSize != nil && *shipper.BulkQueueSize >= 0 {
-		bulkHWM = *shipper.BulkQueueSize
-	}
+	shipper.InitShipperConfig()
 
 	publisher.geoLite = common.LoadGeoIPData(shipper.Geoip)
 
@@ -243,8 +235,8 @@ func (publisher *BeatPublisher) init(
 					config,
 					output,
 					&publisher.wsOutput,
-					hwm,
-					bulkHWM))
+					*shipper.QueueSize,
+					*shipper.BulkQueueSize))
 
 			if ok, _ := config.Bool("save_topology", 0); !ok {
 				continue
@@ -322,8 +314,8 @@ func (publisher *BeatPublisher) init(
 		go publisher.UpdateTopologyPeriodically()
 	}
 
-	publisher.pipelines.async = newAsyncPipeline(publisher, hwm, bulkHWM, &publisher.wsPublisher)
-	publisher.pipelines.sync = newSyncPipeline(publisher, hwm, bulkHWM)
+	publisher.pipelines.async = newAsyncPipeline(publisher, *shipper.QueueSize, *shipper.BulkQueueSize, &publisher.wsPublisher)
+	publisher.pipelines.sync = newSyncPipeline(publisher, *shipper.QueueSize, *shipper.BulkQueueSize)
 	return nil
 }
 
@@ -334,4 +326,18 @@ func (publisher *BeatPublisher) Stop() {
 
 	publisher.wsPublisher.stop()
 	publisher.wsOutput.stop()
+}
+
+func (config *ShipperConfig) InitShipperConfig() {
+
+	// TODO: replace by ucfg
+	if config.QueueSize == nil || *config.QueueSize <= 0 {
+		queueSize := DefaultQueueSize
+		config.QueueSize = &queueSize
+	}
+
+	if config.BulkQueueSize == nil || *config.BulkQueueSize < 0 {
+		bulkQueueSize := DefaultBulkQueueSize
+		config.BulkQueueSize = &bulkQueueSize
+	}
 }
