@@ -14,11 +14,13 @@ grouped in the following categories:
 
 * <<exported-fields-apache>>
 * <<exported-fields-beat>>
+* <<exported-fields-beats>>
 * <<exported-fields-common>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
+* <<exported-fields-postgresql>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
 * <<exported-fields-zookeeper>>
@@ -142,7 +144,7 @@ CPU stats.
 [float]
 === apache.status.cpu.load
 
-type: half_float
+type: scaled_float
 
 CPU Load.
 
@@ -150,7 +152,7 @@ CPU Load.
 [float]
 === apache.status.cpu.user
 
-type: half_float
+type: scaled_float
 
 CPU user load.
 
@@ -158,7 +160,7 @@ CPU user load.
 [float]
 === apache.status.cpu.system
 
-type: half_float
+type: scaled_float
 
 System cpu.
 
@@ -166,7 +168,7 @@ System cpu.
 [float]
 === apache.status.cpu.children_user
 
-type: half_float
+type: scaled_float
 
 CPU of children user.
 
@@ -174,7 +176,7 @@ CPU of children user.
 [float]
 === apache.status.cpu.children_system
 
-type: half_float
+type: scaled_float
 
 CPU of children system.
 
@@ -362,7 +364,7 @@ Contains common beat fields available in all event types.
 [float]
 === beat.name
 
-The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
 
 
 [float]
@@ -376,9 +378,9 @@ The hostname as returned by the operating system on which the Beat is running.
 
 type: date
 
-example: 2015-01-24 14:06:05.071000
+example: August 26th 2016, 12:35:53.332
 
-format: YYYY-MM-DDTHH:MM:SS.milliZ
+format: date
 
 required: True
 
@@ -397,6 +399,260 @@ Arbitrary tags that can be set per Beat and per transaction type.
 type: dict
 
 Contains user configurable fields.
+
+
+[[exported-fields-beats]]
+== beats Fields
+
+beats Module
+
+
+
+[float]
+== beats Fields
+
+
+
+
+[float]
+== filebeat Fields
+
+experimental[]
+filebeat metrics
+
+
+
+[float]
+== harvesters Fields
+
+Harvester metrics for all harvesters combined.
+
+
+
+[float]
+=== beats.filebeat.harvesters.started
+
+type: long
+
+Total number of started harvesters.
+
+
+[float]
+=== beats.filebeat.harvesters.closed
+
+type: long
+
+Total number of closed harvesters.
+
+
+[float]
+=== beats.filebeat.harvesters.running
+
+type: long
+
+Number of currently running harvesters.
+
+
+[float]
+=== beats.filebeat.harvesters.skipped
+
+type: long
+
+Total number of harvesters starts that were skipped because of harvester_limit reached.
+
+
+[float]
+== files Fields
+
+File handling related statistics.
+
+
+
+[float]
+=== beats.filebeat.harvesters.files.open
+
+type: long
+
+Currently open files.
+
+
+[float]
+=== beats.filebeat.harvesters.files.truncated
+
+type: long
+
+Number of files which were detected by the harvester as truncated and reading started from scratch.
+
+
+[float]
+== prospectors Fields
+
+Prospector metrics for all prospectors combined.
+
+
+
+[float]
+== log_files Fields
+
+Log files related stastics.
+
+
+
+[float]
+=== beats.filebeat.prospectors.log_files.renamed
+
+type: long
+
+Total number of files for which renaming was detected.
+
+
+[float]
+=== beats.filebeat.prospectors.log_files.truncated
+
+type: long
+
+Number of files which were detected by the prospector as truncated and reading started from scratch.
+
+
+[float]
+== registrar Fields
+
+Registrar statistics
+
+
+
+[float]
+== states Fields
+
+Registrar states metrics.
+
+
+
+[float]
+=== beats.filebeat.registrar.states.update
+
+type: long
+
+Total number of states which were updated or added.
+
+
+[float]
+=== beats.filebeat.registrar.states.cleanup
+
+type: long
+
+Total number of states which were cleaned up (removed).
+
+
+[float]
+=== beats.filebeat.registrar.states.current
+
+type: long
+
+The current number of states in the registry file.
+
+
+[float]
+=== beats.filebeat.registrar.writes
+
+type: long
+
+Total number of times the registry file was written to disk.
+
+
+[float]
+== libbeat Fields
+
+experimental[]
+libbeat metrics. This metricset can be used with all beats.
+
+
+
+[float]
+== output Fields
+
+Output related metrics
+
+
+
+[float]
+== elasticsearch Fields
+
+Elasticsearch specific metrics
+
+
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.events.ack
+
+type: long
+
+Number of acknowledged events by elasticsearch
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.events.not_ack
+
+type: long
+
+Number of not acknowledged events by elasticsearch
+
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.read.bytes
+
+type: long
+
+Number of bytes read by the output
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.read.errors
+
+type: long
+
+Number of read errors
+
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.write.bytes
+
+type: long
+
+Number of bytes written by the output
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.write.errors
+
+type: long
+
+Number of write errors
+
+
+[float]
+== publisher Fields
+
+General publisher metrics
+
+
+
+[float]
+== events Fields
+
+Log files related stastics.
+
+
+
+[float]
+=== beats.libbeat.publisher.events.published
+
+type: long
+
+Total number of events published
 
 
 [[exported-fields-common]]
@@ -765,6 +1021,8 @@ Platform specific data.
 
 type: long
 
+format: bytes
+
 The total size in bytes of heap space used by the database process. Only available on Unix/Linux.
 
 
@@ -788,6 +1046,8 @@ Platform specific data.
 
 type: long
 
+format: bytes
+
 The amount of network traffic, in bytes, received by this database.
 
 
@@ -795,6 +1055,8 @@ The amount of network traffic, in bytes, received by this database.
 === mongodb.status.network.out.bytes
 
 type: long
+
+format: bytes
 
 The amount of network traffic, in bytes, sent from this database.
 
@@ -1056,6 +1318,8 @@ Bytes stats.
 
 type: integer
 
+format: bytes
+
 The number of bytes received from all clients.
 
 
@@ -1063,6 +1327,8 @@ The number of bytes received from all clients.
 === mysql.status.bytes.sent
 
 type: integer
+
+format: bytes
 
 The number of bytes sent to all clients.
 
@@ -1275,6 +1541,407 @@ The current number of connections where Nginx is writing the response back to th
 type: integer
 
 The current number of idle client connections waiting for a request.
+
+
+[[exported-fields-postgresql]]
+== PostgreSQL Fields
+
+Metrics collected from PostgreSQL servers.
+
+
+
+[float]
+== postgresql Fields
+
+PostgreSQL metrics.
+
+
+
+[float]
+== activity Fields
+
+One document per server process, showing information related to the current activity of that process, such as state and current query. Collected by querying pg_stat_activity.
+
+
+
+[float]
+=== postgresql.activity.database.oid
+
+type: long
+
+OID of the database this backend is connected to.
+
+
+[float]
+=== postgresql.activity.database.name
+
+type: keyword
+
+Name of the database this backend is connected to.
+
+
+[float]
+=== postgresql.activity.pid
+
+type: integer
+
+Process ID of this backend.
+
+
+[float]
+=== postgresql.activity.user.id
+
+type: long
+
+OID of the user logged into this backend.
+
+
+[float]
+=== postgresql.activity.user.name
+
+Name of the user logged into this backend.
+
+
+[float]
+=== postgresql.activity.application_name
+
+Name of the application that is connected to this backend.
+
+
+[float]
+=== postgresql.activity.client.address
+
+IP address of the client connected to this backend.
+
+
+[float]
+=== postgresql.activity.client.hostname
+
+Host name of the connected client, as reported by a reverse DNS lookup of client_addr.
+
+
+[float]
+=== postgresql.activity.client.port
+
+type: integer
+
+TCP port number that the client is using for communication with this backend, or -1 if a Unix socket is used.
+
+
+[float]
+=== postgresql.activity.backend_start
+
+type: date
+
+Time when this process was started, i.e., when the client connected to the server.
+
+
+[float]
+=== postgresql.activity.transaction_start
+
+type: date
+
+Time when this process' current transaction was started.
+
+
+[float]
+=== postgresql.activity.query_start
+
+type: date
+
+Time when the currently active query was started, or if state is not active, when the last query was started.
+
+
+[float]
+=== postgresql.activity.state_change
+
+type: date
+
+Time when the state was last changed.
+
+
+[float]
+=== postgresql.activity.waiting
+
+type: boolean
+
+True if this backend is currently waiting on a lock.
+
+
+[float]
+=== postgresql.activity.state
+
+Current overall state of this backend. Possible values are:
+
+  * active: The backend is executing a query.
+  * idle: The backend is waiting for a new client command.
+  * idle in transaction: The backend is in a transaction, but is not
+    currently executing a query.
+  * idle in transaction (aborted): This state is similar to idle in
+    transaction, except one of the statements in the transaction caused
+    an error.
+  * fastpath function call: The backend is executing a fast-path function.
+  * disabled: This state is reported if track_activities is disabled in this backend.
+
+
+[float]
+=== postgresql.activity.query
+
+Text of this backend's most recent query. If state is active this field shows the currently executing query. In all other states, it shows the last query that was executed.
+
+
+[float]
+== bgwriter Fields
+
+Statistics about the background writer process's activity. Collected using the pg_stat_bgwriter query.
+
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.scheduled
+
+type: long
+
+Number of scheduled checkpoints that have been performed.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.requested
+
+type: long
+
+Number of requested checkpoints that have been performed.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.times.write.ms
+
+type: float
+
+Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.times.sync.ms
+
+type: float
+
+Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk, in milliseconds.
+
+
+[float]
+=== postgresql.bgwriter.buffers.checkpoints
+
+type: long
+
+Number of buffers written during checkpoints.
+
+
+[float]
+=== postgresql.bgwriter.buffers.clean
+
+type: long
+
+Number of buffers written by the background writer.
+
+
+[float]
+=== postgresql.bgwriter.buffers.clean_full
+
+type: long
+
+Number of times the background writer stopped a cleaning scan because it had written too many buffers.
+
+
+[float]
+=== postgresql.bgwriter.buffers.backend
+
+type: long
+
+Number of buffers written directly by a backend.
+
+
+[float]
+=== postgresql.bgwriter.buffers.backend_fsync
+
+type: long
+
+Number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write)
+
+
+[float]
+=== postgresql.bgwriter.buffers.allocated
+
+type: long
+
+Number of buffers allocated.
+
+
+[float]
+=== postgresql.bgwriter.stats_reset
+
+type: date
+
+Time at which these statistics were last reset.
+
+
+[float]
+== database Fields
+
+One row per database, showing database-wide statistics. Collected by querying pg_stat_database
+
+
+
+[float]
+=== postgresql.database.oid
+
+type: long
+
+OID of the database this backend is connected to.
+
+
+[float]
+=== postgresql.database.name
+
+type: keyword
+
+Name of the database this backend is connected to.
+
+
+[float]
+=== postgresql.database.number_of_backends
+
+type: long
+
+Number of backends currently connected to this database.
+
+
+[float]
+=== postgresql.database.transactions.commit
+
+type: long
+
+Number of transactions in this database that have been committed.
+
+
+[float]
+=== postgresql.database.transactions.rollback
+
+type: long
+
+Number of transactions in this database that have been rolled back.
+
+
+[float]
+=== postgresql.database.blocks.read
+
+type: long
+
+Number of disk blocks read in this database.
+
+
+[float]
+=== postgresql.database.blocks.hit
+
+type: long
+
+Number of times disk blocks were found already in the buffer cache, so that a read was not necessary (this only includes hits in the PostgreSQL buffer cache, not the operating system's file system cache).
+
+
+[float]
+=== postgresql.database.blocks.time.read.ms
+
+type: long
+
+Time spent reading data file blocks by backends in this database, in milliseconds.
+
+
+[float]
+=== postgresql.database.blocks.time.write.ms
+
+type: long
+
+Time spent writing data file blocks by backends in this database, in milliseconds.
+
+
+[float]
+=== postgresql.database.rows.returned
+
+type: long
+
+Number of rows returned by queries in this database.
+
+
+[float]
+=== postgresql.database.rows.fetched
+
+type: long
+
+Number of rows fetched by queries in this database.
+
+
+[float]
+=== postgresql.database.rows.inserted
+
+type: long
+
+Number of rows inserted by queries in this database.
+
+
+[float]
+=== postgresql.database.rows.updated
+
+type: long
+
+Number of rows updated by queries in this database.
+
+
+[float]
+=== postgresql.database.rows.deleted
+
+type: long
+
+Number of rows deleted by queries in this database.
+
+
+[float]
+=== postgresql.database.conflicts
+
+type: long
+
+Number of queries canceled due to conflicts with recovery in this database.
+
+
+[float]
+=== postgresql.database.temporary.files
+
+type: long
+
+Number of temporary files created by queries in this database. All temporary files are counted, regardless of why the temporary file was created (e.g., sorting or hashing), and regardless of the log_temp_files setting.
+
+
+[float]
+=== postgresql.database.temporary.bytes
+
+type: long
+
+Total amount of data written to temporary files by queries in this database. All temporary files are counted, regardless of why the temporary file was created, and regardless of the log_temp_files setting.
+
+
+[float]
+=== postgresql.database.deadlocks
+
+type: long
+
+Number of deadlocks detected in this database.
+
+
+[float]
+=== postgresql.database.stats_reset
+
+type: date
+
+Time at which these statistics were last reset.
 
 
 [[exported-fields-redis]]
@@ -1928,7 +2595,9 @@ CPU Core number.
 [float]
 === system.core.user.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
@@ -1944,7 +2613,9 @@ The amount of CPU time spent in user space.
 [float]
 === system.core.system.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in kernel space.
 
@@ -1960,7 +2631,9 @@ The amount of CPU time spent in kernel space.
 [float]
 === system.core.nice.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent on low-priority processes.
 
@@ -1976,7 +2649,9 @@ The amount of CPU time spent on low-priority processes.
 [float]
 === system.core.idle.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent idle.
 
@@ -1992,7 +2667,9 @@ The amount of CPU time spent idle.
 [float]
 === system.core.iowait.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in wait (on disk).
 
@@ -2008,7 +2685,9 @@ The amount of CPU time spent in wait (on disk).
 [float]
 === system.core.irq.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -2024,7 +2703,9 @@ The amount of CPU time spent servicing and handling hardware interrupts.
 [float]
 === system.core.softirq.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent servicing and handling software interrupts.
 
@@ -2040,7 +2721,9 @@ The amount of CPU time spent servicing and handling software interrupts.
 [float]
 === system.core.steal.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
@@ -2063,7 +2746,9 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 [float]
 === system.cpu.user.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
@@ -2071,7 +2756,9 @@ The percentage of CPU time spent in user space. On multi-core systems, you can h
 [float]
 === system.cpu.system.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in kernel space.
 
@@ -2079,7 +2766,9 @@ The percentage of CPU time spent in kernel space.
 [float]
 === system.cpu.nice.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent on low-priority processes.
 
@@ -2087,7 +2776,9 @@ The percentage of CPU time spent on low-priority processes.
 [float]
 === system.cpu.idle.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent idle.
 
@@ -2095,7 +2786,9 @@ The percentage of CPU time spent idle.
 [float]
 === system.cpu.iowait.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in wait (on disk).
 
@@ -2103,7 +2796,9 @@ The percentage of CPU time spent in wait (on disk).
 [float]
 === system.cpu.irq.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -2111,7 +2806,9 @@ The percentage of CPU time spent servicing and handling hardware interrupts.
 [float]
 === system.cpu.softirq.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent servicing and handling software interrupts.
 
@@ -2119,7 +2816,9 @@ The percentage of CPU time spent servicing and handling software interrupts.
 [float]
 === system.cpu.steal.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
@@ -2189,37 +2888,6 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 
 [float]
-== load Fields
-
-Load averages.
-
-
-
-[float]
-=== system.cpu.load.1
-
-type: half_float
-
-Load average for the last minute.
-
-
-[float]
-=== system.cpu.load.5
-
-type: half_float
-
-Load average for the last 5 minutes.
-
-
-[float]
-=== system.cpu.load.15
-
-type: half_float
-
-Load average for the last 15 minutes.
-
-
-[float]
 == diskio Fields
 
 `disk` contains disk IO metrics collected from the operating system.
@@ -2265,6 +2933,8 @@ The total number of writes completed successfully.
 
 type: long
 
+format: bytes
+
 The total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
 
 
@@ -2272,6 +2942,8 @@ The total number of bytes read successfully. On Linux this is the number of sect
 === system.diskio.write.bytes
 
 type: long
+
+format: bytes
 
 The total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
 
@@ -2308,9 +2980,11 @@ The total number of of milliseconds spent doing I/Os.
 
 
 [float]
-=== system.filesystem.avail
+=== system.filesystem.available
 
 type: long
+
+format: bytes
 
 The disk space available to an unprivileged user in bytes.
 
@@ -2344,6 +3018,8 @@ The total number of file nodes in the file system.
 
 type: long
 
+format: bytes
+
 The disk space available in bytes.
 
 
@@ -2360,6 +3036,8 @@ The number of free file nodes in the file system.
 
 type: long
 
+format: bytes
+
 The total disk space in bytes.
 
 
@@ -2368,13 +3046,17 @@ The total disk space in bytes.
 
 type: long
 
+format: bytes
+
 The used disk space in bytes.
 
 
 [float]
 === system.filesystem.used.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of used disk space.
 
@@ -2411,6 +3093,8 @@ Nested file system docs.
 
 type: long
 
+format: bytes
+
 Total free space.
 
 
@@ -2418,6 +3102,8 @@ Total free space.
 === system.fsstat.total_size.used
 
 type: long
+
+format: bytes
 
 Total used space.
 
@@ -2427,7 +3113,64 @@ Total used space.
 
 type: long
 
+format: bytes
+
 Total space (used plus free).
+
+
+[float]
+== load Fields
+
+Load averages.
+
+
+
+[float]
+=== system.load.1
+
+type: scaled_float
+
+Load average for the last minute.
+
+
+[float]
+=== system.load.5
+
+type: scaled_float
+
+Load average for the last 5 minutes.
+
+
+[float]
+=== system.load.15
+
+type: scaled_float
+
+Load average for the last 15 minutes.
+
+
+[float]
+=== system.load.norm.1
+
+type: scaled_float
+
+Load divided by the number of cores for the last minute.
+
+
+[float]
+=== system.load.norm.5
+
+type: scaled_float
+
+Load divided by the number of cores for the last 5 minutes.
+
+
+[float]
+=== system.load.norm.15
+
+type: scaled_float
+
+Load divided by the number of cores for the last 15 minutes.
 
 
 [float]
@@ -2442,6 +3185,8 @@ Total space (used plus free).
 
 type: long
 
+format: bytes
+
 Total memory.
 
 
@@ -2449,6 +3194,8 @@ Total memory.
 === system.memory.used.bytes
 
 type: long
+
+format: bytes
 
 Used memory.
 
@@ -2458,13 +3205,17 @@ Used memory.
 
 type: long
 
-Available memory.
+format: bytes
+
+The total amount of free memory in bytes. This value does not include memory consumed by system caches and buffers (see system.memory.actual.free).
 
 
 [float]
 === system.memory.used.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of used memory.
 
@@ -2472,7 +3223,7 @@ The percentage of used memory.
 [float]
 == actual Fields
 
-Actual memory fields.
+Actual memory used and free.
 
 
 
@@ -2481,7 +3232,7 @@ Actual memory fields.
 
 type: long
 
-Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
+Actual used memory in bytes. It represents the difference between the total and the available memory. The available memory depends on the OS. For more details, please check `system.actual.free`.
 
 
 [float]
@@ -2489,13 +3240,13 @@ Actual used memory. This value is the "used" memory minus the memory used for di
 
 type: long
 
-Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
+Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is the  amount of unreserved and uncommitted memory currently in the user-mode portion of the virtual address space of the calling process.
 
 
 [float]
 === system.memory.actual.used.pct
 
-type: half_float
+type: scaled_float
 
 The percentage of actual used memory.
 
@@ -2511,6 +3262,8 @@ This group contains statistics related to the swap memory usage on the system.
 
 type: long
 
+format: bytes
+
 Total swap memory.
 
 
@@ -2518,6 +3271,8 @@ Total swap memory.
 === system.memory.swap.used.bytes
 
 type: long
+
+format: bytes
 
 Used swap memory.
 
@@ -2527,13 +3282,17 @@ Used swap memory.
 
 type: long
 
+format: bytes
+
 Available swap memory.
 
 
 [float]
 === system.memory.swap.used.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of used swap memory.
 
@@ -2560,6 +3319,8 @@ The network interface name.
 
 type: long
 
+format: bytes
+
 The number of bytes sent.
 
 
@@ -2567,6 +3328,8 @@ The number of bytes sent.
 === system.network.in.bytes
 
 type: long
+
+format: bytes
 
 The number of bytes received.
 
@@ -2699,7 +3462,9 @@ The amount of CPU time the process spent in user space.
 [float]
 === system.process.cpu.total.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent by the process since the last update. Its value is similar to the %CPU value of the process displayed by the top command on Unix systems.
 
@@ -2723,9 +3488,9 @@ The total CPU time spent by the process.
 [float]
 === system.process.cpu.start_time
 
-type: keyword
+type: date
 
-The time when the process was started. Example: "17:45".
+The time when the process was started.
 
 
 [float]
@@ -2739,6 +3504,8 @@ Memory-specific statistics per process.
 
 type: long
 
+format: bytes
+
 The total virtual memory the process has.
 
 
@@ -2747,13 +3514,17 @@ The total virtual memory the process has.
 
 type: long
 
+format: bytes
+
 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
 
 [float]
 === system.process.memory.rss.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of memory the process occupied in main memory (RAM).
 
@@ -2763,7 +3534,562 @@ The percentage of memory the process occupied in main memory (RAM).
 
 type: long
 
+format: bytes
+
 The shared memory the process uses.
+
+
+[float]
+== fd Fields
+
+File descriptor usage metrics. This set of metrics is available for Linux and FreeBSD.
+
+
+
+[float]
+=== system.process.fd.open
+
+type: long
+
+The number of file descriptors open by the process.
+
+[float]
+=== system.process.fd.limit.soft
+
+type: long
+
+The soft limit on the number of file descriptors opened by the process. The soft limit can be changed by the process at any time.
+
+
+[float]
+=== system.process.fd.limit.hard
+
+type: long
+
+The hard limit on the number of file descriptors opened by the process. The hard limit can only be raised by root.
+
+
+[float]
+== cgroup Fields
+
+experimental[]
+Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.
+
+
+
+[float]
+=== system.process.cgroup.id
+
+type: keyword
+
+The ID common to all cgroups associated with this task. If there isn't a common ID used by all cgroups this field will be absent.
+
+
+[float]
+=== system.process.cgroup.path
+
+type: keyword
+
+The path to the cgroup relative to the cgroup subsystem's mountpoint. If there isn't a common path used by all cgroups this field will be absent.
+
+
+[float]
+== cpu Fields
+
+The cpu subsystem schedules CPU access for tasks in the cgroup. Access can be controlled by two separate schedulers, CFS and RT. CFS stands for completely fair scheduler which proportionally divides the CPU time between cgroups based on weight. RT stands for real time scheduler which sets a maximum amount of CPU time that processes in the cgroup can consume during a given period.
+
+
+
+[float]
+=== system.process.cgroup.cpu.id
+
+type: keyword
+
+ID of the cgroup.
+
+[float]
+=== system.process.cgroup.cpu.path
+
+type: keyword
+
+Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
+
+[float]
+=== system.process.cgroup.cpu.cfs.period.us
+
+type: long
+
+Period of time in microseconds for how regularly a cgroup's access to CPU resources should be reallocated.
+
+
+[float]
+=== system.process.cgroup.cpu.cfs.quota.us
+
+type: long
+
+Total amount of time in microseconds for which all tasks in a cgroup can run during one period (as defined by cfs.period.us).
+
+
+[float]
+=== system.process.cgroup.cpu.cfs.shares
+
+type: long
+
+An integer value that specifies a relative share of CPU time available to the tasks in a cgroup. The value specified in the cpu.shares file must be 2 or higher.
+
+
+[float]
+=== system.process.cgroup.cpu.rt.period.us
+
+type: long
+
+Period of time in microseconds for how regularly a cgroup's access to CPU resources is reallocated.
+
+
+[float]
+=== system.process.cgroup.cpu.rt.runtime.us
+
+type: long
+
+Period of time in microseconds for the longest continuous period in which the tasks in a cgroup have access to CPU resources.
+
+
+[float]
+=== system.process.cgroup.cpu.stats.periods
+
+type: long
+
+Number of period intervals (as specified in cpu.cfs.period.us) that have elapsed.
+
+
+[float]
+=== system.process.cgroup.cpu.stats.throttled.periods
+
+type: long
+
+Number of times tasks in a cgroup have been throttled (that is, not allowed to run because they have exhausted all of the available time as specified by their quota).
+
+
+[float]
+=== system.process.cgroup.cpu.stats.throttled.ns
+
+type: long
+
+The total time duration (in nanoseconds) for which tasks in a cgroup have been throttled.
+
+
+[float]
+== cpuacct Fields
+
+CPU accounting metrics.
+
+
+[float]
+=== system.process.cgroup.cpuacct.id
+
+type: keyword
+
+ID of the cgroup.
+
+[float]
+=== system.process.cgroup.cpuacct.path
+
+type: keyword
+
+Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
+
+[float]
+=== system.process.cgroup.cpuacct.total.ns
+
+type: long
+
+Total CPU time in nanoseconds consumed by all tasks in the cgroup.
+
+
+[float]
+=== system.process.cgroup.cpuacct.stats.user.ns
+
+type: long
+
+CPU time consumed by tasks in user mode.
+
+[float]
+=== system.process.cgroup.cpuacct.stats.system.ns
+
+type: long
+
+CPU time consumed by tasks in user (kernel) mode.
+
+[float]
+=== system.process.cgroup.cpuacct.percpu
+
+type: dict
+
+CPU time (in nanoseconds) consumed on each CPU by all tasks in this cgroup.
+
+
+[float]
+== memory Fields
+
+Memory limits and metrics.
+
+
+[float]
+=== system.process.cgroup.memory.id
+
+type: keyword
+
+ID of the cgroup.
+
+[float]
+=== system.process.cgroup.memory.path
+
+type: keyword
+
+Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
+
+[float]
+=== system.process.cgroup.memory.mem.usage.bytes
+
+type: long
+
+format: bytes
+
+Total memory usage by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.mem.usage.max.bytes
+
+type: long
+
+format: bytes
+
+The maximum memory used by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.mem.limit.bytes
+
+type: long
+
+format: bytes
+
+The maximum amount of user memory in bytes (including file cache) that tasks in the cgroup are allowed to use.
+
+
+[float]
+=== system.process.cgroup.memory.mem.failures
+
+type: long
+
+The number of times that the memory limit (mem.limit.bytes) was reached.
+
+
+[float]
+=== system.process.cgroup.memory.memsw.usage.bytes
+
+type: long
+
+format: bytes
+
+The sum of current memory usage plus swap space used by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.memsw.usage.max.bytes
+
+type: long
+
+format: bytes
+
+The maximum amount of memory and swap space used by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.memsw.limit.bytes
+
+type: long
+
+format: bytes
+
+The maximum amount for the sum of memory and swap usage that tasks in the cgroup are allowed to use.
+
+
+[float]
+=== system.process.cgroup.memory.memsw.failures
+
+type: long
+
+The number of times that the memory plus swap space limit (memsw.limit.bytes) was reached.
+
+
+[float]
+=== system.process.cgroup.memory.kmem.usage.bytes
+
+type: long
+
+format: bytes
+
+Total kernel memory usage by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.kmem.usage.max.bytes
+
+type: long
+
+format: bytes
+
+The maximum kernel memory used by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.kmem.limit.bytes
+
+type: long
+
+format: bytes
+
+The maximum amount of kernel memory that tasks in the cgroup are allowed to use.
+
+
+[float]
+=== system.process.cgroup.memory.kmem.failures
+
+type: long
+
+The number of times that the memory limit (kmem.limit.bytes) was reached.
+
+
+[float]
+=== system.process.cgroup.memory.kmem_tcp.usage.bytes
+
+type: long
+
+format: bytes
+
+Total memory usage for TCP buffers in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.kmem_tcp.usage.max.bytes
+
+type: long
+
+format: bytes
+
+The maximum memory used for TCP buffers by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.kmem_tcp.limit.bytes
+
+type: long
+
+format: bytes
+
+The maximum amount of memory for TCP buffers that tasks in the cgroup are allowed to use.
+
+
+[float]
+=== system.process.cgroup.memory.kmem_tcp.failures
+
+type: long
+
+The number of times that the memory limit (kmem_tcp.limit.bytes) was reached.
+
+
+[float]
+=== system.process.cgroup.memory.stats.active_anon.bytes
+
+type: long
+
+format: bytes
+
+Anonymous and swap cache on active least-recently-used (LRU) list, including tmpfs (shmem), in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.active_file.bytes
+
+type: long
+
+format: bytes
+
+File-backed memory on active LRU list, in bytes.
+
+[float]
+=== system.process.cgroup.memory.stats.cache.bytes
+
+type: long
+
+format: bytes
+
+Page cache, including tmpfs (shmem), in bytes.
+
+[float]
+=== system.process.cgroup.memory.stats.hierarchical_memory_limit.bytes
+
+type: long
+
+format: bytes
+
+Memory limit for the hierarchy that contains the memory cgroup, in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.hierarchical_memsw_limit.bytes
+
+type: long
+
+format: bytes
+
+Memory plus swap limit for the hierarchy that contains the memory cgroup, in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.inactive_anon.bytes
+
+type: long
+
+format: bytes
+
+Anonymous and swap cache on inactive LRU list, including tmpfs (shmem), in bytes
+
+
+[float]
+=== system.process.cgroup.memory.stats.inactive_file.bytes
+
+type: long
+
+format: bytes
+
+File-backed memory on inactive LRU list, in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.mapped_file.bytes
+
+type: long
+
+format: bytes
+
+Size of memory-mapped mapped files, including tmpfs (shmem), in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.page_faults
+
+type: long
+
+Number of times that a process in the cgroup triggered a page fault.
+
+
+[float]
+=== system.process.cgroup.memory.stats.major_page_faults
+
+type: long
+
+Number of times that a process in the cgroup triggered a major fault. "Major" faults happen when the kernel actually has to read the data from disk.
+
+
+[float]
+=== system.process.cgroup.memory.stats.pages_in
+
+type: long
+
+Number of pages paged into memory. This is a counter.
+
+
+[float]
+=== system.process.cgroup.memory.stats.pages_out
+
+type: long
+
+Number of pages paged out of memory. This is a counter.
+
+
+[float]
+=== system.process.cgroup.memory.stats.rss.bytes
+
+type: long
+
+format: bytes
+
+Anonymous and swap cache (includes transparent hugepages), not including tmpfs (shmem), in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.rss_huge.bytes
+
+type: long
+
+format: bytes
+
+Number of bytes of anonymous transparent hugepages.
+
+
+[float]
+=== system.process.cgroup.memory.stats.swap.bytes
+
+type: long
+
+format: bytes
+
+Swap usage, in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.unevictable.bytes
+
+type: long
+
+format: bytes
+
+Memory that cannot be reclaimed, in bytes.
+
+
+[float]
+== blkio Fields
+
+Block IO metrics.
+
+
+[float]
+=== system.process.cgroup.blkio.id
+
+type: keyword
+
+ID of the cgroup.
+
+[float]
+=== system.process.cgroup.blkio.path
+
+type: keyword
+
+Path to the cgroup relative to the cgroup subsystems mountpoint.
+
+
+[float]
+=== system.process.cgroup.blkio.total.bytes
+
+type: keyword
+
+format: bytes
+
+Total number of bytes transferred to and from all block devices by processes in the cgroup.
+
+
+[float]
+=== system.process.cgroup.blkio.total.ios
+
+type: keyword
+
+Total number of I/O operations performed on all devices by processes in the cgroup as seen by the throttling policy.
 
 
 [[exported-fields-zookeeper]]

@@ -1,0 +1,3 @@
+=== beats libbeat MetricSet
+
+This is the libbeat metricset of the module beats.

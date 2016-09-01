@@ -95,23 +95,23 @@
                 CPU stats.
               fields:
                 - name: load
-                  type: half_float
+                  type: scaled_float
                   description: >
                     CPU Load.
                 - name: user
-                  type: half_float
+                  type: scaled_float
                   description: >
                     CPU user load.
                 - name: system
-                  type: half_float
+                  type: scaled_float
                   description: >
                     System cpu.
                 - name: children_user
-                  type: half_float
+                  type: scaled_float
                   description: >
                     CPU of children user.
                 - name: children_system
-                  type: half_float
+                  type: scaled_float
                   description: >
                     CPU of children system.
             - name: connections
@@ -205,6 +205,7 @@
                   type: integer
                   description: >
                     Total.
+
 - key: haproxy
   title: "haproxy"
   description: >
@@ -217,12 +218,724 @@
         - name: stat
           type: group
           description: >
-            stat
+            Results from haproxy stat
           fields:
-            - name: example
-              type: keyword
+            - name: pxname
+              type: string
               description: >
-                Example field
+                proxy name
+
+            - name: svname
+              type: string
+              description: >
+                service name (FRONTEND for frontend, BACKEND for backend, any name for server/listener)
+
+            - name: qcur
+              type: integer
+              description: >
+                current queued requests. For the backend this reports the number queued without a server assigned
+
+            - name: qmax
+              type: integer
+              description: >
+                max value of qcur
+
+            - name: scur
+              type: integer
+              description: >
+                current sessions
+
+            - name: smax
+              type: integer
+              description: >
+                max sessions
+
+            - name: slim
+              type: integer
+              description: >
+                configured session limit 
+
+            - name: stot
+              type: string
+              description: >
+                cumulative number of connections  
+
+            - name: bin
+              type: integer
+              description: >
+                bytes in
+
+            - name: bout
+              type: integer
+              description: >
+                bytes out
+
+            - name: dreq
+              type: integer
+              description: >
+                requests denied because of security concerns.
+                  * For tcp this is because of a matched tcp-request content rule.
+                  * For http this is because of a matched http-request or tarpit rule.
+
+            - name: dresp
+              type: integer
+              description: >
+                responses denied because of security concerns.
+                  * For http this is because of a matched http-request rule, or "option checkcache".
+
+            - name: ereq
+              type: integer
+              description: >
+                request errors. Some of the possible causes are:
+                  * early termination from the client, before the request has been sent.
+                  * read error from the client
+                  * client timeout
+                  * client closed connection
+                  * various bad requests from the client.
+                  * request was tarpitted.
+
+            - name: econ
+              type: integer
+              description: >
+                number of requests that encountered an error trying to
+                connect to a backend server. The backend stat is the sum of the stat
+                for all servers of that backend, plus any connection errors not
+                associated with a particular server (such as the backend having no
+                active servers).
+
+            - name: eresp
+              type: integer
+              description: >
+                response errors. srv_abrt will be counted here also.
+                Some other errors are:
+                * write error on the client socket (won't be counted for the server stat)
+                * failure applying filters to the response.     
+
+            - name: wretr
+              type: integer
+              description: >
+                number of times a connection to a server was retried.
+
+            - name: wredis
+              type: integer
+              description: >
+                number of times a request was redispatched to another
+                server. The server value counts the number of times that server was
+                switched away from.
+
+            - name: status
+              type: string
+              description: >
+                status (UP/DOWN/NOLB/MAINT/MAINT(via)...)
+
+            - name: weight
+              type: integer
+              description: >
+                total weight (backend), server weight (server)
+
+            - name: act
+              type: integer
+              description: >
+                number of active servers (backend), server is active (server)
+
+            - name: bck
+              type: integer
+              description: >
+                number of backup servers (backend), server is backup (server)
+
+            - name: chkfail
+              type: integer
+              description: >
+                number of failed checks. (Only counts checks failed when
+                the server is up.)
+
+            - name: chkdown
+              type: integer
+              description: >
+                number of UP->DOWN transitions. The backend counter counts
+                transitions to the whole backend being down, rather than the sum of the
+                counters for each server.
+
+            - name: lastchg
+              type: integer
+              description: >
+                number of seconds since the last UP<->DOWN transition
+
+            - name: downtime
+              type: integer
+              description: >
+                total downtime (in seconds). The value for the backend
+                is the downtime for the whole backend, not the sum of the server downtime.
+
+            - name: qlimit
+              type: integer
+              description: >
+                configured maxqueue for the server, or nothing in the
+                value is 0 (default, meaning no limit)
+
+            - name: pid
+              type: integer
+              description: >
+                process id (0 for first instance, 1 for second, ...)
+
+            - name: iid
+              type: integer
+              description: >
+                unique proxy id
+
+            - name: sid
+              type: integer
+              description: >
+                server id (unique inside a proxy)
+
+            - name: throttle
+              type: integer
+              description: >
+                current throttle percentage for the server, when
+                slowstart is active, or no value if not in slowstart.
+
+            - name: lbtot
+              type: integer
+              description: >
+                total number of times a server was selected, either for new
+                sessions, or when re-dispatching. The server counter is the number
+                of times that server was selected.
+
+            - name: tracked
+              type: integer
+              description: >
+                id of proxy/server if tracking is enabled.
+
+            - name: type
+              type: integer
+              description: >
+                (0=frontend, 1=backend, 2=server, 3=socket/listener)
+
+            - name: rate
+              type: integer
+              description: >
+                number of sessions per second over last elapsed second
+
+            - name: rate_lim
+              type: integer
+              description: >
+                configured limit on new sessions per second
+
+            - name: rate_max
+              type: integer
+              description: >
+                max number of new sessions per second
+
+            - name: check_status 
+              type: string
+              description: >
+                status of last health check, one of:
+                  UNK     -> unknown
+                  INI     -> initializing
+                  SOCKERR -> socket error
+                  L4OK    -> check passed on layer 4, no upper layers testing enabled
+                  L4TOUT  -> layer 1-4 timeout
+                  L4CON   -> layer 1-4 connection problem, for example
+                            "Connection refused" (tcp rst) or "No route to host" (icmp)
+                  L6OK    -> check passed on layer 6
+                  L6TOUT  -> layer 6 (SSL) timeout
+                  L6RSP   -> layer 6 invalid response - protocol error
+                  L7OK    -> check passed on layer 7
+                  L7OKC   -> check conditionally passed on layer 7, for example 404 with
+                            disable-on-404
+                  L7TOUT  -> layer 7 (HTTP/SMTP) timeout
+                  L7RSP   -> layer 7 invalid response - protocol error
+                  L7STS   -> layer 7 response error, for example HTTP 5xx
+
+            - name: check_code
+              type: integer
+              description: >
+                layer5-7 code, if available
+
+            - name: check_duration
+              type: integer
+              description: >
+                time in ms took to finish last health check
+
+            - name: hrsp_1xx
+              type: integer
+              description: >
+                http responses with 1xx code
+
+            - name: hrsp_2xx
+              type: integer
+              description: >
+                http responses with 2xx code
+
+            - name: hrsp_3xx
+              type: integer
+              description: >
+                http responses with 3xx code
+
+            - name: hrsp_4xx
+              type: integer
+              description: >
+                http responses with 4xx code
+
+            - name: hrsp_5xx
+              type: integer
+              description: >
+                http responses with 5xx code
+
+            - name: hrsp_other
+              type: integer
+              description: >
+                http responses with other codes (protocol error)
+
+            - name: hanafail
+              type: integer
+              description: >
+                failed health checks details
+
+            - name: req_rate
+              type: integer
+              description: >
+                HTTP requests per second over last elapsed second
+
+            - name: req_rate_max
+              type: integer
+              description: >
+                max number of HTTP requests per second observed
+
+            - name: req_tot
+              type: integer
+              description: >
+                total number of HTTP requests received
+
+            - name: cli_abrt
+              type: integer
+              description: >
+                number of data transfers aborted by the client
+
+            - name: srv_abrt
+              type: integer
+              description: >
+                number of data transfers aborted by the server (inc. in eresp)
+
+            - name: comp_in
+              type: integer
+              description: >
+                number of HTTP response bytes fed to the compressor
+
+            - name: comp_out
+              type: integer
+              description: >
+                number of HTTP response bytes emitted by the compressor
+
+            - name: comp_byp
+              type: integer
+              description: >
+                number of bytes that bypassed the HTTP compressor (CPU/BW limit)
+
+            - name: comp_rsp
+              type: integer
+              description: >
+                number of HTTP responses that were compressed
+
+            - name: lastsess
+              type: integer
+              description: >
+                number of seconds since last session assigned to server/backend
+
+            - name: last_chk
+              type: string
+              description: >
+                last health check contents or textual error
+
+            - name: last_agt
+              type: integer
+              description: >
+                llast agent check contents or textual error
+
+            - name: qtime
+              type: integer
+              description: >
+                the average queue time in ms over the 1024 last requests
+
+            - name: ctime
+              type: integer
+              description: >
+                the average connect time in ms over the 1024 last requests
+
+            - name: rtime
+              type: integer
+              description: >
+                the average response time in ms over the 1024 last requests (0 for TCP)
+
+            - name: ttime
+              type: integer
+              description: >
+                the average total session time in ms over the 1024 last requests
+                
+        - name: info
+          type: group
+          description: >
+            Results from haproxy info
+          fields:
+            - name: nb_proc
+              type: integer
+              description: >
+                Number of processes
+
+            - name: process_num
+              type: integer
+              description: >
+                Process number
+
+            - name: pid
+              type: integer
+              description: >
+                Process ID
+
+            - name: uptime_sec
+              type: integer
+              description: >
+                Current uptime in seconds
+
+            - name: mem_max_mb
+              type: integer
+              format: bytes
+              description: >
+                Max number of memory usage in MB
+
+            - name: ulimit_n
+              type: integer
+              description: >
+                Max number of open files for process
+
+            - name: max_sock
+              type: integer
+              description: >
+                
+            - name: max_conn
+              type: integer
+              description: >
+                
+            - name: hard_max_conn
+              type: integer
+              description: >
+                
+            - name: curr_conns
+              type: integer
+              description: >
+                
+            - name: cum_conns
+              type: integer
+              description: >
+                
+            - name: cum_req
+              type: integer
+              description: >
+                
+            - name: max_ssl_conns
+              type: integer
+              description: >
+                
+            - name: curr_ssl_conns
+              type: integer
+              description: >
+
+            - name: cum_ssl_conns
+              type: integer
+              description: >
+          
+            - name: max_pipes
+              type: integer
+              description: >
+
+            - name: pipes_used
+              type: integer
+              description: >
+                
+            - name: pipes_free
+              type: integer
+              description: >
+
+            - name: conn_rate
+              type: integer
+              description: >
+          
+            - name: conn_rate_limit
+              type: integer
+              description: >
+
+            - name: max_conn_rate
+              type: integer
+              description: >
+
+            - name: sess_rate
+              type: integer
+              description: >
+
+            - name: sess_rate_limit
+              type: integer
+              description: >
+
+            - name: max_sess_rate
+              type: integer
+              description: >
+
+            - name: ssl_rate
+              type: integer
+              description: >
+
+            - name: ssl_rate_limit
+              type: integer
+              description: >
+
+            - name: max_ssl_rate
+              type: integer
+              description: >
+
+            - name: ssl_frontend_key_rate
+              type: integer
+              description: >
+
+            - name: ssl_frontend_max_key_rate
+              type: integer
+              description: >
+
+            - name: ssl_frontend_session_reuse_pct
+              type: integer
+              description: >
+
+            - name: ssl_babckend_key_rate
+              type: integer
+              description: >
+
+            - name: ssl_frontend_key_rate
+              type: integer
+              description: >
+
+            - name: ssl_frontend_max_key_rate
+              type: integer
+              description: >
+
+            - name: ssl_frontend_session_reuse_pct
+              type: integer
+              description: >
+
+            - name: ssl_babckend_key_rate
+              type: integer
+              description: >
+
+            - name: ssl_backend_max_key_rate
+              type: integer
+              description: >
+
+            - name: ssl_cached_lookups
+              type: integer
+              description: >
+
+            - name: ssl_cache_misses
+              type: integer
+              description: >
+
+            - name: compress_bps_in
+              type: integer
+              description: >
+
+            - name: compress_bps_out
+              type: integer
+              description: >
+
+            - name: compress_bps_rate_limit
+              type: integer
+              description: >
+
+            - name: zlib_mem_usage
+              type: integer
+              description: >
+
+            - name: max_zlib_mem_usage
+              type: integer
+              description: >
+
+            - name: tasks
+              type: integer
+              description: >
+
+            - name: run_queue
+              type: integer
+              description: >
+
+            - name: idle_pct
+              type: scaled_float
+              format: percent
+              description: >
+
+- key: beats
+  title: "beats"
+  description: >
+    beats Module
+  short_config: false
+  fields:
+    - name: beats
+      type: group
+      description: >
+      fields:
+        - name: filebeat
+          type: group
+          description: >
+            experimental[]
+
+            filebeat metrics
+          fields:
+            - name: harvesters
+              type: group
+              description: >
+                Harvester metrics for all harvesters combined.
+              fields:
+                - name: started
+                  type: long
+                  description: >
+                    Total number of started harvesters.
+                - name: closed
+                  type: long
+                  description: >
+                    Total number of closed harvesters.
+                - name: running
+                  type: long
+                  description: >
+                    Number of currently running harvesters.
+                - name: skipped
+                  type: long
+                  description: >
+                    Total number of harvesters starts that were skipped because of harvester_limit reached.
+                - name: files
+                  type: group
+                  description: >
+                    File handling related statistics.
+                  fields:
+                    - name: open
+                      type: long
+                      description: >
+                        Currently open files.
+                    - name: truncated
+                      type: long
+                      description: >
+                        Number of files which were detected by the harvester as truncated and reading started from scratch.
+            - name: prospectors
+              type: group
+              description: >
+                Prospector metrics for all prospectors combined.
+              fields:
+                - name: log_files
+                  type: group
+                  description: >
+                    Log files related stastics.
+                  fields:
+                    - name: renamed
+                      type: long
+                      description: >
+                        Total number of files for which renaming was detected.
+                    - name: truncated
+                      type: long
+                      description: >
+                        Number of files which were detected by the prospector as truncated and reading started from scratch.
+
+            - name: registrar
+              type: group
+              description: >
+                Registrar statistics
+              fields:
+                - name: states
+                  type: group
+                  description: >
+                    Registrar states metrics.
+                  fields:
+                    - name: update
+                      type: long
+                      description: >
+                        Total number of states which were updated or added.
+                    - name: cleanup
+                      type: long
+                      description: >
+                        Total number of states which were cleaned up (removed).
+                    - name: current
+                      type: long
+                      description: >
+                        The current number of states in the registry file.
+                - name: writes
+                  type: long
+                  description: >
+                    Total number of times the registry file was written to disk.
+        - name: libbeat
+          type: group
+          description: >
+            experimental[]
+
+            libbeat metrics. This metricset can be used with all beats.
+          fields:
+            - name: output
+              type: group
+              description: >
+                Output related metrics
+              fields:
+                - name: elasticsearch
+                  type: group
+                  description: >
+                    Elasticsearch specific metrics
+                  fields:
+                    - name: events
+                      type: group
+                      descriptions: >
+                        Elasticsearch event metrics
+                      fields:
+                        - name: ack
+                          type: long
+                          description: >
+                            Number of acknowledged events by elasticsearch
+                        - name: not_ack
+                          type: long
+                          description: >
+                            Number of not acknowledged events by elasticsearch
+                    - name: read
+                      type: group
+                      descriptions: >
+                        Elasticsearch read metrics
+                      fields:
+                        - name: bytes
+                          type: long
+                          description: >
+                            Number of bytes read by the output
+                        - name: errors
+                          type: long
+                          description: >
+                            Number of read errors
+                    - name: write
+                      type: group
+                      descriptions: >
+                        Elasticsearch write metrics
+                      fields:
+                        - name: bytes
+                          type: long
+                          description: >
+                            Number of bytes written by the output
+                        - name: errors
+                          type: long
+                          description: >
+                            Number of write errors
+            - name: publisher
+              type: group
+              description: >
+                General publisher metrics
+              fields:
+                - name: events
+                  type: group
+                  description: >
+                    Log files related stastics.
+                  fields:
+                    - name: published
+                      type: long
+                      description: >
+                        Total number of events published
+
 - key: mongodb
   title: "MongoDB"
   description: >
@@ -414,6 +1127,7 @@
               fields:
                 - name: heap_usage.bytes
                   type: long
+                  format: bytes
                   description: >
                     The total size in bytes of heap space used by the database process.
                     Only available on Unix/Linux.
@@ -431,10 +1145,12 @@
               fields:
                 - name: in.bytes
                   type: long
+                  format: bytes
                   description: >
                     The amount of network traffic, in bytes, received by this database.
                 - name: out.bytes
                   type: long
+                  format: bytes
                   description: >
                     The amount of network traffic, in bytes, sent from this database.
                 - name: requests
@@ -612,12 +1328,14 @@
                 Bytes stats.
               fields:
                 - name: received
+                  format: bytes
                   type: integer
                   description: >
                     The number of bytes received from all clients.
 
                 - name: sent
                   type: integer
+                  format: bytes
                   description: >
                     The number of bytes sent to all clients.
 
@@ -740,6 +1458,247 @@
               type: integer
               description: >
                 The current number of idle client connections waiting for a request.
+- key: postgresql
+  title: "PostgreSQL"
+  description: >
+    Metrics collected from PostgreSQL servers.
+  short_config: false
+  fields:
+    - name: postgresql
+      type: group
+      description: >
+        PostgreSQL metrics.
+      fields:
+        - name: activity
+          type: group
+          description: >
+            One document per server process, showing information related to the current
+            activity of that process, such as state and current query. Collected by
+            querying pg_stat_activity.
+          fields:
+            - name: database.oid
+              type: long
+              description: >
+                OID of the database this backend is connected to.
+            - name: database.name
+              type: keyword
+              description: >
+                Name of the database this backend is connected to.
+            - name: pid
+              type: integer
+              description: >
+                Process ID of this backend.
+            - name: user.id
+              type: long
+              description: >
+                OID of the user logged into this backend.
+            - name: user.name
+              description: >
+                Name of the user logged into this backend.
+            - name: application_name
+              description: >
+                Name of the application that is connected to this backend.
+            - name: client.address
+              description: >
+                IP address of the client connected to this backend.
+            - name: client.hostname
+              description: >
+                Host name of the connected client, as reported by a reverse DNS lookup of client_addr.
+            - name: client.port
+              type: integer
+              description: >
+                TCP port number that the client is using for communication with this
+                backend, or -1 if a Unix socket is used.
+            - name: backend_start
+              type: date
+              description: >
+                Time when this process was started, i.e., when the client connected to
+                the server.
+            - name: transaction_start
+              type: date
+              description: >
+                Time when this process' current transaction was started.
+            - name: query_start
+              type: date
+              description: >
+                Time when the currently active query was started, or if state is not
+                active, when the last query was started.
+            - name: state_change
+              type: date
+              description: >
+                Time when the state was last changed.
+            - name: waiting
+              type: boolean
+              description: >
+                True if this backend is currently waiting on a lock.
+            - name: state
+              description: >
+                Current overall state of this backend. Possible values are:
+        
+                  * active: The backend is executing a query.
+                  * idle: The backend is waiting for a new client command.
+                  * idle in transaction: The backend is in a transaction, but is not
+                    currently executing a query.
+                  * idle in transaction (aborted): This state is similar to idle in
+                    transaction, except one of the statements in the transaction caused
+                    an error.
+                  * fastpath function call: The backend is executing a fast-path function.
+                  * disabled: This state is reported if track_activities is disabled in this backend.
+            - name: query
+              description: >
+                Text of this backend's most recent query. If state is active this field
+                shows the currently executing query. In all other states, it shows the
+                last query that was executed.
+
+        - name: bgwriter
+          type: group
+          description: >
+            Statistics about the background writer process's activity. Collected using the
+            pg_stat_bgwriter query.
+          fields:
+            - name: checkpoints.scheduled
+              type: long
+              description: >
+                Number of scheduled checkpoints that have been performed.
+            - name: checkpoints.requested
+              type: long
+              description: >
+                Number of requested checkpoints that have been performed.
+            - name: checkpoints.times.write.ms
+              type: float
+              description: >
+                Total amount of time that has been spent in the portion of checkpoint
+                processing where files are written to disk, in milliseconds.
+            - name: checkpoints.times.sync.ms
+              type: float
+              description: >
+                Total amount of time that has been spent in the portion of checkpoint
+                processing where files are synchronized to disk, in milliseconds.
+            - name: buffers.checkpoints
+              type: long
+              description: >
+                Number of buffers written during checkpoints.
+            - name: buffers.clean
+              type: long
+              description: >
+                Number of buffers written by the background writer.
+            - name: buffers.clean_full
+              type: long
+              description: >
+                Number of times the background writer stopped a cleaning scan because it
+                had written too many buffers.
+            - name: buffers.backend
+              type: long
+              description: >
+                Number of buffers written directly by a backend.
+            - name: buffers.backend_fsync
+              type: long
+              description: >
+                Number of times a backend had to execute its own fsync call (normally
+                the background writer handles those even when the backend does its own
+                write)
+            - name: buffers.allocated
+              type: long
+              description: >
+                Number of buffers allocated.
+            - name: stats_reset
+              type: date
+              description: >
+                Time at which these statistics were last reset.
+        - name: database
+          type: group
+          description: >
+            One row per database, showing database-wide statistics. Collected by querying
+            pg_stat_database
+          fields:
+            - name: oid
+              type: long
+              description: >
+                OID of the database this backend is connected to.
+            - name: name
+              type: keyword
+              description: >
+                Name of the database this backend is connected to.
+            - name: number_of_backends
+              type: long
+              description: >
+                Number of backends currently connected to this database.
+            - name: transactions.commit
+              type: long
+              description: >
+                Number of transactions in this database that have been committed.
+            - name: transactions.rollback
+              type: long
+              description: >
+                Number of transactions in this database that have been rolled back.
+            - name: blocks.read
+              type: long
+              description: >
+                Number of disk blocks read in this database.
+            - name: blocks.hit
+              type: long
+              description: >
+                Number of times disk blocks were found already in the buffer cache, so
+                that a read was not necessary (this only includes hits in the PostgreSQL
+                buffer cache, not the operating system's file system cache).
+            - name: blocks.time.read.ms
+              type: long
+              description: >
+                Time spent reading data file blocks by backends in this database, in
+                milliseconds.
+            - name: blocks.time.write.ms
+              type: long
+              description: >
+                Time spent writing data file blocks by backends in this database, in
+                milliseconds.
+            - name: rows.returned
+              type: long
+              description: >
+                Number of rows returned by queries in this database.
+            - name: rows.fetched
+              type: long
+              description: >
+                Number of rows fetched by queries in this database.
+            - name: rows.inserted
+              type: long
+              description: >
+                Number of rows inserted by queries in this database.
+            - name: rows.updated
+              type: long
+              description: >
+                Number of rows updated by queries in this database.
+            - name: rows.deleted
+              type: long
+              description: >
+                Number of rows deleted by queries in this database.
+            - name: conflicts
+              type: long
+              description: >
+                Number of queries canceled due to conflicts with recovery in this
+                database.
+            - name: temporary.files
+              type: long
+              description: >
+                Number of temporary files created by queries in this database. All
+                temporary files are counted, regardless of why the temporary file was
+                created (e.g., sorting or hashing), and regardless of the log_temp_files
+                setting.
+            - name: temporary.bytes
+              type: long
+              description: >
+                Total amount of data written to temporary files by queries in this
+                database. All temporary files are counted, regardless of why the
+                temporary file was created, and regardless of the log_temp_files
+                setting.
+            - name: deadlocks
+              type: long
+              description: >
+                Number of deadlocks detected in this database.
+            - name: stats_reset
+              type: date
+              description: >
+                Time at which these statistics were last reset.
+
 - key: redis
   title: "Redis"
   description: >
@@ -1134,7 +2093,8 @@
                 CPU Core number.
 
             - name: user.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
                 For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
@@ -1145,7 +2105,8 @@
                The amount of CPU time spent in user space.
 
             - name: system.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in kernel space.
 
@@ -1155,7 +2116,8 @@
                 The amount of CPU time spent in kernel space.
 
             - name: nice.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent on low-priority processes.
 
@@ -1165,7 +2127,8 @@
                 The amount of CPU time spent on low-priority processes.
 
             - name: idle.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent idle.
 
@@ -1175,7 +2138,8 @@
                 The amount of CPU time spent idle.
 
             - name: iowait.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in wait (on disk).
 
@@ -1185,7 +2149,8 @@
                 The amount of CPU time spent in wait (on disk).
 
             - name: irq.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -1195,7 +2160,8 @@
                 The amount of CPU time spent servicing and handling hardware interrupts.
 
             - name: softirq.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent servicing and handling software interrupts.
 
@@ -1205,7 +2171,8 @@
                 The amount of CPU time spent servicing and handling software interrupts.
 
             - name: steal.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
@@ -1224,43 +2191,51 @@
             `cpu` contains local CPU stats.
           fields:
             - name: user.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
                 For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
             - name: system.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in kernel space.
 
             - name: nice.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent on low-priority processes.
 
             - name: idle.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent idle.
 
             - name: iowait.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in wait (on disk).
 
             - name: irq.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent servicing and handling hardware interrupts.
 
             - name: softirq.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent servicing and handling software interrupts.
 
             - name: steal.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
@@ -1307,24 +2282,6 @@
                 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
                 was servicing another processor.
                 Available only on Unix.
-
-            - name: load
-              type: group
-              description: >
-                Load averages.
-              fields:
-                - name: "1"
-                  type: half_float
-                  description: >
-                    Load average for the last minute.
-                - name: "5"
-                  type: half_float
-                  description: >
-                    Load average for the last 5 minutes.
-                - name: "15"
-                  type: half_float
-                  description: >
-                    Load average for the last 15 minutes.
         - name: diskio
           type: group
           description: >
@@ -1354,12 +2311,14 @@
 
             - name: read.bytes
               type: long
+              format: bytes
               description: >
                 The total number of bytes read successfully. On Linux this is
                 the number of sectors read multiplied by an assumed sector size of 512.
 
             - name: write.bytes
               type: long
+              format: bytes
               description: >
                 The total number of bytes written successfully. On Linux this is
                 the number of sectors written multiplied by an assumed sector size of
@@ -1384,8 +2343,9 @@
           description: >
             `filesystem` contains local filesystem stats.
           fields:
-            - name: avail
+            - name: available
               type: long
+              format: bytes
               description: >
                 The disk space available to an unprivileged user in bytes.
             - name: device_name
@@ -1402,6 +2362,7 @@
                 The total number of file nodes in the file system.
             - name: free
               type: long
+              format: bytes
               description: >
                 The disk space available in bytes.
             - name: free_files
@@ -1410,14 +2371,17 @@
                 The number of free file nodes in the file system.
             - name: total
               type: long
+              format: bytes
               description: >
                 The total disk space in bytes.
             - name: used.bytes
               type: long
+              format: bytes
               description: >
                 The used disk space in bytes.
             - name: used.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of used disk space.
 
@@ -1435,21 +2399,63 @@
               type: long
               description: Total number of files.
             - name: total_size
+              format: bytes
               type: group
               description: Nested file system docs.
               fields:
                 - name: free
                   type: long
+                  format: bytes
                   description: >
                     Total free space.
                 - name: used
                   type: long
+                  format: bytes
                   description: >
                     Total used space.
                 - name: total
                   type: long
+                  format: bytes
                   description: >
                     Total space (used plus free).
+        - name: load
+          type: group
+          description: >
+            Load averages.
+          fields:
+            - name: "1"
+              type: scaled_float
+              scaling_factor: 100
+              description: >
+                Load average for the last minute.
+            - name: "5"
+              type: scaled_float
+              scaling_factor: 100
+              description: >
+                Load average for the last 5 minutes.
+            - name: "15"
+              type: scaled_float
+              scaling_factor: 100
+              description: >
+                Load average for the last 15 minutes.
+
+            - name: "norm.1"
+              type: scaled_float
+              scaling_factor: 100
+              description: >
+                Load divided by the number of cores for the last minute.
+
+            - name: "norm.5"
+              type: scaled_float
+              scaling_factor: 100
+              description: >
+                Load divided by the number of cores for the last 5 minutes.
+
+            - name: "norm.15"
+              type: scaled_float
+              scaling_factor: 100
+              description: >
+                Load divided by the number of cores for the last 15 minutes.
         - name: memory
           type: group
           description: >
@@ -1457,43 +2463,51 @@
           fields:
             - name: total
               type: long
+              format: bytes
               description: >
                 Total memory.
 
             - name: used.bytes
               type: long
+              format: bytes
               description: >
                 Used memory.
 
             - name: free
               type: long
+              format: bytes
               description: >
-                Available memory.
+                The total amount of free memory in bytes. This value does not include memory consumed by system caches and
+                buffers (see system.memory.actual.free).
 
             - name: used.pct
-              type: half_float
+              type: scaled_float
+              format: percent
               description: >
                 The percentage of used memory.
 
             - name: actual
               type: group
               description: >
-                Actual memory fields.
+                Actual memory used and free.
               fields:
+
                 - name: used.bytes
                   type: long
                   description: >
-                    Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
-                    Available only on Unix.
-
+                    Actual used memory in bytes. It represents the difference between the total and the available memory. The
+                    available memory depends on the OS. For more details, please check `system.actual.free`.
+ 
                 - name: free
                   type: long
                   description: >
-                    Actual available memory. This value is the "free" memory plus the memory used for disk caches and
-                    buffers. Available only on Unix.
+                    Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory
+                    plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is the 
+                    amount of unreserved and uncommitted memory currently in the user-mode portion of the virtual address space
+                    of the calling process.
 
                 - name: used.pct
-                  type: half_float
+                  type: scaled_float
                   description: >
                     The percentage of actual used memory.
 
@@ -1504,21 +2518,25 @@
               fields:
                 - name: total
                   type: long
+                  format: bytes
                   description: >
                     Total swap memory.
 
                 - name: used.bytes
                   type: long
+                  format: bytes
                   description: >
                     Used swap memory.
 
                 - name: free
                   type: long
+                  format: bytes
                   description: >
                     Available swap memory.
 
                 - name: used.pct
-                  type: half_float
+                  type: scaled_float
+                  format: percent
                   description: >
                     The percentage of used swap memory.
         - name: network
@@ -1534,11 +2552,13 @@
 
             - name: out.bytes
               type: long
+              format: bytes
               description: >
                 The number of bytes sent.
 
             - name: in.bytes
               type: long
+              format: bytes
               description: >
                 The number of bytes received.
 
@@ -1619,7 +2639,8 @@
                   description: >
                     The amount of CPU time the process spent in user space.
                 - name: total.pct
-                  type: half_float
+                  type: scaled_float
+                  format: percent
                   description: >
                     The percentage of CPU time spent by the process since the last update. Its value is similar to the
                     %CPU value of the process displayed by the top command on Unix systems.
@@ -1632,9 +2653,9 @@
                   description: >
                     The total CPU time spent by the process.
                 - name: start_time
-                  type: keyword
+                  type: date
                   description: >
-                    The time when the process was started. Example: "17:45".
+                    The time when the process was started.
             - name: memory
               type: group
               description: Memory-specific statistics per process.
@@ -1642,20 +2663,415 @@
               fields:
                 - name: size
                   type: long
+                  format: bytes
                   description: >
                     The total virtual memory the process has.
                 - name: rss.bytes
                   type: long
+                  format: bytes
                   description: >
                     The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
                 - name: rss.pct
-                  type: half_float
+                  type: scaled_float
+                  format: percent
                   description: >
                     The percentage of memory the process occupied in main memory (RAM).
                 - name: share
                   type: long
+                  format: bytes
                   description: >
                     The shared memory the process uses.
+            - name: fd
+              type: group
+              description: >
+                File descriptor usage metrics. This set of metrics is available for
+                Linux and FreeBSD.
+              prefix: "[float]"
+              fields:
+                - name: open
+                  type: long
+                  description: The number of file descriptors open by the process.
+                - name: limit.soft
+                  type: long
+                  description: >
+                    The soft limit on the number of file descriptors opened by the
+                    process. The soft limit can be changed by the process at any time.
+                - name: limit.hard
+                  type: long
+                  description: >
+                    The hard limit on the number of file descriptors opened by the
+                    process. The hard limit can only be raised by root.
+            - name: cgroup
+              type: group
+              description: >
+                experimental[]
+
+                Metrics and limits from the cgroup of which the task is a member.
+                cgroup metrics are reported when the process has membership in a
+                non-root cgroup. These metrics are only available on Linux.
+              fields:
+                - name: id
+                  type: keyword
+                  description: >
+                    The ID common to all cgroups associated with this task.
+                    If there isn't a common ID used by all cgroups this field will be
+                    absent.
+
+                - name: path
+                  type: keyword
+                  description: >
+                    The path to the cgroup relative to the cgroup subsystem's mountpoint.
+                    If there isn't a common path used by all cgroups this field will be
+                    absent.
+
+                - name: cpu
+                  type: group
+                  description: >
+                    The cpu subsystem schedules CPU access for tasks in the cgroup.
+                    Access can be controlled by two separate schedulers, CFS and RT.
+                    CFS stands for completely fair scheduler which proportionally
+                    divides the CPU time between cgroups based on weight. RT stands for
+                    real time scheduler which sets a maximum amount of CPU time that
+                    processes in the cgroup can consume during a given period.
+
+                  fields:
+                    - name: id
+                      type: keyword
+                      description: ID of the cgroup.
+
+                    - name: path
+                      type: keyword
+                      description: >
+                        Path to the cgroup relative to the cgroup subsystem's
+                        mountpoint.
+
+                    - name: cfs.period.us
+                      type: long
+                      description: >
+                        Period of time in microseconds for how regularly a
+                        cgroup's access to CPU resources should be reallocated.
+
+                    - name: cfs.quota.us
+                      type: long
+                      description: >
+                        Total amount of time in microseconds for which all
+                        tasks in a cgroup can run during one period (as defined by
+                        cfs.period.us).
+
+                    - name: cfs.shares
+                      type: long
+                      description: >
+                        An integer value that specifies a relative share of CPU time
+                        available to the tasks in a cgroup. The value specified in the
+                        cpu.shares file must be 2 or higher.
+
+                    - name: rt.period.us
+                      type: long
+                      description: >
+                        Period of time in microseconds for how regularly a cgroup's
+                        access to CPU resources is reallocated.
+
+                    - name: rt.runtime.us
+                      type: long
+                      description: >
+                        Period of time in microseconds for the longest continuous period
+                        in which the tasks in a cgroup have access to CPU resources.
+
+                    - name: stats.periods
+                      type: long
+                      description: >
+                        Number of period intervals (as specified in cpu.cfs.period.us)
+                        that have elapsed.
+
+                    - name: stats.throttled.periods
+                      type: long
+                      description: >
+                        Number of times tasks in a cgroup have been throttled (that is,
+                        not allowed to run because they have exhausted all of the
+                        available time as specified by their quota).
+
+                    - name: stats.throttled.ns
+                      type: long
+                      description: >
+                        The total time duration (in nanoseconds) for which tasks in a
+                        cgroup have been throttled.
+
+                - name: cpuacct
+                  type: group
+                  description: CPU accounting metrics.
+                  fields:
+                    - name: id
+                      type: keyword
+                      description: ID of the cgroup.
+
+                    - name: path
+                      type: keyword
+                      description: >
+                        Path to the cgroup relative to the cgroup subsystem's
+                        mountpoint.
+
+                    - name: total.ns
+                      type: long
+                      description: >
+                        Total CPU time in nanoseconds consumed by all tasks in the
+                        cgroup.
+
+                    - name: stats.user.ns
+                      type: long
+                      description: CPU time consumed by tasks in user mode.
+
+                    - name: stats.system.ns
+                      type: long
+                      description: CPU time consumed by tasks in user (kernel) mode.
+
+                    - name: percpu
+                      type: dict
+                      dict-type: long
+                      description: >
+                        CPU time (in nanoseconds) consumed on each CPU by all tasks in
+                        this cgroup.
+
+                - name: memory
+                  type: group
+                  description: Memory limits and metrics.
+                  fields:
+                    - name: id
+                      type: keyword
+                      description: ID of the cgroup.
+
+                    - name: path
+                      type: keyword
+                      description: >
+                        Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
+                    - name: mem.usage.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        Total memory usage by processes in the cgroup (in bytes).
+
+                    - name: mem.usage.max.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        The maximum memory used by processes in the cgroup (in bytes).
+
+                    - name: mem.limit.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        The maximum amount of user memory in bytes (including file
+                        cache) that tasks in the cgroup are allowed to use.
+
+                    - name: mem.failures
+                      type: long
+                      description: >
+                        The number of times that the memory limit (mem.limit.bytes) was
+                        reached.
+
+                    - name: memsw.usage.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        The sum of current memory usage plus swap space used by
+                        processes in the cgroup (in bytes).
+
+                    - name: memsw.usage.max.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        The maximum amount of memory and swap space used by processes in
+                        the cgroup (in bytes).
+
+                    - name: memsw.limit.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        The maximum amount for the sum of memory and swap usage
+                        that tasks in the cgroup are allowed to use.
+
+                    - name: memsw.failures
+                      type: long
+                      description: >
+                        The number of times that the memory plus swap space limit
+                        (memsw.limit.bytes) was reached.
+
+                    - name: kmem.usage.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        Total kernel memory usage by processes in the cgroup (in bytes).
+
+                    - name: kmem.usage.max.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        The maximum kernel memory used by processes in the cgroup (in
+                        bytes).
+
+                    - name: kmem.limit.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        The maximum amount of kernel memory that tasks in the cgroup are
+                        allowed to use.
+
+                    - name: kmem.failures
+                      type: long
+                      description: >
+                        The number of times that the memory limit (kmem.limit.bytes) was
+                        reached.
+
+                    - name: kmem_tcp.usage.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        Total memory usage for TCP buffers in bytes.
+
+                    - name: kmem_tcp.usage.max.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        The maximum memory used for TCP buffers by processes in the
+                        cgroup (in bytes).
+
+                    - name: kmem_tcp.limit.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        The maximum amount of memory for TCP buffers that tasks in the
+                        cgroup are allowed to use.
+
+                    - name: kmem_tcp.failures
+                      type: long
+                      description: >
+                        The number of times that the memory limit (kmem_tcp.limit.bytes)
+                        was reached.
+
+                    - name: stats.active_anon.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        Anonymous and swap cache on active least-recently-used (LRU)
+                        list, including tmpfs (shmem), in bytes.
+
+                    - name: stats.active_file.bytes
+                      type: long
+                      format: bytes
+                      description: File-backed memory on active LRU list, in bytes.
+
+                    - name: stats.cache.bytes
+                      type: long
+                      format: bytes
+                      description: Page cache, including tmpfs (shmem), in bytes.
+
+                    - name: stats.hierarchical_memory_limit.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        Memory limit for the hierarchy that contains the memory cgroup,
+                        in bytes.
+
+                    - name: stats.hierarchical_memsw_limit.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        Memory plus swap limit for the hierarchy that contains the
+                        memory cgroup, in bytes.
+
+                    - name: stats.inactive_anon.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        Anonymous and swap cache on inactive LRU list, including tmpfs
+                        (shmem), in bytes
+
+                    - name: stats.inactive_file.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        File-backed memory on inactive LRU list, in bytes.
+
+                    - name: stats.mapped_file.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        Size of memory-mapped mapped files, including tmpfs (shmem),
+                        in bytes.
+
+                    - name: stats.page_faults
+                      type: long
+                      description: >
+                        Number of times that a process in the cgroup triggered a page
+                        fault.
+
+                    - name: stats.major_page_faults
+                      type: long
+                      description: >
+                        Number of times that a process in the cgroup triggered a major
+                        fault. "Major" faults happen when the kernel actually has to
+                        read the data from disk.
+
+                    - name: stats.pages_in
+                      type: long
+                      description: >
+                        Number of pages paged into memory. This is a counter.
+
+                    - name: stats.pages_out
+                      type: long
+                      description: >
+                        Number of pages paged out of memory. This is a counter.
+
+                    - name: stats.rss.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        Anonymous and swap cache (includes transparent hugepages), not
+                        including tmpfs (shmem), in bytes.
+
+                    - name: stats.rss_huge.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        Number of bytes of anonymous transparent hugepages.
+
+                    - name: stats.swap.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        Swap usage, in bytes.
+
+                    - name: stats.unevictable.bytes
+                      type: long
+                      format: bytes
+                      description: >
+                        Memory that cannot be reclaimed, in bytes.
+
+                - name: blkio
+                  type: group
+                  description: Block IO metrics.
+                  fields:
+                    - name: id
+                      type: keyword
+                      description: ID of the cgroup.
+
+                    - name: path
+                      type: keyword
+                      description: >
+                        Path to the cgroup relative to the cgroup subsystems mountpoint.
+
+                    - name: total.bytes
+                      type: keyword
+                      format: bytes
+                      description: >
+                        Total number of bytes transferred to and from all block devices
+                        by processes in the cgroup.
+
+                    - name: total.ios
+                      type: keyword
+                      description: >
+                        Total number of I/O operations performed on all devices
+                        by processes in the cgroup as seen by the throttling policy.
 - key: zookeeper
   title: "ZooKeeper"
   description: >

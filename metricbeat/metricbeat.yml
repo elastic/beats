@@ -16,6 +16,9 @@ metricbeat.modules:
     # CPU stats
     - cpu
 
+    # System Load stats
+    - load
+
     # Per CPU core stats
     #- core
 
@@ -39,9 +42,6 @@ metricbeat.modules:
   enabled: true
   period: 10s
   processes: ['.*']
-
-  # if true, exports the CPU usage in ticks, together with the percentage values
-  cpu_ticks: false
 
 
 #================================ General =====================================
@@ -91,7 +91,7 @@ output.elasticsearch:
 
 #================================ Logging =====================================
 
-# Sets log level. The default log level is error.
+# Sets log level. The default log level is info.
 # Available log levels are: critical, error, warning, info, debug
 #logging.level: debug
 

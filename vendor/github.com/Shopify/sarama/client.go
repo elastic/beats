@@ -290,7 +290,7 @@ func (client *client) Leader(topic string, partitionID int32) (*Broker, error) {
 	leader, err := client.cachedLeader(topic, partitionID)
 
 	if leader == nil {
-		err := client.RefreshMetadata(topic)
+		err = client.RefreshMetadata(topic)
 		if err != nil {
 			return nil, err
 		}
@@ -685,7 +685,7 @@ func (client *client) getConsumerMetadata(consumerGroup string, attemptsRemainin
 	}
 
 	for broker := client.any(); broker != nil; broker = client.any() {
-		Logger.Printf("client/coordinator requesting coordinator for consumergoup %s from %s\n", consumerGroup, broker.Addr())
+		Logger.Printf("client/coordinator requesting coordinator for consumergroup %s from %s\n", consumerGroup, broker.Addr())
 
 		request := new(ConsumerMetadataRequest)
 		request.ConsumerGroup = consumerGroup
@@ -707,7 +707,7 @@ func (client *client) getConsumerMetadata(consumerGroup string, attemptsRemainin
 
 		switch response.Err {
 		case ErrNoError:
-			Logger.Printf("client/coordinator coordinator for consumergoup %s is #%d (%s)\n", consumerGroup, response.Coordinator.ID(), response.Coordinator.Addr())
+			Logger.Printf("client/coordinator coordinator for consumergroup %s is #%d (%s)\n", consumerGroup, response.Coordinator.ID(), response.Coordinator.Addr())
 			return response, nil
 
 		case ErrConsumerCoordinatorNotAvailable:

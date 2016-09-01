@@ -104,8 +104,8 @@ func reifyStruct(opts *options, orig reflect.Value, cfg *Config) Error {
 			return raisePathErr(err, cfg.metadata, "", cfg.Path("."))
 		}
 
-		if err := unpackWith(v, reified); err != nil {
-			return raiseUnsupportedInputType(cfg.ctx, cfg.metadata, v)
+		if err := unpackWith(cfg.ctx, cfg.metadata, v, reified); err != nil {
+			return err
 		}
 	} else {
 		numField := to.NumField()
@@ -335,9 +335,8 @@ func reifyMergeValue(
 			return reflect.Value{}, raisePathErr(err, val.meta(), "", ctx.path("."))
 		}
 
-		if err := unpackWith(v, reified); err != nil {
-			ctx := val.Context()
-			return reflect.Value{}, raiseUnsupportedInputType(ctx, val.meta(), v)
+		if err := unpackWith(val.Context(), val.meta(), v, reified); err != nil {
+			return reflect.Value{}, err
 		}
 		return old, nil
 	}
@@ -446,10 +445,8 @@ func reifyPrimitive(
 			return reflect.Value{}, raisePathErr(err, val.meta(), "", ctx.path("."))
 		}
 
-		err = unpackWith(v, reified)
-		if err != nil {
-			ctx := val.Context()
-			return reflect.Value{}, raiseUnsupportedInputType(ctx, val.meta(), v)
+		if err := unpackWith(val.Context(), val.meta(), v, reified); err != nil {
+			return reflect.Value{}, err
 		}
 	} else {
 		v, err = doReifyPrimitive(opts, val, baseType)

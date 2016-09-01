@@ -161,12 +161,16 @@ filebeat.prospectors:
   # The backoff value will be multiplied each time with the backoff_factor until max_backoff is reached
   #backoff_factor: 2
 
+  # Experimental: Max number of harvesters that are started in parallel.
+  # Default is 0 which means unlimited
+  #harvester_limit: 0
+
   ### Harvester closing options
 
   # Close inactive closes the file handler after the predefined period.
   # The period starts when the last line of the file was, not the file ModTime.
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
-  #close_inactive: 1h
+  #close_inactive: 5m
 
   # Close renamed closes a file handler when the file is renamed or rotated.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
@@ -182,12 +186,6 @@ filebeat.prospectors:
   # By default this option is disabled.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_eof: false
-
-  # Close timeout closes the harvester after the predefined time.
-  # This is independent if the harvester did finish reading the file or not.
-  # By default this option is disabled.
-  # Note: Potential data loss. Make sure to read and understand the docs for this option.
-  #close_timeout: 0
 
   ### State options
 

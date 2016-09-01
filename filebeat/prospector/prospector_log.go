@@ -61,8 +61,8 @@ func (p *ProspectorLog) Run() {
 	// It is important that a first scan is run before cleanup to make sure all new states are read first
 	if p.config.CleanInactive > 0 || p.config.CleanRemoved {
 		beforeCount := p.Prospector.states.Count()
-		p.Prospector.states.Cleanup()
-		logp.Debug("prospector", "Prospector states cleaned up. Before: %d, After: %d", beforeCount, p.Prospector.states.Count())
+		cleanedStates := p.Prospector.states.Cleanup()
+		logp.Debug("prospector", "Prospector states cleaned up. Before: %d, After: %d", beforeCount, beforeCount-cleanedStates)
 	}
 
 	// Marking removed files to be cleaned up. Cleanup happens after next scan to make sure all states are updated first
@@ -157,7 +157,10 @@ func (p *ProspectorLog) scan() {
 		// Decides if previous state exists
 		if lastState.IsEmpty() {
 			logp.Debug("prospector", "Start harvester for new file: %s", newState.Source)
-			p.Prospector.startHarvester(newState, 0)
+			err := p.Prospector.startHarvester(newState, 0)
+			if err != nil {
+				logp.Err("Harvester could not be started on new file: %s, Err: %s", newState.Source, err)
+			}
 		} else {
 			p.harvestExistingFile(newState, lastState)
 		}
@@ -177,14 +180,20 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 		// This could also be an issue with force_close_older that a new harvester is started after each scan but not needed?
 		// One problem with comparing modTime is that it is in seconds, and scans can happen more then once a second
 		logp.Debug("prospector", "Resuming harvesting of file: %s, offset: %v", newState.Source, oldState.Offset)
-		p.Prospector.startHarvester(newState, oldState.Offset)
+		err := p.Prospector.startHarvester(newState, oldState.Offset)
+		if err != nil {
+			logp.Err("Harvester could not be started on existing file: %s, Err: %s", newState.Source, err)
+		}
 		return
 	}
 
 	// File size was reduced -> truncated file
 	if oldState.Finished && newState.Fileinfo.Size() < oldState.Offset {
 		logp.Debug("prospector", "Old file was truncated. Starting from the beginning: %s", newState.Source)
-		p.Prospector.startHarvester(newState, 0)
+		err := p.Prospector.startHarvester(newState, 0)
+		if err != nil {
+			logp.Err("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err)
+		}
 
 		filesTrucated.Add(1)
 		return
@@ -194,14 +203,19 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 	if oldState.Source != "" && oldState.Source != newState.Source {
 		// This does not start a new harvester as it is assume that the older harvester is still running
 		// or no new lines were detected. It sends only an event status update to make sure the new name is persisted.
-		logp.Debug("prospector", "File rename was detected, updating state: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
+		logp.Debug("prospector", "File rename was detected: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
 
-		// Update state because of file rotation
-		newState.Offset = oldState.Offset
-		event := input.NewEvent(newState)
-		p.Prospector.harvesterChan <- event
+		if oldState.Finished {
+			logp.Debug("prospector", "Updating state for renamed file: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
+			// Update state because of file rotation
+			oldState.Source = newState.Source
+			event := input.NewEvent(oldState)
+			p.Prospector.harvesterChan <- event
 
-		filesRenamed.Add(1)
+			filesRenamed.Add(1)
+		} else {
+			logp.Debug("prospector", "File rename detected but harvester not finished yet.")
+		}
 	}
 
 	if !oldState.Finished {

@@ -89,10 +89,13 @@ func (s *States) findPrevious(newState State) (int, State) {
 }
 
 // Cleanup cleans up the state array. All states which are older then `older` are removed
-func (s *States) Cleanup() {
+// The number of states that were cleaned up is returned
+func (s *States) Cleanup() int {
 
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
+
+	statesBefore := len(s.states)
 
 	currentTime := time.Now()
 	states := s.states[:0]
@@ -113,6 +116,8 @@ func (s *States) Cleanup() {
 		states = append(states, state) // in-place copy old state
 	}
 	s.states = states
+
+	return statesBefore - len(s.states)
 }
 
 // Count returns number of states

@@ -1,0 +1,37 @@
+- module: system
+  metricsets:
+    # CPU stats
+    - cpu
+
+    # System Load stats
+    - load
+
+    # Per CPU core stats
+    #- core
+
+    # IO stats
+    #- diskio
+
+    # Per filesystem stats
+    - filesystem
+
+    # File system summary stats
+    #- fsstat
+
+    # Memory stats
+    - memory
+
+    # Network stats
+    - network
+
+    # Per process stats
+    - process
+  enabled: true
+  period: 10s
+  processes: ['.*']
+
+  # if true, exports the CPU usage in ticks, together with the percentage values
+  #cpu_ticks: false
+
+  # EXPERIMENTAL: cgroups can be enabled for the process metricset.
+  #cgroups: false

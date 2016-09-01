@@ -85,6 +85,7 @@ const (
 	ErrMessageSizeTooLarge             KError = 10
 	ErrStaleControllerEpochCode        KError = 11
 	ErrOffsetMetadataTooLarge          KError = 12
+	ErrNetworkException                KError = 13
 	ErrOffsetsLoadInProgress           KError = 14
 	ErrConsumerCoordinatorNotAvailable KError = 15
 	ErrNotCoordinatorForConsumer       KError = 16
@@ -103,6 +104,10 @@ const (
 	ErrTopicAuthorizationFailed        KError = 29
 	ErrGroupAuthorizationFailed        KError = 30
 	ErrClusterAuthorizationFailed      KError = 31
+	ErrInvalidTimestamp                KError = 32
+	ErrUnsupportedSASLMechanism        KError = 33
+	ErrIllegalSASLState                KError = 34
+	ErrUnsupportedVersion              KError = 35
 )
 
 func (err KError) Error() string {
@@ -137,6 +142,8 @@ func (err KError) Error() string {
 		return "kafka server: StaleControllerEpochCode (internal error code for broker-to-broker communication)."
 	case ErrOffsetMetadataTooLarge:
 		return "kafka server: Specified a string larger than the configured maximum for offset metadata."
+	case ErrNetworkException:
+		return "kafka server: The server disconnected before a response was received."
 	case ErrOffsetsLoadInProgress:
 		return "kafka server: The broker is still loading offsets after a leader change for that offset's topic partition."
 	case ErrConsumerCoordinatorNotAvailable:
@@ -173,6 +180,14 @@ func (err KError) Error() string {
 		return "kafka server: The client is not authorized to access this group."
 	case ErrClusterAuthorizationFailed:
 		return "kafka server: The client is not authorized to send this request type."
+	case ErrInvalidTimestamp:
+		return "kafka server: The timestamp of the message is out of acceptable range."
+	case ErrUnsupportedSASLMechanism:
+		return "kafka server: The broker does not support the requested SASL mechanism."
+	case ErrIllegalSASLState:
+		return "kafka server: Request is not valid given the current SASL state."
+	case ErrUnsupportedVersion:
+		return "kafka server: The version of API is not supported."
 	}
 
 	return fmt.Sprintf("Unknown error, how did this happen? Error code = %d", err)

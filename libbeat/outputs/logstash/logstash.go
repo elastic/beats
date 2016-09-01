@@ -70,12 +70,6 @@ func (lj *logstash) init(cfg *common.Config) error {
 		return err
 	}
 
-	sendRetries := config.MaxRetries
-	maxAttempts := sendRetries + 1
-	if sendRetries < 0 {
-		maxAttempts = 0
-	}
-
 	tls, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return err
@@ -93,22 +87,8 @@ func (lj *logstash) init(cfg *common.Config) error {
 		},
 	}
 
-	logp.Info("Max Retries set to: %v", sendRetries)
-	var m mode.ConnectionMode
-	if config.Pipelining == 0 {
-		clients, err := modeutil.MakeClients(cfg, makeClientFactory(&config, transp))
-		if err == nil {
-			m, err = modeutil.NewConnectionMode(clients, !config.LoadBalance,
-				maxAttempts, defaultWaitRetry, config.Timeout, defaultMaxWaitRetry)
-		}
-	} else {
-		clients, err := modeutil.MakeAsyncClients(cfg,
-			makeAsyncClientFactory(&config, transp))
-		if err == nil {
-			m, err = modeutil.NewAsyncConnectionMode(clients, !config.LoadBalance,
-				maxAttempts, defaultWaitRetry, config.Timeout, defaultMaxWaitRetry)
-		}
-	}
+	logp.Info("Max Retries set to: %v", config.MaxRetries)
+	m, err := initConnectionMode(cfg, &config, transp)
 	if err != nil {
 		return err
 	}
@@ -117,6 +97,40 @@ func (lj *logstash) init(cfg *common.Config) error {
 	lj.index = config.Index
 
 	return nil
+}
+
+func initConnectionMode(
+	cfg *common.Config,
+	config *logstashConfig,
+	transp *transport.Config,
+) (mode.ConnectionMode, error) {
+	sendRetries := config.MaxRetries
+	maxAttempts := sendRetries + 1
+	if sendRetries < 0 {
+		maxAttempts = 0
+	}
+
+	settings := modeutil.Settings{
+		Failover:     !config.LoadBalance,
+		MaxAttempts:  maxAttempts,
+		Timeout:      config.Timeout,
+		WaitRetry:    defaultWaitRetry,
+		MaxWaitRetry: defaultMaxWaitRetry,
+	}
+
+	if config.Pipelining == 0 {
+		clients, err := modeutil.MakeClients(cfg, makeClientFactory(config, transp))
+		if err != nil {
+			return nil, err
+		}
+		return modeutil.NewConnectionMode(clients, settings)
+	}
+
+	clients, err := modeutil.MakeAsyncClients(cfg, makeAsyncClientFactory(config, transp))
+	if err != nil {
+		return nil, err
+	}
+	return modeutil.NewAsyncConnectionMode(clients, settings)
 }
 
 func makeClientFactory(
@@ -164,9 +178,9 @@ func (lj *logstash) Close() error {
 func (lj *logstash) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
-	return lj.mode.PublishEvent(signaler, opts, event)
+	return lj.mode.PublishEvent(signaler, opts, data)
 }
 
 // BulkPublish implements the BulkOutputer interface pushing a bulk of events
@@ -174,7 +188,7 @@ func (lj *logstash) PublishEvent(
 func (lj *logstash) BulkPublish(
 	trans op.Signaler,
 	opts outputs.Options,
-	events []common.MapStr,
+	data []outputs.Data,
 ) error {
-	return lj.mode.PublishEvents(trans, opts, events)
+	return lj.mode.PublishEvents(trans, opts, data)
 }

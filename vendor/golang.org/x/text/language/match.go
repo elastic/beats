@@ -4,9 +4,7 @@
 
 package language
 
-import (
-	"errors"
-)
+import "errors"
 
 // Matcher is the interface that wraps the Match method.
 //
@@ -17,36 +15,48 @@ type Matcher interface {
 	Match(t ...Tag) (tag Tag, index int, c Confidence)
 }
 
-// ComprehensibleTo returns the confidence score for speaker being able to
-// comprehend the (written) language t. It uses a Matcher under the hood.
-func (t Tag) ComprehensibleTo(speaker Tag) Confidence {
-	// TODO: this could be more efficient.
-	_, _, c := NewMatcher([]Tag{t}).Match(speaker)
+// Comprehends reports the confidence score for a speaker of a given language
+// to being able to comprehend the written form of an alternative language.
+func Comprehends(speaker, alternative Tag) Confidence {
+	_, _, c := NewMatcher([]Tag{alternative}).Match(speaker)
 	return c
 }
 
-// NewMatcher returns a Matcher that finds the best match for a tag
-// based on written intelligibility. The index returned by the Match
-// method corresponds to the index of the matched tag in the given list.
-// The first element is used as the default value in case no good match
-// is found.
+// NewMatcher returns a Matcher that matches an ordered list of preferred tags
+// against a list of supported tags based on written intelligibility, closeness
+// of dialect, equivalence of subtags and various other rules. It is initialized
+// with the list of supported tags. The first element is used as the default
+// value in case no match is found.
 //
-// Its Match method matches matches the first of the given Tags to
-// reach a certain confidence threshold. The tags passed to Match should
-// therefore be specified in order of preference.
-// Various factors such as deprecated variants of tags, legacy mappings
-// and information based on mutual intelligibility defined in CLDR
-// are considered to determine equivalence.
+// Its Match method matches the first of the given Tags to reach a certain
+// confidence threshold. The tags passed to Match should therefore be specified
+// in order of preference. Extensions are ignored for matching.
+//
+// The index returned by the Match method corresponds to the index of the
+// matched tag in t, but is augmented with the Unicode extension ('u')of the
+// corresponding preferred tag. This allows user locale options to be passed
+// transparently.
 func NewMatcher(t []Tag) Matcher {
 	return newMatcher(t)
 }
 
-func (m *matcher) Match(want ...Tag) (Tag, int, Confidence) {
-	match, c := m.getBest(want...)
+func (m *matcher) Match(want ...Tag) (t Tag, index int, c Confidence) {
+	match, w, c := m.getBest(want...)
 	if match == nil {
-		return m.default_.tag, 0, c
+		t = m.default_.tag
+	} else {
+		t, index = match.tag, match.index
 	}
-	return match.tag, match.index, c
+	// Copy options from the user-provided tag into the result tag. This is hard
+	// to do after the fact, so we do it here.
+	// TODO: consider also adding in variants that are compatible with the
+	// matched language.
+	// TODO: Add back region if it is non-ambiguous? Or create another tag to
+	// preserve the region?
+	if u, ok := w.Extension('u'); ok {
+		t, _ = Raw.Compose(t, u)
+	}
+	return t, index, c
 }
 
 type scriptRegionFlags uint8
@@ -378,8 +388,9 @@ func minimizeTags(t Tag) (Tag, error) {
 
 // matcher keeps a set of supported language tags, indexed by language.
 type matcher struct {
-	default_ *haveTag
-	index    map[langID]*matchHeader
+	default_     *haveTag
+	index        map[langID]*matchHeader
+	passSettings bool
 }
 
 // matchHeader has the lists of tags for exact matches and matches based on
@@ -451,7 +462,9 @@ func (h *matchHeader) addIfNew(n haveTag, exact bool) {
 	// Allow duplicate maximized tags, but create a linked list to allow quickly
 	// comparing the equivalents and bail out.
 	for i, v := range h.max {
-		if v.maxScript == n.maxScript && v.maxRegion == n.maxRegion && v.tag.strPart() == n.tag.strPart() {
+		if v.maxScript == n.maxScript &&
+			v.maxRegion == n.maxRegion &&
+			v.tag.variantOrPrivateTagStr() == n.tag.variantOrPrivateTagStr() {
 			for h.max[i].nextMax != 0 {
 				i = int(h.max[i].nextMax)
 			}
@@ -555,7 +568,7 @@ func newMatcher(supported []Tag) *matcher {
 
 // getBest gets the best matching tag in m for any of the given tags, taking into
 // account the order of preference of the given tags.
-func (m *matcher) getBest(want ...Tag) (*haveTag, Confidence) {
+func (m *matcher) getBest(want ...Tag) (got *haveTag, orig Tag, c Confidence) {
 	best := bestMatch{}
 	for _, w := range want {
 		var max Tag
@@ -569,7 +582,7 @@ func (m *matcher) getBest(want ...Tag) (*haveTag, Confidence) {
 			for i := range h.exact {
 				have := &h.exact[i]
 				if have.tag.equalsRest(w) {
-					return have, Exact
+					return have, w, Exact
 				}
 			}
 			max, _ = w.canonicalize(Legacy | Deprecated)
@@ -580,7 +593,7 @@ func (m *matcher) getBest(want ...Tag) (*haveTag, Confidence) {
 				for i := range h.exact {
 					have := &h.exact[i]
 					if have.tag.equalsRest(w) {
-						return have, Exact
+						return have, w, Exact
 					}
 				}
 			}
@@ -603,19 +616,23 @@ func (m *matcher) getBest(want ...Tag) (*haveTag, Confidence) {
 					have = &h.max[have.nextMax]
 					best.update(have, w, max.script, max.region)
 				}
-				return best.have, High
+				return best.have, best.want, High
 			}
 		}
 	}
 	if best.conf <= No {
-		return nil, No
+		if len(want) != 0 {
+			return nil, want[0], No
+		}
+		return nil, Tag{}, No
 	}
-	return best.have, best.conf
+	return best.have, best.want, best.conf
 }
 
 // bestMatch accumulates the best match so far.
 type bestMatch struct {
 	have *haveTag
+	want Tag
 	conf Confidence
 	// Cached results from applying tie-breaking rules.
 	origLang   bool
@@ -715,6 +732,7 @@ func (m *bestMatch) update(have *haveTag, tag Tag, maxScript scriptID, maxRegion
 	// Update m to the newly found best match.
 	if beaten {
 		m.have = have
+		m.want = tag
 		m.conf = c
 		m.origLang = origLang
 		m.origReg = origReg
@@ -782,8 +800,11 @@ func (t Tag) variants() string {
 	return t.str[t.pVariant:t.pExt]
 }
 
-// strPart returns variants and extensions.
-func (t Tag) strPart() string {
+// variantOrPrivateTagStr returns variants or private use tags.
+func (t Tag) variantOrPrivateTagStr() string {
+	if t.pExt > 0 {
+		return t.str[t.pVariant:t.pExt]
+	}
 	return t.str[t.pVariant:]
 }
 
@@ -791,7 +812,7 @@ func (t Tag) strPart() string {
 func (a Tag) equalsRest(b Tag) bool {
 	// TODO: don't include extensions in this comparison. To do this efficiently,
 	// though, we should handle private tags separately.
-	return a.script == b.script && a.region == b.region && a.strPart() == b.strPart()
+	return a.script == b.script && a.region == b.region && a.variantOrPrivateTagStr() == b.variantOrPrivateTagStr()
 }
 
 // isExactEquivalent returns true if canonicalizing the language will not alter

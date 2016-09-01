@@ -78,8 +78,10 @@ func (h *Harvester) Harvest() {
 				logp.Info("Reader was closed: %s. Closing.", h.state.Source)
 			case io.EOF:
 				logp.Info("End of file reached: %s. Closing because close_eof is enabled.", h.state.Source)
+			case ErrInactive:
+				logp.Info("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
 			default:
-				logp.Info("Read line error: %s", err)
+				logp.Err("Read line error: %s; File: ", err, h.state.Source)
 			}
 			return
 		}
@@ -258,7 +260,7 @@ func (h *Harvester) close() {
 	if h.file != nil {
 
 		h.file.Close()
-		logp.Debug("harvester", "Stopping harvester, closing file: %s", h.state.Source)
+		logp.Debug("harvester", "Closing file: %s", h.state.Source)
 		harvesterOpenFiles.Add(-1)
 
 		// On completion, push offset so we can continue where we left off if we relaunch on the same file
@@ -271,6 +273,19 @@ func (h *Harvester) close() {
 	harvesterClosed.Add(1)
 }
 
+// newLogFileReader creates a new reader to read log files
+//
+// It creates a chain of readers which looks as following:
+//
+//   limit -> (multiline -> timeout) -> strip_newline -> json -> encode -> line -> log_file
+//
+// Each reader on the left, contains the reader on the right and calls `Next()` to fetch more data.
+// At the base of all readers the the log_file reader. That means in the data is flowing in the opposite direction:
+//
+//   log_file -> line -> encode -> json -> strip_newline -> (timeout -> multiline) -> limit
+//
+// log_file implements io.Reader interface and encode reader is an adapter for io.Reader to
+// reader.Reader also handling file encodings. All other readers implement reader.Reader
 func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 
 	var r reader.Reader
@@ -304,3 +319,9 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 
 	return reader.NewLimit(r, h.config.MaxBytes), nil
 }
+
+/*
+
+TODO: introduce new structure: log_file —[raw bytes]—> (line —[utf8 bytes]—> encode) —[message]—> …`
+
+*/

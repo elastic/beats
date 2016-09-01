@@ -118,16 +118,16 @@ type MetadataResponse struct {
 	Topics  []*TopicMetadata
 }
 
-func (m *MetadataResponse) decode(pd packetDecoder) (err error) {
+func (r *MetadataResponse) decode(pd packetDecoder, version int16) (err error) {
 	n, err := pd.getArrayLength()
 	if err != nil {
 		return err
 	}
 
-	m.Brokers = make([]*Broker, n)
+	r.Brokers = make([]*Broker, n)
 	for i := 0; i < n; i++ {
-		m.Brokers[i] = new(Broker)
-		err = m.Brokers[i].decode(pd)
+		r.Brokers[i] = new(Broker)
+		err = r.Brokers[i].decode(pd)
 		if err != nil {
 			return err
 		}
@@ -138,10 +138,10 @@ func (m *MetadataResponse) decode(pd packetDecoder) (err error) {
 		return err
 	}
 
-	m.Topics = make([]*TopicMetadata, n)
+	r.Topics = make([]*TopicMetadata, n)
 	for i := 0; i < n; i++ {
-		m.Topics[i] = new(TopicMetadata)
-		err = m.Topics[i].decode(pd)
+		r.Topics[i] = new(TopicMetadata)
+		err = r.Topics[i].decode(pd)
 		if err != nil {
 			return err
 		}
@@ -150,23 +150,23 @@ func (m *MetadataResponse) decode(pd packetDecoder) (err error) {
 	return nil
 }
 
-func (m *MetadataResponse) encode(pe packetEncoder) error {
-	err := pe.putArrayLength(len(m.Brokers))
+func (r *MetadataResponse) encode(pe packetEncoder) error {
+	err := pe.putArrayLength(len(r.Brokers))
 	if err != nil {
 		return err
 	}
-	for _, broker := range m.Brokers {
+	for _, broker := range r.Brokers {
 		err = broker.encode(pe)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = pe.putArrayLength(len(m.Topics))
+	err = pe.putArrayLength(len(r.Topics))
 	if err != nil {
 		return err
 	}
-	for _, tm := range m.Topics {
+	for _, tm := range r.Topics {
 		err = tm.encode(pe)
 		if err != nil {
 			return err
@@ -176,16 +176,28 @@ func (m *MetadataResponse) encode(pe packetEncoder) error {
 	return nil
 }
 
-// testing API
-
-func (m *MetadataResponse) AddBroker(addr string, id int32) {
-	m.Brokers = append(m.Brokers, &Broker{id: id, addr: addr})
+func (r *MetadataResponse) key() int16 {
+	return 3
 }
 
-func (m *MetadataResponse) AddTopic(topic string, err KError) *TopicMetadata {
+func (r *MetadataResponse) version() int16 {
+	return 0
+}
+
+func (r *MetadataResponse) requiredVersion() KafkaVersion {
+	return minVersion
+}
+
+// testing API
+
+func (r *MetadataResponse) AddBroker(addr string, id int32) {
+	r.Brokers = append(r.Brokers, &Broker{id: id, addr: addr})
+}
+
+func (r *MetadataResponse) AddTopic(topic string, err KError) *TopicMetadata {
 	var tmatch *TopicMetadata
 
-	for _, tm := range m.Topics {
+	for _, tm := range r.Topics {
 		if tm.Name == topic {
 			tmatch = tm
 			goto foundTopic
@@ -194,7 +206,7 @@ func (m *MetadataResponse) AddTopic(topic string, err KError) *TopicMetadata {
 
 	tmatch = new(TopicMetadata)
 	tmatch.Name = topic
-	m.Topics = append(m.Topics, tmatch)
+	r.Topics = append(r.Topics, tmatch)
 
 foundTopic:
 
@@ -202,8 +214,8 @@ foundTopic:
 	return tmatch
 }
 
-func (m *MetadataResponse) AddTopicPartition(topic string, partition, brokerID int32, replicas, isr []int32, err KError) {
-	tmatch := m.AddTopic(topic, ErrNoError)
+func (r *MetadataResponse) AddTopicPartition(topic string, partition, brokerID int32, replicas, isr []int32, err KError) {
+	tmatch := r.AddTopic(topic, ErrNoError)
 	var pmatch *PartitionMetadata
 
 	for _, pm := range tmatch.Partitions {

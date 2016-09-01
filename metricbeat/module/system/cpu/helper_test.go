@@ -4,7 +4,6 @@
 package cpu
 
 import (
-	"runtime"
 	"testing"
 
 	"github.com/elastic/gosigar"
@@ -62,20 +61,4 @@ func TestCpuPercentage(t *testing.T) {
 
 	assert.Equal(t, cpu2.UserPercent, 0.9502)
 	assert.Equal(t, cpu2.SystemPercent, 0.0448)
-}
-
-func TestGetSystemLoad(t *testing.T) {
-
-	if runtime.GOOS == "windows" {
-		return //no load data on windows
-	}
-
-	load, err := GetSystemLoad()
-
-	assert.NotNil(t, load)
-	assert.Nil(t, err)
-
-	assert.True(t, (load.Load1 > 0))
-	assert.True(t, (load.Load5 > 0))
-	assert.True(t, (load.Load15 > 0))
 }

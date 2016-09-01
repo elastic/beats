@@ -2,16 +2,22 @@
 
 # Name can be overwritten, as Metricbeat is also a library
 BEATNAME?=metricbeat
+BEAT_DESCRIPTION?=Sends metrics to Elasticsearch.
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT?=true
-GOPACKAGES=$(shell go list ${BEAT_DIR}/${BEATNAME}/... | grep -v /vendor/)
+GOPACKAGES=$(shell go list ${BEAT_DIR}/... | grep -v /vendor/)
 ES_BEATS?=..
+
+TARGETS?="windows/amd64 windows/386 darwin/amd64"
+TARGETS_OLD?="linux/amd64 linux/386"
+CGO=true
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO which
 # are the same platforms where the system metrics (cpu, memory) are not
 # implemented.
 GOX_OS=solaris netbsd
 GOX_FLAGS='-arch=amd64'
+
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
 

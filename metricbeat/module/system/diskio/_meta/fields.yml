@@ -27,12 +27,14 @@
 
     - name: read.bytes
       type: long
+      format: bytes
       description: >
         The total number of bytes read successfully. On Linux this is
         the number of sectors read multiplied by an assumed sector size of 512.
 
     - name: write.bytes
       type: long
+      format: bytes
       description: >
         The total number of bytes written successfully. On Linux this is
         the number of sectors written multiplied by an assumed sector size of

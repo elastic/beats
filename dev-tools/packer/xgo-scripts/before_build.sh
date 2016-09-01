@@ -2,7 +2,7 @@
 
 set -e
 
-BEATS_PATH=/go/src/${1}
+BEAT_PATH=/go/src/${1}
 # BEATNAME is in the $PACK variable
 BEATNAME=$PACK
 
@@ -10,21 +10,36 @@ if [ $BEATNAME = "packetbeat" ]; then
 	patch -p1 < /gopacket_pcap.patch
 fi
 
-if [ $BEATS_PATH = "/go/src/github.com/elastic/beats" ]; then
-    BEAT_PATH=$BEATS_PATH/$BEATNAME
-else
-    BEAT_PATH=$BEATS_PATH
-fi
-
 cd $BEAT_PATH
 
 PREFIX=/build
 
 # Add data to the home directory
-mkdir -p $PREFIX/homedirs/$BEATNAME
-make install-home HOME_PREFIX=$PREFIX/homedirs/$BEATNAME
+mkdir -p $PREFIX/homedir
+make install-home HOME_PREFIX=$PREFIX/homedir
+
+# Compile the import_dashboards binary for the requested targets.
+if [ -d $BEAT_PATH/../libbeat/ ]; then
+	# official Beats have libbeat in the top level folder
+	LIBBEAT_PATH=$BEAT_PATH/../libbeat/
+elif [ -d $BEAT_PATH/vendor/github.com/elastic/beats/libbeat/ ]; then
+	# community Beats have libbeat vendored
+	LIBBEAT_PATH=$BEAT_PATH/vendor/github.com/elastic/beats/libbeat/
+else
+	echo "Couldn't find the libbeat location"
+	exit 1
+fi
+
+for TARGET in $TARGETS; do
+	echo "Compiling import_dashboards for $TARGET"
+	XGOOS=`echo $TARGET | cut -d '/' -f 1`
+	XGOARCH=`echo $TARGET | cut -d '/' -f 2`
+
+	GOOS=$XGOOS GOARCH=$XGOARCH go build -o $PREFIX/import_dashboards-$XGOOS-$XGOARCH $LIBBEAT_PATH/dashboards/import_dashboards.go
+done
+
 if [ -n "BUILDID" ]; then
-    echo "$BUILDID" > $PREFIX/homedirs/$BEATNAME/.build_hash.txt
+    echo "$BUILDID" > $PREFIX/homedir/.build_hash.txt
 fi
 
 # Copy template

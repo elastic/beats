@@ -317,7 +317,7 @@ func (b *Broker) DescribeGroups(request *DescribeGroupsRequest) (*DescribeGroups
 	return response, nil
 }
 
-func (b *Broker) send(rb requestBody, promiseResponse bool) (*responsePromise, error) {
+func (b *Broker) send(rb protocolBody, promiseResponse bool) (*responsePromise, error) {
 	b.lock.Lock()
 	defer b.lock.Unlock()
 
@@ -326,6 +326,10 @@ func (b *Broker) send(rb requestBody, promiseResponse bool) (*responsePromise, e
 			return nil, b.connErr
 		}
 		return nil, ErrNotConnected
+	}
+
+	if !b.conf.Version.IsAtLeast(rb.requiredVersion()) {
+		return nil, ErrUnsupportedVersion
 	}
 
 	req := &request{correlationID: b.correlationID, clientID: b.conf.ClientID, body: rb}
@@ -355,7 +359,7 @@ func (b *Broker) send(rb requestBody, promiseResponse bool) (*responsePromise, e
 	return &promise, nil
 }
 
-func (b *Broker) sendAndReceive(req requestBody, res decoder) error {
+func (b *Broker) sendAndReceive(req protocolBody, res versionedDecoder) error {
 	promise, err := b.send(req, res != nil)
 
 	if err != nil {
@@ -368,7 +372,7 @@ func (b *Broker) sendAndReceive(req requestBody, res decoder) error {
 
 	select {
 	case buf := <-promise.packets:
-		return decode(buf, res)
+		return versionedDecode(buf, res, req.version())
 	case err = <-promise.errors:
 		return err
 	}

@@ -12,6 +12,7 @@ about each module can be found under the links below.
   * <<metricbeat-module-mysql,MySQL>>
   * <<metricbeat-module-nginx,Nginx>>
   * <<metricbeat-module-redis,Redis>>
+  * <<metricbeat-module-postgresql,Postgresql>>
   * <<metricbeat-module-system,System>>
   * <<metricbeat-module-zookeeper,ZooKeeper>>
 
@@ -21,6 +22,7 @@ include::modules/apache.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nginx.asciidoc[]
+include::modules/postgresql.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/system.asciidoc[]
 include::modules/zookeeper.asciidoc[]

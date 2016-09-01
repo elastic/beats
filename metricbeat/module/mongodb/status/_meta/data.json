@@ -21,30 +21,30 @@
             },
             "background_flushing": {
                 "average": {
-                    "ms": 2
+                    "ms": 0
                 },
-                "flushes": 68,
+                "flushes": 0,
                 "last": {
-                    "ms": 2
+                    "ms": 0
                 },
-                "last_finished": "2016-06-13T07:59:58.867Z",
+                "last_finished": "1970-01-01T00:00:00.000Z",
                 "total": {
-                    "ms": 145
+                    "ms": 0
                 }
             },
             "connections": {
-                "available": 838859,
-                "current": 1,
-                "total_created": 13
+                "available": 838858,
+                "current": 2,
+                "total_created": 2
             },
             "extra_info": {
                 "heap_usage": {
-                    "bytes": 62893688
+                    "bytes": 62906976
                 },
-                "page_faults": 127
+                "page_faults": 8
             },
             "journaling": {
-                "commits": 25,
+                "commits": 30,
                 "commits_in_write_lock": 0,
                 "compression": 0,
                 "early_commits": 0,
@@ -59,7 +59,7 @@
                         "ms": 0
                     },
                     "dt": {
-                        "ms": 0
+                        "ms": 3096
                     },
                     "prep_log_buffer": {
                         "ms": 0
@@ -78,7 +78,7 @@
                     "mb": 0
                 }
             },
-            "local_time": "2016-06-13T08:00:03.509Z",
+            "local_time": "2016-08-19T10:01:41.565Z",
             "memory": {
                 "bits": 64,
                 "mapped": {
@@ -88,7 +88,7 @@
                     "mb": 160
                 },
                 "resident": {
-                    "mb": 42
+                    "mb": 57
                 },
                 "virtual": {
                     "mb": 356
@@ -96,15 +96,15 @@
             },
             "network": {
                 "in": {
-                    "bytes": 3656
+                    "bytes": 402
                 },
                 "out": {
-                    "bytes": 124556
+                    "bytes": 10657
                 },
-                "requests": 64
+                "requests": 7
             },
             "opcounters": {
-                "command": 65,
+                "command": 8,
                 "delete": 0,
                 "getmore": 0,
                 "insert": 0,
@@ -123,7 +123,7 @@
                 "name": "mmapv1"
             },
             "uptime": {
-                "ms": 37201270
+                "ms": 24689
             },
             "version": "3.0.12",
             "write_backs_queued": false

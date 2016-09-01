@@ -1,0 +1,44 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-beats]]
+== beats Module
+
+This is the beats Module.
+
+
+
+[float]
+=== Example Configuration
+
+The beats module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+#- module: beats
+  #metricsets: ["filebeat", "libbeat"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:6060"]
+
+  # Path to httpprof variables
+  #vars_path: /debug/vars
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-beats-filebeat,filebeat>>
+
+* <<metricbeat-metricset-beats-libbeat,libbeat>>
+
+include::beats/filebeat.asciidoc[]
+
+include::beats/libbeat.asciidoc[]
+

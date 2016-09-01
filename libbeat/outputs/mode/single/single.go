@@ -79,18 +79,18 @@ func (s *Mode) closeClient() error {
 func (s *Mode) PublishEvents(
 	signaler op.Signaler,
 	opts outputs.Options,
-	events []common.MapStr,
+	data []outputs.Data,
 ) error {
 	return s.publish(signaler, opts, func() (bool, bool) {
-		for len(events) > 0 {
+		for len(data) > 0 {
 			var err error
 
-			total := len(events)
-			events, err = s.conn.PublishEvents(events)
+			total := len(data)
+			data, err = s.conn.PublishEvents(data)
 			if err != nil {
 				logp.Info("Error publishing events (retrying): %s", err)
 
-				madeProgress := len(events) < total
+				madeProgress := len(data) < total
 				return false, madeProgress
 			}
 		}
@@ -103,10 +103,10 @@ func (s *Mode) PublishEvents(
 func (s *Mode) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
 	return s.publish(signaler, opts, func() (bool, bool) {
-		if err := s.conn.PublishEvent(event); err != nil {
+		if err := s.conn.PublishEvent(data); err != nil {
 			logp.Info("Error publishing event (retrying): %s", err)
 			return false, false
 		}
@@ -137,7 +137,7 @@ func (s *Mode) publish(
 		resetFail := false
 
 		if err := s.connect(); err != nil {
-			logp.Info("Connecting error publishing events (retrying): %s", err)
+			logp.Err("Connecting error publishing events (retrying): %s", err)
 			goto sendFail
 		}
 

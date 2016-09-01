@@ -14,6 +14,7 @@ type ConsumerMessage struct {
 	Topic      string
 	Partition  int32
 	Offset     int64
+	Timestamp  time.Time // only set if kafka is version 0.10+
 }
 
 // ConsumerError is what is provided to the user when an error occurs.
@@ -255,7 +256,7 @@ type PartitionConsumer interface {
 	// the broker.
 	Messages() <-chan *ConsumerMessage
 
-	// Errors returns a read channel of errors that occured during consuming, if
+	// Errors returns a read channel of errors that occurred during consuming, if
 	// enabled. By default, errors are logged and not returned over this channel.
 	// If you want to implement any custom error handling, set your config's
 	// Consumer.Return.Errors setting to true, and read from this channel.
@@ -412,15 +413,18 @@ func (child *partitionConsumer) HighWaterMarkOffset() int64 {
 
 func (child *partitionConsumer) responseFeeder() {
 	var msgs []*ConsumerMessage
+	expiryTimer := time.NewTimer(child.conf.Consumer.MaxProcessingTime)
 
 feederLoop:
 	for response := range child.feeder {
 		msgs, child.responseResult = child.parseResponse(response)
 
 		for i, msg := range msgs {
+			expiryTimer.Reset(child.conf.Consumer.MaxProcessingTime)
+
 			select {
 			case child.messages <- msg:
-			case <-time.After(child.conf.Consumer.MaxProcessingTime):
+			case <-expiryTimer.C:
 				child.responseResult = errTimedOut
 				child.broker.acks.Done()
 				for _, msg = range msgs[i:] {
@@ -489,6 +493,7 @@ func (child *partitionConsumer) parseResponse(response *FetchResponse) ([]*Consu
 					Key:       msg.Msg.Key,
 					Value:     msg.Msg.Value,
 					Offset:    msg.Offset,
+					Timestamp: msg.Msg.Timestamp,
 				})
 				child.offset = msg.Offset + 1
 			} else {
@@ -538,7 +543,7 @@ func (bc *brokerConsumer) subscriptionManager() {
 	var buffer []*partitionConsumer
 
 	// The subscriptionManager constantly accepts new subscriptions on `input` (even when the main subscriptionConsumer
-	//  goroutine is in the middle of a network request) and batches it up. The main worker goroutine picks
+	// goroutine is in the middle of a network request) and batches it up. The main worker goroutine picks
 	// up a batch of new subscriptions between every network request by reading from `newSubscriptions`, so we give
 	// it nil if no new subscriptions are available. We also write to `wait` only when new subscriptions is available,
 	// so the main goroutine can block waiting for work if it has none.
@@ -669,8 +674,12 @@ func (bc *brokerConsumer) abort(err error) {
 		child.trigger <- none{}
 	}
 
-	for newSubscription := range bc.newSubscriptions {
-		for _, child := range newSubscription {
+	for newSubscriptions := range bc.newSubscriptions {
+		if len(newSubscriptions) == 0 {
+			<-bc.wait
+			continue
+		}
+		for _, child := range newSubscriptions {
 			child.sendError(err)
 			child.trigger <- none{}
 		}
@@ -681,6 +690,9 @@ func (bc *brokerConsumer) fetchNewMessages() (*FetchResponse, error) {
 	request := &FetchRequest{
 		MinBytes:    bc.consumer.conf.Consumer.Fetch.Min,
 		MaxWaitTime: int32(bc.consumer.conf.Consumer.MaxWaitTime / time.Millisecond),
+	}
+	if bc.consumer.conf.Version.IsAtLeast(V0_10_0_0) {
+		request.Version = 2
 	}
 
 	for child := range bc.subscriptions {

@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Packetbeat Cassandra", 
+  "uiStateJSON": "{\"P-10\":{\"vis\":{\"legendOpen\":false}},\"P-17\":{\"vis\":{\"legendOpen\":false}},\"P-18\":{\"vis\":{\"legendOpen\":false}}}", 
+  "panelsJSON": "[{\"col\":10,\"id\":\"Cassandra:-ResponseKeyspace\",\"panelIndex\":3,\"row\":3,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Cassandra:-ResponseType\",\"panelIndex\":4,\"row\":3,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Cassandra:-ResponseTime\",\"panelIndex\":9,\"row\":5,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Cassandra:-RequestCount\",\"panelIndex\":10,\"row\":1,\"size_x\":9,\"size_y\":2,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Cassandra:-Ops\",\"panelIndex\":11,\"row\":3,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Cassandra:-RequestCountStackByType\",\"panelIndex\":15,\"row\":7,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Cassandra:-ResponseCountStackByType\",\"panelIndex\":16,\"row\":9,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Cassandra:-RequestCountByType\",\"panelIndex\":17,\"row\":11,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Cassandra:-ResponseCountByType\",\"panelIndex\":18,\"row\":11,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Navigation\",\"panelIndex\":19,\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\"},{\"id\":\"Cassandra:-QueryView\",\"type\":\"search\",\"panelIndex\":20,\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":14,\"columns\":[\"cassandra.request.query\",\"cassandra.response.result.rows.meta.keyspace\",\"cassandra.response.result.rows.meta.table\",\"cassandra.response.result.rows.num_rows\"],\"sort\":[\"@timestamp\",\"desc\"]}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

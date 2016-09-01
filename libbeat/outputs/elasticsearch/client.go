@@ -15,14 +15,17 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 type Client struct {
 	Connection
-	index  string
-	params map[string]string
+	index    outil.Selector
+	pipeline *outil.Selector
+	params   map[string]string
 
 	// buffered bulk requests
 	bulkRequ *bulkRequest
@@ -33,6 +36,18 @@ type Client struct {
 	// additional configs
 	compressionLevel int
 	proxyURL         *url.URL
+}
+
+type ClientSettings struct {
+	URL                string
+	Proxy              *url.URL
+	TLS                *tls.Config
+	Username, Password string
+	Parameters         map[string]string
+	Index              outil.Selector
+	Pipeline           *outil.Selector
+	Timeout            time.Duration
+	CompressionLevel   int
 }
 
 type connectCallback func(client *Client) error
@@ -75,21 +90,22 @@ var (
 )
 
 func NewClient(
-	esURL, index string, proxyURL *url.URL, tls *tls.Config,
-	username, password string,
-	params map[string]string,
-	timeout time.Duration,
-	compression int,
+	s ClientSettings,
 	onConnectCallback connectCallback,
 ) (*Client, error) {
 	proxy := http.ProxyFromEnvironment
-	if proxyURL != nil {
-		proxy = http.ProxyURL(proxyURL)
+	if s.Proxy != nil {
+		proxy = http.ProxyURL(s.Proxy)
 	}
 
-	logp.Info("Elasticsearch url: %s", esURL)
+	pipeline := s.Pipeline
+	if pipeline != nil && pipeline.IsEmpty() {
+		pipeline = nil
+	}
 
-	dialer := transport.NetDialer(timeout)
+	logp.Info("Elasticsearch url: %s", s.URL)
+
+	dialer := transport.NetDialer(s.Timeout)
 	dialer = transport.StatsDialer(dialer, &transport.IOStats{
 		Read:        statReadBytes,
 		Write:       statWriteBytes,
@@ -97,12 +113,14 @@ func NewClient(
 		WriteErrors: statWriteErrors,
 	})
 
-	bulkRequ, err := newBulkRequest(esURL, "", "", params, nil)
+	params := s.Parameters
+	bulkRequ, err := newBulkRequest(s.URL, "", "", params, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var encoder bodyEncoder
+	compression := s.CompressionLevel
 	if compression == 0 {
 		encoder = newJSONEncoder(nil)
 	} else {
@@ -114,26 +132,27 @@ func NewClient(
 
 	client := &Client{
 		Connection: Connection{
-			URL:      esURL,
-			Username: username,
-			Password: password,
+			URL:      s.URL,
+			Username: s.Username,
+			Password: s.Password,
 			http: &http.Client{
 				Transport: &http.Transport{
 					Dial:            dialer.Dial,
-					TLSClientConfig: tls,
+					TLSClientConfig: s.TLS,
 					Proxy:           proxy,
 				},
-				Timeout: timeout,
+				Timeout: s.Timeout,
 			},
 			encoder: encoder,
 		},
-		index:  index,
-		params: params,
+		index:    s.Index,
+		pipeline: pipeline,
+		params:   params,
 
 		bulkRequ: bulkRequ,
 
 		compressionLevel: compression,
-		proxyURL:         proxyURL,
+		proxyURL:         s.Proxy,
 	}
 
 	client.Connection.onConnectCallback = func() error {
@@ -154,15 +173,18 @@ func (client *Client) Clone() *Client {
 
 	transport := client.http.Transport.(*http.Transport)
 	c, _ := NewClient(
-		client.URL,
-		client.index,
-		client.proxyURL,
-		transport.TLSClientConfig,
-		client.Username,
-		client.Password,
-		nil, // XXX: do not pass params?
-		client.http.Timeout,
-		client.compressionLevel,
+		ClientSettings{
+			URL:              client.URL,
+			Index:            client.index,
+			Pipeline:         client.pipeline,
+			Proxy:            client.proxyURL,
+			TLS:              transport.TLSClientConfig,
+			Username:         client.Username,
+			Password:         client.Password,
+			Parameters:       nil, // XXX: do not pass params?
+			Timeout:          client.http.Timeout,
+			CompressionLevel: client.compressionLevel,
+		},
 		nil, // XXX: do not pass connection callback?
 	)
 	return c
@@ -172,12 +194,12 @@ func (client *Client) Clone() *Client {
 // events not published or confirmed to be processed by elasticsearch will be
 // returned. The input slice backing memory will be reused by return the value.
 func (client *Client) PublishEvents(
-	events []common.MapStr,
-) ([]common.MapStr, error) {
+	data []outputs.Data,
+) ([]outputs.Data, error) {
 	begin := time.Now()
 	publishEventsCallCount.Add(1)
 
-	if len(events) == 0 {
+	if len(data) == 0 {
 		return nil, nil
 	}
 
@@ -186,8 +208,8 @@ func (client *Client) PublishEvents(
 
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
-	events = bulkEncodePublishRequest(body, client.index, events)
-	if len(events) == 0 {
+	data = bulkEncodePublishRequest(body, client.index, client.pipeline, data)
+	if len(data) == 0 {
 		return nil, nil
 	}
 
@@ -196,23 +218,23 @@ func (client *Client) PublishEvents(
 	status, result, sendErr := client.sendBulkRequest(requ)
 	if sendErr != nil {
 		logp.Err("Failed to perform any bulk index operations: %s", sendErr)
-		return events, sendErr
+		return data, sendErr
 	}
 
-	debugf("PublishEvents: %d metrics have been  published to elasticsearch in %v.",
-		len(events),
+	debugf("PublishEvents: %d events have been  published to elasticsearch in %v.",
+		len(data),
 		time.Now().Sub(begin))
 
 	// check response for transient errors
-	var failedEvents []common.MapStr
+	var failedEvents []outputs.Data
 	if status != 200 {
-		failedEvents = events
+		failedEvents = data
 	} else {
 		client.json.init(result.raw)
-		failedEvents = bulkCollectPublishFails(&client.json, events)
+		failedEvents = bulkCollectPublishFails(&client.json, data)
 	}
 
-	ackedEvents.Add(int64(len(events) - len(failedEvents)))
+	ackedEvents.Add(int64(len(data) - len(failedEvents)))
 	eventsNotAcked.Add(int64(len(failedEvents)))
 	if len(failedEvents) > 0 {
 		if sendErr == nil {
@@ -228,60 +250,105 @@ func (client *Client) PublishEvents(
 // successfully added to bulk request.
 func bulkEncodePublishRequest(
 	body bulkWriter,
-	index string,
-	events []common.MapStr,
-) []common.MapStr {
-	okEvents := events[:0]
-	for _, event := range events {
-		meta := eventBulkMeta(index, event)
-		err := body.Add(meta, event)
-		if err != nil {
+	index outil.Selector,
+	pipeline *outil.Selector,
+	data []outputs.Data,
+) []outputs.Data {
+	var mkMeta func(outil.Selector, *outil.Selector, outputs.Data) interface{}
+
+	mkMeta = eventBulkMeta
+	if pipeline != nil {
+		mkMeta = eventIngestBulkMeta
+	}
+
+	okEvents := data[:0]
+	for _, datum := range data {
+		meta := mkMeta(index, pipeline, datum)
+		if err := body.Add(meta, datum.Event); err != nil {
 			logp.Err("Failed to encode event: %s", err)
 			continue
 		}
-
-		okEvents = append(okEvents, event)
+		okEvents = append(okEvents, datum)
 	}
 	return okEvents
 }
 
-func eventBulkMeta(index string, event common.MapStr) bulkMeta {
-	index = getIndex(event, index)
+func eventBulkMeta(
+	index outil.Selector,
+	_ *outil.Selector,
+	data outputs.Data,
+) interface{} {
+	type bulkMetaIndex struct {
+		Index   string `json:"_index"`
+		DocType string `json:"_type"`
+	}
+	type bulkMeta struct {
+		Index bulkMetaIndex `json:"index"`
+	}
+
+	event := data.Event
 	meta := bulkMeta{
 		Index: bulkMetaIndex{
-			Index:   index,
+			Index:   getIndex(event, index),
 			DocType: event["type"].(string),
 		},
 	}
 	return meta
 }
 
+func eventIngestBulkMeta(
+	index outil.Selector,
+	pipelineSel *outil.Selector,
+	data outputs.Data,
+) interface{} {
+	type bulkMetaIndex struct {
+		Index    string `json:"_index"`
+		DocType  string `json:"_type"`
+		Pipeline string `json:"pipeline"`
+	}
+	type bulkMeta struct {
+		Index bulkMetaIndex `json:"index"`
+	}
+
+	event := data.Event
+	pipeline, _ := pipelineSel.Select(event)
+	if pipeline == "" {
+		return eventBulkMeta(index, nil, data)
+	}
+
+	return bulkMeta{
+		Index: bulkMetaIndex{
+			Index:    getIndex(event, index),
+			Pipeline: pipeline,
+			DocType:  event["type"].(string),
+		},
+	}
+}
+
 // getIndex returns the full index name
 // Index is either defined in the config as part of the output
 // or can be overload by the event through setting index
-func getIndex(event common.MapStr, index string) string {
+func getIndex(event common.MapStr, index outil.Selector) string {
 
 	ts := time.Time(event["@timestamp"].(common.Time)).UTC()
 
 	// Check for dynamic index
+	// XXX: is this used/needed?
 	if _, ok := event["beat"]; ok {
 		beatMeta, ok := event["beat"].(common.MapStr)
 		if ok {
 			// Check if index is set dynamically
 			if dynamicIndex, ok := beatMeta["index"]; ok {
-				dynamicIndexValue, ok := dynamicIndex.(string)
-				if ok {
-					index = dynamicIndexValue
+				if dynamicIndexValue, ok := dynamicIndex.(string); ok {
+					return fmt.Sprintf("%s-%d.%02d.%02d",
+						dynamicIndexValue, ts.Year(), ts.Month(), ts.Day())
 				}
 			}
 		}
 	}
 
-	// Append timestamp to index
-	index = fmt.Sprintf("%s-%d.%02d.%02d", index,
-		ts.Year(), ts.Month(), ts.Day())
-
-	return index
+	str, _ := index.Select(event)
+	return str
 }
 
 // bulkCollectPublishFails checks per item errors returning all events
@@ -290,8 +357,8 @@ func getIndex(event common.MapStr, index string) string {
 // the event will be dropped.
 func bulkCollectPublishFails(
 	reader *jsonReader,
-	events []common.MapStr,
-) []common.MapStr {
+	data []outputs.Data,
+) []outputs.Data {
 	if err := reader.expectDict(); err != nil {
 		logp.Err("Failed to parse bulk respose: expected JSON object")
 		return nil
@@ -324,8 +391,8 @@ func bulkCollectPublishFails(
 		return nil
 	}
 
-	count := len(events)
-	failed := events[:0]
+	count := len(data)
+	failed := data[:0]
 	for i := 0; i < count; i++ {
 		status, msg, err := itemStatus(reader)
 		if err != nil {
@@ -343,7 +410,7 @@ func bulkCollectPublishFails(
 		}
 
 		logp.Info("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
-		failed = append(failed, events[i])
+		failed = append(failed, data[i])
 	}
 
 	return failed
@@ -416,7 +483,10 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 			}
 
 		default: // ignore unknown fields
-			reader.ignoreNext()
+			_, err = reader.ignoreNext()
+			if err != nil {
+				return 0, nil, err
+			}
 		}
 	}
 
@@ -426,13 +496,35 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 	return status, msg, nil
 }
 
-func (client *Client) PublishEvent(event common.MapStr) error {
+func (client *Client) PublishEvent(data outputs.Data) error {
+	// insert the events one by one
+
+	event := data.Event
 	index := getIndex(event, client.index)
+	typ := event["type"].(string)
+
 	debugf("Publish event: %s", event)
 
-	// insert the events one by one
-	status, _, err := client.Index(
-		index, event["type"].(string), "", client.params, event)
+	pipeline := ""
+	if client.pipeline != nil {
+		var err error
+		pipeline, err = client.pipeline.Select(event)
+		if err != nil {
+			logp.Err("Failed to select pipeline: %v", err)
+			return err
+		}
+		debugf("select pipeline: %v", pipeline)
+	}
+
+	var status int
+	var err error
+	if pipeline == "" {
+		status, _, err = client.Index(index, typ, "", client.params, event)
+	} else {
+		status, _, err = client.Ingest(index, typ, pipeline, "", client.params, event)
+	}
+
+	// check indexing error
 	if err != nil {
 		logp.Warn("Fail to insert a single event: %s", err)
 		if err == ErrJSONEncodeFailed {
@@ -459,16 +551,22 @@ func (client *Client) PublishEvent(event common.MapStr) error {
 func (client *Client) LoadTemplate(templateName string, template map[string]interface{}) error {
 
 	path := "/_template/" + templateName
-	status, _, err := client.request("PUT", path, nil, template)
-
+	err := client.LoadJson(path, template)
 	if err != nil {
-		return fmt.Errorf("Template could not be loaded. Error: %s", err)
+		return fmt.Errorf("couldn't load template: %v", err)
 	}
-	if status != 200 {
-		return fmt.Errorf("Template could not be loaded. Status: %v", status)
-	}
-
 	logp.Info("Elasticsearch template with name '%s' loaded", templateName)
+	return nil
+}
+
+func (client *Client) LoadJson(path string, json map[string]interface{}) error {
+	status, _, err := client.request("PUT", path, "", nil, json)
+	if err != nil {
+		return fmt.Errorf("couldn't load json. Error: %s", err)
+	}
+	if status > 300 {
+		return fmt.Errorf("couldn't load json. Status: %v", status)
+	}
 
 	return nil
 }
@@ -477,7 +575,7 @@ func (client *Client) LoadTemplate(templateName string, template map[string]inte
 // and only if Elasticsearch returns with HTTP status code 200.
 func (client *Client) CheckTemplate(templateName string) bool {
 
-	status, _, _ := client.request("HEAD", "/_template/"+templateName, nil, nil)
+	status, _, _ := client.request("HEAD", "/_template/"+templateName, "", nil, nil)
 
 	if status != 200 {
 		return false
@@ -537,11 +635,12 @@ func (conn *Connection) Close() error {
 
 func (conn *Connection) request(
 	method, path string,
+	pipeline string,
 	params map[string]string,
 	body interface{},
 ) (int, []byte, error) {
-	url := makeURL(conn.URL, path, params)
-	debugf("%s %s %v", method, url, body)
+	url := makeURL(conn.URL, path, pipeline, params)
+	debugf("%s %s %s %v", method, url, pipeline, body)
 
 	if body == nil {
 		return conn.execRequest(method, url, nil)

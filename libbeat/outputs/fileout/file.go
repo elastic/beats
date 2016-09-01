@@ -74,14 +74,14 @@ func (out *fileOutput) Close() error {
 func (out *fileOutput) PublishEvent(
 	sig op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
-	jsonEvent, err := json.Marshal(event)
+	jsonEvent, err := json.Marshal(data.Event)
 	if err != nil {
 		// mark as success so event is not sent again.
 		op.SigCompleted(sig)
 
-		logp.Err("Fail to json encode event(%v): %#v", err, event)
+		logp.Err("Fail to json encode event(%v): %#v", err, data.Event)
 		return err
 	}
 
