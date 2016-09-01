@@ -1,78 +1,11 @@
 package match
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"testing"
 )
-
-type testMatcher interface {
-	// Match([]byte) bool
-	// MatchReader(io.RuneReader) bool
-	MatchString(string) bool
-}
-
-type matcherFactory func(pattern string) (testMatcher, error)
-
-func BenchmarkBeginning(b *testing.B) {
-	pattern := `^PATTERN`
-	b.Run("Matcher=Regex", makeRegexRunner(pattern))
-	b.Run("Matcher=Match", makeMatchRunner(pattern))
-}
-
-func BenchmarkBeginningSpace(b *testing.B) {
-	pattern := `^ `
-	b.Run("Matcher=Regex", makeRegexRunner(pattern))
-	b.Run("Matcher=Match", makeMatchRunner(pattern))
-}
-
-func BenchmarkBeginningDate(b *testing.B) {
-	pattern := `^\d{2}-\d{2}-\d{4}`
-	b.Run("Matcher=Regex", makeRegexRunner(pattern))
-	b.Run("Matcher=Match", makeMatchRunner(pattern))
-}
-
-func BenchmarkStringPatternRegex(b *testing.B) {
-	pattern := `PATTERN`
-	b.Run("Matcher=Regex", makeRegexRunner(pattern))
-	b.Run("Matcher=Match", makeMatchRunner(pattern))
-}
-
-func BenchmarkStringPatternDotStarRegex(b *testing.B) {
-	pattern := `.*PATTERN.*`
-	b.Run("Matcher=Regex", makeRegexRunner(pattern))
-	b.Run("Matcher=Match", makeMatchRunner(pattern))
-}
-
-func runBenchStrings(
-	b *testing.B,
-	factory matcherFactory,
-	pattern string,
-	content []string,
-) bool {
-	matcher, err := factory(pattern)
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	found := false
-	for i := 0; i < b.N; i++ {
-		for _, line := range content {
-			b := matcher.MatchString(line)
-			found = found || b
-		}
-	}
-
-	return found
-}
-
-func regexFactory(pattern string) (testMatcher, error) {
-	return regexp.Compile(pattern)
-}
-
-func matchFactory(pattern string) (testMatcher, error) {
-	return Compile(pattern)
-}
 
 var commonContent = strings.Split(`Lorem ipsum dolor sit amet,
 PATTERN consectetur adipiscing elit. Nam vitae turpis augue.
@@ -85,6 +18,33 @@ erat, a maximus sapien rutrum ut. Curabitur congue condimentum dignissim.
  Mauris hendrerit, velit nec accumsan egestas, augue justo tincidunt risus,
 a facilisis nulla augue PATTERN eu metus. Duis vel neque sit amet nunc elementum viverra
 eu ut ligula. Mauris et libero lacus.`, "\n")
+
+func BenchmarkPatterns(b *testing.B) {
+	patterns := []struct {
+		title string
+		regex string
+	}{
+		{"startsWith 'PATTERN'", `^PATTERN`},
+		{"startsWith ' '", `^ `},
+		{"startsWithDate", `^\d{2}-\d{2}-\d{4}`},
+		{"contains 'PATTERN'", `PATTERN`},
+		{"contains 'PATTERN' with '.*", `.*PATTERN.*`},
+	}
+
+	runTitle := func(matcher, name string) string {
+		return fmt.Sprintf("Name=%v, Matcher=%v", name, matcher)
+	}
+
+	for i, pattern := range patterns {
+		b.Logf("benchmark (%v): %v", i, pattern.title)
+
+		regex := makeRunner(regexp.MustCompile(pattern.regex).MatchString)
+		matcher := makeRunner(MustCompile(pattern.regex).MatchString)
+
+		b.Run(runTitle("Regex", pattern.title), regex)
+		b.Run(runTitle("Match", pattern.title), matcher)
+	}
+}
 
 func makeRunner(m func(string) bool) func(*testing.B) {
 	return func(b *testing.B) {
@@ -99,12 +59,4 @@ func makeRunner(m func(string) bool) func(*testing.B) {
 			b.Error("no matches found")
 		}
 	}
-}
-
-func makeRegexRunner(pattern string) func(*testing.B) {
-	return makeRunner(regexp.MustCompile(pattern).MatchString)
-}
-
-func makeMatchRunner(pattern string) func(*testing.B) {
-	return makeRunner(MustCompile(pattern).MatchString)
 }

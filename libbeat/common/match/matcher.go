@@ -7,7 +7,7 @@ import (
 )
 
 type Match struct {
-	m stringMatcher
+	stringMatcher
 }
 
 type stringMatcher interface {
@@ -15,11 +15,7 @@ type stringMatcher interface {
 	// the matcher didn't match. If matched is true, rest contains the yet
 	// unmatched substring which can be used for further matching (e.g. when
 	// concatenating matches)
-	matchString(s string) (matched bool, rest string)
-}
-
-type regexStringMatcher struct {
-	r *regexp.Regexp
+	MatchString(s string) (matched bool)
 }
 
 type substringMatcher struct {
@@ -63,33 +59,23 @@ func compile(r *syntax.Regexp) (Match, error) {
 		if err != nil {
 			return Match{}, err
 		}
-		return Match{regexStringMatcher{r}}, nil
+		return Match{r}, nil
 	}
 }
 
-func (m Match) MatchString(s string) bool {
-	b, _ := m.m.matchString(s)
-	return b
-}
-
-func (m regexStringMatcher) matchString(s string) (bool, string) {
-	b := m.r.MatchString(s)
-	return b, ""
-}
-
-func (m *substringMatcher) matchString(s string) (bool, string) {
+func (m *substringMatcher) MatchString(s string) bool {
 	idx := strings.Index(s, m.s)
 	if idx < 0 {
-		return false, ""
+		return false
 	}
-	return true, s[idx+len(m.s):]
+	return true
 }
 
-func (m *prefixMatcher) matchString(s string) (bool, string) {
+func (m *prefixMatcher) MatchString(s string) bool {
 	if !strings.HasPrefix(s, m.s) {
-		return false, ""
+		return false
 	}
-	return true, m.s[len(m.s):]
+	return true
 }
 
 type trans func(*syntax.Regexp) (bool, *syntax.Regexp)
