@@ -20,7 +20,7 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 * <<redis-output>>
 * <<file-output>>
 * <<console-output>>
-* <<configuration-output-tls>>
+* <<configuration-output-ssl>>
 * <<configuration-path>>
 * <<configuration-logging>>
 * <<configuration-run-options>>

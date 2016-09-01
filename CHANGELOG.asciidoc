@@ -17,6 +17,10 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Replace `output.kafka.use_type` by `output.kafka.topic` accepting a format string. {pull}2188[2188]
 - If the path specified by the `-c` flag is not absolute and `-path.config` is not specified, it
   is considered relative to the current working directory. {pull}2245[2245]
+- rename `tls` configurations section to `ssl`. {pull}2330[2330]
+- rename `certificate_key` configuration to `key`. {pull}2330[2330]
+- replace `tls.insecure` with `ssl.verification_mode` setting. {pull}2330[2330]
+- replace `tls.min/max_version` with `ssl.supported_protocols` setting requiring full protocol name. {pull}2330[2330]
 
 *Metricbeat*
 - Change field type system.process.cpu.start_time from keyword to date. {issue}1565[1565]
@@ -77,6 +81,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Re-write import_dashboards.sh in Golang. {pull}2155[2155]
 - Update to Go 1.7. {pull}2306[2306]
 - Log total non-zero internal metrics on shutdown. {pull}2349[2349]
+- Add support for encrypted private key files by introducing `ssl.key_passphrase` setting. {pull}2330[2330]
 
 *Metricbeat*
 

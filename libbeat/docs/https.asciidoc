@@ -49,18 +49,18 @@ output.elasticsearch:
   password: verysecret
   protocol: https
   hosts: ["elasticsearch.example.com:9200"]
-  tls.certificate_authorities: <1>
+  ssl.certificate_authorities: <1>
     - /etc/pki/my_root_ca.pem
     - /etc/pki/my_other_ca.pem
-  tls.certificate: "/etc/pki/client.pem" <2>
-  tls.certificate_key: "/etc/pki/key.pem" <3>
+  ssl.certificate: "/etc/pki/client.pem" <2>
+  ssl.key: "/etc/pki/key.pem" <3>
 ----------------------------------------------------------------------
 <1> The list of CA certificates to trust
-<2> The path to the certificate for TLS client authentication
+<2> The path to the certificate for SSL client authentication
 <3> The client certificate key
 
 NOTE: For any given connection, the SSL/TLS certificates must have a subject
-that matches the value specified for `hosts`, or the TLS handshake fails.
+that matches the value specified for `hosts`, or the SSL handshake fails.
 For example, if you specify `hosts: ["foobar:9200"]`, the certificate MUST
 include `foobar` in the subject (`CN=foobar`) or as a subject alternative name
 (SAN). Make sure the hostname resolves to the correct IP address. If no DNS is available, then
