@@ -3,7 +3,7 @@ libbeat:
   links:
     - redis
     - elasticsearch-173
-    - elasticsearch-210
+    - elasticsearch-240
     - logstash
   environment:
     - REDIS_HOST=redis
@@ -15,8 +15,9 @@ libbeat:
     - build/test.env
 elasticsearch-173:
   image: elasticsearch:1.7.3
-elasticsearch-210:
-  image: elasticsearch:2.1.0
+elasticsearch-240:
+  build: ../scripts/docker/elasticsearch
+  dockerfile: Dockerfile-2.4.0
   command: elasticsearch -Des.network.host=0.0.0.0
 redis:
   image: redis
@@ -28,4 +29,4 @@ logstash:
     - build/test.env
   links:
     - elasticsearch-173
-    - elasticsearch-210
+    - elasticsearch-240
