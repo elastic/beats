@@ -112,6 +112,54 @@ func TestMode(
 		return
 	}
 
+	results, expectedData := PublishWith(t, mode, opts, data, expectedSignals)
+	assert.Equal(t, expectedSignals, results)
+
+	if collected != nil {
+		assert.Equal(t, len(expectedData), len(*collected))
+		if len(expectedData) == len(*collected) {
+			for i := range *collected {
+				expected := expectedData[i]
+				actual := (*collected)[i]
+				assert.Equal(t, expected, actual)
+			}
+		}
+	}
+}
+
+func PublishWith(
+	t *testing.T,
+	mode mode.ConnectionMode,
+	opts outputs.Options,
+	data []EventInfo,
+	expectedSignals []bool,
+) ([]bool, [][]outputs.Data) {
+	return doPublishWith(t, mode, opts, data, func(i int) bool {
+		return expectedSignals[i]
+	})
+}
+
+func PublishAllWith(
+	t *testing.T,
+	mode mode.ConnectionMode,
+	data []EventInfo,
+) ([]bool, [][]outputs.Data) {
+	opts := outputs.Options{Guaranteed: true}
+	expectSignal := func(_ int) bool { return true }
+	return doPublishWith(t, mode, opts, data, expectSignal)
+}
+
+func doPublishWith(
+	t *testing.T,
+	mode mode.ConnectionMode,
+	opts outputs.Options,
+	data []EventInfo,
+	expectedSignals func(int) bool,
+) ([]bool, [][]outputs.Data) {
+	if data == nil {
+		return nil, nil
+	}
+
 	numSignals := 0
 	for _, pubEvents := range data {
 		if pubEvents.Single {
@@ -129,34 +177,24 @@ func TestMode(
 		if pubEvents.Single {
 			for _, event := range pubEvents.Data {
 				_ = mode.PublishEvent(signal, opts, event)
-				if expectedSignals[idx] {
+				if expectedSignals(idx) {
 					expectedData = append(expectedData, []outputs.Data{event})
 				}
 				idx++
 			}
 		} else {
 			_ = mode.PublishEvents(signal, opts, pubEvents.Data)
-			if expectedSignals[idx] {
+			if expectedSignals(idx) {
 				expectedData = append(expectedData, pubEvents.Data)
 			}
 			idx++
 		}
 	}
 
-	results := make([]bool, len(expectedSignals))
-	for i := 0; i < len(expectedSignals); i++ {
-		results[i] = <-ch == op.SignalCompleted
+	var signals []bool
+	for i := 0; i < idx; i++ {
+		signals = append(signals, <-ch == op.SignalCompleted)
 	}
-	assert.Equal(t, expectedSignals, results)
 
-	if collected != nil {
-		assert.Equal(t, len(expectedData), len(*collected))
-		if len(expectedData) == len(*collected) {
-			for i := range *collected {
-				expected := expectedData[i]
-				actual := (*collected)[i]
-				assert.Equal(t, expected, actual)
-			}
-		}
-	}
+	return signals, expectedData
 }

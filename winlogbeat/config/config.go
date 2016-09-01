@@ -46,7 +46,7 @@ func (s Settings) Validate() error {
 
 	validKeys := []string{
 		"fields", "fields_under_root", "tags",
-		"name", "refresh_topology_freq", "ignore_outgoing", "topology_expire", "geoip",
+		"name", "refresh_topology_freq", "topology_expire", "geoip",
 		"queue_size", "bulk_queue_size", "max_procs",
 		"processors", "logging", "output", "path", "winlogbeat",
 	}

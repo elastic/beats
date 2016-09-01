@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package runes provide transforms for UTF-8 encoded text.
-package runes
+package runes // import "golang.org/x/text/runes"
 
 import (
 	"unicode"
@@ -220,4 +220,59 @@ func (t mapper) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err erro
 		nSrc += size
 	}
 	return
+}
+
+// ReplaceIllFormed returns a transformer that replaces all input bytes that are
+// not part of a well-formed UTF-8 code sequence with utf8.RuneError.
+func ReplaceIllFormed() Transformer {
+	return Transformer{&replaceIllFormed{}}
+}
+
+type replaceIllFormed struct{ transform.NopResetter }
+
+func (t replaceIllFormed) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	for nSrc < len(src) {
+		r, size := utf8.DecodeRune(src[nSrc:])
+
+		// Look for an ASCII rune.
+		if r < utf8.RuneSelf {
+			if nDst == len(dst) {
+				err = transform.ErrShortDst
+				break
+			}
+			dst[nDst] = byte(r)
+			nDst++
+			nSrc++
+			continue
+		}
+
+		// Look for a valid non-ASCII rune.
+		if r != utf8.RuneError || size != 1 {
+			if size != copy(dst[nDst:], src[nSrc:nSrc+size]) {
+				err = transform.ErrShortDst
+				break
+			}
+			nDst += size
+			nSrc += size
+			continue
+		}
+
+		// Look for short source data.
+		if !atEOF && !utf8.FullRune(src[nSrc:]) {
+			err = transform.ErrShortSrc
+			break
+		}
+
+		// We have an invalid rune.
+		if nDst+3 > len(dst) {
+			err = transform.ErrShortDst
+			break
+		}
+		dst[nDst+0] = runeErrorString[0]
+		dst[nDst+1] = runeErrorString[1]
+		dst[nDst+2] = runeErrorString[2]
+		nDst += 3
+		nSrc++
+	}
+	return nDst, nSrc, err
 }

@@ -1,0 +1,70 @@
+- name: libbeat
+  type: group
+  description: >
+    experimental[]
+
+    libbeat metrics. This metricset can be used with all beats.
+  fields:
+    - name: output
+      type: group
+      description: >
+        Output related metrics
+      fields:
+        - name: elasticsearch
+          type: group
+          description: >
+            Elasticsearch specific metrics
+          fields:
+            - name: events
+              type: group
+              descriptions: >
+                Elasticsearch event metrics
+              fields:
+                - name: ack
+                  type: long
+                  description: >
+                    Number of acknowledged events by elasticsearch
+                - name: not_ack
+                  type: long
+                  description: >
+                    Number of not acknowledged events by elasticsearch
+            - name: read
+              type: group
+              descriptions: >
+                Elasticsearch read metrics
+              fields:
+                - name: bytes
+                  type: long
+                  description: >
+                    Number of bytes read by the output
+                - name: errors
+                  type: long
+                  description: >
+                    Number of read errors
+            - name: write
+              type: group
+              descriptions: >
+                Elasticsearch write metrics
+              fields:
+                - name: bytes
+                  type: long
+                  description: >
+                    Number of bytes written by the output
+                - name: errors
+                  type: long
+                  description: >
+                    Number of write errors
+    - name: publisher
+      type: group
+      description: >
+        General publisher metrics
+      fields:
+        - name: events
+          type: group
+          description: >
+            Log files related stastics.
+          fields:
+            - name: published
+              type: long
+              description: >
+                Total number of events published

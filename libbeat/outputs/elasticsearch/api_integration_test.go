@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -76,6 +77,10 @@ func TestIngest(t *testing.T) {
 	}
 
 	client := GetTestingElasticsearch()
+	if strings.HasPrefix(client.Connection.version, "2.") {
+		t.Skip("Skipping tests as pipeline not available in 2.x releases")
+	}
+
 	_, _, err := client.DeletePipeline(pipeline, nil)
 
 	_, resp, err := client.CreatePipeline(pipeline, nil, pipelineBody)

@@ -45,7 +45,6 @@ type TopologyProvider interface {
 	IsPublisherIP(ip string) bool
 	GetServerName(ip string) string
 	GeoLite() *libgeo.GeoIP
-	IgnoreOutgoing() bool
 }
 
 func (t *ChanTransactions) PublishTransaction(event common.MapStr) bool {
@@ -58,6 +57,7 @@ var debugf = logp.MakeDebug("publish")
 func NewPublisher(
 	pub publisher.Publisher,
 	hwm, bulkHWM int,
+	ignoreOutgoing bool,
 ) (*PacketbeatPublisher, error) {
 	topo, ok := pub.(TopologyProvider)
 	if !ok {
@@ -68,7 +68,7 @@ func NewPublisher(
 		pub:            pub,
 		topo:           topo,
 		geoLite:        topo.GeoLite(),
-		ignoreOutgoing: topo.IgnoreOutgoing(),
+		ignoreOutgoing: ignoreOutgoing,
 		client:         pub.Connect(),
 		done:           make(chan struct{}),
 		trans:          make(chan common.MapStr, hwm),

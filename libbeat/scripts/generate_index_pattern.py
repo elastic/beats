@@ -43,6 +43,8 @@ def field_to_json(desc, path, output):
             field["type"] = "number"
         elif desc["type"] in ["text", "keyword"]:
             field["type"] = "string"
+        elif desc["type"] == "date":
+            field["type"] = "date"
     else:
         field["type"] = "string"
 
@@ -80,7 +82,7 @@ def fields_to_index_pattern(args, input):
 
 def get_index_pattern_name(index):
 
-    allow = string.letters + string.digits + "_"
+    allow = string.ascii_letters + string.digits + "_"
     return re.sub('[^%s]' % allow, '', index)
 
 
@@ -119,4 +121,4 @@ if __name__ == "__main__":
     with open(target_file, 'w') as f:
         f.write(output)
 
-    print "The index pattern was created under {}".format(target_file)
+    print ("The index pattern was created under {}".format(target_file))

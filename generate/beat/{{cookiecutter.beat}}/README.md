@@ -9,7 +9,7 @@ Ensure that this folder is at the following location:
 
 ### Requirements
 
-* [Golang](https://golang.org/dl/) 1.6.2
+* [Golang](https://golang.org/dl/) 1.7
 
 ### Init Project
 To get running with {{cookiecutter.beat|capitalize}} and also install the

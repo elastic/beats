@@ -78,13 +78,15 @@ func Title(t language.Tag, opts ...Option) Caser {
 	return Caser{makeTitle(t, getOpts(opts...))}
 }
 
-// Fold returns a Caser that implements Unicode case folding.
+// Fold returns a Caser that implements Unicode case folding. The returned Caser
+// is stateless and safe to use concurrently by multiple goroutines.
 //
-// Folding is like mapping to lowercase without context-dependent mappings. Its
-// primary use is for caseless matching. Note that case folding does not
-// normalize the input and may not preserve a normal form.
-func Fold(t language.Tag, opts ...Option) Caser {
-	panic("TODO: implement")
+// Case folding does not normalize the input and may not preserve a normal form.
+// Use the collate or search package for more convenient and linguistically
+// sound comparisons.  Use unicode/precis for string comparisons where security
+// aspects are a concern.
+func Fold(opts ...Option) Caser {
+	return Caser{makeFold(getOpts(opts...))}
 }
 
 // An Option is used to modify the behavior of a Caser.
@@ -96,7 +98,7 @@ var (
 	NoLower Option = noLower
 
 	// Compact omits mappings in case folding for characters that would grow the
-	// input.
+	// input. (Unimplemented.)
 	Compact Option = compact
 )
 

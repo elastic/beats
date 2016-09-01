@@ -13,7 +13,7 @@
 [[connection-problem]]
 === Logstash connection doesn't work?
 
-You may have configured Logstash or {beatname_uc} incorrectly. To resolve the issue: 
+You may have configured Logstash or {beatname_uc} incorrectly. To resolve the issue:
 
 * Make sure that Logstash is running and you can connect to it. First, try to ping the Logstash host to verify that you can reach it
 from the host running {beatname_uc}. Then use either `nc` or `telnet` to make sure that the port is available. For example:
@@ -23,8 +23,8 @@ from the host running {beatname_uc}. Then use either `nc` or `telnet` to make su
 ping <hostname or IP>
 telnet <hostname or IP> 5044
 ----------------------------------------------------------------------
-* Verify that the config file for {beatname_uc} specifies the correct port where Logstash is running.  
-* Make sure that the Elasticsearch output is commented out in the config file and the Logstash output is uncommented. 
+* Verify that the config file for {beatname_uc} specifies the correct port where Logstash is running.
+* Make sure that the Elasticsearch output is commented out in the config file and the Logstash output is uncommented.
 * Confirm that the most recent Beats input plugin for Logstash is installed and configured. Note that Beats will not connect
 to the Lumberjack input plugin. See
 {libbeat}/logstash-installation.html#logstash-input-update[Updating the Beats Input Plugin for Logstash].
@@ -47,7 +47,7 @@ Beats are lightweight data shippers that you install as agents on your servers t
 data to Elasticsearch. Beats have a small footprint and use fewer system resources than Logstash.
 
 Logstash has a larger footprint, but provides a broad array of input, filter, and output plugins for collecting, enriching,
-and transforming data from a variety of sources. 
+and transforming data from a variety of sources.
 
 For more information, see the https://www.elastic.co/guide/en/logstash/current/introduction.html[Logstash Introduction] and
 the https://www.elastic.co/guide/en/beats/libbeat/current/beats-reference.html[Beats Overview].
@@ -67,10 +67,11 @@ ping <hostname or IP>
 telnet <hostname or IP> 5044
 ----------------------------------------------------------------------
 
-* Verify that the certificate is valid and that the hostname and IP match. 
+* Verify that the certificate is valid and that the hostname and IP match.
 +
 TIP: For testing purposes only, you can set `insecure: true` to disable hostname checking.
 
+* Use OpenSSL to test connectivity to the Logstash server and diagnose problems. See the https://www.openssl.org/docs/manmaster/apps/s_client.html[OpenSSL documentation] for more info.
 * Make sure that you have enabled SSL (set `ssl => true`) when configuring the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash].
 
 [float]

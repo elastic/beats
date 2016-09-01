@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"regexp"
 	"time"
-
-	"github.com/elastic/beats/libbeat/common"
 )
 
 // MultiLine reader combining multiple line events into one multi-line event.
@@ -26,14 +24,11 @@ type Multiline struct {
 	maxBytes  int // bytes stored in content
 	maxLines  int
 	separator []byte
-	ts        time.Time
-	content   []byte
 	last      []byte
-	readBytes int // bytes as read from input source
 	numLines  int
-	fields    common.MapStr
 	err       error // last seen error
 	state     func(*Multiline) (Message, error)
+	message   Message
 }
 
 const (
@@ -55,7 +50,7 @@ var (
 // NewMultiline creates a new multi-line reader combining stream of
 // line events into stream of multi-line events.
 func NewMultiline(
-	r Reader,
+	reader Reader,
 	separator string,
 	maxBytes int,
 	config *MultilineConfig,
@@ -93,16 +88,17 @@ func NewMultiline(
 	}
 
 	if timeout > 0 {
-		r = NewTimeout(r, sigMultilineTimeout, timeout)
+		reader = NewTimeout(reader, sigMultilineTimeout, timeout)
 	}
 
 	mlr := &Multiline{
-		reader:    r,
+		reader:    reader,
 		pred:      matcher,
 		state:     (*Multiline).readFirst,
 		maxBytes:  maxBytes,
 		maxLines:  maxLines,
 		separator: []byte(separator),
+		message:   Message{},
 	}
 	return mlr, nil
 }
@@ -130,8 +126,8 @@ func (mlr *Multiline) readFirst() (Message, error) {
 		}
 
 		// Start new multiline event
-		mlr.clearBuffer()
-		mlr.resetBuffer(message)
+		mlr.clear()
+		mlr.load(message)
 		mlr.setState((*Multiline).readNext)
 		return mlr.readNext()
 	}
@@ -150,9 +146,9 @@ func (mlr *Multiline) readNext() (Message, error) {
 
 				// return collected multiline event and
 				// empty buffer for new multiline event
-				message := mlr.finalize()
+				msg := mlr.finalize()
 				mlr.resetState()
-				return message, nil
+				return msg, nil
 			}
 
 			// handle error without any bytes returned from reader
@@ -163,37 +159,37 @@ func (mlr *Multiline) readNext() (Message, error) {
 				}
 
 				// lines buffered, return multiline and error on next read
-				m := mlr.finalize()
+				msg := mlr.finalize()
 				mlr.err = err
 				mlr.setState((*Multiline).readFailed)
-				return m, nil
+				return msg, nil
 			}
 
 			// handle error with some content being returned by reader and
 			// line matching multiline criteria or no multiline started yet
-			if mlr.readBytes == 0 || mlr.pred(mlr.last, message.Content) {
+			if mlr.message.Bytes == 0 || mlr.pred(mlr.last, message.Content) {
 				mlr.addLine(message)
 
 				// return multiline and error on next read
-				m := mlr.finalize()
+				msg := mlr.finalize()
 				mlr.err = err
 				mlr.setState((*Multiline).readFailed)
-				return m, nil
+				return msg, nil
 			}
 
 			// no match, return current multline and retry with current line on next
 			// call to readNext awaiting the error being reproduced (or resolved)
 			// in next call to Next
-			m := mlr.finalize()
-			mlr.resetBuffer(message)
-			return m, nil
+			msg := mlr.finalize()
+			mlr.load(message)
+			return msg, nil
 		}
 
 		// if predicate does not match current multiline -> return multiline event
-		if mlr.readBytes > 0 && !mlr.pred(mlr.last, message.Content) {
-			m := mlr.finalize()
-			mlr.resetBuffer(message)
-			return m, nil
+		if mlr.message.Bytes > 0 && !mlr.pred(mlr.last, message.Content) {
+			msg := mlr.finalize()
+			mlr.load(message)
+			return msg, nil
 		}
 
 		// add line to current multiline event
@@ -209,39 +205,30 @@ func (mlr *Multiline) readFailed() (Message, error) {
 	return Message{}, err
 }
 
-// resetBuffer loads the reader with the given message. It is recommend to either
-// run reset or finalize before.
-func (mlr *Multiline) resetBuffer(m Message) {
+// load loads the reader with the given message. It is recommend to either
+// run clear or finalize before.
+func (mlr *Multiline) load(m Message) {
 	mlr.addLine(m)
 	// Timestamp of first message is taken as overall timestamp
-	mlr.ts = m.Ts
-	mlr.fields = m.Fields
+	mlr.message.Ts = m.Ts
+	mlr.message.Fields = m.Fields
+}
+
+// clearBuffer resets the reader buffer variables
+func (mlr *Multiline) clear() {
+	mlr.message = Message{}
+	mlr.last = nil
+	mlr.numLines = 0
+	mlr.err = nil
 }
 
 // finalize writes the existing content into the returned message and resets all reader variables.
 func (mlr *Multiline) finalize() Message {
 
-	// Create message from existing content
-	m := Message{
-		Ts:      mlr.ts,
-		Content: mlr.content,
-		Fields:  mlr.fields,
-		Bytes:   mlr.readBytes,
-	}
-
-	mlr.clearBuffer()
-
-	return m
-}
-
-// clearBuffer resets the reader buffer variables
-func (mlr *Multiline) clearBuffer() {
-	mlr.content = nil
-	mlr.last = nil
-	mlr.readBytes = 0
-	mlr.numLines = 0
-	mlr.err = nil
-	mlr.fields = nil
+	// Copy message from existing content
+	msg := mlr.message
+	mlr.clear()
+	return msg
 }
 
 // addLine adds the read content to the message
@@ -252,8 +239,8 @@ func (mlr *Multiline) addLine(m Message) {
 		return
 	}
 
-	sz := len(mlr.content)
-	addSeparator := len(mlr.content) > 0 && len(mlr.separator) > 0
+	sz := len(mlr.message.Content)
+	addSeparator := len(mlr.message.Content) > 0 && len(mlr.separator) > 0
 	if addSeparator {
 		sz += len(mlr.separator)
 	}
@@ -268,16 +255,16 @@ func (mlr *Multiline) addLine(m Message) {
 			space = len(m.Content)
 		}
 
-		tmp := mlr.content
+		tmp := mlr.message.Content
 		if addSeparator {
 			tmp = append(tmp, mlr.separator...)
 		}
-		mlr.content = append(tmp, m.Content[:space]...)
+		mlr.message.Content = append(tmp, m.Content[:space]...)
 		mlr.numLines++
 	}
 
 	mlr.last = m.Content
-	mlr.readBytes += m.Bytes
+	mlr.message.Bytes += m.Bytes
 }
 
 // resetState sets state of the reader to readFirst

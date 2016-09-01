@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-apache>>
 * <<exported-fields-beat>>
+* <<exported-fields-beats>>
 * <<exported-fields-common>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -362,7 +363,7 @@ Contains common beat fields available in all event types.
 [float]
 === beat.name
 
-The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
 
 
 [float]
@@ -376,9 +377,9 @@ The hostname as returned by the operating system on which the Beat is running.
 
 type: date
 
-example: 2015-01-24 14:06:05.071000
+example: August 26th 2016, 12:35:53.332
 
-format: YYYY-MM-DDTHH:MM:SS.milliZ
+format: date
 
 required: True
 
@@ -397,6 +398,260 @@ Arbitrary tags that can be set per Beat and per transaction type.
 type: dict
 
 Contains user configurable fields.
+
+
+[[exported-fields-beats]]
+== beats Fields
+
+beats Module
+
+
+
+[float]
+== beats Fields
+
+
+
+
+[float]
+== filebeat Fields
+
+experimental[]
+filebeat metrics
+
+
+
+[float]
+== harvesters Fields
+
+Harvester metrics for all harvesters combined.
+
+
+
+[float]
+=== beats.filebeat.harvesters.started
+
+type: long
+
+Total number of started harvesters.
+
+
+[float]
+=== beats.filebeat.harvesters.closed
+
+type: long
+
+Total number of closed harvesters.
+
+
+[float]
+=== beats.filebeat.harvesters.running
+
+type: long
+
+Number of currently running harvesters.
+
+
+[float]
+=== beats.filebeat.harvesters.skipped
+
+type: long
+
+Total number of harvesters starts that were skipped because of harvester_limit reached.
+
+
+[float]
+== files Fields
+
+File handling related statistics.
+
+
+
+[float]
+=== beats.filebeat.harvesters.files.open
+
+type: long
+
+Currently open files.
+
+
+[float]
+=== beats.filebeat.harvesters.files.truncated
+
+type: long
+
+Number of files which were detected by the harvester as truncated and reading started from scratch.
+
+
+[float]
+== prospectors Fields
+
+Prospector metrics for all prospectors combined.
+
+
+
+[float]
+== log_files Fields
+
+Log files related stastics.
+
+
+
+[float]
+=== beats.filebeat.prospectors.log_files.renamed
+
+type: long
+
+Total number of files for which renaming was detected.
+
+
+[float]
+=== beats.filebeat.prospectors.log_files.truncated
+
+type: long
+
+Number of files which were detected by the prospector as truncated and reading started from scratch.
+
+
+[float]
+== registrar Fields
+
+Registrar statistics
+
+
+
+[float]
+== states Fields
+
+Registrar states metrics.
+
+
+
+[float]
+=== beats.filebeat.registrar.states.update
+
+type: long
+
+Total number of states which were updated or added.
+
+
+[float]
+=== beats.filebeat.registrar.states.cleanup
+
+type: long
+
+Total number of states which were cleaned up (removed).
+
+
+[float]
+=== beats.filebeat.registrar.states.current
+
+type: long
+
+The current number of states in the registry file.
+
+
+[float]
+=== beats.filebeat.registrar.writes
+
+type: long
+
+Total number of times the registry file was written to disk.
+
+
+[float]
+== libbeat Fields
+
+experimental[]
+libbeat metrics. This metricset can be used with all beats.
+
+
+
+[float]
+== output Fields
+
+Output related metrics
+
+
+
+[float]
+== elasticsearch Fields
+
+Elasticsearch specific metrics
+
+
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.events.ack
+
+type: long
+
+Number of acknowledged events by elasticsearch
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.events.not_ack
+
+type: long
+
+Number of not acknowledged events by elasticsearch
+
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.read.bytes
+
+type: long
+
+Number of bytes read by the output
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.read.errors
+
+type: long
+
+Number of read errors
+
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.write.bytes
+
+type: long
+
+Number of bytes written by the output
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.write.errors
+
+type: long
+
+Number of write errors
+
+
+[float]
+== publisher Fields
+
+General publisher metrics
+
+
+
+[float]
+== events Fields
+
+Log files related stastics.
+
+
+
+[float]
+=== beats.libbeat.publisher.events.published
+
+type: long
+
+Total number of events published
 
 
 [[exported-fields-common]]
@@ -1404,6 +1659,101 @@ Current overall state of this backend. Possible values are:
 === postgresql.activity.query
 
 Text of this backend's most recent query. If state is active this field shows the currently executing query. In all other states, it shows the last query that was executed.
+
+
+[float]
+== bgwriter Fields
+
+Statistics about the background writer process's activity. Collected using the pg_stat_bgwriter query.
+
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.scheduled
+
+type: long
+
+Number of scheduled checkpoints that have been performed.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.requested
+
+type: long
+
+Number of requested checkpoints that have been performed.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.times.write.ms
+
+type: float
+
+Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.times.sync.ms
+
+type: float
+
+Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk, in milliseconds.
+
+
+[float]
+=== postgresql.bgwriter.buffers.checkpoints
+
+type: long
+
+Number of buffers written during checkpoints.
+
+
+[float]
+=== postgresql.bgwriter.buffers.clean
+
+type: long
+
+Number of buffers written by the background writer.
+
+
+[float]
+=== postgresql.bgwriter.buffers.clean_full
+
+type: long
+
+Number of times the background writer stopped a cleaning scan because it had written too many buffers.
+
+
+[float]
+=== postgresql.bgwriter.buffers.backend
+
+type: long
+
+Number of buffers written directly by a backend.
+
+
+[float]
+=== postgresql.bgwriter.buffers.backend_fsync
+
+type: long
+
+Number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write)
+
+
+[float]
+=== postgresql.bgwriter.buffers.allocated
+
+type: long
+
+Number of buffers allocated.
+
+
+[float]
+=== postgresql.bgwriter.stats_reset
+
+type: date
+
+Time at which these statistics were last reset.
 
 
 [float]
@@ -3193,6 +3543,7 @@ The hard limit on the number of file descriptors opened by the process. The hard
 [float]
 == cgroup Fields
 
+experimental[]
 Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.
 
 
@@ -3376,6 +3727,8 @@ Path to the cgroup relative to the cgroup subsystem's mountpoint.
 
 type: long
 
+format: bytes
+
 Total memory usage by processes in the cgroup (in bytes).
 
 
@@ -3384,6 +3737,8 @@ Total memory usage by processes in the cgroup (in bytes).
 
 type: long
 
+format: bytes
+
 The maximum memory used by processes in the cgroup (in bytes).
 
 
@@ -3391,6 +3746,8 @@ The maximum memory used by processes in the cgroup (in bytes).
 === system.process.cgroup.memory.mem.limit.bytes
 
 type: long
+
+format: bytes
 
 The maximum amount of user memory in bytes (including file cache) that tasks in the cgroup are allowed to use.
 
@@ -3408,6 +3765,8 @@ The number of times that the memory limit (mem.limit.bytes) was reached.
 
 type: long
 
+format: bytes
+
 The sum of current memory usage plus swap space used by processes in the cgroup (in bytes).
 
 
@@ -3416,6 +3775,8 @@ The sum of current memory usage plus swap space used by processes in the cgroup 
 
 type: long
 
+format: bytes
+
 The maximum amount of memory and swap space used by processes in the cgroup (in bytes).
 
 
@@ -3423,6 +3784,8 @@ The maximum amount of memory and swap space used by processes in the cgroup (in 
 === system.process.cgroup.memory.memsw.limit.bytes
 
 type: long
+
+format: bytes
 
 The maximum amount for the sum of memory and swap usage that tasks in the cgroup are allowed to use.
 
@@ -3440,6 +3803,8 @@ The number of times that the memory plus swap space limit (memsw.limit.bytes) wa
 
 type: long
 
+format: bytes
+
 Total kernel memory usage by processes in the cgroup (in bytes).
 
 
@@ -3448,6 +3813,8 @@ Total kernel memory usage by processes in the cgroup (in bytes).
 
 type: long
 
+format: bytes
+
 The maximum kernel memory used by processes in the cgroup (in bytes).
 
 
@@ -3455,6 +3822,8 @@ The maximum kernel memory used by processes in the cgroup (in bytes).
 === system.process.cgroup.memory.kmem.limit.bytes
 
 type: long
+
+format: bytes
 
 The maximum amount of kernel memory that tasks in the cgroup are allowed to use.
 
@@ -3472,6 +3841,8 @@ The number of times that the memory limit (kmem.limit.bytes) was reached.
 
 type: long
 
+format: bytes
+
 Total memory usage for TCP buffers in bytes.
 
 
@@ -3480,6 +3851,8 @@ Total memory usage for TCP buffers in bytes.
 
 type: long
 
+format: bytes
+
 The maximum memory used for TCP buffers by processes in the cgroup (in bytes).
 
 
@@ -3487,6 +3860,8 @@ The maximum memory used for TCP buffers by processes in the cgroup (in bytes).
 === system.process.cgroup.memory.kmem_tcp.limit.bytes
 
 type: long
+
+format: bytes
 
 The maximum amount of memory for TCP buffers that tasks in the cgroup are allowed to use.
 
@@ -3504,6 +3879,8 @@ The number of times that the memory limit (kmem_tcp.limit.bytes) was reached.
 
 type: long
 
+format: bytes
+
 Anonymous and swap cache on active least-recently-used (LRU) list, including tmpfs (shmem), in bytes.
 
 
@@ -3512,6 +3889,8 @@ Anonymous and swap cache on active least-recently-used (LRU) list, including tmp
 
 type: long
 
+format: bytes
+
 File-backed memory on active LRU list, in bytes.
 
 [float]
@@ -3519,12 +3898,16 @@ File-backed memory on active LRU list, in bytes.
 
 type: long
 
+format: bytes
+
 Page cache, including tmpfs (shmem), in bytes.
 
 [float]
 === system.process.cgroup.memory.stats.hierarchical_memory_limit.bytes
 
 type: long
+
+format: bytes
 
 Memory limit for the hierarchy that contains the memory cgroup, in bytes.
 
@@ -3534,6 +3917,8 @@ Memory limit for the hierarchy that contains the memory cgroup, in bytes.
 
 type: long
 
+format: bytes
+
 Memory plus swap limit for the hierarchy that contains the memory cgroup, in bytes.
 
 
@@ -3541,6 +3926,8 @@ Memory plus swap limit for the hierarchy that contains the memory cgroup, in byt
 === system.process.cgroup.memory.stats.inactive_anon.bytes
 
 type: long
+
+format: bytes
 
 Anonymous and swap cache on inactive LRU list, including tmpfs (shmem), in bytes
 
@@ -3550,6 +3937,8 @@ Anonymous and swap cache on inactive LRU list, including tmpfs (shmem), in bytes
 
 type: long
 
+format: bytes
+
 File-backed memory on inactive LRU list, in bytes.
 
 
@@ -3557,6 +3946,8 @@ File-backed memory on inactive LRU list, in bytes.
 === system.process.cgroup.memory.stats.mapped_file.bytes
 
 type: long
+
+format: bytes
 
 Size of memory-mapped mapped files, including tmpfs (shmem), in bytes.
 
@@ -3598,6 +3989,8 @@ Number of pages paged out of memory. This is a counter.
 
 type: long
 
+format: bytes
+
 Anonymous and swap cache (includes transparent hugepages), not including tmpfs (shmem), in bytes.
 
 
@@ -3605,6 +3998,8 @@ Anonymous and swap cache (includes transparent hugepages), not including tmpfs (
 === system.process.cgroup.memory.stats.rss_huge.bytes
 
 type: long
+
+format: bytes
 
 Number of bytes of anonymous transparent hugepages.
 
@@ -3614,6 +4009,8 @@ Number of bytes of anonymous transparent hugepages.
 
 type: long
 
+format: bytes
+
 Swap usage, in bytes.
 
 
@@ -3621,6 +4018,8 @@ Swap usage, in bytes.
 === system.process.cgroup.memory.stats.unevictable.bytes
 
 type: long
+
+format: bytes
 
 Memory that cannot be reclaimed, in bytes.
 
@@ -3650,6 +4049,8 @@ Path to the cgroup relative to the cgroup subsystems mountpoint.
 === system.process.cgroup.blkio.total.bytes
 
 type: keyword
+
+format: bytes
 
 Total number of bytes transferred to and from all block devices by processes in the cgroup.
 

@@ -132,8 +132,13 @@ func (out *elasticsearchOutput) init(
 
 	out.clients = clients
 	loadBalance := config.LoadBalance
-	m, err := modeutil.NewConnectionMode(clients, !loadBalance,
-		maxAttempts, waitRetry, config.Timeout, maxWaitRetry)
+	m, err := modeutil.NewConnectionMode(clients, modeutil.Settings{
+		Failover:     !loadBalance,
+		MaxAttempts:  maxAttempts,
+		Timeout:      config.Timeout,
+		WaitRetry:    waitRetry,
+		MaxWaitRetry: maxWaitRetry,
+	})
 	if err != nil {
 		return err
 	}

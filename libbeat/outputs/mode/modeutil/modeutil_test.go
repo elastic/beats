@@ -34,7 +34,7 @@ func makeTestClients(c map[string]interface{},
 func TestMakeEmptyClientFail(t *testing.T) {
 	config := map[string]interface{}{}
 	clients, err := makeTestClients(config, dummyMockClientFactory)
-	assert.Equal(t, mode.ErrNoHostsConfigured, err)
+	assert.Error(t, err)
 	assert.Equal(t, 0, len(clients))
 }
 

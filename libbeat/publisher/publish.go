@@ -59,7 +59,6 @@ type BeatPublisher struct {
 	Index          string
 	Output         []*outputWorker
 	TopologyOutput outputs.TopologyOutputer
-	ignoreOutgoing bool
 	geoLite        *libgeo.GeoIP
 	Processors     *processors.Processors
 
@@ -87,7 +86,6 @@ type ShipperConfig struct {
 	common.EventMetadata `config:",inline"` // Fields and tags to add to each event.
 	Name                 string             `config:"name"`
 	RefreshTopologyFreq  time.Duration      `config:"refresh_topology_freq"`
-	Ignore_outgoing      bool               `config:"ignore_outgoing"`
 	Topology_expire      int                `config:"topology_expire"`
 	Geoip                common.Geoip       `config:"geoip"`
 
@@ -135,6 +133,7 @@ func (publisher *BeatPublisher) GetServerName(ip string) string {
 
 	// find the shipper with the desired IP
 	if publisher.TopologyOutput != nil {
+		logp.Warn("Topology settings are deprecated.")
 		return publisher.TopologyOutput.GetNameByIP(ip)
 	}
 
@@ -143,10 +142,6 @@ func (publisher *BeatPublisher) GetServerName(ip string) string {
 
 func (publisher *BeatPublisher) GeoLite() *libgeo.GeoIP {
 	return publisher.geoLite
-}
-
-func (publisher *BeatPublisher) IgnoreOutgoing() bool {
-	return publisher.ignoreOutgoing
 }
 
 func (publisher *BeatPublisher) Connect() Client {
@@ -207,7 +202,6 @@ func (publisher *BeatPublisher) init(
 	processors *processors.Processors,
 ) error {
 	var err error
-	publisher.ignoreOutgoing = shipper.Ignore_outgoing
 	publisher.Processors = processors
 
 	publisher.disabled = *publishDisabled

@@ -25,7 +25,7 @@ import:
   subpackages:
   - /difflib
 - package: github.com/elastic/gosigar
-  version: 5245ee4aa55dac30920e4d7c69b13578c5e12440
+  version: 2716c1fe855ee5c88eae707195e0688374458c92
 - package: github.com/samuel/go-parser
   version: ca8abbf65d0e61dedf061f98bd3850f250e27539
 - package: github.com/samuel/go-thrift
@@ -47,7 +47,7 @@ import:
   - /proxy
   - /publicsuffix
 - package: golang.org/x/text
-  version: f024ad8118c1182f0c9c976f0fa8e56b39ef821b
+  version: d69c40b4be55797923cec7457fac7a244d91a9b6
   subpackages:
   - /encoding
 - package: github.com/satori/go.uuid
@@ -75,7 +75,7 @@ import:
 - package: github.com/dustin/go-humanize
   version: 499693e27ee0d14ffab67c31ad065fdb3d34ea75
 - package: github.com/elastic/go-ucfg
-  version: v0.3.3
+  version: v0.3.4
 - package: github.com/armon/go-socks5
   version: 3a873e99f5400ad7706e464e905ffcc94b3ff247
 - package: github.com/pkg/errors

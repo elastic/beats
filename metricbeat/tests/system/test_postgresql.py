@@ -1,5 +1,6 @@
 import os
 import metricbeat
+import unittest
 from nose.plugins.attrib import attr
 
 
@@ -19,6 +20,7 @@ class Test(metricbeat.BaseTest):
     def get_hosts(self):
         return [os.getenv("POSTGRESQL_DSN")]
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_activity(self):
         """
@@ -42,6 +44,7 @@ class Test(metricbeat.BaseTest):
             assert "oid" in evt["postgresql"]["activity"]["database"]
             assert "state" in evt["postgresql"]["activity"]
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_database(self):
         """
@@ -67,3 +70,27 @@ class Test(metricbeat.BaseTest):
             assert "rows" in evt["postgresql"]["database"]
             assert "conflicts" in evt["postgresql"]["database"]
             assert "deadlocks" in evt["postgresql"]["database"]
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_bgwriter(self):
+        """
+        PostgreSQL module outputs an event.
+        """
+        self.render_config_template(modules=[{
+            "name": "postgresql",
+            "metricsets": ["bgwriter"],
+            "hosts": self.get_hosts(),
+            "period": "5s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+
+        output = self.read_output_json()
+        self.common_checks(output)
+
+        for evt in output:
+            assert "checkpoints" in evt["postgresql"]["bgwriter"]
+            assert "buffers" in evt["postgresql"]["bgwriter"]
+            assert "stats_reset" in evt["postgresql"]["bgwriter"]

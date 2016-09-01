@@ -1,5 +1,6 @@
 import os
 import metricbeat
+import unittest
 from nose.plugins.attrib import attr
 
 MYSQL_FIELDS = metricbeat.COMMON_FIELDS + ["mysql"]
@@ -9,6 +10,8 @@ MYSQL_STATUS_FIELDS = ["clients", "cluster", "cpu", "keyspace", "memory",
 
 
 class Test(metricbeat.BaseTest):
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_status(self):
         """

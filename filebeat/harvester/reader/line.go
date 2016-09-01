@@ -62,6 +62,13 @@ func (l *Line) Next() ([]byte, int, error) {
 		// Check last decoded byte really being '\n' also unencoded
 		// if not, continue reading
 		buf := l.outBuffer.Bytes()
+
+		// This can happen if something goes wrong during decoding
+		if len(buf) == 0 {
+			logp.Err("Empty buffer returned by advance")
+			continue
+		}
+
 		if buf[len(buf)-1] == '\n' {
 			break
 		} else {
@@ -103,6 +110,7 @@ func (l *Line) advance() error {
 
 		// try to read more bytes into buffer
 		n, err := l.reader.Read(buf)
+
 		// Appends buffer also in case of err
 		l.inBuffer.Append(buf[:n])
 		if err != nil {
@@ -121,6 +129,9 @@ func (l *Line) advance() error {
 	// found encoded byte sequence for '\n' in buffer
 	// -> decode input sequence into outBuffer
 	sz, err := l.decode(idx + len(l.nl))
+	if err != nil {
+		logp.Err("Error decoding line: %s", err)
+	}
 
 	// consume transformed bytes from input buffer
 	err = l.inBuffer.Advance(sz)
@@ -146,12 +157,15 @@ func (l *Line) decode(end int) (int, error) {
 		var nDst, nSrc int
 
 		nDst, nSrc, err = l.decoder.Transform(buffer, inBytes[start:end], false)
+
 		start += nSrc
 
 		l.outBuffer.Write(buffer[:nDst])
 
 		if err != nil {
 			if err == transform.ErrShortDst { // continue transforming
+				// Reset error as decoding continues
+				err = nil
 				continue
 			}
 			break

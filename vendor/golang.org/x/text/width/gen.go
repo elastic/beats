@@ -12,7 +12,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"math"
 	"unicode/utf8"
@@ -27,8 +26,8 @@ func main() {
 	gen.Init()
 	genTables()
 	genTests()
-	repackage("gen_trieval.go", "trieval.go")
-	repackage("gen_common.go", "common_test.go")
+	gen.Repackage("gen_trieval.go", "trieval.go", "width")
+	gen.Repackage("gen_common.go", "common_test.go", "width")
 }
 
 func genTables() {
@@ -113,21 +112,4 @@ func genTests() {
 	})
 	fmt.Fprintln(w, "}")
 	gen.WriteGoFile("runes_test.go", "width", w.Bytes())
-}
-
-// repackage rewrites a file from belonging to package main to belonging to
-// package width.
-func repackage(inFile, outFile string) {
-	src, err := ioutil.ReadFile(inFile)
-	if err != nil {
-		log.Fatalf("reading %s: %v", inFile, err)
-	}
-	const toDelete = "package main\n\n"
-	i := bytes.Index(src, []byte(toDelete))
-	if i < 0 {
-		log.Fatalf("Could not find %q in gen_trieval.go", toDelete)
-	}
-	w := &bytes.Buffer{}
-	w.Write(src[i+len(toDelete):])
-	gen.WriteGoFile(outFile, "width", w.Bytes())
 }

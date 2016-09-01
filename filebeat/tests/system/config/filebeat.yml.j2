@@ -22,9 +22,11 @@ filebeat.prospectors:
   close_removed: {{close_removed}}
   close_renamed: {{close_renamed}}
   close_eof: {{close_eof}}
+  close_timeout: {{close_timeout}}
   force_close_files: {{force_close_files}}
   clean_inactive: {{clean_inactive}}
   clean_removed: {{clean_removed}}
+  harvester_limit: {{harvester_limit | default(0) }}
 
   {% if fields %}
   fields:
@@ -92,11 +94,6 @@ tags: [
       {%- endfor -%}
   {%- endif -%}
 ]
-
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-# ignore_outgoing: true
 
 {% if geoip_paths is not none %}
 geoip:

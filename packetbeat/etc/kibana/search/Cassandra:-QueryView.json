@@ -8,12 +8,12 @@
   "title": "Cassandra: QueryView", 
   "version": 1, 
   "kibanaSavedObjectMeta": {
-    "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[{\"meta\":{\"negate\":false,\"index\":\"packetbeat-*\",\"key\":\"cassandra_request.request_headers.op\",\"value\":\"QUERY\",\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"cassandra_request.request_headers.op\":{\"query\":\"QUERY\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"negate\":true,\"index\":\"packetbeat-*\",\"key\":\"cassandra_response.response_headers.op\",\"value\":\"ERROR\",\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"cassandra_response.response_headers.op\":{\"query\":\"ERROR\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+    "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[{\"meta\":{\"negate\":false,\"index\":\"packetbeat-*\",\"key\":\"cassandra.request.headers.op\",\"value\":\"QUERY\",\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"cassandra.request.headers.op\":{\"query\":\"QUERY\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"negate\":true,\"index\":\"packetbeat-*\",\"key\":\"cassandra.response.headers.op\",\"value\":\"ERROR\",\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"cassandra.response.headers.op\":{\"query\":\"ERROR\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
   }, 
   "columns": [
-    "cassandra_request.query", 
-    "cassandra_response.rows.meta.keyspace", 
-    "cassandra_response.rows.meta.table", 
-    "cassandra_response.rows.num_rows"
+    "cassandra.request.query", 
+    "cassandra.response.result.rows.meta.keyspace", 
+    "cassandra.response.result.rows.meta.table", 
+    "cassandra.response.result.rows.num_rows"
   ]
 }

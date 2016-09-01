@@ -29,6 +29,7 @@ ARCH?=$(shell uname -m)
 export PATH := ./bin:$(PATH)
 GOFILES = $(shell find . -type f -name '*.go')
 GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*")
+GOFILES_ALL = $(GOFILES) $(shell find $(ES_BEATS) -type f -name '*.go')
 SHELL=bash
 ES_HOST?="elasticsearch"
 PWD=$(shell pwd)
@@ -68,13 +69,11 @@ endif
 ### BUILDING ###
 
 # Builds beat
-.PHONY: ${BEATNAME}
-${BEATNAME}: $(GOFILES)
+${BEATNAME}: $(GOFILES_ALL)
 	go build
 
 # Create test coverage binary
-.PHONY: ${BEATNAME}.test
-${BEATNAME}.test: $(GOFILES)
+${BEATNAME}.test: $(GOFILES_ALL)
 	go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
 
 # Cross-compile beat for the OS'es specified in GOX_OS variable.
@@ -133,7 +132,6 @@ prepare-tests:
 unit-tests: prepare-tests
 	$(GOPATH)/bin/gotestcover $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
 
-
 # Runs the unit tests without coverage reports.
 .PHONY: unit
 unit:
@@ -152,24 +150,29 @@ integration-tests-environment: prepare-tests build-image
 # Runs the system tests
 .PHONY: system-tests
 system-tests: ${BEATNAME}.test prepare-tests python-env
-	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
+	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=1 nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs the system tests
 .PHONY: system-tests-environment
 system-tests-environment: prepare-tests build-image
-	${DOCKER_COMPOSE} run beat make system-tests;
+	${DOCKER_COMPOSE} run beat make system-tests
 
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
 fast-system-tests: ${BEATNAME}.test python-env
-	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a '!integration'
+	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT)
 
 # Run benchmark tests
 .PHONY: benchmark-tests
 benchmark-tests:
 	# No benchmark tests exist so far
 	#go test -bench=. ${GOPACKAGES}
+
+# Run load tests
+.PHONY: load-tests
+load-tests:
+	. ${PYTHON_ENV}/bin/activate; LOAD_TESTS=1  nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a 'load'
 
 # Sets up the virtual python environment
 .PHONY: python-env
@@ -272,12 +275,13 @@ docs-preview:
 ES_URL?=http://localhost:9200
 
 .PHONY: export-dashboards
-export-dashboards: python-env
-	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
+export-dashboards: python-env update
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --regex ${BEATNAME}-*
 
 .PHONY: import-dashboards
-import-dashboards: build-dashboards
-	${ES_BEATS}/libbeat/dashboards/import_dashboards -es ${ES_URL} -dir $(shell pwd)/etc/kibana
+import-dashboards: update
+	$(MAKE) -C ${ES_BEATS}/libbeat/dashboards import_dasboards
+	${ES_BEATS}/libbeat/dashboards/import_dashboards -es ${ES_URL} -dir ${PWD}/etc/kibana
 
 ### CONTAINER ENVIRONMENT ####
 
@@ -316,10 +320,9 @@ env-logs:
 # Installs the files that need to get to the home path on installations
 HOME_PREFIX?=/tmp/${BEATNAME}
 .PHONY: install-home
-install-home: build-dashboards 
+install-home:
 	install -d -m 755 ${HOME_PREFIX}/scripts/
 	install -m 755 ${ES_BEATS}/libbeat/scripts/migrate_beat_config_1_x_to_5_0.py ${HOME_PREFIX}/scripts/
-	install -m 755 ${ES_BEATS}/libbeat/dashboards/import_dashboards ${HOME_PREFIX}/scripts/
 
 # Prepares for packaging. Builds binaries and creates homedir data
 .PHONY: prepare-package
@@ -369,11 +372,13 @@ prepare-package-cgo:
 		${BEAT_DIR}
 
 # Prepares images for packaging
+.PHONY: package-setup
 package-setup:
 	$(MAKE) -C ${ES_BEATS}/dev-tools/packer deps images
 
 # Create binary packages for the beat.
 # This requires that `package-setup` was run before once.
+.PHONY: package
 package:
 
 	echo "Start building packages for ${BEATNAME}"
@@ -396,5 +401,8 @@ package:
 
 	echo "Finished packages for ${BEATNAME}"
 
-build-dashboards: ${ES_BEATS}/libbeat/dashboards/import_dashboards.go
-	go build -o ${ES_BEATS}/libbeat/dashboards/import_dashboards ${ES_BEATS}/libbeat/dashboards/import_dashboards.go
+package-dashboards:
+	mkdir -p ${BUILD_DIR}
+	cp -r etc/kibana ${BUILD_DIR}/dashboards
+	# build the dashboards package
+	BEATNAME=${BEATNAME} BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C ${ES_BEATS}/dev-tools/packer package-dashboards ${shell pwd}/build/upload/build_id.txt

@@ -77,11 +77,6 @@ output.elasticsearch:
   # Optional http or https. Default is http
   protocol: "https"
 
-  # Comment this option if you don't want to store the topology in
-  # Elasticsearch. The default is false.
-  # This option makes sense only for Packetbeat
-  # save_topology: false
-
   # HTTP basic auth
   username: "admin"
   password: "s3cr3t"
@@ -248,7 +243,7 @@ After the specified number of retries, the events are typically dropped.
 Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
 events are published.
 
-Set `max_retries` to a value less than 0 to retry until all events are published. 
+Set `max_retries` to a value less than 0 to retry until all events are published.
 
 The default is 3.
 
@@ -260,7 +255,7 @@ If the Beat sends single events, the events are collected into batches. If the B
 a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
 split.
 
-Specifying a larger batch size can improve performance by lowering the overhead of sending events. 
+Specifying a larger batch size can improve performance by lowering the overhead of sending events.
 However big batch sizes can also increase processing times, which might result in
 API errors, killed connections, timed-out publishing requests, and, ultimately, lower
 throughput.
@@ -282,6 +277,8 @@ requests are made.
 
 [[save_topology]]
 ===== save_topology
+
+deprecated[5.0.0]
 
 A Boolean that specifies whether the topology is kept in Elasticsearch. The default is
 false.
@@ -484,7 +481,7 @@ For example "{beatname_lc}" generates "[{beatname_lc}-]YYYY.MM.DD" indexes (for 
 ===== tls
 
 Configuration options for TLS parameters like the root CA for Logstash connections. See
-<<configuration-output-tls>> for more information. To use TLS, you must also configure the 
+<<configuration-output-tls>> for more information. To use TLS, you must also configure the
 https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] to use SSL/TLS.
 
 ===== timeout
@@ -498,7 +495,7 @@ After the specified number of retries, the events are typically dropped.
 Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
 events are published.
 
-Set `max_retries` to a value less than 0 to retry until all events are published. 
+Set `max_retries` to a value less than 0 to retry until all events are published.
 
 The default is 3.
 
@@ -510,7 +507,7 @@ If the Beat sends single events, the events are collected into batches. If the B
 a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
 split.
 
-Specifying a larger batch size can improve performance by lowering the overhead of sending events. 
+Specifying a larger batch size can improve performance by lowering the overhead of sending events.
 However big batch sizes can also increase processing times, which might result in
 API errors, killed connections, timed-out publishing requests, and, ultimately, lower
 throughput.
@@ -590,7 +587,7 @@ After the specified number of retries, the events are typically dropped.
 Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
 events are published.
 
-Set `max_retries` to a value less than 0 to retry until all events are published. 
+Set `max_retries` to a value less than 0 to retry until all events are published.
 
 The default is 3.
 
@@ -720,13 +717,19 @@ The default value is `list`.
 
 ===== host_topology
 
+deprecated[5.0.0]
+
 The Redis host to connect to when using topology map support. Topology map support is disabled if this option is not set.
 
 ===== password_topology
 
+deprecated[5.0.0]
+
 The password to use for authenticating with the Redis topology server. The default is no authentication.
 
 ===== db_topology
+
+deprecated[5.0.0]
 
 The Redis database number where the topology information is stored. The default is 1.
 
@@ -752,7 +755,7 @@ After the specified number of retries, the events are typically dropped.
 Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
 events are published.
 
-Set `max_retries` to a value less than 0 to retry until all events are published. 
+Set `max_retries` to a value less than 0 to retry until all events are published.
 
 The default is 3.
 
@@ -890,16 +893,16 @@ The default value is true.
 
 The maximum number of events to buffer internally during publishing. The default is 2048.
 
-Specifying a larger batch size may add some latency and buffering during publishing. However, for Console output, this 
+Specifying a larger batch size may add some latency and buffering during publishing. However, for Console output, this
 setting does not affect how events are published.
 
-Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. 
+Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat.
 
 [[configuration-output-tls]]
 
 === TLS Configuration
 
-You can specify TLS options for any output that supports TLS. 
+You can specify TLS options for any output that supports TLS.
 
 Example configuration:
 

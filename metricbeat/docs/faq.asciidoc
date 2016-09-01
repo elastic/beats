@@ -10,10 +10,12 @@ https://discuss.elastic.co/c/beats/metricbeat[Metricbeat discussion forum].
 
 The system metricsets rely a Linux comparability layer to retrieve metrics on
 FreeBSD. You need to mount the Linux procfs filesystem using the following
-commands.
+commands. You may want to add these filesystems to your `/etc/fstab` so they are
+mounted automatically.
 
 [source,sh]
 ----
+sudo mount -t procfs proc /proc
 sudo mkdir -p /compat/linux/proc
 sudo mount -t linprocfs /dev/null /compat/linux/proc
 ----

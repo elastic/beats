@@ -161,6 +161,10 @@ filebeat.prospectors:
   # The backoff value will be multiplied each time with the backoff_factor until max_backoff is reached
   #backoff_factor: 2
 
+  # Experimental: Max number of harvesters that are started in parallel.
+  # Default is 0 which means unlimited
+  #harvester_limit: 0
+
   ### Harvester closing options
 
   # Close inactive closes the file handler after the predefined period.
@@ -183,12 +187,6 @@ filebeat.prospectors:
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_eof: false
 
-  # Close timeout closes the harvester after the predefined time.
-  # This is independent if the harvester did finish reading the file or not.
-  # By default this option is disabled.
-  # Note: Potential data loss. Make sure to read and understand the docs for this option.
-  #close_timeout: 0
-
   ### State options
 
   # Files for the modification data is older then clean_inactive the state from the registry is removed
@@ -198,6 +196,11 @@ filebeat.prospectors:
   # Removes the state for file which cannot be found on disk anymore immediately
   #clean_removed: false
 
+  # Close timeout closes the harvester after the predefined time.
+  # This is independent if the harvester did finish reading the file or not.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close_timeout: 0
 
 #----------------------------- Stdin prospector -------------------------------
 # Configuration to use stdin input
@@ -247,22 +250,6 @@ filebeat.prospectors:
 # fields in the output document instead of being grouped under a fields
 # sub-dictionary. Default is false.
 #fields_under_root: false
-
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-#ignore_outgoing: true
-
-# How often (in seconds) shippers are publishing their IPs to the topology map.
-# The default is 10 seconds.
-#refresh_topology_freq: 10
-
-# Expiration time (in seconds) of the IPs published by a shipper to the topology map.
-# All the IPs will be deleted afterwards. Note, that the value must be higher than
-# refresh_topology_freq. This setting is used only by the Redis output. The other
-# outputs don't support expiring entries.
-# The default is 15 seconds.
-#topology_expire: 15
 
 # Internal queue size for single events in processing pipeline
 #queue_size: 1000
@@ -361,10 +348,6 @@ output.elasticsearch:
   # If `bulk_max_size` is reached before this interval expires, addition bulk index
   # requests are made.
   #flush_interval: 1s
-
-  # Boolean that sets if the topology is kept in Elasticsearch. The default is
-  # false. This option makes sense only for Packetbeat.
-  #save_topology: false
 
   # A template is used to set the mapping in Elasticsearch
   # By default template loading is enabled and the template is loaded.
@@ -486,6 +469,23 @@ output.elasticsearch:
   # The Kafka topic used for produced events. The setting can be a format string
   # using any event field. To set the topic from document type use `%{[type]}`.
   #topic: beats
+
+  # The Kafka event key setting. Use format string to create unique event key.
+  # By default no event key will be generated.
+  #key: ''
+
+  # The Kafka event partitioning strategy. Default hashing strategy is `hash`
+  # using the `output.kafka.key` setting or randomly distributes events if
+  # `output.kafka.key` is not configured.
+  #partition.hash:
+    # If enabled, events will only be published to partitions with reachable
+    # leaders. Default is false.
+    #reachable_only: false
+
+    # Configure alternative event field names used to compute the hash value.
+    # If empty `output.kafka.key` setting will be used.
+    # Default value is empty list.
+    #hash: []
 
   # Authentication details. Password is required if username is set.
   #username: ''
@@ -610,18 +610,6 @@ output.elasticsearch:
   # PUBLISH command is used. The default value is list.
   #datetype: list
 
-  # The Redis host to connect to when using topology map support. Topology map
-  # support is disabled if this option is not set.
-  #host_topology:
-
-  # The password to use for authenticating with the Redis topology server. The
-  # default is no authentication.
-  #password_topology:
-
-  # The Redis database number where the topology information is stored. The
-  # default is 1.
-  #db_topology: 1
-
   # The number of workers to use for each host configured to publish events to
   # Redis. Use this setting along with the loadbalance option. For example, if
   # you have 2 hosts and 3 workers, in total 6 workers are started (3 for each
@@ -745,7 +733,7 @@ output.elasticsearch:
 
 # Sets log level. The default log level is info.
 # Available log levels are: critical, error, warning, info, debug
-#logging.level: error
+#logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
 # Other available selectors are "beat", "publish", "service"
@@ -757,7 +745,8 @@ output.elasticsearch:
 
 # If enabled, filebeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
-# the beginning of the period is logged. The default is true.
+# the beginning of the period is logged. Also, the total values for
+# all non-zero internal metrics are logged on shutdown. The default is true.
 #logging.metrics.enabled: true
 
 # The period after which to log the internal metrics. The default is 30s.
@@ -769,10 +758,10 @@ logging.to_files: true
 logging.files:
   # Configure the path where the logs are written. The default is the logs directory
   # under the home path (the binary location).
-  #path: /var/log/mybeat
+  #path: /var/log/filebeat
 
   # The name of the files where the logs are written to.
-  #name: mybeat
+  #name: filebeat
 
   # Configure log file size limit. If limit is reached, log file will be
   # automatically rotated

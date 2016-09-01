@@ -23,8 +23,12 @@ metricbeat.modules:
     # Stats about every PostgreSQL database
     #- database
 
+    # Stats about the background writer process's activity
+    #- bgwriter
+
     # Stats about every PostgreSQL process
-    #-activity
+    #- activity
+
   #enabled: true
   #period: 10s
 
@@ -43,9 +47,13 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-postgresql-activity,activity>>
 
+* <<metricbeat-metricset-postgresql-bgwriter,bgwriter>>
+
 * <<metricbeat-metricset-postgresql-database,database>>
 
 include::postgresql/activity.asciidoc[]
+
+include::postgresql/bgwriter.asciidoc[]
 
 include::postgresql/database.asciidoc[]
 
