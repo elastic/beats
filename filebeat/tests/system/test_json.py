@@ -262,6 +262,7 @@ class Test(BaseTest):
                 keys_under_root=True,
                 overwrite_keys=True,
                 add_error_key=True,
+                nested_parsing=False
                 ),
             processors=[{
                 "drop_fields": {
@@ -304,6 +305,7 @@ class Test(BaseTest):
                 keys_under_root=True,
                 overwrite_keys=True,
                 add_error_key=True,
+                nested_parsing=False
                 ),
             processors=[{
                 "drop_fields": {

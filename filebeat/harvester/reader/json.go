@@ -28,7 +28,7 @@ func NewJSON(r Reader, cfg *JSONConfig) *JSON {
 func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
 	var jsonFields map[string]interface{}
 
-	err := unmarshal(text, &jsonFields)
+	err := unmarshal(text, &jsonFields, r.cfg.NestedParsing)
 	if err != nil {
 		logp.Err("Error decoding JSON: %v", err)
 		if r.cfg.AddErrorKey {
@@ -60,15 +60,29 @@ func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
 	return []byte(textString), jsonFields
 }
 
-// unmarshal is equivalent with json.Unmarshal but it converts numbers
-// to int64 where possible, instead of using always float64.
-func unmarshal(text []byte, fields *map[string]interface{}) error {
+// unmarshal is equivalent with json.Unmarshal but it checks to nested json objects in a string.
+// convert numbers to int64 where possible, instead of using always float64.
+func unmarshal(text []byte, fields *map[string]interface{}, nestedParsing bool) error {
 	dec := json.NewDecoder(bytes.NewReader(text))
 	dec.UseNumber()
 	err := dec.Decode(fields)
 	if err != nil {
 		return err
 	}
+
+	if nestedParsing {
+		for k, v := range *fields {
+			switch vv := v.(type) {
+			case string:
+				var output map[string]interface{}
+				sErr := unmarshal([]byte(vv), &output, nestedParsing)
+				if sErr == nil {
+					(*fields)[k] = output
+				}
+			}
+		}
+	}
+
 	transformNumbersDict(*fields)
 	return nil
 }

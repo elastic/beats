@@ -16,6 +16,20 @@ func TestUnmarshal(t *testing.T) {
 
 	tests := []io{
 		io{
+			Name:  "Nested JSON Parsing",
+			Input: `{"msg":"{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"foo\":3}","pipeline":"us1"}`,
+			Output: map[string]interface{}{
+				"msg": map[string]interface{}{
+					"log": map[string]interface{}{
+						"level": "info",
+					},
+					"stream": "stderr",
+					"foo":    int64(3),
+				},
+				"pipeline": "us1",
+			},
+		},
+		io{
 			Name:  "Top level int, float, string, bool",
 			Input: `{"a": 3, "b": 2.0, "c": "hello", "d": true}`,
 			Output: map[string]interface{}{

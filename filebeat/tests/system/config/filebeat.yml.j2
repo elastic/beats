@@ -56,6 +56,7 @@ filebeat.prospectors:
     {% if json.keys_under_root %}keys_under_root: true{% endif %}
     {% if json.overwrite_keys %}overwrite_keys: true{% endif %}
     {% if json.add_error_key %}add_error_key: true{% endif %}
+    {% if json.nested_parsing %}nested_parsing: false{% endif %}
   {% endif %}
 
   {% if multiline %}
