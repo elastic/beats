@@ -26,6 +26,10 @@ type prefixMatcher struct {
 	s string
 }
 
+type emptyStringMatcher struct{}
+
+type emptyWhiteStringMatcher struct{}
+
 func MustCompile(pattern string) Match {
 	m, err := Compile(pattern)
 	if err != nil {
@@ -54,6 +58,14 @@ func compile(r *syntax.Regexp) (Match, error) {
 		s := string(r.Sub[0].Rune)
 		return Match{&prefixMatcher{s}}, nil
 
+	case isEmptyText(r):
+		var m *emptyStringMatcher
+		return Match{m}, nil
+
+	case isEmptyTextWithWhitespace(r):
+		var m *emptyWhiteStringMatcher
+		return Match{m}, nil
+
 	default:
 		r, err := regexp.Compile(r.String())
 		if err != nil {
@@ -74,6 +86,19 @@ func (m *substringMatcher) MatchString(s string) bool {
 func (m *prefixMatcher) MatchString(s string) bool {
 	if !strings.HasPrefix(s, m.s) {
 		return false
+	}
+	return true
+}
+
+func (m *emptyStringMatcher) MatchString(s string) bool {
+	return len(s) == 0
+}
+
+func (m *emptyWhiteStringMatcher) MatchString(s string) bool {
+	for _, r := range s {
+		if !(r == ' ' || ('\t' <= r && r <= '\n') || ('\f' <= r && r <= 'r')) {
+			return false
+		}
 	}
 	return true
 }
@@ -227,4 +252,21 @@ func isPrefixLiteral(r *syntax.Regexp) bool {
 		len(r.Sub) == 2 &&
 		r.Sub[0].Op == syntax.OpBeginText &&
 		r.Sub[1].Op == syntax.OpLiteral
+}
+
+func isEmptyText(r *syntax.Regexp) bool {
+	return r.Op == syntax.OpConcat &&
+		len(r.Sub) == 2 &&
+		r.Sub[0].Op == syntax.OpBeginText &&
+		r.Sub[1].Op == syntax.OpEndText
+}
+
+func isEmptyTextWithWhitespace(r *syntax.Regexp) bool {
+	return r.Op == syntax.OpConcat &&
+		len(r.Sub) == 3 &&
+		r.Sub[0].Op == syntax.OpBeginText &&
+		r.Sub[1].Op == syntax.OpStar &&
+		r.Sub[1].Sub[0].Op == syntax.OpCharClass &&
+		r.Sub[1].Sub[0].String() == `[\t-\n\f-\r ]` &&
+		r.Sub[2].Op == syntax.OpEndText
 }

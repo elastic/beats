@@ -10,12 +10,16 @@ import (
 var commonContent = strings.Split(`Lorem ipsum dolor sit amet,
 PATTERN consectetur adipiscing elit. Nam vitae turpis augue.
  Quisque euismod erat tortor, posuere auctor elit fermentum vel. Proin in odio
+
 23-08-2016 eleifend, maximus turpis non, lacinia ligula. Nullam vel pharetra quam, id egestas
+   
 massa. Sed a vestibulum libero. Sed tellus lorem, imperdiet non nisl ac,
  aliquet placerat magna. Sed PATTERN in bibendum eros. Curabitur ut pretium neque. Sed
 23-08-2016 egestas elit et leo consectetur, nec dignissim arcu ultricies. Sed molestie tempor
+
 erat, a maximus sapien rutrum ut. Curabitur congue condimentum dignissim.
  Mauris hendrerit, velit nec accumsan egestas, augue justo tincidunt risus,
+  
 a facilisis nulla augue PATTERN eu metus. Duis vel neque sit amet nunc elementum viverra
 eu ut ligula. Mauris et libero lacus.`, "\n")
 
@@ -29,6 +33,8 @@ func BenchmarkPatterns(b *testing.B) {
 		{"startsWithDate", `^\d{2}-\d{2}-\d{4}`},
 		{"contains 'PATTERN'", `PATTERN`},
 		{"contains 'PATTERN' with '.*", `.*PATTERN.*`},
+		{"empty line", `^$`},
+		{"empty line with whitespace", `^\s*$`},
 	}
 
 	runTitle := func(matcher, name string) string {
