@@ -1,5 +1,6 @@
 import os
 import metricbeat
+import unittest
 from nose.plugins.attrib import attr
 
 
@@ -19,6 +20,7 @@ class Test(metricbeat.BaseTest):
     def get_hosts(self):
         return [os.getenv("POSTGRESQL_DSN")]
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_activity(self):
         """
@@ -42,6 +44,7 @@ class Test(metricbeat.BaseTest):
             assert "oid" in evt["postgresql"]["activity"]["database"]
             assert "state" in evt["postgresql"]["activity"]
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_database(self):
         """
@@ -68,6 +71,7 @@ class Test(metricbeat.BaseTest):
             assert "conflicts" in evt["postgresql"]["database"]
             assert "deadlocks" in evt["postgresql"]["database"]
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_bgwriter(self):
         """

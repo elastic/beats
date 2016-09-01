@@ -1,5 +1,6 @@
 import os
 import metricbeat
+import unittest
 from nose.plugins.attrib import attr
 import urllib2
 import time
@@ -16,6 +17,7 @@ CPU_FIELDS = ["load", "user", "system", "children_user",
 
 
 class ApacheStatusTest(metricbeat.BaseTest):
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_output(self):
         """
