@@ -6,6 +6,9 @@
           "enabled": false
         }
       },
+      "_meta": {
+        "version": "5.0.0-alpha6"
+      },
       "dynamic_templates": [
         {
           "fields": {
