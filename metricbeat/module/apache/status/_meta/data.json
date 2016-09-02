@@ -2,8 +2,8 @@
     "@timestamp": "2016-05-23T08:05:34.853Z",
     "apache": {
         "status": {
-            "bytes_per_request": 916.211,
-            "bytes_per_sec": 10.921,
+            "bytes_per_request": 1024,
+            "bytes_per_sec": 3.39823,
             "connections": {
                 "async": {
                     "closing": 0,
@@ -15,17 +15,17 @@
             "cpu": {
                 "children_system": 0,
                 "children_user": 0,
-                "load": 0.0890841,
-                "system": 0.77,
-                "user": 0.65
+                "load": 0.139381,
+                "system": 1.64,
+                "user": 2.14
             },
             "hostname": "apache",
             "load": {
-                "1": 1.53,
-                "15": 0.53,
-                "5": 0.92
+                "1": 0.31,
+                "15": 0.19,
+                "5": 0.2
             },
-            "requests_per_sec": 0.0119197,
+            "requests_per_sec": 0.00331858,
             "scoreboard": {
                 "closing_connection": 0,
                 "dns_lookup": 0,
@@ -40,11 +40,11 @@
                 "total": 400,
                 "waiting_for_connection": 74
             },
-            "total_accesses": 19,
-            "total_kbytes": 17,
+            "total_accesses": 9,
+            "total_kbytes": 9,
             "uptime": {
-                "server_uptime": 1594,
-                "uptime": 1594
+                "server_uptime": 2712,
+                "uptime": 2712
             },
             "workers": {
                 "busy": 1,

@@ -14,7 +14,7 @@
       description: >
         Name of the database this backend is connected to.
     - name: pid
-      type: integer
+      type: long
       description: >
         Process ID of this backend.
     - name: user.id
@@ -34,7 +34,7 @@
       description: >
         Host name of the connected client, as reported by a reverse DNS lookup of client_addr.
     - name: client.port
-      type: integer
+      type: long
       description: >
         TCP port number that the client is using for communication with this
         backend, or -1 if a Unix socket is used.
@@ -63,7 +63,7 @@
     - name: state
       description: >
         Current overall state of this backend. Possible values are:
-        
+
           * active: The backend is executing a query.
           * idle: The backend is waiting for a new client command.
           * idle in transaction: The backend is in a transaction, but is not

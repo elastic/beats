@@ -23,9 +23,9 @@
             },
             "cpu": {
                 "used": {
-                    "sys": 0.45,
+                    "sys": 2.41,
                     "sys_children": 0,
-                    "user": 0.54,
+                    "user": 2.71,
                     "user_children": 0
                 }
             },
@@ -33,9 +33,9 @@
                 "allocator": "jemalloc-4.0.3",
                 "used": {
                     "lua": 37888,
-                    "peak": 1010736,
-                    "rss": 9531392,
-                    "value": 886048
+                    "peak": 1007704,
+                    "rss": 3956736,
+                    "value": 883032
                 }
             },
             "persistence": {
@@ -55,7 +55,7 @@
                     "current_bgsave_time_sec": -1,
                     "last_bgsave_status": "ok",
                     "last_bgsave_time_sec": -1,
-                    "last_save_time": 1470133208
+                    "last_save_time": 1472718414
                 }
             },
             "replication": {
@@ -71,20 +71,20 @@
             },
             "server": {
                 "arch_bits": "64",
-                "build_id": "5382f69a4e75566b",
+                "build_id": "7aa1aa9b12040006",
                 "config_file": "",
                 "gcc_version": "4.9.2",
                 "git_dirty": "0",
                 "git_sha1": "00000000",
                 "hz": 10,
-                "lru_clock": 10515904,
+                "lru_clock": 13103343,
                 "mode": "standalone",
                 "multiplexing_api": "epoll",
-                "os": "Linux 4.4.15-moby x86_64",
+                "os": "Linux 4.4.19-moby x86_64",
                 "process_id": 1,
-                "run_id": "6ed624659e20543f023669f6f117db8a7a1be908",
+                "run_id": "f1cee1757f72a57ea07b3df70daf682343b98f06",
                 "tcp_port": 6379,
-                "uptime": 488,
+                "uptime": 2721,
                 "version": "3.2.3"
             },
             "stats": {
@@ -114,7 +114,7 @@
                 },
                 "total_commands_processed": 49,
                 "total_net_input_bytes": 1702,
-                "total_net_output_bytes": 28477
+                "total_net_output_bytes": 28475
             }
         }
     },

@@ -4,7 +4,7 @@
     `system-core` contains local CPU core stats.
   fields:
     - name: id
-      type: integer
+      type: long
       description: >
         CPU Core number.
 

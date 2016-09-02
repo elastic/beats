@@ -25,10 +25,12 @@
             "status": {
               "properties": {
                 "bytes_per_request": {
-                  "type": "half_float"
+                  "scaling_factor": 1000,
+                  "type": "scaled_float"
                 },
                 "bytes_per_sec": {
-                  "type": "float"
+                  "scaling_factor": 1000,
+                  "type": "scaled_float"
                 },
                 "connections": {
                   "properties": {
@@ -81,18 +83,22 @@
                 "load": {
                   "properties": {
                     "1": {
-                      "type": "half_float"
+                      "scaling_factor": 100,
+                      "type": "scaled_float"
                     },
                     "15": {
-                      "type": "half_float"
+                      "scaling_factor": 100,
+                      "type": "scaled_float"
                     },
                     "5": {
-                      "type": "half_float"
+                      "scaling_factor": 100,
+                      "type": "scaled_float"
                     }
                   }
                 },
                 "requests_per_sec": {
-                  "type": "half_float"
+                  "scaling_factor": 1000,
+                  "type": "scaled_float"
                 },
                 "scoreboard": {
                   "properties": {
@@ -999,16 +1005,20 @@
                     "used": {
                       "properties": {
                         "sys": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         },
                         "sys_children": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         },
                         "user": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         },
                         "user_children": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         }
                       }
                     }
@@ -1201,13 +1211,15 @@
                       }
                     },
                     "instantaneous_input_kbps": {
-                      "type": "float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "instantaneous_ops_per_sec": {
                       "type": "long"
                     },
                     "instantaneous_output_kbps": {
-                      "type": "float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "keys": {
                       "properties": {

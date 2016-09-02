@@ -42,7 +42,7 @@ AMQP specific event fields.
 [float]
 === amqp.reply-code
 
-type: integer
+type: long
 
 example: 404
 
@@ -60,7 +60,7 @@ Text explaining the error.
 [float]
 === amqp.class-id
 
-type: integer
+type: long
 
 Failing method class.
 
@@ -68,7 +68,7 @@ Failing method class.
 [float]
 === amqp.method-id
 
-type: integer
+type: long
 
 Failing method ID.
 
@@ -140,7 +140,7 @@ Identifier for the consumer, valid within the current channel.
 [float]
 === amqp.delivery-tag
 
-type: integer
+type: long
 
 The server-assigned and channel-specific delivery tag.
 
@@ -148,7 +148,7 @@ The server-assigned and channel-specific delivery tag.
 [float]
 === amqp.message-count
 
-type: integer
+type: long
 
 The number of messages in the queue, which will be zero for newly-declared queues.
 
@@ -156,7 +156,7 @@ The number of messages in the queue, which will be zero for newly-declared queue
 [float]
 === amqp.consumer-count
 
-type: integer
+type: long
 
 The number of consumers of a queue.
 
@@ -286,7 +286,7 @@ Non-persistent (1) or persistent (2).
 [float]
 === amqp.priority
 
-type: integer
+type: long
 
 Message priority, 0 to 9.
 
@@ -429,7 +429,7 @@ Cassandra request headers.
 [float]
 === cassandra.request.headers.version
 
-type: integer
+type: long
 
 The version of the protocol.
 
@@ -457,7 +457,7 @@ An operation type that distinguishes the actual message.
 [float]
 === cassandra.request.headers.length
 
-type: integer
+type: long
 
 A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
 
@@ -483,7 +483,7 @@ Cassandra response headers, the structure is as same as request's header.
 [float]
 === cassandra.response.headers.version
 
-type: integer
+type: long
 
 The version of the protocol.
 
@@ -511,7 +511,7 @@ An operation type that distinguishes the actual message.
 [float]
 === cassandra.response.headers.length
 
-type: integer
+type: long
 
 A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
 
@@ -537,7 +537,7 @@ Details about the rows.
 [float]
 === cassandra.response.result.rows.num_rows
 
-type: integer
+type: long
 
 Representing the number of rows present in this result.
 
@@ -571,14 +571,14 @@ Provides information on the formatting of the remaining information.
 [float]
 === cassandra.response.result.rows.meta.col_count
 
-type: integer
+type: long
 
 Representing the number of columns selected by the query that produced this result.
 
 [float]
 === cassandra.response.result.rows.meta.pkey_columns
 
-type: integer
+type: long
 
 Representing the PK columns index and counts.
 
@@ -694,14 +694,14 @@ Provides information on the formatting of the remaining information.
 [float]
 === cassandra.response.result.prepared.req_meta.col_count
 
-type: integer
+type: long
 
 Representing the number of columns selected by the query that produced this result.
 
 [float]
 === cassandra.response.result.prepared.req_meta.pkey_columns
 
-type: integer
+type: long
 
 Representing the PK columns index and counts.
 
@@ -742,14 +742,14 @@ Provides information on the formatting of the remaining information.
 [float]
 === cassandra.response.result.prepared.resp_meta.col_count
 
-type: integer
+type: long
 
 Representing the number of columns selected by the query that produced this result.
 
 [float]
 === cassandra.response.result.prepared.resp_meta.pkey_columns
 
-type: integer
+type: long
 
 Representing the PK columns index and counts.
 
@@ -885,7 +885,7 @@ Indicates an error processing a request. The body of the message will be an  err
 [float]
 === cassandra.response.error.code
 
-type: integer
+type: long
 
 The error code of the Cassandra response.
 
@@ -919,28 +919,28 @@ Representing the consistency level of the query that triggered the exception.
 [float]
 === cassandra.response.error.details.required
 
-type: integer
+type: long
 
 Representing the number of nodes that should be alive to respect consistency level.
 
 [float]
 === cassandra.response.error.details.alive
 
-type: integer
+type: long
 
 Representing the number of replicas that were known to be alive when the request had been processed (since an unavailable exception has been triggered).
 
 [float]
 === cassandra.response.error.details.received
 
-type: integer
+type: long
 
 Representing the number of nodes having acknowledged the request.
 
 [float]
 === cassandra.response.error.details.blockfor
 
-type: integer
+type: long
 
 Representing the number of replicas whose acknowledgement is required to achieve consistency level.
 
@@ -1118,7 +1118,7 @@ DNS-specific event fields.
 [float]
 === dns.id
 
-type: integer
+type: long
 
 The DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
 
@@ -1218,7 +1218,7 @@ The effective top-level domain (eTLD) plus one more label. For example, the eTLD
 [float]
 === dns.answers_count
 
-type: integer
+type: long
 
 The number of resource records contained in the `dns.answers` field.
 
@@ -1247,7 +1247,7 @@ The class of DNS data contained in this resource record.
 [float]
 === dns.answers.ttl
 
-type: integer
+type: long
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
@@ -1269,7 +1269,7 @@ An array containing a dictionary for each authority section from the answer.
 [float]
 === dns.authorities_count
 
-type: integer
+type: long
 
 The number of resource records contained in the `dns.authorities` field. The `dns.authorities` field may or may not be included depending on the configuration of Packetbeat.
 
@@ -1306,7 +1306,7 @@ An array containing a dictionary about each answer section returned by the serve
 [float]
 === dns.answers.ttl
 
-type: integer
+type: long
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
@@ -1328,7 +1328,7 @@ An array containing a dictionary for each additional section from the answer.
 [float]
 === dns.additionals_count
 
-type: integer
+type: long
 
 The number of resource records contained in the `dns.additionals` field. The `dns.additionals` field may or may not be included depending on the configuration of Packetbeat.
 
@@ -1357,7 +1357,7 @@ The class of DNS data contained in this resource record.
 [float]
 === dns.additionals.ttl
 
-type: integer
+type: long
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
@@ -1392,7 +1392,7 @@ Extended response code field.
 [float]
 === dns.opt.udp_size
 
-type: integer
+type: long
 
 Requestor's UDP payload size (in bytes).
 
@@ -1802,14 +1802,14 @@ A human readable form of the request.
 [float]
 === icmp.request.type
 
-type: integer
+type: long
 
 The request type.
 
 [float]
 === icmp.request.code
 
-type: integer
+type: long
 
 The request code.
 
@@ -1823,14 +1823,14 @@ A human readable form of the response.
 [float]
 === icmp.response.type
 
-type: integer
+type: long
 
 The response type.
 
 [float]
 === icmp.response.code
 
-type: integer
+type: long
 
 The response code.
 
@@ -1916,7 +1916,7 @@ The binary protocol message opcode name.
 [float]
 === memcache.request.opcode_value
 
-type: integer
+type: long
 
 The binary protocol message opcode value.
 
@@ -1924,7 +1924,7 @@ The binary protocol message opcode value.
 [float]
 === memcache.response.opcode_value
 
-type: integer
+type: long
 
 The binary protocol message opcode value.
 
@@ -1932,7 +1932,7 @@ The binary protocol message opcode value.
 [float]
 === memcache.request.opaque
 
-type: integer
+type: long
 
 The binary protocol opaque header value used for correlating request with response messages.
 
@@ -1940,7 +1940,7 @@ The binary protocol opaque header value used for correlating request with respon
 [float]
 === memcache.response.opaque
 
-type: integer
+type: long
 
 The binary protocol opaque header value used for correlating request with response messages.
 
@@ -1948,7 +1948,7 @@ The binary protocol opaque header value used for correlating request with respon
 [float]
 === memcache.request.vbucket
 
-type: integer
+type: long
 
 The vbucket index sent in the binary message.
 
@@ -1964,7 +1964,7 @@ The textual representation of the response error code (binary protocol only).
 [float]
 === memcache.response.status_code
 
-type: integer
+type: long
 
 The status code value returned in the response (binary protocol only).
 
@@ -1988,7 +1988,7 @@ The list of keys returned for the load command (if present).
 [float]
 === memcache.request.count_values
 
-type: integer
+type: long
 
 The number of values found in the memcache request message. If the command does not send any data, this field is missing.
 
@@ -1996,7 +1996,7 @@ The number of values found in the memcache request message. If the command does 
 [float]
 === memcache.response.count_values
 
-type: integer
+type: long
 
 The number of values found in the memcache response message. If the command does not send any data, this field is missing.
 
@@ -2040,7 +2040,7 @@ The byte count of the values being transfered.
 [float]
 === memcache.request.delta
 
-type: integer
+type: long
 
 The counter increment/decrement delta value.
 
@@ -2048,7 +2048,7 @@ The counter increment/decrement delta value.
 [float]
 === memcache.request.initial
 
-type: integer
+type: long
 
 The counter increment/decrement initial value parameter (binary protocol only).
 
@@ -2056,7 +2056,7 @@ The counter increment/decrement initial value parameter (binary protocol only).
 [float]
 === memcache.request.verbosity
 
-type: integer
+type: long
 
 The value of the memcache "verbosity" command.
 
@@ -2072,7 +2072,7 @@ The text protocol raw arguments for the "stats ..." and "lru crawl ..." commands
 [float]
 === memcache.request.source_class
 
-type: integer
+type: long
 
 The source class id in 'slab reassign' command.
 
@@ -2080,7 +2080,7 @@ The source class id in 'slab reassign' command.
 [float]
 === memcache.request.dest_class
 
-type: integer
+type: long
 
 The destination class id in 'slab reassign' command.
 
@@ -2112,7 +2112,7 @@ The memcache message flags sent in the response (if present).
 [float]
 === memcache.request.exptime
 
-type: integer
+type: long
 
 The data expiry time in seconds sent with the memcache command (if present). If the value is <30 days, the expiry time is relative to "now", or else it is an absolute Unix time in seconds (32-bit).
 
@@ -2204,7 +2204,7 @@ The full collection name. The full collection name is the concatenation of the d
 [float]
 === mongodb.numberToSkip
 
-type: integer
+type: long
 
 Sets the number of documents to omit - starting from the first document in the resulting dataset - when returning the result of the query.
 
@@ -2212,7 +2212,7 @@ Sets the number of documents to omit - starting from the first document in the r
 [float]
 === mongodb.numberToReturn
 
-type: integer
+type: long
 
 The requested maximum number of documents to be returned.
 
@@ -2220,7 +2220,7 @@ The requested maximum number of documents to be returned.
 [float]
 === mongodb.numberReturned
 
-type: integer
+type: long
 
 The number of documents in the reply.
 
@@ -2275,14 +2275,14 @@ RPC message transaction identifier.
 [float]
 === rpc.call_size
 
-type: integer
+type: long
 
 RPC call size with argument.
 
 [float]
 === rpc.reply_size
 
-type: integer
+type: long
 
 RPC reply size with argument.
 
@@ -2311,14 +2311,14 @@ RPC authentication flavor.
 [float]
 === rpc.cred.uid
 
-type: integer
+type: long
 
 RPC caller's user id, in case of auth-unix.
 
 [float]
 === rpc.cred.gid
 
-type: integer
+type: long
 
 RPC caller's group id, in case of auth-unix.
 
@@ -2330,7 +2330,7 @@ RPC caller's secondary group ids, in case of auth-unix.
 [float]
 === rpc.cred.stamp
 
-type: integer
+type: long
 
 Arbitrary ID which the caller machine may generate.
 
@@ -2358,7 +2358,7 @@ If the MySQL query returns an error, this field is set to true.
 [float]
 === mysql.affected_rows
 
-type: integer
+type: long
 
 If the MySQL command is successful, this field contains the affected number of rows of the last statement.
 
@@ -2390,7 +2390,7 @@ The row mysql query as read from the transaction's request.
 [float]
 === mysql.error_code
 
-type: integer
+type: long
 
 The error code returned by MySQL.
 
@@ -2411,14 +2411,14 @@ NFS v4/3 specific event fields.
 [float]
 === nfs.version
 
-type: integer
+type: long
 
 NFS protocol version number.
 
 [float]
 === nfs.minor_version
 
-type: integer
+type: long
 
 NFS protocol minor version number.
 
@@ -2463,7 +2463,7 @@ If the PgSQL query returns an error, this field is set to true.
 [float]
 === pgsql.error_code
 
-type: integer
+type: long
 
 The PostgreSQL error code.
 
