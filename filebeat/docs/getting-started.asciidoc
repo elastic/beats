@@ -147,7 +147,7 @@ TIP: To test your configuration file, run Filebeat in the foreground with the fo
 See <<filebeat-configuration-details>> for more details about each configuration option.
 
 [[config-filebeat-logstash]]
-=== Step 3 (Optional): Configuring Filebeat to Use Logstash
+=== Step 3: Configuring Filebeat to Use Logstash
 
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 

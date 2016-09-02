@@ -16,7 +16,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-In Elasticsearch, http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
+In Elasticsearch, {elasticsearch}/indices-templates.html[index
 templates] are used to define settings and mappings that determine how fields should be analyzed. 
 
 The recommended index template file for {beatname_uc} is installed by the {beatname_uc} packages. If you accept
@@ -29,14 +29,14 @@ you can change the settings for template loading in the {beatname_uc} configurat
 choose to disable automatic template loading, you need to load the template manually. 
 For more information, see:
 
-* <<load-template-auto>>
-* <<load-template-manually>>
+* <<load-template-auto>> - supported for Elasticsearch output only
+* <<load-template-manually>> - required for Logstash output
 
 [[load-template-auto]]
 ==== Configuring Template Loading
 
 By default, {beatname_uc} automatically loads the recommended template file, +{beatname_lc}.template.json+,
-if elasticsearch output is enabled. You can configure {beatname_lc} to load a different template
+if Elasticsearch output is enabled. You can configure {beatname_lc} to load a different template
 by adjusting the `template.name` and `template.path` options in +{beatname_lc}.yml+ file:
 
 ["source","yaml",subs="attributes,callouts"]
@@ -51,7 +51,10 @@ output.elasticsearch:
 By default, if a template already exists in the index, it is not overwritten. To overwrite an existing
 template, set `template.overwrite: true` in the configuration file.
 
-To disable automatic template loading, comment out the template part under elasticsearch output.
+To disable automatic template loading, comment out the template part under the Elasticsearch output.
+
+The options for auto loading the template are not supported if you are using the
+Logstash output.
 
 [[load-template-manually]]
 ==== Loading the Template Manually
