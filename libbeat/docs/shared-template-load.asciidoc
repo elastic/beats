@@ -16,22 +16,20 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-Before starting {beatname_uc}, you need to load the
-http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
-template], which lets Elasticsearch know which fields should be analyzed
-in which way.
+In Elasticsearch, {elasticsearch}/indices-templates.html[index templates]
+are used to define settings and mappings that determine how fields should be analyzed.
 
 The recommended template file is installed by the {beatname_uc} packages. You can either configure 
-{beatname_uc} to load the template automatically, or you can run a shell command to load the template:
+{beatname_uc} to load the template automatically, or you can load the template manually. 
 
-* <<load-template-auto>>
-* <<load-template-shell>>
+* <<load-template-auto>> - supported for Elasticsearch output only
+* <<load-template-shell>> - required for Logstash output
 
 [[load-template-auto]]
-==== Configuring {beatname_uc} to Load the Template
+==== Configuring Template Loading
 
-To configure {beatname_uc} to load the template, you must enable the elasticsearch output. In the
-{beatname_uc} configuration file, uncomment the template part under elasticsearch output. By default
+To configure {beatname_uc} to load the template, you must enable the Elasticsearch output. In the
+{beatname_uc} configuration file, uncomment the template part under `elasticsearch` section. By default
 the template is named {beatname_lc}. Adjust the path to your template file. 
 
 ["source","yaml",subs="attributes,callouts"]
@@ -59,8 +57,11 @@ The template is loaded when you start {beatname_uc}. By default, if a template
 already exists in the index, it is not overwritten. To overwrite an existing template,
 set `overwrite: true` in the configuration file.
 
+The options for auto loading the template are not supported if you are using the
+Logstash output.
+
 [[load-template-shell]]
-==== Running a Shell Command to Load the Template
+==== Loading the Template Manually
 
 You can load the template by running the following command:
 
