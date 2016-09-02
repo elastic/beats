@@ -443,13 +443,13 @@ func (f *Framer) parseResultPrepared() map[string]interface{} {
 
 	result := make(map[string]interface{})
 
-        uuid,err := UUIDFromBytes((f.decoder).ReadShortBytes())
+        uuid, err := UUIDFromBytes((f.decoder).ReadShortBytes())
 
 	if err != nil {
 		logp.Err("Error in parsing UUID")
 	}
 	
-	result["prepared_id"] =  uuid.String()
+	result["prepared_id"] = uuid.String()
 	
 	result["req_meta"] = f.parseResultMetadata(true)
 
