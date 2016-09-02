@@ -57,7 +57,7 @@ Apache hostname.
 [float]
 === apache.status.total_accesses
 
-type: integer
+type: long
 
 Total number of access requests.
 
@@ -65,7 +65,7 @@ Total number of access requests.
 [float]
 === apache.status.total_kbytes
 
-type: integer
+type: long
 
 Total number of kilobytes served.
 
@@ -73,7 +73,7 @@ Total number of kilobytes served.
 [float]
 === apache.status.requests_per_sec
 
-type: half_float
+type: scaled_float
 
 Requests per second.
 
@@ -81,7 +81,7 @@ Requests per second.
 [float]
 === apache.status.bytes_per_sec
 
-type: float
+type: scaled_float
 
 Bytes per second.
 
@@ -89,7 +89,7 @@ Bytes per second.
 [float]
 === apache.status.bytes_per_request
 
-type: half_float
+type: scaled_float
 
 Bytes per request.
 
@@ -97,7 +97,7 @@ Bytes per request.
 [float]
 === apache.status.workers.busy
 
-type: integer
+type: long
 
 Number of busy workers.
 
@@ -105,7 +105,7 @@ Number of busy workers.
 [float]
 === apache.status.workers.idle
 
-type: integer
+type: long
 
 Number of idle workers.
 
@@ -120,7 +120,7 @@ Uptime stats.
 [float]
 === apache.status.uptime.server_uptime
 
-type: integer
+type: long
 
 Server uptime in seconds.
 
@@ -128,7 +128,7 @@ Server uptime in seconds.
 [float]
 === apache.status.uptime.uptime
 
-type: integer
+type: long
 
 Server uptime.
 
@@ -190,7 +190,7 @@ Connection stats.
 [float]
 === apache.status.connections.total
 
-type: integer
+type: long
 
 Total connections.
 
@@ -198,7 +198,7 @@ Total connections.
 [float]
 === apache.status.connections.async.writing
 
-type: integer
+type: long
 
 Async connection writing.
 
@@ -206,7 +206,7 @@ Async connection writing.
 [float]
 === apache.status.connections.async.keep_alive
 
-type: integer
+type: long
 
 Async keeped alive connections.
 
@@ -214,7 +214,7 @@ Async keeped alive connections.
 [float]
 === apache.status.connections.async.closing
 
-type: integer
+type: long
 
 Async closed connections.
 
@@ -229,7 +229,7 @@ Load averages.
 [float]
 === apache.status.load.1
 
-type: half_float
+type: scaled_float
 
 Load average for the last minute.
 
@@ -237,7 +237,7 @@ Load average for the last minute.
 [float]
 === apache.status.load.5
 
-type: half_float
+type: scaled_float
 
 Load average for the last 5 minutes.
 
@@ -245,7 +245,7 @@ Load average for the last 5 minutes.
 [float]
 === apache.status.load.15
 
-type: half_float
+type: scaled_float
 
 Load average for the last 15 minutes.
 
@@ -260,7 +260,7 @@ Scoreboard metrics.
 [float]
 === apache.status.scoreboard.starting_up
 
-type: integer
+type: long
 
 Starting up.
 
@@ -268,7 +268,7 @@ Starting up.
 [float]
 === apache.status.scoreboard.reading_request
 
-type: integer
+type: long
 
 Reading requests.
 
@@ -276,7 +276,7 @@ Reading requests.
 [float]
 === apache.status.scoreboard.sending_reply
 
-type: integer
+type: long
 
 Sending Reply.
 
@@ -284,7 +284,7 @@ Sending Reply.
 [float]
 === apache.status.scoreboard.keepalive
 
-type: integer
+type: long
 
 Keep alive.
 
@@ -292,7 +292,7 @@ Keep alive.
 [float]
 === apache.status.scoreboard.dns_lookup
 
-type: integer
+type: long
 
 Dns Lookups.
 
@@ -300,7 +300,7 @@ Dns Lookups.
 [float]
 === apache.status.scoreboard.closing_connection
 
-type: integer
+type: long
 
 Closing connections.
 
@@ -308,7 +308,7 @@ Closing connections.
 [float]
 === apache.status.scoreboard.logging
 
-type: integer
+type: long
 
 Logging
 
@@ -316,7 +316,7 @@ Logging
 [float]
 === apache.status.scoreboard.gracefully_finishing
 
-type: integer
+type: long
 
 Gracefully finishing.
 
@@ -324,7 +324,7 @@ Gracefully finishing.
 [float]
 === apache.status.scoreboard.idle_cleanup
 
-type: integer
+type: long
 
 Idle cleanups.
 
@@ -332,7 +332,7 @@ Idle cleanups.
 [float]
 === apache.status.scoreboard.open_slot
 
-type: integer
+type: long
 
 Open slots.
 
@@ -340,7 +340,7 @@ Open slots.
 [float]
 === apache.status.scoreboard.waiting_for_connection
 
-type: integer
+type: long
 
 Waiting for connections.
 
@@ -348,7 +348,7 @@ Waiting for connections.
 [float]
 === apache.status.scoreboard.total
 
-type: integer
+type: long
 
 Total.
 
@@ -1244,7 +1244,7 @@ Aborted status fields.
 [float]
 === mysql.status.aborted.clients
 
-type: integer
+type: long
 
 The number of connections that were aborted because the client died without closing the connection properly.
 
@@ -1252,7 +1252,7 @@ The number of connections that were aborted because the client died without clos
 [float]
 === mysql.status.aborted.connects
 
-type: integer
+type: long
 
 The number of failed attempts to connect to the MySQL server.
 
@@ -1266,14 +1266,14 @@ The number of failed attempts to connect to the MySQL server.
 [float]
 === mysql.status.binlog.cache.disk_use
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.binlog.cache.use
 
-type: integer
+type: long
 
 
 
@@ -1287,7 +1287,7 @@ Bytes stats.
 [float]
 === mysql.status.bytes.received
 
-type: integer
+type: long
 
 format: bytes
 
@@ -1297,7 +1297,7 @@ The number of bytes received from all clients.
 [float]
 === mysql.status.bytes.sent
 
-type: integer
+type: long
 
 format: bytes
 
@@ -1307,7 +1307,7 @@ The number of bytes sent to all clients.
 [float]
 === mysql.status.connections
 
-type: integer
+type: long
 
 
 
@@ -1320,21 +1320,21 @@ type: integer
 [float]
 === mysql.status.created.tmp.disk_tables
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.created.tmp.files
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.created.tmp.tables
 
-type: integer
+type: long
 
 
 
@@ -1347,35 +1347,35 @@ type: integer
 [float]
 === mysql.status.delayed.errors
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.delayed.insert_threads
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.delayed.writes
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.flush_commands
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.max_used_connections
 
-type: integer
+type: long
 
 
 
@@ -1388,28 +1388,28 @@ type: integer
 [float]
 === mysql.status.open.files
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.open.streams
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.open.tables
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.opened_tables
 
-type: integer
+type: long
 
 
 
@@ -1445,7 +1445,7 @@ Nginx hostname.
 [float]
 === nginx.stubstatus.active
 
-type: integer
+type: long
 
 The current number of active client connections including Waiting connections.
 
@@ -1453,7 +1453,7 @@ The current number of active client connections including Waiting connections.
 [float]
 === nginx.stubstatus.accepts
 
-type: integer
+type: long
 
 The total number of accepted client connections.
 
@@ -1461,7 +1461,7 @@ The total number of accepted client connections.
 [float]
 === nginx.stubstatus.handled
 
-type: integer
+type: long
 
 The total number of handled client connections.
 
@@ -1469,7 +1469,7 @@ The total number of handled client connections.
 [float]
 === nginx.stubstatus.dropped
 
-type: integer
+type: long
 
 The total number of dropped client connections.
 
@@ -1477,7 +1477,7 @@ The total number of dropped client connections.
 [float]
 === nginx.stubstatus.requests
 
-type: integer
+type: long
 
 The total number of client requests.
 
@@ -1485,7 +1485,7 @@ The total number of client requests.
 [float]
 === nginx.stubstatus.current
 
-type: integer
+type: long
 
 The current number of client requests.
 
@@ -1493,7 +1493,7 @@ The current number of client requests.
 [float]
 === nginx.stubstatus.reading
 
-type: integer
+type: long
 
 The current number of connections where Nginx is reading the request header.
 
@@ -1501,7 +1501,7 @@ The current number of connections where Nginx is reading the request header.
 [float]
 === nginx.stubstatus.writing
 
-type: integer
+type: long
 
 The current number of connections where Nginx is writing the response back to the client.
 
@@ -1509,7 +1509,7 @@ The current number of connections where Nginx is writing the response back to th
 [float]
 === nginx.stubstatus.waiting
 
-type: integer
+type: long
 
 The current number of idle client connections waiting for a request.
 
@@ -1554,7 +1554,7 @@ Name of the database this backend is connected to.
 [float]
 === postgresql.activity.pid
 
-type: integer
+type: long
 
 Process ID of this backend.
 
@@ -1594,7 +1594,7 @@ Host name of the connected client, as reported by a reverse DNS lookup of client
 [float]
 === postgresql.activity.client.port
 
-type: integer
+type: long
 
 TCP port number that the client is using for communication with this backend, or -1 if a Unix socket is used.
 
@@ -1946,7 +1946,7 @@ Redis client stats.
 [float]
 === redis.info.clients.connected
 
-type: integer
+type: long
 
 Number of client connections (excluding connections from slaves).
 
@@ -1954,7 +1954,7 @@ Number of client connections (excluding connections from slaves).
 [float]
 === redis.info.clients.longest_output_list
 
-type: integer
+type: long
 
 Longest output list among current client connections.
 
@@ -1962,7 +1962,7 @@ Longest output list among current client connections.
 [float]
 === redis.info.clients.biggest_input_buf
 
-type: integer
+type: long
 
 Biggest input buffer among current client connections.
 
@@ -1970,7 +1970,7 @@ Biggest input buffer among current client connections.
 [float]
 === redis.info.clients.blocked
 
-type: integer
+type: long
 
 Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH).
 
@@ -2000,7 +2000,7 @@ Redis CPU stats
 [float]
 === redis.info.cpu.used.sys
 
-type: half_float
+type: scaled_float
 
 System CPU consumed by the Redis server.
 
@@ -2008,7 +2008,7 @@ System CPU consumed by the Redis server.
 [float]
 === redis.info.cpu.used.sys_children
 
-type: half_float
+type: scaled_float
 
 User CPU consumed by the Redis server.
 
@@ -2016,7 +2016,7 @@ User CPU consumed by the Redis server.
 [float]
 === redis.info.cpu.used.user
 
-type: half_float
+type: scaled_float
 
 System CPU consumed by the background processes.
 
@@ -2024,7 +2024,7 @@ System CPU consumed by the background processes.
 [float]
 === redis.info.cpu.used.user_children
 
-type: half_float
+type: scaled_float
 
 User CPU consumed by the background processes.
 
@@ -2039,7 +2039,7 @@ Redis CPU stats.
 [float]
 === redis.info.memory.used.value
 
-type: integer
+type: long
 
 Used memory.
 
@@ -2047,7 +2047,7 @@ Used memory.
 [float]
 === redis.info.memory.used.rss
 
-type: integer
+type: long
 
 Used memory rss.
 
@@ -2055,7 +2055,7 @@ Used memory rss.
 [float]
 === redis.info.memory.used.peak
 
-type: integer
+type: long
 
 Used memory peak.
 
@@ -2063,7 +2063,7 @@ Used memory peak.
 [float]
 === redis.info.memory.used.lua
 
-type: integer
+type: long
 
 Used memory lua.
 
@@ -2093,7 +2093,7 @@ None
 [float]
 === redis.info.persistence.rdb.changes_since_last_save
 
-type: integer
+type: long
 
 None
 
@@ -2107,7 +2107,7 @@ None
 [float]
 === redis.info.persistence.rdb.last_save_time
 
-type: integer
+type: long
 
 None
 
@@ -2121,14 +2121,14 @@ None
 [float]
 === redis.info.persistence.rdb.last_bgsave_time_sec
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.persistence.rdb.current_bgsave_time_sec
 
-type: integer
+type: long
 
 None
 
@@ -2156,14 +2156,14 @@ None
 [float]
 === redis.info.persistence.aof.last_rewrite_time_sec
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.persistence.aof.current_rewrite_time_sec
 
-type: integer
+type: long
 
 None
 
@@ -2198,42 +2198,42 @@ None
 [float]
 === redis.info.replication.connected_slaves
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.replication.master_offset
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.replication.backlog.active
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.replication.backlog.size
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.replication.backlog.first_byte_offset
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.replication.backlog.histlen
 
-type: integer
+type: long
 
 None
 
@@ -2310,7 +2310,7 @@ None
 [float]
 === redis.info.server.process_id
 
-type: integer
+type: long
 
 None
 
@@ -2324,28 +2324,28 @@ None
 [float]
 === redis.info.server.tcp_port
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.server.uptime
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.server.hz
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.server.lru_clock
 
-type: integer
+type: long
 
 None
 
@@ -2366,133 +2366,133 @@ Redis stats.
 [float]
 === redis.info.stats.connections.received
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.connections.rejected
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.total_commands_processed
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.total_net_input_bytes
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.total_net_output_bytes
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.instantaneous_ops_per_sec
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.instantaneous_input_kbps
 
-type: float
+type: scaled_float
 
 None
 
 [float]
 === redis.info.stats.instantaneous_output_kbps
 
-type: float
+type: scaled_float
 
 None
 
 [float]
 === redis.info.stats.sync.full
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.sync.partial_ok
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.sync.partial_err
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.keys.expired
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.keys.evicted
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.keyspace.hits
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.keyspace.misses
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.pubsub_channels
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.pubsub_patterns
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.latest_fork_usec
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.migrate_cached_sockets
 
-type: integer
+type: long
 
 None
 
@@ -2558,7 +2558,7 @@ System status metrics, like CPU and memory usage, that are collected from the op
 [float]
 === system.core.id
 
-type: integer
+type: long
 
 CPU Core number.
 
@@ -3379,7 +3379,7 @@ The process state. For example: "running".
 [float]
 === system.process.pid
 
-type: integer
+type: long
 
 The process pid.
 
@@ -3387,7 +3387,7 @@ The process pid.
 [float]
 === system.process.ppid
 
-type: integer
+type: long
 
 The process parent pid.
 
@@ -3395,7 +3395,7 @@ The process parent pid.
 [float]
 === system.process.pgid
 
-type: integer
+type: long
 
 The process group id.
 
@@ -4103,7 +4103,7 @@ Approximate size of ZooKeeper data.
 [float]
 === zookeeper.mntr.latency.avg
 
-type: integer
+type: long
 
 Average latency between ensemble hosts in milliseconds.
 
@@ -4111,7 +4111,7 @@ Average latency between ensemble hosts in milliseconds.
 [float]
 === zookeeper.mntr.ephemerals_count
 
-type: integer
+type: long
 
 Number of ephemeral znodes.
 
@@ -4119,7 +4119,7 @@ Number of ephemeral znodes.
 [float]
 === zookeeper.mntr.followers
 
-type: integer
+type: long
 
 Number of followers seen by the current host.
 
@@ -4127,7 +4127,7 @@ Number of followers seen by the current host.
 [float]
 === zookeeper.mntr.max_file_descriptor_count
 
-type: integer
+type: long
 
 Maximum number of file descriptors allowed for the ZooKeeper process.
 
@@ -4135,7 +4135,7 @@ Maximum number of file descriptors allowed for the ZooKeeper process.
 [float]
 === zookeeper.mntr.latency.max
 
-type: integer
+type: long
 
 Maximum latency in milliseconds.
 
@@ -4143,7 +4143,7 @@ Maximum latency in milliseconds.
 [float]
 === zookeeper.mntr.latency.min
 
-type: integer
+type: long
 
 Minimum latency in milliseconds.
 
@@ -4151,7 +4151,7 @@ Minimum latency in milliseconds.
 [float]
 === zookeeper.mntr.num_alive_connections
 
-type: integer
+type: long
 
 Number of connections to ZooKeeper that are currently alive.
 
@@ -4159,7 +4159,7 @@ Number of connections to ZooKeeper that are currently alive.
 [float]
 === zookeeper.mntr.open_file_descriptor_count
 
-type: integer
+type: long
 
 Number of file descriptors open by the ZooKeeper process.
 
@@ -4167,7 +4167,7 @@ Number of file descriptors open by the ZooKeeper process.
 [float]
 === zookeeper.mntr.outstanding_requests
 
-type: integer
+type: long
 
 Number of outstanding requests that need to be processed by the cluster.
 
@@ -4175,7 +4175,7 @@ Number of outstanding requests that need to be processed by the cluster.
 [float]
 === zookeeper.mntr.packets.received
 
-type: integer
+type: long
 
 Number of ZooKeeper network packets received.
 
@@ -4191,7 +4191,7 @@ Number of ZooKeeper network packets sent.
 [float]
 === zookeeper.mntr.pending_syncs
 
-type: integer
+type: long
 
 Number of pending syncs to carry out to ZooKeeper ensemble followers.
 
@@ -4207,7 +4207,7 @@ Role in the ZooKeeper ensemble.
 [float]
 === zookeeper.mntr.synced_followers
 
-type: integer
+type: long
 
 Number of synced followers reported when a node server_state is leader.
 
@@ -4223,7 +4223,7 @@ ZooKeeper version and build string reported.
 [float]
 === zookeeper.mntr.watch_count
 
-type: integer
+type: long
 
 Number of watches currently set on the local ZooKeeper process.
 
@@ -4231,7 +4231,7 @@ Number of watches currently set on the local ZooKeeper process.
 [float]
 === zookeeper.mntr.znode_count
 
-type: integer
+type: long
 
 Number of znodes reported by the local ZooKeeper process.
 
