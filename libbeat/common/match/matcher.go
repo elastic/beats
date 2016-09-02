@@ -1,10 +1,12 @@
 package match
 
 import (
+	"bytes"
 	"errors"
 	"regexp"
 	"regexp/syntax"
 	"strings"
+	"unicode/utf8"
 )
 
 type Matcher struct {
@@ -17,14 +19,16 @@ type stringMatcher interface {
 	// unmatched substring which can be used for further matching (e.g. when
 	// concatenating matches)
 	MatchString(s string) (matched bool)
+	Match(bs []byte) (matched bool)
 }
 
 type substringMatcher struct {
-	s string
+	s  string
+	bs []byte
 }
 
 type prefixMatcher struct {
-	s string
+	s []byte
 }
 
 type emptyStringMatcher struct{}
@@ -87,10 +91,10 @@ func compile(r *syntax.Regexp) (Matcher, error) {
 	switch {
 	case r.Op == syntax.OpLiteral:
 		s := string(r.Rune)
-		return Matcher{&substringMatcher{s}}, nil
+		return Matcher{&substringMatcher{s, []byte(s)}}, nil
 
 	case isPrefixLiteral(r):
-		s := string(r.Sub[0].Rune)
+		s := []byte(string(r.Sub[0].Rune))
 		return Matcher{&prefixMatcher{s}}, nil
 
 	case isEmptyText(r):
@@ -115,22 +119,27 @@ func compile(r *syntax.Regexp) (Matcher, error) {
 }
 
 func (m *substringMatcher) MatchString(s string) bool {
-	idx := strings.Index(s, m.s)
-	if idx < 0 {
-		return false
-	}
-	return true
+	return strings.Contains(s, m.s)
+}
+
+func (m *substringMatcher) Match(bs []byte) bool {
+	return bytes.Contains(bs, m.bs)
 }
 
 func (m *prefixMatcher) MatchString(s string) bool {
-	if !strings.HasPrefix(s, m.s) {
-		return false
-	}
-	return true
+	return len(s) >= len(m.s) && s[0:len(m.s)] == string(m.s)
+}
+
+func (m *prefixMatcher) Match(bs []byte) bool {
+	return len(bs) >= len(m.s) && bytes.Equal(bs[0:len(m.s)], m.s)
 }
 
 func (m *emptyStringMatcher) MatchString(s string) bool {
 	return len(s) == 0
+}
+
+func (m *emptyStringMatcher) Match(bs []byte) bool {
+	return len(bs) == 0
 }
 
 func (m *emptyWhiteStringMatcher) MatchString(s string) bool {
@@ -142,9 +151,19 @@ func (m *emptyWhiteStringMatcher) MatchString(s string) bool {
 	return true
 }
 
-func (m *matchAny) MatchString(s string) bool {
+func (m *emptyWhiteStringMatcher) Match(bs []byte) bool {
+	for i := 0; i < len(bs); {
+		r, size := utf8.DecodeRune(bs[i:])
+		i += size
+		if !(r == ' ' || ('\t' <= r && r <= '\n') || ('\f' <= r && r <= 'r')) {
+			return false
+		}
+	}
 	return true
 }
+
+func (m *matchAny) Match(_ []byte) bool       { return true }
+func (m *matchAny) MatchString(_ string) bool { return true }
 
 type trans func(*syntax.Regexp) (bool, *syntax.Regexp)
 

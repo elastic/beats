@@ -1,13 +1,13 @@
 package match
 
 import (
+	"bytes"
 	"fmt"
 	"regexp"
-	"strings"
 	"testing"
 )
 
-var commonContent = strings.Split(`Lorem ipsum dolor sit amet,
+var commonContent = bytes.Split([]byte(`Lorem ipsum dolor sit amet,
 PATTERN consectetur adipiscing elit. Nam vitae turpis augue.
  Quisque euismod erat tortor, posuere auctor elit fermentum vel. Proin in odio
 
@@ -21,7 +21,7 @@ erat, a maximus sapien rutrum ut. Curabitur congue condimentum dignissim.
  Mauris hendrerit, velit nec accumsan egestas, augue justo tincidunt risus,
   
 a facilisis nulla augue PATTERN eu metus. Duis vel neque sit amet nunc elementum viverra
-eu ut ligula. Mauris et libero lacus.`, "\n")
+eu ut ligula. Mauris et libero lacus.`), []byte("\n"))
 
 func BenchmarkPatterns(b *testing.B) {
 	patterns := []struct {
@@ -46,15 +46,15 @@ func BenchmarkPatterns(b *testing.B) {
 	for i, pattern := range patterns {
 		b.Logf("benchmark (%v): %v", i, pattern.title)
 
-		regex := makeRunner(regexp.MustCompile(pattern.regex).MatchString)
-		matcher := makeRunner(MustCompile(pattern.regex).MatchString)
+		regex := makeRunner(regexp.MustCompile(pattern.regex).Match)
+		matcher := makeRunner(MustCompile(pattern.regex).Match)
 
 		b.Run(runTitle("Regex", pattern.title), regex)
 		b.Run(runTitle("Match", pattern.title), matcher)
 	}
 }
 
-func makeRunner(m func(string) bool) func(*testing.B) {
+func makeRunner(m func([]byte) bool) func(*testing.B) {
 	return func(b *testing.B) {
 		found := false
 		for i := 0; i < b.N; i++ {
