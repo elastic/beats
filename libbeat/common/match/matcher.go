@@ -53,6 +53,10 @@ func MustCompile(pattern string) Match {
 	return m
 }
 
+// Compile regular expression to string matcher. String matcher by default uses
+// regular expressions as provided by regexp library, but tries to optimize some
+// common cases, replacing expensive patterns with cheaper custom implementations
+// or removing terms not necessary for string matching.
 func Compile(pattern string) (Match, error) {
 	regex, err := syntax.Parse(pattern, syntax.Perl)
 	if err != nil {
