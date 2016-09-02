@@ -20,6 +20,7 @@ func (p *StripNewline) Next() (Message, error) {
 
 	L := message.Content
 	message.Content = L[:len(L)-lineEndingChars(L)]
+
 	return message, err
 }
 

@@ -102,7 +102,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 *Topbeat*
 
 *Filebeat*
-- Introduce close_timeout harvester options {issue}1600[1600]
+- Introduce close_timeout harvester options {issue}1926[1926]
+- Strip BOM from first message in case of BOM files {issue}2351[2351]
 
 
 - Add harvester_limit option {pull}2417[2417]
