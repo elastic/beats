@@ -15,8 +15,9 @@ Example configuration for the `runoptions` section of the +{beatname_lc}.yml+ co
 
 [source,yaml]
 ------------------------------------------------------------------------------
-runoptions:
+packetbeat.runoptions:
   uid=501
   gid=501
 ------------------------------------------------------------------------------
 
+The `runoptions` configuration is supported on Linux only.
