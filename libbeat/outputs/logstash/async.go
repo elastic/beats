@@ -106,6 +106,7 @@ func (c *asyncClient) AsyncPublishEvents(
 		cb:        cb,
 		err:       nil,
 	}
+	defer ref.dec()
 
 	for len(data) > 0 {
 		n, err := c.publishWindowed(ref, data)
@@ -119,7 +120,6 @@ func (c *asyncClient) AsyncPublishEvents(
 			return err
 		}
 	}
-	ref.dec()
 
 	return nil
 }
