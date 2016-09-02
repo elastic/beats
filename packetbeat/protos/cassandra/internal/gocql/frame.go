@@ -445,7 +445,7 @@ func (f *Framer) parseResultPrepared() map[string]interface{} {
 
         uuid,err := UUIDFromBytes((f.decoder).ReadShortBytes())
 
-	if(err != nil){
+	if err != nil {
 		logp.Err("Error in parsing UUID")
 	}
 	
