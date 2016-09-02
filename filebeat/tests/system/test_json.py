@@ -289,7 +289,9 @@ class Test(BaseTest):
 
         assert "headers.content-type" in o
         assert "headers.request-id" not in o
-        assert o["res"] is None
+
+        # We drop null values during the generic event conversion.
+        assert "res" not in o
 
     def test_with_generic_filtering_remove_headers(self):
         """

@@ -126,8 +126,6 @@ func extractString(unk interface{}) (string, error) {
 	switch s := unk.(type) {
 	case string:
 		return s, nil
-	case *string:
-		return *s, nil
 	default:
 		return "", fmt.Errorf("unknown type %T passed to extractString", unk)
 	}

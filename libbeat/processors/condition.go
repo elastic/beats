@@ -281,10 +281,6 @@ outer:
 			if !strings.Contains(value.(string), equalValue) {
 				return false
 			}
-		case *string:
-			if !strings.Contains(*value.(*string), equalValue) {
-				return false
-			}
 		case []string:
 			for _, s := range value.([]string) {
 				if strings.Contains(s, equalValue) {
