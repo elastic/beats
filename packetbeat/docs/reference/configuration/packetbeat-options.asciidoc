@@ -662,5 +662,5 @@ include::../../../../libbeat/docs/shipperconfig.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
-include::../../../../libbeat/docs/runconfig.asciidoc[]
+include::./runconfig.asciidoc[]
 

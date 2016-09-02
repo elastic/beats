@@ -17,7 +17,6 @@ configuration settings, you need to restart Topbeat to pick up the changes.
 * <<console-output>>
 * <<configuration-shipper>>
 * <<configuration-logging>>
-* <<configuration-run-options>>
 
 include::configuration/topbeat-options.asciidoc[]
 
