@@ -94,7 +94,7 @@ func compile(r *syntax.Regexp) (Matcher, error) {
 		return Matcher{&substringMatcher{s, []byte(s)}}, nil
 
 	case isPrefixLiteral(r):
-		s := []byte(string(r.Sub[0].Rune))
+		s := []byte(string(r.Sub[1].Rune))
 		return Matcher{&prefixMatcher{s}}, nil
 
 	case isEmptyText(r):
