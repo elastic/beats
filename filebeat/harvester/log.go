@@ -93,10 +93,9 @@ func (h *Harvester) Harvest() {
 		// Create state event
 		event := input.NewEvent(h.getState())
 
-		text := string(message.Content)
-
 		// Check if data should be added to event. Only export non empty events.
-		if !message.IsEmpty() && h.shouldExportLine(text) {
+		if !message.IsEmpty() && h.shouldExportLine(message.Content) {
+			text := string(message.Content)
 			event.ReadTime = message.Ts
 			event.Bytes = message.Bytes
 			event.Text = &text
@@ -128,7 +127,7 @@ func (h *Harvester) sendEvent(event *input.Event) bool {
 
 // shouldExportLine decides if the line is exported or not based on
 // the include_lines and exclude_lines options.
-func (h *Harvester) shouldExportLine(line string) bool {
+func (h *Harvester) shouldExportLine(line []byte) bool {
 	if len(h.config.IncludeLines) > 0 {
 		if !MatchAnyRegexps(h.config.IncludeLines, line) {
 			// drop line

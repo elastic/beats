@@ -1,11 +1,11 @@
 package harvester
 
 import (
-	"regexp"
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/match"
 )
 
 // readLine reads a full line into buffer and returns it.
@@ -23,13 +23,11 @@ func readLine(reader reader.Reader) (time.Time, string, int, common.MapStr, erro
 }
 
 // MatchAnyRegexps checks if the text matches any of the regular expressions
-func MatchAnyRegexps(regexps []*regexp.Regexp, text string) bool {
-
+func MatchAnyRegexps(regexps []match.Matcher, text []byte) bool {
 	for _, rexp := range regexps {
-		if rexp.MatchString(text) {
+		if rexp.Match(text) {
 			return true
 		}
 	}
-
 	return false
 }

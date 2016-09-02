@@ -107,8 +107,8 @@ func TestExcludeLine(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	assert.True(t, MatchAnyRegexps(regexp, "DBG: a debug message"))
-	assert.False(t, MatchAnyRegexps(regexp, "ERR: an error message"))
+	assert.True(t, MatchAnyRegexps(regexp, []byte("DBG: a debug message")))
+	assert.False(t, MatchAnyRegexps(regexp, []byte("ERR: an error message")))
 }
 
 func TestIncludeLine(t *testing.T) {
@@ -117,9 +117,9 @@ func TestIncludeLine(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	assert.False(t, MatchAnyRegexps(regexp, "DBG: a debug message"))
-	assert.True(t, MatchAnyRegexps(regexp, "ERR: an error message"))
-	assert.True(t, MatchAnyRegexps(regexp, "WARNING: a simple warning message"))
+	assert.False(t, MatchAnyRegexps(regexp, []byte("DBG: a debug message")))
+	assert.True(t, MatchAnyRegexps(regexp, []byte("ERR: an error message")))
+	assert.True(t, MatchAnyRegexps(regexp, []byte("WARNING: a simple warning message")))
 }
 
 func TestInitRegexp(t *testing.T) {
