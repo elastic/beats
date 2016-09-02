@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 
 *Metricbeat*
 - Change field type system.process.cpu.start_time from keyword to date. {issue}1565[1565]
+- redis/info metricset fields were renamed up according to the naming conventions.
 
 *Packetbeat*
 - Group HTTP fields under `http.request` and `http.response` {pull}2167[2167]

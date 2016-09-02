@@ -102,27 +102,27 @@
           type: boolean
           description:
 
-        - name: rdb.changes_since_last_save
+        - name: rdb.last_save.changes_since
           type: long
           description:
 
-        - name: rdb.bgsave_in_progress
+        - name: rdb.bgsave.in_progress
           type: boolean
           description:
 
-        - name: rdb.last_save_time
+        - name: rdb.last_save.time
           type: long
           description:
 
-        - name: rdb.last_bgsave_status
+        - name: rdb.bgsave.last_status
           type: keyword
           description:
 
-        - name: rdb.last_bgsave_time_sec
+        - name: rdb.bgsave.last_time.sec
           type: long
           description:
 
-        - name: rdb.current_bgsave_time_sec
+        - name: rdb.bgsave.current_time.sec
           type: long
           description:
 
@@ -130,27 +130,27 @@
           type: boolean
           description:
 
-        - name: aof.rewrite_in_progress
+        - name: aof.rewrite.in_progress
           type: boolean
           description:
 
-        - name: aof.rewrite_scheduled
+        - name: aof.rewrite.scheduled
           type: boolean
           description:
 
-        - name: aof.last_rewrite_time_sec
+        - name: aof.rewrite.last_time.sec
           type: long
           description:
 
-        - name: aof.current_rewrite_time_sec
+        - name: aof.rewrite.current_time.sec
           type: long
           description:
 
-        - name: aof.last_bgrewrite_status
+        - name: aof.bgrewrite.last_status
           type: keyword
           description:
 
-        - name: aof.last_write_status
+        - name: aof.write.last_status
           type: keyword
           description:
 
@@ -264,32 +264,37 @@
         - name: connections.received
           type: long
           description:
+            Total number of connections received.
 
         - name: connections.rejected
           type: long
           description:
+            Total number of connections rejected.
 
-        - name: total_commands_processed
+        - name: commands_processed
+          type: long
+          description:
+            Total number of commands preocessed.
+
+        - name: net.input.bytes
+          type: long
+          description:
+            Total network input in bytes.
+
+        - name: net.output.bytes
+          type: long
+          description:
+            Total network output in bytes.
+
+        - name: instantaneous.ops_per_sec
           type: long
           description:
 
-        - name: total_net_input_bytes
-          type: long
-          description:
-
-        - name: total_net_output_bytes
-          type: long
-          description:
-
-        - name: instantaneous_ops_per_sec
-          type: long
-          description:
-
-        - name: instantaneous_input_kbps
+        - name: instantaneous.input_kbps
           type: scaled_float
           description:
 
-        - name: instantaneous_output_kbps
+        - name: instantaneous.output_kbps
           type: scaled_float
           description:
 
@@ -297,11 +302,11 @@
           type: long
           description:
 
-        - name: sync.partial_ok
+        - name: sync.partial.ok
           type: long
           description:
 
-        - name: sync.partial_err
+        - name: sync.partial.err
           type: long
           description:
 
@@ -321,11 +326,11 @@
           type: long
           description:
 
-        - name: pubsub_channels
+        - name: pubsub.channels
           type: long
           description:
 
-        - name: pubsub_patterns
+        - name: pubsub.patterns
           type: long
           description:
 

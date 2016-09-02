@@ -2091,42 +2091,42 @@ type: boolean
 None
 
 [float]
-=== redis.info.persistence.rdb.changes_since_last_save
+=== redis.info.persistence.rdb.last_save.changes_since
 
 type: long
 
 None
 
 [float]
-=== redis.info.persistence.rdb.bgsave_in_progress
+=== redis.info.persistence.rdb.bgsave.in_progress
 
 type: boolean
 
 None
 
 [float]
-=== redis.info.persistence.rdb.last_save_time
+=== redis.info.persistence.rdb.last_save.time
 
 type: long
 
 None
 
 [float]
-=== redis.info.persistence.rdb.last_bgsave_status
+=== redis.info.persistence.rdb.bgsave.last_status
 
 type: keyword
 
 None
 
 [float]
-=== redis.info.persistence.rdb.last_bgsave_time_sec
+=== redis.info.persistence.rdb.bgsave.last_time.sec
 
 type: long
 
 None
 
 [float]
-=== redis.info.persistence.rdb.current_bgsave_time_sec
+=== redis.info.persistence.rdb.bgsave.current_time.sec
 
 type: long
 
@@ -2140,42 +2140,42 @@ type: boolean
 None
 
 [float]
-=== redis.info.persistence.aof.rewrite_in_progress
+=== redis.info.persistence.aof.rewrite.in_progress
 
 type: boolean
 
 None
 
 [float]
-=== redis.info.persistence.aof.rewrite_scheduled
+=== redis.info.persistence.aof.rewrite.scheduled
 
 type: boolean
 
 None
 
 [float]
-=== redis.info.persistence.aof.last_rewrite_time_sec
+=== redis.info.persistence.aof.rewrite.last_time.sec
 
 type: long
 
 None
 
 [float]
-=== redis.info.persistence.aof.current_rewrite_time_sec
+=== redis.info.persistence.aof.rewrite.current_time.sec
 
 type: long
 
 None
 
 [float]
-=== redis.info.persistence.aof.last_bgrewrite_status
+=== redis.info.persistence.aof.bgrewrite.last_status
 
 type: keyword
 
 None
 
 [float]
-=== redis.info.persistence.aof.last_write_status
+=== redis.info.persistence.aof.write.last_status
 
 type: keyword
 
@@ -2368,52 +2368,52 @@ Redis stats.
 
 type: long
 
-None
+Total number of connections received.
 
 [float]
 === redis.info.stats.connections.rejected
 
 type: long
 
-None
+Total number of connections rejected.
 
 [float]
-=== redis.info.stats.total_commands_processed
+=== redis.info.stats.commands_processed
+
+type: long
+
+Total number of commands preocessed.
+
+[float]
+=== redis.info.stats.net.input.bytes
+
+type: long
+
+Total network input in bytes.
+
+[float]
+=== redis.info.stats.net.output.bytes
+
+type: long
+
+Total network output in bytes.
+
+[float]
+=== redis.info.stats.instantaneous.ops_per_sec
 
 type: long
 
 None
 
 [float]
-=== redis.info.stats.total_net_input_bytes
-
-type: long
-
-None
-
-[float]
-=== redis.info.stats.total_net_output_bytes
-
-type: long
-
-None
-
-[float]
-=== redis.info.stats.instantaneous_ops_per_sec
-
-type: long
-
-None
-
-[float]
-=== redis.info.stats.instantaneous_input_kbps
+=== redis.info.stats.instantaneous.input_kbps
 
 type: scaled_float
 
 None
 
 [float]
-=== redis.info.stats.instantaneous_output_kbps
+=== redis.info.stats.instantaneous.output_kbps
 
 type: scaled_float
 
@@ -2427,14 +2427,14 @@ type: long
 None
 
 [float]
-=== redis.info.stats.sync.partial_ok
+=== redis.info.stats.sync.partial.ok
 
 type: long
 
 None
 
 [float]
-=== redis.info.stats.sync.partial_err
+=== redis.info.stats.sync.partial.err
 
 type: long
 
@@ -2469,14 +2469,14 @@ type: long
 None
 
 [float]
-=== redis.info.stats.pubsub_channels
+=== redis.info.stats.pubsub.channels
 
 type: long
 
 None
 
 [float]
-=== redis.info.stats.pubsub_patterns
+=== redis.info.stats.pubsub.patterns
 
 type: long
 
