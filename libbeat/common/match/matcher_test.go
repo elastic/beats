@@ -28,13 +28,15 @@ func BenchmarkPatterns(b *testing.B) {
 		title string
 		regex string
 	}{
+		{"match any 1", `^.*$`},
+		{"match any 2", `.*`},
 		{"startsWith 'PATTERN'", `^PATTERN`},
 		{"startsWith ' '", `^ `},
 		{"startsWithDate", `^\d{2}-\d{2}-\d{4}`},
 		{"contains 'PATTERN'", `PATTERN`},
 		{"contains 'PATTERN' with '.*", `.*PATTERN.*`},
 		{"empty line", `^$`},
-		{"empty line with whitespace", `^\s*$`},
+		{"empty line with optional whitespace", `^\s*$`},
 	}
 
 	runTitle := func(matcher, name string) string {

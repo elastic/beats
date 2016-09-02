@@ -30,6 +30,21 @@ type emptyStringMatcher struct{}
 
 type emptyWhiteStringMatcher struct{}
 
+type matchAny struct{}
+
+// common predefined patterns
+var (
+	patDotStar        = mustParse(`.*`)
+	patEmptyText      = mustParse(`^$`)
+	patEmptyWhiteText = mustParse(`^\s*$`)
+
+	// patterns matching any content
+	patAny1 = patDotStar
+	patAny2 = mustParse(`^.*`)
+	patAny3 = mustParse(`^.*$`)
+	patAny4 = mustParse(`.*$`)
+)
+
 func MustCompile(pattern string) Match {
 	m, err := Compile(pattern)
 	if err != nil {
@@ -66,6 +81,10 @@ func compile(r *syntax.Regexp) (Match, error) {
 		var m *emptyWhiteStringMatcher
 		return Match{m}, nil
 
+	case isAnyMatch(r):
+		var m *matchAny
+		return Match{m}, nil
+
 	default:
 		r, err := regexp.Compile(r.String())
 		if err != nil {
@@ -100,6 +119,10 @@ func (m *emptyWhiteStringMatcher) MatchString(s string) bool {
 			return false
 		}
 	}
+	return true
+}
+
+func (m *matchAny) MatchString(s string) bool {
 	return true
 }
 
@@ -169,50 +192,22 @@ func uncapture(r *syntax.Regexp) (bool, *syntax.Regexp) {
 
 // trimLeft removes not required '.*' from beginning of regular expressions.
 func trimLeft(r *syntax.Regexp) (bool, *syntax.Regexp) {
-	switch r.Op {
-	case syntax.OpStar:
-		if isdotStar(r) {
-			return true, &syntax.Regexp{
-				Op:    syntax.OpEmptyMatch,
-				Flags: r.Flags,
-			}
-		}
-
-	case syntax.OpConcat:
-		if len(r.Sub) == 0 || !isdotStar(r.Sub[0]) {
-			break
-		}
-
+	if eqPrefixRegex(r, patDotStar) {
 		tmp := *r
 		tmp.Sub = tmp.Sub[1:]
 		return true, &tmp
 	}
-
 	return false, r
 }
 
 // trimLeft removes not required '.*' from end of regular expressions.
 func trimRight(r *syntax.Regexp) (bool, *syntax.Regexp) {
-	switch r.Op {
-	case syntax.OpStar:
-		if isdotStar(r) {
-			return true, &syntax.Regexp{
-				Op:    syntax.OpEmptyMatch,
-				Flags: r.Flags,
-			}
-		}
-
-	case syntax.OpConcat:
+	if eqSuffixRegex(r, patDotStar) {
 		i := len(r.Sub) - 1
-		if len(r.Sub) == 0 || !isdotStar(r.Sub[i]) {
-			break
-		}
-
 		tmp := *r
 		tmp.Sub = tmp.Sub[0:i]
 		return true, &tmp
 	}
-
 	return false, r
 }
 
@@ -238,13 +233,6 @@ func unconcat(r *syntax.Regexp) (bool, *syntax.Regexp) {
 	return false, r
 }
 
-// isdotStar checks the term being `.*`.
-func isdotStar(r *syntax.Regexp) bool {
-	return r.Op == syntax.OpStar &&
-		len(r.Sub) == 1 &&
-		r.Sub[0].Op == syntax.OpAnyCharNotNL
-}
-
 // isPrefixLiteral checks regular expression being literal checking string
 // starting with literal pattern (like '^PATTERN')
 func isPrefixLiteral(r *syntax.Regexp) bool {
@@ -254,19 +242,104 @@ func isPrefixLiteral(r *syntax.Regexp) bool {
 		r.Sub[1].Op == syntax.OpLiteral
 }
 
+// isdotStar checks the term being `.*`.
+func isdotStar(r *syntax.Regexp) bool {
+	return eqRegex(r, patDotStar)
+}
+
 func isEmptyText(r *syntax.Regexp) bool {
-	return r.Op == syntax.OpConcat &&
-		len(r.Sub) == 2 &&
-		r.Sub[0].Op == syntax.OpBeginText &&
-		r.Sub[1].Op == syntax.OpEndText
+	return eqRegex(r, patEmptyText)
 }
 
 func isEmptyTextWithWhitespace(r *syntax.Regexp) bool {
-	return r.Op == syntax.OpConcat &&
-		len(r.Sub) == 3 &&
-		r.Sub[0].Op == syntax.OpBeginText &&
-		r.Sub[1].Op == syntax.OpStar &&
-		r.Sub[1].Sub[0].Op == syntax.OpCharClass &&
-		r.Sub[1].Sub[0].String() == `[\t-\n\f-\r ]` &&
-		r.Sub[2].Op == syntax.OpEndText
+	return eqRegex(r, patEmptyWhiteText)
+}
+
+func isAnyMatch(r *syntax.Regexp) bool {
+	return eqRegex(r, patAny1) ||
+		eqRegex(r, patAny2) ||
+		eqRegex(r, patAny3) ||
+		eqRegex(r, patAny4)
+}
+
+func eqRegex(r, proto *syntax.Regexp) bool {
+	unmatchable := r.Op != proto.Op || r.Flags != proto.Flags ||
+		(r.Min != proto.Min) || (r.Max != proto.Max) ||
+		(len(r.Sub) != len(proto.Sub)) ||
+		(len(r.Rune) != len(proto.Rune))
+
+	if unmatchable {
+		return false
+	}
+
+	for i := range r.Sub {
+		if !eqRegex(r.Sub[i], proto.Sub[i]) {
+			return false
+		}
+	}
+
+	for i := range r.Rune {
+		if r.Rune[i] != proto.Rune[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func eqPrefixRegex(r, proto *syntax.Regexp) bool {
+	if r.Op != syntax.OpConcat {
+		return false
+	}
+
+	if proto.Op != syntax.OpConcat {
+		if len(r.Sub) == 0 {
+			return false
+		}
+		return eqRegex(r.Sub[0], proto)
+	}
+
+	if len(r.Sub) < len(proto.Sub) {
+		return false
+	}
+
+	for i := range proto.Sub {
+		if !eqRegex(r.Sub[i], proto.Sub[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+func eqSuffixRegex(r, proto *syntax.Regexp) bool {
+	if r.Op != syntax.OpConcat {
+		return false
+	}
+
+	if proto.Op != syntax.OpConcat {
+		i := len(r.Sub) - 1
+		if i < 0 {
+			return false
+		}
+		return eqRegex(r.Sub[i], proto)
+	}
+
+	if len(r.Sub) < len(proto.Sub) {
+		return false
+	}
+
+	d := len(r.Sub) - len(proto.Sub)
+	for i := range proto.Sub {
+		if !eqRegex(r.Sub[d+i], proto.Sub[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+func mustParse(pattern string) *syntax.Regexp {
+	r, err := syntax.Parse(pattern, syntax.Perl)
+	if err != nil {
+		panic(err)
+	}
+	return r
 }
