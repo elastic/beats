@@ -105,6 +105,7 @@ func NewCheckpoint(file string, maxUpdates int, interval time.Duration) (*Checkp
 // the amount of time since the last disk write reaches flushInterval.
 func (c *Checkpoint) run() {
 	defer c.wg.Done()
+	defer c.persist()
 
 	flushTimer := time.NewTimer(c.flushInterval)
 	defer flushTimer.Stop()
@@ -127,8 +128,6 @@ loop:
 		c.persist()
 		flushTimer.Reset(c.flushInterval)
 	}
-
-	c.persist()
 }
 
 // Shutdown stops the checkpoint worker (which persists any state to disk as
@@ -185,7 +184,7 @@ func (c *Checkpoint) persist() bool {
 // flush writes the current state to disk.
 func (c *Checkpoint) flush() error {
 	tempFile := c.file + ".new"
-	file, err := os.Create(tempFile)
+	file, err := create(tempFile)
 	if os.IsNotExist(err) {
 		// Try to create directory if it does not exist.
 		if createDirErr := c.createDir(); createDirErr == nil {
