@@ -1052,28 +1052,48 @@
                   "properties": {
                     "aof": {
                       "properties": {
-                        "current_rewrite_time_sec": {
-                          "type": "long"
+                        "bgrewrite": {
+                          "properties": {
+                            "last_status": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            }
+                          }
                         },
                         "enabled": {
                           "type": "boolean"
                         },
-                        "last_bgrewrite_status": {
-                          "ignore_above": 1024,
-                          "type": "keyword"
+                        "rewrite": {
+                          "properties": {
+                            "current_time": {
+                              "properties": {
+                                "sec": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "in_progress": {
+                              "type": "boolean"
+                            },
+                            "last_time": {
+                              "properties": {
+                                "sec": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "scheduled": {
+                              "type": "boolean"
+                            }
+                          }
                         },
-                        "last_rewrite_time_sec": {
-                          "type": "long"
-                        },
-                        "last_write_status": {
-                          "ignore_above": 1024,
-                          "type": "keyword"
-                        },
-                        "rewrite_in_progress": {
-                          "type": "boolean"
-                        },
-                        "rewrite_scheduled": {
-                          "type": "boolean"
+                        "write": {
+                          "properties": {
+                            "last_status": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            }
+                          }
                         }
                       }
                     },
@@ -1082,24 +1102,40 @@
                     },
                     "rdb": {
                       "properties": {
-                        "bgsave_in_progress": {
-                          "type": "boolean"
+                        "bgsave": {
+                          "properties": {
+                            "current_time": {
+                              "properties": {
+                                "sec": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "in_progress": {
+                              "type": "boolean"
+                            },
+                            "last_status": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            },
+                            "last_time": {
+                              "properties": {
+                                "sec": {
+                                  "type": "long"
+                                }
+                              }
+                            }
+                          }
                         },
-                        "changes_since_last_save": {
-                          "type": "long"
-                        },
-                        "current_bgsave_time_sec": {
-                          "type": "long"
-                        },
-                        "last_bgsave_status": {
-                          "ignore_above": 1024,
-                          "type": "keyword"
-                        },
-                        "last_bgsave_time_sec": {
-                          "type": "long"
-                        },
-                        "last_save_time": {
-                          "type": "long"
+                        "last_save": {
+                          "properties": {
+                            "changes_since": {
+                              "type": "long"
+                            },
+                            "time": {
+                              "type": "long"
+                            }
+                          }
                         }
                       }
                     }
@@ -1200,6 +1236,9 @@
                 },
                 "stats": {
                   "properties": {
+                    "commands_processed": {
+                      "type": "long"
+                    },
                     "connections": {
                       "properties": {
                         "received": {
@@ -1210,16 +1249,20 @@
                         }
                       }
                     },
-                    "instantaneous_input_kbps": {
-                      "scaling_factor": 1000,
-                      "type": "scaled_float"
-                    },
-                    "instantaneous_ops_per_sec": {
-                      "type": "long"
-                    },
-                    "instantaneous_output_kbps": {
-                      "scaling_factor": 1000,
-                      "type": "scaled_float"
+                    "instantaneous": {
+                      "properties": {
+                        "input_kbps": {
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
+                        },
+                        "ops_per_sec": {
+                          "type": "long"
+                        },
+                        "output_kbps": {
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
+                        }
+                      }
                     },
                     "keys": {
                       "properties": {
@@ -1247,33 +1290,50 @@
                     "migrate_cached_sockets": {
                       "type": "long"
                     },
-                    "pubsub_channels": {
-                      "type": "long"
+                    "net": {
+                      "properties": {
+                        "input": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "output": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
                     },
-                    "pubsub_patterns": {
-                      "type": "long"
+                    "pubsub": {
+                      "properties": {
+                        "channels": {
+                          "type": "long"
+                        },
+                        "patterns": {
+                          "type": "long"
+                        }
+                      }
                     },
                     "sync": {
                       "properties": {
                         "full": {
                           "type": "long"
                         },
-                        "partial_err": {
-                          "type": "long"
-                        },
-                        "partial_ok": {
-                          "type": "long"
+                        "partial": {
+                          "properties": {
+                            "err": {
+                              "type": "long"
+                            },
+                            "ok": {
+                              "type": "long"
+                            }
+                          }
                         }
                       }
-                    },
-                    "total_commands_processed": {
-                      "type": "long"
-                    },
-                    "total_net_input_bytes": {
-                      "type": "long"
-                    },
-                    "total_net_output_bytes": {
-                      "type": "long"
                     }
                   }
                 }
