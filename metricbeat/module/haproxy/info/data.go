@@ -17,7 +17,7 @@ var (
 		"process_num":                    c.Int("ProcessNum"),
 		"pid":                            c.Int("Pid"),
 		"uptime_sec":                     c.Int("UptimeSec"),
-		"mem_max_mb":                     c.Int("MemMaxMB"),
+		"mem_max_bytes":                  c.Int("MemMax"),
 		"ulimit_n":                       c.Int("UlimitN"),
 		"max_sock":                       c.Int("Maxsock"),
 		"max_conn":                       c.Int("Maxconn"),
@@ -59,14 +59,12 @@ var (
 )
 
 // Map data to MapStr
-func eventMapping(info *haproxy.Info) common.MapStr {
+func eventMapping(info *haproxy.Info) (common.MapStr, error) {
 	// Full mapping from info
-
-	source := map[string]interface{}{}
 
 	st := reflect.ValueOf(info).Elem()
 	typeOfT := st.Type()
-	source = map[string]interface{}{}
+	source := map[string]interface{}{}
 
 	for i := 0; i < st.NumField(); i++ {
 		f := st.Field(i)
@@ -75,14 +73,14 @@ func eventMapping(info *haproxy.Info) common.MapStr {
 			// Convert this value to a float between 0.0 and 1.0
 			fval, err := strconv.ParseFloat(f.Interface().(string), 64)
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 			source[typeOfT.Field(i).Name] = strconv.FormatFloat(fval/float64(100), 'f', 2, 64)
 		} else if typeOfT.Field(i).Name == "Memmax_MB" {
 			// Convert this value to bytes
 			val, err := strconv.Atoi(strings.TrimSpace(f.Interface().(string)))
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 			source[typeOfT.Field(i).Name] = strconv.Itoa((val * 1024 * 1024))
 		} else {
@@ -91,5 +89,5 @@ func eventMapping(info *haproxy.Info) common.MapStr {
 
 	}
 
-	return schema.Apply(source)
+	return schema.Apply(source), nil
 }

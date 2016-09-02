@@ -23,11 +23,11 @@
       description: >
         Current uptime in seconds
 
-    - name: mem_max_mb
+    - name: mem_max_bytes
       type: integer
       format: bytes
       description: >
-        Max number of memory usage in MB
+        Max number of memory usage in bytes (The 'Memmax_MB' value converted to bytes)
 
     - name: ulimit_n
       type: integer

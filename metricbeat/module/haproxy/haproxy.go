@@ -5,12 +5,13 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"github.com/gocarina/gocsv"
-	"github.com/mitchellh/mapstructure"
 	"io"
 	"io/ioutil"
 	"net"
 	"strings"
+
+	"github.com/gocarina/gocsv"
+	"github.com/mitchellh/mapstructure"
 )
 
 // Stat is an instance of the HAProxy stat information
@@ -88,7 +89,7 @@ type Info struct {
 	Pid                        string `mapstructure:"Pid"`
 	Uptime                     string `mapstructure:"Uptime"`
 	UptimeSec                  string `mapstructure:"Uptime_sec"`
-	MemMaxMB                   string `mapstructure:"Memmax_MB"`
+	MemMax                     string `mapstructure:"Memmax_MB"`
 	UlimitN                    string `mapstructure:"Ulimit-n"`
 	Maxsock                    string `mapstructure:"Maxsock"`
 	Maxconn                    string `mapstructure:"Maxconn"`
@@ -140,11 +141,11 @@ type Client struct {
 func NewHaproxyClient(address string) (*Client, error) {
 	parts := strings.Split(address, "://")
 	if len(parts) != 2 {
-		return nil, errors.New("Must have protocol scheme and address!")
+		return nil, errors.New("must have protocol scheme and address")
 	}
 
 	if parts[0] != "tcp" && parts[0] != "unix" {
-		return nil, errors.New("Invalid Protocol Scheme!")
+		return nil, errors.New("invalid protocol scheme")
 	}
 
 	return &Client{
@@ -176,7 +177,7 @@ func (c *Client) run(cmd string) (*bytes.Buffer, error) {
 	}
 
 	if strings.HasPrefix(response.String(), "Unknown command") {
-		return response, fmt.Errorf("Unknown command: %s", cmd)
+		return response, fmt.Errorf("unknown command: %s", cmd)
 	}
 
 	return response, nil
@@ -196,7 +197,7 @@ func (c *Client) GetStat() ([]*Stat, error) {
 
 	err = gocsv.UnmarshalCSV(csvReader, &statRes)
 	if err != nil {
-		return nil, fmt.Errorf("Error parsing CSV: %s", err)
+		return nil, fmt.Errorf("error parsing CSV: %s", err)
 	}
 
 	return statRes, nil
@@ -231,8 +232,8 @@ func (c *Client) GetInfo() (*Info, error) {
 		}
 
 		var result *Info
-		err := mapstructure.Decode(resultMap, &result)
-		if err != nil {
+
+		if err := mapstructure.Decode(resultMap, &result); err != nil {
 			return nil, err
 		}
 		return result, nil

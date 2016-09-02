@@ -75,6 +75,10 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 	m.counter++
 
-	return eventMapping(res), nil
+	mappedEvent, err := eventMapping(res)
+	if err != nil {
+		return nil, err
+	}
+	return mappedEvent, nil
 
 }

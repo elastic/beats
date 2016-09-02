@@ -119,12 +119,11 @@ func parseResponse(data []byte) []map[string]string {
 func eventMapping(info []*haproxy.Stat) []common.MapStr {
 
 	var events []common.MapStr
-	source := map[string]interface{}{}
 
 	for _, evt := range info {
 		st := reflect.ValueOf(evt).Elem()
 		typeOfT := st.Type()
-		source = map[string]interface{}{}
+		source := map[string]interface{}{}
 
 		for i := 0; i < st.NumField(); i++ {
 			f := st.Field(i)
