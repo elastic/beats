@@ -1,6 +1,7 @@
 package harvester
 
 import (
+	"bytes"
 	"errors"
 	"expvar"
 	"io"
@@ -85,6 +86,12 @@ func (h *Harvester) Harvest() {
 				logp.Err("Read line error: %s; File: ", err, h.state.Source)
 			}
 			return
+		}
+
+		// Strip UTF-8 BOM if beginning of file
+		// As all BOMS are converted to UTF-8 it is enough to only remove this one
+		if h.state.Offset == 0 {
+			message.Content = bytes.Trim(message.Content, "\xef\xbb\xbf")
 		}
 
 		// Update offset
