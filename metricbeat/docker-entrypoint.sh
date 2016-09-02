@@ -23,7 +23,6 @@ waitFor() {
 
 # Main
 waitFor ${APACHE_HOST} ${APACHE_PORT} Apache
-waitFor ${FILEBEAT_HOST} ${FILEBEAT_PORT} Filebeat
 waitFor ${MYSQL_HOST} ${MYSQL_PORT} MySQL
 waitFor ${NGINX_HOST} ${NGINX_PORT} Nginx
 waitFor ${POSTGRESQL_HOST} ${POSTGRESQL_PORT} Postgresql
