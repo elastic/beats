@@ -1,12 +1,13 @@
 package match
 
 import (
+	"errors"
 	"regexp"
 	"regexp/syntax"
 	"strings"
 )
 
-type Match struct {
+type Matcher struct {
 	stringMatcher
 }
 
@@ -45,7 +46,7 @@ var (
 	patAny4 = mustParse(`.*$`)
 )
 
-func MustCompile(pattern string) Match {
+func MustCompile(pattern string) Matcher {
 	m, err := Compile(pattern)
 	if err != nil {
 		panic(err)
@@ -57,44 +58,59 @@ func MustCompile(pattern string) Match {
 // regular expressions as provided by regexp library, but tries to optimize some
 // common cases, replacing expensive patterns with cheaper custom implementations
 // or removing terms not necessary for string matching.
-func Compile(pattern string) (Match, error) {
+func Compile(pattern string) (Matcher, error) {
 	regex, err := syntax.Parse(pattern, syntax.Perl)
 	if err != nil {
-		return Match{}, err
+		return Matcher{}, err
 	}
 
 	regex = optimize(regex).Simplify()
 	return compile(regex)
 }
 
-func compile(r *syntax.Regexp) (Match, error) {
+func (m *Matcher) Unpack(v interface{}) error {
+	s, ok := v.(string)
+	if !ok {
+		return errors.New("requires regular expression")
+	}
+
+	tmp, err := Compile(s)
+	if err != nil {
+		return err
+	}
+
+	*m = tmp
+	return nil
+}
+
+func compile(r *syntax.Regexp) (Matcher, error) {
 	switch {
 	case r.Op == syntax.OpLiteral:
 		s := string(r.Rune)
-		return Match{&substringMatcher{s}}, nil
+		return Matcher{&substringMatcher{s}}, nil
 
 	case isPrefixLiteral(r):
 		s := string(r.Sub[0].Rune)
-		return Match{&prefixMatcher{s}}, nil
+		return Matcher{&prefixMatcher{s}}, nil
 
 	case isEmptyText(r):
 		var m *emptyStringMatcher
-		return Match{m}, nil
+		return Matcher{m}, nil
 
 	case isEmptyTextWithWhitespace(r):
 		var m *emptyWhiteStringMatcher
-		return Match{m}, nil
+		return Matcher{m}, nil
 
 	case isAnyMatch(r):
 		var m *matchAny
-		return Match{m}, nil
+		return Matcher{m}, nil
 
 	default:
 		r, err := regexp.Compile(r.String())
 		if err != nil {
-			return Match{}, err
+			return Matcher{}, err
 		}
-		return Match{r}, nil
+		return Matcher{r}, nil
 	}
 }
 
