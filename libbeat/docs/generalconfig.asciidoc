@@ -30,15 +30,6 @@ Here is an example configuration:
 # logical properties.
 tags: ["service-X", "web-tier"]
 
-# How often (in seconds) shippers are publishing their IPs to the topology map.
-# The default is 10 seconds.
-refresh_topology_freq: 10
-
-# Expiration time (in seconds) of the IPs published by a shipper to the topology map.
-# All the IPs will be deleted afterwards. Note, that the value must be higher than
-# refresh_topology_freq. The default is 15 seconds.
-topology_expire: 15
-
 ------------------------------------------------------------------------------
 
 ==== General Options
@@ -50,19 +41,6 @@ You can specify the following options:
 The name of the Beat. If this option is empty, the `hostname` of the server is
 used. The name is included as the `beat.name` field in each published transaction. You can
 use the name to group all transactions sent by a single Beat.
-
-At startup, each Beat can publish its IP, port, and name to Elasticsearch. This information
-is stored in Elasticsearch as a network topology map that maps the IP and port
-of each Beat to the name that you specify here.
-
-When a Beat receives a new request and response (called a transaction), the Beat can query
-Elasticsearch to see if the network topology includes the IP and port of the source
-and destination servers. If this information is available, the `client_server` field in the
-output is set to the name of the Beat running on the source server, and the `server` field is set to the
-name of the Beat running on the destination server.
-
-To use the topology map in Elasticsearch, you must enable Elasticsearch as output and set the
-`save_topology` option to true.
 
 Example:
 
@@ -121,11 +99,15 @@ fields:
 
 ===== refresh_topology_freq
 
+deprecated[5.0.0]
+
 The refresh interval of the topology map in
 seconds. In other words, this setting specifies how often each Beat publishes its
 IP addresses to the topology map. The default is 10 seconds.
 
 ===== topology_expire
+
+deprecated[5.0.0]
 
 The expiration time for the topology in seconds. This is useful in case a Beat
 stops publishing its IP addresses. The IP addresses are removed automatically

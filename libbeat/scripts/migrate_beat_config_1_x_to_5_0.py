@@ -1,55 +1,214 @@
 #!/usr/bin/env python
 import argparse
 import os
+import re
 
-def migrate_packetbeat(content):
+
+def collect_lines(fn):
+    return lambda content: "\n".join(fn(content)) + "\n"
+
+
+def process_lines(fn):
+    def go(content):
+        return (l for line in content.splitlines() for l in fn(line))
+    return collect_lines(go)
+
+
+@process_lines
+def migrate_packetbeat(line):
     """
     Changes things like `interfaces:` to `packetbeat.interfaces:`
     at the top level.
     """
-    sections = ["interfaces", "protocols", "procs", "runoptions", "ignore_outgoing"]
-    lines = content.splitlines()
-    outlines = []
-    for line in lines:
-        found = False
-        for sec in sections:
-            if line.startswith(sec + ":"):
-                outlines.append("packetbeat." + line)
-                found = True
-                break
-        if not found:
-            outlines.append(line)
-    return "\n".join(outlines) + "\n"
+    sections = ["interfaces", "protocols", "procs",
+                "runoptions", "ignore_outgoing"]
+    for sec in sections:
+        if line.startswith(sec + ":"):
+            return ["packetbeat." + line]
+    return [line]
 
 
+@collect_lines
 def migrate_shipper(content):
     """
     Moves everything under the `shipper:` section to be top level.
     """
-    lines = content.splitlines()
-    outlines = []
     state = "out"
-    for line in lines:
+    for line in content.splitlines():
         if state == "out":
             if line.startswith("shipper:"):
                 state = "in"
                 # eat line
             else:
-                outlines.append(line)
+                yield line
         elif state == "in":
             if line.startswith("  "):
-                outlines.append(line[2:])
+                yield line[2:]
             elif line.startswith("\t"):
-                outlines.append(line[1:])
+                yield line[1:]
             elif line == "":
-                outlines.append(line)
+                yield line
             else:
-                outlines.append(line)
+                yield line
                 state = "out"
-    return "\n".join(outlines) + "\n"
+
+
+@collect_lines
+def migrate_tls_settings(content):
+    """
+    Updates tls section, changing tls to ssl and adapting field changes.
+    """
+    state = "out"
+    indent = 0
+    comments = []
+
+    keep_settings = [
+        'certificate_authorities',
+        'certificate',
+        'cipher_suites',
+        'curve_types'
+    ]
+
+    rename_settings = {
+        "certificate_key": "key",
+    }
+
+    regex_replace_settings = {
+        "insecure": [
+            [re.compile(".*insecure.*false"), "verification_mode: full"],
+            [re.compile(".*insecure.*true"), "verification_mode: none"],
+        ]
+    }
+
+    version_indent = [None]
+    min_version = [None]
+    max_version = [None]
+    min_version_used = max_version_used = False
+
+    ssl_versions_old = {"SSL-3.0": 0, "1.0": 1, "1.1": 2, "1.2": 3}
+    ssl_versions_new = ["SSLv3", "TLSv1.0", "TLSv1.1", "TLSv1.2"]
+
+    def get_old_tls_version(v, default):
+        if v not in ssl_versions_old:
+            return ssl_versions_old[default]
+        return ssl_versions_old[v]
+
+    def make_version_info():
+        if version_indent[0] is None:
+            return
+
+        indent = version_indent[0]
+        commented_out = not (min_version_used or max_version_used)
+        v_start = min_version[0]
+        v_end = max_version[0]
+
+        if min_version_used != max_version_used:
+            if not min_version_used:
+                v_start = "1.0"
+            if not max_version_used:
+                v_end = "1.2"
+
+        v_start = get_old_tls_version(v_start, "1.0")
+        v_end = get_old_tls_version(v_end, "1.2")
+        versions = (ssl_versions_new[i] for i in xrange(v_start, v_end+1))
+
+        line = indent * ' ' + ('#' if commented_out else '')
+        line += "supported_protocols:"
+        line += "[" + ", ".join(versions) + "]"
+
+        yield ""
+        yield line
+
+        version_indent[0] = None
+        min_version[0] = None
+        max_version[0] = None
+
+    for line in content.splitlines():
+        tmp = line.expandtabs()
+        line_indent = len(tmp) - len(tmp.lstrip())
+        line_start = tmp.lstrip()
+        tmp = line_start.split(':', 1)
+        setting = None
+        value = None
+        commented_out = len(line_start) > 0 and line_start[0] == '#'
+        if len(tmp) > 1:
+            setting = tmp[0]
+            value = tmp[1].strip()
+            if setting[0] == '#':
+                setting = setting[1:]
+
+        def create_setting(l):
+            return (line_indent * " ") + ('#' if commented_out else '') + l
+
+        if state == "out":
+            if setting == "tls":
+                state = "in"
+                indent = line_indent
+                yield create_setting("ssl:")
+            else:
+                yield line
+        elif state == "in":
+            if setting is not None and line_indent <= indent:
+                for l in make_version_info():
+                    yield l
+                # last few comments have been part of next line -> print
+                for l in comments:
+                    yield l
+                yield line
+                comments = []
+                state = "out"
+            elif setting is None:
+                comments.append(line)
+            elif setting in keep_settings:
+                for c in comments:
+                    yield c
+                comments = []
+                yield line
+            elif setting in rename_settings:
+                new_name = rename_settings[setting]
+                for c in comments:
+                    yield c
+                comments = []
+                yield line.replace(setting, new_name, 1)
+            elif setting in regex_replace_settings:
+                # drop comments and add empty line before new setting
+                comments = []
+                yield ""
+
+                for pattern in regex_replace_settings[setting]:
+                    regex, val = pattern
+                    if regex.match(line):
+                        yield create_setting(regex.sub(line, val, 1))
+                        break
+            elif setting == 'min_version':
+                comments = []
+                min_version[0] = value
+                min_version_used = not commented_out
+                version_indent[0] = line_indent
+            elif setting == 'max_version':
+                comments = []
+                max_version[0] = value
+                max_version_used = not commented_out
+                version_indent[0] = line_indent
+            else:
+                yield line
+        else:
+            yield line
+
+    # add version info in case end of output is SSL/TLS section
+    if state == 'in':
+        for l in make_version_info():
+            yield l
 
 
 def main():
+    # List of migrations to apply. Shipper must be migrated first for
+    # ignore_outgoing to be applied properly
+    migrations = [
+        migrate_shipper,
+        migrate_packetbeat,
+        migrate_tls_settings]
+
     parser = argparse.ArgumentParser(
         description="Migrates beats configuration from 1.x to 5.0")
     parser.add_argument("file",
@@ -61,17 +220,16 @@ def main():
 
     with open(args.file, "r") as f:
         content = f.read()
-        # Shipper must be migrated first for ignore_outgoing to be applied properly
-        out = migrate_shipper(content)
-        out = migrate_packetbeat(out)
+        for m in migrations:
+            content = m(content)
 
     if args.dry:
-        print(out)
+        print(content)
     else:
         os.rename(args.file, args.file + ".bak")
         print("Backup file created: {}".format(args.file + ".bak"))
         with open(args.file, "w") as f:
-            f.write(out)
+            f.write(content)
 
 
 if __name__ == "__main__":
@@ -145,4 +303,172 @@ name:
 # logical properties.
 #tags: ["service-X", "web-tier"]
 test:
+"""
+
+def test_migrate_tls_settings():
+    test = """
+output:
+  # Elasticsearch output
+  elasticsearch:
+    # tls configuration. By default is off.
+    tls:
+      # List of root certificates for HTTPS server verifications
+      certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+      # Certificate for TLS client authentication
+      #certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      #certificate_key: "/etc/pki/client/cert.key"
+
+      # Controls whether the client verifies server certificates and host name.
+      # If insecure is set to true, all server host names and certificates will be
+      # accepted. In this mode TLS based connections are susceptible to
+      # man-in-the-middle attacks. Use only for testing.
+      #insecure: true
+
+      # Configure cipher suites to be used for TLS connections
+      #cipher_suites: []
+
+      # Configure curve types for ECDHE based cipher suites
+      #curve_types: []
+
+      # Configure minimum TLS version allowed for connection to logstash
+      min_version: 1.1
+
+      # Configure maximum TLS version allowed for connection to logstash
+      max_version: 1.2
+
+  # Logstash output.
+  #logstash:
+    # tls configuration. By default is off.
+    #tls:
+      # List of root certificates for HTTPS server verifications
+      #certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+      # Certificate for TLS client authentication
+      #certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      #certificate_key: "/etc/pki/client/cert.key"
+
+      # Controls whether the client verifies server certificates and host name.
+      # If insecure is set to true, all server host names and certificates will be
+      # accepted. In this mode TLS based connections are susceptible to
+      # man-in-the-middle attacks. Use only for testing.
+      #insecure: true
+
+      # Configure cipher suites to be used for TLS connections
+      #cipher_suites: []
+
+      # Configure curve types for ECDHE based cipher suites
+      #curve_types: []
+
+      # Configure minimum TLS version allowed for connection to logstash
+      #min_version: 1.0
+
+      # Configure maximum TLS version allowed for connection to logstash
+      #max_version: 1.2
+
+  # Redis output
+  redis:
+    tls:
+      # List of root certificates for HTTPS server verifications
+      certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+      # Certificate for TLS client authentication
+      certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      certificate_key: "/etc/pki/client/cert.key"
+
+      # Controls whether the client verifies server certificates and host name.
+      # If insecure is set to true, all server host names and certificates will be
+      # accepted. In this mode TLS based connections are susceptible to
+      # man-in-the-middle attacks. Use only for testing.
+      insecure: false
+
+      # Configure cipher suites to be used for TLS connections
+      #cipher_suites: []
+
+      # Configure curve types for ECDHE based cipher suites
+      #curve_types: []
+
+      # Configure minimum TLS version allowed for connection to logstash
+      #min_version: 1.1
+
+      # Configure maximum TLS version allowed for connection to logstash
+      max_version: 1.1
+    """
+
+    output = migrate_tls_settings(test)
+    assert output == """
+output:
+  # Elasticsearch output
+  elasticsearch:
+    # tls configuration. By default is off.
+    ssl:
+      # List of root certificates for HTTPS server verifications
+      certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+      # Certificate for TLS client authentication
+      #certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      #key: "/etc/pki/client/cert.key"
+
+      #verification_mode: none
+
+      # Configure cipher suites to be used for TLS connections
+      #cipher_suites: []
+
+      # Configure curve types for ECDHE based cipher suites
+      #curve_types: []
+
+      supported_protocols:[TLSv1.1, TLSv1.2]
+
+  # Logstash output.
+  #logstash:
+    # tls configuration. By default is off.
+    #ssl:
+      # List of root certificates for HTTPS server verifications
+      #certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+      # Certificate for TLS client authentication
+      #certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      #key: "/etc/pki/client/cert.key"
+
+      #verification_mode: none
+
+      # Configure cipher suites to be used for TLS connections
+      #cipher_suites: []
+
+      # Configure curve types for ECDHE based cipher suites
+      #curve_types: []
+
+      #supported_protocols:[TLSv1.0, TLSv1.1, TLSv1.2]
+
+  # Redis output
+  redis:
+    ssl:
+      # List of root certificates for HTTPS server verifications
+      certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+      # Certificate for TLS client authentication
+      certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      key: "/etc/pki/client/cert.key"
+
+      verification_mode: full
+
+      # Configure cipher suites to be used for TLS connections
+      #cipher_suites: []
+
+      # Configure curve types for ECDHE based cipher suites
+      #curve_types: []
+
+      supported_protocols:[TLSv1.0, TLSv1.1]
 """

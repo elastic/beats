@@ -1,10 +1,12 @@
 package harvester
 
 import (
+	"bytes"
 	"errors"
 	"expvar"
 	"io"
 	"os"
+	"time"
 
 	"golang.org/x/text/transform"
 
@@ -84,6 +86,12 @@ func (h *Harvester) Harvest() {
 				logp.Err("Read line error: %s; File: ", err, h.state.Source)
 			}
 			return
+		}
+
+		// Strip UTF-8 BOM if beginning of file
+		// As all BOMS are converted to UTF-8 it is enough to only remove this one
+		if h.state.Offset == 0 {
+			message.Content = bytes.Trim(message.Content, "\xef\xbb\xbf")
 		}
 
 		// Update offset
@@ -260,6 +268,7 @@ func (h *Harvester) close() {
 	if h.file != nil {
 
 		h.file.Close()
+
 		logp.Debug("harvester", "Closing file: %s", h.state.Source)
 		harvesterOpenFiles.Add(-1)
 
@@ -294,12 +303,27 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
 	//       don't require 'complicated' logic.
-	fileReader, err := NewLogFile(h.file, h.config, h.done)
+	h.fileReader, err = NewLogFile(h.file, h.config)
 	if err != nil {
 		return nil, err
 	}
 
-	r, err = reader.NewEncode(fileReader, h.encoding, h.config.BufferSize)
+	// Closes reader after timeout or when done channel is closed
+	go func() {
+		var closeTimeout <-chan time.Time
+		if h.config.CloseTimeout > 0 {
+			closeTimeout = time.After(h.config.CloseTimeout)
+		}
+
+		select {
+		case <-h.done:
+		case <-closeTimeout:
+			logp.Info("Closing harvester because close_timeout was reached: %s", h.state.Source)
+		}
+		h.fileReader.Close()
+	}()
+
+	r, err = reader.NewEncode(h.fileReader, h.encoding, h.config.BufferSize)
 	if err != nil {
 		return nil, err
 	}

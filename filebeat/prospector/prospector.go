@@ -116,6 +116,7 @@ func (p *Prospector) Run() {
 				if p.config.CleanInactive > 0 {
 					event.State.TTL = p.config.CleanInactive
 				}
+
 				select {
 				case <-p.done:
 					logp.Info("Prospector channel stopped")

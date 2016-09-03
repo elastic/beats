@@ -449,9 +449,8 @@ func (mc memcacheString) String() string {
 	return string(mc.raw)
 }
 
-func (mc memcacheString) MarshalJSON() ([]byte, error) {
-	s := string(mc.raw)
-	return json.Marshal(s)
+func (mc memcacheString) MarshalText() ([]byte, error) {
+	return mc.raw, nil
 }
 
 func (mc memcacheData) String() string {

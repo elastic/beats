@@ -12,15 +12,15 @@
       description: >
         The process state. For example: "running".
     - name: pid
-      type: integer
+      type: long
       description: >
         The process pid.
     - name: ppid
-      type: integer
+      type: long
       description: >
         The process parent pid.
     - name: pgid
-      type: integer
+      type: long
       description: >
         The process group id.
     - name: cmdline

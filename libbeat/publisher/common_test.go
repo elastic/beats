@@ -160,12 +160,12 @@ func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
 	ow := &outputWorker{}
 	ow.config.BulkMaxSize = bulkSize
 	ow.handler = mh
-	ow.messageWorker.init(&pub.wsOutput, defaultChanSize, defaultBulkChanSize, mh)
+	ow.messageWorker.init(&pub.wsOutput, DefaultQueueSize, DefaultBulkQueueSize, mh)
 
 	pub.Output = []*outputWorker{ow}
 
-	pub.pipelines.sync = newSyncPipeline(pub, defaultChanSize, defaultBulkChanSize)
-	pub.pipelines.async = newAsyncPipeline(pub, defaultChanSize, defaultBulkChanSize, &pub.wsPublisher)
+	pub.pipelines.sync = newSyncPipeline(pub, DefaultQueueSize, DefaultBulkQueueSize)
+	pub.pipelines.async = newAsyncPipeline(pub, DefaultQueueSize, DefaultBulkQueueSize, &pub.wsPublisher)
 
 	return &testPublisher{
 		pub:              pub,

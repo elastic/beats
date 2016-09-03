@@ -6,7 +6,7 @@
     },
    "metricset": {
       "module": "system",
-      "name": "disk",
+      "name": "diskio",
       "rtt": 17082,
    },
    "system": {

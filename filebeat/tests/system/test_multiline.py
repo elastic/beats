@@ -1,5 +1,6 @@
 from filebeat import BaseTest
 import os
+import time
 
 """
 Tests for the multiline log messages
@@ -114,9 +115,6 @@ connection <0.23893.109>, channel 3 - soft error:
 
         # Check that output file has the same number of lines as the log file
         assert 3 == len(output)
-
-
-
 
     def test_max_lines(self):
         """
@@ -238,3 +236,58 @@ connection <0.23893.109>, channel 3 - soft error:
 
         # Check that output file has the same number of lines as the log file
         assert 20 == len(output)
+
+    def test_close_timeout_with_multiline(self):
+        """
+        Test if multiline events are split up with close_timeout
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            multiline=True,
+            pattern="^\[",
+            negate="true",
+            match="after",
+            close_timeout="1s",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+
+        with open(testfile, 'w', 0) as file:
+            file.write("[2015] hello world")
+            file.write("\n")
+            file.write("  First Line\n")
+            file.write("  Second Line\n")
+
+        proc = self.start_beat()
+
+        # Wait until harvester is closed because of timeout
+        # This leads to the partial event above to be sent
+        self.wait_until(
+            lambda: self.log_contains(
+                "Closing harvester because close_timeout was reached"),
+            max_timeout=15)
+
+        # Because of the timeout the following two lines should be put together
+        with open(testfile, 'a', 0) as file:
+            file.write("  This should not be third\n")
+            file.write("  This should not be fourth\n")
+            # This starts a new pattern
+            file.write("[2016] Hello world\n")
+            # This line should be appended
+            file.write("  First line again\n")
+
+        self.wait_until(
+            lambda: self.output_has(lines=3),
+            max_timeout=10)
+        proc.check_kill_and_wait()
+
+        # close_timeout must have closed the reader exactly twice
+        self.wait_until(
+            lambda: self.log_contains_count(
+                "Closing harvester because close_timeout was reached") == 2,
+            max_timeout=15)
+
+        output = self.read_output()
+        assert 3 == len(output)

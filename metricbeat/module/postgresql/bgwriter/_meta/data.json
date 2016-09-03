@@ -13,7 +13,7 @@
     "postgresql": {
         "bgwriter": {
             "buffers": {
-                "allocated": 178,
+                "allocated": 191,
                 "backend": 0,
                 "backend_fsync": 0,
                 "checkpoints": 0,
@@ -22,7 +22,7 @@
             },
             "checkpoints": {
                 "requested": 0,
-                "scheduled": 0,
+                "scheduled": 8,
                 "times": {
                     "sync": {
                         "ms": 0
@@ -32,7 +32,7 @@
                     }
                 }
             },
-            "stats_reset": "2016-08-19T10:01:23.374Z"
+            "stats_reset": "2016-09-01T08:27:15.963Z"
         }
     },
     "type": "metricsets"
