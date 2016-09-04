@@ -1,4 +1,5 @@
 import sys
+import os
 
 sys.path.append('../../../libbeat/tests/system')
 from beat.beat import TestCase
@@ -6,6 +7,7 @@ from beat.beat import TestCase
 COMMON_FIELDS = ["@timestamp", "beat", "metricset.name", "metricset.host",
                  "metricset.module", "metricset.rtt", "type"]
 
+INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 class BaseTest(TestCase):
     @classmethod

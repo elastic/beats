@@ -256,8 +256,10 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	k.Net.TLS.Enable = tls != nil
-	k.Net.TLS.Config = tls
+	if tls != nil {
+		k.Net.TLS.Enable = true
+		k.Net.TLS.Config = tls.BuildModuleConfig("")
+	}
 
 	if config.Username != "" {
 		k.Net.SASL.Enable = true

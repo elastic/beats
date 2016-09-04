@@ -189,7 +189,7 @@
       description: >
         id of proxy/server if tracking is enabled.
 
-    - name: type
+    - name: component_type
       type: integer
       description: >
         (0=frontend, 1=backend, 2=server, 3=socket/listener)

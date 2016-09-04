@@ -16,7 +16,7 @@ type logstashConfig struct {
 	Pipelining       int                   `config:"pipelining"        validate:"min=0"`
 	CompressionLevel int                   `config:"compression_level" validate:"min=0, max=9"`
 	MaxRetries       int                   `config:"max_retries"       validate:"min=-1"`
-	TLS              *outputs.TLSConfig    `config:"tls"`
+	TLS              *outputs.TLSConfig    `config:"ssl"`
 	Proxy            transport.ProxyConfig `config:",inline"`
 }
 

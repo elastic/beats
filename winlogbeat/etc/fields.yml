@@ -187,7 +187,7 @@
         The type of account associated with this event.
 
     - name: version
-      type: integer
+      type: long
       required: false
       description: The version number of the event's definition.
 

@@ -69,7 +69,7 @@ telnet <hostname or IP> 5044
 
 * Verify that the certificate is valid and that the hostname and IP match.
 +
-TIP: For testing purposes only, you can set `insecure: true` to disable hostname checking.
+TIP: For testing purposes only, you can set `verification_mode: none` to disable hostname checking.
 
 * Use OpenSSL to test connectivity to the Logstash server and diagnose problems. See the https://www.openssl.org/docs/manmaster/apps/s_client.html[OpenSSL documentation] for more info.
 * Make sure that you have enabled SSL (set `ssl => true`) when configuring the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash].
@@ -102,13 +102,13 @@ server's certificate valid for both the hostname and the IP address.
 [[getsockopt-no-route-to-host]]
 ===== getsockopt: no route to host
 
-This is not a TLS problem. It's a networking problem. Make sure the two hosts can communicate.
+This is not a SSL problem. It's a networking problem. Make sure the two hosts can communicate.
 
 [float]
 [[getsockopt-connection-refused]]
 ===== getsockopt: connection refused
 
-This is not a TLS problem. Make sure that Logstash is running and that there is no firewall blocking the traffic.
+This is not a SSL problem. Make sure that Logstash is running and that there is no firewall blocking the traffic.
 
 [float]
 [[target-machine-refused-connection]]

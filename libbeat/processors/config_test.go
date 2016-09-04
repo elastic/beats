@@ -14,10 +14,4 @@ func TestExtractString(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, input, v)
-
-	v, err = extractString(&input)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, input, v)
 }

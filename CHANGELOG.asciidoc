@@ -17,9 +17,14 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Replace `output.kafka.use_type` by `output.kafka.topic` accepting a format string. {pull}2188[2188]
 - If the path specified by the `-c` flag is not absolute and `-path.config` is not specified, it
   is considered relative to the current working directory. {pull}2245[2245]
+- rename `tls` configurations section to `ssl`. {pull}2330[2330]
+- rename `certificate_key` configuration to `key`. {pull}2330[2330]
+- replace `tls.insecure` with `ssl.verification_mode` setting. {pull}2330[2330]
+- replace `tls.min/max_version` with `ssl.supported_protocols` setting requiring full protocol name. {pull}2330[2330]
 
 *Metricbeat*
 - Change field type system.process.cpu.start_time from keyword to date. {issue}1565[1565]
+- redis/info metricset fields were renamed up according to the naming conventions.
 
 *Packetbeat*
 - Group HTTP fields under `http.request` and `http.response` {pull}2167[2167]
@@ -37,6 +42,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
+- Fix logstash output handles error twice when asynchronous sending fails. {pull}2441[2441]
 - Fix Elasticsearch structured error response parsing error. {issue}2229[2229]
 - Fixed the run script to allow the overriding of the configuration file. {issue}2171[2171]
 - Fix logstash output crash if no hosts are configured. {issue}2325[2325]
@@ -53,6 +59,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Fix processor failure in Filebeat when using regex, contain, or equals with the message field. {issue}2178[2178]
 
 *Winlogbeat*
+- Fix corrupt registry file that occurs on power loss by disabling file write caching. {issue}2313[2313]
 
 ==== Added
 
@@ -77,6 +84,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Re-write import_dashboards.sh in Golang. {pull}2155[2155]
 - Update to Go 1.7. {pull}2306[2306]
 - Log total non-zero internal metrics on shutdown. {pull}2349[2349]
+- Add support for encrypted private key files by introducing `ssl.key_passphrase` setting. {pull}2330[2330]
 
 *Metricbeat*
 
@@ -85,6 +93,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Added a PostgreSQL module. {pull}2253[2253]
 - Add experimental filebeat metricset in the beats module. {pull}2297[2297]
 - Add experimental libbeat metricset in the beats module. {pull}2339[2339]
+- Improve mapping by converting half_float to scaled_float and integers to long. {pull}2430[2430]
 
 *Packetbeat*
 
@@ -95,6 +104,9 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 *Topbeat*
 
 *Filebeat*
+- Introduce close_timeout harvester options {issue}1926[1926]
+- Strip BOM from first message in case of BOM files {issue}2351[2351]
+
 
 - Add harvester_limit option {pull}2417[2417]
 
@@ -104,6 +116,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 ==== Deprecated
 
 *Affecting all Beats*
+- Topology map is deperecated. This applies to the settings: refresh_topology_freq, topology_expire, save_topology, host_topology, password_topology, db_topology
 
 *Packetbeat*
 

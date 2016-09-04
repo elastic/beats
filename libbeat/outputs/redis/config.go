@@ -18,7 +18,7 @@ type redisConfig struct {
 	LoadBalance bool                  `config:"loadbalance"`
 	Timeout     time.Duration         `config:"timeout"`
 	MaxRetries  int                   `config:"max_retries"`
-	TLS         *outputs.TLSConfig    `config:"tls"`
+	TLS         *outputs.TLSConfig    `config:"ssl"`
 	Proxy       transport.ProxyConfig `config:",inline"`
 
 	Db       int    `config:"db"`

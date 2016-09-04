@@ -38,9 +38,10 @@ type Harvester struct {
 	state           file.State
 	prospectorChan  chan *input.Event
 	file            source.FileSource /* the file being watched */
-	done            chan struct{}
+	fileReader      *LogFile
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
+	done            chan struct{}
 }
 
 func NewHarvester(

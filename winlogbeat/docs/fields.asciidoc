@@ -314,7 +314,7 @@ The type of account associated with this event.
 [float]
 === version
 
-type: integer
+type: long
 
 required: False
 

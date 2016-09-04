@@ -12,7 +12,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/harvester/source"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -126,4 +128,18 @@ func TestInitRegexp(t *testing.T) {
 
 	_, err := InitRegexps([]string{"((((("})
 	assert.NotNil(t, err)
+}
+
+// readLine reads a full line into buffer and returns it.
+// In case of partial lines, readLine does return and error and en empty string
+// This could potentialy be improved / replaced by https://github.com/elastic/beats/libbeat/tree/master/common/streambuf
+func readLine(reader reader.Reader) (time.Time, string, int, common.MapStr, error) {
+	message, err := reader.Next()
+
+	// Full line read to be returned
+	if message.Bytes != 0 && err == nil {
+		return message.Ts, string(message.Content), message.Bytes, message.Fields, err
+	}
+
+	return time.Time{}, "", 0, nil, err
 }

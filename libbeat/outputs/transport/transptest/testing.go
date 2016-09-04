@@ -109,14 +109,16 @@ func NewMockServerTLS(t *testing.T, to time.Duration, cert string, proxy *transp
 	}
 
 	tlsConfig, err := outputs.LoadTLSConfig(&outputs.TLSConfig{
-		Certificate:    cert + ".pem",
-		CertificateKey: cert + ".key",
+		Certificate: outputs.CertificateConfig{
+			Certificate: cert + ".pem",
+			Key:         cert + ".key",
+		},
 	})
 	if err != nil {
 		t.Fatalf("failed to load certificate")
 	}
 
-	listener := tls.NewListener(tcpListener, tlsConfig)
+	listener := tls.NewListener(tcpListener, tlsConfig.BuildModuleConfig(""))
 
 	server := &MockServer{Listener: listener, Timeout: to}
 	server.Handshake = func(client net.Conn) {
