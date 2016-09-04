@@ -89,7 +89,7 @@ var (
 		"last": s.Object{
 			"sess": c.Int("LastSess"),
 			"chk":  c.Str("LastChk"),
-			"agt":  c.Int("LastAgt"),
+			"agt":  c.Str("LastAgt"),
 		},
 
 		"qtime": c.Int("Qtime"),

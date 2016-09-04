@@ -367,9 +367,9 @@
             last health check contents or textual error
 
         - name: agt
-          type: integer
+          type: string
           description: >
-            llast agent check contents or textual error
+            last agent check contents or textual error
 
 
     - name: qtime
