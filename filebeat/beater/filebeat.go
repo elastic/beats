@@ -10,7 +10,7 @@ import (
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/crawler"
 	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/publish"
+	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/filebeat/spooler"
 )
@@ -54,7 +54,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	publisherChan := make(chan []*input.Event, 1)
 
 	// Publishes event to output
-	publisher := publish.New(config.PublishAsync,
+	publisher := publisher.New(config.PublishAsync,
 		publisherChan, registrar.Channel, b.Publisher)
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
