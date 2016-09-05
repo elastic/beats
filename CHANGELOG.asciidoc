@@ -57,6 +57,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 
 *Filebeat*
 - Fix processor failure in Filebeat when using regex, contain, or equals with the message field. {issue}2178[2178]
+- Fix async publisher sending empty events {pull}2455[2455]
 
 *Winlogbeat*
 - Fix corrupt registry file that occurs on power loss by disabling file write caching. {issue}2313[2313]

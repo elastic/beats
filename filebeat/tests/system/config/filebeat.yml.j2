@@ -74,6 +74,7 @@ filebeat.idle_timeout: 0.1s
 {% if not skip_registry_config %}
 filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
 {%endif%}
+filebeat.publish_async: {{publish_async}}
 
 
 #================================ General =====================================
