@@ -1,6 +1,6 @@
 // +build !integration
 
-package publish
+package publisher
 
 import (
 	"fmt"
