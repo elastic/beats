@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	// defaultSocket is the default path to the unix socket tfor stats on haproxy.
+	// defaultSocket is the default path to the unix socket for stats on haproxy.
 	statsMethod = "stat"
 	defaultAddr = "unix:///var/lib/haproxy/stats"
 )
@@ -41,6 +41,8 @@ type MetricSet struct {
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
+	logp.Warn("EXPERIMENTAL: The haproxy stat metricset is experimental")
+
 	config := struct {
 		StatsAddr string `config:"stats_addr"`
 	}{
@@ -65,13 +67,13 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	hapc, err := haproxy.NewHaproxyClient(m.statsAddr)
 	if err != nil {
-		return nil, fmt.Errorf(fmt.Sprintf("HAProxy Client error: %s", err))
+		return nil, fmt.Errorf("HAProxy Client error: %s", err)
 	}
 
 	res, err := hapc.GetStat()
 
 	if err != nil {
-		return nil, fmt.Errorf(fmt.Sprintf("HAProxy Client error fetching %s: %s", statsMethod, err))
+		return nil, fmt.Errorf("HAProxy Client error fetching %s: %s", statsMethod, err)
 	}
 	m.counter++
 

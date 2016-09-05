@@ -41,6 +41,8 @@ type MetricSet struct {
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
+	logp.Warn("EXPERIMENTAL: The haproxy info metricset is experimental")
+
 	config := struct {
 		StatsAddr string `config:"stats_addr"`
 	}{
