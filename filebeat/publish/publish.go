@@ -111,7 +111,7 @@ func (p *syncLogPublisher) Start() {
 			pubEvents := make([]common.MapStr, 0, len(events))
 			for _, event := range events {
 				// Only send event with bytes read. 0 Bytes means state update only
-				if event.Bytes > 0 {
+				if event.HasData() {
 					pubEvents = append(pubEvents, event.ToMapStr())
 				}
 			}
@@ -172,9 +172,12 @@ func (p *asyncLogPublisher) Start() {
 			case <-p.done:
 				return
 			case events := <-p.in:
-				pubEvents := make([]common.MapStr, len(events))
-				for i, event := range events {
-					pubEvents[i] = event.ToMapStr()
+
+				pubEvents := make([]common.MapStr, 0, len(events))
+				for _, event := range events {
+					if event.HasData() {
+						pubEvents = append(pubEvents, event.ToMapStr())
+					}
 				}
 
 				batch := &eventsBatch{
@@ -185,6 +188,7 @@ func (p *asyncLogPublisher) Start() {
 					publisher.Signal(batch), publisher.Guaranteed)
 
 				p.active.append(batch)
+
 			case <-ticker.C:
 			}
 
