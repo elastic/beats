@@ -17,7 +17,7 @@ To use SSL mutual authentication:
 
 . Create a certificate authority (CA) and use it to sign the certificates that you plan to use for
 {beatname_uc} and Logstash. Creating a correct SSL/TLS infrastructure is outside the scope of this
-document. There are many online resources available that describe how to create certificates including https://www.elastic.co/guide/en/shield/2.3/certificate-authority.html[this section of the documentation for Shield].
+document. There are many online resources available that describe how to create certificates, including the section in the {security} documentation about {securitydoc}/certificate-authority.html[setting up a certificate authority].
 +
 NOTE: Certificates must be signed by your root CA. Intermediate CAs are currently not supported.
 
