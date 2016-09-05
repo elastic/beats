@@ -21,13 +21,13 @@ logstash section:
 output:
   logstash:
     hosts: ["127.0.0.1:5044"]
-
-    # Optional load balance the events between the Logstash hosts
-    #loadbalance: true
 ------------------------------------------------------------------------------
 
-In this configuration, `hosts` specifies the Logstash server and the port (`5044`)
-where Logstash is configured to listen for incoming Beats connections.
+The `hosts` option specifies the Logstash server and the port (`5044`) where Logstash is configured to listen for incoming
+Beats connections.
+
+For this configuration, you must <<load-template-shell,load the index template into Elasticsearch manually>>
+because the options for auto loading the template are only available for the Elasticsearch output.
 
 TIP: To test your configuration file, run {beatname_uc} in the foreground with the following options specified:
 +./{beatname_lc} -configtest -e+.
