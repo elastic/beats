@@ -35,7 +35,7 @@ for TARGET in $TARGETS; do
 	XGOOS=`echo $TARGET | cut -d '/' -f 1`
 	XGOARCH=`echo $TARGET | cut -d '/' -f 2`
 
-	GOOS=$XGOOS GOARCH=$XGOARCH go build -o $PREFIX/import_dashboards-$XGOOS-$XGOARCH $LIBBEAT_PATH/dashboards/import_dashboards.go
+	GOOS=$XGOOS GOARCH=$XGOARCH go build -ldflags "-X main.beat=${BEATNAME}" -o $PREFIX/import_dashboards-$XGOOS-$XGOARCH $LIBBEAT_PATH/dashboards/import_dashboards.go
 done
 
 if [ -n "BUILDID" ]; then
