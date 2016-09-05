@@ -7,6 +7,7 @@ include::./version.asciidoc[]
 :metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/shield/current
 :security: X-Pack Security
 :ES-version: {stack-version}
 :LS-version: {stack-version}

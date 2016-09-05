@@ -4,7 +4,8 @@ include::./version.asciidoc[]
 
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}/
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/shield/current
 :version: {stack-version}
 :beatname_lc: metricbeat
 :beatname_uc: Metricbeat
