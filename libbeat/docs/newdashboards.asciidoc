@@ -22,61 +22,39 @@ export the Kibana dashboards.
 === Importing Existing Beat Dashboards
 
 You can use the `import_dashboards` script to import all the dashboards and the index pattern for a Beat, including the dependencies such as visualizations and searches.
-The `import_dashboards` script is available in the Beat package, under the `scripts` directory.
+The `import_dashboards` script is available under
+https://github.com/elastic/beats/tree/master/libbeat/dashboards[beats/libbeat/dashboards], and it's copied in each Beat package under the `scripts` directory. 
 
-You can import the dashboards and the index pattern to Elasticsearch running on localhost for a single Beat:
+
+Using the `import_dashboards` script, you can import the dashboards and the index pattern to
+Elasticsearch running on localhost for a single Beat (eg. Metricbeat):
 
 - from a local directory:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ scripts/import_dashboards -dir etc/kibana
+$ ./scripts/import_dashboards -dir kibana/metricbeat
 ----------------------------------------------------------------------
 
 - from a local zip archive:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ scripts/import_dashboards -file metricbeat-dashboards-1.0.zip
+$ ./scripts/import_dashboards -beat metricbeat -file metricbeat-dashboards-1.1.zip
 ----------------------------------------------------------------------
 
 - from a zip archive available online:
 
 [source,shell]
 -----------------------
-$ scripts/import_dashboards -url https://github.com/monicasarbu/metricbeat-dashboards/archive/v1.0.zip
+$ scripts/import_dashboards -beat metricbeat -url https://github.com/monicasarbu/metricbeat-dashboards/archive/v1.1.zip
 -----------------------
 
-NOTE: You can make use of the Makefile from the Beat GitHub repository to import the
-dashboards. If Elasticsearch is running on localhost, then you can run the following command from the Beat repository:
+NOTE:: When running the `import_dashboards` from the Beat package, the `-beat` option is set automatically to the Beat
+name.
 
-[source,shell]
---------------------------------
-$ make import-dashboards
---------------------------------
-
-If Elasticsearch is running on a different host, then you can use the environment `ES_URL`:
-
-[source,shell]
--------------------------------
-$ ES_URL="http://192.168.3.206:9200" make import-dashboards
--------------------------------
-
-The zip archive can contain dashboards for a single Beat or for multiple Beats.
-
-If the zip archive contains dashboards for a single Beat (metricbeat-dashboards-1.0.zip), then it must contain a
-directory (metricbeat-dashboards-1.0) of the same name as the zip archive that has the following structure:
-
-[source,shell]
--------------------------
- dashboard/
- search/
- visualization/
- index-pattern/
-------------------------
-
-If the zip archive contains dashboards for multiple Beats (beats-dashboards-{stack-version}.zip), then it must contain a
-directory (beats-dashboards-{stack-version}) of the same name as the zip archive that has the following structure:
+The zip archive contains dashboards for at least one Beat. The index pattern, dashboards, visualizations and searches
+are available in a separate directory for each Beat, having the name of the Beat. For example the official zip archive (beats-dashboards-{stack-version}) has the following structure:
 
 [source,shell]
 -------------------------
@@ -99,79 +77,97 @@ directory (beats-dashboards-{stack-version}) of the same name as the zip archive
     index-pattern/
 ------------------------
 
-If the archive contains dashboards for multiple Beats, you need to use the `-beat` option to specify the name of the Beat for which you want to import dashboards.
+
+If you don't specify the `-url` option, then by default it's set to the official zip archive containing the index
+pattern and the dashboards of the official Beats.
 
 
-- from a local zip archive:
+For development or community Beats it's easier to run the `import_dashboards` script from the https://github.com/elastic/beats/tree/master/libbeat/dashboards[beats/libbeat/dashboards] directory. In this case, you need to first compile the script:
 
-["source","sh",subs="attributes"]
--------------------
-$ scripts/import_dashboards -beat metricbeat -file beats-dashboards-{stack-version}.zip
--------------------
+[source,shell]
+-----------------------
+$ cd beats/libbeat/dashboards
+$ make
+-----------------------
 
-- from a zip archive available online:
-
-["source","sh",subs="attributes"]
-------------------
-$ scripts/import_dashboards -beat metricbeat -url http://download.elastic.co/beats/dashboards/beats-dashboards-{stack-version}.zip
--------------------
-
-If you don't specify the `-url` option, you must specify the `-beat` option because the default package imported by the script contains the dashboards for all Beats.
+And then you can import the index pattern and the dashboards together with visualizations and searches for a single
+Beat, by passing the `-beat` option. If the `-beat` option is not specified, by default it imports the dashboards of all
+Beats.
 
 For example, to import the Metricbeat dashboards together with visualizations, 
 searches and the Metricbeat index pattern:
 
 [source,shell]
 -----------------
-$ scripts/import_dashboards -beat metricbeat
+$ beats/libbeat/dashboards/import_dashboards -beat metricbeat
 -----------------
+
+
+NOTE: You can make use of the Makefile from the Beat GitHub repository to import the
+dashboards. If Elasticsearch is running on localhost, then you can run the following command from the Beat repository:
+
+[source,shell]
+--------------------------------
+$ make import-dashboards
+--------------------------------
+
+If Elasticsearch is running on a different host, then you can use the environment `ES_URL`:
+
+[source,shell]
+-------------------------------
+$ ES_URL="http://192.168.3.206:9200" make import-dashboards
+-------------------------------
 
 The command has the following options:
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
+
+./import_dashboards -h
+
 Usage: ./import_dashboards [options]
 
 Kibana dashboards are stored in a special index in Elasticsearch together with the searches, visualizations, and indexes that they use.
 
-You can import the dashboards, visualizations, searches, and the index pattern for any Beat:
+You can import the dashboards, visualizations, searches, and the index pattern for a single Beat (eg. Metricbeat):
   1. from a local directory:
-       	./import_dashboards -dir etc/kibana
-  2. from a local zip archive:
-       	./import_dashboards -beat metricbeat -file beats-dashboards-{stack-version}.zip
-  3. from a zip archive available online:
-       	./import_dashboards -beat metricbeat -url http://download.elastic.co/beats/dashboards/beats-dashboards-{stack-version}.zip
+       	./import_dashboards -dir kibana/metricbeat
+  2. from a local zip archive containing dashboards of multiple Beats:
+       	./import_dashboards -beat metricbeat -file beats-dashboards-5.0.0-alpha6.zip
+  3. from the official zip archive available under http://download.elastic.co/beats/dashboards/beats-dashboards-5.0.0-alpha6.zip:
+       	./import_dashboards -beat metricbeat
+  4. from any zip archive available online:
+    ./import_dashboards -beat metricbeat -url https://github.com/monicasarbu/metricbeat-dashboards/archive/1.1.zip
 
-If the archive contains dashboards for multiple Beats, you need to pass the Beat name in -beat option:
-       	./import_dashboards -beat metricbeat -url http://download.elastic.co/beats/dashboards/beats-dashboards-{stack-version}.zip
-
-To import only the index-pattern for a single Beat, from the same version use:
+To import only the index-pattern for a single Beat (eg. Metricbeat) use:
        	./import_dashboards -only-index -beat metricbeat
+
+To import only the dashboards together with visualizations and searches for a single Beat (eg. Metricbeat) use:
+       	./import_dashboards -only-dashboards -beat metricbeat
 
 Options:
   -beat string
-		Specify the Beat name. Required if the archive contains the dashboards for multiple Beats.
+       	The Beat name, in case a zip archive is passed as input (default "packetbeat")
   -dir string
-       	Directory containing the subdirectories: dashboard, visualization, search, index-pattern. eg. kibana/
+       	Directory containing the subdirectories: dashboard, visualization, search, index-pattern. Example: etc/kibana/
   -es string
        	Elasticsearch URL (default "http://127.0.0.1:9200")
   -file string
-       	Zip archive file containing the Beats dashboards.
+       	Zip archive file containing the Beats dashboards. The archive contains a directory for each Beat.
   -i string
-       	Overwrites the Elasticsearch index name. For example you can replace metricbeat-* with custombeat-*
+       	The Elasticsearch index name. This overwrites the index name defined in the dashboards and index pattern. Example: metricbeat-*
   -k string
        	Kibana index (default ".kibana")
   -only-dashboards
-       	Import only dashboards together with visualizations and searches. By default imports both, dashboards and the index-pattern.
+       	Import only dashboards together with visualizations and searches. By default import both, dashboards and the index-pattern.
   -only-index
        	Import only the index-pattern. By default imports both, dashboards and the index pattern.
   -pass string
-       	Password to connect to Elasticsearch
+       	Password to connect to Elasticsearch. By default no password is passed.
   -url string
-       	URL to the zip archive containing the Beats dashboards (default
-		"https://download.elastic.co/beats/dashboards/beats-dashboards-{stack-version}.zip")
+       	URL to the zip archive containing the Beats dashboards (default "https://download.elastic.co/beats/dashboards/beats-dashboards-5.0.0-alpha6.zip")
   -user string
-       	Username to connect to Elasticsearch
+       	Username to connect to Elasticsearch. By default no username is passed.
 ----------------------------------------------------------------------
 
 
@@ -210,7 +206,9 @@ Zip archive with the dashboards, available online. The archive can contain Kiban
 multiple Beats.
 
 ==== beat
-The Beat name. Required if the archive contains the dashboards for multiple Beats.
+The Beat name, and it's required when importing from a zip archive. When using the `import_dashboards` from the Beat package, this option is set automatically with the name of
+the Beat. When running the script from source, the default value is "", so you need to set this option in order to install the index pattern and
+the dashboards for a single Beat. Otherwise it imports the index pattern and the dashboards for all Beats.
 
 [[build-dashboards]]
 === Building your Own Dashboards
