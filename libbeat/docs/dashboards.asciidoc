@@ -18,50 +18,67 @@ Use the following command to import the Kibana dashboards for any of the Elastic
 
 *deb, rpm, and mac:*
 
-From the directory where you installed the Beat, run the `import_dashboards` script. For example, to import the
-Metricbeat dashboards, and the index pattern, use:
+From the directory where you installed the Beat, run the `import_dashboards` script. 
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-$ scripts/import_dashboards -beat metricbeat
+$ ./scripts/import_dashboards
 ----------------------------------------------------------------------
 
 On deb and rpm, the `scripts` folder is located under the home path, which is `/usr/share/{beat_name}/` unless you change it.
 
 By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-es` option
-to specify a different location. For example: `./scripts/import_dashboards -es http://192.168.33.60:9200`. 
+to specify a different location. For example: 
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+$ ./scripts/import_dashboards -es http://192.168.33.60:9200 
+----------------------------------------------------------------------
+
+The username and password to use for Elasticsearch authentication. There are a few ways to pass in the username and password. For example:
+
+["source","sh",subs="attributes,callouts"]
+-----------------------------------------------------------------------
+$ ./scripts/import_dashboards -es https://xyz.found.io -user user -pass password <1>
+$ ./scripts/import_dashboards -es https://xyz.found.io -user admin -pass $(cat ~/pass-file) <2> 
+-----------------------------------------------------------------------
+
+<1> Specify the username and password as options.
+<2> Use a file to avoid polluting the bash history with the password.
 
 
 *win:*
 
-. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
 and select *Run As Administrator*). If you are running Windows XP, you may need
 to download and install PowerShell. 
 
-. From the directory where you installed the Beat, run the `import_dashboards`  script. For example, to import the
-Metricbeat dashboards, and the index pattern, user:
+From the directory where you installed the Beat, run the `import_dashboards` script:
 +
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-PS > scripts\import_dashboards -beat metricbeat
+PS > scripts\import_dashboards
 ----------------------------------------------------------------------
 
-By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-es` option to specify a different location. For example: `scripts\import_dashboards -es http://192.168.33.60:9200`. 
+By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-es` option to specify a different location. For example: 
+
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+PS > scripts\import_dashboards -es http://192.168.33.60:9200
+----------------------------------------------------------------------
 
 NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to
 allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File scripts\import_dashboards -es http://192.168.33.60:9200`.
 
 
-The username and password to use for authentication. There are a few ways to pass in the username and password. For example:
+The username and password to use for authentication:
 
 ["source","sh",subs="attributes,callouts"]
 -----------------------------------------------------------------------
-$ scripts/import_dashboards -es https://xyz.found.io -user user -pass password <1>
-$ scripts/import_dashboards -es https://xyz.found.io -user admin -pass $(cat ~/pass-file) <2> 
+PS > scripts\import_dashboards -es https://xyz.found.io -user user -pass password
 -----------------------------------------------------------------------
 
-<1> Specify the username and password as options.
-<2> Use a file to avoid polluting the bash history with the password.
 
 Please see <<import-dashboards,import Kibana dashboards>> for more details about the `import_dashboards` script.
 
