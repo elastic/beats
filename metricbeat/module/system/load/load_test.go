@@ -1,6 +1,7 @@
-// +build darwin freebsd linux openbsd windows
+// +build !integration
+// +build darwin freebsd linux openbsd
 
-package filesystem
+package load
 
 import (
 	"testing"
@@ -11,13 +12,13 @@ import (
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
+	f := mbtest.NewEventFetcher(t, getConfig())
 
-	// Do a first fetch to have precentages
+	// Do a first fetch to have percentages
 	f.Fetch()
 	time.Sleep(1 * time.Second)
 
-	err := mbtest.WriteEvents(f, t)
+	err := mbtest.WriteEvent(f, t)
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -26,6 +27,6 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "system",
-		"metricsets": []string{"filesystem"},
+		"metricsets": []string{"load"},
 	}
 }

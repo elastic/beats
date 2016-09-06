@@ -1,6 +1,7 @@
-// +build darwin freebsd linux openbsd windows
+// +build !integration
+// +build freebsd linux windows
 
-package filesystem
+package diskio
 
 import (
 	"testing"
@@ -26,6 +27,6 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "system",
-		"metricsets": []string{"filesystem"},
+		"metricsets": []string{"diskio"},
 	}
 }
