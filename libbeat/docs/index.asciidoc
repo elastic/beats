@@ -6,7 +6,7 @@
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/1.3
 :ES-version: 2.4.0
 :LS-version: 2.4.0
-:Kibana-version: 4.6.0
+:Kibana-version: 4.6.1
 :Dashboards-version: 1.3.0
 
 
