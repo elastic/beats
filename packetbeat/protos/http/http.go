@@ -265,19 +265,21 @@ func (http *HTTP) doParse(
 		detailedf("Payload received: [%s]", pkt.Payload)
 	}
 
+	extraMsgSize := 0 // size of a "seen" packet for which we don't store the actual bytes
+
 	st := conn.Streams[dir]
 	if st == nil {
 		st = newStream(pkt, tcptuple)
 		conn.Streams[dir] = st
 	} else {
 		// concatenate bytes
-		st.data = append(st.data, pkt.Payload...)
-		if len(st.data) > tcp.TCP_MAX_DATA_IN_STREAM {
+		if len(st.data)+len(pkt.Payload) > tcp.TCP_MAX_DATA_IN_STREAM {
 			if isDebug {
-				debugf("Stream data too large, dropping TCP stream")
+				debugf("Stream data too large, ignoring message")
 			}
-			conn.Streams[dir] = nil
-			return conn
+			extraMsgSize = len(pkt.Payload)
+		} else {
+			st.data = append(st.data, pkt.Payload...)
 		}
 	}
 
@@ -287,7 +289,7 @@ func (http *HTTP) doParse(
 		}
 
 		parser := newParser(&http.parserConfig)
-		ok, complete := parser.parse(st)
+		ok, complete := parser.parse(st, extraMsgSize)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
@@ -322,6 +324,7 @@ func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *stream {
 func (http *HTTP) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
+	debugf("Received FIN")
 	conn := getHTTPConnection(private)
 	if conn == nil {
 		return private
