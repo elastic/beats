@@ -48,6 +48,12 @@ func (f *Event) ToMapStr() common.MapStr {
 	return event
 }
 
+// HasData returns true if the event itself contains data
+// Events without data are only state updates
+func (e *Event) HasData() bool {
+	return e.Bytes > 0
+}
+
 // mergeJSONFields writes the JSON fields in the event map,
 // respecting the KeysUnderRoot and OverwriteKeys configuration options.
 // If MessageKey is defined, the Text value from the event always
