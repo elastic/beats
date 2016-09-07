@@ -16,6 +16,7 @@ var (
 		CleanInactive:  0,
 		CleanRemoved:   false,
 		HarvesterLimit: 0,
+		Symlinks:       false,
 	}
 )
 
@@ -28,6 +29,7 @@ type prospectorConfig struct {
 	CleanInactive  time.Duration    `config:"clean_inactive" validate:"min=0"`
 	CleanRemoved   bool             `config:"clean_removed"`
 	HarvesterLimit uint64           `config:"harvester_limit" validate:"min=0"`
+	Symlinks       bool             `config:"symlinks"`
 }
 
 func (config *prospectorConfig) Validate() error {
