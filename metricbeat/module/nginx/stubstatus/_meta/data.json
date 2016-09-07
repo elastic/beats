@@ -12,11 +12,11 @@
     },
     "nginx": {
         "stubstatus": {
-            "accepts": 10,
+            "accepts": 22,
             "active": 1,
             "current": 10,
             "dropped": 0,
-            "handled": 10,
+            "handled": 22,
             "hostname": "nginx",
             "reading": 0,
             "requests": 10,
