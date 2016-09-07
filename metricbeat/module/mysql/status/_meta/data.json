@@ -14,7 +14,7 @@
         "status": {
             "aborted": {
                 "clients": 13,
-                "connects": 4
+                "connects": 16
             },
             "binlog": {
                 "cache": {
@@ -24,9 +24,9 @@
             },
             "bytes": {
                 "received": 2100,
-                "sent": 91334
+                "sent": 92281
             },
-            "connections": 21,
+            "connections": 33,
             "created": {
                 "tmp": {
                     "disk_tables": 0,
@@ -44,9 +44,9 @@
             "open": {
                 "files": 14,
                 "streams": 0,
-                "tables": 105
+                "tables": 106
             },
-            "opened_tables": 112
+            "opened_tables": 113
         }
     },
     "type": "metricsets"

@@ -3,7 +3,7 @@
     "apache": {
         "status": {
             "bytes_per_request": 1024,
-            "bytes_per_sec": 3.39823,
+            "bytes_per_sec": 0.201113,
             "connections": {
                 "async": {
                     "closing": 0,
@@ -15,17 +15,17 @@
             "cpu": {
                 "children_system": 0,
                 "children_user": 0,
-                "load": 0.139381,
-                "system": 1.64,
-                "user": 2.14
+                "load": 0.00652482,
+                "system": 1.46,
+                "user": 1.53
             },
             "hostname": "apache",
             "load": {
-                "1": 0.31,
-                "15": 0.19,
-                "5": 0.2
+                "1": 0.55,
+                "15": 0.31,
+                "5": 0.31
             },
-            "requests_per_sec": 0.00331858,
+            "requests_per_sec": 0.000196399,
             "scoreboard": {
                 "closing_connection": 0,
                 "dns_lookup": 0,
@@ -43,8 +43,8 @@
             "total_accesses": 9,
             "total_kbytes": 9,
             "uptime": {
-                "server_uptime": 2712,
-                "uptime": 2712
+                "server_uptime": 45825,
+                "uptime": 45825
             },
             "workers": {
                 "busy": 1,

@@ -14,9 +14,9 @@
         "process": {
             "cmdline": "go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data",
             "cpu": {
-                "start_time": "2016-08-08T16:39:13.040Z",
+                "start_time": "2016-09-06T07:33:04.000Z",
                 "total": {
-                    "pct": 0.01
+                    "pct": 0
                 }
             },
             "fd": {
@@ -28,13 +28,14 @@
             },
             "memory": {
                 "rss": {
-                    "bytes": 16572416,
-                    "pct": 0.002
+                    "bytes": 13770752,
+                    "pct": 0.0016
                 },
-                "share": 8441856,
-                "size": 234192896
+                "share": 6594560,
+                "size": 232972288
             },
             "name": "go",
+            "pgid": 1,
             "pid": 1,
             "ppid": 0,
             "state": "sleeping",

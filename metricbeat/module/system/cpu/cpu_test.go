@@ -1,11 +1,9 @@
-// +build !integration
 // +build darwin freebsd linux openbsd windows
 
 package cpu
 
 import (
 	"testing"
-
 	"time"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
