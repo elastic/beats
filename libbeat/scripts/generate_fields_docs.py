@@ -4,7 +4,7 @@ import argparse
 
 def document_fields(output, section, sections, path):
     if "anchor" in section:
-        output.write("[[mb-exported-fields-{}]]\n".format(section["anchor"]))
+        output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
 
     if "prefix" in section:
         output.write("{}\n".format(section["prefix"]))
@@ -88,7 +88,7 @@ grouped in the following categories:
         sections[v["key"]] = v["title"]
 
     for key in sorted(sections):
-        output.write("* <<mb-exported-fields-{}>>\n".format(key))
+        output.write("* <<exported-fields-{}>>\n".format(key))
     output.write("\n--\n")
 
     # Sort alphabetically by key

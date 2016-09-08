@@ -60,7 +60,7 @@ before-build:
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields collect-docs configs update imports kibana
+collect: fields collect-docs configs kibana imports update
 
 # Creates a new metricset. Requires the params MODULE and METRICSET
 .PHONY: create-metricset
