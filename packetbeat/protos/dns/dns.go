@@ -469,7 +469,7 @@ func addDnsToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 
 	m["answers_count"] = len(dns.Answer)
 	if len(dns.Answer) > 0 {
-		m["answers"] = rrsToMapStrs(dns.Answer)
+		m["answers"] = ansToMapStrs(dns.Answer)
 	}
 
 	m["authorities_count"] = len(dns.Ns)
@@ -550,6 +550,30 @@ func rrsToMapStrs(records []mkdns.RR) []common.MapStr {
 	}
 	return mapStrArray
 }
+
+// ansToMapStrs extracts answers from an array of RR's and returns MapStr.
+func ansToMapStrs(answers []mkdns.RR) common.MapStr {
+        answer_class := []string{}
+        answer_data := []string{}
+        answer_name := []string{}
+        answer_ttl := []string{}
+        answer_type := []string{}
+
+        for _, a := range rrsToMapStrs(answers) {
+            answer_class = append(answer_class, fmt.Sprint(a["class"]))
+            answer_data = append(answer_data, fmt.Sprint(a["data"]))
+            answer_name = append(answer_name, fmt.Sprint(a["name"]))
+            answer_ttl = append(answer_ttl, fmt.Sprint(a["ttl"]))
+            answer_type = append(answer_type, fmt.Sprint(a["type"]))
+        }
+        ansMapStr := common.MapStr{}
+        ansMapStr["class"] = answer_class
+        ansMapStr["data"] = answer_data
+        ansMapStr["name"] = answer_name
+        ansMapStr["ttl"] = answer_ttl
+        ansMapStr["type"] = answer_type
+        return ansMapStr
+    }
 
 // Convert all RDATA fields of a RR to a single string
 // fields are ordered alphabetically with 'data' as the last element
