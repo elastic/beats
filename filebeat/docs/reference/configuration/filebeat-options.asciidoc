@@ -391,6 +391,18 @@ This option applies to files that Filebeat has not already processed. If you ran
 
 NOTE: You can use this setting to avoid indexing old log lines when you run Filebeat on a set of log files for the first time. After the first run, we recommend disabling this option, or you risk losing lines during file rotation.
 
+===== symlinks
+
+experimental[]
+
+The symlinks options allows to also harvest symlinks in addition to regular files. In case of symlinks, the file that is opened and read in the end is the original file even though the path of the symlink is reported.
+
+It must be made sure, that if a symlink is defined for harvesting, the original is excluded. In case the symlink and original file are harvested by the same prospector, this will be detected and only one of the two files will be harvested which is the first one found by filebeat. In case the symlink and original are defined in two different prospectors, it can happen that both will be harvested at the same time, send duplicated data and will overwrite each other state.
+
+This option can be useful if symlinks to the log files have additional meta data in the file name which can be processed in Logstash. This is for example the case for kubernetes log files.
+
+As this option may lead to data loss, it is disabled by default.
+
 ===== backoff
 
 The backoff options specify how aggressively Filebeat crawls new files for updates.

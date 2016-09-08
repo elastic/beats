@@ -99,6 +99,7 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 			continue
 		}
 
+	OUTER:
 		// Check any matched files to see if we need to start a harvester
 		for _, file := range matches {
 
@@ -108,24 +109,39 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 				continue
 			}
 
-			fileinfo, err := os.Lstat(file)
+			// Fetch Lstat File info to detected also symlinks
+			fileInfo, err := os.Lstat(file)
 			if err != nil {
 				logp.Debug("prospector", "stat(%s) failed: %s", file, err)
 				continue
 			}
 
-			// Check if file is symlink
-			if fileinfo.Mode()&os.ModeSymlink != 0 {
-				logp.Debug("prospector", "File %s skipped as it is a symlink.", file)
-				continue
-			}
-
-			if fileinfo.IsDir() {
+			if fileInfo.IsDir() {
 				logp.Debug("prospector", "Skipping directory: %s", file)
 				continue
 			}
 
-			paths[file] = fileinfo
+			isSymlink := fileInfo.Mode()&os.ModeSymlink > 0
+			if isSymlink && !p.config.Symlinks {
+				logp.Debug("prospector", "File %s skipped as it is a symlink.", file)
+				continue
+			}
+
+			// Fetch Stat file info which fetches the inode from the original and is used for comparison
+			fileInfo, err = os.Stat(file)
+
+			// If symlink is enabled, it is checked that original is not part of same prospector
+			// It original is harvested by other prospector, states will potentially overwrite each other
+			if p.config.Symlinks {
+				for _, finfo := range paths {
+					if os.SameFile(finfo, fileInfo) {
+						logp.Info("Same file found as symlink and original. Skipping file: %s", file)
+						continue OUTER
+					}
+				}
+			}
+
+			paths[file] = fileInfo
 		}
 	}
 

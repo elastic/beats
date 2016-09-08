@@ -143,6 +143,10 @@ filebeat.prospectors:
   # this can mean that the first entries of a new file are skipped.
   #tail_files: false
 
+  # Experimental: If symlinks is enabled, symlinks are opened and harvested. The harvester is openening the
+  # original for harvesting but will report the symlink name as source.
+  #symlinks: false
+
   # Backoff values define how aggressively filebeat crawls new files for updates
   # The default values can be used in most cases. Backoff defines how long it is waited
   # to check a file again after EOF is reached. Default is 1s which means the file
