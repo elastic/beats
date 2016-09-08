@@ -10,6 +10,7 @@ This metricset is available on:
 - Linux
 - Windows
 
+[float]
 === Control Group (cgroup) Metrics
 
 On Linux this metricset can collect metrics from any cgroups that the process
