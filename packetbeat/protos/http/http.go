@@ -588,7 +588,7 @@ func parseCookieValue(raw string) string {
 func (http *HTTP) extractBody(m *message) []byte {
 	body := []byte{}
 
-	if len(m.ContentType) == 0 || http.shouldIncludeInBody(m.ContentType) {
+	if len(m.ContentType) > 0 && http.shouldIncludeInBody(m.ContentType) {
 		if len(m.chunkedBody) > 0 {
 			body = append(body, m.chunkedBody...)
 		} else {
