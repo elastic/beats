@@ -1,6 +1,7 @@
 package publisher
 
 import (
+	"errors"
 	"expvar"
 
 	"github.com/elastic/beats/filebeat/input"
@@ -15,12 +16,16 @@ var (
 type LogPublisher interface {
 	Start()
 	Stop()
-	Publish() error
+}
+
+type SuccessLogger interface {
+	Published(events []*input.Event) bool
 }
 
 func New(
 	async bool,
-	in, out chan []*input.Event,
+	in chan []*input.Event,
+	out SuccessLogger,
 	pub publisher.Publisher,
 ) LogPublisher {
 	if async {
@@ -28,6 +33,10 @@ func New(
 	}
 	return newSyncLogPublisher(in, out, pub)
 }
+
+var (
+	sigPublisherStop = errors.New("publisher was stopped")
+)
 
 // getDataEvents returns all events which contain data (not only state updates)
 func getDataEvents(events []*input.Event) []common.MapStr {

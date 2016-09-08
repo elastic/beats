@@ -23,7 +23,7 @@ type Prospector struct {
 	cfg              *common.Config // Raw config
 	config           prospectorConfig
 	prospectorer     Prospectorer
-	spoolerChan      chan *input.Event
+	outlet           Outlet
 	harvesterChan    chan *input.Event
 	done             chan struct{}
 	states           *file.States
@@ -36,11 +36,15 @@ type Prospectorer interface {
 	Run()
 }
 
-func NewProspector(cfg *common.Config, states file.States, spoolerChan chan *input.Event) (*Prospector, error) {
+type Outlet interface {
+	OnEvent(event *input.Event) bool
+}
+
+func NewProspector(cfg *common.Config, states file.States, outlet Outlet) (*Prospector, error) {
 	prospector := &Prospector{
 		cfg:           cfg,
 		config:        defaultConfig,
-		spoolerChan:   spoolerChan,
+		outlet:        outlet,
 		harvesterChan: make(chan *input.Event),
 		done:          make(chan struct{}),
 		states:        states.Copy(),
@@ -117,13 +121,13 @@ func (p *Prospector) Run() {
 					event.State.TTL = p.config.CleanInactive
 				}
 
-				select {
-				case <-p.done:
-					logp.Info("Prospector channel stopped")
+				ok := p.outlet.OnEvent(event)
+				if !ok {
+					logp.Info("Prospector outlet closed")
 					return
-				case p.spoolerChan <- event:
-					p.states.Update(event.State)
 				}
+
+				p.states.Update(event.State)
 			}
 		}
 	}()

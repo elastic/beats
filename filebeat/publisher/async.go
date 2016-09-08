@@ -1,7 +1,6 @@
 package publisher
 
 import (
-	"errors"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -12,9 +11,10 @@ import (
 )
 
 type asyncLogPublisher struct {
-	pub     publisher.Publisher
-	client  publisher.Client
-	in, out chan []*input.Event
+	pub    publisher.Publisher
+	client publisher.Client
+	in     chan []*input.Event
+	out    SuccessLogger
 
 	// list of in-flight batches
 	active   batchList
@@ -50,7 +50,8 @@ const (
 )
 
 func newAsyncLogPublisher(
-	in, out chan []*input.Event,
+	in chan []*input.Event,
+	out SuccessLogger,
 	pub publisher.Publisher,
 ) *asyncLogPublisher {
 	return &asyncLogPublisher{
@@ -75,38 +76,25 @@ func (p *asyncLogPublisher) Start() {
 		ticker := time.NewTicker(defaultGCTimeout)
 
 		for {
-			err := p.Publish()
-			if err != nil {
-				return
-			}
-
 			select {
 			case <-p.done:
 				return
-			case <-ticker.C:
-				p.collect()
+			case events := <-p.in:
+				batch := &eventsBatch{
+					flag:   0,
+					events: events,
+				}
+				p.client.PublishEvents(
+					getDataEvents(events),
+					publisher.Signal(batch),
+					publisher.Guaranteed)
 
+				p.active.append(batch)
+			case <-ticker.C:
 			}
+			p.collect()
 		}
 	}()
-}
-
-func (p *asyncLogPublisher) Publish() error {
-	select {
-	case <-p.done:
-		return errors.New("async publisher stopped")
-	case events := <-p.in:
-
-		batch := &eventsBatch{
-			flag:   0,
-			events: events,
-		}
-		p.client.PublishEvents(getDataEvents(events), publisher.Signal(batch), publisher.Guaranteed)
-
-		p.active.append(batch)
-		p.collect()
-	}
-	return nil
 }
 
 func (p *asyncLogPublisher) Stop() {
@@ -157,11 +145,10 @@ func (p *asyncLogPublisher) collect() bool {
 		// registrar picking up the current batch. Instead prefer to shut-down and
 		// resend the last published batch on next restart, basically taking advantage
 		// of send-at-last-once semantics in order to speed up cleanup on shutdown.
-		select {
-		case <-p.done:
+		ok := p.out.Published(batch.events)
+		if !ok {
 			logp.Info("Shutting down - No registrar update for successfully published batch.")
 			return false
-		case p.out <- batch.events:
 		}
 	}
 	return true
