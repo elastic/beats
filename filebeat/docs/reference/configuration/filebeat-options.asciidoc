@@ -219,10 +219,7 @@ WINDOWS: In case under windows your log rotation system shows errors because it 
 
 ===== close_removed
 
-WARNING: Only use this options if you understand that data loss is a potential side effect.
-
-Close removed can be used to close a harvester directly when a file is removed. Normally a file should only be removed after it already falls under `close_inactive`. In case files are removed early, without this option Filebeat keeps the file open to make sure finishing is completed. In case the file handle should be released immediately after removal, this option can be used.
-
+Close removed is used to close a harvester directly when a file is removed. Normally a file should only be removed after it already falls under `close_inactive`. In case files are removed early, without this option Filebeat keeps the file open to make sure finishing is completed. In case some files are not completely read because they were removed too early from disk, disable this option.
 
 WINDOWS: In case under windows your log rotation system shows error because it can't rotated the files, this is the option to enabled.
 
@@ -263,10 +260,12 @@ NOTE: Every time a file is renamed, the file state will be updated and the count
 
 ===== clean_removed
 
-WARNING: Only use this options if you understand that data loss is a potential side effect.
+Cleans files from the registry which cannot be found on disk anymore. This does not apply to renamed files or files which were moved to an other directory which is still visible by Filebeat.
 
 
-Cleans files which cannot be found on disk anymore. This does not apply to renamed files or files which were moved to an other directory which is still visible by Filebeat. Be aware that this option will remove the state for removed files immediately. In case a shared drive disappeared for a short period and appears again, all files will be read again from the beginning. This option can only be used in combination `close_removed`.
+In case a shared drive disappears for a short period and appears again, all files will be read again from the beginning as the states were removed. In such cases it is recommended to turn off this option.
+
+This option should only be used in combination `close_removed`.
 
 
 [[scan-frequency]]
