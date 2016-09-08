@@ -47,6 +47,31 @@
           description: >
             The number of bytes sent to all clients.
 
+    - name: threads
+      type: group
+      description: >
+        Threads stats.
+      fields:
+        - name: cached
+          type: long
+          description: >
+            The number of cached threads.
+
+        - name: created
+          type: long
+          description: >
+            The number of created threads.
+
+        - name: connected
+          type: long
+          description: >
+            The number of connected threads.
+
+        - name: running
+          type: long
+          description: >
+            The number of running threads.
+
     - name: connections
       type: long
       description: >
