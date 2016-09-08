@@ -9,7 +9,6 @@ import (
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/crawler"
-	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/filebeat/spooler"
@@ -44,18 +43,19 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	config := fb.config
 
 	// Setup registrar to persist state
-	registrar, err := registrar.New(config.RegistryFile)
+	registrar, err := registrar.New(config.RegistryFile, nil)
 	if err != nil {
 		logp.Err("Could not init registrar: %v", err)
 		return err
 	}
 
 	// Channel from harvesters to spooler
-	publisherChan := make(chan []*input.Event, 1)
+	successLogger := newRegistrarLogger(registrar)
+	publisherChan := newPublisherChannel()
 
 	// Publishes event to output
 	publisher := publisher.New(config.PublishAsync,
-		publisherChan, registrar.Channel, b.Publisher)
+		publisherChan.ch, successLogger, b.Publisher)
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
 	spooler, err := spooler.New(config, publisherChan)
@@ -64,7 +64,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	crawler, err := crawler.New(spooler, config.Prospectors)
+	crawler, err := crawler.New(
+		newSpoolerOutlet(fb.done, spooler, nil),
+		config.Prospectors)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err
@@ -86,11 +88,13 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	publisher.Start()
 	// Stopping publisher (might potentially drop items)
 	defer publisher.Stop()
+	defer successLogger.Close()
 
 	// Starting spooler
 	spooler.Start()
 	// Stopping spooler will flush items
 	defer spooler.Stop()
+	defer publisherChan.Close()
 
 	err = crawler.Start(registrar.GetStates())
 	if err != nil {
