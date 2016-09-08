@@ -3,6 +3,7 @@
 This is the info metricset of the module haproxy.
 
 
+[float]
 === Official documentation for fields
 
 A list of the 'stat' fields along with a basic description can be found here:
@@ -11,8 +12,8 @@ http://www.haproxy.org/download/1.6/doc/management.txt
 
 The following documentation bellow is an extract from the URL above, more specifically from section "9.1. CSV format"
 
-[source]
------------------
+[source,ruby]
+----
 In brackets after each field name are the types which may have a value for
 that field. The types are L (Listeners), F (Frontends), B (Backends), and
 S (Servers).
@@ -129,5 +130,4 @@ S (Servers).
      (0 for TCP)
  61. ttime [..BS]: the average total session time in ms over the 1024 last
      requests
-
------------------
+----

@@ -67,16 +67,6 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
-#------------------------------- haproxy Module ------------------------------
-#- module: haproxy
-  #metricsets: 
-    #- "stat"
-    #- "info"
-  #enabled: true
-  #period: 10s
-  # The address could also be in the form of a unix socket if the metricbeat process is running locally "unix:///var/run/haproxy-stats.sock"
-  #stats_addr: "tcp://127.0.0.1:14567"
-
 #-------------------------------- beats Module -------------------------------
 #- module: beats
   #metricsets: ["filebeat", "libbeat"]
@@ -86,6 +76,17 @@ metricbeat.modules:
 
   # Path to httpprof variables
   #vars_path: /debug/vars
+
+
+#------------------------------- haproxy Module ------------------------------
+#- module: haproxy
+  #metricsets:
+    #- "stat"
+    #- "info"
+
+  #enabled: true
+  #period: 10s
+  #stats_addr: "tcp://127.0.0.1:14567
 
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb

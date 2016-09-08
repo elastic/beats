@@ -82,10 +82,10 @@
                     "1": {
                       "type": "float"
                     },
-                    "5": {
+                    "15": {
                       "type": "float"
                     },
-                    "15": {
+                    "5": {
                       "type": "float"
                     }
                   }
@@ -302,26 +302,6 @@
           "properties": {
             "info": {
               "properties": {
-
-                "nb_proc": {
-                  "type": "long"
-                },
-                "process_num": {
-                  "type": "long"
-                },
-                "pid": {
-                  "type": "integer"
-                },
-                "uptime_sec": {
-                  "type": "long"
-                },
-                "bytes": {
-                  "type": "long"
-                },
-                "ulimit_n": {
-                  "type": "integer"
-                },
-                
                 "compress": {
                   "properties": {
                     "bps": {
@@ -339,59 +319,24 @@
                     }
                   }
                 },
-
-                "max": {
+                "conn": {
                   "properties": {
-                    "sock": {
-                      "type": "long"
-                    },
-                    "conn": {
+                    "rate": {
                       "properties": {
-                        "value": {
-                          "type": "integer"
+                        "limit": {
+                          "type": "long"
                         },
-                        "rate": {
+                        "value": {
                           "type": "long"
                         }
                       }
-                    },
-                    "hard_conn": {
-                      "type": "integer"
-                    },
-                    "sess_rate": {
-                      "type": "long"
-                    },
-                    "ssl_rate": {
-                      "type": "long"
-                    },
-                    "zlib_mem_usage": {
-                      "type": "long"
-                    },
-                    "ssl_conns": {
-                      "type": "long"
-                    },
-                    "pipes": {
-                      "type": "long"
                     }
                   }
                 },
-
-                "curr": {
-                  "properties": {
-                    "conns": {
-                      "type": "integer"
-                    },
-                    "ssl_conns": {
-                      "type": "integer"
-                    }
-                  }
-                },
-
-
                 "cum": {
                   "properties": {
                     "conns": {
-                      "type": "integer"
+                      "type": "long"
                     },
                     "req": {
                       "type": "long"
@@ -401,63 +346,101 @@
                     }
                   }
                 },
-
-                "pipes": {
+                "curr": {
                   "properties": {
-                    "used": {
+                    "conns": {
                       "type": "long"
                     },
-                    "free": {
+                    "ssl_conns": {
                       "type": "long"
                     }
                   }
                 },
-              
-                "conn": {
+                "idle_pct": {
+                  "type": "float"
+                },
+                "max": {
                   "properties": {
-                    "rate": {
-                      "properties": {
-                        "value": {
-                          "type": "long"
-                        },
-                        "limit": {
-                          "type": "long"
-                        }
-                      }
+                    "conn": {
+                      "type": "long"
+                    },
+                    "conn_rate": {
+                      "type": "long"
+                    },
+                    "hard_conn": {
+                      "type": "long"
+                    },
+                    "pipes": {
+                      "type": "long"
+                    },
+                    "sess_rate": {
+                      "type": "long"
+                    },
+                    "sock": {
+                      "type": "long"
+                    },
+                    "ssl_conns": {
+                      "type": "long"
+                    },
+                    "ssl_rate": {
+                      "type": "long"
+                    },
+                    "zlib_mem_usage": {
+                      "type": "long"
                     }
                   }
                 },
-
+                "mem_max_bytes": {
+                  "type": "long"
+                },
+                "nb_proc": {
+                  "type": "long"
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "pipes": {
+                  "properties": {
+                    "free": {
+                      "type": "long"
+                    },
+                    "used": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "process_num": {
+                  "type": "long"
+                },
+                "run_queue": {
+                  "type": "long"
+                },
                 "sess": {
                   "properties": {
                     "rate": {
                       "properties": {
-                        "value": {
+                        "limit": {
                           "type": "long"
                         },
-                        "limit": {
+                        "value": {
                           "type": "long"
                         }
                       }
                     }
                   }
                 },
-
-
                 "ssl": {
                   "properties": {
-
-                    "rate": {
+                    "backend": {
                       "properties": {
-                        "value": {
+                        "key_rate": {
                           "type": "long"
                         },
-                        "limit": {
+                        "max_key_rate": {
                           "type": "long"
                         }
                       }
                     },
-                  
                     "frontend": {
                       "properties": {
                         "key_rate": {
@@ -471,70 +454,44 @@
                         }
                       }
                     },
-
-                    "backend": {
+                    "rate": {
                       "properties": {
-                        "key_rate": {
+                        "limit": {
                           "type": "long"
                         },
-                        "max_key_rate": {
+                        "value": {
                           "type": "long"
                         }
                       }
                     },
-
-                    "cached_lookups": {
+                    "ssl_cache_misses": {
                       "type": "long"
                     },
-                    "cache_misses": {
+                    "ssl_cached_lookups": {
                       "type": "long"
                     }
-
                   }
-                },
-
-                "zlib_mem_usage": {
-                  "type": "long"
                 },
                 "tasks": {
                   "type": "long"
                 },
-                "run_queue": {
+                "ulimit_n": {
                   "type": "long"
                 },
-                "idle_pct": {
-                  "type": "float"
+                "uptime_sec": {
+                  "type": "long"
+                },
+                "zlib_mem_usage": {
+                  "type": "long"
                 }
               }
             },
             "stat": {
               "properties": {
-                "pxname": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
-                },
-                "svname": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
-                },
-                "qcur": {
+                "act": {
                   "type": "long"
                 },
-                "qmax": {
-                  "type": "long"
-                },
-                "scur": {
-                  "type": "long"
-                },
-                "smax": {
-                  "type": "long"
-                },
-                "slim": {
-                  "type": "long"
-                },
-                "stot": {
+                "bck": {
                   "type": "long"
                 },
                 "bin": {
@@ -543,101 +500,72 @@
                 "bout": {
                   "type": "long"
                 },
-                "breq": {
-                  "type": "long"
+                "check": {
+                  "properties": {
+                    "code": {
+                      "type": "long"
+                    },
+                    "duration": {
+                      "type": "long"
+                    },
+                    "status": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
                 },
-                "dresp": {
-                  "type": "long"
-                },
-                "ereq": {
-                  "type": "long"
-                },
-                "econ": {
-                  "type": "long"
-                },
-                "eresp": {
-                  "type": "long"
-                },
-                "wretr": {
-                  "type": "long"
-                },
-                "wredis": {
-                  "type": "long"
-                },
-                "status": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
-                },
-                "weight": {
-                  "type": "long"
-                },
-                "act": {
-                  "type": "long"
-                },
-                "bck": {
+                "chkdown": {
                   "type": "long"
                 },
                 "chkfail": {
                   "type": "long"
                 },
-                "chkdown": {
+                "cli_abrt": {
                   "type": "long"
                 },
-                "lastchg": {
+                "comp": {
+                  "properties": {
+                    "byp": {
+                      "type": "long"
+                    },
+                    "in": {
+                      "type": "long"
+                    },
+                    "out": {
+                      "type": "long"
+                    },
+                    "rsp": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "component_type": {
+                  "type": "long"
+                },
+                "ctime": {
                   "type": "long"
                 },
                 "downtime": {
                   "type": "long"
                 },
-                "qlimit": {
+                "dreq": {
                   "type": "long"
                 },
-                "pid": {
-                  "type": "integer"
-                },
-                "iid": {
-                  "type": "integer"
-                },
-                "throttle": {
-                  "type": "integer"
-                },
-                "lbtot": {
+                "dresp": {
                   "type": "long"
                 },
-                "tracked": {
-                  "type": "integer"
+                "econ": {
+                  "type": "long"
                 },
-                "component_type": {
-                  "type": "integer"
+                "ereq": {
+                  "type": "long"
                 },
-                "rate": {
-                  "properties": {
-                    "value": {
-                      "type": "long"
-                    },
-                    "lim": {
-                      "type": "long"
-                    },
-                    "max": {
-                      "type": "long"
-                    }
-                  }
+                "eresp": {
+                  "type": "long"
                 },
-                "check": {
-                  "properties": {
-                    "stats": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    },
-                    "code": {
-                      "type": "integer"
-                    },
-                    "duration": {
-                      "type": "long"
-                    }
-                  }
+                "hanafail": {
+                  "type": "long"
                 },
                 "hrsp": {
                   "properties": {
@@ -661,17 +589,73 @@
                     }
                   }
                 },
-                "hanafail": {
+                "iid": {
                   "type": "long"
+                },
+                "last": {
+                  "properties": {
+                    "agt": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "chk": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "sess": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "lastchg": {
+                  "type": "long"
+                },
+                "lbtot": {
+                  "type": "long"
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "pxname": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "qcur": {
+                  "type": "long"
+                },
+                "qlimit": {
+                  "type": "long"
+                },
+                "qmax": {
+                  "type": "long"
+                },
+                "qtime": {
+                  "type": "long"
+                },
+                "rate": {
+                  "properties": {
+                    "lim": {
+                      "type": "long"
+                    },
+                    "max": {
+                      "type": "long"
+                    },
+                    "value": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "req": {
                   "properties": {
                     "rate": {
                       "properties": {
-                        "value": {
+                        "max": {
                           "type": "long"
                         },
-                        "max": {
+                        "value": {
                           "type": "long"
                         }
                       }
@@ -681,55 +665,55 @@
                     }
                   }
                 },
-                "cli_abrt": {
+                "rtime": {
+                  "type": "long"
+                },
+                "scur": {
+                  "type": "long"
+                },
+                "sid": {
+                  "type": "long"
+                },
+                "slim": {
+                  "type": "long"
+                },
+                "smax": {
                   "type": "long"
                 },
                 "srv_abrt": {
                   "type": "long"
-                },       
-                "comp": {
-                  "properties": {
-                    "in": {
-                      "type": "long"
-                    },
-                    "out": {
-                      "type": "long"
-                    },
-                    "byp": {
-                      "type": "long"
-                    },
-                    "rsp": {
-                      "type": "long"
-                    }
-                  }
                 },
-                "last": {
-                  "properties": {
-                    "sess": {
-                      "type": "long"
-                    },
-                    "chk": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    },
-                    "agt": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    }
-                  }
+                "status": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
                 },
-                "qtime": {
+                "stot": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "svname": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "throttle": {
                   "type": "long"
                 },
-                "ctime": {
-                  "type": "long"
-                },
-                "rtime": {
+                "tracked": {
                   "type": "long"
                 },
                 "ttime": {
+                  "type": "long"
+                },
+                "weight": {
+                  "type": "long"
+                },
+                "wredis": {
+                  "type": "long"
+                },
+                "wretr": {
                   "type": "long"
                 }
               }
@@ -2103,10 +2087,10 @@
                 "1": {
                   "type": "float"
                 },
-                "5": {
+                "15": {
                   "type": "float"
                 },
-                "15": {
+                "5": {
                   "type": "float"
                 },
                 "norm": {
@@ -2114,10 +2098,10 @@
                     "1": {
                       "type": "float"
                     },
-                    "5": {
+                    "15": {
                       "type": "float"
                     },
-                    "15": {
+                    "5": {
                       "type": "float"
                     }
                   }
