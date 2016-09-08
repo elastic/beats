@@ -1078,22 +1078,6 @@
                     }
                   }
                 },
-                "threads": {
-                  "properties": {
-                    "cached": {
-                      "type": "long"
-                    },
-                    "created": {
-                      "type": "long"
-                    },
-                    "connected": {
-                      "type": "long"
-                    },
-                    "running": {
-                      "type": "long"
-                    }
-                  }
-                },
                 "connections": {
                   "type": "long"
                 },
