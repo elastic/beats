@@ -16,7 +16,7 @@ RUN arch="$(dpkg --print-architecture)" \
 	&& chmod +x /usr/local/bin/gosu
 
 RUN set -x \
-	&& curl -fSL "https://download.elastic.co/kibana/kibana-snapshot/kibana-5.0.0-alpha6-SNAPSHOT-linux-x86_64.tar.gz?20160811" -o kibana.tar.gz \
+	&& curl -fSL "https://download.elastic.co/kibana/kibana-snapshot/kibana-5.0.0-alpha6-SNAPSHOT-linux-x86_64.tar.gz?20160908" -o kibana.tar.gz \
 	&& mkdir -p /opt/kibana \
 	&& tar -xz --strip-components=1 -C /opt/kibana -f kibana.tar.gz \
 	&& chown -R kibana:kibana /opt/kibana \
@@ -25,10 +25,6 @@ RUN set -x \
 ENV PATH /opt/kibana/bin:$PATH
 
 COPY ./docker-entrypoint.sh /
-
-#RUN gosu kibana kibana-plugin install timelion
-# This is a temporary fix as currently no alpha6 snapshot for timelion exists
-RUN gosu kibana kibana-plugin install https://download.elastic.co/kibana/timelion/timelion-5.0.0-beta1.zip
 
 EXPOSE 5601
 ENTRYPOINT ["/docker-entrypoint.sh"]
