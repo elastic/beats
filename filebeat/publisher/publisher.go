@@ -13,12 +13,16 @@ var (
 	eventsSent = expvar.NewInt("publish.events")
 )
 
+// LogPublisher provides functionality to start and stop a publisher worker.
 type LogPublisher interface {
 	Start()
 	Stop()
 }
 
+// SuccessLogger is used to report successfully published events.
 type SuccessLogger interface {
+
+	// Published will be run after events have been acknowledged by the outputs.
 	Published(events []*input.Event) bool
 }
 
