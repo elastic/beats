@@ -68,6 +68,7 @@ type HTTP struct {
 	HideKeywords        []string
 	RedactAuthorization bool
 	IncludeBodyFor      []string
+	MaxMessageSize      int
 
 	parserConfig parserConfig
 
@@ -124,6 +125,7 @@ func (http *HTTP) setFromConfig(config *httpConfig) {
 	http.parserConfig.RealIPHeader = strings.ToLower(config.Real_ip_header)
 	http.transactionTimeout = config.TransactionTimeout
 	http.IncludeBodyFor = config.Include_body_for
+	http.MaxMessageSize = config.MaxMessageSize
 
 	if config.Send_all_headers {
 		http.parserConfig.SendHeaders = true
@@ -273,7 +275,7 @@ func (http *HTTP) doParse(
 		conn.Streams[dir] = st
 	} else {
 		// concatenate bytes
-		if len(st.data)+len(pkt.Payload) > tcp.TCP_MAX_DATA_IN_STREAM {
+		if len(st.data)+len(pkt.Payload) > http.MaxMessageSize {
 			if isDebug {
 				debugf("Stream data too large, ignoring message")
 			}
