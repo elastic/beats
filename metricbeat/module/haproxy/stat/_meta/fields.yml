@@ -4,12 +4,12 @@
     Stats collected from HAProxy process
   fields:
     - name: pxname
-      type: string
+      type: keyword
       description: >
         proxy name
 
     - name: svname
-      type: string
+      type: keyword
       description: >
         service name (FRONTEND for frontend, BACKEND for backend, any name for server/listener)
 
@@ -36,12 +36,12 @@
     - name: slim
       type: integer
       description: >
-        configured session limit 
+        configured session limit
 
     - name: stot
-      type: string
+      type: keyword
       description: >
-        cumulative number of connections  
+        cumulative number of connections
 
     - name: bin
       type: integer
@@ -92,7 +92,7 @@
         response errors. srv_abrt will be counted here also.
         Some other errors are:
         * write error on the client socket (won't be counted for the server stat)
-        * failure applying filters to the response.     
+        * failure applying filters to the response.
 
     - name: wretr
       type: integer
@@ -107,7 +107,7 @@
         switched away from.
 
     - name: status
-      type: string
+      type: keyword
       description: >
         status (UP/DOWN/NOLB/MAINT/MAINT(via)...)
 
@@ -220,8 +220,8 @@
       description: >
 
       fields:
-        - name: status 
-          type: string
+        - name: status
+          type: keyword
           description: >
             status of last health check, one of:
               UNK     -> unknown
@@ -362,12 +362,12 @@
             number of seconds since last session assigned to server/backend
 
         - name: chk
-          type: string
+          type: keyword
           description: >
             last health check contents or textual error
 
         - name: agt
-          type: string
+          type: keyword
           description: >
             last agent check contents or textual error
 

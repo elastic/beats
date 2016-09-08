@@ -104,7 +104,7 @@ metricbeat.modules:
 ==== Fields
 
 For a description of each field in the metricset, see the
-<<exported-fields-""" + module + """,exported fields>> section.
+<<mb-exported-fields-""" + module + """,exported fields>> section.
 
 """
 
