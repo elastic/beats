@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-beats>>
 * <<exported-fields-common>>
+* <<exported-fields-haproxy>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
@@ -697,6 +698,34 @@ example: metricsets
 required: True
 
 The document type. Always set to "metricsets".
+
+
+[[exported-fields-haproxy]]
+== haproxy Fields
+
+haproxy Module
+
+
+
+[float]
+== haproxy Fields
+
+
+
+
+[float]
+== stat Fields
+
+stat
+
+
+
+[float]
+=== haproxy.stat.example
+
+type: keyword
+
+Example field
 
 
 [[exported-fields-mongodb]]

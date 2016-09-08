@@ -20,6 +20,444 @@
         "@timestamp": {
           "type": "date"
         },
+        "haproxy": {
+          "properties": {
+            "info": {
+              "properties": {
+
+                "nb_proc": {
+                  "type": "long"
+                },
+                "process_num": {
+                  "type": "long"
+                },
+                "pid": {
+                  "type": "integer"
+                },
+                "uptime_sec": {
+                  "type": "long"
+                },
+                "bytes": {
+                  "type": "long"
+                },
+                "ulimit_n": {
+                  "type": "integer"
+                },
+                
+                "compress": {
+                  "properties": {
+                    "bps": {
+                      "properties": {
+                        "in": {
+                          "type": "long"
+                        },
+                        "out": {
+                          "type": "long"
+                        },
+                        "rate_limit": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+
+                "max": {
+                  "properties": {
+                    "sock": {
+                      "type": "long"
+                    },
+                    "conn": {
+                      "properties": {
+                        "value": {
+                          "type": "integer"
+                        },
+                        "rate": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "hard_conn": {
+                      "type": "integer"
+                    },
+                    "sess_rate": {
+                      "type": "long"
+                    },
+                    "ssl_rate": {
+                      "type": "long"
+                    },
+                    "zlib_mem_usage": {
+                      "type": "long"
+                    },
+                    "ssl_conns": {
+                      "type": "long"
+                    },
+                    "pipes": {
+                      "type": "long"
+                    }
+                  }
+                },
+
+                "curr": {
+                  "properties": {
+                    "conns": {
+                      "type": "integer"
+                    },
+                    "ssl_conns": {
+                      "type": "integer"
+                    }
+                  }
+                },
+
+
+                "cum": {
+                  "properties": {
+                    "conns": {
+                      "type": "integer"
+                    },
+                    "req": {
+                      "type": "long"
+                    },
+                    "ssl_conns": {
+                      "type": "long"
+                    }
+                  }
+                },
+
+                "pipes": {
+                  "properties": {
+                    "used": {
+                      "type": "long"
+                    },
+                    "free": {
+                      "type": "long"
+                    }
+                  }
+                },
+              
+                "conn": {
+                  "properties": {
+                    "rate": {
+                      "properties": {
+                        "value": {
+                          "type": "long"
+                        },
+                        "limit": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+
+                "sess": {
+                  "properties": {
+                    "rate": {
+                      "properties": {
+                        "value": {
+                          "type": "long"
+                        },
+                        "limit": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+
+
+                "ssl": {
+                  "properties": {
+
+                    "rate": {
+                      "properties": {
+                        "value": {
+                          "type": "long"
+                        },
+                        "limit": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                  
+                    "frontend": {
+                      "properties": {
+                        "key_rate": {
+                          "type": "long"
+                        },
+                        "max_key_rate": {
+                          "type": "long"
+                        },
+                        "session_reuse_pct": {
+                          "type": "long"
+                        }
+                      }
+                    },
+
+                    "backend": {
+                      "properties": {
+                        "key_rate": {
+                          "type": "long"
+                        },
+                        "max_key_rate": {
+                          "type": "long"
+                        }
+                      }
+                    },
+
+                    "cached_lookups": {
+                      "type": "long"
+                    },
+                    "cache_misses": {
+                      "type": "long"
+                    }
+
+                  }
+                },
+
+                "zlib_mem_usage": {
+                  "type": "long"
+                },
+                "tasks": {
+                  "type": "long"
+                },
+                "run_queue": {
+                  "type": "long"
+                },
+                "idle_pct": {
+                  "type": "float"
+                }
+              }
+            },
+            "stat": {
+              "properties": {
+                "pxname": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "svname": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "qcur": {
+                  "type": "long"
+                },
+                "qmax": {
+                  "type": "long"
+                },
+                "scur": {
+                  "type": "long"
+                },
+                "smax": {
+                  "type": "long"
+                },
+                "slim": {
+                  "type": "long"
+                },
+                "stot": {
+                  "type": "long"
+                },
+                "bin": {
+                  "type": "long"
+                },
+                "bout": {
+                  "type": "long"
+                },
+                "breq": {
+                  "type": "long"
+                },
+                "dresp": {
+                  "type": "long"
+                },
+                "ereq": {
+                  "type": "long"
+                },
+                "econ": {
+                  "type": "long"
+                },
+                "eresp": {
+                  "type": "long"
+                },
+                "wretr": {
+                  "type": "long"
+                },
+                "wredis": {
+                  "type": "long"
+                },
+                "status": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "weight": {
+                  "type": "long"
+                },
+                "act": {
+                  "type": "long"
+                },
+                "bck": {
+                  "type": "long"
+                },
+                "chkfail": {
+                  "type": "long"
+                },
+                "chkdown": {
+                  "type": "long"
+                },
+                "lastchg": {
+                  "type": "long"
+                },
+                "downtime": {
+                  "type": "long"
+                },
+                "qlimit": {
+                  "type": "long"
+                },
+                "pid": {
+                  "type": "integer"
+                },
+                "iid": {
+                  "type": "integer"
+                },
+                "throttle": {
+                  "type": "integer"
+                },
+                "lbtot": {
+                  "type": "long"
+                },
+                "tracked": {
+                  "type": "integer"
+                },
+                "component_type": {
+                  "type": "integer"
+                },
+                "rate": {
+                  "properties": {
+                    "value": {
+                      "type": "long"
+                    },
+                    "lim": {
+                      "type": "long"
+                    },
+                    "max": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "check": {
+                  "properties": {
+                    "stats": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "integer"
+                    },
+                    "duration": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "hrsp": {
+                  "properties": {
+                    "1xx": {
+                      "type": "long"
+                    },
+                    "2xx": {
+                      "type": "long"
+                    },
+                    "3xx": {
+                      "type": "long"
+                    },
+                    "4xx": {
+                      "type": "long"
+                    },
+                    "5xx": {
+                      "type": "long"
+                    },
+                    "other": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "hanafail": {
+                  "type": "long"
+                },
+                "req": {
+                  "properties": {
+                    "rate": {
+                      "properties": {
+                        "value": {
+                          "type": "long"
+                        },
+                        "max": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "tot": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "cli_abrt": {
+                  "type": "long"
+                },
+                "srv_abrt": {
+                  "type": "long"
+                },       
+                "comp": {
+                  "properties": {
+                    "in": {
+                      "type": "long"
+                    },
+                    "out": {
+                      "type": "long"
+                    },
+                    "byp": {
+                      "type": "long"
+                    },
+                    "rsp": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "last": {
+                  "properties": {
+                    "sess": {
+                      "type": "long"
+                    },
+                    "chk": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "agt": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "qtime": {
+                  "type": "long"
+                },
+                "ctime": {
+                  "type": "long"
+                },
+                "rtime": {
+                  "type": "long"
+                },
+                "ttime": {
+                  "type": "long"
+                }
+              }
+            }
+          }
+        },
         "apache": {
           "properties": {
             "status": {
@@ -1659,11 +2097,11 @@
                   "scaling_factor": 100,
                   "type": "scaled_float"
                 },
-                "15": {
+                "5": {
                   "scaling_factor": 100,
                   "type": "scaled_float"
                 },
-                "5": {
+                "15": {
                   "scaling_factor": 100,
                   "type": "scaled_float"
                 },
@@ -1673,11 +2111,11 @@
                       "scaling_factor": 100,
                       "type": "scaled_float"
                     },
-                    "15": {
+                    "5": {
                       "scaling_factor": 100,
                       "type": "scaled_float"
                     },
-                    "5": {
+                    "15": {
                       "scaling_factor": 100,
                       "type": "scaled_float"
                     }
