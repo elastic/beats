@@ -13,12 +13,14 @@ import (
 	cfg "github.com/elastic/beats/filebeat/config"
 	. "github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
 type Registrar struct {
 	Channel      chan []*Event
+	out          publisher.SuccessLogger
 	done         chan struct{}
 	registryFile string       // Path to the Registry File
 	states       *file.States // Map with all file paths inside and the corresponding state
@@ -32,13 +34,14 @@ var (
 	registryWrites = expvar.NewInt("registrar.writes")
 )
 
-func New(registryFile string) (*Registrar, error) {
+func New(registryFile string, out publisher.SuccessLogger) (*Registrar, error) {
 
 	r := &Registrar{
 		registryFile: registryFile,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
 		Channel:      make(chan []*Event, 1),
+		out:          out,
 		wg:           sync.WaitGroup{},
 	}
 	err := r.Init()
@@ -180,22 +183,32 @@ func (r *Registrar) Run() {
 	}()
 
 	for {
+		var events []*Event
+
 		select {
 		case <-r.done:
 			logp.Info("Ending Registrar")
 			return
-		case events := <-r.Channel:
-			r.processEventStates(events)
+		case events = <-r.Channel:
 		}
+
+		r.processEventStates(events)
 
 		beforeCount := r.states.Count()
 		cleanedStates := r.states.Cleanup()
-		logp.Debug("registrar", "Registrar states cleaned up. Before: %d , After: %d", beforeCount, beforeCount-cleanedStates)
 		statesCleanup.Add(int64(cleanedStates))
+
+		logp.Debug("registrar",
+			"Registrar states cleaned up. Before: %d , After: %d",
+			beforeCount, beforeCount-cleanedStates)
+
 		if err := r.writeRegistry(); err != nil {
 			logp.Err("Writing of registry returned error: %v. Continuing...", err)
 		}
 
+		if r.out != nil {
+			r.out.Published(events)
+		}
 	}
 }
 
