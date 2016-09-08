@@ -12,21 +12,21 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Metricbeat. They are
 grouped in the following categories:
 
-* <<mb-exported-fields-apache>>
-* <<mb-exported-fields-beat>>
-* <<mb-exported-fields-beats>>
-* <<mb-exported-fields-common>>
-* <<mb-exported-fields-haproxy>>
-* <<mb-exported-fields-mongodb>>
-* <<mb-exported-fields-mysql>>
-* <<mb-exported-fields-nginx>>
-* <<mb-exported-fields-postgresql>>
-* <<mb-exported-fields-redis>>
-* <<mb-exported-fields-system>>
-* <<mb-exported-fields-zookeeper>>
+* <<exported-fields-apache>>
+* <<exported-fields-beat>>
+* <<exported-fields-beats>>
+* <<exported-fields-common>>
+* <<exported-fields-haproxy>>
+* <<exported-fields-mongodb>>
+* <<exported-fields-mysql>>
+* <<exported-fields-nginx>>
+* <<exported-fields-postgresql>>
+* <<exported-fields-redis>>
+* <<exported-fields-system>>
+* <<exported-fields-zookeeper>>
 
 --
-[[mb-exported-fields-apache]]
+[[exported-fields-apache]]
 == Apache Fields
 
 Apache HTTPD server metricsets collected from the Apache web server.
@@ -354,7 +354,7 @@ type: long
 Total.
 
 
-[[mb-exported-fields-beat]]
+[[exported-fields-beat]]
 == Beat Fields
 
 Contains common beat fields available in all event types.
@@ -401,7 +401,7 @@ type: dict
 Contains user configurable fields.
 
 
-[[mb-exported-fields-beats]]
+[[exported-fields-beats]]
 == beats Fields
 
 beats Module
@@ -655,7 +655,7 @@ type: long
 Total number of events published
 
 
-[[mb-exported-fields-common]]
+[[exported-fields-common]]
 == Common Fields
 
 Contains common fields available in all event types.
@@ -700,7 +700,7 @@ required: True
 The document type. Always set to "metricsets".
 
 
-[[mb-exported-fields-haproxy]]
+[[exported-fields-haproxy]]
 == haproxy Fields
 
 experimental[]
@@ -1680,7 +1680,7 @@ type: integer
 the average total session time in ms over the 1024 last requests
 
 
-[[mb-exported-fields-mongodb]]
+[[exported-fields-mongodb]]
 == MongoDB Fields
 
 Metrics collected from MongoDB servers.
@@ -2194,7 +2194,7 @@ type: keyword
 A string that represents the name of the current storage engine.
 
 
-[[mb-exported-fields-mysql]]
+[[exported-fields-mysql]]
 == MySQL Fields
 
 MySQL server status metrics collected from MySQL.
@@ -2394,7 +2394,7 @@ type: long
 
 
 
-[[mb-exported-fields-nginx]]
+[[exported-fields-nginx]]
 == Nginx Fields
 
 Nginx server status metrics collected from various modules.
@@ -2495,7 +2495,7 @@ type: long
 The current number of idle client connections waiting for a request.
 
 
-[[mb-exported-fields-postgresql]]
+[[exported-fields-postgresql]]
 == PostgreSQL Fields
 
 Metrics collected from PostgreSQL servers.
@@ -2896,7 +2896,7 @@ type: date
 Time at which these statistics were last reset.
 
 
-[[mb-exported-fields-redis]]
+[[exported-fields-redis]]
 == Redis Fields
 
 Redis metrics collected from Redis.
@@ -3515,7 +3515,7 @@ type: long
 
 
 
-[[mb-exported-fields-system]]
+[[exported-fields-system]]
 == System Fields
 
 System status metrics, like CPU and memory usage, that are collected from the operating system.
@@ -5044,7 +5044,7 @@ type: keyword
 Total number of I/O operations performed on all devices by processes in the cgroup as seen by the throttling policy.
 
 
-[[mb-exported-fields-zookeeper]]
+[[exported-fields-zookeeper]]
 == ZooKeeper Fields
 
 ZooKeeper metrics collected by the four-letter monitoring commands.
