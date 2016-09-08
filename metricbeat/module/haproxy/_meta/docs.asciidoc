@@ -1,0 +1,9 @@
+== haproxy Module
+
+This is the haproxy Module.  To enable stats collection from HAProxy, you must enable the stats socket via TCP.  
+For example, placing the following statement under the `global` or `default` section of the haproxy config:
+
+`stats socket 127.0.0.1:14567`
+
+will enable stats reporting via any local IP on port 14567.  Please note that you should probably use an internal private IP
+or secure this with a firewall rule so that only designated hosts can access this data.

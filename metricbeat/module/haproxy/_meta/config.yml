@@ -1,0 +1,7 @@
+- module: haproxy
+  metricsets: 
+    - "stat"
+    - "info"
+  enabled: true
+  period: 10s
+  stats_addr: "tcp://127.0.0.1:14567"
