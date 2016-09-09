@@ -78,9 +78,9 @@ cd {beatname_lc}-{version}-darwin
 curl -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@{beatname_lc}.template.json
 ----------------------------------------------------------------------
 
-endif::allplatforms[]
-
 *win:*
+
+endif::allplatforms[]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
