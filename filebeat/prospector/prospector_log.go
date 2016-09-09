@@ -112,7 +112,7 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 			// Fetch Lstat File info to detected also symlinks
 			fileInfo, err := os.Lstat(file)
 			if err != nil {
-				logp.Debug("prospector", "stat(%s) failed: %s", file, err)
+				logp.Debug("prospector", "lstat(%s) failed: %s", file, err)
 				continue
 			}
 
@@ -127,8 +127,12 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 				continue
 			}
 
-			// Fetch Stat file info which fetches the inode from the original and is used for comparison
+			// Fetch Stat file info which fetches the inode. In case of a symlink, the original inode is fetched
 			fileInfo, err = os.Stat(file)
+			if err != nil {
+				logp.Debug("prospector", "stat(%s) failed: %s", file, err)
+				continue
+			}
 
 			// If symlink is enabled, it is checked that original is not part of same prospector
 			// It original is harvested by other prospector, states will potentially overwrite each other
