@@ -612,11 +612,12 @@ class Test(BaseTest):
 
     def test_symlink_removed(self):
         """
-        Tests that if a symlink to a file is removed, no further data is read which is added to the original file
+        Tests that if a symlink to a file is removed, further data is read which is added to the original file
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/symlink.log",
             symlinks="true",
+            clean_removed="false"
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -643,14 +644,14 @@ class Test(BaseTest):
         os.remove(symlink)
 
         with open(logfile, 'a') as file:
-            file.write("Hello World2n")
+            file.write("Hello World2\n")
 
         # Sleep 1s to make sure new events are not picked up
         time.sleep(1)
 
         # Make sure also new file was read
         self.wait_until(
-            lambda: self.output_has(lines=1),
+            lambda: self.output_has(lines=2),
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
