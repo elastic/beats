@@ -67,7 +67,7 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *i
 			}
 			continue
 		}
-		crawler.Registrar.state[event.Source] = event
+		crawler.Registrar.setState(event)
 		logp.Debug("prospector", "Registrar will re-save state for %s", event.Source)
 
 		if !crawler.running {
