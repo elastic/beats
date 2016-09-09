@@ -149,6 +149,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...v5.0.0-alpha5[View comm
 
 - Create a separate metricSet for load under the system module and remove load information from CPU stats. {pull}2101[2101]
 - Add `system.load.norm.1`, `system.load.norm.5` and `system.load.norm.15`. {pull}2101[2101]
+- Add threads fields to mysql module. {pull}2484[2484]
 
 *Packetbeat*
 

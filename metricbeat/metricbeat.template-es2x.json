@@ -1132,6 +1132,22 @@
                 },
                 "opened_tables": {
                   "type": "long"
+                },
+                "threads": {
+                  "properties": {
+                    "cached": {
+                      "type": "long"
+                    },
+                    "connected": {
+                      "type": "long"
+                    },
+                    "created": {
+                      "type": "long"
+                    },
+                    "running": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             }
