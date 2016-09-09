@@ -8,30 +8,29 @@ import (
 	"github.com/elastic/beats/libbeat/publisher"
 )
 
-type syncLogPublisher struct {
+type syncPublisher struct {
 	pub    publisher.Publisher
 	client publisher.Client
 	in     chan []*input.Event
-	out    SuccessLogger
-
-	done chan struct{}
-	wg   sync.WaitGroup
+	logger Logger
+	done   chan struct{}
+	wg     sync.WaitGroup
 }
 
-func newSyncLogPublisher(
+func newSyncPublisher(
 	in chan []*input.Event,
-	out SuccessLogger,
+	logger Logger,
 	pub publisher.Publisher,
-) *syncLogPublisher {
-	return &syncLogPublisher{
-		in:   in,
-		out:  out,
-		pub:  pub,
-		done: make(chan struct{}),
+) *syncPublisher {
+	return &syncPublisher{
+		in:     in,
+		logger: logger,
+		pub:    pub,
+		done:   make(chan struct{}),
 	}
 }
 
-func (p *syncLogPublisher) Start() {
+func (p *syncPublisher) Start() {
 	p.client = p.pub.Connect()
 
 	p.wg.Add(1)
@@ -50,7 +49,7 @@ func (p *syncLogPublisher) Start() {
 	}()
 }
 
-func (p *syncLogPublisher) Publish() error {
+func (p *syncPublisher) Publish() error {
 	var events []*input.Event
 	select {
 	case <-p.done:
@@ -69,7 +68,7 @@ func (p *syncLogPublisher) Publish() error {
 	eventsSent.Add(int64(len(events)))
 
 	// Tell the logger that we've successfully sent these events
-	ok = p.out.Published(events)
+	ok = p.logger.Log(events)
 	if !ok {
 		// stop publisher if successfully send events can not be logged anymore.
 		return sigPublisherStop
@@ -77,7 +76,7 @@ func (p *syncLogPublisher) Publish() error {
 	return nil
 }
 
-func (p *syncLogPublisher) Stop() {
+func (p *syncPublisher) Stop() {
 	p.client.Close()
 	close(p.done)
 	p.wg.Wait()

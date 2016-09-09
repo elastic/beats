@@ -20,7 +20,7 @@ import (
 
 type Registrar struct {
 	Channel      chan []*Event
-	out          publisher.SuccessLogger
+	logger       publisher.Logger
 	done         chan struct{}
 	registryFile string       // Path to the Registry File
 	states       *file.States // Map with all file paths inside and the corresponding state
@@ -34,14 +34,14 @@ var (
 	registryWrites = expvar.NewInt("registrar.writes")
 )
 
-func New(registryFile string, out publisher.SuccessLogger) (*Registrar, error) {
+func New(registryFile string, logger publisher.Logger) (*Registrar, error) {
 
 	r := &Registrar{
 		registryFile: registryFile,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
 		Channel:      make(chan []*Event, 1),
-		out:          out,
+		logger:       logger,
 		wg:           sync.WaitGroup{},
 	}
 	err := r.Init()
@@ -206,8 +206,9 @@ func (r *Registrar) Run() {
 			logp.Err("Writing of registry returned error: %v. Continuing...", err)
 		}
 
-		if r.out != nil {
-			r.out.Published(events)
+		// Log successful writes to disk
+		if r.logger != nil {
+			r.logger.Log(events)
 		}
 	}
 }
@@ -264,4 +265,8 @@ func (r *Registrar) writeRegistry() error {
 	statesCurrent.Set(int64(len(states)))
 
 	return file.SafeFileRotate(r.registryFile, tempfile)
+}
+
+func (r *Registrar) GetLogger() *Logger {
+	return newLogger(r)
 }

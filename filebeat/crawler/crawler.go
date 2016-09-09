@@ -13,11 +13,11 @@ import (
 type Crawler struct {
 	prospectors       []*prospector.Prospector
 	prospectorConfigs []*common.Config
-	out               prospector.Outlet
+	out               prospector.Output
 	wg                sync.WaitGroup
 }
 
-func New(out prospector.Outlet, prospectorConfigs []*common.Config) (*Crawler, error) {
+func New(out prospector.Output, prospectorConfigs []*common.Config) (*Crawler, error) {
 
 	if len(prospectorConfigs) == 0 {
 		return nil, fmt.Errorf("No prospectors defined. You must have at least one prospector defined in the config file.")
