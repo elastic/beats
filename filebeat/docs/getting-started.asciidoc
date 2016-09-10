@@ -9,7 +9,17 @@ To get started with your own Filebeat setup, install and configure these related
 
 See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information.
 
-After you have installed these products, you can start <<filebeat-installation>>.
+After installing the Elastic Stack, read the following topics to learn how to install, configure, and run Filebeat:
+
+* <<filebeat-installation>>
+* <<filebeat-configuration>>
+* <<config-filebeat-logstash>>
+* <<filebeat-template>>
+* <<filebeat-starting>>
+* <<filebeat-index-pattern>>
+* <<filebeat-command-line>>
+* <<directory-layout>>
+
 
 [[filebeat-installation]]
 === Step 1: Installing Filebeat
@@ -147,6 +157,7 @@ include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
+[[filebeat-starting]]
 === Step 5: Starting Filebeat
 
 Start Filebeat by issuing the appropriate command for your platform.
@@ -183,6 +194,7 @@ By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
 
 Filebeat is now ready to send log files to your defined output.
 
+[[filebeat-index-pattern]]
 === Step 6: Loading the Kibana Index Pattern
 
 We don't offer prebuilt dashboards for visualizing Filebeat data. However, to make it easier for you to explore Filebeat

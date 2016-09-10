@@ -34,6 +34,11 @@ system), it sends an event error to the specified output. This means that Metric
 always sends an event, even when there is a failure. This allows you to monitor
 for errors and see debug messages to help you diagnose what went wrong.
 
+The following topics provide more detail about the structure of Metricbeat events:
+
+* <<metricbeat-event-structure>>
+* <<error-event-structure>>
+
 For more about the benefits of using Metricbeat, see <<key-features>>.
 
 [[metricbeat-event-structure]]

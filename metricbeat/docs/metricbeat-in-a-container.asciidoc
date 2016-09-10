@@ -1,3 +1,4 @@
+[[running-in-container]]
 == Running Metricbeat in a Container
 
 Elastic does not provide any official container images for Metricbeat. The
@@ -9,6 +10,7 @@ containers. Let's walk-through some examples using Docker as our container
 orchestration tool.
 
 [float]
+[[monitoring-host]]
 === Monitoring the Host Machine
 
 This first example highlights the changes required to make the system module
@@ -46,6 +48,7 @@ flag. This is due to Linux namespacing, simply bind mounting the host's `/proc`
 to `/hostfs/proc` is not sufficient.
 
 [float]
+[[monitoring-service]]
 === Monitoring a Service in Another Container
 
 Next let's look at an example of monitoring a containerized service from a
@@ -80,3 +83,4 @@ metricbeat.modules:
 <1> The `mysql` hostname will resolve to the `some-mysql` container's address.
 <2> The `MYSQL_PASSWORD` variable will be evaluated at startup. If a variable
 is not set this will lead to an error at startup.
+
