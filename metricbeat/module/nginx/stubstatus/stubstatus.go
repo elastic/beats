@@ -37,8 +37,6 @@ type MetricSet struct {
 
 	client *http.Client // HTTP client that is reused across requests.
 	url    string       // Nginx stubstatus endpoint URL.
-
-	requests int
 }
 
 // New creates new instance of MetricSet
@@ -64,7 +62,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		url:           u.String(),
 		client:        &http.Client{Timeout: base.Module().Config().Timeout},
-		requests:      0,
 	}, nil
 }
 

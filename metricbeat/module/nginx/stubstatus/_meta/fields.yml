@@ -19,18 +19,10 @@
       type: long
       description: >
         The total number of handled client connections.
-    - name: dropped
-      type: long
-      description: >
-        The total number of dropped client connections.
     - name: requests
       type: long
       description: >
         The total number of client requests.
-    - name: current
-      type: long
-      description: >
-        The current number of client requests.
     - name: reading
       type: long
       description: >
