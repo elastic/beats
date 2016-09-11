@@ -28,7 +28,7 @@ func eventMapping(m *MetricSet, body io.ReadCloser, hostname string, metricset s
 	for name, tcpupstream := range tcpupstreams {
 		event := common.MapStr{
 			"hostname": hostname,
-			"name": name,
+			"name":     name,
 		}
 
 		for k, v := range tcpupstream.(map[string]interface{}) {

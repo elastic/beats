@@ -28,7 +28,7 @@ func eventMapping(m *MetricSet, body io.ReadCloser, hostname string, metricset s
 	for name, cache := range caches {
 		event := common.MapStr{
 			"hostname": hostname,
-			"name": name,
+			"name":     name,
 		}
 
 		for k, v := range cache.(map[string]interface{}) {
