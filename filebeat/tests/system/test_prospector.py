@@ -115,7 +115,8 @@ class Test(BaseTest):
         Test that Filebeat works when stdin is closed.
         """
         self.render_config_template(
-            input_type="stdin"
+            input_type="stdin",
+            close_eof="true",
         )
 
         args = [self.beat_path,
@@ -127,16 +128,22 @@ class Test(BaseTest):
                 ]
         proc = Proc(args, os.path.join(self.working_dir, "filebeat.log"))
         os.write(proc.stdin_write, "Hello World\n")
-        os.close(proc.stdin_write)
 
         proc.start()
         self.wait_until(lambda: self.output_has(lines=1))
+
+        # Continue writing after end was reached
+        os.write(proc.stdin_write, "Hello World2\n")
+        os.close(proc.stdin_write)
+
+        self.wait_until(lambda: self.output_has(lines=2))
 
         proc.proc.terminate()
         proc.proc.wait()
 
         objs = self.read_output()
         assert objs[0]["message"] == "Hello World"
+        assert objs[1]["message"] == "Hello World2"
 
     def test_rotating_close_inactive_larger_write_rate(self):
         self.render_config_template(
