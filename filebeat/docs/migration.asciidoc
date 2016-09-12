@@ -35,13 +35,13 @@ Beats input plugin on the same Logstash instances, but set up the Beats input pl
 all the machines to Filebeat, you can remove the Lumberjack plugin.
 
 We realize that opening additional ports may not be feasible in your organization. Another option for phased migration
-to Filebeat is to ship data from Logstash Forwarder directly to the Beats input plugin. 
+to Filebeat is to ship data from Logstash Forwarder directly to the Beats input plugin.
 
 IMPORTANT: This data shipping path is only supported for migrating to Filebeat and will no longer be supported when Logstash Forwarder reaches https://www.elastic.co/support/eol[End of Life].
 
 What's required?
 
-* The https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] 
+* The https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash]
 version 2.2.8 or later.
 * SSL must be explicitly enabled in the Beats input plugin (`ssl => true`) because SSL is on by default with Logstash Forwarder. The SSL/TLS configs should be the same for both the Logstash Forwarder and Filebeat instances.
 
@@ -125,11 +125,10 @@ The equivalent `prospectors` section would look like this:
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-# Each - is a prospector. Below are the prospector specific configurations
 - input_type: log
   paths:
     - /var/log/messages
-    - "/var/log/*.log"
+    - /var/log/*.log
   document_type: syslog <1>
   fields:
     service: apache
@@ -139,7 +138,7 @@ filebeat.prospectors:
   document_type: stdin
 - input_type: log
   paths:
-    - "/var/log/apache2/httpd-*.log"
+    - /var/log/apache2/httpd-*.log
   document_type: apache
 -------------------------------------------------------------------------------------
 
@@ -201,22 +200,12 @@ The equivalent in Filebeat would look like this:
 [source,yaml]
 -------------------------------------------------------------------------------------
 output.logstash:
-  # The Logstash hosts. <1>
-  hosts:
+  hosts: <1>
     - localhost:5043
-
-  # Network timeout in seconds.
   timeout: 15
-
-  # Optional SSL settings <2>
-  # List of root certificates for HTTPS server verifications
-  ssl.certificate_authorities:
+  ssl.certificate_authorities: <2>
     - ./logstash-forwarder.crt
-
-  # Certificate for SSL client authentication
   ssl.certificate: ./logstash-forwarder.crt
-
-  # Client Certificate Key
   ssl.key: ./logstash-forwarder.key
 -------------------------------------------------------------------------------------
 
@@ -287,7 +276,7 @@ Filebeat configuration:
 filebeat.prospectors:
 - input_type: log
   paths:
-    - "/var/log/*.log"
+    - /var/log/*.log
   document_type: syslog
   fields:
     service: test01
@@ -374,7 +363,7 @@ you can use the <<fields-under-root>> configuration option:
 filebeat.prospectors:
 - input_type: log
   paths:
-    - "/var/log/*.log"
+    - /var/log/*.log
   document_type: syslog
   fields:
     service: test01

@@ -205,6 +205,10 @@ packetbeat.protocols.http:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
+  # Maximum message size. If an HTTP message is larger than this, it will
+  # be trimmed to this size. Default is 10 MB.
+  #max_message_size: 10485760
+
 packetbeat.protocols.memcache:
   # Enable memcache monitoring. Default: true
   #enabled: true

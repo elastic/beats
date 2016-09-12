@@ -24,7 +24,7 @@ var (
 		MaxBackoff:      10 * time.Second,
 		CloseInactive:   5 * time.Minute,
 		MaxBytes:        10 * humanize.MiByte,
-		CloseRemoved:    false,
+		CloseRemoved:    true,
 		CloseRenamed:    false,
 		CloseEOF:        false,
 		CloseTimeout:    0,

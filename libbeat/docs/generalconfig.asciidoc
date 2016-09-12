@@ -20,16 +20,8 @@ Here is an example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-# The name of the shipper that publishes the network data. It can be used to group
-# all the transactions sent by a single shipper in the web interface.
-# If this options is not defined, the hostname is used.
-#name:
-
-# The tags of the shipper are included in their own field with each
-# transaction published. Tags make it easy to group servers by different
-# logical properties.
+name: "my-shipper"
 tags: ["service-X", "web-tier"]
-
 ------------------------------------------------------------------------------
 
 ==== General Options
@@ -144,12 +136,12 @@ that if finds. Then, for each transaction, the Beat exports the GeoIP location o
 The recommended values for geoip.paths are `/usr/share/GeoIP/GeoLiteCity.dat`
 and `/usr/local/var/GeoIP/GeoLiteCity.dat`.
 
+If no paths are configured, GeoIP is disabled.
+
 Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-# Configure local GeoIP database support.
-# If no paths are not configured geoip is disabled.
 geoip:
   paths:
     - "/usr/share/GeoIP/GeoLiteCity.dat"

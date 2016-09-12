@@ -143,6 +143,10 @@ filebeat.prospectors:
   # this can mean that the first entries of a new file are skipped.
   #tail_files: false
 
+  # Experimental: If symlinks is enabled, symlinks are opened and harvested. The harvester is openening the
+  # original for harvesting but will report the symlink name as source.
+  #symlinks: false
+
   # Backoff values define how aggressively filebeat crawls new files for updates
   # The default values can be used in most cases. Backoff defines how long it is waited
   # to check a file again after EOF is reached. Default is 1s which means the file
@@ -179,8 +183,7 @@ filebeat.prospectors:
   # When enabling this option, a file handler is closed immediately in case a file can't be found
   # any more. In case the file shows up again later, harvesting will continue at the last known position
   # after scan_frequency.
-  # Note: Potential data loss. Make sure to read and understand the docs for this option.
-  #close_removed: false
+  #close_removed: true
 
   # Closes the file handler as soon as the harvesters reaches the end of the file.
   # By default this option is disabled.
@@ -194,7 +197,7 @@ filebeat.prospectors:
   #clean_inactive: 0
 
   # Removes the state for file which cannot be found on disk anymore immediately
-  #clean_removed: false
+  #clean_removed: true
 
   # Close timeout closes the harvester after the predefined time.
   # This is independent if the harvester did finish reading the file or not.
@@ -227,3 +230,7 @@ filebeat.prospectors:
 # the prospector part is processed. All global options like spool_size are ignored.
 # The config_dir MUST point to a different directory then where the main filebeat config file is in.
 #filebeat.config_dir:
+
+# How long filebeat waits on shutdown for the publisher to finish.
+# Default is 0, not waiting.
+#filebeat.shutdown_timeout: 0

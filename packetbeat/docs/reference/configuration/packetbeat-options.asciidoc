@@ -5,17 +5,9 @@ The `interfaces` section of the +{beatname_lc}.yml+ config file configures the s
 
 [source,yaml]
 ------------------------------------------------------------------------------
-# Select the network interfaces to sniff the data. You can use the "any"
-# keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: any
-
-# The maximum capture size of a single packet.
 packetbeat.interfaces.snaplen: 1514
-
-# The type of the sniffer to use
 packetbeat.interfaces.type: af_packet
-
-# The size of the sniffing buffer
 packetbeat.interfaces.buffer_size_mb: 100
 ------------------------------------------------------------------------------
 
@@ -347,15 +339,7 @@ The `dns` section of the +{beatname_lc}.yml+ config file specifies configuration
 ------------------------------------------------------------------------------
 packetbeat.protocols.dns:
   ports: [53]
-
-  # include_authorities controls whether or not the dns.authorities field
-  # (authority resource records) is added to messages.
-  # Default: false
   include_authorities: true
-
-  # include_additionals controls whether or not the dns.additionals field
-  # (additional resource records) is added to messages.
-  # Default: false
   include_additionals: true
 ------------------------------------------------------------------------------
 
@@ -377,27 +361,10 @@ sample configuration for the `http` section of the +{beatname_lc}.yml+ config fi
 [source,yaml]
 ------------------------------------------------------------------------------
 packetbeat.protocols.http:
-
-  # Configure the ports where to listen for HTTP traffic. You can disable
-  # the http protocol by commenting the list of ports.
   ports: [80, 8080, 8000, 5000, 8002]
-
-  # Uncomment the following to hide certain parameters in URL or forms attached
-  # to HTTP requests. The names of the parameters are case insensitive.
-  # The value of the parameters will be replaced with the 'xxxxx' string.
-  # This is generally useful for avoiding storing user passwords or other
-  # sensitive information.
   hide_keywords: ["pass", "password", "passwd"]
-
-  # A list of header names to capture and send to Elasticsearch. These headers
-  # are placed under the `headers` dictionary in the resulting JSON.
   send_headers: ["User-Agent", "Cookie", "Set-Cookie"]
-
-  # If the Cookie or Set-Cookie headers are sent, this option controls whether
-  # they are split into individual values.
   split_coookie: true
-
-  # Configure the HTTP header that contains the real IP address.
   real_ip_header: "X-Forwarded-For"
 ------------------------------------------------------------------------------
 
@@ -500,6 +467,12 @@ you want to capture traffic behind a reverse proxy, but you want to get the geo-
 information. If this header is present and contains a valid IP addresses, the
 information is used for the `real_ip` and `client_location` indexed
 fields.
+
+===== max_message_size
+
+If an individual HTTP message is larger than this setting (in bytes), it will be trimmed
+to this size. Unless this value is very small (<1.5K), Packetbeat is able to still correctly
+follow the transaction and create an event for it. The default is 10485760 (10 MB).
 
 
 ==== AMQP Configuration Options

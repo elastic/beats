@@ -44,6 +44,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             rotate_every_kb=(total_lines * (line_length +1)),    # With filepath, each line can be up to 1KB is assumed
+            clean_removed="false",
         )
 
         # Start filebeat

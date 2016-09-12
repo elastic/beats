@@ -21,13 +21,8 @@ is used on Windows systems, and syslog output is used on Linux and OS X.
 [source,yaml]
 ------------------------------------------------------------------------------
 logging.level: warning
-
-# enable file rotation with default configuration
 logging.to_files: true
-
-# do not log to syslog
 logging.to_syslog: false
-
 logging.files:
   path: /var/log/mybeat
   name: mybeat.log
