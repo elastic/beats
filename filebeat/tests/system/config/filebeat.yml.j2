@@ -71,6 +71,7 @@ filebeat.prospectors:
 {% endif %}
 
 filebeat.spool_size:
+filebeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
 filebeat.idle_timeout: 0.1s
 {% if not skip_registry_config %}
 filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
@@ -132,11 +133,16 @@ processors:
 # Multiple outputs may be used.
 
 #------------------------------- File output ----------------------------------
+{%- if logstash %}
+output.logstash:
+  hosts: ["{{ logstash.host }}"]
+{%- else %}
 output.file:
   path: {{ output_file_path|default(beat.working_dir + "/output") }}
   filename: "{{ output_file_filename|default("filebeat") }}"
   rotate_every_kb: {{ rotate_every_kb | default(1000) }}
   #number_of_files: 7
+{%- endif %}
 
 {% if path_data %}
 #================================ Paths =====================================
