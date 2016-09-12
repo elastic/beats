@@ -19,7 +19,7 @@ type collectLogger struct {
 	events [][]*input.Event
 }
 
-func (l *collectLogger) Published(events []*input.Event) bool {
+func (l *collectLogger) Log(events []*input.Event) bool {
 	l.wg.Done()
 	l.events = append(l.events, events)
 	return true

@@ -10,37 +10,35 @@ import (
 )
 
 var (
-	eventsSent = expvar.NewInt("publish.events")
+	eventsSent       = expvar.NewInt("publish.events")
+	sigPublisherStop = errors.New("publisher was stopped")
 )
 
-// LogPublisher provides functionality to start and stop a publisher worker.
-type LogPublisher interface {
+// Publisher provides functionality to start and stop a publisher worker.
+type Publisher interface {
 	Start()
 	Stop()
 }
 
-// SuccessLogger is used to report successfully published events.
-type SuccessLogger interface {
-
+// Logger is used to log successfully published events.
+// This can be used for example to log events to the registry
+type Logger interface {
 	// Published will be run after events have been acknowledged by the outputs.
-	Published(events []*input.Event) bool
+	Log(events []*input.Event) bool
 }
 
+// New creates new sync Publisher. If async is set to true, an async publisher is returned.
 func New(
 	async bool,
 	in chan []*input.Event,
-	out SuccessLogger,
+	logger Logger,
 	pub publisher.Publisher,
-) LogPublisher {
+) Publisher {
 	if async {
-		return newAsyncLogPublisher(in, out, pub)
+		return newAsyncPublisher(in, logger, pub)
 	}
-	return newSyncLogPublisher(in, out, pub)
+	return newSyncPublisher(in, logger, pub)
 }
-
-var (
-	sigPublisherStop = errors.New("publisher was stopped")
-)
 
 // getDataEvents returns all events which contain data (not only state updates)
 func getDataEvents(events []*input.Event) []common.MapStr {

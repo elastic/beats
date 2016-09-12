@@ -19,12 +19,12 @@ type Spooler struct {
 	Channel chan *input.Event // Channel is the input to the Spooler.
 	config  spoolerConfig
 	exit    chan struct{}  // Channel used to signal shutdown.
-	output  Output         // batch event output on flush
+	output  Outputer       // batch event output on flush
 	spool   []*input.Event // Events being held by the Spooler.
 	wg      sync.WaitGroup // WaitGroup used to control the shutdown.
 }
 
-type Output interface {
+type Outputer interface {
 	Send(events []*input.Event) bool
 }
 
@@ -37,7 +37,7 @@ type spoolerConfig struct {
 // started by calling Start before it can be used.
 func New(
 	config *cfg.Config,
-	out Output,
+	out Outputer,
 ) (*Spooler, error) {
 	return &Spooler{
 		Channel: make(chan *input.Event, channelSize),

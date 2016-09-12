@@ -10,11 +10,11 @@ import (
 	"github.com/elastic/beats/libbeat/publisher"
 )
 
-type asyncLogPublisher struct {
+type asyncPublisher struct {
 	pub    publisher.Publisher
 	client publisher.Client
 	in     chan []*input.Event
-	out    SuccessLogger
+	logger Logger
 
 	// list of in-flight batches
 	active   batchList
@@ -49,20 +49,20 @@ const (
 	batchCanceled
 )
 
-func newAsyncLogPublisher(
+func newAsyncPublisher(
 	in chan []*input.Event,
-	out SuccessLogger,
+	logger Logger,
 	pub publisher.Publisher,
-) *asyncLogPublisher {
-	return &asyncLogPublisher{
-		in:   in,
-		out:  out,
-		pub:  pub,
-		done: make(chan struct{}),
+) *asyncPublisher {
+	return &asyncPublisher{
+		in:     in,
+		logger: logger,
+		pub:    pub,
+		done:   make(chan struct{}),
 	}
 }
 
-func (p *asyncLogPublisher) Start() {
+func (p *asyncPublisher) Start() {
 	p.client = p.pub.Connect()
 
 	p.wg.Add(1)
@@ -97,7 +97,7 @@ func (p *asyncLogPublisher) Start() {
 	}()
 }
 
-func (p *asyncLogPublisher) Stop() {
+func (p *asyncPublisher) Stop() {
 	p.client.Close()
 	close(p.done)
 	p.wg.Wait()
@@ -106,7 +106,7 @@ func (p *asyncLogPublisher) Stop() {
 // collect collects finished bulk-Events in order and forward processed batches
 // to registrar. Reports to registrar are guaranteed to be in same order
 // as bulk-Events have been received by the spooler
-func (p *asyncLogPublisher) collect() bool {
+func (p *asyncPublisher) collect() bool {
 	for batch := p.active.head; batch != nil; batch = batch.next {
 		state := batchStatus(atomic.LoadInt32(&batch.flag))
 		if state == batchInProgress && !p.stopping {
@@ -145,7 +145,7 @@ func (p *asyncLogPublisher) collect() bool {
 		// registrar picking up the current batch. Instead prefer to shut-down and
 		// resend the last published batch on next restart, basically taking advantage
 		// of send-at-last-once semantics in order to speed up cleanup on shutdown.
-		ok := p.out.Published(batch.events)
+		ok := p.logger.Log(batch.events)
 		if !ok {
 			logp.Info("Shutting down - No registrar update for successfully published batch.")
 			return false
