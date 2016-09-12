@@ -180,6 +180,428 @@
             }
           }
         },
+        "haproxy": {
+          "properties": {
+            "info": {
+              "properties": {
+                "compress": {
+                  "properties": {
+                    "bps": {
+                      "properties": {
+                        "in": {
+                          "type": "long"
+                        },
+                        "out": {
+                          "type": "long"
+                        },
+                        "rate_limit": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "conn": {
+                  "properties": {
+                    "rate": {
+                      "properties": {
+                        "limit": {
+                          "type": "long"
+                        },
+                        "value": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "cum": {
+                  "properties": {
+                    "conns": {
+                      "type": "long"
+                    },
+                    "req": {
+                      "type": "long"
+                    },
+                    "ssl_conns": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "curr": {
+                  "properties": {
+                    "conns": {
+                      "type": "long"
+                    },
+                    "ssl_conns": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "idle_pct": {
+                  "type": "float"
+                },
+                "max": {
+                  "properties": {
+                    "conn": {
+                      "type": "long"
+                    },
+                    "conn_rate": {
+                      "type": "long"
+                    },
+                    "hard_conn": {
+                      "type": "long"
+                    },
+                    "pipes": {
+                      "type": "long"
+                    },
+                    "sess_rate": {
+                      "type": "long"
+                    },
+                    "sock": {
+                      "type": "long"
+                    },
+                    "ssl_conns": {
+                      "type": "long"
+                    },
+                    "ssl_rate": {
+                      "type": "long"
+                    },
+                    "zlib_mem_usage": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "mem_max_bytes": {
+                  "type": "long"
+                },
+                "nb_proc": {
+                  "type": "long"
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "pipes": {
+                  "properties": {
+                    "free": {
+                      "type": "long"
+                    },
+                    "used": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "process_num": {
+                  "type": "long"
+                },
+                "run_queue": {
+                  "type": "long"
+                },
+                "sess": {
+                  "properties": {
+                    "rate": {
+                      "properties": {
+                        "limit": {
+                          "type": "long"
+                        },
+                        "value": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "ssl": {
+                  "properties": {
+                    "backend": {
+                      "properties": {
+                        "key_rate": {
+                          "type": "long"
+                        },
+                        "max_key_rate": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "frontend": {
+                      "properties": {
+                        "key_rate": {
+                          "type": "long"
+                        },
+                        "max_key_rate": {
+                          "type": "long"
+                        },
+                        "session_reuse_pct": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "rate": {
+                      "properties": {
+                        "limit": {
+                          "type": "long"
+                        },
+                        "value": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "ssl_cache_misses": {
+                      "type": "long"
+                    },
+                    "ssl_cached_lookups": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "tasks": {
+                  "type": "long"
+                },
+                "ulimit_n": {
+                  "type": "long"
+                },
+                "uptime_sec": {
+                  "type": "long"
+                },
+                "zlib_mem_usage": {
+                  "type": "long"
+                }
+              }
+            },
+            "stat": {
+              "properties": {
+                "act": {
+                  "type": "long"
+                },
+                "bck": {
+                  "type": "long"
+                },
+                "bin": {
+                  "type": "long"
+                },
+                "bout": {
+                  "type": "long"
+                },
+                "check": {
+                  "properties": {
+                    "code": {
+                      "type": "long"
+                    },
+                    "duration": {
+                      "type": "long"
+                    },
+                    "status": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "chkdown": {
+                  "type": "long"
+                },
+                "chkfail": {
+                  "type": "long"
+                },
+                "cli_abrt": {
+                  "type": "long"
+                },
+                "comp": {
+                  "properties": {
+                    "byp": {
+                      "type": "long"
+                    },
+                    "in": {
+                      "type": "long"
+                    },
+                    "out": {
+                      "type": "long"
+                    },
+                    "rsp": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "component_type": {
+                  "type": "long"
+                },
+                "ctime": {
+                  "type": "long"
+                },
+                "downtime": {
+                  "type": "long"
+                },
+                "dreq": {
+                  "type": "long"
+                },
+                "dresp": {
+                  "type": "long"
+                },
+                "econ": {
+                  "type": "long"
+                },
+                "ereq": {
+                  "type": "long"
+                },
+                "eresp": {
+                  "type": "long"
+                },
+                "hanafail": {
+                  "type": "long"
+                },
+                "hrsp": {
+                  "properties": {
+                    "1xx": {
+                      "type": "long"
+                    },
+                    "2xx": {
+                      "type": "long"
+                    },
+                    "3xx": {
+                      "type": "long"
+                    },
+                    "4xx": {
+                      "type": "long"
+                    },
+                    "5xx": {
+                      "type": "long"
+                    },
+                    "other": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "iid": {
+                  "type": "long"
+                },
+                "last": {
+                  "properties": {
+                    "agt": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "chk": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "sess": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "lastchg": {
+                  "type": "long"
+                },
+                "lbtot": {
+                  "type": "long"
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "pxname": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "qcur": {
+                  "type": "long"
+                },
+                "qlimit": {
+                  "type": "long"
+                },
+                "qmax": {
+                  "type": "long"
+                },
+                "qtime": {
+                  "type": "long"
+                },
+                "rate": {
+                  "properties": {
+                    "lim": {
+                      "type": "long"
+                    },
+                    "max": {
+                      "type": "long"
+                    },
+                    "value": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "req": {
+                  "properties": {
+                    "rate": {
+                      "properties": {
+                        "max": {
+                          "type": "long"
+                        },
+                        "value": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "tot": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "rtime": {
+                  "type": "long"
+                },
+                "scur": {
+                  "type": "long"
+                },
+                "sid": {
+                  "type": "long"
+                },
+                "slim": {
+                  "type": "long"
+                },
+                "smax": {
+                  "type": "long"
+                },
+                "srv_abrt": {
+                  "type": "long"
+                },
+                "status": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "stot": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "svname": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "throttle": {
+                  "type": "long"
+                },
+                "tracked": {
+                  "type": "long"
+                },
+                "ttime": {
+                  "type": "long"
+                },
+                "weight": {
+                  "type": "long"
+                },
+                "wredis": {
+                  "type": "long"
+                },
+                "wretr": {
+                  "type": "long"
+                }
+              }
+            }
+          }
+        },
         "metricset": {
           "properties": {
             "host": {
@@ -589,6 +1011,22 @@
                 },
                 "opened_tables": {
                   "type": "long"
+                },
+                "threads": {
+                  "properties": {
+                    "cached": {
+                      "type": "long"
+                    },
+                    "connected": {
+                      "type": "long"
+                    },
+                    "created": {
+                      "type": "long"
+                    },
+                    "running": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             }
