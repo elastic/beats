@@ -14,7 +14,7 @@ var (
 		ScanFrequency:  10 * time.Second,
 		InputType:      cfg.DefaultInputType,
 		CleanInactive:  0,
-		CleanRemoved:   false,
+		CleanRemoved:   true,
 		HarvesterLimit: 0,
 		Symlinks:       false,
 	}

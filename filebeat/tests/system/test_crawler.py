@@ -214,7 +214,8 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            clean_removed="false",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -273,7 +274,8 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*.log",
             close_removed="true",
-            scan_frequency="0.1s"
+            scan_frequency="0.1s",
+            clean_removed="false",
         )
         os.mkdir(self.working_dir + "/log/")
 

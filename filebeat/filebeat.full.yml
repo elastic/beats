@@ -183,8 +183,7 @@ filebeat.prospectors:
   # When enabling this option, a file handler is closed immediately in case a file can't be found
   # any more. In case the file shows up again later, harvesting will continue at the last known position
   # after scan_frequency.
-  # Note: Potential data loss. Make sure to read and understand the docs for this option.
-  #close_removed: false
+  #close_removed: true
 
   # Closes the file handler as soon as the harvesters reaches the end of the file.
   # By default this option is disabled.
@@ -198,7 +197,7 @@ filebeat.prospectors:
   #clean_inactive: 0
 
   # Removes the state for file which cannot be found on disk anymore immediately
-  #clean_removed: false
+  #clean_removed: true
 
   # Close timeout closes the harvester after the predefined time.
   # This is independent if the harvester did finish reading the file or not.
