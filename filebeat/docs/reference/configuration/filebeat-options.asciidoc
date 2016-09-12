@@ -11,22 +11,15 @@ Here is a sample configuration:
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-# Each - is a prospector. Below are the prospector specific configurations
 - input_type: log
-  # Paths that should be crawled and fetched. Glob based paths.
-  # For each file found under this path, a harvester is started.
   paths:
-    - "/var/log/apache/httpd-*.log"
-  # Type to be published in the 'type' field. For Elasticsearch output,
-  # the type defines the document type these entries should be stored
-  # in. Default: log
+    - /var/log/apache/httpd-*.log
   document_type: apache
 
 - input_type: log
   paths:
     - /var/log/messages
-    - "/var/log/*.log"
-
+    - /var/log/*.log
 -------------------------------------------------------------------------------------
 
 ==== Options
@@ -433,14 +426,14 @@ lines. The `backoff` value will be multiplied each time with the `backoff_factor
 
 ===== harvester_limit
 
-EXPERIMENTAL
+experimental[]
 
-harvester_limit limits the number of harvesters that are started in parallel for one prospector. This directly relates
+`harvester_limit` limits the number of harvesters that are started in parallel for one prospector. This directly relates
 to the maximum number of file handlers that are opened. The default is 0 which means there is no limit. This configuration
 is useful if the number of files to be harvested exceeds the open file handler limit of the operating system.
 
 As setting a limit on harvester means that potentially not all files are opened in parallel, it is recommended to use
-this option in combination with the close_* options to make sure harvesters are stopped more often so new files can be
+this option in combination with the `close_*` options to make sure harvesters are stopped more often so new files can be
 picked up.
 
 Currently if a new harvester can be started again, the new harvester to be started is picked randomly. This means it can
