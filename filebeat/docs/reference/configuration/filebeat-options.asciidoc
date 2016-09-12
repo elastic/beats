@@ -11,22 +11,15 @@ Here is a sample configuration:
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-# Each - is a prospector. Below are the prospector specific configurations
 - input_type: log
-  # Paths that should be crawled and fetched. Glob based paths.
-  # For each file found under this path, a harvester is started.
   paths:
-    - "/var/log/apache/httpd-*.log"
-  # Type to be published in the 'type' field. For Elasticsearch output,
-  # the type defines the document type these entries should be stored
-  # in. Default: log
+    - /var/log/apache/httpd-*.log
   document_type: apache
 
 - input_type: log
   paths:
     - /var/log/messages
-    - "/var/log/*.log"
-
+    - /var/log/*.log
 -------------------------------------------------------------------------------------
 
 ==== Options
@@ -219,10 +212,7 @@ WINDOWS: In case under windows your log rotation system shows errors because it 
 
 ===== close_removed
 
-WARNING: Only use this options if you understand that data loss is a potential side effect.
-
-Close removed can be used to close a harvester directly when a file is removed. Normally a file should only be removed after it already falls under `close_inactive`. In case files are removed early, without this option Filebeat keeps the file open to make sure finishing is completed. In case the file handle should be released immediately after removal, this option can be used.
-
+Close removed is used to close a harvester directly when a file is removed. Normally a file should only be removed after it already falls under `close_inactive`. In case files are removed early, without this option Filebeat keeps the file open to make sure finishing is completed. In case some files are not completely read because they were removed too early from disk, disable this option.
 
 WINDOWS: In case under windows your log rotation system shows error because it can't rotated the files, this is the option to enabled.
 
@@ -263,10 +253,12 @@ NOTE: Every time a file is renamed, the file state will be updated and the count
 
 ===== clean_removed
 
-WARNING: Only use this options if you understand that data loss is a potential side effect.
+Cleans files from the registry which cannot be found on disk anymore. This does not apply to renamed files or files which were moved to an other directory which is still visible by Filebeat.
 
 
-Cleans files which cannot be found on disk anymore. This does not apply to renamed files or files which were moved to an other directory which is still visible by Filebeat. Be aware that this option will remove the state for removed files immediately. In case a shared drive disappeared for a short period and appears again, all files will be read again from the beginning. This option can only be used in combination `close_removed`.
+In case a shared drive disappears for a short period and appears again, all files will be read again from the beginning as the states were removed. In such cases it is recommended to turn off this option.
+
+This option should only be used in combination `close_removed`.
 
 
 [[scan-frequency]]
@@ -391,6 +383,18 @@ This option applies to files that Filebeat has not already processed. If you ran
 
 NOTE: You can use this setting to avoid indexing old log lines when you run Filebeat on a set of log files for the first time. After the first run, we recommend disabling this option, or you risk losing lines during file rotation.
 
+===== symlinks
+
+experimental[]
+
+The symlinks options allows to also harvest symlinks in addition to regular files. In case of symlinks, the file that is opened and read in the end is the original file even though the path of the symlink is reported.
+
+It must be made sure, that if a symlink is defined for harvesting, the original is excluded. In case the symlink and original file are harvested by the same prospector, this will be detected and only one of the two files will be harvested which is the first one found by filebeat. In case the symlink and original are defined in two different prospectors, it can happen that both will be harvested at the same time, send duplicated data and will overwrite each other state.
+
+This option can be useful if symlinks to the log files have additional meta data in the file name which can be processed in Logstash. This is for example the case for kubernetes log files.
+
+As this option may lead to data loss, it is disabled by default.
+
 ===== backoff
 
 The backoff options specify how aggressively Filebeat crawls new files for updates.
@@ -422,14 +426,14 @@ lines. The `backoff` value will be multiplied each time with the `backoff_factor
 
 ===== harvester_limit
 
-EXPERIMENTAL
+experimental[]
 
-harvester_limit limits the number of harvesters that are started in parallel for one prospector. This directly relates
+`harvester_limit` limits the number of harvesters that are started in parallel for one prospector. This directly relates
 to the maximum number of file handlers that are opened. The default is 0 which means there is no limit. This configuration
 is useful if the number of files to be harvested exceeds the open file handler limit of the operating system.
 
 As setting a limit on harvester means that potentially not all files are opened in parallel, it is recommended to use
-this option in combination with the close_* options to make sure harvesters are stopped more often so new files can be
+this option in combination with the `close_*` options to make sure harvesters are stopped more often so new files can be
 picked up.
 
 Currently if a new harvester can be started again, the new harvester to be started is picked randomly. This means it can

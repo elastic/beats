@@ -21,33 +21,14 @@ Example configuration:
 ------------------------------------------------------------------------------
 
 output.elasticsearch:
-  # The Elasticsearch cluster
   hosts: ["http://localhost:9200"]
-
-  # Load the Elasticsearch template.
   template.enabled: true
-
-  # Path to template file
   template.path: "{beatname_lc}.template.json"
-
-  # Overwrite existing template
   template.overwrite: false
-
-  # Optional index name. The default is "{beatname_lc}" and generates
-  # [{beatname_lc}-]YYYY.MM.DD keys.
   index: "{beatname_lc}"
-
-  # Optional SSL configuration options. SSL is off by default.
-
-  # List of root certificates for HTTPS server verifications
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-  # Certificate for SSL client authentication
   ssl.certificate: "/etc/pki/client/cert.pem"
-
-  # Client Certificate Key
   ssl.key: "/etc/pki/client/cert.key"
-
 ------------------------------------------------------------------------------
 
 To enable SSL, just add `https` to all URLs defined under __hosts__.
@@ -56,28 +37,18 @@ To enable SSL, just add `https` to all URLs defined under __hosts__.
 ------------------------------------------------------------------------------
 
 output.elasticsearch:
-  # Array of hosts to connect to.
   hosts: ["https://localhost:9200"]
-
-  # HTTP basic auth
   username: "admin"
   password: "s3cr3t"
-
 ------------------------------------------------------------------------------
 
 If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` to the yaml file.
 
 [source,yaml]
 ------------------------------------------------------------------------------
-
 output.elasticsearch:
-  # The Elasticsearch cluster
   hosts: ["localhost"]
-
-  # Optional http or https. Default is http
   protocol: "https"
-
-  # HTTP basic auth
   username: "admin"
   password: "s3cr3t"
 
@@ -110,13 +81,8 @@ NOTE: When a node is defined as an `IP:PORT`, the _scheme_ and _path_ are taken 
 [source,yaml]
 ------------------------------------------------------------------------------
 output.elasticsearch:
-  # The Elasticsearch cluster
   hosts: ["10.45.3.2:9220", "10.45.3.1:9230"]
-
-  # Optional http or https. Default is http
   protocol: https
-
-  # HTTP Path at which each Elasticsearch server lives
   path: /elasticsearch
 ------------------------------------------------------------------------------
 
@@ -372,11 +338,6 @@ Here is an example of how to configure the Beat to use Logstash:
 ------------------------------------------------------------------------------
 output.logstash:
   hosts: ["localhost:5044"]
-
-  # index configures '@metadata.beat' field to be used by Logstash for
-  # indexing. The default index name depends on the each beat.
-  # For Packetbeat, the default is set to packetbeat, for Metricbeat to
-  # metricbeat and for Filebeat to filebeat.
   index: {beatname_lc}
 ------------------------------------------------------------------------------
 
@@ -424,11 +385,7 @@ will switch to another host if the selected one becomes unresponsive. The defaul
 ------------------------------------------------------------------------------
 output.logstash:
   hosts: ["localhost:5044", "localhost:5045"]
-
-  # configure logstash plugin to loadbalance events between the logstash instances
   loadbalance: true
-
-  # configure index prefix name
   index: {beatname_lc}
 ------------------------------------------------------------------------------
 
@@ -647,22 +604,10 @@ Example configuration:
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 output.redis:
-  # Set the host and port where to find Redis.
   hosts: ["localhost"]
-
-  # Optional password to authenticate with. By default, no
-  # password is set.
   password: "my_password"
-
-  # Optional key name. The default is {beatname_lc}
   key: "{beatname_lc}"
-
-  # Optional Redis database number where the events are stored
-  # The default is 0.
   db: 0
-
-  # Optional Redis initial connection timeout in seconds.
-  # The default is 5 seconds.
   timeout: 5
 ------------------------------------------------------------------------------
 
@@ -813,20 +758,9 @@ Logstash.
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 output.file:
-  # Path to the directory where to save the generated files. The option is mandatory.
   path: "/tmp/{beatname_lc}"
-
-  # Name of the generated files. The default is `beatname` and it generates
-  # files: `beatname`, `beatname.1`, `beatname.2`, etc.
   filename: {beatname_lc}
-
-  # Maximum size in kilobytes of each file. When this size is reached, the files are
-  # rotated. The default value is 10240 kB.
   #rotate_every_kb: 10000
-
-  # Maximum number of files under path. When this number of files is reached, the
-  # oldest file is deleted and the rest are shifted from last to first. The default
-  # is 7 files.
   #number_of_files: 7
 ------------------------------------------------------------------------------
 
@@ -910,14 +844,8 @@ Example configuration:
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["192.168.1.42:9200"]
-
-  # List of root certificates for HTTPS server verifications
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-  # Certificate for SSL client authentication
   ssl.certificate: "/etc/pki/client/cert.pem"
-
-  # Client Certificate Key
   ssl.key: "/etc/pki/client/cert.key"
 ------------------------------------------------------------------------------
 

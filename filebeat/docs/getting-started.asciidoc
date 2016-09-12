@@ -23,6 +23,7 @@ mac>> for OS X, and <<win, win>> for Windows).
 If you use Apt or Yum, you can {libbeat}/setup-repositories.html[install Filebeat from our repositories] to update to the newest version more easily.
 
 See our https://www.elastic.co/downloads/beats/filebeat[download page] for other installation options, such as 32-bit images.
+
 ==================================================
 
 [[deb]]
@@ -91,17 +92,10 @@ default values for most configuration options.
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-# Each - is a prospector. Most options can be set at the prospector level, so
-# you can use different prospectors for various configurations.
-# Below are the prospector specific configurations.
-
 - input_type: log
-
-  # Paths that should be crawled and fetched. Glob based paths.
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
-
 -------------------------------------------------------------------------------------
 
 To configure Filebeat:
@@ -115,7 +109,7 @@ For the most basic Filebeat configuration, you can define a single prospector wi
 filebeat.prospectors:
 - input_type: log
   paths:
-    - "/var/log/*.log"
+    - /var/log/*.log
 -------------------------------------------------------------------------------------
 +
 The prospector in this example harvests all files in the path `/var/log/*.log`, which means
@@ -131,11 +125,7 @@ fetch all files in all subdirectories of a directory.
 +
 [source,yaml]
 ----------------------------------------------------------------------
-# Configure what outputs to use when sending the data collected by the beat.
-# Multiple outputs may be used.
-
 output.elasticsearch:
-  # Array of hosts to connect to.
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
@@ -197,12 +187,12 @@ Filebeat is now ready to send log files to your defined output.
 
 We don't offer prebuilt dashboards for visualizing Filebeat data. However, to make it easier for you to explore Filebeat
 data in Kibana, we've created a Filebeat index pattern: `filebeat-*`. To load this pattern, you can use the script
-that's provided for loading dashboards. 
+that's provided for loading dashboards.
 
 For more information about running the script, see
 {libbeat}/load-kibana-dashboards.html[Loading the Beats Dashboards].
 
 After you've created the index pattern, you can select the `filebeat-*` index pattern in Kibana to explore
-Filebeat data. 
+Filebeat data.
 
 image:./images/filebeat-discover-tab.png[]

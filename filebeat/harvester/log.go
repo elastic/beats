@@ -10,6 +10,8 @@ import (
 
 	"golang.org/x/text/transform"
 
+	"fmt"
+
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/harvester/source"
@@ -163,8 +165,7 @@ func (h *Harvester) openFile() error {
 
 	f, err := file.ReadOpen(h.state.Source)
 	if err != nil {
-		logp.Err("Failed opening %s: %s", h.state.Source, err)
-		return err
+		return fmt.Errorf("Failed opening %s: %s", h.state.Source, err)
 	}
 
 	harvesterOpenFiles.Add(1)
@@ -182,16 +183,16 @@ func (h *Harvester) openFile() error {
 }
 
 func (h *Harvester) validateFile(f *os.File) error {
-	// Check we are not following a rabbit hole (symlinks, etc.)
-	if !file.IsRegular(f) {
-		return errors.New("Given file is not a regular file.")
-	}
 
 	info, err := f.Stat()
 	if err != nil {
-		logp.Err("Failed getting stats for file %s: %s", h.state.Source, err)
-		return err
+		return fmt.Errorf("Failed getting stats for file %s: %s", h.state.Source, err)
 	}
+
+	if !info.Mode().IsRegular() {
+		return fmt.Errorf("Tried to open non regular file: %q %s", info.Mode(), info.Name())
+	}
+
 	// Compares the stat of the opened file to the state given by the prospector. Abort if not match.
 	if !os.SameFile(h.state.Fileinfo, info) {
 		return errors.New("File info is not identical with opened file. Aborting harvesting and retrying file later again.")

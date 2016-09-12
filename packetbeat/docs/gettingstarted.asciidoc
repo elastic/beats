@@ -104,8 +104,6 @@ server on which Packetbeat is installed. For this, use `any` as the device:
 +
 [source,yaml]
 ----------------------------------------------------------------------
-# Select the network interface to sniff the data. You can use the "any"
-# keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: any
 ----------------------------------------------------------------------
 
@@ -176,12 +174,8 @@ installation:
 +
 [source,yaml]
 ----------------------------------------------------------------------
-# Configure what outputs to use when sending the data collected by the beat.
-# Multiple outputs may be used.
-
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
-  # Array of hosts to connect to.
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +

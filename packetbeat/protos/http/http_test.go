@@ -45,7 +45,7 @@ func (tp *testParser) parse() (*message, bool, bool) {
 	}
 
 	parser := newParser(&tp.http.parserConfig)
-	ok, complete := parser.parse(st)
+	ok, complete := parser.parse(st, 0)
 	return st.message, ok, complete
 }
 
@@ -63,9 +63,9 @@ func testParse(http *HTTP, data string) (*message, bool, bool) {
 	return tp.parse()
 }
 
-func testParseStream(http *HTTP, st *stream) (bool, bool) {
+func testParseStream(http *HTTP, st *stream, extraLen int) (bool, bool) {
 	parser := newParser(&http.parserConfig)
-	return parser.parse(st)
+	return parser.parse(st, extraLen)
 }
 
 func TestHttpParser_simpleResponse(t *testing.T) {
@@ -165,8 +165,80 @@ func TestHttpParser_Request_ContentLength_0(t *testing.T) {
 	assert.True(t, complete)
 }
 
+func TestHttpParser_eatBody(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
+	}
+
+	http := httpModForTests()
+	http.parserConfig.SendHeaders = true
+	http.parserConfig.SendAllHeaders = true
+
+	data := []byte("POST / HTTP/1.1\r\n" +
+		"user-agent: curl/7.35.0\r\n" +
+		"host: localhost:9000\r\n" +
+		"accept: */*\r\n" +
+		"authorization: Company 1\r\n" +
+		"content-length: 20\r\n" +
+		"connection: close\r\n" +
+		"\r\n" +
+		"0123456789")
+
+	st := &stream{data: data, message: new(message)}
+	ok, complete := testParseStream(http, st, 0)
+	assert.True(t, ok)
+	assert.False(t, complete)
+	assert.Equal(t, st.bodyReceived, 10)
+
+	ok, complete = testParseStream(http, st, 5)
+	assert.True(t, ok)
+	assert.False(t, complete)
+	assert.Equal(t, st.bodyReceived, 15)
+
+	ok, complete = testParseStream(http, st, 5)
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.Equal(t, st.bodyReceived, 20)
+	assert.Equal(t, st.message.end, len(data))
+}
+
+func TestHttpParser_eatBody_connclose(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
+	}
+
+	http := httpModForTests()
+	http.parserConfig.SendHeaders = true
+	http.parserConfig.SendAllHeaders = true
+
+	data := []byte("HTTP/1.1 200 ok\r\n" +
+		"user-agent: curl/7.35.0\r\n" +
+		"host: localhost:9000\r\n" +
+		"accept: */*\r\n" +
+		"authorization: Company 1\r\n" +
+		"connection: close\r\n" +
+		"\r\n" +
+		"0123456789")
+
+	st := &stream{data: data, message: new(message)}
+	ok, complete := testParseStream(http, st, 0)
+	assert.True(t, ok)
+	assert.False(t, complete)
+	assert.Equal(t, st.bodyReceived, 10)
+
+	ok, complete = testParseStream(http, st, 5)
+	assert.True(t, ok)
+	assert.False(t, complete)
+	assert.Equal(t, st.bodyReceived, 15)
+
+	ok, complete = testParseStream(http, st, 5)
+	assert.True(t, ok)
+	assert.False(t, complete)
+	assert.Equal(t, st.bodyReceived, 20)
+}
+
 func TestHttpParser_splitResponse(t *testing.T) {
-	data1 := "HTTP/1.1 200 OK\r\n" +
+	data1 := "HTTP/1.1 200 ok\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"Expires: -1\r\n" +
 		"Cache-Control: private, max-age=0\r\n" +
@@ -672,7 +744,7 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 
 	st := &stream{data: data1, message: new(message)}
 
-	ok, complete := testParseStream(http, st)
+	ok, complete := testParseStream(http, st, 0)
 	if !ok {
 		t.Errorf("Parsing returned error")
 	}
@@ -722,7 +794,7 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 
 	st := &stream{data: data, message: new(message)}
 
-	ok, _ := testParseStream(http, st)
+	ok, _ := testParseStream(http, st, 0)
 
 	st.message.Raw = st.data[st.message.start:]
 	http.hideHeaders(st.message)
@@ -759,7 +831,7 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 
 	st := &stream{data: data, message: new(message)}
 
-	ok, complete := testParseStream(http, st)
+	ok, complete := testParseStream(http, st, 0)
 
 	st.message.Raw = st.data[st.message.start:]
 	http.hideHeaders(st.message)
@@ -796,7 +868,7 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 
 	st := &stream{data: data, message: new(message)}
 
-	ok, complete := testParseStream(http, st)
+	ok, complete := testParseStream(http, st, 0)
 
 	st.message.Raw = st.data[st.message.start:]
 	http.hideHeaders(st.message)
@@ -905,7 +977,7 @@ func Test_gap_in_headers(t *testing.T) {
 		"Content-Type: text/html; charset=UTF-8\r\n")
 
 	st := &stream{data: data1, message: new(message)}
-	ok, complete := testParseStream(http, st)
+	ok, complete := testParseStream(http, st, 0)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
@@ -934,7 +1006,7 @@ func Test_gap_in_body(t *testing.T) {
 		"xxxxxxxxxxxxxxxxxxxx")
 
 	st := &stream{data: data1, message: new(message)}
-	ok, complete := testParseStream(http, st)
+	ok, complete := testParseStream(http, st, 0)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
@@ -966,7 +1038,7 @@ func Test_gap_in_body_http1dot0(t *testing.T) {
 		"xxxxxxxxxxxxxxxxxxxx")
 
 	st := &stream{data: data1, message: new(message)}
-	ok, complete := testParseStream(http, st)
+	ok, complete := testParseStream(http, st, 0)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
@@ -1100,7 +1172,7 @@ func benchmarkHTTPMessage(b *testing.B, data []byte) {
 
 	for i := 0; i < b.N; i++ {
 		stream := &stream{data: data, message: new(message)}
-		ok, complete := parser.parse(stream)
+		ok, complete := parser.parse(stream, 0)
 		if !ok || !complete {
 			b.Errorf("failed to parse message")
 		}
@@ -1159,13 +1231,13 @@ func BenchmarkHTTPSplitResponse(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		stream := &stream{data: data1, message: new(message)}
-		ok, complete := parser.parse(stream)
+		ok, complete := parser.parse(stream, 0)
 		if !ok || complete {
 			b.Errorf("parse failure. Expected message to be incomplete, but no parse failures")
 		}
 
 		stream.data = append(stream.data, data2...)
-		ok, complete = parser.parse(stream)
+		ok, complete = parser.parse(stream, 0)
 		if !ok || !complete {
 			b.Errorf("failed to parse message")
 		}

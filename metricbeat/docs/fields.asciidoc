@@ -2286,6 +2286,45 @@ The number of bytes sent to all clients.
 
 
 [float]
+== threads Fields
+
+Threads stats.
+
+
+
+[float]
+=== mysql.status.threads.cached
+
+type: long
+
+The number of cached threads.
+
+
+[float]
+=== mysql.status.threads.created
+
+type: long
+
+The number of created threads.
+
+
+[float]
+=== mysql.status.threads.connected
+
+type: long
+
+The number of connected threads.
+
+
+[float]
+=== mysql.status.threads.running
+
+type: long
+
+The number of running threads.
+
+
+[float]
 === mysql.status.connections
 
 type: long
