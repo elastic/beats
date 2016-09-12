@@ -170,7 +170,7 @@ func reifyGetField(
 		value = nil
 	}
 
-	if _, ok := value.(*cfgNil); value == nil || ok {
+	if isNil(value) {
 		if err := runValidators(nil, opts.validators); err != nil {
 			return raiseValidation(cfg.ctx, cfg.metadata, name, err)
 		}
@@ -430,7 +430,7 @@ func reifyPrimitive(
 	t, baseType reflect.Type,
 ) (reflect.Value, Error) {
 	// zero initialize value if val==nil
-	if _, ok := val.(*cfgNil); ok {
+	if isNil(val) {
 		return pointerize(t, baseType, reflect.Zero(baseType)), nil
 	}
 
