@@ -63,7 +63,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Logger for publisher to log sucessfully sent events to registrar
 	registrarLogger := registrar.GetLogger()
 
-	// Channel to send events to publisher
+	// Output to send events to publisher
 	publisherOutput := publisher.NewOutput()
 
 	// Creates publisher to send events to output
@@ -118,7 +118,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		// published and written by registrar before continuing shutdown.
 		fb.sigWait.Wait()
 
-		// Publisher channel must be closed before spooler shutdown as otherwise spooler could be blocked
+		// Publisher output must be closed before spooler shutdown as otherwise spooler could be blocked
 		publisherOutput.Close()
 		spooler.Stop()
 	}()
