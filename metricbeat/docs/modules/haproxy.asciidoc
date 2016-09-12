@@ -1,0 +1,47 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-haproxy]]
+== haproxy Module
+
+This is the haproxy Module.  To enable stats collection from HAProxy, you must enable the stats socket via TCP.  
+For example, placing the following statement under the `global` or `default` section of the haproxy config:
+
+`stats socket 127.0.0.1:14567`
+
+will enable stats reporting via any local IP on port 14567.  Please note that you should probably use an internal private IP
+or secure this with a firewall rule so that only designated hosts can access this data.
+
+
+[float]
+=== Example Configuration
+
+The haproxy module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: haproxy
+  metricsets: 
+    - "stat"
+    - "info"
+  enabled: true
+  period: 10s
+  stats_addr: "tcp://127.0.0.1:14567"
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-haproxy-info,info>>
+
+* <<metricbeat-metricset-haproxy-stat,stat>>
+
+include::haproxy/info.asciidoc[]
+
+include::haproxy/stat.asciidoc[]
+

@@ -8,6 +8,7 @@ important things to be aware of if you want to monitor the host machine or other
 containers. Let's walk-through some examples using Docker as our container
 orchestration tool.
 
+[float]
 === Monitoring the Host Machine
 
 This first example highlights the changes required to make the system module
@@ -44,6 +45,7 @@ to make this file contain the host's network devices is to use the `--net=host`
 flag. This is due to Linux namespacing, simply bind mounting the host's `/proc`
 to `/hostfs/proc` is not sufficient.
 
+[float]
 === Monitoring a Service in Another Container
 
 Next let's look at an example of monitoring a containerized service from a

@@ -11,7 +11,7 @@ func TestForceCloseFiles(t *testing.T) {
 
 	config := defaultConfig
 	assert.False(t, config.ForceCloseFiles)
-	assert.False(t, config.CloseRemoved)
+	assert.True(t, config.CloseRemoved)
 	assert.False(t, config.CloseRenamed)
 
 	config.ForceCloseFiles = true

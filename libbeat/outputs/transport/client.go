@@ -128,7 +128,6 @@ func (c *Client) Read(b []byte) (int, error) {
 		return 0, ErrNotConnected
 	}
 
-	debugf("try read: %v", len(b))
 	n, err := conn.Read(b)
 	return n, c.handleError(err)
 }

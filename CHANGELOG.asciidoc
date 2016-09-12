@@ -35,6 +35,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 
 *Filebeat*
 - Set close_inactive default to 5 minutes (was 1 hour before)
+- Set clean_removed and close_removed to true by default
 
 *Winlogbeat*
 
@@ -42,6 +43,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
+- Fix logstash output handles error twice when asynchronous sending fails. {pull}2441[2441]
 - Fix Elasticsearch structured error response parsing error. {issue}2229[2229]
 - Fixed the run script to allow the overriding of the configuration file. {issue}2171[2171]
 - Fix logstash output crash if no hosts are configured. {issue}2325[2325]
@@ -51,6 +53,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 
 *Packetbeat*
 - Fix mapping for some Packetbeat flow metrics that were not marked as being longs. {issue}2177[2177]
+- Fix handling of messages larger than the maximum message size (10MB). {pull}2470[2470]
 
 *Topbeat*
 
@@ -85,6 +88,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Update to Go 1.7. {pull}2306[2306]
 - Log total non-zero internal metrics on shutdown. {pull}2349[2349]
 - Add support for encrypted private key files by introducing `ssl.key_passphrase` setting. {pull}2330[2330]
+- Add experimental symlink support with `symlinks` config {pull}2478[2478]
 
 *Metricbeat*
 
@@ -92,12 +96,14 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Add experimental cgroup metrics to the system/process MetricSet. {pull}2184[2184]
 - Added a PostgreSQL module. {pull}2253[2253]
 - Improve mapping by converting half_float to scaled_float and integers to long. {pull}2430[2430]
+- Add experimental haproxy module. {pull}2384[2384]
 
 *Packetbeat*
 
 - Add cassandra protocol analyzer to packetbeat. {pull}1959[1959]
 - Match connections with IPv6 addresses to processes {pull}2254[2254]
 - Add IP address to -devices command output {pull}2327[2327]
+- Add configuration option for the maximum message size. Used to be hard-coded to 10 MB. {pull}2470[2470]
 
 *Topbeat*
 
@@ -144,6 +150,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...v5.0.0-alpha5[View comm
 
 - Create a separate metricSet for load under the system module and remove load information from CPU stats. {pull}2101[2101]
 - Add `system.load.norm.1`, `system.load.norm.5` and `system.load.norm.15`. {pull}2101[2101]
+- Add threads fields to mysql module. {pull}2484[2484]
 
 *Packetbeat*
 

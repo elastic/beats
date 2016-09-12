@@ -291,3 +291,50 @@ connection <0.23893.109>, channel 3 - soft error:
 
         output = self.read_output()
         assert 3 == len(output)
+
+    def test_consecutive_newline(self):
+
+        """
+        Test if consecutive multilines have an affect on multiline
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            multiline=True,
+            pattern="^\[",
+            negate="true",
+            match="after",
+            close_timeout="1s",
+        )
+
+        logentry1 = """[2016-09-02 19:54:23 +0000] Started 2016-09-02 19:54:23 +0000 "GET" for /gaq?path=%2FCA%2FFallbrook%2F1845-Acacia-Ln&referer=http%3A%2F%2Fwww.xxxxx.com%2FAcacia%2BLn%2BFallbrook%2BCA%2Baddresses&search_bucket=none&page_controller=v9%2Faddresses&page_action=show at 23.235.47.31
+X-Forwarded-For:72.197.227.93, 23.235.47.31
+Processing by GoogleAnalyticsController#index as JSON
+
+  Parameters: {"path"=>"/CA/Fallbrook/1845-Acacia-Ln", "referer"=>"http://www.xxxx.com/Acacia+Ln+Fallbrook+CA+addresses", "search_bucket"=>"none", "page_controller"=>"v9/addresses", "page_action"=>"show"}
+Completed 200 OK in 5ms (Views: 1.9ms)"""
+        logentry2 = """[2016-09-02 19:54:23 +0000] Started 2016-09-02 19:54:23 +0000 "GET" for /health_check at xxx.xx.44.181
+X-Forwarded-For:
+SetAdCodeMiddleware.default_ad_code referer
+SetAdCodeMiddleware.default_ad_code path /health_check
+SetAdCodeMiddleware.default_ad_code route """
+
+
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+
+        with open(testfile, 'w', 0) as file:
+            file.write(logentry1 + "\n")
+            file.write(logentry2 + "\n")
+
+        proc = self.start_beat()
+
+        self.wait_until(
+            lambda: self.output_has(lines=2),
+            max_timeout=10)
+
+        proc.check_kill_and_wait()
+
+        output = self.read_output_json()
+        output[0]["message"] = logentry1
+        output[1]["message"] = logentry2

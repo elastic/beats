@@ -23,13 +23,13 @@
                 "average": {
                     "ms": 16
                 },
-                "flushes": 44,
+                "flushes": 37,
                 "last": {
-                    "ms": 6
+                    "ms": 18
                 },
-                "last_finished": "2016-09-01T09:11:23.067Z",
+                "last_finished": "2016-09-06T07:32:58.228Z",
                 "total": {
-                    "ms": 716
+                    "ms": 624
                 }
             },
             "connections": {
@@ -41,10 +41,10 @@
                 "heap_usage": {
                     "bytes": 62895448
                 },
-                "page_faults": 52
+                "page_faults": 71
             },
             "journaling": {
-                "commits": 30,
+                "commits": 1,
                 "commits_in_write_lock": 0,
                 "compression": 0,
                 "early_commits": 0,
@@ -59,7 +59,7 @@
                         "ms": 0
                     },
                     "dt": {
-                        "ms": 3092
+                        "ms": 0
                     },
                     "prep_log_buffer": {
                         "ms": 0
@@ -78,7 +78,7 @@
                     "mb": 0
                 }
             },
-            "local_time": "2016-09-01T09:12:11.462Z",
+            "local_time": "2016-09-06T07:33:15.546Z",
             "memory": {
                 "bits": 64,
                 "mapped": {
@@ -88,7 +88,7 @@
                     "mb": 160
                 },
                 "resident": {
-                    "mb": 60
+                    "mb": 57
                 },
                 "virtual": {
                     "mb": 356
@@ -99,7 +99,7 @@
                     "bytes": 2258
                 },
                 "out": {
-                    "bytes": 93288
+                    "bytes": 93486
                 },
                 "requests": 39
             },
@@ -123,7 +123,7 @@
                 "name": "mmapv1"
             },
             "uptime": {
-                "ms": 2714568
+                "ms": 45828938
             },
             "version": "3.0.12",
             "write_backs_queued": false

@@ -99,6 +99,7 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 			continue
 		}
 
+	OUTER:
 		// Check any matched files to see if we need to start a harvester
 		for _, file := range matches {
 
@@ -108,24 +109,43 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 				continue
 			}
 
-			fileinfo, err := os.Lstat(file)
+			// Fetch Lstat File info to detected also symlinks
+			fileInfo, err := os.Lstat(file)
+			if err != nil {
+				logp.Debug("prospector", "lstat(%s) failed: %s", file, err)
+				continue
+			}
+
+			if fileInfo.IsDir() {
+				logp.Debug("prospector", "Skipping directory: %s", file)
+				continue
+			}
+
+			isSymlink := fileInfo.Mode()&os.ModeSymlink > 0
+			if isSymlink && !p.config.Symlinks {
+				logp.Debug("prospector", "File %s skipped as it is a symlink.", file)
+				continue
+			}
+
+			// Fetch Stat file info which fetches the inode. In case of a symlink, the original inode is fetched
+			fileInfo, err = os.Stat(file)
 			if err != nil {
 				logp.Debug("prospector", "stat(%s) failed: %s", file, err)
 				continue
 			}
 
-			// Check if file is symlink
-			if fileinfo.Mode()&os.ModeSymlink != 0 {
-				logp.Debug("prospector", "File %s skipped as it is a symlink.", file)
-				continue
+			// If symlink is enabled, it is checked that original is not part of same prospector
+			// It original is harvested by other prospector, states will potentially overwrite each other
+			if p.config.Symlinks {
+				for _, finfo := range paths {
+					if os.SameFile(finfo, fileInfo) {
+						logp.Info("Same file found as symlink and original. Skipping file: %s", file)
+						continue OUTER
+					}
+				}
 			}
 
-			if fileinfo.IsDir() {
-				logp.Debug("prospector", "Skipping directory: %s", file)
-				continue
-			}
-
-			paths[file] = fileinfo
+			paths[file] = fileInfo
 		}
 	}
 
@@ -148,7 +168,9 @@ func (p *ProspectorLog) scan() {
 		// Ignores all files which fall under ignore_older
 		if p.isIgnoreOlder(newState) {
 			logp.Debug("prospector", "Ignore file because ignore_older reached: %s", newState.Source)
-			if lastState.IsEmpty() && lastState.Finished == false {
+
+			// If last state is empty, it means state was removed or never created -> can be ignored
+			if !lastState.IsEmpty() && !lastState.Finished {
 				logp.Err("File is falling under ignore_older before harvesting is finished. Adjust your close_* settings: %s", newState.Source)
 			}
 			continue

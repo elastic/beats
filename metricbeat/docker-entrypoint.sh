@@ -28,4 +28,5 @@ waitFor ${NGINX_HOST} ${NGINX_PORT} Nginx
 waitFor ${POSTGRESQL_HOST} ${POSTGRESQL_PORT} Postgresql
 waitFor ${REDIS_HOST} ${REDIS_PORT} Redis
 waitFor ${ZOOKEEPER_HOST} ${ZOOKEEPER_PORT} Zookeeper
+waitFor ${HAPROXY_HOST} ${HAPROXY_PORT} HAProxy
 exec "$@"

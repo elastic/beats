@@ -14,7 +14,7 @@ import json
 import argparse
 
 
-def fields_to_es_template(args, input, output, index):
+def fields_to_es_template(args, input, output, index, version):
     """
     Reads the YAML file from input and generates the JSON for
     the ES template in output. input and output are both file
@@ -52,7 +52,10 @@ def fields_to_es_template(args, input, output, index):
                 "_all": {
                     "norms": False
                 },
-                "properties": {}
+                "properties": {},
+                "_meta": {
+                    "version": version,
+                }
             }
         }
     }
@@ -288,5 +291,8 @@ if __name__ == "__main__":
         with open(args.es_beats + "/libbeat/_meta/fields.yml") as f:
             fields = f.read() + fields
 
+        with open(args.es_beats + "/dev-tools/packer/version.yml") as file:
+            version_data = yaml.load(file)
+
         with open(target, 'w') as output:
-            fields_to_es_template(args, fields, output, args.beatname + "-*")
+            fields_to_es_template(args, fields, output, args.beatname + "-*", version_data['version'])
