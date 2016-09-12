@@ -168,7 +168,9 @@ func (p *ProspectorLog) scan() {
 		// Ignores all files which fall under ignore_older
 		if p.isIgnoreOlder(newState) {
 			logp.Debug("prospector", "Ignore file because ignore_older reached: %s", newState.Source)
-			if lastState.IsEmpty() && lastState.Finished == false {
+
+			// If last state is empty, it means state was removed or never created -> can be ignored
+			if !lastState.IsEmpty() && !lastState.Finished {
 				logp.Err("File is falling under ignore_older before harvesting is finished. Adjust your close_* settings: %s", newState.Source)
 			}
 			continue
