@@ -501,6 +501,12 @@ information. If this header is present and contains a valid IP addresses, the
 information is used for the `real_ip` and `client_location` indexed
 fields.
 
+===== max_message_size
+
+If an individual HTTP message is larger than this setting (in bytes), it will be trimmed
+to this size. Unless this value is very small (<1.5K), Packetbeat is able to still correctly
+follow the transaction and create an event for it. The default is 10485760 (10 MB).
+
 
 ==== AMQP Configuration Options
 
