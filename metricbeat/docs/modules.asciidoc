@@ -8,6 +8,7 @@ contained in {beatname_uc}. Each module contains one or multiple metricsets. Mor
 about each module can be found under the links below.
 
   * <<metricbeat-module-apache,Apache>>
+  * <<metricbeat-module-haproxy,HAProxy>>
   * <<metricbeat-module-mongodb,MongoDB>>
   * <<metricbeat-module-mysql,MySQL>>
   * <<metricbeat-module-nginx,Nginx>>
@@ -19,6 +20,7 @@ about each module can be found under the links below.
 --
 
 include::modules/apache.asciidoc[]
+include::modules/haproxy.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nginx.asciidoc[]

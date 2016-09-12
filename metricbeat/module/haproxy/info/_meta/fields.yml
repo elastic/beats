@@ -1,0 +1,252 @@
+- name: info
+  type: group
+  description: >
+    General infomration collected on HAProxy process
+  fields:
+    - name: nb_proc
+      type: integer
+      description: >
+        Number of processes
+
+    - name: process_num
+      type: integer
+      description: >
+        Process number
+
+    - name: pid
+      type: integer
+      description: >
+        Process ID
+
+    - name: uptime_sec
+      type: integer
+      description: >
+        Current uptime in seconds
+
+    - name: mem_max_bytes
+      type: integer
+      format: bytes
+      description: >
+        Max number of memory usage in bytes (The 'Memmax_MB' value converted to bytes)
+
+    - name: ulimit_n
+      type: integer
+      description: >
+        Max number of open files for process
+
+    - name: compress
+      type: group
+      description: >
+
+      fields:
+        - name: bps
+          type: group
+          description: >
+
+          fields:
+            - name: in
+              type: integer
+              description: >
+
+            - name: out
+              type: integer
+              description: >
+
+            - name: rate_limit
+              type: integer
+              description: >
+
+    - name: conn
+      type: group
+      description: >
+
+      fields:
+        - name: rate
+          type: group
+          description: >
+
+          fields:
+            - name: value
+              type: integer
+              description: >
+          
+            - name: limit
+              type: integer
+              description: >
+
+    - name: curr
+      type: group
+      description: >
+      
+      fields:
+        - name: conns
+          type: integer
+          description: >
+            
+        - name: ssl_conns
+          type: integer
+          description: >
+
+    - name: cum
+      type: group
+      description: >
+      
+      fields:
+        - name: conns
+          type: integer
+          description: >
+            
+        - name: req
+          type: integer
+          description: >
+
+        - name: ssl_conns
+          type: integer
+          description: >
+
+
+    - name: max
+      type: group
+      description: >
+
+      fields:
+        - name: hard_conn
+          type: integer
+          description: >
+
+        - name: sock
+          type: integer
+          description: >     
+      
+        - name: conn
+          type: integer
+          description: >
+
+        - name: ssl_conns
+          type: integer
+          description: >
+
+        - name: pipes
+          type: integer
+          description: >
+
+        - name: conn_rate
+          type: integer
+          description: >
+        
+        - name: sess_rate
+          type: integer
+          description: >
+
+        - name: ssl_rate
+          type: integer
+          description: >
+
+        - name: zlib_mem_usage
+          type: integer
+          description: >
+
+    - name: pipes
+      type: group
+      description: >
+      
+      fields:
+        - name: used
+          type: integer
+          description: >
+            
+        - name: free
+          type: integer
+          description: >
+
+
+    - name: sess
+      type: group
+      description: >
+      
+      fields:
+        - name: rate
+          type: group
+          description: >
+
+          fields:
+            - name: value
+              type: integer
+              description: >
+
+            - name: limit
+              type: integer
+              description: >
+
+    - name: ssl
+      type: group
+      description: >
+      
+      fields:
+        - name: rate
+          type: group
+          description: >
+          
+          fields:
+            - name: value
+              type: integer
+              description: >
+
+            - name: limit
+              type: integer
+              description: >
+
+        - name: frontend
+          type: group
+          description: >
+          
+          fields:
+            - name: key_rate
+              type: integer
+              description: >
+
+            - name: max_key_rate
+              type: integer
+              description: >
+
+            - name: session_reuse_pct
+              type: integer
+              description: >
+
+        - name: backend
+          type: group
+          description: >
+          
+          fields:
+            - name: key_rate
+              type: integer
+              description: >
+
+            - name: max_key_rate
+              type: integer
+              description: >
+
+        - name: ssl_cached_lookups
+          type: integer
+          description: >
+
+        - name: ssl_cache_misses
+          type: integer
+          description: >
+
+    - name: zlib_mem_usage
+      type: integer
+      description: >
+
+    - name: tasks
+      type: integer
+      description: >
+
+    - name: run_queue
+      type: integer
+      description: >
+
+    - name: idle_pct
+      type: scaled_float
+      format: percent
+      description: >

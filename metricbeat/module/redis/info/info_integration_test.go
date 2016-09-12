@@ -37,7 +37,6 @@ func TestData(t *testing.T) {
 	}
 }
 
-// +build integration
 const (
 	password = "foobared"
 )

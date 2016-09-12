@@ -1,0 +1,59 @@
+{
+    "@timestamp": "2016-08-13T19:44:21.036Z",
+    "beat": {
+        "hostname": "beathost",
+        "name": "beathost"
+    },
+    "haproxy": {
+        "info": {
+            "compress_bps_in": 0,
+            "compress_bps_out": 0,
+            "compress_bps_rate_limit": 0,
+            "conn_rate": 0,
+            "conn_rate_limit": 0,
+            "cum_conns": 67,
+            "cum_req": 67,
+            "cum_ssl_conns": 0,
+            "curr_conns": 0,
+            "curr_ssl_conns": 0,
+            "hard_max_conn": 4000,
+            "idle_pct": 100,
+            "max_conn": 4000,
+            "max_conn_rate": 5,
+            "max_pipes": 0,
+            "max_sess_rate": 5,
+            "max_sock": 8033,
+            "max_ssl_conns": 0,
+            "max_ssl_rate": 0,
+            "max_zlib_mem_usage": 0,
+            "mem_max_mb": 0,
+            "nb_proc": 1,
+            "pid": 53858,
+            "pipes_free": 0,
+            "pipes_used": 0,
+            "process_num": 1,
+            "run_queue": 2,
+            "sess_rate": 0,
+            "sess_rate_limit": 0,
+            "ssl_babckend_key_rate": 0,
+            "ssl_backend_max_key_rate": 0,
+            "ssl_cache_misses": 0,
+            "ssl_cached_lookups": 0,
+            "ssl_frontend_key_rate": 0,
+            "ssl_frontend_max_key_rate": 0,
+            "ssl_frontend_session_reuse_pct": 0,
+            "ssl_rate": 0,
+            "ssl_rate_limit": 0,
+            "tasks": 7,
+            "ulimit_n": 8033,
+            "uptime_sec": 13700,
+            "zlib_mem_usage": 0
+        }
+    },
+    "metricset": {
+        "module": "haproxy",
+        "name": "info",
+        "rtt": 707
+    },
+    "type": "metricsets"
+}

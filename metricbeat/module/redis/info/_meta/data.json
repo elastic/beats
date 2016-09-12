@@ -23,39 +23,43 @@
             },
             "cpu": {
                 "used": {
-                    "sys": 2.41,
+                    "sys": 49.19,
                     "sys_children": 0,
-                    "user": 2.71,
-                    "user_children": 0
+                    "user": 55.02,
+                    "user_children": 0.01
                 }
             },
             "memory": {
                 "allocator": "jemalloc-4.0.3",
                 "used": {
                     "lua": 37888,
-                    "peak": 1007704,
-                    "rss": 3956736,
-                    "value": 883032
+                    "peak": 15216072,
+                    "rss": 7077888,
+                    "value": 4687616
                 }
             },
             "persistence": {
                 "aof": {
-                    "current_rewrite_time_sec": -1,
+                    "bgrewrite.last_status": "ok",
                     "enabled": false,
-                    "last_bgrewrite_status": "ok",
-                    "last_rewrite_time_sec": -1,
-                    "last_write_status": "ok",
-                    "rewrite_in_progress": false,
-                    "rewrite_scheduled": false
+                    "rewrite": {
+                        "current_time.sec": -1,
+                        "in_progress": false,
+                        "last_time.sec": -1,
+                        "scheduled": false
+                    },
+                    "write.last_status": "ok"
                 },
                 "loading": false,
                 "rdb": {
-                    "bgsave_in_progress": false,
-                    "changes_since_last_save": 8,
-                    "current_bgsave_time_sec": -1,
-                    "last_bgsave_status": "ok",
-                    "last_bgsave_time_sec": -1,
-                    "last_save_time": 1472718414
+                    "bgsave": {
+                        "current_time.sec": -1,
+                        "in_progress": false,
+                        "last_status": "ok",
+                        "last_time.sec": -1
+                    },
+                    "last_save.changes_since": 200224,
+                    "last_save.time": 1472827193
                 }
             },
             "replication": {
@@ -71,50 +75,52 @@
             },
             "server": {
                 "arch_bits": "64",
-                "build_id": "7aa1aa9b12040006",
+                "build_id": "f449541256e7d446",
                 "config_file": "",
                 "gcc_version": "4.9.2",
                 "git_dirty": "0",
                 "git_sha1": "00000000",
                 "hz": 10,
-                "lru_clock": 13103343,
+                "lru_clock": 13529407,
                 "mode": "standalone",
                 "multiplexing_api": "epoll",
                 "os": "Linux 4.4.19-moby x86_64",
                 "process_id": 1,
-                "run_id": "f1cee1757f72a57ea07b3df70daf682343b98f06",
+                "run_id": "12aa47bb284cef56c793646b291167131a999ebe",
                 "tcp_port": 6379,
-                "uptime": 2721,
-                "version": "3.2.3"
+                "uptime": 320006,
+                "version": "3.2.0"
             },
             "stats": {
+                "commands_processed": 200540,
                 "connections": {
-                    "received": 51,
+                    "received": 87,
                     "rejected": 0
                 },
-                "instantaneous_input_kbps": 0,
-                "instantaneous_ops_per_sec": 0,
-                "instantaneous_output_kbps": 0,
+                "instantaneous": {
+                    "input_kbps": 0,
+                    "ops_per_sec": 0,
+                    "output_kbps": 0
+                },
                 "keys": {
                     "evicted": 0,
-                    "expired": 0
+                    "expired": 3
                 },
                 "keyspace": {
-                    "hits": 0,
+                    "hits": 33,
                     "misses": 0
                 },
                 "latest_fork_usec": 0,
                 "migrate_cached_sockets": 0,
-                "pubsub_channels": 0,
-                "pubsub_patterns": 0,
+                "net.input.bytes": 17576095,
+                "net.output.bytes": 1915928,
+                "pubsub.channels": 0,
+                "pubsub.patterns": 0,
                 "sync": {
                     "full": 0,
-                    "partial_err": 0,
-                    "partial_ok": 0
-                },
-                "total_commands_processed": 49,
-                "total_net_input_bytes": 1702,
-                "total_net_output_bytes": 28475
+                    "partial.err": 0,
+                    "partial.ok": 0
+                }
             }
         }
     },

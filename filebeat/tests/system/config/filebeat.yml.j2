@@ -27,6 +27,7 @@ filebeat.prospectors:
   clean_inactive: {{clean_inactive}}
   clean_removed: {{clean_removed}}
   harvester_limit: {{harvester_limit | default(0) }}
+  symlinks: {{symlinks}}
 
   {% if fields %}
   fields:

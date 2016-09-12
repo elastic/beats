@@ -106,6 +106,7 @@ func (c *asyncClient) AsyncPublishEvents(
 		cb:        cb,
 		err:       nil,
 	}
+	defer ref.dec()
 
 	for len(data) > 0 {
 		n, err := c.publishWindowed(ref, data)
@@ -115,15 +116,10 @@ func (c *asyncClient) AsyncPublishEvents(
 
 		data = data[n:]
 		if err != nil {
-			c.win.shrinkWindow()
 			_ = c.Close()
-
-			logp.Err("Failed to publish events caused by: %v", err)
-			eventsNotAcked.Add(int64(len(data)))
 			return err
 		}
 	}
-	ref.dec()
 
 	return nil
 }
@@ -191,6 +187,7 @@ func (r *msgRef) dec() {
 	err := r.err
 	if err != nil {
 		eventsNotAcked.Add(int64(len(r.batch)))
+		logp.Err("Failed to publish events caused by: %v", err)
 		r.cb(r.batch, err)
 	} else {
 		r.cb(nil, nil)

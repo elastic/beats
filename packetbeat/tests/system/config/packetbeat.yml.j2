@@ -75,6 +75,7 @@ packetbeat.protocols.http:
       {%- endfor -%}
   ]
 {%- endif %}
+{%- if http_max_message_size %}  max_message_size: {{ http_max_message_size }} {%- endif %}
 
 packetbeat.protocols.memcache:
   ports: [{{ memcache_ports|default([11211])|join(", ") }}]

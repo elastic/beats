@@ -1,35 +1,20 @@
-package publish
+package publisher
 
 import (
-	"expvar"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 )
 
-type LogPublisher interface {
-	Start()
-	Stop()
-}
-
-type syncLogPublisher struct {
-	pub     publisher.Publisher
-	client  publisher.Client
-	in, out chan []*input.Event
-
-	done chan struct{}
-	wg   sync.WaitGroup
-}
-
 type asyncLogPublisher struct {
-	pub     publisher.Publisher
-	client  publisher.Client
-	in, out chan []*input.Event
+	pub    publisher.Publisher
+	client publisher.Client
+	in     chan []*input.Event
+	out    SuccessLogger
 
 	// list of in-flight batches
 	active   batchList
@@ -64,86 +49,9 @@ const (
 	batchCanceled
 )
 
-var (
-	eventsSent = expvar.NewInt("publish.events")
-)
-
-func New(
-	async bool,
-	in, out chan []*input.Event,
-	pub publisher.Publisher,
-) LogPublisher {
-	if async {
-		return newAsyncLogPublisher(in, out, pub)
-	}
-	return newSyncLogPublisher(in, out, pub)
-}
-
-func newSyncLogPublisher(
-	in, out chan []*input.Event,
-	pub publisher.Publisher,
-) *syncLogPublisher {
-	return &syncLogPublisher{
-		in:   in,
-		out:  out,
-		pub:  pub,
-		done: make(chan struct{}),
-	}
-}
-
-func (p *syncLogPublisher) Start() {
-	p.client = p.pub.Connect()
-
-	p.wg.Add(1)
-	go func() {
-		defer p.wg.Done()
-
-		logp.Info("Start sending events to output")
-
-		for {
-			var events []*input.Event
-			select {
-			case <-p.done:
-				return
-			case events = <-p.in:
-			}
-
-			pubEvents := make([]common.MapStr, 0, len(events))
-			for _, event := range events {
-				// Only send event with bytes read. 0 Bytes means state update only
-				if event.HasData() {
-					pubEvents = append(pubEvents, event.ToMapStr())
-				}
-			}
-
-			ok := p.client.PublishEvents(pubEvents, publisher.Sync, publisher.Guaranteed)
-			if !ok {
-				// PublishEvents will only returns false, if p.client has been closed.
-				logp.Debug("publish", "Shutting down publisher")
-				return
-			}
-
-			logp.Debug("publish", "Events sent: %d", len(events))
-			eventsSent.Add(int64(len(events)))
-
-			// Tell the registrar that we've successfully sent these events
-			select {
-			case <-p.done:
-				return
-			case p.out <- events:
-			}
-		}
-	}()
-}
-
-func (p *syncLogPublisher) Stop() {
-	p.client.Close()
-	close(p.done)
-	p.wg.Wait()
-}
-
 func newAsyncLogPublisher(
-	in, out chan []*input.Event,
+	in chan []*input.Event,
+	out SuccessLogger,
 	pub publisher.Publisher,
 ) *asyncLogPublisher {
 	return &asyncLogPublisher{
@@ -172,26 +80,19 @@ func (p *asyncLogPublisher) Start() {
 			case <-p.done:
 				return
 			case events := <-p.in:
-
-				pubEvents := make([]common.MapStr, 0, len(events))
-				for _, event := range events {
-					if event.HasData() {
-						pubEvents = append(pubEvents, event.ToMapStr())
-					}
-				}
-
 				batch := &eventsBatch{
 					flag:   0,
 					events: events,
 				}
-				p.client.PublishEvents(pubEvents,
-					publisher.Signal(batch), publisher.Guaranteed)
+				p.client.PublishEvents(
+					getDataEvents(events),
+					publisher.Signal(batch),
+					publisher.Guaranteed)
 
 				p.active.append(batch)
 
 			case <-ticker.C:
 			}
-
 			p.collect()
 		}
 	}()
@@ -245,11 +146,10 @@ func (p *asyncLogPublisher) collect() bool {
 		// registrar picking up the current batch. Instead prefer to shut-down and
 		// resend the last published batch on next restart, basically taking advantage
 		// of send-at-last-once semantics in order to speed up cleanup on shutdown.
-		select {
-		case <-p.done:
+		ok := p.out.Published(batch.events)
+		if !ok {
 			logp.Info("Shutting down - No registrar update for successfully published batch.")
 			return false
-		case p.out <- batch.events:
 		}
 	}
 	return true

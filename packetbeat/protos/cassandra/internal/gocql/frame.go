@@ -443,7 +443,14 @@ func (f *Framer) parseResultPrepared() map[string]interface{} {
 
 	result := make(map[string]interface{})
 
-	result["prepared_id"] = string((f.decoder).ReadShortBytes())
+	uuid, err := UUIDFromBytes((f.decoder).ReadShortBytes())
+
+	if err != nil {
+		logp.Err("Error in parsing UUID")
+	}
+
+	result["prepared_id"] = uuid.String()
+
 	result["req_meta"] = f.parseResultMetadata(true)
 
 	if f.proto < protoVersion2 {

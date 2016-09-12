@@ -44,6 +44,9 @@ def collect():
                     else:
                         fields_yml += line
 
+            # Add newline to make sure indentation is correct
+            fields_yml += "\n"
+
     # output string so it can be concatenated
     print fields_yml
 

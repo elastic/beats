@@ -1,37 +1,39 @@
 {
-  "@timestamp": "2016-07-27T11:08:54.166Z",
-  "beat": {
-    "hostname": "host.example.com",
-    "name": "host.example.com"
-  },
-  "metricset": {
-    "module": "system",
-    "name": "memory",
-    "rtt": 135
-  },
-  "system": {
-    "memory": {
-      "actual": {
-        "free": 6274166784,
-        "used": {
-          "bytes": 2089246720,
-          "pct": 0.2498
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "system",
+        "name": "memory",
+        "rtt": 115
+    },
+    "system": {
+        "memory": {
+            "actual": {
+                "free": 5786603520,
+                "used": {
+                    "bytes": 2575933440,
+                    "pct": 0.308
+                }
+            },
+            "free": 286552064,
+            "swap": {
+                "free": 4197806080,
+                "total": 4199542784,
+                "used": {
+                    "bytes": 1736704,
+                    "pct": 0.0004
+                }
+            },
+            "total": 8362536960,
+            "used": {
+                "bytes": 8075984896,
+                "pct": 0.9657
+            }
         }
-      },
-      "free": 5331386368,
-      "swap": {
-        "free": 4199542784,
-        "total": 4199542784,
-        "used": {
-          "bytes": 0,
-          "pct": 0
-        }
-      },
-      "total": 8363413504,
-      "used": {
-        "bytes": 3032027136,
-        "pct": 0.3625
-      }
-  },
-  "type": "metricsets"
+    },
+    "type": "metricsets"
 }
