@@ -231,6 +231,10 @@ filebeat.prospectors:
 # The config_dir MUST point to a different directory then where the main filebeat config file is in.
 #filebeat.config_dir:
 
+# How long filebeat waits on shutdown for the publisher to finish.
+# Default is 0, not waiting.
+#filebeat.shutdown_timeout: 0
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
