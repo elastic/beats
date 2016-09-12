@@ -2,6 +2,7 @@ package beater
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -16,8 +17,9 @@ import (
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
-	config *cfg.Config
-	done   chan struct{}
+	config  *cfg.Config
+	sigWait *signalWait
+	done    chan struct{}
 }
 
 // New creates a new Filebeat pointer instance.
@@ -31,8 +33,9 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	}
 
 	fb := &Filebeat{
-		done:   make(chan struct{}),
-		config: &config,
+		done:    make(chan struct{}),
+		sigWait: newSignalWait(),
+		config:  &config,
 	}
 	return fb, nil
 }
@@ -42,8 +45,16 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
 
+	var wgEvents *sync.WaitGroup // count active events for waiting on shutdown
+	var finishedLogger publisher.SuccessLogger
+
+	if fb.config.ShutdownTimeout > 0 {
+		wgEvents = &sync.WaitGroup{}
+		finishedLogger = newFinishedLogger(wgEvents)
+	}
+
 	// Setup registrar to persist state
-	registrar, err := registrar.New(config.RegistryFile, nil)
+	registrar, err := registrar.New(config.RegistryFile, finishedLogger)
 	if err != nil {
 		logp.Err("Could not init registrar: %v", err)
 		return err
@@ -65,7 +76,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	crawler, err := crawler.New(
-		newSpoolerOutlet(fb.done, spooler, nil),
+		newSpoolerOutlet(fb.done, spooler, wgEvents),
 		config.Prospectors)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
@@ -92,9 +103,17 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Starting spooler
 	spooler.Start()
+
 	// Stopping spooler will flush items
-	defer spooler.Stop()
-	defer publisherChan.Close()
+	defer func() {
+		// With harvesters being stopped, optionally wait for all enqueued events being
+		// published and written by registrar before continuing shutdown.
+		fb.sigWait.Wait()
+
+		// continue shutdown
+		publisherChan.Close()
+		spooler.Stop()
+	}()
 
 	err = crawler.Start(registrar.GetStates())
 	if err != nil {
@@ -105,6 +124,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Blocks progressing. As soon as channel is closed, all defer statements come into play
 	<-fb.done
+
+	if fb.config.ShutdownTimeout > 0 {
+		// Wait for either timeout or all events having been ACKed by outputs.
+		fb.sigWait.Add(wgEvents.Wait)
+		fb.sigWait.AddTimeout(fb.config.ShutdownTimeout)
+	}
 
 	return nil
 }
