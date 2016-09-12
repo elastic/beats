@@ -16,7 +16,6 @@ type message struct {
 	Ts               time.Time
 	hasContentLength bool
 	headerOffset     int
-	bodyOffset       int
 	version          version
 	connection       common.NetString
 	chunkedLength    int
@@ -46,9 +45,10 @@ type message struct {
 
 	Notes []string
 
-	//Timing
-	start int
-	end   int
+	//Offsets
+	start      int
+	end        int
+	bodyOffset int
 
 	next *message
 }
@@ -87,8 +87,17 @@ func newParser(config *parserConfig) *parser {
 	return &parser{config: config}
 }
 
-func (parser *parser) parse(s *stream) (bool, bool) {
+func (parser *parser) parse(s *stream, extraMsgSize int) (bool, bool) {
 	m := s.message
+
+	if extraMsgSize > 0 {
+		// A packet of extraMsgSize size was seen, but we don't have
+		// its actual bytes. This is only usable in the `stateBody` state.
+		if s.parseState != stateBody {
+			return false, false
+		}
+		return parser.eatBody(s, m, extraMsgSize)
+	}
 
 	for s.parseOffset < len(s.data) {
 		switch s.parseState {
@@ -363,14 +372,14 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 
 func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
 	if isDebug {
-		debugf("eat body: %d", s.parseOffset)
+		debugf("parseBody body: %d", s.parseOffset)
 	}
 	if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
 		(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
 
 		// HTTP/1.0 no content length. Add until the end of the connection
 		if isDebug {
-			debugf("close connection, %d", len(s.data)-s.parseOffset)
+			debugf("http conn close, received %d", len(s.data)-s.parseOffset)
 		}
 		s.bodyReceived += (len(s.data) - s.parseOffset)
 		m.ContentLength += (len(s.data) - s.parseOffset)
@@ -384,6 +393,36 @@ func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
 	} else {
 		s.bodyReceived += (len(s.data) - s.parseOffset)
 		s.parseOffset = len(s.data)
+		if isDebug {
+			debugf("bodyReceived: %d", s.bodyReceived)
+		}
+		return true, false
+	}
+}
+
+// eatBody acts as if size bytes were received, without having access to
+// those bytes.
+func (*parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
+	if isDebug {
+		debugf("eatBody body: %d", s.parseOffset)
+	}
+	if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
+		(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
+
+		// HTTP/1.0 no content length. Add until the end of the connection
+		if isDebug {
+			debugf("http conn close, received %d", size)
+		}
+		s.bodyReceived += size
+		m.ContentLength += size
+		return true, false
+	} else if size >= m.ContentLength-s.bodyReceived {
+		s.bodyReceived += (m.ContentLength - s.bodyReceived)
+		m.end = s.parseOffset
+		m.Size = uint64(m.bodyOffset-m.start) + uint64(m.ContentLength)
+		return true, true
+	} else {
+		s.bodyReceived += size
 		if isDebug {
 			debugf("bodyReceived: %d", s.bodyReceived)
 		}
