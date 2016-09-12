@@ -45,21 +45,23 @@ func parsePath(in, sep string) cfgPath {
 	if sep == "" {
 		return cfgPath{
 			sep:    sep,
-			fields: []field{namedField{in}},
+			fields: []field{parseField(in)},
 		}
 	}
 
 	elems := strings.Split(in, sep)
 	fields := make([]field, 0, len(elems))
 	for _, elem := range elems {
-		if idx, err := strconv.ParseInt(elem, 0, 64); err == nil {
-			fields = append(fields, idxField{int(idx)})
-		} else {
-			fields = append(fields, namedField{elem})
-		}
+		fields = append(fields, parseField(elem))
 	}
-
 	return cfgPath{fields: fields, sep: sep}
+}
+
+func parseField(in string) field {
+	if idx, err := strconv.ParseInt(in, 0, 64); err == nil {
+		return idxField{int(idx)}
+	}
+	return namedField{in}
 }
 
 func (p cfgPath) String() string {
@@ -159,7 +161,7 @@ func (p cfgPath) SetValue(cfg *Config, opt *options, val value) Error {
 			return err
 		}
 
-		if _, isNil := v.(*cfgNil); v == nil || isNil {
+		if isNil(v) {
 			break
 		}
 		node = v
@@ -200,7 +202,7 @@ func (i idxField) SetValue(opts *options, elem value, v value) Error {
 		return raiseExpectedObject(opts, elem)
 	}
 
-	sub.c.fields.setAt(i.i, v)
+	sub.c.fields.setAt(i.i, elem, v)
 	v.SetContext(context{parent: elem, field: i.String()})
 	return nil
 }
