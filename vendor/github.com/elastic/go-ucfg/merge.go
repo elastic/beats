@@ -10,6 +10,7 @@ import (
 func (c *Config) Merge(from interface{}, options ...Option) error {
 	opts := makeOptions(options)
 	other, err := normalize(opts, from)
+
 	if err != nil {
 		return err
 	}
@@ -17,6 +18,13 @@ func (c *Config) Merge(from interface{}, options ...Option) error {
 }
 
 func mergeConfig(opts *options, to, from *Config) Error {
+	if err := mergeConfigDict(opts, to, from); err != nil {
+		return err
+	}
+	return mergeConfigArr(opts, to, from)
+}
+
+func mergeConfigDict(opts *options, to, from *Config) Error {
 	for k, v := range from.fields.dict() {
 		ctx := context{
 			parent: cfgSub{to},
@@ -45,6 +53,56 @@ func mergeConfig(opts *options, to, from *Config) Error {
 			return err
 		}
 	}
+	return nil
+}
+
+func mergeConfigArr(opts *options, to, from *Config) Error {
+	l := len(to.fields.array())
+	if l > len(from.fields.array()) {
+		l = len(from.fields.array())
+	}
+
+	// merge array indexes available in to and from
+	for i := 0; i < l; i++ {
+		ctx := context{
+			parent: cfgSub{to},
+			field:  fmt.Sprintf("%v", i),
+		}
+
+		v := from.fields.array()[i]
+
+		old := to.fields.array()[i]
+		subOld, err := old.toConfig(opts)
+		if err != nil {
+			to.fields.setAt(i, cfgSub{to}, v.cpy(ctx))
+			continue
+		}
+
+		subFrom, err := v.toConfig(opts)
+		if err != nil {
+			to.fields.setAt(i, cfgSub{to}, v.cpy(ctx))
+		}
+
+		if err := mergeConfig(opts, subOld, subFrom); err != nil {
+			return err
+		}
+	}
+
+	end := len(from.fields.array())
+	if end <= l {
+		return nil
+	}
+
+	// add additional array entries not yet in 'to'
+	for ; l < end; l++ {
+		ctx := context{
+			parent: cfgSub{to},
+			field:  fmt.Sprintf("%v", l),
+		}
+		v := from.fields.array()[l]
+		to.fields.setAt(l, cfgSub{to}, v.cpy(ctx))
+	}
+
 	return nil
 }
 
@@ -166,8 +224,9 @@ func normalizeSetField(
 		}
 		old = nil
 	}
-	if old != nil {
-		if _, isNil := val.(*cfgNil); val == nil || isNil {
+
+	if !isNil(old) {
+		if isNil(val) {
 			return nil
 		}
 		return raiseDuplicateKey(cfg, name)
