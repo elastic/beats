@@ -2,6 +2,7 @@ package beater
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -105,6 +106,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Blocks progressing. As soon as channel is closed, all defer statements come into play
 	<-fb.done
+
+	// Uses shutdown_timeout to wait for potential completion of sending events
+	<-time.After(fb.config.ShutdownTimeout)
 
 	return nil
 }
