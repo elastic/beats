@@ -27,12 +27,11 @@ Usage: ./import_dashboards [options]
 
 Kibana dashboards are stored in a special index in Elasticsearch together with the searches, visualizations, and indexes that they use.
 
-To import the dashboards for your beat version into localhost, run:
+To import the official Kibana dashboards for your Beat version into a local Elasticsearch instance, use:
 
 	./import_dashboards
 
-This will load the dashboards from elastic.co for your beat and load them into Kibana. To import to a remove elasticsearch
- instance with shield, use:
+To import the official Kibana dashboards for your Beat version into a remote Elasticsearch instance with Shield, use:
 
 	./import_dashboards -es https://xyz.found.io -user user -pass password
 

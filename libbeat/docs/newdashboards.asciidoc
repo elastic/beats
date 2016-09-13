@@ -197,7 +197,7 @@ the dashboards for a single Beat. Otherwise it imports the index pattern and the
 
 ==== snapshot
 
-Using `-snapshot` will load the snapshot dashboards build for the current version. This is mainly useful when testing a snapshot beat build for testing purpose.
+Using `-snapshot` will import the snapshot dashboards build for the current version. This is mainly useful when running a snapshot beat build for testing purpose.
 
 NOTE: When using `-snapshot`, `-url` will be ignored.
 
