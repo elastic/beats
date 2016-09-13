@@ -35,7 +35,9 @@ The value that you specify here is used as the `input_type` for each event publi
 
 ===== paths
 
-A list of glob-based paths that should be crawled and fetched. Filebeat starts a harvester for
+A list of glob-based paths that should be crawled and fetched. Filebeat supports all glob patterns that are supported by https://golang.org/pkg/path/filepath/#Glob[Golang Glob].
+
+Filebeat starts a harvester for
 each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
 
 ===== encoding
