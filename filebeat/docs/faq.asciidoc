@@ -47,6 +47,19 @@ config file. Setting `scan_frequency` to less than 1s may cause Filebeat to scan
 The index template might not be loaded correctly. See <<filebeat-template>>.
 
 [float]
+[[fields-not-indexed]]
+=== Fields are not indexed or usable in Kibana visualizations?
+
+If you have recently performed an operation that loads or parses custom, structured logs,
+you might need to refresh the index to make the fields available in Kibana. To refresh
+the index, use the {elasticsearch}/indices-refresh.html[refresh API]. For example:
+
+["source","sh"]
+----------------------------------------------------------------------
+curl -XPOST 'http://localhost:9200/filebeat-2016.08.09/_refresh'
+----------------------------------------------------------------------
+
+[float]
 [[newline-character-required-eof]]
 === Filebeat isn't shipping the last line of a file?
 
