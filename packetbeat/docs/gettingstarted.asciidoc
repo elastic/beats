@@ -12,7 +12,15 @@ To get started with your own Packetbeat setup, install and configure these relat
 
 See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information.
 
-After you have installed these products, you can start <<packetbeat-installation>>.
+After installing the Elastic Stack, read the following topics to learn how to install, configure, and run Packetbeat:
+
+* <<packetbeat-installation>>
+* <<configuring-packetbeat>>
+* <<packetbeat-template>>
+* <<packetbeat-starting>>
+* <<packetbeat-sample-dashboards>>
+* <<packetbeat-command>>
+* <<directory-layout>>
 
 [[packetbeat-installation]]
 === Step 1: Installing Packetbeat
@@ -190,6 +198,7 @@ TIP: To test your configuration file, run Packetbeat in the foreground with the 
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
+[[packetbeat-starting]]
 === Step 4: Starting Packetbeat
 
 Run Packetbeat by issuing the following command:
@@ -245,6 +254,7 @@ curl -XGET 'http://localhost:9200/packetbeat-*/_search?pretty'
 Make sure that you replace `localhost:9200` with the address of your Elasticsearch
 instance. The command should return data about the HTTP transaction you just created.
 
+[[packetbeat-sample-dashboards]]
 === Step 5: Loading Sample Kibana Dashboards
 
 To make it easier for you to get application performance insights
