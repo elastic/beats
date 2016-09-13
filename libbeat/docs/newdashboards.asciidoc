@@ -18,6 +18,14 @@ recommend that you use the virtual environment under
 https://github.com/elastic/beats/tree/master/testing/environments[beats/testing/environments] to import, create, and
 export the Kibana dashboards.
 
+The following topics provide more detail about importing and working with Beats dashboards:
+
+* <<import-dashboards>>
+* <<build-dashboards>>
+* <<generate-index-pattern>>
+* <<export-dashboards>>
+* <<archive-dashboards>>
+
 [[import-dashboards]]
 === Importing Existing Beat Dashboards
 

@@ -7,10 +7,10 @@ the Elastic stack for Beats.
 
 A regular _Beats setup_ consists of:
 
- * One or more Beats. You install the Beats on your servers to capture operational data.
  * Elasticsearch for storage and indexing. See <<elasticsearch-installation>>.
  * Logstash (optional) for inserting data into Elasticsearch. See <<logstash-installation,Installing Logstash>>.
  * Kibana for the UI. See <<kibana-installation>>.
+ * One or more Beats. You install the Beats on your servers to capture operational data. See <<installing-beats>>.
  * Kibana dashboards for visualizing the data. See <<load-kibana-dashboards>>.
  
 See the https://www.elastic.co/support/matrix[Elastic Support Matrix] for information 

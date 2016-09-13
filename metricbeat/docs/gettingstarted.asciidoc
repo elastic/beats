@@ -11,12 +11,17 @@ related products:
  * Kibana for the UI.
  * Logstash (optional) for inserting data into Elasticsearch.
 
-See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic
-Stack] for more information.
+See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information. 
 
-After you have installed these products, you can start
-<<metricbeat-installation>>.
+After installing the Elastic Stack, read the following topics to learn how to install, configure, and run Metricbeat:
 
+* <<metricbeat-installation>>
+* <<metricbeat-configuration>>
+* <<metricbeat-template>>
+* <<metricbeat-starting>>
+* <<metricbeat-sample-dashboards>>
+* <<command-line-options>>
+* <<directory-layout>>
 
 [[metricbeat-installation]]
 === Step 1: Installing Metricbeat
@@ -170,6 +175,7 @@ instead.
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
+[[metricbeat-starting]]
 === Step 4: Starting Metricbeat
 
 Run Metricbeat by issuing the following command:
