@@ -60,6 +60,7 @@ type Options struct {
 	Pass           string
 	OnlyDashboards bool
 	OnlyIndex      bool
+	Snapshot       bool
 }
 
 type CommandLine struct {
@@ -96,6 +97,7 @@ func DefineCommandLine() (*CommandLine, error) {
 	cl.flagSet.StringVar(&cl.opt.Beat, "beat", beat, "The Beat name, in case a zip archive is passed as input")
 	cl.flagSet.BoolVar(&cl.opt.OnlyDashboards, "only-dashboards", false, "Import only dashboards together with visualizations and searches. By default import both, dashboards and the index-pattern.")
 	cl.flagSet.BoolVar(&cl.opt.OnlyIndex, "only-index", false, "Import only the index-pattern. By default imports both, dashboards and the index pattern.")
+	cl.flagSet.BoolVar(&cl.opt.Snapshot, "snapshot", false, "Import dashboards from snapshot builds.")
 
 	return &cl, nil
 }
@@ -557,8 +559,14 @@ func (imp Importer) ImportArchive() error {
 	fmt.Println("Create temporary directory", target)
 	if imp.cl.opt.File != "" {
 		archive = imp.cl.opt.File
+	} else if imp.cl.opt.Snapshot {
+		// In case snapshot is set, snapshot version is fetched
+		url := fmt.Sprintf("https://beats-nightlies.s3.amazonaws.com/dashboards/beats-dashboards-%s-SNAPSHOT.zip", lbeat.GetDefaultVersion())
+		archive, err = downloadFile(url, target)
+		if err != nil {
+			return fmt.Errorf("fail to download snapshot file: %s", url)
+		}
 	} else if imp.cl.opt.Url != "" {
-		// it's an URL
 		archive, err = downloadFile(imp.cl.opt.Url, target)
 		if err != nil {
 			return fmt.Errorf("fail to download file: %s", imp.cl.opt.Url)
