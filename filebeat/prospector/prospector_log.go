@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
+	"sync"
 )
 
 var (
@@ -22,6 +23,7 @@ type ProspectorLog struct {
 	Prospector *Prospector
 	config     prospectorConfig
 	lastClean  time.Time
+	mutex      sync.Mutex
 }
 
 func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
@@ -54,6 +56,8 @@ func (p *ProspectorLog) Init() {
 }
 
 func (p *ProspectorLog) Run() {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 	logp.Debug("prospector", "Start next scan")
 
 	p.scan()
@@ -179,6 +183,7 @@ func (p *ProspectorLog) scan() {
 		// Decides if previous state exists
 		if lastState.IsEmpty() {
 			logp.Debug("prospector", "Start harvester for new file: %s", newState.Source)
+			p.Prospector.states.Update(newState)
 			err := p.Prospector.startHarvester(newState, 0)
 			if err != nil {
 				logp.Err("Harvester could not be started on new file: %s, Err: %s", newState.Source, err)
