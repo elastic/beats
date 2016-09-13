@@ -17,6 +17,9 @@ def main():
                         help="Continue after fixing merging errors.")
     args = parser.parse_args()
 
+    tmp_branch = "automatic_merge_from_{}_to_{}_branch".format(
+        args.from_branch, args.to_branch)
+
     if not vars(args)["continue"]:
         if not args.yes and raw_input("This will destroy all local changes. " +
                                       "Continue? [y/n]: ") != "y":
@@ -30,8 +33,8 @@ def main():
 
         check_call("git checkout {}".format(args.to_branch), shell=True)
         check_call("git pull", shell=True)
-        call("git branch -D automatic_merge_branch > /dev/null", shell=True)
-        check_call("git checkout -b automatic_merge_branch", shell=True)
+        call("git branch -D {} > /dev/null".format(tmp_branch), shell=True)
+        check_call("git checkout -b {}".format(tmp_branch), shell=True)
         if call("git merge {}".format(args.from_branch), shell=True) != 0:
             print("Looks like you have merge errors.")
             print("Fix them, commit, then run: {} --continue"
@@ -49,10 +52,10 @@ def main():
 
     print("Ready to push branch.")
     remote = raw_input("To which remote should I push? (your fork): ")
-    call("git push {} :automatic_merge_branch > /dev/null".format(remote),
+    call("git push {} :{} > /dev/null".format(remote, tmp_branch),
          shell=True)
-    check_call("git push --set-upstream {} automatic_merge_branch"
-               .format(remote), shell=True)
+    check_call("git push --set-upstream {} {}"
+               .format(remote, tmp_branch), shell=True)
     print("Done. Go to Github and open the PR")
 
 if __name__ == "__main__":
