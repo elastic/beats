@@ -63,6 +63,14 @@ https://github.com/elastic/beats/compare/v1.3.0...1.3[Check the HEAD diff]
 
 ////////////////////////////////////////////////////////////
 
+[[release-notes-1.3.1]]
+=== Beats version 1.3.1
+https://github.com/elastic/beats/compare/v1.3.0...v1.3.1[View commits]
+
+*Filebeat*
+
+- Fix a concurrent bug on filebeat startup with a large number of prospectors defined. {pull}2509[2509]
+
 [[release-notes-1.3.0]]
 === Beats version 1.3.0
 https://github.com/elastic/beats/compare/v1.2.3...v1.3.0[View commits]
