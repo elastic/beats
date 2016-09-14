@@ -21,6 +21,8 @@ include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
 include::./how-metricbeat-works.asciidoc[]
 
+include::./metricbeat-in-a-container.asciidoc[]
+
 include::./configuring-howto.asciidoc[]
 
 include::./metricbeat-filtering.asciidoc[]
@@ -34,8 +36,6 @@ include::../../libbeat/docs/shared-env-vars.asciidoc[]
 include::../../libbeat/docs/yaml.asciidoc[]
 
 include::../../libbeat/docs/regexp.asciidoc[]
-
-include::./metricbeat-in-a-container.asciidoc[]
 
 include::./modules.asciidoc[]
 
