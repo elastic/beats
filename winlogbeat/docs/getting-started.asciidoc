@@ -11,8 +11,16 @@ related products:
 See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic
 Stack] for more information.
 
-After you have installed these products, you can start
-<<winlogbeat-installation>>.
+After installing the Elastic Stack, read the following topics to learn how to install, configure, and run Winlogbeat:
+
+* <<winlogbeat-installation>>
+* <<winlogbeat-configuration>>
+* <<config-winlogbeat-logstash>>
+* <<winlogbeat-template>>
+* <<winlogbeat-starting>>
+* <<winlogbeat-sample-dashboards>>
+* <<winlogbeat-command-line-options>>
+* <<directory-layout>>
 
 [[winlogbeat-installation]]
 === Step 1: Installing Winlogbeat
@@ -120,6 +128,7 @@ include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
+[[winlogbeat-starting]]
 === Step 5: Starting Winlogbeat
 
 Start the Winlogbeat service with the following command:
@@ -150,16 +159,15 @@ Stop the Winlogbeat service with the following command:
 PS C:\Program Files\Winlogbeat> Stop-Service winlogbeat
 ----------------------------------------------------------------------
 
+[[winlogbeat-sample-dashboards]]
 === Step 6: Loading Sample Kibana Dashboards
 
 To make it easier for you to start monitoring your servers in Kibana,
-we have created a sample Winlogbeat dashboard. This dashboard is provided as
-an example. We recommend that you
-http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] it
+we have created sample Winlogbeat dashboards. The dashboards are provided as
+examples. We recommend that you
+http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
 to meet your needs.
-
-For more information, see
-{libbeat}/load-kibana-dashboards.html[Loading the Beats Dashboards].
 
 image:./images/winlogbeat-dashboard.png[Winlogbeat statistics]
 
+include::../../libbeat/docs/dashboards.asciidoc[]

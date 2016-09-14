@@ -27,24 +27,15 @@ Usage: ./import_dashboards [options]
 
 Kibana dashboards are stored in a special index in Elasticsearch together with the searches, visualizations, and indexes that they use.
 
-You can import the dashboards, visualizations, searches, and the index pattern for a single Beat (eg. Metricbeat):
-  1. from a local directory:
-	./import_dashboards -dir kibana/metricbeat
-  2. from a local zip archive containing dashboards of multiple Beats:
-	./import_dashboards -beat metricbeat -file beats-dashboards-%s.zip
-  3. from the official zip archive available under http://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip:
-	./import_dashboards -beat metricbeat
-  4. from any zip archive available online:
-    ./import_dashboards -beat metricbeat -url https://github.com/monicasarbu/metricbeat-dashboards/archive/1.1.zip
+To import the official Kibana dashboards for your Beat version into a local Elasticsearch instance, use:
 
-To import only the index-pattern for a single Beat (eg. Metricbeat) use:
-	./import_dashboards -only-index -beat metricbeat
+	./import_dashboards
 
-To import only the dashboards together with visualizations and searches for a single Beat (eg. Metricbeat) use:
-	./import_dashboards -only-dashboards -beat metricbeat
+To import the official Kibana dashboards for your Beat version into a remote Elasticsearch instance with Shield, use:
 
-Options:
-`, lbeat.GetDefaultVersion(), lbeat.GetDefaultVersion())
+	./import_dashboards -es https://xyz.found.io -user user -pass password
+
+For more details, check https://www.elastic.co/guide/en/beats/libbeat/5.0/import-dashboards.html`)
 
 var beat string
 
@@ -60,6 +51,7 @@ type Options struct {
 	Pass           string
 	OnlyDashboards bool
 	OnlyIndex      bool
+	Snapshot       bool
 }
 
 type CommandLine struct {
@@ -96,6 +88,7 @@ func DefineCommandLine() (*CommandLine, error) {
 	cl.flagSet.StringVar(&cl.opt.Beat, "beat", beat, "The Beat name, in case a zip archive is passed as input")
 	cl.flagSet.BoolVar(&cl.opt.OnlyDashboards, "only-dashboards", false, "Import only dashboards together with visualizations and searches. By default import both, dashboards and the index-pattern.")
 	cl.flagSet.BoolVar(&cl.opt.OnlyIndex, "only-index", false, "Import only the index-pattern. By default imports both, dashboards and the index pattern.")
+	cl.flagSet.BoolVar(&cl.opt.Snapshot, "snapshot", false, "Import dashboards from snapshot builds.")
 
 	return &cl, nil
 }
@@ -557,8 +550,14 @@ func (imp Importer) ImportArchive() error {
 	fmt.Println("Create temporary directory", target)
 	if imp.cl.opt.File != "" {
 		archive = imp.cl.opt.File
+	} else if imp.cl.opt.Snapshot {
+		// In case snapshot is set, snapshot version is fetched
+		url := fmt.Sprintf("https://beats-nightlies.s3.amazonaws.com/dashboards/beats-dashboards-%s-SNAPSHOT.zip", lbeat.GetDefaultVersion())
+		archive, err = downloadFile(url, target)
+		if err != nil {
+			return fmt.Errorf("fail to download snapshot file: %s", url)
+		}
 	} else if imp.cl.opt.Url != "" {
-		// it's an URL
 		archive, err = downloadFile(imp.cl.opt.Url, target)
 		if err != nil {
 			return fmt.Errorf("fail to download file: %s", imp.cl.opt.Url)

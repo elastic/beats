@@ -12,6 +12,8 @@ kibana:
   ports:
     - "5601:5601"
 
+# The link is available here in order to avoid fetching and building it for each CI build on travis and jenkins which
+# makes the builds a lot slower.
 beat:
   links:
     - kibana

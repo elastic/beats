@@ -297,7 +297,7 @@ func (c cfgSub) cpy(ctx context) value {
 		for i, f := range arr {
 			ctx := f.Context()
 			v := f.cpy(context{field: ctx.field, parent: newC})
-			fields.setAt(i, v)
+			fields.setAt(i, newC, v)
 		}
 	}
 
@@ -502,4 +502,20 @@ func (s *cfgSplice) toFloat(opt *options) (float64, error) {
 		return 0, err
 	}
 	return strconv.ParseFloat(str, 64)
+}
+
+func isNil(v value) bool {
+	if v == nil {
+		return true
+	}
+	_, tst := v.(*cfgNil)
+	return tst
+}
+
+func isSub(v value) bool {
+	if v == nil {
+		return false
+	}
+	_, tst := v.(cfgSub)
+	return tst
 }

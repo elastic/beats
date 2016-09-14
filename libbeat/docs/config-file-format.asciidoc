@@ -4,7 +4,7 @@
 Beats config files are based on http://www.yaml.org[YAML], a file format that is
 easier to read and write than other common data formats like XML or JSON.
 
-In beats all YAML files start with an dictionary, an unordered collection of
+In beats all YAML files start with a dictionary, an unordered collection of
 name/value pairs. In addition to dictionaries, YAML also supports lists, numbers,
 strings, and many other data types. All members of the same list or dictionary must
 have the same indentation level.
@@ -52,6 +52,14 @@ person: \{name: "John Doe", age: 34, country: "Canada"}
 colors: ["Red", "Green", "Blue"]
 ------------------------------------------------------------------------------
 
+The following topics provide more detail to help you understand and work with config files in YAML:
+
+* <<config-file-format-namespacing>>
+* <<config-file-format-type>>
+* <<config-file-format-env-vars>>
+* <<config-gile-format-refs>>
+* <<config-file-format-cli>>
+* <<config-file-format-tips>>
 
 [[config-file-format-namespacing]]
 === Namespacing
@@ -154,7 +162,7 @@ style supports no escaping (use `''` to quote a single quote). Only printable
 characters can be used when using this form.
 
 Unquoted style requires no quotes, but does not support any escaping plus care
-needs to be taken to not use any symbol that has a speacial meaning in YAML.
+needs to be taken to not use any symbol that has a special meaning in YAML.
 
 Note: Single-quoted style is recommended when defining regular expressions,
 event format strings, windows file paths, or non-alphabetical symbolic characters.
@@ -313,7 +321,7 @@ when using plain references.
 === Command line arguments
 
 Config files to load are set using the `-c` flag on command line. If no flag is
-given, a beat and OS pecific default file path will be assumed.
+given, a beat and OS-specific default file path will be assumed.
 
 You can specify multiple configuration files by repeating the `-c` flag. You can
 use this, for example, for setting defaults in a base configuration file, and
