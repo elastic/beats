@@ -332,12 +332,14 @@ prepare-package:
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
 		-v $(abspath ../):/source \
 		-v $(BUILD_DIR):/build \
+		-v $(abspath ../../../aws):/awssdk \
 		-e PUREGO="yes" \
 		-e PACK=${BEATNAME} \
 		-e BEFORE_BUILD=before_build.sh \
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS} \
 		-e BUILDID=${BUILDID} \
+		-e AWSSDK=/awssdk \
 		tudorg/beats-builder \
 		${BEAT_DIR}
 
@@ -350,11 +352,13 @@ prepare-package-cgo:
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
 		-v $(abspath ../):/source \
 		-v $(BUILD_DIR):/build \
+		-v $(abspath ../../../aws):/awssdk \
 		-e PACK=${BEATNAME} \
 		-e BEFORE_BUILD=before_build.sh \
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS} \
 		-e BUILDID=${BUILDID} \
+		-e AWSSDK=/awssdk \
 		tudorg/beats-builder \
 		${BEAT_DIR}
 
@@ -363,11 +367,13 @@ prepare-package-cgo:
 		-v ${BUILD_DIR}:/build \
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
 		-v $(abspath ..):/source \
+		-v $(abspath ../../../aws):/awssdk \
 		-e PACK=${BEATNAME} \
 		-e BEFORE_BUILD=before_build.sh \
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS_OLD} \
 		-e BUILDID=${BUILDID} \
+		-e AWSSDK=/awssdk \
 		tudorg/beats-builder-deb6 \
 		${BEAT_DIR}
 
