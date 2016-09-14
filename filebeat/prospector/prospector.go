@@ -1,6 +1,7 @@
 package prospector
 
 import (
+	"errors"
 	"expvar"
 	"fmt"
 	"sync"
@@ -29,7 +30,6 @@ type Prospector struct {
 	states           *file.States
 	wg               sync.WaitGroup
 	harvesterCounter uint64
-	stateMutex       sync.Mutex
 }
 
 type Prospectorer interface {
@@ -117,7 +117,10 @@ func (p *Prospector) Run() {
 				logp.Info("Prospector channel stopped")
 				return
 			case event := <-p.harvesterChan:
-				p.updateState(event)
+				err := p.updateState(event)
+				if err != nil {
+					return
+				}
 			}
 		}
 	}()
@@ -139,9 +142,7 @@ func (p *Prospector) Run() {
 
 // updateState updates the prospector state and forwards the event to the spooler
 // All state updates done by the prospector itself are synchronous to make sure not states are overwritten
-func (p *Prospector) updateState(event *input.Event) {
-	p.stateMutex.Lock()
-	defer p.stateMutex.Unlock()
+func (p *Prospector) updateState(event *input.Event) error {
 
 	// Add ttl if cleanOlder is enabled
 	if p.config.CleanInactive > 0 {
@@ -151,10 +152,11 @@ func (p *Prospector) updateState(event *input.Event) {
 	ok := p.outlet.OnEvent(event)
 	if !ok {
 		logp.Info("Prospector outlet closed")
-		return
+		return errors.New("prospector outlet closed")
 	}
 
 	p.states.Update(event.State)
+	return nil
 }
 
 func (p *Prospector) Stop() {
@@ -186,7 +188,7 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 	}
 
 	state.Offset = offset
-	// All harvesters must start with a finished state
+	// Set state to "not" finished to indicate that a harvester is running
 	state.Finished = false
 
 	// Create harvester with state
@@ -202,7 +204,10 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 
 	// State is directly updated and not through channel to make state update immidiate
 	// State is only updated after setup is completed successfully
-	p.updateState(input.NewEvent(state))
+	err = p.updateState(input.NewEvent(state))
+	if err != nil {
+		return err
+	}
 
 	p.wg.Add(1)
 	// startHarvester is not run concurrently, but atomic operations are need for the decrementing of the counter
