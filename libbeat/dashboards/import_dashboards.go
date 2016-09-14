@@ -27,24 +27,15 @@ Usage: ./import_dashboards [options]
 
 Kibana dashboards are stored in a special index in Elasticsearch together with the searches, visualizations, and indexes that they use.
 
-You can import the dashboards, visualizations, searches, and the index pattern for a single Beat (eg. Metricbeat):
-  1. from a local directory:
-	./import_dashboards -dir kibana/metricbeat
-  2. from a local zip archive containing dashboards of multiple Beats:
-	./import_dashboards -beat metricbeat -file beats-dashboards-%s.zip
-  3. from the official zip archive available under http://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip:
-	./import_dashboards -beat metricbeat
-  4. from any zip archive available online:
-    ./import_dashboards -beat metricbeat -url https://github.com/monicasarbu/metricbeat-dashboards/archive/1.1.zip
+To import the official Kibana dashboards for your Beat version into a local Elasticsearch instance, use:
 
-To import only the index-pattern for a single Beat (eg. Metricbeat) use:
-	./import_dashboards -only-index -beat metricbeat
+	./import_dashboards
 
-To import only the dashboards together with visualizations and searches for a single Beat (eg. Metricbeat) use:
-	./import_dashboards -only-dashboards -beat metricbeat
+To import the official Kibana dashboards for your Beat version into a remote Elasticsearch instance with Shield, use:
 
-Options:
-`, lbeat.GetDefaultVersion(), lbeat.GetDefaultVersion())
+	./import_dashboards -es https://xyz.found.io -user user -pass password
+
+For more details, check https://www.elastic.co/guide/en/beats/libbeat/5.0/import-dashboards.html`)
 
 var beat string
 
