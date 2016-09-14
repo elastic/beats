@@ -21,6 +21,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/outputs/kafka"
 	_ "github.com/elastic/beats/libbeat/outputs/logstash"
 	_ "github.com/elastic/beats/libbeat/outputs/redis"
+	_ "github.com/elastic/beats/libbeat/outputs/s3"
 )
 
 // command line flags
