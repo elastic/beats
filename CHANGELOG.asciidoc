@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v1.3.0...1.3[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v1.3.1...1.3[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -28,8 +28,6 @@ https://github.com/elastic/beats/compare/v1.3.0...1.3[Check the HEAD diff]
 *Affecting all Beats*
 
 *Packetbeat*
-
-- Fix description for the -I CLI flag. {pull}2480[2480]
 
 *Topbeat*
 
@@ -67,9 +65,15 @@ https://github.com/elastic/beats/compare/v1.3.0...1.3[Check the HEAD diff]
 === Beats version 1.3.1
 https://github.com/elastic/beats/compare/v1.3.0...v1.3.1[View commits]
 
+==== Bugfixes
+
 *Filebeat*
 
 - Fix a concurrent bug on filebeat startup with a large number of prospectors defined. {pull}2509[2509]
+
+*Packetbeat*
+
+- Fix description for the -I CLI flag. {pull}2480[2480]
 
 [[release-notes-1.3.0]]
 === Beats version 1.3.0
