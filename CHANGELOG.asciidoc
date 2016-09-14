@@ -34,7 +34,6 @@ https://github.com/elastic/beats/compare/v1.3.1...1.3[Check the HEAD diff]
 *Filebeat*
 
 *Winlogbeat*
-- Fix corrupt registry file that occurs on power loss by disabling file write caching. {issue}2313[2313]
 
 ==== Added
 
@@ -75,6 +74,10 @@ https://github.com/elastic/beats/compare/v1.3.0...v1.3.1[View commits]
 *Packetbeat*
 
 - Fix description for the -I CLI flag. {pull}2480[2480]
+
+*Winlogbeat*
+
+- Fix corrupt registry file that occurs on power loss by disabling file write caching. {issue}2313[2313]
 
 [[release-notes-1.3.0]]
 === Beats version 1.3.0
