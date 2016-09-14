@@ -28,37 +28,36 @@ var (
 	filesTruncated     = expvar.NewInt("filebeat.harvester.files.truncated")
 )
 
-// Log harvester reads files line by line and sends events to the defined output
-func (h *Harvester) Harvest() {
+// Setup opens the file handler and creates the reader for the harvester
+func (h *Harvester) Setup() (reader.Reader, error) {
+	err := h.open()
+	if err != nil {
+		return nil, fmt.Errorf("Harvester setup failed. Unexpected file opening error: %s", err)
+	}
+
+	r, err := h.newLogFileReader()
+	if err != nil {
+		if h.file != nil {
+			h.file.Close()
+		}
+		return nil, fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
+	}
+
+	return r, nil
+
+}
+
+// Harvest reads files line by line and sends events to the defined output
+func (h *Harvester) Harvest(r reader.Reader) {
 
 	harvesterStarted.Add(1)
 	harvesterRunning.Add(1)
 	defer harvesterRunning.Add(-1)
 
-	h.state.Finished = false
-
 	// Makes sure file is properly closed when the harvester is stopped
 	defer h.close()
 
-	err := h.open()
-	if err != nil {
-		logp.Err("Stop Harvesting. Unexpected file opening error: %s", err)
-		return
-	}
-
 	logp.Info("Harvester started for file: %s", h.state.Source)
-
-	r, err := h.newLogFileReader()
-	if err != nil {
-		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
-		return
-	}
-
-	// Always report the state before starting a harvester
-	// This is useful in case the file was renamed
-	if !h.sendStateUpdate() {
-		return
-	}
 
 	for {
 		select {

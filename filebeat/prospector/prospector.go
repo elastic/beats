@@ -1,6 +1,7 @@
 package prospector
 
 import (
+	"errors"
 	"expvar"
 	"fmt"
 	"sync"
@@ -116,18 +117,10 @@ func (p *Prospector) Run() {
 				logp.Info("Prospector channel stopped")
 				return
 			case event := <-p.harvesterChan:
-				// Add ttl if cleanOlder is enabled
-				if p.config.CleanInactive > 0 {
-					event.State.TTL = p.config.CleanInactive
-				}
-
-				ok := p.outlet.OnEvent(event)
-				if !ok {
-					logp.Info("Prospector outlet closed")
+				err := p.updateState(event)
+				if err != nil {
 					return
 				}
-
-				p.states.Update(event.State)
 			}
 		}
 	}()
@@ -145,6 +138,25 @@ func (p *Prospector) Run() {
 			p.prospectorer.Run()
 		}
 	}
+}
+
+// updateState updates the prospector state and forwards the event to the spooler
+// All state updates done by the prospector itself are synchronous to make sure not states are overwritten
+func (p *Prospector) updateState(event *input.Event) error {
+
+	// Add ttl if cleanOlder is enabled
+	if p.config.CleanInactive > 0 {
+		event.State.TTL = p.config.CleanInactive
+	}
+
+	ok := p.outlet.OnEvent(event)
+	if !ok {
+		logp.Info("Prospector outlet closed")
+		return errors.New("prospector outlet closed")
+	}
+
+	p.states.Update(event.State)
+	return nil
 }
 
 func (p *Prospector) Stop() {
@@ -176,8 +188,23 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 	}
 
 	state.Offset = offset
+	// Set state to "not" finished to indicate that a harvester is running
+	state.Finished = false
+
 	// Create harvester with state
 	h, err := p.createHarvester(state)
+	if err != nil {
+		return err
+	}
+
+	reader, err := h.Setup()
+	if err != nil {
+		return fmt.Errorf("Error setting up harvester: %s", err)
+	}
+
+	// State is directly updated and not through channel to make state update immidiate
+	// State is only updated after setup is completed successfully
+	err = p.updateState(input.NewEvent(state))
 	if err != nil {
 		return err
 	}
@@ -191,8 +218,9 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 			atomic.AddUint64(&p.harvesterCounter, ^uint64(0))
 			p.wg.Done()
 		}()
+
 		// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
-		h.Harvest()
+		h.Harvest(reader)
 	}()
 
 	return nil
