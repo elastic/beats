@@ -18,7 +18,7 @@ RUN arch="$(dpkg --print-architecture)" \
 ENV KIBANA_VERSION 4.6.0
 
 RUN set -x \
-	&& curl -fSL "https://download.elastic.co/kibana/staging/4.6.0-f898fba/kibana/kibana-4.6.0-linux-x86_64.tar.gz" -o kibana.tar.gz \
+	&& curl -fSL "https://download.elastic.co/kibana/kibana/kibana-4.6.1-linux-x86_64.tar.gz" -o kibana.tar.gz \
 	&& mkdir -p /opt/kibana \
 	&& tar -xz --strip-components=1 -C /opt/kibana -f kibana.tar.gz \
 	&& chown -R kibana:kibana /opt/kibana \
@@ -30,7 +30,10 @@ COPY ./docker-entrypoint.sh /
 
 RUN gosu kibana kibana plugin --install elastic/sense
 RUN gosu kibana kibana plugin --install kibana/timelion
-RUN gosu kibana kibana plugin --install kibana/reporting/2.4.0-SNAPSHOT
+RUN gosu kibana kibana plugin --install kibana/reporting/2.4.0
+
+# generate a random key
+RUN echo "reporting.encryptionKey: `date +%s | sha256sum | base64 | head -c 32`" >> /opt/kibana/config/kibana.yml
 
 EXPOSE 5601
 ENTRYPOINT ["/docker-entrypoint.sh"]

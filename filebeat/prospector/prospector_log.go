@@ -75,7 +75,10 @@ func (p *ProspectorLog) Run() {
 				if state.Finished {
 					state.TTL = 0
 					event := input.NewEvent(state)
-					p.Prospector.harvesterChan <- event
+					err := p.Prospector.updateState(event)
+					if err != nil {
+						logp.Err("File cleanup state update error: %s", err)
+					}
 					logp.Debug("prospector", "Remove state for file as file removed: %s", state.Source)
 				} else {
 					logp.Debug("prospector", "State for file not removed because not finished: %s", state.Source)
@@ -232,7 +235,10 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 			// Update state because of file rotation
 			oldState.Source = newState.Source
 			event := input.NewEvent(oldState)
-			p.Prospector.harvesterChan <- event
+			err := p.Prospector.updateState(event)
+			if err != nil {
+				logp.Err("File rotation state update error: %s", err)
+			}
 
 			filesRenamed.Add(1)
 		} else {

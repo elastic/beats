@@ -13,3 +13,13 @@ logstash:
 kibana:
   build: ./docker/kibana
   dockerfile: Dockerfile-5.0.0-alpha5
+
+metricbeat:
+  build: ./docker/metricbeat
+  dockerfile: Dockerfile-5.0.0-cgroups
+  links:
+    - elasticsearch
+  volumes:
+    - "/proc:/hostfs/proc:ro"
+    - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup"
+  command: -system.hostfs=/hostfs -E output.elasticsearch.hosts=elasticsearch -E metricbeat.modules.0.cgroups=true

@@ -1,3 +1,4 @@
+[[kibana-queries-filters]]
 == Kibana Queries and Filters
 
 In Kibana, you can filter transactions either by entering a search query or by clicking on elements within a visualization.
