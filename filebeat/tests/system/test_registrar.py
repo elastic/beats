@@ -763,6 +763,10 @@ class Test(BaseTest):
             lambda: self.log_contains("Registry file updated"),
             max_timeout=15)
 
+        if os.name == "nt":
+            # On windows registry recreation can take a bit longer
+            time.sleep(1)
+
         data = self.get_registry()
         assert len(data) == 2
 

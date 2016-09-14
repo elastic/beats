@@ -47,6 +47,9 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Fix Elasticsearch structured error response parsing error. {issue}2229[2229]
 - Fixed the run script to allow the overriding of the configuration file. {issue}2171[2171]
 - Fix logstash output crash if no hosts are configured. {issue}2325[2325]
+- Fix array value support in -E CLI flag. {pull}2521[2521]
+- Fix merging array values if -c CLI flag is used multiple times. {pull}2521[2521]
+- Fix beats failing to start due to invalid duplicate key error in configuration file. {pull}2521[2521]
 
 *Metricbeat*
 - Fix module filters to work properly with drop_event filter. {issue}2249[2249]
