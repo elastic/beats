@@ -119,16 +119,25 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	if err != nil {
 		return err
 	}
-	// Stop crawler -> stop prospectors -> stop harvesters
-	defer crawler.Stop()
-
 	// Blocks progressing. As soon as channel is closed, all defer statements come into play
+
 	<-fb.done
 
-	if fb.config.ShutdownTimeout > 0 {
+	// Stop crawler -> stop prospectors -> stop harvesters
+	// Note: waiting for crawlers to stop here in order to install wgEvents.Wait
+	//       after all events have been enqueued for publishing. Otherwise wgEvents.Wait
+	//       or publisher might panic due to concurrent updates.
+	crawler.Stop()
+
+	timeout := fb.config.ShutdownTimeout
+	if timeout > 0 {
+		logp.Info("Shutdown output timer started. Waiting for max %v.", timeout)
+
 		// Wait for either timeout or all events having been ACKed by outputs.
-		fb.sigWait.Add(wgEvents.Wait)
-		fb.sigWait.AddTimeout(fb.config.ShutdownTimeout)
+		fb.sigWait.Add(withLog(wgEvents.Wait,
+			"Continue shutdown: All enqueued events being published."))
+		fb.sigWait.Add(withLog(waitDuration(timeout),
+			"Continue shutdown: Time out waiting for events being published."))
 	}
 
 	return nil
