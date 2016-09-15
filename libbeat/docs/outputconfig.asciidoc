@@ -54,6 +54,10 @@ output.elasticsearch:
 
 ------------------------------------------------------------------------------
 
+==== Compatibility
+
+This output works with all compatible versions of Elasticsearch. See "Supported Beats Versions" in the https://www.elastic.co/support/matrix#show_compatibility[Elastic Support Matrix].
+
 ==== Elasticsearch Output Options
 
 You can specify the following options in the `elasticsearch` section of the +{beatname_lc}.yml+ config file:
@@ -341,6 +345,10 @@ output.logstash:
   index: {beatname_lc}
 ------------------------------------------------------------------------------
 
+==== Compatibility
+
+This output works with all compatible versions of Logstash. See "Supported Beats Versions" in the https://www.elastic.co/support/matrix#show_compatibility[Elastic Support Matrix].
+
 ==== Logstash Output Options
 
 You can specify the following options in the `logstash` section of the
@@ -479,6 +487,10 @@ spooler size.
 
 The Kafka output sends the events to Apache Kafka.
 
+==== Compatibility
+
+This output works with Kafka 0.8, 0.9, and 0.10.
+
 ==== Kafka Output Options
 
 You can specify the following options in the `kafka` section of the +{beatname_lc}.yml+ config file:
@@ -610,6 +622,10 @@ output.redis:
   db: 0
   timeout: 5
 ------------------------------------------------------------------------------
+
+==== Compatibility
+
+This output works with Redis 3.2.0.
 
 ==== Redis Output Options
 
