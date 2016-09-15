@@ -551,7 +551,6 @@ func (http *HTTP) collectHeaders(m *message) interface{} {
 			}
 		}
 	}
-	fmt.Println("Headers: ", hdrs)
 	return hdrs
 }
 
