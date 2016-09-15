@@ -2237,12 +2237,10 @@
                         "total": {
                           "properties": {
                             "bytes": {
-                              "ignore_above": 1024,
-                              "type": "keyword"
+                              "type": "long"
                             },
                             "ios": {
-                              "ignore_above": 1024,
-                              "type": "keyword"
+                              "type": "long"
                             }
                           }
                         }

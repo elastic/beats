@@ -5068,7 +5068,7 @@ Path to the cgroup relative to the cgroup subsystems mountpoint.
 [float]
 === system.process.cgroup.blkio.total.bytes
 
-type: keyword
+type: long
 
 format: bytes
 
@@ -5078,7 +5078,7 @@ Total number of bytes transferred to and from all block devices by processes in 
 [float]
 === system.process.cgroup.blkio.total.ios
 
-type: keyword
+type: long
 
 Total number of I/O operations performed on all devices by processes in the cgroup as seen by the throttling policy.
 

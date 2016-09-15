@@ -241,12 +241,11 @@ update: python-env
 		cat etc/beat.full.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml ; \
 	fi;
 
-	# Update fields
-	echo "Update fields"
+	# Update docs
 
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEATNAME} ${ES_BEATS}
 
-	# Update templates
+	# Generate index templates
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME} ${ES_BEATS}
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME} ${ES_BEATS}
 
@@ -254,6 +253,7 @@ update: python-env
 	cp ${ES_BEATS}/libbeat/docs/version.asciidoc docs/version.asciidoc
 
 	# Generate index-pattern
+	echo "Generate index pattern"
 	-rm -f $(PWD)/etc/kibana/index-pattern/${BEATNAME}.json
 	mkdir -p $(PWD)/etc/kibana/index-pattern
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index ${BEATNAME}-* --libbeat ${ES_BEATS}/libbeat --beat $(PWD)
