@@ -1,7 +1,7 @@
 = Winlogbeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/1.3
 :elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/1.3
-:version: 1.3.0
+:version: 1.3.1
 :beatname_lc: winlogbeat
 :beatname_uc: Winlogbeat
 
