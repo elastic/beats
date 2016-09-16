@@ -69,7 +69,7 @@
             - name: value
               type: integer
               description: >
-          
+
             - name: limit
               type: integer
               description: >
@@ -77,12 +77,12 @@
     - name: curr
       type: group
       description: >
-      
+
       fields:
         - name: conns
           type: integer
           description: >
-            
+
         - name: ssl_conns
           type: integer
           description: >
@@ -90,12 +90,12 @@
     - name: cum
       type: group
       description: >
-      
+
       fields:
         - name: conns
           type: integer
           description: >
-            
+
         - name: req
           type: integer
           description: >
@@ -107,63 +107,62 @@
 
     - name: max
       type: group
-      description: >
+      description: Maximum values reported by HAProxy.
 
       fields:
         - name: hard_conn
           type: integer
-          description: >
+          description: HardMaxconn
+
+        - name: ssl.conns
+          type: integer
+          description: MaxSslConns
+
+        - name: ssl.rate
+          type: integer
+          description: MaxSslRate
 
         - name: sock
           type: integer
-          description: >     
-      
-        - name: conn
-          type: integer
-          description: >
+          description: Maxsock
 
-        - name: ssl_conns
+        - name: conn.value
           type: integer
-          description: >
+          description: Maxconn
+
+        - name: conn.rate
+          type: integer
+          description: MaxConnRate
+
+        - name: sess_rate
+          type: integer
+          description: MaxSessRate
 
         - name: pipes
           type: integer
-          description: >
-
-        - name: conn_rate
-          type: integer
-          description: >
-        
-        - name: sess_rate
-          type: integer
-          description: >
-
-        - name: ssl_rate
-          type: integer
-          description: >
+          description: Maxpipes
 
         - name: zlib_mem_usage
           type: integer
-          description: >
+          description: MaxZlibMemUsage
 
     - name: pipes
       type: group
       description: >
-      
+
       fields:
         - name: used
           type: integer
           description: >
-            
+
         - name: free
           type: integer
           description: >
 
-
     - name: sess
       type: group
       description: >
-      
+
       fields:
         - name: rate
           type: group
@@ -181,12 +180,12 @@
     - name: ssl
       type: group
       description: >
-      
+
       fields:
         - name: rate
           type: group
           description: >
-          
+
           fields:
             - name: value
               type: integer
@@ -199,7 +198,7 @@
         - name: frontend
           type: group
           description: >
-          
+
           fields:
             - name: key_rate
               type: integer
@@ -216,7 +215,7 @@
         - name: backend
           type: group
           description: >
-          
+
           fields:
             - name: key_rate
               type: integer
@@ -226,11 +225,11 @@
               type: integer
               description: >
 
-        - name: ssl_cached_lookups
+        - name: cached_lookups
           type: integer
           description: >
 
-        - name: ssl_cache_misses
+        - name: cache_misses
           type: integer
           description: >
 
