@@ -1,12 +1,12 @@
 package stat
 
 import (
+	"reflect"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/haproxy"
 	s "github.com/elastic/beats/metricbeat/schema"
 	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
-	"reflect"
-	"strings"
 )
 
 var (
@@ -98,45 +98,6 @@ var (
 		"ttime": c.Int("Ttime"),
 	}
 )
-
-func parseResponse(data []byte) []map[string]string {
-
-	var results []map[string]string
-
-	str := string(data)
-	fieldNames := []string{}
-
-	for lnNum, ln := range strings.Split(str, "\n") {
-
-		// If the line by any chance is empty, then skip it
-		ln := strings.Trim(ln, " ")
-		if ln == "" {
-			continue
-		}
-
-		// Now split the line on each comma and if there isn
-		ln = strings.Trim(ln, ",")
-		parts := strings.Split(strings.Trim(ln, " "), ",")
-		if len(parts) != 62 {
-			continue
-		}
-
-		// For the first row, keep the column names and continue
-		if lnNum == 0 {
-			fieldNames = parts
-			continue
-		}
-
-		res := map[string]string{}
-		for i, v := range parts {
-			res[fieldNames[i]] = v
-		}
-
-		results = append(results, res)
-
-	}
-	return results
-}
 
 // Map data to MapStr
 func eventMapping(info []*haproxy.Stat) []common.MapStr {
