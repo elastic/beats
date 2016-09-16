@@ -114,7 +114,7 @@ type: dict
 
 required: False
 
-The event specific data. This field is mutually exclusive with `user_data`.
+The event-specific data. This field is mutually exclusive with `user_data`. If you are capturing event data on versions prior to Windows Vista, the parameters in `event_data` are named `param1`, `param2`, and so on, because event log parameters are unnamed in earlier versions of Windows. 
 
 
 [float]
