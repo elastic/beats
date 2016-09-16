@@ -155,6 +155,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			logp.Info("Shutdown output timer started. Waiting for max %v.", timeout)
 			waitEvents.Add(withLog(waitDuration(timeout),
 				"Continue shutdown: Time out waiting for events being published."))
+		} else {
+			waitEvents.AddChan(fb.done)
 		}
 	}
 
