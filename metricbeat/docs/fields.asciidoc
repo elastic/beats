@@ -881,7 +881,7 @@ type: integer
 [float]
 == max Fields
 
-
+Maximum values reported by HAProxy.
 
 
 [float]
@@ -889,63 +889,63 @@ type: integer
 
 type: integer
 
+HardMaxconn
 
+[float]
+=== haproxy.info.max.ssl.conns
+
+type: integer
+
+MaxSslConns
+
+[float]
+=== haproxy.info.max.ssl.rate
+
+type: integer
+
+MaxSslRate
 
 [float]
 === haproxy.info.max.sock
 
 type: integer
 
-
+Maxsock
 
 [float]
-=== haproxy.info.max.conn
+=== haproxy.info.max.conn.value
 
 type: integer
 
-
+Maxconn
 
 [float]
-=== haproxy.info.max.ssl_conns
+=== haproxy.info.max.conn.rate
 
 type: integer
 
-
-
-[float]
-=== haproxy.info.max.pipes
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.max.conn_rate
-
-type: integer
-
-
+MaxConnRate
 
 [float]
 === haproxy.info.max.sess_rate
 
 type: integer
 
-
+MaxSessRate
 
 [float]
-=== haproxy.info.max.ssl_rate
+=== haproxy.info.max.pipes
 
 type: integer
 
-
+Maxpipes
 
 [float]
 === haproxy.info.max.zlib_mem_usage
 
 type: integer
 
-
+MaxZlibMemUsage
 
 [float]
 == pipes Fields
@@ -1067,14 +1067,14 @@ type: integer
 
 
 [float]
-=== haproxy.info.ssl.ssl_cached_lookups
+=== haproxy.info.ssl.cached_lookups
 
 type: integer
 
 
 
 [float]
-=== haproxy.info.ssl.ssl_cache_misses
+=== haproxy.info.ssl.cache_misses
 
 type: integer
 

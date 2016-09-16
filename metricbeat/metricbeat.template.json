@@ -371,10 +371,14 @@
                 "max": {
                   "properties": {
                     "conn": {
-                      "type": "long"
-                    },
-                    "conn_rate": {
-                      "type": "long"
+                      "properties": {
+                        "rate": {
+                          "type": "long"
+                        },
+                        "value": {
+                          "type": "long"
+                        }
+                      }
                     },
                     "hard_conn": {
                       "type": "long"
@@ -388,11 +392,15 @@
                     "sock": {
                       "type": "long"
                     },
-                    "ssl_conns": {
-                      "type": "long"
-                    },
-                    "ssl_rate": {
-                      "type": "long"
+                    "ssl": {
+                      "properties": {
+                        "conns": {
+                          "type": "long"
+                        },
+                        "rate": {
+                          "type": "long"
+                        }
+                      }
                     },
                     "zlib_mem_usage": {
                       "type": "long"
@@ -450,6 +458,12 @@
                         }
                       }
                     },
+                    "cache_misses": {
+                      "type": "long"
+                    },
+                    "cached_lookups": {
+                      "type": "long"
+                    },
                     "frontend": {
                       "properties": {
                         "key_rate": {
@@ -472,12 +486,6 @@
                           "type": "long"
                         }
                       }
-                    },
-                    "ssl_cache_misses": {
-                      "type": "long"
-                    },
-                    "ssl_cached_lookups": {
-                      "type": "long"
                     }
                   }
                 },
