@@ -10,7 +10,7 @@ Filebeat consists of two main components: <<prospector,prospectors>> and <<harve
 [[harvester]]
 === What is a Harvester?
 
-A harvester is responsible for reading the content of a single file. The harvester reads each file, line by line, and sends the content to the output. One harvester is started for each file. The harvester is responsible for opening and closing the file, which means that the file descriptor remains open while the harvester is running. If a file is removed or renamed while it's being harvested, Filebeat continues to read the file. This has the side effect that the space on your disk is reserved until the harvester closes. By default, Filebeat keeps the file open for harvesting for 5 minutes.
+A harvester is responsible for reading the content of a single file. The harvester reads each file, line by line, and sends the content to the output. One harvester is started for each file. The harvester is responsible for opening and closing the file, which means that the file descriptor remains open while the harvester is running. If a file is removed or renamed while it's being harvested, Filebeat continues to read the file. This has the side effect that the space on your disk is reserved until the harvester closes. By default, Filebeat keeps the file open until <<close-inactive,`close_inactive`>> is reached.
 
 Closing a harvester has the following consequences:
 
@@ -39,7 +39,7 @@ filebeat.prospectors:
     - /var/path2/*.log
 -------------------------------------------------------------------------------------
 
-Filebeat currently supports two `prospector` types: `log` and `stdin`. Each prospector type can be defined multiple times. The `log` prospector checks each file to see whether a harvester needs to be started, whether one is already running, or whether the file can be ignored (see <<ignore-older,`ignore_older`>>). New files are only picked up if the offset or size of the file has changed since the harvester was closed.
+Filebeat currently supports two `prospector` types: `log` and `stdin`. Each prospector type can be defined multiple times. The `log` prospector checks each file to see whether a harvester needs to be started, whether one is already running, or whether the file can be ignored (see <<ignore-older,`ignore_older`>>). New files are only picked up if the size of the file has changed since the harvester was closed.
 
 [float]
 === How Does Filebeat Keep the State of Files?
