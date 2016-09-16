@@ -47,15 +47,13 @@ def fields_to_es_template(args, input, output, index, version):
         "settings": {
             "index.refresh_interval": "5s"
         },
+        "version": version,
         "mappings": {
             "_default_": {
                 "_all": {
                     "norms": False
                 },
-                "properties": {},
-                "_meta": {
-                    "version": version,
-                }
+                "properties": {}
             }
         }
     }

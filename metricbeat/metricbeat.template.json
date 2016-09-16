@@ -4,9 +4,6 @@
       "_all": {
         "norms": false
       },
-      "_meta": {
-        "version": "6.0.0-alpha1"
-      },
       "dynamic_templates": [
         {
           "fields": {
@@ -2775,5 +2772,6 @@
   "settings": {
     "index.refresh_interval": "5s"
   },
-  "template": "metricbeat-*"
+  "template": "metricbeat-*",
+  "version": "6.0.0-alpha1"
 }
