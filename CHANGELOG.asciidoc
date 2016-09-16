@@ -8,11 +8,64 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.0.0-beta1...master[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Topbeat*
+
+*Filebeat*
+
+*Winlogbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Topbeat*
+
+*Filebeat*
+
+*Winlogbeat*
+
+==== Added
+
+*Affecting all Beats*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Topbeat*
+
+*Filebeat*
+
+- Add command line option -once to run filebeat only once and then close {pull}2456[2456]
+
+*Winlogbeat*
+
+
+////////////////////////////////////////////////////////////
+
+[[release-notes-5.0.0-beta1]]
+=== Beats version 5.0.0-beta1
+https://github.com/elastic/beats/compare/v5.0.0-alpha5...v5.0.0-beta1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
 - Change Elasticsearch output index configuration to be based on format strings. If index has been configured, no date will be appended anymore to the index name. {pull}2119[2119]
 - Replace `output.kafka.use_type` by `output.kafka.topic` accepting a format string. {pull}2188[2188]
 - If the path specified by the `-c` flag is not absolute and `-path.config` is not specified, it
@@ -23,26 +76,26 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - replace `tls.min/max_version` with `ssl.supported_protocols` setting requiring full protocol name. {pull}2330[2330]
 
 *Metricbeat*
+
 - Change field type system.process.cpu.start_time from keyword to date. {issue}1565[1565]
 - redis/info metricset fields were renamed up according to the naming conventions.
 
 *Packetbeat*
+
 - Group HTTP fields under `http.request` and `http.response` {pull}2167[2167]
 - Export `http.request.body` and `http.response.body` when configured under `include_body_for` {pull}2167[2167]
 - Move `ignore_outgoing` config to `packetbeat.ignore_outgoing` {pull}2393[2393]
 
-*Topbeat*
-
 *Filebeat*
+
 - Set close_inactive default to 5 minutes (was 1 hour before)
 - Set clean_removed and close_removed to true by default
-
-*Winlogbeat*
 
 
 ==== Bugfixes
 
 *Affecting all Beats*
+
 - Fix logstash output handles error twice when asynchronous sending fails. {pull}2441[2441]
 - Fix Elasticsearch structured error response parsing error. {issue}2229[2229]
 - Fixed the run script to allow the overriding of the configuration file. {issue}2171[2171]
@@ -53,20 +106,22 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Fix panic on non writable logging directory.
 
 *Metricbeat*
+
 - Fix module filters to work properly with drop_event filter. {issue}2249[2249]
 
 *Packetbeat*
+
 - Fix mapping for some Packetbeat flow metrics that were not marked as being longs. {issue}2177[2177]
 - Fix handling of messages larger than the maximum message size (10MB). {pull}2470[2470]
 
-*Topbeat*
-
 *Filebeat*
+
 - Fix processor failure in Filebeat when using regex, contain, or equals with the message field. {issue}2178[2178]
 - Fix async publisher sending empty events {pull}2455[2455]
 - Fix potential issue with multiple harvester per file on large file numbers or slow output {pull}2541[2541]
 
 *Winlogbeat*
+
 - Fix corrupt registry file that occurs on power loss by disabling file write caching. {issue}2313[2313]
 
 ==== Added
@@ -113,33 +168,14 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Add IP address to -devices command output {pull}2327[2327]
 - Add configuration option for the maximum message size. Used to be hard-coded to 10 MB. {pull}2470[2470]
 
-*Topbeat*
-
 *Filebeat*
+
 - Introduce close_timeout harvester options {issue}1926[1926]
 - Strip BOM from first message in case of BOM files {issue}2351[2351]
-- Add command line option -once to run filebeat only once and then close {pull}2456[2456]
 
 
 - Add harvester_limit option {pull}2417[2417]
 
-*Winlogbeat*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-- Topology map is deperecated. This applies to the settings: refresh_topology_freq, topology_expire, save_topology, host_topology, password_topology, db_topology
-
-*Packetbeat*
-
-*Topbeat*
-
-*Filebeat*
-
-*Winlogbeat*
-
-////////////////////////////////////////////////////////////
 
 [[release-notes-5.0.0-alpha5]]
 === Beats version 5.0.0-alpha5
