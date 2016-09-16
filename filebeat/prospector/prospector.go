@@ -29,6 +29,7 @@ type Prospector struct {
 	done             chan struct{}
 	states           *file.States
 	wg               sync.WaitGroup
+	channelWg        sync.WaitGroup // Separate waitgroup for channels as not stopped on completion
 	harvesterCounter uint64
 }
 
@@ -50,6 +51,7 @@ func NewProspector(cfg *common.Config, states file.States, outlet Outlet) (*Pros
 		done:          make(chan struct{}),
 		states:        states.Copy(),
 		wg:            sync.WaitGroup{},
+		channelWg:     sync.WaitGroup{},
 	}
 
 	if err := cfg.Unpack(&prospector.config); err != nil {
@@ -101,16 +103,22 @@ func (p *Prospector) Init() error {
 }
 
 // Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
-func (p *Prospector) Run() {
+func (p *Prospector) Run(once bool) {
 
 	logp.Info("Starting prospector of type: %v", p.config.InputType)
-	p.wg.Add(2)
-	defer p.wg.Done()
 
+	// This waitgroup is not needed if run only once
+	// Waitgroup has to be added here to prevent panic in case Stop is called immediately afterwards
+	if !once {
+		// Add waitgroup to make sure prospectors finished
+		p.wg.Add(1)
+		defer p.wg.Done()
+	}
 	// Open channel to receive events from harvester and forward them to spooler
 	// Here potential filtering can happen
+	p.channelWg.Add(1)
 	go func() {
-		defer p.wg.Done()
+		defer p.channelWg.Done()
 		for {
 			select {
 			case <-p.done:
@@ -127,6 +135,13 @@ func (p *Prospector) Run() {
 
 	// Initial prospector run
 	p.prospectorer.Run()
+
+	// Shuts down after the first complete scan of all prospectors
+	// As all harvesters are part of the prospector waitgroup, this waits for the closing of all harvesters
+	if once {
+		p.wg.Wait()
+		return
+	}
 
 	for {
 		select {
@@ -162,6 +177,7 @@ func (p *Prospector) updateState(event *input.Event) error {
 func (p *Prospector) Stop() {
 	logp.Info("Stopping Prospector")
 	close(p.done)
+	p.channelWg.Wait()
 	p.wg.Wait()
 }
 
