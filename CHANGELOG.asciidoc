@@ -103,6 +103,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Add experimental libbeat metricset in the beats module. {pull}2339[2339]
 - Improve mapping by converting half_float to scaled_float and integers to long. {pull}2430[2430]
 - Add experimental haproxy module. {pull}2384[2384]
+- Add Kibana dashboard for cgroups data {pull}2555[2555]
 
 *Packetbeat*
 
