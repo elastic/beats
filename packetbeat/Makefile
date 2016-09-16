@@ -1,6 +1,6 @@
 
 BEATNAME?=packetbeat
-BEAT_DESCRIPTION?=A network analyzer tool that sends data to Elasticsearch.
+BEAT_DESCRIPTION?=Packetbeat analyzes network traffic and sends the data to Elasticsearch.
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
 TARGETS="windows/amd64 windows/386 darwin/amd64"
