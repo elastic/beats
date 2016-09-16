@@ -43,6 +43,7 @@ There are additional configuration options that you can use to close file handle
 * <<close-removed,`close_removed`>>
 * <<close-eof,`close_eof`>>
 * <<close-timeout,`close_timeout`>>
+* <<harvester-limit,`harvester_limit`>>
 
 The `close_renamed` and `close_removed` options can be useful on Windows to resolve issues related to file rotation. See <<windows-file-rotation>>. The `close_eof` option can be useful in environments with a large number of files that have only very few entries. The `close_timeout` option is useful in environments where closing file handlers is more important than sending all log lines. For more details, see <<configuration-filebeat-options>>.
 
@@ -52,7 +53,7 @@ Make sure that you read the documentation for these configuration options before
 [[reduce-registry-size]]
 === Registry file is too large?
 
-Filebeat keeps the state of each file and persists the state to disk in the `registry_file`. The file state is used to continue file reading at a previous position when Filebeat is restarted. If a large number of new files are produced every day, the registry file might grow to be too large. To reduce the size of the registry file, there are two configuration options available: <<clean-removed,`clean_removed`>> and <<close-inactive,`close_inactive`>>.
+Filebeat keeps the state of each file and persists the state to disk in the `registry_file`. The file state is used to continue file reading at a previous position when Filebeat is restarted. If a large number of new files are produced every day, the registry file might grow to be too large. To reduce the size of the registry file, there are two configuration options available: <<clean-removed,`clean_removed`>> and <<clean-inactive,`clean_inactive`>>.
 
 For old files that you no longer touch and are ignored (see <<ignore-older,`ignore_older`>>), we recommended that you use `clean_inactive`. If old files get removed from disk, then use the `clean_removed` option.
 

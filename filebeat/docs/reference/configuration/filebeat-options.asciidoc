@@ -168,6 +168,8 @@ If this option is enabled, Filebeat ignores any files that were modified before 
 You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 0, which disables the setting.
 Commenting out the config has the same effect as setting it to 0.
 
+IMPORTANT: You must set `ignore_older` to be greater than `close_inactive`. 
+
 The files affected by this setting fall into two categories:
 
 * Files that were never harvested
@@ -181,7 +183,7 @@ To remove the state of previously harvested files from the registry file, use th
 
 Before a file can be ignored by the prospector, it must be closed. To ensure a file is no longer being harvested when it is ignored, you must set `ignore_older` to a longer duration than `close_inactive`. 
 
-If a file that's currently being harvested falls under `ignore_older`, the harvester will finish reading the file and close it after `close_inactive` is reached. 
+If a file that's currently being harvested falls under `ignore_older`, the harvester will first finish reading the file and close it after `close_inactive` is reached. Then, after that, the file will be ignored.
 
 [[close-options]]
 ===== close_*
@@ -242,7 +244,7 @@ The `close_timeout` setting won't apply if your output is stalled and no further
 [[clean-options]]
 ===== clean_*
 
-The `clean_*` options are used to clean up the state entries in the registry file. These settings help to reduce the size of the registry file and can prevent a potential <<inode-reuse-issue,inode reuse issue>>. These options are disabled by default because incorrect settings can lead to data duplication when complete log files are sent again.
+The `clean_*` options are used to clean up the state entries in the registry file. These settings help to reduce the size of the registry file and can prevent a potential <<inode-reuse-issue,inode reuse issue>>. 
 
 [[clean-inactive]]
 ===== clean_inactive
@@ -431,24 +433,23 @@ the backoff algorithm is disabled, and the `backoff` value is used for waiting f
 lines. The `backoff` value will be multiplied each time with the `backoff_factor` until
 `max_backoff` is reached. The default is 2.
 
+[[harvester-limit]]
 ===== harvester_limit
 
 experimental[]
 
-`harvester_limit` limits the number of harvesters that are started in parallel for one prospector. This directly relates
-to the maximum number of file handlers that are opened. The default is 0 which means there is no limit. This configuration
-is useful if the number of files to be harvested exceeds the open file handler limit of the operating system.
+The `harvester_limit` option limits the number of harvesters that are started in parallel for one prospector. This directly relates
+to the maximum number of file handlers that are opened. The default for `harvester_limit` is 0, which means there is no limit. This
+configuration is useful if the number of files to be harvested exceeds the open file handler limit of the operating system.
 
-As setting a limit on harvester means that potentially not all files are opened in parallel, it is recommended to use
-this option in combination with the `close_*` options to make sure harvesters are stopped more often so new files can be
+Setting a limit on the number of harvesters means that potentially not all files are opened in parallel. Therefore we recommended that you use
+this option in combination with the `close_*` options to make sure harvesters are stopped more often so that new files can be
 picked up.
 
-Currently if a new harvester can be started again, the new harvester to be started is picked randomly. This means it can
-happen that a harvester for a file which was just closed and the file was updated again will be started instead of a
-harvester for a file which wasn't harvested for a longer period of time.
+Currently if a new harvester can be started again, the harvester is picked randomly. This means it's possible that the harvester for a file that was just closed and then updated again might be started instead of the harvester for a file that hasn't been harvested for a longer period of time.
 
-This configuration option applies per prospector. This can be indirectly used to set higher priorities on certain prospectors
-by assining a higher limit of harvesters.
+This configuration option applies per prospector. You can use this option to indirectly set higher priorities on certain prospectors
+by assigning a higher limit of harvesters.
 
 [[configuration-global-options]]
 === Filebeat Global Configuration
