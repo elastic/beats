@@ -12,7 +12,6 @@ import (
 )
 
 // init registers the MetricSet with the central registry.
-// The New method will be called after the setup of the module and before starting to fetch data
 func init() {
 	if err := mb.Registry.AddMetricSet("goprof", "memstats", New); err != nil {
 		panic(err)
@@ -29,8 +28,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
-	// Additional configuration options
 	config := struct {
 		VarsPath string `config:"vars_path"`
 	}{

@@ -1,0 +1,3 @@
+=== goprof memprof MetricSet
+
+This is the memprof metricset of the module goprof.

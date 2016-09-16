@@ -1,0 +1,9 @@
+- name: memprof
+  type: group
+  description: >
+    memprof
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
