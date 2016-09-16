@@ -67,11 +67,7 @@ func (r *Registrar) Init() error {
 	if os.IsNotExist(err) {
 		logp.Info("No registry file found under: %s. Creating a new registry file.", r.registryFile)
 		// No registry exists yet, write empty state to check if registry can be written
-		err = r.writeRegistry()
-		if err != nil {
-			return err
-		}
-		return nil
+		return r.writeRegistry()
 	}
 	if err != nil {
 		return err
@@ -262,6 +258,7 @@ func (r *Registrar) writeRegistry() error {
 	encoder := json.NewEncoder(f)
 	err = encoder.Encode(states)
 	if err != nil {
+		f.Close()
 		logp.Err("Error when encoding the states: %s", err)
 		return err
 	}
