@@ -1,0 +1,5 @@
+#- module: goprof
+  #metricsets: ["memstats"]
+  #enabled: true
+  #period: 1s
+  #hosts: ["localhost:6060"]

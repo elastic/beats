@@ -13,6 +13,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/beats"
 	_ "github.com/elastic/beats/metricbeat/module/beats/filebeat"
 	_ "github.com/elastic/beats/metricbeat/module/beats/libbeat"
+	_ "github.com/elastic/beats/metricbeat/module/goprof"
+	_ "github.com/elastic/beats/metricbeat/module/goprof/memstats"
 	_ "github.com/elastic/beats/metricbeat/module/haproxy"
 	_ "github.com/elastic/beats/metricbeat/module/haproxy/info"
 	_ "github.com/elastic/beats/metricbeat/module/haproxy/stat"

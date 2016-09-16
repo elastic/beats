@@ -78,6 +78,13 @@ metricbeat.modules:
   #vars_path: /debug/vars
 
 
+#------------------------------- goprof Module -------------------------------
+#- module: goprof
+  #metricsets: ["memstats"]
+  #enabled: true
+  #period: 1s
+  #hosts: ["localhost:6060"]
+
 #------------------------------- haproxy Module ------------------------------
 #- module: haproxy
   #metricsets: [stat, info]

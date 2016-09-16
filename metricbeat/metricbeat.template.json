@@ -306,6 +306,109 @@
             }
           }
         },
+        "goprof": {
+          "properties": {
+            "memstats": {
+              "properties": {
+                "allocator": {
+                  "properties": {
+                    "allocations": {
+                      "type": "long"
+                    },
+                    "frees": {
+                      "type": "long"
+                    },
+                    "size": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "gc_cycle": {
+                  "properties": {
+                    "duration": {
+                      "properties": {
+                        "ns": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "end": {
+                      "type": "date"
+                    },
+                    "run": {
+                      "type": "long"
+                    },
+                    "start": {
+                      "type": "date"
+                    }
+                  }
+                },
+                "gc_summary": {
+                  "properties": {
+                    "gc_count": {
+                      "type": "long"
+                    },
+                    "gc_total_pause": {
+                      "properties": {
+                        "ns": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "next_gc_limit": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "heap": {
+                  "properties": {
+                    "allocations": {
+                      "properties": {
+                        "active": {
+                          "type": "long"
+                        },
+                        "allocated": {
+                          "type": "long"
+                        },
+                        "frees": {
+                          "type": "long"
+                        },
+                        "idle": {
+                          "type": "long"
+                        },
+                        "mallocs": {
+                          "type": "long"
+                        },
+                        "objects": {
+                          "type": "long"
+                        },
+                        "total": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "system": {
+                      "properties": {
+                        "obtained": {
+                          "type": "long"
+                        },
+                        "released": {
+                          "type": "long"
+                        },
+                        "stack": {
+                          "type": "long"
+                        },
+                        "total": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "haproxy": {
           "properties": {
             "info": {

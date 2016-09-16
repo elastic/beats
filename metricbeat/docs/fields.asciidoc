@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-beats>>
 * <<exported-fields-common>>
+* <<exported-fields-goprof>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -698,6 +699,266 @@ example: metricsets
 required: True
 
 The document type. Always set to "metricsets".
+
+
+[[exported-fields-goprof]]
+== goprof Fields
+
+goprof Module
+
+
+
+[float]
+== goprof Fields
+
+go http based process profiling information.
+
+
+
+[float]
+== memstats Fields
+
+golang expvar memstats
+
+
+
+[float]
+== gc_summary Fields
+
+Garbage collector summary
+
+
+
+[float]
+=== goprof.memstats.gc_summary.next_gc_limit
+
+type: long
+
+format: bytes
+
+Upper bound of memory being allocated until another garbage collection phase will be run.
+
+
+[float]
+=== goprof.memstats.gc_summary.gc_count
+
+type: long
+
+Total number of garbage collection cycles executed since program startup
+
+
+[float]
+== gc_total_pause Fields
+
+Total duration of all garbage collection cycles
+
+
+[float]
+=== goprof.memstats.gc_summary.gc_total_pause.ns
+
+type: long
+
+Duration in nanoseconds
+
+[float]
+== heap Fields
+
+Heap usage counters.
+
+
+
+[float]
+== allocations Fields
+
+Application heap allocations counters.
+
+
+
+[float]
+=== goprof.memstats.heap.allocations.mallocs
+
+type: long
+
+Total number of memory allocations
+
+
+[float]
+=== goprof.memstats.heap.allocations.frees
+
+type: long
+
+Number of memory allocations being freed.
+
+
+[float]
+=== goprof.memstats.heap.allocations.objects
+
+type: long
+
+Total number of allocated heap objects.
+
+
+[float]
+=== goprof.memstats.heap.allocations.total
+
+type: long
+
+format: bytes
+
+Total number of bytes being allocated since startup.
+
+
+[float]
+=== goprof.memstats.heap.allocations.allocated
+
+type: long
+
+format: bytes
+
+Number of bytes being actively allocated and not yet freed.
+
+
+[float]
+=== goprof.memstats.heap.allocations.idle
+
+type: long
+
+format: bytes
+
+Bytes in idle heap spans
+
+
+[float]
+=== goprof.memstats.heap.allocations.active
+
+type: long
+
+format: bytes
+
+Bytes in non-idle heap spans
+
+
+[float]
+== system Fields
+
+Memory allocator system counters.
+
+
+
+[float]
+=== goprof.memstats.heap.system.total
+
+type: long
+
+format: bytes
+
+Total number of bytes received from system
+
+
+[float]
+=== goprof.memstats.heap.system.obtained
+
+type: long
+
+format: bytes
+
+Bytes optained from system
+
+
+[float]
+=== goprof.memstats.heap.system.stack
+
+type: long
+
+format: bytes
+
+System memory allocated for go-routine stacks.
+
+
+[float]
+=== goprof.memstats.heap.system.released
+
+type: long
+
+format: bytes
+
+Number of bytes returned to OS.
+
+
+[float]
+== allocator Fields
+
+Go runtime allocator per size class counters.
+
+
+
+[float]
+=== goprof.memstats.allocator.size
+
+type: long
+
+format: bytes
+
+The allocator bucket its size.
+
+
+[float]
+=== goprof.memstats.allocator.allocations
+
+type: long
+
+format: bytes
+
+Total number of allocation from current size class.
+
+
+[float]
+=== goprof.memstats.allocator.frees
+
+type: long
+
+format: bytes
+
+Total number of objects being freed in current size class.
+
+
+[float]
+== gc_cycle Fields
+
+Go per garbage collection cycle counters.
+
+
+
+[float]
+=== goprof.memstats.gc_cycle.run
+
+type: long
+
+The nth garbage collection cycle since startup
+
+
+[float]
+=== goprof.memstats.gc_cycle.start
+
+type: date
+
+GC cycle start timestamp
+
+
+[float]
+=== goprof.memstats.gc_cycle.end
+
+type: date
+
+GC cycle end timestamp
+
+
+[float]
+=== goprof.memstats.gc_cycle.duration.ns
+
+type: long
+
+GC cycle duration in nanoseconds.
 
 
 [[exported-fields-haproxy]]
