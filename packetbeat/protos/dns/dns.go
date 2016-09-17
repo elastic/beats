@@ -469,7 +469,10 @@ func addDnsToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 
 	m["answers_count"] = len(dns.Answer)
 	if len(dns.Answer) > 0 {
-		m["answers"] = ansToMapStrs(dns.Answer)
+		//m["answers"] = ansToMapStrs(dns.Answer)
+        ans := ansToMapStrs(dns.Answer)
+        ans["raw"] = rrsToMapStrs(dns.Answer)
+		m["answers"] = ans
 	}
 
 	m["authorities_count"] = len(dns.Ns)
@@ -551,20 +554,40 @@ func rrsToMapStrs(records []mkdns.RR) []common.MapStr {
 	return mapStrArray
 }
 
+func AppendStrIfMissing(slice []string, i string) []string {
+    for _, ele := range slice {
+        if ele == i {
+            return slice
+        }
+    }
+    return append(slice, i)
+}
+
+func AppendIntIfMissing(slice []int, i int) []int {
+    for _, ele := range slice {
+        if ele == i {
+            return slice
+        }
+    }
+    return append(slice, i)
+}
+
 // ansToMapStrs extracts answers from an array of RR's and returns MapStr.
+// TODO adapt unit tests for this
 func ansToMapStrs(answers []mkdns.RR) common.MapStr {
         answer_class := []string{}
         answer_data := []string{}
         answer_name := []string{}
-        answer_ttl := []string{}
+        answer_ttl := []int{}
         answer_type := []string{}
 
         for _, a := range rrsToMapStrs(answers) {
-            answer_class = append(answer_class, fmt.Sprint(a["class"]))
-            answer_data = append(answer_data, fmt.Sprint(a["data"]))
-            answer_name = append(answer_name, fmt.Sprint(a["name"]))
-            answer_ttl = append(answer_ttl, fmt.Sprint(a["ttl"]))
-            answer_type = append(answer_type, fmt.Sprint(a["type"]))
+            answer_class = AppendStrIfMissing(answer_class, fmt.Sprint(a["class"]))
+            answer_data = AppendStrIfMissing(answer_data, fmt.Sprint(a["data"]))
+            answer_name = AppendStrIfMissing(answer_name, fmt.Sprint(a["name"]))
+            i, _ := strconv.Atoi(fmt.Sprint(a["ttl"]))
+            answer_ttl = AppendIntIfMissing(answer_ttl, i)
+            answer_type = AppendStrIfMissing(answer_type, fmt.Sprint(a["type"]))
         }
         ansMapStr := common.MapStr{}
         ansMapStr["class"] = answer_class
