@@ -469,7 +469,6 @@ func addDnsToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 
 	m["answers_count"] = len(dns.Answer)
 	if len(dns.Answer) > 0 {
-		//m["answers"] = ansToMapStrs(dns.Answer)
         ans := ansToMapStrs(dns.Answer)
         ans["raw"] = rrsToMapStrs(dns.Answer)
 		m["answers"] = ans
