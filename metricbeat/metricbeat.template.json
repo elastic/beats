@@ -308,6 +308,280 @@
         },
         "goprof": {
           "properties": {
+            "memprof": {
+              "properties": {
+                "allocation": {
+                  "properties": {
+                    "address": {
+                      "type": "long"
+                    },
+                    "file": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "function": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "line": {
+                      "type": "long"
+                    },
+                    "package": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "stats": {
+                      "properties": {
+                        "alloc_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "alloc_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "edge_allocation": {
+                  "properties": {
+                    "child": {
+                      "properties": {
+                        "file": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "name": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "package": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "parent": {
+                      "properties": {
+                        "file": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "name": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "package": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "stats": {
+                      "properties": {
+                        "alloc_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "alloc_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "function": {
+                  "properties": {
+                    "children": {
+                      "properties": {
+                        "alloc_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "alloc_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "file": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "package": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "self": {
+                      "properties": {
+                        "alloc_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "alloc_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "total": {
+                      "properties": {
+                        "alloc_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "alloc_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "run": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "summary": {
+                  "properties": {
+                    "alloc_objects": {
+                      "properties": {
+                        "count": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "alloc_space": {
+                      "properties": {
+                        "count": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "inuse_objects": {
+                      "properties": {
+                        "count": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "inuse_space": {
+                      "properties": {
+                        "count": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "memstats": {
               "properties": {
                 "allocator": {

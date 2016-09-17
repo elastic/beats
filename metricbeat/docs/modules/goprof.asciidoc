@@ -19,9 +19,9 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 #- module: goprof
-  #metricsets: ["memstats"]
+  #metricsets: ["memstats", "memprof"]
   #enabled: true
-  #period: 1s
+  #period: 30s
   #hosts: ["localhost:6060"]
 ----
 
@@ -30,7 +30,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-goprof-memprof,memprof>>
+
 * <<metricbeat-metricset-goprof-memstats,memstats>>
+
+include::goprof/memprof.asciidoc[]
 
 include::goprof/memstats.asciidoc[]
 

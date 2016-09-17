@@ -45,9 +45,9 @@ metricbeat.modules:
 
 #------------------------------- goprof Module -------------------------------
 #- module: goprof
-  #metricsets: ["memstats"]
+  #metricsets: ["memstats", "memprof"]
   #enabled: true
-  #period: 1s
+  #period: 30s
   #hosts: ["localhost:6060"]
 
 

@@ -387,6 +387,203 @@
       description: >
         go http based process profiling information.
       fields:
+        - name: memprof
+          type: group
+          description: >
+            HTTP sampling based memory profiler.
+          fields:
+
+            - name: run
+              type: keyword
+              description: unique id shared by all events of the same profiling run.
+
+            - name: summary
+              type: group
+              description: >
+                Total allocation statistics of profile run.
+              fields:
+                - name: alloc_objects.count
+                  type: long
+                  description: Total number of objects allocated.
+                - name: alloc_space.count
+                  type: long
+                  format: bytes
+                  description: Total amount of bytes allocated.
+                - name: inuse_objects.count
+                  type: long
+                  description: Number of objects not being collected by garbage collector.
+                - name: inuse_space.count
+                  type: long
+                  format: bytes
+                  description: Amount of space not being collected by garbage collector.
+
+            - name: function
+              type: group
+              description: >
+                Per function allocation statisitics.
+              fields:
+                - name: package
+                  type: keyword
+                  description: The function its package name
+                - name: name
+                  type: keyword
+                  description: The function name
+                - name: file
+                  type: keyword
+                  description: The file name in package the function is defined in
+                - name: self
+                  type: group
+                  description: >
+                    Object allocation statistics for allocation within the function itself
+                  fields:
+                    - name: alloc_objects.count
+                      type: long
+                      description: Total number of objects allocated.
+                    - name: alloc_space.count
+                      type: long
+                      format: bytes
+                      description: Total amount of bytes allocated.
+                    - name: inuse_objects.count
+                      type: long
+                      description: Number of objects not being collected by garbage collector.
+                    - name: inuse_space.count
+                      type: long
+                      format: bytes
+                      description: Amount of space not being collected by garbage collector.
+                - name: total
+                  type: group
+                  description: >
+                    Cummulative allocation statistics including the function itself and
+                    all functions being called directly or indirectly.
+                  fields:
+                    - name: alloc_objects.count
+                      type: long
+                      description: Total number of objects allocated.
+                    - name: alloc_space.count
+                      type: long
+                      format: bytes
+                      description: Total amount of bytes allocated.
+                    - name: inuse_objects.count
+                      type: long
+                      description: Number of objects not being collected by garbage collector.
+                    - name: inuse_space.count
+                      type: long
+                      format: bytes
+                      description: Amount of space not being collected by garbage collector.
+                - name: children
+                  type: group
+                  description: >
+                    Cummulative allocation statistics including all functions being
+                    called directly or indirectly, but not the current function itself.
+                  fields:
+                    - name: alloc_objects.count
+                      type: long
+                      description: Total number of objects allocated.
+                    - name: alloc_space.count
+                      type: long
+                      format: bytes
+                      description: Total amount of bytes allocated.
+                    - name: inuse_objects.count
+                      type: long
+                      description: Number of objects not being collected by garbage collector.
+                    - name: inuse_space.count
+                      type: long
+                      format: bytes
+                      description: Amount of space not being collected by garbage collector.
+
+            - name: edge_allocation
+              type: group
+              description: >
+                Allocation statistics between caller and callee.
+              fields:
+                - name: parent
+                  type: group
+                  description: >
+                    The parent node in call graph (caller).
+                  fields:
+                    - name: package
+                      type: keyword
+                      description: The function its package name
+                    - name: name
+                      type: keyword
+                      description: The function name
+                    - name: file
+                      type: keyword
+                      description: The file name in package the function is defined in
+                - name: child
+                  type: group
+                  description: >
+                    The child node in call graph (callee).
+                  fields:
+                    - name: package
+                      type: keyword
+                      description: The function its package name
+                    - name: name
+                      type: keyword
+                      description: The function name
+                    - name: file
+                      type: keyword
+                      description: The file name in package the function is defined in
+                - name: stats
+                  type: group
+                  description: >
+                    Total amount of allocations due to caller using the callee.
+                  fields:
+                    - name: alloc_objects.count
+                      type: long
+                      description: Total number of objects allocated.
+                    - name: alloc_space.count
+                      type: long
+                      format: bytes
+                      description: Total amount of bytes allocated.
+                    - name: inuse_objects.count
+                      type: long
+                      description: Number of objects not being collected by garbage collector.
+                    - name: inuse_space.count
+                      type: long
+                      format: bytes
+                      description: Amount of space not being collected by garbage collector.
+
+            - name: allocation
+              type: group
+              description: >
+                Allocation sample captured by profiler
+              fields:
+                - name: package
+                  type: keyword
+                  description: The function its package name
+                - name: function
+                  type: keyword
+                  description: The function name
+                - name: file
+                  type: keyword
+                  description: The file name in package the function is defined in
+                - name: line
+                  type: integer
+                  description: The file its line the allocation happened.
+                - name: address
+                  type: long
+                  description: Executable in memory location the allocation happened at.
+                - name: stats
+                  type: group
+                  description: >
+                    Total allocation statistics for allocations happening at the given location.
+                  fields:
+                    - name: alloc_objects.count
+                      type: long
+                      description: Total number of objects allocated.
+                    - name: alloc_space.count
+                      type: long
+                      format: bytes
+                      description: Total amount of bytes allocated.
+                    - name: inuse_objects.count
+                      type: long
+                      description: Number of objects not being collected by garbage collector.
+                    - name: inuse_space.count
+                      type: long
+                      format: bytes
+                      description: Amount of space not being collected by garbage collector.
+
         - name: memstats
           type: group
           description: >

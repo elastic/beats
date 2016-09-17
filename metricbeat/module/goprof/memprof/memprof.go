@@ -115,7 +115,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		for _, sample := range f.SamplesSelf {
 			loc := sample.Locations[0]
 			emit(common.MapStr{
-				"allocation": common.MapStr{
+				"sample": common.MapStr{
 					"package":  pkg,
 					"function": name,
 					"file":     file,

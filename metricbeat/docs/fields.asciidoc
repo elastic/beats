@@ -716,6 +716,387 @@ go http based process profiling information.
 
 
 [float]
+== memprof Fields
+
+HTTP sampling based memory profiler.
+
+
+
+[float]
+=== goprof.memprof.run
+
+type: keyword
+
+unique id shared by all events of the same profiling run.
+
+[float]
+== summary Fields
+
+Total allocation statistics of profile run.
+
+
+
+[float]
+=== goprof.memprof.summary.alloc_objects.count
+
+type: long
+
+Total number of objects allocated.
+
+[float]
+=== goprof.memprof.summary.alloc_space.count
+
+type: long
+
+format: bytes
+
+Total amount of bytes allocated.
+
+[float]
+=== goprof.memprof.summary.inuse_objects.count
+
+type: long
+
+Number of objects not being collected by garbage collector.
+
+[float]
+=== goprof.memprof.summary.inuse_space.count
+
+type: long
+
+format: bytes
+
+Amount of space not being collected by garbage collector.
+
+[float]
+== function Fields
+
+Per function allocation statisitics.
+
+
+
+[float]
+=== goprof.memprof.function.package
+
+type: keyword
+
+The function its package name
+
+[float]
+=== goprof.memprof.function.name
+
+type: keyword
+
+The function name
+
+[float]
+=== goprof.memprof.function.file
+
+type: keyword
+
+The file name in package the function is defined in
+
+[float]
+== self Fields
+
+Object allocation statistics for allocation within the function itself
+
+
+
+[float]
+=== goprof.memprof.function.self.alloc_objects.count
+
+type: long
+
+Total number of objects allocated.
+
+[float]
+=== goprof.memprof.function.self.alloc_space.count
+
+type: long
+
+format: bytes
+
+Total amount of bytes allocated.
+
+[float]
+=== goprof.memprof.function.self.inuse_objects.count
+
+type: long
+
+Number of objects not being collected by garbage collector.
+
+[float]
+=== goprof.memprof.function.self.inuse_space.count
+
+type: long
+
+format: bytes
+
+Amount of space not being collected by garbage collector.
+
+[float]
+== total Fields
+
+Cummulative allocation statistics including the function itself and all functions being called directly or indirectly.
+
+
+
+[float]
+=== goprof.memprof.function.total.alloc_objects.count
+
+type: long
+
+Total number of objects allocated.
+
+[float]
+=== goprof.memprof.function.total.alloc_space.count
+
+type: long
+
+format: bytes
+
+Total amount of bytes allocated.
+
+[float]
+=== goprof.memprof.function.total.inuse_objects.count
+
+type: long
+
+Number of objects not being collected by garbage collector.
+
+[float]
+=== goprof.memprof.function.total.inuse_space.count
+
+type: long
+
+format: bytes
+
+Amount of space not being collected by garbage collector.
+
+[float]
+== children Fields
+
+Cummulative allocation statistics including all functions being called directly or indirectly, but not the current function itself.
+
+
+
+[float]
+=== goprof.memprof.function.children.alloc_objects.count
+
+type: long
+
+Total number of objects allocated.
+
+[float]
+=== goprof.memprof.function.children.alloc_space.count
+
+type: long
+
+format: bytes
+
+Total amount of bytes allocated.
+
+[float]
+=== goprof.memprof.function.children.inuse_objects.count
+
+type: long
+
+Number of objects not being collected by garbage collector.
+
+[float]
+=== goprof.memprof.function.children.inuse_space.count
+
+type: long
+
+format: bytes
+
+Amount of space not being collected by garbage collector.
+
+[float]
+== edge_allocation Fields
+
+Allocation statistics between caller and callee.
+
+
+
+[float]
+== parent Fields
+
+The parent node in call graph (caller).
+
+
+
+[float]
+=== goprof.memprof.edge_allocation.parent.package
+
+type: keyword
+
+The function its package name
+
+[float]
+=== goprof.memprof.edge_allocation.parent.name
+
+type: keyword
+
+The function name
+
+[float]
+=== goprof.memprof.edge_allocation.parent.file
+
+type: keyword
+
+The file name in package the function is defined in
+
+[float]
+== child Fields
+
+The child node in call graph (callee).
+
+
+
+[float]
+=== goprof.memprof.edge_allocation.child.package
+
+type: keyword
+
+The function its package name
+
+[float]
+=== goprof.memprof.edge_allocation.child.name
+
+type: keyword
+
+The function name
+
+[float]
+=== goprof.memprof.edge_allocation.child.file
+
+type: keyword
+
+The file name in package the function is defined in
+
+[float]
+== stats Fields
+
+Total amount of allocations due to caller using the callee.
+
+
+
+[float]
+=== goprof.memprof.edge_allocation.stats.alloc_objects.count
+
+type: long
+
+Total number of objects allocated.
+
+[float]
+=== goprof.memprof.edge_allocation.stats.alloc_space.count
+
+type: long
+
+format: bytes
+
+Total amount of bytes allocated.
+
+[float]
+=== goprof.memprof.edge_allocation.stats.inuse_objects.count
+
+type: long
+
+Number of objects not being collected by garbage collector.
+
+[float]
+=== goprof.memprof.edge_allocation.stats.inuse_space.count
+
+type: long
+
+format: bytes
+
+Amount of space not being collected by garbage collector.
+
+[float]
+== allocation Fields
+
+Allocation sample captured by profiler
+
+
+
+[float]
+=== goprof.memprof.allocation.package
+
+type: keyword
+
+The function its package name
+
+[float]
+=== goprof.memprof.allocation.function
+
+type: keyword
+
+The function name
+
+[float]
+=== goprof.memprof.allocation.file
+
+type: keyword
+
+The file name in package the function is defined in
+
+[float]
+=== goprof.memprof.allocation.line
+
+type: integer
+
+The file its line the allocation happened.
+
+[float]
+=== goprof.memprof.allocation.address
+
+type: long
+
+Executable in memory location the allocation happened at.
+
+[float]
+== stats Fields
+
+Total allocation statistics for allocations happening at the given location.
+
+
+
+[float]
+=== goprof.memprof.allocation.stats.alloc_objects.count
+
+type: long
+
+Total number of objects allocated.
+
+[float]
+=== goprof.memprof.allocation.stats.alloc_space.count
+
+type: long
+
+format: bytes
+
+Total amount of bytes allocated.
+
+[float]
+=== goprof.memprof.allocation.stats.inuse_objects.count
+
+type: long
+
+Number of objects not being collected by garbage collector.
+
+[float]
+=== goprof.memprof.allocation.stats.inuse_space.count
+
+type: long
+
+format: bytes
+
+Amount of space not being collected by garbage collector.
+
+[float]
 == memstats Fields
 
 golang expvar memstats

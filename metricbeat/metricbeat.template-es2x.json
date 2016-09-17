@@ -303,6 +303,293 @@
         },
         "goprof": {
           "properties": {
+            "memprof": {
+              "properties": {
+                "allocation": {
+                  "properties": {
+                    "address": {
+                      "type": "long"
+                    },
+                    "file": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "function": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "line": {
+                      "type": "long"
+                    },
+                    "package": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "stats": {
+                      "properties": {
+                        "alloc_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "alloc_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "edge_allocation": {
+                  "properties": {
+                    "child": {
+                      "properties": {
+                        "file": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "name": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "package": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "parent": {
+                      "properties": {
+                        "file": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "name": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "package": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "stats": {
+                      "properties": {
+                        "alloc_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "alloc_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "function": {
+                  "properties": {
+                    "children": {
+                      "properties": {
+                        "alloc_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "alloc_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "file": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "package": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "self": {
+                      "properties": {
+                        "alloc_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "alloc_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "total": {
+                      "properties": {
+                        "alloc_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "alloc_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_objects": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "inuse_space": {
+                          "properties": {
+                            "count": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "run": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "summary": {
+                  "properties": {
+                    "alloc_objects": {
+                      "properties": {
+                        "count": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "alloc_space": {
+                      "properties": {
+                        "count": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "inuse_objects": {
+                      "properties": {
+                        "count": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "inuse_space": {
+                      "properties": {
+                        "count": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "memstats": {
               "properties": {
                 "allocator": {
