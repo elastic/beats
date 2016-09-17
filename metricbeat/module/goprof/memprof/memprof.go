@@ -2,6 +2,9 @@ package memprof
 
 import (
 	"net/http"
+	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -21,14 +24,19 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	client *http.Client // HTTP client that is reused across requests
 	url    string       // httpprof endpoint url
+	gopath *regexp.Regexp
 }
+
+var defaultGoPath = regexp.MustCompile(`(?U)^.*/src/`)
 
 // New creates a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
-		ProfPath string `config:"prof_path"`
+		ProfPath string         `config:"prof_path"`
+		GoPath   *regexp.Regexp `config:"gopath"`
 	}{
 		ProfPath: "/debug/pprof/heap?debug=1",
+		GoPath:   defaultGoPath,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -39,6 +47,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		url:           url,
 		client:        &http.Client{Timeout: base.Module().Config().Timeout},
+		gopath:        config.GoPath,
 	}, nil
 }
 
@@ -71,15 +80,19 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	// current profile run summary
 	emit(common.MapStr{
-		"summary": SumSamples(profile.Sample),
+		"summary": valueStats(SumSamples(profile.Sample)),
 	})
 
 	for _, f := range CollectFunctionStats(profile) {
+		pkg, name := splitName(m.gopath, f.Function.Name)
+		file := filepath.Base(f.Function.File)
+
 		// per function allocation summaries
 		emit(common.MapStr{
 			"function": common.MapStr{
-				"name": f.Function.Name,
-				"file": f.Function.File,
+				"package": pkg,
+				"name":    name,
+				"file":    file,
 
 				// mem stats done by function itself
 				"self": common.MapStr{
@@ -103,8 +116,9 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			loc := sample.Locations[0]
 			emit(common.MapStr{
 				"allocation": common.MapStr{
-					"function": f.Function.Name,
-					"file":     f.Function.File,
+					"package":  pkg,
+					"function": name,
+					"file":     file,
 					"line":     loc.Line,
 					"address":  loc.Addr,
 					"stats":    valueStats(sample.Values),
@@ -118,15 +132,19 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		// Edge allocations: allocation stats for current functions children in call graph
 		for _, c := range f.Children {
 			fo := c.Other.Function
+			foPkg, foName := splitName(m.gopath, fo.Name)
+
 			emit(common.MapStr{
 				"edge_allocation": common.MapStr{
 					"parent": common.MapStr{
-						"function": f.Function.Name,
-						"file":     f.Function.File,
+						"package":  pkg,
+						"function": name,
+						"file":     file,
 					},
 					"child": common.MapStr{
-						"function": fo.Name,
-						"file":     fo.File,
+						"package":  foPkg,
+						"function": foName,
+						"file":     filepath.Base(fo.File),
 					},
 					"stats": valueStats(c.StatsTotal),
 				},
@@ -144,4 +162,32 @@ func (m *MetricSet) fetchProfile() (*Profile, error) {
 	}
 
 	return ParseHeap(buf)
+}
+
+func splitName(gopath *regexp.Regexp, fullName string) (string, string) {
+	idx := strings.LastIndex(fullName, "/")
+	if idx < 0 {
+		idx = 0
+	}
+
+	path := idx
+	idx = strings.Index(fullName[idx:], ".")
+	if idx < 0 {
+		return "", fullName
+	}
+
+	idx += path
+	pkg, name := fullName[:idx], fullName[idx+1:]
+	return withoutGoPath(gopath, pkg), name
+}
+
+func withoutGoPath(gopath *regexp.Regexp, name string) string {
+	if gopath == nil {
+		return name
+	}
+
+	if loc := gopath.FindStringIndex(name); len(loc) == 2 {
+		name = name[loc[1]:]
+	}
+	return name
 }
