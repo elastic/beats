@@ -40,17 +40,6 @@ include::../../libbeat/docs/processors.asciidoc[]
 For example, the following filters configuration reduces the exported fields by
 dropping the `beat.name` and `beat.hostname` fields under `beat`, from all documents.
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
-
-[source, yaml]
-----
-filters:
- - drop_fields:
-    fields: ['beat']
-----
-
-added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
-
 [source, yaml]
 ----
 processors:
