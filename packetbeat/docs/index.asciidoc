@@ -8,7 +8,7 @@ include::./version.asciidoc[]
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
 :elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/shield/current
+:securitydoc: https://www.elastic.co/guide/en/x-pack/5.0
 :version: {stack-version}
 :beatname_lc: packetbeat
 :beatname_uc: Packetbeat
