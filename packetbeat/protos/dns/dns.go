@@ -476,7 +476,9 @@ func addDnsToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 
 	m["authorities_count"] = len(dns.Ns)
 	if authority && len(dns.Ns) > 0 {
-		m["authorities"] = rrsToMapStrs(dns.Ns)
+        authorities := ansToMapStrs(dns.Ns)
+        authorities["raw"] = rrsToMapStrs(dns.Ns)
+		m["authorities"] = authorities
 	}
 
 	if rrOPT != nil {
@@ -489,7 +491,9 @@ func addDnsToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 		// We do not want OPT RR to appear in the 'additional' section,
 		// that's why rrsMapStrs could be empty even though len(dns.Extra) > 0
 		if len(rrsMapStrs) > 0 {
-			m["additionals"] = rrsMapStrs
+            additionals := ansToMapStrs(dns.Extra)
+            additionals["raw"] = rrsMapStrs
+			m["additionals"] = additionals
 		}
 	}
 
