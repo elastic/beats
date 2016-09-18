@@ -62,7 +62,7 @@ def main():
         check_call("git checkout {}".format(args.from_branch), shell=True)
         check_call("git pull", shell=True)
 
-        check_call("git checkout {}".format(args.from_branch), shell=True)
+        check_call("git checkout {}".format(args.to_branch), shell=True)
         check_call("git pull", shell=True)
 
         call("git branch -D {} > /dev/null".format(tmp_branch), shell=True)
@@ -73,7 +73,7 @@ def main():
             print("Fix them, then run: ")
             print("    git cherry-pick --continue")
             print("    {} --continue".format(" ".join(sys.argv)))
-        return 1
+            return 1
 
     if len(check_output("git status -s", shell=True).strip()) > 0:
         print("Looks like you have uncommitted changes." +
