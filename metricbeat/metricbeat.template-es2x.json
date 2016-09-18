@@ -587,105 +587,74 @@
                       }
                     }
                   }
+                },
+                "type": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
                 }
               }
             },
             "memstats": {
               "properties": {
-                "allocator": {
+                "allocations": {
+                  "type": "long"
+                },
+                "duration": {
                   "properties": {
-                    "allocations": {
-                      "type": "long"
-                    },
-                    "frees": {
-                      "type": "long"
-                    },
-                    "size": {
+                    "ns": {
                       "type": "long"
                     }
                   }
                 },
-                "gc_cycle": {
-                  "properties": {
-                    "duration": {
-                      "properties": {
-                        "ns": {
-                          "type": "long"
-                        }
-                      }
-                    },
-                    "end": {
-                      "type": "date"
-                    },
-                    "run": {
-                      "type": "long"
-                    },
-                    "start": {
-                      "type": "date"
-                    }
-                  }
+                "end": {
+                  "type": "date"
                 },
-                "gc_summary": {
+                "frees": {
+                  "type": "long"
+                },
+                "gc_count": {
+                  "type": "long"
+                },
+                "gc_total_pause": {
                   "properties": {
-                    "gc_count": {
-                      "type": "long"
-                    },
-                    "gc_total_pause": {
-                      "properties": {
-                        "ns": {
-                          "type": "long"
-                        }
-                      }
-                    },
-                    "next_gc_limit": {
+                    "ns": {
                       "type": "long"
                     }
                   }
                 },
-                "heap": {
+                "next_gc_limit": {
+                  "type": "long"
+                },
+                "run": {
+                  "type": "long"
+                },
+                "size": {
+                  "type": "long"
+                },
+                "start": {
+                  "type": "date"
+                },
+                "system": {
                   "properties": {
-                    "allocations": {
-                      "properties": {
-                        "active": {
-                          "type": "long"
-                        },
-                        "allocated": {
-                          "type": "long"
-                        },
-                        "frees": {
-                          "type": "long"
-                        },
-                        "idle": {
-                          "type": "long"
-                        },
-                        "mallocs": {
-                          "type": "long"
-                        },
-                        "objects": {
-                          "type": "long"
-                        },
-                        "total": {
-                          "type": "long"
-                        }
-                      }
+                    "obtained": {
+                      "type": "long"
                     },
-                    "system": {
-                      "properties": {
-                        "obtained": {
-                          "type": "long"
-                        },
-                        "released": {
-                          "type": "long"
-                        },
-                        "stack": {
-                          "type": "long"
-                        },
-                        "total": {
-                          "type": "long"
-                        }
-                      }
+                    "released": {
+                      "type": "long"
+                    },
+                    "stack": {
+                      "type": "long"
+                    },
+                    "total": {
+                      "type": "long"
                     }
                   }
+                },
+                "type": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
                 }
               }
             }

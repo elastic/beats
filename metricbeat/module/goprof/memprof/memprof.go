@@ -80,6 +80,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	// current profile run summary
 	emit(common.MapStr{
+		"type":    "summary",
 		"summary": valueStats(SumSamples(profile.Sample)),
 	})
 
@@ -89,6 +90,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 		// per function allocation summaries
 		emit(common.MapStr{
+			"type": "function",
 			"function": common.MapStr{
 				"package": pkg,
 				"name":    name,
@@ -115,7 +117,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		for _, sample := range f.SamplesSelf {
 			loc := sample.Locations[0]
 			emit(common.MapStr{
-				"sample": common.MapStr{
+				"type": "allocation",
+				"allocation": common.MapStr{
 					"package":  pkg,
 					"function": name,
 					"file":     file,
@@ -135,6 +138,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			foPkg, foName := splitName(m.gopath, fo.Name)
 
 			emit(common.MapStr{
+				"type": "edge_allocation",
 				"edge_allocation": common.MapStr{
 					"parent": common.MapStr{
 						"package":  pkg,

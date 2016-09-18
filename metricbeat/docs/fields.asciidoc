@@ -730,6 +730,13 @@ type: keyword
 unique id shared by all events of the same profiling run.
 
 [float]
+=== goprof.memprof.type
+
+type: keyword
+
+memprof report type.
+
+[float]
 == summary Fields
 
 Total allocation statistics of profile run.
@@ -1104,14 +1111,14 @@ golang expvar memstats
 
 
 [float]
-== gc_summary Fields
+=== goprof.memstats.type
 
-Garbage collector summary
+type: keyword
 
-
+memstats report type.
 
 [float]
-=== goprof.memstats.gc_summary.next_gc_limit
+=== goprof.memstats.next_gc_limit
 
 type: long
 
@@ -1121,7 +1128,7 @@ Upper bound of memory being allocated until another garbage collection phase wil
 
 
 [float]
-=== goprof.memstats.gc_summary.gc_count
+=== goprof.memstats.gc_count
 
 type: long
 
@@ -1129,24 +1136,11 @@ Total number of garbage collection cycles executed since program startup
 
 
 [float]
-== gc_total_pause Fields
-
-Total duration of all garbage collection cycles
-
-
-[float]
-=== goprof.memstats.gc_summary.gc_total_pause.ns
+=== goprof.memstats.gc_total_pause.ns
 
 type: long
 
-Duration in nanoseconds
-
-[float]
-== heap Fields
-
-Heap usage counters.
-
-
+Total duration of all garbage collection cycles
 
 [float]
 == allocations Fields
@@ -1156,7 +1150,7 @@ Application heap allocations counters.
 
 
 [float]
-=== goprof.memstats.heap.allocations.mallocs
+=== goprof.memstats.allocations.mallocs
 
 type: long
 
@@ -1164,7 +1158,7 @@ Total number of memory allocations
 
 
 [float]
-=== goprof.memstats.heap.allocations.frees
+=== goprof.memstats.allocations.frees
 
 type: long
 
@@ -1172,7 +1166,7 @@ Number of memory allocations being freed.
 
 
 [float]
-=== goprof.memstats.heap.allocations.objects
+=== goprof.memstats.allocations.objects
 
 type: long
 
@@ -1180,7 +1174,7 @@ Total number of allocated heap objects.
 
 
 [float]
-=== goprof.memstats.heap.allocations.total
+=== goprof.memstats.allocations.total
 
 type: long
 
@@ -1190,7 +1184,7 @@ Total number of bytes being allocated since startup.
 
 
 [float]
-=== goprof.memstats.heap.allocations.allocated
+=== goprof.memstats.allocations.allocated
 
 type: long
 
@@ -1200,7 +1194,7 @@ Number of bytes being actively allocated and not yet freed.
 
 
 [float]
-=== goprof.memstats.heap.allocations.idle
+=== goprof.memstats.allocations.idle
 
 type: long
 
@@ -1210,7 +1204,7 @@ Bytes in idle heap spans
 
 
 [float]
-=== goprof.memstats.heap.allocations.active
+=== goprof.memstats.allocations.active
 
 type: long
 
@@ -1227,7 +1221,7 @@ Memory allocator system counters.
 
 
 [float]
-=== goprof.memstats.heap.system.total
+=== goprof.memstats.system.total
 
 type: long
 
@@ -1237,7 +1231,7 @@ Total number of bytes received from system
 
 
 [float]
-=== goprof.memstats.heap.system.obtained
+=== goprof.memstats.system.obtained
 
 type: long
 
@@ -1247,7 +1241,7 @@ Bytes optained from system
 
 
 [float]
-=== goprof.memstats.heap.system.stack
+=== goprof.memstats.system.stack
 
 type: long
 
@@ -1257,7 +1251,7 @@ System memory allocated for go-routine stacks.
 
 
 [float]
-=== goprof.memstats.heap.system.released
+=== goprof.memstats.system.released
 
 type: long
 
@@ -1267,14 +1261,7 @@ Number of bytes returned to OS.
 
 
 [float]
-== allocator Fields
-
-Go runtime allocator per size class counters.
-
-
-
-[float]
-=== goprof.memstats.allocator.size
+=== goprof.memstats.size
 
 type: long
 
@@ -1284,7 +1271,7 @@ The allocator bucket its size.
 
 
 [float]
-=== goprof.memstats.allocator.allocations
+=== goprof.memstats.allocations
 
 type: long
 
@@ -1294,7 +1281,7 @@ Total number of allocation from current size class.
 
 
 [float]
-=== goprof.memstats.allocator.frees
+=== goprof.memstats.frees
 
 type: long
 
@@ -1304,14 +1291,7 @@ Total number of objects being freed in current size class.
 
 
 [float]
-== gc_cycle Fields
-
-Go per garbage collection cycle counters.
-
-
-
-[float]
-=== goprof.memstats.gc_cycle.run
+=== goprof.memstats.run
 
 type: long
 
@@ -1319,7 +1299,7 @@ The nth garbage collection cycle since startup
 
 
 [float]
-=== goprof.memstats.gc_cycle.start
+=== goprof.memstats.start
 
 type: date
 
@@ -1327,7 +1307,7 @@ GC cycle start timestamp
 
 
 [float]
-=== goprof.memstats.gc_cycle.end
+=== goprof.memstats.end
 
 type: date
 
@@ -1335,7 +1315,7 @@ GC cycle end timestamp
 
 
 [float]
-=== goprof.memstats.gc_cycle.duration.ns
+=== goprof.memstats.duration.ns
 
 type: long
 

@@ -8,6 +8,10 @@
       type: keyword
       description: unique id shared by all events of the same profiling run.
 
+    - name: type
+      type: keyword
+      description: memprof report type.
+
     - name: summary
       type: group
       description: >

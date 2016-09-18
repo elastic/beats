@@ -59,46 +59,43 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	// add garbage collector summary
 	events = append(events, common.MapStr{
-		"gc_summary": common.MapStr{
-			"next_gc_limit": ms.NextGC,
-			"gc_count":      ms.NumGC,
-			"gc_total_pause": common.MapStr{
-				"ns": ms.PauseTotalNs,
-			},
+		"type":          "gc_summary",
+		"next_gc_limit": ms.NextGC,
+		"gc_count":      ms.NumGC,
+		"gc_total_pause": common.MapStr{
+			"ns": ms.PauseTotalNs,
 		},
 	})
 
 	// add heap summary
 	events = append(events, common.MapStr{
-		"heap": common.MapStr{
-			"allocations": common.MapStr{
-				"mallocs": ms.Mallocs,
-				"frees":   ms.Frees,
-				"objects": ms.HeapObjects,
+		"type": "heap",
+		"allocations": common.MapStr{
+			"mallocs": ms.Mallocs,
+			"frees":   ms.Frees,
+			"objects": ms.HeapObjects,
 
-				// byte counters
-				"total":     ms.TotalAlloc,
-				"allocated": ms.HeapAlloc,
-				"idle":      ms.HeapIdle,
-				"active":    ms.HeapInuse,
-			},
-			"system": common.MapStr{
-				"total":    ms.Sys,
-				"optained": ms.HeapSys,
-				"stack":    ms.StackSys,
-				"released": ms.HeapReleased,
-			},
+			// byte counters
+			"total":     ms.TotalAlloc,
+			"allocated": ms.HeapAlloc,
+			"idle":      ms.HeapIdle,
+			"active":    ms.HeapInuse,
+		},
+		"system": common.MapStr{
+			"total":    ms.Sys,
+			"optained": ms.HeapSys,
+			"stack":    ms.StackSys,
+			"released": ms.HeapReleased,
 		},
 	})
 
 	// collect per size class allocation stats
 	for _, c := range ms.BySize {
 		events = append(events, common.MapStr{
-			"allocator": common.MapStr{
-				"size":        c.Size,
-				"allocations": c.Mallocs,
-				"frees":       c.Frees,
-			},
+			"type":        "allocator",
+			"size":        c.Size,
+			"allocations": c.Mallocs,
+			"frees":       c.Frees,
 		})
 	}
 
@@ -118,13 +115,12 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			d := ms.PauseNs[idx]
 			start := time.Unix(0, 0).Add(time.Duration(ms.PauseEnd[idx] - d))
 			events = append(events, common.MapStr{
-				"gc_cycle": common.MapStr{
-					"run":   i,
-					"start": common.Time(start),
-					"end":   common.Time(end),
-					"duration": common.MapStr{
-						"ns": d,
-					},
+				"type":  "gc_cycle",
+				"run":   i,
+				"start": common.Time(start),
+				"end":   common.Time(end),
+				"duration": common.MapStr{
+					"ns": d,
 				},
 			})
 		}
