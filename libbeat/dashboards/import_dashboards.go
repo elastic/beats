@@ -83,7 +83,7 @@ func DefineCommandLine() (*CommandLine, error) {
 	cl.flagSet.StringVar(&cl.opt.Dir, "dir", "", "Directory containing the subdirectories: dashboard, visualization, search, index-pattern. Example: etc/kibana/")
 	cl.flagSet.StringVar(&cl.opt.File, "file", "", "Zip archive file containing the Beats dashboards. The archive contains a directory for each Beat.")
 	cl.flagSet.StringVar(&cl.opt.Url, "url",
-		fmt.Sprintf("https://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip", lbeat.GetDefaultVersion()),
+		fmt.Sprintf("https://download.elastic.co/beats/beats-dashboards/beats-dashboards-%s.zip", lbeat.GetDefaultVersion()),
 		"URL to the zip archive containing the Beats dashboards")
 	cl.flagSet.StringVar(&cl.opt.Beat, "beat", beat, "The Beat name, in case a zip archive is passed as input")
 	cl.flagSet.BoolVar(&cl.opt.OnlyDashboards, "only-dashboards", false, "Import only dashboards together with visualizations and searches. By default import both, dashboards and the index-pattern.")
