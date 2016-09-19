@@ -59,7 +59,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	// add garbage collector summary
 	events = append(events, common.MapStr{
-		"type":          "gc_summary",
+		"type":          "gcsummary",
 		"next_gc_limit": ms.NextGC,
 		"gc_count":      ms.NumGC,
 		"gc_total_pause": common.MapStr{
@@ -92,10 +92,10 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	// collect per size class allocation stats
 	for _, c := range ms.BySize {
 		events = append(events, common.MapStr{
-			"type":        "allocator",
-			"size":        c.Size,
-			"allocations": c.Mallocs,
-			"frees":       c.Frees,
+			"type":    "allocator",
+			"size":    c.Size,
+			"mallocs": c.Mallocs,
+			"frees":   c.Frees,
 		})
 	}
 
@@ -104,24 +104,23 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		delta := ms.NumGC - m.lastNumGC
 		start := m.lastNumGC
 		if delta > 256 {
-			logp.Err("Missing %v gc cycles", delta-255)
-			start = m.lastNumGC - 255
-			delta = 255
+			logp.Err("Missing %v gc cycles", delta-256)
+			start = ms.NumGC - 256
+			delta = 256
 		}
 
-		for i := start; i < delta; i++ {
+		end := start + delta
+		for i := start; i < end; i++ {
 			idx := i % 256
 			end := time.Unix(0, 0).Add(time.Duration(ms.PauseEnd[idx]))
 			d := ms.PauseNs[idx]
 			start := time.Unix(0, 0).Add(time.Duration(ms.PauseEnd[idx] - d))
 			events = append(events, common.MapStr{
-				"type":  "gc_cycle",
-				"run":   i,
-				"start": common.Time(start),
-				"end":   common.Time(end),
-				"duration": common.MapStr{
-					"ns": d,
-				},
+				"type":     "gccycle",
+				"run":      i,
+				"start":    common.Time(start),
+				"end":      common.Time(end),
+				"duration": common.MapStr{"ns": d},
 			})
 		}
 
