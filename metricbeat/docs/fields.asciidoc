@@ -1269,26 +1269,19 @@ format: bytes
 
 The allocator bucket its size.
 
-
 [float]
-=== goprof.memstats.allocations
+=== goprof.memstats.mallocs
 
 type: long
 
-format: bytes
-
 Total number of allocation from current size class.
-
 
 [float]
 === goprof.memstats.frees
 
 type: long
 
-format: bytes
-
 Total number of objects being freed in current size class.
-
 
 [float]
 === goprof.memstats.run
@@ -1305,7 +1298,6 @@ type: date
 
 GC cycle start timestamp
 
-
 [float]
 === goprof.memstats.end
 
@@ -1313,14 +1305,12 @@ type: date
 
 GC cycle end timestamp
 
-
 [float]
 === goprof.memstats.duration.ns
 
 type: long
 
 GC cycle duration in nanoseconds.
-
 
 [[exported-fields-haproxy]]
 == haproxy Fields

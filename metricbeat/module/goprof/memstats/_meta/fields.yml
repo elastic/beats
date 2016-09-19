@@ -90,18 +90,13 @@
     - name: size
       type: long
       format: bytes
-      description: >
-        The allocator bucket its size.
-    - name: allocations
+      description: The allocator bucket its size.
+    - name: mallocs
       type: long
-      format: bytes
-      description: >
-        Total number of allocation from current size class.
+      description: Total number of allocation from current size class.
     - name: frees
       type: long
-      format: bytes
-      description: >
-        Total number of objects being freed in current size class.
+      description: Total number of objects being freed in current size class.
 
     # Per garbage collection cycle counters (type == gc_cycle)
     - name: run
@@ -110,13 +105,10 @@
         The nth garbage collection cycle since startup
     - name: start
       type: date
-      description: >
-        GC cycle start timestamp
+      description: GC cycle start timestamp
     - name: end
       type: date
-      description: >
-        GC cycle end timestamp
+      description: GC cycle end timestamp
     - name: duration.ns
       type: long
-      description: >
-        GC cycle duration in nanoseconds.
+      description: GC cycle duration in nanoseconds.

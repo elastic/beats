@@ -589,7 +589,29 @@
             "memstats": {
               "properties": {
                 "allocations": {
-                  "type": "long"
+                  "properties": {
+                    "active": {
+                      "type": "long"
+                    },
+                    "allocated": {
+                      "type": "long"
+                    },
+                    "frees": {
+                      "type": "long"
+                    },
+                    "idle": {
+                      "type": "long"
+                    },
+                    "mallocs": {
+                      "type": "long"
+                    },
+                    "objects": {
+                      "type": "long"
+                    },
+                    "total": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "duration": {
                   "properties": {
@@ -613,6 +635,9 @@
                       "type": "long"
                     }
                   }
+                },
+                "mallocs": {
+                  "type": "long"
                 },
                 "next_gc_limit": {
                   "type": "long"
