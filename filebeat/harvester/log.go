@@ -258,6 +258,9 @@ func (h *Harvester) getState() file.State {
 }
 
 func (h *Harvester) close() {
+	// stops all go routines inside the harvester
+	close(h.harvesterDone)
+
 	// Mark harvester as finished
 	h.state.Finished = true
 
@@ -309,6 +312,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	}
 
 	// Closes reader after timeout or when done channel is closed
+	// This routine is also responsible to properly stop the reader
 	go func() {
 		var closeTimeout <-chan time.Time
 		if h.config.CloseTimeout > 0 {
@@ -316,9 +320,10 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		}
 
 		select {
-		case <-h.done:
 		case <-closeTimeout:
 			logp.Info("Closing harvester because close_timeout was reached: %s", h.state.Source)
+		case <-h.done:
+		case <-h.harvesterDone:
 		}
 		h.fileReader.Close()
 	}()
