@@ -2,17 +2,15 @@ FROM java:8-jre
 
 ENV LS_VERSION 5
 
-
-COPY setup.sh /
-
-ENV URL http://staging.elastic.co/5.0.0-beta1-2b315be2/download/logstash/logstash-5.0.0-beta1.tar.gz
+ENV URL https://staging.elastic.co/5.0.0-beta1-e9e2b09c/download/logstash/logstash-5.0.0-beta1.tar.gz
 ENV VERSION 5.0.0-beta1
 ENV PATH $PATH:/opt/logstash-$VERSION/bin
 
-RUN echo $PATH
-
 # As all snapshot builds have the same url, the image is cached. The date at then can be used to invalidate the image
-RUN bash setup.sh
+RUN set -x && \
+    cd /opt && \
+    wget -q $URL && \
+    tar xzf logstash-$VERSION.tar.gz
 
 
 COPY logstash.conf.2.tmpl /logstash.conf.2.tmpl
