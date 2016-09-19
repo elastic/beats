@@ -50,6 +50,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...master[Check the HEAD d
 - Fix array value support in -E CLI flag. {pull}2521[2521]
 - Fix merging array values if -c CLI flag is used multiple times. {pull}2521[2521]
 - Fix beats failing to start due to invalid duplicate key error in configuration file. {pull}2521[2521]
+- Fix panic on non writable logging directory.
 
 *Metricbeat*
 - Fix module filters to work properly with drop_event filter. {issue}2249[2249]
