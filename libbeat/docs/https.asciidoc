@@ -33,7 +33,7 @@ either by using a web proxy or by using {security}. For more information, see {s
 certificates. Creating a correct SSL/TLS infrastructure is outside the scope of
 this document.
 
-//TO DO: Need to replace the link before adding this back into the doc: "but a good guide to follow is the https://www.elastic.co/guide/en/shield/current/certificate-authority.html[Setting Up a Certificate Authority] topic in the {security}" documentation. Also add it back to shared-ssl-logstash-config, if possible.
+//TODO: Need to replace the link before adding this back into the doc: "but a good guide to follow is the https://www.elastic.co/guide/en/shield/current/certificate-authority.html[Setting Up a Certificate Authority] topic in the {security}" documentation. Also add it back to shared-ssl-logstash-config, if possible.
 
 By default {beatname_uc} uses the list of trusted certificate authorities from the
 operating system where {beatname_uc} is running. You can configure {beatname_uc} to use a specific list of
