@@ -139,17 +139,16 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...v5.0.0-beta1[View commi
 *Affecting all Beats*
 
 - Add script to generate the Kibana index-pattern from fields.yml. {pull}2122[2122]
-- Enhance redis output key selection based on format string. {pull}2169[2169]
-- Configurable redis `keys` using filters and format strings. {pull}2169[2169]
+- Enhance Redis output key selection based on format string. {pull}2169[2169]
+- Configurable Redis `keys` using filters and format strings. {pull}2169[2169]
 - Add format string support to `output.kafka.topic`. {pull}2188[2188]
 - Add `output.kafka.topics` for more advanced kafka topic selection per event. {pull}2188[2188]
-- Add support for kafka 0.10.
-- Add support for kafka 0.10. {pull}2190[2190]
+- Add support for Kafka 0.10. {pull}2190[2190]
 - Add SASL/PLAIN authentication support to kafka output. {pull}2190[2190]
 - Make Kafka metadata update configurable. {pull}2190[2190]
-- Add kafka version setting (optional) enabling kafka broker version support. {pull}2190[2190]
-- Add kafka message timestamp if at least version 0.10 is configured. {pull}2190[2190]
-- Add configurable kafka event key setting. {pull}2284[2284]
+- Add Kafka version setting (optional) enabling kafka broker version support. {pull}2190[2190]
+- Add Kafka message timestamp if at least version 0.10 is configured. {pull}2190[2190]
+- Add configurable Kafka event key setting. {pull}2284[2284]
 - Add settings for configuring the kafka partitioning strategy. {pull}2284[2284]
 - Add partitioner settings `reachable_only` to ignore partitions not reachable by network. {pull}2284[2284]
 - Enhance contains condition to work on fields that are arrays of strings. {issue}2237[2237]
@@ -170,7 +169,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...v5.0.0-beta1[View commi
 
 *Packetbeat*
 
-- Add cassandra protocol analyzer to packetbeat. {pull}1959[1959]
+- Add Cassandra protocol analyzer to Packetbeat. {pull}1959[1959]
 - Match connections with IPv6 addresses to processes {pull}2254[2254]
 - Add IP address to -devices command output {pull}2327[2327]
 - Add configuration option for the maximum message size. Used to be hard-coded to 10 MB. {pull}2470[2470]
