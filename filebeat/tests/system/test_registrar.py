@@ -5,6 +5,7 @@ import platform
 import time
 import shutil
 import json
+import stat
 from nose.plugins.skip import Skip, SkipTest
 
 
@@ -760,12 +761,8 @@ class Test(BaseTest):
 
         # Wait until registry file is created
         self.wait_until(
-            lambda: self.log_contains("Registry file updated"),
+            lambda: self.log_contains_count("Registry file updated") > 1,
             max_timeout=15)
-
-        if os.name == "nt":
-            # On windows registry recreation can take a bit longer
-            time.sleep(1)
 
         data = self.get_registry()
         assert len(data) == 2
@@ -835,10 +832,6 @@ class Test(BaseTest):
             lambda: self.log_contains("Registry file updated"),
             max_timeout=15)
 
-        if os.name == "nt":
-            # On windows registry recration can take a bit longer
-            time.sleep(1)
-
         data = self.get_registry()
         assert len(data) == 2
 
@@ -869,3 +862,90 @@ class Test(BaseTest):
             assert data[0]["offset"] == len("make sure registry is written\n" + "2\n") + 2
         else:
             assert data[0]["offset"] == len("make sure registry is written\n" + "2\n")
+
+    def test_directory_failure(self):
+        """
+        Test that filebeat does not start if a directory is set as registry file
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            registryFile="registrar",
+        )
+        os.mkdir(self.working_dir + "/log/")
+        os.mkdir(self.working_dir + "/registrar/")
+
+        testfile = self.working_dir + "/log/test.log"
+        with open(testfile, 'w') as file:
+            file.write("Hello World\n")
+
+        filebeat = self.start_beat()
+
+        # Make sure states written appears one more time
+        self.wait_until(
+            lambda: self.log_contains("CRIT Exiting: Registry file path must be a file"),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait(exit_code=1)
+
+    def test_symlink_failure(self):
+        """
+        Test that filebeat does not start if a symlink is set as registry file
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            registryFile="registry_symlink",
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+        with open(testfile, 'w') as file:
+            file.write("Hello World\n")
+
+        registryfile = self.working_dir + "/registry"
+        with open(registryfile, 'w') as file:
+            file.write("[]")
+
+        if os.name == "nt":
+            import win32file
+            win32file.CreateSymbolicLink(self.working_dir + "/registry_symlink", registryfile, 0)
+        else:
+            os.symlink(registryfile, self.working_dir + "/registry_symlink")
+
+        filebeat = self.start_beat()
+
+        # Make sure states written appears one more time
+        self.wait_until(
+            lambda: self.log_contains("CRIT Exiting: Registry file path is not a regular file"),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait(exit_code=1)
+
+    def test_invalid_state(self):
+        """
+        Test that filebeat fails starting if invalid state in registry
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+        os.mkdir(self.working_dir + "/log/")
+        registry_file = self.working_dir + "/registry"
+
+        testfile = self.working_dir + "/log/test.log"
+        with open(testfile, 'w') as file:
+            file.write("Hello World\n")
+
+        registry_file = self.working_dir + "/registry"
+        with open(registry_file, 'w') as file:
+            # Write invalid state
+            file.write("Hello World")
+
+        filebeat = self.start_beat()
+
+        # Make sure states written appears one more time
+        self.wait_until(
+            lambda: self.log_contains("CRIT Exiting: Could not start registrar: Error loading state"),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait(exit_code=1)

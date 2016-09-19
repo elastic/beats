@@ -161,6 +161,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...v5.0.0-beta1[View commi
 - Log total non-zero internal metrics on shutdown. {pull}2349[2349]
 - Add support for encrypted private key files by introducing `ssl.key_passphrase` setting. {pull}2330[2330]
 - Add experimental symlink support with `symlinks` config {pull}2478[2478]
+- Improve validation of registry file on startup.
 
 *Metricbeat*
 
