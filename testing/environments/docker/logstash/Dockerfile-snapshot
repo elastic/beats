@@ -2,12 +2,15 @@ FROM java:8-jre
 
 ENV LS_VERSION 5
 
-ENV PATH $PATH:/usr/share/logstash/bin
-
-COPY setup.sh /
+ENV URL https://staging.elastic.co/5.0.0-beta1-e9e2b09c/download/logstash/logstash-5.0.0-beta1.tar.gz
+ENV VERSION 5.0.0-beta1
+ENV PATH $PATH:/opt/logstash-$VERSION/bin
 
 # As all snapshot builds have the same url, the image is cached. The date at then can be used to invalidate the image
-RUN bash setup.sh https://s3-eu-west-1.amazonaws.com/build-eu.elasticsearch.org/logstash/master/nightly/JDK8/logstash-latest-SNAPSHOT.deb?20160826
+RUN set -x && \
+    cd /opt && \
+    wget -q $URL && \
+    tar xzf logstash-$VERSION.tar.gz
 
 
 COPY logstash.conf.2.tmpl /logstash.conf.2.tmpl
@@ -19,4 +22,4 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 5044 5055
 
-CMD logstash --path.settings=/etc/logstash -f /logstash.conf --log.level=debug --config.debug
+CMD logstash -f /logstash.conf --log.level=debug --config.debug
