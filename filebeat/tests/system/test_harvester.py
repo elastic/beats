@@ -71,6 +71,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test.log",
             close_removed="true",
+            clean_removed="false",
             scan_frequency="0.1s"
         )
         os.mkdir(self.working_dir + "/log/")
