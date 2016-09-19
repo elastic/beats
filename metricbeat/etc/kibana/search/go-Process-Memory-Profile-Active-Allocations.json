@@ -1,0 +1,20 @@
+{
+  "sort": [
+    "@timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "go Process Memory Profile Active Allocations", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"metricset.module:goprof AND metricset.name:memprof AND type:allocation AND -goprof.memprof.allocation.stats.inuse_objects.count:0\"}},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":true,\"index\":\"metricbeat-*\",\"key\":\"metricset.module\",\"negate\":false,\"value\":\"goprof\"},\"query\":{\"match\":{\"metricset.module\":{\"query\":\"goprof\",\"type\":\"phrase\"}}}}],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+  }, 
+  "columns": [
+    "goprof.memprof.allocation.function", 
+    "goprof.memprof.allocation.stats.inuse_objects.count", 
+    "goprof.memprof.allocation.package", 
+    "goprof.memprof.allocation.file", 
+    "goprof.memprof.allocation.line"
+  ]
+}

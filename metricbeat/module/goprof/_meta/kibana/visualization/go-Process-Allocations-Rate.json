@@ -1,0 +1,10 @@
+{
+  "visState": "{\"type\":\"timelion\",\"title\":\"go Process Allocations Rate\",\"params\":{\"expression\":\".es(index=\\\"metricbeat-*\\\",q=\\\"metricset.module:goprof AND metricset.name:memstats\\\",metric=\\\"avg:goprof.memstats.allocations.total\\\", kibana=true).derivative().bars().label(\\\"Bytes Allocated/min\\\"),.es(index=\\\"metricbeat-*\\\",q=\\\"metricset.module:goprof AND metricset.name:memstats\\\",metric=\\\"max:goprof.memstats.allocations.allocated\\\", kibana=true).label(\\\"Bytes Allocated (Max)\\\"),.es(index=\\\"metricbeat-*\\\",q=\\\"metricset.module:goprof AND metricset.name:memstats\\\",metric=\\\"max:goprof.memstats.next_gc_limit\\\", kibana=true).label(\\\"GC Limit\\\")\",\"interval\":\"1m\"}}", 
+  "description": "", 
+  "title": "go Process Allocations Rate", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{}"
+  }
+}

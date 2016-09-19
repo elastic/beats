@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"go Process Object count\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat-*\\\",q=\\\"metricset.module:goprof AND metricset.name:memstats\\\",metric=\\\"avg:goprof.memstats.allocations.objects\\\", kibana=true).mvavg(10).label(\\\"Object count  (avg)\\\"), .subtract(.es(index=\\\"metricbeat-*\\\",q=\\\"metricset.module:goprof AND metricset.name:memstats\\\",metric=\\\"avg:goprof.memstats.allocations.mallocs\\\", kibana=true).derivative(), .es(index=\\\"metricbeat-*\\\",q=\\\"metricset.module:goprof AND metricset.name:memstats\\\",metric=\\\"avg:goprof.memstats.allocations.frees\\\", kibana=true).derivative()).bars().label(\\\"Object allocation rate\\\")\",\"interval\":\"1m\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "go Process Object count", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}
