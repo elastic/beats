@@ -6,6 +6,7 @@
 --
 This section summarizes the changes in each release.
 
+* <<release-notes-5.0.0-beta1>>
 * <<release-notes-5.0.0-alpha5>>
 * <<release-notes-5.0.0-alpha4>>
 * <<release-notes-5.0.0-alpha3>>
