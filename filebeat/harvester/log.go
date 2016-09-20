@@ -70,9 +70,12 @@ func (h *Harvester) Harvest(r reader.Reader) {
 		}
 
 		select {
+		// Applies when timeout is reached
 		case <-closeTimeout:
 			logp.Info("Closing harvester because close_timeout was reached: %s", h.state.Source)
+		// Required for shutdown when hanging inside reader
 		case <-h.done:
+		// Required when reader loop returns and reader finished
 		case <-harvestDone:
 		}
 		h.fileReader.Close()
