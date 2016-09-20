@@ -12,7 +12,7 @@ fi
 
 mkdir /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}
 cp -a homedir/. /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
-install -D -m 755 import_dashboards-windows-{{.arch}} /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/scripts/import_dashboards
+install -D -m 755 import_dashboards-windows-{{.arch}} /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/scripts/import_dashboards.exe
 cp {{.beat_name}}-windows-{{.arch}}.exe /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/{{.beat_name}}.exe
 unix2dos {{.beat_name}}-win.yml
 cp {{.beat_name}}-win.yml /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/{{.beat_name}}.yml
