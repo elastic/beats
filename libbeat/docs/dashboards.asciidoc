@@ -76,30 +76,29 @@ Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
 and select *Run As Administrator*). If you are running Windows XP, you may need
 to download and install PowerShell. 
 
-From the directory where you installed {beatname_uc}, run the `import_dashboards` script:
+From the directory where you installed {beatname_uc}, run the `import_dashboards.exe` script:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-PS > scripts\import_dashboards
+PS > scripts\import_dashboards.exe
 ----------------------------------------------------------------------
 
-By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-es` option to specify a different location. For example: 
-
+By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-es` option to specify a different location. For example:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-PS > scripts\import_dashboards -es http://192.168.33.60:9200
+PS > scripts\import_dashboards.exe -es http://192.168.33.60:9200
 ----------------------------------------------------------------------
 
 NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to
-allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File scripts\import_dashboards -es http://192.168.33.60:9200`.
+allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File scripts\import_dashboards.exe -es http://192.168.33.60:9200`.
 
 
 Use the `-user` option to specify the username and password to use for Elasticsearch authentication:
 
 ["source","sh",subs="attributes,callouts"]
 -----------------------------------------------------------------------
-PS > scripts\import_dashboards -es https://xyz.found.io -user user -pass password
+PS > scripts\import_dashboards.exe -es https://xyz.found.io -user user -pass password
 -----------------------------------------------------------------------
 
 [[view-kibana-dashboards]]
