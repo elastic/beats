@@ -57,6 +57,30 @@ func (h *Harvester) Harvest(r reader.Reader) {
 	// Makes sure file is properly closed when the harvester is stopped
 	defer h.close()
 
+	// Channel to stop internal harvester routines
+	harvestDone := make(chan struct{})
+	defer close(harvestDone)
+
+	// Closes reader after timeout or when done channel is closed
+	// This routine is also responsible to properly stop the reader
+	go func() {
+		var closeTimeout <-chan time.Time
+		if h.config.CloseTimeout > 0 {
+			closeTimeout = time.After(h.config.CloseTimeout)
+		}
+
+		select {
+		// Applies when timeout is reached
+		case <-closeTimeout:
+			logp.Info("Closing harvester because close_timeout was reached: %s", h.state.Source)
+		// Required for shutdown when hanging inside reader
+		case <-h.done:
+		// Required when reader loop returns and reader finished
+		case <-harvestDone:
+		}
+		h.fileReader.Close()
+	}()
+
 	logp.Info("Harvester started for file: %s", h.state.Source)
 
 	for {
@@ -258,8 +282,6 @@ func (h *Harvester) getState() file.State {
 }
 
 func (h *Harvester) close() {
-	// stops all go routines inside the harvester
-	close(h.harvesterDone)
 
 	// Mark harvester as finished
 	h.state.Finished = true
@@ -310,23 +332,6 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// Closes reader after timeout or when done channel is closed
-	// This routine is also responsible to properly stop the reader
-	go func() {
-		var closeTimeout <-chan time.Time
-		if h.config.CloseTimeout > 0 {
-			closeTimeout = time.After(h.config.CloseTimeout)
-		}
-
-		select {
-		case <-closeTimeout:
-			logp.Info("Closing harvester because close_timeout was reached: %s", h.state.Source)
-		case <-h.done:
-		case <-h.harvesterDone:
-		}
-		h.fileReader.Close()
-	}()
 
 	r, err = reader.NewEncode(h.fileReader, h.encoding, h.config.BufferSize)
 	if err != nil {
