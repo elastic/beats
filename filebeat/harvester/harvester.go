@@ -41,7 +41,6 @@ type Harvester struct {
 	fileReader      *LogFile
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
-	harvesterDone   chan struct{}
 	done            chan struct{}
 }
 
@@ -56,7 +55,6 @@ func NewHarvester(
 		config:         defaultConfig,
 		state:          state,
 		prospectorChan: prospectorChan,
-		harvesterDone:  make(chan struct{}),
 		done:           done,
 	}
 

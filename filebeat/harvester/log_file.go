@@ -3,7 +3,6 @@ package harvester
 import (
 	"io"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester/source"
@@ -18,7 +17,6 @@ type LogFile struct {
 	lastTimeRead time.Time
 	backoff      time.Duration
 	done         chan struct{}
-	singleClose  sync.Once
 }
 
 func NewLogFile(
@@ -167,9 +165,6 @@ func (r *LogFile) wait() {
 }
 
 func (r *LogFile) Close() {
-	// Make sure reader is only closed once
-	r.singleClose.Do(func() {
-		close(r.done)
-		// Note: File reader is not closed here because that leads to race conditions
-	})
+	close(r.done)
+	// Note: File reader is not closed here because that leads to race conditions
 }
