@@ -35,7 +35,9 @@ To import the official Kibana dashboards for your Beat version into a remote Ela
 
 	./import_dashboards -es https://xyz.found.io -user user -pass password
 
-For more details, check https://www.elastic.co/guide/en/beats/libbeat/5.0/import-dashboards.html`)
+For more details, check https://www.elastic.co/guide/en/beats/libbeat/5.0/import-dashboards.html.
+
+`)
 
 var beat string
 
@@ -85,7 +87,7 @@ func DefineCommandLine() (*CommandLine, error) {
 	cl.flagSet.StringVar(&cl.opt.Url, "url",
 		fmt.Sprintf("https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-%s.zip", lbeat.GetDefaultVersion()),
 		"URL to the zip archive containing the Beats dashboards")
-	cl.flagSet.StringVar(&cl.opt.Beat, "beat", beat, "The Beat name, in case a zip archive is passed as input")
+	cl.flagSet.StringVar(&cl.opt.Beat, "beat", beat, "The Beat name that is used to select what dashboards to install from a zip. An empty string selects all.")
 	cl.flagSet.BoolVar(&cl.opt.OnlyDashboards, "only-dashboards", false, "Import only dashboards together with visualizations and searches. By default import both, dashboards and the index-pattern.")
 	cl.flagSet.BoolVar(&cl.opt.OnlyIndex, "only-index", false, "Import only the index-pattern. By default imports both, dashboards and the index pattern.")
 	cl.flagSet.BoolVar(&cl.opt.Snapshot, "snapshot", false, "Import dashboards from snapshot builds.")
