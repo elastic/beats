@@ -2,7 +2,7 @@ FROM java:8-jre
 
 ENV LS_VERSION 5
 
-ENV URL https://staging.elastic.co/5.0.0-beta1-e9e2b09c/download/logstash/logstash-5.0.0-beta1.tar.gz
+ENV URL https://staging.elastic.co/5.0.0-beta1-5eb5cbdb/downloads/logstash/logstash-5.0.0-beta1.tar.gz
 ENV VERSION 5.0.0-beta1
 ENV PATH $PATH:/opt/logstash-$VERSION/bin
 
