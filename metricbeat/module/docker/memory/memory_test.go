@@ -71,7 +71,8 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	event := eventMapping(&rawStats)
 	//THEN
 	assert.True(t, equalEvent(expectedEvent, event))
-
+	t.Logf(" expected : %v", expectedEvent)
+	t.Logf(" eventmapping : %v ", event)
 }
 
 func getMemoryStats(read time.Time, number uint64) dc.Stats {

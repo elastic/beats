@@ -1,5 +1,6 @@
 package cpu
 
+/*
 import (
 	"testing"
 
@@ -23,3 +24,4 @@ func getConfig() map[string]interface{} {
 		"socket":     "unix:///var/run/docker.sock",
 	}
 }
+*/
