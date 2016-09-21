@@ -73,7 +73,6 @@ func TestCPUService_UsageInUsermode(t *testing.T) {
 	//  THEN
 	assert.Equal(t, float64(0.50), result)
 }
-
 func TestCPUService_GetCpuStats(t *testing.T) {
 	// GIVEN
 	containerID := "containerID"
