@@ -98,6 +98,8 @@ In the previous example, the Elasticsearch nodes are available at `https://10.45
 The gzip compression level. Setting this value to 0 disables compression.
 The compression level must be in the range of 1 (best speed) to 9 (best compression).
 
+Increasing the compression level will reduce the network usage but will increase the cpu usage.
+
 The default value is 0.
 
 ===== worker
@@ -372,6 +374,8 @@ is used as the default port number.
 
 The gzip compression level. Setting this value to 0 disables compression.
 The compression level must be in the range of 1 (best speed) to 9 (best compression).
+
+Increasing the compression level will reduce the network usage but will increase the cpu usage.
 
 The default value is 3.
 
@@ -652,7 +656,7 @@ The Redis port to use if `hosts` does not contain a port number. The default is 
 
 ===== index
 
-deprecated[5.0.0-alpha5,The `index` setting is renamed to `key.]
+deprecated[5.0.0,The `index` setting is renamed to `key`]
 
 The name of the Redis list or channel the events are published to. The default is
 "{beatname_lc}".

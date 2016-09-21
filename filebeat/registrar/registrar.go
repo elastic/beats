@@ -59,8 +59,28 @@ func (r *Registrar) Init() error {
 	registryPath := filepath.Dir(r.registryFile)
 	err := os.MkdirAll(registryPath, 0755)
 	if err != nil {
-		return fmt.Errorf("Failed to created registry file dir %s: %v",
-			registryPath, err)
+		return fmt.Errorf("Failed to created registry file dir %s: %v", registryPath, err)
+	}
+
+	// Check if files exists
+	fileInfo, err := os.Lstat(r.registryFile)
+	if os.IsNotExist(err) {
+		logp.Info("No registry file found under: %s. Creating a new registry file.", r.registryFile)
+		// No registry exists yet, write empty state to check if registry can be written
+		return r.writeRegistry()
+	}
+	if err != nil {
+		return err
+	}
+
+	// Check if regular file, no dir, no symlink
+	if !fileInfo.Mode().IsRegular() {
+		// Special error message for directory
+		if fileInfo.IsDir() {
+			return fmt.Errorf("Registry file path must be a file. %s is a directory.", r.registryFile)
+		} else {
+			return fmt.Errorf("Registry file path is not a regular file: %s", r.registryFile)
+		}
 	}
 
 	logp.Info("Registry file set to: %s", r.registryFile)
@@ -76,18 +96,6 @@ func (r *Registrar) GetStates() file.States {
 // loadStates fetches the previous reading state from the configure RegistryFile file
 // The default file is `registry` in the data path.
 func (r *Registrar) loadStates() error {
-
-	// Check if files exists
-	_, err := os.Stat(r.registryFile)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	// Error means no file found
-	if err != nil {
-		logp.Info("No registry file found under: %s. Creating a new registry file.", r.registryFile)
-		return nil
-	}
 
 	f, err := os.Open(r.registryFile)
 	if err != nil {
@@ -108,8 +116,7 @@ func (r *Registrar) loadStates() error {
 	states := []file.State{}
 	err = decoder.Decode(&states)
 	if err != nil {
-		logp.Err("Error decoding states: %s", err)
-		return err
+		return fmt.Errorf("Error decoding states: %s", err)
 	}
 
 	r.states.SetStates(states)
@@ -164,8 +171,7 @@ func (r *Registrar) Start() error {
 	// Load the previous log file locations now, for use in prospector
 	err := r.loadStates()
 	if err != nil {
-		logp.Err("Error loading state: %v", err)
-		return err
+		return fmt.Errorf("Error loading state: %v", err)
 	}
 
 	r.wg.Add(1)
@@ -252,6 +258,7 @@ func (r *Registrar) writeRegistry() error {
 	encoder := json.NewEncoder(f)
 	err = encoder.Encode(states)
 	if err != nil {
+		f.Close()
 		logp.Err("Error when encoding the states: %s", err)
 		return err
 	}
@@ -259,9 +266,11 @@ func (r *Registrar) writeRegistry() error {
 	// Directly close file because of windows
 	f.Close()
 
+	err = file.SafeFileRotate(r.registryFile, tempfile)
+
 	logp.Debug("registrar", "Registry file updated. %d states written.", len(states))
 	registryWrites.Add(1)
 	statesCurrent.Set(int64(len(states)))
 
-	return file.SafeFileRotate(r.registryFile, tempfile)
+	return err
 }
