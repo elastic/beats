@@ -110,7 +110,7 @@ func TestCPUService_GetCpuStats(t *testing.T) {
 	// expected events
 	expectedEvent := common.MapStr{
 		"@timestamp": common.Time(stats.Read),
-		 "container": common.MapStr{
+		"container": common.MapStr{
 			"id":   containerID,
 			"name": "name1",
 			"labels": []common.MapStr{

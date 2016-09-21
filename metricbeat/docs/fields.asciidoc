@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-beats>>
 * <<exported-fields-common>>
+* <<exported-fields-docker>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -698,6 +699,102 @@ example: metricsets
 required: True
 
 The document type. Always set to "metricsets".
+
+
+[[exported-fields-docker]]
+== docker Fields
+
+Docker stats collected from Docker.
+
+
+
+[float]
+== docker Fields
+
+docker contains different informations and statistics of docker's containers running
+
+
+
+[float]
+== diskio Fields
+
+diskio
+
+
+
+[float]
+=== docker.diskio.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== cpu Fields
+
+Runtime cpu metrics
+
+
+
+[float]
+== cpu Fields
+
+CPU statistics of the running container
+
+
+
+[float]
+=== docker.cpu.cpu.usage_in_user_mode
+
+type: float
+
+The system user mode consumed by The Docker server.
+
+
+[float]
+== container Fields
+
+container
+
+
+
+[float]
+=== docker.container.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== network Fields
+
+network
+
+
+
+[float]
+=== docker.network.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== memory Fields
+
+memory
+
+
+
+[float]
+=== docker.memory.example
+
+type: keyword
+
+Example field
 
 
 [[exported-fields-haproxy]]
@@ -2549,234 +2646,6 @@ PostgreSQL metrics.
 
 
 [float]
-== activity Fields
-
-One document per server process, showing information related to the current activity of that process, such as state and current query. Collected by querying pg_stat_activity.
-
-
-
-[float]
-=== postgresql.activity.database.oid
-
-type: long
-
-OID of the database this backend is connected to.
-
-
-[float]
-=== postgresql.activity.database.name
-
-type: keyword
-
-Name of the database this backend is connected to.
-
-
-[float]
-=== postgresql.activity.pid
-
-type: long
-
-Process ID of this backend.
-
-
-[float]
-=== postgresql.activity.user.id
-
-type: long
-
-OID of the user logged into this backend.
-
-
-[float]
-=== postgresql.activity.user.name
-
-Name of the user logged into this backend.
-
-
-[float]
-=== postgresql.activity.application_name
-
-Name of the application that is connected to this backend.
-
-
-[float]
-=== postgresql.activity.client.address
-
-IP address of the client connected to this backend.
-
-
-[float]
-=== postgresql.activity.client.hostname
-
-Host name of the connected client, as reported by a reverse DNS lookup of client_addr.
-
-
-[float]
-=== postgresql.activity.client.port
-
-type: long
-
-TCP port number that the client is using for communication with this backend, or -1 if a Unix socket is used.
-
-
-[float]
-=== postgresql.activity.backend_start
-
-type: date
-
-Time when this process was started, i.e., when the client connected to the server.
-
-
-[float]
-=== postgresql.activity.transaction_start
-
-type: date
-
-Time when this process' current transaction was started.
-
-
-[float]
-=== postgresql.activity.query_start
-
-type: date
-
-Time when the currently active query was started, or if state is not active, when the last query was started.
-
-
-[float]
-=== postgresql.activity.state_change
-
-type: date
-
-Time when the state was last changed.
-
-
-[float]
-=== postgresql.activity.waiting
-
-type: boolean
-
-True if this backend is currently waiting on a lock.
-
-
-[float]
-=== postgresql.activity.state
-
-Current overall state of this backend. Possible values are:
-
-  * active: The backend is executing a query.
-  * idle: The backend is waiting for a new client command.
-  * idle in transaction: The backend is in a transaction, but is not
-    currently executing a query.
-  * idle in transaction (aborted): This state is similar to idle in
-    transaction, except one of the statements in the transaction caused
-    an error.
-  * fastpath function call: The backend is executing a fast-path function.
-  * disabled: This state is reported if track_activities is disabled in this backend.
-
-
-[float]
-=== postgresql.activity.query
-
-Text of this backend's most recent query. If state is active this field shows the currently executing query. In all other states, it shows the last query that was executed.
-
-
-[float]
-== bgwriter Fields
-
-Statistics about the background writer process's activity. Collected using the pg_stat_bgwriter query.
-
-
-
-[float]
-=== postgresql.bgwriter.checkpoints.scheduled
-
-type: long
-
-Number of scheduled checkpoints that have been performed.
-
-
-[float]
-=== postgresql.bgwriter.checkpoints.requested
-
-type: long
-
-Number of requested checkpoints that have been performed.
-
-
-[float]
-=== postgresql.bgwriter.checkpoints.times.write.ms
-
-type: float
-
-Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds.
-
-
-[float]
-=== postgresql.bgwriter.checkpoints.times.sync.ms
-
-type: float
-
-Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk, in milliseconds.
-
-
-[float]
-=== postgresql.bgwriter.buffers.checkpoints
-
-type: long
-
-Number of buffers written during checkpoints.
-
-
-[float]
-=== postgresql.bgwriter.buffers.clean
-
-type: long
-
-Number of buffers written by the background writer.
-
-
-[float]
-=== postgresql.bgwriter.buffers.clean_full
-
-type: long
-
-Number of times the background writer stopped a cleaning scan because it had written too many buffers.
-
-
-[float]
-=== postgresql.bgwriter.buffers.backend
-
-type: long
-
-Number of buffers written directly by a backend.
-
-
-[float]
-=== postgresql.bgwriter.buffers.backend_fsync
-
-type: long
-
-Number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write)
-
-
-[float]
-=== postgresql.bgwriter.buffers.allocated
-
-type: long
-
-Number of buffers allocated.
-
-
-[float]
-=== postgresql.bgwriter.stats_reset
-
-type: date
-
-Time at which these statistics were last reset.
-
-
-[float]
 == database Fields
 
 One row per database, showing database-wide statistics. Collected by querying pg_stat_database
@@ -2933,6 +2802,234 @@ Number of deadlocks detected in this database.
 type: date
 
 Time at which these statistics were last reset.
+
+
+[float]
+== bgwriter Fields
+
+Statistics about the background writer process's activity. Collected using the pg_stat_bgwriter query.
+
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.scheduled
+
+type: long
+
+Number of scheduled checkpoints that have been performed.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.requested
+
+type: long
+
+Number of requested checkpoints that have been performed.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.times.write.ms
+
+type: float
+
+Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.times.sync.ms
+
+type: float
+
+Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk, in milliseconds.
+
+
+[float]
+=== postgresql.bgwriter.buffers.checkpoints
+
+type: long
+
+Number of buffers written during checkpoints.
+
+
+[float]
+=== postgresql.bgwriter.buffers.clean
+
+type: long
+
+Number of buffers written by the background writer.
+
+
+[float]
+=== postgresql.bgwriter.buffers.clean_full
+
+type: long
+
+Number of times the background writer stopped a cleaning scan because it had written too many buffers.
+
+
+[float]
+=== postgresql.bgwriter.buffers.backend
+
+type: long
+
+Number of buffers written directly by a backend.
+
+
+[float]
+=== postgresql.bgwriter.buffers.backend_fsync
+
+type: long
+
+Number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write)
+
+
+[float]
+=== postgresql.bgwriter.buffers.allocated
+
+type: long
+
+Number of buffers allocated.
+
+
+[float]
+=== postgresql.bgwriter.stats_reset
+
+type: date
+
+Time at which these statistics were last reset.
+
+
+[float]
+== activity Fields
+
+One document per server process, showing information related to the current activity of that process, such as state and current query. Collected by querying pg_stat_activity.
+
+
+
+[float]
+=== postgresql.activity.database.oid
+
+type: long
+
+OID of the database this backend is connected to.
+
+
+[float]
+=== postgresql.activity.database.name
+
+type: keyword
+
+Name of the database this backend is connected to.
+
+
+[float]
+=== postgresql.activity.pid
+
+type: long
+
+Process ID of this backend.
+
+
+[float]
+=== postgresql.activity.user.id
+
+type: long
+
+OID of the user logged into this backend.
+
+
+[float]
+=== postgresql.activity.user.name
+
+Name of the user logged into this backend.
+
+
+[float]
+=== postgresql.activity.application_name
+
+Name of the application that is connected to this backend.
+
+
+[float]
+=== postgresql.activity.client.address
+
+IP address of the client connected to this backend.
+
+
+[float]
+=== postgresql.activity.client.hostname
+
+Host name of the connected client, as reported by a reverse DNS lookup of client_addr.
+
+
+[float]
+=== postgresql.activity.client.port
+
+type: long
+
+TCP port number that the client is using for communication with this backend, or -1 if a Unix socket is used.
+
+
+[float]
+=== postgresql.activity.backend_start
+
+type: date
+
+Time when this process was started, i.e., when the client connected to the server.
+
+
+[float]
+=== postgresql.activity.transaction_start
+
+type: date
+
+Time when this process' current transaction was started.
+
+
+[float]
+=== postgresql.activity.query_start
+
+type: date
+
+Time when the currently active query was started, or if state is not active, when the last query was started.
+
+
+[float]
+=== postgresql.activity.state_change
+
+type: date
+
+Time when the state was last changed.
+
+
+[float]
+=== postgresql.activity.waiting
+
+type: boolean
+
+True if this backend is currently waiting on a lock.
+
+
+[float]
+=== postgresql.activity.state
+
+Current overall state of this backend. Possible values are:
+
+  * active: The backend is executing a query.
+  * idle: The backend is waiting for a new client command.
+  * idle in transaction: The backend is in a transaction, but is not
+    currently executing a query.
+  * idle in transaction (aborted): This state is similar to idle in
+    transaction, except one of the statements in the transaction caused
+    an error.
+  * fastpath function call: The backend is executing a fast-path function.
+  * disabled: This state is reported if track_activities is disabled in this backend.
+
+
+[float]
+=== postgresql.activity.query
+
+Text of this backend's most recent query. If state is active this field shows the currently executing query. In all other states, it shows the last query that was executed.
 
 
 [[exported-fields-redis]]
@@ -3569,316 +3666,6 @@ System status metrics, like CPU and memory usage, that are collected from the op
 
 
 [float]
-== core Fields
-
-`system-core` contains local CPU core stats.
-
-
-
-[float]
-=== system.core.id
-
-type: long
-
-CPU Core number.
-
-
-[float]
-=== system.core.user.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
-
-
-[float]
-=== system.core.user.ticks
-
-type: long
-
-The amount of CPU time spent in user space.
-
-
-[float]
-=== system.core.system.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent in kernel space.
-
-
-[float]
-=== system.core.system.ticks
-
-type: long
-
-The amount of CPU time spent in kernel space.
-
-
-[float]
-=== system.core.nice.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent on low-priority processes.
-
-
-[float]
-=== system.core.nice.ticks
-
-type: long
-
-The amount of CPU time spent on low-priority processes.
-
-
-[float]
-=== system.core.idle.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent idle.
-
-
-[float]
-=== system.core.idle.ticks
-
-type: long
-
-The amount of CPU time spent idle.
-
-
-[float]
-=== system.core.iowait.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent in wait (on disk).
-
-
-[float]
-=== system.core.iowait.ticks
-
-type: long
-
-The amount of CPU time spent in wait (on disk).
-
-
-[float]
-=== system.core.irq.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent servicing and handling hardware interrupts.
-
-
-[float]
-=== system.core.irq.ticks
-
-type: long
-
-The amount of CPU time spent servicing and handling hardware interrupts.
-
-
-[float]
-=== system.core.softirq.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent servicing and handling software interrupts.
-
-
-[float]
-=== system.core.softirq.ticks
-
-type: long
-
-The amount of CPU time spent servicing and handling software interrupts.
-
-
-[float]
-=== system.core.steal.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
-
-
-[float]
-=== system.core.steal.ticks
-
-type: long
-
-The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
-
-
-[float]
-== cpu Fields
-
-`cpu` contains local CPU stats.
-
-
-
-[float]
-=== system.cpu.user.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
-
-
-[float]
-=== system.cpu.system.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent in kernel space.
-
-
-[float]
-=== system.cpu.nice.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent on low-priority processes.
-
-
-[float]
-=== system.cpu.idle.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent idle.
-
-
-[float]
-=== system.cpu.iowait.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent in wait (on disk).
-
-
-[float]
-=== system.cpu.irq.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent servicing and handling hardware interrupts.
-
-
-[float]
-=== system.cpu.softirq.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent servicing and handling software interrupts.
-
-
-[float]
-=== system.cpu.steal.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
-
-
-[float]
-=== system.cpu.user.ticks
-
-type: long
-
-The amount of CPU time spent in user space.
-
-
-[float]
-=== system.cpu.system.ticks
-
-type: long
-
-The amount of CPU time spent in kernel space.
-
-
-[float]
-=== system.cpu.nice.ticks
-
-type: long
-
-The amount of CPU time spent on low-priority processes.
-
-
-[float]
-=== system.cpu.idle.ticks
-
-type: long
-
-The amount of CPU time spent idle.
-
-
-[float]
-=== system.cpu.iowait.ticks
-
-type: long
-
-The amount of CPU time spent in wait (on disk).
-
-
-[float]
-=== system.cpu.irq.ticks
-
-type: long
-
-The amount of CPU time spent servicing and handling hardware interrupts.
-
-
-[float]
-=== system.cpu.softirq.ticks
-
-type: long
-
-The amount of CPU time spent servicing and handling software interrupts.
-
-
-[float]
-=== system.cpu.steal.ticks
-
-type: long
-
-The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
-
-
-[float]
 == diskio Fields
 
 `disk` contains disk IO metrics collected from the operating system.
@@ -3964,95 +3751,6 @@ The total number of of milliseconds spent doing I/Os.
 
 
 [float]
-== filesystem Fields
-
-`filesystem` contains local filesystem stats.
-
-
-
-[float]
-=== system.filesystem.available
-
-type: long
-
-format: bytes
-
-The disk space available to an unprivileged user in bytes.
-
-
-[float]
-=== system.filesystem.device_name
-
-type: keyword
-
-The disk name. For example: `/dev/disk1`
-
-
-[float]
-=== system.filesystem.mount_point
-
-type: keyword
-
-The mounting point. For example: `/`
-
-
-[float]
-=== system.filesystem.files
-
-type: long
-
-The total number of file nodes in the file system.
-
-
-[float]
-=== system.filesystem.free
-
-type: long
-
-format: bytes
-
-The disk space available in bytes.
-
-
-[float]
-=== system.filesystem.free_files
-
-type: long
-
-The number of free file nodes in the file system.
-
-
-[float]
-=== system.filesystem.total
-
-type: long
-
-format: bytes
-
-The total disk space in bytes.
-
-
-[float]
-=== system.filesystem.used.bytes
-
-type: long
-
-format: bytes
-
-The used disk space in bytes.
-
-
-[float]
-=== system.filesystem.used.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of used disk space.
-
-
-[float]
 == fsstat Fields
 
 `system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
@@ -4107,270 +3805,6 @@ type: long
 format: bytes
 
 Total space (used plus free).
-
-
-[float]
-== load Fields
-
-Load averages.
-
-
-
-[float]
-=== system.load.1
-
-type: scaled_float
-
-Load average for the last minute.
-
-
-[float]
-=== system.load.5
-
-type: scaled_float
-
-Load average for the last 5 minutes.
-
-
-[float]
-=== system.load.15
-
-type: scaled_float
-
-Load average for the last 15 minutes.
-
-
-[float]
-=== system.load.norm.1
-
-type: scaled_float
-
-Load divided by the number of cores for the last minute.
-
-
-[float]
-=== system.load.norm.5
-
-type: scaled_float
-
-Load divided by the number of cores for the last 5 minutes.
-
-
-[float]
-=== system.load.norm.15
-
-type: scaled_float
-
-Load divided by the number of cores for the last 15 minutes.
-
-
-[float]
-== memory Fields
-
-`memory` contains local memory stats.
-
-
-
-[float]
-=== system.memory.total
-
-type: long
-
-format: bytes
-
-Total memory.
-
-
-[float]
-=== system.memory.used.bytes
-
-type: long
-
-format: bytes
-
-Used memory.
-
-
-[float]
-=== system.memory.free
-
-type: long
-
-format: bytes
-
-The total amount of free memory in bytes. This value does not include memory consumed by system caches and buffers (see system.memory.actual.free).
-
-
-[float]
-=== system.memory.used.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of used memory.
-
-
-[float]
-== actual Fields
-
-Actual memory used and free.
-
-
-
-[float]
-=== system.memory.actual.used.bytes
-
-type: long
-
-Actual used memory in bytes. It represents the difference between the total and the available memory. The available memory depends on the OS. For more details, please check `system.actual.free`.
-
-
-[float]
-=== system.memory.actual.free
-
-type: long
-
-Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is the  amount of unreserved and uncommitted memory currently in the user-mode portion of the virtual address space of the calling process.
-
-
-[float]
-=== system.memory.actual.used.pct
-
-type: scaled_float
-
-The percentage of actual used memory.
-
-
-[float]
-== swap Fields
-
-This group contains statistics related to the swap memory usage on the system.
-
-
-[float]
-=== system.memory.swap.total
-
-type: long
-
-format: bytes
-
-Total swap memory.
-
-
-[float]
-=== system.memory.swap.used.bytes
-
-type: long
-
-format: bytes
-
-Used swap memory.
-
-
-[float]
-=== system.memory.swap.free
-
-type: long
-
-format: bytes
-
-Available swap memory.
-
-
-[float]
-=== system.memory.swap.used.pct
-
-type: scaled_float
-
-format: percent
-
-The percentage of used swap memory.
-
-
-[float]
-== network Fields
-
-`network` contains network IO metrics for a single network interface.
-
-
-
-[float]
-=== system.network.name
-
-type: keyword
-
-example: eth0
-
-The network interface name.
-
-
-[float]
-=== system.network.out.bytes
-
-type: long
-
-format: bytes
-
-The number of bytes sent.
-
-
-[float]
-=== system.network.in.bytes
-
-type: long
-
-format: bytes
-
-The number of bytes received.
-
-
-[float]
-=== system.network.out.packets
-
-type: long
-
-The number of packets sent.
-
-
-[float]
-=== system.network.in.packets
-
-type: long
-
-The number or packets received.
-
-
-[float]
-=== system.network.in.errors
-
-type: long
-
-The number of errors while receiving.
-
-
-[float]
-=== system.network.out.errors
-
-type: long
-
-The number of errors while sending.
-
-
-[float]
-=== system.network.in.dropped
-
-type: long
-
-The number of incoming packets that were dropped.
-
-
-[float]
-=== system.network.out.dropped
-
-type: long
-
-The number of outgoing packets that were dropped. This value is always 0 on Darwin and BSD because it is not reported by the operating system.
 
 
 [float]
@@ -5081,6 +4515,669 @@ Total number of bytes transferred to and from all block devices by processes in 
 type: long
 
 Total number of I/O operations performed on all devices by processes in the cgroup as seen by the throttling policy.
+
+
+[float]
+== cpu Fields
+
+`cpu` contains local CPU stats.
+
+
+
+[float]
+=== system.cpu.user.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+
+
+[float]
+=== system.cpu.system.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in kernel space.
+
+
+[float]
+=== system.cpu.nice.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent on low-priority processes.
+
+
+[float]
+=== system.cpu.idle.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent idle.
+
+
+[float]
+=== system.cpu.iowait.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in wait (on disk).
+
+
+[float]
+=== system.cpu.irq.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent servicing and handling hardware interrupts.
+
+
+[float]
+=== system.cpu.softirq.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent servicing and handling software interrupts.
+
+
+[float]
+=== system.cpu.steal.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+[float]
+=== system.cpu.user.ticks
+
+type: long
+
+The amount of CPU time spent in user space.
+
+
+[float]
+=== system.cpu.system.ticks
+
+type: long
+
+The amount of CPU time spent in kernel space.
+
+
+[float]
+=== system.cpu.nice.ticks
+
+type: long
+
+The amount of CPU time spent on low-priority processes.
+
+
+[float]
+=== system.cpu.idle.ticks
+
+type: long
+
+The amount of CPU time spent idle.
+
+
+[float]
+=== system.cpu.iowait.ticks
+
+type: long
+
+The amount of CPU time spent in wait (on disk).
+
+
+[float]
+=== system.cpu.irq.ticks
+
+type: long
+
+The amount of CPU time spent servicing and handling hardware interrupts.
+
+
+[float]
+=== system.cpu.softirq.ticks
+
+type: long
+
+The amount of CPU time spent servicing and handling software interrupts.
+
+
+[float]
+=== system.cpu.steal.ticks
+
+type: long
+
+The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+[float]
+== core Fields
+
+`system-core` contains local CPU core stats.
+
+
+
+[float]
+=== system.core.id
+
+type: long
+
+CPU Core number.
+
+
+[float]
+=== system.core.user.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+
+
+[float]
+=== system.core.user.ticks
+
+type: long
+
+The amount of CPU time spent in user space.
+
+
+[float]
+=== system.core.system.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in kernel space.
+
+
+[float]
+=== system.core.system.ticks
+
+type: long
+
+The amount of CPU time spent in kernel space.
+
+
+[float]
+=== system.core.nice.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent on low-priority processes.
+
+
+[float]
+=== system.core.nice.ticks
+
+type: long
+
+The amount of CPU time spent on low-priority processes.
+
+
+[float]
+=== system.core.idle.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent idle.
+
+
+[float]
+=== system.core.idle.ticks
+
+type: long
+
+The amount of CPU time spent idle.
+
+
+[float]
+=== system.core.iowait.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in wait (on disk).
+
+
+[float]
+=== system.core.iowait.ticks
+
+type: long
+
+The amount of CPU time spent in wait (on disk).
+
+
+[float]
+=== system.core.irq.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent servicing and handling hardware interrupts.
+
+
+[float]
+=== system.core.irq.ticks
+
+type: long
+
+The amount of CPU time spent servicing and handling hardware interrupts.
+
+
+[float]
+=== system.core.softirq.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent servicing and handling software interrupts.
+
+
+[float]
+=== system.core.softirq.ticks
+
+type: long
+
+The amount of CPU time spent servicing and handling software interrupts.
+
+
+[float]
+=== system.core.steal.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+[float]
+=== system.core.steal.ticks
+
+type: long
+
+The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+[float]
+== load Fields
+
+Load averages.
+
+
+
+[float]
+=== system.load.1
+
+type: scaled_float
+
+Load average for the last minute.
+
+
+[float]
+=== system.load.5
+
+type: scaled_float
+
+Load average for the last 5 minutes.
+
+
+[float]
+=== system.load.15
+
+type: scaled_float
+
+Load average for the last 15 minutes.
+
+
+[float]
+=== system.load.norm.1
+
+type: scaled_float
+
+Load divided by the number of cores for the last minute.
+
+
+[float]
+=== system.load.norm.5
+
+type: scaled_float
+
+Load divided by the number of cores for the last 5 minutes.
+
+
+[float]
+=== system.load.norm.15
+
+type: scaled_float
+
+Load divided by the number of cores for the last 15 minutes.
+
+
+[float]
+== network Fields
+
+`network` contains network IO metrics for a single network interface.
+
+
+
+[float]
+=== system.network.name
+
+type: keyword
+
+example: eth0
+
+The network interface name.
+
+
+[float]
+=== system.network.out.bytes
+
+type: long
+
+format: bytes
+
+The number of bytes sent.
+
+
+[float]
+=== system.network.in.bytes
+
+type: long
+
+format: bytes
+
+The number of bytes received.
+
+
+[float]
+=== system.network.out.packets
+
+type: long
+
+The number of packets sent.
+
+
+[float]
+=== system.network.in.packets
+
+type: long
+
+The number or packets received.
+
+
+[float]
+=== system.network.in.errors
+
+type: long
+
+The number of errors while receiving.
+
+
+[float]
+=== system.network.out.errors
+
+type: long
+
+The number of errors while sending.
+
+
+[float]
+=== system.network.in.dropped
+
+type: long
+
+The number of incoming packets that were dropped.
+
+
+[float]
+=== system.network.out.dropped
+
+type: long
+
+The number of outgoing packets that were dropped. This value is always 0 on Darwin and BSD because it is not reported by the operating system.
+
+
+[float]
+== memory Fields
+
+`memory` contains local memory stats.
+
+
+
+[float]
+=== system.memory.total
+
+type: long
+
+format: bytes
+
+Total memory.
+
+
+[float]
+=== system.memory.used.bytes
+
+type: long
+
+format: bytes
+
+Used memory.
+
+
+[float]
+=== system.memory.free
+
+type: long
+
+format: bytes
+
+The total amount of free memory in bytes. This value does not include memory consumed by system caches and buffers (see system.memory.actual.free).
+
+
+[float]
+=== system.memory.used.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of used memory.
+
+
+[float]
+== actual Fields
+
+Actual memory used and free.
+
+
+
+[float]
+=== system.memory.actual.used.bytes
+
+type: long
+
+Actual used memory in bytes. It represents the difference between the total and the available memory. The available memory depends on the OS. For more details, please check `system.actual.free`.
+
+
+[float]
+=== system.memory.actual.free
+
+type: long
+
+Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is the  amount of unreserved and uncommitted memory currently in the user-mode portion of the virtual address space of the calling process.
+
+
+[float]
+=== system.memory.actual.used.pct
+
+type: scaled_float
+
+The percentage of actual used memory.
+
+
+[float]
+== swap Fields
+
+This group contains statistics related to the swap memory usage on the system.
+
+
+[float]
+=== system.memory.swap.total
+
+type: long
+
+format: bytes
+
+Total swap memory.
+
+
+[float]
+=== system.memory.swap.used.bytes
+
+type: long
+
+format: bytes
+
+Used swap memory.
+
+
+[float]
+=== system.memory.swap.free
+
+type: long
+
+format: bytes
+
+Available swap memory.
+
+
+[float]
+=== system.memory.swap.used.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of used swap memory.
+
+
+[float]
+== filesystem Fields
+
+`filesystem` contains local filesystem stats.
+
+
+
+[float]
+=== system.filesystem.available
+
+type: long
+
+format: bytes
+
+The disk space available to an unprivileged user in bytes.
+
+
+[float]
+=== system.filesystem.device_name
+
+type: keyword
+
+The disk name. For example: `/dev/disk1`
+
+
+[float]
+=== system.filesystem.mount_point
+
+type: keyword
+
+The mounting point. For example: `/`
+
+
+[float]
+=== system.filesystem.files
+
+type: long
+
+The total number of file nodes in the file system.
+
+
+[float]
+=== system.filesystem.free
+
+type: long
+
+format: bytes
+
+The disk space available in bytes.
+
+
+[float]
+=== system.filesystem.free_files
+
+type: long
+
+The number of free file nodes in the file system.
+
+
+[float]
+=== system.filesystem.total
+
+type: long
+
+format: bytes
+
+The total disk space in bytes.
+
+
+[float]
+=== system.filesystem.used.bytes
+
+type: long
+
+format: bytes
+
+The used disk space in bytes.
+
+
+[float]
+=== system.filesystem.used.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of used disk space.
 
 
 [[exported-fields-zookeeper]]
