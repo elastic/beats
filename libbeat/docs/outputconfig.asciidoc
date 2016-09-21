@@ -148,14 +148,14 @@ The index name to write events to. The default is "{beatname_lc}-%{+yyyy.MM.dd}"
 
 ===== indices
 
-Array of index selector rules supporting conditionals, *Format String*
+Array of index selector rules supporting conditionals, format string
 based field access and name mappings. The first rule matching will be used to
 set the `index` for the event to be published. If `indices` is missing or no
 rule matches, the `index` field will be used.
 
 Rule settings:
 
-*`index`*: The index *Format String* to use. If the fields used are missing, the rule fails.
+*`index`*: The index format string to use. If the fields used are missing, the rule fails.
 
 *`mapping`*: Dictionary mapping index names to new names
 
@@ -181,11 +181,11 @@ output.elasticsearch:
 
 ===== pipeline
 
-*Format String* value configuring the ingest node pipeline to write events to.
+format string value configuring the ingest node pipeline to write events to.
 
 ===== pipelines
 
-Array of pipeline selector configurations supporting conditionals, *Format String*
+Array of pipeline selector configurations supporting conditionals, format string
 based field access and name mappings. The first rule matching will be used to
 set the `pipeline` for the event to be published. If `pipelines` is missing or no
 rule matches, the `pipeline` field will be used.
@@ -565,19 +565,19 @@ The password for connecting to Kafka.
 
 ===== topic
 
-The Kafka topic used for produced events. The setting can be a *Format String*
+The Kafka topic used for produced events. The setting can be a format string
 using any event field. To set the topic from document type use `%{[type]}`.
 
 ===== topics
 
-Array of topic selector rules supporting conditionals, *Format String*
+Array of topic selector rules supporting conditionals, format string
 based field access and name mappings. The first rule matching will be used to
 set the `topic` for the event to be published. If `topics` is missing or no
 rule matches, the `topic` field will be used.
 
 Rule settings:
 
-*`topic`*: The topic *Format String* to use. If the fields used are missing, the
+*`topic`*: The topic format string to use. If the fields used are missing, the
  rule fails.
 
 *`mapping`*: Dictionary mapping index names to new names
@@ -588,8 +588,7 @@ Rule settings:
 
 ===== key
 
-The Kafka event key. The event key must be unique and can be extracted from the
-event using a *Format String*.
+Optional Kafka event key. If configured, the event key must be unique and can be extracted from the event using a format string.
 
 ===== partition
 
@@ -609,12 +608,12 @@ Kafka output broker event partitioning strategy. Must be one of `random`,
 *`hash.random`*: Randomly distribute events if no hash or key value can be computed.
 
 All partitioners will try to publish events to all partitions by default. If a
-partitions leader becomes unreachable for the beat, the output might block. All
+partition's leader becomes unreachable for the beat, the output might block. All
 partitioners support setting `reachable_only` to overwrite this
 behavior. If `reachable_only` is set to `true`, events will be published to
-available partitions only. Note: publishing to the subset of available partitions
-only potentially increases resource usage due to events becoming more unevenly
-distributed.
+available partitions only.
+
+NOTE: Publishing to a subset of available partitions potentially increases resource usage because events may become unevenly distributed.
 
 ===== client_id
 
@@ -748,7 +747,7 @@ The name of the Redis list or channel the events are published to. The default i
 The name of the Redis list or channel the events are published to. The default is
 "{beatname_lc}".
 
-The redis key can be set dynamically using a *Format String* accessing any
+The redis key can be set dynamically using a format string accessing any
 fields in the event to be published.
 
 This configuration will use the `fields.list` field to set the redis list key. If
@@ -763,14 +762,14 @@ output.redis:
 
 ===== keys
 
-Array of key selector configurations supporting conditionals, *Format String*
+Array of key selector configurations supporting conditionals, format string
 based field access and name mappings. The first rule matching will be used to
 set the `key` for the event to be published. If `keys` is missing or no
 rule matches, the `key` field will be used.
 
 Rule settings:
 
-*`key`*: The key *Format String*. If the fields used in the format string are missing, the rule fails.
+*`key`*: The key format string. If the fields used in the format string are missing, the rule fails.
 
 *`mapping`*: Dictionary mapping key values to new names
 
