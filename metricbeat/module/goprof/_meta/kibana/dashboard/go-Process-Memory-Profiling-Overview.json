@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "go Process Memory Profiling Overview", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"go-Process-Memory-Overview\",\"panelIndex\":1,\"row\":1,\"size_x\":7,\"size_y\":3,\"type\":\"visualization\"},{\"col\":8,\"id\":\"go-Process-Object-count\",\"panelIndex\":2,\"row\":1,\"size_x\":5,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"go-Process-Memory-Profile-Top-Active-Allocations\",\"panelIndex\":3,\"row\":4,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"id\":\"go-Process-Memory-Profile-Top-Active-Indirect-Allocations\",\"type\":\"visualization\",\"panelIndex\":4,\"size_x\":12,\"size_y\":5,\"col\":1,\"row\":10},{\"id\":\"go-Process-Memory-Profile-Active-Allocations\",\"type\":\"search\",\"panelIndex\":5,\"size_x\":12,\"size_y\":5,\"col\":1,\"row\":15,\"columns\":[\"goprof.memprof.allocation.function\",\"goprof.memprof.allocation.stats.inuse_objects.count\",\"goprof.memprof.allocation.package\",\"goprof.memprof.allocation.file\",\"goprof.memprof.allocation.line\"],\"sort\":[\"@timestamp\",\"desc\"]}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

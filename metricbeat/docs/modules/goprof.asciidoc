@@ -1,0 +1,40 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-goprof]]
+== goprof Module
+
+This is the goprof Module.
+
+
+
+[float]
+=== Example Configuration
+
+The goprof module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+#- module: goprof
+  #metricsets: ["memstats", "memprof"]
+  #enabled: true
+  #period: 30s
+  #hosts: ["localhost:6060"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-goprof-memprof,memprof>>
+
+* <<metricbeat-metricset-goprof-memstats,memstats>>
+
+include::goprof/memprof.asciidoc[]
+
+include::goprof/memstats.asciidoc[]
+

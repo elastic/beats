@@ -377,6 +377,332 @@
                       description: >
                         Total number of events published
 
+- key: goprof
+  title: "goprof"
+  description: >
+    goprof Module
+  fields:
+    - name: goprof
+      type: group
+      description: >
+        go http based process profiling information.
+      fields:
+        - name: memprof
+          type: group
+          description: >
+            HTTP sampling based memory profiler.
+          fields:
+
+            - name: run
+              type: keyword
+              description: unique id shared by all events of the same profiling run.
+
+            - name: type
+              type: keyword
+              description: memprof report type.
+
+            - name: summary
+              type: group
+              description: >
+                Total allocation statistics of profile run.
+              fields:
+                - name: alloc_objects.count
+                  type: long
+                  description: Total number of objects allocated.
+                - name: alloc_space.count
+                  type: long
+                  format: bytes
+                  description: Total amount of bytes allocated.
+                - name: inuse_objects.count
+                  type: long
+                  description: Number of objects not being collected by garbage collector.
+                - name: inuse_space.count
+                  type: long
+                  format: bytes
+                  description: Amount of space not being collected by garbage collector.
+
+            - name: function
+              type: group
+              description: >
+                Per function allocation statisitics.
+              fields:
+                - name: package
+                  type: keyword
+                  description: The function its package name
+                - name: name
+                  type: keyword
+                  description: The function name
+                - name: file
+                  type: keyword
+                  description: The file name in package the function is defined in
+                - name: self
+                  type: group
+                  description: >
+                    Object allocation statistics for allocation within the function itself
+                  fields:
+                    - name: alloc_objects.count
+                      type: long
+                      description: Total number of objects allocated.
+                    - name: alloc_space.count
+                      type: long
+                      format: bytes
+                      description: Total amount of bytes allocated.
+                    - name: inuse_objects.count
+                      type: long
+                      description: Number of objects not being collected by garbage collector.
+                    - name: inuse_space.count
+                      type: long
+                      format: bytes
+                      description: Amount of space not being collected by garbage collector.
+                - name: total
+                  type: group
+                  description: >
+                    Cummulative allocation statistics including the function itself and
+                    all functions being called directly or indirectly.
+                  fields:
+                    - name: alloc_objects.count
+                      type: long
+                      description: Total number of objects allocated.
+                    - name: alloc_space.count
+                      type: long
+                      format: bytes
+                      description: Total amount of bytes allocated.
+                    - name: inuse_objects.count
+                      type: long
+                      description: Number of objects not being collected by garbage collector.
+                    - name: inuse_space.count
+                      type: long
+                      format: bytes
+                      description: Amount of space not being collected by garbage collector.
+                - name: children
+                  type: group
+                  description: >
+                    Cummulative allocation statistics including all functions being
+                    called directly or indirectly, but not the current function itself.
+                  fields:
+                    - name: alloc_objects.count
+                      type: long
+                      description: Total number of objects allocated.
+                    - name: alloc_space.count
+                      type: long
+                      format: bytes
+                      description: Total amount of bytes allocated.
+                    - name: inuse_objects.count
+                      type: long
+                      description: Number of objects not being collected by garbage collector.
+                    - name: inuse_space.count
+                      type: long
+                      format: bytes
+                      description: Amount of space not being collected by garbage collector.
+
+            - name: edge_allocation
+              type: group
+              description: >
+                Allocation statistics between caller and callee.
+              fields:
+                - name: parent
+                  type: group
+                  description: >
+                    The parent node in call graph (caller).
+                  fields:
+                    - name: package
+                      type: keyword
+                      description: The function its package name
+                    - name: name
+                      type: keyword
+                      description: The function name
+                    - name: file
+                      type: keyword
+                      description: The file name in package the function is defined in
+                - name: child
+                  type: group
+                  description: >
+                    The child node in call graph (callee).
+                  fields:
+                    - name: package
+                      type: keyword
+                      description: The function its package name
+                    - name: name
+                      type: keyword
+                      description: The function name
+                    - name: file
+                      type: keyword
+                      description: The file name in package the function is defined in
+                - name: stats
+                  type: group
+                  description: >
+                    Total amount of allocations due to caller using the callee.
+                  fields:
+                    - name: alloc_objects.count
+                      type: long
+                      description: Total number of objects allocated.
+                    - name: alloc_space.count
+                      type: long
+                      format: bytes
+                      description: Total amount of bytes allocated.
+                    - name: inuse_objects.count
+                      type: long
+                      description: Number of objects not being collected by garbage collector.
+                    - name: inuse_space.count
+                      type: long
+                      format: bytes
+                      description: Amount of space not being collected by garbage collector.
+
+            - name: allocation
+              type: group
+              description: >
+                Allocation sample captured by profiler
+              fields:
+                - name: package
+                  type: keyword
+                  description: The function its package name
+                - name: function
+                  type: keyword
+                  description: The function name
+                - name: file
+                  type: keyword
+                  description: The file name in package the function is defined in
+                - name: line
+                  type: integer
+                  description: The file its line the allocation happened.
+                - name: address
+                  type: long
+                  description: Executable in memory location the allocation happened at.
+                - name: stats
+                  type: group
+                  description: >
+                    Total allocation statistics for allocations happening at the given location.
+                  fields:
+                    - name: alloc_objects.count
+                      type: long
+                      description: Total number of objects allocated.
+                    - name: alloc_space.count
+                      type: long
+                      format: bytes
+                      description: Total amount of bytes allocated.
+                    - name: inuse_objects.count
+                      type: long
+                      description: Number of objects not being collected by garbage collector.
+                    - name: inuse_space.count
+                      type: long
+                      format: bytes
+                      description: Amount of space not being collected by garbage collector.
+
+        - name: memstats
+          type: group
+          description: >
+            golang expvar memstats
+          fields:
+            - name: type
+              type: keyword
+              description: memstats report type.
+
+            # GC summary fields (type == gc_summary)
+            - name: next_gc_limit
+              type: long
+              format: bytes
+              description: >
+                Upper bound of memory being allocated until another garbage collection
+                phase will be run.
+            - name: gc_count
+              type: long
+              description: >
+                Total number of garbage collection cycles executed since program startup
+            - name: gc_total_pause.ns
+              type: long
+              description: Total duration of all garbage collection cycles
+
+            # Heap usage counters (type == heap)
+            - name: allocations
+              type: group
+              description: >
+                Application heap allocations counters.
+              fields:
+                - name: mallocs
+                  type: long
+                  description: >
+                    Total number of memory allocations
+                - name: frees
+                  type: long
+                  description: >
+                    Number of memory allocations being freed.
+                - name: objects
+                  type: long
+                  description: >
+                    Total number of allocated heap objects.
+                - name: total
+                  type: long
+                  format: bytes
+                  description: >
+                    Total number of bytes being allocated since startup.
+                - name: allocated
+                  type: long
+                  format: bytes
+                  description: >
+                    Number of bytes being actively allocated and not yet freed.
+                - name: idle
+                  type: long
+                  format: bytes
+                  description: >
+                    Bytes in idle heap spans
+                - name: active
+                  type: long
+                  format: bytes
+                  description: >
+                    Bytes in non-idle heap spans
+            - name: system
+              type: group
+              description: >
+                Memory allocator system counters.
+              fields:
+                - name: total
+                  type: long
+                  format: bytes
+                  description: >
+                    Total number of bytes received from system
+                - name: obtained
+                  type: long
+                  format: bytes
+                  description: >
+                    Bytes optained from system
+                - name: stack
+                  type: long
+                  format: bytes
+                  description: >
+                    System memory allocated for go-routine stacks.
+                - name: released
+                  type: long
+                  format: bytes
+                  description: >
+                    Number of bytes returned to OS.
+
+            # Go runtime allocator (per size class) counters (type == allocator)
+            - name: size
+              type: long
+              format: bytes
+              description: The allocator bucket its size.
+            - name: mallocs
+              type: long
+              description: Total number of allocation from current size class.
+            - name: frees
+              type: long
+              description: Total number of objects being freed in current size class.
+
+            # Per garbage collection cycle counters (type == gc_cycle)
+            - name: run
+              type: long
+              description: >
+                The nth garbage collection cycle since startup
+            - name: start
+              type: date
+              description: GC cycle start timestamp
+            - name: end
+              type: date
+              description: GC cycle end timestamp
+            - name: duration.ns
+              type: long
+              description: GC cycle duration in nanoseconds.
+
 - key: haproxy
   title: "haproxy"
   description: >

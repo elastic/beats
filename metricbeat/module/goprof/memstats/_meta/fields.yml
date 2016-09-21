@@ -1,0 +1,114 @@
+- name: memstats
+  type: group
+  description: >
+    golang expvar memstats
+  fields:
+    - name: type
+      type: keyword
+      description: memstats report type.
+
+    # GC summary fields (type == gc_summary)
+    - name: next_gc_limit
+      type: long
+      format: bytes
+      description: >
+        Upper bound of memory being allocated until another garbage collection
+        phase will be run.
+    - name: gc_count
+      type: long
+      description: >
+        Total number of garbage collection cycles executed since program startup
+    - name: gc_total_pause.ns
+      type: long
+      description: Total duration of all garbage collection cycles
+
+    # Heap usage counters (type == heap)
+    - name: allocations
+      type: group
+      description: >
+        Application heap allocations counters.
+      fields:
+        - name: mallocs
+          type: long
+          description: >
+            Total number of memory allocations
+        - name: frees
+          type: long
+          description: >
+            Number of memory allocations being freed.
+        - name: objects
+          type: long
+          description: >
+            Total number of allocated heap objects.
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Total number of bytes being allocated since startup.
+        - name: allocated
+          type: long
+          format: bytes
+          description: >
+            Number of bytes being actively allocated and not yet freed.
+        - name: idle
+          type: long
+          format: bytes
+          description: >
+            Bytes in idle heap spans
+        - name: active
+          type: long
+          format: bytes
+          description: >
+            Bytes in non-idle heap spans
+    - name: system
+      type: group
+      description: >
+        Memory allocator system counters.
+      fields:
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Total number of bytes received from system
+        - name: obtained
+          type: long
+          format: bytes
+          description: >
+            Bytes optained from system
+        - name: stack
+          type: long
+          format: bytes
+          description: >
+            System memory allocated for go-routine stacks.
+        - name: released
+          type: long
+          format: bytes
+          description: >
+            Number of bytes returned to OS.
+
+    # Go runtime allocator (per size class) counters (type == allocator)
+    - name: size
+      type: long
+      format: bytes
+      description: The allocator bucket its size.
+    - name: mallocs
+      type: long
+      description: Total number of allocation from current size class.
+    - name: frees
+      type: long
+      description: Total number of objects being freed in current size class.
+
+    # Per garbage collection cycle counters (type == gc_cycle)
+    - name: run
+      type: long
+      description: >
+        The nth garbage collection cycle since startup
+    - name: start
+      type: date
+      description: GC cycle start timestamp
+    - name: end
+      type: date
+      description: GC cycle end timestamp
+    - name: duration.ns
+      type: long
+      description: GC cycle duration in nanoseconds.

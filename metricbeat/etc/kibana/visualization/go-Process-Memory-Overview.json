@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"go Process Memory Overview\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat-*\\\",q=\\\"metricset.module:goprof AND metricset.name:memstats\\\",metric=\\\"sum:goprof.memstats.duration.ns\\\",timefield=\\\"goprof.memstats.start\\\", kibana=true).divide(1000).label(\\\"GC cycle - duration (us)\\\").bars().yaxis(2,label=\\\"duration [us]\\\").color(\\\"#e6e6e6\\\"), .es(index=\\\"metricbeat-*\\\",q=\\\"metricset.module:goprof AND metricset.name:memstats\\\",metric=\\\"max:goprof.memstats.system.total\\\", kibana=true).label(\\\"System Memory\\\").yaxis(1,label=\\\"bytes\\\",position=left), .es(index=\\\"metricbeat-*\\\",q=\\\"metricset.module:goprof AND metricset.name:memstats\\\",metric=\\\"max:goprof.memstats.next_gc_limit\\\", kibana=true).movingaverage(10).label(\\\"GC Limit\\\"), .es(index=\\\"metricbeat-*\\\",q=\\\"metricset.module:goprof AND metricset.name:memstats\\\",metric=\\\"max:goprof.memstats.allocations.allocated\\\", kibana=true).mvavg(10).label(\\\"Bytes Allocated (Max)\\\"), .es(index=\\\"metricbeat-*\\\",q=\\\"metricset.module:goprof AND metricset.name:memstats\\\",metric=\\\"min:goprof.memstats.allocations.allocated\\\", kibana=true).mvavg(10).label(\\\"Bytes Allocated (Min)\\\")\",\"interval\":\"1m\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "go Process Memory Overview", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

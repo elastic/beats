@@ -1,0 +1,10 @@
+- key: goprof
+  title: "goprof"
+  description: >
+    goprof Module
+  fields:
+    - name: goprof
+      type: group
+      description: >
+        go http based process profiling information.
+      fields:
