@@ -17,19 +17,13 @@ To use SSL mutual authentication:
 
 . Create a certificate authority (CA) and use it to sign the certificates that you plan to use for
 {beatname_uc} and Logstash. Creating a correct SSL/TLS infrastructure is outside the scope of this
-document. There are many online resources available that describe how to create certificates, including the section in the {security} documentation about {securitydoc}/certificate-authority.html[setting up a certificate authority].
-+
-NOTE: Certificates must be signed by your root CA. Intermediate CAs are currently not supported.
+document. There are many online resources available that describe how to create certificates.
 
 . Configure {beatname_uc} to use SSL. In the +{beatname_lc}.yml+ config file, specify the following settings under
 `ssl`:
 +
 * `certificate_authorities`: Configures {beatname_uc} to trust any certificates signed by the specified CA. If
 `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
-+
-Although  intermediate CAs are currently not supported, you may be able to work around this issue by merging all the
-certificates in the chain into one file. You can create the PEM file containing the CA chain by concatenating the root CA
-cert and the intermediate CA into a single file: `cat root-ca.crt intermediate-ca.crt > chain.crt`. Then set `certificate_authorities` to use this file: `certificate_authorities: ['chain.crt']`.
 
 * `certificate` and `key`: Specifies the certificate and key that {beatname_uc} uses to authenticate with
 Logstash.
@@ -73,7 +67,7 @@ input {
 ------------------------------------------------------------------------------
 +
 For more information about these options, see the
-https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[documentation] for the Beats input plugin.
+https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[documentation for the Beats input plugin].
 
 [float]
 [[testing-ssl-logstash]]

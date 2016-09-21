@@ -652,7 +652,7 @@ The Redis port to use if `hosts` does not contain a port number. The default is 
 
 ===== index
 
-deprecated[5.0.0-alpha5,The `index` setting is renamed to `key.]
+deprecated[5.0.0,The `index` setting is renamed to `key`]
 
 The name of the Redis list or channel the events are published to. The default is
 "{beatname_lc}".
