@@ -25,6 +25,7 @@ The following topics provide more detail about importing and working with Beats 
 * <<generate-index-pattern>>
 * <<export-dashboards>>
 * <<archive-dashboards>>
+* <<share-beat-dashboards>>
 
 [[import-dashboards]]
 === Importing Existing Beat Dashboards
@@ -219,7 +220,7 @@ If you would like to build dashboards from scratch for any Elastic Beats, you ca
 
 [source,shell]
 ---------------
-$ scripts/import_dashboards -only-index -beat metricbeat
+$ scripts/import_dashboards -only-index
 ---------------
 
 After creating your own dashboards in Kibana, you can <<export-dashboards,export the Kibana dashboards>> to a local
@@ -350,3 +351,11 @@ Another option would be to create a repository only with the dashboards, and use
 create a zip archive.
 
 Share the Kibana dashboards archive with the community, so other users can use your cool Kibana visualizations!
+
+
+
+[[share-beat-dashboards]]
+=== Share your own Beat Dashboards
+
+When you're done with your own Beat dashboards, how about letting everyone know? You can create a topic on the https://discuss.elastic.co/c/beats[Beats
+forum], and provide the link to the zip archive together with a small description.
