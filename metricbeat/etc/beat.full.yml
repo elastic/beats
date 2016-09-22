@@ -49,57 +49,6 @@ metricbeat.modules:
   # EXPERIMENTAL: cgroups can be enabled for the process metricset.
   #cgroups: false
 
-#----------------------------- PostgreSQL Module -----------------------------
-#- module: postgresql
-  #metricsets:
-    # Stats about every PostgreSQL database
-    #- database
-
-    # Stats about the background writer process's activity
-    #- bgwriter
-
-    # Stats about every PostgreSQL process
-    #- activity
-
-  #enabled: true
-  #period: 10s
-
-  # The host must be passed as PostgreSQL DSN. Example:
-  # postgres://pqgotest:password@localhost:5432?sslmode=disable
-  # The available parameters are documented here:
-  # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
-  #hosts: ["postgres://postgres@localhost:5432"]
-
-
-#-------------------------------- MySQL Module -------------------------------
-#- module: mysql
-  #metricsets: ["status"]
-  #enabled: true
-  #period: 10s
-
-  # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
-  # The username and password can either be set in the DSN or for all hosts in username and password config option
-  #hosts: ["root@tcp(127.0.0.1:3306)/"]
-
-  # Username of hosts. Empty by default
-  #username: root
-
-  # Password of hosts. Empty by default
-  #password: test
-
-#------------------------------- docker Module -------------------------------
-- module: docker
-  metricsets: ["cpu","memory","network","diskio","container"]
-  enabled: true
-  period: 5s
-  hosts: ["localhost"]
-  socket: unix:///var/run/docker.sock
-
-         # If dockerbeat has to deal with a TLS-enabled docker daemon, you need to enable TLS and configure path for key and certificates.
-  tls:
-           # By default, TLS is disabled
-          enable: false
-
 #------------------------------- Apache Module -------------------------------
 #- module: apache
   #metricsets: ["status"]
@@ -129,6 +78,26 @@ metricbeat.modules:
   #vars_path: /debug/vars
 
 
+#------------------------------- docker Module -------------------------------
+- module: docker
+  metricsets: ["cpu","memory","network","diskio","container"]
+  enabled: true
+  period: 5s
+  hosts: ["localhost"]
+  socket: unix:///var/run/docker.sock
+
+         # If dockerbeat has to deal with a TLS-enabled docker daemon, you need to enable TLS and configure path for key and certificates.
+  tls:
+           # By default, TLS is disabled
+          enable: false
+
+#------------------------------- haproxy Module ------------------------------
+#- module: haproxy
+  #metricsets: [stat, info]
+  #enabled: true
+  #period: 10s
+  #hosts: ['tcp://127.0.0.1:14567']
+
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
   #metricsets: ["status"]
@@ -140,12 +109,21 @@ metricbeat.modules:
   #hosts: ["localhost:27017"]
 
 
-#------------------------------- haproxy Module ------------------------------
-#- module: haproxy
-  #metricsets: [stat, info]
+#-------------------------------- MySQL Module -------------------------------
+#- module: mysql
+  #metricsets: ["status"]
   #enabled: true
   #period: 10s
-  #hosts: ['tcp://127.0.0.1:14567']
+
+  # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
+  # The username and password can either be set in the DSN or for all hosts in username and password config option
+  #hosts: ["root@tcp(127.0.0.1:3306)/"]
+
+  # Username of hosts. Empty by default
+  #username: root
+
+  # Password of hosts. Empty by default
+  #password: test
 
 #-------------------------------- Nginx Module -------------------------------
 #- module: nginx
@@ -158,6 +136,28 @@ metricbeat.modules:
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
+
+#----------------------------- PostgreSQL Module -----------------------------
+#- module: postgresql
+  #metricsets:
+    # Stats about every PostgreSQL database
+    #- database
+
+    # Stats about the background writer process's activity
+    #- bgwriter
+
+    # Stats about every PostgreSQL process
+    #- activity
+
+  #enabled: true
+  #period: 10s
+
+  # The host must be passed as PostgreSQL DSN. Example:
+  # postgres://pqgotest:password@localhost:5432?sslmode=disable
+  # The available parameters are documented here:
+  # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
+  #hosts: ["postgres://postgres@localhost:5432"]
+
 
 #-------------------------------- Redis Module -------------------------------
 #- module: redis
