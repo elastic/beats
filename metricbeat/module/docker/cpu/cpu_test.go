@@ -123,6 +123,7 @@ func TestCPUService_GetCpuStats(t *testing.T) {
 			"usage_in_user_mode":   mockedCPUCalculator.UsageInUsermode(&stats),
 		},
 	}
+
 	CPUService := NewCpuService()
 	cpuData := CPUService.GetCpuStats(&cpuStatsStruct)
 	event := eventMapping(&cpuData)

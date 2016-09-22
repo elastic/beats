@@ -129,6 +129,7 @@ metricbeat.modules:
   #vars_path: /debug/vars
 
 
+<<<<<<< 4e90187e6d1a42593769b25b634ff9b9c24c9bb4
 <<<<<<< b72a8919f2038174aac5db97833a2bca431ae2b3
 #------------------------------- haproxy Module ------------------------------
 #- module: haproxy
@@ -139,6 +140,8 @@ metricbeat.modules:
 
 =======
 >>>>>>> Squatching all commits into one : Docker meets metricbeat
+=======
+>>>>>>> Run make collect & make check
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
   #metricsets: ["status"]
@@ -152,6 +155,7 @@ metricbeat.modules:
 
 #------------------------------- haproxy Module ------------------------------
 #- module: haproxy
+<<<<<<< 4e90187e6d1a42593769b25b634ff9b9c24c9bb4
   #metricsets:
     #- "stat"
     #- "info"
@@ -159,6 +163,12 @@ metricbeat.modules:
   #enabled: true
   #period: 10s
   #stats_addr: "tcp://127.0.0.1:14567
+=======
+  #metricsets: [stat, info]
+  #enabled: true
+  #period: 10s
+  #hosts: ['tcp://127.0.0.1:14567']
+>>>>>>> Run make collect & make check
 
 #-------------------------------- Nginx Module -------------------------------
 #- module: nginx

@@ -37,7 +37,6 @@ func ExtractContainerName(names []string) string {
 func BuildLabelArray(labels map[string]string) []common.MapStr {
 
 	output_labels := make([]common.MapStr, len(labels))
-
 	i := 0
 	for k, v := range labels {
 		label := strings.Replace(k, ".", "_", -1)
@@ -47,7 +46,7 @@ func BuildLabelArray(labels map[string]string) []common.MapStr {
 		}
 		i++
 	}
-	return output_labels
+	return output_labelsmake
 }
 
 func ConvertContainerPorts(ports *[]docker.APIPort) []map[string]interface{} {
