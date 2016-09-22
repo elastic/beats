@@ -1,0 +1,9 @@
+- name: diskio
+  type: group
+  description: >
+    diskio
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
