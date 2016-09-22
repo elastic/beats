@@ -158,19 +158,20 @@ func (l *Line) decode(end int) (int, error) {
 		var nDst, nSrc int
 
 		nDst, nSrc, err = l.decoder.Transform(buffer, inBytes[start:end], false)
-
-		start += nSrc
-
-		l.outBuffer.Write(buffer[:nDst])
-
 		if err != nil {
 			if err == transform.ErrShortDst { // continue transforming
 				// Reset error as decoding continues
 				err = nil
+				start += nSrc
+				l.outBuffer.Write(buffer[:nDst])
 				continue
 			}
+			l.outBuffer.Write(inBytes[0:end])
+			start = end
 			break
 		}
+		start += nSrc
+		l.outBuffer.Write(buffer[:nDst])
 	}
 
 	l.byteCount += start
