@@ -18,7 +18,7 @@ var (
 )
 
 // ErrNoHostsConfigured indicates missing host or hosts configuration
-var ErrNoHostsConfigured = errors.New("no host configuration found")
+var ErrNoHostsConfigured = errors.New("no hosts configuration found")
 
 // ConnectionMode takes care of connecting to hosts
 // and potentially doing load balancing and/or failover

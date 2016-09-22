@@ -75,7 +75,7 @@ import:
 - package: github.com/dustin/go-humanize
   version: 499693e27ee0d14ffab67c31ad065fdb3d34ea75
 - package: github.com/elastic/go-ucfg
-  version: v0.3.4
+  version: v0.3.6
 - package: github.com/armon/go-socks5
   version: 3a873e99f5400ad7706e464e905ffcc94b3ff247
 - package: github.com/pkg/errors

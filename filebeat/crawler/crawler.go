@@ -6,7 +6,6 @@ import (
 
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector"
-	"github.com/elastic/beats/filebeat/spooler"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -14,30 +13,30 @@ import (
 type Crawler struct {
 	prospectors       []*prospector.Prospector
 	prospectorConfigs []*common.Config
-	spooler           *spooler.Spooler
+	out               prospector.Outlet
 	wg                sync.WaitGroup
 }
 
-func New(spooler *spooler.Spooler, prospectorConfigs []*common.Config) (*Crawler, error) {
+func New(out prospector.Outlet, prospectorConfigs []*common.Config) (*Crawler, error) {
 
 	if len(prospectorConfigs) == 0 {
 		return nil, fmt.Errorf("No prospectors defined. You must have at least one prospector defined in the config file.")
 	}
 
 	return &Crawler{
-		spooler:           spooler,
+		out:               out,
 		prospectorConfigs: prospectorConfigs,
 	}, nil
 }
 
-func (c *Crawler) Start(states file.States) error {
+func (c *Crawler) Start(states file.States, once bool) error {
 
 	logp.Info("Loading Prospectors: %v", len(c.prospectorConfigs))
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, prospectorConfig := range c.prospectorConfigs {
 
-		prospector, err := prospector.NewProspector(prospectorConfig, states, c.spooler.Channel)
+		prospector, err := prospector.NewProspector(prospectorConfig, states, c.out)
 		if err != nil {
 			return fmt.Errorf("Error in initing prospector: %s", err)
 		}
@@ -55,7 +54,7 @@ func (c *Crawler) Start(states file.States) error {
 				logp.Debug("crawler", "Prospector %v stopped", id)
 			}()
 			logp.Debug("crawler", "Starting prospector %v", id)
-			prospector.Run()
+			prospector.Run(once)
 		}(i, p)
 	}
 
@@ -77,6 +76,10 @@ func (c *Crawler) Stop() {
 		c.wg.Add(1)
 		go stopProspector(p)
 	}
-	c.wg.Wait()
+	c.WaitForCompletion()
 	logp.Info("Crawler stopped")
+}
+
+func (c *Crawler) WaitForCompletion() {
+	c.wg.Wait()
 }

@@ -1,5 +1,6 @@
 from filebeat import BaseTest
 import os
+import codecs
 import time
 
 """
@@ -70,6 +71,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test.log",
             close_removed="true",
+            clean_removed="false",
             scan_frequency="0.1s"
         )
         os.mkdir(self.working_dir + "/log/")
@@ -258,7 +260,7 @@ class Test(BaseTest):
         # Wait until state is written
         self.wait_until(
             lambda: self.log_contains(
-                "1 states written."),
+                "Registrar states cleaned up"),
             max_timeout=15)
 
         filebeat.check_kill_and_wait()
@@ -366,3 +368,392 @@ class Test(BaseTest):
             max_timeout=15)
 
         filebeat.check_kill_and_wait()
+
+    def test_close_timeout(self):
+        """
+        Checks that a file is closed after close_timeout
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+            close_timeout="1s",
+            scan_frequency="1s"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        filebeat = self.start_beat()
+
+        testfile1 = self.working_dir + "/log/test.log"
+        file = open(testfile1, 'w')
+
+        # Write 1000 lines with a sleep between each line to make sure it takes more then 1s to complete
+        iterations1 = 1000
+        for n in range(0, iterations1):
+            file.write("example data")
+            file.write("\n")
+            time.sleep(0.001)
+
+        file.close()
+
+        # Wait until harvester is closed because of ttl
+        self.wait_until(
+            lambda: self.log_contains(
+                "Closing harvester because close_timeout was reached"),
+            max_timeout=15)
+
+        filebeat.check_kill_and_wait()
+
+        data = self.get_registry()
+        assert len(data) == 1
+
+        # Check that not all but some lines were read
+        assert self.output_lines() < 1000
+        assert self.output_lines() > 0
+
+
+    def test_bom_utf8(self):
+        """
+        Test utf8 log file with bom
+        Additional test here to make sure in case generation in python is not correct
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        self.copy_files(["logs/bom8.log"],
+                        source_dir="../files",
+                        target_dir="log")
+
+        filebeat = self.start_beat()
+        self.wait_until(
+            lambda: self.output_has(lines=7),
+            max_timeout=10)
+
+        # Check that output does not cotain bom
+        output = self.read_output_json()
+        assert output[0]["message"] == "#Software: Microsoft Exchange Server"
+
+        filebeat.check_kill_and_wait()
+
+    def test_boms(self):
+
+        """
+        Test bom log files if bom is removed properly
+        """
+
+        os.mkdir(self.working_dir + "/log/")
+        os.mkdir(self.working_dir + "/output/")
+
+        message = "Hello World"
+
+        # Config array contains:
+        # filebeat encoding, python encoding name, bom
+        configs = [
+            ("utf-8", "utf-8", codecs.BOM_UTF8),
+            ("utf-16be-bom", "utf-16-be", codecs.BOM_UTF16_BE),
+            ("utf-16le-bom", "utf-16-le", codecs.BOM_UTF16_LE),
+        ]
+
+        for config in configs:
+
+            # Render config with specific encoding
+            self.render_config_template(
+                path=os.path.abspath(self.working_dir) + "/log/*",
+                encoding=config[0],
+                output_file_filename=config[0],
+            )
+
+            logfile = self.working_dir + "/log/" + config[0] + "test.log"
+
+            # Write bom to file
+            with codecs.open(logfile, 'wb') as file:
+                file.write(config[2])
+
+            # Write hello world to file
+            with codecs.open(logfile, 'a', config[1]) as file:
+                content = message + '\n'
+                file.write(content)
+
+            filebeat = self.start_beat()
+
+            self.wait_until(
+                lambda: self.output_has(lines=1, output_file="output/" + config[0]),
+                max_timeout=10)
+
+            # Verify that output does not contain bom
+            output = self.read_output_json(output_file="output/" + config[0])
+            assert output[0]["message"] == message
+
+            filebeat.kill_and_wait()
+
+    def test_ignore_symlink(self):
+        """
+        Test that symlinks are ignored
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/symlink.log",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+
+        logfile = self.working_dir + "/log/test.log"
+        symlink = self.working_dir + "/log/symlink.log"
+
+        if os.name == "nt":
+            import win32file
+            win32file.CreateSymbolicLink(symlink, logfile, 0)
+        else:
+            os.symlink(logfile, symlink)
+
+        with open(logfile, 'a') as file:
+            file.write("Hello World\n")
+
+        filebeat = self.start_beat()
+
+        # Make sure symlink is skipped
+        self.wait_until(
+            lambda: self.log_contains(
+                "skipped as it is a symlink"),
+            max_timeout=15)
+
+        filebeat.check_kill_and_wait()
+
+
+    def test_symlinks_enabled(self):
+        """
+        Test if symlinks are harvested
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/symlink.log",
+            symlinks="true",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+
+        logfile = self.working_dir + "/log/test.log"
+        symlink = self.working_dir + "/log/symlink.log"
+
+        if os.name == "nt":
+            import win32file
+            win32file.CreateSymbolicLink(symlink, logfile, 0)
+        else:
+            os.symlink(logfile, symlink)
+
+        with open(logfile, 'a') as file:
+            file.write("Hello World\n")
+
+        filebeat = self.start_beat()
+
+        # Make sure content in symlink file is read
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+
+    def test_symlink_rotated(self):
+        """
+        Test what happens if symlink removed and points to a new file
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/symlink.log",
+            symlinks="true",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+
+        logfile1 = self.working_dir + "/log/test1.log"
+        logfile2 = self.working_dir + "/log/test2.log"
+        symlink = self.working_dir + "/log/symlink.log"
+
+        if os.name == "nt":
+            import win32file
+            win32file.CreateSymbolicLink(symlink, logfile1, 0)
+        else:
+            os.symlink(logfile1, symlink)
+
+        with open(logfile1, 'a') as file:
+            file.write("Hello World1\n")
+
+        with open(logfile2, 'a') as file:
+            file.write("Hello World2\n")
+
+        filebeat = self.start_beat()
+
+
+        # Make sure symlink is skipped
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        os.remove(symlink)
+
+        if os.name == "nt":
+            import win32file
+            win32file.CreateSymbolicLink(symlink, logfile2, 0)
+        else:
+            os.symlink(logfile2, symlink)
+
+        with open(logfile1, 'a') as file:
+            file.write("Hello World3\n")
+            file.write("Hello World4\n")
+
+        # Make sure new file and addition to old file were read
+        self.wait_until(
+            lambda: self.output_has(lines=4),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        # Check if two different files are in registry
+        data = self.get_registry()
+        assert len(data) == 2
+
+
+    def test_symlink_removed(self):
+        """
+        Tests that if a symlink to a file is removed, further data is read which is added to the original file
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/symlink.log",
+            symlinks="true",
+            clean_removed="false"
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+
+        logfile = self.working_dir + "/log/test.log"
+        symlink = self.working_dir + "/log/symlink.log"
+
+        if os.name == "nt":
+            import win32file
+            win32file.CreateSymbolicLink(symlink, logfile, 0)
+        else:
+            os.symlink(logfile, symlink)
+
+        with open(logfile, 'a') as file:
+            file.write("Hello World1\n")
+
+        filebeat = self.start_beat()
+
+        # Make sure symlink is skipped
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        os.remove(symlink)
+
+        with open(logfile, 'a') as file:
+            file.write("Hello World2\n")
+
+        # Sleep 1s to make sure new events are not picked up
+        time.sleep(1)
+
+        # Make sure also new file was read
+        self.wait_until(
+            lambda: self.output_has(lines=2),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        # Check if two different files are in registry
+        data = self.get_registry()
+        assert len(data) == 1
+
+    def test_symlink_and_file(self):
+        """
+        Tests that if symlink and original file are read, that only events from one are added
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            symlinks="true",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+
+        logfile = self.working_dir + "/log/test.log"
+        symlink = self.working_dir + "/log/symlink.log"
+
+        if os.name == "nt":
+            import win32file
+            win32file.CreateSymbolicLink(symlink, logfile, 0)
+        else:
+            os.symlink(logfile, symlink)
+
+        with open(logfile, 'a') as file:
+            file.write("Hello World1\n")
+
+        filebeat = self.start_beat()
+
+        # Make sure both files were read
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        # Check if two different files are in registry
+        data = self.get_registry()
+        assert len(data) == 1
+
+    def test_truncate(self):
+        """
+        Tests what happens if file is truncated and symlink recreated
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            symlinks="true",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+
+        logfile = self.working_dir + "/log/test.log"
+        symlink = self.working_dir + "/log/symlink.log"
+
+        if os.name == "nt":
+            import win32file
+            win32file.CreateSymbolicLink(symlink, logfile, 0)
+        else:
+            os.symlink(logfile, symlink)
+
+        with open(logfile, 'w') as file:
+            file.write("Hello World1\n")
+            file.write("Hello World2\n")
+            file.write("Hello World3\n")
+            file.write("Hello World4\n")
+
+        filebeat = self.start_beat()
+
+        # Make sure both files were read
+        self.wait_until(
+            lambda: self.output_has(lines=4),
+            max_timeout=10)
+
+        os.remove(symlink)
+        with open(logfile, 'w') as file:
+            file.truncate()
+            file.seek(0)
+
+        if os.name == "nt":
+            import win32file
+            win32file.CreateSymbolicLink(symlink, logfile, 0)
+        else:
+            os.symlink(logfile, symlink)
+
+        # Write new file with content shorter then old one
+        with open(logfile, 'a') as file:
+            file.write("Hello World5\n")
+            file.write("Hello World6\n")
+            file.write("Hello World7\n")
+
+        # Make sure both files were read
+        self.wait_until(
+            lambda: self.output_has(lines=7),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that only 1 registry entry as original was only truncated
+        data = self.get_registry()
+        assert len(data) == 1

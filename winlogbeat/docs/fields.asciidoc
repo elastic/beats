@@ -27,7 +27,7 @@ Contains common beat fields available in all event types.
 [float]
 === beat.name
 
-The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
 
 
 [float]
@@ -114,7 +114,7 @@ type: dict
 
 required: False
 
-The event specific data. This field is mutually exclusive with `user_data`.
+The event-specific data. This field is mutually exclusive with `user_data`. If you are capturing event data on versions prior to Windows Vista, the parameters in `event_data` are named `param1`, `param2`, and so on, because event log parameters are unnamed in earlier versions of Windows. 
 
 
 [float]
@@ -314,7 +314,7 @@ The type of account associated with this event.
 [float]
 === version
 
-type: integer
+type: long
 
 required: False
 

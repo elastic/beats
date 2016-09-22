@@ -78,6 +78,13 @@ metricbeat.modules:
   #vars_path: /debug/vars
 
 
+#------------------------------- haproxy Module ------------------------------
+#- module: haproxy
+  #metricsets: [stat, info]
+  #enabled: true
+  #period: 10s
+  #hosts: ['tcp://127.0.0.1:14567']
+
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
   #metricsets: ["status"]

@@ -75,6 +75,7 @@ packetbeat.protocols.http:
       {%- endfor -%}
   ]
 {%- endif %}
+{%- if http_max_message_size %}  max_message_size: {{ http_max_message_size }} {%- endif %}
 
 packetbeat.protocols.memcache:
   ports: [{{ memcache_ports|default([11211])|join(", ") }}]
@@ -167,11 +168,6 @@ tags: [
       {%- endfor -%}
   {%- endif -%}
 ]
-
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-# ignore_outgoing: true
 
 {% if geoip_paths is not none %}
 geoip:

@@ -16,12 +16,16 @@ const channelSize = 16
 
 // Spooler aggregates the events and sends the aggregated data to the publisher.
 type Spooler struct {
-	Channel   chan *input.Event // Channel is the input to the Spooler.
-	config    spoolerConfig
-	exit      chan struct{}         // Channel used to signal shutdown.
-	publisher chan<- []*input.Event // Channel used to publish events.
-	spool     []*input.Event        // Events being held by the Spooler.
-	wg        sync.WaitGroup        // WaitGroup used to control the shutdown.
+	Channel chan *input.Event // Channel is the input to the Spooler.
+	config  spoolerConfig
+	output  Output         // batch event output on flush
+	spool   []*input.Event // Events being held by the Spooler.
+	wg      sync.WaitGroup // WaitGroup used to control the shutdown.
+}
+
+// Output spooler sends event to through Send method
+type Output interface {
+	Send(events []*input.Event) bool
 }
 
 type spoolerConfig struct {
@@ -33,18 +37,16 @@ type spoolerConfig struct {
 // started by calling Start before it can be used.
 func New(
 	config *cfg.Config,
-	publisher chan<- []*input.Event,
+	out Output,
 ) (*Spooler, error) {
-
 	return &Spooler{
 		Channel: make(chan *input.Event, channelSize),
 		config: spoolerConfig{
 			idleTimeout: config.IdleTimeout,
 			spoolSize:   config.SpoolSize,
 		},
-		exit:      make(chan struct{}),
-		publisher: publisher,
-		spool:     make([]*input.Event, 0, config.SpoolSize),
+		output: out,
+		spool:  make([]*input.Event, 0, config.SpoolSize),
 	}, nil
 }
 
@@ -57,20 +59,22 @@ func (s *Spooler) Start() {
 // run queues events that it reads from Channel and flushes them when either the
 // queue reaches its capacity (which is spoolSize) or a timeout period elapses.
 func (s *Spooler) run() {
-	defer s.wg.Done()
-
 	logp.Info("Starting spooler: spool_size: %v; idle_timeout: %s",
 		s.config.spoolSize, s.config.idleTimeout)
 
-	timer := time.NewTimer(s.config.idleTimeout)
+	defer s.flush()
+	defer s.wg.Done()
 
-loop:
+	timer := time.NewTimer(s.config.idleTimeout)
+	defer timer.Stop()
+
 	for {
 		select {
-		case <-s.exit:
-			timer.Stop()
-			break loop
-		case event := <-s.Channel:
+		case event, ok := <-s.Channel:
+			if !ok {
+				return
+			}
+
 			if event != nil {
 				flushed := s.queue(event)
 				if flushed {
@@ -87,28 +91,20 @@ loop:
 			timer.Reset(s.config.idleTimeout)
 		}
 	}
-
-	// Drain any events that may remain in Channel.
-	for e := range s.Channel {
-		s.queue(e)
-	}
-	debugf("Flushing events from spooler at shutdown")
-	s.flush()
 }
 
 // Stop stops this Spooler. This method blocks until all events have been
 // flushed to the publisher. The method should only be invoked one time after
 // Start has been invoked.
 func (s *Spooler) Stop() {
+
 	logp.Info("Stopping spooler")
 
 	// Signal to the run method that it should stop.
-	close(s.exit)
-
 	// Stop accepting writes. Any events in the channel will be flushed.
 	close(s.Channel)
 
-	// Wait for the flush to complete.
+	// Wait for spooler shutdown to complete.
 	s.wg.Wait()
 	debugf("Spooler has stopped")
 }
@@ -128,18 +124,22 @@ func (s *Spooler) queue(event *input.Event) bool {
 }
 
 // flush flushes all events to the publisher.
-func (s *Spooler) flush() {
-	if len(s.spool) > 0 {
-		// copy buffer
-		tmpCopy := make([]*input.Event, len(s.spool))
-		copy(tmpCopy, s.spool)
+func (s *Spooler) flush() int {
 
-		// clear buffer
-		s.spool = s.spool[:0]
-
-		select {
-		case <-s.exit:
-		case s.publisher <- tmpCopy: // send
-		}
+	count := len(s.spool)
+	if count == 0 {
+		return 0
 	}
+
+	// copy buffer
+	tmpCopy := make([]*input.Event, count)
+	copy(tmpCopy, s.spool)
+
+	// clear buffer
+	s.spool = s.spool[:0]
+
+	// send batched events to output
+	s.output.Send(tmpCopy)
+
+	return count
 }

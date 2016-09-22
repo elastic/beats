@@ -1,6 +1,7 @@
 import os
 import metricbeat
 import redis
+import unittest
 from nose.plugins.attrib import attr
 
 REDIS_FIELDS = metricbeat.COMMON_FIELDS + ["redis"]
@@ -18,6 +19,7 @@ CLIENTS_FIELDS = ["blocked", "biggest_input_buf",
 
 
 class Test(metricbeat.BaseTest):
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_info(self):
         """
@@ -48,6 +50,7 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
         self.assert_fields_are_documented(evt)
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_keysace(self):
         """
@@ -81,6 +84,7 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(self.de_dot(REDIS_KEYSPACE_FIELDS), redis_info.keys())
         self.assert_fields_are_documented(evt)
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_filters(self):
         """

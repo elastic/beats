@@ -13,24 +13,28 @@
         - name: started
           type: long
           description: >
-            Total number of started harvesters
+            Total number of started harvesters.
         - name: closed
           type: long
           description: >
-            Total number of closed harvesters
+            Total number of closed harvesters.
         - name: running
           type: long
           description: >
-            Number of currently running harvesters
+            Number of currently running harvesters.
+        - name: skipped
+          type: long
+          description: >
+            Total number of harvesters starts that were skipped because of harvester_limit reached.
         - name: files
           type: group
           description: >
-            File handling related statistics
+            File handling related statistics.
           fields:
             - name: open
               type: long
               description: >
-                Currently open files
+                Currently open files.
             - name: truncated
               type: long
               description: >
@@ -48,7 +52,7 @@
             - name: renamed
               type: long
               description: >
-                Total number of files for which renaming was detected
+                Total number of files for which renaming was detected.
             - name: truncated
               type: long
               description: >
@@ -62,21 +66,21 @@
         - name: states
           type: group
           description: >
-            Registrar states metrics
+            Registrar states metrics.
           fields:
             - name: update
               type: long
               description: >
-                Total number of states which were updated or added
+                Total number of states which were updated or added.
             - name: cleanup
               type: long
               description: >
-                Total number of states which were cleaned up (removed)
+                Total number of states which were cleaned up (removed).
             - name: current
               type: long
               description: >
-                The current number of states in the registry file
+                The current number of states in the registry file.
         - name: writes
           type: long
           description: >
-            Total number of times the registry file was written to disk
+            Total number of times the registry file was written to disk.

@@ -22,6 +22,12 @@ var (
 			"received": c.Int("Bytes_received"),
 			"sent":     c.Int("Bytes_sent"),
 		},
+		"threads": s.Object{
+			"cached":    c.Int("Threads_cached"),
+			"created":   c.Int("Threads_created"),
+			"connected": c.Int("Threads_connected"),
+			"running":   c.Int("Threads_running"),
+		},
 		"connections": c.Int("Connections"),
 		"created": s.Object{
 			"tmp": s.Object{

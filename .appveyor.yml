@@ -6,7 +6,7 @@ os: Windows Server 2012 R2
 
 # Environment variables
 environment:
-  GOROOT: c:\go1.7
+  GOROOT: c:\go1.7.1
   GOPATH: c:\gopath
   PYWIN_DL: https://beats-files.s3.amazonaws.com/deps/pywin32-220.win32-py2.7.exe
   matrix:
@@ -22,13 +22,13 @@ clone_folder: c:\gopath\src\github.com\elastic\beats
 cache:
 - C:\ProgramData\chocolatey\bin -> .appveyor.yml
 - C:\ProgramData\chocolatey\lib -> .appveyor.yml
-- C:\go1.7 -> .appveyor.yml
+- C:\go1.7.1 -> .appveyor.yml
 - C:\tools\mingw64 -> .appveyor.yml
 - C:\pywin_inst.exe -> .appveyor.yml
 
 # Scripts that run after cloning repository
 install:
-  - ps: c:\gopath\src\github.com\elastic\beats\libbeat\scripts\install-go.ps1 -version 1.7
+  - ps: c:\gopath\src\github.com\elastic\beats\libbeat\scripts\install-go.ps1 -version 1.7.1
   - set PATH=%GOROOT%\bin;%PATH%
   # AppVeyor installed mingw is 32-bit only.
   - ps: >-

@@ -60,7 +60,7 @@ before-build:
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields collect-docs configs update imports kibana
+collect: fields collect-docs configs kibana imports update
 
 # Creates a new metricset. Requires the params MODULE and METRICSET
 .PHONY: create-metricset
@@ -72,3 +72,4 @@ create-metricset:
 .PHONY: generate-json
 generate-json: build-image
 	 ${DOCKER_COMPOSE} run beat go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data
+

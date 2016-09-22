@@ -115,7 +115,8 @@ class Test(BaseTest):
         Test that Filebeat works when stdin is closed.
         """
         self.render_config_template(
-            input_type="stdin"
+            input_type="stdin",
+            close_eof="true",
         )
 
         args = [self.beat_path,
@@ -127,16 +128,22 @@ class Test(BaseTest):
                 ]
         proc = Proc(args, os.path.join(self.working_dir, "filebeat.log"))
         os.write(proc.stdin_write, "Hello World\n")
-        os.close(proc.stdin_write)
 
         proc.start()
         self.wait_until(lambda: self.output_has(lines=1))
+
+        # Continue writing after end was reached
+        os.write(proc.stdin_write, "Hello World2\n")
+        os.close(proc.stdin_write)
+
+        self.wait_until(lambda: self.output_has(lines=2))
 
         proc.proc.terminate()
         proc.proc.wait()
 
         objs = self.read_output()
         assert objs[0]["message"] == "Hello World"
+        assert objs[1]["message"] == "Hello World2"
 
     def test_rotating_close_inactive_larger_write_rate(self):
         self.render_config_template(
@@ -574,10 +581,57 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=15)
 
-        time.sleep(5)
         filebeat.check_kill_and_wait()
 
         data = self.read_output()
 
         # Make sure there is only one entry, means it didn't follow the symlink
         assert len(data) == 1
+
+    def test_harvester_limit(self):
+        """
+        Test if harvester_limit applies
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            harvester_limit=1,
+            close_inactive="1s",
+            scan_frequency="1s",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile1 = self.working_dir + "/log/test1.log"
+        testfile2 = self.working_dir + "/log/test2.log"
+        testfile3 = self.working_dir + "/log/test3.log"
+
+        with open(testfile1, 'w') as file:
+            file.write("Line1\n")
+
+        with open(testfile2, 'w') as file:
+            file.write("Line2\n")
+
+        with open(testfile3, 'w') as file:
+            file.write("Line3\n")
+
+        filebeat = self.start_beat()
+
+        # check that not all harvesters were started
+        self.wait_until(
+            lambda: self.log_contains("Harvester limit reached"),
+            max_timeout=10)
+
+        # wait for registry to be written
+        self.wait_until(
+            lambda: self.log_contains_count("Registry file updated") > 1,
+            max_timeout=10)
+
+        # Make sure not all events were written so far
+        data = self.read_output()
+        assert len(data) < 3
+
+        self.wait_until(lambda: self.output_has(lines=3), max_timeout=15)
+
+        data = self.read_output()
+        assert len(data) == 3
+
+        filebeat.check_kill_and_wait()

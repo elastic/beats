@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import argparse
+from subprocess import check_call
 
 template_go = '''package beat
 
@@ -27,6 +28,11 @@ def main():
         f.write(template_packer.format(
             version=version,
         ))
+
+    # Updates all files with the new templates
+    os.chdir(dir + "/../")
+    print("Update build files")
+    check_call("make update", shell=True)
 
 if __name__ == "__main__":
     main()

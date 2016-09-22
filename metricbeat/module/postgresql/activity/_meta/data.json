@@ -13,22 +13,22 @@
     "postgresql": {
         "activity": {
             "application_name": "",
-            "backend_start": "2016-08-12T11:59:18.564Z",
+            "backend_start": "2016-09-06T07:33:18.323Z",
             "client": {
-                "address": "172.17.0.21",
+                "address": "172.17.0.14",
                 "hostname": "",
-                "port": 48020
+                "port": 57436
             },
             "database": {
                 "name": "postgres",
                 "oid": 12379
             },
-            "pid": 104,
+            "pid": 162,
             "query": "SELECT * FROM pg_stat_activity",
-            "query_start": "2016-08-12T11:59:18.565Z",
+            "query_start": "2016-09-06T07:33:18.325Z",
             "state": "active",
-            "state_change": "2016-08-12T11:59:18.565Z",
-            "transaction_start": "2016-08-12T11:59:18.565Z",
+            "state_change": "2016-09-06T07:33:18.325Z",
+            "transaction_start": "2016-09-06T07:33:18.325Z",
             "user": {
                 "id": 10,
                 "name": "postgres"

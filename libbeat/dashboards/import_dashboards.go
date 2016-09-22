@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
+	lbeat "github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
@@ -27,22 +27,19 @@ Usage: ./import_dashboards [options]
 
 Kibana dashboards are stored in a special index in Elasticsearch together with the searches, visualizations, and indexes that they use.
 
-You can import the dashboards, visualizations, searches, and the index pattern for any Beat:
-  1. from a local directory:
-	./import_dashboards -dir etc/kibana
-  2. from a local zip archive:
-	./import_dashboards -beat metricbeat -file beats-dashboards-%s.zip
-  3. from a zip archive available online:
-	./import_dashboards -beat metricbeat -url http://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip
+To import the official Kibana dashboards for your Beat version into a local Elasticsearch instance, use:
 
-If the archive contains dashboards for multiple Beats, you need to pass the Beat name in -beat option:
-	./import_dashboards -beat metricbeat -url http://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip
+	./import_dashboards
 
-To import only the index-pattern for a single Beat, from the same version use:
-	./import_dashboards -only-index -beat metricbeat
+To import the official Kibana dashboards for your Beat version into a remote Elasticsearch instance with Shield, use:
 
-Options:
-`, beat.GetDefaultVersion(), beat.GetDefaultVersion(), beat.GetDefaultVersion())
+	./import_dashboards -es https://xyz.found.io -user user -pass password
+
+For more details, check https://www.elastic.co/guide/en/beats/libbeat/5.0/import-dashboards.html.
+
+`)
+
+var beat string
 
 type Options struct {
 	KibanaIndex    string
@@ -56,6 +53,7 @@ type Options struct {
 	Pass           string
 	OnlyDashboards bool
 	OnlyIndex      bool
+	Snapshot       bool
 }
 
 type CommandLine struct {
@@ -68,7 +66,7 @@ type Importer struct {
 	client *elasticsearch.Client
 }
 
-func ParseCommandLine() (*CommandLine, error) {
+func DefineCommandLine() (*CommandLine, error) {
 	var cl CommandLine
 
 	cl.flagSet = flag.NewFlagSet("import", flag.ContinueOnError)
@@ -81,22 +79,25 @@ func ParseCommandLine() (*CommandLine, error) {
 
 	cl.flagSet.StringVar(&cl.opt.KibanaIndex, "k", ".kibana", "Kibana index")
 	cl.flagSet.StringVar(&cl.opt.ES, "es", "http://127.0.0.1:9200", "Elasticsearch URL")
-	cl.flagSet.StringVar(&cl.opt.User, "user", "", "Username to connect to Elasticsearch")
-	cl.flagSet.StringVar(&cl.opt.Pass, "pass", "", "Password to connect to Elasticsearch")
-	cl.flagSet.StringVar(&cl.opt.Index, "i", "", "Overwrites the Elasticsearch index name. For example you can replaces metricbeat-* with custombeat-*")
-	cl.flagSet.StringVar(&cl.opt.Dir, "dir", "", "Directory containing the subdirectories: dashboard, visualization, search, index-pattern. eg. kibana/")
-	cl.flagSet.StringVar(&cl.opt.File, "file", "", "Zip archive file containing the Beats dashboards.")
+	cl.flagSet.StringVar(&cl.opt.User, "user", "", "Username to connect to Elasticsearch. By default no username is passed.")
+	cl.flagSet.StringVar(&cl.opt.Pass, "pass", "", "Password to connect to Elasticsearch. By default no password is passed.")
+	cl.flagSet.StringVar(&cl.opt.Index, "i", "", "The Elasticsearch index name. This overwrites the index name defined in the dashboards and index pattern. Example: metricbeat-*")
+	cl.flagSet.StringVar(&cl.opt.Dir, "dir", "", "Directory containing the subdirectories: dashboard, visualization, search, index-pattern. Example: etc/kibana/")
+	cl.flagSet.StringVar(&cl.opt.File, "file", "", "Zip archive file containing the Beats dashboards. The archive contains a directory for each Beat.")
 	cl.flagSet.StringVar(&cl.opt.Url, "url",
-		fmt.Sprintf("https://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip", beat.GetDefaultVersion()),
+		fmt.Sprintf("https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-%s.zip", lbeat.GetDefaultVersion()),
 		"URL to the zip archive containing the Beats dashboards")
-	cl.flagSet.StringVar(&cl.opt.Beat, "beat", "", "Specify the Beat name, in case the archive contains the dashboards for multiple Beats.")
-	cl.flagSet.BoolVar(&cl.opt.OnlyDashboards, "only-dashboards", false, "Import only dashboards together with visualizations and searches. By default imports both, dashboards and the index-pattern.")
+	cl.flagSet.StringVar(&cl.opt.Beat, "beat", beat, "The Beat name that is used to select what dashboards to install from a zip. An empty string selects all.")
+	cl.flagSet.BoolVar(&cl.opt.OnlyDashboards, "only-dashboards", false, "Import only dashboards together with visualizations and searches. By default import both, dashboards and the index-pattern.")
 	cl.flagSet.BoolVar(&cl.opt.OnlyIndex, "only-index", false, "Import only the index-pattern. By default imports both, dashboards and the index pattern.")
+	cl.flagSet.BoolVar(&cl.opt.Snapshot, "snapshot", false, "Import dashboards from snapshot builds.")
 
 	return &cl, nil
 }
 
-func (cl *CommandLine) Read() error {
+func (cl *CommandLine) ParseCommandLine() error {
+
+	cl.opt.Beat = beat
 
 	if err := cl.flagSet.Parse(os.Args[1:]); err != nil {
 		return err
@@ -113,13 +114,13 @@ func New() (*Importer, error) {
 	importer := Importer{}
 
 	/* define the command line arguments */
-	cl, err := ParseCommandLine()
+	cl, err := DefineCommandLine()
 	if err != nil {
 		cl.flagSet.Usage()
 		return nil, err
 	}
 	/* parse command line arguments */
-	err = cl.Read()
+	err = cl.ParseCommandLine()
 	if err != nil {
 		return nil, err
 	}
@@ -488,6 +489,22 @@ func getMainDir(target string) (string, error) {
 	return filepath.Join(target, dirs[0]), nil
 }
 
+func getDirectories(target string) ([]string, error) {
+
+	files, err := ioutil.ReadDir(target)
+	if err != nil {
+		return nil, err
+	}
+	var dirs []string
+
+	for _, file := range files {
+		if file.IsDir() {
+			dirs = append(dirs, filepath.Join(target, file.Name()))
+		}
+	}
+	return dirs, nil
+}
+
 func downloadFile(url string, target string) (string, error) {
 
 	fileName := filepath.Base(url)
@@ -535,8 +552,14 @@ func (imp Importer) ImportArchive() error {
 	fmt.Println("Create temporary directory", target)
 	if imp.cl.opt.File != "" {
 		archive = imp.cl.opt.File
+	} else if imp.cl.opt.Snapshot {
+		// In case snapshot is set, snapshot version is fetched
+		url := fmt.Sprintf("https://beats-nightlies.s3.amazonaws.com/dashboards/beats-dashboards-%s-SNAPSHOT.zip", lbeat.GetDefaultVersion())
+		archive, err = downloadFile(url, target)
+		if err != nil {
+			return fmt.Errorf("fail to download snapshot file: %s", url)
+		}
 	} else if imp.cl.opt.Url != "" {
-		// it's an URL
 		archive, err = downloadFile(imp.cl.opt.Url, target)
 		if err != nil {
 			return fmt.Errorf("fail to download file: %s", imp.cl.opt.Url)
@@ -549,16 +572,28 @@ func (imp Importer) ImportArchive() error {
 	if err != nil {
 		return fmt.Errorf("fail to unzip the archive: %s", archive)
 	}
-	dir, err := getMainDir(target)
+	dirs, err := getDirectories(target)
+	if err != nil {
+		return err
+	}
+	if len(dirs) != 1 {
+		return fmt.Errorf("too many directories under %s", target)
+	}
+
+	dirs, err = getDirectories(dirs[0])
 	if err != nil {
 		return err
 	}
 
-	err = imp.ImportKibana(path.Join(dir, imp.cl.opt.Beat))
-	if err != nil {
-		return err
+	for _, dir := range dirs {
+		fmt.Println(dir)
+		if imp.cl.opt.Beat == "" || filepath.Base(dir) == imp.cl.opt.Beat {
+			err = imp.ImportKibana(dir)
+			if err != nil {
+				return err
+			}
+		}
 	}
-
 	return nil
 }
 

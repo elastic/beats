@@ -123,8 +123,8 @@ func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 	}
 	if tls {
 		config["hosts"] = []string{getLogstashTLSHost()}
-		config["tls.insecure"] = false
-		config["tls.certificate_authorities"] = []string{
+		config["ssl.verification_mode"] = "full"
+		config["ssl.certificate_authorities"] = []string{
 			"../../../testing/environments/docker/logstash/pki/tls/certs/logstash.crt",
 		}
 	}

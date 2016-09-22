@@ -1,12 +1,16 @@
 package harvester
 
 import (
+	"bytes"
 	"errors"
 	"expvar"
 	"io"
 	"os"
+	"time"
 
 	"golang.org/x/text/transform"
+
+	"fmt"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/reader"
@@ -24,37 +28,60 @@ var (
 	filesTruncated     = expvar.NewInt("filebeat.harvester.files.truncated")
 )
 
-// Log harvester reads files line by line and sends events to the defined output
-func (h *Harvester) Harvest() {
+// Setup opens the file handler and creates the reader for the harvester
+func (h *Harvester) Setup() (reader.Reader, error) {
+	err := h.open()
+	if err != nil {
+		return nil, fmt.Errorf("Harvester setup failed. Unexpected file opening error: %s", err)
+	}
+
+	r, err := h.newLogFileReader()
+	if err != nil {
+		if h.file != nil {
+			h.file.Close()
+		}
+		return nil, fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
+	}
+
+	return r, nil
+
+}
+
+// Harvest reads files line by line and sends events to the defined output
+func (h *Harvester) Harvest(r reader.Reader) {
 
 	harvesterStarted.Add(1)
 	harvesterRunning.Add(1)
 	defer harvesterRunning.Add(-1)
 
-	h.state.Finished = false
-
 	// Makes sure file is properly closed when the harvester is stopped
 	defer h.close()
 
-	err := h.open()
-	if err != nil {
-		logp.Err("Stop Harvesting. Unexpected file opening error: %s", err)
-		return
-	}
+	// Channel to stop internal harvester routines
+	harvestDone := make(chan struct{})
+	defer close(harvestDone)
+
+	// Closes reader after timeout or when done channel is closed
+	// This routine is also responsible to properly stop the reader
+	go func() {
+		var closeTimeout <-chan time.Time
+		if h.config.CloseTimeout > 0 {
+			closeTimeout = time.After(h.config.CloseTimeout)
+		}
+
+		select {
+		// Applies when timeout is reached
+		case <-closeTimeout:
+			logp.Info("Closing harvester because close_timeout was reached: %s", h.state.Source)
+		// Required for shutdown when hanging inside reader
+		case <-h.done:
+		// Required when reader loop returns and reader finished
+		case <-harvestDone:
+		}
+		h.fileReader.Close()
+	}()
 
 	logp.Info("Harvester started for file: %s", h.state.Source)
-
-	r, err := h.newLogFileReader()
-	if err != nil {
-		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
-		return
-	}
-
-	// Always report the state before starting a harvester
-	// This is useful in case the file was renamed
-	if !h.sendStateUpdate() {
-		return
-	}
 
 	for {
 		select {
@@ -84,6 +111,12 @@ func (h *Harvester) Harvest() {
 				logp.Err("Read line error: %s; File: ", err, h.state.Source)
 			}
 			return
+		}
+
+		// Strip UTF-8 BOM if beginning of file
+		// As all BOMS are converted to UTF-8 it is enough to only remove this one
+		if h.state.Offset == 0 {
+			message.Content = bytes.Trim(message.Content, "\xef\xbb\xbf")
 		}
 
 		// Update offset
@@ -155,8 +188,7 @@ func (h *Harvester) openFile() error {
 
 	f, err := file.ReadOpen(h.state.Source)
 	if err != nil {
-		logp.Err("Failed opening %s: %s", h.state.Source, err)
-		return err
+		return fmt.Errorf("Failed opening %s: %s", h.state.Source, err)
 	}
 
 	harvesterOpenFiles.Add(1)
@@ -174,16 +206,16 @@ func (h *Harvester) openFile() error {
 }
 
 func (h *Harvester) validateFile(f *os.File) error {
-	// Check we are not following a rabbit hole (symlinks, etc.)
-	if !file.IsRegular(f) {
-		return errors.New("Given file is not a regular file.")
-	}
 
 	info, err := f.Stat()
 	if err != nil {
-		logp.Err("Failed getting stats for file %s: %s", h.state.Source, err)
-		return err
+		return fmt.Errorf("Failed getting stats for file %s: %s", h.state.Source, err)
 	}
+
+	if !info.Mode().IsRegular() {
+		return fmt.Errorf("Tried to open non regular file: %q %s", info.Mode(), info.Name())
+	}
+
 	// Compares the stat of the opened file to the state given by the prospector. Abort if not match.
 	if !os.SameFile(h.state.Fileinfo, info) {
 		return errors.New("File info is not identical with opened file. Aborting harvesting and retrying file later again.")
@@ -250,6 +282,7 @@ func (h *Harvester) getState() file.State {
 }
 
 func (h *Harvester) close() {
+
 	// Mark harvester as finished
 	h.state.Finished = true
 
@@ -260,6 +293,7 @@ func (h *Harvester) close() {
 	if h.file != nil {
 
 		h.file.Close()
+
 		logp.Debug("harvester", "Closing file: %s", h.state.Source)
 		harvesterOpenFiles.Add(-1)
 
@@ -294,12 +328,12 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
 	//       don't require 'complicated' logic.
-	fileReader, err := NewLogFile(h.file, h.config, h.done)
+	h.fileReader, err = NewLogFile(h.file, h.config)
 	if err != nil {
 		return nil, err
 	}
 
-	r, err = reader.NewEncode(fileReader, h.encoding, h.config.BufferSize)
+	r, err = reader.NewEncode(h.fileReader, h.encoding, h.config.BufferSize)
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,13 @@
+- key: haproxy
+  title: "haproxy"
+  description: >
+    experimental[]
+
+    haproxy Module
+  short_config: false
+  fields:
+    - name: haproxy
+      type: group
+      description: >
+        HAProx metrics.
+      fields:

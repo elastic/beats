@@ -3,9 +3,13 @@ from nose.plugins.attrib import attr
 
 import os
 import subprocess
+import unittest
 
+INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 class Test(BaseTest):
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_load_dashboard(self):
         """

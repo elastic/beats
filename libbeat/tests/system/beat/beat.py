@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 BEAT_REQUIRED_FIELDS = ["@timestamp", "type",
                         "beat.name", "beat.hostname"]
 
+INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 class Proc(object):
     """

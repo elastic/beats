@@ -205,6 +205,10 @@ packetbeat.protocols.http:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
+  # Maximum message size. If an HTTP message is larger than this, it will
+  # be trimmed to this size. Default is 10 MB.
+  #max_message_size: 10485760
+
 packetbeat.protocols.memcache:
   # Enable memcache monitoring. Default: true
   #enabled: true
@@ -444,6 +448,10 @@ packetbeat.protocols.nfs:
 #    - process: app
 #      cmdline_grep: gunicorn
 
+# Uncomment the following if you want to ignore transactions created
+# by the server on which the shipper is installed. This option is useful
+# to remove duplicates if shippers are installed on multiple servers.
+#packetbeat.ignore_outgoing: true
 
 #================================ General =====================================
 
@@ -468,24 +476,12 @@ packetbeat.protocols.nfs:
 # sub-dictionary. Default is false.
 #fields_under_root: false
 
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-#ignore_outgoing: true
-
-# How often (in seconds) shippers are publishing their IPs to the topology map.
-# The default is 10 seconds.
-#refresh_topology_freq: 10
-
-# Expiration time (in seconds) of the IPs published by a shipper to the topology map.
-# All the IPs will be deleted afterwards. Note, that the value must be higher than
-# refresh_topology_freq. This setting is used only by the Redis output. The other
-# outputs don't support expiring entries.
-# The default is 15 seconds.
-#topology_expire: 15
-
 # Internal queue size for single events in processing pipeline
 #queue_size: 1000
+
+# The internal queue size for bulk events in the processing pipeline.
+# Do not modify this value.
+#bulk_queue_size: 0
 
 # Sets the maximum number of CPUs that can be executing simultaneously. The
 # default is the number of logical CPUs available in the system.
@@ -582,10 +578,6 @@ output.elasticsearch:
   # requests are made.
   #flush_interval: 1s
 
-  # Boolean that sets if the topology is kept in Elasticsearch. The default is
-  # false. This option makes sense only for Packetbeat.
-  #save_topology: false
-
   # A template is used to set the mapping in Elasticsearch
   # By default template loading is enabled and the template is loaded.
   # These settings can be adjusted to load your own template or overwrite existing ones.
@@ -610,34 +602,37 @@ output.elasticsearch:
   # Path to the Elasticsearch 2.x version of the template file.
   #template.versions.2x.path: "${path.config}/packetbeat.template-es2x.json"
 
+  # Use SSL settings for HTTPS. Default is true.
+  #ssl.enabled: true
 
-  # TLS configuration. By default is off.
+  # Configure SSL verification mode. If `none` is configured, all server hosts
+  # and certificates will be accepted. In this mode, SSL based connections are
+  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
+  # `full`.
+  #ssl.verification_mode: full
+
+  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # 1.2 are enabled.
+  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+  # SSL configuration. By default is off.
   # List of root certificates for HTTPS server verifications
-  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-  # Certificate for TLS client authentication
-  #tls.certificate: "/etc/pki/client/cert.pem"
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  #tls.certificate_key: "/etc/pki/client/cert.key"
+  #ssl.key: "/etc/pki/client/cert.key"
 
-  # Controls whether the client verifies server certificates and host name.
-  # If insecure is set to true, all server host names and certificates will be
-  # accepted. In this mode TLS based connections are susceptible to
-  # man-in-the-middle attacks. Use only for testing.
-  #tls.insecure: true
+  # Optional passphrase for decrypting the Certificate Key.
+  #ssl.key_passphrase: ''
 
-  # Configure cipher suites to be used for TLS connections
-  #tls.cipher_suites: []
+  # Configure cipher suites to be used for SSL connections
+  #ssl.cipher_suites: []
 
   # Configure curve types for ECDHE based cipher suites
-  #tls.curve_types: []
-
-  # Configure minimum TLS version allowed for connection to logstash
-  #tls.min_version: 1.0
-
-  # Configure maximum TLS version allowed for connection to logstash
-  #tls.max_version: 1.2
+  #ssl.curve_types: []
 
 
 #----------------------------- Logstash output --------------------------------
@@ -671,27 +666,37 @@ output.elasticsearch:
   # Resolve names locally when using a proxy server. Defaults to false.
   #proxy_use_local_resolver: false
 
-  # Optional TLS configuration options. TLS is off by default.
-  # List of root certificates for HTTPS server verifications
-  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  #ssl.enabled: true
 
-  # Certificate for TLS client authentication
-  #tls.certificate: "/etc/pki/client/cert.pem"
+  # Configure SSL verification mode. If `none` is configured, all server hosts
+  # and certificates will be accepted. In this mode, SSL based connections are
+  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
+  # `full`.
+  #ssl.verification_mode: full
+
+  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # 1.2 are enabled.
+  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+  # Optional SSL configuration options. SSL is off by default.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  #tls.certificate_key: "/etc/pki/client/cert.key"
+  #ssl.key: "/etc/pki/client/cert.key"
 
-  # Controls whether the client verifies server certificates and host name.
-  # If insecure is set to true, all server host names and certificates will be
-  # accepted. In this mode TLS based connections are susceptible to
-  # man-in-the-middle attacks. Use only for testing.
-  #tls.insecure: true
+  # Optional passphrase for decrypting the Certificate Key.
+  #ssl.key_passphrase: ''
 
-  # Configure cipher suites to be used for TLS connections
-  #tls.cipher_suites: []
+  # Configure cipher suites to be used for SSL connections
+  #ssl.cipher_suites: []
 
   # Configure curve types for ECDHE based cipher suites
-  #tls.curve_types: []
+  #ssl.curve_types: []
 
 #------------------------------- Kafka output ---------------------------------
 #output.kafka:
@@ -796,27 +801,37 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Optional TLS configuration options. TLS is off by default.
-  # List of root certificates for HTTPS server verifications
-  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  #ssl.enabled: true
 
-  # Certificate for TLS client authentication
-  #tls.certificate: "/etc/pki/client/cert.pem"
+  # Optional SSL configuration options. SSL is off by default.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Configure SSL verification mode. If `none` is configured, all server hosts
+  # and certificates will be accepted. In this mode, SSL based connections are
+  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
+  # `full`.
+  #ssl.verification_mode: full
+
+  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # 1.2 are enabled.
+  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  #tls.certificate_key: "/etc/pki/client/cert.key"
+  #ssl.key: "/etc/pki/client/cert.key"
 
-  # Controls whether the client verifies server certificates and host name.
-  # If insecure is set to true, all server host names and certificates will be
-  # accepted. In this mode TLS based connections are susceptible to
-  # man-in-the-middle attacks. Use only for testing.
-  #tls.insecure: true
+  # Optional passphrase for decrypting the Certificate Key.
+  #ssl.key_passphrase: ''
 
-  # Configure cipher suites to be used for TLS connections
-  #tls.cipher_suites: []
+  # Configure cipher suites to be used for SSL connections
+  #ssl.cipher_suites: []
 
   # Configure curve types for ECDHE based cipher suites
-  #tls.curve_types: []
+  #ssl.curve_types: []
 
 #------------------------------- Redis output ---------------------------------
 #output.redis:
@@ -846,18 +861,6 @@ output.elasticsearch:
   # the Redis RPUSH command is used. If the data type is channel, the Redis
   # PUBLISH command is used. The default value is list.
   #datetype: list
-
-  # The Redis host to connect to when using topology map support. Topology map
-  # support is disabled if this option is not set.
-  #host_topology:
-
-  # The password to use for authenticating with the Redis topology server. The
-  # default is no authentication.
-  #password_topology:
-
-  # The Redis database number where the topology information is stored. The
-  # default is 1.
-  #db_topology: 1
 
   # The number of workers to use for each host configured to publish events to
   # Redis. Use this setting along with the loadbalance option. For example, if
@@ -895,27 +898,38 @@ output.elasticsearch:
   # occurs on the proxy server.
   #proxy_use_local_resolver: false
 
-  # Optional TLS configuration options. TLS is off by default.
-  # List of root certificates for HTTPS server verifications
-  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  #ssl.enabled: true
 
-  # Certificate for TLS client authentication
-  #tls.certificate: "/etc/pki/client/cert.pem"
+  # Configure SSL verification mode. If `none` is configured, all server hosts
+  # and certificates will be accepted. In this mode, SSL based connections are
+  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
+  # `full`.
+  #ssl.verification_mode: full
+
+  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # 1.2 are enabled.
+  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+
+  # Optional SSL configuration options. SSL is off by default.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  #tls.certificate_key: "/etc/pki/client/cert.key"
+  #ssl.key: "/etc/pki/client/cert.key"
 
-  # Controls whether the client verifies server certificates and host name.
-  # If insecure is set to true, all server host names and certificates will be
-  # accepted. In this mode TLS based connections are susceptible to
-  # man-in-the-middle attacks. Use only for testing.
-  #tls.insecure: true
+  # Optional passphrase for decrypting the Certificate Key.
+  #ssl.key_passphrase: ''
 
-  # Configure cipher suites to be used for TLS connections
-  #tls.cipher_suites: []
+  # Configure cipher suites to be used for SSL connections
+  #ssl.cipher_suites: []
 
   # Configure curve types for ECDHE based cipher suites
-  #tls.curve_types: []
+  #ssl.curve_types: []
+
 
 #------------------------------- File output ----------------------------------
 #output.file:

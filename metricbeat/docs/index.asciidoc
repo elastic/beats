@@ -4,7 +4,8 @@ include::./version.asciidoc[]
 
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}/
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/x-pack/5.0
 :version: {stack-version}
 :beatname_lc: metricbeat
 :beatname_uc: Metricbeat
@@ -20,6 +21,8 @@ include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
 include::./how-metricbeat-works.asciidoc[]
 
+include::./metricbeat-in-a-container.asciidoc[]
+
 include::./configuring-howto.asciidoc[]
 
 include::./metricbeat-filtering.asciidoc[]
@@ -33,8 +36,6 @@ include::../../libbeat/docs/shared-env-vars.asciidoc[]
 include::../../libbeat/docs/yaml.asciidoc[]
 
 include::../../libbeat/docs/regexp.asciidoc[]
-
-include::./metricbeat-in-a-container.asciidoc[]
 
 include::./modules.asciidoc[]
 

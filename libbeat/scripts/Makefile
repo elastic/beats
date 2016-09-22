@@ -132,7 +132,6 @@ prepare-tests:
 unit-tests: prepare-tests
 	$(GOPATH)/bin/gotestcover $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
 
-
 # Runs the unit tests without coverage reports.
 .PHONY: unit
 unit:
@@ -151,24 +150,29 @@ integration-tests-environment: prepare-tests build-image
 # Runs the system tests
 .PHONY: system-tests
 system-tests: ${BEATNAME}.test prepare-tests python-env
-	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
+	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=1 nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs the system tests
 .PHONY: system-tests-environment
 system-tests-environment: prepare-tests build-image
-	${DOCKER_COMPOSE} run beat make system-tests;
+	${DOCKER_COMPOSE} run beat make system-tests
 
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
 fast-system-tests: ${BEATNAME}.test python-env
-	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a '!integration'
+	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT)
 
 # Run benchmark tests
 .PHONY: benchmark-tests
 benchmark-tests:
 	# No benchmark tests exist so far
 	#go test -bench=. ${GOPACKAGES}
+
+# Run load tests
+.PHONY: load-tests
+load-tests:
+	. ${PYTHON_ENV}/bin/activate; LOAD_TESTS=1  nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a 'load'
 
 # Sets up the virtual python environment
 .PHONY: python-env
@@ -237,12 +241,11 @@ update: python-env
 		cat etc/beat.full.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml ; \
 	fi;
 
-	# Update fields
-	echo "Update fields"
+	# Update docs
 
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEATNAME} ${ES_BEATS}
 
-	# Update templates
+	# Generate index templates
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME} ${ES_BEATS}
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME} ${ES_BEATS}
 
@@ -250,6 +253,7 @@ update: python-env
 	cp ${ES_BEATS}/libbeat/docs/version.asciidoc docs/version.asciidoc
 
 	# Generate index-pattern
+	echo "Generate index pattern"
 	-rm -f $(PWD)/etc/kibana/index-pattern/${BEATNAME}.json
 	mkdir -p $(PWD)/etc/kibana/index-pattern
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index ${BEATNAME}-* --libbeat ${ES_BEATS}/libbeat --beat $(PWD)
@@ -270,7 +274,7 @@ docs-preview:
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200
 
-.PHONY: export-dashboards 
+.PHONY: export-dashboards
 export-dashboards: python-env update
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --regex ${BEATNAME}-*
 

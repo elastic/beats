@@ -22,7 +22,6 @@ type LogFile struct {
 func NewLogFile(
 	fs source.FileSource,
 	config harvesterConfig,
-	done chan struct{},
 ) (*LogFile, error) {
 	var offset int64
 	if seeker, ok := fs.(io.Seeker); ok {
@@ -39,7 +38,7 @@ func NewLogFile(
 		config:       config,
 		lastTimeRead: time.Now(),
 		backoff:      config.Backoff,
-		done:         done,
+		done:         make(chan struct{}),
 	}, nil
 }
 
@@ -163,4 +162,9 @@ func (r *LogFile) wait() {
 			r.backoff = r.config.MaxBackoff
 		}
 	}
+}
+
+func (r *LogFile) Close() {
+	close(r.done)
+	// Note: File reader is not closed here because that leads to race conditions
 }

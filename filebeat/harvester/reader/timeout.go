@@ -48,8 +48,8 @@ func (p *Timeout) Next() (Message, error) {
 		p.running = true
 		go func() {
 			for {
-				line, err := p.reader.Next()
-				p.ch <- lineMessage{line, err}
+				message, err := p.reader.Next()
+				p.ch <- lineMessage{message, err}
 				if err != nil {
 					break
 				}

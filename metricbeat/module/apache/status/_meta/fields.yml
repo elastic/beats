@@ -8,31 +8,31 @@
       description: >
         Apache hostname.
     - name: total_accesses
-      type: integer
+      type: long
       description: >
         Total number of access requests.
     - name: total_kbytes
-      type: integer
+      type: long
       description: >
         Total number of kilobytes served.
     - name: requests_per_sec
-      type: half_float
+      type: scaled_float
       description: >
         Requests per second.
     - name: bytes_per_sec
-      type: float
+      type: scaled_float
       description: >
         Bytes per second.
     - name: bytes_per_request
-      type: half_float
+      type: scaled_float
       description: >
         Bytes per request.
     - name: workers.busy
-      type: integer
+      type: long
       description: >
         Number of busy workers.
     - name: workers.idle
-      type: integer
+      type: long
       description: >
         Number of idle workers.
     - name: uptime
@@ -41,11 +41,11 @@
         Uptime stats.
       fields:
         - name: server_uptime
-          type: integer
+          type: long
           description: >
             Server uptime in seconds.
         - name: uptime
-          type: integer
+          type: long
           description: >
             Server uptime.
     - name: cpu
@@ -79,19 +79,19 @@
         Connection stats.
       fields:
         - name: total
-          type: integer
+          type: long
           description: >
             Total connections.
         - name: async.writing
-          type: integer
+          type: long
           description: >
             Async connection writing.
         - name: async.keep_alive
-          type: integer
+          type: long
           description: >
             Async keeped alive connections.
         - name: async.closing
-          type: integer
+          type: long
           description: >
             Async closed connections.
     - name: load
@@ -100,15 +100,18 @@
         Load averages.
       fields:
         - name: "1"
-          type: half_float
+          type: scaled_float
+          scaling_factor: 100
           description: >
             Load average for the last minute.
         - name: "5"
-          type: half_float
+          type: scaled_float
+          scaling_factor: 100
           description: >
             Load average for the last 5 minutes.
         - name: "15"
-          type: half_float
+          type: scaled_float
+          scaling_factor: 100
           description: >
             Load average for the last 15 minutes.
     - name: scoreboard
@@ -117,50 +120,50 @@
         Scoreboard metrics.
       fields:
         - name: starting_up
-          type: integer
+          type: long
           description: >
             Starting up.
         - name: reading_request
-          type: integer
+          type: long
           description: >
             Reading requests.
         - name: sending_reply
-          type: integer
+          type: long
           description: >
             Sending Reply.
         - name: keepalive
-          type: integer
+          type: long
           description: >
             Keep alive.
         - name: dns_lookup
-          type: integer
+          type: long
           description: >
             Dns Lookups.
         - name: closing_connection
-          type: integer
+          type: long
           description: >
             Closing connections.
         - name: logging
-          type: integer
+          type: long
           description: >
             Logging
         - name: gracefully_finishing
-          type: integer
+          type: long
           description: >
             Gracefully finishing.
         - name: idle_cleanup
-          type: integer
+          type: long
           description: >
             Idle cleanups.
         - name: open_slot
-          type: integer
+          type: long
           description: >
             Open slots.
         - name: waiting_for_connection
-          type: integer
+          type: long
           description: >
             Waiting for connections.
         - name: total
-          type: integer
+          type: long
           description: >
             Total.

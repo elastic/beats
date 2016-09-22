@@ -7,7 +7,8 @@ include::./version.asciidoc[]
 :metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}/
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/x-pack/5.0
 :version: {stack-version}
 :beatname_lc: filebeat
 :beatname_uc: Filebeat
@@ -17,11 +18,11 @@ include::./overview.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
-include::./how-filebeat-works.asciidoc[]
-
 include::./command-line.asciidoc[]
 
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+
+include::./how-filebeat-works.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 

@@ -75,7 +75,10 @@ func (p *ProspectorLog) Run() {
 				if state.Finished {
 					state.TTL = 0
 					event := input.NewEvent(state)
-					p.Prospector.harvesterChan <- event
+					err := p.Prospector.updateState(event)
+					if err != nil {
+						logp.Err("File cleanup state update error: %s", err)
+					}
 					logp.Debug("prospector", "Remove state for file as file removed: %s", state.Source)
 				} else {
 					logp.Debug("prospector", "State for file not removed because not finished: %s", state.Source)
@@ -99,6 +102,7 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 			continue
 		}
 
+	OUTER:
 		// Check any matched files to see if we need to start a harvester
 		for _, file := range matches {
 
@@ -108,24 +112,43 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 				continue
 			}
 
-			fileinfo, err := os.Lstat(file)
+			// Fetch Lstat File info to detected also symlinks
+			fileInfo, err := os.Lstat(file)
+			if err != nil {
+				logp.Debug("prospector", "lstat(%s) failed: %s", file, err)
+				continue
+			}
+
+			if fileInfo.IsDir() {
+				logp.Debug("prospector", "Skipping directory: %s", file)
+				continue
+			}
+
+			isSymlink := fileInfo.Mode()&os.ModeSymlink > 0
+			if isSymlink && !p.config.Symlinks {
+				logp.Debug("prospector", "File %s skipped as it is a symlink.", file)
+				continue
+			}
+
+			// Fetch Stat file info which fetches the inode. In case of a symlink, the original inode is fetched
+			fileInfo, err = os.Stat(file)
 			if err != nil {
 				logp.Debug("prospector", "stat(%s) failed: %s", file, err)
 				continue
 			}
 
-			// Check if file is symlink
-			if fileinfo.Mode()&os.ModeSymlink != 0 {
-				logp.Debug("prospector", "File %s skipped as it is a symlink.", file)
-				continue
+			// If symlink is enabled, it is checked that original is not part of same prospector
+			// It original is harvested by other prospector, states will potentially overwrite each other
+			if p.config.Symlinks {
+				for _, finfo := range paths {
+					if os.SameFile(finfo, fileInfo) {
+						logp.Info("Same file found as symlink and original. Skipping file: %s", file)
+						continue OUTER
+					}
+				}
 			}
 
-			if fileinfo.IsDir() {
-				logp.Debug("prospector", "Skipping directory: %s", file)
-				continue
-			}
-
-			paths[file] = fileinfo
+			paths[file] = fileInfo
 		}
 	}
 
@@ -148,7 +171,9 @@ func (p *ProspectorLog) scan() {
 		// Ignores all files which fall under ignore_older
 		if p.isIgnoreOlder(newState) {
 			logp.Debug("prospector", "Ignore file because ignore_older reached: %s", newState.Source)
-			if lastState.IsEmpty() && lastState.Finished == false {
+
+			// If last state is empty, it means state was removed or never created -> can be ignored
+			if !lastState.IsEmpty() && !lastState.Finished {
 				logp.Err("File is falling under ignore_older before harvesting is finished. Adjust your close_* settings: %s", newState.Source)
 			}
 			continue
@@ -159,7 +184,7 @@ func (p *ProspectorLog) scan() {
 			logp.Debug("prospector", "Start harvester for new file: %s", newState.Source)
 			err := p.Prospector.startHarvester(newState, 0)
 			if err != nil {
-				logp.Err("Harvester could not be started on new file: %s", err)
+				logp.Err("Harvester could not be started on new file: %s, Err: %s", newState.Source, err)
 			}
 		} else {
 			p.harvestExistingFile(newState, lastState)
@@ -182,7 +207,7 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 		logp.Debug("prospector", "Resuming harvesting of file: %s, offset: %v", newState.Source, oldState.Offset)
 		err := p.Prospector.startHarvester(newState, oldState.Offset)
 		if err != nil {
-			logp.Err("Harvester could not be started on existing file: %s", err)
+			logp.Err("Harvester could not be started on existing file: %s, Err: %s", newState.Source, err)
 		}
 		return
 	}
@@ -192,7 +217,7 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 		logp.Debug("prospector", "Old file was truncated. Starting from the beginning: %s", newState.Source)
 		err := p.Prospector.startHarvester(newState, 0)
 		if err != nil {
-			logp.Err("Harvester could not be started on truncated file: %s", err)
+			logp.Err("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err)
 		}
 
 		filesTrucated.Add(1)
@@ -210,7 +235,10 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 			// Update state because of file rotation
 			oldState.Source = newState.Source
 			event := input.NewEvent(oldState)
-			p.Prospector.harvesterChan <- event
+			err := p.Prospector.updateState(event)
+			if err != nil {
+				logp.Err("File rotation state update error: %s", err)
+			}
 
 			filesRenamed.Add(1)
 		} else {

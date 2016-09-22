@@ -186,15 +186,15 @@ The only difference between this and the previous example is that the second exa
 Metricbeat will add the same timestamp to all the events in the list to make it possible to correlate the events.
 
 [float]
-==== Parsing and normalizing fields
+==== Parsing and Normalizing Fields
 
-In Metricbeat we aim to normalize the metric names from all Metricsets to
+In Metricbeat we aim to normalize the metric names from all metricsets to
 respect a common {libbeat}/event-conventions.html[set of conventions]. This
 makes it easy for users to find and interpret metrics. To simplify parsing,
 converting, renaming, and restructuring of the object read from the monitored
 system to the Metricbeat format, we have created the
 https://godoc.org/github.com/elastic/beats/metricbeat/schema[schema] package
-that allows to declaratively define transformations.
+that allows you to declaratively define transformations.
 
 For example, assuming this input object:
 
@@ -251,7 +251,7 @@ func eventMapping(input map[string]interface{}) common.MapStr {
 ----
 
 In the above example, note that it is possible to create the schema object once
-but to apply to all events.
+and apply it to all events.
 
 [float]
 === Configuration File

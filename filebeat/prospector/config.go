@@ -10,22 +10,26 @@ import (
 
 var (
 	defaultConfig = prospectorConfig{
-		IgnoreOlder:   0,
-		ScanFrequency: 10 * time.Second,
-		InputType:     cfg.DefaultInputType,
-		CleanInactive: 0,
-		CleanRemoved:  false,
+		IgnoreOlder:    0,
+		ScanFrequency:  10 * time.Second,
+		InputType:      cfg.DefaultInputType,
+		CleanInactive:  0,
+		CleanRemoved:   true,
+		HarvesterLimit: 0,
+		Symlinks:       false,
 	}
 )
 
 type prospectorConfig struct {
-	ExcludeFiles  []*regexp.Regexp `config:"exclude_files"`
-	IgnoreOlder   time.Duration    `config:"ignore_older"`
-	Paths         []string         `config:"paths"`
-	ScanFrequency time.Duration    `config:"scan_frequency" validate:"min=0,nonzero"`
-	InputType     string           `config:"input_type"`
-	CleanInactive time.Duration    `config:"clean_inactive" validate:"min=0"`
-	CleanRemoved  bool             `config:"clean_removed"`
+	ExcludeFiles   []*regexp.Regexp `config:"exclude_files"`
+	IgnoreOlder    time.Duration    `config:"ignore_older"`
+	Paths          []string         `config:"paths"`
+	ScanFrequency  time.Duration    `config:"scan_frequency" validate:"min=0,nonzero"`
+	InputType      string           `config:"input_type"`
+	CleanInactive  time.Duration    `config:"clean_inactive" validate:"min=0"`
+	CleanRemoved   bool             `config:"clean_removed"`
+	HarvesterLimit uint64           `config:"harvester_limit" validate:"min=0"`
+	Symlinks       bool             `config:"symlinks"`
 }
 
 func (config *prospectorConfig) Validate() error {

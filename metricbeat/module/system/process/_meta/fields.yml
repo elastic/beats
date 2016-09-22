@@ -12,15 +12,15 @@
       description: >
         The process state. For example: "running".
     - name: pid
-      type: integer
+      type: long
       description: >
         The process pid.
     - name: ppid
-      type: integer
+      type: long
       description: >
         The process parent pid.
     - name: pgid
-      type: integer
+      type: long
       description: >
         The process group id.
     - name: cmdline
@@ -467,14 +467,14 @@
                 Path to the cgroup relative to the cgroup subsystems mountpoint.
 
             - name: total.bytes
-              type: keyword
+              type: long
               format: bytes
               description: >
                 Total number of bytes transferred to and from all block devices
                 by processes in the cgroup.
 
             - name: total.ios
-              type: keyword
+              type: long
               description: >
                 Total number of I/O operations performed on all devices
                 by processes in the cgroup as seen by the throttling policy.

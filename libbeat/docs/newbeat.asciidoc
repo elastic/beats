@@ -15,6 +15,18 @@ an example Beat called Countbeat. The Beat generator creates all the files requi
 for a working Beat. To create your own Beat, you modify the generated
 files and implement the custom logic needed to collect the data you want to ship.
 
+The following topics describe how to build a new Beat:
+
+* <<newbeat-getting-ready>>
+* <<newbeat-overview>>
+* <<newbeat-generate>>
+* <<setting-up-beat>>
+* <<compiling-and-running>>
+* <<beater-interface>>
+* <<ls-beat>>
+* <<newbeat-sharing>>
+* <<event-conventions>>
+
 [[newbeat-getting-ready]]
 === Getting Ready
 
@@ -42,6 +54,7 @@ When you run the command, all source files are downloaded to the
 `$GOPATH/src/github.com/elastic/beats` path. You can ignore the "no buildable Go source files" message because
 you will build the source later.
 
+[[newbeat-overview]]
 === Overview
 
 At the high level, a simple Beat has two main components:
@@ -99,6 +112,7 @@ The following example shows an event object in Lsbeat:
 
 Now that you have the big picture, let's dig into the code.
 
+[[newbeat-generate]]
 === Generating Your Beat
 
 To generate your own Beat, you use the Beat generator available in the beats repo on GitHub. If you haven't
@@ -355,7 +369,6 @@ You also need to add `path` to `etc/beat.yml`:
 [source,yml]
 ----------------------------------------------------------------------
 countbeat:
-  # Defines how often an event is sent to the output
   period: 10s
   path: "."
 ----------------------------------------------------------------------
@@ -480,7 +493,7 @@ Lsbeat periodically ships them to Elasticsearch for storage.
 To help you learn how to build a Beat, we've created this http://elastic.co//blog/build-your-own-beat[blog post]
 that describes how to build Lsbeat from scratch. You can refer to the Lsbeat implementation as a working example.
 
-
+[[newbeat-sharing]]
 === Sharing Your Beat with the Community
 
 When you're done with your new Beat, how about letting everyone know? Open

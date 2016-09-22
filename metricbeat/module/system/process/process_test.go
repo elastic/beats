@@ -1,4 +1,3 @@
-// +build !integration
 // +build darwin freebsd linux windows
 
 package process
