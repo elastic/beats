@@ -224,35 +224,6 @@
                 IP address of the client connected to this backend.
             - name: client.hostname
               description: >
-<<<<<<< a63d2c06a01702fcce25f7ea0c1894d7b7744ab3
-
-              fields:
-                - name: rate
-                  type: group
-                  description: >
-
-                  fields:
-                    - name: value
-                      type: integer
-                      description: >
-
-                    - name: limit
-                      type: integer
-                      description: >
-
-            - name: curr
-              type: group
-              description: >
-
-              fields:
-                - name: conns
-                  type: integer
-                  description: >
-
-                - name: ssl_conns
-                  type: integer
-                  description: >
-=======
                 Host name of the connected client, as reported by a reverse DNS lookup of client_addr.
             - name: client.port
               type: long
@@ -284,7 +255,6 @@
             - name: state
               description: >
                 Current overall state of this backend. Possible values are:
->>>>>>> make fmt & collect
 
                   * active: The backend is executing a query.
                   * idle: The backend is waiting for a new client command.
@@ -297,21 +267,9 @@
                   * disabled: This state is reported if track_activities is disabled in this backend.
             - name: query
               description: >
-<<<<<<< a63d2c06a01702fcce25f7ea0c1894d7b7744ab3
-
-              fields:
-                - name: conns
-                  type: integer
-                  description: >
-
-                - name: req
-                  type: integer
-                  description: >
-=======
                 Text of this backend's most recent query. If state is active this field
                 shows the currently executing query. In all other states, it shows the
                 last query that was executed.
->>>>>>> make fmt & collect
 
 
 - key: system
@@ -335,48 +293,6 @@
               description: >
                 The disk name.
 
-<<<<<<< a63d2c06a01702fcce25f7ea0c1894d7b7744ab3
-            - name: max
-              type: group
-              description: Maximum values reported by HAProxy.
-
-              fields:
-                - name: hard_conn
-                  type: integer
-                  description: HardMaxconn
-
-                - name: ssl.conns
-                  type: integer
-                  description: MaxSslConns
-
-                - name: ssl.rate
-                  type: integer
-                  description: MaxSslRate
-
-                - name: sock
-                  type: integer
-                  description: Maxsock
-
-                - name: conn.value
-                  type: integer
-                  description: Maxconn
-
-                - name: conn.rate
-                  type: integer
-                  description: MaxConnRate
-
-                - name: sess_rate
-                  type: integer
-                  description: MaxSessRate
-
-                - name: pipes
-                  type: integer
-                  description: Maxpipes
-
-                - name: zlib_mem_usage
-                  type: integer
-                  description: MaxZlibMemUsage
-=======
             - name: serial_number
               type: keyword
               description: >
@@ -422,7 +338,6 @@
               type: long
               description: >
                 The total number of of milliseconds spent doing I/Os.
->>>>>>> make fmt & collect
 
         - name: fsstat
           type: group
@@ -439,12 +354,7 @@
             - name: total_size
               format: bytes
               type: group
-<<<<<<< a63d2c06a01702fcce25f7ea0c1894d7b7744ab3
-              description: >
-
-=======
               description: Nested file system docs.
->>>>>>> make fmt & collect
               fields:
                 - name: free
                   type: long
@@ -455,56 +365,13 @@
                   type: long
                   format: bytes
                   description: >
-<<<<<<< a63d2c06a01702fcce25f7ea0c1894d7b7744ab3
-
-                - name: free
-                  type: integer
-=======
                     Total used space.
                 - name: total
                   type: long
                   format: bytes
->>>>>>> make fmt & collect
                   description: >
                     Total space (used plus free).
 
-<<<<<<< a63d2c06a01702fcce25f7ea0c1894d7b7744ab3
-            - name: sess
-              type: group
-              description: >
-
-              fields:
-                - name: rate
-                  type: group
-                  description: >
-
-                  fields:
-                    - name: value
-                      type: integer
-                      description: >
-
-                    - name: limit
-                      type: integer
-                      description: >
-
-            - name: ssl
-              type: group
-              description: >
-
-              fields:
-                - name: rate
-                  type: group
-                  description: >
-
-                  fields:
-                    - name: value
-                      type: integer
-                      description: >
-
-                    - name: limit
-                      type: integer
-                      description: >
-=======
         - name: process
           type: group
           description: >
@@ -618,7 +485,6 @@
               type: group
               description: >
                 experimental[]
->>>>>>> make fmt & collect
 
                 Metrics and limits from the cgroup of which the task is a member.
                 cgroup metrics are reported when the process has membership in a
@@ -641,15 +507,12 @@
                 - name: cpu
                   type: group
                   description: >
-<<<<<<< a63d2c06a01702fcce25f7ea0c1894d7b7744ab3
-=======
                     The cpu subsystem schedules CPU access for tasks in the cgroup.
                     Access can be controlled by two separate schedulers, CFS and RT.
                     CFS stands for completely fair scheduler which proportionally
                     divides the CPU time between cgroups based on weight. RT stands for
                     real time scheduler which sets a maximum amount of CPU time that
                     processes in the cgroup can consume during a given period.
->>>>>>> make fmt & collect
 
                   fields:
                     - name: id
@@ -675,18 +538,8 @@
                         tasks in a cgroup can run during one period (as defined by
                         cfs.period.us).
 
-<<<<<<< a63d2c06a01702fcce25f7ea0c1894d7b7744ab3
-                - name: backend
-                  type: group
-                  description: >
-
-                  fields:
-                    - name: key_rate
-                      type: integer
-=======
                     - name: cfs.shares
                       type: long
->>>>>>> make fmt & collect
                       description: >
                         An integer value that specifies a relative share of CPU time
                         available to the tasks in a cgroup. The value specified in the
@@ -698,15 +551,6 @@
                         Period of time in microseconds for how regularly a cgroup's
                         access to CPU resources is reallocated.
 
-<<<<<<< a63d2c06a01702fcce25f7ea0c1894d7b7744ab3
-                - name: cached_lookups
-                  type: integer
-                  description: >
-
-                - name: cache_misses
-                  type: integer
-                  description: >
-=======
                     - name: rt.runtime.us
                       type: long
                       description: >
@@ -718,7 +562,6 @@
                       description: >
                         Number of period intervals (as specified in cpu.cfs.period.us)
                         that have elapsed.
->>>>>>> make fmt & collect
 
                     - name: stats.throttled.periods
                       type: long
@@ -2477,7 +2320,7 @@
                     - name: value
                       type: integer
                       description: >
-          
+
                     - name: limit
                       type: integer
                       description: >
@@ -2485,12 +2328,12 @@
             - name: curr
               type: group
               description: >
-      
+
               fields:
                 - name: conns
                   type: integer
                   description: >
-            
+
                 - name: ssl_conns
                   type: integer
                   description: >
@@ -2498,12 +2341,12 @@
             - name: cum
               type: group
               description: >
-      
+
               fields:
                 - name: conns
                   type: integer
                   description: >
-            
+
                 - name: req
                   type: integer
                   description: >
@@ -2515,63 +2358,62 @@
 
             - name: max
               type: group
-              description: >
+              description: Maximum values reported by HAProxy.
 
               fields:
                 - name: hard_conn
                   type: integer
-                  description: >
+                  description: HardMaxconn
+
+                - name: ssl.conns
+                  type: integer
+                  description: MaxSslConns
+
+                - name: ssl.rate
+                  type: integer
+                  description: MaxSslRate
 
                 - name: sock
                   type: integer
-                  description: >     
-      
-                - name: conn
-                  type: integer
-                  description: >
+                  description: Maxsock
 
-                - name: ssl_conns
+                - name: conn.value
                   type: integer
-                  description: >
+                  description: Maxconn
+
+                - name: conn.rate
+                  type: integer
+                  description: MaxConnRate
+
+                - name: sess_rate
+                  type: integer
+                  description: MaxSessRate
 
                 - name: pipes
                   type: integer
-                  description: >
-
-                - name: conn_rate
-                  type: integer
-                  description: >
-        
-                - name: sess_rate
-                  type: integer
-                  description: >
-
-                - name: ssl_rate
-                  type: integer
-                  description: >
+                  description: Maxpipes
 
                 - name: zlib_mem_usage
                   type: integer
-                  description: >
+                  description: MaxZlibMemUsage
 
             - name: pipes
               type: group
               description: >
-      
+
               fields:
                 - name: used
                   type: integer
                   description: >
-            
+
                 - name: free
                   type: integer
                   description: >
 
-
             - name: sess
               type: group
               description: >
-      
+
               fields:
                 - name: rate
                   type: group
@@ -2589,12 +2431,12 @@
             - name: ssl
               type: group
               description: >
-      
+
               fields:
                 - name: rate
                   type: group
                   description: >
-          
+
                   fields:
                     - name: value
                       type: integer
@@ -2607,7 +2449,7 @@
                 - name: frontend
                   type: group
                   description: >
-          
+
                   fields:
                     - name: key_rate
                       type: integer
@@ -2624,7 +2466,7 @@
                 - name: backend
                   type: group
                   description: >
-          
+
                   fields:
                     - name: key_rate
                       type: integer
@@ -2634,11 +2476,11 @@
                       type: integer
                       description: >
 
-                - name: ssl_cached_lookups
+                - name: cached_lookups
                   type: integer
                   description: >
 
-                - name: ssl_cache_misses
+                - name: cache_misses
                   type: integer
                   description: >
 
