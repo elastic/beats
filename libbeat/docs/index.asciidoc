@@ -27,7 +27,7 @@ include::./config-file-format.asciidoc[]
 
 // include::./visualizing-data.asciidoc[]
 
-//include::./dashboards.asciidoc[]
+include::./dashboards.asciidoc[]
 
 pass::[<?page_header <b>PLEASE NOTE:</b><br/>Always refer to the documentation in master for the latest information about contributing to Beats.?>]
 
