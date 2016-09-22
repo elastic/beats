@@ -6,6 +6,7 @@ import (
 	"github.com/fsouza/go-dockerclient"
 
 	"github.com/elastic/beats/libbeat/common"
+	"sort"
 )
 
 type Container struct {
@@ -38,15 +39,20 @@ func BuildLabelArray(labels map[string]string) []common.MapStr {
 
 	output_labels := make([]common.MapStr, len(labels))
 	i := 0
-	for k, v := range labels {
+	var keys []string
+	for key := range labels {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
 		label := strings.Replace(k, ".", "_", -1)
 		output_labels[i] = common.MapStr{
 			"key":   label,
-			"value": v,
+			"value": labels[k],
 		}
 		i++
 	}
-	return output_labelsmake
+	return output_labels
 }
 
 func ConvertContainerPorts(ports *[]docker.APIPort) []map[string]interface{} {
