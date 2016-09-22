@@ -16,9 +16,10 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 
 	//Container  + dockerstats
 	containerID := "containerID"
-	labels := map[string]string{}
-	labels["label1"] = "val1"
-	labels["label2"] = "val2"
+	labels := map[string]string{
+		"label1": "val1",
+		"label2": "val2",
+	}
 	container := dc.APIContainers{
 		ID:         containerID,
 		Image:      "image",
@@ -42,18 +43,9 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	expectedEvent := common.MapStr{
 		"@timestamp": common.Time(memorystats.Read),
 		"container": common.MapStr{
-			"id":   containerID,
-			"name": "name1",
-			"labels": []common.MapStr{
-				{
-					"key":   "label1",
-					"value": "val1",
-				},
-				{
-					"key":   "label2",
-					"value": "val2",
-				},
-			},
+			"id":     containerID,
+			"name":   "name1",
+			"labels": docker.BuildLabelArray(labels),
 		},
 		"socket": docker.GetSocket(),
 		"memory": common.MapStr{
@@ -71,8 +63,6 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	event := eventMapping(&rawStats)
 	//THEN
 	assert.True(t, equalEvent(expectedEvent, event))
-	t.Logf(" expected : %v", expectedEvent)
-	t.Logf(" eventmapping : %v ", event)
 }
 
 func getMemoryStats(read time.Time, number uint64) dc.Stats {

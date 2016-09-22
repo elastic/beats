@@ -76,9 +76,10 @@ func TestCPUService_UsageInUsermode(t *testing.T) {
 func TestCPUService_GetCpuStats(t *testing.T) {
 	// GIVEN
 	containerID := "containerID"
-	labels := map[string]string{}
-	labels["label1"] = "val1"
-	labels["label2"] = "val2"
+	labels := map[string]string{
+		"label1": "val1",
+		"label2": "val2",
+	}
 	container := dc.APIContainers{
 		ID:         containerID,
 		Image:      "image",
@@ -110,18 +111,9 @@ func TestCPUService_GetCpuStats(t *testing.T) {
 	expectedEvent := common.MapStr{
 		"@timestamp": common.Time(stats.Read),
 		"container": common.MapStr{
-			"id":   containerID,
-			"name": "name1",
-			"labels": []common.MapStr{
-				{
-					"key":   "label1",
-					"value": "val1",
-				},
-				{
-					"key":   "label2",
-					"value": "val2",
-				},
-			},
+			"id":     containerID,
+			"name":   "name1",
+			"labels": docker.BuildLabelArray(labels),
 		},
 		"socket": docker.GetSocket(),
 		"cpu": common.MapStr{
