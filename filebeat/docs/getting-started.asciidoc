@@ -39,7 +39,7 @@ See our https://www.elastic.co/downloads/beats/filebeat[download page] for other
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-amd64.deb
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-amd64.deb
 sudo dpkg -i filebeat-{version}-amd64.deb
 ------------------------------------------------
 
@@ -48,7 +48,7 @@ sudo dpkg -i filebeat-{version}-amd64.deb
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-x86_64.rpm
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-x86_64.rpm
 sudo rpm -vi filebeat-{version}-x86_64.rpm
 ------------------------------------------------
 
@@ -57,7 +57,7 @@ sudo rpm -vi filebeat-{version}-x86_64.rpm
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-darwin-x86_64.tar.gz
 tar xzvf filebeat-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 

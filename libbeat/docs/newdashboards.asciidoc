@@ -51,7 +51,7 @@ $ ./scripts/import_dashboards -dir kibana/metricbeat
 $ ./scripts/import_dashboards -beat metricbeat -file metricbeat-dashboards-1.1.zip
 ----------------------------------------------------------------------
 
-- from the official zip archive available under http://download.elastic.co/:
+- from the official zip archive available under http://artifacts.elastic.co/:
 
 [source,shell]
 ----------------------------------------------------------------------
