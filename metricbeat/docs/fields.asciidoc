@@ -405,6 +405,7 @@ Contains user configurable fields.
 [[exported-fields-beats]]
 == beats Fields
 
+experimental[]
 beats Module
 
 
@@ -704,6 +705,7 @@ The document type. Always set to "metricsets".
 [[exported-fields-docker]]
 == docker Fields
 
+experimental[]
 Docker stats collected from Docker.
 
 
