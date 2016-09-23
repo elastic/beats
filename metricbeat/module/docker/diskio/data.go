@@ -24,7 +24,7 @@ func eventMapping(myBlkioStats *BlkioStats) common.MapStr {
 		"blkio": common.MapStr{
 			"reads":  myBlkioStats.reads,
 			"writes": myBlkioStats.writes,
-			"Total":  myBlkioStats.totals,
+			"total":  myBlkioStats.totals,
 		},
 	}
 	return event
