@@ -9,8 +9,8 @@
 
 #============================== Network device ================================
 
-# Select the network interface to sniff the data. You can use the "any"
-# keyword to sniff on all connected interfaces.
+# Select the network interface to sniff the data. On Linux, you can use the
+# "any" keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: any
 
 #================================== Flows =====================================
