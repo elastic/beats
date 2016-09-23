@@ -28,6 +28,8 @@ https://github.com/elastic/beats/compare/v5.0.0-beta1...master[Check the HEAD di
 ==== Bugfixes
 
 *Affecting all Beats*
+- Make sure Beats sent always float values when they are defined as float by sending 5.00000 instead of 5.
+  {pull}2627[2627]
 
 *Metricbeat*
 
