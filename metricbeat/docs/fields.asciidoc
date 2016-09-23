@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-beats>>
 * <<exported-fields-common>>
+* <<exported-fields-docker>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -698,6 +699,102 @@ example: metricsets
 required: True
 
 The document type. Always set to "metricsets".
+
+
+[[exported-fields-docker]]
+== docker Fields
+
+Docker stats collected from Docker.
+
+
+
+[float]
+== docker Fields
+
+docker contains different informations and statistics of docker's containers running
+
+
+
+[float]
+== container Fields
+
+container
+
+
+
+[float]
+=== docker.container.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== cpu Fields
+
+Runtime cpu metrics
+
+
+
+[float]
+== cpu Fields
+
+CPU statistics of the running container
+
+
+
+[float]
+=== docker.cpu.cpu.usage_in_user_mode
+
+type: float
+
+The system user mode consumed by The Docker server.
+
+
+[float]
+== diskio Fields
+
+diskio
+
+
+
+[float]
+=== docker.diskio.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== memory Fields
+
+memory
+
+
+
+[float]
+=== docker.memory.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== network Fields
+
+network
+
+
+
+[float]
+=== docker.network.example
+
+type: keyword
+
+Example field
 
 
 [[exported-fields-haproxy]]
