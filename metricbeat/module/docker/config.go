@@ -1,7 +1,7 @@
 package docker
 
 type TlsConfig struct {
-	Enabled  bool   `config:"enable"`
+	Enabled  bool   `config:"enabled"`
 	CaPath   string `config:"ca_path"`
 	CertPath string `config:"cert_path"`
 	KeyPath  string `config:"key_path"`
