@@ -45,15 +45,15 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* <<metricbeat-metricset-postgresql-activity,activity>>
+* <<metricbeat-metricset-postgresql-database,database>>
 
 * <<metricbeat-metricset-postgresql-bgwriter,bgwriter>>
 
-* <<metricbeat-metricset-postgresql-database,database>>
+* <<metricbeat-metricset-postgresql-activity,activity>>
 
-include::postgresql/activity.asciidoc[]
+include::postgresql/database.asciidoc[]
 
 include::postgresql/bgwriter.asciidoc[]
 
-include::postgresql/database.asciidoc[]
+include::postgresql/activity.asciidoc[]
 
