@@ -1,0 +1,9 @@
+- name: network
+  type: group
+  description: >
+    network
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
