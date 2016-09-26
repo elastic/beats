@@ -168,7 +168,7 @@ If this option is enabled, Filebeat ignores any files that were modified before 
 You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 0, which disables the setting.
 Commenting out the config has the same effect as setting it to 0.
 
-IMPORTANT: You must set `ignore_older` to be greater than `close_inactive`. 
+IMPORTANT: You must set `ignore_older` to be greater than `close_inactive`.
 
 The files affected by this setting fall into two categories:
 
@@ -181,7 +181,7 @@ The `ignore_older` setting relies on the modification time of the file to determ
 
 To remove the state of previously harvested files from the registry file, use the `clean_inactive` configuration option.
 
-Before a file can be ignored by the prospector, it must be closed. To ensure a file is no longer being harvested when it is ignored, you must set `ignore_older` to a longer duration than `close_inactive`. 
+Before a file can be ignored by the prospector, it must be closed. To ensure a file is no longer being harvested when it is ignored, you must set `ignore_older` to a longer duration than `close_inactive`.
 
 If a file that's currently being harvested falls under `ignore_older`, the harvester will first finish reading the file and close it after `close_inactive` is reached. Then, after that, the file will be ignored.
 
@@ -220,7 +220,7 @@ When this option is enabled, Filebeat closes the harvester when a file is remove
 
 This option is enabled by default. If you disable this option, you must also disable `clean_removed`.
 
-WINDOWS:  If your Windows log rotation system shows errors because it can't rotate files, make sure this option is enabled. 
+WINDOWS:  If your Windows log rotation system shows errors because it can't rotate files, make sure this option is enabled.
 
 [[close-eof]]
 ===== close_eof
@@ -244,7 +244,7 @@ The `close_timeout` setting won't apply if your output is stalled and no further
 [[clean-options]]
 ===== clean_*
 
-The `clean_*` options are used to clean up the state entries in the registry file. These settings help to reduce the size of the registry file and can prevent a potential <<inode-reuse-issue,inode reuse issue>>. 
+The `clean_*` options are used to clean up the state entries in the registry file. These settings help to reduce the size of the registry file and can prevent a potential <<inode-reuse-issue,inode reuse issue>>.
 
 [[clean-inactive]]
 ===== clean_inactive
@@ -255,14 +255,14 @@ When this option is enabled, Filebeat removes the state of a file after the spec
 
 The `clean_inactive` configuration option is useful to reduce the size of the registry file, especially if a large amount of new files are generated every day.
 
-This config option is also useful to prevent Filebeat problems resulting from inode reuse on Linux. For more information, see <<inode-reuse-issue>>. 
+This config option is also useful to prevent Filebeat problems resulting from inode reuse on Linux. For more information, see <<inode-reuse-issue>>.
 
 NOTE: Every time a file is renamed, the file state is updated and the counter for `clean_inactive` starts at 0 again.
 
 [[clean-removed]]
 ===== clean_removed
 
-When this option is enabled, Filebeat cleans files from the registry if they cannot be found on disk anymore. This setting does not apply to renamed files or files that were moved to another directory that is still visible to Filebeat. This option is enabled by default. 
+When this option is enabled, Filebeat cleans files from the registry if they cannot be found on disk anymore. This setting does not apply to renamed files or files that were moved to another directory that is still visible to Filebeat. This option is enabled by default.
 
 
 If a shared drive disappears for a short period and appears again, all files will be read again from the beginning because the states were removed from the registry file. In such cases, we recommend that you disable the `clean_removed` option.
@@ -398,7 +398,7 @@ experimental[]
 
 The `symlinks` option allows Filebeat to harvest symlinks in addition to regular files. When harvesting symlinks, Filebeat opens and reads the original file even though it reports the path of the symlink.
 
-When you configure a symlink for harvesting, make sure the original path is excluded. If a single prospector is configured to harvest both the symlink and the original file, the prospector will detect the problem and only process the first file it finds. However, if two different prospectors are configured (one to read the symlink and the other the original path), both paths will be harvested, causing Filebeat to send duplicate data and the prospectors to overwrite each other's state.  
+When you configure a symlink for harvesting, make sure the original path is excluded. If a single prospector is configured to harvest both the symlink and the original file, the prospector will detect the problem and only process the first file it finds. However, if two different prospectors are configured (one to read the symlink and the other the original path), both paths will be harvested, causing Filebeat to send duplicate data and the prospectors to overwrite each other's state.
 
 The `symlinks` option can be useful if symlinks to the log files have additional metadata in the file name, and you want to process the metadata in Logstash. This is, for example, the case for Kubernetes log files.
 
@@ -524,3 +524,27 @@ include::../../../../libbeat/docs/outputconfig.asciidoc[]
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
+
+
+===== shutdown_timeout
+
+`shutdown_timeout` defines how long filebeat waits on shutdown for the publisher to finish.
+
+In case the defined output is blocked and does not confirm all events, filebeat keeps resending the events
+before the confirmation is persisted to disk in the registrar. Waiting on the output to acknowledge all events
+can take seconds or much longer depending on the state of the output. To still be able to shutdown filebeat, filebeat
+does not wait for the confirmation of all events on shutdown. This means the state for events which were sent but
+not acked yet, will not be persisted to disk. This can lead to the issue that some events are sent again on starting
+filebeat afterwards as the events ended up at the receiving end but filebeat was already stopped when the acked arrived.
+
+With `shutdown_timeout` a timeout can be defined what the maximum time should be that filebeat waits for the complete
+sending of all events in the pipeline. Should all events be acked before `shutdown_timeout` is reached, filebeat will
+already shutdown. The right value for `shutdown_timeout` heavily depends on the environment in which filebeat is running
+and the current state of the output.
+
+By default this is disable and filebeat shuts down without waiting for the completion of sending events.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.shutdown_timeout: 5s
+-------------------------------------------------------------------------------------
