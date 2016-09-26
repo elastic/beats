@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Name          string // Name of the event log or channel.
 	RemoteAddress string // Remote computer to connect to. Optional.
+	BatchReadSize int    // The number of events to read in one batch.
 
 	API string // Name of the API to use. Optional.
 }

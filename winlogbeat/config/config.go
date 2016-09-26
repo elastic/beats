@@ -105,9 +105,10 @@ func (mc MetricsConfig) Validate() error {
 // EventLogConfig holds the configuration data that specifies which event logs
 // to monitor.
 type EventLogConfig struct {
-	Name        string
-	IgnoreOlder string `yaml:"ignore_older"`
-	API         string
+	Name          string
+	IgnoreOlder   string `yaml:"ignore_older"`
+	BatchReadSize int    `yaml:"batch_read_size"`
+	API           string
 }
 
 // Validate validates the EventLogConfig data and returns an error describing
