@@ -81,6 +81,15 @@ func (s Selector) IsEmpty() bool {
 	return s.sel == nilSelector || s.sel == nil
 }
 
+func (s Selector) IsConst() bool {
+	if s.sel == nilSelector {
+		return true
+	}
+
+	_, ok := s.sel.(*constSelector)
+	return ok
+}
+
 func BuildSelectorFromConfig(
 	cfg *common.Config,
 	settings Settings,

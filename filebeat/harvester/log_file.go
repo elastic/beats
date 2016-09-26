@@ -22,7 +22,6 @@ type LogFile struct {
 func NewLogFile(
 	fs source.FileSource,
 	config harvesterConfig,
-	done chan struct{},
 ) (*LogFile, error) {
 	var offset int64
 	if seeker, ok := fs.(io.Seeker); ok {
@@ -39,11 +38,15 @@ func NewLogFile(
 		config:       config,
 		lastTimeRead: time.Now(),
 		backoff:      config.Backoff,
-		done:         done,
+		done:         make(chan struct{}),
 	}, nil
 }
 
+// Read reads from the reader and updates the offset
+// The total number of bytes read is returned.
 func (r *LogFile) Read(buf []byte) (int, error) {
+
+	totalN := 0
 
 	for {
 		select {
@@ -57,40 +60,46 @@ func (r *LogFile) Read(buf []byte) (int, error) {
 			r.offset += int64(n)
 			r.lastTimeRead = time.Now()
 		}
+		totalN += n
 
-		// reset backoff
+		// Read from source completed without error
+		// Either end reached or buffer full
 		if err == nil {
+			// reset backoff for next read
 			r.backoff = r.config.Backoff
-			return n, nil
+			return totalN, nil
 		}
 
-		if err != io.EOF {
-			logp.Err("Unexpected state reading from %s; error: %s", r.fs.Name(), err)
-			return n, err
-		}
+		// Move buffer forward for next read
+		buf = buf[n:]
 
-		// Stdin is not continuable
-		if !r.fs.Continuable() {
-			logp.Debug("harvester", "Source is not continuable: %s", r.fs.Name())
-			return n, err
-		}
-
+		// Checks if an error happened or buffer is full
+		// If buffer is full, cannot continue reading.
+		// Can happen if n == bufferSize + io.EOF error
 		err = r.errorChecks(err)
-		if err != nil {
-			return n, err
+		if err != nil || len(buf) == 0 {
+			return totalN, err
 		}
 
 		logp.Debug("harvester", "End of file reached: %s; Backoff now.", r.fs.Name())
-		buf = buf[n:]
-		if len(buf) == 0 {
-			return n, nil
-		}
 		r.wait()
 	}
 }
 
 // errorChecks checks how the given error should be handled based on the config options
 func (r *LogFile) errorChecks(err error) error {
+
+	if err != io.EOF {
+		logp.Err("Unexpected state reading from %s; error: %s", r.fs.Name(), err)
+		return err
+	}
+
+	// Stdin is not continuable
+	if !r.fs.Continuable() {
+		logp.Debug("harvester", "Source is not continuable: %s", r.fs.Name())
+		return err
+	}
+
 	if err == io.EOF && r.config.CloseEOF {
 		return err
 	}
@@ -107,7 +116,7 @@ func (r *LogFile) errorChecks(err error) error {
 	// check if file was truncated
 	if info.Size() < r.offset {
 		logp.Debug("harvester",
-			"File was truncated as offset (%s) > size (%s): %s", r.offset, info.Size(), r.fs.Name())
+			"File was truncated as offset (%d) > size (%d): %s", r.offset, info.Size(), r.fs.Name())
 		return ErrFileTruncate
 	}
 
@@ -153,4 +162,9 @@ func (r *LogFile) wait() {
 			r.backoff = r.config.MaxBackoff
 		}
 	}
+}
+
+func (r *LogFile) Close() {
+	close(r.done)
+	// Note: File reader is not closed here because that leads to race conditions
 }

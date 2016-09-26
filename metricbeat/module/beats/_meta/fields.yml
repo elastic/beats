@@ -1,0 +1,12 @@
+- key: beats
+  title: "beats"
+  description: >
+    experimental[]
+
+    beats Module
+  short_config: false
+  fields:
+    - name: beats
+      type: group
+      description: >
+      fields:

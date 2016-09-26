@@ -72,8 +72,8 @@ func (self *FDUsage) Get() error {
 }
 
 func (self *ProcFDUsage) Get(pid int) error {
-	err := readFile(procFileNameNative(pid, "rlimit"), func(line string) bool {
-		if strings.HasPrefix(line, "nofile ") {
+	err := readFile("/proc/"+strconv.Itoa(pid)+"/rlimit", func(line string) bool {
+		if strings.HasPrefix(line, "nofile") {
 			fields := strings.Fields(line)
 			if len(fields) == 3 {
 				self.SoftLimit, _ = strconv.ParseUint(fields[1], 10, 64)
@@ -86,11 +86,14 @@ func (self *ProcFDUsage) Get(pid int) error {
 	if err != nil {
 		return err
 	}
+
+	// linprocfs only provides this information for this process (self).
 	fds, err := ioutil.ReadDir(procFileName(pid, "fd"))
 	if err != nil {
 		return err
 	}
 	self.Open = uint64(len(fds))
+
 	return nil
 }
 
@@ -102,8 +105,4 @@ func parseCpuStat(self *Cpu, line string) error {
 	self.Sys, _ = strtoull(fields[3])
 	self.Idle, _ = strtoull(fields[4])
 	return nil
-}
-
-func procFileNameNative(pid int, name string) string {
-	return "/proc/" + strconv.Itoa(pid) + "/" + name
 }

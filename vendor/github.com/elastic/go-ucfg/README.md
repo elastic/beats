@@ -11,7 +11,7 @@ Card](https://goreportcard.com/badge/github.com/elastic/go-ucfg)](https://gorepo
 
 ## API Documentation
 
-The full API Documentat can be found [here](https://godoc.org/github.com/elastic/go-ucfg).
+The full API Documentation can be found [here](https://godoc.org/github.com/elastic/go-ucfg).
 
 ## Examples
 
@@ -81,4 +81,4 @@ The above uses `Counter` as the config variable. ucfg assures that the value is 
 
 ucfg has the following requirements:
 
-* Golang 1.6
+* Golang 1.5+

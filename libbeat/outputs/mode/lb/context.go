@@ -3,8 +3,8 @@ package lb
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
@@ -34,8 +34,8 @@ type eventsMessage struct {
 	worker       int
 	attemptsLeft int
 	signaler     op.Signaler
-	events       []common.MapStr
-	event        common.MapStr
+	data         []outputs.Data
+	datum        outputs.Data
 }
 
 func makeContext(nClients, maxAttempts int, timeout time.Duration) context {

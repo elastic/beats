@@ -49,8 +49,8 @@ func TestTopologyInRedisTLS(t *testing.T) {
 		"db_topology":   db,
 		"timeout":       "5s",
 
-		"tls.insecure": false,
-		"tls.certificate_authorities": []string{
+		"ssl.verification_mode": "full",
+		"ssl.certificate_authorities": []string{
 			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
 		},
 	}
@@ -139,8 +139,8 @@ func TestPublishListTLS(t *testing.T) {
 		"datatype": "list",
 		"timeout":  "5s",
 
-		"tls.insecure": false,
-		"tls.certificate_authorities": []string{
+		"ssl.verification_mode": "full",
+		"ssl.certificate_authorities": []string{
 			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
 		},
 	}
@@ -210,8 +210,8 @@ func TestPublishChannelTLS(t *testing.T) {
 		"datatype": "channel",
 		"timeout":  "5s",
 
-		"tls.insecure": false,
-		"tls.certificate_authorities": []string{
+		"ssl.verification_mode": "full",
+		"ssl.certificate_authorities": []string{
 			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
 		},
 	}
@@ -337,9 +337,9 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) *redisOut {
 func sendTestEvents(out *redisOut, batches, N int) error {
 	i := 1
 	for b := 0; b < batches; b++ {
-		batch := make([]common.MapStr, N)
+		batch := make([]outputs.Data, N)
 		for n := range batch {
-			batch[n] = common.MapStr{"message": i}
+			batch[n] = outputs.Data{Event: common.MapStr{"message": i}}
 			i++
 		}
 

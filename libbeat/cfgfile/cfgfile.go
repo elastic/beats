@@ -14,7 +14,7 @@ var (
 	// The default config cannot include the beat name as it is not initialized
 	// when this variable is created. See ChangeDefaultCfgfileFlag which should
 	// be called prior to flags.Parse().
-	configfiles = flagArgList("c", "beat.yml", "Configuration file `path`")
+	configfiles = flagArgList("c", "beat.yml", "Configuration file, relative to path.config")
 	overwrites  = common.NewFlagConfig(nil, nil, "E", "Configuration overwrite")
 	testConfig  = flag.Bool("configtest", false, "Test configuration and exit.")
 
@@ -29,7 +29,8 @@ var (
 	})
 
 	// home-path CLI flag (initialized in init)
-	homePath *string
+	homePath   *string
+	configPath *string
 )
 
 func init() {
@@ -39,7 +40,7 @@ func init() {
 	}
 
 	homePath = makePathFlag("path.home", "Home path")
-	makePathFlag("path.config", "Configuration path")
+	configPath = makePathFlag("path.config", "Configuration path")
 	makePathFlag("path.data", "Data path")
 	makePathFlag("path.logs", "Logs path")
 }
@@ -55,15 +56,7 @@ func mustNewConfigFrom(from interface{}) *common.Config {
 // ChangeDefaultCfgfileFlag replaces the value and default value for the `-c`
 // flag so that it reflects the beat name.
 func ChangeDefaultCfgfileFlag(beatName string) error {
-	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		return fmt.Errorf("Failed to set default config file location because "+
-			"the absolute path to %s could not be obtained. %v",
-			os.Args[0], err)
-	}
-
-	path = filepath.Join(path, beatName+".yml")
-	configfiles.SetDefault(path)
+	configfiles.SetDefault(beatName + ".yml")
 	return nil
 }
 
@@ -105,9 +98,27 @@ func Load(path string) (*common.Config, error) {
 	var config *common.Config
 	var err error
 
+	cfgpath := ""
+	if *configPath != "" {
+		cfgpath = *configPath
+	} else if *homePath != "" {
+		cfgpath = *homePath
+	}
+
 	if path == "" {
-		config, err = common.LoadFiles(configfiles.list...)
+		list := []string{}
+		for _, cfg := range configfiles.list {
+			if !filepath.IsAbs(cfg) {
+				list = append(list, filepath.Join(cfgpath, cfg))
+			} else {
+				list = append(list, cfg)
+			}
+		}
+		config, err = common.LoadFiles(list...)
 	} else {
+		if !filepath.IsAbs(path) {
+			path = filepath.Join(cfgpath, path)
+		}
 		config, err = common.LoadFile(path)
 	}
 	if err != nil {

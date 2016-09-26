@@ -145,6 +145,12 @@ func TestContainsCondition(t *testing.T) {
 				"proc.name": "secddd",
 			}},
 		},
+
+		ConditionConfig{
+			Contains: &ConditionFields{fields: map[string]interface{}{
+				"proc.keywords": "bar",
+			}},
+		},
 	}
 
 	conds := GetConditions(t, configs)
@@ -165,12 +171,14 @@ func TestContainsCondition(t *testing.T) {
 			"ppid":     1,
 			"state":    "running",
 			"username": "monica",
+			"keywords": []string{"foo", "bar"},
 		},
 		"type": "process",
 	}
 
 	assert.True(t, conds[0].Check(event))
 	assert.False(t, conds[1].Check(event))
+	assert.True(t, conds[2].Check(event))
 }
 
 func TestRegexpCondition(t *testing.T) {

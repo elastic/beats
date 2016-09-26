@@ -3,6 +3,7 @@ package kafka
 import (
 	"encoding/json"
 	"expvar"
+	"fmt"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -10,14 +11,17 @@ import (
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
 type client struct {
-	hosts   []string
-	topic   string
-	useType bool
-	config  sarama.Config
+	hosts  []string
+	topic  outil.Selector
+	key    *fmtstr.EventFormatString
+	config sarama.Config
 
 	producer sarama.AsyncProducer
 
@@ -26,8 +30,8 @@ type client struct {
 
 type msgRef struct {
 	count int32
-	batch []common.MapStr
-	cb    func([]common.MapStr, error)
+	batch []outputs.Data
+	cb    func([]outputs.Data, error)
 
 	err error
 }
@@ -38,12 +42,17 @@ var (
 	publishEventsCallCount = expvar.NewInt("libbeat.kafka.call_count.PublishEvents")
 )
 
-func newKafkaClient(hosts []string, topic string, useType bool, cfg *sarama.Config) (*client, error) {
+func newKafkaClient(
+	hosts []string,
+	key *fmtstr.EventFormatString,
+	topic outil.Selector,
+	cfg *sarama.Config,
+) (*client, error) {
 	c := &client{
-		hosts:   hosts,
-		useType: useType,
-		topic:   topic,
-		config:  *cfg,
+		hosts:  hosts,
+		topic:  topic,
+		key:    key,
+		config: *cfg,
 	}
 	return c, nil
 }
@@ -80,59 +89,96 @@ func (c *client) Close() error {
 
 func (c *client) AsyncPublishEvent(
 	cb func(error),
-	event common.MapStr,
+	data outputs.Data,
 ) error {
-	return c.AsyncPublishEvents(func(_ []common.MapStr, err error) {
+	return c.AsyncPublishEvents(func(_ []outputs.Data, err error) {
 		cb(err)
-	}, []common.MapStr{event})
+	}, []outputs.Data{data})
 }
 
 func (c *client) AsyncPublishEvents(
-	cb func([]common.MapStr, error),
-	events []common.MapStr,
+	cb func([]outputs.Data, error),
+	data []outputs.Data,
 ) error {
 	publishEventsCallCount.Add(1)
 	debugf("publish events")
 
 	ref := &msgRef{
-		count: int32(len(events)),
-		batch: events,
+		count: int32(len(data)),
+		batch: data,
 		cb:    cb,
 	}
 
 	ch := c.producer.Input()
 
-	for _, event := range events {
-		topic := c.topic
-		if c.useType {
-			topic = event["type"].(string)
-		}
+	for i := range data {
+		d := &data[i]
 
-		jsonEvent, err := json.Marshal(event)
+		msg, err := c.getEventMessage(d)
 		if err != nil {
+			logp.Err("Dropping event: %v", err)
 			ref.done()
 			continue
 		}
+		msg.ref = ref
 
-		msg := &sarama.ProducerMessage{
-			Metadata: ref,
-			Topic:    topic,
-			Value:    sarama.ByteEncoder(jsonEvent),
-		}
-
-		ch <- msg
+		msg.initProducerMessage()
+		ch <- &msg.msg
 	}
 
 	return nil
+}
+
+func (c *client) getEventMessage(data *outputs.Data) (*message, error) {
+	event := data.Event
+	msg := messageFromData(data)
+	if msg.topic != "" {
+		return msg, nil
+	}
+
+	msg.event = event
+
+	topic, err := c.topic.Select(event)
+	if err != nil {
+		return nil, fmt.Errorf("setting kafka topic failed with %v", err)
+	}
+	msg.topic = topic
+
+	jsonEvent, err := json.Marshal(event)
+	if err != nil {
+		return nil, fmt.Errorf("json encoding failed with %v", err)
+	}
+	msg.value = jsonEvent
+
+	// message timestamps have been added to kafka with version 0.10.0.0
+	var ts time.Time
+	if c.config.Version.IsAtLeast(sarama.V0_10_0_0) {
+		if tsRaw, ok := event["@timestamp"]; ok {
+			if tmp, ok := tsRaw.(common.Time); ok {
+				ts = time.Time(tmp)
+			} else if tmp, ok := tsRaw.(time.Time); ok {
+				ts = tmp
+			}
+		}
+	}
+	msg.ts = ts
+
+	if c.key != nil {
+		if key, err := c.key.RunBytes(event); err == nil {
+			msg.key = key
+		}
+	}
+
+	return msg, nil
 }
 
 func (c *client) successWorker(ch <-chan *sarama.ProducerMessage) {
 	defer c.wg.Done()
 	defer debugf("Stop kafka ack worker")
 
-	for msg := range ch {
-		ref := msg.Metadata.(*msgRef)
-		ref.done()
+	for libMsg := range ch {
+		msg := libMsg.Metadata.(*message)
+		msg.ref.done()
 	}
 }
 
@@ -141,9 +187,8 @@ func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 	defer debugf("Stop kafka error handler")
 
 	for errMsg := range ch {
-		msg := errMsg.Msg
-		ref := msg.Metadata.(*msgRef)
-		ref.fail(errMsg.Err)
+		msg := errMsg.Msg.Metadata.(*message)
+		msg.ref.fail(errMsg.Err)
 	}
 }
 

@@ -8,10 +8,10 @@
  - DNS
  - HTTP
  - AMQP 0.9.1
+ - Cassandra
  - Mysql
  - PostgreSQL
  - Redis
  - Thrift-RPC
  - MongoDB
  - Memcache
- 

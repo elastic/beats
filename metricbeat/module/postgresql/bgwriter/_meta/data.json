@@ -1,0 +1,39 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "postgresql",
+        "name": "bgwriter",
+        "rtt": 115
+    },
+    "postgresql": {
+        "bgwriter": {
+            "buffers": {
+                "allocated": 191,
+                "backend": 0,
+                "backend_fsync": 0,
+                "checkpoints": 0,
+                "clean": 0,
+                "clean_full": 0
+            },
+            "checkpoints": {
+                "requested": 0,
+                "scheduled": 7,
+                "times": {
+                    "sync": {
+                        "ms": 0
+                    },
+                    "write": {
+                        "ms": 0
+                    }
+                }
+            },
+            "stats_reset": "2016-09-05T18:49:53.575Z"
+        }
+    },
+    "type": "metricsets"
+}

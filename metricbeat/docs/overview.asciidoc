@@ -10,6 +10,8 @@ Metricbeat helps you monitor your servers by collecting metrics from the system
 and the following services:
 
   * <<metricbeat-module-apache,Apache>>
+  * <<metricbeat-module-haproxy,HAProxy>>
+  * <<metricbeat-module-mongodb,MongoDB>>
   * <<metricbeat-module-mysql,MySQL>>
   * <<metricbeat-module-nginx,Nginx>>
   * <<metricbeat-module-redis,Redis>>

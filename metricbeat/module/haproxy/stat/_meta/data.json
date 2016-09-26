@@ -1,0 +1,61 @@
+{
+    "@timestamp": "2016-08-13T19:44:21.036Z",
+    "beat": {
+        "hostname": "beathost",
+        "name": "beathost"
+    },
+    "haproxy": {
+        "stat": {
+            "act": 1,
+            "bck": 0,
+            "bin": 0,
+            "bout": 0,
+            "check_duration": 0,
+            "check_status": "L4CON",
+            "chkdown": 1,
+            "chkfail": 1,
+            "cli_abrt": 0,
+            "ctime": 0,
+            "downtime": 13700,
+            "dresp": 0,
+            "econ": 0,
+            "eresp": 0,
+            "hanafail": 0,
+            "hrsp_1xx": 0,
+            "hrsp_2xx": 0,
+            "hrsp_3xx": 0,
+            "hrsp_4xx": 0,
+            "hrsp_5xx": 0,
+            "hrsp_other": 0,
+            "iid": 3,
+            "last_chk": "Connection refused",
+            "lastchg": 13700,
+            "lastsess": -1,
+            "lbtot": 0,
+            "pid": 1,
+            "qcur": 0,
+            "qmax": 0,
+            "qtime": 0,
+            "rate": 0,
+            "rate_max": 0,
+            "rtime": 0,
+            "scur": 0,
+            "sid": 1,
+            "smax": 0,
+            "srv_abrt": 0,
+            "status": "DOWN",
+            "stot": 0,
+            "svname": "log1",
+            "ttime": 0,
+            "weight": 1,
+            "wredis": 0,
+            "wretr": 0
+        }
+    },
+    "metricset": {
+        "module": "haproxy",
+        "name": "stat",
+        "rtt": 2118
+    },
+    "type": "metricsets"
+}

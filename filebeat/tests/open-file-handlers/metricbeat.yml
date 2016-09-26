@@ -1,0 +1,37 @@
+metricbeat.modules:
+- module: system
+  metricsets:
+    - cpu
+    - load
+    - core
+    - diskio
+    - filesystem
+    - fsstat
+    - memory
+    - network
+    - process
+  enabled: true
+  period: 10s
+  processes: ['.*']
+
+- module: beats
+  metricsets: ["filebeat"]
+  enabled: true
+  period: 5s
+  hosts: ["localhost:6060"]
+
+
+output.elasticsearch:
+  enabled: true
+  hosts: ["${ES_HOST}"]
+  username: "${ES_USER}"
+  password: "${ES_PASSWORD}"
+  template.enabled: true
+  #template.overwrite: true
+output.file:
+  enabled: false
+  path: "/tmp/metricbeat"
+
+logging.to_files: true
+logging.files:
+  path: /var/log/metricbeat

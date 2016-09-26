@@ -189,7 +189,7 @@ func (self *FileSystemUsage) Get(path string) error {
 }
 
 func (self *FDUsage) Get() error {
-	return &ErrNotImplemented{runtime.GOOS}
+	return ErrNotImplemented{runtime.GOOS}
 }
 
 func (self *LoadAverage) Get() error {
@@ -374,7 +374,7 @@ func (self *ProcExe) Get(pid int) error {
 }
 
 func (self *ProcFDUsage) Get(pid int) error {
-	return &ErrNotImplemented{runtime.GOOS}
+	return ErrNotImplemented{runtime.GOOS}
 }
 
 func fillCpu(cpu *Cpu, load [C.CPUSTATES]C.long) {

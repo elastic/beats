@@ -206,6 +206,7 @@ func (b *Beat) launch(bt Creator) error {
 
 	logp.Info("%s start running.", b.Name)
 	defer logp.Info("%s stopped.", b.Name)
+	defer logp.LogTotalExpvars(&b.Config.Logging)
 
 	return beater.Run(b)
 }
@@ -287,4 +288,9 @@ func handleError(err error) error {
 	logp.Critical("Exiting: %v", err)
 	fmt.Fprintf(os.Stderr, "Exiting: %v\n", err)
 	return err
+}
+
+// GetDefaultVersion returns the current libbeat version.
+func GetDefaultVersion() string {
+	return defaultBeatVersion
 }

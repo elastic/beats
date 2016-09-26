@@ -3,13 +3,13 @@
 
 elasticsearch:
   build: docker/elasticsearch
-  dockerfile: Dockerfile-2.3.0
+  dockerfile: Dockerfile-2.4.0
   command: elasticsearch -Des.network.host=0.0.0.0
 
 logstash:
   build: docker/logstash
-  dockerfile: Dockerfile-2.3.0
+  dockerfile: Dockerfile-2.4.0
 
 kibana:
   build: docker/kibana/
-  dockerfile: Dockerfile-4.5.0
+  dockerfile: Dockerfile-4.6.0

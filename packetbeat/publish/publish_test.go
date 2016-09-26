@@ -63,7 +63,7 @@ func TestFilterEvent(t *testing.T) {
 
 func TestDirectionOut(t *testing.T) {
 	publisher := newTestPublisher([]string{"192.145.2.4"})
-	ppub, _ := NewPublisher(publisher, 1000, 1)
+	ppub, _ := NewPublisher(publisher, 1000, 1, false)
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
@@ -89,7 +89,7 @@ func TestDirectionOut(t *testing.T) {
 
 func TestDirectionIn(t *testing.T) {
 	publisher := newTestPublisher([]string{"192.145.2.5"})
-	ppub, _ := NewPublisher(publisher, 1000, 1)
+	ppub, _ := NewPublisher(publisher, 1000, 1, false)
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
@@ -121,7 +121,7 @@ func newTestPublisher(ips []string) *publisher.BeatPublisher {
 
 func TestNoDirection(t *testing.T) {
 	publisher := newTestPublisher([]string{"192.145.2.6"})
-	ppub, _ := NewPublisher(publisher, 1000, 1)
+	ppub, _ := NewPublisher(publisher, 1000, 1, false)
 
 	event := common.MapStr{
 		"src": &common.Endpoint{

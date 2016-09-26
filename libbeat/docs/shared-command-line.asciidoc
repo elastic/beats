@@ -9,6 +9,14 @@
 //// include::../../libbeat/docs/shared-command-line.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
+*`-E <setting>=<value>`*::
+Overwrite an individual setting in the config file. For example:
++
+["source","sh"]
+----------------------------------------------------------------------
+sudo ./packetbeat -c packetbeat.yml -E name=mybeat
+----------------------------------------------------------------------
+
 *`-N`*::
 Disable the publishing of events to the defined output. This option is useful only
 for testing the Beat.

@@ -9,8 +9,8 @@
 
 #============================== Network device ================================
 
-# Select the network interface to sniff the data. You can use the "any"
-# keyword to sniff on all connected interfaces.
+# Select the network interface to sniff the data. On Linux, you can use the
+# "any" keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: any
 
 #================================== Flows =====================================
@@ -34,6 +34,10 @@ packetbeat.protocols.amqp:
   # Configure the ports where to listen for AMQP traffic. You can disable
   # the AMQP protocol by commenting out the list of ports.
   ports: [5672]
+
+packetbeat.protocols.cassandra:
+  #Cassandra port for traffic monitoring.
+  ports: [9042]
 
 packetbeat.protocols.dns:
   # Configure the ports where to listen for DNS traffic. You can disable

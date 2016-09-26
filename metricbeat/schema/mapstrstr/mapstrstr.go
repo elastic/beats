@@ -43,7 +43,9 @@ package mapstrstr
 import (
 	"fmt"
 	"strconv"
+	"time"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/schema"
 )
 
@@ -113,6 +115,28 @@ func Int(key string, opts ...schema.SchemaOption) schema.Conv {
 // toStr converts value to str. In case of error, returns ""
 func toStr(key string, data map[string]interface{}) (interface{}, error) {
 	return getString(key, data)
+}
+
+// Time creates a schema.Conv object for parsing timestamps. Unlike the
+// other functions, Time receives a `layout` parameter which defines the
+// time.Time layout to use for parsing.
+func Time(layout, key string, opts ...schema.SchemaOption) schema.Conv {
+	return schema.SetOptions(schema.Conv{
+		Key: key,
+		Func: func(key string, data map[string]interface{}) (interface{}, error) {
+			str, err := getString(key, data)
+			if err != nil {
+				return false, err
+			}
+
+			value, err := time.Parse(layout, str)
+			if err != nil {
+				return 0, fmt.Errorf("Error converting param to time.Time: %s. Original: %s", key, str)
+			}
+
+			return common.Time(value), nil
+		},
+	}, opts)
 }
 
 // Str creates a schema.Conv object for parsing strings

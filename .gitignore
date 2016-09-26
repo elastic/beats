@@ -3,6 +3,7 @@
 /.idea
 /build
 /*/data
+/*/logs
 
 # Files
 .DS_Store

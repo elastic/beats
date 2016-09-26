@@ -14,10 +14,14 @@ grouped in the following categories:
 
 * <<exported-fields-apache>>
 * <<exported-fields-beat>>
+* <<exported-fields-beats>>
 * <<exported-fields-common>>
+* <<exported-fields-docker>>
+* <<exported-fields-haproxy>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
+* <<exported-fields-postgresql>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
 * <<exported-fields-zookeeper>>
@@ -55,7 +59,7 @@ Apache hostname.
 [float]
 === apache.status.total_accesses
 
-type: integer
+type: long
 
 Total number of access requests.
 
@@ -63,7 +67,7 @@ Total number of access requests.
 [float]
 === apache.status.total_kbytes
 
-type: integer
+type: long
 
 Total number of kilobytes served.
 
@@ -71,7 +75,7 @@ Total number of kilobytes served.
 [float]
 === apache.status.requests_per_sec
 
-type: half_float
+type: scaled_float
 
 Requests per second.
 
@@ -79,7 +83,7 @@ Requests per second.
 [float]
 === apache.status.bytes_per_sec
 
-type: float
+type: scaled_float
 
 Bytes per second.
 
@@ -87,7 +91,7 @@ Bytes per second.
 [float]
 === apache.status.bytes_per_request
 
-type: half_float
+type: scaled_float
 
 Bytes per request.
 
@@ -95,7 +99,7 @@ Bytes per request.
 [float]
 === apache.status.workers.busy
 
-type: integer
+type: long
 
 Number of busy workers.
 
@@ -103,7 +107,7 @@ Number of busy workers.
 [float]
 === apache.status.workers.idle
 
-type: integer
+type: long
 
 Number of idle workers.
 
@@ -118,7 +122,7 @@ Uptime stats.
 [float]
 === apache.status.uptime.server_uptime
 
-type: integer
+type: long
 
 Server uptime in seconds.
 
@@ -126,7 +130,7 @@ Server uptime in seconds.
 [float]
 === apache.status.uptime.uptime
 
-type: integer
+type: long
 
 Server uptime.
 
@@ -141,7 +145,7 @@ CPU stats.
 [float]
 === apache.status.cpu.load
 
-type: half_float
+type: scaled_float
 
 CPU Load.
 
@@ -149,7 +153,7 @@ CPU Load.
 [float]
 === apache.status.cpu.user
 
-type: half_float
+type: scaled_float
 
 CPU user load.
 
@@ -157,7 +161,7 @@ CPU user load.
 [float]
 === apache.status.cpu.system
 
-type: half_float
+type: scaled_float
 
 System cpu.
 
@@ -165,7 +169,7 @@ System cpu.
 [float]
 === apache.status.cpu.children_user
 
-type: half_float
+type: scaled_float
 
 CPU of children user.
 
@@ -173,7 +177,7 @@ CPU of children user.
 [float]
 === apache.status.cpu.children_system
 
-type: half_float
+type: scaled_float
 
 CPU of children system.
 
@@ -188,7 +192,7 @@ Connection stats.
 [float]
 === apache.status.connections.total
 
-type: integer
+type: long
 
 Total connections.
 
@@ -196,7 +200,7 @@ Total connections.
 [float]
 === apache.status.connections.async.writing
 
-type: integer
+type: long
 
 Async connection writing.
 
@@ -204,7 +208,7 @@ Async connection writing.
 [float]
 === apache.status.connections.async.keep_alive
 
-type: integer
+type: long
 
 Async keeped alive connections.
 
@@ -212,7 +216,7 @@ Async keeped alive connections.
 [float]
 === apache.status.connections.async.closing
 
-type: integer
+type: long
 
 Async closed connections.
 
@@ -227,7 +231,7 @@ Load averages.
 [float]
 === apache.status.load.1
 
-type: half_float
+type: scaled_float
 
 Load average for the last minute.
 
@@ -235,7 +239,7 @@ Load average for the last minute.
 [float]
 === apache.status.load.5
 
-type: half_float
+type: scaled_float
 
 Load average for the last 5 minutes.
 
@@ -243,7 +247,7 @@ Load average for the last 5 minutes.
 [float]
 === apache.status.load.15
 
-type: half_float
+type: scaled_float
 
 Load average for the last 15 minutes.
 
@@ -258,7 +262,7 @@ Scoreboard metrics.
 [float]
 === apache.status.scoreboard.starting_up
 
-type: integer
+type: long
 
 Starting up.
 
@@ -266,7 +270,7 @@ Starting up.
 [float]
 === apache.status.scoreboard.reading_request
 
-type: integer
+type: long
 
 Reading requests.
 
@@ -274,7 +278,7 @@ Reading requests.
 [float]
 === apache.status.scoreboard.sending_reply
 
-type: integer
+type: long
 
 Sending Reply.
 
@@ -282,7 +286,7 @@ Sending Reply.
 [float]
 === apache.status.scoreboard.keepalive
 
-type: integer
+type: long
 
 Keep alive.
 
@@ -290,7 +294,7 @@ Keep alive.
 [float]
 === apache.status.scoreboard.dns_lookup
 
-type: integer
+type: long
 
 Dns Lookups.
 
@@ -298,7 +302,7 @@ Dns Lookups.
 [float]
 === apache.status.scoreboard.closing_connection
 
-type: integer
+type: long
 
 Closing connections.
 
@@ -306,7 +310,7 @@ Closing connections.
 [float]
 === apache.status.scoreboard.logging
 
-type: integer
+type: long
 
 Logging
 
@@ -314,7 +318,7 @@ Logging
 [float]
 === apache.status.scoreboard.gracefully_finishing
 
-type: integer
+type: long
 
 Gracefully finishing.
 
@@ -322,7 +326,7 @@ Gracefully finishing.
 [float]
 === apache.status.scoreboard.idle_cleanup
 
-type: integer
+type: long
 
 Idle cleanups.
 
@@ -330,7 +334,7 @@ Idle cleanups.
 [float]
 === apache.status.scoreboard.open_slot
 
-type: integer
+type: long
 
 Open slots.
 
@@ -338,7 +342,7 @@ Open slots.
 [float]
 === apache.status.scoreboard.waiting_for_connection
 
-type: integer
+type: long
 
 Waiting for connections.
 
@@ -346,7 +350,7 @@ Waiting for connections.
 [float]
 === apache.status.scoreboard.total
 
-type: integer
+type: long
 
 Total.
 
@@ -361,7 +365,7 @@ Contains common beat fields available in all event types.
 [float]
 === beat.name
 
-The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
 
 
 [float]
@@ -375,9 +379,9 @@ The hostname as returned by the operating system on which the Beat is running.
 
 type: date
 
-example: 2015-01-24 14:06:05.071000
+example: August 26th 2016, 12:35:53.332
 
-format: YYYY-MM-DDTHH:MM:SS.milliZ
+format: date
 
 required: True
 
@@ -396,6 +400,261 @@ Arbitrary tags that can be set per Beat and per transaction type.
 type: dict
 
 Contains user configurable fields.
+
+
+[[exported-fields-beats]]
+== beats Fields
+
+experimental[]
+beats Module
+
+
+
+[float]
+== beats Fields
+
+
+
+
+[float]
+== filebeat Fields
+
+experimental[]
+filebeat metrics
+
+
+
+[float]
+== harvesters Fields
+
+Harvester metrics for all harvesters combined.
+
+
+
+[float]
+=== beats.filebeat.harvesters.started
+
+type: long
+
+Total number of started harvesters.
+
+
+[float]
+=== beats.filebeat.harvesters.closed
+
+type: long
+
+Total number of closed harvesters.
+
+
+[float]
+=== beats.filebeat.harvesters.running
+
+type: long
+
+Number of currently running harvesters.
+
+
+[float]
+=== beats.filebeat.harvesters.skipped
+
+type: long
+
+Total number of harvesters starts that were skipped because of harvester_limit reached.
+
+
+[float]
+== files Fields
+
+File handling related statistics.
+
+
+
+[float]
+=== beats.filebeat.harvesters.files.open
+
+type: long
+
+Currently open files.
+
+
+[float]
+=== beats.filebeat.harvesters.files.truncated
+
+type: long
+
+Number of files which were detected by the harvester as truncated and reading started from scratch.
+
+
+[float]
+== prospectors Fields
+
+Prospector metrics for all prospectors combined.
+
+
+
+[float]
+== log_files Fields
+
+Log files related stastics.
+
+
+
+[float]
+=== beats.filebeat.prospectors.log_files.renamed
+
+type: long
+
+Total number of files for which renaming was detected.
+
+
+[float]
+=== beats.filebeat.prospectors.log_files.truncated
+
+type: long
+
+Number of files which were detected by the prospector as truncated and reading started from scratch.
+
+
+[float]
+== registrar Fields
+
+Registrar statistics
+
+
+
+[float]
+== states Fields
+
+Registrar states metrics.
+
+
+
+[float]
+=== beats.filebeat.registrar.states.update
+
+type: long
+
+Total number of states which were updated or added.
+
+
+[float]
+=== beats.filebeat.registrar.states.cleanup
+
+type: long
+
+Total number of states which were cleaned up (removed).
+
+
+[float]
+=== beats.filebeat.registrar.states.current
+
+type: long
+
+The current number of states in the registry file.
+
+
+[float]
+=== beats.filebeat.registrar.writes
+
+type: long
+
+Total number of times the registry file was written to disk.
+
+
+[float]
+== libbeat Fields
+
+experimental[]
+libbeat metrics. This metricset can be used with all beats.
+
+
+
+[float]
+== output Fields
+
+Output related metrics
+
+
+
+[float]
+== elasticsearch Fields
+
+Elasticsearch specific metrics
+
+
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.events.ack
+
+type: long
+
+Number of acknowledged events by elasticsearch
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.events.not_ack
+
+type: long
+
+Number of not acknowledged events by elasticsearch
+
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.read.bytes
+
+type: long
+
+Number of bytes read by the output
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.read.errors
+
+type: long
+
+Number of read errors
+
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.write.bytes
+
+type: long
+
+Number of bytes written by the output
+
+
+[float]
+=== beats.libbeat.output.elasticsearch.write.errors
+
+type: long
+
+Number of write errors
+
+
+[float]
+== publisher Fields
+
+General publisher metrics
+
+
+
+[float]
+== events Fields
+
+Log files related stastics.
+
+
+
+[float]
+=== beats.libbeat.publisher.events.published
+
+type: long
+
+Total number of events published
 
 
 [[exported-fields-common]]
@@ -441,6 +700,1083 @@ example: metricsets
 required: True
 
 The document type. Always set to "metricsets".
+
+
+[[exported-fields-docker]]
+== docker Fields
+
+experimental[]
+Docker stats collected from Docker.
+
+
+
+[float]
+== docker Fields
+
+docker contains different informations and statistics of docker's containers running
+
+
+
+[float]
+== container Fields
+
+container
+
+
+
+[float]
+=== docker.container.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== cpu Fields
+
+Runtime cpu metrics
+
+
+
+[float]
+== cpu Fields
+
+CPU statistics of the running container
+
+
+
+[float]
+=== docker.cpu.cpu.usage_in_user_mode
+
+type: float
+
+The system user mode consumed by The Docker server.
+
+
+[float]
+== diskio Fields
+
+diskio
+
+
+
+[float]
+=== docker.diskio.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== memory Fields
+
+memory
+
+
+
+[float]
+=== docker.memory.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== network Fields
+
+network
+
+
+
+[float]
+=== docker.network.example
+
+type: keyword
+
+Example field
+
+
+[[exported-fields-haproxy]]
+== haproxy Fields
+
+experimental[]
+haproxy Module
+
+
+
+[float]
+== haproxy Fields
+
+HAProx metrics.
+
+
+
+[float]
+== info Fields
+
+General infomration collected on HAProxy process
+
+
+
+[float]
+=== haproxy.info.nb_proc
+
+type: integer
+
+Number of processes
+
+
+[float]
+=== haproxy.info.process_num
+
+type: integer
+
+Process number
+
+
+[float]
+=== haproxy.info.pid
+
+type: integer
+
+Process ID
+
+
+[float]
+=== haproxy.info.uptime_sec
+
+type: integer
+
+Current uptime in seconds
+
+
+[float]
+=== haproxy.info.mem_max_bytes
+
+type: integer
+
+format: bytes
+
+Max number of memory usage in bytes (The 'Memmax_MB' value converted to bytes)
+
+
+[float]
+=== haproxy.info.ulimit_n
+
+type: integer
+
+Max number of open files for process
+
+
+[float]
+== compress Fields
+
+
+
+
+[float]
+== bps Fields
+
+
+
+
+[float]
+=== haproxy.info.compress.bps.in
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.compress.bps.out
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.compress.bps.rate_limit
+
+type: integer
+
+
+
+[float]
+== conn Fields
+
+
+
+
+[float]
+== rate Fields
+
+
+
+
+[float]
+=== haproxy.info.conn.rate.value
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.conn.rate.limit
+
+type: integer
+
+
+
+[float]
+== curr Fields
+
+
+
+
+[float]
+=== haproxy.info.curr.conns
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.curr.ssl_conns
+
+type: integer
+
+
+
+[float]
+== cum Fields
+
+
+
+
+[float]
+=== haproxy.info.cum.conns
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.cum.req
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.cum.ssl_conns
+
+type: integer
+
+
+
+[float]
+== max Fields
+
+Maximum values reported by HAProxy.
+
+
+[float]
+=== haproxy.info.max.hard_conn
+
+type: integer
+
+HardMaxconn
+
+[float]
+=== haproxy.info.max.ssl.conns
+
+type: integer
+
+MaxSslConns
+
+[float]
+=== haproxy.info.max.ssl.rate
+
+type: integer
+
+MaxSslRate
+
+[float]
+=== haproxy.info.max.sock
+
+type: integer
+
+Maxsock
+
+[float]
+=== haproxy.info.max.conn.value
+
+type: integer
+
+Maxconn
+
+[float]
+=== haproxy.info.max.conn.rate
+
+type: integer
+
+MaxConnRate
+
+[float]
+=== haproxy.info.max.sess_rate
+
+type: integer
+
+MaxSessRate
+
+[float]
+=== haproxy.info.max.pipes
+
+type: integer
+
+Maxpipes
+
+[float]
+=== haproxy.info.max.zlib_mem_usage
+
+type: integer
+
+MaxZlibMemUsage
+
+[float]
+== pipes Fields
+
+
+
+
+[float]
+=== haproxy.info.pipes.used
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.pipes.free
+
+type: integer
+
+
+
+[float]
+== sess Fields
+
+
+
+
+[float]
+== rate Fields
+
+
+
+
+[float]
+=== haproxy.info.sess.rate.value
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.sess.rate.limit
+
+type: integer
+
+
+
+[float]
+== ssl Fields
+
+
+
+
+[float]
+== rate Fields
+
+
+
+
+[float]
+=== haproxy.info.ssl.rate.value
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.ssl.rate.limit
+
+type: integer
+
+
+
+[float]
+== frontend Fields
+
+
+
+
+[float]
+=== haproxy.info.ssl.frontend.key_rate
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.ssl.frontend.max_key_rate
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.ssl.frontend.session_reuse_pct
+
+type: integer
+
+
+
+[float]
+== backend Fields
+
+
+
+
+[float]
+=== haproxy.info.ssl.backend.key_rate
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.ssl.backend.max_key_rate
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.ssl.cached_lookups
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.ssl.cache_misses
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.zlib_mem_usage
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.tasks
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.run_queue
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.idle_pct
+
+type: scaled_float
+
+format: percent
+
+
+
+[float]
+== stat Fields
+
+Stats collected from HAProxy process
+
+
+
+[float]
+=== haproxy.stat.pxname
+
+type: keyword
+
+proxy name
+
+
+[float]
+=== haproxy.stat.svname
+
+type: keyword
+
+service name (FRONTEND for frontend, BACKEND for backend, any name for server/listener)
+
+
+[float]
+=== haproxy.stat.qcur
+
+type: integer
+
+current queued requests. For the backend this reports the number queued without a server assigned
+
+
+[float]
+=== haproxy.stat.qmax
+
+type: integer
+
+max value of qcur
+
+
+[float]
+=== haproxy.stat.scur
+
+type: integer
+
+current sessions
+
+
+[float]
+=== haproxy.stat.smax
+
+type: integer
+
+max sessions
+
+
+[float]
+=== haproxy.stat.slim
+
+type: integer
+
+configured session limit
+
+
+[float]
+=== haproxy.stat.stot
+
+type: keyword
+
+cumulative number of connections
+
+
+[float]
+=== haproxy.stat.bin
+
+type: integer
+
+bytes in
+
+
+[float]
+=== haproxy.stat.bout
+
+type: integer
+
+bytes out
+
+
+[float]
+=== haproxy.stat.dreq
+
+type: integer
+
+requests denied because of security concerns.
+  * For tcp this is because of a matched tcp-request content rule.
+  * For http this is because of a matched http-request or tarpit rule.
+
+
+[float]
+=== haproxy.stat.dresp
+
+type: integer
+
+responses denied because of security concerns.
+  * For http this is because of a matched http-request rule, or "option checkcache".
+
+
+[float]
+=== haproxy.stat.ereq
+
+type: integer
+
+request errors. Some of the possible causes are:
+  * early termination from the client, before the request has been sent.
+  * read error from the client
+  * client timeout
+  * client closed connection
+  * various bad requests from the client.
+  * request was tarpitted.
+
+
+[float]
+=== haproxy.stat.econ
+
+type: integer
+
+number of requests that encountered an error trying to connect to a backend server. The backend stat is the sum of the stat for all servers of that backend, plus any connection errors not associated with a particular server (such as the backend having no active servers).
+
+
+[float]
+=== haproxy.stat.eresp
+
+type: integer
+
+response errors. srv_abrt will be counted here also. Some other errors are: * write error on the client socket (won't be counted for the server stat) * failure applying filters to the response.
+
+
+[float]
+=== haproxy.stat.wretr
+
+type: integer
+
+number of times a connection to a server was retried.
+
+
+[float]
+=== haproxy.stat.wredis
+
+type: integer
+
+number of times a request was redispatched to another server. The server value counts the number of times that server was switched away from.
+
+
+[float]
+=== haproxy.stat.status
+
+type: keyword
+
+status (UP/DOWN/NOLB/MAINT/MAINT(via)...)
+
+
+[float]
+=== haproxy.stat.weight
+
+type: integer
+
+total weight (backend), server weight (server)
+
+
+[float]
+=== haproxy.stat.act
+
+type: integer
+
+number of active servers (backend), server is active (server)
+
+
+[float]
+=== haproxy.stat.bck
+
+type: integer
+
+number of backup servers (backend), server is backup (server)
+
+
+[float]
+=== haproxy.stat.chkfail
+
+type: integer
+
+number of failed checks. (Only counts checks failed when the server is up.)
+
+
+[float]
+=== haproxy.stat.chkdown
+
+type: integer
+
+number of UP->DOWN transitions. The backend counter counts transitions to the whole backend being down, rather than the sum of the counters for each server.
+
+
+[float]
+=== haproxy.stat.lastchg
+
+type: integer
+
+number of seconds since the last UP<->DOWN transition
+
+
+[float]
+=== haproxy.stat.downtime
+
+type: integer
+
+total downtime (in seconds). The value for the backend is the downtime for the whole backend, not the sum of the server downtime.
+
+
+[float]
+=== haproxy.stat.qlimit
+
+type: integer
+
+configured maxqueue for the server, or nothing in the value is 0 (default, meaning no limit)
+
+
+[float]
+=== haproxy.stat.pid
+
+type: integer
+
+process id (0 for first instance, 1 for second, ...)
+
+
+[float]
+=== haproxy.stat.iid
+
+type: integer
+
+unique proxy id
+
+
+[float]
+=== haproxy.stat.sid
+
+type: integer
+
+server id (unique inside a proxy)
+
+
+[float]
+=== haproxy.stat.throttle
+
+type: integer
+
+current throttle percentage for the server, when slowstart is active, or no value if not in slowstart.
+
+
+[float]
+=== haproxy.stat.lbtot
+
+type: integer
+
+total number of times a server was selected, either for new sessions, or when re-dispatching. The server counter is the number of times that server was selected.
+
+
+[float]
+=== haproxy.stat.tracked
+
+type: integer
+
+id of proxy/server if tracking is enabled.
+
+
+[float]
+=== haproxy.stat.component_type
+
+type: integer
+
+(0=frontend, 1=backend, 2=server, 3=socket/listener)
+
+
+[float]
+== rate Fields
+
+
+
+
+[float]
+=== haproxy.stat.rate.value
+
+type: integer
+
+number of sessions per second over last elapsed second
+
+
+[float]
+=== haproxy.stat.rate.lim
+
+type: integer
+
+configured limit on new sessions per second
+
+
+[float]
+=== haproxy.stat.rate.max
+
+type: integer
+
+max number of new sessions per second
+
+
+[float]
+== check Fields
+
+
+
+
+[float]
+=== haproxy.stat.check.status
+
+type: keyword
+
+status of last health check, one of:
+  UNK     -> unknown
+  INI     -> initializing
+  SOCKERR -> socket error
+  L4OK    -> check passed on layer 4, no upper layers testing enabled
+  L4TOUT  -> layer 1-4 timeout
+  L4CON   -> layer 1-4 connection problem, for example
+            "Connection refused" (tcp rst) or "No route to host" (icmp)
+  L6OK    -> check passed on layer 6
+  L6TOUT  -> layer 6 (SSL) timeout
+  L6RSP   -> layer 6 invalid response - protocol error
+  L7OK    -> check passed on layer 7
+  L7OKC   -> check conditionally passed on layer 7, for example 404 with
+            disable-on-404
+  L7TOUT  -> layer 7 (HTTP/SMTP) timeout
+  L7RSP   -> layer 7 invalid response - protocol error
+  L7STS   -> layer 7 response error, for example HTTP 5xx
+
+
+[float]
+=== haproxy.stat.check.code
+
+type: integer
+
+layer5-7 code, if available
+
+
+[float]
+=== haproxy.stat.check.duration
+
+type: integer
+
+time in ms took to finish last health check
+
+
+[float]
+== hrsp Fields
+
+
+
+
+[float]
+=== haproxy.stat.hrsp.1xx
+
+type: integer
+
+http responses with 1xx code
+
+
+[float]
+=== haproxy.stat.hrsp.2xx
+
+type: integer
+
+http responses with 2xx code
+
+
+[float]
+=== haproxy.stat.hrsp.3xx
+
+type: integer
+
+http responses with 3xx code
+
+
+[float]
+=== haproxy.stat.hrsp.4xx
+
+type: integer
+
+http responses with 4xx code
+
+
+[float]
+=== haproxy.stat.hrsp.5xx
+
+type: integer
+
+http responses with 5xx code
+
+
+[float]
+=== haproxy.stat.hrsp.other
+
+type: integer
+
+http responses with other codes (protocol error)
+
+
+[float]
+=== haproxy.stat.hanafail
+
+type: integer
+
+failed health checks details
+
+
+[float]
+== req Fields
+
+
+
+
+[float]
+== rate Fields
+
+
+
+
+[float]
+=== haproxy.stat.req.rate.value
+
+type: integer
+
+HTTP requests per second over last elapsed second
+
+
+[float]
+=== haproxy.stat.req.rate.max
+
+type: integer
+
+max number of HTTP requests per second observed
+
+
+[float]
+=== haproxy.stat.req.tot
+
+type: integer
+
+total number of HTTP requests received
+
+
+[float]
+=== haproxy.stat.cli_abrt
+
+type: integer
+
+number of data transfers aborted by the client
+
+
+[float]
+=== haproxy.stat.srv_abrt
+
+type: integer
+
+number of data transfers aborted by the server (inc. in eresp)
+
+
+[float]
+== comp Fields
+
+
+
+
+[float]
+=== haproxy.stat.comp.in
+
+type: integer
+
+number of HTTP response bytes fed to the compressor
+
+
+[float]
+=== haproxy.stat.comp.out
+
+type: integer
+
+number of HTTP response bytes emitted by the compressor
+
+
+[float]
+=== haproxy.stat.comp.byp
+
+type: integer
+
+number of bytes that bypassed the HTTP compressor (CPU/BW limit)
+
+
+[float]
+=== haproxy.stat.comp.rsp
+
+type: integer
+
+number of HTTP responses that were compressed
+
+
+[float]
+== last Fields
+
+
+
+
+[float]
+=== haproxy.stat.last.sess
+
+type: integer
+
+number of seconds since last session assigned to server/backend
+
+
+[float]
+=== haproxy.stat.last.chk
+
+type: keyword
+
+last health check contents or textual error
+
+
+[float]
+=== haproxy.stat.last.agt
+
+type: keyword
+
+last agent check contents or textual error
+
+
+[float]
+=== haproxy.stat.qtime
+
+type: integer
+
+the average queue time in ms over the 1024 last requests
+
+
+[float]
+=== haproxy.stat.ctime
+
+type: integer
+
+the average connect time in ms over the 1024 last requests
+
+
+[float]
+=== haproxy.stat.rtime
+
+type: integer
+
+the average response time in ms over the 1024 last requests (0 for TCP)
+
+
+[float]
+=== haproxy.stat.ttime
+
+type: integer
+
+the average total session time in ms over the 1024 last requests
 
 
 [[exported-fields-mongodb]]
@@ -736,6 +2072,8 @@ Platform specific data.
 
 type: long
 
+format: bytes
+
 The total size in bytes of heap space used by the database process. Only available on Unix/Linux.
 
 
@@ -759,6 +2097,8 @@ Platform specific data.
 
 type: long
 
+format: bytes
+
 The amount of network traffic, in bytes, received by this database.
 
 
@@ -766,6 +2106,8 @@ The amount of network traffic, in bytes, received by this database.
 === mongodb.status.network.out.bytes
 
 type: long
+
+format: bytes
 
 The amount of network traffic, in bytes, sent from this database.
 
@@ -982,7 +2324,7 @@ Aborted status fields.
 [float]
 === mysql.status.aborted.clients
 
-type: integer
+type: long
 
 The number of connections that were aborted because the client died without closing the connection properly.
 
@@ -990,7 +2332,7 @@ The number of connections that were aborted because the client died without clos
 [float]
 === mysql.status.aborted.connects
 
-type: integer
+type: long
 
 The number of failed attempts to connect to the MySQL server.
 
@@ -1004,14 +2346,14 @@ The number of failed attempts to connect to the MySQL server.
 [float]
 === mysql.status.binlog.cache.disk_use
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.binlog.cache.use
 
-type: integer
+type: long
 
 
 
@@ -1025,7 +2367,9 @@ Bytes stats.
 [float]
 === mysql.status.bytes.received
 
-type: integer
+type: long
+
+format: bytes
 
 The number of bytes received from all clients.
 
@@ -1033,15 +2377,56 @@ The number of bytes received from all clients.
 [float]
 === mysql.status.bytes.sent
 
-type: integer
+type: long
+
+format: bytes
 
 The number of bytes sent to all clients.
 
 
 [float]
+== threads Fields
+
+Threads stats.
+
+
+
+[float]
+=== mysql.status.threads.cached
+
+type: long
+
+The number of cached threads.
+
+
+[float]
+=== mysql.status.threads.created
+
+type: long
+
+The number of created threads.
+
+
+[float]
+=== mysql.status.threads.connected
+
+type: long
+
+The number of connected threads.
+
+
+[float]
+=== mysql.status.threads.running
+
+type: long
+
+The number of running threads.
+
+
+[float]
 === mysql.status.connections
 
-type: integer
+type: long
 
 
 
@@ -1054,21 +2439,21 @@ type: integer
 [float]
 === mysql.status.created.tmp.disk_tables
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.created.tmp.files
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.created.tmp.tables
 
-type: integer
+type: long
 
 
 
@@ -1081,35 +2466,35 @@ type: integer
 [float]
 === mysql.status.delayed.errors
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.delayed.insert_threads
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.delayed.writes
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.flush_commands
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.max_used_connections
 
-type: integer
+type: long
 
 
 
@@ -1122,28 +2507,28 @@ type: integer
 [float]
 === mysql.status.open.files
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.open.streams
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.open.tables
 
-type: integer
+type: long
 
 
 
 [float]
 === mysql.status.opened_tables
 
-type: integer
+type: long
 
 
 
@@ -1179,7 +2564,7 @@ Nginx hostname.
 [float]
 === nginx.stubstatus.active
 
-type: integer
+type: long
 
 The current number of active client connections including Waiting connections.
 
@@ -1187,7 +2572,7 @@ The current number of active client connections including Waiting connections.
 [float]
 === nginx.stubstatus.accepts
 
-type: integer
+type: long
 
 The total number of accepted client connections.
 
@@ -1195,7 +2580,7 @@ The total number of accepted client connections.
 [float]
 === nginx.stubstatus.handled
 
-type: integer
+type: long
 
 The total number of handled client connections.
 
@@ -1203,7 +2588,7 @@ The total number of handled client connections.
 [float]
 === nginx.stubstatus.dropped
 
-type: integer
+type: long
 
 The total number of dropped client connections.
 
@@ -1211,7 +2596,7 @@ The total number of dropped client connections.
 [float]
 === nginx.stubstatus.requests
 
-type: integer
+type: long
 
 The total number of client requests.
 
@@ -1219,7 +2604,7 @@ The total number of client requests.
 [float]
 === nginx.stubstatus.current
 
-type: integer
+type: long
 
 The current number of client requests.
 
@@ -1227,7 +2612,7 @@ The current number of client requests.
 [float]
 === nginx.stubstatus.reading
 
-type: integer
+type: long
 
 The current number of connections where Nginx is reading the request header.
 
@@ -1235,7 +2620,7 @@ The current number of connections where Nginx is reading the request header.
 [float]
 === nginx.stubstatus.writing
 
-type: integer
+type: long
 
 The current number of connections where Nginx is writing the response back to the client.
 
@@ -1243,9 +2628,410 @@ The current number of connections where Nginx is writing the response back to th
 [float]
 === nginx.stubstatus.waiting
 
-type: integer
+type: long
 
 The current number of idle client connections waiting for a request.
+
+
+[[exported-fields-postgresql]]
+== PostgreSQL Fields
+
+Metrics collected from PostgreSQL servers.
+
+
+
+[float]
+== postgresql Fields
+
+PostgreSQL metrics.
+
+
+
+[float]
+== activity Fields
+
+One document per server process, showing information related to the current activity of that process, such as state and current query. Collected by querying pg_stat_activity.
+
+
+
+[float]
+=== postgresql.activity.database.oid
+
+type: long
+
+OID of the database this backend is connected to.
+
+
+[float]
+=== postgresql.activity.database.name
+
+type: keyword
+
+Name of the database this backend is connected to.
+
+
+[float]
+=== postgresql.activity.pid
+
+type: long
+
+Process ID of this backend.
+
+
+[float]
+=== postgresql.activity.user.id
+
+type: long
+
+OID of the user logged into this backend.
+
+
+[float]
+=== postgresql.activity.user.name
+
+Name of the user logged into this backend.
+
+
+[float]
+=== postgresql.activity.application_name
+
+Name of the application that is connected to this backend.
+
+
+[float]
+=== postgresql.activity.client.address
+
+IP address of the client connected to this backend.
+
+
+[float]
+=== postgresql.activity.client.hostname
+
+Host name of the connected client, as reported by a reverse DNS lookup of client_addr.
+
+
+[float]
+=== postgresql.activity.client.port
+
+type: long
+
+TCP port number that the client is using for communication with this backend, or -1 if a Unix socket is used.
+
+
+[float]
+=== postgresql.activity.backend_start
+
+type: date
+
+Time when this process was started, i.e., when the client connected to the server.
+
+
+[float]
+=== postgresql.activity.transaction_start
+
+type: date
+
+Time when this process' current transaction was started.
+
+
+[float]
+=== postgresql.activity.query_start
+
+type: date
+
+Time when the currently active query was started, or if state is not active, when the last query was started.
+
+
+[float]
+=== postgresql.activity.state_change
+
+type: date
+
+Time when the state was last changed.
+
+
+[float]
+=== postgresql.activity.waiting
+
+type: boolean
+
+True if this backend is currently waiting on a lock.
+
+
+[float]
+=== postgresql.activity.state
+
+Current overall state of this backend. Possible values are:
+
+  * active: The backend is executing a query.
+  * idle: The backend is waiting for a new client command.
+  * idle in transaction: The backend is in a transaction, but is not
+    currently executing a query.
+  * idle in transaction (aborted): This state is similar to idle in
+    transaction, except one of the statements in the transaction caused
+    an error.
+  * fastpath function call: The backend is executing a fast-path function.
+  * disabled: This state is reported if track_activities is disabled in this backend.
+
+
+[float]
+=== postgresql.activity.query
+
+Text of this backend's most recent query. If state is active this field shows the currently executing query. In all other states, it shows the last query that was executed.
+
+
+[float]
+== bgwriter Fields
+
+Statistics about the background writer process's activity. Collected using the pg_stat_bgwriter query.
+
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.scheduled
+
+type: long
+
+Number of scheduled checkpoints that have been performed.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.requested
+
+type: long
+
+Number of requested checkpoints that have been performed.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.times.write.ms
+
+type: float
+
+Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds.
+
+
+[float]
+=== postgresql.bgwriter.checkpoints.times.sync.ms
+
+type: float
+
+Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk, in milliseconds.
+
+
+[float]
+=== postgresql.bgwriter.buffers.checkpoints
+
+type: long
+
+Number of buffers written during checkpoints.
+
+
+[float]
+=== postgresql.bgwriter.buffers.clean
+
+type: long
+
+Number of buffers written by the background writer.
+
+
+[float]
+=== postgresql.bgwriter.buffers.clean_full
+
+type: long
+
+Number of times the background writer stopped a cleaning scan because it had written too many buffers.
+
+
+[float]
+=== postgresql.bgwriter.buffers.backend
+
+type: long
+
+Number of buffers written directly by a backend.
+
+
+[float]
+=== postgresql.bgwriter.buffers.backend_fsync
+
+type: long
+
+Number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write)
+
+
+[float]
+=== postgresql.bgwriter.buffers.allocated
+
+type: long
+
+Number of buffers allocated.
+
+
+[float]
+=== postgresql.bgwriter.stats_reset
+
+type: date
+
+Time at which these statistics were last reset.
+
+
+[float]
+== database Fields
+
+One row per database, showing database-wide statistics. Collected by querying pg_stat_database
+
+
+
+[float]
+=== postgresql.database.oid
+
+type: long
+
+OID of the database this backend is connected to.
+
+
+[float]
+=== postgresql.database.name
+
+type: keyword
+
+Name of the database this backend is connected to.
+
+
+[float]
+=== postgresql.database.number_of_backends
+
+type: long
+
+Number of backends currently connected to this database.
+
+
+[float]
+=== postgresql.database.transactions.commit
+
+type: long
+
+Number of transactions in this database that have been committed.
+
+
+[float]
+=== postgresql.database.transactions.rollback
+
+type: long
+
+Number of transactions in this database that have been rolled back.
+
+
+[float]
+=== postgresql.database.blocks.read
+
+type: long
+
+Number of disk blocks read in this database.
+
+
+[float]
+=== postgresql.database.blocks.hit
+
+type: long
+
+Number of times disk blocks were found already in the buffer cache, so that a read was not necessary (this only includes hits in the PostgreSQL buffer cache, not the operating system's file system cache).
+
+
+[float]
+=== postgresql.database.blocks.time.read.ms
+
+type: long
+
+Time spent reading data file blocks by backends in this database, in milliseconds.
+
+
+[float]
+=== postgresql.database.blocks.time.write.ms
+
+type: long
+
+Time spent writing data file blocks by backends in this database, in milliseconds.
+
+
+[float]
+=== postgresql.database.rows.returned
+
+type: long
+
+Number of rows returned by queries in this database.
+
+
+[float]
+=== postgresql.database.rows.fetched
+
+type: long
+
+Number of rows fetched by queries in this database.
+
+
+[float]
+=== postgresql.database.rows.inserted
+
+type: long
+
+Number of rows inserted by queries in this database.
+
+
+[float]
+=== postgresql.database.rows.updated
+
+type: long
+
+Number of rows updated by queries in this database.
+
+
+[float]
+=== postgresql.database.rows.deleted
+
+type: long
+
+Number of rows deleted by queries in this database.
+
+
+[float]
+=== postgresql.database.conflicts
+
+type: long
+
+Number of queries canceled due to conflicts with recovery in this database.
+
+
+[float]
+=== postgresql.database.temporary.files
+
+type: long
+
+Number of temporary files created by queries in this database. All temporary files are counted, regardless of why the temporary file was created (e.g., sorting or hashing), and regardless of the log_temp_files setting.
+
+
+[float]
+=== postgresql.database.temporary.bytes
+
+type: long
+
+Total amount of data written to temporary files by queries in this database. All temporary files are counted, regardless of why the temporary file was created, and regardless of the log_temp_files setting.
+
+
+[float]
+=== postgresql.database.deadlocks
+
+type: long
+
+Number of deadlocks detected in this database.
+
+
+[float]
+=== postgresql.database.stats_reset
+
+type: date
+
+Time at which these statistics were last reset.
 
 
 [[exported-fields-redis]]
@@ -1279,7 +3065,7 @@ Redis client stats.
 [float]
 === redis.info.clients.connected
 
-type: integer
+type: long
 
 Number of client connections (excluding connections from slaves).
 
@@ -1287,7 +3073,7 @@ Number of client connections (excluding connections from slaves).
 [float]
 === redis.info.clients.longest_output_list
 
-type: integer
+type: long
 
 Longest output list among current client connections.
 
@@ -1295,7 +3081,7 @@ Longest output list among current client connections.
 [float]
 === redis.info.clients.biggest_input_buf
 
-type: integer
+type: long
 
 Biggest input buffer among current client connections.
 
@@ -1303,7 +3089,7 @@ Biggest input buffer among current client connections.
 [float]
 === redis.info.clients.blocked
 
-type: integer
+type: long
 
 Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH).
 
@@ -1333,7 +3119,7 @@ Redis CPU stats
 [float]
 === redis.info.cpu.used.sys
 
-type: half_float
+type: scaled_float
 
 System CPU consumed by the Redis server.
 
@@ -1341,7 +3127,7 @@ System CPU consumed by the Redis server.
 [float]
 === redis.info.cpu.used.sys_children
 
-type: half_float
+type: scaled_float
 
 User CPU consumed by the Redis server.
 
@@ -1349,7 +3135,7 @@ User CPU consumed by the Redis server.
 [float]
 === redis.info.cpu.used.user
 
-type: half_float
+type: scaled_float
 
 System CPU consumed by the background processes.
 
@@ -1357,7 +3143,7 @@ System CPU consumed by the background processes.
 [float]
 === redis.info.cpu.used.user_children
 
-type: half_float
+type: scaled_float
 
 User CPU consumed by the background processes.
 
@@ -1372,7 +3158,7 @@ Redis CPU stats.
 [float]
 === redis.info.memory.used.value
 
-type: integer
+type: long
 
 Used memory.
 
@@ -1380,7 +3166,7 @@ Used memory.
 [float]
 === redis.info.memory.used.rss
 
-type: integer
+type: long
 
 Used memory rss.
 
@@ -1388,7 +3174,7 @@ Used memory rss.
 [float]
 === redis.info.memory.used.peak
 
-type: integer
+type: long
 
 Used memory peak.
 
@@ -1396,7 +3182,7 @@ Used memory peak.
 [float]
 === redis.info.memory.used.lua
 
-type: integer
+type: long
 
 Used memory lua.
 
@@ -1424,44 +3210,44 @@ type: boolean
 None
 
 [float]
-=== redis.info.persistence.rdb.changes_since_last_save
+=== redis.info.persistence.rdb.last_save.changes_since
 
-type: integer
+type: long
 
 None
 
 [float]
-=== redis.info.persistence.rdb.bgsave_in_progress
+=== redis.info.persistence.rdb.bgsave.in_progress
 
 type: boolean
 
 None
 
 [float]
-=== redis.info.persistence.rdb.last_save_time
+=== redis.info.persistence.rdb.last_save.time
 
-type: integer
+type: long
 
 None
 
 [float]
-=== redis.info.persistence.rdb.last_bgsave_status
+=== redis.info.persistence.rdb.bgsave.last_status
 
 type: keyword
 
 None
 
 [float]
-=== redis.info.persistence.rdb.last_bgsave_time_sec
+=== redis.info.persistence.rdb.bgsave.last_time.sec
 
-type: integer
+type: long
 
 None
 
 [float]
-=== redis.info.persistence.rdb.current_bgsave_time_sec
+=== redis.info.persistence.rdb.bgsave.current_time.sec
 
-type: integer
+type: long
 
 None
 
@@ -1473,42 +3259,42 @@ type: boolean
 None
 
 [float]
-=== redis.info.persistence.aof.rewrite_in_progress
+=== redis.info.persistence.aof.rewrite.in_progress
 
 type: boolean
 
 None
 
 [float]
-=== redis.info.persistence.aof.rewrite_scheduled
+=== redis.info.persistence.aof.rewrite.scheduled
 
 type: boolean
 
 None
 
 [float]
-=== redis.info.persistence.aof.last_rewrite_time_sec
+=== redis.info.persistence.aof.rewrite.last_time.sec
 
-type: integer
-
-None
-
-[float]
-=== redis.info.persistence.aof.current_rewrite_time_sec
-
-type: integer
+type: long
 
 None
 
 [float]
-=== redis.info.persistence.aof.last_bgrewrite_status
+=== redis.info.persistence.aof.rewrite.current_time.sec
+
+type: long
+
+None
+
+[float]
+=== redis.info.persistence.aof.bgrewrite.last_status
 
 type: keyword
 
 None
 
 [float]
-=== redis.info.persistence.aof.last_write_status
+=== redis.info.persistence.aof.write.last_status
 
 type: keyword
 
@@ -1531,42 +3317,42 @@ None
 [float]
 === redis.info.replication.connected_slaves
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.replication.master_offset
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.replication.backlog.active
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.replication.backlog.size
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.replication.backlog.first_byte_offset
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.replication.backlog.histlen
 
-type: integer
+type: long
 
 None
 
@@ -1643,7 +3429,7 @@ None
 [float]
 === redis.info.server.process_id
 
-type: integer
+type: long
 
 None
 
@@ -1657,28 +3443,28 @@ None
 [float]
 === redis.info.server.tcp_port
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.server.uptime
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.server.hz
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.server.lru_clock
 
-type: integer
+type: long
 
 None
 
@@ -1699,133 +3485,133 @@ Redis stats.
 [float]
 === redis.info.stats.connections.received
 
-type: integer
+type: long
 
-None
+Total number of connections received.
 
 [float]
 === redis.info.stats.connections.rejected
 
-type: integer
+type: long
+
+Total number of connections rejected.
+
+[float]
+=== redis.info.stats.commands_processed
+
+type: long
+
+Total number of commands preocessed.
+
+[float]
+=== redis.info.stats.net.input.bytes
+
+type: long
+
+Total network input in bytes.
+
+[float]
+=== redis.info.stats.net.output.bytes
+
+type: long
+
+Total network output in bytes.
+
+[float]
+=== redis.info.stats.instantaneous.ops_per_sec
+
+type: long
 
 None
 
 [float]
-=== redis.info.stats.total_commands_processed
+=== redis.info.stats.instantaneous.input_kbps
 
-type: integer
-
-None
-
-[float]
-=== redis.info.stats.total_net_input_bytes
-
-type: integer
+type: scaled_float
 
 None
 
 [float]
-=== redis.info.stats.total_net_output_bytes
+=== redis.info.stats.instantaneous.output_kbps
 
-type: integer
-
-None
-
-[float]
-=== redis.info.stats.instantaneous_ops_per_sec
-
-type: integer
-
-None
-
-[float]
-=== redis.info.stats.instantaneous_input_kbps
-
-type: float
-
-None
-
-[float]
-=== redis.info.stats.instantaneous_output_kbps
-
-type: float
+type: scaled_float
 
 None
 
 [float]
 === redis.info.stats.sync.full
 
-type: integer
+type: long
 
 None
 
 [float]
-=== redis.info.stats.sync.partial_ok
+=== redis.info.stats.sync.partial.ok
 
-type: integer
+type: long
 
 None
 
 [float]
-=== redis.info.stats.sync.partial_err
+=== redis.info.stats.sync.partial.err
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.keys.expired
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.keys.evicted
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.keyspace.hits
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.keyspace.misses
 
-type: integer
+type: long
 
 None
 
 [float]
-=== redis.info.stats.pubsub_channels
+=== redis.info.stats.pubsub.channels
 
-type: integer
+type: long
 
 None
 
 [float]
-=== redis.info.stats.pubsub_patterns
+=== redis.info.stats.pubsub.patterns
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.latest_fork_usec
 
-type: integer
+type: long
 
 None
 
 [float]
 === redis.info.stats.migrate_cached_sockets
 
-type: integer
+type: long
 
 None
 
@@ -1891,7 +3677,7 @@ System status metrics, like CPU and memory usage, that are collected from the op
 [float]
 === system.core.id
 
-type: integer
+type: long
 
 CPU Core number.
 
@@ -1899,7 +3685,9 @@ CPU Core number.
 [float]
 === system.core.user.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
@@ -1915,7 +3703,9 @@ The amount of CPU time spent in user space.
 [float]
 === system.core.system.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in kernel space.
 
@@ -1931,7 +3721,9 @@ The amount of CPU time spent in kernel space.
 [float]
 === system.core.nice.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent on low-priority processes.
 
@@ -1947,7 +3739,9 @@ The amount of CPU time spent on low-priority processes.
 [float]
 === system.core.idle.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent idle.
 
@@ -1963,7 +3757,9 @@ The amount of CPU time spent idle.
 [float]
 === system.core.iowait.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in wait (on disk).
 
@@ -1979,7 +3775,9 @@ The amount of CPU time spent in wait (on disk).
 [float]
 === system.core.irq.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -1995,7 +3793,9 @@ The amount of CPU time spent servicing and handling hardware interrupts.
 [float]
 === system.core.softirq.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent servicing and handling software interrupts.
 
@@ -2011,7 +3811,9 @@ The amount of CPU time spent servicing and handling software interrupts.
 [float]
 === system.core.steal.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
@@ -2034,7 +3836,9 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 [float]
 === system.cpu.user.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
@@ -2042,7 +3846,9 @@ The percentage of CPU time spent in user space. On multi-core systems, you can h
 [float]
 === system.cpu.system.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in kernel space.
 
@@ -2050,7 +3856,9 @@ The percentage of CPU time spent in kernel space.
 [float]
 === system.cpu.nice.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent on low-priority processes.
 
@@ -2058,7 +3866,9 @@ The percentage of CPU time spent on low-priority processes.
 [float]
 === system.cpu.idle.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent idle.
 
@@ -2066,7 +3876,9 @@ The percentage of CPU time spent idle.
 [float]
 === system.cpu.iowait.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in wait (on disk).
 
@@ -2074,7 +3886,9 @@ The percentage of CPU time spent in wait (on disk).
 [float]
 === system.cpu.irq.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent servicing and handling hardware interrupts.
 
@@ -2082,7 +3896,9 @@ The percentage of CPU time spent servicing and handling hardware interrupts.
 [float]
 === system.cpu.softirq.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent servicing and handling software interrupts.
 
@@ -2090,7 +3906,9 @@ The percentage of CPU time spent servicing and handling software interrupts.
 [float]
 === system.cpu.steal.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
@@ -2205,6 +4023,8 @@ The total number of writes completed successfully.
 
 type: long
 
+format: bytes
+
 The total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
 
 
@@ -2212,6 +4032,8 @@ The total number of bytes read successfully. On Linux this is the number of sect
 === system.diskio.write.bytes
 
 type: long
+
+format: bytes
 
 The total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
 
@@ -2252,6 +4074,8 @@ The total number of of milliseconds spent doing I/Os.
 
 type: long
 
+format: bytes
+
 The disk space available to an unprivileged user in bytes.
 
 
@@ -2284,6 +4108,8 @@ The total number of file nodes in the file system.
 
 type: long
 
+format: bytes
+
 The disk space available in bytes.
 
 
@@ -2300,6 +4126,8 @@ The number of free file nodes in the file system.
 
 type: long
 
+format: bytes
+
 The total disk space in bytes.
 
 
@@ -2308,13 +4136,17 @@ The total disk space in bytes.
 
 type: long
 
+format: bytes
+
 The used disk space in bytes.
 
 
 [float]
 === system.filesystem.used.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of used disk space.
 
@@ -2351,6 +4183,8 @@ Nested file system docs.
 
 type: long
 
+format: bytes
+
 Total free space.
 
 
@@ -2359,6 +4193,8 @@ Total free space.
 
 type: long
 
+format: bytes
+
 Total used space.
 
 
@@ -2366,6 +4202,8 @@ Total used space.
 === system.fsstat.total_size.total
 
 type: long
+
+format: bytes
 
 Total space (used plus free).
 
@@ -2380,7 +4218,7 @@ Load averages.
 [float]
 === system.load.1
 
-type: half_float
+type: scaled_float
 
 Load average for the last minute.
 
@@ -2388,7 +4226,7 @@ Load average for the last minute.
 [float]
 === system.load.5
 
-type: half_float
+type: scaled_float
 
 Load average for the last 5 minutes.
 
@@ -2396,7 +4234,7 @@ Load average for the last 5 minutes.
 [float]
 === system.load.15
 
-type: half_float
+type: scaled_float
 
 Load average for the last 15 minutes.
 
@@ -2404,7 +4242,7 @@ Load average for the last 15 minutes.
 [float]
 === system.load.norm.1
 
-type: half_float
+type: scaled_float
 
 Load divided by the number of cores for the last minute.
 
@@ -2412,7 +4250,7 @@ Load divided by the number of cores for the last minute.
 [float]
 === system.load.norm.5
 
-type: half_float
+type: scaled_float
 
 Load divided by the number of cores for the last 5 minutes.
 
@@ -2420,7 +4258,7 @@ Load divided by the number of cores for the last 5 minutes.
 [float]
 === system.load.norm.15
 
-type: half_float
+type: scaled_float
 
 Load divided by the number of cores for the last 15 minutes.
 
@@ -2437,6 +4275,8 @@ Load divided by the number of cores for the last 15 minutes.
 
 type: long
 
+format: bytes
+
 Total memory.
 
 
@@ -2444,6 +4284,8 @@ Total memory.
 === system.memory.used.bytes
 
 type: long
+
+format: bytes
 
 Used memory.
 
@@ -2453,13 +4295,17 @@ Used memory.
 
 type: long
 
+format: bytes
+
 The total amount of free memory in bytes. This value does not include memory consumed by system caches and buffers (see system.memory.actual.free).
 
 
 [float]
 === system.memory.used.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of used memory.
 
@@ -2490,7 +4336,7 @@ Actual free memory in bytes. It is calculated based on the OS. On Linux it consi
 [float]
 === system.memory.actual.used.pct
 
-type: half_float
+type: scaled_float
 
 The percentage of actual used memory.
 
@@ -2506,6 +4352,8 @@ This group contains statistics related to the swap memory usage on the system.
 
 type: long
 
+format: bytes
+
 Total swap memory.
 
 
@@ -2513,6 +4361,8 @@ Total swap memory.
 === system.memory.swap.used.bytes
 
 type: long
+
+format: bytes
 
 Used swap memory.
 
@@ -2522,13 +4372,17 @@ Used swap memory.
 
 type: long
 
+format: bytes
+
 Available swap memory.
 
 
 [float]
 === system.memory.swap.used.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of used swap memory.
 
@@ -2555,6 +4409,8 @@ The network interface name.
 
 type: long
 
+format: bytes
+
 The number of bytes sent.
 
 
@@ -2562,6 +4418,8 @@ The number of bytes sent.
 === system.network.in.bytes
 
 type: long
+
+format: bytes
 
 The number of bytes received.
 
@@ -2640,7 +4498,7 @@ The process state. For example: "running".
 [float]
 === system.process.pid
 
-type: integer
+type: long
 
 The process pid.
 
@@ -2648,7 +4506,7 @@ The process pid.
 [float]
 === system.process.ppid
 
-type: integer
+type: long
 
 The process parent pid.
 
@@ -2656,7 +4514,7 @@ The process parent pid.
 [float]
 === system.process.pgid
 
-type: integer
+type: long
 
 The process group id.
 
@@ -2694,7 +4552,9 @@ The amount of CPU time the process spent in user space.
 [float]
 === system.process.cpu.total.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of CPU time spent by the process since the last update. Its value is similar to the %CPU value of the process displayed by the top command on Unix systems.
 
@@ -2718,9 +4578,9 @@ The total CPU time spent by the process.
 [float]
 === system.process.cpu.start_time
 
-type: keyword
+type: date
 
-The time when the process was started. Example: "17:45".
+The time when the process was started.
 
 
 [float]
@@ -2734,6 +4594,8 @@ Memory-specific statistics per process.
 
 type: long
 
+format: bytes
+
 The total virtual memory the process has.
 
 
@@ -2742,13 +4604,17 @@ The total virtual memory the process has.
 
 type: long
 
+format: bytes
+
 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
 
 [float]
 === system.process.memory.rss.pct
 
-type: half_float
+type: scaled_float
+
+format: percent
 
 The percentage of memory the process occupied in main memory (RAM).
 
@@ -2758,7 +4624,562 @@ The percentage of memory the process occupied in main memory (RAM).
 
 type: long
 
+format: bytes
+
 The shared memory the process uses.
+
+
+[float]
+== fd Fields
+
+File descriptor usage metrics. This set of metrics is available for Linux and FreeBSD.
+
+
+
+[float]
+=== system.process.fd.open
+
+type: long
+
+The number of file descriptors open by the process.
+
+[float]
+=== system.process.fd.limit.soft
+
+type: long
+
+The soft limit on the number of file descriptors opened by the process. The soft limit can be changed by the process at any time.
+
+
+[float]
+=== system.process.fd.limit.hard
+
+type: long
+
+The hard limit on the number of file descriptors opened by the process. The hard limit can only be raised by root.
+
+
+[float]
+== cgroup Fields
+
+experimental[]
+Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.
+
+
+
+[float]
+=== system.process.cgroup.id
+
+type: keyword
+
+The ID common to all cgroups associated with this task. If there isn't a common ID used by all cgroups this field will be absent.
+
+
+[float]
+=== system.process.cgroup.path
+
+type: keyword
+
+The path to the cgroup relative to the cgroup subsystem's mountpoint. If there isn't a common path used by all cgroups this field will be absent.
+
+
+[float]
+== cpu Fields
+
+The cpu subsystem schedules CPU access for tasks in the cgroup. Access can be controlled by two separate schedulers, CFS and RT. CFS stands for completely fair scheduler which proportionally divides the CPU time between cgroups based on weight. RT stands for real time scheduler which sets a maximum amount of CPU time that processes in the cgroup can consume during a given period.
+
+
+
+[float]
+=== system.process.cgroup.cpu.id
+
+type: keyword
+
+ID of the cgroup.
+
+[float]
+=== system.process.cgroup.cpu.path
+
+type: keyword
+
+Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
+
+[float]
+=== system.process.cgroup.cpu.cfs.period.us
+
+type: long
+
+Period of time in microseconds for how regularly a cgroup's access to CPU resources should be reallocated.
+
+
+[float]
+=== system.process.cgroup.cpu.cfs.quota.us
+
+type: long
+
+Total amount of time in microseconds for which all tasks in a cgroup can run during one period (as defined by cfs.period.us).
+
+
+[float]
+=== system.process.cgroup.cpu.cfs.shares
+
+type: long
+
+An integer value that specifies a relative share of CPU time available to the tasks in a cgroup. The value specified in the cpu.shares file must be 2 or higher.
+
+
+[float]
+=== system.process.cgroup.cpu.rt.period.us
+
+type: long
+
+Period of time in microseconds for how regularly a cgroup's access to CPU resources is reallocated.
+
+
+[float]
+=== system.process.cgroup.cpu.rt.runtime.us
+
+type: long
+
+Period of time in microseconds for the longest continuous period in which the tasks in a cgroup have access to CPU resources.
+
+
+[float]
+=== system.process.cgroup.cpu.stats.periods
+
+type: long
+
+Number of period intervals (as specified in cpu.cfs.period.us) that have elapsed.
+
+
+[float]
+=== system.process.cgroup.cpu.stats.throttled.periods
+
+type: long
+
+Number of times tasks in a cgroup have been throttled (that is, not allowed to run because they have exhausted all of the available time as specified by their quota).
+
+
+[float]
+=== system.process.cgroup.cpu.stats.throttled.ns
+
+type: long
+
+The total time duration (in nanoseconds) for which tasks in a cgroup have been throttled.
+
+
+[float]
+== cpuacct Fields
+
+CPU accounting metrics.
+
+
+[float]
+=== system.process.cgroup.cpuacct.id
+
+type: keyword
+
+ID of the cgroup.
+
+[float]
+=== system.process.cgroup.cpuacct.path
+
+type: keyword
+
+Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
+
+[float]
+=== system.process.cgroup.cpuacct.total.ns
+
+type: long
+
+Total CPU time in nanoseconds consumed by all tasks in the cgroup.
+
+
+[float]
+=== system.process.cgroup.cpuacct.stats.user.ns
+
+type: long
+
+CPU time consumed by tasks in user mode.
+
+[float]
+=== system.process.cgroup.cpuacct.stats.system.ns
+
+type: long
+
+CPU time consumed by tasks in user (kernel) mode.
+
+[float]
+=== system.process.cgroup.cpuacct.percpu
+
+type: dict
+
+CPU time (in nanoseconds) consumed on each CPU by all tasks in this cgroup.
+
+
+[float]
+== memory Fields
+
+Memory limits and metrics.
+
+
+[float]
+=== system.process.cgroup.memory.id
+
+type: keyword
+
+ID of the cgroup.
+
+[float]
+=== system.process.cgroup.memory.path
+
+type: keyword
+
+Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
+
+[float]
+=== system.process.cgroup.memory.mem.usage.bytes
+
+type: long
+
+format: bytes
+
+Total memory usage by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.mem.usage.max.bytes
+
+type: long
+
+format: bytes
+
+The maximum memory used by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.mem.limit.bytes
+
+type: long
+
+format: bytes
+
+The maximum amount of user memory in bytes (including file cache) that tasks in the cgroup are allowed to use.
+
+
+[float]
+=== system.process.cgroup.memory.mem.failures
+
+type: long
+
+The number of times that the memory limit (mem.limit.bytes) was reached.
+
+
+[float]
+=== system.process.cgroup.memory.memsw.usage.bytes
+
+type: long
+
+format: bytes
+
+The sum of current memory usage plus swap space used by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.memsw.usage.max.bytes
+
+type: long
+
+format: bytes
+
+The maximum amount of memory and swap space used by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.memsw.limit.bytes
+
+type: long
+
+format: bytes
+
+The maximum amount for the sum of memory and swap usage that tasks in the cgroup are allowed to use.
+
+
+[float]
+=== system.process.cgroup.memory.memsw.failures
+
+type: long
+
+The number of times that the memory plus swap space limit (memsw.limit.bytes) was reached.
+
+
+[float]
+=== system.process.cgroup.memory.kmem.usage.bytes
+
+type: long
+
+format: bytes
+
+Total kernel memory usage by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.kmem.usage.max.bytes
+
+type: long
+
+format: bytes
+
+The maximum kernel memory used by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.kmem.limit.bytes
+
+type: long
+
+format: bytes
+
+The maximum amount of kernel memory that tasks in the cgroup are allowed to use.
+
+
+[float]
+=== system.process.cgroup.memory.kmem.failures
+
+type: long
+
+The number of times that the memory limit (kmem.limit.bytes) was reached.
+
+
+[float]
+=== system.process.cgroup.memory.kmem_tcp.usage.bytes
+
+type: long
+
+format: bytes
+
+Total memory usage for TCP buffers in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.kmem_tcp.usage.max.bytes
+
+type: long
+
+format: bytes
+
+The maximum memory used for TCP buffers by processes in the cgroup (in bytes).
+
+
+[float]
+=== system.process.cgroup.memory.kmem_tcp.limit.bytes
+
+type: long
+
+format: bytes
+
+The maximum amount of memory for TCP buffers that tasks in the cgroup are allowed to use.
+
+
+[float]
+=== system.process.cgroup.memory.kmem_tcp.failures
+
+type: long
+
+The number of times that the memory limit (kmem_tcp.limit.bytes) was reached.
+
+
+[float]
+=== system.process.cgroup.memory.stats.active_anon.bytes
+
+type: long
+
+format: bytes
+
+Anonymous and swap cache on active least-recently-used (LRU) list, including tmpfs (shmem), in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.active_file.bytes
+
+type: long
+
+format: bytes
+
+File-backed memory on active LRU list, in bytes.
+
+[float]
+=== system.process.cgroup.memory.stats.cache.bytes
+
+type: long
+
+format: bytes
+
+Page cache, including tmpfs (shmem), in bytes.
+
+[float]
+=== system.process.cgroup.memory.stats.hierarchical_memory_limit.bytes
+
+type: long
+
+format: bytes
+
+Memory limit for the hierarchy that contains the memory cgroup, in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.hierarchical_memsw_limit.bytes
+
+type: long
+
+format: bytes
+
+Memory plus swap limit for the hierarchy that contains the memory cgroup, in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.inactive_anon.bytes
+
+type: long
+
+format: bytes
+
+Anonymous and swap cache on inactive LRU list, including tmpfs (shmem), in bytes
+
+
+[float]
+=== system.process.cgroup.memory.stats.inactive_file.bytes
+
+type: long
+
+format: bytes
+
+File-backed memory on inactive LRU list, in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.mapped_file.bytes
+
+type: long
+
+format: bytes
+
+Size of memory-mapped mapped files, including tmpfs (shmem), in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.page_faults
+
+type: long
+
+Number of times that a process in the cgroup triggered a page fault.
+
+
+[float]
+=== system.process.cgroup.memory.stats.major_page_faults
+
+type: long
+
+Number of times that a process in the cgroup triggered a major fault. "Major" faults happen when the kernel actually has to read the data from disk.
+
+
+[float]
+=== system.process.cgroup.memory.stats.pages_in
+
+type: long
+
+Number of pages paged into memory. This is a counter.
+
+
+[float]
+=== system.process.cgroup.memory.stats.pages_out
+
+type: long
+
+Number of pages paged out of memory. This is a counter.
+
+
+[float]
+=== system.process.cgroup.memory.stats.rss.bytes
+
+type: long
+
+format: bytes
+
+Anonymous and swap cache (includes transparent hugepages), not including tmpfs (shmem), in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.rss_huge.bytes
+
+type: long
+
+format: bytes
+
+Number of bytes of anonymous transparent hugepages.
+
+
+[float]
+=== system.process.cgroup.memory.stats.swap.bytes
+
+type: long
+
+format: bytes
+
+Swap usage, in bytes.
+
+
+[float]
+=== system.process.cgroup.memory.stats.unevictable.bytes
+
+type: long
+
+format: bytes
+
+Memory that cannot be reclaimed, in bytes.
+
+
+[float]
+== blkio Fields
+
+Block IO metrics.
+
+
+[float]
+=== system.process.cgroup.blkio.id
+
+type: keyword
+
+ID of the cgroup.
+
+[float]
+=== system.process.cgroup.blkio.path
+
+type: keyword
+
+Path to the cgroup relative to the cgroup subsystems mountpoint.
+
+
+[float]
+=== system.process.cgroup.blkio.total.bytes
+
+type: long
+
+format: bytes
+
+Total number of bytes transferred to and from all block devices by processes in the cgroup.
+
+
+[float]
+=== system.process.cgroup.blkio.total.ios
+
+type: long
+
+Total number of I/O operations performed on all devices by processes in the cgroup as seen by the throttling policy.
 
 
 [[exported-fields-zookeeper]]
@@ -2801,7 +5222,7 @@ Approximate size of ZooKeeper data.
 [float]
 === zookeeper.mntr.latency.avg
 
-type: integer
+type: long
 
 Average latency between ensemble hosts in milliseconds.
 
@@ -2809,7 +5230,7 @@ Average latency between ensemble hosts in milliseconds.
 [float]
 === zookeeper.mntr.ephemerals_count
 
-type: integer
+type: long
 
 Number of ephemeral znodes.
 
@@ -2817,7 +5238,7 @@ Number of ephemeral znodes.
 [float]
 === zookeeper.mntr.followers
 
-type: integer
+type: long
 
 Number of followers seen by the current host.
 
@@ -2825,7 +5246,7 @@ Number of followers seen by the current host.
 [float]
 === zookeeper.mntr.max_file_descriptor_count
 
-type: integer
+type: long
 
 Maximum number of file descriptors allowed for the ZooKeeper process.
 
@@ -2833,7 +5254,7 @@ Maximum number of file descriptors allowed for the ZooKeeper process.
 [float]
 === zookeeper.mntr.latency.max
 
-type: integer
+type: long
 
 Maximum latency in milliseconds.
 
@@ -2841,7 +5262,7 @@ Maximum latency in milliseconds.
 [float]
 === zookeeper.mntr.latency.min
 
-type: integer
+type: long
 
 Minimum latency in milliseconds.
 
@@ -2849,7 +5270,7 @@ Minimum latency in milliseconds.
 [float]
 === zookeeper.mntr.num_alive_connections
 
-type: integer
+type: long
 
 Number of connections to ZooKeeper that are currently alive.
 
@@ -2857,7 +5278,7 @@ Number of connections to ZooKeeper that are currently alive.
 [float]
 === zookeeper.mntr.open_file_descriptor_count
 
-type: integer
+type: long
 
 Number of file descriptors open by the ZooKeeper process.
 
@@ -2865,7 +5286,7 @@ Number of file descriptors open by the ZooKeeper process.
 [float]
 === zookeeper.mntr.outstanding_requests
 
-type: integer
+type: long
 
 Number of outstanding requests that need to be processed by the cluster.
 
@@ -2873,7 +5294,7 @@ Number of outstanding requests that need to be processed by the cluster.
 [float]
 === zookeeper.mntr.packets.received
 
-type: integer
+type: long
 
 Number of ZooKeeper network packets received.
 
@@ -2889,7 +5310,7 @@ Number of ZooKeeper network packets sent.
 [float]
 === zookeeper.mntr.pending_syncs
 
-type: integer
+type: long
 
 Number of pending syncs to carry out to ZooKeeper ensemble followers.
 
@@ -2905,7 +5326,7 @@ Role in the ZooKeeper ensemble.
 [float]
 === zookeeper.mntr.synced_followers
 
-type: integer
+type: long
 
 Number of synced followers reported when a node server_state is leader.
 
@@ -2921,7 +5342,7 @@ ZooKeeper version and build string reported.
 [float]
 === zookeeper.mntr.watch_count
 
-type: integer
+type: long
 
 Number of watches currently set on the local ZooKeeper process.
 
@@ -2929,7 +5350,7 @@ Number of watches currently set on the local ZooKeeper process.
 [float]
 === zookeeper.mntr.znode_count
 
-type: integer
+type: long
 
 Number of znodes reported by the local ZooKeeper process.
 

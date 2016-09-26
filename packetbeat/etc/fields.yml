@@ -198,10 +198,12 @@
             Object with source to destination flow measurements.
           fields:
             - name: net_packets_total
+              type: long
               description: >
                 Total number of packets
 
             - name: net_bytes_total
+              type: long
               description: >
                 Total number of bytes
 
@@ -274,10 +276,12 @@
             Object with destination to source flow measurements.
           fields:
             - name: net_packets_total
+              type: long
               description: >
                 Total number of packets
 
             - name: net_bytes_total
+              type: long
               description: >
                 Total number of bytes
     - name: icmp_id
@@ -390,11 +394,11 @@
           description: A human readable form of the request.
 
         - name: request.type
-          type: integer
+          type: long
           description: The request type.
 
         - name: request.code
-          type: integer
+          type: long
           description: The request code.
 
         - name: response.message
@@ -402,11 +406,11 @@
           description: A human readable form of the response.
 
         - name: response.type
-          type: integer
+          type: long
           description: The response type.
 
         - name: response.code
-          type: integer
+          type: long
           description: The response code.
 
 - key: dns
@@ -417,7 +421,7 @@
       type: group
       fields:
         - name: id
-          type: integer
+          type: long
           description: >
             The DNS packet identifier assigned by the program that generated the
             query. The identifier is copied to the response.
@@ -494,7 +498,7 @@
           example: amazon.co.uk.
 
         - name: answers_count
-          type: integer
+          type: long
           description: >
             The number of resource records contained in the `dns.answers` field.
 
@@ -515,7 +519,7 @@
             The time interval in seconds that this resource record may be cached
             before it should be discarded. Zero values mean that the data should
             not be cached.
-          type: integer
+          type: long
 
         - name: answers.data
           description: >
@@ -529,7 +533,7 @@
             answer.
 
         - name: authorities_count
-          type: integer
+          type: long
           description: >
             The number of resource records contained in the `dns.authorities` field.
             The `dns.authorities` field may or may not be included depending on the
@@ -558,7 +562,7 @@
             The time interval in seconds that this resource record may be cached
             before it should be discarded. Zero values mean that the data should
             not be cached.
-          type: integer
+          type: long
 
         - name: answers.data
           description: >
@@ -572,7 +576,7 @@
             answer.
 
         - name: additionals_count
-          type: integer
+          type: long
           description: >
             The number of resource records contained in the `dns.additionals` field.
             The `dns.additionals` field may or may not be included depending on the
@@ -595,7 +599,7 @@
             The time interval in seconds that this resource record may be cached
             before it should be discarded. Zero values mean that the data should
             not be cached.
-          type: integer
+          type: long
 
         - name: additionals.data
           description: >
@@ -615,7 +619,7 @@
           example: "BADVERS"
 
         - name: opt.udp_size
-          type: integer
+          type: long
           description: Requestor's UDP payload size (in bytes).
 
 - key: amqp
@@ -626,7 +630,7 @@
       type: group
       fields:
         - name: reply-code
-          type: integer
+          type: long
           description: >
             AMQP reply code to an error, similar to http reply-code
           example: 404
@@ -637,12 +641,12 @@
             Text explaining the error.
 
         - name: class-id
-          type: integer
+          type: long
           description: >
             Failing method class.
 
         - name: method-id
-          type: integer
+          type: long
           description: >
             Failing method ID.
 
@@ -687,18 +691,18 @@
             Identifier for the consumer, valid within the current channel.
 
         - name: delivery-tag
-          type: integer
+          type: long
           description: >
             The server-assigned and channel-specific delivery tag.
 
         - name: message-count
-          type: integer
+          type: long
           description: >
             The number of messages in the queue, which will be zero for
             newly-declared queues.
 
         - name: consumer-count
-          type: integer
+          type: long
           description: >
             The number of consumers of a queue.
 
@@ -783,7 +787,7 @@
             Non-persistent (1) or persistent (2).
 
         - name: priority
-          type: integer
+          type: long
           description: >
             Message priority, 0 to 9.
 
@@ -827,43 +831,368 @@
           description: >
             Creating application id.
 
+
+- key: cassandra
+  title: "Cassandra"
+  description: Cassandra v4/3 specific event fields.
+  fields:
+    - name: cassandra
+      type: group
+      description: Information about the Cassandra request and response.
+      fields:
+        - name: request
+          type: group
+          description: Cassandra request.
+          fields:
+            - name: headers
+              type: group
+              description: Cassandra request headers.
+              fields:
+                - name: version
+                  type: long
+                  description: The version of the protocol.
+                - name: flags
+                  type: keyword
+                  description: Flags applying to this frame.
+                - name: stream
+                  type: keyword
+                  description:  A frame has a stream id.  If a client sends a request message with the stream id X, it is guaranteed that the stream id of the response to that message will be X.
+                - name: op
+                  type: keyword
+                  description: An operation type that distinguishes the actual message.
+                - name: length
+                  type: long
+                  description: A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+            - name: query
+              type: keyword
+              description: The CQL query which client send to cassandra.
+
+        - name: response
+          type: group
+          description: Cassandra response.
+          fields:
+            - name: headers
+              type: group
+              description: Cassandra response headers, the structure is as same as request's header.
+              fields:
+                - name: version
+                  type: long
+                  description: The version of the protocol.
+                - name: flags
+                  type: keyword
+                  description: Flags applying to this frame.
+                - name: stream
+                  type: keyword
+                  description:  A frame has a stream id.  If a client sends a request message with the stream id X, it is guaranteed that the stream id of the response to that message will be X.
+                - name: op
+                  type: keyword
+                  description: An operation type that distinguishes the actual message.
+                - name: length
+                  type: long
+                  description: A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+
+
+            - name: result
+              type: group
+              description: Details about the returned result.
+              fields:
+                - name: type
+                  type: keyword
+                  description: Cassandra result type.
+                - name: rows
+                  type: group
+                  description: Details about the rows.
+                  fields:
+                    - name: num_rows
+                      type: long
+                      description: Representing the number of rows present in this result.
+                    - name: meta
+                      type: group
+                      description: Composed of result metadata.
+                      fields:
+                        - name: keyspace
+                          type: keyword
+                          description: Only present after set Global_tables_spec, the keyspace name.
+                        - name: table
+                          type: keyword
+                          description: Only present after set Global_tables_spec, the table name.
+                        - name: flags
+                          type: keyword
+                          description: Provides information on the formatting of the remaining information.
+                        - name: col_count
+                          type: long
+                          description: Representing the number of columns selected by the query that produced this result.
+                        - name: pkey_columns
+                          type: long
+                          description: Representing the PK columns index and counts.
+                        - name: paging_state
+                          type: keyword
+                          description: The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
+                - name: keyspace
+                  type: keyword
+                  description: Indicating the name of the keyspace that has been set.
+                - name: schema_change
+                  type: group
+                  description: The result to a schema_change message.
+                  fields:
+                    - name: change
+                      type: keyword
+                      description:  Representing the type of changed involved.
+                    - name: keyspace
+                      type: keyword
+                      description: This describes which keyspace has changed.
+                    - name: table
+                      type: keyword
+                      description: This describes which table has changed.
+                    - name: object
+                      type: keyword
+                      description: This describes the name of said affected object (either the table, user type, function, or aggregate name).
+                    - name: target
+                      type: keyword
+                      description: Target could be "FUNCTION" or "AGGREGATE", multiple arguments.
+                    - name: name
+                      type: keyword
+                      description: The function/aggregate name.
+                    - name: args
+                      type: keyword
+                      description: One string for each argument type (as CQL type).
+                - name: prepared
+                  type: group
+                  description: The result to a PREPARE message.
+                  fields:
+                    - name: prepared_id
+                      type: keyword
+                      description: Representing the prepared query ID.
+                    - name: req_meta
+                      type: group
+                      description: This describes the request metadata.
+                      fields:
+                        - name: keyspace
+                          type: keyword
+                          description: Only present after set Global_tables_spec, the keyspace name.
+                        - name: table
+                          type: keyword
+                          description: Only present after set Global_tables_spec, the table name.
+                        - name: flags
+                          type: keyword
+                          description: Provides information on the formatting of the remaining information.
+                        - name: col_count
+                          type: long
+                          description: Representing the number of columns selected by the query that produced this result.
+                        - name: pkey_columns
+                          type: long
+                          description: Representing the PK columns index and counts.
+                        - name: paging_state
+                          type: keyword
+                          description: The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
+                    - name: resp_meta
+                      type: group
+                      description: This describes the metadata for the result set.
+                      fields:
+                        - name: keyspace
+                          type: keyword
+                          description: Only present after set Global_tables_spec, the keyspace name.
+                        - name: table
+                          type: keyword
+                          description: Only present after set Global_tables_spec, the table name.
+                        - name: flags
+                          type: keyword
+                          description: Provides information on the formatting of the remaining information.
+                        - name: col_count
+                          type: long
+                          description: Representing the number of columns selected by the query that produced this result.
+                        - name: pkey_columns
+                          type: long
+                          description: Representing the PK columns index and counts.
+                        - name: paging_state
+                          type: keyword
+                          description: The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
+
+            - name: supported
+              type: dict
+              dict-type: keyword
+              description:  Indicates which startup options are supported by the server. This message comes as a response to an OPTIONS message.
+
+            - name: authentication
+              type: group
+              description:  Indicates that the server requires authentication, and which authentication mechanism to use.
+              fields:
+              - name: class
+                type: keyword
+                description: Indicates the full class name of the IAuthenticator in use
+
+
+            - name: warnings
+              type: keyword
+              description: The text of the warnings, only occur when Warning flag was set.
+
+            - name: event
+              type: group
+              description: Event pushed by the server. A client will only receive events for the types it has REGISTERed to.
+              fields:
+                - name: type
+                  type: keyword
+                  description: Representing the event type.
+                - name: change
+                  type: keyword
+                  description: The message corresponding respectively to the type of change followed by the address of the new/removed node.
+                - name: host
+                  type: keyword
+                  description: Representing the node ip.
+                - name: host
+                  type: keyword
+                  description: Representing the node port.
+                - name: schema_change
+                  type: group
+                  description: The events details related to schema change.
+                  fields:
+                    - name: change
+                      type: keyword
+                      description:  Representing the type of changed involved.
+                    - name: keyspace
+                      type: keyword
+                      description: This describes which keyspace has changed.
+                    - name: table
+                      type: keyword
+                      description: This describes which table has changed.
+                    - name: object
+                      type: keyword
+                      description: This describes the name of said affected object (either the table, user type, function, or aggregate name).
+                    - name: target
+                      type: keyword
+                      description: Target could be "FUNCTION" or "AGGREGATE", multiple arguments.
+                    - name: name
+                      type: keyword
+                      description: The function/aggregate name.
+                    - name: args
+                      type: keyword
+                      description: One string for each argument type (as CQL type).
+
+
+            - name: error
+              type: group
+              description: Indicates an error processing a request. The body of the message will be an  error code followed by a error message. Then, depending on the exception, more content may follow.
+              fields:
+                - name: code
+                  type: long
+                  description: The error code of the Cassandra response.
+
+                - name: msg
+                  type: keyword
+                  description: The error message of the Cassandra response.
+
+                - name: type
+                  type: keyword
+                  description: The error type of the Cassandra response.
+
+                - name: details
+                  type: group
+                  description: The details of the error.
+                  fields:
+                    - name: read_consistency
+                      type: keyword
+                      description:  Representing the consistency level of the query that triggered the exception.
+
+                    - name: required
+                      type: long
+                      description:  Representing the number of nodes that should be alive to respect consistency level.
+
+                    - name: alive
+                      type: long
+                      description:  Representing the number of replicas that were known to be alive when the request had been processed (since an unavailable exception has been triggered).
+
+                    - name: received
+                      type: long
+                      description:  Representing the number of nodes having acknowledged the request.
+
+                    - name: blockfor
+                      type: long
+                      description:  Representing the number of replicas whose acknowledgement is required to achieve consistency level.
+
+                    - name: write_type
+                      type: keyword
+                      description:  Describe the type of the write that timed out.
+
+                    - name: data_present
+                      type: boolean
+                      description:  It means the replica that was asked for data had responded.
+
+                    - name: keyspace
+                      type: keyword
+                      description:  The keyspace of the failed function.
+
+                    - name: table
+                      type: keyword
+                      description:  The keyspace of the failed function.
+
+                    - name: stmt_id
+                      type: keyword
+                      description:  Representing the unknown ID.
+
+                    - name: num_failures
+                      type: keyword
+                      description:  Representing the number of nodes that experience a failure while executing the request.
+
+                    - name: function
+                      type: keyword
+                      description:  The name of the failed function.
+
+                    - name: arg_types
+                      type: keyword
+                      description:  One string for each argument type (as CQL type) of the failed function.
+
+
+
 - key: http
   title: "HTTP"
   description: HTTP-specific event fields.
   fields:
     - name: http
       type: group
+      description: Information about the HTTP request and response.
       fields:
-        - name: code
-          description: The HTTP status code.
-          example: 404
+        - name: request
+          description: HTTP request
+          type: group
+          fields:
+            - name: params
+              description: >
+                The query parameters or form values. The query parameters are available in the Request-URI
+                and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
+            - name: headers
+              type: dict
+              dict-type: keyword
+              description: >
+                A map containing the captured header fields from the request.
+                Which headers to capture is configurable. If headers with the same
+                header name are present in the message, they will be separated by
+                commas.
+            - name: body
+              type: text
+              description: The body of the HTTP request.
 
-        - name: phrase
-          description: The HTTP status phrase.
-          example: Not found.
+        - name: response
+          description: HTTP response
+          type: group
+          fields:
+            - name: code
+              description: The HTTP status code.
+              example: 404
 
-        - name: request_headers
-          type: dict
-          dict-type: keyword
-          description: >
-            A map containing the captured header fields from the request.
-            Which headers to capture is configurable. If headers with the same
-            header name are present in the message, they will be separated by
-            commas.
+            - name: phrase
+              description: The HTTP status phrase.
+              example: Not found.
 
-        - name: response_headers
-          type: dict
-          dict-type: keyword
-          description: >
-            A map containing the captured header fields from the response.
-            Which headers to capture is configurable. If headers with the
-            same header name are present in the message, they will be separated
-            by commas.
-
-        - name: content_length
-          type: long
-          description: >
-            The value of the Content-Length header if present.
+            - name: headers
+              type: dict
+              dict-type: keyword
+              description: >
+                A map containing the captured header fields from the response.
+                Which headers to capture is configurable. If headers with the
+                same header name are present in the message, they will be separated
+                by commas.
+            - name: body
+              description: The body of the HTTP response.
 
 - key: memcache
   title: "Memcache"
@@ -931,29 +1260,29 @@
             The binary protocol message opcode name.
 
         - name: request.opcode_value
-          type: integer
+          type: long
           description: >
             The binary protocol message opcode value.
 
         - name: response.opcode_value
-          type: integer
+          type: long
           description: >
             The binary protocol message opcode value.
 
         - name: request.opaque
-          type: integer
+          type: long
           description: >
             The binary protocol opaque header value used for correlating request
             with response messages.
 
         - name: response.opaque
-          type: integer
+          type: long
           description: >
             The binary protocol opaque header value used for correlating request
             with response messages.
 
         - name: request.vbucket
-          type: integer
+          type: long
           description: >
             The vbucket index sent in the binary message.
 
@@ -964,7 +1293,7 @@
             (binary protocol only).
 
         - name: response.status_code
-          type: integer
+          type: long
           description: >
             The status code value returned in the response (binary protocol only).
 
@@ -979,13 +1308,13 @@
             The list of keys returned for the load command (if present).
 
         - name: request.count_values
-          type: integer
+          type: long
           description: >
             The number of values found in the memcache request message.
             If the command does not send any data, this field is missing.
 
         - name: response.count_values
-          type: integer
+          type: long
           description: >
             The number of values found in the memcache response message.
             If the command does not send any data, this field is missing.
@@ -1002,26 +1331,28 @@
 
         - name: request.bytes
           type: long
+          format: bytes
           description: >
             The byte count of the values being transfered.
 
         - name: response.bytes
           type: long
+          format: bytes
           description: >
             The byte count of the values being transfered.
 
         - name: request.delta
-          type: integer
+          type: long
           description: >
             The counter increment/decrement delta value.
 
         - name: request.initial
-          type: integer
+          type: long
           description: >
             The counter increment/decrement initial value parameter (binary protocol only).
 
         - name: request.verbosity
-          type: integer
+          type: long
           description: >
             The value of the memcache "verbosity" command.
 
@@ -1031,12 +1362,12 @@
             The text protocol raw arguments for the "stats ..." and "lru crawl ..." commands.
 
         - name: request.source_class
-          type: integer
+          type: long
           description: >
             The source class id in 'slab reassign' command.
 
         - name: request.dest_class
-          type: integer
+          type: long
           description: >
             The destination class id in 'slab reassign' command.
 
@@ -1058,7 +1389,7 @@
             The memcache message flags sent in the response (if present).
 
         - name: request.exptime
-          type: integer
+          type: long
           description: >
             The data expiry time in seconds sent with the memcache command (if present).
             If the value is <30 days, the expiry time is relative to "now", or else it
@@ -1121,7 +1452,7 @@
            If the MySQL query returns an error, this field is set to true.
 
         - name: affected_rows
-          type: integer
+          type: long
           description: >
             If the MySQL command is successful, this field contains the affected
             number of rows of the last statement.
@@ -1146,7 +1477,7 @@
             The row mysql query as read from the transaction's request.
 
         - name: error_code
-          type: integer
+          type: long
           description: >
             The error code returned by MySQL.
 
@@ -1172,7 +1503,7 @@
 
         - name: error_code
           description: The PostgreSQL error code.
-          type: integer
+          type: long
 
         - name: error_message
           description: The PostgreSQL error message.
@@ -1261,16 +1592,16 @@
             using a dot (.) for the concatenation.
             For example, for the database foo and the collection bar, the full collection name is foo.bar.
         - name: numberToSkip
-          type: integer
+          type: long
           description: >
             Sets the number of documents to omit - starting from the first document in the resulting dataset -
             when returning the result of the query.
         - name: numberToReturn
-          type: integer
+          type: long
           description: >
             The requested maximum number of documents to be returned.
         - name: numberReturned
-          type: integer
+          type: long
           description: >
             The number of documents in the reply.
         - name: startingFrom
@@ -1306,11 +1637,11 @@
           description: RPC message transaction identifier.
 
         - name: call_size
-          type: integer
+          type: long
           description: RPC call size with argument.
 
         - name: reply_size
-          type: integer
+          type: long
           description: RPC reply size with argument.
 
         - name: status
@@ -1327,18 +1658,18 @@
           description: RPC authentication flavor.
 
         - name: cred.uid
-          type: integer
+          type: long
           description: RPC caller's user id, in case of auth-unix.
 
         - name: cred.gid
-          type: integer
+          type: long
           description: RPC caller's group id, in case of auth-unix.
 
         - name: cred.gids
           description: RPC caller's secondary group ids, in case of auth-unix.
 
         - name: cred.stamp
-          type: integer
+          type: long
           description: Arbitrary ID which the caller machine may generate.
 
         - name: cred.machinename
@@ -1352,11 +1683,11 @@
       type: group
       fields:
         - name: version
-          type: integer
+          type: long
           description: NFS protocol version number.
 
         - name: minor_version
-          type: integer
+          type: long
           description: NFS protocol minor version number.
 
         - name: tag
@@ -1369,6 +1700,7 @@
 
         - name: status
           description: NFS operation reply status.
+
 
 
 - key: raw
@@ -1410,6 +1742,7 @@
         the application layer message length, without the length of the IP or
         TCP headers.
       type: long
+      format: bytes
 
     - name: bytes_out
       description: >
@@ -1417,6 +1750,7 @@
         the application layer message length, without the length of the IP or
         TCP headers.
       type: long
+      format: bytes
 
     - name: dnstime
       type: long

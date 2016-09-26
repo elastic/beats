@@ -13,10 +13,19 @@ import (
 	"github.com/elastic/beats/libbeat/paths"
 )
 
-// cmd line flags
-var verbose *bool
-var toStderr *bool
-var debugSelectorsStr *string
+var (
+	// cmd line flags
+	verbose           *bool
+	toStderr          *bool
+	debugSelectorsStr *string
+
+	// Beat start time
+	startTime time.Time
+)
+
+func init() {
+	startTime = time.Now()
+}
 
 type Logging struct {
 	Selectors []string
@@ -223,4 +232,16 @@ func logExpvars(metricsCfg *LoggingMetricsConfig) {
 			Info("No non-zero metrics in the last %s", metricsCfg.Period)
 		}
 	}
+}
+
+func LogTotalExpvars(cfg *Logging) {
+	if cfg.Metrics.Enabled != nil && *cfg.Metrics.Enabled == false {
+		return
+	}
+	vals := map[string]int64{}
+	prevVals := map[string]int64{}
+	snapshotExpvars(vals)
+	metrics := buildMetricsOutput(prevVals, vals)
+	Info("Total non-zero values: %s", metrics)
+	Info("Uptime: %s", time.Now().Sub(startTime))
 }

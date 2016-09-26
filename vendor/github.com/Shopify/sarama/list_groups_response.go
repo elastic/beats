@@ -23,7 +23,7 @@ func (r *ListGroupsResponse) encode(pe packetEncoder) error {
 	return nil
 }
 
-func (r *ListGroupsResponse) decode(pd packetDecoder) error {
+func (r *ListGroupsResponse) decode(pd packetDecoder, version int16) error {
 	if kerr, err := pd.getInt16(); err != nil {
 		return err
 	} else {
@@ -53,4 +53,16 @@ func (r *ListGroupsResponse) decode(pd packetDecoder) error {
 	}
 
 	return nil
+}
+
+func (r *ListGroupsResponse) key() int16 {
+	return 16
+}
+
+func (r *ListGroupsResponse) version() int16 {
+	return 0
+}
+
+func (r *ListGroupsResponse) requiredVersion() KafkaVersion {
+	return V0_9_0_0
 }

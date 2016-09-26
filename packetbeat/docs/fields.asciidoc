@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-amqp>>
 * <<exported-fields-beat>>
+* <<exported-fields-cassandra>>
 * <<exported-fields-common>>
 * <<exported-fields-dns>>
 * <<exported-fields-flows_event>>
@@ -41,7 +42,7 @@ AMQP specific event fields.
 [float]
 === amqp.reply-code
 
-type: integer
+type: long
 
 example: 404
 
@@ -59,7 +60,7 @@ Text explaining the error.
 [float]
 === amqp.class-id
 
-type: integer
+type: long
 
 Failing method class.
 
@@ -67,7 +68,7 @@ Failing method class.
 [float]
 === amqp.method-id
 
-type: integer
+type: long
 
 Failing method ID.
 
@@ -139,7 +140,7 @@ Identifier for the consumer, valid within the current channel.
 [float]
 === amqp.delivery-tag
 
-type: integer
+type: long
 
 The server-assigned and channel-specific delivery tag.
 
@@ -147,7 +148,7 @@ The server-assigned and channel-specific delivery tag.
 [float]
 === amqp.message-count
 
-type: integer
+type: long
 
 The number of messages in the queue, which will be zero for newly-declared queues.
 
@@ -155,7 +156,7 @@ The number of messages in the queue, which will be zero for newly-declared queue
 [float]
 === amqp.consumer-count
 
-type: integer
+type: long
 
 The number of consumers of a queue.
 
@@ -285,7 +286,7 @@ Non-persistent (1) or persistent (2).
 [float]
 === amqp.priority
 
-type: integer
+type: long
 
 Message priority, 0 to 9.
 
@@ -364,7 +365,7 @@ Contains common beat fields available in all event types.
 [float]
 === beat.name
 
-The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
 
 
 [float]
@@ -378,9 +379,9 @@ The hostname as returned by the operating system on which the Beat is running.
 
 type: date
 
-example: 2015-01-24 14:06:05.071000
+example: August 26th 2016, 12:35:53.332
 
-format: YYYY-MM-DDTHH:MM:SS.milliZ
+format: date
 
 required: True
 
@@ -400,6 +401,604 @@ type: dict
 
 Contains user configurable fields.
 
+
+[[exported-fields-cassandra]]
+== Cassandra Fields
+
+Cassandra v4/3 specific event fields.
+
+
+[float]
+== cassandra Fields
+
+Information about the Cassandra request and response.
+
+
+[float]
+== request Fields
+
+Cassandra request.
+
+
+[float]
+== headers Fields
+
+Cassandra request headers.
+
+
+[float]
+=== cassandra.request.headers.version
+
+type: long
+
+The version of the protocol.
+
+[float]
+=== cassandra.request.headers.flags
+
+type: keyword
+
+Flags applying to this frame.
+
+[float]
+=== cassandra.request.headers.stream
+
+type: keyword
+
+A frame has a stream id.  If a client sends a request message with the stream id X, it is guaranteed that the stream id of the response to that message will be X.
+
+[float]
+=== cassandra.request.headers.op
+
+type: keyword
+
+An operation type that distinguishes the actual message.
+
+[float]
+=== cassandra.request.headers.length
+
+type: long
+
+A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+
+[float]
+=== cassandra.request.query
+
+type: keyword
+
+The CQL query which client send to cassandra.
+
+[float]
+== response Fields
+
+Cassandra response.
+
+
+[float]
+== headers Fields
+
+Cassandra response headers, the structure is as same as request's header.
+
+
+[float]
+=== cassandra.response.headers.version
+
+type: long
+
+The version of the protocol.
+
+[float]
+=== cassandra.response.headers.flags
+
+type: keyword
+
+Flags applying to this frame.
+
+[float]
+=== cassandra.response.headers.stream
+
+type: keyword
+
+A frame has a stream id.  If a client sends a request message with the stream id X, it is guaranteed that the stream id of the response to that message will be X.
+
+[float]
+=== cassandra.response.headers.op
+
+type: keyword
+
+An operation type that distinguishes the actual message.
+
+[float]
+=== cassandra.response.headers.length
+
+type: long
+
+A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+
+[float]
+== result Fields
+
+Details about the returned result.
+
+
+[float]
+=== cassandra.response.result.type
+
+type: keyword
+
+Cassandra result type.
+
+[float]
+== rows Fields
+
+Details about the rows.
+
+
+[float]
+=== cassandra.response.result.rows.num_rows
+
+type: long
+
+Representing the number of rows present in this result.
+
+[float]
+== meta Fields
+
+Composed of result metadata.
+
+
+[float]
+=== cassandra.response.result.rows.meta.keyspace
+
+type: keyword
+
+Only present after set Global_tables_spec, the keyspace name.
+
+[float]
+=== cassandra.response.result.rows.meta.table
+
+type: keyword
+
+Only present after set Global_tables_spec, the table name.
+
+[float]
+=== cassandra.response.result.rows.meta.flags
+
+type: keyword
+
+Provides information on the formatting of the remaining information.
+
+[float]
+=== cassandra.response.result.rows.meta.col_count
+
+type: long
+
+Representing the number of columns selected by the query that produced this result.
+
+[float]
+=== cassandra.response.result.rows.meta.pkey_columns
+
+type: long
+
+Representing the PK columns index and counts.
+
+[float]
+=== cassandra.response.result.rows.meta.paging_state
+
+type: keyword
+
+The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
+
+[float]
+=== cassandra.response.result.keyspace
+
+type: keyword
+
+Indicating the name of the keyspace that has been set.
+
+[float]
+== schema_change Fields
+
+The result to a schema_change message.
+
+
+[float]
+=== cassandra.response.result.schema_change.change
+
+type: keyword
+
+Representing the type of changed involved.
+
+[float]
+=== cassandra.response.result.schema_change.keyspace
+
+type: keyword
+
+This describes which keyspace has changed.
+
+[float]
+=== cassandra.response.result.schema_change.table
+
+type: keyword
+
+This describes which table has changed.
+
+[float]
+=== cassandra.response.result.schema_change.object
+
+type: keyword
+
+This describes the name of said affected object (either the table, user type, function, or aggregate name).
+
+[float]
+=== cassandra.response.result.schema_change.target
+
+type: keyword
+
+Target could be "FUNCTION" or "AGGREGATE", multiple arguments.
+
+[float]
+=== cassandra.response.result.schema_change.name
+
+type: keyword
+
+The function/aggregate name.
+
+[float]
+=== cassandra.response.result.schema_change.args
+
+type: keyword
+
+One string for each argument type (as CQL type).
+
+[float]
+== prepared Fields
+
+The result to a PREPARE message.
+
+
+[float]
+=== cassandra.response.result.prepared.prepared_id
+
+type: keyword
+
+Representing the prepared query ID.
+
+[float]
+== req_meta Fields
+
+This describes the request metadata.
+
+
+[float]
+=== cassandra.response.result.prepared.req_meta.keyspace
+
+type: keyword
+
+Only present after set Global_tables_spec, the keyspace name.
+
+[float]
+=== cassandra.response.result.prepared.req_meta.table
+
+type: keyword
+
+Only present after set Global_tables_spec, the table name.
+
+[float]
+=== cassandra.response.result.prepared.req_meta.flags
+
+type: keyword
+
+Provides information on the formatting of the remaining information.
+
+[float]
+=== cassandra.response.result.prepared.req_meta.col_count
+
+type: long
+
+Representing the number of columns selected by the query that produced this result.
+
+[float]
+=== cassandra.response.result.prepared.req_meta.pkey_columns
+
+type: long
+
+Representing the PK columns index and counts.
+
+[float]
+=== cassandra.response.result.prepared.req_meta.paging_state
+
+type: keyword
+
+The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
+
+[float]
+== resp_meta Fields
+
+This describes the metadata for the result set.
+
+
+[float]
+=== cassandra.response.result.prepared.resp_meta.keyspace
+
+type: keyword
+
+Only present after set Global_tables_spec, the keyspace name.
+
+[float]
+=== cassandra.response.result.prepared.resp_meta.table
+
+type: keyword
+
+Only present after set Global_tables_spec, the table name.
+
+[float]
+=== cassandra.response.result.prepared.resp_meta.flags
+
+type: keyword
+
+Provides information on the formatting of the remaining information.
+
+[float]
+=== cassandra.response.result.prepared.resp_meta.col_count
+
+type: long
+
+Representing the number of columns selected by the query that produced this result.
+
+[float]
+=== cassandra.response.result.prepared.resp_meta.pkey_columns
+
+type: long
+
+Representing the PK columns index and counts.
+
+[float]
+=== cassandra.response.result.prepared.resp_meta.paging_state
+
+type: keyword
+
+The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
+
+[float]
+=== cassandra.response.supported
+
+type: dict
+
+Indicates which startup options are supported by the server. This message comes as a response to an OPTIONS message.
+
+[float]
+== authentication Fields
+
+Indicates that the server requires authentication, and which authentication mechanism to use.
+
+
+[float]
+=== cassandra.response.authentication.class
+
+type: keyword
+
+Indicates the full class name of the IAuthenticator in use
+
+[float]
+=== cassandra.response.warnings
+
+type: keyword
+
+The text of the warnings, only occur when Warning flag was set.
+
+[float]
+== event Fields
+
+Event pushed by the server. A client will only receive events for the types it has REGISTERed to.
+
+
+[float]
+=== cassandra.response.event.type
+
+type: keyword
+
+Representing the event type.
+
+[float]
+=== cassandra.response.event.change
+
+type: keyword
+
+The message corresponding respectively to the type of change followed by the address of the new/removed node.
+
+[float]
+=== cassandra.response.event.host
+
+type: keyword
+
+Representing the node ip.
+
+[float]
+=== cassandra.response.event.host
+
+type: keyword
+
+Representing the node port.
+
+[float]
+== schema_change Fields
+
+The events details related to schema change.
+
+
+[float]
+=== cassandra.response.event.schema_change.change
+
+type: keyword
+
+Representing the type of changed involved.
+
+[float]
+=== cassandra.response.event.schema_change.keyspace
+
+type: keyword
+
+This describes which keyspace has changed.
+
+[float]
+=== cassandra.response.event.schema_change.table
+
+type: keyword
+
+This describes which table has changed.
+
+[float]
+=== cassandra.response.event.schema_change.object
+
+type: keyword
+
+This describes the name of said affected object (either the table, user type, function, or aggregate name).
+
+[float]
+=== cassandra.response.event.schema_change.target
+
+type: keyword
+
+Target could be "FUNCTION" or "AGGREGATE", multiple arguments.
+
+[float]
+=== cassandra.response.event.schema_change.name
+
+type: keyword
+
+The function/aggregate name.
+
+[float]
+=== cassandra.response.event.schema_change.args
+
+type: keyword
+
+One string for each argument type (as CQL type).
+
+[float]
+== error Fields
+
+Indicates an error processing a request. The body of the message will be an  error code followed by a error message. Then, depending on the exception, more content may follow.
+
+
+[float]
+=== cassandra.response.error.code
+
+type: long
+
+The error code of the Cassandra response.
+
+[float]
+=== cassandra.response.error.msg
+
+type: keyword
+
+The error message of the Cassandra response.
+
+[float]
+=== cassandra.response.error.type
+
+type: keyword
+
+The error type of the Cassandra response.
+
+[float]
+== details Fields
+
+The details of the error.
+
+
+[float]
+=== cassandra.response.error.details.read_consistency
+
+type: keyword
+
+Representing the consistency level of the query that triggered the exception.
+
+[float]
+=== cassandra.response.error.details.required
+
+type: long
+
+Representing the number of nodes that should be alive to respect consistency level.
+
+[float]
+=== cassandra.response.error.details.alive
+
+type: long
+
+Representing the number of replicas that were known to be alive when the request had been processed (since an unavailable exception has been triggered).
+
+[float]
+=== cassandra.response.error.details.received
+
+type: long
+
+Representing the number of nodes having acknowledged the request.
+
+[float]
+=== cassandra.response.error.details.blockfor
+
+type: long
+
+Representing the number of replicas whose acknowledgement is required to achieve consistency level.
+
+[float]
+=== cassandra.response.error.details.write_type
+
+type: keyword
+
+Describe the type of the write that timed out.
+
+[float]
+=== cassandra.response.error.details.data_present
+
+type: boolean
+
+It means the replica that was asked for data had responded.
+
+[float]
+=== cassandra.response.error.details.keyspace
+
+type: keyword
+
+The keyspace of the failed function.
+
+[float]
+=== cassandra.response.error.details.table
+
+type: keyword
+
+The keyspace of the failed function.
+
+[float]
+=== cassandra.response.error.details.stmt_id
+
+type: keyword
+
+Representing the unknown ID.
+
+[float]
+=== cassandra.response.error.details.num_failures
+
+type: keyword
+
+Representing the number of nodes that experience a failure while executing the request.
+
+[float]
+=== cassandra.response.error.details.function
+
+type: keyword
+
+The name of the failed function.
+
+[float]
+=== cassandra.response.error.details.arg_types
+
+type: keyword
+
+One string for each argument type (as CQL type) of the failed function.
 
 [[exported-fields-common]]
 == Common Fields
@@ -519,7 +1118,7 @@ DNS-specific event fields.
 [float]
 === dns.id
 
-type: integer
+type: long
 
 The DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
 
@@ -619,7 +1218,7 @@ The effective top-level domain (eTLD) plus one more label. For example, the eTLD
 [float]
 === dns.answers_count
 
-type: integer
+type: long
 
 The number of resource records contained in the `dns.answers` field.
 
@@ -648,7 +1247,7 @@ The class of DNS data contained in this resource record.
 [float]
 === dns.answers.ttl
 
-type: integer
+type: long
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
@@ -670,7 +1269,7 @@ An array containing a dictionary for each authority section from the answer.
 [float]
 === dns.authorities_count
 
-type: integer
+type: long
 
 The number of resource records contained in the `dns.authorities` field. The `dns.authorities` field may or may not be included depending on the configuration of Packetbeat.
 
@@ -707,7 +1306,7 @@ An array containing a dictionary about each answer section returned by the serve
 [float]
 === dns.answers.ttl
 
-type: integer
+type: long
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
@@ -729,7 +1328,7 @@ An array containing a dictionary for each additional section from the answer.
 [float]
 === dns.additionals_count
 
-type: integer
+type: long
 
 The number of resource records contained in the `dns.additionals` field. The `dns.additionals` field may or may not be included depending on the configuration of Packetbeat.
 
@@ -758,7 +1357,7 @@ The class of DNS data contained in this resource record.
 [float]
 === dns.additionals.ttl
 
-type: integer
+type: long
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
@@ -793,7 +1392,7 @@ Extended response code field.
 [float]
 === dns.opt.udp_size
 
-type: integer
+type: long
 
 Requestor's UDP payload size (in bytes).
 
@@ -971,11 +1570,15 @@ Object with source to destination flow measurements.
 [float]
 === source.stats.net_packets_total
 
+type: long
+
 Total number of packets
 
 
 [float]
 === source.stats.net_bytes_total
+
+type: long
 
 Total number of bytes
 
@@ -1073,11 +1676,15 @@ Object with destination to source flow measurements.
 [float]
 === dest.stats.net_packets_total
 
+type: long
+
 Total number of packets
 
 
 [float]
 === dest.stats.net_bytes_total
+
+type: long
 
 Total number of bytes
 
@@ -1106,23 +1713,26 @@ optional TCP connection id
 HTTP-specific event fields.
 
 
+[float]
+== http Fields
+
+Information about the HTTP request and response.
+
 
 [float]
-=== http.code
+== request Fields
 
-example: 404
+HTTP request
 
-The HTTP status code.
-
-[float]
-=== http.phrase
-
-example: Not found.
-
-The HTTP status phrase.
 
 [float]
-=== http.request_headers
+=== http.request.params
+
+The query parameters or form values. The query parameters are available in the Request-URI and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
+
+
+[float]
+=== http.request.headers
 
 type: dict
 
@@ -1130,7 +1740,34 @@ A map containing the captured header fields from the request. Which headers to c
 
 
 [float]
-=== http.response_headers
+=== http.request.body
+
+type: text
+
+The body of the HTTP request.
+
+[float]
+== response Fields
+
+HTTP response
+
+
+[float]
+=== http.response.code
+
+example: 404
+
+The HTTP status code.
+
+[float]
+=== http.response.phrase
+
+example: Not found.
+
+The HTTP status phrase.
+
+[float]
+=== http.response.headers
 
 type: dict
 
@@ -1138,12 +1775,9 @@ A map containing the captured header fields from the response. Which headers to 
 
 
 [float]
-=== http.content_length
+=== http.response.body
 
-type: long
-
-The value of the Content-Length header if present.
-
+The body of the HTTP response.
 
 [[exported-fields-icmp]]
 == ICMP Fields
@@ -1168,14 +1802,14 @@ A human readable form of the request.
 [float]
 === icmp.request.type
 
-type: integer
+type: long
 
 The request type.
 
 [float]
 === icmp.request.code
 
-type: integer
+type: long
 
 The request code.
 
@@ -1189,14 +1823,14 @@ A human readable form of the response.
 [float]
 === icmp.response.type
 
-type: integer
+type: long
 
 The response type.
 
 [float]
 === icmp.response.code
 
-type: integer
+type: long
 
 The response code.
 
@@ -1282,7 +1916,7 @@ The binary protocol message opcode name.
 [float]
 === memcache.request.opcode_value
 
-type: integer
+type: long
 
 The binary protocol message opcode value.
 
@@ -1290,7 +1924,7 @@ The binary protocol message opcode value.
 [float]
 === memcache.response.opcode_value
 
-type: integer
+type: long
 
 The binary protocol message opcode value.
 
@@ -1298,7 +1932,7 @@ The binary protocol message opcode value.
 [float]
 === memcache.request.opaque
 
-type: integer
+type: long
 
 The binary protocol opaque header value used for correlating request with response messages.
 
@@ -1306,7 +1940,7 @@ The binary protocol opaque header value used for correlating request with respon
 [float]
 === memcache.response.opaque
 
-type: integer
+type: long
 
 The binary protocol opaque header value used for correlating request with response messages.
 
@@ -1314,7 +1948,7 @@ The binary protocol opaque header value used for correlating request with respon
 [float]
 === memcache.request.vbucket
 
-type: integer
+type: long
 
 The vbucket index sent in the binary message.
 
@@ -1330,7 +1964,7 @@ The textual representation of the response error code (binary protocol only).
 [float]
 === memcache.response.status_code
 
-type: integer
+type: long
 
 The status code value returned in the response (binary protocol only).
 
@@ -1354,7 +1988,7 @@ The list of keys returned for the load command (if present).
 [float]
 === memcache.request.count_values
 
-type: integer
+type: long
 
 The number of values found in the memcache request message. If the command does not send any data, this field is missing.
 
@@ -1362,7 +1996,7 @@ The number of values found in the memcache request message. If the command does 
 [float]
 === memcache.response.count_values
 
-type: integer
+type: long
 
 The number of values found in the memcache response message. If the command does not send any data, this field is missing.
 
@@ -1388,6 +2022,8 @@ The list of base64 encoded values sent with the response (if present).
 
 type: long
 
+format: bytes
+
 The byte count of the values being transfered.
 
 
@@ -1396,13 +2032,15 @@ The byte count of the values being transfered.
 
 type: long
 
+format: bytes
+
 The byte count of the values being transfered.
 
 
 [float]
 === memcache.request.delta
 
-type: integer
+type: long
 
 The counter increment/decrement delta value.
 
@@ -1410,7 +2048,7 @@ The counter increment/decrement delta value.
 [float]
 === memcache.request.initial
 
-type: integer
+type: long
 
 The counter increment/decrement initial value parameter (binary protocol only).
 
@@ -1418,7 +2056,7 @@ The counter increment/decrement initial value parameter (binary protocol only).
 [float]
 === memcache.request.verbosity
 
-type: integer
+type: long
 
 The value of the memcache "verbosity" command.
 
@@ -1434,7 +2072,7 @@ The text protocol raw arguments for the "stats ..." and "lru crawl ..." commands
 [float]
 === memcache.request.source_class
 
-type: integer
+type: long
 
 The source class id in 'slab reassign' command.
 
@@ -1442,7 +2080,7 @@ The source class id in 'slab reassign' command.
 [float]
 === memcache.request.dest_class
 
-type: integer
+type: long
 
 The destination class id in 'slab reassign' command.
 
@@ -1474,7 +2112,7 @@ The memcache message flags sent in the response (if present).
 [float]
 === memcache.request.exptime
 
-type: integer
+type: long
 
 The data expiry time in seconds sent with the memcache command (if present). If the value is <30 days, the expiry time is relative to "now", or else it is an absolute Unix time in seconds (32-bit).
 
@@ -1566,7 +2204,7 @@ The full collection name. The full collection name is the concatenation of the d
 [float]
 === mongodb.numberToSkip
 
-type: integer
+type: long
 
 Sets the number of documents to omit - starting from the first document in the resulting dataset - when returning the result of the query.
 
@@ -1574,7 +2212,7 @@ Sets the number of documents to omit - starting from the first document in the r
 [float]
 === mongodb.numberToReturn
 
-type: integer
+type: long
 
 The requested maximum number of documents to be returned.
 
@@ -1582,7 +2220,7 @@ The requested maximum number of documents to be returned.
 [float]
 === mongodb.numberReturned
 
-type: integer
+type: long
 
 The number of documents in the reply.
 
@@ -1637,14 +2275,14 @@ RPC message transaction identifier.
 [float]
 === rpc.call_size
 
-type: integer
+type: long
 
 RPC call size with argument.
 
 [float]
 === rpc.reply_size
 
-type: integer
+type: long
 
 RPC reply size with argument.
 
@@ -1673,14 +2311,14 @@ RPC authentication flavor.
 [float]
 === rpc.cred.uid
 
-type: integer
+type: long
 
 RPC caller's user id, in case of auth-unix.
 
 [float]
 === rpc.cred.gid
 
-type: integer
+type: long
 
 RPC caller's group id, in case of auth-unix.
 
@@ -1692,7 +2330,7 @@ RPC caller's secondary group ids, in case of auth-unix.
 [float]
 === rpc.cred.stamp
 
-type: integer
+type: long
 
 Arbitrary ID which the caller machine may generate.
 
@@ -1720,7 +2358,7 @@ If the MySQL query returns an error, this field is set to true.
 [float]
 === mysql.affected_rows
 
-type: integer
+type: long
 
 If the MySQL command is successful, this field contains the affected number of rows of the last statement.
 
@@ -1752,7 +2390,7 @@ The row mysql query as read from the transaction's request.
 [float]
 === mysql.error_code
 
-type: integer
+type: long
 
 The error code returned by MySQL.
 
@@ -1773,14 +2411,14 @@ NFS v4/3 specific event fields.
 [float]
 === nfs.version
 
-type: integer
+type: long
 
 NFS protocol version number.
 
 [float]
 === nfs.minor_version
 
-type: integer
+type: long
 
 NFS protocol minor version number.
 
@@ -1825,7 +2463,7 @@ If the PgSQL query returns an error, this field is set to true.
 [float]
 === pgsql.error_code
 
-type: integer
+type: long
 
 The PostgreSQL error code.
 
@@ -2039,6 +2677,8 @@ The CPU time it took to complete the transaction.
 
 type: long
 
+format: bytes
+
 The number of bytes of the request. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 
 
@@ -2046,6 +2686,8 @@ The number of bytes of the request. Note that this size is the application layer
 === bytes_out
 
 type: long
+
+format: bytes
 
 The number of bytes of the response. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 

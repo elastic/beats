@@ -14,6 +14,27 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.3.6]
+
+### Fixed
+- Fix duplicate key error when normalizing tables. #63
+
+## [0.3.5]
+
+### Fixed
+- Fix merging array values. #59
+- Fix initializing empty array values. #58
+
+## [0.3.4]
+
+### Fixed
+- Fix error message if Unpack returns error. #56
+
+## [0.3.3]
+
+### Fixed
+- Fix `(*FlagValue).String` panic with go 1.7 #54
+
 ## [0.3.2]
 
 ### Changed
@@ -90,7 +111,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.3.2...HEAD
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.3.6...HEAD
+[0.3.6]: https://github.com/elastic/go-ucfg/compare/v0.3.5...v0.3.6
+[0.3.5]: https://github.com/elastic/go-ucfg/compare/v0.3.4...v0.3.5
+[0.3.4]: https://github.com/elastic/go-ucfg/compare/v0.3.3...v0.3.4
+[0.3.3]: https://github.com/elastic/go-ucfg/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/elastic/go-ucfg/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/elastic/go-ucfg/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/elastic/go-ucfg/compare/v0.2.1...v0.3.0

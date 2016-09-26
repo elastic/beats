@@ -1,0 +1,9 @@
+#- module: beats
+  #metricsets: ["filebeat", "libbeat"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:6060"]
+
+  # Path to httpprof variables
+  #vars_path: /debug/vars
+

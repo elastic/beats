@@ -116,10 +116,10 @@ func transformNumbersArray(arr []interface{}) {
 
 // Next decodes JSON and returns the filled Line object.
 func (r *JSON) Next() (Message, error) {
-	reader, err := r.reader.Next()
+	message, err := r.reader.Next()
 	if err != nil {
-		return reader, err
+		return message, err
 	}
-	reader.Content, reader.Fields = r.decodeJSON(reader.Content)
-	return reader, nil
+	message.Content, message.Fields = r.decodeJSON(message.Content)
+	return message, nil
 }

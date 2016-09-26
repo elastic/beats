@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -69,9 +70,27 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		return errors.New("Bad Redis data type")
 	}
 
-	key := []byte(config.Key)
-	if len(key) == 0 {
-		key = []byte(r.beatName)
+	if cfg.HasField("index") && !cfg.HasField("key") {
+		s, err := cfg.String("index", -1)
+		if err != nil {
+			return err
+		}
+		if err := cfg.SetString("key", -1, s); err != nil {
+			return err
+		}
+	}
+	if !cfg.HasField("key") {
+		cfg.SetString("key", -1, r.beatName)
+	}
+
+	key, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "key",
+		MultiKey:         "keys",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+	})
+	if err != nil {
+		return err
 	}
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
@@ -112,8 +131,13 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 	}
 
 	logp.Info("Max Retries set to: %v", sendRetries)
-	m, err := modeutil.NewConnectionMode(clients, !config.LoadBalance,
-		maxAttempts, defaultWaitRetry, config.Timeout, defaultMaxWaitRetry)
+	m, err := modeutil.NewConnectionMode(clients, modeutil.Settings{
+		Failover:     !config.LoadBalance,
+		MaxAttempts:  maxAttempts,
+		Timeout:      config.Timeout,
+		WaitRetry:    defaultWaitRetry,
+		MaxWaitRetry: defaultMaxWaitRetry,
+	})
 	if err != nil {
 		return err
 	}
@@ -129,15 +153,15 @@ func (r *redisOut) Close() error {
 func (r *redisOut) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
-	return r.mode.PublishEvent(signaler, opts, event)
+	return r.mode.PublishEvent(signaler, opts, data)
 }
 
 func (r *redisOut) BulkPublish(
 	signaler op.Signaler,
 	opts outputs.Options,
-	events []common.MapStr,
+	data []outputs.Data,
 ) error {
-	return r.mode.PublishEvents(signaler, opts, events)
+	return r.mode.PublishEvents(signaler, opts, data)
 }

@@ -41,11 +41,17 @@ func (f *Event) ToMapStr() common.MapStr {
 
 	if f.JSONConfig != nil && len(f.JSONFields) > 0 {
 		mergeJSONFields(f, event)
-	} else {
-		event["message"] = f.Text
+	} else if f.Text != nil {
+		event["message"] = *f.Text
 	}
 
 	return event
+}
+
+// HasData returns true if the event itself contains data
+// Events without data are only state updates
+func (e *Event) HasData() bool {
+	return e.Bytes > 0
 }
 
 // mergeJSONFields writes the JSON fields in the event map,

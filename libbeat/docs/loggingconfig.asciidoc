@@ -21,13 +21,8 @@ is used on Windows systems, and syslog output is used on Linux and OS X.
 [source,yaml]
 ------------------------------------------------------------------------------
 logging.level: warning
-
-# enable file rotation with default configuration
 logging.to_files: true
-
-# do not log to syslog
 logging.to_syslog: false
-
 logging.files:
   path: /var/log/mybeat
   name: mybeat.log
@@ -55,7 +50,7 @@ default value is true.
 
 Minimum log level. One of debug, info, warning, error or critical. If debug is
 used, but no selectors are configured, the `*` selector will be used.
-The default log level is error.
+The default log level is "info".
 
 ===== selectors
 
@@ -69,7 +64,8 @@ the debug log level).
 
 If enabled, {beatname_uc} periodically logs its internal metrics that have
 changed in the last period. For each metric that changed, the delta from the
-value at the beginning of the period is logged. The default is true.
+value at the beginning of the period is logged. Also, the total values for
+all non-zero internal metrics are logged on shutdown. The default is true.
 
 Here is an example log line:
 

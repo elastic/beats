@@ -20,30 +20,8 @@ Here is an example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-# The name of the shipper that publishes the network data. It can be used to group
-# all the transactions sent by a single shipper in the web interface.
-# If this options is not defined, the hostname is used.
-#name:
-
-# The tags of the shipper are included in their own field with each
-# transaction published. Tags make it easy to group servers by different
-# logical properties.
+name: "my-shipper"
 tags: ["service-X", "web-tier"]
-
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-ignore_outgoing: true
-
-# How often (in seconds) shippers are publishing their IPs to the topology map.
-# The default is 10 seconds.
-refresh_topology_freq: 10
-
-# Expiration time (in seconds) of the IPs published by a shipper to the topology map.
-# All the IPs will be deleted afterwards. Note, that the value must be higher than
-# refresh_topology_freq. The default is 15 seconds.
-topology_expire: 15
-
 ------------------------------------------------------------------------------
 
 ==== General Options
@@ -55,19 +33,6 @@ You can specify the following options:
 The name of the Beat. If this option is empty, the `hostname` of the server is
 used. The name is included as the `beat.name` field in each published transaction. You can
 use the name to group all transactions sent by a single Beat.
-
-At startup, each Beat can publish its IP, port, and name to Elasticsearch. This information
-is stored in Elasticsearch as a network topology map that maps the IP and port
-of each Beat to the name that you specify here.
-
-When a Beat receives a new request and response (called a transaction), the Beat can query
-Elasticsearch to see if the network topology includes the IP and port of the source
-and destination servers. If this information is available, the `client_server` field in the
-output is set to the name of the Beat running on the source server, and the `server` field is set to the
-name of the Beat running on the destination server.
-
-To use the topology map in Elasticsearch, you must enable Elasticsearch as output and set the
-`save_topology` option to true.
 
 Example:
 
@@ -124,45 +89,17 @@ fields:
   region: us-east-1
 ------------------------------------------------------------------------------
 
-===== ignore_outgoing
-
-If the `ignore_outgoing` option is enabled, the Beat ignores all the
-transactions initiated from the server running the Beat.
-
-This is useful when two Beats publish the same transactions. Because one Beat
-sees the transaction in its outgoing queue and the other sees it in its incoming
-queue, you can end up with duplicate transactions. To remove the duplicates, you
-can enable the `ignore_outgoing` option on one of the servers.
-
-For example, in the following scenario, you see a 3-server architecture
-where a Beat is installed on each server. t1 is the transaction exchanged between
-Server1 and Server2, and t2 is the transaction between Server2 and Server3.
-
-image:./images/option_ignore_outgoing.png[Beats Architecture]
-
-By default, each transaction is indexed twice because Beat2
-sees both transactions. So you would see the following published transactions
-(when `ignore_outgoing` is false):
-
- - Beat1: t1
- - Beat2: t1 and t2
- - Beat3: t2
-
-To avoid duplicates, you can force your Beats to send only the incoming
-transactions and ignore the transactions created by the local server. So you would
-see the following published transactions (when `ignore_outgoing` is true):
-
- - Beat1: none
- - Beat2: t1
- - Beat3: t2
-
 ===== refresh_topology_freq
+
+deprecated[5.0.0]
 
 The refresh interval of the topology map in
 seconds. In other words, this setting specifies how often each Beat publishes its
 IP addresses to the topology map. The default is 10 seconds.
 
 ===== topology_expire
+
+deprecated[5.0.0]
 
 The expiration time for the topology in seconds. This is useful in case a Beat
 stops publishing its IP addresses. The IP addresses are removed automatically
@@ -199,12 +136,12 @@ that if finds. Then, for each transaction, the Beat exports the GeoIP location o
 The recommended values for geoip.paths are `/usr/share/GeoIP/GeoLiteCity.dat`
 and `/usr/local/var/GeoIP/GeoLiteCity.dat`.
 
+If no paths are configured, GeoIP is disabled.
+
 Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-# Configure local GeoIP database support.
-# If no paths are not configured geoip is disabled.
 geoip:
   paths:
     - "/usr/share/GeoIP/GeoLiteCity.dat"

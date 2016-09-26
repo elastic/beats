@@ -1,0 +1,59 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-postgresql]]
+== postgresql Module
+
+This is the postgresql Module.
+
+
+
+[float]
+=== Example Configuration
+
+The PostgreSQL module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+#- module: postgresql
+  #metricsets:
+    # Stats about every PostgreSQL database
+    #- database
+
+    # Stats about the background writer process's activity
+    #- bgwriter
+
+    # Stats about every PostgreSQL process
+    #- activity
+
+  #enabled: true
+  #period: 10s
+
+  # The host must be passed as PostgreSQL DSN. Example:
+  # postgres://pqgotest:password@localhost:5432?sslmode=disable
+  # The available parameters are documented here:
+  # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
+  #hosts: ["postgres://postgres@localhost:5432"]
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-postgresql-activity,activity>>
+
+* <<metricbeat-metricset-postgresql-bgwriter,bgwriter>>
+
+* <<metricbeat-metricset-postgresql-database,database>>
+
+include::postgresql/activity.asciidoc[]
+
+include::postgresql/bgwriter.asciidoc[]
+
+include::postgresql/database.asciidoc[]
+

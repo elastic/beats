@@ -1,0 +1,393 @@
+- name: stat
+  type: group
+  description: >
+    Stats collected from HAProxy process
+  fields:
+    - name: pxname
+      type: keyword
+      description: >
+        proxy name
+
+    - name: svname
+      type: keyword
+      description: >
+        service name (FRONTEND for frontend, BACKEND for backend, any name for server/listener)
+
+    - name: qcur
+      type: integer
+      description: >
+        current queued requests. For the backend this reports the number queued without a server assigned
+
+    - name: qmax
+      type: integer
+      description: >
+        max value of qcur
+
+    - name: scur
+      type: integer
+      description: >
+        current sessions
+
+    - name: smax
+      type: integer
+      description: >
+        max sessions
+
+    - name: slim
+      type: integer
+      description: >
+        configured session limit
+
+    - name: stot
+      type: keyword
+      description: >
+        cumulative number of connections
+
+    - name: bin
+      type: integer
+      description: >
+        bytes in
+
+    - name: bout
+      type: integer
+      description: >
+        bytes out
+
+    - name: dreq
+      type: integer
+      description: >
+        requests denied because of security concerns.
+          * For tcp this is because of a matched tcp-request content rule.
+          * For http this is because of a matched http-request or tarpit rule.
+
+    - name: dresp
+      type: integer
+      description: >
+        responses denied because of security concerns.
+          * For http this is because of a matched http-request rule, or "option checkcache".
+
+    - name: ereq
+      type: integer
+      description: >
+        request errors. Some of the possible causes are:
+          * early termination from the client, before the request has been sent.
+          * read error from the client
+          * client timeout
+          * client closed connection
+          * various bad requests from the client.
+          * request was tarpitted.
+
+    - name: econ
+      type: integer
+      description: >
+        number of requests that encountered an error trying to
+        connect to a backend server. The backend stat is the sum of the stat
+        for all servers of that backend, plus any connection errors not
+        associated with a particular server (such as the backend having no
+        active servers).
+
+    - name: eresp
+      type: integer
+      description: >
+        response errors. srv_abrt will be counted here also.
+        Some other errors are:
+        * write error on the client socket (won't be counted for the server stat)
+        * failure applying filters to the response.
+
+    - name: wretr
+      type: integer
+      description: >
+        number of times a connection to a server was retried.
+
+    - name: wredis
+      type: integer
+      description: >
+        number of times a request was redispatched to another
+        server. The server value counts the number of times that server was
+        switched away from.
+
+    - name: status
+      type: keyword
+      description: >
+        status (UP/DOWN/NOLB/MAINT/MAINT(via)...)
+
+    - name: weight
+      type: integer
+      description: >
+        total weight (backend), server weight (server)
+
+    - name: act
+      type: integer
+      description: >
+        number of active servers (backend), server is active (server)
+
+    - name: bck
+      type: integer
+      description: >
+        number of backup servers (backend), server is backup (server)
+
+    - name: chkfail
+      type: integer
+      description: >
+        number of failed checks. (Only counts checks failed when
+        the server is up.)
+
+    - name: chkdown
+      type: integer
+      description: >
+        number of UP->DOWN transitions. The backend counter counts
+        transitions to the whole backend being down, rather than the sum of the
+        counters for each server.
+
+    - name: lastchg
+      type: integer
+      description: >
+        number of seconds since the last UP<->DOWN transition
+
+    - name: downtime
+      type: integer
+      description: >
+        total downtime (in seconds). The value for the backend
+        is the downtime for the whole backend, not the sum of the server downtime.
+
+    - name: qlimit
+      type: integer
+      description: >
+        configured maxqueue for the server, or nothing in the
+        value is 0 (default, meaning no limit)
+
+    - name: pid
+      type: integer
+      description: >
+        process id (0 for first instance, 1 for second, ...)
+
+    - name: iid
+      type: integer
+      description: >
+        unique proxy id
+
+    - name: sid
+      type: integer
+      description: >
+        server id (unique inside a proxy)
+
+    - name: throttle
+      type: integer
+      description: >
+        current throttle percentage for the server, when
+        slowstart is active, or no value if not in slowstart.
+
+    - name: lbtot
+      type: integer
+      description: >
+        total number of times a server was selected, either for new
+        sessions, or when re-dispatching. The server counter is the number
+        of times that server was selected.
+
+    - name: tracked
+      type: integer
+      description: >
+        id of proxy/server if tracking is enabled.
+
+    - name: component_type
+      type: integer
+      description: >
+        (0=frontend, 1=backend, 2=server, 3=socket/listener)
+
+    - name: rate
+      type: group
+      description: >
+
+      fields:
+        - name: value
+          type: integer
+          description: >
+            number of sessions per second over last elapsed second
+
+        - name: lim
+          type: integer
+          description: >
+            configured limit on new sessions per second
+
+        - name: max
+          type: integer
+          description: >
+            max number of new sessions per second
+
+
+    - name: check
+      type: group
+      description: >
+
+      fields:
+        - name: status
+          type: keyword
+          description: >
+            status of last health check, one of:
+              UNK     -> unknown
+              INI     -> initializing
+              SOCKERR -> socket error
+              L4OK    -> check passed on layer 4, no upper layers testing enabled
+              L4TOUT  -> layer 1-4 timeout
+              L4CON   -> layer 1-4 connection problem, for example
+                        "Connection refused" (tcp rst) or "No route to host" (icmp)
+              L6OK    -> check passed on layer 6
+              L6TOUT  -> layer 6 (SSL) timeout
+              L6RSP   -> layer 6 invalid response - protocol error
+              L7OK    -> check passed on layer 7
+              L7OKC   -> check conditionally passed on layer 7, for example 404 with
+                        disable-on-404
+              L7TOUT  -> layer 7 (HTTP/SMTP) timeout
+              L7RSP   -> layer 7 invalid response - protocol error
+              L7STS   -> layer 7 response error, for example HTTP 5xx
+
+        - name: code
+          type: integer
+          description: >
+            layer5-7 code, if available
+
+        - name: duration
+          type: integer
+          description: >
+            time in ms took to finish last health check
+
+    - name: hrsp
+      type: group
+      description: >
+
+      fields:
+        - name: 1xx
+          type: integer
+          description: >
+            http responses with 1xx code
+
+        - name: 2xx
+          type: integer
+          description: >
+            http responses with 2xx code
+
+        - name: 3xx
+          type: integer
+          description: >
+            http responses with 3xx code
+
+        - name: 4xx
+          type: integer
+          description: >
+            http responses with 4xx code
+
+        - name: 5xx
+          type: integer
+          description: >
+            http responses with 5xx code
+
+        - name: other
+          type: integer
+          description: >
+            http responses with other codes (protocol error)
+
+    - name: hanafail
+      type: integer
+      description: >
+        failed health checks details
+
+    - name: req
+      type: group
+      description: >
+
+      fields:
+        - name: rate
+          type: group
+          description: >
+
+          fields:
+            - name: value
+              type: integer
+              description: >
+                HTTP requests per second over last elapsed second
+
+            - name: max
+              type: integer
+              description: >
+                max number of HTTP requests per second observed
+
+        - name: tot
+          type: integer
+          description: >
+            total number of HTTP requests received
+
+    - name: cli_abrt
+      type: integer
+      description: >
+        number of data transfers aborted by the client
+
+    - name: srv_abrt
+      type: integer
+      description: >
+        number of data transfers aborted by the server (inc. in eresp)
+
+    - name: comp
+      type: group
+      description: >
+
+      fields:
+        - name: in
+          type: integer
+          description: >
+            number of HTTP response bytes fed to the compressor
+
+        - name: out
+          type: integer
+          description: >
+            number of HTTP response bytes emitted by the compressor
+
+        - name: byp
+          type: integer
+          description: >
+            number of bytes that bypassed the HTTP compressor (CPU/BW limit)
+
+        - name: rsp
+          type: integer
+          description: >
+            number of HTTP responses that were compressed
+
+    - name: last
+      type: group
+      description: >
+
+      fields:
+        - name: sess
+          type: integer
+          description: >
+            number of seconds since last session assigned to server/backend
+
+        - name: chk
+          type: keyword
+          description: >
+            last health check contents or textual error
+
+        - name: agt
+          type: keyword
+          description: >
+            last agent check contents or textual error
+
+
+    - name: qtime
+      type: integer
+      description: >
+        the average queue time in ms over the 1024 last requests
+
+    - name: ctime
+      type: integer
+      description: >
+        the average connect time in ms over the 1024 last requests
+
+    - name: rtime
+      type: integer
+      description: >
+        the average response time in ms over the 1024 last requests (0 for TCP)
+
+    - name: ttime
+      type: integer
+      description: >
+        the average total session time in ms over the 1024 last requests

@@ -4,7 +4,7 @@
 Metricbeat consists of modules and metricsets. A Metricbeat _module_ defines the
 basic logic for collecting data from a specific service, such as Redis, MySQL,
 and so on. The module specifies details about the service, including how to connect,
-how often to collect metrics, and which metrics to collect. 
+how often to collect metrics, and which metrics to collect.
 
 Each module has one or more metricsets. A _metricset_ is the part of the module
 that fetches and structures the data. Rather than collecting each metric as a
@@ -14,10 +14,10 @@ metricset that collects information and statistics from Redis by running the
 http://redis.io/commands/INFO[`INFO`] command and parsing the returned result.
 Likewise, the MySQL module provides a `status` metricset that collects data
 from MySQL by running a http://dev.mysql.com/doc/refman/5.7/en/show-status.html[`SHOW GLOBAL STATUS`]
-SQL query. 
+SQL query.
 
-Metricsets make it easier for you by grouping sets of related metrics together 
-in a single request returned by the remote server. 
+Metricsets make it easier for you by grouping sets of related metrics together
+in a single request returned by the remote server.
 
 //TODO: ADD DIAGRAM HERE THAT SHOWS A COUPLE OF MODULES AND METRICSETS WITHIN THOSE MODULES.
 
@@ -27,12 +27,17 @@ metricsets can send requests to the same service, Metricbeat reuses connections
 whenever possible. If Metricbeat cannot connect to the host system within the time
 specified by the `timeout` config setting, it returns an error. Metricbeat sends
 the events asynchronously, which means the event retrieval is not acknowledged. If
-the configured output is not available, events may be lost. 
+the configured output is not available, events may be lost.
 
 When Metricbeat encounters an error (for example, when it cannot connect to the host
 system), it sends an event error to the specified output. This means that Metricbeat
 always sends an event, even when there is a failure. This allows you to monitor
 for errors and see debug messages to help you diagnose what went wrong.
+
+The following topics provide more detail about the structure of Metricbeat events:
+
+* <<metricbeat-event-structure>>
+* <<error-event-structure>>
 
 For more about the benefits of using Metricbeat, see <<key-features>>.
 
@@ -67,7 +72,7 @@ For example:
   .
   .
   .
-  
+
   "type": "metricsets"
 }
 ----
@@ -83,7 +88,7 @@ has an error field that contains an error string. This makes it possible to chec
 for errors across all metric events.
 
 The following example shows an error event sent when the Apache server is not
-reachable: 
+reachable:
 
 [source,json]
 ----
@@ -103,7 +108,7 @@ reachable:
   .
   .
   .
-  
+
   "type": "metricsets"
 ----
 
@@ -123,15 +128,15 @@ Metricbeat has some key features that are critical to how it works:
 Metricbeat sends more than just metrics. When it cannot retrieve metrics, it
 sends error events. The error is not simply a flag, but a full error string that is
 created during fetching from the host systems. This enables you to monitor not
-only the metrics, but also any errors that occur during metrics monitoring. 
+only the metrics, but also any errors that occur during metrics monitoring.
 
-Because you see the full error message, you can track down the error faster. 
+Because you see the full error message, you can track down the error faster.
 Metricbeat is installed locally on the host machine, which means that you can
 differentiate errors that happen locally from other issues, such as network problems.
 
 Each metricset is retrieved based on a predefined period, so when Metricbeat fails to
 retrieve metrics for more than one interval, you can infer that there is potentially
-something wrong with the host or host connectivity. 
+something wrong with the host or host connectivity.
 
 [[no-aggregations]]
 ==== No Aggregations When Data is Fetched
@@ -152,9 +157,9 @@ structure, Elasticsearch knows in advance which types will be stored in
 Elasticsearch, and it can optimize storage.
 
 Basic meta information about each metric (such as the host) is also sent as part
-of each event. 
+of each event.
 
-//QUESTION: I didn't mention the ability to provide additional information, like unit, because it sounds like that's no implemented, right? 
+//QUESTION: I didn't mention the ability to provide additional information, like unit, because it sounds like that's no implemented, right?
 
 [[multiple-events-in-one]]
 ==== Multiple Metrics in One Event

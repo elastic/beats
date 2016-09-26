@@ -4,10 +4,18 @@
 [partintro]
 --
 If you have issues installing or running Packetbeat, read the
-following tips.
+following tips:
+
+* <<getting-help>>
+* <<enable-packetbeat-debugging>>
+* <<recording-trace>>
+* <<faq>>
+
+
 
 --
 
+[[getting-help]]
 == Getting Help
 
 include::../../libbeat/docs/getting-help.asciidoc[]
@@ -17,6 +25,7 @@ include::../../libbeat/docs/getting-help.asciidoc[]
 
 include::../../libbeat/docs/debugging.asciidoc[]
 
+[[recording-trace]]
 == Recording a Trace
 
 If you are having an issue, it's often useful to record a full network trace

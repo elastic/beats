@@ -211,7 +211,7 @@ func (self *FileSystemList) Get() error {
 }
 
 func (self *FDUsage) Get() error {
-	return &ErrNotImplemented{runtime.GOOS}
+	return ErrNotImplemented{runtime.GOOS}
 }
 
 // Retrieves the process identifier for each process object in the system.
@@ -472,7 +472,7 @@ func (self *ProcExe) Get(pid int) error {
 }
 
 func (self *ProcFDUsage) Get(pid int) error {
-	return &ErrNotImplemented{runtime.GOOS}
+	return ErrNotImplemented{runtime.GOOS}
 }
 
 func (self *FileSystemUsage) Get(path string) error {

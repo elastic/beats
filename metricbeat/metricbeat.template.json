@@ -4,6 +4,9 @@
       "_all": {
         "norms": false
       },
+      "_meta": {
+        "version": "6.0.0-alpha1"
+      },
       "dynamic_templates": [
         {
           "fields": {
@@ -25,10 +28,12 @@
             "status": {
               "properties": {
                 "bytes_per_request": {
-                  "type": "half_float"
+                  "scaling_factor": 1000,
+                  "type": "scaled_float"
                 },
                 "bytes_per_sec": {
-                  "type": "float"
+                  "scaling_factor": 1000,
+                  "type": "scaled_float"
                 },
                 "connections": {
                   "properties": {
@@ -53,19 +58,24 @@
                 "cpu": {
                   "properties": {
                     "children_system": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "children_user": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "load": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "system": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "user": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     }
                   }
                 },
@@ -76,18 +86,22 @@
                 "load": {
                   "properties": {
                     "1": {
-                      "type": "half_float"
+                      "scaling_factor": 100,
+                      "type": "scaled_float"
                     },
                     "15": {
-                      "type": "half_float"
+                      "scaling_factor": 100,
+                      "type": "scaled_float"
                     },
                     "5": {
-                      "type": "half_float"
+                      "scaling_factor": 100,
+                      "type": "scaled_float"
                     }
                   }
                 },
                 "requests_per_sec": {
-                  "type": "half_float"
+                  "scaling_factor": 1000,
+                  "type": "scaled_float"
                 },
                 "scoreboard": {
                   "properties": {
@@ -168,6 +182,598 @@
             "name": {
               "ignore_above": 1024,
               "type": "keyword"
+            }
+          }
+        },
+        "beats": {
+          "properties": {
+            "filebeat": {
+              "properties": {
+                "harvesters": {
+                  "properties": {
+                    "closed": {
+                      "type": "long"
+                    },
+                    "files": {
+                      "properties": {
+                        "open": {
+                          "type": "long"
+                        },
+                        "truncated": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "running": {
+                      "type": "long"
+                    },
+                    "skipped": {
+                      "type": "long"
+                    },
+                    "started": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "prospectors": {
+                  "properties": {
+                    "log_files": {
+                      "properties": {
+                        "renamed": {
+                          "type": "long"
+                        },
+                        "truncated": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "registrar": {
+                  "properties": {
+                    "states": {
+                      "properties": {
+                        "cleanup": {
+                          "type": "long"
+                        },
+                        "current": {
+                          "type": "long"
+                        },
+                        "update": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "writes": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
+            },
+            "libbeat": {
+              "properties": {
+                "output": {
+                  "properties": {
+                    "elasticsearch": {
+                      "properties": {
+                        "events": {
+                          "properties": {
+                            "ack": {
+                              "type": "long"
+                            },
+                            "not_ack": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "read": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            },
+                            "errors": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "write": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            },
+                            "errors": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "publisher": {
+                  "properties": {
+                    "events": {
+                      "properties": {
+                        "published": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "docker": {
+          "properties": {
+            "container": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "cpu": {
+              "properties": {
+                "cpu": {
+                  "properties": {
+                    "usage_in_user_mode": {
+                      "type": "float"
+                    }
+                  }
+                }
+              }
+            },
+            "diskio": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "memory": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "network": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "haproxy": {
+          "properties": {
+            "info": {
+              "properties": {
+                "compress": {
+                  "properties": {
+                    "bps": {
+                      "properties": {
+                        "in": {
+                          "type": "long"
+                        },
+                        "out": {
+                          "type": "long"
+                        },
+                        "rate_limit": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "conn": {
+                  "properties": {
+                    "rate": {
+                      "properties": {
+                        "limit": {
+                          "type": "long"
+                        },
+                        "value": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "cum": {
+                  "properties": {
+                    "conns": {
+                      "type": "long"
+                    },
+                    "req": {
+                      "type": "long"
+                    },
+                    "ssl_conns": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "curr": {
+                  "properties": {
+                    "conns": {
+                      "type": "long"
+                    },
+                    "ssl_conns": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "idle_pct": {
+                  "scaling_factor": 1000,
+                  "type": "scaled_float"
+                },
+                "max": {
+                  "properties": {
+                    "conn": {
+                      "properties": {
+                        "rate": {
+                          "type": "long"
+                        },
+                        "value": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "hard_conn": {
+                      "type": "long"
+                    },
+                    "pipes": {
+                      "type": "long"
+                    },
+                    "sess_rate": {
+                      "type": "long"
+                    },
+                    "sock": {
+                      "type": "long"
+                    },
+                    "ssl": {
+                      "properties": {
+                        "conns": {
+                          "type": "long"
+                        },
+                        "rate": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "zlib_mem_usage": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "mem_max_bytes": {
+                  "type": "long"
+                },
+                "nb_proc": {
+                  "type": "long"
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "pipes": {
+                  "properties": {
+                    "free": {
+                      "type": "long"
+                    },
+                    "used": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "process_num": {
+                  "type": "long"
+                },
+                "run_queue": {
+                  "type": "long"
+                },
+                "sess": {
+                  "properties": {
+                    "rate": {
+                      "properties": {
+                        "limit": {
+                          "type": "long"
+                        },
+                        "value": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "ssl": {
+                  "properties": {
+                    "backend": {
+                      "properties": {
+                        "key_rate": {
+                          "type": "long"
+                        },
+                        "max_key_rate": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "cache_misses": {
+                      "type": "long"
+                    },
+                    "cached_lookups": {
+                      "type": "long"
+                    },
+                    "frontend": {
+                      "properties": {
+                        "key_rate": {
+                          "type": "long"
+                        },
+                        "max_key_rate": {
+                          "type": "long"
+                        },
+                        "session_reuse_pct": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "rate": {
+                      "properties": {
+                        "limit": {
+                          "type": "long"
+                        },
+                        "value": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "tasks": {
+                  "type": "long"
+                },
+                "ulimit_n": {
+                  "type": "long"
+                },
+                "uptime_sec": {
+                  "type": "long"
+                },
+                "zlib_mem_usage": {
+                  "type": "long"
+                }
+              }
+            },
+            "stat": {
+              "properties": {
+                "act": {
+                  "type": "long"
+                },
+                "bck": {
+                  "type": "long"
+                },
+                "bin": {
+                  "type": "long"
+                },
+                "bout": {
+                  "type": "long"
+                },
+                "check": {
+                  "properties": {
+                    "code": {
+                      "type": "long"
+                    },
+                    "duration": {
+                      "type": "long"
+                    },
+                    "status": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "chkdown": {
+                  "type": "long"
+                },
+                "chkfail": {
+                  "type": "long"
+                },
+                "cli_abrt": {
+                  "type": "long"
+                },
+                "comp": {
+                  "properties": {
+                    "byp": {
+                      "type": "long"
+                    },
+                    "in": {
+                      "type": "long"
+                    },
+                    "out": {
+                      "type": "long"
+                    },
+                    "rsp": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "component_type": {
+                  "type": "long"
+                },
+                "ctime": {
+                  "type": "long"
+                },
+                "downtime": {
+                  "type": "long"
+                },
+                "dreq": {
+                  "type": "long"
+                },
+                "dresp": {
+                  "type": "long"
+                },
+                "econ": {
+                  "type": "long"
+                },
+                "ereq": {
+                  "type": "long"
+                },
+                "eresp": {
+                  "type": "long"
+                },
+                "hanafail": {
+                  "type": "long"
+                },
+                "hrsp": {
+                  "properties": {
+                    "1xx": {
+                      "type": "long"
+                    },
+                    "2xx": {
+                      "type": "long"
+                    },
+                    "3xx": {
+                      "type": "long"
+                    },
+                    "4xx": {
+                      "type": "long"
+                    },
+                    "5xx": {
+                      "type": "long"
+                    },
+                    "other": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "iid": {
+                  "type": "long"
+                },
+                "last": {
+                  "properties": {
+                    "agt": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "chk": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "sess": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "lastchg": {
+                  "type": "long"
+                },
+                "lbtot": {
+                  "type": "long"
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "pxname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "qcur": {
+                  "type": "long"
+                },
+                "qlimit": {
+                  "type": "long"
+                },
+                "qmax": {
+                  "type": "long"
+                },
+                "qtime": {
+                  "type": "long"
+                },
+                "rate": {
+                  "properties": {
+                    "lim": {
+                      "type": "long"
+                    },
+                    "max": {
+                      "type": "long"
+                    },
+                    "value": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "req": {
+                  "properties": {
+                    "rate": {
+                      "properties": {
+                        "max": {
+                          "type": "long"
+                        },
+                        "value": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "tot": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "rtime": {
+                  "type": "long"
+                },
+                "scur": {
+                  "type": "long"
+                },
+                "sid": {
+                  "type": "long"
+                },
+                "slim": {
+                  "type": "long"
+                },
+                "smax": {
+                  "type": "long"
+                },
+                "srv_abrt": {
+                  "type": "long"
+                },
+                "status": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "stot": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "svname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "throttle": {
+                  "type": "long"
+                },
+                "tracked": {
+                  "type": "long"
+                },
+                "ttime": {
+                  "type": "long"
+                },
+                "weight": {
+                  "type": "long"
+                },
+                "wredis": {
+                  "type": "long"
+                },
+                "wretr": {
+                  "type": "long"
+                }
+              }
             }
           }
         },
@@ -575,6 +1181,22 @@
                 },
                 "opened_tables": {
                   "type": "long"
+                },
+                "threads": {
+                  "properties": {
+                    "cached": {
+                      "type": "long"
+                    },
+                    "connected": {
+                      "type": "long"
+                    },
+                    "created": {
+                      "type": "long"
+                    },
+                    "running": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             }
@@ -619,6 +1241,228 @@
             }
           }
         },
+        "postgresql": {
+          "properties": {
+            "activity": {
+              "properties": {
+                "application_name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "backend_start": {
+                  "type": "date"
+                },
+                "client": {
+                  "properties": {
+                    "address": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "hostname": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "port": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "database": {
+                  "properties": {
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "oid": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "query": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "query_start": {
+                  "type": "date"
+                },
+                "state": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "state_change": {
+                  "type": "date"
+                },
+                "transaction_start": {
+                  "type": "date"
+                },
+                "user": {
+                  "properties": {
+                    "id": {
+                      "type": "long"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "waiting": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "bgwriter": {
+              "properties": {
+                "buffers": {
+                  "properties": {
+                    "allocated": {
+                      "type": "long"
+                    },
+                    "backend": {
+                      "type": "long"
+                    },
+                    "backend_fsync": {
+                      "type": "long"
+                    },
+                    "checkpoints": {
+                      "type": "long"
+                    },
+                    "clean": {
+                      "type": "long"
+                    },
+                    "clean_full": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "checkpoints": {
+                  "properties": {
+                    "requested": {
+                      "type": "long"
+                    },
+                    "scheduled": {
+                      "type": "long"
+                    },
+                    "times": {
+                      "properties": {
+                        "sync": {
+                          "properties": {
+                            "ms": {
+                              "type": "float"
+                            }
+                          }
+                        },
+                        "write": {
+                          "properties": {
+                            "ms": {
+                              "type": "float"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "stats_reset": {
+                  "type": "date"
+                }
+              }
+            },
+            "database": {
+              "properties": {
+                "blocks": {
+                  "properties": {
+                    "hit": {
+                      "type": "long"
+                    },
+                    "read": {
+                      "type": "long"
+                    },
+                    "time": {
+                      "properties": {
+                        "read": {
+                          "properties": {
+                            "ms": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "write": {
+                          "properties": {
+                            "ms": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "conflicts": {
+                  "type": "long"
+                },
+                "deadlocks": {
+                  "type": "long"
+                },
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "number_of_backends": {
+                  "type": "long"
+                },
+                "oid": {
+                  "type": "long"
+                },
+                "rows": {
+                  "properties": {
+                    "deleted": {
+                      "type": "long"
+                    },
+                    "fetched": {
+                      "type": "long"
+                    },
+                    "inserted": {
+                      "type": "long"
+                    },
+                    "returned": {
+                      "type": "long"
+                    },
+                    "updated": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "stats_reset": {
+                  "type": "date"
+                },
+                "temporary": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "files": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "transactions": {
+                  "properties": {
+                    "commit": {
+                      "type": "long"
+                    },
+                    "rollback": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "redis": {
           "properties": {
             "info": {
@@ -651,16 +1495,20 @@
                     "used": {
                       "properties": {
                         "sys": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         },
                         "sys_children": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         },
                         "user": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         },
                         "user_children": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         }
                       }
                     }
@@ -694,28 +1542,48 @@
                   "properties": {
                     "aof": {
                       "properties": {
-                        "current_rewrite_time_sec": {
-                          "type": "long"
+                        "bgrewrite": {
+                          "properties": {
+                            "last_status": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            }
+                          }
                         },
                         "enabled": {
                           "type": "boolean"
                         },
-                        "last_bgrewrite_status": {
-                          "ignore_above": 1024,
-                          "type": "keyword"
+                        "rewrite": {
+                          "properties": {
+                            "current_time": {
+                              "properties": {
+                                "sec": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "in_progress": {
+                              "type": "boolean"
+                            },
+                            "last_time": {
+                              "properties": {
+                                "sec": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "scheduled": {
+                              "type": "boolean"
+                            }
+                          }
                         },
-                        "last_rewrite_time_sec": {
-                          "type": "long"
-                        },
-                        "last_write_status": {
-                          "ignore_above": 1024,
-                          "type": "keyword"
-                        },
-                        "rewrite_in_progress": {
-                          "type": "boolean"
-                        },
-                        "rewrite_scheduled": {
-                          "type": "boolean"
+                        "write": {
+                          "properties": {
+                            "last_status": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            }
+                          }
                         }
                       }
                     },
@@ -724,24 +1592,40 @@
                     },
                     "rdb": {
                       "properties": {
-                        "bgsave_in_progress": {
-                          "type": "boolean"
+                        "bgsave": {
+                          "properties": {
+                            "current_time": {
+                              "properties": {
+                                "sec": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "in_progress": {
+                              "type": "boolean"
+                            },
+                            "last_status": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            },
+                            "last_time": {
+                              "properties": {
+                                "sec": {
+                                  "type": "long"
+                                }
+                              }
+                            }
+                          }
                         },
-                        "changes_since_last_save": {
-                          "type": "long"
-                        },
-                        "current_bgsave_time_sec": {
-                          "type": "long"
-                        },
-                        "last_bgsave_status": {
-                          "ignore_above": 1024,
-                          "type": "keyword"
-                        },
-                        "last_bgsave_time_sec": {
-                          "type": "long"
-                        },
-                        "last_save_time": {
-                          "type": "long"
+                        "last_save": {
+                          "properties": {
+                            "changes_since": {
+                              "type": "long"
+                            },
+                            "time": {
+                              "type": "long"
+                            }
+                          }
                         }
                       }
                     }
@@ -842,6 +1726,9 @@
                 },
                 "stats": {
                   "properties": {
+                    "commands_processed": {
+                      "type": "long"
+                    },
                     "connections": {
                       "properties": {
                         "received": {
@@ -852,14 +1739,20 @@
                         }
                       }
                     },
-                    "instantaneous_input_kbps": {
-                      "type": "float"
-                    },
-                    "instantaneous_ops_per_sec": {
-                      "type": "long"
-                    },
-                    "instantaneous_output_kbps": {
-                      "type": "float"
+                    "instantaneous": {
+                      "properties": {
+                        "input_kbps": {
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
+                        },
+                        "ops_per_sec": {
+                          "type": "long"
+                        },
+                        "output_kbps": {
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
+                        }
+                      }
                     },
                     "keys": {
                       "properties": {
@@ -887,33 +1780,50 @@
                     "migrate_cached_sockets": {
                       "type": "long"
                     },
-                    "pubsub_channels": {
-                      "type": "long"
+                    "net": {
+                      "properties": {
+                        "input": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "output": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
                     },
-                    "pubsub_patterns": {
-                      "type": "long"
+                    "pubsub": {
+                      "properties": {
+                        "channels": {
+                          "type": "long"
+                        },
+                        "patterns": {
+                          "type": "long"
+                        }
+                      }
                     },
                     "sync": {
                       "properties": {
                         "full": {
                           "type": "long"
                         },
-                        "partial_err": {
-                          "type": "long"
-                        },
-                        "partial_ok": {
-                          "type": "long"
+                        "partial": {
+                          "properties": {
+                            "err": {
+                              "type": "long"
+                            },
+                            "ok": {
+                              "type": "long"
+                            }
+                          }
                         }
                       }
-                    },
-                    "total_commands_processed": {
-                      "type": "long"
-                    },
-                    "total_net_input_bytes": {
-                      "type": "long"
-                    },
-                    "total_net_output_bytes": {
-                      "type": "long"
                     }
                   }
                 }
@@ -948,7 +1858,8 @@
                 "idle": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -958,7 +1869,8 @@
                 "iowait": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -968,7 +1880,8 @@
                 "irq": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -978,7 +1891,8 @@
                 "nice": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -988,7 +1902,8 @@
                 "softirq": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -998,7 +1913,8 @@
                 "steal": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1008,7 +1924,8 @@
                 "system": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1018,7 +1935,8 @@
                 "user": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1032,7 +1950,8 @@
                 "idle": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1042,7 +1961,8 @@
                 "iowait": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1052,7 +1972,8 @@
                 "irq": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1062,7 +1983,8 @@
                 "nice": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1072,7 +1994,8 @@
                 "softirq": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1082,7 +2005,8 @@
                 "steal": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1092,7 +2016,8 @@
                 "system": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1102,7 +2027,8 @@
                 "user": {
                   "properties": {
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     },
                     "ticks": {
                       "type": "long"
@@ -1187,7 +2113,8 @@
                       "type": "long"
                     },
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     }
                   }
                 }
@@ -1219,24 +2146,30 @@
             "load": {
               "properties": {
                 "1": {
-                  "type": "half_float"
+                  "scaling_factor": 100,
+                  "type": "scaled_float"
                 },
                 "15": {
-                  "type": "half_float"
+                  "scaling_factor": 100,
+                  "type": "scaled_float"
                 },
                 "5": {
-                  "type": "half_float"
+                  "scaling_factor": 100,
+                  "type": "scaled_float"
                 },
                 "norm": {
                   "properties": {
                     "1": {
-                      "type": "half_float"
+                      "scaling_factor": 100,
+                      "type": "scaled_float"
                     },
                     "15": {
-                      "type": "half_float"
+                      "scaling_factor": 100,
+                      "type": "scaled_float"
                     },
                     "5": {
-                      "type": "half_float"
+                      "scaling_factor": 100,
+                      "type": "scaled_float"
                     }
                   }
                 }
@@ -1255,7 +2188,8 @@
                           "type": "long"
                         },
                         "pct": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         }
                       }
                     }
@@ -1278,7 +2212,8 @@
                           "type": "long"
                         },
                         "pct": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         }
                       }
                     }
@@ -1293,7 +2228,8 @@
                       "type": "long"
                     },
                     "pct": {
-                      "type": "half_float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     }
                   }
                 }
@@ -1341,6 +2277,369 @@
             },
             "process": {
               "properties": {
+                "cgroup": {
+                  "properties": {
+                    "blkio": {
+                      "properties": {
+                        "id": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "path": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "total": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            },
+                            "ios": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "cpu": {
+                      "properties": {
+                        "cfs": {
+                          "properties": {
+                            "period": {
+                              "properties": {
+                                "us": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "quota": {
+                              "properties": {
+                                "us": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "shares": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "id": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "path": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "rt": {
+                          "properties": {
+                            "period": {
+                              "properties": {
+                                "us": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "runtime": {
+                              "properties": {
+                                "us": {
+                                  "type": "long"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "stats": {
+                          "properties": {
+                            "periods": {
+                              "type": "long"
+                            },
+                            "throttled": {
+                              "properties": {
+                                "ns": {
+                                  "type": "long"
+                                },
+                                "periods": {
+                                  "type": "long"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "cpuacct": {
+                      "properties": {
+                        "id": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "path": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "stats": {
+                          "properties": {
+                            "system": {
+                              "properties": {
+                                "ns": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "user": {
+                              "properties": {
+                                "ns": {
+                                  "type": "long"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "properties": {
+                            "ns": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "id": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "memory": {
+                      "properties": {
+                        "id": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "kmem": {
+                          "properties": {
+                            "failures": {
+                              "type": "long"
+                            },
+                            "limit": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "usage": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                },
+                                "max": {
+                                  "properties": {
+                                    "bytes": {
+                                      "type": "long"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "kmem_tcp": {
+                          "properties": {
+                            "failures": {
+                              "type": "long"
+                            },
+                            "limit": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "usage": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                },
+                                "max": {
+                                  "properties": {
+                                    "bytes": {
+                                      "type": "long"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "mem": {
+                          "properties": {
+                            "failures": {
+                              "type": "long"
+                            },
+                            "limit": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "usage": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                },
+                                "max": {
+                                  "properties": {
+                                    "bytes": {
+                                      "type": "long"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "memsw": {
+                          "properties": {
+                            "failures": {
+                              "type": "long"
+                            },
+                            "limit": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "usage": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                },
+                                "max": {
+                                  "properties": {
+                                    "bytes": {
+                                      "type": "long"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "path": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "stats": {
+                          "properties": {
+                            "active_anon": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "active_file": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "cache": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "hierarchical_memory_limit": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "hierarchical_memsw_limit": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "inactive_anon": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "inactive_file": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "major_page_faults": {
+                              "type": "long"
+                            },
+                            "mapped_file": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "page_faults": {
+                              "type": "long"
+                            },
+                            "pages_in": {
+                              "type": "long"
+                            },
+                            "pages_out": {
+                              "type": "long"
+                            },
+                            "rss": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "rss_huge": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "swap": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "unevictable": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "path": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
                 "cmdline": {
                   "ignore_above": 1024,
                   "type": "keyword"
@@ -1348,8 +2647,7 @@
                 "cpu": {
                   "properties": {
                     "start_time": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
+                      "type": "date"
                     },
                     "system": {
                       "type": "long"
@@ -1357,7 +2655,8 @@
                     "total": {
                       "properties": {
                         "pct": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         },
                         "ticks": {
                           "type": "long"
@@ -1365,6 +2664,23 @@
                       }
                     },
                     "user": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "fd": {
+                  "properties": {
+                    "limit": {
+                      "properties": {
+                        "hard": {
+                          "type": "long"
+                        },
+                        "soft": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "open": {
                       "type": "long"
                     }
                   }
@@ -1377,7 +2693,8 @@
                           "type": "long"
                         },
                         "pct": {
-                          "type": "half_float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         }
                       }
                     },

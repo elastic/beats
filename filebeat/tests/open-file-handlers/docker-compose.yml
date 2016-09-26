@@ -1,0 +1,30 @@
+filebeat:
+  build: ${PWD}/.
+  dockerfile: Dockerfile-filebeat
+  volumes:
+    - /var/lib/docker/containers:/var/lib/docker/containers
+    - /logfiles
+  environment:
+    - ES_HOST=${ES_HOST}
+    - ES_USER=${ES_USER}
+    - ES_PASSWORD=${ES_PASSWORD}
+  ports:
+    - 6060:6060
+
+# This host name is fixed because of the certificate
+logs:
+  build: ${PWD}/.
+  dockerfile: Dockerfile-log
+  volumes_from:
+    - filebeat
+
+
+#addtional:
+#  image: debian
+#  links:
+#    - filebeat
+#    - loggenerator
+#  volumes_from:
+#    - filebeat
+
+# TODO: Add filebeat instance that mounts volumes

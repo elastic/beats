@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 BEAT_REQUIRED_FIELDS = ["@timestamp", "type",
                         "beat.name", "beat.hostname"]
 
+INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 class Proc(object):
     """
@@ -26,9 +27,9 @@ class Proc(object):
     def __init__(self, args, outputfile):
         self.args = args
         self.output = open(outputfile, "ab")
+        self.stdin_read, self.stdin_write = os.pipe()
 
     def start(self):
-        self.stdin_read, self.stdin_write = os.pipe()
 
         if sys.platform.startswith("win"):
             self.proc = subprocess.Popen(

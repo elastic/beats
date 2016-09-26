@@ -1,0 +1,36 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "beats": {
+        "filebeat": {
+            "harvesters": {
+                "closed": 3,
+                "files": {
+                    "open": 0,
+                    "truncated": 0
+                },
+                "running": 0,
+                "started": 3
+            },
+            "prospectors": {
+                "log_files": {
+                    "renamed": 0,
+                    "truncated": 0
+                }
+            },
+            "registrar": {
+                "states": {}
+            }
+        }
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "beats",
+        "name": "filebeat",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

@@ -13,7 +13,7 @@ filebeat.prospectors:
   scan_frequency: {{scan_frequency | default("0.1s") }}
   ignore_older: {{ignore_older}}
   close_inactive: {{close_inactive}}
-  harvester_buffer_size:
+  harvester_buffer_size: {{harvester_buffer_size}}
   encoding: {{encoding | default("utf-8") }}
   tail_files: {{tail_files}}
   backoff: 0.1s
@@ -22,9 +22,12 @@ filebeat.prospectors:
   close_removed: {{close_removed}}
   close_renamed: {{close_renamed}}
   close_eof: {{close_eof}}
+  close_timeout: {{close_timeout}}
   force_close_files: {{force_close_files}}
   clean_inactive: {{clean_inactive}}
   clean_removed: {{clean_removed}}
+  harvester_limit: {{harvester_limit | default(0) }}
+  symlinks: {{symlinks}}
 
   {% if fields %}
   fields:
@@ -68,10 +71,12 @@ filebeat.prospectors:
 {% endif %}
 
 filebeat.spool_size:
+filebeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
 filebeat.idle_timeout: 0.1s
 {% if not skip_registry_config %}
 filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
 {%endif%}
+filebeat.publish_async: {{publish_async}}
 
 
 #================================ General =====================================
@@ -92,11 +97,6 @@ tags: [
       {%- endfor -%}
   {%- endif -%}
 ]
-
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-# ignore_outgoing: true
 
 {% if geoip_paths is not none %}
 geoip:
@@ -133,11 +133,16 @@ processors:
 # Multiple outputs may be used.
 
 #------------------------------- File output ----------------------------------
+{%- if logstash %}
+output.logstash:
+  hosts: ["{{ logstash.host }}"]
+{%- else %}
 output.file:
   path: {{ output_file_path|default(beat.working_dir + "/output") }}
   filename: "{{ output_file_filename|default("filebeat") }}"
   rotate_every_kb: {{ rotate_every_kb | default(1000) }}
   #number_of_files: 7
+{%- endif %}
 
 {% if path_data %}
 #================================ Paths =====================================

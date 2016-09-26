@@ -14,13 +14,17 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
 type kafka struct {
 	config kafkaConfig
+	topic  outil.Selector
 
 	modeRetry      mode.ConnectionMode
 	modeGuaranteed mode.ConnectionMode
+
+	partitioner sarama.PartitionerConstructor
 }
 
 const (
@@ -51,6 +55,25 @@ var (
 		"gzip":   sarama.CompressionGZIP,
 		"snappy": sarama.CompressionSnappy,
 	}
+
+	kafkaVersions = map[string]sarama.KafkaVersion{
+		"": sarama.V0_8_2_0,
+
+		"0.8.2.0": sarama.V0_8_2_0,
+		"0.8.2.1": sarama.V0_8_2_1,
+		"0.8.2.2": sarama.V0_8_2_2,
+		"0.8.2":   sarama.V0_8_2_2,
+		"0.8":     sarama.V0_8_2_2,
+
+		"0.9.0.0": sarama.V0_9_0_0,
+		"0.9.0.1": sarama.V0_9_0_1,
+		"0.9.0":   sarama.V0_9_0_1,
+		"0.9":     sarama.V0_9_0_1,
+
+		"0.10.0.0": sarama.V0_10_0_0,
+		"0.10.0":   sarama.V0_10_0_0,
+		"0.10":     sarama.V0_10_0_0,
+	}
 )
 
 // New instantiates a new kafka output instance.
@@ -66,12 +89,32 @@ func New(beatName string, cfg *common.Config, topologyExpire int) (outputs.Outpu
 func (k *kafka) init(cfg *common.Config) error {
 	debugf("initialize kafka output")
 
-	k.config = defaultConfig
-	if err := cfg.Unpack(&k.config); err != nil {
+	config := defaultConfig
+	if err := cfg.Unpack(&config); err != nil {
 		return err
 	}
 
-	_, err := newKafkaConfig(&k.config)
+	topic, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "topic",
+		MultiKey:         "topics",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+	})
+	if err != nil {
+		return err
+	}
+
+	partitioner, err := makePartitioner(config.Partition)
+	if err != nil {
+		return err
+	}
+
+	k.config = config
+	k.partitioner = partitioner
+	k.topic = topic
+
+	// validate config one more time
+	_, err = k.newKafkaConfig()
 	if err != nil {
 		return err
 	}
@@ -80,7 +123,7 @@ func (k *kafka) init(cfg *common.Config) error {
 }
 
 func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
-	libCfg, err := newKafkaConfig(&k.config)
+	libCfg, err := k.newKafkaConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -96,10 +139,9 @@ func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
 
 	var clients []mode.AsyncProtocolClient
 	hosts := k.config.Hosts
-	topic := k.config.Topic
-	useType := k.config.UseType
+	topic := k.topic
 	for i := 0; i < worker; i++ {
-		client, err := newKafkaClient(hosts, topic, useType, libCfg)
+		client, err := newKafkaClient(hosts, k.config.Key, topic, libCfg)
 		if err != nil {
 			logp.Err("Failed to create kafka client: %v", err)
 			return nil, err
@@ -112,13 +154,13 @@ func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
 		maxAttempts = 0
 	}
 
-	mode, err := modeutil.NewAsyncConnectionMode(
-		clients,
-		false,
-		maxAttempts,
-		defaultWaitRetry,
-		libCfg.Net.WriteTimeout,
-		defaultMaxWaitRetry)
+	mode, err := modeutil.NewAsyncConnectionMode(clients, modeutil.Settings{
+		Failover:     false,
+		MaxAttempts:  maxAttempts,
+		WaitRetry:    defaultWaitRetry,
+		Timeout:      libCfg.Net.WriteTimeout,
+		MaxWaitRetry: defaultMaxWaitRetry,
+	})
 	if err != nil {
 		logp.Err("Failed to configure kafka connection: %v", err)
 		return nil, err
@@ -160,25 +202,43 @@ func (k *kafka) Close() error {
 func (k *kafka) PublishEvent(
 	signal op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
 	mode, err := k.getMode(opts)
 	if err != nil {
 		return err
 	}
-	return mode.PublishEvent(signal, opts, event)
+	return mode.PublishEvent(signal, opts, data)
 }
 
 func (k *kafka) BulkPublish(
 	signal op.Signaler,
 	opts outputs.Options,
-	event []common.MapStr,
+	data []outputs.Data,
 ) error {
 	mode, err := k.getMode(opts)
 	if err != nil {
 		return err
 	}
-	return mode.PublishEvents(signal, opts, event)
+	return mode.PublishEvents(signal, opts, data)
+}
+
+func (k *kafka) PublishEvents(
+	signal op.Signaler,
+	opts outputs.Options,
+	data []outputs.Data,
+) error {
+	return k.BulkPublish(signal, opts, data)
+}
+
+func (k *kafka) newKafkaConfig() (*sarama.Config, error) {
+	cfg, err := newKafkaConfig(&k.config)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.Producer.Partitioner = k.partitioner
+	return cfg, nil
 }
 
 func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
@@ -196,11 +256,21 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	k.Net.TLS.Enable = tls != nil
-	k.Net.TLS.Config = tls
+	if tls != nil {
+		k.Net.TLS.Enable = true
+		k.Net.TLS.Config = tls.BuildModuleConfig("")
+	}
 
-	// TODO: configure metadata level properties
-	//       use lib defaults
+	if config.Username != "" {
+		k.Net.SASL.Enable = true
+		k.Net.SASL.User = config.Username
+		k.Net.SASL.Password = config.Password
+	}
+
+	// configure metadata update properties
+	k.Metadata.Retry.Max = config.Metadata.Retry.Max
+	k.Metadata.Retry.Backoff = config.Metadata.Retry.Backoff
+	k.Metadata.RefreshFrequency = config.Metadata.RefreshFreq
 
 	// configure producer API properties
 	if config.MaxMessageBytes != nil {
@@ -212,7 +282,7 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
 
 	compressionMode, ok := compressionModes[strings.ToLower(config.Compression)]
 	if !ok {
-		return nil, fmt.Errorf("Unknown compression mode: %v", config.Compression)
+		return nil, fmt.Errorf("Unknown compression mode: '%v'", config.Compression)
 	}
 	k.Producer.Compression = compressionMode
 
@@ -225,6 +295,7 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
 		retryMax = 1000
 	}
 	k.Producer.Retry.Max = retryMax
+	// TODO: k.Producer.Retry.Backoff = ?
 
 	// configure per broker go channel buffering
 	k.ChannelBufferSize = config.ChanBufferSize
@@ -235,5 +306,12 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
 		logp.Err("Invalid kafka configuration: %v", err)
 		return nil, err
 	}
+
+	version, ok := kafkaVersions[config.Version]
+	if !ok {
+		return nil, fmt.Errorf("Unknown/unsupported kafka version: %v", config.Version)
+	}
+	k.Version = version
+
 	return k, nil
 }
