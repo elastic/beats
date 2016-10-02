@@ -29,7 +29,7 @@ If you are sure you found a bug or have a feature request, open an issue on
 ## Contributions
 
 We love contributions from our community! Please read the
-[CONTRIBUTING.md](CONTRIBUTING.md) file.
+[CONTRIBUTING.md](../CONTRIBUTING.md) file.
 
 ## Nightlies
 
