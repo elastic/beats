@@ -138,10 +138,14 @@ func (l *winEventLog) Close() error {
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
 func newWinEventLog(c Config) (EventLog, error) {
+	if c.BatchReadSize <= 0 {
+		c.BatchReadSize = defaultMaxNumRead
+	}
+
 	return &winEventLog{
 		channelName:  c.Name,
 		remoteServer: c.RemoteAddress,
-		maxRead:      defaultMaxNumRead,
+		maxRead:      c.BatchReadSize,
 		renderBuf:    make([]byte, renderBufferSize),
 		logPrefix:    fmt.Sprintf("WinEventLog[%s]", c.Name),
 	}, nil
