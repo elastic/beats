@@ -4,7 +4,7 @@
 :topbeat: http://www.elastic.co/guide/en/beats/topbeat/1.3
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/1.3
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/1.3
-:ES-version: 2.4.0
+:ES-version: 2.4.1
 :LS-version: 2.4.0
 :Kibana-version: 4.6.1
 :Dashboards-version: 1.3.1
