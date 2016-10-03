@@ -59,7 +59,7 @@ Elasticsearch running on localhost for a single Beat (eg. Metricbeat):
 ----------------------------------------------------------------------
 
 - from the official zip archive available under http://artifacts.elastic.co/:
-
++
 [source,shell]
 ----------------------------------------------------------------------
 ./scripts/import_dashboards
