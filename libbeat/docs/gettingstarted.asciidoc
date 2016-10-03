@@ -42,7 +42,7 @@ mac>> for OS X, and <<win, win>> for Windows):
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-8-jre
-curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/{ES-version}/elasticsearch-{ES-version}.deb
+curl -L -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{ES-version}.deb
 sudo dpkg -i elasticsearch-{ES-version}.deb
 sudo /etc/init.d/elasticsearch start
 ----------------------------------------------------------------------
@@ -52,7 +52,7 @@ sudo /etc/init.d/elasticsearch start
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo yum install java-1.8.0-openjdk
-curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/rpm/elasticsearch/{ES-version}/elasticsearch-{ES-version}.rpm
+curl -L -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{ES-version}.rpm
 sudo rpm -i elasticsearch-{ES-version}.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
@@ -62,7 +62,7 @@ sudo service elasticsearch start
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
-curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/{ES-version}/elasticsearch-{ES-version}.zip
+curl -L -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{ES-version}.zip
 unzip elasticsearch-{ES-version}.zip
 cd elasticsearch-{ES-version}
 ./bin/elasticsearch
