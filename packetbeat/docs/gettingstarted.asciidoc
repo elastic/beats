@@ -265,5 +265,5 @@ to meet your needs.
 
 image:./images/packetbeat-statistics.png[Packetbeat statistics]
 
-:allplatforms
+:allplatforms:
 include::../../libbeat/docs/dashboards.asciidoc[]
