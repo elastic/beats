@@ -1,19 +1,34 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"mysql",
-        "name":"status",
-        "rtt":44269
-    },
-    "docker":{
-        "memory":{
-            "example": "memory"
+    "docker": {
+        "memory": {
+            "container": {
+                "id": "42d21fbdb065b223b8d10802dd3f8d7030e42719fbaba373f0250862835e2501",
+                "name": "sleepy_montalcini",
+                "socket": "unix:///var/run/docker.sock"
+            },
+            "fail.count": 0,
+            "limit": 2096566272,
+            "total": {
+                "rss": 495616,
+                "rss.pct": 0.00023639414914712508
+            },
+            "usage": {
+                "max": 3096576,
+                "pct": 0.0013382643980643031,
+                "total": 2805760
+            }
         }
     },
-    "type":"metricsets"
+    "metricset": {
+        "host": "localhost",
+        "module": "docker",
+        "name": "memory",
+        "rtt": 115
+    },
+    "type": "metricsets"
 }

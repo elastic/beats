@@ -13,58 +13,62 @@ type DockerStat struct {
 	Stats     docker.Stats
 }
 
+// TOOD: These should not be global as otherwise only one client and socket can be used -> max 1 module to monitor
 var socket string
-var client *docker.Client
 
-func CreateDockerCLient(config *Config) *docker.Client {
+func NewDockerClient(config *Config) (*docker.Client, error) {
 	socket = config.Socket
+
 	var err error
-	if client == nil {
-		if config.Tls.Enabled == true {
-			client, err = docker.NewTLSClient(
-				config.Socket,
-				config.Tls.CertPath,
-				config.Tls.KeyPath,
-				config.Tls.CaPath,
-			)
-		} else {
-			client, err = docker.NewClient(config.Socket)
-		}
-		if err == nil {
-			logp.Info("DockerCLient is created")
-			return client
-		} else {
-			logp.Info("DockerCLient is not created")
-		}
+	var client *docker.Client = nil
+
+	if config.Tls.Enabled == true {
+		client, err = docker.NewTLSClient(
+			config.Socket,
+			config.Tls.CertPath,
+			config.Tls.KeyPath,
+			config.Tls.CaPath,
+		)
 	} else {
-		logp.Info("DockerCLient already exists")
-		return client
+		client, err = docker.NewClient(config.Socket)
 	}
-	return nil
+	if err != nil {
+		return nil, err
+	}
+
+	logp.Info("Docker client is created")
+
+	return client, nil
 }
-func FetchDockerStats(client *docker.Client) ([]DockerStat, error) {
+
+// FetchStats returns a list of running containers with all related stats inside
+func FetchStats(client *docker.Client) ([]DockerStat, error) {
 	containers, err := client.ListContainers(docker.ListContainersOptions{})
-	containersList := []DockerStat{}
-	if err == nil {
-		for _, container := range containers {
-			containersList = append(containersList, exportContainerStats(client, &container))
-		}
-	} else {
-		logp.Err("Can not get container list: %v", err)
+	if err != nil {
+		return nil, err
 	}
+
+	containersList := []DockerStat{}
+	for _, container := range containers {
+		containersList = append(containersList, exportContainerStats(client, &container))
+	}
+
 	return containersList, err
 }
+
 func exportContainerStats(client *docker.Client, container *docker.APIContainers) DockerStat {
 	var wg sync.WaitGroup
+	var event DockerStat
+
 	statsC := make(chan *docker.Stats)
 	errC := make(chan error, 1)
-	var event DockerStat
 	statsOptions := docker.StatsOptions{
 		ID:      container.ID,
 		Stats:   statsC,
 		Stream:  false,
 		Timeout: -1,
 	}
+
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
@@ -87,6 +91,7 @@ func exportContainerStats(client *docker.Client, container *docker.APIContainers
 	wg.Wait()
 	return event
 }
+
 func GetSocket() string {
 	return socket
 }

@@ -1,9 +1,6 @@
 package network
 
-import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/docker"
-)
+import "github.com/elastic/beats/libbeat/common"
 
 func eventsMapping(netsStatsList []NETstats) []common.MapStr {
 	myEvents := []common.MapStr{}
@@ -12,28 +9,22 @@ func eventsMapping(netsStatsList []NETstats) []common.MapStr {
 	}
 	return myEvents
 }
-func eventMapping(myNetStats *NETstats) common.MapStr {
+
+func eventMapping(stats *NETstats) common.MapStr {
 	event := common.MapStr{
-		"@timestamp": myNetStats.Time,
-		"container": common.MapStr{
-			"id":     myNetStats.MyContainer.Id,
-			"name":   myNetStats.MyContainer.Name,
-			"labels": myNetStats.MyContainer.Labels,
+		"container": stats.Container.ToMapStr(),
+		"interface": stats.NameInterface,
+		"in": common.MapStr{
+			"bytes":   stats.RxBytes,
+			"dropped": stats.RxDropped,
+			"errors":  stats.RxErrors,
+			"packets": stats.RxPackets,
 		},
-		"socket": docker.GetSocket(),
-		myNetStats.NameInterface: common.MapStr{
-			"rx": common.MapStr{
-				"bytes":   myNetStats.RxBytes,
-				"dropped": myNetStats.RxDropped,
-				"errors":  myNetStats.RxErrors,
-				"packets": myNetStats.RxPackets,
-			},
-			"tx": common.MapStr{
-				"bytes":   myNetStats.TxBytes,
-				"dropped": myNetStats.TxDropped,
-				"errors":  myNetStats.TxErrors,
-				"packets": myNetStats.TxPackets,
-			},
+		"out": common.MapStr{
+			"bytes":   stats.TxBytes,
+			"dropped": stats.TxDropped,
+			"errors":  stats.TxErrors,
+			"packets": stats.TxPackets,
 		},
 	}
 	return event
