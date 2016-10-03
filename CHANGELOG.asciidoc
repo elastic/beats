@@ -56,9 +56,11 @@ https://github.com/elastic/beats/compare/v5.0.0-beta1...master[Check the HEAD di
 
 *Filebeat*
 
-- Add command line option -once to run filebeat only once and then close {pull}2456[2456]
+- Add command line option -once to run filebeat only once and then close. {pull}2456[2456]
 
 *Winlogbeat*
+
+- Add `event_logs.batch_read_size` configuration option. {pull}2641[2641]
 
 ==== Deprecated
 
