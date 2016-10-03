@@ -235,5 +235,5 @@ to meet your needs.
 
 image:./images/metricbeat_system_dashboard.png[Metricbeat Dashboard]
 
-:allplatforms
+:allplatforms:
 include::../../libbeat/docs/dashboards.asciidoc[]
