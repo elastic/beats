@@ -17,9 +17,6 @@ import (
 )
 
 const (
-	// defaultBatchReadSize is the maximum number of event Read will return.
-	defaultBatchReadSize = 100
-
 	// renderBufferSize is the size in bytes of the buffer used to render events.
 	renderBufferSize = 1 << 14
 
@@ -33,11 +30,16 @@ var winEventLogConfigKeys = append(commonConfigKeys, "batch_read_size",
 
 type winEventLogConfig struct {
 	ConfigCommon  `config:",inline"`
-	BatchReadSize int                    `config:"batch_read_size"`
+	BatchReadSize int                    `config:"batch_read_size"` // Maximum number of events that Read will return.
 	IncludeXML    bool                   `config:"include_xml"`
 	Forwarded     *bool                  `config:"forwarded"`
 	SimpleQuery   query                  `config:",inline"`
 	Raw           map[string]interface{} `config:",inline"`
+}
+
+// defaultWinEventLogConfig is the default configuration for new wineventlog readers.
+var defaultWinEventLogConfig = winEventLogConfig{
+	BatchReadSize: 100,
 }
 
 // query contains parameters used to customize the event log data that is
@@ -219,7 +221,7 @@ func reportDrop(reason interface{}) {
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
 func newWinEventLog(options map[string]interface{}) (EventLog, error) {
-	c := winEventLogConfig{BatchReadSize: defaultBatchReadSize}
+	c := defaultWinEventLogConfig
 	if err := readConfig(options, &c, winEventLogConfigKeys); err != nil {
 		return nil, err
 	}
