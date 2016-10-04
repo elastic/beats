@@ -198,11 +198,11 @@ func (pb *Packetbeat) setupSniffer() error {
 	}
 
 	pb.Sniff = &sniffer.SnifferSetup{}
-	return pb.Sniff.Init(false, pb.makeWorkerFactory(filter), &config.Interfaces)
+	return pb.Sniff.Init(false, filter, pb.makeWorkerFactory(), &config.Interfaces)
 }
 
-func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
-	return func(dl layers.LinkType) (sniffer.Worker, string, error) {
+func (pb *Packetbeat) makeWorkerFactory() sniffer.WorkerFactory {
+	return func(dl layers.LinkType) (sniffer.Worker, error) {
 		var f *flows.Flows
 		var err error
 		config := &pb.Config
@@ -210,7 +210,7 @@ func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
 		if config.Flows.IsEnabled() {
 			f, err = flows.NewFlows(pb.Pub, config.Flows)
 			if err != nil {
-				return nil, "", err
+				return nil, err
 			}
 		}
 
@@ -219,7 +219,7 @@ func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
 		if cfg := config.Protocols["icmp"]; cfg.Enabled() {
 			icmp, err := icmp.New(false, pb.Pub, cfg)
 			if err != nil {
-				return nil, "", err
+				return nil, err
 			}
 
 			icmp4 = icmp
@@ -228,22 +228,22 @@ func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
 
 		tcp, err := tcp.NewTcp(&protos.Protos)
 		if err != nil {
-			return nil, "", err
+			return nil, err
 		}
 
 		udp, err := udp.NewUdp(&protos.Protos)
 		if err != nil {
-			return nil, "", err
+			return nil, err
 		}
 
 		worker, err := decoder.NewDecoder(f, dl, icmp4, icmp6, tcp, udp)
 		if err != nil {
-			return nil, "", err
+			return nil, err
 		}
 
 		if f != nil {
 			pb.services = append(pb.services, f)
 		}
-		return worker, filter, nil
+		return worker, nil
 	}
 }

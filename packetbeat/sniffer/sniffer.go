@@ -37,7 +37,7 @@ type Worker interface {
 	OnPacket(data []byte, ci *gopacket.CaptureInfo)
 }
 
-type WorkerFactory func(layers.LinkType) (Worker, string, error)
+type WorkerFactory func(layers.LinkType) (Worker, error)
 
 // Computes the block_size and the num_blocks in such a way that the
 // allocated mmap buffer is close to but smaller than target_size_mb.
@@ -261,21 +261,22 @@ func (sniffer *SnifferSetup) Datalink() layers.LinkType {
 	return layers.LinkTypeEthernet
 }
 
-func (sniffer *SnifferSetup) Init(test_mode bool, factory WorkerFactory, interfaces *config.InterfacesConfig) error {
+func (sniffer *SnifferSetup) Init(test_mode bool, filter string, factory WorkerFactory, interfaces *config.InterfacesConfig) error {
 	var err error
 
 	if !test_mode {
+		sniffer.filter = filter
+		logp.Debug("sniffer", "BPF filter: '%s'", sniffer.filter)
 		err = sniffer.setFromConfig(interfaces)
 		if err != nil {
 			return fmt.Errorf("Error creating sniffer: %v", err)
 		}
 	}
 
-	sniffer.worker, sniffer.filter, err = factory(sniffer.Datalink())
+	sniffer.worker, err = factory(sniffer.Datalink())
 	if err != nil {
 		return fmt.Errorf("Error creating decoder: %v", err)
 	}
-	logp.Debug("sniffer", "BPF filter: '%s'", sniffer.filter)
 
 	if sniffer.config.Dumpfile != "" {
 		p, err := pcap.OpenDead(sniffer.Datalink(), 65535)
