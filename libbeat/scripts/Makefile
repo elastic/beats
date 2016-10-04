@@ -377,9 +377,8 @@ package-setup:
 	$(MAKE) -C ${ES_BEATS}/dev-tools/packer deps images
 
 # Create binary packages for the beat.
-# This requires that `package-setup` was run before once.
 .PHONY: package
-package:
+package: package-setup
 
 	echo "Start building packages for ${BEATNAME}"
 
@@ -401,7 +400,7 @@ package:
 
 	echo "Finished packages for ${BEATNAME}"
 
-package-dashboards:
+package-dashboards: package-setup
 	mkdir -p ${BUILD_DIR}
 	cp -r etc/kibana ${BUILD_DIR}/dashboards
 	# build the dashboards package
