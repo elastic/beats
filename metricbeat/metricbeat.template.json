@@ -310,7 +310,36 @@
           "properties": {
             "container": {
               "properties": {
-                "example": {
+                "command": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "created": {
+                  "type": "date"
+                },
+                "id": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "image": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "size": {
+                  "properties": {
+                    "root_fs": {
+                      "type": "long"
+                    },
+                    "rw": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "status": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 }
@@ -318,10 +347,35 @@
             },
             "cpu": {
               "properties": {
-                "cpu": {
+                "container": {
                   "properties": {
-                    "usage_in_user_mode": {
-                      "type": "float"
+                    "id": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "socket": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "usage": {
+                  "properties": {
+                    "kernel_mode": {
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
+                    },
+                    "total": {
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
+                    },
+                    "user_mode": {
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     }
                   }
                 }
@@ -329,9 +383,33 @@
             },
             "diskio": {
               "properties": {
-                "example": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                "container": {
+                  "properties": {
+                    "id": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "socket": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "reads": {
+                  "scaling_factor": 1000,
+                  "type": "scaled_float"
+                },
+                "total": {
+                  "scaling_factor": 1000,
+                  "type": "scaled_float"
+                },
+                "writes": {
+                  "scaling_factor": 1000,
+                  "type": "scaled_float"
                 }
               }
             },
@@ -364,17 +442,116 @@
             },
             "memory": {
               "properties": {
-                "example": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                "container": {
+                  "properties": {
+                    "id": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "socket": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "fail": {
+                  "properties": {
+                    "count": {
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
+                    }
+                  }
+                },
+                "limit": {
+                  "type": "long"
+                },
+                "total": {
+                  "properties": {
+                    "rss": {
+                      "properties": {
+                        "pct": {
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
+                        }
+                      }
+                    }
+                  }
+                },
+                "usage": {
+                  "properties": {
+                    "max": {
+                      "type": "long"
+                    },
+                    "pct": {
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
+                    },
+                    "total": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
             "network": {
               "properties": {
-                "example": {
+                "container": {
+                  "properties": {
+                    "id": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "socket": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "in": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "dropped": {
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
+                    },
+                    "errors": {
+                      "type": "long"
+                    },
+                    "packets": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "interface": {
                   "ignore_above": 1024,
                   "type": "keyword"
+                },
+                "out": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "dropped": {
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
+                    },
+                    "errors": {
+                      "type": "long"
+                    },
+                    "packets": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             }
