@@ -35,6 +35,8 @@ https://github.com/elastic/beats/compare/v5.0.0-beta1...master[Check the HEAD di
 
 *Packetbeat*
 
+- Fix the `bpf_filter` setting. {issue}2660[2660]
+
 *Topbeat*
 
 *Filebeat*
