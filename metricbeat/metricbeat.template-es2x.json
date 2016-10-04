@@ -332,6 +332,34 @@
                 }
               }
             },
+            "info": {
+              "properties": {
+                "containers": {
+                  "properties": {
+                    "paused": {
+                      "type": "long"
+                    },
+                    "running": {
+                      "type": "long"
+                    },
+                    "stopped": {
+                      "type": "long"
+                    },
+                    "total": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "id": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "images": {
+                  "type": "long"
+                }
+              }
+            },
             "memory": {
               "properties": {
                 "example": {
