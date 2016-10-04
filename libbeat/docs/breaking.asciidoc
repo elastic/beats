@@ -18,7 +18,7 @@ the Beats from version 1.x to 5.x.
 ==== Configuration file changes
 
 Beats 5.0 come with a more powerful and more robust <<config-file-format,file
-configuration format>>. While this necessarily cause a few breaking changes, we
+configuration format>>. While this necessarily causes a few breaking changes, we
 provide a migration script that should make upgrading easy. Please see the
 <<upgrading>> section.
 
@@ -30,7 +30,7 @@ migration script.
 
 Similarly, common settings available in all Beats are now top level. As part of
 this, the options under the `shipper` section are moved to the top level. For
-example, the `shipper.name` settings becomes `shipper`. This change is made
+example, the `shipper.name` settings becomes `name`. This change is made
 automatically by the migration script.
 
 For consistency with the rest of the Elastic stack, several TLS/SSL related
@@ -44,7 +44,7 @@ options where changed:
 These changes are made automatically by the migration script.
 
 In Filebeat, we refactored the configuration around when to close and when to
-start ignore files. Options like `ignore_older` and `force_close_older` were
+start ignoring files. Options like `close_older` and `force_close_older` were
 changed or replaced with options from the `close_*` group. See the
 {filebeat}/_how_filebeat_works.html[How Filebeat works] docs for details. These
 changes are not made automatically by the migration script.

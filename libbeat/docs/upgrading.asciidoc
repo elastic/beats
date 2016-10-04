@@ -68,10 +68,10 @@ input file, but outputs the upgraded version to stdout instead.
 
 ==== Filebeat registry file location and format
 
-Filebeat stores which the read offset in a registry file that it persist to
-disk. The format of this file has changed in version 5.0, but the Filebeat code
-automatically upgrades the format on first run, so there's normally no action
-required on upgrading.
+Filebeat stores the read offset in a registry file that it persist to disk. The
+format of this file has changed in version 5.0, but Filebeat automatically
+upgrades the format on first run, so there's normally no action required on
+upgrading.
 
 If you have installed Filebeat from the DEB or RPM packages, the location of the
 file stays the same as well (`/var/lib/filebeat/registry`). Also if you've
