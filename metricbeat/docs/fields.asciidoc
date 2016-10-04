@@ -770,6 +770,69 @@ Example field
 
 
 [float]
+== info Fields
+
+experimental[]
+info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information
+
+
+
+[float]
+== containers Fields
+
+Overall container stats.
+
+
+
+[float]
+=== docker.info.containers.paused
+
+type: long
+
+Total number of paused containers.
+
+
+[float]
+=== docker.info.containers.running
+
+type: long
+
+Total number of running containers.
+
+
+[float]
+=== docker.info.containers.stopped
+
+type: long
+
+Total number of stopped containers.
+
+
+[float]
+=== docker.info.containers.total
+
+type: long
+
+Total number of existing containers.
+
+
+[float]
+=== docker.info.id
+
+type: keyword
+
+Unique docker host identifier.
+
+
+[float]
+=== docker.info.images
+
+type: long
+
+Total number of existing images.
+
+
+[float]
 == memory Fields
 
 memory
