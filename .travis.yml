@@ -73,7 +73,7 @@ before_install:
     fi
   # install virtualenv on OSX
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      brew install pyenv-virtualenv
+      brew install pyenv-virtualenv;
     fi
   # Docker-compose installation
   - sudo rm /usr/local/bin/docker-compose || true
