@@ -22,13 +22,11 @@ RUN groupadd -r elasticsearch && useradd -r -m -g elasticsearch elasticsearch
 
 RUN set -x && \
 	cd /opt && \
-	wget -q $URL && \
-	tar xzvf elasticsearch-${FILENAME_VERSION}.tar.gz && \
+	wget -qO elasticsearch.tar.gz "$URL?t=$(date +%F)" && \
+	tar xzvf elasticsearch.tar.gz && \
 	chown -R elasticsearch:elasticsearch ${ESHOME}
 
 ENV PATH ${ESHOME}/bin:$PATH
-
-#COPY config /opt/elasticsearch-$VERSION/config
 
 VOLUME ${ESHOME}/data
 
