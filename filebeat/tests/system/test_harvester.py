@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from filebeat import BaseTest
 import os
 import codecs
@@ -756,3 +758,48 @@ class Test(BaseTest):
         # Check that only 1 registry entry as original was only truncated
         data = self.get_registry()
         assert len(data) == 1
+
+
+    def test_decode_error(self):
+        """
+        Tests that in case of a decoding error it is handled gracefully
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            encoding="GBK", # Set invalid encoding for entry below which is actually uft-8
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+
+        logfile = self.working_dir + "/log/test.log"
+
+        with open(logfile, 'w') as file:
+            file.write("hello world1" + "\n")
+
+            file.write('<meta content="瞭解「Google 商業解決方案」提供的各類服務軟件如何助您分析資料、刊登廣告、提升網站成效等。" name="description">' + '\n')
+            file.write("hello world2" + "\n")
+
+        filebeat = self.start_beat()
+
+        # Make sure both files were read
+        self.wait_until(
+            lambda: self.output_has(lines=3),
+            max_timeout=10)
+
+        # Wait until error shows up
+        self.wait_until(
+            lambda: self.log_contains("Error decoding line: simplifiedchinese: invalid GBK encoding"),
+            max_timeout=5)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that only 1 registry entry as original was only truncated
+        data = self.get_registry()
+        assert len(data) == 1
+
+        output = self.read_output_json()
+        assert output[2]["message"] == "hello world2"
+
+
+
+
