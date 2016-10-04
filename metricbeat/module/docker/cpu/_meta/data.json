@@ -1,19 +1,32 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"mysql",
-        "name":"status",
-        "rtt":44269
-    },
-    "docker":{
-        "cpu":{
-            "example": "cpu"
+    "docker": {
+        "cpu": {
+            "container": {
+                "id": "42d21fbdb065b223b8d10802dd3f8d7030e42719fbaba373f0250862835e2501",
+                "name": "sleepy_montalcini",
+                "socket": "unix:///var/run/docker.sock"
+            },
+            "usage": {
+                "kernel_mode": 0,
+                "per_cpu": {
+                    "0": 0,
+                    "1": 0
+                },
+                "total": 0,
+                "user_mode": 0
+            }
         }
     },
-    "type":"metricsets"
+    "metricset": {
+        "host": "localhost",
+        "module": "docker",
+        "name": "cpu",
+        "rtt": 115
+    },
+    "type": "metricsets"
 }

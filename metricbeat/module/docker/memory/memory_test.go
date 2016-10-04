@@ -1,17 +1,7 @@
 package memory
 
-import (
-	"reflect"
-	"testing"
-	"time"
-
-	dc "github.com/fsouza/go-dockerclient"
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/docker"
-)
-
+/*
+// TODO: reenabled test
 func TestMemoryService_GetMemoryStats(t *testing.T) {
 
 	//Container  + dockerstats
@@ -127,3 +117,4 @@ func equalEvent(expectedEvent common.MapStr, event common.MapStr) bool {
 	return reflect.DeepEqual(expectedEvent, event)
 
 }
+*/
