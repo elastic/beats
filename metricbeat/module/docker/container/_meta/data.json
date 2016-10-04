@@ -7,17 +7,15 @@
     "docker": {
         "container": {
             "command": "bash",
-            "created": "2016-10-03T19:45:33.000Z",
-            "id": "42d21fbdb065b223b8d10802dd3f8d7030e42719fbaba373f0250862835e2501",
+            "created": "2016-10-04T12:45:17.000Z",
+            "id": "9f537cd4dc231c37c7eec0cc7f1e42244b6b0aee92c4094340b2cbba8833ae43",
             "image": "debian",
-            "labels": [],
-            "name": "sleepy_montalcini",
-            "ports": [],
+            "name": "awesome_ptolemy",
             "size": {
                 "root_fs": 0,
                 "rw": 0
             },
-            "status": "Up 10 hours"
+            "status": "Up 30 minutes"
         }
     },
     "metricset": {

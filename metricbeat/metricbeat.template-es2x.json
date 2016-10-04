@@ -305,7 +305,40 @@
           "properties": {
             "container": {
               "properties": {
-                "example": {
+                "command": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "created": {
+                  "type": "date"
+                },
+                "id": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "image": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "name": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "size": {
+                  "properties": {
+                    "root_fs": {
+                      "type": "long"
+                    },
+                    "rw": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "status": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
@@ -314,9 +347,34 @@
             },
             "cpu": {
               "properties": {
-                "cpu": {
+                "container": {
                   "properties": {
-                    "usage_in_user_mode": {
+                    "id": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "socket": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "usage": {
+                  "properties": {
+                    "kernel_mode": {
+                      "type": "float"
+                    },
+                    "total": {
+                      "type": "float"
+                    },
+                    "user_mode": {
                       "type": "float"
                     }
                   }
@@ -325,10 +383,33 @@
             },
             "diskio": {
               "properties": {
-                "example": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
+                "container": {
+                  "properties": {
+                    "id": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "socket": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "reads": {
+                  "type": "float"
+                },
+                "total": {
+                  "type": "float"
+                },
+                "writes": {
+                  "type": "float"
                 }
               }
             },
@@ -362,19 +443,118 @@
             },
             "memory": {
               "properties": {
-                "example": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
+                "container": {
+                  "properties": {
+                    "id": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "socket": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "fail": {
+                  "properties": {
+                    "count": {
+                      "type": "float"
+                    }
+                  }
+                },
+                "limit": {
+                  "type": "long"
+                },
+                "total": {
+                  "properties": {
+                    "rss": {
+                      "properties": {
+                        "pct": {
+                          "type": "float"
+                        }
+                      }
+                    }
+                  }
+                },
+                "usage": {
+                  "properties": {
+                    "max": {
+                      "type": "long"
+                    },
+                    "pct": {
+                      "type": "float"
+                    },
+                    "total": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
             "network": {
               "properties": {
-                "example": {
+                "container": {
+                  "properties": {
+                    "id": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "socket": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "in": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "dropped": {
+                      "type": "float"
+                    },
+                    "errors": {
+                      "type": "long"
+                    },
+                    "packets": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "interface": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
+                },
+                "out": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "dropped": {
+                      "type": "float"
+                    },
+                    "errors": {
+                      "type": "long"
+                    },
+                    "packets": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             }

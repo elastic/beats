@@ -1,9 +1,62 @@
 - name: memory
   type: group
   description: >
-    memory
+    Memory metrics.
   fields:
-    - name: example
-      type: keyword
+    - name: container
+      type: group
       description: >
-        Example field
+        Container meta data.
+      fields:
+        # TODO: Add optional labels
+        - name: id
+          type: keyword
+          description: >
+            Unique container id.
+        - name: name
+          type: keyword
+          description: >
+            Container name.
+        - name: socket
+          type: keyword
+          description: >
+            The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
+
+    - name: fail.count
+      type: scaled_float
+      description: >
+        Fail counter.
+    - name: limit
+      type: long
+      description: >
+        Memory limit.
+    - name: total
+      type: group
+      description: >
+        Total memory stats.
+      fields:
+        - name: rss
+          type: long
+          description: >
+            Memory resident set size.
+        - name: rss.pct
+          type: scaled_float
+          description: >
+            Memory resident set size percentage.
+    - name: usage
+      type: group
+      description: >
+        Usage memory stats.
+      fields:
+        - name: max
+          type: long
+          description: >
+            Max memory usage.
+        - name: pct
+          type: scaled_float
+          description: >
+            Memory usage percentage.
+        - name: total
+          type: long
+          description: >
+            Total memory usage.

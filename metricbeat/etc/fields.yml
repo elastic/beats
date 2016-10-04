@@ -392,88 +392,130 @@
       description: >
         docker contains different informations and statistics of docker's containers running
       fields:
+        # TODO: Currently ports and labels are not added to the template yet
         - name: container
           type: group
           description: >
-            container
+            Docker container metrics
           fields:
-            - name: example
+            - name: command
               type: keyword
               description: >
-                Example field
+                Executed command in docker container.
+            - name: created
+              type: date
+              description: >
+                Date then the container was created.
+            - name: id
+              type: keyword
+              description: >
+                Unique container id.
+            - name: image
+              type: keyword
+              description: >
+                Name of the image the container was built on.
+            - name: name
+              type: keyword
+              description: >
+                Container name.
+            - name: status
+              type: keyword
+              description: >
+                Container status.
+            - name: size
+              type: group
+              description: >
+                Container size metrics.
+              fields:
+                - name: root_fs
+                  type: long
+                  description: >
+                     Total size of all the files in the container.
+                - name: rw
+                  type: long
+                  description: >
+                     Size of the files which have been created or changed since creation.
 
         - name: cpu
           type: group
           description: >
-            Runtime cpu metrics
+            Runtime cpu metrics.
           fields:
-            - name: timestamp
-              type: time
+            - name: container
+              type: group
               description: >
-                 The time generate by Docker daemon while sending the events requested.
-          fields:
-              - name: socket
-                type: string
-                description: >
-                  The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
-          fields:
-              - name: container
-                type: group
-                description: >
-                  informations of running container.
-                fields:
-                  - name: container_id
-                    type: string
-                    description: >
-                      the container's ID
-                fields:
-                  - name: container_name
-                    type: string
-                    description: >
-                      the container's name.
-                fields:
-                    - name: container_labels
-                      type: common.MapStr[]
-                      description: >
-                        the container's labels. It's a key/value pair. It's used to add notes or licensing information to a docker image or to identify a host
-          fields:
-              - name: cpu
-                type: group
-                description: >
-                 CPU statistics of the running container
-                fields:
-                  - name: per_cpu_usage
-                    type: common.MapStr
-                    description: >
-                      The system CPU (per cpu) ressources consumed by The Docker server.
-                fields:
-                  - name: total_usage
-                    type: float
-                    description: >
-                      The total system ressources consumed by The Docker server.
-                fields:
-                  - name: usage_in_kernel_mode
-                    type: float
-                    description: >
-                      The system kernel consumed by The Docker server.
-                fields:
-                  - name: usage_in_user_mode
-                    type: float
-                    description: >
-                      The system user mode consumed by The Docker server.
+                Container meta data.
+              fields:
+                # TODO: Add optional labels
+                - name: id
+                  type: keyword
+                  description: >
+                    Unique container id.
+                - name: name
+                  type: keyword
+                  description: >
+                    Container name.
+                - name: socket
+                  type: keyword
+                  description: >
+                    The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
 
+            - name: usage
+              type: group
+              description: >
+                Cpu usage metrics.
+              fields:
+                - name: kernel_mode
+                  type: scaled_float
+                  description: >
+                    The system kernel consumed by The Docker server.
+                - name: user_mode
+                  type: scaled_float
+                  description: >
+                    The system user mode consumed by The Docker server.
+                - name: total
+                  type: scaled_float
+                  description: >
+                    The total system ressources consumed by The Docker server.
 
-
+                # TODO: Add per_cpu
 
         - name: diskio
           type: group
           description: >
-            diskio
+            Diskio metrics.
           fields:
-            - name: example
-              type: keyword
+            - name: container
+              type: group
               description: >
-                Example field
+                Container meta data.
+              fields:
+                # TODO: Add optional labels
+                - name: id
+                  type: keyword
+                  description: >
+                    Unique container id.
+                - name: name
+                  type: keyword
+                  description: >
+                    Container name.
+                - name: socket
+                  type: keyword
+                  description: >
+                    The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
+
+            - name: reads
+              type: scaled_float
+              description: >
+                Number of reads.
+            - name: writes
+              type: scaled_float
+              description: >
+                Number of writes.
+            - name: total
+              type: scaled_float
+              description: >
+                Reads and writes numbers combined.
 
         - name: info
           type: group
@@ -516,22 +558,136 @@
         - name: memory
           type: group
           description: >
-            memory
+            Memory metrics.
           fields:
-            - name: example
-              type: keyword
+            - name: container
+              type: group
               description: >
-                Example field
+                Container meta data.
+              fields:
+                # TODO: Add optional labels
+                - name: id
+                  type: keyword
+                  description: >
+                    Unique container id.
+                - name: name
+                  type: keyword
+                  description: >
+                    Container name.
+                - name: socket
+                  type: keyword
+                  description: >
+                    The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
+
+            - name: fail.count
+              type: scaled_float
+              description: >
+                Fail counter.
+            - name: limit
+              type: long
+              description: >
+                Memory limit.
+            - name: total
+              type: group
+              description: >
+                Total memory stats.
+              fields:
+                - name: rss
+                  type: long
+                  description: >
+                    Memory resident set size.
+                - name: rss.pct
+                  type: scaled_float
+                  description: >
+                    Memory resident set size percentage.
+            - name: usage
+              type: group
+              description: >
+                Usage memory stats.
+              fields:
+                - name: max
+                  type: long
+                  description: >
+                    Max memory usage.
+                - name: pct
+                  type: scaled_float
+                  description: >
+                    Memory usage percentage.
+                - name: total
+                  type: long
+                  description: >
+                    Total memory usage.
 
         - name: network
           type: group
           description: >
-            network
+            Netowrk metrics.
           fields:
-            - name: example
+            - name: container
+              type: group
+              description: >
+                Container meta data.
+              fields:
+                # TODO: Add optional labels
+                - name: id
+                  type: keyword
+                  description: >
+                    Unique container id.
+                - name: name
+                  type: keyword
+                  description: >
+                    Container name.
+                - name: socket
+                  type: keyword
+                  description: >
+                    The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
+
+            - name: interface
               type: keyword
               description: >
-                Example field
+                Network interface name.
+            - name: in
+              type: group
+              description: >
+                Incoming network stats.
+              fields:
+                - name: bytes
+                  type: long
+                  description: >
+                    Total number of incoming bytes.
+                - name: dropped
+                  type: scaled_float
+                  description: >
+                    Total number of dropped incoming packets.
+                - name: errors
+                  type: long
+                  description: >
+                    Total errors on incoming packets.
+                - name: packets
+                  type: long
+                  description: >
+                    Total number of incoming packets.
+            - name: out
+              type: group
+              description: >
+                Outgoing network stats.
+              fields:
+                - name: bytes
+                  type: long
+                  description: >
+                    Total number of outgoing bytes.
+                - name: dropped
+                  type: scaled_float
+                  description: >
+                    Total number of dropped outgoing packets.
+                - name: errors
+                  type: long
+                  description: >
+                    Total errors on outgoing packets.
+                - name: packets
+                  type: long
+                  description: >
+                    Total number of outgoing packets.
 
 - key: haproxy
   title: "haproxy"
