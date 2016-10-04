@@ -21,7 +21,7 @@ include::./gettingstarted.asciidoc[]
 
 include::./installing-beats.asciidoc[]
 
-//include::./repositories.asciidoc[]
+include::./repositories.asciidoc[]
 
 include::./config-file-format.asciidoc[]
 
