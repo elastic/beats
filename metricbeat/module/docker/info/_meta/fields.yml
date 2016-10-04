@@ -1,0 +1,37 @@
+- name: info
+  type: group
+  description: >
+    experimental[]
+
+    info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information
+  fields:
+    - name: containers
+      type: group
+      description: >
+        Overall container stats.
+      fields:
+        - name: paused
+          type: long
+          description: >
+            Total number of paused containers.
+        - name: running
+          type: long
+          description: >
+            Total number of running containers.
+        - name: stopped
+          type: long
+          description: >
+            Total number of stopped containers.
+        - name: total
+          type: long
+          description: >
+            Total number of existing containers.
+    - name: id
+      type: keyword
+      description: >
+        Unique docker host identifier.
+
+    - name: images
+      type: long
+      description: >
+        Total number of existing images.

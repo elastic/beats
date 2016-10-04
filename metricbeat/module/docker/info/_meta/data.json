@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "docker": {
+        "info": {
+            "containers": {
+                "paused": 0,
+                "running": 1,
+                "stopped": 16,
+                "total": 17
+            },
+            "id": "HAUM:OUVF:WQF3:3BMQ:JS3B:QEMH:U7YR:SM5Z:P2UA:CRKR:5KRS:UTVU",
+            "images": 784
+        }
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "docker",
+        "name": "info",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

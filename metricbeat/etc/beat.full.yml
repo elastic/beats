@@ -80,7 +80,7 @@ metricbeat.modules:
 
 #------------------------------- docker Module -------------------------------
 #- module: docker
-  #metricsets: ["cpu","memory","network","diskio","container"]
+  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
   #enabled: true
   #period: 10s
   #hosts: ["localhost"]
