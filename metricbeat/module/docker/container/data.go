@@ -25,13 +25,21 @@ func eventMapping(cont *dc.APIContainers) common.MapStr {
 		"name":    docker.ExtractContainerName(cont.Names),
 		"command": cont.Command,
 		"image":   cont.Image,
-		"ports":   convertContainerPorts(cont.Ports),
-		"labels":  docker.BuildLabelArray(cont.Labels),
 		"size": common.MapStr{
 			"root_fs": cont.SizeRootFs,
 			"rw":      cont.SizeRw,
 		},
 		"status": cont.Status,
+	}
+
+	labels := docker.BuildLabelArray(cont.Labels)
+	if len(labels) > 0 {
+		event["labels"] = labels
+	}
+
+	ports := convertContainerPorts(cont.Ports)
+	if len(ports) > 0 {
+		event["ports"] = ports
 	}
 
 	return event

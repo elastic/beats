@@ -720,53 +720,210 @@ docker contains different informations and statistics of docker's containers run
 [float]
 == container Fields
 
-container
+Docker container metrics
 
 
 
 [float]
-=== docker.container.example
+=== docker.container.command
 
 type: keyword
 
-Example field
+Executed command in docker container.
+
+
+[float]
+=== docker.container.created
+
+type: date
+
+Date then the container was created.
+
+
+[float]
+=== docker.container.id
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== docker.container.image
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== docker.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.container.status
+
+type: keyword
+
+Container status.
+
+
+[float]
+== size Fields
+
+Container size metrics.
+
+
+
+[float]
+=== docker.container.size.root_fs
+
+type: long
+
+Total size of all the files in the container.
+
+
+[float]
+=== docker.container.size.rw
+
+type: long
+
+Size of the files which have been created or changed since creation.
 
 
 [float]
 == cpu Fields
 
-Runtime cpu metrics
+Runtime cpu metrics.
 
 
 
 [float]
-== cpu Fields
+== container Fields
 
-CPU statistics of the running container
+Container meta data.
 
 
 
 [float]
-=== docker.cpu.cpu.usage_in_user_mode
+=== docker.cpu.container.id
 
-type: float
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== docker.cpu.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.cpu.container.socket
+
+type: keyword
+
+The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
+
+
+[float]
+== usage Fields
+
+Cpu usage metrics.
+
+
+
+[float]
+=== docker.cpu.usage.kernel_mode
+
+type: scaled_float
+
+The system kernel consumed by The Docker server.
+
+
+[float]
+=== docker.cpu.usage.user_mode
+
+type: scaled_float
 
 The system user mode consumed by The Docker server.
 
 
 [float]
+=== docker.cpu.usage.total
+
+type: scaled_float
+
+The total system ressources consumed by The Docker server.
+
+
+[float]
 == diskio Fields
 
-diskio
+Diskio metrics.
 
 
 
 [float]
-=== docker.diskio.example
+== container Fields
+
+Container meta data.
+
+
+
+[float]
+=== docker.diskio.container.id
 
 type: keyword
 
-Example field
+Unique container id.
+
+
+[float]
+=== docker.diskio.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.diskio.container.socket
+
+type: keyword
+
+The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
+
+
+[float]
+=== docker.diskio.reads
+
+type: scaled_float
+
+Number of reads.
+
+
+[float]
+=== docker.diskio.writes
+
+type: scaled_float
+
+Number of writes.
+
+
+[float]
+=== docker.diskio.total
+
+type: scaled_float
+
+Reads and writes numbers combined.
 
 
 [float]
@@ -835,31 +992,233 @@ Total number of existing images.
 [float]
 == memory Fields
 
-memory
+Memory metrics.
 
 
 
 [float]
-=== docker.memory.example
+== container Fields
+
+Container meta data.
+
+
+
+[float]
+=== docker.memory.container.id
 
 type: keyword
 
-Example field
+Unique container id.
+
+
+[float]
+=== docker.memory.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.memory.container.socket
+
+type: keyword
+
+The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
+
+
+[float]
+=== docker.memory.fail.count
+
+type: scaled_float
+
+Fail counter.
+
+
+[float]
+=== docker.memory.limit
+
+type: long
+
+Memory limit.
+
+
+[float]
+== total Fields
+
+Total memory stats.
+
+
+
+[float]
+=== docker.memory.total.rss
+
+type: long
+
+Memory resident set size.
+
+
+[float]
+=== docker.memory.total.rss.pct
+
+type: scaled_float
+
+Memory resident set size percentage.
+
+
+[float]
+== usage Fields
+
+Usage memory stats.
+
+
+
+[float]
+=== docker.memory.usage.max
+
+type: long
+
+Max memory usage.
+
+
+[float]
+=== docker.memory.usage.pct
+
+type: scaled_float
+
+Memory usage percentage.
+
+
+[float]
+=== docker.memory.usage.total
+
+type: long
+
+Total memory usage.
 
 
 [float]
 == network Fields
 
-network
+Netowrk metrics.
 
 
 
 [float]
-=== docker.network.example
+== container Fields
+
+Container meta data.
+
+
+
+[float]
+=== docker.network.container.id
 
 type: keyword
 
-Example field
+Unique container id.
+
+
+[float]
+=== docker.network.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.network.container.socket
+
+type: keyword
+
+The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
+
+
+[float]
+=== docker.network.interface
+
+type: keyword
+
+Network interface name.
+
+
+[float]
+== in Fields
+
+Incoming network stats.
+
+
+
+[float]
+=== docker.network.in.bytes
+
+type: long
+
+Total number of incoming bytes.
+
+
+[float]
+=== docker.network.in.dropped
+
+type: scaled_float
+
+Total number of dropped incoming packets.
+
+
+[float]
+=== docker.network.in.errors
+
+type: long
+
+Total errors on incoming packets.
+
+
+[float]
+=== docker.network.in.packets
+
+type: long
+
+Total number of incoming packets.
+
+
+[float]
+== out Fields
+
+Outgoing network stats.
+
+
+
+[float]
+=== docker.network.out.bytes
+
+type: long
+
+Total number of outgoing bytes.
+
+
+[float]
+=== docker.network.out.dropped
+
+type: scaled_float
+
+Total number of dropped outgoing packets.
+
+
+[float]
+=== docker.network.out.errors
+
+type: long
+
+Total errors on outgoing packets.
+
+
+[float]
+=== docker.network.out.packets
+
+type: long
+
+Total number of outgoing packets.
 
 
 [[exported-fields-haproxy]]

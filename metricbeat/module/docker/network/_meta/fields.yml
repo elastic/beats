@@ -1,9 +1,70 @@
 - name: network
   type: group
   description: >
-    network
+    Netowrk metrics.
   fields:
-    - name: example
+    - name: container
+      type: group
+      description: >
+        Container meta data.
+      fields:
+        # TODO: Add optional labels
+        - name: id
+          type: keyword
+          description: >
+            Unique container id.
+        - name: name
+          type: keyword
+          description: >
+            Container name.
+        - name: socket
+          type: keyword
+          description: >
+            The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
+
+    - name: interface
       type: keyword
       description: >
-        Example field
+        Network interface name.
+    - name: in
+      type: group
+      description: >
+        Incoming network stats.
+      fields:
+        - name: bytes
+          type: long
+          description: >
+            Total number of incoming bytes.
+        - name: dropped
+          type: scaled_float
+          description: >
+            Total number of dropped incoming packets.
+        - name: errors
+          type: long
+          description: >
+            Total errors on incoming packets.
+        - name: packets
+          type: long
+          description: >
+            Total number of incoming packets.
+    - name: out
+      type: group
+      description: >
+        Outgoing network stats.
+      fields:
+        - name: bytes
+          type: long
+          description: >
+            Total number of outgoing bytes.
+        - name: dropped
+          type: scaled_float
+          description: >
+            Total number of dropped outgoing packets.
+        - name: errors
+          type: long
+          description: >
+            Total errors on outgoing packets.
+        - name: packets
+          type: long
+          description: >
+            Total number of outgoing packets.
