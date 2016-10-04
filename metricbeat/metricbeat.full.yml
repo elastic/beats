@@ -82,7 +82,7 @@ metricbeat.modules:
 #- module: docker
   #metricsets: ["cpu","memory","network","diskio","container"]
   #enabled: true
-  #period: 5s
+  #period: 10s
   #hosts: ["localhost"]
   #socket: unix:///var/run/docker.sock
 

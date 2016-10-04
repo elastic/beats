@@ -1,9 +1,6 @@
 package diskio
 
-import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/docker"
-)
+import "github.com/elastic/beats/libbeat/common"
 
 func eventsMapping(blkioStatsList []BlkioStats) []common.MapStr {
 	myEvents := []common.MapStr{}
@@ -12,20 +9,14 @@ func eventsMapping(blkioStatsList []BlkioStats) []common.MapStr {
 	}
 	return myEvents
 }
-func eventMapping(myBlkioStats *BlkioStats) common.MapStr {
+
+func eventMapping(stats *BlkioStats) common.MapStr {
 	event := common.MapStr{
-		"@timestamp": myBlkioStats.Time,
-		"container": common.MapStr{
-			"id":     myBlkioStats.MyContainer.Id,
-			"name":   myBlkioStats.MyContainer.Name,
-			"labels": myBlkioStats.MyContainer.Labels,
-		},
-		"socket": docker.GetSocket(),
-		"blkio": common.MapStr{
-			"reads":  myBlkioStats.reads,
-			"writes": myBlkioStats.writes,
-			"total":  myBlkioStats.totals,
-		},
+		"container": stats.Container.ToMapStr(),
+		"reads":     stats.reads,
+		"writes":    stats.writes,
+		"total":     stats.totals,
 	}
+
 	return event
 }
