@@ -75,7 +75,6 @@ docs:
 
 .PHONY: package
 package: beats-dashboards
-	$(MAKE) -C libbeat package-setup
 	$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package || exit 1;)
 
 	# build the dashboards package
