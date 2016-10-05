@@ -166,7 +166,13 @@ incorect data.
 
 You can set the `output.elasticsearch.template.overwrite` option to `true` to
 make the Beats install the new mapping template even if a template with the same
-name already exists.
+name already exists. You can set this option in the configuration file or as a
+CLI flag, for example:
+
+[source,shell]
+------------------------------------------------------------------------------
+packetbeat -e -E output.elasticsearch.template.overwrite=true
+------------------------------------------------------------------------------
 
 However, the mapping template is applied on index creation, so it won't affect
 the current index if it was already created with the old version.
