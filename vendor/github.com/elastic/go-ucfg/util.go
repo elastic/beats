@@ -123,6 +123,15 @@ func isUint(k reflect.Kind) bool {
 	}
 }
 
+func isFloat(k reflect.Kind) bool {
+	switch k {
+	case reflect.Float32, reflect.Float64:
+		return true
+	default:
+		return false
+	}
+}
+
 func implementsUnpacker(v reflect.Value) (reflect.Value, bool) {
 	for {
 		if v.Type().Implements(tUnpacker) {
