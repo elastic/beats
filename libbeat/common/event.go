@@ -19,6 +19,8 @@ var eventDebugf = logp.MakeDebug(eventDebugSelector)
 
 var textMarshalerType = reflect.TypeOf((*encoding.TextMarshaler)(nil)).Elem()
 
+type Float float64
+
 // ConvertToGenericEvent normalizes the types contained in the given MapStr.
 //
 // Nil values in maps are dropped during the conversion. Any unsupported types
@@ -130,6 +132,7 @@ func normalizeValue(value interface{}, keys ...string) (interface{}, []error) {
 	case uint, uint8, uint16, uint32, uint64:
 	case []uint, []uint8, []uint16, []uint32, []uint64:
 	case float32, float64:
+		return Float(value.(float64)), nil
 	case []float32, []float64:
 	case complex64, complex128:
 	case []complex64, []complex128:
@@ -156,7 +159,7 @@ func normalizeValue(value interface{}, keys ...string) (interface{}, []error) {
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 			return v.Uint(), nil
 		case reflect.Float32, reflect.Float64:
-			return v.Float(), nil
+			return Float(v.Float()), nil
 		case reflect.Complex64, reflect.Complex128:
 			return v.Complex(), nil
 		case reflect.String:
@@ -220,4 +223,9 @@ func joinKeys(keys ...string) string {
 		keys = keys[1:]
 	}
 	return strings.Join(keys, ".")
+}
+
+// Defines the marshal of the Float type
+func (f Float) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%.6f", f)), nil
 }
