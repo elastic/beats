@@ -803,37 +803,6 @@ Runtime cpu metrics.
 
 
 [float]
-== container Fields
-
-Container meta data.
-
-
-
-[float]
-=== docker.cpu.container.id
-
-type: keyword
-
-Unique container id.
-
-
-[float]
-=== docker.cpu.container.name
-
-type: keyword
-
-Container name.
-
-
-[float]
-=== docker.cpu.container.socket
-
-type: keyword
-
-The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
-
-
-[float]
 == usage Fields
 
 Cpu usage metrics.
@@ -869,37 +838,6 @@ The total system ressources consumed by The Docker server.
 
 Diskio metrics.
 
-
-
-[float]
-== container Fields
-
-Container meta data.
-
-
-
-[float]
-=== docker.diskio.container.id
-
-type: keyword
-
-Unique container id.
-
-
-[float]
-=== docker.diskio.container.name
-
-type: keyword
-
-Container name.
-
-
-[float]
-=== docker.diskio.container.socket
-
-type: keyword
-
-The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
 
 
 [float]
@@ -997,37 +935,6 @@ Memory metrics.
 
 
 [float]
-== container Fields
-
-Container meta data.
-
-
-
-[float]
-=== docker.memory.container.id
-
-type: keyword
-
-Unique container id.
-
-
-[float]
-=== docker.memory.container.name
-
-type: keyword
-
-Container name.
-
-
-[float]
-=== docker.memory.container.socket
-
-type: keyword
-
-The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
-
-
-[float]
 === docker.memory.fail.count
 
 type: scaled_float
@@ -1044,22 +951,22 @@ Memory limit.
 
 
 [float]
-== total Fields
+== rss Fields
 
-Total memory stats.
+Rss memory stats.
 
 
 
 [float]
-=== docker.memory.total.rss
+=== docker.memory.rss.total
 
 type: long
 
-Memory resident set size.
+Total memory resident set size.
 
 
 [float]
-=== docker.memory.total.rss.pct
+=== docker.memory.rss.pct
 
 type: scaled_float
 
@@ -1102,37 +1009,6 @@ Total memory usage.
 
 Netowrk metrics.
 
-
-
-[float]
-== container Fields
-
-Container meta data.
-
-
-
-[float]
-=== docker.network.container.id
-
-type: keyword
-
-Unique container id.
-
-
-[float]
-=== docker.network.container.name
-
-type: keyword
-
-Container name.
-
-
-[float]
-=== docker.network.container.socket
-
-type: keyword
-
-The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
 
 
 [float]

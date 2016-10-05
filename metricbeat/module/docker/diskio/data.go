@@ -1,6 +1,9 @@
 package diskio
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
+)
 
 func eventsMapping(blkioStatsList []BlkioStats) []common.MapStr {
 	myEvents := []common.MapStr{}
@@ -12,10 +15,12 @@ func eventsMapping(blkioStatsList []BlkioStats) []common.MapStr {
 
 func eventMapping(stats *BlkioStats) common.MapStr {
 	event := common.MapStr{
-		"container": stats.Container.ToMapStr(),
-		"reads":     stats.reads,
-		"writes":    stats.writes,
-		"total":     stats.totals,
+		mb.ModuleData: common.MapStr{
+			"container": stats.Container.ToMapStr(),
+		},
+		"reads":  stats.reads,
+		"writes": stats.writes,
+		"total":  stats.totals,
 	}
 
 	return event

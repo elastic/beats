@@ -347,22 +347,6 @@
             },
             "cpu": {
               "properties": {
-                "container": {
-                  "properties": {
-                    "id": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "name": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "socket": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
-                  }
-                },
                 "usage": {
                   "properties": {
                     "kernel_mode": {
@@ -383,22 +367,6 @@
             },
             "diskio": {
               "properties": {
-                "container": {
-                  "properties": {
-                    "id": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "name": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "socket": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
-                  }
-                },
                 "reads": {
                   "scaling_factor": 1000,
                   "type": "scaled_float"
@@ -442,22 +410,6 @@
             },
             "memory": {
               "properties": {
-                "container": {
-                  "properties": {
-                    "id": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "name": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "socket": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
-                  }
-                },
                 "fail": {
                   "properties": {
                     "count": {
@@ -469,15 +421,14 @@
                 "limit": {
                   "type": "long"
                 },
-                "total": {
+                "rss": {
                   "properties": {
-                    "rss": {
-                      "properties": {
-                        "pct": {
-                          "scaling_factor": 1000,
-                          "type": "scaled_float"
-                        }
-                      }
+                    "pct": {
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
+                    },
+                    "total": {
+                      "type": "long"
                     }
                   }
                 },
@@ -499,22 +450,6 @@
             },
             "network": {
               "properties": {
-                "container": {
-                  "properties": {
-                    "id": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "name": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "socket": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
-                  }
-                },
                 "in": {
                   "properties": {
                     "bytes": {

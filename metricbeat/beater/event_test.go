@@ -25,12 +25,12 @@ var (
 	tags      = []string{tag}
 )
 
-var builder = eventBuilder{
-	moduleName:    moduleName,
-	metricSetName: metricSetName,
+var builder = EventBuilder{
+	ModuleName:    moduleName,
+	MetricSetName: metricSetName,
 	// host
-	startTime:     startTime,
-	fetchDuration: elapsed,
+	StartTime:     startTime,
+	FetchDuration: elapsed,
 	// event
 	// fetchErr
 	// processors
@@ -39,8 +39,8 @@ var builder = eventBuilder{
 
 func TestEventBuilder(t *testing.T) {
 	b := builder
-	b.host = host
-	event, err := b.build()
+	b.Host = host
+	event, err := b.Build()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +60,7 @@ func TestEventBuilder(t *testing.T) {
 func TestEventBuilderError(t *testing.T) {
 	b := builder
 	b.fetchErr = errFetch
-	event, err := b.build()
+	event, err := b.Build()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,7 +70,7 @@ func TestEventBuilderError(t *testing.T) {
 
 func TestEventBuilderNoHost(t *testing.T) {
 	b := builder
-	event, err := b.build()
+	event, err := b.Build()
 	if err != nil {
 		t.Fatal(err)
 	}
