@@ -1,6 +1,9 @@
 package network
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
+)
 
 func eventsMapping(netsStatsList []NETstats) []common.MapStr {
 	myEvents := []common.MapStr{}
@@ -12,7 +15,7 @@ func eventsMapping(netsStatsList []NETstats) []common.MapStr {
 
 func eventMapping(stats *NETstats) common.MapStr {
 	event := common.MapStr{
-		"_module": common.MapStr{
+		mb.MODULE_DATA: common.MapStr{
 			"container": stats.Container.ToMapStr(),
 		},
 		"interface": stats.NameInterface,

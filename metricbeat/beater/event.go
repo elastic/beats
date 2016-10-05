@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 const (
@@ -48,11 +49,11 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 		}
 	}
 
-	// Checks if additional meta information is provided by the MetricSet under the key _module
-	// This is based on the convention that each MetricSet can provide module data under the key _module
-	moduleData, moudleDataExists := event["_module"]
+	// Checks if additional meta information is provided by the MetricSet under the key MODULE_DATA
+	// This is based on the convention that each MetricSet can provide module data under the key MODULE_DATA
+	moduleData, moudleDataExists := event[mb.MODULE_DATA]
 	if moudleDataExists {
-		delete(event, "_module")
+		delete(event, mb.MODULE_DATA)
 	}
 
 	event = common.MapStr{
@@ -71,7 +72,7 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 
 	// In case meta data exists, it is added on the module level
 	if moudleDataExists {
-		if _, ok := event[b.ModuleName].(common.MapStr); ok {
+		if _, ok := moduleData.(common.MapStr); ok {
 			event[b.ModuleName].(common.MapStr).Update(moduleData.(common.MapStr))
 		}
 	}

@@ -11,6 +11,10 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 )
 
+const (
+	MODULE_DATA string = "_module"
+)
+
 // Module interfaces
 
 // Module is the common interface for all Module implementations.
