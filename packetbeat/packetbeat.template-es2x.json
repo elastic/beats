@@ -11,58 +11,13 @@
       },
       "dynamic_templates": [
         {
-          "fields": {
+          "strings_as_keyword": {
             "mapping": {
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
             },
-            "match_mapping_type": "string",
-            "path_match": "fields.*"
-          }
-        },
-        {
-          "amqp.headers": {
-            "mapping": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "match_mapping_type": "string",
-            "path_match": "amqp.headers.*"
-          }
-        },
-        {
-          "cassandra.response.supported": {
-            "mapping": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "match_mapping_type": "string",
-            "path_match": "cassandra.response.supported.*"
-          }
-        },
-        {
-          "http.request.headers": {
-            "mapping": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "match_mapping_type": "string",
-            "path_match": "http.request.headers.*"
-          }
-        },
-        {
-          "http.response.headers": {
-            "mapping": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "match_mapping_type": "string",
-            "path_match": "http.response.headers.*"
+            "match_mapping_type": "string"
           }
         }
       ],

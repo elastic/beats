@@ -14,6 +14,8 @@ https://github.com/elastic/beats/compare/v5.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- A dynamic mapping rule is added to the default Elasticsearch template to treat strings as keywords by default. {pull}2688[2688]
+
 *Metricbeat*
 
 *Packetbeat*
