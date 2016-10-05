@@ -11,14 +11,13 @@
       },
       "dynamic_templates": [
         {
-          "fields": {
+          "strings_as_keyword": {
             "mapping": {
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
             },
-            "match_mapping_type": "string",
-            "path_match": "fields.*"
+            "match_mapping_type": "string"
           }
         }
       ],
