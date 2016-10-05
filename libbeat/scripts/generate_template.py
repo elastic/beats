@@ -68,6 +68,30 @@ def fields_to_es_template(args, input, output, index, version):
 
     properties = {}
     dynamic_templates = []
+
+    # Make strings keywords by default
+    if args.es2x:
+        dynamic_templates.append({
+            "strings_as_keyword": {
+                "mapping": {
+                    "type": "string",
+                    "index": "not_analyzed",
+                    "ignore_above": 1024
+                },
+                "match_mapping_type": "string",
+            }
+        })
+    else:
+        dynamic_templates.append({
+            "strings_as_keyword": {
+                "mapping": {
+                    "type": "keyword",
+                    "ignore_above": 1024
+                },
+                "match_mapping_type": "string",
+            }
+        })
+
     for section in docs["fields"]:
         prop, dynamic = fill_section_properties(args, section,
                                                 defaults, "")
@@ -200,9 +224,9 @@ def fill_field_properties(args, field, defaults, path):
                 field.get("scaling_factor", 1000)
 
     elif field["type"] in ["dict", "list"]:
-        if field.get("dict-type") == "keyword":
+        if field.get("dict-type") == "text":
             # add a dynamic template to set all members of
-            # the dict as keywords
+            # the dict as text
             if len(path) > 0:
                 name = path + "." + field["name"]
             else:
@@ -213,8 +237,7 @@ def fill_field_properties(args, field, defaults, path):
                     name: {
                         "mapping": {
                             "type": "string",
-                            "index": "not_analyzed",
-                            "ignore_above": 1024
+                            "index": "analyzed",
                         },
                         "match_mapping_type": "string",
                         "path_match": name + ".*"
@@ -224,8 +247,7 @@ def fill_field_properties(args, field, defaults, path):
                 dynamic_templates.append({
                     name: {
                         "mapping": {
-                            "type": "keyword",
-                            "ignore_above": 1024
+                            "type": "text",
                         },
                         "match_mapping_type": "string",
                         "path_match": name + ".*"
