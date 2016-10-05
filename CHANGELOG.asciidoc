@@ -31,6 +31,8 @@ https://github.com/elastic/beats/compare/v5.0.0-beta1...master[Check the HEAD di
 - Make sure Beats sent always float values when they are defined as float by sending 5.00000 instead of 5.
   {pull}2627[2627]
 
+- Fix ignoring all fields from drop_fields in case the first field is unknown. {pull}2685[2685]
+
 *Metricbeat*
 
 - Fix default configuration file on Windows to not enabled the `load` metricset. {pull}2632[2632]
