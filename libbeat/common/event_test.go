@@ -1,6 +1,7 @@
 package common
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -295,6 +296,23 @@ func TestMarshalUnmarshalArray(t *testing.T) {
 
 		assert.Equal(t, test.out, out, "Test case %v", i)
 	}
+}
+
+func TestMarshalFloatValues(t *testing.T) {
+
+	assert := assert.New(t)
+
+	var f float64
+
+	f = 5
+
+	a := MapStr{
+		"f": Float(f),
+	}
+
+	b, err := json.Marshal(a)
+	assert.Nil(err)
+	assert.Equal(string(b), "{\"f\":5.000000}")
 }
 
 // Uses TextMarshaler interface.
