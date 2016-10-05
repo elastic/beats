@@ -369,7 +369,7 @@ func (c *Condition) checkRange(event common.MapStr) bool {
 				return false
 			}
 
-		case float64, float32:
+		case float64, float32, common.Float:
 			floatValue := reflect.ValueOf(value).Float()
 
 			if !checkValue(floatValue, rangeValue) {
@@ -377,7 +377,7 @@ func (c *Condition) checkRange(event common.MapStr) bool {
 			}
 
 		default:
-			logp.Warn("unexpected type %T in range condition as it accepts only strings. ", value)
+			logp.Warn("unexpected type %T in range condition. ", value)
 			return false
 		}
 
