@@ -12,7 +12,7 @@ const (
 	defaultType = "metricsets"
 )
 
-// eventBuilder is used for building MetricSet events. MetricSets generate a
+// EventBuilder is used for building MetricSet events. MetricSets generate a
 // data in the form of a common.MapStr. This builder transforms that data into
 // a complete event and applies any Module-level filtering.
 type EventBuilder struct {
@@ -27,7 +27,7 @@ type EventBuilder struct {
 	metadata      common.EventMetadata
 }
 
-// build builds an event from MetricSet data and applies the Module-level
+// Build builds an event from MetricSet data and applies the Module-level
 // filters.
 func (b EventBuilder) Build() (common.MapStr, error) {
 	// event may be nil when there was an error fetching.
@@ -71,7 +71,9 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 
 	// In case meta data exists, it is added on the module level
 	if moudleDataExists {
-		event[b.ModuleName].(common.MapStr).Update(moduleData.(common.MapStr))
+		if _, ok := event[b.ModuleName].(common.MapStr); ok {
+			event[b.ModuleName].(common.MapStr).Update(moduleData.(common.MapStr))
+		}
 	}
 
 	// Overwrite default index if set.

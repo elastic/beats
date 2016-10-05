@@ -4,12 +4,12 @@
         "info": {
             "containers": {
                 "paused": 0,
-                "running": 6,
-                "stopped": 3,
-                "total": 9
+                "running": 11,
+                "stopped": 1,
+                "total": 12
             },
-            "id": "72D7:ZROM:4ZNR:GOAB:OSHR:WCN4:UF7W:WVY2:MN36:Y24M:YUZS:4PER",
-            "images": 790
+            "id": "CRDS:UHQ6:W3IR:GROZ:IUG3:VS2E:4QJJ:FJWG:PRQ4:R25R:VNNP:NE62",
+            "images": 119
         }
     },
     "metricset": {
