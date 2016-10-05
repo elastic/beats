@@ -1,23 +1,41 @@
 {
     "@timestamp": "2016-05-23T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "docker": {
-        "cpu": {
-            "container": {
-                "id": "42d21fbdb065b223b8d10802dd3f8d7030e42719fbaba373f0250862835e2501",
-                "name": "sleepy_montalcini",
-                "socket": "unix:///var/run/docker.sock"
-            },
-            "usage": {
-                "kernel_mode": 0,
-                "per_cpu": {
-                    "0": 0,
-                    "1": 0
+        "container": {
+            "id": "33a924f09bc9fc7dfb66cb479904e362ae1df341b2d832040c54bfe4770e3f28",
+            "labels": [
+                {
+                    "key": "com_docker_compose_container-number",
+                    "value": "1"
                 },
-                "total": 0,
+                {
+                    "key": "com_docker_compose_oneoff",
+                    "value": "True"
+                },
+                {
+                    "key": "com_docker_compose_project",
+                    "value": "environments"
+                },
+                {
+                    "key": "com_docker_compose_service",
+                    "value": "beat"
+                },
+                {
+                    "key": "com_docker_compose_version",
+                    "value": "1.8.1"
+                }
+            ],
+            "name": "environments_beat_run_1",
+            "socket": "unix:///var/run/docker.sock"
+        },
+        "cpu": {
+            "usage": {
+                "kernel_mode": 0.01,
+                "per_cpu": {
+                    "0": 0.002353412,
+                    "1": 0.0064889
+                },
+                "total": 0.008842312,
                 "user_mode": 0
             }
         }

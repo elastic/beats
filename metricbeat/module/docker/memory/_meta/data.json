@@ -1,26 +1,46 @@
 {
     "@timestamp": "2016-05-23T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "docker": {
+        "container": {
+            "id": "33a924f09bc9fc7dfb66cb479904e362ae1df341b2d832040c54bfe4770e3f28",
+            "labels": [
+                {
+                    "key": "com_docker_compose_container-number",
+                    "value": "1"
+                },
+                {
+                    "key": "com_docker_compose_oneoff",
+                    "value": "True"
+                },
+                {
+                    "key": "com_docker_compose_project",
+                    "value": "environments"
+                },
+                {
+                    "key": "com_docker_compose_service",
+                    "value": "beat"
+                },
+                {
+                    "key": "com_docker_compose_version",
+                    "value": "1.8.1"
+                }
+            ],
+            "name": "environments_beat_run_1",
+            "socket": "unix:///var/run/docker.sock"
+        },
         "memory": {
-            "container": {
-                "id": "42d21fbdb065b223b8d10802dd3f8d7030e42719fbaba373f0250862835e2501",
-                "name": "sleepy_montalcini",
-                "socket": "unix:///var/run/docker.sock"
+            "fail": {
+                "count": 0
             },
-            "fail.count": 0,
-            "limit": 2096566272,
-            "total": {
-                "rss": 495616,
-                "rss.pct": 0.00023639414914712508
+            "limit": 4139544576,
+            "rss": {
+                "pct": 0.00012566406532156643,
+                "total": 520192
             },
             "usage": {
-                "max": 3096576,
-                "pct": 0.0013382643980643031,
-                "total": 2805760
+                "max": 5410816,
+                "pct": 0.0009597964044245625,
+                "total": 3973120
             }
         }
     },

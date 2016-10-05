@@ -1,19 +1,15 @@
 {
     "@timestamp": "2016-05-23T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "docker": {
         "info": {
             "containers": {
                 "paused": 0,
-                "running": 1,
-                "stopped": 16,
-                "total": 17
+                "running": 6,
+                "stopped": 3,
+                "total": 9
             },
-            "id": "HAUM:OUVF:WQF3:3BMQ:JS3B:QEMH:U7YR:SM5Z:P2UA:CRKR:5KRS:UTVU",
-            "images": 784
+            "id": "72D7:ZROM:4ZNR:GOAB:OSHR:WCN4:UF7W:WVY2:MN36:Y24M:YUZS:4PER",
+            "images": 790
         }
     },
     "metricset": {

@@ -6,8 +6,10 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/beater"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -50,23 +52,21 @@ func createEvent(event common.MapStr, m mb.MetricSet) error {
 		return err
 	}
 
-	fullEvent := common.MapStr{
-		"@timestamp": "2016-05-23T08:05:34.853Z",
-		"beat": common.MapStr{
-			"hostname": "host.example.com",
-			"name":     "host.example.com",
-		},
-		"metricset": common.MapStr{
-			"host":   "localhost",
-			"module": m.Module().Name(),
-			"name":   m.Name(),
-			"rtt":    115,
-		},
-		m.Module().Name(): common.MapStr{
-			m.Name(): event,
-		},
-		"type": "metricsets",
+	startTime, _ := time.Parse(time.RFC3339Nano, "2016-05-23T08:05:34.853Z")
+
+	build := beater.EventBuilder{
+		ModuleName:    m.Module().Name(),
+		MetricSetName: m.Name(),
+		Host:          "localhost",
+		StartTime:     startTime,
+		FetchDuration: 115 * time.Microsecond,
+		Event:         event,
 	}
+
+	fullEvent, _ := build.Build()
+
+	// Delete meta data as not needed for the event output here
+	delete(fullEvent, "_event_metadata")
 
 	output, _ := json.MarshalIndent(fullEvent, "", "    ")
 

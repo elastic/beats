@@ -13,7 +13,9 @@ func eventsMapping(cpuStatsList []CPUStats) []common.MapStr {
 func eventMapping(stats *CPUStats) common.MapStr {
 
 	event := common.MapStr{
-		"container": stats.Container.ToMapStr(),
+		"_module": common.MapStr{
+			"container": stats.Container.ToMapStr(),
+		},
 		"usage": common.MapStr{
 			"per_cpu":     stats.PerCpuUsage,
 			"total":       stats.TotalUsage,

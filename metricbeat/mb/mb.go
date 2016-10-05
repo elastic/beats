@@ -114,7 +114,7 @@ type ModuleConfig struct {
 // defaultModuleConfig contains the default values for ModuleConfig instances.
 var defaultModuleConfig = ModuleConfig{
 	Enabled: true,
-	Period:  time.Second,
+	Period:  time.Second * 10,
 	Timeout: time.Second,
 }
 

@@ -3,25 +3,6 @@
   description: >
     Runtime cpu metrics.
   fields:
-    - name: container
-      type: group
-      description: >
-        Container meta data.
-      fields:
-        # TODO: Add optional labels
-        - name: id
-          type: keyword
-          description: >
-            Unique container id.
-        - name: name
-          type: keyword
-          description: >
-            Container name.
-        - name: socket
-          type: keyword
-          description: >
-            The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
-
     - name: usage
       type: group
       description: >

@@ -12,10 +12,12 @@ func eventsMapping(blkioStatsList []BlkioStats) []common.MapStr {
 
 func eventMapping(stats *BlkioStats) common.MapStr {
 	event := common.MapStr{
-		"container": stats.Container.ToMapStr(),
-		"reads":     stats.reads,
-		"writes":    stats.writes,
-		"total":     stats.totals,
+		"_module": common.MapStr{
+			"container": stats.Container.ToMapStr(),
+		},
+		"reads":  stats.reads,
+		"writes": stats.writes,
+		"total":  stats.totals,
 	}
 
 	return event

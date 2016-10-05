@@ -1,21 +1,39 @@
 {
     "@timestamp": "2016-05-23T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "docker": {
         "container": {
-            "command": "bash",
-            "created": "2016-10-04T12:45:17.000Z",
-            "id": "9f537cd4dc231c37c7eec0cc7f1e42244b6b0aee92c4094340b2cbba8833ae43",
-            "image": "debian",
-            "name": "awesome_ptolemy",
+            "command": "/go/src/github.com/elastic/beats/libbeat/scripts/docker-entrypoint.sh make system-tests",
+            "created": "2016-10-05T12:19:25.000Z",
+            "id": "33a924f09bc9fc7dfb66cb479904e362ae1df341b2d832040c54bfe4770e3f28",
+            "image": "environments_beat",
+            "labels": [
+                {
+                    "key": "com_docker_compose_container-number",
+                    "value": "1"
+                },
+                {
+                    "key": "com_docker_compose_oneoff",
+                    "value": "True"
+                },
+                {
+                    "key": "com_docker_compose_project",
+                    "value": "environments"
+                },
+                {
+                    "key": "com_docker_compose_service",
+                    "value": "beat"
+                },
+                {
+                    "key": "com_docker_compose_version",
+                    "value": "1.8.1"
+                }
+            ],
+            "name": "environments_beat_run_1",
             "size": {
                 "root_fs": 0,
                 "rw": 0
             },
-            "status": "Up 30 minutes"
+            "status": "Up 33 seconds"
         }
     },
     "metricset": {

@@ -12,7 +12,9 @@ func eventsMapping(netsStatsList []NETstats) []common.MapStr {
 
 func eventMapping(stats *NETstats) common.MapStr {
 	event := common.MapStr{
-		"container": stats.Container.ToMapStr(),
+		"_module": common.MapStr{
+			"container": stats.Container.ToMapStr(),
+		},
 		"interface": stats.NameInterface,
 		"in": common.MapStr{
 			"bytes":   stats.RxBytes,
