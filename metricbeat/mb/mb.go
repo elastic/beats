@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	MODULE_DATA string = "_module"
+	ModuleData string = "_module"
 )
 
 // Module interfaces

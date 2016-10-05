@@ -49,11 +49,11 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 		}
 	}
 
-	// Checks if additional meta information is provided by the MetricSet under the key MODULE_DATA
-	// This is based on the convention that each MetricSet can provide module data under the key MODULE_DATA
-	moduleData, moudleDataExists := event[mb.MODULE_DATA]
+	// Checks if additional meta information is provided by the MetricSet under the key ModuleData
+	// This is based on the convention that each MetricSet can provide module data under the key ModuleData
+	moduleData, moudleDataExists := event[mb.ModuleData]
 	if moudleDataExists {
-		delete(event, mb.MODULE_DATA)
+		delete(event, mb.ModuleData)
 	}
 
 	event = common.MapStr{

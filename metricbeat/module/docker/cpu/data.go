@@ -16,7 +16,7 @@ func eventsMapping(cpuStatsList []CPUStats) []common.MapStr {
 func eventMapping(stats *CPUStats) common.MapStr {
 
 	event := common.MapStr{
-		mb.MODULE_DATA: common.MapStr{
+		mb.ModuleData: common.MapStr{
 			"container": stats.Container.ToMapStr(),
 		},
 		"usage": common.MapStr{
