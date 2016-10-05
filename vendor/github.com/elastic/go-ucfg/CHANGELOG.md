@@ -14,6 +14,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.3.7]
+
+### Fixed
+- Fix int/uint to float type conversation. #68
+- Fix primitive type unpacking for variables expanded from environment variables
+  or strings read/created by config file parsers. #67
+
 ## [0.3.6]
 
 ### Fixed
@@ -111,7 +118,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.3.6...HEAD
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.3.7...HEAD
+[0.3.7]: https://github.com/elastic/go-ucfg/compare/v0.3.6...v0.3.7
 [0.3.6]: https://github.com/elastic/go-ucfg/compare/v0.3.5...v0.3.6
 [0.3.5]: https://github.com/elastic/go-ucfg/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/elastic/go-ucfg/compare/v0.3.3...v0.3.4
