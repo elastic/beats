@@ -90,6 +90,7 @@ func equalEvent(expectedEvent []common.MapStr, event []common.MapStr) bool {
 	return reflect.DeepEqual(expectedEvent, event)
 
 }
+
 // Case : old interface  x of the container y !exist
 /*func TestGetNetworkStatsFirstEvent(t *testing.T) {
 
