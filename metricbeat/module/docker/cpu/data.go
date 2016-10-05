@@ -1,6 +1,9 @@
 package cpu
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
+)
 
 func eventsMapping(cpuStatsList []CPUStats) []common.MapStr {
 	events := []common.MapStr{}
@@ -13,7 +16,9 @@ func eventsMapping(cpuStatsList []CPUStats) []common.MapStr {
 func eventMapping(stats *CPUStats) common.MapStr {
 
 	event := common.MapStr{
-		"container": stats.Container.ToMapStr(),
+		mb.ModuleData: common.MapStr{
+			"container": stats.Container.ToMapStr(),
+		},
 		"usage": common.MapStr{
 			"per_cpu":     stats.PerCpuUsage,
 			"total":       stats.TotalUsage,

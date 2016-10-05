@@ -1,6 +1,9 @@
 package memory
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
+)
 
 func eventsMapping(memoryDataList []MemoryData) []common.MapStr {
 	events := []common.MapStr{}
@@ -13,12 +16,16 @@ func eventsMapping(memoryDataList []MemoryData) []common.MapStr {
 func eventMapping(memoryData *MemoryData) common.MapStr {
 
 	event := common.MapStr{
-		"container":  memoryData.Container.ToMapStr(),
-		"fail.count": memoryData.Failcnt,
-		"limit":      memoryData.Limit,
-		"total": common.MapStr{
-			"rss":     memoryData.TotalRss,
-			"rss.pct": memoryData.TotalRss_p,
+		mb.ModuleData: common.MapStr{
+			"container": memoryData.Container.ToMapStr(),
+		},
+		"fail": common.MapStr{
+			"count": memoryData.Failcnt,
+		},
+		"limit": memoryData.Limit,
+		"rss": common.MapStr{
+			"total": memoryData.TotalRss,
+			"pct":   memoryData.TotalRss_p,
 		},
 		"usage": common.MapStr{
 			"total": memoryData.Usage,
