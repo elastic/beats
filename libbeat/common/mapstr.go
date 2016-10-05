@@ -63,6 +63,7 @@ func (m MapStr) Delete(key string) error {
 	keysLen := len(keyParts)
 
 	mapp := m
+
 	for i := 0; i < keysLen-1; i++ {
 		keyPart := keyParts[i]
 
@@ -75,8 +76,11 @@ func (m MapStr) Delete(key string) error {
 			return fmt.Errorf("unknown key %s", keyPart)
 		}
 	}
-	delete(mapp, keyParts[keysLen-1])
-	return nil
+	if _, ok := mapp[keyParts[keysLen-1]]; ok {
+		delete(mapp, keyParts[keysLen-1])
+		return nil
+	}
+	return fmt.Errorf("unknown key %s", keyParts[keysLen-1])
 }
 
 func (m MapStr) CopyFieldsTo(to MapStr, key string) error {

@@ -47,22 +47,23 @@ func newIncludeFields(c common.Config) (processors.Processor, error) {
 
 func (f includeFields) Run(event common.MapStr) (common.MapStr, error) {
 	filtered := common.MapStr{}
+	errors := []string{}
 
 	for _, field := range f.Fields {
 		hasKey, err := event.HasKey(field)
 		if err != nil {
-			return filtered, fmt.Errorf("Fail to check the key %s: %s", field, err)
+			errors = append(errors, err.Error())
 		}
 
 		if hasKey {
 			errorOnCopy := event.CopyFieldsTo(filtered, field)
 			if errorOnCopy != nil {
-				return filtered, fmt.Errorf("Fail to copy key %s: %s", field, err)
+				errors = append(errors, err.Error())
 			}
 		}
 	}
 
-	return filtered, nil
+	return filtered, fmt.Errorf(strings.Join(errors, ", "))
 }
 
 func (f includeFields) String() string {
