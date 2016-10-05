@@ -12,7 +12,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
-/*func TestCPUService_PerCpuUsage(t *testing.T) {
+func TestCPUService_PerCpuUsage(t *testing.T) {
 	//GIVEN
 	preCpuStats := getCPUStats([]uint64{1, 9, 9, 5}, []uint64{0, 0, 0})
 	cpuStats := getCPUStats([]uint64{100000001, 900000009, 900000009, 500000005}, []uint64{0, 0, 0})
@@ -75,7 +75,7 @@ func TestCPUService_UsageInUsermode(t *testing.T) {
 	result := CPUService.UsageInUsermode(&stats)
 	//  THEN
 	assert.Equal(t, float64(0.50), result)
-}*/
+}
 
 //TODO: uncomment
 /**
