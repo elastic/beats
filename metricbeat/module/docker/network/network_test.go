@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"testing"
 	"time"
-
 	//"github.com/elastic/beats/metricbeat/module/docker"
 )
 
