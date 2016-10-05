@@ -67,6 +67,7 @@ https://github.com/elastic/beats/compare/v5.0.0-beta1...master[Check the HEAD di
 ==== Deprecated
 
 *Affecting all Beats*
+- Setting `port` has been deprecated in redis and logstash outputs. {pull}2620[2620]
 
 *Metricbeat*
 
