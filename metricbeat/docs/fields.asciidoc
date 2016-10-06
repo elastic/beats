@@ -2856,6 +2856,12 @@ type: boolean
 None
 
 [float]
+== rdb Fields
+
+None
+
+
+[float]
 === redis.info.persistence.rdb.last_save.changes_since
 
 type: long
@@ -2896,6 +2902,12 @@ None
 type: long
 
 None
+
+[float]
+== aof Fields
+
+None
+
 
 [float]
 === redis.info.persistence.aof.enabled
