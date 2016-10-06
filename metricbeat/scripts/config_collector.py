@@ -47,7 +47,7 @@ def collect(beat_path, full=False):
 
     # Read the modules list but put "system" first
     modules = ["system"]
-    for module in os.listdir(base_dir):
+    for module in sorted(os.listdir(base_dir)):
         if module != "system":
             modules.append(module)
 

@@ -22,7 +22,7 @@ def generate(go_beat_path):
     list_file = header
 
     # Fetch all modules
-    for module in os.listdir(base_dir):
+    for module in sorted(os.listdir(base_dir)):
 
         if os.path.isfile(path + "/" + module) or module == "_meta":
             continue
@@ -30,7 +30,7 @@ def generate(go_beat_path):
         list_file += '	_ "' + go_beat_path + '/module/' + module + '"\n'
 
         # Fetch all metricsets
-        for metricset in os.listdir(base_dir + "/" + module):
+        for metricset in sorted(os.listdir(base_dir + "/" + module)):
             if os.path.isfile(base_dir + "/" + module + "/" + metricset) or metricset == "_meta" or metricset == "vendor":
                 continue
 

@@ -53,6 +53,11 @@ clean-vendor:
 .PHONY: check
 check:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
+	# Validate that all updates were commited
+	$(MAKE) update
+	$(MAKE) -C metricbeat collect
+	git update-index --refresh
+	git diff-index --exit-code HEAD --
 
 .PHONY: fmt
 fmt:
