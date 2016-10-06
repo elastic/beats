@@ -1,23 +1,31 @@
 # Metricbeat
 
-Metricbeat takes metrics and statistics from your systems and ships them to elasticsearch or logstash.
+Metricbeat fetches a set of metrics on a predefined interval from the operating system and services such as Apache web server, Redis, and more and ships them to Elasticsearch or Logstash.
 
-**WARNING: Metricbeat is currently still in an experimental phase and under heavy development.**
+## Getting started
 
-## Usage
+Please follow the [getting started](https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-getting-started.html)
+guide from the docs.
 
-Metricbeat should be installed as local as possible so it can fetch metrics directly from the intended systems. For example if there are multiple MySQL servers, Metricbeat should be installed on each machine if possible instead of a centralised installation.
+## Documentation
+
+Please visit [elastic.co](https://www.elastic.co/guide/en/beats/metricbeat/current/index.html)
+ for the documentation.
+
+## Bugs and feature requests
+
+If you have an issue, please start by opening a topic on the
+[forums](https://discuss.elastic.co/c/beats/metricbeat). We'll help you
+troubleshoot and work with you on a solution.
+
+If you are sure you found a bug or have a feature request, open an issue on
+[Github](https://github.com/elastic/beats/issues).
 
 ## Contributions
 
-Contributions of new modules and metricsets to Metricbeat are highly welcome. To guarantee the quality of all metricsets we defined the following requirements for each metricset:
+We love contributions from our community! Please read the
+[CONTRIBUTING.md](../CONTRIBUTING.md) file.
 
-* Unit tests
-* Integration tests
-* Kibana Dashboards
-* Template
+## Snapshots
 
-Best is to start your own module as its own beat first (see below use it as a library) so you can test it and then start a discussion with our team if it would fit into Metricbeat.
-
-## Use it as library
-Metricbeat can also be used as a library so you can implement your own module on top of metricbeat and building your own beat based on it, withouth getting your module into the main repository. This allows to make use of the schedule and interfaces of Metricbeat. A developer guide and how to do this will follow soon.
+For testing purposes, we generate snapshot builds that you can find [here](https://beats-nightlies.s3.amazonaws.com/index.html?prefix=metricbeat). Please be aware that these are built on top of master and are not meant for production.
