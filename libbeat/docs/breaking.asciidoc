@@ -46,7 +46,7 @@ These changes are made automatically by the migration script.
 In Filebeat, we refactored the configuration around when to close and when to
 start ignoring files. Options like `close_older` and `force_close_older` were
 changed or replaced with options from the `close_*` group. See the
-{filebeat}/_how_filebeat_works.html[How Filebeat works] docs for details. These
+{filebeat}/how-filebeat-works.html[How Filebeat works] docs for details. These
 changes are not made automatically by the migration script.
 
 ==== Field renames
