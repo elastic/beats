@@ -1,5 +1,5 @@
 {
-  "visState": "{\"title\":\"Network Bytes\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"40\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.network.in.bytes\",\"customLabel\":\"In\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.network.out.bytes\",\"customLabel\":\"Out\"}}],\"listeners\":{}}", 
+  "visState": "{\"title\":\"Network Bytes\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"30\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.network.in.bytes\",\"customLabel\":\"In\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.network.out.bytes\",\"customLabel\":\"Out\"}}],\"listeners\":{}}", 
   "description": "", 
   "title": "Network Bytes", 
   "uiStateJSON": "{}", 
