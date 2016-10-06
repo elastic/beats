@@ -19,6 +19,10 @@ include::./communitybeats.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
 
+include::./breaking.asciidoc[]
+
+include::./upgrading.asciidoc[]
+
 include::./installing-beats.asciidoc[]
 
 include::./repositories.asciidoc[]
