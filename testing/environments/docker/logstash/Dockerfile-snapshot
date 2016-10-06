@@ -6,11 +6,14 @@ ENV VERSION 6.0.0-alpha1-SNAPSHOT
 ENV URL https://snapshots.elastic.co/downloads/logstash/logstash-${VERSION}.tar.gz
 ENV PATH $PATH:/opt/logstash-$VERSION/bin
 
+# Cache variable can be set during building to invalidate the build cache with `--build-arg CACHE=$(date +%s) .`
+ARG CACHE=1
+
 # As all snapshot builds have the same url, the image is cached. The date at then can be used to invalidate the image
 RUN set -x && \
     cd /opt && \
-    wget -q $URL && \
-    tar xzf logstash-$VERSION.tar.gz
+    wget -qO logstash.tar.gz $URL?${CACHE} && \
+    tar xzf logstash.tar.gz
 
 
 COPY logstash.conf.2.tmpl /logstash.conf.2.tmpl
