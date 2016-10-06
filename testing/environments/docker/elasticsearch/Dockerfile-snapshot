@@ -6,6 +6,9 @@ ENV VERSION 6.0.0-alpha1
 ENV FILENAME_VERSION 6.0.0-alpha1-SNAPSHOT
 ENV URL https://snapshots.elastic.co/downloads/elasticsearch/elasticsearch-${FILENAME_VERSION}.tar.gz
 
+# Cache variable can be set during building to invalidate the build cache with `--build-arg CACHE=$(date +%s) .`
+ARG CACHE=1
+
 ENV ESHOME /opt/elasticsearch-${FILENAME_VERSION}
 
 # grab gosu for easy step-down from root
@@ -22,7 +25,7 @@ RUN groupadd -r elasticsearch && useradd -r -m -g elasticsearch elasticsearch
 
 RUN set -x && \
 	cd /opt && \
-	wget -qO elasticsearch.tar.gz "$URL?t=$(date +%F)" && \
+	wget -qO elasticsearch.tar.gz "$URL?${CACHE}" && \
 	tar xzvf elasticsearch.tar.gz && \
 	chown -R elasticsearch:elasticsearch ${ESHOME}
 
