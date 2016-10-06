@@ -4,6 +4,9 @@ ENV VERSION 6.0.0-alpha1
 ENV FILENAME_VERSION 6.0.0-alpha1-SNAPSHOT-linux-x86_64
 ENV URL https://snapshots.elastic.co/downloads/kibana/kibana-${FILENAME_VERSION}.tar.gz
 
+# Cache variable can be set during building to invalidate the build cache with `--build-arg CACHE=$(date +%s) .`
+ARG CACHE=1
+
 # add our user and group first to make sure their IDs get assigned consistently
 RUN groupadd -r kibana && useradd -r -m -g kibana kibana
 
@@ -20,7 +23,7 @@ RUN arch="$(dpkg --print-architecture)" \
 	&& chmod +x /usr/local/bin/gosu
 
 RUN set -x \
-	&& curl -fSL "$URL?t=$(date +%F)" -o kibana.tar.gz \
+	&& curl -fSL "$URL?${CACHE}" -o kibana.tar.gz \
 	&& mkdir -p /opt/kibana \
 	&& tar -xz --strip-components=1 -C /opt/kibana -f kibana.tar.gz \
 	&& chown -R kibana:kibana /opt/kibana \
