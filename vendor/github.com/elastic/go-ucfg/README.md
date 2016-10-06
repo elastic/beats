@@ -58,7 +58,7 @@ ucfg allows to automatically validate fields and set defaults for fields in case
 ```
 // Defines struct to read config from
 type ExampleConfig struct {
-    Counter  string 	`config:"username" validate:"min=0, max=9"`
+    Counter  string 	`config:"counter" validate:"min=0, max=9"`
 }
 
 // Defines default config option
@@ -66,11 +66,20 @@ var (
     defaultConfig = ExampleConfig{
 		    Counter: 4,
     }
-}
+)
 
 func main() {
+    appConfig := defaultConfig // copy default config so it's not overwritten
     config, err := yaml.NewConfigWithFile(path, ucfg.PathSep("."))
-    config.Unpack(defaultConfig)
+    if err != nil {
+        fmt.Fprintln(err)
+        os.Exit(1)
+    }
+    err = config.Unpack(&appConfig)
+    if err != nil {
+        fmt.Fprintln(err)
+        os.Exit(1)
+    }
 }
 ```
 

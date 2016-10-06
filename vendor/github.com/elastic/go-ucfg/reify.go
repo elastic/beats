@@ -521,6 +521,13 @@ func doReifyPrimitive(
 		}
 		return v, nil
 
+	case isFloat(kind):
+		v, err := reifyFloat(opts, val, baseType)
+		if err != nil {
+			return v, err
+		}
+		return v, nil
+
 	case kind == reflect.Bool:
 		v, err := reifyBool(opts, val, baseType)
 		if err != nil {
@@ -622,6 +629,23 @@ func reifyUint(
 		return reflect.Value{}, raiseConversion(opts.opts, val, ErrOverflow, "uint")
 	}
 	return reflect.ValueOf(u).Convert(t), nil
+}
+
+func reifyFloat(
+	opts fieldOptions,
+	val value,
+	t reflect.Type,
+) (reflect.Value, Error) {
+	f, err := val.toFloat(opts.opts)
+	if err != nil {
+		return reflect.Value{}, raiseConversion(opts.opts, val, err, "float")
+	}
+
+	tmp := reflect.Zero(t)
+	if tmp.OverflowFloat(f) {
+		return reflect.Value{}, raiseConversion(opts.opts, val, ErrOverflow, "float")
+	}
+	return reflect.ValueOf(f).Convert(t), nil
 }
 
 func reifyBool(
