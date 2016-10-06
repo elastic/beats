@@ -1,5 +1,12 @@
 FROM debian:jessie
 
+ENV VERSION 5.0.0-rc1
+ENV FILENAME_VERSION 5.0.0-rc1-linux-x86_64
+ENV URL http://staging.elastic.co/5.0.0-rc1-795f98e2/downloads/kibana/kibana-${FILENAME_VERSION}.tar.gz
+
+# Cache variable can be set during building to invalidate the build cache with `--build-arg CACHE=$(date +%s) .`
+ARG CACHE=1
+
 # add our user and group first to make sure their IDs get assigned consistently
 RUN groupadd -r kibana && useradd -r -m -g kibana kibana
 
@@ -16,7 +23,7 @@ RUN arch="$(dpkg --print-architecture)" \
 	&& chmod +x /usr/local/bin/gosu
 
 RUN set -x \
-	&& curl -fSL "https://download.elastic.co/kibana/kibana-snapshot/kibana-5.0.0-alpha6-SNAPSHOT-linux-x86_64.tar.gz?20160908" -o kibana.tar.gz \
+	&& curl -fSL "$URL?${CACHE}" -o kibana.tar.gz \
 	&& mkdir -p /opt/kibana \
 	&& tar -xz --strip-components=1 -C /opt/kibana -f kibana.tar.gz \
 	&& chown -R kibana:kibana /opt/kibana \
