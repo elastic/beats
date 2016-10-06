@@ -36,6 +36,8 @@ def field_to_json(desc, path, output):
         "indexed": True,
         "analyzed": False,
         "doc_values": True,
+        "searchable": True,
+        "aggregatable": True,
     }
     # find the kibana types based on the field type
     if "type" in desc:
@@ -43,6 +45,8 @@ def field_to_json(desc, path, output):
             field["type"] = "number"
         elif desc["type"] in ["text", "keyword"]:
             field["type"] = "string"
+            if desc["type"] == "text":
+                field["aggregatable"] = False
         elif desc["type"] == "date":
             field["type"] = "date"
     else:
