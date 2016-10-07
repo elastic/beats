@@ -37,6 +37,12 @@ The hostname as returned by the operating system on which the Beat is running.
 
 
 [float]
+=== beat.version
+
+The version of the beat that generated this event.
+
+
+[float]
 === @timestamp
 
 type: date

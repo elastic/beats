@@ -25,6 +25,7 @@ env:
     - TARGETS="-C libbeat crosscompile"
     - TARGETS="-C metricbeat crosscompile"
     - TARGETS="-C winlogbeat crosscompile"
+    - TARGETS="-C libbeat/dashboards"
     - TARGETS="-C generate/metricbeat/metricset test"
     - TARGETS="-C generate/beat test"
   global:
@@ -48,6 +49,8 @@ matrix:
       env: TARGETS="-C libbeat testsuite"
     - os: osx
       env: TARGETS="-C metricbeat testsuite"
+    - os: osx
+      env: TARGETS="-C libbeat/dashboards"
     - os: osx
       env: TARGETS="-C generate/metricbeat/metricset test"
     - os: osx
