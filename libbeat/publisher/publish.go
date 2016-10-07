@@ -54,6 +54,7 @@ type BeatPublisher struct {
 	shipperName    string // Shipper name as set in the configuration file
 	hostname       string // Host name as returned by the operation system
 	name           string // The shipperName if configured, the hostname otherwise
+	version        string
 	IpAddrs        []string
 	disabled       bool
 	Index          string
@@ -182,13 +183,14 @@ func (publisher *BeatPublisher) PublishTopology(params ...string) error {
 // Create new PublisherType
 func New(
 	beatName string,
+	beatVersion string,
 	configs map[string]*common.Config,
 	shipper ShipperConfig,
 	processors *processors.Processors,
 ) (*BeatPublisher, error) {
 
 	publisher := BeatPublisher{}
-	err := publisher.init(beatName, configs, shipper, processors)
+	err := publisher.init(beatName, beatVersion, configs, shipper, processors)
 	if err != nil {
 		return nil, err
 	}
@@ -197,6 +199,7 @@ func New(
 
 func (publisher *BeatPublisher) init(
 	beatName string,
+	beatVersion string,
 	configs map[string]*common.Config,
 	shipper ShipperConfig,
 	processors *processors.Processors,
@@ -276,6 +279,7 @@ func (publisher *BeatPublisher) init(
 
 	publisher.shipperName = shipper.Name
 	publisher.hostname, err = os.Hostname()
+	publisher.version = beatVersion
 	if err != nil {
 		return err
 	}
