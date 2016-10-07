@@ -23,8 +23,8 @@ type SocketInfo struct {
 	Src_ip, Dst_ip     net.IP
 	Src_port, Dst_port uint16
 
-	Uid   uint16
-	Inode int64
+	Uid   uint32
+	Inode uint64
 }
 
 type PortProcMapping struct {
@@ -308,7 +308,7 @@ func (proc *ProcessesWatcher) UpdateMap() {
 		logp.Err("Parse_Proc_Net_Tcp ipv6: %s", err)
 		return
 	}
-	socks_map := map[int64]*SocketInfo{}
+	socks_map := map[uint64]*SocketInfo{}
 	for _, s := range ipv4socks {
 		socks_map[s.Inode] = s
 	}
@@ -380,9 +380,9 @@ func Parse_Proc_Net_Tcp(input io.Reader, ipv6 bool) ([]*SocketInfo, error) {
 		}
 
 		uid, _ := strconv.Atoi(string(words[7]))
-		sock.Uid = uint16(uid)
+		sock.Uid = uint32(uid)
 		inode, _ := strconv.Atoi(string(words[9]))
-		sock.Inode = int64(inode)
+		sock.Inode = uint64(inode)
 
 		sockets = append(sockets, &sock)
 	}
@@ -401,17 +401,17 @@ func (proc *ProcessesWatcher) UpdateMappingEntry(port uint16, pid int, p *Proces
 	logp.Debug("procsdetailed", "UpdateMappingEntry(): port=%d pid=%d", port, p.Name)
 }
 
-func FindSocketsOfPid(prefix string, pid int) (inodes []int64, err error) {
+func FindSocketsOfPid(prefix string, pid int) (inodes []uint64, err error) {
 
 	dirname := filepath.Join(prefix, "/proc", strconv.Itoa(pid), "fd")
 	procfs, err := os.Open(dirname)
 	if err != nil {
-		return []int64{}, fmt.Errorf("Open: %s", err)
+		return []uint64{}, fmt.Errorf("Open: %s", err)
 	}
 	defer procfs.Close()
 	names, err := procfs.Readdirnames(0)
 	if err != nil {
-		return []int64{}, fmt.Errorf("Readdirnames: %s", err)
+		return []uint64{}, fmt.Errorf("Readdirnames: %s", err)
 	}
 
 	for _, name := range names {
@@ -428,7 +428,7 @@ func FindSocketsOfPid(prefix string, pid int) (inodes []int64, err error) {
 				continue
 			}
 
-			inodes = append(inodes, int64(inode))
+			inodes = append(inodes, uint64(inode))
 		}
 	}
 
