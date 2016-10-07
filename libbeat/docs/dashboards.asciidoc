@@ -14,17 +14,6 @@
 [[load-kibana-dashboards]]
 ==== Importing the Dashboards
 
-[NOTE]
-.Known Doc Issue in 5.0.0-alpha5
-====
-The instructions in this section describe how to use a script that's not available in the {beatname_uc} 5.0.0-alpha5
-download package. If you are importing dashboards for 5.0.0-alpha5, you need to run one of the
-import scripts in the `kibana` directory: `import_dashboards.sh` or `import_dashboards.ps1`.
-Use the `-help` command to see the list of options for running the script. For example: 
-`./import_dashboards.sh -help`.
-
-====
-
 {beatname_uc} comes packaged with the `scripts/import_dashboards` script that you can use to import the example dashboards,
 visualizations, and searches for {beatname_uc}. The script also creates an index pattern,
 +{beatname_lc}-*+, for {beatname_uc}. 
