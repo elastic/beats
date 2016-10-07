@@ -131,12 +131,22 @@ func (r *Registrar) loadAndConvertOldState(f *os.File) bool {
 	// Make sure file reader is reset afterwards
 	defer f.Seek(0, 0)
 
+	stat, err := f.Stat()
+	if err != nil {
+		logp.Err("Error getting stat for old state: %+v", err)
+		return false
+	}
+
+	// Empty state does not have to be transformed ({} + newline)
+	if stat.Size() <= 4 {
+		return false
+	}
+
 	decoder := json.NewDecoder(f)
 	oldStates := map[string]file.State{}
-	err := decoder.Decode(&oldStates)
-
+	err = decoder.Decode(&oldStates)
 	if err != nil {
-		logp.Debug("registrar", "Error decoding old state: %+v", err)
+		logp.Err("Error decoding old state: %+v", err)
 		return false
 	}
 
