@@ -178,7 +178,7 @@ func (b *Beat) launch(bt Creator) error {
 	}
 
 	debugf("Initializing output plugins")
-	publisher, err := publisher.New(b.Name, b.Config.Output, b.Config.Shipper, processors)
+	publisher, err := publisher.New(b.Name, b.Version, b.Config.Output, b.Config.Shipper, processors)
 	if err != nil {
 		return fmt.Errorf("error initializing publisher: %v", err)
 	}

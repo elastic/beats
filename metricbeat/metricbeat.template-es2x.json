@@ -176,6 +176,11 @@
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
+            },
+            "version": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
             }
           }
         },
