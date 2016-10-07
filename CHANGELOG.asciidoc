@@ -8,13 +8,11 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.0.0-beta1...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.0.0-rc1...5.0[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
-
-- A dynamic mapping rule is added to the default Elasticsearch template to treat strings as keywords by default. {pull}2688[2688]
 
 *Metricbeat*
 
@@ -30,25 +28,17 @@ https://github.com/elastic/beats/compare/v5.0.0-beta1...master[Check the HEAD di
 ==== Bugfixes
 
 *Affecting all Beats*
-- Make sure Beats sent always float values when they are defined as float by sending 5.00000 instead of 5.
-  {pull}2627[2627]
-- Fix ignoring all fields from drop_fields in case the first field is unknown. {pull}2685[2685]
+
 - Fix dynamic configuration int/uint to float type conversation. {pull}2698[2698]
 - Fix primitive types conversation if values are read from environment variables. {pull}2698[2698]
 
-
 *Metricbeat*
 
-- Fix default configuration file on Windows to not enabled the `load` metricset. {pull}2632[2632]
-
 *Packetbeat*
-
-- Fix the `bpf_filter` setting. {issue}2660[2660]
 
 *Topbeat*
 
 *Filebeat*
-- Fix input buffer on encoding problem
 
 *Winlogbeat*
 
@@ -69,7 +59,6 @@ https://github.com/elastic/beats/compare/v5.0.0-beta1...master[Check the HEAD di
 ==== Deprecated
 
 *Affecting all Beats*
-- Setting `port` has been deprecated in redis and logstash outputs. {pull}2620[2620]
 
 *Metricbeat*
 
@@ -82,6 +71,42 @@ https://github.com/elastic/beats/compare/v5.0.0-beta1...master[Check the HEAD di
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.0.0-rc1]]
+=== Beats version 5.0.0-rc1
+https://github.com/elastic/beats/compare/v5.0.0-beta1...v5.0.0-rc1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- A dynamic mapping rule is added to the default Elasticsearch template to treat strings as keywords by default. {pull}2688[2688]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Make sure Beats sent always float values when they are defined as float by sending 5.00000 instead of 5. {pull}2627[2627]
+- Fix ignoring all fields from drop_fields in case the first field is unknown. {pull}2685[2685]
+
+*Metricbeat*
+
+- Fix default configuration file on Windows to not enabled the `load` metricset. {pull}2632[2632]
+
+*Packetbeat*
+
+- Fix the `bpf_filter` setting. {issue}2660[2660]
+
+*Filebeat*
+
+- Fix input buffer on encoding problem. {pull}2416[2416]
+
+==== Deprecated
+
+*Affecting all Beats*
+
+- Setting `port` has been deprecated in Redis and Logstash outputs. {pull}2620[2620]
+
 
 [[release-notes-5.0.0-beta1]]
 === Beats version 5.0.0-beta1
