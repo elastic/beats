@@ -23,6 +23,10 @@ include::./installing-beats.asciidoc[]
 
 include::./repositories.asciidoc[]
 
+include::./breaking.asciidoc[]
+
+include::./upgrading.asciidoc[]
+
 include::./config-file-format.asciidoc[]
 
 // include::./visualizing-data.asciidoc[]
