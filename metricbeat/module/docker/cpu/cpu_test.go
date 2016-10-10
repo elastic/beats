@@ -3,11 +3,13 @@ package cpu
 import (
 	"reflect"
 	"testing"
+	"time"
 
 	dc "github.com/fsouza/go-dockerclient"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
 func TestCPUService_PerCpuUsage(t *testing.T) {
@@ -75,7 +77,12 @@ func TestCPUService_UsageInUsermode(t *testing.T) {
 	assert.Equal(t, float64(0.50), result)
 }
 
-/* TODO: uncomment
+//TODO: uncomment
+/**
+TestCPUService_GetCpuStats simulates the generation of a cpu event, it checks  :
+ -The validity of the parameters sent to the different methods used to get the data calculated and the retuned values
+ -The generated events are correctly formated
+*/
 func TestCPUService_GetCpuStats(t *testing.T) {
 	// GIVEN
 	containerID := "containerID"
@@ -100,6 +107,7 @@ func TestCPUService_GetCpuStats(t *testing.T) {
 	preCPUStats := getCPUStats([]uint64{1, 9, 9, 5}, []uint64{0, 50, 0})
 	CPUStats := getCPUStats([]uint64{100000001, 900000009, 900000009, 500000005}, []uint64{500000000, 500000050, 500000000})
 
+	//CPU stats
 	stats := dc.Stats{}
 	stats.Read = time.Now()
 	stats.CPUStats = CPUStats
@@ -110,29 +118,29 @@ func TestCPUService_GetCpuStats(t *testing.T) {
 	cpuStatsStruct.Stats = stats
 
 	mockedCPUCalculator := getMockedCPUCalcul(1.0)
-	// expected events
+	// expected events : The generated event should be equal to the expected event
 	expectedEvent := common.MapStr{
-		"@timestamp": common.Time(stats.Read),
-		"container": common.MapStr{
-			"id":     containerID,
-			"name":   "name1",
-			"labels": docker.BuildLabelArray(labels),
+		"_module": common.MapStr{
+			"container": common.MapStr{
+				"id":     containerID,
+				"name":   "name1",
+				"socket": docker.GetSocket(),
+				"labels": docker.BuildLabelArray(labels),
+			},
 		},
-		"socket": docker.GetSocket(),
-		"cpu": common.MapStr{
-			"per_cpu_usage":        mockedCPUCalculator.PerCpuUsage(&stats),
-			"total_usage":          mockedCPUCalculator.TotalUsage(&stats),
-			"usage_in_kernel_mode": mockedCPUCalculator.UsageInKernelmode(&stats),
-			"usage_in_user_mode":   mockedCPUCalculator.UsageInUsermode(&stats),
-		},
-	}
+			"usage": common.MapStr{
+				"per_cpu":     mockedCPUCalculator.PerCpuUsage(&stats),
+				"total":       mockedCPUCalculator.TotalUsage(&stats),
+				"kernel_mode": mockedCPUCalculator.UsageInKernelmode(&stats),
+				"user_mode":   mockedCPUCalculator.UsageInUsermode(&stats),
+			},
+		}
 
 	CPUService := NewCpuService()
 	cpuData := CPUService.getCpuStats(&cpuStatsStruct)
 	event := eventMapping(&cpuData)
 	//THEN
-	assert.True(t, equalEvent(expectedEvent, event))
-}*/
+	assert.True(t, equalEvent(expectedEvent, event))}
 
 func getMockedCPUCalcul(number float64) MockCPUCalculator {
 	mockedCPU := MockCPUCalculator{}
