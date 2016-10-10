@@ -26,7 +26,7 @@ The Redis module has these additional config options:
 [float]
 === Compatibility
 
-The Redis metricsets were tested with Redis 3.2 and are expected to work with all version
+The Redis metricsets were tested with Redis 3.2.4 and are expected to work with all version
 >= 3.0.
 
 
