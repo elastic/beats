@@ -29,9 +29,10 @@ type client struct {
 }
 
 type msgRef struct {
-	count int32
-	batch []outputs.Data
-	cb    func([]outputs.Data, error)
+	count  int32
+	total  int
+	failed []outputs.Data
+	cb     func([]outputs.Data, error)
 
 	err error
 }
@@ -104,9 +105,10 @@ func (c *client) AsyncPublishEvents(
 	debugf("publish events")
 
 	ref := &msgRef{
-		count: int32(len(data)),
-		batch: data,
-		cb:    cb,
+		count:  int32(len(data)),
+		total:  len(data),
+		failed: nil,
+		cb:     cb,
 	}
 
 	ch := c.producer.Input()
@@ -136,7 +138,7 @@ func (c *client) getEventMessage(data *outputs.Data) (*message, error) {
 		return msg, nil
 	}
 
-	msg.event = event
+	msg.data = *data
 
 	topic, err := c.topic.Select(event)
 	if err != nil {
@@ -188,7 +190,7 @@ func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 
 	for errMsg := range ch {
 		msg := errMsg.Msg.Metadata.(*message)
-		msg.ref.fail(errMsg.Err)
+		msg.ref.fail(msg, errMsg.Err)
 	}
 }
 
@@ -196,8 +198,20 @@ func (r *msgRef) done() {
 	r.dec()
 }
 
-func (r *msgRef) fail(err error) {
-	r.err = err
+func (r *msgRef) fail(msg *message, err error) {
+	switch err {
+	case sarama.ErrInvalidMessage:
+		logp.Err("Kafka (topic=%v): dropping invalid message", msg.topic)
+
+	case sarama.ErrMessageSizeTooLarge, sarama.ErrInvalidMessageSize:
+		logp.Err("Kafka (topic=%v): dropping too large message of size %v.",
+			msg.topic,
+			len(msg.key)+len(msg.value))
+
+	default:
+		r.failed = append(r.failed, msg.data)
+		r.err = err
+	}
 	r.dec()
 }
 
@@ -211,11 +225,18 @@ func (r *msgRef) dec() {
 
 	err := r.err
 	if err != nil {
-		eventsNotAcked.Add(int64(len(r.batch)))
+		failed := len(r.failed)
+		success := r.total - failed
+
+		eventsNotAcked.Add(int64(failed))
+		if success > 0 {
+			ackedEvents.Add(int64(success))
+		}
+
 		debugf("Kafka publish failed with: %v", err)
-		r.cb(r.batch, err)
+		r.cb(r.failed, err)
 	} else {
-		ackedEvents.Add(int64(len(r.batch)))
+		ackedEvents.Add(int64(r.total))
 		r.cb(nil, nil)
 	}
 }
