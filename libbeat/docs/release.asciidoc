@@ -28,4 +28,4 @@ This section summarizes the changes in each release.
 
 --
 
-include::{beats-dir}/CHANGELOG.asciidoc[]
+include::../../CHANGELOG.asciidoc[]
