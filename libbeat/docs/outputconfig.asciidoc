@@ -531,6 +531,9 @@ spooler size.
 
 The Kafka output sends the events to Apache Kafka.
 
+Note: Events bigger then <<kafka-max_message_bytes>> will be dropped. Make sure
++{beatname_lc} will not generate events bigger then <<kafka-max_message_bytes>>.
+
 ==== Compatibility
 
 This output works with Kafka 0.8, 0.9, and 0.10.
@@ -677,6 +680,7 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 
 Sets the output compression codec. Must be one of `none`, `snappy` and `gzip`. The default is `gzip`.
 
+[[kafka-max_message_bytes]]
 ===== max_message_bytes
 
 The maximum permitted size of JSON-encoded messages. Bigger messages will be dropped. The default value is 1000000 (bytes). This value should be equal to or less than the broker's `message.max.bytes`.
