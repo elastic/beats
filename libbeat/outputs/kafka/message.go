@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
@@ -20,7 +19,7 @@ type message struct {
 	hash      uint32
 	partition int32
 
-	event common.MapStr
+	data outputs.Data
 }
 
 var kafkaMessageKey interface{} = int(0)

@@ -223,7 +223,7 @@ func makeFieldsHashPartitioner(fields []string, dropFail bool) partitioner {
 
 			var err error
 			for _, field := range fields {
-				err = hashFieldValue(hasher, msg.event, field)
+				err = hashFieldValue(hasher, msg.data.Event, field)
 				if err != nil {
 					break
 				}
