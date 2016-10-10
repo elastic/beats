@@ -46,6 +46,9 @@ import:
   subpackages:
   - /proxy
   - /publicsuffix
+  - /icmp
+  - /ipv4
+  - /ipv6
 - package: golang.org/x/text
   version: d69c40b4be55797923cec7457fac7a244d91a9b6
   subpackages:
@@ -99,3 +102,5 @@ import:
   version: v1.0
 - package: https://github.com/go-inf/inf
   version: v0.9.0
+- package: github.com/gorhill/cronexpr
+  version: f0984319b44273e83de132089ae42b1810f4933b
