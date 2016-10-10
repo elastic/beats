@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
+
 func TestMemoryService_GetMemoryStats(t *testing.T) {
 
 	//Container  + dockerstats
@@ -54,13 +55,12 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 		"limit": memorystats.MemoryStats.Limit,
 		"rss": common.MapStr{
 			"total": memorystats.MemoryStats.Stats.TotalRss,
-			"pct":  float64(memorystats.MemoryStats.Stats.TotalRss) / float64(memorystats.MemoryStats.Limit),
+			"pct":   float64(memorystats.MemoryStats.Stats.TotalRss) / float64(memorystats.MemoryStats.Limit),
 		},
 		"usage": common.MapStr{
-			"total":       memorystats.MemoryStats.Usage,
-			"pct":     float64(memorystats.MemoryStats.Usage) / float64(memorystats.MemoryStats.Limit),
-			"max": memorystats.MemoryStats.MaxUsage,
-
+			"total": memorystats.MemoryStats.Usage,
+			"pct":   float64(memorystats.MemoryStats.Usage) / float64(memorystats.MemoryStats.Limit),
+			"max":   memorystats.MemoryStats.MaxUsage,
 		},
 	}
 	//WHEN
@@ -131,4 +131,3 @@ func equalEvent(expectedEvent common.MapStr, event common.MapStr) bool {
 
 	return reflect.DeepEqual(expectedEvent, event)
 }
-

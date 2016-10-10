@@ -128,19 +128,20 @@ func TestCPUService_GetCpuStats(t *testing.T) {
 				"labels": docker.BuildLabelArray(labels),
 			},
 		},
-			"usage": common.MapStr{
-				"per_cpu":     mockedCPUCalculator.PerCpuUsage(&stats),
-				"total":       mockedCPUCalculator.TotalUsage(&stats),
-				"kernel_mode": mockedCPUCalculator.UsageInKernelmode(&stats),
-				"user_mode":   mockedCPUCalculator.UsageInUsermode(&stats),
-			},
-		}
+		"usage": common.MapStr{
+			"per_cpu":     mockedCPUCalculator.PerCpuUsage(&stats),
+			"total":       mockedCPUCalculator.TotalUsage(&stats),
+			"kernel_mode": mockedCPUCalculator.UsageInKernelmode(&stats),
+			"user_mode":   mockedCPUCalculator.UsageInUsermode(&stats),
+		},
+	}
 
 	CPUService := NewCpuService()
 	cpuData := CPUService.getCpuStats(&cpuStatsStruct)
 	event := eventMapping(&cpuData)
 	//THEN
-	assert.True(t, equalEvent(expectedEvent, event))}
+	assert.True(t, equalEvent(expectedEvent, event))
+}
 
 func getMockedCPUCalcul(number float64) MockCPUCalculator {
 	mockedCPU := MockCPUCalculator{}

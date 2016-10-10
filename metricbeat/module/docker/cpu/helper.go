@@ -60,7 +60,7 @@ func (c *CPUService) getCpuStats(myRawStat *docker.DockerStat) CPUStats {
 	}
 }
 
-func getOLdCpu(stats *dc.Stats) CPURaw {
+func getOldCpu(stats *dc.Stats) CPURaw {
 	return CPURaw{
 		PerCpuUsage:       stats.PreCPUStats.CPUUsage.PercpuUsage,
 		TotalUsage:        stats.PreCPUStats.CPUUsage.TotalUsage,
@@ -80,27 +80,30 @@ func getNewCpu(stats *dc.Stats) CPURaw {
 
 func (c *CPUService) PerCpuUsage(stats *dc.Stats) common.MapStr {
 	var output common.MapStr
-	if cap(getNewCpu(stats).PerCpuUsage) == cap(getOLdCpu(stats).PerCpuUsage) {
+	if cap(getNewCpu(stats).PerCpuUsage) == cap(getOldCpu(stats).PerCpuUsage) {
 		output = common.MapStr{}
 		for index := range getNewCpu(stats).PerCpuUsage {
-			output[strconv.Itoa(index)] = c.calculateLoad(int64(getNewCpu(stats).PerCpuUsage[index] - getOLdCpu(stats).PerCpuUsage[index]))
+			output[strconv.Itoa(index)] = c.calculateLoad(int64(getNewCpu(stats).PerCpuUsage[index] - getOldCpu(stats).PerCpuUsage[index]))
 		}
 	}
 	return output
 }
 
 func (c *CPUService) TotalUsage(stats *dc.Stats) float64 {
-	return c.calculateLoad(int64(getNewCpu(stats).TotalUsage - getOLdCpu(stats).TotalUsage))
+	return c.calculateLoad(int64(getNewCpu(stats).TotalUsage - getOldCpu(stats).TotalUsage))
 }
 
 func (c *CPUService) UsageInKernelmode(stats *dc.Stats) float64 {
-	return c.calculateLoad(int64(getNewCpu(stats).UsageInKernelmode - getOLdCpu(stats).UsageInKernelmode))
+	return c.calculateLoad(int64(getNewCpu(stats).UsageInKernelmode - getOldCpu(stats).UsageInKernelmode))
 }
 
 func (c *CPUService) UsageInUsermode(stats *dc.Stats) float64 {
-	return c.calculateLoad(int64(getNewCpu(stats).UsageInUsermode - getOLdCpu(stats).UsageInUsermode))
+	return c.calculateLoad(int64(getNewCpu(stats).UsageInUsermode - getOldCpu(stats).UsageInUsermode))
 }
 
 func (c *CPUService) calculateLoad(value int64) float64 {
+	if value < 0 {
+		value = 0
+	}
 	return float64(value) / float64(1000000000)
 }
