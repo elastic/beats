@@ -1,0 +1,78 @@
+################### Beat Configuration #########################
+
+
+
+############################# Output ##########################################
+
+# Configure what outputs to use when sending the data collected by the beat.
+# You can enable one or multiple outputs by setting enabled option to true.
+output:
+
+  ### File as output
+  file:
+    # Enabling file output
+    enabled: true
+
+    # Path to the directory where to save the generated files. The option is mandatory.
+    path: {{ output_file_path|default(beat.working_dir + "/output") }}
+
+
+    # Name of the generated files. The default is `heartbeat` and it generates
+    # files: `heartbeat`, `heartbeat.1`, `heartbeat.2`, etc.
+    filename: "{{ output_file_filename|default("heartbeat") }}"
+
+    # Maximum size in kilobytes of each file. When this size is reached, the files are
+    # rotated. The default value is 10 MB.
+    #rotate_every_kb: 10000
+
+    # Maximum number of files under path. When this number of files is reached, the
+    # oldest file is deleted and the rest are shifted from last to first. The default
+    # is 7 files.
+    #number_of_files: 7
+
+
+
+############################# Beat #########################################
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+# If this options is not defined, the hostname is used.
+#name:
+
+# The tags of the shipper are included in their own field with each
+# transaction published. Tags make it easy to group servers by different
+# logical properties.
+#tags: ["service-X", "web-tier"]
+
+
+
+############################# Logging #########################################
+
+#logging:
+  # Send all logging output to syslog. On Windows default is false, otherwise
+  # default is true.
+  #to_syslog: true
+
+  # Write all logging output to files. Beats automatically rotate files if configurable
+  # limit is reached.
+  #to_files: false
+
+  # Enable debug output for selected components.
+  #selectors: []
+
+  # Set log level
+  #level: error
+
+  #files:
+    # The directory where the log files will written to.
+    #path: /var/log/heartbeat
+
+    # The name of the files where the logs are written to.
+    #name: heartbeat
+
+    # Configure log file size limit. If limit is reached, log file will be
+    # automatically rotated
+    #rotateeverybytes: 10485760 # = 10MB
+
+    # Number of rotated log files to keep. Oldest files will be deleted first.
+    #keepfiles: 7
