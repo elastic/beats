@@ -721,7 +721,7 @@ output.redis:
 
 ==== Compatibility
 
-This output works with Redis 3.2.0.
+This output works with Redis 3.2.4.
 
 ==== Redis Output Options
 
