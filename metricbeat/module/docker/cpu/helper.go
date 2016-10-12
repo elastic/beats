@@ -53,28 +53,28 @@ func (c *CPUService) getCpuStats(myRawStat *docker.DockerStat) CPUStats {
 	return CPUStats{
 		Time:              common.Time(myRawStat.Stats.Read),
 		Container:         docker.NewContainer(&myRawStat.Container),
-		PerCpuUsage:       c.PerCpuUsage(&myRawStat.Stats),
-		TotalUsage:        c.TotalUsage(&myRawStat.Stats),
-		UsageInKernelmode: c.UsageInKernelmode(&myRawStat.Stats),
-		UsageInUsermode:   c.UsageInUsermode(&myRawStat.Stats),
+		PerCpuUsage:       c.perCpuUsage(&myRawStat.Stats),
+		TotalUsage:        c.totalUsage(&myRawStat.Stats),
+		UsageInKernelmode: c.usageInKernelmode(&myRawStat.Stats),
+		UsageInUsermode:   c.usageInUsermode(&myRawStat.Stats),
 	}
 }
 
 func getOldCpu(stats *dc.Stats) CPURaw {
 	return CPURaw{
-		PerCpuUsage:       stats.PreCPUStats.CPUUsage.percpuUsage,
-		TotalUsage:        stats.PreCPUStats.CPUUsage.totalUsage,
-		UsageInKernelmode: stats.PreCPUStats.CPUUsage.usageInKernelmode,
-		UsageInUsermode:   stats.PreCPUStats.CPUUsage.usageInUsermode,
+		PerCpuUsage:       stats.PreCPUStats.CPUUsage.PercpuUsage,
+		TotalUsage:        stats.PreCPUStats.CPUUsage.TotalUsage,
+		UsageInKernelmode: stats.PreCPUStats.CPUUsage.UsageInKernelmode,
+		UsageInUsermode:   stats.PreCPUStats.CPUUsage.UsageInUsermode,
 	}
 }
 
 func getNewCpu(stats *dc.Stats) CPURaw {
 	return CPURaw{
-		PerCpuUsage:       stats.CPUStats.CPUUsage.percpuUsage,
-		TotalUsage:        stats.CPUStats.CPUUsage.totalUsage,
-		UsageInKernelmode: stats.CPUStats.CPUUsage.usageInKernelmode,
-		UsageInUsermode:   stats.CPUStats.CPUUsage.usageInUsermode,
+		PerCpuUsage:       stats.CPUStats.CPUUsage.PercpuUsage,
+		TotalUsage:        stats.CPUStats.CPUUsage.TotalUsage,
+		UsageInKernelmode: stats.CPUStats.CPUUsage.UsageInKernelmode,
+		UsageInUsermode:   stats.CPUStats.CPUUsage.UsageInUsermode,
 	}
 }
 

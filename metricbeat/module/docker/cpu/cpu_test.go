@@ -12,69 +12,117 @@ import (
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
+var statsList = make([]dc.Stats, 3)
+
 func TestCPUService_PerCpuUsage(t *testing.T) {
-	//GIVEN
-	preCpuStats := getCPUStats([]uint64{1, 9, 9, 5}, []uint64{0, 0, 0})
-	cpuStats := getCPUStats([]uint64{100000001, 900000009, 900000009, 500000005}, []uint64{0, 0, 0})
+	oldPerCpuValuesTest := [][]uint64{{1, 9, 9, 5}, {1, 2, 3, 4}, {0, 0, 0, 0}}
+	newPerCpuValuesTest := [][]uint64{{100000001, 900000009, 900000009, 500000005}, {101, 202, 303, 404}, {0, 0, 0, 0}}
+	for index := range statsList {
+		statsList[index].PreCPUStats.CPUUsage.PercpuUsage = oldPerCpuValuesTest[index]
+		statsList[index].CPUStats.CPUUsage.PercpuUsage = newPerCpuValuesTest[index]
+	}
+	testCase := []struct {
+		given    dc.Stats
+		expected common.MapStr
+	}{
+		{statsList[0], common.MapStr{
+			"0": float64(0.10),
+			"1": float64(0.90),
+			"2": float64(0.90),
+			"3": float64(0.50),
+		}},
+		{statsList[1], common.MapStr{
+			"0": float64(0.0000001),
+			"1": float64(0.0000002),
+			"2": float64(0.0000003),
+			"3": float64(0.0000004),
+		}},
+		{statsList[2], common.MapStr{
+			"0": float64(0),
+			"1": float64(0),
+			"2": float64(0),
+			"3": float64(0),
+		}},
+	}
 	CPUService := NewCpuService()
-	stats := dc.Stats{}
-	stats.CPUStats = cpuStats
-	stats.PreCPUStats = preCpuStats
-	// WHEN
-	result := CPUService.PerCpuUsage(&stats)
-	//THEN
-	assert.Equal(t, common.MapStr{
-		"0": float64(0.10),
-		"1": float64(0.90),
-		"2": float64(0.90),
-		"3": float64(0.50),
-	}, result)
+	for _, tt := range testCase {
+		out := CPUService.perCpuUsage(&tt.given)
+		if !equalEvent(tt.expected, out) {
+			t.Errorf("PerCpuUsage(%v) => %v, want %v", tt.given.CPUStats.CPUUsage.PercpuUsage, out, tt.expected)
+		}
+	}
 }
 
 func TestCPUService_TotalUsage(t *testing.T) {
-
-	//GIVEN
-	preCpuStats := getCPUStats(nil, []uint64{0, 50, 0})
-	cpuStats := getCPUStats(nil, []uint64{0, 500000050, 0})
+	oldTotalValuesTest := []uint64{569832511, 50, 10}
+	totalValuesTest := []uint64{45996245, 500000050, 10}
+	for index := range statsList {
+		statsList[index].PreCPUStats.CPUUsage.TotalUsage = oldTotalValuesTest[index]
+		statsList[index].CPUStats.CPUUsage.TotalUsage = totalValuesTest[index]
+	}
+	testCase := []struct {
+		given    dc.Stats
+		expected float64
+	}{
+		{statsList[0], 0},
+		{statsList[1], 0.50},
+		{statsList[2], 0},
+	}
 	CPUService := NewCpuService()
-
-	stats := dc.Stats{}
-	stats.CPUStats = cpuStats
-	stats.PreCPUStats = preCpuStats
-	//WHEN
-	result := CPUService.TotalUsage(&stats)
-	// THEN
-	assert.Equal(t, 0.50, result)
+	for _, tt := range testCase {
+		out := CPUService.totalUsage(&tt.given)
+		if out != tt.expected {
+			t.Errorf("usageInKernelmode(%v) => %v, want %v", tt.given.CPUStats.CPUUsage.PercpuUsage, out, tt.expected)
+		}
+	}
 }
 
 func TestCPUService_UsageInKernelmode(t *testing.T) {
-	//GIVEN
-	preCpuStats := getCPUStats(nil, []uint64{0, 0, 0})
-	cpuStats := getCPUStats(nil, []uint64{0, 0, 500000000})
+	usageOldValuesTest := []uint64{0, 10, 356985235698}
+	usageValuesTest := []uint64{500000000, 500000010, 500000050}
+	for index := range statsList {
+		statsList[index].PreCPUStats.CPUUsage.UsageInKernelmode = usageOldValuesTest[index]
+		statsList[index].CPUStats.CPUUsage.UsageInKernelmode = usageValuesTest[index]
+	}
+	testCase := []struct {
+		given    dc.Stats
+		expected float64
+	}{
+		{statsList[0], 0.50},
+		{statsList[1], 0.50},
+		{statsList[2], 0},
+	}
 	CPUService := NewCpuService()
-
-	stats := dc.Stats{}
-	stats.CPUStats = cpuStats
-	stats.PreCPUStats = preCpuStats
-	//WHEN
-	result := CPUService.UsageInKernelmode(&stats)
-	//THEN
-	assert.Equal(t, float64(0.50), result)
+	for _, tt := range testCase {
+		out := CPUService.usageInKernelmode(&tt.given)
+		if out != tt.expected {
+			t.Errorf("usageInKernelmode(%v) => %v, want %v", tt.given, out, tt.expected)
+		}
+	}
 }
 
 func TestCPUService_UsageInUsermode(t *testing.T) {
-	//GIVEN
-	preCpuStats := getCPUStats(nil, []uint64{0, 0, 0})
-	cpuStats := getCPUStats(nil, []uint64{500000000, 0, 0})
+	usageOldValuesTest := []uint64{0, 1958965, 500}
+	usageValuesTest := []uint64{500000000, 50, 1000000500}
+	for index := range statsList {
+		statsList[index].PreCPUStats.CPUUsage.UsageInUsermode = usageOldValuesTest[index]
+		statsList[index].CPUStats.CPUUsage.UsageInUsermode = usageValuesTest[index]
+	}
+	testCase := []struct {
+		given    dc.Stats
+		expected float64
+	}{
+		{statsList[0], 0.50},
+		{statsList[1], 0},
+		{statsList[2], 1},
+	}
 	CPUService := NewCpuService()
-
-	stats := dc.Stats{}
-	stats.CPUStats = cpuStats
-	stats.PreCPUStats = preCpuStats
-	//WHEN
-	result := CPUService.UsageInUsermode(&stats)
-	//  THEN
-	assert.Equal(t, float64(0.50), result)
+	for _, tt := range testCase {
+		out := CPUService.usageInUsermode(&tt.given)
+		if out != tt.expected {
+			t.Errorf("usageInKernelmode(%v) => %v, want %v", tt.given, out, tt.expected)
+		}
+	}
 }
 
 //TestCPUService_GetCpuStats simulates the generation of a cpu event, it checks  :
@@ -155,13 +203,11 @@ func getMockedCPUCalcul(number float64) MockCPUCalculator {
 	mockedCPU.On("UsageInUsermode").Return(float64(0.50))
 	return mockedCPU
 }
-
 func equalEvent(expectedEvent common.MapStr, event common.MapStr) bool {
 
 	return reflect.DeepEqual(expectedEvent, event)
 
 }
-
 func getCPUStats(perCPU []uint64, numbers []uint64) dc.CPUStats {
 	return dc.CPUStats{
 		CPUUsage: struct {
