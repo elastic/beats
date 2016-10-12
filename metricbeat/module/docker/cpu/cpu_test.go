@@ -12,7 +12,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
-var CPUService CPUService
+var cpuService CPUService
 var statsList = make([]dc.Stats, 3)
 
 func TestCPUService_PerCpuUsage(t *testing.T) {
@@ -70,7 +70,7 @@ func TestCPUService_TotalUsage(t *testing.T) {
 		{statsList[2], 0},
 	}
 	for _, tt := range testCase {
-		out := CPUService.totalUsage(&tt.given)
+		out := cpuService.totalUsage(&tt.given)
 		if out != tt.expected {
 			t.Errorf("usageInKernelmode(%v) => %v, want %v", tt.given.CPUStats.CPUUsage.PercpuUsage, out, tt.expected)
 		}
@@ -93,7 +93,7 @@ func TestCPUService_UsageInKernelmode(t *testing.T) {
 		{statsList[2], 0},
 	}
 	for _, tt := range testCase {
-		out := CPUService.usageInKernelmode(&tt.given)
+		out := cpuService.usageInKernelmode(&tt.given)
 		if out != tt.expected {
 			t.Errorf("usageInKernelmode(%v) => %v, want %v", tt.given, out, tt.expected)
 		}
@@ -116,7 +116,7 @@ func TestCPUService_UsageInUsermode(t *testing.T) {
 		{statsList[2], 1},
 	}
 	for _, tt := range testCase {
-		out := CPUService.usageInUsermode(&tt.given)
+		out := cpuService.usageInUsermode(&tt.given)
 		if out != tt.expected {
 			t.Errorf("usageInKernelmode(%v) => %v, want %v", tt.given, out, tt.expected)
 		}
@@ -180,7 +180,7 @@ func TestCPUService_GetCpuStats(t *testing.T) {
 		},
 	}
 
-	cpuData := CPUService.getCpuStats(&cpuStatsStruct)
+	cpuData := cpuService.getCpuStats(&cpuStatsStruct)
 	event := eventMapping(&cpuData)
 	//THEN
 	assert.True(t, equalEvent(expectedEvent, event))
