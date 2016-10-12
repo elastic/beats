@@ -80,7 +80,7 @@ func getNewCpu(stats *dc.Stats) CPURaw {
 
 func (c *CPUService) perCpuUsage(stats *dc.Stats) common.MapStr {
 	var output common.MapStr
-	if cap(getNewCpu(stats).PerCpuUsage) == cap(getOldCpu(stats).PerCpuUsage) {
+	if len(getNewCpu(stats).PerCpuUsage) == len(getOldCpu(stats).PerCpuUsage) {
 		output = common.MapStr{}
 		for index := range getNewCpu(stats).PerCpuUsage {
 			output[strconv.Itoa(index)] = c.calculateLoad(int64(getNewCpu(stats).PerCpuUsage[index] - getOldCpu(stats).PerCpuUsage[index]))
