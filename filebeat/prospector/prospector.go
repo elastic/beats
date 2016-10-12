@@ -144,8 +144,8 @@ func (p *Prospector) Run() {
 // All state updates done by the prospector itself are synchronous to make sure not states are overwritten
 func (p *Prospector) updateState(event *input.Event) error {
 
-	// Add ttl if cleanOlder is enabled
-	if p.config.CleanInactive > 0 {
+	// Add ttl if cleanOlder is enabled and TTL is not already 0
+	if p.config.CleanInactive > 0 && event.State.TTL != 0 {
 		event.State.TTL = p.config.CleanInactive
 	}
 
