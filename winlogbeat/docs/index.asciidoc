@@ -22,6 +22,8 @@ include::./command-line.asciidoc[]
 
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
+include::./upgrading.asciidoc[]
+
 include::./configuring-howto.asciidoc[]
 
 include::./winlogbeat-filtering.asciidoc[]
