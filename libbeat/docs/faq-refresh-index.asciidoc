@@ -1,0 +1,23 @@
+[float]
+[[refresh-index-pattern]]
+=== Fields show up as nested JSON in Kibana
+
+In case the Beat exports a field of type dictionary, and the keys are not known in advance, the Discovery page from Kibana will display it as a nested JSON object:
+
+[source,shell]
+----------------------------------------------------------------------
+http.response.headers = {
+        "content-length": 12,
+        "content-type": "application/json"
+}
+----------------------------------------------------------------------
+To fix this you need to https://www.elastic.co/guide/en/kibana/5.0/settings.html#reload-fields[reload the index pattern] in Kibana under the Management->Index Patterns, and the index-pattern will be
+updated with a field for each key available in the dictionary:
+
+[source,shell]
+----------------------------------------------------------------------
+http.response.headers.content-length = 12
+http.response.headers.content-type = "application/json"
+----------------------------------------------------------------------
+
+
