@@ -1,5 +1,5 @@
 [[breaking-changes]]
-== Breaking changes
+== Breaking Changes
 
 As a general rule, we strive to keep backwards compatibility between minor
 versions (e.g.  5.x to 5.y) so you can upgrade without any configuration file
@@ -10,14 +10,14 @@ We list the breaking changes at the top of the <<release-notes,release notes>>
 for each version.
 
 [[breaking-changes-5.0]]
-=== Breaking changes in 5.0
+=== Breaking Changes in 5.0
 
 This section discusses the changes that you should be aware of if you upgrade
 the Beats from version 1.x to 5.x.
 
-==== Configuration file changes
+==== Configuration File Changes
 
-Beats 5.0 come with a more powerful and more robust <<config-file-format,file
+Beats 5.0 comes with a more powerful and more robust <<config-file-format,file
 configuration format>>. While this necessarily causes a few breaking changes, we
 provide a migration script that should make upgrading easy. Please see the
 <<upgrading>> section.
@@ -29,7 +29,7 @@ particular Beat are now prefixed by the name of the Beat. For example, the
 migration script.
 
 Similarly, common settings available in all Beats are now top level. As part of
-this, the options under the `shipper` section are moved to the top level. For
+this effort, the options under the `shipper` section are moved to the top level. For
 example, the `shipper.name` settings becomes `name`. This change is made
 automatically by the migration script.
 
@@ -46,12 +46,12 @@ These changes are made automatically by the migration script.
 In Filebeat, we refactored the configuration around when to close and when to
 start ignoring files. Options like `close_older` and `force_close_older` were
 changed or replaced with options from the `close_*` group. See the
-{filebeat}/how-filebeat-works.html[How Filebeat works] docs for details. These
+{filebeat}/how-filebeat-works.html[How Filebeat Works] docs for details. These
 changes are not made automatically by the migration script.
 
-==== Field renames
+==== Field Renames
 
-Beats 5.0 also come with several changes in the exported fields. If you are
+Beats 5.0 also comes with several changes in the exported fields. If you are
 using these fields in Kibana dashboards, you will likely need to adjust the
 dashbaords.
 
@@ -73,7 +73,7 @@ Changes:
 
 In addition, the unused `count` field was removed from all Packetbeat modules.
 
-==== Installation paths
+==== Installation Paths
 
 For 5.0 we have refactored the {filebeat}/directory-layout.html[directory
 layout] of the Beats, so they are more consistent and in-line with the best
