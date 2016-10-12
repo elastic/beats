@@ -77,12 +77,10 @@ func TestCPUService_UsageInUsermode(t *testing.T) {
 	assert.Equal(t, float64(0.50), result)
 }
 
-//TODO: uncomment
-/**
-TestCPUService_GetCpuStats simulates the generation of a cpu event, it checks  :
- -The validity of the parameters sent to the different methods used to get the data calculated and the retuned values
- -The generated events are correctly formated
-*/
+//TestCPUService_GetCpuStats simulates the generation of a cpu event, it checks  :
+// -The validity of the parameters sent to the different methods used to get the data calculated and the retuned values
+//-The generated events are correctly formated
+
 func TestCPUService_GetCpuStats(t *testing.T) {
 	// GIVEN
 	containerID := "containerID"
