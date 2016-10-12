@@ -2,7 +2,7 @@
 
 # Name can be overwritten, as Metricbeat is also a library
 BEATNAME?=metricbeat
-BEAT_DESCRIPTION?=Sends metrics to Elasticsearch.
+BEAT_DESCRIPTION?=Metricbeat sends metrics to Elasticsearch.
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT?=true
 GOPACKAGES=$(shell go list ${BEAT_DIR}/... | grep -v /vendor/)

@@ -384,17 +384,18 @@ package: package-setup
 
 	mkdir -p ${BUILD_DIR}/upload
 
-	if [ $(CGO) = true ]; then \
-		 $(MAKE) prepare-package-cgo; \
-	else \
-		$(MAKE) prepare-package; \
-	fi
-
 	# Generates the package.yml file with all information needed to create packages
 	echo "beat_name: ${BEATNAME}" > ${BUILD_DIR}/package.yml
 	echo "beat_url: https://${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_repo: ${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_description: ${BEAT_DESCRIPTION}" >> ${BUILD_DIR}/package.yml
+	cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml
+
+	if [ $(CGO) = true ]; then \
+		 $(MAKE) prepare-package-cgo; \
+	else \
+		$(MAKE) prepare-package; \
+	fi
 
 	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_DIR=${BEAT_DIR} BUILD_DIR=${BUILD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${BUILD_DIR}/upload/build_id.txt
 
