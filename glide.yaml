@@ -25,7 +25,7 @@ import:
   subpackages:
   - /difflib
 - package: github.com/elastic/gosigar
-  version: 2716c1fe855ee5c88eae707195e0688374458c92
+  version: 286c817a8ced9b4206b891c81d874f8ec5fee866
 - package: github.com/samuel/go-parser
   version: ca8abbf65d0e61dedf061f98bd3850f250e27539
 - package: github.com/samuel/go-thrift
