@@ -72,3 +72,4 @@ response messages are not sent.
 
 include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
 include::../../libbeat/docs/shared-faq.asciidoc[]
+include::../../libbeat/docs/faq-refresh-index.asciidoc[]
