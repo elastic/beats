@@ -18,10 +18,11 @@ os:
 env:
   matrix:
     - TARGETS="check"
-    - TARGETS="-C libbeat testsuite"
     - TARGETS="-C filebeat testsuite"
-    - TARGETS="-C packetbeat testsuite"
+    - TARGETS="-C heartbeat testsuite"
+    - TARGETS="-C libbeat testsuite"
     - TARGETS="-C metricbeat testsuite"
+    - TARGETS="-C packetbeat testsuite"
     - TARGETS="-C libbeat crosscompile"
     - TARGETS="-C metricbeat crosscompile"
     - TARGETS="-C winlogbeat crosscompile"
@@ -47,6 +48,8 @@ matrix:
       env: TARGETS="-C winlogbeat crosscompile"
     - os: osx
       env: TARGETS="-C libbeat testsuite"
+    - os: osx
+      env: TARGETS="-C hearbeat testsuite"
     - os: osx
       env: TARGETS="-C metricbeat testsuite"
     - os: osx
