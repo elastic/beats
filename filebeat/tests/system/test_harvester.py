@@ -96,11 +96,17 @@ class Test(BaseTest):
 
         os.remove(testfile1)
 
+        # Make sure state is written
+        self.wait_until(
+            lambda: self.log_contains_count(
+                "Write registry file") > 1,
+            max_timeout=10)
+
         # Wait until error shows up on windows
         self.wait_until(
             lambda: self.log_contains(
                 "Closing because close_removed is enabled"),
-            max_timeout=15)
+            max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -583,6 +589,11 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
+        # Make sure state is written
+        self.wait_until(
+            lambda: self.log_contains_count(
+                "Write registry file") > 1,
+            max_timeout=10)
 
         # Make sure symlink is skipped
         self.wait_until(
