@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
+var CPUService CPUService
 var statsList = make([]dc.Stats, 3)
 
 func TestCPUService_PerCpuUsage(t *testing.T) {
@@ -68,7 +69,6 @@ func TestCPUService_TotalUsage(t *testing.T) {
 		{statsList[1], 0.50},
 		{statsList[2], 0},
 	}
-	CPUService := NewCpuService()
 	for _, tt := range testCase {
 		out := CPUService.totalUsage(&tt.given)
 		if out != tt.expected {
@@ -92,7 +92,6 @@ func TestCPUService_UsageInKernelmode(t *testing.T) {
 		{statsList[1], 0.50},
 		{statsList[2], 0},
 	}
-	CPUService := NewCpuService()
 	for _, tt := range testCase {
 		out := CPUService.usageInKernelmode(&tt.given)
 		if out != tt.expected {
@@ -116,7 +115,6 @@ func TestCPUService_UsageInUsermode(t *testing.T) {
 		{statsList[1], 0},
 		{statsList[2], 1},
 	}
-	CPUService := NewCpuService()
 	for _, tt := range testCase {
 		out := CPUService.usageInUsermode(&tt.given)
 		if out != tt.expected {
@@ -182,7 +180,6 @@ func TestCPUService_GetCpuStats(t *testing.T) {
 		},
 	}
 
-	CPUService := NewCpuService()
 	cpuData := CPUService.getCpuStats(&cpuStatsStruct)
 	event := eventMapping(&cpuData)
 	//THEN
