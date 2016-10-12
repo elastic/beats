@@ -17,10 +17,10 @@ type CPURaw struct {
 }
 
 type CPUCalculator interface {
-	PerCpuUsage(stats *dc.Stats) common.MapStr
-	TotalUsage(stats *dc.Stats) float64
-	UsageInKernelmode(stats *dc.Stats) float64
-	UsageInUsermode(stats *dc.Stats) float64
+	perCpuUsage(stats *dc.Stats) common.MapStr
+	totalUsage(stats *dc.Stats) float64
+	usageInKernelmode(stats *dc.Stats) float64
+	usageInUsermode(stats *dc.Stats) float64
 }
 
 type CPUStats struct {
@@ -62,23 +62,23 @@ func (c *CPUService) getCpuStats(myRawStat *docker.DockerStat) CPUStats {
 
 func getOldCpu(stats *dc.Stats) CPURaw {
 	return CPURaw{
-		PerCpuUsage:       stats.PreCPUStats.CPUUsage.PercpuUsage,
-		TotalUsage:        stats.PreCPUStats.CPUUsage.TotalUsage,
-		UsageInKernelmode: stats.PreCPUStats.CPUUsage.UsageInKernelmode,
-		UsageInUsermode:   stats.PreCPUStats.CPUUsage.UsageInUsermode,
+		PerCpuUsage:       stats.PreCPUStats.CPUUsage.percpuUsage,
+		TotalUsage:        stats.PreCPUStats.CPUUsage.totalUsage,
+		UsageInKernelmode: stats.PreCPUStats.CPUUsage.usageInKernelmode,
+		UsageInUsermode:   stats.PreCPUStats.CPUUsage.usageInUsermode,
 	}
 }
 
 func getNewCpu(stats *dc.Stats) CPURaw {
 	return CPURaw{
-		PerCpuUsage:       stats.CPUStats.CPUUsage.PercpuUsage,
-		TotalUsage:        stats.CPUStats.CPUUsage.TotalUsage,
-		UsageInKernelmode: stats.CPUStats.CPUUsage.UsageInKernelmode,
-		UsageInUsermode:   stats.CPUStats.CPUUsage.UsageInUsermode,
+		PerCpuUsage:       stats.CPUStats.CPUUsage.percpuUsage,
+		TotalUsage:        stats.CPUStats.CPUUsage.totalUsage,
+		UsageInKernelmode: stats.CPUStats.CPUUsage.usageInKernelmode,
+		UsageInUsermode:   stats.CPUStats.CPUUsage.usageInUsermode,
 	}
 }
 
-func (c *CPUService) PerCpuUsage(stats *dc.Stats) common.MapStr {
+func (c *CPUService) perCpuUsage(stats *dc.Stats) common.MapStr {
 	var output common.MapStr
 	if cap(getNewCpu(stats).PerCpuUsage) == cap(getOldCpu(stats).PerCpuUsage) {
 		output = common.MapStr{}
@@ -89,15 +89,15 @@ func (c *CPUService) PerCpuUsage(stats *dc.Stats) common.MapStr {
 	return output
 }
 
-func (c *CPUService) TotalUsage(stats *dc.Stats) float64 {
+func (c *CPUService) totalUsage(stats *dc.Stats) float64 {
 	return c.calculateLoad(int64(getNewCpu(stats).TotalUsage - getOldCpu(stats).TotalUsage))
 }
 
-func (c *CPUService) UsageInKernelmode(stats *dc.Stats) float64 {
+func (c *CPUService) usageInKernelmode(stats *dc.Stats) float64 {
 	return c.calculateLoad(int64(getNewCpu(stats).UsageInKernelmode - getOldCpu(stats).UsageInKernelmode))
 }
 
-func (c *CPUService) UsageInUsermode(stats *dc.Stats) float64 {
+func (c *CPUService) usageInUsermode(stats *dc.Stats) float64 {
 	return c.calculateLoad(int64(getNewCpu(stats).UsageInUsermode - getOldCpu(stats).UsageInUsermode))
 }
 
