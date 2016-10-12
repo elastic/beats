@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/pkg/errors"
 )
 
 type includeFields struct {
@@ -47,23 +48,17 @@ func newIncludeFields(c common.Config) (processors.Processor, error) {
 
 func (f includeFields) Run(event common.MapStr) (common.MapStr, error) {
 	filtered := common.MapStr{}
-	errors := []string{}
+	errs := []string{}
 
 	for _, field := range f.Fields {
-		hasKey, err := event.HasKey(field)
-		if err != nil {
-			errors = append(errors, err.Error())
-		}
-
-		if hasKey {
-			errorOnCopy := event.CopyFieldsTo(filtered, field)
-			if errorOnCopy != nil {
-				errors = append(errors, err.Error())
-			}
+		err := event.CopyFieldsTo(filtered, field)
+		// Ignore errors caused by a field not existing in the event.
+		if err != nil && errors.Cause(err) != common.ErrKeyNotFound {
+			errs = append(errs, err.Error())
 		}
 	}
 
-	return filtered, fmt.Errorf(strings.Join(errors, ", "))
+	return filtered, fmt.Errorf(strings.Join(errs, ", "))
 }
 
 func (f includeFields) String() string {
