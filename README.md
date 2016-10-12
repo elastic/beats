@@ -17,8 +17,10 @@ following folders:
 Folder  | Description
 --- | ---
 [libbeat](https://github.com/elastic/beats/tree/master/libbeat) | The Go framework for creating new Beats
-[Packetbeat](https://github.com/elastic/beats/tree/master/packetbeat) | Tap into your wire data
 [Filebeat](https://github.com/elastic/beats/tree/master/filebeat) | Lightweight log forwarder to Logstash & Elasticsearch
+[Heartbeat](https://github.com/elastic/beats/tree/master/heartbeat) | Testing service availability using PING based on ICMP, TCP or higher level protocols
+[Metricbeat](https://github.com/elastic/beats/tree/master/metricbeat) | Fetches sets of metrics from the operating system and services
+[Packetbeat](https://github.com/elastic/beats/tree/master/packetbeat) | Tap into your wire data
 [Winlogbeat](https://github.com/elastic/beats/tree/master/winlogbeat) | Sends Windows Event logs
 
 In addition to the above Beats, which are officially supported by
