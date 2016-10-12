@@ -8,7 +8,7 @@ ARCHDIR=${BASEDIR}/../../
 # executed from the top directory
 runid=darwin-$BEAT-$ARCH
 
-cat ${BUILD_DIR}/package.yml ${ARCHDIR}/archs/$ARCH.yml ${ARCHDIR}/version.yml > ${BUILD_DIR}/settings-$runid.yml
+cat ${BUILD_DIR}/package.yml ${ARCHDIR}/archs/$ARCH.yml > ${BUILD_DIR}/settings-$runid.yml
 gotpl ${BASEDIR}/run.sh.j2 < ${BUILD_DIR}/settings-$runid.yml > ${BUILD_DIR}/run-$runid.sh
 chmod +x ${BUILD_DIR}/run-$runid.sh
 
