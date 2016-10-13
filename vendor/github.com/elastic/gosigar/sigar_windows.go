@@ -36,7 +36,6 @@ var (
 )
 
 const (
-	PROCESS_ALL_ACCESS = 0x001f0fff
 	TH32CS_SNAPPROCESS = 0x02
 	MAX_PATH           = 260
 )
@@ -79,7 +78,43 @@ type Win32_Process struct {
 	CommandLine string
 }
 
+// processQueryLimitedInfoAccess is set to PROCESS_QUERY_INFORMATION for Windows
+// 2003 and XP where PROCESS_QUERY_LIMITED_INFORMATION is unknown. For all newer
+// OS versions it is set to PROCESS_QUERY_LIMITED_INFORMATION.
+var processQueryLimitedInfoAccess = PROCESS_QUERY_LIMITED_INFORMATION
+
 func init() {
+	major, minor, _ := GetWindowsVersion()
+
+	if !isWindowsVistaOrGreater(major, minor) {
+		// PROCESS_QUERY_LIMITED_INFORMATION cannot be used on 2003 or XP.
+		processQueryLimitedInfoAccess = syscall.PROCESS_QUERY_INFORMATION
+	}
+}
+
+func isWindowsVistaOrGreater(major, minor int) bool {
+	// Vista is 6.0.
+	return major >= 6 && minor >= 0
+}
+
+// GetWindowsVersion returns the Windows version information. Applications not
+// manifested for Windows 8.1 or Windows 10 will return the Windows 8 OS version
+// value (6.2).
+//
+// For a table of version numbers see:
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms724833(v=vs.85).aspx
+func GetWindowsVersion() (major, minor, build int) {
+	// https://msdn.microsoft.com/en-us/library/windows/desktop/ms724439(v=vs.85).aspx
+	ver, err := syscall.GetVersion()
+	if err != nil {
+		// GetVersion should never return an error.
+		panic(fmt.Errorf("GetVersion failed: %v", err))
+	}
+
+	major = int(ver & 0xFF)
+	minor = int(ver >> 8 & 0xFF)
+	build = int(ver >> 16)
+	return major, minor, build
 }
 
 func (self *LoadAverage) Get() error {
@@ -102,9 +137,8 @@ func (self *Mem) Get() error {
 	self.Total = uint64(statex.ullTotalPhys)
 	self.Free = uint64(statex.ullAvailPhys)
 	self.Used = self.Total - self.Free
-	vtotal := uint64(statex.ullTotalVirtual)
-	self.ActualFree = uint64(statex.ullAvailVirtual)
-	self.ActualUsed = vtotal - self.ActualFree
+	self.ActualFree = self.Free
+	self.ActualUsed = self.Used
 
 	return nil
 }
@@ -289,7 +323,7 @@ func (self *ProcState) Get(pid int) error {
 
 func GetProcName(pid int) (string, error) {
 
-	handle, err := syscall.OpenProcess(syscall.PROCESS_QUERY_INFORMATION, false, uint32(pid))
+	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
 
 	defer syscall.CloseHandle(handle)
 
@@ -355,7 +389,7 @@ func GetProcCredName(pid int) (string, error) {
 
 func GetProcStatus(pid int) (RunState, error) {
 
-	handle, err := syscall.OpenProcess(syscall.PROCESS_QUERY_INFORMATION, false, uint32(pid))
+	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
 
 	defer syscall.CloseHandle(handle)
 
@@ -397,7 +431,7 @@ func GetParentPid(pid int) (int, error) {
 }
 
 func (self *ProcMem) Get(pid int) error {
-	handle, err := syscall.OpenProcess(PROCESS_ALL_ACCESS, false, uint32(pid))
+	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess|PROCESS_VM_READ, false, uint32(pid))
 
 	defer syscall.CloseHandle(handle)
 
@@ -429,7 +463,7 @@ func (self *ProcMem) Get(pid int) error {
 }
 
 func (self *ProcTime) Get(pid int) error {
-	handle, err := syscall.OpenProcess(syscall.PROCESS_QUERY_INFORMATION, false, uint32(pid))
+	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
 
 	defer syscall.CloseHandle(handle)
 
