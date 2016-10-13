@@ -256,7 +256,7 @@ update: python-env
 	echo "Generate index pattern"
 	-rm -f $(PWD)/etc/kibana/index-pattern/${BEATNAME}.json
 	mkdir -p $(PWD)/etc/kibana/index-pattern
-	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index ${BEATNAME}-* --libbeat ${ES_BEATS}/libbeat --beat $(PWD)
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index '${BEATNAME}-*' --libbeat ${ES_BEATS}/libbeat --beat $(PWD)
 
 
 # Builds the documents for the beat
