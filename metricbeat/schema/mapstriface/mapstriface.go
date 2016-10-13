@@ -57,6 +57,8 @@ import (
 	"fmt"
 	"time"
 
+	"encoding/json"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/schema"
@@ -84,9 +86,30 @@ func Dict(key string, s schema.Schema) ConvMap {
 	return ConvMap{Key: key, Schema: s}
 }
 
-func toStr(key string, data map[string]interface{}) (interface{}, error) {
+func toStrFromNum(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, exists := data[key]
 	if !exists {
+		return false, fmt.Errorf("Key not found")
+	}
+	switch emptyIface.(type) {
+	case int, int32, int64, uint, uint32, uint64, float32, float64:
+		return fmt.Sprintf("%v", emptyIface), nil
+	case json.Number:
+		return string(emptyIface.(json.Number)), nil
+	default:
+		return "", fmt.Errorf("Expected number, found %T", emptyIface)
+	}
+}
+
+// StrFromNum creates a schema.Conv object that transforms numbers to strings.
+func StrFromNum(key string, opts ...schema.SchemaOption) schema.Conv {
+	return schema.SetOptions(schema.Conv{Key: key, Func: toStrFromNum}, opts)
+}
+
+func toStr(key string, data map[string]interface{}) (interface{}, error) {
+	emptyIface, err := common.MapStr(data).GetValue(key)
+	if err != nil {
+		fmt.Println(err)
 		return "", fmt.Errorf("Key not found")
 	}
 	str, ok := emptyIface.(string)
@@ -96,7 +119,7 @@ func toStr(key string, data map[string]interface{}) (interface{}, error) {
 	return str, nil
 }
 
-// Str creates a schema.Conv object for converting strings
+// Str creates a schema.Conv object for converting strings.
 func Str(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toStr}, opts)
 }
@@ -113,7 +136,7 @@ func toBool(key string, data map[string]interface{}) (interface{}, error) {
 	return boolean, nil
 }
 
-// Bool creates a Conv object for converting booleans
+// Bool creates a Conv object for converting booleans.
 func Bool(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toBool}, opts)
 }
@@ -130,6 +153,17 @@ func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 		return int64(emptyIface.(int)), nil
 	case float64:
 		return int64(emptyIface.(float64)), nil
+	case json.Number:
+		num := emptyIface.(json.Number)
+		i64, err := num.Int64()
+		if err == nil {
+			return i64, nil
+		}
+		f64, err := num.Float64()
+		if err == nil {
+			return int64(f64), nil
+		}
+		return 0, fmt.Errorf("Expected integer, found json.Number (%v) that cannot be converted", num)
 	default:
 		return 0, fmt.Errorf("Expected integer, found %T", emptyIface)
 	}
