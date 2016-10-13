@@ -1,5 +1,12 @@
 package gosigar
 
+// Process-specific access rights. Others are declared in the syscall package.
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms684880(v=vs.85).aspx
+const (
+	PROCESS_QUERY_LIMITED_INFORMATION uint32 = 0x1000
+	PROCESS_VM_READ                   uint32 = 0x0010
+)
+
 // Use "GOOS=windows go generate -v -x ." to generate the source.
 
 // Add -trace to enable debug prints around syscalls.
