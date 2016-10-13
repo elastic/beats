@@ -26,7 +26,7 @@ include ${ES_BEATS}/libbeat/scripts/Makefile
 kibana:
 	-rm -r etc/kibana
 	mkdir -p etc/kibana
-	-cp -r module/*/_meta/kibana/ etc/kibana
+	-cp -r module/*/_meta/kibana etc/
 
 # Collects all module and metricset fields
 .PHONY: fields

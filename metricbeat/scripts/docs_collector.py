@@ -16,7 +16,7 @@ This file is generated! See scripts/docs_collector.py
 """
 
     # Iterate over all modules
-    for module in os.listdir(base_dir):
+    for module in sorted(os.listdir(base_dir)):
 
         module_doc = path + "/" + module + "/_meta/docs.asciidoc"
 
@@ -76,7 +76,7 @@ metricbeat.modules:
         module_includes = ""
 
         # Iterate over all metricsets
-        for metricset in os.listdir(base_dir + "/" + module):
+        for metricset in sorted(os.listdir(base_dir + "/" + module)):
 
             metricset_docs = path + "/" + module + "/" + metricset + "/_meta/docs.asciidoc"
 
