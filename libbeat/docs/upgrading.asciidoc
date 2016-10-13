@@ -3,7 +3,7 @@
 
 This section gives general recommendations for upgrading the Beats.
 
-=== Upgrading between minor versions
+=== Upgrading Between Minor Versions
 
 As a general rule, upgrading between minor versions (e.g. 5.x to 5.y, where x <
 y) can be done by simply installing the new release and restarting the Beat
@@ -25,24 +25,23 @@ upgrading the Elasticsearch mapping templates.
 Before upgrading your Beats, please review the <<breaking-changes, breaking
 changes>> doc.
 
-In addition to the subsections here, please read the
-<<upgrade-mapping-template>> 
+In addition to the subsections here, please read <<upgrade-mapping-template>>.
 
-==== Configuration file migration
+==== Migrating Configuration Files
 
-Beats 5.0 come with several backwards incompatible configuration changes.
+Beats 5.0 comes with several backwards incompatible configuration changes.
 However, we provide a script that can automatically fixup the most common
-settings in your configuration file.
+settings in your configuration files.
 
-This script can be found in the Beats download packages. For the `.tar.gz` and
-`.zip` archives, it is found under:
+You can find this script in the Beats download packages. For the `.tar.gz` and
+`.zip` archives, look under:
 
 [source,shell]
 ------------------------------------------------------------------------------
 ./scripts/migrate_beat_config_1_x_to_5_0.py
 ------------------------------------------------------------------------------
 
-For the `.deb` and `.rpm` packages it is found under the
+For the `.deb` and `.rpm` packages, look under the
 `/usr/share/<beatname>/scripts/` folder, for example:
 
 
@@ -54,7 +53,7 @@ For the `.deb` and `.rpm` packages it is found under the
 Python 2.7 or later is required for executing the migration script.
 
 To upgrade your configuration file automatically, simply pass it as an argument
-to the migration script, e.g.:
+to the migration script, for example:
 
 [source,shell]
 ------------------------------------------------------------------------------
@@ -62,20 +61,20 @@ to the migration script, e.g.:
 Backup file created: packetbeat.yml.bak
 ------------------------------------------------------------------------------
 
-The script will automatically create a backup file and overwrite it with the
-upgraded version. You can also use the `--dry` option, which doesn't modify the
-input file, but outputs the upgraded version to stdout instead.
+The script will automatically create a backup file and overwrite the input file
+with the upgraded version. You can also use the `--dry` option, which doesn't
+modify the input file, but outputs the upgraded version to stdout instead.
 
-==== Filebeat registry file location and format
+==== Filebeat Registry File Location and Format
 
-Filebeat stores the read offset in a registry file that it persist to disk. The
-format of this file has changed in version 5.0, but Filebeat automatically
-upgrades the format on first run, so there's normally no action required on
+Filebeat stores the read offset in a registry file that it persists to disk.
+The format of this file has changed in version 5.0, but Filebeat automatically
+upgrades the format on the first run, so there's normally no action required on
 upgrading.
 
 If you have installed Filebeat from the DEB or RPM packages, the location of the
 file stays the same as well (`/var/lib/filebeat/registry`). Also if you've
-installed Filebeat as a service on Windows the location stays the same
+installed Filebeat as a service on Windows, the location stays the same
 (`C:\ProgramData\filebeat\registry`).
 
 If you are running Filebeat from the `tar.gz` archive, however, the location of
@@ -88,11 +87,11 @@ recommend copying the `.filebeat` file to `data/registry`.
 
 With the Beats 5.0 release, Topbeat is replaced by Metricbeat, which offers more
 functionality. More precisely, the Topbeat functionality is roughly equivalent
-with the "system" module in Metricbeat.
+to the "system" module in Metricbeat.
 
-While there is no automatic way to convert a Topbeat configuration file in the
-equivalent Metricbeat configuration file, both configuration are simple enough
-that migrating shouldn't take long.
+While there is no automatic way to convert a Topbeat configuration file to the
+equivalent of a Metricbeat configuration file, both configurations are simple
+enough that migrating shouldn't take long.
 
 For example, this is the input section of the Topbeat configuration file:
 
@@ -152,17 +151,17 @@ metricbeat.modules:
   processes: ['.*']
 ------------------------------------------------------------------------------
 
-The rest of the configuration options (outputs, name, tags) stay the same or can
+The remaining configuration options (outputs, name, tags) stay the same or can
 be upgraded using the migration script.
 
 [[upgrade-mapping-template]]
-=== Upgrade the Elasticsearch mapping template
+=== Upgrading the Elasticsearch Mapping Template
 
-By default, the Elasticsearch mapping template which comes with the Beats is not
+By default, the Elasticsearch mapping template that comes with the Beats is not
 re-installed if it already exists.  This means that if the new Beats version
 adds new fields (e.g. a new module in Metricbeat), they won't be reflected in
 the Elasticsearch mapping, which can result in visualization problems or
-incorect data.
+incorrect data.
 
 You can set the `output.elasticsearch.template.overwrite` option to `true` to
 make the Beats install the new mapping template even if a template with the same
@@ -197,7 +196,7 @@ DELETE /packetbeat-2016.09.20
 ------------------------------------------------------------------------------
 
 Note that the reindex API command can take a long time, depending on the size of
-the index. It is recommended that the Beat is stopped during this time, so the
+the index. It is recommended that you stop the Beat during this time, so the
 order of operations should be:
 
 1. Stop the old version of the Beat
