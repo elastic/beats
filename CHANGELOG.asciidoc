@@ -34,6 +34,8 @@ https://github.com/elastic/beats/compare/v5.0.0-rc1...5.0[Check the HEAD diff]
 *Metricbeat*
 
 - Fix high CPU usage on macOS when encountering processes with long command lines. {issue}2747[2747]
+- Fix high value of `system.memory.actual.free` and `system.memory.actual.used`. {issue}2653[2653]
+- Change several `OpenProcess` calls on Windows to request the lowest possible access provilege.  {issue}1897[1897]
 
 *Packetbeat*
 
