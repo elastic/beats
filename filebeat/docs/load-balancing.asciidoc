@@ -1,0 +1,69 @@
+[[load-balancing]]
+== Configuring Load Balancing
+
+//REVIEWERS: Which outputs support load balancing? I only see the loadbalance option described under Logstash and Redis. Are any other outputs supported?
+
+Filebeat provides configuration options that you can use to fine
+tune load balancing when sending events to multiple hosts. 
+
+To enable load balancing, you specify `load_balance: true` when you configure
+the output. For example:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+output.logstash:
+  hosts: ["localhost:5044", "localhost:5045"]
+  loadbalance: true
+-------------------------------------------------------------------------------
+
+Filebeat can perform load balancing in a few different modes:
+
+* **Send events to one host after another:**
++
+By default, when you configure Filebeat to send events to multiple hosts
+(`load_balance: true`), Filebeat will send the events to one host after
+another. This mode requires the least memory and CPU usage.
+
+* **Send events to `N` hosts in lock-step:**
++
+You can configure Filebeat to send events to `N` hosts in lock-step by setting
+`spool_size = N * bulk_max_size`. This mode requires more memory and CPU usage
+than the previous mode.
++
+Example:
++
+[source,yaml]
+-------------------------------------------------------------------------------
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /var/log/*.log
+filebeat.spool_size: 4096
+output.logstash:
+  hosts: ["localhost:5044", "localhost:5045"]
+  loadbalance: true
+  bulk_max_size: 2048
+-------------------------------------------------------------------------------
+
+
+//REVIEWERS: Please confirm the accuracy of the config examples here. I'm guessing at the config and haven't tested these examples. It would probably be better to use a more realistic path for /var/log/*.log (please suggest one). I'd like to show the full config because it helps users understand where the settings fit into the overall yaml file.
+
+//REVIEWERS: I'm a bit confused in the above example because bulk_max_size does not appear under output.logstash in filebeat.full.yml. Is this intentional? It does show up as an option in https://www.elastic.co/guide/en/beats/filebeat/5.0/logstash-output.html, so I assume it's valid, correct?
+
+* **Send events in parallel and asynchronously:**
++
+You can configure Filebeat to send events in parallel and asynchronously by setting `publish_async: true`. This mode can improve load-balancing throughput, but requires the most memory and CPU usage.
++
+Example:
++
+[source,yaml]
+-------------------------------------------------------------------------------
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /var/log/*.log
+filebeat.publish_async: false
+output.logstash:
+  hosts: ["localhost:5044", "localhost:5045"]
+  loadbalance: true
+-------------------------------------------------------------------------------
