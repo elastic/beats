@@ -233,12 +233,18 @@ func (s *Scheduler) run() {
 			// Try to start waiting tasks of already running jobs.
 			// The s.tasks waiting list will only have any entries if `s.limit > 0`.
 			if s.limit > 0 && (s.active < s.limit) {
-				N := s.limit - s.active
-				debugf("start %v waiting tasks", N)
-				tasks := s.tasks[:N]
-				s.tasks = s.tasks[N:]
-				for _, t := range tasks {
-					s.runTask(t)
+				if T := uint(len(s.tasks)); T > 0 {
+					N := s.limit - s.active
+					debugf("start up to %v waiting tasks (%v)", N, T)
+					if N > T {
+						N = T
+					}
+
+					tasks := s.tasks[:N]
+					s.tasks = s.tasks[N:]
+					for _, t := range tasks {
+						s.runTask(t)
+					}
 				}
 			}
 
