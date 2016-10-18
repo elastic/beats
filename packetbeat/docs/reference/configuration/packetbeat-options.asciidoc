@@ -94,6 +94,9 @@ Packetbeat supports three sniffer types:
    http://www.ntop.org/products/pf_ring/[project]. This setting provides the best
    sniffing speed, but it requires a kernel module, and it's Linux-specific.
 
+NOTE: The `pf_ring` option requires re-compilation of Packetbeat and is not
+      officially supported by Elastic at this moment.
+
 The default sniffer type is `pcap`.
 
 Here is an example configuration that specifies
@@ -105,9 +108,9 @@ packetbeat.interfaces.device: eth0
 packetbeat.interfaces.type: af_packet
 ------------------------------------------------------------------------------
 
-On Linux, if you are trying to optimize the CPU usage of Packetbeat,
-we recommend trying the `af_packet` and `pf_ring` options. Read <<capturing-options>>
-for more details.
+On Linux, if you are trying to optimize the CPU usage of Packetbeat, we
+recommend trying the `af_packet` option. Read <<capturing-options>> for more
+details.
 
 If you use the `af_packet` sniffer, you can tune its behaviour by specifying the
 following options:
