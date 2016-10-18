@@ -19,23 +19,23 @@ import (
 )
 
 const (
+	// metadataHost is the IP that each of the cloud providers supported here
+	// use for their metadata service.
+	metadataHost = "169.254.169.254"
+
 	// AWS EC2 Metadata Service
-	ec2MetadataHost        = "169.254.169.254"
 	ec2InstanceIdentityURI = "/2014-02-25/dynamic/instance-identity/document"
 
 	// DigitalOcean Metadata Service
-	doMetadataHost = "169.254.169.254"
-	doMetadataURI  = "/metadata/v1.json"
+	doMetadataURI = "/metadata/v1.json"
 
 	// Google GCE Metadata Service
-	gceMetadataHost = "169.254.169.254"
-	gceMetadataURI  = "/computeMetadata/v1/?recursive=true&alt=json"
+	gceMetadataURI = "/computeMetadata/v1/?recursive=true&alt=json"
 )
 
 var debugf = logp.MakeDebug("filters")
 
 var (
-	ec2URL    = "http://" + ec2MetadataHost + ec2InstanceIdentityURI
 	ec2Schema = s.Schema{
 		"instance_id":       c.Str("instanceId"),
 		"machine_type":      c.Str("instanceType"),
@@ -43,14 +43,12 @@ var (
 		"availability_zone": c.Str("availabilityZone"),
 	}.Apply
 
-	doURL    = "http://" + doMetadataHost + doMetadataURI
 	doSchema = s.Schema{
 		"instance_id": c.StrFromNum("droplet_id"),
 		"region":      c.Str("region"),
 	}.Apply
 
 	gceHeaders = map[string]string{"Metadata-Flavor": "Google"}
-	gceURL     = "http://" + gceMetadataHost + gceMetadataURI
 	gceSchema  = func(m map[string]interface{}) common.MapStr {
 		out := common.MapStr{}
 
@@ -159,7 +157,7 @@ func writeResult(ctx context.Context, c chan result, r result) error {
 // hosting providers supported by this processor. It wait for the results to
 // be returned or for a timeout to occur then returns the results that
 // completed in time.
-func fetchMetadata(timeout time.Duration) *result {
+func fetchMetadata(doURL, ec2URL, gceURL string, timeout time.Duration) *result {
 	debugf("add_cloud_metadata: starting to fetch metadata, timeout=%v", timeout)
 	start := time.Now()
 	defer func() {
@@ -211,16 +209,24 @@ type addCloudMetadata struct {
 
 func newCloudMetadata(c common.Config) (processors.Processor, error) {
 	config := struct {
-		Timeout time.Duration `config:"timeout"` // Amount of time to wait for responses from the metadata services.
+		MetadataHostAndPort string        `config:"host"`    // Specifies the host and port of the metadata service (for testing purposes only).
+		Timeout             time.Duration `config:"timeout"` // Amount of time to wait for responses from the metadata services.
 	}{
-		Timeout: 3 * time.Second,
+		MetadataHostAndPort: metadataHost,
+		Timeout:             3 * time.Second,
 	}
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to unpack add_cloud_metadata config")
 	}
 
-	result := fetchMetadata(config.Timeout)
+	var (
+		doURL  = "http://" + config.MetadataHostAndPort + doMetadataURI
+		ec2URL = "http://" + config.MetadataHostAndPort + ec2InstanceIdentityURI
+		gceURL = "http://" + config.MetadataHostAndPort + gceMetadataURI
+	)
+
+	result := fetchMetadata(doURL, ec2URL, gceURL, config.Timeout)
 	if result == nil {
 		logp.Info("add_cloud_metadata: hosting provider type not detected.")
 		return addCloudMetadata{}, nil
