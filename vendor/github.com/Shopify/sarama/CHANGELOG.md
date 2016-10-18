@@ -1,5 +1,20 @@
 # Changelog
 
+#### Version 1.10.1 (2016-08-30)
+
+Bug Fixes:
+ - Fix the documentation for `HashPartitioner` which was incorrect
+   ([#717](https://github.com/Shopify/sarama/pull/717)).
+ - Permit client creation even when it is limited by ACLs
+   ([#722](https://github.com/Shopify/sarama/pull/722)).
+ - Several fixes to the consumer timer optimization code, regressions introduced
+   in v1.10.0. Go's timers are finicky
+   ([#730](https://github.com/Shopify/sarama/pull/730),
+    [#733](https://github.com/Shopify/sarama/pull/733),
+    [#734](https://github.com/Shopify/sarama/pull/734)).
+ - Handle consuming compressed relative offsets with Kafka 0.10
+   ([#735](https://github.com/Shopify/sarama/pull/735)).
+
 #### Version 1.10.0 (2016-08-02)
 
 _Important:_ As of Sarama 1.10 it is necessary to tell Sarama the version of
