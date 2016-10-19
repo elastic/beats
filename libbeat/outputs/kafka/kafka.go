@@ -4,9 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Shopify/sarama"
+	metrics "github.com/rcrowley/go-metrics"
+	"github.com/rcrowley/go-metrics/exp"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
@@ -35,9 +38,24 @@ const (
 	defaultMaxWaitRetry = 60 * time.Second
 )
 
+var kafkaMetricsRegistryInstance metrics.Registry
+
 func init() {
 	sarama.Logger = kafkaLogger{}
+
+	reg := metrics.NewPrefixedRegistry("libbeat.kafka.")
+
+	// Note: registers /debug/metrics handler for displaying all expvar counters
+	exp.Exp(reg)
+	kafkaMetricsRegistryInstance = reg
+
 	outputs.RegisterOutputPlugin("kafka", New)
+}
+
+var kafkaMetricsOnce sync.Once
+
+func kafkaMetricsRegistry() metrics.Registry {
+	return kafkaMetricsRegistryInstance
 }
 
 var debugf = logp.MakeDebug("kafka")
@@ -71,8 +89,9 @@ var (
 		"0.9":     sarama.V0_9_0_1,
 
 		"0.10.0.0": sarama.V0_10_0_0,
-		"0.10.0":   sarama.V0_10_0_0,
-		"0.10":     sarama.V0_10_0_0,
+		"0.10.0.1": sarama.V0_10_0_1,
+		"0.10.0":   sarama.V0_10_0_1,
+		"0.10":     sarama.V0_10_0_1,
 	}
 )
 
@@ -313,5 +332,6 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	}
 	k.Version = version
 
+	k.MetricRegistry = kafkaMetricsRegistry()
 	return k, nil
 }
