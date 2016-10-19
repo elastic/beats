@@ -181,7 +181,16 @@ output.elasticsearch:
 
 ===== pipeline
 
-format string value configuring the ingest node pipeline to write events to.
+A format string value that specifies the ingest node pipeline to write events to.
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  pipeline: my_pipeline_id
+------------------------------------------------------------------------------
+
+For more information, see <<configuring-ingest-node>>.
 
 ===== pipelines
 
