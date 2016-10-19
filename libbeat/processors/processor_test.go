@@ -41,7 +41,7 @@ func TestBadConfig(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"contains": map[string]string{
@@ -82,7 +82,7 @@ func TestIncludeFields(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"contains": map[string]string{
@@ -150,7 +150,7 @@ func TestIncludeFields1(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"regexp": map[string]string{
@@ -203,7 +203,7 @@ func TestIncludeFields1(t *testing.T) {
 func TestDropFields(t *testing.T) {
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"drop_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"equals": map[string]string{
@@ -268,7 +268,7 @@ func TestMultipleIncludeFields(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"contains": map[string]string{
@@ -278,7 +278,7 @@ func TestMultipleIncludeFields(t *testing.T) {
 				"fields": []string{"proc"},
 			},
 		},
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"fields": []string{"proc.cpu.start_time", "proc.cpu.total_p", "proc.mem.rss_p", "proc.cmdline"},
 			},
@@ -365,7 +365,7 @@ func TestDropEvent(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"drop_event": map[string]interface{}{
 				"when": map[string]interface{}{
 					"range": map[string]interface{}{
@@ -418,7 +418,7 @@ func TestEmptyCondition(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"drop_event": map[string]interface{}{},
 		},
 	}
@@ -463,7 +463,7 @@ func TestBadCondition(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"drop_event": map[string]interface{}{
 				"when": map[string]interface{}{
 					"equal": map[string]string{
@@ -502,7 +502,7 @@ func TestMissingFields(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"equals": map[string]string{
@@ -539,7 +539,7 @@ func TestBadConditionConfig(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"fake": map[string]string{
@@ -573,7 +573,7 @@ func TestBadConditionConfig(t *testing.T) {
 func TestDropMissingFields(t *testing.T) {
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"drop_fields": map[string]interface{}{
 				"fields": []string{"foo.bar", "proc.cpu", "proc.sss", "beat", "mem"},
 			},

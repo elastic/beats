@@ -79,15 +79,15 @@ func (amqp *Amqp) init(results publish.Transactions, config *amqpConfig) error {
 
 func (amqp *Amqp) initMethodMap() {
 	amqp.MethodMap = map[codeClass]map[codeMethod]AmqpMethod{
-		connectionCode: map[codeMethod]AmqpMethod{
+		connectionCode: {
 			connectionClose:   connectionCloseMethod,
 			connectionCloseOk: okMethod,
 		},
-		channelCode: map[codeMethod]AmqpMethod{
+		channelCode: {
 			channelClose:   channelCloseMethod,
 			channelCloseOk: okMethod,
 		},
-		exchangeCode: map[codeMethod]AmqpMethod{
+		exchangeCode: {
 			exchangeDeclare:   exchangeDeclareMethod,
 			exchangeDeclareOk: okMethod,
 			exchangeDelete:    exchangeDeleteMethod,
@@ -97,7 +97,7 @@ func (amqp *Amqp) initMethodMap() {
 			exchangeUnbind:    exchangeUnbindMethod,
 			exchangeUnbindOk:  okMethod,
 		},
-		queueCode: map[codeMethod]AmqpMethod{
+		queueCode: {
 			queueDeclare:   queueDeclareMethod,
 			queueDeclareOk: queueDeclareOkMethod,
 			queueBind:      queueBindMethod,
@@ -109,7 +109,7 @@ func (amqp *Amqp) initMethodMap() {
 			queueDelete:    queueDeleteMethod,
 			queueDeleteOk:  queueDeleteOkMethod,
 		},
-		basicCode: map[codeMethod]AmqpMethod{
+		basicCode: {
 			basicConsume:   basicConsumeMethod,
 			basicConsumeOk: basicConsumeOkMethod,
 			basicCancel:    basicCancelMethod,
@@ -126,7 +126,7 @@ func (amqp *Amqp) initMethodMap() {
 			basicRecoverOk: okMethod,
 			basicNack:      basicNackMethod,
 		},
-		txCode: map[codeMethod]AmqpMethod{
+		txCode: {
 			txSelect:     txSelectMethod,
 			txSelectOk:   okMethod,
 			txCommit:     txCommitMethod,
@@ -251,7 +251,7 @@ func (amqp *Amqp) handleAmqpRequest(msg *AmqpMessage) {
 	}
 
 	trans.ts = msg.Ts
-	trans.Ts = int64(trans.ts.UnixNano() / 1000)
+	trans.Ts = trans.ts.UnixNano() / 1000
 	trans.JsTs = msg.Ts
 	trans.Src = common.Endpoint{
 		Ip:   msg.TcpTuple.Src_ip.String(),
@@ -357,7 +357,7 @@ func (amqp *Amqp) handlePublishing(client *AmqpMessage) {
 	}
 
 	trans.ts = client.Ts
-	trans.Ts = int64(client.Ts.UnixNano() / 1000)
+	trans.Ts = client.Ts.UnixNano() / 1000
 	trans.JsTs = client.Ts
 	trans.Src = common.Endpoint{
 		Ip:   client.TcpTuple.Src_ip.String(),
@@ -404,7 +404,7 @@ func (amqp *Amqp) handleDelivering(server *AmqpMessage) {
 	}
 
 	trans.ts = server.Ts
-	trans.Ts = int64(server.Ts.UnixNano() / 1000)
+	trans.Ts = server.Ts.UnixNano() / 1000
 	trans.JsTs = server.Ts
 	trans.Src = common.Endpoint{
 		Ip:   server.TcpTuple.Src_ip.String(),

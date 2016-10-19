@@ -245,7 +245,7 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 			return mf
 		}
 
-		mf.Handles = []sys.FileHandle{sys.FileHandle{Handle: uintptr(h)}}
+		mf.Handles = []sys.FileHandle{{Handle: uintptr(h)}}
 		return mf
 	}
 

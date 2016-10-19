@@ -564,7 +564,7 @@ func rrToString(rr mkdns.RR) string {
 	data, ok := mapStr["data"]
 	delete(mapStr, "data")
 
-	for k, _ := range mapStr {
+	for k := range mapStr {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)

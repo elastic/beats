@@ -23,7 +23,7 @@ func QueryStats(db *sql.DB, query string) ([]map[string]interface{}, error) {
 	}
 	vals := make([][]byte, len(columns))
 	valPointers := make([]interface{}, len(columns))
-	for i, _ := range vals {
+	for i := range vals {
 		valPointers[i] = &vals[i]
 	}
 
