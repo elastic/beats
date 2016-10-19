@@ -2,10 +2,11 @@ package amqp
 
 import (
 	"encoding/binary"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"strconv"
 	"strings"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func connectionStartMethod(m *AmqpMessage, args []byte) (bool, bool) {
@@ -81,7 +82,7 @@ func connectionStartOkMethod(m *AmqpMessage, args []byte) (bool, bool) {
 func connectionTuneMethod(m *AmqpMessage, args []byte) (bool, bool) {
 	m.IsRequest = true
 	m.Method = "connection.tune"
-	//parameters are not parsed here, they are further negociated by the server
+	//parameters are not parsed here, they are further negotiated by the server
 	//in the connection.tune-ok method
 	return true, true
 }

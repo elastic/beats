@@ -89,7 +89,7 @@ func (mc *Memcache) Parse(
 	debug("memcache connection %p", tcpConn)
 	tcpConn = mc.memcacheParseTCP(tcpConn, pkt, tcptuple, dir)
 	if tcpConn == nil {
-		// explicitely return nil if tcpConn equals nil so ProtocolData really is nil
+		// explicitly return nil if tcpConn equals nil so ProtocolData really is nil
 		return nil
 	}
 	return tcpConn

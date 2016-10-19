@@ -14,7 +14,7 @@ import (
 type NetDirection uint8
 
 const (
-	// Message due to a reponse by server
+	// Message due to a response by server
 	NetReverseDirection NetDirection = 0
 
 	// Message was send by client
