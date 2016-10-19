@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"strconv"
 	"syscall"
 	"time"
@@ -270,6 +271,15 @@ func (sniffer *SnifferSetup) Init(test_mode bool, filter string, factory WorkerF
 		err = sniffer.setFromConfig(interfaces)
 		if err != nil {
 			return fmt.Errorf("Error creating sniffer: %v", err)
+		}
+	}
+
+	if len(interfaces.File) == 0 {
+		if interfaces.Device == "any" {
+			// OS X or Windows
+			if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
+				return fmt.Errorf("any interface is not supported on %s", runtime.GOOS)
+			}
 		}
 	}
 
