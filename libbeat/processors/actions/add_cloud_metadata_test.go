@@ -194,12 +194,6 @@ func initGCETestServer() *httptest.Server {
 	}))
 }
 
-func setURLs(url string) {
-	ec2URL = url + ec2InstanceIdentityURI
-	doURL = url + doMetadataURI
-	gceURL = url + gceMetadataURI
-}
-
 func TestRetrieveAWSMetadata(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
@@ -207,9 +201,14 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 
 	server := initEC2TestServer()
 	defer server.Close()
-	setURLs(server.URL)
 
-	config := common.NewConfig()
+	config, err := common.NewConfigFrom(map[string]interface{}{
+		"host": server.Listener.Addr().String(),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	p, err := newCloudMetadata(*config)
 	if err != nil {
 		t.Fatal(err)
@@ -237,9 +236,14 @@ func TestRetrieveDigitalOceanMetadata(t *testing.T) {
 
 	server := initDigitalOceanTestServer()
 	defer server.Close()
-	setURLs(server.URL)
 
-	config := common.NewConfig()
+	config, err := common.NewConfigFrom(map[string]interface{}{
+		"host": server.Listener.Addr().String(),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	p, err := newCloudMetadata(*config)
 	if err != nil {
 		t.Fatal(err)
@@ -265,9 +269,14 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 
 	server := initGCETestServer()
 	defer server.Close()
-	setURLs(server.URL)
 
-	config := common.NewConfig()
+	config, err := common.NewConfigFrom(map[string]interface{}{
+		"host": server.Listener.Addr().String(),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	p, err := newCloudMetadata(*config)
 	if err != nil {
 		t.Fatal(err)
