@@ -174,7 +174,7 @@ type AmqpFrame struct {
 
 type AmqpMessage struct {
 	Ts             time.Time
-	TcpTuple       common.TcpTuple
+	TcpTuple       common.TCPTuple
 	CmdlineTuple   *common.CmdlineTuple
 	Method         string
 	IsRequest      bool
@@ -193,7 +193,7 @@ type AmqpMessage struct {
 
 // represent a stream of data to be parsed
 type AmqpStream struct {
-	tcptuple *common.TcpTuple
+	tcptuple *common.TCPTuple
 
 	data        []byte
 	parseOffset int
@@ -204,7 +204,7 @@ type AmqpStream struct {
 // contains the result of parsing
 type AmqpTransaction struct {
 	Type  string
-	tuple common.TcpTuple
+	tuple common.TCPTuple
 	Src   common.Endpoint
 	Dst   common.Endpoint
 	Ts    int64

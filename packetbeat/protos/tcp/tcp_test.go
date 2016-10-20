@@ -45,20 +45,20 @@ type TestProtocol struct {
 	Ports []int
 
 	init  func(testMode bool, results publish.Transactions) error
-	parse func(*protos.Packet, *common.TcpTuple, uint8, protos.ProtocolData) protos.ProtocolData
-	onFin func(*common.TcpTuple, uint8, protos.ProtocolData) protos.ProtocolData
-	gap   func(*common.TcpTuple, uint8, int, protos.ProtocolData) (protos.ProtocolData, bool)
+	parse func(*protos.Packet, *common.TCPTuple, uint8, protos.ProtocolData) protos.ProtocolData
+	onFin func(*common.TCPTuple, uint8, protos.ProtocolData) protos.ProtocolData
+	gap   func(*common.TCPTuple, uint8, int, protos.ProtocolData) (protos.ProtocolData, bool)
 }
 
 var _ protos.Plugin = &TestProtocol{
 	init: func(m bool, r publish.Transactions) error { return nil },
-	parse: func(p *protos.Packet, t *common.TcpTuple, d uint8, priv protos.ProtocolData) protos.ProtocolData {
+	parse: func(p *protos.Packet, t *common.TCPTuple, d uint8, priv protos.ProtocolData) protos.ProtocolData {
 		return priv
 	},
-	onFin: func(t *common.TcpTuple, d uint8, p protos.ProtocolData) protos.ProtocolData {
+	onFin: func(t *common.TCPTuple, d uint8, p protos.ProtocolData) protos.ProtocolData {
 		return p
 	},
-	gap: func(t *common.TcpTuple, d uint8, b int, p protos.ProtocolData) (protos.ProtocolData, bool) {
+	gap: func(t *common.TCPTuple, d uint8, b int, p protos.ProtocolData) (protos.ProtocolData, bool) {
 		return p, true
 	},
 }
@@ -71,17 +71,17 @@ func (proto TestProtocol) GetPorts() []int {
 	return proto.Ports
 }
 
-func (proto TestProtocol) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
+func (proto TestProtocol) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData) protos.ProtocolData {
 	return proto.parse(pkt, tcptuple, dir, private)
 }
 
-func (proto TestProtocol) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+func (proto TestProtocol) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 	return proto.onFin(tcptuple, dir, private)
 }
 
-func (proto TestProtocol) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (proto TestProtocol) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 	return proto.gap(tcptuple, dir, nbytes, private)
 }
@@ -286,7 +286,7 @@ func TestTCSeqPayload(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		addr := common.NewIpPortTuple(4,
+		addr := common.NewIPPortTuple(4,
 			net.ParseIP(ServerIp), ServerPort,
 			net.ParseIP(ClientIp), uint16(rand.Intn(65535)))
 
@@ -324,7 +324,7 @@ func BenchmarkParallelProcess(b *testing.B) {
 		for pb.Next() {
 			pkt := &protos.Packet{
 				Ts: time.Now(),
-				Tuple: common.NewIpPortTuple(4,
+				Tuple: common.NewIPPortTuple(4,
 					net.ParseIP(ServerIp), ServerPort,
 					net.ParseIP(ClientIp), uint16(rand.Intn(65535))),
 				Payload: []byte{1, 2, 3, 4},
@@ -337,9 +337,9 @@ func BenchmarkParallelProcess(b *testing.B) {
 func makeCountGaps(
 	counter *int,
 	bytes *int,
-) func(*common.TcpTuple, uint8, int, protos.ProtocolData) (protos.ProtocolData, bool) {
+) func(*common.TCPTuple, uint8, int, protos.ProtocolData) (protos.ProtocolData, bool) {
 	return func(
-		t *common.TcpTuple,
+		t *common.TCPTuple,
 		d uint8,
 		n int,
 		p protos.ProtocolData,
@@ -358,10 +358,10 @@ func makeCountGaps(
 func makeCollectPayload(
 	state *[]byte,
 	resetOnNil bool,
-) func(*protos.Packet, *common.TcpTuple, uint8, protos.ProtocolData) protos.ProtocolData {
+) func(*protos.Packet, *common.TCPTuple, uint8, protos.ProtocolData) protos.ProtocolData {
 	return func(
 		p *protos.Packet,
-		t *common.TcpTuple,
+		t *common.TCPTuple,
 		d uint8,
 		priv protos.ProtocolData,
 	) protos.ProtocolData {

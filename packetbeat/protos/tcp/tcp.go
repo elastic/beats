@@ -54,13 +54,13 @@ func (tcp *Tcp) getId() uint32 {
 	return tcp.id
 }
 
-func (tcp *Tcp) decideProtocol(tuple *common.IpPortTuple) protos.Protocol {
-	protocol, exists := tcp.portMap[tuple.Src_port]
+func (tcp *Tcp) decideProtocol(tuple *common.IPPortTuple) protos.Protocol {
+	protocol, exists := tcp.portMap[tuple.SrcPort]
 	if exists {
 		return protocol
 	}
 
-	protocol, exists = tcp.portMap[tuple.Dst_port]
+	protocol, exists = tcp.portMap[tuple.DstPort]
 	if exists {
 		return protocol
 	}
@@ -68,7 +68,7 @@ func (tcp *Tcp) decideProtocol(tuple *common.IpPortTuple) protos.Protocol {
 	return protos.UnknownProtocol
 }
 
-func (tcp *Tcp) findStream(k common.HashableIpPortTuple) *TcpConnection {
+func (tcp *Tcp) findStream(k common.HashableIPPortTuple) *TcpConnection {
 	v := tcp.streams.Get(k)
 	if v != nil {
 		return v.(*TcpConnection)
@@ -78,9 +78,9 @@ func (tcp *Tcp) findStream(k common.HashableIpPortTuple) *TcpConnection {
 
 type TcpConnection struct {
 	id       uint32
-	tuple    *common.IpPortTuple
+	tuple    *common.IPPortTuple
 	protocol protos.Protocol
-	tcptuple common.TcpTuple
+	tcptuple common.TCPTuple
 	tcp      *Tcp
 
 	lastSeq [2]uint32
@@ -232,8 +232,8 @@ func (tcp *Tcp) getStream(pkt *protos.Packet) (stream TcpStream, created bool) {
 	if isDebug {
 		t := pkt.Tuple
 		debugf("Connection src[%s:%d] dst[%s:%d] doesn't exist, creating new",
-			t.Src_ip.String(), t.Src_port,
-			t.Dst_ip.String(), t.Dst_port)
+			t.SrcIP.String(), t.SrcPort,
+			t.DstIP.String(), t.DstPort)
 	}
 
 	conn := &TcpConnection{
@@ -241,7 +241,7 @@ func (tcp *Tcp) getStream(pkt *protos.Packet) (stream TcpStream, created bool) {
 		tuple:    &pkt.Tuple,
 		protocol: protocol,
 		tcp:      tcp}
-	conn.tcptuple = common.TcpTupleFromIpPort(conn.tuple, conn.id)
+	conn.tcptuple = common.TCPTupleFromIPPort(conn.tuple, conn.id)
 	tcp.streams.PutWithTimeout(pkt.Tuple.Hashable(), conn, timeout)
 	return TcpStream{conn: conn, dir: TcpDirectionOriginal}, true
 }

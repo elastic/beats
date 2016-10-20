@@ -39,13 +39,13 @@ type PgsqlMessage struct {
 	Notes          []string
 
 	Direction    uint8
-	TcpTuple     common.TcpTuple
+	TcpTuple     common.TCPTuple
 	CmdlineTuple *common.CmdlineTuple
 }
 
 type PgsqlTransaction struct {
 	Type         string
-	tuple        common.TcpTuple
+	tuple        common.TCPTuple
 	Src          common.Endpoint
 	Dst          common.Endpoint
 	ResponseTime int32
@@ -65,7 +65,7 @@ type PgsqlTransaction struct {
 }
 
 type PgsqlStream struct {
-	tcptuple *common.TcpTuple
+	tcptuple *common.TCPTuple
 
 	data []byte
 
@@ -117,7 +117,7 @@ type Pgsql struct {
 	results publish.Transactions
 
 	// function pointer for mocking
-	handlePgsql func(pgsql *Pgsql, m *PgsqlMessage, tcp *common.TcpTuple,
+	handlePgsql func(pgsql *Pgsql, m *PgsqlMessage, tcp *common.TCPTuple,
 		dir uint8, raw_msg []byte)
 }
 
@@ -166,7 +166,7 @@ func (pgsql *Pgsql) setFromConfig(config *pgsqlConfig) {
 	pgsql.transactionTimeout = config.TransactionTimeout
 }
 
-func (pgsql *Pgsql) getTransaction(k common.HashableTcpTuple) []*PgsqlTransaction {
+func (pgsql *Pgsql) getTransaction(k common.HashableTCPTuple) []*PgsqlTransaction {
 	v := pgsql.transactions.Get(k)
 	if v != nil {
 		return v.([]*PgsqlTransaction)
@@ -206,7 +206,7 @@ func (pgsql *Pgsql) ConnectionTimeout() time.Duration {
 	return pgsql.transactionTimeout
 }
 
-func (pgsql *Pgsql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
+func (pgsql *Pgsql) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ParsePgsql exception")
@@ -303,7 +303,7 @@ func messageHasEnoughData(msg *PgsqlMessage) bool {
 }
 
 // Called when there's a drop packet
-func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (pgsql *Pgsql) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	defer logp.Recover("GapInPgsqlStream exception")
@@ -342,17 +342,17 @@ func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	return pgsqlData, true
 }
 
-func (pgsql *Pgsql) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+func (pgsql *Pgsql) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 	return private
 }
 
-var handlePgsql = func(pgsql *Pgsql, m *PgsqlMessage, tcptuple *common.TcpTuple,
+var handlePgsql = func(pgsql *Pgsql, m *PgsqlMessage, tcptuple *common.TCPTuple,
 	dir uint8, raw_msg []byte) {
 
 	m.TcpTuple = *tcptuple
 	m.Direction = dir
-	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
+	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 
 	if m.IsRequest {
 		pgsql.receivedPgsqlRequest(m)
@@ -384,13 +384,13 @@ func (pgsql *Pgsql) receivedPgsqlRequest(msg *PgsqlMessage) {
 		trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
 		trans.JsTs = msg.Ts
 		trans.Src = common.Endpoint{
-			Ip:   msg.TcpTuple.Src_ip.String(),
-			Port: msg.TcpTuple.Src_port,
+			IP:   msg.TcpTuple.SrcIP.String(),
+			Port: msg.TcpTuple.SrcPort,
 			Proc: string(msg.CmdlineTuple.Src),
 		}
 		trans.Dst = common.Endpoint{
-			Ip:   msg.TcpTuple.Dst_ip.String(),
-			Port: msg.TcpTuple.Dst_port,
+			IP:   msg.TcpTuple.DstIP.String(),
+			Port: msg.TcpTuple.DstPort,
 			Proc: string(msg.CmdlineTuple.Dst),
 		}
 		if msg.Direction == tcp.TcpDirectionReverse {
@@ -490,7 +490,7 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 }
 
 func (pgsql *Pgsql) removeTransaction(transList []*PgsqlTransaction,
-	tuple common.TcpTuple, index int) *PgsqlTransaction {
+	tuple common.TCPTuple, index int) *PgsqlTransaction {
 
 	trans := transList[index]
 	transList = append(transList[:index], transList[index+1:]...)

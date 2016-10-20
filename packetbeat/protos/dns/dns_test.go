@@ -47,10 +47,10 @@ type DnsTestMessage struct {
 
 // Request and response addresses.
 var (
-	forward = common.NewIpPortTuple(4,
+	forward = common.NewIPPortTuple(4,
 		net.ParseIP(ServerIp), ServerPort,
 		net.ParseIP(ClientIp), ClientPort)
-	reverse = common.NewIpPortTuple(4,
+	reverse = common.NewIPPortTuple(4,
 		net.ParseIP(ClientIp), ClientPort,
 		net.ParseIP(ServerIp), ServerPort)
 )
@@ -78,7 +78,7 @@ func newDns(verbose bool) *Dns {
 	return dns.(*Dns)
 }
 
-func newPacket(t common.IpPortTuple, payload []byte) *protos.Packet {
+func newPacket(t common.IPPortTuple, payload []byte) *protos.Packet {
 	return &protos.Packet{
 		Ts:      time.Now(),
 		Tuple:   t,
@@ -252,12 +252,12 @@ func assertFlags(t testing.TB, m common.MapStr, flags []string) {
 
 // Assert that the given Endpoint matches the IP and port in the given
 // IpPortTuple.
-func assertAddress(t testing.TB, expected common.IpPortTuple, endpoint interface{}) {
+func assertAddress(t testing.TB, expected common.IPPortTuple, endpoint interface{}) {
 	e, ok := endpoint.(*common.Endpoint)
 	if !ok {
 		t.Errorf("Expected a common.Endpoint but got %v", endpoint)
 	}
 
-	assert.Equal(t, expected.Src_ip.String(), e.Ip)
-	assert.Equal(t, expected.Src_port, e.Port)
+	assert.Equal(t, expected.SrcIP.String(), e.IP)
+	assert.Equal(t, expected.SrcPort, e.Port)
 }

@@ -18,8 +18,8 @@ type FileRotator struct {
 	RotateEveryBytes *uint64
 	KeepFiles        *int
 
-	current      *os.File
-	current_size uint64
+	current     *os.File
+	currentSize uint64
 }
 
 func (rotator *FileRotator) CreateDirectory() error {
@@ -72,7 +72,7 @@ func (rotator *FileRotator) WriteLine(line []byte) error {
 	if err != nil {
 		return err
 	}
-	rotator.current_size += uint64(len(line))
+	rotator.currentSize += uint64(len(line))
 
 	return nil
 }
@@ -82,24 +82,24 @@ func (rotator *FileRotator) shouldRotate() bool {
 		return true
 	}
 
-	if rotator.current_size >= *rotator.RotateEveryBytes {
+	if rotator.currentSize >= *rotator.RotateEveryBytes {
 		return true
 	}
 
 	return false
 }
 
-func (rotator *FileRotator) FilePath(file_no int) string {
-	if file_no == 0 {
+func (rotator *FileRotator) FilePath(fileNo int) string {
+	if fileNo == 0 {
 		return filepath.Join(rotator.Path, rotator.Name)
 	}
-	filename := strings.Join([]string{rotator.Name, strconv.Itoa(file_no)}, ".")
+	filename := strings.Join([]string{rotator.Name, strconv.Itoa(fileNo)}, ".")
 	return filepath.Join(rotator.Path, filename)
 }
 
-func (rotator *FileRotator) FileExists(file_no int) bool {
-	file_path := rotator.FilePath(file_no)
-	_, err := os.Stat(file_path)
+func (rotator *FileRotator) FileExists(fileNo int) bool {
+	path := rotator.FilePath(fileNo)
+	_, err := os.Stat(path)
 	if os.IsNotExist(err) {
 		return false
 	}
@@ -115,9 +115,9 @@ func (rotator *FileRotator) Rotate() error {
 	}
 
 	// delete any extra files, normally we shouldn't have any
-	for file_no := *rotator.KeepFiles; file_no < RotatorMaxFiles; file_no++ {
-		if rotator.FileExists(file_no) {
-			perr := os.Remove(rotator.FilePath(file_no))
+	for fileNo := *rotator.KeepFiles; fileNo < RotatorMaxFiles; fileNo++ {
+		if rotator.FileExists(fileNo) {
+			perr := os.Remove(rotator.FilePath(fileNo))
 			if perr != nil {
 				return perr
 			}
@@ -130,31 +130,31 @@ func (rotator *FileRotator) Rotate() error {
 			// file doesn't exist, don't rotate
 			continue
 		}
-		file_path := rotator.FilePath(fileNo)
+		path := rotator.FilePath(fileNo)
 
 		if rotator.FileExists(fileNo + 1) {
 			// next file exists, something is strange
 			return fmt.Errorf("File %s exists, when rotating would overwrite it", rotator.FilePath(fileNo+1))
 		}
 
-		err := os.Rename(file_path, rotator.FilePath(fileNo+1))
+		err := os.Rename(path, rotator.FilePath(fileNo+1))
 		if err != nil {
 			return err
 		}
 	}
 
 	// create the new file
-	file_path := rotator.FilePath(0)
-	current, err := os.Create(file_path)
+	path := rotator.FilePath(0)
+	current, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	rotator.current = current
-	rotator.current_size = 0
+	rotator.currentSize = 0
 
 	// delete the extra file, ignore errors here
-	file_path = rotator.FilePath(*rotator.KeepFiles)
-	os.Remove(file_path)
+	path = rotator.FilePath(*rotator.KeepFiles)
+	os.Remove(path)
 
 	return nil
 }

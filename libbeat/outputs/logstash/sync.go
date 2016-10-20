@@ -66,21 +66,21 @@ func (c *client) PublishEvent(data outputs.Data) error {
 
 // PublishEvents sends all events to logstash. On error a slice with all events
 // not published or confirmed to be processed by logstash will be returned.
-func (l *client) PublishEvents(
+func (c *client) PublishEvents(
 	data []outputs.Data,
 ) ([]outputs.Data, error) {
 	publishEventsCallCount.Add(1)
 	totalNumberOfEvents := len(data)
 	for len(data) > 0 {
-		n, err := l.publishWindowed(data)
+		n, err := c.publishWindowed(data)
 
 		debug("%v events out of %v events sent to logstash. Continue sending",
 			n, len(data))
 
 		data = data[n:]
 		if err != nil {
-			l.win.shrinkWindow()
-			_ = l.Close()
+			c.win.shrinkWindow()
+			_ = c.Close()
 
 			logp.Err("Failed to publish events caused by: %v", err)
 

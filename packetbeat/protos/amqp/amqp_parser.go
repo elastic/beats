@@ -312,14 +312,14 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 	return false
 }
 
-func (amqp *Amqp) handleAmqp(m *AmqpMessage, tcptuple *common.TcpTuple, dir uint8) {
+func (amqp *Amqp) handleAmqp(m *AmqpMessage, tcptuple *common.TCPTuple, dir uint8) {
 	if amqp.mustHideCloseMethod(m) {
 		return
 	}
 	debugf("A message is ready to be handled")
 	m.TcpTuple = *tcptuple
 	m.Direction = dir
-	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
+	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 
 	if m.Method == "basic.publish" {
 		amqp.handlePublishing(m)

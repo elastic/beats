@@ -171,7 +171,7 @@ func (amqp *Amqp) ConnectionTimeout() time.Duration {
 	return amqp.transactionTimeout
 }
 
-func (amqp *Amqp) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
+func (amqp *Amqp) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ParseAmqp exception")
@@ -224,13 +224,13 @@ func (amqp *Amqp) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 	return priv
 }
 
-func (amqp *Amqp) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (amqp *Amqp) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 	detailedf("GapInStream called")
 	return private, true
 }
 
-func (amqp *Amqp) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+func (amqp *Amqp) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 	return private
 }
@@ -254,13 +254,13 @@ func (amqp *Amqp) handleAmqpRequest(msg *AmqpMessage) {
 	trans.Ts = trans.ts.UnixNano() / 1000
 	trans.JsTs = msg.Ts
 	trans.Src = common.Endpoint{
-		Ip:   msg.TcpTuple.Src_ip.String(),
-		Port: msg.TcpTuple.Src_port,
+		IP:   msg.TcpTuple.SrcIP.String(),
+		Port: msg.TcpTuple.SrcPort,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
 	trans.Dst = common.Endpoint{
-		Ip:   msg.TcpTuple.Dst_ip.String(),
-		Port: msg.TcpTuple.Dst_port,
+		IP:   msg.TcpTuple.DstIP.String(),
+		Port: msg.TcpTuple.DstPort,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
 	if msg.Direction == tcp.TcpDirectionReverse {
@@ -360,13 +360,13 @@ func (amqp *Amqp) handlePublishing(client *AmqpMessage) {
 	trans.Ts = client.Ts.UnixNano() / 1000
 	trans.JsTs = client.Ts
 	trans.Src = common.Endpoint{
-		Ip:   client.TcpTuple.Src_ip.String(),
-		Port: client.TcpTuple.Src_port,
+		IP:   client.TcpTuple.SrcIP.String(),
+		Port: client.TcpTuple.SrcPort,
 		Proc: string(client.CmdlineTuple.Src),
 	}
 	trans.Dst = common.Endpoint{
-		Ip:   client.TcpTuple.Dst_ip.String(),
-		Port: client.TcpTuple.Dst_port,
+		IP:   client.TcpTuple.DstIP.String(),
+		Port: client.TcpTuple.DstPort,
 		Proc: string(client.CmdlineTuple.Dst),
 	}
 
@@ -407,13 +407,13 @@ func (amqp *Amqp) handleDelivering(server *AmqpMessage) {
 	trans.Ts = server.Ts.UnixNano() / 1000
 	trans.JsTs = server.Ts
 	trans.Src = common.Endpoint{
-		Ip:   server.TcpTuple.Src_ip.String(),
-		Port: server.TcpTuple.Src_port,
+		IP:   server.TcpTuple.SrcIP.String(),
+		Port: server.TcpTuple.SrcPort,
 		Proc: string(server.CmdlineTuple.Src),
 	}
 	trans.Dst = common.Endpoint{
-		Ip:   server.TcpTuple.Dst_ip.String(),
-		Port: server.TcpTuple.Dst_port,
+		IP:   server.TcpTuple.DstIP.String(),
+		Port: server.TcpTuple.DstPort,
 		Proc: string(server.CmdlineTuple.Dst),
 	}
 
@@ -546,7 +546,7 @@ func isStringable(m *AmqpMessage) bool {
 	return stringable
 }
 
-func (amqp *Amqp) getTransaction(k common.HashableTcpTuple) *AmqpTransaction {
+func (amqp *Amqp) getTransaction(k common.HashableTCPTuple) *AmqpTransaction {
 	v := amqp.transactions.Get(k)
 	if v != nil {
 		return v.(*AmqpTransaction)

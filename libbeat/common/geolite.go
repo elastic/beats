@@ -23,9 +23,9 @@ func LoadGeoIPData(config Geoip) *libgeo.GeoIP {
 	if len(geoipPaths) == 0 {
 		// disabled
 		return nil
-	} else {
-		logp.Warn("GeoIP lookup support is deprecated and will be removed in version 6.0.")
 	}
+
+	logp.Warn("GeoIP lookup support is deprecated and will be removed in version 6.0.")
 
 	// look for the first existing path
 	var geoipPath string

@@ -5,9 +5,9 @@ import (
 	"net"
 )
 
-// LocalIpAddrs finds the IP addresses of the hosts on which
+// LocalIPAddrs finds the IP addresses of the hosts on which
 // the shipper currently runs on.
-func LocalIpAddrs() ([]net.IP, error) {
+func LocalIPAddrs() ([]net.IP, error) {
 	var localIPAddrs = []net.IP{}
 	ipaddrs, err := net.InterfaceAddrs()
 	if err != nil {
@@ -21,18 +21,18 @@ func LocalIpAddrs() ([]net.IP, error) {
 	return localIPAddrs, nil
 }
 
-// LocalIpAddrsAsStrings finds the IP addresses of the hosts on which
+// LocalIPAddrsAsStrings finds the IP addresses of the hosts on which
 // the shipper currently runs on and returns them as an array of
 // strings.
-func LocalIpAddrsAsStrings(include_loopbacks bool) ([]string, error) {
+func LocalIPAddrsAsStrings(includeLoopbacks bool) ([]string, error) {
 	var localIPAddrsStrings = []string{}
 	var err error
-	ipaddrs, err := LocalIpAddrs()
+	ipaddrs, err := LocalIPAddrs()
 	if err != nil {
 		return []string{}, err
 	}
 	for _, ipaddr := range ipaddrs {
-		if include_loopbacks || !ipaddr.IsLoopback() {
+		if includeLoopbacks || !ipaddr.IsLoopback() {
 			localIPAddrsStrings = append(localIPAddrsStrings, ipaddr.String())
 		}
 	}
@@ -41,10 +41,10 @@ func LocalIpAddrsAsStrings(include_loopbacks bool) ([]string, error) {
 
 // IsLoopback check if a particular IP notation corresponds
 // to a loopback interface.
-func IsLoopback(ip_str string) (bool, error) {
-	ip := net.ParseIP(ip_str)
+func IsLoopback(ipStr string) (bool, error) {
+	ip := net.ParseIP(ipStr)
 	if ip == nil {
-		return false, fmt.Errorf("Wrong IP format %s", ip_str)
+		return false, fmt.Errorf("Wrong IP format %s", ipStr)
 	}
 	return ip.IsLoopback(), nil
 }

@@ -123,7 +123,7 @@ func (pb *Packetbeat) init(b *beat.Beat) error {
 
 func (pb *Packetbeat) Run(b *beat.Beat) error {
 	defer func() {
-		if service.WithMemProfile() {
+		if service.ProfileEnabled() {
 			logp.Debug("main", "Waiting for streams and transactions to expire...")
 			time.Sleep(time.Duration(float64(protos.DefaultTransactionExpiration) * 1.2))
 			logp.Debug("main", "Streams and transactions should all be expired now.")

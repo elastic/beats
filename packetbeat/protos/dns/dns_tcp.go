@@ -22,7 +22,7 @@ const DecodeOffset = 2
 // DnsStream contains DNS data from one side of a TCP transmission. A pair
 // of DnsStream's are used to represent the full conversation.
 type DnsStream struct {
-	tcpTuple    *common.TcpTuple
+	tcpTuple    *common.TCPTuple
 	rawData     []byte
 	parseOffset int
 	message     *DnsMessage
@@ -37,7 +37,7 @@ type dnsConnectionData struct {
 	prevRequest *DnsMessage
 }
 
-func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
+func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TCPTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
 	defer logp.Recover("Dns ParseTcp")
 
 	debugf("Parsing packet addressed with %s of length %d.",
@@ -71,7 +71,7 @@ func ensureDnsConnection(private protos.ProtocolData) *dnsConnectionData {
 	return conn
 }
 
-func (dns *Dns) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8) *dnsConnectionData {
+func (dns *Dns) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTuple *common.TCPTuple, dir uint8) *dnsConnectionData {
 	stream := conn.Data[dir]
 	payload := pkt.Payload
 
@@ -117,7 +117,7 @@ func (dns *Dns) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTuple *c
 	return conn
 }
 
-func newStream(pkt *protos.Packet, tcpTuple *common.TcpTuple) *DnsStream {
+func newStream(pkt *protos.Packet, tcpTuple *common.TCPTuple) *DnsStream {
 	return &DnsStream{
 		tcpTuple: tcpTuple,
 		rawData:  pkt.Payload,
@@ -125,15 +125,15 @@ func newStream(pkt *protos.Packet, tcpTuple *common.TcpTuple) *DnsStream {
 	}
 }
 
-func (dns *Dns) messageComplete(conn *dnsConnectionData, tcpTuple *common.TcpTuple, dir uint8, decodedData *mkdns.Msg) {
+func (dns *Dns) messageComplete(conn *dnsConnectionData, tcpTuple *common.TCPTuple, dir uint8, decodedData *mkdns.Msg) {
 	dns.handleDns(conn, tcpTuple, decodedData, dir)
 }
 
-func (dns *Dns) handleDns(conn *dnsConnectionData, tcpTuple *common.TcpTuple, decodedData *mkdns.Msg, dir uint8) {
+func (dns *Dns) handleDns(conn *dnsConnectionData, tcpTuple *common.TCPTuple, decodedData *mkdns.Msg, dir uint8) {
 	message := conn.Data[dir].message
 	dnsTuple := DnsTupleFromIpPort(&message.Tuple, TransportTcp, decodedData.Id)
 
-	message.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcpTuple.IpPort())
+	message.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcpTuple.IPPort())
 	message.Data = decodedData
 	message.Length += DecodeOffset
 
@@ -152,7 +152,7 @@ func (stream *DnsStream) PrepareForNewMessage() {
 	stream.parseOffset = 0
 }
 
-func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
+func (dns *Dns) ReceivedFin(tcpTuple *common.TCPTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
 	if private == nil {
 		return nil
 	}
@@ -183,7 +183,7 @@ func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos
 	return conn
 }
 
-func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir uint8, nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
+func (dns *Dns) GapInStream(tcpTuple *common.TCPTuple, dir uint8, nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 	if private == nil {
 		return private, true
 	}

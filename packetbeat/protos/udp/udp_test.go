@@ -193,7 +193,7 @@ func Test_buildPortsMap_portOverlapError(t *testing.T) {
 // packet's source port.
 func Test_decideProtocol_bySrcPort(t *testing.T) {
 	test := testSetup(t)
-	tuple := common.NewIpPortTuple(4,
+	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("192.168.0.1"), PORT,
 		net.ParseIP("10.0.0.1"), 34898)
 	assert.Equal(t, PROTO, test.udp.decideProtocol(&tuple))
@@ -203,7 +203,7 @@ func Test_decideProtocol_bySrcPort(t *testing.T) {
 // packet's destination port.
 func Test_decideProtocol_byDstPort(t *testing.T) {
 	test := testSetup(t)
-	tuple := common.NewIpPortTuple(4,
+	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("10.0.0.1"), 34898,
 		net.ParseIP("192.168.0.1"), PORT)
 	assert.Equal(t, PROTO, test.udp.decideProtocol(&tuple))
@@ -213,7 +213,7 @@ func Test_decideProtocol_byDstPort(t *testing.T) {
 // which it does not have a plugin.
 func TestProcess_unknownProtocol(t *testing.T) {
 	test := testSetup(t)
-	tuple := common.NewIpPortTuple(4,
+	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("10.0.0.1"), 34898,
 		net.ParseIP("192.168.0.1"), PORT+1)
 	assert.Equal(t, protos.UnknownProtocol, test.udp.decideProtocol(&tuple))
@@ -222,7 +222,7 @@ func TestProcess_unknownProtocol(t *testing.T) {
 // Verify that Process ignores empty packets.
 func TestProcess_emptyPayload(t *testing.T) {
 	test := testSetup(t)
-	tuple := common.NewIpPortTuple(4,
+	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("192.168.0.1"), PORT,
 		net.ParseIP("10.0.0.1"), 34898)
 	emptyPkt := &protos.Packet{Ts: time.Now(), Tuple: tuple, Payload: []byte{}}
@@ -234,7 +234,7 @@ func TestProcess_emptyPayload(t *testing.T) {
 // ProcessUdp on it.
 func TestProcess_nonEmptyPayload(t *testing.T) {
 	test := testSetup(t)
-	tuple := common.NewIpPortTuple(4,
+	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("192.168.0.1"), PORT,
 		net.ParseIP("10.0.0.1"), 34898)
 	payload := []byte{1}

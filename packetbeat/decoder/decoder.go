@@ -221,9 +221,9 @@ func (d *DecoderStruct) process(
 			d.flowID.AddIPv4(ip4.SrcIP, ip4.DstIP)
 		}
 
-		packet.Tuple.Src_ip = ip4.SrcIP
-		packet.Tuple.Dst_ip = ip4.DstIP
-		packet.Tuple.Ip_length = 4
+		packet.Tuple.SrcIP = ip4.SrcIP
+		packet.Tuple.DstIP = ip4.DstIP
+		packet.Tuple.IPLength = 4
 
 	case layers.LayerTypeIPv6:
 		debugf("IPv6 packet")
@@ -234,9 +234,9 @@ func (d *DecoderStruct) process(
 			d.flowID.AddIPv6(ip6.SrcIP, ip6.DstIP)
 		}
 
-		packet.Tuple.Src_ip = ip6.SrcIP
-		packet.Tuple.Dst_ip = ip6.DstIP
-		packet.Tuple.Ip_length = 16
+		packet.Tuple.SrcIP = ip6.SrcIP
+		packet.Tuple.DstIP = ip6.DstIP
+		packet.Tuple.IPLength = 16
 
 	case layers.LayerTypeICMPv4:
 		debugf("ICMPv4 packet")
@@ -287,8 +287,8 @@ func (d *DecoderStruct) onUDP(packet *protos.Packet) {
 		d.flowID.AddUDP(src, dst)
 	}
 
-	packet.Tuple.Src_port = src
-	packet.Tuple.Dst_port = dst
+	packet.Tuple.SrcPort = src
+	packet.Tuple.DstPort = dst
 	packet.Payload = d.udp.Payload
 	packet.Tuple.ComputeHashebles()
 
@@ -304,8 +304,8 @@ func (d *DecoderStruct) onTCP(packet *protos.Packet) {
 		id.AddTCP(src, dst)
 	}
 
-	packet.Tuple.Src_port = src
-	packet.Tuple.Dst_port = dst
+	packet.Tuple.SrcPort = src
+	packet.Tuple.DstPort = dst
 	packet.Payload = d.tcp.Payload
 
 	if id == nil && len(packet.Payload) == 0 && !d.tcp.FIN {

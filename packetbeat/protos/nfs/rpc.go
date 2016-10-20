@@ -31,7 +31,7 @@ const (
 )
 
 type RpcStream struct {
-	tcpTuple *common.TcpTuple
+	tcpTuple *common.TCPTuple
 	rawData  []byte
 }
 
@@ -105,7 +105,7 @@ func (rpc *Rpc) GetPorts() []int {
 // Called when TCP payload data is available for parsing.
 func (rpc *Rpc) Parse(
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
@@ -122,7 +122,7 @@ func (rpc *Rpc) Parse(
 }
 
 // Called when the FIN flag is seen in the TCP stream.
-func (rpc *Rpc) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+func (rpc *Rpc) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ReceivedFinRpc exception")
@@ -133,7 +133,7 @@ func (rpc *Rpc) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 
 // Called when a packets are missing from the tcp
 // stream.
-func (rpc *Rpc) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (rpc *Rpc) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	defer logp.Recover("GapInRpcStream exception")
@@ -179,7 +179,7 @@ func getRpcConnection(private protos.ProtocolData) *rpcConnectionData {
 func (rpc *Rpc) handleRpcFragment(
 	conn *rpcConnectionData,
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *rpcConnectionData {
 
@@ -229,7 +229,7 @@ func (rpc *Rpc) handleRpcFragment(
 	return conn
 }
 
-func (rpc *Rpc) handleRpcPacket(xdr *Xdr, ts time.Time, tcptuple *common.TcpTuple, dir uint8) {
+func (rpc *Rpc) handleRpcPacket(xdr *Xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
 
 	xid := fmt.Sprintf("%.8x", xdr.getUInt())
 
@@ -245,7 +245,7 @@ func (rpc *Rpc) handleRpcPacket(xdr *Xdr, ts time.Time, tcptuple *common.TcpTupl
 	}
 }
 
-func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *RpcStream {
+func newStream(pkt *protos.Packet, tcptuple *common.TCPTuple) *RpcStream {
 	return &RpcStream{
 		tcpTuple: tcptuple,
 		rawData:  pkt.Payload,
