@@ -31,9 +31,11 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	// fill up the header common to all messages
 	// see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#standard-message-header
 	s.message.messageLength = length
-	s.message.requestId, err = d.readInt32()
-	s.message.responseTo, err = d.readInt32()
-	code, err := d.readInt32()
+
+	s.message.requestId, _ = d.readInt32()
+	s.message.responseTo, _ = d.readInt32()
+	code, _ := d.readInt32()
+
 	opCode := opCode(code)
 
 	if !validOpcode(opCode) {

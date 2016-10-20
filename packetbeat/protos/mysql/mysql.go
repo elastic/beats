@@ -292,7 +292,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 					m.AffectedRows = affectedRows
 
 					// last insert id
-					insertId, off, complete, err := read_linteger(s.data, off)
+					insertId, _, complete, err := read_linteger(s.data, off)
 					if !complete {
 						return true, false
 					}
@@ -356,7 +356,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 						logp.Debug("mysql", "Error on read_lstring: %s", err)
 						return false, false
 					}
-					table /* table */, off, complete, err := read_lstring(s.data, off)
+					table /* table */, _ /*off*/, complete, err := read_lstring(s.data, off)
 					if !complete {
 						return true, false
 					}
@@ -757,7 +757,7 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
-			_ /* org name */, off, complete, err = read_lstring(data, off)
+			_ /* org name */, _ /*off*/, complete, err = read_lstring(data, off)
 			if err != nil || !complete {
 				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows

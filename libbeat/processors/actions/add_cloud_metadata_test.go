@@ -216,6 +216,10 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 	}
 
 	actual, err := p.Run(common.MapStr{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	expected := common.MapStr{
 		"meta": common.MapStr{
 			"cloud": common.MapStr{
@@ -246,6 +250,10 @@ func TestRetrieveDigitalOceanMetadata(t *testing.T) {
 	}
 
 	actual, err := p.Run(common.MapStr{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	expected := common.MapStr{
 		"meta": common.MapStr{
 			"cloud": common.MapStr{
@@ -274,6 +282,10 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 	}
 
 	actual, err := p.Run(common.MapStr{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	expected := common.MapStr{
 		"meta": common.MapStr{
 			"cloud": common.MapStr{

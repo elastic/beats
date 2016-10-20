@@ -1107,7 +1107,7 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 	private, drop := http.GapInStream(tcptuple, 1, 10, private)
 	assert.Equal(t, false, drop)
 
-	private = http.ReceivedFin(tcptuple, 1, private)
+	http.ReceivedFin(tcptuple, 1, private)
 
 	trans := expectTransaction(t, http)
 	assert.NotNil(t, trans)
@@ -1284,7 +1284,7 @@ func BenchmarkHttpSimpleTransaction(b *testing.B) {
 		private = http.ReceivedFin(tcptuple, 0, private)
 
 		private = http.Parse(&resp, tcptuple, 1, private)
-		private = http.ReceivedFin(tcptuple, 1, private)
+		http.ReceivedFin(tcptuple, 1, private)
 
 		select {
 		case <-client.Channel:

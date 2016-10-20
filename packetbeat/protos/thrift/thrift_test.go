@@ -1072,8 +1072,7 @@ func TestThrift_GapInStream_response(t *testing.T) {
 	private := protos.ProtocolData(new(thriftPrivateData))
 	private = thrift.Parse(req, tcptuple, 0, private)
 	private = thrift.Parse(repl, tcptuple, 1, private)
-	private, drop := thrift.GapInStream(tcptuple, 1, 5, private)
-
+	_, drop := thrift.GapInStream(tcptuple, 1, 5, private)
 	if drop == false {
 		t.Error("GapInStream returned drop=false")
 	}
@@ -1124,8 +1123,7 @@ func TestThrift_GapInStream_request(t *testing.T) {
 	private = thrift.Parse(req, tcptuple, 0, private)
 	private, drop := thrift.GapInStream(tcptuple, 0, 5, private)
 
-	private = thrift.Parse(repl, tcptuple, 1, private)
-
+	thrift.Parse(repl, tcptuple, 1, private)
 	if drop == false {
 		t.Error("GapInStream returned drop=false")
 	}

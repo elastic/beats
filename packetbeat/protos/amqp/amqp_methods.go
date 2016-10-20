@@ -584,7 +584,7 @@ func basicReturnMethod(m *AmqpMessage, args []byte) (bool, bool) {
 		logp.Warn("Error getting name of exchange in basic return")
 		return false, false
 	}
-	routingKey, nextOffset, err := getShortString(args, nextOffset+1, uint32(args[nextOffset]))
+	routingKey, _, err := getShortString(args, nextOffset+1, uint32(args[nextOffset]))
 	if err {
 		logp.Warn("Error getting name of routing key in basic return")
 		return false, false

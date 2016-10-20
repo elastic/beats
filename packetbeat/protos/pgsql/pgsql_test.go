@@ -353,7 +353,7 @@ func Test_gap_in_response(t *testing.T) {
 
 	logp.Debug("pgsql", "Now sending gap..")
 
-	private, drop := pgsql.GapInStream(tcptuple, 1, 10, private)
+	_, drop := pgsql.GapInStream(tcptuple, 1, 10, private)
 	assert.Equal(t, true, drop)
 
 	trans := expectTransaction(t, pgsql)

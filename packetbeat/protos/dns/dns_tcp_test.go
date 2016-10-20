@@ -397,7 +397,7 @@ func TestParseTcp_errorDuplicateRequestsOnePacket(t *testing.T) {
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	packet = newPacket(forward, q.request[offset:])
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	m := expectResult(t, dns)

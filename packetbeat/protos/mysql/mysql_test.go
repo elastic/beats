@@ -443,6 +443,9 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 			"2a00000a013309416e6f6e796d6f75730454657374047465737413323031332d30372d32322031383a33323a3130" +
 			"2a00000b013409416e6f6e796d6f75730474657374047465737413323031332d30372d32322031383a34343a3137" +
 			"0500000cfe00002100")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	pkt = protos.Packet{
 		Payload: data,
@@ -522,7 +525,7 @@ func Test_gap_in_response(t *testing.T) {
 
 	logp.Debug("mysql", "Now sending gap..")
 
-	private, drop := mysql.GapInStream(tcptuple, 1, 10, private)
+	_, drop := mysql.GapInStream(tcptuple, 1, 10, private)
 	assert.Equal(t, true, drop)
 
 	trans := expectTransaction(t, mysql)

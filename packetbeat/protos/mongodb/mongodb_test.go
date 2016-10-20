@@ -106,7 +106,7 @@ func TestSimpleFindLimit1(t *testing.T) {
 	private := protos.ProtocolData(new(mongodbConnectionData))
 
 	private = mongodb.Parse(&req, tcptuple, 0, private)
-	private = mongodb.Parse(&resp, tcptuple, 1, private)
+	mongodb.Parse(&resp, tcptuple, 1, private)
 	trans := expectTransaction(t, mongodb)
 
 	assert.Equal(t, "OK", trans["status"])
@@ -188,7 +188,7 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 	private = mongodb.Parse(&resp2, tcptuple, 1, private)
 
 	resp3 := protos.Packet{Payload: resp_data3}
-	private = mongodb.Parse(&resp3, tcptuple, 1, private)
+	mongodb.Parse(&resp3, tcptuple, 1, private)
 
 	trans := expectTransaction(t, mongodb)
 
