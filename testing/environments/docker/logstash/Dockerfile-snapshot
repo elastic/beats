@@ -2,8 +2,8 @@ FROM java:8-jre
 
 ENV LS_VERSION 5
 
-ENV VERSION 5.0.0-rc1
-ENV URL http://staging.elastic.co/5.0.0-rc1-9db751df/downloads/logstash/logstash-${VERSION}.tar.gz
+ENV VERSION 5.0.0
+ENV URL http://staging.elastic.co/5.0.0-731e78df/downloads/logstash/logstash-${VERSION}.tar.gz
 ENV PATH $PATH:/opt/logstash-$VERSION/bin
 
 # Cache variable can be set during building to invalidate the build cache with `--build-arg CACHE=$(date +%s) .`
