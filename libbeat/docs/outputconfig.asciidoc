@@ -540,8 +540,25 @@ spooler size.
 
 The Kafka output sends the events to Apache Kafka.
 
-Note: Events bigger then <<kafka-max_message_bytes>> will be dropped. Make sure
-+{beatname_lc} will not generate events bigger then <<kafka-max_message_bytes>>.
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.kafka:
+  # initial brokers for reading cluster metadata
+  hosts: ["kafka1:9092", "kafka2:9092", "kafka3:9092"]
+
+  # message topic selection + partitioning
+  topic: '%{[type]}'
+  partition.round_robin:
+    reachable_only: false
+
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000
+------------------------------------------------------------------------------
+
+NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be dropped. To avoid this problem, make sure {beatname_uc} does not generate events bigger than <<kafka-max_message_bytes,`max_message_bytes`>>.
 
 ==== Compatibility
 
