@@ -187,8 +187,11 @@ output.elasticsearch:
 +
 If you are sending output to Logstash, see <<config-packetbeat-logstash>> instead.
 
-TIP: To test your configuration file, run Packetbeat in the foreground with the following options specified:
-+sudo ./packetbeat -configtest -e+.
+TIP: To test your configuration file, change to the directory where the Packetbeat
+binary is installed, and run Packetbeat in the foreground with the following
+options specified: +sudo ./packetbeat -configtest -e+. Make sure your config files are
+in the path expected by Packetbeat (see <<directory-layout>>). If you
+installed from DEB or RPM packages, run +sudo ./packetbeat.sh -configtest -e+.
 
 [[packetbeat-template]]
 === Step 3: Loading the Index Template in Elasticsearch
