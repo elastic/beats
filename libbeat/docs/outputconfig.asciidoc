@@ -536,6 +536,26 @@ spooler size.
 
 The Kafka output sends the events to Apache Kafka.
 
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.kafka:
+  # initial brokers for reading cluster metadata
+  hosts: ["kafka1:9092", "kafka2:9092", "kafka3:9092"]
+
+  # message topic selection + partitioning
+  topic: '%{[type]}'
+  partition.round_robin:
+    reachable_only: false
+
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000
+------------------------------------------------------------------------------
+
+NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be dropped. To avoid this problem, make sure {beatname_uc} does not generate events bigger than <<kafka-max_message_bytes,`max_message_bytes`>>.
+
 ==== Compatibility
 
 This output works with Kafka 0.8, 0.9, and 0.10.
@@ -682,6 +702,7 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 
 Sets the output compression codec. Must be one of `none`, `snappy` and `gzip`. The default is `gzip`.
 
+[[kafka-max_message_bytes]]
 ===== max_message_bytes
 
 The maximum permitted size of JSON-encoded messages. Bigger messages will be dropped. The default value is 1000000 (bytes). This value should be equal to or less than the broker's `message.max.bytes`.
