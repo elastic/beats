@@ -42,15 +42,23 @@ func (p *ProspectorLog) Init() {
 
 	// Make sure all states are set as finished
 	for _, state := range fileStates {
-		state.Finished = true
-		// Set all states again to infinity TTL to make sure only removed if config still same
-		// clean_inactive / clean_removed could have been changed between restarts
-		state.TTL = -1
 
-		// Update prospector states and send new states to registry
-		err := p.Prospector.updateState(input.NewEvent(state))
-		if err != nil {
-			logp.Err("Problem putting initial state: %+v", err)
+		// Check if state source belongs to this prospector. If yes, update the state.
+		if p.hasFile(state.Source) {
+			// Set all states again to infinity TTL to make sure only removed if config still same
+			// clean_inactive / clean_removed could have been changed between restarts
+			state.TTL = -1
+
+			// Update prospector states and send new states to registry
+			err := p.Prospector.updateState(input.NewEvent(state))
+			if err != nil {
+				logp.Err("Problem putting initial state: %+v", err)
+			}
+		} else {
+			// Only update internal state, do not report it to registry
+			// Having all states could be useful in case later a file is moved into this prospector
+			// TODO: Think about if this is expected or unexpected
+			p.Prospector.states.Update(state)
 		}
 	}
 
@@ -158,6 +166,31 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 	}
 
 	return paths
+}
+
+// hasFile returns true in case the given filePath is part of this prospector
+func (p *ProspectorLog) hasFile(filePath string) bool {
+	for _, glob := range p.config.Paths {
+		// Evaluate the path as a wildcards/shell glob
+		matches, err := filepath.Glob(glob)
+		if err != nil {
+			continue
+		}
+
+		// Check any matched files to see if we need to start a harvester
+		for _, file := range matches {
+
+			// check if the file is in the exclude_files list
+			if p.isFileExcluded(file) {
+				continue
+			}
+
+			if filePath == file {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // Scan starts a scanGlob for each provided path/glob
