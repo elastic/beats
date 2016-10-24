@@ -153,12 +153,13 @@ func cfgRoundRobinPartitioner(config *common.Config) (func() partitioner, error)
 	return func() partitioner {
 		N := cfg.GroupEvents
 		count := N
-		partition := rand.Int31()
+		var partition int32
+		partition = 0
 
 		return func(_ *message, numPartitions int32) (int32, error) {
 			if N == count {
 				count = 0
-				if partition++; partition >= numPartitions {
+				if partition++; partition%numPartitions == 0 {
 					partition = 0
 				}
 			}
