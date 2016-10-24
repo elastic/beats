@@ -139,7 +139,7 @@ The list below covers changes between 1.x to 5.0.0 releases.
 - Update to Go 1.7. {pull}2306[2306]
 - Add option to Elasticsearch output to pass http parameters in index operations {issue}805[805]
 - Improve Logstash and Elasticsearch backoff behavior. {pull}927[927]
-- Add experimental Kafka output. {pull}942[942] {pull}2188[2188] {pull}2190[2190] {pull}2284[2284]
+- Add Kafka output. {pull}942[942] {pull}2188[2188] {pull}2190[2190] {pull}2284[2284]
 - Add config file option to configure GOMAXPROCS. {pull}969[969]
 - Improve shutdown handling in libbeat. {pull}1075[1075]
 - Log total non-zero internal metrics on shutdown. {pull}2349[2349]
