@@ -112,6 +112,12 @@ func (r *Registrar) loadStates() error {
 		return err
 	}
 
+	// Set all states to finished on restart
+	for key, state := range states {
+		state.Finished = true
+		states[key] = state
+	}
+
 	r.states.SetStates(states)
 	logp.Info("States Loaded from registrar: %+v", len(states))
 
