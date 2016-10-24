@@ -499,6 +499,13 @@
             }
           }
         },
+        "client_geoip": {
+          "properties": {
+            "location": {
+              "type": "geo_point"
+            }
+          }
+        },
         "client_ip": {
           "ignore_above": 1024,
           "type": "keyword"
