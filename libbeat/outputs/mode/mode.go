@@ -64,7 +64,7 @@ type ProtocolClient interface {
 	PublishEvent(data outputs.Data) error
 }
 
-// AsyncProtocolClient interface is a output plugin specfic client implementation
+// AsyncProtocolClient interface is a output plugin specific client implementation
 // for asynchronous encoding and publishing events.
 type AsyncProtocolClient interface {
 	Connectable

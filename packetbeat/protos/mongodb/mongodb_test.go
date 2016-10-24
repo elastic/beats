@@ -25,11 +25,11 @@ func MongodbModForTests() *Mongodb {
 }
 
 // Helper function that returns an example TcpTuple
-func testTcpTuple() *common.TcpTuple {
-	t := &common.TcpTuple{
-		Ip_length: 4,
-		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
-		Src_port: 6512, Dst_port: 27017,
+func testTcpTuple() *common.TCPTuple {
+	t := &common.TCPTuple{
+		IPLength: 4,
+		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+		SrcPort: 6512, DstPort: 27017,
 	}
 	t.ComputeHashebles()
 	return t
@@ -106,7 +106,7 @@ func TestSimpleFindLimit1(t *testing.T) {
 	private := protos.ProtocolData(new(mongodbConnectionData))
 
 	private = mongodb.Parse(&req, tcptuple, 0, private)
-	private = mongodb.Parse(&resp, tcptuple, 1, private)
+	mongodb.Parse(&resp, tcptuple, 1, private)
 	trans := expectTransaction(t, mongodb)
 
 	assert.Equal(t, "OK", trans["status"])
@@ -188,7 +188,7 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 	private = mongodb.Parse(&resp2, tcptuple, 1, private)
 
 	resp3 := protos.Packet{Payload: resp_data3}
-	private = mongodb.Parse(&resp3, tcptuple, 1, private)
+	mongodb.Parse(&resp3, tcptuple, 1, private)
 
 	trans := expectTransaction(t, mongodb)
 

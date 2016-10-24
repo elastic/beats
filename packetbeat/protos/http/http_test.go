@@ -1048,11 +1048,11 @@ func Test_gap_in_body_http1dot0(t *testing.T) {
 
 }
 
-func testCreateTCPTuple() *common.TcpTuple {
-	t := &common.TcpTuple{
-		Ip_length: 4,
-		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
-		Src_port: 6512, Dst_port: 80,
+func testCreateTCPTuple() *common.TCPTuple {
+	t := &common.TCPTuple{
+		IPLength: 4,
+		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+		SrcPort: 6512, DstPort: 80,
 	}
 	t.ComputeHashebles()
 	return t
@@ -1107,7 +1107,7 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 	private, drop := http.GapInStream(tcptuple, 1, 10, private)
 	assert.Equal(t, false, drop)
 
-	private = http.ReceivedFin(tcptuple, 1, private)
+	http.ReceivedFin(tcptuple, 1, private)
 
 	trans := expectTransaction(t, http)
 	assert.NotNil(t, trans)
@@ -1284,7 +1284,7 @@ func BenchmarkHttpSimpleTransaction(b *testing.B) {
 		private = http.ReceivedFin(tcptuple, 0, private)
 
 		private = http.Parse(&resp, tcptuple, 1, private)
-		private = http.ReceivedFin(tcptuple, 1, private)
+		http.ReceivedFin(tcptuple, 1, private)
 
 		select {
 		case <-client.Channel:

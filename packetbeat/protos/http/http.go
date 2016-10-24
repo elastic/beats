@@ -37,7 +37,7 @@ var (
 )
 
 type stream struct {
-	tcptuple *common.TcpTuple
+	tcptuple *common.TCPTuple
 
 	data []byte
 
@@ -198,7 +198,7 @@ func (st *stream) PrepareForNewMessage() {
 // of a message.
 func (http *HTTP) messageComplete(
 	conn *httpConnectionData,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 	st *stream,
 ) {
@@ -215,7 +215,7 @@ func (http *HTTP) ConnectionTimeout() time.Duration {
 // Parse function is used to process TCP payloads.
 func (http *HTTP) Parse(
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
@@ -259,7 +259,7 @@ func getHTTPConnection(private protos.ProtocolData) *httpConnectionData {
 func (http *HTTP) doParse(
 	conn *httpConnectionData,
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *httpConnectionData {
 
@@ -314,7 +314,7 @@ func (http *HTTP) doParse(
 	return conn
 }
 
-func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *stream {
+func newStream(pkt *protos.Packet, tcptuple *common.TCPTuple) *stream {
 	return &stream{
 		tcptuple: tcptuple,
 		data:     pkt.Payload,
@@ -323,7 +323,7 @@ func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *stream {
 }
 
 // ReceivedFin will be called when TCP transaction is terminating.
-func (http *HTTP) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+func (http *HTTP) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
 	debugf("Received FIN")
@@ -352,7 +352,7 @@ func (http *HTTP) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 
 // GapInStream is called when a gap of nbytes bytes is found in the stream (due
 // to packet loss).
-func (http *HTTP) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (http *HTTP) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	defer logp.Recover("GapInStream(http) exception")
@@ -390,13 +390,13 @@ func (http *HTTP) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 func (http *HTTP) handleHTTP(
 	conn *httpConnectionData,
 	m *message,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 ) {
 
 	m.TCPTuple = *tcptuple
 	m.Direction = dir
-	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
+	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 	http.hideHeaders(m)
 
 	if m.IsRequest {
@@ -452,13 +452,13 @@ func (http *HTTP) newTransaction(requ, resp *message) common.MapStr {
 	}
 
 	src := common.Endpoint{
-		Ip:   requ.TCPTuple.Src_ip.String(),
-		Port: requ.TCPTuple.Src_port,
+		IP:   requ.TCPTuple.SrcIP.String(),
+		Port: requ.TCPTuple.SrcPort,
 		Proc: string(requ.CmdlineTuple.Src),
 	}
 	dst := common.Endpoint{
-		Ip:   requ.TCPTuple.Dst_ip.String(),
-		Port: requ.TCPTuple.Dst_port,
+		IP:   requ.TCPTuple.DstIP.String(),
+		Port: requ.TCPTuple.DstPort,
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
 	if requ.Direction == tcp.TcpDirectionReverse {

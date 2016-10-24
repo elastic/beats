@@ -478,7 +478,7 @@ func parseUnknown(parser *parser, buf *streambuf.Buffer) parseResult {
 func parseCounterResponse(parser *parser, buf *streambuf.Buffer) parseResult {
 	msg := parser.message
 	tmp := streambuf.NewFixed(msg.rawCommand)
-	msg.value, _ = tmp.AsciiUint(false)
+	msg.value, _ = tmp.UintASCII(false)
 	if tmp.Failed() {
 		err := tmp.Err()
 		debug("counter response invalid: %v", err)
@@ -610,7 +610,7 @@ func withUintArg(
 ) error {
 	msg := parser.message
 	parseNextArg(buf)
-	value, err := buf.AsciiUint(false)
+	value, err := buf.UintASCII(false)
 	if err == nil {
 		fn(msg, uint32(value))
 	}
@@ -623,7 +623,7 @@ func withUint64Arg(
 	fn func(msg *message, v uint64),
 ) error {
 	parseNextArg(buf)
-	value, err := buf.AsciiUint(false)
+	value, err := buf.UintASCII(false)
 	if err == nil {
 		fn(parser.message, value)
 	}
@@ -648,7 +648,7 @@ func withInt64Arg(
 	fn func(msg *message, v int64),
 ) error {
 	parseNextArg(buf)
-	value, err := buf.AsciiInt(false)
+	value, err := buf.IntASCII(false)
 	if err == nil {
 		fn(parser.message, value)
 	}

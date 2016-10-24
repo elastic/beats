@@ -44,7 +44,7 @@ func (f *ConditionFields) Unpack(to interface{}) error {
 				expand(fmt.Sprintf("%v.%v", key, k), val)
 			}
 		case []interface{}:
-			for i, _ := range v {
+			for i := range v {
 				expand(fmt.Sprintf("%v.%v", key, i), v[i])
 			}
 		default:

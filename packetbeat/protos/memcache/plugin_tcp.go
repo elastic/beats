@@ -79,7 +79,7 @@ func (mc *Memcache) ConnectionTimeout() time.Duration {
 // Parse is called from TCP layer when payload data is available for parsing.
 func (mc *Memcache) Parse(
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
@@ -89,13 +89,13 @@ func (mc *Memcache) Parse(
 	debug("memcache connection %p", tcpConn)
 	tcpConn = mc.memcacheParseTCP(tcpConn, pkt, tcptuple, dir)
 	if tcpConn == nil {
-		// explicitely return nil if tcpConn equals nil so ProtocolData really is nil
+		// explicitly return nil if tcpConn equals nil so ProtocolData really is nil
 		return nil
 	}
 	return tcpConn
 }
 
-func (mc *Memcache) newStream(tcptuple *common.TcpTuple) *stream {
+func (mc *Memcache) newStream(tcptuple *common.TCPTuple) *stream {
 	s := &stream{}
 	s.parser.init(&mc.config)
 	s.Stream.Init(tcp.TCP_MAX_DATA_IN_STREAM)
@@ -105,7 +105,7 @@ func (mc *Memcache) newStream(tcptuple *common.TcpTuple) *stream {
 func (mc *Memcache) memcacheParseTCP(
 	tcpConn *tcpConnectionData,
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *tcpConnectionData {
 	// assume we are in sync
@@ -151,7 +151,7 @@ func (mc *Memcache) memcacheParseTCP(
 		}
 		stream.reset()
 
-		tuple := tcptuple.IpPort()
+		tuple := tcptuple.IPPort()
 		err = mc.onTCPMessage(conn, tuple, dir, msg)
 		if err != nil {
 			logp.Warn("error processing memcache message: %s", err)
@@ -168,7 +168,7 @@ func (mc *Memcache) memcacheParseTCP(
 
 func (mc *Memcache) onTCPMessage(
 	conn *connection,
-	tuple *common.IpPortTuple,
+	tuple *common.IPPortTuple,
 	dir uint8,
 	msg *message,
 ) error {
@@ -185,7 +185,7 @@ func (mc *Memcache) onTCPMessage(
 
 func (mc *Memcache) onTCPRequest(
 	conn *connection,
-	tuple *common.IpPortTuple,
+	tuple *common.IPPortTuple,
 	dir uint8,
 	msg *message,
 ) error {
@@ -213,7 +213,7 @@ func (mc *Memcache) onTCPRequest(
 
 func (mc *Memcache) onTCPResponse(
 	conn *connection,
-	tuple *common.IpPortTuple,
+	tuple *common.IPPortTuple,
 	dir uint8,
 	msg *message,
 ) error {
@@ -321,7 +321,7 @@ func (mc *Memcache) onTCPTrans(requ, resp *message) error {
 // GapInStream is called by TCP layer when a packets are missing from the tcp
 // stream.
 func (mc *Memcache) GapInStream(
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8, nbytes int,
 	private protos.ProtocolData,
 ) (priv protos.ProtocolData, drop bool) {
@@ -385,7 +385,7 @@ func (mc *Memcache) GapInStream(
 
 // ReceivedFin is called by tcp layer when the FIN flag is seen in the TCP stream.
 func (mc *Memcache) ReceivedFin(
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {

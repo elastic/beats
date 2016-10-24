@@ -17,7 +17,7 @@ import (
 
 type udpMemcache struct {
 	udpConfig      udpConfig
-	udpConnections map[common.HashableIpPortTuple]*udpConnection
+	udpConnections map[common.HashableIPPortTuple]*udpConnection
 	udpExpTrans    udpExpTransList
 }
 
@@ -32,7 +32,7 @@ type mcUdpHeader struct {
 }
 
 type udpConnection struct {
-	tuple        common.IpPortTuple
+	tuple        common.IPPortTuple
 	transactions map[uint16]*udpTransaction
 	memcache     *Memcache
 }
@@ -136,7 +136,7 @@ func (mc *Memcache) ParseUdp(pkt *protos.Packet) {
 }
 
 func (mc *Memcache) getUdpConnection(
-	tuple *common.IpPortTuple,
+	tuple *common.IPPortTuple,
 ) (*udpConnection, applayer.NetDirection) {
 	connection := mc.udpConnections[tuple.Hashable()]
 	if connection != nil {
@@ -154,7 +154,7 @@ func (mc *Memcache) getUdpConnection(
 
 func (mc *Memcache) onUdpMessage(
 	trans *udpTransaction,
-	tuple *common.IpPortTuple,
+	tuple *common.IPPortTuple,
 	dir applayer.NetDirection,
 	msg *message,
 ) (bool, error) {
@@ -198,7 +198,7 @@ func (mc *Memcache) onUdpTrans(udp *udpTransaction) error {
 	return mc.finishTransaction(trans)
 }
 
-func newUdpConnection(mc *Memcache, tuple *common.IpPortTuple) *udpConnection {
+func newUdpConnection(mc *Memcache, tuple *common.IPPortTuple) *udpConnection {
 	c := &udpConnection{
 		tuple:        *tuple,
 		memcache:     mc,

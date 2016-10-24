@@ -195,7 +195,7 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 	debugf("has src: %v", ok)
 	if ok {
 		// check if it's outgoing transaction (as client)
-		isOutgoing := p.topo.IsPublisherIP(src.Ip)
+		isOutgoing := p.topo.IsPublisherIP(src.IP)
 		if isOutgoing {
 			if p.ignoreOutgoing {
 				// duplicated transaction -> ignore it
@@ -207,8 +207,8 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 			event["direction"] = "out"
 		}
 
-		srcServer = p.topo.GetServerName(src.Ip)
-		event["client_ip"] = src.Ip
+		srcServer = p.topo.GetServerName(src.IP)
+		event["client_ip"] = src.IP
 		event["client_port"] = src.Port
 		event["client_proc"] = src.Proc
 		event["client_server"] = srcServer
@@ -218,15 +218,15 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 	dst, ok := event["dst"].(*common.Endpoint)
 	debugf("has dst: %v", ok)
 	if ok {
-		dstServer = p.topo.GetServerName(dst.Ip)
-		event["ip"] = dst.Ip
+		dstServer = p.topo.GetServerName(dst.IP)
+		event["ip"] = dst.IP
 		event["port"] = dst.Port
 		event["proc"] = dst.Proc
 		event["server"] = dstServer
 		delete(event, "dst")
 
 		//check if it's incoming transaction (as server)
-		if p.topo.IsPublisherIP(dst.Ip) {
+		if p.topo.IsPublisherIP(dst.IP) {
 			// incoming transaction
 			event["direction"] = "in"
 		}
@@ -243,7 +243,7 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 			}
 		} else {
 			if len(srcServer) == 0 && src != nil { // only for external IP addresses
-				loc := p.geoLite.GetLocationByIP(src.Ip)
+				loc := p.geoLite.GetLocationByIP(src.IP)
 				if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
 					loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
 					event["client_location"] = loc

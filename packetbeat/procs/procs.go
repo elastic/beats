@@ -105,7 +105,7 @@ func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
 
 	// Read the local IP addresses
 	var err error
-	proc.LocalAddrs, err = common.LocalIpAddrs()
+	proc.LocalAddrs, err = common.LocalIPAddrs()
 	if err != nil {
 		logp.Err("Error getting local IP addresses: %s", err)
 		proc.LocalAddrs = []net.IP{}
@@ -194,26 +194,26 @@ func FindPidsByCmdlineGrep(prefix string, process string) ([]int, error) {
 	return pids, nil
 }
 
-func (proc *ProcessesWatcher) FindProcessesTuple(tuple *common.IpPortTuple) (proc_tuple *common.CmdlineTuple) {
+func (proc *ProcessesWatcher) FindProcessesTuple(tuple *common.IPPortTuple) (proc_tuple *common.CmdlineTuple) {
 	proc_tuple = &common.CmdlineTuple{}
 
 	if !proc.ReadFromProc {
 		return
 	}
 
-	if proc.IsLocalIp(tuple.Src_ip) {
-		logp.Debug("procs", "Looking for port %d", tuple.Src_port)
-		proc_tuple.Src = []byte(proc.FindProc(tuple.Src_port))
+	if proc.IsLocalIp(tuple.SrcIP) {
+		logp.Debug("procs", "Looking for port %d", tuple.SrcPort)
+		proc_tuple.Src = []byte(proc.FindProc(tuple.SrcPort))
 		if len(proc_tuple.Src) > 0 {
-			logp.Debug("procs", "Found device %s for port %d", proc_tuple.Src, tuple.Src_port)
+			logp.Debug("procs", "Found device %s for port %d", proc_tuple.Src, tuple.SrcPort)
 		}
 	}
 
-	if proc.IsLocalIp(tuple.Dst_ip) {
-		logp.Debug("procs", "Looking for port %d", tuple.Dst_port)
-		proc_tuple.Dst = []byte(proc.FindProc(tuple.Dst_port))
+	if proc.IsLocalIp(tuple.DstIP) {
+		logp.Debug("procs", "Looking for port %d", tuple.DstPort)
+		proc_tuple.Dst = []byte(proc.FindProc(tuple.DstPort))
 		if len(proc_tuple.Dst) > 0 {
-			logp.Debug("procs", "Found device %s for port %d", proc_tuple.Dst, tuple.Dst_port)
+			logp.Debug("procs", "Found device %s for port %d", proc_tuple.Dst, tuple.DstPort)
 		}
 	}
 

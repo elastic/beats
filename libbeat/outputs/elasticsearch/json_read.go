@@ -202,7 +202,7 @@ func (r *jsonReader) nextInt() (int, error) {
 	}
 
 	tmp := streambuf.NewFixed(raw)
-	i, err := tmp.AsciiInt(false)
+	i, err := tmp.IntASCII(false)
 	return int(i), err
 }
 
@@ -428,7 +428,7 @@ func (r *jsonReader) stepFalse() (entity, []byte, error) {
 }
 
 func stepSymbol(r *jsonReader, e entity, symb []byte, fail error) (entity, []byte, error) {
-	ok, err := r.AsciiMatch(symb)
+	ok, err := r.MatchASCII(symb)
 	if err != nil {
 		return failEntity, nil, err
 	}

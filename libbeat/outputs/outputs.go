@@ -85,7 +85,7 @@ func InitOutputs(
 	configs map[string]*common.Config,
 	topologyExpire int,
 ) ([]OutputPlugin, error) {
-	var plugins []OutputPlugin = nil
+	var plugins []OutputPlugin
 	for name, plugin := range outputsPlugins {
 		config, exists := configs[name]
 		if !exists {

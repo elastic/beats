@@ -140,6 +140,7 @@ func Test_ReadBufSmaller(t *testing.T) {
 	assert.Equal(t, []byte{6, 7, 8}, tmp[:n])
 
 	n, err = b.Read(tmp)
+	assert.Equal(t, 0, n)
 	assert.Equal(t, io.EOF, err)
 }
 
@@ -154,6 +155,7 @@ func Test_ReadBufBigger(t *testing.T) {
 	assert.Equal(t, []byte{1, 2, 3, 4, 5, 6, 7, 8}, tmp[:n])
 
 	n, err = b.Read(tmp)
+	assert.Equal(t, 0, n)
 	assert.Equal(t, io.EOF, err)
 }
 

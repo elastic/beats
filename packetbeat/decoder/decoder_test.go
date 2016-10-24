@@ -77,10 +77,10 @@ func TestDecodePacketData_ipv4Tcp(t *testing.T) {
 	d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
 
 	assert.NotNil(t, tcp.pkt, "TCP packet not received")
-	assert.Equal(t, "172.16.16.164", tcp.pkt.Tuple.Src_ip.String())
-	assert.Equal(t, uint16(1108), tcp.pkt.Tuple.Src_port)
-	assert.Equal(t, "172.16.16.139", tcp.pkt.Tuple.Dst_ip.String())
-	assert.Equal(t, uint16(53), tcp.pkt.Tuple.Dst_port)
+	assert.Equal(t, "172.16.16.164", tcp.pkt.Tuple.SrcIP.String())
+	assert.Equal(t, uint16(1108), tcp.pkt.Tuple.SrcPort)
+	assert.Equal(t, "172.16.16.139", tcp.pkt.Tuple.DstIP.String())
+	assert.Equal(t, uint16(53), tcp.pkt.Tuple.DstPort)
 	assert.NotEqual(t, -1, strings.Index(string(p.Data()), string(tcp.pkt.Payload)))
 }
 
@@ -103,10 +103,10 @@ func TestDecodePacketData_ipv4Udp(t *testing.T) {
 	d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
 
 	assert.NotNil(t, udp.pkt, "UDP packet not received")
-	assert.Equal(t, "192.168.170.8", udp.pkt.Tuple.Src_ip.String())
-	assert.Equal(t, uint16(32795), udp.pkt.Tuple.Src_port)
-	assert.Equal(t, "192.168.170.20", udp.pkt.Tuple.Dst_ip.String())
-	assert.Equal(t, uint16(53), udp.pkt.Tuple.Dst_port)
+	assert.Equal(t, "192.168.170.8", udp.pkt.Tuple.SrcIP.String())
+	assert.Equal(t, uint16(32795), udp.pkt.Tuple.SrcPort)
+	assert.Equal(t, "192.168.170.20", udp.pkt.Tuple.DstIP.String())
+	assert.Equal(t, uint16(53), udp.pkt.Tuple.DstPort)
 	assert.NotEqual(t, -1, strings.Index(string(p.Data()), string(udp.pkt.Payload)))
 }
 
@@ -144,10 +144,10 @@ func TestDecodePacketData_ipv6Tcp(t *testing.T) {
 	d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
 
 	assert.NotNil(t, tcp.pkt, "TCP packet not received")
-	assert.Equal(t, "2001:6f8:102d:0:2d0:9ff:fee3:e8de", tcp.pkt.Tuple.Src_ip.String())
-	assert.Equal(t, uint16(59201), tcp.pkt.Tuple.Src_port)
-	assert.Equal(t, "2001:6f8:900:7c0::2", tcp.pkt.Tuple.Dst_ip.String())
-	assert.Equal(t, uint16(80), tcp.pkt.Tuple.Dst_port)
+	assert.Equal(t, "2001:6f8:102d:0:2d0:9ff:fee3:e8de", tcp.pkt.Tuple.SrcIP.String())
+	assert.Equal(t, uint16(59201), tcp.pkt.Tuple.SrcPort)
+	assert.Equal(t, "2001:6f8:900:7c0::2", tcp.pkt.Tuple.DstIP.String())
+	assert.Equal(t, uint16(80), tcp.pkt.Tuple.DstPort)
 	assert.NotEqual(t, -1, strings.Index(string(p.Data()), string(tcp.pkt.Payload)))
 }
 
@@ -175,10 +175,10 @@ func TestDecodePacketData_ipv6Udp(t *testing.T) {
 	d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
 
 	assert.NotNil(t, udp.pkt, "UDP packet not received")
-	assert.Equal(t, "3ffe:507:0:1:200:86ff:fe05:80da", udp.pkt.Tuple.Src_ip.String())
-	assert.Equal(t, uint16(2415), udp.pkt.Tuple.Src_port)
-	assert.Equal(t, "3ffe:501:4819::42", udp.pkt.Tuple.Dst_ip.String())
-	assert.Equal(t, uint16(53), udp.pkt.Tuple.Dst_port)
+	assert.Equal(t, "3ffe:507:0:1:200:86ff:fe05:80da", udp.pkt.Tuple.SrcIP.String())
+	assert.Equal(t, uint16(2415), udp.pkt.Tuple.SrcPort)
+	assert.Equal(t, "3ffe:501:4819::42", udp.pkt.Tuple.DstIP.String())
+	assert.Equal(t, uint16(53), udp.pkt.Tuple.DstPort)
 	assert.NotEqual(t, -1, strings.Index(string(p.Data()), string(udp.pkt.Payload)))
 }
 

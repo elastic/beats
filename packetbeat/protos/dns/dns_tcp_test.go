@@ -175,11 +175,11 @@ var (
 	}
 )
 
-func testTcpTuple() *common.TcpTuple {
-	t := &common.TcpTuple{
-		Ip_length: 4,
-		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
-		Src_port: ClientPort, Dst_port: ServerPort,
+func testTcpTuple() *common.TCPTuple {
+	t := &common.TCPTuple{
+		IPLength: 4,
+		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+		SrcPort: ClientPort, DstPort: ServerPort,
 	}
 	t.ComputeHashebles()
 	return t
@@ -397,7 +397,7 @@ func TestParseTcp_errorDuplicateRequestsOnePacket(t *testing.T) {
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	packet = newPacket(forward, q.request[offset:])
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	m := expectResult(t, dns)
@@ -636,7 +636,7 @@ func BenchmarkParallelTcpParse(b *testing.B) {
 		for pb.Next() {
 			q := messagesTcp[rand.Intn(numMessages)]
 			var packet *protos.Packet
-			var tcptuple *common.TcpTuple
+			var tcptuple *common.TCPTuple
 			var private protos.ProtocolData
 
 			if rand.Intn(2) == 0 {

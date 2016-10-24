@@ -20,27 +20,27 @@ func TestConvertOldStates(t *testing.T) {
 		{
 			Name: "Simple test with three files",
 			Input: map[string]file.State{
-				"test":  file.State{Source: "test", FileStateOS: file.StateOS{Inode: 5}},
-				"test1": file.State{Source: "test1", FileStateOS: file.StateOS{Inode: 3}},
-				"test2": file.State{Source: "test2", FileStateOS: file.StateOS{Inode: 2}},
+				"test":  {Source: "test", FileStateOS: file.StateOS{Inode: 5}},
+				"test1": {Source: "test1", FileStateOS: file.StateOS{Inode: 3}},
+				"test2": {Source: "test2", FileStateOS: file.StateOS{Inode: 2}},
 			},
 			Output: []string{"test", "test1", "test2"},
 		},
 		{
 			Name: "De-duplicate inodes. Bigger offset wins (1)",
 			Input: map[string]file.State{
-				"test":  file.State{Source: "test", FileStateOS: file.StateOS{Inode: 2}},
-				"test1": file.State{Source: "test1", FileStateOS: file.StateOS{Inode: 3}},
-				"test2": file.State{Source: "test2", FileStateOS: file.StateOS{Inode: 2}, Offset: 2},
+				"test":  {Source: "test", FileStateOS: file.StateOS{Inode: 2}},
+				"test1": {Source: "test1", FileStateOS: file.StateOS{Inode: 3}},
+				"test2": {Source: "test2", FileStateOS: file.StateOS{Inode: 2}, Offset: 2},
 			},
 			Output: []string{"test1", "test2"},
 		},
 		{
 			Name: "De-duplicate inodes. Bigger offset wins (2)",
 			Input: map[string]file.State{
-				"test":  file.State{Source: "test", FileStateOS: file.StateOS{Inode: 2}, Offset: 2},
-				"test1": file.State{Source: "test1", FileStateOS: file.StateOS{Inode: 3}},
-				"test2": file.State{Source: "test2", FileStateOS: file.StateOS{Inode: 2}, Offset: 0},
+				"test":  {Source: "test", FileStateOS: file.StateOS{Inode: 2}, Offset: 2},
+				"test1": {Source: "test1", FileStateOS: file.StateOS{Inode: 3}},
+				"test2": {Source: "test2", FileStateOS: file.StateOS{Inode: 2}, Offset: 0},
 			},
 			Output: []string{"test", "test1"},
 		},
@@ -54,6 +54,5 @@ func TestConvertOldStates(t *testing.T) {
 		}
 		sort.Strings(resultSources)
 		assert.Equal(t, test.Output, resultSources, test.Name)
-
 	}
 }

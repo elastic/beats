@@ -10,7 +10,7 @@ import (
 type mongodbMessage struct {
 	Ts time.Time
 
-	TcpTuple     common.TcpTuple
+	TcpTuple     common.TCPTuple
 	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
 
@@ -40,7 +40,7 @@ type mongodbMessage struct {
 
 // Represent a stream being parsed that contains a mongodb message
 type stream struct {
-	tcptuple *common.TcpTuple
+	tcptuple *common.TCPTuple
 
 	data    []byte
 	message *mongodbMessage
@@ -62,7 +62,7 @@ type mongodbConnectionData struct {
 // These transactions are the end product of this parser
 type transaction struct {
 	Type         string
-	tuple        common.TcpTuple
+	tuple        common.TCPTuple
 	cmdline      *common.CmdlineTuple
 	Src          common.Endpoint
 	Dst          common.Endpoint

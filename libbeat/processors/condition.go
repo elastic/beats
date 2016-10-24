@@ -77,16 +77,16 @@ func NewCondition(config *ConditionConfig) (*Condition, error) {
 			return nil, err
 		}
 	} else if len(config.OR) > 0 {
-		for _, cond_config := range config.OR {
-			cond, err := NewCondition(&cond_config)
+		for _, condConfig := range config.OR {
+			cond, err := NewCondition(&condConfig)
 			if err != nil {
 				return nil, err
 			}
 			c.or = append(c.or, *cond)
 		}
 	} else if len(config.AND) > 0 {
-		for _, cond_config := range config.AND {
-			cond, err := NewCondition(&cond_config)
+		for _, condConfig := range config.AND {
+			cond, err := NewCondition(&condConfig)
 			if err != nil {
 				return nil, err
 			}

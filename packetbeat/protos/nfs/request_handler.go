@@ -33,7 +33,7 @@ func (rpc *Rpc) handleExpiredPacket(nfs *Nfs) {
 }
 
 // called when we process a RPC call
-func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.TcpTuple, dir uint8) {
+func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
 
 	// eat rpc version number
 	xdr.getUInt()
@@ -44,12 +44,12 @@ func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 	}
 
 	src := common.Endpoint{
-		Ip:   tcptuple.Src_ip.String(),
-		Port: tcptuple.Src_port,
+		IP:   tcptuple.SrcIP.String(),
+		Port: tcptuple.SrcPort,
 	}
 	dst := common.Endpoint{
-		Ip:   tcptuple.Dst_ip.String(),
-		Port: tcptuple.Dst_port,
+		IP:   tcptuple.DstIP.String(),
+		Port: tcptuple.DstPort,
 	}
 
 	// The direction of the stream is based in the direction of first packet seen.
@@ -84,7 +84,7 @@ func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 		cred["stamp"] = credXdr.getUInt()
 		machine := credXdr.getString()
 		if machine == "" {
-			machine = src.Ip
+			machine = src.IP
 		}
 		cred["machinename"] = machine
 		cred["uid"] = credXdr.getUInt()
@@ -107,14 +107,14 @@ func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 	event["nfs"] = nfs.getRequestInfo(xdr)
 
 	// use xid+src ip to uniquely identify request
-	reqId := xid + tcptuple.Src_ip.String()
+	reqId := xid + tcptuple.SrcIP.String()
 
 	// populate cache to trace request reply
 	rpc.callsSeen.Put(reqId, &nfs)
 }
 
 // called when we process a RPC reply
-func (rpc *Rpc) handleReply(xid string, xdr *Xdr, ts time.Time, tcptuple *common.TcpTuple, dir uint8) {
+func (rpc *Rpc) handleReply(xid string, xdr *Xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
 	replyStatus := xdr.getUInt()
 	// we are interested only in accepted rpc reply
 	if replyStatus != 0 {
@@ -129,10 +129,10 @@ func (rpc *Rpc) handleReply(xid string, xdr *Xdr, ts time.Time, tcptuple *common
 	var reqId string
 	if dir == tcp.TcpDirectionReverse {
 		// stream in correct order: Src points to a client
-		reqId = xid + tcptuple.Src_ip.String()
+		reqId = xid + tcptuple.SrcIP.String()
 	} else {
 		// stream in reverse order: Dst points to a client
-		reqId = xid + tcptuple.Dst_ip.String()
+		reqId = xid + tcptuple.DstIP.String()
 	}
 
 	// get cached request

@@ -26,17 +26,17 @@ func (proto *TcpProtocol) GetPorts() []int {
 	return proto.Ports
 }
 
-func (proto *TcpProtocol) Parse(pkt *Packet, tcptuple *common.TcpTuple,
+func (proto *TcpProtocol) Parse(pkt *Packet, tcptuple *common.TCPTuple,
 	dir uint8, private ProtocolData) ProtocolData {
 	return private
 }
 
-func (proto *TcpProtocol) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+func (proto *TcpProtocol) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private ProtocolData) ProtocolData {
 	return private
 }
 
-func (proto *TcpProtocol) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (proto *TcpProtocol) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private ProtocolData) (priv ProtocolData, drop bool) {
 	return private, true
 }
@@ -67,17 +67,17 @@ func (proto *TcpUdpProtocol) GetPorts() []int {
 	return proto.Ports
 }
 
-func (proto *TcpUdpProtocol) Parse(pkt *Packet, tcptuple *common.TcpTuple,
+func (proto *TcpUdpProtocol) Parse(pkt *Packet, tcptuple *common.TCPTuple,
 	dir uint8, private ProtocolData) ProtocolData {
 	return private
 }
 
-func (proto *TcpUdpProtocol) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+func (proto *TcpUdpProtocol) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private ProtocolData) ProtocolData {
 	return private
 }
 
-func (proto *TcpUdpProtocol) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (proto *TcpUdpProtocol) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private ProtocolData) (priv ProtocolData, drop bool) {
 	return private, true
 }
