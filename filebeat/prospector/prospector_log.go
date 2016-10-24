@@ -41,13 +41,19 @@ func (p *ProspectorLog) Init() {
 	fileStates := p.Prospector.states.GetStates()
 
 	// Make sure all states are set as finished
-	for key, state := range fileStates {
+	for _, state := range fileStates {
 		state.Finished = true
-		fileStates[key] = state
+		// Set all states again to infinity TTL to make sure only removed if config still same
+		// clean_inactive / clean_removed could have been changed between restarts
+		state.TTL = -1
+
+		// Update prospector states and send new states to registry
+		err := p.Prospector.updateState(input.NewEvent(state))
+		if err != nil {
+			logp.Err("Problem putting initial state: %+v", err)
+		}
 	}
 
-	// Overwrite prospector states
-	p.Prospector.states.SetStates(fileStates)
 	p.lastClean = time.Now()
 
 	logp.Info("Previous states loaded: %v", p.Prospector.states.Count())
@@ -74,8 +80,7 @@ func (p *ProspectorLog) Run() {
 				// Only clean up files where state is Finished
 				if state.Finished {
 					state.TTL = 0
-					event := input.NewEvent(state)
-					err := p.Prospector.updateState(event)
+					err := p.Prospector.updateState(input.NewEvent(state))
 					if err != nil {
 						logp.Err("File cleanup state update error: %s", err)
 					}
@@ -234,8 +239,7 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 			logp.Debug("prospector", "Updating state for renamed file: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
 			// Update state because of file rotation
 			oldState.Source = newState.Source
-			event := input.NewEvent(oldState)
-			err := p.Prospector.updateState(event)
+			err := p.Prospector.updateState(input.NewEvent(oldState))
 			if err != nil {
 				logp.Err("File rotation state update error: %s", err)
 			}
