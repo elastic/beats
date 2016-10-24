@@ -640,6 +640,8 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
+            clean_removed="false",
+            clean_inactive="0",
         )
 
         filebeat = self.start_beat()
@@ -936,3 +938,55 @@ class Test(BaseTest):
             assert data[0]["offset"] == len("make sure registry is written\n" + "2\n") + 2
         else:
             assert data[0]["offset"] == len("make sure registry is written\n" + "2\n")
+
+    def test_restart_state(self):
+        """
+        Make sure that states are rewritten correctly on restart and cleaned
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            close_inactive="1s",
+            ignore_older="3s",
+            clean_inactive="5s",
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile1 = self.working_dir + "/log/test1.log"
+        testfile2 = self.working_dir + "/log/test2.log"
+        testfile3 = self.working_dir + "/log/test3.log"
+        testfile4 = self.working_dir + "/log/test4.log"
+
+        with open(testfile1, 'w') as file:
+            file.write("Hello World\n")
+        with open(testfile2, 'w') as file:
+            file.write("Hello World\n")
+        with open(testfile3, 'w') as file:
+            file.write("Hello World\n")
+
+        filebeat = self.start_beat()
+
+        # Make sure states written appears one more time
+        self.wait_until(
+            lambda: self.log_contains("Ignore file because ignore_older"),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        filebeat = self.start_beat(output="filebeat2.log")
+
+        # Write additional file
+        with open(testfile4, 'w') as file:
+            file.write("Hello World\n")
+
+        # Make sure all 4 states are persisted
+        self.wait_until(
+            lambda: self.log_contains("Before: 4, After: 4", logfile="filebeat2.log"),
+            max_timeout=10)
+
+        # Wait until registry file is cleaned
+        self.wait_until(
+            lambda: self.log_contains("Before: 0, After: 0", logfile="filebeat2.log"),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
