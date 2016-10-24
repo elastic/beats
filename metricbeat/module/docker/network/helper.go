@@ -153,5 +153,9 @@ func (NT *NETService) getTxPacketsPerSecond(newStats *NETRaw, oldStats *NETRaw) 
 }
 
 func (NT *NETService) calculatePerSecond(duration time.Duration, oldValue uint64, newValue uint64) float64 {
-	return float64((newValue - oldValue)) / duration.Seconds()
+	value := float64(newValue) - float64(oldValue)
+	if value < 0 {
+		value = 0
+	}
+	return value / duration.Seconds()
 }
