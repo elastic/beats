@@ -124,10 +124,19 @@ func (r *Registrar) loadAndConvertOldState(f *os.File) bool {
 	// Make sure file reader is reset afterwards
 	defer f.Seek(0, 0)
 
+	// Check if already new state format
 	decoder := json.NewDecoder(f)
-	oldStates := map[string]file.State{}
-	err := decoder.Decode(&oldStates)
+	newState := []file.State{}
+	err := decoder.Decode(&newState)
+	// No error means registry is already in new format
+	if err == nil {
+		return false
+	}
 
+	// Reset file offset
+	f.Seek(0, 0)
+	oldStates := map[string]file.State{}
+	err = decoder.Decode(&oldStates)
 	if err != nil {
 		logp.Debug("registrar", "Error decoding old state: %+v", err)
 		return false
