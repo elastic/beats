@@ -63,7 +63,7 @@ func AssertIntArraysAreEqual(t *testing.T, expected []int, result []int) bool {
 	return true
 }
 
-func AssertInt64ArraysAreEqual(t *testing.T, expected []int64, result []int64) bool {
+func AssertUint64ArraysAreEqual(t *testing.T, expected []uint64, result []uint64) bool {
 	for _, ex := range expected {
 		found := false
 		for _, res := range result {
@@ -204,7 +204,7 @@ func TestFindSocketsOfPid(t *testing.T) {
 		t.Fatalf("FindSocketsOfPid: %s", err)
 	}
 
-	AssertInt64ArraysAreEqual(t, []int64{7619, 7620}, inodes)
+	AssertUint64ArraysAreEqual(t, []uint64{7619, 7620}, inodes)
 }
 
 func TestParse_Proc_Net_Tcp(t *testing.T) {
