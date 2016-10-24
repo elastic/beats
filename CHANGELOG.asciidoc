@@ -64,6 +64,8 @@ https://github.com/elastic/beats/compare/v5.0.0-rc1...master[Check the HEAD diff
 - Add experimental docker module. Provided by Ingensi and @douaejeouit based on dockbeat.
 
 *Packetbeat*
+- Define `client_geoip.location` as geo_point in the mappings to be used by the GeoIP processor in the Ingest Node pipeline.
+  {pull}2795[2795]
 
 *Topbeat*
 
