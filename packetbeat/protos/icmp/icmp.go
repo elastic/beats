@@ -75,7 +75,7 @@ func (icmp *Icmp) init(results publish.Transactions, config *icmpConfig) error {
 	icmp.setFromConfig(config)
 
 	var err error
-	icmp.localIps, err = common.LocalIpAddrs()
+	icmp.localIps, err = common.LocalIPAddrs()
 	if err != nil {
 		logp.Err("icmp", "Error getting local IP addresses: %s", err)
 		icmp.localIps = []net.IP{}
@@ -115,8 +115,8 @@ func (icmp *Icmp) ProcessICMPv4(
 
 	tuple := &icmpTuple{
 		IcmpVersion: 4,
-		SrcIp:       pkt.Tuple.Src_ip,
-		DstIp:       pkt.Tuple.Dst_ip,
+		SrcIp:       pkt.Tuple.SrcIP,
+		DstIp:       pkt.Tuple.DstIP,
 		Id:          id,
 		Seq:         seq,
 	}
@@ -150,8 +150,8 @@ func (icmp *Icmp) ProcessICMPv6(
 	id, seq := extractTrackingData(6, typ, &icmp6.BaseLayer)
 	tuple := &icmpTuple{
 		IcmpVersion: 6,
-		SrcIp:       pkt.Tuple.Src_ip,
-		DstIp:       pkt.Tuple.Dst_ip,
+		SrcIp:       pkt.Tuple.SrcIP,
+		DstIp:       pkt.Tuple.DstIP,
 		Id:          id,
 		Seq:         seq,
 	}

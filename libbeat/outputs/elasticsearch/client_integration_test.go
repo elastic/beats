@@ -29,7 +29,7 @@ func TestCheckTemplate(t *testing.T) {
 	err := client.Connect(5 * time.Second)
 	assert.Nil(t, err)
 
-	// Check for non existant template
+	// Check for non existent template
 	assert.False(t, client.CheckTemplate("libbeat-notexists"))
 }
 

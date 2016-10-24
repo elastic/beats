@@ -69,7 +69,7 @@ type HashableDnsTuple [MaxDnsTupleRawSize]byte
 // DnsMessage contains a single DNS message.
 type DnsMessage struct {
 	Ts           time.Time          // Time when the message was received.
-	Tuple        common.IpPortTuple // Source and destination addresses of packet.
+	Tuple        common.IPPortTuple // Source and destination addresses of packet.
 	CmdlineTuple *common.CmdlineTuple
 	Data         *mkdns.Msg // Parsed DNS packet data.
 	Length       int        // Length of the DNS message in bytes (without DecodeOffset).
@@ -88,13 +88,13 @@ type DnsTuple struct {
 	revRaw HashableDnsTuple // Dst_ip:Dst_port:Src_ip:Src_port:Transport:Id
 }
 
-func DnsTupleFromIpPort(t *common.IpPortTuple, trans Transport, id uint16) DnsTuple {
+func DnsTupleFromIpPort(t *common.IPPortTuple, trans Transport, id uint16) DnsTuple {
 	tuple := DnsTuple{
-		Ip_length: t.Ip_length,
-		Src_ip:    t.Src_ip,
-		Dst_ip:    t.Dst_ip,
-		Src_port:  t.Src_port,
-		Dst_port:  t.Dst_port,
+		Ip_length: t.IPLength,
+		Src_ip:    t.SrcIP,
+		Dst_ip:    t.DstIP,
+		Src_port:  t.SrcPort,
+		Dst_port:  t.DstPort,
 		Transport: trans,
 		Id:        id,
 	}
@@ -256,12 +256,12 @@ func newTransaction(ts time.Time, tuple DnsTuple, cmd common.CmdlineTuple) *DnsT
 		tuple:     tuple,
 	}
 	trans.Src = common.Endpoint{
-		Ip:   tuple.Src_ip.String(),
+		IP:   tuple.Src_ip.String(),
 		Port: tuple.Src_port,
 		Proc: string(cmd.Src),
 	}
 	trans.Dst = common.Endpoint{
-		Ip:   tuple.Dst_ip.String(),
+		IP:   tuple.Dst_ip.String(),
 		Port: tuple.Dst_port,
 		Proc: string(cmd.Dst),
 	}
@@ -564,7 +564,7 @@ func rrToString(rr mkdns.RR) string {
 	data, ok := mapStr["data"]
 	delete(mapStr, "data")
 
-	for k, _ := range mapStr {
+	for k := range mapStr {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
@@ -771,7 +771,7 @@ func dnsToString(dns *mkdns.Msg) string {
 }
 
 // decodeDnsData decodes a byte array into a DNS struct. If an error occurs
-// then the returnd dns pointer will be nil. This method recovers from panics
+// then the returned dns pointer will be nil. This method recovers from panics
 // and is concurrency-safe.
 // We do not handle Unpack ErrTruncated for now. See https://github.com/miekg/dns/pull/281
 func decodeDnsData(transport Transport, rawData []byte) (dns *mkdns.Msg, err error) {

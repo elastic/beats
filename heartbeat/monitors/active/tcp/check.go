@@ -91,7 +91,7 @@ func sendBuffer(conn net.Conn, buf []byte) error {
 }
 
 func recvBuffer(conn net.Conn, buf []byte) error {
-	if len(buf) > 0 {
+	for len(buf) > 0 {
 		n, err := conn.Read(buf)
 		if err != nil {
 			return err

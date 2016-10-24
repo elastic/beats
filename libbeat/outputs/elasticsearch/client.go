@@ -563,7 +563,7 @@ func (client *Client) PublishEvent(data outputs.Data) error {
 func (client *Client) LoadTemplate(templateName string, template map[string]interface{}) error {
 
 	path := "/_template/" + templateName
-	err := client.LoadJson(path, template)
+	err := client.LoadJSON(path, template)
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %v", err)
 	}
@@ -571,7 +571,7 @@ func (client *Client) LoadTemplate(templateName string, template map[string]inte
 	return nil
 }
 
-func (client *Client) LoadJson(path string, json map[string]interface{}) error {
+func (client *Client) LoadJSON(path string, json map[string]interface{}) error {
 	status, _, err := client.request("PUT", path, "", nil, json)
 	if err != nil {
 		return fmt.Errorf("couldn't load json. Error: %s", err)

@@ -379,7 +379,7 @@ func pgsqlFieldsParser(s *PgsqlStream, buf []byte) error {
 		off += 4
 
 		// read format (int16)
-		format := common.Bytes_Ntohs(buf[off : off+2])
+		format := common.BytesNtohs(buf[off : off+2])
 		off += 2
 		fieldsFormat = append(fieldsFormat, byte(format))
 
@@ -649,7 +649,7 @@ func isSpecialPgsqlCommand(data []byte) (bool, int, int) {
 	length := readLength(data[0:])
 
 	// read command identifier
-	code := int(common.Bytes_Ntohl(data[4:]))
+	code := int(common.BytesNtohl(data[4:]))
 
 	if length == 16 && code == 80877102 {
 		// Cancel Request
@@ -670,11 +670,11 @@ func isSpecialPgsqlCommand(data []byte) (bool, int, int) {
 // length field in pgsql counts total length of length field + payload, not
 // including the message identifier. => Always check buffer size >= length + 1
 func readLength(b []byte) int {
-	return int(common.Bytes_Ntohl(b))
+	return int(common.BytesNtohl(b))
 }
 
 func readCount(b []byte) int {
-	return int(common.Bytes_Ntohs(b))
+	return int(common.BytesNtohs(b))
 }
 
 func pgsqlString(b []byte, sz int) (string, error) {

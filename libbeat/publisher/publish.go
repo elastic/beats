@@ -55,7 +55,7 @@ type BeatPublisher struct {
 	hostname       string // Host name as returned by the operation system
 	name           string // The shipperName if configured, the hostname otherwise
 	version        string
-	IpAddrs        []string
+	IPAddrs        []string
 	disabled       bool
 	Index          string
 	Output         []*outputWorker
@@ -87,7 +87,7 @@ type ShipperConfig struct {
 	common.EventMetadata `config:",inline"` // Fields and tags to add to each event.
 	Name                 string             `config:"name"`
 	RefreshTopologyFreq  time.Duration      `config:"refresh_topology_freq"`
-	Topology_expire      int                `config:"topology_expire"`
+	TopologyExpire       int                `config:"topology_expire"`
 	Geoip                common.Geoip       `config:"geoip"`
 
 	// internal publisher queue sizes
@@ -98,7 +98,7 @@ type ShipperConfig struct {
 
 type Topology struct {
 	Name string `json:"name"`
-	Ip   string `json:"ip"`
+	IP   string `json:"ip"`
 }
 
 const (
@@ -111,7 +111,7 @@ func init() {
 }
 
 func (publisher *BeatPublisher) IsPublisherIP(ip string) bool {
-	for _, myip := range publisher.IpAddrs {
+	for _, myip := range publisher.IPAddrs {
 		if myip == ip {
 			return true
 		}
@@ -160,7 +160,7 @@ func (publisher *BeatPublisher) PublishTopology(params ...string) error {
 
 	localAddrs := params
 	if len(params) == 0 {
-		addrs, err := common.LocalIpAddrsAsStrings(false)
+		addrs, err := common.LocalIPAddrsAsStrings(false)
 		if err != nil {
 			logp.Err("Getting local IP addresses fails with: %s", err)
 			return err
@@ -220,7 +220,7 @@ func (publisher *BeatPublisher) init(
 	publisher.wsOutput.Init()
 
 	if !publisher.disabled {
-		plugins, err := outputs.InitOutputs(beatName, configs, shipper.Topology_expire)
+		plugins, err := outputs.InitOutputs(beatName, configs, shipper.TopologyExpire)
 		if err != nil {
 			return err
 		}
@@ -293,7 +293,7 @@ func (publisher *BeatPublisher) init(
 	publisher.globalEventMetadata = shipper.EventMetadata
 
 	//Store the publisher's IP addresses
-	publisher.IpAddrs, err = common.LocalIpAddrsAsStrings(false)
+	publisher.IPAddrs, err = common.LocalIPAddrsAsStrings(false)
 	if err != nil {
 		logp.Err("Failed to get local IP addresses: %s", err)
 		return err

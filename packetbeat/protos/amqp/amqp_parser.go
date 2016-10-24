@@ -2,10 +2,11 @@ package amqp
 
 import (
 	"encoding/binary"
+	"time"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/procs"
-	"time"
 )
 
 func (amqp *Amqp) amqpMessageParser(s *AmqpStream) (ok bool, complete bool) {
@@ -301,25 +302,24 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop2, appIdProp) {
-		appId, next, err := getShortString(data, offset+1, uint32(data[offset]))
+		appId, _, err := getShortString(data, offset+1, uint32(data[offset]))
 		if err {
 			logp.Warn("Failed to get app-id in header frame")
 			return true
 		}
 		m.Fields["app-id"] = appId
-		offset = next
 	}
 	return false
 }
 
-func (amqp *Amqp) handleAmqp(m *AmqpMessage, tcptuple *common.TcpTuple, dir uint8) {
+func (amqp *Amqp) handleAmqp(m *AmqpMessage, tcptuple *common.TCPTuple, dir uint8) {
 	if amqp.mustHideCloseMethod(m) {
 		return
 	}
 	debugf("A message is ready to be handled")
 	m.TcpTuple = *tcptuple
 	m.Direction = dir
-	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
+	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 
 	if m.Method == "basic.publish" {
 		amqp.handlePublishing(m)

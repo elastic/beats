@@ -201,11 +201,11 @@ func TestPgsqlParser_threeResponses(t *testing.T) {
 		Payload: data,
 		Ts:      ts,
 	}
-	var tuple common.TcpTuple
+	var tuple common.TCPTuple
 	var private pgsqlPrivateData
 	var count_handlePgsql = 0
 
-	pgsql.handlePgsql = func(pgsql *Pgsql, m *PgsqlMessage, tcptuple *common.TcpTuple,
+	pgsql.handlePgsql = func(pgsql *Pgsql, m *PgsqlMessage, tcptuple *common.TCPTuple,
 		dir uint8, raw_msg []byte) {
 
 		count_handlePgsql += 1
@@ -291,11 +291,11 @@ func TestPgsqlParser_invalidMessage(t *testing.T) {
 	}
 }
 
-func testTcpTuple() *common.TcpTuple {
-	t := &common.TcpTuple{
-		Ip_length: 4,
-		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
-		Src_port: 6512, Dst_port: 5432,
+func testTcpTuple() *common.TCPTuple {
+	t := &common.TCPTuple{
+		IPLength: 4,
+		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+		SrcPort: 6512, DstPort: 5432,
 	}
 	t.ComputeHashebles()
 	return t
@@ -353,7 +353,7 @@ func Test_gap_in_response(t *testing.T) {
 
 	logp.Debug("pgsql", "Now sending gap..")
 
-	private, drop := pgsql.GapInStream(tcptuple, 1, 10, private)
+	_, drop := pgsql.GapInStream(tcptuple, 1, 10, private)
 	assert.Equal(t, true, drop)
 
 	trans := expectTransaction(t, pgsql)

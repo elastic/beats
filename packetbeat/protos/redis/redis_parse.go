@@ -17,7 +17,7 @@ type parser struct {
 type redisMessage struct {
 	Ts time.Time
 
-	TcpTuple     common.TcpTuple
+	TcpTuple     common.TCPTuple
 	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
 
@@ -439,7 +439,7 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString,
 
 func parseInt(line []byte) (int64, error) {
 	buf := streambuf.NewFixed(line)
-	return buf.AsciiInt(false)
+	return buf.IntASCII(false)
 	// TODO: is it an error if 'buf.Len() != 0 {}' ?
 }
 

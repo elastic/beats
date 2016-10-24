@@ -24,7 +24,7 @@ type ProtocolData interface{}
 
 type Packet struct {
 	Ts      time.Time
-	Tuple   common.IpPortTuple
+	Tuple   common.IPPortTuple
 	Payload []byte
 }
 

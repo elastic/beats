@@ -23,7 +23,7 @@ import (
 type ThriftMessage struct {
 	Ts time.Time
 
-	TcpTuple     common.TcpTuple
+	TcpTuple     common.TCPTuple
 	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
 
@@ -53,7 +53,7 @@ type ThriftField struct {
 }
 
 type ThriftStream struct {
-	tcptuple *common.TcpTuple
+	tcptuple *common.TCPTuple
 
 	data []byte
 
@@ -69,7 +69,7 @@ type ThriftStream struct {
 
 type ThriftTransaction struct {
 	Type         string
-	tuple        common.TcpTuple
+	tuple        common.TCPTuple
 	Src          common.Endpoint
 	Dst          common.Endpoint
 	ResponseTime int32
@@ -212,7 +212,7 @@ func (thrift *Thrift) init(
 	return nil
 }
 
-func (thrift *Thrift) getTransaction(k common.HashableTcpTuple) *ThriftTransaction {
+func (thrift *Thrift) getTransaction(k common.HashableTCPTuple) *ThriftTransaction {
 	v := thrift.transactions.Get(k)
 	if v != nil {
 		return v.(*ThriftTransaction)
@@ -292,7 +292,7 @@ func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 		return true, false // ok, not complete
 	}
 
-	sz := common.Bytes_Ntohl(s.data[s.parseOffset : s.parseOffset+4])
+	sz := common.BytesNtohl(s.data[s.parseOffset : s.parseOffset+4])
 	if int32(sz) < 0 {
 		m.Version = sz & ThriftVersionMask
 		if m.Version != ThriftVersion1 {
@@ -323,7 +323,7 @@ func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 			logp.Debug("thriftdetailed", "Less then 4 bytes remaining")
 			return true, false // ok, not complete
 		}
-		m.SeqId = common.Bytes_Ntohl(s.data[offset : offset+4])
+		m.SeqId = common.BytesNtohl(s.data[offset : offset+4])
 		s.parseOffset = offset + 4
 	} else {
 		// no version mode
@@ -348,7 +348,7 @@ func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 
 		m.Type = uint32(s.data[offset])
 		offset += 1
-		m.SeqId = common.Bytes_Ntohl(s.data[offset : offset+4])
+		m.SeqId = common.BytesNtohl(s.data[offset : offset+4])
 		s.parseOffset = offset + 4
 	}
 
@@ -372,7 +372,7 @@ func (thrift *Thrift) readString(data []byte) (value string, ok bool, complete b
 	if len(data) < 4 {
 		return "", true, false, 0 // ok, not complete
 	}
-	sz := int(common.Bytes_Ntohl(data[:4]))
+	sz := int(common.BytesNtohl(data[:4]))
 	if int32(sz) < 0 {
 		return "", false, false, 0 // not ok
 	}
@@ -446,7 +446,7 @@ func (thrift *Thrift) readI16(data []byte) (value string, ok bool, complete bool
 	if len(data) < 2 {
 		return "", true, false, 0
 	}
-	i16 := common.Bytes_Ntohs(data[:2])
+	i16 := common.BytesNtohs(data[:2])
 	value = strconv.Itoa(int(i16))
 
 	return value, true, true, 2
@@ -456,7 +456,7 @@ func (thrift *Thrift) readI32(data []byte) (value string, ok bool, complete bool
 	if len(data) < 4 {
 		return "", true, false, 0
 	}
-	i32 := common.Bytes_Ntohl(data[:4])
+	i32 := common.BytesNtohl(data[:4])
 	value = strconv.Itoa(int(i32))
 
 	return value, true, true, 4
@@ -466,7 +466,7 @@ func (thrift *Thrift) readI64(data []byte) (value string, ok bool, complete bool
 	if len(data) < 8 {
 		return "", true, false, 0
 	}
-	i64 := common.Bytes_Ntohll(data[:8])
+	i64 := common.BytesNtohll(data[:8])
 	value = strconv.FormatInt(int64(i64), 10)
 
 	return value, true, true, 8
@@ -485,7 +485,7 @@ func (thrift *Thrift) readListOrSet(data []byte) (value string, ok bool, complet
 		return "", false, false, 0
 	}
 
-	sz := int(common.Bytes_Ntohl(data[1:5]))
+	sz := int(common.BytesNtohl(data[1:5]))
 	if sz < 0 {
 		logp.Debug("thrift", "List/Set too big: %d", sz)
 		return "", false, false, 0
@@ -549,7 +549,7 @@ func (thrift *Thrift) readMap(data []byte) (value string, ok bool, complete bool
 		return "", false, false, 0
 	}
 
-	sz := int(common.Bytes_Ntohl(data[2:6]))
+	sz := int(common.BytesNtohl(data[2:6]))
 	if sz < 0 {
 		logp.Debug("thrift", "Map too big: %d", sz)
 		return "", false, false, 0
@@ -618,7 +618,7 @@ func (thrift *Thrift) readStruct(data []byte) (value string, ok bool, complete b
 			return "", true, false, 0 // not complete
 		}
 
-		field.Id = common.Bytes_Ntohs(data[offset : offset+2])
+		field.Id = common.BytesNtohs(data[offset : offset+2])
 		offset += 2
 
 		funcReader, typeFound := thrift.funcReadersByType(field.Type)
@@ -707,7 +707,7 @@ func (thrift *Thrift) readField(s *ThriftStream) (ok bool, complete bool, field 
 	if len(s.data[offset:]) < 2 {
 		return true, false, nil // ok, not complete
 	}
-	field.Id = common.Bytes_Ntohs(s.data[offset : offset+2])
+	field.Id = common.BytesNtohs(s.data[offset : offset+2])
 	offset += 2
 
 	funcReader, typeFound := thrift.funcReadersByType(field.Type)
@@ -746,7 +746,7 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 				if len(s.data) < 4 {
 					return true, false
 				}
-				m.FrameSize = common.Bytes_Ntohl(s.data[:4])
+				m.FrameSize = common.BytesNtohl(s.data[:4])
 				s.parseOffset = 4
 			}
 
@@ -856,7 +856,7 @@ type thriftPrivateData struct {
 	Data [2]*ThriftStream
 }
 
-func (thrift *Thrift) messageComplete(tcptuple *common.TcpTuple, dir uint8,
+func (thrift *Thrift) messageComplete(tcptuple *common.TCPTuple, dir uint8,
 	stream *ThriftStream, priv *thriftPrivateData) {
 
 	var flush bool = false
@@ -884,7 +884,7 @@ func (thrift *Thrift) messageComplete(tcptuple *common.TcpTuple, dir uint8,
 	// all ok, go to next level
 	stream.message.TcpTuple = *tcptuple
 	stream.message.Direction = dir
-	stream.message.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
+	stream.message.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 	if stream.message.FrameSize == 0 {
 		stream.message.FrameSize = uint32(stream.parseOffset - stream.message.start)
 	}
@@ -899,7 +899,7 @@ func (thrift *Thrift) ConnectionTimeout() time.Duration {
 	return thrift.transactionTimeout
 }
 
-func (thrift *Thrift) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
+func (thrift *Thrift) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ParseThrift exception")
@@ -993,13 +993,13 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
 	trans.JsTs = msg.Ts
 	trans.Src = common.Endpoint{
-		Ip:   msg.TcpTuple.Src_ip.String(),
-		Port: msg.TcpTuple.Src_port,
+		IP:   msg.TcpTuple.SrcIP.String(),
+		Port: msg.TcpTuple.SrcPort,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
 	trans.Dst = common.Endpoint{
-		Ip:   msg.TcpTuple.Dst_ip.String(),
-		Port: msg.TcpTuple.Dst_port,
+		IP:   msg.TcpTuple.DstIP.String(),
+		Port: msg.TcpTuple.DstPort,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
 	if msg.Direction == tcp.TcpDirectionReverse {
@@ -1040,7 +1040,7 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	logp.Debug("thrift", "Transaction queued")
 }
 
-func (thrift *Thrift) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+func (thrift *Thrift) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
 	trans := thrift.getTransaction(tcptuple.Hashable())
@@ -1055,7 +1055,7 @@ func (thrift *Thrift) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	return private
 }
 
-func (thrift *Thrift) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (thrift *Thrift) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	defer logp.Recover("GapInStream(thrift) exception")

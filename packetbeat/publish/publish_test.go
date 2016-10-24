@@ -67,14 +67,14 @@ func TestDirectionOut(t *testing.T) {
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
-			Ip:      "192.145.2.4",
+			IP:      "192.145.2.4",
 			Port:    3267,
 			Name:    "server1",
 			Cmdline: "proc1 start",
 			Proc:    "proc1",
 		},
 		"dst": &common.Endpoint{
-			Ip:      "192.145.2.5",
+			IP:      "192.145.2.5",
 			Port:    32232,
 			Name:    "server2",
 			Cmdline: "proc2 start",
@@ -93,14 +93,14 @@ func TestDirectionIn(t *testing.T) {
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
-			Ip:      "192.145.2.4",
+			IP:      "192.145.2.4",
 			Port:    3267,
 			Name:    "server1",
 			Cmdline: "proc1 start",
 			Proc:    "proc1",
 		},
 		"dst": &common.Endpoint{
-			Ip:      "192.145.2.5",
+			IP:      "192.145.2.5",
 			Port:    32232,
 			Name:    "server2",
 			Cmdline: "proc2 start",
@@ -115,7 +115,7 @@ func TestDirectionIn(t *testing.T) {
 
 func newTestPublisher(ips []string) *publisher.BeatPublisher {
 	p := &publisher.BeatPublisher{}
-	p.IpAddrs = ips
+	p.IPAddrs = ips
 	return p
 }
 
@@ -125,14 +125,14 @@ func TestNoDirection(t *testing.T) {
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
-			Ip:      "192.145.2.4",
+			IP:      "192.145.2.4",
 			Port:    3267,
 			Name:    "server1",
 			Cmdline: "proc1 start",
 			Proc:    "proc1",
 		},
 		"dst": &common.Endpoint{
-			Ip:      "192.145.2.5",
+			IP:      "192.145.2.5",
 			Port:    32232,
 			Name:    "server2",
 			Cmdline: "proc2 start",

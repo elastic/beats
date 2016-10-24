@@ -22,7 +22,7 @@ type message struct {
 	chunkedBody      []byte
 
 	IsRequest    bool
-	TCPTuple     common.TcpTuple
+	TCPTuple     common.TCPTuple
 	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
 
@@ -533,7 +533,7 @@ func trimRight(buf []byte) []byte {
 
 func parseInt(line []byte) (int, error) {
 	buf := streambuf.NewFixed(line)
-	i, err := buf.AsciiInt(false)
+	i, err := buf.IntASCII(false)
 	return int(i), err
 	// TODO: is it an error if 'buf.Len() != 0 {}' ?
 }

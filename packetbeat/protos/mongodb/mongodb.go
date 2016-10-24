@@ -32,7 +32,7 @@ type Mongodb struct {
 }
 
 type transactionKey struct {
-	tcp common.HashableTcpTuple
+	tcp common.HashableTCPTuple
 	id  int
 }
 
@@ -99,7 +99,7 @@ func (mongodb *Mongodb) ConnectionTimeout() time.Duration {
 
 func (mongodb *Mongodb) Parse(
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
@@ -135,7 +135,7 @@ func ensureMongodbConnection(private protos.ProtocolData) *mongodbConnectionData
 func (mongodb *Mongodb) doParse(
 	conn *mongodbConnectionData,
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *mongodbConnectionData {
 	st := conn.Streams[dir]
@@ -182,7 +182,7 @@ func (mongodb *Mongodb) doParse(
 	return conn
 }
 
-func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *stream {
+func newStream(pkt *protos.Packet, tcptuple *common.TCPTuple) *stream {
 	s := &stream{
 		tcptuple: tcptuple,
 		data:     pkt.Payload,
@@ -194,13 +194,13 @@ func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *stream {
 func (mongodb *Mongodb) handleMongodb(
 	conn *mongodbConnectionData,
 	m *mongodbMessage,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 ) {
 
 	m.TcpTuple = *tcptuple
 	m.Direction = dir
-	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
+	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 
 	if m.IsResponse {
 		debugf("MongoDB response message")
@@ -274,13 +274,13 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 		trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
 		trans.JsTs = requ.Ts
 		trans.Src = common.Endpoint{
-			Ip:   requ.TcpTuple.Src_ip.String(),
-			Port: requ.TcpTuple.Src_port,
+			IP:   requ.TcpTuple.SrcIP.String(),
+			Port: requ.TcpTuple.SrcPort,
 			Proc: string(requ.CmdlineTuple.Src),
 		}
 		trans.Dst = common.Endpoint{
-			Ip:   requ.TcpTuple.Dst_ip.String(),
-			Port: requ.TcpTuple.Dst_port,
+			IP:   requ.TcpTuple.DstIP.String(),
+			Port: requ.TcpTuple.DstPort,
 			Proc: string(requ.CmdlineTuple.Dst),
 		}
 		if requ.Direction == tcp.TcpDirectionReverse {
@@ -313,12 +313,12 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 	return trans
 }
 
-func (mongodb *Mongodb) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (mongodb *Mongodb) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 	return private, true
 }
 
-func (mongodb *Mongodb) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+func (mongodb *Mongodb) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 	return private
 }

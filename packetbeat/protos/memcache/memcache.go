@@ -138,7 +138,7 @@ func (mc *Memcache) init(results publish.Transactions, config *memcacheConfig) e
 		return err
 	}
 
-	mc.udpConnections = make(map[common.HashableIpPortTuple]*udpConnection)
+	mc.udpConnections = make(map[common.HashableIPPortTuple]*udpConnection)
 	mc.results = results
 	return nil
 }

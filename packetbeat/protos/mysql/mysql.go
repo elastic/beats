@@ -54,7 +54,7 @@ type MysqlMessage struct {
 
 	Direction    uint8
 	IsTruncated  bool
-	TcpTuple     common.TcpTuple
+	TcpTuple     common.TCPTuple
 	CmdlineTuple *common.CmdlineTuple
 	Raw          []byte
 	Notes        []string
@@ -62,7 +62,7 @@ type MysqlMessage struct {
 
 type MysqlTransaction struct {
 	Type         string
-	tuple        common.TcpTuple
+	tuple        common.TCPTuple
 	Src          common.Endpoint
 	Dst          common.Endpoint
 	ResponseTime int32
@@ -83,7 +83,7 @@ type MysqlTransaction struct {
 }
 
 type MysqlStream struct {
-	tcptuple *common.TcpTuple
+	tcptuple *common.TCPTuple
 
 	data []byte
 
@@ -131,7 +131,7 @@ type Mysql struct {
 	results publish.Transactions
 
 	// function pointer for mocking
-	handleMysql func(mysql *Mysql, m *MysqlMessage, tcp *common.TcpTuple,
+	handleMysql func(mysql *Mysql, m *MysqlMessage, tcp *common.TCPTuple,
 		dir uint8, raw_msg []byte)
 }
 
@@ -180,7 +180,7 @@ func (mysql *Mysql) setFromConfig(config *mysqlConfig) {
 	mysql.transactionTimeout = config.TransactionTimeout
 }
 
-func (mysql *Mysql) getTransaction(k common.HashableTcpTuple) *MysqlTransaction {
+func (mysql *Mysql) getTransaction(k common.HashableTCPTuple) *MysqlTransaction {
 	v := mysql.transactions.Get(k)
 	if v != nil {
 		return v.(*MysqlTransaction)
@@ -292,7 +292,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 					m.AffectedRows = affectedRows
 
 					// last insert id
-					insertId, off, complete, err := read_linteger(s.data, off)
+					insertId, _, complete, err := read_linteger(s.data, off)
 					if !complete {
 						return true, false
 					}
@@ -356,7 +356,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 						logp.Debug("mysql", "Error on read_lstring: %s", err)
 						return false, false
 					}
-					table /* table */, off, complete, err := read_lstring(s.data, off)
+					table /* table */, _ /*off*/, complete, err := read_lstring(s.data, off)
 					if !complete {
 						return true, false
 					}
@@ -462,7 +462,7 @@ type mysqlPrivateData struct {
 }
 
 // Called when the parser has identified a full message.
-func (mysql *Mysql) messageComplete(tcptuple *common.TcpTuple, dir uint8, stream *MysqlStream) {
+func (mysql *Mysql) messageComplete(tcptuple *common.TCPTuple, dir uint8, stream *MysqlStream) {
 	// all ok, ship it
 	msg := stream.data[stream.message.start:stream.message.end]
 
@@ -478,7 +478,7 @@ func (mysql *Mysql) ConnectionTimeout() time.Duration {
 	return mysql.transactionTimeout
 }
 
-func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
+func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ParseMysql exception")
@@ -534,7 +534,7 @@ func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 	return priv
 }
 
-func (mysql *Mysql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (mysql *Mysql) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	defer logp.Recover("GapInStream(mysql) exception")
@@ -563,7 +563,7 @@ func (mysql *Mysql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	return private, true
 }
 
-func (mysql *Mysql) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+func (mysql *Mysql) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
 	// TODO: check if we have data pending and either drop it to free
@@ -571,12 +571,12 @@ func (mysql *Mysql) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	return private
 }
 
-func handleMysql(mysql *Mysql, m *MysqlMessage, tcptuple *common.TcpTuple,
+func handleMysql(mysql *Mysql, m *MysqlMessage, tcptuple *common.TCPTuple,
 	dir uint8, raw_msg []byte) {
 
 	m.TcpTuple = *tcptuple
 	m.Direction = dir
-	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
+	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 	m.Raw = raw_msg
 
 	if m.IsRequest {
@@ -603,13 +603,13 @@ func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
 	trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
 	trans.JsTs = msg.Ts
 	trans.Src = common.Endpoint{
-		Ip:   msg.TcpTuple.Src_ip.String(),
-		Port: msg.TcpTuple.Src_port,
+		IP:   msg.TcpTuple.SrcIP.String(),
+		Port: msg.TcpTuple.SrcPort,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
 	trans.Dst = common.Endpoint{
-		Ip:   msg.TcpTuple.Dst_ip.String(),
-		Port: msg.TcpTuple.Dst_port,
+		IP:   msg.TcpTuple.DstIP.String(),
+		Port: msg.TcpTuple.DstPort,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
 	if msg.Direction == tcp.TcpDirectionReverse {
@@ -757,7 +757,7 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
-			_ /* org name */, off, complete, err = read_lstring(data, off)
+			_ /* org name */, _ /*off*/, complete, err = read_lstring(data, off)
 			if err != nil || !complete {
 				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows

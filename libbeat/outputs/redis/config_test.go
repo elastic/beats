@@ -7,21 +7,19 @@ import (
 )
 
 func TestValidate(t *testing.T) {
-	type io struct {
+	tests := []struct {
 		Name  string
 		Input redisConfig
 		Valid bool
-	}
+	}{
+		{"No config", redisConfig{Key: "", Index: ""}, true},
+		{"Only key", redisConfig{Key: "test", Index: ""}, true},
+		{"Only index", redisConfig{Key: "", Index: "test"}, true},
+		{"Both", redisConfig{Key: "test", Index: "test"}, false},
 
-	tests := []io{
-		io{"No config", redisConfig{Key: "", Index: ""}, true},
-		io{"Only key", redisConfig{Key: "test", Index: ""}, true},
-		io{"Only index", redisConfig{Key: "", Index: "test"}, true},
-		io{"Both", redisConfig{Key: "test", Index: "test"}, false},
-
-		io{"Invalid Datatype", redisConfig{Key: "test", DataType: "something"}, false},
-		io{"List Datatype", redisConfig{Key: "test", DataType: "list"}, true},
-		io{"Channel Datatype", redisConfig{Key: "test", DataType: "channel"}, true},
+		{"Invalid Datatype", redisConfig{Key: "test", DataType: "something"}, false},
+		{"List Datatype", redisConfig{Key: "test", DataType: "list"}, true},
+		{"Channel Datatype", redisConfig{Key: "test", DataType: "channel"}, true},
 	}
 
 	for _, test := range tests {

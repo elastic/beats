@@ -16,7 +16,7 @@ import (
 
 var testOptions = outputs.Options{}
 
-func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearchOutput {
+func createElasticsearchConnection(flushInterval int, bulkSize int) *elasticsearchOutput {
 	index := fmt.Sprintf("packetbeat-int-test-%d", os.Getpid())
 
 	esPort, err := strconv.Atoi(GetEsPort())
@@ -39,7 +39,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 		"template.enabled": false,
 	})
 
-	var output elasticsearchOutput
+	output := &elasticsearchOutput{beatName: "test"}
 	output.init(config, 10)
 	return output
 }
@@ -231,7 +231,7 @@ func TestEvents(t *testing.T) {
 	}
 }
 
-func testBulkWithParams(t *testing.T, output elasticsearchOutput) {
+func testBulkWithParams(t *testing.T, output *elasticsearchOutput) {
 	ts := time.Now()
 	index, _ := output.index.Select(common.MapStr{
 		"@timestamp": common.Time(ts),
@@ -302,12 +302,7 @@ func TestBulkEvents(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch", "elasticsearch"})
 	}
 
-	output := createElasticsearchConnection(50, 2)
-	testBulkWithParams(t, output)
-
-	output = createElasticsearchConnection(50, 1000)
-	testBulkWithParams(t, output)
-
-	output = createElasticsearchConnection(50, 5)
-	testBulkWithParams(t, output)
+	testBulkWithParams(t, createElasticsearchConnection(50, 2))
+	testBulkWithParams(t, createElasticsearchConnection(50, 1000))
+	testBulkWithParams(t, createElasticsearchConnection(50, 5))
 }

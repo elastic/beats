@@ -22,13 +22,13 @@ type Processor interface {
 // decideProtocol determines the protocol based on the source and destination
 // ports. If the protocol cannot be determined then protos.UnknownProtocol
 // is returned.
-func (udp *Udp) decideProtocol(tuple *common.IpPortTuple) protos.Protocol {
-	protocol, exists := udp.portMap[tuple.Src_port]
+func (udp *Udp) decideProtocol(tuple *common.IPPortTuple) protos.Protocol {
+	protocol, exists := udp.portMap[tuple.SrcPort]
 	if exists {
 		return protocol
 	}
 
-	protocol, exists = udp.portMap[tuple.Dst_port]
+	protocol, exists = udp.portMap[tuple.DstPort]
 	if exists {
 		return protocol
 	}

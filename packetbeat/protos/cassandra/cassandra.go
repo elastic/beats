@@ -124,7 +124,7 @@ func (cassandra *cassandra) GetPorts() []int {
 // state shall be dropped (e.g. parser not in sync with tcp stream)
 func (cassandra *cassandra) Parse(
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple, dir uint8,
+	tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
 	defer logp.Recover("Parse cassandra exception")
@@ -134,7 +134,7 @@ func (cassandra *cassandra) Parse(
 	if st == nil {
 		st = &stream{}
 		st.parser.init(&cassandra.parserConfig, func(msg *message) error {
-			return conn.trans.onMessage(tcptuple.IpPort(), dir, msg)
+			return conn.trans.onMessage(tcptuple.IPPort(), dir, msg)
 		})
 		conn.streams[dir] = st
 	}
@@ -149,14 +149,14 @@ func (cassandra *cassandra) Parse(
 
 // ReceivedFin handles TCP-FIN packet.
 func (cassandra *cassandra) ReceivedFin(
-	tcptuple *common.TcpTuple, dir uint8,
+	tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
 	return private
 }
 
 // GapInStream handles lost packets in tcp-stream.
-func (cassandra *cassandra) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (cassandra *cassandra) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int,
 	private protos.ProtocolData,
 ) (protos.ProtocolData, bool) {

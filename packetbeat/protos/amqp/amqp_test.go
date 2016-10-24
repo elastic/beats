@@ -20,11 +20,11 @@ func AmqpModForTests() *Amqp {
 	return &amqp
 }
 
-func testTcpTuple() *common.TcpTuple {
-	t := &common.TcpTuple{
-		Ip_length: 4,
-		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
-		Src_port: 6512, Dst_port: 3306,
+func testTcpTuple() *common.TCPTuple {
+	t := &common.TCPTuple{
+		IPLength: 4,
+		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+		SrcPort: 6512, DstPort: 3306,
 	}
 	t.ComputeHashebles()
 	return t
@@ -291,7 +291,7 @@ func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 1, private)
+	amqp.Parse(&req, tcptuple, 1, private)
 
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "exchange.unbind", trans["method"])
@@ -339,7 +339,7 @@ func TestAmqp_PublishMessage(t *testing.T) {
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data3}
 	//body frame
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, amqp)
 
@@ -390,7 +390,7 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data3}
 	//body frame
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, amqp)
 
@@ -521,7 +521,7 @@ func TestAmqp_NoWaitQueueDeleteMethod(t *testing.T) {
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, amqp)
 
@@ -555,7 +555,7 @@ func TestAmqp_RejectMessage(t *testing.T) {
 	private := protos.ProtocolData(new(amqpPrivateData))
 
 	//method frame
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, amqp)
 
@@ -590,7 +590,7 @@ func TestAmqp_GetEmptyMethod(t *testing.T) {
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 1, private)
+	amqp.Parse(&req, tcptuple, 1, private)
 
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "basic.get-empty", trans["method"])
@@ -623,7 +623,7 @@ func TestAmqp_GetMethod(t *testing.T) {
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 1, private)
+	amqp.Parse(&req, tcptuple, 1, private)
 
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "basic.get", trans["method"])
@@ -684,7 +684,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 	private = protos.ProtocolData(new(amqpPrivateData))
 
 	//method frame
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans = expectTransaction(t, amqp)
 
@@ -748,7 +748,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 	tcptuple = testTcpTuple()
 	req = protos.Packet{Payload: data}
 	private = protos.ProtocolData(new(amqpPrivateData))
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 	trans = expectTransaction(t, amqp)
 	assert.Equal(t, "basic.publish", trans["method"])
 	assert.Equal(t, "amqp", trans["type"])
@@ -786,7 +786,7 @@ func TestAmqp_RecoverMethod(t *testing.T) {
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 1, private)
+	amqp.Parse(&req, tcptuple, 1, private)
 
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "basic.recover", trans["method"])
@@ -1112,7 +1112,7 @@ func TestAmqp_ChannelCloseErrorMethod(t *testing.T) {
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 1, private)
+	amqp.Parse(&req, tcptuple, 1, private)
 
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "channel.close", trans["method"])
@@ -1140,7 +1140,7 @@ func TestAmqp_ConnectionCloseNoError(t *testing.T) {
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 1, private)
+	amqp.Parse(&req, tcptuple, 1, private)
 
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "connection.close", trans["method"])
@@ -1175,7 +1175,7 @@ func TestAmqp_MultipleBodyFrames(t *testing.T) {
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "basic.publish", trans["method"])
 	assert.Equal(t, "***hello I like to publish big messages***", trans["request"])
