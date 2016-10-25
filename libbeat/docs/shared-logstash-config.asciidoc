@@ -29,8 +29,23 @@ Beats connections.
 For this configuration, you must <<load-template-manually,load the index template into Elasticsearch manually>>
 because the options for auto loading the template are only available for the Elasticsearch output.
 
-TIP: To test your configuration file, run {beatname_uc} in the foreground with the following options specified:
-+./{beatname_lc} -configtest -e+.
+ifdef::allplatforms[]
+
+TIP: To test your configuration file, change to the directory where the {beatname_uc} 
+binary is installed, and run {beatname_uc} in the foreground with the following
+options specified: +./{beatname_lc} -configtest -e+. Make sure your config files are
+in the path expected by {beatname_uc} (see <<directory-layout>>). If you
+installed from DEB or RPM packages, run +./{beatname_lc}.sh -configtest -e+.
+
+endif::allplatforms[]
+
+ifdef::win[]
+
+TIP: To test your configuration file, change to the directory where the {beatname_uc} 
+binary is installed, and run {beatname_uc} in the foreground with the following
+options specified: +.\winlogbeat.exe -c .\winlogbeat.yml -configtest -e+.
+
+endif::win[]
 
 To use this configuration, you must also
 {libbeat}/logstash-installation.html#logstash-setup[set up Logstash] to receive events
