@@ -468,6 +468,7 @@ the specified value.
 filebeat.spool_size: 2048
 -------------------------------------------------------------------------------------
 
+See <<load-balancing>> for more information about how this setting affects load balancing.
 
 ===== publish_async
 
@@ -475,6 +476,7 @@ If enabled, the publisher pipeline in Filebeat operates in async mode preparing
 a new batch of lines while waiting for ACK. This option can improve load-balancing
 throughput at the cost of increased memory usage. The default value is false.
 
+See <<load-balancing>> for more information about how this setting affects load balancing.
 
 ===== idle_timeout
 
