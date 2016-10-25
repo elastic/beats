@@ -515,6 +515,34 @@ If the specified path is not absolute, it is considered relative to the configur
 filebeat.config_dir: path/to/configs
 -------------------------------------------------------------------------------------
 
+[[shutdown-timeout]]
+===== shutdown_timeout
+
+How long Filebeat waits on shutdown for the publisher to finish sending events
+before Filebeat shuts down.
+
+By default, this option is disabled, and Filebeat does not wait for the
+publisher to finish sending events before shutting down. This means that any
+events sent to the output, but not acknowledged before Filebeat shuts down, 
+are sent again when you restart Filebeat. For more details about how this
+works, see <<at-least-once-delivery>>.
+
+You can configure the `shutdown_timeout` option to specify the maximum amount
+of time that Filebeat waits for the publisher to finish sending events before
+shutting down. If all events are acknowledged before `shutdown_timeout` is
+reached, Filebeat will shut down. 
+
+There is no recommended setting for this option because determining the correct
+value for `shutdown_timeout` depends heavily on the environment in which
+Filebeat is running and the current state of the output.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.shutdown_timeout: 5s
+-------------------------------------------------------------------------------------
+
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
 include::../../../../libbeat/docs/processors-config.asciidoc[]
@@ -525,26 +553,3 @@ include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
-
-===== shutdown_timeout
-
-`shutdown_timeout` defines how long filebeat waits on shutdown for the publisher to finish.
-
-In case the defined output is blocked and does not confirm all events, filebeat keeps resending the events
-before the confirmation is persisted to disk in the registrar. Waiting on the output to acknowledge all events
-can take seconds or much longer depending on the state of the output. To still be able to shutdown filebeat, filebeat
-does not wait for the confirmation of all events on shutdown. This means the state for events which were sent but
-not acked yet, will not be persisted to disk. This can lead to the issue that some events are sent again on starting
-filebeat afterwards as the events ended up at the receiving end but filebeat was already stopped when the acked arrived.
-
-With `shutdown_timeout` a timeout can be defined what the maximum time should be that filebeat waits for the complete
-sending of all events in the pipeline. Should all events be acked before `shutdown_timeout` is reached, filebeat will
-already shutdown. The right value for `shutdown_timeout` heavily depends on the environment in which filebeat is running
-and the current state of the output.
-
-By default this is disable and filebeat shuts down without waiting for the completion of sending events.
-
-[source,yaml]
--------------------------------------------------------------------------------------
-filebeat.shutdown_timeout: 5s
--------------------------------------------------------------------------------------

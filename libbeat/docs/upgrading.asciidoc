@@ -3,6 +3,7 @@
 
 This section gives general recommendations for upgrading the Beats.
 
+[[upgrading-minor-versions]]
 === Upgrading Between Minor Versions
 
 As a general rule, upgrading between minor versions (e.g. 5.x to 5.y, where x <
@@ -19,7 +20,7 @@ well.
 Please see the <<upgrade-mapping-template>> section for possible strategies in
 upgrading the Elasticsearch mapping templates.
 
-
+[[upgrading-1-to-5]]
 === Upgrading from 1.x to 5.x
 
 Before upgrading your Beats, please review the <<breaking-changes, breaking
@@ -84,6 +85,10 @@ the registry file has changed. In version 1.x it was by default named
 recommend copying the `.filebeat` file to `data/registry`.
 
 ==== Upgrading Topbeat to Metricbeat
+
+NOTE: When upgrading to Metricbeat, keep in mind that any data you've collected
+with Topbeat is not compatible with the 5.0 version of the Beats dashboards
+because the underlying event data structures have changed. 
 
 With the Beats 5.0 release, Topbeat is replaced by Metricbeat, which offers more
 functionality. More precisely, the Topbeat functionality is roughly equivalent
