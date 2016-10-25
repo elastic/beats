@@ -252,12 +252,6 @@ func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
 		return file.Seek(h.state.Offset, os.SEEK_SET)
 	}
 
-	// tail file if file is new and tail_files config is set
-	if h.config.TailFiles {
-		logp.Debug("harvester", "Setting offset for tailing file: %s.", h.state.Source)
-		return file.Seek(0, os.SEEK_END)
-	}
-
 	// get offset from file in case of encoding factory was required to read some data.
 	logp.Debug("harvester", "Setting offset for file based on seek: %s", h.state.Source)
 	return file.Seek(0, os.SEEK_CUR)

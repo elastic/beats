@@ -34,7 +34,7 @@ type Prospector struct {
 }
 
 type Prospectorer interface {
-	Init(states []file.State) error
+	Init(states file.States) error
 	Run()
 }
 
@@ -61,7 +61,7 @@ func NewProspector(cfg *common.Config, states file.States, outlet Outlet) (*Pros
 		return nil, err
 	}
 
-	err := prospector.Init(states.GetStates())
+	err := prospector.Init(states)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func NewProspector(cfg *common.Config, states file.States, outlet Outlet) (*Pros
 }
 
 // Init sets up default config for prospector
-func (p *Prospector) Init(states []file.State) error {
+func (p *Prospector) Init(states file.States) error {
 
 	var prospectorer Prospectorer
 	var err error
