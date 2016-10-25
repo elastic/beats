@@ -34,7 +34,7 @@ type Prospector struct {
 }
 
 type Prospectorer interface {
-	Init()
+	Init(states []file.State) error
 	Run()
 }
 
@@ -49,8 +49,8 @@ func NewProspector(cfg *common.Config, states file.States, outlet Outlet) (*Pros
 		outlet:        outlet,
 		harvesterChan: make(chan *input.Event),
 		done:          make(chan struct{}),
-		states:        states.Copy(),
 		wg:            sync.WaitGroup{},
+		states:        &file.States{},
 		channelWg:     sync.WaitGroup{},
 	}
 
@@ -61,7 +61,7 @@ func NewProspector(cfg *common.Config, states file.States, outlet Outlet) (*Pros
 		return nil, err
 	}
 
-	err := prospector.Init()
+	err := prospector.Init(states.GetStates())
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func NewProspector(cfg *common.Config, states file.States, outlet Outlet) (*Pros
 }
 
 // Init sets up default config for prospector
-func (p *Prospector) Init() error {
+func (p *Prospector) Init(states []file.State) error {
 
 	var prospectorer Prospectorer
 	var err error
@@ -90,7 +90,10 @@ func (p *Prospector) Init() error {
 		return err
 	}
 
-	prospectorer.Init()
+	err = prospectorer.Init(states)
+	if err != nil {
+		return err
+	}
 	p.prospectorer = prospectorer
 
 	// Create empty harvester to check if configs are fine
