@@ -15,6 +15,12 @@ for each version.
 This section discusses the changes that you should be aware of if you upgrade
 the Beats from version 1.x to 5.x.
 
+==== URL changes for DEB/RPM packages
+
+The previous `packages.elastic.co` URL has been altered to `artifacts.elastic.co`. 
+Ensure you update your repository files before running the upgrade process, or 
+your operating system may not see the new packages.
+
 ==== Configuration File Changes
 
 Beats 5.0 comes with a more powerful and more robust <<config-file-format,file
