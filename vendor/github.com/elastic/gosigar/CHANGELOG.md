@@ -15,3 +15,4 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Fix value of `Mem.ActualFree` and `Mem.ActualUsed` on Windows. #49
+- Fix `ProcTime.StartTime` on Windows to report value in milliseconds since Unix epoch. #51

@@ -476,13 +476,14 @@ func (self *ProcTime) Get(pid int) error {
 		return fmt.Errorf("GetProcessTimes fails with %v", err)
 	}
 
-	// convert to millis
-	self.StartTime = uint64(FiletimeToDuration(&CPU.CreationTime).Nanoseconds() / 1e6)
+	// Windows epoch times are expressed as time elapsed since midnight on
+	// January 1, 1601 at Greenwich, England. This converts the Filetime to
+	// unix epoch in milliseconds.
+	self.StartTime = uint64(CPU.CreationTime.Nanoseconds() / 1e6)
 
+	// Convert to millis.
 	self.User = uint64(FiletimeToDuration(&CPU.UserTime).Nanoseconds() / 1e6)
-
 	self.Sys = uint64(FiletimeToDuration(&CPU.KernelTime).Nanoseconds() / 1e6)
-
 	self.Total = self.User + self.Sys
 
 	return nil
