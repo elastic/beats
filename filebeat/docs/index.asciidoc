@@ -38,6 +38,8 @@ include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
 include::./multiple-prospectors.asciidoc[]
 
+include::./load-balancing.asciidoc[]
+
 :allplatforms:
 include::../../libbeat/docs/yaml.asciidoc[]
 
