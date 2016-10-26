@@ -137,8 +137,8 @@ func (h *Harvester) Harvest(r reader.Reader) {
 			event.InputType = h.config.InputType
 			event.DocumentType = h.config.DocumentType
 			event.JSONConfig = h.config.JSON
-                        event.AnnotationRegex =  h.config.ParsingRegex
-                        event.DateFormat = h.config.DateFormat
+			event.AnnotationRegex = h.config.ParsingRegex
+			event.DateFormat = h.config.DateFormat
 		}
 
 		// Always send event to update state, also if lines was skipped
