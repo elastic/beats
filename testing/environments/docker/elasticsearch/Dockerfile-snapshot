@@ -4,7 +4,7 @@ ENV ELASTICSEARCH_MAJOR 5.0
 ENV ELASTICSEARCH_VERSION 5.0
 ENV VERSION 5.0.0
 ENV FILENAME_VERSION 5.0.0
-ENV URL http://staging.elastic.co/5.0.0-ccd69424/downloads/elasticsearch/elasticsearch-5.0.0.tar.gz
+ENV URL http://staging.elastic.co/5.0.0-86a0b164/downloads/elasticsearch/elasticsearch-5.0.0.tar.gz
 
 ENV ESHOME /opt/elasticsearch-${FILENAME_VERSION}
 
