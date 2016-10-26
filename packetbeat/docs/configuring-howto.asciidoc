@@ -17,6 +17,7 @@ The following topics describe how to configure Packetbeat:
 * <<packetbeat-configuration>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
+* <<packetbeat-geoip>>
 * <<config-packetbeat-logstash>>
 * <<using-environ-vars>>
 * <<capturing-options>>

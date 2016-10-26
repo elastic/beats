@@ -6,7 +6,9 @@ versions (e.g.  5.x to 5.y) so you can upgrade without any configuration file
 changes, but there are breaking changes between major versions (e.g. 5.x to
 6.y).
 
-We list the breaking changes at the top of the <<release-notes,release notes>>
+* <<breaking-changes-5.0>>
+
+We also list the breaking changes at the top of the <<release-notes,release notes>>
 for each version.
 
 [[breaking-changes-5.0]]
