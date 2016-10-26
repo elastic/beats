@@ -21,7 +21,7 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check number of fields.
-	assert.Equal(t, 10, len(event))
+	assert.Equal(t, 8, len(event))
 }
 
 func TestData(t *testing.T) {

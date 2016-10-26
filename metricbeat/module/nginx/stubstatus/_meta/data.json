@@ -14,8 +14,6 @@
         "stubstatus": {
             "accepts": 22,
             "active": 1,
-            "current": 10,
-            "dropped": 0,
             "handled": 22,
             "hostname": "nginx",
             "reading": 0,

@@ -5,15 +5,26 @@ import (
 	"fmt"
 	"io"
 	"regexp"
-	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
+	s "github.com/elastic/beats/metricbeat/schema"
+	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
 )
 
 var (
 	activeRe  = regexp.MustCompile("Active connections: (\\d+)")
 	requestRe = regexp.MustCompile("\\s(\\d+)\\s+(\\d+)\\s+(\\d+)")
 	connRe    = regexp.MustCompile("Reading: (\\d+) Writing: (\\d+) Waiting: (\\d+)")
+
+	schema = s.Schema{
+		"active":   c.Int("active"),
+		"accepts":  c.Int("accepts"),
+		"handled":  c.Int("handled"),
+		"requests": c.Int("requests"),
+		"reading":  c.Int("reading"),
+		"writing":  c.Int("writing"),
+		"waiting":  c.Int("waiting"),
+	}
 )
 
 // Map body to MapStr
@@ -24,15 +35,13 @@ func eventMapping(m *MetricSet, body io.ReadCloser, hostname string, metricset s
 	//  7 7 19
 	// Reading: 0 Writing: 1 Waiting: 0
 	var (
-		active   int
-		accepts  int
-		handled  int
-		dropped  int
-		requests int
-		current  int
-		reading  int
-		writing  int
-		waiting  int
+		active   string
+		accepts  string
+		handled  string
+		requests string
+		reading  string
+		writing  string
+		waiting  string
 	)
 
 	scanner := bufio.NewScanner(body)
@@ -42,7 +51,7 @@ func eventMapping(m *MetricSet, body io.ReadCloser, hostname string, metricset s
 	if matches := activeRe.FindStringSubmatch(scanner.Text()); matches == nil {
 		return nil, fmt.Errorf("cannot parse active connections from Nginx stub status")
 	} else {
-		active, _ = strconv.Atoi(matches[1])
+		active = matches[1]
 	}
 
 	// Skip request status headers.
@@ -53,16 +62,9 @@ func eventMapping(m *MetricSet, body io.ReadCloser, hostname string, metricset s
 	if matches := requestRe.FindStringSubmatch(scanner.Text()); matches == nil {
 		return nil, fmt.Errorf("cannot parse request status from Nginx stub status")
 	} else {
-		accepts, _ = strconv.Atoi(matches[1])
-		handled, _ = strconv.Atoi(matches[2])
-		requests, _ = strconv.Atoi(matches[3])
-
-		// Derived request status.
-		dropped = accepts - handled
-		current = requests - m.requests
-
-		// Kept for next run.
-		m.requests = requests
+		accepts = matches[1]
+		handled = matches[2]
+		requests = matches[3]
 	}
 
 	// Parse connection status.
@@ -70,24 +72,23 @@ func eventMapping(m *MetricSet, body io.ReadCloser, hostname string, metricset s
 	if matches := connRe.FindStringSubmatch(scanner.Text()); matches == nil {
 		return nil, fmt.Errorf("cannot parse connection status from Nginx stub status")
 	} else {
-		reading, _ = strconv.Atoi(matches[1])
-		writing, _ = strconv.Atoi(matches[2])
-		waiting, _ = strconv.Atoi(matches[3])
+		reading = matches[1]
+		writing = matches[2]
+		waiting = matches[3]
 	}
 
 	event := common.MapStr{
 		"hostname": hostname,
-
+	}
+	metrics := map[string]interface{}{
 		"active":   active,
 		"accepts":  accepts,
 		"handled":  handled,
-		"dropped":  dropped,
 		"requests": requests,
-		"current":  current,
 		"reading":  reading,
 		"writing":  writing,
 		"waiting":  waiting,
 	}
 
-	return event, nil
+	return schema.ApplyTo(event, metrics), nil
 }
