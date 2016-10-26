@@ -1,7 +1,11 @@
 [[upgrading]]
 == Upgrading
 
-This section gives general recommendations for upgrading the Beats.
+This section gives general recommendations for upgrading the Beats:
+
+* <<upgrading-minor-versions>>
+* <<upgrading-1-to-5>>
+* <<upgrade-mapping-template>>
 
 [[upgrading-minor-versions]]
 === Upgrading Between Minor Versions
