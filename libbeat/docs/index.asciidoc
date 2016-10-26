@@ -33,7 +33,7 @@ include::./config-file-format.asciidoc[]
 
 include::./dashboards.asciidoc[]
 
-pass::[<?page_header <b>PLEASE NOTE:</b><br/>Always refer to the documentation in master for the latest information about contributing to Beats.?>]
+pass::[<?page_header Always refer to the documentation in master for the latest information about contributing to Beats.?>]
 
 include::./newbeat.asciidoc[]
 

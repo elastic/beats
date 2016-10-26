@@ -60,4 +60,9 @@ include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
 
+pass::[<?page_header We are working on updating this section. Some content might be out of date. While you're waiting for updates, you might want to try out the TCP protocol generator at https://github.com/elastic/beats/tree/master/generate/packetbeat/tcp-protocol. ?>]
+
 include::./new_protocol.asciidoc[]
+
+pass::[<?page_header ?>]
+
