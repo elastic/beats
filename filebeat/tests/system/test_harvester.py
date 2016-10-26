@@ -413,10 +413,9 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 1
 
-        # Check that not all but some lines were read
-        assert self.output_lines() < 1000
+        # Check that not all but some lines were read. It can happen sometimes that filebeat finishes reading ...
+        assert self.output_lines() <= 1000
         assert self.output_lines() > 0
-
 
     def test_bom_utf8(self):
         """

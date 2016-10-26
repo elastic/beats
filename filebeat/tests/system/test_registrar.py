@@ -1285,3 +1285,94 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 1
         assert data[0]["ttl"] == -1
+
+    def test_ignore_older_state(self):
+        """
+        Check that state is also persisted for files falling under ignore_older on startup
+        without a previous state
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            close_inactive="1s",
+            ignore_older="1s",
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile1 = self.working_dir + "/log/test.log"
+
+        with open(testfile1, 'w') as file:
+            file.write("Hello World\n")
+
+        time.sleep(1)
+
+        filebeat = self.start_beat()
+
+        # Make sure file falls under ignore_older
+        self.wait_until(
+            lambda: self.log_contains("Ignore file because ignore_older reached"),
+            max_timeout=10)
+
+        # Make sure state is loaded for file
+        self.wait_until(
+            lambda: self.log_contains("Before: 1, After: 1"),
+            max_timeout=10)
+
+        # Make sure state is written
+        self.wait_until(
+            lambda: self.log_contains("Registry file updated. 1 states written."),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        data = self.get_registry()
+        assert len(data) == 1
+
+        # Check that offset is 0 even though there is content in it
+        assert data[0]["offset"] == 0
+
+    def test_ignore_older_state_clean_inactive(self):
+        """
+        Check that state for ignore_older is not persisted when falling under clean_inactive
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            close_inactive="1s",
+            clean_inactive="2s",
+            ignore_older="1s",
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile1 = self.working_dir + "/log/test.log"
+
+        with open(testfile1, 'w') as file:
+            file.write("Hello World\n")
+
+        time.sleep(2)
+
+        filebeat = self.start_beat()
+
+        # Make sure file falls under ignore_older
+        self.wait_until(
+            lambda: self.log_contains("Ignore file because ignore_older reached"),
+            max_timeout=10)
+
+        self.wait_until(
+            lambda: self.log_contains("Do not write state for ignore_older because clean_inactive reached"),
+            max_timeout=10)
+
+        # Make sure state is loaded for file
+        self.wait_until(
+            lambda: self.log_contains("Before: 0, After: 0"),
+            max_timeout=10)
+
+        # Make sure state is written
+        self.wait_until(
+            lambda: self.log_contains("Registry file updated. 0 states written."),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        data = self.get_registry()
+        assert len(data) == 0
