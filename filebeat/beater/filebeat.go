@@ -91,6 +91,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	err = registrar.Start()
 	if err != nil {
 		logp.Err("Could not start registrar: %v", err)
+		return err
 	}
 	// Stopping registrar will write last state
 	defer registrar.Stop()
