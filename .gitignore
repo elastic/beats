@@ -4,6 +4,7 @@
 /build
 /*/data
 /*/logs
+/.vscode
 
 # Files
 .DS_Store

@@ -120,6 +120,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.3.7...HEAD
 [0.3.7]: https://github.com/elastic/go-ucfg/compare/v0.3.6...v0.3.7
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.3.6...HEAD
 [0.3.6]: https://github.com/elastic/go-ucfg/compare/v0.3.5...v0.3.6
 [0.3.5]: https://github.com/elastic/go-ucfg/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/elastic/go-ucfg/compare/v0.3.3...v0.3.4
