@@ -31,7 +31,11 @@ Redhat/Centos/Fedora, <<mac, mac>> for OS X, and <<win, win>> for Windows).
 
 [NOTE]
 ==================================================
-See our https://www.elastic.co/downloads/beats/packetbeat[download page] for other installation options, such as 32-bit images.
+If you use Apt or Yum, you can {libbeat}/setup-repositories.html[install Packetbeat from our repositories] to update to
+the newest version more easily.
+
+See our https://www.elastic.co/downloads/beats/packetbeat[download page] for other installation options, such as 32-bit
+images.
 ==================================================
 
 [[deb]]

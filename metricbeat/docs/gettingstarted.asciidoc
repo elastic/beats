@@ -40,6 +40,10 @@ mac>> for OS X, and <<win, win>> for Windows).
 
 [NOTE]
 ==================================================
+If you use Apt or Yum, you can
+{libbeat}/setup-repositories.html[install Metricbeat from our repositories] to
+update to the newest version more easily.
+
 See our https://www.elastic.co/downloads/beats/metricbeat[download page] for
 other installation options, such as 32-bit images.
 ==================================================
