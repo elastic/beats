@@ -31,6 +31,8 @@ https://github.com/elastic/beats/compare/v5.0.0...5.0[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix `system.process.start_time` on Windows. {pull}2848[2848]
+
 *Packetbeat*
 
 *Topbeat*
