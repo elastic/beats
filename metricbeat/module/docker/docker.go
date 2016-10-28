@@ -13,7 +13,7 @@ type DockerStat struct {
 	Stats     docker.Stats
 }
 
-// TOOD: These should not be global as otherwise only one client and socket can be used -> max 1 module to monitor
+// TODO: These should not be global as otherwise only one client and socket can be used -> max 1 module to monitor
 var socket string
 
 func NewDockerClient(config *Config) (*docker.Client, error) {

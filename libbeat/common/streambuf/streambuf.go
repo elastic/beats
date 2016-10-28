@@ -12,7 +12,7 @@
 // All functions that might fail, will return an error. The last error reported
 // will be stored with the buffer itself. Instead of checking every single error
 // one can use the Failed() and Err() methods to check if the buffer is still in a
-// valid state and all parsing was successfull.
+// valid state and all parsing was successful.
 package streambuf
 
 import (
@@ -51,7 +51,7 @@ type Buffer struct {
 
 	// Internal parser state offsets.
 	// Offset is the position a parse might continue to work at when called
-	// again (e.g. usefull for parsing tcp streams.). The mark is used to remember
+	// again (e.g. useful for parsing tcp streams.). The mark is used to remember
 	// the position last parse operation ended at. The variable available is used
 	// for faster lookup
 	// Invariants:

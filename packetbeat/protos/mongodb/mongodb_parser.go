@@ -114,7 +114,7 @@ func opReplyParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	m.documents = documents
 
 	if err != nil {
-		logp.Err("An error occured while parsing OP_REPLY message: %s", err)
+		logp.Err("An error occurred while parsing OP_REPLY message: %s", err)
 		return false, false
 	}
 	return true, true
@@ -124,7 +124,7 @@ func opMsgParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	var err error
 	m.event["message"], err = d.readCStr()
 	if err != nil {
-		logp.Err("An error occured while parsing OP_MSG message: %s", err)
+		logp.Err("An error occurred while parsing OP_MSG message: %s", err)
 		return false, false
 	}
 	return true, true
@@ -139,7 +139,7 @@ func opUpdateParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	m.event["update"], err = d.readDocumentStr()
 
 	if err != nil {
-		logp.Err("An error occured while parsing OP_UPDATE message: %s", err)
+		logp.Err("An error occurred while parsing OP_UPDATE message: %s", err)
 		return false, false
 	}
 
@@ -155,7 +155,7 @@ func opInsertParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	// Find an old client to generate a pcap with legacy protocol ?
 
 	if err != nil {
-		logp.Err("An error occured while parsing OP_INSERT message: %s", err)
+		logp.Err("An error occurred while parsing OP_INSERT message: %s", err)
 		return false, false
 	}
 
@@ -235,7 +235,7 @@ func opQueryParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	m.params = query
 
 	if err != nil {
-		logp.Err("An error occured while parsing OP_QUERY message: %s", err)
+		logp.Err("An error occurred while parsing OP_QUERY message: %s", err)
 		return false, false
 	}
 
@@ -249,7 +249,7 @@ func opGetMoreParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	m.event["cursorId"], err = d.readInt64()
 
 	if err != nil {
-		logp.Err("An error occured while parsing OP_GET_MORE message: %s", err)
+		logp.Err("An error occurred while parsing OP_GET_MORE message: %s", err)
 		return false, false
 	}
 	return true, true
@@ -263,7 +263,7 @@ func opDeleteParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	m.event["selector"], err = d.readDocumentStr()
 
 	if err != nil {
-		logp.Err("An error occured while parsing OP_DELETE message: %s", err)
+		logp.Err("An error occurred while parsing OP_DELETE message: %s", err)
 		return false, false
 	}
 

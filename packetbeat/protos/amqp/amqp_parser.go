@@ -119,7 +119,7 @@ func (amqp *Amqp) decodeMethodFrame(s *AmqpStream, m_data []byte) (bool, bool) {
 	if function, exists := amqp.MethodMap[class][method]; exists {
 		return function(s.message, arguments)
 	} else {
-		logp.Debug("amqpdetailed", "Received unkown or not supported method")
+		logp.Debug("amqpdetailed", "Received unknown or not supported method")
 		return false, false
 	}
 }
