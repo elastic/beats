@@ -39,6 +39,8 @@ https://github.com/elastic/beats/compare/v5.0.0...5.0[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix 'index out of bounds' bug in Packetbeat DNS protocol plugin. {issue}2872[2872]
+
 *Topbeat*
 
 *Filebeat*
