@@ -14,8 +14,7 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 
 echo Testing
 mkdir build\coverage
-set gotestcover="%GOPATH/src/github.com/elastic/beats/vendor/github.com/pierrre/gotestcover/gotestcover.go"
-go run %gotestcover% -race -coverprofile=build/coverage/integration.cov github.com/elastic/beats/winlogbeat/...
+gotestcover -race -coverprofile=build/coverage/integration.cov github.com/elastic/beats/winlogbeat/...
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 echo System Testing
