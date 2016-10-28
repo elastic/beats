@@ -44,9 +44,7 @@ func SafeFileRotate(path, tempfile string) error {
 
 // ReadOpen opens a file for reading only
 func ReadOpen(path string) (*os.File, error) {
-
 	flag := os.O_RDONLY
-	var perm os.FileMode = 0
-
+	perm := os.FileMode(0)
 	return os.OpenFile(path, flag, perm)
 }
