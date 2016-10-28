@@ -1,6 +1,6 @@
 // +build !cgo !linux
 
-package util
+package linux
 
 func GetClockTicks() int {
 	return 100
