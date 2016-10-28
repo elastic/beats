@@ -77,7 +77,7 @@ func (proc *Process) getDetails(cmdline string) error {
 
 	if cmdline == "" {
 		args := sigar.ProcArgs{}
-		if err := args.Get(proc.Pid); err != nil {
+		if err := args.Get(proc.Pid); err != nil && !sigar.IsNotImplemented(err) {
 			return fmt.Errorf("error getting process arguments for pid=%d: %v", proc.Pid, err)
 		}
 		proc.CmdLine = strings.Join(args.List, " ")
@@ -330,14 +330,12 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 }
 
 func (procStats *ProcStats) GetProcStatsEvents() ([]common.MapStr, error) {
-
-	events := []common.MapStr{}
-
 	processes, err := procStats.GetProcStats()
 	if err != nil {
 		return nil, err
 	}
 
+	events := make([]common.MapStr, len(processes))
 	for _, proc := range processes {
 		event := common.MapStr{
 			"@timestamp": common.Time(time.Now()),

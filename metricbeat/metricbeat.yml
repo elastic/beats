@@ -29,7 +29,7 @@ metricbeat.modules:
     - filesystem
 
     # File system summary stats
-    #- fsstat
+    - fsstat
 
     # Memory stats
     - memory

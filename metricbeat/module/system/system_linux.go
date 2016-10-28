@@ -7,6 +7,10 @@ import (
 	"github.com/elastic/gosigar"
 )
 
+func initModule() {
+	configureHostFS()
+}
+
 func configureHostFS() {
 	dir := *HostFS
 	if dir == "" {

@@ -97,7 +97,7 @@ class SystemTest(metricbeat.BaseTest):
             cpuStats = evt["system"]["cpu"]
             self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS_ALL), cpuStats.keys())
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core(self):
         """
         Test core system output.
@@ -123,7 +123,7 @@ class SystemTest(metricbeat.BaseTest):
             core = evt["system"]["core"]
             self.assertItemsEqual(self.de_dot(SYSTEM_CORE_FIELDS), core.keys())
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core_with_cpu_ticks(self):
         """
         Test core system output.
