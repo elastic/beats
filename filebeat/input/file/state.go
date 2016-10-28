@@ -27,7 +27,7 @@ func NewState(fileInfo os.FileInfo, path string) State {
 		Finished:    false,
 		FileStateOS: GetOSState(fileInfo),
 		Timestamp:   time.Now(),
-		TTL:         -1 * time.Second, // By default, state does have an infinit ttl
+		TTL:         -1 * time.Second, // By default, state does have an infinite ttl
 	}
 }
 
