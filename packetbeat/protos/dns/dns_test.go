@@ -16,6 +16,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	mkdns "github.com/miekg/dns"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -260,4 +261,28 @@ func assertAddress(t testing.TB, expected common.IpPortTuple, endpoint interface
 
 	assert.Equal(t, expected.Src_ip.String(), e.Ip)
 	assert.Equal(t, expected.Src_port, e.Port)
+}
+
+func TestRRsToMapStrsWithOPTRecord(t *testing.T) {
+	o := new(mkdns.OPT)
+	o.Hdr.Name = "." // MUST be the root zone, per definition.
+	o.Hdr.Rrtype = mkdns.TypeOPT
+
+	r := new(mkdns.MX)
+	r.Hdr = mkdns.RR_Header{Name: "miek.nl.", Rrtype: mkdns.TypeMX,
+		Class: mkdns.ClassINET, Ttl: 3600}
+	r.Preference = 10
+	r.Mx = "mx.miek.nl."
+
+	// The OPT record is a psuedo-record so it doesn't become a real record
+	// in our conversion, and there will be 1 entry instead of 2.
+	mapStrs := rrsToMapStrs([]mkdns.RR{o, r})
+	assert.Len(t, mapStrs, 1)
+
+	mapStr := mapStrs[0]
+	assert.Equal(t, "IN", mapStr["class"])
+	assert.Equal(t, "MX", mapStr["type"])
+	assert.Equal(t, "mx.miek.nl.", mapStr["data"])
+	assert.Equal(t, "miek.nl.", mapStr["name"])
+	assert.EqualValues(t, 10, mapStr["preference"])
 }
