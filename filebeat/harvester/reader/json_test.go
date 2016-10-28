@@ -150,8 +150,8 @@ func TestDecodeJSON(t *testing.T) {
 
 		var p JSON
 		p.cfg = &test.Config
-		text, map_ := p.decodeJSON([]byte(test.Text))
+		text, M := p.decodeJSON([]byte(test.Text))
 		assert.Equal(t, test.ExpectedText, string(text))
-		assert.Equal(t, test.ExpectedMap, map_)
+		assert.Equal(t, test.ExpectedMap, M)
 	}
 }

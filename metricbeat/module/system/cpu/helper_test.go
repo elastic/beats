@@ -11,15 +11,13 @@ import (
 )
 
 func TestGetCpuTimes(t *testing.T) {
+	stat, err := GetCpuTimes()
 
-	cpu_stat, err := GetCpuTimes()
-
-	assert.NotNil(t, cpu_stat)
+	assert.NotNil(t, stat)
 	assert.Nil(t, err)
 
-	assert.True(t, (cpu_stat.User > 0))
-	assert.True(t, (cpu_stat.Sys > 0))
-
+	assert.True(t, (stat.User > 0))
+	assert.True(t, (stat.Sys > 0))
 }
 
 func TestCpuPercentage(t *testing.T) {
