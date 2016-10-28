@@ -8,3 +8,4 @@ This metricset is available on:
 - FreeBSD
 - Linux
 - OpenBSD
+- Windows
