@@ -11,7 +11,7 @@ import (
 	"time"
 
 	cfg "github.com/elastic/beats/filebeat/config"
-	. "github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/libbeat/logp"
@@ -19,7 +19,7 @@ import (
 )
 
 type Registrar struct {
-	Channel      chan []*Event
+	Channel      chan []*input.Event
 	out          publisher.SuccessLogger
 	done         chan struct{}
 	registryFile string       // Path to the Registry File
@@ -40,7 +40,7 @@ func New(registryFile string, out publisher.SuccessLogger) (*Registrar, error) {
 		registryFile: registryFile,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
-		Channel:      make(chan []*Event, 1),
+		Channel:      make(chan []*input.Event, 1),
 		out:          out,
 		wg:           sync.WaitGroup{},
 	}
@@ -78,9 +78,8 @@ func (r *Registrar) Init() error {
 		// Special error message for directory
 		if fileInfo.IsDir() {
 			return fmt.Errorf("Registry file path must be a file. %s is a directory.", r.registryFile)
-		} else {
-			return fmt.Errorf("Registry file path is not a regular file: %s", r.registryFile)
 		}
+		return fmt.Errorf("Registry file path is not a regular file: %s", r.registryFile)
 	}
 
 	logp.Info("Registry file set to: %s", r.registryFile)
@@ -233,7 +232,7 @@ func (r *Registrar) Run() {
 	}()
 
 	for {
-		var events []*Event
+		var events []*input.Event
 
 		select {
 		case <-r.done:
@@ -263,7 +262,7 @@ func (r *Registrar) Run() {
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
-func (r *Registrar) processEventStates(events []*Event) {
+func (r *Registrar) processEventStates(events []*input.Event) {
 	logp.Debug("registrar", "Processing %d events", len(events))
 
 	// Take the last event found for each file source
