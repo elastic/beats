@@ -10,6 +10,8 @@ environment:
   GOPATH: c:\gopath
   PYWIN_DL: https://beats-files.s3.amazonaws.com/deps/pywin32-220.win32-py2.7.exe
   matrix:
+  - PROJ: github.com\elastic\beats\metricbeat
+    BEAT: metricbeat 
   - PROJ: github.com\elastic\beats\filebeat
     BEAT: filebeat
   - PROJ: github.com\elastic\beats\winlogbeat
@@ -49,7 +51,7 @@ install:
   - set PYTHONPATH=C:\Python27
   - set PATH=%PYTHONPATH%;%PYTHONPATH%\Scripts;%PATH%
   - python --version
-  - pip install jinja2 nose nose-timer PyYAML
+  - pip install jinja2 nose nose-timer PyYAML redis
   - easy_install C:/pywin_inst.exe
 
 # To run your custom scripts instead of automatic MSBuild
