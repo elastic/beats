@@ -620,6 +620,57 @@ https://github.com/elastic/beats/compare/v1.2.0...v5.0.0-alpha1[View commits]
   template. {issue}1315[1315]
 * The ES template automatic load doesn't work if Elasticsearch is not available when the Beat is starting. {issue}1321[1321]
 
+[[release-notes-1.3.1]]
+=== Beats version 1.3.1
+https://github.com/elastic/beats/compare/v1.3.0...v1.3.1[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix a concurrent bug on filebeat startup with a large number of prospectors defined. {pull}2509[2509]
+
+*Packetbeat*
+
+- Fix description for the -I CLI flag. {pull}2480[2480]
+
+*Winlogbeat*
+
+- Fix corrupt registry file that occurs on power loss by disabling file write caching. {issue}2313[2313]
+
+[[release-notes-1.3.0]]
+=== Beats version 1.3.0
+https://github.com/elastic/beats/compare/v1.2.3...v1.3.0[View commits]
+
+==== Deprecated
+
+*Filebeat*
+
+- Undocumented support for following symlinks is deprecated. Filebeat will not follow symlinks in version 5.0. {pull}1767[1767]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix beats load balancer deadlock if `max_retries: -1` or `publish_async` is enabled in filebeat. {issue}1829[1829]
+- Fix output modes backoff counter reset. {issue}1803[1803] {pull}1814[1814] {pull}1818[1818]
+- Set logstash output default bulk_max_size to 2048. {issue}1662[1662]
+- Seed random number generator using crypto.rand package. {pull}1503[1503]
+- Check stdout being available when console output is configured. {issue}2063[2063]
+
+*Packetbeat*
+
+- Add missing nil-check to memcached GapInStream handler. {issue}1162[1162]
+- Fix NFSv4 Operation returning the first found first-class operation available in compound requests. {pull}1821[1821]
+- Fix TCP overlapping segments not being handled correctly. {pull}1917[1917]
+
+==== Added
+
+*Affecting all Beats*
+
+- Updated to Go 1.7
+
+
 [[release-notes-1.2.3]]
 === Beats version 1.2.3
 https://github.com/elastic/beats/compare/v1.2.2...v1.2.3[View commits]
