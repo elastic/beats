@@ -25,11 +25,11 @@ func eventMapping(memoryData *MemoryData) common.MapStr {
 		"limit": memoryData.Limit,
 		"rss": common.MapStr{
 			"total": memoryData.TotalRss,
-			"pct":   memoryData.TotalRss_p,
+			"pct":   memoryData.TotalRssP,
 		},
 		"usage": common.MapStr{
 			"total": memoryData.Usage,
-			"pct":   memoryData.Usage_p,
+			"pct":   memoryData.UsageP,
 			"max":   memoryData.MaxUsage,
 		},
 	}

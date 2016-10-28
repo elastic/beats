@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/lib/pq"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/postgresql"
 	"github.com/pkg/errors"
+
+	// Register postgresql database/sql driver
+	_ "github.com/lib/pq"
 )
 
 // init registers the MetricSet with the central registry.
