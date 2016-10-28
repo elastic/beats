@@ -89,12 +89,12 @@ func (r result) String() string {
 
 // fetchJSON query metadata from a hosting provider's metadata service.
 func fetchJSON(
+	ctx context.Context,
 	provider string,
 	headers map[string]string,
 	url string,
 	conv func(map[string]interface{}) common.MapStr,
 	client http.Client,
-	ctx context.Context,
 ) result {
 	result := result{provider: provider}
 
@@ -181,9 +181,9 @@ func fetchMetadata(doURL, ec2URL, gceURL string, timeout time.Duration) *result 
 	defer cancel()
 
 	c := make(chan result)
-	go func() { writeResult(ctx, c, fetchJSON("digitalocean", nil, doURL, doSchema, client, ctx)) }()
-	go func() { writeResult(ctx, c, fetchJSON("ec2", nil, ec2URL, ec2Schema, client, ctx)) }()
-	go func() { writeResult(ctx, c, fetchJSON("gce", gceHeaders, gceURL, gceSchema, client, ctx)) }()
+	go func() { writeResult(ctx, c, fetchJSON(ctx, "digitalocean", nil, doURL, doSchema, client)) }()
+	go func() { writeResult(ctx, c, fetchJSON(ctx, "ec2", nil, ec2URL, ec2Schema, client)) }()
+	go func() { writeResult(ctx, c, fetchJSON(ctx, "gce", gceHeaders, gceURL, gceSchema, client)) }()
 
 	for i := 0; i < 3; i++ {
 		select {

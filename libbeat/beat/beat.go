@@ -47,10 +47,12 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/processors"
-	_ "github.com/elastic/beats/libbeat/processors/actions"
 	"github.com/elastic/beats/libbeat/publisher"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/satori/go.uuid"
+
+	// Register default processors.
+	_ "github.com/elastic/beats/libbeat/processors/actions"
 )
 
 // Beater is the interface that must be implemented by every Beat. A Beater
