@@ -30,10 +30,10 @@ func IOFailed(err error) Reason {
 }
 
 func (e ValidateError) Error() string { return e.err.Error() }
-func (_ ValidateError) Type() string  { return "validate" }
+func (ValidateError) Type() string    { return "validate" }
 
 func (e IOError) Error() string { return e.err.Error() }
-func (_ IOError) Type() string  { return "io" }
+func (IOError) Type() string    { return "io" }
 
 func FailError(typ string, err error) common.MapStr {
 	return common.MapStr{

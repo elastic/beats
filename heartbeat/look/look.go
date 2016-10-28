@@ -1,6 +1,5 @@
-/* package look defines common formatters for fields/types to be used when
-   generating custom events.
-*/
+// Package look defines common formatters for fields/types to be used when
+// generating custom events.
 package look
 
 import (
