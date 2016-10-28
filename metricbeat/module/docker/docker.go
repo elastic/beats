@@ -20,7 +20,7 @@ func NewDockerClient(config *Config) (*docker.Client, error) {
 	socket = config.Socket
 
 	var err error
-	var client *docker.Client = nil
+	var client *docker.Client
 
 	if config.Tls.Enabled == true {
 		client, err = docker.NewTLSClient(
