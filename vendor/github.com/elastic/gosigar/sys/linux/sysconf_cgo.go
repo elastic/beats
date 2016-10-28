@@ -1,6 +1,6 @@
 // +build linux,cgo
 
-package util
+package linux
 
 /*
 #include <unistd.h>
