@@ -3,12 +3,14 @@ package activity
 import (
 	"database/sql"
 
-	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/postgresql"
+
+	// Register postgresql database/sql driver
+	_ "github.com/lib/pq"
 )
 
 // init registers the MetricSet with the central registry.

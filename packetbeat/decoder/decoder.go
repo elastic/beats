@@ -146,7 +146,7 @@ func (d *DecoderStruct) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	if d.flowID != nil {
 		d.flowID.Reset(d.flowIDBufferBacking[:0])
 
-		// supress flow stats snapshots while processing packet
+		// suppress flow stats snapshots while processing packet
 		d.flows.Lock()
 		defer d.flows.Unlock()
 	}

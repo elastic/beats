@@ -380,7 +380,7 @@ func (t *transaction) Event(event common.MapStr) error {
 	if t.response != nil {
 		_, err := t.response.SubEvent("response", mc)
 		if err != nil {
-			logp.Warn("error filling transaction reponse: %v", err)
+			logp.Warn("error filling transaction response: %v", err)
 			return err
 		}
 	}

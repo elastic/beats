@@ -1,5 +1,5 @@
 /*
-Package disk fetches disk IO metrics from the OS. It is implemented for freebsd,
+Package diskio fetches disk IO metrics from the OS. It is implemented for freebsd,
 linux, and windows.
 
 Detailed descriptions of IO stats provided by Linux can be found here:

@@ -484,7 +484,7 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 		case bytes.Equal(name, nameStatus): // name == "status"
 			status, err = reader.nextInt()
 			if err != nil {
-				logp.Err("Failed to parse bulk reponse item: %s", err)
+				logp.Err("Failed to parse bulk response item: %s", err)
 				return 0, nil, err
 			}
 
