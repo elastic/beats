@@ -53,7 +53,7 @@ import:
 - package: github.com/satori/go.uuid
   version: v1.1.0
 - package: github.com/StackExchange/wmi
-  version: f3e2bae1e0cb5aef83e319133eabfee30013a4a5
+  version: e54cbda6595d7293a7a468ccf9525f6bc8887f99
 - package: github.com/go-ole/go-ole
   version: v1.2.0
 - package: github.com/miekg/dns
