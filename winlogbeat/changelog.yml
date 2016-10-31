@@ -1,0 +1,203 @@
+project: winlogbeat
+changes:
+- type: release
+  version: master
+  parent: v5.0.0-rc1
+  date: ""
+
+- type: added
+  issue: 2641
+  description: >
+    Add `event_logs.batch_read_size` configuration option.
+
+
+- type: release
+  version: v5.0.0-rc1
+  parent: v5.0.0-beta1
+  date: ""
+
+- type: release
+  version: v5.0.0-beta1
+  parent: v5.0.0-alpha5
+  date: ""
+
+- type: bug
+  issue: 2313
+  description: >
+    Fix corrupt registry file that occurs on power loss by disabling file write caching.
+
+
+- type: release
+  version: v5.0.0-alpha5
+  parent: v5.0.0-alpha4
+  date: ""
+
+- type: bug
+  issue: 2041
+  description: >
+    Fix potential data loss between Winlogbeat restarts, reporting unpublished lines as published.
+
+
+- type: release
+  version: v5.0.0-alpha4
+  parent: v5.0.0-alpha3
+  date: ""
+
+- type: bug
+  issue: 1891
+  description: >
+    Fix issue with rendering forwarded event log records.
+
+
+- type: release
+  version: v5.0.0-alpha3
+  parent: v5.0.0-alpha2
+  date: ""
+
+- type: bug
+  issue: 1590
+  description: >
+    Adding missing argument to the "Stop processing" log message.
+
+
+- type: release
+  version: v1.2.3
+  parent: v1.2.2
+  date: ""
+
+- type: bug
+  issue: 1498
+  description: >
+    Fix panic when reading messages larger than 32K characters on Windows XP and 2003.
+
+
+- type: release
+  version: v5.0.0-alpha2
+  parent: v5.0.0-alpha1
+  date: ""
+
+- type: bug
+  issue: 1498
+  description: >
+    Fix panic when reading messages larger than 32K characters on Windows XP and 2003.
+
+
+- type: bug
+  issue: 1499
+  description: >
+    Fix panic that occurs when reading a large events on Windows Vista and newer.
+
+
+- type: release
+  version: v1.2.2
+  parent: v1.2.0
+  date: ""
+
+- type: release
+  version: v1.2.1
+  parent: v1.2.0
+  date: ""
+
+- type: release
+  version: v5.0.0-alpha1
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 1053
+  description: >
+    The `message_inserts` field was replaced with the `event_data` field
+
+
+- type: breaking
+  issue: 1053
+  description: >
+    The `category` field was renamed to `task` to better align with the Windows Event Log API naming
+
+
+- type: breaking
+  issue: 1218
+  description: >
+    Remove the count field from the exported event
+
+
+- type: added
+  issue: 888
+  description: >
+    Add caching of event metadata handles and the system render context for the wineventlog API
+
+
+- type: added
+  issue: 1100
+  description: >
+    Improve config validation by checking for unknown top-level YAML keys.
+
+
+- type: added
+  issue: 1092
+  description: >
+    Add the ability to set tags, fields, and fields_under_root as options for each event log
+
+
+- type: added
+  issue: 1218
+  description: >
+    Add `event_id`, `level`, and `provider` configuration options for filtering events
+
+
+- type: added
+  issue: 1218
+  description: >
+    Add `include_xml` configuration option for including the raw XML with the event
+
+
+- type: release
+  version: v1.2.0
+  parent: v1.1.2
+  date: ""
+
+- type: bug
+  issue: 1227
+  description: >
+    Fix invalid `event_id` on Windows XP and Windows 2003
+
+
+- type: release
+  version: v1.1.2
+  parent: v1.1.1
+  date: ""
+
+- type: release
+  version: v1.1.1
+  parent: v1.1.0
+  date: ""
+
+- type: release
+  version: v1.1.0
+  parent: v1.0.1
+  date: ""
+
+- type: release
+  version: v1.0.1
+  parent: v1.0.0
+  date: ""
+
+- type: release
+  version: 1.0.0
+  parent: 1.0.0-rc2
+  date: ""
+
+- type: release
+  version: 1.0.0-rc2
+  parent: 1.0.0-rc1
+  date: ""
+
+- type: release
+  version: 1.0.0-rc1
+  parent: 1.0.0-beta4
+  date: ""
+
+- type: release
+  version: 1.0.0-beta4
+  parent: 1.0.0-beta3
+  date: ""

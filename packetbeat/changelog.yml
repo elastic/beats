@@ -1,0 +1,347 @@
+project: packetbeat
+changes:
+- type: release
+  version: master
+  parent: v5.0.0-rc1
+  date: ""
+
+- type: release
+  version: v5.0.0-rc1
+  parent: v5.0.0-beta1
+  date: ""
+
+- type: bug
+  issue: 2660
+  description: >
+    Fix the `bpf_filter` setting.
+
+
+- type: release
+  version: v5.0.0-beta1
+  parent: v5.0.0-alpha5
+  date: ""
+
+- type: breaking
+  issue: 2167
+  description: >
+    Group HTTP fields under `http.request` and `http.response`
+
+
+- type: breaking
+  issue: 2167
+  description: >
+    Export `http.request.body` and `http.response.body` when configured under `include_body_for`
+
+
+- type: breaking
+  issue: 2393
+  description: >
+    Move `ignore_outgoing` config to `packetbeat.ignore_outgoing`
+
+
+- type: bug
+  issue: 2177
+  description: >
+    Fix mapping for some Packetbeat flow metrics that were not marked as being longs.
+
+
+- type: bug
+  issue: 2470
+  description: >
+    Fix handling of messages larger than the maximum message size (10MB).
+
+
+- type: added
+  issue: 1959
+  description: >
+    Add Cassandra protocol analyzer to Packetbeat.
+
+
+- type: added
+  issue: 2254
+  description: >
+    Match connections with IPv6 addresses to processes
+
+
+- type: added
+  issue: 2327
+  description: >
+    Add IP address to -devices command output
+
+
+- type: added
+  issue: 2470
+  description: >
+    Add configuration option for the maximum message size. Used to be hard-coded to 10 MB.
+
+
+- type: release
+  version: v5.0.0-alpha5
+  parent: v5.0.0-alpha4
+  date: ""
+
+- type: breaking
+  issue: 1988
+  description: >
+    Set `enabled` ` in `packetbeat.protocols.icmp` configuration to `true` by default.
+
+
+- type: added
+  issue: 1988
+  description: >
+    Add enabled setting to Packetbeat protocols.
+
+
+- type: added
+  issue: 1988
+  description: >
+    Add enabled setting to Packetbeat network flows configuration.
+
+
+- type: release
+  version: v5.0.0-alpha4
+  parent: v5.0.0-alpha3
+  date: ""
+
+- type: bug
+  issue: 1162
+  description: >
+    Add missing nil-check to memcached GapInStream handler.
+
+
+- type: bug
+  issue: 1821
+  description: >
+    Fix NFSv4 Operation returning the first found first-class operation available in compound requests.
+
+
+- type: bug
+  issue: 1898
+  description: >
+    Fix TCP overlapping segments not being handled correctly.
+
+
+- type: release
+  version: v5.0.0-alpha3
+  parent: v5.0.0-alpha2
+  date: ""
+
+- type: release
+  version: v1.2.3
+  parent: v1.2.2
+  date: ""
+
+- type: release
+  version: v5.0.0-alpha2
+  parent: v5.0.0-alpha1
+  date: ""
+
+- type: breaking
+  issue: 1353
+  description: >
+    Configuration of redis topology support changed.
+
+
+- type: breaking
+  issue: 1417
+  description: >
+    Move all Packetbeat configuration options under the packetbeat namespace
+
+
+- type: added
+  issue: 1347
+  description: >
+    Fix compile issues for OpenBSD.
+
+
+- type: release
+  version: v1.2.2
+  parent: v1.2.0
+  date: ""
+
+- type: release
+  version: v1.2.1
+  parent: v1.2.0
+  date: ""
+
+- type: release
+  version: v5.0.0-alpha1
+  parent: v1.2.0
+  date: ""
+
+- type: breaking
+  issue: 803
+  description: >
+    Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available`.
+
+
+- type: breaking
+  issue: 803
+  description: >
+    The fully qualified domain names which are part of output fields values of the dns package now terminate with a dot.
+
+
+- type: breaking
+  issue: 1210
+  description: >
+    Remove the count field from the exported event
+
+
+- type: bug
+  issue: 757
+  description: >
+    Create a proper BPF filter when ICMP is the only enabled protocol
+
+
+- type: bug
+  issue: 565
+  description: >
+    Check column length in pgsql parser.
+
+
+- type: bug
+  issue: 565
+  description: >
+    Harden pgsql parser.
+
+
+- type: added
+  issue: 803
+  description: >
+    Change the DNS library used throughout the dns package to github.com/miekg/dns.
+
+
+- type: added
+  issue: 1231
+  description: >
+    Add support for NFS v3 and v4.
+
+
+- type: added
+  issue: 1292
+  description: >
+    Add support for EDNS and DNSSEC.
+
+
+- type: release
+  version: v1.2.0
+  parent: v1.1.2
+  date: ""
+
+- type: bug
+  issue: 1241
+  description: >
+    Split real_ip_header value when it contains multiple IPs
+
+
+- type: release
+  version: v1.1.2
+  parent: v1.1.1
+  date: ""
+
+- type: release
+  version: v1.1.1
+  parent: v1.1.0
+  date: ""
+
+- type: release
+  version: v1.1.0
+  parent: v1.0.1
+  date: ""
+
+- type: bug
+  issue: 557
+  description: >
+    Fix setting direction to out and use its value to decide when dropping events if ignore_outgoing is enabled
+
+
+- type: bug
+  issue: 516
+  description: >
+    Reduce memory usage by having separate queue sizes for single events and bulk events. {pull}649[649]
+
+
+- type: bug
+  issue: 628
+  description: >
+    Set default bulk_max_size value to 2048
+
+
+- type: bug
+  issue: 598
+  description: >
+    Fix logstash window size of 1 not increasing.
+
+
+- type: bug
+  issue: 671
+  description: >
+    Allow PF_RING sniffer type to be configured using pf_ring or pfring
+
+
+- type: added
+  issue: 554
+  description: >
+    Add support for capturing DNS over TCP network traffic. {pull}486[486]
+
+
+- type: release
+  version: v1.0.1
+  parent: v1.0.0
+  date: ""
+
+- type: bug
+  issue: 377
+  description: >
+    Improve MongoDB message correlation.
+
+
+- type: bug
+  issue: 442
+  description: >
+    Improve redis parser performance.
+
+
+- type: bug
+  issue: 384
+  description: >
+    Fix panic on nil in redis protocol parser.
+
+
+- type: bug
+  issue: 402
+  description: >
+    Fix errors redis parser when messages are split in multiple TCP segments.
+
+
+- type: bug
+  issue: 
+  description: >
+    Fix errors in redis parser when length prefixed strings contain sequences of CRLF.
+
+
+- type: bug
+  issue: 402
+  description: >
+    Fix errors in redis parser when dealing with nested arrays.
+
+
+- type: release
+  version: 1.0.0
+  parent: 1.0.0-rc2
+  date: ""
+
+- type: release
+  version: 1.0.0-rc2
+  parent: 1.0.0-rc1
+  date: ""
+
+- type: release
+  version: 1.0.0-rc1
+  parent: 1.0.0-beta4
+  date: ""
+
+- type: release
+  version: 1.0.0-beta4
+  parent: 1.0.0-beta3
+  date: ""

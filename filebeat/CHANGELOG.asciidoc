@@ -1,0 +1,222 @@
+////
+This file is generated! See scripts/changelog.py
+////
+
+[[release-notes-v5.0.0-rc1]]
+=== Beats version v5.0.0-rc1
+ https://github.com/elastic/beats/compare/v5.0.0-beta1...v5.0.0-rc1[View commits]
+
+==== Bug
+
+- Fix input buffer on encoding problem.
+  {issue}2416[2416]
+
+[[release-notes-v5.0.0-beta1]]
+=== Beats version v5.0.0-beta1
+ https://github.com/elastic/beats/compare/v5.0.0-alpha5...v5.0.0-beta1[View commits]
+
+==== Added
+
+- Introduce close_timeout harvester options
+  {issue}1926[1926]
+- Strip BOM from first message in case of BOM files
+  {issue}2351[2351]
+- Add harvester_limit option
+  {issue}2417[2417]
+
+==== Bug
+
+- Fix processor failure in Filebeat when using regex, contain, or equals with the message field.
+  {issue}2178[2178]
+- Fix async publisher sending empty events
+  {issue}2455[2455]
+- Fix potential issue with multiple harvester per file on large file numbers or slow output
+  {issue}2541[2541]
+
+[[release-notes-v5.0.0-alpha5]]
+=== Beats version v5.0.0-alpha5
+ https://github.com/elastic/beats/compare/v5.0.0-alpha4...v5.0.0-alpha5[View commits]
+
+==== Deprecated
+
+- Deprecate `close_older` option and replace it with `close_inactive`.
+  {issue}2051[2051]
+- Deprecate `force_close_files` option and replace it with `close_removed` and `close_renamed`.
+  {issue}1600[1600]
+
+==== Added
+
+- Introduce `close_removed` and `close_renamed` harvester options.
+  {issue}1600[1600]
+- Introduce `close_eof` harvester option.
+  {issue}1600[1600]
+- Add `clean_removed` and `clean_inactive` config option.
+  {issue}1600[1600]
+
+==== Bug
+
+- Fix potential data loss between Filebeat restarts, reporting unpublished lines as published.
+  {issue}2041[2041]
+- Fix open file handler issue. {issue}2028[2028]
+  {issue}2020[2020]
+- Fix filtering of JSON events when using integers in conditions.
+  {issue}2038[2038]
+
+[[release-notes-v5.0.0-alpha4]]
+=== Beats version v5.0.0-alpha4
+ https://github.com/elastic/beats/compare/v5.0.0-alpha3...v5.0.0-alpha4[View commits]
+
+==== Breaking
+
+- Stop following symlink. Symlinks are now ignored:
+  {issue}1686[1686]
+
+[[release-notes-v5.0.0-alpha3]]
+=== Beats version v5.0.0-alpha3
+ https://github.com/elastic/beats/compare/v5.0.0-alpha2...v5.0.0-alpha3[View commits]
+
+==== Added
+
+- The registry format was changed to an array instead of dict. The migration to the new format will happen automatically at the first startup.
+  {issue}1703[1703]
+
+[[release-notes-v5.0.0-alpha2]]
+=== Beats version v5.0.0-alpha2
+ https://github.com/elastic/beats/compare/v5.0.0-alpha1...v5.0.0-alpha2[View commits]
+
+==== Bug
+
+- Improvements in registrar dealing with file rotation.
+  {issue}1281[1281]
+- Fix issue with JSON decoding where values having `null` as values could crash Filebeat.
+  {issue}1466[1466]
+- Multiline reader normalizing newline to use `\n`.
+  {issue}1552[1552]
+
+[[release-notes-v5.0.0-alpha1]]
+=== Beats version v5.0.0-alpha1
+ https://github.com/elastic/beats/compare/v1.2.0...v5.0.0-alpha1[View commits]
+
+==== Breaking
+
+- Scalar values in used in the `fields` configuration setting are no longer automatically converted to strings.
+  {issue}1092[1092]
+- Count field was removed from event as not used in filebeat
+  {issue}778[778]
+
+==== Bug
+
+- Stop filebeat if started without any prospectors defined or empty prospectors {pull}644[644]
+  {issue}647[647]
+- Improve shutdown of crawler and prospector to wait for clean completion
+  {issue}720[720]
+- Omit `fields` from Filebeat events when null
+  {issue}899[899]
+
+==== Added
+
+- Add the ability to set a list of tags for each prospector
+  {issue}1092[1092]
+- Add JSON decoding support
+  {issue}1143[1143]
+
+[[release-notes-v1.2.3]]
+=== Beats version v1.2.3
+ https://github.com/elastic/beats/compare/v1.2.2...v1.2.3[View commits]
+
+==== Added
+
+- Prevent file opening for files which reached ignore_older.
+  {issue}1649[1649]
+
+==== Bug
+
+- Fix rotation issue with ignore_older.
+  {issue}1528[1528]
+
+[[release-notes-v1.2.2]]
+=== Beats version v1.2.2
+ https://github.com/elastic/beats/compare/v1.2.0...v1.2.2[View commits]
+
+==== Bug
+
+- Improvements in registrar dealing with file rotation.
+  {issue}1281[1281]
+
+[[release-notes-v1.2.1]]
+=== Beats version v1.2.1
+ https://github.com/elastic/beats/compare/v1.2.0...v1.2.1[View commits]
+
+[[release-notes-v1.2.0]]
+=== Beats version v1.2.0
+ https://github.com/elastic/beats/compare/v1.1.2...v1.2.0[View commits]
+
+[[release-notes-v1.1.2]]
+=== Beats version v1.1.2
+ https://github.com/elastic/beats/compare/v1.1.1...v1.1.2[View commits]
+
+==== Bug
+
+- Fix registrar bug for rotated files
+  {issue}1010[1010]
+
+[[release-notes-v1.1.1]]
+=== Beats version v1.1.1
+ https://github.com/elastic/beats/compare/v1.1.0...v1.1.1[View commits]
+
+[[release-notes-v1.1.0]]
+=== Beats version v1.1.0
+ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
+
+==== Added
+
+- Add multiline support for combining multiple related lines into one event.
+  {issue}461[461]
+- Add `exclude_lines` and `include_lines` options for regexp based line filtering.
+  {issue}430[430]
+- Add `exclude_files` configuration option.
+  {issue}563[563]
+- Add experimental option to enable filebeat publisher pipeline to operate asynchonrously
+  {issue}782[782]
+
+==== Bug
+
+- Set spool_size default value to 2048
+  {issue}628[628]
+
+[[release-notes-v1.0.1]]
+=== Beats version v1.0.1
+ https://github.com/elastic/beats/compare/v1.0.0...v1.0.1[View commits]
+
+[[release-notes-master]]
+=== Beats version master
+ https://github.com/elastic/beats/compare/v5.0.0-rc1...master[View commits]
+
+==== Added
+
+- Add command line option -once to run filebeat only once and then close.
+  {issue}2456[2456]
+
+==== Bug
+
+- Fix issue where upgrading a 1.x registry file resulted in duplicate state entries.
+  {issue}2792[2792]
+- Fix registry cleanup issue when files falling under ignore_older after restart.
+  {issue}2818[2818]
+
+[[release-notes-1.0.0-rc2]]
+=== Beats version 1.0.0-rc2
+ https://github.com/elastic/beats/compare/1.0.0-rc1...1.0.0-rc2[View commits]
+
+[[release-notes-1.0.0-rc1]]
+=== Beats version 1.0.0-rc1
+ https://github.com/elastic/beats/compare/1.0.0-beta4...1.0.0-rc1[View commits]
+
+[[release-notes-1.0.0-beta4]]
+=== Beats version 1.0.0-beta4
+ https://github.com/elastic/beats/compare/1.0.0-beta3...1.0.0-beta4[View commits]
+
+[[release-notes-1.0.0]]
+=== Beats version 1.0.0
+ https://github.com/elastic/beats/compare/1.0.0-rc2...1.0.0[View commits]
+

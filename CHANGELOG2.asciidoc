@@ -1,0 +1,1326 @@
+////
+This file is generated! See scripts/changelog.py
+////
+
+[[release-notes-v5.0.0-rc1]]
+=== Beats version v5.0.0-rc1
+ https://github.com/elastic/beats/compare/v5.0.0-beta1...v5.0.0-rc1[View commits]
+
+*Filebeat*
+
+
+==== Bug
+
+- Fix input buffer on encoding problem.
+  {issue}2416[2416]
+
+*Libbeat*
+
+
+==== Deprecated
+
+- Setting `port` has been deprecated in Redis and Logstash outputs.
+  {issue}2620[2620]
+
+==== Breaking
+
+- A dynamic mapping rule is added to the default Elasticsearch template to treat strings as keywords by default.
+  {issue}2688[2688]
+
+==== Bug
+
+- Make sure Beats sent always float values when they are defined as float by sending 5.00000 instead of 5.
+  {issue}2627[2627]
+- Fix ignoring all fields from drop_fields in case the first field is unknown.
+  {issue}2685[2685]
+- Fix dynamic configuration int/uint to float type conversion.
+  {issue}2698[2698]
+- Fix primitive types conversion if values are read from environment variables.
+  {issue}2698[2698]
+
+*Winlogbeat*
+
+
+*Metricbeat*
+
+
+==== Bug
+
+- Fix default configuration file on Windows to not enabled the `load` metricset.
+  {issue}2632[2632]
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+==== Bug
+
+- Fix the `bpf_filter` setting.
+  {issue}2660[2660]
+
+[[release-notes-v5.0.0-beta1]]
+=== Beats version v5.0.0-beta1
+ https://github.com/elastic/beats/compare/v5.0.0-alpha5...v5.0.0-beta1[View commits]
+
+*Filebeat*
+
+
+==== Added
+
+- Introduce close_timeout harvester options
+  {issue}1926[1926]
+- Strip BOM from first message in case of BOM files
+  {issue}2351[2351]
+- Add harvester_limit option
+  {issue}2417[2417]
+
+==== Bug
+
+- Fix processor failure in Filebeat when using regex, contain, or equals with the message field.
+  {issue}2178[2178]
+- Fix async publisher sending empty events
+  {issue}2455[2455]
+- Fix potential issue with multiple harvester per file on large file numbers or slow output
+  {issue}2541[2541]
+
+*Libbeat*
+
+
+==== Breaking
+
+- Change Elasticsearch output index configuration to be based on format strings. If index has been configured, no date will be appended anymore to the index name.
+  {issue}2119[2119]
+- Replace `output.kafka.use_type` by `output.kafka.topic` accepting a format string.
+  {issue}2188[2188]
+- rename `tls` configurations section to `ssl`.
+  {issue}2330[2330]
+- rename `certificate_key` configuration to `key`.
+  {issue}2330[2330]
+- replace `tls.insecure` with `ssl.verification_mode` setting.
+  {issue}2330[2330]
+- replace `tls.min/max_version` with `ssl.supported_protocols` setting requiring full protocol name.
+  {issue}2330[2330]
+
+==== Bug
+
+- Fix logstash output handles error twice when asynchronous sending fails.
+  {issue}2441[2441]
+- Fix Elasticsearch structured error response parsing error.
+  {issue}2229[2229]
+- Fixed the run script to allow the overriding of the configuration file.
+  {issue}2171[2171]
+- Fix logstash output crash if no hosts are configured.
+  {issue}2325[2325]
+- Fix array value support in -E CLI flag.
+  {issue}2521[2521]
+- Fix merging array values if -c CLI flag is used multiple times.
+  {issue}2521[2521]
+- Fix beats failing to start due to invalid duplicate key error in configuration file.
+  {issue}2521[2521]
+- Fix panic on non writable logging directory.
+  {issue}2571[2571]
+
+==== Added
+
+- Add script to generate the Kibana index-pattern from fields.yml.
+  {issue}2122[2122]
+- Enhance Redis output key selection based on format string.
+  {issue}2169[2169]
+- Configurable Redis `keys` using filters and format strings.
+  {issue}2169[2169]
+- Add format string support to `output.kafka.topic`.
+  {issue}2188[2188]
+- Add `output.kafka.topics` for more advanced kafka topic selection per event.
+  {issue}2188[2188]
+- Add support for Kafka 0.10.
+  {issue}2190[2190]
+- Add SASL/PLAIN authentication support to kafka output.
+  {issue}2190[2190]
+- Make Kafka metadata update configurable.
+  {issue}2190[2190]
+- Add Kafka version setting (optional) enabling kafka broker version support.
+  {issue}2190[2190]
+- Add Kafka message timestamp if at least version 0.10 is configured.
+  {issue}2190[2190]
+- Add configurable Kafka event key setting.
+  {issue}2284[2284]
+- Add settings for configuring the kafka partitioning strategy.
+  {issue}2284[2284]
+- Add partitioner settings `reachable_only` to ignore partitions not reachable by network.
+  {issue}2284[2284]
+- Enhance contains condition to work on fields that are arrays of strings.
+  {issue}2237[2237]
+- Lookup the configuration file relative to the `-path.config` CLI flag.
+  {issue}2245[2245]
+- Re-write import_dashboards.sh in Golang.
+  {issue}2155[2155]
+- Update to Go 1.7.
+  {issue}2306[2306]
+- Log total non-zero internal metrics on shutdown.
+  {issue}2349[2349]
+- Add support for encrypted private key files by introducing `ssl.key_passphrase` setting.
+  {issue}2330[2330]
+- Add experimental symlink support with `symlinks` config
+  {issue}2478[2478]
+
+*Winlogbeat*
+
+
+==== Bug
+
+- Fix corrupt registry file that occurs on power loss by disabling file write caching.
+  {issue}2313[2313]
+
+*Metricbeat*
+
+
+==== Breaking
+
+- Change field type system.process.cpu.start_time from keyword to date.
+  {issue}1565[1565]
+
+==== Bug
+
+- Fix module filters to work properly with drop_event filter.
+  {issue}2249[2249]
+
+==== Added
+
+- Use the new scaled_float Elasticsearch type for the percentage values.
+  {issue}2156[2156]
+- Add experimental cgroup metrics to the system/process MetricSet.
+  {issue}2184[2184]
+- Added a PostgreSQL module.
+  {issue}2253[2253]
+- Improve mapping by converting half_float to scaled_float and integers to long.
+  {issue}2430[2430]
+- Add experimental haproxy module.
+  {issue}2384[2384]
+- Add Kibana dashboard for cgroups data
+  {issue}2555[2555]
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+==== Breaking
+
+- Group HTTP fields under `http.request` and `http.response`
+  {issue}2167[2167]
+- Export `http.request.body` and `http.response.body` when configured under `include_body_for`
+  {issue}2167[2167]
+- Move `ignore_outgoing` config to `packetbeat.ignore_outgoing`
+  {issue}2393[2393]
+
+==== Bug
+
+- Fix mapping for some Packetbeat flow metrics that were not marked as being longs.
+  {issue}2177[2177]
+- Fix handling of messages larger than the maximum message size (10MB).
+  {issue}2470[2470]
+
+==== Added
+
+- Add Cassandra protocol analyzer to Packetbeat.
+  {issue}1959[1959]
+- Match connections with IPv6 addresses to processes
+  {issue}2254[2254]
+- Add IP address to -devices command output
+  {issue}2327[2327]
+- Add configuration option for the maximum message size. Used to be hard-coded to 10 MB.
+  {issue}2470[2470]
+
+[[release-notes-v5.0.0-alpha5]]
+=== Beats version v5.0.0-alpha5
+ https://github.com/elastic/beats/compare/v5.0.0-alpha4...v5.0.0-alpha5[View commits]
+
+*Filebeat*
+
+
+==== Deprecated
+
+- Deprecate `close_older` option and replace it with `close_inactive`.
+  {issue}2051[2051]
+- Deprecate `force_close_files` option and replace it with `close_removed` and `close_renamed`.
+  {issue}1600[1600]
+
+==== Added
+
+- Introduce `close_removed` and `close_renamed` harvester options.
+  {issue}1600[1600]
+- Introduce `close_eof` harvester option.
+  {issue}1600[1600]
+- Add `clean_removed` and `clean_inactive` config option.
+  {issue}1600[1600]
+
+==== Bug
+
+- Fix potential data loss between Filebeat restarts, reporting unpublished lines as published.
+  {issue}2041[2041]
+- Fix open file handler issue. {issue}2028[2028]
+  {issue}2020[2020]
+- Fix filtering of JSON events when using integers in conditions.
+  {issue}2038[2038]
+
+*Libbeat*
+
+
+==== Breaking
+
+- Rename the `filters` section to `processors`.
+  {issue}1944[1944]
+- Introduce the condition with `when` in the processor configuration.
+  {issue}1949[1949]
+- The Elasticsearch template is now loaded by default.
+  {issue}1993[1993]
+- The Redis output `index` setting is renamed to `key`. `index` still works but it's deprecated.
+  {issue}2077[2077]
+- The undocumented file output `index` setting was removed. Use `filename` instead.
+  {issue}2077[2077]
+
+==== Bug
+
+- Fix sync publisher `PublishEvents` return value if client is closed concurrently.
+  {issue}2046[2046]
+
+==== Added
+
+- Periodically log internal metrics.
+  {issue}1955[1955]
+- Add enabled setting to all output modules.
+  {issue}1987[1987]
+- Command line flag `-c` can be used multiple times.
+  {issue}1985[1985]
+- Add OR/AND/NOT to the condition associated with the processors.
+  {issue}1983[1983]
+- Add `-E` CLI flag for overwriting single config options via command line.
+  {issue}1986[1986]
+- Choose the mapping template file based on the Elasticsearch version.
+  {issue}1993[1993]
+- Check stdout being available when console output is configured.
+  {issue}2035[2035]
+
+*Winlogbeat*
+
+
+==== Bug
+
+- Fix potential data loss between Winlogbeat restarts, reporting unpublished lines as published.
+  {issue}2041[2041]
+
+*Metricbeat*
+
+
+==== Breaking
+
+- Create a separate metricSet for load under the system module and remove load information from CPU stats.
+  {issue}2101[2101]
+- Add `system.load.norm.1`, `system.load.norm.5` and `system.load.norm.15`.
+  {issue}2101[2101]
+- Add threads fields to mysql module.
+  {issue}2484[2484]
+
+==== Bug
+
+- Do not send zero values when no value was present in the source.
+  {issue}1972[1972]
+
+==== Added
+
+- Add pgid field to process information.
+  {issue}None[None]
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+==== Breaking
+
+- Set `enabled` ` in `packetbeat.protocols.icmp` configuration to `true` by default.
+  {issue}1988[1988]
+
+==== Added
+
+- Add enabled setting to Packetbeat protocols.
+  {issue}1988[1988]
+- Add enabled setting to Packetbeat network flows configuration.
+  {issue}1988[1988]
+
+[[release-notes-v5.0.0-alpha4]]
+=== Beats version v5.0.0-alpha4
+ https://github.com/elastic/beats/compare/v5.0.0-alpha3...v5.0.0-alpha4[View commits]
+
+*Filebeat*
+
+
+==== Breaking
+
+- Stop following symlink. Symlinks are now ignored:
+  {issue}1686[1686]
+
+*Libbeat*
+
+
+==== Breaking
+
+- The topology_expire option of the Elasticserach output was removed.
+  {issue}1907[1907]
+
+==== Bug
+
+- Reset backoff factor on partial ACK.
+  {issue}1803[1803]
+- Fix beats load balancer deadlock if max_retries: -1 or publish_async is enabled in filebeat.
+  {issue}1829[1829]
+- Fix logstash output with pipelining mode enabled not reconnecting.
+  {issue}1876[1876]
+- Empty configuration sections become merge-able with variables containing full path.
+  {issue}1900[1900]
+- Fix error message about required fields missing not printing the missing field name.
+  {issue}1900[1900]
+
+==== Added
+
+- Improve error message if compiling regular expression from config files fails.
+  {issue}1900[1900]
+- Compression support in the Elasticsearch output.
+  {issue}1835[1835]
+
+*Winlogbeat*
+
+
+==== Bug
+
+- Fix issue with rendering forwarded event log records.
+  {issue}1891[1891]
+
+*Metricbeat*
+
+
+==== Added
+
+- Add MongoDB module.
+  {issue}1837[1837]
+
+==== Bug
+
+- Fix the CPU values returned for each core.
+  {issue}1863[1863]
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+==== Bug
+
+- Add missing nil-check to memcached GapInStream handler.
+  {issue}1162[1162]
+- Fix NFSv4 Operation returning the first found first-class operation available in compound requests.
+  {issue}1821[1821]
+- Fix TCP overlapping segments not being handled correctly.
+  {issue}1898[1898]
+
+[[release-notes-v5.0.0-alpha3]]
+=== Beats version v5.0.0-alpha3
+ https://github.com/elastic/beats/compare/v5.0.0-alpha2...v5.0.0-alpha3[View commits]
+
+*Filebeat*
+
+
+==== Added
+
+- The registry format was changed to an array instead of dict. The migration to the new format will happen automatically at the first startup.
+  {issue}1703[1703]
+
+*Libbeat*
+
+
+==== Deprecated
+
+- The support for doing GeoIP lookups is deprecated and will be removed in version 6.0.
+  {issue}1601[1601]
+
+==== Added
+
+- Add conditions to generic filtering.
+  {issue}1623[1623]
+
+*Winlogbeat*
+
+
+==== Bug
+
+- Adding missing argument to the "Stop processing" log message.
+  {issue}1590[1590]
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+[[release-notes-v5.0.0-alpha2]]
+=== Beats version v5.0.0-alpha2
+ https://github.com/elastic/beats/compare/v5.0.0-alpha1...v5.0.0-alpha2[View commits]
+
+*Filebeat*
+
+
+==== Bug
+
+- Improvements in registrar dealing with file rotation.
+  {issue}1281[1281]
+- Fix issue with JSON decoding where values having `null` as values could crash Filebeat.
+  {issue}1466[1466]
+- Multiline reader normalizing newline to use `\n`.
+  {issue}1552[1552]
+
+*Libbeat*
+
+
+==== Breaking
+
+- On DEB/RPM installations, the binary files are now found under `/usr/share/{{beat_name}}/bin`, not in `/usr/bin`.
+  {issue}1385[1385]
+- The logs are written by default to self rotating files, instead of syslog.
+  {issue}1371[1371]
+- Remove deprecated `host` option from elasticsearch, logstash and redis outputs.
+  {issue}1474[1474]
+
+==== Bug
+
+- Drain response buffers when pipelining is used by Redis output.
+  {issue}1353[1353]
+- Unterminated environment variable expressions in config files will now cause an error
+  {issue}1389[1389]
+- Fix issue with the automatic template loading when Elasticsearch is not available on Beat start.
+  {issue}1321[1321]
+- Fix bug affecting -cpuprofile, -memprofile, and -httpprof CLI flags
+  {issue}1415[1415]
+- Fix race when multiple outputs access the same event with logstash output manipulating event {issue}1410[1410]
+  {issue}1428[1428]
+- Seed random number generator using crypto.rand package.
+  {issue}1503[1503]
+- Fix beats hanging in -configtest
+  {issue}1213[1213]
+- Fix kafka log message output
+  {issue}1516[1516]
+
+==== Added
+
+- Add support for TLS to Redis output.
+  {issue}1353[1353]
+- Add SOCKS5 proxy support to Redis output.
+  {issue}1353[1353]
+- Failover and load balancing support in redis output.
+  {issue}1353[1353]
+- Multiple-worker per host support for redis output.
+  {issue}1353[1353]
+- Added ability to escape `${x}` in config files to avoid environment variable expansion
+  {issue}1389[1389]
+- Configuration options and CLI flags for setting the home, data and config paths.
+  {issue}1373[1373]
+- Configuration options and CLI flags for setting the default logs path.
+  {issue}1437[1437]
+- Update to Go 1.6.2
+  {issue}1447[1447]
+- Add Elasticsearch template files compatible with Elasticsearch 2.x.
+  {issue}1501[1501]
+- Add scripts for managing the dashboards of a single Beat
+  {issue}1359[1359]
+
+*Winlogbeat*
+
+
+==== Bug
+
+- Fix panic when reading messages larger than 32K characters on Windows XP and 2003.
+  {issue}1498[1498]
+- Fix panic that occurs when reading a large events on Windows Vista and newer.
+  {issue}1499[1499]
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+==== Breaking
+
+- Configuration of redis topology support changed.
+  {issue}1353[1353]
+- Move all Packetbeat configuration options under the packetbeat namespace
+  {issue}1417[1417]
+
+==== Added
+
+- Fix compile issues for OpenBSD.
+  {issue}1347[1347]
+
+[[release-notes-v5.0.0-alpha1]]
+=== Beats version v5.0.0-alpha1
+ https://github.com/elastic/beats/compare/v1.2.0...v5.0.0-alpha1[View commits]
+
+*Filebeat*
+
+
+==== Breaking
+
+- Scalar values in used in the `fields` configuration setting are no longer automatically converted to strings.
+  {issue}1092[1092]
+- Count field was removed from event as not used in filebeat
+  {issue}778[778]
+- Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space  {issue}631[631]
+- Remove `count` field from the exported fields  {issue}1207[1207]
+- Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space  {issue}631[631]
+- Remove `count` field from the exported fields  {issue}1207[1207]
+- Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space  {issue}631[631]
+- Remove `count` field from the exported fields  {issue}1207[1207]
+- Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space  {issue}631[631]
+- Remove `count` field from the exported fields  {issue}1207[1207]
+- Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space  {issue}631[631]
+- Remove `count` field from the exported fields  {issue}1207[1207]
+- Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space  {issue}631[631]
+- Remove `count` field from the exported fields  {issue}1207[1207]
+- Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space
+  {issue}631[631]
+- Remove `count` field from the exported fields
+  {issue}1207[1207]
+- Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.
+  {issue}1343[1343]
+- Fix issue with cpu.system_p being greater than 1 on Windows
+  {issue}1128[1128]
+- Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space
+  {issue}631[631]
+- Remove `count` field from the exported fields
+  {issue}1207[1207]
+
+==== Bug
+
+- Stop filebeat if started without any prospectors defined or empty prospectors {pull}644[644]
+  {issue}647[647]
+- Improve shutdown of crawler and prospector to wait for clean completion
+  {issue}720[720]
+- Omit `fields` from Filebeat events when null
+  {issue}899[899]
+- Fix issue with `cpu.system_p` being greater than 1 on Windows  {issue}1128[1128]
+- Fix high CPU usage when using filtering under Windows.  {issue}1598[1598]
+- Fix issue with `cpu.system_p` being greater than 1 on Windows  {issue}1128[1128]
+- Fix high CPU usage when using filtering under Windows.  {issue}1598[1598]
+- Fix issue with `cpu.system_p` being greater than 1 on Windows  {issue}1128[1128]
+- Fix high CPU usage when using filtering under Windows.  {issue}1598[1598]
+- Fix issue with `cpu.system_p` being greater than 1 on Windows  {issue}1128[1128]
+- Fix high CPU usage when using filtering under Windows.  {issue}1598[1598]
+- Fix issue with `cpu.system_p` being greater than 1 on Windows  {issue}1128[1128]
+- Fix high CPU usage when using filtering under Windows.  {issue}1598[1598]
+- Fix issue with `cpu.system_p` being greater than 1 on Windows  {issue}1128[1128]
+- Fix high CPU usage when using filtering under Windows.
+  {issue}1598[1598]
+- Fix issue with `cpu.system_p` being greater than 1 on Windows
+  {issue}1128[1128]
+- Fix high CPU usage when using filtering under Windows.
+  {issue}1598[1598]
+- Fix issue with `cpu.system_p` being greater than 1 on Windows
+  {issue}1128[1128]
+
+==== Added
+
+- Add the ability to set a list of tags for each prospector
+  {issue}1092[1092]
+- Add JSON decoding support
+  {issue}1143[1143]
+- Add `username` to processes  {issue}845[845]
+- Add the command line used to start processes  {issue}533[533]
+- Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured  {issue}496[496]
+- Updated elastic/gosigar version so Topbeat can compile on OpenBSD.  {issue}1403[1403]
+- Add `username` to processes  {issue}845[845]
+- Add the command line used to start processes  {issue}533[533]
+- Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured  {issue}496[496]
+- Updated elastic/gosigar version so Topbeat can compile on OpenBSD.  {issue}1403[1403]
+- Add `username` to processes  {issue}845[845]
+- Add the command line used to start processes  {issue}533[533]
+- Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured  {issue}496[496]
+- Updated elastic/gosigar version so Topbeat can compile on OpenBSD.  {issue}1403[1403]
+- Add `username` to processes  {issue}845[845]
+- Add the command line used to start processes  {issue}533[533]
+- Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured  {issue}496[496]
+- Updated elastic/gosigar version so Topbeat can compile on OpenBSD.  {issue}1403[1403]
+- Add `username` to processes  {issue}845[845]
+- Updated elastic/gosigar version so Topbeat can compile on OpenBSD.  {issue}1403[1403]
+- Add `username` to processes  {issue}845[845]
+- Add the command line used to start processes  {issue}533[533]
+- Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured  {issue}496[496]
+- Updated elastic/gosigar version so Topbeat can compile on OpenBSD.
+  {issue}1403[1403]
+- Add `username` to processes
+  {issue}845[845]
+- Add the command line used to start processes
+  {issue}533[533]
+- Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured
+  {issue}496[496]
+- Updated elastic/gosigar version so Topbeat can compile on OpenBSD.
+  {issue}1403[1403]
+- Add username to processes
+  {issue}845[845]
+- Add `username` to processes
+  {issue}845[845]
+- Add the command line used to start processes
+  {issue}533[533]
+- Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured
+  {issue}496[496]
+
+*Libbeat*
+
+
+==== Breaking
+
+- Run function to start a Beat now returns an error instead of directly exiting.
+  {issue}771[771]
+- The method signature of HandleFlags() was changed to allow returning an error
+  {issue}1249[1249]
+- Require braces for environment variable expansion in config files
+  {issue}1304[1304]
+
+==== Bug
+
+- Logstash output will not retry events that are not JSON-encodable
+  {issue}927[927]
+
+==== Added
+
+- Add option to Elasticsearch output to pass http parameters in index operations
+  {issue}805[805]
+- Improve Logstash and Elasticsearch backoff behavior.
+  {issue}927[927]
+- Add experimental Kafka output.
+  {issue}942[942]
+- Add config file option to configure GOMAXPROCS.
+  {issue}969[969]
+- Improve shutdown handling in libbeat.
+  {issue}1075[1075]
+- Add `fields` and `fields_under_root` options under the `shipper` configuration
+  {issue}1092[1092]
+- Add the ability to use a SOCKS5 proxy with the Logstash output
+  {issue}823[823]
+- The `-configtest` flag will now print "Config OK" to stdout on success
+  {issue}1249[1249]
+
+*Winlogbeat*
+
+
+==== Breaking
+
+- The `message_inserts` field was replaced with the `event_data` field
+  {issue}1053[1053]
+- The `category` field was renamed to `task` to better align with the Windows Event Log API naming
+  {issue}1053[1053]
+- Remove the count field from the exported event
+  {issue}1218[1218]
+
+==== Added
+
+- Add caching of event metadata handles and the system render context for the wineventlog API
+  {issue}888[888]
+- Improve config validation by checking for unknown top-level YAML keys.
+  {issue}1100[1100]
+- Add the ability to set tags, fields, and fields_under_root as options for each event log
+  {issue}1092[1092]
+- Add `event_id`, `level`, and `provider` configuration options for filtering events
+  {issue}1218[1218]
+- Add `include_xml` configuration option for including the raw XML with the event
+  {issue}1218[1218]
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+==== Breaking
+
+- Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available`.
+  {issue}803[803]
+- The fully qualified domain names which are part of output fields values of the dns package now terminate with a dot.
+  {issue}803[803]
+- Remove the count field from the exported event
+  {issue}1210[1210]
+
+==== Bug
+
+- Create a proper BPF filter when ICMP is the only enabled protocol
+  {issue}757[757]
+- Check column length in pgsql parser.
+  {issue}565[565]
+- Harden pgsql parser.
+  {issue}565[565]
+
+==== Added
+
+- Change the DNS library used throughout the dns package to github.com/miekg/dns.
+  {issue}803[803]
+- Add support for NFS v3 and v4.
+  {issue}1231[1231]
+- Add support for EDNS and DNSSEC.
+  {issue}1292[1292]
+
+[[release-notes-v1.2.3]]
+=== Beats version v1.2.3
+ https://github.com/elastic/beats/compare/v1.2.2...v1.2.3[View commits]
+
+*Filebeat*
+
+
+==== Added
+
+- Prevent file opening for files which reached ignore_older.
+  {issue}1649[1649]
+
+==== Bug
+
+- Fix rotation issue with ignore_older.
+  {issue}1528[1528]
+
+*Libbeat*
+
+
+*Winlogbeat*
+
+
+==== Bug
+
+- Fix panic when reading messages larger than 32K characters on Windows XP and 2003.
+  {issue}1498[1498]
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+[[release-notes-v1.2.2]]
+=== Beats version v1.2.2
+ https://github.com/elastic/beats/compare/v1.2.0...v1.2.2[View commits]
+
+*Filebeat*
+
+
+==== Breaking
+
+- Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.  {issue}1343[1343]
+- Fix issue with cpu.system_p being greater than 1 on Windows  {issue}1128[1128]
+- Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.  {issue}1343[1343]
+- Fix issue with cpu.system_p being greater than 1 on Windows  {issue}1128[1128]
+- Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.  {issue}1343[1343]
+- Fix issue with cpu.system_p being greater than 1 on Windows  {issue}1128[1128]
+- Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.  {issue}1343[1343]
+- Fix issue with cpu.system_p being greater than 1 on Windows  {issue}1128[1128]
+- Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.  {issue}1343[1343]
+- Fix issue with cpu.system_p being greater than 1 on Windows  {issue}1128[1128]
+- Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.  {issue}1343[1343]
+- Fix issue with cpu.system_p being greater than 1 on Windows  {issue}1128[1128]
+- Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file.
+  {issue}1343[1343]
+- Fix issue with cpu.system_p being greater than 1 on Windows
+  {issue}1128[1128]
+
+==== Bug
+
+- Improvements in registrar dealing with file rotation.
+  {issue}1281[1281]
+- Fix race when multiple outputs access the same event with Logstash output manipulating event.  {issue}1410[1410]
+- Fix go-daemon (supervisor used in init scripts) hanging when executed over SSH.  {issue}1394[1394]
+- Fix race when multiple outputs access the same event with Logstash output manipulating event.  {issue}1410[1410]
+- Fix go-daemon (supervisor used in init scripts) hanging when executed over SSH.  {issue}1394[1394]
+
+==== Added
+
+- Add username to processes  {issue}845[845]
+- Add username to processes  {issue}845[845]
+- Add username to processes  {issue}845[845]
+- Add username to processes  {issue}845[845]
+- Add username to processes  {issue}845[845]
+- Add username to processes  {issue}845[845]
+- Add username to processes
+  {issue}845[845]
+
+*Libbeat*
+
+
+==== Bug
+
+- Fix race when multiple outputs access the same event with Logstash output manipulating event.
+  {issue}1410[1410]
+- Fix go-daemon (supervisor used in init scripts) hanging when executed over SSH.
+  {issue}1394[1394]
+
+*Winlogbeat*
+
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+[[release-notes-v1.2.1]]
+=== Beats version v1.2.1
+ https://github.com/elastic/beats/compare/v1.2.0...v1.2.1[View commits]
+
+*Filebeat*
+
+
+*Libbeat*
+
+
+==== Breaking
+
+- Require braces for environment variable expansion in config files
+  {issue}1304[1304]
+- Removed deprecation warning for the Redis output.
+  {issue}1282[1282]
+
+*Winlogbeat*
+
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+[[release-notes-v1.2.0]]
+=== Beats version v1.2.0
+ https://github.com/elastic/beats/compare/v1.1.2...v1.2.0[View commits]
+
+*Filebeat*
+
+
+*Libbeat*
+
+
+==== Added
+
+- Add ability to override configuration settings using environment variables
+  {issue}114[114]
+- Libbeat now always exits through a single exit method for proper cleanup and control
+  {issue}736[736]
+- Add ability to create Elasticsearch mapping on startup
+  {issue}639[639]
+
+*Winlogbeat*
+
+
+==== Bug
+
+- Fix invalid `event_id` on Windows XP and Windows 2003
+  {issue}1227[1227]
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+==== Bug
+
+- Split real_ip_header value when it contains multiple IPs
+  {issue}1241[1241]
+
+[[release-notes-v1.1.2]]
+=== Beats version v1.1.2
+ https://github.com/elastic/beats/compare/v1.1.1...v1.1.2[View commits]
+
+*Filebeat*
+
+
+==== Bug
+
+- Fix registrar bug for rotated files
+  {issue}1010[1010]
+
+*Libbeat*
+
+
+*Winlogbeat*
+
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+[[release-notes-v1.1.1]]
+=== Beats version v1.1.1
+ https://github.com/elastic/beats/compare/v1.1.0...v1.1.1[View commits]
+
+*Filebeat*
+
+
+*Libbeat*
+
+
+==== Bug
+
+- Fix logstash output loop hanging in infinite loop on too many output errors.
+  {issue}944[944]
+- Fix critical bug in filebeat and winlogbeat potentially dropping events.
+  {issue}953[953]
+
+*Winlogbeat*
+
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+[[release-notes-v1.1.0]]
+=== Beats version v1.1.0
+ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
+
+*Filebeat*
+
+
+==== Added
+
+- Add multiline support for combining multiple related lines into one event.
+  {issue}461[461]
+- Add `exclude_lines` and `include_lines` options for regexp based line filtering.
+  {issue}430[430]
+- Add `exclude_files` configuration option.
+  {issue}563[563]
+- Add experimental option to enable filebeat publisher pipeline to operate asynchonrously
+  {issue}782[782]
+
+==== Bug
+
+- Set spool_size default value to 2048
+  {issue}628[628]
+
+*Libbeat*
+
+
+==== Added
+
+- Add include_fields and drop_fields as part of generic filtering
+  {issue}1120[1120]
+- Make logstash output compression level configurable.
+  {issue}630[630]
+- Some publisher options refactoring in libbeat
+  {issue}684[684]
+- Move event preprocessor applying GeoIP to packetbeat
+  {issue}772[772]
+
+==== Bug
+
+- Reduce memory usage by separate queue sizes for single events and bulk events. {pull}649[649]
+  {issue}516[516]
+- Set default default bulk_max_size value to 2048
+  {issue}628[628]
+
+*Winlogbeat*
+
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+==== Added
+
+- Add support for capturing DNS over TCP network traffic. {pull}486[486]
+  {issue}554[554]
+
+==== Bug
+
+- Fix setting direction to out and use its value to decide when dropping events if ignore_outgoing is enabled
+  {issue}557[557]
+- Reduce memory usage by having separate queue sizes for single events and bulk events. {pull}649[649]
+  {issue}516[516]
+- Set default bulk_max_size value to 2048
+  {issue}628[628]
+- Fix logstash window size of 1 not increasing.
+  {issue}598[598]
+- Allow PF_RING sniffer type to be configured using pf_ring or pfring
+  {issue}671[671]
+
+[[release-notes-v1.0.1]]
+=== Beats version v1.0.1
+ https://github.com/elastic/beats/compare/v1.0.0...v1.0.1[View commits]
+
+*Filebeat*
+
+
+*Libbeat*
+
+
+*Winlogbeat*
+
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+==== Bug
+
+- Improve MongoDB message correlation.
+  {issue}377[377]
+- Improve redis parser performance.
+  {issue}442[442]
+- Fix panic on nil in redis protocol parser.
+  {issue}384[384]
+- Fix errors redis parser when messages are split in multiple TCP segments.
+  {issue}402[402]
+- Fix errors in redis parser when length prefixed strings contain sequences of CRLF.
+  {issue}None[None]
+- Fix errors in redis parser when dealing with nested arrays.
+  {issue}402[402]
+
+=== Unreleased
+
+
+*Beats*
+
+
+==== Added
+
+- Add changelog generation script to generate changelogs from structured yaml files.
+  {issue}1879[1879]
+
+[[release-notes-master]]
+=== Beats version master
+ https://github.com/elastic/beats/compare/v5.0.0-rc1...master[View commits]
+
+*Filebeat*
+
+
+==== Added
+
+- Add command line option -once to run filebeat only once and then close.
+  {issue}2456[2456]
+
+==== Bug
+
+- Fix issue where upgrading a 1.x registry file resulted in duplicate state entries.
+  {issue}2792[2792]
+- Fix registry cleanup issue when files falling under ignore_older after restart.
+  {issue}2818[2818]
+
+*Libbeat*
+
+
+==== Added
+
+- Add add_cloud_metadata processor for collecting cloud provider metadata.
+  {issue}2728[2728]
+
+==== Bug
+
+- Fix kafka output re-trying batches with too large events.
+  {issue}2735[2735]
+- Fix kafka output protocol error if `version: 0.10` is configured.
+  {issue}2651[2651]
+- Fix kafka output connection closed by broker on SASL/PLAIN.
+  {issue}2717[2717]
+
+*Winlogbeat*
+
+
+==== Added
+
+- Add `event_logs.batch_read_size` configuration option.
+  {issue}2641[2641]
+
+*Metricbeat*
+
+
+==== Added
+
+- Add experimental filebeat metricset in the beats module.
+  {issue}2297[2297]
+- Add experimental libbeat metricset in the beats module.
+  {issue}2339[2339]
+
+==== Bug
+
+- Fix high CPU usage on macOS when encountering processes with long command lines.
+  {issue}2747[2747]
+- Fix high value of `system.memory.actual.free` and `system.memory.actual.used`.
+  {issue}2653[2653]
+- Change several `OpenProcess` calls on Windows to request the lowest possible access provilege. 
+  {issue}1897[1897]
+- Fix system.memory.actual.free high value on Windows.
+  {issue}2653[2653]
+- Calculate the fsstat values per mounting point, and not filesystem.
+  {issue}2777[2777]
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+[[release-notes-5.0.0-alpha3]]
+=== Beats version 5.0.0-alpha3
+2016-05-31 https://github.com/elastic/beats/compare/5.0.0-alpha2...5.0.0-alpha3[View commits]
+
+*Beats*
+
+
+[[release-notes-1.0.0-rc2]]
+=== Beats version 1.0.0-rc2
+ https://github.com/elastic/beats/compare/1.0.0-rc1...1.0.0-rc2[View commits]
+
+*Filebeat*
+
+
+*Libbeat*
+
+
+*Winlogbeat*
+
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+[[release-notes-1.0.0-rc1]]
+=== Beats version 1.0.0-rc1
+ https://github.com/elastic/beats/compare/1.0.0-beta4...1.0.0-rc1[View commits]
+
+*Filebeat*
+
+
+*Libbeat*
+
+
+*Winlogbeat*
+
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+
+[[release-notes-1.0.0-beta4]]
+=== Beats version 1.0.0-beta4
+ https://github.com/elastic/beats/compare/1.0.0-beta3...1.0.0-beta4[View commits]
+
+*Filebeat*
+
+
+==== Added
+
+- Updated elastic/gosigar version so Topbeat can compile on OpenBSD.  {issue}1403[1403]
+
+==== Bug
+
+- Fix high CPU usage when using filtering under Windows.  {issue}1598[1598]
+
+*Libbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Beat-Generator*
+
+
+==== Added
+
+- Add dev-tools/packer to package the beat for all supported platforms
+
+
+==== Changed
+
+- The registry format was changed to an array instead of dict. The migration to the new format will happen automatically at the first startup.
+- Use ucfg.Unpack() instead of cfgfile.Read() in Beater.Config method.
+- Rename `Configuration` variable in beat struct to `beatConfig` as generalization from @buehler.
+- Update Golang dependency to 1.6.0
+
+[[release-notes-1.0.0]]
+=== Beats version 1.0.0
+ https://github.com/elastic/beats/compare/1.0.0-rc2...1.0.0[View commits]
+
+*Filebeat*
+
+
+*Libbeat*
+
+
+*Winlogbeat*
+
+
+*Metricbeat*
+
+
+*Heartbeat*
+
+
+*Packetbeat*
+
+

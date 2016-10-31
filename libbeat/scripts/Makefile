@@ -227,7 +227,7 @@ coverage-report:
 
 # Update expects the most recent version of libbeat in the GOPATH
 .PHONY: update
-update: python-env
+update: python-env changelog
 	# Update config
 	echo "Update config file"
 	-rm -f ${BEATNAME}.yml
@@ -269,6 +269,10 @@ docs:
 docs-preview:
 	if [ ! -d "build/docs" ]; then $(MAKE) docs; fi;
 	${BUILD_DIR}/docs/build_docs.pl --chunk=1 -open chunk=1 -open --doc ${GOPATH}/src/github.com/elastic/beats/${BEATNAME}/docs/index.asciidoc -out ${BUILD_DIR}/html_docs
+
+.PHONY: changelog
+changelog:
+	python ${ES_BEATS}/scripts/changelog.py changelog.yml > CHANGELOG.asciidoc
 
 
 ### KIBANA FILES HANDLING ###
@@ -406,3 +410,7 @@ package-dashboards: package-setup
 	cp -r etc/kibana ${BUILD_DIR}/dashboards
 	# build the dashboards package
 	BEATNAME=${BEATNAME} BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C ${ES_BEATS}/dev-tools/packer package-dashboards ${shell pwd}/build/upload/build_id.txt
+
+.PHONY: create-packer
+create-packer:
+	python ${ES_BEATS}/libbeat/scripts/create_packer.py --es_beats=${ES_BEATS} --beat_path=${BEAT_DIR} --beat=${BEATNAME}

@@ -1,0 +1,8 @@
+////
+This file is generated! See scripts/changelog.py
+////
+
+[[release-notes-5.0.0-alpha2]]
+=== Beats version 5.0.0-alpha2
+2016-05-03 https://github.com/elastic/beats/compare/v5.0.0-alpha1...v5.0.0-alpha2[View commits]
+

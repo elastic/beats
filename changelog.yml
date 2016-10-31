@@ -1,0 +1,15 @@
+project: beats
+changes:
+
+- type: added
+  description: >
+    Add changelog generation script to generate changelogs from structured yaml files.
+  issue: 1879
+  target: dev
+
+- type: release
+  version: 5.0.0-alpha3
+  parent: 5.0.0-alpha2
+  date: "2016-05-31"
+
+

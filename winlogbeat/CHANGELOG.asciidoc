@@ -1,0 +1,148 @@
+////
+This file is generated! See scripts/changelog.py
+////
+
+[[release-notes-v5.0.0-rc1]]
+=== Beats version v5.0.0-rc1
+ https://github.com/elastic/beats/compare/v5.0.0-beta1...v5.0.0-rc1[View commits]
+
+[[release-notes-v5.0.0-beta1]]
+=== Beats version v5.0.0-beta1
+ https://github.com/elastic/beats/compare/v5.0.0-alpha5...v5.0.0-beta1[View commits]
+
+==== Bug
+
+- Fix corrupt registry file that occurs on power loss by disabling file write caching.
+  {issue}2313[2313]
+
+[[release-notes-v5.0.0-alpha5]]
+=== Beats version v5.0.0-alpha5
+ https://github.com/elastic/beats/compare/v5.0.0-alpha4...v5.0.0-alpha5[View commits]
+
+==== Bug
+
+- Fix potential data loss between Winlogbeat restarts, reporting unpublished lines as published.
+  {issue}2041[2041]
+
+[[release-notes-v5.0.0-alpha4]]
+=== Beats version v5.0.0-alpha4
+ https://github.com/elastic/beats/compare/v5.0.0-alpha3...v5.0.0-alpha4[View commits]
+
+==== Bug
+
+- Fix issue with rendering forwarded event log records.
+  {issue}1891[1891]
+
+[[release-notes-v5.0.0-alpha3]]
+=== Beats version v5.0.0-alpha3
+ https://github.com/elastic/beats/compare/v5.0.0-alpha2...v5.0.0-alpha3[View commits]
+
+==== Bug
+
+- Adding missing argument to the "Stop processing" log message.
+  {issue}1590[1590]
+
+[[release-notes-v5.0.0-alpha2]]
+=== Beats version v5.0.0-alpha2
+ https://github.com/elastic/beats/compare/v5.0.0-alpha1...v5.0.0-alpha2[View commits]
+
+==== Bug
+
+- Fix panic when reading messages larger than 32K characters on Windows XP and 2003.
+  {issue}1498[1498]
+- Fix panic that occurs when reading a large events on Windows Vista and newer.
+  {issue}1499[1499]
+
+[[release-notes-v5.0.0-alpha1]]
+=== Beats version v5.0.0-alpha1
+ https://github.com/elastic/beats/compare/v1.2.0...v5.0.0-alpha1[View commits]
+
+==== Breaking
+
+- The `message_inserts` field was replaced with the `event_data` field
+  {issue}1053[1053]
+- The `category` field was renamed to `task` to better align with the Windows Event Log API naming
+  {issue}1053[1053]
+- Remove the count field from the exported event
+  {issue}1218[1218]
+
+==== Added
+
+- Add caching of event metadata handles and the system render context for the wineventlog API
+  {issue}888[888]
+- Improve config validation by checking for unknown top-level YAML keys.
+  {issue}1100[1100]
+- Add the ability to set tags, fields, and fields_under_root as options for each event log
+  {issue}1092[1092]
+- Add `event_id`, `level`, and `provider` configuration options for filtering events
+  {issue}1218[1218]
+- Add `include_xml` configuration option for including the raw XML with the event
+  {issue}1218[1218]
+
+[[release-notes-v1.2.3]]
+=== Beats version v1.2.3
+ https://github.com/elastic/beats/compare/v1.2.2...v1.2.3[View commits]
+
+==== Bug
+
+- Fix panic when reading messages larger than 32K characters on Windows XP and 2003.
+  {issue}1498[1498]
+
+[[release-notes-v1.2.2]]
+=== Beats version v1.2.2
+ https://github.com/elastic/beats/compare/v1.2.0...v1.2.2[View commits]
+
+[[release-notes-v1.2.1]]
+=== Beats version v1.2.1
+ https://github.com/elastic/beats/compare/v1.2.0...v1.2.1[View commits]
+
+[[release-notes-v1.2.0]]
+=== Beats version v1.2.0
+ https://github.com/elastic/beats/compare/v1.1.2...v1.2.0[View commits]
+
+==== Bug
+
+- Fix invalid `event_id` on Windows XP and Windows 2003
+  {issue}1227[1227]
+
+[[release-notes-v1.1.2]]
+=== Beats version v1.1.2
+ https://github.com/elastic/beats/compare/v1.1.1...v1.1.2[View commits]
+
+[[release-notes-v1.1.1]]
+=== Beats version v1.1.1
+ https://github.com/elastic/beats/compare/v1.1.0...v1.1.1[View commits]
+
+[[release-notes-v1.1.0]]
+=== Beats version v1.1.0
+ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
+
+[[release-notes-v1.0.1]]
+=== Beats version v1.0.1
+ https://github.com/elastic/beats/compare/v1.0.0...v1.0.1[View commits]
+
+[[release-notes-master]]
+=== Beats version master
+ https://github.com/elastic/beats/compare/v5.0.0-rc1...master[View commits]
+
+==== Added
+
+- Add `event_logs.batch_read_size` configuration option.
+  {issue}2641[2641]
+
+[[release-notes-1.0.0-rc2]]
+=== Beats version 1.0.0-rc2
+ https://github.com/elastic/beats/compare/1.0.0-rc1...1.0.0-rc2[View commits]
+
+[[release-notes-1.0.0-rc1]]
+=== Beats version 1.0.0-rc1
+ https://github.com/elastic/beats/compare/1.0.0-beta4...1.0.0-rc1[View commits]
+
+[[release-notes-1.0.0-beta4]]
+=== Beats version 1.0.0-beta4
+ https://github.com/elastic/beats/compare/1.0.0-beta3...1.0.0-beta4[View commits]
+
+[[release-notes-1.0.0]]
+=== Beats version 1.0.0
+ https://github.com/elastic/beats/compare/1.0.0-rc2...1.0.0[View commits]
+
