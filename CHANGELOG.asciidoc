@@ -69,8 +69,9 @@ https://github.com/elastic/beats/compare/v5.0.0...master[Check the HEAD diff]
 *Topbeat*
 
 *Filebeat*
-
 - Add command line option -once to run filebeat only once and then close. {pull}2456[2456]
+- Only load matching states into prospector to improve state handling {pull}2840[2840]
+- Reset all states ttl on startup to make sure it is overwritten by new config {pull}2840[2840]
 
 *Winlogbeat*
 
