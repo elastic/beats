@@ -118,9 +118,12 @@ func (r *Registrar) loadStates() error {
 		return fmt.Errorf("Error decoding states: %s", err)
 	}
 
-	// Set all states to finished on restart
+	// Set all states to finished and disable TTL on restart
+	// For all states covered by a prospector, TTL will be overwritten with the prospector value
 	for key, state := range states {
 		state.Finished = true
+		// Set ttl to -2 to easily spot which states are not managed by a prospector
+		state.TTL = -2
 		states[key] = state
 	}
 
@@ -248,7 +251,7 @@ func (r *Registrar) Run() {
 		statesCleanup.Add(int64(cleanedStates))
 
 		logp.Debug("registrar",
-			"Registrar states cleaned up. Before: %d , After: %d",
+			"Registrar states cleaned up. Before: %d, After: %d",
 			beforeCount, beforeCount-cleanedStates)
 
 		if err := r.writeRegistry(); err != nil {

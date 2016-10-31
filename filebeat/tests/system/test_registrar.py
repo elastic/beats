@@ -1028,7 +1028,6 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*",
             close_inactive="1s",
             ignore_older="3s",
-            clean_inactive="5s",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -1053,6 +1052,13 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            close_inactive="1s",
+            ignore_older="3s",
+            clean_inactive="5s",
+        )
+
         filebeat = self.start_beat(output="filebeat2.log")
 
         # Write additional file
@@ -1061,12 +1067,221 @@ class Test(BaseTest):
 
         # Make sure all 4 states are persisted
         self.wait_until(
-            lambda: self.log_contains("Before: 4, After: 4", logfile="filebeat2.log"),
+            lambda: self.log_contains("Prospector states cleaned up. Before: 4, After: 4", logfile="filebeat2.log"),
             max_timeout=10)
 
         # Wait until registry file is cleaned
         self.wait_until(
-            lambda: self.log_contains("Before: 0, After: 0", logfile="filebeat2.log"),
+            lambda: self.log_contains("Prospector states cleaned up. Before: 0, After: 0", logfile="filebeat2.log"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
+
+
+    def test_restart_state_reset(self):
+        """
+        Test that ttl is set to -1 after restart and no prospector covering it
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            clean_inactive="10s",
+            ignore_older="5s"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+
+        with open(testfile, 'w') as file:
+            file.write("Hello World\n")
+
+        filebeat = self.start_beat()
+
+        # Wait until state written
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=30)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that ttl > 0 was set because of clean_inactive
+        data = self.get_registry()
+        assert len(data) == 1
+        assert data[0]["ttl"] > 0
+
+        # No config file which does not match the exisitng state
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test2.log",
+            clean_inactive="10s",
+            ignore_older="5s",
+        )
+
+        filebeat = self.start_beat(output="filebeat2.log")
+
+        # Wait until prospectors are started
+        self.wait_until(
+            lambda: self.log_contains_count("Starting prospector of type: log", logfile="filebeat2.log") >= 1,
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that ttl was reset correctly
+        data = self.get_registry()
+        assert len(data) == 1
+        assert data[0]["ttl"] == -2
+
+    def test_restart_state_reset_ttl(self):
+        """
+        Test that ttl is reset after restart if clean_inactive changes
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+            clean_inactive="10s",
+            ignore_older="5s"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+
+        with open(testfile, 'w') as file:
+            file.write("Hello World\n")
+
+        filebeat = self.start_beat()
+
+        # Wait until state written
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=30)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that ttl > 0 was set because of clean_inactive
+        data = self.get_registry()
+        assert len(data) == 1
+        assert data[0]["ttl"] == 10 * 1000 * 1000 * 1000
+
+        # No config file which does not match the existing state
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+            clean_inactive="20s",
+            ignore_older="5s",
+        )
+
+        filebeat = self.start_beat(output="filebeat2.log")
+
+        # Wait until new state is written
+        self.wait_until(
+            lambda: self.log_contains("Flushing spooler because of timeout. Events flushed: ", logfile="filebeat2.log"),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that ttl was reset correctly
+        data = self.get_registry()
+        assert len(data) == 1
+        assert data[0]["ttl"] == 20 * 1000 * 1000 * 1000
+
+    def test_restart_state_reset_ttl_with_space(self):
+        """
+        Test that ttl is reset after restart if clean_inactive changes
+        This time it is tested with a space in the filename to see if everything is loaded as expected
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test file.log",
+            clean_inactive="10s",
+            ignore_older="5s"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test file.log"
+
+        with open(testfile, 'w') as file:
+            file.write("Hello World\n")
+
+        filebeat = self.start_beat()
+
+        # Wait until state written
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=30)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that ttl > 0 was set because of clean_inactive
+        data = self.get_registry()
+        assert len(data) == 1
+        assert data[0]["ttl"] == 10 * 1000 * 1000 * 1000
+
+        # new config file whith other clean_inactive
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test file.log",
+            clean_inactive="20s",
+            ignore_older="5s",
+        )
+
+        filebeat = self.start_beat(output="filebeat2.log")
+
+        # Wait until new state is written
+        self.wait_until(
+            lambda: self.log_contains("Flushing spooler because of timeout. Events flushed: ", logfile="filebeat2.log"),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that ttl was reset correctly
+        data = self.get_registry()
+        assert len(data) == 1
+        assert data[0]["ttl"] == 20 * 1000 * 1000 * 1000
+
+
+    def test_restart_state_reset_ttl_no_clean_inactive(self):
+        """
+        Test that ttl is reset after restart if clean_inactive is disabled
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+            clean_inactive="10s",
+            ignore_older="5s"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+
+        with open(testfile, 'w') as file:
+            file.write("Hello World\n")
+
+        filebeat = self.start_beat()
+
+        # Wait until state written
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=30)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that ttl > 0 was set because of clean_inactive
+        data = self.get_registry()
+        assert len(data) == 1
+        assert data[0]["ttl"] == 10 * 1000 * 1000 * 1000
+
+        # New config without clean_inactive
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+        )
+
+        filebeat = self.start_beat(output="filebeat2.log")
+
+        # Wait until prospectors are started
+        self.wait_until(
+            lambda: self.log_contains("Flushing spooler because of timeout. Events flushed: ", logfile="filebeat2.log"),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that ttl was reset correctly
+        data = self.get_registry()
+        assert len(data) == 1
+        assert data[0]["ttl"] == -1

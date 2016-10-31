@@ -482,7 +482,7 @@ class Test(BaseTest):
                 content = message + '\n'
                 file.write(content)
 
-            filebeat = self.start_beat()
+            filebeat = self.start_beat(output=config[0] + ".log")
 
             self.wait_until(
                 lambda: self.output_has(lines=1, output_file="output/" + config[0]),

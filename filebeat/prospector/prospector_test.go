@@ -6,6 +6,8 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/elastic/beats/filebeat/input/file"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +17,7 @@ func TestProspectorInitInputTypeLogError(t *testing.T) {
 		config: prospectorConfig{},
 	}
 
-	err := prospector.Init()
+	err := prospector.Init([]file.State{})
 	// Error should be returned because no path is set
 	assert.Error(t, err)
 }

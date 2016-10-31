@@ -1,11 +1,12 @@
 package prospector
 
 import (
+	"expvar"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"time"
-
-	"expvar"
 
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
@@ -21,7 +22,6 @@ var (
 type ProspectorLog struct {
 	Prospector *Prospector
 	config     prospectorConfig
-	lastClean  time.Time
 }
 
 func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
@@ -34,37 +34,27 @@ func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
 	return prospectorer, nil
 }
 
-func (p *ProspectorLog) Init() {
+// Init sets up the prospector
+// It goes through all states coming from the registry. Only the states which match the glob patterns of
+// the prospector will be loaded and updated. All other states will not be touched.
+func (p *ProspectorLog) Init(states []file.State) error {
 	logp.Debug("prospector", "exclude_files: %s", p.config.ExcludeFiles)
 
-	logp.Info("Load previous states from registry into memory")
-	fileStates := p.Prospector.states.GetStates()
-
-	// Make sure all states are set as finished
-	for _, state := range fileStates {
-
+	for _, state := range states {
 		// Check if state source belongs to this prospector. If yes, update the state.
-		if p.hasFile(state.Source) {
-			// Set all states again to infinity TTL to make sure only removed if config still same
-			// clean_inactive / clean_removed could have been changed between restarts
+		if p.matchesFile(state.Source) {
 			state.TTL = -1
-
 			// Update prospector states and send new states to registry
 			err := p.Prospector.updateState(input.NewEvent(state))
 			if err != nil {
 				logp.Err("Problem putting initial state: %+v", err)
+				return err
 			}
-		} else {
-			// Only update internal state, do not report it to registry
-			// Having all states could be useful in case later a file is moved into this prospector
-			// TODO: Think about if this is expected or unexpected
-			p.Prospector.states.Update(state)
 		}
 	}
 
-	p.lastClean = time.Now()
-
-	logp.Info("Previous states loaded: %v", p.Prospector.states.Count())
+	logp.Info("Prospector with previous states loaded: %v", p.Prospector.states.Count())
+	return nil
 }
 
 func (p *ProspectorLog) Run() {
@@ -168,26 +158,26 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 	return paths
 }
 
-// hasFile returns true in case the given filePath is part of this prospector
-func (p *ProspectorLog) hasFile(filePath string) bool {
+// matchesFile returns true in case the given filePath is part of this prospector, means matches its glob patterns
+func (p *ProspectorLog) matchesFile(filePath string) bool {
 	for _, glob := range p.config.Paths {
-		// Evaluate the path as a wildcards/shell glob
-		matches, err := filepath.Glob(glob)
+
+		if runtime.GOOS == "windows" {
+			// Windows allows / slashes which makes glob patterns with / work
+			// But for match we need paths with \ as only file names are compared and no lookup happens
+			glob = strings.Replace(glob, "/", "\\", -1)
+		}
+
+		// Evaluate if glob matches filePath
+		match, err := filepath.Match(glob, filePath)
 		if err != nil {
+			logp.Debug("prospector", "Error matching glob: %s", err)
 			continue
 		}
 
-		// Check any matched files to see if we need to start a harvester
-		for _, file := range matches {
-
-			// check if the file is in the exclude_files list
-			if p.isFileExcluded(file) {
-				continue
-			}
-
-			if filePath == file {
-				return true
-			}
+		// Check if file is not excluded
+		if match && !p.isFileExcluded(filePath) {
+			return true
 		}
 	}
 	return false
