@@ -4,6 +4,15 @@
   #period: 10s
 
   # The hosts must be passed as MongoDB URLs in the format:
-  # [mongodb://][user:pass@]host[:port]
+  # [mongodb://][user:pass@]host[:port].
+  # Warning: specifying the user/password in the hosts array is possible
+  # but it will result in the password being present in the output documents.
+  # We recommend using the username and password options instead.
   #hosts: ["localhost:27017"]
+
+  # Username to use when connecting to MongoDB. Empty by default.
+  #username: user
+
+  # Password to use when connecting to MongoDB. Empty by default.
+  #password: pass
 

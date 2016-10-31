@@ -3,6 +3,7 @@ package status
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/mongodb"
 
 	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
@@ -11,7 +12,6 @@ import (
 
 /*
 TODOs:
-	* add support for username/password
 	* add metricset for "locks" data
 	* add a metricset for "metrics" data
 */
@@ -24,26 +24,36 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
+	dialInfo *mgo.DialInfo
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config := struct {
-		Hosts []string `config:"hosts"    validate:"nonzero,required"`
+		Hosts    []string `config:"hosts"    validate:"nonzero,required"`
+		Username string   `config:"username"`
+		Password string   `config:"username"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
+	info, err := mongodb.ParseURL(base.Host(), config.Username, config.Password)
+	if err != nil {
+		return nil, err
+	}
+	info.Timeout = base.Module().Config().Timeout
+
 	return &MetricSet{
 		BaseMetricSet: base,
+		dialInfo:      info,
 	}, nil
 }
 
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 
-	session, err := mgo.DialWithTimeout(m.Host(), m.Module().Config().Timeout)
+	session, err := mgo.DialWithInfo(m.dialInfo)
 	if err != nil {
 		return nil, err
 	}
