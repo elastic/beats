@@ -529,26 +529,23 @@ func optToMapStr(rrOPT *mkdns.OPT) common.MapStr {
 	return optMapStr
 }
 
-// rrsToMapStr converts an array of RR's to an array of MapStr's.
+// rrsToMapStr converts an slice of RR's to an slice of MapStr's.
 func rrsToMapStrs(records []mkdns.RR) []common.MapStr {
-	mapStrArray := make([]common.MapStr, len(records))
-	for i, rr := range records {
+	mapStrSlice := make([]common.MapStr, 0, len(records))
+	for _, rr := range records {
 		rrHeader := rr.Header()
 
 		mapStr := rrToMapStr(rr)
 		if len(mapStr) == 0 { // OPT pseudo-RR returns an empty MapStr
-			resizeStrArray := make([]common.MapStr, len(mapStrArray)-1)
-			copy(resizeStrArray, mapStrArray)
-			mapStrArray = resizeStrArray
 			continue
 		}
 		mapStr["name"] = rrHeader.Name
 		mapStr["type"] = dnsTypeToString(rrHeader.Rrtype)
 		mapStr["class"] = dnsClassToString(rrHeader.Class)
 		mapStr["ttl"] = strconv.FormatInt(int64(rrHeader.Ttl), 10)
-		mapStrArray[i] = mapStr
+		mapStrSlice = append(mapStrSlice, mapStr)
 	}
-	return mapStrArray
+	return mapStrSlice
 }
 
 // Convert all RDATA fields of a RR to a single string
