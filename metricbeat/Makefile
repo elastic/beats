@@ -12,11 +12,9 @@ TARGETS?="windows/amd64 windows/386 darwin/amd64"
 TARGETS_OLD?="linux/amd64 linux/386"
 CGO=true
 
-# Metricbeat can only be cross-compiled on platforms not requiring CGO which
-# are the same platforms where the system metrics (cpu, memory) are not
-# implemented.
-GOX_OS=solaris netbsd
-GOX_FLAGS='-arch=amd64'
+# Metricbeat can only be cross-compiled on platforms not requiring CGO.
+GOX_OS=solaris netbsd linux windows
+GOX_FLAGS='-arch=amd64 386 arm ppc64 ppc64le'
 
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
