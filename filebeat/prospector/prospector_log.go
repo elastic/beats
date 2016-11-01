@@ -298,6 +298,8 @@ func (p *ProspectorLog) handleIgnoreOlder(lastState, newState file.State) error 
 		return nil
 	}
 
+	newState.Offset = newState.Fileinfo.Size()
+
 	// Write state for ignore_older file as none exists yet
 	newState.Finished = true
 	err := p.Prospector.updateState(input.NewEvent(newState))
