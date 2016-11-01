@@ -1,0 +1,10 @@
+{
+  "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"field\":\"flow_id\"},\"schema\":\"metric\",\"type\":\"cardinality\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customInterval\":\"2h\",\"extended_bounds\":{},\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1},\"schema\":\"segment\",\"type\":\"date_histogram\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"interpolate\":\"linear\",\"legendPosition\":\"right\",\"mode\":\"stacked\",\"scale\":\"linear\",\"setYExtents\":false,\"shareYAxis\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{}},\"title\":\"Connections over time\",\"type\":\"area\"}", 
+  "description": "", 
+  "title": "Connections over time", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}
