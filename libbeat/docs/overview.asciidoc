@@ -4,13 +4,13 @@ The _Beats_ are open source data shippers that you install as _agents_ on
 your servers to send different types of operational data to
 https://www.elastic.co/products/elasticsearch[Elasticsearch]. Beats can
 send data directly to Elasticsearch or send it to Elasticsearch via Logstash, which
-you can use to enrich or archive the data.
+you can use to parse and transform the data.
 
-_Packetbeat_, _Metricbeat_, and _Filebeat_ are a few examples of _Beats_. Packetbeat
+_Packetbeat_, _Filebeat_, _Metricbeat_, and _Winlogbeat_ are a few examples of _Beats_. Packetbeat
 is a network packet analyzer that ships information about the transactions
-exchanged between your application servers. Metricbeat is a server monitoring agent
+exchanged between your application servers. Filebeat ships log files from your servers. Metricbeat is a server monitoring agent
 that periodically collects metrics from the operating systems and services
-running on your servers. And Filebeat ships log files from your servers.
+running on your servers. And Winlogbeat ships Windows event logs.
 
 image:./images/beats-platform.png[Beats Platform]
 
