@@ -198,11 +198,9 @@ func (p *ProspectorLog) scan() {
 
 		// Ignores all files which fall under ignore_older
 		if p.isIgnoreOlder(newState) {
-			logp.Debug("prospector", "Ignore file because ignore_older reached: %s", newState.Source)
-
-			// If last state is empty, it means state was removed or never created -> can be ignored
-			if !lastState.IsEmpty() && !lastState.Finished {
-				logp.Err("File is falling under ignore_older before harvesting is finished. Adjust your close_* settings: %s", newState.Source)
+			err := p.handleIgnoreOlder(lastState, newState)
+			if err != nil {
+				logp.Err("Updating ignore_older state error: %s", err)
 			}
 			continue
 		}
@@ -281,6 +279,35 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 	}
 }
 
+// handleIgnoreOlder handles states which fall under ignore older
+// Based on the state information it is decided if the state information has to be updated or not
+func (p *ProspectorLog) handleIgnoreOlder(lastState, newState file.State) error {
+	logp.Debug("prospector", "Ignore file because ignore_older reached: %s", newState.Source)
+
+	if !lastState.IsEmpty() {
+		if !lastState.Finished {
+			logp.Info("File is falling under ignore_older before harvesting is finished. Adjust your close_* settings: %s", newState.Source)
+		}
+		// Old state exist, no need to update it
+		return nil
+	}
+
+	// Make sure file is not falling under clean_inactive yet
+	if p.isCleanInactive(newState) {
+		logp.Debug("prospector", "Do not write state for ignore_older because clean_inactive reached")
+		return nil
+	}
+
+	// Write state for ignore_older file as none exists yet
+	newState.Finished = true
+	err := p.Prospector.updateState(input.NewEvent(newState))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // isFileExcluded checks if the given path should be excluded
 func (p *ProspectorLog) isFileExcluded(file string) bool {
 	patterns := p.config.ExcludeFiles
@@ -297,6 +324,22 @@ func (p *ProspectorLog) isIgnoreOlder(state file.State) bool {
 
 	modTime := state.Fileinfo.ModTime()
 	if time.Since(modTime) > p.config.IgnoreOlder {
+		return true
+	}
+
+	return false
+}
+
+// isCleanInactive checks if the given state false under clean_inactive
+func (p *ProspectorLog) isCleanInactive(state file.State) bool {
+
+	// clean_inactive is disable
+	if p.config.CleanInactive <= 0 {
+		return false
+	}
+
+	modTime := state.Fileinfo.ModTime()
+	if time.Since(modTime) > p.config.CleanInactive {
 		return true
 	}
 
