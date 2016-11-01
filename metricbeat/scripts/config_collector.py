@@ -35,9 +35,9 @@ def collect(beat_name, beat_path, full=False):
     # yml file
 
     if full:
-        config_yml = "########################## " + beat_name + " Configuration ###########################" + header_full
+        config_yml = "########################## " + beat_name.title() + " Configuration ###########################\n" + header_full
     else:
-        config_yml = "###################### " + beat_name + " Configuration Example #######################" + header_short
+        config_yml = "###################### " + beat_name.title() + " Configuration Example #######################\n" + header_short
 
     config_yml += beat_name + """.modules:
 
