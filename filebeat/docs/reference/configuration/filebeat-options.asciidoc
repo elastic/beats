@@ -175,7 +175,7 @@ The files affected by this setting fall into two categories:
 * Files that were never harvested
 * Files that were harvested but weren't updated for longer than `ignore_older`
 
-When a file that has never been harvested is updated, the reading starts from the beginning of the file because no state has been persisted. For a file that has been harvested previously, the state still exists, so when the file is updated, reading continues at the last position.
+When a file that has never been harvested is updated, the reading starts from the beginning as the state of the file was created with the offset 0. For a file that has been harvested previously, reading continues at the last position.
 
 The `ignore_older` setting relies on the modification time of the file to determine if a file is ignored. If the modification time of the file is not updated when lines are written to a file (which can happen on Windows), the `ignore_older` setting may cause Filebeat to ignore files even though content was added at a later time.
 
@@ -527,14 +527,14 @@ before Filebeat shuts down.
 
 By default, this option is disabled, and Filebeat does not wait for the
 publisher to finish sending events before shutting down. This means that any
-events sent to the output, but not acknowledged before Filebeat shuts down, 
+events sent to the output, but not acknowledged before Filebeat shuts down,
 are sent again when you restart Filebeat. For more details about how this
 works, see <<at-least-once-delivery>>.
 
 You can configure the `shutdown_timeout` option to specify the maximum amount
 of time that Filebeat waits for the publisher to finish sending events before
 shutting down. If all events are acknowledged before `shutdown_timeout` is
-reached, Filebeat will shut down. 
+reached, Filebeat will shut down.
 
 There is no recommended setting for this option because determining the correct
 value for `shutdown_timeout` depends heavily on the environment in which
