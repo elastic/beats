@@ -53,6 +53,7 @@ import (
 
 	// Register default processors.
 	_ "github.com/elastic/beats/libbeat/processors/actions"
+	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
 )
 
 // Beater is the interface that must be implemented by every Beat. A Beater

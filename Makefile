@@ -34,9 +34,9 @@ coverage-report:
 	-tail -q -n +2 ./libbeat/${COVERAGE_DIR}/*.cov >> ./${COVERAGE_DIR}/full.cov
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 
-.PHONY: update
-update:
-	$(foreach var,$(BEATS),$(MAKE) -C $(var) update || exit 1;)
+.PHONY: collect
+collect:
+	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) collect || exit 1;)
 
 .PHONY: clean
 clean:
@@ -54,8 +54,7 @@ clean-vendor:
 check:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
 	# Validate that all updates were commited
-	$(MAKE) update
-	$(MAKE) -C metricbeat collect
+	$(MAKE) collect
 	git update-index --refresh
 	git diff-index --exit-code HEAD --
 
