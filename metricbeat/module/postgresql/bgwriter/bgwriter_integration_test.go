@@ -54,5 +54,7 @@ func getConfig() map[string]interface{} {
 		"module":     "postgresql",
 		"metricsets": []string{"bgwriter"},
 		"hosts":      []string{postgresql.GetEnvDSN()},
+		"username":   postgresql.GetEnvUsername(),
+		"password":   postgresql.GetEnvPassword(),
 	}
 }
