@@ -21,9 +21,10 @@ beat:
     - MYSQL_DSN=root:test@tcp(mysql:3306)/
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
-    - POSTGRESQL_DSN=postgres://postgres@postgresql:5432?sslmode=disable
+    - POSTGRESQL_DSN=postgres://postgresql:5432?sslmode=disable
     - POSTGRESQL_HOST=postgresql
     - POSTGRESQL_PORT=5432
+    - POSTGRESQL_USERNAME=postgres
     - ZOOKEEPER_HOST=zookeeper
     - ZOOKEEPER_PORT=2181
     - HAPROXY_HOST=haproxy

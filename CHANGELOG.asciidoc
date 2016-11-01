@@ -48,6 +48,8 @@ https://github.com/elastic/beats/compare/v5.0.0...5.0[Check the HEAD diff]
 
 *Metricbeat*
 
+- Add username and password config options to the PostgreSQL module. {pull}2889[2890]
+
 *Packetbeat*
 
 *Topbeat*
