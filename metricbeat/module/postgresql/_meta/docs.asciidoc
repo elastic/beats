@@ -1,4 +1,50 @@
-== postgresql Module
+== PostgreSQL Module
 
-This is the postgresql Module.
+This module periodically fetches metrics from
+https://www.postgresql.org/[PostgreSQL] servers.
 
+[float]
+=== Module-Specific Configuration Notes
+
+When configuring the `hosts` option, you must use Postgres URLs of the following
+format:
+
+-----------------------------------
+[postgres://][user:pass@]host[:port][?options]
+-----------------------------------
+
+The URL can be as simple as:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: postgresql
+  hosts: ["postgres://localhost"]
+----------------------------------------------------------------------
+
+Or more complex like:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: postgresql
+  hosts: ["postgres://localhost:40001?sslmode=disable", "postgres://otherhost:40001"]
+----------------------------------------------------------------------
+
+WARNING: In case you use username and password in the hosts array, this
+information will be sent with each event as part of the `metricset.host` field.
+To prevent sending username and password the config options `username` and
+`password` can be used.
+
+[source,yaml]
+----
+- module: postgresql
+  metricsets: ["status"]
+  hosts: ["postgres://localhost:5432"]
+  username: root
+  password: test
+----
+
+[float]
+=== Compatibility
+
+This module was tested with PostgreSQL 9.5.3 and is expected to work with all
+versions >= 9.
