@@ -38,13 +38,13 @@ fields:
 collect-docs: python-env
 	-rm -r docs/modules
 	mkdir -p docs/modules
-	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/docs_collector.py
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/docs_collector.py --beat ${BEATNAME}
 
 # Collects all module configs
 .PHONY: configs
 configs: python-env
-	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py $(PWD) > etc/beat.yml
-	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --full $(PWD) > etc/beat.full.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEATNAME} $(PWD) > etc/beat.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEATNAME} --full $(PWD) > etc/beat.full.yml
 
 # Generates imports for all modules and metricsets
 .PHONY: imports
