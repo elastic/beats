@@ -65,6 +65,8 @@ https://github.com/elastic/beats/compare/v5.0.0...5.0[Check the HEAD diff]
 
 *Metricbeat*
 
+- Add username and password config options to the MongoDB module. {pull}2889[2889]
+
 *Packetbeat*
 
 *Topbeat*
