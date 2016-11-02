@@ -53,7 +53,7 @@ func (proto *UdpProtocol) GetPorts() []int {
 	return proto.Ports
 }
 
-func (proto *UdpProtocol) ParseUdp(pkt *Packet) {
+func (proto *UdpProtocol) ParseUDP(pkt *Packet) {
 	return
 }
 
@@ -82,7 +82,7 @@ func (proto *TcpUdpProtocol) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	return private, true
 }
 
-func (proto *TcpUdpProtocol) ParseUdp(pkt *Packet) {
+func (proto *TcpUdpProtocol) ParseUDP(pkt *Packet) {
 	return
 }
 
@@ -96,8 +96,8 @@ func TestProtocolNames(t *testing.T) {
 func newProtocols() Protocols {
 	p := ProtocolsStruct{}
 	p.all = make(map[Protocol]Plugin)
-	p.tcp = make(map[Protocol]TcpPlugin)
-	p.udp = make(map[Protocol]UdpPlugin)
+	p.tcp = make(map[Protocol]TCPPlugin)
+	p.udp = make(map[Protocol]UDPPlugin)
 
 	tcp := &TcpProtocol{Ports: []int{80}}
 	udp := &UdpProtocol{Ports: []int{5060}}
@@ -112,8 +112,8 @@ func newProtocols() Protocols {
 func TestBpfFilterWithoutVlanOnlyIcmp(t *testing.T) {
 	p := ProtocolsStruct{}
 	p.all = make(map[Protocol]Plugin)
-	p.tcp = make(map[Protocol]TcpPlugin)
-	p.udp = make(map[Protocol]UdpPlugin)
+	p.tcp = make(map[Protocol]TCPPlugin)
+	p.udp = make(map[Protocol]UDPPlugin)
 
 	filter := p.BpfFilter(false, true)
 	assert.Equal(t, "icmp or icmp6", filter)

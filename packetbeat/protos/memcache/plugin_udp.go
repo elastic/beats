@@ -66,7 +66,7 @@ type udpMessage struct {
 	datagrams    [][]byte
 }
 
-func (mc *Memcache) ParseUdp(pkt *protos.Packet) {
+func (mc *Memcache) ParseUDP(pkt *protos.Packet) {
 	defer logp.Recover("ParseMemcache(UDP) exception")
 
 	buffer := streambuf.NewFixed(pkt.Payload)

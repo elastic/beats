@@ -58,26 +58,26 @@ func validatePorts(ports []int) error {
 
 type Protocols interface {
 	BpfFilter(with_vlans bool, with_icmp bool) string
-	GetTCP(proto Protocol) TcpPlugin
-	GetUDP(proto Protocol) UdpPlugin
+	GetTCP(proto Protocol) TCPPlugin
+	GetUDP(proto Protocol) UDPPlugin
 	GetAll() map[Protocol]Plugin
-	GetAllTCP() map[Protocol]TcpPlugin
-	GetAllUDP() map[Protocol]UdpPlugin
+	GetAllTCP() map[Protocol]TCPPlugin
+	GetAllUDP() map[Protocol]UDPPlugin
 	// Register(proto Protocol, plugin ProtocolPlugin)
 }
 
 // list of protocol plugins
 type ProtocolsStruct struct {
 	all map[Protocol]Plugin
-	tcp map[Protocol]TcpPlugin
-	udp map[Protocol]UdpPlugin
+	tcp map[Protocol]TCPPlugin
+	udp map[Protocol]UDPPlugin
 }
 
 // Singleton of Protocols type.
 var Protos = ProtocolsStruct{
 	all: map[Protocol]Plugin{},
-	tcp: map[Protocol]TcpPlugin{},
-	udp: map[Protocol]UdpPlugin{},
+	tcp: map[Protocol]TCPPlugin{},
+	udp: map[Protocol]UDPPlugin{},
 }
 
 func (protocols ProtocolsStruct) Init(
@@ -124,7 +124,7 @@ func (protocols ProtocolsStruct) Init(
 	return nil
 }
 
-func (protocols ProtocolsStruct) GetTCP(proto Protocol) TcpPlugin {
+func (protocols ProtocolsStruct) GetTCP(proto Protocol) TCPPlugin {
 	plugin, exists := protocols.tcp[proto]
 	if !exists {
 		return nil
@@ -133,7 +133,7 @@ func (protocols ProtocolsStruct) GetTCP(proto Protocol) TcpPlugin {
 	return plugin
 }
 
-func (protocols ProtocolsStruct) GetUDP(proto Protocol) UdpPlugin {
+func (protocols ProtocolsStruct) GetUDP(proto Protocol) UDPPlugin {
 	plugin, exists := protocols.udp[proto]
 	if !exists {
 		return nil
@@ -146,11 +146,11 @@ func (protocols ProtocolsStruct) GetAll() map[Protocol]Plugin {
 	return protocols.all
 }
 
-func (protocols ProtocolsStruct) GetAllTCP() map[Protocol]TcpPlugin {
+func (protocols ProtocolsStruct) GetAllTCP() map[Protocol]TCPPlugin {
 	return protocols.tcp
 }
 
-func (protocols ProtocolsStruct) GetAllUDP() map[Protocol]UdpPlugin {
+func (protocols ProtocolsStruct) GetAllUDP() map[Protocol]UDPPlugin {
 	return protocols.udp
 }
 
@@ -213,11 +213,11 @@ func (protos ProtocolsStruct) register(proto Protocol, plugin Plugin) {
 	protos.all[proto] = plugin
 
 	success := false
-	if tcp, ok := plugin.(TcpPlugin); ok {
+	if tcp, ok := plugin.(TCPPlugin); ok {
 		protos.tcp[proto] = tcp
 		success = true
 	}
-	if udp, ok := plugin.(UdpPlugin); ok {
+	if udp, ok := plugin.(UDPPlugin); ok {
 		protos.udp[proto] = udp
 		success = true
 	}

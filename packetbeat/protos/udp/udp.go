@@ -38,7 +38,7 @@ func (udp *Udp) decideProtocol(tuple *common.IPPortTuple) protos.Protocol {
 
 // Process handles UDP packets that have been received. It attempts to
 // determine the protocol type and then invokes the associated
-// UdpProtocolPlugin's ParseUdp method. If the protocol cannot be determined
+// UdpProtocolPlugin's ParseUDP method. If the protocol cannot be determined
 // or the payload is empty then the method is a noop.
 func (udp *Udp) Process(id *flows.FlowID, pkt *protos.Packet) {
 	protocol := udp.decideProtocol(&pkt.Tuple)
@@ -56,14 +56,14 @@ func (udp *Udp) Process(id *flows.FlowID, pkt *protos.Packet) {
 	if len(pkt.Payload) > 0 {
 		logp.Debug("udp", "Parsing packet from %v of length %d.",
 			pkt.Tuple.String(), len(pkt.Payload))
-		plugin.ParseUdp(pkt)
+		plugin.ParseUDP(pkt)
 	}
 }
 
 // buildPortsMap creates a mapping of port numbers to protocol identifiers. If
 // any two UdpProtocolPlugins operate on the same port number then an error
 // will be returned.
-func buildPortsMap(plugins map[protos.Protocol]protos.UdpPlugin) (map[uint16]protos.Protocol, error) {
+func buildPortsMap(plugins map[protos.Protocol]protos.UDPPlugin) (map[uint16]protos.Protocol, error) {
 	var res = map[uint16]protos.Protocol{}
 
 	for proto, protoPlugin := range plugins {

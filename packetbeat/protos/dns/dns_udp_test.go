@@ -33,7 +33,7 @@ import (
 )
 
 // Verify that the interface for UDP has been satisfied.
-var _ protos.UdpPlugin = &Dns{}
+var _ protos.UDPPlugin = &Dns{}
 
 // DNS messages for testing. When adding a new test message, add it to the
 // messages array and create a new benchmark test for the message.
@@ -241,7 +241,7 @@ var (
 func TestParseUdp_emptyPacket(t *testing.T) {
 	dns := newDns(testing.Verbose())
 	packet := newPacket(forward, []byte{})
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
@@ -253,7 +253,7 @@ func TestParseUdp_malformedPacket(t *testing.T) {
 	dns := newDns(testing.Verbose())
 	garbage := []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}
 	packet := newPacket(forward, garbage)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 
 	// As a future addition, a malformed message should publish a result.
@@ -263,7 +263,7 @@ func TestParseUdp_malformedPacket(t *testing.T) {
 func TestParseUdp_requestPacket(t *testing.T) {
 	dns := newDns(testing.Verbose())
 	packet := newPacket(forward, elasticA.request)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
@@ -276,7 +276,7 @@ func TestParseUdp_responseOnly(t *testing.T) {
 	dns := newDns(testing.Verbose())
 	q := elasticA
 	packet := newPacket(reverse, q.response)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 
 	m := expectResult(t, dns)
 	assert.Equal(t, "udp", mapValue(t, m, "transport"))
@@ -295,10 +295,10 @@ func TestParseUdp_duplicateRequests(t *testing.T) {
 	dns := newDns(testing.Verbose())
 	q := elasticA
 	packet := newPacket(forward, q.request)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 	packet = newPacket(forward, q.request)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	m := expectResult(t, dns)
@@ -377,10 +377,10 @@ func TestPublishTransaction_edns(t *testing.T) {
 	dns := newDns(testing.Verbose())
 	q := ednsSecA
 	packet := newPacket(forward, q.request)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 	packet = newPacket(reverse, q.response)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 
 	m := expectResult(t, dns)
@@ -400,10 +400,10 @@ func TestPublishTransaction_respEdnsNoSupport(t *testing.T) {
 	q.response = q.response[:len(q.response)-11] // Remove OPT RR
 
 	packet := newPacket(forward, q.request)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 	packet = newPacket(reverse, q.response)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 
 	m := expectResult(t, dns)
@@ -423,10 +423,10 @@ func TestPublishTransaction_respEdnsUnexpected(t *testing.T) {
 	q.request = q.request[:len(q.request)-11] // Remove OPT RR
 
 	packet := newPacket(forward, q.request)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 	packet = newPacket(reverse, q.response)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 
 	m := expectResult(t, dns)
@@ -444,9 +444,9 @@ func benchmarkUdp(b *testing.B, q DnsTestMessage) {
 	dns := newDns(false)
 	for i := 0; i < b.N; i++ {
 		packet := newPacket(forward, q.request)
-		dns.ParseUdp(packet)
+		dns.ParseUDP(packet)
 		packet = newPacket(reverse, q.response)
-		dns.ParseUdp(packet)
+		dns.ParseUDP(packet)
 
 		client := dns.results.(*publish.ChanTransactions)
 		<-client.Channel
@@ -490,7 +490,7 @@ func BenchmarkParallelUdpParse(b *testing.B) {
 			} else {
 				packet = newPacket(reverse, q.response)
 			}
-			dns.ParseUdp(packet)
+			dns.ParseUDP(packet)
 		}
 	})
 
@@ -501,9 +501,9 @@ func BenchmarkParallelUdpParse(b *testing.B) {
 // the published result.
 func parseUdpRequestResponse(t testing.TB, dns *Dns, q DnsTestMessage) {
 	packet := newPacket(forward, q.request)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	packet = newPacket(reverse, q.response)
-	dns.ParseUdp(packet)
+	dns.ParseUDP(packet)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 
 	m := expectResult(t, dns)

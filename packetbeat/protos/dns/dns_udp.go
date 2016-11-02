@@ -10,7 +10,7 @@ import (
 // Only EDNS packets should have their size beyond this value
 const MaxDnsPacketSize = (1 << 9) // 512 (bytes)
 
-func (dns *Dns) ParseUdp(pkt *protos.Packet) {
+func (dns *Dns) ParseUDP(pkt *protos.Packet) {
 	defer logp.Recover("Dns ParseUdp")
 	packetSize := len(pkt.Payload)
 

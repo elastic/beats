@@ -266,7 +266,7 @@ func tcpSeqBeforeEq(seq1 uint32, seq2 uint32) bool {
 	return int32(seq1-seq2) <= 0
 }
 
-func buildPortsMap(plugins map[protos.Protocol]protos.TcpPlugin) (map[uint16]protos.Protocol, error) {
+func buildPortsMap(plugins map[protos.Protocol]protos.TCPPlugin) (map[uint16]protos.Protocol, error) {
 	var res = map[uint16]protos.Protocol{}
 
 	for proto, protoPlugin := range plugins {
