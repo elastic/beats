@@ -149,6 +149,24 @@ winlogbeat.event_logs:
     event_id: 4624, 4625, 4700-4800, -4735
 --------------------------------------------------------------------------------
 
+[WARNING]
+=======================================
+There is a limit on the query depth to prevent the possibility of a stack overflow from deep recursive queries. This limit is actually set to 22 filters.
+
+More than 22 event id's should be handled with multiple monitors to the same name:
+
+--------------------------------------------------------------------------------
+winlogbeat.event_logs:
+  - name: Security
+    event_id: 4624, 4625, 4700-4800, -4735 ....
+  - name: Security
+    event_id: 4624, 4625, 4700-4800, -4735 ....
+--------------------------------------------------------------------------------
+
+For more information around this, please visit https://support.microsoft.com/en-us/kb/970453.
+=======================================
+
+
 ===== event_logs.level
 
 A list of event levels to include. The value is a comma-separated list of
