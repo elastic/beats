@@ -56,15 +56,15 @@ func TestIcmpMessageExtractTrackingDataICMPv4(t *testing.T) {
 	baseLayer := &layers.BaseLayer{Contents: []byte{0x0, 0x0, 0x0, 0x0, 0xff, 0x1, 0x0, 0x2}}
 
 	// pair type
-	actualId, actualSeq := extractTrackingData(4, layers.ICMPv4TypeEchoRequest, baseLayer)
+	actualID, actualSeq := extractTrackingData(4, layers.ICMPv4TypeEchoRequest, baseLayer)
 
-	assert.Equal(t, uint16(65281), actualId)
+	assert.Equal(t, uint16(65281), actualID)
 	assert.Equal(t, uint16(2), actualSeq)
 
 	// non-pair type
-	actualId, actualSeq = extractTrackingData(4, layers.ICMPv4TypeDestinationUnreachable, baseLayer)
+	actualID, actualSeq = extractTrackingData(4, layers.ICMPv4TypeDestinationUnreachable, baseLayer)
 
-	assert.Equal(t, uint16(0), actualId)
+	assert.Equal(t, uint16(0), actualID)
 	assert.Equal(t, uint16(0), actualSeq)
 }
 
@@ -72,15 +72,15 @@ func TestIcmpMessageExtractTrackingDataICMPv6(t *testing.T) {
 	baseLayer := &layers.BaseLayer{Contents: []byte{0x0, 0x0, 0x0, 0x0, 0xff, 0x1, 0x0, 0x2}}
 
 	// pair type
-	actualId, actualSeq := extractTrackingData(6, layers.ICMPv6TypeEchoRequest, baseLayer)
+	actualID, actualSeq := extractTrackingData(6, layers.ICMPv6TypeEchoRequest, baseLayer)
 
-	assert.Equal(t, uint16(65281), actualId)
+	assert.Equal(t, uint16(65281), actualID)
 	assert.Equal(t, uint16(2), actualSeq)
 
 	// non-pair type
-	actualId, actualSeq = extractTrackingData(6, layers.ICMPv6TypeDestinationUnreachable, baseLayer)
+	actualID, actualSeq = extractTrackingData(6, layers.ICMPv6TypeDestinationUnreachable, baseLayer)
 
-	assert.Equal(t, uint16(0), actualId)
+	assert.Equal(t, uint16(0), actualID)
 	assert.Equal(t, uint16(0), actualSeq)
 }
 
