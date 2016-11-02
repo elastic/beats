@@ -145,7 +145,7 @@ func (p *parser) appendMessageData(data []byte) {
 		}
 		msg.values = append(msg.values, msg.data)
 	}
-	msg.count_values++
+	msg.countValues++
 }
 
 func parseFailing(parser *parser, buf *streambuf.Buffer) parseResult {
@@ -161,8 +161,8 @@ func doParseCommand(parser *parser, buf *streambuf.Buffer) parseResult {
 		return parser.needMore()
 	}
 	magic := buf.Bytes()[0]
-	is_binary := magic == MemcacheMagicRequest || magic == MemcacheMagicResponse
-	if is_binary {
+	isBinary := magic == MemcacheMagicRequest || magic == MemcacheMagicResponse
+	if isBinary {
 		return parser.contWith(buf, parseStateBinaryCommand)
 	} else {
 		return parser.contWith(buf, parseStateTextCommand)
