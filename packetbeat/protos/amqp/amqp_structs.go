@@ -120,7 +120,7 @@ const (
 const (
 	expirationProp      byte = 1
 	replyToProp         byte = 2
-	correlationIdProp   byte = 4
+	correlationIDProp   byte = 4
 	priorityProp        byte = 8
 	deliveryModeProp    byte = 16
 	headersProp         byte = 32
@@ -131,11 +131,11 @@ const (
 //Message properties codes for byte prop2 in getMessageProperties
 
 const (
-	appIdProp     byte = 8
-	userIdProp    byte = 16
+	appIDProp     byte = 8
+	userIDProp    byte = 16
 	typeProp      byte = 32
 	timestampProp byte = 64
-	messageIdProp byte = 128
+	messageIDProp byte = 128
 )
 
 //table types
@@ -174,7 +174,7 @@ type AmqpFrame struct {
 
 type AmqpMessage struct {
 	Ts             time.Time
-	TcpTuple       common.TCPTuple
+	TCPTuple       common.TCPTuple
 	CmdlineTuple   *common.CmdlineTuple
 	Method         string
 	IsRequest      bool
@@ -185,8 +185,8 @@ type AmqpMessage struct {
 	//mapstr containing all the options for the methods and header fields
 	Fields common.MapStr
 
-	Body      []byte
-	Body_size uint64
+	Body     []byte
+	BodySize uint64
 
 	Notes []string
 }

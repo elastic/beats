@@ -71,13 +71,13 @@ func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint
 	//get name of the field. If it's an array, it will be the index parameter as a
 	//string. If it's a table, it will be the name of the field.
 	if index < 0 {
-		field_name, offset_temp, err := getShortString(data, offset+1, uint32(data[offset]))
+		fieldName, offsetTemp, err := getShortString(data, offset+1, uint32(data[offset]))
 		if err {
 			logp.Warn("Failed to get short string in table")
 			return true
 		}
-		name = field_name
-		offset = offset_temp
+		name = fieldName
+		offset = offsetTemp
 	} else {
 		name = strconv.Itoa(index)
 		index += 1
