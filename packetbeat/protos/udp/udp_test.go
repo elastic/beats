@@ -36,7 +36,7 @@ type TestProtocols struct {
 	udp map[protos.Protocol]protos.UDPPlugin
 }
 
-func (p TestProtocols) BpfFilter(with_vlans bool, with_icmp bool) string {
+func (p TestProtocols) BpfFilter(withVlans bool, withICMP bool) string {
 	return "mock bpf filter"
 }
 
@@ -69,7 +69,7 @@ type TestProtocol struct {
 	pkt   *protos.Packet // UDP packet that the plugin was called to process.
 }
 
-func (proto *TestProtocol) Init(test_mode bool, results publish.Transactions) error {
+func (proto *TestProtocol) Init(testMode bool, results publish.Transactions) error {
 	return nil
 }
 
@@ -83,7 +83,7 @@ func (proto *TestProtocol) ParseUDP(pkt *protos.Packet) {
 
 type TestStruct struct {
 	protocols *TestProtocols
-	udp       *Udp
+	udp       *UDP
 	plugin    *TestProtocol
 }
 
@@ -98,7 +98,7 @@ func testSetup(t *testing.T) *TestStruct {
 	plugin := &TestProtocol{Ports: []int{PORT}}
 	protocols.udp[PROTO] = plugin
 
-	udp, err := NewUdp(protocols)
+	udp, err := NewUDP(protocols)
 	if err != nil {
 		t.Error("Error creating UDP handler: ", err)
 	}
@@ -114,7 +114,7 @@ func Test_buildPortsMap(t *testing.T) {
 
 	// The protocols named here are not necessarily UDP. They are just used
 	// for testing purposes.
-	config_tests := []configTest{
+	configTests := []configTest{
 		{
 			Input: map[protos.Protocol]protos.UDPPlugin{
 				httpProtocol: &TestProtocol{Ports: []int{80, 8080}},
@@ -153,7 +153,7 @@ func Test_buildPortsMap(t *testing.T) {
 		},
 	}
 
-	for _, test := range config_tests {
+	for _, test := range configTests {
 		output, err := buildPortsMap(test.Input)
 		assert.Nil(t, err)
 		assert.Equal(t, test.Output, output)

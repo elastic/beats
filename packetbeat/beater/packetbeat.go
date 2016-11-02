@@ -230,7 +230,7 @@ func (pb *Packetbeat) createWorker(dl layers.LinkType) (sniffer.Worker, error) {
 		return nil, err
 	}
 
-	udp, err := udp.NewUdp(&protos.Protos)
+	udp, err := udp.NewUDP(&protos.Protos)
 	if err != nil {
 		return nil, err
 	}
