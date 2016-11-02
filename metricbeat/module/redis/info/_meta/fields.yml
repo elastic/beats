@@ -66,25 +66,29 @@
     - name: memory
       type: group
       description: >
-        Redis CPU stats.
+        Redis memory stats.
       fields:
         - name: used.value
           type: long
           description: >
+          format: bytes
             Used memory.
 
         - name: used.rss
           type: long
+          format: bytes
           description: >
             Used memory rss.
 
         - name: used.peak
           type: long
+          format: bytes
           description: >
             Used memory peak.
 
         - name: used.lua
           type: long
+          format: bytes
           description: >
             Used memory lua.
 
