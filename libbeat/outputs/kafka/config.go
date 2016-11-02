@@ -30,6 +30,7 @@ type kafkaConfig struct {
 	ChanBufferSize  int                       `config:"channel_buffer_size" validate:"min=1"`
 	Username        string                    `config:"username"`
 	Password        string                    `config:"password"`
+	Format          *fmtstr.EventFormatString `config:"format"`
 }
 
 type metaConfig struct {

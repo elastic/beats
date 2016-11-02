@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+    "github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
 func init() {
@@ -16,6 +17,7 @@ func init() {
 type fileOutput struct {
 	beatName string
 	rotator  logp.FileRotator
+    format        *fmtstr.EventFormatString
 }
 
 // New instantiates a new file output instance.
@@ -42,7 +44,9 @@ func (out *fileOutput) init(config config) error {
 	if out.rotator.Name == "" {
 		out.rotator.Name = out.beatName
 	}
-	logp.Info("File output path set to: %v", out.rotator.Path)
+
+    out.format = config.Format
+    logp.Info("File output path set to: %v", out.rotator.Path)
 	logp.Info("File output base filename set to: %v", out.rotator.Name)
 
 	rotateeverybytes := uint64(config.RotateEveryKb) * 1024
@@ -76,16 +80,30 @@ func (out *fileOutput) PublishEvent(
 	opts outputs.Options,
 	data outputs.Data,
 ) error {
-	jsonEvent, err := json.Marshal(data.Event)
-	if err != nil {
-		// mark as success so event is not sent again.
-		op.SigCompleted(sig)
+    var serializedEvent []byte
+    var err error
 
-		logp.Err("Fail to json encode event(%v): %#v", err, data.Event)
-		return err
-	}
+    if out.format != nil {
+        formattedEvent, err := out.format.Run(data.Event)
+        if err != nil {
+            logp.Err("Fail to format event (%v): %#v", err, data.Event)
+            op.SigCompleted(sig)
+            return err
+        }
+        serializedEvent = []byte(formattedEvent)
 
-	err = out.rotator.WriteLine(jsonEvent)
+    }else {
+        serializedEvent, err = json.Marshal(data.Event)
+        if err != nil {
+            // mark as success so event is not sent again.
+            op.SigCompleted(sig)
+
+            logp.Err("Fail to json encode event(%v): %#v", err, data.Event)
+            return err
+        }
+    }
+
+	err = out.rotator.WriteLine(serializedEvent)
 	if err != nil {
 		if opts.Guaranteed {
 			logp.Critical("Unable to write events to file: %s", err)

@@ -10,6 +10,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
@@ -32,6 +33,7 @@ type client struct {
 	key      outil.Selector
 	password string
 	publish  publishFn
+	format   *fmtstr.EventFormatString
 }
 
 type redisDataType uint16
@@ -41,13 +43,14 @@ const (
 	redisChannelType
 )
 
-func newClient(tc *transport.Client, pass string, db int, key outil.Selector, dt redisDataType) *client {
+func newClient(tc *transport.Client, pass string, db int, key outil.Selector, dt redisDataType, format *fmtstr.EventFormatString) *client {
 	return &client{
 		Client:   tc,
 		password: pass,
 		db:       db,
 		dataType: dt,
 		key:      key,
+		format:   format,
 	}
 }
 
@@ -66,7 +69,7 @@ func (c *client) Connect(to time.Duration) error {
 	}()
 
 	if err = initRedisConn(conn, c.password, c.db); err == nil {
-		c.publish, err = makePublish(conn, c.key, c.dataType)
+		c.publish, err = makePublish(conn, c.key, c.dataType, c.format)
 	}
 	return err
 }
@@ -109,17 +112,18 @@ func makePublish(
 	conn redis.Conn,
 	key outil.Selector,
 	dt redisDataType,
+    format *fmtstr.EventFormatString,
 ) (publishFn, error) {
 	if dt == redisChannelType {
-		return makePublishPUBLISH(conn)
+		return makePublishPUBLISH(conn, format)
 	}
-	return makePublishRPUSH(conn, key)
+	return makePublishRPUSH(conn, key, format)
 }
 
-func makePublishRPUSH(conn redis.Conn, key outil.Selector) (publishFn, error) {
+func makePublishRPUSH(conn redis.Conn, key outil.Selector, format *fmtstr.EventFormatString) (publishFn, error) {
 	if !key.IsConst() {
 		// TODO: more clever bulk handling batching events with same key
-		return publishEventsPipeline(conn, "RPUSH"), nil
+		return publishEventsPipeline(conn, "RPUSH", format), nil
 	}
 
 	var major, minor int
@@ -158,23 +162,23 @@ func makePublishRPUSH(conn redis.Conn, key outil.Selector) (publishFn, error) {
 	// See: http://redis.io/commands/rpush
 	multiValue := major > 2 || (major == 2 && minor >= 4)
 	if multiValue {
-		return publishEventsBulk(conn, key, "RPUSH"), nil
+		return publishEventsBulk(conn, key, "RPUSH", format), nil
 	}
-	return publishEventsPipeline(conn, "RPUSH"), nil
+	return publishEventsPipeline(conn, "RPUSH", format), nil
 }
 
-func makePublishPUBLISH(conn redis.Conn) (publishFn, error) {
-	return publishEventsPipeline(conn, "PUBLISH"), nil
+func makePublishPUBLISH(conn redis.Conn, format *fmtstr.EventFormatString ) (publishFn, error) {
+	return publishEventsPipeline(conn, "PUBLISH", format), nil
 }
 
-func publishEventsBulk(conn redis.Conn, key outil.Selector, command string) publishFn {
+func publishEventsBulk(conn redis.Conn, key outil.Selector, command string, format *fmtstr.EventFormatString) publishFn {
 	// XXX: requires key.IsConst() == true
 	dest, _ := key.Select(common.MapStr{})
 	return func(_ outil.Selector, data []outputs.Data) ([]outputs.Data, error) {
 		args := make([]interface{}, 1, len(data)+1)
 		args[0] = dest
 
-		data, args = serializeEvents(args, 1, data)
+		data, args = serializeEvents(args, 1, data, format)
 		if (len(args) - 1) == 0 {
 			return nil, nil
 		}
@@ -190,11 +194,11 @@ func publishEventsBulk(conn redis.Conn, key outil.Selector, command string) publ
 	}
 }
 
-func publishEventsPipeline(conn redis.Conn, command string) publishFn {
+func publishEventsPipeline(conn redis.Conn, command string, format *fmtstr.EventFormatString ) publishFn {
 	return func(key outil.Selector, data []outputs.Data) ([]outputs.Data, error) {
 		var okEvents []outputs.Data
 		serialized := make([]interface{}, 0, len(data))
-		okEvents, serialized = serializeEvents(serialized, 0, data)
+		okEvents, serialized = serializeEvents(serialized, 0, data, format)
 		if len(serialized) == 0 {
 			return nil, nil
 		}
@@ -245,15 +249,29 @@ func serializeEvents(
 	to []interface{},
 	i int,
 	data []outputs.Data,
+    format *fmtstr.EventFormatString,
 ) ([]outputs.Data, []interface{}) {
+    var serializedEvent []byte
+    var err error
+
 	succeeded := data
 	for _, d := range data {
-		jsonEvent, err := json.Marshal(d.Event)
-		if err != nil {
-			logp.Err("Failed to convert the event to JSON (%v): %#v", err, d.Event)
-			goto failLoop
-		}
-		to = append(to, jsonEvent)
+        if (format != nil){
+            formattedEvent, err := format.Run(d.Event)
+            if err != nil {
+                logp.Err("Fail to format event (%v): %#v", err, formattedEvent)
+                goto failLoop
+            }
+            serializedEvent = []byte(formattedEvent)
+        }else {
+            serializedEvent, err = json.Marshal(d.Event)
+            if err != nil {
+                logp.Err("Failed to convert the event to JSON (%v): %#v", err, d.Event)
+                goto failLoop
+            }
+
+        }
+		to = append(to, serializedEvent)
 		i++
 	}
 	return succeeded, to

@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+    "github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
 func init() {
@@ -35,8 +36,8 @@ func New(_ string, config *common.Config, _ int) (outputs.Outputer, error) {
 	return c, nil
 }
 
-func newConsole(pretty bool) *console {
-	return &console{config: config{pretty}, out: os.Stdout}
+func newConsole(pretty bool, format *fmtstr.EventFormatString) *console {
+	return &console{config: config{Pretty: pretty, Format: format}, out: os.Stdout}
 }
 
 // Implement Outputer
@@ -49,21 +50,31 @@ func (c *console) PublishEvent(
 	opts outputs.Options,
 	data outputs.Data,
 ) error {
-	var jsonEvent []byte
+	var serializedEvent []byte
 	var err error
 
-	if c.config.Pretty {
-		jsonEvent, err = json.MarshalIndent(data.Event, "", "  ")
-	} else {
-		jsonEvent, err = json.Marshal(data.Event)
-	}
-	if err != nil {
-		logp.Err("Fail to convert the event to JSON (%v): %#v", err, data.Event)
-		op.SigCompleted(s)
-		return err
-	}
+    if c.config.Format != nil {
+        formattedEvent, err := c.config.Format.Run(data.Event)
+        if err != nil {
+            logp.Err("Fail to format event (%v): %#v", err, data.Event)
+            op.SigCompleted(s)
+            return err
+        }
+        serializedEvent = []byte(formattedEvent)
+    }else {
+        if c.config.Pretty {
+            serializedEvent, err = json.MarshalIndent(data.Event, "", "  ")
+        } else {
+            serializedEvent, err = json.Marshal(data.Event)
+        }
+        if err != nil {
+            logp.Err("Fail to convert the event to JSON (%v): %#v", err, data.Event)
+            op.SigCompleted(s)
+            return err
+        }
+    }
 
-	if err = c.writeBuffer(jsonEvent); err != nil {
+	if err = c.writeBuffer(serializedEvent); err != nil {
 		goto fail
 	}
 	if err = c.writeBuffer([]byte{'\n'}); err != nil {

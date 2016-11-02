@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
+    "github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
 type redisConfig struct {
@@ -27,6 +28,7 @@ type redisConfig struct {
 	HostTopology     string `config:"host_topology"`
 	PasswordTopology string `config:"password_topology"`
 	DbTopology       int    `config:"db_topology"`
+    Format          *fmtstr.EventFormatString `config:"format"`
 }
 
 var (

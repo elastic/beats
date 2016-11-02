@@ -3,20 +3,23 @@ package fileout
 import (
 	"fmt"
 
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 type config struct {
-	Path          string `config:"path"`
-	Filename      string `config:"filename"`
-	RotateEveryKb int    `config:"rotate_every_kb" validate:"min=1"`
-	NumberOfFiles int    `config:"number_of_files"`
+	Path          string                    `config:"path"`
+	Filename      string                    `config:"filename"`
+	RotateEveryKb int                       `config:"rotate_every_kb" validate:"min=1"`
+	NumberOfFiles int                       `config:"number_of_files"`
+	Format        *fmtstr.EventFormatString `config:"format"`
 }
 
 var (
 	defaultConfig = config{
 		NumberOfFiles: 7,
 		RotateEveryKb: 10 * 1024,
+		Format:        nil,
 	}
 )
 

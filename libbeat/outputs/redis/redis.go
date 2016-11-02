@@ -124,7 +124,7 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		if err != nil {
 			return nil, err
 		}
-		return newClient(t, config.Password, config.Db, key, dataType), nil
+		return newClient(t, config.Password, config.Db, key, dataType, config.Format), nil
 	})
 	if err != nil {
 		return err
