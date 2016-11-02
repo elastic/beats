@@ -58,11 +58,11 @@ func validatePorts(ports []int) error {
 
 type Protocols interface {
 	BpfFilter(with_vlans bool, with_icmp bool) string
-	GetTcp(proto Protocol) TcpPlugin
-	GetUdp(proto Protocol) UdpPlugin
+	GetTCP(proto Protocol) TcpPlugin
+	GetUDP(proto Protocol) UdpPlugin
 	GetAll() map[Protocol]Plugin
-	GetAllTcp() map[Protocol]TcpPlugin
-	GetAllUdp() map[Protocol]UdpPlugin
+	GetAllTCP() map[Protocol]TcpPlugin
+	GetAllUDP() map[Protocol]UdpPlugin
 	// Register(proto Protocol, plugin ProtocolPlugin)
 }
 
@@ -124,7 +124,7 @@ func (protocols ProtocolsStruct) Init(
 	return nil
 }
 
-func (protocols ProtocolsStruct) GetTcp(proto Protocol) TcpPlugin {
+func (protocols ProtocolsStruct) GetTCP(proto Protocol) TcpPlugin {
 	plugin, exists := protocols.tcp[proto]
 	if !exists {
 		return nil
@@ -133,7 +133,7 @@ func (protocols ProtocolsStruct) GetTcp(proto Protocol) TcpPlugin {
 	return plugin
 }
 
-func (protocols ProtocolsStruct) GetUdp(proto Protocol) UdpPlugin {
+func (protocols ProtocolsStruct) GetUDP(proto Protocol) UdpPlugin {
 	plugin, exists := protocols.udp[proto]
 	if !exists {
 		return nil
@@ -146,11 +146,11 @@ func (protocols ProtocolsStruct) GetAll() map[Protocol]Plugin {
 	return protocols.all
 }
 
-func (protocols ProtocolsStruct) GetAllTcp() map[Protocol]TcpPlugin {
+func (protocols ProtocolsStruct) GetAllTCP() map[Protocol]TcpPlugin {
 	return protocols.tcp
 }
 
-func (protocols ProtocolsStruct) GetAllUdp() map[Protocol]UdpPlugin {
+func (protocols ProtocolsStruct) GetAllUDP() map[Protocol]UdpPlugin {
 	return protocols.udp
 }
 

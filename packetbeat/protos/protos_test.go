@@ -153,46 +153,46 @@ func TestGetAll(t *testing.T) {
 	assert.NotNil(t, all[3])
 }
 
-func TestGetAllTcp(t *testing.T) {
+func TestGetAllTCP(t *testing.T) {
 	p := newProtocols()
-	tcp := p.GetAllTcp()
+	tcp := p.GetAllTCP()
 	assert.NotNil(t, tcp[1])
 	assert.Nil(t, tcp[2])
 	assert.NotNil(t, tcp[3])
 }
 
-func TestGetAllUdp(t *testing.T) {
+func TestGetAllUDP(t *testing.T) {
 	p := newProtocols()
-	udp := p.GetAllUdp()
+	udp := p.GetAllUDP()
 	assert.Nil(t, udp[1])
 	assert.NotNil(t, udp[2])
 	assert.NotNil(t, udp[3])
 }
 
-func TestGetTcp(t *testing.T) {
+func TestGetTCP(t *testing.T) {
 	p := newProtocols()
-	tcp := p.GetTcp(1)
+	tcp := p.GetTCP(1)
 	assert.NotNil(t, tcp)
 	assert.Contains(t, tcp.GetPorts(), 80)
 
-	tcp = p.GetTcp(2)
+	tcp = p.GetTCP(2)
 	assert.Nil(t, tcp)
 
-	tcp = p.GetTcp(3)
+	tcp = p.GetTCP(3)
 	assert.NotNil(t, tcp)
 	assert.Contains(t, tcp.GetPorts(), 53)
 }
 
-func TestGetUdp(t *testing.T) {
+func TestGetUDP(t *testing.T) {
 	p := newProtocols()
-	udp := p.GetUdp(1)
+	udp := p.GetUDP(1)
 	assert.Nil(t, udp)
 
-	udp = p.GetUdp(2)
+	udp = p.GetUDP(2)
 	assert.NotNil(t, udp)
 	assert.Contains(t, udp.GetPorts(), 5060)
 
-	udp = p.GetUdp(3)
+	udp = p.GetUDP(3)
 	assert.NotNil(t, udp)
 	assert.Contains(t, udp.GetPorts(), 53)
 }

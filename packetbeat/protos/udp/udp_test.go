@@ -40,11 +40,11 @@ func (p TestProtocols) BpfFilter(with_vlans bool, with_icmp bool) string {
 	return "mock bpf filter"
 }
 
-func (p TestProtocols) GetTcp(proto protos.Protocol) protos.TcpPlugin {
+func (p TestProtocols) GetTCP(proto protos.Protocol) protos.TcpPlugin {
 	return nil
 }
 
-func (p TestProtocols) GetUdp(proto protos.Protocol) protos.UdpPlugin {
+func (p TestProtocols) GetUDP(proto protos.Protocol) protos.UdpPlugin {
 	return p.udp[proto]
 }
 
@@ -52,11 +52,11 @@ func (p TestProtocols) GetAll() map[protos.Protocol]protos.Plugin {
 	return nil
 }
 
-func (p TestProtocols) GetAllTcp() map[protos.Protocol]protos.TcpPlugin {
+func (p TestProtocols) GetAllTCP() map[protos.Protocol]protos.TcpPlugin {
 	return nil
 }
 
-func (p TestProtocols) GetAllUdp() map[protos.Protocol]protos.UdpPlugin {
+func (p TestProtocols) GetAllUDP() map[protos.Protocol]protos.UdpPlugin {
 	return p.udp
 }
 

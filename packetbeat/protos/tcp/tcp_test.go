@@ -178,11 +178,11 @@ type protocols struct {
 var _ protos.Protocols = &protocols{}
 
 func (p protocols) BpfFilter(with_vlans bool, with_icmp bool) string     { return "" }
-func (p protocols) GetTcp(proto protos.Protocol) protos.TcpPlugin        { return p.tcp[proto] }
-func (p protocols) GetUdp(proto protos.Protocol) protos.UdpPlugin        { return nil }
+func (p protocols) GetTCP(proto protos.Protocol) protos.TcpPlugin        { return p.tcp[proto] }
+func (p protocols) GetUDP(proto protos.Protocol) protos.UdpPlugin        { return nil }
 func (p protocols) GetAll() map[protos.Protocol]protos.Plugin            { return nil }
-func (p protocols) GetAllTcp() map[protos.Protocol]protos.TcpPlugin      { return p.tcp }
-func (p protocols) GetAllUdp() map[protos.Protocol]protos.UdpPlugin      { return nil }
+func (p protocols) GetAllTCP() map[protos.Protocol]protos.TcpPlugin      { return p.tcp }
+func (p protocols) GetAllUDP() map[protos.Protocol]protos.UdpPlugin      { return nil }
 func (p protocols) Register(proto protos.Protocol, plugin protos.Plugin) { return }
 
 func TestTCSeqPayload(t *testing.T) {

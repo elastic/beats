@@ -47,7 +47,7 @@ func (udp *Udp) Process(id *flows.FlowID, pkt *protos.Packet) {
 		return
 	}
 
-	plugin := udp.protocols.GetUdp(protocol)
+	plugin := udp.protocols.GetUDP(protocol)
 	if plugin == nil {
 		logp.Debug("udp", "Ignoring protocol for which we have no module loaded: %s", protocol)
 		return
@@ -85,7 +85,7 @@ func buildPortsMap(plugins map[protos.Protocol]protos.UdpPlugin) (map[uint16]pro
 
 // NewUdp creates and returns a new Udp.
 func NewUdp(p protos.Protocols) (*Udp, error) {
-	portMap, err := buildPortsMap(p.GetAllUdp())
+	portMap, err := buildPortsMap(p.GetAllUDP())
 	if err != nil {
 		return nil, err
 	}

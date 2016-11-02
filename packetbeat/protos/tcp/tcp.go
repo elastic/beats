@@ -101,7 +101,7 @@ func (conn *TcpConnection) String() string {
 
 func (stream *TcpStream) addPacket(pkt *protos.Packet, tcphdr *layers.TCP) {
 	conn := stream.conn
-	mod := conn.tcp.protocols.GetTcp(conn.protocol)
+	mod := conn.tcp.protocols.GetTCP(conn.protocol)
 	if mod == nil {
 		if isDebug {
 			protocol := conn.protocol
@@ -122,7 +122,7 @@ func (stream *TcpStream) addPacket(pkt *protos.Packet, tcphdr *layers.TCP) {
 
 func (stream *TcpStream) gapInStream(nbytes int) (drop bool) {
 	conn := stream.conn
-	mod := conn.tcp.protocols.GetTcp(conn.protocol)
+	mod := conn.tcp.protocols.GetTCP(conn.protocol)
 	conn.data, drop = mod.GapInStream(&conn.tcptuple, stream.dir, nbytes, conn.data)
 	return drop
 }
@@ -224,7 +224,7 @@ func (tcp *Tcp) getStream(pkt *protos.Packet) (stream TcpStream, created bool) {
 	}
 
 	var timeout time.Duration
-	mod := tcp.protocols.GetTcp(protocol)
+	mod := tcp.protocols.GetTCP(protocol)
 	if mod != nil {
 		timeout = mod.ConnectionTimeout()
 	}
@@ -290,7 +290,7 @@ func buildPortsMap(plugins map[protos.Protocol]protos.TcpPlugin) (map[uint16]pro
 func NewTcp(p protos.Protocols) (*Tcp, error) {
 	isDebug = logp.IsDebug("tcp")
 
-	portMap, err := buildPortsMap(p.GetAllTcp())
+	portMap, err := buildPortsMap(p.GetAllTCP())
 	if err != nil {
 		return nil, err
 	}
