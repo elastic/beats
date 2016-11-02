@@ -189,10 +189,10 @@ func (pb *Packetbeat) Stop() {
 func (pb *Packetbeat) setupSniffer() error {
 	config := &pb.Config
 
-	withVlans := config.Interfaces.With_vlans
+	withVlans := config.Interfaces.WithVlans
 	withICMP := config.Protocols["icmp"].Enabled()
 
-	filter := config.Interfaces.Bpf_filter
+	filter := config.Interfaces.BpfFilter
 	if filter == "" && !config.Flows.IsEnabled() {
 		filter = protos.Protos.BpfFilter(withVlans, withICMP)
 	}

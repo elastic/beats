@@ -180,12 +180,12 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.pcapHandle)
 
 	case "af_packet":
-		if sniffer.config.Buffer_size_mb == 0 {
-			sniffer.config.Buffer_size_mb = 24
+		if sniffer.config.BufferSizeMb == 0 {
+			sniffer.config.BufferSizeMb = 24
 		}
 
 		frame_size, block_size, num_blocks, err := afpacketComputeSize(
-			sniffer.config.Buffer_size_mb,
+			sniffer.config.BufferSizeMb,
 			sniffer.config.Snaplen,
 			os.Getpagesize())
 		if err != nil {
