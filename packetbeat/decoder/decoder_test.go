@@ -35,26 +35,26 @@ func (l *TestIcmp6Processor) ProcessICMPv6(id *flows.FlowID, icmp6 *layers.ICMPv
 	l.pkt = pkt
 }
 
-type TestTcpProcessor struct {
+type TestTCPProcessor struct {
 	tcphdr *layers.TCP
 	pkt    *protos.Packet
 }
 
-func (l *TestTcpProcessor) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet) {
+func (l *TestTCPProcessor) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet) {
 	l.tcphdr = tcphdr
 	l.pkt = pkt
 }
 
-type TestUdpProcessor struct {
+type TestUDPProcessor struct {
 	pkt *protos.Packet
 }
 
-func (l *TestUdpProcessor) Process(id *flows.FlowID, pkt *protos.Packet) {
+func (l *TestUDPProcessor) Process(id *flows.FlowID, pkt *protos.Packet) {
 	l.pkt = pkt
 }
 
 // 172.16.16.164:1108 172.16.16.139:53 DNS 87  Standard query 0x0007  AXFR contoso.local
-var ipv4TcpDns = []byte{
+var ipv4TcpDNS = []byte{
 	0x00, 0x0c, 0x29, 0xce, 0xd1, 0x9e, 0x00, 0x0c, 0x29, 0x7e, 0xec, 0xa4, 0x08, 0x00, 0x45, 0x00,
 	0x00, 0x49, 0x46, 0x54, 0x40, 0x00, 0x80, 0x06, 0x3b, 0x0b, 0xac, 0x10, 0x10, 0xa4, 0xac, 0x10,
 	0x10, 0x8b, 0x04, 0x54, 0x00, 0x35, 0x5d, 0x9f, 0x0c, 0x90, 0x1a, 0xef, 0x6f, 0x43, 0x50, 0x18,
@@ -69,7 +69,7 @@ func TestDecodePacketData_ipv4Tcp(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"decoder"})
 	}
 
-	p := gopacket.NewPacket(ipv4TcpDns, layers.LinkTypeEthernet, gopacket.Default)
+	p := gopacket.NewPacket(ipv4TcpDNS, layers.LinkTypeEthernet, gopacket.Default)
 	if p.ErrorLayer() != nil {
 		t.Error("Failed to decode packet:", p.ErrorLayer().Error())
 	}
@@ -85,7 +85,7 @@ func TestDecodePacketData_ipv4Tcp(t *testing.T) {
 }
 
 // 192.168.170.8:32795 192.168.170.20:53  DNS 74  Standard query 0x75c0  A www.netbsd.org
-var ipv4UdpDns = []byte{
+var ipv4UdpDNS = []byte{
 	0x00, 0xc0, 0x9f, 0x32, 0x41, 0x8c, 0x00, 0xe0, 0x18, 0xb1, 0x0c, 0xad, 0x08, 0x00, 0x45, 0x00,
 	0x00, 0x3c, 0x00, 0x00, 0x40, 0x00, 0x40, 0x11, 0x65, 0x43, 0xc0, 0xa8, 0xaa, 0x08, 0xc0, 0xa8,
 	0xaa, 0x14, 0x80, 0x1b, 0x00, 0x35, 0x00, 0x28, 0xaf, 0x61, 0x75, 0xc0, 0x01, 0x00, 0x00, 0x01,
@@ -95,7 +95,7 @@ var ipv4UdpDns = []byte{
 
 // Test that DecodePacket decodes and IPv4/UDP packet and invokes the UDP processor.
 func TestDecodePacketData_ipv4Udp(t *testing.T) {
-	p := gopacket.NewPacket(ipv4UdpDns, layers.LinkTypeEthernet, gopacket.Default)
+	p := gopacket.NewPacket(ipv4UdpDNS, layers.LinkTypeEthernet, gopacket.Default)
 	if p.ErrorLayer() != nil {
 		t.Error("Failed to decode packet:", p.ErrorLayer().Error())
 	}
@@ -111,7 +111,7 @@ func TestDecodePacketData_ipv4Udp(t *testing.T) {
 }
 
 // IP6 2001:6f8:102d::2d0:9ff:fee3:e8de.59201 > 2001:6f8:900:7c0::2.80
-var ipv6TcpHttpGet = []byte{
+var ipv6TcpHTTPGet = []byte{
 	0x00, 0x11, 0x25, 0x82, 0x95, 0xb5, 0x00, 0xd0, 0x09, 0xe3, 0xe8, 0xde, 0x86, 0xdd, 0x60, 0x00,
 	0x00, 0x00, 0x01, 0x04, 0x06, 0x40, 0x20, 0x01, 0x06, 0xf8, 0x10, 0x2d, 0x00, 0x00, 0x02, 0xd0,
 	0x09, 0xff, 0xfe, 0xe3, 0xe8, 0xde, 0x20, 0x01, 0x06, 0xf8, 0x09, 0x00, 0x07, 0xc0, 0x00, 0x00,
@@ -136,7 +136,7 @@ var ipv6TcpHttpGet = []byte{
 
 // Test that DecodePacket decodes and IPv6/TCP packet and invokes the TCP processor.
 func TestDecodePacketData_ipv6Tcp(t *testing.T) {
-	p := gopacket.NewPacket(ipv6TcpHttpGet, layers.LinkTypeEthernet, gopacket.Default)
+	p := gopacket.NewPacket(ipv6TcpHTTPGet, layers.LinkTypeEthernet, gopacket.Default)
 	if p.ErrorLayer() != nil {
 		t.Error("Failed to decode packet: ", p.ErrorLayer().Error())
 	}
@@ -152,7 +152,7 @@ func TestDecodePacketData_ipv6Tcp(t *testing.T) {
 }
 
 // 3ffe:507:0:1:200:86ff:fe05:80da.2415 > 3ffe:501:4819::42.53
-var ipv6UdpDns = []byte{
+var ipv6UdpDNS = []byte{
 	0x00, 0x60, 0x97, 0x07, 0x69, 0xea, 0x00, 0x00, 0x86, 0x05, 0x80, 0xda, 0x86, 0xdd, 0x60, 0x00,
 	0x00, 0x00, 0x00, 0x61, 0x11, 0x40, 0x3f, 0xfe, 0x05, 0x07, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00,
 	0x86, 0xff, 0xfe, 0x05, 0x80, 0xda, 0x3f, 0xfe, 0x05, 0x01, 0x48, 0x19, 0x00, 0x00, 0x00, 0x00,
@@ -167,7 +167,7 @@ var ipv6UdpDns = []byte{
 
 // Test that DecodePacket decodes and IPv6/UDP packet and invokes the UDP processor.
 func TestDecodePacketData_ipv6Udp(t *testing.T) {
-	p := gopacket.NewPacket(ipv6UdpDns, layers.LinkTypeEthernet, gopacket.Default)
+	p := gopacket.NewPacket(ipv6UdpDNS, layers.LinkTypeEthernet, gopacket.Default)
 	if p.ErrorLayer() != nil {
 		t.Error("Failed to decode packet:", p.ErrorLayer().Error())
 	}
@@ -183,11 +183,11 @@ func TestDecodePacketData_ipv6Udp(t *testing.T) {
 }
 
 // Creates a new TestDecoder that handles ethernet packets.
-func newTestDecoder(t *testing.T) (*DecoderStruct, *TestTcpProcessor, *TestUdpProcessor) {
+func newTestDecoder(t *testing.T) (*DecoderStruct, *TestTCPProcessor, *TestUDPProcessor) {
 	icmp4Layer := &TestIcmp4Processor{}
 	icmp6Layer := &TestIcmp6Processor{}
-	tcpLayer := &TestTcpProcessor{}
-	udpLayer := &TestUdpProcessor{}
+	tcpLayer := &TestTCPProcessor{}
+	udpLayer := &TestUDPProcessor{}
 	d, err := NewDecoder(nil, layers.LinkTypeEthernet, icmp4Layer, icmp6Layer, tcpLayer, udpLayer)
 	if err != nil {
 		t.Fatalf("Error creating decoder %v", err)
