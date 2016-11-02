@@ -16,77 +16,77 @@ type TestProtocol struct {
 	Ports []int
 }
 
-type TcpProtocol TestProtocol
+type TCPProtocol TestProtocol
 
-func (proto *TcpProtocol) Init(test_mode bool, results publish.Transactions) error {
+func (proto *TCPProtocol) Init(testMode bool, results publish.Transactions) error {
 	return nil
 }
 
-func (proto *TcpProtocol) GetPorts() []int {
+func (proto *TCPProtocol) GetPorts() []int {
 	return proto.Ports
 }
 
-func (proto *TcpProtocol) Parse(pkt *Packet, tcptuple *common.TCPTuple,
+func (proto *TCPProtocol) Parse(pkt *Packet, tcptuple *common.TCPTuple,
 	dir uint8, private ProtocolData) ProtocolData {
 	return private
 }
 
-func (proto *TcpProtocol) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
+func (proto *TCPProtocol) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private ProtocolData) ProtocolData {
 	return private
 }
 
-func (proto *TcpProtocol) GapInStream(tcptuple *common.TCPTuple, dir uint8,
+func (proto *TCPProtocol) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private ProtocolData) (priv ProtocolData, drop bool) {
 	return private, true
 }
 
-func (proto *TcpProtocol) ConnectionTimeout() time.Duration { return 0 }
+func (proto *TCPProtocol) ConnectionTimeout() time.Duration { return 0 }
 
-type UdpProtocol TestProtocol
+type UDPProtocol TestProtocol
 
-func (proto *UdpProtocol) Init(test_mode bool, results publish.Transactions) error {
+func (proto *UDPProtocol) Init(testMode bool, results publish.Transactions) error {
 	return nil
 }
 
-func (proto *UdpProtocol) GetPorts() []int {
+func (proto *UDPProtocol) GetPorts() []int {
 	return proto.Ports
 }
 
-func (proto *UdpProtocol) ParseUDP(pkt *Packet) {
+func (proto *UDPProtocol) ParseUDP(pkt *Packet) {
 	return
 }
 
-type TcpUdpProtocol TestProtocol
+type TCPUDPProtocol TestProtocol
 
-func (proto *TcpUdpProtocol) Init(test_mode bool, results publish.Transactions) error {
+func (proto *TCPUDPProtocol) Init(testMode bool, results publish.Transactions) error {
 	return nil
 }
 
-func (proto *TcpUdpProtocol) GetPorts() []int {
+func (proto *TCPUDPProtocol) GetPorts() []int {
 	return proto.Ports
 }
 
-func (proto *TcpUdpProtocol) Parse(pkt *Packet, tcptuple *common.TCPTuple,
+func (proto *TCPUDPProtocol) Parse(pkt *Packet, tcptuple *common.TCPTuple,
 	dir uint8, private ProtocolData) ProtocolData {
 	return private
 }
 
-func (proto *TcpUdpProtocol) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
+func (proto *TCPUDPProtocol) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private ProtocolData) ProtocolData {
 	return private
 }
 
-func (proto *TcpUdpProtocol) GapInStream(tcptuple *common.TCPTuple, dir uint8,
+func (proto *TCPUDPProtocol) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private ProtocolData) (priv ProtocolData, drop bool) {
 	return private, true
 }
 
-func (proto *TcpUdpProtocol) ParseUDP(pkt *Packet) {
+func (proto *TCPUDPProtocol) ParseUDP(pkt *Packet) {
 	return
 }
 
-func (proto *TcpUdpProtocol) ConnectionTimeout() time.Duration { return 0 }
+func (proto *TCPUDPProtocol) ConnectionTimeout() time.Duration { return 0 }
 
 func TestProtocolNames(t *testing.T) {
 	assert.Equal(t, "unknown", UnknownProtocol.String())
@@ -99,13 +99,13 @@ func newProtocols() Protocols {
 	p.tcp = make(map[Protocol]TCPPlugin)
 	p.udp = make(map[Protocol]UDPPlugin)
 
-	tcp := &TcpProtocol{Ports: []int{80}}
-	udp := &UdpProtocol{Ports: []int{5060}}
-	tcpUdp := &TcpUdpProtocol{Ports: []int{53}}
+	tcp := &TCPProtocol{Ports: []int{80}}
+	udp := &UDPProtocol{Ports: []int{5060}}
+	tcpUDP := &TCPUDPProtocol{Ports: []int{53}}
 
 	p.register(1, tcp)
 	p.register(2, udp)
-	p.register(3, tcpUdp)
+	p.register(3, tcpUDP)
 	return p
 }
 
