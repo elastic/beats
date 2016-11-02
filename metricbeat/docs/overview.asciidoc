@@ -14,6 +14,7 @@ and the following services:
   * <<metricbeat-module-mongodb,MongoDB>>
   * <<metricbeat-module-mysql,MySQL>>
   * <<metricbeat-module-nginx,Nginx>>
+  * <<metricbeat-module-postgresql,PostgreSQL>>
   * <<metricbeat-module-redis,Redis>>
   * <<metricbeat-module-system,System>>
   * <<metricbeat-module-zookeeper,Zookeeper>>
