@@ -112,7 +112,7 @@ func makePublish(
 	conn redis.Conn,
 	key outil.Selector,
 	dt redisDataType,
-    format *fmtstr.EventFormatString,
+	format *fmtstr.EventFormatString,
 ) (publishFn, error) {
 	if dt == redisChannelType {
 		return makePublishPUBLISH(conn, format)
@@ -167,7 +167,7 @@ func makePublishRPUSH(conn redis.Conn, key outil.Selector, format *fmtstr.EventF
 	return publishEventsPipeline(conn, "RPUSH", format), nil
 }
 
-func makePublishPUBLISH(conn redis.Conn, format *fmtstr.EventFormatString ) (publishFn, error) {
+func makePublishPUBLISH(conn redis.Conn, format *fmtstr.EventFormatString) (publishFn, error) {
 	return publishEventsPipeline(conn, "PUBLISH", format), nil
 }
 
@@ -194,7 +194,7 @@ func publishEventsBulk(conn redis.Conn, key outil.Selector, command string, form
 	}
 }
 
-func publishEventsPipeline(conn redis.Conn, command string, format *fmtstr.EventFormatString ) publishFn {
+func publishEventsPipeline(conn redis.Conn, command string, format *fmtstr.EventFormatString) publishFn {
 	return func(key outil.Selector, data []outputs.Data) ([]outputs.Data, error) {
 		var okEvents []outputs.Data
 		serialized := make([]interface{}, 0, len(data))
@@ -249,28 +249,28 @@ func serializeEvents(
 	to []interface{},
 	i int,
 	data []outputs.Data,
-    format *fmtstr.EventFormatString,
+	format *fmtstr.EventFormatString,
 ) ([]outputs.Data, []interface{}) {
-    var serializedEvent []byte
-    var err error
+	var serializedEvent []byte
+	var err error
 
 	succeeded := data
 	for _, d := range data {
-        if (format != nil){
-            formattedEvent, err := format.Run(d.Event)
-            if err != nil {
-                logp.Err("Fail to format event (%v): %#v", err, formattedEvent)
-                goto failLoop
-            }
-            serializedEvent = []byte(formattedEvent)
-        }else {
-            serializedEvent, err = json.Marshal(d.Event)
-            if err != nil {
-                logp.Err("Failed to convert the event to JSON (%v): %#v", err, d.Event)
-                goto failLoop
-            }
+		if format != nil {
+			formattedEvent, err := format.Run(d.Event)
+			if err != nil {
+				logp.Err("Fail to format event (%v): %#v", err, formattedEvent)
+				goto failLoop
+			}
+			serializedEvent = []byte(formattedEvent)
+		} else {
+			serializedEvent, err = json.Marshal(d.Event)
+			if err != nil {
+				logp.Err("Failed to convert the event to JSON (%v): %#v", err, d.Event)
+				goto failLoop
+			}
 
-        }
+		}
 		to = append(to, serializedEvent)
 		i++
 	}

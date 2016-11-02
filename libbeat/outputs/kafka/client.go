@@ -149,21 +149,21 @@ func (c *client) getEventMessage(data *outputs.Data) (*message, error) {
 	}
 	msg.topic = topic
 
-    var serializedEvent []byte
+	var serializedEvent []byte
 
-    if c.format != nil {
-        formattedEvent, err := c.format.Run(event)
-        if err != nil {
-            return nil, fmt.Errorf("Fail to format event (%v): %#v", err, event)
-        }
-        serializedEvent = []byte(formattedEvent)
-    }else {
-        jsonEvent, err := json.Marshal(event)
-        if err != nil {
-            return nil, fmt.Errorf("json encoding failed with %v", err)
-        }
-        serializedEvent = jsonEvent
-    }
+	if c.format != nil {
+		formattedEvent, err := c.format.Run(event)
+		if err != nil {
+			return nil, fmt.Errorf("Fail to format event (%v): %#v", err, event)
+		}
+		serializedEvent = []byte(formattedEvent)
+	} else {
+		jsonEvent, err := json.Marshal(event)
+		if err != nil {
+			return nil, fmt.Errorf("json encoding failed with %v", err)
+		}
+		serializedEvent = jsonEvent
+	}
 
 	msg.value = serializedEvent
 

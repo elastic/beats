@@ -10,10 +10,10 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
-    "github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
 const (
@@ -221,18 +221,18 @@ func TestPublishChannelTLS(t *testing.T) {
 }
 
 func TestPublishChannelTCPWithFormatting(t *testing.T) {
-    db := 0
-    key := "test_pubchan_tcp"
-    redisConfig := map[string]interface{}{
-        "hosts":    []string{getRedisAddr()},
-        "key":      key,
-        "db":       db,
-        "datatype": "channel",
-        "timeout":  "5s",
-        "format": "%{[message]} bla",
-    }
+	db := 0
+	key := "test_pubchan_tcp"
+	redisConfig := map[string]interface{}{
+		"hosts":    []string{getRedisAddr()},
+		"key":      key,
+		"db":       db,
+		"datatype": "channel",
+		"timeout":  "5s",
+		"format":   "%{[message]} bla",
+	}
 
-    testPublishChannel(t, redisConfig)
+	testPublishChannel(t, redisConfig)
 }
 
 func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
@@ -298,17 +298,17 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 	assert.Equal(t, total, len(messages))
 	for i, raw := range messages {
 		evt := struct{ Message int }{}
-        if cfg["format"] != nil {
-            fmtString := fmtstr.MustCompileEvent(cfg["format"].(string))
-            expectedMessage, _ := fmtString.Run(createEvent(i+1))
+		if cfg["format"] != nil {
+			fmtString := fmtstr.MustCompileEvent(cfg["format"].(string))
+			expectedMessage, _ := fmtString.Run(createEvent(i + 1))
 
-            assert.NoError(t, err)
-            assert.Equal(t, string(expectedMessage), string(raw))
-        }else {
-            err = json.Unmarshal(raw, &evt)
-            assert.NoError(t, err)
-            assert.Equal(t, i+1, evt.Message)
-        }
+			assert.NoError(t, err)
+			assert.Equal(t, string(expectedMessage), string(raw))
+		} else {
+			err = json.Unmarshal(raw, &evt)
+			assert.NoError(t, err)
+			assert.Equal(t, i+1, evt.Message)
+		}
 	}
 }
 
@@ -376,6 +376,6 @@ func sendTestEvents(out *redisOut, batches, N int) error {
 	return nil
 }
 
-func createEvent(message int) common.MapStr{
-    return common.MapStr{"message": message}
+func createEvent(message int) common.MapStr {
+	return common.MapStr{"message": message}
 }

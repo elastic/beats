@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
-    "github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
 // capture stdout and return captured string
@@ -71,10 +71,10 @@ func TestConsoleOneEventIndented(t *testing.T) {
 }
 
 func TestConsoleOneEventFormatted(t *testing.T) {
-    lines, err := run(false, fmtstr.MustCompileEvent("%{[event]}"), event("event", "myevent"))
-    assert.Nil(t, err)
-    expected := "myevent\n"
-    assert.Equal(t, expected, lines)
+	lines, err := run(false, fmtstr.MustCompileEvent("%{[event]}"), event("event", "myevent"))
+	assert.Nil(t, err)
+	expected := "myevent\n"
+	assert.Equal(t, expected, lines)
 }
 
 func TestConsoleMultipleEvents(t *testing.T) {

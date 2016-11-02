@@ -13,12 +13,11 @@ import (
 
 	"github.com/Shopify/sarama"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode/modetest"
 	"github.com/stretchr/testify/assert"
-    "github.com/elastic/beats/libbeat/common/fmtstr"
-
 )
 
 const (
@@ -67,20 +66,20 @@ func TestKafkaPublish(t *testing.T) {
 				"message":    id,
 			}),
 		},
-        {
-            "publish single event with formating to test topic",
-            map[string]interface{}{
-                "format": "%{[message]}",
-            },
-            testTopic,
-            single(common.MapStr{
-                "@timestamp": common.Time(time.Now()),
-                "host":       "test-host",
-                "type":       "log",
-                "message":    id,
-            }),
-        },
-        {
+		{
+			"publish single event with formating to test topic",
+			map[string]interface{}{
+				"format": "%{[message]}",
+			},
+			testTopic,
+			single(common.MapStr{
+				"@timestamp": common.Time(time.Now()),
+				"host":       "test-host",
+				"type":       "log",
+				"message":    id,
+			}),
+		},
+		{
 			"batch publish to test topic",
 			nil,
 			testTopic,
@@ -215,24 +214,24 @@ func TestKafkaPublish(t *testing.T) {
 			}
 
 			for i, d := range expected {
-                if test.config["format"] != nil {
-                    fmtString := fmtstr.MustCompileEvent(test.config["format"].(string))
-                    expectedMessage, _ := fmtString.Run(d.Event)
-                    assert.Equal(t, string(expectedMessage), string(stored[i].Value))
-                }else {
+				if test.config["format"] != nil {
+					fmtString := fmtstr.MustCompileEvent(test.config["format"].(string))
+					expectedMessage, _ := fmtString.Run(d.Event)
+					assert.Equal(t, string(expectedMessage), string(stored[i].Value))
+				} else {
 
-                    var decoded map[string]interface{}
-                    err := json.Unmarshal(stored[i].Value, &decoded)
-                    if err != nil {
-                        t.Errorf("can not json decode event value: %v", stored[i].Value)
-                        return
-                    }
-                    event := d.Event
+					var decoded map[string]interface{}
+					err := json.Unmarshal(stored[i].Value, &decoded)
+					if err != nil {
+						t.Errorf("can not json decode event value: %v", stored[i].Value)
+						return
+					}
+					event := d.Event
 
-                    assert.Equal(t, decoded["type"], event["type"])
-                    assert.Equal(t, decoded["message"], event["message"])
+					assert.Equal(t, decoded["type"], event["type"])
+					assert.Equal(t, decoded["message"], event["message"])
 
-                }
+				}
 			}
 		}()
 	}

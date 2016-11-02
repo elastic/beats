@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
-    "github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
 func init() {
@@ -17,7 +17,7 @@ func init() {
 type fileOutput struct {
 	beatName string
 	rotator  logp.FileRotator
-    format        *fmtstr.EventFormatString
+	format   *fmtstr.EventFormatString
 }
 
 // New instantiates a new file output instance.
@@ -45,8 +45,8 @@ func (out *fileOutput) init(config config) error {
 		out.rotator.Name = out.beatName
 	}
 
-    out.format = config.Format
-    logp.Info("File output path set to: %v", out.rotator.Path)
+	out.format = config.Format
+	logp.Info("File output path set to: %v", out.rotator.Path)
 	logp.Info("File output base filename set to: %v", out.rotator.Name)
 
 	rotateeverybytes := uint64(config.RotateEveryKb) * 1024
@@ -80,28 +80,28 @@ func (out *fileOutput) PublishEvent(
 	opts outputs.Options,
 	data outputs.Data,
 ) error {
-    var serializedEvent []byte
-    var err error
+	var serializedEvent []byte
+	var err error
 
-    if out.format != nil {
-        formattedEvent, err := out.format.Run(data.Event)
-        if err != nil {
-            logp.Err("Fail to format event (%v): %#v", err, data.Event)
-            op.SigCompleted(sig)
-            return err
-        }
-        serializedEvent = []byte(formattedEvent)
+	if out.format != nil {
+		formattedEvent, err := out.format.Run(data.Event)
+		if err != nil {
+			logp.Err("Fail to format event (%v): %#v", err, data.Event)
+			op.SigCompleted(sig)
+			return err
+		}
+		serializedEvent = []byte(formattedEvent)
 
-    }else {
-        serializedEvent, err = json.Marshal(data.Event)
-        if err != nil {
-            // mark as success so event is not sent again.
-            op.SigCompleted(sig)
+	} else {
+		serializedEvent, err = json.Marshal(data.Event)
+		if err != nil {
+			// mark as success so event is not sent again.
+			op.SigCompleted(sig)
 
-            logp.Err("Fail to json encode event(%v): %#v", err, data.Event)
-            return err
-        }
-    }
+			logp.Err("Fail to json encode event(%v): %#v", err, data.Event)
+			return err
+		}
+	}
 
 	err = out.rotator.WriteLine(serializedEvent)
 	if err != nil {
