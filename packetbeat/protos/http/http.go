@@ -461,7 +461,7 @@ func (http *HTTP) newTransaction(requ, resp *message) common.MapStr {
 		Port: requ.TCPTuple.DstPort,
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
-	if requ.Direction == tcp.TcpDirectionReverse {
+	if requ.Direction == tcp.TCPDirectionReverse {
 		src, dst = dst, src
 	}
 

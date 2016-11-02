@@ -231,7 +231,7 @@ func (pgsql *Pgsql) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 		// concatenate bytes
 		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
 		logp.Debug("pgsqldetailed", "Len data: %d cap data: %d", len(priv.Data[dir].data), cap(priv.Data[dir].data))
-		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
+		if len(priv.Data[dir].data) > tcp.TCPMaxDataInStream {
 			debugf("Stream data too large, dropping TCP stream")
 			priv.Data[dir] = nil
 			return priv
@@ -393,7 +393,7 @@ func (pgsql *Pgsql) receivedPgsqlRequest(msg *PgsqlMessage) {
 			Port: msg.TCPTuple.DstPort,
 			Proc: string(msg.CmdlineTuple.Dst),
 		}
-		if msg.Direction == tcp.TcpDirectionReverse {
+		if msg.Direction == tcp.TCPDirectionReverse {
 			trans.Src, trans.Dst = trans.Dst, trans.Src
 		}
 

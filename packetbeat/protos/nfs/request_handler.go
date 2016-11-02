@@ -54,7 +54,7 @@ func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 
 	// The direction of the stream is based in the direction of first packet seen.
 	// if we have stored stream in reverse order, swap src and dst
-	if dir == tcp.TcpDirectionReverse {
+	if dir == tcp.TCPDirectionReverse {
 		src, dst = dst, src
 	}
 
@@ -127,7 +127,7 @@ func (rpc *Rpc) handleReply(xid string, xdr *Xdr, ts time.Time, tcptuple *common
 
 	// xid+src ip is used to uniquely identify request.
 	var reqId string
-	if dir == tcp.TcpDirectionReverse {
+	if dir == tcp.TCPDirectionReverse {
 		// stream in correct order: Src points to a client
 		reqId = xid + tcptuple.SrcIP.String()
 	} else {

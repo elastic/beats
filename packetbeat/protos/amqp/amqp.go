@@ -195,7 +195,7 @@ func (amqp *Amqp) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	} else {
 		// concatenate databytes
 		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
-		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
+		if len(priv.Data[dir].data) > tcp.TCPMaxDataInStream {
 			debugf("Stream data too large, dropping TCP stream")
 			priv.Data[dir] = nil
 			return priv
@@ -263,7 +263,7 @@ func (amqp *Amqp) handleAmqpRequest(msg *AmqpMessage) {
 		Port: msg.TCPTuple.DstPort,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
-	if msg.Direction == tcp.TcpDirectionReverse {
+	if msg.Direction == tcp.TCPDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
 

@@ -23,6 +23,6 @@ var (
 		ProtocolCommon: config.ProtocolCommon{
 			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
-		MaxMessageSize: tcp.TCP_MAX_DATA_IN_STREAM,
+		MaxMessageSize: tcp.TCPMaxDataInStream,
 	}
 )

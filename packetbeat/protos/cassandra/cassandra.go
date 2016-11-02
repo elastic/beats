@@ -76,7 +76,7 @@ func (cassandra *cassandra) setFromConfig(config *cassandraConfig) error {
 
 	// set parser configuration
 	parser := &cassandra.parserConfig
-	parser.maxBytes = tcp.TCP_MAX_DATA_IN_STREAM
+	parser.maxBytes = tcp.TCPMaxDataInStream
 
 	// set parser's compressor, only `snappy` supported right now
 	if config.Compressor == Snappy {

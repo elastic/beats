@@ -190,7 +190,7 @@ func (rpc *Rpc) handleRpcFragment(
 	} else {
 		// concatenate bytes
 		st.rawData = append(st.rawData, pkt.Payload...)
-		if len(st.rawData) > tcp.TCP_MAX_DATA_IN_STREAM {
+		if len(st.rawData) > tcp.TCPMaxDataInStream {
 			debugf("Stream data too large, dropping TCP stream")
 			conn.Streams[dir] = nil
 			return conn

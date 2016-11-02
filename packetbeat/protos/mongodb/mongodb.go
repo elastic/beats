@@ -146,7 +146,7 @@ func (mongodb *Mongodb) doParse(
 	} else {
 		// concatenate bytes
 		st.data = append(st.data, pkt.Payload...)
-		if len(st.data) > tcp.TCP_MAX_DATA_IN_STREAM {
+		if len(st.data) > tcp.TCPMaxDataInStream {
 			debugf("Stream data too large, dropping TCP stream")
 			conn.Streams[dir] = nil
 			return conn
@@ -283,7 +283,7 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 			Port: requ.TCPTuple.DstPort,
 			Proc: string(requ.CmdlineTuple.Dst),
 		}
-		if requ.Direction == tcp.TcpDirectionReverse {
+		if requ.Direction == tcp.TCPDirectionReverse {
 			trans.Src, trans.Dst = trans.Dst, trans.Src
 		}
 		trans.params = requ.params

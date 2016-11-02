@@ -225,7 +225,7 @@ func (pb *Packetbeat) createWorker(dl layers.LinkType) (sniffer.Worker, error) {
 		icmp6 = icmp
 	}
 
-	tcp, err := tcp.NewTcp(&protos.Protos)
+	tcp, err := tcp.NewTCP(&protos.Protos)
 	if err != nil {
 		return nil, err
 	}

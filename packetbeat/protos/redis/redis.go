@@ -208,7 +208,7 @@ func newStream(ts time.Time, tcptuple *common.TCPTuple) *stream {
 		tcptuple: tcptuple,
 	}
 	s.parser.message = newMessage(ts)
-	s.Stream.Init(tcp.TCP_MAX_DATA_IN_STREAM)
+	s.Stream.Init(tcp.TCPMaxDataInStream)
 	return s
 }
 
@@ -284,7 +284,7 @@ func (redis *Redis) newTransaction(requ, resp *redisMessage) common.MapStr {
 		Port: requ.TCPTuple.DstPort,
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
-	if requ.Direction == tcp.TcpDirectionReverse {
+	if requ.Direction == tcp.TCPDirectionReverse {
 		src, dst = dst, src
 	}
 

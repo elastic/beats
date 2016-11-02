@@ -84,7 +84,7 @@ func (dns *Dns) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTuple *c
 		}
 
 		stream.rawData = append(stream.rawData, payload...)
-		if len(stream.rawData) > tcp.TCP_MAX_DATA_IN_STREAM {
+		if len(stream.rawData) > tcp.TCPMaxDataInStream {
 			debugf("Stream data too large, dropping DNS stream")
 			conn.Data[dir] = nil
 			return conn
@@ -99,7 +99,7 @@ func (dns *Dns) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTuple *c
 			return conn
 		}
 
-		if dir == tcp.TcpDirectionReverse {
+		if dir == tcp.TCPDirectionReverse {
 			dns.publishResponseError(conn, err)
 		}
 
@@ -173,7 +173,7 @@ func (dns *Dns) ReceivedFin(tcpTuple *common.TCPTuple, dir uint8, private protos
 		return conn
 	}
 
-	if dir == tcp.TcpDirectionReverse {
+	if dir == tcp.TCPDirectionReverse {
 		dns.publishResponseError(conn, err)
 	}
 
@@ -204,7 +204,7 @@ func (dns *Dns) GapInStream(tcpTuple *common.TCPTuple, dir uint8, nbytes int, pr
 		return private, true
 	}
 
-	if dir == tcp.TcpDirectionReverse {
+	if dir == tcp.TCPDirectionReverse {
 		dns.publishResponseError(conn, err)
 	}
 
@@ -219,8 +219,8 @@ func (dns *Dns) GapInStream(tcpTuple *common.TCPTuple, dir uint8, nbytes int, pr
 // Add Notes to the transaction about a failure in the response
 // Publish and remove the transaction
 func (dns *Dns) publishResponseError(conn *dnsConnectionData, err error) {
-	streamOrigin := conn.Data[tcp.TcpDirectionOriginal]
-	streamReverse := conn.Data[tcp.TcpDirectionReverse]
+	streamOrigin := conn.Data[tcp.TCPDirectionOriginal]
+	streamReverse := conn.Data[tcp.TCPDirectionReverse]
 
 	if streamOrigin == nil || conn.prevRequest == nil || streamReverse == nil {
 		return

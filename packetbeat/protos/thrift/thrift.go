@@ -929,7 +929,7 @@ func (thrift *Thrift) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple, dir u
 		}
 		// concatenate bytes
 		stream.data = append(stream.data, pkt.Payload...)
-		if len(stream.data) > tcp.TCP_MAX_DATA_IN_STREAM {
+		if len(stream.data) > tcp.TCPMaxDataInStream {
 			logp.Debug("thrift", "Stream data too large, dropping TCP stream")
 			priv.Data[dir] = nil
 			return priv
@@ -1002,7 +1002,7 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 		Port: msg.TCPTuple.DstPort,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
-	if msg.Direction == tcp.TcpDirectionReverse {
+	if msg.Direction == tcp.TCPDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
 
