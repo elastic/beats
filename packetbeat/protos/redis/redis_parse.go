@@ -17,7 +17,7 @@ type parser struct {
 type redisMessage struct {
 	Ts time.Time
 
-	TcpTuple     common.TCPTuple
+	TCPTuple     common.TCPTuple
 	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
 
@@ -33,8 +33,8 @@ type redisMessage struct {
 
 const (
 	START = iota
-	BULK_ARRAY
-	SIMPLE_MESSAGE
+	BulkArray
+	SimpleMessage
 )
 
 var (

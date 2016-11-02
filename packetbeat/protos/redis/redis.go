@@ -222,7 +222,7 @@ func (redis *Redis) handleRedis(
 	tcptuple *common.TCPTuple,
 	dir uint8,
 ) {
-	m.TcpTuple = *tcptuple
+	m.TCPTuple = *tcptuple
 	m.Direction = dir
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 
@@ -275,13 +275,13 @@ func (redis *Redis) newTransaction(requ, resp *redisMessage) common.MapStr {
 	}
 
 	src := &common.Endpoint{
-		IP:   requ.TcpTuple.SrcIP.String(),
-		Port: requ.TcpTuple.SrcPort,
+		IP:   requ.TCPTuple.SrcIP.String(),
+		Port: requ.TCPTuple.SrcPort,
 		Proc: string(requ.CmdlineTuple.Src),
 	}
 	dst := &common.Endpoint{
-		IP:   requ.TcpTuple.DstIP.String(),
-		Port: requ.TcpTuple.DstPort,
+		IP:   requ.TCPTuple.DstIP.String(),
+		Port: requ.TCPTuple.DstPort,
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
 	if requ.Direction == tcp.TcpDirectionReverse {
