@@ -418,7 +418,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 						// only send up to here, but read until the end
 						m.end = s.parseOffset
 					}
-					m.NumberOfRows += 1
+					m.NumberOfRows++
 					// go to next row
 				}
 			} else {

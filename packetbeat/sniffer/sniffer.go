@@ -325,7 +325,7 @@ func (sniffer *SnifferSetup) Run() error {
 
 		if err == io.EOF {
 			logp.Debug("sniffer", "End of file")
-			loopCount += 1
+			loopCount++
 			if sniffer.config.Loop > 0 && loopCount > sniffer.config.Loop {
 				// give a bit of time to the publish goroutine
 				// to flush

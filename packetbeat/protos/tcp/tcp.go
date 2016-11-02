@@ -50,7 +50,7 @@ var (
 )
 
 func (tcp *TCP) getID() uint32 {
-	tcp.id += 1
+	tcp.id++
 	return tcp.id
 }
 

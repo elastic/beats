@@ -227,12 +227,12 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 		} else if data[offset] == 2 {
 			m.Fields["delivery-mode"] = "persistent"
 		}
-		offset += 1
+		offset++
 	}
 
 	if hasProperty(prop1, priorityProp) {
 		m.Fields["priority"] = data[offset]
-		offset += 1
+		offset++
 	}
 
 	if hasProperty(prop1, correlationIDProp) {

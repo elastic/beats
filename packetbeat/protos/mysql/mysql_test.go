@@ -338,7 +338,7 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 	mysql.handleMysql = func(mysql *Mysql, m *MysqlMessage, tcp *common.TCPTuple,
 		dir uint8, raw_msg []byte) {
 
-		countHandleMysql += 1
+		countHandleMysql++
 	}
 
 	mysql.Parse(&pkt, &tuple, 1, private)
@@ -381,7 +381,7 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 	mysql.handleMysql = func(mysql *Mysql, m *MysqlMessage, tcptuple *common.TCPTuple,
 		dir uint8, raw_msg []byte) {
 
-		countHandleMysql += 1
+		countHandleMysql++
 	}
 
 	mysql.Parse(&pkt, &tuple, 1, private)
@@ -425,7 +425,7 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 	mysql.handleMysql = func(mysql *Mysql, m *MysqlMessage, tcptuple *common.TCPTuple,
 		dir uint8, raw_msg []byte) {
 
-		countHandleMysql += 1
+		countHandleMysql++
 	}
 
 	private = mysql.Parse(&pkt, &tuple, 1, private).(mysqlPrivateData)

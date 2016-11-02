@@ -208,7 +208,7 @@ func TestPgsqlParser_threeResponses(t *testing.T) {
 	pgsql.handlePgsql = func(pgsql *Pgsql, m *PgsqlMessage, tcptuple *common.TCPTuple,
 		dir uint8, raw_msg []byte) {
 
-		countHandlePgsql += 1
+		countHandlePgsql++
 	}
 
 	pgsql.Parse(&pkt, &tuple, 1, private)

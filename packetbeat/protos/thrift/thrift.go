@@ -609,7 +609,7 @@ func (thrift *Thrift) readStruct(data []byte) (value string, ok bool, complete b
 		}
 
 		field.Type = byte(data[offset])
-		offset += 1
+		offset++
 		if field.Type == ThriftTypeStop {
 			return thrift.formatStruct(fields, false, []*string{}), true, true, offset
 		}

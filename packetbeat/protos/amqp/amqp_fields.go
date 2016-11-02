@@ -2,12 +2,13 @@ package amqp
 
 import (
 	"encoding/binary"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"math"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func getTable(fields common.MapStr, data []byte, offset uint32) (next uint32, err bool, exists bool) {
@@ -80,7 +81,7 @@ func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint
 		offset = offsetTemp
 	} else {
 		name = strconv.Itoa(index)
-		index += 1
+		index++
 	}
 
 	switch data[offset] {
@@ -175,7 +176,7 @@ func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint
 		offset = next
 	case noField:
 		table[name] = nil
-		offset += 1
+		offset++
 	case byteArray:
 		size := binary.BigEndian.Uint32(data[offset+1 : offset+5])
 		table[name] = bodyToByteArray(data[offset+1+size : offset+5+size])
