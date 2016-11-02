@@ -166,7 +166,7 @@ func (mc *Memcache) onUdpMessage(
 		msg.Direction = applayer.NetReverseDirection
 	}
 	msg.Tuple = *tuple
-	msg.Transport = applayer.TransportUdp
+	msg.Transport = applayer.TransportUDP
 	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tuple)
 
 	done := false

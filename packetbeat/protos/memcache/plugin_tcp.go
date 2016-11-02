@@ -173,7 +173,7 @@ func (mc *Memcache) onTCPMessage(
 	msg *message,
 ) error {
 	msg.Tuple = *tuple
-	msg.Transport = applayer.TransportTcp
+	msg.Transport = applayer.TransportTCP
 	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tuple)
 
 	if msg.IsRequest {

@@ -25,16 +25,16 @@ const (
 type Transport uint8
 
 const (
-	TransportUdp Transport = iota
-	TransportTcp
+	TransportUDP Transport = iota
+	TransportTCP
 )
 
 // String returns the transport type its textual representation.
 func (t Transport) String() string {
 	switch t {
-	case TransportUdp:
+	case TransportUDP:
 		return "udp"
-	case TransportTcp:
+	case TransportTCP:
 		return "tcp"
 	default:
 		return "invalid"
