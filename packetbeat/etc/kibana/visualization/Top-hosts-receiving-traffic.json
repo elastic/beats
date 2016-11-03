@@ -4,7 +4,8 @@
   "title": "Top hosts receiving traffic", 
   "uiStateJSON": "{}", 
   "version": 1, 
+  "savedSearchId": "Packetbeat-Flows-Search", 
   "kibanaSavedObjectMeta": {
-    "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+    "searchSourceJSON": "{\"filter\":[]}"
   }
 }
