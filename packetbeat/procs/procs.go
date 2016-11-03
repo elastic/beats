@@ -271,9 +271,8 @@ func hexToIpv6(word string) (net.IP, error) {
 func hexToIP(word string, ipv6 bool) (net.IP, error) {
 	if ipv6 {
 		return hexToIpv6(word)
-	} else {
-		return hexToIpv4(word)
 	}
+	return hexToIpv4(word)
 }
 
 func hexToIPPort(str []byte, ipv6 bool) (net.IP, uint16, error) {
@@ -350,7 +349,7 @@ func ParseProcNetTCP(input io.Reader, ipv6 bool) ([]*SocketInfo, error) {
 	buf := bufio.NewReader(input)
 
 	sockets := []*SocketInfo{}
-	var err error = nil
+	var err error
 	var line []byte
 	for err != io.EOF {
 		line, err = buf.ReadBytes('\n')

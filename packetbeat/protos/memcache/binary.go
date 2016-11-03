@@ -468,16 +468,16 @@ func makeSerializeBinary(
 			event["quiet"] = msg.isQuiet
 			event["vbucket"] = msg.vbucket
 			return serializeArgs(msg, event, requestArgs)
-		} else {
-			status := memcacheStatusCode(msg.status)
-			event["status"] = status.String()
-			event["status_code"] = status
-
-			if typ == MemcacheCounterMsg {
-				event["value"] = msg.value
-			}
-			return serializeArgs(msg, event, responseArgs)
 		}
+
+		status := memcacheStatusCode(msg.status)
+		event["status"] = status.String()
+		event["status_code"] = status
+
+		if typ == MemcacheCounterMsg {
+			event["value"] = msg.value
+		}
+		return serializeArgs(msg, event, responseArgs)
 	}
 }
 

@@ -514,17 +514,16 @@ func (amqp *Amqp) publishTransaction(t *AmqpTransaction) {
 func isAsynchronous(trans *AmqpTransaction) bool {
 	if val, ok := trans.Amqp["no-wait"]; ok && val == true {
 		return true
-	} else {
-		return trans.Method == "basic.reject" ||
-			trans.Method == "basic.ack" ||
-			trans.Method == "basic.nack"
 	}
+
+	return trans.Method == "basic.reject" ||
+		trans.Method == "basic.ack" ||
+		trans.Method == "basic.nack"
 }
 
 //function to convert a body slice into a readable format
 func bodyToString(data []byte) string {
-	var ret []string = make([]string, len(data))
-
+	ret := make([]string, len(data))
 	for i, c := range data {
 		ret[i] = strconv.Itoa(int(c))
 	}
@@ -565,10 +564,6 @@ func isCloseError(t *AmqpTransaction) bool {
 }
 
 func getReplyCode(m common.MapStr) uint16 {
-	code, ok := m["reply-code"].(uint16)
-	if !ok {
-		return 0
-	} else {
-		return code
-	}
+	code, _ := m["reply-code"].(uint16)
+	return code
 }

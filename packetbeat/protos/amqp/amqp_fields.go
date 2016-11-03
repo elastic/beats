@@ -191,8 +191,7 @@ func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint
 
 // function to convert a body slice into a byte array
 func bodyToByteArray(data []byte) string {
-	var ret []string = make([]string, len(data))
-
+	ret := make([]string, len(data))
 	for i, c := range data {
 		ret[i] = strconv.Itoa(int(c))
 	}

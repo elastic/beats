@@ -307,7 +307,7 @@ func (sniffer *SnifferSetup) Init(testMode bool, filter string, factory WorkerFa
 func (sniffer *SnifferSetup) Run() error {
 	counter := 0
 	loopCount := 1
-	var lastPktTime *time.Time = nil
+	var lastPktTime *time.Time
 	var retError error
 
 	for sniffer.isAlive {

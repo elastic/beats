@@ -2,25 +2,27 @@ package cassandra
 
 import (
 	"errors"
+	"time"
+
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
-	. "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
-	"time"
+
+	gocql "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
 )
 
 type parser struct {
 	buf       streambuf.Buffer
 	config    *parserConfig
-	framer    *Framer
+	framer    *gocql.Framer
 	message   *message
 	onMessage func(m *message) error
 }
 
 type parserConfig struct {
 	maxBytes   int
-	compressor Compressor
-	ignoredOps map[FrameOp]bool
+	compressor gocql.Compressor
+	ignoredOps map[gocql.FrameOp]bool
 }
 
 // check whether this ops is enabled or not
@@ -195,7 +197,7 @@ func (p *parser) parse() (*message, error) {
 		if isDebug {
 			debugf("start new framer")
 		}
-		p.framer = NewFramer(&p.buf, p.config.compressor)
+		p.framer = gocql.NewFramer(&p.buf, p.config.compressor)
 	}
 
 	// check if the frame header were parsed or not

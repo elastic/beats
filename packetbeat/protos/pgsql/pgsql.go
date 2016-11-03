@@ -297,9 +297,8 @@ func messageHasEnoughData(msg *PgsqlMessage) bool {
 	}
 	if msg.IsRequest {
 		return len(msg.Query) > 0
-	} else {
-		return len(msg.Rows) > 0
 	}
+	return len(msg.Rows) > 0
 }
 
 // Called when there's a drop packet

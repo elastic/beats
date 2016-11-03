@@ -1,5 +1,6 @@
-// This file contains methods process RPC calls
 package nfs
+
+// This file contains methods process RPC calls
 
 import (
 	"expvar"

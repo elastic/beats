@@ -28,7 +28,6 @@ var nfsOpnum3 = [...]string{
 func (nfs *NFS) getV3Opcode(proc int) string {
 	if proc < len(nfsOpnum3) {
 		return nfsOpnum3[proc]
-	} else {
-		return "ILLEGAL"
 	}
+	return "ILLEGAL"
 }

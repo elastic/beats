@@ -58,8 +58,8 @@ func (amqp *Amqp) amqpMessageParser(s *AmqpStream) (ok bool, complete bool) {
 	return ok, complete
 }
 
-func (stream *AmqpStream) PrepareForNewMessage() {
-	stream.message = nil
+func (s *AmqpStream) PrepareForNewMessage() {
+	s.message = nil
 }
 
 func isProtocolHeader(data []byte) (isHeader bool, version string) {
@@ -116,12 +116,13 @@ func (amqp *Amqp) decodeMethodFrame(s *AmqpStream, buf []byte) (bool, bool) {
 
 	debugf("Received frame of class %d and method %d", class, method)
 
-	if function, exists := amqp.MethodMap[class][method]; exists {
-		return function(s.message, arguments)
-	} else {
+	fn, exists := amqp.MethodMap[class][method]
+	if !exists {
 		logp.Debug("amqpdetailed", "Received unknown or not supported method")
 		return false, false
 	}
+
+	return fn(s.message, arguments)
 }
 
 /*
@@ -163,11 +164,9 @@ func (s *AmqpStream) decodeBodyFrame(buf []byte) (ok bool, complete bool) {
 	debugf("A body frame of %d bytes long has been transmitted",
 		len(buf))
 	//is the message complete ? If yes, let's publish it
-	if uint64(len(s.message.Body)) < s.message.BodySize {
-		return true, false
-	} else {
-		return true, true
-	}
+
+	complete = uint64(len(s.message.Body)) >= s.message.BodySize
+	return true, complete
 }
 
 func hasProperty(prop, flag byte) bool {

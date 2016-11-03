@@ -164,9 +164,8 @@ func doParseCommand(parser *parser, buf *streambuf.Buffer) parseResult {
 	isBinary := magic == MemcacheMagicRequest || magic == MemcacheMagicResponse
 	if isBinary {
 		return parser.contWith(buf, parseStateBinaryCommand)
-	} else {
-		return parser.contWith(buf, parseStateTextCommand)
 	}
+	return parser.contWith(buf, parseStateTextCommand)
 }
 
 func argparseNoop(p *parser, h, b *streambuf.Buffer) error {

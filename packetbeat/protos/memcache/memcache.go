@@ -209,6 +209,7 @@ func (m *message) SubEvent(
 	if m == nil {
 		return nil, nil
 	}
+
 	msgEvent := common.MapStr{}
 	event[name] = msgEvent
 	return msgEvent, m.Event(msgEvent)
@@ -236,17 +237,17 @@ func tryMergeResponses(mc *Memcache, prev, msg *message) (bool, error) {
 		}
 
 		return false, nil
-	} else {
-		// merge binary protocol stats messages
-		if prev.opcode != opcodeStat || msg.opcode != opcodeStat {
-			return false, nil
-		}
-		if prev.opaque != msg.opaque {
-			return false, nil
-		}
-
-		return mergeStatsMessages(mc, prev, msg)
 	}
+
+	// merge binary protocol stats messages
+	if prev.opcode != opcodeStat || msg.opcode != opcodeStat {
+		return false, nil
+	}
+	if prev.opaque != msg.opaque {
+		return false, nil
+	}
+
+	return mergeStatsMessages(mc, prev, msg)
 }
 
 func mergeValueMessages(mc *Memcache, prev, msg *message) (bool, error) {
@@ -309,11 +310,11 @@ func checkResponseComplete(msg *message) bool {
 			return true
 		}
 		return len(msg.keys) == 0
-	} else {
-		cont := msg.command.code == MemcacheResValue ||
-			msg.command.code == MemcacheResStat
-		return !cont
 	}
+
+	cont := msg.command.code == MemcacheResValue ||
+		msg.command.code == MemcacheResStat
+	return !cont
 }
 
 func newTransaction(requ, resp *message) *transaction {

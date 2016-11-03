@@ -21,7 +21,6 @@ func (t *icmpTransaction) HasError() bool {
 func (t *icmpTransaction) ResponseTimeMillis() (int32, bool) {
 	if t.Request != nil && t.Response != nil {
 		return int32(t.Response.Ts.Sub(t.Request.Ts).Nanoseconds() / 1e6), true
-	} else {
-		return 0, false
 	}
+	return 0, false
 }

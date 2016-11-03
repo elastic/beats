@@ -526,8 +526,7 @@ func parseStatLine(parser *parser, hdr, buf *streambuf.Buffer) error {
 	return nil
 }
 
-func parseTextArgs(parser *parser, args []argDef) error {
-	var err error = nil
+func parseTextArgs(parser *parser, args []argDef) (err error) {
 	buf := streambuf.NewFixed(parser.message.rawArgs)
 	for _, arg := range args {
 		debug("args rest: %s", buf.Bytes())
@@ -536,7 +535,7 @@ func parseTextArgs(parser *parser, args []argDef) error {
 			break
 		}
 	}
-	return err
+	return
 }
 
 func splitCommandAndArgs(line []byte) ([]byte, []byte, error) {

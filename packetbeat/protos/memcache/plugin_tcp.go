@@ -178,9 +178,8 @@ func (mc *Memcache) onTCPMessage(
 
 	if msg.IsRequest {
 		return mc.onTCPRequest(conn, tuple, dir, msg)
-	} else {
-		return mc.onTCPResponse(conn, tuple, dir, msg)
 	}
+	return mc.onTCPResponse(conn, tuple, dir, msg)
 }
 
 func (mc *Memcache) onTCPRequest(

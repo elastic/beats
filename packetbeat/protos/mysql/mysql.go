@@ -105,7 +105,7 @@ const (
 	MysqlStateMax
 )
 
-var stateStrings []string = []string{
+var stateStrings = []string{
 	"Start",
 	"EatMessage",
 	"EatFields",
@@ -270,54 +270,54 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 				logp.Debug("mysql", "Unexpected MySQL message of type %d received.", m.Typ)
 				return false, false
 			}
-			break
 
 		case mysqlStateEatMessage:
-			if len(s.data[s.parseOffset:]) >= int(m.PacketLength)+4 {
-				s.parseOffset += 4 //header
-				s.parseOffset += int(m.PacketLength)
-				m.end = s.parseOffset
-				if m.IsRequest {
-					m.Query = string(s.data[m.start+5 : m.end])
-				} else if m.IsOK {
-					// affected rows
-					affectedRows, off, complete, err := readLinteger(s.data, m.start+5)
-					if !complete {
-						return true, false
-					}
-					if err != nil {
-						logp.Debug("mysql", "Error on read_linteger: %s", err)
-						return false, false
-					}
-					m.AffectedRows = affectedRows
-
-					// last insert id
-					insertID, _, complete, err := readLinteger(s.data, off)
-					if !complete {
-						return true, false
-					}
-					if err != nil {
-						logp.Debug("mysql", "Error on read_linteger: %s", err)
-						return false, false
-					}
-					m.InsertID = insertID
-				} else if m.IsError {
-					// int<1>header (0xff)
-					// int<2>error code
-					// string[1] sql state marker
-					// string[5] sql state
-					// string<EOF> error message
-					m.ErrorCode = uint16(s.data[m.start+6])<<8 | uint16(s.data[m.start+5])
-
-					m.ErrorInfo = string(s.data[m.start+8:m.start+13]) + ": " + string(s.data[m.start+13:])
-				}
-				m.Size = uint64(m.end - m.start)
-				logp.Debug("mysqldetailed", "Message complete. remaining=%d", len(s.data[s.parseOffset:]))
-				return true, true
-			} else {
-				// wait for more
+			if len(s.data[s.parseOffset:]) < int(m.PacketLength)+4 {
+				// wait for more data
 				return true, false
 			}
+
+			s.parseOffset += 4 //header
+			s.parseOffset += int(m.PacketLength)
+			m.end = s.parseOffset
+			if m.IsRequest {
+				m.Query = string(s.data[m.start+5 : m.end])
+			} else if m.IsOK {
+				// affected rows
+				affectedRows, off, complete, err := readLinteger(s.data, m.start+5)
+				if !complete {
+					return true, false
+				}
+				if err != nil {
+					logp.Debug("mysql", "Error on read_linteger: %s", err)
+					return false, false
+				}
+				m.AffectedRows = affectedRows
+
+				// last insert id
+				insertID, _, complete, err := readLinteger(s.data, off)
+				if !complete {
+					return true, false
+				}
+				if err != nil {
+					logp.Debug("mysql", "Error on read_linteger: %s", err)
+					return false, false
+				}
+				m.InsertID = insertID
+			} else if m.IsError {
+				// int<1>header (0xff)
+				// int<2>error code
+				// string[1] sql state marker
+				// string[5] sql state
+				// string<EOF> error message
+				m.ErrorCode = uint16(s.data[m.start+6])<<8 | uint16(s.data[m.start+5])
+
+				m.ErrorInfo = string(s.data[m.start+8:m.start+13]) + ": " + string(s.data[m.start+13:])
+			}
+			m.Size = uint64(m.end - m.start)
+			logp.Debug("mysqldetailed", "Message complete. remaining=%d",
+				len(s.data[s.parseOffset:]))
+			return true, true
 
 		case mysqlStateEatFields:
 			if len(s.data[s.parseOffset:]) < 4 {
@@ -380,7 +380,6 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 				// wait for more
 				return true, false
 			}
-			break
 
 		case mysqlStateEatRows:
 			if len(s.data[s.parseOffset:]) < 4 {
@@ -393,40 +392,38 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
 			logp.Debug("mysqldetailed", "Rows: packet length %d, packet number %d", m.PacketLength, m.Seq)
 
-			if len(s.data[s.parseOffset:]) >= int(m.PacketLength)+4 {
-				s.parseOffset += 4 //header
-
-				if uint8(s.data[s.parseOffset]) == 0xfe {
-					logp.Debug("mysqldetailed", "Received EOF packet")
-					// EOF marker
-					s.parseOffset += int(m.PacketLength)
-
-					if m.end == 0 {
-						m.end = s.parseOffset
-					} else {
-						m.IsTruncated = true
-					}
-					if !m.IsError {
-						// in case the response was sent successfully
-						m.IsOK = true
-					}
-					m.Size = uint64(m.end - m.start)
-					return true, true
-				} else {
-					s.parseOffset += int(m.PacketLength)
-					if m.end == 0 && s.parseOffset > MaxPayloadSize {
-						// only send up to here, but read until the end
-						m.end = s.parseOffset
-					}
-					m.NumberOfRows++
-					// go to next row
-				}
-			} else {
+			if len(s.data[s.parseOffset:]) < int(m.PacketLength)+4 {
 				// wait for more
 				return true, false
 			}
 
-			break
+			s.parseOffset += 4 //header
+
+			if uint8(s.data[s.parseOffset]) == 0xfe {
+				logp.Debug("mysqldetailed", "Received EOF packet")
+				// EOF marker
+				s.parseOffset += int(m.PacketLength)
+
+				if m.end == 0 {
+					m.end = s.parseOffset
+				} else {
+					m.IsTruncated = true
+				}
+				if !m.IsError {
+					// in case the response was sent successfully
+					m.IsOK = true
+				}
+				m.Size = uint64(m.end - m.start)
+				return true, true
+			}
+
+			s.parseOffset += int(m.PacketLength)
+			if m.end == 0 && s.parseOffset > MaxPayloadSize {
+				// only send up to here, but read until the end
+				m.end = s.parseOffset
+			}
+			m.NumberOfRows++
+			// go to next row
 		}
 	}
 

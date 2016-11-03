@@ -3,7 +3,6 @@
 package procs
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -56,7 +55,7 @@ func AssertIntArraysAreEqual(t *testing.T, expected []int, result []int) bool {
 			}
 		}
 		if !found {
-			t.Error(fmt.Sprintf("Expected array %v but got %v", expected, result))
+			t.Errorf("Expected array %v but got %v", expected, result)
 			return false
 		}
 	}
@@ -73,7 +72,7 @@ func AssertUint64ArraysAreEqual(t *testing.T, expected []uint64, result []uint64
 			}
 		}
 		if !found {
-			t.Error(fmt.Sprintf("Expected array %v but got %v", expected, result))
+			t.Errorf("Expected array %v but got %v", expected, result)
 			return false
 		}
 	}
@@ -144,9 +143,11 @@ func TestRefreshPids(t *testing.T) {
 	}
 
 	testSignals := make(chan bool)
-	var procs ProcessesWatcher = ProcessesWatcher{procPrefix: pathPrefix,
-		TestSignals: &testSignals}
-	var ch chan time.Time = make(chan time.Time)
+	procs := ProcessesWatcher{
+		procPrefix:  pathPrefix,
+		TestSignals: &testSignals,
+	}
+	ch := make(chan time.Time)
 
 	p, err := NewProcess(&procs, "nginx", "nginx", (<-chan time.Time)(ch))
 	if err != nil {

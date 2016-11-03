@@ -1,4 +1,4 @@
-// The applayer module provides common definitions with common fields
+// Package applayer provides common definitions with common fields
 // for use with application layer protocols among beats.
 package applayer
 

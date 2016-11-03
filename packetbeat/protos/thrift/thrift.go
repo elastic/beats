@@ -775,7 +775,7 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 			}
 			if complete {
 				// done
-				var method *ThriftIdlMethod = nil
+				var method *ThriftIdlMethod
 				if thrift.Idl != nil {
 					method = thrift.Idl.FindMethod(m.Method)
 				}
@@ -859,7 +859,7 @@ type thriftPrivateData struct {
 func (thrift *Thrift) messageComplete(tcptuple *common.TCPTuple, dir uint8,
 	stream *ThriftStream, priv *thriftPrivateData) {
 
-	var flush bool = false
+	flush := false
 
 	if stream.message.IsRequest {
 		logp.Debug("thrift", "Thrift request message: %s", stream.message.Method)

@@ -4,7 +4,6 @@
 // RFC 4035 (DNS Security Extensions), but since those specifications only
 // add backwards compatible features there will be no issues handling the
 // messages.
-
 package dns
 
 import (

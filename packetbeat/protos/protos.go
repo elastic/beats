@@ -80,7 +80,7 @@ var Protos = ProtocolsStruct{
 	udp: map[Protocol]UDPPlugin{},
 }
 
-func (protocols ProtocolsStruct) Init(
+func (s ProtocolsStruct) Init(
 	testMode bool,
 	results publish.Transactions,
 	configs map[string]*common.Config,
@@ -118,14 +118,14 @@ func (protocols ProtocolsStruct) Init(
 			return err
 		}
 
-		protocols.register(proto, inst)
+		s.register(proto, inst)
 	}
 
 	return nil
 }
 
-func (protocols ProtocolsStruct) GetTCP(proto Protocol) TCPPlugin {
-	plugin, exists := protocols.tcp[proto]
+func (s ProtocolsStruct) GetTCP(proto Protocol) TCPPlugin {
+	plugin, exists := s.tcp[proto]
 	if !exists {
 		return nil
 	}
@@ -133,8 +133,8 @@ func (protocols ProtocolsStruct) GetTCP(proto Protocol) TCPPlugin {
 	return plugin
 }
 
-func (protocols ProtocolsStruct) GetUDP(proto Protocol) UDPPlugin {
-	plugin, exists := protocols.udp[proto]
+func (s ProtocolsStruct) GetUDP(proto Protocol) UDPPlugin {
+	plugin, exists := s.udp[proto]
 	if !exists {
 		return nil
 	}
@@ -142,26 +142,26 @@ func (protocols ProtocolsStruct) GetUDP(proto Protocol) UDPPlugin {
 	return plugin
 }
 
-func (protocols ProtocolsStruct) GetAll() map[Protocol]Plugin {
-	return protocols.all
+func (s ProtocolsStruct) GetAll() map[Protocol]Plugin {
+	return s.all
 }
 
-func (protocols ProtocolsStruct) GetAllTCP() map[Protocol]TCPPlugin {
-	return protocols.tcp
+func (s ProtocolsStruct) GetAllTCP() map[Protocol]TCPPlugin {
+	return s.tcp
 }
 
-func (protocols ProtocolsStruct) GetAllUDP() map[Protocol]UDPPlugin {
-	return protocols.udp
+func (s ProtocolsStruct) GetAllUDP() map[Protocol]UDPPlugin {
+	return s.udp
 }
 
 // BpfFilter returns a Berkeley Packer Filter (BFP) expression that
 // will match against packets for the registered protocols. If with_vlans is
 // true the filter will match against both IEEE 802.1Q VLAN encapsulated
 // and unencapsulated packets
-func (protocols ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
+func (s ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
 	// Sort the protocol IDs so that the return value is consistent.
 	var protos []int
-	for proto := range protocols.all {
+	for proto := range s.all {
 		protos = append(protos, int(proto))
 	}
 	sort.Ints(protos)
@@ -169,15 +169,15 @@ func (protocols ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string
 	var expressions []string
 	for _, key := range protos {
 		proto := Protocol(key)
-		plugin := protocols.all[proto]
+		plugin := s.all[proto]
 		for _, port := range plugin.GetPorts() {
 			hasTCP := false
 			hasUDP := false
 
-			if _, present := protocols.tcp[proto]; present {
+			if _, present := s.tcp[proto]; present {
 				hasTCP = true
 			}
-			if _, present := protocols.udp[proto]; present {
+			if _, present := s.udp[proto]; present {
 				hasUDP = true
 			}
 
@@ -205,20 +205,20 @@ func (protocols ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string
 	return filter
 }
 
-func (protos ProtocolsStruct) register(proto Protocol, plugin Plugin) {
-	if _, exists := protos.all[proto]; exists {
+func (s ProtocolsStruct) register(proto Protocol, plugin Plugin) {
+	if _, exists := s.all[proto]; exists {
 		logp.Warn("Protocol (%s) plugin will overwritten by another plugin", proto.String())
 	}
 
-	protos.all[proto] = plugin
+	s.all[proto] = plugin
 
 	success := false
 	if tcp, ok := plugin.(TCPPlugin); ok {
-		protos.tcp[proto] = tcp
+		s.tcp[proto] = tcp
 		success = true
 	}
 	if udp, ok := plugin.(UDPPlugin); ok {
-		protos.udp[proto] = udp
+		s.udp[proto] = udp
 		success = true
 	}
 	if !success {
