@@ -28,7 +28,12 @@ before-build:
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: update
+collect: fields update
+
+.PHONY: fields
+fields:
+	cat etc/fields_base.yml > etc/fields.yml
+	cat protos/*/_meta/fields.yml >> etc/fields.yml
 
 .PHONY: benchmark
 benchmark:

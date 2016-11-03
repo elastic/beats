@@ -1,0 +1,17 @@
+- key: redis
+  title: "Redis"
+  description: >
+    Redis-specific event fields.
+  fields:
+    - name: redis
+      type: group
+      fields:
+        - name: return_value
+          description: >
+            The return value of the Redis command in a human readable format.
+
+        - name: error
+          description: >
+            If the Redis command has resulted in an error, this field contains the
+            error message returned by the Redis server.
+
