@@ -59,19 +59,19 @@ type message struct {
 	isQuiet bool
 
 	// values
-	keys         []memcacheString
-	flags        uint32
-	exptime      uint32
-	value        uint64
-	value2       uint64
-	ivalue       int64
-	ivalue2      int64
-	str          memcacheString
-	data         memcacheData
-	bytes        uint
-	bytesLost    uint
-	values       []memcacheData
-	count_values uint32
+	keys        []memcacheString
+	flags       uint32
+	exptime     uint32
+	value       uint64
+	value2      uint64
+	ivalue      int64
+	ivalue2     int64
+	str         memcacheString
+	data        memcacheData
+	bytes       uint
+	bytesLost   uint
+	values      []memcacheData
+	countValues uint32
 
 	stats []memcacheStat
 }
@@ -157,11 +157,11 @@ func (mc *Memcache) setFromConfig(config *memcacheConfig) error {
 
 	mc.config.parseUnkown = config.ParseUnknown
 
-	mc.udpConfig.transTimeout = config.UdpTransactionTimeout
+	mc.udpConfig.transTimeout = config.UDPTransactionTimeout
 	mc.tcpConfig.tcpTransTimeout = config.TransactionTimeout
 
 	debug("transaction timeout: %v", config.TransactionTimeout)
-	debug("udp transaction timeout: %v", config.UdpTransactionTimeout)
+	debug("udp transaction timeout: %v", config.UDPTransactionTimeout)
 	debug("maxValues = %v", mc.config.maxValues)
 	debug("maxBytesPerValue = %v", mc.config.maxBytesPerValue)
 
@@ -209,9 +209,10 @@ func (m *message) SubEvent(
 	if m == nil {
 		return nil, nil
 	}
-	msg_event := common.MapStr{}
-	event[name] = msg_event
-	return msg_event, m.Event(msg_event)
+
+	msgEvent := common.MapStr{}
+	event[name] = msgEvent
+	return msgEvent, m.Event(msgEvent)
 }
 
 func tryMergeResponses(mc *Memcache, prev, msg *message) (bool, error) {
@@ -236,17 +237,17 @@ func tryMergeResponses(mc *Memcache, prev, msg *message) (bool, error) {
 		}
 
 		return false, nil
-	} else {
-		// merge binary protocol stats messages
-		if prev.opcode != opcodeStat || msg.opcode != opcodeStat {
-			return false, nil
-		}
-		if prev.opaque != msg.opaque {
-			return false, nil
-		}
-
-		return mergeStatsMessages(mc, prev, msg)
 	}
+
+	// merge binary protocol stats messages
+	if prev.opcode != opcodeStat || msg.opcode != opcodeStat {
+		return false, nil
+	}
+	if prev.opaque != msg.opaque {
+		return false, nil
+	}
+
+	return mergeStatsMessages(mc, prev, msg)
 }
 
 func mergeValueMessages(mc *Memcache, prev, msg *message) (bool, error) {
@@ -265,7 +266,7 @@ func mergeValueMessages(mc *Memcache, prev, msg *message) (bool, error) {
 	prev.bytes += msg.bytes
 	prev.keys = append(prev.keys, msg.keys...)
 	prev.AddNotes(msg.Notes...)
-	prev.count_values += msg.count_values
+	prev.countValues += msg.countValues
 	if msg.command.code == MemcacheResValue {
 		delta := 0
 		if mc.config.maxValues < 0 {
@@ -309,11 +310,11 @@ func checkResponseComplete(msg *message) bool {
 			return true
 		}
 		return len(msg.keys) == 0
-	} else {
-		cont := msg.command.code == MemcacheResValue ||
-			msg.command.code == MemcacheResStat
-		return !cont
 	}
+
+	cont := msg.command.code == MemcacheResValue ||
+		msg.command.code == MemcacheResStat
+	return !cont
 }
 
 func newTransaction(requ, resp *message) *transaction {

@@ -10,7 +10,7 @@ import (
 type mongodbMessage struct {
 	Ts time.Time
 
-	TcpTuple     common.TCPTuple
+	TCPTuple     common.TCPTuple
 	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
 
@@ -20,7 +20,7 @@ type mongodbMessage struct {
 	// Standard message header fields from mongodb wire protocol
 	// see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#standard-message-header
 	messageLength int
-	requestId     int
+	requestID     int
 	responseTo    int
 	opCode        opCode
 

@@ -104,18 +104,16 @@ func extractTrackingData(icmpVersion uint8, msgType uint8, baseLayer *layers.Bas
 			id := binary.BigEndian.Uint16(baseLayer.Contents[4:6])
 			seq := binary.BigEndian.Uint16(baseLayer.Contents[6:8])
 			return id, seq
-		} else {
-			return 0, 0
 		}
+		return 0, 0
 	}
 	if icmpVersion == 6 {
 		if icmp6PairTypes[msgType] {
 			id := binary.BigEndian.Uint16(baseLayer.Contents[4:6])
 			seq := binary.BigEndian.Uint16(baseLayer.Contents[6:8])
 			return id, seq
-		} else {
-			return 0, 0
 		}
+		return 0, 0
 	}
 	logp.WTF("icmp", "Invalid ICMP version[%d]", icmpVersion)
 	return 0, 0

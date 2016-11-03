@@ -7,9 +7,10 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/packetbeat/protos"
-	. "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 	"github.com/elastic/beats/packetbeat/publish"
+
+	gocql "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
 )
 
 // cassandra application level protocol analyzer plugin
@@ -76,18 +77,18 @@ func (cassandra *cassandra) setFromConfig(config *cassandraConfig) error {
 
 	// set parser configuration
 	parser := &cassandra.parserConfig
-	parser.maxBytes = tcp.TCP_MAX_DATA_IN_STREAM
+	parser.maxBytes = tcp.TCPMaxDataInStream
 
 	// set parser's compressor, only `snappy` supported right now
-	if config.Compressor == Snappy {
-		parser.compressor = SnappyCompressor{}
+	if config.Compressor == gocql.Snappy {
+		parser.compressor = gocql.SnappyCompressor{}
 	} else {
 		parser.compressor = nil
 	}
 
 	// parsed ignored ops
 	if len(config.OPsIgnored) > 0 {
-		maps := map[FrameOp]bool{}
+		maps := map[gocql.FrameOp]bool{}
 		for _, op := range config.OPsIgnored {
 			maps[op] = true
 		}

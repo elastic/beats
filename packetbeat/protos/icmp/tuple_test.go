@@ -12,18 +12,18 @@ import (
 func TestIcmpTupleReverse(t *testing.T) {
 	tuple := icmpTuple{
 		IcmpVersion: 4,
-		SrcIp:       net.IPv4(192, 168, 0, 1),
-		DstIp:       net.IPv4(192, 168, 0, 2),
-		Id:          256,
+		SrcIP:       net.IPv4(192, 168, 0, 1),
+		DstIP:       net.IPv4(192, 168, 0, 2),
+		ID:          256,
 		Seq:         1,
 	}
 
 	actualReverse := tuple.Reverse()
 	expectedReverse := icmpTuple{
 		IcmpVersion: 4,
-		SrcIp:       net.IPv4(192, 168, 0, 2),
-		DstIp:       net.IPv4(192, 168, 0, 1),
-		Id:          256,
+		SrcIP:       net.IPv4(192, 168, 0, 2),
+		DstIP:       net.IPv4(192, 168, 0, 1),
+		ID:          256,
 		Seq:         1,
 	}
 
@@ -33,9 +33,9 @@ func TestIcmpTupleReverse(t *testing.T) {
 func BenchmarkIcmpTupleReverse(b *testing.B) {
 	tuple := icmpTuple{
 		IcmpVersion: 4,
-		SrcIp:       net.IPv4(192, 168, 0, 1),
-		DstIp:       net.IPv4(192, 168, 0, 2),
-		Id:          256,
+		SrcIP:       net.IPv4(192, 168, 0, 1),
+		DstIP:       net.IPv4(192, 168, 0, 2),
+		ID:          256,
 		Seq:         1,
 	}
 
@@ -49,9 +49,9 @@ func BenchmarkIcmpTupleReverse(b *testing.B) {
 func TestIcmpTupleHashable(t *testing.T) {
 	tuple := icmpTuple{
 		IcmpVersion: 4,
-		SrcIp:       net.IPv4(192, 168, 0, 1),
-		DstIp:       net.IPv4(192, 168, 0, 2),
-		Id:          256,
+		SrcIP:       net.IPv4(192, 168, 0, 1),
+		DstIP:       net.IPv4(192, 168, 0, 2),
+		ID:          256,
 		Seq:         1,
 	}
 
@@ -69,9 +69,9 @@ func TestIcmpTupleHashable(t *testing.T) {
 func BenchmarkIcmpTupleHashable(b *testing.B) {
 	tuple := icmpTuple{
 		IcmpVersion: 4,
-		SrcIp:       net.IPv4(192, 168, 0, 1),
-		DstIp:       net.IPv4(192, 168, 0, 2),
-		Id:          256,
+		SrcIP:       net.IPv4(192, 168, 0, 1),
+		DstIP:       net.IPv4(192, 168, 0, 2),
+		ID:          256,
 		Seq:         1,
 	}
 
@@ -85,9 +85,9 @@ func BenchmarkIcmpTupleHashable(b *testing.B) {
 func TestIcmpTupleToString(t *testing.T) {
 	tuple := icmpTuple{
 		IcmpVersion: 4,
-		SrcIp:       net.IPv4(192, 168, 0, 1),
-		DstIp:       net.IPv4(192, 168, 0, 2),
-		Id:          256,
+		SrcIP:       net.IPv4(192, 168, 0, 1),
+		DstIP:       net.IPv4(192, 168, 0, 2),
+		ID:          256,
 		Seq:         1,
 	}
 

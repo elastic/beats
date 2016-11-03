@@ -119,23 +119,23 @@ func (http *HTTP) setFromConfig(config *httpConfig) {
 	http.Ports = config.Ports
 	http.SendRequest = config.SendRequest
 	http.SendResponse = config.SendResponse
-	http.HideKeywords = config.Hide_keywords
-	http.RedactAuthorization = config.Redact_authorization
-	http.SplitCookie = config.Split_cookie
-	http.parserConfig.RealIPHeader = strings.ToLower(config.Real_ip_header)
+	http.HideKeywords = config.HideKeywords
+	http.RedactAuthorization = config.RedactAuthorization
+	http.SplitCookie = config.SplitCookie
+	http.parserConfig.RealIPHeader = strings.ToLower(config.RealIPHeader)
 	http.transactionTimeout = config.TransactionTimeout
-	http.IncludeBodyFor = config.Include_body_for
+	http.IncludeBodyFor = config.IncludeBodyFor
 	http.MaxMessageSize = config.MaxMessageSize
 
-	if config.Send_all_headers {
+	if config.SendAllHeaders {
 		http.parserConfig.SendHeaders = true
 		http.parserConfig.SendAllHeaders = true
 	} else {
-		if len(config.Send_headers) > 0 {
+		if len(config.SendHeaders) > 0 {
 			http.parserConfig.SendHeaders = true
 
 			http.parserConfig.HeadersWhitelist = map[string]bool{}
-			for _, hdr := range config.Send_headers {
+			for _, hdr := range config.SendHeaders {
 				http.parserConfig.HeadersWhitelist[strings.ToLower(hdr)] = true
 			}
 		}
@@ -461,11 +461,11 @@ func (http *HTTP) newTransaction(requ, resp *message) common.MapStr {
 		Port: requ.TCPTuple.DstPort,
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
-	if requ.Direction == tcp.TcpDirectionReverse {
+	if requ.Direction == tcp.TCPDirectionReverse {
 		src, dst = dst, src
 	}
 
-	http_details := common.MapStr{
+	httpDetails := common.MapStr{
 		"request": common.MapStr{
 			"params":  params,
 			"headers": http.collectHeaders(requ),
@@ -477,8 +477,8 @@ func (http *HTTP) newTransaction(requ, resp *message) common.MapStr {
 		},
 	}
 
-	http.setBody(http_details["request"].(common.MapStr), requ)
-	http.setBody(http_details["response"].(common.MapStr), resp)
+	http.setBody(httpDetails["request"].(common.MapStr), requ)
+	http.setBody(httpDetails["response"].(common.MapStr), resp)
 
 	event := common.MapStr{
 		"@timestamp":   common.Time(requ.Ts),
@@ -488,7 +488,7 @@ func (http *HTTP) newTransaction(requ, resp *message) common.MapStr {
 		"method":       requ.Method,
 		"path":         path,
 		"query":        fmt.Sprintf("%s %s", requ.Method, path),
-		"http":         http_details,
+		"http":         httpDetails,
 		"bytes_out":    resp.Size,
 		"bytes_in":     requ.Size,
 		"src":          &src,

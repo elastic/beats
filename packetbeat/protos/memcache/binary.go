@@ -370,7 +370,7 @@ func parseDataBinary(parser *parser, buf *streambuf.Buffer) parseResult {
 
 	debug("found data message")
 	if msg.bytesLost > 0 {
-		msg.count_values++
+		msg.countValues++
 	} else {
 		parser.appendMessageData(data)
 	}
@@ -453,8 +453,8 @@ func makeSerializeBinary(
 		if msg.isCas {
 			serializeCas(msg, event)
 		}
-		if msg.count_values > 0 {
-			event["count_values"] = msg.count_values
+		if msg.countValues > 0 {
+			event["count_values"] = msg.countValues
 			if len(msg.values) > 0 {
 				event["values"] = msg.values
 			}
@@ -468,16 +468,16 @@ func makeSerializeBinary(
 			event["quiet"] = msg.isQuiet
 			event["vbucket"] = msg.vbucket
 			return serializeArgs(msg, event, requestArgs)
-		} else {
-			status := memcacheStatusCode(msg.status)
-			event["status"] = status.String()
-			event["status_code"] = status
-
-			if typ == MemcacheCounterMsg {
-				event["value"] = msg.value
-			}
-			return serializeArgs(msg, event, responseArgs)
 		}
+
+		status := memcacheStatusCode(msg.status)
+		event["status"] = status.String()
+		event["status_code"] = status
+
+		if typ == MemcacheCounterMsg {
+			event["value"] = msg.value
+		}
+		return serializeArgs(msg, event, responseArgs)
 	}
 }
 

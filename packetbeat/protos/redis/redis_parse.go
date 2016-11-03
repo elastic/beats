@@ -17,7 +17,7 @@ type parser struct {
 type redisMessage struct {
 	Ts time.Time
 
-	TcpTuple     common.TCPTuple
+	TCPTuple     common.TCPTuple
 	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
 
@@ -32,9 +32,9 @@ type redisMessage struct {
 }
 
 const (
-	START = iota
-	BULK_ARRAY
-	SIMPLE_MESSAGE
+	Start = iota
+	BulkArray
+	SimpleMessage
 )
 
 var (
@@ -247,10 +247,10 @@ func (p *parser) reset() {
 	p.message = nil
 }
 
-func (parser *parser) parse(buf *streambuf.Buffer) (bool, bool) {
+func (p *parser) parse(buf *streambuf.Buffer) (bool, bool) {
 	snapshot := buf.Snapshot()
 
-	content, iserror, ok, complete := parser.dispatch(0, buf)
+	content, iserror, ok, complete := p.dispatch(0, buf)
 	if !ok || !complete {
 		// on error or incomplete message drop all parsing progress, due to
 		// parse not being statefull among multiple calls
@@ -259,9 +259,9 @@ func (parser *parser) parse(buf *streambuf.Buffer) (bool, bool) {
 		return ok, complete
 	}
 
-	parser.message.IsError = iserror
-	parser.message.Size = buf.BufferConsumed()
-	parser.message.Message = content
+	p.message.IsError = iserror
+	p.message.Size = buf.BufferConsumed()
+	p.message.Message = content
 	return true, true
 }
 

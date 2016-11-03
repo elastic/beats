@@ -195,7 +195,7 @@ func (amqp *Amqp) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	} else {
 		// concatenate databytes
 		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
-		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
+		if len(priv.Data[dir].data) > tcp.TCPMaxDataInStream {
 			debugf("Stream data too large, dropping TCP stream")
 			priv.Data[dir] = nil
 			return priv
@@ -237,7 +237,7 @@ func (amqp *Amqp) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 
 func (amqp *Amqp) handleAmqpRequest(msg *AmqpMessage) {
 	// Add it to the HT
-	tuple := msg.TcpTuple
+	tuple := msg.TCPTuple
 
 	trans := amqp.getTransaction(tuple.Hashable())
 	if trans != nil {
@@ -254,16 +254,16 @@ func (amqp *Amqp) handleAmqpRequest(msg *AmqpMessage) {
 	trans.Ts = trans.ts.UnixNano() / 1000
 	trans.JsTs = msg.Ts
 	trans.Src = common.Endpoint{
-		IP:   msg.TcpTuple.SrcIP.String(),
-		Port: msg.TcpTuple.SrcPort,
+		IP:   msg.TCPTuple.SrcIP.String(),
+		Port: msg.TCPTuple.SrcPort,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
 	trans.Dst = common.Endpoint{
-		IP:   msg.TcpTuple.DstIP.String(),
-		Port: msg.TcpTuple.DstPort,
+		IP:   msg.TCPTuple.DstIP.String(),
+		Port: msg.TCPTuple.DstPort,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
-	if msg.Direction == tcp.TcpDirectionReverse {
+	if msg.Direction == tcp.TCPDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
 
@@ -275,7 +275,7 @@ func (amqp *Amqp) handleAmqpRequest(msg *AmqpMessage) {
 		trans.Request = msg.Method
 	}
 	//length = message + 4 bytes header + frame end octet
-	trans.BytesIn = msg.Body_size + 12
+	trans.BytesIn = msg.BodySize + 12
 	if msg.Fields != nil {
 		trans.Amqp = msg.Fields
 	} else {
@@ -299,7 +299,7 @@ func (amqp *Amqp) handleAmqpRequest(msg *AmqpMessage) {
 }
 
 func (amqp *Amqp) handleAmqpResponse(msg *AmqpMessage) {
-	tuple := msg.TcpTuple
+	tuple := msg.TCPTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 	if trans == nil || trans.Amqp == nil {
 		debugf("Response from unknown transaction. Ignoring.")
@@ -308,7 +308,7 @@ func (amqp *Amqp) handleAmqpResponse(msg *AmqpMessage) {
 	}
 
 	//length = message + 4 bytes class/method + frame end octet + header
-	trans.BytesOut = msg.Body_size + 12
+	trans.BytesOut = msg.BodySize + 12
 	//merge the both fields from request and response
 	trans.Amqp.Update(msg.Fields)
 	trans.Response = common.OK_STATUS
@@ -348,34 +348,34 @@ func (amqp *Amqp) expireTransaction(trans *AmqpTransaction) {
 //process, the method, header and body frames are regrouped in one transaction
 func (amqp *Amqp) handlePublishing(client *AmqpMessage) {
 
-	tuple := client.TcpTuple
+	tuple := client.TCPTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 
 	if trans == nil {
 		trans = &AmqpTransaction{Type: "amqp", tuple: tuple}
-		amqp.transactions.Put(client.TcpTuple.Hashable(), trans)
+		amqp.transactions.Put(client.TCPTuple.Hashable(), trans)
 	}
 
 	trans.ts = client.Ts
 	trans.Ts = client.Ts.UnixNano() / 1000
 	trans.JsTs = client.Ts
 	trans.Src = common.Endpoint{
-		IP:   client.TcpTuple.SrcIP.String(),
-		Port: client.TcpTuple.SrcPort,
+		IP:   client.TCPTuple.SrcIP.String(),
+		Port: client.TCPTuple.SrcPort,
 		Proc: string(client.CmdlineTuple.Src),
 	}
 	trans.Dst = common.Endpoint{
-		IP:   client.TcpTuple.DstIP.String(),
-		Port: client.TcpTuple.DstPort,
+		IP:   client.TCPTuple.DstIP.String(),
+		Port: client.TCPTuple.DstPort,
 		Proc: string(client.CmdlineTuple.Dst),
 	}
 
 	trans.Method = client.Method
 	//for publishing and delivering, bytes in and out represent the length of the
 	//message itself
-	trans.BytesIn = client.Body_size
+	trans.BytesIn = client.BodySize
 
-	if client.Body_size > uint64(amqp.MaxBodyLength) {
+	if client.BodySize > uint64(amqp.MaxBodyLength) {
 		trans.Body = client.Body[:amqp.MaxBodyLength]
 	} else {
 		trans.Body = client.Body
@@ -395,33 +395,33 @@ func (amqp *Amqp) handlePublishing(client *AmqpMessage) {
 //body frames are regrouped in one transaction
 func (amqp *Amqp) handleDelivering(server *AmqpMessage) {
 
-	tuple := server.TcpTuple
+	tuple := server.TCPTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 
 	if trans == nil {
 		trans = &AmqpTransaction{Type: "amqp", tuple: tuple}
-		amqp.transactions.Put(server.TcpTuple.Hashable(), trans)
+		amqp.transactions.Put(server.TCPTuple.Hashable(), trans)
 	}
 
 	trans.ts = server.Ts
 	trans.Ts = server.Ts.UnixNano() / 1000
 	trans.JsTs = server.Ts
 	trans.Src = common.Endpoint{
-		IP:   server.TcpTuple.SrcIP.String(),
-		Port: server.TcpTuple.SrcPort,
+		IP:   server.TCPTuple.SrcIP.String(),
+		Port: server.TCPTuple.SrcPort,
 		Proc: string(server.CmdlineTuple.Src),
 	}
 	trans.Dst = common.Endpoint{
-		IP:   server.TcpTuple.DstIP.String(),
-		Port: server.TcpTuple.DstPort,
+		IP:   server.TCPTuple.DstIP.String(),
+		Port: server.TCPTuple.DstPort,
 		Proc: string(server.CmdlineTuple.Dst),
 	}
 
 	//for publishing and delivering, bytes in and out represent the length of the
 	//message itself
-	trans.BytesOut = server.Body_size
+	trans.BytesOut = server.BodySize
 
-	if server.Body_size > uint64(amqp.MaxBodyLength) {
+	if server.BodySize > uint64(amqp.MaxBodyLength) {
 		trans.Body = server.Body[:amqp.MaxBodyLength]
 	} else {
 		trans.Body = server.Body
@@ -514,17 +514,16 @@ func (amqp *Amqp) publishTransaction(t *AmqpTransaction) {
 func isAsynchronous(trans *AmqpTransaction) bool {
 	if val, ok := trans.Amqp["no-wait"]; ok && val == true {
 		return true
-	} else {
-		return trans.Method == "basic.reject" ||
-			trans.Method == "basic.ack" ||
-			trans.Method == "basic.nack"
 	}
+
+	return trans.Method == "basic.reject" ||
+		trans.Method == "basic.ack" ||
+		trans.Method == "basic.nack"
 }
 
 //function to convert a body slice into a readable format
 func bodyToString(data []byte) string {
-	var ret []string = make([]string, len(data))
-
+	ret := make([]string, len(data))
 	for i, c := range data {
 		ret[i] = strconv.Itoa(int(c))
 	}
@@ -565,10 +564,6 @@ func isCloseError(t *AmqpTransaction) bool {
 }
 
 func getReplyCode(m common.MapStr) uint16 {
-	code, ok := m["reply-code"].(uint16)
-	if !ok {
-		return 0
-	} else {
-		return code
-	}
+	code, _ := m["reply-code"].(uint16)
+	return code
 }

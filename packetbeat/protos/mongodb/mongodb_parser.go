@@ -32,7 +32,7 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	// see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#standard-message-header
 	s.message.messageLength = length
 
-	s.message.requestId, _ = d.readInt32()
+	s.message.requestID, _ = d.readInt32()
 	s.message.responseTo, _ = d.readInt32()
 	code, _ := d.readInt32()
 
@@ -162,13 +162,13 @@ func opInsertParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	return true, true
 }
 
-func extract_documents(query map[string]interface{}) []interface{} {
-	docs_vi, present := query["documents"]
+func extractDocuments(query map[string]interface{}) []interface{} {
+	docsVi, present := query["documents"]
 	if !present {
 		return []interface{}{}
 	}
 
-	docs, ok := docs_vi.([]interface{})
+	docs, ok := docsVi.([]interface{})
 	if !ok {
 		return []interface{}{}
 	}

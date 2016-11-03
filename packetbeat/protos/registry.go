@@ -19,7 +19,7 @@ type Plugin interface {
 	GetPorts() []int
 }
 
-type TcpPlugin interface {
+type TCPPlugin interface {
 	Plugin
 
 	// Called when TCP payload data is available for parsing.
@@ -40,11 +40,11 @@ type TcpPlugin interface {
 	ConnectionTimeout() time.Duration
 }
 
-type UdpPlugin interface {
+type UDPPlugin interface {
 	Plugin
 
-	// ParseUdp is invoked when UDP payload data is available for parsing.
-	ParseUdp(pkt *Packet)
+	// ParseUDP is invoked when UDP payload data is available for parsing.
+	ParseUDP(pkt *Packet)
 }
 
 // Protocol identifier.

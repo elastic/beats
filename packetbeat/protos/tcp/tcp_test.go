@@ -18,9 +18,9 @@ import (
 
 // Test Constants
 const (
-	ServerIp   = "192.168.0.1"
+	ServerIP   = "192.168.0.1"
 	ServerPort = 12345
-	ClientIp   = "10.0.0.1"
+	ClientIP   = "10.0.0.1"
 )
 
 var (
@@ -63,8 +63,8 @@ var _ protos.Plugin = &TestProtocol{
 	},
 }
 
-func (proto *TestProtocol) Init(test_mode bool, results publish.Transactions) error {
-	return proto.init(test_mode, results)
+func (proto *TestProtocol) Init(testMode bool, results publish.Transactions) error {
+	return proto.init(testMode, results)
 }
 
 func (proto TestProtocol) GetPorts() []int {
@@ -93,13 +93,13 @@ func (proto TestProtocol) ConnectionTimeout() time.Duration {
 func Test_configToPortsMap(t *testing.T) {
 
 	type configTest struct {
-		Input  map[protos.Protocol]protos.TcpPlugin
+		Input  map[protos.Protocol]protos.TCPPlugin
 		Output map[uint16]protos.Protocol
 	}
 
-	config_tests := []configTest{
+	configTests := []configTest{
 		{
-			Input: map[protos.Protocol]protos.TcpPlugin{
+			Input: map[protos.Protocol]protos.TCPPlugin{
 				httpProtocol: &TestProtocol{Ports: []int{80, 8080}},
 			},
 			Output: map[uint16]protos.Protocol{
@@ -108,7 +108,7 @@ func Test_configToPortsMap(t *testing.T) {
 			},
 		},
 		{
-			Input: map[protos.Protocol]protos.TcpPlugin{
+			Input: map[protos.Protocol]protos.TCPPlugin{
 				httpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
 				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
 				redisProtocol: &TestProtocol{Ports: []int{6379, 6380}},
@@ -124,7 +124,7 @@ func Test_configToPortsMap(t *testing.T) {
 
 		// should ignore duplicate ports in the same protocol
 		{
-			Input: map[protos.Protocol]protos.TcpPlugin{
+			Input: map[protos.Protocol]protos.TCPPlugin{
 				httpProtocol:  &TestProtocol{Ports: []int{80, 8080, 8080}},
 				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
 			},
@@ -136,7 +136,7 @@ func Test_configToPortsMap(t *testing.T) {
 		},
 	}
 
-	for _, test := range config_tests {
+	for _, test := range configTests {
 		output, err := buildPortsMap(test.Input)
 		assert.Nil(t, err)
 		assert.Equal(t, test.Output, output)
@@ -146,14 +146,14 @@ func Test_configToPortsMap(t *testing.T) {
 func Test_configToPortsMap_negative(t *testing.T) {
 
 	type errTest struct {
-		Input map[protos.Protocol]protos.TcpPlugin
+		Input map[protos.Protocol]protos.TCPPlugin
 		Err   string
 	}
 
 	tests := []errTest{
 		{
 			// should raise error on duplicate port
-			Input: map[protos.Protocol]protos.TcpPlugin{
+			Input: map[protos.Protocol]protos.TCPPlugin{
 				httpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
 				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
 				redisProtocol: &TestProtocol{Ports: []int{6379, 6380, 3306}},
@@ -171,18 +171,18 @@ func Test_configToPortsMap_negative(t *testing.T) {
 
 // Mock protos.Protocols used for testing the tcp package.
 type protocols struct {
-	tcp map[protos.Protocol]protos.TcpPlugin
+	tcp map[protos.Protocol]protos.TCPPlugin
 }
 
 // Verify protocols implements the protos.Protocols interface.
 var _ protos.Protocols = &protocols{}
 
-func (p protocols) BpfFilter(with_vlans bool, with_icmp bool) string     { return "" }
-func (p protocols) GetTcp(proto protos.Protocol) protos.TcpPlugin        { return p.tcp[proto] }
-func (p protocols) GetUdp(proto protos.Protocol) protos.UdpPlugin        { return nil }
+func (p protocols) BpfFilter(withVlans bool, withICMP bool) string       { return "" }
+func (p protocols) GetTCP(proto protos.Protocol) protos.TCPPlugin        { return p.tcp[proto] }
+func (p protocols) GetUDP(proto protos.Protocol) protos.UDPPlugin        { return nil }
 func (p protocols) GetAll() map[protos.Protocol]protos.Plugin            { return nil }
-func (p protocols) GetAllTcp() map[protos.Protocol]protos.TcpPlugin      { return p.tcp }
-func (p protocols) GetAllUdp() map[protos.Protocol]protos.UdpPlugin      { return nil }
+func (p protocols) GetAllTCP() map[protos.Protocol]protos.TCPPlugin      { return p.tcp }
+func (p protocols) GetAllUDP() map[protos.Protocol]protos.UDPPlugin      { return nil }
 func (p protocols) Register(proto protos.Protocol, plugin protos.Plugin) { return }
 
 func TestTCSeqPayload(t *testing.T) {
@@ -273,8 +273,8 @@ func TestTCSeqPayload(t *testing.T) {
 
 		gap := 0
 		var state []byte
-		tcp, err := NewTcp(protocols{
-			tcp: map[protos.Protocol]protos.TcpPlugin{
+		tcp, err := NewTCP(protocols{
+			tcp: map[protos.Protocol]protos.TCPPlugin{
 				httpProtocol: &TestProtocol{
 					Ports: []int{ServerPort},
 					gap:   makeCountGaps(nil, &gap),
@@ -287,8 +287,8 @@ func TestTCSeqPayload(t *testing.T) {
 		}
 
 		addr := common.NewIPPortTuple(4,
-			net.ParseIP(ServerIp), ServerPort,
-			net.ParseIP(ClientIp), uint16(rand.Intn(65535)))
+			net.ParseIP(ServerIP), ServerPort,
+			net.ParseIP(ClientIP), uint16(rand.Intn(65535)))
 
 		for _, segment := range test.segments {
 			hdr := &layers.TCP{Seq: segment.seq}
@@ -315,9 +315,9 @@ func TestTCSeqPayload(t *testing.T) {
 func BenchmarkParallelProcess(b *testing.B) {
 	rand.Seed(18)
 	p := protocols{}
-	p.tcp = make(map[protos.Protocol]protos.TcpPlugin)
+	p.tcp = make(map[protos.Protocol]protos.TCPPlugin)
 	p.tcp[1] = &TestProtocol{Ports: []int{ServerPort}}
-	tcp, _ := NewTcp(p)
+	tcp, _ := NewTCP(p)
 
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
@@ -325,8 +325,8 @@ func BenchmarkParallelProcess(b *testing.B) {
 			pkt := &protos.Packet{
 				Ts: time.Now(),
 				Tuple: common.NewIPPortTuple(4,
-					net.ParseIP(ServerIp), ServerPort,
-					net.ParseIP(ClientIp), uint16(rand.Intn(65535))),
+					net.ParseIP(ServerIP), ServerPort,
+					net.ParseIP(ClientIP), uint16(rand.Intn(65535))),
 				Payload: []byte{1, 2, 3, 4},
 			}
 			tcp.Process(nil, &layers.TCP{}, pkt)

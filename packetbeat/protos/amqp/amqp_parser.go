@@ -58,8 +58,8 @@ func (amqp *Amqp) amqpMessageParser(s *AmqpStream) (ok bool, complete bool) {
 	return ok, complete
 }
 
-func (stream *AmqpStream) PrepareForNewMessage() {
-	stream.message = nil
+func (s *AmqpStream) PrepareForNewMessage() {
+	s.message = nil
 }
 
 func isProtocolHeader(data []byte) (isHeader bool, version string) {
@@ -103,25 +103,26 @@ The Method Payload, according to official doc :
   short       short       ...
 */
 
-func (amqp *Amqp) decodeMethodFrame(s *AmqpStream, m_data []byte) (bool, bool) {
-	if len(m_data) < 4 {
+func (amqp *Amqp) decodeMethodFrame(s *AmqpStream, buf []byte) (bool, bool) {
+	if len(buf) < 4 {
 		logp.Warn("Method frame too small, waiting for more data")
 		return true, false
 	}
-	class := codeClass(binary.BigEndian.Uint16(m_data[0:2]))
-	method := codeMethod(binary.BigEndian.Uint16(m_data[2:4]))
-	arguments := m_data[4:]
+	class := codeClass(binary.BigEndian.Uint16(buf[0:2]))
+	method := codeMethod(binary.BigEndian.Uint16(buf[2:4]))
+	arguments := buf[4:]
 	s.message.ParseArguments = amqp.ParseArguments
-	s.message.Body_size = uint64(len(m_data[4:]))
+	s.message.BodySize = uint64(len(buf[4:]))
 
 	debugf("Received frame of class %d and method %d", class, method)
 
-	if function, exists := amqp.MethodMap[class][method]; exists {
-		return function(s.message, arguments)
-	} else {
+	fn, exists := amqp.MethodMap[class][method]
+	if !exists {
 		logp.Debug("amqpdetailed", "Received unknown or not supported method")
 		return false, false
 	}
+
+	return fn(s.message, arguments)
 }
 
 /*
@@ -133,16 +134,16 @@ Structure of a content header, according to official doc :
   short      short   long long        short         remainder...
 */
 
-func (amqp *Amqp) decodeHeaderFrame(s *AmqpStream, h_data []byte) bool {
-	if len(h_data) < 14 {
+func (amqp *Amqp) decodeHeaderFrame(s *AmqpStream, buf []byte) bool {
+	if len(buf) < 14 {
 		logp.Warn("Header frame too small, waiting for mode data")
 		return true
 	}
-	s.message.Body_size = binary.BigEndian.Uint64(h_data[4:12])
-	debugf("Received Header frame. A message of %d bytes is expected", s.message.Body_size)
+	s.message.BodySize = binary.BigEndian.Uint64(buf[4:12])
+	debugf("Received Header frame. A message of %d bytes is expected", s.message.BodySize)
 
 	if amqp.ParseHeaders == true {
-		err := getMessageProperties(s, h_data[12:])
+		err := getMessageProperties(s, buf[12:])
 		if err {
 			return false
 		}
@@ -157,17 +158,15 @@ Structure of a body frame, according to official doc :
 +-----------------------+ +-----------+
 */
 
-func (s *AmqpStream) decodeBodyFrame(b_data []byte) (ok bool, complete bool) {
-	s.message.Body = append(s.message.Body, b_data...)
+func (s *AmqpStream) decodeBodyFrame(buf []byte) (ok bool, complete bool) {
+	s.message.Body = append(s.message.Body, buf...)
 
 	debugf("A body frame of %d bytes long has been transmitted",
-		len(b_data))
+		len(buf))
 	//is the message complete ? If yes, let's publish it
-	if uint64(len(s.message.Body)) < s.message.Body_size {
-		return true, false
-	} else {
-		return true, true
-	}
+
+	complete = uint64(len(s.message.Body)) >= s.message.BodySize
+	return true, complete
 }
 
 func hasProperty(prop, flag byte) bool {
@@ -227,21 +226,21 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 		} else if data[offset] == 2 {
 			m.Fields["delivery-mode"] = "persistent"
 		}
-		offset += 1
+		offset++
 	}
 
 	if hasProperty(prop1, priorityProp) {
 		m.Fields["priority"] = data[offset]
-		offset += 1
+		offset++
 	}
 
-	if hasProperty(prop1, correlationIdProp) {
-		correlationId, next, err := getShortString(data, offset+1, uint32(data[offset]))
+	if hasProperty(prop1, correlationIDProp) {
+		correlationID, next, err := getShortString(data, offset+1, uint32(data[offset]))
 		if err {
 			logp.Warn("Failed to get correlation-id in header frame")
 			return true
 		}
-		m.Fields["correlation-id"] = correlationId
+		m.Fields["correlation-id"] = correlationID
 		offset = next
 	}
 
@@ -265,13 +264,13 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 		offset = next
 	}
 
-	if hasProperty(prop2, messageIdProp) {
-		messageId, next, err := getShortString(data, offset+1, uint32(data[offset]))
+	if hasProperty(prop2, messageIDProp) {
+		messageID, next, err := getShortString(data, offset+1, uint32(data[offset]))
 		if err {
 			logp.Warn("Failed to get message id in header frame")
 			return true
 		}
-		m.Fields["message-id"] = messageId
+		m.Fields["message-id"] = messageID
 		offset = next
 	}
 
@@ -291,23 +290,23 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 		offset = next
 	}
 
-	if hasProperty(prop2, userIdProp) {
-		userId, next, err := getShortString(data, offset+1, uint32(data[offset]))
+	if hasProperty(prop2, userIDProp) {
+		userID, next, err := getShortString(data, offset+1, uint32(data[offset]))
 		if err {
 			logp.Warn("Failed to get user id in header frame")
 			return true
 		}
-		m.Fields["user-id"] = userId
+		m.Fields["user-id"] = userID
 		offset = next
 	}
 
-	if hasProperty(prop2, appIdProp) {
-		appId, _, err := getShortString(data, offset+1, uint32(data[offset]))
+	if hasProperty(prop2, appIDProp) {
+		appID, _, err := getShortString(data, offset+1, uint32(data[offset]))
 		if err {
 			logp.Warn("Failed to get app-id in header frame")
 			return true
 		}
-		m.Fields["app-id"] = appId
+		m.Fields["app-id"] = appID
 	}
 	return false
 }
@@ -317,7 +316,7 @@ func (amqp *Amqp) handleAmqp(m *AmqpMessage, tcptuple *common.TCPTuple, dir uint
 		return
 	}
 	debugf("A message is ready to be handled")
-	m.TcpTuple = *tcptuple
+	m.TCPTuple = *tcptuple
 	m.Direction = dir
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 
