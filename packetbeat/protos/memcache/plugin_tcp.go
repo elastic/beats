@@ -98,7 +98,7 @@ func (mc *Memcache) Parse(
 func (mc *Memcache) newStream(tcptuple *common.TCPTuple) *stream {
 	s := &stream{}
 	s.parser.init(&mc.config)
-	s.Stream.Init(tcp.TCP_MAX_DATA_IN_STREAM)
+	s.Stream.Init(tcp.TCPMaxDataInStream)
 	return s
 }
 
@@ -173,14 +173,13 @@ func (mc *Memcache) onTCPMessage(
 	msg *message,
 ) error {
 	msg.Tuple = *tuple
-	msg.Transport = applayer.TransportTcp
+	msg.Transport = applayer.TransportTCP
 	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tuple)
 
 	if msg.IsRequest {
 		return mc.onTCPRequest(conn, tuple, dir, msg)
-	} else {
-		return mc.onTCPResponse(conn, tuple, dir, msg)
 	}
+	return mc.onTCPResponse(conn, tuple, dir, msg)
 }
 
 func (mc *Memcache) onTCPRequest(
@@ -189,7 +188,7 @@ func (mc *Memcache) onTCPRequest(
 	dir uint8,
 	msg *message,
 ) error {
-	requestSeenFirst := dir == tcp.TcpDirectionOriginal
+	requestSeenFirst := dir == tcp.TCPDirectionOriginal
 	if requestSeenFirst {
 		msg.Direction = applayer.NetOriginalDirection
 	} else {
@@ -217,7 +216,7 @@ func (mc *Memcache) onTCPResponse(
 	dir uint8,
 	msg *message,
 ) error {
-	requestSeenFirst := dir == tcp.TcpDirectionReverse
+	requestSeenFirst := dir == tcp.TCPDirectionReverse
 	if requestSeenFirst {
 		msg.Direction = applayer.NetOriginalDirection
 	} else {

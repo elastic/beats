@@ -1,6 +1,6 @@
 package nfs
 
-var NFS_STATUS = map[int]string{
+var NFSStatus = map[int]string{
 	0:     "NFS_OK",
 	1:     "NFSERR_PERM",
 	2:     "NFSERR_NOENT",

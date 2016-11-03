@@ -25,25 +25,25 @@ import (
 )
 
 // Verify that the interface TCP has been satisfied.
-var _ protos.TcpPlugin = &Dns{}
+var _ protos.TCPPlugin = &DNS{}
 
 var (
-	messagesTcp = []DnsTestMessage{
+	messagesTCP = []DNSTestMessage{
 		elasticATcp,
-		zoneAxfrTcp,
-		githubPtrTcp,
-		sophosTxtTcp,
+		zoneAxfrTCP,
+		githubPtrTCP,
+		sophosTxtTCP,
 	}
 
-	elasticATcp = DnsTestMessage{
+	elasticATcp = DNSTestMessage{
 		id:          11674,
 		opcode:      "QUERY",
 		flags:       []string{"rd", "ra"},
 		rcode:       "NOERROR",
-		q_class:     "IN",
-		q_type:      "A",
-		q_name:      "elastic.co.",
-		q_etld:      "elastic.co.",
+		qClass:      "IN",
+		qType:       "A",
+		qName:       "elastic.co.",
+		qEtld:       "elastic.co.",
 		answers:     []string{"54.201.204.244", "54.200.185.88"},
 		authorities: []string{"NS-835.AWSDNS-40.NET.", "NS-1183.AWSDNS-19.ORG.", "NS-2007.AWSDNS-58.CO.UK.", "NS-66.AWSDNS-08.COM."},
 		request: []byte{
@@ -67,14 +67,14 @@ var (
 		},
 	}
 
-	zoneAxfrTcp = DnsTestMessage{
+	zoneAxfrTCP = DNSTestMessage{
 		id:      0,
 		opcode:  "QUERY",
 		rcode:   "NOERROR",
-		q_class: "IN",
-		q_type:  "AXFR",
-		q_name:  "etas.com.",
-		q_etld:  "etas.com.",
+		qClass:  "IN",
+		qType:   "AXFR",
+		qName:   "etas.com.",
+		qEtld:   "etas.com.",
 		answers: []string{"training2003p.", "training2003p.", "1.1.1.1", "training2003p."},
 		request: []byte{
 			0x00, 0x1c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x65,
@@ -97,15 +97,15 @@ var (
 		},
 	}
 
-	githubPtrTcp = DnsTestMessage{
+	githubPtrTCP = DNSTestMessage{
 		id:          6766,
 		opcode:      "QUERY",
 		flags:       []string{"rd", "ra"},
 		rcode:       "NOERROR",
-		q_class:     "IN",
-		q_type:      "PTR",
-		q_name:      "131.252.30.192.in-addr.arpa.",
-		q_etld:      "192.in-addr.arpa.",
+		qClass:      "IN",
+		qType:       "PTR",
+		qName:       "131.252.30.192.in-addr.arpa.",
+		qEtld:       "192.in-addr.arpa.",
 		answers:     []string{"github.com."},
 		authorities: []string{"ns1.p16.dynect.net.", "ns3.p16.dynect.net.", "ns4.p16.dynect.net.", "ns2.p16.dynect.net."},
 		request: []byte{
@@ -127,17 +127,17 @@ var (
 		},
 	}
 
-	sophosTxtTcp = DnsTestMessage{
-		id:      35009,
-		opcode:  "QUERY",
-		flags:   []string{"rd", "ra"},
-		rcode:   "NXDOMAIN",
-		q_class: "IN",
-		q_type:  "TXT",
-		q_name: "3.1o19ss00s2s17s4qp375sp49r830n2n4n923s8839052s7p7768s53365226pp3.659p1r741os37393" +
+	sophosTxtTCP = DNSTestMessage{
+		id:     35009,
+		opcode: "QUERY",
+		flags:  []string{"rd", "ra"},
+		rcode:  "NXDOMAIN",
+		qClass: "IN",
+		qType:  "TXT",
+		qName: "3.1o19ss00s2s17s4qp375sp49r830n2n4n923s8839052s7p7768s53365226pp3.659p1r741os37393" +
 			"648s2348o762q1066q53rq5p4614r1q4781qpr16n809qp4.879o3o734q9sns005o3pp76q83.2q65qns3spns" +
 			"1081s5rn5sr74opqrqnpq6rn3ro5.i.00.mac.sophosxl.net.",
-		q_etld: "sophosxl.net.",
+		qEtld: "sophosxl.net.",
 		request: []byte{
 			0x00, 0xed, 0x88, 0xc1, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x33,
 			0x3f, 0x31, 0x6f, 0x31, 0x39, 0x73, 0x73, 0x30, 0x30, 0x73, 0x32, 0x73, 0x31, 0x37, 0x73, 0x34,
@@ -175,7 +175,7 @@ var (
 	}
 )
 
-func testTcpTuple() *common.TCPTuple {
+func testTCPTuple() *common.TCPTuple {
 	t := &common.TCPTuple{
 		IPLength: 4,
 		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
@@ -188,36 +188,36 @@ func testTcpTuple() *common.TCPTuple {
 func TestDecodeTcp_nonDnsMsgRequest(t *testing.T) {
 	rawData := []byte{0, 2, 1, 2}
 
-	_, err := decodeDnsData(TransportTcp, rawData)
-	assert.Equal(t, err, NonDnsMsg)
+	_, err := decodeDNSData(TransportTCP, rawData)
+	assert.Equal(t, err, NonDNSMsg)
 }
 
 // Verify that the split lone request packet is decoded.
 func TestDecodeTcp_splitRequest(t *testing.T) {
-	stream := &DnsStream{rawData: sophosTxtTcp.request[:10], message: new(DnsMessage)}
-	_, err := decodeDnsData(TransportTcp, stream.rawData)
+	stream := &DNSStream{rawData: sophosTxtTCP.request[:10], message: new(DNSMessage)}
+	_, err := decodeDNSData(TransportTCP, stream.rawData)
 
 	assert.NotNil(t, err, "Not expecting a complete message yet")
 
-	stream.rawData = append(stream.rawData, sophosTxtTcp.request[10:]...)
-	_, err = decodeDnsData(TransportTcp, stream.rawData)
+	stream.rawData = append(stream.rawData, sophosTxtTCP.request[10:]...)
+	_, err = decodeDNSData(TransportTCP, stream.rawData)
 
 	assert.Nil(t, err, "Message should be complete")
 }
 
 func TestParseTcp_errorNonDnsMsgResponse(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
-	tcptuple := testTcpTuple()
+	dns := newDNS(testing.Verbose())
+	tcptuple := testTCPTuple()
 	q := elasticATcp
 	packet := newPacket(forward, q.request)
 
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	r := []byte{0, 2, 1, 2}
 	packet = newPacket(reverse, r)
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionReverse, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionReverse, private)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transaction.")
 
 	m := expectResult(t, dns)
@@ -226,17 +226,17 @@ func TestParseTcp_errorNonDnsMsgResponse(t *testing.T) {
 	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
 	assert.Nil(t, mapValue(t, m, "bytes_out"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, NonDnsMsg.ResponseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, NonDNSMsg.ResponseError(), mapValue(t, m, "notes"))
 }
 
 // Verify that a request message with length (first two bytes value) of zero is not published
 func TestParseTcp_zeroLengthMsgRequest(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
-	tcptuple := testTcpTuple()
+	dns := newDNS(testing.Verbose())
+	tcptuple := testTCPTuple()
 	packet := newPacket(forward, []byte{0, 0, 1, 2})
 
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
@@ -246,17 +246,17 @@ func TestParseTcp_zeroLengthMsgRequest(t *testing.T) {
 // Verify that a response message with length (first two bytes value) of zero is published with the corresponding Notes
 func TestParseTcp_errorZeroLengthMsgResponse(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
-	tcptuple := testTcpTuple()
+	dns := newDNS(testing.Verbose())
+	tcptuple := testTCPTuple()
 	q := elasticATcp
 	packet := newPacket(forward, q.request)
 
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	r := []byte{0, 0, 1, 2}
 	packet = newPacket(reverse, r)
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionReverse, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionReverse, private)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transaction.")
 
 	m := expectResult(t, dns)
@@ -271,11 +271,11 @@ func TestParseTcp_errorZeroLengthMsgResponse(t *testing.T) {
 // Verify that an empty packet is safely handled (no panics).
 func TestParseTcp_emptyPacket(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
+	dns := newDNS(testing.Verbose())
 	packet := newPacket(forward, []byte{})
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
@@ -285,23 +285,23 @@ func TestParseTcp_emptyPacket(t *testing.T) {
 // Verify that a malformed packet is safely handled (no panics).
 func TestParseTcp_malformedPacket(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
+	dns := newDNS(testing.Verbose())
 	garbage := []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 	packet := newPacket(forward, garbage)
 
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 }
 
 // Verify that the lone request packet is parsed.
 func TestParseTcp_requestPacket(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
+	dns := newDNS(testing.Verbose())
 	packet := newPacket(forward, elasticATcp.request)
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
@@ -312,12 +312,12 @@ func TestParseTcp_requestPacket(t *testing.T) {
 // result is published.
 func TestParseTcp_errorResponseOnly(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
+	dns := newDNS(testing.Verbose())
 	q := elasticATcp
 	packet := newPacket(reverse, q.response)
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	m := expectResult(t, dns)
 	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
 	assert.Nil(t, mapValue(t, m, "bytes_in"))
@@ -333,15 +333,15 @@ func TestParseTcp_errorResponseOnly(t *testing.T) {
 // map awaiting a response.
 func TestParseTcp_errorDuplicateRequests(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
+	dns := newDNS(testing.Verbose())
 	q := elasticATcp
 	packet := newPacket(forward, q.request)
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	// The first request is published and this one becomes a transaction
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
@@ -359,15 +359,15 @@ func TestParseTcp_errorDuplicateRequests(t *testing.T) {
 // Checks that PrepareNewMessage and Parse can manage two messages on the same stream, in different packets
 func TestParseTcp_errorDuplicateRequestsOneStream(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
+	dns := newDNS(testing.Verbose())
 	q := elasticATcp
 	packet := newPacket(forward, q.request)
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	// The first query is published and this one becomes a transaction
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
@@ -385,19 +385,19 @@ func TestParseTcp_errorDuplicateRequestsOneStream(t *testing.T) {
 // It typically happens when a SOA is followed by AXFR
 func TestParseTcp_errorDuplicateRequestsOnePacket(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
+	dns := newDNS(testing.Verbose())
 	q := elasticATcp
 	offset := 4
 
 	concatRequest := append(q.request, q.request[:offset]...)
 	packet := newPacket(forward, concatRequest)
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	packet = newPacket(forward, q.request[offset:])
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	m := expectResult(t, dns)
@@ -413,28 +413,28 @@ func TestParseTcp_errorDuplicateRequestsOnePacket(t *testing.T) {
 // Verify that a split response packet is parsed and published
 func TestParseTcp_splitResponse(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
+	dns := newDNS(testing.Verbose())
 	tcpQuery := elasticATcp
 	q := tcpQuery.request
 	r0 := tcpQuery.response[:1]
 	r1 := tcpQuery.response[1:10]
 	r2 := tcpQuery.response[10:]
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	packet := newPacket(forward, q)
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	packet = newPacket(reverse, r0)
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionReverse, private)
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionReverse, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	packet = newPacket(reverse, r1)
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionReverse, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionReverse, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	packet = newPacket(reverse, r2)
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionReverse, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionReverse, private)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transaction.")
 
 	m := expectResult(t, dns)
@@ -449,18 +449,18 @@ func TestParseTcp_splitResponse(t *testing.T) {
 
 func TestGap_requestDrop(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
-	q := sophosTxtTcp.request[:10]
+	dns := newDNS(testing.Verbose())
+	q := sophosTxtTCP.request[:10]
 	packet := newPacket(forward, q)
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 
-	private, drop := dns.GapInStream(tcptuple, tcp.TcpDirectionOriginal, 10, private)
+	private, drop := dns.GapInStream(tcptuple, tcp.TCPDirectionOriginal, 10, private)
 
 	assert.Equal(t, true, drop)
 
-	dns.ReceivedFin(tcptuple, tcp.TcpDirectionOriginal, private)
+	dns.ReceivedFin(tcptuple, tcp.TCPDirectionOriginal, private)
 
 	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
@@ -471,26 +471,26 @@ func TestGap_requestDrop(t *testing.T) {
 // Verify that a gap during the response publish the request with Notes
 func TestGap_errorResponse(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
-	q := sophosTxtTcp.request
-	r := sophosTxtTcp.response[:10]
-	tcptuple := testTcpTuple()
+	dns := newDNS(testing.Verbose())
+	q := sophosTxtTCP.request
+	r := sophosTxtTCP.response[:10]
+	tcptuple := testTCPTuple()
 
 	packet := newPacket(forward, q)
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	packet = newPacket(reverse, r)
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionReverse, private)
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionReverse, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
-	private, drop := dns.GapInStream(tcptuple, tcp.TcpDirectionReverse, 10, private)
+	private, drop := dns.GapInStream(tcptuple, tcp.TCPDirectionReverse, 10, private)
 	assert.Equal(t, true, drop)
 
-	dns.ReceivedFin(tcptuple, tcp.TcpDirectionReverse, private)
+	dns.ReceivedFin(tcptuple, tcp.TCPDirectionReverse, private)
 
 	m := expectResult(t, dns)
-	assertRequest(t, m, sophosTxtTcp)
+	assertRequest(t, m, sophosTxtTCP)
 	assert.Equal(t, IncompleteMsg.ResponseError(), mapValue(t, m, "notes"))
 	assert.Nil(t, mapValue(t, m, "answers"))
 }
@@ -498,18 +498,18 @@ func TestGap_errorResponse(t *testing.T) {
 // Verify that a gap/fin happening after a valid query create only one tansaction
 func TestGapFin_validMessage(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
-	q := sophosTxtTcp.request
-	tcptuple := testTcpTuple()
+	dns := newDNS(testing.Verbose())
+	q := sophosTxtTCP.request
+	tcptuple := testTCPTuple()
 
 	packet := newPacket(forward, q)
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
-	private, drop := dns.GapInStream(tcptuple, tcp.TcpDirectionOriginal, 10, private)
+	private, drop := dns.GapInStream(tcptuple, tcp.TCPDirectionOriginal, 10, private)
 	assert.Equal(t, false, drop)
 
-	dns.ReceivedFin(tcptuple, tcp.TcpDirectionReverse, private)
+	dns.ReceivedFin(tcptuple, tcp.TCPDirectionReverse, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	client := dns.results.(*publish.ChanTransactions)
@@ -522,37 +522,37 @@ func TestGapFin_validMessage(t *testing.T) {
 // Verify that a Fin during the response publish the request with Notes
 func TestFin_errorResponse(t *testing.T) {
 	var private protos.ProtocolData
-	dns := newDns(testing.Verbose())
-	q := zoneAxfrTcp.request
-	r := zoneAxfrTcp.response[:10]
-	tcptuple := testTcpTuple()
+	dns := newDNS(testing.Verbose())
+	q := zoneAxfrTCP.request
+	r := zoneAxfrTCP.response[:10]
+	tcptuple := testTCPTuple()
 
 	packet := newPacket(forward, q)
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	packet = newPacket(reverse, r)
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionReverse, private)
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionReverse, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
-	dns.ReceivedFin(tcptuple, tcp.TcpDirectionReverse, private)
+	dns.ReceivedFin(tcptuple, tcp.TCPDirectionReverse, private)
 
 	m := expectResult(t, dns)
-	assertRequest(t, m, zoneAxfrTcp)
+	assertRequest(t, m, zoneAxfrTCP)
 	assert.Equal(t, IncompleteMsg.ResponseError(), mapValue(t, m, "notes"))
 	assert.Nil(t, mapValue(t, m, "answers"))
 }
 
 // parseTcpRequestResponse parses a request then a response packet and validates
 // the published result.
-func parseTcpRequestResponse(t testing.TB, dns *Dns, q DnsTestMessage) {
+func parseTCPRequestResponse(t testing.TB, dns *DNS, q DNSTestMessage) {
 	var private protos.ProtocolData
 	packet := newPacket(forward, q.request)
-	tcptuple := testTcpTuple()
-	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	tcptuple := testTCPTuple()
+	private = dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 
 	packet = newPacket(reverse, q.response)
-	dns.Parse(packet, tcptuple, tcp.TcpDirectionReverse, private)
+	dns.Parse(packet, tcptuple, tcp.TCPDirectionReverse, private)
 
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 
@@ -575,29 +575,29 @@ func parseTcpRequestResponse(t testing.TB, dns *Dns, q DnsTestMessage) {
 // Verify that the request/response pair are parsed and that a result
 // is published.
 func TestParseTcp_requestResponse(t *testing.T) {
-	parseTcpRequestResponse(t, newDns(testing.Verbose()), elasticATcp)
+	parseTCPRequestResponse(t, newDNS(testing.Verbose()), elasticATcp)
 }
 
 // Verify all DNS TCP test messages are parsed correctly.
 func TestParseTcp_allTestMessages(t *testing.T) {
-	dns := newDns(testing.Verbose())
-	for _, q := range messagesTcp {
-		t.Logf("Testing with query for %s", q.q_name)
-		parseTcpRequestResponse(t, dns, q)
+	dns := newDNS(testing.Verbose())
+	for _, q := range messagesTCP {
+		t.Logf("Testing with query for %s", q.qName)
+		parseTCPRequestResponse(t, dns, q)
 	}
 }
 
 // Benchmarks TCP parsing for the given test message.
-func benchmarkTcp(b *testing.B, q DnsTestMessage) {
-	dns := newDns(false)
+func benchmarkTCP(b *testing.B, q DNSTestMessage) {
+	dns := newDNS(false)
 	for i := 0; i < b.N; i++ {
 		var private protos.ProtocolData
 		packet := newPacket(forward, q.request)
-		tcptuple := testTcpTuple()
-		private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+		tcptuple := testTCPTuple()
+		private = dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 
 		packet = newPacket(reverse, q.response)
-		dns.Parse(packet, tcptuple, tcp.TcpDirectionReverse, private)
+		dns.Parse(packet, tcptuple, tcp.TCPDirectionReverse, private)
 
 		client := dns.results.(*publish.ChanTransactions)
 		<-client.Channel
@@ -605,18 +605,18 @@ func benchmarkTcp(b *testing.B, q DnsTestMessage) {
 }
 
 // Benchmark Tcp parsing against each test message.
-func BenchmarkTcpElasticA(b *testing.B)  { benchmarkTcp(b, elasticATcp) }
-func BenchmarkTcpZoneIxfr(b *testing.B)  { benchmarkTcp(b, zoneAxfrTcp) }
-func BenchmarkTcpGithubPtr(b *testing.B) { benchmarkTcp(b, githubPtrTcp) }
-func BenchmarkTcpSophosTxt(b *testing.B) { benchmarkTcp(b, sophosTxtTcp) }
+func BenchmarkTcpElasticA(b *testing.B)  { benchmarkTCP(b, elasticATcp) }
+func BenchmarkTcpZoneIxfr(b *testing.B)  { benchmarkTCP(b, zoneAxfrTCP) }
+func BenchmarkTcpGithubPtr(b *testing.B) { benchmarkTCP(b, githubPtrTCP) }
+func BenchmarkTcpSophosTxt(b *testing.B) { benchmarkTCP(b, sophosTxtTCP) }
 
 // Benchmark that runs with parallelism to help find concurrency related
 // issues. To run with parallelism, the 'go test' cpu flag must be set
 // greater than 1, otherwise it just runs concurrently but not in parallel.
 func BenchmarkParallelTcpParse(b *testing.B) {
 	rand.Seed(22)
-	numMessages := len(messagesTcp)
-	dns := newDns(false)
+	numMessages := len(messagesTCP)
+	dns := newDNS(false)
 	client := dns.results.(*publish.ChanTransactions)
 
 	// Drain the results channel while the test is running.
@@ -634,19 +634,19 @@ func BenchmarkParallelTcpParse(b *testing.B) {
 		// Each iteration parses one message, either a request or a response.
 		// The request and response could be parsed on different goroutines.
 		for pb.Next() {
-			q := messagesTcp[rand.Intn(numMessages)]
+			q := messagesTCP[rand.Intn(numMessages)]
 			var packet *protos.Packet
 			var tcptuple *common.TCPTuple
 			var private protos.ProtocolData
 
 			if rand.Intn(2) == 0 {
 				packet = newPacket(forward, q.request)
-				tcptuple = testTcpTuple()
+				tcptuple = testTCPTuple()
 			} else {
 				packet = newPacket(reverse, q.response)
-				tcptuple = testTcpTuple()
+				tcptuple = testTCPTuple()
 			}
-			dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+			dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 		}
 	})
 

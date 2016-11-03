@@ -3,7 +3,6 @@
 package procs
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -56,7 +55,7 @@ func AssertIntArraysAreEqual(t *testing.T, expected []int, result []int) bool {
 			}
 		}
 		if !found {
-			t.Error(fmt.Sprintf("Expected array %v but got %v", expected, result))
+			t.Errorf("Expected array %v but got %v", expected, result)
 			return false
 		}
 	}
@@ -73,7 +72,7 @@ func AssertUint64ArraysAreEqual(t *testing.T, expected []uint64, result []uint64
 			}
 		}
 		if !found {
-			t.Error(fmt.Sprintf("Expected array %v but got %v", expected, result))
+			t.Errorf("Expected array %v but got %v", expected, result)
 			return false
 		}
 	}
@@ -95,20 +94,20 @@ func TestFindPidsByCmdlineGrep(t *testing.T) {
 	}
 
 	// Create fake proc file system
-	path_prefix, err := ioutil.TempDir("/tmp", "")
+	pathPrefix, err := ioutil.TempDir("/tmp", "")
 	if err != nil {
 		t.Error("TempDir failed:", err)
 		return
 	}
-	defer os.RemoveAll(path_prefix)
+	defer os.RemoveAll(pathPrefix)
 
-	err = CreateFakeDirectoryStructure(path_prefix, proc)
+	err = CreateFakeDirectoryStructure(pathPrefix, proc)
 	if err != nil {
 		t.Error("CreateFakeDirectoryStructure failed:", err)
 		return
 	}
 
-	pids, err := FindPidsByCmdlineGrep(path_prefix, "nginx")
+	pids, err := FindPidsByCmdlineGrep(pathPrefix, "nginx")
 	if err != nil {
 		t.Error("FindPidsByCmdline:", err)
 		return
@@ -130,23 +129,25 @@ func TestRefreshPids(t *testing.T) {
 	}
 
 	// Create fake proc file system
-	path_prefix, err := ioutil.TempDir("/tmp", "")
+	pathPrefix, err := ioutil.TempDir("/tmp", "")
 	if err != nil {
 		t.Error("TempDir failed:", err)
 		return
 	}
-	defer os.RemoveAll(path_prefix)
+	defer os.RemoveAll(pathPrefix)
 
-	err = CreateFakeDirectoryStructure(path_prefix, proc)
+	err = CreateFakeDirectoryStructure(pathPrefix, proc)
 	if err != nil {
 		t.Error("CreateFakeDirectoryStructure failed:", err)
 		return
 	}
 
 	testSignals := make(chan bool)
-	var procs ProcessesWatcher = ProcessesWatcher{proc_prefix: path_prefix,
-		TestSignals: &testSignals}
-	var ch chan time.Time = make(chan time.Time)
+	procs := ProcessesWatcher{
+		procPrefix:  pathPrefix,
+		TestSignals: &testSignals,
+	}
+	ch := make(chan time.Time)
 
 	p, err := NewProcess(&procs, "nginx", "nginx", (<-chan time.Time)(ch))
 	if err != nil {
@@ -160,8 +161,8 @@ func TestRefreshPids(t *testing.T) {
 	AssertIntArraysAreEqual(t, []int{766, 768, 769}, p.Pids)
 
 	// Add new process
-	os.MkdirAll(filepath.Join(path_prefix, "/proc/780"), 0755)
-	ioutil.WriteFile(filepath.Join(path_prefix, "/proc/780/cmdline"),
+	os.MkdirAll(filepath.Join(pathPrefix, "/proc/780"), 0755)
+	ioutil.WriteFile(filepath.Join(pathPrefix, "/proc/780/cmdline"),
 		[]byte("nginx whatever"), 0644)
 
 	ch <- time.Now()
@@ -186,20 +187,20 @@ func TestFindSocketsOfPid(t *testing.T) {
 	}
 
 	// Create fake proc file system
-	path_prefix, err := ioutil.TempDir("/tmp", "")
+	pathPrefix, err := ioutil.TempDir("/tmp", "")
 	if err != nil {
 		t.Error("TempDir failed:", err)
 		return
 	}
-	defer os.RemoveAll(path_prefix)
+	defer os.RemoveAll(pathPrefix)
 
-	err = CreateFakeDirectoryStructure(path_prefix, proc)
+	err = CreateFakeDirectoryStructure(pathPrefix, proc)
 	if err != nil {
 		t.Error("CreateFakeDirectoryStructure failed:", err)
 		return
 	}
 
-	inodes, err := FindSocketsOfPid(path_prefix, 766)
+	inodes, err := FindSocketsOfPid(pathPrefix, 766)
 	if err != nil {
 		t.Fatalf("FindSocketsOfPid: %s", err)
 	}
@@ -212,17 +213,17 @@ func TestParse_Proc_Net_Tcp(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Opening ../tests/files/proc_net_tcp.txt: %s", err)
 	}
-	socketInfo, err := Parse_Proc_Net_Tcp(file, false)
+	socketInfo, err := ParseProcNetTCP(file, false)
 	if err != nil {
 		t.Fatalf("Parse_Proc_Net_Tcp: %s", err)
 	}
 	if len(socketInfo) != 32 {
 		t.Error("expected socket information on 32 sockets but got", len(socketInfo))
 	}
-	if socketInfo[31].Src_ip.String() != "192.168.2.243" {
+	if socketInfo[31].SrcIP.String() != "192.168.2.243" {
 		t.Error("Failed to parse source IP address 192.168.2.243")
 	}
-	if socketInfo[31].Src_port != 41622 {
+	if socketInfo[31].SrcPort != 41622 {
 		t.Error("Failed to parse source port 41622")
 	}
 }
@@ -232,18 +233,18 @@ func TestParse_Proc_Net_Tcp6(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Opening ../tests/files/proc_net_tcp6.txt: %s", err)
 	}
-	socketInfo, err := Parse_Proc_Net_Tcp(file, true)
+	socketInfo, err := ParseProcNetTCP(file, true)
 	if err != nil {
 		t.Fatalf("Parse_Proc_Net_Tcp: %s", err)
 	}
 	if len(socketInfo) != 6 {
 		t.Error("expected socket information on 6 sockets but got", len(socketInfo))
 	}
-	if socketInfo[5].Src_ip.String() != "::" {
-		t.Error("Failed to parse source IP address ::, got instead", socketInfo[5].Src_ip.String())
+	if socketInfo[5].SrcIP.String() != "::" {
+		t.Error("Failed to parse source IP address ::, got instead", socketInfo[5].SrcIP.String())
 	}
 	// TODO add an example of a 'real' IPv6 address
-	if socketInfo[5].Src_port != 59497 {
-		t.Error("Failed to parse source port 59497, got instead", socketInfo[5].Src_port)
+	if socketInfo[5].SrcPort != 59497 {
+		t.Error("Failed to parse source port 59497, got instead", socketInfo[5].SrcPort)
 	}
 }

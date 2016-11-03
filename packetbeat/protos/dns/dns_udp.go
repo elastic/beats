@@ -8,16 +8,16 @@ import (
 )
 
 // Only EDNS packets should have their size beyond this value
-const MaxDnsPacketSize = (1 << 9) // 512 (bytes)
+const MaxDNSPacketSize = (1 << 9) // 512 (bytes)
 
-func (dns *Dns) ParseUdp(pkt *protos.Packet) {
+func (dns *DNS) ParseUDP(pkt *protos.Packet) {
 	defer logp.Recover("Dns ParseUdp")
 	packetSize := len(pkt.Payload)
 
 	debugf("Parsing packet addressed with %s of length %d.",
 		pkt.Tuple.String(), packetSize)
 
-	dnsPkt, err := decodeDnsData(TransportUdp, pkt.Payload)
+	dnsPkt, err := decodeDNSData(TransportUDP, pkt.Payload)
 	if err != nil {
 		// This means that malformed requests or responses are being sent or
 		// that someone is attempting to the DNS port for non-DNS traffic. Both
@@ -26,8 +26,8 @@ func (dns *Dns) ParseUdp(pkt *protos.Packet) {
 		return
 	}
 
-	dnsTuple := DnsTupleFromIpPort(&pkt.Tuple, TransportUdp, dnsPkt.Id)
-	dnsMsg := &DnsMessage{
+	dnsTuple := DNSTupleFromIPPort(&pkt.Tuple, TransportUDP, dnsPkt.Id)
+	dnsMsg := &DNSMessage{
 		Ts:           pkt.Ts,
 		Tuple:        pkt.Tuple,
 		CmdlineTuple: procs.ProcWatcher.FindProcessesTuple(&pkt.Tuple),
@@ -36,8 +36,8 @@ func (dns *Dns) ParseUdp(pkt *protos.Packet) {
 	}
 
 	if dnsMsg.Data.Response {
-		dns.receivedDnsResponse(&dnsTuple, dnsMsg)
+		dns.receivedDNSResponse(&dnsTuple, dnsMsg)
 	} else /* Query */ {
-		dns.receivedDnsRequest(&dnsTuple, dnsMsg)
+		dns.receivedDNSRequest(&dnsTuple, dnsMsg)
 	}
 }

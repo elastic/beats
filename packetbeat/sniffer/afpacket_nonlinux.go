@@ -12,7 +12,7 @@ import (
 type AfpacketHandle struct {
 }
 
-func NewAfpacketHandle(device string, snaplen int, block_size int, num_blocks int,
+func NewAfpacketHandle(device string, snaplen int, blockSize int, numBlocks int,
 	timeout time.Duration) (*AfpacketHandle, error) {
 
 	return nil, fmt.Errorf("Afpacket MMAP sniffing is only available on Linux")

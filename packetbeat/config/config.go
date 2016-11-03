@@ -18,17 +18,17 @@ type Config struct {
 }
 
 type InterfacesConfig struct {
-	Device         string
-	Type           string
-	File           string
-	With_vlans     bool
-	Bpf_filter     string
-	Snaplen        int
-	Buffer_size_mb int
-	TopSpeed       bool
-	Dumpfile       string
-	OneAtATime     bool
-	Loop           int
+	Device       string
+	Type         string
+	File         string
+	WithVlans    bool
+	BpfFilter    string
+	Snaplen      int
+	BufferSizeMb int
+	TopSpeed     bool
+	Dumpfile     string
+	OneAtATime   bool
+	Loop         int
 }
 
 type Flows struct {

@@ -22,23 +22,23 @@ import (
 
 // Test Constants
 const (
-	ServerIp   = "192.168.0.1"
+	ServerIP   = "192.168.0.1"
 	ServerPort = 53
-	ClientIp   = "10.0.0.1"
+	ClientIP   = "10.0.0.1"
 	ClientPort = 34898
 )
 
 // DnsTestMessage holds the data that is expected to be returned when parsing
 // the raw DNS layer payloads for the request and response packet.
-type DnsTestMessage struct {
+type DNSTestMessage struct {
 	id          uint16
 	opcode      string
 	flags       []string
 	rcode       string
-	q_class     string
-	q_type      string
-	q_name      string
-	q_etld      string
+	qClass      string
+	qType       string
+	qName       string
+	qEtld       string
 	answers     []string
 	authorities []string
 	additionals []string
@@ -49,14 +49,14 @@ type DnsTestMessage struct {
 // Request and response addresses.
 var (
 	forward = common.NewIPPortTuple(4,
-		net.ParseIP(ServerIp), ServerPort,
-		net.ParseIP(ClientIp), ClientPort)
+		net.ParseIP(ServerIP), ServerPort,
+		net.ParseIP(ClientIP), ClientPort)
 	reverse = common.NewIPPortTuple(4,
-		net.ParseIP(ClientIp), ClientPort,
-		net.ParseIP(ServerIp), ServerPort)
+		net.ParseIP(ClientIP), ClientPort,
+		net.ParseIP(ServerIP), ServerPort)
 )
 
-func newDns(verbose bool) *Dns {
+func newDNS(verbose bool) *DNS {
 	if verbose {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"dns"})
 	} else {
@@ -76,7 +76,7 @@ func newDns(verbose bool) *Dns {
 		panic(err)
 	}
 
-	return dns.(*Dns)
+	return dns.(*DNS)
 }
 
 func newPacket(t common.IPPortTuple, payload []byte) *protos.Packet {
@@ -89,7 +89,7 @@ func newPacket(t common.IPPortTuple, payload []byte) *protos.Packet {
 
 // expectResult returns one MapStr result from the Dns results channel. If
 // no result is available then the test fails.
-func expectResult(t testing.TB, dns *Dns) common.MapStr {
+func expectResult(t testing.TB, dns *DNS) common.MapStr {
 	client := dns.results.(*publish.ChanTransactions)
 	select {
 	case result := <-client.Channel:
@@ -158,7 +158,7 @@ func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
 //     dns.authorities
 //     dns.additionals_count
 //     dns.additionals
-func assertMapStrData(t testing.TB, m common.MapStr, q DnsTestMessage) {
+func assertMapStrData(t testing.TB, m common.MapStr, q DNSTestMessage) {
 	assertRequest(t, m, q)
 
 	// Answers
@@ -204,20 +204,20 @@ func assertMapStrData(t testing.TB, m common.MapStr, q DnsTestMessage) {
 	}
 }
 
-func assertRequest(t testing.TB, m common.MapStr, q DnsTestMessage) {
+func assertRequest(t testing.TB, m common.MapStr, q DNSTestMessage) {
 	assert.Equal(t, "dns", mapValue(t, m, "type"))
 	assertAddress(t, forward, mapValue(t, m, "src"))
 	assertAddress(t, reverse, mapValue(t, m, "dst"))
-	assert.Equal(t, fmt.Sprintf("class %s, type %s, %s", q.q_class, q.q_type, q.q_name),
+	assert.Equal(t, fmt.Sprintf("class %s, type %s, %s", q.qClass, q.qType, q.qName),
 		mapValue(t, m, "query"))
-	assert.Equal(t, q.q_name, mapValue(t, m, "resource"))
+	assert.Equal(t, q.qName, mapValue(t, m, "resource"))
 	assert.Equal(t, q.opcode, mapValue(t, m, "method"))
 	assert.Equal(t, q.id, mapValue(t, m, "dns.id"))
 	assert.Equal(t, q.opcode, mapValue(t, m, "dns.op_code"))
-	assert.Equal(t, q.q_class, mapValue(t, m, "dns.question.class"))
-	assert.Equal(t, q.q_type, mapValue(t, m, "dns.question.type"))
-	assert.Equal(t, q.q_name, mapValue(t, m, "dns.question.name"))
-	assert.Equal(t, q.q_etld, mapValue(t, m, "dns.question.etld_plus_one"))
+	assert.Equal(t, q.qClass, mapValue(t, m, "dns.question.class"))
+	assert.Equal(t, q.qType, mapValue(t, m, "dns.question.type"))
+	assert.Equal(t, q.qName, mapValue(t, m, "dns.question.name"))
+	assert.Equal(t, q.qEtld, mapValue(t, m, "dns.question.etld_plus_one"))
 }
 
 // Assert that the specified flags are set.

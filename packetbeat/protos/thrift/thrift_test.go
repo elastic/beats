@@ -79,8 +79,8 @@ func TestThrift_readMessageBegin(t *testing.T) {
 		t.Errorf("Bad result: %v %v", ok, complete)
 	}
 	if m.Method != "ping" || m.Type != ThriftMsgTypeCall ||
-		m.SeqId != 0 || m.Version != ThriftVersion1 {
-		t.Errorf("Bad values: %v %v %v %v", m.Method, m.Type, m.SeqId, m.Version)
+		m.SeqID != 0 || m.Version != ThriftVersion1 {
+		t.Errorf("Bad values: %v %v %v %v", m.Method, m.Type, m.SeqID, m.Version)
 	}
 
 	data, _ = hex.DecodeString("800100010000000470696e6700000000")
@@ -91,8 +91,8 @@ func TestThrift_readMessageBegin(t *testing.T) {
 		t.Errorf("Bad result: %v %v", ok, complete)
 	}
 	if m.Method != "ping" || m.Type != ThriftMsgTypeCall ||
-		m.SeqId != 0 || m.Version != ThriftVersion1 {
-		t.Errorf("Bad values: %v %v %v %v", m.Method, m.Type, m.SeqId, m.Version)
+		m.SeqID != 0 || m.Version != ThriftVersion1 {
+		t.Errorf("Bad values: %v %v %v %v", m.Method, m.Type, m.SeqID, m.Version)
 	}
 
 	data, _ = hex.DecodeString("800100010000000470696e6700000001")
@@ -103,8 +103,8 @@ func TestThrift_readMessageBegin(t *testing.T) {
 		t.Errorf("Bad result: %v %v", ok, complete)
 	}
 	if m.Method != "ping" || m.Type != ThriftMsgTypeCall ||
-		m.SeqId != 1 || m.Version != ThriftVersion1 {
-		t.Errorf("Bad values: %v %v %v %v", m.Method, m.Type, m.SeqId, m.Version)
+		m.SeqID != 1 || m.Version != ThriftVersion1 {
+		t.Errorf("Bad values: %v %v %v %v", m.Method, m.Type, m.SeqID, m.Version)
 	}
 
 	data, _ = hex.DecodeString("800100010000000570696e6700000001")
@@ -131,8 +131,8 @@ func TestThrift_readMessageBegin(t *testing.T) {
 		t.Errorf("Bad result: %v %v", ok, complete)
 	}
 	if m.Method != "ping" || m.Type != ThriftMsgTypeCall ||
-		m.SeqId != 0 || m.Version != 0 {
-		t.Errorf("Bad values: %v %v %v %v", m.Method, m.Type, m.SeqId, m.Version)
+		m.SeqID != 0 || m.Version != 0 {
+		t.Errorf("Bad values: %v %v %v %v", m.Method, m.Type, m.SeqID, m.Version)
 	}
 
 	data, _ = hex.DecodeString("0000000570696e670100000000")
@@ -166,9 +166,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeI32 || field.Value != "1" ||
+		if field.ID != 1 || field.Type != ThriftTypeI32 || field.Value != "1" ||
 			stream.parseOffset != len(stream.data) {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -178,9 +178,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeI16 || field.Value != "1" ||
+		if field.ID != 1 || field.Type != ThriftTypeI16 || field.Value != "1" ||
 			stream.parseOffset != len(stream.data) {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -190,9 +190,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeI64 || field.Value != "1" ||
+		if field.ID != 1 || field.Type != ThriftTypeI64 || field.Value != "1" ||
 			stream.parseOffset != len(stream.data) {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -202,9 +202,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeDouble || field.Value != "1.2" ||
+		if field.ID != 1 || field.Type != ThriftTypeDouble || field.Value != "1.2" ||
 			stream.parseOffset != len(stream.data) {
-			t.Error("Bad values:", field.Id, field.Type, field.Value, stream.parseOffset)
+			t.Error("Bad values:", field.ID, field.Type, field.Value, stream.parseOffset)
 		}
 	}
 
@@ -214,9 +214,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeBool || field.Value != "true" ||
+		if field.ID != 1 || field.Type != ThriftTypeBool || field.Value != "true" ||
 			stream.parseOffset != len(stream.data) {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -233,8 +233,8 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeString || field.Value != `"hello"` {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+		if field.ID != 1 || field.Type != ThriftTypeString || field.Value != `"hello"` {
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -245,9 +245,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeString || field.Value != `"hel..."` ||
+		if field.ID != 1 || field.Type != ThriftTypeString || field.Value != `"hel..."` ||
 			stream.parseOffset != len(stream.data) {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 	thrift.StringMaxSize = _old
@@ -258,9 +258,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeList ||
+		if field.ID != 1 || field.Type != ThriftTypeList ||
 			field.Value != "[1, 2, 3]" {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -271,10 +271,10 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeList ||
+		if field.ID != 1 || field.Type != ThriftTypeList ||
 			stream.parseOffset != len(stream.data) ||
 			field.Value != "[1, ...]" {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 	thrift.CollectionMaxSize = _old
@@ -285,9 +285,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeSet ||
+		if field.ID != 1 || field.Type != ThriftTypeSet ||
 			field.Value != "{1, 2, 3}" {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -298,10 +298,10 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeSet ||
+		if field.ID != 1 || field.Type != ThriftTypeSet ||
 			stream.parseOffset != len(stream.data) ||
 			field.Value != "{1, 2, ...}" {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 	thrift.CollectionMaxSize = _old
@@ -312,10 +312,10 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeMap ||
+		if field.ID != 1 || field.Type != ThriftTypeMap ||
 			field.Value != `{"a": 1, "c": 3, "b": 2}` ||
 			stream.parseOffset != len(stream.data) {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -326,9 +326,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeMap ||
+		if field.ID != 1 || field.Type != ThriftTypeMap ||
 			field.Value != `{"a": 1, "c": 3, ...}` {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 	thrift.CollectionMaxSize = _old
@@ -339,8 +339,8 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeString || field.Value != `"h\x10llo"` {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+		if field.ID != 1 || field.Type != ThriftTypeString || field.Value != `"h\x10llo"` {
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -350,9 +350,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeStruct ||
+		if field.ID != 1 || field.Type != ThriftTypeStruct ||
 			field.Value != `(1: 1, 2: 0, 3: 4)` {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -363,9 +363,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeStruct ||
+		if field.ID != 1 || field.Type != ThriftTypeStruct ||
 			field.Value != `(1: 1, 2: 0, ...)` {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 	thrift.CollectionMaxSize = _old
@@ -376,9 +376,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeStruct ||
+		if field.ID != 1 || field.Type != ThriftTypeStruct ||
 			field.Value != `(1: 1, 2: "hello")` {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -388,9 +388,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeStruct ||
+		if field.ID != 1 || field.Type != ThriftTypeStruct ||
 			field.Value != `(1: 1, 2: (1: 1, 2: "hello"))` {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -400,9 +400,9 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeStruct ||
+		if field.ID != 1 || field.Type != ThriftTypeStruct ||
 			field.Value != `(1: 1, 2: {1, 2, 3})` {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+			t.Error("Bad values:", field.ID, field.Type, field.Value)
 		}
 	}
 
@@ -430,7 +430,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if !m.IsRequest || m.Method != "ping" ||
-		m.SeqId != 0 || m.Type != ThriftMsgTypeCall || m.Params != "()" {
+		m.SeqID != 0 || m.Type != ThriftMsgTypeCall || m.Params != "()" {
 		t.Error("Bad result:", stream.message)
 	}
 
@@ -443,7 +443,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if !m.IsRequest || m.Method != "add16" ||
-		m.SeqId != 0 || m.Type != ThriftMsgTypeCall ||
+		m.SeqID != 0 || m.Type != ThriftMsgTypeCall ||
 		m.Params != "(1: 1, 2: 1)" {
 		t.Error("Bad result:", stream.message)
 	}
@@ -457,7 +457,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if !m.IsRequest || m.Method != "calculate" ||
-		m.SeqId != 0 || m.Type != ThriftMsgTypeCall ||
+		m.SeqID != 0 || m.Type != ThriftMsgTypeCall ||
 		m.Params != "(1: 1, 2: (1: 1, 2: 0, 3: 4))" {
 		t.Error("Bad result:", stream.message)
 	}
@@ -470,7 +470,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "add16" ||
-		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
+		m.SeqID != 0 || m.Type != ThriftMsgTypeReply ||
 		m.ReturnValue != "2" {
 		t.Error("Bad result:", stream.message)
 	}
@@ -484,7 +484,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "echo_string" ||
-		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
+		m.SeqID != 0 || m.Type != ThriftMsgTypeReply ||
 		m.ReturnValue != `"hello"` {
 		t.Error("Bad result:", stream.message)
 	}
@@ -498,7 +498,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "echo_list" ||
-		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
+		m.SeqID != 0 || m.Type != ThriftMsgTypeReply ||
 		m.ReturnValue != `[1, 2, 3]` {
 		t.Error("Bad result:", stream.message)
 	}
@@ -512,7 +512,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "echo_map" ||
-		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
+		m.SeqID != 0 || m.Type != ThriftMsgTypeReply ||
 		m.ReturnValue != `{"a": 1, "c": 3, "b": 2}` {
 		t.Error("Bad result:", stream.message)
 	}
@@ -525,7 +525,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "calculate" ||
-		m.SeqId != 0 || m.Type != ThriftMsgTypeReply || m.HasException ||
+		m.SeqID != 0 || m.Type != ThriftMsgTypeReply || m.HasException ||
 		m.ReturnValue != `5` {
 		t.Error("Bad result:", stream.message)
 	}
@@ -539,7 +539,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "calculate" ||
-		m.SeqId != 0 || m.Type != ThriftMsgTypeReply || !m.HasException ||
+		m.SeqID != 0 || m.Type != ThriftMsgTypeReply || !m.HasException ||
 		m.Exceptions != `(1: (1: 4, 2: "Cannot divide by 0"))` {
 		t.Error("Bad result:", stream.message)
 	}
@@ -553,7 +553,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "echo_binary" ||
-		m.SeqId != 0 || m.Type != ThriftMsgTypeReply || m.HasException ||
+		m.SeqID != 0 || m.Type != ThriftMsgTypeReply || m.HasException ||
 		m.ReturnValue != `ab0c1d281a000000` {
 		t.Error("Bad result:", stream.message)
 	}
@@ -584,7 +584,7 @@ func expectThriftTransaction(t *testing.T, thrift *Thrift) *ThriftTransaction {
 	return nil
 }
 
-func testTcpTuple() *common.TCPTuple {
+func testTCPTuple() *common.TCPTuple {
 	t := &common.TCPTuple{
 		IPLength: 4,
 		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
@@ -603,7 +603,7 @@ func TestThrift_ParseSimpleTBinary(t *testing.T) {
 	thrift := thriftForTests()
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 	req := createTestPacket(t, "800100010000000470696e670000000000")
 	repl := createTestPacket(t, "800100020000000470696e670000000000")
 
@@ -632,7 +632,7 @@ func TestThrift_ParseSimpleTFramed(t *testing.T) {
 	thrift.TransportType = ThriftTFramed
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
 		"00020000000100")
@@ -663,19 +663,19 @@ func TestThrift_ParseSimpleTFramedSplit(t *testing.T) {
 	thrift.TransportType = ThriftTFramed
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
-	req_half1 := createTestPacket(t, "0000001e8001000100")
-	req_half2 := createTestPacket(t, "000003616464000000000800010000000108"+
+	reqHalf1 := createTestPacket(t, "0000001e8001000100")
+	reqHalf2 := createTestPacket(t, "000003616464000000000800010000000108"+
 		"00020000000100")
-	repl_half1 := createTestPacket(t, "000000178001000200000003")
-	repl_half2 := createTestPacket(t, "616464000000000800000000000200")
+	replHalf1 := createTestPacket(t, "000000178001000200000003")
+	replHalf2 := createTestPacket(t, "616464000000000800000000000200")
 
 	var private thriftPrivateData
-	private = thrift.Parse(req_half1, tcptuple, 0, private).(thriftPrivateData)
-	private = thrift.Parse(req_half2, tcptuple, 0, private).(thriftPrivateData)
-	private = thrift.Parse(repl_half1, tcptuple, 1, private).(thriftPrivateData)
-	thrift.Parse(repl_half2, tcptuple, 1, private)
+	private = thrift.Parse(reqHalf1, tcptuple, 0, private).(thriftPrivateData)
+	private = thrift.Parse(reqHalf2, tcptuple, 0, private).(thriftPrivateData)
+	private = thrift.Parse(replHalf1, tcptuple, 1, private).(thriftPrivateData)
+	thrift.Parse(replHalf2, tcptuple, 1, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
@@ -697,19 +697,19 @@ func TestThrift_ParseSimpleTFramedSplitInterleaved(t *testing.T) {
 	thrift.TransportType = ThriftTFramed
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
-	req_half1 := createTestPacket(t, "0000001e8001000100")
-	repl_half1 := createTestPacket(t, "000000178001000200000003")
-	req_half2 := createTestPacket(t, "000003616464000000000800010000000108"+
+	reqHalf1 := createTestPacket(t, "0000001e8001000100")
+	replHalf1 := createTestPacket(t, "000000178001000200000003")
+	reqHalf2 := createTestPacket(t, "000003616464000000000800010000000108"+
 		"00020000000100")
-	repl_half2 := createTestPacket(t, "616464000000000800000000000200")
+	replHalf2 := createTestPacket(t, "616464000000000800000000000200")
 
 	var private thriftPrivateData
-	private = thrift.Parse(req_half1, tcptuple, 0, private).(thriftPrivateData)
-	private = thrift.Parse(req_half2, tcptuple, 0, private).(thriftPrivateData)
-	private = thrift.Parse(repl_half1, tcptuple, 1, private).(thriftPrivateData)
-	thrift.Parse(repl_half2, tcptuple, 1, private)
+	private = thrift.Parse(reqHalf1, tcptuple, 0, private).(thriftPrivateData)
+	private = thrift.Parse(reqHalf2, tcptuple, 0, private).(thriftPrivateData)
+	private = thrift.Parse(replHalf1, tcptuple, 1, private).(thriftPrivateData)
+	thrift.Parse(replHalf2, tcptuple, 1, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
@@ -730,7 +730,7 @@ func TestThrift_Parse_OneWayCallWithFin(t *testing.T) {
 	thrift.TransportType = ThriftTFramed
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := createTestPacket(t, "0000001080010001000000037a69700000000000")
 
@@ -757,7 +757,7 @@ func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 	thrift.TransportType = ThriftTFramed
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	reqzip := createTestPacket(t, "0000001080010001000000037a69700000000000")
 	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
@@ -796,7 +796,7 @@ func TestThrift_Parse_RequestReplyMismatch(t *testing.T) {
 	thrift.TransportType = ThriftTFramed
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	reqzip := createTestPacket(t, "0000001080010001000000037a69700000000000")
 	repladd := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
@@ -825,7 +825,7 @@ func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {
 	thrift.CaptureReply = false
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
 		"00020000000100")
@@ -867,7 +867,7 @@ func TestThrift_ParseObfuscateStrings(t *testing.T) {
 	thrift.ObfuscateStrings = true
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := createTestPacket(t, "00000024800100010000000b6563686f5f737472696e670000"+
 		"00000b00010000000568656c6c6f00")
@@ -898,13 +898,13 @@ func BenchmarkThrift_ParseSkipReply(b *testing.B) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 	thrift.CaptureReply = false
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
-	data_req, _ := hex.DecodeString("0000001e8001000100000003616464000000000800010000000108" +
+	dataReq, _ := hex.DecodeString("0000001e8001000100000003616464000000000800010000000108" +
 		"00020000000100")
-	req := &protos.Packet{Payload: data_req}
-	data_repl, _ := hex.DecodeString("000000178001000200000003616464000000000800000000000200")
-	repl := &protos.Packet{Payload: data_repl}
+	req := &protos.Packet{Payload: dataReq}
+	dataRepl, _ := hex.DecodeString("000000178001000200000003616464000000000800000000000200")
+	repl := &protos.Packet{Payload: dataRepl}
 
 	var private thriftPrivateData
 	for n := 0; n < b.N; n++ {
@@ -942,7 +942,7 @@ func TestThrift_Parse_Exception(t *testing.T) {
 	thrift := thriftForTests()
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := createTestPacket(t, "800100010000000963616c63756c6174650000000008000"+
 		"1000000010c00020800010000000108000200000000080003000000040000")
@@ -979,7 +979,7 @@ func TestThrift_ParametersNames(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
 		"00020000000100")
@@ -1019,7 +1019,7 @@ func TestThrift_ExceptionName(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := createTestPacket(t, "800100010000000963616c63756c6174650000000008000"+
 		"1000000010c00020800010000000108000200000000080003000000040000")
@@ -1061,7 +1061,7 @@ func TestThrift_GapInStream_response(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := createTestPacket(t, "800100010000000963616c63756c6174650000000008000"+
 		"1000000010c00020800010000000108000200000000080003000000040000")
@@ -1112,7 +1112,7 @@ func TestThrift_GapInStream_request(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	// missing bytes from the request
 	req := createTestPacket(t, "800100010000000963616c63756c6174")

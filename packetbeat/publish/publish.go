@@ -76,9 +76,9 @@ func NewPublisher(
 	}, nil
 }
 
-func (t *PacketbeatPublisher) PublishTransaction(event common.MapStr) bool {
+func (p *PacketbeatPublisher) PublishTransaction(event common.MapStr) bool {
 	select {
-	case t.trans <- event:
+	case p.trans <- event:
 		return true
 	default:
 		// drop event if queue is full
@@ -86,64 +86,64 @@ func (t *PacketbeatPublisher) PublishTransaction(event common.MapStr) bool {
 	}
 }
 
-func (t *PacketbeatPublisher) PublishFlows(event []common.MapStr) bool {
+func (p *PacketbeatPublisher) PublishFlows(event []common.MapStr) bool {
 	select {
-	case t.flows <- event:
+	case p.flows <- event:
 		return true
-	case <-t.done:
+	case <-p.done:
 		// drop event, if worker has been stopped
 		return false
 	}
 }
 
-func (t *PacketbeatPublisher) Start() {
-	t.wg.Add(1)
+func (p *PacketbeatPublisher) Start() {
+	p.wg.Add(1)
 	go func() {
-		defer t.wg.Done()
+		defer p.wg.Done()
 		for {
 			select {
-			case <-t.done:
+			case <-p.done:
 				return
-			case event := <-t.trans:
-				t.onTransaction(event)
+			case event := <-p.trans:
+				p.onTransaction(event)
 			}
 		}
 	}()
 
-	t.wg.Add(1)
+	p.wg.Add(1)
 	go func() {
-		defer t.wg.Done()
+		defer p.wg.Done()
 		for {
 			select {
-			case <-t.done:
+			case <-p.done:
 				return
-			case events := <-t.flows:
-				t.onFlow(events)
+			case events := <-p.flows:
+				p.onFlow(events)
 			}
 		}
 	}()
 }
 
-func (t *PacketbeatPublisher) Stop() {
-	t.client.Close()
-	close(t.done)
-	t.wg.Wait()
+func (p *PacketbeatPublisher) Stop() {
+	p.client.Close()
+	close(p.done)
+	p.wg.Wait()
 }
 
-func (t *PacketbeatPublisher) onTransaction(event common.MapStr) {
+func (p *PacketbeatPublisher) onTransaction(event common.MapStr) {
 	if err := validateEvent(event); err != nil {
 		logp.Warn("Dropping invalid event: %v", err)
 		return
 	}
 
-	if !t.normalizeTransAddr(event) {
+	if !p.normalizeTransAddr(event) {
 		return
 	}
 
-	t.client.PublishEvent(event)
+	p.client.PublishEvent(event)
 }
 
-func (t *PacketbeatPublisher) onFlow(events []common.MapStr) {
+func (p *PacketbeatPublisher) onFlow(events []common.MapStr) {
 	pub := events[:0]
 	for _, event := range events {
 		if err := validateEvent(event); err != nil {
@@ -151,14 +151,14 @@ func (t *PacketbeatPublisher) onFlow(events []common.MapStr) {
 			continue
 		}
 
-		if !t.addGeoIPToFlow(event) {
+		if !p.addGeoIPToFlow(event) {
 			continue
 		}
 
 		pub = append(pub, event)
 	}
 
-	t.client.PublishEvents(pub)
+	p.client.PublishEvents(pub)
 }
 
 // filterEvent validates an event for common required fields with types.

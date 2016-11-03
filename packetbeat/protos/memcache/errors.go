@@ -29,7 +29,7 @@ var (
 
 // memcache UDP errors
 var (
-	ErrUdpIncompleteMessage = errors.New("attempt to parse incomplete message failed")
+	ErrUDPIncompleteMessage = errors.New("attempt to parse incomplete message failed")
 )
 
 // memcache transaction/message errors

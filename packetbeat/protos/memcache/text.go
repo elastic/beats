@@ -42,15 +42,15 @@ var argMultiKeys = argDef{
 		msg := parser.message
 		rest := buf.Bytes()
 		buf.Advance(len(rest))
-		raw_keys := bytes.FieldsFunc(rest, func(b rune) bool {
+		rawKeys := bytes.FieldsFunc(rest, func(b rune) bool {
 			return b == ' '
 		})
-		if len(raw_keys) == 0 {
+		if len(rawKeys) == 0 {
 			return ErrExpectedKeys
 		}
-		msg.keys = make([]memcacheString, len(raw_keys))
-		for i, raw_key := range raw_keys {
-			msg.keys[i] = memcacheString{raw_key}
+		msg.keys = make([]memcacheString, len(rawKeys))
+		for i, rawKey := range rawKeys {
+			msg.keys[i] = memcacheString{rawKey}
 		}
 		return nil
 	},
@@ -262,10 +262,10 @@ func defTextMessage(
 }
 
 func makeDefTextDataMessage(
-	is_request bool,
+	isRequest bool,
 ) func(string, commandTypeCode, commandCode, ...argDef) textCommandType {
 	serialize := serializeDataResponse
-	if is_request {
+	if isRequest {
 		serialize = serializeDataRequest
 	}
 	return func(
@@ -504,7 +504,7 @@ func parseData(parser *parser, buf *streambuf.Buffer) parseResult {
 
 	debug("found message data")
 	if msg.bytesLost > 0 {
-		msg.count_values++
+		msg.countValues++
 	} else {
 		parser.appendMessageData(data)
 	}
@@ -526,8 +526,7 @@ func parseStatLine(parser *parser, hdr, buf *streambuf.Buffer) error {
 	return nil
 }
 
-func parseTextArgs(parser *parser, args []argDef) error {
-	var err error = nil
+func parseTextArgs(parser *parser, args []argDef) (err error) {
 	buf := streambuf.NewFixed(parser.message.rawArgs)
 	for _, arg := range args {
 		debug("args rest: %s", buf.Bytes())
@@ -536,21 +535,21 @@ func parseTextArgs(parser *parser, args []argDef) error {
 			break
 		}
 	}
-	return err
+	return
 }
 
 func splitCommandAndArgs(line []byte) ([]byte, []byte, error) {
-	command_line := streambuf.NewFixed(line)
-	command, err := parseStringArg(command_line)
+	commandLine := streambuf.NewFixed(line)
+	command, err := parseStringArg(commandLine)
 	if err != nil {
 		return nil, nil, err
 	}
 	var args []byte
-	if command_line.Len() > 0 {
-		command_line.Advance(1)
-		args = command_line.Bytes()
+	if commandLine.Len() > 0 {
+		commandLine.Advance(1)
+		args = commandLine.Bytes()
 	}
-	return command, args, command_line.Err()
+	return command, args, commandLine.Err()
 }
 
 func parseStringArg(buf *streambuf.Buffer) ([]byte, error) {
@@ -684,12 +683,12 @@ func serializeDataRequest(
 	args ...argDef,
 ) eventFn {
 	command := code.String()
-	event_type := typ.String()
+	eventType := typ.String()
 	return func(msg *message, event common.MapStr) error {
 		event["command"] = command
-		event["type"] = event_type
-		event["count_values"] = msg.count_values
-		if msg.count_values != 0 && msg.data.IsSet() {
+		event["type"] = eventType
+		event["count_values"] = msg.countValues
+		if msg.countValues != 0 && msg.data.IsSet() {
 			event["values"] = msg.data
 		}
 		return serializeArgs(msg, event, args)
@@ -702,12 +701,12 @@ func serializeDataResponse(
 	args ...argDef,
 ) eventFn {
 	response := code.String()
-	event_type := typ.String()
+	eventType := typ.String()
 	return func(msg *message, event common.MapStr) error {
 		event["command"] = response
-		event["type"] = event_type
-		event["count_values"] = msg.count_values
-		if msg.count_values != 0 && len(msg.values) > 0 {
+		event["type"] = eventType
+		event["count_values"] = msg.countValues
+		if msg.countValues != 0 && len(msg.values) > 0 {
 			event["values"] = msg.values
 		}
 		return serializeArgs(msg, event, args)

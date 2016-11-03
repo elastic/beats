@@ -23,7 +23,7 @@ import (
 type ThriftMessage struct {
 	Ts time.Time
 
-	TcpTuple     common.TCPTuple
+	TCPTuple     common.TCPTuple
 	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
 
@@ -36,7 +36,7 @@ type ThriftMessage struct {
 	Version      uint32
 	Type         uint32
 	Method       string
-	SeqId        uint32
+	SeqID        uint32
 	Params       string
 	ReturnValue  string
 	Exceptions   string
@@ -47,7 +47,7 @@ type ThriftMessage struct {
 
 type ThriftField struct {
 	Type byte
-	Id   uint16
+	ID   uint16
 
 	Value string
 }
@@ -144,8 +144,8 @@ type Thrift struct {
 	DropAfterNStructFields int
 	CaptureReply           bool
 	ObfuscateStrings       bool
-	Send_request           bool
-	Send_response          bool
+	SendRequest            bool
+	SendResponse           bool
 
 	TransportType byte
 	ProtocolType  byte
@@ -229,8 +229,8 @@ func (thrift *Thrift) InitDefaults() {
 	thrift.ProtocolType = ThriftTBinary
 	thrift.CaptureReply = true
 	thrift.ObfuscateStrings = false
-	thrift.Send_request = false
-	thrift.Send_response = false
+	thrift.SendRequest = false
+	thrift.SendResponse = false
 	thrift.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
@@ -238,8 +238,8 @@ func (thrift *Thrift) readConfig(config *thriftConfig) error {
 	var err error
 
 	thrift.Ports = config.Ports
-	thrift.Send_request = config.SendRequest
-	thrift.Send_response = config.SendResponse
+	thrift.SendRequest = config.SendRequest
+	thrift.SendResponse = config.SendResponse
 
 	thrift.StringMaxSize = config.StringMaxSize
 	thrift.CollectionMaxSize = config.CollectionMaxSize
@@ -279,7 +279,7 @@ func (thrift *Thrift) GetPorts() []int {
 
 func (m *ThriftMessage) String() string {
 	return fmt.Sprintf("IsRequest: %t Type: %d Method: %s SeqId: %d Params: %s ReturnValue: %s Exceptions: %s",
-		m.IsRequest, m.Type, m.Method, m.SeqId, m.Params, m.ReturnValue, m.Exceptions)
+		m.IsRequest, m.Type, m.Method, m.SeqID, m.Params, m.ReturnValue, m.Exceptions)
 }
 
 func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
@@ -323,7 +323,7 @@ func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 			logp.Debug("thriftdetailed", "Less then 4 bytes remaining")
 			return true, false // ok, not complete
 		}
-		m.SeqId = common.BytesNtohl(s.data[offset : offset+4])
+		m.SeqID = common.BytesNtohl(s.data[offset : offset+4])
 		s.parseOffset = offset + 4
 	} else {
 		// no version mode
@@ -347,8 +347,8 @@ func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 		}
 
 		m.Type = uint32(s.data[offset])
-		offset += 1
-		m.SeqId = common.BytesNtohl(s.data[offset : offset+4])
+		offset++
+		m.SeqID = common.BytesNtohl(s.data[offset : offset+4])
 		s.parseOffset = offset + 4
 	}
 
@@ -477,11 +477,11 @@ func (thrift *Thrift) readListOrSet(data []byte) (value string, ok bool, complet
 	if len(data) < 5 {
 		return "", true, false, 0
 	}
-	type_ := data[0]
+	typ := data[0]
 
-	funcReader, typeFound := thrift.funcReadersByType(type_)
+	funcReader, typeFound := thrift.funcReadersByType(typ)
 	if !typeFound {
-		logp.Debug("thrift", "Field type %d not known", type_)
+		logp.Debug("thrift", "Field type %d not known", typ)
 		return "", false, false, 0
 	}
 
@@ -534,18 +534,18 @@ func (thrift *Thrift) readMap(data []byte) (value string, ok bool, complete bool
 	if len(data) < 6 {
 		return "", true, false, 0
 	}
-	type_key := data[0]
-	type_value := data[1]
+	typeKey := data[0]
+	typeValue := data[1]
 
-	funcReaderKey, typeFound := thrift.funcReadersByType(type_key)
+	funcReaderKey, typeFound := thrift.funcReadersByType(typeKey)
 	if !typeFound {
-		logp.Debug("thrift", "Field type %d not known", type_key)
+		logp.Debug("thrift", "Field type %d not known", typeKey)
 		return "", false, false, 0
 	}
 
-	funcReaderValue, typeFound := thrift.funcReadersByType(type_value)
+	funcReaderValue, typeFound := thrift.funcReadersByType(typeValue)
 	if !typeFound {
-		logp.Debug("thrift", "Field type %d not known", type_value)
+		logp.Debug("thrift", "Field type %d not known", typeValue)
 		return "", false, false, 0
 	}
 
@@ -609,7 +609,7 @@ func (thrift *Thrift) readStruct(data []byte) (value string, ok bool, complete b
 		}
 
 		field.Type = byte(data[offset])
-		offset += 1
+		offset++
 		if field.Type == ThriftTypeStop {
 			return thrift.formatStruct(fields, false, []*string{}), true, true, offset
 		}
@@ -618,7 +618,7 @@ func (thrift *Thrift) readStruct(data []byte) (value string, ok bool, complete b
 			return "", true, false, 0 // not complete
 		}
 
-		field.Id = common.BytesNtohs(data[offset : offset+2])
+		field.ID = common.BytesNtohs(data[offset : offset+2])
 		offset += 2
 
 		funcReader, typeFound := thrift.funcReadersByType(field.Type)
@@ -640,7 +640,7 @@ func (thrift *Thrift) readStruct(data []byte) (value string, ok bool, complete b
 	}
 }
 
-func (thrift *Thrift) formatStruct(fields []ThriftField, resolve_names bool,
+func (thrift *Thrift) formatStruct(fields []ThriftField, resolveNames bool,
 	fieldnames []*string) string {
 
 	toJoin := []string{}
@@ -649,18 +649,18 @@ func (thrift *Thrift) formatStruct(fields []ThriftField, resolve_names bool,
 			toJoin = append(toJoin, "...")
 			break
 		}
-		if resolve_names && int(field.Id) < len(fieldnames) && fieldnames[field.Id] != nil {
-			toJoin = append(toJoin, *fieldnames[field.Id]+": "+field.Value)
+		if resolveNames && int(field.ID) < len(fieldnames) && fieldnames[field.ID] != nil {
+			toJoin = append(toJoin, *fieldnames[field.ID]+": "+field.Value)
 		} else {
-			toJoin = append(toJoin, strconv.Itoa(int(field.Id))+": "+field.Value)
+			toJoin = append(toJoin, strconv.Itoa(int(field.ID))+": "+field.Value)
 		}
 	}
 	return "(" + strings.Join(toJoin, ", ") + ")"
 }
 
 // Dictionary wrapped in a function to avoid "initialization loop"
-func (thrift *Thrift) funcReadersByType(type_ byte) (func_ ThriftFieldReader, exists bool) {
-	switch type_ {
+func (thrift *Thrift) funcReadersByType(typ byte) (fn ThriftFieldReader, exists bool) {
+	switch typ {
 	case ThriftTypeBool:
 		return thrift.readBool, true
 	case ThriftTypeByte:
@@ -707,7 +707,7 @@ func (thrift *Thrift) readField(s *ThriftStream) (ok bool, complete bool, field 
 	if len(s.data[offset:]) < 2 {
 		return true, false, nil // ok, not complete
 	}
-	field.Id = common.BytesNtohs(s.data[offset : offset+2])
+	field.ID = common.BytesNtohs(s.data[offset : offset+2])
 	offset += 2
 
 	funcReader, typeFound := thrift.funcReadersByType(field.Type)
@@ -775,7 +775,7 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 			}
 			if complete {
 				// done
-				var method *ThriftIdlMethod = nil
+				var method *ThriftIdlMethod
 				if thrift.Idl != nil {
 					method = thrift.Idl.FindMethod(m.Method)
 				}
@@ -793,7 +793,7 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 					}
 					if len(m.fields) > 0 {
 						field := m.fields[0]
-						if field.Id == 0 {
+						if field.ID == 0 {
 							m.ReturnValue = field.Value
 							m.Exceptions = ""
 						} else {
@@ -859,15 +859,15 @@ type thriftPrivateData struct {
 func (thrift *Thrift) messageComplete(tcptuple *common.TCPTuple, dir uint8,
 	stream *ThriftStream, priv *thriftPrivateData) {
 
-	var flush bool = false
+	flush := false
 
 	if stream.message.IsRequest {
 		logp.Debug("thrift", "Thrift request message: %s", stream.message.Method)
 		if !thrift.CaptureReply {
 			// enable the stream in the other direction to get the reply
-			stream_rev := priv.Data[1-dir]
-			if stream_rev != nil {
-				stream_rev.skipInput = false
+			streamRev := priv.Data[1-dir]
+			if streamRev != nil {
+				streamRev.skipInput = false
 			}
 		}
 	} else {
@@ -882,7 +882,7 @@ func (thrift *Thrift) messageComplete(tcptuple *common.TCPTuple, dir uint8,
 	}
 
 	// all ok, go to next level
-	stream.message.TcpTuple = *tcptuple
+	stream.message.TCPTuple = *tcptuple
 	stream.message.Direction = dir
 	stream.message.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 	if stream.message.FrameSize == 0 {
@@ -929,7 +929,7 @@ func (thrift *Thrift) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple, dir u
 		}
 		// concatenate bytes
 		stream.data = append(stream.data, pkt.Payload...)
-		if len(stream.data) > tcp.TCP_MAX_DATA_IN_STREAM {
+		if len(stream.data) > tcp.TCPMaxDataInStream {
 			logp.Debug("thrift", "Stream data too large, dropping TCP stream")
 			priv.Data[dir] = nil
 			return priv
@@ -974,7 +974,7 @@ func (thrift *Thrift) handleThrift(msg *ThriftMessage) {
 }
 
 func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
-	tuple := msg.TcpTuple
+	tuple := msg.TCPTuple
 
 	trans := thrift.getTransaction(tuple.Hashable())
 	if trans != nil {
@@ -993,16 +993,16 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
 	trans.JsTs = msg.Ts
 	trans.Src = common.Endpoint{
-		IP:   msg.TcpTuple.SrcIP.String(),
-		Port: msg.TcpTuple.SrcPort,
+		IP:   msg.TCPTuple.SrcIP.String(),
+		Port: msg.TCPTuple.SrcPort,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
 	trans.Dst = common.Endpoint{
-		IP:   msg.TcpTuple.DstIP.String(),
-		Port: msg.TcpTuple.DstPort,
+		IP:   msg.TCPTuple.DstIP.String(),
+		Port: msg.TCPTuple.DstPort,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
-	if msg.Direction == tcp.TcpDirectionReverse {
+	if msg.Direction == tcp.TCPDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
 
@@ -1013,7 +1013,7 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 
 	// we need to search the request first.
-	tuple := msg.TcpTuple
+	tuple := msg.TCPTuple
 
 	trans := thrift.getTransaction(tuple.Hashable())
 	if trans == nil {
@@ -1111,7 +1111,7 @@ func (thrift *Thrift) publishTransactions() {
 				thriftmap["service"] = t.Request.Service
 			}
 
-			if thrift.Send_request {
+			if thrift.SendRequest {
 				event["request"] = fmt.Sprintf("%s%s", t.Request.Method,
 					t.Request.Params)
 			}
@@ -1124,7 +1124,7 @@ func (thrift *Thrift) publishTransactions() {
 			}
 			event["bytes_out"] = uint64(t.Reply.FrameSize)
 
-			if thrift.Send_response {
+			if thrift.SendResponse {
 				if !t.Reply.HasException {
 					event["response"] = t.Reply.ReturnValue
 				} else {
