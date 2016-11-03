@@ -2,6 +2,7 @@ package console
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -10,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/mattn/go-isatty"
 )
 
 func init() {
@@ -22,6 +24,13 @@ type console struct {
 }
 
 func New(_ string, config *common.Config, _ int) (outputs.Outputer, error) {
+	if runtime.GOOS == "windows" {
+		if !isatty.IsTerminal(os.Stdout.Fd()) {
+			logp.Info("It seems you're not running from a console. Please use another output.")
+			return nil, errors.New("It seems you're not running from a console. Please use another output.")
+		}
+	}
+
 	c := &console{config: defaultConfig, out: os.Stdout}
 	err := config.Unpack(&c.config)
 	if err != nil {
