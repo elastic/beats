@@ -45,9 +45,9 @@
       type: geo_point
       example: 40.715, -74.011
       description: >
-        DEPRECATED. Please use `client_geoip` instead. 
+        DEPRECATED. Please use `client_geoip` instead.
         The GeoIP location of the `real_ip` IP address or of the `client_ip` address if the `real_ip` is
-        disabled. The field is a string containing the latitude and longitude separated by a comma. 
+        disabled. The field is a string containing the latitude and longitude separated by a comma.
 
     - name: client_geoip
       description: The GeoIP information of the client.
@@ -388,252 +388,86 @@
         Messages from Packetbeat itself. This field usually contains error messages for
         interpreting the raw data. This information can be helpful for troubleshooting.
 
-- key: icmp
-  title: "ICMP"
+- key: raw
+  title: Raw
+  description: These fields contain the raw transaction data.
+  fields:
+    - name: request
+      type: text
+      description: >
+        For text protocols, this is the request as seen on the wire
+        (application layer only). For binary protocols this is our
+        representation of the request.
+
+    - name: response
+      type: text
+      description: >
+        For text protocols, this is the response as seen on the wire
+        (application layer only). For binary protocols this is our
+        representation of the request.
+
+- key: trans_measurements
+  title: "Measurements (Transactions)"
   description: >
-    ICMP specific event fields.
+    These fields contain measurements related to the transaction.
   fields:
-    - name: icmp
-      type: group
-      fields:
-        - name: version
-          description: The version of the ICMP protocol.
-          possible_values:
-            - 4
-            - 6
+    - name: responsetime
+      description: >
+        The wall clock time it took to complete the transaction.
+        The precision is in milliseconds.
+      type: long
 
-        - name: request.message
-          type: keyword
-          description: A human readable form of the request.
+    - name: cpu_time
+      description: The CPU time it took to complete the transaction.
+      type: long
 
-        - name: request.type
-          type: long
-          description: The request type.
+    - name: bytes_in
+      description: >
+        The number of bytes of the request. Note that this size is
+        the application layer message length, without the length of the IP or
+        TCP headers.
+      type: long
+      format: bytes
 
-        - name: request.code
-          type: long
-          description: The request code.
+    - name: bytes_out
+      description: >
+        The number of bytes of the response. Note that this size is
+        the application layer message length, without the length of the IP or
+        TCP headers.
+      type: long
+      format: bytes
 
-        - name: response.message
-          type: keyword
-          description: A human readable form of the response.
+    - name: dnstime
+      type: long
+      description: >
+        The time it takes to query the name server for a given request.
+        This is typically used for RUM (real-user-monitoring) but can
+        also have values for server-to-server communication when DNS
+        is used for service discovery.
+        The precision is in microseconds.
 
-        - name: response.type
-          type: long
-          description: The response type.
+    - name: connecttime
+      type: long
+      description: >
+        The time it takes for the TCP connection to be established for
+        the given transaction.
+        The precision is in microseconds.
 
-        - name: response.code
-          type: long
-          description: The response code.
+    - name: loadtime
+      type: long
+      description: >
+        The time it takes for the content to be loaded. This is typically
+        used for RUM (real-user-monitoring) but it can make sense in other
+        cases as well.
+        The precision is in microseconds.
 
-- key: dns
-  title: "DNS"
-  description: DNS-specific event fields.
-  fields:
-    - name: dns
-      type: group
-      fields:
-        - name: id
-          type: long
-          description: >
-            The DNS packet identifier assigned by the program that generated the
-            query. The identifier is copied to the response.
-
-        - name: op_code
-          description: >
-            The DNS operation code that specifies the kind of query in the message.
-            This value is set by the originator of a query and copied into the
-            response.
-          example: QUERY
-
-        - name: flags.authoritative
-          type: boolean
-          description: >
-            A DNS flag specifying that the responding server is an authority for
-            the domain name used in the question.
-
-        - name: flags.recursion_available
-          type: boolean
-          description: >
-            A DNS flag specifying whether recursive query support is available in the
-            name server.
-
-        - name: flags.recursion_desired
-          type: boolean
-          description: >
-            A DNS flag specifying that the client directs the server to pursue a
-            query recursively. Recursive query support is optional.
-
-        - name: flags.authentic_data
-          type: boolean
-          description: >
-            A DNS flag specifying that the recursive server considers the response
-            authentic.
-
-        - name: flags.checking_disabled
-          type: boolean
-          description: >
-            A DNS flag specifying that the client disables the server
-            signature validation of the query.
-
-        - name: flags.truncated_response
-          type: boolean
-          description: >
-            A DNS flag specifying that only the first 512 bytes of the reply were
-            returned.
-
-        - name: response_code
-          description: The DNS status code.
-          example: NOERROR
-
-        - name: question.name
-          description: >
-            The domain name being queried. If the name field contains non-printable
-            characters (below 32 or above 126), then those characters are represented
-            as escaped base 10 integers (\DDD). Back slashes and quotes are escaped.
-            Tabs, carriage returns, and line feeds are converted to \t, \r, and
-            \n respectively.
-          example: www.google.com.
-
-        - name: question.type
-          description: The type of records being queried.
-          example: AAAA
-
-        - name: question.class
-          description: The class of of records being queried.
-          example: IN
-
-        - name: question.etld_plus_one
-          description: The effective top-level domain (eTLD) plus one more label.
-            For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.".
-            The data for determining the eTLD comes from an embedded copy of the
-            data from http://publicsuffix.org.
-          example: amazon.co.uk.
-
-        - name: answers_count
-          type: long
-          description: >
-            The number of resource records contained in the `dns.answers` field.
-
-        - name: answers.name
-          description: The domain name to which this resource record pertains.
-          example: example.com.
-
-        - name: answers.type
-          description: The type of data contained in this resource record.
-          example: MX
-
-        - name: answers.class
-          description: The class of DNS data contained in this resource record.
-          example: IN
-
-        - name: answers.ttl
-          description: >
-            The time interval in seconds that this resource record may be cached
-            before it should be discarded. Zero values mean that the data should
-            not be cached.
-          type: long
-
-        - name: answers.data
-          description: >
-            The data describing the resource. The meaning of this data depends
-            on the type and class of the resource record.
-
-        - name: authorities
-          type: dict
-          description: >
-            An array containing a dictionary for each authority section from the
-            answer.
-
-        - name: authorities_count
-          type: long
-          description: >
-            The number of resource records contained in the `dns.authorities` field.
-            The `dns.authorities` field may or may not be included depending on the
-            configuration of Packetbeat.
-
-        - name: authorities.name
-          description: The domain name to which this resource record pertains.
-          example: example.com.
-
-        - name: authorities.type
-          description: The type of data contained in this resource record.
-          example: NS
-
-        - name: authorities.class
-          description: The class of DNS data contained in this resource record.
-          example: IN
-
-        - name: answers
-          type: dict
-          description: >
-            An array containing a dictionary about each answer section returned by
-            the server.
-
-        - name: answers.ttl
-          description: >
-            The time interval in seconds that this resource record may be cached
-            before it should be discarded. Zero values mean that the data should
-            not be cached.
-          type: long
-
-        - name: answers.data
-          description: >
-            The data describing the resource. The meaning of this data depends
-            on the type and class of the resource record.
-
-        - name: additionals
-          type: dict
-          description: >
-            An array containing a dictionary for each additional section from the
-            answer.
-
-        - name: additionals_count
-          type: long
-          description: >
-            The number of resource records contained in the `dns.additionals` field.
-            The `dns.additionals` field may or may not be included depending on the
-            configuration of Packetbeat.
-
-        - name: additionals.name
-          description: The domain name to which this resource record pertains.
-          example: example.com.
-
-        - name: additionals.type
-          description: The type of data contained in this resource record.
-          example: NS
-
-        - name: additionals.class
-          description: The class of DNS data contained in this resource record.
-          example: IN
-
-        - name: additionals.ttl
-          description: >
-            The time interval in seconds that this resource record may be cached
-            before it should be discarded. Zero values mean that the data should
-            not be cached.
-          type: long
-
-        - name: additionals.data
-          description: >
-            The data describing the resource. The meaning of this data depends
-            on the type and class of the resource record.
-
-        - name: opt.version
-          description: The EDNS version.
-          example: "0"
-
-        - name: opt.do
-          type: boolean
-          description: If set, the transaction uses DNSSEC.
-
-        - name: opt.ext_rcode
-          description: Extended response code field.
-          example: "BADVERS"
-
-        - name: opt.udp_size
-          type: long
-          description: Requestor's UDP payload size (in bytes).
+    - name: domloadtime
+      type: long
+      description: >
+        In RUM (real-user-monitoring), the total time it takes for the
+        DOM to be loaded. In terms of the W3 Navigation Timing API, this is
+        the difference between `domContentLoadedEnd` and
+        `domContentLoadedStart`.
 
 - key: amqp
   title: "AMQP"
@@ -843,7 +677,6 @@
           type: keyword
           description: >
             Creating application id.
-
 
 - key: cassandra
   title: "Cassandra"
@@ -1155,6 +988,214 @@
                       description:  One string for each argument type (as CQL type) of the failed function.
 
 
+- key: dns
+  title: "DNS"
+  description: DNS-specific event fields.
+  fields:
+    - name: dns
+      type: group
+      fields:
+        - name: id
+          type: long
+          description: >
+            The DNS packet identifier assigned by the program that generated the
+            query. The identifier is copied to the response.
+
+        - name: op_code
+          description: >
+            The DNS operation code that specifies the kind of query in the message.
+            This value is set by the originator of a query and copied into the
+            response.
+          example: QUERY
+
+        - name: flags.authoritative
+          type: boolean
+          description: >
+            A DNS flag specifying that the responding server is an authority for
+            the domain name used in the question.
+
+        - name: flags.recursion_available
+          type: boolean
+          description: >
+            A DNS flag specifying whether recursive query support is available in the
+            name server.
+
+        - name: flags.recursion_desired
+          type: boolean
+          description: >
+            A DNS flag specifying that the client directs the server to pursue a
+            query recursively. Recursive query support is optional.
+
+        - name: flags.authentic_data
+          type: boolean
+          description: >
+            A DNS flag specifying that the recursive server considers the response
+            authentic.
+
+        - name: flags.checking_disabled
+          type: boolean
+          description: >
+            A DNS flag specifying that the client disables the server
+            signature validation of the query.
+
+        - name: flags.truncated_response
+          type: boolean
+          description: >
+            A DNS flag specifying that only the first 512 bytes of the reply were
+            returned.
+
+        - name: response_code
+          description: The DNS status code.
+          example: NOERROR
+
+        - name: question.name
+          description: >
+            The domain name being queried. If the name field contains non-printable
+            characters (below 32 or above 126), then those characters are represented
+            as escaped base 10 integers (\DDD). Back slashes and quotes are escaped.
+            Tabs, carriage returns, and line feeds are converted to \t, \r, and
+            \n respectively.
+          example: www.google.com.
+
+        - name: question.type
+          description: The type of records being queried.
+          example: AAAA
+
+        - name: question.class
+          description: The class of of records being queried.
+          example: IN
+
+        - name: question.etld_plus_one
+          description: The effective top-level domain (eTLD) plus one more label.
+            For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.".
+            The data for determining the eTLD comes from an embedded copy of the
+            data from http://publicsuffix.org.
+          example: amazon.co.uk.
+
+        - name: answers_count
+          type: long
+          description: >
+            The number of resource records contained in the `dns.answers` field.
+
+        - name: answers.name
+          description: The domain name to which this resource record pertains.
+          example: example.com.
+
+        - name: answers.type
+          description: The type of data contained in this resource record.
+          example: MX
+
+        - name: answers.class
+          description: The class of DNS data contained in this resource record.
+          example: IN
+
+        - name: answers.ttl
+          description: >
+            The time interval in seconds that this resource record may be cached
+            before it should be discarded. Zero values mean that the data should
+            not be cached.
+          type: long
+
+        - name: answers.data
+          description: >
+            The data describing the resource. The meaning of this data depends
+            on the type and class of the resource record.
+
+        - name: authorities
+          type: dict
+          description: >
+            An array containing a dictionary for each authority section from the
+            answer.
+
+        - name: authorities_count
+          type: long
+          description: >
+            The number of resource records contained in the `dns.authorities` field.
+            The `dns.authorities` field may or may not be included depending on the
+            configuration of Packetbeat.
+
+        - name: authorities.name
+          description: The domain name to which this resource record pertains.
+          example: example.com.
+
+        - name: authorities.type
+          description: The type of data contained in this resource record.
+          example: NS
+
+        - name: authorities.class
+          description: The class of DNS data contained in this resource record.
+          example: IN
+
+        - name: answers
+          type: dict
+          description: >
+            An array containing a dictionary about each answer section returned by
+            the server.
+
+        - name: answers.ttl
+          description: >
+            The time interval in seconds that this resource record may be cached
+            before it should be discarded. Zero values mean that the data should
+            not be cached.
+          type: long
+
+        - name: answers.data
+          description: >
+            The data describing the resource. The meaning of this data depends
+            on the type and class of the resource record.
+
+        - name: additionals
+          type: dict
+          description: >
+            An array containing a dictionary for each additional section from the
+            answer.
+
+        - name: additionals_count
+          type: long
+          description: >
+            The number of resource records contained in the `dns.additionals` field.
+            The `dns.additionals` field may or may not be included depending on the
+            configuration of Packetbeat.
+
+        - name: additionals.name
+          description: The domain name to which this resource record pertains.
+          example: example.com.
+
+        - name: additionals.type
+          description: The type of data contained in this resource record.
+          example: NS
+
+        - name: additionals.class
+          description: The class of DNS data contained in this resource record.
+          example: IN
+
+        - name: additionals.ttl
+          description: >
+            The time interval in seconds that this resource record may be cached
+            before it should be discarded. Zero values mean that the data should
+            not be cached.
+          type: long
+
+        - name: additionals.data
+          description: >
+            The data describing the resource. The meaning of this data depends
+            on the type and class of the resource record.
+
+        - name: opt.version
+          description: The EDNS version.
+          example: "0"
+
+        - name: opt.do
+          type: boolean
+          description: If set, the transaction uses DNSSEC.
+
+        - name: opt.ext_rcode
+          description: Extended response code field.
+          example: "BADVERS"
+
+        - name: opt.udp_size
+          type: long
+          description: Requestor's UDP payload size (in bytes).
 
 - key: http
   title: "HTTP"
@@ -1206,6 +1247,44 @@
                 by commas.
             - name: body
               description: The body of the HTTP response.
+
+- key: icmp
+  title: "ICMP"
+  description: >
+    ICMP specific event fields.
+  fields:
+    - name: icmp
+      type: group
+      fields:
+        - name: version
+          description: The version of the ICMP protocol.
+          possible_values:
+            - 4
+            - 6
+
+        - name: request.message
+          type: keyword
+          description: A human readable form of the request.
+
+        - name: request.type
+          type: long
+          description: The request type.
+
+        - name: request.code
+          type: long
+          description: The request code.
+
+        - name: response.message
+          type: keyword
+          description: A human readable form of the response.
+
+        - name: response.type
+          type: long
+          description: The response type.
+
+        - name: response.code
+          type: long
+          description: The response code.
 
 - key: memcache
   title: "Memcache"
@@ -1451,139 +1530,6 @@
           description: >
             The returned memcache version string.
 
-- key: mysql
-  title: "MySQL"
-  description: >
-    MySQL-specific event fields.
-  fields:
-    - name: mysql
-      type: group
-      fields:
-        - name: iserror
-          type: boolean
-          description: >
-           If the MySQL query returns an error, this field is set to true.
-
-        - name: affected_rows
-          type: long
-          description: >
-            If the MySQL command is successful, this field contains the affected
-            number of rows of the last statement.
-
-        - name: insert_id
-          description: >
-            If the INSERT query is successful, this field contains the id of the
-            newly inserted row.
-
-        - name: num_fields
-          description: >
-            If the SELECT query is successful, this field is set to the number
-            of fields returned.
-
-        - name: num_rows
-          description: >
-            If the SELECT query is successful, this field is set to the number
-            of rows returned.
-
-        - name: query
-          description: >
-            The row mysql query as read from the transaction's request.
-
-        - name: error_code
-          type: long
-          description: >
-            The error code returned by MySQL.
-
-        - name: error_message
-          description: >
-            The error info message returned by MySQL.
-- key: pgsql
-  title: "PostgreSQL"
-  description: >
-    PostgreSQL-specific event fields.
-  fields:
-    - name: pgsql
-      type: group
-      fields:
-        - name: query
-          description: >
-            The row pgsql query as read from the transaction's request.
-
-        - name: iserror
-          type: boolean
-          description: >
-            If the PgSQL query returns an error, this field is set to true.
-
-        - name: error_code
-          description: The PostgreSQL error code.
-          type: long
-
-        - name: error_message
-          description: The PostgreSQL error message.
-
-        - name: error_severity
-          description: The PostgreSQL error severity.
-          possible_values:
-            - ERROR
-            - FATAL
-            - PANIC
-
-        - name: num_fields
-          description: >
-            If the SELECT query if successful, this field is set to the number
-            of fields returned.
-
-        - name: num_rows
-          description: >
-            If the SELECT query if successful, this field is set to the number
-            of rows returned.
-
-
-- key: thrift
-  title: "Thrift-RPC"
-  description: >
-    Thrift-RPC specific event fields.
-  fields:
-    - name: thrift
-      type: group
-      fields:
-        - name: params
-          description: >
-            The RPC method call parameters in a human readable format. If the IDL
-            files are available, the parameters use names whenever possible.
-            Otherwise, the IDs from the message are used.
-
-        - name: service
-          description: >
-            The name of the Thrift-RPC service as defined in the IDL files.
-
-        - name: return_value
-          description: >
-            The value returned by the Thrift-RPC call. This is encoded in a human
-            readable format.
-
-        - name: exceptions
-          description: >
-            If the call resulted in exceptions, this field contains the exceptions in a human
-            readable format.
-
-- key: redis
-  title: "Redis"
-  description: >
-    Redis-specific event fields.
-  fields:
-    - name: redis
-      type: group
-      fields:
-        - name: return_value
-          description: >
-            The return value of the Redis command in a human readable format.
-
-        - name: error
-          description: >
-            If the Redis command has resulted in an error, this field contains the
-            error message returned by the Redis server.
-
 - key: mongodb
   title: "MongoDb"
   description: >
@@ -1688,6 +1634,53 @@
         - name: cred.machinename
           description: The name of the caller's machine.
 
+- key: mysql
+  title: "MySQL"
+  description: >
+    MySQL-specific event fields.
+  fields:
+    - name: mysql
+      type: group
+      fields:
+        - name: iserror
+          type: boolean
+          description: >
+           If the MySQL query returns an error, this field is set to true.
+
+        - name: affected_rows
+          type: long
+          description: >
+            If the MySQL command is successful, this field contains the affected
+            number of rows of the last statement.
+
+        - name: insert_id
+          description: >
+            If the INSERT query is successful, this field contains the id of the
+            newly inserted row.
+
+        - name: num_fields
+          description: >
+            If the SELECT query is successful, this field is set to the number
+            of fields returned.
+
+        - name: num_rows
+          description: >
+            If the SELECT query is successful, this field is set to the number
+            of rows returned.
+
+        - name: query
+          description: >
+            The row mysql query as read from the transaction's request.
+
+        - name: error_code
+          type: long
+          description: >
+            The error code returned by MySQL.
+
+        - name: error_message
+          description: >
+            The error info message returned by MySQL.
+
 - key: nfs
   title: "NFS"
   description: NFS v4/3 specific event fields.
@@ -1715,84 +1708,89 @@
           description: NFS operation reply status.
 
 
-
-- key: raw
-  title: Raw
-  description: These fields contain the raw transaction data.
-  fields:
-    - name: request
-      type: text
-      description: >
-        For text protocols, this is the request as seen on the wire
-        (application layer only). For binary protocols this is our
-        representation of the request.
-
-    - name: response
-      type: text
-      description: >
-        For text protocols, this is the response as seen on the wire
-        (application layer only). For binary protocols this is our
-        representation of the request.
-
-- key: trans_measurements
-  title: "Measurements (Transactions)"
+- key: pgsql
+  title: "PostgreSQL"
   description: >
-    These fields contain measurements related to the transaction.
+    PostgreSQL-specific event fields.
   fields:
-    - name: responsetime
-      description: >
-        The wall clock time it took to complete the transaction.
-        The precision is in milliseconds.
-      type: long
+    - name: pgsql
+      type: group
+      fields:
+        - name: query
+          description: >
+            The row pgsql query as read from the transaction's request.
 
-    - name: cpu_time
-      description: The CPU time it took to complete the transaction.
-      type: long
+        - name: iserror
+          type: boolean
+          description: >
+            If the PgSQL query returns an error, this field is set to true.
 
-    - name: bytes_in
-      description: >
-        The number of bytes of the request. Note that this size is
-        the application layer message length, without the length of the IP or
-        TCP headers.
-      type: long
-      format: bytes
+        - name: error_code
+          description: The PostgreSQL error code.
+          type: long
 
-    - name: bytes_out
-      description: >
-        The number of bytes of the response. Note that this size is
-        the application layer message length, without the length of the IP or
-        TCP headers.
-      type: long
-      format: bytes
+        - name: error_message
+          description: The PostgreSQL error message.
 
-    - name: dnstime
-      type: long
-      description: >
-        The time it takes to query the name server for a given request.
-        This is typically used for RUM (real-user-monitoring) but can
-        also have values for server-to-server communication when DNS
-        is used for service discovery.
-        The precision is in microseconds.
+        - name: error_severity
+          description: The PostgreSQL error severity.
+          possible_values:
+            - ERROR
+            - FATAL
+            - PANIC
 
-    - name: connecttime
-      type: long
-      description: >
-        The time it takes for the TCP connection to be established for
-        the given transaction.
-        The precision is in microseconds.
+        - name: num_fields
+          description: >
+            If the SELECT query if successful, this field is set to the number
+            of fields returned.
 
-    - name: loadtime
-      type: long
-      description: >
-        The time it takes for the content to be loaded. This is typically
-        used for RUM (real-user-monitoring) but it can make sense in other
-        cases as well.
-        The precision is in microseconds.
+        - name: num_rows
+          description: >
+            If the SELECT query if successful, this field is set to the number
+            of rows returned.
 
-    - name: domloadtime
-      type: long
-      description: >
-        In RUM (real-user-monitoring), the total time it takes for the
-        DOM to be loaded. In terms of the W3 Navigation Timing API, this is
-        the difference between `domContentLoadedEnd` and
-        `domContentLoadedStart`.
+- key: redis
+  title: "Redis"
+  description: >
+    Redis-specific event fields.
+  fields:
+    - name: redis
+      type: group
+      fields:
+        - name: return_value
+          description: >
+            The return value of the Redis command in a human readable format.
+
+        - name: error
+          description: >
+            If the Redis command has resulted in an error, this field contains the
+            error message returned by the Redis server.
+
+- key: thrift
+  title: "Thrift-RPC"
+  description: >
+    Thrift-RPC specific event fields.
+  fields:
+    - name: thrift
+      type: group
+      fields:
+        - name: params
+          description: >
+            The RPC method call parameters in a human readable format. If the IDL
+            files are available, the parameters use names whenever possible.
+            Otherwise, the IDs from the message are used.
+
+        - name: service
+          description: >
+            The name of the Thrift-RPC service as defined in the IDL files.
+
+        - name: return_value
+          description: >
+            The value returned by the Thrift-RPC call. This is encoded in a human
+            readable format.
+
+        - name: exceptions
+          description: >
+            If the call resulted in exceptions, this field contains the exceptions in a human
+            readable format.
+

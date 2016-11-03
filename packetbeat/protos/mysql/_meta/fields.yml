@@ -1,0 +1,47 @@
+- key: mysql
+  title: "MySQL"
+  description: >
+    MySQL-specific event fields.
+  fields:
+    - name: mysql
+      type: group
+      fields:
+        - name: iserror
+          type: boolean
+          description: >
+           If the MySQL query returns an error, this field is set to true.
+
+        - name: affected_rows
+          type: long
+          description: >
+            If the MySQL command is successful, this field contains the affected
+            number of rows of the last statement.
+
+        - name: insert_id
+          description: >
+            If the INSERT query is successful, this field contains the id of the
+            newly inserted row.
+
+        - name: num_fields
+          description: >
+            If the SELECT query is successful, this field is set to the number
+            of fields returned.
+
+        - name: num_rows
+          description: >
+            If the SELECT query is successful, this field is set to the number
+            of rows returned.
+
+        - name: query
+          description: >
+            The row mysql query as read from the transaction's request.
+
+        - name: error_code
+          type: long
+          description: >
+            The error code returned by MySQL.
+
+        - name: error_message
+          description: >
+            The error info message returned by MySQL.
+
