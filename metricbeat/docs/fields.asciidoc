@@ -3507,7 +3507,7 @@ User CPU consumed by the background processes.
 [float]
 == memory Fields
 
-Redis CPU stats.
+Redis memory stats.
 
 
 
@@ -3516,13 +3516,16 @@ Redis CPU stats.
 
 type: long
 
-Used memory.
+format: bytes Used memory.
+
 
 
 [float]
 === redis.info.memory.used.rss
 
 type: long
+
+format: bytes
 
 Used memory rss.
 
@@ -3532,6 +3535,8 @@ Used memory rss.
 
 type: long
 
+format: bytes
+
 Used memory peak.
 
 
@@ -3539,6 +3544,8 @@ Used memory peak.
 === redis.info.memory.used.lua
 
 type: long
+
+format: bytes
 
 Used memory lua.
 
