@@ -1328,8 +1328,8 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 1
 
-        # Check that offset is 0 even though there is content in it
-        assert data[0]["offset"] == 0
+        # Check that offset is set to the end of the file
+        assert data[0]["offset"] == os.path.getsize(testfile1)
 
     def test_ignore_older_state_clean_inactive(self):
         """

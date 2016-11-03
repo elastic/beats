@@ -175,7 +175,7 @@ The files affected by this setting fall into two categories:
 * Files that were never harvested
 * Files that were harvested but weren't updated for longer than `ignore_older`
 
-When a file that has never been harvested is updated, the reading starts from the beginning as the state of the file was created with the offset 0. For a file that has been harvested previously, reading continues at the last position.
+For files which were never seen before, the offset state is set to the end of the file. If a state already exist, the offset is not changed. In case a file is updated again later, reading continues at the set offset position.
 
 The `ignore_older` setting relies on the modification time of the file to determine if a file is ignored. If the modification time of the file is not updated when lines are written to a file (which can happen on Windows), the `ignore_older` setting may cause Filebeat to ignore files even though content was added at a later time.
 

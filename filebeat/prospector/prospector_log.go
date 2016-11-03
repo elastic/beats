@@ -298,6 +298,10 @@ func (p *ProspectorLog) handleIgnoreOlder(lastState, newState file.State) error 
 		return nil
 	}
 
+	// Set offset to end of file to be consistent with files which were harvested before
+	// See https://github.com/elastic/beats/pull/2907
+	newState.Offset = newState.Fileinfo.Size()
+
 	// Write state for ignore_older file as none exists yet
 	newState.Finished = true
 	err := p.Prospector.updateState(input.NewEvent(newState))
