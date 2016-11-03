@@ -151,19 +151,25 @@ winlogbeat.event_logs:
 
 [WARNING]
 =======================================
-There is a limit on the query depth to prevent the possibility of a stack overflow from deep recursive queries. This limit is actually set to 22 filters.
+You can specify up to 22 event IDs. Specifying more than 22 event IDs may produce deep recursive queries that could result in a stack overflow. For more information, see https://support.microsoft.com/en-us/kb/970453.
 
-More than 22 event id's should be handled with multiple monitors to the same name:
+To workaround this issue you can use different event logs configuration, and/or drop events with processors
 
+[source,yaml]
 --------------------------------------------------------------------------------
 winlogbeat.event_logs:
   - name: Security
     event_id: 4624, 4625, 4700-4800, -4735 ....
   - name: Security
     event_id: 4624, 4625, 4700-4800, -4735 ....
+    
+processors:
+ - drop_event:
+     when:
+       equals:
+         event_id: 50037
 --------------------------------------------------------------------------------
 
-For more information around this, please visit https://support.microsoft.com/en-us/kb/970453.
 =======================================
 
 
