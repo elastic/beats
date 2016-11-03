@@ -1,5 +1,5 @@
 import yaml
-import sys
+import os
 import argparse
 
 def document_fields(output, section, sections, path):
@@ -112,8 +112,14 @@ if __name__ == "__main__":
     beat_name = args.beatname
     es_beats = args.es_beats
 
+    fields_yml = beat_path + "/etc/fields.generated.yml"
+
+    # Not all beats have a fields.generated.yml. Fall back to fields.yml
+    if not os.path.isfile(fields_yml):
+        fields_yml = beat_path + "/etc/fields.yml"
+
     # Read fields.yml
-    with open(beat_path + "/etc/fields.yml") as f:
+    with open(fields_yml) as f:
         fields = f.read()
 
     # Prepends beat fields from libbeat

@@ -105,7 +105,7 @@ simplify:
 # Cleans up directory and source code with gofmt
 .PHONY: clean
 clean:
-	rm -rf build ${BEATNAME} ${BEATNAME}.test ${BEATNAME}.exe ${BEATNAME}.test.exe
+	rm -rf build ${BEATNAME} ${BEATNAME}.test ${BEATNAME}.exe ${BEATNAME}.test.exe etc/fields.generated.yml
 
 # Shortcut for continuous integration
 # This should always run before merging.
@@ -194,7 +194,7 @@ test: unit
 
 # Runs all tests and generates the coverage reports
 .PHONY: testsuite
-testsuite:
+testsuite: clean collect
 	$(MAKE) unit-tests
 
 	# Setups environment if TEST_ENVIRONMENT is set to true
@@ -227,7 +227,8 @@ coverage-report:
 
 # Update expects the most recent version of libbeat in the GOPATH
 .PHONY: update
-update: python-env
+update: python-env collect
+
 	# Update config
 	echo "Update config file"
 	-rm -f ${BEATNAME}.yml
@@ -242,7 +243,6 @@ update: python-env
 	fi;
 
 	# Update docs
-
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEATNAME} ${ES_BEATS}
 
 	# Generate index templates

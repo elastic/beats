@@ -100,8 +100,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    fields_yml = args.beat + "/etc/fields.generated.yml"
+
+    # Not all beats have a fields.generated.yml. Fall back to fields.yml
+    if not os.path.isfile(fields_yml):
+        fields_yml = args.beat + "/etc/fields.yml"
+
     # generate the index-pattern content
-    with open(args.beat + "/etc/fields.yml", 'r') as f:
+    with open(fields_yml, 'r') as f:
         fields = f.read()
 
         # Prepend beat fields from libbeat
