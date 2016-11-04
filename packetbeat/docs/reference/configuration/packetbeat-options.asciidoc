@@ -468,8 +468,7 @@ The default is false.
 The header field to extract the real IP from. This setting is useful when
 you want to capture traffic behind a reverse proxy, but you want to get the geo-location
 information. If this header is present and contains a valid IP addresses, the
-information is used for the `real_ip` and `client_location` indexed
-fields.
+information is used for the `real_ip` field.
 
 ===== max_message_size
 

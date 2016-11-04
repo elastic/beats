@@ -60,6 +60,8 @@ https://github.com/elastic/beats/compare/v5.0.0...5.0[Check the HEAD diff]
 - Add system core metricset for Windows. {pull}2883}[2883]
 
 *Packetbeat*
+- Define `client_geoip.location` as geo_point in the mappings to be used by the GeoIP processor in the Ingest Node pipeline.
+  {pull}2795[2795]
 
 *Topbeat*
 

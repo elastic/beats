@@ -1069,7 +1069,23 @@ type: geo_point
 
 example: 40.715, -74.011
 
-The GeoIP location of the `real_ip` IP address or of the `client_ip` address if the `real_ip` is disabled. The field is a string containing the latitude and longitude separated by a comma.
+DEPRECATED. Please use `client_geoip` instead.  The GeoIP location of the `real_ip` IP address or of the `client_ip` address if the `real_ip` is disabled. The field is a string containing the latitude and longitude separated by a comma. 
+
+
+[float]
+== client_geoip Fields
+
+The GeoIP information of the client.
+
+
+[float]
+=== client_geoip.location
+
+type: geo_point
+
+example: {'lat': 51, 'lon': 9}
+
+The GeoIP location of the `client_ip` address. This field is available only if you define a https://www.elastic.co/guide/en/elasticsearch/plugins/master/using-ingest-geoip.html[GeoIP Processor] as a pipeline in the https://www.elastic.co/guide/en/elasticsearch/plugins/master/ingest-geoip.html[Ingest GeoIP processor plugin] or using Logstash.
 
 
 [float]
