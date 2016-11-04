@@ -12,9 +12,9 @@
 *`-E <setting>=<value>`*::
 Overwrite an individual setting in the config file. For example:
 +
-["source","sh"]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo ./packetbeat -c packetbeat.yml -E name=mybeat
+sudo ./{beatname_lc} -c {beatname_lc}.yml -E name=mybeat
 ----------------------------------------------------------------------
 
 *`-N`*::
