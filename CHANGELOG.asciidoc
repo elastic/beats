@@ -44,6 +44,7 @@ https://github.com/elastic/beats/compare/v5.0.0...5.0[Check the HEAD diff]
 *Topbeat*
 
 *Filebeat*
+
 - Fix registry cleanup issue when files falling under ignore_older after restart. {issue}2818[2818]
 
 *Winlogbeat*
@@ -55,9 +56,6 @@ https://github.com/elastic/beats/compare/v5.0.0...5.0[Check the HEAD diff]
 *Metricbeat*
 
 - Add username and password config options to the PostgreSQL module. {pull}2889[2890]
-- Add experimental filebeat metricset in the beats module. {pull}2297[2297]
-- Add experimental libbeat metricset in the beats module. {pull}2339[2339]
-- Add experimental docker module. Provided by Ingensi and @douaejeouit based on dockbeat.
 - Add username and password config options to the MongoDB module. {pull}2889[2889]
 - Add system core metricset for Windows. {pull}2883}[2883]
 
@@ -66,7 +64,8 @@ https://github.com/elastic/beats/compare/v5.0.0...5.0[Check the HEAD diff]
 *Topbeat*
 
 *Filebeat*
-- Stop Filebeat on registrar loading error.
+
+- Stop Filebeat on registrar loading error. {pull}2868[2868]
 
 *Winlogbeat*
 
@@ -75,8 +74,6 @@ https://github.com/elastic/beats/compare/v5.0.0...5.0[Check the HEAD diff]
 *Affecting all Beats*
 
 *Metricbeat*
-
-- Add username and password config options to the MongoDB module. {pull}2889[2889]
 
 *Packetbeat*
 
