@@ -149,6 +149,38 @@ winlogbeat.event_logs:
     event_id: 4624, 4625, 4700-4800, -4735
 --------------------------------------------------------------------------------
 
+[WARNING]
+=======================================
+If you specify more that 22 event IDs to include or 22 event IDs to exclude,
+Windows will prevent Winlogbeat from reading the event log because it limits the
+number of conditions that can be used in an event log query. If this occurs a similar
+warning as shown below will be logged by Winlogbeat, and it will continue
+processing data from other event logs. For more information, see
+https://support.microsoft.com/en-us/kb/970453. 
+
+`WARN EventLog[Application] Open() error. No events will be read from this
+source. The specified query is invalid.`
+
+If you have more than 22 event IDs, you can workaround this Windows limitation
+by using a drop_event[drop-event] processor to do the filtering after
+Winlogbeat has received the events from Windows. The filter shown below is
+equivalent to `event_id: 903, 1024, 4624` but can be expanded beyond 22
+event IDs.
+
+[source,yaml]
+--------------------------------------------------------------------------------
+processors:                   
+- drop_event.when.and:               
+    - equals.log_name: Security      
+    - not.or:                   
+        - equals.event_id: 903     
+        - equals.event_id: 1024    
+        - equals.event_id: 4624
+--------------------------------------------------------------------------------
+
+=======================================
+
+
 ===== event_logs.level
 
 A list of event levels to include. The value is a comma-separated list of
