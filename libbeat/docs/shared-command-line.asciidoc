@@ -14,7 +14,7 @@ Overwrite an individual setting in the config file. For example:
 +
 ["source","sh"]
 ----------------------------------------------------------------------
-sudo ./packetbeat -c packetbeat.yml -E name=mybeat
+sudo ./metricbeat -c metricbeat.yml -E name=mybeat
 ----------------------------------------------------------------------
 
 *`-N`*::
