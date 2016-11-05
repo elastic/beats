@@ -1005,6 +1005,8 @@ Fail counter.
 
 type: long
 
+format: bytes
+
 Memory limit.
 
 
@@ -1019,6 +1021,8 @@ Rss memory stats.
 === docker.memory.rss.total
 
 type: long
+
+format: bytes
 
 Total memory resident set size.
 
@@ -1043,6 +1047,8 @@ Usage memory stats.
 
 type: long
 
+format: bytes
+
 Max memory usage.
 
 
@@ -1058,6 +1064,8 @@ Memory usage percentage.
 === docker.memory.usage.total
 
 type: long
+
+format: bytes
 
 Total memory usage.
 
@@ -1088,6 +1096,8 @@ Incoming network stats.
 === docker.network.in.bytes
 
 type: long
+
+format: bytes
 
 Total number of incoming bytes.
 
@@ -1127,6 +1137,8 @@ Outgoing network stats.
 === docker.network.out.bytes
 
 type: long
+
+format: bytes
 
 Total number of outgoing bytes.
 

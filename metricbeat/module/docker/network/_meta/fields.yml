@@ -15,6 +15,7 @@
       fields:
         - name: bytes
           type: long
+          format: bytes
           description: >
             Total number of incoming bytes.
         - name: dropped
@@ -36,6 +37,7 @@
       fields:
         - name: bytes
           type: long
+          format: bytes
           description: >
             Total number of outgoing bytes.
         - name: dropped
