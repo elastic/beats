@@ -10,6 +10,7 @@
         Fail counter.
     - name: limit
       type: long
+      format: bytes
       description: >
         Memory limit.
     - name: rss
@@ -19,6 +20,7 @@
       fields:
         - name: total
           type: long
+          format: bytes
           description: >
             Total memory resident set size.
         - name: pct
@@ -32,6 +34,7 @@
       fields:
         - name: max
           type: long
+          format: bytes
           description: >
             Max memory usage.
         - name: pct
@@ -40,5 +43,6 @@
             Memory usage percentage.
         - name: total
           type: long
+          format: bytes
           description: >
             Total memory usage.
