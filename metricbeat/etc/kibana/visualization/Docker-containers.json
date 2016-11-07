@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Docker containers\",\"type\":\"table\",\"params\":{\"perPage\":8,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":true,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"docker.container.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Name\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"docker.cpu.usage.total\",\"customLabel\":\"CPU usage\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"docker.diskio.total\",\"customLabel\":\"DiskIO\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"docker.memory.usage.pct\",\"customLabel\":\"Mem (%)\"}},{\"id\":\"6\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"docker.memory.rss.total\",\"customLabel\":\"Mem RSS\"}},{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"docker.container.id\",\"customLabel\":\"Number of Containers\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Docker containers", 
+  "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"asc\"}}}}", 
+  "version": 1, 
+  "savedSearchId": "Metricbeat-Docker", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}
