@@ -35,10 +35,16 @@ The value that you specify here is used as the `input_type` for each event publi
 
 ===== paths
 
-A list of glob-based paths that should be crawled and fetched. Filebeat supports all glob patterns that are supported by https://golang.org/pkg/path/filepath/#Glob[Golang Glob].
+A list of glob-based paths that should be crawled and fetched. All patterns
+supported by https://golang.org/pkg/path/filepath/#Glob[Golang Glob] are also
+supported here. For example, to fetch all files from a predefined level of
+subdirectories, the following pattern can be used: `/var/log/*/*.log`. This
+fetches all `.log` files from the subfolders of `/var/log`. It does not
+fetch log files from the `/var/log` folder itself. Currently it is not possible
+to recursively fetch all files in all subdirectories of a directory.
 
-Filebeat starts a harvester for
-each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
+Filebeat starts a harvester for each file that it finds under the specified
+paths. You can specify one path per line. Each line begins with a dash (-).
 
 ===== encoding
 
