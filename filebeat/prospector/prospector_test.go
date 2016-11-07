@@ -17,7 +17,9 @@ func TestProspectorInitInputTypeLogError(t *testing.T) {
 		config: prospectorConfig{},
 	}
 
-	err := prospector.Init([]file.State{})
+	states := file.NewStates()
+	states.SetStates([]file.State{})
+	err := prospector.Init(*states)
 	// Error should be returned because no path is set
 	assert.Error(t, err)
 }

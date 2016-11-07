@@ -138,7 +138,9 @@ func TestInit(t *testing.T) {
 				Paths: test.paths,
 			},
 		}
-		err := p.Init(test.states)
+		states := file.NewStates()
+		states.SetStates(test.states)
+		err := p.Init(*states)
 		assert.NoError(t, err)
 		assert.Equal(t, test.count, p.Prospector.states.Count())
 	}
