@@ -15,8 +15,8 @@ import (
 )
 
 var (
-	filesRenamed  = expvar.NewInt("filebeat.prospector.log.files.renamed")
-	filesTrucated = expvar.NewInt("filebeat.prospector.log.files.truncated")
+	filesRenamed   = expvar.NewInt("filebeat.prospector.log.files.renamed")
+	filesTruncated = expvar.NewInt("filebeat.prospector.log.files.truncated")
 )
 
 type ProspectorLog struct {
@@ -37,13 +37,14 @@ func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
 // Init sets up the prospector
 // It goes through all states coming from the registry. Only the states which match the glob patterns of
 // the prospector will be loaded and updated. All other states will not be touched.
-func (p *ProspectorLog) Init(states []file.State) error {
+func (p *ProspectorLog) Init(states file.States) error {
 	logp.Debug("prospector", "exclude_files: %s", p.config.ExcludeFiles)
 
-	for _, state := range states {
+	for _, state := range states.GetStates() {
 		// Check if state source belongs to this prospector. If yes, update the state.
 		if p.matchesFile(state.Source) {
 			state.TTL = -1
+
 			// Update prospector states and send new states to registry
 			err := p.Prospector.updateState(input.NewEvent(state))
 			if err != nil {
@@ -60,6 +61,19 @@ func (p *ProspectorLog) Init(states []file.State) error {
 func (p *ProspectorLog) Run() {
 	logp.Debug("prospector", "Start next scan")
 
+	// TailFiles is like ignore_older = 1ns and only on startup
+	if p.config.TailFiles {
+		ignoreOlder := p.config.IgnoreOlder
+
+		// Overwrite ignore_older for the first scan
+		p.config.IgnoreOlder = 1
+		defer func() {
+			// Reset ignore_older after first run
+			p.config.IgnoreOlder = ignoreOlder
+			// Disable tail_files after the first run
+			p.config.TailFiles = false
+		}()
+	}
 	p.scan()
 
 	// It is important that a first scan is run before cleanup to make sure all new states are read first
@@ -246,7 +260,7 @@ func (p *ProspectorLog) harvestExistingFile(newState file.State, oldState file.S
 			logp.Err("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err)
 		}
 
-		filesTrucated.Add(1)
+		filesTruncated.Add(1)
 		return
 	}
 

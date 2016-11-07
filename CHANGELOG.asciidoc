@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v5.0.0...master[Check the HEAD diff]
 - If a file is falling under ignore_older during startup, offset is now set to end of file instead of 0.
   With the previous logic the whole file was sent in case a line was added and it was inconsitent with
   files which were harvested previously. {pull}2907[2907]
+- tail_files is now only applied on the first scan and not for all new files. {pull}2932[2932]
 
 *Winlogbeat*
 

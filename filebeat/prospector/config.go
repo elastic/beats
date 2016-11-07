@@ -17,6 +17,7 @@ var (
 		CleanRemoved:   true,
 		HarvesterLimit: 0,
 		Symlinks:       false,
+		TailFiles:      false,
 	}
 )
 
@@ -30,6 +31,7 @@ type prospectorConfig struct {
 	CleanRemoved   bool             `config:"clean_removed"`
 	HarvesterLimit uint64           `config:"harvester_limit" validate:"min=0"`
 	Symlinks       bool             `config:"symlinks"`
+	TailFiles      bool             `config:"tail_files"`
 }
 
 func (config *prospectorConfig) Validate() error {
