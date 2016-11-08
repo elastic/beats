@@ -376,7 +376,7 @@ class TestCase(unittest.TestCase):
                     raise Exception("Unexpected key '{}' found"
                                     .format(key))
 
-    def load_fields(self, fields_doc="../../etc/fields.yml"):
+    def load_fields(self, fields_doc="../../etc/fields.generated.yml"):
         """
         Returns a list of fields to expect in the output dictionaries
         and a second list that contains the fields that have a
@@ -404,6 +404,10 @@ class TestCase(unittest.TestCase):
                     if field.get("type") == "dict":
                         dictfields.append(newName)
             return fields, dictfields
+
+        # Not all beats have a fields.generated.yml. Fall back to fields.yml
+        if not os.path.isfile(fields_doc):
+            fields_doc = "../../etc/fields.yml"
 
         # TODO: Make fields_doc path more generic to work with beat-generator
         with open(fields_doc, "r") as f:

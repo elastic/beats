@@ -12,6 +12,7 @@ Example usage:
 import yaml
 import json
 import argparse
+import os
 
 
 def fields_to_es_template(args, input, output, index, version):
@@ -306,7 +307,13 @@ if __name__ == "__main__":
         target += "-es2x"
     target += ".json"
 
-    with open(args.path + "/etc/fields.yml", 'r') as f:
+    fields_yml = args.path + "/etc/fields.generated.yml"
+
+    # Not all beats have a fields.generated.yml. Fall back to fields.yml
+    if not os.path.isfile(fields_yml):
+        fields_yml = args.path + "/etc/fields.yml"
+
+    with open(fields_yml, 'r') as f:
         fields = f.read()
 
         # Prepend beat fields from libbeat
