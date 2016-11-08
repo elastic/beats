@@ -98,7 +98,7 @@ https://github.com/elastic/beats/compare/v5.0.0...v5.0.1[View commits]
 
 - Add username and password config options to the PostgreSQL module. {pull}2889[2890]
 - Add username and password config options to the MongoDB module. {pull}2889[2889]
-- Add system core metricset for Windows. {pull}2883}[2883]
+- Add system core metricset for Windows. {pull}2883[2883]
 
 *Packetbeat*
 
