@@ -919,6 +919,24 @@
         },
         "kafka": {
           "properties": {
+            "broker": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            },
+            "consumer": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            },
             "partition": {
               "properties": {
                 "broker": {

@@ -87,5 +87,3 @@ services:
 
   zookeeper:
     image: jplock/zookeeper:3.4.8
-
-

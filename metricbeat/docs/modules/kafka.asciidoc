@@ -31,7 +31,15 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-kafka-broker,broker>>
+
+* <<metricbeat-metricset-kafka-consumer,consumer>>
+
 * <<metricbeat-metricset-kafka-partition,partition>>
+
+include::kafka/broker.asciidoc[]
+
+include::kafka/consumer.asciidoc[]
 
 include::kafka/partition.asciidoc[]
 
