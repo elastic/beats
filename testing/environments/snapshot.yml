@@ -1,19 +1,24 @@
 # This should test the environment with the latest snapshots
 # This is based on base.yml
-elasticsearch:
-  build: ./docker/elasticsearch
-  dockerfile: Dockerfile-snapshot
-  environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "network.host="
-      - "transport.host=127.0.0.1"
-      - "http.host=0.0.0.0"
+version: '2'
+services:
+  elasticsearch:
+    build:
+      context: ./docker/elasticsearch
+      dockerfile: Dockerfile-snapshot
+    environment:
+        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        - "network.host="
+        - "transport.host=127.0.0.1"
+        - "http.host=0.0.0.0"
 
-logstash:
-  build: ./docker/logstash
-  dockerfile: Dockerfile-snapshot
+  logstash:
+    build:
+      context: ./docker/logstash
+      dockerfile: Dockerfile-snapshot
 
-kibana:
-  build: ./docker/kibana
-  dockerfile: Dockerfile-snapshot
+  kibana:
+    build:
+      context: ./docker/kibana
+      dockerfile: Dockerfile-snapshot
 
