@@ -76,6 +76,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	for name, p := range config.NamedProspectors {
+		p.SetString("document_type", -1, name)
+		config.Prospectors = append(config.Prospectors, p)
+	}
+
 	crawler, err := crawler.New(newSpoolerOutlet(fb.done, spooler, wgEvents), config.Prospectors)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
