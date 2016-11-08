@@ -12,4 +12,4 @@ before-build:
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: update
+collect:

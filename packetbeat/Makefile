@@ -28,7 +28,7 @@ before-build:
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: fields update
+collect: fields
 
 .PHONY: fields
 fields:
