@@ -5,12 +5,10 @@ MAINTAINER Elastic Docker Team <docker@elastic.co>
 ARG ELASTIC_VERSION
 ARG ES_DOWNLOAD_URL
 ARG ES_JAVA_OPTS
+ARG XPACK=x-pack
 
 ENV PATH /usr/share/elasticsearch/bin:$PATH
 ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
-
-ENV ELASTIC_VERSION 6.0.0-alpha1-SNAPSHOT
-ENV ES_DOWNLOAD_URL https://snapshots.elastic.co/downloads/elasticsearch
 
 WORKDIR /usr/share/elasticsearch
 
@@ -29,13 +27,10 @@ RUN set -ex && for esdirs in config data logs; do \
         chown -R elasticsearch:elasticsearch "$esdirs"; \
     done
 
-COPY config/elasticsearch.yml config/
-RUN chown elasticsearch:elasticsearch config/elasticsearch.yml
-
 USER elasticsearch
 
 # Install xpack
-#RUN eval ${ES_JAVA_OPTS:-} elasticsearch-plugin install --batch x-pack
+#RUN eval ${ES_JAVA_OPTS:-} elasticsearch-plugin install --batch ${XPACK}
 
 COPY config/elasticsearch.yml config/
 COPY config/log4j2.properties config/
