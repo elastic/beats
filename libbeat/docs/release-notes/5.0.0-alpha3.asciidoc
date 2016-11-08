@@ -1,0 +1,47 @@
+
+[[release-notes-5.0.0-alpha3]]
+=== Beats version 5.0.0-alpha3
+https://github.com/elastic/beats/compare/v5.0.0-alpha2...v5.0.0-alpha3[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- All configuration settings under `shipper:` are moved to be top level configuration settings. I.e.
+  `shipper.name:` becomes `name:` in the configuration file. {pull}1570[1570]
+
+*Topbeat*
+
+- Topbeat is replaced by Metricbeat.
+
+*Filebeat*
+
+- The state for files which fall under ignore_older is not stored anymore. This has the consequence, that if a file which fell under ignore_older is updated, the whole file will be crawled.
+
+==== Bugfixes
+
+*Winlogbeat*
+
+- Adding missing argument to the "Stop processing" log message. {pull}1590[1590]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add conditions to generic filtering. {pull}1623[1623]
+
+*Metricbeat*
+
+- First public release, containing the following modules: apache, mysql, nginx, redis, system, and zookeeper.
+
+*Filebeat*
+
+- The registry format was changed to an array instead of dict. The migration to the new format will happen automatically at the first startup. {pull}1703[1703]
+
+==== Deprecated
+
+*Affecting all Beats*
+
+- The support for doing GeoIP lookups is deprecated and will be removed in version 6.0. {pull}1601[1601]
+
+

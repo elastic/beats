@@ -1,4 +1,7 @@
-:beats-dir: ../../../beats
+// Use these for links to issue and pulls. Note issues and pulls redirect one to
+// each other on Github, so don't worry too much on using the right prefix.
+:issue: https://github.com/elastic/beats/issues/
+:pull: https://github.com/elastic/beats/pull/
 
 [[release-notes]]
 == Release notes
@@ -16,20 +19,31 @@ This section summarizes the changes in each release.
 * <<release-notes-5.0.0-alpha3>>
 * <<release-notes-5.0.0-alpha2>>
 * <<release-notes-5.0.0-alpha1>>
-* <<release-notes-1.3.1>>
-* <<release-notes-1.3.0>>
-* <<release-notes-1.2.3>>
-* <<release-notes-1.2.2>>
-* <<release-notes-1.2.1>>
-* <<release-notes-1.2.0>>
-* <<release-notes-1.1.2>>
-* <<release-notes-1.1.1>>
-* <<release-notes-1.1.0>>
-* <<release-notes-1.0.1>>
-* <<release-notes-1.0.0>>
-* <<release-notes-1.0.0-rc2>>
-* <<release-notes-1.0.0-rc1>>
-* <<release-notes-1.0.0-beta4>>
 --
 
-include::../../CHANGELOG.asciidoc[]
+
+include::release-notes/5.0.1.asciidoc[]
+include::release-notes/5.0.0.asciidoc[]
+include::release-notes/5.0.0-ga.asciidoc[]
+include::release-notes/5.0.0-rc1.asciidoc[]
+include::release-notes/5.0.0-beta1.asciidoc[]
+include::release-notes/5.0.0-alpha5.asciidoc[]
+include::release-notes/5.0.0-alpha4.asciidoc[]
+include::release-notes/5.0.0-alpha3.asciidoc[]
+include::release-notes/5.0.0-alpha2.asciidoc[]
+include::release-notes/5.0.0-alpha1.asciidoc[]
+
+include::release-notes/1.3.1.asciidoc[]
+include::release-notes/1.3.0.asciidoc[]
+include::release-notes/1.2.3.asciidoc[]
+include::release-notes/1.2.2.asciidoc[]
+include::release-notes/1.2.1.asciidoc[]
+include::release-notes/1.2.0.asciidoc[]
+include::release-notes/1.1.2.asciidoc[]
+include::release-notes/1.1.1.asciidoc[]
+include::release-notes/1.1.0.asciidoc[]
+include::release-notes/1.0.1.asciidoc[]
+include::release-notes/1.0.0.asciidoc[]
+include::release-notes/1.0.0-rc2.asciidoc[]
+include::release-notes/1.0.0-rc1.asciidoc[]
+include::release-notes/1.0.0-beta4.asciidoc[]

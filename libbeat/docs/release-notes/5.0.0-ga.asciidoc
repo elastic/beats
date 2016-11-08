@@ -1,0 +1,33 @@
+[[release-notes-5.0.0-ga]]
+=== Beats version 5.0.0-GA
+https://github.com/elastic/beats/compare/v5.0.0-rc1...v5.0.0[View commits]
+
+The list below covers the changes between 5.0.0-rc1 and 5.0.0 GA only.
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix kafka output re-trying batches with too large events. {issue}2735[2735]
+- Fix kafka output protocol error if `version: 0.10` is configured. {issue}2651[2651]
+- Fix kafka output connection closed by broker on SASL/PLAIN. {issue}2717[2717]
+
+*Metricbeat*
+
+- Fix high CPU usage on macOS when encountering processes with long command lines. {issue}2747[2747]
+- Fix high value of `system.memory.actual.free` and `system.memory.actual.used`. {issue}2653[2653]
+- Change several `OpenProcess` calls on Windows to request the lowest possible access provilege.  {issue}1897[1897]
+- Fix system.memory.actual.free high value on Windows. {issue}2653[2653]
+
+*Filebeat*
+
+- Fix issue when clean_removed and clean_inactive were used together that states were not directly removed from the registry.
+- Fix issue where upgrading a 1.x registry file resulted in duplicate state entries. {pull}2792[2792]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add beat.version fields to all events.
+
+

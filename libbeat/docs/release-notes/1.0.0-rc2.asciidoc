@@ -1,0 +1,67 @@
+[[release-notes-1.0.0-rc2]]
+=== Beats version 1.0.0-rc2
+https://github.com/elastic/beats/compare/1.0.0-rc1...1.0.0-rc2[Check 1.0.0-rc2
+diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The `shipper` output field is renamed to `beat.name`. #285
+- Use of `enabled` as a configuration option for outputs (elasticsearch,
+  logstash, etc.) has been removed. #264
+- Use of `disabled` as a configuration option for tls has been removed. #264
+- The `-test` command line flag was renamed to `-configtest`. #264
+- Disable geoip by default. To enable it uncomment in config file. #305
+
+
+*Filebeat*
+
+- Removed utf-16be-bom encoding support. Support will be added with fix for #205
+- Rename force_close_windows_files to force_close_files and make it available for all platforms.
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Disable logging to stderr after configuration phase. #276
+- Set the default file logging path when not set in config. #275
+- Fix bug silently dropping records based on current window size. elastic/filebeat#226
+- Fix direction field in published events. #300
+- Fix elasticsearch structured errors breaking error handling. #309
+
+*Packetbeat*
+
+- Packetbeat will now exit if a configuration error is detected. #357
+- Fixed an issue handling DNS requests containing no questions. #369
+
+*Topbeat*
+
+- Fix leak of Windows handles. #98
+- Fix memory leak of process information. #104
+
+*Filebeat*
+
+- Filebeat will now exit if a configuration error is detected. #198
+- Fix to enable prospector to harvest existing files that are modified. #199
+- Improve line reading and encoding to better keep track of file offsets based
+  on encoding. #224
+- Set input_type by default to "log"
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Added `beat.hostname` to contain the hostname where the Beat is running on as
+  returned by the operating system. #285
+- Added timestamp for file logging. #291
+
+*Filebeat*
+
+- Handling end of line under windows was improved #233
+
+
+
+
