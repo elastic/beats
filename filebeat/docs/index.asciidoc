@@ -52,5 +52,3 @@ include::./securing-filebeat.asciidoc[]
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
-
-include::./migration.asciidoc[]
