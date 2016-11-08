@@ -919,6 +919,42 @@
             }
           }
         },
+        "kafka": {
+          "properties": {
+            "partition": {
+              "properties": {
+                "broker": {
+                  "properties": {
+                    "address": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "id": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "offset": {
+                  "properties": {
+                    "newest": {
+                      "type": "long"
+                    },
+                    "oldest": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "partition": {
+                  "type": "long"
+                },
+                "topic": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
         "meta": {
           "properties": {
             "cloud": {

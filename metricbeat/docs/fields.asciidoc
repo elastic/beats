@@ -19,6 +19,7 @@ grouped in the following categories:
 * <<exported-fields-common>>
 * <<exported-fields-docker>>
 * <<exported-fields-haproxy>>
+* <<exported-fields-kafka>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
@@ -2145,6 +2146,81 @@ the average response time in ms over the 1024 last requests (0 for TCP)
 type: integer
 
 the average total session time in ms over the 1024 last requests
+
+
+[[exported-fields-kafka]]
+== kafka Fields
+
+kafka Module
+
+
+
+[float]
+== kafka Fields
+
+
+
+
+[float]
+== partition Fields
+
+partition
+
+
+
+[float]
+== offset Fields
+
+Available offsets of the given partition.
+
+
+
+[float]
+=== kafka.partition.offset.newest
+
+type: long
+
+Newest offset of the partition.
+
+
+[float]
+=== kafka.partition.offset.oldest
+
+type: long
+
+Oldest offset of the partition.
+
+
+[float]
+=== kafka.partition.partition
+
+type: long
+
+Partition id.
+
+
+[float]
+=== kafka.partition.topic
+
+type: keyword
+
+Topic name
+
+
+[float]
+=== kafka.partition.broker.id
+
+type: long
+
+Broker id
+
+
+[float]
+=== kafka.partition.broker.address
+
+type: keyword
+
+Broker address
 
 
 [[exported-fields-mongodb]]

@@ -98,6 +98,14 @@ metricbeat.modules:
   #period: 10s
   #hosts: ["tcp://127.0.0.1:14567"]
 
+#-------------------------------- kafka Module -------------------------------
+#- module: kafka
+  #metricsets: ["partition"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:9092"]
+
+
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
   #metricsets: ["status"]
