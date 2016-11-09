@@ -59,7 +59,6 @@ class Test(BaseTest):
             files = os.listdir(path)
 
             for f in files:
-                print f
                 self.assertIsNone(re.search('[:\>\<"/\\\|\?\*]', f))
             
 
