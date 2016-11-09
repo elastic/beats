@@ -60,7 +60,7 @@ type message struct {
 
 // Error code if stream exceeds max allowed size on append.
 var (
-	ErrStreamTooLarge = errors.New("Stream data too large")
+	errStreamTooLarge = errors.New("Stream data too large")
 	isDebug           = false
 )
 
@@ -85,7 +85,7 @@ func (p *parser) append(data []byte) error {
 	}
 
 	if p.config.maxBytes > 0 && p.buf.Total() > p.config.maxBytes {
-		return ErrStreamTooLarge
+		return errStreamTooLarge
 	}
 	return nil
 }
