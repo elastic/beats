@@ -67,7 +67,7 @@ type CollectionType struct {
 
 func goType(t TypeInfo) reflect.Type {
 	switch t.Type() {
-	case TypeVarchar, TypeAscii, TypeInet, TypeText:
+	case TypeVarchar, TypeASCII, TypeInet, TypeText:
 		return reflect.TypeOf(*new(string))
 	case TypeBigInt, TypeCounter:
 		return reflect.TypeOf(*new(int64))
@@ -172,7 +172,7 @@ type Type int
 
 const (
 	TypeCustom    Type = 0x0000
-	TypeAscii     Type = 0x0001
+	TypeASCII     Type = 0x0001
 	TypeBigInt    Type = 0x0002
 	TypeBlob      Type = 0x0003
 	TypeBoolean   Type = 0x0004
@@ -204,7 +204,7 @@ func (t Type) String() string {
 	switch t {
 	case TypeCustom:
 		return "custom"
-	case TypeAscii:
+	case TypeASCII:
 		return "ascii"
 	case TypeBigInt:
 		return "bigint"
@@ -265,7 +265,7 @@ const (
 func getApacheCassandraType(class string) Type {
 	switch strings.TrimPrefix(class, apacheCassandraTypePrefix) {
 	case "AsciiType":
-		return TypeAscii
+		return TypeASCII
 	case "LongType":
 		return TypeBigInt
 	case "BytesType":

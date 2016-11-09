@@ -141,8 +141,6 @@ An important advantage to this approach is that you can
 use Logstash to modify the data captured by Beats in any way you like. You can also
 use Logstash's many output plugins to integrate with other systems.
 
-image:./images/beats-logstash.png[Integration with Logstash]
-
 To download and install Logstash, use the commands that work
 with your system:
 

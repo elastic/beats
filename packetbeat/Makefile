@@ -26,6 +26,15 @@ before-build:
 	sed -i.bk 's/device: any/device: 0/' $(PREFIX)/packetbeat-win.full.yml
 	rm $(PREFIX)/packetbeat-win.full.yml.bk
 
+# Collects all dependencies and then calls update
+.PHONY: collect
+collect: fields
+
+.PHONY: fields
+fields:
+	cat etc/fields_base.yml > etc/fields.yml
+	cat protos/*/_meta/fields.yml >> etc/fields.yml
+
 .PHONY: benchmark
 benchmark:
 	go test -short -bench=. ./... -cpu=2

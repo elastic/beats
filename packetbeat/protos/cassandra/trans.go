@@ -41,7 +41,7 @@ func (trans *transactions) onMessage(
 ) error {
 	var err error
 	msg.Tuple = *tuple
-	msg.Transport = applayer.TransportTcp
+	msg.Transport = applayer.TransportTCP
 	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(&msg.Tuple)
 
 	if msg.IsRequest {

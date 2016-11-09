@@ -1,0 +1,27 @@
+- key: nfs
+  title: "NFS"
+  description: NFS v4/3 specific event fields.
+  fields:
+    - name: nfs
+      type: group
+      fields:
+        - name: version
+          type: long
+          description: NFS protocol version number.
+
+        - name: minor_version
+          type: long
+          description: NFS protocol minor version number.
+
+        - name: tag
+          description: NFS v4 COMPOUND operation tag.
+
+        - name: opcode
+          description: >
+            NFS operation name, or main operation name, in case of COMPOUND
+            calls.
+
+        - name: status
+          description: NFS operation reply status.
+
+

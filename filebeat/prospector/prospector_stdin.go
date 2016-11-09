@@ -29,8 +29,9 @@ func NewProspectorStdin(p *Prospector) (*ProspectorStdin, error) {
 	return prospectorer, nil
 }
 
-func (p *ProspectorStdin) Init() {
+func (p *ProspectorStdin) Init(states file.States) error {
 	p.started = false
+	return nil
 }
 
 func (p *ProspectorStdin) Run() {

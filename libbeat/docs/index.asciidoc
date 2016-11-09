@@ -29,10 +29,6 @@ include::./upgrading.asciidoc[]
 
 include::./config-file-format.asciidoc[]
 
-// include::./visualizing-data.asciidoc[]
-
-include::./dashboards.asciidoc[]
-
 pass::[<?page_header Always refer to the documentation in master for the latest information about contributing to Beats.?>]
 
 include::./newbeat.asciidoc[]

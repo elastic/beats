@@ -189,10 +189,10 @@ func (pb *Packetbeat) Stop() {
 func (pb *Packetbeat) setupSniffer() error {
 	config := &pb.Config
 
-	withVlans := config.Interfaces.With_vlans
+	withVlans := config.Interfaces.WithVlans
 	withICMP := config.Protocols["icmp"].Enabled()
 
-	filter := config.Interfaces.Bpf_filter
+	filter := config.Interfaces.BpfFilter
 	if filter == "" && !config.Flows.IsEnabled() {
 		filter = protos.Protos.BpfFilter(withVlans, withICMP)
 	}
@@ -225,12 +225,12 @@ func (pb *Packetbeat) createWorker(dl layers.LinkType) (sniffer.Worker, error) {
 		icmp6 = icmp
 	}
 
-	tcp, err := tcp.NewTcp(&protos.Protos)
+	tcp, err := tcp.NewTCP(&protos.Protos)
 	if err != nil {
 		return nil, err
 	}
 
-	udp, err := udp.NewUdp(&protos.Protos)
+	udp, err := udp.NewUDP(&protos.Protos)
 	if err != nil {
 		return nil, err
 	}

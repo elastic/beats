@@ -79,8 +79,8 @@ def SaveJson(doc_type, doc, output_directory):
     dir = os.path.join(output_directory, doc_type)
     if not os.path.exists(dir):
         os.makedirs(dir)
-
-    filepath = os.path.join(dir, doc['_id'] + '.json')
+    # replace unsupported characters
+    filepath = os.path.join(dir, re.sub(r'[\>\<:"/\\\|\?\*]', '', doc['_id']) + '.json')
     with open(filepath, 'w') as f:
         json.dump(doc['_source'], f, indent=2)
         print("Written {}".format(filepath))

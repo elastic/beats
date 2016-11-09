@@ -20,7 +20,7 @@ func AmqpModForTests() *Amqp {
 	return &amqp
 }
 
-func testTcpTuple() *common.TCPTuple {
+func testTCPTuple() *common.TCPTuple {
 	t := &common.TCPTuple{
 		IPLength: 4,
 		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
@@ -285,7 +285,7 @@ func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 	data2, err := hex.DecodeString("0100010000000400280033ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -327,7 +327,7 @@ func TestAmqp_PublishMessage(t *testing.T) {
 		"2049276d20686f6d6520616761696ece")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -378,7 +378,7 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 	data3, err := hex.DecodeString("030001000000056b696b6f6fce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -516,7 +516,7 @@ func TestAmqp_NoWaitQueueDeleteMethod(t *testing.T) {
 		"6f6d617304ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -549,7 +549,7 @@ func TestAmqp_RejectMessage(t *testing.T) {
 	data, err := hex.DecodeString("0100010000000d003c005a000000000000000101ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -584,7 +584,7 @@ func TestAmqp_GetEmptyMethod(t *testing.T) {
 	data2, err := hex.DecodeString("01000100000005003c004800ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -617,7 +617,7 @@ func TestAmqp_GetMethod(t *testing.T) {
 		"f752064617265ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -647,7 +647,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 		"0300010000001649276d2061207665727920626967206d657373616765ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -678,7 +678,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 		"414141414141414141414141414141414141414141414141414141414141ce")
 	assert.Nil(t, err)
 
-	tcptuple = testTcpTuple()
+	tcptuple = testTCPTuple()
 
 	req = protos.Packet{Payload: data}
 	private = protos.ProtocolData(new(amqpPrivateData))
@@ -719,7 +719,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 		"6572180000003704626f6f6c74010362697462050568656c6c6f530000001f4869206461" +
 		"726c696e6720c3aac3aac3aac3aac3aac3aac3aae697a5e69cacce")
 	assert.Nil(t, err)
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
@@ -745,7 +745,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 		"e02060a656c206d656e73616a65ce0300010000001a54657374206865616465722066696" +
 		"56c647320666f7265766572ce")
 	assert.Nil(t, err)
-	tcptuple = testTcpTuple()
+	tcptuple = testTCPTuple()
 	req = protos.Packet{Payload: data}
 	private = protos.ProtocolData(new(amqpPrivateData))
 	amqp.Parse(&req, tcptuple, 0, private)
@@ -780,7 +780,7 @@ func TestAmqp_RecoverMethod(t *testing.T) {
 	data2, err := hex.DecodeString("01000100000004003c006fce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -1106,7 +1106,7 @@ func TestAmqp_ChannelCloseErrorMethod(t *testing.T) {
 	data2, err := hex.DecodeString("0100010000000400280033ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -1134,7 +1134,7 @@ func TestAmqp_ConnectionCloseNoError(t *testing.T) {
 	data2, err := hex.DecodeString("01000000000004000a0033ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -1170,7 +1170,7 @@ func TestAmqp_MultipleBodyFrames(t *testing.T) {
 	data2, err := hex.DecodeString("0300010000000a657373616765732a2a2ace")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)

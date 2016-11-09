@@ -36,11 +36,11 @@ service Test {
 }
 `)
 
-	methods_map := idl.MethodsByName
-	if len(methods_map) == 0 {
+	methodsMap := idl.MethodsByName
+	if len(methodsMap) == 0 {
 		t.Error("Empty methods_map")
 	}
-	m, exists := methods_map["add"]
+	m, exists := methodsMap["add"]
 	if !exists || m.Service == nil || m.Method == nil ||
 		m.Service.Name != "Test" || m.Method.Name != "add" {
 

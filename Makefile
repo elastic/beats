@@ -36,6 +36,7 @@ coverage-report:
 
 .PHONY: update
 update:
+	$(MAKE) -C libbeat collect
 	$(foreach var,$(BEATS),$(MAKE) -C $(var) update || exit 1;)
 
 .PHONY: clean
@@ -55,7 +56,6 @@ check:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
 	# Validate that all updates were commited
 	$(MAKE) update
-	$(MAKE) -C metricbeat collect
 	git update-index --refresh
 	git diff-index --exit-code HEAD --
 

@@ -21,25 +21,25 @@ import (
 var debugf = logp.MakeDebug("rpc")
 
 const (
-	RPC_LAST_FRAG = 0x80000000
-	RPC_SIZE_MASK = 0x7fffffff
+	RPCLastFrag = 0x80000000
+	RPCSizeMask = 0x7fffffff
 )
 
 const (
-	RPC_CALL  = 0
-	RPC_REPLY = 1
+	RPCCall  = 0
+	RPCReply = 1
 )
 
-type RpcStream struct {
+type RPCStream struct {
 	tcpTuple *common.TCPTuple
 	rawData  []byte
 }
 
 type rpcConnectionData struct {
-	Streams [2]*RpcStream
+	Streams [2]*RPCStream
 }
 
-type Rpc struct {
+type RPC struct {
 	// Configuration data.
 	Ports              []int
 	callsSeen          *common.Cache
@@ -57,7 +57,7 @@ func New(
 	results publish.Transactions,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
-	p := &Rpc{}
+	p := &RPC{}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -73,14 +73,14 @@ func New(
 	return p, nil
 }
 
-func (rpc *Rpc) init(results publish.Transactions, config *rpcConfig) error {
+func (rpc *RPC) init(results publish.Transactions, config *rpcConfig) error {
 	rpc.setFromConfig(config)
 	rpc.results = results
 	rpc.callsSeen = common.NewCacheWithRemovalListener(
 		rpc.transactionTimeout,
 		protos.DefaultTransactionHashSize,
 		func(k common.Key, v common.Value) {
-			nfs, ok := v.(*Nfs)
+			nfs, ok := v.(*NFS)
 			if !ok {
 				logp.Err("Expired value is not a MapStr (%T).", v)
 				return
@@ -92,18 +92,18 @@ func (rpc *Rpc) init(results publish.Transactions, config *rpcConfig) error {
 	return nil
 }
 
-func (rpc *Rpc) setFromConfig(config *rpcConfig) error {
+func (rpc *RPC) setFromConfig(config *rpcConfig) error {
 	rpc.Ports = config.Ports
 	rpc.transactionTimeout = config.TransactionTimeout
 	return nil
 }
 
-func (rpc *Rpc) GetPorts() []int {
+func (rpc *RPC) GetPorts() []int {
 	return rpc.Ports
 }
 
 // Called when TCP payload data is available for parsing.
-func (rpc *Rpc) Parse(
+func (rpc *RPC) Parse(
 	pkt *protos.Packet,
 	tcptuple *common.TCPTuple,
 	dir uint8,
@@ -112,9 +112,9 @@ func (rpc *Rpc) Parse(
 
 	defer logp.Recover("ParseRPC exception")
 
-	conn := ensureRpcConnection(private)
+	conn := ensureRPCConnection(private)
 
-	conn = rpc.handleRpcFragment(conn, pkt, tcptuple, dir)
+	conn = rpc.handleRPCFragment(conn, pkt, tcptuple, dir)
 	if conn == nil {
 		return nil
 	}
@@ -122,7 +122,7 @@ func (rpc *Rpc) Parse(
 }
 
 // Called when the FIN flag is seen in the TCP stream.
-func (rpc *Rpc) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
+func (rpc *RPC) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ReceivedFinRpc exception")
@@ -133,7 +133,7 @@ func (rpc *Rpc) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 
 // Called when a packets are missing from the tcp
 // stream.
-func (rpc *Rpc) GapInStream(tcptuple *common.TCPTuple, dir uint8,
+func (rpc *RPC) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	defer logp.Recover("GapInRpcStream exception")
@@ -144,20 +144,20 @@ func (rpc *Rpc) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 
 // ConnectionTimeout returns the per stream connection timeout.
 // Return <=0 to set default tcp module transaction timeout.
-func (rpc *Rpc) ConnectionTimeout() time.Duration {
+func (rpc *RPC) ConnectionTimeout() time.Duration {
 	// forced by TCP interface
 	return rpc.transactionTimeout
 }
 
-func ensureRpcConnection(private protos.ProtocolData) *rpcConnectionData {
-	conn := getRpcConnection(private)
+func ensureRPCConnection(private protos.ProtocolData) *rpcConnectionData {
+	conn := getRPCConnection(private)
 	if conn == nil {
 		conn = &rpcConnectionData{}
 	}
 	return conn
 }
 
-func getRpcConnection(private protos.ProtocolData) *rpcConnectionData {
+func getRPCConnection(private protos.ProtocolData) *rpcConnectionData {
 	if private == nil {
 		return nil
 	}
@@ -176,7 +176,7 @@ func getRpcConnection(private protos.ProtocolData) *rpcConnectionData {
 }
 
 // Parse function is used to process TCP payloads.
-func (rpc *Rpc) handleRpcFragment(
+func (rpc *RPC) handleRPCFragment(
 	conn *rpcConnectionData,
 	pkt *protos.Packet,
 	tcptuple *common.TCPTuple,
@@ -190,7 +190,7 @@ func (rpc *Rpc) handleRpcFragment(
 	} else {
 		// concatenate bytes
 		st.rawData = append(st.rawData, pkt.Payload...)
-		if len(st.rawData) > tcp.TCP_MAX_DATA_IN_STREAM {
+		if len(st.rawData) > tcp.TCPMaxDataInStream {
 			debugf("Stream data too large, dropping TCP stream")
 			conn.Streams[dir] = nil
 			return conn
@@ -205,8 +205,8 @@ func (rpc *Rpc) handleRpcFragment(
 		}
 
 		marker := uint32(binary.BigEndian.Uint32(st.rawData[0:4]))
-		size := int(marker & RPC_SIZE_MASK)
-		islast := (marker & RPC_LAST_FRAG) != 0
+		size := int(marker & RPCSizeMask)
+		islast := (marker & RPCLastFrag) != 0
 
 		if len(st.rawData)-4 < size {
 			debugf("Wainting for more data")
@@ -223,30 +223,30 @@ func (rpc *Rpc) handleRpcFragment(
 		// keep the rest of the next fragment
 		st.rawData = st.rawData[4+size:]
 
-		rpc.handleRpcPacket(xdr, pkt.Ts, tcptuple, dir)
+		rpc.handleRPCPacket(xdr, pkt.Ts, tcptuple, dir)
 	}
 
 	return conn
 }
 
-func (rpc *Rpc) handleRpcPacket(xdr *Xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
+func (rpc *RPC) handleRPCPacket(xdr *Xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
 
 	xid := fmt.Sprintf("%.8x", xdr.getUInt())
 
 	msgType := xdr.getUInt()
 
 	switch msgType {
-	case RPC_CALL:
+	case RPCCall:
 		rpc.handleCall(xid, xdr, ts, tcptuple, dir)
-	case RPC_REPLY:
+	case RPCReply:
 		rpc.handleReply(xid, xdr, ts, tcptuple, dir)
 	default:
 		logp.Warn("Bad RPC message")
 	}
 }
 
-func newStream(pkt *protos.Packet, tcptuple *common.TCPTuple) *RpcStream {
-	return &RpcStream{
+func newStream(pkt *protos.Packet, tcptuple *common.TCPTuple) *RPCStream {
+	return &RPCStream{
 		tcpTuple: tcptuple,
 		rawData:  pkt.Payload,
 	}

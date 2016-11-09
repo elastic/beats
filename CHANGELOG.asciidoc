@@ -21,6 +21,10 @@ https://github.com/elastic/beats/compare/v5.0.0...master[Check the HEAD diff]
 *Topbeat*
 
 *Filebeat*
+- If a file is falling under ignore_older during startup, offset is now set to end of file instead of 0.
+  With the previous logic the whole file was sent in case a line was added and it was inconsitent with
+  files which were harvested previously. {pull}2907[2907]
+- tail_files is now only applied on the first scan and not for all new files. {pull}2932[2932]
 
 *Winlogbeat*
 
@@ -61,7 +65,9 @@ https://github.com/elastic/beats/compare/v5.0.0...master[Check the HEAD diff]
 - Add experimental libbeat metricset in the beats module. {pull}2339[2339]
 - Add experimental docker module. Provided by Ingensi and @douaejeouit based on dockbeat.
 - Add username and password config options to the MongoDB module. {pull}2889[2889]
-- Add system core metricset for Windows. {pull}2883}[2883]
+- Add username and password config options to the PostgreSQL module. {pull}2889[2890]
+- Add system core metricset for Windows. {pull}2883[2883]
+- Add a sample Redis Kibana dashboard. {pull}2916[2916]
 
 *Packetbeat*
 - Define `client_geoip.location` as geo_point in the mappings to be used by the GeoIP processor in the Ingest Node pipeline.
@@ -70,8 +76,10 @@ https://github.com/elastic/beats/compare/v5.0.0...master[Check the HEAD diff]
 *Topbeat*
 
 *Filebeat*
-
 - Add command line option -once to run filebeat only once and then close. {pull}2456[2456]
+- Only load matching states into prospector to improve state handling {pull}2840[2840]
+- Reset all states ttl on startup to make sure it is overwritten by new config {pull}2840[2840]
+- Persist all states for files which fall under ignore_older to have consistent behaviour {pull}2859[2859]
 
 *Winlogbeat*
 

@@ -61,7 +61,7 @@ when it encounters an event that doesn't have a `client_ip` field.
 +
 See 
 {plugindoc}/using-ingest-geoip.html[Using the Geoip Processor in a Pipeline]
-for more options. 
+for more options.
 
 3. In the Packetbeat config file, configure the Elasticsearch output to use the
 pipeline. Specify the pipeline ID in the `pipeline` option under
@@ -74,7 +74,7 @@ output.elasticsearch:
   pipeline: geoip-info
 -------------------------------------------------------------------------------
 
-4. Run Packbeat, passing in the configuration file that you updated earlier.
+4. Run Packetbeat, passing in the configuration file that you updated earlier.
 +
 [source,shell]
 -------------------------------------------------------------------------------

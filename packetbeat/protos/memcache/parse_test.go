@@ -179,7 +179,7 @@ func extras(es ...extraFn) []extraFn {
 
 func (b *offsetBinWriter) WriteNetUint8(u uint8) error {
 	err := b.WriteNetUint8At(u, 0)
-	b.offset += 1
+	b.offset++
 	return err
 }
 
