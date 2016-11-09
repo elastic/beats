@@ -4,13 +4,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type NFS struct {
+type nfs struct {
 	vers  uint32
 	proc  uint32
 	event common.MapStr
 }
 
-func (nfs *NFS) getRequestInfo(xdr *Xdr) common.MapStr {
+func (nfs *nfs) getRequestInfo(xdr *xdr) common.MapStr {
 
 	nfsInfo := common.MapStr{}
 	nfsInfo["version"] = nfs.vers
@@ -32,12 +32,12 @@ func (nfs *NFS) getRequestInfo(xdr *Xdr) common.MapStr {
 	return nfsInfo
 }
 
-func (nfs *NFS) getNFSReplyStatus(xdr *Xdr) string {
+func (nfs *nfs) getNFSReplyStatus(xdr *xdr) string {
 	switch nfs.proc {
 	case 0:
-		return NFSStatus[0]
+		return nfsStatus[0]
 	default:
 		stat := int(xdr.getUInt())
-		return NFSStatus[stat]
+		return nfsStatus[stat]
 	}
 }

@@ -3,63 +3,63 @@ package nfs
 import "fmt"
 
 const (
-	OpAccess             = 3
-	OpClose              = 4
-	OpCommit             = 5
-	OpCreate             = 6
-	OpDelegpurge         = 7
-	OpDelegreturn        = 8
-	OpGetattr            = 9
-	OpGetfh              = 10
-	OpLink               = 11
-	OpLock               = 12
-	OpLockt              = 13
-	OpLocku              = 14
-	OpLookup             = 15
-	OpLookupp            = 16
-	OpNverify            = 17
-	OpOpen               = 18
-	OpOpenattr           = 19
-	OpOpenConfirm        = 20
-	OpOpenDowngrade      = 21
-	OpPutfh              = 22
-	OpPutpubfh           = 23
-	OpPutrootfh          = 24
-	OpRead               = 25
-	OpReaddir            = 26
-	OpReadlink           = 27
-	OpRemove             = 28
-	OpRename             = 29
-	OpRenew              = 30
-	OpRestorefh          = 31
-	OpSavefh             = 32
-	OpSecinfo            = 33
-	OpSetattr            = 34
-	OpSetclientid        = 35
-	OpSetclientidConfirm = 36
-	OpVerify             = 37
-	OpWrite              = 38
-	OpReleaseLockowner   = 39
-	OpBackchannelCtl     = 40
-	OpBindConnToSession  = 41
-	OpExchangeID         = 42
-	OpCreateSession      = 43
-	OpDestroySession     = 44
-	OpFreeStateid        = 45
-	OpGetDirDelegation   = 46
-	OpGetdeviceinfo      = 47
-	OpGetdevicelist      = 48
-	OpLayoutcommit       = 49
-	OpLayoutget          = 50
-	OpLayoutreturn       = 51
-	OpSecinfoNoName      = 52
-	OpSequence           = 53
-	OpSetSsv             = 54
-	OpTestStateid        = 55
-	OpWantDelegation     = 56
-	OpDestroyClientid    = 57
-	OpReclaimComplete    = 58
-	OpIllegal            = 10044
+	opAccess             = 3
+	opClose              = 4
+	opCommit             = 5
+	opCreate             = 6
+	opDelegpurge         = 7
+	opDelegreturn        = 8
+	opGetattr            = 9
+	opGetfh              = 10
+	opLink               = 11
+	opLock               = 12
+	opLockt              = 13
+	opLocku              = 14
+	opLookup             = 15
+	opLookupp            = 16
+	opNverify            = 17
+	opOpen               = 18
+	opOpenattr           = 19
+	opOpenConfirm        = 20
+	opOpenDowngrade      = 21
+	opPutfh              = 22
+	opPutpubfh           = 23
+	opPutrootfh          = 24
+	opRead               = 25
+	opReaddir            = 26
+	opReadlink           = 27
+	opRemove             = 28
+	opRename             = 29
+	opRenew              = 30
+	opRestorefh          = 31
+	opSavefh             = 32
+	opSecinfo            = 33
+	opSetattr            = 34
+	opSetclientid        = 35
+	opSetclientidConfirm = 36
+	opVerify             = 37
+	opWrite              = 38
+	opReleaseLockowner   = 39
+	opBackchannelCtl     = 40
+	opBindConnToSession  = 41
+	opExchangeID         = 42
+	opCreateSession      = 43
+	opDestroySession     = 44
+	opFreeStateid        = 45
+	opGetDirDelegation   = 46
+	opGetdeviceinfo      = 47
+	opGetdevicelist      = 48
+	opLayoutcommit       = 49
+	opLayoutget          = 50
+	opLayoutreturn       = 51
+	opSecinfoNoName      = 52
+	opSequence           = 53
+	opSetSsv             = 54
+	opTestStateid        = 55
+	opWantDelegation     = 56
+	opDestroyClientid    = 57
+	opReclaimComplete    = 58
+	opIllegal            = 10044
 )
 
 var nfsOpnum4 = map[int]string{
@@ -122,40 +122,40 @@ var nfsOpnum4 = map[int]string{
 	10044: "ILLEGAL",
 }
 
-func (nfs *NFS) eatData(op int, xdr *Xdr) {
+func (nfs *nfs) eatData(op int, xdr *xdr) {
 
 	switch op {
-	case OpGetattr:
+	case opGetattr:
 		xdr.getUIntVector()
-	case OpGetfh:
+	case opGetfh:
 		// nothing to eat
-	case OpLookup:
+	case opLookup:
 		xdr.getDynamicOpaque()
-	case OpLookupp:
+	case opLookupp:
 		// nothing to eat
-	case OpNverify:
+	case opNverify:
 		xdr.getUIntVector()
 		xdr.getDynamicOpaque()
-	case OpPutfh:
+	case opPutfh:
 		xdr.getDynamicOpaque()
-	case OpPutpubfh:
+	case opPutpubfh:
 		// nothing to eat
-	case OpPutrootfh:
+	case opPutrootfh:
 		// nothing to eat
-	case OpReadlink:
+	case opReadlink:
 		// nothing to eat
-	case OpRenew:
+	case opRenew:
 		xdr.getUHyper()
-	case OpRestorefh:
+	case opRestorefh:
 		// nothing to eat
-	case OpSavefh:
+	case opSavefh:
 		// nothing to eat
-	case OpSecinfo:
+	case opSecinfo:
 		xdr.getDynamicOpaque()
-	case OpVerify:
+	case opVerify:
 		xdr.getUIntVector()
 		xdr.getDynamicOpaque()
-	case OpSequence:
+	case opSequence:
 		xdr.getOpaque(16)
 		xdr.getUInt()
 		xdr.getUInt()
@@ -179,7 +179,7 @@ func (nfs *NFS) eatData(op int, xdr *Xdr) {
 // PUTFH + GETATTR
 //
 // GETATTR is the main operation.
-func (nfs *NFS) findV4MainOpcode(xdr *Xdr) string {
+func (nfs *nfs) findV4MainOpcode(xdr *xdr) string {
 
 	// did we find a main operation opcode?
 	found := false
@@ -205,48 +205,48 @@ func (nfs *NFS) findV4MainOpcode(xdr *Xdr) string {
 		// first class ops are used, like OPEN->LOCK->WRITE->LOCKU->CLOSE,
 		// but such construnction are not used in the practice.
 		case
-			OpAccess,
-			OpBackchannelCtl,
-			OpBindConnToSession,
-			OpClose,
-			OpCommit,
-			OpCreate,
-			OpCreateSession,
-			OpDelegpurge,
-			OpDelegreturn,
-			OpDestroyClientid,
-			OpDestroySession,
-			OpExchangeID,
-			OpFreeStateid,
-			OpGetdeviceinfo,
-			OpGetdevicelist,
-			OpGetDirDelegation,
-			OpLayoutcommit,
-			OpLayoutget,
-			OpLayoutreturn,
-			OpLink,
-			OpLock,
-			OpLockt,
-			OpLocku,
-			OpOpen,
-			OpOpenattr,
-			OpOpenConfirm,
-			OpOpenDowngrade,
-			OpRead,
-			OpReaddir,
-			OpReadlink,
-			OpReclaimComplete,
-			OpReleaseLockowner,
-			OpRemove,
-			OpRename,
-			OpSecinfoNoName,
-			OpSetattr,
-			OpSetclientid,
-			OpSetclientidConfirm,
-			OpSetSsv,
-			OpTestStateid,
-			OpWantDelegation,
-			OpWrite:
+			opAccess,
+			opBackchannelCtl,
+			opBindConnToSession,
+			opClose,
+			opCommit,
+			opCreate,
+			opCreateSession,
+			opDelegpurge,
+			opDelegreturn,
+			opDestroyClientid,
+			opDestroySession,
+			opExchangeID,
+			opFreeStateid,
+			opGetdeviceinfo,
+			opGetdevicelist,
+			opGetDirDelegation,
+			opLayoutcommit,
+			opLayoutget,
+			opLayoutreturn,
+			opLink,
+			opLock,
+			opLockt,
+			opLocku,
+			opOpen,
+			opOpenattr,
+			opOpenConfirm,
+			opOpenDowngrade,
+			opRead,
+			opReaddir,
+			opReadlink,
+			opReclaimComplete,
+			opReleaseLockowner,
+			opRemove,
+			opRename,
+			opSecinfoNoName,
+			opSetattr,
+			opSetclientid,
+			opSetclientidConfirm,
+			opSetSsv,
+			opTestStateid,
+			opWantDelegation,
+			opWrite:
 
 			found = true
 		default:

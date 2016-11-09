@@ -11,9 +11,9 @@ import (
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
-const NFSProgramNumber = 100003
+const nfsProgramNumber = 100003
 
-var AcceptStatus = [...]string{
+var acceptStatus = [...]string{
 	"success",
 	"prog_unavail",
 	"prog_mismatch",
@@ -27,19 +27,19 @@ var (
 )
 
 // called by Cache, when re reply seen within expected time window
-func (rpc *RPC) handleExpiredPacket(nfs *NFS) {
+func (r *rpc) handleExpiredPacket(nfs *nfs) {
 	nfs.event["status"] = "NO_REPLY"
-	rpc.results.PublishTransaction(nfs.event)
+	r.results.PublishTransaction(nfs.event)
 	unmatchedRequests.Add(1)
 }
 
 // called when we process a RPC call
-func (rpc *RPC) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
+func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
 
 	// eat rpc version number
 	xdr.getUInt()
 	rpcProg := xdr.getUInt()
-	if rpcProg != NFSProgramNumber {
+	if rpcProg != nfsProgramNumber {
 		// not a NFS request
 		return
 	}
@@ -81,7 +81,7 @@ func (rpc *RPC) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 	case 1:
 		rpcInfo["auth_flavor"] = "unix"
 		cred := common.MapStr{}
-		credXdr := Xdr{data: authOpaque, offset: 0}
+		credXdr := makeXDR(authOpaque)
 		cred["stamp"] = credXdr.getUInt()
 		machine := credXdr.getString()
 		if machine == "" {
@@ -104,18 +104,18 @@ func (rpc *RPC) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 
 	event["type"] = "nfs"
 	event["rpc"] = rpcInfo
-	nfs := NFS{vers: nfsVers, proc: nfsProc, event: event}
+	nfs := nfs{vers: nfsVers, proc: nfsProc, event: event}
 	event["nfs"] = nfs.getRequestInfo(xdr)
 
 	// use xid+src ip to uniquely identify request
 	reqID := xid + tcptuple.SrcIP.String()
 
 	// populate cache to trace request reply
-	rpc.callsSeen.Put(reqID, &nfs)
+	r.callsSeen.Put(reqID, &nfs)
 }
 
 // called when we process a RPC reply
-func (rpc *RPC) handleReply(xid string, xdr *Xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
+func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
 	replyStatus := xdr.getUInt()
 	// we are interested only in accepted rpc reply
 	if replyStatus != 0 {
@@ -137,9 +137,9 @@ func (rpc *RPC) handleReply(xid string, xdr *Xdr, ts time.Time, tcptuple *common
 	}
 
 	// get cached request
-	v := rpc.callsSeen.Delete(reqID)
+	v := r.callsSeen.Delete(reqID)
 	if v != nil {
-		nfs := v.(*NFS)
+		nfs := v.(*nfs)
 		event := nfs.event
 		rpcInfo := event["rpc"].(common.MapStr)
 		rpcInfo["reply_size"] = xdr.size()
@@ -147,14 +147,14 @@ func (rpc *RPC) handleReply(xid string, xdr *Xdr, ts time.Time, tcptuple *common
 		rpcInfo["time"] = rpcTime
 		// the same in human readable form
 		rpcInfo["time_str"] = fmt.Sprintf("%v", rpcTime)
-		acceptStatus := int(xdr.getUInt())
-		rpcInfo["status"] = AcceptStatus[acceptStatus]
+		status := int(xdr.getUInt())
+		rpcInfo["status"] = acceptStatus[status]
 
 		// populate nfs info for successfully executed requests
-		if acceptStatus == 0 {
+		if status == 0 {
 			nfsInfo := event["nfs"].(common.MapStr)
 			nfsInfo["status"] = nfs.getNFSReplyStatus(xdr)
 		}
-		rpc.results.PublishTransaction(event)
+		r.results.PublishTransaction(event)
 	}
 }
