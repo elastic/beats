@@ -33,13 +33,13 @@ import (
 )
 
 // Verify that the interface for UDP has been satisfied.
-var _ protos.UDPPlugin = &DNS{}
+var _ protos.UDPPlugin = &dnsPlugin{}
 
 // DNS messages for testing. When adding a new test message, add it to the
 // messages array and create a new benchmark test for the message.
 var (
 	// An array of all test messages.
-	messages = []DNSTestMessage{
+	messages = []dnsTestMessage{
 		elasticA,
 		zoneIxfr,
 		githubPtr,
@@ -47,7 +47,7 @@ var (
 		ednsSecA,
 	}
 
-	elasticA = DNSTestMessage{
+	elasticA = dnsTestMessage{
 		id:      8529,
 		opcode:  "QUERY",
 		flags:   []string{"rd", "ra"},
@@ -69,7 +69,7 @@ var (
 		},
 	}
 
-	zoneIxfr = DNSTestMessage{
+	zoneIxfr = dnsTestMessage{
 		id:     16384,
 		opcode: "QUERY",
 		flags:  []string{"ra"},
@@ -106,7 +106,7 @@ var (
 		},
 	}
 
-	githubPtr = DNSTestMessage{
+	githubPtr = dnsTestMessage{
 		id:      344,
 		opcode:  "QUERY",
 		flags:   []string{"rd", "ra"},
@@ -147,7 +147,7 @@ var (
 		},
 	}
 
-	sophosTxt = DNSTestMessage{
+	sophosTxt = dnsTestMessage{
 		id:     8238,
 		opcode: "QUERY",
 		flags:  []string{"rd", "ra"},
@@ -194,7 +194,7 @@ var (
 		},
 	}
 
-	ednsSecA = DNSTestMessage{
+	ednsSecA = dnsTestMessage{
 		id:      20498,
 		opcode:  "QUERY",
 		flags:   []string{"rd", "ad", "ra"},
@@ -284,7 +284,7 @@ func TestParseUdp_responseOnly(t *testing.T) {
 	assert.Equal(t, len(q.response), mapValue(t, m, "bytes_out"))
 	assert.Nil(t, mapValue(t, m, "responsetime"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, OrphanedResponse.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, orphanedResponse.Error(), mapValue(t, m, "notes"))
 	assertMapStrData(t, m, q)
 }
 
@@ -307,7 +307,7 @@ func TestParseUdp_duplicateRequests(t *testing.T) {
 	assert.Nil(t, mapValue(t, m, "bytes_out"))
 	assert.Nil(t, mapValue(t, m, "responsetime"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, DuplicateQueryMsg.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, duplicateQueryMsg.Error(), mapValue(t, m, "notes"))
 }
 
 // Verify that the request/response pair are parsed and that a result
@@ -330,9 +330,9 @@ func TestParseUdp_allTestMessages(t *testing.T) {
 func TestExpireTransaction(t *testing.T) {
 	dns := newDNS(testing.Verbose())
 
-	trans := newTransaction(time.Now(), DNSTuple{}, common.CmdlineTuple{})
-	trans.Request = &DNSMessage{
-		Data: &mkdns.Msg{
+	trans := newTransaction(time.Now(), dnsTuple{}, common.CmdlineTuple{})
+	trans.request = &dnsMessage{
+		data: &mkdns.Msg{
 			Question: []mkdns.Question{{}},
 		},
 	}
@@ -342,16 +342,16 @@ func TestExpireTransaction(t *testing.T) {
 	assert.Nil(t, mapValue(t, m, "bytes_out"))
 	assert.Nil(t, mapValue(t, m, "responsetime"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, NoResponse.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, noResponse.Error(), mapValue(t, m, "notes"))
 }
 
 // Verify that an empty DNS request packet can be published.
 func TestPublishTransaction_emptyDnsRequest(t *testing.T) {
 	dns := newDNS(testing.Verbose())
 
-	trans := newTransaction(time.Now(), DNSTuple{}, common.CmdlineTuple{})
-	trans.Request = &DNSMessage{
-		Data: &mkdns.Msg{},
+	trans := newTransaction(time.Now(), dnsTuple{}, common.CmdlineTuple{})
+	trans.request = &dnsMessage{
+		data: &mkdns.Msg{},
 	}
 	dns.publishTransaction(trans)
 
@@ -363,9 +363,9 @@ func TestPublishTransaction_emptyDnsRequest(t *testing.T) {
 func TestPublishTransaction_emptyDnsResponse(t *testing.T) {
 	dns := newDNS(testing.Verbose())
 
-	trans := newTransaction(time.Now(), DNSTuple{}, common.CmdlineTuple{})
-	trans.Response = &DNSMessage{
-		Data: &mkdns.Msg{},
+	trans := newTransaction(time.Now(), dnsTuple{}, common.CmdlineTuple{})
+	trans.response = &dnsMessage{
+		data: &mkdns.Msg{},
 	}
 	dns.publishTransaction(trans)
 
@@ -412,7 +412,7 @@ func TestPublishTransaction_respEdnsNoSupport(t *testing.T) {
 	assert.Equal(t, len(q.response), mapValue(t, m, "bytes_out"))
 	assert.NotNil(t, mapValue(t, m, "responsetime"))
 	assert.Equal(t, common.OK_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, RespEdnsNoSupport.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, respEdnsNoSupport.Error(), mapValue(t, m, "notes"))
 	assertRequest(t, m, q)
 }
 
@@ -435,12 +435,12 @@ func TestPublishTransaction_respEdnsUnexpected(t *testing.T) {
 	assert.Equal(t, len(q.response), mapValue(t, m, "bytes_out"))
 	assert.NotNil(t, mapValue(t, m, "responsetime"))
 	assert.Equal(t, common.OK_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, RespEdnsUnexpected.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, respEdnsUnexpected.Error(), mapValue(t, m, "notes"))
 	assertMapStrData(t, m, q)
 }
 
 // Benchmarks UDP parsing for the given test message.
-func benchmarkUDP(b *testing.B, q DNSTestMessage) {
+func benchmarkUDP(b *testing.B, q dnsTestMessage) {
 	dns := newDNS(false)
 	for i := 0; i < b.N; i++ {
 		packet := newPacket(forward, q.request)
@@ -499,7 +499,7 @@ func BenchmarkParallelUdpParse(b *testing.B) {
 
 // parseUdpRequestResponse parses a request then a response packet and validates
 // the published result.
-func parseUDPRequestResponse(t testing.TB, dns *DNS, q DNSTestMessage) {
+func parseUDPRequestResponse(t testing.TB, dns *dnsPlugin, q dnsTestMessage) {
 	packet := newPacket(forward, q.request)
 	dns.ParseUDP(packet)
 	packet = newPacket(reverse, q.response)

@@ -22,15 +22,15 @@ import (
 
 // Test Constants
 const (
-	ServerIP   = "192.168.0.1"
-	ServerPort = 53
-	ClientIP   = "10.0.0.1"
-	ClientPort = 34898
+	serverIP   = "192.168.0.1"
+	serverPort = 53
+	clientIP   = "10.0.0.1"
+	clientPort = 34898
 )
 
 // DnsTestMessage holds the data that is expected to be returned when parsing
 // the raw DNS layer payloads for the request and response packet.
-type DNSTestMessage struct {
+type dnsTestMessage struct {
 	id          uint16
 	opcode      string
 	flags       []string
@@ -49,14 +49,14 @@ type DNSTestMessage struct {
 // Request and response addresses.
 var (
 	forward = common.NewIPPortTuple(4,
-		net.ParseIP(ServerIP), ServerPort,
-		net.ParseIP(ClientIP), ClientPort)
+		net.ParseIP(serverIP), serverPort,
+		net.ParseIP(clientIP), clientPort)
 	reverse = common.NewIPPortTuple(4,
-		net.ParseIP(ClientIP), ClientPort,
-		net.ParseIP(ServerIP), ServerPort)
+		net.ParseIP(clientIP), clientPort,
+		net.ParseIP(serverIP), serverPort)
 )
 
-func newDNS(verbose bool) *DNS {
+func newDNS(verbose bool) *dnsPlugin {
 	if verbose {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"dns"})
 	} else {
@@ -65,7 +65,7 @@ func newDNS(verbose bool) *DNS {
 
 	results := &publish.ChanTransactions{make(chan common.MapStr, 100)}
 	cfg, _ := common.NewConfigFrom(map[string]interface{}{
-		"ports":               []int{ServerPort},
+		"ports":               []int{serverPort},
 		"include_authorities": true,
 		"include_additionals": true,
 		"send_request":        true,
@@ -76,7 +76,7 @@ func newDNS(verbose bool) *DNS {
 		panic(err)
 	}
 
-	return dns.(*DNS)
+	return dns.(*dnsPlugin)
 }
 
 func newPacket(t common.IPPortTuple, payload []byte) *protos.Packet {
@@ -89,7 +89,7 @@ func newPacket(t common.IPPortTuple, payload []byte) *protos.Packet {
 
 // expectResult returns one MapStr result from the Dns results channel. If
 // no result is available then the test fails.
-func expectResult(t testing.TB, dns *DNS) common.MapStr {
+func expectResult(t testing.TB, dns *dnsPlugin) common.MapStr {
 	client := dns.results.(*publish.ChanTransactions)
 	select {
 	case result := <-client.Channel:
@@ -158,7 +158,7 @@ func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
 //     dns.authorities
 //     dns.additionals_count
 //     dns.additionals
-func assertMapStrData(t testing.TB, m common.MapStr, q DNSTestMessage) {
+func assertMapStrData(t testing.TB, m common.MapStr, q dnsTestMessage) {
 	assertRequest(t, m, q)
 
 	// Answers
@@ -204,7 +204,7 @@ func assertMapStrData(t testing.TB, m common.MapStr, q DNSTestMessage) {
 	}
 }
 
-func assertRequest(t testing.TB, m common.MapStr, q DNSTestMessage) {
+func assertRequest(t testing.TB, m common.MapStr, q dnsTestMessage) {
 	assert.Equal(t, "dns", mapValue(t, m, "type"))
 	assertAddress(t, forward, mapValue(t, m, "src"))
 	assertAddress(t, reverse, mapValue(t, m, "dst"))
