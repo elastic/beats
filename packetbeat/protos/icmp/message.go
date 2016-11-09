@@ -59,42 +59,42 @@ var icmp6PairTypes = map[uint8]bool{
 
 // Contains all used information from the ICMP message on the wire.
 type icmpMessage struct {
-	Ts     time.Time
+	ts     time.Time
 	Type   uint8
-	Code   uint8
-	Length int
+	code   uint8
+	length int
 }
 
 func isRequest(tuple *icmpTuple, msg *icmpMessage) bool {
-	if tuple.IcmpVersion == 4 {
+	if tuple.icmpVersion == 4 {
 		return !icmp4ResponseTypes[msg.Type]
 	}
-	if tuple.IcmpVersion == 6 {
+	if tuple.icmpVersion == 6 {
 		return !icmp6ResponseTypes[msg.Type]
 	}
-	logp.WTF("icmp", "Invalid ICMP version[%d]", tuple.IcmpVersion)
+	logp.WTF("icmp", "Invalid ICMP version[%d]", tuple.icmpVersion)
 	return true
 }
 
 func isError(tuple *icmpTuple, msg *icmpMessage) bool {
-	if tuple.IcmpVersion == 4 {
+	if tuple.icmpVersion == 4 {
 		return icmp4ErrorTypes[msg.Type]
 	}
-	if tuple.IcmpVersion == 6 {
+	if tuple.icmpVersion == 6 {
 		return icmp6ErrorTypes[msg.Type]
 	}
-	logp.WTF("icmp", "Invalid ICMP version[%d]", tuple.IcmpVersion)
+	logp.WTF("icmp", "Invalid ICMP version[%d]", tuple.icmpVersion)
 	return true
 }
 
 func requiresCounterpart(tuple *icmpTuple, msg *icmpMessage) bool {
-	if tuple.IcmpVersion == 4 {
+	if tuple.icmpVersion == 4 {
 		return icmp4PairTypes[msg.Type]
 	}
-	if tuple.IcmpVersion == 6 {
+	if tuple.icmpVersion == 6 {
 		return icmp6PairTypes[msg.Type]
 	}
-	logp.WTF("icmp", "Invalid ICMP version[%d]", tuple.IcmpVersion)
+	logp.WTF("icmp", "Invalid ICMP version[%d]", tuple.icmpVersion)
 	return false
 }
 
@@ -120,12 +120,12 @@ func extractTrackingData(icmpVersion uint8, msgType uint8, baseLayer *layers.Bas
 }
 
 func humanReadable(tuple *icmpTuple, msg *icmpMessage) string {
-	if tuple.IcmpVersion == 4 {
-		return layers.ICMPv4TypeCode(binary.BigEndian.Uint16([]byte{msg.Type, msg.Code})).String()
+	if tuple.icmpVersion == 4 {
+		return layers.ICMPv4TypeCode(binary.BigEndian.Uint16([]byte{msg.Type, msg.code})).String()
 	}
-	if tuple.IcmpVersion == 6 {
-		return layers.ICMPv6TypeCode(binary.BigEndian.Uint16([]byte{msg.Type, msg.Code})).String()
+	if tuple.icmpVersion == 6 {
+		return layers.ICMPv6TypeCode(binary.BigEndian.Uint16([]byte{msg.Type, msg.code})).String()
 	}
-	logp.WTF("icmp", "Invalid ICMP version[%d]", tuple.IcmpVersion)
+	logp.WTF("icmp", "Invalid ICMP version[%d]", tuple.icmpVersion)
 	return ""
 }

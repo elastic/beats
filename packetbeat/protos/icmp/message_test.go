@@ -11,42 +11,42 @@ import (
 )
 
 func TestIcmpMessageIsRequestICMPv4(t *testing.T) {
-	tuple := &icmpTuple{IcmpVersion: 4}
+	tuple := &icmpTuple{icmpVersion: 4}
 
 	assert.True(t, isRequest(tuple, &icmpMessage{Type: layers.ICMPv4TypeEchoRequest}))
 	assert.False(t, isRequest(tuple, &icmpMessage{Type: layers.ICMPv4TypeEchoReply}))
 }
 
 func TestIcmpMessageIsRequestICMPv6(t *testing.T) {
-	tuple := &icmpTuple{IcmpVersion: 6}
+	tuple := &icmpTuple{icmpVersion: 6}
 
 	assert.True(t, isRequest(tuple, &icmpMessage{Type: layers.ICMPv6TypeEchoRequest}))
 	assert.False(t, isRequest(tuple, &icmpMessage{Type: layers.ICMPv6TypeEchoReply}))
 }
 
 func TestIcmpMessageIsErrorICMPv4(t *testing.T) {
-	tuple := &icmpTuple{IcmpVersion: 4}
+	tuple := &icmpTuple{icmpVersion: 4}
 
 	assert.True(t, isError(tuple, &icmpMessage{Type: layers.ICMPv4TypeDestinationUnreachable}))
 	assert.False(t, isError(tuple, &icmpMessage{Type: layers.ICMPv4TypeEchoReply}))
 }
 
 func TestIcmpMessageIsErrorICMPv6(t *testing.T) {
-	tuple := &icmpTuple{IcmpVersion: 6}
+	tuple := &icmpTuple{icmpVersion: 6}
 
 	assert.True(t, isError(tuple, &icmpMessage{Type: layers.ICMPv6TypeDestinationUnreachable}))
 	assert.False(t, isError(tuple, &icmpMessage{Type: layers.ICMPv6TypeEchoReply}))
 }
 
 func TestIcmpMessageRequiresCounterpartICMPv4(t *testing.T) {
-	tuple := &icmpTuple{IcmpVersion: 4}
+	tuple := &icmpTuple{icmpVersion: 4}
 
 	assert.True(t, requiresCounterpart(tuple, &icmpMessage{Type: layers.ICMPv4TypeEchoRequest}))
 	assert.False(t, requiresCounterpart(tuple, &icmpMessage{Type: layers.ICMPv4TypeDestinationUnreachable}))
 }
 
 func TestIcmpMessageRequiresCounterpartICMPv6(t *testing.T) {
-	tuple := &icmpTuple{IcmpVersion: 6}
+	tuple := &icmpTuple{icmpVersion: 6}
 
 	assert.True(t, requiresCounterpart(tuple, &icmpMessage{Type: layers.ICMPv6TypeEchoRequest}))
 	assert.False(t, requiresCounterpart(tuple, &icmpMessage{Type: layers.ICMPv6TypeDestinationUnreachable}))
@@ -85,15 +85,15 @@ func TestIcmpMessageExtractTrackingDataICMPv6(t *testing.T) {
 }
 
 func TestIcmpMessageHumanReadableICMPv4(t *testing.T) {
-	tuple := &icmpTuple{IcmpVersion: 4}
-	msg := &icmpMessage{Type: layers.ICMPv4TypeDestinationUnreachable, Code: 3}
+	tuple := &icmpTuple{icmpVersion: 4}
+	msg := &icmpMessage{Type: layers.ICMPv4TypeDestinationUnreachable, code: 3}
 
 	assert.Equal(t, "DestinationUnreachable(Port)", humanReadable(tuple, msg))
 }
 
 func TestIcmpMessageHumanReadableICMPv6(t *testing.T) {
-	tuple := &icmpTuple{IcmpVersion: 6}
-	msg := &icmpMessage{Type: layers.ICMPv6TypeDestinationUnreachable, Code: 3}
+	tuple := &icmpTuple{icmpVersion: 6}
+	msg := &icmpMessage{Type: layers.ICMPv6TypeDestinationUnreachable, code: 3}
 
 	assert.Equal(t, "DestinationUnreachable(Address)", humanReadable(tuple, msg))
 }
