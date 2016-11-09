@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func AmqpModForTests() *Amqp {
-	var amqp Amqp
+func AmqpModForTests() *amqpPlugin {
+	var amqp amqpPlugin
 	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
 	config := defaultConfig
 	amqp.init(results, &config)
@@ -30,7 +30,7 @@ func testTCPTuple() *common.TCPTuple {
 	return t
 }
 
-func expectTransaction(t *testing.T, amqp *Amqp) common.MapStr {
+func expectTransaction(t *testing.T, amqp *amqpPlugin) common.MapStr {
 	client := amqp.results.(*publish.ChanTransactions)
 	select {
 	case trans := <-client.Channel:

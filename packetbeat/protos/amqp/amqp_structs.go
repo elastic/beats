@@ -1,8 +1,9 @@
 package amqp
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type AmqpMethod func(*AmqpMessage, []byte) (bool, bool)
@@ -18,11 +19,14 @@ const (
 )
 
 //Frame types and codes
+
+type frameType byte
+
 const (
-	methodType    = 1
-	headerType    = 2
-	bodyType      = 3
-	heartbeatType = 8
+	methodType    frameType = 1
+	headerType    frameType = 2
+	bodyType      frameType = 3
+	heartbeatType frameType = 8
 )
 
 const (
@@ -166,8 +170,8 @@ type amqpPrivateData struct {
 }
 
 type AmqpFrame struct {
-	Type    byte
-	channel uint16
+	Type frameType
+	// channel uint16  (frame channel is currently ignored)
 	size    uint32
 	content []byte
 }
@@ -193,22 +197,16 @@ type AmqpMessage struct {
 
 // represent a stream of data to be parsed
 type AmqpStream struct {
-	tcptuple *common.TCPTuple
-
 	data        []byte
 	parseOffset int
-
-	message *AmqpMessage
+	message     *AmqpMessage
 }
 
 // contains the result of parsing
 type AmqpTransaction struct {
-	Type  string
 	tuple common.TCPTuple
 	Src   common.Endpoint
 	Dst   common.Endpoint
-	Ts    int64
-	JsTs  time.Time
 	ts    time.Time
 
 	Method       string

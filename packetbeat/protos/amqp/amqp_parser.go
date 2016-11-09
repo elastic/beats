@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/packetbeat/procs"
 )
 
-func (amqp *Amqp) amqpMessageParser(s *AmqpStream) (ok bool, complete bool) {
+func (amqp *amqpPlugin) amqpMessageParser(s *AmqpStream) (ok bool, complete bool) {
 	for s.parseOffset < len(s.data) {
 
 		if len(s.data[s.parseOffset:]) < 8 {
@@ -83,8 +83,7 @@ func readFrameHeader(data []byte) (ret *AmqpFrame, err bool) {
 		logp.Warn("Missing frame end octet in frame, discarding it")
 		return nil, true
 	}
-	frame.Type = data[0]
-	frame.channel = binary.BigEndian.Uint16(data[1:3])
+	frame.Type = frameType(data[0])
 	if frame.size == 0 {
 		//frame content is nil with hearbeat frames
 		frame.content = nil
@@ -103,7 +102,7 @@ The Method Payload, according to official doc :
   short       short       ...
 */
 
-func (amqp *Amqp) decodeMethodFrame(s *AmqpStream, buf []byte) (bool, bool) {
+func (amqp *amqpPlugin) decodeMethodFrame(s *AmqpStream, buf []byte) (bool, bool) {
 	if len(buf) < 4 {
 		logp.Warn("Method frame too small, waiting for more data")
 		return true, false
@@ -134,7 +133,7 @@ Structure of a content header, according to official doc :
   short      short   long long        short         remainder...
 */
 
-func (amqp *Amqp) decodeHeaderFrame(s *AmqpStream, buf []byte) bool {
+func (amqp *amqpPlugin) decodeHeaderFrame(s *AmqpStream, buf []byte) bool {
 	if len(buf) < 14 {
 		logp.Warn("Header frame too small, waiting for mode data")
 		return true
@@ -311,7 +310,7 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 	return false
 }
 
-func (amqp *Amqp) handleAmqp(m *AmqpMessage, tcptuple *common.TCPTuple, dir uint8) {
+func (amqp *amqpPlugin) handleAmqp(m *AmqpMessage, tcptuple *common.TCPTuple, dir uint8) {
 	if amqp.mustHideCloseMethod(m) {
 		return
 	}
@@ -332,7 +331,7 @@ func (amqp *Amqp) handleAmqp(m *AmqpMessage, tcptuple *common.TCPTuple, dir uint
 	}
 }
 
-func (amqp *Amqp) mustHideCloseMethod(m *AmqpMessage) bool {
+func (amqp *amqpPlugin) mustHideCloseMethod(m *AmqpMessage) bool {
 	return amqp.HideConnectionInformation == true &&
 		(m.Method == "connection.close" || m.Method == "channel.close") &&
 		getReplyCode(m.Fields) < uint16(300)

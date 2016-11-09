@@ -18,7 +18,7 @@ var (
 	detailedf = logp.MakeDebug("amqpdetailed")
 )
 
-type Amqp struct {
+type amqpPlugin struct {
 	Ports                     []int
 	SendRequest               bool
 	SendResponse              bool
@@ -48,7 +48,7 @@ func New(
 	results publish.Transactions,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
-	p := &Amqp{}
+	p := &amqpPlugin{}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -62,7 +62,7 @@ func New(
 	return p, nil
 }
 
-func (amqp *Amqp) init(results publish.Transactions, config *amqpConfig) error {
+func (amqp *amqpPlugin) init(results publish.Transactions, config *amqpConfig) error {
 	amqp.initMethodMap()
 	amqp.setFromConfig(config)
 
@@ -77,7 +77,7 @@ func (amqp *Amqp) init(results publish.Transactions, config *amqpConfig) error {
 	return nil
 }
 
-func (amqp *Amqp) initMethodMap() {
+func (amqp *amqpPlugin) initMethodMap() {
 	amqp.MethodMap = map[codeClass]map[codeMethod]AmqpMethod{
 		connectionCode: {
 			connectionClose:   connectionCloseMethod,
@@ -137,11 +137,11 @@ func (amqp *Amqp) initMethodMap() {
 	}
 }
 
-func (amqp *Amqp) GetPorts() []int {
+func (amqp *amqpPlugin) GetPorts() []int {
 	return amqp.Ports
 }
 
-func (amqp *Amqp) setFromConfig(config *amqpConfig) {
+func (amqp *amqpPlugin) setFromConfig(config *amqpConfig) {
 	amqp.Ports = config.Ports
 	amqp.SendRequest = config.SendRequest
 	amqp.SendResponse = config.SendResponse
@@ -152,7 +152,7 @@ func (amqp *Amqp) setFromConfig(config *amqpConfig) {
 	amqp.transactionTimeout = config.TransactionTimeout
 }
 
-func (amqp *Amqp) addConnectionMethods() {
+func (amqp *amqpPlugin) addConnectionMethods() {
 	amqp.MethodMap[connectionCode][connectionStart] = connectionStartMethod
 	amqp.MethodMap[connectionCode][connectionStartOk] = connectionStartOkMethod
 	amqp.MethodMap[connectionCode][connectionTune] = connectionTuneMethod
@@ -167,11 +167,11 @@ func (amqp *Amqp) addConnectionMethods() {
 	amqp.MethodMap[basicCode][basicQosOk] = okMethod
 }
 
-func (amqp *Amqp) ConnectionTimeout() time.Duration {
+func (amqp *amqpPlugin) ConnectionTimeout() time.Duration {
 	return amqp.transactionTimeout
 }
 
-func (amqp *Amqp) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
+func (amqp *amqpPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ParseAmqp exception")
@@ -188,9 +188,8 @@ func (amqp *Amqp) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 
 	if priv.Data[dir] == nil {
 		priv.Data[dir] = &AmqpStream{
-			tcptuple: tcptuple,
-			data:     pkt.Payload,
-			message:  &AmqpMessage{Ts: pkt.Ts},
+			data:    pkt.Payload,
+			message: &AmqpMessage{Ts: pkt.Ts},
 		}
 	} else {
 		// concatenate databytes
@@ -224,18 +223,18 @@ func (amqp *Amqp) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	return priv
 }
 
-func (amqp *Amqp) GapInStream(tcptuple *common.TCPTuple, dir uint8,
+func (amqp *amqpPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 	detailedf("GapInStream called")
 	return private, true
 }
 
-func (amqp *Amqp) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
+func (amqp *amqpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 	return private
 }
 
-func (amqp *Amqp) handleAmqpRequest(msg *AmqpMessage) {
+func (amqp *amqpPlugin) handleAmqpRequest(msg *AmqpMessage) {
 	// Add it to the HT
 	tuple := msg.TCPTuple
 
@@ -246,13 +245,11 @@ func (amqp *Amqp) handleAmqpRequest(msg *AmqpMessage) {
 			unmatchedRequests.Add(1)
 		}
 	} else {
-		trans = &AmqpTransaction{Type: "amqp", tuple: tuple}
+		trans = &AmqpTransaction{tuple: tuple}
 		amqp.transactions.Put(tuple.Hashable(), trans)
 	}
 
 	trans.ts = msg.Ts
-	trans.Ts = trans.ts.UnixNano() / 1000
-	trans.JsTs = msg.Ts
 	trans.Src = common.Endpoint{
 		IP:   msg.TCPTuple.SrcIP.String(),
 		Port: msg.TCPTuple.SrcPort,
@@ -298,7 +295,7 @@ func (amqp *Amqp) handleAmqpRequest(msg *AmqpMessage) {
 	trans.timer = time.AfterFunc(TransactionTimeout, func() { amqp.expireTransaction(trans) })
 }
 
-func (amqp *Amqp) handleAmqpResponse(msg *AmqpMessage) {
+func (amqp *amqpPlugin) handleAmqpResponse(msg *AmqpMessage) {
 	tuple := msg.TCPTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 	if trans == nil || trans.Amqp == nil {
@@ -331,7 +328,7 @@ func (amqp *Amqp) handleAmqpResponse(msg *AmqpMessage) {
 	}
 }
 
-func (amqp *Amqp) expireTransaction(trans *AmqpTransaction) {
+func (amqp *amqpPlugin) expireTransaction(trans *AmqpTransaction) {
 	debugf("Transaction expired")
 
 	//possibility of a connection.close or channel.close method that didn't get an
@@ -346,19 +343,17 @@ func (amqp *Amqp) expireTransaction(trans *AmqpTransaction) {
 
 //This method handles published messages from clients. Being an async
 //process, the method, header and body frames are regrouped in one transaction
-func (amqp *Amqp) handlePublishing(client *AmqpMessage) {
+func (amqp *amqpPlugin) handlePublishing(client *AmqpMessage) {
 
 	tuple := client.TCPTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 
 	if trans == nil {
-		trans = &AmqpTransaction{Type: "amqp", tuple: tuple}
+		trans = &AmqpTransaction{tuple: tuple}
 		amqp.transactions.Put(client.TCPTuple.Hashable(), trans)
 	}
 
 	trans.ts = client.Ts
-	trans.Ts = client.Ts.UnixNano() / 1000
-	trans.JsTs = client.Ts
 	trans.Src = common.Endpoint{
 		IP:   client.TCPTuple.SrcIP.String(),
 		Port: client.TCPTuple.SrcPort,
@@ -393,19 +388,17 @@ func (amqp *Amqp) handlePublishing(client *AmqpMessage) {
 //This method handles delivered messages via basic.deliver and basic.get-ok AND
 //returned messages to clients. Being an async process, the method, header and
 //body frames are regrouped in one transaction
-func (amqp *Amqp) handleDelivering(server *AmqpMessage) {
+func (amqp *amqpPlugin) handleDelivering(server *AmqpMessage) {
 
 	tuple := server.TCPTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 
 	if trans == nil {
-		trans = &AmqpTransaction{Type: "amqp", tuple: tuple}
+		trans = &AmqpTransaction{tuple: tuple}
 		amqp.transactions.Put(server.TCPTuple.Hashable(), trans)
 	}
 
 	trans.ts = server.Ts
-	trans.Ts = server.Ts.UnixNano() / 1000
-	trans.JsTs = server.Ts
 	trans.Src = common.Endpoint{
 		IP:   server.TCPTuple.SrcIP.String(),
 		Port: server.TCPTuple.SrcPort,
@@ -440,7 +433,7 @@ func (amqp *Amqp) handleDelivering(server *AmqpMessage) {
 	amqp.transactions.Delete(trans.tuple.Hashable())
 }
 
-func (amqp *Amqp) publishTransaction(t *AmqpTransaction) {
+func (amqp *amqpPlugin) publishTransaction(t *AmqpTransaction) {
 
 	if amqp.results == nil {
 		return
@@ -545,7 +538,7 @@ func isStringable(m *AmqpMessage) bool {
 	return stringable
 }
 
-func (amqp *Amqp) getTransaction(k common.HashableTCPTuple) *AmqpTransaction {
+func (amqp *amqpPlugin) getTransaction(k common.HashableTCPTuple) *AmqpTransaction {
 	v := amqp.transactions.Get(k)
 	if v != nil {
 		return v.(*AmqpTransaction)
