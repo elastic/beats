@@ -38,6 +38,7 @@ services:
     working_dir: /go/src/github.com/elastic/beats/metricbeat
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
+      - /var/run/docker.sock:/var/run/docker.sock
     command: make
     entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
 
