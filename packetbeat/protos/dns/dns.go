@@ -326,8 +326,8 @@ func (dns *dnsPlugin) receivedDNSResponse(tuple *dnsTuple, msg *dnsMessage) {
 	if tuple.transport == transportUDP {
 		respIsEdns := msg.data.IsEdns0() != nil
 		if !respIsEdns && msg.length > maxDNSPacketSize {
-			trans.notes = append(trans.notes, udpPacketTooLarge.ResponseError())
-			debugf("%s", udpPacketTooLarge.ResponseError())
+			trans.notes = append(trans.notes, udpPacketTooLarge.responseError())
+			debugf("%s", udpPacketTooLarge.responseError())
 		}
 
 		request := trans.request

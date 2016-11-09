@@ -226,7 +226,7 @@ func TestParseTcp_errorNonDnsMsgResponse(t *testing.T) {
 	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
 	assert.Nil(t, mapValue(t, m, "bytes_out"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, nonDNSMsg.ResponseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, nonDNSMsg.responseError(), mapValue(t, m, "notes"))
 }
 
 // Verify that a request message with length (first two bytes value) of zero is not published
@@ -265,7 +265,7 @@ func TestParseTcp_errorZeroLengthMsgResponse(t *testing.T) {
 	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
 	assert.Nil(t, mapValue(t, m, "bytes_out"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, zeroLengthMsg.ResponseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, zeroLengthMsg.responseError(), mapValue(t, m, "notes"))
 }
 
 // Verify that an empty packet is safely handled (no panics).
@@ -491,7 +491,7 @@ func TestGap_errorResponse(t *testing.T) {
 
 	m := expectResult(t, dns)
 	assertRequest(t, m, sophosTxtTCP)
-	assert.Equal(t, incompleteMsg.ResponseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, incompleteMsg.responseError(), mapValue(t, m, "notes"))
 	assert.Nil(t, mapValue(t, m, "answers"))
 }
 
@@ -539,7 +539,7 @@ func TestFin_errorResponse(t *testing.T) {
 
 	m := expectResult(t, dns)
 	assertRequest(t, m, zoneAxfrTCP)
-	assert.Equal(t, incompleteMsg.ResponseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, incompleteMsg.responseError(), mapValue(t, m, "notes"))
 	assert.Nil(t, mapValue(t, m, "answers"))
 }
 

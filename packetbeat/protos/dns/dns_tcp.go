@@ -236,11 +236,11 @@ func (dns *dnsPlugin) publishResponseError(conn *dnsConnectionData, err error) {
 		return
 	}
 
-	errDNS, ok := err.(*DNSError)
+	errDNS, ok := err.(*dnsError)
 	if !ok {
 		return
 	}
-	trans.notes = append(trans.notes, errDNS.ResponseError())
+	trans.notes = append(trans.notes, errDNS.responseError())
 
 	// Should we publish the length (bytes_out) of the failed Response?
 	//streamReverse.message.Length = len(streamReverse.rawData)
