@@ -178,7 +178,7 @@ type amqpFrame struct {
 
 type amqpMessage struct {
 	ts             time.Time
-	tCPTuple       common.TCPTuple
+	tcpTuple       common.TCPTuple
 	cmdlineTuple   *common.CmdlineTuple
 	method         string
 	isRequest      bool

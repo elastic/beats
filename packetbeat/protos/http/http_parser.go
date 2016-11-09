@@ -22,7 +22,7 @@ type message struct {
 	chunkedBody      []byte
 
 	isRequest    bool
-	tCPTuple     common.TCPTuple
+	tcpTuple     common.TCPTuple
 	cmdlineTuple *common.CmdlineTuple
 	direction    uint8
 

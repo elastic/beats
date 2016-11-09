@@ -54,7 +54,7 @@ type mysqlMessage struct {
 
 	direction    uint8
 	isTruncated  bool
-	tCPTuple     common.TCPTuple
+	tcpTuple     common.TCPTuple
 	cmdlineTuple *common.CmdlineTuple
 	raw          []byte
 	notes        []string
@@ -565,7 +565,7 @@ func (mysql *mysqlPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 func handleMysql(mysql *mysqlPlugin, m *mysqlMessage, tcptuple *common.TCPTuple,
 	dir uint8, rawMsg []byte) {
 
-	m.tCPTuple = *tcptuple
+	m.tcpTuple = *tcptuple
 	m.direction = dir
 	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 	m.raw = rawMsg
@@ -578,7 +578,7 @@ func handleMysql(mysql *mysqlPlugin, m *mysqlMessage, tcptuple *common.TCPTuple,
 }
 
 func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
-	tuple := msg.tCPTuple
+	tuple := msg.tcpTuple
 	trans := mysql.getTransaction(tuple.Hashable())
 	if trans != nil {
 		if trans.mysql != nil {
@@ -592,13 +592,13 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 
 	trans.ts = msg.ts
 	trans.src = common.Endpoint{
-		IP:   msg.tCPTuple.SrcIP.String(),
-		Port: msg.tCPTuple.SrcPort,
+		IP:   msg.tcpTuple.SrcIP.String(),
+		Port: msg.tcpTuple.SrcPort,
 		Proc: string(msg.cmdlineTuple.Src),
 	}
 	trans.dst = common.Endpoint{
-		IP:   msg.tCPTuple.DstIP.String(),
-		Port: msg.tCPTuple.DstPort,
+		IP:   msg.tcpTuple.DstIP.String(),
+		Port: msg.tcpTuple.DstPort,
 		Proc: string(msg.cmdlineTuple.Dst),
 	}
 	if msg.direction == tcp.TCPDirectionReverse {
@@ -629,7 +629,7 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 }
 
 func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
-	trans := mysql.getTransaction(msg.tCPTuple.Hashable())
+	trans := mysql.getTransaction(msg.tcpTuple.Hashable())
 	if trans == nil {
 		logp.Debug("mysql", "Response from unknown transaction. Ignoring.")
 		unmatchedResponses.Add(1)

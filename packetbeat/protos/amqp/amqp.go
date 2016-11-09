@@ -236,7 +236,7 @@ func (amqp *amqpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 
 func (amqp *amqpPlugin) handleAmqpRequest(msg *amqpMessage) {
 	// Add it to the HT
-	tuple := msg.tCPTuple
+	tuple := msg.tcpTuple
 
 	trans := amqp.getTransaction(tuple.Hashable())
 	if trans != nil {
@@ -251,13 +251,13 @@ func (amqp *amqpPlugin) handleAmqpRequest(msg *amqpMessage) {
 
 	trans.ts = msg.ts
 	trans.src = common.Endpoint{
-		IP:   msg.tCPTuple.SrcIP.String(),
-		Port: msg.tCPTuple.SrcPort,
+		IP:   msg.tcpTuple.SrcIP.String(),
+		Port: msg.tcpTuple.SrcPort,
 		Proc: string(msg.cmdlineTuple.Src),
 	}
 	trans.dst = common.Endpoint{
-		IP:   msg.tCPTuple.DstIP.String(),
-		Port: msg.tCPTuple.DstPort,
+		IP:   msg.tcpTuple.DstIP.String(),
+		Port: msg.tcpTuple.DstPort,
 		Proc: string(msg.cmdlineTuple.Dst),
 	}
 	if msg.direction == tcp.TCPDirectionReverse {
@@ -296,7 +296,7 @@ func (amqp *amqpPlugin) handleAmqpRequest(msg *amqpMessage) {
 }
 
 func (amqp *amqpPlugin) handleAmqpResponse(msg *amqpMessage) {
-	tuple := msg.tCPTuple
+	tuple := msg.tcpTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 	if trans == nil || trans.amqp == nil {
 		debugf("Response from unknown transaction. Ignoring.")
@@ -345,23 +345,23 @@ func (amqp *amqpPlugin) expireTransaction(trans *amqpTransaction) {
 //process, the method, header and body frames are regrouped in one transaction
 func (amqp *amqpPlugin) handlePublishing(client *amqpMessage) {
 
-	tuple := client.tCPTuple
+	tuple := client.tcpTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 
 	if trans == nil {
 		trans = &amqpTransaction{tuple: tuple}
-		amqp.transactions.Put(client.tCPTuple.Hashable(), trans)
+		amqp.transactions.Put(client.tcpTuple.Hashable(), trans)
 	}
 
 	trans.ts = client.ts
 	trans.src = common.Endpoint{
-		IP:   client.tCPTuple.SrcIP.String(),
-		Port: client.tCPTuple.SrcPort,
+		IP:   client.tcpTuple.SrcIP.String(),
+		Port: client.tcpTuple.SrcPort,
 		Proc: string(client.cmdlineTuple.Src),
 	}
 	trans.dst = common.Endpoint{
-		IP:   client.tCPTuple.DstIP.String(),
-		Port: client.tCPTuple.DstPort,
+		IP:   client.tcpTuple.DstIP.String(),
+		Port: client.tcpTuple.DstPort,
 		Proc: string(client.cmdlineTuple.Dst),
 	}
 
@@ -390,23 +390,23 @@ func (amqp *amqpPlugin) handlePublishing(client *amqpMessage) {
 //body frames are regrouped in one transaction
 func (amqp *amqpPlugin) handleDelivering(server *amqpMessage) {
 
-	tuple := server.tCPTuple
+	tuple := server.tcpTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 
 	if trans == nil {
 		trans = &amqpTransaction{tuple: tuple}
-		amqp.transactions.Put(server.tCPTuple.Hashable(), trans)
+		amqp.transactions.Put(server.tcpTuple.Hashable(), trans)
 	}
 
 	trans.ts = server.ts
 	trans.src = common.Endpoint{
-		IP:   server.tCPTuple.SrcIP.String(),
-		Port: server.tCPTuple.SrcPort,
+		IP:   server.tcpTuple.SrcIP.String(),
+		Port: server.tcpTuple.SrcPort,
 		Proc: string(server.cmdlineTuple.Src),
 	}
 	trans.dst = common.Endpoint{
-		IP:   server.tCPTuple.DstIP.String(),
-		Port: server.tCPTuple.DstPort,
+		IP:   server.tcpTuple.DstIP.String(),
+		Port: server.tcpTuple.DstPort,
 		Proc: string(server.cmdlineTuple.Dst),
 	}
 

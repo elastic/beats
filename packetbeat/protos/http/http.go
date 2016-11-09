@@ -394,19 +394,19 @@ func (http *httpPlugin) handleHTTP(
 	dir uint8,
 ) {
 
-	m.tCPTuple = *tcptuple
+	m.tcpTuple = *tcptuple
 	m.direction = dir
 	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 	http.hideHeaders(m)
 
 	if m.isRequest {
 		if isDebug {
-			debugf("Received request with tuple: %s", m.tCPTuple)
+			debugf("Received request with tuple: %s", m.tcpTuple)
 		}
 		conn.requests.append(m)
 	} else {
 		if isDebug {
-			debugf("Received response with tuple: %s", m.tCPTuple)
+			debugf("Received response with tuple: %s", m.tcpTuple)
 		}
 		conn.responses.append(m)
 		http.correlate(conn)
@@ -452,13 +452,13 @@ func (http *httpPlugin) newTransaction(requ, resp *message) common.MapStr {
 	}
 
 	src := common.Endpoint{
-		IP:   requ.tCPTuple.SrcIP.String(),
-		Port: requ.tCPTuple.SrcPort,
+		IP:   requ.tcpTuple.SrcIP.String(),
+		Port: requ.tcpTuple.SrcPort,
 		Proc: string(requ.cmdlineTuple.Src),
 	}
 	dst := common.Endpoint{
-		IP:   requ.tCPTuple.DstIP.String(),
-		Port: requ.tCPTuple.DstPort,
+		IP:   requ.tcpTuple.DstIP.String(),
+		Port: requ.tcpTuple.DstPort,
 		Proc: string(requ.cmdlineTuple.Dst),
 	}
 	if requ.direction == tcp.TCPDirectionReverse {

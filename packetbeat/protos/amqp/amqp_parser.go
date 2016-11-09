@@ -315,7 +315,7 @@ func (amqp *amqpPlugin) handleAmqp(m *amqpMessage, tcptuple *common.TCPTuple, di
 		return
 	}
 	debugf("A message is ready to be handled")
-	m.tCPTuple = *tcptuple
+	m.tcpTuple = *tcptuple
 	m.direction = dir
 	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 
