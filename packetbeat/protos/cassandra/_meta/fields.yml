@@ -205,8 +205,8 @@
                 - name: host
                   type: keyword
                   description: Representing the node ip.
-                - name: host
-                  type: keyword
+                - name: port
+                  type: long
                   description: Representing the node port.
                 - name: schema_change
                   type: group
