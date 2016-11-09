@@ -61,13 +61,10 @@ type MysqlMessage struct {
 }
 
 type MysqlTransaction struct {
-	Type         string
 	tuple        common.TCPTuple
 	Src          common.Endpoint
 	Dst          common.Endpoint
 	ResponseTime int32
-	Ts           int64
-	JsTs         time.Time
 	ts           time.Time
 	Query        string
 	Method       string
@@ -83,8 +80,6 @@ type MysqlTransaction struct {
 }
 
 type MysqlStream struct {
-	tcptuple *common.TCPTuple
-
 	data []byte
 
 	parseOffset int
@@ -116,7 +111,7 @@ func (state parseState) String() string {
 	return stateStrings[state]
 }
 
-type Mysql struct {
+type mysqlPlugin struct {
 
 	// config
 	Ports        []int
@@ -131,7 +126,7 @@ type Mysql struct {
 	results publish.Transactions
 
 	// function pointer for mocking
-	handleMysql func(mysql *Mysql, m *MysqlMessage, tcp *common.TCPTuple,
+	handleMysql func(mysql *mysqlPlugin, m *MysqlMessage, tcp *common.TCPTuple,
 		dir uint8, raw_msg []byte)
 }
 
@@ -144,7 +139,7 @@ func New(
 	results publish.Transactions,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
-	p := &Mysql{}
+	p := &mysqlPlugin{}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -158,7 +153,7 @@ func New(
 	return p, nil
 }
 
-func (mysql *Mysql) init(results publish.Transactions, config *mysqlConfig) error {
+func (mysql *mysqlPlugin) init(results publish.Transactions, config *mysqlConfig) error {
 	mysql.setFromConfig(config)
 
 	mysql.transactions = common.NewCache(
@@ -171,7 +166,7 @@ func (mysql *Mysql) init(results publish.Transactions, config *mysqlConfig) erro
 	return nil
 }
 
-func (mysql *Mysql) setFromConfig(config *mysqlConfig) {
+func (mysql *mysqlPlugin) setFromConfig(config *mysqlConfig) {
 	mysql.Ports = config.Ports
 	mysql.maxRowLength = config.MaxRowLength
 	mysql.maxStoreRows = config.MaxRows
@@ -180,7 +175,7 @@ func (mysql *Mysql) setFromConfig(config *mysqlConfig) {
 	mysql.transactionTimeout = config.TransactionTimeout
 }
 
-func (mysql *Mysql) getTransaction(k common.HashableTCPTuple) *MysqlTransaction {
+func (mysql *mysqlPlugin) getTransaction(k common.HashableTCPTuple) *MysqlTransaction {
 	v := mysql.transactions.Get(k)
 	if v != nil {
 		return v.(*MysqlTransaction)
@@ -188,7 +183,7 @@ func (mysql *Mysql) getTransaction(k common.HashableTCPTuple) *MysqlTransaction 
 	return nil
 }
 
-func (mysql *Mysql) GetPorts() []int {
+func (mysql *mysqlPlugin) GetPorts() []int {
 	return mysql.Ports
 }
 
@@ -215,8 +210,8 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 			}
 			hdr := s.data[s.parseOffset : s.parseOffset+5]
 			m.PacketLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
-			m.Seq = uint8(hdr[3])
-			m.Typ = uint8(hdr[4])
+			m.Seq = hdr[3]
+			m.Typ = hdr[4]
 
 			logp.Debug("mysqldetailed", "MySQL Header: Packet length %d, Seq %d, Type=%d", m.PacketLength, m.Seq, m.Typ)
 
@@ -243,18 +238,18 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 				// parse response
 				m.IsRequest = false
 
-				if uint8(hdr[4]) == 0x00 || uint8(hdr[4]) == 0xfe {
+				if hdr[4] == 0x00 || hdr[4] == 0xfe {
 					logp.Debug("mysqldetailed", "Received OK response")
 					m.start = s.parseOffset
 					s.parseState = mysqlStateEatMessage
 					m.IsOK = true
-				} else if uint8(hdr[4]) == 0xff {
+				} else if hdr[4] == 0xff {
 					logp.Debug("mysqldetailed", "Received ERR response")
 					m.start = s.parseOffset
 					s.parseState = mysqlStateEatMessage
 					m.IsError = true
 				} else if m.PacketLength == 1 {
-					logp.Debug("mysqldetailed", "Query response. Number of fields %d", uint8(hdr[4]))
+					logp.Debug("mysqldetailed", "Query response. Number of fields %d", hdr[4])
 					m.NumberOfFields = int(hdr[4])
 					m.start = s.parseOffset
 					s.parseOffset += 5
@@ -327,13 +322,13 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
 			hdr := s.data[s.parseOffset : s.parseOffset+4]
 			m.PacketLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
-			m.Seq = uint8(hdr[3])
+			m.Seq = hdr[3]
 			logp.Debug("mysqldetailed", "Fields: packet length %d, packet number %d", m.PacketLength, m.Seq)
 
 			if len(s.data[s.parseOffset:]) >= int(m.PacketLength)+4 {
 				s.parseOffset += 4 // header
 
-				if uint8(s.data[s.parseOffset]) == 0xfe {
+				if s.data[s.parseOffset] == 0xfe {
 					logp.Debug("mysqldetailed", "Received EOF packet")
 					// EOF marker
 					s.parseOffset += int(m.PacketLength)
@@ -388,7 +383,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 			}
 			hdr := s.data[s.parseOffset : s.parseOffset+4]
 			m.PacketLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
-			m.Seq = uint8(hdr[3])
+			m.Seq = hdr[3]
 
 			logp.Debug("mysqldetailed", "Rows: packet length %d, packet number %d", m.PacketLength, m.Seq)
 
@@ -399,7 +394,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
 			s.parseOffset += 4 //header
 
-			if uint8(s.data[s.parseOffset]) == 0xfe {
+			if s.data[s.parseOffset] == 0xfe {
 				logp.Debug("mysqldetailed", "Received EOF packet")
 				// EOF marker
 				s.parseOffset += int(m.PacketLength)
@@ -433,7 +428,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 // messageGap is called when a gap of size `nbytes` is found in the
 // tcp stream. Returns true if there is already enough data in the message
 // read so far that we can use it further in the stack.
-func (mysql *Mysql) messageGap(s *MysqlStream, nbytes int) (complete bool) {
+func (mysql *mysqlPlugin) messageGap(s *MysqlStream, nbytes int) (complete bool) {
 
 	m := s.message
 	switch s.parseState {
@@ -459,7 +454,7 @@ type mysqlPrivateData struct {
 }
 
 // Called when the parser has identified a full message.
-func (mysql *Mysql) messageComplete(tcptuple *common.TCPTuple, dir uint8, stream *MysqlStream) {
+func (mysql *mysqlPlugin) messageComplete(tcptuple *common.TCPTuple, dir uint8, stream *MysqlStream) {
 	// all ok, ship it
 	msg := stream.data[stream.message.start:stream.message.end]
 
@@ -471,11 +466,11 @@ func (mysql *Mysql) messageComplete(tcptuple *common.TCPTuple, dir uint8, stream
 	stream.PrepareForNewMessage()
 }
 
-func (mysql *Mysql) ConnectionTimeout() time.Duration {
+func (mysql *mysqlPlugin) ConnectionTimeout() time.Duration {
 	return mysql.transactionTimeout
 }
 
-func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
+func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ParseMysql exception")
@@ -491,9 +486,8 @@ func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 
 	if priv.Data[dir] == nil {
 		priv.Data[dir] = &MysqlStream{
-			tcptuple: tcptuple,
-			data:     pkt.Payload,
-			message:  &MysqlMessage{Ts: pkt.Ts},
+			data:    pkt.Payload,
+			message: &MysqlMessage{Ts: pkt.Ts},
 		}
 	} else {
 		// concatenate bytes
@@ -531,7 +525,7 @@ func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	return priv
 }
 
-func (mysql *Mysql) GapInStream(tcptuple *common.TCPTuple, dir uint8,
+func (mysql *mysqlPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	defer logp.Recover("GapInStream(mysql) exception")
@@ -560,7 +554,7 @@ func (mysql *Mysql) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	return private, true
 }
 
-func (mysql *Mysql) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
+func (mysql *mysqlPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
 	// TODO: check if we have data pending and either drop it to free
@@ -568,7 +562,7 @@ func (mysql *Mysql) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	return private
 }
 
-func handleMysql(mysql *Mysql, m *MysqlMessage, tcptuple *common.TCPTuple,
+func handleMysql(mysql *mysqlPlugin, m *MysqlMessage, tcptuple *common.TCPTuple,
 	dir uint8, rawMsg []byte) {
 
 	m.TCPTuple = *tcptuple
@@ -583,7 +577,7 @@ func handleMysql(mysql *Mysql, m *MysqlMessage, tcptuple *common.TCPTuple,
 	}
 }
 
-func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
+func (mysql *mysqlPlugin) receivedMysqlRequest(msg *MysqlMessage) {
 	tuple := msg.TCPTuple
 	trans := mysql.getTransaction(tuple.Hashable())
 	if trans != nil {
@@ -592,13 +586,11 @@ func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
 			unmatchedRequests.Add(1)
 		}
 	} else {
-		trans = &MysqlTransaction{Type: "mysql", tuple: tuple}
+		trans = &MysqlTransaction{tuple: tuple}
 		mysql.transactions.Put(tuple.Hashable(), trans)
 	}
 
 	trans.ts = msg.Ts
-	trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
-	trans.JsTs = msg.Ts
 	trans.Src = common.Endpoint{
 		IP:   msg.TCPTuple.SrcIP.String(),
 		Port: msg.TCPTuple.SrcPort,
@@ -636,7 +628,7 @@ func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
 	trans.BytesIn = msg.Size
 }
 
-func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
+func (mysql *mysqlPlugin) receivedMysqlResponse(msg *MysqlMessage) {
 	trans := mysql.getTransaction(msg.TCPTuple.Hashable())
 	if trans == nil {
 		logp.Debug("mysql", "Response from unknown transaction. Ignoring.")
@@ -681,7 +673,7 @@ func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
 	logp.Debug("mysql", "%s", trans.ResponseRaw)
 }
 
-func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
+func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string) {
 
 	length, err := readLength(data, 0)
 	if err != nil {
@@ -701,9 +693,9 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 		return []string{}, [][]string{}
 	}
 
-	if uint8(data[4]) == 0x00 {
+	if data[4] == 0x00 {
 		// OK response
-	} else if uint8(data[4]) == 0xff {
+	} else if data[4] == 0xff {
 		// Error response
 	} else {
 		offset := 5
@@ -723,7 +715,7 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 				return []string{}, [][]string{}
 			}
 
-			if uint8(data[offset+4]) == 0xfe {
+			if data[offset+4] == 0xfe {
 				// EOF
 				offset += length + 4
 				break
@@ -779,7 +771,7 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 				break
 			}
 
-			if uint8(data[offset+4]) == 0xfe {
+			if data[offset+4] == 0xfe {
 				// EOF
 				offset += length + 4
 				break
@@ -795,7 +787,7 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 			for off < start+length {
 				var text []byte
 
-				if uint8(data[off]) == 0xfb {
+				if data[off] == 0xfb {
 					text = []byte("NULL")
 					off++
 				} else {
@@ -831,7 +823,7 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 	return fields, rows
 }
 
-func (mysql *Mysql) publishTransaction(t *MysqlTransaction) {
+func (mysql *mysqlPlugin) publishTransaction(t *MysqlTransaction) {
 
 	if mysql.results == nil {
 		return
@@ -888,7 +880,7 @@ func readLinteger(data []byte, offset int) (uint64, int, bool, error) {
 	if len(data) < offset+1 {
 		return 0, 0, false, nil
 	}
-	switch uint8(data[offset]) {
+	switch data[offset] {
 	case 0xfe:
 		if len(data[offset+1:]) < 8 {
 			return 0, 0, false, nil

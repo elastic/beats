@@ -17,8 +17,8 @@ import (
 	"time"
 )
 
-func MysqlModForTests() *Mysql {
-	var mysql Mysql
+func MysqlModForTests() *mysqlPlugin {
+	var mysql mysqlPlugin
 	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
 	config := defaultConfig
 	mysql.init(results, &config)
@@ -335,7 +335,7 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 
 	var countHandleMysql = 0
 
-	mysql.handleMysql = func(mysql *Mysql, m *MysqlMessage, tcp *common.TCPTuple,
+	mysql.handleMysql = func(mysql *mysqlPlugin, m *MysqlMessage, tcp *common.TCPTuple,
 		dir uint8, raw_msg []byte) {
 
 		countHandleMysql++
@@ -378,7 +378,7 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 
 	var countHandleMysql = 0
 
-	mysql.handleMysql = func(mysql *Mysql, m *MysqlMessage, tcptuple *common.TCPTuple,
+	mysql.handleMysql = func(mysql *mysqlPlugin, m *MysqlMessage, tcptuple *common.TCPTuple,
 		dir uint8, raw_msg []byte) {
 
 		countHandleMysql++
@@ -422,7 +422,7 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 
 	var countHandleMysql = 0
 
-	mysql.handleMysql = func(mysql *Mysql, m *MysqlMessage, tcptuple *common.TCPTuple,
+	mysql.handleMysql = func(mysql *mysqlPlugin, m *MysqlMessage, tcptuple *common.TCPTuple,
 		dir uint8, raw_msg []byte) {
 
 		countHandleMysql++
@@ -469,7 +469,7 @@ func testTCPTuple() *common.TCPTuple {
 }
 
 // Helper function to read from the Publisher Queue
-func expectTransaction(t *testing.T, mysql *Mysql) common.MapStr {
+func expectTransaction(t *testing.T, mysql *mysqlPlugin) common.MapStr {
 	client := mysql.results.(*publish.ChanTransactions)
 	select {
 	case trans := <-client.Channel:
