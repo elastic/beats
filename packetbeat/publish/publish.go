@@ -23,7 +23,7 @@ type PacketbeatPublisher struct {
 	pub    publisher.Publisher
 	client publisher.Client
 
-	topo           TopologyProvider
+	topo           topologyProvider
 	geoLite        *libgeo.GeoIP
 	ignoreOutgoing bool
 
@@ -41,7 +41,7 @@ type ChanTransactions struct {
 // XXX: currently implemented by libbeat publisher. This functionality is only
 // required by packetbeat. Source for TopologyProvider should become local to
 // packetbeat.
-type TopologyProvider interface {
+type topologyProvider interface {
 	IsPublisherIP(ip string) bool
 	GetServerName(ip string) string
 	GeoLite() *libgeo.GeoIP
@@ -59,7 +59,7 @@ func NewPublisher(
 	hwm, bulkHWM int,
 	ignoreOutgoing bool,
 ) (*PacketbeatPublisher, error) {
-	topo, ok := pub.(TopologyProvider)
+	topo, ok := pub.(topologyProvider)
 	if !ok {
 		return nil, errors.New("Requires topology provider")
 	}

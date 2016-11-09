@@ -9,13 +9,13 @@ import (
 	"github.com/tsg/gopacket/pfring"
 )
 
-type PfringHandle struct {
+type pfringHandle struct {
 	Ring *pfring.Ring
 }
 
-func NewPfringHandle(device string, snaplen int, promisc bool) (*PfringHandle, error) {
+func newPfringHandle(device string, snaplen int, promisc bool) (*pfringHandle, error) {
 
-	var h PfringHandle
+	var h pfringHandle
 	var err error
 
 	if device == "any" {
@@ -33,18 +33,18 @@ func NewPfringHandle(device string, snaplen int, promisc bool) (*PfringHandle, e
 	return &h, err
 }
 
-func (h *PfringHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
+func (h *pfringHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
 	return h.Ring.ReadPacketData()
 }
 
-func (h *PfringHandle) SetBPFFilter(expr string) (_ error) {
+func (h *pfringHandle) SetBPFFilter(expr string) (_ error) {
 	return h.Ring.SetBPFFilter(expr)
 }
 
-func (h *PfringHandle) Enable() (_ error) {
+func (h *pfringHandle) Enable() (_ error) {
 	return h.Ring.Enable()
 }
 
-func (h *PfringHandle) Close() {
+func (h *pfringHandle) Close() {
 	h.Ring.Close()
 }
