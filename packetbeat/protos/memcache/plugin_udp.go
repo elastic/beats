@@ -34,7 +34,7 @@ type mcUDPHeader struct {
 type udpConnection struct {
 	tuple        common.IPPortTuple
 	transactions map[uint16]*udpTransaction
-	memcache     *Memcache
+	memcache     *memcache
 }
 
 type udpTransaction struct {
@@ -66,7 +66,7 @@ type udpMessage struct {
 	datagrams    [][]byte
 }
 
-func (mc *Memcache) ParseUDP(pkt *protos.Packet) {
+func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	defer logp.Recover("ParseMemcache(UDP) exception")
 
 	buffer := streambuf.NewFixed(pkt.Payload)
@@ -135,7 +135,7 @@ func (mc *Memcache) ParseUDP(pkt *protos.Packet) {
 	}
 }
 
-func (mc *Memcache) getUDPConnection(
+func (mc *memcache) getUDPConnection(
 	tuple *common.IPPortTuple,
 ) (*udpConnection, applayer.NetDirection) {
 	connection := mc.udpConnections[tuple.Hashable()]
@@ -152,7 +152,7 @@ func (mc *Memcache) getUDPConnection(
 	return connection, applayer.NetOriginalDirection
 }
 
-func (mc *Memcache) onUDPMessage(
+func (mc *memcache) onUDPMessage(
 	trans *udpTransaction,
 	tuple *common.IPPortTuple,
 	dir applayer.NetDirection,
@@ -175,7 +175,7 @@ func (mc *Memcache) onUDPMessage(
 		msg.isComplete = true
 		trans.request = msg
 		waitResponse := msg.noreply ||
-			(!msg.isBinary && msg.command.code != MemcacheCmdQuit) ||
+			(!msg.isBinary && msg.command.code != memcacheCmdQuit) ||
 			(msg.isBinary && msg.opcode != opcodeQuitQ)
 		done = !waitResponse
 	} else {
@@ -191,14 +191,14 @@ func (mc *Memcache) onUDPMessage(
 	return done, err
 }
 
-func (mc *Memcache) onUDPTrans(udp *udpTransaction) error {
+func (mc *memcache) onUDPTrans(udp *udpTransaction) error {
 
 	debug("received memcache(udp) transaction")
 	trans := newTransaction(udp.request, udp.response)
 	return mc.finishTransaction(trans)
 }
 
-func newUDPConnection(mc *Memcache, tuple *common.IPPortTuple) *udpConnection {
+func newUDPConnection(mc *memcache, tuple *common.IPPortTuple) *udpConnection {
 	c := &udpConnection{
 		tuple:        *tuple,
 		memcache:     mc,
@@ -335,7 +335,7 @@ func parseUDP(
 	parser := newParser(config)
 	msg, err := parser.parse(buf, ts)
 	if err != nil && msg == nil {
-		err = ErrUDPIncompleteMessage
+		err = errUDPIncompleteMessage
 	}
 	return msg, err
 }

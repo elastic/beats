@@ -28,14 +28,14 @@ type binHeader struct {
 }
 
 type binValueWriter interface {
-	WriteNetUint8(uint8) error
-	WriteNetUint16(uint16) error
-	WriteNetUint32(uint32) error
-	WriteNetUint64(uint64) error
-	WriteNetUint8At(uint8, int) error
-	WriteNetUint16At(uint16, int) error
-	WriteNetUint32At(uint32, int) error
-	WriteNetUint64At(uint64, int) error
+	writeNetUint8(uint8) error
+	writeNetUint16(uint16) error
+	writeNetUint32(uint32) error
+	writeNetUint64(uint64) error
+	writeNetUint8At(uint8, int) error
+	writeNetUint16At(uint16, int) error
+	writeNetUint32At(uint32, int) error
+	writeNetUint64At(uint64, int) error
 }
 
 type extraFn func(binValueWriter) int
@@ -116,30 +116,30 @@ func binParseNoFail(t *testing.T, buf []byte) *message {
 
 func (h *binHeader) write(buf binValueWriter) {
 	if h.request {
-		buf.WriteNetUint8At(MemcacheMagicRequest, 0)
+		buf.writeNetUint8At(memcacheMagicRequest, 0)
 	} else {
-		buf.WriteNetUint8At(MemcacheMagicResponse, 0)
-		buf.WriteNetUint16At(h.status, 6)
+		buf.writeNetUint8At(memcacheMagicResponse, 0)
+		buf.writeNetUint16At(h.status, 6)
 	}
 	total := uint32(h.extrasLen) + uint32(h.keyLen) + h.valueLen
-	buf.WriteNetUint8At(uint8(h.opcode), 1)
-	buf.WriteNetUint16At(h.keyLen, 2)
-	buf.WriteNetUint8At(h.extrasLen, 4)
-	buf.WriteNetUint32At(total, 8)
-	buf.WriteNetUint32At(h.opaque, 12)
-	buf.WriteNetUint64At(h.cas, 16)
+	buf.writeNetUint8At(uint8(h.opcode), 1)
+	buf.writeNetUint16At(h.keyLen, 2)
+	buf.writeNetUint8At(h.extrasLen, 4)
+	buf.writeNetUint32At(total, 8)
+	buf.writeNetUint32At(h.opaque, 12)
+	buf.writeNetUint64At(h.cas, 16)
 }
 
 func extra32Bit(x uint32) extraFn {
 	return func(buf binValueWriter) int {
-		buf.WriteNetUint32(x)
+		buf.writeNetUint32(x)
 		return 4
 	}
 }
 
 func extra64Bit(x uint64) extraFn {
 	return func(buf binValueWriter) int {
-		buf.WriteNetUint64(x)
+		buf.writeNetUint64(x)
 		return 8
 	}
 }
@@ -177,44 +177,44 @@ func extras(es ...extraFn) []extraFn {
 	return es
 }
 
-func (b *offsetBinWriter) WriteNetUint8(u uint8) error {
-	err := b.WriteNetUint8At(u, 0)
+func (b *offsetBinWriter) writeNetUint8(u uint8) error {
+	err := b.writeNetUint8At(u, 0)
 	b.offset++
 	return err
 }
 
-func (b *offsetBinWriter) WriteNetUint16(u uint16) error {
-	err := b.WriteNetUint16At(u, 0)
+func (b *offsetBinWriter) writeNetUint16(u uint16) error {
+	err := b.writeNetUint16At(u, 0)
 	b.offset += 2
 	return err
 }
 
-func (b *offsetBinWriter) WriteNetUint32(u uint32) error {
-	err := b.WriteNetUint32At(u, 0)
+func (b *offsetBinWriter) writeNetUint32(u uint32) error {
+	err := b.writeNetUint32At(u, 0)
 	b.offset += 4
 	return err
 }
 
-func (b *offsetBinWriter) WriteNetUint64(u uint64) error {
-	err := b.WriteNetUint64At(u, 0)
+func (b *offsetBinWriter) writeNetUint64(u uint64) error {
+	err := b.writeNetUint64At(u, 0)
 	b.offset += 8
 	return err
 }
 
-func (b *offsetBinWriter) WriteNetUint8At(u uint8, i int) error {
-	return b.w.WriteNetUint8At(u, i+b.offset)
+func (b *offsetBinWriter) writeNetUint8At(u uint8, i int) error {
+	return b.w.writeNetUint8At(u, i+b.offset)
 }
 
-func (b *offsetBinWriter) WriteNetUint16At(u uint16, i int) error {
-	return b.w.WriteNetUint16At(u, i+b.offset)
+func (b *offsetBinWriter) writeNetUint16At(u uint16, i int) error {
+	return b.w.writeNetUint16At(u, i+b.offset)
 }
 
-func (b *offsetBinWriter) WriteNetUint32At(u uint32, i int) error {
-	return b.w.WriteNetUint32At(u, i+b.offset)
+func (b *offsetBinWriter) writeNetUint32At(u uint32, i int) error {
+	return b.w.writeNetUint32At(u, i+b.offset)
 }
 
-func (b *offsetBinWriter) WriteNetUint64At(u uint64, i int) error {
-	return b.w.WriteNetUint64At(u, i+b.offset)
+func (b *offsetBinWriter) writeNetUint64At(u uint64, i int) error {
+	return b.w.writeNetUint64At(u, i+b.offset)
 }
 
 func genBinMessage(
