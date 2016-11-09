@@ -35,6 +35,8 @@ ES_HOST?="elasticsearch"
 PWD=$(shell pwd)
 BUILD_DIR?=$(shell pwd)/build
 COVERAGE_DIR=${BUILD_DIR}/coverage
+COVERAGE_TOOL=${GOPATH}/bin/gotestcover
+COVERAGE_TOOL_REPO=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 PROCESSES?= 4
 TIMEOUT?= 90
 TEST_ENVIRONMENT?=false
@@ -124,13 +126,13 @@ ci:
 prepare-tests:
 	mkdir -p ${COVERAGE_DIR}
 	# gotestcover is needed to fetch coverage for multiple packages
-	go install github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
+	go get ${COVERAGE_TOOL_REPO}
 
 # Runs the unit tests with coverage
 # Race is not enabled for unit tests because tests run much slower.
 .PHONY: unit-tests
 unit-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
+	$(COVERAGE_TOOL) $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
 
 # Runs the unit tests without coverage reports.
 .PHONY: unit
@@ -140,7 +142,7 @@ unit:
 # Run integration tests. Unit tests are run as part of the integration tests.
 .PHONY: integration-tests
 integration-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov  ${GOPACKAGES}
+	$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov  ${GOPACKAGES}
 
 # Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 .PHONY: integration-tests-environment
