@@ -16,7 +16,7 @@ type afpacketHandle struct {
 func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks int,
 	timeout time.Duration) (*afpacketHandle, error) {
 
-	var h AfpacketHandle
+	h := &afpacketHandle{}
 	var err error
 
 	if device == "any" {
@@ -34,7 +34,7 @@ func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks in
 			afpacket.OptPollTimeout(timeout))
 	}
 
-	return &h, err
+	return h, err
 }
 
 func (h *afpacketHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
