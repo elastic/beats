@@ -59,11 +59,6 @@ type ProcessesWatcher struct {
 	testSignals *chan bool
 }
 
-type procConfig struct {
-	process     string
-	cmdlineGrep string
-}
-
 var ProcWatcher ProcessesWatcher
 
 func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
@@ -107,12 +102,12 @@ func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
 	if proc.readFromProc {
 		for _, procConfig := range config.Monitored {
 
-			grepper := procConfig.cmdlineGrep
+			grepper := procConfig.CmdlineGrep
 			if len(grepper) == 0 {
-				grepper = procConfig.process
+				grepper = procConfig.Process
 			}
 
-			p, err := newProcess(proc, procConfig.process, grepper, time.Tick(proc.refreshPidsFreq))
+			p, err := newProcess(proc, procConfig.Process, grepper, time.Tick(proc.refreshPidsFreq))
 			if err != nil {
 				logp.Err("NewProcess: %s", err)
 			} else {
