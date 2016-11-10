@@ -175,8 +175,8 @@ func Test_BinParseStatResponse(t *testing.T) {
 	msg := binParseNoFail(t, buf.Bytes())
 	assert.NotNil(t, msg)
 	assert.Equal(t, 1, len(msg.stats))
-	assert.Equal(t, "statKey", msg.stats[0].name.String())
-	assert.Equal(t, "1000", msg.stats[0].value.String())
+	assert.Equal(t, "statKey", msg.stats[0].Name.String())
+	assert.Equal(t, "1000", msg.stats[0].Value.String())
 }
 
 func Test_BinParseStatInvalidResponse(t *testing.T) {

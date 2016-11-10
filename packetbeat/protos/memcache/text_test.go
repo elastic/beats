@@ -216,6 +216,6 @@ func Test_TextParseStatusResponse(t *testing.T) {
 	msg := textParseNoFail(t, "STAT abc 5\r\n")
 	assert.NotNil(t, msg)
 	assert.Equal(t, memcacheResStat, msg.command.code)
-	assert.Equal(t, "abc", msg.stats[0].name.String())
-	assert.Equal(t, "5", msg.stats[0].value.String())
+	assert.Equal(t, "abc", msg.stats[0].Name.String())
+	assert.Equal(t, "5", msg.stats[0].Value.String())
 }

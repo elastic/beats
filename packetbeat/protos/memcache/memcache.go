@@ -94,8 +94,8 @@ type memcacheData struct {
 }
 
 type memcacheStat struct {
-	name  memcacheString `json:"name"`
-	value memcacheString `json:"value"`
+	Name  memcacheString `json:"name"`
+	Value memcacheString `json:"value"`
 }
 
 var debug = logp.MakeDebug("memcache")
