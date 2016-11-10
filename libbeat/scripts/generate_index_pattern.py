@@ -13,6 +13,8 @@ import json
 import os
 import errno
 
+unique_fields = []
+
 def fields_to_json(section, path, output):
 
     for field in section["fields"]:
@@ -28,6 +30,13 @@ def fields_to_json(section, path, output):
 
 
 def field_to_json(desc, path, output):
+
+    global unique_fields
+
+    if path in unique_fields:
+        print "ERROR: Field", path, "is duplicated. Please delete it and try again. Fields already are", unique_fields
+    else:
+        unique_fields.append(path)
 
     field = {
         "name": path,
