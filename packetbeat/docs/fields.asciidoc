@@ -822,9 +822,9 @@ type: keyword
 Representing the node ip.
 
 [float]
-=== cassandra.response.event.host
+=== cassandra.response.event.port
 
-type: keyword
+type: long
 
 Representing the node port.
 
@@ -1157,6 +1157,14 @@ The transport protocol used for the transaction. If not specified, then tcp is a
 
 
 [float]
+=== type
+
+required: True
+
+The type of the transaction (for example, HTTP, MySQL, Redis, or RUM) or "flow" in case of flows.
+
+
+[float]
 === port
 
 format: dotted notation.
@@ -1290,6 +1298,14 @@ example: amazon.co.uk.
 The effective top-level domain (eTLD) plus one more label. For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.". The data for determining the eTLD comes from an embedded copy of the data from http://publicsuffix.org.
 
 [float]
+=== dns.answers
+
+type: dict
+
+An array containing a dictionary about each answer section returned by the server.
+
+
+[float]
 === dns.answers_count
 
 type: long
@@ -1368,28 +1384,6 @@ The type of data contained in this resource record.
 example: IN
 
 The class of DNS data contained in this resource record.
-
-[float]
-=== dns.answers
-
-type: dict
-
-An array containing a dictionary about each answer section returned by the server.
-
-
-[float]
-=== dns.answers.ttl
-
-type: long
-
-The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
-
-
-[float]
-=== dns.answers.data
-
-The data describing the resource. The meaning of this data depends on the type and class of the resource record.
-
 
 [float]
 === dns.additionals
@@ -1478,20 +1472,6 @@ These fields contain data about the flow itself.
 
 
 [float]
-=== @timestamp
-
-type: date
-
-example: 2015-01-24 14:06:05.071000
-
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The timestamp of the event, as measured by the Beat. The precision is in milliseconds. The timezone is UTC.
-
-
-[float]
 === start_time
 
 type: date
@@ -1517,14 +1497,6 @@ format: YYYY-MM-DDTHH:MM:SS.milliZ
 required: True
 
 The time, the most recent processed packet for the flow has been seen.
-
-
-[float]
-=== type
-
-required: True
-
-Indicates the event to be a flow event. This field is always set to "flow".
 
 
 [float]
@@ -1767,12 +1739,6 @@ Total number of bytes
 === icmp_id
 
 ICMP id used in ICMP based flow.
-
-
-[float]
-=== transport
-
-The transport protocol used by the flow. If known, one of "udp" or "tcp".
 
 
 [float]
@@ -2642,28 +2608,6 @@ If the call resulted in exceptions, this field contains the exceptions in a huma
 
 These fields contain data about the transaction itself.
 
-
-
-[float]
-=== @timestamp
-
-type: date
-
-example: 2015-01-24 14:06:05.071000
-
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The timestamp of the event, as measured either by the Beat or by a common collector point. The precision is in milliseconds. The timezone is UTC.
-
-
-[float]
-=== type
-
-required: True
-
-The type of the transaction (for example, HTTP, MySQL, Redis, or RUM).
 
 
 [float]

@@ -73,6 +73,11 @@
         tcp is assumed.
       example: udp
 
+    - name: type
+      description: >
+        The type of the transaction (for example, HTTP, MySQL, Redis, or RUM) or "flow" in case of flows.
+      required: true
+
     - name: port
       description: >
         The layer 4 port of the process that served the transaction.
@@ -96,15 +101,6 @@
   description: >
     These fields contain data about the flow itself.
   fields:
-    - name: "@timestamp"
-      type: date
-      required: true
-      format: YYYY-MM-DDTHH:MM:SS.milliZ
-      example: 2015-01-24T14:06:05.071Z
-      description: >
-        The timestamp of the event, as measured by the Beat. The precision is in
-        milliseconds. The timezone is UTC.
-
     - name: "start_time"
       type: date
       required: true
@@ -120,11 +116,6 @@
       example: 2015-01-24T14:06:05.071Z
       description: >
         The time, the most recent processed packet for the flow has been seen.
-
-    - name: type
-      description: >
-        Indicates the event to be a flow event. This field is always set to "flow".
-      required: true
 
     - name: final
       description: >
@@ -301,10 +292,6 @@
       description: >
         ICMP id used in ICMP based flow.
 
-    - name: transport
-      description: >
-        The transport protocol used by the flow. If known, one of "udp" or "tcp".
-
     - name: connection_id
       description: >
         optional TCP connection id
@@ -314,20 +301,6 @@
   description: >
     These fields contain data about the transaction itself.
   fields:
-    - name: "@timestamp"
-      type: date
-      required: true
-      format: YYYY-MM-DDTHH:MM:SS.milliZ
-      example: 2015-01-24T14:06:05.071Z
-      description: >
-        The timestamp of the event, as measured either by the Beat or
-        by a common collector point. The precision is in milliseconds.
-        The timezone is UTC.
-
-    - name: type
-      description: >
-        The type of the transaction (for example, HTTP, MySQL, Redis, or RUM).
-      required: true
 
     - name: direction
       required: true
