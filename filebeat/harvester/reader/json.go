@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/jsontransform"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -69,7 +70,7 @@ func unmarshal(text []byte, fields *map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	common.TransformNumbersDict(*fields)
+	jsontransform.TransformNumbers(*fields)
 	return nil
 }
 
