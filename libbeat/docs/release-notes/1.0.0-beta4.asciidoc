@@ -1,0 +1,99 @@
+[[release-notes-1.0.0-beta4]]
+=== Beats version 1.0.0-beta4
+https://github.com/elastic/beats/compare/1.0.0-beta3...1.0.0-beta4[Check
+1.0.0-beta4 diff]
+
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Update tls config options naming from dash to underline #162
+- Feature/output modes: Introduction of PublishEvent(s) to be used by beats #118 #115
+
+*Packetbeat*
+
+- Renamed http module config file option 'strip_authorization' to 'redact_authorization'
+- Save_topology is set to false by default
+- Rename elasticsearch index to [packetbeat-]YYYY.MM.DD
+
+*Topbeat*
+
+- Percentage fields (e.g user_p) are exported as a float between 0 and 1 #34
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Determine Elasticsearch index for an event based on UTC time #81
+- Fixing ES output's defaultDeadTimeout so that it is 60 seconds #103
+- ES outputer: fix timestamp conversion #91
+- Fix TLS insecure config option #239
+- ES outputer: check bulk API per item status code for retransmit on failure.
+
+*Packetbeat*
+
+- Support for lower-case header names when redacting http authorization headers
+- Redact proxy-authorization if redact-authorization is set
+- Fix some multithreading issues #203
+- Fix negative response time #216
+- Fix memcache TCP connection being nil after dropping stream data. #299
+- Add missing DNS protocol configuration to documentation #269
+
+*Topbeat*
+
+- Don't divide the reported memory by an extra 1024 #60
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Add logstash output plugin #151
+- Integration tests for Beat -> Logstash -> Elasticsearch added #195 #188 #168 #137 #128 #112
+- Large updates and improvements to the documentation
+- Add direction field to publisher output to indicate inbound/outbound transactions #150
+- Add tls configuration support to elasticsearch and logstash outputers #139
+- All external dependencies were updated to the latest version. Update to Golang 1.5.1 #162
+- Guarantee ES index is based in UTC time zone #164
+- Cache: optional per element timeout #144
+- Make it possible to set hosts in different ways. #135
+- Expose more TLS config options #124
+- Use the Beat name in the default configuration file path #99
+
+*Packetbeat*
+
+- add [.editorconfig file](http://editorconfig.org/)
+- add (experimental/unsupported?) saltstack files
+- Sample config file cleanup
+- Moved common documentation to [libbeat repository](https://github.com/elastic/libbeat)
+- Update build to go 1.5.1
+- Adding device descriptions to the -device output.
+- Generate coverage for system tests
+- Move go-daemon dependency to beats-packer
+- Rename integration tests to system tests
+- Made the `-devices` option more user friendly in case `sudo` is not used.
+  Issue #296.
+- Publish expired DNS transactions #301
+- Update protocol guide to libbeat changes
+- Add protocol registration to new protocol guide
+- Make transaction timeouts configurable #300
+- Add direction field to the exported fields #317
+
+*Topbeat*
+
+- Document fields in a standardized format (etc/fields.yml) #34
+- Updated to use new libbeat Publisher #37 #41
+- Update to go 1.5.1 #43
+- Updated configuration files with comments for all options #65
+- Documentation improvements
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+- Redis output was deprecated #169 #145
+- Host and port configuration options are deprecated. They are replaced by the hosts
+ configuration option. #141

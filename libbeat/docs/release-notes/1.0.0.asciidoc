@@ -1,0 +1,25 @@
+[[release-notes-1.0.0]]
+=== Beats version 1.0.0
+https://github.com/elastic/beats/compare/1.0.0-rc2...1.0.0[Check 1.0.0 diff]
+
+==== Breaking changes
+
+*Topbeat*
+
+- Change proc type to process #138
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix random panic on shutdown by calling shutdown handler only once. elastic/filebeat#204
+- Fix credentials are not send when pinging an elasticsearch host. elastic/fileabeat#287
+
+*Filebeat*
+
+- Fix problem that harvesters stopped reading after some time and filebeat stopped processing events #257
+- Fix line truncating by internal buffers being reused by accident #258
+- Set default ignore_older to 24 hours #282
+
+

@@ -1,0 +1,97 @@
+[[release-notes-1.0.0-rc1]]
+=== Beats version 1.0.0-rc1
+https://github.com/elastic/beats/compare/1.0.0-beta4...1.0.0-rc1[Check
+1.0.0-rc1 diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Rename timestamp field with @timestamp. #237
+
+*Packetbeat*
+
+- Rename timestamp field with @timestamp. #343
+
+*Topbeat*
+
+- Rename timestamp field with @timestamp for a better integration with
+Logstash. #80
+
+*Filebeat*
+
+- Rename the timestamp field with @timestamp #168
+- Rename tail_on_rotate prospector config to tail_files
+- Removal of line field in event. Line number was not correct and does not add value. #217
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Use stderr for console log output. #219
+- Handle empty event array in publisher. #207
+- Respect '*' debug selector in IsDebug. #226 (elastic/packetbeat#339)
+- Limit number of workers for Elasticsearch output. elastic/packetbeat#226
+- On Windows, remove service related error message when running in the console. #242
+- Fix waitRetry no configured in single output mode configuration. elastic/filebeat#144
+- Use http as the default scheme in the elasticsearch hosts #253
+- Respect max bulk size if bulk publisher (collector) is disabled or sync flag is set.
+- Always evaluate status code from Elasticsearch responses when indexing events. #192
+- Use bulk_max_size configuration option instead of bulk_size. #256
+- Fix max_retries=0 (no retries) configuration option. #266
+- Filename used for file based logging now defaults to beat name. #267
+
+*Packetbeat*
+
+- Close file descriptors used to monitor processes. #337
+- Remove old RPM spec file. It moved to elastic/beats-packer. #334
+
+*Topbeat*
+
+- Don't wait for one period until shutdown #75
+
+*Filebeat*
+
+- Omit 'fields' from event JSON when null. #126
+- Make offset and line value of type long in elasticsearch template to prevent overflow. #140
+- Fix locking files for writing behaviour. #156
+- Introduce 'document_type' config option per prospector to define document type
+  for event stored in elasticsearch. #133
+- Add 'input_type' field to published events reporting the prospector type being used. #133
+- Fix high CPU usage when not connected to Elasticsearch or Logstash. #144
+- Fix issue that files were not crawled anymore when encoding was set to something other then plain. #182
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Add Console output plugin. #218
+- Add timestamp to log messages #245
+- Send @metadata.beat to Logstash instead of @metadata.index to prevent
+  possible name clashes and give user full control over index name used for
+  Elasticsearch
+- Add logging messages for bulk publishing in case of error #229
+- Add option to configure number of parallel workers publishing to Elasticsearch
+  or Logstash.
+- Set default bulk size for Elasticsearch output to 50.
+- Set default http timeout for Elasticsearch to 90s.
+- Improve publish retry if sync flag is set by retrying only up to max bulk size
+  events instead of all events to be published.
+
+*Filebeat*
+
+- Introduction of backoff, backoff_factor, max_backoff, partial_line_waiting, force_close_windows_files
+  config variables to make crawling more configurable.
+- All Godeps dependencies were updated to master on 2015-10-21 [#122]
+- Set default value for ignore_older config to 10 minutes. #164
+- Added the fields_under_root setting to optionally store the custom fields top
+level in the output dictionary. #188
+- Add more encodings by using x/text/encodings/htmlindex package to select
+  encoding by name.
+
+
+
+
+
