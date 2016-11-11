@@ -184,6 +184,8 @@ Options that control how Filebeat deals with log messages that span multiple lin
 
 The following example shows how to configure Filebeat to handle a multiline message where the first line of the message begins with a bracket (`[`).
 
+NOTE: `pattern` is not compatible with format used in `logstash`. See <<regexp-support>> for details or you will face with errors like: `ERR Stop Harvesting. Unexpected encoding line reader error: error parsing regexp: invalid escape sequence: '\d'`
+
 [source,yaml]
 -------------------------------------------------------------------------------------
 multiline:
