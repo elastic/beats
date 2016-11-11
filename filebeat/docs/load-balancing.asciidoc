@@ -24,7 +24,7 @@ Filebeat can send events in a few different modes:
 By default, when you configure Filebeat to send events to multiple hosts
 (`loadbalance: true`), Filebeat will send the events to one host after
 another. This mode requires the least memory and CPU usage. This is not
-true load balancing in the sense that Filebeat does account for the load
+true load balancing in the sense that Filebeat doesn't account for the load
 being processed by each host.
 +
 The load balancer also supports multiple workers per host. The default is
@@ -51,8 +51,12 @@ In this example, there are 4 workers participating in load balancing.
 * **Send events to `N` hosts in lock-step:**
 +
 You can configure Filebeat to send events to `N` hosts in lock-step by setting
-`spool_size = N * bulk_max_size`. This mode requires more memory and CPU usage
-than the previous mode.
+`spool_size = N * bulk_max_size`. In lock-step mode, the batch collected by the
+spooler is split up into smaller batches of size `bulk_max_size`. These smaller
+batches are load balanced between available connections. Filebeat waits for all
+sub-batches to be published before it retrieves another batch from the spooler. 
++
+This mode requires more memory and CPU usage than the previous mode.
 +
 Example:
 +
