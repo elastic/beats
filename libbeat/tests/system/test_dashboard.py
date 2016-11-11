@@ -65,7 +65,7 @@ class Test(BaseTest):
             else:
                 command = 'python ../../../dev-tools/export_dashboards.py ' \
                           '--url http://' + self.get_elasticsearch_host() + ' --dir ' + path + \
-                          ' --regex' + beat + '-*'
+                          ' --regex ' + beat + '-*'
 
             print(command)
 
