@@ -122,7 +122,7 @@ if __name__ == "__main__":
         fields = f.read()
 
         # Prepend beat fields from libbeat
-        with open(args.libbeat + "/_meta/fields.yml") as f:
+        with open(args.libbeat + "/_meta/fields.generated.yml") as f:
             fields = f.read() + fields
 
         # with open(target, 'w') as output:

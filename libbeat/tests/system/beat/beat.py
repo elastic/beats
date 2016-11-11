@@ -412,9 +412,10 @@ class TestCase(unittest.TestCase):
         # TODO: Make fields_doc path more generic to work with beat-generator
         with open(fields_doc, "r") as f:
             # TODO: Make this path more generic to work with beat-generator.
-            with open("../../../libbeat/_meta/fields.yml") as f2:
+            with open("../../../libbeat/_meta/fields.common.yml") as f2:
                 content = f2.read()
 
+            #content = "fields:\n"
             content += f.read()
             doc = yaml.load(content)
 

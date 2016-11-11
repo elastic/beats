@@ -123,7 +123,7 @@ if __name__ == "__main__":
         fields = f.read()
 
     # Prepends beat fields from libbeat
-    with open(es_beats + "/libbeat/_meta/fields.yml") as f:
+    with open(es_beats + "/libbeat/_meta/fields.generated.yml") as f:
         fields = f.read() + fields
 
     output = open(beat_path + "/docs/fields.asciidoc", 'w')

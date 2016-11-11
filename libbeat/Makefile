@@ -8,8 +8,8 @@ include scripts/Makefile
 # Collects all fields from processors
 .PHONY: fields
 fields:
-	cat _meta/fields_base.yml > _meta/fields.yml
-	cat processors/*/_meta/fields.yml >> _meta/fields.yml
+	cat _meta/fields.common.yml > _meta/fields.generated.yml
+	cat processors/*/_meta/fields.yml >> _meta/fields.generated.yml
 
 # Collects all dependencies and then calls update
 .PHONY: collect
