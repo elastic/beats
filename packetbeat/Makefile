@@ -32,8 +32,8 @@ collect: fields
 
 .PHONY: fields
 fields:
-	cat etc/fields_base.yml > etc/fields.yml
-	cat protos/*/_meta/fields.yml >> etc/fields.yml
+	cat _meta/fields_base.yml > _meta/fields.yml
+	cat protos/*/_meta/fields.yml >> _meta/fields.yml
 
 .PHONY: benchmark
 benchmark:

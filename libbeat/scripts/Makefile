@@ -105,7 +105,7 @@ simplify:
 # Cleans up directory and source code with gofmt
 .PHONY: clean
 clean:
-	rm -rf build ${BEATNAME} ${BEATNAME}.test ${BEATNAME}.exe ${BEATNAME}.test.exe etc/fields.generated.yml
+	rm -rf build ${BEATNAME} ${BEATNAME}.test ${BEATNAME}.exe ${BEATNAME}.test.exe _meta/fields.generated.yml
 
 # Shortcut for continuous integration
 # This should always run before merging.
@@ -232,14 +232,14 @@ update: python-env collect
 	# Update config
 	echo "Update config file"
 	-rm -f ${BEATNAME}.yml
-	cat etc/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
+	cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
 	-rm -f ${BEATNAME}.full.yml
-	cat etc/beat.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml
+	cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml
 
 	# Check if also a full config exist (optional)
-	if [ -a etc/beat.full.yml ] ; \
+	if [ -a _meta/beat.full.yml ] ; \
     then \
-		cat etc/beat.full.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml ; \
+		cat _meta/beat.full.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml ; \
 	fi;
 
 	# Update docs
@@ -254,8 +254,8 @@ update: python-env collect
 
 	# Generate index-pattern
 	echo "Generate index pattern"
-	-rm -f $(PWD)/etc/kibana/index-pattern/${BEATNAME}.json
-	mkdir -p $(PWD)/etc/kibana/index-pattern
+	-rm -f $(PWD)/_meta/kibana/index-pattern/${BEATNAME}.json
+	mkdir -p $(PWD)/_meta/kibana/index-pattern
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index '${BEATNAME}-*' --libbeat ${ES_BEATS}/libbeat --beat $(PWD)
 
 
@@ -276,12 +276,12 @@ ES_URL?=http://localhost:9200
 
 .PHONY: export-dashboards
 export-dashboards: python-env update
-	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --regex ${BEATNAME}-*
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/_meta/kibana --regex ${BEATNAME}-*
 
 .PHONY: import-dashboards
 import-dashboards: update
 	$(MAKE) -C ${ES_BEATS}/libbeat/dashboards import_dasboards
-	${ES_BEATS}/libbeat/dashboards/import_dashboards -es ${ES_URL} -dir ${PWD}/etc/kibana
+	${ES_BEATS}/libbeat/dashboards/import_dashboards -es ${ES_URL} -dir ${PWD}/_meta/kibana
 
 ### CONTAINER ENVIRONMENT ####
 
@@ -403,6 +403,6 @@ package: package-setup
 
 package-dashboards: package-setup
 	mkdir -p ${BUILD_DIR}
-	cp -r etc/kibana ${BUILD_DIR}/dashboards
+	cp -r _meta/kibana ${BUILD_DIR}/dashboards
 	# build the dashboards package
 	BEATNAME=${BEATNAME} BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C ${ES_BEATS}/dev-tools/packer package-dashboards ${shell pwd}/build/upload/build_id.txt
