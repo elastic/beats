@@ -1,4 +1,4 @@
-:beats-dir: ../../../beats
+:beats-dir: ../..
 
 [[release-notes]]
 == Release notes
