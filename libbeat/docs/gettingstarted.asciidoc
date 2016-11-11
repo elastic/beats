@@ -378,7 +378,8 @@ https://www.elastic.co/downloads/kibana[Kibana downloads page].
 
 ==== Launching the Kibana Web Interface
 
-To launch the Kibana web interface, point your browser to port 5601. For example, `http://127.0.0.1:5601`.
+To launch the Kibana web interface, point your browser to port 5601. For example,
+http://127.0.0.1:5601[http://127.0.0.1:5601].
 
 You can learn more about Kibana in the
 http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
