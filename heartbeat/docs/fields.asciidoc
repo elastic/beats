@@ -128,20 +128,6 @@ None
 
 
 [float]
-=== @timestamp
-
-type: date
-
-example: 2015-01-24 14:06:05.071000
-
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The timestamp of the event, as measured either by the Beat or by a common collector point. The precision is in milliseconds. The timezone is UTC.
-
-
-[float]
 === type
 
 type: keyword

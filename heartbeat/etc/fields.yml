@@ -2,16 +2,6 @@
   title: "Common monitoring fields"
   description:
   fields:
-    - name: "@timestamp"
-      type: date
-      required: true
-      format: YYYY-MM-DDTHH:MM:SS.milliZ
-      example: 2015-01-24T14:06:05.071Z
-      description: >
-        The timestamp of the event, as measured either by the Beat or
-        by a common collector point. The precision is in milliseconds.
-        The timezone is UTC.
-
     - name: type
       type: keyword
       required: true
