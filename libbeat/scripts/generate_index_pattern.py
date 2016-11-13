@@ -12,6 +12,7 @@ import re
 import json
 import os
 import errno
+import sys
 
 unique_fields = []
 
@@ -35,6 +36,7 @@ def field_to_json(desc, path, output):
 
     if path in unique_fields:
         print "ERROR: Field", path, "is duplicated. Please delete it and try again. Fields already are", unique_fields
+        sys.exit(1)
     else:
         unique_fields.append(path)
 
