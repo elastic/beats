@@ -183,12 +183,12 @@ func TestDecodePacketData_ipv6Udp(t *testing.T) {
 }
 
 // Creates a new TestDecoder that handles ethernet packets.
-func newTestDecoder(t *testing.T) (*DecoderStruct, *TestTCPProcessor, *TestUDPProcessor) {
+func newTestDecoder(t *testing.T) (*Decoder, *TestTCPProcessor, *TestUDPProcessor) {
 	icmp4Layer := &TestIcmp4Processor{}
 	icmp6Layer := &TestIcmp6Processor{}
 	tcpLayer := &TestTCPProcessor{}
 	udpLayer := &TestUDPProcessor{}
-	d, err := NewDecoder(nil, layers.LinkTypeEthernet, icmp4Layer, icmp6Layer, tcpLayer, udpLayer)
+	d, err := New(nil, layers.LinkTypeEthernet, icmp4Layer, icmp6Layer, tcpLayer, udpLayer)
 	if err != nil {
 		t.Fatalf("Error creating decoder %v", err)
 	}

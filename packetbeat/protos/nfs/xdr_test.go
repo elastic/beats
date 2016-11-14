@@ -17,7 +17,7 @@ var testMsg = []byte{
 }
 
 func TestXdrDecoding(t *testing.T) {
-	xdr := Xdr{data: testMsg, offset: 0}
+	xdr := makeXDR(testMsg)
 
 	assert.Equal(t, uint32(0x800000e0), uint32(xdr.getUInt()))
 	assert.Equal(t, uint32(0xb54921ab), uint32(xdr.getUInt()))
