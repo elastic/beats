@@ -74,8 +74,8 @@ test_script:
   - go test -race -c -cover -covermode=atomic -coverpkg ./...
   - ps: |
       if ($env:BEAT -eq "metricbeat") {
-        cp .\etc\fields.common.yml .\etc\fields.generated.yml
-        python .\scripts\fields_collector.py | out-file -append -encoding UTF8 -filepath .\etc\fields.generated.yml
+        cp .\_meta\fields.common.yml .\_meta\fields.generated.yml
+        python .\scripts\fields_collector.py | out-file -append -encoding UTF8 -filepath .\_meta\fields.generated.yml
       }
   - ps: cd tests/system
   - nosetests --with-timer
