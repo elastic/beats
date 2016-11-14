@@ -7,18 +7,18 @@ package memcache
 type commandTypeCode uint8
 
 const (
-	MemcacheUnknownType commandTypeCode = iota
-	MemcacheLoadMsg
-	MemcacheStoreMsg
-	MemcacheDeleteMsg
-	MemcacheCounterMsg
-	MemcacheInfoMsg
-	MemcacheSlabCtrlMsg
-	MemcacheLruCrawlerMsg
-	MemcacheStatsMsg
-	MemcacheSuccessResp
-	MemcacheFailResp
-	MemcacheAuthMsg
+	memcacheUnknownType commandTypeCode = iota
+	memcacheLoadMsg
+	memcacheStoreMsg
+	memcacheDeleteMsg
+	memcacheCounterMsg
+	memcacheInfoMsg
+	memcacheSlabCtrlMsg
+	memcacheLruCrawlerMsg
+	memcacheStatsMsg
+	memcacheSuccessResp
+	memcacheFailResp
+	memcacheAuthMsg
 )
 
 var commandTypeCodeStrings = []string{
@@ -40,73 +40,73 @@ var commandTypeCodeStrings = []string{
 type commandCode uint8
 
 const (
-	MemcacheCmdUNKNOWN commandCode = iota
-	MemcacheCmdNoOp
-	MemcacheCmdSet
-	MemcacheCmdAdd
-	MemcacheCmdReplace
-	MemcacheCmdAppend
-	MemcacheCmdPrepend
-	MemcacheCmdCas
+	memcacheCmdUNKNOWN commandCode = iota
+	memcacheCmdNoOp
+	memcacheCmdSet
+	memcacheCmdAdd
+	memcacheCmdReplace
+	memcacheCmdAppend
+	memcacheCmdPrepend
+	memcacheCmdCas
 
-	MemcacheCmdGet
-	MemcacheCmdGets
+	memcacheCmdGet
+	memcacheCmdGets
 
-	MemcacheCmdIncr
-	MemcacheCmdDecr
-	MemcacheResCounterOp
+	memcacheCmdIncr
+	memcacheCmdDecr
+	memcacheResCounterOp
 
-	MemcacheCmdTouch
+	memcacheCmdTouch
 
-	MemcacheCmdDelete
+	memcacheCmdDelete
 
-	MemcacheCmdSlabs
-	MemcacheCmdSlabsReassign
-	MemcacheCmdSlabsAutomove
+	memcacheCmdSlabs
+	memcacheCmdSlabsReassign
+	memcacheCmdSlabsAutomove
 
-	MemcacheCmdLru
-	MemcacheCmdLruEnable
-	MemcacheCmdLruDisable
-	MemcacheCmdLruSleep
-	MemcacheCmdLruToCrawl
-	MemcacheCmdLruCrawl
+	memcacheCmdLru
+	memcacheCmdLruEnable
+	memcacheCmdLruDisable
+	memcacheCmdLruSleep
+	memcacheCmdLruToCrawl
+	memcacheCmdLruCrawl
 
-	MemcacheCmdStats
-	MemcacheResStat
+	memcacheCmdStats
+	memcacheResStat
 
-	MemcacheCmdFlushAll
-	MemcacheCmdVerbosity
-	MemcacheCmdQuit
-	MemcacheCmdVersion
+	memcacheCmdFlushAll
+	memcacheCmdVerbosity
+	memcacheCmdQuit
+	memcacheCmdVersion
 
-	MemcacheCmdSaslList
-	MemcacheCmdSaslAuth
-	MemcacheCmdSaslStep
+	memcacheCmdSaslList
+	memcacheCmdSaslAuth
+	memcacheCmdSaslStep
 
-	MemcacheResOK
-	MemcacheResValue
-	MemcacheResEnd
+	memcacheResOK
+	memcacheResValue
+	memcacheResEnd
 
-	MemcacheResStored
-	MemcacheResNotStored
-	MemcacheResExists
-	MemcacheResNotFound
+	memcacheResStored
+	memcacheResNotStored
+	memcacheResExists
+	memcacheResNotFound
 
-	MemcacheResTouched
+	memcacheResTouched
 
-	MemcacheResDeleted
+	memcacheResDeleted
 
-	MemcacheErrError
-	MemcacheErrClientError
-	MemcacheErrServerError
-	MemcacheErrBusy
-	MemcacheErrBadClass
-	MemcacheErrNoSpare
-	MemcacheErrNotFull
-	MemcacheErrUnsafe
-	MemcacheErrSame
+	memcacheErrError
+	memcacheErrClientError
+	memcacheErrServerError
+	memcacheErrBusy
+	memcacheErrBadClass
+	memcacheErrNoSpare
+	memcacheErrNotFull
+	memcacheErrUnsafe
+	memcacheErrSame
 
-	MemcacheResVersion
+	memcacheResVersion
 )
 
 var commandCodeStrings = []string{

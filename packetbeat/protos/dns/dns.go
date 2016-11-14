@@ -26,141 +26,13 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
-var (
-	debugf = logp.MakeDebug("dns")
-)
-
-const MaxDNSTupleRawSize = 16 + 16 + 2 + 2 + 4 + 1
-
-// Constants used to associate the DNS QR flag with a meaningful value.
-const (
-	Query    = false
-	Response = true
-)
-
-// Transport protocol.
-type Transport uint8
-
-var (
-	unmatchedRequests  = expvar.NewInt("dns.unmatched_requests")
-	unmatchedResponses = expvar.NewInt("dns.unmatched_responses")
-)
-
-const (
-	TransportTCP = iota
-	TransportUDP
-)
-
-var TransportNames = []string{
-	"tcp",
-	"udp",
-}
-
-func (t Transport) String() string {
-	if int(t) >= len(TransportNames) {
-		return "impossible"
-	}
-	return TransportNames[t]
-}
-
-type HashableDNSTuple [MaxDNSTupleRawSize]byte
-
-// DnsMessage contains a single DNS message.
-type DNSMessage struct {
-	Ts           time.Time          // Time when the message was received.
-	Tuple        common.IPPortTuple // Source and destination addresses of packet.
-	CmdlineTuple *common.CmdlineTuple
-	Data         *mkdns.Msg // Parsed DNS packet data.
-	Length       int        // Length of the DNS message in bytes (without DecodeOffset).
-}
-
-// DnsTuple contains source IP/port, destination IP/port, transport protocol,
-// and DNS ID.
-type DNSTuple struct {
-	IPLength         int
-	SrcIP, DstIP     net.IP
-	SrcPort, DstPort uint16
-	Transport        Transport
-	ID               uint16
-
-	raw    HashableDNSTuple // Src_ip:Src_port:Dst_ip:Dst_port:Transport:Id
-	revRaw HashableDNSTuple // Dst_ip:Dst_port:Src_ip:Src_port:Transport:Id
-}
-
-func DNSTupleFromIPPort(t *common.IPPortTuple, trans Transport, id uint16) DNSTuple {
-	tuple := DNSTuple{
-		IPLength:  t.IPLength,
-		SrcIP:     t.SrcIP,
-		DstIP:     t.DstIP,
-		SrcPort:   t.SrcPort,
-		DstPort:   t.DstPort,
-		Transport: trans,
-		ID:        id,
-	}
-	tuple.ComputeHashebles()
-
-	return tuple
-}
-
-func (t DNSTuple) Reverse() DNSTuple {
-	return DNSTuple{
-		IPLength:  t.IPLength,
-		SrcIP:     t.DstIP,
-		DstIP:     t.SrcIP,
-		SrcPort:   t.DstPort,
-		DstPort:   t.SrcPort,
-		Transport: t.Transport,
-		ID:        t.ID,
-		raw:       t.revRaw,
-		revRaw:    t.raw,
-	}
-}
-
-func (t *DNSTuple) ComputeHashebles() {
-	copy(t.raw[0:16], t.SrcIP)
-	copy(t.raw[16:18], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
-	copy(t.raw[18:34], t.DstIP)
-	copy(t.raw[34:36], []byte{byte(t.DstPort >> 8), byte(t.DstPort)})
-	copy(t.raw[36:38], []byte{byte(t.ID >> 8), byte(t.ID)})
-	t.raw[39] = byte(t.Transport)
-
-	copy(t.revRaw[0:16], t.DstIP)
-	copy(t.revRaw[16:18], []byte{byte(t.DstPort >> 8), byte(t.DstPort)})
-	copy(t.revRaw[18:34], t.SrcIP)
-	copy(t.revRaw[34:36], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
-	copy(t.revRaw[36:38], []byte{byte(t.ID >> 8), byte(t.ID)})
-	t.revRaw[39] = byte(t.Transport)
-}
-
-func (t *DNSTuple) String() string {
-	return fmt.Sprintf("DnsTuple src[%s:%d] dst[%s:%d] transport[%s] id[%d]",
-		t.SrcIP.String(),
-		t.SrcPort,
-		t.DstIP.String(),
-		t.DstPort,
-		t.Transport,
-		t.ID)
-}
-
-// Hashable returns a hashable value that uniquely identifies
-// the DNS tuple.
-func (t *DNSTuple) Hashable() HashableDNSTuple {
-	return t.raw
-}
-
-// Hashable returns a hashable value that uniquely identifies
-// the DNS tuple after swapping the source and destination.
-func (t *DNSTuple) RevHashable() HashableDNSTuple {
-	return t.revRaw
-}
-
-type DNS struct {
+type dnsPlugin struct {
 	// Configuration data.
-	Ports              []int
-	SendRequest        bool
-	SendResponse       bool
-	IncludeAuthorities bool
-	IncludeAdditionals bool
+	ports              []int
+	sendRequest        bool
+	sendResponse       bool
+	includeAuthorities bool
+	includeAdditionals bool
 
 	// Cache of active DNS transactions. The map key is the HashableDnsTuple
 	// associated with the request.
@@ -170,29 +42,157 @@ type DNS struct {
 	results publish.Transactions // Channel where results are pushed.
 }
 
+var (
+	debugf = logp.MakeDebug("dns")
+)
+
+const maxDNSTupleRawSize = 16 + 16 + 2 + 2 + 4 + 1
+
+// Constants used to associate the DNS QR flag with a meaningful value.
+const (
+	query    = false
+	response = true
+)
+
+// Transport protocol.
+type transport uint8
+
+var (
+	unmatchedRequests  = expvar.NewInt("dns.unmatched_requests")
+	unmatchedResponses = expvar.NewInt("dns.unmatched_responses")
+)
+
+const (
+	transportTCP = iota
+	transportUDP
+)
+
+var transportNames = []string{
+	"tcp",
+	"udp",
+}
+
+func (t transport) String() string {
+	if int(t) >= len(transportNames) {
+		return "impossible"
+	}
+	return transportNames[t]
+}
+
+type hashableDNSTuple [maxDNSTupleRawSize]byte
+
+// DnsMessage contains a single DNS message.
+type dnsMessage struct {
+	ts           time.Time          // Time when the message was received.
+	tuple        common.IPPortTuple // Source and destination addresses of packet.
+	cmdlineTuple *common.CmdlineTuple
+	data         *mkdns.Msg // Parsed DNS packet data.
+	length       int        // Length of the DNS message in bytes (without DecodeOffset).
+}
+
+// DnsTuple contains source IP/port, destination IP/port, transport protocol,
+// and DNS ID.
+type dnsTuple struct {
+	ipLength         int
+	srcIP, dstIP     net.IP
+	srcPort, dstPort uint16
+	transport        transport
+	id               uint16
+
+	raw    hashableDNSTuple // Src_ip:Src_port:Dst_ip:Dst_port:Transport:Id
+	revRaw hashableDNSTuple // Dst_ip:Dst_port:Src_ip:Src_port:Transport:Id
+}
+
+func dnsTupleFromIPPort(t *common.IPPortTuple, trans transport, id uint16) dnsTuple {
+	tuple := dnsTuple{
+		ipLength:  t.IPLength,
+		srcIP:     t.SrcIP,
+		dstIP:     t.DstIP,
+		srcPort:   t.SrcPort,
+		dstPort:   t.DstPort,
+		transport: trans,
+		id:        id,
+	}
+	tuple.computeHashebles()
+
+	return tuple
+}
+
+func (t dnsTuple) reverse() dnsTuple {
+	return dnsTuple{
+		ipLength:  t.ipLength,
+		srcIP:     t.dstIP,
+		dstIP:     t.srcIP,
+		srcPort:   t.dstPort,
+		dstPort:   t.srcPort,
+		transport: t.transport,
+		id:        t.id,
+		raw:       t.revRaw,
+		revRaw:    t.raw,
+	}
+}
+
+func (t *dnsTuple) computeHashebles() {
+	copy(t.raw[0:16], t.srcIP)
+	copy(t.raw[16:18], []byte{byte(t.srcPort >> 8), byte(t.srcPort)})
+	copy(t.raw[18:34], t.dstIP)
+	copy(t.raw[34:36], []byte{byte(t.dstPort >> 8), byte(t.dstPort)})
+	copy(t.raw[36:38], []byte{byte(t.id >> 8), byte(t.id)})
+	t.raw[39] = byte(t.transport)
+
+	copy(t.revRaw[0:16], t.dstIP)
+	copy(t.revRaw[16:18], []byte{byte(t.dstPort >> 8), byte(t.dstPort)})
+	copy(t.revRaw[18:34], t.srcIP)
+	copy(t.revRaw[34:36], []byte{byte(t.srcPort >> 8), byte(t.srcPort)})
+	copy(t.revRaw[36:38], []byte{byte(t.id >> 8), byte(t.id)})
+	t.revRaw[39] = byte(t.transport)
+}
+
+func (t *dnsTuple) String() string {
+	return fmt.Sprintf("DnsTuple src[%s:%d] dst[%s:%d] transport[%s] id[%d]",
+		t.srcIP.String(),
+		t.srcPort,
+		t.dstIP.String(),
+		t.dstPort,
+		t.transport,
+		t.id)
+}
+
+// Hashable returns a hashable value that uniquely identifies
+// the DNS tuple.
+func (t *dnsTuple) hashable() hashableDNSTuple {
+	return t.raw
+}
+
+// Hashable returns a hashable value that uniquely identifies
+// the DNS tuple after swapping the source and destination.
+func (t *dnsTuple) revHashable() hashableDNSTuple {
+	return t.revRaw
+}
+
 // getTransaction returns the transaction associated with the given
 // HashableDnsTuple. The lookup key should be the HashableDnsTuple associated
 // with the request (src is the requestor). Nil is returned if the entry
 // does not exist.
-func (dns *DNS) getTransaction(k HashableDNSTuple) *DNSTransaction {
+func (dns *dnsPlugin) getTransaction(k hashableDNSTuple) *dnsTransaction {
 	v := dns.transactions.Get(k)
 	if v != nil {
-		return v.(*DNSTransaction)
+		return v.(*dnsTransaction)
 	}
 	return nil
 }
 
-type DNSTransaction struct {
+type dnsTransaction struct {
 	ts           time.Time // Time when the request was received.
-	tuple        DNSTuple  // Key used to track this transaction in the transactionsMap.
-	ResponseTime int32     // Elapsed time in milliseconds between the request and response.
-	Src          common.Endpoint
-	Dst          common.Endpoint
-	Transport    Transport
-	Notes        []string
+	tuple        dnsTuple  // Key used to track this transaction in the transactionsMap.
+	responseTime int32     // Elapsed time in milliseconds between the request and response.
+	src          common.Endpoint
+	dst          common.Endpoint
+	transport    transport
+	notes        []string
 
-	Request  *DNSMessage
-	Response *DNSMessage
+	request  *dnsMessage
+	response *dnsMessage
 }
 
 func init() {
@@ -204,7 +204,7 @@ func New(
 	results publish.Transactions,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
-	p := &DNS{}
+	p := &dnsPlugin{}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -218,13 +218,13 @@ func New(
 	return p, nil
 }
 
-func (dns *DNS) init(results publish.Transactions, config *dnsConfig) error {
+func (dns *dnsPlugin) init(results publish.Transactions, config *dnsConfig) error {
 	dns.setFromConfig(config)
 	dns.transactions = common.NewCacheWithRemovalListener(
 		dns.transactionTimeout,
 		protos.DefaultTransactionHashSize,
 		func(k common.Key, v common.Value) {
-			trans, ok := v.(*DNSTransaction)
+			trans, ok := v.(*dnsTransaction)
 			if !ok {
 				logp.Err("Expired value is not a *DnsTransaction.")
 				return
@@ -238,30 +238,30 @@ func (dns *DNS) init(results publish.Transactions, config *dnsConfig) error {
 	return nil
 }
 
-func (dns *DNS) setFromConfig(config *dnsConfig) error {
-	dns.Ports = config.Ports
-	dns.SendRequest = config.SendRequest
-	dns.SendResponse = config.SendResponse
-	dns.IncludeAuthorities = config.IncludeAuthorities
-	dns.IncludeAdditionals = config.IncludeAdditionals
+func (dns *dnsPlugin) setFromConfig(config *dnsConfig) error {
+	dns.ports = config.Ports
+	dns.sendRequest = config.SendRequest
+	dns.sendResponse = config.SendResponse
+	dns.includeAuthorities = config.IncludeAuthorities
+	dns.includeAdditionals = config.IncludeAdditionals
 	dns.transactionTimeout = config.TransactionTimeout
 	return nil
 }
 
-func newTransaction(ts time.Time, tuple DNSTuple, cmd common.CmdlineTuple) *DNSTransaction {
-	trans := &DNSTransaction{
-		Transport: tuple.Transport,
+func newTransaction(ts time.Time, tuple dnsTuple, cmd common.CmdlineTuple) *dnsTransaction {
+	trans := &dnsTransaction{
+		transport: tuple.transport,
 		ts:        ts,
 		tuple:     tuple,
 	}
-	trans.Src = common.Endpoint{
-		IP:   tuple.SrcIP.String(),
-		Port: tuple.SrcPort,
+	trans.src = common.Endpoint{
+		IP:   tuple.srcIP.String(),
+		Port: tuple.srcPort,
 		Proc: string(cmd.Src),
 	}
-	trans.Dst = common.Endpoint{
-		IP:   tuple.DstIP.String(),
-		Port: tuple.DstPort,
+	trans.dst = common.Endpoint{
+		IP:   tuple.dstIP.String(),
+		Port: tuple.dstPort,
 		Proc: string(cmd.Dst),
 	}
 	return trans
@@ -269,87 +269,87 @@ func newTransaction(ts time.Time, tuple DNSTuple, cmd common.CmdlineTuple) *DNST
 
 // deleteTransaction deletes an entry from the transaction map and returns
 // the deleted element. If the key does not exist then nil is returned.
-func (dns *DNS) deleteTransaction(k HashableDNSTuple) *DNSTransaction {
+func (dns *dnsPlugin) deleteTransaction(k hashableDNSTuple) *dnsTransaction {
 	v := dns.transactions.Delete(k)
 	if v != nil {
-		return v.(*DNSTransaction)
+		return v.(*dnsTransaction)
 	}
 	return nil
 }
 
-func (dns *DNS) GetPorts() []int {
-	return dns.Ports
+func (dns *dnsPlugin) GetPorts() []int {
+	return dns.ports
 }
 
-func (dns *DNS) ConnectionTimeout() time.Duration {
+func (dns *dnsPlugin) ConnectionTimeout() time.Duration {
 	return dns.transactionTimeout
 }
 
-func (dns *DNS) receivedDNSRequest(tuple *DNSTuple, msg *DNSMessage) {
+func (dns *dnsPlugin) receivedDNSRequest(tuple *dnsTuple, msg *dnsMessage) {
 	debugf("Processing query. %s", tuple.String())
 
-	trans := dns.deleteTransaction(tuple.Hashable())
+	trans := dns.deleteTransaction(tuple.hashable())
 	if trans != nil {
 		// This happens if a client puts multiple requests in flight
 		// with the same ID.
-		trans.Notes = append(trans.Notes, DuplicateQueryMsg.Error())
-		debugf("%s %s", DuplicateQueryMsg.Error(), tuple.String())
+		trans.notes = append(trans.notes, duplicateQueryMsg.Error())
+		debugf("%s %s", duplicateQueryMsg.Error(), tuple.String())
 		dns.publishTransaction(trans)
-		dns.deleteTransaction(trans.tuple.Hashable())
+		dns.deleteTransaction(trans.tuple.hashable())
 	}
 
-	trans = newTransaction(msg.Ts, *tuple, *msg.CmdlineTuple)
+	trans = newTransaction(msg.ts, *tuple, *msg.cmdlineTuple)
 
-	if tuple.Transport == TransportUDP && (msg.Data.IsEdns0() != nil) && msg.Length > MaxDNSPacketSize {
-		trans.Notes = append(trans.Notes, UDPPacketTooLarge.Error())
-		debugf("%s", UDPPacketTooLarge.Error())
+	if tuple.transport == transportUDP && (msg.data.IsEdns0() != nil) && msg.length > maxDNSPacketSize {
+		trans.notes = append(trans.notes, udpPacketTooLarge.Error())
+		debugf("%s", udpPacketTooLarge.Error())
 	}
 
-	dns.transactions.Put(tuple.Hashable(), trans)
-	trans.Request = msg
+	dns.transactions.Put(tuple.hashable(), trans)
+	trans.request = msg
 }
 
-func (dns *DNS) receivedDNSResponse(tuple *DNSTuple, msg *DNSMessage) {
+func (dns *dnsPlugin) receivedDNSResponse(tuple *dnsTuple, msg *dnsMessage) {
 	debugf("Processing response. %s", tuple.String())
 
-	trans := dns.getTransaction(tuple.RevHashable())
+	trans := dns.getTransaction(tuple.revHashable())
 	if trans == nil {
-		trans = newTransaction(msg.Ts, tuple.Reverse(), common.CmdlineTuple{
-			Src: msg.CmdlineTuple.Dst, Dst: msg.CmdlineTuple.Src})
-		trans.Notes = append(trans.Notes, OrphanedResponse.Error())
-		debugf("%s %s", OrphanedResponse.Error(), tuple.String())
+		trans = newTransaction(msg.ts, tuple.reverse(), common.CmdlineTuple{
+			Src: msg.cmdlineTuple.Dst, Dst: msg.cmdlineTuple.Src})
+		trans.notes = append(trans.notes, orphanedResponse.Error())
+		debugf("%s %s", orphanedResponse.Error(), tuple.String())
 		unmatchedResponses.Add(1)
 	}
 
-	trans.Response = msg
+	trans.response = msg
 
-	if tuple.Transport == TransportUDP {
-		respIsEdns := msg.Data.IsEdns0() != nil
-		if !respIsEdns && msg.Length > MaxDNSPacketSize {
-			trans.Notes = append(trans.Notes, UDPPacketTooLarge.ResponseError())
-			debugf("%s", UDPPacketTooLarge.ResponseError())
+	if tuple.transport == transportUDP {
+		respIsEdns := msg.data.IsEdns0() != nil
+		if !respIsEdns && msg.length > maxDNSPacketSize {
+			trans.notes = append(trans.notes, udpPacketTooLarge.responseError())
+			debugf("%s", udpPacketTooLarge.responseError())
 		}
 
-		request := trans.Request
+		request := trans.request
 		if request != nil {
-			reqIsEdns := request.Data.IsEdns0() != nil
+			reqIsEdns := request.data.IsEdns0() != nil
 
 			switch {
 			case reqIsEdns && !respIsEdns:
-				trans.Notes = append(trans.Notes, RespEdnsNoSupport.Error())
-				debugf("%s %s", RespEdnsNoSupport.Error(), tuple.String())
+				trans.notes = append(trans.notes, respEdnsNoSupport.Error())
+				debugf("%s %s", respEdnsNoSupport.Error(), tuple.String())
 			case !reqIsEdns && respIsEdns:
-				trans.Notes = append(trans.Notes, RespEdnsUnexpected.Error())
-				debugf("%s %s", RespEdnsUnexpected.Error(), tuple.String())
+				trans.notes = append(trans.notes, respEdnsUnexpected.Error())
+				debugf("%s %s", respEdnsUnexpected.Error(), tuple.String())
 			}
 		}
 	}
 
 	dns.publishTransaction(trans)
-	dns.deleteTransaction(trans.tuple.Hashable())
+	dns.deleteTransaction(trans.tuple.hashable())
 }
 
-func (dns *DNS) publishTransaction(t *DNSTransaction) {
+func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 	if dns.results == nil {
 		return
 	}
@@ -359,74 +359,74 @@ func (dns *DNS) publishTransaction(t *DNSTransaction) {
 	event := common.MapStr{}
 	event["@timestamp"] = common.Time(t.ts)
 	event["type"] = "dns"
-	event["transport"] = t.Transport.String()
-	event["src"] = &t.Src
-	event["dst"] = &t.Dst
+	event["transport"] = t.transport.String()
+	event["src"] = &t.src
+	event["dst"] = &t.dst
 	event["status"] = common.ERROR_STATUS
-	if len(t.Notes) == 1 {
-		event["notes"] = t.Notes[0]
-	} else if len(t.Notes) > 1 {
-		event["notes"] = strings.Join(t.Notes, " ")
+	if len(t.notes) == 1 {
+		event["notes"] = t.notes[0]
+	} else if len(t.notes) > 1 {
+		event["notes"] = strings.Join(t.notes, " ")
 	}
 
 	dnsEvent := common.MapStr{}
 	event["dns"] = dnsEvent
 
-	if t.Request != nil && t.Response != nil {
-		event["bytes_in"] = t.Request.Length
-		event["bytes_out"] = t.Response.Length
-		event["responsetime"] = int32(t.Response.Ts.Sub(t.ts).Nanoseconds() / 1e6)
-		event["method"] = dnsOpCodeToString(t.Request.Data.Opcode)
-		if len(t.Request.Data.Question) > 0 {
-			event["query"] = dnsQuestionToString(t.Request.Data.Question[0])
-			event["resource"] = t.Request.Data.Question[0].Name
+	if t.request != nil && t.response != nil {
+		event["bytes_in"] = t.request.length
+		event["bytes_out"] = t.response.length
+		event["responsetime"] = int32(t.response.ts.Sub(t.ts).Nanoseconds() / 1e6)
+		event["method"] = dnsOpCodeToString(t.request.data.Opcode)
+		if len(t.request.data.Question) > 0 {
+			event["query"] = dnsQuestionToString(t.request.data.Question[0])
+			event["resource"] = t.request.data.Question[0].Name
 		}
-		addDNSToMapStr(dnsEvent, t.Response.Data, dns.IncludeAuthorities,
-			dns.IncludeAdditionals)
+		addDNSToMapStr(dnsEvent, t.response.data, dns.includeAuthorities,
+			dns.includeAdditionals)
 
-		if t.Response.Data.Rcode == 0 {
+		if t.response.data.Rcode == 0 {
 			event["status"] = common.OK_STATUS
 		}
 
-		if dns.SendRequest {
-			event["request"] = dnsToString(t.Request.Data)
+		if dns.sendRequest {
+			event["request"] = dnsToString(t.request.data)
 		}
-		if dns.SendResponse {
-			event["response"] = dnsToString(t.Response.Data)
+		if dns.sendResponse {
+			event["response"] = dnsToString(t.response.data)
 		}
-	} else if t.Request != nil {
-		event["bytes_in"] = t.Request.Length
-		event["method"] = dnsOpCodeToString(t.Request.Data.Opcode)
-		if len(t.Request.Data.Question) > 0 {
-			event["query"] = dnsQuestionToString(t.Request.Data.Question[0])
-			event["resource"] = t.Request.Data.Question[0].Name
+	} else if t.request != nil {
+		event["bytes_in"] = t.request.length
+		event["method"] = dnsOpCodeToString(t.request.data.Opcode)
+		if len(t.request.data.Question) > 0 {
+			event["query"] = dnsQuestionToString(t.request.data.Question[0])
+			event["resource"] = t.request.data.Question[0].Name
 		}
-		addDNSToMapStr(dnsEvent, t.Request.Data, dns.IncludeAuthorities,
-			dns.IncludeAdditionals)
+		addDNSToMapStr(dnsEvent, t.request.data, dns.includeAuthorities,
+			dns.includeAdditionals)
 
-		if dns.SendRequest {
-			event["request"] = dnsToString(t.Request.Data)
+		if dns.sendRequest {
+			event["request"] = dnsToString(t.request.data)
 		}
-	} else if t.Response != nil {
-		event["bytes_out"] = t.Response.Length
-		event["method"] = dnsOpCodeToString(t.Response.Data.Opcode)
-		if len(t.Response.Data.Question) > 0 {
-			event["query"] = dnsQuestionToString(t.Response.Data.Question[0])
-			event["resource"] = t.Response.Data.Question[0].Name
+	} else if t.response != nil {
+		event["bytes_out"] = t.response.length
+		event["method"] = dnsOpCodeToString(t.response.data.Opcode)
+		if len(t.response.data.Question) > 0 {
+			event["query"] = dnsQuestionToString(t.response.data.Question[0])
+			event["resource"] = t.response.data.Question[0].Name
 		}
-		addDNSToMapStr(dnsEvent, t.Response.Data, dns.IncludeAuthorities,
-			dns.IncludeAdditionals)
-		if dns.SendResponse {
-			event["response"] = dnsToString(t.Response.Data)
+		addDNSToMapStr(dnsEvent, t.response.data, dns.includeAuthorities,
+			dns.includeAdditionals)
+		if dns.sendResponse {
+			event["response"] = dnsToString(t.response.data)
 		}
 	}
 
 	dns.results.PublishTransaction(event)
 }
 
-func (dns *DNS) expireTransaction(t *DNSTransaction) {
-	t.Notes = append(t.Notes, NoResponse.Error())
-	debugf("%s %s", NoResponse.Error(), t.tuple.String())
+func (dns *dnsPlugin) expireTransaction(t *dnsTransaction) {
+	t.notes = append(t.notes, noResponse.Error())
+	debugf("%s %s", noResponse.Error(), t.tuple.String())
 	dns.publishTransaction(t)
 	unmatchedRequests.Add(1)
 }
@@ -770,10 +770,10 @@ func dnsToString(dns *mkdns.Msg) string {
 // then the returned dns pointer will be nil. This method recovers from panics
 // and is concurrency-safe.
 // We do not handle Unpack ErrTruncated for now. See https://github.com/miekg/dns/pull/281
-func decodeDNSData(transport Transport, rawData []byte) (dns *mkdns.Msg, err error) {
+func decodeDNSData(transp transport, rawData []byte) (dns *mkdns.Msg, err error) {
 	var offset int
-	if transport == TransportTCP {
-		offset = DecodeOffset
+	if transp == transportTCP {
+		offset = decodeOffset
 	}
 
 	// Recover from any panics that occur while parsing a packet.
@@ -791,7 +791,7 @@ func decodeDNSData(transport Transport, rawData []byte) (dns *mkdns.Msg, err err
 	// We use this check because Unpack does not return an error for some unvalid messages.
 	// TODO: can a better solution be found?
 	if msg.Len() <= 12 || err != nil {
-		return nil, NonDNSMsg
+		return nil, nonDNSMsg
 	}
 	return msg, nil
 }

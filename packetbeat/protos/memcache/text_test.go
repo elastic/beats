@@ -11,11 +11,11 @@ import (
 func Test_TextParseQuitCommand(t *testing.T) {
 	msg := textParseNoFail(t, "quit\r\n")
 	assert.NotNil(t, msg)
-	assert.Equal(t, MemcacheCmdQuit, msg.command.code)
+	assert.Equal(t, memcacheCmdQuit, msg.command.code)
 
 	msg = textParseNoFail(t, "quit noreply\r\n")
 	assert.NotNil(t, msg)
-	assert.Equal(t, MemcacheCmdQuit, msg.command.code)
+	assert.Equal(t, memcacheCmdQuit, msg.command.code)
 	assert.True(t, msg.noreply)
 }
 
@@ -31,7 +31,7 @@ func Test_TextParseUnknownCommand(t *testing.T) {
 func Test_TextSimpleGetCommand(t *testing.T) {
 	msg := textParseNoFail(t, "get k\r\n")
 	assert.NotNil(t, msg)
-	assert.Equal(t, MemcacheCmdGet, msg.command.code)
+	assert.Equal(t, memcacheCmdGet, msg.command.code)
 	assert.Equal(t, 1, len(msg.keys))
 	assert.Equal(t, "k", msg.keys[0].String())
 
@@ -53,7 +53,7 @@ func Test_TextSimpleGetCommand(t *testing.T) {
 func Test_TextParseMultiGetCommand(t *testing.T) {
 	msg := textParseNoFail(t, "get a b c d\r\n")
 	assert.NotNil(t, msg)
-	assert.Equal(t, MemcacheCmdGet, msg.command.code)
+	assert.Equal(t, memcacheCmdGet, msg.command.code)
 	assert.Equal(t, 4, len(msg.keys))
 	assert.Equal(t, "a", msg.keys[0].String())
 	assert.Equal(t, "b", msg.keys[1].String())
@@ -66,7 +66,7 @@ func Test_TextParseMultiGetCommand(t *testing.T) {
 	assert.Nil(t, msg)
 	msg = p.textNoFail("c d\r\n")
 	assert.NotNil(t, msg)
-	assert.Equal(t, MemcacheCmdGet, msg.command.code)
+	assert.Equal(t, memcacheCmdGet, msg.command.code)
 	assert.Equal(t, 4, len(msg.keys))
 	if len(msg.keys) == 4 {
 		assert.Equal(t, "a", msg.keys[0].String())
@@ -78,13 +78,13 @@ func Test_TextParseMultiGetCommand(t *testing.T) {
 
 func Test_TextParseFailingGet(t *testing.T) {
 	_, err := textTryParse(t, "get\r\n")
-	assert.Equal(t, ErrExpectedKeys, err)
+	assert.Equal(t, errExpectedKeys, err)
 }
 
 func Test_TextParseSet(t *testing.T) {
 	msg := textParseNoFail(t, "set k 2 102 5\r\nvalue\r\n")
 	assert.NotNil(t, msg)
-	assert.Equal(t, MemcacheCmdSet, msg.command.code)
+	assert.Equal(t, memcacheCmdSet, msg.command.code)
 	assert.False(t, msg.noreply)
 	assert.Equal(t, "k", msg.keys[0].String())
 	assert.Equal(t, uint32(2), msg.flags)
@@ -102,8 +102,8 @@ func Test_TextParseSet(t *testing.T) {
 
 	msg = textParseNoFail(t, "STORED\r\n")
 	assert.NotNil(t, msg)
-	assert.Equal(t, MemcacheResStored, msg.command.code)
-	assert.Equal(t, MemcacheSuccessResp, msg.command.typ)
+	assert.Equal(t, memcacheResStored, msg.command.code)
+	assert.Equal(t, memcacheSuccessResp, msg.command.typ)
 
 	event = makeMessageEvent(t, msg)
 	assert.Equal(t, "STORED", event["command"])
@@ -111,7 +111,7 @@ func Test_TextParseSet(t *testing.T) {
 	msg = textParseNoFail(t, "set k 2 102 5 noreply\r\nvalue\r\n")
 	assert.NotNil(t, msg)
 	assert.True(t, msg.noreply)
-	assert.Equal(t, MemcacheCmdSet, msg.command.code)
+	assert.Equal(t, memcacheCmdSet, msg.command.code)
 	assert.Equal(t, "k", msg.keys[0].String())
 	assert.Equal(t, uint32(2), msg.flags)
 	assert.Equal(t, uint32(102), msg.exptime)
@@ -128,7 +128,7 @@ func Test_TextParseSetCont(t *testing.T) {
 	msg = p.textNoFail("value\r\n")
 	assert.NotNil(t, msg)
 	assert.False(t, msg.noreply)
-	assert.Equal(t, MemcacheCmdSet, msg.command.code)
+	assert.Equal(t, memcacheCmdSet, msg.command.code)
 	assert.Equal(t, "k", msg.keys[0].String())
 	assert.Equal(t, uint32(2), msg.flags)
 	assert.Equal(t, uint32(102), msg.exptime)
@@ -137,15 +137,15 @@ func Test_TextParseSetCont(t *testing.T) {
 
 	msg = p.textNoFail("BUSY ...\r\n")
 	assert.NotNil(t, msg)
-	assert.Equal(t, MemcacheErrBusy, msg.command.code)
-	assert.Equal(t, MemcacheFailResp, msg.command.typ)
+	assert.Equal(t, memcacheErrBusy, msg.command.code)
+	assert.Equal(t, memcacheFailResp, msg.command.typ)
 }
 
 func Test_TextParseCasCommand(t *testing.T) {
 	msg := textParseNoFail(t, "cas k 2 102 5 1234\r\nvalue\r\n")
 	assert.NotNil(t, msg)
 	assert.False(t, msg.noreply)
-	assert.Equal(t, MemcacheCmdCas, msg.command.code)
+	assert.Equal(t, memcacheCmdCas, msg.command.code)
 	assert.Equal(t, "k", msg.keys[0].String())
 	assert.Equal(t, uint32(2), msg.flags)
 	assert.Equal(t, uint32(102), msg.exptime)
@@ -158,7 +158,7 @@ func Test_TextParseCasCommand(t *testing.T) {
 func Test_TextParseSlabsCommands(t *testing.T) {
 	msg := textParseNoFail(t, "slabs reassign -1 2\r\n")
 	assert.NotNil(t, msg)
-	assert.Equal(t, MemcacheCmdSlabsReassign, msg.command.code)
+	assert.Equal(t, memcacheCmdSlabsReassign, msg.command.code)
 	assert.Equal(t, int64(-1), msg.ivalue)
 	assert.Equal(t, int64(2), msg.ivalue2)
 
@@ -171,7 +171,7 @@ func Test_TextParseSlabsCommands(t *testing.T) {
 func Test_TextParseSlabsUnknown(t *testing.T) {
 	msg := textParseNoFail(t, "slabs unknown -1 2\r\n")
 	assert.NotNil(t, msg)
-	assert.Equal(t, MemcacheCmdUNKNOWN, msg.command.code)
+	assert.Equal(t, memcacheCmdUNKNOWN, msg.command.code)
 }
 
 func Test_TextSlabsAutomove(t *testing.T) {
@@ -194,7 +194,7 @@ func Test_TextSlabsAutomove(t *testing.T) {
 func Test_TextParseCounterResponse(t *testing.T) {
 	msg := textParseNoFail(t, "12\r\n")
 	assert.NotNil(t, msg)
-	assert.Equal(t, MemcacheResCounterOp, msg.command.code)
+	assert.Equal(t, memcacheResCounterOp, msg.command.code)
 	assert.Equal(t, uint64(12), msg.value)
 
 	event := makeMessageEvent(t, msg)
@@ -215,7 +215,7 @@ func Test_TextStatusRequest(t *testing.T) {
 func Test_TextParseStatusResponse(t *testing.T) {
 	msg := textParseNoFail(t, "STAT abc 5\r\n")
 	assert.NotNil(t, msg)
-	assert.Equal(t, MemcacheResStat, msg.command.code)
+	assert.Equal(t, memcacheResStat, msg.command.code)
 	assert.Equal(t, "abc", msg.stats[0].Name.String())
 	assert.Equal(t, "5", msg.stats[0].Value.String())
 }

@@ -25,7 +25,7 @@ type argDef struct {
 func argOptional(arg argDef) argDef {
 	parse := func(parser *parser, hdr, buf *streambuf.Buffer) error {
 		err := arg.parse(parser, hdr, buf)
-		if err == ErrNoMoreArgument {
+		if err == errNoMoreArgument {
 			return nil
 		}
 		if err != nil {

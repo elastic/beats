@@ -16,8 +16,8 @@ import (
 
 // Helper function returning a Mongodb module that can be used
 // in tests. It publishes the transactions in the results channel.
-func MongodbModForTests() *Mongodb {
-	var mongodb Mongodb
+func mongodbModForTests() *mongodbPlugin {
+	var mongodb mongodbPlugin
 	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
 	config := defaultConfig
 	mongodb.init(results, &config)
@@ -37,7 +37,7 @@ func testTCPTuple() *common.TCPTuple {
 
 // Helper function to read from the results Queue. Raises
 // an error if nothing is found in the queue.
-func expectTransaction(t *testing.T, mongodb *Mongodb) common.MapStr {
+func expectTransaction(t *testing.T, mongodb *mongodbPlugin) common.MapStr {
 	client := mongodb.results.(*publish.ChanTransactions)
 	select {
 	case trans := <-client.Channel:
@@ -54,7 +54,7 @@ func TestSimpleFindLimit1(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
 	}
 
-	mongodb := MongodbModForTests()
+	mongodb := mongodbModForTests()
 
 	// request and response from tests/pcaps/mongo_one_row.pcap
 	reqData, err := hex.DecodeString(
@@ -123,9 +123,9 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
 	}
 
-	mongodb := MongodbModForTests()
-	mongodb.SendRequest = true
-	mongodb.SendResponse = true
+	mongodb := mongodbModForTests()
+	mongodb.sendRequest = true
+	mongodb.sendResponse = true
 
 	// request and response from tests/pcaps/mongo_one_row.pcap
 	reqData, err := hex.DecodeString(
@@ -265,9 +265,9 @@ func TestMaxDocs(t *testing.T) {
 		},
 	}
 
-	mongodb := MongodbModForTests()
-	mongodb.SendResponse = true
-	mongodb.MaxDocs = 3
+	mongodb := mongodbModForTests()
+	mongodb.sendResponse = true
+	mongodb.maxDocs = 3
 
 	mongodb.publishTransaction(&trans)
 
@@ -303,7 +303,7 @@ func TestMaxDocs(t *testing.T) {
 			1, 2, 3, 4,
 		},
 	}
-	mongodb.MaxDocs = 0
+	mongodb.maxDocs = 0
 	mongodb.publishTransaction(&trans)
 	res = expectTransaction(t, mongodb)
 	assert.Equal(t, "1\n2\n3\n4", res["response"])
@@ -323,9 +323,9 @@ func TestMaxDocSize(t *testing.T) {
 		},
 	}
 
-	mongodb := MongodbModForTests()
-	mongodb.SendResponse = true
-	mongodb.MaxDocLength = 5
+	mongodb := mongodbModForTests()
+	mongodb.sendResponse = true
+	mongodb.maxDocLength = 5
 
 	mongodb.publishTransaction(&trans)
 

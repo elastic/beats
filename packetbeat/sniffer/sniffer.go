@@ -20,8 +20,8 @@ import (
 
 type SnifferSetup struct {
 	pcapHandle     *pcap.Handle
-	afpacketHandle *AfpacketHandle
-	pfringHandle   *PfringHandle
+	afpacketHandle *afpacketHandle
+	pfringHandle   *pfringHandle
 	config         *config.InterfacesConfig
 	isAlive        bool
 	dumper         *pcap.Dumper
@@ -192,7 +192,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 			return err
 		}
 
-		sniffer.afpacketHandle, err = NewAfpacketHandle(
+		sniffer.afpacketHandle, err = newAfpacketHandle(
 			sniffer.config.Device,
 			frameSize,
 			blockSize,
@@ -209,7 +209,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.afpacketHandle)
 	case "pfring", "pf_ring":
-		sniffer.pfringHandle, err = NewPfringHandle(
+		sniffer.pfringHandle, err = newPfringHandle(
 			sniffer.config.Device,
 			sniffer.config.Snaplen,
 			true)

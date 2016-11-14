@@ -44,8 +44,8 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	}
 
 	s.message.opCode = opCode
-	s.message.IsResponse = false // default is that the message is a request. If not opReplyParse will set this to false
-	s.message.ExpectsResponse = false
+	s.message.isResponse = false // default is that the message is a request. If not opReplyParse will set this to false
+	s.message.expectsResponse = false
 	debugf("opCode = %v", s.message.opCode)
 
 	// then split depending on operation type
@@ -53,7 +53,7 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 
 	switch s.message.opCode {
 	case opReply:
-		s.message.IsResponse = true
+		s.message.isResponse = true
 		return opReplyParse(d, s.message)
 	case opMsg:
 		s.message.method = "msg"
@@ -65,11 +65,11 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 		s.message.method = "insert"
 		return opInsertParse(d, s.message)
 	case opQuery:
-		s.message.ExpectsResponse = true
+		s.message.expectsResponse = true
 		return opQueryParse(d, s.message)
 	case opGetMore:
 		s.message.method = "getMore"
-		s.message.ExpectsResponse = true
+		s.message.expectsResponse = true
 		return opGetMoreParse(d, s.message)
 	case opDelete:
 		s.message.method = "delete"
@@ -179,7 +179,7 @@ func extractDocuments(query map[string]interface{}) []interface{} {
 // the query represents a command.
 func isDatabaseCommand(key string, val interface{}) bool {
 	nameExists := false
-	for _, cmd := range DatabaseCommands {
+	for _, cmd := range databaseCommands {
 		if strings.EqualFold(cmd, key) {
 			nameExists = true
 			break
