@@ -111,11 +111,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    fields_yml = args.beat + "/etc/fields.generated.yml"
+    fields_yml = args.beat + "/_meta/fields.generated.yml"
 
     # Not all beats have a fields.generated.yml. Fall back to fields.yml
     if not os.path.isfile(fields_yml):
-        fields_yml = args.beat + "/etc/fields.yml"
+        fields_yml = args.beat + "/_meta/fields.yml"
 
     # generate the index-pattern content
     with open(fields_yml, 'r') as f:
@@ -130,7 +130,7 @@ if __name__ == "__main__":
 
     # dump output to a json file
     fileName = get_index_pattern_name(args.index)
-    target_dir = os.path.join(args.beat, "etc", "kibana", "index-pattern")
+    target_dir = os.path.join(args.beat, "_meta", "kibana", "index-pattern")
     target_file =os.path.join(target_dir, fileName + ".json")
 
     try: os.makedirs(target_dir)
