@@ -11,7 +11,7 @@ var schema = s.Schema{
 		"ms": c.Int("uptimeMillis"),
 	},
 	"local_time":         c.Time("localTime"),
-	"write_backs_queued": c.Bool("writeBacksQueued"),
+	"write_backs_queued": c.Bool("writeBacksQueued", s.Optional),
 	"asserts": c.Dict("asserts", s.Schema{
 		"regular":   c.Int("regular"),
 		"warning":   c.Int("warning"),
@@ -31,7 +31,7 @@ var schema = s.Schema{
 			"ms": c.Int("last_ms"),
 		},
 		"last_finished": c.Time("last_finished"),
-	}),
+	}, c.DictOptional),
 	"connections": c.Dict("connections", s.Schema{
 		"current":       c.Int("current"),
 		"available":     c.Int("available"),
@@ -57,9 +57,9 @@ var schema = s.Schema{
 			"commits":               s.Object{"ms": c.Int("commits")},
 			"commits_in_write_lock": s.Object{"ms": c.Int("commitsInWriteLock")},
 		}),
-	}),
+	}, c.DictOptional),
 	"extra_info": c.Dict("extra_info", s.Schema{
-		"heap_usage":  s.Object{"bytes": c.Int("heap_usage_bytes")},
+		"heap_usage":  s.Object{"bytes": c.Int("heap_usage_bytes", s.Optional)},
 		"page_faults": c.Int("page_faults"),
 	}),
 	"network": c.Dict("network", s.Schema{
