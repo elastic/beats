@@ -1,8 +1,8 @@
 FROM debian:jessie
 
-ENV VERSION 5.0.0
-ENV FILENAME_VERSION 5.0.0-linux-x86_64
-ENV URL http://staging.elastic.co/5.0.0-86a0b164/downloads/kibana/kibana-${FILENAME_VERSION}.tar.gz
+ENV VERSION 5.0.1
+ENV FILENAME_VERSION 5.0.1-linux-x86_64
+ENV URL http://staging.elastic.co/5.0.1-904bca74/downloads/kibana/kibana-${FILENAME_VERSION}.tar.gz
 
 # Cache variable can be set during building to invalidate the build cache with `--build-arg CACHE=$(date +%s) .`
 ARG CACHE=1
