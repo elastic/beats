@@ -131,6 +131,9 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test
 
+  # By setting raw to true, all raw fields from the status metricset will be added to the event.
+  #raw: false
+
 #-------------------------------- Nginx Module -------------------------------
 #- module: nginx
   #metricsets: ["stubstatus"]
