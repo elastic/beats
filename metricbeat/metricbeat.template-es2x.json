@@ -1265,6 +1265,115 @@
                   "index": "not_analyzed",
                   "type": "string"
                 },
+                "wired_tiger": {
+                  "properties": {
+                    "cache": {
+                      "properties": {
+                        "dirty": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "maximum": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "pages": {
+                          "properties": {
+                            "evicted": {
+                              "type": "long"
+                            },
+                            "read": {
+                              "type": "long"
+                            },
+                            "write": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "used": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "concurrent_transactions": {
+                      "properties": {
+                        "read": {
+                          "properties": {
+                            "available": {
+                              "type": "long"
+                            },
+                            "out": {
+                              "type": "long"
+                            },
+                            "total_tickets": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "write": {
+                          "properties": {
+                            "available": {
+                              "type": "long"
+                            },
+                            "out": {
+                              "type": "long"
+                            },
+                            "total_tickets": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "log": {
+                      "properties": {
+                        "flushes": {
+                          "type": "long"
+                        },
+                        "max_file_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "scans": {
+                          "type": "long"
+                        },
+                        "size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "syncs": {
+                          "type": "long"
+                        },
+                        "write": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "writes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
                 "write_backs_queued": {
                   "type": "boolean"
                 }
