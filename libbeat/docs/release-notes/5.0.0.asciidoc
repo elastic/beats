@@ -105,6 +105,7 @@ The list below covers changes between 1.x to 5.0.0 releases.
 - Fix input buffer on encoding problem. {pull}2416[2416]
 - Fix issue when `clean_removed` and `clean_inactive` were used together that states were not directly removed from the registry.
 - Fix issue where upgrading a 1.x registry file resulted in duplicate state entries. {pull}2792[2792]
+- Fix registry cleanup issue when files falling under ignore_older after restart. {issue}2818[2818]
 
 
 *Packetbeat*
