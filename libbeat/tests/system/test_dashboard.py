@@ -90,7 +90,8 @@ class Test(BaseTest):
         Test export dashboards with special characters in name
         """
 
-        client = elasticsearch.Elasticsearch()  # Default localhost:9200
+        client = elasticsearch.Elasticsearch(
+            ['http://' + self.get_elasticsearch_host()])
 
         # Create index and dashboard
         if client.indices.exists(index=".testdashboard"):
@@ -106,10 +107,6 @@ class Test(BaseTest):
                 'title': "test-dashboard",
                 "panelsJSON": ""
             })
-
-        con = elasticsearch.Urllib3HttpConnection()
-
-        con.close()
 
         path = tempfile.mkdtemp()
 
