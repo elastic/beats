@@ -32,7 +32,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
 		Hosts    []string `config:"hosts"    validate:"nonzero,required"`
 		Username string   `config:"username"`
-		Password string   `config:"username"`
+		Password string   `config:"password"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
