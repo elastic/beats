@@ -136,11 +136,23 @@ metricbeat.modules:
   cpu_ticks: false  
 -------------------------------------
 
-The following example shows how to configure the Apache HTTPD module:
+The following example shows how to configure two modules: the system module
+and the Apache HTTPD module:
 
 [source, shell]
 -------------------------------------
 metricbeat.modules:
+- module: system
+  metricsets:
+    - cpu
+    - filesystem
+    - memory
+    - network
+    - process
+  enabled: true
+  period: 10s
+  processes: ['.*']
+  cpu_ticks: false  
 - module: apache
   metricsets: ["status"]
   enabled: true
