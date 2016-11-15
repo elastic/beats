@@ -87,11 +87,6 @@ https://github.com/elastic/beats/compare/v5.0.0...v5.0.1[View commits]
 
 - Fix 'index out of bounds' bug in Packetbeat DNS protocol plugin. {issue}2872[2872]
 
-*Filebeat*
-
-- Fix registry cleanup issue when files falling under ignore_older after restart. {issue}2818[2818]
-
-
 ==== Added
 
 *Metricbeat*
@@ -174,6 +169,8 @@ https://github.com/elastic/beats/compare/v5.0.0-beta1...v5.0.0-rc1[View commits]
 *Filebeat*
 
 - Fix input buffer on encoding problem. {pull}2416[2416]
+- Fix registry cleanup issue when files falling under ignore_older after restart. {issue}2818[2818]
+
 
 ==== Deprecated
 
