@@ -4,6 +4,7 @@
 /build
 /*/data
 /*/logs
+/*/_meta/kibana/index-pattern
 
 # Files
 .DS_Store
