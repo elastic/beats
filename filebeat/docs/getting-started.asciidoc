@@ -214,3 +214,5 @@ After you've created the index pattern, you can select the `filebeat-*` index pa
 Filebeat data.
 
 image:./images/filebeat-discover-tab.png[]
+
+TIP: If you don't see `filebeat-*` in the list of available index patterns, try refreshing the page in your browser.

@@ -367,7 +367,8 @@ See <<multiline-examples>> for more configuration examples.
 
 You specify the following settings under `multiline` to control how Filebeat combines the lines in the message:
 
-*`pattern`*:: Specifies the regular expression pattern to match. See <<regexp-support>> for a list of supported regexp patterns.
+*`pattern`*:: Specifies the regular expression pattern to match. Note that the regexp patterns supported by Filebeat differ
+somewhat from the patterns supported by Logstash. See <<regexp-support>> for a list of supported regexp patterns.
 
 *`negate`*:: Defines whether the pattern is negated. The default is `false`.
 
