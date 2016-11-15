@@ -2,55 +2,64 @@
     "@timestamp": "2016-05-23T08:05:34.853Z",
     "haproxy": {
         "stat": {
-            "bin": 0,
-            "bout": 0,
             "check": {
+                "agent.last": "",
+                "health.last": "",
                 "status": ""
             },
-            "comp": {
-                "byp": 0,
-                "in": 0,
-                "out": 0,
-                "rsp": 0
-            },
             "component_type": 0,
-            "dreq": 0,
-            "dresp": 0,
-            "ereq": 0,
-            "hrsp": {
-                "1xx": 0,
-                "2xx": 0,
-                "3xx": 0,
-                "4xx": 0,
-                "5xx": 0,
-                "other": 0
+            "compressor": {
+                "bypassed.bytes": 0,
+                "in.bytes": 0,
+                "out.bytes": 0,
+                "response.bytes": 0
             },
-            "iid": 2,
-            "last": {
-                "agt": "",
-                "chk": ""
+            "connection": {
+                "total": 0
             },
-            "pid": 1,
-            "pxname": "http-webservices",
-            "rate": {
-                "lim": 0,
-                "max": 0,
-                "value": 0
+            "in.bytes": 0,
+            "out.bytes": 0,
+            "process_id": 1,
+            "proxy": {
+                "id": 2,
+                "name": "http-webservices"
             },
-            "req": {
+            "queue": {},
+            "request": {
+                "denied": 0,
+                "errors": 0,
                 "rate": {
                     "max": 0,
                     "value": 0
                 },
-                "tot": 0
+                "total": 0
             },
-            "scur": 0,
-            "sid": 0,
-            "slim": 25000,
-            "smax": 0,
-            "status": "OPEN",
-            "stot": 0,
-            "svname": "FRONTEND"
+            "response": {
+                "denied": 0,
+                "http": {
+                    "1xx": 0,
+                    "2xx": 0,
+                    "3xx": 0,
+                    "4xx": 0,
+                    "5xx": 0,
+                    "other": 0
+                }
+            },
+            "server": {
+                "id": 0
+            },
+            "service_name": "FRONTEND",
+            "session": {
+                "current": 0,
+                "limit": 25000,
+                "max": 0,
+                "rate": {
+                    "limit": 0,
+                    "max": 0,
+                    "value": 0
+                }
+            },
+            "status": "OPEN"
         }
     },
     "metricset": {
