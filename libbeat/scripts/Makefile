@@ -244,6 +244,9 @@ update: python-env collect
 		cat _meta/beat.full.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml ; \
 	fi;
 
+	# make sure generated docs in libbeat are up-to-date
+	$(MAKE) -C ${ES_BEATS}/libbeat fields
+
 	# Update docs
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEATNAME} ${ES_BEATS}
 
