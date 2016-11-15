@@ -55,7 +55,7 @@ services:
     build: ${PWD}/module/beats/filebeat/_meta
 
   mongodb:
-    image: mongo:3.0
+    image: mongo:3.4
 
   mysql:
     image: mysql:5.7.12

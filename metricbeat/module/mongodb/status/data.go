@@ -11,7 +11,7 @@ var schema = s.Schema{
 		"ms": c.Int("uptimeMillis"),
 	},
 	"local_time":         c.Time("localTime"),
-	"write_backs_queued": c.Bool("writeBacksQueued"),
+	"write_backs_queued": c.Bool("writeBacksQueued", s.Optional),
 	"asserts": c.Dict("asserts", s.Schema{
 		"regular":   c.Int("regular"),
 		"warning":   c.Int("warning"),
@@ -31,7 +31,7 @@ var schema = s.Schema{
 			"ms": c.Int("last_ms"),
 		},
 		"last_finished": c.Time("last_finished"),
-	}),
+	}, c.DictOptional),
 	"connections": c.Dict("connections", s.Schema{
 		"current":       c.Int("current"),
 		"available":     c.Int("available"),
@@ -57,9 +57,9 @@ var schema = s.Schema{
 			"commits":               s.Object{"ms": c.Int("commits")},
 			"commits_in_write_lock": s.Object{"ms": c.Int("commitsInWriteLock")},
 		}),
-	}),
+	}, c.DictOptional),
 	"extra_info": c.Dict("extra_info", s.Schema{
-		"heap_usage":  s.Object{"bytes": c.Int("heap_usage_bytes")},
+		"heap_usage":  s.Object{"bytes": c.Int("heap_usage_bytes", s.Optional)},
 		"page_faults": c.Int("page_faults"),
 	}),
 	"network": c.Dict("network", s.Schema{
@@ -92,6 +92,41 @@ var schema = s.Schema{
 	}),
 	"storage_engine": c.Dict("storageEngine", s.Schema{
 		"name": c.Str("name"),
+	}),
+	"wired_tiger": c.Dict("wiredTiger", wiredTigerSchema, c.DictOptional),
+}
+
+var wiredTigerSchema = s.Schema{
+	"concurrent_transactions": c.Dict("concurrentTransactions", s.Schema{
+		"write": c.Dict("write", s.Schema{
+			"out":           c.Int("out"),
+			"available":     c.Int("available"),
+			"total_tickets": c.Int("totalTickets"),
+		}),
+		"read": c.Dict("write", s.Schema{
+			"out":           c.Int("out"),
+			"available":     c.Int("available"),
+			"total_tickets": c.Int("totalTickets"),
+		}),
+	}),
+	"cache": c.Dict("cache", s.Schema{
+		"maximum": s.Object{"bytes": c.Int("maximum bytes configured")},
+		"used":    s.Object{"bytes": c.Int("bytes currently in the cache")},
+		"dirty":   s.Object{"bytes": c.Int("tracked dirty bytes in the cache")},
+		"pages": s.Object{
+			"read":    c.Int("pages read into cache"),
+			"write":   c.Int("pages written from cache"),
+			"evicted": c.Int("unmodified pages evicted"),
+		},
+	}),
+	"log": c.Dict("log", s.Schema{
+		"size":          s.Object{"bytes": c.Int("total log buffer size")},
+		"write":         s.Object{"bytes": c.Int("log bytes written")},
+		"max_file_size": s.Object{"bytes": c.Int("maximum log file size")},
+		"flushes":       c.Int("log flush operations"),
+		"writes":        c.Int("log write operations"),
+		"scans":         c.Int("log scan operations"),
+		"syncs":         c.Int("log sync operations"),
 	}),
 }
 

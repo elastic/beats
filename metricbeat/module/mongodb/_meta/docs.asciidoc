@@ -47,4 +47,4 @@ To prevent sending username and password the config options `username` and
 [float]
 === Compatibility
 
-The MongoDB metricsets were tested with MongoDB 3.0 and are expected to work with all versions >= 2.8.
+The MongoDB metricsets were tested with MongoDB 3.4 and 3.0 and are expected to work with all versions >= 2.8.

@@ -2661,6 +2661,198 @@ type: keyword
 A string that represents the name of the current storage engine.
 
 
+[float]
+== wired_tiger Fields
+
+Statistics about the WiredTiger storage engine.
+
+
+
+[float]
+== concurrent_transactions Fields
+
+Statistics about the transactions currently in progress.
+
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.write.out
+
+type: long
+
+Number of concurrent write transaction in progress.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.write.available
+
+type: long
+
+Number of concurrent write tickets available.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.write.total_tickets
+
+type: long
+
+Number of total write tickets.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.read.out
+
+type: long
+
+Number of concurrent read transaction in progress.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.read.available
+
+type: long
+
+Number of concurrent read tickets available.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.read.total_tickets
+
+type: long
+
+Number of total read tickets.
+
+
+[float]
+== cache Fields
+
+Statistics about the cache and page evictions from the cache.
+
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.maximum.bytes
+
+type: long
+
+format: bytes
+
+Maximum cache size.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.used.bytes
+
+type: long
+
+format: bytes
+
+Size in byte of the data currently in cache.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.dirty.bytes
+
+type: long
+
+format: bytes
+
+Size in bytes of the dirty data in the cache.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.pages.read
+
+type: long
+
+Number of pages read into the cache.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.pages.write
+
+type: long
+
+Number of pages written from the cache.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.pages.evicted
+
+type: long
+
+Number of pages evicted from the cache.
+
+
+[float]
+== log Fields
+
+Statistics about the write ahead log used by WiredTiger.
+
+
+
+[float]
+=== mongodb.status.wired_tiger.log.size.bytes
+
+type: long
+
+format: bytes
+
+Total log size in bytes.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.write.bytes
+
+type: long
+
+format: bytes
+
+Number of bytes written into the log.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.max_file_size.bytes
+
+type: long
+
+format: bytes
+
+Maximum file size.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.flushes
+
+type: long
+
+Number of flush operations.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.writes
+
+type: long
+
+Number of write operations.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.scans
+
+type: long
+
+Number of scan operations.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.syncs
+
+type: long
+
+Number of sync operations.
+
+
 [[exported-fields-mysql]]
 == MySQL Fields
 
