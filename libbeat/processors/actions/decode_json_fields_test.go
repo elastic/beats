@@ -9,8 +9,9 @@ import (
 )
 
 var fields = [1]string{"msg"}
-var config, _ = common.NewConfigFrom(map[string]interface{}{
-	"fields": fields,
+var testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+	"fields":       fields,
+	"processArray": false,
 })
 
 func TestMissingKey(t *testing.T) {
@@ -18,7 +19,7 @@ func TestMissingKey(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	actual := getActualValue(t, config, input)
+	actual := getActualValue(t, testConfig, input)
 
 	expected := common.MapStr{
 		"pipeline": "us1",
@@ -33,7 +34,7 @@ func TestFieldNotString(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	actual := getActualValue(t, config, input)
+	actual := getActualValue(t, testConfig, input)
 
 	expected := common.MapStr{
 		"msg":      123,
@@ -50,7 +51,7 @@ func TestInvalidJSON(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	actual := getActualValue(t, config, input)
+	actual := getActualValue(t, testConfig, input)
 
 	expected := common.MapStr{
 		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3",
@@ -60,13 +61,40 @@ func TestInvalidJSON(t *testing.T) {
 
 }
 
-func TestValidJSON(t *testing.T) {
+func TestValidJSONDepthOne(t *testing.T) {
 	input := common.MapStr{
 		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
 		"pipeline": "us1",
 	}
 
-	actual := getActualValue(t, config, input)
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": map[string]interface{}{
+			"log":    "{\"level\":\"info\"}",
+			"stream": "stderr",
+			"count":  3,
+		},
+		"pipeline": "us1",
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+
+}
+
+func TestValidJSONDepthTwo(t *testing.T) {
+	input := common.MapStr{
+		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
+		"pipeline": "us1",
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":       fields,
+		"processArray": false,
+		"maxDepth":     2,
+	})
+
+	actual := getActualValue(t, testConfig, input)
 
 	expected := common.MapStr{
 		"msg": map[string]interface{}{
