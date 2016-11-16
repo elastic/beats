@@ -1,0 +1,34 @@
+- name: partition
+  type: group
+  description: >
+    partition
+  fields:
+    - name: offset
+      type: group
+      description: >
+        Available offsets of the given partition.
+      fields:
+        - name: newest
+          type: long
+          description: >
+            Newest offset of the partition.
+        - name: oldest
+          type: long
+          description: >
+            Oldest offset of the partition.
+    - name: partition
+      type: long
+      description: >
+        Partition id.
+    - name: topic
+      type: keyword
+      description: >
+        Topic name
+    - name: broker.id
+      type: long
+      description: >
+        Broker id
+    - name: broker.address
+      type: keyword
+      description: >
+        Broker address
