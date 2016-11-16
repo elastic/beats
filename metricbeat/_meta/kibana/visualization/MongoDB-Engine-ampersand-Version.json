@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"MongoDB Engine & Version\",\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"legendPosition\":\"bottom\",\"shareYAxis\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"metricset.host\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"mongodb.status.storage_engine.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Engine\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"mongodb.status.version\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Version\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "MongoDB Engine & Version", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "MongoDB-search", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}
