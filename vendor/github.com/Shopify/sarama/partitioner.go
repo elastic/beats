@@ -87,9 +87,9 @@ type hashPartitioner struct {
 	hasher hash.Hash32
 }
 
-// NewHashPartitioner returns a Partitioner which behaves as follows. If the message's key is nil, or fails to
-// encode, then a random partition is chosen. Otherwise the FNV-1a hash of the encoded bytes of the message key
-// is used, modulus the number of partitions. This ensures that messages with the same key always end up on the
+// NewHashPartitioner returns a Partitioner which behaves as follows. If the message's key is nil then a
+// random partition is chosen. Otherwise the FNV-1a hash of the encoded bytes of the message key is used,
+// modulus the number of partitions. This ensures that messages with the same key always end up on the
 // same partition.
 func NewHashPartitioner(topic string) Partitioner {
 	p := new(hashPartitioner)

@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/lib/pq"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/postgresql"
 	"github.com/pkg/errors"
+
+	// Register postgresql database/sql driver
+	_ "github.com/lib/pq"
 )
 
 // init registers the MetricSet with the central registry.
@@ -23,26 +24,40 @@ func init() {
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
+	connectionString string
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
-	config := struct{}{}
+	config := struct {
+		Hosts    []string `config:"hosts"    validate:"nonzero,required"`
+		Username string   `config:"username"`
+		Password string   `config:"password"`
+	}{
+		Username: "",
+		Password: "",
+	}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
+	url, err := postgresql.ParseURL(base.Host(), config.Username, config.Password,
+		base.Module().Config().Timeout)
+	if err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
-		BaseMetricSet: base,
+		BaseMetricSet:    base,
+		connectionString: url,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 
-	db, err := sql.Open("postgres", m.Host())
+	db, err := sql.Open("postgres", m.connectionString)
 	if err != nil {
 		return nil, err
 	}

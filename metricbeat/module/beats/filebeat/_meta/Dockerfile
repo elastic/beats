@@ -1,8 +1,11 @@
 FROM debian
 
+ENV VERSION 6.0.0-alpha1-SNAPSHOT
+ENV URL https://snapshots.elastic.co/downloads/beats/filebeat/filebeat-${VERSION}-amd64.deb
+
 RUN apt-get update && apt-get install -y wget
-RUN wget https://download.elastic.co/beats/filebeat/filebeat-5.0.0-alpha5-amd64.deb
-RUN dpkg -i filebeat-5.0.0-alpha5-amd64.deb
+RUN wget ${URL}
+RUN dpkg -i filebeat-${VERSION}-amd64.deb
 
 COPY filebeat.yml /etc/filebeat/filebeat.yml
 

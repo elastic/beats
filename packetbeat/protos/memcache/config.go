@@ -11,7 +11,7 @@ type memcacheConfig struct {
 	config.ProtocolCommon `config:",inline"`
 	MaxValues             int
 	MaxBytesPerValue      int
-	UdpTransactionTimeout time.Duration
+	UDPTransactionTimeout time.Duration
 	ParseUnknown          bool
 }
 
@@ -21,6 +21,6 @@ var (
 			Ports:              []int{11211},
 			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
-		UdpTransactionTimeout: protos.DefaultTransactionExpiration,
+		UDPTransactionTimeout: protos.DefaultTransactionExpiration,
 	}
 )

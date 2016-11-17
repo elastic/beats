@@ -1,0 +1,344 @@
+
+////
+This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+////
+
+[[exported-fields]]
+= Exported Fields
+
+[partintro]
+
+--
+This document describes the fields that are exported by Heartbeat. They are
+grouped in the following categories:
+
+* <<exported-fields-beat>>
+* <<exported-fields-cloud>>
+* <<exported-fields-common>>
+
+--
+[[exported-fields-beat]]
+== Beat Fields
+
+Contains common beat fields available in all event types.
+
+
+
+[float]
+=== beat.name
+
+The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
+
+
+[float]
+=== beat.hostname
+
+The hostname as returned by the operating system on which the Beat is running.
+
+
+[float]
+=== beat.version
+
+The version of the beat that generated this event.
+
+
+[float]
+=== @timestamp
+
+type: date
+
+example: August 26th 2016, 12:35:53.332
+
+format: date
+
+required: True
+
+The timestamp when the event log record was generated.
+
+
+[float]
+=== tags
+
+Arbitrary tags that can be set per Beat and per transaction type.
+
+
+[float]
+=== fields
+
+type: dict
+
+Contains user configurable fields.
+
+
+[[exported-fields-cloud]]
+== Cloud Provider Metadata Fields
+
+Metadata from cloud providers added by the add_cloud_metadata processor.
+
+
+
+[float]
+=== meta.cloud.provider
+
+example: ec2
+
+Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
+
+
+[float]
+=== meta.cloud.instance_id
+
+Instance ID of the host machine.
+
+
+[float]
+=== meta.cloud.machine_type
+
+example: t2.medium
+
+Machine type of the host machine.
+
+
+[float]
+=== meta.cloud.availability_zone
+
+example: us-east-1c
+
+Availability zone in which this host is running.
+
+
+[float]
+=== meta.cloud.project_id
+
+example: project-x
+
+Name of the project in Google Cloud.
+
+
+[float]
+=== meta.cloud.region
+
+Region in which this host is running.
+
+
+[[exported-fields-common]]
+== Common monitoring fields Fields
+
+None
+
+
+[float]
+=== type
+
+type: keyword
+
+required: True
+
+The monitor type.
+
+
+[float]
+=== monitor
+
+type: keyword
+
+Monitor job name.
+
+
+[float]
+=== scheme
+
+type: keyword
+
+Address url scheme. For example `tcp`, `ssl`, `http`, and `https`.
+
+
+[float]
+=== host
+
+type: keyword
+
+Hostname of service being monitored. Can be missing, if service is monitored by IP.
+
+
+[float]
+=== port
+
+type: integer
+
+Service port number.
+
+
+[float]
+=== url
+
+type: text
+
+Service url used by monitor.
+
+
+[float]
+=== ip
+
+type: keyword
+
+IP of service being monitored. If service is monitored by hostname, the `ip` field contains the resolved ip address for the current host.
+
+
+[float]
+== duration Fields
+
+total monitoring test duration
+
+
+[float]
+=== duration.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== resolve_rtt Fields
+
+Duration required to resolve an IP from hostname.
+
+
+[float]
+=== resolve_rtt.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== icmp_rtt Fields
+
+ICMP Echo Request and Reply round trip time
+
+
+[float]
+=== icmp_rtt.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== tcp_connect_rtt Fields
+
+Duration required to establish a TCP connection based on already available IP address.
+
+
+
+[float]
+=== tcp_connect_rtt.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== socks5_connect_rtt Fields
+
+Time required to establish a connection via SOCKS5 to endpoint based on available connection to SOCKS5 proxy.
+
+
+
+[float]
+=== socks5_connect_rtt.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== tls_handshake_rtt Fields
+
+Time required to finish TLS handshake based on already available network connection.
+
+
+
+[float]
+=== tls_handshake_rtt.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== http_rtt Fields
+
+Time required between sending the HTTP request and first by from HTTP response being read. Duration based on already available network connection.
+
+
+
+[float]
+=== http_rtt.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== validate_rtt Fields
+
+Time required for validating the connection if connection checks are configured.
+
+
+
+[float]
+=== validate_rtt.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== response Fields
+
+Service response parameters.
+
+
+
+[float]
+=== response.status
+
+type: integer
+
+Response status code.
+
+
+[float]
+=== up
+
+type: boolean
+
+required: True
+
+Boolean indicator if monitor could validate the service to be available.
+
+
+[float]
+== error Fields
+
+Reason monitor flagging a service as down.
+
+
+
+[float]
+=== error.type
+
+type: keyword
+
+Failure type. For example `io` or `validate`.
+
+
+[float]
+=== error.message
+
+type: text
+
+Failure description.
+
+

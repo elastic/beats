@@ -119,7 +119,7 @@ func Test_extract_documents(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.Output, extract_documents(test.Input))
+		assert.Equal(t, test.Output, extractDocuments(test.Input))
 	}
 }
 

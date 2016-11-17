@@ -55,7 +55,7 @@ func (b *Buffer) ReadNetUint16() (uint16, error) {
 	if err := b.Advance(2); err != nil {
 		return 0, err
 	}
-	value := common.Bytes_Ntohs(tmp)
+	value := common.BytesNtohs(tmp)
 	return value, nil
 }
 
@@ -73,7 +73,7 @@ func (b *Buffer) ReadNetUint16At(index int) (uint16, error) {
 	if !b.Avail(2 + index) {
 		return 0, b.bufferEndError()
 	}
-	return common.Bytes_Ntohs(b.data[index+b.mark:]), nil
+	return common.BytesNtohs(b.data[index+b.mark:]), nil
 
 }
 
@@ -98,7 +98,7 @@ func (b *Buffer) ReadNetUint32() (uint32, error) {
 	if err := b.Advance(4); err != nil {
 		return 0, err
 	}
-	value := common.Bytes_Ntohl(tmp)
+	value := common.BytesNtohl(tmp)
 	return value, nil
 }
 
@@ -116,7 +116,7 @@ func (b *Buffer) ReadNetUint32At(index int) (uint32, error) {
 	if !b.Avail(4 + index) {
 		return 0, b.bufferEndError()
 	}
-	return common.Bytes_Ntohl(b.data[index+b.mark:]), nil
+	return common.BytesNtohl(b.data[index+b.mark:]), nil
 
 }
 
@@ -143,7 +143,7 @@ func (b *Buffer) ReadNetUint64() (uint64, error) {
 	if err := b.Advance(8); err != nil {
 		return 0, err
 	}
-	value := common.Bytes_Ntohll(tmp)
+	value := common.BytesNtohll(tmp)
 	return value, nil
 }
 
@@ -161,7 +161,7 @@ func (b *Buffer) ReadNetUint64At(index int) (uint64, error) {
 	if !b.Avail(8 + index) {
 		return 0, b.bufferEndError()
 	}
-	return common.Bytes_Ntohll(b.data[index+b.mark:]), nil
+	return common.BytesNtohll(b.data[index+b.mark:]), nil
 
 }
 

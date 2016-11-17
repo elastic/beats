@@ -9,22 +9,22 @@ import (
 	"github.com/tsg/gopacket"
 )
 
-type AfpacketHandle struct {
+type afpacketHandle struct {
 }
 
-func NewAfpacketHandle(device string, snaplen int, block_size int, num_blocks int,
-	timeout time.Duration) (*AfpacketHandle, error) {
+func newAfpacketHandle(device string, snaplen int, blockSize int, numBlocks int,
+	timeout time.Duration) (*afpacketHandle, error) {
 
 	return nil, fmt.Errorf("Afpacket MMAP sniffing is only available on Linux")
 }
 
-func (h *AfpacketHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
+func (h *afpacketHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
 	return data, ci, fmt.Errorf("Afpacket MMAP sniffing is only available on Linux")
 }
 
-func (h *AfpacketHandle) SetBPFFilter(expr string) (_ error) {
+func (h *afpacketHandle) SetBPFFilter(expr string) (_ error) {
 	return fmt.Errorf("Afpacket MMAP sniffing is only available on Linux")
 }
 
-func (h *AfpacketHandle) Close() {
+func (h *afpacketHandle) Close() {
 }

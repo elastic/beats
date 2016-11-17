@@ -1,0 +1,54 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "docker": {
+        "container": {
+            "id": "7e29f4a1b2c0dd13af7c725d8deb342a36ed170eac977c183da70ef266513202",
+            "labels": [
+                {
+                    "key": "com_docker_compose_config-hash",
+                    "value": "62a912f01b02c0673332badedfcb092977d8dba2ca1115448a2674218ae1af5a"
+                },
+                {
+                    "key": "com_docker_compose_container-number",
+                    "value": "1"
+                },
+                {
+                    "key": "com_docker_compose_oneoff",
+                    "value": "False"
+                },
+                {
+                    "key": "com_docker_compose_project",
+                    "value": "environments"
+                },
+                {
+                    "key": "com_docker_compose_service",
+                    "value": "logstash"
+                },
+                {
+                    "key": "com_docker_compose_version",
+                    "value": "1.8.1"
+                }
+            ],
+            "name": "logstash",
+            "socket": "unix:///var/run/docker.sock"
+        },
+        "cpu": {
+            "usage": {
+                "kernel_mode": 0.01,
+                "per_cpu": {
+                    "0": 0.009357942,
+                    "1": 0.01215135
+                },
+                "total": 0.021509292,
+                "user_mode": 0.01
+            }
+        }
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "docker",
+        "name": "cpu",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

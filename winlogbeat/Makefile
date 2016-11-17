@@ -1,5 +1,5 @@
 BEATNAME=winlogbeat
-BEAT_DESCRIPTION=Ships Windows event logs to Elasticsearch or Logstash.
+BEAT_DESCRIPTION=Winlogbeat ships Windows event logs to Elasticsearch or Logstash.
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
 
@@ -16,3 +16,7 @@ gen:
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
+
+# Collects all dependencies and then calls update
+.PHONY: collect
+collect:

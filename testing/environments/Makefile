@@ -10,6 +10,11 @@ stop:
 	${BASE_COMMAND} stop
 	${BASE_COMMAND} rm -f
 
+
+up:
+	${BASE_COMMAND} build
+	${BASE_COMMAND} up
+
 # Be careful using this command, as it will remove all containers and volumes of your docker-machine
 clean:
 	docker stop $(shell docker ps -a -q)

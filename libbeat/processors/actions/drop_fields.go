@@ -42,14 +42,16 @@ func newDropFields(c common.Config) (processors.Processor, error) {
 }
 
 func (f dropFields) Run(event common.MapStr) (common.MapStr, error) {
+	errors := []string{}
+
 	for _, field := range f.Fields {
 		err := event.Delete(field)
 		if err != nil {
-			return event, fmt.Errorf("Fail to delete key %s: %s", field, err)
+			errors = append(errors, err.Error())
 		}
 
 	}
-	return event, nil
+	return event, fmt.Errorf(strings.Join(errors, ", "))
 }
 
 func (f dropFields) String() string {

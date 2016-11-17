@@ -9,7 +9,17 @@ To get started with your own Filebeat setup, install and configure these related
 
 See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information.
 
-After you have installed these products, you can start <<filebeat-installation>>.
+After installing the Elastic Stack, read the following topics to learn how to install, configure, and run Filebeat:
+
+* <<filebeat-installation>>
+* <<filebeat-configuration>>
+* <<config-filebeat-logstash>>
+* <<filebeat-template>>
+* <<filebeat-starting>>
+* <<filebeat-index-pattern>>
+* <<filebeat-command-line>>
+* <<directory-layout>>
+
 
 [[filebeat-installation]]
 === Step 1: Installing Filebeat
@@ -31,7 +41,7 @@ See our https://www.elastic.co/downloads/beats/filebeat[download page] for other
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-amd64.deb
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-amd64.deb
 sudo dpkg -i filebeat-{version}-amd64.deb
 ------------------------------------------------
 
@@ -40,7 +50,7 @@ sudo dpkg -i filebeat-{version}-amd64.deb
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-x86_64.rpm
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-x86_64.rpm
 sudo rpm -vi filebeat-{version}-x86_64.rpm
 ------------------------------------------------
 
@@ -49,7 +59,7 @@ sudo rpm -vi filebeat-{version}-x86_64.rpm
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-darwin-x86_64.tar.gz
 tar xzvf filebeat-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 
@@ -131,14 +141,18 @@ output.elasticsearch:
 +
 If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
 
-TIP: To test your configuration file, run Filebeat in the foreground with the following options specified:
-+./filebeat -configtest -e+.
+TIP: To test your configuration file, change to the directory where the Filebeat
+binary is installed, and run Filebeat in the foreground with the following
+options specified: +./filebeat -configtest -e+. Make sure your config files are
+in the path expected by Filebeat (see <<directory-layout>>). If you
+installed from DEB or RPM packages, run +./filebeat.sh -configtest -e+.
 
 See <<filebeat-configuration-details>> for more details about each configuration option.
 
 [[config-filebeat-logstash]]
 === Step 3: Configuring Filebeat to Use Logstash
 
+:allplatforms:
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[filebeat-template]]
@@ -147,6 +161,7 @@ include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
+[[filebeat-starting]]
 === Step 5: Starting Filebeat
 
 Start Filebeat by issuing the appropriate command for your platform.
@@ -183,16 +198,19 @@ By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
 
 Filebeat is now ready to send log files to your defined output.
 
+[[filebeat-index-pattern]]
 === Step 6: Loading the Kibana Index Pattern
 
 We don't offer prebuilt dashboards for visualizing Filebeat data. However, to make it easier for you to explore Filebeat
 data in Kibana, we've created a Filebeat index pattern: `filebeat-*`. To load this pattern, you can use the script
-that's provided for loading dashboards.
+that's provided for importing dashboards.
 
 For more information about running the script, see
-{libbeat}/load-kibana-dashboards.html[Loading the Beats Dashboards].
+{libbeat}/import-dashboards.html[Importing Existing Beat Dashboards] in the _Beats Platform Reference_.
 
 After you've created the index pattern, you can select the `filebeat-*` index pattern in Kibana to explore
 Filebeat data.
 
 image:./images/filebeat-discover-tab.png[]
+
+TIP: If you don't see `filebeat-*` in the list of available index patterns, try refreshing the page in your browser.

@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-beats]]
 == beats Module
 
+experimental[]
+
 This is the beats Module.
 
 

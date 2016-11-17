@@ -66,25 +66,29 @@
     - name: memory
       type: group
       description: >
-        Redis CPU stats.
+        Redis memory stats.
       fields:
         - name: used.value
           type: long
           description: >
+          format: bytes
             Used memory.
 
         - name: used.rss
           type: long
+          format: bytes
           description: >
             Used memory rss.
 
         - name: used.peak
           type: long
+          format: bytes
           description: >
             Used memory peak.
 
         - name: used.lua
           type: long
+          format: bytes
           description: >
             Used memory lua.
 
@@ -102,57 +106,65 @@
           type: boolean
           description:
 
-        - name: rdb.last_save.changes_since
-          type: long
+        - name: rdb
+          type: group
           description:
+          fields:
+            - name: last_save.changes_since
+              type: long
+              description:
 
-        - name: rdb.bgsave.in_progress
-          type: boolean
-          description:
+            - name: bgsave.in_progress
+              type: boolean
+              description:
 
-        - name: rdb.last_save.time
-          type: long
-          description:
+            - name: last_save.time
+              type: long
+              description:
 
-        - name: rdb.bgsave.last_status
-          type: keyword
-          description:
+            - name: bgsave.last_status
+              type: keyword
+              description:
 
-        - name: rdb.bgsave.last_time.sec
-          type: long
-          description:
+            - name: bgsave.last_time.sec
+              type: long
+              description:
 
-        - name: rdb.bgsave.current_time.sec
-          type: long
-          description:
+            - name: bgsave.current_time.sec
+              type: long
+              description:
 
-        - name: aof.enabled
-          type: boolean
+        - name: aof
+          type: group
           description:
+          fields:
+            - name: enabled
+              type: boolean
+              description:
 
-        - name: aof.rewrite.in_progress
-          type: boolean
-          description:
+            - name: rewrite.in_progress
+              type: boolean
+              description:
 
-        - name: aof.rewrite.scheduled
-          type: boolean
-          description:
+            - name: rewrite.scheduled
+              type: boolean
+              description:
 
-        - name: aof.rewrite.last_time.sec
-          type: long
-          description:
+            - name: rewrite.last_time.sec
+              type: long
+              description:
 
-        - name: aof.rewrite.current_time.sec
-          type: long
-          description:
+            - name: rewrite.current_time.sec
+              type: long
+              description:
 
-        - name: aof.bgrewrite.last_status
-          type: keyword
-          description:
+            - name: bgrewrite.last_status
+              type: keyword
+              description:
 
-        - name: aof.write.last_status
-          type: keyword
-          description:
+            - name: write.last_status
+              type: keyword
+              description:
 
     - name: replication
       type: group

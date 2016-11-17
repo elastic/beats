@@ -9,53 +9,12 @@
       },
       "dynamic_templates": [
         {
-          "fields": {
+          "strings_as_keyword": {
             "mapping": {
               "ignore_above": 1024,
               "type": "keyword"
             },
-            "match_mapping_type": "string",
-            "path_match": "fields.*"
-          }
-        },
-        {
-          "amqp.headers": {
-            "mapping": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "match_mapping_type": "string",
-            "path_match": "amqp.headers.*"
-          }
-        },
-        {
-          "cassandra.response.supported": {
-            "mapping": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "match_mapping_type": "string",
-            "path_match": "cassandra.response.supported.*"
-          }
-        },
-        {
-          "http.request.headers": {
-            "mapping": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "match_mapping_type": "string",
-            "path_match": "http.request.headers.*"
-          }
-        },
-        {
-          "http.response.headers": {
-            "mapping": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "match_mapping_type": "string",
-            "path_match": "http.response.headers.*"
+            "match_mapping_type": "string"
           }
         }
       ],
@@ -204,6 +163,10 @@
             "name": {
               "ignore_above": 1024,
               "type": "keyword"
+            },
+            "version": {
+              "ignore_above": 1024,
+              "type": "keyword"
             }
           }
         },
@@ -330,6 +293,9 @@
                     "host": {
                       "ignore_above": 1024,
                       "type": "keyword"
+                    },
+                    "port": {
+                      "type": "long"
                     },
                     "schema_change": {
                       "properties": {
@@ -533,6 +499,13 @@
                   "type": "keyword"
                 }
               }
+            }
+          }
+        },
+        "client_geoip": {
+          "properties": {
+            "location": {
+              "type": "geo_point"
             }
           }
         },
@@ -994,6 +967,38 @@
                   "type": "long"
                 },
                 "version": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "meta": {
+          "properties": {
+            "cloud": {
+              "properties": {
+                "availability_zone": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "instance_id": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "machine_type": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "project_id": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "provider": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "region": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 }

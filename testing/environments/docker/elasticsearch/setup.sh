@@ -17,6 +17,9 @@ wget $1 -O elasticsearch.deb
 
 dpkg -i elasticsearch.deb
 
+# this is more convenient when running without the init script
+cp -r /etc/elasticsearch/ /usr/share/elasticsearch/config
+
 set -ex \
 	&& for path in \
 		/usr/share/elasticsearch/data \

@@ -170,7 +170,7 @@ func reifyGetField(
 		value = nil
 	}
 
-	if _, ok := value.(*cfgNil); value == nil || ok {
+	if isNil(value) {
 		if err := runValidators(nil, opts.validators); err != nil {
 			return raiseValidation(cfg.ctx, cfg.metadata, name, err)
 		}
@@ -430,7 +430,7 @@ func reifyPrimitive(
 	t, baseType reflect.Type,
 ) (reflect.Value, Error) {
 	// zero initialize value if val==nil
-	if _, ok := val.(*cfgNil); ok {
+	if isNil(val) {
 		return pointerize(t, baseType, reflect.Zero(baseType)), nil
 	}
 
@@ -516,6 +516,13 @@ func doReifyPrimitive(
 
 	case isUint(kind):
 		v, err := reifyUint(opts, val, baseType)
+		if err != nil {
+			return v, err
+		}
+		return v, nil
+
+	case isFloat(kind):
+		v, err := reifyFloat(opts, val, baseType)
 		if err != nil {
 			return v, err
 		}
@@ -622,6 +629,23 @@ func reifyUint(
 		return reflect.Value{}, raiseConversion(opts.opts, val, ErrOverflow, "uint")
 	}
 	return reflect.ValueOf(u).Convert(t), nil
+}
+
+func reifyFloat(
+	opts fieldOptions,
+	val value,
+	t reflect.Type,
+) (reflect.Value, Error) {
+	f, err := val.toFloat(opts.opts)
+	if err != nil {
+		return reflect.Value{}, raiseConversion(opts.opts, val, err, "float")
+	}
+
+	tmp := reflect.Zero(t)
+	if tmp.OverflowFloat(f) {
+		return reflect.Value{}, raiseConversion(opts.opts, val, ErrOverflow, "float")
+	}
+	return reflect.ValueOf(f).Convert(t), nil
 }
 
 func reifyBool(

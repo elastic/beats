@@ -1,16 +1,14 @@
-/*
-  The harvester package harvest different inputs for new information. Currently
-  two harvester types exist:
-
-   * log
-   * stdin
-
-  The log harvester reads a file line by line. In case the end of a file is found
-  with an incomplete line, the line pointer stays at the beginning of the incomplete
-  line. As soon as the line is completed, it is read and returned.
-
-  The stdin harvesters reads data from stdin.
-*/
+// Package harvester harvests different inputs for new information. Currently
+// two harvester types exist:
+//
+//   * log
+//   * stdin
+//
+//  The log harvester reads a file line by line. In case the end of a file is found
+//  with an incomplete line, the line pointer stays at the beginning of the incomplete
+//  line. As soon as the line is completed, it is read and returned.
+//
+//  The stdin harvesters reads data from stdin.
 package harvester
 
 import (

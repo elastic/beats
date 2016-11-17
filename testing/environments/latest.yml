@@ -1,15 +1,21 @@
 # This is the latest stable release environment
 # It inherits from base.yml
 
-elasticsearch:
-  build: docker/elasticsearch
-  dockerfile: Dockerfile-2.4.0
-  command: elasticsearch -Des.network.host=0.0.0.0
+version: '2'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:latest
+    environment:
+        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        - "network.host="
+        - "transport.host=127.0.0.1"
+        - "http.host=0.0.0.0"
+        - "xpack.security.enabled=false"
 
-logstash:
-  build: docker/logstash
-  dockerfile: Dockerfile-2.4.0
+  logstash:
+    build:
+      context: docker/logstash
+      dockerfile: Dockerfile-latest
 
-kibana:
-  build: docker/kibana/
-  dockerfile: Dockerfile-4.6.0
+  kibana:
+    image: docker.elastic.co/kibana/kibana:latest

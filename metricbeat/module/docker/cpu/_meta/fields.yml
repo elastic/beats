@@ -1,0 +1,24 @@
+- name: cpu
+  type: group
+  description: >
+    Runtime cpu metrics.
+  fields:
+    - name: usage
+      type: group
+      description: >
+        Cpu usage metrics.
+      fields:
+        - name: kernel_mode
+          type: scaled_float
+          description: >
+            The system kernel consumed by The Docker server.
+        - name: user_mode
+          type: scaled_float
+          description: >
+            The system user mode consumed by The Docker server.
+        - name: total
+          type: scaled_float
+          description: >
+            The total system ressources consumed by The Docker server.
+
+        # TODO: Add per_cpu

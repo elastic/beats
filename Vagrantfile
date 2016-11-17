@@ -60,7 +60,7 @@ Vagrant.configure(2) do |config|
   # Windows Server 2012 R2
   config.vm.define "win2012", primary: true do |win2012|
 
-    win2012.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2016-01-20_0057.box"
+    win2012.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2016-10-28_1224.box"
     win2012.vm.guest = :windows
 
     # Communicator for windows boxes
@@ -76,7 +76,7 @@ Vagrant.configure(2) do |config|
 
   # Solaris 11.2
   config.vm.define "solaris", primary: true do |solaris|
-    solaris.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-solaris-11.2-virtualbox-2016-01-23_0522.box"
+    solaris.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-solaris-11.2-virtualbox-2016-11-02_1603.box"
     solaris.vm.network :forwarded_port, guest: 22,   host: 2223,  id: "ssh", auto_correct: true
 
     solaris.vm.provision "shell", inline: $unixProvision, privileged: false
@@ -84,7 +84,7 @@ Vagrant.configure(2) do |config|
 
   # FreeBSD 11.0
   config.vm.define "freebsd", primary: true do |freebsd|
-    freebsd.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-freebsd-11.0-virtualbox-2016-01-23_1919.box"
+    freebsd.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-freebsd-11.0-virtualbox-2016-11-02_1638.box"
     freebsd.vm.network :forwarded_port, guest: 22,   host: 2224,  id: "ssh", auto_correct: true
 
     # Must use NFS to sync a folder on FreeBSD and this requires a host-only network.
@@ -95,9 +95,9 @@ Vagrant.configure(2) do |config|
     freebsd.vm.provision "shell", inline: $unixProvision, privileged: false
   end
 
-  # OpenBSD 5.9-current
+  # OpenBSD 5.9-stable
   config.vm.define "openbsd", primary: true do |openbsd|
-    openbsd.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-openbsd-5.9-current-virtualbox-2016-04-22_0422.box"
+    openbsd.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-openbsd-5.9-current-virtualbox-2016-11-02_2007.box"
     openbsd.vm.network :forwarded_port, guest: 22,   host: 2225,  id: "ssh", auto_correct: true
 
     config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true

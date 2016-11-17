@@ -37,25 +37,39 @@ var (
 		"persistence": s.Object{
 			"loading": c.Bool("loading"),
 			"rdb": s.Object{
-				"last_save.changes_since": c.Int("rdb_changes_since_last_save"),
-				"last_save.time":          c.Int("rdb_last_save_time"),
+				"last_save": s.Object{
+					"changes_since": c.Int("rdb_changes_since_last_save"),
+					"time":          c.Int("rdb_last_save_time"),
+				},
 				"bgsave": s.Object{
-					"last_status":      c.Str("rdb_last_bgsave_status"),
-					"in_progress":      c.Bool("rdb_bgsave_in_progress"),
-					"last_time.sec":    c.Int("rdb_last_bgsave_time_sec"),
-					"current_time.sec": c.Int("rdb_current_bgsave_time_sec"),
+					"last_status": c.Str("rdb_last_bgsave_status"),
+					"in_progress": c.Bool("rdb_bgsave_in_progress"),
+					"last_time": s.Object{
+						"sec": c.Int("rdb_last_bgsave_time_sec"),
+					},
+					"current_time": s.Object{
+						"sec": c.Int("rdb_current_bgsave_time_sec"),
+					},
 				},
 			},
 			"aof": s.Object{
 				"enabled": c.Bool("aof_enabled"),
 				"rewrite": s.Object{
-					"in_progress":      c.Bool("aof_rewrite_in_progress"),
-					"scheduled":        c.Bool("aof_rewrite_scheduled"),
-					"last_time.sec":    c.Int("aof_last_rewrite_time_sec"),
-					"current_time.sec": c.Int("aof_current_rewrite_time_sec"),
+					"in_progress": c.Bool("aof_rewrite_in_progress"),
+					"scheduled":   c.Bool("aof_rewrite_scheduled"),
+					"last_time": s.Object{
+						"sec": c.Int("aof_last_rewrite_time_sec"),
+					},
+					"current_time": s.Object{
+						"sec": c.Int("aof_current_rewrite_time_sec"),
+					},
 				},
-				"bgrewrite.last_status": c.Str("aof_last_bgrewrite_status"),
-				"write.last_status":     c.Str("aof_last_write_status"),
+				"bgrewrite": s.Object{
+					"last_status": c.Str("aof_last_bgrewrite_status"),
+				},
+				"write": s.Object{
+					"last_status": c.Str("aof_last_write_status"),
+				},
 			},
 		},
 		"replication": s.Object{
@@ -93,17 +107,25 @@ var (
 				"rejected": c.Int("rejected_connections"),
 			},
 			"commands_processed": c.Int("total_commands_processed"),
-			"net.input.bytes":    c.Int("total_net_input_bytes"),
-			"net.output.bytes":   c.Int("total_net_output_bytes"),
+			"net": s.Object{
+				"input": s.Object{
+					"bytes": c.Int("total_net_input_bytes"),
+				},
+				"output": s.Object{
+					"bytes": c.Int("total_net_output_bytes"),
+				},
+			},
 			"instantaneous": s.Object{
 				"ops_per_sec": c.Int("instantaneous_ops_per_sec"),
 				"input_kbps":  c.Float("instantaneous_input_kbps"),
 				"output_kbps": c.Float("instantaneous_output_kbps"),
 			},
 			"sync": s.Object{
-				"full":        c.Int("sync_full"),
-				"partial.ok":  c.Int("sync_partial_ok"),
-				"partial.err": c.Int("sync_partial_err"),
+				"full": c.Int("sync_full"),
+				"partial": s.Object{
+					"ok":  c.Int("sync_partial_ok"),
+					"err": c.Int("sync_partial_err"),
+				},
 			},
 			"keys": s.Object{
 				"expired": c.Int("expired_keys"),
@@ -113,8 +135,10 @@ var (
 				"hits":   c.Int("keyspace_hits"),
 				"misses": c.Int("keyspace_misses"),
 			},
-			"pubsub.channels":        c.Int("pubsub_channels"),
-			"pubsub.patterns":        c.Int("pubsub_patterns"),
+			"pubsub": s.Object{
+				"channels": c.Int("pubsub_channels"),
+				"patterns": c.Int("pubsub_patterns"),
+			},
 			"latest_fork_usec":       c.Int("latest_fork_usec"),
 			"migrate_cached_sockets": c.Int("migrate_cached_sockets"),
 		},

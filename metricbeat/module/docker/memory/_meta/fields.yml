@@ -1,0 +1,48 @@
+- name: memory
+  type: group
+  description: >
+    Memory metrics.
+  fields:
+
+    - name: fail.count
+      type: scaled_float
+      description: >
+        Fail counter.
+    - name: limit
+      type: long
+      format: bytes
+      description: >
+        Memory limit.
+    - name: rss
+      type: group
+      description: >
+        Rss memory stats.
+      fields:
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Total memory resident set size.
+        - name: pct
+          type: scaled_float
+          description: >
+            Memory resident set size percentage.
+    - name: usage
+      type: group
+      description: >
+        Usage memory stats.
+      fields:
+        - name: max
+          type: long
+          format: bytes
+          description: >
+            Max memory usage.
+        - name: pct
+          type: scaled_float
+          description: >
+            Memory usage percentage.
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Total memory usage.

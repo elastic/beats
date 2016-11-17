@@ -205,7 +205,7 @@ func readTemplate(filename string) (map[string]interface{}, error) {
 }
 
 // loadTemplate checks if the index mapping template should be loaded
-// In case the template is not already loaded or overwritting is enabled, the
+// In case the template is not already loaded or overwriting is enabled, the
 // template is written to index
 func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) error {
 	out.templateMutex.Lock()

@@ -13,7 +13,7 @@ Use the following naming conventions for field names:
 - Group related fields into subdocuments by using dot (.) notation. Groups typically have common prefixes. For example, if you have fields called `CPULoad` and `CPUSystem` in a service, you would convert
 them into `cpu.load` and `cpu.system` in the event. 
 - Avoid repeating the namespace in field names. If a word or abbreviation appears in the namespace, it's not needed in the field name. For example, instead of `cpu.cpu_load`, use `cpu.load`.
-- Use <<abbreviations,standard abbreviations>> and avoid using abbreviations that aren't commonly known.
+- Use <<abbreviations,standardised names>> and avoid using abbreviations that aren't commonly known.
 - Organise the documents from general to specific to allow for namespacing. The type, such as `.pct`, should always be last. For example, `system.core.user.pct`.
 - If two fields are the same, but with different units, remove the less granular one. For example, include `timeout.sec`, but don't include `timeout.min`. If a less granular value is required, you can calculate it later.
 - If a field name matches the namespace used for nested fields, add `.value` to the field name. For example, instead of:

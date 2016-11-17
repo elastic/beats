@@ -134,7 +134,7 @@ class TestProcessors(metricbeat.BaseTest):
         output = self.read_output(
             required_fields=["@timestamp", "type"],
         )
-        assert len(output) == 1
+        assert len(output) >= 1
 
 
     def test_include_fields(self):

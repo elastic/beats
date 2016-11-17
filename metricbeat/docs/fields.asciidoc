@@ -1,6 +1,6 @@
 
 ////
-This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
@@ -15,8 +15,11 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-beat>>
 * <<exported-fields-beats>>
+* <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-docker>>
 * <<exported-fields-haproxy>>
+* <<exported-fields-kafka>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
@@ -374,6 +377,12 @@ The hostname as returned by the operating system on which the Beat is running.
 
 
 [float]
+=== beat.version
+
+The version of the beat that generated this event.
+
+
+[float]
 === @timestamp
 
 type: date
@@ -404,6 +413,7 @@ Contains user configurable fields.
 [[exported-fields-beats]]
 == beats Fields
 
+experimental[]
 beats Module
 
 
@@ -655,6 +665,57 @@ type: long
 Total number of events published
 
 
+[[exported-fields-cloud]]
+== Cloud Provider Metadata Fields
+
+Metadata from cloud providers added by the add_cloud_metadata processor.
+
+
+
+[float]
+=== meta.cloud.provider
+
+example: ec2
+
+Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
+
+
+[float]
+=== meta.cloud.instance_id
+
+Instance ID of the host machine.
+
+
+[float]
+=== meta.cloud.machine_type
+
+example: t2.medium
+
+Machine type of the host machine.
+
+
+[float]
+=== meta.cloud.availability_zone
+
+example: us-east-1c
+
+Availability zone in which this host is running.
+
+
+[float]
+=== meta.cloud.project_id
+
+example: project-x
+
+Name of the project in Google Cloud.
+
+
+[float]
+=== meta.cloud.region
+
+Region in which this host is running.
+
+
 [[exported-fields-common]]
 == Common Fields
 
@@ -698,6 +759,413 @@ example: metricsets
 required: True
 
 The document type. Always set to "metricsets".
+
+
+[[exported-fields-docker]]
+== docker Fields
+
+experimental[]
+Docker stats collected from Docker.
+
+
+
+[float]
+== docker Fields
+
+docker contains different informations and statistics of docker's containers running
+
+
+
+[float]
+== container Fields
+
+Docker container metrics
+
+
+
+[float]
+=== docker.container.command
+
+type: keyword
+
+Executed command in docker container.
+
+
+[float]
+=== docker.container.created
+
+type: date
+
+Date then the container was created.
+
+
+[float]
+=== docker.container.id
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== docker.container.image
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== docker.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.container.status
+
+type: keyword
+
+Container status.
+
+
+[float]
+== size Fields
+
+Container size metrics.
+
+
+
+[float]
+=== docker.container.size.root_fs
+
+type: long
+
+Total size of all the files in the container.
+
+
+[float]
+=== docker.container.size.rw
+
+type: long
+
+Size of the files which have been created or changed since creation.
+
+
+[float]
+== cpu Fields
+
+Runtime cpu metrics.
+
+
+
+[float]
+== usage Fields
+
+Cpu usage metrics.
+
+
+
+[float]
+=== docker.cpu.usage.kernel_mode
+
+type: scaled_float
+
+The system kernel consumed by The Docker server.
+
+
+[float]
+=== docker.cpu.usage.user_mode
+
+type: scaled_float
+
+The system user mode consumed by The Docker server.
+
+
+[float]
+=== docker.cpu.usage.total
+
+type: scaled_float
+
+The total system ressources consumed by The Docker server.
+
+
+[float]
+== diskio Fields
+
+Diskio metrics.
+
+
+
+[float]
+=== docker.diskio.reads
+
+type: scaled_float
+
+Number of reads.
+
+
+[float]
+=== docker.diskio.writes
+
+type: scaled_float
+
+Number of writes.
+
+
+[float]
+=== docker.diskio.total
+
+type: scaled_float
+
+Reads and writes numbers combined.
+
+
+[float]
+== info Fields
+
+experimental[]
+info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information
+
+
+
+[float]
+== containers Fields
+
+Overall container stats.
+
+
+
+[float]
+=== docker.info.containers.paused
+
+type: long
+
+Total number of paused containers.
+
+
+[float]
+=== docker.info.containers.running
+
+type: long
+
+Total number of running containers.
+
+
+[float]
+=== docker.info.containers.stopped
+
+type: long
+
+Total number of stopped containers.
+
+
+[float]
+=== docker.info.containers.total
+
+type: long
+
+Total number of existing containers.
+
+
+[float]
+=== docker.info.id
+
+type: keyword
+
+Unique docker host identifier.
+
+
+[float]
+=== docker.info.images
+
+type: long
+
+Total number of existing images.
+
+
+[float]
+== memory Fields
+
+Memory metrics.
+
+
+
+[float]
+=== docker.memory.fail.count
+
+type: scaled_float
+
+Fail counter.
+
+
+[float]
+=== docker.memory.limit
+
+type: long
+
+format: bytes
+
+Memory limit.
+
+
+[float]
+== rss Fields
+
+Rss memory stats.
+
+
+
+[float]
+=== docker.memory.rss.total
+
+type: long
+
+format: bytes
+
+Total memory resident set size.
+
+
+[float]
+=== docker.memory.rss.pct
+
+type: scaled_float
+
+Memory resident set size percentage.
+
+
+[float]
+== usage Fields
+
+Usage memory stats.
+
+
+
+[float]
+=== docker.memory.usage.max
+
+type: long
+
+format: bytes
+
+Max memory usage.
+
+
+[float]
+=== docker.memory.usage.pct
+
+type: scaled_float
+
+Memory usage percentage.
+
+
+[float]
+=== docker.memory.usage.total
+
+type: long
+
+format: bytes
+
+Total memory usage.
+
+
+[float]
+== network Fields
+
+Netowrk metrics.
+
+
+
+[float]
+=== docker.network.interface
+
+type: keyword
+
+Network interface name.
+
+
+[float]
+== in Fields
+
+Incoming network stats.
+
+
+
+[float]
+=== docker.network.in.bytes
+
+type: long
+
+format: bytes
+
+Total number of incoming bytes.
+
+
+[float]
+=== docker.network.in.dropped
+
+type: scaled_float
+
+Total number of dropped incoming packets.
+
+
+[float]
+=== docker.network.in.errors
+
+type: long
+
+Total errors on incoming packets.
+
+
+[float]
+=== docker.network.in.packets
+
+type: long
+
+Total number of incoming packets.
+
+
+[float]
+== out Fields
+
+Outgoing network stats.
+
+
+
+[float]
+=== docker.network.out.bytes
+
+type: long
+
+format: bytes
+
+Total number of outgoing bytes.
+
+
+[float]
+=== docker.network.out.dropped
+
+type: scaled_float
+
+Total number of dropped outgoing packets.
+
+
+[float]
+=== docker.network.out.errors
+
+type: long
+
+Total errors on outgoing packets.
+
+
+[float]
+=== docker.network.out.packets
+
+type: long
+
+Total number of outgoing packets.
 
 
 [[exported-fields-haproxy]]
@@ -881,7 +1349,7 @@ type: integer
 [float]
 == max Fields
 
-
+Maximum values reported by HAProxy.
 
 
 [float]
@@ -889,63 +1357,63 @@ type: integer
 
 type: integer
 
+HardMaxconn
 
+[float]
+=== haproxy.info.max.ssl.conns
+
+type: integer
+
+MaxSslConns
+
+[float]
+=== haproxy.info.max.ssl.rate
+
+type: integer
+
+MaxSslRate
 
 [float]
 === haproxy.info.max.sock
 
 type: integer
 
-
+Maxsock
 
 [float]
-=== haproxy.info.max.conn
+=== haproxy.info.max.conn.value
 
 type: integer
 
-
+Maxconn
 
 [float]
-=== haproxy.info.max.ssl_conns
+=== haproxy.info.max.conn.rate
 
 type: integer
 
-
-
-[float]
-=== haproxy.info.max.pipes
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.max.conn_rate
-
-type: integer
-
-
+MaxConnRate
 
 [float]
 === haproxy.info.max.sess_rate
 
 type: integer
 
-
+MaxSessRate
 
 [float]
-=== haproxy.info.max.ssl_rate
+=== haproxy.info.max.pipes
 
 type: integer
 
-
+Maxpipes
 
 [float]
 === haproxy.info.max.zlib_mem_usage
 
 type: integer
 
-
+MaxZlibMemUsage
 
 [float]
 == pipes Fields
@@ -1067,14 +1535,14 @@ type: integer
 
 
 [float]
-=== haproxy.info.ssl.ssl_cached_lookups
+=== haproxy.info.ssl.cached_lookups
 
 type: integer
 
 
 
 [float]
-=== haproxy.info.ssl.ssl_cache_misses
+=== haproxy.info.ssl.cache_misses
 
 type: integer
 
@@ -1680,6 +2148,81 @@ type: integer
 the average total session time in ms over the 1024 last requests
 
 
+[[exported-fields-kafka]]
+== kafka Fields
+
+kafka Module
+
+
+
+[float]
+== kafka Fields
+
+
+
+
+[float]
+== partition Fields
+
+partition
+
+
+
+[float]
+== offset Fields
+
+Available offsets of the given partition.
+
+
+
+[float]
+=== kafka.partition.offset.newest
+
+type: long
+
+Newest offset of the partition.
+
+
+[float]
+=== kafka.partition.offset.oldest
+
+type: long
+
+Oldest offset of the partition.
+
+
+[float]
+=== kafka.partition.partition
+
+type: long
+
+Partition id.
+
+
+[float]
+=== kafka.partition.topic
+
+type: keyword
+
+Topic name
+
+
+[float]
+=== kafka.partition.broker.id
+
+type: long
+
+Broker id
+
+
+[float]
+=== kafka.partition.broker.address
+
+type: keyword
+
+Broker address
+
+
 [[exported-fields-mongodb]]
 == MongoDB Fields
 
@@ -2192,6 +2735,198 @@ True when there are operations from a mongos instance queued for retrying.
 type: keyword
 
 A string that represents the name of the current storage engine.
+
+
+[float]
+== wired_tiger Fields
+
+Statistics about the WiredTiger storage engine.
+
+
+
+[float]
+== concurrent_transactions Fields
+
+Statistics about the transactions currently in progress.
+
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.write.out
+
+type: long
+
+Number of concurrent write transaction in progress.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.write.available
+
+type: long
+
+Number of concurrent write tickets available.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.write.total_tickets
+
+type: long
+
+Number of total write tickets.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.read.out
+
+type: long
+
+Number of concurrent read transaction in progress.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.read.available
+
+type: long
+
+Number of concurrent read tickets available.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.read.total_tickets
+
+type: long
+
+Number of total read tickets.
+
+
+[float]
+== cache Fields
+
+Statistics about the cache and page evictions from the cache.
+
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.maximum.bytes
+
+type: long
+
+format: bytes
+
+Maximum cache size.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.used.bytes
+
+type: long
+
+format: bytes
+
+Size in byte of the data currently in cache.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.dirty.bytes
+
+type: long
+
+format: bytes
+
+Size in bytes of the dirty data in the cache.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.pages.read
+
+type: long
+
+Number of pages read into the cache.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.pages.write
+
+type: long
+
+Number of pages written from the cache.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.pages.evicted
+
+type: long
+
+Number of pages evicted from the cache.
+
+
+[float]
+== log Fields
+
+Statistics about the write ahead log used by WiredTiger.
+
+
+
+[float]
+=== mongodb.status.wired_tiger.log.size.bytes
+
+type: long
+
+format: bytes
+
+Total log size in bytes.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.write.bytes
+
+type: long
+
+format: bytes
+
+Number of bytes written into the log.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.max_file_size.bytes
+
+type: long
+
+format: bytes
+
+Maximum file size.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.flushes
+
+type: long
+
+Number of flush operations.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.writes
+
+type: long
+
+Number of write operations.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.scans
+
+type: long
+
+Number of scan operations.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.syncs
+
+type: long
+
+Number of sync operations.
 
 
 [[exported-fields-mysql]]
@@ -3052,7 +3787,7 @@ User CPU consumed by the background processes.
 [float]
 == memory Fields
 
-Redis CPU stats.
+Redis memory stats.
 
 
 
@@ -3061,13 +3796,16 @@ Redis CPU stats.
 
 type: long
 
-Used memory.
+format: bytes Used memory.
+
 
 
 [float]
 === redis.info.memory.used.rss
 
 type: long
+
+format: bytes
 
 Used memory rss.
 
@@ -3077,6 +3815,8 @@ Used memory rss.
 
 type: long
 
+format: bytes
+
 Used memory peak.
 
 
@@ -3084,6 +3824,8 @@ Used memory peak.
 === redis.info.memory.used.lua
 
 type: long
+
+format: bytes
 
 Used memory lua.
 
@@ -3109,6 +3851,12 @@ Redis CPU stats.
 type: boolean
 
 None
+
+[float]
+== rdb Fields
+
+None
+
 
 [float]
 === redis.info.persistence.rdb.last_save.changes_since
@@ -3151,6 +3899,12 @@ None
 type: long
 
 None
+
+[float]
+== aof Fields
+
+None
+
 
 [float]
 === redis.info.persistence.aof.enabled
@@ -4055,7 +4809,7 @@ The percentage of used disk space.
 [float]
 == fsstat Fields
 
-`system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
+`system.fsstat` contains filesystem metrics aggregated from all mounted filesystems, similar with what `df -a` prints out.
 
 
 
@@ -4223,6 +4977,8 @@ Actual memory used and free.
 
 type: long
 
+format: bytes
+
 Actual used memory in bytes. It represents the difference between the total and the available memory. The available memory depends on the OS. For more details, please check `system.actual.free`.
 
 
@@ -4231,13 +4987,17 @@ Actual used memory in bytes. It represents the difference between the total and 
 
 type: long
 
-Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is the  amount of unreserved and uncommitted memory currently in the user-mode portion of the virtual address space of the calling process.
+format: bytes
+
+Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
 
 
 [float]
 === system.memory.actual.used.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of actual used memory.
 
@@ -5068,7 +5828,7 @@ Path to the cgroup relative to the cgroup subsystems mountpoint.
 [float]
 === system.process.cgroup.blkio.total.bytes
 
-type: keyword
+type: long
 
 format: bytes
 
@@ -5078,7 +5838,7 @@ Total number of bytes transferred to and from all block devices by processes in 
 [float]
 === system.process.cgroup.blkio.total.ios
 
-type: keyword
+type: long
 
 Total number of I/O operations performed on all devices by processes in the cgroup as seen by the throttling policy.
 

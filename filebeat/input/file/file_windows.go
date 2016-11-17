@@ -30,7 +30,7 @@ func GetOSState(info os.FileInfo) StateOS {
 	// Get the three fields required to uniquely identify file und windows
 	// More details can be found here: https://msdn.microsoft.com/en-us/library/aa363788(v=vs.85).aspx
 	// Uint should already return uint64, but making sure this is the case
-	// The required fiels can be found here: https://github.com/golang/go/blob/master/src/os/types_windows.go#L78
+	// The required fields can be found here: https://github.com/golang/go/blob/master/src/os/types_windows.go#L78
 	fileState := StateOS{
 		IdxHi: uint64(fileStat.FieldByName("idxhi").Uint()),
 		IdxLo: uint64(fileStat.FieldByName("idxlo").Uint()),

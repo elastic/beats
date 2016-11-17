@@ -13,8 +13,18 @@
   #period: 10s
 
   # The host must be passed as PostgreSQL DSN. Example:
-  # postgres://pqgotest:password@localhost:5432?sslmode=disable
+  # postgres://localhost:5432?sslmode=disable
   # The available parameters are documented here:
   # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
-  #hosts: ["postgres://postgres@localhost:5432"]
+  #
+  # Warning: specifying the user/password in the hosts array is possible
+  # but it will result in the password being present in the output documents.
+  # We recommend using the username and password options instead.
+  #hosts: ["postgres://localhost:5432"]
+
+  # Username to use when connecting to PostgreSQL. Empty by default.
+  #username: user
+
+  # Password to use when connecting to PostgreSQL. Empty by default.
+  #password: pass
 

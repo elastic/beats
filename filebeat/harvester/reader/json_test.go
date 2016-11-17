@@ -8,14 +8,12 @@ import (
 )
 
 func TestUnmarshal(t *testing.T) {
-	type io struct {
+	tests := []struct {
 		Name   string
 		Input  string
 		Output map[string]interface{}
-	}
-
-	tests := []io{
-		io{
+	}{
+		{
 			Name:  "Top level int, float, string, bool",
 			Input: `{"a": 3, "b": 2.0, "c": "hello", "d": true}`,
 			Output: map[string]interface{}{
@@ -25,7 +23,7 @@ func TestUnmarshal(t *testing.T) {
 				"d": true,
 			},
 		},
-		io{
+		{
 			Name:  "Nested objects with ints",
 			Input: `{"a": 3, "b": {"c": {"d": 5}}}`,
 			Output: map[string]interface{}{
@@ -37,7 +35,7 @@ func TestUnmarshal(t *testing.T) {
 				},
 			},
 		},
-		io{
+		{
 			Name:  "Array of floats",
 			Input: `{"a": 3, "b": {"c": [4.0, 4.1, 4.2]}}`,
 			Output: map[string]interface{}{
@@ -49,7 +47,7 @@ func TestUnmarshal(t *testing.T) {
 				},
 			},
 		},
-		io{
+		{
 			Name:  "Array of mixed ints and floats",
 			Input: `{"a": 3, "b": {"c": [4, 4.1, 4.2]}}`,
 			Output: map[string]interface{}{
@@ -61,7 +59,7 @@ func TestUnmarshal(t *testing.T) {
 				},
 			},
 		},
-		io{
+		{
 			Name:  "Negative values",
 			Input: `{"a": -3, "b": -1.0}`,
 			Output: map[string]interface{}{
@@ -81,14 +79,12 @@ func TestUnmarshal(t *testing.T) {
 }
 
 func TestDecodeJSON(t *testing.T) {
-	type io struct {
+	var tests = []struct {
 		Text         string
 		Config       JSONConfig
 		ExpectedText string
 		ExpectedMap  common.MapStr
-	}
-
-	var tests = []io{
+	}{
 		{
 			Text:         `{"message": "test", "value": 1}`,
 			Config:       JSONConfig{MessageKey: "message"},
@@ -154,8 +150,8 @@ func TestDecodeJSON(t *testing.T) {
 
 		var p JSON
 		p.cfg = &test.Config
-		text, map_ := p.decodeJSON([]byte(test.Text))
+		text, M := p.decodeJSON([]byte(test.Text))
 		assert.Equal(t, test.ExpectedText, string(text))
-		assert.Equal(t, test.ExpectedMap, map_)
+		assert.Equal(t, test.ExpectedMap, M)
 	}
 }

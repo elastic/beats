@@ -23,7 +23,7 @@ type PacketbeatPublisher struct {
 	pub    publisher.Publisher
 	client publisher.Client
 
-	topo           TopologyProvider
+	topo           topologyProvider
 	geoLite        *libgeo.GeoIP
 	ignoreOutgoing bool
 
@@ -41,7 +41,7 @@ type ChanTransactions struct {
 // XXX: currently implemented by libbeat publisher. This functionality is only
 // required by packetbeat. Source for TopologyProvider should become local to
 // packetbeat.
-type TopologyProvider interface {
+type topologyProvider interface {
 	IsPublisherIP(ip string) bool
 	GetServerName(ip string) string
 	GeoLite() *libgeo.GeoIP
@@ -59,7 +59,7 @@ func NewPublisher(
 	hwm, bulkHWM int,
 	ignoreOutgoing bool,
 ) (*PacketbeatPublisher, error) {
-	topo, ok := pub.(TopologyProvider)
+	topo, ok := pub.(topologyProvider)
 	if !ok {
 		return nil, errors.New("Requires topology provider")
 	}
@@ -76,9 +76,9 @@ func NewPublisher(
 	}, nil
 }
 
-func (t *PacketbeatPublisher) PublishTransaction(event common.MapStr) bool {
+func (p *PacketbeatPublisher) PublishTransaction(event common.MapStr) bool {
 	select {
-	case t.trans <- event:
+	case p.trans <- event:
 		return true
 	default:
 		// drop event if queue is full
@@ -86,64 +86,64 @@ func (t *PacketbeatPublisher) PublishTransaction(event common.MapStr) bool {
 	}
 }
 
-func (t *PacketbeatPublisher) PublishFlows(event []common.MapStr) bool {
+func (p *PacketbeatPublisher) PublishFlows(event []common.MapStr) bool {
 	select {
-	case t.flows <- event:
+	case p.flows <- event:
 		return true
-	case <-t.done:
+	case <-p.done:
 		// drop event, if worker has been stopped
 		return false
 	}
 }
 
-func (t *PacketbeatPublisher) Start() {
-	t.wg.Add(1)
+func (p *PacketbeatPublisher) Start() {
+	p.wg.Add(1)
 	go func() {
-		defer t.wg.Done()
+		defer p.wg.Done()
 		for {
 			select {
-			case <-t.done:
+			case <-p.done:
 				return
-			case event := <-t.trans:
-				t.onTransaction(event)
+			case event := <-p.trans:
+				p.onTransaction(event)
 			}
 		}
 	}()
 
-	t.wg.Add(1)
+	p.wg.Add(1)
 	go func() {
-		defer t.wg.Done()
+		defer p.wg.Done()
 		for {
 			select {
-			case <-t.done:
+			case <-p.done:
 				return
-			case events := <-t.flows:
-				t.onFlow(events)
+			case events := <-p.flows:
+				p.onFlow(events)
 			}
 		}
 	}()
 }
 
-func (t *PacketbeatPublisher) Stop() {
-	t.client.Close()
-	close(t.done)
-	t.wg.Wait()
+func (p *PacketbeatPublisher) Stop() {
+	p.client.Close()
+	close(p.done)
+	p.wg.Wait()
 }
 
-func (t *PacketbeatPublisher) onTransaction(event common.MapStr) {
+func (p *PacketbeatPublisher) onTransaction(event common.MapStr) {
 	if err := validateEvent(event); err != nil {
 		logp.Warn("Dropping invalid event: %v", err)
 		return
 	}
 
-	if !t.normalizeTransAddr(event) {
+	if !p.normalizeTransAddr(event) {
 		return
 	}
 
-	t.client.PublishEvent(event)
+	p.client.PublishEvent(event)
 }
 
-func (t *PacketbeatPublisher) onFlow(events []common.MapStr) {
+func (p *PacketbeatPublisher) onFlow(events []common.MapStr) {
 	pub := events[:0]
 	for _, event := range events {
 		if err := validateEvent(event); err != nil {
@@ -151,14 +151,14 @@ func (t *PacketbeatPublisher) onFlow(events []common.MapStr) {
 			continue
 		}
 
-		if !t.addGeoIPToFlow(event) {
+		if !p.addGeoIPToFlow(event) {
 			continue
 		}
 
 		pub = append(pub, event)
 	}
 
-	t.client.PublishEvents(pub)
+	p.client.PublishEvents(pub)
 }
 
 // filterEvent validates an event for common required fields with types.
@@ -195,7 +195,7 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 	debugf("has src: %v", ok)
 	if ok {
 		// check if it's outgoing transaction (as client)
-		isOutgoing := p.topo.IsPublisherIP(src.Ip)
+		isOutgoing := p.topo.IsPublisherIP(src.IP)
 		if isOutgoing {
 			if p.ignoreOutgoing {
 				// duplicated transaction -> ignore it
@@ -207,8 +207,8 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 			event["direction"] = "out"
 		}
 
-		srcServer = p.topo.GetServerName(src.Ip)
-		event["client_ip"] = src.Ip
+		srcServer = p.topo.GetServerName(src.IP)
+		event["client_ip"] = src.IP
 		event["client_port"] = src.Port
 		event["client_proc"] = src.Proc
 		event["client_server"] = srcServer
@@ -218,15 +218,15 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 	dst, ok := event["dst"].(*common.Endpoint)
 	debugf("has dst: %v", ok)
 	if ok {
-		dstServer = p.topo.GetServerName(dst.Ip)
-		event["ip"] = dst.Ip
+		dstServer = p.topo.GetServerName(dst.IP)
+		event["ip"] = dst.IP
 		event["port"] = dst.Port
 		event["proc"] = dst.Proc
 		event["server"] = dstServer
 		delete(event, "dst")
 
 		//check if it's incoming transaction (as server)
-		if p.topo.IsPublisherIP(dst.Ip) {
+		if p.topo.IsPublisherIP(dst.IP) {
 			// incoming transaction
 			event["direction"] = "in"
 		}
@@ -243,7 +243,7 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 			}
 		} else {
 			if len(srcServer) == 0 && src != nil { // only for external IP addresses
-				loc := p.geoLite.GetLocationByIP(src.Ip)
+				loc := p.geoLite.GetLocationByIP(src.IP)
 				if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
 					loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
 					event["client_location"] = loc

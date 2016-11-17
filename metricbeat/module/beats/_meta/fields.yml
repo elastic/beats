@@ -1,6 +1,8 @@
 - key: beats
   title: "beats"
   description: >
+    experimental[]
+
     beats Module
   short_config: false
   fields:

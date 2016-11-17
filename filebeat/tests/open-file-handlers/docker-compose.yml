@@ -8,6 +8,8 @@ filebeat:
     - ES_HOST=${ES_HOST}
     - ES_USER=${ES_USER}
     - ES_PASSWORD=${ES_PASSWORD}
+  ports:
+    - 6060:6060
 
 # This host name is fixed because of the certificate
 logs:

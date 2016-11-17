@@ -10,5 +10,7 @@ Here's how Filebeat works: When you start Filebeat, it starts one or more prospe
 
 image:./images/filebeat.png[Beats design]
 
+For more information about prospectors and harvesters, see <<how-filebeat-works>>.
+
 Filebeat is a https://www.elastic.co/products/beats[Beat], and it is based on the libbeat framework.
 General information about libbeat and setting up Elasticsearch, Logstash, and Kibana are covered in the {libbeat}/index.html[Beats Platform Reference].
