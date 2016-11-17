@@ -1,7 +1,6 @@
 package docker
 
 import (
-	"sort"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -12,7 +11,7 @@ import (
 type Container struct {
 	Id     string
 	Name   string
-	Labels []common.MapStr
+	Labels common.MapStr
 	Socket *string
 }
 
@@ -52,24 +51,15 @@ func ExtractContainerName(names []string) string {
 	return strings.Trim(output, "/")
 }
 
-func BuildLabelArray(labels map[string]string) []common.MapStr {
+func BuildLabelArray(labels map[string]string) common.MapStr {
 
-	outputLabels := make([]common.MapStr, len(labels))
-	i := 0
-	var keys []string
-	for key := range labels {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-	for _, k := range keys {
-		// Replace all . in the labels by _
-		// TODO: WHY?
+	outputLabels := common.MapStr{}
+
+	for k, v := range labels {
+		// This is necessary, so ES does not interpret '.' fields as new nested JSONs, and also makes this compatible with ES 2.4
 		label := strings.Replace(k, ".", "_", -1)
-		outputLabels[i] = common.MapStr{
-			"key":   label,
-			"value": labels[k],
-		}
-		i++
+		outputLabels.Put(label, v)
 	}
+
 	return outputLabels
 }
