@@ -85,7 +85,7 @@ func TestEventToMapStrJSON(t *testing.T) {
                         Event: Event{
                                 DocumentType: "test_type",
                                 Text:         &text,
-                                JSONFields:   common.MapStr{"type": "test", "text": "hi"},
+                                JSONFields:   common.MapStr{"type": "test", "text": "hello"},
                                 JSONConfig:   &reader.JSONConfig{JsonKey: "foobar"},
                         },
                         ExpectedItems: common.MapStr{
