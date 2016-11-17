@@ -84,5 +84,9 @@ func (config *harvesterConfig) Validate() error {
 		return fmt.Errorf("When using the JSON decoder and line filtering together, you need to specify a message_key value")
 	}
 
+	if config.JSON != nil && len(config.JSON.JsonKey) == 0 {
+		config.JSON.JsonKey = "json"
+	}
+
 	return nil
 }
