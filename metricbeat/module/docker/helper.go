@@ -34,7 +34,7 @@ func NewContainer(container *docker.APIContainers) *Container {
 	return &Container{
 		Id:     container.ID,
 		Name:   ExtractContainerName(container.Names),
-		Labels: BuildLabelArray(container.Labels),
+		Labels: ConvertContainerLabels(container.Labels),
 	}
 }
 
@@ -51,7 +51,7 @@ func ExtractContainerName(names []string) string {
 	return strings.Trim(output, "/")
 }
 
-func BuildLabelArray(labels map[string]string) common.MapStr {
+func ConvertContainerLabels(labels map[string]string) common.MapStr {
 
 	outputLabels := common.MapStr{}
 
