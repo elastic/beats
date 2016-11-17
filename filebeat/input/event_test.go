@@ -80,19 +80,19 @@ func TestEventToMapStrJSON(t *testing.T) {
 				"type": "test_type",
 			},
 		},
-                {
-                        // when JsonKey is defined, the json content is expected under that key
-                        Event: Event{
-                                DocumentType: "test_type",
-                                Text:         &text,
-                                JSONFields:   common.MapStr{"type": "test", "text": "hello"},
-                                JSONConfig:   &reader.JSONConfig{JsonKey: "foobar"},
-                        },
-                        ExpectedItems: common.MapStr{
-                                "foobar": common.MapStr{"type": "test", "text": "hello"},
-                                "type": "test_type",
-                        },
-                },
+		{
+			// when JsonKey is defined, the json content is expected under that key
+			Event: Event{
+				DocumentType: "test_type",
+				Text:         &text,
+				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
+				JSONConfig:   &reader.JSONConfig{JsonKey: "foobar"},
+			},
+			ExpectedItems: common.MapStr{
+				"foobar": common.MapStr{"type": "test", "text": "hello"},
+				"type":   "test_type",
+			},
+		},
 		{
 			// when @timestamp is in JSON and overwrite_keys is true, parse it
 			// in a common.Time
