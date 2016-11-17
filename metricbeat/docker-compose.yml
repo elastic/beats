@@ -4,7 +4,6 @@ services:
     build: ${PWD}/.
     links:
       - apache
-      - filebeat
       - mongodb
       - kafka
       - mysql
@@ -16,8 +15,6 @@ services:
     environment:
       - APACHE_HOST=apache
       - APACHE_PORT=80
-      - FILEBEAT_HOST=filebeat
-      - FILEBEAT_PORT=6060
       - KAFKA_HOST=kafka
       - KAFKA_PORT=9092
       - NGINX_HOST=nginx
@@ -53,9 +50,6 @@ services:
   # Modules
   apache:
     build: ${PWD}/module/apache/_meta
-
-  filebeat:
-    build: ${PWD}/module/beats/filebeat/_meta
 
   kafka:
     image: spotify/kafka
