@@ -1,5 +1,6 @@
 // +build integration
-package broker
+
+package consumer
 
 import (
 	"testing"
@@ -17,7 +18,6 @@ func TestData(t *testing.T) {
 	if err != nil {
 		t.Fatal("write", err)
 	}
-
 }
 
 func TestTopic(t *testing.T) {
@@ -26,18 +26,19 @@ func TestTopic(t *testing.T) {
 	kafka.GenerateKafkaData(t)
 
 	f := mbtest.NewEventsFetcher(t, getConfig())
-	data, err := f.Fetch()
+	dataBefore, err := f.Fetch()
 	if err != nil {
 		t.Fatal("write", err)
 	}
 
-	t.Errorf("DATA: %+v", data)
-
+	t.Errorf("%v", dataBefore)
 	/*
 
-		// Create 10 messages
-		for i := 0; i < 10; i++ {
-			generateKafkaData(t)
+		var n int64 = 10
+		var i int64 = 0
+		// Create n messages
+		for ; i < n; i++ {
+			kafka.GenerateKafkaData(t)
 		}
 
 		dataAfter, err := f.Fetch()
@@ -45,12 +46,25 @@ func TestTopic(t *testing.T) {
 			t.Fatal("write", err)
 		}*/
 
+	// Checks that no new topics / partitions were added
+	//assert.True(t, len(dataBefore) == len(dataAfter))
+
+	// Compares offset before and after
+	/*offsetBefore := dataBefore[0]["offset"].(common.MapStr)["newest"].(int64)
+	offsetAfter := dataAfter[0]["offset"].(common.MapStr)["newest"].(int64)
+
+	if offsetBefore+n != offsetAfter {
+		t.Errorf("Offset before: %v", offsetBefore)
+		t.Errorf("Offset after: %v", offsetAfter)
+	}
+	assert.True(t, offsetBefore+n == offsetAfter)*/
+
 }
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "kafka",
-		"metricsets": []string{"broker"},
+		"metricsets": []string{"consumer"},
 		"hosts":      []string{kafka.GetTestKafkaHost()},
 	}
 }

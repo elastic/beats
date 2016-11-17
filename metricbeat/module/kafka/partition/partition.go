@@ -43,18 +43,6 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	if err != nil {
 		return nil, err
 	}
-	/*if m.client == nil {
-		config := sarama.NewConfig()
-		config.Net.DialTimeout = m.Module().Config().Timeout
-		config.Net.ReadTimeout = m.Module().Config().Timeout
-		config.ClientID = "metricbeat"
-
-		client, err := sarama.NewClient([]string{m.Host()}, config)
-		if err != nil {
-			return nil, err
-		}
-		m.client = client
-	}*/
 
 	topics, err := m.client.Topics()
 	if err != nil {

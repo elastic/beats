@@ -1,3 +1,0 @@
-=== kafka broker MetricSet
-
-This is the broker metricset of the module kafka.

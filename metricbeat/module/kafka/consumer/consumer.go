@@ -1,8 +1,15 @@
 package consumer
 
 import (
+	"time"
+
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/kafka"
+
+	"github.com/Shopify/sarama"
+	"github.com/wvanbergen/kazoo-go"
 )
 
 // init registers the MetricSet with the central registry.
@@ -19,7 +26,7 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	counter int
+	client sarama.Client
 }
 
 // New create a new instance of the MetricSet
@@ -35,7 +42,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		counter:       1,
 	}, nil
 }
 
@@ -44,34 +50,66 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
-	/*
-		Returns a list of consumer with the following fields
-
-
-		- partition id
-		- topic
-		- group
-		- offset
-		- size-offset (optional)
-
-		Do we need to open a consumer to get the data?
-		Connection to zookeeper need to fetch list of consumers?
-
-		https://github.com/linkedin/Burrow/blob/master/protocol/protocol.go#L70
-	*/
-
-	/*var err error
-	config := sarama.NewConfig()
-	client, err := sarama.NewClient([]string{"localhost:9092"}, config)*/
-
-	/*logp.Debug("test", "TOPICS: %+v", topics)
-
+	var err error
+	m.client, err = kafka.GetClient(m.client, m)
 	if err != nil {
+		return nil, err
+	}
 
-			logp.Err("ERRR: %s", err)
-	}*/
+	// Create config for it
+	hosts := []string{"kafka:2181"}
+
+	zookeeperClient, err := kazoo.NewKazoo(hosts, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	groups, err := zookeeperClient.Consumergroups()
+	if err != nil {
+		return nil, err
+	}
+
+	topics, err := m.client.Topics()
+	if err != nil {
+		return nil, err
+	}
 
 	events := []common.MapStr{}
-	return events, nil
+	for _, group := range groups {
+		broker, err := m.client.Coordinator(group.Name)
+		if err != nil {
+			logp.Err("Broker error: %s", err)
+			continue
+		}
 
+		offsetRequest := &sarama.OffsetFetchRequest{
+			ConsumerGroup: group.Name,
+			Version:       0,
+		}
+		response, err := broker.FetchOffset(offsetRequest)
+		for _, topic := range topics {
+			partitions, err := m.client.Partitions(topic)
+			if err != nil {
+				logp.Err("Fetch partition info for topic %s: %s", topic, err)
+			}
+
+			for _, partition := range partitions {
+
+				// Could we use group.FetchOffset() instead?
+				offset := response.GetBlock(topic, partition)
+
+				event := common.MapStr{
+					"@timestamp": common.Time(time.Now()),
+					"type":       "consumer",
+					"partition":  partition,
+					"topic":      topic,
+					"group":      group.Name,
+					"offset":     offset,
+				}
+				events = append(events, event)
+			}
+		}
+	}
+
+	return events, nil
 }
