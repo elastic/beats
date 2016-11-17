@@ -3,19 +3,12 @@
 package partition
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
-	"github.com/Shopify/sarama"
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/kafka"
 	"github.com/stretchr/testify/assert"
-)
-
-const (
-	kafkaDefaultHost = "localhost"
-	kafkaDefaultPort = "9092"
 )
 
 func TestData(t *testing.T) {
@@ -32,7 +25,7 @@ func TestData(t *testing.T) {
 func TestTopic(t *testing.T) {
 
 	// Create initial topic
-	generateKafkaData(t)
+	kafka.GenerateKafkaData(t)
 
 	f := mbtest.NewEventsFetcher(t, getConfig())
 	dataBefore, err := f.Fetch()
@@ -44,7 +37,7 @@ func TestTopic(t *testing.T) {
 	var i int64 = 0
 	// Create n messages
 	for ; i < n; i++ {
-		generateKafkaData(t)
+		kafka.GenerateKafkaData(t)
 	}
 
 	dataAfter, err := f.Fetch()
@@ -67,57 +60,10 @@ func TestTopic(t *testing.T) {
 
 }
 
-func generateKafkaData(t *testing.T) {
-
-	config := sarama.NewConfig()
-	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
-	if err != nil {
-		t.Errorf("%s", err)
-	}
-
-	producer, err := sarama.NewSyncProducerFromClient(client)
-	if err != nil {
-		t.Error(err)
-	}
-	defer producer.Close()
-
-	topic := "testtopic"
-
-	msg := &sarama.ProducerMessage{
-		Topic: topic,
-		Value: sarama.StringEncoder("Hello World"),
-	}
-
-	_, _, err = producer.SendMessage(msg)
-	if err != nil {
-		t.Errorf("FAILED to send message: %s\n", err)
-	}
-
-	client.RefreshMetadata(topic)
-}
-
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "kafka",
 		"metricsets": []string{"partition"},
-		"hosts":      []string{getTestKafkaHost()},
+		"hosts":      []string{kafka.GetTestKafkaHost()},
 	}
-}
-
-func getTestKafkaHost() string {
-	return fmt.Sprintf("%v:%v",
-		getenv("KAFKA_HOST", kafkaDefaultHost),
-		getenv("KAFKA_PORT", kafkaDefaultPort),
-	)
-}
-
-func getenv(name, defaultValue string) string {
-	return strDefault(os.Getenv(name), defaultValue)
-}
-
-func strDefault(a, defaults string) string {
-	if len(a) == 0 {
-		return defaults
-	}
-	return a
 }
