@@ -71,7 +71,7 @@ simplify:
 .PHONY: beats-dashboards
 beats-dashboards:
 	mkdir -p build/dashboards
-	$(foreach var,$(BEATS),-cp -r $(var)/_meta/kibana/ build/dashboards/$(var)  || exit 1;)
+	$(foreach var,$(BEATS),cp -r $(var)/_meta/kibana/ build/dashboards/$(var)  || exit 1;)
 
 # Builds the documents for each beat
 .PHONY: docs
