@@ -2162,6 +2162,36 @@ kafka Module
 
 
 [float]
+== broker Fields
+
+broker
+
+
+
+[float]
+=== kafka.broker.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== consumer Fields
+
+consumer
+
+
+
+[float]
+=== kafka.consumer.example
+
+type: keyword
+
+Example field
+
+
+[float]
 == partition Fields
 
 partition

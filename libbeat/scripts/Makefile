@@ -301,6 +301,9 @@ build-image: write-environment
 start-environment: stop-environment
 	${DOCKER_COMPOSE} up -d
 
+start-env:
+	${DOCKER_COMPOSE} run beat bash
+
 .PHONY: stop-environment
 stop-environment:
 	-${DOCKER_COMPOSE} stop

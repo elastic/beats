@@ -1,0 +1,4 @@
+package: github.com/elastic/beats/metricbeat/module/kafka/consumer
+import:
+- package: github.com/wvanbergen/kazoo-go
+  version: 968957352185472eacb69215fa3dbfcfdbac1096
