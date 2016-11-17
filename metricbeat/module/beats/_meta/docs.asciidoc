@@ -1,6 +1,0 @@
-== beats Module
-
-experimental[]
-
-This is the beats Module.
-
