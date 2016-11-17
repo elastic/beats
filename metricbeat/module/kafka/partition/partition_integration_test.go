@@ -13,7 +13,7 @@ import (
 
 func TestData(t *testing.T) {
 
-	generateKafkaData(t)
+	kafka.GenerateKafkaData(t)
 
 	f := mbtest.NewEventsFetcher(t, getConfig())
 	err := mbtest.WriteEvents(f, t)

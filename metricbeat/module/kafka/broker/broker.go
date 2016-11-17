@@ -7,26 +7,19 @@ import (
 	metrics "github.com/rcrowley/go-metrics"
 )
 
-// init registers the MetricSet with the central registry.
-// The New method will be called after the setup of the module and before starting to fetch data
+// init adds broker metricset
 func init() {
 	if err := mb.Registry.AddMetricSet("kafka", "broker", New); err != nil {
 		panic(err)
 	}
 }
 
-// MetricSet type defines all fields of the MetricSet
-// As a minimum it must inherit the mb.BaseMetricSet fields, but can be extended with
-// additional entries. These variables can be used to persist data or configuration between
-// multiple fetch calls.
+// MetricSet type defines broker metricset
 type MetricSet struct {
 	mb.BaseMetricSet
-	counter int
 }
 
-// New create a new instance of the MetricSet
-// Part of new is also setting up the configuration by processing additional
-// configuration entries if needed.
+// New creates new broker metricset
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config := struct{}{}
@@ -37,7 +30,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		counter:       1,
 	}, nil
 }
 

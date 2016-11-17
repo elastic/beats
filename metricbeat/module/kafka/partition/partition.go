@@ -5,6 +5,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/kafka"
 )
 
 // init registers the partition MetricSet with the central registry.
@@ -37,7 +38,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch partition stats list from kafka
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
-	if m.client == nil {
+	var err error
+	m.client, err = kafka.GetClient(m.client, m)
+	if err != nil {
+		return nil, err
+	}
+	/*if m.client == nil {
 		config := sarama.NewConfig()
 		config.Net.DialTimeout = m.Module().Config().Timeout
 		config.Net.ReadTimeout = m.Module().Config().Timeout
@@ -48,7 +54,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			return nil, err
 		}
 		m.client = client
-	}
+	}*/
 
 	topics, err := m.client.Topics()
 	if err != nil {
