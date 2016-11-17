@@ -1,0 +1,64 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-docker]]
+== docker Module
+
+experimental[]
+
+This is the docker Module.
+
+
+
+[float]
+=== Example Configuration
+
+The docker module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+#- module: docker
+  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost"]
+  #socket: unix:///var/run/docker.sock
+
+  # If dockerbeat has to deal with a TLS-enabled docker daemon, you need to enable TLS and configure path for key and certificates.
+  #tls:
+    # By default, TLS is disabled
+    #enabled: false
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-docker-container,container>>
+
+* <<metricbeat-metricset-docker-cpu,cpu>>
+
+* <<metricbeat-metricset-docker-diskio,diskio>>
+
+* <<metricbeat-metricset-docker-info,info>>
+
+* <<metricbeat-metricset-docker-memory,memory>>
+
+* <<metricbeat-metricset-docker-network,network>>
+
+include::docker/container.asciidoc[]
+
+include::docker/cpu.asciidoc[]
+
+include::docker/diskio.asciidoc[]
+
+include::docker/info.asciidoc[]
+
+include::docker/memory.asciidoc[]
+
+include::docker/network.asciidoc[]
+

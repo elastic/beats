@@ -1,0 +1,191 @@
+################### Heartbeat Configuration Example #########################
+
+############################# Heartbeat ######################################
+
+# Configure monitors
+heartbeat.monitors:
+- type: icmp # monitor type `icmp` (requires root) uses ICMP Echo Request to ping
+             # configured hosts
+
+  # Monitor name used for job name and document type.
+  #name: icmp
+
+  # Enable/Disable monitor
+  #enabled: true
+
+  # Configure task schedule using cron-like syntax
+  schedule: '*/5 * * * * * *' # exactly every 5 seconds like 10:00:00, 10:00:05, ...
+
+  # List of hosts to ping
+  hosts: ["localhost"]
+
+  # Configure IP protocol types to ping on if hostnames are configured.
+  # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
+  ipv4: true
+  ipv6: true
+  mode: any
+
+  # Configure file json file to be watched for changes to the monitor:
+  #watch.poll_file:
+    # Path to check for updates.
+    #path:
+
+    # Interval between file file changed checks.
+    #interval: 5s
+
+  # Total running time per ping test.
+  timeout: 16s
+
+  # Waiting duration until another ICMP Echo Request is emitted.
+  wait: 1s
+
+- type: tcp # monitor type `tcp`. Connect via TCP and optionally verify endpoint
+            # by sending/receiving a custom payload
+
+  # Monitor name used for job name and document type
+  #name: tcp
+
+  # Enable/Disable monitor
+  #enabled: true
+
+  # Configure task schedule
+  schedule: '@every 5s' # every 5 seconds from start of beat
+
+  # configure hosts to ping.
+  # Entries can be:
+  #   - plain host name or IP like `localhost`:
+  #       Requires ports configs to be checked. If ssl is configured,
+  #       a SSL/TLS based connection will be established. Otherwise plain tcp connection
+  #       will be established
+  #   - hostname + port like `localhost:12345`:  
+  #       Connect to port on given host. If ssl is configured, 
+  #       a SSL/TLS based connection will be established. Otherwise plain tcp connection
+  #       will be established
+  #   - full url syntax. `scheme://<host>:[port]`. The `<scheme>` can be one of
+  #     `tcp`, `plain`, `ssl` and `tls`. If `tcp`, `plain` is configured, a plain
+  #     tcp connection will be established, even if ssl is configured.
+  #     Using `tls`/`ssl`, an SSL connection is established. If no ssl is configured,
+  #     system defaults will be used (not supported on windows).
+  #     If `port` is missing in url, the ports setting is required.
+  hosts: ["localhost:12345"]
+
+  # Configure IP protocol types to ping on if hostnames are configured.
+  # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
+  ipv4: true
+  ipv6: true
+  mode: any
+
+  # Configure file json file to be watched for changes to the monitor:
+  #watch.poll_file:
+    # Path to check for updates.
+    #path:
+
+    # Interval between file file changed checks.
+    #interval: 5s
+
+  # List of ports to ping if host does not contain a port number
+  # ports: [80, 9200, 5044]
+
+  # Total test connection and data exchange timeout
+  #timeout: 16s
+
+  # Optional payload string to send to remote and expected answer. If none is
+  # configured, the endpoint is expected to be up if connection attempt was
+  # successful. If only `send_string` is configured, any response will be
+  # accepted as ok. If only `receive_string` is configured, no payload will be
+  # send, but client expects to receive expected payload on connect.
+  #check:
+    #send: ''
+    #receive: ''
+
+  # SOCKS5 proxy url
+  # proxy_url: ''
+
+  # Resolve hostnames locally instead on SOCKS5 server:
+  #proxy_use_local_resolver: false
+
+  # TLS/SSL connection settings:
+  #ssl:
+    # Certificate Authorities
+    #certificate_authorities: ['']
+
+    # Required TLS protocols
+    #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
+
+- type: http # monitor type `http`. Connect via HTTP an optionally verify response
+
+  # Monitor name used for job name and document type
+  #name: tcp
+
+  # Enable/Disable monitor
+  #enabled: true
+
+  # Configure task schedule
+  schedule: '@every 5s' # every 5 seconds from start of beat
+
+  # Configure URLs to ping
+  urls: ["http://localhost:80"]
+
+  # Configure IP protocol types to ping on if hostnames are configured.
+  # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
+  ipv4: true
+  ipv6: true
+  mode: any
+
+  # Configure file json file to be watched for changes to the monitor:
+  #watch.poll_file:
+    # Path to check for updates.
+    #path:
+
+    # Interval between file file changed checks.
+    #interval: 5s
+
+  # Optional HTTP proxy url. If not set HTTP_PROXY environment variable will be used.
+  #proxy_url: ''
+
+  # Total test connection and data exchange timeout
+  #timeout: 16s
+
+  # Optional Authentication Credentials
+  #username: ''
+  #password: ''
+
+  # TLS/SSL connection settings for use with HTTPS endpoint. If not configured
+  # system defaults will be used.
+  #ssl:
+    # Certificate Authorities
+    #certificate_authorities: ['']
+
+    # Required TLS protocols
+    #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
+
+  # Request settings:
+  #check.request:
+    # Configure HTTP method to use. Only 'HEAD', 'GET' and 'POST' methods are allowed.
+    #method: "GET"
+
+    # Dictionary of additional HTTP headers to send:
+    #headers:
+
+    # Optional request body content
+    #body:
+
+  # Expected response settings
+  #check.response:
+    # Expected status code. If not configured or set to 0 any status code not
+    # being 404 is accepted.
+    #status: 0
+
+    # Required response headers.
+    #headers:
+
+    # Required response contents.
+    #body:
+
+heartbeat.scheduler:
+  # Limit number of concurrent tasks executed by heartbeat. The task limit if
+  # disabled if set to 0. The default is 0.
+  #limit: 0
+
+  # Set the scheduler it's timezone
+  #location: ''

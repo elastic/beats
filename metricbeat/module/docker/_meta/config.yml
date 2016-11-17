@@ -1,0 +1,11 @@
+#- module: docker
+  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost"]
+  #socket: unix:///var/run/docker.sock
+
+  # If dockerbeat has to deal with a TLS-enabled docker daemon, you need to enable TLS and configure path for key and certificates.
+  #tls:
+    # By default, TLS is disabled
+    #enabled: false

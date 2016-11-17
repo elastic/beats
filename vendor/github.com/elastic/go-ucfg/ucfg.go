@@ -1,6 +1,7 @@
 package ucfg
 
 import (
+	"fmt"
 	"reflect"
 	"regexp"
 	"time"
@@ -138,11 +139,19 @@ func (f *fields) add(v value) {
 	f.a = append(f.a, v)
 }
 
-func (f *fields) setAt(idx int, v value) {
-	if idx >= len(f.a) {
+func (f *fields) setAt(idx int, parent, v value) {
+	l := len(f.a)
+	if idx >= l {
 		tmp := make([]value, idx+1)
 		copy(tmp, f.a)
+
+		for i := l; i < idx; i++ {
+			ctx := context{parent: parent, field: fmt.Sprintf("%d", i)}
+			tmp[i] = &cfgNil{cfgPrimitive{ctx, nil}}
+		}
+
 		f.a = tmp
 	}
+
 	f.a[idx] = v
 }

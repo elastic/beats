@@ -6,45 +6,40 @@ import (
 
 // All dns protocol errors are defined here.
 
-type Error interface {
-	error
-	ResponseError() string
+type dnsError struct {
+	message string
 }
 
-type DNSError struct {
-	Err string
-}
-
-func (e *DNSError) Error() string {
+func (e *dnsError) Error() string {
 	if e == nil {
 		return "<nil>"
 	}
-	return e.Err
+	return e.message
 }
 
-func (e *DNSError) ResponseError() string {
+func (e *dnsError) responseError() string {
 	return "Response: " + e.Error()
 }
 
 // Common
 var (
-	NonDnsMsg         = &DNSError{Err: "Message's data could not be decoded as DNS"}
-	DuplicateQueryMsg = &DNSError{Err: "Another query with the same DNS ID from this client " +
+	nonDNSMsg         = &dnsError{message: "Message's data could not be decoded as DNS"}
+	duplicateQueryMsg = &dnsError{message: "Another query with the same DNS ID from this client " +
 		"was received so this query was closed without receiving a response"}
-	NoResponse       = &DNSError{Err: "No response to this query was received"}
-	OrphanedResponse = &DNSError{Err: "Response: received without an associated Query"}
+	noResponse       = &dnsError{message: "No response to this query was received"}
+	orphanedResponse = &dnsError{message: "Response: received without an associated Query"}
 )
 
 // EDNS
 var (
-	UdpPacketTooLarge  = &DNSError{Err: fmt.Sprintf("Non-EDNS packet has size greater than %d", MaxDnsPacketSize)}
-	RespEdnsNoSupport  = &DNSError{Err: "Responder does not support EDNS"}
-	RespEdnsUnexpected = &DNSError{Err: "Unexpected EDNS answer"}
+	udpPacketTooLarge  = &dnsError{message: fmt.Sprintf("Non-EDNS packet has size greater than %d", maxDNSPacketSize)}
+	respEdnsNoSupport  = &dnsError{message: "Responder does not support EDNS"}
+	respEdnsUnexpected = &dnsError{message: "Unexpected EDNS answer"}
 )
 
 // TCP
 var (
-	ZeroLengthMsg       = &DNSError{Err: "Message's length was set to zero"}
-	UnexpectedLengthMsg = &DNSError{Err: "Unexpected message data length"}
-	IncompleteMsg       = &DNSError{Err: "Message's data is incomplete"}
+	zeroLengthMsg       = &dnsError{message: "Message's length was set to zero"}
+	unexpectedLengthMsg = &dnsError{message: "Unexpected message data length"}
+	incompleteMsg       = &dnsError{message: "Message's data is incomplete"}
 )

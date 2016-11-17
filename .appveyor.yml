@@ -6,10 +6,12 @@ os: Windows Server 2012 R2
 
 # Environment variables
 environment:
-  GOROOT: c:\go1.7
+  GOROOT: c:\go1.7.1
   GOPATH: c:\gopath
   PYWIN_DL: https://beats-files.s3.amazonaws.com/deps/pywin32-220.win32-py2.7.exe
   matrix:
+  - PROJ: github.com\elastic\beats\metricbeat
+    BEAT: metricbeat
   - PROJ: github.com\elastic\beats\filebeat
     BEAT: filebeat
   - PROJ: github.com\elastic\beats\winlogbeat
@@ -22,13 +24,13 @@ clone_folder: c:\gopath\src\github.com\elastic\beats
 cache:
 - C:\ProgramData\chocolatey\bin -> .appveyor.yml
 - C:\ProgramData\chocolatey\lib -> .appveyor.yml
-- C:\go1.7 -> .appveyor.yml
+- C:\go1.7.1 -> .appveyor.yml
 - C:\tools\mingw64 -> .appveyor.yml
 - C:\pywin_inst.exe -> .appveyor.yml
 
 # Scripts that run after cloning repository
 install:
-  - ps: c:\gopath\src\github.com\elastic\beats\libbeat\scripts\install-go.ps1 -version 1.7
+  - ps: c:\gopath\src\github.com\elastic\beats\libbeat\scripts\install-go.ps1 -version 1.7.1
   - set PATH=%GOROOT%\bin;%PATH%
   # AppVeyor installed mingw is 32-bit only.
   - ps: >-
@@ -49,7 +51,7 @@ install:
   - set PYTHONPATH=C:\Python27
   - set PATH=%PYTHONPATH%;%PYTHONPATH%\Scripts;%PATH%
   - python --version
-  - pip install jinja2 nose nose-timer PyYAML
+  - pip install jinja2 nose nose-timer PyYAML redis
   - easy_install C:/pywin_inst.exe
 
 # To run your custom scripts instead of automatic MSBuild
@@ -70,6 +72,11 @@ test_script:
   # System tests
   - ps: Add-AppveyorTest "System tests" -Outcome Running
   - go test -race -c -cover -covermode=atomic -coverpkg ./...
+  - ps: |
+      if ($env:BEAT -eq "metricbeat") {
+        cp .\_meta\fields.common.yml .\_meta\fields.generated.yml
+        python .\scripts\fields_collector.py | out-file -append -encoding UTF8 -filepath .\_meta\fields.generated.yml
+      }
   - ps: cd tests/system
   - nosetests --with-timer
   - ps: Update-AppveyorTest "System tests" -Outcome Passed

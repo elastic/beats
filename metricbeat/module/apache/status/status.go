@@ -99,7 +99,7 @@ func getURL(user, password, statusPath, rawHost string) (*url.URL, error) {
 
 	if u.Scheme == "" {
 		// Add scheme and re-parse.
-		u, err = url.Parse(fmt.Sprintf("%s://%s", "http", rawHost))
+		u, err = url.Parse(fmt.Sprintf("%s://%s", defaultScheme, rawHost))
 		if err != nil {
 			return nil, fmt.Errorf("error parsing apache host: %v", err)
 		}
@@ -127,7 +127,7 @@ func getURL(user, password, statusPath, rawHost string) (*url.URL, error) {
 	// Add the 'auto' query parameter so that server-status returns
 	// machine readable output.
 	query := u.Query()
-	query.Set("auto", "")
+	query.Set(autoQueryParam, "")
 	u.RawQuery = query.Encode()
 
 	return u, nil

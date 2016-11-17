@@ -14,6 +14,14 @@ metricbeat.modules:
     {% endfor %}
   {% endif -%}
 
+  {% if m.username -%}
+  username: {{ m.username }}
+  {% endif -%}
+
+  {% if m.password -%}
+  password: {{ m.password }}
+  {% endif -%}
+
   {% if m.metricsets -%}
   metricsets:
     {% for ms in m.metricsets -%}

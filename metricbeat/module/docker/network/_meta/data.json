@@ -1,0 +1,58 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "docker": {
+        "container": {
+            "id": "7e29f4a1b2c0dd13af7c725d8deb342a36ed170eac977c183da70ef266513202",
+            "labels": [
+                {
+                    "key": "com_docker_compose_config-hash",
+                    "value": "62a912f01b02c0673332badedfcb092977d8dba2ca1115448a2674218ae1af5a"
+                },
+                {
+                    "key": "com_docker_compose_container-number",
+                    "value": "1"
+                },
+                {
+                    "key": "com_docker_compose_oneoff",
+                    "value": "False"
+                },
+                {
+                    "key": "com_docker_compose_project",
+                    "value": "environments"
+                },
+                {
+                    "key": "com_docker_compose_service",
+                    "value": "logstash"
+                },
+                {
+                    "key": "com_docker_compose_version",
+                    "value": "1.8.1"
+                }
+            ],
+            "name": "logstash",
+            "socket": "unix:///var/run/docker.sock"
+        },
+        "network": {
+            "in": {
+                "bytes": 0,
+                "dropped": 0,
+                "errors": 0,
+                "packets": 0
+            },
+            "interface": "eth0",
+            "out": {
+                "bytes": 0,
+                "dropped": 0,
+                "errors": 0,
+                "packets": 0
+            }
+        }
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "docker",
+        "name": "network",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

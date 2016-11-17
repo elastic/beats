@@ -1,0 +1,23 @@
+FROM java:8-jre
+
+ENV LS_VERSION 5
+ENV VERSION 5.0.0
+ENV URL https://artifacts.elastic.co/downloads/logstash/logstash-${VERSION}.tar.gz
+ENV PATH $PATH:/opt/logstash-$VERSION/bin
+
+# As all snapshot builds have the same url, the image is cached. The date at then can be used to invalidate the image
+RUN set -x && \
+    cd /opt && \
+    wget -qO logstash.tar.gz $URL && \
+    tar xzf logstash.tar.gz
+
+COPY logstash.conf.2.tmpl /logstash.conf.2.tmpl
+COPY docker-entrypoint.sh /entrypoint.sh
+
+COPY pki /etc/pki
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+EXPOSE 5044 5055
+
+CMD logstash -f /logstash.conf --log.level=debug --config.debug

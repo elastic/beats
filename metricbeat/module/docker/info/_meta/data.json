@@ -1,0 +1,22 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "docker": {
+        "info": {
+            "containers": {
+                "paused": 0,
+                "running": 11,
+                "stopped": 1,
+                "total": 12
+            },
+            "id": "CRDS:UHQ6:W3IR:GROZ:IUG3:VS2E:4QJJ:FJWG:PRQ4:R25R:VNNP:NE62",
+            "images": 119
+        }
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "docker",
+        "name": "info",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

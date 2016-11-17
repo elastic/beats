@@ -2,13 +2,14 @@ package amqp
 
 import (
 	"encoding/binary"
+	"time"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/procs"
-	"time"
 )
 
-func (amqp *Amqp) amqpMessageParser(s *AmqpStream) (ok bool, complete bool) {
+func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool) {
 	for s.parseOffset < len(s.data) {
 
 		if len(s.data[s.parseOffset:]) < 8 {
@@ -57,8 +58,8 @@ func (amqp *Amqp) amqpMessageParser(s *AmqpStream) (ok bool, complete bool) {
 	return ok, complete
 }
 
-func (stream *AmqpStream) PrepareForNewMessage() {
-	stream.message = nil
+func (s *amqpStream) prepareForNewMessage() {
+	s.message = nil
 }
 
 func isProtocolHeader(data []byte) (isHeader bool, version string) {
@@ -70,8 +71,8 @@ func isProtocolHeader(data []byte) (isHeader bool, version string) {
 }
 
 //func to read a frame header and check if it is valid and complete
-func readFrameHeader(data []byte) (ret *AmqpFrame, err bool) {
-	var frame AmqpFrame
+func readFrameHeader(data []byte) (ret *amqpFrame, err bool) {
+	var frame amqpFrame
 
 	frame.size = binary.BigEndian.Uint32(data[3:7])
 	if len(data) < int(frame.size)+8 {
@@ -82,8 +83,7 @@ func readFrameHeader(data []byte) (ret *AmqpFrame, err bool) {
 		logp.Warn("Missing frame end octet in frame, discarding it")
 		return nil, true
 	}
-	frame.Type = data[0]
-	frame.channel = binary.BigEndian.Uint16(data[1:3])
+	frame.Type = frameType(data[0])
 	if frame.size == 0 {
 		//frame content is nil with hearbeat frames
 		frame.content = nil
@@ -102,25 +102,26 @@ The Method Payload, according to official doc :
   short       short       ...
 */
 
-func (amqp *Amqp) decodeMethodFrame(s *AmqpStream, m_data []byte) (bool, bool) {
-	if len(m_data) < 4 {
+func (amqp *amqpPlugin) decodeMethodFrame(s *amqpStream, buf []byte) (bool, bool) {
+	if len(buf) < 4 {
 		logp.Warn("Method frame too small, waiting for more data")
 		return true, false
 	}
-	class := codeClass(binary.BigEndian.Uint16(m_data[0:2]))
-	method := codeMethod(binary.BigEndian.Uint16(m_data[2:4]))
-	arguments := m_data[4:]
-	s.message.ParseArguments = amqp.ParseArguments
-	s.message.Body_size = uint64(len(m_data[4:]))
+	class := codeClass(binary.BigEndian.Uint16(buf[0:2]))
+	method := codeMethod(binary.BigEndian.Uint16(buf[2:4]))
+	arguments := buf[4:]
+	s.message.parseArguments = amqp.parseArguments
+	s.message.bodySize = uint64(len(buf[4:]))
 
 	debugf("Received frame of class %d and method %d", class, method)
 
-	if function, exists := amqp.MethodMap[class][method]; exists {
-		return function(s.message, arguments)
-	} else {
-		logp.Debug("amqpdetailed", "Received unkown or not supported method")
+	fn, exists := amqp.methodMap[class][method]
+	if !exists {
+		logp.Debug("amqpdetailed", "Received unknown or not supported method")
 		return false, false
 	}
+
+	return fn(s.message, arguments)
 }
 
 /*
@@ -132,16 +133,16 @@ Structure of a content header, according to official doc :
   short      short   long long        short         remainder...
 */
 
-func (amqp *Amqp) decodeHeaderFrame(s *AmqpStream, h_data []byte) bool {
-	if len(h_data) < 14 {
+func (amqp *amqpPlugin) decodeHeaderFrame(s *amqpStream, buf []byte) bool {
+	if len(buf) < 14 {
 		logp.Warn("Header frame too small, waiting for mode data")
 		return true
 	}
-	s.message.Body_size = binary.BigEndian.Uint64(h_data[4:12])
-	debugf("Received Header frame. A message of %d bytes is expected", s.message.Body_size)
+	s.message.bodySize = binary.BigEndian.Uint64(buf[4:12])
+	debugf("Received Header frame. A message of %d bytes is expected", s.message.bodySize)
 
-	if amqp.ParseHeaders == true {
-		err := getMessageProperties(s, h_data[12:])
+	if amqp.parseHeaders == true {
+		err := getMessageProperties(s, buf[12:])
 		if err {
 			return false
 		}
@@ -156,17 +157,15 @@ Structure of a body frame, according to official doc :
 +-----------------------+ +-----------+
 */
 
-func (s *AmqpStream) decodeBodyFrame(b_data []byte) (ok bool, complete bool) {
-	s.message.Body = append(s.message.Body, b_data...)
+func (s *amqpStream) decodeBodyFrame(buf []byte) (ok bool, complete bool) {
+	s.message.body = append(s.message.body, buf...)
 
 	debugf("A body frame of %d bytes long has been transmitted",
-		len(b_data))
+		len(buf))
 	//is the message complete ? If yes, let's publish it
-	if uint64(len(s.message.Body)) < s.message.Body_size {
-		return true, false
-	} else {
-		return true, true
-	}
+
+	complete = uint64(len(s.message.body)) >= s.message.bodySize
+	return true, complete
 }
 
 func hasProperty(prop, flag byte) bool {
@@ -174,7 +173,7 @@ func hasProperty(prop, flag byte) bool {
 }
 
 //function to get message content-type and content-encoding
-func getMessageProperties(s *AmqpStream, data []byte) bool {
+func getMessageProperties(s *amqpStream, data []byte) bool {
 	m := s.message
 
 	//properties are coded in the two first bytes
@@ -194,7 +193,7 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 			logp.Warn("Failed to get content type in header frame")
 			return true
 		}
-		m.Fields["content-type"] = contentType
+		m.fields["content-type"] = contentType
 		offset = next
 	}
 
@@ -204,7 +203,7 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 			logp.Warn("Failed to get content encoding in header frame")
 			return true
 		}
-		m.Fields["content-encoding"] = contentEncoding
+		m.fields["content-encoding"] = contentEncoding
 		offset = next
 	}
 
@@ -212,7 +211,7 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 		headers := common.MapStr{}
 		next, err, exists := getTable(headers, data, offset)
 		if !err && exists {
-			m.Fields["headers"] = headers
+			m.fields["headers"] = headers
 		} else if err {
 			logp.Warn("Failed to get headers")
 			return true
@@ -222,25 +221,25 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 
 	if hasProperty(prop1, deliveryModeProp) {
 		if data[offset] == 1 {
-			m.Fields["delivery-mode"] = "non-persistent"
+			m.fields["delivery-mode"] = "non-persistent"
 		} else if data[offset] == 2 {
-			m.Fields["delivery-mode"] = "persistent"
+			m.fields["delivery-mode"] = "persistent"
 		}
-		offset += 1
+		offset++
 	}
 
 	if hasProperty(prop1, priorityProp) {
-		m.Fields["priority"] = data[offset]
-		offset += 1
+		m.fields["priority"] = data[offset]
+		offset++
 	}
 
-	if hasProperty(prop1, correlationIdProp) {
-		correlationId, next, err := getShortString(data, offset+1, uint32(data[offset]))
+	if hasProperty(prop1, correlationIDProp) {
+		correlationID, next, err := getShortString(data, offset+1, uint32(data[offset]))
 		if err {
 			logp.Warn("Failed to get correlation-id in header frame")
 			return true
 		}
-		m.Fields["correlation-id"] = correlationId
+		m.fields["correlation-id"] = correlationID
 		offset = next
 	}
 
@@ -250,7 +249,7 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 			logp.Warn("Failed to get reply-to in header frame")
 			return true
 		}
-		m.Fields["reply-to"] = replyTo
+		m.fields["reply-to"] = replyTo
 		offset = next
 	}
 
@@ -260,23 +259,23 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 			logp.Warn("Failed to get expiration in header frame")
 			return true
 		}
-		m.Fields["expiration"] = expiration
+		m.fields["expiration"] = expiration
 		offset = next
 	}
 
-	if hasProperty(prop2, messageIdProp) {
-		messageId, next, err := getShortString(data, offset+1, uint32(data[offset]))
+	if hasProperty(prop2, messageIDProp) {
+		messageID, next, err := getShortString(data, offset+1, uint32(data[offset]))
 		if err {
 			logp.Warn("Failed to get message id in header frame")
 			return true
 		}
-		m.Fields["message-id"] = messageId
+		m.fields["message-id"] = messageID
 		offset = next
 	}
 
 	if hasProperty(prop2, timestampProp) {
 		t := time.Unix(int64(binary.BigEndian.Uint64(data[offset:offset+8])), 0)
-		m.Fields["timestamp"] = t.Format(amqpTimeLayout)
+		m.fields["timestamp"] = t.Format(amqpTimeLayout)
 		offset += 8
 	}
 
@@ -286,55 +285,54 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 			logp.Warn("Failed to get message type in header frame")
 			return true
 		}
-		m.Fields["type"] = msgType
+		m.fields["type"] = msgType
 		offset = next
 	}
 
-	if hasProperty(prop2, userIdProp) {
-		userId, next, err := getShortString(data, offset+1, uint32(data[offset]))
+	if hasProperty(prop2, userIDProp) {
+		userID, next, err := getShortString(data, offset+1, uint32(data[offset]))
 		if err {
 			logp.Warn("Failed to get user id in header frame")
 			return true
 		}
-		m.Fields["user-id"] = userId
+		m.fields["user-id"] = userID
 		offset = next
 	}
 
-	if hasProperty(prop2, appIdProp) {
-		appId, next, err := getShortString(data, offset+1, uint32(data[offset]))
+	if hasProperty(prop2, appIDProp) {
+		appID, _, err := getShortString(data, offset+1, uint32(data[offset]))
 		if err {
 			logp.Warn("Failed to get app-id in header frame")
 			return true
 		}
-		m.Fields["app-id"] = appId
-		offset = next
+		m.fields["app-id"] = appID
 	}
 	return false
 }
 
-func (amqp *Amqp) handleAmqp(m *AmqpMessage, tcptuple *common.TcpTuple, dir uint8) {
+func (amqp *amqpPlugin) handleAmqp(m *amqpMessage, tcptuple *common.TCPTuple, dir uint8) {
 	if amqp.mustHideCloseMethod(m) {
 		return
 	}
 	debugf("A message is ready to be handled")
-	m.TcpTuple = *tcptuple
-	m.Direction = dir
-	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
+	m.tcpTuple = *tcptuple
+	m.direction = dir
+	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 
-	if m.Method == "basic.publish" {
+	if m.method == "basic.publish" {
 		amqp.handlePublishing(m)
-	} else if m.Method == "basic.deliver" || m.Method == "basic.return" ||
-		m.Method == "basic.get-ok" {
+	} else if m.method == "basic.deliver" || m.method == "basic.return" ||
+		m.method == "basic.get-ok" {
 		amqp.handleDelivering(m)
-	} else if m.IsRequest == true {
+	} else if m.isRequest == true {
 		amqp.handleAmqpRequest(m)
-	} else if m.IsRequest == false {
+	} else if m.isRequest == false {
 		amqp.handleAmqpResponse(m)
 	}
 }
 
-func (amqp *Amqp) mustHideCloseMethod(m *AmqpMessage) bool {
-	return amqp.HideConnectionInformation == true &&
-		(m.Method == "connection.close" || m.Method == "channel.close") &&
-		getReplyCode(m.Fields) < uint16(300)
+func (amqp *amqpPlugin) mustHideCloseMethod(m *amqpMessage) bool {
+	return amqp.hideConnectionInformation == true &&
+		(m.method == "connection.close" || m.method == "channel.close") &&
+		getReplyCode(m.fields) < uint16(300)
 }

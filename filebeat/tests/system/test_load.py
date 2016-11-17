@@ -3,6 +3,7 @@ import os
 import logging
 import logging.handlers
 import json
+import time
 import unittest
 from nose.plugins.skip import Skip, SkipTest
 from nose.plugins.attrib import attr
@@ -146,3 +147,50 @@ class Test(BaseTest):
         assert len(data) == number_of_files
 
 
+    @unittest.skipUnless(LOAD_TESTS, "load test")
+    @attr('load')
+    def test_concurrent_harvesters(self):
+        """
+        Test large number of files on startup if harvester overlap happens and would create too many events
+        """
+        number_of_files = 5000
+        lines_per_file = 10
+
+        # Create content for each file
+        content = ""
+        for n in range(lines_per_file):
+            content += "Line " + str(n+1) + "\n"
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile = self.working_dir + "/log/test"
+
+        for n in range(number_of_files):
+            with open(testfile + "-" + str(n+1), 'w') as f:
+                f.write(content)
+
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            rotate_every_kb=number_of_files * lines_per_file * 12 * 2,
+        )
+        filebeat = self.start_beat()
+
+        total_lines = number_of_files * lines_per_file
+
+        print total_lines
+        # wait until all lines are read
+        self.wait_until(
+            lambda: self.output_has(lines=total_lines),
+            max_timeout=120)
+
+        time.sleep(2)
+
+        # make sure not further lines were read
+        self.wait_until(
+            lambda: self.output_has(lines=total_lines),
+            max_timeout=120)
+
+        filebeat.check_kill_and_wait()
+
+        data = self.get_registry()
+        assert len(data) == number_of_files

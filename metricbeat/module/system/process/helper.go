@@ -77,7 +77,7 @@ func (proc *Process) getDetails(cmdline string) error {
 
 	if cmdline == "" {
 		args := sigar.ProcArgs{}
-		if err := args.Get(proc.Pid); err != nil {
+		if err := args.Get(proc.Pid); err != nil && !sigar.IsNotImplemented(err) {
 			return fmt.Errorf("error getting process arguments for pid=%d: %v", proc.Pid, err)
 		}
 		proc.CmdLine = strings.Join(args.List, " ")
@@ -121,20 +121,20 @@ func getProcFDUsage(pid int) (*sigar.ProcFDUsage, error) {
 	return &fd, nil
 }
 
-func GetProcMemPercentage(proc *Process, total_phymem uint64) float64 {
+func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
 
 	// in unit tests, total_phymem is set to a value greater than zero
 
-	if total_phymem == 0 {
+	if totalPhyMem == 0 {
 		memStat, err := memory.GetMemory()
 		if err != nil {
 			logp.Warn("Getting memory details: %v", err)
 			return 0
 		}
-		total_phymem = memStat.Mem.Total
+		totalPhyMem = memStat.Mem.Total
 	}
 
-	perc := (float64(proc.Mem.Resident) / float64(total_phymem))
+	perc := (float64(proc.Mem.Resident) / float64(totalPhyMem))
 
 	return system.Round(perc, .5, 4)
 }
@@ -224,9 +224,9 @@ func GetProcCpuPercentage(last *Process, current *Process) float64 {
 
 	if last != nil && current != nil {
 
-		delta_proc := int64(current.Cpu.Total - last.Cpu.Total)
-		delta_time := float64(current.Ctime.Sub(last.Ctime).Nanoseconds()) / float64(1e6) // in milliseconds
-		perc := float64(delta_proc) / delta_time
+		dCPU := int64(current.Cpu.Total - last.Cpu.Total)
+		dt := float64(current.Ctime.Sub(last.Ctime).Nanoseconds()) / float64(1e6) // in milliseconds
+		perc := float64(dCPU) / dt
 
 		return system.Round(perc, .5, 4)
 	}
@@ -330,14 +330,12 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 }
 
 func (procStats *ProcStats) GetProcStatsEvents() ([]common.MapStr, error) {
-
-	events := []common.MapStr{}
-
 	processes, err := procStats.GetProcStats()
 	if err != nil {
 		return nil, err
 	}
 
+	events := make([]common.MapStr, len(processes))
 	for _, proc := range processes {
 		event := common.MapStr{
 			"@timestamp": common.Time(time.Now()),

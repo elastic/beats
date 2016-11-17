@@ -2,6 +2,7 @@ package info
 
 import (
 	"fmt"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -40,22 +41,11 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
 	logp.Warn("EXPERIMENTAL: The haproxy info metricset is experimental")
-
-	config := struct {
-		StatsAddr string `config:"stats_addr"`
-	}{
-		StatsAddr: defaultAddr,
-	}
-
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		statsAddr:     config.StatsAddr,
+		statsAddr:     base.Host(),
 		counter:       1,
 	}, nil
 }

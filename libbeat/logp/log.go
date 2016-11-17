@@ -162,10 +162,7 @@ func SetToSyslog(toSyslog bool, prefix string) {
 }
 
 func SetToFile(toFile bool, rotator *FileRotator) error {
-	_log.toFile = toFile
-	if _log.toFile {
-		_log.rotator = rotator
-
+	if toFile {
 		err := rotator.CreateDirectory()
 		if err != nil {
 			return err
@@ -174,6 +171,12 @@ func SetToFile(toFile bool, rotator *FileRotator) error {
 		if err != nil {
 			return err
 		}
+
+		// Only assign rotator on no errors
+		_log.rotator = rotator
 	}
+
+	_log.toFile = toFile
+
 	return nil
 }

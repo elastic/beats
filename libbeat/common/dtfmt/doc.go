@@ -1,4 +1,4 @@
-// dtfmt package provides time formatter support with pattern syntax mostly
+// Package dtfmt provides time formatter support with pattern syntax mostly
 // similar to joda DateTimeFormat. The pattern syntax supported is a subset
 // (mostly compatible) with joda DateTimeFormat.
 //

@@ -27,7 +27,7 @@ func NewState(fileInfo os.FileInfo, path string) State {
 		Finished:    false,
 		FileStateOS: GetOSState(fileInfo),
 		Timestamp:   time.Now(),
-		TTL:         -1 * time.Second, // By default, state does have an infinit ttl
+		TTL:         -1, // By default, state does have an infinite ttl
 	}
 }
 
@@ -102,11 +102,11 @@ func (s *States) Cleanup() int {
 
 	for _, state := range s.states {
 
-		ttl := state.TTL
+		expired := (state.TTL > 0 && currentTime.Sub(state.Timestamp) > state.TTL)
 
-		if ttl == 0 || (ttl > 0 && currentTime.Sub(state.Timestamp) > ttl) {
+		if state.TTL == 0 || expired {
 			if state.Finished {
-				logp.Debug("state", "State removed for %v because of older: %v", state.Source, ttl)
+				logp.Debug("state", "State removed for %v because of older: %v", state.Source, state.TTL)
 				continue // drop state
 			} else {
 				logp.Err("State for %s should have been dropped, but couldn't as state is not finished.", state.Source)

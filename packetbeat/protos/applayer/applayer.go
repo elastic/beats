@@ -1,4 +1,4 @@
-// The applayer module provides common definitions with common fields
+// Package applayer provides common definitions with common fields
 // for use with application layer protocols among beats.
 package applayer
 
@@ -14,7 +14,7 @@ import (
 type NetDirection uint8
 
 const (
-	// Message due to a reponse by server
+	// Message due to a response by server
 	NetReverseDirection NetDirection = 0
 
 	// Message was send by client
@@ -25,16 +25,16 @@ const (
 type Transport uint8
 
 const (
-	TransportUdp Transport = iota
-	TransportTcp
+	TransportUDP Transport = iota
+	TransportTCP
 )
 
 // String returns the transport type its textual representation.
 func (t Transport) String() string {
 	switch t {
-	case TransportUdp:
+	case TransportUDP:
 		return "udp"
-	case TransportTcp:
+	case TransportTCP:
 		return "tcp"
 	default:
 		return "invalid"
@@ -59,7 +59,7 @@ type Transaction struct {
 	Type string
 
 	// Transaction source and destination IPs and Ports.
-	Tuple common.IpPortTuple
+	Tuple common.IPPortTuple
 
 	// Transport layer type
 	Transport Transport
@@ -102,7 +102,7 @@ type TransactionTimestamp struct {
 // are required to initialize a Transaction (see (*Transaction).InitWithMsg).
 type Message struct {
 	Ts           time.Time
-	Tuple        common.IpPortTuple
+	Tuple        common.IPPortTuple
 	Transport    Transport
 	CmdlineTuple *common.CmdlineTuple
 	Direction    NetDirection
@@ -160,7 +160,7 @@ func (stream *Stream) Write(data []byte) (int, error) {
 // BytesOut are initialized to zero and must be filled by application code.
 func (t *Transaction) Init(
 	typ string,
-	tuple common.IpPortTuple,
+	tuple common.IPPortTuple,
 	transport Transport,
 	direction NetDirection,
 	time time.Time,
@@ -175,13 +175,13 @@ func (t *Transaction) Init(
 	t.Ts.Ts = time
 	t.Ts.Millis = int64(time.UnixNano() / 1000)
 	t.Src = common.Endpoint{
-		Ip:   tuple.Src_ip.String(),
-		Port: tuple.Src_port,
+		IP:   tuple.SrcIP.String(),
+		Port: tuple.SrcPort,
 		Proc: string(cmdline.Src),
 	}
 	t.Dst = common.Endpoint{
-		Ip:   tuple.Dst_ip.String(),
-		Port: tuple.Dst_port,
+		IP:   tuple.DstIP.String(),
+		Port: tuple.DstPort,
 		Proc: string(cmdline.Dst),
 	}
 	t.Notes = notes

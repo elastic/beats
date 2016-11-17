@@ -124,6 +124,10 @@ func TestFormatString(t *testing.T) {
 
 		// run string formatter
 		actual, err := sf.Run(nil)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
 
 		// test validation
 		if test.dyn == nil {

@@ -1,0 +1,43 @@
+# TODO: Currently ports and labels are not added to the template yet
+- name: container
+  type: group
+  description: >
+    Docker container metrics
+  fields:
+    - name: command
+      type: keyword
+      description: >
+        Executed command in docker container.
+    - name: created
+      type: date
+      description: >
+        Date then the container was created.
+    - name: id
+      type: keyword
+      description: >
+        Unique container id.
+    - name: image
+      type: keyword
+      description: >
+        Name of the image the container was built on.
+    - name: name
+      type: keyword
+      description: >
+        Container name.
+    - name: status
+      type: keyword
+      description: >
+        Container status.
+    - name: size
+      type: group
+      description: >
+        Container size metrics.
+      fields:
+        - name: root_fs
+          type: long
+          description: >
+             Total size of all the files in the container.
+        - name: rw
+          type: long
+          description: >
+             Size of the files which have been created or changed since creation.

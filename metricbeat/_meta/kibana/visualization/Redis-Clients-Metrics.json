@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Redis Clients Metrics\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"redis.info.clients.connected\",\"customLabel\":\"Connected clients\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Redis Clients Metrics", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Metricbeat-Redis", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

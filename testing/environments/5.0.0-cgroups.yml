@@ -1,0 +1,31 @@
+# This should test the environment with the latest snapshots
+# This is based on base.yml
+
+version: '2'
+services:
+  elasticsearch:
+    build:
+      context: ./docker/elasticsearch
+      dockerfile: Dockerfile-5.0.0-alpha5
+    command: elasticsearch -Enetwork.host=0.0.0.0 -Ediscovery.zen.minimum_master_nodes=1 -Ebootstrap.ignore_system_bootstrap_checks=true
+
+  logstash:
+    build:
+      context: ./docker/logstash
+      dockerfile: Dockerfile-5.0.0-alpha5
+
+  kibana:
+    build:
+      context: ./docker/kibana
+      dockerfile: Dockerfile-5.0.0-alpha5
+
+  metricbeat:
+    build:
+      context: ./docker/metricbeat
+      dockerfile: Dockerfile-5.0.0-cgroups
+    links:
+      - elasticsearch
+    volumes:
+      - "/proc:/hostfs/proc:ro"
+      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup"
+    command: -system.hostfs=/hostfs -E output.elasticsearch.hosts=elasticsearch -E metricbeat.modules.0.cgroups=true

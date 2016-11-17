@@ -1,4 +1,4 @@
-// +build darwin freebsd linux openbsd
+// +build darwin freebsd linux openbsd windows
 
 package core
 
@@ -24,7 +24,6 @@ type MetricSet struct {
 
 // New is a mb.MetricSetFactory that returns a cores.MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
 	config := struct {
 		CpuTicks bool `config:"cpu_ticks"` // export CPU usage in ticks
 	}{
@@ -46,7 +45,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches CPU core metrics from the OS.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
 	cpuCoreStat, err := cpu.GetCpuTimesList()
 	if err != nil {
 		return nil, errors.Wrap(err, "cpu core times")
@@ -54,8 +52,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	m.cpu.AddCpuPercentageList(cpuCoreStat)
 
-	cores := []common.MapStr{}
-
+	cores := make([]common.MapStr, 0, len(cpuCoreStat))
 	for core, stat := range cpuCoreStat {
 
 		coreStat := common.MapStr{

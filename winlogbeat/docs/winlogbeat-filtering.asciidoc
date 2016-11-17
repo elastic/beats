@@ -5,17 +5,6 @@ include::../../libbeat/docs/processors.asciidoc[]
 
 For example, the following filter configuration drops a few fields that are rarely used (`provider_guid`, `process_id`, `thread_id`, and `version`) and one nested field, `event_data.ErrorSourceTable`:
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
-
-[source, yaml]
------------------------------------------------------
-filters:
-  - drop_fields:
-      fields: [provider_guid, process_id, thread_id, version, event_data.ErrorSourceTable]
------------------------------------------------------
-
-added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
-
 [source, yaml]
 -----------------------------------------------------
 processors:

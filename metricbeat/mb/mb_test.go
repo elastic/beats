@@ -51,7 +51,7 @@ func TestModuleConfig(t *testing.T) {
 				Module:     "example",
 				MetricSets: []string{"test"},
 				Enabled:    true,
-				Period:     time.Second,
+				Period:     time.Second * 10,
 				Timeout:    time.Second,
 			},
 		},
@@ -114,7 +114,7 @@ func TestModuleConfigDefaults(t *testing.T) {
 	}
 
 	assert.Equal(t, true, mc.Enabled)
-	assert.Equal(t, time.Second, mc.Period)
+	assert.Equal(t, time.Second*10, mc.Period)
 	assert.Equal(t, time.Second, mc.Timeout)
 	assert.Empty(t, mc.Hosts)
 }
@@ -171,7 +171,7 @@ func TestNewBaseModuleFromModuleConfigStruct(t *testing.T) {
 	assert.Equal(t, moduleName, baseModule.Name())
 	assert.Equal(t, moduleName, baseModule.Config().Module)
 	assert.Equal(t, true, baseModule.Config().Enabled)
-	assert.Equal(t, time.Second, baseModule.Config().Period)
+	assert.Equal(t, time.Second*10, baseModule.Config().Period)
 	assert.Equal(t, time.Second, baseModule.Config().Timeout)
 	assert.Empty(t, baseModule.Config().Hosts)
 }

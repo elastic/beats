@@ -1,0 +1,13 @@
+- key: docker
+  title: "docker"
+  description: >
+    experimental[]
+
+    Docker stats collected from Docker.
+  short_config: false
+  fields:
+    - name: docker
+      type: group
+      description: >
+        docker contains different informations and statistics of docker's containers running
+      fields:

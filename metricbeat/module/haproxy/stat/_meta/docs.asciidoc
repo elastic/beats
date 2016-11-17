@@ -1,6 +1,6 @@
-=== haproxy stat MetricSet
+=== HAProxy stat MetricSet
 
-This is the info metricset of the module haproxy.
+This is the stat metricset of the haproxy module.
 
 
 [float]
@@ -12,7 +12,7 @@ http://www.haproxy.org/download/1.6/doc/management.txt
 
 The following documentation bellow is an extract from the URL above, more specifically from section "9.1. CSV format"
 
-[source,ruby]
+[source,log]
 ----
 In brackets after each field name are the types which may have a value for
 that field. The types are L (Listeners), F (Frontends), B (Backends), and

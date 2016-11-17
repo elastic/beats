@@ -13,6 +13,8 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"net/http"
+
+	// blank pprof import to load HTTP handler for debugging endpoint
 	_ "net/http/pprof"
 )
 
@@ -48,20 +50,18 @@ func init() {
 	httpprof = flag.String("httpprof", "", "Start pprof http server")
 }
 
-// WithMemProfile returns whether the beat should write the memory profile to file
-func WithMemProfile() bool {
-	return *memprofile != ""
+// ProfileEnabled checks whether the beat should write a cpu or memory profile.
+func ProfileEnabled() bool {
+	return withMemProfile() || withCPUProfile()
 }
 
-// WithCpuProfile returns whether the beat should write the CPU profile file
-func WithCpuProfile() bool {
-	return *cpuprofile != ""
-}
+func withMemProfile() bool { return *memprofile != "" }
+func withCPUProfile() bool { return *cpuprofile != "" }
 
 // BeforeRun takes care of necessary actions such as creating files
 // before the beat should run.
 func BeforeRun() {
-	if WithCpuProfile() {
+	if withCPUProfile() {
 		cpuOut, err := os.Create(*cpuprofile)
 		if err != nil {
 			log.Fatal(err)
@@ -80,12 +80,12 @@ func BeforeRun() {
 // Cleanup handles cleaning up the runtime and OS environments. This includes
 // tasks such as stopping the CPU profile if it is running.
 func Cleanup() {
-	if WithCpuProfile() {
+	if withCPUProfile() {
 		pprof.StopCPUProfile()
 		cpuOut.Close()
 	}
 
-	if WithMemProfile() {
+	if withMemProfile() {
 		runtime.GC()
 
 		writeHeapProfile(*memprofile)

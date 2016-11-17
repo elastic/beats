@@ -5,6 +5,7 @@ import (
 
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type ProspectorStdin struct {
@@ -28,15 +29,21 @@ func NewProspectorStdin(p *Prospector) (*ProspectorStdin, error) {
 	return prospectorer, nil
 }
 
-func (p *ProspectorStdin) Init() {
+func (p *ProspectorStdin) Init(states file.States) error {
 	p.started = false
+	return nil
 }
 
 func (p *ProspectorStdin) Run() {
 
 	// Make sure stdin harvester is only started once
 	if !p.started {
-		go p.harvester.Harvest()
+		reader, err := p.harvester.Setup()
+		if err != nil {
+			logp.Err("Error starting stdin harvester: %s", err)
+			return
+		}
+		go p.harvester.Harvest(reader)
 		p.started = true
 	}
 }

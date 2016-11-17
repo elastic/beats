@@ -35,6 +35,8 @@ ES_HOST?="elasticsearch"
 PWD=$(shell pwd)
 BUILD_DIR?=$(shell pwd)/build
 COVERAGE_DIR=${BUILD_DIR}/coverage
+COVERAGE_TOOL=${GOPATH}/bin/gotestcover
+COVERAGE_TOOL_REPO=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 PROCESSES?= 4
 TIMEOUT?= 90
 TEST_ENVIRONMENT?=false
@@ -105,7 +107,7 @@ simplify:
 # Cleans up directory and source code with gofmt
 .PHONY: clean
 clean:
-	rm -rf build ${BEATNAME} ${BEATNAME}.test ${BEATNAME}.exe ${BEATNAME}.test.exe
+	rm -rf build ${BEATNAME} ${BEATNAME}.test ${BEATNAME}.exe ${BEATNAME}.test.exe _meta/fields.generated.yml
 
 # Shortcut for continuous integration
 # This should always run before merging.
@@ -124,13 +126,13 @@ ci:
 prepare-tests:
 	mkdir -p ${COVERAGE_DIR}
 	# gotestcover is needed to fetch coverage for multiple packages
-	go install github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
+	go get ${COVERAGE_TOOL_REPO}
 
 # Runs the unit tests with coverage
 # Race is not enabled for unit tests because tests run much slower.
 .PHONY: unit-tests
 unit-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
+	$(COVERAGE_TOOL) $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
 
 # Runs the unit tests without coverage reports.
 .PHONY: unit
@@ -140,7 +142,7 @@ unit:
 # Run integration tests. Unit tests are run as part of the integration tests.
 .PHONY: integration-tests
 integration-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov  ${GOPACKAGES}
+	$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov  ${GOPACKAGES}
 
 # Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 .PHONY: integration-tests-environment
@@ -194,7 +196,7 @@ test: unit
 
 # Runs all tests and generates the coverage reports
 .PHONY: testsuite
-testsuite:
+testsuite: clean collect
 	$(MAKE) unit-tests
 
 	# Setups environment if TEST_ENVIRONMENT is set to true
@@ -227,26 +229,28 @@ coverage-report:
 
 # Update expects the most recent version of libbeat in the GOPATH
 .PHONY: update
-update: python-env
+update: python-env collect
+
 	# Update config
 	echo "Update config file"
 	-rm -f ${BEATNAME}.yml
-	cat etc/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
+	cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
 	-rm -f ${BEATNAME}.full.yml
-	cat etc/beat.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml
+	cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml
 
 	# Check if also a full config exist (optional)
-	if [ -a etc/beat.full.yml ] ; \
+	if [ -a _meta/beat.full.yml ] ; \
     then \
-		cat etc/beat.full.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml ; \
+		cat _meta/beat.full.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.full.yml ; \
 	fi;
 
-	# Update fields
-	echo "Update fields"
+	# make sure generated docs in libbeat are up-to-date
+	$(MAKE) -C ${ES_BEATS}/libbeat fields
 
+	# Update docs
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEATNAME} ${ES_BEATS}
 
-	# Update templates
+	# Generate index templates
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME} ${ES_BEATS}
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME} ${ES_BEATS}
 
@@ -254,9 +258,10 @@ update: python-env
 	cp ${ES_BEATS}/libbeat/docs/version.asciidoc docs/version.asciidoc
 
 	# Generate index-pattern
-	-rm -f $(PWD)/etc/kibana/index-pattern/${BEATNAME}.json
-	mkdir -p $(PWD)/etc/kibana/index-pattern
-	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index ${BEATNAME}-* --libbeat ${ES_BEATS}/libbeat --beat $(PWD)
+	echo "Generate index pattern"
+	-rm -f $(PWD)/_meta/kibana/index-pattern/${BEATNAME}.json
+	mkdir -p $(PWD)/_meta/kibana/index-pattern
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index '${BEATNAME}-*' --libbeat ${ES_BEATS}/libbeat --beat $(PWD)
 
 
 # Builds the documents for the beat
@@ -276,12 +281,12 @@ ES_URL?=http://localhost:9200
 
 .PHONY: export-dashboards
 export-dashboards: python-env update
-	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --regex ${BEATNAME}-*
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/_meta/kibana --regex ${BEATNAME}-*
 
 .PHONY: import-dashboards
 import-dashboards: update
 	$(MAKE) -C ${ES_BEATS}/libbeat/dashboards import_dasboards
-	${ES_BEATS}/libbeat/dashboards/import_dashboards -es ${ES_URL} -dir ${PWD}/etc/kibana
+	${ES_BEATS}/libbeat/dashboards/import_dashboards -es ${ES_URL} -dir ${PWD}/_meta/kibana
 
 ### CONTAINER ENVIRONMENT ####
 
@@ -377,13 +382,19 @@ package-setup:
 	$(MAKE) -C ${ES_BEATS}/dev-tools/packer deps images
 
 # Create binary packages for the beat.
-# This requires that `package-setup` was run before once.
 .PHONY: package
-package:
+package: package-setup
 
 	echo "Start building packages for ${BEATNAME}"
 
 	mkdir -p ${BUILD_DIR}/upload
+
+	# Generates the package.yml file with all information needed to create packages
+	echo "beat_name: ${BEATNAME}" > ${BUILD_DIR}/package.yml
+	echo "beat_url: https://${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
+	echo "beat_repo: ${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
+	echo "beat_description: ${BEAT_DESCRIPTION}" >> ${BUILD_DIR}/package.yml
+	cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml
 
 	if [ $(CGO) = true ]; then \
 		 $(MAKE) prepare-package-cgo; \
@@ -391,18 +402,12 @@ package:
 		$(MAKE) prepare-package; \
 	fi
 
-	# Generates the package.yml file with all information needed to create packages
-	echo "beat_name: ${BEATNAME}" > ${BUILD_DIR}/package.yml
-	echo "beat_url: https://${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
-	echo "beat_repo: ${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
-	echo "beat_description: ${BEAT_DESCRIPTION}" >> ${BUILD_DIR}/package.yml
-
 	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_DIR=${BEAT_DIR} BUILD_DIR=${BUILD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${BUILD_DIR}/upload/build_id.txt
 
 	echo "Finished packages for ${BEATNAME}"
 
-package-dashboards:
+package-dashboards: package-setup
 	mkdir -p ${BUILD_DIR}
-	cp -r etc/kibana ${BUILD_DIR}/dashboards
+	cp -r _meta/kibana ${BUILD_DIR}/dashboards
 	# build the dashboards package
 	BEATNAME=${BEATNAME} BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C ${ES_BEATS}/dev-tools/packer package-dashboards ${shell pwd}/build/upload/build_id.txt

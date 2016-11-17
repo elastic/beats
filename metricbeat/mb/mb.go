@@ -11,6 +11,10 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 )
 
+const (
+	ModuleData string = "_module"
+)
+
 // Module interfaces
 
 // Module is the common interface for all Module implementations.
@@ -114,7 +118,7 @@ type ModuleConfig struct {
 // defaultModuleConfig contains the default values for ModuleConfig instances.
 var defaultModuleConfig = ModuleConfig{
 	Enabled: true,
-	Period:  time.Second,
+	Period:  time.Second * 10,
 	Timeout: time.Second,
 }
 
