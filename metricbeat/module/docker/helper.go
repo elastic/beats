@@ -34,7 +34,7 @@ func NewContainer(container *docker.APIContainers) *Container {
 	return &Container{
 		Id:     container.ID,
 		Name:   ExtractContainerName(container.Names),
-		Labels: ConvertContainerLabels(container.Labels),
+		Labels: DeDotLabels(container.Labels),
 	}
 }
 
@@ -51,7 +51,9 @@ func ExtractContainerName(names []string) string {
 	return strings.Trim(output, "/")
 }
 
-func ConvertContainerLabels(labels map[string]string) common.MapStr {
+// DeDotLabels returns a new common.MapStr containing a copy of the labels
+// where the dots in each label name have been changed to an underscore.
+func DeDotLabels(labels map[string]string) common.MapStr {
 
 	outputLabels := common.MapStr{}
 
