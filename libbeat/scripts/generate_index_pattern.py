@@ -12,6 +12,9 @@ import re
 import json
 import os
 import errno
+import sys
+
+unique_fields = []
 
 def fields_to_json(section, path, output):
 
@@ -28,6 +31,14 @@ def fields_to_json(section, path, output):
 
 
 def field_to_json(desc, path, output):
+
+    global unique_fields
+
+    if path in unique_fields:
+        print "ERROR: Field", path, "is duplicated. Please delete it and try again. Fields already are", unique_fields
+        sys.exit(1)
+    else:
+        unique_fields.append(path)
 
     field = {
         "name": path,
@@ -100,18 +111,18 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    fields_yml = args.beat + "/etc/fields.generated.yml"
+    fields_yml = args.beat + "/_meta/fields.generated.yml"
 
     # Not all beats have a fields.generated.yml. Fall back to fields.yml
     if not os.path.isfile(fields_yml):
-        fields_yml = args.beat + "/etc/fields.yml"
+        fields_yml = args.beat + "/_meta/fields.yml"
 
     # generate the index-pattern content
     with open(fields_yml, 'r') as f:
         fields = f.read()
 
         # Prepend beat fields from libbeat
-        with open(args.libbeat + "/_meta/fields.yml") as f:
+        with open(args.libbeat + "/_meta/fields.generated.yml") as f:
             fields = f.read() + fields
 
         # with open(target, 'w') as output:
@@ -119,7 +130,7 @@ if __name__ == "__main__":
 
     # dump output to a json file
     fileName = get_index_pattern_name(args.index)
-    target_dir = os.path.join(args.beat, "etc", "kibana", "index-pattern")
+    target_dir = os.path.join(args.beat, "_meta", "kibana", "index-pattern")
     target_file =os.path.join(target_dir, fileName + ".json")
 
     try: os.makedirs(target_dir)

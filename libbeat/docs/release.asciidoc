@@ -1,4 +1,4 @@
-:beats-dir: ../../../beats
+:beats-dir: ../..
 
 [[release-notes]]
 == Release notes
@@ -6,6 +6,7 @@
 --
 This section summarizes the changes in each release.
 
+* <<release-notes-5.0.1>>
 * <<release-notes-5.0.0>>
 * <<release-notes-5.0.0-ga>>
 * <<release-notes-5.0.0-rc1>>

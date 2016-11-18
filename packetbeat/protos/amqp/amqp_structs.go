@@ -1,15 +1,16 @@
 package amqp
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
-type AmqpMethod func(*AmqpMessage, []byte) (bool, bool)
+type amqpMethod func(*amqpMessage, []byte) (bool, bool)
 
 const (
-	TransactionsHashSize = 2 ^ 16
-	TransactionTimeout   = 10 * 1e9
+	transactionsHashSize = 2 ^ 16
+	transactionTimeout   = 10 * 1e9
 )
 
 //layout used when a timestamp must be parsed
@@ -18,11 +19,14 @@ const (
 )
 
 //Frame types and codes
+
+type frameType byte
+
 const (
-	methodType    = 1
-	headerType    = 2
-	bodyType      = 3
-	heartbeatType = 8
+	methodType    frameType = 1
+	headerType    frameType = 2
+	bodyType      frameType = 3
+	heartbeatType frameType = 8
 )
 
 const (
@@ -162,66 +166,60 @@ const (
 )
 
 type amqpPrivateData struct {
-	Data [2]*AmqpStream
+	data [2]*amqpStream
 }
 
-type AmqpFrame struct {
-	Type    byte
-	channel uint16
+type amqpFrame struct {
+	Type frameType
+	// channel uint16  (frame channel is currently ignored)
 	size    uint32
 	content []byte
 }
 
-type AmqpMessage struct {
-	Ts             time.Time
-	TCPTuple       common.TCPTuple
-	CmdlineTuple   *common.CmdlineTuple
-	Method         string
-	IsRequest      bool
-	Request        string
-	Direction      uint8
-	ParseArguments bool
+type amqpMessage struct {
+	ts             time.Time
+	tcpTuple       common.TCPTuple
+	cmdlineTuple   *common.CmdlineTuple
+	method         string
+	isRequest      bool
+	request        string
+	direction      uint8
+	parseArguments bool
 
 	//mapstr containing all the options for the methods and header fields
-	Fields common.MapStr
+	fields common.MapStr
 
-	Body     []byte
-	BodySize uint64
+	body     []byte
+	bodySize uint64
 
-	Notes []string
+	notes []string
 }
 
 // represent a stream of data to be parsed
-type AmqpStream struct {
-	tcptuple *common.TCPTuple
-
+type amqpStream struct {
 	data        []byte
 	parseOffset int
-
-	message *AmqpMessage
+	message     *amqpMessage
 }
 
 // contains the result of parsing
-type AmqpTransaction struct {
-	Type  string
+type amqpTransaction struct {
 	tuple common.TCPTuple
-	Src   common.Endpoint
-	Dst   common.Endpoint
-	Ts    int64
-	JsTs  time.Time
+	src   common.Endpoint
+	dst   common.Endpoint
 	ts    time.Time
 
-	Method       string
-	Request      string
-	Response     string
-	ResponseTime int32
-	Body         []byte
-	BytesOut     uint64
-	BytesIn      uint64
-	ToString     bool
-	Notes        []string
+	method       string
+	request      string
+	response     string
+	responseTime int32
+	body         []byte
+	bytesOut     uint64
+	bytesIn      uint64
+	toString     bool
+	notes        []string
 
-	Amqp common.MapStr
+	amqp common.MapStr
 
 	timer *time.Timer
 }

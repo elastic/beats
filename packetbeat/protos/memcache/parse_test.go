@@ -116,9 +116,9 @@ func binParseNoFail(t *testing.T, buf []byte) *message {
 
 func (h *binHeader) write(buf binValueWriter) {
 	if h.request {
-		buf.WriteNetUint8At(MemcacheMagicRequest, 0)
+		buf.WriteNetUint8At(memcacheMagicRequest, 0)
 	} else {
-		buf.WriteNetUint8At(MemcacheMagicResponse, 0)
+		buf.WriteNetUint8At(memcacheMagicResponse, 0)
 		buf.WriteNetUint16At(h.status, 6)
 	}
 	total := uint32(h.extrasLen) + uint32(h.keyLen) + h.valueLen

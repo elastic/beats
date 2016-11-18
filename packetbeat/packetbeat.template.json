@@ -294,6 +294,9 @@
                       "ignore_above": 1024,
                       "type": "keyword"
                     },
+                    "port": {
+                      "type": "long"
+                    },
                     "schema_change": {
                       "properties": {
                         "args": {

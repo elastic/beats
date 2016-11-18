@@ -25,17 +25,17 @@ import (
 )
 
 // Verify that the interface TCP has been satisfied.
-var _ protos.TCPPlugin = &DNS{}
+var _ protos.TCPPlugin = &dnsPlugin{}
 
 var (
-	messagesTCP = []DNSTestMessage{
+	messagesTCP = []dnsTestMessage{
 		elasticATcp,
 		zoneAxfrTCP,
 		githubPtrTCP,
 		sophosTxtTCP,
 	}
 
-	elasticATcp = DNSTestMessage{
+	elasticATcp = dnsTestMessage{
 		id:          11674,
 		opcode:      "QUERY",
 		flags:       []string{"rd", "ra"},
@@ -67,7 +67,7 @@ var (
 		},
 	}
 
-	zoneAxfrTCP = DNSTestMessage{
+	zoneAxfrTCP = dnsTestMessage{
 		id:      0,
 		opcode:  "QUERY",
 		rcode:   "NOERROR",
@@ -97,7 +97,7 @@ var (
 		},
 	}
 
-	githubPtrTCP = DNSTestMessage{
+	githubPtrTCP = dnsTestMessage{
 		id:          6766,
 		opcode:      "QUERY",
 		flags:       []string{"rd", "ra"},
@@ -127,7 +127,7 @@ var (
 		},
 	}
 
-	sophosTxtTCP = DNSTestMessage{
+	sophosTxtTCP = dnsTestMessage{
 		id:     35009,
 		opcode: "QUERY",
 		flags:  []string{"rd", "ra"},
@@ -179,7 +179,7 @@ func testTCPTuple() *common.TCPTuple {
 	t := &common.TCPTuple{
 		IPLength: 4,
 		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
-		SrcPort: ClientPort, DstPort: ServerPort,
+		SrcPort: clientPort, DstPort: serverPort,
 	}
 	t.ComputeHashebles()
 	return t
@@ -188,19 +188,19 @@ func testTCPTuple() *common.TCPTuple {
 func TestDecodeTcp_nonDnsMsgRequest(t *testing.T) {
 	rawData := []byte{0, 2, 1, 2}
 
-	_, err := decodeDNSData(TransportTCP, rawData)
-	assert.Equal(t, err, NonDNSMsg)
+	_, err := decodeDNSData(transportTCP, rawData)
+	assert.Equal(t, err, nonDNSMsg)
 }
 
 // Verify that the split lone request packet is decoded.
 func TestDecodeTcp_splitRequest(t *testing.T) {
-	stream := &DNSStream{rawData: sophosTxtTCP.request[:10], message: new(DNSMessage)}
-	_, err := decodeDNSData(TransportTCP, stream.rawData)
+	stream := &dnsStream{rawData: sophosTxtTCP.request[:10], message: new(dnsMessage)}
+	_, err := decodeDNSData(transportTCP, stream.rawData)
 
 	assert.NotNil(t, err, "Not expecting a complete message yet")
 
 	stream.rawData = append(stream.rawData, sophosTxtTCP.request[10:]...)
-	_, err = decodeDNSData(TransportTCP, stream.rawData)
+	_, err = decodeDNSData(transportTCP, stream.rawData)
 
 	assert.Nil(t, err, "Message should be complete")
 }
@@ -226,7 +226,7 @@ func TestParseTcp_errorNonDnsMsgResponse(t *testing.T) {
 	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
 	assert.Nil(t, mapValue(t, m, "bytes_out"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, NonDNSMsg.ResponseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, nonDNSMsg.responseError(), mapValue(t, m, "notes"))
 }
 
 // Verify that a request message with length (first two bytes value) of zero is not published
@@ -265,7 +265,7 @@ func TestParseTcp_errorZeroLengthMsgResponse(t *testing.T) {
 	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
 	assert.Nil(t, mapValue(t, m, "bytes_out"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, ZeroLengthMsg.ResponseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, zeroLengthMsg.responseError(), mapValue(t, m, "notes"))
 }
 
 // Verify that an empty packet is safely handled (no panics).
@@ -324,7 +324,7 @@ func TestParseTcp_errorResponseOnly(t *testing.T) {
 	assert.Equal(t, len(q.response), mapValue(t, m, "bytes_out"))
 	assert.Nil(t, mapValue(t, m, "responsetime"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, OrphanedResponse.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, orphanedResponse.Error(), mapValue(t, m, "notes"))
 	assertMapStrData(t, m, q)
 }
 
@@ -352,7 +352,7 @@ func TestParseTcp_errorDuplicateRequests(t *testing.T) {
 	assert.Nil(t, mapValue(t, m, "bytes_out"))
 	assert.Nil(t, mapValue(t, m, "responsetime"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, DuplicateQueryMsg.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, duplicateQueryMsg.Error(), mapValue(t, m, "notes"))
 }
 
 // Same than the previous one but on the same stream
@@ -378,7 +378,7 @@ func TestParseTcp_errorDuplicateRequestsOneStream(t *testing.T) {
 	assert.Nil(t, mapValue(t, m, "bytes_out"))
 	assert.Nil(t, mapValue(t, m, "responsetime"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, DuplicateQueryMsg.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, duplicateQueryMsg.Error(), mapValue(t, m, "notes"))
 }
 
 // Checks that PrepareNewMessage and Parse can manage two messages sharing one packet on the same stream
@@ -407,7 +407,7 @@ func TestParseTcp_errorDuplicateRequestsOnePacket(t *testing.T) {
 	assert.Nil(t, mapValue(t, m, "bytes_out"))
 	assert.Nil(t, mapValue(t, m, "responsetime"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, DuplicateQueryMsg.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, duplicateQueryMsg.Error(), mapValue(t, m, "notes"))
 }
 
 // Verify that a split response packet is parsed and published
@@ -491,7 +491,7 @@ func TestGap_errorResponse(t *testing.T) {
 
 	m := expectResult(t, dns)
 	assertRequest(t, m, sophosTxtTCP)
-	assert.Equal(t, IncompleteMsg.ResponseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, incompleteMsg.responseError(), mapValue(t, m, "notes"))
 	assert.Nil(t, mapValue(t, m, "answers"))
 }
 
@@ -539,13 +539,13 @@ func TestFin_errorResponse(t *testing.T) {
 
 	m := expectResult(t, dns)
 	assertRequest(t, m, zoneAxfrTCP)
-	assert.Equal(t, IncompleteMsg.ResponseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, incompleteMsg.responseError(), mapValue(t, m, "notes"))
 	assert.Nil(t, mapValue(t, m, "answers"))
 }
 
 // parseTcpRequestResponse parses a request then a response packet and validates
 // the published result.
-func parseTCPRequestResponse(t testing.TB, dns *DNS, q DNSTestMessage) {
+func parseTCPRequestResponse(t testing.TB, dns *dnsPlugin, q dnsTestMessage) {
 	var private protos.ProtocolData
 	packet := newPacket(forward, q.request)
 	tcptuple := testTCPTuple()
@@ -588,7 +588,7 @@ func TestParseTcp_allTestMessages(t *testing.T) {
 }
 
 // Benchmarks TCP parsing for the given test message.
-func benchmarkTCP(b *testing.B, q DNSTestMessage) {
+func benchmarkTCP(b *testing.B, q dnsTestMessage) {
 	dns := newDNS(false)
 	for i := 0; i < b.N; i++ {
 		var private protos.ProtocolData

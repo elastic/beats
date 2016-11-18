@@ -63,7 +63,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches status messages from a mysql host.
-func (m *MetricSet) Fetch() (event common.MapStr, err error) {
+func (m *MetricSet) Fetch() (common.MapStr, error) {
 	if m.db == nil {
 		var err error
 		m.db, err = mysql.NewDB(m.dsn)
@@ -77,7 +77,12 @@ func (m *MetricSet) Fetch() (event common.MapStr, err error) {
 		return nil, err
 	}
 
-	return eventMapping(status), nil
+	event := eventMapping(status)
+
+	if m.Module().Config().Raw {
+		event["raw"] = rawEventMapping(status)
+	}
+	return event, nil
 }
 
 // loadStatus loads all status entries from the given database into an array.

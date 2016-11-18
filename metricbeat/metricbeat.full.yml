@@ -67,17 +67,6 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
-#-------------------------------- beats Module -------------------------------
-#- module: beats
-  #metricsets: ["filebeat", "libbeat"]
-  #enabled: true
-  #period: 10s
-  #hosts: ["localhost:6060"]
-
-  # Path to httpprof variables
-  #vars_path: /debug/vars
-
-
 #------------------------------- docker Module -------------------------------
 #- module: docker
   #metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
@@ -97,6 +86,14 @@ metricbeat.modules:
   #enabled: true
   #period: 10s
   #hosts: ["tcp://127.0.0.1:14567"]
+
+#-------------------------------- kafka Module -------------------------------
+#- module: kafka
+  #metricsets: ["partition"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:9092"]
+
 
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
@@ -133,6 +130,9 @@ metricbeat.modules:
 
   # Password of hosts. Empty by default
   #password: test
+
+  # By setting raw to true, all raw fields from the status metricset will be added to the event.
+  #raw: false
 
 #-------------------------------- Nginx Module -------------------------------
 #- module: nginx

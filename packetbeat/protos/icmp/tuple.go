@@ -15,32 +15,32 @@ const maxIcmpTupleRawSize = 1 + 16 + 16 + 2 + 2
 type hashableIcmpTuple [maxIcmpTupleRawSize]byte
 
 type icmpTuple struct {
-	IcmpVersion uint8
-	SrcIP       net.IP
-	DstIP       net.IP
-	ID          uint16
-	Seq         uint16
+	icmpVersion uint8
+	srcIP       net.IP
+	dstIP       net.IP
+	id          uint16
+	seq         uint16
 }
 
 func (t *icmpTuple) Reverse() icmpTuple {
 	return icmpTuple{
-		IcmpVersion: t.IcmpVersion,
-		SrcIP:       t.DstIP,
-		DstIP:       t.SrcIP,
-		ID:          t.ID,
-		Seq:         t.Seq,
+		icmpVersion: t.icmpVersion,
+		srcIP:       t.dstIP,
+		dstIP:       t.srcIP,
+		id:          t.id,
+		seq:         t.seq,
 	}
 }
 
 func (t *icmpTuple) Hashable() hashableIcmpTuple {
 	var hash hashableIcmpTuple
-	copy(hash[0:16], t.SrcIP)
-	copy(hash[16:32], t.DstIP)
-	copy(hash[32:37], []byte{byte(t.ID >> 8), byte(t.ID), byte(t.Seq >> 8), byte(t.Seq), t.IcmpVersion})
+	copy(hash[0:16], t.srcIP)
+	copy(hash[16:32], t.dstIP)
+	copy(hash[32:37], []byte{byte(t.id >> 8), byte(t.id), byte(t.seq >> 8), byte(t.seq), t.icmpVersion})
 	return hash
 }
 
 func (t *icmpTuple) String() string {
 	return fmt.Sprintf("icmpTuple version[%d] src[%s] dst[%s] id[%d] seq[%d]",
-		t.IcmpVersion, t.SrcIP, t.DstIP, t.ID, t.Seq)
+		t.icmpVersion, t.srcIP, t.dstIP, t.id, t.seq)
 }

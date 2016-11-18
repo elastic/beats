@@ -46,7 +46,7 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 				"id":     containerID,
 				"name":   "name1",
 				"socket": docker.GetSocket(),
-				"labels": docker.BuildLabelArray(labels),
+				"labels": docker.DeDotLabels(labels),
 			},
 		},
 		"fail": common.MapStr{

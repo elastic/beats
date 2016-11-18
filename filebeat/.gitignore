@@ -1,4 +1,4 @@
-/etc/filebeat.dev.yml
+/_meta/filebeat.dev.yml
 .vagrant
 /docs/html_docs
 

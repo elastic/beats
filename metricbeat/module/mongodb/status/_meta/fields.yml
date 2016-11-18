@@ -322,6 +322,109 @@
       description: >
         A string that represents the name of the current storage engine.
 
+    - name: wired_tiger
+      type: group
+      description: >
+        Statistics about the WiredTiger storage engine.
+      fields:
+        - name: concurrent_transactions
+          type: group
+          description: >
+            Statistics about the transactions currently in progress.
+          fields:
+            - name: write.out
+              type: long
+              description: >
+                Number of concurrent write transaction in progress.
+            - name: write.available
+              type: long
+              description: >
+                Number of concurrent write tickets available.
+            - name: write.total_tickets
+              type: long
+              description: >
+                Number of total write tickets.
+            - name: read.out
+              type: long
+              description: >
+                Number of concurrent read transaction in progress.
+            - name: read.available
+              type: long
+              description: >
+                Number of concurrent read tickets available.
+            - name: read.total_tickets
+              type: long
+              description: >
+                Number of total read tickets.
+        - name: cache
+          type: group
+          description: >
+            Statistics about the cache and page evictions from the cache.
+          fields:
+            - name: maximum.bytes
+              type: long
+              format: bytes
+              description: >
+                Maximum cache size.
+            - name: used.bytes
+              type: long
+              format: bytes
+              description: >
+                Size in byte of the data currently in cache.
+            - name: dirty.bytes
+              type: long
+              format: bytes
+              description: >
+                Size in bytes of the dirty data in the cache.
+            - name: pages.read
+              type: long
+              description: >
+                Number of pages read into the cache.
+            - name: pages.write
+              type: long
+              description: >
+                Number of pages written from the cache.
+            - name: pages.evicted
+              type: long
+              description: >
+                Number of pages evicted from the cache.
+        - name: log
+          type: group
+          description: >
+            Statistics about the write ahead log used by WiredTiger.
+          fields:
+            - name: size.bytes
+              type: long
+              format: bytes
+              description: >
+                Total log size in bytes.
+            - name: write.bytes
+              type: long
+              format: bytes
+              description: >
+                Number of bytes written into the log.
+            - name: max_file_size.bytes
+              type: long
+              format: bytes
+              description: >
+                Maximum file size.
+            - name: flushes
+              type: long
+              description: >
+                Number of flush operations.
+            - name: writes
+              type: long
+              description: >
+                Number of write operations.
+            - name: scans
+              type: long
+              description: >
+                Number of scan operations.
+            - name: syncs
+              type: long
+              description: >
+                Number of sync operations.
+
 
 
 
