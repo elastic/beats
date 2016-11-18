@@ -61,3 +61,16 @@ func eventMapping(status map[string]string) common.MapStr {
 	}
 	return schema.Apply(source)
 }
+
+func rawEventMapping(status map[string]string) common.MapStr {
+	source := common.MapStr{}
+	for key, val := range status {
+		// Only adds events which are not in the mapping
+		if schema.HasKey(key) {
+			continue
+		}
+
+		source[key] = val
+	}
+	return source
+}

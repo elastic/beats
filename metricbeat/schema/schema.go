@@ -15,6 +15,8 @@ type Mapper interface {
 	// Map applies the Mapper conversion on the data and adds the result
 	// to the event on the key.
 	Map(key string, event common.MapStr, data map[string]interface{})
+
+	HasKey(key string) bool
 }
 
 // A Conv object represents a conversion mechanism from the data map to the event map.
@@ -40,6 +42,10 @@ func (conv Conv) Map(key string, event common.MapStr, data map[string]interface{
 	}
 }
 
+func (conv Conv) HasKey(key string) bool {
+	return conv.Key == key
+}
+
 // implements Mapper interface for structure
 type Object map[string]Mapper
 
@@ -47,6 +53,10 @@ func (o Object) Map(key string, event common.MapStr, data map[string]interface{}
 	subEvent := common.MapStr{}
 	applySchemaToEvent(subEvent, data, o)
 	event[key] = subEvent
+}
+
+func (o Object) HasKey(key string) bool {
+	return hasKey(key, o)
 }
 
 // ApplyTo adds the fields extracted from data, converted using the schema, to the
@@ -59,6 +69,20 @@ func (s Schema) ApplyTo(event common.MapStr, data map[string]interface{}) common
 // Apply converts the fields extracted from data, using the schema, into a new map.
 func (s Schema) Apply(data map[string]interface{}) common.MapStr {
 	return s.ApplyTo(common.MapStr{}, data)
+}
+
+// HasKey checks if the key is part of the schema
+func (s Schema) HasKey(key string) bool {
+	return hasKey(key, s)
+}
+
+func hasKey(key string, mappers map[string]Mapper) bool {
+	for _, mapper := range mappers {
+		if mapper.HasKey(key) {
+			return true
+		}
+	}
+	return false
 }
 
 func applySchemaToEvent(event common.MapStr, data map[string]interface{}, conversions map[string]Mapper) {
