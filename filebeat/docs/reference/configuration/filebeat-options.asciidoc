@@ -319,7 +319,7 @@ Example configuration:
 [source,yaml]
 -------------------------------------------------------------------------------------
 json.message_key: log
-json.message_key: "json"
+json.target: json
 json.keys_under_root: true
 json.add_error_key: true
 -------------------------------------------------------------------------------------
@@ -329,7 +329,7 @@ json.add_error_key: true
 and its value must be string, otherwise it is ignored. If no text key is defined, the line
 filtering and multiline features cannot be used.
 
-*`json_key`*:: name of the JSON key in the output document where the decoded JSON has to be placed. The default is "json"
+*`target`*:: name of the JSON key in the output document where the decoded JSON will be placed. The default is "json".
 
 *`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key in the output document.
 If you enable this setting, the keys are copied top level in the output document. The default is false.

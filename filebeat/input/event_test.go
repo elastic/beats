@@ -81,12 +81,12 @@ func TestEventToMapStrJSON(t *testing.T) {
 			},
 		},
 		{
-			// when JsonKey is defined, the json content is expected under that key
+			// when Target is defined, the json content is expected under that key
 			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
 				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
-				JSONConfig:   &reader.JSONConfig{JsonKey: "foobar"},
+				JSONConfig:   &reader.JSONConfig{Target: "foobar"},
 			},
 			ExpectedItems: common.MapStr{
 				"foobar": common.MapStr{"type": "test", "text": "hello"},
