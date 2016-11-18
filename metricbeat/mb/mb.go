@@ -103,6 +103,10 @@ func (b *BaseMetricSet) Host() string {
 // Configuration types
 
 // ModuleConfig is the base configuration data for all Modules.
+//
+// The Raw config option is used to enable raw fields in a metricset. This means
+// the metricset fetches not only the predefined fields but add alls raw data under
+// the raw namespace to the event.
 type ModuleConfig struct {
 	Hosts      []string                `config:"hosts"`
 	Period     time.Duration           `config:"period"     validate:"positive"`
@@ -111,6 +115,7 @@ type ModuleConfig struct {
 	MetricSets []string                `config:"metricsets" validate:"required"`
 	Enabled    bool                    `config:"enabled"`
 	Filters    processors.PluginConfig `config:"filters"`
+	Raw        bool                    `config:"raw"`
 
 	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
 }
