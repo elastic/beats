@@ -28,7 +28,6 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
         evt = output[0]
-        print evt
 
         self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS), evt.keys(), evt)
 
