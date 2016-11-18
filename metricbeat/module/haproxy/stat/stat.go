@@ -19,20 +19,20 @@ var (
 	debugf = logp.MakeDebug("haproxy-stat")
 )
 
-// init adds stat metricset
+// init adds stat metricset.
 func init() {
 	if err := mb.Registry.AddMetricSet("haproxy", statsMethod, New); err != nil {
 		panic(err)
 	}
 }
 
-// MetricSet defines stat metricset
+// MetricSet defines stat metricset.
 type MetricSet struct {
 	mb.BaseMetricSet
 	statsAddr string
 }
 
-// New creates a new instance of haproxy stat metricset
+// New creates a new instance of haproxy stat metricset.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logp.Warn("EXPERIMENTAL: The haproxy stat metricset is experimental")
 
@@ -42,7 +42,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch methods returns a list of stats metrics
+// Fetch methods returns a list of stats metrics.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	hapc, err := haproxy.NewHaproxyClient(m.statsAddr)

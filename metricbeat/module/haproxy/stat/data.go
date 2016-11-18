@@ -108,7 +108,7 @@ var (
 	}
 )
 
-// Map data to MapStr
+// Map data to MapStr.
 func eventMapping(info []*haproxy.Stat) []common.MapStr {
 
 	var events []common.MapStr
