@@ -221,6 +221,11 @@
                     }
                   }
                 },
+                "socket": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
                 "status": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",

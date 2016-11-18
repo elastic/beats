@@ -50,6 +50,9 @@ func FetchStats(client *docker.Client) ([]DockerStat, error) {
 
 	containersList := []DockerStat{}
 	for _, container := range containers {
+		// This is currently very inefficient as docker calculates the average for each request,
+		// means each request will take at least 2s: https://github.com/docker/docker/blob/master/cli/command/container/stats_helpers.go#L148
+		// Getting all stats at once is implemented here: https://github.com/docker/docker/pull/25361
 		containersList = append(containersList, exportContainerStats(client, &container))
 	}
 
