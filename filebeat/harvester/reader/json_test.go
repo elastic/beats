@@ -87,60 +87,60 @@ func TestDecodeJSON(t *testing.T) {
 	}{
 		{
 			Text:         `{"message": "test", "value": 1}`,
-			Config:       JSONConfig{MessageKey: "message"},
+			Config:       JSONConfig{MessageKey: "message", Target: "json"},
 			ExpectedText: "test",
 			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1)},
 		},
 		{
 			Text:         `{"message": "test", "value": 1}`,
-			Config:       JSONConfig{MessageKey: "message1"},
+			Config:       JSONConfig{MessageKey: "message1", Target: "json"},
 			ExpectedText: "",
 			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1)},
 		},
 		{
 			Text:         `{"message": "test", "value": 1}`,
-			Config:       JSONConfig{MessageKey: "value"},
+			Config:       JSONConfig{MessageKey: "value", Target: "json"},
 			ExpectedText: "",
 			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1)},
 		},
 		{
 			Text:         `{"message": "test", "value": "1"}`,
-			Config:       JSONConfig{MessageKey: "value"},
+			Config:       JSONConfig{MessageKey: "value", Target: "json"},
 			ExpectedText: "1",
 			ExpectedMap:  common.MapStr{"message": "test", "value": "1"},
 		},
 		{
 			// in case of JSON decoding errors, the text is passed as is
 			Text:         `{"message": "test", "value": "`,
-			Config:       JSONConfig{MessageKey: "value"},
+			Config:       JSONConfig{MessageKey: "value", Target: "json"},
 			ExpectedText: `{"message": "test", "value": "`,
 			ExpectedMap:  nil,
 		},
 		{
 			// Add key error helps debugging this
 			Text:         `{"message": "test", "value": "`,
-			Config:       JSONConfig{MessageKey: "value", AddErrorKey: true},
+			Config:       JSONConfig{MessageKey: "value", AddErrorKey: true, Target: "json"},
 			ExpectedText: `{"message": "test", "value": "`,
 			ExpectedMap:  common.MapStr{"json_error": "Error decoding JSON: unexpected EOF"},
 		},
 		{
 			// If the text key is not found, put an error
 			Text:         `{"message": "test", "value": "1"}`,
-			Config:       JSONConfig{MessageKey: "hello", AddErrorKey: true},
+			Config:       JSONConfig{MessageKey: "hello", AddErrorKey: true, Target: "json"},
 			ExpectedText: ``,
 			ExpectedMap:  common.MapStr{"message": "test", "value": "1", "json_error": "Key 'hello' not found"},
 		},
 		{
 			// If the text key is found, but not a string, put an error
 			Text:         `{"message": "test", "value": 1}`,
-			Config:       JSONConfig{MessageKey: "value", AddErrorKey: true},
+			Config:       JSONConfig{MessageKey: "value", AddErrorKey: true, Target: "json"},
 			ExpectedText: ``,
 			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1), "json_error": "Value of key 'value' is not a string"},
 		},
 		{
 			// Without a text key, simple return the json and an empty text
 			Text:         `{"message": "test", "value": 1}`,
-			Config:       JSONConfig{AddErrorKey: true},
+			Config:       JSONConfig{AddErrorKey: true, Target: "json"},
 			ExpectedText: ``,
 			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1)},
 		},
