@@ -169,7 +169,7 @@ func TestCPUService_GetCpuStats(t *testing.T) {
 				"id":     containerID,
 				"name":   "name1",
 				"socket": docker.GetSocket(),
-				"labels": docker.BuildLabelArray(labels),
+				"labels": docker.DeDotLabels(labels),
 			},
 		},
 		"usage": common.MapStr{

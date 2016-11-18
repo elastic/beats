@@ -32,7 +32,7 @@ func eventMapping(cont *dc.APIContainers) common.MapStr {
 		"status": cont.Status,
 	}
 
-	labels := docker.BuildLabelArray(cont.Labels)
+	labels := docker.DeDotLabels(cont.Labels)
 	if len(labels) > 0 {
 		event["labels"] = labels
 	}
