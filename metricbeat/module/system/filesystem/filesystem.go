@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
 )
@@ -13,7 +14,7 @@ import (
 var debugf = logp.MakeDebug("system-filesystem")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "filesystem", New); err != nil {
+	if err := mb.Registry.AddMetricSet("system", "filesystem", New, parse.EmptyHostParser); err != nil {
 		panic(err)
 	}
 }
