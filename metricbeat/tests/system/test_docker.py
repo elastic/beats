@@ -57,8 +57,8 @@ class Test(metricbeat.BaseTest):
 
         evt = self.remove_labels(evt)
 
-        if 'per_cpu' in evt["docker"]["cpu"]["usage"]:
-            del evt["docker"]["cpu"]["usage"]["per_cpu"]
+        if 'core' in evt["docker"]["cpu"]:
+            del evt["docker"]["cpu"]["core"]
 
         self.assert_fields_are_documented(evt)
 

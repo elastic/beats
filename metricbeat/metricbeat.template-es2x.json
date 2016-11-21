@@ -235,16 +235,40 @@
             },
             "cpu": {
               "properties": {
-                "usage": {
+                "kernel": {
                   "properties": {
-                    "kernel_mode": {
+                    "pct": {
                       "type": "float"
                     },
-                    "total": {
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "system": {
+                  "properties": {
+                    "pct": {
                       "type": "float"
                     },
-                    "user_mode": {
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "total": {
+                  "properties": {
+                    "pct": {
                       "type": "float"
+                    }
+                  }
+                },
+                "user": {
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    },
+                    "ticks": {
+                      "type": "long"
                     }
                   }
                 }
