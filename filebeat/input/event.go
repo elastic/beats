@@ -20,7 +20,7 @@ type Event struct {
 	Text         *string
 	JSONConfig   *reader.JSONConfig
 	State        file.State
-	Data         common.MapStr
+	Data         common.MapStr // Use in readers to add data to the event
 }
 
 func NewEvent(state file.State) *Event {

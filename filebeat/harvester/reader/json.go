@@ -121,7 +121,7 @@ func (r *JSON) Next() (Message, error) {
 		return message, err
 	}
 
-	var fields = common.MapStr{}
+	var fields common.MapStr
 	message.Content, fields = r.decodeJSON(message.Content)
 	message.AddFields(common.MapStr{"json": fields})
 	return message, nil
