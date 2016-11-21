@@ -1,5 +1,5 @@
-// Package stubstatus reads server status from nginx host under /server-status, ngx_http_stub_status_module is required.
-package stubstatus
+// Package plustcpzone reads server tcpzone status from Nginx, ngx_http_status_module is required.
+package plustcpzone
 
 import (
 	"fmt"
@@ -16,8 +16,8 @@ const (
 	// the host config.
 	defaultScheme = "http"
 
-	// defaultPath is the default path to the ngx_http_stub_status_module endpoint on Nginx.
-	defaultPath = "/server-status"
+	// defaultPath is the default path to the ngx_http_status_module server tcpzone endpoint on Nginx.
+	defaultPath = "/status/server_tcpzones"
 )
 
 var (
@@ -25,17 +25,17 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("nginx", "stubstatus", New); err != nil {
+	if err := mb.Registry.AddMetricSet("nginx", "plustcpzone", New); err != nil {
 		panic(err)
 	}
 }
 
-// MetricSet for fetching Nginx stub status.
+// MetricSet for fetching Nginx plus status.
 type MetricSet struct {
 	mb.BaseMetricSet
 
 	client *http.Client // HTTP client that is reused across requests.
-	url    string       // Nginx stubstatus endpoint URL.
+	url    string       // Nginx plustcpzone endpoint URL.
 
 	requests int
 }
@@ -58,7 +58,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	debugf("nginx-stubstatus URL=%s", u)
+	debugf("nginx-plustcpzone URL=%s", u)
 	return &MetricSet{
 		BaseMetricSet: base,
 		url:           u.String(),
@@ -67,8 +67,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch makes an HTTP request to fetch status metrics from the stubstatus endpoint.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+// Fetch makes an HTTP request to fetch status metrics from the plustcpzone endpoint.
+func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	req, err := http.NewRequest("GET", m.url, nil)
 	resp, err := m.client.Do(req)
 	if err != nil {

@@ -1,0 +1,9 @@
+- name: pluscache
+  type: group
+  description: >
+    `pluscache` reads server cache status from Nginx ngx_http_status_module.
+  fields:
+    - name: hostname
+      type: keyword
+      description: >
+        Nginx hostname

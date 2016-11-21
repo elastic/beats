@@ -1,0 +1,9 @@
+- name: plustcpzone
+  type: group
+  description: >
+    `plustcpzone` reads server tcpzone status from Nginx ngx_http_status_module.
+  fields:
+    - name: hostname
+      type: keyword
+      description: >
+        Nginx hostname

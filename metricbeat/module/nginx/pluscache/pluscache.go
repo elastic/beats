@@ -1,5 +1,5 @@
-// Package stubstatus reads server status from nginx host under /server-status, ngx_http_stub_status_module is required.
-package stubstatus
+// Package pluscache reads server cache status from Nginx, ngx_http_status_module is required.
+package pluscache
 
 import (
 	"fmt"
@@ -16,8 +16,8 @@ const (
 	// the host config.
 	defaultScheme = "http"
 
-	// defaultPath is the default path to the ngx_http_stub_status_module endpoint on Nginx.
-	defaultPath = "/server-status"
+	// defaultPath is the default path to the ngx_http_status_module server cache endpoint on Nginx.
+	defaultPath = "/status/caches"
 )
 
 var (
@@ -25,17 +25,17 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("nginx", "stubstatus", New); err != nil {
+	if err := mb.Registry.AddMetricSet("nginx", "pluscache", New); err != nil {
 		panic(err)
 	}
 }
 
-// MetricSet for fetching Nginx stub status.
+// MetricSet for fetching Nginx plus status.
 type MetricSet struct {
 	mb.BaseMetricSet
 
 	client *http.Client // HTTP client that is reused across requests.
-	url    string       // Nginx stubstatus endpoint URL.
+	url    string       // Nginx pluscache endpoint URL.
 
 	requests int
 }
@@ -58,7 +58,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	debugf("nginx-stubstatus URL=%s", u)
+	debugf("nginx-pluscache URL=%s", u)
 	return &MetricSet{
 		BaseMetricSet: base,
 		url:           u.String(),
@@ -67,8 +67,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch makes an HTTP request to fetch status metrics from the stubstatus endpoint.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+// Fetch makes an HTTP request to fetch status metrics from the pluscache endpoint.
+func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	req, err := http.NewRequest("GET", m.url, nil)
 	resp, err := m.client.Do(req)
 	if err != nil {
