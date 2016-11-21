@@ -48,11 +48,9 @@ class Test(metricbeat.BaseTest):
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
 
-        # TODO: There are lots of errors converting empty strings to numbers
-        # during the schema conversion. This needs fixed.
         # Ensure no errors or warnings exist in the log.
-        #log = self.get_log()
-        #self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
+        log = self.get_log()
+        self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
