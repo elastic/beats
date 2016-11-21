@@ -233,19 +233,44 @@
             },
             "cpu": {
               "properties": {
-                "usage": {
+                "kernel": {
                   "properties": {
-                    "kernel_mode": {
+                    "pct": {
                       "scaling_factor": 1000,
                       "type": "scaled_float"
                     },
-                    "total": {
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "system": {
+                  "properties": {
+                    "pct": {
                       "scaling_factor": 1000,
                       "type": "scaled_float"
                     },
-                    "user_mode": {
+                    "ticks": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "total": {
+                  "properties": {
+                    "pct": {
                       "scaling_factor": 1000,
                       "type": "scaled_float"
+                    }
+                  }
+                },
+                "user": {
+                  "properties": {
+                    "pct": {
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
+                    },
+                    "ticks": {
+                      "type": "long"
                     }
                   }
                 }

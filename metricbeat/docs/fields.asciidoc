@@ -614,34 +614,65 @@ Runtime cpu metrics.
 
 
 [float]
-== usage Fields
-
-Cpu usage metrics.
-
-
-
-[float]
-=== docker.cpu.usage.kernel_mode
+=== docker.cpu.kernel.pct
 
 type: scaled_float
+
+format: percentage
 
 The system kernel consumed by The Docker server.
 
 
 [float]
-=== docker.cpu.usage.user_mode
+=== docker.cpu.kernel.ticks
 
-type: scaled_float
+type: long
 
-The system user mode consumed by The Docker server.
+Cpu kernel tikcs
 
 
 [float]
-=== docker.cpu.usage.total
+=== docker.cpu.system.pct
 
 type: scaled_float
 
-The total system ressources consumed by The Docker server.
+format: percentage
+
+
+
+[float]
+=== docker.cpu.system.ticks
+
+type: long
+
+Cpu system tikcs
+
+
+[float]
+=== docker.cpu.user.pct
+
+type: scaled_float
+
+format: percentage
+
+
+
+[float]
+=== docker.cpu.user.ticks
+
+type: long
+
+Cpu user tikcs
+
+
+[float]
+=== docker.cpu.total.pct
+
+type: scaled_float
+
+format: percentage
+
+Total cpu usage.
 
 
 [float]
