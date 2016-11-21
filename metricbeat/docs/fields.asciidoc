@@ -1895,6 +1895,7 @@ the average queue time in ms over the 1024 last requests
 == kafka Fields
 
 kafka Module
+experimental[]
 
 
 
