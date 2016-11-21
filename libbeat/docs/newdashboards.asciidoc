@@ -58,7 +58,7 @@ Elasticsearch running on localhost for a single Beat (eg. Metricbeat):
 ./scripts/import_dashboards -file metricbeat-dashboards-1.1.zip
 ----------------------------------------------------------------------
 
-- from the official zip archive available under http://artifacts.elastic.co/:
+- from the official zip archive available at {dashboards}:
 +
 [source,shell]
 ----------------------------------------------------------------------
