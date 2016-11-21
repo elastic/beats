@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v5.0.0...master[Check the HEAD diff]
 - Only load matching states into prospector to improve state handling {pull}2840[2840]
 - Reset all states ttl on startup to make sure it is overwritten by new config {pull}2840[2840]
 - Persist all states for files which fall under ignore_older to have consistent behaviour {pull}2859[2859]
+- Improve shutdown behaviour with large number of files. {pull}3035[3035]
 
 *Winlogbeat*
 
