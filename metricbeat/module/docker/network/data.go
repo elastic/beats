@@ -5,7 +5,7 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func eventsMapping(netsStatsList []NETstats) []common.MapStr {
+func eventsMapping(netsStatsList []NetStats) []common.MapStr {
 	myEvents := []common.MapStr{}
 	for _, netsStats := range netsStatsList {
 		myEvents = append(myEvents, eventMapping(&netsStats))
@@ -13,7 +13,7 @@ func eventsMapping(netsStatsList []NETstats) []common.MapStr {
 	return myEvents
 }
 
-func eventMapping(stats *NETstats) common.MapStr {
+func eventMapping(stats *NetStats) common.MapStr {
 	event := common.MapStr{
 		mb.ModuleData: common.MapStr{
 			"container": stats.Container.ToMapStr(),

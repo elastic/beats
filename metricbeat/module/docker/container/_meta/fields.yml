@@ -27,10 +27,6 @@
       type: keyword
       description: >
         Container status.
-    - name: socket
-      type: keyword
-      description: >
-        Socket path
     - name: size
       type: group
       description: >

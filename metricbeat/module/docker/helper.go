@@ -9,21 +9,17 @@ import (
 )
 
 type Container struct {
-	Id     string
+	ID     string
 	Name   string
 	Labels common.MapStr
-	Socket *string
 }
 
 func (c *Container) ToMapStr() common.MapStr {
 	m := common.MapStr{
-		"id":   c.Id,
+		"id":   c.ID,
 		"name": c.Name,
-		// TODO: Is this really needed
-		"socket": GetSocket(),
 	}
 
-	// Only add labels array if not 0
 	if len(c.Labels) > 0 {
 		m["labels"] = c.Labels
 	}
@@ -32,7 +28,7 @@ func (c *Container) ToMapStr() common.MapStr {
 
 func NewContainer(container *docker.APIContainers) *Container {
 	return &Container{
-		Id:     container.ID,
+		ID:     container.ID,
 		Name:   ExtractContainerName(container.Names),
 		Labels: DeDotLabels(container.Labels),
 	}
@@ -41,7 +37,7 @@ func NewContainer(container *docker.APIContainers) *Container {
 func ExtractContainerName(names []string) string {
 	output := names[0]
 
-	if cap(names) > 1 {
+	if len(names) > 1 {
 		for _, name := range names {
 			if strings.Count(output, "/") > strings.Count(name, "/") {
 				output = name
@@ -54,11 +50,10 @@ func ExtractContainerName(names []string) string {
 // DeDotLabels returns a new common.MapStr containing a copy of the labels
 // where the dots in each label name have been changed to an underscore.
 func DeDotLabels(labels map[string]string) common.MapStr {
-
 	outputLabels := common.MapStr{}
-
 	for k, v := range labels {
-		// This is necessary, so ES does not interpret '.' fields as new nested JSONs, and also makes this compatible with ES 2.4
+		// This is necessary so that ES does not interpret '.' fields as new
+		// nested JSON objects, and also makes this compatible with ES 2.x.
 		label := strings.Replace(k, ".", "_", -1)
 		outputLabels.Put(label, v)
 	}

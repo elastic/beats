@@ -3,10 +3,10 @@ package container
 import (
 	"time"
 
-	dc "github.com/fsouza/go-dockerclient"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/docker"
+
+	dc "github.com/fsouza/go-dockerclient"
 )
 
 func eventsMapping(containersList []dc.APIContainers) []common.MapStr {
@@ -18,7 +18,6 @@ func eventsMapping(containersList []dc.APIContainers) []common.MapStr {
 }
 
 func eventMapping(cont *dc.APIContainers) common.MapStr {
-
 	event := common.MapStr{
 		"created": common.Time(time.Unix(cont.Created, 0)),
 		"id":      cont.ID,

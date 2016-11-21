@@ -14,7 +14,6 @@ func eventsMapping(memoryDataList []MemoryData) []common.MapStr {
 }
 
 func eventMapping(memoryData *MemoryData) common.MapStr {
-
 	event := common.MapStr{
 		mb.ModuleData: common.MapStr{
 			"container": memoryData.Container.ToMapStr(),
