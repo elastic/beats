@@ -202,6 +202,13 @@ func (p *ProspectorLog) scan() {
 
 	for path, info := range p.getFiles() {
 
+		select {
+		case <-p.Prospector.done:
+			logp.Info("Scan aborted because prospector stopped.")
+			return
+		default:
+		}
+
 		logp.Debug("prospector", "Check file for harvesting: %s", path)
 
 		// Create new state for comparison
