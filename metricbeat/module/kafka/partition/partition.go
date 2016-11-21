@@ -23,6 +23,8 @@ type MetricSet struct {
 // New create a new instance of the partition MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
+	logp.Warn("EXPERIMENTAL: The haproxy info metricset is experimental")
+
 	config := struct{}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
