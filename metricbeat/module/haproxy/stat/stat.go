@@ -1,58 +1,51 @@
 package stat
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/haproxy"
+
+	"github.com/pkg/errors"
 )
 
 const (
-	// defaultSocket is the default path to the unix socket for stats on haproxy.
 	statsMethod = "stat"
-	defaultAddr = "unix:///var/lib/haproxy/stats"
 )
 
 var (
 	debugf = logp.MakeDebug("haproxy-stat")
 )
 
-// init adds stat metricset.
+// init registers the haproxy stat MetricSet.
 func init() {
-	if err := mb.Registry.AddMetricSet("haproxy", statsMethod, New); err != nil {
+	if err := mb.Registry.AddMetricSet("haproxy", statsMethod, New, haproxy.HostParser); err != nil {
 		panic(err)
 	}
 }
 
-// MetricSet defines stat metricset.
+// MetricSet for haproxy stats.
 type MetricSet struct {
 	mb.BaseMetricSet
-	statsAddr string
 }
 
-// New creates a new instance of haproxy stat metricset.
+// New creates a new haproxy stat MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The haproxy stat metricset is experimental")
+	logp.Warn("EXPERIMENTAL: The %v %v metricset is experimental", base.Module().Name(), base.Name())
 
-	return &MetricSet{
-		BaseMetricSet: base,
-		statsAddr:     base.Host(),
-	}, nil
+	return &MetricSet{BaseMetricSet: base}, nil
 }
 
 // Fetch methods returns a list of stats metrics.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
-	hapc, err := haproxy.NewHaproxyClient(m.statsAddr)
+	hapc, err := haproxy.NewHaproxyClient(m.HostData().URI)
 	if err != nil {
-		return nil, fmt.Errorf("HAProxy Client error: %s", err)
+		return nil, errors.Wrap(err, "failed creating haproxy client")
 	}
 
 	res, err := hapc.GetStat()
 	if err != nil {
-		return nil, fmt.Errorf("HAProxy Client error fetching %s: %s", statsMethod, err)
+		return nil, errors.Wrap(err, "failed fetching haproxy stat")
 	}
 
 	return eventMapping(res), nil
