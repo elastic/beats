@@ -29,7 +29,7 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        evt = self.remove_labels_and_ports(evt)
+        evt = self.remove_labels(evt)
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -55,7 +55,7 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        evt = self.remove_labels_and_ports(evt)
+        evt = self.remove_labels(evt)
 
         if 'per_cpu' in evt["docker"]["cpu"]["usage"]:
             del evt["docker"]["cpu"]["usage"]["per_cpu"]
@@ -85,7 +85,7 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        evt = self.remove_labels_and_ports(evt)
+        evt = self.remove_labels(evt)
 
         self.assert_fields_are_documented(evt)
 
@@ -137,7 +137,7 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        evt = self.remove_labels_and_ports(evt)
+        evt = self.remove_labels(evt)
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -163,14 +163,12 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        evt = self.remove_labels_and_ports(evt)
+        evt = self.remove_labels(evt)
         self.assert_fields_are_documented(evt)
 
-    def remove_labels_and_ports(self, evt):
+    def remove_labels(self, evt):
 
         if 'labels' in evt["docker"]["container"]:
             del evt["docker"]["container"]["labels"]
-        if 'ports' in evt["docker"]["container"]:
-            del evt["docker"]["container"]["ports"]
 
         return evt
