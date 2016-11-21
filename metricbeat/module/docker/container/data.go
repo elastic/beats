@@ -37,27 +37,5 @@ func eventMapping(cont *dc.APIContainers) common.MapStr {
 		event["labels"] = labels
 	}
 
-	ports := convertContainerPorts(cont.Ports)
-	if len(ports) > 0 {
-		event["ports"] = ports
-	}
-
 	return event
-}
-
-func convertContainerPorts(ports []dc.APIPort) []map[string]interface{} {
-	var outputPorts = []map[string]interface{}{}
-	for _, port := range ports {
-		outputPort := common.MapStr{
-			"ip": port.IP,
-			"port": common.MapStr{
-				"private": port.PrivatePort,
-				"public":  port.PublicPort,
-			},
-			"type": port.Type,
-		}
-		outputPorts = append(outputPorts, outputPort)
-	}
-
-	return outputPorts
 }
