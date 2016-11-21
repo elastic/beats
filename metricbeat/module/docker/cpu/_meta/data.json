@@ -1,5 +1,9 @@
 {
     "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
     "docker": {
         "container": {
             "id": "fa01dd9d2489b23968be9013ef55be34bdcaebddf1dab94ee9c895475052e130",
@@ -11,7 +15,6 @@
                 "com_docker_compose_version": "1.9.0-rc4"
             },
             "name": "environments_beat_run_5",
-            "socket": "unix:///var/run/docker.sock"
         },
         "cpu": {
             "core": {
@@ -42,7 +45,7 @@
         }
     },
     "metricset": {
-        "host": "localhost",
+        "host": "/var/run/docker.sock",
         "module": "docker",
         "name": "cpu",
         "rtt": 115

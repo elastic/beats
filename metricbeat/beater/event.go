@@ -84,11 +84,8 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 		}
 	}
 
-	// Adds host name to event. In case credentials are passed through
-	// hostname, these are contained in this string.
+	// Adds host name to event.
 	if b.Host != "" {
-		// TODO (akroh): allow metricset to specify this value so that
-		// a proper URL can be specified and passwords be redacted.
 		event["metricset"].(common.MapStr)["host"] = b.Host
 	}
 
