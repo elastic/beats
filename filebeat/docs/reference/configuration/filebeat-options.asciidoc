@@ -233,7 +233,7 @@ WINDOWS:  If your Windows log rotation system shows errors because it can't rota
 
 WARNING: Only use this option if you understand that data loss is a potential side effect.
 
-When this option is enabled, Filebeat closes a file as soon as the end of a file is reached. This is useful when your files are only written once and not updated from time to time. For example, this happens when you are writing every single log event to a new file.
+When this option is enabled, Filebeat closes a file as soon as the end of a file is reached. This is useful when your files are only written once and not updated from time to time. For example, this happens when you are writing every single log event to a new file. This option is disabled by default.
 
 [[close-timeout]]
 ===== close_timeout
@@ -245,6 +245,8 @@ When this option is enabled, Filebeat gives every harvester a predefined lifetim
 When you use `close_timeout` for logs that contain multiline events, the harvester might stop in the middle of a multiline event, which means that only parts of the event will be sent. If the harvester is started again and the file still exists, only the second part of the event will be sent.
 
 The `close_timeout` setting won't apply if your output is stalled and no further events can be sent. At least one event must be sent after `close_timeout` elapses so the harvester can be closed after sending the event.
+
+This option is set to 0 by default which means it is disabled.
 
 
 [[clean-options]]
