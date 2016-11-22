@@ -57,7 +57,7 @@
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
+        "host": "apache",
         "module": "apache",
         "name": "status",
         "rtt": 115

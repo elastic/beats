@@ -1,13 +1,12 @@
 package cpu
 
 import (
+	"reflect"
 	"testing"
 
-	dc "github.com/fsouza/go-dockerclient"
-
-	"reflect"
-
 	"github.com/elastic/beats/libbeat/common"
+
+	dc "github.com/fsouza/go-dockerclient"
 )
 
 var cpuService CPUService
@@ -125,7 +124,5 @@ func TestCPUService_UsageInUsermode(t *testing.T) {
 }
 
 func equalEvent(expectedEvent common.MapStr, event common.MapStr) bool {
-
 	return reflect.DeepEqual(expectedEvent, event)
-
 }

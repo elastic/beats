@@ -33,6 +33,7 @@ func TestWritePs(t *testing.T) {
 		}
 	}
 }
+
 func TestReadPS(t *testing.T) {
 	oldReasPs := []uint64{0, 951, 235}
 	newReadPs := []uint64{120, 3951, 62}
@@ -57,6 +58,7 @@ func TestReadPS(t *testing.T) {
 		}
 	}
 }
+
 func TestBlkioTotal(t *testing.T) {
 	oldTotal := []uint64{40, 1954, 235}
 	newTotal := []uint64{120, 1964, 62}
@@ -81,6 +83,7 @@ func TestBlkioTotal(t *testing.T) {
 		}
 	}
 }
+
 func setTime(index int) {
 	oldBlkioRaw[index].Time = time.Now()
 	newBlkioRaw[index].Time = oldBlkioRaw[index].Time.Add(time.Duration(2000000000))

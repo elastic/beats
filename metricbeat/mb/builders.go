@@ -127,10 +127,24 @@ func initMetricSets(r *Register, modules []Module) (map[Module][]MetricSet, erro
 	active := map[Module][]MetricSet{}
 	var errs multierror.Errors
 	for _, bms := range newBaseMetricSets(modules) {
-		f, err := r.metricSetFactory(bms.Module().Name(), bms.Name())
+		f, hostParser, err := r.metricSetFactory(bms.Module().Name(), bms.Name())
 		if err != nil {
 			errs = append(errs, err)
 			continue
+		}
+
+		// Parse the 'host' field using the HostParser registered with the MetricSet.
+		if hostParser != nil {
+			bms.hostData, err = hostParser(bms.Module(), bms.host)
+			if err != nil {
+				errs = append(errs, err)
+				continue
+			}
+			bms.host = bms.hostData.Host
+		} else {
+			// The MetricSet was registered without a HostParser so provide a
+			// default HostData value.
+			bms.hostData = HostData{URI: bms.host}
 		}
 
 		metricSet, err := f(bms)

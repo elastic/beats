@@ -3,52 +3,68 @@ package docker
 import (
 	"sync"
 
-	"github.com/fsouza/go-dockerclient"
-
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
+
+	"github.com/fsouza/go-dockerclient"
 )
 
-type DockerStat struct {
+var HostParser = parse.URLHostParserBuilder{DefaultScheme: "tcp"}.Build()
+
+func init() {
+	// Register the ModuleFactory function for the "docker" module.
+	if err := mb.Registry.AddModule("docker", NewModule); err != nil {
+		panic(err)
+	}
+}
+
+func NewModule(base mb.BaseModule) (mb.Module, error) {
+	// Validate that at least one host has been specified.
+	config := struct {
+		Hosts []string `config:"hosts"    validate:"nonzero,required"`
+	}{}
+	if err := base.UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	return &base, nil
+}
+
+type Stat struct {
 	Container docker.APIContainers
 	Stats     docker.Stats
 }
 
-// TODO: These should not be global as otherwise only one client and socket can be used -> max 1 module to monitor
-var socket string
-
-func NewDockerClient(config *Config) (*docker.Client, error) {
-	socket = config.Socket
-
+func NewDockerClient(endpoint string, config Config) (*docker.Client, error) {
 	var err error
 	var client *docker.Client
 
-	if config.Tls.Enabled == true {
-		client, err = docker.NewTLSClient(
-			config.Socket,
-			config.Tls.CertPath,
-			config.Tls.KeyPath,
-			config.Tls.CaPath,
-		)
+	if !config.TLS.IsEnabled() {
+		client, err = docker.NewClient(endpoint)
 	} else {
-		client, err = docker.NewClient(config.Socket)
+		client, err = docker.NewTLSClient(
+			endpoint,
+			config.TLS.Certificate,
+			config.TLS.Key,
+			config.TLS.CA,
+		)
 	}
 	if err != nil {
 		return nil, err
 	}
-
-	logp.Info("Docker client is created")
 
 	return client, nil
 }
 
 // FetchStats returns a list of running containers with all related stats inside
-func FetchStats(client *docker.Client) ([]DockerStat, error) {
+func FetchStats(client *docker.Client) ([]Stat, error) {
 	containers, err := client.ListContainers(docker.ListContainersOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	containersList := []DockerStat{}
+	containersList := []Stat{}
 	for _, container := range containers {
 		// This is currently very inefficient as docker calculates the average for each request,
 		// means each request will take at least 2s: https://github.com/docker/docker/blob/master/cli/command/container/stats_helpers.go#L148
@@ -59,9 +75,9 @@ func FetchStats(client *docker.Client) ([]DockerStat, error) {
 	return containersList, err
 }
 
-func exportContainerStats(client *docker.Client, container *docker.APIContainers) DockerStat {
+func exportContainerStats(client *docker.Client, container *docker.APIContainers) Stat {
 	var wg sync.WaitGroup
-	var event DockerStat
+	var event Stat
 
 	statsC := make(chan *docker.Stats)
 	errC := make(chan error, 1)
@@ -93,8 +109,4 @@ func exportContainerStats(client *docker.Client, container *docker.APIContainers
 	}()
 	wg.Wait()
 	return event
-}
-
-func GetSocket() string {
-	return socket
 }

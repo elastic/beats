@@ -7,7 +7,6 @@ import (
 )
 
 func eventMapping(info *dc.DockerInfo) common.MapStr {
-
 	event := common.MapStr{
 		"id": info.ID,
 		"containers": common.MapStr{

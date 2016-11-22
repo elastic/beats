@@ -12,6 +12,10 @@ import (
 )
 
 const (
+	// ModuleData is the key used in events created by MetricSets to add data
+	// to an event that is common to the module. The data must be a
+	// common.MapStr and when the final event is built the object will be stored
+	// in the event under a key that is the module name.
 	ModuleData string = "_module"
 )
 
@@ -57,6 +61,7 @@ type MetricSet interface {
 	Host() string   // Host returns a hostname or other module specific value
 	// that identifies a specific host or service instance from which to collect
 	// metrics.
+	HostData() HostData // HostData returns the parsed host data.
 }
 
 // EventFetcher is a MetricSet that returns a single event when collecting data.
@@ -78,9 +83,23 @@ type EventsFetcher interface {
 // MetricSet interface requirements, leaving only the Fetch() method to be
 // implemented to have a complete MetricSet implementation.
 type BaseMetricSet struct {
-	name   string
-	module Module
-	host   string
+	name     string
+	module   Module
+	host     string
+	hostData HostData
+}
+
+// HostData contains values parsed from the 'host' configuration. Other
+// configuration data like protocols, usernames, and passwords may also be
+// used to construct this HostData data.
+type HostData struct {
+	URI          string // The full URI that should be used in connections.
+	SanitizedURI string // A sanitized version of the URI without credentials.
+
+	// Parts of the URI.
+	Host     string // The host and possibly port.
+	User     string // Username
+	Password string // Password
 }
 
 // Name returns the name of the MetricSet. It should not include the name of
@@ -98,6 +117,11 @@ func (b *BaseMetricSet) Module() Module {
 // specific host or service instance from which to collect metrics.
 func (b *BaseMetricSet) Host() string {
 	return b.host
+}
+
+// HostData returns the parsed host data.
+func (b *BaseMetricSet) HostData() HostData {
+	return b.hostData
 }
 
 // Configuration types

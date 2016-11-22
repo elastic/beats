@@ -22,7 +22,6 @@ const (
 )
 
 func TestData(t *testing.T) {
-
 	generateKafkaData(t, "metricbeat-generate-data")
 
 	f := mbtest.NewEventsFetcher(t, getConfig())
@@ -33,7 +32,6 @@ func TestData(t *testing.T) {
 }
 
 func TestTopic(t *testing.T) {
-
 	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
 	testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
@@ -83,11 +81,9 @@ func TestTopic(t *testing.T) {
 		t.Errorf("Offset after: %v", offsetAfter)
 	}
 	assert.True(t, offsetBefore+n == offsetAfter)
-
 }
 
 func generateKafkaData(t *testing.T, topic string) {
-
 	config := sarama.NewConfig()
 	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
 	if err != nil {

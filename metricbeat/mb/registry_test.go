@@ -119,14 +119,34 @@ func TestModuleFactoryUnknownModule(t *testing.T) {
 }
 
 func TestMetricSetFactory(t *testing.T) {
-	registry := NewRegister()
-	err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
-	if err != nil {
-		t.Fatal(err)
-	}
+	t.Run("without HostParser", func(t *testing.T) {
+		registry := NewRegister()
+		err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	ms, err := registry.metricSetFactory(moduleName, metricSetName)
-	if assert.NoError(t, err) {
+		ms, hp, err := registry.metricSetFactory(moduleName, metricSetName)
+		if err != nil {
+			t.Fatal(err)
+		}
 		assert.NotNil(t, ms)
-	}
+		assert.Nil(t, hp)
+	})
+
+	t.Run("with HostParser", func(t *testing.T) {
+		registry := NewRegister()
+		hostParser := func(Module, string) (HostData, error) { return HostData{}, nil }
+		err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory, hostParser)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ms, hp, err := registry.metricSetFactory(moduleName, metricSetName)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.NotNil(t, ms)
+		assert.NotNil(t, hp) // Can't compare functions in Go so just check for non-nil.
+	})
 }

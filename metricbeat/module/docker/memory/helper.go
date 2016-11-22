@@ -19,17 +19,16 @@ type MemoryData struct {
 
 type MemoryService struct{}
 
-func (s *MemoryService) getMemoryStatsList(rawStats []docker.DockerStat) []MemoryData {
-	formatedStats := []MemoryData{}
+func (s *MemoryService) getMemoryStatsList(rawStats []docker.Stat) []MemoryData {
+	formattedStats := []MemoryData{}
 	for _, myRawStats := range rawStats {
-		formatedStats = append(formatedStats, s.GetMemoryStats(myRawStats))
+		formattedStats = append(formattedStats, s.GetMemoryStats(myRawStats))
 	}
 
-	return formatedStats
+	return formattedStats
 }
 
-func (s *MemoryService) GetMemoryStats(myRawStat docker.DockerStat) MemoryData {
-
+func (s *MemoryService) GetMemoryStats(myRawStat docker.Stat) MemoryData {
 	return MemoryData{
 		Time:      common.Time(myRawStat.Stats.Read),
 		Container: docker.NewContainer(&myRawStat.Container),

@@ -8,7 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-const initialSize = 10 // initialSize specifies the initial size of the Register.
+const initialSize = 20 // initialSize specifies the initial size of the Register.
 
 // Registry is the singleton Register instance where all ModuleFactory's and
 // MetricSetFactory's should be registered.
@@ -31,20 +31,32 @@ type ModuleFactory func(base BaseModule) (Module, error)
 // (but not both).
 type MetricSetFactory func(base BaseMetricSet) (MetricSet, error)
 
+// HostParser is a function that parses a host value from the configuration
+// and returns a HostData object. The module is provided in case additional
+// configuration values are required to parse and build the HostData object.
+// An error should be returned if the host or configuration is invalid.
+type HostParser func(module Module, host string) (HostData, error)
+
+type metricSetFactoryInfo struct {
+	name       string
+	factory    MetricSetFactory
+	hostParser HostParser
+}
+
 // Register contains the factory functions for creating new Modules and new
 // MetricSets.
 type Register struct {
 	// A map of module name to ModuleFactory.
 	modules map[string]ModuleFactory
-	// A map of module name to nested map of MetricSet name to MetricSetFactory.
-	metricSets map[string]map[string]MetricSetFactory
+	// A map of module name to nested map of MetricSet name to metricSetFactoryInfo.
+	metricSets map[string]map[string]metricSetFactoryInfo
 }
 
 // NewRegister creates and returns a new Register.
 func NewRegister() *Register {
 	return &Register{
 		modules:    make(map[string]ModuleFactory, initialSize),
-		metricSets: make(map[string]map[string]MetricSetFactory, initialSize),
+		metricSets: make(map[string]map[string]metricSetFactoryInfo, initialSize),
 	}
 }
 
@@ -72,10 +84,11 @@ func (r *Register) AddModule(name string, factory ModuleFactory) error {
 	return nil
 }
 
-// AddMetricSet registers a new MetricSetFactory. An error is returned if
-// any parameter is empty or nil or if a factory has already been registered
-// under the name.
-func (r *Register) AddMetricSet(module string, name string, factory MetricSetFactory) error {
+// AddMetricSet registers a new MetricSetFactory. Optionally it accepts a single
+// HostParser function for parsing the 'host' configuration data. An error is
+// returned if any parameter is empty or nil or if a factory has already been
+// registered under the name.
+func (r *Register) AddMetricSet(module string, name string, factory MetricSetFactory, hostParser ...HostParser) error {
 	if module == "" {
 		return fmt.Errorf("module name is required")
 	}
@@ -88,7 +101,7 @@ func (r *Register) AddMetricSet(module string, name string, factory MetricSetFac
 	name = strings.ToLower(name)
 
 	if metricsets, ok := r.metricSets[module]; !ok {
-		r.metricSets[module] = map[string]MetricSetFactory{}
+		r.metricSets[module] = map[string]metricSetFactoryInfo{}
 	} else if _, exists := metricsets[name]; exists {
 		return fmt.Errorf("metricset '%s/%s' is already registered", module, name)
 	}
@@ -97,7 +110,11 @@ func (r *Register) AddMetricSet(module string, name string, factory MetricSetFac
 		return fmt.Errorf("metricset '%s/%s' cannot be registered with a nil factory", module, name)
 	}
 
-	r.metricSets[module][name] = factory
+	var hp HostParser
+	if len(hostParser) > 0 {
+		hp = hostParser[0]
+	}
+	r.metricSets[module][name] = metricSetFactoryInfo{name: name, factory: factory, hostParser: hp}
 	logp.Info("MetricSet registered: %s/%s", module, name)
 	return nil
 }
@@ -110,21 +127,21 @@ func (r *Register) moduleFactory(name string) ModuleFactory {
 
 // metricSetFactory returns the registered MetricSetFactory associated with the
 // given name. It returns an error if no MetricSetFactory is registered.
-func (r *Register) metricSetFactory(module, name string) (MetricSetFactory, error) {
+func (r *Register) metricSetFactory(module, name string) (MetricSetFactory, HostParser, error) {
 	module = strings.ToLower(module)
 	name = strings.ToLower(name)
 
 	modules, exists := r.metricSets[module]
 	if !exists {
-		return nil, fmt.Errorf("metricset '%s/%s' is not registered, module not found", module, name)
+		return nil, nil, fmt.Errorf("metricset '%s/%s' is not registered, module not found", module, name)
 	}
 
-	f, exists := modules[name]
+	info, exists := modules[name]
 	if !exists {
-		return nil, fmt.Errorf("metricset '%s/%s' is not registered, metricset not found", module, name)
+		return nil, nil, fmt.Errorf("metricset '%s/%s' is not registered, metricset not found", module, name)
 	}
 
-	return f, nil
+	return info.factory, info.hostParser, nil
 }
 
 // String return a string representation of the registered ModuleFactory's and

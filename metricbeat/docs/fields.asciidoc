@@ -576,14 +576,6 @@ Container status.
 
 
 [float]
-=== docker.container.socket
-
-type: keyword
-
-Socket path
-
-
-[float]
 == size Fields
 
 Container size metrics.

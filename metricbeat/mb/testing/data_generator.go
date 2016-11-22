@@ -46,7 +46,6 @@ func WriteEvents(f mb.EventsFetcher, t *testing.T) error {
 }
 
 func createEvent(event common.MapStr, m mb.MetricSet) error {
-
 	path, err := os.Getwd()
 	if err != nil {
 		return err
@@ -57,13 +56,17 @@ func createEvent(event common.MapStr, m mb.MetricSet) error {
 	build := beater.EventBuilder{
 		ModuleName:    m.Module().Name(),
 		MetricSetName: m.Name(),
-		Host:          "localhost",
+		Host:          m.Host(),
 		StartTime:     startTime,
 		FetchDuration: 115 * time.Microsecond,
 		Event:         event,
 	}
 
 	fullEvent, _ := build.Build()
+	fullEvent["beat"] = common.MapStr{
+		"name":     "host.example.com",
+		"hostname": "host.example.com",
+	}
 
 	// Delete meta data as not needed for the event output here
 	delete(fullEvent, "_event_metadata")

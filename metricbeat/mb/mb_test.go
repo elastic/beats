@@ -11,11 +11,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type testModule struct {
+	BaseModule
+	hostParser func(string) (HostData, error)
+}
+
+func (m testModule) ParseHost(host string) (HostData, error) {
+	return m.hostParser(host)
+}
+
 type testMetricSet struct {
 	BaseMetricSet
 }
 
-func (m *testMetricSet) Fetch(host string) (common.MapStr, error) {
+func (m *testMetricSet) Fetch() (common.MapStr, error) {
 	return nil, nil
 }
 
@@ -157,7 +166,75 @@ func TestNewModulesDuplicateHosts(t *testing.T) {
 	assert.Error(t, err)
 }
 
-// TestNewBaseModuleFromModuleConfigStruct tests using a ModuleConfig struct
+func TestNewModules(t *testing.T) {
+	const (
+		name = "HostParser"
+		host = "example.com"
+		uri  = "http://" + host
+	)
+
+	r := newTestRegistry(t)
+
+	factory := func(base BaseMetricSet) (MetricSet, error) {
+		return &testMetricSet{base}, nil
+	}
+
+	hostParser := func(m Module, rawHost string) (HostData, error) {
+		return HostData{URI: uri, Host: host}, nil
+	}
+
+	if err := r.AddMetricSet(moduleName, name, factory, hostParser); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("MetricSet without HostParser", func(t *testing.T) {
+		c := newConfig(t, map[string]interface{}{
+			"module":     moduleName,
+			"metricsets": []string{metricSetName},
+			"hosts":      []string{uri},
+		})
+
+		modules, err := NewModules(c, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		for _, metricSets := range modules {
+			metricSet := metricSets[0]
+
+			// The URI is passed through in the Host() and HostData().URI.
+			assert.Equal(t, uri, metricSet.Host())
+			assert.Equal(t, HostData{URI: uri}, metricSet.HostData())
+			return
+		}
+		assert.FailNow(t, "no modules found")
+	})
+
+	t.Run("MetricSet with HostParser", func(t *testing.T) {
+		c := newConfig(t, map[string]interface{}{
+			"module":     moduleName,
+			"metricsets": []string{name},
+			"hosts":      []string{uri},
+		})
+
+		modules, err := NewModules(c, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		for _, metricSets := range modules {
+			metricSet := metricSets[0]
+
+			// The URI is passed through in the Host() and HostData().URI.
+			assert.Equal(t, host, metricSet.Host())
+			assert.Equal(t, HostData{URI: uri, Host: host}, metricSet.HostData())
+			return
+		}
+		assert.FailNow(t, "no modules found")
+	})
+}
+
+// TestNewBaseModuleFromModuleConfigStruct tests the creation a new BaseModule.
 func TestNewBaseModuleFromModuleConfigStruct(t *testing.T) {
 	moduleConf := DefaultModuleConfig()
 	moduleConf.Module = moduleName
