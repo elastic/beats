@@ -2,6 +2,7 @@ package status
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
 
@@ -16,8 +17,10 @@ TODOs:
 	* add a metricset for "metrics" data
 */
 
+var debugf = logp.MakeDebug("mongodb.status")
+
 func init() {
-	if err := mb.Registry.AddMetricSet("mongodb", "status", New); err != nil {
+	if err := mb.Registry.AddMetricSet("mongodb", "status", New, mongodb.ParseURL); err != nil {
 		panic(err)
 	}
 }
@@ -28,31 +31,20 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
-	config := struct {
-		Hosts    []string `config:"hosts"    validate:"nonzero,required"`
-		Username string   `config:"username"`
-		Password string   `config:"username"`
-	}{}
-
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
-
-	info, err := mongodb.ParseURL(base.Host(), config.Username, config.Password)
+	dialInfo, err := mgo.ParseURL(base.HostData().URI)
 	if err != nil {
 		return nil, err
 	}
-	info.Timeout = base.Module().Config().Timeout
+	dialInfo.Timeout = base.Module().Config().Timeout
 
+	debugf("mongodb-status url=%v", base.HostData().SanitizedURI)
 	return &MetricSet{
 		BaseMetricSet: base,
-		dialInfo:      info,
+		dialInfo:      dialInfo,
 	}, nil
 }
 
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-
 	session, err := mgo.DialWithInfo(m.dialInfo)
 	if err != nil {
 		return nil, err

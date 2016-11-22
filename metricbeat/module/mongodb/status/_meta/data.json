@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
+        "host": "mongodb:27017",
         "module": "mongodb",
         "name": "status",
         "rtt": 115

@@ -29,10 +29,9 @@ Or more complex like:
   hosts: ["postgres://localhost:40001?sslmode=disable", "postgres://otherhost:40001"]
 ----------------------------------------------------------------------
 
-WARNING: In case you use username and password in the hosts array, this
-information will be sent with each event as part of the `metricset.host` field.
-To prevent sending username and password the config options `username` and
-`password` can be used.
+You can also separately specify the username and password using the respective
+configuration options. Usernames and passwords specified in the URL take
+precedence over those specified in the `username` and `password` config options.
 
 [source,yaml]
 ----

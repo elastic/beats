@@ -3,10 +3,12 @@ package mongodb
 import (
 	"testing"
 
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseURL(t *testing.T) {
+func TestParseMongoURL(t *testing.T) {
 	tests := []struct {
 		Name             string
 		URL              string
@@ -47,14 +49,14 @@ func TestParseURL(t *testing.T) {
 			ExpectedPassword: "secret",
 		},
 		{
-			Name:     "user password overwride",
+			Name:     "username and password do not overwride",
 			URL:      "mongodb://user:secret@localhost:40001",
 			Username: "anotheruser",
 			Password: "anotherpass",
 
 			ExpectedAddr:     "localhost:40001",
-			ExpectedUsername: "anotheruser",
-			ExpectedPassword: "anotherpass",
+			ExpectedUsername: "user",
+			ExpectedPassword: "secret",
 		},
 		{
 			Name:     "with options",
@@ -66,13 +68,31 @@ func TestParseURL(t *testing.T) {
 			ExpectedUsername: "anotheruser",
 			ExpectedPassword: "anotherpass",
 		},
+		{
+			Name:     "multiple hosts",
+			URL:      "mongodb://localhost:40001,localhost:40002",
+			Username: "",
+			Password: "",
+
+			ExpectedAddr:     "localhost:40001,localhost:40002",
+			ExpectedUsername: "",
+			ExpectedPassword: "",
+		},
 	}
 
 	for _, test := range tests {
-		info, err := ParseURL(test.URL, test.Username, test.Password)
-		assert.NoError(t, err, test.Name)
-		assert.Equal(t, info.Addrs[0], test.ExpectedAddr, test.Name)
-		assert.Equal(t, info.Username, test.ExpectedUsername, test.Name)
-		assert.Equal(t, info.Password, test.ExpectedPassword, test.Name)
+		mod := mbtest.NewTestModule(t, map[string]interface{}{
+			"username": test.Username,
+			"password": test.Password,
+		})
+		hostData, err := ParseURL(mod, test.URL)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		assert.Equal(t, test.ExpectedAddr, hostData.Host, test.Name)
+		assert.Equal(t, test.ExpectedUsername, hostData.User, test.Name)
+		assert.Equal(t, test.ExpectedPassword, hostData.Password, test.Name)
 	}
 }

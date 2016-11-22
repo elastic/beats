@@ -13,9 +13,8 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "docker",
             "metricsets": ["container"],
-            "hosts": ["localhost"],
+            "hosts": ["unix:///var/run/docker.sock"],
             "period": "1s",
-            "socket": "unix:///var/run/docker.sock",
         }])
 
         proc = self.start_beat()
@@ -40,7 +39,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "docker",
             "metricsets": ["cpu"],
-            "hosts": ["localhost"],
+            "hosts": ["unix:///var/run/docker.sock"],
             "period": "1s"
         }])
 
@@ -70,7 +69,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "docker",
             "metricsets": ["diskio"],
-            "hosts": ["localhost"],
+            "hosts": ["unix:///var/run/docker.sock"],
             "period": "1s"
         }])
 
@@ -97,7 +96,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "docker",
             "metricsets": ["info"],
-            "hosts": ["localhost"],
+            "hosts": ["unix:///var/run/docker.sock"],
             "period": "1s"
         }])
 
@@ -122,7 +121,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "docker",
             "metricsets": ["memory"],
-            "hosts": ["localhost"],
+            "hosts": ["unix:///var/run/docker.sock"],
             "period": "1s"
         }])
 
@@ -148,7 +147,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "docker",
             "metricsets": ["network"],
-            "hosts": ["localhost"],
+            "hosts": ["unix:///var/run/docker.sock"],
             "period": "1s"
         }])
 

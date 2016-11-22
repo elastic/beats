@@ -1,15 +1,17 @@
 package partition
 
 import (
-	"github.com/Shopify/sarama"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
+
+	"github.com/Shopify/sarama"
 )
 
 // init registers the partition MetricSet with the central registry.
 func init() {
-	if err := mb.Registry.AddMetricSet("kafka", "partition", New); err != nil {
+	if err := mb.Registry.AddMetricSet("kafka", "partition", New, parse.PassThruHostParser); err != nil {
 		panic(err)
 	}
 }
@@ -20,25 +22,15 @@ type MetricSet struct {
 	client sarama.Client
 }
 
-// New create a new instance of the partition MetricSet
+// New creates a new instance of the partition MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	logp.Warn("EXPERIMENTAL: The %v %v metricset is experimental", base.Module().Name(), base.Name())
 
-	logp.Warn("EXPERIMENTAL: The haproxy info metricset is experimental")
-
-	config := struct{}{}
-
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
-
-	return &MetricSet{
-		BaseMetricSet: base,
-	}, nil
+	return &MetricSet{BaseMetricSet: base}, nil
 }
 
 // Fetch partition stats list from kafka
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
 	if m.client == nil {
 		config := sarama.NewConfig()
 		config.Net.DialTimeout = m.Module().Config().Timeout

@@ -3,10 +3,10 @@ package cpu
 import (
 	"strconv"
 
-	dc "github.com/fsouza/go-dockerclient"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/docker"
+
+	dc "github.com/fsouza/go-dockerclient"
 )
 
 type CPUCalculator interface {
@@ -35,17 +35,17 @@ func NewCpuService() *CPUService {
 	return &CPUService{}
 }
 
-func (c *CPUService) getCPUStatsList(rawStats []docker.DockerStat) []CPUStats {
-	formatedStats := []CPUStats{}
+func (c *CPUService) getCPUStatsList(rawStats []docker.Stat) []CPUStats {
+	formattedStats := []CPUStats{}
 
 	for _, stats := range rawStats {
-		formatedStats = append(formatedStats, c.getCpuStats(&stats))
+		formattedStats = append(formattedStats, c.getCpuStats(&stats))
 	}
 
-	return formatedStats
+	return formattedStats
 }
 
-func (c *CPUService) getCpuStats(myRawStat *docker.DockerStat) CPUStats {
+func (c *CPUService) getCpuStats(myRawStat *docker.Stat) CPUStats {
 
 	return CPUStats{
 		Time:                        common.Time(myRawStat.Stats.Read),

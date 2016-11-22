@@ -20,7 +20,6 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "docker",
 		"metricsets": []string{"info"},
-		"hosts":      []string{"localhost"},
-		"socket":     "unix:///var/run/docker.sock",
+		"hosts":      []string{"unix:///var/run/docker.sock"},
 	}
 }
