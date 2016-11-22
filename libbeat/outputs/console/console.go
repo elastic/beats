@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
@@ -28,8 +29,10 @@ func New(_ string, config *common.Config, _ int) (outputs.Outputer, error) {
 	}
 
 	// check stdout actually being available
-	if _, err = c.out.Stat(); err != nil {
-		return nil, fmt.Errorf("console output initialization failed with: %v", err)
+	if runtime.GOOS != "windows" {
+		if _, err = c.out.Stat(); err != nil {
+			return nil, fmt.Errorf("console output initialization failed with: %v", err)
+		}
 	}
 
 	return c, nil

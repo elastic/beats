@@ -36,20 +36,22 @@
 
         - name: used.bytes
           type: long
+          format: bytes
           description: >
             Actual used memory in bytes. It represents the difference between the total and the available memory. The
             available memory depends on the OS. For more details, please check `system.actual.free`.
  
         - name: free
           type: long
+          format: bytes
           description: >
             Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory
-            plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is the 
-            amount of unreserved and uncommitted memory currently in the user-mode portion of the virtual address space
-            of the calling process.
+            plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal
+            to `system.memory.free`.
 
         - name: used.pct
           type: scaled_float
+          format: percent
           description: >
             The percentage of actual used memory.
 

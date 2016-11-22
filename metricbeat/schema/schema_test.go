@@ -37,6 +37,25 @@ func TestSchema(t *testing.T) {
 	})
 }
 
+func TestHasKey(t *testing.T) {
+	schema := Schema{
+		"test": Conv{Key: "Test", Func: nop},
+		"test_obj": Object{
+			"test_a": Conv{Key: "TestA", Func: nop},
+			"test_b": Conv{Key: "TestB", Func: nop},
+		},
+	}
+
+	assert.True(t, schema.HasKey("Test"))
+	assert.True(t, schema.HasKey("TestA"))
+	assert.True(t, schema.HasKey("TestB"))
+	assert.False(t, schema.HasKey("test"))
+	assert.False(t, schema.HasKey("test_obj"))
+	assert.False(t, schema.HasKey("test_a"))
+	assert.False(t, schema.HasKey("test_b"))
+	assert.False(t, schema.HasKey("other"))
+}
+
 func test(key string, opts ...SchemaOption) Conv {
 	return SetOptions(Conv{Key: key, Func: nop}, opts)
 }

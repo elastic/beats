@@ -18,7 +18,6 @@ var (
 		BufferSize:      16 * humanize.KiByte,
 		DocumentType:    "log",
 		InputType:       cfg.DefaultInputType,
-		TailFiles:       false,
 		Backoff:         1 * time.Second,
 		BackoffFactor:   2,
 		MaxBackoff:      10 * time.Second,
@@ -38,7 +37,6 @@ type harvesterConfig struct {
 	DocumentType         string                  `config:"document_type"`
 	Encoding             string                  `config:"encoding"`
 	InputType            string                  `config:"input_type"`
-	TailFiles            bool                    `config:"tail_files"`
 	Backoff              time.Duration           `config:"backoff" validate:"min=0,nonzero"`
 	BackoffFactor        int                     `config:"backoff_factor" validate:"min=1"`
 	MaxBackoff           time.Duration           `config:"max_backoff" validate:"min=0,nonzero"`

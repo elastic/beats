@@ -7,11 +7,12 @@ include::./version.asciidoc[]
 :metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/shield/current
+:securitydoc: https://www.elastic.co/guide/en/x-pack/5.0
 :security: X-Pack Security
 :ES-version: {stack-version}
 :LS-version: {stack-version}
 :Kibana-version: {stack-version}
+:dashboards: https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-{stack-version}.zip
 
 include::./overview.asciidoc[]
 
@@ -23,13 +24,13 @@ include::./installing-beats.asciidoc[]
 
 include::./repositories.asciidoc[]
 
+include::./breaking.asciidoc[]
+
+include::./upgrading.asciidoc[]
+
 include::./config-file-format.asciidoc[]
 
-include::./visualizing-data.asciidoc[]
-
-include::./dashboards.asciidoc[]
-
-pass::[<?page_header <b>PLEASE NOTE:</b><br/>Always refer to the documentation in master for the latest information about contributing to Beats.?>]
+pass::[<?page_header Always refer to the documentation in master for the latest information about contributing to Beats.?>]
 
 include::./newbeat.asciidoc[]
 

@@ -622,7 +622,7 @@ class Test(BaseTest):
 
         # wait for registry to be written
         self.wait_until(
-            lambda: self.log_contains("Registry file updated"),
+            lambda: self.log_contains_count("Registry file updated") > 1,
             max_timeout=10)
 
         # Make sure not all events were written so far

@@ -310,8 +310,8 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 		detail["table"] = table
 
 	case errUnprepared:
-		stmtId := decoder.ReadShortBytes()
-		detail["stmt_id"] = stmtId
+		stmtID := decoder.ReadShortBytes()
+		detail["stmt_id"] = stmtID
 
 	case errReadFailure:
 		detail["read_consistency"] = decoder.ReadConsistency().String()

@@ -1,10 +1,11 @@
 import os
+import argparse
 import yaml
 
 # Collects docs for all modules and metricset
 
 
-def collect():
+def collect(beat_name):
 
     base_dir = "module"
     path = os.path.abspath("module")
@@ -16,7 +17,7 @@ This file is generated! See scripts/docs_collector.py
 """
 
     # Iterate over all modules
-    for module in os.listdir(base_dir):
+    for module in sorted(os.listdir(base_dir)):
 
         module_doc = path + "/" + module + "/_meta/docs.asciidoc"
 
@@ -55,8 +56,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
 ----
-metricbeat.modules:
-"""
+""" + beat_name + ".modules:\n"
 
             # Load metricset yaml
             with file(config_file) as f:
@@ -76,7 +76,7 @@ metricbeat.modules:
         module_includes = ""
 
         # Iterate over all metricsets
-        for metricset in os.listdir(base_dir + "/" + module):
+        for metricset in sorted(os.listdir(base_dir + "/" + module)):
 
             metricset_docs = path + "/" + module + "/" + metricset + "/_meta/docs.asciidoc"
 
@@ -132,7 +132,14 @@ For a description of each field in the metricset, see the
             f.write(module_file)
 
 if __name__ == "__main__":
-    collect()
+    parser = argparse.ArgumentParser(
+        description="Collects modules docs")
+    parser.add_argument("--beat", help="Beat name")
+
+    args = parser.parse_args()
+    beat_name = args.beat
+
+    collect(beat_name)
 
 
 

@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"MongoDB operation counters\",\"type\":\"area\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"smoothLines\":false,\"scale\":\"linear\",\"interpolate\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mongodb.status.opcounters.command\",\"customLabel\":\"command\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mongodb.status.opcounters.delete\",\"customLabel\":\"delete\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mongodb.status.opcounters.getmore\",\"customLabel\":\"getmore\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mongodb.status.opcounters.insert\",\"customLabel\":\"insert\"}},{\"id\":\"6\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mongodb.status.opcounters.query\",\"customLabel\":\"query\"}},{\"id\":\"7\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mongodb.status.opcounters_replicated.update\",\"customLabel\":\"update\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "MongoDB operation counters", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "MongoDB-search", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

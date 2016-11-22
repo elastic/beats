@@ -11,12 +11,17 @@ related products:
  * Kibana for the UI.
  * Logstash (optional) for inserting data into Elasticsearch.
 
-See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic
-Stack] for more information.
+See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information. 
 
-After you have installed these products, you can start
-<<metricbeat-installation>>.
+After installing the Elastic Stack, read the following topics to learn how to install, configure, and run Metricbeat:
 
+* <<metricbeat-installation>>
+* <<metricbeat-configuration>>
+* <<metricbeat-template>>
+* <<metricbeat-starting>>
+* <<metricbeat-sample-dashboards>>
+* <<command-line-options>>
+* <<directory-layout>>
 
 [[metricbeat-installation]]
 === Step 1: Installing Metricbeat
@@ -48,7 +53,7 @@ other installation options, such as 32-bit images.
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-amd64.deb
+curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{version}-amd64.deb
 sudo dpkg -i metricbeat-{version}-amd64.deb
 ------------------------------------------------
 
@@ -57,7 +62,7 @@ sudo dpkg -i metricbeat-{version}-amd64.deb
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-x86_64.rpm
+curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{version}-x86_64.rpm
 sudo rpm -vi metricbeat-{version}-x86_64.rpm
 ------------------------------------------------
 
@@ -66,7 +71,7 @@ sudo rpm -vi metricbeat-{version}-x86_64.rpm
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{version}-darwin-x86_64.tar.gz
 tar xzvf metricbeat-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 
@@ -131,11 +136,23 @@ metricbeat.modules:
   cpu_ticks: false  
 -------------------------------------
 
-The following example shows how to configure the Apache HTTPD module:
+The following example shows how to configure two modules: the system module
+and the Apache HTTPD module:
 
 [source, shell]
 -------------------------------------
 metricbeat.modules:
+- module: system
+  metricsets:
+    - cpu
+    - filesystem
+    - memory
+    - network
+    - process
+  enabled: true
+  period: 10s
+  processes: ['.*']
+  cpu_ticks: false  
 - module: apache
   metricsets: ["status"]
   enabled: true
@@ -170,6 +187,7 @@ instead.
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
+[[metricbeat-starting]]
 === Step 4: Starting Metricbeat
 
 Run Metricbeat by issuing the following command:
@@ -226,12 +244,12 @@ URL.
 === Step 5: Loading Sample Kibana Dashboards
 
 To make it easier for you to start monitoring your servers in Kibana,
-we have created a sample Metricbeat dashboard. This dashboard is provided as
-an example. We recommend that you
-http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] it
+we have created sample Metricbeat dashboards. The dashboards are provided as
+examples. We recommend that you
+http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
 to meet your needs.
 
-For more information, see
-{libbeat}/load-kibana-dashboards.html[Loading the Beats Dashboards].
-
 image:./images/metricbeat_system_dashboard.png[Metricbeat Dashboard]
+
+:allplatforms:
+include::../../libbeat/docs/dashboards.asciidoc[]

@@ -1,0 +1,99 @@
+#!/usr/bin/env python
+import sys
+import argparse
+from subprocess import check_call, call, check_output
+
+"""
+Example usage:
+
+./dev-tools/cherrypick_pr 5.0 2565 6490604aa0cf7fa61932a90700e6ca988fc8a527
+
+In case of backporting errors, fix them, then run:
+
+git cherry-pick --continue
+./dev-tools/cherrypick_pr 5.0 2565 6490604aa0cf7fa61932a90700e6ca988fc8a527 --continue
+
+This script does the following:
+
+* cleanups both from_branch and to_branch (warning: drops local changes)
+* creates a temporary branch named something like "branch_2565"
+* calls the git cherry-pick command in this branch
+* after fixing the merge errors (if needed), pushes the branch to your
+  remote
+
+You then just need to go to Github and open the PR.
+
+Note that you need to take the commit hashes from `git log` on the
+from_branch, copying the IDs from Github doesn't work in case we squashed the
+PR.
+"""
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Creates a PR for merging two branches")
+    parser.add_argument("to_branch",
+                        help="To branch (e.g 5.0)")
+    parser.add_argument("pr_number",
+                        help="The PR number being merged (e.g. 2345)")
+    parser.add_argument("commit_hashes", metavar="hash", nargs="+",
+                        help="The commit hashes to cherry pick." +
+                             " You can specify multiple.")
+    parser.add_argument("--yes", action="store_true",
+                        help="Assume yes. Warning: discards local changes.")
+    parser.add_argument("--continue", action="store_true",
+                        help="Continue after fixing merging errors.")
+    parser.add_argument("--from_branch", default="master",
+                        help="From branch")
+    args = parser.parse_args()
+
+    print args
+
+    tmp_branch = "backport_{}".format(args.pr_number)
+
+    if not vars(args)["continue"]:
+        if not args.yes and raw_input("This will destroy all local changes. " +
+                                      "Continue? [y/n]: ") != "y":
+            return 1
+        check_call("git reset --hard", shell=True)
+        check_call("git clean -df", shell=True)
+        check_call("git fetch", shell=True)
+
+        check_call("git checkout {}".format(args.from_branch), shell=True)
+        check_call("git pull", shell=True)
+
+        check_call("git checkout {}".format(args.to_branch), shell=True)
+        check_call("git pull", shell=True)
+
+        call("git branch -D {} > /dev/null".format(tmp_branch), shell=True)
+        check_call("git checkout -b {}".format(tmp_branch), shell=True)
+        if call("git cherry-pick -x {}".format(" ".join(args.commit_hashes)),
+                shell=True) != 0:
+            print("Looks like you have cherry-pick errors.")
+            print("Fix them, then run: ")
+            print("    git cherry-pick --continue")
+            print("    {} --continue".format(" ".join(sys.argv)))
+            return 1
+
+    if len(check_output("git status -s", shell=True).strip()) > 0:
+        print("Looks like you have uncommitted changes." +
+              " Please execute first: git cherry-pick --continue")
+        return 1
+
+    if len(check_output("git log HEAD...{}".format(args.to_branch),
+                        shell=True).strip()) == 0:
+        print("No commit to push")
+        return 1
+
+    print("Ready to push branch.")
+    remote = raw_input("To which remote should I push? (your fork): ")
+    call("git push {} :{} > /dev/null".format(remote, tmp_branch),
+         shell=True)
+    check_call("git push --set-upstream {} {}"
+               .format(remote, tmp_branch), shell=True)
+    print("Done. Open PR by following this URL: \n\t" +
+          "https://github.com/elastic/beats/compare/{}...{}:{}?expand=1"
+          .format(args.to_branch, remote, tmp_branch))
+
+if __name__ == "__main__":
+    sys.exit(main())

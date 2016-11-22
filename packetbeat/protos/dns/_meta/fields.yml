@@ -1,0 +1,198 @@
+- key: dns
+  title: "DNS"
+  description: DNS-specific event fields.
+  fields:
+    - name: dns
+      type: group
+      fields:
+        - name: id
+          type: long
+          description: >
+            The DNS packet identifier assigned by the program that generated the
+            query. The identifier is copied to the response.
+
+        - name: op_code
+          description: >
+            The DNS operation code that specifies the kind of query in the message.
+            This value is set by the originator of a query and copied into the
+            response.
+          example: QUERY
+
+        - name: flags.authoritative
+          type: boolean
+          description: >
+            A DNS flag specifying that the responding server is an authority for
+            the domain name used in the question.
+
+        - name: flags.recursion_available
+          type: boolean
+          description: >
+            A DNS flag specifying whether recursive query support is available in the
+            name server.
+
+        - name: flags.recursion_desired
+          type: boolean
+          description: >
+            A DNS flag specifying that the client directs the server to pursue a
+            query recursively. Recursive query support is optional.
+
+        - name: flags.authentic_data
+          type: boolean
+          description: >
+            A DNS flag specifying that the recursive server considers the response
+            authentic.
+
+        - name: flags.checking_disabled
+          type: boolean
+          description: >
+            A DNS flag specifying that the client disables the server
+            signature validation of the query.
+
+        - name: flags.truncated_response
+          type: boolean
+          description: >
+            A DNS flag specifying that only the first 512 bytes of the reply were
+            returned.
+
+        - name: response_code
+          description: The DNS status code.
+          example: NOERROR
+
+        - name: question.name
+          description: >
+            The domain name being queried. If the name field contains non-printable
+            characters (below 32 or above 126), then those characters are represented
+            as escaped base 10 integers (\DDD). Back slashes and quotes are escaped.
+            Tabs, carriage returns, and line feeds are converted to \t, \r, and
+            \n respectively.
+          example: www.google.com.
+
+        - name: question.type
+          description: The type of records being queried.
+          example: AAAA
+
+        - name: question.class
+          description: The class of of records being queried.
+          example: IN
+
+        - name: question.etld_plus_one
+          description: The effective top-level domain (eTLD) plus one more label.
+            For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.".
+            The data for determining the eTLD comes from an embedded copy of the
+            data from http://publicsuffix.org.
+          example: amazon.co.uk.
+
+        - name: answers
+          type: dict
+          description: >
+            An array containing a dictionary about each answer section returned by
+            the server.
+
+        - name: answers_count
+          type: long
+          description: >
+            The number of resource records contained in the `dns.answers` field.
+
+
+        - name: answers.name
+          description: The domain name to which this resource record pertains.
+          example: example.com.
+
+        - name: answers.type
+          description: The type of data contained in this resource record.
+          example: MX
+
+        - name: answers.class
+          description: The class of DNS data contained in this resource record.
+          example: IN
+
+        - name: answers.ttl
+          description: >
+            The time interval in seconds that this resource record may be cached
+            before it should be discarded. Zero values mean that the data should
+            not be cached.
+          type: long
+
+        - name: answers.data
+          description: >
+            The data describing the resource. The meaning of this data depends
+            on the type and class of the resource record.
+
+        - name: authorities
+          type: dict
+          description: >
+            An array containing a dictionary for each authority section from the
+            answer.
+
+        - name: authorities_count
+          type: long
+          description: >
+            The number of resource records contained in the `dns.authorities` field.
+            The `dns.authorities` field may or may not be included depending on the
+            configuration of Packetbeat.
+
+        - name: authorities.name
+          description: The domain name to which this resource record pertains.
+          example: example.com.
+
+        - name: authorities.type
+          description: The type of data contained in this resource record.
+          example: NS
+
+        - name: authorities.class
+          description: The class of DNS data contained in this resource record.
+          example: IN
+
+        - name: additionals
+          type: dict
+          description: >
+            An array containing a dictionary for each additional section from the
+            answer.
+
+        - name: additionals_count
+          type: long
+          description: >
+            The number of resource records contained in the `dns.additionals` field.
+            The `dns.additionals` field may or may not be included depending on the
+            configuration of Packetbeat.
+
+        - name: additionals.name
+          description: The domain name to which this resource record pertains.
+          example: example.com.
+
+        - name: additionals.type
+          description: The type of data contained in this resource record.
+          example: NS
+
+        - name: additionals.class
+          description: The class of DNS data contained in this resource record.
+          example: IN
+
+        - name: additionals.ttl
+          description: >
+            The time interval in seconds that this resource record may be cached
+            before it should be discarded. Zero values mean that the data should
+            not be cached.
+          type: long
+
+        - name: additionals.data
+          description: >
+            The data describing the resource. The meaning of this data depends
+            on the type and class of the resource record.
+
+        - name: opt.version
+          description: The EDNS version.
+          example: "0"
+
+        - name: opt.do
+          type: boolean
+          description: If set, the transaction uses DNSSEC.
+
+        - name: opt.ext_rcode
+          description: Extended response code field.
+          example: "BADVERS"
+
+        - name: opt.udp_size
+          type: long
+          description: Requestor's UDP payload size (in bytes).
+

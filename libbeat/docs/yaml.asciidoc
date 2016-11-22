@@ -31,13 +31,27 @@ simply uncomment the line and change the setting.
 [float]
 === Test Your Config File
 
-You can test your configuration file to verify that the structure is valid. Simply run
+You can test your configuration file to verify that the structure is valid.
+Simply change to the directory where the binary is installed, and run
 {beatname_uc} in the foreground with the `-configtest` flag specified. For example: 
 
-["source","yaml",subs="attributes,callouts"]
+ifdef::allplatforms[]
+
+["source","shell",subs="attributes"]
 ----------------------------------------------------------------------
 {beatname_lc} -c {beatname_lc}.yml -configtest
 ----------------------------------------------------------------------
+
+endif::allplatforms[]
+
+ifdef::win[]
+
+["source","shell",subs="attributes"]
+----------------------------------------------------------------------
+.\winlogbeat.exe -c .\winlogbeat.yml -configtest -e
+----------------------------------------------------------------------
+
+endif::win[]
 
 You'll see a message if {beatname_uc} finds an error in the file.
 

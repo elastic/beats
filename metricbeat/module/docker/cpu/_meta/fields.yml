@@ -1,0 +1,40 @@
+- name: cpu
+  type: group
+  description: >
+    Runtime cpu metrics.
+  fields:
+    - name: kernel.pct
+      type: scaled_float
+      format: percentage
+      description: >
+        The system kernel consumed by The Docker server.
+    - name: kernel.ticks
+      type: long
+      description: >
+        Cpu kernel tikcs
+    - name: system.pct
+      type: scaled_float
+      format: percentage
+      description: >
+    - name: system.ticks
+      type: long
+      description: >
+        Cpu system tikcs
+    - name: user.pct
+      type: scaled_float
+      format: percentage
+      description: >
+    - name: user.ticks
+      type: long
+      description: >
+        Cpu user tikcs
+    - name: total.pct
+      type: scaled_float
+      format: percentage
+      description: >
+        Total cpu usage.
+    # TODO: how to document cpu list?
+    #- name: core
+    #  type: list
+    #  description: >
+    #    Dictionary with list of cpu and usage inside.

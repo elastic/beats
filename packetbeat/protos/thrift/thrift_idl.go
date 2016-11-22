@@ -8,19 +8,19 @@ import (
 	"github.com/samuel/go-thrift/parser"
 )
 
-type ThriftIdlMethod struct {
-	Service *parser.Service
-	Method  *parser.Method
+type thriftIdlMethod struct {
+	service *parser.Service
+	method  *parser.Method
 
-	Params     []*string
-	Exceptions []*string
+	params     []*string
+	exceptions []*string
 }
 
-type ThriftIdl struct {
-	MethodsByName map[string]*ThriftIdlMethod
+type thriftIdl struct {
+	methodsByName map[string]*thriftIdlMethod
 }
 
-func fieldsToArrayById(fields []*parser.Field) []*string {
+func fieldsToArrayByID(fields []*parser.Field) []*string {
 	if len(fields) == 0 {
 		return []*string{}
 	}
@@ -43,22 +43,22 @@ func fieldsToArrayById(fields []*parser.Field) []*string {
 	return output
 }
 
-func BuildMethodsMap(thrift_files map[string]parser.Thrift) map[string]*ThriftIdlMethod {
+func buildMethodsMap(thriftFiles map[string]parser.Thrift) map[string]*thriftIdlMethod {
 
-	output := make(map[string]*ThriftIdlMethod)
+	output := make(map[string]*thriftIdlMethod)
 
-	for _, thrift := range thrift_files {
+	for _, thrift := range thriftFiles {
 		for _, service := range thrift.Services {
 			for _, method := range service.Methods {
 				if _, exists := output[method.Name]; exists {
 					logp.Warn("Thrift IDL: Method %s is defined in more services: %s and %s",
-						output[method.Name].Service.Name, service.Name)
+						output[method.Name].service.Name, service.Name)
 				}
-				output[method.Name] = &ThriftIdlMethod{
-					Service:    service,
-					Method:     method,
-					Params:     fieldsToArrayById(method.Arguments),
-					Exceptions: fieldsToArrayById(method.Exceptions),
+				output[method.Name] = &thriftIdlMethod{
+					service:    service,
+					method:     method,
+					params:     fieldsToArrayByID(method.Arguments),
+					exceptions: fieldsToArrayByID(method.Exceptions),
 				}
 			}
 		}
@@ -67,18 +67,18 @@ func BuildMethodsMap(thrift_files map[string]parser.Thrift) map[string]*ThriftId
 	return output
 }
 
-func ReadFiles(files []string) (map[string]parser.Thrift, error) {
+func readFiles(files []string) (map[string]parser.Thrift, error) {
 	output := make(map[string]parser.Thrift)
 
 	thriftParser := parser.Parser{}
 
 	for _, file := range files {
-		files_map, _, err := thriftParser.ParseFile(file)
+		filesMap, _, err := thriftParser.ParseFile(file)
 		if err != nil {
 			return output, fmt.Errorf("Error parsing Thrift IDL file %s: %s", file, err)
 		}
 
-		for fname, parsedFile := range files_map {
+		for fname, parsedFile := range filesMap {
 			output[fname] = *parsedFile
 		}
 	}
@@ -86,21 +86,21 @@ func ReadFiles(files []string) (map[string]parser.Thrift, error) {
 	return output, nil
 }
 
-func (thriftidl *ThriftIdl) FindMethod(name string) *ThriftIdlMethod {
-	return thriftidl.MethodsByName[name]
+func (thriftidl *thriftIdl) findMethod(name string) *thriftIdlMethod {
+	return thriftidl.methodsByName[name]
 }
 
-func NewThriftIdl(idl_files []string) (*ThriftIdl, error) {
+func newThriftIdl(idlFiles []string) (*thriftIdl, error) {
 
-	if len(idl_files) == 0 {
+	if len(idlFiles) == 0 {
 		return nil, nil
 	}
-	thrift_files, err := ReadFiles(idl_files)
+	thriftFiles, err := readFiles(idlFiles)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ThriftIdl{
-		MethodsByName: BuildMethodsMap(thrift_files),
+	return &thriftIdl{
+		methodsByName: buildMethodsMap(thriftFiles),
 	}, nil
 }

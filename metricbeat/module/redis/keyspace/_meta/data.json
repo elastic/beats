@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
+        "host": "redis:6379",
         "module": "redis",
         "name": "keyspace",
         "rtt": 115
@@ -15,7 +15,7 @@
             "avg_ttl": 0,
             "expires": 0,
             "id": "db0",
-            "keys": 3
+            "keys": 1
         }
     },
     "type": "metricsets"

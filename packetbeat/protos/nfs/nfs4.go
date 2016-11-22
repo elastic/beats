@@ -3,66 +3,66 @@ package nfs
 import "fmt"
 
 const (
-	OP_ACCESS               = 3
-	OP_CLOSE                = 4
-	OP_COMMIT               = 5
-	OP_CREATE               = 6
-	OP_DELEGPURGE           = 7
-	OP_DELEGRETURN          = 8
-	OP_GETATTR              = 9
-	OP_GETFH                = 10
-	OP_LINK                 = 11
-	OP_LOCK                 = 12
-	OP_LOCKT                = 13
-	OP_LOCKU                = 14
-	OP_LOOKUP               = 15
-	OP_LOOKUPP              = 16
-	OP_NVERIFY              = 17
-	OP_OPEN                 = 18
-	OP_OPENATTR             = 19
-	OP_OPEN_CONFIRM         = 20
-	OP_OPEN_DOWNGRADE       = 21
-	OP_PUTFH                = 22
-	OP_PUTPUBFH             = 23
-	OP_PUTROOTFH            = 24
-	OP_READ                 = 25
-	OP_READDIR              = 26
-	OP_READLINK             = 27
-	OP_REMOVE               = 28
-	OP_RENAME               = 29
-	OP_RENEW                = 30
-	OP_RESTOREFH            = 31
-	OP_SAVEFH               = 32
-	OP_SECINFO              = 33
-	OP_SETATTR              = 34
-	OP_SETCLIENTID          = 35
-	OP_SETCLIENTID_CONFIRM  = 36
-	OP_VERIFY               = 37
-	OP_WRITE                = 38
-	OP_RELEASE_LOCKOWNER    = 39
-	OP_BACKCHANNEL_CTL      = 40
-	OP_BIND_CONN_TO_SESSION = 41
-	OP_EXCHANGE_ID          = 42
-	OP_CREATE_SESSION       = 43
-	OP_DESTROY_SESSION      = 44
-	OP_FREE_STATEID         = 45
-	OP_GET_DIR_DELEGATION   = 46
-	OP_GETDEVICEINFO        = 47
-	OP_GETDEVICELIST        = 48
-	OP_LAYOUTCOMMIT         = 49
-	OP_LAYOUTGET            = 50
-	OP_LAYOUTRETURN         = 51
-	OP_SECINFO_NO_NAME      = 52
-	OP_SEQUENCE             = 53
-	OP_SET_SSV              = 54
-	OP_TEST_STATEID         = 55
-	OP_WANT_DELEGATION      = 56
-	OP_DESTROY_CLIENTID     = 57
-	OP_RECLAIM_COMPLETE     = 58
-	OP_ILLEGAL              = 10044
+	opAccess             = 3
+	opClose              = 4
+	opCommit             = 5
+	opCreate             = 6
+	opDelegpurge         = 7
+	opDelegreturn        = 8
+	opGetattr            = 9
+	opGetfh              = 10
+	opLink               = 11
+	opLock               = 12
+	opLockt              = 13
+	opLocku              = 14
+	opLookup             = 15
+	opLookupp            = 16
+	opNverify            = 17
+	opOpen               = 18
+	opOpenattr           = 19
+	opOpenConfirm        = 20
+	opOpenDowngrade      = 21
+	opPutfh              = 22
+	opPutpubfh           = 23
+	opPutrootfh          = 24
+	opRead               = 25
+	opReaddir            = 26
+	opReadlink           = 27
+	opRemove             = 28
+	opRename             = 29
+	opRenew              = 30
+	opRestorefh          = 31
+	opSavefh             = 32
+	opSecinfo            = 33
+	opSetattr            = 34
+	opSetclientid        = 35
+	opSetclientidConfirm = 36
+	opVerify             = 37
+	opWrite              = 38
+	opReleaseLockowner   = 39
+	opBackchannelCtl     = 40
+	opBindConnToSession  = 41
+	opExchangeID         = 42
+	opCreateSession      = 43
+	opDestroySession     = 44
+	opFreeStateid        = 45
+	opGetDirDelegation   = 46
+	opGetdeviceinfo      = 47
+	opGetdevicelist      = 48
+	opLayoutcommit       = 49
+	opLayoutget          = 50
+	opLayoutreturn       = 51
+	opSecinfoNoName      = 52
+	opSequence           = 53
+	opSetSsv             = 54
+	opTestStateid        = 55
+	opWantDelegation     = 56
+	opDestroyClientid    = 57
+	opReclaimComplete    = 58
+	opIllegal            = 10044
 )
 
-var nfs_opnum4 = map[int]string{
+var nfsOpnum4 = map[int]string{
 	3:     "ACCESS",
 	4:     "CLOSE",
 	5:     "COMMIT",
@@ -122,40 +122,40 @@ var nfs_opnum4 = map[int]string{
 	10044: "ILLEGAL",
 }
 
-func (nfs *Nfs) eatData(op int, xdr *Xdr) {
+func (nfs *nfs) eatData(op int, xdr *xdr) {
 
 	switch op {
-	case OP_GETATTR:
+	case opGetattr:
 		xdr.getUIntVector()
-	case OP_GETFH:
+	case opGetfh:
 		// nothing to eat
-	case OP_LOOKUP:
+	case opLookup:
 		xdr.getDynamicOpaque()
-	case OP_LOOKUPP:
+	case opLookupp:
 		// nothing to eat
-	case OP_NVERIFY:
+	case opNverify:
 		xdr.getUIntVector()
 		xdr.getDynamicOpaque()
-	case OP_PUTFH:
+	case opPutfh:
 		xdr.getDynamicOpaque()
-	case OP_PUTPUBFH:
+	case opPutpubfh:
 		// nothing to eat
-	case OP_PUTROOTFH:
+	case opPutrootfh:
 		// nothing to eat
-	case OP_READLINK:
+	case opReadlink:
 		// nothing to eat
-	case OP_RENEW:
+	case opRenew:
 		xdr.getUHyper()
-	case OP_RESTOREFH:
+	case opRestorefh:
 		// nothing to eat
-	case OP_SAVEFH:
+	case opSavefh:
 		// nothing to eat
-	case OP_SECINFO:
+	case opSecinfo:
 		xdr.getDynamicOpaque()
-	case OP_VERIFY:
+	case opVerify:
 		xdr.getUIntVector()
 		xdr.getDynamicOpaque()
-	case OP_SEQUENCE:
+	case opSequence:
 		xdr.getOpaque(16)
 		xdr.getUInt()
 		xdr.getUInt()
@@ -179,23 +179,23 @@ func (nfs *Nfs) eatData(op int, xdr *Xdr) {
 // PUTFH + GETATTR
 //
 // GETATTR is the main operation.
-func (nfs *Nfs) findV4MainOpcode(xdr *Xdr) string {
+func (nfs *nfs) findV4MainOpcode(xdr *xdr) string {
 
 	// did we find a main operation opcode?
 	found := false
 
 	// default op code
-	current_opname := "ILLEGAL"
+	currentOpname := "ILLEGAL"
 
 	opcount := int(xdr.getUInt())
 	for i := 0; !found && i < opcount; i++ {
 		op := int(xdr.getUInt())
-		opname, ok := nfs_opnum4[op]
+		opname, ok := nfsOpnum4[op]
 
 		if !ok {
 			return fmt.Sprintf("ILLEGAL (%d)", op)
 		}
-		current_opname = opname
+		currentOpname = opname
 
 		switch op {
 		// First class ops
@@ -205,53 +205,53 @@ func (nfs *Nfs) findV4MainOpcode(xdr *Xdr) string {
 		// first class ops are used, like OPEN->LOCK->WRITE->LOCKU->CLOSE,
 		// but such construnction are not used in the practice.
 		case
-			OP_ACCESS,
-			OP_BACKCHANNEL_CTL,
-			OP_BIND_CONN_TO_SESSION,
-			OP_CLOSE,
-			OP_COMMIT,
-			OP_CREATE,
-			OP_CREATE_SESSION,
-			OP_DELEGPURGE,
-			OP_DELEGRETURN,
-			OP_DESTROY_CLIENTID,
-			OP_DESTROY_SESSION,
-			OP_EXCHANGE_ID,
-			OP_FREE_STATEID,
-			OP_GETDEVICEINFO,
-			OP_GETDEVICELIST,
-			OP_GET_DIR_DELEGATION,
-			OP_LAYOUTCOMMIT,
-			OP_LAYOUTGET,
-			OP_LAYOUTRETURN,
-			OP_LINK,
-			OP_LOCK,
-			OP_LOCKT,
-			OP_LOCKU,
-			OP_OPEN,
-			OP_OPENATTR,
-			OP_OPEN_CONFIRM,
-			OP_OPEN_DOWNGRADE,
-			OP_READ,
-			OP_READDIR,
-			OP_READLINK,
-			OP_RECLAIM_COMPLETE,
-			OP_RELEASE_LOCKOWNER,
-			OP_REMOVE,
-			OP_RENAME,
-			OP_SECINFO_NO_NAME,
-			OP_SETATTR,
-			OP_SETCLIENTID,
-			OP_SETCLIENTID_CONFIRM,
-			OP_SET_SSV,
-			OP_TEST_STATEID,
-			OP_WANT_DELEGATION,
-			OP_WRITE:
+			opAccess,
+			opBackchannelCtl,
+			opBindConnToSession,
+			opClose,
+			opCommit,
+			opCreate,
+			opCreateSession,
+			opDelegpurge,
+			opDelegreturn,
+			opDestroyClientid,
+			opDestroySession,
+			opExchangeID,
+			opFreeStateid,
+			opGetdeviceinfo,
+			opGetdevicelist,
+			opGetDirDelegation,
+			opLayoutcommit,
+			opLayoutget,
+			opLayoutreturn,
+			opLink,
+			opLock,
+			opLockt,
+			opLocku,
+			opOpen,
+			opOpenattr,
+			opOpenConfirm,
+			opOpenDowngrade,
+			opRead,
+			opReaddir,
+			opReadlink,
+			opReclaimComplete,
+			opReleaseLockowner,
+			opRemove,
+			opRename,
+			opSecinfoNoName,
+			opSetattr,
+			opSetclientid,
+			opSetclientidConfirm,
+			opSetSsv,
+			opTestStateid,
+			opWantDelegation,
+			opWrite:
 
 			found = true
 		default:
 			nfs.eatData(op, xdr)
 		}
 	}
-	return current_opname
+	return currentOpname
 }

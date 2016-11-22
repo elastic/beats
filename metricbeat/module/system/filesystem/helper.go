@@ -31,10 +31,8 @@ func GetFileSystemList() ([]sigar.FileSystem, error) {
 }
 
 func GetFileSystemStat(fs sigar.FileSystem) (*FileSystemStat, error) {
-
 	stat := sigar.FileSystemUsage{}
-	err := stat.Get(fs.DirName)
-	if err != nil {
+	if err := stat.Get(fs.DirName); err != nil {
 		return nil, err
 	}
 

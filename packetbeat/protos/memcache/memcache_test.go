@@ -11,13 +11,13 @@ import (
 )
 
 type memcacheTest struct {
-	mc           *Memcache
+	mc           *memcache
 	transactions []*transaction
 }
 
 func newMemcacheTest(config memcacheConfig) *memcacheTest {
 	mct := &memcacheTest{}
-	mc := &Memcache{}
+	mc := &memcache{}
 	mc.init(nil, &config)
 	mc.handler = mct
 	mct.mc = mc
@@ -170,7 +170,7 @@ func Test_MergeTextValueResponsesNoLimits(t *testing.T) {
 	msg := msg1
 	assert.Equal(t, "k1", msg.keys[0].String())
 	assert.Equal(t, "k2", msg.keys[1].String())
-	assert.Equal(t, uint32(2), msg.count_values)
+	assert.Equal(t, uint32(2), msg.countValues)
 	assert.Equal(t, "value1", msg.values[0].String())
 	assert.Equal(t, "value2", msg.values[1].String())
 }
@@ -197,7 +197,7 @@ func Test_MergeTextValueResponsesWithLimits(t *testing.T) {
 	msg := msg1
 	assert.Equal(t, "k1", msg.keys[0].String())
 	assert.Equal(t, "k2", msg.keys[1].String())
-	assert.Equal(t, uint32(2), msg.count_values)
+	assert.Equal(t, uint32(2), msg.countValues)
 	assert.Equal(t, 1, len(msg.values))
 	assert.Equal(t, "value1", msg.values[0].String())
 }

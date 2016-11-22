@@ -14,7 +14,7 @@ import (
 func TestData(t *testing.T) {
 	f := mbtest.NewEventsFetcher(t, getConfig())
 
-	// Do a first fetch to have precentages
+	// Do a first fetch to have percentages
 	f.Fetch()
 	time.Sleep(1 * time.Second)
 

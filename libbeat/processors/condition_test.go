@@ -27,24 +27,24 @@ func TestBadCondition(t *testing.T) {
 	}
 
 	configs := []ConditionConfig{
-		ConditionConfig{
+		{
 			Equals: &ConditionFields{fields: map[string]interface{}{
 				"proc.pid": 0.08,
 			}},
 		},
 
-		ConditionConfig{
+		{
 			Range: &ConditionFields{fields: map[string]interface{}{
 				"gtr": 0.3,
 			}},
 		},
 
-		ConditionConfig{
+		{
 			Range: &ConditionFields{fields: map[string]interface{}{
 				"gt": "fdfdd",
 			}},
 		},
-		ConditionConfig{
+		{
 			Regexp: &ConditionFields{fields: map[string]interface{}{
 				"proc.name": "58gdhsga-=kw++w00",
 			}},
@@ -78,20 +78,20 @@ func TestEqualsCondition(t *testing.T) {
 	}
 
 	configs := []ConditionConfig{
-		ConditionConfig{
+		{
 			Equals: &ConditionFields{fields: map[string]interface{}{
 				"type": "process",
 			}},
 		},
 
-		ConditionConfig{
+		{
 			Equals: &ConditionFields{fields: map[string]interface{}{
 				"type":     "process",
 				"proc.pid": 305,
 			}},
 		},
 
-		ConditionConfig{
+		{
 			Range: &ConditionFields{fields: map[string]interface{}{
 				"proc.cpu.total_p.gt": 0.5,
 			}},
@@ -132,21 +132,21 @@ func TestContainsCondition(t *testing.T) {
 	}
 
 	configs := []ConditionConfig{
-		ConditionConfig{
+		{
 			Contains: &ConditionFields{fields: map[string]interface{}{
 				"proc.name":     "sec",
 				"proc.username": "monica",
 			}},
 		},
 
-		ConditionConfig{
+		{
 			Contains: &ConditionFields{fields: map[string]interface{}{
 				"type":      "process",
 				"proc.name": "secddd",
 			}},
 		},
 
-		ConditionConfig{
+		{
 			Contains: &ConditionFields{fields: map[string]interface{}{
 				"proc.keywords": "bar",
 			}},
@@ -188,19 +188,19 @@ func TestRegexpCondition(t *testing.T) {
 	}
 
 	configs := []ConditionConfig{
-		ConditionConfig{
+		{
 			Regexp: &ConditionFields{fields: map[string]interface{}{
 				"source": "apache2/error.*",
 			}},
 		},
 
-		ConditionConfig{
+		{
 			Regexp: &ConditionFields{fields: map[string]interface{}{
 				"source": "apache2/access.*",
 			}},
 		},
 
-		ConditionConfig{
+		{
 			Regexp: &ConditionFields{fields: map[string]interface{}{
 				"source":  "apache2/error.*",
 				"message": "[client 1.2.3.4]",
@@ -243,27 +243,27 @@ func TestRangeCondition(t *testing.T) {
 	}
 
 	configs := []ConditionConfig{
-		ConditionConfig{
+		{
 			Range: &ConditionFields{fields: map[string]interface{}{
 				"http.code.gte": 400,
 				"http.code.lt":  500,
 			}},
 		},
 
-		ConditionConfig{
+		{
 			Range: &ConditionFields{fields: map[string]interface{}{
 				"bytes_out.gte": 2800,
 			}},
 		},
 
-		ConditionConfig{
+		{
 			Range: &ConditionFields{fields: map[string]interface{}{
 				"bytes_out.gte":   2800,
 				"responsetime.gt": 30,
 			}},
 		},
 
-		ConditionConfig{
+		{
 			Range: &ConditionFields{fields: map[string]interface{}{
 				"proc.cpu.total_p.gte": 0.5,
 			}},
@@ -330,15 +330,15 @@ func TestORCondition(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 	configs := []ConditionConfig{
-		ConditionConfig{
+		{
 			OR: []ConditionConfig{
-				ConditionConfig{
+				{
 					Range: &ConditionFields{fields: map[string]interface{}{
 						"http.code.gte": 400,
 						"http.code.lt":  500,
 					}},
 				},
-				ConditionConfig{
+				{
 					Range: &ConditionFields{fields: map[string]interface{}{
 						"http.code.gte": 200,
 						"http.code.lt":  300,
@@ -388,14 +388,14 @@ func TestANDCondition(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 	configs := []ConditionConfig{
-		ConditionConfig{
+		{
 			AND: []ConditionConfig{
-				ConditionConfig{
+				{
 					Equals: &ConditionFields{fields: map[string]interface{}{
 						"client_server": "mar.local",
 					}},
 				},
-				ConditionConfig{
+				{
 					Range: &ConditionFields{fields: map[string]interface{}{
 						"http.code.gte": 400,
 						"http.code.lt":  500,
@@ -445,7 +445,7 @@ func TestNOTCondition(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 	configs := []ConditionConfig{
-		ConditionConfig{
+		{
 			NOT: &ConditionConfig{
 				Equals: &ConditionFields{fields: map[string]interface{}{
 					"method": "GET",
@@ -494,22 +494,22 @@ func TestCombinedCondition(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 	configs := []ConditionConfig{
-		ConditionConfig{
+		{
 			OR: []ConditionConfig{
-				ConditionConfig{
+				{
 					Range: &ConditionFields{fields: map[string]interface{}{
 						"http.code.gte": 100,
 						"http.code.lt":  300,
 					}},
 				},
-				ConditionConfig{
+				{
 					AND: []ConditionConfig{
-						ConditionConfig{
+						{
 							Equals: &ConditionFields{fields: map[string]interface{}{
 								"status": 200,
 							}},
 						},
-						ConditionConfig{
+						{
 							Equals: &ConditionFields{fields: map[string]interface{}{
 								"type": "http",
 							}},

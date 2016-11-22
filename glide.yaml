@@ -25,7 +25,7 @@ import:
   subpackages:
   - /difflib
 - package: github.com/elastic/gosigar
-  version: 2716c1fe855ee5c88eae707195e0688374458c92
+  version: 0ba14c25cb14e2d939b563ca49a504c3117680c6
 - package: github.com/samuel/go-parser
   version: ca8abbf65d0e61dedf061f98bd3850f250e27539
 - package: github.com/samuel/go-thrift
@@ -46,6 +46,9 @@ import:
   subpackages:
   - /proxy
   - /publicsuffix
+  - /icmp
+  - /ipv4
+  - /ipv6
 - package: golang.org/x/text
   version: d69c40b4be55797923cec7457fac7a244d91a9b6
   subpackages:
@@ -53,13 +56,16 @@ import:
 - package: github.com/satori/go.uuid
   version: v1.1.0
 - package: github.com/StackExchange/wmi
-  version: f3e2bae1e0cb5aef83e319133eabfee30013a4a5
+  version: e54cbda6595d7293a7a468ccf9525f6bc8887f99
 - package: github.com/go-ole/go-ole
   version: v1.2.0
 - package: github.com/miekg/dns
   version: 5d001d020961ae1c184f9f8152fdc73810481677
 - package: github.com/Shopify/sarama
-  version: v1.10.0
+  version: fix/sasl-handshake
+  repo: https://github.com/urso/sarama
+- package: github.com/rcrowley/go-metrics
+  version: ab2277b1c5d15c3cba104e9cbddbdfc622df5ad8
 - package: github.com/klauspost/crc32
   version: v1.0
 - package: github.com/golang/snappy
@@ -75,7 +81,7 @@ import:
 - package: github.com/dustin/go-humanize
   version: 499693e27ee0d14ffab67c31ad065fdb3d34ea75
 - package: github.com/elastic/go-ucfg
-  version: v0.3.4
+  version: v0.3.7
 - package: github.com/armon/go-socks5
   version: 3a873e99f5400ad7706e464e905ffcc94b3ff247
 - package: github.com/pkg/errors
@@ -99,3 +105,5 @@ import:
   version: v1.0
 - package: https://github.com/go-inf/inf
   version: v0.9.0
+- package: github.com/gorhill/cronexpr
+  version: f0984319b44273e83de132089ae42b1810f4933b

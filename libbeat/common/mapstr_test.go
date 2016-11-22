@@ -4,7 +4,6 @@ package common
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -64,7 +63,7 @@ func TestMapStrCopyFieldsTo(t *testing.T) {
 	c := MapStr{}
 
 	err := m.CopyFieldsTo(c, "dd")
-	assert.Equal(nil, err)
+	assert.Error(err)
 	assert.Equal(MapStr{}, c)
 
 	err = m.CopyFieldsTo(c, "a")
@@ -144,7 +143,39 @@ func TestHasKey(t *testing.T) {
 	hasKey, err = m.HasKey("dd")
 	assert.Equal(nil, err)
 	assert.Equal(false, hasKey)
+}
 
+func TestMapStrPut(t *testing.T) {
+	m := MapStr{
+		"subMap": MapStr{
+			"a": 1,
+		},
+	}
+
+	// Add new value to the top-level.
+	v, err := m.Put("a", "ok")
+	assert.NoError(t, err)
+	assert.Nil(t, v)
+	assert.Equal(t, MapStr{"a": "ok", "subMap": MapStr{"a": 1}}, m)
+
+	// Add new value to subMap.
+	v, err = m.Put("subMap.b", 2)
+	assert.NoError(t, err)
+	assert.Nil(t, v)
+	assert.Equal(t, MapStr{"a": "ok", "subMap": MapStr{"a": 1, "b": 2}}, m)
+
+	// Overwrite a value in subMap.
+	v, err = m.Put("subMap.a", 2)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, v)
+	assert.Equal(t, MapStr{"a": "ok", "subMap": MapStr{"a": 2, "b": 2}}, m)
+
+	// Add value to map that does not exist.
+	m = MapStr{}
+	v, err = m.Put("subMap.newMap.a", 1)
+	assert.NoError(t, err)
+	assert.Nil(t, v)
+	assert.Equal(t, MapStr{"subMap": MapStr{"newMap": MapStr{"a": 1}}}, m)
 }
 
 func TestClone(t *testing.T) {
@@ -161,127 +192,6 @@ func TestClone(t *testing.T) {
 
 	c := m.Clone()
 	assert.Equal(MapStr{"c31": 1, "c32": 2}, c["c3"])
-}
-
-func TestEnsureTimestampField(t *testing.T) {
-
-	type io struct {
-		Input  MapStr
-		Output MapStr
-	}
-
-	tests := []io{
-		// should add a @timestamp field if it doesn't exists.
-		{
-			Input: MapStr{},
-			Output: MapStr{
-				"@timestamp": MustParseTime("2015-03-01T12:34:56.123Z"),
-			},
-		},
-		// should convert from string to Time
-		{
-			Input: MapStr{"@timestamp": "2015-03-01T12:34:57.123Z"},
-			Output: MapStr{
-				"@timestamp": MustParseTime("2015-03-01T12:34:57.123Z"),
-			},
-		},
-		// should convert from time.Time to Time
-		{
-			Input: MapStr{
-				"@timestamp": time.Date(2015, time.March, 01,
-					12, 34, 57, 123*1e6, time.UTC),
-			},
-			Output: MapStr{
-				"@timestamp": MustParseTime("2015-03-01T12:34:57.123Z"),
-			},
-		},
-		// should leave a Time alone
-		{
-			Input: MapStr{
-				"@timestamp": MustParseTime("2015-03-01T12:34:57.123Z"),
-			},
-			Output: MapStr{
-				"@timestamp": MustParseTime("2015-03-01T12:34:57.123Z"),
-			},
-		},
-	}
-
-	now := func() time.Time {
-		return time.Date(2015, time.March, 01, 12, 34, 56, 123*1e6, time.UTC)
-	}
-
-	for _, test := range tests {
-		m := test.Input
-		err := m.EnsureTimestampField(now)
-		assert.Nil(t, err)
-		assert.Equal(t, test.Output, m)
-	}
-}
-
-func TestEnsureTimestampFieldNegative(t *testing.T) {
-
-	inputs := []MapStr{
-		// should error on invalid string layout (microseconds)
-		{
-			"@timestamp": "2015-03-01T12:34:57.123456Z",
-		},
-		// should error when the @timestamp is an integer
-		{
-			"@timestamp": 123456678,
-		},
-	}
-
-	now := func() time.Time {
-		return time.Date(2015, time.March, 01, 12, 34, 56, 123*1e6, time.UTC)
-	}
-
-	for _, input := range inputs {
-		m := input
-		err := m.EnsureTimestampField(now)
-		assert.NotNil(t, err)
-	}
-}
-
-func TestEnsureCountFiled(t *testing.T) {
-	type io struct {
-		Input  MapStr
-		Output MapStr
-	}
-	tests := []io{
-		// should add a count field if there is none
-		{
-			Input: MapStr{
-				"a": "b",
-			},
-			Output: MapStr{
-				"a":     "b",
-				"count": 1,
-			},
-		},
-
-		// should do nothing if there is already a count
-		{
-			Input: MapStr{
-				"count": 1,
-			},
-			Output: MapStr{
-				"count": 1,
-			},
-		},
-
-		// should add count on an empty dict
-		{
-			Input:  MapStr{},
-			Output: MapStr{"count": 1},
-		},
-	}
-
-	for _, test := range tests {
-		m := test.Input
-		err := m.EnsureCountField()
-		assert.Nil(t, err)
-		assert.Equal(t, test.Output, m)
-	}
 }
 
 func TestString(t *testing.T) {
@@ -323,7 +233,7 @@ func TestMergeFields(t *testing.T) {
 		Event     MapStr
 		Fields    MapStr
 		Output    MapStr
-		Err       error
+		Err       string
 	}
 	tests := []io{
 		// underRoot = true, merges
@@ -406,14 +316,18 @@ func TestMergeFields(t *testing.T) {
 			Output: MapStr{
 				"fields": "not a MapStr",
 			},
-			Err: ErrorFieldsIsNotMapStr,
+			Err: "expected map",
 		},
 	}
 
 	for _, test := range tests {
 		err := MergeFields(test.Event, test.Fields, test.UnderRoot)
-		assert.Equal(t, test.Err, err)
 		assert.Equal(t, test.Output, test.Event)
+		if test.Err != "" {
+			assert.Contains(t, err.Error(), test.Err)
+		} else {
+			assert.NoError(t, err)
+		}
 	}
 }
 
@@ -422,7 +336,7 @@ func TestAddTag(t *testing.T) {
 		Event  MapStr
 		Tags   []string
 		Output MapStr
-		Err    error
+		Err    string
 	}
 	tests := []io{
 		// No existing tags, creates new tag array
@@ -452,13 +366,17 @@ func TestAddTag(t *testing.T) {
 			Output: MapStr{
 				"tags": "not a slice",
 			},
-			Err: ErrorTagsIsNotStringArray,
+			Err: "expected string array",
 		},
 	}
 
 	for _, test := range tests {
 		err := AddTags(test.Event, test.Tags)
-		assert.Equal(t, test.Err, err)
 		assert.Equal(t, test.Output, test.Event)
+		if test.Err != "" {
+			assert.Contains(t, err.Error(), test.Err)
+		} else {
+			assert.NoError(t, err)
+		}
 	}
 }

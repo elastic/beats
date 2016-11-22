@@ -26,11 +26,11 @@ import (
 )
 
 // Beater object. Contains all objects needed to run the beat
-type Packetbeat struct {
-	Config      config.Config
-	CmdLineArgs CmdLineArgs
-	Pub         *publish.PacketbeatPublisher
-	Sniff       *sniffer.SnifferSetup
+type packetbeat struct {
+	config      config.Config
+	cmdLineArgs flags
+	pub         *publish.PacketbeatPublisher
+	sniff       *sniffer.SnifferSetup
 
 	services []interface {
 		Start()
@@ -38,36 +38,36 @@ type Packetbeat struct {
 	}
 }
 
-type CmdLineArgs struct {
-	File         *string
-	Loop         *int
-	OneAtAtime   *bool
-	TopSpeed     *bool
-	Dumpfile     *string
-	WaitShutdown *int
+type flags struct {
+	file         *string
+	loop         *int
+	oneAtAtime   *bool
+	topSpeed     *bool
+	dumpfile     *string
+	waitShutdown *int
 }
 
-var cmdLineArgs CmdLineArgs
+var cmdLineArgs flags
 
 func init() {
-	cmdLineArgs = CmdLineArgs{
-		File:         flag.String("I", "", "Read packet data from specified file"),
-		Loop:         flag.Int("l", 1, "Loop file. 0 - loop forever"),
-		OneAtAtime:   flag.Bool("O", false, "Read packets one at a time (press Enter)"),
-		TopSpeed:     flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
-		Dumpfile:     flag.String("dump", "", "Write all captured packets to this libpcap file"),
-		WaitShutdown: flag.Int("waitstop", 0, "Additional seconds to wait before shutting down"),
+	cmdLineArgs = flags{
+		file:         flag.String("I", "", "Read packet data from specified file"),
+		loop:         flag.Int("l", 1, "Loop file. 0 - loop forever"),
+		oneAtAtime:   flag.Bool("O", false, "Read packets one at a time (press Enter)"),
+		topSpeed:     flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
+		dumpfile:     flag.String("dump", "", "Write all captured packets to this libpcap file"),
+		waitShutdown: flag.Int("waitstop", 0, "Additional seconds to wait before shutting down"),
 	}
 }
 
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	config := config.Config{
 		Interfaces: config.InterfacesConfig{
-			File:       *cmdLineArgs.File,
-			Loop:       *cmdLineArgs.Loop,
-			TopSpeed:   *cmdLineArgs.TopSpeed,
-			OneAtATime: *cmdLineArgs.OneAtAtime,
-			Dumpfile:   *cmdLineArgs.Dumpfile,
+			File:       *cmdLineArgs.file,
+			Loop:       *cmdLineArgs.loop,
+			TopSpeed:   *cmdLineArgs.topSpeed,
+			OneAtATime: *cmdLineArgs.oneAtAtime,
+			Dumpfile:   *cmdLineArgs.dumpfile,
 		},
 	}
 	err := rawConfig.Unpack(&config)
@@ -76,9 +76,9 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	pb := &Packetbeat{
-		Config:      config,
-		CmdLineArgs: cmdLineArgs,
+	pb := &packetbeat{
+		config:      config,
+		cmdLineArgs: cmdLineArgs,
 	}
 	err = pb.init(b)
 	if err != nil {
@@ -89,9 +89,9 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 }
 
 // init packetbeat components
-func (pb *Packetbeat) init(b *beat.Beat) error {
+func (pb *packetbeat) init(b *beat.Beat) error {
 
-	cfg := &pb.Config
+	cfg := &pb.config
 	err := procs.ProcWatcher.Init(cfg.Procs)
 	if err != nil {
 		logp.Critical(err.Error())
@@ -101,13 +101,13 @@ func (pb *Packetbeat) init(b *beat.Beat) error {
 	// This is required as init Beat is called before the beat publisher is initialised
 	b.Config.Shipper.InitShipperConfig()
 
-	pb.Pub, err = publish.NewPublisher(b.Publisher, *b.Config.Shipper.QueueSize, *b.Config.Shipper.BulkQueueSize, pb.Config.IgnoreOutgoing)
+	pb.pub, err = publish.NewPublisher(b.Publisher, *b.Config.Shipper.QueueSize, *b.Config.Shipper.BulkQueueSize, pb.config.IgnoreOutgoing)
 	if err != nil {
 		return fmt.Errorf("Initializing publisher failed: %v", err)
 	}
 
 	logp.Debug("main", "Initializing protocol plugins")
-	err = protos.Protos.Init(false, pb.Pub, cfg.Protocols)
+	err = protos.Protos.Init(false, pb.pub, cfg.Protocols)
 	if err != nil {
 		return fmt.Errorf("Initializing protocol analyzers failed: %v", err)
 	}
@@ -121,9 +121,9 @@ func (pb *Packetbeat) init(b *beat.Beat) error {
 	return nil
 }
 
-func (pb *Packetbeat) Run(b *beat.Beat) error {
+func (pb *packetbeat) Run(b *beat.Beat) error {
 	defer func() {
-		if service.WithMemProfile() {
+		if service.ProfileEnabled() {
 			logp.Debug("main", "Waiting for streams and transactions to expire...")
 			time.Sleep(time.Duration(float64(protos.DefaultTransactionExpiration) * 1.2))
 			logp.Debug("main", "Streams and transactions should all be expired now.")
@@ -133,10 +133,10 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 		// pb.TransPub.Stop()
 	}()
 
-	pb.Pub.Start()
+	pb.pub.Start()
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
-	if err := droppriv.DropPrivileges(pb.Config.RunOptions); err != nil {
+	if err := droppriv.DropPrivileges(pb.config.RunOptions); err != nil {
 		return err
 	}
 
@@ -152,7 +152,7 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err := pb.Sniff.Run()
+		err := pb.sniff.Run()
 		if err != nil {
 			errC <- fmt.Errorf("Sniffer main loop failed: %v", err)
 		}
@@ -171,7 +171,7 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 		service.Stop()
 	}
 
-	waitShutdown := pb.CmdLineArgs.WaitShutdown
+	waitShutdown := pb.cmdLineArgs.waitShutdown
 	if waitShutdown != nil && *waitShutdown > 0 {
 		time.Sleep(time.Duration(*waitShutdown) * time.Second)
 	}
@@ -180,70 +180,68 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 }
 
 // Called by the Beat stop function
-func (pb *Packetbeat) Stop() {
+func (pb *packetbeat) Stop() {
 	logp.Info("Packetbeat send stop signal")
-	pb.Sniff.Stop()
-	pb.Pub.Stop()
+	pb.sniff.Stop()
+	pb.pub.Stop()
 }
 
-func (pb *Packetbeat) setupSniffer() error {
-	config := &pb.Config
+func (pb *packetbeat) setupSniffer() error {
+	config := &pb.config
 
-	withVlans := config.Interfaces.With_vlans
+	withVlans := config.Interfaces.WithVlans
 	withICMP := config.Protocols["icmp"].Enabled()
 
-	filter := config.Interfaces.Bpf_filter
+	filter := config.Interfaces.BpfFilter
 	if filter == "" && !config.Flows.IsEnabled() {
 		filter = protos.Protos.BpfFilter(withVlans, withICMP)
 	}
 
-	pb.Sniff = &sniffer.SnifferSetup{}
-	return pb.Sniff.Init(false, pb.makeWorkerFactory(filter), &config.Interfaces)
+	pb.sniff = &sniffer.SnifferSetup{}
+	return pb.sniff.Init(false, filter, pb.createWorker, &config.Interfaces)
 }
 
-func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
-	return func(dl layers.LinkType) (sniffer.Worker, string, error) {
-		var f *flows.Flows
-		var err error
-		config := &pb.Config
+func (pb *packetbeat) createWorker(dl layers.LinkType) (sniffer.Worker, error) {
+	var f *flows.Flows
+	var err error
+	config := &pb.config
 
-		if config.Flows.IsEnabled() {
-			f, err = flows.NewFlows(pb.Pub, config.Flows)
-			if err != nil {
-				return nil, "", err
-			}
-		}
-
-		var icmp4 icmp.ICMPv4Processor
-		var icmp6 icmp.ICMPv6Processor
-		if cfg := config.Protocols["icmp"]; cfg.Enabled() {
-			icmp, err := icmp.New(false, pb.Pub, cfg)
-			if err != nil {
-				return nil, "", err
-			}
-
-			icmp4 = icmp
-			icmp6 = icmp
-		}
-
-		tcp, err := tcp.NewTcp(&protos.Protos)
+	if config.Flows.IsEnabled() {
+		f, err = flows.NewFlows(pb.pub, config.Flows)
 		if err != nil {
-			return nil, "", err
+			return nil, err
 		}
-
-		udp, err := udp.NewUdp(&protos.Protos)
-		if err != nil {
-			return nil, "", err
-		}
-
-		worker, err := decoder.NewDecoder(f, dl, icmp4, icmp6, tcp, udp)
-		if err != nil {
-			return nil, "", err
-		}
-
-		if f != nil {
-			pb.services = append(pb.services, f)
-		}
-		return worker, filter, nil
 	}
+
+	var icmp4 icmp.ICMPv4Processor
+	var icmp6 icmp.ICMPv6Processor
+	if cfg := config.Protocols["icmp"]; cfg.Enabled() {
+		icmp, err := icmp.New(false, pb.pub, cfg)
+		if err != nil {
+			return nil, err
+		}
+
+		icmp4 = icmp
+		icmp6 = icmp
+	}
+
+	tcp, err := tcp.NewTCP(&protos.Protos)
+	if err != nil {
+		return nil, err
+	}
+
+	udp, err := udp.NewUDP(&protos.Protos)
+	if err != nil {
+		return nil, err
+	}
+
+	worker, err := decoder.New(f, dl, icmp4, icmp6, tcp, udp)
+	if err != nil {
+		return nil, err
+	}
+
+	if f != nil {
+		pb.services = append(pb.services, f)
+	}
+	return worker, nil
 }

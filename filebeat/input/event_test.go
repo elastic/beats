@@ -33,7 +33,7 @@ func TestEventToMapStrJSON(t *testing.T) {
 			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
-				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
+				Data:         common.MapStr{"json": common.MapStr{"type": "test", "text": "hello"}},
 				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true},
 			},
 			ExpectedItems: common.MapStr{
@@ -46,7 +46,7 @@ func TestEventToMapStrJSON(t *testing.T) {
 			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
-				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
+				Data:         common.MapStr{"json": common.MapStr{"type": "test", "text": "hello"}},
 				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
@@ -59,7 +59,7 @@ func TestEventToMapStrJSON(t *testing.T) {
 			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
-				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
+				Data:         common.MapStr{"json": common.MapStr{"type": "test", "text": "hello"}},
 				JSONConfig:   &reader.JSONConfig{},
 			},
 			ExpectedItems: common.MapStr{
@@ -72,7 +72,7 @@ func TestEventToMapStrJSON(t *testing.T) {
 			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
-				JSONFields:   common.MapStr{"type": "test", "text": "hi"},
+				Data:         common.MapStr{"json": common.MapStr{"type": "test", "text": "hi"}},
 				JSONConfig:   &reader.JSONConfig{MessageKey: "text"},
 			},
 			ExpectedItems: common.MapStr{
@@ -87,7 +87,7 @@ func TestEventToMapStrJSON(t *testing.T) {
 				ReadTime:     now,
 				DocumentType: "test_type",
 				Text:         &text,
-				JSONFields:   common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.444Z"},
+				Data:         common.MapStr{"json": common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.444Z"}},
 				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
@@ -102,7 +102,7 @@ func TestEventToMapStrJSON(t *testing.T) {
 				ReadTime:     now,
 				DocumentType: "test_type",
 				Text:         &text,
-				JSONFields:   common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.44XX4Z"},
+				Data:         common.MapStr{"json": common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.44XX4Z"}},
 				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
@@ -118,7 +118,7 @@ func TestEventToMapStrJSON(t *testing.T) {
 				ReadTime:     now,
 				DocumentType: "test_type",
 				Text:         &text,
-				JSONFields:   common.MapStr{"type": "test", "@timestamp": 42},
+				Data:         common.MapStr{"json": common.MapStr{"type": "test", "@timestamp": 42}},
 				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
@@ -132,7 +132,7 @@ func TestEventToMapStrJSON(t *testing.T) {
 			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
-				JSONFields:   common.MapStr{"type": 42},
+				Data:         common.MapStr{"json": common.MapStr{"type": 42}},
 				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
@@ -145,7 +145,7 @@ func TestEventToMapStrJSON(t *testing.T) {
 			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
-				JSONFields:   common.MapStr{"type": ""},
+				Data:         common.MapStr{"json": common.MapStr{"type": ""}},
 				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{
@@ -158,7 +158,7 @@ func TestEventToMapStrJSON(t *testing.T) {
 			Event: Event{
 				DocumentType: "test_type",
 				Text:         &text,
-				JSONFields:   common.MapStr{"type": "_type"},
+				Data:         common.MapStr{"json": common.MapStr{"type": "_type"}},
 				JSONConfig:   &reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			},
 			ExpectedItems: common.MapStr{

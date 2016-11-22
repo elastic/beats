@@ -1,3 +1,4 @@
+[[thrift-rpc]]
 == Configuring Thrift-RPC Support
 
 https://thrift.apache.org/[Apache Thrift] is a communication protocol and RPC

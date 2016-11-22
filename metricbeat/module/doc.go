@@ -29,9 +29,10 @@ List of standardised words and units across all metricsets. On the left are the 
 * connection: conn
 * count:
 * day: days, d
+* der: derivative
 * max: maximumg
 * min: minimum
-* pct: precentage
+* pct: percentage
 * request: req
 * sec: seconds, second, s
 * ms: millisecond, millis

@@ -1,0 +1,54 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "docker": {
+        "container": {
+            "id": "fa01dd9d2489b23968be9013ef55be34bdcaebddf1dab94ee9c895475052e130",
+            "labels": {
+                "com_docker_compose_container-number": "5",
+                "com_docker_compose_oneoff": "True",
+                "com_docker_compose_project": "environments",
+                "com_docker_compose_service": "beat",
+                "com_docker_compose_version": "1.9.0-rc4"
+            },
+            "name": "environments_beat_run_5",
+        },
+        "cpu": {
+            "core": {
+                "0": {
+                    "pct": 0,
+                    "ticks": 481110059659
+                },
+                "1": {
+                    "pct": 0.996920377,
+                    "ticks": 1188388427420
+                }
+            },
+            "kernel": {
+                "pct": 0,
+                "ticks": 123480000000
+            },
+            "system": {
+                "pct": 1.96,
+                "ticks": 43733560000000
+            },
+            "total": {
+                "pct": 0.996920377
+            },
+            "user": {
+                "pct": 1,
+                "ticks": 1430680000000
+            }
+        }
+    },
+    "metricset": {
+        "host": "/var/run/docker.sock",
+        "module": "docker",
+        "name": "cpu",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

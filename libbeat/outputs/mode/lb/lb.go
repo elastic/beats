@@ -28,7 +28,7 @@ import (
 // If a connection becomes unavailable, the events are rescheduled for another
 // connection to pick up. Rescheduling events is limited to a maximum number of
 // send attempts. If events have not been send after maximum number of allowed
-// attemps has been passed, they will be dropped.
+// attempts has been passed, they will be dropped.
 //
 // Like network connections, distributing events to workers is subject to
 // timeout. If no worker is available to pickup a message for sending, the message

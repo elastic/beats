@@ -1,7 +1,7 @@
 
 BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
-BEATS=packetbeat filebeat winlogbeat metricbeat
+BEATS=packetbeat filebeat winlogbeat metricbeat heartbeat
 PROJECTS=libbeat ${BEATS}
 SNAPSHOT?=yes
 
@@ -36,6 +36,7 @@ coverage-report:
 
 .PHONY: update
 update:
+	$(MAKE) -C libbeat collect
 	$(foreach var,$(BEATS),$(MAKE) -C $(var) update || exit 1;)
 
 .PHONY: clean
@@ -53,6 +54,10 @@ clean-vendor:
 .PHONY: check
 check:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
+	# Validate that all updates were commited
+	$(MAKE) update
+	git update-index --refresh
+	git diff-index --exit-code HEAD --
 
 .PHONY: fmt
 fmt:
@@ -66,7 +71,7 @@ simplify:
 .PHONY: beats-dashboards
 beats-dashboards:
 	mkdir -p build/dashboards
-	$(foreach var,$(BEATS),cp -r $(var)/etc/kibana/ build/dashboards/$(var)  || exit 1;)
+	$(foreach var,$(BEATS),cp -r $(var)/_meta/kibana/ build/dashboards/$(var)  || exit 1;)
 
 # Builds the documents for each beat
 .PHONY: docs
@@ -74,8 +79,7 @@ docs:
 	sh libbeat/scripts/build_docs.sh ${PROJECTS}
 
 .PHONY: package
-package: beats-dashboards
-	$(MAKE) -C libbeat package-setup
+package: update beats-dashboards
 	$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package || exit 1;)
 
 	# build the dashboards package

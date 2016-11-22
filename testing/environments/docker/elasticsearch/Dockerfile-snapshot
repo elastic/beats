@@ -1,28 +1,46 @@
-FROM java:8-jre
+# Copy of https://github.com/elastic/elasticsearch-docker/blob/master/build/elasticsearch/Dockerfile
+FROM docker.elastic.co/elasticsearch/elasticsearch-alpine-base:latest
+MAINTAINER Elastic Docker Team <docker@elastic.co>
 
-ENV ELASTICSEARCH_MAJOR 5.0
-ENV ELASTICSEARCH_VERSION master
-
-
-COPY setup.sh /
-RUN bash setup.sh https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/5.0.0-alpha5/elasticsearch-5.0.0-alpha5.deb
+ARG ELASTIC_VERSION
+ARG ES_DOWNLOAD_URL
+ARG ES_JAVA_OPTS
+ARG XPACK=x-pack
 
 ENV PATH /usr/share/elasticsearch/bin:$PATH
+ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
 
-COPY config /usr/share/elasticsearch/config
+WORKDIR /usr/share/elasticsearch
 
-VOLUME /usr/share/elasticsearch/data
+# Download/extract defined ES version. busybox tar can't strip leading dir.
+RUN wget ${ES_DOWNLOAD_URL}/elasticsearch-${ELASTIC_VERSION}.tar.gz && \
+    EXPECTED_SHA=$(wget -O - ${ES_DOWNLOAD_URL}/elasticsearch-${ELASTIC_VERSION}.tar.gz.sha1) && \
+    test $EXPECTED_SHA == $(sha1sum elasticsearch-${ELASTIC_VERSION}.tar.gz | awk '{print $1}') && \
+    tar zxf elasticsearch-${ELASTIC_VERSION}.tar.gz && \
+    chown -R elasticsearch:elasticsearch elasticsearch-${ELASTIC_VERSION} && \
+    mv elasticsearch-${ELASTIC_VERSION}/* . && \
+    rmdir elasticsearch-${ELASTIC_VERSION} && \
+    rm elasticsearch-${ELASTIC_VERSION}.tar.gz
 
-ENV ES_JAVA_OPTS="-Xms512m -Xmx512m"
+RUN set -ex && for esdirs in config data logs; do \
+        mkdir -p "$esdirs"; \
+        chown -R elasticsearch:elasticsearch "$esdirs"; \
+    done
 
-# Shield currently not enabled
-#ES_JAVA_OPTS="-Des.plugins.staging=b0da471" elasticsearch-plugin install x-pack
+USER elasticsearch
 
-COPY docker-entrypoint.sh /
+# Install xpack
+#RUN eval ${ES_JAVA_OPTS:-} elasticsearch-plugin install --batch ${XPACK}
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+COPY config/elasticsearch.yml config/
+COPY config/log4j2.properties config/
+COPY bin/es-docker bin/es-docker
+
+USER root
+RUN chown elasticsearch:elasticsearch config/elasticsearch.yml config/log4j2.properties bin/es-docker && \
+    chmod 0750 bin/es-docker
+
+USER elasticsearch
+CMD ["/bin/bash", "bin/es-docker"]
 
 EXPOSE 9200 9300
-
-CMD ["elasticsearch"]
-

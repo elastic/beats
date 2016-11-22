@@ -28,37 +28,60 @@ var (
 	filesTruncated     = expvar.NewInt("filebeat.harvester.files.truncated")
 )
 
-// Log harvester reads files line by line and sends events to the defined output
-func (h *Harvester) Harvest() {
+// Setup opens the file handler and creates the reader for the harvester
+func (h *Harvester) Setup() (reader.Reader, error) {
+	err := h.open()
+	if err != nil {
+		return nil, fmt.Errorf("Harvester setup failed. Unexpected file opening error: %s", err)
+	}
+
+	r, err := h.newLogFileReader()
+	if err != nil {
+		if h.file != nil {
+			h.file.Close()
+		}
+		return nil, fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
+	}
+
+	return r, nil
+
+}
+
+// Harvest reads files line by line and sends events to the defined output
+func (h *Harvester) Harvest(r reader.Reader) {
 
 	harvesterStarted.Add(1)
 	harvesterRunning.Add(1)
 	defer harvesterRunning.Add(-1)
 
-	h.state.Finished = false
-
 	// Makes sure file is properly closed when the harvester is stopped
 	defer h.close()
 
-	err := h.open()
-	if err != nil {
-		logp.Err("Stop Harvesting. Unexpected file opening error: %s", err)
-		return
-	}
+	// Channel to stop internal harvester routines
+	harvestDone := make(chan struct{})
+	defer close(harvestDone)
+
+	// Closes reader after timeout or when done channel is closed
+	// This routine is also responsible to properly stop the reader
+	go func() {
+		var closeTimeout <-chan time.Time
+		if h.config.CloseTimeout > 0 {
+			closeTimeout = time.After(h.config.CloseTimeout)
+		}
+
+		select {
+		// Applies when timeout is reached
+		case <-closeTimeout:
+			logp.Info("Closing harvester because close_timeout was reached: %s", h.state.Source)
+		// Required for shutdown when hanging inside reader
+		case <-h.done:
+		// Required when reader loop returns and reader finished
+		case <-harvestDone:
+		}
+		h.fileReader.Close()
+	}()
 
 	logp.Info("Harvester started for file: %s", h.state.Source)
-
-	r, err := h.newLogFileReader()
-	if err != nil {
-		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
-		return
-	}
-
-	// Always report the state before starting a harvester
-	// This is useful in case the file was renamed
-	if !h.sendStateUpdate() {
-		return
-	}
 
 	for {
 		select {
@@ -109,8 +132,8 @@ func (h *Harvester) Harvest() {
 			event.ReadTime = message.Ts
 			event.Bytes = message.Bytes
 			event.Text = &text
-			event.JSONFields = message.Fields
 			event.EventMetadata = h.config.EventMetadata
+			event.Data = message.Fields
 			event.InputType = h.config.InputType
 			event.DocumentType = h.config.DocumentType
 			event.JSONConfig = h.config.JSON
@@ -229,12 +252,6 @@ func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
 		return file.Seek(h.state.Offset, os.SEEK_SET)
 	}
 
-	// tail file if file is new and tail_files config is set
-	if h.config.TailFiles {
-		logp.Debug("harvester", "Setting offset for tailing file: %s.", h.state.Source)
-		return file.Seek(0, os.SEEK_END)
-	}
-
 	// get offset from file in case of encoding factory was required to read some data.
 	logp.Debug("harvester", "Setting offset for file based on seek: %s", h.state.Source)
 	return file.Seek(0, os.SEEK_CUR)
@@ -259,6 +276,7 @@ func (h *Harvester) getState() file.State {
 }
 
 func (h *Harvester) close() {
+
 	// Mark harvester as finished
 	h.state.Finished = true
 
@@ -308,21 +326,6 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// Closes reader after timeout or when done channel is closed
-	go func() {
-		var closeTimeout <-chan time.Time
-		if h.config.CloseTimeout > 0 {
-			closeTimeout = time.After(h.config.CloseTimeout)
-		}
-
-		select {
-		case <-h.done:
-		case <-closeTimeout:
-			logp.Info("Closing harvester because close_timeout was reached: %s", h.state.Source)
-		}
-		h.fileReader.Close()
-	}()
 
 	r, err = reader.NewEncode(h.fileReader, h.encoding, h.config.BufferSize)
 	if err != nil {

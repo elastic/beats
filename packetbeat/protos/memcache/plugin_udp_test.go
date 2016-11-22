@@ -10,21 +10,21 @@ import (
 
 func Test_UdpDatagramAddOnCompleteMessage(t *testing.T) {
 	msg := &udpMessage{isComplete: true}
-	buf := msg.addDatagram(&mcUdpHeader{}, []byte{1, 2, 3, 4})
+	buf := msg.addDatagram(&mcUDPHeader{}, []byte{1, 2, 3, 4})
 	assert.Nil(t, buf)
 }
 
 func Test_UdpDatagramAddSingleDatagram(t *testing.T) {
-	hdr := &mcUdpHeader{requestId: 10, seqNumber: 0, numDatagrams: 1}
-	msg := newUdpMessage(hdr)
+	hdr := &mcUDPHeader{requestID: 10, seqNumber: 0, numDatagrams: 1}
+	msg := newUDPMessage(hdr)
 	buf := msg.addDatagram(hdr, []byte{1, 2, 3, 4})
 	assert.Equal(t, 4, buf.Len())
 	assert.Equal(t, []byte{1, 2, 3, 4}, buf.Bytes())
 }
 
 func Test_UdpDatagramMultiple(t *testing.T) {
-	hdr := &mcUdpHeader{requestId: 10, seqNumber: 0, numDatagrams: 4}
-	msg := newUdpMessage(hdr)
+	hdr := &mcUDPHeader{requestID: 10, seqNumber: 0, numDatagrams: 4}
+	msg := newUDPMessage(hdr)
 
 	buf := msg.addDatagram(hdr, []byte{1, 2})
 	assert.Nil(t, buf)
@@ -47,8 +47,8 @@ func Test_UdpDatagramMultiple(t *testing.T) {
 }
 
 func Test_UdpDatagramMultipleDups(t *testing.T) {
-	hdr := &mcUdpHeader{requestId: 10, seqNumber: 0, numDatagrams: 4}
-	msg := newUdpMessage(hdr)
+	hdr := &mcUDPHeader{requestID: 10, seqNumber: 0, numDatagrams: 4}
+	msg := newUDPMessage(hdr)
 
 	buf := msg.addDatagram(hdr, []byte{1, 2})
 	assert.Nil(t, buf)

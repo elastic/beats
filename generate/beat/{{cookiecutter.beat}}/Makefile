@@ -39,3 +39,7 @@ git-init:
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
+
+# Collects all dependencies and then calls update
+.PHONY: collect
+collect:

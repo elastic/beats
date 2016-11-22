@@ -57,21 +57,26 @@ import (
 	"fmt"
 	"time"
 
+	"encoding/json"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/schema"
 )
 
 type ConvMap struct {
-	Key    string        // The key in the data map
-	Schema schema.Schema // The schema describing how to convert the sub-map
+	Key      string        // The key in the data map
+	Schema   schema.Schema // The schema describing how to convert the sub-map
+	Optional bool
 }
 
 // Map drills down in the data dictionary by using the key
 func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]interface{}) {
 	subData, ok := data[convMap.Key].(map[string]interface{})
 	if !ok {
-		logp.Err("Error accessing sub-dictionary `%s`", convMap.Key)
+		if !convMap.Optional {
+			logp.Err("Error accessing sub-dictionary `%s`", convMap.Key)
+		}
 		return
 	}
 
@@ -80,14 +85,43 @@ func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]inte
 	event[key] = subEvent
 }
 
-func Dict(key string, s schema.Schema) ConvMap {
-	return ConvMap{Key: key, Schema: s}
+func (convMap ConvMap) HasKey(key string) bool {
+	if convMap.Key == key {
+		return true
+	}
+
+	return convMap.Schema.HasKey(key)
+}
+
+func Dict(key string, s schema.Schema, opts ...DictSchemaOption) ConvMap {
+	return dictSetOptions(ConvMap{Key: key, Schema: s}, opts)
+}
+
+func toStrFromNum(key string, data map[string]interface{}) (interface{}, error) {
+	emptyIface, exists := data[key]
+	if !exists {
+		return false, fmt.Errorf("Key %s not found", key)
+	}
+	switch emptyIface.(type) {
+	case int, int32, int64, uint, uint32, uint64, float32, float64:
+		return fmt.Sprintf("%v", emptyIface), nil
+	case json.Number:
+		return string(emptyIface.(json.Number)), nil
+	default:
+		return "", fmt.Errorf("Expected number, found %T", emptyIface)
+	}
+}
+
+// StrFromNum creates a schema.Conv object that transforms numbers to strings.
+func StrFromNum(key string, opts ...schema.SchemaOption) schema.Conv {
+	return schema.SetOptions(schema.Conv{Key: key, Func: toStrFromNum}, opts)
 }
 
 func toStr(key string, data map[string]interface{}) (interface{}, error) {
-	emptyIface, exists := data[key]
-	if !exists {
-		return "", fmt.Errorf("Key not found")
+	emptyIface, err := common.MapStr(data).GetValue(key)
+	if err != nil {
+		fmt.Println(err)
+		return "", fmt.Errorf("Key %s not found", key)
 	}
 	str, ok := emptyIface.(string)
 	if !ok {
@@ -96,7 +130,7 @@ func toStr(key string, data map[string]interface{}) (interface{}, error) {
 	return str, nil
 }
 
-// Str creates a schema.Conv object for converting strings
+// Str creates a schema.Conv object for converting strings.
 func Str(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toStr}, opts)
 }
@@ -104,7 +138,7 @@ func Str(key string, opts ...schema.SchemaOption) schema.Conv {
 func toBool(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, exists := data[key]
 	if !exists {
-		return false, fmt.Errorf("Key not found")
+		return false, fmt.Errorf("Key %s not found", key)
 	}
 	boolean, ok := emptyIface.(bool)
 	if !ok {
@@ -113,7 +147,7 @@ func toBool(key string, data map[string]interface{}) (interface{}, error) {
 	return boolean, nil
 }
 
-// Bool creates a Conv object for converting booleans
+// Bool creates a Conv object for converting booleans.
 func Bool(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toBool}, opts)
 }
@@ -121,7 +155,7 @@ func Bool(key string, opts ...schema.SchemaOption) schema.Conv {
 func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, exists := data[key]
 	if !exists {
-		return 0, fmt.Errorf("Key not found")
+		return 0, fmt.Errorf("Key %s not found", key)
 	}
 	switch emptyIface.(type) {
 	case int64:
@@ -130,6 +164,17 @@ func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 		return int64(emptyIface.(int)), nil
 	case float64:
 		return int64(emptyIface.(float64)), nil
+	case json.Number:
+		num := emptyIface.(json.Number)
+		i64, err := num.Int64()
+		if err == nil {
+			return i64, nil
+		}
+		f64, err := num.Float64()
+		if err == nil {
+			return int64(f64), nil
+		}
+		return 0, fmt.Errorf("Expected integer, found json.Number (%v) that cannot be converted", num)
 	default:
 		return 0, fmt.Errorf("Expected integer, found %T", emptyIface)
 	}
@@ -144,7 +189,7 @@ func Int(key string, opts ...schema.SchemaOption) schema.Conv {
 func toTime(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, exists := data[key]
 	if !exists {
-		return common.Time(time.Unix(0, 0)), fmt.Errorf("Key not found")
+		return common.Time(time.Unix(0, 0)), fmt.Errorf("Key %s not found", key)
 	}
 	ts, ok := emptyIface.(time.Time)
 	if !ok {
@@ -156,4 +201,23 @@ func toTime(key string, data map[string]interface{}) (interface{}, error) {
 // Time creates a Conv object for converting Time objects.
 func Time(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toTime}, opts)
+}
+
+// SchemaOption is for adding optional parameters to the conversion
+// functions
+type DictSchemaOption func(c ConvMap) ConvMap
+
+// The optional flag suppresses the error message in case the key
+// doesn't exist or results in an error.
+func DictOptional(c ConvMap) ConvMap {
+	c.Optional = true
+	return c
+}
+
+// setOptions adds the optional flags to the Conv object
+func dictSetOptions(c ConvMap, opts []DictSchemaOption) ConvMap {
+	for _, opt := range opts {
+		c = opt(c)
+	}
+	return c
 }

@@ -1,4 +1,4 @@
-// Package libbeat.paths provides a common way to handle paths
+// Package paths provides a common way to handle paths
 // configuration for all Beats.
 //
 // Currently the following paths are defined:

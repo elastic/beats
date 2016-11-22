@@ -8,25 +8,25 @@ import (
 	"github.com/tsg/gopacket"
 )
 
-type PfringHandle struct {
+type pfringHandle struct {
 }
 
-func NewPfringHandle(device string, snaplen int, promisc bool) (*PfringHandle, error) {
+func newPfringHandle(device string, snaplen int, promisc bool) (*pfringHandle, error) {
 
 	return nil, fmt.Errorf("Pfring sniffing is not compiled in")
 }
 
-func (h *PfringHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
+func (h *pfringHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
 	return data, ci, fmt.Errorf("Pfring sniffing is not compiled in")
 }
 
-func (h *PfringHandle) SetBPFFilter(expr string) (_ error) {
+func (h *pfringHandle) SetBPFFilter(expr string) (_ error) {
 	return fmt.Errorf("Pfring sniffing is not compiled in")
 }
 
-func (h *PfringHandle) Enable() (_ error) {
+func (h *pfringHandle) Enable() (_ error) {
 	return fmt.Errorf("Pfring sniffing is not compiled in")
 }
 
-func (h *PfringHandle) Close() {
+func (h *pfringHandle) Close() {
 }

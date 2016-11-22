@@ -7,11 +7,11 @@ the Elastic stack for Beats.
 
 A regular _Beats setup_ consists of:
 
- * One or more Beats. You install the Beats on your servers to capture operational data.
  * Elasticsearch for storage and indexing. See <<elasticsearch-installation>>.
  * Logstash (optional) for inserting data into Elasticsearch. See <<logstash-installation,Installing Logstash>>.
  * Kibana for the UI. See <<kibana-installation>>.
- * Kibana dashboards for visualizing the data. See <<load-kibana-dashboards>>.
+ * One or more Beats. You install the Beats on your servers to capture operational data. See <<installing-beats>>.
+ * Kibana dashboards for visualizing the data.
  
 See the https://www.elastic.co/support/matrix[Elastic Support Matrix] for information 
 about supported operating systems and product compatibility.
@@ -42,7 +42,7 @@ mac>> for OS X, and <<win, win>> for Windows):
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-8-jre
-curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/{ES-version}/elasticsearch-{ES-version}.deb
+curl -L -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{ES-version}.deb
 sudo dpkg -i elasticsearch-{ES-version}.deb
 sudo /etc/init.d/elasticsearch start
 ----------------------------------------------------------------------
@@ -52,7 +52,7 @@ sudo /etc/init.d/elasticsearch start
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo yum install java-1.8.0-openjdk
-curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/rpm/elasticsearch/{ES-version}/elasticsearch-{ES-version}.rpm
+curl -L -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{ES-version}.rpm
 sudo rpm -i elasticsearch-{ES-version}.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
@@ -62,7 +62,7 @@ sudo service elasticsearch start
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
-curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/{ES-version}/elasticsearch-{ES-version}.zip
+curl -L -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{ES-version}.zip
 unzip elasticsearch-{ES-version}.zip
 cd elasticsearch-{ES-version}
 ./bin/elasticsearch
@@ -141,8 +141,6 @@ An important advantage to this approach is that you can
 use Logstash to modify the data captured by Beats in any way you like. You can also
 use Logstash's many output plugins to integrate with other systems.
 
-image:./images/beats-logstash.png[Integration with Logstash]
-
 To download and install Logstash, use the commands that work
 with your system:
 
@@ -151,7 +149,7 @@ with your system:
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-8-jre
-curl -L -O https://download.elastic.co/logstash/logstash/packages/debian/logstash-{LS-version}.deb
+curl -L -O https://artifacts.elastic.co/downloads/logstash/logstash-{LS-version}.deb
 sudo dpkg -i logstash-{LS-version}.deb
 ----------------------------------------------------------------------
 
@@ -160,7 +158,7 @@ sudo dpkg -i logstash-{LS-version}.deb
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo yum install java-1.8.0-openjdk
-curl -L -O https://download.elastic.co/logstash/logstash/packages/centos/logstash-{LS-version}.rpm
+curl -L -O https://artifacts.elastic.co/downloads/logstash/logstash-{LS-version}.rpm
 sudo rpm -i logstash-{LS-version}.rpm
 ----------------------------------------------------------------------
 
@@ -169,7 +167,7 @@ sudo rpm -i logstash-{LS-version}.rpm
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
-curl -L -O https://download.elastic.co/logstash/logstash/logstash-{LS-version}.zip
+curl -L -O https://artifacts.elastic.co/downloads/logstash/logstash-{LS-version}.zip
 unzip logstash-{LS-version}.zip
 ----------------------------------------------------------------------
 
@@ -337,7 +335,7 @@ Use the following commands to download and run Kibana.
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/kibana/kibana/kibana-{Kibana-version}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/kibana/kibana-{Kibana-version}-linux-x86_64.tar.gz
 tar xzvf kibana-{Kibana-version}-linux-x86_64.tar.gz
 cd kibana-{Kibana-version}-linux-x86_64/
 ./bin/kibana
@@ -347,7 +345,7 @@ cd kibana-{Kibana-version}-linux-x86_64/
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/kibana/kibana/kibana-{Kibana-version}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/kibana/kibana-{Kibana-version}-darwin-x86_64.tar.gz
 tar xzvf kibana-{Kibana-version}-darwin-x86_64.tar.gz
 cd kibana-{Kibana-version}-darwin-x86_64/
 ./bin/kibana
@@ -380,7 +378,8 @@ https://www.elastic.co/downloads/kibana[Kibana downloads page].
 
 ==== Launching the Kibana Web Interface
 
-To launch the Kibana web interface, point your browser to port 5601. For example, `http://127.0.0.1:5601`.
+To launch the Kibana web interface, point your browser to port 5601. For example,
+http://127.0.0.1:5601[http://127.0.0.1:5601].
 
 You can learn more about Kibana in the
 http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].

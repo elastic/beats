@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
+        "host": "postgresql:5432",
         "module": "postgresql",
         "name": "activity",
         "rtt": 115

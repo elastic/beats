@@ -13,12 +13,22 @@ import (
 
 var (
 	schema = s.Schema{
-		"nb_proc":       c.Int("Nbproc"),
-		"process_num":   c.Int("ProcessNum"),
-		"pid":           c.Int("Pid"),
-		"uptime_sec":    c.Int("UptimeSec"),
-		"mem_max_bytes": c.Int("MemMax"),
-		"ulimit_n":      c.Int("UlimitN"),
+		"processes":   c.Int("Nbproc"),
+		"process_num": c.Int("ProcessNum"),
+		"pid":         c.Int("Pid"),
+		"ulimit_n":    c.Int("UlimitN"),
+		"tasks":       c.Int("Tasks"),
+		"run_queue":   c.Int("RunQueue"),
+
+		"uptime": s.Object{
+			"sec": c.Int("UptimeSec"),
+		},
+
+		"memory": s.Object{
+			"max": s.Object{
+				"bytes": c.Int("MemMax"),
+			},
+		},
 
 		"compress": s.Object{
 			"bps": s.Object{
@@ -28,49 +38,42 @@ var (
 			},
 		},
 
-		"conn": s.Object{
+		"connection": s.Object{
 			"rate": s.Object{
 				"value": c.Int("ConnRate"),
 				"limit": c.Int("ConnRateLimit"),
+				"max":   c.Int("MaxConnRate"),
 			},
-		},
-
-		"curr": s.Object{
-			"conns":     c.Int("CurrConns"),
-			"ssl_conns": c.Int("CurrSslConns"),
-		},
-
-		"cum": s.Object{
-			"conns":     c.Int("CumConns"),
-			"req":       c.Int("CumReq"),
-			"ssl_conns": c.Int("CumSslConns"),
-		},
-
-		"max": s.Object{
-			"hard_conn": c.Int("HardMaxconn"),
 			"ssl": s.Object{
-				"conns": c.Int("MaxSslConns"),
-				"rate":  c.Int("MaxSslRate"),
+				"current": c.Int("CurrSslConns"),
+				"total":   c.Int("CumSslConns"),
+				"max":     c.Int("MaxSslConns"),
 			},
-			"sock": c.Int("Maxsock"),
-			"conn": s.Object{
-				"value": c.Int("Maxconn"),
-				"rate":  c.Int("MaxConnRate"),
-			},
-			"sess_rate":      c.Int("MaxSessRate"),
-			"pipes":          c.Int("Maxpipes"),
-			"zlib_mem_usage": c.Int("MaxZlibMemUsage"),
+			"current":  c.Int("CurrConns"),
+			"total":    c.Int("CumConns"),
+			"hard_max": c.Int("HardMaxconn"),
+			"max":      c.Int("Maxconn"),
+		},
+
+		"requests": s.Object{
+			"total": c.Int("CumReq"),
+		},
+
+		"sockets": s.Object{
+			"max": c.Int("Maxsock"),
 		},
 
 		"pipes": s.Object{
 			"used": c.Int("PipesUsed"),
 			"free": c.Int("PipesFree"),
+			"max":  c.Int("Maxpipes"),
 		},
 
-		"sess": s.Object{
+		"session": s.Object{
 			"rate": s.Object{
 				"value": c.Int("SessRate"),
 				"limit": c.Int("SessRateLimit"),
+				"max":   c.Int("MaxSessRate"),
 			},
 		},
 
@@ -78,24 +81,35 @@ var (
 			"rate": s.Object{
 				"value": c.Int("SslRate"),
 				"limit": c.Int("SslRateLimit"),
+				"max":   c.Int("MaxSslRate"),
 			},
 			"frontend": s.Object{
-				"key_rate":          c.Int("SslFrontendKeyRate"),
-				"max_key_rate":      c.Int("SslFrontendMaxKeyRate"),
-				"session_reuse_pct": c.Int("SslFrontendSessionReusePct"),
+				"key_rate": s.Object{
+					"value": c.Int("SslFrontendKeyRate"),
+					"max":   c.Int("SslFrontendMaxKeyRate"),
+				},
+				"session_reuse": s.Object{
+					"pct": c.Float("SslFrontendSessionReusePct"),
+				},
 			},
 			"backend": s.Object{
-				"key_rate":     c.Int("SslBackendKeyRate"),
-				"max_key_rate": c.Int("SslBackendMaxKeyRate"),
+				"key_rate": s.Object{
+					"value": c.Int("SslBackendKeyRate"),
+					"max":   c.Int("SslBackendMaxKeyRate"),
+				},
 			},
 			"cached_lookups": c.Int("SslCacheLookups"),
 			"cache_misses":   c.Int("SslCacheMisses"),
 		},
 
-		"zlib_mem_usage": c.Int("ZlibMemUsage"),
-		"tasks":          c.Int("Tasks"),
-		"run_queue":      c.Int("RunQueue"),
-		"idle_pct":       c.Float("IdlePct"),
+		"zlib_mem_usage": s.Object{
+			"value": c.Int("ZlibMemUsage"),
+			"max":   c.Int("MaxZlibMemUsage"),
+		},
+
+		"idle": s.Object{
+			"pct": c.Float("IdlePct"),
+		},
 	}
 )
 

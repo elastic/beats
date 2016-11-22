@@ -15,12 +15,21 @@ We recommend that you start by creating your own Beat to keep the development of
 independent of Metricbeat. At a later stage, if you decide to add a module to Metricbeat, you can reuse
 the code without making additional changes.
 
+This following topics describe how to contribute to Metricbeat by adding metricsets, modules, and new Beats based on Metricbeat:
+
+* <<metricbeat-dev-overview>>
+* <<creating-metricsets>>
+* <<metricset-details>>
+* <<creating-metricbeat-module>>
+* <<creating-beat-from-metricbeat>>
+* <<dev-faq>>
+
 If you would like to contribute to Metricbeat or the Beats project, also see the
 https://github.com/elastic/beats/blob/master/CONTRIBUTING.md[general contributor guide].
 
 --
 
-
+[[metricbeat-dev-overview]]
 == Overview
 
 Metricbeat consists of modules and metricsets. A Metricbeat module is typically 

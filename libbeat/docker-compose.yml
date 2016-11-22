@@ -1,59 +1,62 @@
-beat:
-  build: ${PWD}/.
-  links:
-    - redis
-    - sredis
-    - kafka
-  environment:
-    - REDIS_HOST=redis
-    - REDIS_PORT=6379
-    - SREDIS_HOST=sredis
-    - SREDIS_PORT=6380
-    - LS_HOST=logstash
-    - LS_TCP_PORT=5044
-    - LS_TLS_PORT=5055
-    # Setup work environment
-    - LIBBEAT_PATH=/go/src/github.com/elastic/beats/libbeat
-    # TODO: Set to true as soon as stable release is out
-    - SHIELD=false
-    - KAFKA_HOST=kafka
-    - KAFKA_PORT=9092
-  env_file:
-    - ${PWD}/build/test.env
-  volumes:
-    - ${PWD}/..:/go/src/github.com/elastic/beats/
-  working_dir: /go/src/github.com/elastic/beats/libbeat
-  command: make
-  entrypoint: /go/src/github.com/elastic/beats/libbeat/scripts/docker-entrypoint.sh
+version: '2'
+services:
+  beat:
+    build: ${PWD}/.
+    links:
+      - redis
+      - sredis
+      - kafka
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SREDIS_HOST=sredis
+      - SREDIS_PORT=6380
+      - LS_HOST=logstash
+      - LS_TCP_PORT=5044
+      - LS_TLS_PORT=5055
+      # Setup work environment
+      - LIBBEAT_PATH=/go/src/github.com/elastic/beats/libbeat
+      # TODO: Set to true as soon as stable release is out
+      - SHIELD=false
+      - KAFKA_HOST=kafka
+      - KAFKA_PORT=9092
+    env_file:
+      - ${PWD}/build/test.env
+    volumes:
+      - ${PWD}/..:/go/src/github.com/elastic/beats/
+    working_dir: /go/src/github.com/elastic/beats/libbeat
+    command: make
+    entrypoint: /go/src/github.com/elastic/beats/libbeat/scripts/docker-entrypoint.sh
 
-# This host name is fixed because of the certificate
-logstash:
-  env_file:
-    - ${PWD}/build/test.env
+  # This host name is fixed because of the certificate
+  logstash:
+    env_file:
+      - ${PWD}/build/test.env
 
-redis:
-  image: redis:3.2.0
+  redis:
+    image: redis:3.2.4-alpine
 
-# This host name is fixed because of the certificate
-sredis: # stunnel proxy for redis
-  build: ${PWD}/../testing/environments/docker/sredis
-  expose:
-    - 6380
-  links:
-    - redis
-  environment:
-    - REDIS_HOST=redis
-    - REDIS_PORT=6379
-  env_file:
-    - ${PWD}/build/test.env
+  # This host name is fixed because of the certificate
+  sredis: # stunnel proxy for redis
+    build: ${PWD}/../testing/environments/docker/sredis
+    expose:
+      - 6380
+    links:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    env_file:
+      - ${PWD}/build/test.env
 
-kafka:
-  image: spotify/kafka
-  expose:
-    - 9092
-    - 2181
+  kafka:
+    image: spotify/kafka
+    expose:
+      - 9092
+      - 2181
 
-# Overloading kibana with a simple image as it is not needed here
-kibana:
-  build: ${PWD}/../testing/environments/
-  dockerfile: Dockerfile
+  # Overloading kibana with a simple image as it is not needed here
+  kibana:
+    build:
+      context: ${PWD}/../testing/environments/
+      dockerfile: Dockerfile

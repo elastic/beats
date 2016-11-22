@@ -4,6 +4,8 @@ import (
 	"crypto/tls"
 	"regexp"
 	"time"
+
+	"github.com/rcrowley/go-metrics"
 )
 
 const defaultClientID = "sarama"
@@ -233,6 +235,12 @@ type Config struct {
 	// latest features. Setting it to a version greater than you are actually
 	// running may lead to random breakage.
 	Version KafkaVersion
+	// The registry to define metrics into.
+	// Defaults to a local registry.
+	// If you want to disable metrics gathering, set "metrics.UseNilMetrics" to "true"
+	// prior to starting Sarama.
+	// See Examples on how to use the metrics registry
+	MetricRegistry metrics.Registry
 }
 
 // NewConfig returns a new configuration instance with sane defaults.
@@ -268,6 +276,7 @@ func NewConfig() *Config {
 	c.ClientID = defaultClientID
 	c.ChannelBufferSize = 256
 	c.Version = minVersion
+	c.MetricRegistry = metrics.NewRegistry()
 
 	return c
 }

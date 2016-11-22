@@ -11,58 +11,13 @@
       },
       "dynamic_templates": [
         {
-          "fields": {
+          "strings_as_keyword": {
             "mapping": {
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
             },
-            "match_mapping_type": "string",
-            "path_match": "fields.*"
-          }
-        },
-        {
-          "amqp.headers": {
-            "mapping": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "match_mapping_type": "string",
-            "path_match": "amqp.headers.*"
-          }
-        },
-        {
-          "cassandra.response.supported": {
-            "mapping": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "match_mapping_type": "string",
-            "path_match": "cassandra.response.supported.*"
-          }
-        },
-        {
-          "http.request.headers": {
-            "mapping": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "match_mapping_type": "string",
-            "path_match": "http.request.headers.*"
-          }
-        },
-        {
-          "http.response.headers": {
-            "mapping": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "match_mapping_type": "string",
-            "path_match": "http.response.headers.*"
+            "match_mapping_type": "string"
           }
         }
       ],
@@ -230,6 +185,11 @@
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
+            },
+            "version": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
             }
           }
         },
@@ -373,6 +333,9 @@
                       "ignore_above": 1024,
                       "index": "not_analyzed",
                       "type": "string"
+                    },
+                    "port": {
+                      "type": "long"
                     },
                     "schema_change": {
                       "properties": {
@@ -610,6 +573,13 @@
                   "type": "string"
                 }
               }
+            }
+          }
+        },
+        "client_geoip": {
+          "properties": {
+            "location": {
+              "type": "geo_point"
             }
           }
         },
@@ -1129,6 +1099,44 @@
                   "type": "long"
                 },
                 "version": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "meta": {
+          "properties": {
+            "cloud": {
+              "properties": {
+                "availability_zone": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "instance_id": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "machine_type": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "project_id": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "provider": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "region": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"

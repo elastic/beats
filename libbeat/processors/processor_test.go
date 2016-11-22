@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	_ "github.com/elastic/beats/libbeat/processors/actions"
+	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,7 +42,7 @@ func TestBadConfig(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"contains": map[string]string{
@@ -82,7 +83,7 @@ func TestIncludeFields(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"contains": map[string]string{
@@ -150,7 +151,7 @@ func TestIncludeFields1(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"regexp": map[string]string{
@@ -203,7 +204,7 @@ func TestIncludeFields1(t *testing.T) {
 func TestDropFields(t *testing.T) {
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"drop_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"equals": map[string]string{
@@ -268,7 +269,7 @@ func TestMultipleIncludeFields(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"contains": map[string]string{
@@ -278,7 +279,7 @@ func TestMultipleIncludeFields(t *testing.T) {
 				"fields": []string{"proc"},
 			},
 		},
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"fields": []string{"proc.cpu.start_time", "proc.cpu.total_p", "proc.mem.rss_p", "proc.cmdline"},
 			},
@@ -365,7 +366,7 @@ func TestDropEvent(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"drop_event": map[string]interface{}{
 				"when": map[string]interface{}{
 					"range": map[string]interface{}{
@@ -418,7 +419,7 @@ func TestEmptyCondition(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"drop_event": map[string]interface{}{},
 		},
 	}
@@ -463,7 +464,7 @@ func TestBadCondition(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"drop_event": map[string]interface{}{
 				"when": map[string]interface{}{
 					"equal": map[string]string{
@@ -502,7 +503,7 @@ func TestMissingFields(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"equals": map[string]string{
@@ -539,7 +540,7 @@ func TestBadConditionConfig(t *testing.T) {
 	}
 
 	yml := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"include_fields": map[string]interface{}{
 				"when": map[string]interface{}{
 					"fake": map[string]string{
@@ -568,4 +569,55 @@ func TestBadConditionConfig(t *testing.T) {
 	_, err := processors.New(config)
 	assert.NotNil(t, err)
 
+}
+
+func TestDropMissingFields(t *testing.T) {
+
+	yml := []map[string]interface{}{
+		{
+			"drop_fields": map[string]interface{}{
+				"fields": []string{"foo.bar", "proc.cpu", "proc.sss", "beat", "mem"},
+			},
+		},
+	}
+
+	processors := GetProcessors(t, yml)
+
+	event := common.MapStr{
+		"@timestamp": "2016-01-24T18:35:19.308Z",
+		"beat": common.MapStr{
+			"hostname": "mar",
+			"name":     "my-shipper-1",
+		},
+
+		"proc": common.MapStr{
+			"cpu": common.MapStr{
+				"start_time": "Jan14",
+				"system":     26027,
+				"total":      79390,
+				"total_p":    0,
+				"user":       53363,
+			},
+			"cmdline": "/sbin/launchd",
+		},
+		"mem": common.MapStr{
+			"rss":   11194368,
+			"rss_p": 0,
+			"share": 0,
+			"size":  2555572224,
+		},
+		"type": "process",
+	}
+
+	processedEvent := processors.Run(event)
+
+	expectedEvent := common.MapStr{
+		"@timestamp": "2016-01-24T18:35:19.308Z",
+		"proc": common.MapStr{
+			"cmdline": "/sbin/launchd",
+		},
+		"type": "process",
+	}
+
+	assert.Equal(t, expectedEvent, processedEvent)
 }

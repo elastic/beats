@@ -1,4 +1,4 @@
-// The streambuf module provides helpers for buffering multiple packet payloads
+// Package streambuf provides helpers for buffering multiple packet payloads
 // and some general parsing functions. All parsing functions are re-entrant,
 // that is if a parse function fails due do not having buffered enough bytes yet
 // (error value ErrNoMoreBytes) the parser can be called again after appending more
@@ -12,7 +12,7 @@
 // All functions that might fail, will return an error. The last error reported
 // will be stored with the buffer itself. Instead of checking every single error
 // one can use the Failed() and Err() methods to check if the buffer is still in a
-// valid state and all parsing was successfull.
+// valid state and all parsing was successful.
 package streambuf
 
 import (
@@ -51,7 +51,7 @@ type Buffer struct {
 
 	// Internal parser state offsets.
 	// Offset is the position a parse might continue to work at when called
-	// again (e.g. usefull for parsing tcp streams.). The mark is used to remember
+	// again (e.g. useful for parsing tcp streams.). The mark is used to remember
 	// the position last parse operation ended at. The variable available is used
 	// for faster lookup
 	// Invariants:
@@ -221,7 +221,7 @@ func (b *Buffer) Failed() bool {
 	return failed
 }
 
-// Returns the error value of the last failed operation.
+// Err returns the error value of the last failed operation.
 func (b *Buffer) Err() error {
 	return b.err
 }
@@ -268,14 +268,14 @@ func (b *Buffer) Consume(n int) ([]byte, error) {
 		return nil, ErrOutOfRange
 	}
 
-	new_mark := b.mark - n
-	if new_mark < 0 {
+	newMark := b.mark - n
+	if newMark < 0 {
 		return nil, ErrOutOfRange
 	}
 
 	old := b.data[:n]
 	b.data = b.data[n:]
-	b.mark = new_mark
+	b.mark = newMark
 	b.offset -= n
 	b.available = len(b.data) - b.mark
 	return old, nil
@@ -309,9 +309,8 @@ func (b *Buffer) Bytes() []byte {
 func (b *Buffer) bufferEndError() error {
 	if b.fixed {
 		return b.SetError(ErrUnexpectedEOB)
-	} else {
-		return b.SetError(ErrNoMoreBytes)
 	}
+	return b.SetError(ErrNoMoreBytes)
 }
 
 // SetError marks a buffer as failed. Append and parse operations will fail with
@@ -338,7 +337,7 @@ func (b *Buffer) Collect(count int) ([]byte, error) {
 	return data, nil
 }
 
-// CollectWithDelimiter collects count bytes and checks delim will immediately
+// CollectWithSuffix collects count bytes and checks delim will immediately
 // follow the byte sequence. Returns count bytes without delim.
 // If delim is not matched ErrExpectedByteSequenceMismatch will be raised.
 func (b *Buffer) CollectWithSuffix(count int, delim []byte) ([]byte, error) {

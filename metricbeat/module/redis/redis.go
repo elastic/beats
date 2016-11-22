@@ -36,7 +36,7 @@ func ParseRedisLine(s string, delimeter string) []string {
 	return strings.Split(s, delimeter)
 }
 
-// FetchRedisStats returns a map of requested stats
+// FetchRedisInfo returns a map of requested stats.
 func FetchRedisInfo(stat string, c rd.Conn) (map[string]string, error) {
 	defer c.Close()
 
