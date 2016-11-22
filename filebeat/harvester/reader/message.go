@@ -31,3 +31,14 @@ func (m *Message) IsEmpty() bool {
 
 	return false
 }
+
+func (msg *Message) AddFields(fields common.MapStr) {
+	if fields == nil {
+		return
+	}
+
+	if msg.Fields == nil {
+		msg.Fields = common.MapStr{}
+	}
+	msg.Fields.Update(fields)
+}

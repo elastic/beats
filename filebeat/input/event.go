@@ -18,9 +18,9 @@ type Event struct {
 	DocumentType string
 	Bytes        int
 	Text         *string
-	JSONFields   common.MapStr
 	JSONConfig   *reader.JSONConfig
 	State        file.State
+	Data         common.MapStr // Use in readers to add data to the event
 }
 
 func NewEvent(state file.State) *Event {
@@ -39,8 +39,19 @@ func (e *Event) ToMapStr() common.MapStr {
 		"input_type":            e.InputType,
 	}
 
-	if e.JSONConfig != nil && len(e.JSONFields) > 0 {
-		mergeJSONFields(e, event)
+	// Add data fields which are added by the readers
+	for key, value := range e.Data {
+		event[key] = value
+	}
+
+	// Check if json fields exist
+	var jsonFields common.MapStr
+	if fields, ok := event["json"]; ok {
+		jsonFields = fields.(common.MapStr)
+	}
+
+	if e.JSONConfig != nil && len(jsonFields) > 0 {
+		mergeJSONFields(e, event, jsonFields)
 	} else if e.Text != nil {
 		event["message"] = *e.Text
 	}
@@ -58,15 +69,18 @@ func (e *Event) HasData() bool {
 // respecting the KeysUnderRoot and OverwriteKeys configuration options.
 // If MessageKey is defined, the Text value from the event always
 // takes precedence.
-func mergeJSONFields(e *Event, event common.MapStr) {
+func mergeJSONFields(e *Event, event common.MapStr, jsonFields common.MapStr) {
 
 	// The message key might have been modified by multiline
 	if len(e.JSONConfig.MessageKey) > 0 && e.Text != nil {
-		e.JSONFields[e.JSONConfig.MessageKey] = *e.Text
+		jsonFields[e.JSONConfig.MessageKey] = *e.Text
 	}
 
 	if e.JSONConfig.KeysUnderRoot {
-		for k, v := range e.JSONFields {
+		// Delete existing json key
+		delete(event, "json")
+
+		for k, v := range jsonFields {
 			if e.JSONConfig.OverwriteKeys {
 				if k == "@timestamp" {
 					vstr, ok := v.(string)
@@ -104,7 +118,5 @@ func mergeJSONFields(e *Event, event common.MapStr) {
 				event[k] = v
 			}
 		}
-	} else {
-		event["json"] = e.JSONFields
 	}
 }

@@ -211,7 +211,7 @@ func (mlr *Multiline) load(m Message) {
 	mlr.addLine(m)
 	// Timestamp of first message is taken as overall timestamp
 	mlr.message.Ts = m.Ts
-	mlr.message.Fields = m.Fields
+	mlr.message.AddFields(m.Fields)
 }
 
 // clearBuffer resets the reader buffer variables
@@ -265,6 +265,7 @@ func (mlr *Multiline) addLine(m Message) {
 
 	mlr.last = m.Content
 	mlr.message.Bytes += m.Bytes
+	mlr.message.AddFields(m.Fields)
 }
 
 // resetState sets state of the reader to readFirst
