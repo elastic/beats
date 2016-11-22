@@ -1,0 +1,36 @@
+{
+    "@timestamp": "2016-08-27T20:26:21.837Z",
+    "beat": {
+        "hostname": "seu",
+        "name": "seu"
+    },
+    "jmx": {
+        "jolokia": {
+            "gc": {
+                "cms_collection_count": 3,
+                "cms_collection_time": 207
+            },
+            "memory": {
+                "heap_usage": {
+                    "committed": 1.052770304e+09,
+                    "init": 1.073741824e+09,
+                    "max": 1.052770304e+09,
+                    "used": 1.73407544e+08
+                },
+                "non_heap_usage": {
+                    "committed": 7.0098944e+07,
+                    "init": 2.555904e+06,
+                    "max": -1,
+                    "used": 6.8390328e+07
+                }
+            },
+            "uptime": 6.964576e+06
+        }
+    },
+    "metricset": {
+        "module": "jmx",
+        "name": "jolokia",
+        "rtt": 53279
+    },
+    "type": "metricsets"
+}

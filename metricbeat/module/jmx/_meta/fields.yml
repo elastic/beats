@@ -1,0 +1,9 @@
+- key: jmx
+  title: "jmx"
+  description: >
+    jmx Module
+  fields:
+    - name: jmx
+      type: group
+      description: >
+      fields:

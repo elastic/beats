@@ -1,0 +1,34 @@
+###################### Metricbeat Configuration Example #######################
+
+#==========================  Modules configuration ============================
+metricbeat.modules:
+
+#------------------------------ jmx Module -----------------------------
+- module: jmx
+  metricsets: ["jolokia"]
+  enabled: true
+  period: 10s
+  mappings:
+      #common jvm metrics like uptime, heap, gc, etc.
+    -
+      host: localhost:4008
+      mapping: '{"java.lang:type=Runtime:::Uptime":"uptime","java.lang:type=GarbageCollector,name=ConcurrentMarkSweep:::CollectionTime":"gc.cms_collection_time","java.lang:type=GarbageCollector,name=ConcurrentMarkSweep:::CollectionCount":"gc.cms_collection_count","java.lang:type=GarbageCollector,name=ParNew:::CollectionTime":"gc.parnew_collection_time","java.lang:type=GarbageCollector,name=ParNew:::CollectionCount":"gc.parnew_collection_count","java.lang:type=Memory:::HeapMemoryUsage":"memory.heap_usage","java.lang:type=Memory:::NonHeapMemoryUsage":"memory.non_heap_usage"}'
+      application: application1
+      instance: instance1
+
+      #some application specific metrics, e.g. for latency and compaction stats for cassandra
+    -
+      host: localhost:4002
+      mapping: '{"org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency:::OneMinuteRate":"client_request.read_latency_one_min_rate","org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency:::Count":"client_request.read_latency","org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency:::OneMinuteRate":"client_request.write_latency_one_min_rate","org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency:::Count":"client_request.write_latency","org.apache.cassandra.metrics:type=Compaction,name=CompletedTasks:::Value":"compaction.completed_tasks","org.apache.cassandra.metrics:type=Compaction,name=PendingTasks:::Value":"compaction.pending_tasks"}'
+      application: cassandra
+#================================ Outputs =====================================
+
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
+
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
