@@ -12,6 +12,7 @@ include::./version.asciidoc[]
 :ES-version: {stack-version}
 :LS-version: {stack-version}
 :Kibana-version: {stack-version}
+:dashboards: https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-{stack-version}.zip
 
 include::./overview.asciidoc[]
 
