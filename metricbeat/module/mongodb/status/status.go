@@ -37,7 +37,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	dialInfo.Timeout = base.Module().Config().Timeout
 
-	debugf("mongodb-status url=%v", base.HostData().SanitizedURI)
 	return &MetricSet{
 		BaseMetricSet: base,
 		dialInfo:      dialInfo,

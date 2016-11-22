@@ -45,7 +45,6 @@ type MetricSet struct {
 
 // New creates new instance of MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	debugf("nginx-stubstatus URL=%s", base.HostData().SanitizedURI)
 	return &MetricSet{
 		BaseMetricSet: base,
 		client:        &http.Client{Timeout: base.Module().Config().Timeout},
@@ -54,7 +53,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch makes an HTTP request to fetch status metrics from the stubstatus endpoint.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-	req, err := http.NewRequest("GET", m.HostData().URI, nil)
+	req, err := http.NewRequest("GET", m.HostData().SanitizedURI, nil)
+	if m.HostData().User != "" || m.HostData().Password != "" {
+		req.SetBasicAuth(m.HostData().User, m.HostData().Password)
+	}
 	resp, err := m.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error making http request: %v", err)

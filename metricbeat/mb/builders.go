@@ -137,7 +137,8 @@ func initMetricSets(r *Register, modules []Module) (map[Module][]MetricSet, erro
 		if hostParser != nil {
 			bms.hostData, err = hostParser(bms.Module(), bms.host)
 			if err != nil {
-				errs = append(errs, err)
+				errs = append(errs, errors.Wrapf(err, "host parsing failed for %v-%v",
+					bms.Module().Name(), bms.Name()))
 				continue
 			}
 			bms.host = bms.hostData.Host

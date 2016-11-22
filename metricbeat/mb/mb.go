@@ -5,6 +5,7 @@ to implement Modules and their associated MetricSets.
 package mb
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -38,6 +39,12 @@ type BaseModule struct {
 	config    ModuleConfig
 	rawConfig *common.Config
 }
+
+func (m *BaseModule) String() string {
+	return fmt.Sprintf(`{name:"%v", config:%v}`, m.name, m.config.String())
+}
+
+func (m *BaseModule) GoString() string { return m.String() }
 
 // Name returns the name of the Module.
 func (m *BaseModule) Name() string { return m.name }
@@ -77,6 +84,26 @@ type EventsFetcher interface {
 	Fetch() ([]common.MapStr, error)
 }
 
+// HostData contains values parsed from the 'host' configuration. Other
+// configuration data like protocols, usernames, and passwords may also be
+// used to construct this HostData data.
+type HostData struct {
+	URI          string // The full URI that should be used in connections.
+	SanitizedURI string // A sanitized version of the URI without credentials.
+
+	// Parts of the URI.
+
+	Host     string // The host and possibly port.
+	User     string // Username
+	Password string // Password
+}
+
+func (h HostData) String() string {
+	return fmt.Sprintf(`{SanitizedURI:"%v", Host:"%v"}`, h.SanitizedURI, h.Host)
+}
+
+func (h HostData) GoString() string { return h.String() }
+
 // BaseMetricSet implements the MetricSet interface.
 //
 // The BaseMetricSet type can be embedded into another struct to satisfy the
@@ -89,18 +116,16 @@ type BaseMetricSet struct {
 	hostData HostData
 }
 
-// HostData contains values parsed from the 'host' configuration. Other
-// configuration data like protocols, usernames, and passwords may also be
-// used to construct this HostData data.
-type HostData struct {
-	URI          string // The full URI that should be used in connections.
-	SanitizedURI string // A sanitized version of the URI without credentials.
-
-	// Parts of the URI.
-	Host     string // The host and possibly port.
-	User     string // Username
-	Password string // Password
+func (b *BaseMetricSet) String() string {
+	moduleName := "nil"
+	if b.module != nil {
+		moduleName = b.module.Name()
+	}
+	return fmt.Sprintf(`{name:"%v", module:"%v", hostData:%v}`,
+		b.name, moduleName, b.hostData.String())
 }
+
+func (b *BaseMetricSet) GoString() string { return b.String() }
 
 // Name returns the name of the MetricSet. It should not include the name of
 // the module.
@@ -143,6 +168,16 @@ type ModuleConfig struct {
 
 	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
 }
+
+func (c ModuleConfig) String() string {
+	return fmt.Sprintf(`{Module:"%v", MetricSets:%v, Enabled:%v, `+
+		`Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v, Fields:%v, `+
+		`FieldsUnderRoot:%v, Tags:%v}`,
+		c.Module, c.MetricSets, c.Enabled, len(c.Hosts), c.Period, c.Timeout,
+		c.Raw, c.Fields, c.FieldsUnderRoot, c.Tags)
+}
+
+func (c ModuleConfig) GoString() string { return c.String() }
 
 // defaultModuleConfig contains the default values for ModuleConfig instances.
 var defaultModuleConfig = ModuleConfig{

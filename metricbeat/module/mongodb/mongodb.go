@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	// Register the ModuleFactory function for the "mysql" module.
+	// Register the ModuleFactory function for the "mongodb" module.
 	if err := mb.Registry.AddModule("mongodb", NewModule); err != nil {
 		panic(err)
 	}
