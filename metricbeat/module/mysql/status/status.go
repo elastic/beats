@@ -35,7 +35,6 @@ type MetricSet struct {
 
 // New creates and returns a new MetricSet instance.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	debugf("mysql-status dsn=%v", base.HostData().SanitizedURI)
 	return &MetricSet{BaseMetricSet: base}, nil
 }
 
