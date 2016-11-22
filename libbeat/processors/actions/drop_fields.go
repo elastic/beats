@@ -42,7 +42,7 @@ func newDropFields(c common.Config) (processors.Processor, error) {
 }
 
 func (f dropFields) Run(event common.MapStr) (common.MapStr, error) {
-	errors := []string{}
+	var errors []string
 
 	for _, field := range f.Fields {
 		err := event.Delete(field)
@@ -51,7 +51,11 @@ func (f dropFields) Run(event common.MapStr) (common.MapStr, error) {
 		}
 
 	}
-	return event, fmt.Errorf(strings.Join(errors, ", "))
+
+	if len(errors) > 0 {
+		return event, fmt.Errorf(strings.Join(errors, ", "))
+	}
+	return event, nil
 }
 
 func (f dropFields) String() string {
