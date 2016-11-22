@@ -1,0 +1,220 @@
+########################## Metricbeat Configuration ###########################
+
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see metricbeat.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/metricbeat/index.html
+
+#==========================  Modules configuration ============================
+metricbeat.modules:
+
+#------------------------------- System Module -------------------------------
+- module: system
+  metricsets:
+    # CPU stats
+    - cpu
+
+    # System Load stats
+    - load
+
+    # Per CPU core stats
+    #- core
+
+    # IO stats
+    #- diskio
+
+    # Per filesystem stats
+    - filesystem
+
+    # File system summary stats
+    - fsstat
+
+    # Memory stats
+    - memory
+
+    # Network stats
+    - network
+
+    # Per process stats
+    - process
+  enabled: true
+  period: 10s
+  processes: ['.*']
+
+  # if true, exports the CPU usage in ticks, together with the percentage values
+  #cpu_ticks: false
+
+  # EXPERIMENTAL: cgroups can be enabled for the process metricset.
+  #cgroups: false
+
+#------------------------------- Apache Module -------------------------------
+#- module: apache
+  #metricsets: ["status"]
+  #enabled: true
+  #period: 10s
+
+  # Apache hosts
+  #hosts: ["http://127.0.0.1"]
+
+  # Path to server status. Default server-status
+  #server_status_path: "server-status"
+
+  # Username of hosts.  Empty by default
+  #username: test
+
+  # Password of hosts. Empty by default
+  #password: test123
+
+#------------------------------- docker Module -------------------------------
+#- module: docker
+  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
+  #hosts: ["unix:///var/run/docker.sock"]
+  #enabled: true
+  #period: 10s
+
+  # To connect to Docker over TLS you must specify a client and CA certificate.
+  #ssl:
+    #certificate_authority: "/etc/pki/root/ca.pem"
+    #certificate:           "/etc/pki/client/cert.pem"
+    #key:                   "/etc/pki/client/cert.key"
+
+#------------------------------- haproxy Module ------------------------------
+#- module: haproxy
+  #metricsets: ["info", "stat"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["tcp://127.0.0.1:14567"]
+
+#-------------------------------- kafka Module -------------------------------
+#- module: kafka
+  #metricsets: ["partition"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:9092"]
+
+
+#------------------------------- MongoDB Module ------------------------------
+#- module: mongodb
+  #metricsets: ["status"]
+  #enabled: true
+  #period: 10s
+
+  # The hosts must be passed as MongoDB URLs in the format:
+  # [mongodb://][user:pass@]host[:port].
+  # The username and password can also be set using the respective configuration
+  # options. The credentials in the URL take precedence over the username and
+  # password configuration options.
+  #hosts: ["localhost:27017"]
+
+  # Username to use when connecting to MongoDB. Empty by default.
+  #username: user
+
+  # Password to use when connecting to MongoDB. Empty by default.
+  #password: pass
+
+
+#-------------------------------- MySQL Module -------------------------------
+#- module: mysql
+  #metricsets: ["status"]
+  #enabled: true
+  #period: 10s
+
+  # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # The username and password can either be set in the DSN or using the username
+  # and password config options. Those specified in the DSN take precedence.
+  #hosts: ["root:secret@tcp(127.0.0.1:3306)/"]
+
+  # Username of hosts. Empty by default.
+  #username: root
+
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # By setting raw to true, all raw fields from the status metricset will be added to the event.
+  #raw: false
+
+#-------------------------------- Nginx Module -------------------------------
+#- module: nginx
+  #metricsets: ["stubstatus"]
+  #enabled: true
+  #period: 10s
+
+  # Nginx hosts
+  #hosts: ["http://127.0.0.1"]
+
+  # Path to server status. Default server-status
+  #server_status_path: "server-status"
+
+#----------------------------- PostgreSQL Module -----------------------------
+#- module: postgresql
+  #metricsets:
+    # Stats about every PostgreSQL database
+    #- database
+
+    # Stats about the background writer process's activity
+    #- bgwriter
+
+    # Stats about every PostgreSQL process
+    #- activity
+
+  #enabled: true
+  #period: 10s
+
+  # The host must be passed as PostgreSQL URL. Example:
+  # postgres://localhost:5432?sslmode=disable
+  # The available parameters are documented here:
+  # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
+  #hosts: ["postgres://localhost:5432"]
+
+  # Username to use when connecting to PostgreSQL. Empty by default.
+  #username: user
+
+  # Password to use when connecting to PostgreSQL. Empty by default.
+  #password: pass
+
+
+#-------------------------------- Redis Module -------------------------------
+#- module: redis
+  #metricsets: ["info", "keyspace"]
+  #enabled: true
+  #period: 10s
+
+  # Redis hosts
+  #hosts: ["127.0.0.1:6379"]
+
+  # Enabled defines if the module is enabled. Default: true
+  #enabled: true
+
+  # Timeout after which time a metricset should return an error
+  # Timeout is by default defined as period, as a fetch of a metricset
+  # should never take longer then period, as otherwise calls can pile up.
+  #timeout: 1s
+
+  # Optional fields to be added to each event
+  #fields:
+  #  datacenter: west
+
+  # Network type to be used for redis connection. Default: tcp
+  #network: tcp
+
+  # Max number of concurrent connections. Default: 10
+  #maxconn: 10
+
+  # Filters can be used to reduce the number of fields sent.
+  #filters:
+  #  - include_fields:
+  #      fields: ["stats"]
+
+  # Redis AUTH password. Empty by default.
+  #password: foobared
+
+#------------------------------ ZooKeeper Module -----------------------------
+#- module: zookeeper
+  #metricsets: ["mntr"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:2181"]
+
+

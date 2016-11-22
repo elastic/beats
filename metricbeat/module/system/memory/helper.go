@@ -34,8 +34,8 @@ func AddMemPercentage(m *MemStat) {
 	perc := float64(m.Mem.Used) / float64(m.Mem.Total)
 	m.UsedPercent = system.Round(perc, .5, 4)
 
-	actual_perc := float64(m.Mem.ActualUsed) / float64(m.Mem.Total)
-	m.ActualUsedPercent = system.Round(actual_perc, .5, 4)
+	actualPerc := float64(m.Mem.ActualUsed) / float64(m.Mem.Total)
+	m.ActualUsedPercent = system.Round(actualPerc, .5, 4)
 }
 
 type SwapStat struct {

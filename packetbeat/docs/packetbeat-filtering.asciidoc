@@ -43,18 +43,6 @@ The filtered event would look something like this:
 
 If you would like to drop all the successful transactions, you can use the following configuration:
 
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
-
-[source,yaml]
-------------
-filters:
- - drop_event:
-     equals:
-       http.response.code: 200
------------
-
-added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
-
 [source,yaml]
 ------------
 processors:
@@ -66,19 +54,6 @@ processors:
 
 
 If you don't want to export raw data for the successful transactions:
-
-deprecated[5.0.0-alpha4,The `filters` section is being renamed to `processors` in 5.0.0-alpha5. Therefore the following configuration is deprecated]
-
-[source,yaml]
-------------
-filters:
- - drop_fields:
-     equals:
-       http.response.code: 200
-     fields: ["request", "response"]
-------------
-
-added[5.0.0-alpha5,Begin using the following configuration starting with 5.0.0-alpha5]
 
 [source,yaml]
 ------------

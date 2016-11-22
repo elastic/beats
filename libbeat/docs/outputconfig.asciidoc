@@ -54,6 +54,10 @@ output.elasticsearch:
 
 ------------------------------------------------------------------------------
 
+==== Compatibility
+
+This output works with all compatible versions of Elasticsearch. See "Supported Beats Versions" in the https://www.elastic.co/support/matrix#show_compatibility[Elastic Support Matrix].
+
 ==== Elasticsearch Output Options
 
 You can specify the following options in the `elasticsearch` section of the +{beatname_lc}.yml+ config file:
@@ -94,6 +98,8 @@ In the previous example, the Elasticsearch nodes are available at `https://10.45
 The gzip compression level. Setting this value to 0 disables compression.
 The compression level must be in the range of 1 (best speed) to 9 (best compression).
 
+Increasing the compression level will reduce the network usage but will increase the cpu usage.
+
 The default value is 0.
 
 ===== worker
@@ -101,10 +107,6 @@ The default value is 0.
 The number of workers per configured host publishing events to Elasticsearch. This
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
 3 workers, in total 6 workers are started (3 for each host).
-
-===== port
-
-The default port of the Elasticsearch server if the port number is missing in <<hosts-option>> URL. The default port number is 9200.
 
 ===== username
 
@@ -144,9 +146,85 @@ for more information about the environment variables.
 
 ===== index
 
-The index root name to write events to. The default is the Beat name.
-For example "{beatname_lc}" generates "[{beatname_lc}-]YYYY.MM.DD" indexes (for example,
-"{beatname_lc}-2015.04.26").
+The index name to write events to. The default is "{beatname_lc}-%{+yyyy.MM.dd}" (for example, "{beatname_lc}-2015.04.26").
+
+===== indices
+
+Array of index selector rules supporting conditionals, format string
+based field access and name mappings. The first rule matching will be used to
+set the `index` for the event to be published. If `indices` is missing or no
+rule matches, the `index` field will be used.
+
+Rule settings:
+
+*`index`*: The index format string to use. If the fields used are missing, the rule fails.
+
+*`mapping`*: Dictionary mapping index names to new names
+
+*`default`*: Default string value if `mapping` does not find a match.
+
+*`when`*: Condition which must succeed in order to execute the current rule.
+
+Examples elasticsearch output with `indices`:
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  index: "logs-%{+yyyy.MM.dd}"
+  indices:
+    - index: "critical-%{+yyyy.MM.dd}"
+      when.contains:
+        message: "CRITICAL"
+    - index: "error-%{+yyyy.MM.dd}"
+      when.contains:
+        message: "ERR"
+------------------------------------------------------------------------------
+
+===== pipeline
+
+A format string value that specifies the ingest node pipeline to write events to.
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  pipeline: my_pipeline_id
+------------------------------------------------------------------------------
+
+For more information, see <<configuring-ingest-node>>.
+
+===== pipelines
+
+Similar to the `indices` array, this is an array of pipeline selector
+configurations supporting conditionals, format string based field access
+and name mappings. The first rule matching will be used to set the
+`pipeline` for the event to be published. If `pipelines` is missing or
+no rule matches, the `pipeline` field will be used.
+
+Example elasticsearch output with `pipelines`:
+
+["source","yaml"]
+------------------------------------------------------------------------------
+filebeat.prospectors:
+- paths: ["/var/log/app/normal/*.log"]
+  fields:
+    type: "normal"
+- paths: ["/var/log/app/critical/*.log"]
+  fields:
+    type: "critical"
+
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  index: "filebeat-%{+yyyy.MM.dd}"
+  pipelines:
+    - pipeline: critical_pipeline
+      when.equals:
+        type: "critical"
+    - pipeline: normal_pipeline
+      when.equals:
+        type: "normal"
+------------------------------------------------------------------------------
 
 ===== template
 
@@ -341,6 +419,10 @@ output.logstash:
   index: {beatname_lc}
 ------------------------------------------------------------------------------
 
+==== Compatibility
+
+This output works with all compatible versions of Logstash. See "Supported Beats Versions" in the https://www.elastic.co/support/matrix#show_compatibility[Elastic Support Matrix].
+
 ==== Logstash Output Options
 
 You can specify the following options in the `logstash` section of the
@@ -364,6 +446,8 @@ is used as the default port number.
 
 The gzip compression level. Setting this value to 0 disables compression.
 The compression level must be in the range of 1 (best speed) to 9 (best compression).
+
+Increasing the compression level will reduce the network usage but will increase the cpu usage.
 
 The default value is 3.
 
@@ -398,6 +482,8 @@ configured. The default value is 0.
 
 [[port]]
 ===== port
+
+deprecated[5.0.0]
 
 The default port to use if the port number is not given in <<hosts>>. The default port number
 is 10200.
@@ -479,6 +565,30 @@ spooler size.
 
 The Kafka output sends the events to Apache Kafka.
 
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.kafka:
+  # initial brokers for reading cluster metadata
+  hosts: ["kafka1:9092", "kafka2:9092", "kafka3:9092"]
+
+  # message topic selection + partitioning
+  topic: '%{[type]}'
+  partition.round_robin:
+    reachable_only: false
+
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000
+------------------------------------------------------------------------------
+
+NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be dropped. To avoid this problem, make sure {beatname_uc} does not generate events bigger than <<kafka-max_message_bytes,`max_message_bytes`>>.
+
+==== Compatibility
+
+This output works with Kafka 0.8, 0.9, and 0.10.
+
 ==== Kafka Output Options
 
 You can specify the following options in the `kafka` section of the +{beatname_lc}.yml+ config file:
@@ -517,6 +627,54 @@ The password for connecting to Kafka.
 
 The Kafka topic used for produced events. The setting can be a format string
 using any event field. To set the topic from document type use `%{[type]}`.
+
+===== topics
+
+Array of topic selector rules supporting conditionals, format string
+based field access and name mappings. The first rule matching will be used to
+set the `topic` for the event to be published. If `topics` is missing or no
+rule matches, the `topic` field will be used.
+
+Rule settings:
+
+*`topic`*: The topic format string to use. If the fields used are missing, the
+ rule fails.
+
+*`mapping`*: Dictionary mapping index names to new names
+
+*`default`*: Default string value if `mapping` does not find a match.
+
+*`when`*: Condition which must succeed in order to execute the current rule.
+
+===== key
+
+Optional Kafka event key. If configured, the event key must be unique and can be extracted from the event using a format string.
+
+===== partition
+
+Kafka output broker event partitioning strategy. Must be one of `random`,
+`round_robin`, or `hash`. By default the `hash` partitioner is used.
+
+*`random.group_events`*: Sets the number of events to be published to the same
+ partition, before the partitioner selects a new partition by random. The
+ default value is 1 meaning after each event a new parition is picked randomly.
+
+*`round_robin.group_events`*: Sets the number of events to be published to the
+ same partition, before the partitioner selects the next partition. The default
+ value is 1 meaning after each event the next partition will be selected.
+
+*`hash.hash`*: List of fields used to compute the partitioning hash value from.
+ If no field is configured, the events `key` value will be used.
+
+*`hash.random`*: Randomly distribute events if no hash or key value can be computed.
+
+All partitioners will try to publish events to all partitions by default. If a
+partition's leader becomes unreachable for the beat, the output might block. All
+partitioners support setting `reachable_only` to overwrite this
+behavior. If `reachable_only` is set to `true`, events will be published to
+available partitions only.
+
+NOTE: Publishing to a subset of available partitions potentially increases resource usage because events may become unevenly distributed.
 
 ===== client_id
 
@@ -573,6 +731,7 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 
 Sets the output compression codec. Must be one of `none`, `snappy` and `gzip`. The default is `gzip`.
 
+[[kafka-max_message_bytes]]
 ===== max_message_bytes
 
 The maximum permitted size of JSON-encoded messages. Bigger messages will be dropped. The default value is 1000000 (bytes). This value should be equal to or less than the broker's `message.max.bytes`.
@@ -611,6 +770,10 @@ output.redis:
   timeout: 5
 ------------------------------------------------------------------------------
 
+==== Compatibility
+
+This output works with Redis 3.2.4.
+
 ==== Redis Output Options
 
 You can specify the following options in the `redis` section of the +{beatname_lc}.yml+ config file:
@@ -632,11 +795,13 @@ don't specify a port number, the value configured by `port` is used.
 
 ===== port
 
+deprecated[5.0.0]
+
 The Redis port to use if `hosts` does not contain a port number. The default is 6379.
 
 ===== index
 
-deprecated[5.0.0-alpha5,The `index` setting is renamed to `key.]
+deprecated[5.0.0,The `index` setting is renamed to `key`]
 
 The name of the Redis list or channel the events are published to. The default is
 "{beatname_lc}".
@@ -645,6 +810,57 @@ The name of the Redis list or channel the events are published to. The default i
 
 The name of the Redis list or channel the events are published to. The default is
 "{beatname_lc}".
+
+The redis key can be set dynamically using a format string accessing any
+fields in the event to be published.
+
+This configuration will use the `fields.list` field to set the redis list key. If
+`fields.list` is missing, `fallback` will be used.
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.redis:
+  hosts: ["localhost"]
+  key: "%{[fields.list]:fallback}"
+------------------------------------------------------------------------------
+
+===== keys
+
+Array of key selector configurations supporting conditionals, format string
+based field access and name mappings. The first rule matching will be used to
+set the `key` for the event to be published. If `keys` is missing or no
+rule matches, the `key` field will be used.
+
+Rule settings:
+
+*`key`*: The key format string. If the fields used in the format string are missing, the rule fails.
+
+*`mapping`*: Dictionary mapping key values to new names
+
+*`default`*: Default string value if `mapping` does not find a match.
+
+*`when`*: Condition which must succeed in order to execute the current rule.
+
+Example `keys` settings:
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.redis:
+  hosts: ["localhost"]
+  key: "default_list"
+  keys:
+    - key: "info_list"   # send to info_list if `message` field contains INFO
+      when.contains:
+        message: "INFO"
+    - key: "debug_list"  # send to debug_list if `message` field contains DEBUG
+      when.contains:
+        message: "DEBUG"
+    - key: "%{[type]}"
+      mapping:
+        "http": "frontend_list"
+        "nginx": "frontend_list"
+        "mysql": "backend_list"
+------------------------------------------------------------------------------
 
 ===== password
 
@@ -656,8 +872,10 @@ The Redis database number where the events are published. The default is 0.
 
 ===== datatype
 
-The Redis data type to use for publishing events. If the data type is `list`, the
-Redis RPUSH command is used. If the data type is `channel`, the Redis `PUBLISH` command is used.
+The Redis data type to use for publishing events.If the data type is `list`, the
+Redis RPUSH command is used and all events are added to the list with the key defined under `key`.
+If the data type `channel` is used, the Redis `PUBLISH` command is used and means that all events
+are pushed to the pub/sub mechanism of Redis. The name of the channel is the one defined under `key`.
 The default value is `list`.
 
 ===== host_topology

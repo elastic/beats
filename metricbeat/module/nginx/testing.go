@@ -1,9 +1,8 @@
-/*
-
-Helper functions for testing used in the nginx metricsets
-
-*/
 package nginx
+
+/*
+Helper functions for testing used in the nginx metricsets
+*/
 
 import (
 	"os"

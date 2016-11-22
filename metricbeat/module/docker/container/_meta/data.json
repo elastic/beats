@@ -1,0 +1,35 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "docker": {
+        "container": {
+            "command": "bash",
+            "created": "2016-11-21T12:39:48.000Z",
+            "id": "4be260de8fc1212c9ff58789b8221e70c53f5af5d5a3915ff7de4b81b357d851",
+            "image": "environments_beat",
+            "labels": {
+                "com_docker_compose_container-number": "1",
+                "com_docker_compose_oneoff": "True",
+                "com_docker_compose_project": "environments",
+                "com_docker_compose_service": "beat",
+                "com_docker_compose_version": "1.9.0-rc4"
+            },
+            "name": "environments_beat_run_1",
+            "size": {
+                "root_fs": 0,
+                "rw": 0
+            },
+            "status": "Up 15 minutes"
+        }
+    },
+    "metricset": {
+        "host": "/var/run/docker.sock",
+        "module": "docker",
+        "name": "container",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

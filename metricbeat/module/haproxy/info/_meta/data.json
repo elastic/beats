@@ -1,59 +1,100 @@
 {
-    "@timestamp": "2016-08-13T19:44:21.036Z",
-    "beat": {
-        "hostname": "beathost",
-        "name": "beathost"
-    },
+    "@timestamp": "2016-05-23T08:05:34.853Z",
     "haproxy": {
         "info": {
-            "compress_bps_in": 0,
-            "compress_bps_out": 0,
-            "compress_bps_rate_limit": 0,
-            "conn_rate": 0,
-            "conn_rate_limit": 0,
-            "cum_conns": 67,
-            "cum_req": 67,
-            "cum_ssl_conns": 0,
-            "curr_conns": 0,
-            "curr_ssl_conns": 0,
-            "hard_max_conn": 4000,
-            "idle_pct": 100,
-            "max_conn": 4000,
-            "max_conn_rate": 5,
-            "max_pipes": 0,
-            "max_sess_rate": 5,
-            "max_sock": 8033,
-            "max_ssl_conns": 0,
-            "max_ssl_rate": 0,
-            "max_zlib_mem_usage": 0,
-            "mem_max_mb": 0,
-            "nb_proc": 1,
-            "pid": 53858,
-            "pipes_free": 0,
-            "pipes_used": 0,
+            "compress": {
+                "bps": {
+                    "in": 0,
+                    "out": 0,
+                    "rate_limit": 0
+                }
+            },
+            "connection": {
+                "current": 0,
+                "hard_max": 4000,
+                "max": 4000,
+                "rate": {
+                    "limit": 0,
+                    "max": 0,
+                    "value": 0
+                },
+                "ssl": {
+                    "current": 0,
+                    "max": 0,
+                    "total": 0
+                },
+                "total": 15
+            },
+            "idle": {
+                "pct": 1
+            },
+            "memory": {
+                "max": {
+                    "bytes": 0
+                }
+            },
+            "pid": 8,
+            "pipes": {
+                "free": 0,
+                "max": 0,
+                "used": 0
+            },
             "process_num": 1,
-            "run_queue": 2,
-            "sess_rate": 0,
-            "sess_rate_limit": 0,
-            "ssl_babckend_key_rate": 0,
-            "ssl_backend_max_key_rate": 0,
-            "ssl_cache_misses": 0,
-            "ssl_cached_lookups": 0,
-            "ssl_frontend_key_rate": 0,
-            "ssl_frontend_max_key_rate": 0,
-            "ssl_frontend_session_reuse_pct": 0,
-            "ssl_rate": 0,
-            "ssl_rate_limit": 0,
-            "tasks": 7,
-            "ulimit_n": 8033,
-            "uptime_sec": 13700,
-            "zlib_mem_usage": 0
+            "processes": 1,
+            "requests": {
+                "total": 15
+            },
+            "run_queue": 1,
+            "session": {
+                "rate": {
+                    "limit": 0,
+                    "max": 0,
+                    "value": 0
+                }
+            },
+            "sockets": {
+                "max": 8032
+            },
+            "ssl": {
+                "backend": {
+                    "key_rate": {
+                        "max": 0,
+                        "value": 0
+                    }
+                },
+                "cache_misses": 0,
+                "cached_lookups": 0,
+                "frontend": {
+                    "key_rate": {
+                        "max": 0,
+                        "value": 0
+                    },
+                    "session_reuse": {
+                        "pct": 0
+                    }
+                },
+                "rate": {
+                    "limit": 0,
+                    "max": 0,
+                    "value": 0
+                }
+            },
+            "tasks": 5,
+            "ulimit_n": 8032,
+            "uptime": {
+                "sec": 733
+            },
+            "zlib_mem_usage": {
+                "max": 0,
+                "value": 0
+            }
         }
     },
     "metricset": {
+        "host": "localhost",
         "module": "haproxy",
         "name": "info",
-        "rtt": 707
+        "rtt": 115
     },
     "type": "metricsets"
 }

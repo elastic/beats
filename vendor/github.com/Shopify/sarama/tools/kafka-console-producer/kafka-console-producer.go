@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/Shopify/sarama"
+	"github.com/rcrowley/go-metrics"
 )
 
 var (
@@ -19,6 +20,7 @@ var (
 	partitioner = flag.String("partitioner", "", "The partitioning scheme to use. Can be `hash`, `manual`, or `random`")
 	partition   = flag.Int("partition", -1, "The partition to produce to.")
 	verbose     = flag.Bool("verbose", false, "Turn on sarama logging to stderr")
+	showMetrics = flag.Bool("metrics", false, "Output metrics on successful publish to stderr")
 	silent      = flag.Bool("silent", false, "Turn off printing the message's topic, partition, and offset to stdout")
 
 	logger = log.New(os.Stderr, "", log.LstdFlags)
@@ -95,6 +97,9 @@ func main() {
 		printErrorAndExit(69, "Failed to produce message: %s", err)
 	} else if !*silent {
 		fmt.Printf("topic=%s\tpartition=%d\toffset=%d\n", *topic, partition, offset)
+	}
+	if *showMetrics {
+		metrics.WriteOnce(config.MetricRegistry, os.Stderr)
 	}
 }
 

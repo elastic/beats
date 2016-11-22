@@ -6,23 +6,48 @@ import (
 	"testing"
 	"time"
 
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateDSN(t *testing.T) {
-	hostname := "tcp(127.0.0.1:3306)/"
-	username := "root"
-	password := "test"
+func TestParseDSN(t *testing.T) {
+	const query = "?readTimeout=10s&timeout=10s&writeTimeout=10s"
 
-	dsn, _ := CreateDSN(hostname, username, password, 0)
-	assert.Equal(t, "root:test@tcp(127.0.0.1:3306)/", dsn)
+	var tests = []struct {
+		host     string
+		username string
+		password string
+		uri      string
+	}{
+		{"", "", "", "tcp(127.0.0.1:3306)/" + query},
+		{"", "root", "secret", "root:secret@tcp(127.0.0.1:3306)/" + query},
+		{"unix(/tmp/mysql.sock)/", "root", "", "root@unix(/tmp/mysql.sock)/" + query},
+		{"tcp(127.0.0.1:3306)/", "", "", "tcp(127.0.0.1:3306)/" + query},
+		{"tcp(127.0.0.1:3306)/", "root", "", "root@tcp(127.0.0.1:3306)/" + query},
+		{"tcp(127.0.0.1:3306)/", "root", "secret", "root:secret@tcp(127.0.0.1:3306)/" + query},
+	}
 
-	dsn, _ = CreateDSN(hostname, username, "", 0)
-	assert.Equal(t, "root@tcp(127.0.0.1:3306)/", dsn)
+	for _, test := range tests {
+		c := map[string]interface{}{
+			"username": test.username,
+			"password": test.password,
+		}
+		mod := mbtest.NewTestModule(t, c)
+		mod.ModConfig.Timeout = 10 * time.Second
 
-	dsn, _ = CreateDSN(hostname, "", "", 0)
-	assert.Equal(t, "tcp(127.0.0.1:3306)/", dsn)
+		hostData, err := ParseDSN(mod, test.host)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
 
-	dsn, _ = CreateDSN(hostname, "", "", time.Second)
-	assert.Equal(t, "tcp(127.0.0.1:3306)/?readTimeout=1s&timeout=1s&writeTimeout=1s", dsn)
+		assert.Equal(t, test.uri, hostData.URI)
+		if test.username != "" {
+			assert.NotContains(t, hostData.SanitizedURI, test.username)
+		}
+		if test.password != "" {
+			assert.NotContains(t, hostData.SanitizedURI, test.password)
+		}
+	}
 }

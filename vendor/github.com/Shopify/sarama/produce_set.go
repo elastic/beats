@@ -53,8 +53,12 @@ func (ps *produceSet) add(msg *ProducerMessage) error {
 
 	set.msgs = append(set.msgs, msg)
 	msgToSend := &Message{Codec: CompressionNone, Key: key, Value: val}
-	if ps.parent.conf.Version.IsAtLeast(V0_10_0_0) && !msg.Timestamp.IsZero() {
-		msgToSend.Timestamp = msg.Timestamp
+	if ps.parent.conf.Version.IsAtLeast(V0_10_0_0) {
+		if msg.Timestamp.IsZero() {
+			msgToSend.Timestamp = time.Now()
+		} else {
+			msgToSend.Timestamp = msg.Timestamp
+		}
 		msgToSend.Version = 1
 	}
 	set.setToSend.addMessage(msgToSend)
@@ -90,11 +94,16 @@ func (ps *produceSet) buildRequest() *ProduceRequest {
 					Logger.Println(err) // if this happens, it's basically our fault.
 					panic(err)
 				}
-				req.AddMessage(topic, partition, &Message{
+				compMsg := &Message{
 					Codec: ps.parent.conf.Producer.Compression,
 					Key:   nil,
 					Value: payload,
-				})
+				}
+				if ps.parent.conf.Version.IsAtLeast(V0_10_0_0) {
+					compMsg.Version = 1
+					compMsg.Timestamp = set.setToSend.Messages[0].Msg.Timestamp
+				}
+				req.AddMessage(topic, partition, compMsg)
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 package mapstriface
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -16,7 +17,9 @@ func TestConversions(t *testing.T) {
 		"testString":       "hello",
 		"testInt":          42,
 		"testIntFromFloat": 42.0,
+		"testIntFromInt32": int32(32),
 		"testIntFromInt64": int64(42),
+		"testJsonNumber":   json.Number("3910564293633576924"),
 		"testBool":         true,
 		"testObj": map[string]interface{}{
 			"testObjString": "hello, object",
@@ -32,12 +35,15 @@ func TestConversions(t *testing.T) {
 	}
 
 	schema := s.Schema{
-		"test_string":         Str("testString"),
-		"test_int":            Int("testInt"),
-		"test_int_from_float": Int("testIntFromFloat"),
-		"test_int_from_int64": Int("testIntFromInt64"),
-		"test_bool":           Bool("testBool"),
-		"test_time":           Time("testTime"),
+		"test_string":               Str("testString"),
+		"test_int":                  Int("testInt"),
+		"test_int_from_float":       Int("testIntFromFloat"),
+		"test_int_from_int64":       Int("testIntFromInt64"),
+		"test_int_from_json":        Int("testJsonNumber"),
+		"test_string_from_num":      StrFromNum("testIntFromInt32"),
+		"test_string_from_json_num": StrFromNum("testJsonNumber"),
+		"test_bool":                 Bool("testBool"),
+		"test_time":                 Time("testTime"),
 		"test_obj_1": s.Object{
 			"test": Str("testNonNestedObj"),
 		},
@@ -51,12 +57,15 @@ func TestConversions(t *testing.T) {
 	}
 
 	expected := common.MapStr{
-		"test_string":         "hello",
-		"test_int":            int64(42),
-		"test_int_from_float": int64(42),
-		"test_int_from_int64": int64(42),
-		"test_bool":           true,
-		"test_time":           common.Time(ts),
+		"test_string":               "hello",
+		"test_int":                  int64(42),
+		"test_int_from_float":       int64(42),
+		"test_int_from_int64":       int64(42),
+		"test_int_from_json":        int64(3910564293633576924),
+		"test_string_from_num":      "32",
+		"test_string_from_json_num": "3910564293633576924",
+		"test_bool":                 true,
+		"test_time":                 common.Time(ts),
 		"test_obj_1": common.MapStr{
 			"test": "hello from top level",
 		},

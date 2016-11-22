@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var test_msg = []byte{
+var testMsg = []byte{
 	0x80, 0x00, 0x00, 0xe0,
 	0xb5, 0x49, 0x21, 0xab,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
@@ -17,12 +17,12 @@ var test_msg = []byte{
 }
 
 func TestXdrDecoding(t *testing.T) {
-	xdr := Xdr{data: test_msg, offset: 0}
+	xdr := makeXDR(testMsg)
 
 	assert.Equal(t, uint32(0x800000e0), uint32(xdr.getUInt()))
 	assert.Equal(t, uint32(0xb54921ab), uint32(xdr.getUInt()))
 	assert.Equal(t, uint64(2), uint64(xdr.getUHyper()))
 	assert.Equal(t, uint32(4), uint32(xdr.getUInt()))
 	assert.Equal(t, "test string", xdr.getString())
-	assert.Equal(t, len(test_msg), xdr.size())
+	assert.Equal(t, len(testMsg), xdr.size())
 }

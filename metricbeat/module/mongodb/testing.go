@@ -2,7 +2,7 @@ package mongodb
 
 import "os"
 
-// Helper functions for testing used in the mongodb metricsets
+// Helper functions for testing mongodb metricsets.
 
 // GetEnvHost returns the hostname of the Mongodb server to use for testing.
 // It reads the value from the MONGODB_HOST environment variable and returns

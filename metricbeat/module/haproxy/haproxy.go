@@ -10,9 +10,14 @@ import (
 	"net"
 	"strings"
 
+	"github.com/elastic/beats/metricbeat/mb/parse"
+
 	"github.com/gocarina/gocsv"
 	"github.com/mitchellh/mapstructure"
 )
+
+// HostParser is used for parsing the configured HAProxy hosts.
+var HostParser = parse.URLHostParserBuilder{DefaultScheme: "tcp"}.Build()
 
 // Stat is an instance of the HAProxy stat information
 type Stat struct {

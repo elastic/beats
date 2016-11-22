@@ -6,7 +6,7 @@ services:
 language: go
 
 go:
-  - 1.7
+  - 1.7.1
 
 # Make sure project can also be built on travis for clones of the repo
 go_import_path: github.com/elastic/beats
@@ -18,19 +18,21 @@ os:
 env:
   matrix:
     - TARGETS="check"
-    - TARGETS="-C libbeat testsuite"
     - TARGETS="-C filebeat testsuite"
-    - TARGETS="-C packetbeat testsuite"
+    - TARGETS="-C heartbeat testsuite"
+    - TARGETS="-C libbeat testsuite"
     - TARGETS="-C metricbeat testsuite"
+    - TARGETS="-C packetbeat testsuite"
     - TARGETS="-C libbeat crosscompile"
     - TARGETS="-C metricbeat crosscompile"
     - TARGETS="-C winlogbeat crosscompile"
+    - TARGETS="-C libbeat/dashboards"
     - TARGETS="-C generate/metricbeat/metricset test"
     - TARGETS="-C generate/beat test"
   global:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
-    - DOCKER_COMPOSE_VERSION: 1.7.0
+    - DOCKER_COMPOSE_VERSION: 1.8.1
 
 matrix:
   exclude:
@@ -47,7 +49,11 @@ matrix:
     - os: osx
       env: TARGETS="-C libbeat testsuite"
     - os: osx
+      env: TARGETS="-C hearbeat testsuite"
+    - os: osx
       env: TARGETS="-C metricbeat testsuite"
+    - os: osx
+      env: TARGETS="-C libbeat/dashboards"
     - os: osx
       env: TARGETS="-C generate/metricbeat/metricset test"
     - os: osx

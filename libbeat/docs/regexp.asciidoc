@@ -12,15 +12,13 @@
 [[regexp-support]]
 == Regular Expression Support
 
-{beatname_uc} regular expression support is based on https://godoc.org/regexp/syntax[RE2]. added[5.0.0-alpha3,Support is added for previously unsupported patterns]
+{beatname_uc} regular expression support is based on https://godoc.org/regexp/syntax[RE2]. 
 
 NOTE: We recommend that you wrap regular expressions in single quotation marks to work around YAML's string escaping rules. For example, `'^\[?[0-9][0-9]:?[0-9][0-9]|^[[:graph:]]+'`.
 
 For more examples of supported regexp patterns, see {filebeat}/multiline-examples.html[Managing Multiline Messages].
 Although the examples pertain to Filebeat, the regexp patterns are applicable to other use cases.
 
-[float]
-=== Supported Patterns
 The following patterns are supported:
 
 * <<single-characters, Single Characters>>
@@ -115,51 +113,6 @@ The following patterns are supported:
 |`\S`             |not whitespace (same as `[^\t\n\f\r ]`)
 |`\w`             |word characters (same as `[0-9A-Za-z_]`)
 |`\W`             |not word characters (same as `[^0-9A-Za-z_]`)
-|=======================
-
-
-[[unsupported-regexp-patterns]]
-[float]
-=== Unsupported Patterns
-
-deprecated[5.0.0-alpha3,The following patterns are supported starting in 5.0.0-alpha3]
-
-The following patterns are not supported.
-
-[options="header"]
-|=======================
-|Pattern           |Description
-|*Unsupported Single Characters* 1+|  
-|`\d`              |Perl character class
-|`\D`              |negated Perl character class
-|`\pN`             |Unicode character class (one-letter name)
-|`\p{Greek}`       |Unicode character class
-|`\PN`             |negated Unicode character class (one-letter name)
-|`\P{Greek}`       |negated Unicode character class
-|*Unsupported Grouping*      1+|
-|`(?P<name>re)`    |named & numbered capturing group (submatch)
-|`(?:re)`          |non-capturing group
-|`(?i)abc`         |set flags within current group, non-capturing
-|`(?i:re)`         |set flags during re, non-capturing
-|`(?i)PaTTeRN`     |case-insensitive (default false)
-|`(?m)multiline`   |multi-line mode: `^` and `$` match begin/end line in addition to begin/end text (default false)
-|`(?s)pattern.`    |let `.` match `\n` (default false)
-|`(?U)x*abc`      |ungreedy: swap meaning of `x*` and `x*?`, `x+` and `x+?`, etc (default false)
-|*Unsupported Empty Strings* 1+|
-|`\A`              |at beginning of text
-|`\b`              |at ASCII word boundary (`\w` on one side and `\W`, `\A`, or `\z` on the other)
-|`\B`              |not at ASCII word boundary
-|`\z`              |at end of text
-|*Unsupported Escape Sequences* 1+|
-|`\C`              |match a single byte even in UTF-8 mode
-|`\Q...\E`         |literal text `...` even if `...` has punctuation
-|*Unsupported Perl Character Classes*  1+|
-|`\d`              |digits (same as `[0-9]`)
-|`\D`              |not digits (same as `[^0-9]`)
-|`\s`              |whitespace (same as `[\t\n\f\r ]`)
-|`\S`              |not whitespace (same as `[^\t\n\f\r ]`)
-|`\w`              |word characters (same as `[0-9A-Za-z_]`)
-|`\W`              |not word characters (same as `[^0-9A-Za-z_]`)
 |=======================
 
 

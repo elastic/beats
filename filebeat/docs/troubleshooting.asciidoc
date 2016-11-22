@@ -4,58 +4,18 @@
 [partintro]
 --
 If you have issues installing or running Filebeat, read the
-following tips.
+following tips:
+
+* <<getting-help>>
+* <<enable-filebeat-debugging>>
+* <<faq>>
 
 --
 
+[[getting-help]]
 == Getting Help
 
 include::../../libbeat/docs/getting-help.asciidoc[]
-
-
-== Reduce open file handlers
-
-Filebeat keeps the file handler open in case it reaches the end of a file to read new log lines in near real time. If filebeat is harvesting a large number of files, the number of open files can be become an issue. In most environments, the number of files which are actively updated is low. The configuration `close_inactive` should be set accordingly to close files which are not active any more.
-
-There are 4 more configuration options which can be used to close file handlers, but all of them should be used carefully as they can side affects. The options are:
-
-* close_renamed
-* close_removed
-* close_eof
-* close_timeout
-
-`close_renamed` and `close_removed` can be useful on Windows and issues related to file rotation, see <<windows-file-rotation>>. `close_eof` can be useful in environments with a large number of files with only very few entries. `close_timeout` in environments where it is more important to close file handlers then to send all log lines. More details can be found in config options, see <<configuration-filebeat-options>>.
-
-Before using any of these variables, make sure to study the documentation on each.
-
-
-[[reduce-registry-size]]
-== Reduce Registry File Size
-
-Filebeat keeps all states of the files and persists the states on disk in the `registry_file`. The states are used to continue file reading at a previous position in case filebeat is restarted. In case every day a large amount of new files is constantly produced, the registry file grows over time. To reduce the size of the registry file, there are two configuration variables: `clean_removed` and `close_inactive`.
-
-In case old files are not touched anymore and fall under `ignore_older`, it is recommended to use `clean_inactive`. If on the other size old files get removed from disk `clean_removed` can be used.
-
-[[inode-reuse-issue]]
-== Inode Reuse Issue
-
-Filebeat uses under linux inode and device to identify files. In case a file is removed from disk, the inode can again be assigned to a new file. In the case of file rotation where and old file is removed and a new one is directly created afterwards, it can happen that the new files has the exact same inode. In this case, Filebeat assumes that the new file is the same as the old and tries to continue reading at the old position which is not correct.
-
-By default states are never removed from the registry file. In case of inode reuse issue it is recommended to use the `clean_*` options, especially `clean_inactive`. In case your files get rotated every 24 hours and the rotated files rotated files are not updated anymore, `ignore_older` could be set to 48 hours and `clean_inactive` 72 hours.
-
-`clean_removed` can be used for files that are removed from disk. Be aware that `clean_removed` also applies if during one scan a file cannot be found anymore. In case the file shows up at a later stage again, it will be sent again from scratch.
-
-[[windows-file-rotation]]
-== Windows File Rotation
-
-Under Windows it can happen, that files cannot be renamed / removed as long as filebeat keeps the file handler open. This can lead to issues with the file rotating system. To reduce this issue, the options `close_removed` and `close_renamed` can be used together.
-
-It is important to understand, that these two options mean files are closed before the harvester finished reading the file. In case the file cannot be picked up again by the prospector and the harvester didn't finish reading the file, the missing lines will never be sent to elasticsearch.
-
-
-
-
-
 
 [[enable-filebeat-debugging]]
 == Debugging

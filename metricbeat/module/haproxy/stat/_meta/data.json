@@ -1,61 +1,72 @@
 {
-    "@timestamp": "2016-08-13T19:44:21.036Z",
-    "beat": {
-        "hostname": "beathost",
-        "name": "beathost"
-    },
+    "@timestamp": "2016-05-23T08:05:34.853Z",
     "haproxy": {
         "stat": {
-            "act": 1,
-            "bck": 0,
-            "bin": 0,
-            "bout": 0,
-            "check_duration": 0,
-            "check_status": "L4CON",
-            "chkdown": 1,
-            "chkfail": 1,
-            "cli_abrt": 0,
-            "ctime": 0,
-            "downtime": 13700,
-            "dresp": 0,
-            "econ": 0,
-            "eresp": 0,
-            "hanafail": 0,
-            "hrsp_1xx": 0,
-            "hrsp_2xx": 0,
-            "hrsp_3xx": 0,
-            "hrsp_4xx": 0,
-            "hrsp_5xx": 0,
-            "hrsp_other": 0,
-            "iid": 3,
-            "last_chk": "Connection refused",
-            "lastchg": 13700,
-            "lastsess": -1,
-            "lbtot": 0,
-            "pid": 1,
-            "qcur": 0,
-            "qmax": 0,
-            "qtime": 0,
-            "rate": 0,
-            "rate_max": 0,
-            "rtime": 0,
-            "scur": 0,
-            "sid": 1,
-            "smax": 0,
-            "srv_abrt": 0,
-            "status": "DOWN",
-            "stot": 0,
-            "svname": "log1",
-            "ttime": 0,
-            "weight": 1,
-            "wredis": 0,
-            "wretr": 0
+            "check": {
+                "agent.last": "",
+                "health.last": "",
+                "status": ""
+            },
+            "component_type": 0,
+            "compressor": {
+                "bypassed.bytes": 0,
+                "in.bytes": 0,
+                "out.bytes": 0,
+                "response.bytes": 0
+            },
+            "connection": {
+                "total": 0
+            },
+            "in.bytes": 0,
+            "out.bytes": 0,
+            "process_id": 1,
+            "proxy": {
+                "id": 2,
+                "name": "http-webservices"
+            },
+            "queue": {},
+            "request": {
+                "denied": 0,
+                "errors": 0,
+                "rate": {
+                    "max": 0,
+                    "value": 0
+                },
+                "total": 0
+            },
+            "response": {
+                "denied": 0,
+                "http": {
+                    "1xx": 0,
+                    "2xx": 0,
+                    "3xx": 0,
+                    "4xx": 0,
+                    "5xx": 0,
+                    "other": 0
+                }
+            },
+            "server": {
+                "id": 0
+            },
+            "service_name": "FRONTEND",
+            "session": {
+                "current": 0,
+                "limit": 25000,
+                "max": 0,
+                "rate": {
+                    "limit": 0,
+                    "max": 0,
+                    "value": 0
+                }
+            },
+            "status": "OPEN"
         }
     },
     "metricset": {
+        "host": "localhost",
         "module": "haproxy",
         "name": "stat",
-        "rtt": 2118
+        "rtt": 115
     },
     "type": "metricsets"
 }

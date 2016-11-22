@@ -17,9 +17,6 @@ import (
 )
 
 const (
-	// defaultMaxNumRead is the maximum number of event Read will return.
-	defaultMaxNumRead = 100
-
 	// renderBufferSize is the size in bytes of the buffer used to render events.
 	renderBufferSize = 1 << 14
 
@@ -28,15 +25,21 @@ const (
 	winEventLogAPIName = "wineventlog"
 )
 
-var winEventLogConfigKeys = append(commonConfigKeys, "ignore_older", "include_xml",
-	"event_id", "forwarded", "level", "provider")
+var winEventLogConfigKeys = append(commonConfigKeys, "batch_read_size",
+	"ignore_older", "include_xml", "event_id", "forwarded", "level", "provider")
 
 type winEventLogConfig struct {
-	ConfigCommon `config:",inline"`
-	IncludeXML   bool                   `config:"include_xml"`
-	Forwarded    *bool                  `config:"forwarded"`
-	SimpleQuery  query                  `config:",inline"`
-	Raw          map[string]interface{} `config:",inline"`
+	ConfigCommon  `config:",inline"`
+	BatchReadSize int                    `config:"batch_read_size"` // Maximum number of events that Read will return.
+	IncludeXML    bool                   `config:"include_xml"`
+	Forwarded     *bool                  `config:"forwarded"`
+	SimpleQuery   query                  `config:",inline"`
+	Raw           map[string]interface{} `config:",inline"`
+}
+
+// defaultWinEventLogConfig is the default configuration for new wineventlog readers.
+var defaultWinEventLogConfig = winEventLogConfig{
+	BatchReadSize: 100,
 }
 
 // query contains parameters used to customize the event log data that is
@@ -121,7 +124,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 		return nil, nil
 	}
 	if err != nil {
-		logp.Warn("%s EventHandles returned error %v Errno: %d", l.logPrefix, err)
+		logp.Warn("%s EventHandles returned error %v", l.logPrefix, err)
 		return nil, err
 	}
 	defer func() {
@@ -218,7 +221,7 @@ func reportDrop(reason interface{}) {
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
 func newWinEventLog(options map[string]interface{}) (EventLog, error) {
-	var c winEventLogConfig
+	c := defaultWinEventLogConfig
 	if err := readConfig(options, &c, winEventLogConfigKeys); err != nil {
 		return nil, err
 	}
@@ -242,7 +245,7 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 			return mf
 		}
 
-		mf.Handles = []sys.FileHandle{sys.FileHandle{Handle: uintptr(h)}}
+		mf.Handles = []sys.FileHandle{{Handle: uintptr(h)}}
 		return mf
 	}
 
@@ -254,7 +257,7 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 		config:        c,
 		query:         query,
 		channelName:   c.Name,
-		maxRead:       defaultMaxNumRead,
+		maxRead:       c.BatchReadSize,
 		renderBuf:     make([]byte, renderBufferSize),
 		cache:         newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
 		logPrefix:     fmt.Sprintf("WinEventLog[%s]", c.Name),

@@ -27,24 +27,17 @@ Usage: ./import_dashboards [options]
 
 Kibana dashboards are stored in a special index in Elasticsearch together with the searches, visualizations, and indexes that they use.
 
-You can import the dashboards, visualizations, searches, and the index pattern for a single Beat (eg. Metricbeat):
-  1. from a local directory:
-	./import_dashboards -dir kibana/metricbeat
-  2. from a local zip archive containing dashboards of multiple Beats:
-	./import_dashboards -beat metricbeat -file beats-dashboards-%s.zip
-  3. from the official zip archive available under http://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip:
-	./import_dashboards -beat metricbeat
-  4. from any zip archive available online:
-    ./import_dashboards -beat metricbeat -url https://github.com/monicasarbu/metricbeat-dashboards/archive/1.1.zip
+To import the official Kibana dashboards for your Beat version into a local Elasticsearch instance, use:
 
-To import only the index-pattern for a single Beat (eg. Metricbeat) use:
-	./import_dashboards -only-index -beat metricbeat
+	./import_dashboards
 
-To import only the dashboards together with visualizations and searches for a single Beat (eg. Metricbeat) use:
-	./import_dashboards -only-dashboards -beat metricbeat
+To import the official Kibana dashboards for your Beat version into a remote Elasticsearch instance with Shield, use:
 
-Options:
-`, lbeat.GetDefaultVersion(), lbeat.GetDefaultVersion())
+	./import_dashboards -es https://xyz.found.io -user user -pass password
+
+For more details, check https://www.elastic.co/guide/en/beats/libbeat/5.0/import-dashboards.html.
+
+`)
 
 var beat string
 
@@ -55,11 +48,12 @@ type Options struct {
 	Dir            string
 	File           string
 	Beat           string
-	Url            string
+	URL            string
 	User           string
 	Pass           string
 	OnlyDashboards bool
 	OnlyIndex      bool
+	Snapshot       bool
 }
 
 type CommandLine struct {
@@ -90,12 +84,13 @@ func DefineCommandLine() (*CommandLine, error) {
 	cl.flagSet.StringVar(&cl.opt.Index, "i", "", "The Elasticsearch index name. This overwrites the index name defined in the dashboards and index pattern. Example: metricbeat-*")
 	cl.flagSet.StringVar(&cl.opt.Dir, "dir", "", "Directory containing the subdirectories: dashboard, visualization, search, index-pattern. Example: etc/kibana/")
 	cl.flagSet.StringVar(&cl.opt.File, "file", "", "Zip archive file containing the Beats dashboards. The archive contains a directory for each Beat.")
-	cl.flagSet.StringVar(&cl.opt.Url, "url",
-		fmt.Sprintf("https://download.elastic.co/beats/dashboards/beats-dashboards-%s.zip", lbeat.GetDefaultVersion()),
+	cl.flagSet.StringVar(&cl.opt.URL, "url",
+		fmt.Sprintf("https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-%s.zip", lbeat.GetDefaultVersion()),
 		"URL to the zip archive containing the Beats dashboards")
-	cl.flagSet.StringVar(&cl.opt.Beat, "beat", beat, "The Beat name, in case a zip archive is passed as input")
+	cl.flagSet.StringVar(&cl.opt.Beat, "beat", beat, "The Beat name that is used to select what dashboards to install from a zip. An empty string selects all.")
 	cl.flagSet.BoolVar(&cl.opt.OnlyDashboards, "only-dashboards", false, "Import only dashboards together with visualizations and searches. By default import both, dashboards and the index-pattern.")
 	cl.flagSet.BoolVar(&cl.opt.OnlyIndex, "only-index", false, "Import only the index-pattern. By default imports both, dashboards and the index pattern.")
+	cl.flagSet.BoolVar(&cl.opt.Snapshot, "snapshot", false, "Import dashboards from snapshot builds.")
 
 	return &cl, nil
 }
@@ -108,7 +103,7 @@ func (cl *CommandLine) ParseCommandLine() error {
 		return err
 	}
 
-	if cl.opt.Url == "" && cl.opt.File == "" && cl.opt.Dir == "" {
+	if cl.opt.URL == "" && cl.opt.File == "" && cl.opt.Dir == "" {
 		return errors.New("ERROR: Missing input. Please specify one of the options -file, -url or -dir")
 	}
 
@@ -179,7 +174,7 @@ func (imp Importer) CreateIndex() error {
 	return nil
 }
 
-func (imp Importer) ImportJsonFile(fileType string, file string) error {
+func (imp Importer) ImportJSONFile(fileType string, file string) error {
 
 	path := "/" + imp.cl.opt.KibanaIndex + "/" + fileType
 
@@ -191,7 +186,7 @@ func (imp Importer) ImportJsonFile(fileType string, file string) error {
 	json.Unmarshal(reader, &jsonContent)
 	fileBase := strings.TrimSuffix(filepath.Base(file), filepath.Ext(file))
 
-	err = imp.client.LoadJson(path+"/"+fileBase, jsonContent)
+	err = imp.client.LoadJSON(path+"/"+fileBase, jsonContent)
 	if err != nil {
 		return fmt.Errorf("fail to load %s under %s/%s: %s", file, path, fileBase, err)
 	}
@@ -204,7 +199,7 @@ func (imp Importer) ImportDashboard(file string) error {
 	fmt.Println("Import dashboard ", file)
 
 	/* load dashboard */
-	err := imp.ImportJsonFile("dashboard", file)
+	err := imp.ImportJSONFile("dashboard", file)
 	if err != nil {
 		return err
 	}
@@ -235,25 +230,25 @@ func (imp Importer) importPanelsFromDashboard(file string) (err error) {
 		PanelsJSON string `json:"panelsJSON"`
 	}
 	type panel struct {
-		Id   string `json:"id"`
+		ID   string `json:"id"`
 		Type string `json:"type"`
 	}
 
-	var json_content record
-	json.Unmarshal(reader, &json_content)
+	var jsonContent record
+	json.Unmarshal(reader, &jsonContent)
 
 	var widgets []panel
-	json.Unmarshal([]byte(json_content.PanelsJSON), &widgets)
+	json.Unmarshal([]byte(jsonContent.PanelsJSON), &widgets)
 
 	for _, widget := range widgets {
 
 		if widget.Type == "visualization" {
-			err = imp.ImportVisualization(path.Join(mainDir, "visualization", widget.Id+".json"))
+			err = imp.ImportVisualization(path.Join(mainDir, "visualization", widget.ID+".json"))
 			if err != nil {
 				return err
 			}
 		} else if widget.Type == "search" {
-			err = imp.ImportSearch(path.Join(mainDir, "search", widget.Id+".json"))
+			err = imp.ImportSearch(path.Join(mainDir, "search", widget.ID+".json"))
 			if err != nil {
 				return err
 			}
@@ -268,7 +263,7 @@ func (imp Importer) importPanelsFromDashboard(file string) (err error) {
 func (imp Importer) importSearchFromVisualization(file string) error {
 	type record struct {
 		Title         string `json:"title"`
-		SavedSearchId string `json:"savedSearchId"`
+		SavedSearchID string `json:"savedSearchId"`
 	}
 
 	reader, err := ioutil.ReadFile(file)
@@ -276,9 +271,9 @@ func (imp Importer) importSearchFromVisualization(file string) error {
 		return nil
 	}
 
-	var json_content record
-	json.Unmarshal(reader, &json_content)
-	id := json_content.SavedSearchId
+	var jsonContent record
+	json.Unmarshal(reader, &jsonContent)
+	id := jsonContent.SavedSearchID
 	if len(id) == 0 {
 		// no search used
 		return nil
@@ -304,7 +299,7 @@ func (imp Importer) importSearchFromVisualization(file string) error {
 func (imp Importer) ImportVisualization(file string) error {
 
 	fmt.Println("Import vizualization ", file)
-	if err := imp.ImportJsonFile("visualization", file); err != nil {
+	if err := imp.ImportJSONFile("visualization", file); err != nil {
 		return err
 	}
 
@@ -357,7 +352,7 @@ func (imp Importer) ImportSearch(file string) error {
 	path := "/" + imp.cl.opt.KibanaIndex + "/search/" + searchName
 	fmt.Println("Import search ", file)
 
-	if err = imp.client.LoadJson(path, searchContent); err != nil {
+	if err = imp.client.LoadJSON(path, searchContent); err != nil {
 		return err
 	}
 
@@ -387,7 +382,7 @@ func (imp Importer) ImportIndex(file string) error {
 	path := "/" + imp.cl.opt.KibanaIndex + "/index-pattern/" + indexName
 	fmt.Printf("Import index to %s from %s\n", path, file)
 
-	if err = imp.client.LoadJson(path, indexContent); err != nil {
+	if err = imp.client.LoadJSON(path, indexContent); err != nil {
 		return err
 	}
 	return nil
@@ -557,11 +552,17 @@ func (imp Importer) ImportArchive() error {
 	fmt.Println("Create temporary directory", target)
 	if imp.cl.opt.File != "" {
 		archive = imp.cl.opt.File
-	} else if imp.cl.opt.Url != "" {
-		// it's an URL
-		archive, err = downloadFile(imp.cl.opt.Url, target)
+	} else if imp.cl.opt.Snapshot {
+		// In case snapshot is set, snapshot version is fetched
+		url := fmt.Sprintf("https://beats-nightlies.s3.amazonaws.com/dashboards/beats-dashboards-%s-SNAPSHOT.zip", lbeat.GetDefaultVersion())
+		archive, err = downloadFile(url, target)
 		if err != nil {
-			return fmt.Errorf("fail to download file: %s", imp.cl.opt.Url)
+			return fmt.Errorf("fail to download snapshot file: %s", url)
+		}
+	} else if imp.cl.opt.URL != "" {
+		archive, err = downloadFile(imp.cl.opt.URL, target)
+		if err != nil {
+			return fmt.Errorf("fail to download file: %s", imp.cl.opt.URL)
 		}
 	} else {
 		return errors.New("No archive file or URL is set. Please use -file or -url option.")
@@ -636,7 +637,7 @@ func main() {
 			fmt.Println(err)
 		}
 	} else {
-		if importer.cl.opt.Url != "" || importer.cl.opt.File != "" {
+		if importer.cl.opt.URL != "" || importer.cl.opt.File != "" {
 			if err = importer.ImportArchive(); err != nil {
 				fmt.Println(err)
 			}

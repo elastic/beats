@@ -1,0 +1,146 @@
+- key: common
+  title: "Common monitoring fields"
+  description:
+  fields:
+    - name: type
+      type: keyword
+      required: true
+      description: >
+        The monitor type.
+
+    - name: monitor
+      type: keyword
+      description: >
+        Monitor job name.
+
+    - name: scheme
+      type: keyword
+      description: >
+        Address url scheme. For example `tcp`, `ssl`, `http`, and `https`.
+
+    - name: host
+      type: keyword
+      description: >
+        Hostname of service being monitored. Can be missing, if service is
+        monitored by IP.
+
+    - name: port
+      type: integer
+      description: >
+        Service port number.
+
+    - name: url
+      type: text
+      description: >
+        Service url used by monitor.
+
+    - name: ip
+      type: keyword
+      description: >
+        IP of service being monitored. If service is monitored by hostname,
+        the `ip` field contains the resolved ip address for the current host.
+
+    - name: duration
+      type: group
+      description: total monitoring test duration
+      fields:
+        - name: us
+          type: long
+          description: Duration in microseconds
+
+    - name: resolve_rtt
+      type: group
+      description: Duration required to resolve an IP from hostname.
+      fields:
+        - name: us
+          type: long
+          description: Duration in microseconds
+
+    - name: icmp_rtt
+      type: group
+      description: ICMP Echo Request and Reply round trip time
+      fields:
+        - name: us
+          type: long
+          description: Duration in microseconds
+
+    - name: tcp_connect_rtt
+      type: group
+      description: >
+        Duration required to establish a TCP connection based on already
+        available IP address.
+      fields:
+        - name: us
+          type: long
+          description: Duration in microseconds
+
+    - name: socks5_connect_rtt
+      type: group
+      description: >
+        Time required to establish a connection via SOCKS5 to endpoint based on available
+        connection to SOCKS5 proxy.
+      fields:
+        - name: us
+          type: long
+          description: Duration in microseconds
+
+    - name: tls_handshake_rtt
+      type: group
+      description: >
+        Time required to finish TLS handshake based on already available network
+        connection.
+      fields:
+        - name: us
+          type: long
+          description: Duration in microseconds
+
+    - name: http_rtt
+      type: group
+      description: >
+        Time required between sending the HTTP request and first by from HTTP
+        response being read. Duration based on already available network connection.
+      fields:
+        - name: us
+          type: long
+          description: Duration in microseconds
+
+    - name: validate_rtt
+      type: group
+      description: >
+        Time required for validating the connection if connection checks are configured.
+      fields:
+        - name: us
+          type: long
+          description: Duration in microseconds
+
+    - name: response
+      type: group
+      description: >
+        Service response parameters.
+
+      fields:
+        - name: status
+          type: integer
+          description: >
+            Response status code.
+
+    - name: up
+      required: true
+      type: boolean
+      description: >
+        Boolean indicator if monitor could validate the service to be available.
+
+    - name: error
+      type: group
+      description: >
+        Reason monitor flagging a service as down.
+      fields:
+        - name: type
+          type: keyword
+          description: >
+            Failure type. For example `io` or `validate`.
+
+        - name: message
+          type: text
+          description: >
+            Failure description.

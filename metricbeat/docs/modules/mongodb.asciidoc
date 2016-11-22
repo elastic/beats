@@ -11,10 +11,11 @@ servers.
 [float]
 === Module-Specific Configuration Notes
 
-When configuring the `hosts` option, you must use MongoDB URLs of the following format:
+When configuring the `hosts` option, you must use MongoDB URLs of the following
+format:
 
 -----------------------------------
-[mongodb://][user:pass@]host[:port]
+[mongodb://][user:pass@]host[:port][?options]
 -----------------------------------
 
 The URL can be as simple as:
@@ -33,11 +34,24 @@ Or more complex like:
   hosts: ["mongodb://myuser:mypass@localhost:40001", "otherhost:40001"]
 ----------------------------------------------------------------------
 
+The username and password can be included in the URL or they can be set using
+the respective configuration options. The credentials in the URL take precedence
+over the username and password configuration options.
+
+[source,yaml]
+----
+- module: mongodb
+  metricsets: ["status"]
+  hosts: ["localhost:27017"]
+  username: root
+  password: test
+----
 
 [float]
 === Compatibility
 
-The MongoDB metricsets were tested with MongoDB 3.0 and are expected to work with all versions >= 2.8.
+The MongoDB metricsets were tested with MongoDB 3.4 and 3.0 and are expected to
+work with all versions >= 2.8.
 
 
 [float]
@@ -55,8 +69,17 @@ metricbeat.modules:
   #period: 10s
 
   # The hosts must be passed as MongoDB URLs in the format:
-  # [mongodb://][user:pass@]host[:port]
+  # [mongodb://][user:pass@]host[:port].
+  # The username and password can also be set using the respective configuration
+  # options. The credentials in the URL take precedence over the username and
+  # password configuration options.
   #hosts: ["localhost:27017"]
+
+  # Username to use when connecting to MongoDB. Empty by default.
+  #username: user
+
+  # Password to use when connecting to MongoDB. Empty by default.
+  #password: pass
 
 ----
 

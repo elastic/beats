@@ -1,7 +1,7 @@
-// +build !linux
+// +build !linux,!windows
 
 package system
 
-func configureHostFS() {
+func initModule() {
 	// Stub method for non-linux.
 }

@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Process state by host\",\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":false,\"legendPosition\":\"right\",\"shareYAxis\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"system.process.pid\",\"customLabel\":\"\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"beat.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Host\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"system.process.state\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Process state\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Process state by host", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Process-stats", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

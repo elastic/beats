@@ -1,6 +1,6 @@
 
 ////
-This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
@@ -14,9 +14,11 @@ grouped in the following categories:
 
 * <<exported-fields-apache>>
 * <<exported-fields-beat>>
-* <<exported-fields-beats>>
+* <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-docker>>
 * <<exported-fields-haproxy>>
+* <<exported-fields-kafka>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
@@ -374,6 +376,12 @@ The hostname as returned by the operating system on which the Beat is running.
 
 
 [float]
+=== beat.version
+
+The version of the beat that generated this event.
+
+
+[float]
 === @timestamp
 
 type: date
@@ -401,258 +409,55 @@ type: dict
 Contains user configurable fields.
 
 
-[[exported-fields-beats]]
-== beats Fields
+[[exported-fields-cloud]]
+== Cloud Provider Metadata Fields
 
-beats Module
-
-
-
-[float]
-== beats Fields
-
+Metadata from cloud providers added by the add_cloud_metadata processor.
 
 
 
 [float]
-== filebeat Fields
+=== meta.cloud.provider
 
-experimental[]
-filebeat metrics
+example: ec2
 
-
-
-[float]
-== harvesters Fields
-
-Harvester metrics for all harvesters combined.
-
+Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
 
 
 [float]
-=== beats.filebeat.harvesters.started
+=== meta.cloud.instance_id
 
-type: long
-
-Total number of started harvesters.
+Instance ID of the host machine.
 
 
 [float]
-=== beats.filebeat.harvesters.closed
+=== meta.cloud.machine_type
 
-type: long
+example: t2.medium
 
-Total number of closed harvesters.
-
-
-[float]
-=== beats.filebeat.harvesters.running
-
-type: long
-
-Number of currently running harvesters.
+Machine type of the host machine.
 
 
 [float]
-=== beats.filebeat.harvesters.skipped
+=== meta.cloud.availability_zone
 
-type: long
+example: us-east-1c
 
-Total number of harvesters starts that were skipped because of harvester_limit reached.
-
-
-[float]
-== files Fields
-
-File handling related statistics.
-
+Availability zone in which this host is running.
 
 
 [float]
-=== beats.filebeat.harvesters.files.open
+=== meta.cloud.project_id
 
-type: long
+example: project-x
 
-Currently open files.
-
-
-[float]
-=== beats.filebeat.harvesters.files.truncated
-
-type: long
-
-Number of files which were detected by the harvester as truncated and reading started from scratch.
+Name of the project in Google Cloud.
 
 
 [float]
-== prospectors Fields
+=== meta.cloud.region
 
-Prospector metrics for all prospectors combined.
-
-
-
-[float]
-== log_files Fields
-
-Log files related stastics.
-
-
-
-[float]
-=== beats.filebeat.prospectors.log_files.renamed
-
-type: long
-
-Total number of files for which renaming was detected.
-
-
-[float]
-=== beats.filebeat.prospectors.log_files.truncated
-
-type: long
-
-Number of files which were detected by the prospector as truncated and reading started from scratch.
-
-
-[float]
-== registrar Fields
-
-Registrar statistics
-
-
-
-[float]
-== states Fields
-
-Registrar states metrics.
-
-
-
-[float]
-=== beats.filebeat.registrar.states.update
-
-type: long
-
-Total number of states which were updated or added.
-
-
-[float]
-=== beats.filebeat.registrar.states.cleanup
-
-type: long
-
-Total number of states which were cleaned up (removed).
-
-
-[float]
-=== beats.filebeat.registrar.states.current
-
-type: long
-
-The current number of states in the registry file.
-
-
-[float]
-=== beats.filebeat.registrar.writes
-
-type: long
-
-Total number of times the registry file was written to disk.
-
-
-[float]
-== libbeat Fields
-
-experimental[]
-libbeat metrics. This metricset can be used with all beats.
-
-
-
-[float]
-== output Fields
-
-Output related metrics
-
-
-
-[float]
-== elasticsearch Fields
-
-Elasticsearch specific metrics
-
-
-
-
-[float]
-=== beats.libbeat.output.elasticsearch.events.ack
-
-type: long
-
-Number of acknowledged events by elasticsearch
-
-
-[float]
-=== beats.libbeat.output.elasticsearch.events.not_ack
-
-type: long
-
-Number of not acknowledged events by elasticsearch
-
-
-
-[float]
-=== beats.libbeat.output.elasticsearch.read.bytes
-
-type: long
-
-Number of bytes read by the output
-
-
-[float]
-=== beats.libbeat.output.elasticsearch.read.errors
-
-type: long
-
-Number of read errors
-
-
-
-[float]
-=== beats.libbeat.output.elasticsearch.write.bytes
-
-type: long
-
-Number of bytes written by the output
-
-
-[float]
-=== beats.libbeat.output.elasticsearch.write.errors
-
-type: long
-
-Number of write errors
-
-
-[float]
-== publisher Fields
-
-General publisher metrics
-
-
-
-[float]
-== events Fields
-
-Log files related stastics.
-
-
-
-[float]
-=== beats.libbeat.publisher.events.published
-
-type: long
-
-Total number of events published
+Region in which this host is running.
 
 
 [[exported-fields-common]]
@@ -700,6 +505,444 @@ required: True
 The document type. Always set to "metricsets".
 
 
+[[exported-fields-docker]]
+== docker Fields
+
+experimental[]
+Docker stats collected from Docker.
+
+
+
+[float]
+== docker Fields
+
+docker contains different informations and statistics of docker's containers running
+
+
+
+[float]
+== container Fields
+
+Docker container metrics
+
+
+
+[float]
+=== docker.container.command
+
+type: keyword
+
+Executed command in docker container.
+
+
+[float]
+=== docker.container.created
+
+type: date
+
+Date then the container was created.
+
+
+[float]
+=== docker.container.id
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== docker.container.image
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== docker.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.container.status
+
+type: keyword
+
+Container status.
+
+
+[float]
+== size Fields
+
+Container size metrics.
+
+
+
+[float]
+=== docker.container.size.root_fs
+
+type: long
+
+Total size of all the files in the container.
+
+
+[float]
+=== docker.container.size.rw
+
+type: long
+
+Size of the files which have been created or changed since creation.
+
+
+[float]
+== cpu Fields
+
+Runtime cpu metrics.
+
+
+
+[float]
+=== docker.cpu.kernel.pct
+
+type: scaled_float
+
+format: percentage
+
+The system kernel consumed by The Docker server.
+
+
+[float]
+=== docker.cpu.kernel.ticks
+
+type: long
+
+Cpu kernel tikcs
+
+
+[float]
+=== docker.cpu.system.pct
+
+type: scaled_float
+
+format: percentage
+
+
+
+[float]
+=== docker.cpu.system.ticks
+
+type: long
+
+Cpu system tikcs
+
+
+[float]
+=== docker.cpu.user.pct
+
+type: scaled_float
+
+format: percentage
+
+
+
+[float]
+=== docker.cpu.user.ticks
+
+type: long
+
+Cpu user tikcs
+
+
+[float]
+=== docker.cpu.total.pct
+
+type: scaled_float
+
+format: percentage
+
+Total cpu usage.
+
+
+[float]
+== diskio Fields
+
+Diskio metrics.
+
+
+
+[float]
+=== docker.diskio.reads
+
+type: scaled_float
+
+Number of reads.
+
+
+[float]
+=== docker.diskio.writes
+
+type: scaled_float
+
+Number of writes.
+
+
+[float]
+=== docker.diskio.total
+
+type: scaled_float
+
+Reads and writes numbers combined.
+
+
+[float]
+== info Fields
+
+experimental[]
+info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information
+
+
+
+[float]
+== containers Fields
+
+Overall container stats.
+
+
+
+[float]
+=== docker.info.containers.paused
+
+type: long
+
+Total number of paused containers.
+
+
+[float]
+=== docker.info.containers.running
+
+type: long
+
+Total number of running containers.
+
+
+[float]
+=== docker.info.containers.stopped
+
+type: long
+
+Total number of stopped containers.
+
+
+[float]
+=== docker.info.containers.total
+
+type: long
+
+Total number of existing containers.
+
+
+[float]
+=== docker.info.id
+
+type: keyword
+
+Unique docker host identifier.
+
+
+[float]
+=== docker.info.images
+
+type: long
+
+Total number of existing images.
+
+
+[float]
+== memory Fields
+
+Memory metrics.
+
+
+
+[float]
+=== docker.memory.fail.count
+
+type: scaled_float
+
+Fail counter.
+
+
+[float]
+=== docker.memory.limit
+
+type: long
+
+format: bytes
+
+Memory limit.
+
+
+[float]
+== rss Fields
+
+Rss memory stats.
+
+
+
+[float]
+=== docker.memory.rss.total
+
+type: long
+
+format: bytes
+
+Total memory resident set size.
+
+
+[float]
+=== docker.memory.rss.pct
+
+type: scaled_float
+
+Memory resident set size percentage.
+
+
+[float]
+== usage Fields
+
+Usage memory stats.
+
+
+
+[float]
+=== docker.memory.usage.max
+
+type: long
+
+format: bytes
+
+Max memory usage.
+
+
+[float]
+=== docker.memory.usage.pct
+
+type: scaled_float
+
+Memory usage percentage.
+
+
+[float]
+=== docker.memory.usage.total
+
+type: long
+
+format: bytes
+
+Total memory usage.
+
+
+[float]
+== network Fields
+
+Netowrk metrics.
+
+
+
+[float]
+=== docker.network.interface
+
+type: keyword
+
+Network interface name.
+
+
+[float]
+== in Fields
+
+Incoming network stats.
+
+
+
+[float]
+=== docker.network.in.bytes
+
+type: long
+
+format: bytes
+
+Total number of incoming bytes.
+
+
+[float]
+=== docker.network.in.dropped
+
+type: scaled_float
+
+Total number of dropped incoming packets.
+
+
+[float]
+=== docker.network.in.errors
+
+type: long
+
+Total errors on incoming packets.
+
+
+[float]
+=== docker.network.in.packets
+
+type: long
+
+Total number of incoming packets.
+
+
+[float]
+== out Fields
+
+Outgoing network stats.
+
+
+
+[float]
+=== docker.network.out.bytes
+
+type: long
+
+format: bytes
+
+Total number of outgoing bytes.
+
+
+[float]
+=== docker.network.out.dropped
+
+type: scaled_float
+
+Total number of dropped outgoing packets.
+
+
+[float]
+=== docker.network.out.errors
+
+type: long
+
+Total errors on outgoing packets.
+
+
+[float]
+=== docker.network.out.packets
+
+type: long
+
+Total number of outgoing packets.
+
+
 [[exported-fields-haproxy]]
 == haproxy Fields
 
@@ -723,9 +966,9 @@ General infomration collected on HAProxy process
 
 
 [float]
-=== haproxy.info.nb_proc
+=== haproxy.info.processes
 
-type: integer
+type: long
 
 Number of processes
 
@@ -733,7 +976,7 @@ Number of processes
 [float]
 === haproxy.info.process_num
 
-type: integer
+type: long
 
 Process number
 
@@ -741,23 +984,37 @@ Process number
 [float]
 === haproxy.info.pid
 
-type: integer
+type: long
 
 Process ID
 
 
 [float]
-=== haproxy.info.uptime_sec
+=== haproxy.info.run_queue
 
-type: integer
+type: long
+
+
+
+[float]
+=== haproxy.info.tasks
+
+type: long
+
+
+
+[float]
+=== haproxy.info.uptime.sec
+
+type: long
 
 Current uptime in seconds
 
 
 [float]
-=== haproxy.info.mem_max_bytes
+=== haproxy.info.memory.max.bytes
 
-type: integer
+type: long
 
 format: bytes
 
@@ -767,7 +1024,7 @@ Max number of memory usage in bytes (The 'Memmax_MB' value converted to bytes)
 [float]
 === haproxy.info.ulimit_n
 
-type: integer
+type: long
 
 Max number of open files for process
 
@@ -787,26 +1044,26 @@ Max number of open files for process
 [float]
 === haproxy.info.compress.bps.in
 
-type: integer
+type: long
 
 
 
 [float]
 === haproxy.info.compress.bps.out
 
-type: integer
+type: long
 
 
 
 [float]
 === haproxy.info.compress.bps.rate_limit
 
-type: integer
+type: long
 
 
 
 [float]
-== conn Fields
+== connection Fields
 
 
 
@@ -818,132 +1075,99 @@ type: integer
 
 
 [float]
-=== haproxy.info.conn.rate.value
+=== haproxy.info.connection.rate.value
 
-type: integer
-
-
-
-[float]
-=== haproxy.info.conn.rate.limit
-
-type: integer
+type: long
 
 
 
 [float]
-== curr Fields
+=== haproxy.info.connection.rate.limit
 
-
-
-
-[float]
-=== haproxy.info.curr.conns
-
-type: integer
+type: long
 
 
 
 [float]
-=== haproxy.info.curr.ssl_conns
+=== haproxy.info.connection.rate.max
 
-type: integer
-
-
-
-[float]
-== cum Fields
-
+type: long
 
 
 
 [float]
-=== haproxy.info.cum.conns
+=== haproxy.info.connection.current
 
-type: integer
+type: long
+
+Current Connections
+
+
+[float]
+=== haproxy.info.connection.total
+
+type: long
+
+Total Connections
+
+
+[float]
+=== haproxy.info.connection.ssl.current
+
+type: long
+
+Current ssl Connections
+
+
+[float]
+=== haproxy.info.connection.ssl.total
+
+type: long
+
+Current Connections
+
+
+[float]
+=== haproxy.info.connection.ssl.max
+
+type: long
+
+Current Connections
+
+
+[float]
+=== haproxy.info.connection.max
+
+type: long
+
+Max connections
+
+
+[float]
+=== haproxy.info.connection.hard_max
+
+type: long
 
 
 
 [float]
-=== haproxy.info.cum.req
+=== haproxy.info.requests.total
 
-type: integer
-
-
-
-[float]
-=== haproxy.info.cum.ssl_conns
-
-type: integer
+type: long
 
 
 
 [float]
-== max Fields
+=== haproxy.info.sockets.max
 
-
-
-
-[float]
-=== haproxy.info.max.hard_conn
-
-type: integer
+type: long
 
 
 
 [float]
-=== haproxy.info.max.sock
+=== haproxy.info.requests.max
 
-type: integer
-
-
-
-[float]
-=== haproxy.info.max.conn
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.max.ssl_conns
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.max.pipes
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.max.conn_rate
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.max.sess_rate
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.max.ssl_rate
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.max.zlib_mem_usage
-
-type: integer
+type: long
 
 
 
@@ -968,26 +1192,34 @@ type: integer
 
 
 [float]
-== sess Fields
-
-
-
-
-[float]
-== rate Fields
-
-
-
-
-[float]
-=== haproxy.info.sess.rate.value
+=== haproxy.info.pipes.max
 
 type: integer
 
 
 
 [float]
-=== haproxy.info.sess.rate.limit
+== session Fields
+
+None
+
+
+[float]
+=== haproxy.info.session.rate.value
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.session.rate.limit
+
+type: integer
+
+
+
+[float]
+=== haproxy.info.session.rate.max
 
 type: integer
 
@@ -996,13 +1228,7 @@ type: integer
 [float]
 == ssl Fields
 
-
-
-
-[float]
-== rate Fields
-
-
+None
 
 
 [float]
@@ -1010,99 +1236,107 @@ type: integer
 
 type: integer
 
-
+None
 
 [float]
 === haproxy.info.ssl.rate.limit
 
 type: integer
 
+None
 
+[float]
+=== haproxy.info.ssl.rate.max
+
+type: integer
+
+None
 
 [float]
 == frontend Fields
 
-
-
-
-[float]
-=== haproxy.info.ssl.frontend.key_rate
-
-type: integer
-
+None
 
 
 [float]
-=== haproxy.info.ssl.frontend.max_key_rate
+=== haproxy.info.ssl.frontend.key_rate.value
 
 type: integer
 
-
+None
 
 [float]
-=== haproxy.info.ssl.frontend.session_reuse_pct
+=== haproxy.info.ssl.frontend.key_rate.max
 
 type: integer
 
+None
 
+[float]
+=== haproxy.info.ssl.frontend.session_reuse.pct
+
+type: scaled_float
+
+format: percent
+
+None
 
 [float]
 == backend Fields
 
+None
+
+
+[float]
+=== haproxy.info.ssl.backend.key_rate.value
+
+type: integer
+
+None
+
+[float]
+=== haproxy.info.ssl.backend.key_rate.max
+
+type: integer
+
+MaxConnRate
+
+[float]
+=== haproxy.info.ssl.cached_lookups
+
+type: long
+
+None
+
+[float]
+=== haproxy.info.ssl.cache_misses
+
+type: long
+
+None
+
+[float]
+== zlib_mem_usage Fields
+
 
 
 
 [float]
-=== haproxy.info.ssl.backend.key_rate
+=== haproxy.info.zlib_mem_usage.value
 
 type: integer
 
 
 
 [float]
-=== haproxy.info.ssl.backend.max_key_rate
+=== haproxy.info.zlib_mem_usage.max
 
 type: integer
 
 
 
 [float]
-=== haproxy.info.ssl.ssl_cached_lookups
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.ssl.ssl_cache_misses
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.zlib_mem_usage
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.tasks
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.run_queue
-
-type: integer
-
-
-
-[float]
-=== haproxy.info.idle_pct
+=== haproxy.info.idle.pct
 
 type: scaled_float
 
@@ -1118,151 +1352,6 @@ Stats collected from HAProxy process
 
 
 [float]
-=== haproxy.stat.pxname
-
-type: keyword
-
-proxy name
-
-
-[float]
-=== haproxy.stat.svname
-
-type: keyword
-
-service name (FRONTEND for frontend, BACKEND for backend, any name for server/listener)
-
-
-[float]
-=== haproxy.stat.qcur
-
-type: integer
-
-current queued requests. For the backend this reports the number queued without a server assigned
-
-
-[float]
-=== haproxy.stat.qmax
-
-type: integer
-
-max value of qcur
-
-
-[float]
-=== haproxy.stat.scur
-
-type: integer
-
-current sessions
-
-
-[float]
-=== haproxy.stat.smax
-
-type: integer
-
-max sessions
-
-
-[float]
-=== haproxy.stat.slim
-
-type: integer
-
-configured session limit
-
-
-[float]
-=== haproxy.stat.stot
-
-type: keyword
-
-cumulative number of connections
-
-
-[float]
-=== haproxy.stat.bin
-
-type: integer
-
-bytes in
-
-
-[float]
-=== haproxy.stat.bout
-
-type: integer
-
-bytes out
-
-
-[float]
-=== haproxy.stat.dreq
-
-type: integer
-
-requests denied because of security concerns.
-  * For tcp this is because of a matched tcp-request content rule.
-  * For http this is because of a matched http-request or tarpit rule.
-
-
-[float]
-=== haproxy.stat.dresp
-
-type: integer
-
-responses denied because of security concerns.
-  * For http this is because of a matched http-request rule, or "option checkcache".
-
-
-[float]
-=== haproxy.stat.ereq
-
-type: integer
-
-request errors. Some of the possible causes are:
-  * early termination from the client, before the request has been sent.
-  * read error from the client
-  * client timeout
-  * client closed connection
-  * various bad requests from the client.
-  * request was tarpitted.
-
-
-[float]
-=== haproxy.stat.econ
-
-type: integer
-
-number of requests that encountered an error trying to connect to a backend server. The backend stat is the sum of the stat for all servers of that backend, plus any connection errors not associated with a particular server (such as the backend having no active servers).
-
-
-[float]
-=== haproxy.stat.eresp
-
-type: integer
-
-response errors. srv_abrt will be counted here also. Some other errors are: * write error on the client socket (won't be counted for the server stat) * failure applying filters to the response.
-
-
-[float]
-=== haproxy.stat.wretr
-
-type: integer
-
-number of times a connection to a server was retried.
-
-
-[float]
-=== haproxy.stat.wredis
-
-type: integer
-
-number of times a request was redispatched to another server. The server value counts the number of times that server was switched away from.
-
-
-[float]
 === haproxy.stat.status
 
 type: keyword
@@ -1273,113 +1362,17 @@ status (UP/DOWN/NOLB/MAINT/MAINT(via)...)
 [float]
 === haproxy.stat.weight
 
-type: integer
+type: long
 
 total weight (backend), server weight (server)
 
 
 [float]
-=== haproxy.stat.act
-
-type: integer
-
-number of active servers (backend), server is active (server)
-
-
-[float]
-=== haproxy.stat.bck
-
-type: integer
-
-number of backup servers (backend), server is backup (server)
-
-
-[float]
-=== haproxy.stat.chkfail
-
-type: integer
-
-number of failed checks. (Only counts checks failed when the server is up.)
-
-
-[float]
-=== haproxy.stat.chkdown
-
-type: integer
-
-number of UP->DOWN transitions. The backend counter counts transitions to the whole backend being down, rather than the sum of the counters for each server.
-
-
-[float]
-=== haproxy.stat.lastchg
-
-type: integer
-
-number of seconds since the last UP<->DOWN transition
-
-
-[float]
 === haproxy.stat.downtime
 
-type: integer
+type: long
 
 total downtime (in seconds). The value for the backend is the downtime for the whole backend, not the sum of the server downtime.
-
-
-[float]
-=== haproxy.stat.qlimit
-
-type: integer
-
-configured maxqueue for the server, or nothing in the value is 0 (default, meaning no limit)
-
-
-[float]
-=== haproxy.stat.pid
-
-type: integer
-
-process id (0 for first instance, 1 for second, ...)
-
-
-[float]
-=== haproxy.stat.iid
-
-type: integer
-
-unique proxy id
-
-
-[float]
-=== haproxy.stat.sid
-
-type: integer
-
-server id (unique inside a proxy)
-
-
-[float]
-=== haproxy.stat.throttle
-
-type: integer
-
-current throttle percentage for the server, when slowstart is active, or no value if not in slowstart.
-
-
-[float]
-=== haproxy.stat.lbtot
-
-type: integer
-
-total number of times a server was selected, either for new sessions, or when re-dispatching. The server counter is the number of times that server was selected.
-
-
-[float]
-=== haproxy.stat.tracked
-
-type: integer
-
-id of proxy/server if tracking is enabled.
 
 
 [float]
@@ -1391,13 +1384,295 @@ type: integer
 
 
 [float]
+=== haproxy.stat.process_id
+
+type: integer
+
+process id (0 for first instance, 1 for second, ...)
+
+
+[float]
+=== haproxy.stat.service_name
+
+type: keyword
+
+service name (FRONTEND for frontend, BACKEND for backend, any name for server/listener)
+
+
+[float]
+=== haproxy.stat.in.bytes
+
+type: long
+
+format: bytes
+
+bytes in
+
+
+[float]
+=== haproxy.stat.out.bytes
+
+type: long
+
+format: bytes
+
+bytes out
+
+
+[float]
+=== haproxy.stat.last_change
+
+type: integer
+
+number of seconds since the last UP<->DOWN transition
+
+
+[float]
+=== haproxy.stat.throttle.pct
+
+type: scaled_float
+
+format: percentage
+
+current throttle percentage for the server, when slowstart is active, or no value if not in slowstart.
+
+
+[float]
+=== haproxy.stat.selected.total
+
+type: long
+
+total number of times a server was selected, either for new sessions, or when re-dispatching. The server counter is the number of times that server was selected.
+
+
+[float]
+=== haproxy.stat.tracked.id
+
+type: long
+
+id of proxy/server if tracking is enabled.
+
+
+
+[float]
+=== haproxy.stat.connection.total
+
+type: long
+
+cumulative number of connections
+
+
+[float]
+=== haproxy.stat.connection.retried
+
+type: long
+
+number of times a connection to a server was retried.
+
+
+[float]
+=== haproxy.stat.connection.time.avg
+
+type: long
+
+the average connect time in ms over the 1024 last requests
+
+
+
+[float]
+=== haproxy.stat.request.denied
+
+type: long
+
+requests denied because of security concerns.
+  * For tcp this is because of a matched tcp-request content rule.
+  * For http this is because of a matched http-request or tarpit rule.
+
+
+[float]
+=== haproxy.stat.request.queued.current
+
+type: long
+
+current queued requests. For the backend this reports the number queued without a server assigned
+
+
+[float]
+=== haproxy.stat.request.queued.max
+
+type: long
+
+max value of queued.current
+
+
+[float]
+=== haproxy.stat.request.errors
+
+type: long
+
+request errors. Some of the possible causes are:
+  * early termination from the client, before the request has been sent.
+  * read error from the client
+  * client timeout
+  * client closed connection
+  * various bad requests from the client.
+  * request was tarpitted.
+
+
+[float]
+=== haproxy.stat.request.redispatched
+
+type: long
+
+number of times a request was redispatched to another server. The server value counts the number of times that server was switched away from.
+
+
+[float]
+=== haproxy.stat.request.connection.errors
+
+type: long
+
+number of requests that encountered an error trying to connect to a backend server. The backend stat is the sum of the stat for all servers of that backend, plus any connection errors not associated with a particular server (such as the backend having no active servers).
+
+
+[float]
 == rate Fields
 
 
 
 
 [float]
-=== haproxy.stat.rate.value
+=== haproxy.stat.request.rate.value
+
+type: long
+
+HTTP requests per second over last elapsed second
+
+
+[float]
+=== haproxy.stat.request.rate.max
+
+type: long
+
+max number of HTTP requests per second observed
+
+
+[float]
+=== haproxy.stat.request.total
+
+type: long
+
+total number of HTTP requests received
+
+
+
+[float]
+=== haproxy.stat.response.errors
+
+type: long
+
+response errors. srv_abrt will be counted here also. Some other errors are: * write error on the client socket (won't be counted for the server stat) * failure applying filters to the respons
+
+
+[float]
+=== haproxy.stat.response.time.avg
+
+type: long
+
+the average response time in ms over the 1024 last requests (0 for TCP)
+
+
+[float]
+=== haproxy.stat.response.denied
+
+type: integer
+
+responses denied because of security concerns.
+  * For http this is because of a matched http-request rule, or "option checkcache".
+
+
+[float]
+== http Fields
+
+
+
+
+[float]
+=== haproxy.stat.response.http.1xx
+
+type: long
+
+http responses with 1xx code
+
+
+[float]
+=== haproxy.stat.response.http.2xx
+
+type: long
+
+http responses with 2xx code
+
+
+[float]
+=== haproxy.stat.response.http.3xx
+
+type: long
+
+http responses with 3xx code
+
+
+[float]
+=== haproxy.stat.response.http.4xx
+
+type: long
+
+http responses with 4xx code
+
+
+[float]
+=== haproxy.stat.response.http.5xx
+
+type: long
+
+http responses with 5xx code
+
+
+[float]
+=== haproxy.stat.response.http.other
+
+type: long
+
+http responses with other codes (protocol error)
+
+
+
+[float]
+=== haproxy.stat.session.current
+
+type: long
+
+current sessions
+
+
+[float]
+=== haproxy.stat.session.max
+
+type: long
+
+max sessions
+
+
+[float]
+=== haproxy.stat.session.limit
+
+type: long
+
+configured session limit
+
+
+
+[float]
+=== haproxy.stat.session.rate.value
 
 type: integer
 
@@ -1405,7 +1680,7 @@ number of sessions per second over last elapsed second
 
 
 [float]
-=== haproxy.stat.rate.lim
+=== haproxy.stat.session.rate.limit
 
 type: integer
 
@@ -1413,7 +1688,7 @@ configured limit on new sessions per second
 
 
 [float]
-=== haproxy.stat.rate.max
+=== haproxy.stat.session.rate.max
 
 type: integer
 
@@ -1453,7 +1728,7 @@ status of last health check, one of:
 [float]
 === haproxy.stat.check.code
 
-type: integer
+type: long
 
 layer5-7 code, if available
 
@@ -1461,111 +1736,50 @@ layer5-7 code, if available
 [float]
 === haproxy.stat.check.duration
 
-type: integer
+type: long
 
 time in ms took to finish last health check
 
 
 [float]
-== hrsp Fields
+=== haproxy.stat.check.health.last
 
+type: long
 
 
 
 [float]
-=== haproxy.stat.hrsp.1xx
+=== haproxy.stat.check.health.fail
+
+type: long
+
+
+
+[float]
+=== haproxy.stat.check.agent.last
 
 type: integer
 
-http responses with 1xx code
 
 
 [float]
-=== haproxy.stat.hrsp.2xx
+=== haproxy.stat.check.failed
 
-type: integer
+type: long
 
-http responses with 2xx code
-
-
-[float]
-=== haproxy.stat.hrsp.3xx
-
-type: integer
-
-http responses with 3xx code
+number of failed checks. (Only counts checks failed when the server is up.)
 
 
 [float]
-=== haproxy.stat.hrsp.4xx
+=== haproxy.stat.check.down
 
-type: integer
+type: long
 
-http responses with 4xx code
-
-
-[float]
-=== haproxy.stat.hrsp.5xx
-
-type: integer
-
-http responses with 5xx code
+number of UP->DOWN transitions. The backend counter counts transitions to the whole backend being down, rather than the sum of the counters for each server.
 
 
 [float]
-=== haproxy.stat.hrsp.other
-
-type: integer
-
-http responses with other codes (protocol error)
-
-
-[float]
-=== haproxy.stat.hanafail
-
-type: integer
-
-failed health checks details
-
-
-[float]
-== req Fields
-
-
-
-
-[float]
-== rate Fields
-
-
-
-
-[float]
-=== haproxy.stat.req.rate.value
-
-type: integer
-
-HTTP requests per second over last elapsed second
-
-
-[float]
-=== haproxy.stat.req.rate.max
-
-type: integer
-
-max number of HTTP requests per second observed
-
-
-[float]
-=== haproxy.stat.req.tot
-
-type: integer
-
-total number of HTTP requests received
-
-
-[float]
-=== haproxy.stat.cli_abrt
+=== haproxy.stat.client.aborted
 
 type: integer
 
@@ -1573,7 +1787,21 @@ number of data transfers aborted by the client
 
 
 [float]
-=== haproxy.stat.srv_abrt
+== server Fields
+
+
+
+
+[float]
+=== haproxy.stat.server.id
+
+type: integer
+
+server id (unique inside a proxy)
+
+
+[float]
+=== haproxy.stat.server.aborted
 
 type: integer
 
@@ -1581,103 +1809,185 @@ number of data transfers aborted by the server (inc. in eresp)
 
 
 [float]
-== comp Fields
+=== haproxy.stat.server.active
+
+type: integer
+
+number of active servers (backend), server is active (server)
+
+
+[float]
+=== haproxy.stat.server.backup
+
+type: integer
+
+number of backup servers (backend), server is backup (server)
+
+
+[float]
+== compressor Fields
 
 
 
 
 [float]
-=== haproxy.stat.comp.in
+=== haproxy.stat.compressor.in.bytes
 
-type: integer
+type: long
+
+format: bytes
 
 number of HTTP response bytes fed to the compressor
 
 
 [float]
-=== haproxy.stat.comp.out
+=== haproxy.stat.compressor.out.bytes
 
 type: integer
+
+format: bytes
 
 number of HTTP response bytes emitted by the compressor
 
 
 [float]
-=== haproxy.stat.comp.byp
+=== haproxy.stat.compressor.bypassed.bytes
 
-type: integer
+type: long
+
+format: bytes
 
 number of bytes that bypassed the HTTP compressor (CPU/BW limit)
 
 
 [float]
-=== haproxy.stat.comp.rsp
+=== haproxy.stat.compressor.response.bytes
 
-type: integer
+type: long
+
+format: bytes
 
 number of HTTP responses that were compressed
 
 
 [float]
-== last Fields
+== proxy Fields
 
 
 
 
 [float]
-=== haproxy.stat.last.sess
+=== haproxy.stat.proxy.id
 
 type: integer
 
-number of seconds since last session assigned to server/backend
+unique proxy id
 
 
 [float]
-=== haproxy.stat.last.chk
+=== haproxy.stat.proxy.name
 
 type: keyword
 
-last health check contents or textual error
+proxy name
 
 
 [float]
-=== haproxy.stat.last.agt
+== queue Fields
 
-type: keyword
 
-last agent check contents or textual error
 
 
 [float]
-=== haproxy.stat.qtime
+=== haproxy.stat.queue.limit
+
+type: integer
+
+configured maxqueue for the server, or nothing in the value is 0 (default, meaning no limit)
+
+
+[float]
+=== haproxy.stat.queue.time.avg
 
 type: integer
 
 the average queue time in ms over the 1024 last requests
 
 
-[float]
-=== haproxy.stat.ctime
+[[exported-fields-kafka]]
+== kafka Fields
 
-type: integer
+kafka Module
+experimental[]
 
-the average connect time in ms over the 1024 last requests
-
-
-[float]
-=== haproxy.stat.rtime
-
-type: integer
-
-the average response time in ms over the 1024 last requests (0 for TCP)
 
 
 [float]
-=== haproxy.stat.ttime
+== kafka Fields
 
-type: integer
 
-the average total session time in ms over the 1024 last requests
+
+
+[float]
+== partition Fields
+
+partition
+
+
+
+[float]
+== offset Fields
+
+Available offsets of the given partition.
+
+
+
+[float]
+=== kafka.partition.offset.newest
+
+type: long
+
+Newest offset of the partition.
+
+
+[float]
+=== kafka.partition.offset.oldest
+
+type: long
+
+Oldest offset of the partition.
+
+
+[float]
+=== kafka.partition.partition
+
+type: long
+
+Partition id.
+
+
+[float]
+=== kafka.partition.topic
+
+type: keyword
+
+Topic name
+
+
+[float]
+=== kafka.partition.broker.id
+
+type: long
+
+Broker id
+
+
+[float]
+=== kafka.partition.broker.address
+
+type: keyword
+
+Broker address
 
 
 [[exported-fields-mongodb]]
@@ -2192,6 +2502,198 @@ True when there are operations from a mongos instance queued for retrying.
 type: keyword
 
 A string that represents the name of the current storage engine.
+
+
+[float]
+== wired_tiger Fields
+
+Statistics about the WiredTiger storage engine.
+
+
+
+[float]
+== concurrent_transactions Fields
+
+Statistics about the transactions currently in progress.
+
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.write.out
+
+type: long
+
+Number of concurrent write transaction in progress.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.write.available
+
+type: long
+
+Number of concurrent write tickets available.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.write.total_tickets
+
+type: long
+
+Number of total write tickets.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.read.out
+
+type: long
+
+Number of concurrent read transaction in progress.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.read.available
+
+type: long
+
+Number of concurrent read tickets available.
+
+
+[float]
+=== mongodb.status.wired_tiger.concurrent_transactions.read.total_tickets
+
+type: long
+
+Number of total read tickets.
+
+
+[float]
+== cache Fields
+
+Statistics about the cache and page evictions from the cache.
+
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.maximum.bytes
+
+type: long
+
+format: bytes
+
+Maximum cache size.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.used.bytes
+
+type: long
+
+format: bytes
+
+Size in byte of the data currently in cache.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.dirty.bytes
+
+type: long
+
+format: bytes
+
+Size in bytes of the dirty data in the cache.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.pages.read
+
+type: long
+
+Number of pages read into the cache.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.pages.write
+
+type: long
+
+Number of pages written from the cache.
+
+
+[float]
+=== mongodb.status.wired_tiger.cache.pages.evicted
+
+type: long
+
+Number of pages evicted from the cache.
+
+
+[float]
+== log Fields
+
+Statistics about the write ahead log used by WiredTiger.
+
+
+
+[float]
+=== mongodb.status.wired_tiger.log.size.bytes
+
+type: long
+
+format: bytes
+
+Total log size in bytes.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.write.bytes
+
+type: long
+
+format: bytes
+
+Number of bytes written into the log.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.max_file_size.bytes
+
+type: long
+
+format: bytes
+
+Maximum file size.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.flushes
+
+type: long
+
+Number of flush operations.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.writes
+
+type: long
+
+Number of write operations.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.scans
+
+type: long
+
+Number of scan operations.
+
+
+[float]
+=== mongodb.status.wired_tiger.log.syncs
+
+type: long
+
+Number of sync operations.
 
 
 [[exported-fields-mysql]]
@@ -3052,7 +3554,7 @@ User CPU consumed by the background processes.
 [float]
 == memory Fields
 
-Redis CPU stats.
+Redis memory stats.
 
 
 
@@ -3061,13 +3563,16 @@ Redis CPU stats.
 
 type: long
 
-Used memory.
+format: bytes Used memory.
+
 
 
 [float]
 === redis.info.memory.used.rss
 
 type: long
+
+format: bytes
 
 Used memory rss.
 
@@ -3077,6 +3582,8 @@ Used memory rss.
 
 type: long
 
+format: bytes
+
 Used memory peak.
 
 
@@ -3084,6 +3591,8 @@ Used memory peak.
 === redis.info.memory.used.lua
 
 type: long
+
+format: bytes
 
 Used memory lua.
 
@@ -3109,6 +3618,12 @@ Redis CPU stats.
 type: boolean
 
 None
+
+[float]
+== rdb Fields
+
+None
+
 
 [float]
 === redis.info.persistence.rdb.last_save.changes_since
@@ -3151,6 +3666,12 @@ None
 type: long
 
 None
+
+[float]
+== aof Fields
+
+None
+
 
 [float]
 === redis.info.persistence.aof.enabled
@@ -4055,7 +4576,7 @@ The percentage of used disk space.
 [float]
 == fsstat Fields
 
-`system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
+`system.fsstat` contains filesystem metrics aggregated from all mounted filesystems, similar with what `df -a` prints out.
 
 
 
@@ -4223,6 +4744,8 @@ Actual memory used and free.
 
 type: long
 
+format: bytes
+
 Actual used memory in bytes. It represents the difference between the total and the available memory. The available memory depends on the OS. For more details, please check `system.actual.free`.
 
 
@@ -4231,13 +4754,17 @@ Actual used memory in bytes. It represents the difference between the total and 
 
 type: long
 
-Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is the  amount of unreserved and uncommitted memory currently in the user-mode portion of the virtual address space of the calling process.
+format: bytes
+
+Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
 
 
 [float]
 === system.memory.actual.used.pct
 
 type: scaled_float
+
+format: percent
 
 The percentage of actual used memory.
 
@@ -5068,7 +5595,7 @@ Path to the cgroup relative to the cgroup subsystems mountpoint.
 [float]
 === system.process.cgroup.blkio.total.bytes
 
-type: keyword
+type: long
 
 format: bytes
 
@@ -5078,7 +5605,7 @@ Total number of bytes transferred to and from all block devices by processes in 
 [float]
 === system.process.cgroup.blkio.total.ios
 
-type: keyword
+type: long
 
 Total number of I/O operations performed on all devices by processes in the cgroup as seen by the throttling policy.
 

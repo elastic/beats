@@ -1,0 +1,31 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "kafka": {
+        "partition": {
+            "broker": {
+                "address": "kafka:9092",
+                "id": 0
+            },
+            "offset": {
+                "newest": 13,
+                "oldest": 0
+            },
+            "partition": 0,
+            "replicas": [
+                0
+            ],
+            "topic": "testtopic"
+        }
+    },
+    "metricset": {
+        "host": "kafka:9092",
+        "module": "kafka",
+        "name": "partition",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

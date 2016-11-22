@@ -27,8 +27,8 @@ func TestFetch(t *testing.T) {
 	available := event["connections"].(common.MapStr)["available"].(int64)
 	assert.True(t, available > 0)
 
-	commits := event["journaling"].(common.MapStr)["commits"].(int64)
-	assert.True(t, commits >= 0)
+	pageFaults := event["extra_info"].(common.MapStr)["page_faults"].(int64)
+	assert.True(t, pageFaults >= 0)
 }
 
 func TestData(t *testing.T) {

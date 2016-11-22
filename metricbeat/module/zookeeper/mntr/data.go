@@ -14,7 +14,7 @@ import (
 var (
 	// Matches first the variable name, second the param itself
 	paramMatcher = regexp.MustCompile("([^\\s]+)\\s+(.*$)")
-	schema_      = s.Schema{
+	schema       = s.Schema{
 		"version": c.Str("zk_version"),
 		"latency": s.Object{
 			"avg": c.Int("zk_avg_latency"),
@@ -57,7 +57,7 @@ func eventMapping(response io.Reader) common.MapStr {
 		}
 	}
 
-	event := schema_.Apply(fullEvent)
+	event := schema.Apply(fullEvent)
 
 	// only exposed by the Leader
 	if _, ok := fullEvent["zk_followers"]; ok {

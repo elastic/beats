@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
 MAINTAINER Tudor Golubenco <tudor@elastic.co>
 
@@ -6,5 +6,6 @@ MAINTAINER Tudor Golubenco <tudor@elastic.co>
 RUN \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-        build-essential ruby-dev rpm zip dos2unix libgmp3-dev && \
-    gem install fpm
+        build-essential ruby-dev rpm zip dos2unix libgmp3-dev
+
+RUN gem install fpm

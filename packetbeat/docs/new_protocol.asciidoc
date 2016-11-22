@@ -4,8 +4,7 @@
 
 [partintro]
 --
-The following topics walk you through the steps needed to add a new protocol to
-Packetbeat:
+The following topics describe how to add a new protocol to Packetbeat:
 
 * <<getting-ready-new-protocol>>
 * <<protocol-modules>>

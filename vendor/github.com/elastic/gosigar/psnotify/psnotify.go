@@ -1,5 +1,7 @@
 // Copyright (c) 2012 VMware, Inc.
 
+// +build darwin freebsd netbsd openbsd linux
+
 package psnotify
 
 import (

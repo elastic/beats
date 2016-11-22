@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system/filesystem"
 
 	"github.com/pkg/errors"
@@ -14,7 +15,7 @@ import (
 var debugf = logp.MakeDebug("system-fsstat")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "fsstat", New); err != nil {
+	if err := mb.Registry.AddMetricSet("system", "fsstat", New, parse.EmptyHostParser); err != nil {
 		panic(err)
 	}
 }
@@ -41,18 +42,28 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	// These values are optional and could also be calculated by Kibana
 	var totalFiles, totalSize, totalSizeFree, totalSizeUsed uint64
+	dict := map[string]bool{}
 
 	for _, fs := range fss {
-		fsStat, err := filesystem.GetFileSystemStat(fs)
+		stat, err := filesystem.GetFileSystemStat(fs)
 		if err != nil {
 			debugf("error fetching filesystem stats for '%s': %v", fs.DirName, err)
 			continue
 		}
+		logp.Debug("fsstat", "filesystem: %s total=%d, used=%d, free=%d", stat.Mount, stat.Total, stat.Used, stat.Free)
 
-		totalFiles += fsStat.Files
-		totalSize += fsStat.Total
-		totalSizeFree += fsStat.Free
-		totalSizeUsed += fsStat.Used
+		if _, ok := dict[stat.Mount]; ok {
+			// ignore filesystem with the same mounting point
+			continue
+		}
+
+		totalFiles += stat.Files
+		totalSize += stat.Total
+		totalSizeFree += stat.Free
+		totalSizeUsed += stat.Used
+
+		dict[stat.Mount] = true
+
 	}
 
 	return common.MapStr{
@@ -61,7 +72,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 			"used":  totalSizeUsed,
 			"total": totalSize,
 		},
-		"count":       len(fss),
+		"count":       len(dict),
 		"total_files": totalFiles,
 	}, nil
 }

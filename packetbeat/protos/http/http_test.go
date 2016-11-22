@@ -19,13 +19,13 @@ import (
 
 type testParser struct {
 	payloads []string
-	http     *HTTP
+	http     *httpPlugin
 	stream   *stream
 }
 
 var testParserConfig = parserConfig{}
 
-func newTestParser(http *HTTP, payloads ...string) *testParser {
+func newTestParser(http *httpPlugin, payloads ...string) *testParser {
 	if http == nil {
 		http = httpModForTests()
 	}
@@ -49,21 +49,21 @@ func (tp *testParser) parse() (*message, bool, bool) {
 	return st.message, ok, complete
 }
 
-func httpModForTests() *HTTP {
+func httpModForTests() *httpPlugin {
 	results := &publish.ChanTransactions{Channel: make(chan common.MapStr, 10)}
 	http, err := New(false, results, common.NewConfig())
 	if err != nil {
 		panic(err)
 	}
-	return http.(*HTTP)
+	return http.(*httpPlugin)
 }
 
-func testParse(http *HTTP, data string) (*message, bool, bool) {
+func testParse(http *httpPlugin, data string) (*message, bool, bool) {
 	tp := newTestParser(http, data)
 	return tp.parse()
 }
 
-func testParseStream(http *HTTP, st *stream, extraLen int) (bool, bool) {
+func testParseStream(http *httpPlugin, st *stream, extraLen int) (bool, bool) {
 	parser := newParser(&http.parserConfig)
 	return parser.parse(st, extraLen)
 }
@@ -84,12 +84,12 @@ func TestHttpParser_simpleResponse(t *testing.T) {
 
 	assert.True(t, ok)
 	assert.True(t, complete)
-	assert.False(t, message.IsRequest)
-	assert.Equal(t, 200, int(message.StatusCode))
-	assert.Equal(t, "OK", string(message.StatusPhrase))
+	assert.False(t, message.isRequest)
+	assert.Equal(t, 200, int(message.statusCode))
+	assert.Equal(t, "OK", string(message.statusPhrase))
 	assert.True(t, isVersion(message.version, 1, 1))
-	assert.Equal(t, 262, int(message.Size))
-	assert.Equal(t, 0, message.ContentLength)
+	assert.Equal(t, 262, int(message.size))
+	assert.Equal(t, 0, message.contentLength)
 }
 
 func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
@@ -108,18 +108,18 @@ func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 
 	assert.True(t, ok)
 	assert.True(t, complete)
-	assert.False(t, message.IsRequest)
-	assert.Equal(t, 200, int(message.StatusCode))
-	assert.Equal(t, "OK", string(message.StatusPhrase))
+	assert.False(t, message.isRequest)
+	assert.Equal(t, 200, int(message.statusCode))
+	assert.Equal(t, "OK", string(message.statusPhrase))
 	assert.True(t, isVersion(message.version, 1, 1))
-	assert.Equal(t, 262, int(message.Size))
-	assert.Equal(t, 0, message.ContentLength)
+	assert.Equal(t, 262, int(message.size))
+	assert.Equal(t, 0, message.contentLength)
 }
 
 func TestHttpParser_simpleRequest(t *testing.T) {
 	http := httpModForTests()
-	http.parserConfig.SendHeaders = true
-	http.parserConfig.SendAllHeaders = true
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
 
 	data := "GET / HTTP/1.1\r\n" +
 		"Host: www.google.ro\r\n" +
@@ -139,18 +139,18 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 
 	assert.True(t, ok)
 	assert.True(t, complete)
-	assert.True(t, message.IsRequest)
+	assert.True(t, message.isRequest)
 	assert.True(t, isVersion(message.version, 1, 1))
-	assert.Equal(t, 669, int(message.Size))
-	assert.Equal(t, "GET", string(message.Method))
-	assert.Equal(t, "/", string(message.RequestURI))
-	assert.Equal(t, "www.google.ro", string(message.Headers["host"]))
+	assert.Equal(t, 669, int(message.size))
+	assert.Equal(t, "GET", string(message.method))
+	assert.Equal(t, "/", string(message.requestURI))
+	assert.Equal(t, "www.google.ro", string(message.headers["host"]))
 }
 
 func TestHttpParser_Request_ContentLength_0(t *testing.T) {
 	http := httpModForTests()
-	http.parserConfig.SendHeaders = true
-	http.parserConfig.SendAllHeaders = true
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
 
 	data := "POST / HTTP/1.1\r\n" +
 		"user-agent: curl/7.35.0\r\n" + "host: localhost:9000\r\n" +
@@ -171,8 +171,8 @@ func TestHttpParser_eatBody(t *testing.T) {
 	}
 
 	http := httpModForTests()
-	http.parserConfig.SendHeaders = true
-	http.parserConfig.SendAllHeaders = true
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
 
 	data := []byte("POST / HTTP/1.1\r\n" +
 		"user-agent: curl/7.35.0\r\n" +
@@ -208,8 +208,8 @@ func TestHttpParser_eatBody_connclose(t *testing.T) {
 	}
 
 	http := httpModForTests()
-	http.parserConfig.SendHeaders = true
-	http.parserConfig.SendAllHeaders = true
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
 
 	data := []byte("HTTP/1.1 200 ok\r\n" +
 		"user-agent: curl/7.35.0\r\n" +
@@ -262,8 +262,8 @@ func TestHttpParser_splitResponse(t *testing.T) {
 
 func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
 	http := httpModForTests()
-	http.parserConfig.SendHeaders = true
-	http.parserConfig.SendAllHeaders = true
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
 
 	data1 := "HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -286,12 +286,12 @@ func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
 	message, ok, complete := tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
-	assert.False(t, message.IsRequest)
-	assert.Equal(t, 200, int(message.StatusCode))
-	assert.Equal(t, "OK", string(message.StatusPhrase))
+	assert.False(t, message.isRequest)
+	assert.Equal(t, 200, int(message.statusCode))
+	assert.Equal(t, "OK", string(message.statusPhrase))
 	assert.True(t, isVersion(message.version, 1, 1))
-	assert.Equal(t, 262, int(message.Size))
-	assert.Equal(t, 0, message.ContentLength)
+	assert.Equal(t, 262, int(message.size))
+	assert.Equal(t, 0, message.contentLength)
 }
 
 func TestHttpParser_splitResponse_midHeaderValue(t *testing.T) {
@@ -361,7 +361,7 @@ func TestHttpParser_ResponseWithBody(t *testing.T) {
 	message, ok, complete := tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
-	assert.Equal(t, 30, message.ContentLength)
+	assert.Equal(t, 30, message.contentLength)
 	assert.Equal(t, "garbage", string(tp.stream.data[tp.stream.parseOffset:]))
 }
 
@@ -377,7 +377,7 @@ func TestHttpParser_Response_HTTP_10_without_content_length(t *testing.T) {
 	message, ok, complete := testParse(nil, data)
 	assert.True(t, ok)
 	assert.False(t, complete)
-	assert.Equal(t, 4, message.ContentLength)
+	assert.Equal(t, 4, message.contentLength)
 }
 
 func TestHttpParser_splitResponse_midBody(t *testing.T) {
@@ -408,7 +408,7 @@ func TestHttpParser_splitResponse_midBody(t *testing.T) {
 	message, ok, complete := tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
-	assert.Equal(t, 30, message.ContentLength)
+	assert.Equal(t, 30, message.contentLength)
 	assert.Equal(t, []byte(""), tp.stream.data[tp.stream.parseOffset:])
 }
 
@@ -447,7 +447,7 @@ func TestHttpParser_RequestResponse(t *testing.T) {
 	assert.True(t, complete)
 
 	tp.stream.PrepareForNewMessage()
-	tp.stream.message = &message{Ts: time.Now()}
+	tp.stream.message = &message{ts: time.Now()}
 	_, ok, complete = tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
@@ -485,11 +485,11 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 	msg, ok, complete := tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
-	assert.Equal(t, 2, msg.ContentLength)
+	assert.Equal(t, 2, msg.contentLength)
 	assert.Equal(t, []byte(data1), tp.stream.data[tp.stream.message.start:tp.stream.message.end])
 
 	tp.stream.PrepareForNewMessage()
-	tp.stream.message = &message{Ts: time.Now()}
+	tp.stream.message = &message{ts: time.Now()}
 	msg, ok, complete = tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
@@ -522,7 +522,7 @@ func TestHttpParser_301_response(t *testing.T) {
 	msg, ok, complete := testParse(nil, data)
 	assert.True(t, ok)
 	assert.True(t, complete)
-	assert.Equal(t, 290, msg.ContentLength)
+	assert.Equal(t, 290, msg.contentLength)
 }
 
 func TestEatBodyChunked(t *testing.T) {
@@ -543,7 +543,7 @@ func TestEatBodyChunked(t *testing.T) {
 	}
 	msg := &message{
 		chunkedLength: 5,
-		ContentLength: 0,
+		contentLength: 0,
 	}
 	parser := newParser(&testParserConfig)
 
@@ -608,7 +608,7 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 	}
 	msg := &message{
 		chunkedLength: 5,
-		ContentLength: 0,
+		contentLength: 0,
 	}
 	parser := newParser(&testParserConfig)
 
@@ -660,9 +660,9 @@ func TestHttpParser_censorPasswordURL(t *testing.T) {
 	}
 
 	http := httpModForTests()
-	http.HideKeywords = []string{"password", "pass"}
-	http.parserConfig.SendHeaders = true
-	http.parserConfig.SendAllHeaders = true
+	http.hideKeywords = []string{"password", "pass"}
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
 
 	data1 := "GET http://localhost:8080/test?password=secret HTTP/1.1\r\n" +
 		"Host: www.google.com\r\n" +
@@ -698,9 +698,9 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 	}
 
 	http := httpModForTests()
-	http.HideKeywords = []string{"password"}
-	http.parserConfig.SendHeaders = true
-	http.parserConfig.SendAllHeaders = true
+	http.hideKeywords = []string{"password"}
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
 
 	data1 :=
 		"POST /users/login HTTP/1.1\r\n" +
@@ -728,11 +728,11 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 	}
 
 	http := httpModForTests()
-	http.HideKeywords = []string{"password"}
-	http.parserConfig.SendHeaders = true
-	http.parserConfig.SendAllHeaders = true
-	http.SendRequest = false
-	http.SendResponse = false
+	http.hideKeywords = []string{"password"}
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
+	http.sendRequest = false
+	http.sendResponse = false
 
 	data1 := []byte(
 		"GET /users/login HTTP/1.1\r\n" +
@@ -775,9 +775,9 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 	}
 
 	http := httpModForTests()
-	http.RedactAuthorization = true
-	http.parserConfig.SendHeaders = true
-	http.parserConfig.SendAllHeaders = true
+	http.redactAuthorization = true
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
 
 	data := []byte("POST /services/ObjectControl?ID=client0 HTTP/1.1\r\n" +
 		"User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; MS Web Services Client Protocol 2.0.50727.5472)\r\n" +
@@ -796,18 +796,18 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 
 	ok, _ := testParseStream(http, st, 0)
 
-	st.message.Raw = st.data[st.message.start:]
+	st.message.raw = st.data[st.message.start:]
 	http.hideHeaders(st.message)
-	msg := st.message.Raw
+	msg := st.message.raw
 
 	assert.True(t, ok)
-	assert.Equal(t, "*", string(st.message.Headers["authorization"]))
+	assert.Equal(t, "*", string(st.message.headers["authorization"]))
 
 	authPattern, _ := regexp.Compile(`(?m)^[Aa]uthorization:\*+`)
 	authObscured := authPattern.Match(msg)
 	assert.True(t, authObscured)
 
-	assert.Equal(t, "*", string(st.message.Headers["proxy-authorization"]))
+	assert.Equal(t, "*", string(st.message.headers["proxy-authorization"]))
 
 	proxyPattern, _ := regexp.Compile(`(?m)^[Pp]roxy-[Aa]uthorization:\*+`)
 	proxyObscured := proxyPattern.Match(msg)
@@ -817,9 +817,9 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 
 	http := httpModForTests()
-	http.RedactAuthorization = true
-	http.parserConfig.SendHeaders = false
-	http.parserConfig.SendAllHeaders = false
+	http.redactAuthorization = true
+	http.parserConfig.sendHeaders = false
+	http.parserConfig.sendAllHeaders = false
 
 	data := []byte("POST / HTTP/1.1\r\n" +
 		"user-agent: curl/7.35.0\r\n" + "host: localhost:9000\r\n" +
@@ -833,9 +833,9 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 
 	ok, complete := testParseStream(http, st, 0)
 
-	st.message.Raw = st.data[st.message.start:]
+	st.message.raw = st.data[st.message.start:]
 	http.hideHeaders(st.message)
-	msg := st.message.Raw
+	msg := st.message.raw
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -854,9 +854,9 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 
 	http := httpModForTests()
-	http.RedactAuthorization = true
-	http.parserConfig.SendHeaders = false
-	http.parserConfig.SendAllHeaders = false
+	http.redactAuthorization = true
+	http.parserConfig.sendHeaders = false
+	http.parserConfig.sendAllHeaders = false
 
 	data := []byte("POST / HTTP/1.1\r\n" +
 		"user-agent: curl/7.35.0\r\n" + "host: localhost:9000\r\n" +
@@ -870,9 +870,9 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 
 	ok, complete := testParseStream(http, st, 0)
 
-	st.message.Raw = st.data[st.message.start:]
+	st.message.raw = st.data[st.message.start:]
 	http.hideHeaders(st.message)
-	msg := st.message.Raw
+	msg := st.message.raw
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -1048,18 +1048,18 @@ func Test_gap_in_body_http1dot0(t *testing.T) {
 
 }
 
-func testCreateTCPTuple() *common.TcpTuple {
-	t := &common.TcpTuple{
-		Ip_length: 4,
-		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
-		Src_port: 6512, Dst_port: 80,
+func testCreateTCPTuple() *common.TCPTuple {
+	t := &common.TCPTuple{
+		IPLength: 4,
+		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+		SrcPort: 6512, DstPort: 80,
 	}
 	t.ComputeHashebles()
 	return t
 }
 
 // Helper function to read from the Publisher Queue
-func expectTransaction(t *testing.T, http *HTTP) common.MapStr {
+func expectTransaction(t *testing.T, http *httpPlugin) common.MapStr {
 	client := http.results.(*publish.ChanTransactions)
 	select {
 	case trans := <-client.Channel:
@@ -1107,7 +1107,7 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 	private, drop := http.GapInStream(tcptuple, 1, 10, private)
 	assert.Equal(t, false, drop)
 
-	private = http.ReceivedFin(tcptuple, 1, private)
+	http.ReceivedFin(tcptuple, 1, private)
 
 	trans := expectTransaction(t, http)
 	assert.NotNil(t, trans)
@@ -1124,26 +1124,26 @@ func TestHttp_configsSettingAll(t *testing.T) {
 
 	config.SendRequest = true
 	config.SendResponse = true
-	config.Hide_keywords = []string{"a", "b"}
-	config.Redact_authorization = true
-	config.Send_all_headers = true
-	config.Split_cookie = true
-	config.Real_ip_header = "X-Forwarded-For"
+	config.HideKeywords = []string{"a", "b"}
+	config.RedactAuthorization = true
+	config.SendAllHeaders = true
+	config.SplitCookie = true
+	config.RealIPHeader = "X-Forwarded-For"
 
 	// Set config
 	http.setFromConfig(&config)
 
 	// Check if http config is set correctly
-	assert.Equal(t, config.Ports, http.Ports)
+	assert.Equal(t, config.Ports, http.ports)
 	assert.Equal(t, config.Ports, http.GetPorts())
-	assert.Equal(t, config.SendRequest, http.SendRequest)
-	assert.Equal(t, config.SendResponse, http.SendResponse)
-	assert.Equal(t, config.Hide_keywords, http.HideKeywords)
-	assert.Equal(t, config.Redact_authorization, http.RedactAuthorization)
-	assert.True(t, http.parserConfig.SendHeaders)
-	assert.True(t, http.parserConfig.SendAllHeaders)
-	assert.Equal(t, config.Split_cookie, http.SplitCookie)
-	assert.Equal(t, strings.ToLower(config.Real_ip_header), http.parserConfig.RealIPHeader)
+	assert.Equal(t, config.SendRequest, http.sendRequest)
+	assert.Equal(t, config.SendResponse, http.sendResponse)
+	assert.Equal(t, config.HideKeywords, http.hideKeywords)
+	assert.Equal(t, config.RedactAuthorization, http.redactAuthorization)
+	assert.True(t, http.parserConfig.sendHeaders)
+	assert.True(t, http.parserConfig.sendAllHeaders)
+	assert.Equal(t, config.SplitCookie, http.splitCookie)
+	assert.Equal(t, strings.ToLower(config.RealIPHeader), http.parserConfig.realIPHeader)
 }
 
 func TestHttp_configsSettingHeaders(t *testing.T) {
@@ -1152,16 +1152,16 @@ func TestHttp_configsSettingHeaders(t *testing.T) {
 	config := defaultConfig
 
 	// Assign config vars
-	config.Send_headers = []string{"a", "b", "c"}
+	config.SendHeaders = []string{"a", "b", "c"}
 
 	// Set config
 	http.setFromConfig(&config)
 
 	// Check if http config is set correctly
-	assert.True(t, http.parserConfig.SendHeaders)
-	assert.Equal(t, len(config.Send_headers), len(http.parserConfig.HeadersWhitelist))
+	assert.True(t, http.parserConfig.sendHeaders)
+	assert.Equal(t, len(config.SendHeaders), len(http.parserConfig.headersWhitelist))
 
-	for _, val := range http.parserConfig.HeadersWhitelist {
+	for _, val := range http.parserConfig.headersWhitelist {
 		assert.True(t, val)
 	}
 }
@@ -1284,7 +1284,7 @@ func BenchmarkHttpSimpleTransaction(b *testing.B) {
 		private = http.ReceivedFin(tcptuple, 0, private)
 
 		private = http.Parse(&resp, tcptuple, 1, private)
-		private = http.ReceivedFin(tcptuple, 1, private)
+		http.ReceivedFin(tcptuple, 1, private)
 
 		select {
 		case <-client.Channel:

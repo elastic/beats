@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
+        "host": "zookeeper:2181",
         "module": "zookeeper",
         "name": "mntr",
         "rtt": 115

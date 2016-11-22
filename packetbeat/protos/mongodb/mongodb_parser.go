@@ -31,9 +31,11 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	// fill up the header common to all messages
 	// see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#standard-message-header
 	s.message.messageLength = length
-	s.message.requestId, err = d.readInt32()
-	s.message.responseTo, err = d.readInt32()
-	code, err := d.readInt32()
+
+	s.message.requestID, _ = d.readInt32()
+	s.message.responseTo, _ = d.readInt32()
+	code, _ := d.readInt32()
+
 	opCode := opCode(code)
 
 	if !validOpcode(opCode) {
@@ -42,8 +44,8 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	}
 
 	s.message.opCode = opCode
-	s.message.IsResponse = false // default is that the message is a request. If not opReplyParse will set this to false
-	s.message.ExpectsResponse = false
+	s.message.isResponse = false // default is that the message is a request. If not opReplyParse will set this to false
+	s.message.expectsResponse = false
 	debugf("opCode = %v", s.message.opCode)
 
 	// then split depending on operation type
@@ -51,7 +53,7 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 
 	switch s.message.opCode {
 	case opReply:
-		s.message.IsResponse = true
+		s.message.isResponse = true
 		return opReplyParse(d, s.message)
 	case opMsg:
 		s.message.method = "msg"
@@ -63,11 +65,11 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 		s.message.method = "insert"
 		return opInsertParse(d, s.message)
 	case opQuery:
-		s.message.ExpectsResponse = true
+		s.message.expectsResponse = true
 		return opQueryParse(d, s.message)
 	case opGetMore:
 		s.message.method = "getMore"
-		s.message.ExpectsResponse = true
+		s.message.expectsResponse = true
 		return opGetMoreParse(d, s.message)
 	case opDelete:
 		s.message.method = "delete"
@@ -112,7 +114,7 @@ func opReplyParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	m.documents = documents
 
 	if err != nil {
-		logp.Err("An error occured while parsing OP_REPLY message: %s", err)
+		logp.Err("An error occurred while parsing OP_REPLY message: %s", err)
 		return false, false
 	}
 	return true, true
@@ -122,7 +124,7 @@ func opMsgParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	var err error
 	m.event["message"], err = d.readCStr()
 	if err != nil {
-		logp.Err("An error occured while parsing OP_MSG message: %s", err)
+		logp.Err("An error occurred while parsing OP_MSG message: %s", err)
 		return false, false
 	}
 	return true, true
@@ -137,7 +139,7 @@ func opUpdateParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	m.event["update"], err = d.readDocumentStr()
 
 	if err != nil {
-		logp.Err("An error occured while parsing OP_UPDATE message: %s", err)
+		logp.Err("An error occurred while parsing OP_UPDATE message: %s", err)
 		return false, false
 	}
 
@@ -153,20 +155,20 @@ func opInsertParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	// Find an old client to generate a pcap with legacy protocol ?
 
 	if err != nil {
-		logp.Err("An error occured while parsing OP_INSERT message: %s", err)
+		logp.Err("An error occurred while parsing OP_INSERT message: %s", err)
 		return false, false
 	}
 
 	return true, true
 }
 
-func extract_documents(query map[string]interface{}) []interface{} {
-	docs_vi, present := query["documents"]
+func extractDocuments(query map[string]interface{}) []interface{} {
+	docsVi, present := query["documents"]
 	if !present {
 		return []interface{}{}
 	}
 
-	docs, ok := docs_vi.([]interface{})
+	docs, ok := docsVi.([]interface{})
 	if !ok {
 		return []interface{}{}
 	}
@@ -177,7 +179,7 @@ func extract_documents(query map[string]interface{}) []interface{} {
 // the query represents a command.
 func isDatabaseCommand(key string, val interface{}) bool {
 	nameExists := false
-	for _, cmd := range DatabaseCommands {
+	for _, cmd := range databaseCommands {
 		if strings.EqualFold(cmd, key) {
 			nameExists = true
 			break
@@ -233,7 +235,7 @@ func opQueryParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	m.params = query
 
 	if err != nil {
-		logp.Err("An error occured while parsing OP_QUERY message: %s", err)
+		logp.Err("An error occurred while parsing OP_QUERY message: %s", err)
 		return false, false
 	}
 
@@ -247,7 +249,7 @@ func opGetMoreParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	m.event["cursorId"], err = d.readInt64()
 
 	if err != nil {
-		logp.Err("An error occured while parsing OP_GET_MORE message: %s", err)
+		logp.Err("An error occurred while parsing OP_GET_MORE message: %s", err)
 		return false, false
 	}
 	return true, true
@@ -261,7 +263,7 @@ func opDeleteParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	m.event["selector"], err = d.readDocumentStr()
 
 	if err != nil {
-		logp.Err("An error occured while parsing OP_DELETE message: %s", err)
+		logp.Err("An error occurred while parsing OP_DELETE message: %s", err)
 		return false, false
 	}
 

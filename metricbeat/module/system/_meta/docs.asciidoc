@@ -10,7 +10,7 @@ The System module has these additional config options:
 
 *`processes`*:: When the `process` metricset is enabled, you can use the `processes` option to define a list of
 regexp expressions to filter the processes that are reported. For more complex filtering, you should use the
-`filters` configuration option.
+<<configuration-processors, processors>> configuration option.
 +
 The following example config returns metrics for all processes:
 +

@@ -57,9 +57,9 @@ func GetCpuTimesList() ([]CpuTimes, error) {
 func GetCpuPercentage(last *CpuTimes, current *CpuTimes) *CpuTimes {
 
 	if last != nil && current != nil {
-		all_delta := current.Cpu.Total() - last.Cpu.Total()
+		allDelta := current.Cpu.Total() - last.Cpu.Total()
 
-		if all_delta == 0 {
+		if allDelta == 0 {
 			// first inquiry
 			return current
 		}
@@ -68,7 +68,7 @@ func GetCpuPercentage(last *CpuTimes, current *CpuTimes) *CpuTimes {
 
 			perc := 0.0
 			delta := int64(field2 - field1)
-			perc = float64(delta) / float64(all_delta)
+			perc = float64(delta) / float64(allDelta)
 			return system.Round(perc, .5, 4)
 		}
 
@@ -98,15 +98,15 @@ func GetCpuPercentageList(last, current []CpuTimes) []CpuTimes {
 		}
 
 		for i := 0; i < len(last); i++ {
-			all_delta := current[i].Cpu.Total() - last[i].Cpu.Total()
-			current[i].UserPercent = calculate(current[i].Cpu.User, last[i].Cpu.User, all_delta)
-			current[i].SystemPercent = calculate(current[i].Cpu.Sys, last[i].Cpu.Sys, all_delta)
-			current[i].IdlePercent = calculate(current[i].Cpu.Idle, last[i].Cpu.Idle, all_delta)
-			current[i].IOwaitPercent = calculate(current[i].Cpu.Wait, last[i].Cpu.Wait, all_delta)
-			current[i].IrqPercent = calculate(current[i].Cpu.Irq, last[i].Cpu.Irq, all_delta)
-			current[i].NicePercent = calculate(current[i].Cpu.Nice, last[i].Cpu.Nice, all_delta)
-			current[i].SoftIrqPercent = calculate(current[i].Cpu.SoftIrq, last[i].Cpu.SoftIrq, all_delta)
-			current[i].StealPercent = calculate(current[i].Cpu.Stolen, last[i].Cpu.Stolen, all_delta)
+			allDelta := current[i].Cpu.Total() - last[i].Cpu.Total()
+			current[i].UserPercent = calculate(current[i].Cpu.User, last[i].Cpu.User, allDelta)
+			current[i].SystemPercent = calculate(current[i].Cpu.Sys, last[i].Cpu.Sys, allDelta)
+			current[i].IdlePercent = calculate(current[i].Cpu.Idle, last[i].Cpu.Idle, allDelta)
+			current[i].IOwaitPercent = calculate(current[i].Cpu.Wait, last[i].Cpu.Wait, allDelta)
+			current[i].IrqPercent = calculate(current[i].Cpu.Irq, last[i].Cpu.Irq, allDelta)
+			current[i].NicePercent = calculate(current[i].Cpu.Nice, last[i].Cpu.Nice, allDelta)
+			current[i].SoftIrqPercent = calculate(current[i].Cpu.SoftIrq, last[i].Cpu.SoftIrq, allDelta)
+			current[i].StealPercent = calculate(current[i].Cpu.Stolen, last[i].Cpu.Stolen, allDelta)
 
 		}
 
