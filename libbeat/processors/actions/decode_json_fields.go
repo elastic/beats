@@ -84,7 +84,10 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 		}
 	}
 
-	return event, fmt.Errorf(strings.Join(errs, ", "))
+	if len(errs) > 0 {
+		return event, fmt.Errorf(strings.Join(errs, ", "))
+	}
+	return event, nil
 }
 
 func unmarshal(maxDepth int, text []byte, fields *interface{}, processArray bool) error {

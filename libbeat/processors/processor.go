@@ -75,10 +75,8 @@ func (procs *Processors) Run(event common.MapStr) common.MapStr {
 }
 
 func (procs Processors) String() string {
-	s := []string{}
-
+	var s []string
 	for _, p := range procs.list {
-
 		s = append(s, p.String())
 	}
 	return strings.Join(s, ", ")
