@@ -281,22 +281,14 @@ func (f funcTask) annotated(start time.Time, typ string) TaskRunner {
 	return annotated(start, typ, f.run)
 }
 
-func (p *PingMode) Unpack(v interface{}) error {
-	var fail = errors.New("expecting 'any' or 'all'")
-	s, ok := v.(string)
-	if !ok {
-		return fail
-	}
-
+func (p *PingMode) Unpack(s string) error {
 	switch s {
 	case "all":
 		*p = PingAll
 	case "any":
 		*p = PingAny
-	default:
-		return fail
 	}
-	return nil
+	return errors.New("expecting 'any' or 'all'")
 }
 
 func annotated(start time.Time, typ string, fn func() (common.MapStr, []TaskRunner, error)) TaskRunner {
