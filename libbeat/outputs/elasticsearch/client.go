@@ -142,6 +142,19 @@ func NewClient(
 		}
 	}
 
+	u, err := url.Parse(s.URL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse elasticsearch URL: %v", err)
+	}
+	if u.User != nil {
+		s.Username = u.User.Username()
+		s.Password, _ = u.User.Password()
+		u.User = nil
+
+		// Re-write URL without credentials.
+		s.URL = u.String()
+	}
+
 	client := &Client{
 		Connection: Connection{
 			URL:      s.URL,
