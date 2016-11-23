@@ -57,7 +57,7 @@ func (r *Registrar) Init() error {
 
 	// Create directory if it does not already exist.
 	registryPath := filepath.Dir(r.registryFile)
-	err := os.MkdirAll(registryPath, 0755)
+	err := os.MkdirAll(registryPath, 0750)
 	if err != nil {
 		return fmt.Errorf("Failed to created registry file dir %s: %v", registryPath, err)
 	}
@@ -298,7 +298,7 @@ func (r *Registrar) writeRegistry() error {
 	logp.Debug("registrar", "Write registry file: %s", r.registryFile)
 
 	tempfile := r.registryFile + ".new"
-	f, err := os.Create(tempfile)
+	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		logp.Err("Failed to create tempfile (%s) for writing: %s", tempfile, err)
 		return err
