@@ -95,7 +95,7 @@ func parseSingleResponse(mbeanName string, attributeName string, attibuteValue i
 			event[aliasStructure[0]] = map[string]interface{}{aliasStructure[1]: attibuteValue}
 		}
 	default:
-		fmt.Errorf("Mapping failed, alias nesting depth exceeds 1: %d", len(aliasStructure)-1)
+		_ = fmt.Errorf("Mapping failed, alias nesting depth exceeds 1: %d", len(aliasStructure)-1)
 	}
 
 	return event

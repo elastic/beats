@@ -61,19 +61,19 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		req, err := http.NewRequest("POST", elem.Url, strings.NewReader(elem.Body))
 		resp, err := m.client.Do(req)
 		if err != nil {
-			fmt.Errorf("Error making http request: %#v", err)
+			_ = fmt.Errorf("Error making http request: %#v", err)
 			continue
 		}
 		defer resp.Body.Close()
 
 		if resp.StatusCode != 200 {
-			fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
+			_ = fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
 			continue
 		}
 
 		resp_body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Errorf("Error converting response body: %#v", err)
+			_ = fmt.Errorf("Error converting response body: %#v", err)
 			continue
 		}
 
