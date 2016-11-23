@@ -1,9 +1,9 @@
 package jolokia
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
 	"encoding/json"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestConfigParser(t *testing.T) {
@@ -14,18 +14,17 @@ func TestConfigParser(t *testing.T) {
 	jolokiaConfig, err := parseConfig(jolokiaConfigInput)
 	assert.Nil(t, err)
 
-	mappingConfigOne := map[string]string{"java.lang:type=Memory:::HeapMemoryUsage":"memory.heap_usage", "java.lang:type=Runtime:::Uptime":"uptime", "java.lang:type=GarbageCollector,name=ConcurrentMarkSweep:::CollectionTime":"gc.cms_collection_time", "java.lang:type=GarbageCollector,name=ParNew:::CollectionTime":"gc.parnew_collection_time", "java.lang:type=GarbageCollector,name=ConcurrentMarkSweep:::CollectionCount":"gc.cms_collection_count", "java.lang:type=GarbageCollector,name=ParNew:::CollectionCount":"gc.parnew_collection_count", "java.lang:type=Memory:::NonHeapMemoryUsage":"memory.non_heap_usage"}
-	mappingConfigTwo := map[string]string{"org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency:::OneMinuteRate":"client_request.read_latency_one_min_rate", "org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency:::Count":"client_request.read_latency", "org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency:::Count":"client_request.write_latency", "org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency:::OneMinuteRate":"client_request.write_latency_one_min_rate", "org.apache.cassandra.metrics:type=Compaction,name=CompletedTasks:::Value":"compaction.completed_tasks", "org.apache.cassandra.metrics:type=Compaction,name=PendingTasks:::Value":"compaction.pending_tasks"}
+	mappingConfigOne := map[string]string{"java.lang:type=Memory:::HeapMemoryUsage": "memory.heap_usage", "java.lang:type=Runtime:::Uptime": "uptime", "java.lang:type=GarbageCollector,name=ConcurrentMarkSweep:::CollectionTime": "gc.cms_collection_time", "java.lang:type=GarbageCollector,name=ParNew:::CollectionTime": "gc.parnew_collection_time", "java.lang:type=GarbageCollector,name=ConcurrentMarkSweep:::CollectionCount": "gc.cms_collection_count", "java.lang:type=GarbageCollector,name=ParNew:::CollectionCount": "gc.parnew_collection_count", "java.lang:type=Memory:::NonHeapMemoryUsage": "memory.non_heap_usage"}
+	mappingConfigTwo := map[string]string{"org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency:::OneMinuteRate": "client_request.read_latency_one_min_rate", "org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency:::Count": "client_request.read_latency", "org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency:::Count": "client_request.write_latency", "org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency:::OneMinuteRate": "client_request.write_latency_one_min_rate", "org.apache.cassandra.metrics:type=Compaction,name=CompletedTasks:::Value": "compaction.completed_tasks", "org.apache.cassandra.metrics:type=Compaction,name=PendingTasks:::Value": "compaction.pending_tasks"}
 
 	var expectedBodyOne []Entry
-	json.Unmarshal([]byte("[{\"type\":\"read\",\"mbean\":\"java.lang:type=Runtime\",\"attribute\":[\"Uptime\"]}," +
-		"{\"type\":\"read\",\"mbean\":\"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep\"," +
+	json.Unmarshal([]byte("[{\"type\":\"read\",\"mbean\":\"java.lang:type=Runtime\",\"attribute\":[\"Uptime\"]},"+
+		"{\"type\":\"read\",\"mbean\":\"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep\","+
 		"\"attribute\":[\"CollectionTime\",\"CollectionCount\"]},{\"type\":\"read\",\"mbean\":\"java.lang:type=GarbageCollector,name=ParNew\",\"attribute\":[\"CollectionTime\",\"CollectionCount\"]},{\"type\":\"read\",\"mbean\":\"java.lang:type=Memory\",\"attribute\":[\"HeapMemoryUsage\",\"NonHeapMemoryUsage\"]}]"), &expectedBodyOne)
 	var expectedBodyTwo []Entry
-	json.Unmarshal([]byte("[{\"type\":\"read\",\"mbean\":\"org.apache.cassandra.metrics:type=ClientRequest," +
-		"scope=Read,name=Latency\",\"attribute\":[\"OneMinuteRate\",\"Count\"]},{\"type\":\"read\"," +
+	json.Unmarshal([]byte("[{\"type\":\"read\",\"mbean\":\"org.apache.cassandra.metrics:type=ClientRequest,"+
+		"scope=Read,name=Latency\",\"attribute\":[\"OneMinuteRate\",\"Count\"]},{\"type\":\"read\","+
 		"\"mbean\":\"org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency\",\"attribute\":[\"OneMinuteRate\",\"Count\"]},{\"type\":\"read\",\"mbean\":\"org.apache.cassandra.metrics:type=Compaction,name=CompletedTasks\"},{\"type\":\"read\",\"mbean\":\"org.apache.cassandra.metrics:type=Compaction,name=PendingTasks\"}]"), &expectedBodyTwo)
-
 
 	var actualBodyOne []Entry
 	err = json.Unmarshal([]byte(jolokiaConfig[0].Body), &actualBodyOne)

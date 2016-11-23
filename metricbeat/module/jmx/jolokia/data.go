@@ -1,15 +1,17 @@
 package jolokia
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"encoding/json"
 	"fmt"
+	"github.com/elastic/beats/libbeat/common"
 	"strings"
 )
 
 type Entry struct {
-	Request struct{ Mbean string `json:"mbean"` }
-	Value   map[string]interface{}
+	Request struct {
+		Mbean string `json:"mbean"`
+	}
+	Value map[string]interface{}
 }
 
 // Map responseBody to common.MapStr
@@ -46,7 +48,6 @@ func eventMapping(responseBody []byte, mapping map[string]string, application st
 
 }
 
-
 // getValue finds a value in a map and passes it back
 func getValue(key string, data map[string]string) (string, error) {
 	value, exists := data[key]
@@ -58,7 +59,7 @@ func getValue(key string, data map[string]string) (string, error) {
 	return value, nil
 }
 
-func parseSingleResponse(mbeanName string, attributeName string, attibuteValue interface{}, event map[string]interface{}, mapping map[string]string) (map[string]interface{}) {
+func parseSingleResponse(mbeanName string, attributeName string, attibuteValue interface{}, event map[string]interface{}, mapping map[string]string) map[string]interface{} {
 	//create metric name by merging mbean and attribute fields
 	var metricName = mbeanName + ":::" + attributeName
 	//find alias for the metric
@@ -94,7 +95,7 @@ func parseSingleResponse(mbeanName string, attributeName string, attibuteValue i
 			event[aliasStructure[0]] = map[string]interface{}{aliasStructure[1]: attibuteValue}
 		}
 	default:
-		fmt.Errorf("Mapping failed, alias nesting depth exceeds 1: %d", len(aliasStructure) - 1)
+		fmt.Errorf("Mapping failed, alias nesting depth exceeds 1: %d", len(aliasStructure)-1)
 	}
 
 	return event

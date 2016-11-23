@@ -19,11 +19,11 @@ func TestEventMapper(t *testing.T) {
 	assert.Nil(t, err)
 
 	var mapping = map[string]string{
-		"java.lang:type=Runtime:::Uptime":"uptime",
-		"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep:::CollectionTime":"gc.cms_collection_time",
-		"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep:::CollectionCount":"gc.cms_collection_count",
-		"java.lang:type=Memory:::HeapMemoryUsage":"memory.heap_usage",
-		"java.lang:type=Memory:::NonHeapMemoryUsage":"memory.non_heap_usage",
+		"java.lang:type=Runtime:::Uptime":                                            "uptime",
+		"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep:::CollectionTime":  "gc.cms_collection_time",
+		"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep:::CollectionCount": "gc.cms_collection_count",
+		"java.lang:type=Memory:::HeapMemoryUsage":                                    "memory.heap_usage",
+		"java.lang:type=Memory:::NonHeapMemoryUsage":                                 "memory.non_heap_usage",
 	}
 
 	event, err := eventMapping(jolokiaResponse, mapping, "application1", "instance1")

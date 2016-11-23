@@ -7,8 +7,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	"strings"
 	"io/ioutil"
+	"strings"
 )
 
 var (
@@ -44,9 +44,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, parseErr
 	} else {
 		return &MetricSet{
-			BaseMetricSet: base,
+			BaseMetricSet:   base,
 			metricSetConfig: jolokiaConfig,
-			client:  &http.Client{Timeout: base.Module().Config().Timeout},
+			client:          &http.Client{Timeout: base.Module().Config().Timeout},
 		}, nil
 	}
 
@@ -91,4 +91,3 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	}
 
 }
-

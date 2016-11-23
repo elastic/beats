@@ -1,13 +1,13 @@
 package jolokia
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"strings"
 )
 
 type MetricSetConfigInput struct {
-	Host         string `yaml:"host"`
+	Host        string `yaml:"host"`
 	Mapping     string `yaml:"mapping"`
 	Application string `yaml:"application"`
 	Instance    string `yaml:"instance"`
@@ -30,7 +30,6 @@ func (s SliceSet) Add(key, value string) {
 	}
 	s[key] = append(s[key], value)
 }
-
 
 //parse MetricSetConfigRaw to MetricSetConfig
 func parseConfig(metricSetConfigRaw []MetricSetConfigInput) ([]MetricSetConfig, error) {
@@ -70,7 +69,7 @@ func buildRequestBody(mapping map[string]string) (string, error) {
 	return marshalJSONRequest(requestBodyStructure), nil
 }
 
-func marshalJSONRequest(this SliceSet) (string){
+func marshalJSONRequest(this SliceSet) string {
 	result := "["
 	for mbean, attributes := range this {
 		singleRequest := "{\"type\":\"read\",\"mbean\":\"" + mbean + "\",\"attribute\":["
@@ -84,5 +83,3 @@ func marshalJSONRequest(this SliceSet) (string){
 	debugf("Marshalled JSON: %s", result)
 	return result
 }
-
-
