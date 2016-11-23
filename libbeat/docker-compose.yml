@@ -60,3 +60,4 @@ services:
     build:
       context: ${PWD}/../testing/environments/
       dockerfile: Dockerfile
+      args: []

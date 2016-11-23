@@ -16,7 +16,7 @@ RUN set -x && \
     tar xzf logstash.tar.gz
 
 
-COPY logstash.conf.2.tmpl /logstash.conf.2.tmpl
+COPY logstash.conf.tmpl /logstash.conf.tmpl
 COPY docker-entrypoint.sh /entrypoint.sh
 
 COPY pki /etc/pki
