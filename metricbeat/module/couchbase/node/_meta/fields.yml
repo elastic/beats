@@ -1,0 +1,9 @@
+- name: node
+  type: group
+  description: >
+    node
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
