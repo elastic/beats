@@ -1,0 +1,3 @@
+=== couchbase host MetricSet
+
+This is the host metricset of the module couchbase.

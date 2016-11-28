@@ -1,0 +1,6 @@
+- module: couchbase
+  metricsets: ["host"]
+  enabled: true
+  period: 1s
+  hosts: ["localhost"]
+

@@ -1,0 +1,9 @@
+- key: couchbase
+  title: "couchbase"
+  description: >
+    couchbase Module
+  fields:
+    - name: couchbase
+      type: group
+      description: >
+      fields:
