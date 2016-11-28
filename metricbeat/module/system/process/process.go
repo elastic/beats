@@ -48,8 +48,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	m := &MetricSet{
 		BaseMetricSet: base,
 		stats: &ProcStats{
-			ProcStats: true,
-			Procs:     config.Procs,
+			Procs: config.Procs,
 		},
 	}
 	err := m.stats.InitProcStats()
