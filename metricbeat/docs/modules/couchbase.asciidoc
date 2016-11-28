@@ -33,5 +33,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-couchbase-host,host>>
 
+* <<metricbeat-metricset-couchbase-node,node>>
+
 include::couchbase/host.asciidoc[]
+
+include::couchbase/node.asciidoc[]
 
