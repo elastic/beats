@@ -12,7 +12,11 @@
     },
     "couchbase":{
         "host":{
-            "example": "host"
+            "hostname": "http://example:8081",
+            "indexMemoryQuota": 256,
+            "maxBucketCount": 10,
+            "memoryQuota": 4783,
+            "name": "default"
         }
     },
     "type":"metricsets"

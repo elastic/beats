@@ -1,9 +1,9 @@
 - name: host
   type: group
   description: >
-    host
+    host information
   fields:
-    - name: example
+    - name: hostname
       type: keyword
       description: >
         Example field

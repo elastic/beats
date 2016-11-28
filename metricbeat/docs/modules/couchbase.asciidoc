@@ -21,7 +21,7 @@ metricbeat.modules:
 - module: couchbase
   metricsets: ["host"]
   enabled: true
-  period: 20s
+  period: 1s
   hosts: ["localhost"]
 
 ----
