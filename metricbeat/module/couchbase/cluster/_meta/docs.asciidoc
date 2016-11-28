@@ -1,0 +1,3 @@
+=== couchbase cluster MetricSet
+
+This is the cluster metricset of the module couchbase.

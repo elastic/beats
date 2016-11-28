@@ -1,4 +1,4 @@
-package host
+package cluster
 
 import (
 	"encoding/json"
@@ -33,7 +33,6 @@ type Data struct {
 	StorageTotals        StorageTotals `json:"storageTotals"`
 	IndexMemoryQuota     int `json:"indexMemoryQuota"`
 	MemoryQuota          int `json:"memoryQuota"`
-	Name                 string `json:"name"`
 	RebalanceStatus      string `json:"rebalanceStatus"`
 	RebalanceProgressURI string `json:"rebalanceProgressUri"`
 	StopRebalanceURI     string `json:"stopRebalanceUri"`
@@ -41,7 +40,7 @@ type Data struct {
 	MaxBucketCount       int `json:"maxBucketCount"`
 }
 
-func eventMapping(body io.Reader, hostname string) common.MapStr {
+func eventMapping(body io.Reader) common.MapStr {
 
 	var d Data
 	err := json.NewDecoder(body).Decode(&d)
@@ -50,9 +49,7 @@ func eventMapping(body io.Reader, hostname string) common.MapStr {
 	}
 
 	logp.Info("Printing Data:")
-	hostEvent := common.MapStr{
-		"hostname": hostname,
-		"name": d.Name,
+	event := common.MapStr{
 		"indexMemoryQuota": d.IndexMemoryQuota,
 		"maxBucketCount": d.MaxBucketCount,
 		"memoryQuota": d.MemoryQuota,
@@ -70,5 +67,5 @@ func eventMapping(body io.Reader, hostname string) common.MapStr {
 		"ram_usedByData": d.StorageTotals.RAM.UsedByData,
 	}
 
-	return hostEvent
+	return event
 }

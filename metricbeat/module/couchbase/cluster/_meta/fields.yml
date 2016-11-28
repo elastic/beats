@@ -1,7 +1,7 @@
-- name: host
+- name: cluster
   type: group
   description: >
-    host information
+    cluster information
   fields:
     - name: hostname
       type: keyword

@@ -11,7 +11,7 @@
         "rtt":44269
     },
     "couchbase":{
-        "host":{
+        "cluster":{
             "hostname": "http://example:8081",
             "indexMemoryQuota": 256,
             "maxBucketCount": 10,
