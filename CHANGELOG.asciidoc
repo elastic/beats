@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.0.1...5.0[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.0.2...5.0[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -30,8 +30,6 @@ https://github.com/elastic/beats/compare/v5.0.1...5.0[Check the HEAD diff]
 *Affecting all Beats*
 
 *Metricbeat*
-
-- Fix the `password` option in the MongoDB module. {pull}2995[2995]
 
 *Packetbeat*
 
@@ -70,6 +68,17 @@ https://github.com/elastic/beats/compare/v5.0.1...5.0[Check the HEAD diff]
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.0.2]]
+=== Beats version 5.0.2
+https://github.com/elastic/beats/compare/v5.0.1...v5.0.2[View commits]
+
+==== Bugfixes
+
+*Metricbeat*
+
+- Fix the `password` option in the MongoDB module. {pull}2995[2995]
+
 
 [[release-notes-5.0.1]]
 === Beats version 5.0.1
