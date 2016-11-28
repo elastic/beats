@@ -542,10 +542,8 @@ func (http *httpPlugin) collectHeaders(m *message) interface{} {
 			if strings.ToLower(name) == "content-length" {
 				continue
 			}
-			if http.splitCookie {
-				if name == cookie {
-					hdrs[name] = splitCookiesHeader(string(value))
-				}
+			if http.splitCookie && name == cookie {
+				hdrs[name] = splitCookiesHeader(string(value))
 			} else {
 				hdrs[name] = value
 			}
