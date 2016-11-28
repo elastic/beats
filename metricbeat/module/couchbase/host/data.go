@@ -29,55 +29,11 @@ type StorageTotals struct {
 	Hdd StorageTotals_Hdd `json:"hdd"`
 }
 
-type NodeSystemStats struct {
-	CPUUtilizationRate int `json:"cpu_utilization_rate"`
-	SwapTotal          int64 `json:"swap_total"`
-	SwapUsed           int `json:"swap_used"`
-	MemTotal           int64 `json:"mem_total"`
-	MemFree            int64 `json:"mem_free"`
-}
-
-type NodeInterestingStats struct {
-	CmdGet                   int `json:"cmd_get"`
-	CouchDocsActualDiskSize  int `json:"couch_docs_actual_disk_size"`
-	CouchDocsDataSize        int `json:"couch_docs_data_size"`
-	CouchSpatialDataSize     int `json:"couch_spatial_data_size"`
-	CouchSpatialDiskSize     int `json:"couch_spatial_disk_size"`
-	CouchViewsActualDiskSize int `json:"couch_views_actual_disk_size"`
-	CouchViewsDataSize       int `json:"couch_views_data_size"`
-	CurrItems                int `json:"curr_items"`
-	CurrItemsTot             int `json:"curr_items_tot"`
-	EpBgFetched              int `json:"ep_bg_fetched"`
-	GetHits                  int `json:"get_hits"`
-	MemUsed                  int `json:"mem_used"`
-	Ops                      int `json:"ops"`
-	VbReplicaCurrItems       int `json:"vb_replica_curr_items"`
-}
-
-type Node struct {
-	SystemStats        NodeSystemStats `json:"systemStats"`
-	InterestingStats   NodeInterestingStats `json:"interestingStats"`
-	Uptime             string `json:"uptime"`
-	MemoryTotal        int64 `json:"memoryTotal"`
-	MemoryFree         int64 `json:"memoryFree"`
-	McdMemoryReserved  int `json:"mcdMemoryReserved"`
-	McdMemoryAllocated int `json:"mcdMemoryAllocated"`
-	ClusterMembership  string `json:"clusterMembership"`
-	RecoveryType       string `json:"recoveryType"`
-	Status             string `json:"status"`
-	ThisNode           bool `json:"thisNode"`
-	Hostname           string `json:"hostname"`
-	ClusterCompatibility int `json:"clusterCompatibility"`
-	Version              string `json:"version"`
-	Os                   string `json:"os"`
-}
-
 type Data struct {
 	StorageTotals        StorageTotals `json:"storageTotals"`
 	IndexMemoryQuota     int `json:"indexMemoryQuota"`
 	MemoryQuota          int `json:"memoryQuota"`
 	Name                 string `json:"name"`
-	Nodes                []Node `json:"nodes"`
 	RebalanceStatus      string `json:"rebalanceStatus"`
 	RebalanceProgressURI string `json:"rebalanceProgressUri"`
 	StopRebalanceURI     string `json:"stopRebalanceUri"`
