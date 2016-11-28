@@ -56,28 +56,19 @@ func eventMapping(body io.Reader, hostname string) common.MapStr {
 		"indexMemoryQuota": d.IndexMemoryQuota,
 		"maxBucketCount": d.MaxBucketCount,
 		"memoryQuota": d.MemoryQuota,
-		"storage_totals": common.MapStr{
-			"hdd": common.MapStr{
-				"free": d.StorageTotals.Hdd.Free,
-				"quotaTotal": d.StorageTotals.Hdd.QuotaTotal,
-				"total": d.StorageTotals.Hdd.Total,
-				"used": d.StorageTotals.Hdd.Used,
-				"usedByData": d.StorageTotals.Hdd.UsedByData,
-
-			},
-			"ram": common.MapStr{
-				"quotaTotal": d.StorageTotals.RAM.QuotaTotal,
-				"quotaTotalPerNode": d.StorageTotals.RAM.QuotaTotalPerNode,
-				"quotaUsed": d.StorageTotals.RAM.QuotaUsed,
-				"quotaUsedPerNode": d.StorageTotals.RAM.QuotaUsedPerNode,
-				"total": d.StorageTotals.RAM.Total,
-				"used": d.StorageTotals.RAM.Used,
-				"usedByData": d.StorageTotals.RAM.UsedByData,
-			},
-
-		},
+		"hdd_free": d.StorageTotals.Hdd.Free,
+		"hdd_quotaTotal": d.StorageTotals.Hdd.QuotaTotal,
+		"hdd_total": d.StorageTotals.Hdd.Total,
+		"hdd_used": d.StorageTotals.Hdd.Used,
+		"hdd_usedByData": d.StorageTotals.Hdd.UsedByData,
+		"ram_quotaTotal": d.StorageTotals.RAM.QuotaTotal,
+		"ram_quotaTotalPerNode": d.StorageTotals.RAM.QuotaTotalPerNode,
+		"ram_quotaUsed": d.StorageTotals.RAM.QuotaUsed,
+		"ram_quotaUsedPerNode": d.StorageTotals.RAM.QuotaUsedPerNode,
+		"ram_total": d.StorageTotals.RAM.Total,
+		"ram_used": d.StorageTotals.RAM.Used,
+		"ram_usedByData": d.StorageTotals.RAM.UsedByData,
 	}
 
 	return hostEvent
 }
-
