@@ -85,7 +85,7 @@ type Data struct {
 	MaxBucketCount       int `json:"maxBucketCount"`
 }
 
-func eventsMapping(body io.Reader, hostname string) common.MapStr {
+func eventMapping(body io.Reader, hostname string) common.MapStr {
 
 	var d Data
 	err := json.NewDecoder(body).Decode(&d)

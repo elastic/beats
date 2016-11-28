@@ -76,5 +76,5 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 
-	return eventsMapping(resp.Body, m.Host()), nil
+	return eventMapping(resp.Body, m.Host()), nil
 }
