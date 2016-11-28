@@ -31,11 +31,14 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-couchbase-bucket,bucket>>
+
 * <<metricbeat-metricset-couchbase-cluster,cluster>>
 
 * <<metricbeat-metricset-couchbase-node,node>>
 
+include::couchbase/bucket.asciidoc[]
+
 include::couchbase/cluster.asciidoc[]
 
 include::couchbase/node.asciidoc[]
-

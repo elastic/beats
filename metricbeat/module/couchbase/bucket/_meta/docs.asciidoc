@@ -1,0 +1,3 @@
+=== couchbase bucket MetricSet
+
+This is the bucket metricset of the module couchbase.

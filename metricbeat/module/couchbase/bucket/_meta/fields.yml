@@ -1,0 +1,9 @@
+- name: bucket
+  type: group
+  description: >
+    bucket
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
