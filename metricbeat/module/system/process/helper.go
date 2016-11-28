@@ -260,25 +260,6 @@ func (procStats *ProcStats) InitProcStats() error {
 		procStats.regexps = append(procStats.regexps, reg)
 	}
 
-	pids, err := Pids()
-	if err != nil {
-		logp.Warn("Getting the initial list of pids: %v", err)
-	}
-
-	for _, pid := range pids {
-		process, err := newProcess(pid)
-		if err != nil {
-			logp.Debug("metricbeat", "Skip process pid=%d: %v", pid, err)
-			continue
-		}
-		err = process.getDetails("")
-		if err != nil {
-			logp.Err("Error getting process details pid=%d: %v", pid, err)
-			continue
-		}
-		procStats.ProcsMap[process.Pid] = process
-	}
-
 	return nil
 }
 
