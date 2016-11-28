@@ -38,6 +38,7 @@ https://github.com/elastic/beats/compare/v5.0.1...master[Check the HEAD diff]
 *Metricbeat*
 
 - Calculate the fsstat values per mounting point, and not filesystem. {pull}2777[2777]
+- Fix service times-out at startup. {pull}3056[3056]
 
 *Packetbeat*
 
