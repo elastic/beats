@@ -21,6 +21,7 @@ type MonitorManager struct {
 	monitors   []Monitor
 	jobControl JobControl
 	client     publisher.Client
+	defaults   *common.Config
 }
 
 type Monitor struct {
@@ -53,6 +54,7 @@ func newMonitorManager(
 	client publisher.Client,
 	jobControl JobControl,
 	registry *monitors.Registrar,
+	defaultConfig *common.Config,
 	configs []*common.Config,
 ) (*MonitorManager, error) {
 	type watchConfig struct {
@@ -66,6 +68,7 @@ func newMonitorManager(
 	m := &MonitorManager{
 		client:     client,
 		jobControl: jobControl,
+		defaults:   defaultConfig,
 	}
 
 	if len(configs) == 0 {
@@ -74,6 +77,16 @@ func newMonitorManager(
 
 	// check monitors exist
 	for _, config := range configs {
+		if defaultConfig != nil {
+			var err error
+
+			config, err = common.MergeConfigs(defaultConfig, config)
+			if err != nil {
+				logp.Err("Failed to merge monitor settings with defaults: %v", err)
+				continue
+			}
+		}
+
 		plugin := struct {
 			Type    string `config:"type" validate:"required"`
 			Enabled bool   `config:"enabled"`

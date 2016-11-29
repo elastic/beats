@@ -38,9 +38,14 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
+	var defaults *common.Config
+	if config.Defaults != nil {
+		defaults = config.Defaults["monitors"]
+	}
+
 	client := b.Publisher.Connect()
 	sched := scheduler.NewWithLocation(limit, location)
-	manager, err := newMonitorManager(client, sched, monitors.Registry, config.Monitors)
+	manager, err := newMonitorManager(client, sched, monitors.Registry, defaults, config.Monitors)
 	if err != nil {
 		return nil, err
 	}
