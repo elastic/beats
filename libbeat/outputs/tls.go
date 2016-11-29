@@ -269,12 +269,7 @@ func loadCertificateAuthorities(CAs []string) (*x509.CertPool, []error) {
 	return roots, errors
 }
 
-func (cs *tlsCipherSuite) Unpack(in interface{}) error {
-	s, ok := in.(string)
-	if !ok {
-		return fmt.Errorf("tls cipher suite must be an identifier")
-	}
-
+func (cs *tlsCipherSuite) Unpack(s string) error {
 	suite, found := tlsCipherSuites[s]
 	if !found {
 		return fmt.Errorf("invalid tls cipher suite '%v'", s)
@@ -284,12 +279,7 @@ func (cs *tlsCipherSuite) Unpack(in interface{}) error {
 	return nil
 }
 
-func (ct *tlsCurveType) Unpack(in interface{}) error {
-	s, ok := in.(string)
-	if !ok {
-		return fmt.Errorf("tls curve type must be an identifier")
-	}
-
+func (ct *tlsCurveType) Unpack(s string) error {
 	t, found := tlsCurveTypes[s]
 	if !found {
 		return fmt.Errorf("invalid tls curve type '%v'", s)
@@ -297,5 +287,4 @@ func (ct *tlsCurveType) Unpack(in interface{}) error {
 
 	*ct = t
 	return nil
-
 }

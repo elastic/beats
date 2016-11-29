@@ -7,6 +7,15 @@ import (
 	"time"
 )
 
+// Config object to store hierarchical configurations into. Config can be
+// both a dictionary and a list holding primitive values. Primitive values
+// can be booleans, integers, float point numbers and strings.
+//
+// Config provides a low level interface for setting and getting settings
+// via SetBool, SetInt, SetUing, SetFloat, SetString, SetChild, Bool, Int, Uint,
+// Float, String, and Child.
+//
+// A more user-friendly high level interface is provided via Unpack and Merge.
 type Config struct {
 	ctx      context
 	metadata *Meta
@@ -24,13 +33,9 @@ type fields struct {
 	a []value
 }
 
-// Meta holds additional meta data per config value
+// Meta holds additional meta data per config value.
 type Meta struct {
 	Source string
-}
-
-type Unpacker interface {
-	Unpack(interface{}) error
 }
 
 var (
@@ -40,7 +45,6 @@ var (
 	tInterfaceArray = reflect.TypeOf([]interface{}(nil))
 
 	// interface types
-	tUnpacker  = reflect.TypeOf((*Unpacker)(nil)).Elem()
 	tValidator = reflect.TypeOf((*Validator)(nil)).Elem()
 
 	// primitives
@@ -53,12 +57,17 @@ var (
 	tRegexp   = reflect.TypeOf(regexp.Regexp{})
 )
 
+// New creates a new empty Config object.
 func New() *Config {
 	return &Config{
 		fields: &fields{nil, nil},
 	}
 }
 
+// NewFrom creates a new config object normalizing and copying from into the new
+// Config object. NewFrom uses Merge to copy from.
+//
+// NewFrom supports the options: PathSep, MetaData, StructTag, VarExp
 func NewFrom(from interface{}, opts ...Option) (*Config, error) {
 	c := New()
 	if err := c.Merge(from, opts...); err != nil {
@@ -67,14 +76,17 @@ func NewFrom(from interface{}, opts ...Option) (*Config, error) {
 	return c, nil
 }
 
+// IsDict checks if c has named keys.
 func (c *Config) IsDict() bool {
 	return c.fields.dict() != nil
 }
 
+// IsArray checks if c has index only accessible settings.
 func (c *Config) IsArray() bool {
 	return c.fields.array() != nil
 }
 
+// GetFields returns a list of all top-level named keys in c.
 func (c *Config) GetFields() []string {
 	var names []string
 	for k := range c.fields.dict() {
@@ -83,19 +95,26 @@ func (c *Config) GetFields() []string {
 	return names
 }
 
+// HasField checks if c has a top-level named key name.
 func (c *Config) HasField(name string) bool {
 	_, ok := c.fields.get(name)
 	return ok
 }
 
+// Path gets the absolute path of c separated by sep. If c is a root-Config an
+// empty string will be returned.
 func (c *Config) Path(sep string) string {
 	return c.ctx.path(sep)
 }
 
+// PathOf gets the absolute path of a potential setting field in c with name
+// separated by sep.
 func (c *Config) PathOf(field, sep string) string {
 	return c.ctx.pathOf(field, sep)
 }
 
+// Parent returns the parent configuration or nil if c is already a root
+// Configuration.
 func (c *Config) Parent() *Config {
 	ctx := c.ctx
 	for {

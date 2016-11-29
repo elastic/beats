@@ -1,7 +1,6 @@
 package cron
 
 import (
-	"errors"
 	"time"
 
 	"github.com/gorhill/cronexpr"
@@ -27,17 +26,10 @@ func (s *Schedule) Next(t time.Time) time.Time {
 	return expr.Next(t)
 }
 
-func (s *Schedule) Unpack(in interface{}) error {
-	str, ok := in.(string)
-	if !ok {
-		return errors.New("scheduler string required")
-	}
-
+func (s *Schedule) Unpack(str string) error {
 	tmp, err := Parse(str)
-	if err != nil {
-		return err
+	if err == nil {
+		*s = *tmp
 	}
-
-	*s = *tmp
-	return nil
+	return err
 }
