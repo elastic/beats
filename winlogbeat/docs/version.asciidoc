@@ -1,2 +1,2 @@
-:stack-version: 5.0.1
+:stack-version: 5.0.2
 :doc-branch: 5.0
