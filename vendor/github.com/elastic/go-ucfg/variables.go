@@ -390,9 +390,7 @@ func lexer(in string) (<-chan token, <-chan error) {
 }
 
 func parseVarExp(lex <-chan token, pathSep string) (varEvaler, error) {
-	stack := []parseState{
-		parseState{st: stLeft},
-	}
+	stack := []parseState{{st: stLeft}}
 
 	// parser loop
 	for tok := range lex {
