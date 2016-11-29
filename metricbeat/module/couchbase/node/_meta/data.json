@@ -1,19 +1,43 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"mysql",
-        "name":"status",
-        "rtt":44269
-    },
-    "couchbase":{
-        "node":{
-            "example": "node"
+    "couchbase": {
+        "node": {
+            "CPUUtilizationRate": 98.73418,
+            "cmdGet": 0,
+            "couchDocsActualDiskSize": 13567853,
+            "couchDocsDataSize": 9796608,
+            "couchSpatialDataSize": 0,
+            "couchSpatialDiskSize": 0,
+            "couchViewsActualDiskSize": 2792901,
+            "couchViewsDataSize": 2792901,
+            "currItems": 7303,
+            "currItemsTot": 7303,
+            "epBgFetched": 0,
+            "getHits": 0,
+            "hostname": "172.21.0.12:8091",
+            "mcdMemoryAllocated": 6377,
+            "mcdMemoryReserved": 6377,
+            "memFree": 4107649024,
+            "memTotal": 8359174144,
+            "memUsed": 53962160,
+            "memoryFree": 4107649024,
+            "memoryTotal": 8359174144,
+            "ops": 0,
+            "swapTotal": 4189057024,
+            "swapUsed": 1040384,
+            "uptime": "15673",
+            "vbReplicaCurrItems": 0
         }
     },
-    "type":"metricsets"
+    "metricset": {
+        "host": "couchbase:8091",
+        "module": "couchbase",
+        "name": "node",
+        "rtt": 115
+    },
+    "type": "metricsets"
 }
