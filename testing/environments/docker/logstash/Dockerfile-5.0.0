@@ -1,6 +1,5 @@
 FROM java:8-jre
 
-ENV LS_VERSION 5
 ENV VERSION 5.0.0
 ENV URL https://artifacts.elastic.co/downloads/logstash/logstash-${VERSION}.tar.gz
 ENV PATH $PATH:/opt/logstash-$VERSION/bin
@@ -11,7 +10,7 @@ RUN set -x && \
     wget -qO logstash.tar.gz $URL && \
     tar xzf logstash.tar.gz
 
-COPY logstash.conf.2.tmpl /logstash.conf.2.tmpl
+COPY logstash.conf.tmpl /logstash.conf.tmpl
 COPY docker-entrypoint.sh /entrypoint.sh
 
 COPY pki /etc/pki
