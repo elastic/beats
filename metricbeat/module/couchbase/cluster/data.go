@@ -10,17 +10,17 @@ import (
 type StorageTotals_Ram struct {
 	Total             int64 `json:"total"`
 	QuotaTotal        int64 `json:"quotaTotal"`
-	QuotaUsed         int `json:"quotaUsed"`
+	QuotaUsed         int64 `json:"quotaUsed"`
 	Used              int64 `json:"used"`
-	UsedByData        int `json:"usedByData"`
-	QuotaUsedPerNode  int `json:"quotaUsedPerNode"`
+	UsedByData        int64 `json:"usedByData"`
+	QuotaUsedPerNode  int64 `json:"quotaUsedPerNode"`
 	QuotaTotalPerNode int64 `json:"quotaTotalPerNode"`
 }
 type StorageTotals_Hdd struct {
 	Total      int64 `json:"total"`
 	QuotaTotal int64 `json:"quotaTotal"`
 	Used       int64 `json:"used"`
-	UsedByData int `json:"usedByData"`
+	UsedByData int64 `json:"usedByData"`
 	Free       int64 `json:"free"`
 }
 
@@ -31,13 +31,13 @@ type StorageTotals struct {
 
 type Data struct {
 	StorageTotals        StorageTotals `json:"storageTotals"`
-	IndexMemoryQuota     int `json:"indexMemoryQuota"`
-	MemoryQuota          int `json:"memoryQuota"`
+	IndexMemoryQuota     int64 `json:"indexMemoryQuota"`
+	MemoryQuota          int64 `json:"memoryQuota"`
 	RebalanceStatus      string `json:"rebalanceStatus"`
 	RebalanceProgressURI string `json:"rebalanceProgressUri"`
 	StopRebalanceURI     string `json:"stopRebalanceUri"`
 	NodeStatusesURI      string `json:"nodeStatusesUri"`
-	MaxBucketCount       int `json:"maxBucketCount"`
+	MaxBucketCount       int64 `json:"maxBucketCount"`
 }
 
 func eventMapping(body io.Reader) common.MapStr {
