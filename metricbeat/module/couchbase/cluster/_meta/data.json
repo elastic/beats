@@ -1,23 +1,33 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"mysql",
-        "name":"status",
-        "rtt":44269
-    },
-    "couchbase":{
-        "cluster":{
-            "hostname": "http://example:8081",
-            "indexMemoryQuota": 256,
+    "couchbase": {
+        "cluster": {
+            "hdd_free": 46902679716,
+            "hdd_quotaTotal": 63381999616,
+            "hdd_total": 63381999616,
+            "hdd_used": 16479319900,
+            "hdd_usedByData": 16360754,
+            "indexMemoryQuota": 300,
             "maxBucketCount": 10,
-            "memoryQuota": 4783,
-            "name": "default"
+            "memoryQuota": 300,
+            "ram_quotaTotal": 314572800,
+            "ram_quotaTotalPerNode": 314572800,
+            "ram_quotaUsed": 104857600,
+            "ram_quotaUsedPerNode": 104857600,
+            "ram_total": 8359174144,
+            "ram_used": 7675994112,
+            "ram_usedByData": 53962160
         }
     },
-    "type":"metricsets"
+    "metricset": {
+        "host": "couchbase:8091",
+        "module": "couchbase",
+        "name": "cluster",
+        "rtt": 115
+    },
+    "type": "metricsets"
 }
