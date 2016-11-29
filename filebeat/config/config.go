@@ -39,8 +39,9 @@ var (
 )
 
 const (
-	LogInputType   = "log"
-	StdinInputType = "stdin"
+	LogInputType    = "log"
+	StdinInputType  = "stdin"
+	GZipCompression = "gzip"
 )
 
 // List of valid input types

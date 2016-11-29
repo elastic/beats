@@ -28,6 +28,7 @@ var (
 		CloseEOF:        false,
 		CloseTimeout:    0,
 		ForceCloseFiles: false,
+		Compression:     "",
 	}
 )
 
@@ -53,6 +54,7 @@ type harvesterConfig struct {
 	Multiline            *reader.MultilineConfig `config:"multiline"`
 	JSON                 *reader.JSONConfig      `config:"json"`
 	Pipeline             string                  `config:"pipeline"`
+	Compression          string                  `config:"compression"`
 }
 
 func (config *harvesterConfig) Validate() error {
@@ -73,6 +75,14 @@ func (config *harvesterConfig) Validate() error {
 	// Check input type
 	if _, ok := cfg.ValidInputType[config.InputType]; !ok {
 		return fmt.Errorf("Invalid input type: %v", config.InputType)
+	}
+
+	// Check compression type
+	if config.Compression != "" {
+		if config.Compression != cfg.GZipCompression {
+			return fmt.Errorf("Invalid compression setting: %v", config.Compression)
+		}
+		logp.Warn("EXPERIMENTAL: Compression setting is enabled.")
 	}
 
 	if config.JSON != nil && len(config.JSON.MessageKey) == 0 &&

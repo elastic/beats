@@ -472,6 +472,16 @@ Currently if a new harvester can be started again, the harvester is picked rando
 This configuration option applies per prospector. You can use this option to indirectly set higher priorities on certain prospectors
 by assigning a higher limit of harvesters.
 
+[[compression]]
+===== compression
+
+experimental[]
+
+The compression feature can be used to read `.gzip` files by setting it compression to `gzip`. One prospector can only read one compression
+type. This feature is mainly recommended to backfill logs in combination with the `-once` flag.
+
+For the limitations of this feature please check https://github.com/elastic/beats/pull/3070[#3070].
+
 ===== enabled
 
 The `enabled` option can be used with each prospector to define if a prospector is enabled or not. By default, enabled is set to true.
