@@ -8,3 +8,4 @@ RUN apt-get update && \
     apt-get clean
 
 
+ARG KIBANA_VERSION

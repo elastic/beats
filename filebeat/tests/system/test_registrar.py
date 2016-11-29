@@ -1146,7 +1146,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test.log",
             clean_inactive="20s",
-            ignore_older="5s"
+            ignore_older="15s"
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -1200,7 +1200,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test file.log",
             clean_inactive="20s",
-            ignore_older="5s"
+            ignore_older="15s"
         )
         os.mkdir(self.working_dir + "/log/")
 
