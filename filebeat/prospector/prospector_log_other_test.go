@@ -132,7 +132,7 @@ func TestInit(t *testing.T) {
 		p := ProspectorLog{
 			Prospector: &Prospector{
 				states: &file.States{},
-				outlet: TestOutlet{},
+				output: TestOutput{},
 			},
 			config: prospectorConfig{
 				Paths: test.paths,
@@ -148,6 +148,6 @@ func TestInit(t *testing.T) {
 }
 
 // TestOutlet is an empty outlet for testing
-type TestOutlet struct{}
+type TestOutput struct{}
 
-func (o TestOutlet) OnEvent(event *input.Event) bool { return true }
+func (o TestOutput) Send(event *input.Event) bool { return true }

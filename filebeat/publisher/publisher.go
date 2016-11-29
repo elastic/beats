@@ -19,23 +19,22 @@ type LogPublisher interface {
 	Stop()
 }
 
-// SuccessLogger is used to report successfully published events.
-type SuccessLogger interface {
-
+// Output is used to report successfully published events.
+type Output interface {
 	// Published will be run after events have been acknowledged by the outputs.
-	Published(events []*input.Event) bool
+	Send(events []*input.Event) bool
 }
 
 func New(
 	async bool,
-	in chan []*input.Event,
-	out SuccessLogger,
+	input chan []*input.Event,
+	output Output,
 	pub publisher.Publisher,
 ) LogPublisher {
 	if async {
-		return newAsyncLogPublisher(in, out, pub)
+		return newAsyncLogPublisher(input, output, pub)
 	}
-	return newSyncLogPublisher(in, out, pub)
+	return newSyncLogPublisher(input, output, pub)
 }
 
 var (

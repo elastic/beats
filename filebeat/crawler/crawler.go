@@ -13,18 +13,18 @@ import (
 type Crawler struct {
 	prospectors       []*prospector.Prospector
 	prospectorConfigs []*common.Config
-	out               prospector.Outlet
+	output            prospector.Output
 	wg                sync.WaitGroup
 }
 
-func New(out prospector.Outlet, prospectorConfigs []*common.Config) (*Crawler, error) {
+func New(output prospector.Output, prospectorConfigs []*common.Config) (*Crawler, error) {
 
 	if len(prospectorConfigs) == 0 {
 		return nil, fmt.Errorf("No prospectors defined. You must have at least one prospector defined in the config file.")
 	}
 
 	return &Crawler{
-		out:               out,
+		output:            output,
 		prospectorConfigs: prospectorConfigs,
 	}, nil
 }
@@ -36,7 +36,7 @@ func (c *Crawler) Start(states file.States, once bool) error {
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, prospectorConfig := range c.prospectorConfigs {
 
-		prospector, err := prospector.NewProspector(prospectorConfig, states, c.out)
+		prospector, err := prospector.NewProspector(prospectorConfig, states, c.output)
 		if err != nil {
 			return fmt.Errorf("Error in initing prospector: %s", err)
 		}

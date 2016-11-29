@@ -16,11 +16,11 @@ const channelSize = 16
 
 // Spooler aggregates the events and sends the aggregated data to the publisher.
 type Spooler struct {
-	Channel chan *input.Event // Channel is the input to the Spooler.
-	config  spoolerConfig
-	output  Output         // batch event output on flush
-	spool   []*input.Event // Events being held by the Spooler.
-	wg      sync.WaitGroup // WaitGroup used to control the shutdown.
+	input  chan *input.Event // Channel is the input to the Spooler.
+	output Output            // batch event output on flush
+	config spoolerConfig
+	spool  []*input.Event // Events being held by the Spooler.
+	wg     sync.WaitGroup // WaitGroup used to control the shutdown.
 }
 
 // Output spooler sends event to through Send method
@@ -40,7 +40,7 @@ func New(
 	out Output,
 ) (*Spooler, error) {
 	return &Spooler{
-		Channel: make(chan *input.Event, channelSize),
+		input: make(chan *input.Event, channelSize),
 		config: spoolerConfig{
 			idleTimeout: config.IdleTimeout,
 			spoolSize:   config.SpoolSize,
@@ -70,7 +70,7 @@ func (s *Spooler) run() {
 
 	for {
 		select {
-		case event, ok := <-s.Channel:
+		case event, ok := <-s.input:
 			if !ok {
 				return
 			}
@@ -102,7 +102,7 @@ func (s *Spooler) Stop() {
 
 	// Signal to the run method that it should stop.
 	// Stop accepting writes. Any events in the channel will be flushed.
-	close(s.Channel)
+	close(s.input)
 
 	// Wait for spooler shutdown to complete.
 	s.wg.Wait()
@@ -142,4 +142,9 @@ func (s *Spooler) flush() int {
 	s.output.Send(tmpCopy)
 
 	return count
+}
+
+// GetInput returns the spooler input channel
+func (s *Spooler) GetInput() chan *input.Event {
+	return s.input
 }

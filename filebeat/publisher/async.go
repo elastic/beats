@@ -13,8 +13,8 @@ import (
 type asyncLogPublisher struct {
 	pub    publisher.Publisher
 	client publisher.Client
-	in     chan []*input.Event
-	out    SuccessLogger
+	input  chan []*input.Event
+	output Output
 
 	// list of in-flight batches
 	active   batchList
@@ -50,15 +50,15 @@ const (
 )
 
 func newAsyncLogPublisher(
-	in chan []*input.Event,
-	out SuccessLogger,
+	input chan []*input.Event,
+	output Output,
 	pub publisher.Publisher,
 ) *asyncLogPublisher {
 	return &asyncLogPublisher{
-		in:   in,
-		out:  out,
-		pub:  pub,
-		done: make(chan struct{}),
+		input:  input,
+		output: output,
+		pub:    pub,
+		done:   make(chan struct{}),
 	}
 }
 
@@ -79,7 +79,7 @@ func (p *asyncLogPublisher) Start() {
 			select {
 			case <-p.done:
 				return
-			case events := <-p.in:
+			case events := <-p.input:
 				batch := &eventsBatch{
 					flag:   0,
 					events: events,
@@ -145,7 +145,7 @@ func (p *asyncLogPublisher) collect() bool {
 		// registrar picking up the current batch. Instead prefer to shut-down and
 		// resend the last published batch on next restart, basically taking advantage
 		// of send-at-last-once semantics in order to speed up cleanup on shutdown.
-		ok := p.out.Published(batch.events)
+		ok := p.output.Send(batch.events)
 		if !ok {
 			logp.Info("Shutting down - No registrar update for successfully published batch.")
 			return false

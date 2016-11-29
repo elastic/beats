@@ -51,32 +51,33 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// count active events for waiting on shutdown
 	wgEvents := &sync.WaitGroup{}
-	finishedLogger := newFinishedLogger(wgEvents)
+	registrarLogger := newLogger(wgEvents)
 
 	// Setup registrar to persist state
-	registrar, err := registrar.New(config.RegistryFile, finishedLogger)
+	registrar, err := registrar.New(config.RegistryFile, registrarLogger)
 	if err != nil {
 		logp.Err("Could not init registrar: %v", err)
 		return err
 	}
 
 	// Make sure all events that were published in
-	registrarChannel := newRegistrarLogger(registrar)
+	publisherOutput := newPublisherOutput(registrar.GetInput())
 
-	// Channel from spooler to harvester
-	publisherChan := newPublisherChannel()
+	// Channel from spooler to publisher
+	spoolerOutput := newSpoolerOutput()
 
 	// Publishes event to output
-	publisher := publisher.New(config.PublishAsync, publisherChan.ch, registrarChannel, b.Publisher)
+	publisher := publisher.New(config.PublishAsync, spoolerOutput.ch, publisherOutput, b.Publisher)
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
-	spooler, err := spooler.New(config, publisherChan)
+	spooler, err := spooler.New(config, spoolerOutput)
 	if err != nil {
 		logp.Err("Could not init spooler: %v", err)
 		return err
 	}
 
-	crawler, err := crawler.New(newSpoolerOutlet(fb.done, spooler, wgEvents), config.Prospectors)
+	prospectorOutput := newProspectorOutput(fb.done, spooler.GetInput(), wgEvents)
+	crawler, err := crawler.New(prospectorOutput, config.Prospectors)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err
@@ -98,9 +99,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	publisher.Start()
 	// Stopping publisher (might potentially drop items)
 	defer func() {
-		// Closes first the registrar logger to make sure not more events arrive at the registrar
-		// registrarChannel must be closed first to potentially unblock (pretty unlikely) the publisher
-		registrarChannel.Close()
+		// Closes first the publisher output to make sure not more events are sent to the registry
+		// publisherOutput must be closed first to potentially unblock (pretty unlikely) the publisher
+		publisherOutput.Close()
 		publisher.Stop()
 	}()
 
@@ -113,7 +114,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		waitEvents.Wait()
 
 		// Closes publisher so no further events can be sent
-		publisherChan.Close()
+		spoolerOutput.Close()
 		// Stopping spooler
 		spooler.Stop()
 	}()

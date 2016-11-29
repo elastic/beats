@@ -12,22 +12,21 @@ type syncLogPublisher struct {
 	pub    publisher.Publisher
 	client publisher.Client
 	in     chan []*input.Event
-	out    SuccessLogger
-
-	done chan struct{}
-	wg   sync.WaitGroup
+	output Output
+	done   chan struct{}
+	wg     sync.WaitGroup
 }
 
 func newSyncLogPublisher(
 	in chan []*input.Event,
-	out SuccessLogger,
+	output Output,
 	pub publisher.Publisher,
 ) *syncLogPublisher {
 	return &syncLogPublisher{
-		in:   in,
-		out:  out,
-		pub:  pub,
-		done: make(chan struct{}),
+		in:     in,
+		output: output,
+		pub:    pub,
+		done:   make(chan struct{}),
 	}
 }
 
@@ -69,7 +68,7 @@ func (p *syncLogPublisher) Publish() error {
 	eventsSent.Add(int64(len(events)))
 
 	// Tell the logger that we've successfully sent these events
-	ok = p.out.Published(events)
+	ok = p.output.Send(events)
 	if !ok {
 		// stop publisher if successfully send events can not be logged anymore.
 		return sigPublisherStop
