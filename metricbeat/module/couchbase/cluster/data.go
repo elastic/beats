@@ -31,13 +31,13 @@ type StorageTotals struct {
 
 type Data struct {
 	StorageTotals        StorageTotals `json:"storageTotals"`
-	IndexMemoryQuota     int64 `json:"indexMemoryQuota"`
-	MemoryQuota          int64 `json:"memoryQuota"`
-	RebalanceStatus      string `json:"rebalanceStatus"`
-	RebalanceProgressURI string `json:"rebalanceProgressUri"`
-	StopRebalanceURI     string `json:"stopRebalanceUri"`
-	NodeStatusesURI      string `json:"nodeStatusesUri"`
-	MaxBucketCount       int64 `json:"maxBucketCount"`
+	IndexMemoryQuota     int64         `json:"indexMemoryQuota"`
+	MemoryQuota          int64         `json:"memoryQuota"`
+	RebalanceStatus      string        `json:"rebalanceStatus"`
+	RebalanceProgressURI string        `json:"rebalanceProgressUri"`
+	StopRebalanceURI     string        `json:"stopRebalanceUri"`
+	NodeStatusesURI      string        `json:"nodeStatusesUri"`
+	MaxBucketCount       int64         `json:"maxBucketCount"`
 }
 
 func eventMapping(body io.Reader) common.MapStr {
@@ -50,21 +50,21 @@ func eventMapping(body io.Reader) common.MapStr {
 
 	logp.Info("Printing Data:")
 	event := common.MapStr{
-		"indexMemoryQuota": d.IndexMemoryQuota,
-		"maxBucketCount": d.MaxBucketCount,
-		"memoryQuota": d.MemoryQuota,
-		"hdd_free": d.StorageTotals.Hdd.Free,
-		"hdd_quotaTotal": d.StorageTotals.Hdd.QuotaTotal,
-		"hdd_total": d.StorageTotals.Hdd.Total,
-		"hdd_used": d.StorageTotals.Hdd.Used,
-		"hdd_usedByData": d.StorageTotals.Hdd.UsedByData,
-		"ram_quotaTotal": d.StorageTotals.RAM.QuotaTotal,
+		"indexMemoryQuota":      d.IndexMemoryQuota,
+		"maxBucketCount":        d.MaxBucketCount,
+		"memoryQuota":           d.MemoryQuota,
+		"hdd_free":              d.StorageTotals.Hdd.Free,
+		"hdd_quotaTotal":        d.StorageTotals.Hdd.QuotaTotal,
+		"hdd_total":             d.StorageTotals.Hdd.Total,
+		"hdd_used":              d.StorageTotals.Hdd.Used,
+		"hdd_usedByData":        d.StorageTotals.Hdd.UsedByData,
+		"ram_quotaTotal":        d.StorageTotals.RAM.QuotaTotal,
 		"ram_quotaTotalPerNode": d.StorageTotals.RAM.QuotaTotalPerNode,
-		"ram_quotaUsed": d.StorageTotals.RAM.QuotaUsed,
-		"ram_quotaUsedPerNode": d.StorageTotals.RAM.QuotaUsedPerNode,
-		"ram_total": d.StorageTotals.RAM.Total,
-		"ram_used": d.StorageTotals.RAM.Used,
-		"ram_usedByData": d.StorageTotals.RAM.UsedByData,
+		"ram_quotaUsed":         d.StorageTotals.RAM.QuotaUsed,
+		"ram_quotaUsedPerNode":  d.StorageTotals.RAM.QuotaUsedPerNode,
+		"ram_total":             d.StorageTotals.RAM.Total,
+		"ram_used":              d.StorageTotals.RAM.Used,
+		"ram_usedByData":        d.StorageTotals.RAM.UsedByData,
 	}
 
 	return event

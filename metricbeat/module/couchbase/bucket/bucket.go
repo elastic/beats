@@ -1,17 +1,18 @@
 package bucket
 
 import (
+	"fmt"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	"net/http"
-	"fmt"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"net/http"
 )
 
 const (
 	defaultScheme = "http"
-	defaultPath = "/pools/default/buckets"
+	defaultPath   = "/pools/default/buckets"
 )
+
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
@@ -49,7 +50,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		client: &http.Client{Timeout: base.Module().Config().Timeout},
+		client:        &http.Client{Timeout: base.Module().Config().Timeout},
 	}, nil
 }
 

@@ -1,16 +1,16 @@
 package node
 
 import (
+	"fmt"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	"net/http"
-	"fmt"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"net/http"
 )
 
 const (
 	defaultScheme = "http"
-	defaultPath = "/pools/default"
+	defaultPath   = "/pools/default"
 )
 
 var (
@@ -50,7 +50,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		client: &http.Client{Timeout: base.Module().Config().Timeout},
+		client:        &http.Client{Timeout: base.Module().Config().Timeout},
 	}, nil
 }
 
@@ -74,7 +74,6 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("Error Connecting to Couchbase %d: %s", resp.StatusCode, resp.Status)
 	}
-
 
 	return eventsMapping(resp.Body), nil
 }

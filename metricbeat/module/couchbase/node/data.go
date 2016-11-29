@@ -1,18 +1,18 @@
 package node
 
 import (
-	"io"
-	"github.com/elastic/beats/libbeat/common"
 	"encoding/json"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"io"
 )
 
 type NodeSystemStats struct {
 	CPUUtilizationRate float32 `json:"cpu_utilization_rate"`
-	SwapTotal          int64 `json:"swap_total"`
-	SwapUsed           int64 `json:"swap_used"`
-	MemTotal           int64 `json:"mem_total"`
-	MemFree            int64 `json:"mem_free"`
+	SwapTotal          int64   `json:"swap_total"`
+	SwapUsed           int64   `json:"swap_used"`
+	MemTotal           int64   `json:"mem_total"`
+	MemFree            int64   `json:"mem_free"`
 }
 
 type NodeInterestingStats struct {
@@ -33,25 +33,25 @@ type NodeInterestingStats struct {
 }
 
 type Node struct {
-	SystemStats        NodeSystemStats `json:"systemStats"`
-	InterestingStats   NodeInterestingStats `json:"interestingStats"`
-	Uptime             string `json:"uptime"`
-	MemoryTotal        int64 `json:"memoryTotal"`
-	MemoryFree         int64 `json:"memoryFree"`
-	McdMemoryReserved  int64 `json:"mcdMemoryReserved"`
-	McdMemoryAllocated int64 `json:"mcdMemoryAllocated"`
-	ClusterMembership  string `json:"clusterMembership"`
-	RecoveryType       string `json:"recoveryType"`
-	Status             string `json:"status"`
-	ThisNode           bool `json:"thisNode"`
-	Hostname           string `json:"hostname"`
-	ClusterCompatibility int64 `json:"clusterCompatibility"`
-	Version              string `json:"version"`
-	Os                   string `json:"os"`
+	SystemStats          NodeSystemStats      `json:"systemStats"`
+	InterestingStats     NodeInterestingStats `json:"interestingStats"`
+	Uptime               string               `json:"uptime"`
+	MemoryTotal          int64                `json:"memoryTotal"`
+	MemoryFree           int64                `json:"memoryFree"`
+	McdMemoryReserved    int64                `json:"mcdMemoryReserved"`
+	McdMemoryAllocated   int64                `json:"mcdMemoryAllocated"`
+	ClusterMembership    string               `json:"clusterMembership"`
+	RecoveryType         string               `json:"recoveryType"`
+	Status               string               `json:"status"`
+	ThisNode             bool                 `json:"thisNode"`
+	Hostname             string               `json:"hostname"`
+	ClusterCompatibility int64                `json:"clusterCompatibility"`
+	Version              string               `json:"version"`
+	Os                   string               `json:"os"`
 }
 
 type Data struct {
-	Nodes                []Node `json:"nodes"`
+	Nodes []Node `json:"nodes"`
 }
 
 func eventsMapping(body io.Reader) []common.MapStr {
@@ -66,31 +66,31 @@ func eventsMapping(body io.Reader) []common.MapStr {
 
 	for _, NodeItem := range d.Nodes {
 		event := common.MapStr{
-			"hostname": NodeItem.Hostname,
-			"uptime": NodeItem.Uptime,
-			"memoryTotal": NodeItem.MemoryTotal,
-			"memoryFree": NodeItem.MemoryFree,
-			"mcdMemoryReserved": NodeItem.McdMemoryReserved,
-			"mcdMemoryAllocated": NodeItem.McdMemoryAllocated,
-			"cmdGet": NodeItem.InterestingStats.CmdGet,
-			"couchDocsActualDiskSize": NodeItem.InterestingStats.CouchDocsActualDiskSize,
-			"couchDocsDataSize": NodeItem.InterestingStats.CouchDocsDataSize,
-			"couchSpatialDataSize": NodeItem.InterestingStats.CouchSpatialDataSize,
-			"couchSpatialDiskSize": NodeItem.InterestingStats.CouchSpatialDiskSize,
+			"hostname":                 NodeItem.Hostname,
+			"uptime":                   NodeItem.Uptime,
+			"memoryTotal":              NodeItem.MemoryTotal,
+			"memoryFree":               NodeItem.MemoryFree,
+			"mcdMemoryReserved":        NodeItem.McdMemoryReserved,
+			"mcdMemoryAllocated":       NodeItem.McdMemoryAllocated,
+			"cmdGet":                   NodeItem.InterestingStats.CmdGet,
+			"couchDocsActualDiskSize":  NodeItem.InterestingStats.CouchDocsActualDiskSize,
+			"couchDocsDataSize":        NodeItem.InterestingStats.CouchDocsDataSize,
+			"couchSpatialDataSize":     NodeItem.InterestingStats.CouchSpatialDataSize,
+			"couchSpatialDiskSize":     NodeItem.InterestingStats.CouchSpatialDiskSize,
 			"couchViewsActualDiskSize": NodeItem.InterestingStats.CouchViewsActualDiskSize,
-			"couchViewsDataSize": NodeItem.InterestingStats.CouchViewsDataSize,
-			"currItems": NodeItem.InterestingStats.CurrItems,
-			"currItemsTot": NodeItem.InterestingStats.CurrItemsTot,
-			"epBgFetched": NodeItem.InterestingStats.EpBgFetched,
-			"getHits": NodeItem.InterestingStats.GetHits,
-			"memUsed": NodeItem.InterestingStats.MemUsed,
-			"ops": NodeItem.InterestingStats.Ops,
-			"vbReplicaCurrItems": NodeItem.InterestingStats.VbReplicaCurrItems,
-			"CPUUtilizationRate": NodeItem.SystemStats.CPUUtilizationRate,
-			"swapTotal": NodeItem.SystemStats.SwapTotal,
-			"swapUsed": NodeItem.SystemStats.SwapUsed,
-			"memTotal": NodeItem.SystemStats.MemTotal,
-			"memFree": NodeItem.SystemStats.MemFree,
+			"couchViewsDataSize":       NodeItem.InterestingStats.CouchViewsDataSize,
+			"currItems":                NodeItem.InterestingStats.CurrItems,
+			"currItemsTot":             NodeItem.InterestingStats.CurrItemsTot,
+			"epBgFetched":              NodeItem.InterestingStats.EpBgFetched,
+			"getHits":                  NodeItem.InterestingStats.GetHits,
+			"memUsed":                  NodeItem.InterestingStats.MemUsed,
+			"ops":                      NodeItem.InterestingStats.Ops,
+			"vbReplicaCurrItems":       NodeItem.InterestingStats.VbReplicaCurrItems,
+			"CPUUtilizationRate":       NodeItem.SystemStats.CPUUtilizationRate,
+			"swapTotal":                NodeItem.SystemStats.SwapTotal,
+			"swapUsed":                 NodeItem.SystemStats.SwapUsed,
+			"memTotal":                 NodeItem.SystemStats.MemTotal,
+			"memFree":                  NodeItem.SystemStats.MemFree,
 		}
 		events = append(events, event)
 	}
