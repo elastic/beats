@@ -1,3 +1,4 @@
 === couchbase bucket MetricSet
 
-This is the bucket metricset of the module couchbase.
+The Couchbase `bucket` metricset collects data from Couchbase Buckets Rest API
+`http://couchbasehost:8091/pools/default/buckets`.

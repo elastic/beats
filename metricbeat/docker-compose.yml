@@ -4,6 +4,7 @@ services:
     build: ${PWD}/.
     links:
       - apache
+      - couchbase
       - mongodb
       - kafka
       - mysql
@@ -15,6 +16,9 @@ services:
     environment:
       - APACHE_HOST=apache
       - APACHE_PORT=80
+      - COUCHBASE_HOST=couchbase
+      - COUCHBASE_PORT=8091
+      - COUCHBASE_DSN=http://Administrator:password@couchbase:8091
       - KAFKA_HOST=kafka
       - KAFKA_PORT=9092
       - NGINX_HOST=nginx
@@ -50,6 +54,9 @@ services:
   apache:
     build: ${PWD}/module/apache/_meta
 
+  couchbase:
+    build: ${PWD}/module/couchbase/_meta
+
   kafka:
     image: spotify/kafka
     expose:
@@ -80,5 +87,3 @@ services:
 
   zookeeper:
     image: jplock/zookeeper:3.4.8
-
-

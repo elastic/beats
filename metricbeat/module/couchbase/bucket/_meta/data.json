@@ -1,19 +1,29 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"mysql",
-        "name":"status",
-        "rtt":44269
-    },
-    "couchbase":{
-        "bucket":{
-            "example": "bucket"
+    "couchbase": {
+        "bucket": {
+            "bucketType": "membase",
+            "name": "beer-sample",
+            "quota_RAM": 104857600,
+            "quota_RawRAM": 104857600,
+            "stats_DataUsed": 12601896,
+            "stats_DiskFetches": 0,
+            "stats_DiskUsed": 16373175,
+            "stats_ItemCount": 7303,
+            "stats_MemUsed": 53962160,
+            "stats_OpsPerSec": 0,
+            "stats_QuotaPercUse": 51.46232604980469
         }
     },
-    "type":"metricsets"
+    "metricset": {
+        "host": "couchbase:8091",
+        "module": "couchbase",
+        "name": "bucket",
+        "rtt": 115
+    },
+    "type": "metricsets"
 }

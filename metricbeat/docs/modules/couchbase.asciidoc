@@ -19,11 +19,10 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: couchbase
-  metricsets: ["host"]
+  metricsets: ["cluster", "node", "bucket"]
   enabled: true
-  period: 1s
-  hosts: ["localhost"]
-
+  period: 10s
+  hosts: ["localhost:8091"]
 ----
 
 [float]

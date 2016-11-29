@@ -3,7 +3,47 @@
   description: >
     bucket
   fields:
-    - name: example
-      type: keyword
+    - name: name
+      type: string
       description: >
-        Example field
+        name field
+    - name: bucketType
+      type: string
+      description: >
+        bucketType field
+    - name: quota_RAM
+      type: integer
+      description: >
+        quota_RAM field
+    - name: quota_RawRAM
+      type: integer
+      description: >
+        quota_RawRAM field
+    - name: stats_QuotaPercUse
+      type: float
+      description: >
+        stats_QuotaPercUse field
+    - name: stats_OpsPerSec
+      type: integer
+      description: >
+        stats_OpsPerSec field
+    - name: stats_DiskFetches
+      type: integer
+      description: >
+        stats_DiskFetches field
+    - name: stats_ItemCount
+      type: integer
+      description: >
+        stats_ItemCount field
+    - name: stats_DiskUsed
+      type: integer
+      description: >
+        stats_DiskUsed field
+    - name: stats_DataUsed
+      type: integer
+      description: >
+        stats_DataUsed field
+    - name: stats_MemUsed
+      type: integer
+      description: >
+        stats_MemUsed field
