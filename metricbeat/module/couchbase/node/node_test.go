@@ -14,8 +14,6 @@ import (
 	"path/filepath"
 )
 
-// TestFetchEventContents verifies the contents of the returned event against
-// the raw Apache response.
 func TestFetchEventContents(t *testing.T) {
 	absPath, err := filepath.Abs("./testdata/")
 	// response is a raw response from a couchbase

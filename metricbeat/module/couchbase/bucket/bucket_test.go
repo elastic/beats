@@ -14,11 +14,9 @@ import (
 	"path/filepath"
 )
 
-// TestFetchEventContents verifies the contents of the returned event against
-// the raw Apache response.
 func TestFetchEventContents(t *testing.T) {
 	absPath, err := filepath.Abs("./testdata/")
-	// response is a raw response copied from an Apache web server.
+	// response is a raw response from a couchbase
 	response, err := ioutil.ReadFile(absPath + "/sample_response.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
