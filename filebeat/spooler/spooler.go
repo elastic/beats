@@ -21,6 +21,7 @@ type Spooler struct {
 	output  Output         // batch event output on flush
 	spool   []*input.Event // Events being held by the Spooler.
 	wg      sync.WaitGroup // WaitGroup used to control the shutdown.
+	skip    bool
 }
 
 // Output spooler sends event to through Send method
@@ -31,6 +32,7 @@ type Output interface {
 type spoolerConfig struct {
 	idleTimeout time.Duration // How often to flush the spooler if spoolSize is not reached.
 	spoolSize   uint64        // Maximum number of events that are stored before a flush occurs.
+	dropAfter   time.Duration
 }
 
 // New creates and returns a new Spooler. The returned Spooler must be
@@ -44,6 +46,7 @@ func New(
 		config: spoolerConfig{
 			idleTimeout: config.IdleTimeout,
 			spoolSize:   config.SpoolSize,
+			dropAfter:   5 * time.Second,
 		},
 		output: out,
 		spool:  make([]*input.Event, 0, config.SpoolSize),
@@ -131,15 +134,37 @@ func (s *Spooler) flush() int {
 		return 0
 	}
 
+	// clear buffer
+	defer func() {
+		s.spool = s.spool[:0]
+	}()
+
+	if s.skip {
+		logp.Debug("SSS", "%v events dropped.", count)
+		return count
+	}
+
 	// copy buffer
 	tmpCopy := make([]*input.Event, count)
 	copy(tmpCopy, s.spool)
 
-	// clear buffer
-	s.spool = s.spool[:0]
+	done := make(chan struct{})
+	go func() {
+		// send batched events to output
+		s.output.Send(tmpCopy)
+		close(done)
+		// TODO: Should be atomic operation
+		s.skip = false
+	}()
 
-	// send batched events to output
-	s.output.Send(tmpCopy)
+	if s.config.dropAfter > 0 {
+		select {
+		case <-done:
+		// Resets skip as soon as events can be sent again
+		case <-time.After(s.config.dropAfter):
+			s.skip = true
+		}
+	}
 
 	return count
 }
