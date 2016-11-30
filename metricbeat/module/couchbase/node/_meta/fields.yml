@@ -7,3 +7,103 @@
       type: keyword
       description: >
         Example field
+    - name: CPUUtilizationRate
+      type: float
+      description: >
+        CPUUtilizationRate field
+    - name: cmdGet
+      type: integer
+      description: >
+        cmdGet field
+    - name: couchDocsActualDiskSize
+      type: integer
+      description: >
+        couchDocsActualDiskSize field
+    - name: couchDocsDataSize
+      type: integer
+      description: >
+        couchDocsDataSize field
+    - name: couchSpatialDataSize
+      type: integer
+      description: >
+        couchSpatialDataSize field
+    - name: couchSpatialDiskSize
+      type: integer
+      description: >
+        couchSpatialDiskSize field
+    - name: couchViewsActualDiskSize
+      type: integer
+      description: >
+        couchViewsActualDiskSize field
+    - name: couchViewsDataSize
+      type: integer
+      description: >
+        couchViewsDataSize field
+    - name: currItems
+      type: integer
+      description: >
+        currItems field
+    - name: currItemsTot
+      type: integer
+      description: >
+        currItemsTot field
+    - name: epBgFetched
+      type: integer
+      description: >
+        epBgFetched field
+    - name: getHits
+      type: integer
+      description: >
+        getHits field
+    - name: hostname
+      type: integer
+      description: >
+        hostname field
+    - name: mcdMemoryAllocated
+      type: integer
+      description: >
+        mcdMemoryAllocated field
+    - name: mcdMemoryReserved
+      type: integer
+      description: >
+        mcdMemoryReserved field
+    - name: memFree
+      type: integer
+      description: >
+        memFree field
+    - name: memTotal
+      type: integer
+      description: >
+        memTotal field
+    - name: memUsed
+      type: integer
+      description: >
+        memUsed field
+    - name: memoryFree
+      type: integer
+      description: >
+        memoryFree field
+    - name: memoryTotal
+      type: integer
+      description: >
+        memoryTotal field
+    - name: ops
+      type: integer
+      description: >
+        ops field
+    - name: swapTotal
+      type: integer
+      description: >
+        swapTotal field
+    - name: swapUsed
+      type: integer
+      description: >
+        swapUsed field
+    - name: uptime
+      type: string
+      description: >
+        uptime field
+    - name: vbReplicaCurrItems
+      type: integer
+      description: >
+        vbReplicaCurrItems field
