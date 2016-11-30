@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-couchbase>>
 * <<exported-fields-docker>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-kafka>>
@@ -503,6 +504,449 @@ example: metricsets
 required: True
 
 The document type. Always set to "metricsets".
+
+
+[[exported-fields-couchbase]]
+== couchbase Fields
+
+couchbase Module
+
+
+
+[float]
+== couchbase Fields
+
+`couchbase` contains the metrics that were scraped from Couchbase.
+
+
+
+[float]
+== bucket Fields
+
+Couchbase bucket metrics
+
+
+
+[float]
+=== couchbase.bucket.name
+
+type: keyword
+
+name of the bucket
+
+
+[float]
+=== couchbase.bucket.bucketType
+
+type: keyword
+
+type of the bucket
+
+
+[float]
+=== couchbase.bucket.quota_RAM
+
+type: long
+
+Amount of RAM used by the bucket (bytes)
+
+
+[float]
+=== couchbase.bucket.quota_RawRAM
+
+type: long
+
+Amount of raw RAM used by the bucket (bytes)
+
+
+[float]
+=== couchbase.bucket.stats_QuotaPercUse
+
+type: float
+
+Percentage of RAM used (for active objects) against the configure bucket size.(%)
+
+
+[float]
+=== couchbase.bucket.stats_OpsPerSec
+
+type: long
+
+Number of operations per second
+
+
+[float]
+=== couchbase.bucket.stats_DiskFetches
+
+type: long
+
+Number of disk fetches
+
+
+[float]
+=== couchbase.bucket.stats_ItemCount
+
+type: long
+
+Number of items associated with the bucket
+
+
+[float]
+=== couchbase.bucket.stats_DiskUsed
+
+type: long
+
+Amount of disk used (bytes)
+
+
+[float]
+=== couchbase.bucket.stats_DataUsed
+
+type: long
+
+Size of user data within buckets of the specified state that are resident in RAM.
+
+
+[float]
+=== couchbase.bucket.stats_MemUsed
+
+type: long
+
+Amount of memory used by the bucket (bytes)
+
+
+[float]
+== cluster Fields
+
+cluster information
+
+
+
+[float]
+=== couchbase.cluster.hdd_free
+
+type: long
+
+Free harddrive space in the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.hdd_quotaTotal
+
+type: long
+
+Harddrive quota total for the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.hdd_total
+
+type: long
+
+Total harddrive space available to cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.hdd_used
+
+type: long
+
+Harddrive space used by the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.hdd_usedByData
+
+type: long
+
+Harddrive use by the data in the cluster(bytes)
+
+
+[float]
+=== couchbase.cluster.indexMemoryQuota
+
+type: long
+
+Setting of Memory quota for the Index service (Mbyte)
+
+
+[float]
+=== couchbase.cluster.maxBucketCount
+
+type: long
+
+Setting of Max Bucket Count
+
+
+[float]
+=== couchbase.cluster.memoryQuota
+
+type: keyword
+
+Setting of Memory quota for the cluster (Mbyte)
+
+
+[float]
+=== couchbase.cluster.ram_quotaTotal
+
+type: long
+
+Ram quota total for the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.ram_quotaTotalPerNode
+
+type: long
+
+Ram quota used by the current node in the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.ram_quotaUsed
+
+type: long
+
+Ram quota used by the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.ram_quotaUsedPerNode
+
+type: long
+
+Ram quota used by the current node in the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.ram_total
+
+type: long
+
+Total ram available to cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.ram_used
+
+type: long
+
+Ram used by the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.ram_usedByData
+
+type: long
+
+Ram used by the data in the cluster (bytes)
+
+
+[float]
+== node Fields
+
+node
+
+
+
+[float]
+=== couchbase.node.CPUUtilizationRate
+
+type: float
+
+The CPU utilization rate (%)
+
+
+[float]
+=== couchbase.node.cmdGet
+
+type: long
+
+Number of get commands
+
+
+[float]
+=== couchbase.node.couchDocsActualDiskSize
+
+type: long
+
+Amount of disk space used by Couch docs.(bytes)
+
+
+[float]
+=== couchbase.node.couchDocsDataSize
+
+type: long
+
+Data size of couch documents associated with a node (bytes)
+
+
+[float]
+=== couchbase.node.couchSpatialDataSize
+
+type: long
+
+couchSpatialDataSize field
+
+
+[float]
+=== couchbase.node.couchSpatialDiskSize
+
+type: long
+
+couchSpatialDiskSize field
+
+
+[float]
+=== couchbase.node.couchViewsActualDiskSize
+
+type: long
+
+Amount of disk space occupied by Couch views (bytes)
+
+
+[float]
+=== couchbase.node.couchViewsDataSize
+
+type: long
+
+Size of object data for Couch views (bytes)
+
+
+[float]
+=== couchbase.node.currItems
+
+type: long
+
+Number of current items
+
+
+[float]
+=== couchbase.node.currItemsTot
+
+type: long
+
+Total number of items associated with node
+
+
+[float]
+=== couchbase.node.epBgFetched
+
+type: long
+
+Number of disk fetches performed since server was started
+
+
+[float]
+=== couchbase.node.getHits
+
+type: long
+
+Number of get hits
+
+
+[float]
+=== couchbase.node.hostname
+
+type: keyword
+
+The hostname of the Node
+
+
+[float]
+=== couchbase.node.mcdMemoryAllocated
+
+type: long
+
+Amount of memcached memory allocated (bytes)
+
+
+[float]
+=== couchbase.node.mcdMemoryReserved
+
+type: long
+
+Amount of memcached memory reserved (bytes)
+
+
+[float]
+=== couchbase.node.memFree
+
+type: long
+
+Amount of memory free for the node (bytes)
+
+
+[float]
+=== couchbase.node.memTotal
+
+type: long
+
+Total memory available to the node (bytes)
+
+
+[float]
+=== couchbase.node.memUsed
+
+type: long
+
+Memory used by the node (bytes)
+
+
+[float]
+=== couchbase.node.memoryFree
+
+type: long
+
+Amount of memory free for the node (bytes)
+
+
+[float]
+=== couchbase.node.memoryTotal
+
+type: long
+
+Total memory available to the node (bytes)
+
+
+[float]
+=== couchbase.node.ops
+
+type: long
+
+Number of operations performed on Couchbase
+
+
+[float]
+=== couchbase.node.swapTotal
+
+type: long
+
+Total swap size allocated (bytes)
+
+
+[float]
+=== couchbase.node.swapUsed
+
+type: long
+
+Amount of swap space used.(bytes)
+
+
+[float]
+=== couchbase.node.uptime
+
+type: keyword
+
+Time during which the node was in operation (sec)
+
+
+[float]
+=== couchbase.node.vbReplicaCurrItems
+
+type: long
+
+Number of items/documents that are replicas
 
 
 [[exported-fields-docker]]

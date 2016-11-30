@@ -6,19 +6,19 @@
     - name: CPUUtilizationRate
       type: float
       description: >
-        CPUUtilizationRate field
+        The CPU utilization rate (%)
     - name: cmdGet
       type: long
       description: >
-        cmdGet field
+        Number of get commands
     - name: couchDocsActualDiskSize
       type: long
       description: >
-        couchDocsActualDiskSize field
+        Amount of disk space used by Couch docs.(bytes)
     - name: couchDocsDataSize
       type: long
       description: >
-        couchDocsDataSize field
+        Data size of couch documents associated with a node (bytes)
     - name: couchSpatialDataSize
       type: long
       description: >
@@ -30,76 +30,76 @@
     - name: couchViewsActualDiskSize
       type: long
       description: >
-        couchViewsActualDiskSize field
+        Amount of disk space occupied by Couch views (bytes)
     - name: couchViewsDataSize
       type: long
       description: >
-        couchViewsDataSize field
+        Size of object data for Couch views (bytes)
     - name: currItems
       type: long
       description: >
-        currItems field
+        Number of current items
     - name: currItemsTot
       type: long
       description: >
-        currItemsTot field
+        Total number of items associated with node
     - name: epBgFetched
       type: long
       description: >
-        epBgFetched field
+        Number of disk fetches performed since server was started
     - name: getHits
       type: long
       description: >
-        getHits field
+        Number of get hits
     - name: hostname
-      type: long
+      type: keyword
       description: >
-        hostname field
+        The hostname of the Node
     - name: mcdMemoryAllocated
       type: long
       description: >
-        mcdMemoryAllocated field
+        Amount of memcached memory allocated (bytes)
     - name: mcdMemoryReserved
       type: long
       description: >
-        mcdMemoryReserved field
+        Amount of memcached memory reserved (bytes)
     - name: memFree
       type: long
       description: >
-        memFree field
+        Amount of memory free for the node (bytes)
     - name: memTotal
       type: long
       description: >
-        memTotal field
+        Total memory available to the node (bytes)
     - name: memUsed
       type: long
       description: >
-        memUsed field
+        Memory used by the node (bytes)
     - name: memoryFree
       type: long
       description: >
-        memoryFree field
+        Amount of memory free for the node (bytes)
     - name: memoryTotal
       type: long
       description: >
-        memoryTotal field
+        Total memory available to the node (bytes)
     - name: ops
       type: long
       description: >
-        ops field
+        Number of operations performed on Couchbase
     - name: swapTotal
       type: long
       description: >
-        swapTotal field
+        Total swap size allocated (bytes)
     - name: swapUsed
       type: long
       description: >
-        swapUsed field
+        Amount of swap space used.(bytes)
     - name: uptime
       type: keyword
       description: >
-        uptime field
+        Time during which the node was in operation (sec)
     - name: vbReplicaCurrItems
       type: long
       description: >
-        vbReplicaCurrItems field
+        Number of items/documents that are replicas

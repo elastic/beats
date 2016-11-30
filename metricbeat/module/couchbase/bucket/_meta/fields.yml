@@ -1,49 +1,49 @@
 - name: bucket
   type: group
   description: >
-    bucket
+    Couchbase bucket metrics
   fields:
     - name: name
       type: keyword
       description: >
-        name field
+        name of the bucket
     - name: bucketType
       type: keyword
       description: >
-        bucketType field
+        type of the bucket
     - name: quota_RAM
       type: long
       description: >
-        quota_RAM field
+        Amount of RAM used by the bucket (bytes)
     - name: quota_RawRAM
       type: long
       description: >
-        quota_RawRAM field
+        Amount of raw RAM used by the bucket (bytes)
     - name: stats_QuotaPercUse
       type: float
       description: >
-        stats_QuotaPercUse field
+        Percentage of RAM used (for active objects) against the configure bucket size.(%)
     - name: stats_OpsPerSec
       type: long
       description: >
-        stats_OpsPerSec field
+        Number of operations per second
     - name: stats_DiskFetches
       type: long
       description: >
-        stats_DiskFetches field
+        Number of disk fetches
     - name: stats_ItemCount
       type: long
       description: >
-        stats_ItemCount field
+        Number of items associated with the bucket
     - name: stats_DiskUsed
       type: long
       description: >
-        stats_DiskUsed field
+        Amount of disk used (bytes)
     - name: stats_DataUsed
       type: long
       description: >
-        stats_DataUsed field
+        Size of user data within buckets of the specified state that are resident in RAM.
     - name: stats_MemUsed
       type: long
       description: >
-        stats_MemUsed field
+        Amount of memory used by the bucket (bytes)

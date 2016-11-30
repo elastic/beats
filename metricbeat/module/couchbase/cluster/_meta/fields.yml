@@ -6,60 +6,60 @@
     - name: hdd_free
       type: long
       description: >
-        hdd_free field
+        Free harddrive space in the cluster (bytes)
     - name: hdd_quotaTotal
       type: long
       description: >
-        hdd_quotaTotal field
+        Harddrive quota total for the cluster (bytes)
     - name: hdd_total
       type: long
       description: >
-        hdd_total field
+        Total harddrive space available to cluster (bytes)
     - name: hdd_used
       type: long
       description: >
-        hdd_used field
+        Harddrive space used by the cluster (bytes)
     - name: hdd_usedByData
       type: long
       description: >
-        hdd_usedByData field
+        Harddrive use by the data in the cluster(bytes)
     - name: indexMemoryQuota
       type: long
       description: >
-        indexMemoryQuota field
+        Setting of Memory quota for the Index service (Mbyte)
     - name: maxBucketCount
       type: long
       description: >
-        maxBucketCount field
+        Setting of Max Bucket Count
     - name: memoryQuota
       type: keyword
       description: >
-        memoryQuota field
+        Setting of Memory quota for the cluster (Mbyte)
     - name: ram_quotaTotal
       type: long
       description: >
-        ram_quotaTotal field
+        Ram quota total for the cluster (bytes)
     - name: ram_quotaTotalPerNode
       type: long
       description: >
-        ram_quotaTotalPerNode field
+        Ram quota used by the current node in the cluster (bytes)
     - name: ram_quotaUsed
       type: long
       description: >
-        ram_quotaUsed field
+        Ram quota used by the cluster (bytes)
     - name: ram_quotaUsedPerNode
       type: long
       description: >
-        ram_quotaUsedPerNode field
+        Ram quota used by the current node in the cluster (bytes)
     - name: ram_total
       type: long
       description: >
-        ram_total field
+        Total ram available to cluster (bytes)
     - name: ram_used
       type: long
       description: >
-        ram_used field
+        Ram used by the cluster (bytes)
     - name: ram_usedByData
       type: long
       description: >
-        ram_usedByData field
+        Ram used by the data in the cluster (bytes)

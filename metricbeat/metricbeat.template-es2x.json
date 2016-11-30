@@ -184,6 +184,185 @@
             }
           }
         },
+        "couchbase": {
+          "properties": {
+            "bucket": {
+              "properties": {
+                "bucketType": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "name": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "quota_RAM": {
+                  "type": "long"
+                },
+                "quota_RawRAM": {
+                  "type": "long"
+                },
+                "stats_DataUsed": {
+                  "type": "long"
+                },
+                "stats_DiskFetches": {
+                  "type": "long"
+                },
+                "stats_DiskUsed": {
+                  "type": "long"
+                },
+                "stats_ItemCount": {
+                  "type": "long"
+                },
+                "stats_MemUsed": {
+                  "type": "long"
+                },
+                "stats_OpsPerSec": {
+                  "type": "long"
+                },
+                "stats_QuotaPercUse": {
+                  "type": "float"
+                }
+              }
+            },
+            "cluster": {
+              "properties": {
+                "hdd_free": {
+                  "type": "long"
+                },
+                "hdd_quotaTotal": {
+                  "type": "long"
+                },
+                "hdd_total": {
+                  "type": "long"
+                },
+                "hdd_used": {
+                  "type": "long"
+                },
+                "hdd_usedByData": {
+                  "type": "long"
+                },
+                "indexMemoryQuota": {
+                  "type": "long"
+                },
+                "maxBucketCount": {
+                  "type": "long"
+                },
+                "memoryQuota": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "ram_quotaTotal": {
+                  "type": "long"
+                },
+                "ram_quotaTotalPerNode": {
+                  "type": "long"
+                },
+                "ram_quotaUsed": {
+                  "type": "long"
+                },
+                "ram_quotaUsedPerNode": {
+                  "type": "long"
+                },
+                "ram_total": {
+                  "type": "long"
+                },
+                "ram_used": {
+                  "type": "long"
+                },
+                "ram_usedByData": {
+                  "type": "long"
+                }
+              }
+            },
+            "node": {
+              "properties": {
+                "CPUUtilizationRate": {
+                  "type": "float"
+                },
+                "cmdGet": {
+                  "type": "long"
+                },
+                "couchDocsActualDiskSize": {
+                  "type": "long"
+                },
+                "couchDocsDataSize": {
+                  "type": "long"
+                },
+                "couchSpatialDataSize": {
+                  "type": "long"
+                },
+                "couchSpatialDiskSize": {
+                  "type": "long"
+                },
+                "couchViewsActualDiskSize": {
+                  "type": "long"
+                },
+                "couchViewsDataSize": {
+                  "type": "long"
+                },
+                "currItems": {
+                  "type": "long"
+                },
+                "currItemsTot": {
+                  "type": "long"
+                },
+                "epBgFetched": {
+                  "type": "long"
+                },
+                "getHits": {
+                  "type": "long"
+                },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "mcdMemoryAllocated": {
+                  "type": "long"
+                },
+                "mcdMemoryReserved": {
+                  "type": "long"
+                },
+                "memFree": {
+                  "type": "long"
+                },
+                "memTotal": {
+                  "type": "long"
+                },
+                "memUsed": {
+                  "type": "long"
+                },
+                "memoryFree": {
+                  "type": "long"
+                },
+                "memoryTotal": {
+                  "type": "long"
+                },
+                "ops": {
+                  "type": "long"
+                },
+                "swapTotal": {
+                  "type": "long"
+                },
+                "swapUsed": {
+                  "type": "long"
+                },
+                "uptime": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "vbReplicaCurrItems": {
+                  "type": "long"
+                }
+              }
+            }
+          }
+        },
         "docker": {
           "properties": {
             "container": {
