@@ -65,6 +65,7 @@ func (m *MetricSet) connect() (*sarama.Broker, error) {
 	// current broker is bootstrap only. Get metadata to find id:
 	meta, err := b.GetMetadata(&sarama.MetadataRequest{})
 	if err != nil {
+		b.Close()
 		return nil, err
 	}
 
