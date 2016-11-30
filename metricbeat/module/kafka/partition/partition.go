@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 
@@ -35,15 +36,31 @@ var errFailQueryOffset = errors.New("Failed to query offset for")
 
 // New create a new instance of the partition MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := struct{}{}
+	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	tls, err := outputs.LoadTLSConfig(config.TLS)
+	if err != nil {
 		return nil, err
 	}
 
 	cfg := sarama.NewConfig()
 	cfg.Net.DialTimeout = base.Module().Config().Timeout
 	cfg.Net.ReadTimeout = base.Module().Config().Timeout
-	cfg.ClientID = "metricbeat"
+	cfg.ClientID = config.ClientID
+	cfg.Metadata.Retry.Max = config.Metadata.Retries
+	cfg.Metadata.Retry.Backoff = config.Metadata.Backoff
+	if tls != nil {
+		cfg.Net.TLS.Enable = true
+		cfg.Net.TLS.Config = tls.BuildModuleConfig("")
+	}
+	if config.Username != "" {
+		cfg.Net.SASL.Enable = true
+		cfg.Net.SASL.User = config.Username
+		cfg.Net.SASL.Password = config.Password
+	}
 
 	broker := sarama.NewBroker(base.Host())
 	return &MetricSet{
