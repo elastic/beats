@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.1.0...5.1[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.1.1...5.1[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -61,9 +61,9 @@ https://github.com/elastic/beats/compare/v5.1.0...5.1[Check the HEAD diff]
 
 ////////////////////////////////////////////////////////////
 
-[[release-notes-5.1.0]]
-=== Beats version 5.1.0
-https://github.com/elastic/beats/compare/v5.0.2...v5.1.0[View commits]
+[[release-notes-5.1.1]]
+=== Beats version 5.1.1
+https://github.com/elastic/beats/compare/v5.0.2...v5.1.1[View commits]
 
 ==== Breaking changes
 
