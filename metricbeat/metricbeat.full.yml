@@ -99,6 +99,9 @@ metricbeat.modules:
   #metadata.retries: 3
   #metadata.backoff: 250ms
 
+  # List of Topics to query metadata for. If empty, all topics will be queried.
+  #topics: []
+
   # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]

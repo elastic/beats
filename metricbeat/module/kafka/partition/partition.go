@@ -28,6 +28,7 @@ type MetricSet struct {
 	broker *sarama.Broker
 	cfg    *sarama.Config
 	id     int32
+	topics []string
 }
 
 var noID int32 = -1
@@ -68,6 +69,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		broker:        broker,
 		cfg:           cfg,
 		id:            noID,
+		topics:        config.Topics,
 	}, nil
 }
 
@@ -82,7 +84,7 @@ func (m *MetricSet) connect() (*sarama.Broker, error) {
 	}
 
 	// current broker is bootstrap only. Get metadata to find id:
-	meta, err := queryMetadataWithRetry(b, m.cfg)
+	meta, err := queryMetadataWithRetry(b, m.cfg, m.topics)
 	if err != nil {
 		closeBroker(b)
 		return nil, err
@@ -113,7 +115,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	}
 
 	defer closeBroker(b)
-	response, err := queryMetadataWithRetry(b, m.cfg)
+	response, err := queryMetadataWithRetry(b, m.cfg, m.topics)
 	if err != nil {
 		return nil, err
 	}
@@ -246,9 +248,10 @@ func closeBroker(b *sarama.Broker) {
 func queryMetadataWithRetry(
 	b *sarama.Broker,
 	cfg *sarama.Config,
+	topics []string,
 ) (r *sarama.MetadataResponse, err error) {
 	err = withRetry(b, cfg, func() (e error) {
-		r, e = b.GetMetadata(&sarama.MetadataRequest{})
+		r, e = b.GetMetadata(&sarama.MetadataRequest{topics})
 		return
 	})
 	return

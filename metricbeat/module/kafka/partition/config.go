@@ -13,6 +13,7 @@ type connConfig struct {
 	Username string             `config:"username"`
 	Password string             `config:"password"`
 	ClientID string             `config:"client_id"`
+	Topics   []string           `config:"topics"`
 }
 
 type metaConfig struct {
