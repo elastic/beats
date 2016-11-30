@@ -3,107 +3,103 @@
   description: >
     node
   fields:
-    - name: example
-      type: keyword
-      description: >
-        Example field
     - name: CPUUtilizationRate
       type: float
       description: >
         CPUUtilizationRate field
     - name: cmdGet
-      type: integer
+      type: long
       description: >
         cmdGet field
     - name: couchDocsActualDiskSize
-      type: integer
+      type: long
       description: >
         couchDocsActualDiskSize field
     - name: couchDocsDataSize
-      type: integer
+      type: long
       description: >
         couchDocsDataSize field
     - name: couchSpatialDataSize
-      type: integer
+      type: long
       description: >
         couchSpatialDataSize field
     - name: couchSpatialDiskSize
-      type: integer
+      type: long
       description: >
         couchSpatialDiskSize field
     - name: couchViewsActualDiskSize
-      type: integer
+      type: long
       description: >
         couchViewsActualDiskSize field
     - name: couchViewsDataSize
-      type: integer
+      type: long
       description: >
         couchViewsDataSize field
     - name: currItems
-      type: integer
+      type: long
       description: >
         currItems field
     - name: currItemsTot
-      type: integer
+      type: long
       description: >
         currItemsTot field
     - name: epBgFetched
-      type: integer
+      type: long
       description: >
         epBgFetched field
     - name: getHits
-      type: integer
+      type: long
       description: >
         getHits field
     - name: hostname
-      type: integer
+      type: long
       description: >
         hostname field
     - name: mcdMemoryAllocated
-      type: integer
+      type: long
       description: >
         mcdMemoryAllocated field
     - name: mcdMemoryReserved
-      type: integer
+      type: long
       description: >
         mcdMemoryReserved field
     - name: memFree
-      type: integer
+      type: long
       description: >
         memFree field
     - name: memTotal
-      type: integer
+      type: long
       description: >
         memTotal field
     - name: memUsed
-      type: integer
+      type: long
       description: >
         memUsed field
     - name: memoryFree
-      type: integer
+      type: long
       description: >
         memoryFree field
     - name: memoryTotal
-      type: integer
+      type: long
       description: >
         memoryTotal field
     - name: ops
-      type: integer
+      type: long
       description: >
         ops field
     - name: swapTotal
-      type: integer
+      type: long
       description: >
         swapTotal field
     - name: swapUsed
-      type: integer
+      type: long
       description: >
         swapUsed field
     - name: uptime
-      type: string
+      type: keyword
       description: >
         uptime field
     - name: vbReplicaCurrItems
-      type: integer
+      type: long
       description: >
         vbReplicaCurrItems field

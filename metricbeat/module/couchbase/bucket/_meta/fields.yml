@@ -4,19 +4,19 @@
     bucket
   fields:
     - name: name
-      type: string
+      type: keyword
       description: >
         name field
     - name: bucketType
-      type: string
+      type: keyword
       description: >
         bucketType field
     - name: quota_RAM
-      type: integer
+      type: long
       description: >
         quota_RAM field
     - name: quota_RawRAM
-      type: integer
+      type: long
       description: >
         quota_RawRAM field
     - name: stats_QuotaPercUse
@@ -24,26 +24,26 @@
       description: >
         stats_QuotaPercUse field
     - name: stats_OpsPerSec
-      type: integer
+      type: long
       description: >
         stats_OpsPerSec field
     - name: stats_DiskFetches
-      type: integer
+      type: long
       description: >
         stats_DiskFetches field
     - name: stats_ItemCount
-      type: integer
+      type: long
       description: >
         stats_ItemCount field
     - name: stats_DiskUsed
-      type: integer
+      type: long
       description: >
         stats_DiskUsed field
     - name: stats_DataUsed
-      type: integer
+      type: long
       description: >
         stats_DataUsed field
     - name: stats_MemUsed
-      type: integer
+      type: long
       description: >
         stats_MemUsed field
