@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -33,7 +34,7 @@ type MetricSet struct {
 
 var noID int32 = -1
 
-var errFailQueryOffset = errors.New("Failed to query offset for")
+var errFailQueryOffset = errors.New("operation failed")
 
 // New create a new instance of the partition MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -129,9 +130,9 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	for _, topic := range response.Topics {
 		evtTopic := common.MapStr{
 			"name": topic.Name,
-		}
-		if topic.Err != 0 {
-			evtTopic["error"] = topic.Err
+			"error": common.MapStr{
+				"code": topic.Err,
+			},
 		}
 
 		for _, partition := range topic.Partitions {
@@ -146,19 +147,14 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 				// Get oldest and newest available offsets
 				offOldest, offNewest, offOK, err := queryOffsetRange(b, id, topic.Name, partition.ID)
 
-				var offsets common.MapStr
-				if offOK {
-					offsets = common.MapStr{
-						"newest": offNewest,
-						"oldest": offOldest,
-					}
-				} else {
+				if !offOK {
 					if err == nil {
 						err = errFailQueryOffset
 					}
-					offsets = common.MapStr{
-						"error": err,
-					}
+
+					logp.Err("Failed to query kafka partition (%v:%v) offsets: %v",
+						topic.Name, partition.ID, err)
+					continue
 				}
 
 				// create event
@@ -166,17 +162,21 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 					"topic":  evtTopic,
 					"broker": evtBroker,
 					"partition": common.MapStr{
-						"id":             partition.ID,
-						"error":          partition.Err,
+						"id": partition.ID,
+						"error": common.MapStr{
+							"code": partition.Err,
+						},
 						"leader":         partition.Leader,
 						"replica":        id,
 						"insync_replica": hasID(id, partition.Isr),
 					},
-					"offset": offsets,
+					"offset": common.MapStr{
+						"newest": offNewest,
+						"oldest": offOldest,
+					},
 				}
 
 				events = append(events, event)
-
 			}
 		}
 	}

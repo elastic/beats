@@ -16,10 +16,6 @@
           type: long
           description: >
             Oldest offset of the partition.
-        - name: error
-          type: long
-          description: >
-            Error code from fetching offset.
 
     - name: partition
       type: group
@@ -49,15 +45,15 @@
           description: >
             Indicates if replica is included in the in-sync replicate set (ISR).
 
-        - name: error
+        - name: error.code
           type: long
           description: >
             Error code from fetching partition.
 
-    - name: topic.error
+    - name: topic.error.code
       type: long
       description: >
-        topic error.
+        topic error code.
     - name: topic.name
       type: keyword
       description: >

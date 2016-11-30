@@ -948,9 +948,6 @@
                 },
                 "offset": {
                   "properties": {
-                    "error": {
-                      "type": "long"
-                    },
                     "newest": {
                       "type": "long"
                     },
@@ -962,7 +959,11 @@
                 "partition": {
                   "properties": {
                     "error": {
-                      "type": "long"
+                      "properties": {
+                        "code": {
+                          "type": "long"
+                        }
+                      }
                     },
                     "id": {
                       "type": "long"
@@ -981,7 +982,11 @@
                 "topic": {
                   "properties": {
                     "error": {
-                      "type": "long"
+                      "properties": {
+                        "code": {
+                          "type": "long"
+                        }
+                      }
                     },
                     "name": {
                       "ignore_above": 1024,

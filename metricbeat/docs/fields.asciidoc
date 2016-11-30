@@ -1959,14 +1959,6 @@ Oldest offset of the partition.
 
 
 [float]
-=== kafka.partition.offset.error
-
-type: long
-
-Error code from fetching offset.
-
-
-[float]
 == partition Fields
 
 Partition data.
@@ -2014,7 +2006,7 @@ Indicates if replica is included in the in-sync replicate set (ISR).
 
 
 [float]
-=== kafka.partition.partition.error
+=== kafka.partition.partition.error.code
 
 type: long
 
@@ -2022,11 +2014,11 @@ Error code from fetching partition.
 
 
 [float]
-=== kafka.partition.topic.error
+=== kafka.partition.topic.error.code
 
 type: long
 
-topic error.
+topic error code.
 
 
 [float]
