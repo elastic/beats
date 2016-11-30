@@ -8,24 +8,17 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.0.1...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.1.0...5.1[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
 
 *Metricbeat*
-- Change data structure of experimental haproxy module. {pull}3003[3003]
 
 *Packetbeat*
 
-*Topbeat*
-
 *Filebeat*
-- If a file is falling under ignore_older during startup, offset is now set to end of file instead of 0.
-  With the previous logic the whole file was sent in case a line was added and it was inconsitent with
-  files which were harvested previously. {pull}2907[2907]
-- tail_files is now only applied on the first scan and not for all new files. {pull}2932[2932]
 
 *Winlogbeat*
 
@@ -33,54 +26,26 @@ https://github.com/elastic/beats/compare/v5.0.1...master[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix empty benign errors logged by processor actions. {pull}3046[3046]
 
 *Metricbeat*
 
-- Calculate the fsstat values per mounting point, and not filesystem. {pull}2777[2777]
-
 *Packetbeat*
 
-*Topbeat*
-
 *Filebeat*
-- Fix registry cleanup issue when files falling under ignore_older after restart. {issue}2818[2818]
 
 *Winlogbeat*
 
 ==== Added
 
 *Affecting all Beats*
-- Add add_cloud_metadata processor for collecting cloud provider metadata. {pull}2728[2728]
-- Added decode_json_fields processor for decoding fields containing JSON strings. {pull}2605[2605]
 
 *Metricbeat*
 
-- Add experimental filebeat metricset in the beats module. {pull}2297[2297]
-- Add experimental libbeat metricset in the beats module. {pull}2339[2339]
-- Add experimental docker module. Provided by Ingensi and @douaejeouit based on dockbeat.
-- Add username and password config options to the MongoDB module. {pull}2889[2889]
-- Add username and password config options to the PostgreSQL module. {pull}2889[2890]
-- Add system core metricset for Windows. {pull}2883[2883]
-- Add a sample Redis Kibana dashboard. {pull}2916[2916]
-- Add support for MongoDB 3.4 and WiredTiger metrics. {pull}2999[2999]
-- Add experimental kafka module with partition metricset. {pull}2969[2969]
-- Add raw config option for mysql/status metricset. {pull}3001[3001]
-
 *Packetbeat*
 
-*Topbeat*
-
 *Filebeat*
-- Add command line option -once to run filebeat only once and then close. {pull}2456[2456]
-- Only load matching states into prospector to improve state handling {pull}2840[2840]
-- Reset all states ttl on startup to make sure it is overwritten by new config {pull}2840[2840]
-- Persist all states for files which fall under ignore_older to have consistent behaviour {pull}2859[2859]
-- Improve shutdown behaviour with large number of files. {pull}3035[3035]
 
 *Winlogbeat*
-
-- Add `event_logs.batch_read_size` configuration option. {pull}2641[2641]
 
 ==== Deprecated
 
@@ -90,13 +55,76 @@ https://github.com/elastic/beats/compare/v5.0.1...master[Check the HEAD diff]
 
 *Packetbeat*
 
-*Topbeat*
-
 *Filebeat*
 
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.1.0]]
+=== Beats version 5.1.0
+https://github.com/elastic/beats/compare/v5.0.2...v5.1.0[View commits]
+
+==== Breaking changes
+
+*Metricbeat*
+
+- Change data structure of experimental haproxy module. {pull}3003[3003]
+
+*Filebeat*
+
+- If a file is falling under `ignore_older` during startup, offset is now set to end of file instead of 0.
+  With the previous logic the whole file was sent in case a line was added and it was inconsistent with
+  files which were harvested previously. {pull}2907[2907]
+- `tail_files` is now only applied on the first scan and not for all new files. {pull}2932[2932]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix empty benign errors logged by processor actions. {pull}3046[3046]
+
+*Metricbeat*
+
+- Calculate the fsstat values per mounting point, and not filesystem. {pull}2777[2777]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add add_cloud_metadata processor for collecting cloud provider metadata. {pull}2728[2728]
+- Added decode_json_fields processor for decoding fields containing JSON strings. {pull}2605[2605]
+
+*Metricbeat*
+
+- Add experimental Docker module. Provided by Ingensi and @douaejeouit based on dockbeat.
+- Add a sample Redis Kibana dashboard. {pull}2916[2916]
+- Add support for MongoDB 3.4 and WiredTiger metrics. {pull}2999[2999]
+- Add experimental kafka module with partition metricset. {pull}2969[2969]
+- Add raw config option for mysql/status metricset. {pull}3001[3001]
+
+*Filebeat*
+
+- Add command line option `-once` to run Filebeat only once and then close. {pull}2456[2456]
+- Only load matching states into prospector to improve state handling {pull}2840[2840]
+- Reset all states ttl on startup to make sure it is overwritten by new config {pull}2840[2840]
+- Persist all states for files which fall under `ignore_older` to have consistent behaviour {pull}2859[2859]
+- Improve shutdown behaviour with large number of files. {pull}3035[3035]
+
+*Winlogbeat*
+
+- Add `event_logs.batch_read_size` configuration option. {pull}2641[2641]
+
+[[release-notes-5.0.2]]
+=== Beats version 5.0.2
+https://github.com/elastic/beats/compare/v5.0.1...v5.0.2[View commits]
+
+==== Bugfixes
+
+*Metricbeat*
+
+- Fix the `password` option in the MongoDB module. {pull}2995[2995]
+
 
 [[release-notes-5.0.1]]
 === Beats version 5.0.1
@@ -125,7 +153,7 @@ https://github.com/elastic/beats/compare/v5.0.0...v5.0.1[View commits]
 
 *Metricbeat*
 
-- Add username and password config options to the PostgreSQL module. {pull}2889[2890]
+- Add username and password config options to the PostgreSQL module. {pull}2890[2890]
 - Add username and password config options to the MongoDB module. {pull}2889[2889]
 - Add system core metricset for Windows. {pull}2883[2883]
 
