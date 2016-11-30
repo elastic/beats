@@ -8,18 +8,18 @@ import (
 )
 
 type BucketQuota struct {
-	RAM    int `json:"ram"`
-	RawRAM int `json:"rawRAM"`
+	RAM    int64 `json:"ram"`
+	RawRAM int64 `json:"rawRAM"`
 }
 
 type BucketBasicStats struct {
 	QuotaPercentUsed float64 `json:"quotaPercentUsed"`
-	OpsPerSec        int     `json:"opsPerSec"`
-	DiskFetches      int     `json:"diskFetches"`
-	ItemCount        int     `json:"itemCount"`
-	DiskUsed         int     `json:"diskUsed"`
-	DataUsed         int     `json:"dataUsed"`
-	MemUsed          int     `json:"memUsed"`
+	OpsPerSec        int64   `json:"opsPerSec"`
+	DiskFetches      int64   `json:"diskFetches"`
+	ItemCount        int64   `json:"itemCount"`
+	DiskUsed         int64   `json:"diskUsed"`
+	DataUsed         int64   `json:"dataUsed"`
+	MemUsed          int64   `json:"memUsed"`
 }
 
 type Buckets []struct {
