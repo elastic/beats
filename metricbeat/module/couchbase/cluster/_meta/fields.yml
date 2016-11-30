@@ -3,7 +3,63 @@
   description: >
     cluster information
   fields:
-    - name: hostname
-      type: keyword
+    - name: hdd_free
+      type: integer
       description: >
-        Example field
+        hdd_free field
+    - name: hdd_quotaTotal
+      type: integer
+      description: >
+        hdd_quotaTotal field
+    - name: hdd_total
+      type: integer
+      description: >
+        hdd_total field
+    - name: hdd_used
+      type: integer
+      description: >
+        hdd_used field
+    - name: hdd_usedByData
+      type: integer
+      description: >
+        hdd_usedByData field
+    - name: indexMemoryQuota
+      type: integer
+      description: >
+        indexMemoryQuota field
+    - name: maxBucketCount
+      type: integer
+      description: >
+        maxBucketCount field
+    - name: memoryQuota
+      type: string
+      description: >
+        memoryQuota field
+    - name: ram_quotaTotal
+      type: integer
+      description: >
+        ram_quotaTotal field
+    - name: ram_quotaTotalPerNode
+      type: integer
+      description: >
+        ram_quotaTotalPerNode field
+    - name: ram_quotaUsed
+      type: integer
+      description: >
+        ram_quotaUsed field
+    - name: ram_quotaUsedPerNode
+      type: integer
+      description: >
+        ram_quotaUsedPerNode field
+    - name: ram_total
+      type: integer
+      description: >
+        ram_total field
+    - name: ram_used
+      type: integer
+      description: >
+        ram_used field
+    - name: ram_usedByData
+      type: integer
+      description: >
+        ram_usedByData field
