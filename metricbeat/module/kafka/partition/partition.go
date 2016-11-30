@@ -3,6 +3,8 @@ package partition
 import (
 	"errors"
 	"fmt"
+	"io"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -63,9 +65,9 @@ func (m *MetricSet) connect() (*sarama.Broker, error) {
 	}
 
 	// current broker is bootstrap only. Get metadata to find id:
-	meta, err := b.GetMetadata(&sarama.MetadataRequest{})
+	meta, err := queryMetadataWithRetry(b, m.cfg)
 	if err != nil {
-		b.Close()
+		closeBroker(b)
 		return nil, err
 	}
 
@@ -78,7 +80,7 @@ func (m *MetricSet) connect() (*sarama.Broker, error) {
 	}
 
 	if m.id == noID {
-		b.Close()
+		closeBroker(b)
 		err = fmt.Errorf("No advertised broker with address %v found", addr)
 		return nil, err
 	}
@@ -93,8 +95,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	defer b.Close()
-	response, err := b.GetMetadata(&sarama.MetadataRequest{})
+	defer closeBroker(b)
+	response, err := queryMetadataWithRetry(b, m.cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -172,6 +174,8 @@ func hasID(id int32, lst []int32) bool {
 	return false
 }
 
+// queryOffsetRange queries the broker for the oldest and the newest offsets in
+// a kafka topics partition for a given replica.
 func queryOffsetRange(
 	b *sarama.Broker,
 	replicaID int32,
@@ -214,4 +218,79 @@ func queryOffset(
 	}
 
 	return block.Offsets[0], true, nil
+}
+
+func closeBroker(b *sarama.Broker) {
+	if ok, _ := b.Connected(); ok {
+		b.Close()
+	}
+}
+
+func queryMetadataWithRetry(
+	b *sarama.Broker,
+	cfg *sarama.Config,
+) (r *sarama.MetadataResponse, err error) {
+	err = withRetry(b, cfg, func() (e error) {
+		r, e = b.GetMetadata(&sarama.MetadataRequest{})
+		return
+	})
+	return
+}
+
+func withRetry(
+	b *sarama.Broker,
+	cfg *sarama.Config,
+	f func() error,
+) error {
+	var err error
+	for max := 0; max < cfg.Metadata.Retry.Max; max++ {
+		if ok, _ := b.Connected(); !ok {
+			if err = b.Open(cfg); err == nil {
+				err = f()
+			}
+		} else {
+			err = f()
+		}
+
+		if err == nil {
+			return nil
+		}
+
+		retry, reconnect := checkRetryQuery(err)
+		if !retry {
+			return err
+		}
+
+		time.Sleep(cfg.Metadata.Retry.Backoff)
+		if reconnect {
+			closeBroker(b)
+		}
+	}
+	return err
+}
+
+func checkRetryQuery(err error) (retry, reconnect bool) {
+	if err == nil {
+		return false, false
+	}
+
+	if err == io.EOF {
+		return true, true
+	}
+
+	k, ok := err.(sarama.KError)
+	if !ok {
+		return false, false
+	}
+
+	switch k {
+	case sarama.ErrLeaderNotAvailable, sarama.ErrReplicaNotAvailable,
+		sarama.ErrOffsetsLoadInProgress, sarama.ErrRebalanceInProgress:
+		return true, false
+	case sarama.ErrRequestTimedOut, sarama.ErrBrokerNotAvailable,
+		sarama.ErrNetworkException:
+		return true, true
+	}
+
+	return false, false
 }
