@@ -481,6 +481,8 @@ See <<load-balancing>> for more information about how this setting affects load 
 
 ===== publish_async
 
+experimental[]
+
 If enabled, the publisher pipeline in Filebeat operates in async mode preparing
 a new batch of lines while waiting for ACK. This option can improve load-balancing
 throughput at the cost of increased memory usage. The default value is false.
