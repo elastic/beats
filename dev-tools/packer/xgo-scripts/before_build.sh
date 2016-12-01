@@ -46,7 +46,8 @@ fi
 # with git 1.7
 git clone https://github.com/tsg/gotpl.git /go/src/github.com/tsg/gotpl
 mkdir -p /go/src/gopkg.in/yaml.v2
-cp -r /go/src/github.com/elastic/beats/vendor/gopkg.in/yaml.v2 /go/src/gopkg.in/
+
+cp -r $LIBBEAT_PATH/../vendor/gopkg.in/yaml.v2 /go/src/gopkg.in/
 go install github.com/tsg/gotpl
 
 # Append doc versions to package.yml
