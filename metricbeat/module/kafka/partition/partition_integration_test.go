@@ -64,13 +64,13 @@ func TestTopic(t *testing.T) {
 
 	// Its possible that other topics exists -> select the right data
 	for _, data := range dataBefore {
-		if data["topic"] == testTopic {
+		if data["topic"].(common.MapStr)["name"] == testTopic {
 			offsetBefore = data["offset"].(common.MapStr)["newest"].(int64)
 		}
 	}
 
 	for _, data := range dataAfter {
-		if data["topic"] == testTopic {
+		if data["topic"].(common.MapStr)["name"] == testTopic {
 			offsetAfter = data["offset"].(common.MapStr)["newest"].(int64)
 		}
 	}

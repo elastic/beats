@@ -1959,7 +1959,14 @@ Oldest offset of the partition.
 
 
 [float]
-=== kafka.partition.partition
+== partition Fields
+
+Partition data.
+
+
+
+[float]
+=== kafka.partition.partition.id
 
 type: long
 
@@ -1967,7 +1974,55 @@ Partition id.
 
 
 [float]
-=== kafka.partition.topic
+=== kafka.partition.partition.leader
+
+type: long
+
+Leader id (broker).
+
+
+[float]
+=== kafka.partition.partition.isr
+
+type: list
+
+List of isr ids.
+
+
+[float]
+=== kafka.partition.partition.replica
+
+type: long
+
+Replica id (broker).
+
+
+[float]
+=== kafka.partition.partition.insync_replica
+
+type: boolean
+
+Indicates if replica is included in the in-sync replicate set (ISR).
+
+
+[float]
+=== kafka.partition.partition.error.code
+
+type: long
+
+Error code from fetching partition.
+
+
+[float]
+=== kafka.partition.topic.error.code
+
+type: long
+
+topic error code.
+
+
+[float]
+=== kafka.partition.topic.name
 
 type: keyword
 
