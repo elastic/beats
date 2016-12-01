@@ -54,6 +54,8 @@ services:
     expose:
       - 9092
       - 2181
+    environment:
+      - ADVERTISED_HOST=kafka
 
   # Overloading kibana with a simple image as it is not needed here
   kibana:
