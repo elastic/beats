@@ -8,7 +8,8 @@ import (
 )
 
 type connConfig struct {
-	Metadata metaConfig         `config:"metadata"`
+	Retries  int                `config:"retries" validate:"min=0"`
+	Backoff  time.Duration      `config:"backoff" validate:"min=0"`
 	TLS      *outputs.TLSConfig `config:"ssl"`
 	Username string             `config:"username"`
 	Password string             `config:"password"`
@@ -17,15 +18,11 @@ type connConfig struct {
 }
 
 type metaConfig struct {
-	Retries int           `config:"retries" validate:"min=0"`
-	Backoff time.Duration `config:"backoff" validate:"min=0"`
 }
 
 var defaultConfig = connConfig{
-	Metadata: metaConfig{
-		Retries: 3,
-		Backoff: 250 * time.Millisecond,
-	},
+	Retries:  3,
+	Backoff:  250 * time.Millisecond,
 	TLS:      nil,
 	Username: "",
 	Password: "",
