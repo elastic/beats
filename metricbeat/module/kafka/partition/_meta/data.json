@@ -15,14 +15,13 @@
                 "oldest": 0
             },
             "partition": {
-                "error": 0,
                 "id": 0,
                 "insync_replica": true,
                 "leader": 0,
                 "replica": 0
             },
             "topic": {
-                "name": "test-metricbeat-8760238589576171408"
+                "name": "test-metricbeat-70692474374989458"
             }
         }
     },
