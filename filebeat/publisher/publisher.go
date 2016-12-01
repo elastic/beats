@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 )
 
@@ -33,6 +34,7 @@ func New(
 	pub publisher.Publisher,
 ) LogPublisher {
 	if async {
+		logp.Warn("Using publish_async is experimental!")
 		return newAsyncLogPublisher(in, out, pub)
 	}
 	return newSyncLogPublisher(in, out, pub)
