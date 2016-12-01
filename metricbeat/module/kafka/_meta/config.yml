@@ -5,9 +5,8 @@
   #hosts: ["localhost:9092"]
 
   #client_id: metricbeat
-
-  #metadata.retries: 3
-  #metadata.backoff: 250ms
+  #retries: 3
+  #backoff: 250ms
 
   # List of Topics to query metadata for. If empty, all topics will be queried.
   #topics: []

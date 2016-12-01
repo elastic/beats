@@ -52,8 +52,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfg.Net.DialTimeout = base.Module().Config().Timeout
 	cfg.Net.ReadTimeout = base.Module().Config().Timeout
 	cfg.ClientID = config.ClientID
-	cfg.Metadata.Retry.Max = config.Metadata.Retries
-	cfg.Metadata.Retry.Backoff = config.Metadata.Backoff
+	cfg.Metadata.Retry.Max = config.Retries
+	cfg.Metadata.Retry.Backoff = config.Backoff
 	if tls != nil {
 		cfg.Net.TLS.Enable = true
 		cfg.Net.TLS.Config = tls.BuildModuleConfig("")
