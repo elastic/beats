@@ -46,6 +46,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/libbeat/plugin"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher"
 	svc "github.com/elastic/beats/libbeat/service"
@@ -152,6 +153,10 @@ func newBeat(name, version string) *Beat {
 func (b *Beat) launch(bt Creator) error {
 	err := b.handleFlags()
 	if err != nil {
+		return err
+	}
+
+	if err := plugin.Initialize(); err != nil {
 		return err
 	}
 
