@@ -130,9 +130,12 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	for _, topic := range response.Topics {
 		evtTopic := common.MapStr{
 			"name": topic.Name,
-			"error": common.MapStr{
+		}
+
+		if topic.Err != 0 {
+			evtTopic["error"] = common.MapStr{
 				"code": topic.Err,
-			},
+			}
 		}
 
 		for _, partition := range topic.Partitions {
@@ -157,19 +160,24 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 					continue
 				}
 
+				partitionEvent := common.MapStr{
+					"id":             partition.ID,
+					"leader":         partition.Leader,
+					"replica":        id,
+					"insync_replica": hasID(id, partition.Isr),
+				}
+
+				if partition.Err != 0 {
+					partitionEvent["error"] = common.MapStr{
+						"code": partition.Err,
+					}
+				}
+
 				// create event
 				event := common.MapStr{
-					"topic":  evtTopic,
-					"broker": evtBroker,
-					"partition": common.MapStr{
-						"id": partition.ID,
-						"error": common.MapStr{
-							"code": partition.Err,
-						},
-						"leader":         partition.Leader,
-						"replica":        id,
-						"insync_replica": hasID(id, partition.Isr),
-					},
+					"topic":     evtTopic,
+					"broker":    evtBroker,
+					"partition": partitionEvent,
 					"offset": common.MapStr{
 						"newest": offNewest,
 						"oldest": offOldest,
