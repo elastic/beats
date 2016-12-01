@@ -22,11 +22,20 @@ func (b *offsetRequestBlock) decode(pd packetDecoder) (err error) {
 }
 
 type OffsetRequest struct {
-	blocks map[string]map[int32]*offsetRequestBlock
+	replicaID *int32
+	blocks    map[string]map[int32]*offsetRequestBlock
+
+	storeReplicaID int32
 }
 
 func (r *OffsetRequest) encode(pe packetEncoder) error {
-	pe.putInt32(-1) // replica ID is always -1 for clients
+	if r.replicaID == nil {
+		// default replica ID is always -1 for clients
+		pe.putInt32(-1)
+	} else {
+		pe.putInt32(*r.replicaID)
+	}
+
 	err := pe.putArrayLength(len(r.blocks))
 	if err != nil {
 		return err
@@ -98,6 +107,11 @@ func (r *OffsetRequest) version() int16 {
 
 func (r *OffsetRequest) requiredVersion() KafkaVersion {
 	return minVersion
+}
+
+func (r *OffsetRequest) SetReplicaID(id int32) {
+	r.storeReplicaID = id
+	r.replicaID = &r.storeReplicaID
 }
 
 func (r *OffsetRequest) AddBlock(topic string, partitionID int32, time int64, maxOffsets int32) {
