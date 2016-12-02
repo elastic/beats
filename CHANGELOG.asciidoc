@@ -115,6 +115,14 @@ https://github.com/elastic/beats/compare/v5.0.2...v5.1.1[View commits]
 
 - Add `event_logs.batch_read_size` configuration option. {pull}2641[2641]
 
+[[release-notes-5.1.0]]
+=== Beats version 5.1.0 (skipped)
+
+Version 5.1.0 doesn't exist because, for a short period of time, the Elastic
+Yum and Apt repositories included unreleased binaries labeled 5.1.0. To avoid
+confusion and upgrade issues for the people that have installed these without
+realizing, we decided to skip the 5.1.0 version and release 5.1.1 instead.
+
 [[release-notes-5.0.2]]
 === Beats version 5.0.2
 https://github.com/elastic/beats/compare/v5.0.1...v5.0.2[View commits]
