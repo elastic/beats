@@ -125,6 +125,10 @@ func Subscribe(
 // handles available to return. Close must be called on each returned EvtHandle
 // when finished with the handle.
 func EventHandles(subscription EvtHandle, maxHandles int) ([]EvtHandle, error) {
+	if maxHandles < 1 {
+		return nil, fmt.Errorf("maxHandles must be greater than 0")
+	}
+
 	eventHandles := make([]EvtHandle, maxHandles)
 	var numRead uint32
 
