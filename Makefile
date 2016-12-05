@@ -3,6 +3,7 @@ BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
 BEATS=packetbeat filebeat winlogbeat metricbeat heartbeat
 PROJECTS=libbeat ${BEATS}
+PROJECTS_ENV=libbeat metricbeat
 SNAPSHOT?=yes
 
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
@@ -11,6 +12,9 @@ SNAPSHOT?=yes
 testsuite:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
 	#$(MAKE) -C generate test
+
+stop-environments:
+	$(foreach var,$(PROJECTS_ENV),$(MAKE) -C $(var) stop-environment || exit 0;)
 
 # Runs unit and system tests without coverage and race detection.
 .PHONY: test
