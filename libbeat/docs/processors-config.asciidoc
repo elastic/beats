@@ -233,7 +233,7 @@ The supported actions are:
  * <<drop-fields,`drop_fields`>>
  * <<drop-event,`drop_event`>>
  * <<add-cloud-metadata,`add_cloud_metadata`>>
- * <<json-decode-fields,`json_decode_fields`>>
+ * <<decode-json-fields,`decode_json_fields`>>
 
 See <<exported-fields>> for the full list of possible fields.
 
@@ -373,21 +373,23 @@ _GCE_
 }
 --------------------------------------------------------------------------------
 
-[[json-decode-fields]]
-===== json_decode_fields
+[[decode-json-fields]]
+===== decode_json_fields
 
-The `json_decode_fields` action decodes fields containing JSON strings and replaces the strings with valid JSON objects.
+experimental[]
+
+The `decode_json_fields` action decodes fields containing JSON strings and replaces the strings with valid JSON objects.
 
 [source,yaml]
 -----------------------------------------------------
 processors:
- - json_decode_fields:
+ - decode_json_fields:
      fields: ["field1", "field2", ...]
      processArray: false 
      maxDepth: 1
 -----------------------------------------------------
 
-The `json_decode_fields` action has the following configuration settings:
+The `decode_json_fields` action has the following configuration settings:
 
 `fields`:: The fields containing JSON strings to decode.
 `processArray`:: (Optional) A boolean that specifies whether to process arrays. The default is false.
