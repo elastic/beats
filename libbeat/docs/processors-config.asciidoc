@@ -376,8 +376,6 @@ _GCE_
 [[decode-json-fields]]
 ===== decode_json_fields
 
-experimental[]
-
 The `decode_json_fields` action decodes fields containing JSON strings and replaces the strings with valid JSON objects.
 
 [source,yaml]
@@ -385,12 +383,12 @@ The `decode_json_fields` action decodes fields containing JSON strings and repla
 processors:
  - decode_json_fields:
      fields: ["field1", "field2", ...]
-     processArray: false 
-     maxDepth: 1
+     process_array: false 
+     max_depth: 1
 -----------------------------------------------------
 
 The `decode_json_fields` action has the following configuration settings:
 
 `fields`:: The fields containing JSON strings to decode.
-`processArray`:: (Optional) A boolean that specifies whether to process arrays. The default is false.
-`maxDepth`:: (Optional) The maximum parsing depth. The default is 1.
+`process_array`:: (Optional) A boolean that specifies whether to process arrays. The default is false.
+`max_dept`:: (Optional) The maximum parsing depth. The default is 1.
