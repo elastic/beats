@@ -4,7 +4,6 @@ package eventlog
 
 import (
 	"fmt"
-	"strconv"
 	"syscall"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/wineventlog"
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 )
 
@@ -73,6 +73,7 @@ type winEventLog struct {
 	channelName  string        // Name of the channel from which to read.
 	subscription win.EvtHandle // Handle to the subscription.
 	maxRead      int           // Maximum number returned in one Read.
+	lastRead     uint64        // Record number of the last read event.
 
 	render    func(event win.EvtHandle) (string, error) // Function for rendering the event to XML.
 	renderBuf []byte                                    // Buffer used for rendering event.
@@ -118,13 +119,8 @@ func (l *winEventLog) Open(recordNumber uint64) error {
 }
 
 func (l *winEventLog) Read() ([]Record, error) {
-	handles, err := win.EventHandles(l.subscription, l.maxRead)
-	if err == win.ERROR_NO_MORE_ITEMS {
-		detailf("%s No more events", l.logPrefix)
-		return nil, nil
-	}
-	if err != nil {
-		logp.Warn("%s EventHandles returned error %v", l.logPrefix, err)
+	handles, _, err := l.eventHandles(l.maxRead)
+	if err != nil || len(handles) == 0 {
 		return nil, err
 	}
 	defer func() {
@@ -145,17 +141,18 @@ func (l *winEventLog) Read() ([]Record, error) {
 		}
 		if err != nil && x == "" {
 			logp.Err("%s Dropping event with rendering error. %v", l.logPrefix, err)
-			reportDrop(err)
+			incrementMetric(dropReasons, err)
 			continue
 		}
 
 		r, err := l.buildRecordFromXML(x, err)
 		if err != nil {
 			logp.Err("%s Dropping event. %v", l.logPrefix, err)
-			reportDrop("unmarshal")
+			incrementMetric(dropReasons, err)
 			continue
 		}
 		records = append(records, r)
+		l.lastRead = r.RecordID
 	}
 
 	debugf("%s Read() is returning %d records", l.logPrefix, len(records))
@@ -165,6 +162,34 @@ func (l *winEventLog) Read() ([]Record, error) {
 func (l *winEventLog) Close() error {
 	debugf("%s Closing handle", l.logPrefix)
 	return win.Close(l.subscription)
+}
+
+func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
+	handles, err := win.EventHandles(l.subscription, maxRead)
+	switch err {
+	case nil:
+		if l.maxRead > maxRead {
+			debugf("%s Recovered from RPC_S_INVALID_BOUND error (errno 1734) "+
+				"by decreasing batch_read_size to %v", l.logPrefix, maxRead)
+		}
+		return handles, maxRead, nil
+	case win.ERROR_NO_MORE_ITEMS:
+		detailf("%s No more events", l.logPrefix)
+		return nil, maxRead, nil
+	case win.RPC_S_INVALID_BOUND:
+		incrementMetric(readErrors, err)
+		if err := l.Close(); err != nil {
+			return nil, 0, errors.Wrap(err, "failed to recover from RPC_S_INVALID_BOUND")
+		}
+		if err := l.Open(l.lastRead); err != nil {
+			return nil, 0, errors.Wrap(err, "failed to recover from RPC_S_INVALID_BOUND")
+		}
+		return l.eventHandles(maxRead / 2)
+	default:
+		incrementMetric(readErrors, err)
+		logp.Warn("%s EventHandles returned error %v", l.logPrefix, err)
+		return nil, 0, err
+	}
 }
 
 func (l *winEventLog) buildRecordFromXML(x string, recoveredErr error) (Record, error) {
@@ -202,20 +227,6 @@ func (l *winEventLog) buildRecordFromXML(x string, recoveredErr error) (Record, 
 	}
 
 	return r, nil
-}
-
-// reportDrop reports a dropped event log record and the reason as an expvar
-// metric. The reason should be a windows syscall.Errno or a string. Any other
-// types will be reported under the "other" key.
-func reportDrop(reason interface{}) {
-	switch t := reason.(type) {
-	default:
-		dropReasons.Add("other", 1)
-	case string:
-		dropReasons.Add(t, 1)
-	case syscall.Errno:
-		dropReasons.Add(strconv.Itoa(int(t)), 1)
-	}
 }
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
@@ -283,7 +294,7 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 }
 
 func init() {
-	// Register eventlogging API if it is available.
+	// Register wineventlog API if it is available.
 	available, _ := win.IsAvailable()
 	if available {
 		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
