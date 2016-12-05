@@ -8,7 +8,7 @@ start:
 
 stop:
 	${BASE_COMMAND} stop
-	${BASE_COMMAND} rm -f
+	${BASE_COMMAND} rm
 
 
 up:
