@@ -287,8 +287,10 @@ func (p *PingMode) Unpack(s string) error {
 		*p = PingAll
 	case "any":
 		*p = PingAny
+	default:
+		return fmt.Errorf("expecting 'any' or 'all', not '%v'", s)
 	}
-	return errors.New("expecting 'any' or 'all'")
+	return nil
 }
 
 func annotated(start time.Time, typ string, fn func() (common.MapStr, []TaskRunner, error)) TaskRunner {
