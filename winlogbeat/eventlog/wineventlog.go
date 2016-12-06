@@ -3,7 +3,6 @@
 package eventlog
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"syscall"
@@ -79,7 +78,7 @@ type winEventLog struct {
 
 	render    func(event win.EvtHandle, out io.Writer) error // Function for rendering the event to XML.
 	renderBuf []byte                                         // Buffer used for rendering event.
-	outputBuf *bytes.Buffer                                  // Buffer for receiving XML
+	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
 	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
 
 	logPrefix     string               // String to prefix on log messages.
@@ -275,7 +274,7 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 		channelName:   c.Name,
 		maxRead:       c.BatchReadSize,
 		renderBuf:     make([]byte, renderBufferSize),
-		outputBuf:     bytes.NewBuffer(make([]byte, renderBufferSize)),
+		outputBuf:     sys.NewByteBuffer(renderBufferSize),
 		cache:         newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
 		logPrefix:     fmt.Sprintf("WinEventLog[%s]", c.Name),
 		eventMetadata: c.EventMetadata,
