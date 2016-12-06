@@ -50,21 +50,21 @@ func eventMapping(body io.Reader) common.MapStr {
 
 	logp.Info("Printing Data:")
 	event := common.MapStr{
-		"indexMemoryQuota":      d.IndexMemoryQuota,
-		"maxBucketCount":        d.MaxBucketCount,
-		"memoryQuota":           d.MemoryQuota,
-		"hdd_free":              d.StorageTotals.Hdd.Free,
-		"hdd_quotaTotal":        d.StorageTotals.Hdd.QuotaTotal,
-		"hdd_total":             d.StorageTotals.Hdd.Total,
-		"hdd_used":              d.StorageTotals.Hdd.Used,
-		"hdd_usedByData":        d.StorageTotals.Hdd.UsedByData,
-		"ram_quotaTotal":        d.StorageTotals.RAM.QuotaTotal,
-		"ram_quotaTotalPerNode": d.StorageTotals.RAM.QuotaTotalPerNode,
-		"ram_quotaUsed":         d.StorageTotals.RAM.QuotaUsed,
-		"ram_quotaUsedPerNode":  d.StorageTotals.RAM.QuotaUsedPerNode,
-		"ram_total":             d.StorageTotals.RAM.Total,
-		"ram_used":              d.StorageTotals.RAM.Used,
-		"ram_usedByData":        d.StorageTotals.RAM.UsedByData,
+		"quota.index_memory.mb":          d.IndexMemoryQuota,
+		"quota.memory.mb":                d.MemoryQuota,
+		"max_bucket_count":               d.MaxBucketCount,
+		"hdd.free.bytes":                 d.StorageTotals.Hdd.Free,
+		"hdd.quota_total.bytes":          d.StorageTotals.Hdd.QuotaTotal,
+		"hdd.total.bytes":                d.StorageTotals.Hdd.Total,
+		"hdd.used.bytes":                 d.StorageTotals.Hdd.Used,
+		"hdd.used.by_data.bytes":         d.StorageTotals.Hdd.UsedByData,
+		"ram.quota.total.bytes":          d.StorageTotals.RAM.QuotaTotal,
+		"ram.quota.total.per_node.bytes": d.StorageTotals.RAM.QuotaTotalPerNode,
+		"ram.quota.used.bytes":           d.StorageTotals.RAM.QuotaUsed,
+		"ram.quota.used.per_node.bytes":  d.StorageTotals.RAM.QuotaUsedPerNode,
+		"ram.total.bytes":                d.StorageTotals.RAM.Total,
+		"ram.used.bytes":                 d.StorageTotals.RAM.Used,
+		"ram.used.by_data.bytes":         d.StorageTotals.RAM.UsedByData,
 	}
 
 	return event

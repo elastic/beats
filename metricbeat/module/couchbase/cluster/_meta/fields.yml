@@ -3,63 +3,63 @@
   description: >
     cluster information
   fields:
-    - name: hdd_free
+    - name: hdd.free.bytes
       type: long
       description: >
         Free harddrive space in the cluster (bytes)
-    - name: hdd_quotaTotal
+    - name: hdd.quota_total.bytes
       type: long
       description: >
         Harddrive quota total for the cluster (bytes)
-    - name: hdd_total
+    - name: hdd.total.bytes
       type: long
       description: >
         Total harddrive space available to cluster (bytes)
-    - name: hdd_used
+    - name: hdd.used.bytes
       type: long
       description: >
         Harddrive space used by the cluster (bytes)
-    - name: hdd_usedByData
+    - name: hdd.used_by_data.bytes
       type: long
       description: >
         Harddrive use by the data in the cluster(bytes)
-    - name: indexMemoryQuota
+    - name: quota.index_memory.mb
       type: long
       description: >
         Setting of Memory quota for the Index service (Mbyte)
-    - name: maxBucketCount
-      type: long
-      description: >
-        Setting of Max Bucket Count
-    - name: memoryQuota
+    - name: quota.memory.mb
       type: keyword
       description: >
         Setting of Memory quota for the cluster (Mbyte)
-    - name: ram_quotaTotal
+    - name: max_bucket_count
+      type: long
+      description: >
+        Setting of Max Bucket Count
+    - name: ram.quota.total.bytes
       type: long
       description: >
         Ram quota total for the cluster (bytes)
-    - name: ram_quotaTotalPerNode
+    - name: ram.quota.total.per_node.bytes
       type: long
       description: >
         Ram quota used by the current node in the cluster (bytes)
-    - name: ram_quotaUsed
+    - name: ram.quota.used.bytes
       type: long
       description: >
         Ram quota used by the cluster (bytes)
-    - name: ram_quotaUsedPerNode
+    - name: ram.quota.used.per_node.bytes
       type: long
       description: >
         Ram quota used by the current node in the cluster (bytes)
-    - name: ram_total
+    - name: ram.total.bytes
       type: long
       description: >
         Total ram available to cluster (bytes)
-    - name: ram_used
+    - name: ram.used.bytes
       type: long
       description: >
         Ram used by the cluster (bytes)
-    - name: ram_usedByData
+    - name: ram.used.by_data.bytes
       type: long
       description: >
         Ram used by the data in the cluster (bytes)
