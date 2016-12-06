@@ -8,17 +8,14 @@ services:
       - logstash
     environment:
       - LS_HOST=logstash
-    container_name: beat
 
   elasticsearch:
     image: elasticsearch:latest
-    container_name: elasticsearch
 
   logstash:
     image: logstash:latest
     links:
       - elasticsearch
-    container_name: logstash
     environment:
       - ES_HOST=elasticsearch
 
@@ -28,4 +25,3 @@ services:
       - elasticsearch
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200/
-    container_name: kibana
