@@ -7,43 +7,43 @@
       type: keyword
       description: >
         name of the bucket
-    - name: bucketType
+    - name: type
       type: keyword
       description: >
         type of the bucket
-    - name: quota_RAM
+    - name: quota.ram
       type: long
       description: >
         Amount of RAM used by the bucket (bytes)
-    - name: quota_RawRAM
+    - name: quota.raw_ram
       type: long
       description: >
         Amount of raw RAM used by the bucket (bytes)
-    - name: stats_QuotaPercUse
+    - name: quota.use.pct
       type: float
       description: >
         Percentage of RAM used (for active objects) against the configure bucket size.(%)
-    - name: stats_OpsPerSec
+    - name: ops_per_sec
       type: long
       description: >
         Number of operations per second
-    - name: stats_DiskFetches
+    - name: disk.fetches
       type: long
       description: >
         Number of disk fetches
-    - name: stats_ItemCount
-      type: long
-      description: >
-        Number of items associated with the bucket
-    - name: stats_DiskUsed
+    - name: disk.used
       type: long
       description: >
         Amount of disk used (bytes)
-    - name: stats_DataUsed
+    - name: item_count
+      type: long
+      description: >
+        Number of items associated with the bucket
+    - name: data_used
       type: long
       description: >
         Size of user data within buckets of the specified state that are resident in RAM.
-    - name: stats_MemUsed
+    - name: mem_used
       type: long
       description: >
         Amount of memory used by the bucket (bytes)
