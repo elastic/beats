@@ -110,8 +110,8 @@ The resulting output looks something like this:
 {
   "@timestamp": "2016-12-06T17:38:11.541Z",
   "beat": {
-    "hostname": "macbook13.local",
-    "name": "macbook13.local",
+    "hostname": "host.example.com",
+    "name": "host.example.com",
     "version": "{version}"
   },
   "inner": {
