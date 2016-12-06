@@ -391,4 +391,4 @@ The `decode_json_fields` action has the following configuration settings:
 
 `fields`:: The fields containing JSON strings to decode.
 `process_array`:: (Optional) A boolean that specifies whether to process arrays. The default is false.
-`max_dept`:: (Optional) The maximum parsing depth. The default is 1.
+`max_depth`:: (Optional) The maximum parsing depth. The default is 1.

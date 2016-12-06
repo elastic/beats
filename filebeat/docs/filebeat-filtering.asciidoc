@@ -1,11 +1,16 @@
 [[filtering-and-enhancing-data]]
 == Filtering and Enhancing the Exported Data
 
-When your use case requires only a subset of the data exported by Filebeat or you need to add metadata, you can <<filebeat-filtering-overview,use Filebeat config options to filter the data>>, or you can  <<defining-processors,define processors>>.
+Your use case might require only a subset of the data exported by Filebeat, or
+you might need to add metadata. Filebeat provides a couple of options for
+filtering and enhancing exported data. You can:
+
+* <<filebeat-filtering-overview,Use simple filtering based on pattern matching>>
+* <<defining-processors,Define processors for more complex processing requirements>>
 
 [float]
 [[filebeat-filtering-overview]]
-=== Filebeat Config Options for Filtering
+=== Filtering Based on Pattern Matching
 
 You can specify configuration options in the `filebeat` section of the config file to define regular expressions that
 match the lines you want to include and/or exclude from the output. The supported options are <<include-lines,`include_lines`>>, <<exclude-lines,`exclude_lines`>>, and <<exclude-files,`exclude_files`>>.
@@ -31,7 +36,11 @@ See <<configuration-filebeat-options,Filebeat configuration options>> for more i
 
 include::../../libbeat/docs/processors.asciidoc[]
 
-For example, the following configuration drops all the DEBUG messages.
+[float]
+[[drop-event-example]]
+==== Drop Event Example
+
+The following configuration drops all the DEBUG messages.
 
 [source,yaml]
 -----------------------------------------------------
@@ -52,5 +61,55 @@ processors:
         contains:
            source: "test"
 ----------------
+
+[float]
+[[decode-json-example]]
+==== Decode JSON Example
+
+In the following example, the fields exported by Filebeat include a
+field, `inner`, whose value is a JSON object encoded as a string:
+
+[source,json]
+-----------------------------------------------------
+{ "outer": "value", "inner": "{\"data\": \"value\"}" }
+-----------------------------------------------------
+
+The following configuration decodes the inner JSON object:
+
+[source,yaml]
+-----------------------------------------------------
+filebeat.prospectors:
+- paths:
+    - input.json
+  json.keys_under_root: true
+
+processors:
+  - decode_json_fields:
+      fields: ["inner"]
+
+output.console.pretty: true
+-----------------------------------------------------
+
+The resulting output looks something like this:
+
+["source","json",subs="attributes"]
+-----------------------------------------------------
+{
+  "@timestamp": "2016-12-06T17:38:11.541Z",
+  "beat": {
+    "hostname": "macbook13.local",
+    "name": "macbook13.local",
+    "version": "{version}"
+  },
+  "inner": {
+    "data": "value"
+  },
+  "input_type": "log",
+  "offset": 55,
+  "outer": "value",
+  "source": "input.json",
+  "type": "log"
+}
+-----------------------------------------------------
 
 See <<configuration-processors>> for more information.
