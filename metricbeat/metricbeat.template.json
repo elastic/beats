@@ -192,170 +192,312 @@
           "properties": {
             "bucket": {
               "properties": {
-                "bucketType": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                "data_used": {
+                  "type": "long"
+                },
+                "disk": {
+                  "properties": {
+                    "fetches": {
+                      "type": "long"
+                    },
+                    "used": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "item_count": {
+                  "type": "long"
+                },
+                "mem_used": {
+                  "type": "long"
                 },
                 "name": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
-                "quota_RAM": {
+                "ops_per_sec": {
                   "type": "long"
                 },
-                "quota_RawRAM": {
-                  "type": "long"
+                "quota": {
+                  "properties": {
+                    "ram": {
+                      "type": "long"
+                    },
+                    "raw_ram": {
+                      "type": "long"
+                    },
+                    "use": {
+                      "properties": {
+                        "pct": {
+                          "type": "float"
+                        }
+                      }
+                    }
+                  }
                 },
-                "stats_DataUsed": {
-                  "type": "long"
-                },
-                "stats_DiskFetches": {
-                  "type": "long"
-                },
-                "stats_DiskUsed": {
-                  "type": "long"
-                },
-                "stats_ItemCount": {
-                  "type": "long"
-                },
-                "stats_MemUsed": {
-                  "type": "long"
-                },
-                "stats_OpsPerSec": {
-                  "type": "long"
-                },
-                "stats_QuotaPercUse": {
-                  "type": "float"
+                "type": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
                 }
               }
             },
             "cluster": {
               "properties": {
-                "hdd_free": {
+                "hdd": {
+                  "properties": {
+                    "free": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "quota_total": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "total": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "used_by_data": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "max_bucket_count": {
                   "type": "long"
                 },
-                "hdd_quotaTotal": {
-                  "type": "long"
+                "quota": {
+                  "properties": {
+                    "index_memory": {
+                      "properties": {
+                        "mb": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "memory": {
+                      "properties": {
+                        "mb": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        }
+                      }
+                    }
+                  }
                 },
-                "hdd_total": {
-                  "type": "long"
-                },
-                "hdd_used": {
-                  "type": "long"
-                },
-                "hdd_usedByData": {
-                  "type": "long"
-                },
-                "indexMemoryQuota": {
-                  "type": "long"
-                },
-                "maxBucketCount": {
-                  "type": "long"
-                },
-                "memoryQuota": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "ram_quotaTotal": {
-                  "type": "long"
-                },
-                "ram_quotaTotalPerNode": {
-                  "type": "long"
-                },
-                "ram_quotaUsed": {
-                  "type": "long"
-                },
-                "ram_quotaUsedPerNode": {
-                  "type": "long"
-                },
-                "ram_total": {
-                  "type": "long"
-                },
-                "ram_used": {
-                  "type": "long"
-                },
-                "ram_usedByData": {
-                  "type": "long"
+                "ram": {
+                  "properties": {
+                    "quota": {
+                      "properties": {
+                        "total": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            },
+                            "per_node": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "used": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            },
+                            "per_node": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "total": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "used": {
+                      "properties": {
+                        "by_data": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             },
             "node": {
               "properties": {
-                "CPUUtilizationRate": {
-                  "type": "float"
-                },
-                "cmdGet": {
+                "cmd_get": {
                   "type": "long"
                 },
-                "couchDocsActualDiskSize": {
+                "couch_docs_actual_disk_size": {
                   "type": "long"
                 },
-                "couchDocsDataSize": {
+                "couch_docs_data_size": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "couch_spatial_data_size": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "couch_spatial_disk_size": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "couch_views_actual_disk_size": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "couch_views_data_size": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "cpu_utilization_rate": {
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    }
+                  }
+                },
+                "curr_items": {
                   "type": "long"
                 },
-                "couchSpatialDataSize": {
+                "curr_items_tot": {
                   "type": "long"
                 },
-                "couchSpatialDiskSize": {
+                "ep_bg_fetched": {
                   "type": "long"
                 },
-                "couchViewsActualDiskSize": {
-                  "type": "long"
-                },
-                "couchViewsDataSize": {
-                  "type": "long"
-                },
-                "currItems": {
-                  "type": "long"
-                },
-                "currItemsTot": {
-                  "type": "long"
-                },
-                "epBgFetched": {
-                  "type": "long"
-                },
-                "getHits": {
+                "get_hits": {
                   "type": "long"
                 },
                 "hostname": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
-                "mcdMemoryAllocated": {
-                  "type": "long"
+                "mcd_memory": {
+                  "properties": {
+                    "allocated": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "reserved": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
                 },
-                "mcdMemoryReserved": {
-                  "type": "long"
-                },
-                "memFree": {
-                  "type": "long"
-                },
-                "memTotal": {
-                  "type": "long"
-                },
-                "memUsed": {
-                  "type": "long"
-                },
-                "memoryFree": {
-                  "type": "long"
-                },
-                "memoryTotal": {
-                  "type": "long"
+                "mem": {
+                  "properties": {
+                    "free": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "total": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
                 },
                 "ops": {
                   "type": "long"
                 },
-                "swapTotal": {
-                  "type": "long"
-                },
-                "swapUsed": {
-                  "type": "long"
+                "swap": {
+                  "properties": {
+                    "total": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
                 },
                 "uptime": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
-                "vbReplicaCurrItems": {
+                "vb_replica_curr_items": {
                   "type": "long"
                 }
               }
