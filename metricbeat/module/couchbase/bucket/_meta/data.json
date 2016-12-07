@@ -6,17 +6,16 @@
     },
     "couchbase": {
         "bucket": {
-            "bucketType": "membase",
+            "data_used": 12597774,
+            "disk.fetches": 0,
+            "disk.used": 12280826,
+            "item_count": 7303,
+            "mem_used": 53966432,
             "name": "beer-sample",
-            "quota_RAM": 104857600,
-            "quota_RawRAM": 104857600,
-            "stats_DataUsed": 12601896,
-            "stats_DiskFetches": 0,
-            "stats_DiskUsed": 16373175,
-            "stats_ItemCount": 7303,
-            "stats_MemUsed": 53962160,
-            "stats_OpsPerSec": 0,
-            "stats_QuotaPercUse": 51.46232604980469
+            "ops_per_sec": 0,
+            "quota.ram": 104857600,
+            "quota.raw_ram": 104857600,
+            "quota.use.pct": 51.46640014648438
         }
     },
     "metricset": {
@@ -25,5 +24,5 @@
         "name": "bucket",
         "rtt": 115
     },
-    "type": "metricsets"
+    "type": "membase"
 }

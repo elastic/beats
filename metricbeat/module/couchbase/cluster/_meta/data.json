@@ -6,21 +6,21 @@
     },
     "couchbase": {
         "cluster": {
-            "hdd_free": 46902679716,
-            "hdd_quotaTotal": 63381999616,
-            "hdd_total": 63381999616,
-            "hdd_used": 16479319900,
-            "hdd_usedByData": 16360754,
-            "indexMemoryQuota": 300,
-            "maxBucketCount": 10,
-            "memoryQuota": 300,
-            "ram_quotaTotal": 314572800,
-            "ram_quotaTotalPerNode": 314572800,
-            "ram_quotaUsed": 104857600,
-            "ram_quotaUsedPerNode": 104857600,
-            "ram_total": 8359174144,
-            "ram_used": 7675994112,
-            "ram_usedByData": 53962160
+            "hdd.free.bytes": 48804139705,
+            "hdd.quota_total.bytes": 63381999616,
+            "hdd.total.bytes": 63381999616,
+            "hdd.used.by_data.bytes": 12280826,
+            "hdd.used.bytes": 14577859911,
+            "max_bucket_count": 10,
+            "quota.index_memory.mb": 300,
+            "quota.memory.mb": 300,
+            "ram.quota.total.bytes": 314572800,
+            "ram.quota.total.per_node.bytes": 314572800,
+            "ram.quota.used.bytes": 104857600,
+            "ram.quota.used.per_node.bytes": 104857600,
+            "ram.total.bytes": 8360542208,
+            "ram.used.by_data.bytes": 53966432,
+            "ram.used.bytes": 5843070976
         }
     },
     "metricset": {
