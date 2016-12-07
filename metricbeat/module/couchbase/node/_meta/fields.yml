@@ -3,103 +3,95 @@
   description: >
     node
   fields:
-    - name: CPUUtilizationRate
-      type: float
-      description: >
-        The CPU utilization rate (%)
-    - name: cmdGet
-      type: long
-      description: >
-        Number of get commands
-    - name: couchDocsActualDiskSize
-      type: long
-      description: >
-        Amount of disk space used by Couch docs.(bytes)
-    - name: couchDocsDataSize
-      type: long
-      description: >
-        Data size of couch documents associated with a node (bytes)
-    - name: couchSpatialDataSize
-      type: long
-      description: >
-        couchSpatialDataSize field
-    - name: couchSpatialDiskSize
-      type: long
-      description: >
-        couchSpatialDiskSize field
-    - name: couchViewsActualDiskSize
-      type: long
-      description: >
-        Amount of disk space occupied by Couch views (bytes)
-    - name: couchViewsDataSize
-      type: long
-      description: >
-        Size of object data for Couch views (bytes)
-    - name: currItems
-      type: long
-      description: >
-        Number of current items
-    - name: currItemsTot
-      type: long
-      description: >
-        Total number of items associated with node
-    - name: epBgFetched
-      type: long
-      description: >
-        Number of disk fetches performed since server was started
-    - name: getHits
-      type: long
-      description: >
-        Number of get hits
     - name: hostname
       type: keyword
       description: >
         The hostname of the Node
-    - name: mcdMemoryAllocated
-      type: long
-      description: >
-        Amount of memcached memory allocated (bytes)
-    - name: mcdMemoryReserved
-      type: long
-      description: >
-        Amount of memcached memory reserved (bytes)
-    - name: memFree
-      type: long
-      description: >
-        Amount of memory free for the node (bytes)
-    - name: memTotal
-      type: long
-      description: >
-        Total memory available to the node (bytes)
-    - name: memUsed
-      type: long
-      description: >
-        Memory used by the node (bytes)
-    - name: memoryFree
-      type: long
-      description: >
-        Amount of memory free for the node (bytes)
-    - name: memoryTotal
-      type: long
-      description: >
-        Total memory available to the node (bytes)
-    - name: ops
-      type: long
-      description: >
-        Number of operations performed on Couchbase
-    - name: swapTotal
-      type: long
-      description: >
-        Total swap size allocated (bytes)
-    - name: swapUsed
-      type: long
-      description: >
-        Amount of swap space used.(bytes)
     - name: uptime
       type: keyword
       description: >
         Time during which the node was in operation (sec)
-    - name: vbReplicaCurrItems
+    - name: mcd_memory.allocated.bytes
+      type: long
+      description: >
+        Amount of memcached memory allocated (bytes)
+    - name: mcd_memory.reserved.bytes
+      type: long
+      description: >
+        Amount of memcached memory reserved (bytes)
+    - name: cmd_get
+      type: long
+      description: >
+        Number of get commands
+    - name: cpu_utilization_rate.pct
+      type: float
+      description: >
+        The CPU utilization rate (%)
+    - name: couch_docs_actual_disk_size
+      type: long
+      description: >
+        Amount of disk space used by Couch docs.(bytes)
+    - name: couch_docs_data_size.bytes
+      type: long
+      description: >
+        Data size of couch documents associated with a node (bytes)
+    - name: couch_spatial_data_size.bytes
+      type: long
+      description: >
+        couchSpatialDataSize field
+    - name: couch_spatial_disk_size.bytes
+      type: long
+      description: >
+        couchSpatialDiskSize field
+    - name: couch_views_actual_disk_size.bytes
+      type: long
+      description: >
+        Amount of disk space occupied by Couch views (bytes)
+    - name: couch_views_data_size.bytes
+      type: long
+      description: >
+        Size of object data for Couch views (bytes)
+    - name: curr_items
+      type: long
+      description: >
+        Number of current items
+    - name: curr_items_tot
+      type: long
+      description: >
+        Total number of items associated with node
+    - name: ep_bg_fetched
+      type: long
+      description: >
+        Number of disk fetches performed since server was started
+    - name: get_hits
+      type: long
+      description: >
+        Number of get hits
+    - name: mem.free.bytes
+      type: long
+      description: >
+        Amount of memory free for the node (bytes)
+    - name: mem.total.bytes
+      type: long
+      description: >
+        Total memory available to the node (bytes)
+    - name: mem.used.bytes
+      type: long
+      description: >
+        Memory used by the node (bytes)
+    - name: ops
+      type: long
+      description: >
+        Number of operations performed on Couchbase
+    - name: swap.total.bytes
+      type: long
+      description: >
+        Total swap size allocated (bytes)
+    - name: swap.used.bytes
+      type: long
+      description: >
+        Amount of swap space used.(bytes)
+    - name: vb_replica_curr_items
       type: long
       description: >
         Number of items/documents that are replicas
