@@ -49,6 +49,7 @@ DOCKER_CACHE?=1 # If set to 0, all docker images are created without cache
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 PYTHON_ENV?=${BUILD_DIR}/python-env
 BUILDID?=$(shell git rev-parse HEAD)
+VIRTUALENV_PARAMS?=
 
 CGO?=false
 
@@ -180,7 +181,7 @@ load-tests:
 # Sets up the virtual python environment
 .PHONY: python-env
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
-	@test -d ${PYTHON_ENV} || virtualenv --always-copy ${PYTHON_ENV}
+	@test -d ${PYTHON_ENV} || virtualenv ${VIRTUALENV_PARAMS} ${PYTHON_ENV}
 	@. ${PYTHON_ENV}/bin/activate && pip install -q --upgrade pip ; \
 	if [ -a ./tests/system/requirements.txt ] && [ ! ${ES_BEATS}/libbeat/tests/system/requirements.txt -ef ./tests/system/requirements.txt ] ; then \
 		. ${PYTHON_ENV}/bin/activate && pip install -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
