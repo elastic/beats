@@ -75,3 +75,26 @@ func BenchmarkUTF16BytesToString(b *testing.B) {
 		}
 	})
 }
+
+func TestUTF16ToUTF8(t *testing.T) {
+	input := "abc白鵬翔\u145A6"
+	utf16Bytes := toUTF16Bytes(input)
+
+	outputBuf := &bytes.Buffer{}
+	err := UTF16ToUTF8Bytes(utf16Bytes, outputBuf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, []byte(input), outputBuf.Bytes())
+}
+
+func BenchmarkUTF16ToUTF8(b *testing.B) {
+	utf16Bytes := toUTF16Bytes("A logon was attempted using explicit credentials.")
+	outputBuf := &bytes.Buffer{}
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		UTF16ToUTF8Bytes(utf16Bytes, outputBuf)
+		outputBuf.Reset()
+	}
+}

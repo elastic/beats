@@ -4,6 +4,7 @@ package eventlog
 
 import (
 	"fmt"
+	"io"
 	"syscall"
 	"time"
 
@@ -75,9 +76,10 @@ type winEventLog struct {
 	maxRead      int           // Maximum number returned in one Read.
 	lastRead     uint64        // Record number of the last read event.
 
-	render    func(event win.EvtHandle) (string, error) // Function for rendering the event to XML.
-	renderBuf []byte                                    // Buffer used for rendering event.
-	cache     *messageFilesCache                        // Cached mapping of source name to event message file handles.
+	render    func(event win.EvtHandle, out io.Writer) error // Function for rendering the event to XML.
+	renderBuf []byte                                         // Buffer used for rendering event.
+	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
+	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
 
 	logPrefix     string               // String to prefix on log messages.
 	eventMetadata common.EventMetadata // Field and tags to add to each event.
@@ -132,20 +134,22 @@ func (l *winEventLog) Read() ([]Record, error) {
 
 	var records []Record
 	for _, h := range handles {
-		x, err := l.render(h)
+		l.outputBuf.Reset()
+		err := l.render(h, l.outputBuf)
 		if bufErr, ok := err.(sys.InsufficientBufferError); ok {
 			detailf("%s Increasing render buffer size to %d", l.logPrefix,
 				bufErr.RequiredSize)
 			l.renderBuf = make([]byte, bufErr.RequiredSize)
-			x, err = l.render(h)
+			l.outputBuf.Reset()
+			err = l.render(h, l.outputBuf)
 		}
-		if err != nil && x == "" {
+		if err != nil && l.outputBuf.Len() == 0 {
 			logp.Err("%s Dropping event with rendering error. %v", l.logPrefix, err)
 			incrementMetric(dropReasons, err)
 			continue
 		}
 
-		r, err := l.buildRecordFromXML(x, err)
+		r, err := l.buildRecordFromXML(l.outputBuf.Bytes(), err)
 		if err != nil {
 			logp.Err("%s Dropping event. %v", l.logPrefix, err)
 			incrementMetric(dropReasons, err)
@@ -192,8 +196,8 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 	}
 }
 
-func (l *winEventLog) buildRecordFromXML(x string, recoveredErr error) (Record, error) {
-	e, err := sys.UnmarshalEventXML([]byte(x))
+func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, error) {
+	e, err := sys.UnmarshalEventXML(x)
 	if err != nil {
 		return Record{}, fmt.Errorf("Failed to unmarshal XML='%s'. %v", x, err)
 	}
@@ -213,7 +217,7 @@ func (l *winEventLog) buildRecordFromXML(x string, recoveredErr error) (Record, 
 	}
 
 	if logp.IsDebug(detailSelector) {
-		detailf("%s XML=%s Event=%+v", l.logPrefix, x, e)
+		detailf("%s XML=%s Event=%+v", l.logPrefix, string(x), e)
 	}
 
 	r := Record{
@@ -223,7 +227,7 @@ func (l *winEventLog) buildRecordFromXML(x string, recoveredErr error) (Record, 
 	}
 
 	if l.config.IncludeXML {
-		r.XML = x
+		r.XML = string(x)
 	}
 
 	return r, nil
@@ -270,6 +274,7 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 		channelName:   c.Name,
 		maxRead:       c.BatchReadSize,
 		renderBuf:     make([]byte, renderBufferSize),
+		outputBuf:     sys.NewByteBuffer(renderBufferSize),
 		cache:         newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
 		logPrefix:     fmt.Sprintf("WinEventLog[%s]", c.Name),
 		eventMetadata: c.EventMetadata,
@@ -281,12 +286,12 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 	switch {
 	case c.Forwarded == nil && c.Name == "ForwardedEvents",
 		c.Forwarded != nil && *c.Forwarded == true:
-		l.render = func(event win.EvtHandle) (string, error) {
-			return win.RenderEventXML(event, l.renderBuf)
+		l.render = func(event win.EvtHandle, out io.Writer) error {
+			return win.RenderEventXML(event, l.renderBuf, out)
 		}
 	default:
-		l.render = func(event win.EvtHandle) (string, error) {
-			return win.RenderEvent(event, 0, l.renderBuf, l.cache.get)
+		l.render = func(event win.EvtHandle, out io.Writer) error {
+			return win.RenderEvent(event, 0, l.renderBuf, l.cache.get, out)
 		}
 	}
 
