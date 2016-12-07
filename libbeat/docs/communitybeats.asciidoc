@@ -7,6 +7,7 @@ out some of them here.
 NOTE: Elastic provides no warranty or support for community-sourced Beats.
 
 [horizontal]
+https://github.com/awormuth/amazonbeat[amazonbeat]:: Reads data from a specified Amazon product.
 https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache HTTPD server-status.
 https://github.com/goomzee/burrowbeat[burrowbeat]:: Monitors Kafka consumer lag using Burrow.
 https://github.com/goomzee/cassandrabeat[cassandrabeat]:: Uses Cassandra's nodetool cfstats utility to monitor Cassandra database nodes and lag.
