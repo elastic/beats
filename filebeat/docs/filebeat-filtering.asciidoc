@@ -98,7 +98,7 @@ filebeat.prospectors:
 
 processors:
   - decode_json_fields:
-      fields: ['inner']
+      fields: ["inner"]
 
 output.console.pretty: true
 -----------------------------------------------------
