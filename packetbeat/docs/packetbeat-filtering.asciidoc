@@ -8,7 +8,7 @@ requests and their response codes are reported:
 
 [source, yaml]
 -----------------------------------------------------
-filters:
+processors:
   - include_fields:
       fields:
         - bytes_in

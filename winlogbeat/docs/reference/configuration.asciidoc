@@ -11,7 +11,6 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 
 * <<configuration-winlogbeat-options>>
 * <<configuration-general>>
-* <<configuration-processors>>
 * <<elasticsearch-output>>
 * <<logstash-output>>
 * <<kafka-output>>
@@ -21,6 +20,7 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 * <<configuration-output-ssl>>
 * <<configuration-path>>
 * <<configuration-logging>>
+* <<configuration-processors>>
 
 include::configuration/winlogbeat-options.asciidoc[]
 
