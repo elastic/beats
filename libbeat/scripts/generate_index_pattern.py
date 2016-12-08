@@ -60,6 +60,8 @@ def field_to_json(desc, path, output):
                 field["aggregatable"] = False
         elif desc["type"] == "date":
             field["type"] = "date"
+        elif desc["type"] == "geo_point":
+            field["type"] = "geo_point"
     else:
         field["type"] = "string"
 
