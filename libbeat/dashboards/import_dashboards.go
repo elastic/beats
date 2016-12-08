@@ -96,9 +96,9 @@ func DefineCommandLine() (*CommandLine, error) {
 	cl.flagSet.BoolVar(&cl.opt.OnlyDashboards, "only-dashboards", false, "Import only dashboards together with visualizations and searches. By default import both, dashboards and the index-pattern.")
 	cl.flagSet.BoolVar(&cl.opt.OnlyIndex, "only-index", false, "Import only the index-pattern. By default imports both, dashboards and the index pattern.")
 	cl.flagSet.BoolVar(&cl.opt.Snapshot, "snapshot", false, "Import dashboards from snapshot builds.")
-	cl.flagSet.StringVar(&cl.opt.CertificateAuthority, "ca", "", "Certificate Authority for server verification")
-	cl.flagSet.StringVar(&cl.opt.Certificate, "cert", "", "Certificate for SSL client authentication.")
-	cl.flagSet.StringVar(&cl.opt.CertificateKey, "certkey", "", "Client Certificate Key")
+	cl.flagSet.StringVar(&cl.opt.CertificateAuthority, "cacert", "", "Certificate Authority for server verification")
+	cl.flagSet.StringVar(&cl.opt.Certificate, "cert", "", "Certificate for SSL client authentication in PEM format.")
+	cl.flagSet.StringVar(&cl.opt.CertificateKey, "key", "", "Client Certificate Key in PEM format.")
 
 	return &cl, nil
 }
@@ -116,7 +116,7 @@ func (cl *CommandLine) ParseCommandLine() error {
 	}
 
 	if cl.opt.Certificate != "" && cl.opt.CertificateKey == "" {
-		return errors.New("ERROR: A certificate key needs to be passed as well by using the -certkey option.")
+		return errors.New("ERROR: A certificate key needs to be passed as well by using the -key option.")
 	}
 
 	if cl.opt.CertificateKey != "" && cl.opt.Certificate == "" {
