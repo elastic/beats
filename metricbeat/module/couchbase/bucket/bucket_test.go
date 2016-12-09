@@ -3,15 +3,15 @@
 package bucket
 
 import (
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"path/filepath"
 	"testing"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
-	"path/filepath"
 )
 
 func TestFetchEventContents(t *testing.T) {

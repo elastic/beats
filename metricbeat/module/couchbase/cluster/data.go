@@ -2,9 +2,10 @@ package cluster
 
 import (
 	"encoding/json"
+	"io"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"io"
 )
 
 type StorageTotals_Ram struct {
