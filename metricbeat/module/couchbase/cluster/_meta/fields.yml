@@ -1,7 +1,9 @@
 - name: cluster
   type: group
   description: >
-    cluster information
+    experimental[]
+
+    Couchbase Cluster metrics
   fields:
     - name: hdd.free.bytes
       type: long

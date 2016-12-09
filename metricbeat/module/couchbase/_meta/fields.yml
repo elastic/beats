@@ -1,6 +1,8 @@
 - key: couchbase
   title: "couchbase"
   description: >
+    experimental[]
+
     couchbase Module
   short_config: false
   fields:

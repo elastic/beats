@@ -1,6 +1,8 @@
 - name: bucket
   type: group
   description: >
+    experimental[]
+
     Couchbase bucket metrics
   fields:
     - name: name

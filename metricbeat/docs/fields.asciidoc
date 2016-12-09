@@ -509,6 +509,7 @@ The document type. Always set to "metricsets".
 [[exported-fields-couchbase]]
 == couchbase Fields
 
+experimental[]
 couchbase Module
 
 
@@ -523,6 +524,7 @@ couchbase Module
 [float]
 == bucket Fields
 
+experimental[]
 Couchbase bucket metrics
 
 
@@ -620,7 +622,8 @@ Number of items associated with the bucket
 [float]
 == cluster Fields
 
-cluster information
+experimental[]
+Couchbase Cluster metrics
 
 
 
@@ -747,7 +750,8 @@ Ram used by the data in the cluster (bytes)
 [float]
 == node Fields
 
-node
+experimental[]
+Couchbase node metrics
 
 
 

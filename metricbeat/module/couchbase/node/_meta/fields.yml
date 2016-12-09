@@ -1,7 +1,9 @@
 - name: node
   type: group
   description: >
-    node
+    experimental[]
+
+    Couchbase node metrics
   fields:
     - name: hostname
       type: keyword
