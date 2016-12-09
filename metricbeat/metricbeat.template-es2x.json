@@ -271,10 +271,14 @@
                         }
                       }
                     },
-                    "quota_total": {
+                    "quota": {
                       "properties": {
-                        "bytes": {
-                          "type": "long"
+                        "total": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
                         }
                       }
                     },
@@ -287,15 +291,19 @@
                     },
                     "used": {
                       "properties": {
-                        "bytes": {
-                          "type": "long"
-                        }
-                      }
-                    },
-                    "used_by_data": {
-                      "properties": {
-                        "bytes": {
-                          "type": "long"
+                        "by_data": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "value": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
                         }
                       }
                     }
@@ -316,9 +324,7 @@
                     "memory": {
                       "properties": {
                         "mb": {
-                          "ignore_above": 1024,
-                          "index": "not_analyzed",
-                          "type": "string"
+                          "type": "long"
                         }
                       }
                     }
@@ -330,10 +336,14 @@
                       "properties": {
                         "total": {
                           "properties": {
-                            "bytes": {
-                              "type": "long"
-                            },
                             "per_node": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "value": {
                               "properties": {
                                 "bytes": {
                                   "type": "long"
@@ -344,10 +354,14 @@
                         },
                         "used": {
                           "properties": {
-                            "bytes": {
-                              "type": "long"
-                            },
                             "per_node": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "value": {
                               "properties": {
                                 "bytes": {
                                   "type": "long"
@@ -374,8 +388,12 @@
                             }
                           }
                         },
-                        "bytes": {
-                          "type": "long"
+                        "value": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
                         }
                       }
                     }

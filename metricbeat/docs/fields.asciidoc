@@ -632,13 +632,17 @@ Couchbase Cluster metrics
 
 type: long
 
+format: bytes
+
 Free harddrive space in the cluster (bytes)
 
 
 [float]
-=== couchbase.cluster.hdd.quota_total.bytes
+=== couchbase.cluster.hdd.quota.total.bytes
 
 type: long
+
+format: bytes
 
 Harddrive quota total for the cluster (bytes)
 
@@ -648,23 +652,37 @@ Harddrive quota total for the cluster (bytes)
 
 type: long
 
+format: bytes
+
 Total harddrive space available to cluster (bytes)
 
 
 [float]
-=== couchbase.cluster.hdd.used.bytes
+=== couchbase.cluster.hdd.used.value.bytes
 
 type: long
+
+format: bytes
 
 Harddrive space used by the cluster (bytes)
 
 
 [float]
-=== couchbase.cluster.hdd.used_by_data.bytes
+=== couchbase.cluster.hdd.used.by_data.bytes
 
 type: long
 
+format: bytes
+
 Harddrive use by the data in the cluster(bytes)
+
+
+[float]
+=== couchbase.cluster.max_bucket_count
+
+type: long
+
+Setting of Max Bucket Count
 
 
 [float]
@@ -678,23 +696,17 @@ Setting of Memory quota for the Index service (Mbyte)
 [float]
 === couchbase.cluster.quota.memory.mb
 
-type: keyword
+type: long
 
 Setting of Memory quota for the cluster (Mbyte)
 
 
 [float]
-=== couchbase.cluster.max_bucket_count
+=== couchbase.cluster.ram.quota.total.value.bytes
 
 type: long
 
-Setting of Max Bucket Count
-
-
-[float]
-=== couchbase.cluster.ram.quota.total.bytes
-
-type: long
+format: bytes
 
 Ram quota total for the cluster (bytes)
 
@@ -704,13 +716,17 @@ Ram quota total for the cluster (bytes)
 
 type: long
 
+format: bytes
+
 Ram quota used by the current node in the cluster (bytes)
 
 
 [float]
-=== couchbase.cluster.ram.quota.used.bytes
+=== couchbase.cluster.ram.quota.used.value.bytes
 
 type: long
+
+format: bytes
 
 Ram quota used by the cluster (bytes)
 
@@ -720,6 +736,8 @@ Ram quota used by the cluster (bytes)
 
 type: long
 
+format: bytes
+
 Ram quota used by the current node in the cluster (bytes)
 
 
@@ -728,13 +746,17 @@ Ram quota used by the current node in the cluster (bytes)
 
 type: long
 
+format: bytes
+
 Total ram available to cluster (bytes)
 
 
 [float]
-=== couchbase.cluster.ram.used.bytes
+=== couchbase.cluster.ram.used.value.bytes
 
 type: long
+
+format: bytes
 
 Ram used by the cluster (bytes)
 
@@ -743,6 +765,8 @@ Ram used by the cluster (bytes)
 === couchbase.cluster.ram.used.by_data.bytes
 
 type: long
+
+format: bytes
 
 Ram used by the data in the cluster (bytes)
 
