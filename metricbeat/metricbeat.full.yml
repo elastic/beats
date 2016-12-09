@@ -29,7 +29,7 @@ metricbeat.modules:
     - filesystem
 
     # File system summary stats
-    #- fsstat
+    - fsstat
 
     # Memory stats
     - memory
@@ -67,36 +67,53 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
-#-------------------------------- beats Module -------------------------------
-#- module: beats
-  #metricsets: ["filebeat", "libbeat"]
-  #enabled: true
-  #period: 10s
-  #hosts: ["localhost:6060"]
-
-  # Path to httpprof variables
-  #vars_path: /debug/vars
-
-
 #------------------------------- docker Module -------------------------------
 #- module: docker
-  #metricsets: ["cpu","memory","network","diskio","container"]
+  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
+  #hosts: ["unix:///var/run/docker.sock"]
   #enabled: true
-  #period: 5s
-  #hosts: ["localhost"]
-  #socket: unix:///var/run/docker.sock
+  #period: 10s
 
-  # If dockerbeat has to deal with a TLS-enabled docker daemon, you need to enable TLS and configure path for key and certificates.
-  #tls:
-    # By default, TLS is disabled
-    #enabled: false
+  # To connect to Docker over TLS you must specify a client and CA certificate.
+  #ssl:
+    #certificate_authority: "/etc/pki/root/ca.pem"
+    #certificate:           "/etc/pki/client/cert.pem"
+    #key:                   "/etc/pki/client/cert.key"
 
 #------------------------------- haproxy Module ------------------------------
 #- module: haproxy
-  #metricsets: [stat, info]
+  #metricsets: ["info", "stat"]
   #enabled: true
   #period: 10s
-  #hosts: ['tcp://127.0.0.1:14567']
+  #hosts: ["tcp://127.0.0.1:14567"]
+
+#-------------------------------- kafka Module -------------------------------
+#- module: kafka
+  #metricsets: ["partition"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:9092"]
+
+  #client_id: metricbeat
+  #retries: 3
+  #backoff: 250ms
+
+  # List of Topics to query metadata for. If empty, all topics will be queried.
+  #topics: []
+
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # SASL authentication
+  #username: ""
+  #password: ""
 
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
@@ -105,8 +122,17 @@ metricbeat.modules:
   #period: 10s
 
   # The hosts must be passed as MongoDB URLs in the format:
-  # [mongodb://][user:pass@]host[:port]
+  # [mongodb://][user:pass@]host[:port].
+  # The username and password can also be set using the respective configuration
+  # options. The credentials in the URL take precedence over the username and
+  # password configuration options.
   #hosts: ["localhost:27017"]
+
+  # Username to use when connecting to MongoDB. Empty by default.
+  #username: user
+
+  # Password to use when connecting to MongoDB. Empty by default.
+  #password: pass
 
 
 #-------------------------------- MySQL Module -------------------------------
@@ -115,15 +141,19 @@ metricbeat.modules:
   #enabled: true
   #period: 10s
 
-  # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
-  # The username and password can either be set in the DSN or for all hosts in username and password config option
-  #hosts: ["root@tcp(127.0.0.1:3306)/"]
+  # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # The username and password can either be set in the DSN or using the username
+  # and password config options. Those specified in the DSN take precedence.
+  #hosts: ["root:secret@tcp(127.0.0.1:3306)/"]
 
-  # Username of hosts. Empty by default
+  # Username of hosts. Empty by default.
   #username: root
 
-  # Password of hosts. Empty by default
-  #password: test
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # By setting raw to true, all raw fields from the status metricset will be added to the event.
+  #raw: false
 
 #-------------------------------- Nginx Module -------------------------------
 #- module: nginx
@@ -152,11 +182,17 @@ metricbeat.modules:
   #enabled: true
   #period: 10s
 
-  # The host must be passed as PostgreSQL DSN. Example:
-  # postgres://pqgotest:password@localhost:5432?sslmode=disable
+  # The host must be passed as PostgreSQL URL. Example:
+  # postgres://localhost:5432?sslmode=disable
   # The available parameters are documented here:
   # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
-  #hosts: ["postgres://postgres@localhost:5432"]
+  #hosts: ["postgres://localhost:5432"]
+
+  # Username to use when connecting to PostgreSQL. Empty by default.
+  #username: user
+
+  # Password to use when connecting to PostgreSQL. Empty by default.
+  #password: pass
 
 
 #-------------------------------- Redis Module -------------------------------
@@ -167,9 +203,6 @@ metricbeat.modules:
 
   # Redis hosts
   #hosts: ["127.0.0.1:6379"]
-
-  # Enabled defines if the module is enabled. Default: true
-  #enabled: true
 
   # Timeout after which time a metricset should return an error
   # Timeout is by default defined as period, as a fetch of a metricset
@@ -203,7 +236,7 @@ metricbeat.modules:
 
 
 
-#================================ General =====================================
+#================================ General ======================================
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
@@ -237,19 +270,21 @@ metricbeat.modules:
 # default is the number of logical CPUs available in the system.
 #max_procs:
 
-#================================ Processors =====================================
+#================================ Processors ===================================
 
 # Processors are used to reduce the number of fields in the exported event or to
-# enhance the event with external meta data. This section defines a list of processors
-# that are applied one by one and the first one receives the initial event:
+# enhance the event with external metadata. This section defines a list of
+# processors that are applied one by one and the first one receives the initial
+# event:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# Supported processors: drop_fields, drop_event, include_fields
+# The supported processors are drop_fields, drop_event, include_fields, and
+# add_cloud_metadata.
 #
-# For example, you can use the following processors to keep
-# the fields that contain CPU load percentages, but remove the fields that
-# contain CPU ticks values:
+# For example, you can use the following processors to keep the fields that
+# contain CPU load percentages, but remove the fields that contain CPU ticks
+# values:
 #
 #processors:
 #- include_fields:
@@ -265,13 +300,19 @@ metricbeat.modules:
 #       equals:
 #           http.code: 200
 #
+# The following example enriches each event with metadata from the cloud
+# provider about the host machine. It works on EC2, GCE, and DigitalOcean.
+#
+#processors:
+#- add_cloud_metadata:
+#
 
-#================================ Outputs =====================================
+#================================ Outputs ======================================
 
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
 
-#-------------------------- Elasticsearch output ------------------------------
+#-------------------------- Elasticsearch output -------------------------------
 output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -385,7 +426,7 @@ output.elasticsearch:
   #ssl.curve_types: []
 
 
-#----------------------------- Logstash output --------------------------------
+#----------------------------- Logstash output ---------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -448,7 +489,7 @@ output.elasticsearch:
   # Configure curve types for ECDHE based cipher suites
   #ssl.curve_types: []
 
-#------------------------------- Kafka output ---------------------------------
+#------------------------------- Kafka output ----------------------------------
 #output.kafka:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -583,7 +624,7 @@ output.elasticsearch:
   # Configure curve types for ECDHE based cipher suites
   #ssl.curve_types: []
 
-#------------------------------- Redis output ---------------------------------
+#------------------------------- Redis output ----------------------------------
 #output.redis:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -681,7 +722,7 @@ output.elasticsearch:
   #ssl.curve_types: []
 
 
-#------------------------------- File output ----------------------------------
+#------------------------------- File output -----------------------------------
 #output.file:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -739,7 +780,7 @@ output.elasticsearch:
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
 
-#================================ Logging =====================================
+#================================ Logging ======================================
 # There are three options for the log output: syslog, file, stderr.
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.

@@ -4,6 +4,8 @@ package eventlog
 
 import (
 	"fmt"
+	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -34,6 +36,8 @@ const (
 )
 
 const allLevels = elog.Success | elog.AuditFailure | elog.AuditSuccess | elog.Error | elog.Info | elog.Warning
+
+const gigabyte = 1 << 30
 
 // Test messages.
 var messages = map[uint32]struct {
@@ -72,7 +76,7 @@ var oneTimeLogpInit sync.Once
 func configureLogp() {
 	oneTimeLogpInit.Do(func() {
 		if testing.Verbose() {
-			logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"eventlog", "eventlog_detail"})
+			logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"eventlog"})
 			logp.Info("DEBUG enabled for eventlog.")
 		} else {
 			logp.LogInit(logp.LOG_WARNING, "", false, true, []string{})
@@ -141,6 +145,14 @@ func uninstallLog(provider, source string, log *elog.Log) error {
 	}
 
 	return errs.Err()
+}
+
+// setLogSize set the maximum number of bytes that an event log can hold.
+func setLogSize(t testing.TB, provider string, sizeBytes int) {
+	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), providerName).CombinedOutput()
+	if err != nil {
+		t.Fatal("failed to set log size", err, string(output))
+	}
 }
 
 // Verify that all messages are read from the event log.

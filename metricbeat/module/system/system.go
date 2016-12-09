@@ -29,7 +29,7 @@ type Module struct {
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	// This only needs to be configured once for all system modules.
 	once.Do(func() {
-		configureHostFS()
+		initModule()
 	})
 
 	return &Module{BaseModule: base, HostFS: *HostFS}, nil

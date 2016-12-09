@@ -1,64 +1,56 @@
 package network
 
 import (
-	dc "github.com/fsouza/go-dockerclient"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
+
+	dc "github.com/fsouza/go-dockerclient"
 )
 
-// init registers the MetricSet with the central registry.
-// The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("docker", "network", New); err != nil {
+	if err := mb.Registry.AddMetricSet("docker", "network", New, docker.HostParser); err != nil {
 		panic(err)
 	}
 }
 
-// MetricSet type defines all fields of the MetricSet
-// As a minimum it must inherit the mb.BaseMetricSet fields, but can be extended with
-// additional entries. These variables can be used to persist data or configuration between
-// multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	netService   *NETService
+	netService   *NetService
 	dockerClient *dc.Client
 }
 
-// New create a new instance of the MetricSet
-// Part of new is also setting up the configuration by processing additional
-// configuration entries if needed.
+// New creates a new instance of the docker network MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	logp.Warn("EXPERIMENTAL: The docker network metricset is experimental")
 
-	logp.Warn("EXPERIMENTAL: The network metricset is experimental")
-
-	config := docker.GetDefaultConf()
-
+	config := docker.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	client, err := docker.NewDockerClient(base.HostData().URI, config)
+	if err != nil {
 		return nil, err
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		dockerClient:  docker.CreateDockerCLient(config),
-		netService: &NETService{
-			NetworkStatPerContainer: make(map[string]map[string]NETRaw),
+		dockerClient:  client,
+		netService: &NetService{
+			NetworkStatPerContainer: make(map[string]map[string]NetRaw),
 		},
 	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-// It returns the event which is then forward to the output. In case of an error, a
-// descriptive error must be returned.
+// Fetch methods creates a list of network events for each container.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
-	rawStats, err := docker.FetchDockerStats(m.dockerClient)
-
+	stats, err := docker.FetchStats(m.dockerClient)
 	if err != nil {
 		return nil, err
 	}
-	formatedStats := m.netService.GetNetworkStatsPerContainer(rawStats)
-	return eventsMapping(formatedStats), nil
+
+	formattedStats := m.netService.getNetworkStatsPerContainer(stats)
+	return eventsMapping(formattedStats), nil
 }

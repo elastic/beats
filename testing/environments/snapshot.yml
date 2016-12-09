@@ -1,15 +1,34 @@
 # This should test the environment with the latest snapshots
 # This is based on base.yml
-elasticsearch:
-  build: ./docker/elasticsearch
-  dockerfile: Dockerfile-snapshot
-  command: elasticsearch -Enetwork.host=0.0.0.0 -Ediscovery.zen.minimum_master_nodes=1 -Ebootstrap.ignore_system_bootstrap_checks=true
+version: '2'
+services:
+  elasticsearch:
+    build:
+      context: ./docker/elasticsearch
+      dockerfile: Dockerfile-snapshot
+      args:
+        ELASTIC_VERSION: 6.0.0-alpha1-SNAPSHOT
+        ES_DOWNLOAD_URL: https://snapshots.elastic.co/downloads/elasticsearch
+        #XPACK: http://snapshots.elastic.co/downloads/packs/x-pack/x-pack-6.0.0-alpha1-SNAPSHOT.zip
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "network.host="
+      - "transport.host=127.0.0.1"
+      - "http.host=0.0.0.0"
 
-logstash:
-  build: ./docker/logstash
-  dockerfile: Dockerfile-snapshot
+  logstash:
+    build:
+      context: ./docker/logstash
+      dockerfile: Dockerfile
+      args:
+        LS_VERSION: 6.0.0-alpha1-SNAPSHOT
+        LS_DOWNLOAD_URL: https://snapshots.elastic.co/downloads/logstash
 
-kibana:
-  build: ./docker/kibana
-  dockerfile: Dockerfile-snapshot
 
+  kibana:
+    build:
+      context: ./docker/kibana
+      dockerfile: Dockerfile-snapshot
+      args: [ ]
+        #KIBANA_DOWNLOAD_URL: https://snapshots.elastic.co/downloads/kibana/kibana-6.0.0-alpha1-SNAPSHOT-linux-x86_64.tar.gz
+        #X_PACK_URL: http://snapshots.elastic.co/downloads/kibana-plugins/x-pack/x-pack-6.0.0-alpha1-SNAPSHOT.zip

@@ -132,8 +132,8 @@ func (h *Harvester) Harvest(r reader.Reader) {
 			event.ReadTime = message.Ts
 			event.Bytes = message.Bytes
 			event.Text = &text
-			event.JSONFields = message.Fields
 			event.EventMetadata = h.config.EventMetadata
+			event.Data = message.Fields
 			event.InputType = h.config.InputType
 			event.DocumentType = h.config.DocumentType
 			event.JSONConfig = h.config.JSON
@@ -250,12 +250,6 @@ func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
 	if h.state.Offset > 0 {
 		logp.Debug("harvester", "Set previous offset for file: %s. Offset: %d ", h.state.Source, h.state.Offset)
 		return file.Seek(h.state.Offset, os.SEEK_SET)
-	}
-
-	// tail file if file is new and tail_files config is set
-	if h.config.TailFiles {
-		logp.Debug("harvester", "Setting offset for tailing file: %s.", h.state.Source)
-		return file.Seek(0, os.SEEK_END)
 	}
 
 	// get offset from file in case of encoding factory was required to read some data.

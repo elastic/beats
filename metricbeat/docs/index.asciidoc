@@ -19,6 +19,8 @@ include::./command-line.asciidoc[]
 
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
+include::./upgrading.asciidoc[]
+
 include::./how-metricbeat-works.asciidoc[]
 
 include::./metricbeat-in-a-container.asciidoc[]
@@ -33,6 +35,7 @@ include::./configuring-logstash.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
+:allplatforms:
 include::../../libbeat/docs/yaml.asciidoc[]
 
 include::../../libbeat/docs/regexp.asciidoc[]

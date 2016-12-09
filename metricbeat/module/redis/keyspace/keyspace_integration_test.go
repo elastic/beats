@@ -59,6 +59,9 @@ func addEntry(t *testing.T) {
 	}
 	defer c.Close()
 	_, err = c.Do("SET", "foo", "bar")
+	if err != nil {
+		t.Fatal("SET", err)
+	}
 }
 
 func getConfig() map[string]interface{} {

@@ -1,62 +1,40 @@
 - name: cpu
   type: group
   description: >
-    Runtime cpu metrics
+    Runtime cpu metrics.
   fields:
-    - name: timestamp
-      type: time
+    - name: kernel.pct
+      type: scaled_float
+      format: percentage
       description: >
-         The time generate by Docker daemon while sending the events requested.
-  fields:
-      - name: socket
-        type: string
-        description: >
-          The daemon socket option. By default, docker daemon listens on the Unix socket : unix:///var/run/docker.sock.
-  fields:
-      - name: container
-        type: group
-        description: >
-          informations of running container.
-        fields:
-          - name: container_id
-            type: string
-            description: >
-              the container's ID
-        fields:
-          - name: container_name
-            type: string
-            description: >
-              the container's name.
-        fields:
-            - name: container_labels
-              type: common.MapStr[]
-              description: >
-                the container's labels. It's a key/value pair. It's used to add notes or licensing information to a docker image or to identify a host
-  fields:
-      - name: cpu
-        type: group
-        description: >
-         CPU statistics of the running container
-        fields:
-          - name: per_cpu_usage
-            type: common.MapStr
-            description: >
-              The system CPU (per cpu) ressources consumed by The Docker server.
-        fields:
-          - name: total_usage
-            type: float
-            description: >
-              The total system ressources consumed by The Docker server.
-        fields:
-          - name: usage_in_kernel_mode
-            type: float
-            description: >
-              The system kernel consumed by The Docker server.
-        fields:
-          - name: usage_in_user_mode
-            type: float
-            description: >
-              The system user mode consumed by The Docker server.
-
-
-
+        The system kernel consumed by The Docker server.
+    - name: kernel.ticks
+      type: long
+      description: >
+        Cpu kernel tikcs
+    - name: system.pct
+      type: scaled_float
+      format: percentage
+      description: >
+    - name: system.ticks
+      type: long
+      description: >
+        Cpu system tikcs
+    - name: user.pct
+      type: scaled_float
+      format: percentage
+      description: >
+    - name: user.ticks
+      type: long
+      description: >
+        Cpu user tikcs
+    - name: total.pct
+      type: scaled_float
+      format: percentage
+      description: >
+        Total cpu usage.
+    # TODO: how to document cpu list?
+    #- name: core
+    #  type: list
+    #  description: >
+    #    Dictionary with list of cpu and usage inside.

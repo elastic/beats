@@ -1,75 +1,86 @@
-beat:
-  build: ${PWD}/.
-  links:
-    - apache
-    - filebeat
-    - mongodb
-    - mysql
-    - nginx
-    - postgresql
-    - redis
-    - zookeeper
-    - haproxy
-  environment:
-    - APACHE_HOST=apache
-    - APACHE_PORT=80
-    - FILEBEAT_HOST=filebeat
-    - FILEBEAT_PORT=6060
-    - NGINX_HOST=nginx
-    - NGINX_PORT=80
-    - REDIS_HOST=redis
-    - REDIS_PORT=6379
-    - MONGODB_HOST=mongodb
-    - MONGODB_PORT=27017
-    - MYSQL_DSN=root:test@tcp(mysql:3306)/
-    - MYSQL_HOST=mysql
-    - MYSQL_PORT=3306
-    - POSTGRESQL_DSN=postgres://postgres@postgresql:5432?sslmode=disable
-    - POSTGRESQL_HOST=postgresql
-    - POSTGRESQL_PORT=5432
-    - ZOOKEEPER_HOST=zookeeper
-    - ZOOKEEPER_PORT=2181
-    - HAPROXY_HOST=haproxy
-    - HAPROXY_PORT=14567
-    - TEST_ENVIRONMENT=false
-  working_dir: /go/src/github.com/elastic/beats/metricbeat
-  volumes:
-    - ${PWD}/..:/go/src/github.com/elastic/beats/
-  command: make
-  entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
+version: '2'
+services:
+  beat:
+    build: ${PWD}/.
+    links:
+      - apache
+      - mongodb
+      - kafka
+      - mysql
+      - nginx
+      - postgresql
+      - redis
+      - zookeeper
+      - haproxy
+    environment:
+      - APACHE_HOST=apache
+      - APACHE_PORT=80
+      - KAFKA_HOST=kafka
+      - KAFKA_PORT=9092
+      - NGINX_HOST=nginx
+      - NGINX_PORT=80
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - MYSQL_DSN=root:test@tcp(mysql:3306)/
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - POSTGRESQL_DSN=postgres://postgresql:5432?sslmode=disable
+      - POSTGRESQL_HOST=postgresql
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_USERNAME=postgres
+      - ZOOKEEPER_HOST=zookeeper
+      - ZOOKEEPER_PORT=2181
+      - HAPROXY_HOST=haproxy
+      - HAPROXY_PORT=14567
+      - TEST_ENVIRONMENT=false
+    working_dir: /go/src/github.com/elastic/beats/metricbeat
+    volumes:
+      - ${PWD}/..:/go/src/github.com/elastic/beats/
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: make
+    entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
 
-# Overloading kibana with a simple image as it is not needed here
-kibana:
-  build: ${PWD}/../testing/environments/
-  dockerfile: Dockerfile
+  # Overloading kibana with a simple image as it is not needed here
+  kibana:
+    build:
+      context: ${PWD}/../testing/environments/
+      dockerfile: Dockerfile
 
-# Modules
-apache:
-  build: ${PWD}/module/apache/_meta
+  # Modules
+  apache:
+    build: ${PWD}/module/apache/_meta
 
-filebeat:
-  build: ${PWD}/module/beats/filebeat/_meta
+  kafka:
+    image: spotify/kafka
+    expose:
+      - 9092
+      - 2181
+    environment:
+      - ADVERTISED_HOST=kafka
 
-mongodb:
-  image: mongo:3.0
+  mongodb:
+    image: mongo:3.4
 
-mysql:
-  image: mysql:5.7.12
-  environment:
-    - MYSQL_ROOT_PASSWORD=test
+  mysql:
+    image: mysql:5.7.12
+    environment:
+      - MYSQL_ROOT_PASSWORD=test
 
-nginx:
-  build: ${PWD}/module/nginx/_meta
+  nginx:
+    build: ${PWD}/module/nginx/_meta
 
-haproxy:
-  build: ${PWD}/module/haproxy/_meta
+  haproxy:
+    build: ${PWD}/module/haproxy/_meta
 
-postgresql:
-  image: postgres:9.5.3
+  postgresql:
+    image: postgres:9.5.3
 
-redis:
-  image: redis:3.2.3
+  redis:
+    image: redis:3.2.4-alpine
 
-zookeeper:
-  image: jplock/zookeeper:3.4.8
+  zookeeper:
+    image: jplock/zookeeper:3.4.8
+
 

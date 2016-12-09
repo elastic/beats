@@ -5,7 +5,6 @@
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
         "module": "system",
         "name": "core",
         "rtt": 115

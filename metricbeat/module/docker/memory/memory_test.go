@@ -5,15 +5,14 @@ import (
 	"testing"
 	"time"
 
-	dc "github.com/fsouza/go-dockerclient"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/docker"
+
+	dc "github.com/fsouza/go-dockerclient"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMemoryService_GetMemoryStats(t *testing.T) {
-
 	//Container  + dockerstats
 	containerID := "containerID"
 	labels := map[string]string{
@@ -36,26 +35,30 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	memoryService := &MemoryService{}
 	memorystats := getMemoryStats(time.Now(), 1)
 
-	memoryRawStats := docker.DockerStat{}
+	memoryRawStats := docker.Stat{}
 	memoryRawStats.Container = container
 	memoryRawStats.Stats = memorystats
 
 	expectedEvent := common.MapStr{
-		"@timestamp": common.Time(memorystats.Read),
-		"container": common.MapStr{
-			"id":     containerID,
-			"name":   "name1",
-			"labels": docker.BuildLabelArray(labels),
+		"_module": common.MapStr{
+			"container": common.MapStr{
+				"id":     containerID,
+				"name":   "name1",
+				"labels": docker.DeDotLabels(labels),
+			},
 		},
-		"socket": docker.GetSocket(),
-		"memory": common.MapStr{
-			"failcnt":     memorystats.MemoryStats.Failcnt,
-			"limit":       memorystats.MemoryStats.Limit,
-			"max_usage":   memorystats.MemoryStats.MaxUsage,
-			"total_rss":   memorystats.MemoryStats.Stats.TotalRss,
-			"total_rss_p": float64(memorystats.MemoryStats.Stats.TotalRss) / float64(memorystats.MemoryStats.Limit),
-			"usage":       memorystats.MemoryStats.Usage,
-			"usage_p":     float64(memorystats.MemoryStats.Usage) / float64(memorystats.MemoryStats.Limit),
+		"fail": common.MapStr{
+			"count": memorystats.MemoryStats.Failcnt,
+		},
+		"limit": memorystats.MemoryStats.Limit,
+		"rss": common.MapStr{
+			"total": memorystats.MemoryStats.Stats.TotalRss,
+			"pct":   float64(memorystats.MemoryStats.Stats.TotalRss) / float64(memorystats.MemoryStats.Limit),
+		},
+		"usage": common.MapStr{
+			"total": memorystats.MemoryStats.Usage,
+			"pct":   float64(memorystats.MemoryStats.Usage) / float64(memorystats.MemoryStats.Limit),
+			"max":   memorystats.MemoryStats.MaxUsage,
 		},
 	}
 	//WHEN
@@ -63,8 +66,8 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	event := eventMapping(&rawStats)
 	//THEN
 	assert.True(t, equalEvent(expectedEvent, event))
-	t.Logf("Expected : %v", expectedEvent)
-	t.Logf("Returned : %v", event)
+	t.Logf(" expected : %v", expectedEvent)
+	t.Logf(" returned : %v", event)
 }
 
 func getMemoryStats(read time.Time, number uint64) dc.Stats {
@@ -123,7 +126,5 @@ func getMemoryStats(read time.Time, number uint64) dc.Stats {
 	return myMemoryStats
 }
 func equalEvent(expectedEvent common.MapStr, event common.MapStr) bool {
-
 	return reflect.DeepEqual(expectedEvent, event)
-
 }

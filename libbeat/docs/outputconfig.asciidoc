@@ -183,14 +183,48 @@ output.elasticsearch:
 
 ===== pipeline
 
-format string value configuring the ingest node pipeline to write events to.
+A format string value that specifies the ingest node pipeline to write events to.
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  pipeline: my_pipeline_id
+------------------------------------------------------------------------------
+
+For more information, see <<configuring-ingest-node>>.
 
 ===== pipelines
 
-Array of pipeline selector configurations supporting conditionals, format string
-based field access and name mappings. The first rule matching will be used to
-set the `pipeline` for the event to be published. If `pipelines` is missing or no
-rule matches, the `pipeline` field will be used.
+Similar to the `indices` array, this is an array of pipeline selector
+configurations supporting conditionals, format string based field access
+and name mappings. The first rule matching will be used to set the
+`pipeline` for the event to be published. If `pipelines` is missing or
+no rule matches, the `pipeline` field will be used.
+
+Example elasticsearch output with `pipelines`:
+
+["source","yaml"]
+------------------------------------------------------------------------------
+filebeat.prospectors:
+- paths: ["/var/log/app/normal/*.log"]
+  fields:
+    type: "normal"
+- paths: ["/var/log/app/critical/*.log"]
+  fields:
+    type: "critical"
+
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  index: "filebeat-%{+yyyy.MM.dd}"
+  pipelines:
+    - pipeline: critical_pipeline
+      when.equals:
+        type: "critical"
+    - pipeline: normal_pipeline
+      when.equals:
+        type: "normal"
+------------------------------------------------------------------------------
 
 ===== template
 
@@ -449,6 +483,8 @@ configured. The default value is 0.
 [[port]]
 ===== port
 
+deprecated[5.0.0]
+
 The default port to use if the port number is not given in <<hosts>>. The default port number
 is 10200.
 
@@ -528,6 +564,26 @@ spooler size.
 === Kafka Output Configuration
 
 The Kafka output sends the events to Apache Kafka.
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.kafka:
+  # initial brokers for reading cluster metadata
+  hosts: ["kafka1:9092", "kafka2:9092", "kafka3:9092"]
+
+  # message topic selection + partitioning
+  topic: '%{[type]}'
+  partition.round_robin:
+    reachable_only: false
+
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000
+------------------------------------------------------------------------------
+
+NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be dropped. To avoid this problem, make sure {beatname_uc} does not generate events bigger than <<kafka-max_message_bytes,`max_message_bytes`>>.
 
 ==== Compatibility
 
@@ -675,6 +731,7 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 
 Sets the output compression codec. Must be one of `none`, `snappy` and `gzip`. The default is `gzip`.
 
+[[kafka-max_message_bytes]]
 ===== max_message_bytes
 
 The maximum permitted size of JSON-encoded messages. Bigger messages will be dropped. The default value is 1000000 (bytes). This value should be equal to or less than the broker's `message.max.bytes`.
@@ -715,7 +772,7 @@ output.redis:
 
 ==== Compatibility
 
-This output works with Redis 3.2.0.
+This output works with Redis 3.2.4.
 
 ==== Redis Output Options
 
@@ -737,6 +794,8 @@ distributed to the reachable servers only. You can define each Redis server by s
 don't specify a port number, the value configured by `port` is used.
 
 ===== port
+
+deprecated[5.0.0]
 
 The Redis port to use if `hosts` does not contain a port number. The default is 6379.
 

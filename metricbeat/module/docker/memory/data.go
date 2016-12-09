@@ -2,34 +2,34 @@ package memory
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 func eventsMapping(memoryDataList []MemoryData) []common.MapStr {
-	myEvents := []common.MapStr{}
+	events := []common.MapStr{}
 	for _, memoryData := range memoryDataList {
-		myEvents = append(myEvents, eventMapping(&memoryData))
+		events = append(events, eventMapping(&memoryData))
 	}
-	return myEvents
+	return events
 }
-func eventMapping(memoryData *MemoryData) common.MapStr {
 
+func eventMapping(memoryData *MemoryData) common.MapStr {
 	event := common.MapStr{
-		"@timestamp": memoryData.Time,
-		"container": common.MapStr{
-			"id":     memoryData.MyContainer.Id,
-			"name":   memoryData.MyContainer.Name,
-			"labels": memoryData.MyContainer.Labels,
+		mb.ModuleData: common.MapStr{
+			"container": memoryData.Container.ToMapStr(),
 		},
-		"socket": docker.GetSocket(),
-		"memory": common.MapStr{
-			"failcnt":     memoryData.Failcnt,
-			"limit":       memoryData.Limit,
-			"max_usage":   memoryData.MaxUsage,
-			"total_rss":   memoryData.TotalRss,
-			"total_rss_p": memoryData.TotalRss_p,
-			"usage":       memoryData.Usage,
-			"usage_p":     memoryData.Usage_p,
+		"fail": common.MapStr{
+			"count": memoryData.Failcnt,
+		},
+		"limit": memoryData.Limit,
+		"rss": common.MapStr{
+			"total": memoryData.TotalRss,
+			"pct":   memoryData.TotalRssP,
+		},
+		"usage": common.MapStr{
+			"total": memoryData.Usage,
+			"pct":   memoryData.UsageP,
+			"max":   memoryData.MaxUsage,
 		},
 	}
 	return event

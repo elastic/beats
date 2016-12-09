@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Docker Number of Containers\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"36\"},\"aggs\":[{\"id\":\"2\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"docker.info.containers.running\",\"customLabel\":\"Running\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"docker.info.containers.paused\",\"customLabel\":\"Paused\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"docker.info.containers.stopped\",\"customLabel\":\"Stopped\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Docker Number of Containers", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Metricbeat-Docker", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

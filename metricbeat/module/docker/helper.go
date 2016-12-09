@@ -3,30 +3,41 @@ package docker
 import (
 	"strings"
 
-	"github.com/fsouza/go-dockerclient"
-
 	"github.com/elastic/beats/libbeat/common"
-	"sort"
+
+	"github.com/fsouza/go-dockerclient"
 )
 
 type Container struct {
-	Id     string
+	ID     string
 	Name   string
-	Labels []common.MapStr
-	Socket *string
+	Labels common.MapStr
 }
 
-func InitCurrentContainer(container *docker.APIContainers) *Container {
+func (c *Container) ToMapStr() common.MapStr {
+	m := common.MapStr{
+		"id":   c.ID,
+		"name": c.Name,
+	}
+
+	if len(c.Labels) > 0 {
+		m["labels"] = c.Labels
+	}
+	return m
+}
+
+func NewContainer(container *docker.APIContainers) *Container {
 	return &Container{
-		Id:     container.ID,
+		ID:     container.ID,
 		Name:   ExtractContainerName(container.Names),
-		Labels: BuildLabelArray(container.Labels),
+		Labels: DeDotLabels(container.Labels),
 	}
 }
+
 func ExtractContainerName(names []string) string {
 	output := names[0]
 
-	if cap(names) > 1 {
+	if len(names) > 1 {
 		for _, name := range names {
 			if strings.Count(output, "/") > strings.Count(name, "/") {
 				output = name
@@ -35,37 +46,17 @@ func ExtractContainerName(names []string) string {
 	}
 	return strings.Trim(output, "/")
 }
-func BuildLabelArray(labels map[string]string) []common.MapStr {
 
-	output_labels := make([]common.MapStr, len(labels))
-	i := 0
-	var keys []string
-	for key := range labels {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-	for _, k := range keys {
+// DeDotLabels returns a new common.MapStr containing a copy of the labels
+// where the dots in each label name have been changed to an underscore.
+func DeDotLabels(labels map[string]string) common.MapStr {
+	outputLabels := common.MapStr{}
+	for k, v := range labels {
+		// This is necessary so that ES does not interpret '.' fields as new
+		// nested JSON objects, and also makes this compatible with ES 2.x.
 		label := strings.Replace(k, ".", "_", -1)
-		output_labels[i] = common.MapStr{
-			"key":   label,
-			"value": labels[k],
-		}
-		i++
-	}
-	return output_labels
-}
-
-func ConvertContainerPorts(ports *[]docker.APIPort) []map[string]interface{} {
-	var outputPorts = []map[string]interface{}{}
-	for _, port := range *ports {
-		outputPort := common.MapStr{
-			"ip":          port.IP,
-			"privatePort": port.PrivatePort,
-			"publicPort":  port.PublicPort,
-			"type":        port.Type,
-		}
-		outputPorts = append(outputPorts, outputPort)
+		outputLabels.Put(label, v)
 	}
 
-	return outputPorts
+	return outputLabels
 }

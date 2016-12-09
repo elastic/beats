@@ -34,7 +34,7 @@ winlogbeat.event_logs:
   - name: Security
   - name: System
 
-#================================ General =====================================
+#================================ General ======================================
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
@@ -68,19 +68,21 @@ winlogbeat.event_logs:
 # default is the number of logical CPUs available in the system.
 #max_procs:
 
-#================================ Processors =====================================
+#================================ Processors ===================================
 
 # Processors are used to reduce the number of fields in the exported event or to
-# enhance the event with external meta data. This section defines a list of processors
-# that are applied one by one and the first one receives the initial event:
+# enhance the event with external metadata. This section defines a list of
+# processors that are applied one by one and the first one receives the initial
+# event:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# Supported processors: drop_fields, drop_event, include_fields
+# The supported processors are drop_fields, drop_event, include_fields, and
+# add_cloud_metadata.
 #
-# For example, you can use the following processors to keep
-# the fields that contain CPU load percentages, but remove the fields that
-# contain CPU ticks values:
+# For example, you can use the following processors to keep the fields that
+# contain CPU load percentages, but remove the fields that contain CPU ticks
+# values:
 #
 #processors:
 #- include_fields:
@@ -96,13 +98,19 @@ winlogbeat.event_logs:
 #       equals:
 #           http.code: 200
 #
+# The following example enriches each event with metadata from the cloud
+# provider about the host machine. It works on EC2, GCE, and DigitalOcean.
+#
+#processors:
+#- add_cloud_metadata:
+#
 
-#================================ Outputs =====================================
+#================================ Outputs ======================================
 
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
 
-#-------------------------- Elasticsearch output ------------------------------
+#-------------------------- Elasticsearch output -------------------------------
 output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -216,7 +224,7 @@ output.elasticsearch:
   #ssl.curve_types: []
 
 
-#----------------------------- Logstash output --------------------------------
+#----------------------------- Logstash output ---------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -279,7 +287,7 @@ output.elasticsearch:
   # Configure curve types for ECDHE based cipher suites
   #ssl.curve_types: []
 
-#------------------------------- Kafka output ---------------------------------
+#------------------------------- Kafka output ----------------------------------
 #output.kafka:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -414,7 +422,7 @@ output.elasticsearch:
   # Configure curve types for ECDHE based cipher suites
   #ssl.curve_types: []
 
-#------------------------------- Redis output ---------------------------------
+#------------------------------- Redis output ----------------------------------
 #output.redis:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -512,7 +520,7 @@ output.elasticsearch:
   #ssl.curve_types: []
 
 
-#------------------------------- File output ----------------------------------
+#------------------------------- File output -----------------------------------
 #output.file:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -570,7 +578,7 @@ output.elasticsearch:
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
 
-#================================ Logging =====================================
+#================================ Logging ======================================
 # There are three options for the log output: syslog, file, stderr.
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.

@@ -19,6 +19,7 @@ The following topics describe how to configure Filebeat:
 * <<configuring-ingest-node>>
 * <<using-environ-vars>>
 * <<multiple-prospectors>>
+* <<load-balancing>>
 * <<yaml-tips>>
 * <<regexp-support>>
 

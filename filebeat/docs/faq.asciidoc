@@ -20,8 +20,8 @@ Filebeat might be incorrectly configured or unable to send events to the output.
 
 * Make sure the config file specifies the correct path to the file that you are collecting. See <<filebeat-configuration>>
 for more information.
-* Verify that the file is not older than the value specified by <<ignore-older,`ignore_older`>>. By default, Filebeat
-stops reading files that are older than 24 hours. You can change this behavior by specifying a different value for
+* Verify that the file is not older than the value specified by <<ignore-older,`ignore_older`>>. ignore_older is disable by
+default so this depends on the value you have set. You can change this behavior by specifying a different value for
 <<ignore-older,`ignore_older`>>.
 * Make sure that Filebeat is able to send events to the configured output. Run Filebeat in debug mode to determine whether
 it's publishing events successfully:
@@ -47,7 +47,7 @@ There are additional configuration options that you can use to close file handle
 
 The `close_renamed` and `close_removed` options can be useful on Windows to resolve issues related to file rotation. See <<windows-file-rotation>>. The `close_eof` option can be useful in environments with a large number of files that have only very few entries. The `close_timeout` option is useful in environments where closing file handlers is more important than sending all log lines. For more details, see <<configuration-filebeat-options>>.
 
-Make sure that you read the documentation for these configuration options before using any of them. 
+Make sure that you read the documentation for these configuration options before using any of them.
 
 [float]
 [[reduce-registry-size]]

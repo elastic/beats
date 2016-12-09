@@ -2,32 +2,39 @@ package cpu
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 func eventsMapping(cpuStatsList []CPUStats) []common.MapStr {
-	myEvents := []common.MapStr{}
+	events := []common.MapStr{}
 	for _, cpuStats := range cpuStatsList {
-		myEvents = append(myEvents, eventMapping(&cpuStats))
+		events = append(events, eventMapping(&cpuStats))
 	}
-	return myEvents
+	return events
 }
-func eventMapping(mycpuStats *CPUStats) common.MapStr {
 
+func eventMapping(stats *CPUStats) common.MapStr {
 	event := common.MapStr{
-		"@timestamp": mycpuStats.Time,
-		"container": common.MapStr{
-			"id":     mycpuStats.MyContainer.Id,
-			"name":   mycpuStats.MyContainer.Name,
-			"labels": mycpuStats.MyContainer.Labels,
+		mb.ModuleData: common.MapStr{
+			"container": stats.Container.ToMapStr(),
 		},
-		"socket": docker.GetSocket(),
-		"cpu": common.MapStr{
-			"per_cpu_usage":        mycpuStats.PerCpuUsage,
-			"total_usage":          mycpuStats.TotalUsage,
-			"usage_in_kernel_mode": mycpuStats.UsageInKernelmode,
-			"usage_in_user_mode":   mycpuStats.UsageInUsermode,
+		"core": stats.PerCpuUsage,
+		"total": common.MapStr{
+			"pct": stats.TotalUsage,
+		},
+		"kernel": common.MapStr{
+			"ticks": stats.UsageInKernelmode,
+			"pct":   stats.UsageInKernelmodePercentage,
+		},
+		"user": common.MapStr{
+			"ticks": stats.UsageInUsermode,
+			"pct":   stats.UsageInUsermodePercentage,
+		},
+		"system": common.MapStr{
+			"ticks": stats.SystemUsage,
+			"pct":   stats.SystemUsagePercentage,
 		},
 	}
+
 	return event
 }

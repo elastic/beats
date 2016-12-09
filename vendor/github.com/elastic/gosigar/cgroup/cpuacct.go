@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/gosigar/util"
+	"github.com/elastic/gosigar/sys/linux"
 )
 
-var clockTicks = uint64(util.GetClockTicks())
+var clockTicks = uint64(linux.GetClockTicks())
 
 // CPUAccountingSubsystem contains metrics from the "cpuacct" subsystem.
 type CPUAccountingSubsystem struct {

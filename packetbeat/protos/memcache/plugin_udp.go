@@ -17,7 +17,7 @@ import (
 
 type udpMemcache struct {
 	udpConfig      udpConfig
-	udpConnections map[common.HashableIpPortTuple]*udpConnection
+	udpConnections map[common.HashableIPPortTuple]*udpConnection
 	udpExpTrans    udpExpTransList
 }
 
@@ -25,20 +25,20 @@ type udpConfig struct {
 	transTimeout time.Duration
 }
 
-type mcUdpHeader struct {
-	requestId    uint16
+type mcUDPHeader struct {
+	requestID    uint16
 	seqNumber    uint16
 	numDatagrams uint16
 }
 
 type udpConnection struct {
-	tuple        common.IpPortTuple
+	tuple        common.IPPortTuple
 	transactions map[uint16]*udpTransaction
-	memcache     *Memcache
+	memcache     *memcache
 }
 
 type udpTransaction struct {
-	requestId uint16
+	requestID uint16
 	timer     *time.Timer
 	next      *udpTransaction
 
@@ -66,27 +66,27 @@ type udpMessage struct {
 	datagrams    [][]byte
 }
 
-func (mc *Memcache) ParseUdp(pkt *protos.Packet) {
+func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	defer logp.Recover("ParseMemcache(UDP) exception")
 
 	buffer := streambuf.NewFixed(pkt.Payload)
-	header, err := parseUdpHeader(buffer)
+	header, err := parseUDPHeader(buffer)
 	if err != nil {
 		debug("parsing memcache udp header failed")
 		return
 	}
 
 	debug("new udp datagram requestId=%v, seqNumber=%v, numDatagrams=%v",
-		header.requestId, header.seqNumber, header.numDatagrams)
+		header.requestID, header.seqNumber, header.numDatagrams)
 
 	// find connection object based on ips and ports (forward->reverse connection)
-	connection, dir := mc.getUdpConnection(&pkt.Tuple)
+	connection, dir := mc.getUDPConnection(&pkt.Tuple)
 	debug("udp connection: %p", connection)
 
 	// get udp transaction combining forward/reverse direction 'streams'
 	// for current requestId
-	trans := connection.udpTransactionForId(header.requestId)
-	debug("udp transaction (id=%v): %p", header.requestId, trans)
+	trans := connection.udpTransactionForID(header.requestID)
+	debug("udp transaction (id=%v): %p", header.requestID, trans)
 
 	// Clean old transaction. We do the cleaning after potentially adding a new
 	// transaction to the connection object, so connection object will not be
@@ -111,7 +111,7 @@ func (mc *Memcache) ParseUdp(pkt *protos.Packet) {
 	done := false
 	if payload != nil {
 		// parse memcached message
-		msg, err := parseUdp(&mc.config, pkt.Ts, payload)
+		msg, err := parseUDP(&mc.config, pkt.Ts, payload)
 		if err != nil {
 			logp.Warn("failed to parse memcached(UDP) message: %s", err)
 			connection.killTransaction(trans)
@@ -119,7 +119,7 @@ func (mc *Memcache) ParseUdp(pkt *protos.Packet) {
 		}
 
 		// apply memcached to transaction
-		done, err = mc.onUdpMessage(trans, &pkt.Tuple, dir, msg)
+		done, err = mc.onUDPMessage(trans, &pkt.Tuple, dir, msg)
 		if err != nil {
 			logp.Warn("error processing memcache message: %s", err)
 			connection.killTransaction(trans)
@@ -129,14 +129,14 @@ func (mc *Memcache) ParseUdp(pkt *protos.Packet) {
 	if !done {
 		trans.timer = time.AfterFunc(mc.udpConfig.transTimeout, func() {
 			debug("transaction timeout -> forward")
-			mc.onUdpTrans(trans)
+			mc.onUDPTrans(trans)
 			mc.udpExpTrans.push(trans)
 		})
 	}
 }
 
-func (mc *Memcache) getUdpConnection(
-	tuple *common.IpPortTuple,
+func (mc *memcache) getUDPConnection(
+	tuple *common.IPPortTuple,
 ) (*udpConnection, applayer.NetDirection) {
 	connection := mc.udpConnections[tuple.Hashable()]
 	if connection != nil {
@@ -147,14 +147,14 @@ func (mc *Memcache) getUdpConnection(
 		return connection, applayer.NetReverseDirection
 	}
 
-	connection = newUdpConnection(mc, tuple)
+	connection = newUDPConnection(mc, tuple)
 	mc.udpConnections[tuple.Hashable()] = connection
 	return connection, applayer.NetOriginalDirection
 }
 
-func (mc *Memcache) onUdpMessage(
+func (mc *memcache) onUDPMessage(
 	trans *udpTransaction,
-	tuple *common.IpPortTuple,
+	tuple *common.IPPortTuple,
 	dir applayer.NetDirection,
 	msg *message,
 ) (bool, error) {
@@ -166,7 +166,7 @@ func (mc *Memcache) onUdpMessage(
 		msg.Direction = applayer.NetReverseDirection
 	}
 	msg.Tuple = *tuple
-	msg.Transport = applayer.TransportUdp
+	msg.Transport = applayer.TransportUDP
 	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tuple)
 
 	done := false
@@ -175,7 +175,7 @@ func (mc *Memcache) onUdpMessage(
 		msg.isComplete = true
 		trans.request = msg
 		waitResponse := msg.noreply ||
-			(!msg.isBinary && msg.command.code != MemcacheCmdQuit) ||
+			(!msg.isBinary && msg.command.code != memcacheCmdQuit) ||
 			(msg.isBinary && msg.opcode != opcodeQuitQ)
 		done = !waitResponse
 	} else {
@@ -185,20 +185,20 @@ func (mc *Memcache) onUdpMessage(
 
 	done = done || (trans.request != nil && trans.response != nil)
 	if done {
-		err = mc.onUdpTrans(trans)
+		err = mc.onUDPTrans(trans)
 		trans.connection.killTransaction(trans)
 	}
 	return done, err
 }
 
-func (mc *Memcache) onUdpTrans(udp *udpTransaction) error {
+func (mc *memcache) onUDPTrans(udp *udpTransaction) error {
 
 	debug("received memcache(udp) transaction")
 	trans := newTransaction(udp.request, udp.response)
 	return mc.finishTransaction(trans)
 }
 
-func newUdpConnection(mc *Memcache, tuple *common.IpPortTuple) *udpConnection {
+func newUDPConnection(mc *memcache, tuple *common.IPPortTuple) *udpConnection {
 	c := &udpConnection{
 		tuple:        *tuple,
 		memcache:     mc,
@@ -207,8 +207,8 @@ func newUdpConnection(mc *Memcache, tuple *common.IpPortTuple) *udpConnection {
 	return c
 }
 
-func (c *udpConnection) udpTransactionForId(requestId uint16) *udpTransaction {
-	trans := c.transactions[requestId]
+func (c *udpConnection) udpTransactionForID(requestID uint16) *udpTransaction {
+	trans := c.transactions[requestID]
 	if trans != nil && trans.timer != nil {
 		stopped := trans.timer.Stop()
 		if !stopped {
@@ -218,10 +218,10 @@ func (c *udpConnection) udpTransactionForId(requestId uint16) *udpTransaction {
 	}
 	if trans == nil {
 		trans = &udpTransaction{
-			requestId:  requestId,
+			requestID:  requestID,
 			connection: c,
 		}
-		c.transactions[requestId] = trans
+		c.transactions[requestID] = trans
 	} else {
 		trans.timer = nil
 	}
@@ -234,12 +234,12 @@ func (c *udpConnection) killTransaction(t *udpTransaction) {
 		t.timer.Stop()
 	}
 
-	if c.transactions[t.requestId] != t {
+	if c.transactions[t.requestID] != t {
 		// transaction was already replaced
 		return
 	}
 
-	delete(c.transactions, t.requestId)
+	delete(c.transactions, t.requestID)
 	if len(c.transactions) == 0 {
 		delete(c.memcache.udpConnections, c.tuple.Hashable())
 	}
@@ -261,18 +261,18 @@ func (lst *udpExpTransList) steal() *udpTransaction {
 }
 
 func (t *udpTransaction) udpMessageForDir(
-	header *mcUdpHeader,
+	header *mcUDPHeader,
 	dir applayer.NetDirection,
 ) *udpMessage {
 	udpMsg := t.messages[dir]
 	if udpMsg == nil {
-		udpMsg = newUdpMessage(header)
+		udpMsg = newUDPMessage(header)
 		t.messages[dir] = udpMsg
 	}
 	return udpMsg
 }
 
-func newUdpMessage(header *mcUdpHeader) *udpMessage {
+func newUDPMessage(header *mcUDPHeader) *udpMessage {
 	udpMsg := &udpMessage{
 		numDatagrams: header.numDatagrams,
 		count:        0,
@@ -284,7 +284,7 @@ func newUdpMessage(header *mcUdpHeader) *udpMessage {
 }
 
 func (msg *udpMessage) addDatagram(
-	header *mcUdpHeader,
+	header *mcUDPHeader,
 	data []byte,
 ) *streambuf.Buffer {
 	if msg.isComplete {
@@ -318,16 +318,16 @@ func (msg *udpMessage) addDatagram(
 	return buffer
 }
 
-func parseUdpHeader(buf *streambuf.Buffer) (mcUdpHeader, error) {
-	var h mcUdpHeader
-	h.requestId, _ = buf.ReadNetUint16()
+func parseUDPHeader(buf *streambuf.Buffer) (mcUDPHeader, error) {
+	var h mcUDPHeader
+	h.requestID, _ = buf.ReadNetUint16()
 	h.seqNumber, _ = buf.ReadNetUint16()
 	h.numDatagrams, _ = buf.ReadNetUint16()
 	buf.Advance(2) // ignore reserved
 	return h, buf.Err()
 }
 
-func parseUdp(
+func parseUDP(
 	config *parserConfig,
 	ts time.Time,
 	buf *streambuf.Buffer,
@@ -335,7 +335,7 @@ func parseUdp(
 	parser := newParser(config)
 	msg, err := parser.parse(buf, ts)
 	if err != nil && msg == nil {
-		err = ErrUdpIncompleteMessage
+		err = errUDPIncompleteMessage
 	}
 	return msg, err
 }

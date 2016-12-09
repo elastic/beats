@@ -5,6 +5,11 @@ import (
 	"math"
 	"reflect"
 	"strconv"
+	"strings"
+	"sync/atomic"
+
+	"github.com/elastic/go-ucfg/internal/parse"
+	uuid "github.com/satori/go.uuid"
 )
 
 type value interface {
@@ -77,6 +82,14 @@ type cfgRef struct {
 
 type cfgSplice struct {
 	cfgPrimitive
+
+	// id used to store intermediate parse results in current execution context.
+	// As parsing results might differ between multiple calls due to:
+	// splice being shared between multiple configurations, or environment
+	// changing between calls + lazy nature of cfgSplice, parsing results cannot
+	// be stored in cfgSplice itself.
+	id string
+
 	splice varEvaler
 }
 
@@ -86,6 +99,8 @@ type cfgPrimitive struct {
 	ctx      context
 	metadata *Meta
 }
+
+var spliceSeq int32
 
 func (c *context) empty() bool {
 	return c.parent == nil
@@ -149,7 +164,8 @@ func newRef(ctx context, m *Meta, ref *reference) *cfgRef {
 }
 
 func newSplice(ctx context, m *Meta, s varEvaler) *cfgSplice {
-	return &cfgSplice{cfgPrimitive{ctx, m}, s}
+	id := string(atomic.AddInt32(&spliceSeq, 1)) + uuid.NewV4().String()
+	return &cfgSplice{cfgPrimitive{ctx, m}, id, s}
 }
 
 func (p *cfgPrimitive) Context() context                { return p.ctx }
@@ -195,6 +211,7 @@ func (c *cfgBool) typ(*options) (typeInfo, error)          { return typeInfo{"bo
 
 func (c *cfgInt) cpy(ctx context) value                   { return newInt(ctx, c.meta(), c.i) }
 func (c *cfgInt) toInt(*options) (int64, error)           { return c.i, nil }
+func (c *cfgInt) toFloat(*options) (float64, error)       { return float64(c.i), nil }
 func (c *cfgInt) reflect(*options) (reflect.Value, error) { return reflect.ValueOf(c.i), nil }
 func (c *cfgInt) reify(*options) (interface{}, error)     { return c.i, nil }
 func (c *cfgInt) toString(*options) (string, error)       { return fmt.Sprintf("%d", c.i), nil }
@@ -212,6 +229,7 @@ func (c *cfgUint) reify(*options) (interface{}, error)     { return c.u, nil }
 func (c *cfgUint) toString(*options) (string, error)       { return fmt.Sprintf("%d", c.u), nil }
 func (c *cfgUint) typ(*options) (typeInfo, error)          { return typeInfo{"uint", tUint64}, nil }
 func (c *cfgUint) toUint(*options) (uint64, error)         { return c.u, nil }
+func (c *cfgUint) toFloat(*options) (float64, error)       { return float64(c.u), nil }
 func (c *cfgUint) toInt(*options) (int64, error) {
 	if c.u > math.MaxInt64 {
 		return 0, ErrOverflow
@@ -243,13 +261,17 @@ func (c *cfgFloat) toInt(*options) (int64, error) {
 	return int64(c.f), nil
 }
 
-func (c *cfgString) cpy(ctx context) value             { return newString(ctx, c.meta(), c.s) }
-func (c *cfgString) toString(*options) (string, error) { return c.s, nil }
+func (c *cfgString) cpy(ctx context) value { return newString(ctx, c.meta(), c.s) }
 func (c *cfgString) reflect(*options) (reflect.Value, error) {
 	return reflect.ValueOf(c.s), nil
 }
 func (c *cfgString) reify(*options) (interface{}, error) { return c.s, nil }
 func (c *cfgString) typ(*options) (typeInfo, error)      { return typeInfo{"string", tString}, nil }
+func (c *cfgString) toBool(*options) (bool, error)       { return strconv.ParseBool(c.s) }
+func (c *cfgString) toString(*options) (string, error)   { return c.s, nil }
+func (c *cfgString) toInt(*options) (int64, error)       { return strconv.ParseInt(c.s, 0, 64) }
+func (c *cfgString) toUint(*options) (uint64, error)     { return strconv.ParseUint(c.s, 0, 64) }
+func (c *cfgString) toFloat(*options) (float64, error)   { return strconv.ParseFloat(c.s, 64) }
 
 func (c cfgSub) Context() context                   { return c.c.ctx }
 func (cfgSub) toBool(*options) (bool, error)        { return false, ErrTypeMismatch }
@@ -448,8 +470,12 @@ func (r *cfgRef) resolve(opts *options) (value, error) {
 	return r.ref.resolve(r.ctx.getParent(), opts)
 }
 
-func (*cfgSplice) typ(*options) (typeInfo, error) {
-	return typeInfo{"string", tString}, nil
+func (s *cfgSplice) typ(opt *options) (typeInfo, error) {
+	v, err := s.getValue(opt)
+	if err != nil {
+		return typeInfo{}, err
+	}
+	return v.typ(opt)
 }
 
 func (s *cfgSplice) cpy(ctx context) value {
@@ -457,51 +483,120 @@ func (s *cfgSplice) cpy(ctx context) value {
 }
 
 func (s *cfgSplice) reflect(opt *options) (reflect.Value, error) {
-	str, err := s.toString(opt)
+	v, err := s.getValue(opt)
 	if err != nil {
 		return reflect.Value{}, err
 	}
-	return reflect.ValueOf(str), err
+	return v.reflect(opt)
 }
 
 func (s *cfgSplice) reify(opt *options) (interface{}, error) {
-	return s.toString(opt)
-}
-
-func (s *cfgSplice) toBool(opt *options) (bool, error) {
-	str, err := s.toString(opt)
+	v, err := s.getValue(opt)
 	if err != nil {
 		return false, err
 	}
-	return strconv.ParseBool(str)
+	return v.reify(opt)
+}
+
+func (s *cfgSplice) toBool(opt *options) (bool, error) {
+	v, err := s.getValue(opt)
+	if err != nil {
+		return false, err
+	}
+	return v.toBool(opt)
 }
 
 func (s *cfgSplice) toString(opts *options) (string, error) {
-	return s.splice.eval(s.ctx.getParent(), opts)
+	v, err := s.getValue(opts)
+	if err != nil {
+		return "", err
+	}
+	return v.toString(opts)
 }
 
 func (s *cfgSplice) toInt(opt *options) (int64, error) {
-	str, err := s.toString(opt)
+	v, err := s.getValue(opt)
 	if err != nil {
 		return 0, err
 	}
-	return strconv.ParseInt(str, 0, 64)
+	return v.toInt(opt)
 }
 
 func (s *cfgSplice) toUint(opt *options) (uint64, error) {
-	str, err := s.toString(opt)
+	v, err := s.getValue(opt)
 	if err != nil {
 		return 0, err
 	}
-	return strconv.ParseUint(str, 0, 64)
+	return v.toUint(opt)
 }
 
 func (s *cfgSplice) toFloat(opt *options) (float64, error) {
-	str, err := s.toString(opt)
+	v, err := s.getValue(opt)
 	if err != nil {
 		return 0, err
 	}
-	return strconv.ParseFloat(str, 64)
+	return v.toFloat(opt)
+}
+
+func (s *cfgSplice) toConfig(opt *options) (*Config, error) {
+	v, err := s.getValue(opt)
+	if err != nil {
+		return nil, err
+	}
+	return v.toConfig(opt)
+}
+
+func (s *cfgSplice) getValue(opts *options) (value, error) {
+	if v, ok := opts.parsed[s.id]; ok {
+		if v.err != nil {
+			return nil, v.err
+		}
+		return v.value, nil
+	}
+
+	v, err := s.parseValue(opts)
+	opts.parsed[s.id] = spliceValue{err, v}
+	return v, err
+}
+
+func (s *cfgSplice) parseValue(opts *options) (value, error) {
+	str, err := s.splice.eval(s.ctx.getParent(), opts)
+	if err != nil {
+		return nil, err
+	}
+
+	ifc, err := parse.ParseValue(str)
+	if err != nil {
+		return nil, err
+	}
+
+	if ifc == nil {
+		if strings.TrimSpace(str) == "" {
+			return newString(s.ctx, s.meta(), str), nil
+		}
+		return &cfgNil{cfgPrimitive{ctx: s.ctx, metadata: s.meta()}}, nil
+	}
+
+	switch v := ifc.(type) {
+	case bool:
+		return newBool(s.ctx, s.meta(), v), nil
+	case int64:
+		return newInt(s.ctx, s.meta(), v), nil
+	case uint64:
+		return newUint(s.ctx, s.meta(), v), nil
+	case float64:
+		return newFloat(s.ctx, s.meta(), v), nil
+	case string:
+		return newString(s.ctx, s.meta(), v), nil
+	}
+
+	sub, err := normalize(opts, ifc)
+	if err != nil {
+		return nil, err
+	}
+	sub.ctx = s.ctx
+	sub.metadata = s.metadata
+	return cfgSub{sub}, nil
 }
 
 func isNil(v value) bool {

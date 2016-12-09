@@ -6,54 +6,47 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
-// init registers the MetricSet with the central registry.
-// The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("docker", "container", New); err != nil {
+	if err := mb.Registry.AddMetricSet("docker", "container", New, docker.HostParser); err != nil {
 		panic(err)
 	}
 }
 
-// MetricSet type defines all fields of the MetricSet
-// As a minimum it must inherit the mb.BaseMetricSet fields, but can be extended with
-// additional entries. These variables can be used to persist data or configuration between
-// multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
 	dockerClient *dc.Client
 }
 
-// New create a new instance of the MetricSet
-// Part of new is also setting up the configuration by processing additional
-// configuration entries if needed.
+// New creates a new instance of the docker container MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	logp.Warn("EXPERIMENTAL: The docker container metricset is experimental")
 
-	logp.Warn("EXPERIMENTAL: The container metricset is experimental")
-
-	config := docker.GetDefaultConf()
-
+	config := docker.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	client, err := docker.NewDockerClient(base.HostData().URI, config)
+	if err != nil {
 		return nil, err
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		dockerClient:  docker.CreateDockerCLient(config),
+		dockerClient:  client,
 	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-// It returns the event which is then forward to the output. In case of an error, a
-// descriptive error must be returned.
+// Fetch returns a list of all containers as events.
+// This is based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/list-containers.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
-	containersList, err := m.dockerClient.ListContainers(dc.ListContainersOptions{})
+	// Fetch a list of all containers.
+	containers, err := m.dockerClient.ListContainers(dc.ListContainersOptions{})
 	if err != nil {
 		return nil, err
 	}
-	return eventsMapping(containersList), nil
+	return eventsMapping(containers), nil
 }

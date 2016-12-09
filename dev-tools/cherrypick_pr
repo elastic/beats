@@ -56,7 +56,7 @@ def main():
                                       "Continue? [y/n]: ") != "y":
             return 1
         check_call("git reset --hard", shell=True)
-        check_call("git clean -dfx", shell=True)
+        check_call("git clean -df", shell=True)
         check_call("git fetch", shell=True)
 
         check_call("git checkout {}".format(args.from_branch), shell=True)
@@ -67,7 +67,7 @@ def main():
 
         call("git branch -D {} > /dev/null".format(tmp_branch), shell=True)
         check_call("git checkout -b {}".format(tmp_branch), shell=True)
-        if call("git cherry-pick {}".format(" ".join(args.commit_hashes)),
+        if call("git cherry-pick -x {}".format(" ".join(args.commit_hashes)),
                 shell=True) != 0:
             print("Looks like you have cherry-pick errors.")
             print("Fix them, then run: ")
@@ -91,8 +91,9 @@ def main():
          shell=True)
     check_call("git push --set-upstream {} {}"
                .format(remote, tmp_branch), shell=True)
-    print("Done. Go to Github and open the PR. Branch name is: {}"
-          .format(tmp_branch))
+    print("Done. Open PR by following this URL: \n\t" +
+          "https://github.com/elastic/beats/compare/{}...{}:{}?expand=1"
+          .format(args.to_branch, remote, tmp_branch))
 
 if __name__ == "__main__":
     sys.exit(main())

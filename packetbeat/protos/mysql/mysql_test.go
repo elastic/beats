@@ -17,8 +17,8 @@ import (
 	"time"
 )
 
-func MysqlModForTests() *Mysql {
-	var mysql Mysql
+func mysqlModForTests() *mysqlPlugin {
+	var mysql mysqlPlugin
 	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
 	config := defaultConfig
 	mysql.init(results, &config)
@@ -31,7 +31,7 @@ func Test_parseStateNames(t *testing.T) {
 	assert.Equal(t, "EatFields", mysqlStateEatFields.String())
 	assert.Equal(t, "EatRows", mysqlStateEatRows.String())
 
-	assert.NotNil(t, (MysqlStateMax - 1).String())
+	assert.NotNil(t, (mysqlStateMax - 1).String())
 }
 
 func TestMySQLParser_simpleRequest(t *testing.T) {
@@ -49,7 +49,7 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &MysqlStream{data: message, message: new(MysqlMessage)}
+	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -59,15 +59,15 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
-	if !stream.message.IsRequest {
+	if !stream.message.isRequest {
 		t.Errorf("Failed to parse MySQL request")
 	}
-	if stream.message.Query != "INSERT INTO post (username, title, body, pub_date) VALUES ('Anonymous', 'test', 'test', '2013-07-22 18:44:17')" {
+	if stream.message.query != "INSERT INTO post (username, title, body, pub_date) VALUES ('Anonymous', 'test', 'test', '2013-07-22 18:44:17')" {
 		t.Errorf("Failed to parse query")
 	}
 
-	if stream.message.Size != 115 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
+	if stream.message.size != 115 {
+		t.Errorf("Wrong message size %d", stream.message.size)
 	}
 }
 func TestMySQLParser_OKResponse(t *testing.T) {
@@ -80,7 +80,7 @@ func TestMySQLParser_OKResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &MysqlStream{data: message, message: new(MysqlMessage)}
+	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -90,20 +90,20 @@ func TestMySQLParser_OKResponse(t *testing.T) {
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
-	if stream.message.IsRequest {
+	if stream.message.isRequest {
 		t.Errorf("Failed to parse MySQL response")
 	}
-	if !stream.message.IsOK {
+	if !stream.message.isOK {
 		t.Errorf("Failed to parse Response OK")
 	}
-	if stream.message.AffectedRows != 1 {
+	if stream.message.affectedRows != 1 {
 		t.Errorf("Failed to parse affected rows")
 	}
-	if stream.message.InsertId != 4 {
+	if stream.message.insertID != 4 {
 		t.Errorf("Failed to parse last INSERT id")
 	}
-	if stream.message.Size != 11 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
+	if stream.message.size != 11 {
+		t.Errorf("Wrong message size %d", stream.message.size)
 	}
 }
 
@@ -117,7 +117,7 @@ func TestMySQLParser_errorResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &MysqlStream{data: message, message: new(MysqlMessage)}
+	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -127,15 +127,15 @@ func TestMySQLParser_errorResponse(t *testing.T) {
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
-	if stream.message.IsRequest {
+	if stream.message.isRequest {
 		t.Errorf("Failed to parse MySQL response")
 	}
-	if stream.message.IsOK {
+	if stream.message.isOK {
 		t.Errorf("Failed to parse MySQL error esponse")
 	}
 
-	if stream.message.Size != 50 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
+	if stream.message.size != 50 {
+		t.Errorf("Wrong message size %d", stream.message.size)
 	}
 }
 
@@ -143,7 +143,7 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysqldetailed"})
 	}
-	mysql := MysqlModForTests()
+	mysql := mysqlModForTests()
 
 	data := []byte(
 		"0100000105" +
@@ -164,7 +164,7 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &MysqlStream{data: message, message: new(MysqlMessage)}
+	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -174,19 +174,19 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
-	if stream.message.IsRequest {
+	if stream.message.isRequest {
 		t.Errorf("Failed to parse MySQL Query response")
 	}
-	if !stream.message.IsOK || stream.message.IsError {
+	if !stream.message.isOK || stream.message.isError {
 		t.Errorf("Failed to parse MySQL Query response")
 	}
-	if stream.message.Tables != "minitwit.post" {
-		t.Errorf("Failed to get table name: %s", stream.message.Tables)
+	if stream.message.tables != "minitwit.post" {
+		t.Errorf("Failed to get table name: %s", stream.message.tables)
 	}
-	if stream.message.NumberOfFields != 5 {
+	if stream.message.numberOfFields != 5 {
 		t.Errorf("Failed to get the number of fields")
 	}
-	if stream.message.NumberOfRows != 4 {
+	if stream.message.numberOfRows != 4 {
 		t.Errorf("Failed to get the number of rows")
 	}
 
@@ -196,14 +196,14 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 		t.Errorf("Empty raw data")
 	}
 	fields, rows := mysql.parseMysqlResponse(raw)
-	if len(fields) != stream.message.NumberOfFields {
+	if len(fields) != stream.message.numberOfFields {
 		t.Errorf("Failed to parse the fields")
 	}
-	if len(rows) != stream.message.NumberOfRows {
+	if len(rows) != stream.message.numberOfRows {
 		t.Errorf("Failed to parse the rows")
 	}
-	if stream.message.Size != 528 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
+	if stream.message.size != 528 {
+		t.Errorf("Wrong message size %d", stream.message.size)
 	}
 }
 
@@ -219,7 +219,7 @@ func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &MysqlStream{data: message, message: new(MysqlMessage)}
+	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -229,17 +229,17 @@ func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
-	if stream.message.IsRequest {
+	if stream.message.isRequest {
 		t.Errorf("Failed to parse MySQL Query response")
 	}
-	if !stream.message.IsOK || stream.message.IsError {
+	if !stream.message.isOK || stream.message.isError {
 		t.Errorf("Failed to true, true, parse MySQL Query response")
 	}
-	if stream.message.AffectedRows != 1 {
+	if stream.message.affectedRows != 1 {
 		t.Errorf("Failed to get the number of affected rows")
 	}
-	if stream.message.Size != 52 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
+	if stream.message.size != 52 {
+		t.Errorf("Wrong message size %d", stream.message.size)
 	}
 }
 
@@ -257,7 +257,7 @@ func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &MysqlStream{data: message, message: new(MysqlMessage)}
+	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -297,17 +297,17 @@ func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
-	if stream.message.IsRequest {
+	if stream.message.isRequest {
 		t.Errorf("Failed to parse MySQL Query response")
 	}
-	if !stream.message.IsOK || stream.message.IsError {
+	if !stream.message.isOK || stream.message.isError {
 		t.Errorf("Failed to parse MySQL Query response")
 	}
-	if stream.message.AffectedRows != 1 {
+	if stream.message.affectedRows != 1 {
 		t.Errorf("Failed to get the number of affected rows")
 	}
-	if stream.message.Size != 52 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
+	if stream.message.size != 52 {
+		t.Errorf("Wrong message size %d", stream.message.size)
 	}
 }
 
@@ -316,7 +316,7 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysql", "mysqldetailed"})
 	}
 
-	mysql := MysqlModForTests()
+	mysql := mysqlModForTests()
 	data, err := hex.DecodeString("300000010001000100000028526f7773206d61746368" +
 		"65643a203120204368616e6765643a203120205761726e696e67733a2030")
 	if err != nil {
@@ -330,20 +330,20 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 		Payload: data,
 		Ts:      ts,
 	}
-	var tuple common.TcpTuple
+	var tuple common.TCPTuple
 	var private mysqlPrivateData
 
-	var count_handleMysql = 0
+	var countHandleMysql = 0
 
-	mysql.handleMysql = func(mysql *Mysql, m *MysqlMessage, tcp *common.TcpTuple,
+	mysql.handleMysql = func(mysql *mysqlPlugin, m *mysqlMessage, tcp *common.TCPTuple,
 		dir uint8, raw_msg []byte) {
 
-		count_handleMysql += 1
+		countHandleMysql++
 	}
 
 	mysql.Parse(&pkt, &tuple, 1, private)
 
-	if count_handleMysql != 1 {
+	if countHandleMysql != 1 {
 		t.Errorf("handleMysql not called")
 	}
 }
@@ -354,7 +354,7 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysql", "mysqldetailed"})
 	}
 
-	mysql := MysqlModForTests()
+	mysql := mysqlModForTests()
 
 	data, err := hex.DecodeString(
 		"0700000100000000000000" +
@@ -373,20 +373,20 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 		Payload: data,
 		Ts:      ts,
 	}
-	var tuple common.TcpTuple
+	var tuple common.TCPTuple
 	var private mysqlPrivateData
 
-	var count_handleMysql = 0
+	var countHandleMysql = 0
 
-	mysql.handleMysql = func(mysql *Mysql, m *MysqlMessage, tcptuple *common.TcpTuple,
+	mysql.handleMysql = func(mysql *mysqlPlugin, m *mysqlMessage, tcptuple *common.TCPTuple,
 		dir uint8, raw_msg []byte) {
 
-		count_handleMysql += 1
+		countHandleMysql++
 	}
 
 	mysql.Parse(&pkt, &tuple, 1, private)
 
-	if count_handleMysql != 3 {
+	if countHandleMysql != 3 {
 		t.Errorf("handleMysql not called three times")
 	}
 }
@@ -397,7 +397,7 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysql", "mysqldetailed"})
 	}
 
-	mysql := MysqlModForTests()
+	mysql := mysqlModForTests()
 
 	data, err := hex.DecodeString(
 		"0100000105" +
@@ -417,19 +417,19 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 		Payload: data,
 		Ts:      ts,
 	}
-	var tuple common.TcpTuple
+	var tuple common.TCPTuple
 	var private mysqlPrivateData
 
-	var count_handleMysql = 0
+	var countHandleMysql = 0
 
-	mysql.handleMysql = func(mysql *Mysql, m *MysqlMessage, tcptuple *common.TcpTuple,
+	mysql.handleMysql = func(mysql *mysqlPlugin, m *mysqlMessage, tcptuple *common.TCPTuple,
 		dir uint8, raw_msg []byte) {
 
-		count_handleMysql += 1
+		countHandleMysql++
 	}
 
 	private = mysql.Parse(&pkt, &tuple, 1, private).(mysqlPrivateData)
-	if count_handleMysql != 0 {
+	if countHandleMysql != 0 {
 		t.Errorf("handleMysql called on first run")
 	}
 
@@ -443,6 +443,9 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 			"2a00000a013309416e6f6e796d6f75730454657374047465737413323031332d30372d32322031383a33323a3130" +
 			"2a00000b013409416e6f6e796d6f75730474657374047465737413323031332d30372d32322031383a34343a3137" +
 			"0500000cfe00002100")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	pkt = protos.Packet{
 		Payload: data,
@@ -450,23 +453,23 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 	}
 
 	mysql.Parse(&pkt, &tuple, 1, private)
-	if count_handleMysql != 1 {
+	if countHandleMysql != 1 {
 		t.Errorf("handleMysql not called on the second run")
 	}
 }
 
-func testTcpTuple() *common.TcpTuple {
-	t := &common.TcpTuple{
-		Ip_length: 4,
-		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
-		Src_port: 6512, Dst_port: 3306,
+func testTCPTuple() *common.TCPTuple {
+	t := &common.TCPTuple{
+		IPLength: 4,
+		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+		SrcPort: 6512, DstPort: 3306,
 	}
 	t.ComputeHashebles()
 	return t
 }
 
 // Helper function to read from the Publisher Queue
-func expectTransaction(t *testing.T, mysql *Mysql) common.MapStr {
+func expectTransaction(t *testing.T, mysql *mysqlPlugin) common.MapStr {
 	client := mysql.results.(*publish.ChanTransactions)
 	select {
 	case trans := <-client.Channel:
@@ -484,15 +487,15 @@ func Test_gap_in_response(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysql", "mysqldetailed"})
 	}
 
-	mysql := MysqlModForTests()
+	mysql := mysqlModForTests()
 
 	// request and response from tests/pcaps/mysql_result_long.pcap
 	// select * from test
-	req_data, err := hex.DecodeString(
+	reqData, err := hex.DecodeString(
 		"130000000373656c656374202a20" +
 			"66726f6d2074657374")
 	assert.Nil(t, err)
-	resp_data, err := hex.DecodeString(
+	respData, err := hex.DecodeString(
 		"0100000103240000020364656604" +
 			"74657374047465737404746573740161" +
 			"01610c3f000b00000003000000000024" +
@@ -511,9 +514,9 @@ func Test_gap_in_response(t *testing.T) {
 			"696e6475737472792e204c6f72656d20")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
-	req := protos.Packet{Payload: req_data}
-	resp := protos.Packet{Payload: resp_data}
+	tcptuple := testTCPTuple()
+	req := protos.Packet{Payload: reqData}
+	resp := protos.Packet{Payload: respData}
 
 	private := protos.ProtocolData(new(mysqlPrivateData))
 
@@ -522,7 +525,7 @@ func Test_gap_in_response(t *testing.T) {
 
 	logp.Debug("mysql", "Now sending gap..")
 
-	private, drop := mysql.GapInStream(tcptuple, 1, 10, private)
+	_, drop := mysql.GapInStream(tcptuple, 1, 10, private)
 	assert.Equal(t, true, drop)
 
 	trans := expectTransaction(t, mysql)
@@ -537,16 +540,16 @@ func Test_gap_in_eat_message(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysql", "mysqldetailed"})
 	}
 
-	mysql := MysqlModForTests()
+	mysql := mysqlModForTests()
 
 	// request from tests/pcaps/mysql_result_long.pcap
 	// "select * from test". Last byte missing.
-	req_data, err := hex.DecodeString(
+	reqData, err := hex.DecodeString(
 		"130000000373656c656374202a20" +
 			"66726f6d20746573")
 	assert.Nil(t, err)
 
-	stream := &MysqlStream{data: req_data, message: new(MysqlMessage)}
+	stream := &mysqlStream{data: reqData, message: new(mysqlMessage)}
 	ok, complete := mysqlMessageParser(stream)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
@@ -563,13 +566,13 @@ func Test_read_length(t *testing.T) {
 	var err error
 	var length int
 
-	_, err = read_length([]byte{}, 0)
+	_, err = readLength([]byte{}, 0)
 	assert.NotNil(t, err)
 
-	_, err = read_length([]byte{0x00, 0x00}, 0)
+	_, err = readLength([]byte{0x00, 0x00}, 0)
 	assert.NotNil(t, err)
 
-	length, err = read_length([]byte{0x01, 0x00, 0x00}, 0)
+	length, err = readLength([]byte{0x01, 0x00, 0x00}, 0)
 	assert.Nil(t, err)
 	assert.Equal(t, length, 1)
 }
@@ -579,7 +582,7 @@ func Test_parseMysqlResponse_invalid(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysql", "mysqldetailed"})
 	}
 
-	mysql := MysqlModForTests()
+	mysql := mysqlModForTests()
 
 	tests := [][]byte{
 		{},

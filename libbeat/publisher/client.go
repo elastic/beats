@@ -76,6 +76,7 @@ func newClient(pub *BeatPublisher) *client {
 		beatMeta: common.MapStr{
 			"name":     pub.name,
 			"hostname": pub.hostname,
+			"version":  pub.version,
 		},
 		globalEventMetadata: pub.globalEventMetadata,
 	}

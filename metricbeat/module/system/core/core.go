@@ -1,17 +1,18 @@
-// +build darwin freebsd linux openbsd
+// +build darwin freebsd linux openbsd windows
 
 package core
 
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system/cpu"
 
 	"github.com/pkg/errors"
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "core", New); err != nil {
+	if err := mb.Registry.AddMetricSet("system", "core", New, parse.EmptyHostParser); err != nil {
 		panic(err)
 	}
 }
@@ -24,7 +25,6 @@ type MetricSet struct {
 
 // New is a mb.MetricSetFactory that returns a cores.MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
 	config := struct {
 		CpuTicks bool `config:"cpu_ticks"` // export CPU usage in ticks
 	}{
@@ -46,7 +46,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches CPU core metrics from the OS.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
 	cpuCoreStat, err := cpu.GetCpuTimesList()
 	if err != nil {
 		return nil, errors.Wrap(err, "cpu core times")
@@ -54,8 +53,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	m.cpu.AddCpuPercentageList(cpuCoreStat)
 
-	cores := []common.MapStr{}
-
+	cores := make([]common.MapStr, 0, len(cpuCoreStat))
 	for core, stat := range cpuCoreStat {
 
 		coreStat := common.MapStr{

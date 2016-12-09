@@ -72,7 +72,7 @@ func TestPublisherModes(t *testing.T) {
 		}
 
 		var msgs []pubtest.PublishMessage
-		for _ = range test.order {
+		for range test.order {
 			m := <-client.Channel
 			msgs = append(msgs, m)
 		}

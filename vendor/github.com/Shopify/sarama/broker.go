@@ -10,6 +10,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/rcrowley/go-metrics"
 )
 
 // Broker represents a single Kafka broker connection. All operations on this object are entirely concurrency-safe.
@@ -26,6 +28,19 @@ type Broker struct {
 
 	responses chan responsePromise
 	done      chan bool
+
+	incomingByteRate       metrics.Meter
+	requestRate            metrics.Meter
+	requestSize            metrics.Histogram
+	outgoingByteRate       metrics.Meter
+	responseRate           metrics.Meter
+	responseSize           metrics.Histogram
+	brokerIncomingByteRate metrics.Meter
+	brokerRequestRate      metrics.Meter
+	brokerRequestSize      metrics.Histogram
+	brokerOutgoingByteRate metrics.Meter
+	brokerResponseRate     metrics.Meter
+	brokerResponseSize     metrics.Histogram
 }
 
 type responsePromise struct {
@@ -84,8 +99,26 @@ func (b *Broker) Open(conf *Config) error {
 
 		b.conf = conf
 
+		// Create or reuse the global metrics shared between brokers
+		b.incomingByteRate = metrics.GetOrRegisterMeter("incoming-byte-rate", conf.MetricRegistry)
+		b.requestRate = metrics.GetOrRegisterMeter("request-rate", conf.MetricRegistry)
+		b.requestSize = getOrRegisterHistogram("request-size", conf.MetricRegistry)
+		b.outgoingByteRate = metrics.GetOrRegisterMeter("outgoing-byte-rate", conf.MetricRegistry)
+		b.responseRate = metrics.GetOrRegisterMeter("response-rate", conf.MetricRegistry)
+		b.responseSize = getOrRegisterHistogram("response-size", conf.MetricRegistry)
+		// Do not gather metrics for seeded broker (only used during bootstrap) because they share
+		// the same id (-1) and are already exposed through the global metrics above
+		if b.id >= 0 {
+			b.brokerIncomingByteRate = getOrRegisterBrokerMeter("incoming-byte-rate", b, conf.MetricRegistry)
+			b.brokerRequestRate = getOrRegisterBrokerMeter("request-rate", b, conf.MetricRegistry)
+			b.brokerRequestSize = getOrRegisterBrokerHistogram("request-size", b, conf.MetricRegistry)
+			b.brokerOutgoingByteRate = getOrRegisterBrokerMeter("outgoing-byte-rate", b, conf.MetricRegistry)
+			b.brokerResponseRate = getOrRegisterBrokerMeter("response-rate", b, conf.MetricRegistry)
+			b.brokerResponseSize = getOrRegisterBrokerHistogram("response-size", b, conf.MetricRegistry)
+		}
+
 		if conf.Net.SASL.Enable {
-			b.connErr = b.sendAndReceiveSASLPlainAuth()
+			b.connErr = b.saslAuthenticate()
 			if b.connErr != nil {
 				err = b.conn.Close()
 				if err == nil {
@@ -343,7 +376,8 @@ func (b *Broker) send(rb protocolBody, promiseResponse bool) (*responsePromise, 
 		return nil, err
 	}
 
-	_, err = b.conn.Write(buf)
+	bytes, err := b.conn.Write(buf)
+	b.updateOutgoingCommunicationMetrics(bytes)
 	if err != nil {
 		return nil, err
 	}
@@ -441,8 +475,9 @@ func (b *Broker) responseReceiver() {
 			continue
 		}
 
-		_, err = io.ReadFull(b.conn, header)
+		bytesReadHeader, err := io.ReadFull(b.conn, header)
 		if err != nil {
+			b.updateIncomingCommunicationMetrics(bytesReadHeader)
 			dead = err
 			response.errors <- err
 			continue
@@ -451,11 +486,13 @@ func (b *Broker) responseReceiver() {
 		decodedHeader := responseHeader{}
 		err = decode(header, &decodedHeader)
 		if err != nil {
+			b.updateIncomingCommunicationMetrics(bytesReadHeader)
 			dead = err
 			response.errors <- err
 			continue
 		}
 		if decodedHeader.correlationID != response.correlationID {
+			b.updateIncomingCommunicationMetrics(bytesReadHeader)
 			// TODO if decoded ID < cur ID, discard until we catch up
 			// TODO if decoded ID > cur ID, save it so when cur ID catches up we have a response
 			dead = PacketDecodingError{fmt.Sprintf("correlation ID didn't match, wanted %d, got %d", response.correlationID, decodedHeader.correlationID)}
@@ -464,7 +501,8 @@ func (b *Broker) responseReceiver() {
 		}
 
 		buf := make([]byte, decodedHeader.length-4)
-		_, err = io.ReadFull(b.conn, buf)
+		bytesReadBody, err := io.ReadFull(b.conn, buf)
+		b.updateIncomingCommunicationMetrics(bytesReadHeader + bytesReadBody)
 		if err != nil {
 			dead = err
 			response.errors <- err
@@ -474,6 +512,62 @@ func (b *Broker) responseReceiver() {
 		response.packets <- buf
 	}
 	close(b.done)
+}
+
+func (b *Broker) sendAndReceiveSASLHandshake(method string) error {
+	rb := &SaslHandshakeRequest{method}
+	req := &request{correlationID: b.correlationID, clientID: b.conf.ClientID, body: rb}
+	buf, err := encode(req)
+	if err != nil {
+		return err
+	}
+
+	err = b.conn.SetWriteDeadline(time.Now().Add(b.conf.Net.WriteTimeout))
+	if err != nil {
+		return err
+	}
+
+	bytes, err := b.conn.Write(buf)
+	b.updateOutgoingCommunicationMetrics(bytes)
+	if err != nil {
+		Logger.Printf("Failed to send SASL handshake %s: %s\n", b.addr, err.Error())
+		return err
+	}
+	b.correlationID++
+	//wait for the response
+	header := make([]byte, 8) // response header
+	n, err := io.ReadFull(b.conn, header)
+	b.updateIncomingCommunicationMetrics(n)
+	length := binary.BigEndian.Uint32(header[:4])
+	payload := make([]byte, length-4)
+	n, err = io.ReadFull(b.conn, payload)
+	if err != nil {
+		Logger.Printf("Failed to read SASL handshake payload : %s\n", err.Error())
+		return err
+	}
+	b.updateIncomingCommunicationMetrics(n)
+	res := &SaslHandshakeResponse{}
+	err = versionedDecode(payload, res, 0)
+	if err != nil {
+		Logger.Printf("Failed to parse SASL handshake : %s\n", err.Error())
+		return err
+	}
+	if res.Err != ErrNoError {
+		Logger.Printf("Invalid SASL Mechanism : %s\n", err.Error())
+		return res.Err
+	}
+	Logger.Print("Successul SASL handshake")
+	return nil
+
+}
+
+func (b *Broker) saslAuthenticate() error {
+	err := b.sendAndReceiveSASLHandshake("PLAIN")
+	if err != nil {
+		Logger.Printf("Error performing SASL handshake %s: %s\n", b.addr, err)
+		return err
+	}
+	return b.sendAndReceiveSASLPlainAuth()
 }
 
 // Kafka 0.10.0 plans to support SASL Plain and Kerberos as per PR #812 (KIP-43)/(JIRA KAFKA-3149)
@@ -506,7 +600,8 @@ func (b *Broker) sendAndReceiveSASLPlainAuth() error {
 		return err
 	}
 
-	_, err = b.conn.Write(authBytes)
+	bytesWritten, err := b.conn.Write(authBytes)
+	b.updateOutgoingCommunicationMetrics(bytesWritten)
 	if err != nil {
 		Logger.Printf("Failed to write SASL auth header to broker %s: %s\n", b.addr, err.Error())
 		return err
@@ -514,6 +609,7 @@ func (b *Broker) sendAndReceiveSASLPlainAuth() error {
 
 	header := make([]byte, 4)
 	n, err := io.ReadFull(b.conn, header)
+	b.updateIncomingCommunicationMetrics(n)
 	// If the credentials are valid, we would get a 4 byte response filled with null characters.
 	// Otherwise, the broker closes the connection and we get an EOF
 	if err != nil {
@@ -523,4 +619,36 @@ func (b *Broker) sendAndReceiveSASLPlainAuth() error {
 
 	Logger.Printf("SASL authentication successful with broker %s:%v - %v\n", b.addr, n, header)
 	return nil
+}
+
+func (b *Broker) updateIncomingCommunicationMetrics(bytes int) {
+	b.responseRate.Mark(1)
+	if b.brokerResponseRate != nil {
+		b.brokerResponseRate.Mark(1)
+	}
+	responseSize := int64(bytes)
+	b.incomingByteRate.Mark(responseSize)
+	if b.brokerIncomingByteRate != nil {
+		b.brokerIncomingByteRate.Mark(responseSize)
+	}
+	b.responseSize.Update(responseSize)
+	if b.brokerResponseSize != nil {
+		b.brokerResponseSize.Update(responseSize)
+	}
+}
+
+func (b *Broker) updateOutgoingCommunicationMetrics(bytes int) {
+	b.requestRate.Mark(1)
+	if b.brokerRequestRate != nil {
+		b.brokerRequestRate.Mark(1)
+	}
+	requestSize := int64(bytes)
+	b.outgoingByteRate.Mark(requestSize)
+	if b.brokerOutgoingByteRate != nil {
+		b.brokerOutgoingByteRate.Mark(requestSize)
+	}
+	b.requestSize.Update(requestSize)
+	if b.brokerRequestSize != nil {
+		b.brokerRequestSize.Update(requestSize)
+	}
 }

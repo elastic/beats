@@ -39,41 +39,44 @@ func eventMapping(m *MetricSet, body io.ReadCloser, hostname string, metricset s
 
 	// Parse active connections.
 	scanner.Scan()
-	if matches := activeRe.FindStringSubmatch(scanner.Text()); matches == nil {
+	matches := activeRe.FindStringSubmatch(scanner.Text())
+	if matches == nil {
 		return nil, fmt.Errorf("cannot parse active connections from Nginx stub status")
-	} else {
-		active, _ = strconv.Atoi(matches[1])
 	}
+
+	active, _ = strconv.Atoi(matches[1])
 
 	// Skip request status headers.
 	scanner.Scan()
 
 	// Parse request status.
 	scanner.Scan()
-	if matches := requestRe.FindStringSubmatch(scanner.Text()); matches == nil {
+	matches = requestRe.FindStringSubmatch(scanner.Text())
+	if matches == nil {
 		return nil, fmt.Errorf("cannot parse request status from Nginx stub status")
-	} else {
-		accepts, _ = strconv.Atoi(matches[1])
-		handled, _ = strconv.Atoi(matches[2])
-		requests, _ = strconv.Atoi(matches[3])
-
-		// Derived request status.
-		dropped = accepts - handled
-		current = requests - m.requests
-
-		// Kept for next run.
-		m.requests = requests
 	}
+
+	accepts, _ = strconv.Atoi(matches[1])
+	handled, _ = strconv.Atoi(matches[2])
+	requests, _ = strconv.Atoi(matches[3])
+
+	// Derived request status.
+	dropped = accepts - handled
+	current = requests - m.previousNumRequests
+
+	// Kept for next run.
+	m.previousNumRequests = requests
 
 	// Parse connection status.
 	scanner.Scan()
-	if matches := connRe.FindStringSubmatch(scanner.Text()); matches == nil {
+	matches = connRe.FindStringSubmatch(scanner.Text())
+	if matches == nil {
 		return nil, fmt.Errorf("cannot parse connection status from Nginx stub status")
-	} else {
-		reading, _ = strconv.Atoi(matches[1])
-		writing, _ = strconv.Atoi(matches[2])
-		waiting, _ = strconv.Atoi(matches[3])
 	}
+
+	reading, _ = strconv.Atoi(matches[1])
+	writing, _ = strconv.Atoi(matches[2])
+	waiting, _ = strconv.Atoi(matches[3])
 
 	event := common.MapStr{
 		"hostname": hostname,

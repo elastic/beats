@@ -38,61 +38,15 @@ func NewModules(config []*common.Config, r *Register) (map[Module][]MetricSet, e
 	}
 
 	// Create new Modules using the registered ModuleFactory's
-	modules := make([]Module, 0, len(baseModules))
-	var errs multierror.Errors
-	for _, bm := range baseModules {
-		f := r.moduleFactory(bm.Name())
-		if f == nil {
-			f = DefaultModuleFactory
-		}
-
-		module, err := f(bm)
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
-		modules = append(modules, module)
-	}
-
-	if errs.Err() != nil {
-		return nil, errs.Err()
+	modules, err := createModules(r, baseModules)
+	if err != nil {
+		return nil, err
 	}
 
 	// Create new MetricSets for each Module using the registered MetricSetFactory's
-	modToMetricSets := make(map[Module][]MetricSet, len(modules))
-	for _, bms := range newBaseMetricSets(modules) {
-		f, err := r.metricSetFactory(bms.Module().Name(), bms.Name())
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
-
-		metricSet, err := f(bms)
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
-		err = mustImplementFetcher(metricSet)
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
-		err = mustHaveModule(metricSet, bms)
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
-
-		if list, ok := modToMetricSets[metricSet.Module()]; ok {
-			list = append(list, metricSet)
-			modToMetricSets[metricSet.Module()] = list
-			continue
-		}
-		modToMetricSets[metricSet.Module()] = []MetricSet{metricSet}
-	}
-
-	if errs.Err() != nil {
-		return nil, errs.Err()
+	modToMetricSets, err := initMetricSets(r, modules)
+	if err != nil {
+		return nil, err
 	}
 
 	if len(modToMetricSets) == 0 {
@@ -143,6 +97,83 @@ func newBaseModuleFromConfig(rawConfig *common.Config) (BaseModule, error) {
 	}
 
 	return baseModule, nil
+}
+
+func createModules(r *Register, baseModules []BaseModule) ([]Module, error) {
+	modules := make([]Module, 0, len(baseModules))
+	var errs multierror.Errors
+	for _, bm := range baseModules {
+		f := r.moduleFactory(bm.Name())
+		if f == nil {
+			f = DefaultModuleFactory
+		}
+
+		module, err := f(bm)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		modules = append(modules, module)
+	}
+
+	err := errs.Err()
+	if err != nil {
+		return nil, err
+	}
+	return modules, nil
+}
+
+func initMetricSets(r *Register, modules []Module) (map[Module][]MetricSet, error) {
+	active := map[Module][]MetricSet{}
+	var errs multierror.Errors
+	for _, bms := range newBaseMetricSets(modules) {
+		f, hostParser, err := r.metricSetFactory(bms.Module().Name(), bms.Name())
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+
+		// Parse the 'host' field using the HostParser registered with the MetricSet.
+		if hostParser != nil {
+			bms.hostData, err = hostParser(bms.Module(), bms.host)
+			if err != nil {
+				errs = append(errs, errors.Wrapf(err, "host parsing failed for %v-%v",
+					bms.Module().Name(), bms.Name()))
+				continue
+			}
+			bms.host = bms.hostData.Host
+		} else {
+			// The MetricSet was registered without a HostParser so provide a
+			// default HostData value.
+			bms.hostData = HostData{URI: bms.host}
+		}
+
+		metricSet, err := f(bms)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		err = mustImplementFetcher(metricSet)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		err = mustHaveModule(metricSet, bms)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+
+		module := metricSet.Module()
+		active[module] = append(active[module], metricSet)
+	}
+
+	err := errs.Err()
+	if err != nil {
+		return nil, err
+	}
+	return active, nil
+
 }
 
 // newBaseMetricSets creates a new BaseMetricSet for all MetricSets defined

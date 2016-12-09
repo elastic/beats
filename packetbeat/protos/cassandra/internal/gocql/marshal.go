@@ -12,9 +12,10 @@ import (
 	"time"
 
 	"errors"
+	"strings"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"gopkg.in/inf.v0"
-	"strings"
 )
 
 // TypeInfo describes a Cassandra specific data type.
@@ -67,7 +68,7 @@ type CollectionType struct {
 
 func goType(t TypeInfo) reflect.Type {
 	switch t.Type() {
-	case TypeVarchar, TypeAscii, TypeInet, TypeText:
+	case TypeVarchar, TypeASCII, TypeInet, TypeText:
 		return reflect.TypeOf(*new(string))
 	case TypeBigInt, TypeCounter:
 		return reflect.TypeOf(*new(int64))
@@ -172,7 +173,7 @@ type Type int
 
 const (
 	TypeCustom    Type = 0x0000
-	TypeAscii     Type = 0x0001
+	TypeASCII     Type = 0x0001
 	TypeBigInt    Type = 0x0002
 	TypeBlob      Type = 0x0003
 	TypeBoolean   Type = 0x0004
@@ -204,7 +205,7 @@ func (t Type) String() string {
 	switch t {
 	case TypeCustom:
 		return "custom"
-	case TypeAscii:
+	case TypeASCII:
 		return "ascii"
 	case TypeBigInt:
 		return "bigint"
@@ -265,7 +266,7 @@ const (
 func getApacheCassandraType(class string) Type {
 	switch strings.TrimPrefix(class, apacheCassandraTypePrefix) {
 	case "AsciiType":
-		return TypeAscii
+		return TypeASCII
 	case "LongType":
 		return TypeBigInt
 	case "BytesType":
@@ -530,19 +531,12 @@ func FrameOpFromString(s string) (FrameOp, error) {
 	return op, nil
 }
 
-func (f *FrameOp) Unpack(in interface{}) error {
-	s, ok := in.(string)
-	if !ok {
-		return errors.New("expected string")
-	}
-
+func (f *FrameOp) Unpack(s string) error {
 	op, err := FrameOpFromString(s)
-	if err != nil {
-		return err
+	if err == nil {
+		*f = op
 	}
-
-	*f = op
-	return nil
+	return err
 }
 
 const (

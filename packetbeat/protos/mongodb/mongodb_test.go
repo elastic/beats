@@ -16,8 +16,8 @@ import (
 
 // Helper function returning a Mongodb module that can be used
 // in tests. It publishes the transactions in the results channel.
-func MongodbModForTests() *Mongodb {
-	var mongodb Mongodb
+func mongodbModForTests() *mongodbPlugin {
+	var mongodb mongodbPlugin
 	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
 	config := defaultConfig
 	mongodb.init(results, &config)
@@ -25,11 +25,11 @@ func MongodbModForTests() *Mongodb {
 }
 
 // Helper function that returns an example TcpTuple
-func testTcpTuple() *common.TcpTuple {
-	t := &common.TcpTuple{
-		Ip_length: 4,
-		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
-		Src_port: 6512, Dst_port: 27017,
+func testTCPTuple() *common.TCPTuple {
+	t := &common.TCPTuple{
+		IPLength: 4,
+		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+		SrcPort: 6512, DstPort: 27017,
 	}
 	t.ComputeHashebles()
 	return t
@@ -37,7 +37,7 @@ func testTcpTuple() *common.TcpTuple {
 
 // Helper function to read from the results Queue. Raises
 // an error if nothing is found in the queue.
-func expectTransaction(t *testing.T, mongodb *Mongodb) common.MapStr {
+func expectTransaction(t *testing.T, mongodb *mongodbPlugin) common.MapStr {
 	client := mongodb.results.(*publish.ChanTransactions)
 	select {
 	case trans := <-client.Channel:
@@ -54,16 +54,16 @@ func TestSimpleFindLimit1(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
 	}
 
-	mongodb := MongodbModForTests()
+	mongodb := mongodbModForTests()
 
 	// request and response from tests/pcaps/mongo_one_row.pcap
-	req_data, err := hex.DecodeString(
+	reqData, err := hex.DecodeString(
 		"320000000a000000ffffffffd4070000" +
 			"00000000746573742e72667374617572" +
 			"616e7473000000000001000000050000" +
 			"0000")
 	assert.Nil(t, err)
-	resp_data, err := hex.DecodeString(
+	respData, err := hex.DecodeString(
 		"020200004a0000000a00000001000000" +
 			"08000000000000000000000000000000" +
 			"01000000de010000075f696400558beb" +
@@ -99,14 +99,14 @@ func TestSimpleFindLimit1(t *testing.T) {
 			"0000")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
-	req := protos.Packet{Payload: req_data}
-	resp := protos.Packet{Payload: resp_data}
+	tcptuple := testTCPTuple()
+	req := protos.Packet{Payload: reqData}
+	resp := protos.Packet{Payload: respData}
 
 	private := protos.ProtocolData(new(mongodbConnectionData))
 
 	private = mongodb.Parse(&req, tcptuple, 0, private)
-	private = mongodb.Parse(&resp, tcptuple, 1, private)
+	mongodb.Parse(&resp, tcptuple, 1, private)
 	trans := expectTransaction(t, mongodb)
 
 	assert.Equal(t, "OK", trans["status"])
@@ -123,18 +123,18 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
 	}
 
-	mongodb := MongodbModForTests()
-	mongodb.SendRequest = true
-	mongodb.SendResponse = true
+	mongodb := mongodbModForTests()
+	mongodb.sendRequest = true
+	mongodb.sendResponse = true
 
 	// request and response from tests/pcaps/mongo_one_row.pcap
-	req_data, err := hex.DecodeString(
+	reqData, err := hex.DecodeString(
 		"320000000a000000ffffffffd4070000" +
 			"00000000746573742e72667374617572" +
 			"616e7473000000000001000000050000" +
 			"0000")
 	assert.Nil(t, err)
-	resp_data1, err := hex.DecodeString(
+	respData1, err := hex.DecodeString(
 		"020200004a0000000a00000001000000" +
 			"08000000000000000000000000000000" +
 			"01000000de010000075f696400558beb" +
@@ -145,7 +145,7 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 			"3100d5b14ae9996c4440000273747265" +
 			"657400100000004d6f72726973205061")
 
-	resp_data2, err := hex.DecodeString(
+	respData2, err := hex.DecodeString(
 		"726b2041766500027a6970636f646500" +
 			"060000003130343632000002626f726f" +
 			"756768000600000042726f6e78000263" +
@@ -158,7 +158,7 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 			"00026772616465000200000041001073" +
 			"636f72650006000000000332002b0000")
 
-	resp_data3, err := hex.DecodeString(
+	respData3, err := hex.DecodeString(
 		"00096461746500009cda693c01000002" +
 			"6772616465000200000041001073636f" +
 			"7265000a000000000333002b00000009" +
@@ -174,21 +174,21 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 			"0000")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
-	req := protos.Packet{Payload: req_data}
+	tcptuple := testTCPTuple()
+	req := protos.Packet{Payload: reqData}
 
 	private := protos.ProtocolData(new(mongodbConnectionData))
 
 	private = mongodb.Parse(&req, tcptuple, 0, private)
 
-	resp1 := protos.Packet{Payload: resp_data1}
+	resp1 := protos.Packet{Payload: respData1}
 	private = mongodb.Parse(&resp1, tcptuple, 1, private)
 
-	resp2 := protos.Packet{Payload: resp_data2}
+	resp2 := protos.Packet{Payload: respData2}
 	private = mongodb.Parse(&resp2, tcptuple, 1, private)
 
-	resp3 := protos.Packet{Payload: resp_data3}
-	private = mongodb.Parse(&resp3, tcptuple, 1, private)
+	resp3 := protos.Packet{Payload: respData3}
+	mongodb.Parse(&resp3, tcptuple, 1, private)
 
 	trans := expectTransaction(t, mongodb)
 
@@ -265,9 +265,9 @@ func TestMaxDocs(t *testing.T) {
 		},
 	}
 
-	mongodb := MongodbModForTests()
-	mongodb.SendResponse = true
-	mongodb.MaxDocs = 3
+	mongodb := mongodbModForTests()
+	mongodb.sendResponse = true
+	mongodb.maxDocs = 3
 
 	mongodb.publishTransaction(&trans)
 
@@ -303,7 +303,7 @@ func TestMaxDocs(t *testing.T) {
 			1, 2, 3, 4,
 		},
 	}
-	mongodb.MaxDocs = 0
+	mongodb.maxDocs = 0
 	mongodb.publishTransaction(&trans)
 	res = expectTransaction(t, mongodb)
 	assert.Equal(t, "1\n2\n3\n4", res["response"])
@@ -323,9 +323,9 @@ func TestMaxDocSize(t *testing.T) {
 		},
 	}
 
-	mongodb := MongodbModForTests()
-	mongodb.SendResponse = true
-	mongodb.MaxDocLength = 5
+	mongodb := mongodbModForTests()
+	mongodb.sendResponse = true
+	mongodb.maxDocLength = 5
 
 	mongodb.publishTransaction(&trans)
 

@@ -355,8 +355,9 @@ simply uncomment the line and change the values.
 [float]
 ==== Test Your Config File
 
-You can test your configuration file to verify that the structure is valid. Simply run
-your in the foreground with the `-configtest` flag specified. For example:
+You can test your configuration file to verify that the structure is valid.
+Simply change to the directory where the binary is installed, and run
+your Beat in the foreground with the `-configtest` flag specified. For example:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------

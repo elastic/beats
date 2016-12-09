@@ -1,22 +1,16 @@
 package docker
 
-type TlsConfig struct {
-	Enabled  bool   `config:"enabled"`
-	CaPath   string `config:"ca_path"`
-	CertPath string `config:"cert_path"`
-	KeyPath  string `config:"key_path"`
-}
-
 type Config struct {
-	Socket string `config:"socket"`
-	Tls    TlsConfig
+	TLS *TLSConfig `config:"ssl"`
 }
 
-func GetDefaultConf() *Config {
-	return &Config{
-		Socket: "unix:///var/run/docker.sock",
-		Tls: TlsConfig{
-			Enabled: false,
-		},
-	}
+type TLSConfig struct {
+	Enabled     *bool  `config:"enabled"`
+	CA          string `config:"certificate_authority"`
+	Certificate string `config:"certificate"`
+	Key         string `config:"key"`
+}
+
+func (c *TLSConfig) IsEnabled() bool {
+	return c != nil && (c.Enabled == nil || *c.Enabled)
 }

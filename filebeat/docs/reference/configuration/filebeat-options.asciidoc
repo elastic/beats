@@ -35,10 +35,16 @@ The value that you specify here is used as the `input_type` for each event publi
 
 ===== paths
 
-A list of glob-based paths that should be crawled and fetched. Filebeat supports all glob patterns that are supported by https://golang.org/pkg/path/filepath/#Glob[Golang Glob].
+A list of glob-based paths that should be crawled and fetched. All patterns
+supported by https://golang.org/pkg/path/filepath/#Glob[Golang Glob] are also
+supported here. For example, to fetch all files from a predefined level of
+subdirectories, the following pattern can be used: `/var/log/*/*.log`. This
+fetches all `.log` files from the subfolders of `/var/log`. It does not
+fetch log files from the `/var/log` folder itself. Currently it is not possible
+to recursively fetch all files in all subdirectories of a directory.
 
-Filebeat starts a harvester for
-each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
+Filebeat starts a harvester for each file that it finds under the specified
+paths. You can specify one path per line. Each line begins with a dash (-).
 
 ===== encoding
 
@@ -175,7 +181,7 @@ The files affected by this setting fall into two categories:
 * Files that were never harvested
 * Files that were harvested but weren't updated for longer than `ignore_older`
 
-When a file that has never been harvested is updated, the reading starts from the beginning of the file because no state has been persisted. For a file that has been harvested previously, the state still exists, so when the file is updated, reading continues at the last position.
+For files which were never seen before, the offset state is set to the end of the file. If a state already exist, the offset is not changed. In case a file is updated again later, reading continues at the set offset position.
 
 The `ignore_older` setting relies on the modification time of the file to determine if a file is ignored. If the modification time of the file is not updated when lines are written to a file (which can happen on Windows), the `ignore_older` setting may cause Filebeat to ignore files even though content was added at a later time.
 
@@ -227,7 +233,7 @@ WINDOWS:  If your Windows log rotation system shows errors because it can't rota
 
 WARNING: Only use this option if you understand that data loss is a potential side effect.
 
-When this option is enabled, Filebeat closes a file as soon as the end of a file is reached. This is useful when your files are only written once and not updated from time to time. For example, this happens when you are writing every single log event to a new file.
+When this option is enabled, Filebeat closes a file as soon as the end of a file is reached. This is useful when your files are only written once and not updated from time to time. For example, this happens when you are writing every single log event to a new file. This option is disabled by default.
 
 [[close-timeout]]
 ===== close_timeout
@@ -239,6 +245,8 @@ When this option is enabled, Filebeat gives every harvester a predefined lifetim
 When you use `close_timeout` for logs that contain multiline events, the harvester might stop in the middle of a multiline event, which means that only parts of the event will be sent. If the harvester is started again and the file still exists, only the second part of the event will be sent.
 
 The `close_timeout` setting won't apply if your output is stalled and no further events can be sent. At least one event must be sent after `close_timeout` elapses so the harvester can be closed after sending the event.
+
+This option is set to 0 by default which means it is disabled.
 
 
 [[clean-options]]
@@ -312,15 +320,10 @@ Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-json.message_key: log
 json.keys_under_root: true
 json.add_error_key: true
+json.message_key: log
 -------------------------------------------------------------------------------------
-
-
-*`message_key`*:: JSON key on which to apply the line filtering and multiline settings. This key must be top level
-and its value must be string, otherwise it is ignored. If no text key is defined, the line
-filtering and multiline features cannot be used.
 
 *`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key in the output document.
 If you enable this setting, the keys are copied top level in the output document. The default is false.
@@ -329,7 +332,14 @@ If you enable this setting, the keys are copied top level in the output document
 JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.) in case of conflicts.
 
 *`add_error_key`*:: If this setting is enabled, Filebeat adds a "json_error" key in case of JSON
-unmarshaling errors or when a text key is defined in the configuration but cannot be used.
+unmarshalling errors or when a `message_key` is defined in the configuration but cannot be used.
+
+*`message_key`*:: An optional configuration setting that specifies a JSON key on
+which to apply the line filtering and multiline settings. If specified the
+key must be at the top level in the JSON object and the value associated with
+the key must be a string, otherwise no filtering or multiline aggregation will
+occur.
+
 
 [[multiline]]
 ===== multiline
@@ -361,7 +371,8 @@ See <<multiline-examples>> for more configuration examples.
 
 You specify the following settings under `multiline` to control how Filebeat combines the lines in the message:
 
-*`pattern`*:: Specifies the regular expression pattern to match. See <<regexp-support>> for a list of supported regexp patterns.
+*`pattern`*:: Specifies the regular expression pattern to match. Note that the regexp patterns supported by Filebeat differ
+somewhat from the patterns supported by Logstash. See <<regexp-support>> for a list of supported regexp patterns.
 
 *`negate`*:: Defines whether the pattern is negated. The default is `false`.
 
@@ -468,13 +479,17 @@ the specified value.
 filebeat.spool_size: 2048
 -------------------------------------------------------------------------------------
 
+See <<load-balancing>> for more information about how this setting affects load balancing.
 
 ===== publish_async
+
+experimental[]
 
 If enabled, the publisher pipeline in Filebeat operates in async mode preparing
 a new batch of lines while waiting for ACK. This option can improve load-balancing
 throughput at the cost of increased memory usage. The default value is false.
 
+See <<load-balancing>> for more information about how this setting affects load balancing.
 
 ===== idle_timeout
 
@@ -517,6 +532,34 @@ If the specified path is not absolute, it is considered relative to the configur
 filebeat.config_dir: path/to/configs
 -------------------------------------------------------------------------------------
 
+[[shutdown-timeout]]
+===== shutdown_timeout
+
+How long Filebeat waits on shutdown for the publisher to finish sending events
+before Filebeat shuts down.
+
+By default, this option is disabled, and Filebeat does not wait for the
+publisher to finish sending events before shutting down. This means that any
+events sent to the output, but not acknowledged before Filebeat shuts down,
+are sent again when you restart Filebeat. For more details about how this
+works, see <<at-least-once-delivery>>.
+
+You can configure the `shutdown_timeout` option to specify the maximum amount
+of time that Filebeat waits for the publisher to finish sending events before
+shutting down. If all events are acknowledged before `shutdown_timeout` is
+reached, Filebeat will shut down.
+
+There is no recommended setting for this option because determining the correct
+value for `shutdown_timeout` depends heavily on the environment in which
+Filebeat is running and the current state of the output.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.shutdown_timeout: 5s
+-------------------------------------------------------------------------------------
+
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
 include::../../../../libbeat/docs/processors-config.asciidoc[]
@@ -527,26 +570,3 @@ include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
-
-===== shutdown_timeout
-
-`shutdown_timeout` defines how long filebeat waits on shutdown for the publisher to finish.
-
-In case the defined output is blocked and does not confirm all events, filebeat keeps resending the events
-before the confirmation is persisted to disk in the registrar. Waiting on the output to acknowledge all events
-can take seconds or much longer depending on the state of the output. To still be able to shutdown filebeat, filebeat
-does not wait for the confirmation of all events on shutdown. This means the state for events which were sent but
-not acked yet, will not be persisted to disk. This can lead to the issue that some events are sent again on starting
-filebeat afterwards as the events ended up at the receiving end but filebeat was already stopped when the acked arrived.
-
-With `shutdown_timeout` a timeout can be defined what the maximum time should be that filebeat waits for the complete
-sending of all events in the pipeline. Should all events be acked before `shutdown_timeout` is reached, filebeat will
-already shutdown. The right value for `shutdown_timeout` heavily depends on the environment in which filebeat is running
-and the current state of the output.
-
-By default this is disable and filebeat shuts down without waiting for the completion of sending events.
-
-[source,yaml]
--------------------------------------------------------------------------------------
-filebeat.shutdown_timeout: 5s
--------------------------------------------------------------------------------------

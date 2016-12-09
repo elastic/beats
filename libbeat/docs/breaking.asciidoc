@@ -1,0 +1,113 @@
+[[breaking-changes]]
+== Breaking Changes
+
+As a general rule, we strive to keep backwards compatibility between minor
+versions (e.g.  5.x to 5.y) so you can upgrade without any configuration file
+changes, but there are breaking changes between major versions (e.g. 5.x to
+6.y).
+
+* <<breaking-changes-5.0>>
+
+We also list the breaking changes at the top of the <<release-notes,release notes>>
+for each version.
+
+[[breaking-changes-5.0]]
+=== Breaking Changes in 5.0
+
+This section discusses the changes that you should be aware of if you upgrade
+the Beats from version 1.x to 5.x.
+
+==== URL changes for DEB/RPM packages
+
+The previous `packages.elastic.co` URL has been altered to `artifacts.elastic.co`. 
+Ensure you update your repository files before running the upgrade process, or 
+your operating system may not see the new packages.
+
+==== Configuration File Changes
+
+Beats 5.0 comes with a more powerful and more robust <<config-file-format,file
+configuration format>>. While this necessarily causes a few breaking changes, we
+provide a migration script that should make upgrading easy. Please see the
+<<upgrading>> section.
+
+For consistency and clarity, all configuration options that are specific to a
+particular Beat are now prefixed by the name of the Beat. For example, the
+`interfaces.device` option from Packetbeat becomes
+`packetbeat.interfaces.device`. This change is made automatically by the
+migration script.
+
+Similarly, common settings available in all Beats are now top level. As part of
+this effort, the options under the `shipper` section are moved to the top level. For
+example, the `shipper.name` settings becomes `name`. This change is made
+automatically by the migration script.
+
+For consistency with the rest of the Elastic stack, several TLS/SSL related
+options where changed:
+
+* the name of the section was renamed from `tls` to `ssl`
+* `certificate_key` was renamed to `key`
+* `insecure` was replaced by `verification_mode`
+* `min_version` and `max_version` were replaced with `supported_protocols`
+
+These changes are made automatically by the migration script.
+
+In Filebeat, we refactored the configuration around when to close and when to
+start ignoring files. Options like `close_older` and `force_close_older` were
+changed or replaced with options from the `close_*` group. See the
+{filebeat}/how-filebeat-works.html[How Filebeat Works] docs for details. These
+changes are not made automatically by the migration script.
+
+==== Field Renames
+
+Beats 5.0 also comes with several changes in the exported fields. If you are
+using these fields in Kibana dashboards, you will likely need to adjust the
+dashbaords.
+
+Changes:
+
+[options="header",]
+|==========================================================
+| Location | Old name | New Name
+| Packetbeat HTTP module | http.phrase | http.response.phrase
+| Packetbeat HTTP module | http.code | http.response.code
+| Packetbeat HTTP module | http.response_headers | http.response.headers
+| Packetbeat HTTP module | http.request_headers | http.request.headers
+| Packetbeat HTTP module | http.params | http.request.params
+| Packetbeat HTTP module | http.content_length | http.response.headers.content-length
+| Packetbeat HTTP module | http.content_length | http.response.headers.content-length
+| Packetbeat DNS module | dns.flags.recursion_allowed | dns.flags.recursion_available
+| Packetbeat DNS module | dns.flags.recursion_allowed | dns.flags.recursion_available
+|==========================================================
+
+In addition, the unused `count` field was removed from all Packetbeat modules.
+
+==== Installation Paths
+
+For 5.0 we have refactored the {filebeat}/directory-layout.html[directory
+layout] of the Beats, so they are more consistent and in-line with the best
+practices of each operating system.
+
+A notable change is that on the DEB/RPM installations, the binary is no longer
+installed in `/usr/bin` but in `/usr/share/<beatname>/bin`. Instead, a simple
+shell script is placed under `/usr/bin` that is helpful for executing the Beat
+in foreground. It also sets the path settings to the same values as the init
+script would use.
+
+For example, here are the contents of the `/usr/bin/filebeat.sh` script:
+
+
+[source,shell]
+------------------------------------------------------------------------------
+> cat /usr/bin/filebeat.sh
+#!/bin/bash
+
+# Script to run filebeat in foreground with the same path settings that
+# the init script / systemd unit file would do.
+
+/usr/share/filebeat/bin/filebeat \
+  -path.home /usr/share/filebeat \
+  -path.config /etc/filebeat \
+  -path.data /var/lib/filebeat \
+  -path.logs /var/log/filebeat \
+  $@
+------------------------------------------------------------------------------

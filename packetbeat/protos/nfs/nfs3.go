@@ -1,6 +1,6 @@
 package nfs
 
-var nfs_opnum3 = [...]string{
+var nfsOpnum3 = [...]string{
 	"NULL",
 	"GETATTR",
 	"SETATTR",
@@ -25,10 +25,9 @@ var nfs_opnum3 = [...]string{
 	"COMMIT",
 }
 
-func (nfs *Nfs) getV3Opcode(proc int) string {
-	if proc < len(nfs_opnum3) {
-		return nfs_opnum3[proc]
-	} else {
-		return "ILLEGAL"
+func (nfs *nfs) getV3Opcode(proc int) string {
+	if proc < len(nfsOpnum3) {
+		return nfsOpnum3[proc]
 	}
+	return "ILLEGAL"
 }

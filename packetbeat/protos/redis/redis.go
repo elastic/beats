@@ -18,11 +18,11 @@ import (
 type stream struct {
 	applayer.Stream
 	parser   parser
-	tcptuple *common.TcpTuple
+	tcptuple *common.TCPTuple
 }
 
 type redisConnectionData struct {
-	Streams   [2]*stream
+	streams   [2]*stream
 	requests  messageList
 	responses messageList
 }
@@ -32,11 +32,11 @@ type messageList struct {
 }
 
 // Redis protocol plugin
-type Redis struct {
+type redisPlugin struct {
 	// config
-	Ports        []int
-	SendRequest  bool
-	SendResponse bool
+	ports        []int
+	sendRequest  bool
+	sendResponse bool
 
 	transactionTimeout time.Duration
 
@@ -61,7 +61,7 @@ func New(
 	results publish.Transactions,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
-	p := &Redis{}
+	p := &redisPlugin{}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -75,7 +75,7 @@ func New(
 	return p, nil
 }
 
-func (redis *Redis) init(results publish.Transactions, config *redisConfig) error {
+func (redis *redisPlugin) init(results publish.Transactions, config *redisConfig) error {
 	redis.setFromConfig(config)
 
 	redis.results = results
@@ -84,15 +84,15 @@ func (redis *Redis) init(results publish.Transactions, config *redisConfig) erro
 	return nil
 }
 
-func (redis *Redis) setFromConfig(config *redisConfig) {
-	redis.Ports = config.Ports
-	redis.SendRequest = config.SendRequest
-	redis.SendResponse = config.SendResponse
+func (redis *redisPlugin) setFromConfig(config *redisConfig) {
+	redis.ports = config.Ports
+	redis.sendRequest = config.SendRequest
+	redis.sendResponse = config.SendResponse
 	redis.transactionTimeout = config.TransactionTimeout
 }
 
-func (redis *Redis) GetPorts() []int {
-	return redis.Ports
+func (redis *redisPlugin) GetPorts() []int {
+	return redis.ports
 }
 
 func (s *stream) PrepareForNewMessage() {
@@ -101,13 +101,13 @@ func (s *stream) PrepareForNewMessage() {
 	parser.reset()
 }
 
-func (redis *Redis) ConnectionTimeout() time.Duration {
+func (redis *redisPlugin) ConnectionTimeout() time.Duration {
 	return redis.transactionTimeout
 }
 
-func (redis *Redis) Parse(
+func (redis *redisPlugin) Parse(
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
@@ -139,17 +139,17 @@ func ensureRedisConnection(private protos.ProtocolData) *redisConnectionData {
 	return priv
 }
 
-func (redis *Redis) doParse(
+func (redis *redisPlugin) doParse(
 	conn *redisConnectionData,
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *redisConnectionData {
 
-	st := conn.Streams[dir]
+	st := conn.streams[dir]
 	if st == nil {
 		st = newStream(pkt.Ts, tcptuple)
-		conn.Streams[dir] = st
+		conn.streams[dir] = st
 		if isDebug {
 			debugf("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
 		}
@@ -174,7 +174,7 @@ func (redis *Redis) doParse(
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
-			conn.Streams[dir] = nil
+			conn.streams[dir] = nil
 			if isDebug {
 				debugf("Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
 			}
@@ -188,10 +188,10 @@ func (redis *Redis) doParse(
 
 		msg := st.parser.message
 		if isDebug {
-			if msg.IsRequest {
-				debugf("REDIS (%p) request message: %s", conn, msg.Message)
+			if msg.isRequest {
+				debugf("REDIS (%p) request message: %s", conn, msg.message)
 			} else {
-				debugf("REDIS (%p) response message: %s", conn, msg.Message)
+				debugf("REDIS (%p) response message: %s", conn, msg.message)
 			}
 		}
 
@@ -203,30 +203,30 @@ func (redis *Redis) doParse(
 	return conn
 }
 
-func newStream(ts time.Time, tcptuple *common.TcpTuple) *stream {
+func newStream(ts time.Time, tcptuple *common.TCPTuple) *stream {
 	s := &stream{
 		tcptuple: tcptuple,
 	}
 	s.parser.message = newMessage(ts)
-	s.Stream.Init(tcp.TCP_MAX_DATA_IN_STREAM)
+	s.Stream.Init(tcp.TCPMaxDataInStream)
 	return s
 }
 
 func newMessage(ts time.Time) *redisMessage {
-	return &redisMessage{Ts: ts}
+	return &redisMessage{ts: ts}
 }
 
-func (redis *Redis) handleRedis(
+func (redis *redisPlugin) handleRedis(
 	conn *redisConnectionData,
 	m *redisMessage,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 ) {
-	m.TcpTuple = *tcptuple
-	m.Direction = dir
-	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
+	m.tcpTuple = *tcptuple
+	m.direction = dir
+	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
 
-	if m.IsRequest {
+	if m.isRequest {
 		conn.requests.append(m) // wait for response
 	} else {
 		conn.responses.append(m)
@@ -234,7 +234,7 @@ func (redis *Redis) handleRedis(
 	}
 }
 
-func (redis *Redis) correlate(conn *redisConnectionData) {
+func (redis *redisPlugin) correlate(conn *redisConnectionData) {
 	// drop responses with missing requests
 	if conn.requests.empty() {
 		for !conn.responses.empty() {
@@ -257,65 +257,65 @@ func (redis *Redis) correlate(conn *redisConnectionData) {
 	}
 }
 
-func (redis *Redis) newTransaction(requ, resp *redisMessage) common.MapStr {
+func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) common.MapStr {
 	error := common.OK_STATUS
-	if resp.IsError {
+	if resp.isError {
 		error = common.ERROR_STATUS
 	}
 
 	var returnValue map[string]common.NetString
-	if resp.IsError {
+	if resp.isError {
 		returnValue = map[string]common.NetString{
-			"error": resp.Message,
+			"error": resp.message,
 		}
 	} else {
 		returnValue = map[string]common.NetString{
-			"return_value": resp.Message,
+			"return_value": resp.message,
 		}
 	}
 
 	src := &common.Endpoint{
-		Ip:   requ.TcpTuple.Src_ip.String(),
-		Port: requ.TcpTuple.Src_port,
-		Proc: string(requ.CmdlineTuple.Src),
+		IP:   requ.tcpTuple.SrcIP.String(),
+		Port: requ.tcpTuple.SrcPort,
+		Proc: string(requ.cmdlineTuple.Src),
 	}
 	dst := &common.Endpoint{
-		Ip:   requ.TcpTuple.Dst_ip.String(),
-		Port: requ.TcpTuple.Dst_port,
-		Proc: string(requ.CmdlineTuple.Dst),
+		IP:   requ.tcpTuple.DstIP.String(),
+		Port: requ.tcpTuple.DstPort,
+		Proc: string(requ.cmdlineTuple.Dst),
 	}
-	if requ.Direction == tcp.TcpDirectionReverse {
+	if requ.direction == tcp.TCPDirectionReverse {
 		src, dst = dst, src
 	}
 
 	// resp_time in milliseconds
-	responseTime := int32(resp.Ts.Sub(requ.Ts).Nanoseconds() / 1e6)
+	responseTime := int32(resp.ts.Sub(requ.ts).Nanoseconds() / 1e6)
 
 	event := common.MapStr{
-		"@timestamp":   common.Time(requ.Ts),
+		"@timestamp":   common.Time(requ.ts),
 		"type":         "redis",
 		"status":       error,
 		"responsetime": responseTime,
 		"redis":        returnValue,
-		"method":       common.NetString(bytes.ToUpper(requ.Method)),
-		"resource":     requ.Path,
-		"query":        requ.Message,
-		"bytes_in":     uint64(requ.Size),
-		"bytes_out":    uint64(resp.Size),
+		"method":       common.NetString(bytes.ToUpper(requ.method)),
+		"resource":     requ.path,
+		"query":        requ.message,
+		"bytes_in":     uint64(requ.size),
+		"bytes_out":    uint64(resp.size),
 		"src":          src,
 		"dst":          dst,
 	}
-	if redis.SendRequest {
-		event["request"] = requ.Message
+	if redis.sendRequest {
+		event["request"] = requ.message
 	}
-	if redis.SendResponse {
-		event["response"] = resp.Message
+	if redis.sendResponse {
+		event["response"] = resp.message
 	}
 
 	return event
 }
 
-func (redis *Redis) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (redis *redisPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	// tsg: being packet loss tolerant is probably not very useful for Redis,
@@ -324,7 +324,7 @@ func (redis *Redis) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	return private, true
 }
 
-func (redis *Redis) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+func (redis *redisPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
 	// TODO: check if we have pending data that we can send up the stack

@@ -121,6 +121,7 @@ PS C:\Program Files\Winlogbeat> .\winlogbeat.exe -c .\winlogbeat.yml -configtest
 [[config-winlogbeat-logstash]]
 === Step 3: Configuring Winlogbeat to Use Logstash
 
+:win:
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[winlogbeat-template]]

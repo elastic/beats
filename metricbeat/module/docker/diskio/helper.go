@@ -3,19 +3,19 @@ package diskio
 import (
 	"time"
 
-	dc "github.com/fsouza/go-dockerclient"
-
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/docker"
+
+	dc "github.com/fsouza/go-dockerclient"
 )
 
 type BlkioStats struct {
-	Time        time.Time
-	MyContainer *docker.Container
-	reads       float64
-	writes      float64
-	totals      float64
+	Time      time.Time
+	Container *docker.Container
+	reads     float64
+	writes    float64
+	totals    float64
 }
+
 type BlkioCalculator interface {
 	getReadPs(old *BlkioRaw, new *BlkioRaw) float64
 	getWritePs(old *BlkioRaw, new *BlkioRaw) float64
@@ -28,47 +28,38 @@ type BlkioRaw struct {
 	writes uint64
 	totals uint64
 }
+
 type BLkioService struct {
 	BlkioSTatsPerContainer map[string]BlkioRaw
 }
 
-func (io *BLkioService) GetBlkioStatsList(rawStats []docker.DockerStat) []BlkioStats {
-	formatedStats := []BlkioStats{}
-	if len(rawStats) != 0 {
-		for _, myRawStats := range rawStats {
-			formatedStats = append(formatedStats, io.getBlkioStats(&myRawStats))
-		}
-	} else {
-		logp.Info("No container is running")
-	}
-	return formatedStats
-}
-func (io *BLkioService) getBlkioStats(myRawStat *docker.DockerStat) BlkioStats {
+func (io *BLkioService) getBlkioStatsList(rawStats []docker.Stat) []BlkioStats {
+	formattedStats := []BlkioStats{}
 
-	myBlkioStats := BlkioStats{}
+	for _, myRawStats := range rawStats {
+		formattedStats = append(formattedStats, io.getBlkioStats(&myRawStats))
+	}
+
+	return formattedStats
+}
+
+func (io *BLkioService) getBlkioStats(myRawStat *docker.Stat) BlkioStats {
 	newBlkioStats := io.getNewStats(myRawStat.Stats.Read, myRawStat.Stats.BlkioStats.IOServicedRecursive)
 	oldBlkioStats, exist := io.BlkioSTatsPerContainer[myRawStat.Container.ID]
 
-	if exist {
-		myBlkioStats = BlkioStats{
-			Time:        myRawStat.Stats.Read,
-			MyContainer: docker.InitCurrentContainer(&myRawStat.Container),
-			reads:       io.getReadPs(&oldBlkioStats, &newBlkioStats),
-			writes:      io.getWritePs(&oldBlkioStats, &newBlkioStats),
-			totals:      io.getReadPs(&oldBlkioStats, &newBlkioStats),
-		}
-	} else {
-		myBlkioStats = BlkioStats{
-			Time:        myRawStat.Stats.Read,
-			MyContainer: docker.InitCurrentContainer(&myRawStat.Container),
-			reads:       0,
-			writes:      0,
-			totals:      0,
-		}
+	myBlkioStats := BlkioStats{
+		Time:      myRawStat.Stats.Read,
+		Container: docker.NewContainer(&myRawStat.Container),
 	}
-	if _, exist := io.BlkioSTatsPerContainer[myRawStat.Container.ID]; !exist {
+
+	if exist {
+		myBlkioStats.reads = io.getReadPs(&oldBlkioStats, &newBlkioStats)
+		myBlkioStats.writes = io.getWritePs(&oldBlkioStats, &newBlkioStats)
+		myBlkioStats.totals = io.getReadPs(&oldBlkioStats, &newBlkioStats)
+	} else {
 		io.BlkioSTatsPerContainer = make(map[string]BlkioRaw)
 	}
+
 	io.BlkioSTatsPerContainer[myRawStat.Container.ID] = newBlkioStats
 
 	return myBlkioStats
@@ -95,17 +86,23 @@ func (io *BLkioService) getNewStats(time time.Time, blkioEntry []dc.BlkioStatsEn
 
 func (io *BLkioService) getReadPs(old *BlkioRaw, new *BlkioRaw) float64 {
 	duration := new.Time.Sub(old.Time)
-	return io.calculatePerSecond(duration, old.reads, new.reads)
-}
-func (io *BLkioService) getWritePs(old *BlkioRaw, new *BlkioRaw) float64 {
-	duration := new.Time.Sub(old.Time)
-	return io.calculatePerSecond(duration, old.writes, new.writes)
-}
-func (io *BLkioService) getTotalPs(old *BlkioRaw, new *BlkioRaw) float64 {
-	duration := new.Time.Sub(old.Time)
-	return io.calculatePerSecond(duration, old.totals, new.totals)
+	return calculatePerSecond(duration, old.reads, new.reads)
 }
 
-func (io *BLkioService) calculatePerSecond(duration time.Duration, old uint64, new uint64) float64 {
-	return float64(new-old) / duration.Seconds()
+func (io *BLkioService) getWritePs(old *BlkioRaw, new *BlkioRaw) float64 {
+	duration := new.Time.Sub(old.Time)
+	return calculatePerSecond(duration, old.writes, new.writes)
+}
+
+func (io *BLkioService) getTotalPs(old *BlkioRaw, new *BlkioRaw) float64 {
+	duration := new.Time.Sub(old.Time)
+	return calculatePerSecond(duration, old.totals, new.totals)
+}
+
+func calculatePerSecond(duration time.Duration, old uint64, new uint64) float64 {
+	value := float64(new) - float64(old)
+	if value < 0 {
+		value = 0
+	}
+	return value / duration.Seconds()
 }

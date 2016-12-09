@@ -3,27 +3,27 @@ package network
 import (
 	"time"
 
-	dc "github.com/fsouza/go-dockerclient"
-
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/docker"
+
+	dc "github.com/fsouza/go-dockerclient"
 )
 
-type NETService struct {
-	NetworkStatPerContainer map[string]map[string]NETRaw
-}
-type NetworkCalculator interface {
-	getRxBytesPerSecond(newStats *NETRaw, oldStats *NETRaw) float64
-	getRxDroppedPerSecond(newStats *NETRaw, oldStats *NETRaw) float64
-	getRxErrorsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64
-	getRxPacketsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64
-	getTxBytesPerSecond(newStats *NETRaw, oldStats *NETRaw) float64
-	getTxDroppedPerSecond(newStats *NETRaw, oldStats *NETRaw) float64
-	getTxErrorsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64
-	getTxPacketsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64
+type NetService struct {
+	NetworkStatPerContainer map[string]map[string]NetRaw
 }
 
-type NETRaw struct {
+type NetworkCalculator interface {
+	getRxBytesPerSecond(newStats *NetRaw, oldStats *NetRaw) float64
+	getRxDroppedPerSecond(newStats *NetRaw, oldStats *NetRaw) float64
+	getRxErrorsPerSecond(newStats *NetRaw, oldStats *NetRaw) float64
+	getRxPacketsPerSecond(newStats *NetRaw, oldStats *NetRaw) float64
+	getTxBytesPerSecond(newStats *NetRaw, oldStats *NetRaw) float64
+	getTxDroppedPerSecond(newStats *NetRaw, oldStats *NetRaw) float64
+	getTxErrorsPerSecond(newStats *NetRaw, oldStats *NetRaw) float64
+	getTxPacketsPerSecond(newStats *NetRaw, oldStats *NetRaw) float64
+}
+
+type NetRaw struct {
 	Time      time.Time
 	RxBytes   uint64
 	RxDropped uint64
@@ -34,9 +34,10 @@ type NETRaw struct {
 	TxErrors  uint64
 	TxPackets uint64
 }
-type NETstats struct {
+
+type NetStats struct {
 	Time          time.Time
-	MyContainer   *docker.Container
+	Container     *docker.Container
 	NameInterface string
 	RxBytes       float64
 	RxDropped     float64
@@ -48,64 +49,47 @@ type NETstats struct {
 	TxPackets     float64
 }
 
-func (NT *NETService) GetNetworkStatsPerContainer(rawStats []docker.DockerStat) []NETstats {
-	formatedStats := []NETstats{}
-	if len(rawStats) != 0 {
-		for _, myStats := range rawStats {
-			for nameInterface, rawnNetStats := range myStats.Stats.Networks {
-				formatedStats = append(formatedStats, NT.getNetworkStats(nameInterface, &rawnNetStats, &myStats))
-			}
+func (n *NetService) getNetworkStatsPerContainer(rawStats []docker.Stat) []NetStats {
+	formattedStats := []NetStats{}
+	for _, myStats := range rawStats {
+		for nameInterface, rawnNetStats := range myStats.Stats.Networks {
+			formattedStats = append(formattedStats, n.getNetworkStats(nameInterface, &rawnNetStats, &myStats))
 		}
-	} else {
-		logp.Info("No container is running")
 	}
-	return formatedStats
-}
-func (NT *NETService) getNetworkStats(nameInterface string, rawNetStats *dc.NetworkStats, myRawstats *docker.DockerStat) NETstats {
 
-	myNETstats := NETstats{}
-	newNetworkStats := getNewNetRAw(myRawstats.Stats.Read, rawNetStats)
-	oldNetworkStat, exist := NT.NetworkStatPerContainer[myRawstats.Container.ID][nameInterface]
+	return formattedStats
+}
+
+func (n *NetService) getNetworkStats(nameInterface string, rawNetStats *dc.NetworkStats, myRawstats *docker.Stat) NetStats {
+	newNetworkStats := createNetRaw(myRawstats.Stats.Read, rawNetStats)
+	oldNetworkStat, exist := n.NetworkStatPerContainer[myRawstats.Container.ID][nameInterface]
+
+	netStats := NetStats{
+		Container:     docker.NewContainer(&myRawstats.Container),
+		Time:          myRawstats.Stats.Read,
+		NameInterface: nameInterface,
+	}
+
 	if exist {
-		myNETstats = NETstats{
-			MyContainer:   docker.InitCurrentContainer(&myRawstats.Container),
-			Time:          myRawstats.Stats.Read,
-			NameInterface: nameInterface,
-			RxBytes:       NT.getRxBytesPerSecond(&newNetworkStats, &oldNetworkStat),
-			RxDropped:     NT.getRxDroppedPerSecond(&newNetworkStats, &oldNetworkStat),
-			RxErrors:      NT.getRxErrorsPerSecond(&newNetworkStats, &oldNetworkStat),
-			RxPackets:     NT.getRxPacketsPerSecond(&newNetworkStats, &oldNetworkStat),
-			TxBytes:       NT.getTxBytesPerSecond(&newNetworkStats, &oldNetworkStat),
-			TxDropped:     NT.getTxDroppedPerSecond(&newNetworkStats, &oldNetworkStat),
-			TxErrors:      NT.getTxErrorsPerSecond(&newNetworkStats, &oldNetworkStat),
-			TxPackets:     NT.getTxPacketsPerSecond(&newNetworkStats, &oldNetworkStat),
-		}
+		netStats.RxBytes = n.getRxBytesPerSecond(&newNetworkStats, &oldNetworkStat)
+		netStats.RxDropped = n.getRxDroppedPerSecond(&newNetworkStats, &oldNetworkStat)
+		netStats.RxErrors = n.getRxErrorsPerSecond(&newNetworkStats, &oldNetworkStat)
+		netStats.RxPackets = n.getRxPacketsPerSecond(&newNetworkStats, &oldNetworkStat)
+		netStats.TxBytes = n.getTxBytesPerSecond(&newNetworkStats, &oldNetworkStat)
+		netStats.TxDropped = n.getTxDroppedPerSecond(&newNetworkStats, &oldNetworkStat)
+		netStats.TxErrors = n.getTxErrorsPerSecond(&newNetworkStats, &oldNetworkStat)
+		netStats.TxPackets = n.getTxPacketsPerSecond(&newNetworkStats, &oldNetworkStat)
 	} else {
-		myNETstats = NETstats{
-			MyContainer:   docker.InitCurrentContainer(&myRawstats.Container),
-			Time:          myRawstats.Stats.Read,
-			NameInterface: nameInterface,
-			RxBytes:       0,
-			RxDropped:     0,
-			RxErrors:      0,
-			RxPackets:     0,
-			TxBytes:       0,
-			TxDropped:     0,
-			TxErrors:      0,
-			TxPackets:     0,
-		}
+		n.NetworkStatPerContainer[myRawstats.Container.ID] = make(map[string]NetRaw)
 	}
-	if _, exist := NT.NetworkStatPerContainer[myRawstats.Container.ID]; !exist {
-		NT.NetworkStatPerContainer[myRawstats.Container.ID] = make(map[string]NETRaw)
-	}
-	NT.NetworkStatPerContainer[myRawstats.Container.ID][nameInterface] = newNetworkStats
 
-	return myNETstats
+	n.NetworkStatPerContainer[myRawstats.Container.ID][nameInterface] = newNetworkStats
 
+	return netStats
 }
 
-func getNewNetRAw(time time.Time, stats *dc.NetworkStats) NETRaw {
-	return NETRaw{
+func createNetRaw(time time.Time, stats *dc.NetworkStats) NetRaw {
+	return NetRaw{
 		Time:      time,
 		RxBytes:   stats.RxBytes,
 		RxDropped: stats.RxDropped,
@@ -116,49 +100,59 @@ func getNewNetRAw(time time.Time, stats *dc.NetworkStats) NETRaw {
 		TxErrors:  stats.TxErrors,
 		TxPackets: stats.TxPackets,
 	}
-
 }
-func (NT *NETService) checkStats(containerID string, nameInterface string) bool {
-	if _, exist := NT.NetworkStatPerContainer[containerID][nameInterface]; exist {
+
+func (n *NetService) checkStats(containerID string, nameInterface string) bool {
+	if _, exist := n.NetworkStatPerContainer[containerID][nameInterface]; exist {
 		return true
 	}
 	return false
-
 }
 
-func (NT *NETService) getRxBytesPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
+func (n *NetService) getRxBytesPerSecond(newStats *NetRaw, oldStats *NetRaw) float64 {
 	duration := newStats.Time.Sub(oldStats.Time)
-	return NT.calculatePerSecond(duration, oldStats.RxBytes, newStats.RxBytes)
-}
-func (NT *NETService) getRxDroppedPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
-	duration := newStats.Time.Sub(oldStats.Time)
-	return NT.calculatePerSecond(duration, oldStats.RxDropped, newStats.RxDropped)
-}
-func (NT *NETService) getRxErrorsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
-	duration := newStats.Time.Sub(oldStats.Time)
-	return NT.calculatePerSecond(duration, oldStats.RxErrors, newStats.RxErrors)
-}
-func (NT *NETService) getRxPacketsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
-	duration := newStats.Time.Sub(oldStats.Time)
-	return NT.calculatePerSecond(duration, oldStats.RxPackets, newStats.RxPackets)
-}
-func (NT *NETService) getTxBytesPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
-	duration := newStats.Time.Sub(oldStats.Time)
-	return NT.calculatePerSecond(duration, oldStats.TxBytes, newStats.TxBytes)
-}
-func (NT *NETService) getTxDroppedPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
-	duration := newStats.Time.Sub(oldStats.Time)
-	return NT.calculatePerSecond(duration, oldStats.TxDropped, newStats.TxDropped)
-}
-func (NT *NETService) getTxErrorsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
-	duration := newStats.Time.Sub(oldStats.Time)
-	return NT.calculatePerSecond(duration, oldStats.TxErrors, newStats.TxErrors)
-}
-func (NT *NETService) getTxPacketsPerSecond(newStats *NETRaw, oldStats *NETRaw) float64 {
-	duration := newStats.Time.Sub(oldStats.Time)
-	return NT.calculatePerSecond(duration, oldStats.TxPackets, newStats.TxPackets)
+	return n.calculatePerSecond(duration, oldStats.RxBytes, newStats.RxBytes)
 }
 
-func (NT *NETService) calculatePerSecond(duration time.Duration, oldValue uint64, newValue uint64) float64 {
-	return float64((newValue - oldValue)) / duration.Seconds()
+func (n *NetService) getRxDroppedPerSecond(newStats *NetRaw, oldStats *NetRaw) float64 {
+	duration := newStats.Time.Sub(oldStats.Time)
+	return n.calculatePerSecond(duration, oldStats.RxDropped, newStats.RxDropped)
+}
+
+func (n *NetService) getRxErrorsPerSecond(newStats *NetRaw, oldStats *NetRaw) float64 {
+	duration := newStats.Time.Sub(oldStats.Time)
+	return n.calculatePerSecond(duration, oldStats.RxErrors, newStats.RxErrors)
+}
+
+func (n *NetService) getRxPacketsPerSecond(newStats *NetRaw, oldStats *NetRaw) float64 {
+	duration := newStats.Time.Sub(oldStats.Time)
+	return n.calculatePerSecond(duration, oldStats.RxPackets, newStats.RxPackets)
+}
+
+func (n *NetService) getTxBytesPerSecond(newStats *NetRaw, oldStats *NetRaw) float64 {
+	duration := newStats.Time.Sub(oldStats.Time)
+	return n.calculatePerSecond(duration, oldStats.TxBytes, newStats.TxBytes)
+}
+
+func (n *NetService) getTxDroppedPerSecond(newStats *NetRaw, oldStats *NetRaw) float64 {
+	duration := newStats.Time.Sub(oldStats.Time)
+	return n.calculatePerSecond(duration, oldStats.TxDropped, newStats.TxDropped)
+}
+
+func (n *NetService) getTxErrorsPerSecond(newStats *NetRaw, oldStats *NetRaw) float64 {
+	duration := newStats.Time.Sub(oldStats.Time)
+	return n.calculatePerSecond(duration, oldStats.TxErrors, newStats.TxErrors)
+}
+
+func (n *NetService) getTxPacketsPerSecond(newStats *NetRaw, oldStats *NetRaw) float64 {
+	duration := newStats.Time.Sub(oldStats.Time)
+	return n.calculatePerSecond(duration, oldStats.TxPackets, newStats.TxPackets)
+}
+
+func (n *NetService) calculatePerSecond(duration time.Duration, oldValue uint64, newValue uint64) float64 {
+	value := float64(newValue) - float64(oldValue)
+	if value < 0 {
+		value = 0
+	}
+	return value / duration.Seconds()
 }

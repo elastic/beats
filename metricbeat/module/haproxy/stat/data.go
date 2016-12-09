@@ -11,95 +11,104 @@ import (
 
 var (
 	schema = s.Schema{
-		"pxname":         c.Str("PxName"),
-		"svname":         c.Str("SvName"),
-		"qcur":           c.Int("Qcur"),
-		"qmax":           c.Int("Qmax"),
-		"scur":           c.Int("Scur"),
-		"smax":           c.Int("Smax"),
-		"slim":           c.Int("Slim"),
-		"stot":           c.Int("Stot"),
-		"bin":            c.Int("Bin"),
-		"bout":           c.Int("Bout"),
-		"dreq":           c.Int("Dreq"),
-		"dresp":          c.Int("Dresp"),
-		"ereq":           c.Int("Ereq"),
-		"econ":           c.Int("Econ"),
-		"eresp":          c.Int("Eresp"),
-		"wretr":          c.Int("Wretr"),
-		"wredis":         c.Int("Wredis"),
 		"status":         c.Str("Status"),
-		"weight":         c.Int("Weight"),
-		"act":            c.Int("Act"),
-		"bck":            c.Int("Bck"),
-		"chkfail":        c.Int("ChkFail"),
-		"chkdown":        c.Int("ChkDown"),
-		"lastchg":        c.Int("Lastchg"),
-		"downtime":       c.Int("Downtime"),
-		"qlimit":         c.Int("Qlimit"),
-		"pid":            c.Int("Pid"),
-		"iid":            c.Int("Iid"),
-		"sid":            c.Int("Sid"),
-		"throttle":       c.Int("Throttle"),
-		"lbtot":          c.Int("Lbtot"),
-		"tracked":        c.Int("Tracked"),
+		"weight":         c.Int("Weight", s.Optional),
+		"downtime":       c.Int("Downtime", s.Optional),
 		"component_type": c.Int("Type"),
+		"process_id":     c.Int("Pid"),
+		"service_name":   c.Str("SvName"),
+		"in.bytes":       c.Int("Bin"),
+		"out.bytes":      c.Int("Bout"),
+		"last_change":    c.Int("Lastchg", s.Optional),
+		"throttle.pct":   c.Int("Throttle", s.Optional),
+		"selected.total": c.Int("Lbtot", s.Optional),
+		"tracked.id":     c.Int("Tracked", s.Optional),
 
-		"rate": s.Object{
-			"value": c.Int("Rate"),
-			"lim":   c.Int("RateLim"),
-			"max":   c.Int("RateMax"),
+		"connection": s.Object{
+			"total":    c.Int("Stot"),
+			"retried":  c.Int("Wretr", s.Optional),
+			"time.avg": c.Int("Ctime", s.Optional),
+		},
+
+		"request": s.Object{
+			"denied":            c.Int("Dreq", s.Optional),
+			"queued.current":    c.Int("Qcur", s.Optional),
+			"queued.max":        c.Int("Qmax", s.Optional),
+			"errors":            c.Int("Ereq", s.Optional),
+			"redispatched":      c.Int("Wredis", s.Optional),
+			"connection.errors": c.Int("Econ", s.Optional),
+			"rate": s.Object{
+				"value": c.Int("ReqRate", s.Optional),
+				"max":   c.Int("ReqRateMax", s.Optional),
+			},
+			"total": c.Int("ReqTot", s.Optional),
+		},
+
+		"response": s.Object{
+			"errors":   c.Int("Eresp", s.Optional),
+			"time.avg": c.Int("Rtime", s.Optional),
+			"denied":   c.Int("Dresp"),
+			"http": s.Object{
+				"1xx":   c.Int("Hrsp1xx"),
+				"2xx":   c.Int("Hrsp2xx"),
+				"3xx":   c.Int("Hrsp3xx"),
+				"4xx":   c.Int("Hrsp4xx"),
+				"5xx":   c.Int("Hrsp5xx"),
+				"other": c.Int("HrspOther"),
+			},
+		},
+
+		"session": s.Object{
+			"current": c.Int("Scur"),
+			"max":     c.Int("Smax"),
+			"limit":   c.Int("Slim", s.Optional),
+			"rate": s.Object{
+				"value": c.Int("Rate", s.Optional),
+				"limit": c.Int("RateLim", s.Optional),
+				"max":   c.Int("RateMax", s.Optional),
+			},
 		},
 
 		"check": s.Object{
-			"status":   c.Str("CheckStatus"),
-			"code":     c.Int("CheckCode"),
-			"duration": c.Int("CheckDuration"),
+			"status":      c.Str("CheckStatus"),
+			"code":        c.Int("CheckCode", s.Optional),
+			"duration":    c.Int("CheckDuration", s.Optional),
+			"health.last": c.Str("LastChk"),
+			"health.fail": c.Int("Hanafail", s.Optional),
+			"agent.last":  c.Str("LastAgt"),
+			"failed":      c.Int("ChkFail", s.Optional),
+			"down":        c.Int("ChkDown", s.Optional),
 		},
 
-		"hrsp": s.Object{
-			"1xx":   c.Int("Hrsp1xx"),
-			"2xx":   c.Int("Hrsp2xx"),
-			"3xx":   c.Int("Hrsp3xx"),
-			"4xx":   c.Int("Hrsp4xx"),
-			"5xx":   c.Int("Hrsp5xx"),
-			"other": c.Int("HrspOther"),
+		"client.aborted": c.Int("CliAbrt", s.Optional),
+
+		"server": s.Object{
+			"id":      c.Int("Sid"),
+			"aborted": c.Int("SrvAbrt", s.Optional),
+			"active":  c.Int("Act", s.Optional),
+			"backup":  c.Int("Bck", s.Optional),
 		},
 
-		"hanafail": c.Int("Hanafail"),
-
-		"req": s.Object{
-			"rate": s.Object{
-				"value": c.Int("ReqRate"),
-				"max":   c.Int("ReqRateMax"),
-			},
-			"tot": c.Int("ReqTot"),
+		"compressor": s.Object{
+			"in.bytes":       c.Int("CompIn", s.Optional),
+			"out.bytes":      c.Int("CompOut", s.Optional),
+			"bypassed.bytes": c.Int("CompByp", s.Optional),
+			"response.bytes": c.Int("CompRsp", s.Optional),
 		},
 
-		"cli_abrt": c.Int("CliAbrt"),
-		"srv_abrt": c.Int("SrvAbrt"),
-
-		"comp": s.Object{
-			"in":  c.Int("CompIn"),
-			"out": c.Int("CompOut"),
-			"byp": c.Int("CompByp"),
-			"rsp": c.Int("CompRsp"),
+		"proxy": s.Object{
+			"id":   c.Int("Iid"),
+			"name": c.Str("PxName"),
 		},
 
-		"last": s.Object{
-			"sess": c.Int("LastSess"),
-			"chk":  c.Str("LastChk"),
-			"agt":  c.Str("LastAgt"),
+		"queue": s.Object{
+			"time.avg": c.Int("Qtime", s.Optional),
+			"limit":    c.Int("Qlimit", s.Optional),
 		},
-
-		"qtime": c.Int("Qtime"),
-		"ctime": c.Int("Ctime"),
-		"rtime": c.Int("Rtime"),
-		"ttime": c.Int("Ttime"),
 	}
 )
 
-// Map data to MapStr
+// Map data to MapStr.
 func eventMapping(info []*haproxy.Stat) []common.MapStr {
 
 	var events []common.MapStr

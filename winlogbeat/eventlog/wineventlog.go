@@ -4,7 +4,7 @@ package eventlog
 
 import (
 	"fmt"
-	"strconv"
+	"io"
 	"syscall"
 	"time"
 
@@ -13,13 +13,11 @@ import (
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/wineventlog"
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 )
 
 const (
-	// defaultMaxNumRead is the maximum number of event Read will return.
-	defaultMaxNumRead = 100
-
 	// renderBufferSize is the size in bytes of the buffer used to render events.
 	renderBufferSize = 1 << 14
 
@@ -28,15 +26,21 @@ const (
 	winEventLogAPIName = "wineventlog"
 )
 
-var winEventLogConfigKeys = append(commonConfigKeys, "ignore_older", "include_xml",
-	"event_id", "forwarded", "level", "provider")
+var winEventLogConfigKeys = append(commonConfigKeys, "batch_read_size",
+	"ignore_older", "include_xml", "event_id", "forwarded", "level", "provider")
 
 type winEventLogConfig struct {
-	ConfigCommon `config:",inline"`
-	IncludeXML   bool                   `config:"include_xml"`
-	Forwarded    *bool                  `config:"forwarded"`
-	SimpleQuery  query                  `config:",inline"`
-	Raw          map[string]interface{} `config:",inline"`
+	ConfigCommon  `config:",inline"`
+	BatchReadSize int                    `config:"batch_read_size"` // Maximum number of events that Read will return.
+	IncludeXML    bool                   `config:"include_xml"`
+	Forwarded     *bool                  `config:"forwarded"`
+	SimpleQuery   query                  `config:",inline"`
+	Raw           map[string]interface{} `config:",inline"`
+}
+
+// defaultWinEventLogConfig is the default configuration for new wineventlog readers.
+var defaultWinEventLogConfig = winEventLogConfig{
+	BatchReadSize: 100,
 }
 
 // query contains parameters used to customize the event log data that is
@@ -70,10 +74,12 @@ type winEventLog struct {
 	channelName  string        // Name of the channel from which to read.
 	subscription win.EvtHandle // Handle to the subscription.
 	maxRead      int           // Maximum number returned in one Read.
+	lastRead     uint64        // Record number of the last read event.
 
-	render    func(event win.EvtHandle) (string, error) // Function for rendering the event to XML.
-	renderBuf []byte                                    // Buffer used for rendering event.
-	cache     *messageFilesCache                        // Cached mapping of source name to event message file handles.
+	render    func(event win.EvtHandle, out io.Writer) error // Function for rendering the event to XML.
+	renderBuf []byte                                         // Buffer used for rendering event.
+	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
+	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
 
 	logPrefix     string               // String to prefix on log messages.
 	eventMetadata common.EventMetadata // Field and tags to add to each event.
@@ -115,13 +121,8 @@ func (l *winEventLog) Open(recordNumber uint64) error {
 }
 
 func (l *winEventLog) Read() ([]Record, error) {
-	handles, err := win.EventHandles(l.subscription, l.maxRead)
-	if err == win.ERROR_NO_MORE_ITEMS {
-		detailf("%s No more events", l.logPrefix)
-		return nil, nil
-	}
-	if err != nil {
-		logp.Warn("%s EventHandles returned error %v Errno: %d", l.logPrefix, err)
+	handles, _, err := l.eventHandles(l.maxRead)
+	if err != nil || len(handles) == 0 {
 		return nil, err
 	}
 	defer func() {
@@ -133,26 +134,29 @@ func (l *winEventLog) Read() ([]Record, error) {
 
 	var records []Record
 	for _, h := range handles {
-		x, err := l.render(h)
+		l.outputBuf.Reset()
+		err := l.render(h, l.outputBuf)
 		if bufErr, ok := err.(sys.InsufficientBufferError); ok {
 			detailf("%s Increasing render buffer size to %d", l.logPrefix,
 				bufErr.RequiredSize)
 			l.renderBuf = make([]byte, bufErr.RequiredSize)
-			x, err = l.render(h)
+			l.outputBuf.Reset()
+			err = l.render(h, l.outputBuf)
 		}
-		if err != nil && x == "" {
+		if err != nil && l.outputBuf.Len() == 0 {
 			logp.Err("%s Dropping event with rendering error. %v", l.logPrefix, err)
-			reportDrop(err)
+			incrementMetric(dropReasons, err)
 			continue
 		}
 
-		r, err := l.buildRecordFromXML(x, err)
+		r, err := l.buildRecordFromXML(l.outputBuf.Bytes(), err)
 		if err != nil {
 			logp.Err("%s Dropping event. %v", l.logPrefix, err)
-			reportDrop("unmarshal")
+			incrementMetric(dropReasons, err)
 			continue
 		}
 		records = append(records, r)
+		l.lastRead = r.RecordID
 	}
 
 	debugf("%s Read() is returning %d records", l.logPrefix, len(records))
@@ -164,8 +168,36 @@ func (l *winEventLog) Close() error {
 	return win.Close(l.subscription)
 }
 
-func (l *winEventLog) buildRecordFromXML(x string, recoveredErr error) (Record, error) {
-	e, err := sys.UnmarshalEventXML([]byte(x))
+func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
+	handles, err := win.EventHandles(l.subscription, maxRead)
+	switch err {
+	case nil:
+		if l.maxRead > maxRead {
+			debugf("%s Recovered from RPC_S_INVALID_BOUND error (errno 1734) "+
+				"by decreasing batch_read_size to %v", l.logPrefix, maxRead)
+		}
+		return handles, maxRead, nil
+	case win.ERROR_NO_MORE_ITEMS:
+		detailf("%s No more events", l.logPrefix)
+		return nil, maxRead, nil
+	case win.RPC_S_INVALID_BOUND:
+		incrementMetric(readErrors, err)
+		if err := l.Close(); err != nil {
+			return nil, 0, errors.Wrap(err, "failed to recover from RPC_S_INVALID_BOUND")
+		}
+		if err := l.Open(l.lastRead); err != nil {
+			return nil, 0, errors.Wrap(err, "failed to recover from RPC_S_INVALID_BOUND")
+		}
+		return l.eventHandles(maxRead / 2)
+	default:
+		incrementMetric(readErrors, err)
+		logp.Warn("%s EventHandles returned error %v", l.logPrefix, err)
+		return nil, 0, err
+	}
+}
+
+func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, error) {
+	e, err := sys.UnmarshalEventXML(x)
 	if err != nil {
 		return Record{}, fmt.Errorf("Failed to unmarshal XML='%s'. %v", x, err)
 	}
@@ -185,7 +217,7 @@ func (l *winEventLog) buildRecordFromXML(x string, recoveredErr error) (Record, 
 	}
 
 	if logp.IsDebug(detailSelector) {
-		detailf("%s XML=%s Event=%+v", l.logPrefix, x, e)
+		detailf("%s XML=%s Event=%+v", l.logPrefix, string(x), e)
 	}
 
 	r := Record{
@@ -195,30 +227,16 @@ func (l *winEventLog) buildRecordFromXML(x string, recoveredErr error) (Record, 
 	}
 
 	if l.config.IncludeXML {
-		r.XML = x
+		r.XML = string(x)
 	}
 
 	return r, nil
 }
 
-// reportDrop reports a dropped event log record and the reason as an expvar
-// metric. The reason should be a windows syscall.Errno or a string. Any other
-// types will be reported under the "other" key.
-func reportDrop(reason interface{}) {
-	switch t := reason.(type) {
-	default:
-		dropReasons.Add("other", 1)
-	case string:
-		dropReasons.Add(t, 1)
-	case syscall.Errno:
-		dropReasons.Add(strconv.Itoa(int(t)), 1)
-	}
-}
-
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
 func newWinEventLog(options map[string]interface{}) (EventLog, error) {
-	var c winEventLogConfig
+	c := defaultWinEventLogConfig
 	if err := readConfig(options, &c, winEventLogConfigKeys); err != nil {
 		return nil, err
 	}
@@ -242,7 +260,7 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 			return mf
 		}
 
-		mf.Handles = []sys.FileHandle{sys.FileHandle{Handle: uintptr(h)}}
+		mf.Handles = []sys.FileHandle{{Handle: uintptr(h)}}
 		return mf
 	}
 
@@ -254,8 +272,9 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 		config:        c,
 		query:         query,
 		channelName:   c.Name,
-		maxRead:       defaultMaxNumRead,
+		maxRead:       c.BatchReadSize,
 		renderBuf:     make([]byte, renderBufferSize),
+		outputBuf:     sys.NewByteBuffer(renderBufferSize),
 		cache:         newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
 		logPrefix:     fmt.Sprintf("WinEventLog[%s]", c.Name),
 		eventMetadata: c.EventMetadata,
@@ -267,12 +286,12 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 	switch {
 	case c.Forwarded == nil && c.Name == "ForwardedEvents",
 		c.Forwarded != nil && *c.Forwarded == true:
-		l.render = func(event win.EvtHandle) (string, error) {
-			return win.RenderEventXML(event, l.renderBuf)
+		l.render = func(event win.EvtHandle, out io.Writer) error {
+			return win.RenderEventXML(event, l.renderBuf, out)
 		}
 	default:
-		l.render = func(event win.EvtHandle) (string, error) {
-			return win.RenderEvent(event, 0, l.renderBuf, l.cache.get)
+		l.render = func(event win.EvtHandle, out io.Writer) error {
+			return win.RenderEvent(event, 0, l.renderBuf, l.cache.get, out)
 		}
 	}
 
@@ -280,7 +299,7 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 }
 
 func init() {
-	// Register eventlogging API if it is available.
+	// Register wineventlog API if it is available.
 	available, _ := win.IsAvailable()
 	if available {
 		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)

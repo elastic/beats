@@ -51,9 +51,10 @@ import (
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/satori/go.uuid"
 
-	// load modules
+	// Register default processors.
 	_ "github.com/elastic/beats/libbeat/processors/actions"
 	_ "github.com/elastic/beats/libbeat/processors/actions/lookup/exec"
+	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
 )
 
 // Beater is the interface that must be implemented by every Beat. A Beater
@@ -181,7 +182,7 @@ func (b *Beat) launch(bt Creator) error {
 	}
 
 	debugf("Initializing output plugins")
-	publisher, err := publisher.New(b.Name, b.Config.Output, b.Config.Shipper, processors)
+	publisher, err := publisher.New(b.Name, b.Version, b.Config.Output, b.Config.Shipper, processors)
 	if err != nil {
 		return fmt.Errorf("error initializing publisher: %v", err)
 	}

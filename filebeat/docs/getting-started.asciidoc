@@ -141,14 +141,18 @@ output.elasticsearch:
 +
 If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
 
-TIP: To test your configuration file, run Filebeat in the foreground with the following options specified:
-+./filebeat -configtest -e+.
+TIP: To test your configuration file, change to the directory where the Filebeat
+binary is installed, and run Filebeat in the foreground with the following
+options specified: +./filebeat -configtest -e+. Make sure your config files are
+in the path expected by Filebeat (see <<directory-layout>>). If you
+installed from DEB or RPM packages, run +./filebeat.sh -configtest -e+.
 
 See <<filebeat-configuration-details>> for more details about each configuration option.
 
 [[config-filebeat-logstash]]
 === Step 3: Configuring Filebeat to Use Logstash
 
+:allplatforms:
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[filebeat-template]]
@@ -208,3 +212,5 @@ After you've created the index pattern, you can select the `filebeat-*` index pa
 Filebeat data.
 
 image:./images/filebeat-discover-tab.png[]
+
+TIP: If you don't see `filebeat-*` in the list of available index patterns, try refreshing the page in your browser.

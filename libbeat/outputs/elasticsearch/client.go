@@ -104,11 +104,23 @@ func NewClient(
 		pipeline = nil
 	}
 
+	u, err := url.Parse(s.URL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse elasticsearch URL: %v", err)
+	}
+	if u.User != nil {
+		s.Username = u.User.Username()
+		s.Password, _ = u.User.Password()
+		u.User = nil
+
+		// Re-write URL without credentials.
+		s.URL = u.String()
+	}
+
 	logp.Info("Elasticsearch url: %s", s.URL)
 
 	// TODO: add socks5 proxy support
 	var dialer, tlsDialer transport.Dialer
-	var err error
 
 	dialer = transport.NetDialer(s.Timeout)
 	tlsDialer, err = transport.TLSDialer(dialer, s.TLS, s.Timeout)
@@ -484,7 +496,7 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 		case bytes.Equal(name, nameStatus): // name == "status"
 			status, err = reader.nextInt()
 			if err != nil {
-				logp.Err("Failed to parse bulk reponse item: %s", err)
+				logp.Err("Failed to parse bulk response item: %s", err)
 				return 0, nil, err
 			}
 
@@ -563,7 +575,7 @@ func (client *Client) PublishEvent(data outputs.Data) error {
 func (client *Client) LoadTemplate(templateName string, template map[string]interface{}) error {
 
 	path := "/_template/" + templateName
-	err := client.LoadJson(path, template)
+	err := client.LoadJSON(path, template)
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %v", err)
 	}
@@ -571,7 +583,7 @@ func (client *Client) LoadTemplate(templateName string, template map[string]inte
 	return nil
 }
 
-func (client *Client) LoadJson(path string, json map[string]interface{}) error {
+func (client *Client) LoadJSON(path string, json map[string]interface{}) error {
 	status, _, err := client.request("PUT", path, "", nil, json)
 	if err != nil {
 		return fmt.Errorf("couldn't load json. Error: %s", err)
