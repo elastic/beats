@@ -1,0 +1,6 @@
+- input_type: log
+  paths:
+    - {{path}}
+  fields:
+    source_type: mysql-error
+    pipeline_id: {{beat.pipeline_id}}

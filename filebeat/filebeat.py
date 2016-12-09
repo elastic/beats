@@ -6,6 +6,7 @@ import yaml
 import requests
 import tempfile
 import subprocess
+import socket
 from jinja2 import Template
 
 
@@ -37,7 +38,7 @@ def main():
 
 def load_dashboards(args):
     cmd = ["../libbeat/dashboards/import_dashboards",
-           "-dir", "etc/kibana",
+           "-dir", "_meta/kibana",
            "-es", args.es]
     subprocess.Popen(cmd).wait()
 
@@ -77,7 +78,9 @@ def load_fileset(args, module, fileset, path):
 
 
 def evaluate_vars(args, var_in):
-    var = {}
+    var = {
+        "builtin": get_builtin_vars()
+    }
     for name, vals in var_in.items():
         var[name] = vals["default"]
 
@@ -86,6 +89,8 @@ def evaluate_vars(args, var_in):
         elif sys.platform == "windows" and "os.windows" in vals:
             var[name] = vals["os.windows"]
 
+        var[name] = Template(var[name]).render(var)
+
     # overrides
     if args.E is not None:
         for pair in args.E:
@@ -93,6 +98,16 @@ def evaluate_vars(args, var_in):
             var[key] = val
 
     return var
+
+
+def get_builtin_vars():
+    host = socket.gethostname()
+    hostname, _, domain = host.partition(".")
+    # separate the domain
+    return {
+        "hostname": hostname,
+        "domain": domain
+    }
 
 
 def load_pipeline(var, pipeline):
@@ -110,7 +125,8 @@ def load_pipeline(var, pipeline):
                              var["beat"]["pipeline_id"]),
                      data=contents)
     if r.status_code >= 300:
-        print("Error posting template: {}".format(r.text))
+        print("Error posting pipeline: {}".format(r.text))
+        sys.exit(1)
 
 
 def run_filebeat(args, prospectors):
