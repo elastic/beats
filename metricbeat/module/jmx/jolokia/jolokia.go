@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"io/ioutil"
+	"strings"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	"io/ioutil"
-	"strings"
 )
 
 var (

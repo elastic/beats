@@ -3,8 +3,9 @@ package jolokia
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/libbeat/common"
 	"strings"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type Entry struct {
