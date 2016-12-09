@@ -192,8 +192,16 @@
           "properties": {
             "bucket": {
               "properties": {
-                "data_used": {
-                  "type": "long"
+                "data": {
+                  "properties": {
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
                 },
                 "disk": {
                   "properties": {
@@ -201,15 +209,27 @@
                       "type": "long"
                     },
                     "used": {
-                      "type": "long"
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
                     }
                   }
                 },
                 "item_count": {
                   "type": "long"
                 },
-                "mem_used": {
-                  "type": "long"
+                "memory": {
+                  "properties": {
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
                 },
                 "name": {
                   "ignore_above": 1024,
@@ -221,15 +241,17 @@
                 "quota": {
                   "properties": {
                     "ram": {
-                      "type": "long"
-                    },
-                    "raw_ram": {
-                      "type": "long"
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
                     },
                     "use": {
                       "properties": {
                         "pct": {
-                          "type": "float"
+                          "scaling_factor": 1000,
+                          "type": "scaled_float"
                         }
                       }
                     }

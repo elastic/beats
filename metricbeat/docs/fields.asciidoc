@@ -544,25 +544,59 @@ type of the bucket
 
 
 [float]
-=== couchbase.bucket.quota.ram
+=== couchbase.bucket.data.used.bytes
 
 type: long
+
+format: bytes
+
+Size of user data within buckets of the specified state that are resident in RAM.
+
+
+[float]
+=== couchbase.bucket.disk.fetches
+
+type: long
+
+Number of disk fetches
+
+
+[float]
+=== couchbase.bucket.disk.used.bytes
+
+type: long
+
+format: bytes
+
+Amount of disk used (bytes)
+
+
+[float]
+=== couchbase.bucket.memory.used.bytes
+
+type: long
+
+format: bytes
+
+Amount of memory used by the bucket (bytes)
+
+
+[float]
+=== couchbase.bucket.quota.ram.bytes
+
+type: long
+
+format: bytes
 
 Amount of RAM used by the bucket (bytes)
 
 
 [float]
-=== couchbase.bucket.quota.raw_ram
-
-type: long
-
-Amount of raw RAM used by the bucket (bytes)
-
-
-[float]
 === couchbase.bucket.quota.use.pct
 
-type: float
+type: scaled_float
+
+format: percent
 
 Percentage of RAM used (for active objects) against the configure bucket size.(%)
 
@@ -576,43 +610,11 @@ Number of operations per second
 
 
 [float]
-=== couchbase.bucket.disk.fetches
-
-type: long
-
-Number of disk fetches
-
-
-[float]
-=== couchbase.bucket.disk.used
-
-type: long
-
-Amount of disk used (bytes)
-
-
-[float]
 === couchbase.bucket.item_count
 
 type: long
 
 Number of items associated with the bucket
-
-
-[float]
-=== couchbase.bucket.data_used
-
-type: long
-
-Size of user data within buckets of the specified state that are resident in RAM.
-
-
-[float]
-=== couchbase.bucket.mem_used
-
-type: long
-
-Amount of memory used by the bucket (bytes)
 
 
 [float]

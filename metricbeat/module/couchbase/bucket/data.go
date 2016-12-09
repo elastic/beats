@@ -42,17 +42,24 @@ func eventsMapping(body io.Reader) []common.MapStr {
 
 	for _, Bucket := range d {
 		event := common.MapStr{
-			"name":          Bucket.Name,
-			"type":          Bucket.BucketType,
-			"quota.ram":     Bucket.Quota.RAM,
-			"quota.raw_ram": Bucket.Quota.RawRAM,
-			"quota.use.pct": Bucket.BasicStats.QuotaPercentUsed,
-			"ops_per_sec":   Bucket.BasicStats.OpsPerSec,
-			"disk.fetches":  Bucket.BasicStats.DiskFetches,
-			"disk.used":     Bucket.BasicStats.DiskUsed,
-			"item_count":    Bucket.BasicStats.ItemCount,
-			"data_used":     Bucket.BasicStats.DataUsed,
-			"mem_used":      Bucket.BasicStats.MemUsed,
+			"name": Bucket.Name,
+			"type": Bucket.BucketType,
+			"data": common.MapStr{
+				"used.bytes": Bucket.BasicStats.DataUsed,
+			},
+			"disk": common.MapStr{
+				"fetches":    Bucket.BasicStats.DiskFetches,
+				"used.bytes": Bucket.BasicStats.DiskUsed,
+			},
+			"memory": common.MapStr{
+				"used.bytes": Bucket.BasicStats.MemUsed,
+			},
+			"quota": common.MapStr{
+				"ram.bytes": Bucket.Quota.RAM,
+				"use.pct":   Bucket.BasicStats.QuotaPercentUsed,
+			},
+			"ops_per_sec": Bucket.BasicStats.OpsPerSec,
+			"item_count":  Bucket.BasicStats.ItemCount,
 		}
 
 		events = append(events, event)
