@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
@@ -40,27 +41,48 @@ func TestFetchEventContents(t *testing.T) {
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
-	assert.Equal(t, "172.17.0.2:8091", event["hostname"])
-	assert.Equal(t, "7260", event["uptime"])
-	assert.EqualValues(t, 8359174144, event["mem.total.bytes"])
-	assert.EqualValues(t, 4678324224, event["mem.free.bytes"])
-	assert.EqualValues(t, 6377, event["mcd_memory.reserved.bytes"])
-	assert.EqualValues(t, 6377, event["mcd_memory.allocated.bytes"])
 	assert.EqualValues(t, 0, event["cmd_get"])
-	assert.EqualValues(t, 13563791, event["couch_docs_actual_disk_size.bytes"])
-	assert.EqualValues(t, 9792512, event["couch_docs_data_size.bytes"])
-	assert.EqualValues(t, 0, event["couch_spatial_data_size.bytes"])
-	assert.EqualValues(t, 0, event["couch_spatial_disk_size.bytes"])
-	assert.EqualValues(t, 2805219, event["couch_views_actual_disk_size.bytes"])
-	assert.EqualValues(t, 2805219, event["couch_views_data_size.bytes"])
-	assert.EqualValues(t, 7303, event["curr_items"])
-	assert.EqualValues(t, 7303, event["curr_items_tot"])
+
+	couch := event["couch"].(common.MapStr)
+
+	couch_docs := couch["docs"].(common.MapStr)
+	assert.EqualValues(t, 13563791, couch_docs["actual_disk_size.bytes"])
+	assert.EqualValues(t, 9792512, couch_docs["data_size.bytes"])
+
+	couch_spacial := couch["spacial"].(common.MapStr)
+	assert.EqualValues(t, 0, couch_spacial["data_size.bytes"])
+	assert.EqualValues(t, 0, couch_spacial["disk_size.bytes"])
+
+	couch_views := couch["views"].(common.MapStr)
+	assert.EqualValues(t, 2805219, couch_views["actual_disk_size.bytes"])
+	assert.EqualValues(t, 2805219, couch_views["data_size.bytes"])
+
+	assert.EqualValues(t, 29.64705882352941, event["cpu_utilization_rate.pct"])
+
+	current_items := event["current_items"].(common.MapStr)
+	assert.EqualValues(t, 7303, current_items["value"])
+	assert.EqualValues(t, 7303, current_items["total"])
+
 	assert.EqualValues(t, 0, event["ep_bg_fetched"])
 	assert.EqualValues(t, 0, event["get_hits"])
-	assert.EqualValues(t, 53962016, event["mem.used.bytes"])
+	assert.Equal(t, "172.17.0.2:8091", event["hostname"])
+
+	mcd_memory := event["mcd_memory"].(common.MapStr)
+	assert.EqualValues(t, 6377, mcd_memory["reserved.bytes"])
+	assert.EqualValues(t, 6377, mcd_memory["allocated.bytes"])
+
+	memory := event["memory"].(common.MapStr)
+	assert.EqualValues(t, 8359174144, memory["total.bytes"])
+	assert.EqualValues(t, 4678324224, memory["free.bytes"])
+	assert.EqualValues(t, 53962016, memory["used.bytes"])
+
 	assert.EqualValues(t, 0, event["ops"])
+
+	swap := event["swap"].(common.MapStr)
+	assert.EqualValues(t, 4189057024, swap["total.bytes"])
+	assert.EqualValues(t, 135168, swap["used.bytes"])
+
+	assert.EqualValues(t, 7260, event["uptime.sec"])
+
 	assert.EqualValues(t, 0, event["vb_replica_curr_items"])
-	assert.EqualValues(t, 29.64705882352941, event["cpu_utilization_rate.pct"])
-	assert.EqualValues(t, 4189057024, event["swap.total.bytes"])
-	assert.EqualValues(t, 135168, event["swap.used.bytes"])
 }

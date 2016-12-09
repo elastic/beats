@@ -5,59 +5,45 @@
 
     Couchbase node metrics
   fields:
-    - name: hostname
-      type: keyword
-      description: >
-        The hostname of the Node
-    - name: uptime
-      type: keyword
-      description: >
-        Time during which the node was in operation (sec)
-    - name: mcd_memory.allocated.bytes
-      type: long
-      description: >
-        Amount of memcached memory allocated (bytes)
-    - name: mcd_memory.reserved.bytes
-      type: long
-      description: >
-        Amount of memcached memory reserved (bytes)
     - name: cmd_get
       type: long
       description: >
         Number of get commands
-    - name: cpu_utilization_rate.pct
-      type: float
-      description: >
-        The CPU utilization rate (%)
-    - name: couch_docs_actual_disk_size
+    - name: couch.docs.actual_disk_size.bytes
+      format: bytes
       type: long
       description: >
         Amount of disk space used by Couch docs.(bytes)
-    - name: couch_docs_data_size.bytes
+    - name: couch.docs.data_size.bytes
+      format: bytes
       type: long
       description: >
         Data size of couch documents associated with a node (bytes)
-    - name: couch_spatial_data_size.bytes
+    - name: couch.spatial.data_size.bytes
       type: long
       description: >
         couchSpatialDataSize field
-    - name: couch_spatial_disk_size.bytes
+    - name: couch.spatial.disk_size.bytes
       type: long
       description: >
         couchSpatialDiskSize field
-    - name: couch_views_actual_disk_size.bytes
+    - name: couch.views.actual_disk_size.bytes
       type: long
       description: >
         Amount of disk space occupied by Couch views (bytes)
-    - name: couch_views_data_size.bytes
+    - name: couch.views.data_size.bytes
       type: long
       description: >
         Size of object data for Couch views (bytes)
-    - name: curr_items
+    - name: cpu_utilization_rate.pct
+      type: scaled_float
+      description: >
+        The CPU utilization rate (%)
+    - name: current_items.value
       type: long
       description: >
         Number of current items
-    - name: curr_items_tot
+    - name: current_items.total
       type: long
       description: >
         Total number of items associated with node
@@ -69,15 +55,28 @@
       type: long
       description: >
         Number of get hits
-    - name: mem.free.bytes
+    - name: hostname
+      type: keyword
+      description: >
+        The hostname of the Node
+    - name: mcd_memory.allocated.bytes
+      format: bytes
+      type: long
+      description: >
+        Amount of memcached memory allocated (bytes)
+    - name: mcd_memory.reserved.bytes
+      type: long
+      description: >
+        Amount of memcached memory reserved (bytes)
+    - name: memory.free.bytes
       type: long
       description: >
         Amount of memory free for the node (bytes)
-    - name: mem.total.bytes
+    - name: memory.total.bytes
       type: long
       description: >
         Total memory available to the node (bytes)
-    - name: mem.used.bytes
+    - name: memory.used.bytes
       type: long
       description: >
         Memory used by the node (bytes)
@@ -93,6 +92,10 @@
       type: long
       description: >
         Amount of swap space used.(bytes)
+    - name: uptime.sec
+      type: long
+      description: >
+        Time during which the node was in operation (sec)
     - name: vb_replica_curr_items
       type: long
       description: >

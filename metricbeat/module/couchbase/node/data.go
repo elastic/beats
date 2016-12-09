@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"strconv"
 )
 
 type NodeSystemStats struct {
@@ -66,30 +67,48 @@ func eventsMapping(body io.Reader) []common.MapStr {
 	events := []common.MapStr{}
 
 	for _, NodeItem := range d.Nodes {
+		uptime, _ := strconv.ParseInt(NodeItem.Uptime, 10, 64)
+
 		event := common.MapStr{
-			"hostname":                           NodeItem.Hostname,
-			"uptime":                             NodeItem.Uptime,
-			"mcd_memory.reserved.bytes":          NodeItem.McdMemoryReserved,
-			"mcd_memory.allocated.bytes":         NodeItem.McdMemoryAllocated,
-			"cmd_get":                            NodeItem.InterestingStats.CmdGet,
-			"cpu_utilization_rate.pct":           NodeItem.SystemStats.CPUUtilizationRate,
-			"couch_docs_actual_disk_size.bytes":  NodeItem.InterestingStats.CouchDocsActualDiskSize,
-			"couch_docs_data_size.bytes":         NodeItem.InterestingStats.CouchDocsDataSize,
-			"couch_spatial_data_size.bytes":      NodeItem.InterestingStats.CouchSpatialDataSize,
-			"couch_spatial_disk_size.bytes":      NodeItem.InterestingStats.CouchSpatialDiskSize,
-			"couch_views_actual_disk_size.bytes": NodeItem.InterestingStats.CouchViewsActualDiskSize,
-			"couch_views_data_size.bytes":        NodeItem.InterestingStats.CouchViewsDataSize,
-			"curr_items":                         NodeItem.InterestingStats.CurrItems,
-			"curr_items_tot":                     NodeItem.InterestingStats.CurrItemsTot,
-			"ep_bg_fetched":                      NodeItem.InterestingStats.EpBgFetched,
-			"get_hits":                           NodeItem.InterestingStats.GetHits,
-			"ops":                                NodeItem.InterestingStats.Ops,
+			"cmd_get": NodeItem.InterestingStats.CmdGet,
+			"couch": common.MapStr{
+				"docs": common.MapStr{
+					"actual_disk_size.bytes": NodeItem.InterestingStats.CouchDocsActualDiskSize,
+					"data_size.bytes":        NodeItem.InterestingStats.CouchDocsDataSize,
+				},
+				"spacial": common.MapStr{
+					"data_size.bytes": NodeItem.InterestingStats.CouchSpatialDataSize,
+					"disk_size.bytes": NodeItem.InterestingStats.CouchSpatialDiskSize,
+				},
+				"views": common.MapStr{
+					"actual_disk_size.bytes": NodeItem.InterestingStats.CouchViewsActualDiskSize,
+					"data_size.bytes":        NodeItem.InterestingStats.CouchViewsDataSize,
+				},
+			},
+			"cpu_utilization_rate.pct": NodeItem.SystemStats.CPUUtilizationRate,
+			"current_items": common.MapStr{
+				"value": NodeItem.InterestingStats.CurrItems,
+				"total": NodeItem.InterestingStats.CurrItemsTot,
+			},
+			"ep_bg_fetched": NodeItem.InterestingStats.EpBgFetched,
+			"get_hits":      NodeItem.InterestingStats.GetHits,
+			"hostname":      NodeItem.Hostname,
+			"mcd_memory": common.MapStr{
+				"reserved.bytes":  NodeItem.McdMemoryReserved,
+				"allocated.bytes": NodeItem.McdMemoryAllocated,
+			},
+			"memory": common.MapStr{
+				"total.bytes": NodeItem.SystemStats.MemTotal,
+				"free.bytes":  NodeItem.SystemStats.MemFree,
+				"used.bytes":  NodeItem.InterestingStats.MemUsed,
+			},
+			"ops": NodeItem.InterestingStats.Ops,
+			"swap": common.MapStr{
+				"total.bytes": NodeItem.SystemStats.SwapTotal,
+				"used.bytes":  NodeItem.SystemStats.SwapUsed,
+			},
+			"uptime.sec":            uptime,
 			"vb_replica_curr_items": NodeItem.InterestingStats.VbReplicaCurrItems,
-			"swap.total.bytes":      NodeItem.SystemStats.SwapTotal,
-			"swap.used.bytes":       NodeItem.SystemStats.SwapUsed,
-			"mem.total.bytes":       NodeItem.SystemStats.MemTotal,
-			"mem.free.bytes":        NodeItem.SystemStats.MemFree,
-			"mem.used.bytes":        NodeItem.InterestingStats.MemUsed,
 		}
 		events = append(events, event)
 	}
