@@ -59,7 +59,4 @@ services:
 
   # Overloading kibana with a simple image as it is not needed here
   kibana:
-    build:
-      context: ${PWD}/../testing/environments/
-      dockerfile: Dockerfile
-      args: []
+    image: alpine:latest

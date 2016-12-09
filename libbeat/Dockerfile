@@ -4,7 +4,8 @@ MAINTAINER Nicolas Ruflin <ruflin@elastic.co>
 
 RUN set -x && \
     apt-get update && \
-    apt-get install -y netcat python-virtualenv python-pip && \
+    apt-get install -y --no-install-recommends \
+         netcat python-pip virtualenv && \
     apt-get clean
 
 ENV PYTHON_ENV=/tmp/python-env
