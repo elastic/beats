@@ -409,56 +409,81 @@
                 "cmd_get": {
                   "type": "long"
                 },
-                "couch_docs_actual_disk_size": {
-                  "type": "long"
-                },
-                "couch_docs_data_size": {
+                "couch": {
                   "properties": {
-                    "bytes": {
-                      "type": "long"
-                    }
-                  }
-                },
-                "couch_spatial_data_size": {
-                  "properties": {
-                    "bytes": {
-                      "type": "long"
-                    }
-                  }
-                },
-                "couch_spatial_disk_size": {
-                  "properties": {
-                    "bytes": {
-                      "type": "long"
-                    }
-                  }
-                },
-                "couch_views_actual_disk_size": {
-                  "properties": {
-                    "bytes": {
-                      "type": "long"
-                    }
-                  }
-                },
-                "couch_views_data_size": {
-                  "properties": {
-                    "bytes": {
-                      "type": "long"
+                    "docs": {
+                      "properties": {
+                        "actual_disk_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "data_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "spatial": {
+                      "properties": {
+                        "data_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "disk_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "views": {
+                      "properties": {
+                        "actual_disk_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "data_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 },
                 "cpu_utilization_rate": {
                   "properties": {
                     "pct": {
-                      "type": "float"
+                      "scaling_factor": 1000,
+                      "type": "scaled_float"
                     }
                   }
                 },
-                "curr_items": {
-                  "type": "long"
-                },
-                "curr_items_tot": {
-                  "type": "long"
+                "current_items": {
+                  "properties": {
+                    "total": {
+                      "type": "long"
+                    },
+                    "value": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "ep_bg_fetched": {
                   "type": "long"
@@ -488,7 +513,7 @@
                     }
                   }
                 },
-                "mem": {
+                "memory": {
                   "properties": {
                     "free": {
                       "properties": {
@@ -535,8 +560,11 @@
                   }
                 },
                 "uptime": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "properties": {
+                    "sec": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "vb_replica_curr_items": {
                   "type": "long"

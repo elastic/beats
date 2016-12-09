@@ -7,27 +7,43 @@
     "couchbase": {
         "node": {
             "cmd_get": 0,
-            "couch_docs_actual_disk_size.bytes": 9487852,
-            "couch_docs_data_size.bytes": 9804800,
-            "couch_spatial_data_size.bytes": 0,
-            "couch_spatial_disk_size.bytes": 0,
-            "couch_views_actual_disk_size.bytes": 2792974,
-            "couch_views_data_size.bytes": 2792974,
-            "cpu_utilization_rate.pct": 88.49105,
-            "curr_items": 7303,
-            "curr_items_tot": 7303,
+            "couch": {
+                "docs": {
+                    "actual_disk_size.bytes": 13575993,
+                    "data_size.bytes": 9804800
+                },
+                "spacial": {
+                    "data_size.bytes": 0,
+                    "disk_size.bytes": 0
+                },
+                "views": {
+                    "actual_disk_size.bytes": 2792998,
+                    "data_size.bytes": 2792998
+                }
+            },
+            "cpu_utilization_rate.pct": 92.06349,
+            "current_items": {
+                "total": 7303,
+                "value": 7303
+            },
             "ep_bg_fetched": 0,
             "get_hits": 0,
-            "hostname": "172.21.0.6:8091",
-            "mcd_memory.allocated.bytes": 6378,
-            "mcd_memory.reserved.bytes": 6378,
-            "mem.free.bytes": 4109586432,
-            "mem.total.bytes": 8360542208,
-            "mem.used.bytes": 53966432,
+            "hostname": "172.22.0.9:8091",
+            "mcd_memory": {
+                "allocated.bytes": 6378,
+                "reserved.bytes": 6378
+            },
+            "memory": {
+                "free.bytes": 3213410304,
+                "total.bytes": 8360542208,
+                "used.bytes": 53962160
+            },
             "ops": 0,
-            "swap.total.bytes": 4189057024,
-            "swap.used.bytes": 0,
-            "uptime": "58",
+            "swap": {
+                "total.bytes": 4189057024,
+                "used.bytes": 38543360
+            },
+            "uptime.sec": 9262,
             "vb_replica_curr_items": 0
         }
     },

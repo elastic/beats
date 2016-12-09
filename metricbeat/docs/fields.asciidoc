@@ -780,38 +780,6 @@ Couchbase node metrics
 
 
 [float]
-=== couchbase.node.hostname
-
-type: keyword
-
-The hostname of the Node
-
-
-[float]
-=== couchbase.node.uptime
-
-type: keyword
-
-Time during which the node was in operation (sec)
-
-
-[float]
-=== couchbase.node.mcd_memory.allocated.bytes
-
-type: long
-
-Amount of memcached memory allocated (bytes)
-
-
-[float]
-=== couchbase.node.mcd_memory.reserved.bytes
-
-type: long
-
-Amount of memcached memory reserved (bytes)
-
-
-[float]
 === couchbase.node.cmd_get
 
 type: long
@@ -820,31 +788,27 @@ Number of get commands
 
 
 [float]
-=== couchbase.node.cpu_utilization_rate.pct
-
-type: float
-
-The CPU utilization rate (%)
-
-
-[float]
-=== couchbase.node.couch_docs_actual_disk_size
+=== couchbase.node.couch.docs.actual_disk_size.bytes
 
 type: long
+
+format: bytes
 
 Amount of disk space used by Couch docs.(bytes)
 
 
 [float]
-=== couchbase.node.couch_docs_data_size.bytes
+=== couchbase.node.couch.docs.data_size.bytes
 
 type: long
+
+format: bytes
 
 Data size of couch documents associated with a node (bytes)
 
 
 [float]
-=== couchbase.node.couch_spatial_data_size.bytes
+=== couchbase.node.couch.spatial.data_size.bytes
 
 type: long
 
@@ -852,7 +816,7 @@ couchSpatialDataSize field
 
 
 [float]
-=== couchbase.node.couch_spatial_disk_size.bytes
+=== couchbase.node.couch.spatial.disk_size.bytes
 
 type: long
 
@@ -860,7 +824,7 @@ couchSpatialDiskSize field
 
 
 [float]
-=== couchbase.node.couch_views_actual_disk_size.bytes
+=== couchbase.node.couch.views.actual_disk_size.bytes
 
 type: long
 
@@ -868,7 +832,7 @@ Amount of disk space occupied by Couch views (bytes)
 
 
 [float]
-=== couchbase.node.couch_views_data_size.bytes
+=== couchbase.node.couch.views.data_size.bytes
 
 type: long
 
@@ -876,7 +840,15 @@ Size of object data for Couch views (bytes)
 
 
 [float]
-=== couchbase.node.curr_items
+=== couchbase.node.cpu_utilization_rate.pct
+
+type: scaled_float
+
+The CPU utilization rate (%)
+
+
+[float]
+=== couchbase.node.current_items.value
 
 type: long
 
@@ -884,7 +856,7 @@ Number of current items
 
 
 [float]
-=== couchbase.node.curr_items_tot
+=== couchbase.node.current_items.total
 
 type: long
 
@@ -908,7 +880,33 @@ Number of get hits
 
 
 [float]
-=== couchbase.node.mem.free.bytes
+=== couchbase.node.hostname
+
+type: keyword
+
+The hostname of the Node
+
+
+[float]
+=== couchbase.node.mcd_memory.allocated.bytes
+
+type: long
+
+format: bytes
+
+Amount of memcached memory allocated (bytes)
+
+
+[float]
+=== couchbase.node.mcd_memory.reserved.bytes
+
+type: long
+
+Amount of memcached memory reserved (bytes)
+
+
+[float]
+=== couchbase.node.memory.free.bytes
 
 type: long
 
@@ -916,7 +914,7 @@ Amount of memory free for the node (bytes)
 
 
 [float]
-=== couchbase.node.mem.total.bytes
+=== couchbase.node.memory.total.bytes
 
 type: long
 
@@ -924,7 +922,7 @@ Total memory available to the node (bytes)
 
 
 [float]
-=== couchbase.node.mem.used.bytes
+=== couchbase.node.memory.used.bytes
 
 type: long
 
@@ -953,6 +951,14 @@ Total swap size allocated (bytes)
 type: long
 
 Amount of swap space used.(bytes)
+
+
+[float]
+=== couchbase.node.uptime.sec
+
+type: long
+
+Time during which the node was in operation (sec)
 
 
 [float]
