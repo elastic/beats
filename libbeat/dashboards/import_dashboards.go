@@ -56,6 +56,7 @@ type Options struct {
 	Certificate          string
 	CertificateKey       string
 	CertificateAuthority string
+	Insecure             bool // Allow insecure SSL connections.
 	OnlyDashboards       bool
 	OnlyIndex            bool
 	Snapshot             bool
@@ -99,6 +100,7 @@ func DefineCommandLine() (*CommandLine, error) {
 	cl.flagSet.StringVar(&cl.opt.CertificateAuthority, "cacert", "", "Certificate Authority for server verification")
 	cl.flagSet.StringVar(&cl.opt.Certificate, "cert", "", "Certificate for SSL client authentication in PEM format.")
 	cl.flagSet.StringVar(&cl.opt.CertificateKey, "key", "", "Client Certificate Key in PEM format.")
+	cl.flagSet.BoolVar(&cl.opt.Insecure, "insecure", false, `Allows "insecure" SSL connections`)
 
 	return &cl, nil
 }
@@ -151,6 +153,10 @@ func New() (*Importer, error) {
 
 	var tlsConfig outputs.TLSConfig
 	var tls *transport.TLSConfig
+
+	if cl.opt.Insecure {
+		tlsConfig.VerificationMode = transport.VerifyNone
+	}
 
 	if len(cl.opt.Certificate) > 0 && len(cl.opt.CertificateKey) > 0 {
 		tlsConfig.Certificate = outputs.CertificateConfig{
