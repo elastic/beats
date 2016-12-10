@@ -75,7 +75,7 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 				continue
 			}
 
-			_, err = event.Put(field, output)
+			_, err = event.Put("json", output)
 			if err != nil {
 				debug("Error trying to Put value %v for field : %s", output, field)
 				errs = append(errs, err.Error())
