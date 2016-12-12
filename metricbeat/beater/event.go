@@ -56,16 +56,23 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 		delete(event, mb.ModuleData)
 	}
 
+	metricsetName := b.MetricSetName
+	mName, metricsetNameExists := event["_metricsetName"]
+	if metricsetNameExists {
+		metricsetName = mName.(string)
+		delete(event, "_metricsetName")
+	}
+
 	event = common.MapStr{
 		"@timestamp":            timestamp,
 		"type":                  typeName,
 		common.EventMetadataKey: b.metadata,
 		b.ModuleName: common.MapStr{
-			b.MetricSetName: event,
+			metricsetName: event,
 		},
 		"metricset": common.MapStr{
 			"module": b.ModuleName,
-			"name":   b.MetricSetName,
+			"name":   metricsetName,
 			"rtt":    b.FetchDuration.Nanoseconds() / int64(time.Microsecond),
 		},
 	}
@@ -74,6 +81,13 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 	if moudleDataExists {
 		if _, ok := moduleData.(common.MapStr); ok {
 			event[b.ModuleName].(common.MapStr).Update(moduleData.(common.MapStr))
+		}
+	}
+
+	//
+	if metricsetNameExists {
+		if _, ok := event["metricset"].(common.MapStr); ok {
+			event["metricset"].(common.MapStr)["dynamic"] = b.MetricSetName
 		}
 	}
 

@@ -2766,6 +2766,21 @@ MySQL server status metrics collected from MySQL.
 
 
 [float]
+== query Fields
+
+query
+
+
+
+[float]
+=== mysql.query.example
+
+type: keyword
+
+Example field
+
+
+[float]
 == status Fields
 
 `status` contains the metrics that were obtained by the status SQL query.
