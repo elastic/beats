@@ -1,10 +1,10 @@
-
-### VARIABLE SETUP ###
-
+# Product and package information
+# Application using libbeat may override these variables in their Makefile
 BEATNAME?=libbeat
 BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash
 BEAT_VENDOR?=Elastic
 BEAT_LICENSE?=ASL 2.0
+BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEATNAME}/current/index.html
 
 BEAT_DIR?=github.com/elastic/beats/${BEATNAME}
 ES_BEATS?=..
@@ -401,6 +401,7 @@ package: package-setup
 	echo "beat_description: ${BEAT_DESCRIPTION}" >> ${BUILD_DIR}/package.yml
 	echo "beat_vendor: ${BEAT_VENDOR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_license: ${BEAT_LICENSE}" >> ${BUILD_DIR}/package.yml
+	echo "beat_doc_url: ${BEAT_DOC_URL}" >> ${BUILD_DIR}/package.yml
 	cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml
 
 	if [ $(CGO) = true ]; then \
