@@ -402,7 +402,11 @@ package: package-setup
 	echo "beat_vendor: ${BEAT_VENDOR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_license: ${BEAT_LICENSE}" >> ${BUILD_DIR}/package.yml
 	echo "beat_doc_url: ${BEAT_DOC_URL}" >> ${BUILD_DIR}/package.yml
-	cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml
+	if [ -a ./dev-tools/packer/version.yml ] ; then \
+		cat ./dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml; \
+	else \
+		cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml; \
+	fi
 
 	if [ $(CGO) = true ]; then \
 		 $(MAKE) prepare-package-cgo; \
