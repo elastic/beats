@@ -3,6 +3,9 @@
 
 BEATNAME?=libbeat
 BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash
+BEAT_VENDOR?=Elastic
+BEAT_LICENSE?=ASL 2.0
+
 BEAT_DIR?=github.com/elastic/beats/${BEATNAME}
 ES_BEATS?=..
 GOPACKAGES?=${BEAT_DIR}/...
@@ -396,6 +399,8 @@ package: package-setup
 	echo "beat_url: https://${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_repo: ${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_description: ${BEAT_DESCRIPTION}" >> ${BUILD_DIR}/package.yml
+	echo "beat_vendor: ${BEAT_VENDOR}" >> ${BUILD_DIR}/package.yml
+	echo "beat_license: ${BEAT_LICENSE}" >> ${BUILD_DIR}/package.yml
 	cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml
 
 	if [ $(CGO) = true ]; then \
