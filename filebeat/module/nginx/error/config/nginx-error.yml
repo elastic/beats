@@ -1,0 +1,7 @@
+- input_type: log
+  paths:
+  - {{path}}/error.log
+  fields:
+    source_type: nginx-error
+    pipeline_id: {{beat.pipeline_id}}
+

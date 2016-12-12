@@ -12,6 +12,14 @@ include ../libbeat/scripts/Makefile
 .PHONY: before-build
 before-build:
 
-# Collects all dependencies and then calls update
+# Collects all module and dataset fields
+.PHONY: fields
+fields:
+	mkdir -p _meta/
+	cat ${ES_BEATS}/filebeat/_meta/fields.common.yml > _meta/fields.generated.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
+
+
+# Runs all collection steps and updates afterwards
 .PHONY: collect
-collect:
+collect: fields update

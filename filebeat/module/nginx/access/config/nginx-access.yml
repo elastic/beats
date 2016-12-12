@@ -1,0 +1,6 @@
+- input_type: log
+  paths:
+  - {{path}}/access*.log
+  fields:
+    source_type: nginx-access
+    pipeline_id: {{beat.pipeline_id}}
