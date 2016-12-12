@@ -44,9 +44,7 @@ services:
 
   # Overloading kibana with a simple image as it is not needed here
   kibana:
-    build:
-      context: ${PWD}/../testing/environments/
-      dockerfile: Dockerfile
+    image: alpine:latest
 
   # Modules
   apache:
