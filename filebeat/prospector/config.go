@@ -10,6 +10,7 @@ import (
 
 var (
 	defaultConfig = prospectorConfig{
+		Enabled:        true,
 		IgnoreOlder:    0,
 		ScanFrequency:  10 * time.Second,
 		InputType:      cfg.DefaultInputType,
@@ -22,6 +23,7 @@ var (
 )
 
 type prospectorConfig struct {
+	Enabled        bool             `config:"enabled"`
 	ExcludeFiles   []*regexp.Regexp `config:"exclude_files"`
 	IgnoreOlder    time.Duration    `config:"ignore_older"`
 	Paths          []string         `config:"paths"`

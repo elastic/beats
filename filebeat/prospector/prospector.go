@@ -158,6 +158,11 @@ func (p *Prospector) Run(once bool) {
 	}
 }
 
+// IsEnabled returns true if the prospector is eanbled
+func (p *Prospector) IsEnabled() bool {
+	return p.config.Enabled
+}
+
 // updateState updates the prospector state and forwards the event to the spooler
 // All state updates done by the prospector itself are synchronous to make sure not states are overwritten
 func (p *Prospector) updateState(event *input.Event) error {
