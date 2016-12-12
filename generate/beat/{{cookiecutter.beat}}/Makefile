@@ -1,5 +1,11 @@
 BEATNAME={{cookiecutter.beat}}
 BEAT_DIR={{cookiecutter.beat_path}}/{{cookiecutter.beat}}
+
+BEAT_DESCRIPTION?={{cookiecutter.project_name}} sends events to Logstash or directly to Elasticsearch.
+BEAT_VENDOR={{cookiecutter.github_name}}
+BEAT_LICENSE=Apache Software License 2.0
+BEAT_DOC_URL?=https://${BEAT_DIR}
+
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
 ES_BEATS?=./vendor/github.com/elastic/beats

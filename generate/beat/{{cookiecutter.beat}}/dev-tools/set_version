@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+import os
+import argparse
+from subprocess import check_call
+
+template_go = '''package main
+
+const {{cookiecutter.beat}}Version = "{}"
+'''
+
+template_packer = '''version: "{version}"
+'''
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Used to set the current version. Doesn't commit changes.")
+    parser.add_argument("version",
+                        help="The new version")
+    args = parser.parse_args()
+
+    dir = os.path.dirname(os.path.realpath(__file__))
+    with open(dir + "/../version.go", "w") as f:
+        f.write(template_go.format(args.version))
+
+    version = args.version
+    with open(dir + "/packer/version.yml", "w") as f:
+        f.write(template_packer.format(
+            version=version,
+        ))
+
+    # Updates all files with the new templates
+    os.chdir(dir + "/../")
+    print("Update build files")
+    check_call("make update", shell=True)
+
+if __name__ == "__main__":
+    main()
