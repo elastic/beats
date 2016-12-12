@@ -70,11 +70,12 @@ func TestValidJSONDepthOne(t *testing.T) {
 	actual := getActualValue(t, testConfig, input)
 
 	expected := common.MapStr{
-		"msg": map[string]interface{}{
+		"json": map[string]interface{}{
 			"log":    "{\"level\":\"info\"}",
 			"stream": "stderr",
 			"count":  3,
 		},
+		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
 		"pipeline": "us1",
 	}
 
@@ -97,13 +98,14 @@ func TestValidJSONDepthTwo(t *testing.T) {
 	actual := getActualValue(t, testConfig, input)
 
 	expected := common.MapStr{
-		"msg": map[string]interface{}{
+		"json": map[string]interface{}{
 			"log": map[string]interface{}{
 				"level": "info",
 			},
 			"stream": "stderr",
 			"count":  3,
 		},
+		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
 		"pipeline": "us1",
 	}
 
