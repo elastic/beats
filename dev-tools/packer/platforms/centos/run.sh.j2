@@ -24,8 +24,8 @@ RPM_VERSION=`echo ${VERSION} | sed 's/-/_/g'`
 fpm --force -s dir -t rpm \
         -n {{.beat_name}} -v ${RPM_VERSION} \
         --architecture {{.rpm_arch}} \
-        --vendor "Elastic" \
-        --license "ASL 2.0" \
+        --vendor "{{.beat_vendor}}"  \
+        --license "{{.beat_license}}"  \
         --description "{{.beat_description}}" \
         --url {{.beat_url}} \
         --rpm-init /tmp/{{.beat_name}}.init \
