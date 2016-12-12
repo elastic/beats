@@ -30,6 +30,12 @@ else
 	exit 1
 fi
 
+if [ -e $BEAT_PATH/dev-tools/packer/readme.md.j2 ]; then
+	README_TPL=$BEAT_PATH/dev-tools/packer/readme.md.j2
+else
+	README_TPL=${LIBBEAT_PATH}/../dev-tools/packer/readme.md.j2
+fi
+
 for TARGET in $TARGETS; do
 	echo "Compiling import_dashboards for $TARGET"
 	XGOOS=`echo $TARGET | cut -d '/' -f 1`
@@ -54,7 +60,7 @@ go install github.com/tsg/gotpl
 cat ${LIBBEAT_PATH}/docs/version.asciidoc >> ${PREFIX}/package.yml
 # Make variable naming of doc-branch compatible with gotpl. Generate and copy README.md into homedir
 sed -i -e 's/:doc-branch/doc_branch/g' ${PREFIX}/package.yml
-/go/bin/gotpl ${LIBBEAT_PATH}/../dev-tools/packer/readme.md.j2 < ${PREFIX}/package.yml > ${PREFIX}/homedir/README.md
+/go/bin/gotpl ${README_TPL} < ${PREFIX}/package.yml > ${PREFIX}/homedir/README.md
 
 # Copy template
 cp $BEATNAME.template.json $PREFIX/$BEATNAME.template.json

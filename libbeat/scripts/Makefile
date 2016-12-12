@@ -3,9 +3,6 @@
 
 BEATNAME?=libbeat
 BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash
-BEAT_VENDOR?=Elastic
-BEAT_LICENSE?=ASL 2.0
-
 BEAT_DIR?=github.com/elastic/beats/${BEATNAME}
 ES_BEATS?=..
 GOPACKAGES?=${BEAT_DIR}/...
