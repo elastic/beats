@@ -1,0 +1,14 @@
+module_version: 1.0
+
+vars:
+  path:
+    default: /var/log/nginx
+    os.darwin: /usr/local/var/log/nginx
+    os.windows: c:/programfiles/nginx/logs
+  pipeline:
+    # options: with_plugins, no_plugins, json_with_plugins, json_no_plugins
+    default: with_plugins
+
+ingest_pipeline: ingest/{{pipeline}}.json
+prospectors:
+  - config/nginx-access.yml
