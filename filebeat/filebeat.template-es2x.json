@@ -44,6 +44,11 @@
             }
           }
         },
+        "error": {
+          "ignore_above": 1024,
+          "index": "not_analyzed",
+          "type": "string"
+        },
         "input_type": {
           "ignore_above": 1024,
           "index": "not_analyzed",
@@ -86,6 +91,84 @@
                   "type": "string"
                 },
                 "region": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "mysql": {
+          "properties": {
+            "error": {
+              "properties": {
+                "level": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "message": {
+                  "index": "analyzed",
+                  "norms": {
+                    "enabled": false
+                  },
+                  "type": "string"
+                },
+                "thread_id": {
+                  "type": "long"
+                },
+                "timestamp": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            },
+            "slowlog": {
+              "properties": {
+                "host": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "id": {
+                  "type": "long"
+                },
+                "ip": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "lock_time": {
+                  "properties": {
+                    "sec": {
+                      "type": "float"
+                    }
+                  }
+                },
+                "query": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "query_time": {
+                  "properties": {
+                    "sec": {
+                      "type": "float"
+                    }
+                  }
+                },
+                "rows_examined": {
+                  "type": "long"
+                },
+                "rows_sent": {
+                  "type": "long"
+                },
+                "timestamp": {
+                  "type": "long"
+                },
+                "user": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"

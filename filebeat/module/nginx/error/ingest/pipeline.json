@@ -5,7 +5,12 @@
       "field": "message",
       "patterns": [
         "%{DATA:nginx.error.time} \\[%{DATA:nginx.error.level}\\] %{NUMBER:nginx.error.pid}#%{NUMBER:nginx.error.tid}: (\\*%{NUMBER:nginx.error.connection_id} )?%{GREEDYDATA:nginx.error.message}"
-      ]
+      ],
+      "on_failure" : [{
+        "set" : {
+          "field" : "error",
+          "value" : "The error pattern didn't match on this event."
+        }
     }
   },{
     "remove":{

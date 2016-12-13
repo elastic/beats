@@ -27,5 +27,11 @@
     "remove": {
       "field": "nginx.access.time"
     }
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
   }]
 }

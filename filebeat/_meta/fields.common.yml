@@ -33,3 +33,8 @@
       description: >
         The input type from which the event was generated. This field is set to the value specified for the `input_type` option in the prospector section of the Filebeat config file.
 
+    - name: error
+      description: >
+        Ingestion pipeline error message, added in case there are errors reported by
+        the Ingest Node in Elasticsearch.
+
