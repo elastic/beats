@@ -67,7 +67,7 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
-#------------------------------- docker Module -------------------------------
+#------------------------------- Docker Module -------------------------------
 #- module: docker
   #metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
   #hosts: ["unix:///var/run/docker.sock"]
