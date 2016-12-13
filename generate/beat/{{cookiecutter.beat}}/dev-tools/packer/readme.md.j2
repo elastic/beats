@@ -1,0 +1,16 @@
+{% raw %}# Welcome to {{.beat_name}} {{.version}}
+
+{{.beat_description}}
+
+## Getting Started
+
+To get started with {{.beat_name}}, you need to set up Elasticsearch on your localhost first. After that, start {{.beat_name}} with:
+
+     ./{{.beat_name}}  -c {{.beat_name}}.yml -e
+
+This will start the beat and send the data to your Elasticsearch instance. To load the dashboards for {{.beat_name}} into Kibana, run:
+
+    ./scripts/import_dashboards
+
+For further steps visit https://{{.beat_repo}}
+{% endraw %}

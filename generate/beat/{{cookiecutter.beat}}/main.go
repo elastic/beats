@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	err := beat.Run("{{cookiecutter.beat}}", "", beater.New)
+	err := beat.Run("{{cookiecutter.beat}}", appVersion, beater.New)
 	if err != nil {
 		os.Exit(1)
 	}
