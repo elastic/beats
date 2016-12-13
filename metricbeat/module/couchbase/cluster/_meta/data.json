@@ -7,36 +7,64 @@
     "couchbase": {
         "cluster": {
             "hdd": {
-                "free.bytes": 51973239686,
-                "quota": {
-                    "total.bytes": 63381999616
+                "free": {
+                    "bytes": 50705599693
                 },
-                "total.bytes": 63381999616,
+                "quota": {
+                    "total": {
+                        "bytes": 63381999616
+                    }
+                },
+                "total": {
+                    "bytes": 63381999616
+                },
                 "used": {
-                    "by_data.bytes": 16368985,
-                    "value.bytes": 11408759930
+                    "by_data": {
+                        "bytes": 16368995
+                    },
+                    "value": {
+                        "bytes": 12676399923
+                    }
                 }
             },
             "max_bucket_count": 10,
             "quota": {
-                "index_memory.mb": 300,
-                "memory.mb": 300
+                "index_memory": {
+                    "mb": 300
+                },
+                "memory": {
+                    "mb": 300
+                }
             },
             "ram": {
                 "quota": {
                     "total": {
-                        "per_node.bytes": 314572800,
-                        "value.bytes": 314572800
+                        "per_node": {
+                            "bytes": 314572800
+                        },
+                        "value": {
+                            "bytes": 314572800
+                        }
                     },
                     "used": {
-                        "per_node.bytes": 104857600,
-                        "value.bytes": 104857600
+                        "per_node": {
+                            "bytes": 104857600
+                        },
+                        "value": {
+                            "bytes": 104857600
+                        }
                     }
                 },
-                "total.bytes": 8360542208,
+                "total": {
+                    "bytes": 8360542208
+                },
                 "used": {
-                    "by_data.bytes": 53962160,
-                    "value.bytes": 6718734336
+                    "by_data": {
+                        "bytes": 53962160
+                    },
+                    "value": {
+                        "bytes": 7660535808
+                    }
                 }
             }
         }

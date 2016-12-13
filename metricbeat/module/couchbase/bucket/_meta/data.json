@@ -7,21 +7,31 @@
     "couchbase": {
         "bucket": {
             "data": {
-                "used.bytes": 12597798
+                "used": {
+                    "bytes": 12597798
+                }
             },
             "disk": {
                 "fetches": 0,
-                "used.bytes": 16368983
+                "used": {
+                    "bytes": 16368995
+                }
             },
             "item_count": 7303,
             "memory": {
-                "used.bytes": 53962160
+                "used": {
+                    "bytes": 53962160
+                }
             },
             "name": "beer-sample",
             "ops_per_sec": 0,
             "quota": {
-                "ram.bytes": 104857600,
-                "use.pct": 51.46232604980469
+                "ram": {
+                    "bytes": 104857600
+                },
+                "use": {
+                    "pct": 51.46232604980469
+                }
             }
         }
     },
