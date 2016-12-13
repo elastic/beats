@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
   * <<metricbeat-module-apache,Apache>>
-  * <<metricbeat-module-docker,docker>>
+  * <<metricbeat-module-docker,Docker>>
   * <<metricbeat-module-haproxy,haproxy>>
   * <<metricbeat-module-kafka,kafka>>
   * <<metricbeat-module-mongodb,MongoDB>>
