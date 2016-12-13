@@ -1,6 +1,6 @@
 - module: nginx
   metricsets: ["stubstatus"]
-  enabled: true
+  enabled: false
   period: 10s
 
   # Nginx hosts
