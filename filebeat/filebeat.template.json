@@ -38,6 +38,10 @@
             }
           }
         },
+        "error": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
         "input_type": {
           "ignore_above": 1024,
           "type": "keyword"
@@ -71,6 +75,75 @@
                   "type": "keyword"
                 },
                 "region": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "mysql": {
+          "properties": {
+            "error": {
+              "properties": {
+                "level": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "message": {
+                  "norms": false,
+                  "type": "text"
+                },
+                "thread_id": {
+                  "type": "long"
+                },
+                "timestamp": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "slowlog": {
+              "properties": {
+                "host": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "id": {
+                  "type": "long"
+                },
+                "ip": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "lock_time": {
+                  "properties": {
+                    "sec": {
+                      "type": "float"
+                    }
+                  }
+                },
+                "query": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "query_time": {
+                  "properties": {
+                    "sec": {
+                      "type": "float"
+                    }
+                  }
+                },
+                "rows_examined": {
+                  "type": "long"
+                },
+                "rows_sent": {
+                  "type": "long"
+                },
+                "timestamp": {
+                  "type": "long"
+                },
+                "user": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 }

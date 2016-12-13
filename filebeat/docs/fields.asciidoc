@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-log>>
+* <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 
 --
@@ -173,6 +174,141 @@ The name of the log event. This field is set to the value specified for the `doc
 required: True
 
 The input type from which the event was generated. This field is set to the value specified for the `input_type` option in the prospector section of the Filebeat config file.
+
+
+[float]
+=== error
+
+Ingestion pipeline error message, added in case there are errors reported by the Ingest Node in Elasticsearch.
+
+
+[[exported-fields-mysql]]
+== MySQL Fields
+
+Module for parsing the MySQL log files.
+
+
+
+[float]
+== mysql Fields
+
+Fields from the MySQL log files.
+
+
+
+[float]
+== error Fields
+
+Contains fields from the MySQL error logs.
+
+
+
+[float]
+=== mysql.error.timestamp
+
+The timestamp from the log line.
+
+
+[float]
+=== mysql.error.thread_id
+
+type: long
+
+As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this field contains the process id.
+
+
+[float]
+=== mysql.error.level
+
+example: Warning
+
+The log level.
+
+[float]
+=== mysql.error.message
+
+type: text
+
+The logged message.
+
+
+[float]
+== slowlog Fields
+
+Contains fields from the MySQL slow logs.
+
+
+
+[float]
+=== mysql.slowlog.user
+
+The MySQL user that created the query.
+
+
+[float]
+=== mysql.slowlog.host
+
+The host from where the user that created the query logged in.
+
+
+[float]
+=== mysql.slowlog.ip
+
+The IP address from where the user that created the query logged in.
+
+
+[float]
+=== mysql.slowlog.query_time.sec
+
+type: float
+
+The total time the query took, in seconds, as a floating point number.
+
+
+[float]
+=== mysql.slowlog.lock_time.sec
+
+type: float
+
+The amount of time the query waited for the lock to be available. The value is in seconds, as a floating point number.
+
+
+[float]
+=== mysql.slowlog.rows_sent
+
+type: long
+
+The number of rows returned by the query.
+
+
+[float]
+=== mysql.slowlog.rows_examined
+
+type: long
+
+The number of rows scanned by the query.
+
+
+[float]
+=== mysql.slowlog.timestamp
+
+type: long
+
+The unix timestamp taken from the `SET timestamp` query.
+
+
+[float]
+=== mysql.slowlog.query
+
+The slow query.
+
+
+[float]
+=== mysql.slowlog.id
+
+type: long
+
+The connection ID for the query.
 
 
 [[exported-fields-nginx]]

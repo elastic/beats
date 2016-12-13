@@ -41,5 +41,11 @@
       "field": "nginx.access.remote_ip",
       "target_field": "nginx.access.geoip"
     }
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
   }]
 }
