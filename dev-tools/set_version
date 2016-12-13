@@ -4,7 +4,7 @@ import os
 import re
 from subprocess import check_call
 
-libbeat_template_go = '''package beat
+esbeat_template_go = '''package beat
 
 const defaultBeatVersion = "{}"
 '''
@@ -27,7 +27,6 @@ def main():
     args = parser.parse_args()
 
     dir_script = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-
     esBeat = True
 
     # Check whether the script belongs to a community beat project (i.e.: the script is inside the vendor folder)
@@ -41,14 +40,14 @@ def main():
     except:
         pass
 
-
     if esBeat:
         root_folder = os.path.dirname(dir_script)
-        print (root_folder)
+        template_go = esbeat_template_go
         version_file = os.path.join(root_folder, "libbeat", "beat", "version.go")
         version_yml = os.path.join(root_folder, "dev-tools", "packer","version.yml")
     else: # Community beat
         root_folder = os.path.dirname(project_dir)
+        template_go = project_template_go
         version_file = os.path.join(root_folder, "version.go")
         version_yml = os.path.join(root_folder, "dev-tools", "packer","version.yml")
 
@@ -62,20 +61,18 @@ def main():
     except:
         pass
 
-
-
-
+    # Update version.go file
     with open(version_file, "w") as f:
-        f.write(libbeat_template_go.format(args.version))
+        f.write(template_go.format(args.version))
         if old_version:
             print ("Update version from {} to {} in file {}".format(old_version, args.version, version_file))
         else:
             print ("Set version to {} in file {}".format(args.version, version_file))
 
-    version = args.version
+    # Update dev-tools/packer/version.yml file
     with open(version_yml, "w") as f:
         f.write(template_packer.format(
-            version=version,
+            version=args.version,
         ))
         if old_version:
             print ("Update version from {} to {} in file {}".format(old_version, args.version, version_yml))
