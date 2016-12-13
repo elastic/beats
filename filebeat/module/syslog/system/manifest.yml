@@ -1,0 +1,10 @@
+module_version: 1.0
+
+vars:
+  path:
+    default: /var/log/messages
+    os.darwin: /var/log/system.log
+
+ingest_pipeline: ingest/pipeline.json
+prospectors:
+  - config/system.yml
