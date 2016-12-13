@@ -45,18 +45,25 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, "beer-sample", event["name"])
 
 	data := event["data"].(common.MapStr)
-	assert.EqualValues(t, 12597731, data["used.bytes"])
+	data_used := data["used"].(common.MapStr)
+	assert.EqualValues(t, 12597731, data_used["bytes"])
 
 	disk := event["disk"].(common.MapStr)
 	assert.EqualValues(t, 0, disk["fetches"])
-	assert.EqualValues(t, 16369008, disk["used.bytes"])
+
+	disk_used := disk["used"].(common.MapStr)
+	assert.EqualValues(t, 16369008, disk_used["bytes"])
 
 	memory := event["memory"].(common.MapStr)
-	assert.EqualValues(t, 53962160, memory["used.bytes"])
+	memory_used := memory["used"].(common.MapStr)
+	assert.EqualValues(t, 53962160, memory_used["bytes"])
 
 	quota := event["quota"].(common.MapStr)
-	assert.EqualValues(t, 104857600, quota["ram.bytes"])
-	assert.EqualValues(t, 51.46232604980469, quota["use.pct"])
+	quota_ram := quota["ram"].(common.MapStr)
+	assert.EqualValues(t, 104857600, quota_ram["bytes"])
+
+	quota_use := quota["use"].(common.MapStr)
+	assert.EqualValues(t, 51.46232604980469, quota_use["pct"])
 
 	assert.EqualValues(t, 7303, event["item_count"])
 	assert.EqualValues(t, 0, event["ops_per_sec"])

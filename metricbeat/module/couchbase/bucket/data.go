@@ -45,18 +45,28 @@ func eventsMapping(body io.Reader) []common.MapStr {
 			"name": Bucket.Name,
 			"type": Bucket.BucketType,
 			"data": common.MapStr{
-				"used.bytes": Bucket.BasicStats.DataUsed,
+				"used": common.MapStr{
+					"bytes": Bucket.BasicStats.DataUsed,
+				},
 			},
 			"disk": common.MapStr{
-				"fetches":    Bucket.BasicStats.DiskFetches,
-				"used.bytes": Bucket.BasicStats.DiskUsed,
+				"fetches": Bucket.BasicStats.DiskFetches,
+				"used": common.MapStr{
+					"bytes": Bucket.BasicStats.DiskUsed,
+				},
 			},
 			"memory": common.MapStr{
-				"used.bytes": Bucket.BasicStats.MemUsed,
+				"used": common.MapStr{
+					"bytes": Bucket.BasicStats.MemUsed,
+				},
 			},
 			"quota": common.MapStr{
-				"ram.bytes": Bucket.Quota.RAM,
-				"use.pct":   Bucket.BasicStats.QuotaPercentUsed,
+				"ram": common.MapStr{
+					"bytes": Bucket.Quota.RAM,
+				},
+				"use": common.MapStr{
+					"pct": Bucket.BasicStats.QuotaPercentUsed,
+				},
 			},
 			"ops_per_sec": Bucket.BasicStats.OpsPerSec,
 			"item_count":  Bucket.BasicStats.ItemCount,
