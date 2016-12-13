@@ -220,6 +220,10 @@ testsuite: clean collect
 	$(MAKE) benchmark-tests
 	$(MAKE) coverage-report
 
+	if [ $(TEST_ENVIRONMENT) = true ]; then \
+		$(MAKE) fix-permissions; \
+	fi
+
 # Generates a coverage report from the existing coverage files
 .PHONY: coverage-report
 coverage-report:
@@ -405,7 +409,7 @@ package: package-setup
 	fi
 
 	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_DIR=${BEAT_DIR} BUILD_DIR=${BUILD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${BUILD_DIR}/upload/build_id.txt
-
+	$(MAKE) fix-permissions
 	echo "Finished packages for ${BEATNAME}"
 
 package-dashboards: package-setup
@@ -413,3 +417,7 @@ package-dashboards: package-setup
 	cp -r _meta/kibana ${BUILD_DIR}/dashboards
 	# build the dashboards package
 	BEATNAME=${BEATNAME} BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C ${ES_BEATS}/dev-tools/packer package-dashboards ${shell pwd}/build/upload/build_id.txt
+
+fix-permissions:
+	# Change ownership of all files inside /build folder from root/root to current user/group
+	docker run -v ${BUILD_DIR}:/build alpine:3.4 sh -c "chown -R $(shell id -u):$(shell id -g) /build"
