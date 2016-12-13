@@ -70,12 +70,11 @@ func TestValidJSONDepthOne(t *testing.T) {
 	actual := getActualValue(t, testConfig, input)
 
 	expected := common.MapStr{
-		"json": map[string]interface{}{
+		"msg": map[string]interface{}{
 			"log":    "{\"level\":\"info\"}",
 			"stream": "stderr",
 			"count":  3,
 		},
-		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
 		"pipeline": "us1",
 	}
 
@@ -98,7 +97,37 @@ func TestValidJSONDepthTwo(t *testing.T) {
 	actual := getActualValue(t, testConfig, input)
 
 	expected := common.MapStr{
-		"json": map[string]interface{}{
+		"msg": map[string]interface{}{
+			"log": map[string]interface{}{
+				"level": "info",
+			},
+			"stream": "stderr",
+			"count":  3,
+		},
+		"pipeline": "us1",
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+
+}
+
+func TestTargetOption(t *testing.T) {
+	input := common.MapStr{
+		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
+		"pipeline": "us1",
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":       fields,
+		"processArray": false,
+		"maxDepth":     2,
+		"target":       "doc",
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"doc": map[string]interface{}{
 			"log": map[string]interface{}{
 				"level": "info",
 			},
@@ -110,7 +139,6 @@ func TestValidJSONDepthTwo(t *testing.T) {
 	}
 
 	assert.Equal(t, expected.String(), actual.String())
-
 }
 
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {

@@ -17,18 +17,21 @@ type decodeJSONFields struct {
 	fields       []string
 	maxDepth     int
 	processArray bool
+	target       string
 }
 
 type config struct {
 	Fields       []string `config:"fields"`
 	MaxDepth     int      `config:"maxDepth" validate:"min=1"`
 	ProcessArray bool     `config:"processArray"`
+	Target       string   `config:"target"`
 }
 
 var (
 	defaultConfig = config{
 		MaxDepth:     1,
 		ProcessArray: false,
+		Target:       "",
 	}
 )
 
@@ -38,7 +41,7 @@ func init() {
 	processors.RegisterPlugin("decode_json_fields",
 		configChecked(newDecodeJSONFields,
 			requireFields("fields"),
-			allowedFields("fields", "maxDepth", "processArray")))
+			allowedFields("fields", "maxDepth", "processArray", "target")))
 }
 
 func newDecodeJSONFields(c common.Config) (processors.Processor, error) {
@@ -51,7 +54,7 @@ func newDecodeJSONFields(c common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the decode_json_fields configuration: %s", err)
 	}
 
-	f := decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, processArray: config.ProcessArray}
+	f := decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, processArray: config.ProcessArray, target: config.Target}
 	return f, nil
 }
 
@@ -75,7 +78,12 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 				continue
 			}
 
-			_, err = event.Put("json", output)
+			if len(f.target) > 0 {
+				_, err = event.Put(f.target, output)
+			} else {
+				_, err = event.Put(field, output)
+			}
+
 			if err != nil {
 				debug("Error trying to Put value %v for field : %s", output, field)
 				errs = append(errs, err.Error())
