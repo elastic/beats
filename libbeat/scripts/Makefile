@@ -420,4 +420,4 @@ package-dashboards: package-setup
 
 fix-permissions:
 	# Change ownership of all files inside /build folder from root/root to current user/group
-	docker run -v ${BUILD_DIR}:/build -it alpine:3.4 sh -c "chown -R $(shell id -u):$(shell id -g) /build"
+	docker run -v ${BUILD_DIR}:/build alpine:3.4 sh -c "chown -R $(shell id -u):$(shell id -g) /build"
