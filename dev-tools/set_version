@@ -1,16 +1,23 @@
 #!/usr/bin/env python
-import os
 import argparse
+import os
+import re
 from subprocess import check_call
 
-template_go = '''package beat
+libbeat_template_go = '''package beat
 
 const defaultBeatVersion = "{}"
+'''
+
+project_template_go = '''package main
+
+const appVersion = "{}"
 '''
 
 template_packer = '''version: "{version}"
 '''
 
+pattern = re.compile(r'const\s\w*(v|V)ersion\s=\s"(?P<version>.*)"')
 
 def main():
     parser = argparse.ArgumentParser(
@@ -19,18 +26,64 @@ def main():
                         help="The new version")
     args = parser.parse_args()
 
-    dir = os.path.dirname(os.path.realpath(__file__))
-    with open(dir + "/../libbeat/beat/version.go", "w") as f:
-        f.write(template_go.format(args.version))
+    dir_script = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+
+    esBeat = True
+
+    # Check whether the script belongs to a community beat project (i.e.: the script is inside the vendor folder)
+    try:
+        project_dir = dir_script
+        gopath = os.path.abspath(os.environ["GOPATH"])
+        while os.path.basename(project_dir) != 'vendor' and project_dir != gopath and os.path.dirname(project_dir) != project_dir:
+            project_dir=os.path.dirname(project_dir)
+        if os.path.basename(project_dir) == 'vendor':
+            esBeat = False
+    except:
+        pass
+
+
+    if esBeat:
+        root_folder = os.path.dirname(dir_script)
+        print (root_folder)
+        version_file = os.path.join(root_folder, "libbeat", "beat", "version.go")
+        version_yml = os.path.join(root_folder, "dev-tools", "packer","version.yml")
+    else: # Community beat
+        root_folder = os.path.dirname(project_dir)
+        version_file = os.path.join(root_folder, "version.go")
+        version_yml = os.path.join(root_folder, "dev-tools", "packer","version.yml")
+
+    old_version = ""
+    try:
+        with open(version_file) as f:
+            for line in f:
+                match = pattern.match(line)
+                if match:
+                    old_version = match.group('version')
+    except:
+        pass
+
+
+
+
+    with open(version_file, "w") as f:
+        f.write(libbeat_template_go.format(args.version))
+        if old_version:
+            print ("Update version from {} to {} in file {}".format(old_version, args.version, version_file))
+        else:
+            print ("Set version to {} in file {}".format(args.version, version_file))
 
     version = args.version
-    with open(dir + "/packer/version.yml", "w") as f:
+    with open(version_yml, "w") as f:
         f.write(template_packer.format(
             version=version,
         ))
+        if old_version:
+            print ("Update version from {} to {} in file {}".format(old_version, args.version, version_yml))
+        else:
+            print ("Set version to {} in file {}".format(args.version, version_yml))
 
     # Updates all files with the new templates
-    os.chdir(dir + "/../")
+    os.chdir(root_folder)
     print("Update build files")
     check_call("make update", shell=True)
 

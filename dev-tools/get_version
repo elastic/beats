@@ -1,8 +1,15 @@
 #!/usr/bin/env python
-import os
 import argparse
+import os
+import re
 
-pattern = '''const defaultBeatVersion = "'''
+"""
+    get_version returns the version number written in "version.go" file
+    The "version.go" may be located in the root folder of community beat project.
+    When not found, the "version.go" is located in the libbeat/beat folder.
+"""
+
+pattern = re.compile(r'const\s\w*(v|V)ersion\s=\s"(?P<version>.*)"')
 
 
 def main():
@@ -10,11 +17,27 @@ def main():
         description="Prints the current version at stdout.")
     parser.parse_args()
 
-    dir = os.path.dirname(os.path.realpath(__file__))
-    with open(dir + "/../libbeat/beat/version.go", "r") as f:
+    dir_script = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+    try:
+        project_dir = dir_script
+        gopath = os.path.abspath(os.environ["GOPATH"])
+         # Check whether the script belongs to a community beat project (i.e.: the script is inside the vendor folder)
+        while os.path.basename(project_dir) != 'vendor' and project_dir != gopath and os.path.dirname(project_dir) != project_dir:
+            project_dir=os.path.dirname(project_dir)
+        version_file = open(os.path.join(os.path.dirname(project_dir), "version.go"), "r")
+    except:
+        version_file = open(os.path.join(dir_script, "..", "libbeat", "beat", "version.go"))
+
+    with version_file as f:
         for line in f:
-            if line.startswith(pattern):
-                print(line[len(pattern):-2])  # -2 for \n and the final quote
+            match = pattern.match(line)
+            if match:
+                version = match.group('version')
+
+    try:
+        print (version)
+    except:
+        print ("No version found")
 
 if __name__ == "__main__":
     main()
