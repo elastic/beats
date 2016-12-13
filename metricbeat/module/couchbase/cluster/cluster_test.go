@@ -41,37 +41,57 @@ func TestFetchEventContents(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
 	hdd := event["hdd"].(common.MapStr)
-	assert.EqualValues(t, 46902679716, hdd["free.bytes"])
-	assert.EqualValues(t, 63381999616, hdd["total.bytes"])
+	hdd_free := hdd["free"].(common.MapStr)
+	assert.EqualValues(t, 46902679716, hdd_free["bytes"])
+
+	hdd_total := hdd["total"].(common.MapStr)
+	assert.EqualValues(t, 63381999616, hdd_total["bytes"])
 
 	hdd_used := hdd["used"].(common.MapStr)
-	assert.EqualValues(t, 16479319900, hdd_used["value.bytes"])
-	assert.EqualValues(t, 16369010, hdd_used["by_data.bytes"])
+	hdd_used_value := hdd_used["value"].(common.MapStr)
+	assert.EqualValues(t, 16479319900, hdd_used_value["bytes"])
+
+	hdd_used_by_data := hdd_used["by_data"].(common.MapStr)
+	assert.EqualValues(t, 16369010, hdd_used_by_data["bytes"])
 
 	hdd_quota := hdd["quota"].(common.MapStr)
-	assert.EqualValues(t, 63381999616, hdd_quota["total.bytes"])
+	hdd_quota_total := hdd_quota["total"].(common.MapStr)
+	assert.EqualValues(t, 63381999616, hdd_quota_total["bytes"])
 
 	assert.EqualValues(t, 10, event["max_bucket_count"])
 
 	quota := event["quota"].(common.MapStr)
-	assert.EqualValues(t, 300, quota["index_memory.mb"])
-	assert.EqualValues(t, 300, quota["memory.mb"])
+	quota_index_memory := quota["index_memory"].(common.MapStr)
+	assert.EqualValues(t, 300, quota_index_memory["mb"])
+
+	quota_memory := quota["memory"].(common.MapStr)
+	assert.EqualValues(t, 300, quota_memory["mb"])
 
 	ram := event["ram"].(common.MapStr)
 
 	ram_quota := ram["quota"].(common.MapStr)
 
 	ram_quota_total := ram_quota["total"].(common.MapStr)
-	assert.EqualValues(t, 314572800, ram_quota_total["value.bytes"])
-	assert.EqualValues(t, 314572800, ram_quota_total["per_node.bytes"])
+	ram_quota_total_value := ram_quota_total["value"].(common.MapStr)
+	assert.EqualValues(t, 314572800, ram_quota_total_value["bytes"])
+
+	ram_quota_total_per_node := ram_quota_total["per_node"].(common.MapStr)
+	assert.EqualValues(t, 314572800, ram_quota_total_per_node["bytes"])
 
 	ram_quota_used := ram_quota["used"].(common.MapStr)
-	assert.EqualValues(t, 104857600, ram_quota_used["value.bytes"])
-	assert.EqualValues(t, 104857600, ram_quota_used["per_node.bytes"])
+	ram_quota_used_value := ram_quota_used["value"].(common.MapStr)
+	assert.EqualValues(t, 104857600, ram_quota_used_value["bytes"])
 
-	assert.EqualValues(t, 8359174144, ram["total.bytes"])
+	ram_quota_used_per_node := ram_quota_used["per_node"].(common.MapStr)
+	assert.EqualValues(t, 104857600, ram_quota_used_per_node["bytes"])
+
+	ram_total := ram["total"].(common.MapStr)
+	assert.EqualValues(t, 8359174144, ram_total["bytes"])
 
 	ram_used := ram["used"].(common.MapStr)
-	assert.EqualValues(t, 8004751360, ram_used["value.bytes"])
-	assert.EqualValues(t, 53962016, ram_used["by_data.bytes"])
+	ram_used_value := ram_used["value"].(common.MapStr)
+	assert.EqualValues(t, 8004751360, ram_used_value["bytes"])
+
+	ram_used_by_data := ram_used["by_data"].(common.MapStr)
+	assert.EqualValues(t, 53962016, ram_used_by_data["bytes"])
 }

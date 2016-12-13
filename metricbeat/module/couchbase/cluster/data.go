@@ -53,35 +53,63 @@ func eventMapping(body io.Reader) common.MapStr {
 	event := common.MapStr{
 		"hdd": common.MapStr{
 			"quota": common.MapStr{
-				"total.bytes": d.StorageTotals.Hdd.QuotaTotal,
+				"total": common.MapStr{
+					"bytes": d.StorageTotals.Hdd.QuotaTotal,
+				},
 			},
-			"free.bytes":  d.StorageTotals.Hdd.Free,
-			"total.bytes": d.StorageTotals.Hdd.Total,
+			"free": common.MapStr{
+				"bytes": d.StorageTotals.Hdd.Free,
+			},
+			"total": common.MapStr{
+				"bytes": d.StorageTotals.Hdd.Total,
+			},
 			"used": common.MapStr{
-				"value.bytes":   d.StorageTotals.Hdd.Used,
-				"by_data.bytes": d.StorageTotals.Hdd.UsedByData,
+				"value": common.MapStr{
+					"bytes": d.StorageTotals.Hdd.Used,
+				},
+				"by_data": common.MapStr{
+					"bytes": d.StorageTotals.Hdd.UsedByData,
+				},
 			},
 		},
 		"max_bucket_count": d.MaxBucketCount,
 		"quota": common.MapStr{
-			"index_memory.mb": d.IndexMemoryQuota,
-			"memory.mb":       d.MemoryQuota,
+			"index_memory": common.MapStr{
+				"mb": d.IndexMemoryQuota,
+			},
+			"memory": common.MapStr{
+				"mb": d.MemoryQuota,
+			},
 		},
 		"ram": common.MapStr{
 			"quota": common.MapStr{
 				"total": common.MapStr{
-					"value.bytes":    d.StorageTotals.RAM.QuotaTotal,
-					"per_node.bytes": d.StorageTotals.RAM.QuotaTotalPerNode,
+					"value": common.MapStr{
+						"bytes": d.StorageTotals.RAM.QuotaTotal,
+					},
+					"per_node": common.MapStr{
+						"bytes": d.StorageTotals.RAM.QuotaTotalPerNode,
+					},
 				},
 				"used": common.MapStr{
-					"value.bytes":    d.StorageTotals.RAM.QuotaUsed,
-					"per_node.bytes": d.StorageTotals.RAM.QuotaUsedPerNode,
+					"value": common.MapStr{
+						"bytes": d.StorageTotals.RAM.QuotaUsed,
+					},
+					"per_node": common.MapStr{
+						"bytes": d.StorageTotals.RAM.QuotaUsedPerNode,
+					},
 				},
 			},
-			"total.bytes": d.StorageTotals.RAM.Total,
+			"total": common.MapStr{
+				"bytes": d.StorageTotals.RAM.Total,
+			},
 			"used": common.MapStr{
-				"value.bytes":   d.StorageTotals.RAM.Used,
-				"by_data.bytes": d.StorageTotals.RAM.UsedByData,
+				"value": common.MapStr{
+					"bytes": d.StorageTotals.RAM.Used,
+				},
+				"by_data": common.MapStr{
+					"bytes": d.StorageTotals.RAM.UsedByData,
+				},
 			},
 		},
 	}
