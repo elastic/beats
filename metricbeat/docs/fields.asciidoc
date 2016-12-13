@@ -506,7 +506,7 @@ The document type. Always set to "metricsets".
 
 
 [[exported-fields-docker]]
-== docker Fields
+== Docker Fields
 
 experimental[]
 Docker stats collected from Docker.
@@ -516,14 +516,14 @@ Docker stats collected from Docker.
 [float]
 == docker Fields
 
-docker contains different informations and statistics of docker's containers running
+Information and statistics about docker's running containers.
 
 
 
 [float]
 == container Fields
 
-Docker container metrics
+Docker container metrics.
 
 
 
@@ -532,7 +532,7 @@ Docker container metrics
 
 type: keyword
 
-Executed command in docker container.
+Command that was executed in the Docker container.
 
 
 [float]
@@ -540,7 +540,7 @@ Executed command in docker container.
 
 type: date
 
-Date then the container was created.
+Date when the container was created.
 
 
 [float]
@@ -595,13 +595,13 @@ Total size of all the files in the container.
 
 type: long
 
-Size of the files which have been created or changed since creation.
+Size of the files that have been created or changed since creation.
 
 
 [float]
 == cpu Fields
 
-Runtime cpu metrics.
+Runtime CPU metrics.
 
 
 
@@ -612,7 +612,7 @@ type: scaled_float
 
 format: percentage
 
-The system kernel consumed by The Docker server.
+The system kernel consumed by the Docker server.
 
 
 [float]
@@ -620,7 +620,7 @@ The system kernel consumed by The Docker server.
 
 type: long
 
-Cpu kernel tikcs
+CPU kernel ticks.
 
 
 [float]
@@ -637,7 +637,7 @@ format: percentage
 
 type: long
 
-Cpu system tikcs
+CPU system ticks.
 
 
 [float]
@@ -654,7 +654,7 @@ format: percentage
 
 type: long
 
-Cpu user tikcs
+CPU user ticks
 
 
 [float]
@@ -664,13 +664,13 @@ type: scaled_float
 
 format: percentage
 
-Total cpu usage.
+Total CPU usage.
 
 
 [float]
 == diskio Fields
 
-Diskio metrics.
+Disk I/O metrics.
 
 
 
@@ -695,14 +695,14 @@ Number of writes.
 
 type: scaled_float
 
-Reads and writes numbers combined.
+Number of reads and writes combined.
 
 
 [float]
 == info Fields
 
 experimental[]
-info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information
+Info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information.
 
 
 
@@ -750,7 +750,7 @@ Total number of existing containers.
 
 type: keyword
 
-Unique docker host identifier.
+Unique Docker host identifier.
 
 
 [float]
@@ -789,7 +789,7 @@ Memory limit.
 [float]
 == rss Fields
 
-Rss memory stats.
+RSS memory stats.
 
 
 
@@ -849,7 +849,7 @@ Total memory usage.
 [float]
 == network Fields
 
-Netowrk metrics.
+Network metrics.
 
 
 
