@@ -73,19 +73,33 @@ func eventsMapping(body io.Reader) []common.MapStr {
 			"cmd_get": NodeItem.InterestingStats.CmdGet,
 			"couch": common.MapStr{
 				"docs": common.MapStr{
-					"actual_disk_size.bytes": NodeItem.InterestingStats.CouchDocsActualDiskSize,
-					"data_size.bytes":        NodeItem.InterestingStats.CouchDocsDataSize,
+					"actual_disk_size": common.MapStr{
+						"bytes": NodeItem.InterestingStats.CouchDocsActualDiskSize,
+					},
+					"data_size": common.MapStr{
+						"bytes": NodeItem.InterestingStats.CouchDocsDataSize,
+					},
 				},
 				"spacial": common.MapStr{
-					"data_size.bytes": NodeItem.InterestingStats.CouchSpatialDataSize,
-					"disk_size.bytes": NodeItem.InterestingStats.CouchSpatialDiskSize,
+					"data_size": common.MapStr{
+						"bytes": NodeItem.InterestingStats.CouchSpatialDataSize,
+					},
+					"disk_size": common.MapStr{
+						"bytes": NodeItem.InterestingStats.CouchSpatialDiskSize,
+					},
 				},
 				"views": common.MapStr{
-					"actual_disk_size.bytes": NodeItem.InterestingStats.CouchViewsActualDiskSize,
-					"data_size.bytes":        NodeItem.InterestingStats.CouchViewsDataSize,
+					"actual_disk_size": common.MapStr{
+						"bytes": NodeItem.InterestingStats.CouchViewsActualDiskSize,
+					},
+					"data_size": common.MapStr{
+						"bytes": NodeItem.InterestingStats.CouchViewsDataSize,
+					},
 				},
 			},
-			"cpu_utilization_rate.pct": NodeItem.SystemStats.CPUUtilizationRate,
+			"cpu_utilization_rate": common.MapStr{
+				"pct": NodeItem.SystemStats.CPUUtilizationRate,
+			},
 			"current_items": common.MapStr{
 				"value": NodeItem.InterestingStats.CurrItems,
 				"total": NodeItem.InterestingStats.CurrItemsTot,
@@ -94,20 +108,36 @@ func eventsMapping(body io.Reader) []common.MapStr {
 			"get_hits":      NodeItem.InterestingStats.GetHits,
 			"hostname":      NodeItem.Hostname,
 			"mcd_memory": common.MapStr{
-				"reserved.bytes":  NodeItem.McdMemoryReserved,
-				"allocated.bytes": NodeItem.McdMemoryAllocated,
+				"reserved": common.MapStr{
+					"bytes": NodeItem.McdMemoryReserved,
+				},
+				"allocated": common.MapStr{
+					"bytes": NodeItem.McdMemoryAllocated,
+				},
 			},
 			"memory": common.MapStr{
-				"total.bytes": NodeItem.SystemStats.MemTotal,
-				"free.bytes":  NodeItem.SystemStats.MemFree,
-				"used.bytes":  NodeItem.InterestingStats.MemUsed,
+				"total": common.MapStr{
+					"bytes": NodeItem.SystemStats.MemTotal,
+				},
+				"free": common.MapStr{
+					"bytes": NodeItem.SystemStats.MemFree,
+				},
+				"used": common.MapStr{
+					"bytes": NodeItem.InterestingStats.MemUsed,
+				},
 			},
 			"ops": NodeItem.InterestingStats.Ops,
 			"swap": common.MapStr{
-				"total.bytes": NodeItem.SystemStats.SwapTotal,
-				"used.bytes":  NodeItem.SystemStats.SwapUsed,
+				"total": common.MapStr{
+					"bytes": NodeItem.SystemStats.SwapTotal,
+				},
+				"used": common.MapStr{
+					"bytes": NodeItem.SystemStats.SwapUsed,
+				},
 			},
-			"uptime.sec":            uptime,
+			"uptime": common.MapStr{
+				"sec": uptime,
+			},
 			"vb_replica_curr_items": NodeItem.InterestingStats.VbReplicaCurrItems,
 		}
 		events = append(events, event)
