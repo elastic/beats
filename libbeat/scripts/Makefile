@@ -1,11 +1,14 @@
-
 ### VARIABLE SETUP ###
-
+### Application using libbeat may override the following variables in their Makefile
 BEATNAME?=libbeat
 BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash
+BEAT_VENDOR?=Elastic
+BEAT_LICENSE?=ASL 2.0
+BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEATNAME}/current/index.html
 BEAT_DIR?=github.com/elastic/beats/${BEATNAME}
 ES_BEATS?=..
 GOPACKAGES?=${BEAT_DIR}/...
+PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer
 
 # Makefile for a custom beat that includes this libbeat/scripts/Makefile:
 # if glide is used to manage vendor dependencies,
@@ -341,6 +344,7 @@ prepare-package:
 	# cross compile on ubuntu
 	docker run --rm \
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
+		-v $(abspath ${PACKER_TEMPLATES_DIR}):/templates \
 		-v $(abspath ../):/source \
 		-v $(BUILD_DIR):/build \
 		-e PUREGO="yes" \
@@ -359,6 +363,7 @@ prepare-package-cgo:
 	# cross compile on ubuntu
 	docker run --rm \
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
+		-v $(abspath ${PACKER_TEMPLATES_DIR}):/templates \
 		-v $(abspath ../):/source \
 		-v $(BUILD_DIR):/build \
 		-e PACK=${BEATNAME} \
@@ -373,6 +378,7 @@ prepare-package-cgo:
 	docker run --rm \
 		-v ${BUILD_DIR}:/build \
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
+		-v $(abspath ${PACKER_TEMPLATES_DIR}):/templates \
 		-v $(abspath ..):/source \
 		-e PACK=${BEATNAME} \
 		-e BEFORE_BUILD=before_build.sh \
@@ -400,6 +406,9 @@ package: package-setup
 	echo "beat_url: https://${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_repo: ${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_description: ${BEAT_DESCRIPTION}" >> ${BUILD_DIR}/package.yml
+	echo "beat_vendor: ${BEAT_VENDOR}" >> ${BUILD_DIR}/package.yml
+	echo "beat_license: ${BEAT_LICENSE}" >> ${BUILD_DIR}/package.yml
+	echo "beat_doc_url: ${BEAT_DOC_URL}" >> ${BUILD_DIR}/package.yml
 	cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml
 
 	if [ $(CGO) = true ]; then \
