@@ -1,10 +1,13 @@
 module_version: 1.0
 
 vars:
-  path:
-    default: /var/log/nginx
-    os.darwin: /usr/local/var/log/nginx
-    os.windows: c:/programfiles/nginx/logs
+  paths:
+    default:
+      - /var/log/nginx/access.log*
+    os.darwin:
+      - /usr/local/var/log/nginx/access.log*
+    os.windows:
+      - c:/programfiles/nginx/logs/access.log*
   pipeline:
     # options: with_plugins, no_plugins, json_with_plugins, json_no_plugins
     default: with_plugins
