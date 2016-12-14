@@ -275,6 +275,34 @@
           "ignore_above": 1024,
           "type": "keyword"
         },
+        "syslog": {
+          "properties": {
+            "system": {
+              "properties": {
+                "hostname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "message": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "pid": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "program": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "timestamp": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
         "tags": {
           "ignore_above": 1024,
           "type": "keyword"

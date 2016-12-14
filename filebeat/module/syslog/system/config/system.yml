@@ -1,0 +1,9 @@
+- input_type: log
+  paths:
+    - {{path}}
+  multiline:
+    pattern: "^\\s"
+    match: after
+  fields:
+    source_type: syslog-system
+    pipeline_id: {{beat.pipeline_id}}
