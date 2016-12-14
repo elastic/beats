@@ -17,21 +17,20 @@ type decodeJSONFields struct {
 	fields       []string
 	maxDepth     int
 	processArray bool
-	target       string
+	target       *string
 }
 
 type config struct {
 	Fields       []string `config:"fields"`
 	MaxDepth     int      `config:"maxDepth" validate:"min=1"`
 	ProcessArray bool     `config:"processArray"`
-	Target       string   `config:"target"`
+	Target       *string  `config:"target"`
 }
 
 var (
 	defaultConfig = config{
 		MaxDepth:     1,
 		ProcessArray: false,
-		Target:       "",
 	}
 )
 
@@ -78,8 +77,8 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 				continue
 			}
 
-			if len(f.target) > 0 {
-				_, err = event.Put(f.target, output)
+			if f.target != nil {
+				_, err = event.Put(*f.target, output)
 			} else {
 				_, err = event.Put(field, output)
 			}
