@@ -321,6 +321,39 @@
           "index": "not_analyzed",
           "type": "string"
         },
+        "syslog": {
+          "properties": {
+            "system": {
+              "properties": {
+                "hostname": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "message": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "pid": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "program": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "timestamp": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
         "tags": {
           "ignore_above": 1024,
           "index": "not_analyzed",

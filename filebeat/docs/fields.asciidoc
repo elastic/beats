@@ -17,6 +17,7 @@ grouped in the following categories:
 * <<exported-fields-log>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
+* <<exported-fields-syslog>>
 
 --
 [[exported-fields-beat]]
@@ -565,5 +566,56 @@ Connection identifier.
 type: text
 
 The error message
+
+
+[[exported-fields-syslog]]
+== Syslog Fields
+
+Module for parsing syslog files.
+
+
+
+[float]
+== syslog Fields
+
+Fields from the syslog files.
+
+
+
+[float]
+== system Fields
+
+Contains fields from the syslog system logs.
+
+
+
+[float]
+=== syslog.system.timestamp
+
+The timestamp as read from the syslog message.
+
+
+[float]
+=== syslog.system.hostname
+
+The hostname as read from the syslog message.
+
+
+[float]
+=== syslog.system.program
+
+The process name as read from the syslog message.
+
+
+[float]
+=== syslog.system.pid
+
+The PID of the process that sent the syslog message.
+
+
+[float]
+=== syslog.system.message
+
+The message in the log line.
 
 
