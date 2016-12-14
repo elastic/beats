@@ -3,8 +3,8 @@
   description: >
     `cpu` contains local CPU stats.
   fields:
-  - name: cores
-      type: int
+    - name: cores
+      type: long
       description: >
         The number of CPU cores.
 
