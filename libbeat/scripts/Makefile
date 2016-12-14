@@ -1,5 +1,5 @@
 ### VARIABLE SETUP ###
-#¤¤ Application using libbeat may override the following variables in their Makefile
+### Application using libbeat may override the following variables in their Makefile
 BEATNAME?=libbeat
 BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash
 BEAT_VENDOR?=Elastic
