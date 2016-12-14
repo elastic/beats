@@ -54,7 +54,7 @@ go install github.com/tsg/gotpl
 cat ${LIBBEAT_PATH}/docs/version.asciidoc >> ${PREFIX}/package.yml
 # Make variable naming of doc-branch compatible with gotpl. Generate and copy README.md into homedir
 sed -i -e 's/:doc-branch/doc_branch/g' ${PREFIX}/package.yml
-/go/bin/gotpl ${LIBBEAT_PATH}/../dev-tools/packer/readme.md.j2 < ${PREFIX}/package.yml > ${PREFIX}/homedir/README.md
+/go/bin/gotpl /templates/readme.md.j2 < ${PREFIX}/package.yml > ${PREFIX}/homedir/README.md
 
 # Copy template
 cp $BEATNAME.template.json $PREFIX/$BEATNAME.template.json
