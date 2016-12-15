@@ -12,6 +12,7 @@ import (
 type StateOS struct {
 	Inode  uint64 `json:"inode,"`
 	Device uint64 `json:"device,"`
+        Size   uint64 `json:"size,"`
 }
 
 // GetOSState returns the FileStateOS for non windows systems
@@ -23,6 +24,7 @@ func GetOSState(info os.FileInfo) StateOS {
 	fileState := StateOS{
 		Inode:  uint64(stat.Ino),
 		Device: uint64(stat.Dev),
+		Size:   uint64(stat.Size),
 	}
 
 	return fileState
@@ -30,7 +32,7 @@ func GetOSState(info os.FileInfo) StateOS {
 
 // IsSame file checks if the files are identical
 func (fs StateOS) IsSame(state StateOS) bool {
-	return fs.Inode == state.Inode && fs.Device == state.Device
+	return fs.Inode == state.Inode && fs.Device == state.Device && fs.Size <= state.Size
 }
 
 // SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile
