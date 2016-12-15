@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 *Metricbeat*
 
 - Fix service times-out at startup. {pull}3056[3056]
+- Kafka module case sensitive host name matching. {pull}3193[3193]
 
 *Packetbeat*
 
