@@ -39,7 +39,7 @@ class TestProcessors(metricbeat.BaseTest):
         cpu = evt["system"]["cpu"]
         print(cpu.keys())
         self.assertItemsEqual(self.de_dot([
-            "system", "user", "softirq", "iowait",
+            "system", "cores", "user", "softirq", "iowait",
             "idle", "irq", "steal", "nice"
         ]), cpu.keys())
 
