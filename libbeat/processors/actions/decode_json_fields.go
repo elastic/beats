@@ -78,7 +78,20 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 			}
 
 			if f.target != nil {
-				_, err = event.Put(*f.target, output)
+				if len(*f.target) > 0 {
+					_, err = event.Put(*f.target, output)
+				} else {
+					switch t := output.(type) {
+					default:
+						errs = append(errs, errors.New("Error trying to add target to root.").Error())
+					case map[string]interface{}:
+						for k, v := range t {
+							if _, exists := event[k]; !exists {
+								event[k] = v
+							}
+						}
+					}
+				}
 			} else {
 				_, err = event.Put(field, output)
 			}
