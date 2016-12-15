@@ -1,6 +1,9 @@
 - input_type: log
   paths:
-    - {{path}}
+  {%- for path in paths %}
+   - {{path}}
+  {%- endfor %}
+  exclude_files: [".gz$"]
   multiline:
     pattern: "^\\s"
     match: after

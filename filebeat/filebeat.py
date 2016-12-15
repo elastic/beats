@@ -13,27 +13,23 @@ from jinja2 import Template
 def main():
     parser = argparse.ArgumentParser(
         description="PROTOTYPE: start filebeat with a module configuration")
-    parser.add_argument("--module", default="",
+    parser.add_argument("--modules", default="",
                         help="From branch")
-    parser.add_argument("--nginx", action="store_true",
-                        help="Shortcut for --module nginx")
     parser.add_argument("--es", default="http://localhost:9200",
                         help="Elasticsearch URL")
-    parser.add_argument("-E", nargs="*", type=str, default=None,
+    parser.add_argument("-M", nargs="*", type=str, default=None,
                         help="Variables overrides. e.g. path=/test")
 
     args = parser.parse_args()
     print args
 
-    if args.nginx:
-        args.module = "nginx"
-
-    if args.module == "":
-        print("You need to specify a module")
+    modules = args.modules.split(",")
+    if len(modules) == 0:
+        print("You need to specify at least a module")
         sys.exit(1)
 
     load_dashboards(args)
-    load_datasets(args, args.module)
+    load_datasets(args, modules)
 
 
 def load_dashboards(args):
@@ -43,22 +39,23 @@ def load_dashboards(args):
     subprocess.Popen(cmd).wait()
 
 
-def load_datasets(args, module):
-    path = os.path.join("module", module)
-    if not os.path.isdir(path):
-        print("Module {} not found".format(module))
-        sys.exit(1)
-    print("Found module {} in {}".format(module, path))
-
-    filesets = [name for name in os.listdir(path) if
-                os.path.isfile(os.path.join(path, name, "manifest.yml"))]
-
-    print("Found filesets: {}".format(filesets))
-
+def load_datasets(args, modules):
     prospectors = ""
-    for fileset in filesets:
-        prospectors += load_fileset(args, module, fileset,
-                                    os.path.join(path, fileset))
+    for module in modules:
+        path = os.path.join("module", module)
+        if not os.path.isdir(path):
+            print("Module {} not found".format(module))
+            sys.exit(1)
+        print("Found module {} in {}".format(module, path))
+
+        filesets = [name for name in os.listdir(path) if
+                    os.path.isfile(os.path.join(path, name, "manifest.yml"))]
+
+        print("Found filesets: {}".format(filesets))
+
+        for fileset in filesets:
+            prospectors += load_fileset(args, module, fileset,
+                                        os.path.join(path, fileset))
 
     run_filebeat(args, prospectors)
 
@@ -67,7 +64,7 @@ def load_datasets(args, module):
 
 def load_fileset(args, module, fileset, path):
     manifest = yaml.load(file(os.path.join(path, "manifest.yml"), "r"))
-    var = evaluate_vars(args, manifest["vars"])
+    var = evaluate_vars(args, manifest["vars"], module, fileset)
     var["beat"] = dict(module=module, fileset=fileset, path=path, args=args)
     print("Evaluated variables: {}".format(var))
 
@@ -77,25 +74,35 @@ def load_fileset(args, module, fileset, path):
     return var["beat"]["prospectors"]
 
 
-def evaluate_vars(args, var_in):
+def evaluate_vars(args, var_in, module, fileset):
     var = {
         "builtin": get_builtin_vars()
     }
     for name, vals in var_in.items():
         var[name] = vals["default"]
-
         if sys.platform == "darwin" and "os.darwin" in vals:
             var[name] = vals["os.darwin"]
         elif sys.platform == "windows" and "os.windows" in vals:
             var[name] = vals["os.windows"]
 
-        var[name] = Template(var[name]).render(var)
+        if isinstance(var[name], basestring):
+            var[name] = Template(var[name]).render(var)
+        elif isinstance(var[name], list):
+            # only supports array of strings atm
+            var[name] = [Template(x).render(var) for x in var[name]]
 
     # overrides
-    if args.E is not None:
-        for pair in args.E:
+    if args.M is not None:
+        for pair in args.M:
             key, val = pair.partition("=")[::2]
-            var[key] = val
+            if key.startswith("{}.{}.".format(module, fileset)):
+                key = key[len("{}.{}.".format(module, fileset)):]
+
+                # this is a hack in the prototype only, because
+                # here we don't know the type of each variable type.
+                if key == "paths":
+                    val = val.split(",")
+                var[key] = val
 
     return var
 
