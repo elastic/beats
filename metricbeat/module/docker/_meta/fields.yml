@@ -1,5 +1,5 @@
 - key: docker
-  title: "docker"
+  title: "Docker"
   description: >
     experimental[]
 
@@ -9,5 +9,5 @@
     - name: docker
       type: group
       description: >
-        docker contains different informations and statistics of docker's containers running
+        Information and statistics about docker's running containers.
       fields:
