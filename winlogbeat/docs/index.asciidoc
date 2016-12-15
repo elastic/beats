@@ -1,6 +1,6 @@
 = Winlogbeat Reference
 
-include::./version.asciidoc[]
+include::../../libbeat/docs/version.asciidoc[]
 
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
 :packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
