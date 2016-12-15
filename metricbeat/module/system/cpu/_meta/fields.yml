@@ -3,6 +3,11 @@
   description: >
     `cpu` contains local CPU stats.
   fields:
+    - name: cores
+      type: long
+      description: >
+        The number of CPU cores.
+
     - name: user.pct
       type: scaled_float
       format: percent
