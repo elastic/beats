@@ -498,6 +498,14 @@ Event round trip time in microseconds.
 
 
 [float]
+=== metricset.namespace
+
+type: keyword
+
+Namespace of dynamic metricsets.
+
+
+[float]
 === type
 
 example: metricsets
@@ -3960,7 +3968,7 @@ Time at which these statistics were last reset.
 [[exported-fields-prometheus]]
 == Prometheus Fields
 
-prometheus Module
+Prometheus Module
 experimental[]
 
 
