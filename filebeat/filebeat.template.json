@@ -24,15 +24,7 @@
         },
         "beat": {
           "properties": {
-            "hostname": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "name": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "version": {
+            "read_timestamp": {
               "ignore_above": 1024,
               "type": "keyword"
             }
