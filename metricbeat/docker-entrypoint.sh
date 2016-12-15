@@ -23,6 +23,7 @@ waitFor() {
 
 # Main
 waitFor ${APACHE_HOST} ${APACHE_PORT} Apache
+waitFor ${COUCHBASE_HOST} ${COUCHBASE_PORT} Couchbase
 waitFor ${HAPROXY_HOST} ${HAPROXY_PORT} HAProxy
 waitFor ${KAFKA_HOST} ${KAFKA_PORT} Kafka
 waitFor ${MYSQL_HOST} ${MYSQL_PORT} MySQL
