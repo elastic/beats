@@ -2210,6 +2210,38 @@
             }
           }
         },
+        "prometheus": {
+          "properties": {
+            "stats": {
+              "properties": {
+                "notifications": {
+                  "properties": {
+                    "dropped": {
+                      "type": "long"
+                    },
+                    "queue_length": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "processes": {
+                  "properties": {
+                    "open_fds": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "storage": {
+                  "properties": {
+                    "chunks_to_persist": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "redis": {
           "properties": {
             "info": {
