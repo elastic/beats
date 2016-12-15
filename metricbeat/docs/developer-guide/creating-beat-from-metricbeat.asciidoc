@@ -1,5 +1,5 @@
 [[creating-beat-from-metricbeat]]
-== Creating a Beat Based on Metricbeat
+== Creating a Beat based on Metricbeat
 
 The metricset Beat generator enables you to create a Beat that uses Metricbeat as a library and has your
 own metricsets.
@@ -7,7 +7,7 @@ own metricsets.
 [float]
 === Requirements
 
-To create your own Beat, you must have Golang 1.7.1 or later installed, and the `$GOPATH`
+To create your own Beat, you must have Golang {go-version} or later installed, and the `$GOPATH`
 must be set up correctly. In addition, the following tools are quired:
 
 * https://www.python.org/downloads/[python]
@@ -27,7 +27,17 @@ The first step is to get the metricbeat source code:
 go get github.com/elastic/beats/metricbeat
 ----
 
-This will clone the beats repository into `GOPATH`. Now change to the directory where you want to create the beat.
+This will clone the beats repository into `GOPATH`. By default `go get`  fetches the master branch. To build your beat
+on a specific version of libbeat, check out the specific branch ({doc-branch} in the example below):
+
+["source","sh",subs="attributes"]
+----
+cd $GOPATH/src/github.com/elastic/beats
+git checkout {doc-branch}
+----
+
+
+Now change to the directory where you want to create the beat.
 This directory is normally located under `$GOPATH/src/github.com/{your-github-name}`. Inside this directory, run the command to create the beat.
 
 
