@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 * <<exported-fields-postgresql>>
+* <<exported-fields-prometheus>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
 * <<exported-fields-zookeeper>>
@@ -3954,6 +3955,66 @@ Number of deadlocks detected in this database.
 type: date
 
 Time at which these statistics were last reset.
+
+
+[[exported-fields-prometheus]]
+== Prometheus Fields
+
+prometheus Module
+experimental[]
+
+
+
+[float]
+== prometheus Fields
+
+
+
+
+[float]
+== stats Fields
+
+stats
+
+
+
+[float]
+== notifications Fields
+
+Notification stats
+
+
+
+[float]
+=== prometheus.stats.notifications.queue_length
+
+type: long
+
+Current queue length
+
+
+[float]
+=== prometheus.stats.notifications.dropped
+
+type: long
+
+Dropped queue events
+
+
+[float]
+=== prometheus.stats.processes.open_fds
+
+type: long
+
+Open file descriptors gauge
+
+
+[float]
+=== prometheus.stats.storage.chunks_to_persist
+
+type: long
+
+Gauge on chunks which are not persisted to disk yet
 
 
 [[exported-fields-redis]]
