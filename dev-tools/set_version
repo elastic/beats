@@ -1,38 +1,136 @@
 #!/usr/bin/env python
-import os
 import argparse
+import fileinput
+import os
+import re
+import sys
 from subprocess import check_call
 
-template_go = '''package beat
+pattern = re.compile(r'(const\s|)(\w*)(v|V)(ersion)(\s*)(:|=)(\s)(")(.*)(")(.*)')
+repl    = r'\1\2\3\4\5\6\7"{}"\11'
 
-const defaultBeatVersion = "{}"
+
+goversion_template = '''package main
+
+const appVersion = "{version}"
 '''
 
-template_packer = '''version: "{version}"
+goversion_template_libbeat = '''package beat
+
+const defaultBeatVersion = "{version}"
 '''
 
+
+yamlversion_template = '''version: "{version}"
+'''
+
+def split_path(path):
+    allparts = []
+    while 1:
+        parts = os.path.split(path)
+        if parts[0] == path:  # sentinel for absolute paths
+            allparts.insert(0, parts[0])
+            break
+        elif parts[1] == path: # sentinel for relative paths
+            allparts.insert(0, parts[1])
+            break
+        else:
+            path = parts[0]
+            allparts.insert(0, parts[1])
+    return allparts
+
+def get_substituted_content(filename, pattern, replacement, errormsg):
+    nbr_changes = 0
+    new_content = ""
+    with open(filename, "r") as file:
+        for line in file.readlines():
+            if pattern.match(line):
+                new_content += (re.sub(pattern, replacement, line))
+                nbr_changes += 1
+            else:
+                new_content += line
+    if nbr_changes == 0:
+        print (errormsg.format(filename))
+
+    
+    return [new_content, nbr_changes]
+    
+
+def create_from_template(filename, template, version):
+    try:
+        if not os.path.exists(filename):
+            print ("Create {} from template".format(filename))
+            with open(filename, "w") as f:
+                f.write(template.format(version=version))   
+    except:
+        print ("Can't create file {} from tepmplate".format(filename))
+        raise
 
 def main():
     parser = argparse.ArgumentParser(
         description="Used to set the current version. Doesn't commit changes.")
     parser.add_argument("version",
                         help="The new version")
+    parser.add_argument(
+        '--gofile',
+        metavar="version.go",
+        default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "libbeat","beat","version.go"),
+        help="the path of the go file that contains the version number of the application")
+    parser.add_argument(
+        '--yamlfile',
+        metavar="version.yml",
+        default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "packer","version.yml"),
+        help="the path of the yml file that contains the version number of the package")
     args = parser.parse_args()
 
-    dir = os.path.dirname(os.path.realpath(__file__))
-    with open(dir + "/../libbeat/beat/version.go", "w") as f:
-        f.write(template_go.format(args.version))
-
     version = args.version
-    with open(dir + "/packer/version.yml", "w") as f:
-        f.write(template_packer.format(
-            version=version,
-        ))
+    goversion_filepath = os.path.abspath(args.gofile)
+    yamlversion_filepath = os.path.abspath(args.yamlfile)
 
-    # Updates all files with the new templates
-    os.chdir(dir + "/../")
-    print("Update build files")
-    check_call("make update", shell=True)
+    if  os.path.normpath("vendor/github.com/elastic/beats") in goversion_filepath:
+        print ("Community beat application can't set the version of libbeat. Please define the path of your version.go file")
+        return 1
+
+    if  os.path.normpath("vendor/github.com/elastic/beats") in yamlversion_filepath:
+        print ("Community beat application can't set the version of libbeat. Please define the path of your version.yml file")
+        return 1
+
+    is_libbeat = os.path.normpath("github.com/elastic/beats") in goversion_filepath
+
+    # Create version.go and version.yml files if they don't exist
+    go_template = goversion_template_libbeat if is_libbeat else goversion_template 
+    create_from_template(goversion_filepath, go_template, version)
+    create_from_template(yamlversion_filepath, yamlversion_template, version)
+
+    # Get the content of the existing version files and replace the version number 
+    errormsg = "Can't find a version in file {}"
+    new_go_content, nbr_changes_in_gofile = get_substituted_content(goversion_filepath, pattern, repl.format(version), errormsg)
+    new_yaml_content, nbr_changes_in_yamlfile = get_substituted_content(yamlversion_filepath, pattern, repl.format(version), errormsg)
+    
+    # Update the version files only if both contents have been updated
+    if nbr_changes_in_gofile > 0 and nbr_changes_in_yamlfile > 0:
+        try:
+            with open(goversion_filepath, "w") as new_go_file:
+                with open(yamlversion_filepath, "w") as new_yaml_file:
+                    new_go_file.write(new_go_content)
+                    new_yaml_file.write(new_yaml_content)
+        except:
+            print ("Can't write version to files")
+            raise
+        print ("Write version {} in file {}".format(args.version, goversion_filepath))
+        print ("Write version {} in file {}".format(args.version, yamlversion_filepath))
+    else:
+        print ("Abort.")
+        return 1
+
+    # libbeat: Updates all files with the new templates
+    if is_libbeat:
+        os.chdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+        print("Update build files")
+        check_call("make update", shell=True)
+
+    return 0
 
 if __name__ == "__main__":
-    main()
+    status_code = main()
+    exit(status_code)
