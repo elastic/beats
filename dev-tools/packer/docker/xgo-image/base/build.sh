@@ -20,6 +20,7 @@
 
 # Download the canonical import path (may fail, don't allow failures beyond)
 SRC_FOLDER=$SOURCE
+AWS_FOLDER=$GOPATH/src/github.com/aws
 
 BEAT_PATH=$1
 DST_FOLDER=`dirname $GOPATH/src/$BEAT_PATH`
@@ -53,6 +54,12 @@ else
         cd $GOPATH/src/${GIT_REPO}
         echo "Fetching main git repository ${GIT_REPO} in folder $GOPATH/src/${GIT_REPO}"
         git clone https://${GIT_REPO}.git
+fi
+
+if [ "$AWSSDK" != '' ]; then
+	mkdir -p ${AWS_FOLDER}
+	echo "Copying aws-sdk folder ${AWSSDK} to folder ${AWS_FOLDER}"
+	rsync --exclude ".git" -a ${AWSSDK}/ ${AWS_FOLDER}
 fi
 
 set -e
