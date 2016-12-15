@@ -4775,6 +4775,14 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 
 [float]
+=== system.cpu.cores
+
+type: long
+
+The number of CPU cores.
+
+
+[float]
 === system.cpu.user.pct
 
 type: scaled_float
