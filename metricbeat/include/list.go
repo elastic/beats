@@ -36,6 +36,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/postgresql/activity"
 	_ "github.com/elastic/beats/metricbeat/module/postgresql/bgwriter"
 	_ "github.com/elastic/beats/metricbeat/module/postgresql/database"
+	_ "github.com/elastic/beats/metricbeat/module/prometheus"
+	_ "github.com/elastic/beats/metricbeat/module/prometheus/stats"
 	_ "github.com/elastic/beats/metricbeat/module/redis"
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
 	_ "github.com/elastic/beats/metricbeat/module/redis/keyspace"
