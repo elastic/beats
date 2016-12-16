@@ -11,6 +11,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-mysql,MySQL>>
   * <<metricbeat-module-nginx,Nginx>>
   * <<metricbeat-module-postgresql,PostgreSQL>>
+  * <<metricbeat-module-prometheus,Prometheus>>
   * <<metricbeat-module-redis,Redis>>
   * <<metricbeat-module-system,System>>
   * <<metricbeat-module-zookeeper,ZooKeeper>>
@@ -27,6 +28,7 @@ include::modules/mongodb.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nginx.asciidoc[]
 include::modules/postgresql.asciidoc[]
+include::modules/prometheus.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/system.asciidoc[]
 include::modules/zookeeper.asciidoc[]
