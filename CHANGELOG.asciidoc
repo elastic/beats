@@ -55,6 +55,8 @@ https://github.com/elastic/beats/compare/v5.1.1...5.1[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix error on importing dashboards due to colons in the Caassandra dashboard. {issue}3140[3140]
+
 *Filebeat*
 
 *Winlogbeat*
