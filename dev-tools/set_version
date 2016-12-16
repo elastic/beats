@@ -34,13 +34,9 @@ def get_rootfolder():
     return os.path.dirname(script_directory)
 
 def create_from_template(filename, template, version):
-    try:
-        with open(filename, "w") as f:
-            f.write(template.format(version=version))
-            print ("Set version {} in file {}".format(version, filename))
-    except:
-        print ("Can't create file {} from template".format(filename))
-        raise
+    with open(filename, "w") as f:
+        f.write(template.format(version=version))
+        print ("Set version {} in file {}".format(version, filename))
 
 def main():
     parser = argparse.ArgumentParser(
@@ -65,13 +61,10 @@ def main():
     create_from_template(ymlversion_filepath, yamlversion_template, version)
 
     # Updates all version files with the new templates
-    print (get_rootfolder())
     os.chdir(get_rootfolder())
     print("Update build files")
     check_call("make update", shell=True)
 
-    return 0
-
 if __name__ == "__main__":
-    status_code = main()
-    exit(status_code)
+    main()
+    
