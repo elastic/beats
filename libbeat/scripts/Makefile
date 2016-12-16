@@ -62,6 +62,8 @@ TARGETS?="linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64"
 TARGETS_OLD?=""
 PACKAGES?=${BEATNAME}/deb ${BEATNAME}/rpm ${BEATNAME}/darwin ${BEATNAME}/win ${BEATNAME}/bin
 SNAPSHOT?=yes
+BEATS_BUILDER_IMAGE?=tudorg/beats-builder
+BEATS_BUILDER_DEB6_IMAGE?=tudorg/beats-builder-deb6
 
 ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
@@ -353,7 +355,7 @@ prepare-package:
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS} \
 		-e BUILDID=${BUILDID} \
-		tudorg/beats-builder \
+		${BEATS_BUILDER_IMAGE} \
 		${BEAT_DIR}
 
 # Prepares for packaging. Builds binaries with cgo
@@ -371,7 +373,7 @@ prepare-package-cgo:
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS} \
 		-e BUILDID=${BUILDID} \
-		tudorg/beats-builder \
+		${BEATS_BUILDER_IMAGE} \
 		${BEAT_DIR}
 
 	# linux builds on debian 6 for compatibility
@@ -385,7 +387,7 @@ prepare-package-cgo:
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS_OLD} \
 		-e BUILDID=${BUILDID} \
-		tudorg/beats-builder-deb6 \
+		${BEATS_BUILDER_DEB6_IMAGE} \
 		${BEAT_DIR}
 
 # Prepares images for packaging
