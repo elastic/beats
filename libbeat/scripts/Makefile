@@ -438,7 +438,6 @@ fix-permissions:
 
 set_version:
 	${ES_BEATS}/dev-tools/set_version ${VERSION}
-	make update
 
 get_version:
 	@${ES_BEATS}/dev-tools/get_version
