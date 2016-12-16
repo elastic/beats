@@ -25,17 +25,13 @@ def main():
 
     goversion_filepath = get_filepath("version.go")
 
-    try:
-        with open(goversion_filepath, "r") as f:
-            for line in f:
-                match = pattern.match(line)
-                if match:
-                    print(match.group('version'))
-                    return
-            print ("No version found in file {}".format(goversion_filepath))
-    except:
-        print ("Can't read file {}".format(goversion_filepath))
-
+    with open(goversion_filepath, "r") as f:
+        for line in f:
+            match = pattern.match(line)
+            if match:
+                print(match.group('version'))
+                return
+        print ("No version found in file {}".format(goversion_filepath))
 
 if __name__ == "__main__":
     main()
