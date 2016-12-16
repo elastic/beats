@@ -409,7 +409,12 @@ package: package-setup
 	echo "beat_vendor: ${BEAT_VENDOR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_license: ${BEAT_LICENSE}" >> ${BUILD_DIR}/package.yml
 	echo "beat_doc_url: ${BEAT_DOC_URL}" >> ${BUILD_DIR}/package.yml
-	cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml
+
+	if [ -a version.yml ]; then \
+		cat version.yml >> ${BUILD_DIR}/package.yml; \
+	else \
+		cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml; \
+	fi
 
 	if [ $(CGO) = true ]; then \
 		 $(MAKE) prepare-package-cgo; \
@@ -430,3 +435,9 @@ package-dashboards: package-setup
 fix-permissions:
 	# Change ownership of all files inside /build folder from root/root to current user/group
 	docker run -v ${BUILD_DIR}:/build alpine:3.4 sh -c "chown -R $(shell id -u):$(shell id -g) /build"
+
+set_version:
+	${ES_BEATS}/dev-tools/set_version ${VERSION}
+
+get_version:
+	@${ES_BEATS}/dev-tools/get_version

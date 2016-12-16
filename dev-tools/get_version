@@ -1,20 +1,37 @@
 #!/usr/bin/env python
 import os
+import re
 import argparse
 
-pattern = '''const defaultBeatVersion = "'''
+pattern = re.compile(r'(const\s|)\w*(v|V)ersion\s=\s"(?P<version>.*)"')
+vendored_libbeat = os.path.normpath("vendor/github.com/elastic/beats")
+
+
+def get_filepath(filename):
+    script_directory = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+    index = script_directory.find(vendored_libbeat)
+    if index > 0:
+        # Community beat detected
+        filename = os.path.join(script_directory[:index], filename)
+        if os.path.exists(filename):
+            return filename # Community beat version exists
+    return  os.path.abspath(os.path.join(script_directory, os.pardir, "libbeat","beat","version.go"))
 
 
 def main():
     parser = argparse.ArgumentParser(
         description="Prints the current version at stdout.")
-    parser.parse_args()
+    args = parser.parse_args()
 
-    dir = os.path.dirname(os.path.realpath(__file__))
-    with open(dir + "/../libbeat/beat/version.go", "r") as f:
+    goversion_filepath = get_filepath("version.go")
+
+    with open(goversion_filepath, "r") as f:
         for line in f:
-            if line.startswith(pattern):
-                print(line[len(pattern):-2])  # -2 for \n and the final quote
+            match = pattern.match(line)
+            if match:
+                print(match.group('version'))
+                return
+        print ("No version found in file {}".format(goversion_filepath))
 
 if __name__ == "__main__":
     main()
