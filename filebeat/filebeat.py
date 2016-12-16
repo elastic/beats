@@ -157,7 +157,6 @@ output.elasticsearch.pipeline: "%{[fields.pipeline_id]}"
 
     if args.once:
         cfg_template += "\nfilebeat.idle_timeout: 0.5s"
-        cfg_template += "\nfilebeat.shutdown_timeout: 1s"
 
     if args.registry:
         cfg_template += "\nfilebeat.registry_file: {}".format(args.registry)
@@ -170,7 +169,8 @@ output.elasticsearch.pipeline: "%{[fields.pipeline_id]}"
         print("Wrote configuration file: {}".format(cfgfile.name))
     os.close(fd)
 
-    cmd = ["./filebeat", "-e", "-c", cfgfile.name, "-d", "*"]
+    cmd = ["./filebeat.test", "-systemTest",
+           "-e", "-c", cfgfile.name, "-d", "*"]
     if args.once:
         cmd.append("-once")
     print("Starting filebeat: " + " ".join(cmd))

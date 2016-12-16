@@ -6,13 +6,16 @@ import glob
 import subprocess
 from elasticsearch import Elasticsearch
 import json
+import logging
 
 
 class Test(BaseTest):
     def init(self):
-        self.elasticsearch_url = self.get_testing_elasticsearch_url()
+        self.elasticsearch_url = self.get_elasticsearch_url()
         print("Using elasticsearch: {}".format(self.elasticsearch_url))
         self.es = Elasticsearch([self.elasticsearch_url])
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
         self.modules_path = os.path.abspath(self.working_dir +
                                             "/../../../../module")
@@ -63,9 +66,14 @@ class Test(BaseTest):
             "--index", index_name,
             "--registry", self.working_dir + "/registry"
         ]
-        subprocess.Popen(cmd).wait()
-        self.es.indices.refresh(index=index_name)
+        output = open(os.path.join(self.working_dir, "output.log"), "ab")
+        subprocess.Popen(cmd,
+                         stdin=None,
+                         stdout=output,
+                         stderr=subprocess.STDOUT,
+                         bufsize=0).wait()
 
+        self.es.indices.refresh(index=index_name)
         res = self.es.search(index=index_name,
                              body={"query": {"match_all": {}}})
         objects = [o["_source"] for o in res["hits"]["hits"]]

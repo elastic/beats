@@ -24,7 +24,15 @@
         },
         "beat": {
           "properties": {
-            "read_timestamp": {
+            "hostname": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "version": {
               "ignore_above": 1024,
               "type": "keyword"
             }
@@ -262,6 +270,10 @@
         },
         "offset": {
           "type": "long"
+        },
+        "read_timestamp": {
+          "ignore_above": 1024,
+          "type": "keyword"
         },
         "source": {
           "ignore_above": 1024,

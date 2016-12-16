@@ -184,7 +184,7 @@ Ingestion pipeline error message, added in case there are errors reported by the
 
 
 [float]
-=== beat.read_timestamp
+=== read_timestamp
 
 In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
 

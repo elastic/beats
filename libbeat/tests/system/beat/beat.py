@@ -463,7 +463,7 @@ class TestCase(unittest.TestCase):
         except IOError:
             return False
 
-    def get_testing_elasticsearch_url(self):
+    def get_elasticsearch_url(self):
         """
         Returns an elasticsearch.Elasticsearch instance built from the
         env variables like the integration tests.
