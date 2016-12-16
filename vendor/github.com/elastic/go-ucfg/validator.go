@@ -9,10 +9,19 @@ import (
 	"time"
 )
 
+// Validator interface provides additional validation support to Unpack. The
+// Validate method will be executed for any type passed directly or indirectly to
+// Unpack.
+//
+// If Validate fails with an error message, Unpack will add some
+// context - like setting being accessed and file setting was read from - to the
+// error message before returning the actual error.
 type Validator interface {
 	Validate() error
 }
 
+// ValidatorCallback is the type of optional validator tags to be registered via
+// RegisterValidator.
 type ValidatorCallback func(interface{}, string) error
 
 type validatorTag struct {
@@ -26,13 +35,21 @@ var (
 )
 
 func init() {
-	RegisterValidator("nonzero", validateNonZero)
-	RegisterValidator("positive", validatePositive)
-	RegisterValidator("min", validateMin)
-	RegisterValidator("max", validateMax)
-	RegisterValidator("required", validateRequired)
+	initRegisterValidator("nonzero", validateNonZero)
+	initRegisterValidator("positive", validatePositive)
+	initRegisterValidator("min", validateMin)
+	initRegisterValidator("max", validateMax)
+	initRegisterValidator("required", validateRequired)
 }
 
+func initRegisterValidator(name string, cb ValidatorCallback) {
+	if err := RegisterValidator(name, cb); err != nil {
+		panic("Duplicate validator: " + name)
+	}
+}
+
+// RegisterValidator adds a new validator option to the "validate" struct tag.
+// The callback will be executed when unpacking into a struct field.
 func RegisterValidator(name string, cb ValidatorCallback) error {
 	if _, exists := validators[name]; exists {
 		return ErrDuplicateValidator

@@ -1,0 +1,10 @@
+- input_type: log
+  paths:
+  {%- for path in paths %}
+   - {{path}}
+  {%- endfor %}
+  exclude_files: [".gz$"]
+  fields:
+    source_type: nginx-error
+    pipeline_id: {{beat.pipeline_id}}
+

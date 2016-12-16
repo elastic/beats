@@ -1,16 +1,32 @@
 [[filtering-and-enhancing-data]]
 == Filtering and Enhancing the Exported Data
 
-When your use case requires only a subset of the data exported by Filebeat or you need to add metadata, you can <<filebeat-filtering-overview,use Filebeat config options to filter the data>>, or you can  <<defining-processors,define processors>>.
+Your use case might require only a subset of the data exported by Filebeat, or
+you might need to enhance the exported data (for example, by adding metadata).
+Filebeat provides a couple of options for filtering and enhancing exported
+data. You can:
+
+* <<filebeat-filtering-overview,Define filters at the prospector level>> to
+configure each prospector to include or exclude specific lines or files.
+* <<defining-processors,Define processors>> to configure global processing
+across all data exported by Filebeat.
 
 [float]
 [[filebeat-filtering-overview]]
-=== Filebeat Config Options for Filtering
+=== Filtering at the Prospector Level
 
-You can specify configuration options in the `filebeat` section of the config file to define regular expressions that
-match the lines you want to include and/or exclude from the output. The supported options are <<include-lines,`include_lines`>>, <<exclude-lines,`exclude_lines`>>, and <<exclude-files,`exclude_files`>>.
+You can specify filtering options at the prospector level to configure which
+lines or files are included or excluded in the output. This allows you to
+specify different filtering criteria for each prospector.
 
-For example, you can use the `include_lines` option to export any lines that start with "ERR" or "WARN":
+You configure prospector-level filtering in the `filebeat.prospectors` section
+of the config file by specifying regular expressions that match the lines you
+want to include and/or exclude from the output. The supported options are
+<<include-lines,`include_lines`>>, <<exclude-lines,`exclude_lines`>>, and
+<<exclude-files,`exclude_files`>>.
+
+For example, you can use the `include_lines` option to export any lines that
+start with "ERR" or "WARN":
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -21,9 +37,11 @@ filebeat.prospectors:
   include_lines: ["^ERR", "^WARN"]
 -------------------------------------------------------------------------------------
 
-The disadvantage of this approach is that you need to implement a configuration option for each filtering criteria that you need.
+The disadvantage of this approach is that you need to implement a
+configuration option for each filtering criteria that you need.
 
-See <<configuration-filebeat-options,Filebeat configuration options>> for more information about each option.
+See <<configuration-filebeat-options,Filebeat configuration options>> for more
+information about each option.
 
 [float]
 [[defining-processors]]
@@ -31,7 +49,11 @@ See <<configuration-filebeat-options,Filebeat configuration options>> for more i
 
 include::../../libbeat/docs/processors.asciidoc[]
 
-For example, the following configuration drops all the DEBUG messages.
+[float]
+[[drop-event-example]]
+==== Drop Event Example
+
+The following configuration drops all the DEBUG messages.
 
 [source,yaml]
 -----------------------------------------------------
@@ -52,5 +74,55 @@ processors:
         contains:
            source: "test"
 ----------------
+
+[float]
+[[decode-json-example]]
+==== Decode JSON Example
+
+In the following example, the fields exported by Filebeat include a
+field, `inner`, whose value is a JSON object encoded as a string:
+
+[source,json]
+-----------------------------------------------------
+{ "outer": "value", "inner": "{\"data\": \"value\"}" }
+-----------------------------------------------------
+
+The following configuration decodes the inner JSON object:
+
+[source,yaml]
+-----------------------------------------------------
+filebeat.prospectors:
+- paths:
+    - input.json
+  json.keys_under_root: true
+
+processors:
+  - decode_json_fields:
+      fields: ["inner"]
+
+output.console.pretty: true
+-----------------------------------------------------
+
+The resulting output looks something like this:
+
+["source","json",subs="attributes"]
+-----------------------------------------------------
+{
+  "@timestamp": "2016-12-06T17:38:11.541Z",
+  "beat": {
+    "hostname": "host.example.com",
+    "name": "host.example.com",
+    "version": "{version}"
+  },
+  "inner": {
+    "data": "value"
+  },
+  "input_type": "log",
+  "offset": 55,
+  "outer": "value",
+  "source": "input.json",
+  "type": "log"
+}
+-----------------------------------------------------
 
 See <<configuration-processors>> for more information.

@@ -6,5 +6,3 @@ MAINTAINER Nicolas Ruflin <ruflin@elastic.co>
 RUN apt-get update && \
     apt-get install -y curl nano wget zip && \
     apt-get clean
-
-

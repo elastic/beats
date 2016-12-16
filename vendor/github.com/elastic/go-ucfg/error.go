@@ -7,13 +7,18 @@ import (
 	"runtime/debug"
 )
 
+// Error type returned by all public functions in go-ucfg.
 type Error interface {
 	error
-	Reason() error
 
 	// error class, one of ErrConfig, ErrImplementation, ErrUnknown
 	Class() error
 
+	// The internal reason error code like ErrMissing, ErrRequired,
+	// ErrTypeMismatch and others.
+	Reason() error
+
+	// The error message.
 	Message() string
 
 	// [optional] path of config element error occurred for
@@ -27,6 +32,7 @@ type baseError struct {
 	reason  error
 	class   error
 	message string
+	path    string
 }
 
 type criticalError struct {
@@ -34,13 +40,7 @@ type criticalError struct {
 	trace string
 }
 
-type pathError struct {
-	baseError
-	meta *Meta
-	path string
-}
-
-// error Reasons
+// Error Reasons
 var (
 	ErrMissing = errors.New("missing field")
 
@@ -79,28 +79,30 @@ var (
 	ErrEmpty = errors.New("empty field")
 )
 
-// error classes
+// Error Classes
 var (
 	ErrConfig         = errors.New("Configuration error")
 	ErrImplementation = errors.New("Implementation error")
 	ErrUnknown        = errors.New("Unspecified")
 )
 
-func (e baseError) Message() string { return e.Error() }
-func (e baseError) Reason() error   { return e.reason }
-func (e baseError) Class() error    { return e.class }
-func (e baseError) Trace() string   { return "" }
-func (e baseError) Path() string    { return "" }
+func (e baseError) Error() string { return e.Message() }
+func (e baseError) Reason() error { return e.reason }
+func (e baseError) Class() error  { return e.class }
+func (e baseError) Trace() string { return "" }
+func (e baseError) Path() string  { return e.path }
 
-func (e baseError) Error() string {
+func (e baseError) Message() string {
 	if e.message == "" {
 		return e.reason.Error()
 	}
 	return e.message
 }
 
+func (e criticalError) Trace() string { return e.trace }
+
 func (e criticalError) Error() string {
-	return fmt.Sprintf("%s\nTrace:%v\n", e.baseError, e.trace)
+	return fmt.Sprintf("%s\nTrace:%v\n", e.baseError.Message(), e.trace)
 }
 
 func raiseErr(reason error, message string) Error {
@@ -126,21 +128,14 @@ func raiseCritical(reason error, message string) Error {
 		message = fmt.Sprintf("(assert) %v", message)
 	}
 	return criticalError{
-		baseError{reason, ErrImplementation, message},
+		baseError{reason, ErrImplementation, message, ""},
 		string(debug.Stack()),
 	}
 }
 
 func raisePathErr(reason error, meta *Meta, message, path string) Error {
-	// fmt.Printf("path err, reason='%v', meta=%v, message='%v', path='%v'\n", reason, meta, message, path)
 	message = messagePath(reason, meta, message, path)
-	// fmt.Printf("  -> report message: %v\n", message)
-
-	return pathError{
-		baseError{reason, ErrConfig, message},
-		meta,
-		path,
-	}
+	return baseError{reason, ErrConfig, message, path}
 }
 
 func messageMeta(message string, meta *Meta) string {

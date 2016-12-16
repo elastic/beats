@@ -234,12 +234,7 @@ func (v TLSVersion) String() string {
 	return "unknown"
 }
 
-func (v *TLSVersion) Unpack(in interface{}) error {
-	s, ok := in.(string)
-	if !ok {
-		return fmt.Errorf("tls version must be an identifier")
-	}
-
+func (v *TLSVersion) Unpack(s string) error {
 	version, found := tlsProtocolVersions[s]
 	if !found {
 		return fmt.Errorf("invalid tls version '%v'", s)

@@ -7,6 +7,46 @@ import (
 	"time"
 )
 
+// Merge a map, a slice, a struct or another Config object into c.
+//
+// Merge traverses the value from recursively copying all values into a hierarchy
+// of Config objects plus primitives into c.
+//
+// Merge supports the options: PathSep, MetaData, StructTag, VarExp
+//
+// Merge uses the type-dependent default encodings:
+//  - Boolean values are encoded as booleans.
+//  - Integer are encoded as int64 values, unsigned integer values as uint64 and
+//    floats as float64 values.
+//  - Strings are copied into string values.
+//    If the VarExp is set, string fields will be parsed into
+//    variable expansion expressions. The expression can reference any
+//    other setting by absolute name.
+//  - Array and slices are copied into new Config objects with index accessors only.
+//  - Struct values and maps with key type string are encoded as Config objects with
+//    named field accessors.
+//  - Config objects will be copied and added to the current hierarchy.
+//
+// The `config` struct tag (configurable via StructTag option) can be used to
+// set the field name and enable additional merging settings per field:
+//
+//  // field appears in Config as key "myName"
+//  Field int `config:"myName"`
+//
+//  // field appears in sub-Config "mySub" as key "myName" (requires PathSep("."))
+//  Field int `config:"mySub.myName"`
+//
+//  // field is processed as if keys are part of outer struct (type can be a
+//  // struct, a slice, an array, a map or of type *Config)
+//  Field map[string]interface{} `config:",inline"`
+//
+//
+// Returns an error if merging fails to normalize and validate the from value.
+// If duplicate setting names are detected in the input, merging fails as well.
+//
+// Config cannot represent cyclic structures and Merge does not handle them
+// well. Passing cyclic structures to Merge will result in an infinite recursive
+// loop.
 func (c *Config) Merge(from interface{}, options ...Option) error {
 	opts := makeOptions(options)
 	other, err := normalize(opts, from)
@@ -128,6 +168,13 @@ func normalize(opts *options, from interface{}) (*Config, Error) {
 			return normalizeStruct(opts, vFrom)
 		case reflect.Map:
 			return normalizeMap(opts, vFrom)
+		case reflect.Array, reflect.Slice:
+			tmp, err := normalizeArray(opts, tagOptions{}, context{}, vFrom)
+			if err != nil {
+				return nil, err
+			}
+			c, _ := tmp.toConfig(opts)
+			return c, nil
 		}
 
 	}

@@ -1,0 +1,12 @@
+- input_type: log
+  paths:
+  {%- for path in paths %}
+   - {{path}}
+  {%- endfor %}
+  exclude_files: [".gz$"]
+  multiline:
+    pattern: "^\\s"
+    match: after
+  fields:
+    source_type: syslog-system
+    pipeline_id: {{beat.pipeline_id}}
