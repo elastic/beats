@@ -1,9 +1,35 @@
 - name: dbstats
   type: group
   description: >
-    dbstats
+    dbstats provides an overview of a particular mongo database. This document
+    is most concerned with data volumes of a database.
   fields:
-    - name: example
+    - name: avg_object_size
+      type: long
+
+    - name: collections
+      type: integer
+
+    - name: data_size
+      type: long
+
+    - name: db
       type: keyword
-      description: >
-        Example field
+
+    - name: file_size
+      type: long
+
+    - name: index_size
+      type: long
+
+    - name: indexes
+      type: long
+
+    - name: num_extents
+      type: long
+
+    - name: objects
+      type: long
+
+    - name: storage_size
+      type: long
