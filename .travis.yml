@@ -22,6 +22,7 @@ env:
     - TARGETS="-C heartbeat testsuite"
     - TARGETS="-C libbeat testsuite"
     - TARGETS="-C metricbeat testsuite"
+    - TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
     - TARGETS="-C packetbeat testsuite"
     - TARGETS="-C libbeat crosscompile"
     - TARGETS="-C metricbeat crosscompile"
@@ -52,6 +53,8 @@ matrix:
       env: TARGETS="-C hearbeat testsuite"
     - os: osx
       env: TARGETS="-C metricbeat testsuite"
+    - os: linux
+      env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
     - os: osx
       env: TARGETS="-C libbeat/dashboards"
     - os: osx
