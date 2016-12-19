@@ -1,0 +1,9 @@
+- name: dbstats
+  type: group
+  description: >
+    dbstats
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
