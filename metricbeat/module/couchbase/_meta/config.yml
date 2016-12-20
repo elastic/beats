@@ -1,0 +1,5 @@
+#- module: couchbase
+  #metricsets: ["cluster", "node", "bucket"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:8091"]

@@ -3,18 +3,18 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-docker]]
-== docker Module
+== Docker Module
 
 experimental[]
 
-This is the docker Module.
+This module fetches metrics from https://www.docker.com/[Docker] containers.
 
 
 
 [float]
 === Example Configuration
 
-The docker module supports the standard configuration options that are described
+The Docker module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

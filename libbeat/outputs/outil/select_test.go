@@ -1,6 +1,7 @@
 package outil
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -49,24 +50,24 @@ func TestSelector(t *testing.T) {
 		{
 			"missing format string key with default in rule",
 			`keys:
-        - key: '%{[key]}'
-          default: value`,
+			        - key: '%{[key]}'
+			          default: value`,
 			common.MapStr{},
 			"value",
 		},
 		{
 			"empty format string key with default in rule",
 			`keys:
-        - key: '%{[key]}'
-          default: value`,
+						        - key: '%{[key]}'
+						          default: value`,
 			common.MapStr{"key": ""},
 			"value",
 		},
 		{
 			"missing format string key with constant in next rule",
 			`keys:
-        - key: '%{[key]}'
-        - key: value`,
+						        - key: '%{[key]}'
+						        - key: value`,
 			common.MapStr{},
 			"value",
 		},
@@ -79,83 +80,83 @@ func TestSelector(t *testing.T) {
 		{
 			"apply mapping",
 			`keys:
-       - key: '%{[key]}'
-         mappings:
-           v: value`,
+						       - key: '%{[key]}'
+						         mappings:
+						           v: value`,
 			common.MapStr{"key": "v"},
 			"value",
 		},
 		{
 			"apply mapping with default on empty key",
 			`keys:
-       - key: '%{[key]}'
-         default: value
-         mappings:
-           v: 'v'`,
+						       - key: '%{[key]}'
+						         default: value
+						         mappings:
+						           v: 'v'`,
 			common.MapStr{"key": ""},
 			"value",
 		},
 		{
 			"apply mapping with default on empty lookup",
 			`keys:
-       - key: '%{[key]}'
-         default: value
-         mappings:
-           v: ''`,
+			       - key: '%{[key]}'
+			         default: value
+			         mappings:
+			           v: ''`,
 			common.MapStr{"key": "v"},
 			"value",
 		},
 		{
 			"apply mapping without match",
 			`keys:
-       - key: '%{[key]}'
-         mappings:
-           v: ''
-       - key: value`,
+						       - key: '%{[key]}'
+						         mappings:
+						           v: ''
+						       - key: value`,
 			common.MapStr{"key": "x"},
 			"value",
 		},
 		{
 			"mapping with constant key",
 			`keys:
-       - key: k
-         mappings:
-           k: value`,
+						       - key: k
+						         mappings:
+						           k: value`,
 			common.MapStr{},
 			"value",
 		},
 		{
 			"mapping with missing constant key",
 			`keys:
-       - key: unknown
-         mappings: {k: wrong}
-       - key: value`,
+						       - key: unknown
+						         mappings: {k: wrong}
+						       - key: value`,
 			common.MapStr{},
 			"value",
 		},
 		{
 			"mapping with missing constant key, but default",
 			`keys:
-       - key: unknown
-         default: value
-         mappings: {k: wrong}`,
+						       - key: unknown
+						         default: value
+						         mappings: {k: wrong}`,
 			common.MapStr{},
 			"value",
 		},
 		{
 			"matching condition",
 			`keys:
-       - key: value
-         when.equals.test: test`,
+						       - key: value
+						         when.equals.test: test`,
 			common.MapStr{"test": "test"},
 			"value",
 		},
 		{
 			"failing condition",
 			`keys:
-       - key: wrong
-         when.equals.test: test
-       - key: value`,
+						       - key: wrong
+						         when.equals.test: test
+						       - key: value`,
 			common.MapStr{"test": "x"},
 			"value",
 		},
@@ -164,9 +165,10 @@ func TestSelector(t *testing.T) {
 	for i, test := range tests {
 		t.Logf("run (%v): %v", i, test.title)
 
-		cfg, err := common.NewConfigWithYAML([]byte(test.config), "test")
+		yaml := strings.Replace(test.config, "\t", "  ", -1)
+		cfg, err := common.NewConfigWithYAML([]byte(yaml), "test")
 		if err != nil {
-			t.Error(err)
+			t.Errorf("YAML parse error: %v\n%v", err, yaml)
 			continue
 		}
 

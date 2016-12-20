@@ -1,7 +1,6 @@
 package schedule
 
 import (
-	"errors"
 	"strings"
 	"time"
 
@@ -43,17 +42,10 @@ func (s intervalScheduler) Next(t time.Time) time.Time {
 	return t.Add(s.interval)
 }
 
-func (s *Schedule) Unpack(in interface{}) error {
-	str, ok := in.(string)
-	if !ok {
-		return errors.New("scheduler string required")
-	}
-
+func (s *Schedule) Unpack(str string) error {
 	tmp, err := Parse(str)
-	if err != nil {
-		return err
+	if err == nil {
+		*s = *tmp
 	}
-
-	*s = *tmp
-	return nil
+	return err
 }

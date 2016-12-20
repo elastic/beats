@@ -34,7 +34,7 @@ sudo apt-get install apt-transport-https
 +
 ["source","sh",subs="attributes,callouts"]
 --------------------------------------------------
-echo "deb https://artifacts.elastic.co/packages/5.x-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list
+echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list
 --------------------------------------------------
 +
 [WARNING]
@@ -85,7 +85,7 @@ your `/etc/yum.repos.d/` directory and add the following lines:
 --------------------------------------------------
 [elastic-5.x]
 name=Elastic repository for 5.x packages
-baseurl=https://artifacts.elastic.co/packages/5.x-prerelease/yum
+baseurl=https://artifacts.elastic.co/packages/5.x/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1

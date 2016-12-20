@@ -1,0 +1,28 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "127.0.0.1:9090",
+        "module": "prometheus",
+        "name": "stats",
+        "rtt": 115
+    },
+    "prometheus": {
+        "stats": {
+            "notifications": {
+                "dropped": 0,
+                "queue_length": 0
+            },
+            "processes": {
+                "open_fds": 24
+            },
+            "storage": {
+                "chunks_to_persist": 465
+            }
+        }
+    },
+    "type": "metricsets"
+}

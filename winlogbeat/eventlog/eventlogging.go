@@ -195,6 +195,7 @@ func (l *eventLogging) Close() error {
 // by attempting to correct the error through closing and reopening the event
 // log.
 func (l *eventLogging) readRetryErrorHandler(err error) error {
+	incrementMetric(readErrors, err)
 	if errno, ok := err.(syscall.Errno); ok {
 		var reopen bool
 

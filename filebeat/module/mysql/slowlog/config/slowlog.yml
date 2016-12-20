@@ -1,0 +1,13 @@
+- input_type: log
+  paths:
+  {%- for path in paths %}
+   - {{path}}
+  {%- endfor %}
+  exclude_files: [".gz$"]
+  multiline:
+    pattern: "^# User@Host: "
+    negate: true
+    match: after
+  fields:
+    source_type: mysql-slowlog
+    pipeline_id: {{beat.pipeline_id}}

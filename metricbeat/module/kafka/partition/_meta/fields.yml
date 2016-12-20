@@ -16,14 +16,49 @@
           type: long
           description: >
             Oldest offset of the partition.
+
     - name: partition
+      type: group
+      description: >
+        Partition data.
+      fields:
+        - name: id
+          type: long
+          description: >
+            Partition id.
+
+        - name: leader
+          type: long
+          description: >
+            Leader id (broker).
+        - name: isr
+          type: list
+          description: >
+            List of isr ids.
+        - name: replica
+          type: long
+          description: >
+            Replica id (broker).
+
+        - name: insync_replica
+          type: boolean
+          description: >
+            Indicates if replica is included in the in-sync replicate set (ISR).
+
+        - name: error.code
+          type: long
+          description: >
+            Error code from fetching partition.
+
+    - name: topic.error.code
       type: long
       description: >
-        Partition id.
-    - name: topic
+        topic error code.
+    - name: topic.name
       type: keyword
       description: >
         Topic name
+
     - name: broker.id
       type: long
       description: >
@@ -32,3 +67,5 @@
       type: keyword
       description: >
         Broker address
+
+

@@ -18,8 +18,10 @@ import (
 	lbeat "github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 var usage = fmt.Sprintf(`
@@ -42,18 +44,22 @@ For more details, check https://www.elastic.co/guide/en/beats/libbeat/5.0/import
 var beat string
 
 type Options struct {
-	KibanaIndex    string
-	ES             string
-	Index          string
-	Dir            string
-	File           string
-	Beat           string
-	URL            string
-	User           string
-	Pass           string
-	OnlyDashboards bool
-	OnlyIndex      bool
-	Snapshot       bool
+	KibanaIndex          string
+	ES                   string
+	Index                string
+	Dir                  string
+	File                 string
+	Beat                 string
+	URL                  string
+	User                 string
+	Pass                 string
+	Certificate          string
+	CertificateKey       string
+	CertificateAuthority string
+	Insecure             bool // Allow insecure SSL connections.
+	OnlyDashboards       bool
+	OnlyIndex            bool
+	Snapshot             bool
 }
 
 type CommandLine struct {
@@ -91,6 +97,10 @@ func DefineCommandLine() (*CommandLine, error) {
 	cl.flagSet.BoolVar(&cl.opt.OnlyDashboards, "only-dashboards", false, "Import only dashboards together with visualizations and searches. By default import both, dashboards and the index-pattern.")
 	cl.flagSet.BoolVar(&cl.opt.OnlyIndex, "only-index", false, "Import only the index-pattern. By default imports both, dashboards and the index pattern.")
 	cl.flagSet.BoolVar(&cl.opt.Snapshot, "snapshot", false, "Import dashboards from snapshot builds.")
+	cl.flagSet.StringVar(&cl.opt.CertificateAuthority, "cacert", "", "Certificate Authority for server verification")
+	cl.flagSet.StringVar(&cl.opt.Certificate, "cert", "", "Certificate for SSL client authentication in PEM format.")
+	cl.flagSet.StringVar(&cl.opt.CertificateKey, "key", "", "Client Certificate Key in PEM format.")
+	cl.flagSet.BoolVar(&cl.opt.Insecure, "insecure", false, `Allows "insecure" SSL connections`)
 
 	return &cl, nil
 }
@@ -105,6 +115,14 @@ func (cl *CommandLine) ParseCommandLine() error {
 
 	if cl.opt.URL == "" && cl.opt.File == "" && cl.opt.Dir == "" {
 		return errors.New("ERROR: Missing input. Please specify one of the options -file, -url or -dir")
+	}
+
+	if cl.opt.Certificate != "" && cl.opt.CertificateKey == "" {
+		return errors.New("ERROR: A certificate key needs to be passed as well by using the -key option.")
+	}
+
+	if cl.opt.CertificateKey != "" && cl.opt.Certificate == "" {
+		return errors.New("ERROR: A certificate needs to be passed as well by using the -cert option.")
 	}
 
 	return nil
@@ -133,11 +151,35 @@ func New() (*Importer, error) {
 	}
 	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(fmtstr, ""))
 
+	var tlsConfig outputs.TLSConfig
+	var tls *transport.TLSConfig
+
+	if cl.opt.Insecure {
+		tlsConfig.VerificationMode = transport.VerifyNone
+	}
+
+	if len(cl.opt.Certificate) > 0 && len(cl.opt.CertificateKey) > 0 {
+		tlsConfig.Certificate = outputs.CertificateConfig{
+			Certificate: cl.opt.Certificate,
+			Key:         cl.opt.CertificateKey,
+		}
+	}
+
+	if len(cl.opt.CertificateAuthority) > 0 {
+		tlsConfig.CAs = []string{cl.opt.CertificateAuthority}
+	}
+
+	tls, err = outputs.LoadTLSConfig(&tlsConfig)
+	if err != nil {
+		return nil, fmt.Errorf("fail to load the SSL certificate: %s", err)
+	}
+
 	/* connect to Elasticsearch */
 	client, err := elasticsearch.NewClient(
 		elasticsearch.ClientSettings{
 			URL:      cl.opt.ES,
 			Index:    indexSel,
+			TLS:      tls,
 			Username: cl.opt.User,
 			Password: cl.opt.Pass,
 			Timeout:  60 * time.Second,

@@ -15,6 +15,9 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-log>>
+* <<exported-fields-mysql>>
+* <<exported-fields-nginx>>
+* <<exported-fields-syslog>>
 
 --
 [[exported-fields-beat]]
@@ -172,5 +175,453 @@ The name of the log event. This field is set to the value specified for the `doc
 required: True
 
 The input type from which the event was generated. This field is set to the value specified for the `input_type` option in the prospector section of the Filebeat config file.
+
+
+[float]
+=== error
+
+Ingestion pipeline error message, added in case there are errors reported by the Ingest Node in Elasticsearch.
+
+
+[float]
+=== read_timestamp
+
+In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
+
+
+[[exported-fields-mysql]]
+== MySQL Fields
+
+Module for parsing the MySQL log files.
+
+
+
+[float]
+== mysql Fields
+
+Fields from the MySQL log files.
+
+
+
+[float]
+== error Fields
+
+Contains fields from the MySQL error logs.
+
+
+
+[float]
+=== mysql.error.timestamp
+
+The timestamp from the log line.
+
+
+[float]
+=== mysql.error.thread_id
+
+type: long
+
+As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this field contains the process id.
+
+
+[float]
+=== mysql.error.level
+
+example: Warning
+
+The log level.
+
+[float]
+=== mysql.error.message
+
+type: text
+
+The logged message.
+
+
+[float]
+== slowlog Fields
+
+Contains fields from the MySQL slow logs.
+
+
+
+[float]
+=== mysql.slowlog.user
+
+The MySQL user that created the query.
+
+
+[float]
+=== mysql.slowlog.host
+
+The host from where the user that created the query logged in.
+
+
+[float]
+=== mysql.slowlog.ip
+
+The IP address from where the user that created the query logged in.
+
+
+[float]
+=== mysql.slowlog.query_time.sec
+
+type: float
+
+The total time the query took, in seconds, as a floating point number.
+
+
+[float]
+=== mysql.slowlog.lock_time.sec
+
+type: float
+
+The amount of time the query waited for the lock to be available. The value is in seconds, as a floating point number.
+
+
+[float]
+=== mysql.slowlog.rows_sent
+
+type: long
+
+The number of rows returned by the query.
+
+
+[float]
+=== mysql.slowlog.rows_examined
+
+type: long
+
+The number of rows scanned by the query.
+
+
+[float]
+=== mysql.slowlog.timestamp
+
+type: long
+
+The unix timestamp taken from the `SET timestamp` query.
+
+
+[float]
+=== mysql.slowlog.query
+
+The slow query.
+
+
+[float]
+=== mysql.slowlog.id
+
+type: long
+
+The connection ID for the query.
+
+
+[[exported-fields-nginx]]
+== Nginx Fields
+
+Module for parsing the Nginx log files.
+
+
+
+[float]
+== nginx Fields
+
+Fields from the Nginx log files.
+
+
+
+[float]
+== access Fields
+
+Contains fields for the Nginx access logs.
+
+
+
+[float]
+=== nginx.access.remote_ip
+
+type: keyword
+
+Client IP address.
+
+
+[float]
+=== nginx.access.user_name
+
+type: keyword
+
+The user name used when basic authentication is used.
+
+
+[float]
+=== nginx.access.method
+
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+[float]
+=== nginx.access.url
+
+type: keyword
+
+The request HTTP URL.
+
+
+[float]
+=== nginx.access.http_version
+
+type: keyword
+
+The HTTP version.
+
+
+[float]
+=== nginx.access.response_code
+
+type: long
+
+The HTTP response code.
+
+
+[float]
+=== nginx.access.body_sent.bytes
+
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+[float]
+=== nginx.access.referrer
+
+type: keyword
+
+The HTTP referrer.
+
+
+[float]
+=== nginx.access.agent
+
+type: text
+
+Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
+
+
+[float]
+== user_agent Fields
+
+Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== nginx.access.user_agent.device
+
+type: keyword
+
+The name of the physical device.
+
+
+[float]
+=== nginx.access.user_agent.major
+
+type: long
+
+The major version of the user agent.
+
+
+[float]
+=== nginx.access.user_agent.minor
+
+type: long
+
+The minor version of the user agent.
+
+
+[float]
+=== nginx.access.user_agent.patch
+
+type: long
+
+The patch version of the user agent.
+
+
+[float]
+=== nginx.access.user_agent.name
+
+type: keyword
+
+example: Chrome
+
+The name of the user agent.
+
+
+[float]
+=== nginx.access.user_agent.os
+
+type: keyword
+
+The name of the operating system.
+
+
+[float]
+=== nginx.access.user_agent.os_major
+
+type: long
+
+The major version of the operating system.
+
+
+[float]
+=== nginx.access.user_agent.os_minor
+
+type: long
+
+The minor version of the operating system.
+
+
+[float]
+=== nginx.access.user_agent.os_name
+
+type: keyword
+
+The name of the operating system.
+
+
+[float]
+== geoip Fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== nginx.access.geoip.continent_name
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== nginx.access.geoip.country_iso_code
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== nginx.access.geoip.location
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
+== error Fields
+
+Contains fields for the Nginx error logs.
+
+
+
+[float]
+=== nginx.error.level
+
+type: keyword
+
+Error level (e.g. error, critical).
+
+
+[float]
+=== nginx.error.pid
+
+type: long
+
+Process identifier (PID).
+
+
+[float]
+=== nginx.error.tid
+
+type: long
+
+Thread identifier.
+
+
+[float]
+=== nginx.error.connection_id
+
+type: long
+
+Connection identifier.
+
+
+[float]
+=== nginx.error.message
+
+type: text
+
+The error message
+
+
+[[exported-fields-syslog]]
+== Syslog Fields
+
+Module for parsing syslog files.
+
+
+
+[float]
+== syslog Fields
+
+Fields from the syslog files.
+
+
+
+[float]
+== system Fields
+
+Contains fields from the syslog system logs.
+
+
+
+[float]
+=== syslog.system.timestamp
+
+The timestamp as read from the syslog message.
+
+
+[float]
+=== syslog.system.hostname
+
+The hostname as read from the syslog message.
+
+
+[float]
+=== syslog.system.program
+
+The process name as read from the syslog message.
+
+
+[float]
+=== syslog.system.pid
+
+The PID of the process that sent the syslog message.
+
+
+[float]
+=== syslog.system.message
+
+The message in the log line.
 
 

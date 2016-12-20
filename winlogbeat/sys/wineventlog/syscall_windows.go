@@ -13,6 +13,7 @@ const (
 	ERROR_INSUFFICIENT_BUFFER             syscall.Errno = 122
 	ERROR_NO_MORE_ITEMS                   syscall.Errno = 259
 	ERROR_NONE_MAPPED                     syscall.Errno = 1332
+	RPC_S_INVALID_BOUND                   syscall.Errno = 1734
 	ERROR_INVALID_OPERATION               syscall.Errno = 4317
 	ERROR_EVT_MESSAGE_NOT_FOUND           syscall.Errno = 15027
 	ERROR_EVT_MESSAGE_ID_NOT_FOUND        syscall.Errno = 15028

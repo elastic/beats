@@ -12,9 +12,10 @@ import (
 	"time"
 
 	"errors"
+	"strings"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"gopkg.in/inf.v0"
-	"strings"
 )
 
 // TypeInfo describes a Cassandra specific data type.
@@ -530,19 +531,12 @@ func FrameOpFromString(s string) (FrameOp, error) {
 	return op, nil
 }
 
-func (f *FrameOp) Unpack(in interface{}) error {
-	s, ok := in.(string)
-	if !ok {
-		return errors.New("expected string")
-	}
-
+func (f *FrameOp) Unpack(s string) error {
 	op, err := FrameOpFromString(s)
-	if err != nil {
-		return err
+	if err == nil {
+		*f = op
 	}
-
-	*f = op
-	return nil
+	return err
 }
 
 const (
