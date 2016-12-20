@@ -316,6 +316,11 @@
         "offset": {
           "type": "long"
         },
+        "read_timestamp": {
+          "ignore_above": 1024,
+          "index": "not_analyzed",
+          "type": "string"
+        },
         "source": {
           "ignore_above": 1024,
           "index": "not_analyzed",

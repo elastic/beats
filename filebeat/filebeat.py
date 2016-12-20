@@ -17,11 +17,20 @@ def main():
                         help="From branch")
     parser.add_argument("--es", default="http://localhost:9200",
                         help="Elasticsearch URL")
+    parser.add_argument("--index", default=None,
+                        help="Elasticsearch index")
+    parser.add_argument("--registry", default=None,
+                        help="Registry file to use")
     parser.add_argument("-M", nargs="*", type=str, default=None,
                         help="Variables overrides. e.g. path=/test")
+    parser.add_argument("--once", action="store_true",
+                        help="Run filebeat with the -once flag")
 
     args = parser.parse_args()
     print args
+
+    # changing directory because we use paths relative to the binary
+    os.chdir(os.path.dirname(sys.argv[0]))
 
     modules = args.modules.split(",")
     if len(modules) == 0:
@@ -57,9 +66,8 @@ def load_datasets(args, modules):
             prospectors += load_fileset(args, module, fileset,
                                         os.path.join(path, fileset))
 
-    run_filebeat(args, prospectors)
-
     print("Generated configuration: {}".format(prospectors))
+    run_filebeat(args, prospectors)
 
 
 def load_fileset(args, module, fileset, path):
@@ -144,6 +152,15 @@ filebeat.prospectors:
 output.elasticsearch.hosts: ["{{es}}"]
 output.elasticsearch.pipeline: "%{[fields.pipeline_id]}"
 """
+    if args.index:
+        cfg_template += "\noutput.elasticsearch.index: {}".format(args.index)
+
+    if args.once:
+        cfg_template += "\nfilebeat.idle_timeout: 0.5s"
+
+    if args.registry:
+        cfg_template += "\nfilebeat.registry_file: {}".format(args.registry)
+
     fd, fname = tempfile.mkstemp(suffix=".yml", prefix="filebeat-",
                                  text=True)
     with open(fname, "w") as cfgfile:
@@ -152,7 +169,11 @@ output.elasticsearch.pipeline: "%{[fields.pipeline_id]}"
         print("Wrote configuration file: {}".format(cfgfile.name))
     os.close(fd)
 
-    cmd = ["./filebeat", "-e", "-c", cfgfile.name, "-d", "*"]
+    cmd = ["./filebeat.test", "-systemTest",
+           "-e", "-c", cfgfile.name, "-d", "*"]
+    if args.once:
+        cmd.append("-once")
+    print("Starting filebeat: " + " ".join(cmd))
 
     subprocess.Popen(cmd).wait()
 
@@ -163,6 +184,12 @@ def generate_prospectors(var, prospectors):
         path = os.path.join(var["beat"]["path"], Template(pr).render(var))
         with open(path, "r") as f:
             contents = Template(f.read()).render(var)
+        if var["beat"]["args"].once:
+            contents += "\n  close_eof: true"
+            contents += "\n  scan_frequency: 0.2s"
+            if "multiline" in contents:
+                contents += "\n  multiline.timeout: 0.2s"
+
         var["beat"]["prospectors"] += "\n" + contents
 
 

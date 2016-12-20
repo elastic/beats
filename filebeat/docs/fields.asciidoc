@@ -183,6 +183,12 @@ The input type from which the event was generated. This field is set to the valu
 Ingestion pipeline error message, added in case there are errors reported by the Ingest Node in Elasticsearch.
 
 
+[float]
+=== read_timestamp
+
+In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
+
+
 [[exported-fields-mysql]]
 == MySQL Fields
 
