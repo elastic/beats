@@ -1,5 +1,7 @@
 build
+_meta/kibana
 
 /metricbeat
 /metricbeat.test
 /docs/html_docs
+
