@@ -2060,6 +2060,63 @@ MongoDB metrics.
 
 
 [float]
+== dbstats Fields
+
+dbstats provides an overview of a particular mongo database. This document is most concerned with data volumes of a database.
+
+
+
+[float]
+=== mongodb.dbstats.avg_object_size
+
+type: long
+
+[float]
+=== mongodb.dbstats.collections
+
+type: integer
+
+[float]
+=== mongodb.dbstats.data_size
+
+type: long
+
+[float]
+=== mongodb.dbstats.db
+
+type: keyword
+
+[float]
+=== mongodb.dbstats.file_size
+
+type: long
+
+[float]
+=== mongodb.dbstats.index_size
+
+type: long
+
+[float]
+=== mongodb.dbstats.indexes
+
+type: long
+
+[float]
+=== mongodb.dbstats.num_extents
+
+type: long
+
+[float]
+=== mongodb.dbstats.objects
+
+type: long
+
+[float]
+=== mongodb.dbstats.storage_size
+
+type: long
+
+[float]
 == status Fields
 
 MongoDB server status metrics.

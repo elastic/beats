@@ -1051,6 +1051,41 @@
         },
         "mongodb": {
           "properties": {
+            "dbstats": {
+              "properties": {
+                "avg_object_size": {
+                  "type": "long"
+                },
+                "collections": {
+                  "type": "long"
+                },
+                "data_size": {
+                  "type": "long"
+                },
+                "db": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "file_size": {
+                  "type": "long"
+                },
+                "index_size": {
+                  "type": "long"
+                },
+                "indexes": {
+                  "type": "long"
+                },
+                "num_extents": {
+                  "type": "long"
+                },
+                "objects": {
+                  "type": "long"
+                },
+                "storage_size": {
+                  "type": "long"
+                }
+              }
+            },
             "status": {
               "properties": {
                 "asserts": {
