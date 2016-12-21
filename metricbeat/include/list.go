@@ -29,6 +29,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/mongodb"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb/status"
 	_ "github.com/elastic/beats/metricbeat/module/mysql"
+	_ "github.com/elastic/beats/metricbeat/module/mysql/query"
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
 	_ "github.com/elastic/beats/metricbeat/module/nginx"
 	_ "github.com/elastic/beats/metricbeat/module/nginx/stubstatus"

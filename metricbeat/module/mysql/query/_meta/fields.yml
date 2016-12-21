@@ -1,0 +1,9 @@
+- name: query
+  type: group
+  description: >
+    query
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

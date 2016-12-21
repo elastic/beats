@@ -1838,6 +1838,14 @@
         },
         "mysql": {
           "properties": {
+            "query": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
             "status": {
               "properties": {
                 "aborted": {
