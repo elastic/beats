@@ -73,6 +73,9 @@ class Test(BaseTest):
                          stderr=subprocess.STDOUT,
                          bufsize=0).wait()
 
+        # Make sure index exists
+        self.wait_until(lambda: self.es.indices.exists(index_name))
+
         self.es.indices.refresh(index=index_name)
         res = self.es.search(index=index_name,
                              body={"query": {"match_all": {}}})

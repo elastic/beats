@@ -165,7 +165,7 @@ system-tests: ${BEATNAME}.test prepare-tests python-env ${ES_BEATS}/libbeat/dash
 # Runs the system tests
 .PHONY: system-tests-environment
 system-tests-environment: prepare-tests build-image
-	INTEGRATION_TESTS=1 ${DOCKER_COMPOSE} run beat  make system-tests
+	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 beat make system-tests
 
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
@@ -291,7 +291,7 @@ export-dashboards: python-env update
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/_meta/kibana --regex ${BEATNAME}-*
 
 ${ES_BEATS}/libbeat/dashboards/import_dashboards:
-	$(MAKE) -C ${ES_BEATS}/libbeat/dashboards import_dasboards
+	$(MAKE) -C ${ES_BEATS}/libbeat/dashboards import_dashboards
 
 .PHONY: import-dashboards
 import-dashboards: update ${ES_BEATS}/libbeat/dashboards/import_dashboards
