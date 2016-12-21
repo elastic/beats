@@ -208,6 +208,8 @@ metricbeat.modules:
   #enabled: true
   #period: 10s
   #hosts: ["localhost:9090"]
+  #metrics_path: /metrics
+  #namespace: example
 
 #-------------------------------- Redis Module -------------------------------
 #- module: redis
