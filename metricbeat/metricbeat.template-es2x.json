@@ -1433,6 +1433,11 @@
               "index": "not_analyzed",
               "type": "string"
             },
+            "namespace": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
             "rtt": {
               "type": "long"
             }
