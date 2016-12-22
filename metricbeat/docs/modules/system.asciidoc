@@ -93,6 +93,9 @@ metricbeat.modules:
 
     # Per process stats
     - process
+
+    # Sockets (linux only)
+    #- socket
   enabled: true
   period: 10s
   processes: ['.*']
@@ -121,6 +124,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-process,process>>
 
+* <<metricbeat-metricset-system-socket,socket>>
+
 include::system/core.asciidoc[]
 
 include::system/cpu.asciidoc[]
@@ -138,4 +143,6 @@ include::system/memory.asciidoc[]
 include::system/network.asciidoc[]
 
 include::system/process.asciidoc[]
+
+include::system/socket.asciidoc[]
 

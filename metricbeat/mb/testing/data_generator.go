@@ -3,6 +3,7 @@ package testing
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -33,15 +34,18 @@ func WriteEvent(f mb.EventFetcher, t *testing.T) error {
 }
 
 func WriteEvents(f mb.EventsFetcher, t *testing.T) error {
-
 	if !*dataFlag {
 		t.Skip("Skip data generation tests")
 	}
+
 	events, err := f.Fetch()
 	if err != nil {
 		return err
 	}
 
+	if len(events) == 0 {
+		return fmt.Errorf("no events were generated")
+	}
 	return createEvent(events[0], f)
 }
 

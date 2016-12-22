@@ -205,6 +205,18 @@ def fill_field_properties(args, field, defaults, path):
                 "ignore_above": 1024
             }
 
+    elif field["type"] == "ip":
+        if args.es2x:
+            properties[field["name"]] = {
+                "type": "string",
+                "index": "not_analyzed",
+                "ignore_above": 1024
+            }
+        else:
+            properties[field["name"]] = {
+                "type": "ip"
+            }
+
     elif field["type"] in ["geo_point", "date", "long", "integer",
                            "double", "float", "half_float", "scaled_float",
                            "boolean"]:
