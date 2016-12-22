@@ -26,6 +26,9 @@
 
     # Per process stats
     - process
+
+    # Sockets (linux only)
+    #- socket
   enabled: true
   period: 10s
   processes: ['.*']
