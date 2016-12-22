@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/jsontransform"
 	"github.com/elastic/beats/libbeat/logp"
@@ -95,7 +94,7 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 									vstr, ok := v.(string)
 									if !ok {
 										logp.Err("JSON: Won't overwrite @timestamp because value is not string")
-										event[reader.JsonErrorKey] = "@timestamp not overwritten (not string)"
+										event["json_error"] = "@timestamp not overwritten (not string)"
 										continue
 									}
 
@@ -103,7 +102,7 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 									ts, err := time.Parse(time.RFC3339, vstr)
 									if err != nil {
 										logp.Err("JSON: Won't overwrite @timestamp because of parsing error: %v", err)
-										event[reader.JsonErrorKey] = fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr)
+										event["json_error"] = fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr)
 										continue
 									}
 									event[k] = common.Time(ts)
@@ -111,12 +110,12 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 									vstr, ok := v.(string)
 									if !ok {
 										logp.Err("JSON: Won't overwrite type because value is not string")
-										event[reader.JsonErrorKey] = "type not overwritten (not string)"
+										event["json_error"] = "type not overwritten (not string)"
 										continue
 									}
 									if len(vstr) == 0 || vstr[0] == '_' {
 										logp.Err("JSON: Won't overwrite type because value is empty or starts with an underscore")
-										event[reader.JsonErrorKey] = fmt.Sprintf("type not overwritten (invalid value [%s])", vstr)
+										event["json_error"] = fmt.Sprintf("type not overwritten (invalid value [%s])", vstr)
 										continue
 									}
 									event[k] = vstr
