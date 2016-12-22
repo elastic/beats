@@ -3514,6 +3514,80 @@
                   "type": "keyword"
                 }
               }
+            },
+            "socket": {
+              "properties": {
+                "direction": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "family": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "local": {
+                  "properties": {
+                    "ip": {
+                      "type": "ip"
+                    },
+                    "port": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "process": {
+                  "properties": {
+                    "cmdline": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "command": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "exe": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "pid": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "remote": {
+                  "properties": {
+                    "etld_plus_one": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "host": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "host_error": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "ip": {
+                      "type": "ip"
+                    },
+                    "port": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "user": {
+                  "properties": {
+                    "id": {
+                      "type": "long"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                }
+              }
             }
           }
         },
