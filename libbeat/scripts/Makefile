@@ -53,7 +53,7 @@ GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 PYTHON_ENV?=${BUILD_DIR}/python-env
 BUILDID?=$(shell git rev-parse HEAD)
 VIRTUALENV_PARAMS?=
-
+INTEGRATION_TESTS?=
 CGO?=false
 
 # Cross compiling targets
@@ -62,6 +62,8 @@ TARGETS?="linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64"
 TARGETS_OLD?=""
 PACKAGES?=${BEATNAME}/deb ${BEATNAME}/rpm ${BEATNAME}/darwin ${BEATNAME}/win ${BEATNAME}/bin
 SNAPSHOT?=yes
+BEATS_BUILDER_IMAGE?=tudorg/beats-builder
+BEATS_BUILDER_DEB6_IMAGE?=tudorg/beats-builder-deb6
 
 ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
@@ -156,14 +158,14 @@ integration-tests-environment: prepare-tests build-image
 
 # Runs the system tests
 .PHONY: system-tests
-system-tests: ${BEATNAME}.test prepare-tests python-env
-	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=1 nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
+system-tests: ${BEATNAME}.test prepare-tests python-env ${ES_BEATS}/libbeat/dashboards/import_dashboards
+	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs the system tests
 .PHONY: system-tests-environment
 system-tests-environment: prepare-tests build-image
-	${DOCKER_COMPOSE} run beat make system-tests
+	INTEGRATION_TESTS=1 ${DOCKER_COMPOSE} run beat  make system-tests
 
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
@@ -205,17 +207,16 @@ testsuite: clean collect
 	$(MAKE) unit-tests
 
 	# Setups environment if TEST_ENVIRONMENT is set to true
+	# Only runs integration tests with test environemtn
 	if [ $(TEST_ENVIRONMENT) = true ]; then \
 		 $(MAKE) integration-tests-environment; \
-	else \
-		$(MAKE) integration-tests; \
 	fi
 
-	# Runs system tests if SYSTEM_TESTS is set to true
+	# Runs system and system integration tests if SYSTEM_TESTS is set to true
 	if [ $(SYSTEM_TESTS) = true ]; then \
 		if [ $(TEST_ENVIRONMENT) = true ]; then \
-			$(MAKE) system-tests-environment; \
-		else \
+        	$(MAKE) system-tests-environment; \
+    	else \
 			$(MAKE) system-tests; \
 		fi \
 	fi
@@ -263,9 +264,6 @@ update: python-env collect
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME} ${ES_BEATS}
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME} ${ES_BEATS}
 
-	# Update docs version
-	cp ${ES_BEATS}/libbeat/docs/version.asciidoc docs/version.asciidoc
-
 	# Generate index-pattern
 	echo "Generate index pattern"
 	-rm -f $(PWD)/_meta/kibana/index-pattern/${BEATNAME}.json
@@ -292,9 +290,11 @@ ES_URL?=http://localhost:9200
 export-dashboards: python-env update
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/_meta/kibana --regex ${BEATNAME}-*
 
-.PHONY: import-dashboards
-import-dashboards: update
+${ES_BEATS}/libbeat/dashboards/import_dashboards:
 	$(MAKE) -C ${ES_BEATS}/libbeat/dashboards import_dasboards
+
+.PHONY: import-dashboards
+import-dashboards: update ${ES_BEATS}/libbeat/dashboards/import_dashboards
 	${ES_BEATS}/libbeat/dashboards/import_dashboards -es ${ES_URL} -dir ${PWD}/_meta/kibana
 
 ### CONTAINER ENVIRONMENT ####
@@ -353,7 +353,7 @@ prepare-package:
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS} \
 		-e BUILDID=${BUILDID} \
-		tudorg/beats-builder \
+		${BEATS_BUILDER_IMAGE} \
 		${BEAT_DIR}
 
 # Prepares for packaging. Builds binaries with cgo
@@ -371,7 +371,7 @@ prepare-package-cgo:
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS} \
 		-e BUILDID=${BUILDID} \
-		tudorg/beats-builder \
+		${BEATS_BUILDER_IMAGE} \
 		${BEAT_DIR}
 
 	# linux builds on debian 6 for compatibility
@@ -385,7 +385,7 @@ prepare-package-cgo:
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS_OLD} \
 		-e BUILDID=${BUILDID} \
-		tudorg/beats-builder-deb6 \
+		${BEATS_BUILDER_DEB6_IMAGE} \
 		${BEAT_DIR}
 
 # Prepares images for packaging

@@ -1,0 +1,11 @@
+version: '2'
+services:
+  beat:
+    build: ${PWD}/.
+    env_file:
+      - ${PWD}/build/test.env
+    working_dir: /go/src/github.com/elastic/beats/filebeat
+    volumes:
+      - ${PWD}/..:/go/src/github.com/elastic/beats/
+    command: make
+    entrypoint: /go/src/github.com/elastic/beats/filebeat/docker-entrypoint.sh

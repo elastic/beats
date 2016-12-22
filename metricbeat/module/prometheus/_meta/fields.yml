@@ -1,7 +1,7 @@
 - key: prometheus
   title: "Prometheus"
   description: >
-    prometheus Module
+    Prometheus Module
 
     experimental[]
   short_config: false

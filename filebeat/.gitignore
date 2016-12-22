@@ -5,4 +5,5 @@
 filebeat
 
 build
+_meta/kibana
 /tests/load/logs

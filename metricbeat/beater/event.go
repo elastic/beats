@@ -56,18 +56,28 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 		delete(event, mb.ModuleData)
 	}
 
+	metricsetData := common.MapStr{
+		"module": b.ModuleName,
+		"name":   b.MetricSetName,
+		"rtt":    b.FetchDuration.Nanoseconds() / int64(time.Microsecond),
+	}
+
+	namespace := b.MetricSetName
+	if n, ok := event["_namespace"]; ok {
+		delete(event, "_namespace")
+		namespace = n.(string)
+		// TODO: check if namespace does not already exist
+		metricsetData["namespace"] = namespace
+	}
+
 	event = common.MapStr{
 		"@timestamp":            timestamp,
 		"type":                  typeName,
 		common.EventMetadataKey: b.metadata,
 		b.ModuleName: common.MapStr{
-			b.MetricSetName: event,
+			namespace: event,
 		},
-		"metricset": common.MapStr{
-			"module": b.ModuleName,
-			"name":   b.MetricSetName,
-			"rtt":    b.FetchDuration.Nanoseconds() / int64(time.Microsecond),
-		},
+		"metricset": metricsetData,
 	}
 
 	// In case meta data exists, it is added on the module level

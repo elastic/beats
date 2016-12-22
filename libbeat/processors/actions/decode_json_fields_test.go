@@ -89,9 +89,9 @@ func TestValidJSONDepthTwo(t *testing.T) {
 	}
 
 	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
-		"fields":       fields,
-		"processArray": false,
-		"maxDepth":     2,
+		"fields":        fields,
+		"process_array": false,
+		"max_depth":     2,
 	})
 
 	actual := getActualValue(t, testConfig, input)
