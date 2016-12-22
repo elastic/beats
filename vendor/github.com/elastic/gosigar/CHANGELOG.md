@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Added `Swap` implementation for Windows based on page file metrics. #55
 - Added support to `github.com/gosigar/sys/windows` for querying and enabling
   privileges in a process token.
+- Added utility code for interfacing with linux NETLINK_INET_DIAG. #60
 
 ### Changed
 - Changed several `OpenProcess` calls on Windows to request the lowest possible
