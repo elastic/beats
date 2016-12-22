@@ -98,7 +98,7 @@ func (r *JoinGroupRequest) AddGroupProtocol(name string, metadata []byte) {
 }
 
 func (r *JoinGroupRequest) AddGroupProtocolMetadata(name string, metadata *ConsumerGroupMemberMetadata) error {
-	bin, err := encode(metadata)
+	bin, err := encode(metadata, nil)
 	if err != nil {
 		return err
 	}
