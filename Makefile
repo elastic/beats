@@ -3,7 +3,7 @@ BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
 BEATS=packetbeat filebeat winlogbeat metricbeat heartbeat
 PROJECTS=libbeat ${BEATS}
-PROJECTS_ENV=libbeat metricbeat
+PROJECTS_ENV=libbeat filebeat metricbeat
 SNAPSHOT?=yes
 
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
