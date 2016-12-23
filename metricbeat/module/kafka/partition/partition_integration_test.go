@@ -100,6 +100,7 @@ func generateKafkaData(t *testing.T, topic string) {
 	t.Logf("Send Kafka Event to topic: %v", topic)
 
 	config := sarama.NewConfig()
+	config.Producer.Return.Successes = true
 	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
 	if err != nil {
 		t.Errorf("%s", err)
