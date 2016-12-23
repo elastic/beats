@@ -790,12 +790,12 @@ class Test(BaseTest):
         # Wait until states are removed from prospectors
         self.wait_until(
             lambda: self.log_contains_count(
-                "State removed for") == 4,
+                "State removed for") >= 3,
             max_timeout=15)
 
         filebeat.check_kill_and_wait()
 
-        # Check that the first to files were removed from the registry
+        # Check that the first two files were removed from the registry
         data = self.get_registry()
         assert len(data) == 1
 

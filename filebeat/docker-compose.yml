@@ -9,3 +9,10 @@ services:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
     command: make
     entrypoint: /go/src/github.com/elastic/beats/filebeat/docker-entrypoint.sh
+
+  # Overload Kibana and Logstash as not needed here
+  kibana:
+    image: alpine:latest
+
+  logstash:
+    image: alpine:latest
