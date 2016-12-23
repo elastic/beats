@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile-snapshot
       args:
         ELASTIC_VERSION: 5.1.1
-        ES_DOWNLOAD_URL: 'https://staging.elastic.co/5.1.1-719df589/downloads/elasticsearch'
+        ES_DOWNLOAD_URL: 'https://artifacts.elastic.co/downloads/elasticsearch'
         #XPACK: http://snapshots.elastic.co/downloads/packs/x-pack/x-pack-6.0.0-alpha1-SNAPSHOT.zip
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
