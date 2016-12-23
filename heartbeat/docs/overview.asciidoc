@@ -1,0 +1,32 @@
+[[heartbeat-overview]]
+== Overview
+
+//TODO: Add Beta tag, when available, to generate the labels indicating that this is a Beta feature.
+
+Heartbeat is a lightweight daemon that you install on a remote server
+to ping your services periodically and determine whether they are available.
+Unlike {metricbeat}/index.html[Metricbeat], which only tells you if your servers
+are up or down, Heartbeat tells you whether your services are reachable. If
+you run your services using a DNS-based load balancer or proxy, you can configure
+Heartbeat to ping all resolvable IP addresses for a specified hostname. That
+way, you can check all services that are load-balanced to see if they are
+available.
+
+Heartbeat is useful when you need to verify that you're meeting your service
+level agreements for service uptime. It's also useful for other scenarios, such
+as security use cases, when you need to verify that no one from the outside can
+access services on your private enterprise server.
+
+When you configure Heartbeat, you specify monitors that identify the
+hostnames that you want to check. Each monitor runs based on the schedule that
+you specify. For example, you can configure one monitor to run every 10
+minutes, and a different monitor to run between the hours of 9:00 and 17:00.
+
+Heartbeat currently supports monitors for:
+
+* ICMP ping, which uses an ICMP Echo Request to check that the service is
+available. 
+* TCP ping, which connects via TCP and optionally verifies the endpoint by
+sending and/or receiving a custom payload.
+* HTTP ping, which connects via HTTP and optionally verifies that the service
+returns the expected response.
