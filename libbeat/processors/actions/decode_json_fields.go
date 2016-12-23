@@ -56,7 +56,7 @@ func newDecodeJSONFields(c common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the decode_json_fields configuration: %s", err)
 	}
 
-	f := decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, processArray: config.ProcessArray, target: config.Target}
+	f := decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, overwriteKeys: config.OverwriteKeys, processArray: config.ProcessArray, target: config.Target}
 	return f, nil
 }
 
