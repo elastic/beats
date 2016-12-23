@@ -2,6 +2,8 @@ version: '2'
 services:
   beat:
     build: ${PWD}/.
+    depends_on:
+      - elasticsearch
     env_file:
       - ${PWD}/build/test.env
     working_dir: /go/src/github.com/elastic/beats/filebeat
@@ -10,9 +12,7 @@ services:
     command: make
     entrypoint: /go/src/github.com/elastic/beats/filebeat/docker-entrypoint.sh
 
-  # Overload Kibana and Logstash as not needed here
-  kibana:
-    image: alpine:latest
-
-  logstash:
-    image: alpine:latest
+  elasticsearch:
+    extends:
+      file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
