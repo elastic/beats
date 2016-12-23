@@ -118,10 +118,10 @@ func TestTargetOption(t *testing.T) {
 	}
 
 	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
-		"fields":       fields,
-		"processArray": false,
-		"maxDepth":     2,
-		"target":       "doc",
+		"fields":        fields,
+		"process_array": false,
+		"max_depth":     2,
+		"target":        "doc",
 	})
 
 	actual := getActualValue(t, testConfig, input)
@@ -148,10 +148,10 @@ func TestTargetRootOption(t *testing.T) {
 	}
 
 	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
-		"fields":       fields,
-		"processArray": false,
-		"maxDepth":     2,
-		"target":       "",
+		"fields":        fields,
+		"process_array": false,
+		"max_depth":     2,
+		"target":        "",
 	})
 
 	actual := getActualValue(t, testConfig, input)
