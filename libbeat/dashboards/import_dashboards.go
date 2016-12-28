@@ -448,8 +448,7 @@ func (imp Importer) ImportDir(dirType string, dir string) error {
 	// check if the directory exists
 	if _, err := os.Stat(dir); err != nil {
 		// nothing to import
-		fmt.Println("No directory", dir)
-		return nil
+		return fmt.Errorf("No directory %s", dir)
 	}
 
 	fmt.Println("Import directory ", dir)
@@ -677,11 +676,13 @@ func main() {
 	if importer.cl.opt.Dir != "" {
 		if err = importer.ImportKibana(importer.cl.opt.Dir); err != nil {
 			fmt.Println(err)
+			os.Exit(1)
 		}
 	} else {
 		if importer.cl.opt.URL != "" || importer.cl.opt.File != "" {
 			if err = importer.ImportArchive(); err != nil {
 				fmt.Println(err)
+				os.Exit(1)
 			}
 		}
 	}
