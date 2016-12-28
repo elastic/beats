@@ -3,8 +3,8 @@ package dbstats
 import (
 	"testing"
 
-	"github.com/beats/metricbeat/module/mongodb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/mongodb"
 	"github.com/stretchr/testify/assert"
 )
 

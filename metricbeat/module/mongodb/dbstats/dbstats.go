@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/scottcrespo/beats/metricbeat/module/mongodb"
+	"github.com/elastic/beats/metricbeat/module/mongodb"
 	"gopkg.in/mgo.v2"
 )
 
@@ -72,12 +72,14 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	}
 	// wait for goroutines to complete
 	wg.Wait()
+	close(channel)
+
 	// pull results off of the channel and append to events
 	for data := range channel {
 		events = append(events, data.([]common.MapStr)...)
 	}
 
-	// if we didn't get results from any node, return an error
+	//if we didn't get results from any node, return an error
 	if len(events) == 0 {
 		err := errors.New("Failed to retrieve db stats from all nodes")
 		return []common.MapStr{}, err

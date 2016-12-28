@@ -4,7 +4,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/scottcrespo/beats/metricbeat/module/mongodb"
+	"github.com/elastic/beats/metricbeat/module/mongodb"
 
 	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
@@ -45,7 +45,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	dialInfo.Timeout = base.Module().Config().Timeout
 
-	mongoSession := mongodb.NewMongoSession(dialInfo)
+	mongoSession := mongodb.NewSession(dialInfo)
 	mongoSession.SetMode(mgo.Monotonic, true)
 
 	return &MetricSet{
