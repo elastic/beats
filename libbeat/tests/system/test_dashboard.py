@@ -21,10 +21,10 @@ class Test(BaseTest):
         beats = ["metricbeat", "packetbeat", "filebeat", "winlogbeat"]
 
         for beat in beats:
-            command = "go run ../../dashboards/import_dashboards.go -es http://"+ self.get_elasticsearch_host() + " -dir ../../../"+ beat + "/etc/kibana"
+            command = "go run ../../dashboards/import_dashboards.go -es http://"+ self.get_elasticsearch_host() + " -dir ../../../"+ beat + "/_meta/kibana"
 
             if os.name == "nt":
-                command = "go run ..\..\dashboards\import_dashboards.go -es http:\\"+self.get_elasticsearch_host() + " -dir ..\..\..\\" + beat + "\etc\kibana"
+                command = "go run ..\..\dashboards\import_dashboards.go -es http:\\"+self.get_elasticsearch_host() + " -dir ..\..\..\\" + beat + "\_meta\kibana"
 
             print command
             p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
