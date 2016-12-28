@@ -54,7 +54,7 @@ var (
 			"insert": c.Int("Com_insert"),
 			"select": c.Int("Com_select"),
 			"update": c.Int("Com_update"),
-		}
+		},
 	}
 )
 
