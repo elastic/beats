@@ -30,7 +30,7 @@ class Test(BaseTest):
             p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             content, err = p.communicate()
 
-            assert p.returncode == 0
+            self.assertEqual(p.returncode, 0, "stdout:\n{}\n\nstderr:\n{}\n".format(content, err))
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
