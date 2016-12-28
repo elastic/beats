@@ -3463,6 +3463,40 @@ type: long
 
 
 
+[float]
+== com Fields
+
+
+
+
+[float]
+=== mysql.status.com.delete
+
+type: long
+
+
+
+[float]
+=== mysql.status.com.insert
+
+type: long
+
+
+
+[float]
+=== mysql.status.com.select
+
+type: long
+
+
+
+[float]
+=== mysql.status.com.update
+
+type: long
+
+
+
 [[exported-fields-nginx]]
 == Nginx Fields
 
