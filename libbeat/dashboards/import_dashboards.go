@@ -147,7 +147,7 @@ func New() (*Importer, error) {
 	/* prepare the Elasticsearch index pattern */
 	fmtstr, err := fmtstr.CompileEvent(cl.opt.Index)
 	if err != nil {
-		return nil, fmt.Errorf("fail to build the Elasticsearch index pattern: %s", err)
+		return nil, fmt.Errorf("failed to build the Elasticsearch index pattern: %s", err)
 	}
 	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(fmtstr, ""))
 
@@ -171,7 +171,7 @@ func New() (*Importer, error) {
 
 	tls, err = outputs.LoadTLSConfig(&tlsConfig)
 	if err != nil {
-		return nil, fmt.Errorf("fail to load the SSL certificate: %s", err)
+		return nil, fmt.Errorf("failed to load the SSL certificate: %s", err)
 	}
 
 	/* connect to Elasticsearch */
@@ -187,7 +187,7 @@ func New() (*Importer, error) {
 		nil,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("fail to connect to Elasticsearch: %s", err)
+		return nil, fmt.Errorf("failed to connect to Elasticsearch: %s", err)
 	}
 	importer.client = client
 
@@ -211,7 +211,7 @@ func (imp Importer) CreateIndex() error {
 			},
 		})
 	if err != nil {
-		fmt.Printf("fail to set the mapping. Error: %s\n", err)
+		fmt.Printf("failed to set the mapping. Error: %s\n", err)
 	}
 	return nil
 }
@@ -222,7 +222,7 @@ func (imp Importer) ImportJSONFile(fileType string, file string) error {
 
 	reader, err := ioutil.ReadFile(file)
 	if err != nil {
-		return fmt.Errorf("fail to read %s. Error: %s", file, err)
+		return fmt.Errorf("failed to read %s. Error: %s", file, err)
 	}
 	var jsonContent map[string]interface{}
 	json.Unmarshal(reader, &jsonContent)
@@ -230,7 +230,7 @@ func (imp Importer) ImportJSONFile(fileType string, file string) error {
 
 	err = imp.client.LoadJSON(path+"/"+fileBase, jsonContent)
 	if err != nil {
-		return fmt.Errorf("fail to load %s under %s/%s: %s", file, path, fileBase, err)
+		return fmt.Errorf("failed to load %s under %s/%s: %s", file, path, fileBase, err)
 	}
 
 	return nil
@@ -363,7 +363,7 @@ func (imp Importer) ImportSearch(file string) error {
 	var searchContent common.MapStr
 	err = json.Unmarshal(reader, &searchContent)
 	if err != nil {
-		return fmt.Errorf("fail to unmarshal search content %s: %v", searchName, err)
+		return fmt.Errorf("failed to unmarshal search content %s: %v", searchName, err)
 	}
 
 	if imp.cl.opt.Index != "" {
@@ -374,7 +374,7 @@ func (imp Importer) ImportSearch(file string) error {
 				var record common.MapStr
 				err = json.Unmarshal([]byte(source), &record)
 				if err != nil {
-					return fmt.Errorf("fail to unmarshal searchSourceJSON from search %s: %v", searchName, err)
+					return fmt.Errorf("failed to unmarshal searchSourceJSON from search %s: %v", searchName, err)
 				}
 
 				if _, ok := record["index"]; ok {
@@ -382,7 +382,7 @@ func (imp Importer) ImportSearch(file string) error {
 				}
 				searchSourceJSON, err := json.Marshal(record)
 				if err != nil {
-					return fmt.Errorf("fail to marshal searchSourceJSON: %v", err)
+					return fmt.Errorf("failed to marshal searchSourceJSON: %v", err)
 				}
 
 				savedObject["searchSourceJSON"] = string(searchSourceJSON)
@@ -456,7 +456,7 @@ func (imp Importer) ImportDir(dirType string, dir string) error {
 
 	files, err := filepath.Glob(path.Join(dir, "*.json"))
 	if err != nil {
-		return fmt.Errorf("fail to read directory %s. Error: %s", dir, err)
+		return fmt.Errorf("failed to read directory %s. Error: %s", dir, err)
 	}
 	if len(files) == 0 {
 		return fmt.Errorf("empty directory %s", dir)
@@ -470,7 +470,7 @@ func (imp Importer) ImportDir(dirType string, dir string) error {
 		}
 	}
 	if len(errors) > 0 {
-		return fmt.Errorf("fail to load directory %s: %s", dir, strings.Join(errors, ", "))
+		return fmt.Errorf("failed to load directory %s: %s", dir, strings.Join(errors, ", "))
 	}
 	return nil
 
@@ -581,11 +581,11 @@ func (imp Importer) ImportArchive() error {
 
 	target, err := ioutil.TempDir("", "tmp")
 	if err != nil {
-		return errors.New("fail to generate the temporary directory")
+		return errors.New("failed to generate the temporary directory")
 	}
 
 	if err = os.MkdirAll(target, 0755); err != nil {
-		return fmt.Errorf("fail to create the temporary directory: %v", target)
+		return fmt.Errorf("failed to create the temporary directory: %v", target)
 	}
 
 	defer os.RemoveAll(target) // clean up
@@ -598,12 +598,12 @@ func (imp Importer) ImportArchive() error {
 		url := fmt.Sprintf("https://beats-nightlies.s3.amazonaws.com/dashboards/beats-dashboards-%s-SNAPSHOT.zip", lbeat.GetDefaultVersion())
 		archive, err = downloadFile(url, target)
 		if err != nil {
-			return fmt.Errorf("fail to download snapshot file: %s", url)
+			return fmt.Errorf("failed to download snapshot file: %s", url)
 		}
 	} else if imp.cl.opt.URL != "" {
 		archive, err = downloadFile(imp.cl.opt.URL, target)
 		if err != nil {
-			return fmt.Errorf("fail to download file: %s", imp.cl.opt.URL)
+			return fmt.Errorf("failed to download file: %s", imp.cl.opt.URL)
 		}
 	} else {
 		return errors.New("No archive file or URL is set. Please use -file or -url option.")
@@ -611,7 +611,7 @@ func (imp Importer) ImportArchive() error {
 
 	err = unzip(archive, target)
 	if err != nil {
-		return fmt.Errorf("fail to unzip the archive: %s", archive)
+		return fmt.Errorf("failed to unzip the archive: %s", archive)
 	}
 	dirs, err := getDirectories(target)
 	if err != nil {
@@ -646,13 +646,13 @@ func (imp Importer) ImportKibana(dir string) error {
 	if !imp.cl.opt.OnlyDashboards {
 		err = imp.ImportDir("index-pattern", dir)
 		if err != nil {
-			return fmt.Errorf("fail to import index-pattern: %v", err)
+			return fmt.Errorf("failed to import index-pattern: %v", err)
 		}
 	}
 	if !imp.cl.opt.OnlyIndex {
 		err = imp.ImportDir("dashboard", dir)
 		if err != nil {
-			return fmt.Errorf("fail to import dashboards: %v", err)
+			return fmt.Errorf("failed to import dashboards: %v", err)
 		}
 	}
 	return nil
