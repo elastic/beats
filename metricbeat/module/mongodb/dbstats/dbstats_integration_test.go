@@ -3,8 +3,8 @@ package dbstats
 import (
 	"testing"
 
-	"github.com/beats/metricbeat/module/mongodb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/mongodb"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,11 +22,29 @@ func TestFetch(t *testing.T) {
 		db := event["db"].(string)
 		assert.NotEqual(t, db, "")
 
+		collections := event["collections"].(int64)
+		assert.True(t, collections > 0)
+
+		objects := event["objects"].(int64)
+		assert.True(t, objects > 0)
+
+		avgObjSize := event["avg_obj_size"].(int64)
+		assert.True(t, avgObjSize > 0)
+
 		dataSize := event["data_size"].(int64)
 		assert.True(t, dataSize > 0)
 
-		collections := event["collections"].(int64)
-		assert.True(t, collections > 0)
+		storageSize := event["storage_size"].(int64)
+		assert.True(t, storageSize > 0)
+
+		numExtents := event["num_extents"].(int64)
+		assert.True(t, numExtents >= 0)
+
+		indexes := event["indexes"].(int64)
+		assert.True(t, indexes >= 0)
+
+		indexSize := event["index_size"].(int64)
+		assert.True(t, indexSize > 0)
 	}
 }
 
