@@ -24,7 +24,7 @@ func TestFetch(t *testing.T) {
 
 		dataSize := event["data_size"].(int64)
 		assert.True(t, dataSize > 0)
-
+		t.Logf("HELLO WORLD LN 27")
 		collections := event["collections"].(int64)
 		assert.True(t, collections > 0)
 	}

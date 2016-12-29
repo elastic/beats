@@ -7,7 +7,7 @@ import (
 
 var schema = s.Schema{
 	"db":              c.Str("db"),
-	"collection":      c.Int("collections"),
+	"collections":     c.Int("collections"),
 	"objects":         c.Int("objects"),
 	"avg_object_size": c.Int("avgObjectSize"),
 	"data_size":       c.Int("dataSize"),

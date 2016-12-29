@@ -40,6 +40,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	dialInfo.Timeout = base.Module().Config().Timeout
 
+	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSessions, err := mongodb.NewDirectSessions(dialInfo.Addrs, dialInfo)
 	if err != nil {
 		return nil, err
