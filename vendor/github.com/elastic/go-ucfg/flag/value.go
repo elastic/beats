@@ -45,7 +45,7 @@ func NewFlagKeyValue(cfg *ucfg.Config, autoBool bool, opts ...ucfg.Option) *Flag
 			val = true
 		} else {
 			key = args[0]
-			val, err = parse.ParseValue(args[1])
+			val, err = parse.Value(args[1])
 			if err != nil {
 				return nil, err, err
 			}

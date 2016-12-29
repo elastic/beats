@@ -166,7 +166,11 @@ func raiseDuplicateKey(cfg *Config, name string) Error {
 
 func raiseMissing(c *Config, field string) Error {
 	// error reading field from config, as missing in c
-	return raisePathErr(ErrMissing, c.metadata, "", c.PathOf(field, "."))
+	return raiseMissingMsg(c, field, "")
+}
+
+func raiseMissingMsg(c *Config, field string, message string) Error {
+	return raisePathErr(ErrMissing, c.metadata, message, c.PathOf(field, "."))
 }
 
 func raiseMissingArr(ctx context, meta *Meta, idx int) Error {

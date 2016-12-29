@@ -483,10 +483,10 @@ func castArr(opts *options, v value) ([]value, Error) {
 	if sub, ok := v.(cfgSub); ok {
 		return sub.c.fields.array(), nil
 	}
-	if ref, ok := v.(*cfgRef); ok {
-		unrefed, err := ref.resolve(opts)
+	if ref, ok := v.(*cfgDynamic); ok {
+		unrefed, err := ref.getValue(opts)
 		if err != nil {
-			return nil, raiseMissing(ref.ctx.getParent(), ref.ref.String())
+			return nil, raiseMissingMsg(ref.ctx.getParent(), ref.ctx.field, err.Error())
 		}
 
 		if sub, ok := unrefed.(cfgSub); ok {
