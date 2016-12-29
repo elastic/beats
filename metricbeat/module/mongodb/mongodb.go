@@ -89,6 +89,7 @@ func NewDirectSessions(urls []string, dialInfo *mgo.DialInfo) ([]*mgo.Session, e
 			url,
 		}
 		nodeDialInfo.Direct = true
+		nodeDialInfo.FailFast = true
 
 		session, err := mgo.DialWithInfo(&nodeDialInfo)
 		if err != nil {

@@ -57,20 +57,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+
+	// create a wait group because we're going to spawn a goroutine for each host target
 	var wg sync.WaitGroup
 	wg.Add(len(m.mongoSessions))
 
+	// events is the value returned by this function
 	var events []common.MapStr
 
+	// created buffered channel to receive async results from each of the nodes
 	channel := make(chan interface{}, len(m.mongoSessions))
 
-	// fetch stats from each individual mongo node
 	for _, mongo := range m.mongoSessions {
-		go func(mongo *mgo.Session, wg *sync.WaitGroup) {
+		go func(mongo *mgo.Session) {
 			defer wg.Done()
 			channel <- m.fetchNodeDbStats(mongo)
-		}(mongo, &wg)
+		}(mongo)
 	}
+
 	// wait for goroutines to complete
 	wg.Wait()
 	close(channel)
@@ -80,7 +84,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		events = append(events, data.([]common.MapStr)...)
 	}
 
-	//if we didn't get results from any node, return an error
+	// if we didn't get results from any node, return an error
 	if len(events) == 0 {
 		err := errors.New("Failed to retrieve db stats from all nodes")
 		return []common.MapStr{}, err
@@ -91,7 +95,10 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	return events, nil
 }
 
+// fetchNodeDbStats implements the logic to fetch dbstats() for all databases on a particular
+// mongo node.
 func (m *MetricSet) fetchNodeDbStats(session *mgo.Session) []common.MapStr {
+
 	// Get the list of databases names, which we'll use to call db.stats() on each
 	dbNames, err := session.DatabaseNames()
 	if err != nil {
