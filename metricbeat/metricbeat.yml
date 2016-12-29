@@ -43,11 +43,7 @@ metricbeat.modules:
   period: 10s
   processes: ['.*']
 
-- module: mongodb
-  metricsets: ["status"]
-  enabled: true
-  period: 1s
-  hosts: ["localhost:27017"]
+
 
 #================================ General =====================================
 
