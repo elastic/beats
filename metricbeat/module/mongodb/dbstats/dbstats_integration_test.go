@@ -38,10 +38,10 @@ func TestFetch(t *testing.T) {
 		assert.True(t, storageSize > 0)
 
 		numExtents := event["num_extents"].(int64)
-		assert.True(t, numExtents > 0)
+		assert.True(t, numExtents >= 0)
 
 		indexes := event["indexes"].(int64)
-		assert.True(t, indexes > 0)
+		assert.True(t, indexes >= 0)
 
 		indexSize := event["index_size"].(int64)
 		assert.True(t, indexSize > 0)
