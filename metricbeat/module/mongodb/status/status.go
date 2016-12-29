@@ -101,7 +101,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 }
 
 func (m *MetricSet) fetchNodeStatus(session *mgo.Session) common.MapStr {
-	result := common.MapStr{}
+	result := map[string]interface{}{}
 	if err := session.DB("admin").Run(bson.D{{"serverStatus", 1}}, &result); err != nil {
 		return nil
 	}
