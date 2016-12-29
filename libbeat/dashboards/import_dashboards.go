@@ -445,12 +445,6 @@ func (imp Importer) ImportDir(dirType string, dir string) error {
 
 	dir = path.Join(dir, dirType)
 
-	// check if the directory exists
-	if _, err := os.Stat(dir); err != nil {
-		// nothing to import
-		return fmt.Errorf("No directory %s", dir)
-	}
-
 	fmt.Println("Import directory ", dir)
 	errors := []string{}
 
@@ -638,25 +632,49 @@ func (imp Importer) ImportArchive() error {
 	return nil
 }
 
+func (imp Importer) subdirExists(parent string, child string) bool {
+	if _, err := os.Stat(path.Join(parent, child)); err != nil {
+		return false
+	}
+	return true
+}
+
 // import Kibana dashboards and index-pattern or only one of these
 func (imp Importer) ImportKibana(dir string) error {
 
 	var err error
 
+	if _, err := os.Stat(dir); err != nil {
+		return fmt.Errorf("No directory %s", dir)
+	}
+
+	check := []string{}
 	if !imp.cl.opt.OnlyDashboards {
-		err = imp.ImportDir("index-pattern", dir)
-		if err != nil {
-			return fmt.Errorf("failed to import index-pattern: %v", err)
-		}
+		check = append(check, "index-pattern")
 	}
 	if !imp.cl.opt.OnlyIndex {
-		err = imp.ImportDir("dashboard", dir)
+		check = append(check, "dashboard")
+	}
+
+	types := []string{}
+	for _, c := range check {
+		if imp.subdirExists(dir, c) {
+			types = append(types, c)
+		}
+	}
+
+	if len(types) == 0 {
+		return fmt.Errorf("The directory %s does not contain the %s subdirectory."+
+			" There is nothing to import into Kibana.", dir, strings.Join(check, " or "))
+	}
+
+	for _, t := range types {
+		err = imp.ImportDir(t, dir)
 		if err != nil {
-			return fmt.Errorf("failed to import dashboards: %v", err)
+			return fmt.Errorf("failed to import %s: %v", t, err)
 		}
 	}
 	return nil
-
 }
 
 func main() {
