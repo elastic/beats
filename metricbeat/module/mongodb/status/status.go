@@ -71,12 +71,15 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	var events []common.MapStr
 
 	// created buffered channel to receive async results from each of the nodes
-	channel := make(chan interface{}, len(m.mongoSessions))
+	channel := make(chan common.MapStr, len(m.mongoSessions))
 
 	for _, mongo := range m.mongoSessions {
 		go func(mongo *mgo.Session) {
 			defer wg.Done()
-			channel <- m.fetchNodeStatus(mongo)
+			result := m.fetchNodeStatus(mongo)
+			if result != nil {
+				channel <- result
+			}
 		}(mongo)
 	}
 
@@ -86,7 +89,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	// pull results off of the channel and append to events
 	for data := range channel {
-		events = append(events, data.(common.MapStr))
+		events = append(events, data)
 	}
 
 	// if we didn't get results from any node, return an error

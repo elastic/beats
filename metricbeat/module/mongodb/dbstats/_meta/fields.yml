@@ -33,3 +33,24 @@
 
     - name: storage_size
       type: long
+
+    - name: ns_size_mb
+      type: long
+
+    - name: data_file_version
+      type: group
+      fields:
+        - name: major
+          type: long
+
+        - name: minor
+          type: long
+
+    - name: extent_free_list
+      type: group
+      fields:
+        - name: num
+          type: long
+
+        - name: size
+          type: long

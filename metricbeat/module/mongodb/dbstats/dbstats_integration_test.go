@@ -45,10 +45,6 @@ func TestFetch(t *testing.T) {
 
 		indexSize := event["index_size"].(int64)
 		assert.True(t, indexSize > 0)
-
-		fileSize := event["file_size"].(int64)
-		assert.True(t, fileSize > 0)
-
 	}
 }
 
