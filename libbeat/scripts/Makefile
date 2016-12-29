@@ -113,7 +113,7 @@ simplify:
 
 # Cleans up directory and source code with gofmt
 .PHONY: clean
-clean:
+clean::
 	rm -rf build ${BEATNAME} ${BEATNAME}.test ${BEATNAME}.exe ${BEATNAME}.test.exe _meta/fields.generated.yml
 
 # Shortcut for continuous integration
