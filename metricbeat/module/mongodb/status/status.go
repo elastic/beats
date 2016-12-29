@@ -2,7 +2,6 @@ package status
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
 
@@ -16,8 +15,6 @@ TODOs:
 	* add metricset for "locks" data
 	* add a metricset for "metrics" data
 */
-
-var debugf = logp.MakeDebug("mongodb.status")
 
 func init() {
 	if err := mb.Registry.AddMetricSet("mongodb", "status", New, mongodb.ParseURL); err != nil {
