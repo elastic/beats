@@ -4,7 +4,7 @@
     dbstats provides an overview of a particular mongo database. This document
     is most concerned with data volumes of a database.
   fields:
-    - name: avg_object_size
+    - name: avg_obj_size
       type: long
 
     - name: collections

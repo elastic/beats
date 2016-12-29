@@ -6,16 +6,16 @@ import (
 )
 
 var schema = s.Schema{
-	"db":              c.Str("db"),
-	"collections":     c.Int("collections"),
-	"objects":         c.Int("objects"),
-	"avg_object_size": c.Int("avgObjectSize"),
-	"data_size":       c.Int("dataSize"),
-	"storage_size":    c.Int("storageSize"),
-	"num_extents":     c.Int("numExtents"),
-	"indexes":         c.Int("indexes"),
-	"index_size":      c.Int("indexSize"),
-	"file_size":       c.Int("fileSize"),
+	"db":           c.Str("db"),
+	"collections":  c.Int("collections"),
+	"objects":      c.Int("objects"),
+	"avg_obj_size": c.Int("avgObjSize"),
+	"data_size":    c.Int("dataSize"),
+	"storage_size": c.Int("storageSize"),
+	"num_extents":  c.Int("numExtents"),
+	"indexes":      c.Int("indexes"),
+	"index_size":   c.Int("indexSize"),
+	"file_size":    c.Int("fileSize"),
 }
 
 var eventMapping = schema.Apply
