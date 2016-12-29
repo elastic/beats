@@ -60,6 +60,7 @@ type Options struct {
 	OnlyDashboards       bool
 	OnlyIndex            bool
 	Snapshot             bool
+	Quiet                bool
 }
 
 type CommandLine struct {
@@ -101,6 +102,7 @@ func DefineCommandLine() (*CommandLine, error) {
 	cl.flagSet.StringVar(&cl.opt.Certificate, "cert", "", "Certificate for SSL client authentication in PEM format.")
 	cl.flagSet.StringVar(&cl.opt.CertificateKey, "key", "", "Client Certificate Key in PEM format.")
 	cl.flagSet.BoolVar(&cl.opt.Insecure, "insecure", false, `Allows "insecure" SSL connections`)
+	cl.flagSet.BoolVar(&cl.opt.Quiet, "quiet", false, "Suppresses all status messages. Error messages are still printed to stderr.")
 
 	return &cl, nil
 }
@@ -195,6 +197,18 @@ func New() (*Importer, error) {
 
 }
 
+func (imp Importer) statusMsg(msg string, a ...interface{}) {
+	if imp.cl.opt.Quiet {
+		return
+	}
+
+	if len(a) == 0 {
+		fmt.Println(msg)
+	} else {
+		fmt.Println(fmt.Sprintf(msg, a...))
+	}
+}
+
 func (imp Importer) CreateIndex() error {
 	imp.client.CreateIndex(imp.cl.opt.KibanaIndex, nil)
 	_, _, err := imp.client.CreateIndex(imp.cl.opt.KibanaIndex+"/_mapping/search",
@@ -238,7 +252,7 @@ func (imp Importer) ImportJSONFile(fileType string, file string) error {
 
 func (imp Importer) ImportDashboard(file string) error {
 
-	fmt.Println("Import dashboard ", file)
+	imp.statusMsg("Import dashboard %s", file)
 
 	/* load dashboard */
 	err := imp.ImportJSONFile("dashboard", file)
@@ -295,7 +309,7 @@ func (imp Importer) importPanelsFromDashboard(file string) (err error) {
 				return err
 			}
 		} else {
-			fmt.Println(widgets)
+			imp.statusMsg("Widgets: %v", widgets)
 			return fmt.Errorf("Unknown panel type %s in %s", widget.Type, file)
 		}
 	}
@@ -340,7 +354,7 @@ func (imp Importer) importSearchFromVisualization(file string) error {
 
 func (imp Importer) ImportVisualization(file string) error {
 
-	fmt.Println("Import visualization ", file)
+	imp.statusMsg("Import visualization %s", file)
 	if err := imp.ImportJSONFile("visualization", file); err != nil {
 		return err
 	}
@@ -392,7 +406,7 @@ func (imp Importer) ImportSearch(file string) error {
 	}
 
 	path := "/" + imp.cl.opt.KibanaIndex + "/search/" + searchName
-	fmt.Println("Import search ", file)
+	imp.statusMsg("Import search %s", file)
 
 	if err = imp.client.LoadJSON(path, searchContent); err != nil {
 		return err
@@ -417,7 +431,7 @@ func (imp Importer) ImportIndex(file string) error {
 
 	if imp.cl.opt.Index != "" {
 		// change index pattern name
-		fmt.Println("Change index in index-pattern ", indexName)
+		imp.statusMsg("Change index in index-pattern %s", indexName)
 		indexContent["title"] = imp.cl.opt.Index
 	}
 
@@ -445,7 +459,7 @@ func (imp Importer) ImportDir(dirType string, dir string) error {
 
 	dir = path.Join(dir, dirType)
 
-	fmt.Println("Import directory ", dir)
+	imp.statusMsg("Import directory %s", dir)
 	errors := []string{}
 
 	files, err := filepath.Glob(path.Join(dir, "*.json"))
@@ -469,9 +483,9 @@ func (imp Importer) ImportDir(dirType string, dir string) error {
 
 }
 
-func unzip(archive, target string) error {
+func (imp Importer) unzip(archive, target string) error {
 
-	fmt.Println("Unzip archive ", target)
+	imp.statusMsg("Unzip archive %s", target)
 
 	reader, err := zip.OpenReader(archive)
 	if err != nil {
@@ -539,11 +553,11 @@ func getDirectories(target string) ([]string, error) {
 	return dirs, nil
 }
 
-func downloadFile(url string, target string) (string, error) {
+func (imp Importer) downloadFile(url string, target string) (string, error) {
 
 	fileName := filepath.Base(url)
 	targetPath := path.Join(target, fileName)
-	fmt.Println("Downloading", url)
+	imp.statusMsg("Downloading %s", url)
 
 	// Create the file
 	out, err := os.Create(targetPath)
@@ -583,18 +597,18 @@ func (imp Importer) ImportArchive() error {
 
 	defer os.RemoveAll(target) // clean up
 
-	fmt.Println("Create temporary directory", target)
+	imp.statusMsg("Create temporary directory %s", target)
 	if imp.cl.opt.File != "" {
 		archive = imp.cl.opt.File
 	} else if imp.cl.opt.Snapshot {
 		// In case snapshot is set, snapshot version is fetched
 		url := fmt.Sprintf("https://beats-nightlies.s3.amazonaws.com/dashboards/beats-dashboards-%s-SNAPSHOT.zip", lbeat.GetDefaultVersion())
-		archive, err = downloadFile(url, target)
+		archive, err = imp.downloadFile(url, target)
 		if err != nil {
 			return fmt.Errorf("Failed to download snapshot file: %s", url)
 		}
 	} else if imp.cl.opt.URL != "" {
-		archive, err = downloadFile(imp.cl.opt.URL, target)
+		archive, err = imp.downloadFile(imp.cl.opt.URL, target)
 		if err != nil {
 			return fmt.Errorf("Failed to download file: %s", imp.cl.opt.URL)
 		}
@@ -602,7 +616,7 @@ func (imp Importer) ImportArchive() error {
 		return errors.New("No archive file or URL is set - please use -file or -url option")
 	}
 
-	err = unzip(archive, target)
+	err = imp.unzip(archive, target)
 	if err != nil {
 		return fmt.Errorf("Failed to unzip the archive: %s", archive)
 	}
@@ -620,7 +634,7 @@ func (imp Importer) ImportArchive() error {
 	}
 
 	for _, dir := range dirs {
-		fmt.Println(dir)
+		imp.statusMsg("Importing Kibana from %s", dir)
 		if imp.cl.opt.Beat == "" || filepath.Base(dir) == imp.cl.opt.Beat {
 			err = imp.ImportKibana(dir)
 			if err != nil {
