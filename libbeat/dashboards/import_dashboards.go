@@ -340,7 +340,7 @@ func (imp Importer) importSearchFromVisualization(file string) error {
 
 func (imp Importer) ImportVisualization(file string) error {
 
-	fmt.Println("Import vizualization ", file)
+	fmt.Println("Import visualization ", file)
 	if err := imp.ImportJSONFile("visualization", file); err != nil {
 		return err
 	}
