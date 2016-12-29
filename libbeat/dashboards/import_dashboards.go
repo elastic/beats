@@ -211,7 +211,7 @@ func (imp Importer) CreateIndex() error {
 			},
 		})
 	if err != nil {
-		fmt.Printf("Failed to set the mapping. Error: %s\n", err)
+		fmt.Fprintln(os.Stderr, fmt.Sprintf("Failed to set the mapping - %s", err))
 	}
 	return nil
 }
@@ -680,27 +680,27 @@ func main() {
 
 	importer, err := New()
 	if err != nil {
-		fmt.Println(err)
-		fmt.Println("Exiting")
+		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, "Exiting")
 		os.Exit(1)
 	}
 	if err := importer.CreateIndex(); err != nil {
-		fmt.Println(err)
-		fmt.Println("Exiting")
+		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, "Exiting")
 		os.Exit(1)
 	}
 
 	if importer.cl.opt.Dir != "" {
 		if err = importer.ImportKibana(importer.cl.opt.Dir); err != nil {
-			fmt.Println(err)
-			fmt.Println("Exiting")
+			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintln(os.Stderr, "Exiting")
 			os.Exit(1)
 		}
 	} else {
 		if importer.cl.opt.URL != "" || importer.cl.opt.File != "" {
 			if err = importer.ImportArchive(); err != nil {
-				fmt.Println(err)
-				fmt.Println("Exiting")
+				fmt.Fprintln(os.Stderr, err)
+				fmt.Fprintln(os.Stderr, "Exiting")
 				os.Exit(1)
 			}
 		}
