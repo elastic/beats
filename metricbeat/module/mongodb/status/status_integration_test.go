@@ -33,7 +33,7 @@ func TestFetch(t *testing.T) {
 
 func TestData(t *testing.T) {
 	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
+	err := mbtest.WriteEvent(f, t)
 	if err != nil {
 		t.Fatal("write", err)
 	}
