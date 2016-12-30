@@ -2067,7 +2067,7 @@ dbstats provides an overview of a particular mongo database. This document is mo
 
 
 [float]
-=== mongodb.dbstats.avg_object_size
+=== mongodb.dbstats.avg_obj_size
 
 type: long
 
@@ -2113,6 +2113,33 @@ type: long
 
 [float]
 === mongodb.dbstats.storage_size
+
+type: long
+
+[float]
+=== mongodb.dbstats.ns_size_mb
+
+type: long
+
+
+[float]
+=== mongodb.dbstats.data_file_version.major
+
+type: long
+
+[float]
+=== mongodb.dbstats.data_file_version.minor
+
+type: long
+
+
+[float]
+=== mongodb.dbstats.extent_free_list.num
+
+type: long
+
+[float]
+=== mongodb.dbstats.extent_free_list.size
 
 type: long
 

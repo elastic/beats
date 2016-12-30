@@ -20,6 +20,8 @@ func init() {
 	}
 }
 
+// NewModule creates a new mb.Module instance and validates that at least one host has been
+// specified
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	// Validate that at least one host has been specified.
 	config := struct {
@@ -32,6 +34,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	return &base, nil
 }
 
+// ParseURL parses valid MongoDB URL strings into an mb.HostData instance
 func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 	c := struct {
 		Username string `config:"username"`
@@ -91,6 +94,7 @@ func NewDirectSessions(urls []string, dialInfo *mgo.DialInfo) ([]*mgo.Session, e
 		nodeDialInfo.Direct = true
 		nodeDialInfo.FailFast = true
 
+		logp.Info("Connecting to MongoDB node at %s", url)
 		session, err := mgo.DialWithInfo(&nodeDialInfo)
 		if err != nil {
 			logp.Err("Error establishing direct connection to mongo node at %s. Error output: %s", url, err.Error())

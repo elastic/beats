@@ -1056,11 +1056,21 @@
           "properties": {
             "dbstats": {
               "properties": {
-                "avg_object_size": {
+                "avg_obj_size": {
                   "type": "long"
                 },
                 "collections": {
                   "type": "long"
+                },
+                "data_file_version": {
+                  "properties": {
+                    "major": {
+                      "type": "long"
+                    },
+                    "minor": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "data_size": {
                   "type": "long"
@@ -1070,6 +1080,16 @@
                   "index": "not_analyzed",
                   "type": "string"
                 },
+                "extent_free_list": {
+                  "properties": {
+                    "num": {
+                      "type": "long"
+                    },
+                    "size": {
+                      "type": "long"
+                    }
+                  }
+                },
                 "file_size": {
                   "type": "long"
                 },
@@ -1077,6 +1097,9 @@
                   "type": "long"
                 },
                 "indexes": {
+                  "type": "long"
+                },
+                "ns_size_mb": {
                   "type": "long"
                 },
                 "num_extents": {
