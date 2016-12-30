@@ -85,6 +85,7 @@ func NewDirectSessions(urls []string, dialInfo *mgo.DialInfo) ([]*mgo.Session, e
 	var nodes []*mgo.Session
 
 	logp.Info("%d MongoDB nodes configured for monitoring", len(urls))
+	fmt.Printf("%d MongoDB nodes configured for monitoring", len(urls))
 
 	for _, url := range urls {
 
@@ -97,6 +98,7 @@ func NewDirectSessions(urls []string, dialInfo *mgo.DialInfo) ([]*mgo.Session, e
 		nodeDialInfo.FailFast = true
 
 		logp.Info("Connecting to MongoDB node at %s", url)
+		fmt.Printf("Connecting to MongoDB node at %s", url)
 		session, err := mgo.DialWithInfo(&nodeDialInfo)
 		if err != nil {
 			logp.Err("Error establishing direct connection to mongo node at %s. Error output: %s", url, err.Error())
