@@ -69,7 +69,8 @@ func TestKafkaPublish(t *testing.T) {
 		{
 			"publish single event with formating to test topic",
 			map[string]interface{}{
-				"format": "%{[message]}",
+				"writer.type":   "FormatStringWriter",
+				"writer.format": "%{[message]}",
 			},
 			testTopic,
 			single(common.MapStr{
@@ -214,8 +215,8 @@ func TestKafkaPublish(t *testing.T) {
 			}
 
 			for i, d := range expected {
-				if test.config["format"] != nil {
-					fmtString := fmtstr.MustCompileEvent(test.config["format"].(string))
+				if test.config["writer.type"] == "FormatStringWriter" {
+					fmtString := fmtstr.MustCompileEvent(test.config["writer.format"].(string))
 					expectedMessage, _ := fmtString.Run(d.Event)
 					assert.Equal(t, string(expectedMessage), string(stored[i].Value))
 				} else {

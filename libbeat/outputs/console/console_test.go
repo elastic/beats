@@ -47,9 +47,10 @@ func event(k, v string) common.MapStr {
 	return common.MapStr{k: v}
 }
 
-func run(pretty bool, format *fmtstr.EventFormatString, events ...common.MapStr) (string, error) {
+func run(writerConfig outputs.WriterConfig, events ...common.MapStr) (string, error) {
 	return withStdout(func() {
-		c := newConsole(pretty, format)
+		c, _ := newConsole(Config{WriterConfig: writerConfig})
+
 		for _, event := range events {
 			c.PublishEvent(nil, outputs.Options{}, outputs.Data{Event: event})
 		}
@@ -57,28 +58,28 @@ func run(pretty bool, format *fmtstr.EventFormatString, events ...common.MapStr)
 }
 
 func TestConsoleOneEvent(t *testing.T) {
-	lines, err := run(false, nil, event("event", "myevent"))
+	lines, err := run(outputs.WriterConfig{Pretty: false, Type: outputs.JsonWriterType}, event("event", "myevent"))
 	assert.Nil(t, err)
 	expected := "{\"event\":\"myevent\"}\n"
 	assert.Equal(t, expected, lines)
 }
 
 func TestConsoleOneEventIndented(t *testing.T) {
-	lines, err := run(true, nil, event("event", "myevent"))
+	lines, err := run(outputs.WriterConfig{Pretty: true, Type: outputs.JsonWriterType}, event("event", "myevent"))
 	assert.Nil(t, err)
 	expected := "{\n  \"event\": \"myevent\"\n}\n"
 	assert.Equal(t, expected, lines)
 }
 
 func TestConsoleOneEventFormatted(t *testing.T) {
-	lines, err := run(false, fmtstr.MustCompileEvent("%{[event]}"), event("event", "myevent"))
+	lines, err := run(outputs.WriterConfig{Type: outputs.FormatStringWriterType, Format: fmtstr.MustCompileEvent("%{[event]}")}, event("event", "myevent"))
 	assert.Nil(t, err)
 	expected := "myevent\n"
 	assert.Equal(t, expected, lines)
 }
 
 func TestConsoleMultipleEvents(t *testing.T) {
-	lines, err := run(false, nil,
+	lines, err := run(outputs.WriterConfig{Pretty: false, Type: outputs.JsonWriterType},
 		event("event", "event1"),
 		event("event", "event2"),
 		event("event", "event3"),
@@ -90,7 +91,7 @@ func TestConsoleMultipleEvents(t *testing.T) {
 }
 
 func TestConsoleMultipleEventsIndented(t *testing.T) {
-	lines, err := run(true, nil,
+	lines, err := run(outputs.WriterConfig{Pretty: true, Type: outputs.JsonWriterType},
 		event("event", "event1"),
 		event("event", "event2"),
 		event("event", "event3"),

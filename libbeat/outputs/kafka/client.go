@@ -1,7 +1,6 @@
 package kafka
 
 import (
-	"encoding/json"
 	"expvar"
 	"fmt"
 	"sync"
@@ -21,7 +20,7 @@ type client struct {
 	hosts  []string
 	topic  outil.Selector
 	key    *fmtstr.EventFormatString
-	format *fmtstr.EventFormatString
+	writer outputs.Writer
 	config sarama.Config
 
 	producer sarama.AsyncProducer
@@ -48,14 +47,14 @@ func newKafkaClient(
 	hosts []string,
 	key *fmtstr.EventFormatString,
 	topic outil.Selector,
-	format *fmtstr.EventFormatString,
+	writer outputs.Writer,
 	cfg *sarama.Config,
 ) (*client, error) {
 	c := &client{
 		hosts:  hosts,
 		topic:  topic,
 		key:    key,
-		format: format,
+		writer: writer,
 		config: *cfg,
 	}
 	return c, nil
@@ -149,20 +148,9 @@ func (c *client) getEventMessage(data *outputs.Data) (*message, error) {
 	}
 	msg.topic = topic
 
-	var serializedEvent []byte
-
-	if c.format != nil {
-		formattedEvent, err := c.format.Run(event)
-		if err != nil {
-			return nil, fmt.Errorf("Fail to format event (%v): %#v", err, event)
-		}
-		serializedEvent = []byte(formattedEvent)
-	} else {
-		jsonEvent, err := json.Marshal(event)
-		if err != nil {
-			return nil, fmt.Errorf("json encoding failed with %v", err)
-		}
-		serializedEvent = jsonEvent
+	serializedEvent, err := c.writer.Write(event)
+	if err != nil {
+		return nil, err
 	}
 
 	msg.value = serializedEvent

@@ -1,10 +1,7 @@
 package fileout
 
 import (
-	"encoding/json"
-
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -17,7 +14,7 @@ func init() {
 type fileOutput struct {
 	beatName string
 	rotator  logp.FileRotator
-	format   *fmtstr.EventFormatString
+	writer   outputs.Writer
 }
 
 // New instantiates a new file output instance.
@@ -39,13 +36,16 @@ func New(beatName string, cfg *common.Config, _ int) (outputs.Outputer, error) {
 }
 
 func (out *fileOutput) init(config config) error {
+	var err error
+
 	out.rotator.Path = config.Path
 	out.rotator.Name = config.Filename
 	if out.rotator.Name == "" {
 		out.rotator.Name = out.beatName
 	}
 
-	out.format = config.Format
+	out.writer = outputs.CreateWriter(config.WriterConfig)
+
 	logp.Info("File output path set to: %v", out.rotator.Path)
 	logp.Info("File output base filename set to: %v", out.rotator.Name)
 
@@ -57,7 +57,7 @@ func (out *fileOutput) init(config config) error {
 	logp.Info("Number of files set to: %v", keepfiles)
 	out.rotator.KeepFiles = &keepfiles
 
-	err := out.rotator.CreateDirectory()
+	err = out.rotator.CreateDirectory()
 	if err != nil {
 		return err
 	}
@@ -83,24 +83,10 @@ func (out *fileOutput) PublishEvent(
 	var serializedEvent []byte
 	var err error
 
-	if out.format != nil {
-		formattedEvent, err := out.format.Run(data.Event)
-		if err != nil {
-			logp.Err("Fail to format event (%v): %#v", err, data.Event)
-			op.SigCompleted(sig)
-			return err
-		}
-		serializedEvent = []byte(formattedEvent)
-
-	} else {
-		serializedEvent, err = json.Marshal(data.Event)
-		if err != nil {
-			// mark as success so event is not sent again.
-			op.SigCompleted(sig)
-
-			logp.Err("Fail to json encode event(%v): %#v", err, data.Event)
-			return err
-		}
+	serializedEvent, err = out.writer.Write(data.Event)
+	if err != nil {
+		op.SigCompleted(sig)
+		return err
 	}
 
 	err = out.rotator.WriteLine(serializedEvent)

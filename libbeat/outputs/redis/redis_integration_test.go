@@ -224,12 +224,13 @@ func TestPublishChannelTCPWithFormatting(t *testing.T) {
 	db := 0
 	key := "test_pubchan_tcp"
 	redisConfig := map[string]interface{}{
-		"hosts":    []string{getRedisAddr()},
-		"key":      key,
-		"db":       db,
-		"datatype": "channel",
-		"timeout":  "5s",
-		"format":   "%{[message]} bla",
+		"hosts":         []string{getRedisAddr()},
+		"key":           key,
+		"db":            db,
+		"datatype":      "channel",
+		"timeout":       "5s",
+		"writer.type":   "FormatStringWriter",
+		"writer.format": "%{[message]}",
 	}
 
 	testPublishChannel(t, redisConfig)
@@ -298,8 +299,8 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 	assert.Equal(t, total, len(messages))
 	for i, raw := range messages {
 		evt := struct{ Message int }{}
-		if cfg["format"] != nil {
-			fmtString := fmtstr.MustCompileEvent(cfg["format"].(string))
+		if cfg["writer.type"] == "FormatStringWriter" {
+			fmtString := fmtstr.MustCompileEvent(cfg["writer.format"].(string))
 			expectedMessage, _ := fmtString.Run(createEvent(i + 1))
 
 			assert.NoError(t, err)
