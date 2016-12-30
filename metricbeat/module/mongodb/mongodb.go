@@ -1,7 +1,6 @@
 package mongodb
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -67,52 +66,23 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 	return parse.NewHostDataFromURL(u), nil
 }
 
-// NewSession returns a connection to MongoDB (*mgo.Session) by dialing the mongo
-// instance specified in settings. If a connection cannot be established, a Critical error is
-// thrown and the program exits
-func NewSession(dialInfo *mgo.DialInfo) *mgo.Session {
-	mongo, err := mgo.DialWithInfo(dialInfo)
-	if err != nil {
-		logp.Critical("Failed to establish connection to MongDB at %s", dialInfo.Addrs)
-	}
-	return mongo
-}
-
-// NewDirectSessions estbalishes direct connections with a list of hosts. It uses the supplied
+// NewDirectSession estbalishes direct connections with a list of hosts. It uses the supplied
 // dialInfo parameter as a template for establishing more direct connections
-func NewDirectSessions(urls []string, dialInfo *mgo.DialInfo) ([]*mgo.Session, error) {
+func NewDirectSession(dialInfo *mgo.DialInfo) (*mgo.Session, error) {
 
-	var nodes []*mgo.Session
+	// make a copy
+	nodeDialInfo := *dialInfo
+	nodeDialInfo.Direct = true
+	nodeDialInfo.FailFast = true
 
-	logp.Info("%d MongoDB nodes configured for monitoring", len(urls))
-	fmt.Printf("%d MongoDB nodes configured for monitoring", len(urls))
+	logp.Info("Connecting to MongoDB node at %v", nodeDialInfo.Addrs)
+	fmt.Printf("Connecting to MongoDB node at %v", nodeDialInfo.Addrs)
 
-	for _, url := range urls {
-
-		// make a copy
-		nodeDialInfo := *dialInfo
-		nodeDialInfo.Addrs = []string{
-			url,
-		}
-		nodeDialInfo.Direct = true
-		nodeDialInfo.FailFast = true
-
-		logp.Info("Connecting to MongoDB node at %s", url)
-		fmt.Printf("Connecting to MongoDB node at %s", url)
-		session, err := mgo.DialWithInfo(&nodeDialInfo)
-		if err != nil {
-			logp.Err("Error establishing direct connection to mongo node at %s. Error output: %s", url, err.Error())
-			// set i back a value so we don't skip an index when adding successful connections
-			continue
-		}
-		nodes = append(nodes, session)
+	session, err := mgo.DialWithInfo(&nodeDialInfo)
+	if err != nil {
+		logp.Err("Error establishing direct connection to mongo node at %v. Error output: %s", nodeDialInfo.Addrs, err.Error())
+		return nil, err
 	}
 
-	if len(nodes) == 0 {
-		msg := "Error establishing connection to any mongo nodes"
-		logp.Err(msg)
-		return []*mgo.Session{}, errors.New(msg)
-	}
-
-	return nodes, nil
+	return session, nil
 }

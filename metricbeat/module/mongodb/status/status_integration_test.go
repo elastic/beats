@@ -12,29 +12,27 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	events, err := f.Fetch()
+	f := mbtest.NewEventFetcher(t, getConfig())
+	event, err := f.Fetch()
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
 
-	for _, event := range events {
-		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-		// Check event fields
-		current := event["connections"].(common.MapStr)["current"].(int64)
-		assert.True(t, current >= 0)
+	// Check event fields
+	current := event["connections"].(common.MapStr)["current"].(int64)
+	assert.True(t, current >= 0)
 
-		available := event["connections"].(common.MapStr)["available"].(int64)
-		assert.True(t, available > 0)
+	available := event["connections"].(common.MapStr)["available"].(int64)
+	assert.True(t, available > 0)
 
-		pageFaults := event["extra_info"].(common.MapStr)["page_faults"].(int64)
-		assert.True(t, pageFaults >= 0)
-	}
+	pageFaults := event["extra_info"].(common.MapStr)["page_faults"].(int64)
+	assert.True(t, pageFaults >= 0)
 }
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
+	f := mbtest.NewEventFetcher(t, getConfig())
 	err := mbtest.WriteEvents(f, t)
 	if err != nil {
 		t.Fatal("write", err)
