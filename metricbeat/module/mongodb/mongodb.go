@@ -84,6 +84,8 @@ func NewDirectSessions(urls []string, dialInfo *mgo.DialInfo) ([]*mgo.Session, e
 
 	var nodes []*mgo.Session
 
+	logp.Info("%d MongoDB nodes configured for monitoring", len(urls))
+
 	for _, url := range urls {
 
 		// make a copy
