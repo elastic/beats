@@ -64,7 +64,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 #- module: mongodb
-  #metricsets: ["status"]
+  #metricsets: ["status", "dbstats"]
   #enabled: true
   #period: 10s
 
@@ -80,7 +80,6 @@ metricbeat.modules:
 
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
-
 ----
 
 [float]
