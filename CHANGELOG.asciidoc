@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.1.1...5.1[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.1.2...5.1[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -55,15 +55,26 @@ https://github.com/elastic/beats/compare/v5.1.1...5.1[Check the HEAD diff]
 
 *Packetbeat*
 
-- Fix error on importing dashboards due to colons in the Caassandra dashboard. {issue}3140[3140]
-- Fix error on importing dashboards due to the wrong type for the geopoint fields. {pull}3147[3147]
-
 *Filebeat*
 
 *Winlogbeat*
-- Fix for "The array bounds are invalid" error when reading large events. {issue}3076[3076]
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.1.2]]
+=== Beats version 5.1.2
+https://github.com/elastic/beats/compare/v5.1.1...v5.1.2[View commits]
+
+==== Bugfixes
+
+*Packetbeat*
+
+- Fix error on importing dashboards due to colons in the Cassandra dashboard. {issue}3140[3140]
+- Fix error on importing dashboards due to the wrong type for the geo_point fields. {pull}3147[3147]
+
+*Winlogbeat*
+
+- Fix for "The array bounds are invalid" error when reading large events. {issue}3076[3076]
 
 [[release-notes-5.1.1]]
 === Beats version 5.1.1
