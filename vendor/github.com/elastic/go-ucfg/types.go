@@ -75,29 +75,28 @@ type cfgSub struct {
 	c *Config
 }
 
-type cfgRef struct {
-	cfgPrimitive
-	ref *reference
-}
-
-type cfgSplice struct {
-	cfgPrimitive
-
-	// id used to store intermediate parse results in current execution context.
-	// As parsing results might differ between multiple calls due to:
-	// splice being shared between multiple configurations, or environment
-	// changing between calls + lazy nature of cfgSplice, parsing results cannot
-	// be stored in cfgSplice itself.
-	id string
-
-	splice varEvaler
-}
-
 type cfgNil struct{ cfgPrimitive }
 
 type cfgPrimitive struct {
 	ctx      context
 	metadata *Meta
+}
+
+type cfgDynamic struct {
+	cfgPrimitive
+	id  cacheID
+	dyn dynValue
+}
+
+type dynValue interface {
+	getValue(p *cfgPrimitive, opts *options) (value, error)
+	String() string
+}
+
+type refDynValue reference
+
+type spliceDynValue struct {
+	e varEvaler
 }
 
 var spliceSeq int32
@@ -159,13 +158,17 @@ func newString(ctx context, m *Meta, s string) *cfgString {
 	return &cfgString{cfgPrimitive{ctx, m}, s}
 }
 
-func newRef(ctx context, m *Meta, ref *reference) *cfgRef {
-	return &cfgRef{cfgPrimitive{ctx, m}, ref}
+func newRef(ctx context, m *Meta, ref *reference) *cfgDynamic {
+	return newDyn(ctx, m, (*refDynValue)(ref))
 }
 
-func newSplice(ctx context, m *Meta, s varEvaler) *cfgSplice {
+func newSplice(ctx context, m *Meta, s varEvaler) *cfgDynamic {
+	return newDyn(ctx, m, spliceDynValue{s})
+}
+
+func newDyn(ctx context, m *Meta, val dynValue) *cfgDynamic {
 	id := string(atomic.AddInt32(&spliceSeq, 1)) + uuid.NewV4().String()
-	return &cfgSplice{cfgPrimitive{ctx, m}, id, s}
+	return &cfgDynamic{cfgPrimitive{ctx, m}, cacheID(id), val}
 }
 
 func (p *cfgPrimitive) Context() context                { return p.ctx }
@@ -284,6 +287,7 @@ func (c cfgSub) toConfig(*options) (*Config, error) { return c.c, nil }
 func (c cfgSub) Len(*options) (int, error) {
 	arr := c.c.fields.array()
 	if arr != nil {
+
 		return len(arr), nil
 	}
 
@@ -382,220 +386,164 @@ func (c cfgSub) reify(opts *options) (interface{}, error) {
 	}
 }
 
-func (r *cfgRef) typ(opt *options) (typeInfo, error) {
-	v, err := r.resolve(opt)
-	if err != nil {
-		return typeInfo{}, err
+func (d *cfgDynamic) typ(opts *options) (ti typeInfo, err error) {
+	d.withValue(&err, opts, func(v value) {
+		ti, err = v.typ(opts)
+	})
+	return
+}
+
+func (d *cfgDynamic) cpy(c context) value {
+	return newDyn(c, d.meta(), d.dyn)
+}
+
+func (d *cfgDynamic) Len(opts *options) (l int, err error) {
+	d.withValue(&err, opts, func(v value) {
+		l, err = v.Len(opts)
+	})
+	return
+}
+
+func (d *cfgDynamic) reflect(opts *options) (rv reflect.Value, err error) {
+	d.withValue(&err, opts, func(v value) {
+		rv, err = v.reflect(opts)
+	})
+	return
+}
+
+func (d *cfgDynamic) reify(opts *options) (rv interface{}, err error) {
+	d.withValue(&err, opts, func(v value) {
+		rv, err = v.reify(opts)
+	})
+	return
+}
+
+func (d *cfgDynamic) toBool(opts *options) (b bool, err error) {
+	d.withValue(&err, opts, func(v value) {
+		b, err = v.toBool(opts)
+	})
+	return
+}
+
+func (d *cfgDynamic) toString(opts *options) (s string, err error) {
+	d.withValue(&err, opts, func(v value) {
+		s, err = v.toString(opts)
+	})
+	return
+}
+
+func (d *cfgDynamic) toInt(opts *options) (i int64, err error) {
+	d.withValue(&err, opts, func(v value) {
+		i, err = v.toInt(opts)
+	})
+	return
+}
+
+func (d *cfgDynamic) toUint(opts *options) (u uint64, err error) {
+	d.withValue(&err, opts, func(v value) {
+		u, err = v.toUint(opts)
+	})
+	return
+}
+
+func (d *cfgDynamic) toFloat(opts *options) (f float64, err error) {
+	d.withValue(&err, opts, func(v value) {
+		f, err = v.toFloat(opts)
+	})
+	return
+}
+
+func (d *cfgDynamic) toConfig(opts *options) (cfg *Config, err error) {
+	d.withValue(&err, opts, func(v value) {
+		cfg, err = v.toConfig(opts)
+	})
+	return
+}
+
+func (d *cfgDynamic) withValue(err *error, opts *options, fn func(value)) {
+	var v value
+	if v, *err = d.getValue(opts); *err == nil {
+		fn(v)
 	}
-	return v.typ(opt)
 }
 
-func (r *cfgRef) cpy(ctx context) value {
-	return newRef(ctx, r.meta(), r.ref)
+func (d *cfgDynamic) getValue(opts *options) (value, error) {
+	return opts.parsed.cachedValue(d.id, func() (value, error) {
+		return d.dyn.getValue(&d.cfgPrimitive, opts)
+	})
 }
 
-func (r *cfgRef) Len(opt *options) (int, error) {
-	v, err := r.resolve(opt)
-	if err != nil {
-		return 0, err
+func (r *refDynValue) String() string {
+	ref := (*reference)(r)
+	return ref.String()
+}
+
+func (r *refDynValue) getValue(
+	p *cfgPrimitive,
+	opts *options,
+) (value, error) {
+	ref := (*reference)(r)
+	v, err := ref.resolveRef(p.ctx.getParent(), opts)
+	if v != nil || err != nil {
+		return v, err
 	}
-	return v.Len(opt)
-}
 
-func (r *cfgRef) reflect(opts *options) (reflect.Value, error) {
-	v, err := r.resolve(opts)
-	if err != nil {
-		return reflect.Value{}, err
-	}
-	return v.reflect(opts)
-}
-
-func (r *cfgRef) reify(opts *options) (interface{}, error) {
-	v, err := r.resolve(opts)
-	if err != nil {
-		return reflect.Value{}, err
-	}
-	return v.reify(opts)
-}
-
-func (r *cfgRef) toBool(opts *options) (bool, error) {
-	v, err := r.resolve(opts)
-	if err != nil {
-		return false, err
-	}
-	return v.toBool(opts)
-}
-
-func (r *cfgRef) toString(opts *options) (string, error) {
-	v, err := r.resolve(opts)
-	if err != nil {
-		return "", err
-	}
-	return v.toString(opts)
-}
-
-func (r *cfgRef) toInt(opts *options) (int64, error) {
-	v, err := r.resolve(opts)
-	if err != nil {
-		return 0, err
-	}
-	return v.toInt(opts)
-}
-
-func (r *cfgRef) toUint(opts *options) (uint64, error) {
-	v, err := r.resolve(opts)
-	if err != nil {
-		return 0, err
-	}
-	return v.toUint(opts)
-}
-
-func (r *cfgRef) toFloat(opts *options) (float64, error) {
-	v, err := r.resolve(opts)
-	if err != nil {
-		return 0, err
-	}
-	return v.toFloat(opts)
-}
-
-func (r *cfgRef) toConfig(opts *options) (*Config, error) {
-	v, err := r.resolve(opts)
-	if err != nil {
-		return nil, err
-	}
-	return v.toConfig(opts)
-}
-
-func (r *cfgRef) resolve(opts *options) (value, error) {
-	return r.ref.resolve(r.ctx.getParent(), opts)
-}
-
-func (s *cfgSplice) typ(opt *options) (typeInfo, error) {
-	v, err := s.getValue(opt)
-	if err != nil {
-		return typeInfo{}, err
-	}
-	return v.typ(opt)
-}
-
-func (s *cfgSplice) cpy(ctx context) value {
-	return newSplice(ctx, s.meta(), s.splice)
-}
-
-func (s *cfgSplice) reflect(opt *options) (reflect.Value, error) {
-	v, err := s.getValue(opt)
-	if err != nil {
-		return reflect.Value{}, err
-	}
-	return v.reflect(opt)
-}
-
-func (s *cfgSplice) reify(opt *options) (interface{}, error) {
-	v, err := s.getValue(opt)
-	if err != nil {
-		return false, err
-	}
-	return v.reify(opt)
-}
-
-func (s *cfgSplice) toBool(opt *options) (bool, error) {
-	v, err := s.getValue(opt)
-	if err != nil {
-		return false, err
-	}
-	return v.toBool(opt)
-}
-
-func (s *cfgSplice) toString(opts *options) (string, error) {
-	v, err := s.getValue(opts)
-	if err != nil {
-		return "", err
-	}
-	return v.toString(opts)
-}
-
-func (s *cfgSplice) toInt(opt *options) (int64, error) {
-	v, err := s.getValue(opt)
-	if err != nil {
-		return 0, err
-	}
-	return v.toInt(opt)
-}
-
-func (s *cfgSplice) toUint(opt *options) (uint64, error) {
-	v, err := s.getValue(opt)
-	if err != nil {
-		return 0, err
-	}
-	return v.toUint(opt)
-}
-
-func (s *cfgSplice) toFloat(opt *options) (float64, error) {
-	v, err := s.getValue(opt)
-	if err != nil {
-		return 0, err
-	}
-	return v.toFloat(opt)
-}
-
-func (s *cfgSplice) toConfig(opt *options) (*Config, error) {
-	v, err := s.getValue(opt)
+	str, err := ref.resolveEnv(p.ctx.getParent(), opts)
 	if err != nil {
 		return nil, err
 	}
-	return v.toConfig(opt)
+	return parseValue(p, opts, str)
 }
 
-func (s *cfgSplice) getValue(opts *options) (value, error) {
-	if v, ok := opts.parsed[s.id]; ok {
-		if v.err != nil {
-			return nil, v.err
-		}
-		return v.value, nil
-	}
-
-	v, err := s.parseValue(opts)
-	opts.parsed[s.id] = spliceValue{err, v}
-	return v, err
-}
-
-func (s *cfgSplice) parseValue(opts *options) (value, error) {
-	str, err := s.splice.eval(s.ctx.getParent(), opts)
+func (s spliceDynValue) getValue(
+	p *cfgPrimitive,
+	opts *options,
+) (value, error) {
+	splice := s.e
+	str, err := splice.eval(p.ctx.getParent(), opts)
 	if err != nil {
 		return nil, err
 	}
 
-	ifc, err := parse.ParseValue(str)
+	return parseValue(p, opts, str)
+}
+
+func (s spliceDynValue) String() string {
+	return "<splice>"
+}
+
+func parseValue(p *cfgPrimitive, opts *options, str string) (value, error) {
+	ifc, err := parse.Value(str)
 	if err != nil {
 		return nil, err
 	}
 
 	if ifc == nil {
 		if strings.TrimSpace(str) == "" {
-			return newString(s.ctx, s.meta(), str), nil
+			return newString(p.ctx, p.meta(), str), nil
 		}
-		return &cfgNil{cfgPrimitive{ctx: s.ctx, metadata: s.meta()}}, nil
+		return &cfgNil{cfgPrimitive{ctx: p.ctx, metadata: p.meta()}}, nil
 	}
 
 	switch v := ifc.(type) {
 	case bool:
-		return newBool(s.ctx, s.meta(), v), nil
+		return newBool(p.ctx, p.meta(), v), nil
 	case int64:
-		return newInt(s.ctx, s.meta(), v), nil
+		return newInt(p.ctx, p.meta(), v), nil
 	case uint64:
-		return newUint(s.ctx, s.meta(), v), nil
+		return newUint(p.ctx, p.meta(), v), nil
 	case float64:
-		return newFloat(s.ctx, s.meta(), v), nil
+		return newFloat(p.ctx, p.meta(), v), nil
 	case string:
-		return newString(s.ctx, s.meta(), v), nil
+		return newString(p.ctx, p.meta(), v), nil
 	}
 
 	sub, err := normalize(opts, ifc)
 	if err != nil {
 		return nil, err
 	}
-	sub.ctx = s.ctx
-	sub.metadata = s.metadata
+	sub.ctx = p.ctx
+	sub.metadata = p.metadata
 	return cfgSub{sub}, nil
 }
 
