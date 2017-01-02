@@ -21,8 +21,8 @@ type decodeJSONFields struct {
 
 type config struct {
 	Fields       []string `config:"fields"`
-	MaxDepth     int      `config:"maxDepth" validate:"min=1"`
-	ProcessArray bool     `config:"processArray"`
+	MaxDepth     int      `config:"max_depth" validate:"min=1"`
+	ProcessArray bool     `config:"process_array"`
 }
 
 var (
@@ -38,7 +38,7 @@ func init() {
 	processors.RegisterPlugin("decode_json_fields",
 		configChecked(newDecodeJSONFields,
 			requireFields("fields"),
-			allowedFields("fields", "maxDepth", "processArray")))
+			allowedFields("fields", "max_depth", "process_array")))
 }
 
 func newDecodeJSONFields(c common.Config) (processors.Processor, error) {

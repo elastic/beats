@@ -2,19 +2,26 @@ version: '2'
 services:
   beat:
     build: ${PWD}/.
-    links:
+    depends_on:
       - apache
+      - couchbase
       - mongodb
+      - haproxy
       - kafka
       - mysql
       - nginx
       - postgresql
+      - prometheus
       - redis
       - zookeeper
-      - haproxy
     environment:
       - APACHE_HOST=apache
       - APACHE_PORT=80
+      - COUCHBASE_HOST=couchbase
+      - COUCHBASE_PORT=8091
+      - COUCHBASE_DSN=http://Administrator:password@couchbase:8091
+      - HAPROXY_HOST=haproxy
+      - HAPROXY_PORT=14567
       - KAFKA_HOST=kafka
       - KAFKA_PORT=9092
       - NGINX_HOST=nginx
@@ -30,10 +37,10 @@ services:
       - POSTGRESQL_HOST=postgresql
       - POSTGRESQL_PORT=5432
       - POSTGRESQL_USERNAME=postgres
+      - PROMETHEUS_HOST=prometheus
+      - PROMETHEUS_PORT=9090
       - ZOOKEEPER_HOST=zookeeper
       - ZOOKEEPER_PORT=2181
-      - HAPROXY_HOST=haproxy
-      - HAPROXY_PORT=14567
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/metricbeat
     volumes:
@@ -44,13 +51,14 @@ services:
 
   # Overloading kibana with a simple image as it is not needed here
   kibana:
-    build:
-      context: ${PWD}/../testing/environments/
-      dockerfile: Dockerfile
+    image: alpine:latest
 
   # Modules
   apache:
     build: ${PWD}/module/apache/_meta
+
+  couchbase:
+    build: ${PWD}/module/couchbase/_meta
 
   kafka:
     image: spotify/kafka
@@ -77,10 +85,13 @@ services:
   postgresql:
     image: postgres:9.5.3
 
+  prometheus:
+    image: prom/prometheus
+    expose:
+      - 9090
+
   redis:
     image: redis:3.2.4-alpine
 
   zookeeper:
     image: jplock/zookeeper:3.4.8
-
-

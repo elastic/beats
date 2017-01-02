@@ -184,6 +184,392 @@
             }
           }
         },
+        "couchbase": {
+          "properties": {
+            "bucket": {
+              "properties": {
+                "data": {
+                  "properties": {
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "disk": {
+                  "properties": {
+                    "fetches": {
+                      "type": "long"
+                    },
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "item_count": {
+                  "type": "long"
+                },
+                "memory": {
+                  "properties": {
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "name": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "ops_per_sec": {
+                  "type": "long"
+                },
+                "quota": {
+                  "properties": {
+                    "ram": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "use": {
+                      "properties": {
+                        "pct": {
+                          "type": "float"
+                        }
+                      }
+                    }
+                  }
+                },
+                "type": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            },
+            "cluster": {
+              "properties": {
+                "hdd": {
+                  "properties": {
+                    "free": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "quota": {
+                      "properties": {
+                        "total": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "total": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "used": {
+                      "properties": {
+                        "by_data": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "value": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "max_bucket_count": {
+                  "type": "long"
+                },
+                "quota": {
+                  "properties": {
+                    "index_memory": {
+                      "properties": {
+                        "mb": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "memory": {
+                      "properties": {
+                        "mb": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "ram": {
+                  "properties": {
+                    "quota": {
+                      "properties": {
+                        "total": {
+                          "properties": {
+                            "per_node": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "value": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "used": {
+                          "properties": {
+                            "per_node": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            },
+                            "value": {
+                              "properties": {
+                                "bytes": {
+                                  "type": "long"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "total": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "used": {
+                      "properties": {
+                        "by_data": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "value": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "node": {
+              "properties": {
+                "cmd_get": {
+                  "type": "long"
+                },
+                "couch": {
+                  "properties": {
+                    "docs": {
+                      "properties": {
+                        "actual_disk_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "data_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "spatial": {
+                      "properties": {
+                        "data_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "disk_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "views": {
+                      "properties": {
+                        "actual_disk_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "data_size": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "cpu_utilization_rate": {
+                  "properties": {
+                    "pct": {
+                      "type": "float"
+                    }
+                  }
+                },
+                "current_items": {
+                  "properties": {
+                    "total": {
+                      "type": "long"
+                    },
+                    "value": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "ep_bg_fetched": {
+                  "type": "long"
+                },
+                "get_hits": {
+                  "type": "long"
+                },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "mcd_memory": {
+                  "properties": {
+                    "allocated": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "reserved": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "memory": {
+                  "properties": {
+                    "free": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "total": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "ops": {
+                  "type": "long"
+                },
+                "swap": {
+                  "properties": {
+                    "total": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "uptime": {
+                  "properties": {
+                    "sec": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "vb_replica_curr_items": {
+                  "type": "long"
+                }
+              }
+            }
+          }
+        },
         "docker": {
           "properties": {
             "container": {
@@ -950,12 +1336,43 @@
                   }
                 },
                 "partition": {
-                  "type": "long"
+                  "properties": {
+                    "error": {
+                      "properties": {
+                        "code": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "long"
+                    },
+                    "insync_replica": {
+                      "type": "boolean"
+                    },
+                    "leader": {
+                      "type": "long"
+                    },
+                    "replica": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "topic": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
+                  "properties": {
+                    "error": {
+                      "properties": {
+                        "code": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
@@ -1012,6 +1429,11 @@
               "type": "string"
             },
             "name": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "namespace": {
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
@@ -1808,6 +2230,38 @@
             }
           }
         },
+        "prometheus": {
+          "properties": {
+            "stats": {
+              "properties": {
+                "notifications": {
+                  "properties": {
+                    "dropped": {
+                      "type": "long"
+                    },
+                    "queue_length": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "processes": {
+                  "properties": {
+                    "open_fds": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "storage": {
+                  "properties": {
+                    "chunks_to_persist": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "redis": {
           "properties": {
             "info": {
@@ -2295,6 +2749,9 @@
             },
             "cpu": {
               "properties": {
+                "cores": {
+                  "type": "long"
+                },
                 "idle": {
                   "properties": {
                     "pct": {

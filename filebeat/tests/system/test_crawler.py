@@ -761,6 +761,9 @@ class Test(BaseTest):
         """
         Checks that filebeat handles files without reading permission well
         """
+        if os.name != "nt" and os.geteuid() == 0:
+            # root ignores permission flags, so we have to skip the test
+            raise SkipTest
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",

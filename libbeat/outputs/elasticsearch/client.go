@@ -104,11 +104,23 @@ func NewClient(
 		pipeline = nil
 	}
 
+	u, err := url.Parse(s.URL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse elasticsearch URL: %v", err)
+	}
+	if u.User != nil {
+		s.Username = u.User.Username()
+		s.Password, _ = u.User.Password()
+		u.User = nil
+
+		// Re-write URL without credentials.
+		s.URL = u.String()
+	}
+
 	logp.Info("Elasticsearch url: %s", s.URL)
 
 	// TODO: add socks5 proxy support
 	var dialer, tlsDialer transport.Dialer
-	var err error
 
 	dialer = transport.NetDialer(s.Timeout)
 	tlsDialer, err = transport.TLSDialer(dialer, s.TLS, s.Timeout)

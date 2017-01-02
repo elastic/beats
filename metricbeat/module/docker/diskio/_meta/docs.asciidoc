@@ -1,3 +1,3 @@
-=== docker diskio MetricSet
+=== Docker Diskio Metricset
 
-This is the diskio metricset of the module docker.
+The Docker `diskio` metricset collects disk I/O metrics.

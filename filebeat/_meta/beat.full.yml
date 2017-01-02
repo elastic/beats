@@ -205,6 +205,9 @@ filebeat.prospectors:
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_timeout: 0
 
+  # Defines if prospectors is enabled
+  #enabled: true
+
 #----------------------------- Stdin prospector -------------------------------
 # Configuration to use stdin input
 #- input_type: stdin

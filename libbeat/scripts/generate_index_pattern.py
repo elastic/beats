@@ -35,7 +35,7 @@ def field_to_json(desc, path, output):
     global unique_fields
 
     if path in unique_fields:
-        print "ERROR: Field", path, "is duplicated. Please delete it and try again. Fields already are", unique_fields
+        print("ERROR: Field {} is duplicated. Please delete it and try again. Fields already are {}".format(path, ", ".join(unique_fields)))
         sys.exit(1)
     else:
         unique_fields.append(path)
@@ -60,6 +60,8 @@ def field_to_json(desc, path, output):
                 field["aggregatable"] = False
         elif desc["type"] == "date":
             field["type"] = "date"
+        elif desc["type"] == "geo_point":
+            field["type"] = "geo_point"
     else:
         field["type"] = "string"
 

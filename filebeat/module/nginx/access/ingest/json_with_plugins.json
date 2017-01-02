@@ -1,0 +1,16 @@
+{
+  "description": "pipeline for parsing Nginx logs that are JSON format",
+  "processors": [{
+    "user_agent": {
+      "field": "agent"
+    }
+  }, {
+    "remove": {
+      "field": "agent"
+    }
+  }, {
+    "geoip": {
+      "field": "remote_ip"
+    }
+  }]
+}

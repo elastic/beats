@@ -1,0 +1,25 @@
+- name: error
+  type: group
+  description: >
+    Contains fields for the Nginx error logs.
+  fields:
+    - name: level
+      type: keyword
+      description: >
+        Error level (e.g. error, critical).
+    - name: pid
+      type: long
+      description: >
+        Process identifier (PID).
+    - name: tid
+      type: long
+      description: >
+        Thread identifier.
+    - name: connection_id
+      type: long
+      description: >
+        Connection identifier.
+    - name: message
+      type: text
+      description: >
+        The error message

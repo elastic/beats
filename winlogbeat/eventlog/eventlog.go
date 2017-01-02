@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"syscall"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -23,9 +24,14 @@ var (
 	detailf = logp.MakeDebug(detailSelector)
 )
 
-// dropReasons contains counters for the number of dropped events for each
-// reason.
-var dropReasons = expvar.NewMap("drop_reasons")
+var (
+	// dropReasons contains counters for the number of dropped events for each
+	// reason.
+	dropReasons = expvar.NewMap("drop_reasons")
+
+	// readErrors contains counters for the read error types that occur.
+	readErrors = expvar.NewMap("read_errors")
+)
 
 // EventLog is an interface to a Windows Event Log.
 type EventLog interface {
@@ -176,4 +182,18 @@ func isZero(i interface{}) bool {
 		return v.IsNil()
 	}
 	return false
+}
+
+// incrementMetric increments a value in the specified expvar.Map. The key
+// should be a windows syscall.Errno or a string. Any other types will be
+// reported under the "other" key.
+func incrementMetric(v *expvar.Map, key interface{}) {
+	switch t := key.(type) {
+	default:
+		v.Add("other", 1)
+	case string:
+		v.Add(t, 1)
+	case syscall.Errno:
+		v.Add(strconv.Itoa(int(t)), 1)
+	}
 }

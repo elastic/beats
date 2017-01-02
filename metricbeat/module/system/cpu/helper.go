@@ -3,6 +3,8 @@
 package cpu
 
 import (
+	"runtime"
+
 	"github.com/elastic/beats/metricbeat/module/system"
 	sigar "github.com/elastic/gosigar"
 )
@@ -12,6 +14,7 @@ type CPU struct {
 	LastCpuTimes     *CpuTimes
 	LastCpuTimesList []CpuTimes
 	CpuTicks         bool
+	Cores            int
 }
 
 type CpuTimes struct {
@@ -113,6 +116,11 @@ func GetCpuPercentageList(last, current []CpuTimes) []CpuTimes {
 	}
 
 	return current
+}
+
+func GetCores() int {
+	cores := runtime.NumCPU()
+	return cores
 }
 
 func (cpu *CPU) AddCpuPercentage(t2 *CpuTimes) {

@@ -1,0 +1,26 @@
+# This should test the environment with the latest snapshots
+# This is based on base.yml
+
+version: '2'
+services:
+  elasticsearch:
+    build:
+      context: ./docker/elasticsearch
+      dockerfile: Dockerfile-2x
+      args:
+        ELASTICSEARCH_VERSION: 2.4.2
+    command: elasticsearch -Des.network.host=0.0.0.0
+
+  logstash:
+    build:
+      context: ./docker/logstash
+      dockerfile: Dockerfile-2x
+      args:
+        LOGSTASH_VERSION: 2.4.1
+
+  kibana:
+    build:
+      context: ./docker/kibana
+      dockerfile: Dockerfile-4.6
+      args:
+        KIBANA_VERSION: 4.6.3

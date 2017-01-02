@@ -1,3 +1,4 @@
-=== docker container MetricSet
+=== Docker Container Metricset
 
-This is the container metricset of the module docker.
+The Docker `container` metricset collects information and statistics about
+running Docker containers.

@@ -1,6 +1,6 @@
-== docker Module
+== Docker Module
 
 experimental[]
 
-This is the docker Module.
+This module fetches metrics from https://www.docker.com/[Docker] containers.
 

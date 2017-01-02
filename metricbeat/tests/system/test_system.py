@@ -5,10 +5,10 @@ import metricbeat
 import getpass
 import os
 
-SYSTEM_CPU_FIELDS = ["idle.pct", "iowait.pct", "irq.pct", "nice.pct",
+SYSTEM_CPU_FIELDS = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                      "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
-SYSTEM_CPU_FIELDS_ALL = ["idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
+SYSTEM_CPU_FIELDS_ALL = ["cores", "idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
                      "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks"]
 
 SYSTEM_LOAD_FIELDS = ["1", "5", "15", "norm.1", "norm.5", "norm.15"]

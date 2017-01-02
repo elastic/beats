@@ -1,11 +1,14 @@
-
 ### VARIABLE SETUP ###
-
+### Application using libbeat may override the following variables in their Makefile
 BEATNAME?=libbeat
 BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash
+BEAT_VENDOR?=Elastic
+BEAT_LICENSE?=ASL 2.0
+BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEATNAME}/current/index.html
 BEAT_DIR?=github.com/elastic/beats/${BEATNAME}
 ES_BEATS?=..
 GOPACKAGES?=${BEAT_DIR}/...
+PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer
 
 # Makefile for a custom beat that includes this libbeat/scripts/Makefile:
 # if glide is used to manage vendor dependencies,
@@ -43,12 +46,14 @@ TEST_ENVIRONMENT?=false
 SYSTEM_TESTS?=false
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd
 TESTING_ENVIRONMENT?=snapshot
-DOCKER_COMPOSE?=docker-compose -f ${PWD}/../testing/environments/base.yml -f ${PWD}/../testing/environments/${TESTING_ENVIRONMENT}.yml -f docker-compose.yml
+DOCKER_COMPOSE_PROJECT_NAME?=${BEATNAME}_${TESTING_ENVIRONMENT}
+DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
 DOCKER_CACHE?=1 # If set to 0, all docker images are created without cache
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 PYTHON_ENV?=${BUILD_DIR}/python-env
 BUILDID?=$(shell git rev-parse HEAD)
-
+VIRTUALENV_PARAMS?=
+INTEGRATION_TESTS?=
 CGO?=false
 
 # Cross compiling targets
@@ -57,6 +62,8 @@ TARGETS?="linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64"
 TARGETS_OLD?=""
 PACKAGES?=${BEATNAME}/deb ${BEATNAME}/rpm ${BEATNAME}/darwin ${BEATNAME}/win ${BEATNAME}/bin
 SNAPSHOT?=yes
+BEATS_BUILDER_IMAGE?=tudorg/beats-builder
+BEATS_BUILDER_DEB6_IMAGE?=tudorg/beats-builder-deb6
 
 ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
@@ -151,14 +158,14 @@ integration-tests-environment: prepare-tests build-image
 
 # Runs the system tests
 .PHONY: system-tests
-system-tests: ${BEATNAME}.test prepare-tests python-env
-	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=1 nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
+system-tests: ${BEATNAME}.test prepare-tests python-env ${ES_BEATS}/libbeat/dashboards/import_dashboards
+	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs the system tests
 .PHONY: system-tests-environment
 system-tests-environment: prepare-tests build-image
-	${DOCKER_COMPOSE} run beat make system-tests
+	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 beat make system-tests
 
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
@@ -179,7 +186,7 @@ load-tests:
 # Sets up the virtual python environment
 .PHONY: python-env
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
-	@test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
+	@test -d ${PYTHON_ENV} || virtualenv ${VIRTUALENV_PARAMS} ${PYTHON_ENV}
 	@. ${PYTHON_ENV}/bin/activate && pip install -q --upgrade pip ; \
 	if [ -a ./tests/system/requirements.txt ] && [ ! ${ES_BEATS}/libbeat/tests/system/requirements.txt -ef ./tests/system/requirements.txt ] ; then \
 		. ${PYTHON_ENV}/bin/activate && pip install -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
@@ -200,23 +207,26 @@ testsuite: clean collect
 	$(MAKE) unit-tests
 
 	# Setups environment if TEST_ENVIRONMENT is set to true
+	# Only runs integration tests with test environemtn
 	if [ $(TEST_ENVIRONMENT) = true ]; then \
 		 $(MAKE) integration-tests-environment; \
-	else \
-		$(MAKE) integration-tests; \
 	fi
 
-	# Runs system tests if SYSTEM_TESTS is set to true
+	# Runs system and system integration tests if SYSTEM_TESTS is set to true
 	if [ $(SYSTEM_TESTS) = true ]; then \
 		if [ $(TEST_ENVIRONMENT) = true ]; then \
-			$(MAKE) system-tests-environment; \
-		else \
+        	$(MAKE) system-tests-environment; \
+    	else \
 			$(MAKE) system-tests; \
 		fi \
 	fi
 
 	$(MAKE) benchmark-tests
 	$(MAKE) coverage-report
+
+	if [ $(TEST_ENVIRONMENT) = true ]; then \
+		$(MAKE) fix-permissions; \
+	fi
 
 # Generates a coverage report from the existing coverage files
 .PHONY: coverage-report
@@ -254,9 +264,6 @@ update: python-env collect
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME} ${ES_BEATS}
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME} ${ES_BEATS}
 
-	# Update docs version
-	cp ${ES_BEATS}/libbeat/docs/version.asciidoc docs/version.asciidoc
-
 	# Generate index-pattern
 	echo "Generate index pattern"
 	-rm -f $(PWD)/_meta/kibana/index-pattern/${BEATNAME}.json
@@ -283,9 +290,11 @@ ES_URL?=http://localhost:9200
 export-dashboards: python-env update
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/_meta/kibana --regex ${BEATNAME}-*
 
+${ES_BEATS}/libbeat/dashboards/import_dashboards:
+	$(MAKE) -C ${ES_BEATS}/libbeat/dashboards import_dashboards
+
 .PHONY: import-dashboards
-import-dashboards: update
-	$(MAKE) -C ${ES_BEATS}/libbeat/dashboards import_dasboards
+import-dashboards: update ${ES_BEATS}/libbeat/dashboards/import_dashboards
 	${ES_BEATS}/libbeat/dashboards/import_dashboards -es ${ES_URL} -dir ${PWD}/_meta/kibana
 
 ### CONTAINER ENVIRONMENT ####
@@ -304,7 +313,7 @@ start-environment: stop-environment
 .PHONY: stop-environment
 stop-environment:
 	-${DOCKER_COMPOSE} stop
-	-${DOCKER_COMPOSE} rm -f -v -a
+	-${DOCKER_COMPOSE} rm -f -v
 
 .PHONY: write-environment
 write-environment:
@@ -335,6 +344,7 @@ prepare-package:
 	# cross compile on ubuntu
 	docker run --rm \
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
+		-v $(abspath ${PACKER_TEMPLATES_DIR}):/templates \
 		-v $(abspath ../):/source \
 		-v $(BUILD_DIR):/build \
 		-e PUREGO="yes" \
@@ -343,7 +353,7 @@ prepare-package:
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS} \
 		-e BUILDID=${BUILDID} \
-		tudorg/beats-builder \
+		${BEATS_BUILDER_IMAGE} \
 		${BEAT_DIR}
 
 # Prepares for packaging. Builds binaries with cgo
@@ -353,6 +363,7 @@ prepare-package-cgo:
 	# cross compile on ubuntu
 	docker run --rm \
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
+		-v $(abspath ${PACKER_TEMPLATES_DIR}):/templates \
 		-v $(abspath ../):/source \
 		-v $(BUILD_DIR):/build \
 		-e PACK=${BEATNAME} \
@@ -360,20 +371,21 @@ prepare-package-cgo:
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS} \
 		-e BUILDID=${BUILDID} \
-		tudorg/beats-builder \
+		${BEATS_BUILDER_IMAGE} \
 		${BEAT_DIR}
 
 	# linux builds on debian 6 for compatibility
 	docker run --rm \
 		-v ${BUILD_DIR}:/build \
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
+		-v $(abspath ${PACKER_TEMPLATES_DIR}):/templates \
 		-v $(abspath ..):/source \
 		-e PACK=${BEATNAME} \
 		-e BEFORE_BUILD=before_build.sh \
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS_OLD} \
 		-e BUILDID=${BUILDID} \
-		tudorg/beats-builder-deb6 \
+		${BEATS_BUILDER_DEB6_IMAGE} \
 		${BEAT_DIR}
 
 # Prepares images for packaging
@@ -394,7 +406,15 @@ package: package-setup
 	echo "beat_url: https://${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_repo: ${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_description: ${BEAT_DESCRIPTION}" >> ${BUILD_DIR}/package.yml
-	cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml
+	echo "beat_vendor: ${BEAT_VENDOR}" >> ${BUILD_DIR}/package.yml
+	echo "beat_license: ${BEAT_LICENSE}" >> ${BUILD_DIR}/package.yml
+	echo "beat_doc_url: ${BEAT_DOC_URL}" >> ${BUILD_DIR}/package.yml
+
+	if [ -a version.yml ]; then \
+		cat version.yml >> ${BUILD_DIR}/package.yml; \
+	else \
+		cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml; \
+	fi
 
 	if [ $(CGO) = true ]; then \
 		 $(MAKE) prepare-package-cgo; \
@@ -403,7 +423,7 @@ package: package-setup
 	fi
 
 	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_DIR=${BEAT_DIR} BUILD_DIR=${BUILD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${BUILD_DIR}/upload/build_id.txt
-
+	$(MAKE) fix-permissions
 	echo "Finished packages for ${BEATNAME}"
 
 package-dashboards: package-setup
@@ -411,3 +431,13 @@ package-dashboards: package-setup
 	cp -r _meta/kibana ${BUILD_DIR}/dashboards
 	# build the dashboards package
 	BEATNAME=${BEATNAME} BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C ${ES_BEATS}/dev-tools/packer package-dashboards ${shell pwd}/build/upload/build_id.txt
+
+fix-permissions:
+	# Change ownership of all files inside /build folder from root/root to current user/group
+	docker run -v ${BUILD_DIR}:/build alpine:3.4 sh -c "chown -R $(shell id -u):$(shell id -g) /build"
+
+set_version:
+	${ES_BEATS}/dev-tools/set_version ${VERSION}
+
+get_version:
+	@${ES_BEATS}/dev-tools/get_version

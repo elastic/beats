@@ -44,3 +44,14 @@ class BaseTest(TestCase):
 
         return tmp_entry
 
+    def assert_fields_are_documented(self, evt):
+        """
+        Assert that all keys present in evt are documented in fields.yml.
+        This reads from the global fields.yml, means `make collect` has to be run before the check.
+        """
+        expected_fields, dict_fields = self.load_fields()
+        flat = self.flatten_object(evt, dict_fields)
+
+        for key in flat.keys():
+            if key not in expected_fields:
+                raise Exception("Key '{}' found in event is not documented!".format(key))

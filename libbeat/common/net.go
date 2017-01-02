@@ -8,15 +8,29 @@ import (
 // LocalIPAddrs finds the IP addresses of the hosts on which
 // the shipper currently runs on.
 func LocalIPAddrs() ([]net.IP, error) {
-	var localIPAddrs = []net.IP{}
+	var localIPAddrs []net.IP
 	ipaddrs, err := net.InterfaceAddrs()
 	if err != nil {
-		return []net.IP{}, err
+		return nil, err
 	}
-	for _, ipaddr := range ipaddrs {
-		if ipnet, ok := ipaddr.(*net.IPNet); ok {
-			localIPAddrs = append(localIPAddrs, ipnet.IP)
+	for _, addr := range ipaddrs {
+		var ip net.IP
+		ok := true
+
+		switch v := addr.(type) {
+		case *net.IPNet:
+			ip = v.IP
+		case *net.IPAddr:
+			ip = v.IP
+		default:
+			ok = false
 		}
+
+		if !ok {
+			continue
+		}
+
+		localIPAddrs = append(localIPAddrs, ip)
 	}
 	return localIPAddrs, nil
 }

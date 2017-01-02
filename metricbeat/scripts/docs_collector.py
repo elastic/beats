@@ -16,6 +16,8 @@ This file is generated! See scripts/docs_collector.py
 
 """
 
+    modules_list = {}
+
     # Iterate over all modules
     for module in sorted(os.listdir(base_dir)):
 
@@ -40,6 +42,8 @@ This file is generated! See scripts/docs_collector.py
         with open(beat_path + "/fields.yml") as f:
             fields = yaml.load(f.read())
             title = fields[0]["title"]
+
+        modules_list[module] = title
 
         config_file = beat_path + "/config.yml"
 
@@ -130,6 +134,19 @@ For a description of each field in the metricset, see the
         # Write module docs
         with open(os.path.abspath("docs") + "/modules/" + module + ".asciidoc", 'w') as f:
             f.write(module_file)
+
+    module_list_output = generated_note
+    for m, title in sorted(modules_list.iteritems()):
+        module_list_output += "  * <<metricbeat-module-" + m + "," + title + ">>\n"
+
+    module_list_output += "\n\n--\n\n"
+    for m, title in sorted(modules_list.iteritems()):
+        module_list_output += "include::modules/"+ m + ".asciidoc[]\n"
+
+    # Write module link list
+    with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w') as f:
+        f.write(module_list_output)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
