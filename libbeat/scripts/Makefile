@@ -47,7 +47,7 @@ SYSTEM_TESTS?=false
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd
 TESTING_ENVIRONMENT?=snapshot
 DOCKER_COMPOSE_PROJECT_NAME?=${BEATNAME}_${TESTING_ENVIRONMENT}
-DOCKER_COMPOSE?=docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f ${PWD}/../testing/environments/base.yml -f ${PWD}/../testing/environments/${TESTING_ENVIRONMENT}.yml -f docker-compose.yml
+DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
 DOCKER_CACHE?=1 # If set to 0, all docker images are created without cache
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 PYTHON_ENV?=${BUILD_DIR}/python-env

@@ -9,9 +9,9 @@ The different environments can be started with the following commands for manual
 
 Running the environment chains the following docker-compose files together
 
-* base.yml: Basic environment
-* ports.yml: Definition of ports which have to be exposed
+* local.yml: Definition of ports which have to be exposed for local testing including kibana
 * latest.yml: Latest version of elasticsearch, logstash, kibana
+* snapshot.yml: Snapshot version of elasticsearch, logstash, kibana
 
 
 ## Start / Stop environment
@@ -76,7 +76,6 @@ This will run the full testsuite but with latest environments instead of snapsho
 
 By default, elasticsearch, logstash and kibana are started. These are available at all time that these environments are used. Running the environment, chains the following docker-compose flies together:
 
-* base.yml: Basic environment
 * snapshot.yml: Snapshot version of elasticsearch, logstash, kibana
 * docker-compose.yml: Local beat docker-compose file
 
