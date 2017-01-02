@@ -34,11 +34,10 @@ type Process struct {
 }
 
 type ProcStats struct {
-	ProcStats bool
-	Procs     []string
-	regexps   []*regexp.Regexp
-	ProcsMap  ProcsMap
-	CpuTicks  bool
+	Procs    []string
+	regexps  []*regexp.Regexp
+	ProcsMap ProcsMap
+	CpuTicks bool
 }
 
 // newProcess creates a new Process object based on the state information.
@@ -124,7 +123,6 @@ func getProcFDUsage(pid int) (*sigar.ProcFDUsage, error) {
 func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
 
 	// in unit tests, total_phymem is set to a value greater than zero
-
 	if totalPhyMem == 0 {
 		memStat, err := memory.GetMemory()
 		if err != nil {
@@ -260,25 +258,6 @@ func (procStats *ProcStats) InitProcStats() error {
 		procStats.regexps = append(procStats.regexps, reg)
 	}
 
-	pids, err := Pids()
-	if err != nil {
-		logp.Warn("Getting the initial list of pids: %v", err)
-	}
-
-	for _, pid := range pids {
-		process, err := newProcess(pid)
-		if err != nil {
-			logp.Debug("metricbeat", "Skip process pid=%d: %v", pid, err)
-			continue
-		}
-		err = process.getDetails("")
-		if err != nil {
-			logp.Err("Error getting process details pid=%d: %v", pid, err)
-			continue
-		}
-		procStats.ProcsMap[process.Pid] = process
-	}
-
 	return nil
 }
 
@@ -327,26 +306,6 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 
 	procStats.ProcsMap = newProcs
 	return processes, nil
-}
-
-func (procStats *ProcStats) GetProcStatsEvents() ([]common.MapStr, error) {
-	processes, err := procStats.GetProcStats()
-	if err != nil {
-		return nil, err
-	}
-
-	events := make([]common.MapStr, len(processes))
-	for _, proc := range processes {
-		event := common.MapStr{
-			"@timestamp": common.Time(time.Now()),
-			"type":       "process",
-			"proc":       proc,
-		}
-
-		events = append(events, event)
-	}
-
-	return events, nil
 }
 
 // unixTimeMsToTime converts a unix time given in milliseconds since Unix epoch

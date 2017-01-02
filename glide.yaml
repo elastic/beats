@@ -62,7 +62,7 @@ import:
 - package: github.com/miekg/dns
   version: 5d001d020961ae1c184f9f8152fdc73810481677
 - package: github.com/Shopify/sarama
-  version: fix/sasl-handshake
+  version: v1.11/enh/offset-replica-id
   repo: https://github.com/urso/sarama
 - package: github.com/rcrowley/go-metrics
   version: ab2277b1c5d15c3cba104e9cbddbdfc622df5ad8
@@ -81,7 +81,7 @@ import:
 - package: github.com/dustin/go-humanize
   version: 499693e27ee0d14ffab67c31ad065fdb3d34ea75
 - package: github.com/elastic/go-ucfg
-  version: v0.3.7
+  version: v0.4.3
 - package: github.com/armon/go-socks5
   version: 3a873e99f5400ad7706e464e905ffcc94b3ff247
 - package: github.com/pkg/errors
@@ -107,3 +107,7 @@ import:
   version: v0.9.0
 - package: github.com/gorhill/cronexpr
   version: f0984319b44273e83de132089ae42b1810f4933b
+- package: github.com/pierrec/lz4
+  version: 5c9560bfa9ace2bf86080bf40d46b34ae44604df
+- package: github.com/pierrec/xxHash
+  version: 5a004441f897722c627870a981d02b29924215fa

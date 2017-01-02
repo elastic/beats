@@ -320,15 +320,10 @@ Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-json.message_key: log
 json.keys_under_root: true
 json.add_error_key: true
+json.message_key: log
 -------------------------------------------------------------------------------------
-
-
-*`message_key`*:: JSON key on which to apply the line filtering and multiline settings. This key must be top level
-and its value must be string, otherwise it is ignored. If no text key is defined, the line
-filtering and multiline features cannot be used.
 
 *`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key in the output document.
 If you enable this setting, the keys are copied top level in the output document. The default is false.
@@ -337,7 +332,14 @@ If you enable this setting, the keys are copied top level in the output document
 JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.) in case of conflicts.
 
 *`add_error_key`*:: If this setting is enabled, Filebeat adds a "json_error" key in case of JSON
-unmarshaling errors or when a text key is defined in the configuration but cannot be used.
+unmarshalling errors or when a `message_key` is defined in the configuration but cannot be used.
+
+*`message_key`*:: An optional configuration setting that specifies a JSON key on
+which to apply the line filtering and multiline settings. If specified the
+key must be at the top level in the JSON object and the value associated with
+the key must be a string, otherwise no filtering or multiline aggregation will
+occur.
+
 
 [[multiline]]
 ===== multiline
@@ -460,6 +462,10 @@ Currently if a new harvester can be started again, the harvester is picked rando
 This configuration option applies per prospector. You can use this option to indirectly set higher priorities on certain prospectors
 by assigning a higher limit of harvesters.
 
+===== enabled
+
+The `enabled` option can be used with each prospector to define if a prospector is enabled or not. By default, enabled is set to true.
+
 [[configuration-global-options]]
 === Filebeat Global Configuration
 
@@ -480,6 +486,8 @@ filebeat.spool_size: 2048
 See <<load-balancing>> for more information about how this setting affects load balancing.
 
 ===== publish_async
+
+experimental[]
 
 If enabled, the publisher pipeline in Filebeat operates in async mode preparing
 a new batch of lines while waiting for ACK. This option can improve load-balancing
@@ -558,11 +566,11 @@ filebeat.shutdown_timeout: 5s
 
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/processors-config.asciidoc[]
-
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
+
+include::../../../../libbeat/docs/processors-config.asciidoc[]
 

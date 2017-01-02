@@ -64,17 +64,35 @@ func FetchStats(client *docker.Client) ([]Stat, error) {
 		return nil, err
 	}
 
+	var wg sync.WaitGroup
+
 	containersList := []Stat{}
+	queue := make(chan Stat, 1)
+	wg.Add(len(containers))
+
 	for _, container := range containers {
-		// This is currently very inefficient as docker calculates the average for each request,
-		// means each request will take at least 2s: https://github.com/docker/docker/blob/master/cli/command/container/stats_helpers.go#L148
-		// Getting all stats at once is implemented here: https://github.com/docker/docker/pull/25361
-		containersList = append(containersList, exportContainerStats(client, &container))
+		go func(container docker.APIContainers) {
+			queue <- exportContainerStats(client, &container)
+		}(container)
 	}
+
+	go func() {
+		for container := range queue {
+			containersList = append(containersList, container)
+			wg.Done()
+		}
+	}()
+
+	wg.Wait()
 
 	return containersList, err
 }
 
+// exportContainerStats loads stats for the given container
+//
+// This is currently very inefficient as docker calculates the average for each request,
+// means each request will take at least 2s: https://github.com/docker/docker/blob/master/cli/command/container/stats_helpers.go#L148
+// Getting all stats at once is implemented here: https://github.com/docker/docker/pull/25361
 func exportContainerStats(client *docker.Client, container *docker.APIContainers) Stat {
 	var wg sync.WaitGroup
 	var event Stat

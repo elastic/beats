@@ -11,14 +11,18 @@
                 "id": 0
             },
             "offset": {
-                "newest": 13,
+                "newest": 11,
                 "oldest": 0
             },
-            "partition": 0,
-            "replicas": [
-                0
-            ],
-            "topic": "testtopic"
+            "partition": {
+                "id": 0,
+                "insync_replica": true,
+                "leader": 0,
+                "replica": 0
+            },
+            "topic": {
+                "name": "test-metricbeat-70692474374989458"
+            }
         }
     },
     "metricset": {

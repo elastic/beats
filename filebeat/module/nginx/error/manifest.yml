@@ -1,0 +1,14 @@
+module_version: 1.0
+
+vars:
+  paths:
+    default:
+      - /var/log/nginx/error.log*
+    os.darwin:
+      - /usr/local/var/log/nginx/error.log*
+    os.windows:
+      - c:/programfiles/nginx/logs/error.log*
+
+ingest_pipeline: ingest/pipeline.json
+prospectors:
+  - config/nginx-error.yml

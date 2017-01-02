@@ -1,0 +1,18 @@
+version: '2'
+services:
+  beat:
+    build: ${PWD}/.
+    depends_on:
+      - elasticsearch
+    env_file:
+      - ${PWD}/build/test.env
+    working_dir: /go/src/github.com/elastic/beats/filebeat
+    volumes:
+      - ${PWD}/..:/go/src/github.com/elastic/beats/
+    command: make
+    entrypoint: /go/src/github.com/elastic/beats/filebeat/docker-entrypoint.sh
+
+  elasticsearch:
+    extends:
+      file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch

@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-couchbase>>
 * <<exported-fields-docker>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-kafka>>
@@ -23,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 * <<exported-fields-postgresql>>
+* <<exported-fields-prometheus>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
 * <<exported-fields-zookeeper>>
@@ -496,6 +498,14 @@ Event round trip time in microseconds.
 
 
 [float]
+=== metricset.namespace
+
+type: keyword
+
+Namespace of dynamic metricsets.
+
+
+[float]
 === type
 
 example: metricsets
@@ -505,8 +515,471 @@ required: True
 The document type. Always set to "metricsets".
 
 
+[[exported-fields-couchbase]]
+== couchbase Fields
+
+experimental[]
+couchbase Module
+
+
+
+[float]
+== couchbase Fields
+
+`couchbase` contains the metrics that were scraped from Couchbase.
+
+
+
+[float]
+== bucket Fields
+
+experimental[]
+Couchbase bucket metrics
+
+
+
+[float]
+=== couchbase.bucket.name
+
+type: keyword
+
+name of the bucket
+
+
+[float]
+=== couchbase.bucket.type
+
+type: keyword
+
+type of the bucket
+
+
+[float]
+=== couchbase.bucket.data.used.bytes
+
+type: long
+
+format: bytes
+
+Size of user data within buckets of the specified state that are resident in RAM.
+
+
+[float]
+=== couchbase.bucket.disk.fetches
+
+type: long
+
+Number of disk fetches
+
+
+[float]
+=== couchbase.bucket.disk.used.bytes
+
+type: long
+
+format: bytes
+
+Amount of disk used (bytes)
+
+
+[float]
+=== couchbase.bucket.memory.used.bytes
+
+type: long
+
+format: bytes
+
+Amount of memory used by the bucket (bytes)
+
+
+[float]
+=== couchbase.bucket.quota.ram.bytes
+
+type: long
+
+format: bytes
+
+Amount of RAM used by the bucket (bytes)
+
+
+[float]
+=== couchbase.bucket.quota.use.pct
+
+type: scaled_float
+
+format: percent
+
+Percentage of RAM used (for active objects) against the configure bucket size.(%)
+
+
+[float]
+=== couchbase.bucket.ops_per_sec
+
+type: long
+
+Number of operations per second
+
+
+[float]
+=== couchbase.bucket.item_count
+
+type: long
+
+Number of items associated with the bucket
+
+
+[float]
+== cluster Fields
+
+experimental[]
+Couchbase Cluster metrics
+
+
+
+[float]
+=== couchbase.cluster.hdd.free.bytes
+
+type: long
+
+format: bytes
+
+Free harddrive space in the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.hdd.quota.total.bytes
+
+type: long
+
+format: bytes
+
+Harddrive quota total for the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.hdd.total.bytes
+
+type: long
+
+format: bytes
+
+Total harddrive space available to cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.hdd.used.value.bytes
+
+type: long
+
+format: bytes
+
+Harddrive space used by the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.hdd.used.by_data.bytes
+
+type: long
+
+format: bytes
+
+Harddrive use by the data in the cluster(bytes)
+
+
+[float]
+=== couchbase.cluster.max_bucket_count
+
+type: long
+
+Setting of Max Bucket Count
+
+
+[float]
+=== couchbase.cluster.quota.index_memory.mb
+
+type: long
+
+Setting of Memory quota for the Index service (Mbyte)
+
+
+[float]
+=== couchbase.cluster.quota.memory.mb
+
+type: long
+
+Setting of Memory quota for the cluster (Mbyte)
+
+
+[float]
+=== couchbase.cluster.ram.quota.total.value.bytes
+
+type: long
+
+format: bytes
+
+Ram quota total for the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.ram.quota.total.per_node.bytes
+
+type: long
+
+format: bytes
+
+Ram quota used by the current node in the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.ram.quota.used.value.bytes
+
+type: long
+
+format: bytes
+
+Ram quota used by the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.ram.quota.used.per_node.bytes
+
+type: long
+
+format: bytes
+
+Ram quota used by the current node in the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.ram.total.bytes
+
+type: long
+
+format: bytes
+
+Total ram available to cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.ram.used.value.bytes
+
+type: long
+
+format: bytes
+
+Ram used by the cluster (bytes)
+
+
+[float]
+=== couchbase.cluster.ram.used.by_data.bytes
+
+type: long
+
+format: bytes
+
+Ram used by the data in the cluster (bytes)
+
+
+[float]
+== node Fields
+
+experimental[]
+Couchbase node metrics
+
+
+
+[float]
+=== couchbase.node.cmd_get
+
+type: long
+
+Number of get commands
+
+
+[float]
+=== couchbase.node.couch.docs.actual_disk_size.bytes
+
+type: long
+
+format: bytes
+
+Amount of disk space used by Couch docs.(bytes)
+
+
+[float]
+=== couchbase.node.couch.docs.data_size.bytes
+
+type: long
+
+format: bytes
+
+Data size of couch documents associated with a node (bytes)
+
+
+[float]
+=== couchbase.node.couch.spatial.data_size.bytes
+
+type: long
+
+couchSpatialDataSize field
+
+
+[float]
+=== couchbase.node.couch.spatial.disk_size.bytes
+
+type: long
+
+couchSpatialDiskSize field
+
+
+[float]
+=== couchbase.node.couch.views.actual_disk_size.bytes
+
+type: long
+
+Amount of disk space occupied by Couch views (bytes)
+
+
+[float]
+=== couchbase.node.couch.views.data_size.bytes
+
+type: long
+
+Size of object data for Couch views (bytes)
+
+
+[float]
+=== couchbase.node.cpu_utilization_rate.pct
+
+type: scaled_float
+
+The CPU utilization rate (%)
+
+
+[float]
+=== couchbase.node.current_items.value
+
+type: long
+
+Number of current items
+
+
+[float]
+=== couchbase.node.current_items.total
+
+type: long
+
+Total number of items associated with node
+
+
+[float]
+=== couchbase.node.ep_bg_fetched
+
+type: long
+
+Number of disk fetches performed since server was started
+
+
+[float]
+=== couchbase.node.get_hits
+
+type: long
+
+Number of get hits
+
+
+[float]
+=== couchbase.node.hostname
+
+type: keyword
+
+The hostname of the Node
+
+
+[float]
+=== couchbase.node.mcd_memory.allocated.bytes
+
+type: long
+
+format: bytes
+
+Amount of memcached memory allocated (bytes)
+
+
+[float]
+=== couchbase.node.mcd_memory.reserved.bytes
+
+type: long
+
+Amount of memcached memory reserved (bytes)
+
+
+[float]
+=== couchbase.node.memory.free.bytes
+
+type: long
+
+Amount of memory free for the node (bytes)
+
+
+[float]
+=== couchbase.node.memory.total.bytes
+
+type: long
+
+Total memory available to the node (bytes)
+
+
+[float]
+=== couchbase.node.memory.used.bytes
+
+type: long
+
+Memory used by the node (bytes)
+
+
+[float]
+=== couchbase.node.ops
+
+type: long
+
+Number of operations performed on Couchbase
+
+
+[float]
+=== couchbase.node.swap.total.bytes
+
+type: long
+
+Total swap size allocated (bytes)
+
+
+[float]
+=== couchbase.node.swap.used.bytes
+
+type: long
+
+Amount of swap space used.(bytes)
+
+
+[float]
+=== couchbase.node.uptime.sec
+
+type: long
+
+Time during which the node was in operation (sec)
+
+
+[float]
+=== couchbase.node.vb_replica_curr_items
+
+type: long
+
+Number of items/documents that are replicas
+
+
 [[exported-fields-docker]]
-== docker Fields
+== Docker Fields
 
 experimental[]
 Docker stats collected from Docker.
@@ -516,14 +989,14 @@ Docker stats collected from Docker.
 [float]
 == docker Fields
 
-docker contains different informations and statistics of docker's containers running
+Information and statistics about docker's running containers.
 
 
 
 [float]
 == container Fields
 
-Docker container metrics
+Docker container metrics.
 
 
 
@@ -532,7 +1005,7 @@ Docker container metrics
 
 type: keyword
 
-Executed command in docker container.
+Command that was executed in the Docker container.
 
 
 [float]
@@ -540,7 +1013,7 @@ Executed command in docker container.
 
 type: date
 
-Date then the container was created.
+Date when the container was created.
 
 
 [float]
@@ -595,13 +1068,13 @@ Total size of all the files in the container.
 
 type: long
 
-Size of the files which have been created or changed since creation.
+Size of the files that have been created or changed since creation.
 
 
 [float]
 == cpu Fields
 
-Runtime cpu metrics.
+Runtime CPU metrics.
 
 
 
@@ -612,7 +1085,7 @@ type: scaled_float
 
 format: percentage
 
-The system kernel consumed by The Docker server.
+The system kernel consumed by the Docker server.
 
 
 [float]
@@ -620,7 +1093,7 @@ The system kernel consumed by The Docker server.
 
 type: long
 
-Cpu kernel tikcs
+CPU kernel ticks.
 
 
 [float]
@@ -637,7 +1110,7 @@ format: percentage
 
 type: long
 
-Cpu system tikcs
+CPU system ticks.
 
 
 [float]
@@ -654,7 +1127,7 @@ format: percentage
 
 type: long
 
-Cpu user tikcs
+CPU user ticks
 
 
 [float]
@@ -664,13 +1137,13 @@ type: scaled_float
 
 format: percentage
 
-Total cpu usage.
+Total CPU usage.
 
 
 [float]
 == diskio Fields
 
-Diskio metrics.
+Disk I/O metrics.
 
 
 
@@ -695,14 +1168,14 @@ Number of writes.
 
 type: scaled_float
 
-Reads and writes numbers combined.
+Number of reads and writes combined.
 
 
 [float]
 == info Fields
 
 experimental[]
-info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information
+Info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information.
 
 
 
@@ -750,7 +1223,7 @@ Total number of existing containers.
 
 type: keyword
 
-Unique docker host identifier.
+Unique Docker host identifier.
 
 
 [float]
@@ -789,7 +1262,7 @@ Memory limit.
 [float]
 == rss Fields
 
-Rss memory stats.
+RSS memory stats.
 
 
 
@@ -849,7 +1322,7 @@ Total memory usage.
 [float]
 == network Fields
 
-Netowrk metrics.
+Network metrics.
 
 
 
@@ -1959,7 +2432,14 @@ Oldest offset of the partition.
 
 
 [float]
-=== kafka.partition.partition
+== partition Fields
+
+Partition data.
+
+
+
+[float]
+=== kafka.partition.partition.id
 
 type: long
 
@@ -1967,7 +2447,55 @@ Partition id.
 
 
 [float]
-=== kafka.partition.topic
+=== kafka.partition.partition.leader
+
+type: long
+
+Leader id (broker).
+
+
+[float]
+=== kafka.partition.partition.isr
+
+type: list
+
+List of isr ids.
+
+
+[float]
+=== kafka.partition.partition.replica
+
+type: long
+
+Replica id (broker).
+
+
+[float]
+=== kafka.partition.partition.insync_replica
+
+type: boolean
+
+Indicates if replica is included in the in-sync replicate set (ISR).
+
+
+[float]
+=== kafka.partition.partition.error.code
+
+type: long
+
+Error code from fetching partition.
+
+
+[float]
+=== kafka.partition.topic.error.code
+
+type: long
+
+topic error code.
+
+
+[float]
+=== kafka.partition.topic.name
 
 type: keyword
 
@@ -3437,6 +3965,66 @@ type: date
 Time at which these statistics were last reset.
 
 
+[[exported-fields-prometheus]]
+== Prometheus Fields
+
+Prometheus Module
+experimental[]
+
+
+
+[float]
+== prometheus Fields
+
+
+
+
+[float]
+== stats Fields
+
+stats
+
+
+
+[float]
+== notifications Fields
+
+Notification stats
+
+
+
+[float]
+=== prometheus.stats.notifications.queue_length
+
+type: long
+
+Current queue length
+
+
+[float]
+=== prometheus.stats.notifications.dropped
+
+type: long
+
+Dropped queue events
+
+
+[float]
+=== prometheus.stats.processes.open_fds
+
+type: long
+
+Open file descriptors gauge
+
+
+[float]
+=== prometheus.stats.storage.chunks_to_persist
+
+type: long
+
+Gauge on chunks which are not persisted to disk yet
+
+
 [[exported-fields-redis]]
 == Redis Fields
 
@@ -4253,6 +4841,14 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 `cpu` contains local CPU stats.
 
+
+
+[float]
+=== system.cpu.cores
+
+type: long
+
+The number of CPU cores.
 
 
 [float]

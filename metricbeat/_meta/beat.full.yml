@@ -67,7 +67,14 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
-#------------------------------- docker Module -------------------------------
+#------------------------------ couchbase Module -----------------------------
+#- module: couchbase
+  #metricsets: ["cluster", "node", "bucket"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:8091"]
+
+#------------------------------- Docker Module -------------------------------
 #- module: docker
   #metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
   #hosts: ["unix:///var/run/docker.sock"]
@@ -94,6 +101,26 @@ metricbeat.modules:
   #period: 10s
   #hosts: ["localhost:9092"]
 
+  #client_id: metricbeat
+  #retries: 3
+  #backoff: 250ms
+
+  # List of Topics to query metadata for. If empty, all topics will be queried.
+  #topics: []
+
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # SASL authentication
+  #username: ""
+  #password: ""
 
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
@@ -175,6 +202,15 @@ metricbeat.modules:
   #password: pass
 
 
+#----------------------------- Prometheus Module -----------------------------
+#- module: prometheus
+  #metricsets: ["stats"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:9090"]
+  #metrics_path: /metrics
+  #namespace: example
+
 #-------------------------------- Redis Module -------------------------------
 #- module: redis
   #metricsets: ["info", "keyspace"]
@@ -183,9 +219,6 @@ metricbeat.modules:
 
   # Redis hosts
   #hosts: ["127.0.0.1:6379"]
-
-  # Enabled defines if the module is enabled. Default: true
-  #enabled: true
 
   # Timeout after which time a metricset should return an error
   # Timeout is by default defined as period, as a fetch of a metricset

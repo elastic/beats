@@ -1,0 +1,10 @@
+- key: syslog
+  title: "Syslog"
+  description: >
+    Module for parsing syslog files.
+  fields:
+    - name: syslog
+      type: group
+      description: >
+        Fields from the syslog files.
+      fields:

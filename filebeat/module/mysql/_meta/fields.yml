@@ -1,0 +1,10 @@
+- key: mysql
+  title: "MySQL"
+  description: >
+    Module for parsing the MySQL log files.
+  fields:
+    - name: mysql
+      type: group
+      description: >
+        Fields from the MySQL log files.
+      fields:

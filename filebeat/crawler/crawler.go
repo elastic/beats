@@ -40,7 +40,9 @@ func (c *Crawler) Start(states file.States, once bool) error {
 		if err != nil {
 			return fmt.Errorf("Error in initing prospector: %s", err)
 		}
-		c.prospectors = append(c.prospectors, prospector)
+		if prospector.IsEnabled() {
+			c.prospectors = append(c.prospectors, prospector)
+		}
 	}
 
 	logp.Info("Loading Prospectors completed. Number of prospectors: %v", len(c.prospectors))

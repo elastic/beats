@@ -794,8 +794,6 @@ process' command line as read from `/proc/<pid>/cmdline`.
 
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/processors-config.asciidoc[]
-
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
@@ -803,4 +801,7 @@ include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
 include::./runconfig.asciidoc[]
+
+include::../../../../libbeat/docs/processors-config.asciidoc[]
+
 

@@ -401,7 +401,7 @@ class TestCase(unittest.TestCase):
                     dictfields.extend(subdictfields)
                 else:
                     fields.append(newName)
-                    if field.get("type") == "dict":
+                    if field.get("type") in ["dict", "geo_point"]:
                         dictfields.append(newName)
             return fields, dictfields
 
@@ -462,3 +462,13 @@ class TestCase(unittest.TestCase):
                 return pred(len([1 for line in f]))
         except IOError:
             return False
+
+    def get_elasticsearch_url(self):
+        """
+        Returns an elasticsearch.Elasticsearch instance built from the
+        env variables like the integration tests.
+        """
+        return "http://{host}:{port}".format(
+            host=os.getenv("ES_HOST", "localhost"),
+            port=os.getenv("ES_PORT", "9200"),
+        )

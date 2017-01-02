@@ -1,0 +1,17 @@
+module_version: 1.0
+
+vars:
+  paths:
+    default:
+      - /var/log/nginx/access.log*
+    os.darwin:
+      - /usr/local/var/log/nginx/access.log*
+    os.windows:
+      - c:/programfiles/nginx/logs/access.log*
+  pipeline:
+    # options: with_plugins, no_plugins, json_with_plugins, json_no_plugins
+    default: with_plugins
+
+ingest_pipeline: ingest/{{pipeline}}.json
+prospectors:
+  - config/nginx-access.yml
