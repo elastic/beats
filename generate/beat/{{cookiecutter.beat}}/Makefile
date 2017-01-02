@@ -18,7 +18,7 @@ setup: copy-vendor
 .PHONY: copy-vendor
 copy-vendor:
 	mkdir -p vendor/github.com/elastic/
-	cp -R ${GOPATH}/src/github.com/elastic/beats vendor/github.com/elastic/
+	cp -R $(firstword $(subst :, ,${GOPATH}))/src/github.com/elastic/beats vendor/github.com/elastic/
 	rm -rf vendor/github.com/elastic/beats/.git
 
 .PHONY: git-init
