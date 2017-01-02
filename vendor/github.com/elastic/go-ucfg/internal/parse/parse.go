@@ -12,7 +12,15 @@ type flagParser struct {
 	input string
 }
 
-// ParseValue parses command line arguments, supporting
+// stopSet definitions for handling unquoted strings
+const (
+	toplevelStopSet  = ","
+	arrayElemStopSet = ",]"
+	objKeyStopSet    = ":"
+	objValueStopSet  = ",}"
+)
+
+// Value parses command line arguments, supporting
 // boolean, numbers, strings, arrays, objects.
 //
 // The parser implements a superset of JSON, but only a subset of YAML by
@@ -26,7 +34,7 @@ type flagParser struct {
 //
 // In addition, top-level values can be separated by ',' to build arrays
 // without having to use [].
-func ParseValue(content string) (interface{}, error) {
+func Value(content string) (interface{}, error) {
 	p := &flagParser{strings.TrimSpace(content)}
 	v, err := p.parse()
 	if err != nil {
@@ -39,7 +47,7 @@ func (p *flagParser) parse() (interface{}, error) {
 	var values []interface{}
 
 	for {
-		v, err := p.parseValue(true)
+		v, err := p.parseValue(toplevelStopSet)
 		if err != nil {
 			return nil, err
 		}
@@ -64,7 +72,7 @@ func (p *flagParser) parse() (interface{}, error) {
 	return values, nil
 }
 
-func (p *flagParser) parseValue(toplevel bool) (interface{}, error) {
+func (p *flagParser) parseValue(stopSet string) (interface{}, error) {
 	p.ignoreWhitespace()
 	in := p.input
 
@@ -82,7 +90,7 @@ func (p *flagParser) parseValue(toplevel bool) (interface{}, error) {
 	case '\'':
 		return p.parseStringSQuote()
 	default:
-		return p.parsePrimitive(toplevel)
+		return p.parsePrimitive(stopSet)
 	}
 }
 
@@ -102,7 +110,7 @@ loop:
 			break
 		}
 
-		v, err := p.parseValue(false)
+		v, err := p.parseValue(arrayElemStopSet)
 		if err != nil {
 			return nil, err
 		}
@@ -157,7 +165,7 @@ loop:
 			return nil, err
 		}
 
-		v, err := p.parseValue(false)
+		v, err := p.parseValue(objValueStopSet)
 		if err != nil {
 			return nil, err
 		}
@@ -200,7 +208,7 @@ func (p *flagParser) parseKey() (string, error) {
 	case '\'':
 		return p.parseStringSQuote()
 	default:
-		return p.parseNonQuotedString(false)
+		return p.parseNonQuotedString(objKeyStopSet)
 	}
 }
 
@@ -236,14 +244,9 @@ func (p *flagParser) parseStringSQuote() (string, error) {
 	return in[1 : 1+i], nil
 }
 
-func (p *flagParser) parseNonQuotedString(toplevel bool) (string, error) {
+func (p *flagParser) parseNonQuotedString(stopSet string) (string, error) {
 	in := p.input
-	stopChars := ",:[]{}"
-	if toplevel {
-		stopChars = ","
-	}
-	idx := strings.IndexAny(in, stopChars)
-
+	idx := strings.IndexAny(in, stopSet)
 	if idx == 0 {
 		return "", fmt.Errorf("unexpected '%v'", string(in[idx]))
 	}
@@ -257,8 +260,8 @@ func (p *flagParser) parseNonQuotedString(toplevel bool) (string, error) {
 	return strings.TrimSpace(content), nil
 }
 
-func (p *flagParser) parsePrimitive(toplevel bool) (interface{}, error) {
-	content, err := p.parseNonQuotedString(toplevel)
+func (p *flagParser) parsePrimitive(stopSet string) (interface{}, error) {
+	content, err := p.parseNonQuotedString(stopSet)
 	if err != nil {
 		return nil, err
 	}
