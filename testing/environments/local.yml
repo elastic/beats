@@ -4,6 +4,12 @@
 # This is not used for CI as otherwise ports conflicts could happen.
 version: '2'
 services:
+  kibana:
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200/
+
   elasticsearch:
     ports:
       - "9200:9200"
@@ -13,12 +19,10 @@ services:
       - "5044:5044"
       - "5055:5055"
 
-  kibana:
-    ports:
-      - "5601:5601"
-
-  # The link is available here in order to avoid fetching and building it for each CI build on travis and jenkins which
-  # makes the builds a lot slower.
+  # Makes sure containers keep running for manual testing
   beat:
-    links:
+    build: .
+    depends_on:
+      - elasticsearch
       - kibana
+      - logstash

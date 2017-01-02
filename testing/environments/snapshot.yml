@@ -23,7 +23,8 @@ services:
       args:
         LS_VERSION: 6.0.0-alpha1-SNAPSHOT
         LS_DOWNLOAD_URL: https://snapshots.elastic.co/downloads/logstash
-
+    environment:
+      - ES_HOST=elasticsearch
 
   kibana:
     build:

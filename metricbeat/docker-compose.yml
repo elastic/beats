@@ -2,7 +2,7 @@ version: '2'
 services:
   beat:
     build: ${PWD}/.
-    links:
+    depends_on:
       - apache
       - couchbase
       - mongodb
