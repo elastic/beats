@@ -1,6 +1,6 @@
 - module: redis
   metricsets: ["info"]
-  enabled: true
+  enabled: false
   period: 10s
 
   # Redis hosts

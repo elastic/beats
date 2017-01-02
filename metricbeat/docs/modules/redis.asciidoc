@@ -41,7 +41,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: redis
   metricsets: ["info"]
-  enabled: true
+  enabled: false
   period: 10s
 
   # Redis hosts
