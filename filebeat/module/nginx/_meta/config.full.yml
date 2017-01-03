@@ -1,0 +1,33 @@
+- module: nginx
+  # Access logs
+  filesets.access:
+    enabled: true
+
+    # Format. Options are with_plugins and no_plugins
+    #var.pipeline: with_plugins
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat choose the path depending on your OS.
+    #var.paths:
+
+    # Use a custom Ingest Node pipeline file (advanced).
+    #ingest_pipeline:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+  # Error logs
+  filesets.error:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat choose the path depending on your OS.
+    #var.paths:
+
+    # Use a custom Ingest Node pipeline file (advanced).
+    #ingest_pipeline:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
