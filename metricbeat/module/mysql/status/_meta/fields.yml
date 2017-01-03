@@ -135,3 +135,23 @@
     - name: opened_tables
       type: long
       description: >
+
+    - name: command
+      type: group
+      description: >
+      fields:
+        - name: delete
+          type: long
+          description: >
+
+        - name: insert
+          type: long
+          description: >
+
+        - name: select
+          type: long
+          description: >
+
+        - name: update
+          type: long
+          description: >
