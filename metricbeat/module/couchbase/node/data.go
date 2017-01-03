@@ -10,7 +10,7 @@ import (
 )
 
 type NodeSystemStats struct {
-	CPUUtilizationRate float32 `json:"cpu_utilization_rate"`
+	CPUUtilizationRate float64 `json:"cpu_utilization_rate"`
 	SwapTotal          int64   `json:"swap_total"`
 	SwapUsed           int64   `json:"swap_used"`
 	MemTotal           int64   `json:"mem_total"`

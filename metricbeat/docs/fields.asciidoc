@@ -2402,6 +2402,107 @@ experimental[]
 
 
 [float]
+== consumergroup Fields
+
+consumergroup
+
+
+
+[float]
+== broker Fields
+
+Broker Consumer Group Information have been read from (Broker handling the consumer group).
+
+
+
+[float]
+=== kafka.consumergroup.broker.id
+
+type: long
+
+Broker id
+
+
+[float]
+=== kafka.consumergroup.broker.address
+
+type: keyword
+
+Broker address
+
+
+[float]
+=== kafka.consumergroup.id
+
+type: keyword
+
+Consumer Group ID
+
+[float]
+=== kafka.consumergroup.topic
+
+type: keyword
+
+Topic name
+
+[float]
+=== kafka.consumergroup.partition
+
+type: long
+
+Partition ID
+
+[float]
+=== kafka.consumergroup.offset
+
+type: long
+
+consumer offset into partition being read
+
+[float]
+=== kafka.consumergroup.meta
+
+type: text
+
+custom consumer meta data string
+
+[float]
+=== kafka.consumergroup.error.code
+
+type: long
+
+kafka consumer/partition error code.
+
+
+[float]
+== client Fields
+
+Assigned client reading events from partition
+
+
+
+[float]
+=== kafka.consumergroup.client.id
+
+type: keyword
+
+Client ID (kafka setting client.id)
+
+[float]
+=== kafka.consumergroup.client.host
+
+type: keyword
+
+Client host
+
+[float]
+=== kafka.consumergroup.client.member_id
+
+type: keyword
+
+internal consumer group member ID
+
+[float]
 == partition Fields
 
 partition
@@ -3458,6 +3559,40 @@ type: long
 
 [float]
 === mysql.status.opened_tables
+
+type: long
+
+
+
+[float]
+== command Fields
+
+
+
+
+[float]
+=== mysql.status.command.delete
+
+type: long
+
+
+
+[float]
+=== mysql.status.command.insert
+
+type: long
+
+
+
+[float]
+=== mysql.status.command.select
+
+type: long
+
+
+
+[float]
+=== mysql.status.command.update
 
 type: long
 
@@ -6204,6 +6339,148 @@ Total number of bytes transferred to and from all block devices by processes in 
 type: long
 
 Total number of I/O operations performed on all devices by processes in the cgroup as seen by the throttling policy.
+
+
+[float]
+== socket Fields
+
+TCP sockets that are active.
+
+
+
+[float]
+=== system.socket.direction
+
+type: keyword
+
+example: incoming
+
+How the socket was initiated. Possible values are incoming, outgoing, or listening.
+
+
+[float]
+=== system.socket.family
+
+type: keyword
+
+example: ipv4
+
+Address family.
+
+
+[float]
+=== system.socket.local.ip
+
+type: ip
+
+example: 192.0.2.1 or 2001:0DB8:ABED:8536::1
+
+Local IP address. This can be an IPv4 or IPv6 address.
+
+
+[float]
+=== system.socket.local.port
+
+type: long
+
+example: 22
+
+Local port.
+
+
+[float]
+=== system.socket.remote.ip
+
+type: ip
+
+example: 192.0.2.1 or 2001:0DB8:ABED:8536::1
+
+Remote IP address. This can be an IPv4 or IPv6 address
+
+
+[float]
+=== system.socket.remote.port
+
+type: long
+
+example: 22
+
+Remote port.
+
+
+[float]
+=== system.socket.remote.host
+
+type: keyword
+
+example: 76-211-117-36.nw.example.com.
+
+PTR record associated with the remote IP. It is obtained via reverse IP lookup.
+
+
+[float]
+=== system.socket.remote.etld_plus_one
+
+type: keyword
+
+example: example.com.
+
+The effective top-level domain (eTLD) of the remote host plus one more label. For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.". The data for determining the eTLD comes from an embedded copy of the data from http://publicsuffix.org.
+
+
+[float]
+=== system.socket.remote.host_error
+
+type: keyword
+
+Error describing the cause of the reverse lookup failure.
+
+
+[float]
+=== system.socket.process.pid
+
+type: long
+
+ID of the process that opened the socket.
+
+
+[float]
+=== system.socket.process.command
+
+type: keyword
+
+Name of the command (limited to 20 chars by the OS).
+
+
+[float]
+=== system.socket.process.cmdline
+
+type: keyword
+
+
+
+[float]
+=== system.socket.process.exe
+
+type: keyword
+
+Absolute path to the executable.
+
+
+[float]
+=== system.socket.user.id
+
+type: long
+
+UID of the user running the process.
+
+
+[float]
+=== system.socket.user.name
+
+type: keyword
+
+Name of the user running the process.
 
 
 [[exported-fields-zookeeper]]
