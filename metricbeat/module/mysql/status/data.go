@@ -49,6 +49,12 @@ var (
 			"tables":  c.Int("Open_tables"),
 		},
 		"opened_tables": c.Int("Opened_tables"),
+		"command": s.Object{
+			"delete": c.Int("Com_delete"),
+			"insert": c.Int("Com_insert"),
+			"select": c.Int("Com_select"),
+			"update": c.Int("Com_update"),
+		},
 	}
 )
 

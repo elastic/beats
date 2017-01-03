@@ -1878,6 +1878,22 @@
                     }
                   }
                 },
+                "command": {
+                  "properties": {
+                    "delete": {
+                      "type": "long"
+                    },
+                    "insert": {
+                      "type": "long"
+                    },
+                    "select": {
+                      "type": "long"
+                    },
+                    "update": {
+                      "type": "long"
+                    }
+                  }
+                },
                 "connections": {
                   "type": "long"
                 },
