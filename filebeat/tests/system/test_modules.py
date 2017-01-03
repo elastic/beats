@@ -23,7 +23,8 @@ class Test(BaseTest):
         self.filebeat = os.path.abspath(self.working_dir +
                                         "/../../../../filebeat.py")
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    # @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @unittest.skip("modules disabled in 5.2")
     def test_modules(self):
         self.init()
         modules = os.getenv("TESTING_FILEBEAT_MODULES")
