@@ -6,6 +6,7 @@ BEAT_VENDOR?=Elastic
 BEAT_LICENSE?=ASL 2.0
 BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEATNAME}/current/index.html
 BEAT_DIR?=github.com/elastic/beats/${BEATNAME}
+BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 ES_BEATS?=..
 GOPACKAGES?=${BEAT_DIR}/...
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer
@@ -38,7 +39,7 @@ ES_HOST?="elasticsearch"
 PWD=$(shell pwd)
 BUILD_DIR?=$(shell pwd)/build
 COVERAGE_DIR=${BUILD_DIR}/coverage
-COVERAGE_TOOL=$(firstword $(subst :, , ${GOPATH}))/bin/gotestcover
+COVERAGE_TOOL=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 PROCESSES?= 4
 TIMEOUT?= 90
@@ -280,7 +281,7 @@ docs:
 .PHONY: docs-preview
 docs-preview:
 	if [ ! -d "build/docs" ]; then $(MAKE) docs; fi;
-	${BUILD_DIR}/docs/build_docs.pl --chunk=1 -open chunk=1 -open --doc $(firstword $(subst :, , ${GOPATH}))/src/github.com/elastic/beats/${BEATNAME}/docs/index.asciidoc -out ${BUILD_DIR}/html_docs
+	${BUILD_DIR}/docs/build_docs.pl --chunk=1 -open chunk=1 -open --doc ${BEAT_GOPATH}/src/github.com/elastic/beats/${BEATNAME}/docs/index.asciidoc -out ${BUILD_DIR}/html_docs
 
 
 ### KIBANA FILES HANDLING ###
