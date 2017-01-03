@@ -12,13 +12,13 @@ def generate_metricset(base_path, metricbeat_path, module, metricset):
     meta_path = metricset_path + "/_meta"
 
     if os.path.isdir(metricset_path):
-        print "MericSet already exists. Skipping creating metricset " + metricset + ".\n"
+        print("Metricset already exists. Skipping creating metricset {}"
+              .format(metricset))
         return
 
     os.makedirs(meta_path)
 
     templates = metricbeat_path + "/scripts/module/metricset/"
-
 
     content = load_file(templates + "metricset.go.tmpl", module, metricset)
     with open(metricset_path + "/" + metricset + ".go", "w") as f:
@@ -36,7 +36,7 @@ def generate_metricset(base_path, metricbeat_path, module, metricset):
     with open(meta_path + "/data.json", "w") as f:
         f.write(content)
 
-    print "Metricset " + metricset + " created."
+    print("Metricset {} created.".format(metricset))
 
 
 def generate_module(base_path, metricbeat_path, module, metricset):
@@ -45,7 +45,8 @@ def generate_module(base_path, metricbeat_path, module, metricset):
     meta_path = module_path + "/_meta"
 
     if os.path.isdir(module_path):
-        print "Module already exists. Skipping creating module " + module + ".\n"
+        print("Module already exists. Skipping creating module {}"
+              .format(module))
         return
 
     os.makedirs(meta_path)
@@ -68,7 +69,7 @@ def generate_module(base_path, metricbeat_path, module, metricset):
     with open(module_path + "/doc.go", "w") as f:
         f.write(content)
 
-    print "Module " + module + " created."
+    print("Module {} created.".format(module))
 
 
 def load_file(file, module, metricset):
@@ -76,7 +77,8 @@ def load_file(file, module, metricset):
     with open(file) as f:
         content = f.read()
 
-    return content.replace("{module}", module).replace("{metricset}", metricset)
+    return content.replace("{module}", module).replace("{metricset}",
+                                                       metricset)
 
 if __name__ == "__main__":
 
@@ -85,7 +87,8 @@ if __name__ == "__main__":
     parser.add_argument("--metricset", help="Metricset name")
 
     parser.add_argument("--path", help="Beat path")
-    parser.add_argument("--es_beats", help="The path to the general beats folder")
+    parser.add_argument("--es_beats",
+                        help="The path to the general beats folder")
 
     args = parser.parse_args()
 
@@ -106,4 +109,5 @@ if __name__ == "__main__":
     path = os.path.abspath(args.path)
     metricbeat_path = os.path.abspath(args.es_beats + "/metricbeat")
 
-    generate_metricset(path, metricbeat_path, args.module.lower(), args.metricset.lower())
+    generate_metricset(path, metricbeat_path, args.module.lower(),
+                       args.metricset.lower())
