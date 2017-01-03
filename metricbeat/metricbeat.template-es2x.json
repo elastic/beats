@@ -1311,6 +1311,71 @@
         },
         "kafka": {
           "properties": {
+            "consumergroup": {
+              "properties": {
+                "broker": {
+                  "properties": {
+                    "address": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "client": {
+                  "properties": {
+                    "host": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "id": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "member_id": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "error": {
+                  "properties": {
+                    "code": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "id": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "meta": {
+                  "index": "analyzed",
+                  "norms": {
+                    "enabled": false
+                  },
+                  "type": "string"
+                },
+                "offset": {
+                  "type": "long"
+                },
+                "partition": {
+                  "type": "long"
+                },
+                "topic": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            },
             "partition": {
               "properties": {
                 "broker": {

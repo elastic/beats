@@ -1,0 +1,36 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "type":"metricsets",
+    "beat":{
+        "hostname":"localhost",
+        "name":"localhost",
+        "version": "6.0.0-alpha1"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"kafka",
+        "name":"consumergroup",
+        "rtt":269
+    },
+    "kafka":{
+        "consumergroup":{
+            "id": "group",
+            "topic": "test",
+            "partition": 0,
+            "client": {
+              "host": "127.0.0.1",
+              "id": "client0",
+              "member_id": "client0-d20b677a-5740-433e-a7f8-fbdab1f0f150"
+            },
+            "broker": {
+                "address": "kafka0:9092",
+                "id": 0
+            },
+            "error": {
+              "code": 0
+            },
+            "meta": "",
+            "offset": 0
+        }
+    }
+}
