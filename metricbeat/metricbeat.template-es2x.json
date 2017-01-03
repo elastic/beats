@@ -1311,6 +1311,71 @@
         },
         "kafka": {
           "properties": {
+            "consumergroup": {
+              "properties": {
+                "broker": {
+                  "properties": {
+                    "address": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "client": {
+                  "properties": {
+                    "host": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "id": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "member_id": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "error": {
+                  "properties": {
+                    "code": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "id": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "meta": {
+                  "index": "analyzed",
+                  "norms": {
+                    "enabled": false
+                  },
+                  "type": "string"
+                },
+                "offset": {
+                  "type": "long"
+                },
+                "partition": {
+                  "type": "long"
+                },
+                "topic": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            },
             "partition": {
               "properties": {
                 "broker": {
@@ -1881,6 +1946,22 @@
                       "type": "long"
                     },
                     "sent": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "command": {
+                  "properties": {
+                    "delete": {
+                      "type": "long"
+                    },
+                    "insert": {
+                      "type": "long"
+                    },
+                    "select": {
+                      "type": "long"
+                    },
+                    "update": {
                       "type": "long"
                     }
                   }
@@ -3530,6 +3611,93 @@
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
+                }
+              }
+            },
+            "socket": {
+              "properties": {
+                "direction": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "family": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "local": {
+                  "properties": {
+                    "ip": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "port": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "process": {
+                  "properties": {
+                    "cmdline": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "command": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "exe": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "pid": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "remote": {
+                  "properties": {
+                    "etld_plus_one": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "host": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "host_error": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "ip": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "port": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "user": {
+                  "properties": {
+                    "id": {
+                      "type": "long"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }

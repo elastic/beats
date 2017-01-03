@@ -1,3 +1,3 @@
 :stack-version: 5.1.0
 :doc-branch: 5.x
-:go-version: 1.7.1
+:go-version: 1.7.4
