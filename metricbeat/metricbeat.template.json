@@ -1878,7 +1878,7 @@
                     }
                   }
                 },
-                "com": {
+                "command": {
                   "properties": {
                     "delete": {
                       "type": "long"

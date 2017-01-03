@@ -136,7 +136,7 @@
       type: long
       description: >
 
-    - name: com
+    - name: command
       type: group
       description: >
       fields:

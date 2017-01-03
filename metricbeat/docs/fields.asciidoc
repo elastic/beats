@@ -3464,34 +3464,34 @@ type: long
 
 
 [float]
-== com Fields
+== command Fields
 
 
 
 
 [float]
-=== mysql.status.com.delete
+=== mysql.status.command.delete
 
 type: long
 
 
 
 [float]
-=== mysql.status.com.insert
+=== mysql.status.command.insert
 
 type: long
 
 
 
 [float]
-=== mysql.status.com.select
+=== mysql.status.command.select
 
 type: long
 
 
 
 [float]
-=== mysql.status.com.update
+=== mysql.status.command.update
 
 type: long
 

@@ -49,7 +49,7 @@ var (
 			"tables":  c.Int("Open_tables"),
 		},
 		"opened_tables": c.Int("Opened_tables"),
-		"com": s.Object{
+		"command": s.Object{
 			"delete": c.Int("Com_delete"),
 			"insert": c.Int("Com_insert"),
 			"select": c.Int("Com_select"),
