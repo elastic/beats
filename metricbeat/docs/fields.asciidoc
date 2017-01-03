@@ -2402,6 +2402,107 @@ experimental[]
 
 
 [float]
+== consumergroup Fields
+
+consumergroup
+
+
+
+[float]
+== broker Fields
+
+Broker Consumer Group Information have been read from (Broker handling the consumer group).
+
+
+
+[float]
+=== kafka.consumergroup.broker.id
+
+type: long
+
+Broker id
+
+
+[float]
+=== kafka.consumergroup.broker.address
+
+type: keyword
+
+Broker address
+
+
+[float]
+=== kafka.consumergroup.id
+
+type: keyword
+
+Consumer Group ID
+
+[float]
+=== kafka.consumergroup.topic
+
+type: keyword
+
+Topic name
+
+[float]
+=== kafka.consumergroup.partition
+
+type: long
+
+Partition ID
+
+[float]
+=== kafka.consumergroup.offset
+
+type: long
+
+consumer offset into partition being read
+
+[float]
+=== kafka.consumergroup.meta
+
+type: text
+
+custom consumer meta data string
+
+[float]
+=== kafka.consumergroup.error.code
+
+type: long
+
+kafka consumer/partition error code.
+
+
+[float]
+== client Fields
+
+Assigned client reading events from partition
+
+
+
+[float]
+=== kafka.consumergroup.client.id
+
+type: keyword
+
+Client ID (kafka setting client.id)
+
+[float]
+=== kafka.consumergroup.client.host
+
+type: keyword
+
+Client host
+
+[float]
+=== kafka.consumergroup.client.member_id
+
+type: keyword
+
+internal consumer group member ID
+
+[float]
 == partition Fields
 
 partition

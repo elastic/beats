@@ -25,6 +25,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/haproxy/info"
 	_ "github.com/elastic/beats/metricbeat/module/haproxy/stat"
 	_ "github.com/elastic/beats/metricbeat/module/kafka"
+	_ "github.com/elastic/beats/metricbeat/module/kafka/consumergroup"
 	_ "github.com/elastic/beats/metricbeat/module/kafka/partition"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb/status"
