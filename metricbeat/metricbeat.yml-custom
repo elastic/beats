@@ -1,0 +1,76 @@
+metricbeat.modules:
+
+<<<<<<< HEAD
+- module: ceph
+  metricsets: ["perf"]
+=======
+#------------------------------- System Module -------------------------------
+- module: system
+  metricsets:
+    # CPU stats
+    - cpu
+
+    # System Load stats
+    - load
+
+    # Per CPU core stats
+    #- core
+
+    # IO stats
+    #- diskio
+
+    # Per filesystem stats
+    - filesystem
+
+    # File system summary stats
+    - fsstat
+
+    # Memory stats
+    - memory
+
+    # Network stats
+    - network
+
+    # Per process stats
+    - process
+
+    # Sockets (linux only)
+    #- socket
+>>>>>>> upstream/master
+  enabled: true
+  period: 5s
+  
+  ceph:
+          binary_path: "/usr/bin/ceph"
+          socket_dir: "/var/run/ceph"
+          mon_prefix: "ceph-mon"
+          osd_prefix: "ceph-osd"
+          socket_suffix: "asok"
+          user: "client.admin"
+          config_path: "/etc/ceph/ceph.conf"
+
+name: ${HOSTNAME:metricbeat}
+
+#tags: ["service-X", "web-tier"]
+
+fields:
+  env: kubernetesmaster
+
+output.elasticsearch:
+  enabled: true
+  hosts: ["10.200.83.10:19200"]
+  index: "amandametricbeat-%{+yyyy.MM.dd}"
+  #compression_level: 0
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
+  #worker: 1
+  #max_retries: 3
+  #bulk_max_size: 50
+  #timeout: 90
+  #flush_interval: 1s
+  template.enabled: true
+  template.versions.2x.enabled: false 
+
+logging.level: warning 
+logging.to_files: false 

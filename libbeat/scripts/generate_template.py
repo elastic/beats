@@ -46,7 +46,7 @@ def fields_to_es_template(args, input, output, index, version):
         "template": index,
         "order": 0,
         "settings": {
-            "index.refresh_interval": "5s"
+            "index.refresh_interval": "5s",
         },
         "mappings": {
             "_default_": {
@@ -66,6 +66,11 @@ def fields_to_es_template(args, input, output, index, version):
         template["mappings"]["_default_"]["_all"]["norms"] = {
             "enabled": False
         }
+    else:
+        # For ES 5.x, increase the limit on the max number of fields.
+        # In a typical scenario, most fields are not used, so increasing the
+        # limit shouldn't be that bad.
+        template["settings"]["index.mapping.total_fields.limit"] = 10000
 
     properties = {}
     dynamic_templates = []
@@ -203,6 +208,18 @@ def fill_field_properties(args, field, defaults, path):
             properties[field["name"]] = {
                 "type": "keyword",
                 "ignore_above": 1024
+            }
+
+    elif field["type"] == "ip":
+        if args.es2x:
+            properties[field["name"]] = {
+                "type": "string",
+                "index": "not_analyzed",
+                "ignore_above": 1024
+            }
+        else:
+            properties[field["name"]] = {
+                "type": "ip"
             }
 
     elif field["type"] in ["geo_point", "date", "long", "integer",
