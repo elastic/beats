@@ -46,7 +46,7 @@ def fields_to_es_template(args, input, output, index, version):
         "template": index,
         "order": 0,
         "settings": {
-            "index.refresh_interval": "5s"
+            "index.refresh_interval": "5s",
         },
         "mappings": {
             "_default_": {
@@ -66,6 +66,11 @@ def fields_to_es_template(args, input, output, index, version):
         template["mappings"]["_default_"]["_all"]["norms"] = {
             "enabled": False
         }
+    else:
+        # For ES 5.x, increase the limit on the max number of fields.
+        # In a typical scenario, most fields are not used, so increasing the
+        # limit shouldn't be that bad.
+        template["settings"]["index.mapping.total_fields.limit"] = 10000
 
     properties = {}
     dynamic_templates = []
