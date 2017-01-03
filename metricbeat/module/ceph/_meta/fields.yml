@@ -1,0 +1,9 @@
+- key: ceph
+  title: "ceph"
+  description: >
+    ceph Module
+  fields:
+    - name: ceph
+      type: group
+      description: >
+      fields:
