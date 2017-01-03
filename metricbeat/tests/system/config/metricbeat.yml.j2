@@ -80,6 +80,13 @@ metricbeat.modules:
   {% endif -%}
 {%- endfor %}
 
+{% if reload -%}
+metricbeat.reload.modules:
+  path: {{ reload_path }}
+  period: 1s
+  enabled: true
+{% endif -%}
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group

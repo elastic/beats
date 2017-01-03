@@ -17,6 +17,7 @@ type Metricbeat struct {
 	done    chan struct{}    // Channel used to initiate shutdown.
 	modules []*ModuleWrapper // Active list of modules.
 	client  publisher.Client // Publisher client.
+	config  Config
 }
 
 // New creates and returns a new Metricbeat instance.
@@ -24,7 +25,8 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	// List all registered modules and metricsets.
 	logp.Info("%s", mb.Registry.String())
 
-	config := Config{}
+	config := DefaultConfig
+
 	err := rawConfig.Unpack(&config)
 	if err != nil {
 		return nil, errors.Wrap(err, "error reading configuration file")
@@ -32,12 +34,18 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 
 	modules, err := NewModuleWrappers(config.Modules, mb.Registry)
 	if err != nil {
-		return nil, err
+		// Empty config is fine if dynamic config is enabled
+		if !config.ReloadModules.IsEnabled() {
+			return nil, err
+		} else if err != mb.ErrEmptyConfig && err != mb.ErrAllModulesDisabled {
+			return nil, err
+		}
 	}
 
 	mb := &Metricbeat{
 		done:    make(chan struct{}),
 		modules: modules,
+		config:  config,
 	}
 	return mb, nil
 }
@@ -53,6 +61,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	// Start each module.
 	var cs []<-chan common.MapStr
+
 	for _, mw := range bt.modules {
 		c := mw.Start(bt.done)
 		cs = append(cs, c)
@@ -67,6 +76,24 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		defer wg.Done()
 		PublishChannels(bt.client, cs...)
 	}()
+
+	if bt.config.ReloadModules.IsEnabled() {
+		logp.Warn("EXPERIMENTAL feature dynamic configuration reloading is enabled.")
+		configReloader := NewConfigReloader(bt.config.ReloadModules, b.Publisher)
+
+		// Start
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			configReloader.Run()
+		}()
+
+		// Stop
+		go func() {
+			<-bt.done
+			configReloader.Stop()
+		}()
+	}
 
 	// Wait for PublishChannels to stop publishing.
 	wg.Wait()
