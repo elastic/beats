@@ -14,6 +14,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.4.4]
+
+### Added
+- Add support for pure array config files #82 
+
+### Changed
+- Invalid top-level types return non-critical error (no stack-trace) on merge #82
+
+### Fixed
+- Fix panic when merging or creating a config from nil interface value #82
+
 ## [0.4.3]
 
 ### Changed
@@ -149,7 +160,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.4.3...HEAD
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.4.4...HEAD
+[0.4.4]: https://github.com/elastic/go-ucfg/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/elastic/go-ucfg/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/elastic/go-ucfg/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/elastic/go-ucfg/compare/v0.4.0...v0.4.1

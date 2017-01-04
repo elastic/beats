@@ -48,6 +48,11 @@ import (
 // well. Passing cyclic structures to Merge will result in an infinite recursive
 // loop.
 func (c *Config) Merge(from interface{}, options ...Option) error {
+	// from is empty in case of empty config file
+	if from == nil {
+		return nil
+	}
+
 	opts := makeOptions(options)
 	other, err := normalize(opts, from)
 
@@ -179,7 +184,7 @@ func normalize(opts *options, from interface{}) (*Config, Error) {
 
 	}
 
-	return nil, raiseInvalidTopLevelType(from)
+	return nil, raiseInvalidTopLevelType(from, opts.meta)
 }
 
 func normalizeMap(opts *options, from reflect.Value) (*Config, Error) {
