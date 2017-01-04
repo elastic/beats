@@ -126,9 +126,12 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 			return nil, err
 		}
 
-		writer := outputs.CreateWriter(config.WriterConfig)
+		codec, err := outputs.CreateEncoder(config.Codec)
+		if err != nil {
+			return nil, err
+		}
 
-		return newClient(t, config.Password, config.Db, key, dataType, writer), nil
+		return newClient(t, config.Password, config.Db, key, dataType, codec), nil
 	})
 	if err != nil {
 		return err

@@ -2,6 +2,7 @@ package common
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"strings"
@@ -13,7 +14,26 @@ import (
 	"github.com/elastic/go-ucfg/yaml"
 )
 
+// Config object to store hierarchical configurations into.
+// See https://godoc.org/github.com/elastic/go-ucfg#Config
 type Config ucfg.Config
+
+// ConfigNamespace storing at most one configuration section by name and sub-section.
+type ConfigNamespace struct {
+	C map[string]*Config `config:",inline"`
+}
+
+type flagOverwrite struct {
+	config *ucfg.Config
+	path   string
+	value  string
+}
+
+var configOpts = []ucfg.Option{
+	ucfg.PathSep("."),
+	ucfg.ResolveEnv,
+	ucfg.VarExp,
+}
 
 const (
 	selectorConfig             = "config"
@@ -35,18 +55,6 @@ var debugBlacklist = MakeStringSet(
 // make hasSelector and configDebugf available for unit testing
 var hasSelector = logp.HasSelector
 var configDebugf = logp.Debug
-
-type flagOverwrite struct {
-	config *ucfg.Config
-	path   string
-	value  string
-}
-
-var configOpts = []ucfg.Option{
-	ucfg.PathSep("."),
-	ucfg.ResolveEnv,
-	ucfg.VarExp,
-}
 
 func NewConfig() *Config {
 	return fromConfig(ucfg.New())
@@ -296,6 +304,35 @@ func (f *flagOverwrite) Set(v string) error {
 
 func (f *flagOverwrite) Get() interface{} {
 	return f.value
+}
+
+// Validate checks at most one sub-namespace being set.
+func (ns *ConfigNamespace) Validate() error {
+	if len(ns.C) > 1 {
+		return errors.New("more then one namespace configured")
+	}
+	return nil
+}
+
+// Name returns the configuration sections it's name if a section has been set.
+func (ns *ConfigNamespace) Name() string {
+	for name := range ns.C {
+		return name
+	}
+	return ""
+}
+
+// Config return the sub-configuration section if a section has been set.
+func (ns *ConfigNamespace) Config() *Config {
+	for _, cfg := range ns.C {
+		return cfg
+	}
+	return nil
+}
+
+// IsSet returns true if a sub-configuration section has been set.
+func (ns *ConfigNamespace) IsSet() bool {
+	return len(ns.C) != 0
 }
 
 func configDebugString(c *Config, filterPrivate bool) string {

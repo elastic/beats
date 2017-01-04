@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/codecs/json"
 )
 
 func init() {
@@ -16,9 +17,8 @@ func init() {
 }
 
 type console struct {
-	config Config
-	out    *os.File
-	writer outputs.Writer
+	out   *os.File
+	codec outputs.Codec
 }
 
 func New(_ string, config *common.Config, _ int) (outputs.Outputer, error) {
@@ -27,10 +27,22 @@ func New(_ string, config *common.Config, _ int) (outputs.Outputer, error) {
 	if err != nil {
 		return nil, err
 	}
-	c, err := newConsole(unpackedConfig)
+
+	var codec outputs.Codec
+	if unpackedConfig.Codec.Namespace.IsSet() {
+		codec, err = outputs.CreateEncoder(unpackedConfig.Codec)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		codec = json.New(unpackedConfig.Pretty)
+	}
+
+	c, err := newConsole(codec)
 	if err != nil {
 		return nil, fmt.Errorf("console output initialization failed with: %v", err)
 	}
+
 	// check stdout actually being available
 	if runtime.GOOS != "windows" {
 		if _, err = c.out.Stat(); err != nil {
@@ -41,11 +53,8 @@ func New(_ string, config *common.Config, _ int) (outputs.Outputer, error) {
 	return c, nil
 }
 
-func newConsole(config Config) (*console, error) {
-
-	writer := outputs.CreateWriter(config.WriterConfig)
-
-	return &console{config: config, writer: writer, out: os.Stdout}, nil
+func newConsole(codec outputs.Codec) (*console, error) {
+	return &console{codec: codec, out: os.Stdout}, nil
 }
 
 // Implement Outputer
@@ -53,19 +62,18 @@ func (c *console) Close() error {
 	return nil
 }
 
+var nl = []byte{'\n'}
+
 func (c *console) PublishEvent(
 	s op.Signaler,
 	opts outputs.Options,
 	data outputs.Data,
 ) error {
-	defer op.SigCompleted(s)
-
-	serializedEvent, err := c.writer.Write(data.Event)
-
+	serializedEvent, err := c.codec.Encode(data.Event)
 	if err = c.writeBuffer(serializedEvent); err != nil {
 		goto fail
 	}
-	if err = c.writeBuffer([]byte{'\n'}); err != nil {
+	if err = c.writeBuffer(nl); err != nil {
 		goto fail
 	}
 
