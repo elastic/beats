@@ -29,6 +29,8 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Add `_id`, `_type`, `_index` and `_score` fields in the generated index pattern. {pull}3282}[3282]
+
 *Metricbeat*
 
 - Fix service times-out at startup. {pull}3056[3056]
