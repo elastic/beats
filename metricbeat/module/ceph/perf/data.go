@@ -7,6 +7,7 @@ import (
         "os/exec"
         "bytes"
 	"encoding/json"
+	"strings"
 )
 
 const (
@@ -36,15 +37,56 @@ func eventsMapping(socketsList []*socket,binaryPath string) []common.MapStr {
                 }
 
 		for tag, datapoints := range data {
+			
                         event := common.MapStr{
-                                tag: datapoints,
-                        } 
+                                formatTagName(tag): datapoints,
+                        }
+
                         myEvents = append(myEvents, event)
                 }
 	}
 
 	return myEvents
 }
+
+func formatTagName(oldtag string) (string){
+
+	// Replace '::' fields
+	r := strings.NewReplacer("::",".",":.",".",":",".")
+	logp.Warn("newtag: %s", r.Replace(oldtag))
+
+	return r.Replace(oldtag)
+
+}
+
+
+/*func formatDataPointName(oldDatapoint string) (string){
+
+        // Remove repeated fields
+        // Example:
+        // leveldb.leveldb_submit_latency.avgcount must be leveldb.submit_latency.avgcount
+
+        splitedDataPoint := strings.Split(oldDatapoint, ".")
+
+        newDatapoint := splitedDataPoint[0]
+        oldslice := ""
+
+        for i, slice := range splitedDataPoint {
+
+                if(strings.Contains(slice, oldslice)){
+                        r := strings.NewReplacer(oldslice + "_","")
+                        slice = r.Replace(slice)
+                }
+
+                oldslice = slice
+
+                if(i>0){ newDatapoint = newDatapoint + "." + slice }
+
+        }
+
+
+        return newDatapoint
+}*/
 
 func perfDump(binary string, socket *socket) (string, error) {
         cmdArgs := []string{"--admin-daemon", socket.socket}
