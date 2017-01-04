@@ -8,7 +8,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/jsontransform"
-	"github.com/elastic/beats/libbeat/helpers/jsonhelper"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/pkg/errors"
@@ -88,7 +87,7 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 					default:
 						errs = append(errs, errors.New("Error trying to add target to root.").Error())
 					case map[string]interface{}:
-						jsonhelper.WriteJSONKeys(event, t, f.overwriteKeys, "json_error")
+						jsontransform.WriteJSONKeys(event, t, f.overwriteKeys, "json_error")
 					}
 				}
 			} else {

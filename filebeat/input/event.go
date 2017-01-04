@@ -6,7 +6,7 @@ import (
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/helpers/jsonhelper"
+	"github.com/elastic/beats/libbeat/common/jsontransform"
 )
 
 // Event is sent to the output and must contain all relevant information
@@ -79,6 +79,6 @@ func mergeJSONFields(e *Event, event common.MapStr, jsonFields common.MapStr) {
 		// Delete existing json key
 		delete(event, "json")
 
-		jsonhelper.WriteJSONKeys(event, jsonFields, e.JSONConfig.OverwriteKeys, reader.JsonErrorKey)
+		jsontransform.WriteJSONKeys(event, jsonFields, e.JSONConfig.OverwriteKeys, reader.JsonErrorKey)
 	}
 }

@@ -1,4 +1,4 @@
-package jsonhelper
+package jsontransform
 
 import (
 	"fmt"
