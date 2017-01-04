@@ -1,7 +1,6 @@
 package console
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"runtime"
@@ -17,17 +16,21 @@ func init() {
 }
 
 type console struct {
-	config config
+	config Config
 	out    *os.File
+	writer outputs.Writer
 }
 
 func New(_ string, config *common.Config, _ int) (outputs.Outputer, error) {
-	c := &console{config: defaultConfig, out: os.Stdout}
-	err := config.Unpack(&c.config)
+	var unpackedConfig Config
+	err := config.Unpack(&unpackedConfig)
 	if err != nil {
 		return nil, err
 	}
-
+	c, err := newConsole(unpackedConfig)
+	if err != nil {
+		return nil, fmt.Errorf("console output initialization failed with: %v", err)
+	}
 	// check stdout actually being available
 	if runtime.GOOS != "windows" {
 		if _, err = c.out.Stat(); err != nil {
@@ -38,8 +41,11 @@ func New(_ string, config *common.Config, _ int) (outputs.Outputer, error) {
 	return c, nil
 }
 
-func newConsole(pretty bool) *console {
-	return &console{config: config{pretty}, out: os.Stdout}
+func newConsole(config Config) (*console, error) {
+
+	writer := outputs.CreateWriter(config.WriterConfig)
+
+	return &console{config: config, writer: writer, out: os.Stdout}, nil
 }
 
 // Implement Outputer
@@ -52,21 +58,11 @@ func (c *console) PublishEvent(
 	opts outputs.Options,
 	data outputs.Data,
 ) error {
-	var jsonEvent []byte
-	var err error
+	defer op.SigCompleted(s)
 
-	if c.config.Pretty {
-		jsonEvent, err = json.MarshalIndent(data.Event, "", "  ")
-	} else {
-		jsonEvent, err = json.Marshal(data.Event)
-	}
-	if err != nil {
-		logp.Err("Fail to convert the event to JSON (%v): %#v", err, data.Event)
-		op.SigCompleted(s)
-		return err
-	}
+	serializedEvent, err := c.writer.Write(data.Event)
 
-	if err = c.writeBuffer(jsonEvent); err != nil {
+	if err = c.writeBuffer(serializedEvent); err != nil {
 		goto fail
 	}
 	if err = c.writeBuffer([]byte{'\n'}); err != nil {
@@ -74,7 +70,6 @@ func (c *console) PublishEvent(
 	}
 
 	op.SigCompleted(s)
-	return nil
 fail:
 	if opts.Guaranteed {
 		logp.Critical("Unable to publish events to console: %v", err)
