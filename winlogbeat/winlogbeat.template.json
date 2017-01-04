@@ -4,9 +4,6 @@
       "_all": {
         "norms": false
       },
-      "_meta": {
-        "version": "6.0.0-alpha1"
-      },
       "dynamic_templates": [
         {
           "strings_as_keyword": {
@@ -174,5 +171,6 @@
     "index.mapping.total_fields.limit": 10000,
     "index.refresh_interval": "5s"
   },
-  "template": "winlogbeat-*"
+  "template": "winlogbeat-*",
+  "version": "6.0.0-alpha1"
 }
