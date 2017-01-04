@@ -30,7 +30,10 @@ fields:
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields kibana
+collect:
+	# dummy implementation to avoid adding the modules until released
+	mkdir -p _meta/
+	cat ${ES_BEATS}/filebeat/_meta/fields.common.yml > _meta/fields.generated.yml
 
 
 # Creates a new fileset. Requires the params MODULE and FILESET
