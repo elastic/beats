@@ -17,8 +17,17 @@ type options struct {
 
 	// temporary cache of parsed splice values for lifetime of call to
 	// Unpack/Pack/Get/...
-	parsed map[string]spliceValue
+	parsed valueCache
 }
+
+type valueCache map[string]spliceValue
+
+// id used to store intermediate parse results in current execution context.
+// As parsing results might differ between multiple calls due to:
+// splice being shared between multiple configurations, or environment
+// changing between calls + lazy nature of cfgSplice, parsing results cannot
+// be stored in cfgSplice itself.
+type cacheID string
 
 type spliceValue struct {
 	err   error
@@ -107,4 +116,20 @@ func makeOptions(opts []Option) *options {
 		opt(&o)
 	}
 	return &o
+}
+
+func (cache valueCache) cachedValue(
+	id cacheID,
+	f func() (value, error),
+) (value, error) {
+	if v, ok := cache[string(id)]; ok {
+		if v.err != nil {
+			return nil, v.err
+		}
+		return v.value, nil
+	}
+
+	v, err := f()
+	cache[string(id)] = spliceValue{err, v}
+	return v, err
 }

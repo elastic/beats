@@ -166,7 +166,11 @@ func raiseDuplicateKey(cfg *Config, name string) Error {
 
 func raiseMissing(c *Config, field string) Error {
 	// error reading field from config, as missing in c
-	return raisePathErr(ErrMissing, c.metadata, "", c.PathOf(field, "."))
+	return raiseMissingMsg(c, field, "")
+}
+
+func raiseMissingMsg(c *Config, field string, message string) Error {
+	return raisePathErr(ErrMissing, c.metadata, message, c.PathOf(field, "."))
 }
 
 func raiseMissingArr(ctx context, meta *Meta, idx int) Error {
@@ -182,11 +186,11 @@ func raiseIndexOutOfBounds(opts *options, value value, idx int) Error {
 	return raisePathErr(reason, value.meta(), message, ctx.path("."))
 }
 
-func raiseInvalidTopLevelType(v interface{}) Error {
-	// most likely developers fault
+func raiseInvalidTopLevelType(v interface{}, meta *Meta) Error {
+	// could be developers or user fault
 	t := chaseTypePointers(chaseValue(reflect.ValueOf(v)).Type())
-	message := fmt.Sprintf("can not use go type '%v' for merging/unpacking configurations", t)
-	return raiseCritical(ErrTypeMismatch, message)
+	message := fmt.Sprintf("type '%v' is not supported on top level of config, only dictionary or list", t)
+	return raiseErr(ErrTypeMismatch, messageMeta(message, meta))
 }
 
 func raiseKeyInvalidTypeUnpack(t reflect.Type, from *Config) Error {

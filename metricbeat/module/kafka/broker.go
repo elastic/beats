@@ -16,11 +16,12 @@ import (
 
 // Broker provides functionality for communicating with a single kafka broker
 type Broker struct {
-	b   *sarama.Broker
-	cfg *sarama.Config
+	broker *sarama.Broker
+	cfg    *sarama.Config
 
-	id      int32
-	matchID bool
+	advertisedAddr string
+	id             int32
+	matchID        bool
 }
 
 // BrokerSettings defines common configurations used when connecting to a broker
@@ -32,6 +33,18 @@ type BrokerSettings struct {
 	Backoff                  time.Duration
 	TLS                      *tls.Config
 	Username, Password       string
+	Version                  Version
+}
+
+type GroupDescription struct {
+	Members map[string]MemberDescription
+}
+
+type MemberDescription struct {
+	Err        error
+	ClientID   string
+	ClientHost string
+	Topics     map[string][]int32
 }
 
 const noID = -1
@@ -53,9 +66,10 @@ func NewBroker(host string, settings BrokerSettings) *Broker {
 		cfg.Net.SASL.User = user
 		cfg.Net.SASL.Password = settings.Password
 	}
+	cfg.Version = settings.Version.get()
 
 	return &Broker{
-		b:       sarama.NewBroker(host),
+		broker:  sarama.NewBroker(host),
 		cfg:     cfg,
 		id:      noID,
 		matchID: settings.MatchID,
@@ -64,13 +78,13 @@ func NewBroker(host string, settings BrokerSettings) *Broker {
 
 // Close the broker connection
 func (b *Broker) Close() error {
-	closeBroker(b.b)
+	closeBroker(b.broker)
 	return nil
 }
 
 // Connect connects the broker to the configured host
 func (b *Broker) Connect() error {
-	if err := b.b.Open(b.cfg); err != nil {
+	if err := b.broker.Open(b.cfg); err != nil {
 		return err
 	}
 
@@ -79,31 +93,38 @@ func (b *Broker) Connect() error {
 	}
 
 	// current broker is bootstrap only. Get metadata to find id:
-	meta, err := queryMetadataWithRetry(b.b, b.cfg, nil)
+	meta, err := queryMetadataWithRetry(b.broker, b.cfg, nil)
 	if err != nil {
-		closeBroker(b.b)
+		closeBroker(b.broker)
 		return err
 	}
 
-	other := findMatchingBroker(brokerAddress(b.b), meta.Brokers)
+	other := findMatchingBroker(brokerAddress(b.broker), meta.Brokers)
 	if other == nil { // no broker found
-		closeBroker(b.b)
+		closeBroker(b.broker)
 		return fmt.Errorf("No advertised broker with address %v found", b.Addr())
 	}
 
 	debugf("found matching broker %v with id %v", other.Addr(), other.ID())
 	b.id = other.ID()
+	b.advertisedAddr = other.Addr()
 	return nil
 }
 
 // Addr returns the configured broker endpoint.
 func (b *Broker) Addr() string {
-	return b.b.Addr()
+	return b.broker.Addr()
+}
+
+// AdvertisedAddr returns the advertised broker address in case of
+// matching broker has been found.
+func (b *Broker) AdvertisedAddr() string {
+	return b.advertisedAddr
 }
 
 // GetMetadata fetches most recent cluster metadata from the broker.
 func (b *Broker) GetMetadata(topics ...string) (*sarama.MetadataResponse, error) {
-	return queryMetadataWithRetry(b.b, b.cfg, topics)
+	return queryMetadataWithRetry(b.broker, b.cfg, topics)
 }
 
 // GetTopicsMetadata fetches most recent topics/partition metadata from the broker.
@@ -127,7 +148,7 @@ func (b *Broker) PartitionOffset(
 		req.SetReplicaID(replicaID)
 	}
 	req.AddBlock(topic, partition, time, 1)
-	resp, err := b.b.GetAvailableOffsets(req)
+	resp, err := b.broker.GetAvailableOffsets(req)
 	if err != nil {
 		return -1, err
 	}
@@ -140,10 +161,86 @@ func (b *Broker) PartitionOffset(
 	return block.Offsets[0], nil
 }
 
+// ListGroups lists all groups managed by the broker. Other consumer
+// groups might be managed by other brokers.
+func (b *Broker) ListGroups() ([]string, error) {
+	resp, err := b.broker.ListGroups(&sarama.ListGroupsRequest{})
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.Err != sarama.ErrNoError {
+		return nil, resp.Err
+	}
+
+	if len(resp.Groups) == 0 {
+		return nil, nil
+	}
+
+	groups := make([]string, 0, len(resp.Groups))
+	for name := range resp.Groups {
+		groups = append(groups, name)
+	}
+	return groups, nil
+}
+
+// DescribeGroups fetches group details from broker.
+func (b *Broker) DescribeGroups(
+	queryGroups []string,
+) (map[string]GroupDescription, error) {
+	requ := &sarama.DescribeGroupsRequest{Groups: queryGroups}
+	resp, err := b.broker.DescribeGroups(requ)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(resp.Groups) == 0 {
+		return nil, nil
+	}
+
+	groups := map[string]GroupDescription{}
+	for _, descr := range resp.Groups {
+		if len(descr.Members) == 0 {
+			groups[descr.GroupId] = GroupDescription{}
+			continue
+		}
+
+		members := map[string]MemberDescription{}
+		for memberID, memberDescr := range descr.Members {
+			assignment, err := memberDescr.GetMemberAssignment()
+			if err != nil {
+				members[memberID] = MemberDescription{
+					ClientID:   memberDescr.ClientId,
+					ClientHost: memberDescr.ClientHost,
+					Err:        err,
+				}
+				continue
+			}
+
+			members[memberID] = MemberDescription{
+				ClientID:   memberDescr.ClientId,
+				ClientHost: memberDescr.ClientHost,
+				Topics:     assignment.Topics,
+			}
+		}
+		groups[descr.GroupId] = GroupDescription{Members: members}
+	}
+
+	return groups, nil
+}
+
+func (b *Broker) FetchGroupOffsets(group string) (*sarama.OffsetFetchResponse, error) {
+	requ := &sarama.OffsetFetchRequest{
+		ConsumerGroup: group,
+		Version:       1,
+	}
+	return b.broker.FetchOffset(requ)
+}
+
 // ID returns the broker or -1 if the broker id is unknown.
 func (b *Broker) ID() int32 {
 	if b.id == noID {
-		return b.b.ID()
+		return b.broker.ID()
 	}
 	return b.id
 }

@@ -509,7 +509,7 @@ filebeat.idle_timeout: 5s
 ===== registry_file
 
 The name of the registry file. If a relative path is used, it is considered relative to the
-data path. See the <<directory-layout>> section for details. The default is `registry`.
+data path. See the <<directory-layout>> section for details. The default is `${path.data}/registry`.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -517,6 +517,9 @@ filebeat.registry_file: registry
 -------------------------------------------------------------------------------------
 
 It is not possible to use a symlink as registry file.
+
+NOTE: The registry file is only updated when new events are flushed and not on a predefined period.
+That means in case there are some states where the TTL expired, these are only removed when new event are processed.
 
 
 ===== config_dir

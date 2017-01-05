@@ -16,6 +16,7 @@ import sys
 
 unique_fields = []
 
+
 def fields_to_json(section, path, output):
 
     for field in section["fields"]:
@@ -91,6 +92,18 @@ def fields_to_index_pattern(args, input):
 
     for k, section in enumerate(docs["fields"]):
         fields_to_json(section, "", output)
+
+    # add special fields
+    special_fields = {
+        "fields": [
+            {"name": "_index", "type": "text"},
+            {"name": "_id", "type": "text"},
+            {"name": "_type", "type": "text"},
+            {"name": "_score", "type": "integer"}
+        ],
+    }
+
+    fields_to_json(special_fields, "", output)
 
     output["fields"] = json.dumps(output["fields"])
     output["fieldFormatMap"] = json.dumps(output["fieldFormatMap"])

@@ -31,3 +31,10 @@ fields:
 # Runs all collection steps and updates afterwards
 .PHONY: collect
 collect: fields kibana
+
+
+# Creates a new fileset. Requires the params MODULE and FILESET
+.PHONY: create-fileset
+create-fileset: python-env
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/filebeat/scripts/create_fileset.py --path=$(PWD) --es_beats=$(ES_BEATS) --module=$(MODULE) --fileset=$(FILESET)
+

@@ -1,0 +1,43 @@
+=== system socket MetricSet
+
+WARNING: This functionality is in beta and is subject to change. It should be
+deployed in production at your own risk.
+
+This metricset is available on Linux only and requires kernel 2.6.14 or newer.
+
+The system socket metricset reports an event for each new TCP socket that it
+sees. It does this by polling the kernel to get a dump of all sockets. So using
+a short polling interval with this metricset is important to not miss short
+lived connections. You can configure a period specifically for this module by
+declaring it separately from other system metricsets.
+
+[source,yaml]
+---
+metricbeat.modules:
+- module: system
+  metricsets: [cpu, memory]
+- module: system
+  metricsets: [socket]
+  period: 1s
+---
+
+The metricset reports the process that has the socket open. In order to provide
+this information Metricbeat must be running as root. It needs to be root to read
+the file descriptor information of other processes.
+
+A reverse lookup can be performed by the metricset on the remote IP and the
+returned hostname will be added to the event and cached. The is disabled by
+default and can be enabled through the configuration.  If a hostname is found
+then the eTLD+1 (effective top-level domain plus one level) value will also be
+added to the event.
+
+The full configuration for the metricset is shown below with its defaults.
+
+[source,yaml]
+---
+- module: system
+  metricsets: [socket]
+  socket.reverse_lookup.enabled: false
+  socket.reverse_lookup.success_ttl: 60s
+  socket.reverse_lookup.failure_ttl: 60s
+---

@@ -25,6 +25,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/haproxy/info"
 	_ "github.com/elastic/beats/metricbeat/module/haproxy/stat"
 	_ "github.com/elastic/beats/metricbeat/module/kafka"
+	_ "github.com/elastic/beats/metricbeat/module/kafka/consumergroup"
 	_ "github.com/elastic/beats/metricbeat/module/kafka/partition"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb/status"
@@ -52,6 +53,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/system/memory"
 	_ "github.com/elastic/beats/metricbeat/module/system/network"
 	_ "github.com/elastic/beats/metricbeat/module/system/process"
+	_ "github.com/elastic/beats/metricbeat/module/system/socket"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper/mntr"
 )
