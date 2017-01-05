@@ -9,7 +9,7 @@ vars:
     os.windows:
       - c:/programfiles/nginx/logs/access.log*
   pipeline:
-    # options: with_plugins, no_plugins, json_with_plugins, json_no_plugins
+    # options: with_plugins, no_plugins
     default: with_plugins
 
 ingest_pipeline: ingest/{{pipeline}}.json

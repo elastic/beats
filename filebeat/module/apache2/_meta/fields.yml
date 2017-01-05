@@ -1,0 +1,10 @@
+- key: apache2
+  title: "Apache2"
+  description: >
+    Apache2 Module
+  fields:
+    - name: apache2
+      type: group
+      description: >
+        Apache2 fields.
+      fields:
