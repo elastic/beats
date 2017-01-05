@@ -18,7 +18,6 @@ install, configure, and run Heartbeat:
 * <<heartbeat-configuration>>
 * <<heartbeat-template>>
 * <<heartbeat-starting>>
-* <<heartbeat-sample-dashboards>>
 * <<heartbeat-command-line>>
 * <<directory-layout>>
 
@@ -31,7 +30,7 @@ Heartbeat as part of monitoring service that runs on a separate machine
 and possibly even outside of the network where the services that you want to
 monitor are running. 
 
-//Steffen: I wonder if we need a topic that explores deployment scenarios in more detail (like installing on a sub-network where there's a filewall etc. I don't want to complicate the getting started with this level of details. WDYT?
+//TODO: Add a separate topic that explores deployment scenarios in more detail (like installing on a sub-network where there's a firewall etc. 
 
 To download and install Heartbeat, use the commands that work with your
 system (<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora,
@@ -111,9 +110,9 @@ To configure Heartbeat, you edit the configuration file. For rpm and deb,
 you'll find the configuration file at +/etc/heartbeat/heartbeat.yml+.
 For mac and win, look in the archive that you just extracted.
 
-Heartbeat uses monitors to configure ping behavior. You configure each
-monitor individually. Heartbeat currently provides monitors for ICMP ping,
-TCP ping, and HTTP-based ping (see <<heartbeat-overview>> for more about these
+Heartbeat provides monitors to check the status of hosts at set intervals.
+You configure each monitor individually. Heartbeat currently provides monitors
+for ICMP, TCP, and HTTP (see <<heartbeat-overview>> for more about these
 monitors). Here is an example that configures Heartbeat to use an `icmp`
 monitor:
 
@@ -121,17 +120,8 @@ monitor:
 ----------------------------------------------------------------------
 heartbeat.monitors:
 - type: icmp 
-  name: icmp
-  enabled: true
   schedule: '*/5 * * * * * *' 
   hosts: ["myhost"]
-  ipv4: true
-  ipv6: true
-  mode: any
-  timeout: 16s
-  wait: 1s
-heartbeat.scheduler:
-  location: 'UTC-08:00'
 output.elasticsearch:
   hosts: ["myhost:9200"]
 ----------------------------------------------------------------------
@@ -146,36 +136,21 @@ monitors, an `icmp` monitor and a `tcp` monitor:
 ----------------------------------------------------------------------
 heartbeat.monitors:
 - type: icmp
-  name: icmp
-  enabled: true
   schedule: '*/5 * * * * * *' <1>
   hosts: ["myhost"]
-  ipv4: true
-  ipv6: true
-  mode: any
-  timeout: 16s
-  wait: 1s
 - type: tcp 
-  name: tcp
-  enabled: true
   schedule: '@every 5s' <2>
   hosts: ["myhost:12345"]
-  ipv4: true
-  ipv6: true
   mode: any <3>
-  timeout: 16s
-heartbeat.scheduler:
-  location: 'UTC-08:00' <4>
-output.elasticsearch:
-  hosts: ["myhost:9200"]
 ----------------------------------------------------------------------
 <1> The `icmp` monitor is scheduled to run exactly every 5 seconds (10:00:00,
-10:00:05, and so on).
+10:00:05, and so on). The `schedule` option uses a cron-like syntax based on
+https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementation].
 <2> The `tcp` monitor is set to run every 5 seconds from the time when Heartbeat
-was started.
+was started. Heartbeat adds the `@every` keyword to the syntax provided by the
+`cronexpr` package.
 <3> The `mode` specifies whether to ping one IP (`any`) or all resolvable IPs
 (`all`).
-<4> The `location` specifies the time zone for the scheduler.
 +
 See <<heartbeat-configuration-details>> for a full description of each
 configuration option.
@@ -242,20 +217,7 @@ By default, Windows log files are stored in +C:\ProgramData\heartbeat\Logs+.
 
 Heartbeat is now ready to send log files to your defined output.
 
-[[heartbeat-sample-dashboards]]
-=== Step 5: Loading Sample Kibana Dashboards
-
-//Steffen: Will we have Heartbeat dashboards for 5.2?
-
-To make it easier for you to see whether your services are responding, we have
-created sample Heartbeat dashboards. The dashboards are provided as
-examples. We recommend that you
-http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them to
-meet your needs.
-
-//image:./images/heartbeat.png[Hearbeat dashboard] 
-
-//TODO: Update with screen captures of Heartbeat dashboards
+//TODO: Add content about sample dashboards when the dashboards are available.
 
 :allplatforms:
 include::../../libbeat/docs/dashboards.asciidoc[]

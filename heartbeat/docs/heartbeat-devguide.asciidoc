@@ -12,14 +12,14 @@ are available. As a developer, you can use Heartbeat in two different ways:
 
 We recommend that you start by creating your own Beat to keep the development of
 your own monintors independent of Heartbeat. At a later stage, if you decide to
-add a monitor to Metricbeat, you can reuse the code without making additional changes.
+add a monitor to Heartbeat, you can reuse the code without making additional changes.
 
 The following topics describe how to contribute to Heartbeat by adding new monitors
 and new Beats based on Heartbeat:
 
 --
 
-[[metricbeat-dev-overview]]
+[[heartbeat-dev-overview]]
 == Overview
 
 Heartbeat consists of monitors that....

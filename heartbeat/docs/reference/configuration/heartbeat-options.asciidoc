@@ -2,42 +2,31 @@
 === Heartbeat Configuration
 
 The `heartbeat` section of the +heartbeat.yml+ config file specifies the
-list of `monitors` that Heartbeat uses to ping your remote hosts to
+list of `monitors` that Heartbeat uses to check your remote hosts to
 determine if they are available. Each `monitor` item begins with a dash (-) and
-specifies the type of monitor to use, the hosts to ping, and other settings
-that control ping behavior. 
+specifies the type of monitor to use, the hosts to check, and other settings
+that control Heartbeat behavior. 
 
-The following example configures two monitors, an `icmp` monitor and a `tcp`
-monitor:
-
-//I use the same example here that I use in the config section, but I really think it should probably be different. Suggestions? I do think that we should show more than one monitor in the example, even though it makes the example a bit longer, to show that you can specify more than one monitor.
+The following example configures three monitors, `icmp`, `tcp`, and `http`, and
+demonstrates how to use TCP Echo and HTTP response verification:
 
 [source,yaml]
 ----------------------------------------------------------------------
 heartbeat.monitors:
 - type: icmp
-  name: icmp
-  enabled: true
   schedule: '*/5 * * * * * *'
   hosts: ["myhost"]
-  ipv4: true
-  ipv6: true
-  mode: any
-  timeout: 16s
-  wait: 1s
-- type: tcp 
-  name: tcp
-  enabled: true
+- type: tcp
   schedule: '@every 5s'
-  hosts: ["myhost:12345"]
-  ipv4: true
-  ipv6: true
-  mode: any
-  timeout: 16s
+  hosts: ["myhost:7"]  # default TCP Echo Protocol
+  check.send: "Check"
+  check.receive: "Check"
+- type: http
+  schedule: '@every 5s'
+  urls: ["http://localhost:80/service/status"]
+  check.response.status: 200
 heartbeat.scheduler:
-  location: 'UTC-08:00'
-output.elasticsearch:
-  hosts: ["myhost:9200"]
+  limit: 10
 ----------------------------------------------------------------------
 
 [[monitor-options]]
@@ -46,23 +35,24 @@ output.elasticsearch:
 You can specify the following options in the `monitors` section of the
 +heartbeat.yml+ config file. These options are the same for all monitors.
 Each monitor type has additional configuration options that are specific to that
-monitor type. See the following sections for more info about those options:
+monitor type. 
 
-* <<monitor-icmp-options>>
-* <<monitor-tcp-options>>
-* <<monitor-http-options>>
 
 [[monitor-type]]
 ===== type
 
 The type of monitor to run. One of:
 
-* `icmp`: Uses an ICMP Echo Request to ping the configured hosts. Requires root
-access.
+* `icmp`: Uses an ICMP (v4 and v6) Echo Request to ping the configured hosts.
+Requires root access. See <<monitor-icmp-options>>.
 * `tcp`: Connects via TCP and optionally verifies the endpoint by sending and/or
-receiving a custom payload.
+receiving a custom payload. See <<monitor-tcp-options>>.
 * `http`: Connects via HTTP and optionally verifies that the host returns the
-expected response.
+expected response. See <<monitor-http-options>>.
+
+The `tcp` and `http` monitor types both support SSL/TLS and some proxy
+settings. 
+
 
 [[monitor-name]]
 ===== name
@@ -87,7 +77,8 @@ A cron-like expression that specifies the task schedule. For example:
 * `@every 5s` runs the task every 5 seconds from the time when Heartbeat was
 started.
 
-//Steffen: Should we document the syntax of the cron expression somewhere, or point to a resource if one is available that describes specifically what the scheduler supports
+The `schedule` option uses a cron-like syntax based on https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementation],
+but adds the `@every` keyword.
 
 [[monitor-ipv4]]
 ===== ipv4
@@ -115,7 +106,9 @@ ping every IP address for the specified hostname. The default is `any`.
 The total running time for each ping test. This is the total time allowed for
 testing the connection and exchanging data. The default is 16 seconds (16s).
 
-//Steffen: What happens if this timeout is exceeded?
+If the timeout is exceeded, Heartbeat publishes a `service-down` event. If the
+value specified for `timeout` is greater than `schedule`, intermediate checks
+will not be executed by the scheduler.
 
 [[monitor-watch-poll-file]]
 ===== watch.poll_file
@@ -123,49 +116,60 @@ testing the connection and exchanging data. The default is 16 seconds (16s).
 experimental[]
 
 The JSON file to watch for additional monitor configurations. The JSON file can
-have multiple objects, each of which specifies a different monitor config.
-Heartbeat checks this file periodically and starts a new monitor for any new
-objects that are added to the file. For example, imagine that you add 10
-new entries to the JSON file, each for a different hostname. When Heartbeat
-picks up the changes in the file, it starts a monitor for each host that you've
-configured. In this way, the configuration that you specify for the monitor in
-the main Heartbeat config file acts like a default config that you can
-live-reconfigure by specifying additional configurations in the external JSON
-file. 
+contain multiple objects, each of which specifies a different monitor config.
+Heartbeat checks this file periodically and starts a new monitor instance for
+each new JSON object added to the file. For example, imagine that you add
+10 new entries to the JSON file, each for a different hostname. When Heartbeat
+picks up the changes in the file, it merges the original config
+(`hearbeat.yml`) plus the JSON objects, and starts a monitor for each new host
+that you've configured. If you delete an object from the JSON file and it
+doesn't exist in the main config, Heartbeat stops the monitor instance running
+for that object.
 
-//Steffen: Not sure I got that quite right, but there you go! BTW, if you delete an object from the JSON file, I guess it stops the monitor that it has running for that object, right?
-
-//TODO: We have to document the structure of the JSON somewhere.
+Each monitor has a unique ID that's based on parameters like protocol, host,
+and port. If two monitors have the same ID, Heartbeat uses the settings that
+are defined in the last JSON object of the merged config. This means that
+you can specify settings in the JSON file that overwrite the settings in
+the main config. In this way, the configuration that you specify for the
+monitor in the main Heartbeat config file acts like a default config that you
+can live-reconfigure by specifying additional configurations in the external
+JSON file. 
 
 Example configuration:
 
 [source, yaml]
 -------------------------------------------------------------------------------
 heartbeat.monitors:
-- type: icmp
-  enabled: true
+- type: tcp
   schedule: '*/5 * * * * * *'
-  hosts: ["myhost:12345"]
-  ipv4: true
-  ipv6: true
-  mode: any
-  timeout: 16s
-  wait: 1s
+  hosts: ["myhost"]
   watch.poll_file:
-    path: /monitors/myfile.json
+    path: {path.config}/monitors/dynamic.json
     interval: 5s
 -------------------------------------------------------------------------------
 
-
-//Steffen: Can you suggest a realistic path? I have no idea where users would keep these files.  I'm not sure if users specif a glob pattern here or the path to a single file.
-
-*`path`*:: Specifies the path to check for updates. 
+*`path`*:: Specifies the path to the JSON file to check for updates. 
 *`interval`*:: Specifies how often Heartbeat checks the file for changes.
+
+To reconfigure the settings specified in the example config, you could define
+the following JSON objects in `dynamic.json`:
+
+[source, json]
+-------------------------------------------------------------------------------
+{"hosts": ["myhost:1234"], "schedule": "*/15 * * * * * *"} <1> 
+{"hosts": ["tls://otherhost:479"], "ssl.certificate_authorities": ["path/to/ca/file.pem"]} <2>
+-------------------------------------------------------------------------------
+<1> Upon detecting the changes, Heartbeat stops the old monitor and then
+restarts it with a schedule of 15 seconds between checks.
+<2> Heartbeat starts a new monitor that uses a TLS-based connection with a
+custom CA certificate. 
 
 [[monitor-icmp-options]]
 ==== ICMP Options
 
-These options are valid when the `type` is `icmp`.
+These options configure Heartbeat to use ICMP (v4 and v6) Echo Requests to check
+the configured hosts. These options are valid when the <<monitor-type,`type`>> is
+`icmp`.
 
 [[monitor-icmp-hosts]]
 ===== hosts
@@ -181,7 +185,9 @@ second (1s).
 [[monitor-tcp-options]]
 ==== TCP Options
 
-These options are valid when the `type` is `tcp`.
+These options configure Heartbeat to connect via TCP and optionally verify the
+endpoint by sending and/or receiving a custom payload. These options are valid when
+the <<monitor-type,`type`>> is `tcp`.
 
 [[monitor-tcp-hosts]]
 ===== hosts
@@ -193,20 +199,18 @@ option, you must also specify a value for <<monitor-tcp-ports,`ports`>>.  If the
 monitor is configured to use SSL, Heartbeat establishes an SSL/TLS-based
 connection. Otherwise, it establishes a plain TCP connection.
 * A hostname and port, such as `localhost:12345`. Heartbeat connects
-to the port on the specified host. If the monitor is configured to use SSL,
-Heartbeat establishes an SSL/TLS-based connection. Otherwise, it establishes
-a TCP connection.
+to the port on the specified host. If the monitor is
+<<configuration-output-ssl,configured to use SSL>>, Heartbeat establishes an
+SSL/TLS-based connection. Otherwise, it establishes a TCP connection.
 * A full URL using the syntax `scheme://<host>:[port]`, where:
 ** `scheme` is one of `tcp`, `plain`, `ssl` or `tls`. If `tcp` or `plain` is
 specified, Heartbeat establishes a TCP connection even if the monitor is
 configured to use SSL. If `tls` or `ssl` is specified, Heartbeat establishes
 an SSL connection. However, if the monitor is not configured to use SSL, the
-system defaults are used (not supported on Windows).
+system defaults are used (currently not supported on Windows).
 ** `host` is the hostname.
 ** `port` is the port number. If `port` is missing in the URL, the
 <<monitor-tcp-ports,`ports`>> setting is required.
-
-// Questions: Can port above be a list of ports, or is it only a single port.
 
 [[monitor-tcp-ports]]
 ===== ports
@@ -222,10 +226,6 @@ Example configuration:
   schedule: '@every 5s'
   hosts: ["myhost"]
   ports: [80, 9200, 5044]
-  ipv4: true
-  ipv6: true
-  mode: any
-  timeout: 16s
 -------------------------------------------------------------------------------
 
 [[monitor-tcp-check]]
@@ -235,7 +235,8 @@ An optional payload string to send to the remote host and the expected answer.
 If no payload is specified, the endpoint is assumed to be available if the
 connection attempt was successful. If `send` is specified without `receive`,
 any response is accepted as OK. If `receive` is specified without `send`, no
-payload is sent, but the client expects to receive a payload on connect.
+payload is sent, but the client expects to receive a payload in the form of a
+"hello message" or "banner" on connect.
 
 Example configuration:
 
@@ -244,38 +245,45 @@ Example configuration:
 - type: tcp 
   schedule: '@every 5s'
   hosts: ["myhost"]
-  ports: [80, 9200, 5044]
-  ipv4: true
-  ipv6: true
-  mode: any
-  timeout: 16s
-  check:
-    send: ''
-    receive: ''
+  ports: [7]
+  check.send: 'Hello World'
+  check.receive: 'Hello World'
 -------------------------------------------------------------------------------
 
-
-//Steffen: Can you provide a good example of the values to set for send and receive in the above example?
 
 [[monitor-tcp-proxy-url]]
 ===== proxy_url
 
-The SOCKS5 proxy URL.
+The URL of the SOCKS5 proxy to use when connecting to the server. The value
+must be a URL with a scheme of socks5://. 
 
-//Steffen: Can we say more about this option?
+If the SOCKS5 proxy server requires client authentication, then a username and
+password can be embedded in the URL as shown in the example.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+  proxy_url: socks5://user:password@socks5-proxy:2233
+-------------------------------------------------------------------------------
+
+When using a proxy, hostnames are resolved on the proxy server instead of on
+the client. You can change this behavior by setting the
+`proxy_use_local_resolver` option.
 
 [[monitor-tcp-proxy-use-local-resolver]]
 ===== proxy_use_local_resolver
 
-A Boolean value that specifies whether to resolve hostnames locally instead of
-resolving them on the SOCKS5 server. The default is false.
+A Boolean value that determines whether hostnames are resolved locally instead
+of being resolved on the proxy server. The default value is false, which means
+that name resolution occurs on the proxy server.
 
 [[monitor-tcp-tls-ssl]]
 ===== ssl
 
-The TLS/SSL connection settings. 
-
-//Steffen: Is this option so that you can check to see if the servers certificates are valid?
+The TLS/SSL connection settings.  If the monitor is
+<<configuration-output-ssl,configured to use SSL>>, it will attempt an SSL
+handshake. If `check` is not configured, the monitor will only check to see if
+it can establish an SSL/TLS connection. This check can fail either at TCP level
+or during certificate validation.
 
 Example configuration:
 
@@ -285,22 +293,18 @@ Example configuration:
   schedule: '@every 5s'
   hosts: ["myhost"]
   ports: [80, 9200, 5044]
-  ipv4: true
-  ipv6: true
-  mode: any
-  timeout: 16s
   ssl:
     certificate_authorities: ['/etc/ca.crt']
     supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
 -------------------------------------------------------------------------------
 
 
-//Steffen: How are the values for supported_protocols used?
-
 [[monitor-http-options]]
 ==== HTTP Options
 
-These options are valid when the `type` is `http`.
+These options configure Heartbeat to connect via HTTP and optionally verify that
+the host returns the expected response. These options are valid when the
+<<monitor-type,`type`>> is `http`.
 
 [[monitor-http-urls]]
 ===== urls
@@ -314,9 +318,6 @@ Example configuration:
 - type: http 
   schedule: '@every 5s'
   urls: ["http://myhost:80"]
-  ipv4: true
-  ipv6: true
-  mode: any
 -------------------------------------------------------------------------------
 
 
@@ -329,14 +330,17 @@ environment variable is used.
 [[monitor-http-username]]
 ===== username
 
-The username for authenticating with the server. This setting is optional. 
+The username for authenticating with the server. The credentials are passed
+with the request. This setting is optional. 
+
+You need to specify credentials when your `check.response` settings require it.
+For example, you can check for a 403 response (`check.response.status: 403`)
+without setting credentials. 
 
 [[monitor-http-password]]
 ===== password
 
 The password for authenticating with the server. This setting is optional.
-
-//Steffen: When are authentication credential required? If you are sending a request and expecting a response?
 
 [[monitor-http-tls-ssl]]
 ===== ssl
@@ -351,10 +355,7 @@ Example configuration:
 -------------------------------------------------------------------------------
 - type: http 
   schedule: '@every 5s'
-  urls: ["http://myhost:80"]
-  ipv4: true
-  ipv6: true
-  mode: any
+  urls: ["https://myhost:80"]
   ssl:
     certificate_authorities: ['/etc/ca.crt']
     supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]  
@@ -373,21 +374,10 @@ Example configuration:
 - type: http 
   schedule: '@every 5s'
   urls: ["http://myhost:80"]
-  ipv4: true
-  ipv6: true
-  mode: any
-  check.request:
-    method: "GET"
-    headers:
-    body:
-  check.response:
-    status: 0
-    headers:
-    body:
+  check.request.method: HEAD
+  check.response.status: 200
 -------------------------------------------------------------------------------
 
-
-//Steffen: I need help filling out the above example with headers and body
 
 Under `check.request`, specify these options:
 
@@ -403,6 +393,24 @@ it's set to 0, any status code other than 404 is accepted.
 *`headers`*:: The required response headers. 
 *`body`*:: The required response body content.
 
+The following configuration shows how to check the response when the body
+contains JSON:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: http 
+  schedule: '@every 5s'
+  urls: ["https://myhost:80"]
+check.request:
+  method: GET
+  headers:
+    'X-API-Key': '12345-mykey-67890'
+check.response:
+  status: 200
+  body: '{"status": "ok"}'
+-------------------------------------------------------------------------------
+
+
 [[monitors-scheduler]]
 ==== Scheduler Options
 
@@ -414,35 +422,42 @@ Example configuration:
 [source,yaml]
 -------------------------------------------------------------------------------
 heartbeat.scheduler:
-  limit: 0
+  limit: 10
   location: 'UTC-08:00'
 -------------------------------------------------------------------------------
 
-
-//Steffen: What is a reasonable limit to set in the example? Also, I just sort of guessed at what would be valid for location in my example.
-
+In the example, setting `limit` to 10 guarantees that only 10 concurrent
+I/O tasks will be active. An I/O task can be the actual check or resolving an
+address via DNS.
 
 [[heartbeat-scheduler-limit]]
 ===== limit
 
-The number of concurrent tasks that Heartbeat is allowed to execute. If set
-to 0, there is no limit. The default is 0. 
+The number of concurrent I/O tasks that Heartbeat is allowed to execute. If set
+to 0, there is no limit. The default is 0.
+
+Most operating systems set a file descriptor limit of 1024. For Heartbeat to
+operate correctly and not accidentally block libbeat output, the value that you
+specify for `limit` should be below the configured ulimit.
+
 
 [[heartbeat-scheduler-location]]
 ===== location
 
-The timezone for the scheduler.
+The timezone for the scheduler. By default the scheduler uses localtime.
 
-//Steffen: Is the location a required setting? If not, what timezone does the scheduler default to?
-
-  
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/generalconfig.asciidoc ?>] 
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/outputconfig.asciidoc ?>] 
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-path-config.asciidoc ?>] 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/loggingconfig.asciidoc ?>] 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/processors-config.asciidoc ?>] 
 include::../../../../libbeat/docs/processors-config.asciidoc[]
 
