@@ -43,6 +43,7 @@ COVERAGE_TOOL=${GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 PROCESSES?= 4
 TIMEOUT?= 90
+NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer ## @testing the options to pass when calling nosetests
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
@@ -150,7 +151,7 @@ integration-tests-environment: prepare-tests build-image
 .PHONY: system-tests
 system-tests: ## @testing Runs the system tests
 system-tests: ${BEATNAME}.test prepare-tests python-env ${ES_BEATS}/libbeat/dashboards/import_dashboards
-	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
+	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} nosetests -w tests/system ${NOSETESTS_OPTIONS}
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs the system tests
