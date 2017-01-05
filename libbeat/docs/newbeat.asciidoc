@@ -55,7 +55,7 @@ When you run the command, all source files are downloaded to the
 you will build the source later. By default `go get`  fetches the master branch. To build your beat
 on a specific version of libbeat, check out the specific branch ({doc-branch} in the example below):
 
-[source,bash]
+["source","sh",subs="attributes"]
 ----
 cd $GOPATH/src/github.com/elastic/beats
 git checkout {doc-branch}
