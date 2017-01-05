@@ -4,6 +4,7 @@ BEATNAME?=libbeat ## @packaging Name of the application
 BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash ## @packaging Description of the application
 BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
 BEAT_LICENSE?=ASL 2.0 ## @packaging Software license of the application
+BEAT_URL?=https://${BEAT_DIR} ## @packaging Link to the homepage of the application
 BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEATNAME}/current/index.html ## @packaging Link to the user documentation of the application
 BEAT_DIR?=github.com/elastic/beats/${BEATNAME}
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats
@@ -395,7 +396,7 @@ package: package-setup
 
 	# Generates the package.yml file with all information needed to create packages
 	echo "beat_name: ${BEATNAME}" > ${BUILD_DIR}/package.yml
-	echo "beat_url: https://${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
+	echo "beat_url: ${BEAT_URL}" >> ${BUILD_DIR}/package.yml
 	echo "beat_repo: ${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_description: ${BEAT_DESCRIPTION}" >> ${BUILD_DIR}/package.yml
 	echo "beat_vendor: ${BEAT_VENDOR}" >> ${BUILD_DIR}/package.yml
