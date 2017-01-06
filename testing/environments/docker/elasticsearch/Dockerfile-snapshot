@@ -32,8 +32,10 @@ USER elasticsearch
 # Install xpack
 #RUN eval ${ES_JAVA_OPTS:-} elasticsearch-plugin install --batch ${XPACK}
 
-RUN elasticsearch-plugin install --batch https://snapshots.elastic.co/downloads/elasticsearch-plugins/ingest-user-agent/ingest-user-agent-6.0.0-alpha1-SNAPSHOT.zip
-RUN elasticsearch-plugin install --batch https://snapshots.elastic.co/downloads/elasticsearch-plugins/ingest-geoip/ingest-geoip-6.0.0-alpha1-SNAPSHOT.zip
+
+
+RUN elasticsearch-plugin install --batch https://staging.elastic.co/5.2.0-fc0d6f04/downloads/elasticsearch-plugins/ingest-user-agent/ingest-user-agent-5.2.0.zip
+RUN elasticsearch-plugin install --batch https://staging.elastic.co/5.2.0-fc0d6f04/downloads/elasticsearch-plugins/ingest-geoip/ingest-geoip-5.2.0.zip
 
 COPY config/elasticsearch.yml config/
 COPY config/log4j2.properties config/
