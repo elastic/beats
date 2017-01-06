@@ -44,8 +44,10 @@ collect-docs: python-env
 # Collects all module configs
 .PHONY: configs
 configs: python-env
-	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEATNAME} $(PWD) > _meta/beat.yml
-	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEATNAME} --full $(PWD) > _meta/beat.full.yml
+	cat ${ES_BEATS}/metricbeat/_meta/common.yml > _meta/beat.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEATNAME} $(PWD) >> _meta/beat.yml
+	cat ${ES_BEATS}/metricbeat/_meta/common.full.yml > _meta/beat.full.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEATNAME} --full $(PWD) >> _meta/beat.full.yml
 
 # Generates imports for all modules and metricsets
 .PHONY: imports
