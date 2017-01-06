@@ -21,7 +21,8 @@
 # Download the canonical import path (may fail, don't allow failures beyond)
 SRC_FOLDER=$SOURCE
 
-BEAT_PATH=$1
+BEAT_NAME=$PACK
+BEAT_PATH=$1/$BEAT_NAME
 DST_FOLDER=`dirname $GOPATH/src/$BEAT_PATH`
 GIT_REPO=$BEAT_PATH
 
