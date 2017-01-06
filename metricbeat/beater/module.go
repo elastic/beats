@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/joeshaw/multierror"
+	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 )
 
@@ -36,6 +37,7 @@ type ModuleWrapper struct {
 	mb.Module
 	filters    *processors.Processors
 	metricSets []*metricSetWrapper // List of pointers to its associated MetricSets.
+	configHash uint64
 }
 
 // metricSetWrapper contains the MetricSet and the private data associated with
@@ -151,6 +153,25 @@ func (mw *ModuleWrapper) Start(done <-chan struct{}) <-chan common.MapStr {
 func (mw *ModuleWrapper) String() string {
 	return fmt.Sprintf("ModuleWrapper[name=%s, len(metricSetWrappers)=%d]",
 		mw.Name(), len(mw.metricSets))
+}
+
+// Hash returns the hash value of the module wrapper
+// This allows to check if two modules are the same / have the same config
+func (mw *ModuleWrapper) Hash() uint64 {
+	// Check if hash was calculated previously
+	if mw.configHash > 0 {
+		return mw.configHash
+	}
+	var err error
+
+	// Config is unpacked into map[string]interface{} to also take metricset configs into account for the hash
+	var c map[string]interface{}
+	mw.UnpackConfig(&c)
+	mw.configHash, err = hashstructure.Hash(c, nil)
+	if err != nil {
+		logp.Err("Error creating config hash for module %s: %s", mw.String(), err)
+	}
+	return mw.configHash
 }
 
 // metricSetWrapper methods

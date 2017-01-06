@@ -98,12 +98,7 @@ func Load(path string) (*common.Config, error) {
 	var config *common.Config
 	var err error
 
-	cfgpath := ""
-	if *configPath != "" {
-		cfgpath = *configPath
-	} else if *homePath != "" {
-		cfgpath = *homePath
-	}
+	cfgpath := GetPathConfig()
 
 	if path == "" {
 		list := []string{}
@@ -130,6 +125,17 @@ func Load(path string) (*common.Config, error) {
 		config,
 		overwrites,
 	)
+}
+
+// GetPathConfig returns ${path.config}. If ${path.config} is not set, ${path.home} is returned.
+func GetPathConfig() string {
+	if *configPath != "" {
+		return *configPath
+	} else if *homePath != "" {
+		return *homePath
+	}
+	// TODO: Do we need this or should we always return *homePath?
+	return ""
 }
 
 // IsTestConfig returns whether or not this is configuration used for testing
