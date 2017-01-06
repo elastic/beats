@@ -49,10 +49,6 @@ services:
     command: make
     entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
 
-  # Overloading kibana with a simple image as it is not needed here
-  kibana:
-    image: alpine:latest
-
   # Modules
   apache:
     build: ${PWD}/module/apache/_meta
