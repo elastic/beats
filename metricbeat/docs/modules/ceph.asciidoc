@@ -57,5 +57,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-ceph-perf,perf>>
 
+* <<metricbeat-metricset-ceph-status,status>>
+
 include::ceph/perf.asciidoc[]
+
+include::ceph/status.asciidoc[]
 

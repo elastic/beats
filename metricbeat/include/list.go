@@ -12,6 +12,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/apache/status"
 	_ "github.com/elastic/beats/metricbeat/module/ceph"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/perf"
+	_ "github.com/elastic/beats/metricbeat/module/ceph/status"
 	_ "github.com/elastic/beats/metricbeat/module/couchbase"
 	_ "github.com/elastic/beats/metricbeat/module/couchbase/bucket"
 	_ "github.com/elastic/beats/metricbeat/module/couchbase/cluster"

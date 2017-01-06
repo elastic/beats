@@ -1,0 +1,9 @@
+- name: status
+  type: group
+  description: >
+    status
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
