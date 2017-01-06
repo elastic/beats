@@ -37,21 +37,13 @@ func eventsMapping(input string) []common.MapStr {
 		logp.Err("An error occurred while parsing data for getting ceph status osd: %v", errOsdMap)
 	}
 
-//        eventsPgmap,errPgMap := decodeStatusPgmap(data)
-//        if errPgMap != nil {
-//                logp.Err("An error occurred while parsing data for getting ceph status pg: %v", errPgMap)
-//        }
+        eventsPgmap,errPgMap := decodeStatusPgmap(data)
+        if errPgMap != nil {
+                logp.Err("An error occurred while parsing data for getting ceph status pg: %v", errPgMap)
+        }
 
-//	myEvents = append(myEvents,eventsPgmap...)
+	myEvents = append(myEvents,eventsHealthmap,eventsOsdmap,eventsPgmap)
 
-//        eventsPgmapState,errPgmapState := decodeStatusPgmapState(data)
-//        if errPgmapState != nil {
-//                logp.Err("An error occurred while parsing data for getting ceph status pg state: %v", errPgmapState)
-//        }
-
-//	myEvents = append(myEvents,eventsPgmapState...)
-
-	myEvents = append(myEvents,eventsHealthmap,eventsOsdmap)
 	return myEvents
 }
 
@@ -66,7 +58,6 @@ func decodeStatusHealth(data map[string]interface{}) (common.MapStr,error) {
 				"overall_status": healthmap["overall_status"].(string),
 			}
 
-	//health
        	health, ok := healthmap["health"].(map[string]interface{})
         if !ok {
                 return nil,fmt.Errorf("WARNING - unable to decode health health")
@@ -77,7 +68,6 @@ func decodeStatusHealth(data map[string]interface{}) (common.MapStr,error) {
                return nil,err
         }
 
-	//timechecks
 	timechecks, ok := healthmap["timechecks"].(map[string]interface{})
         if !ok {
                 return nil,fmt.Errorf("WARNING - unable to decode health health")
@@ -89,9 +79,6 @@ func decodeStatusHealth(data map[string]interface{}) (common.MapStr,error) {
                 }
                 newevent = common.MapStrUnion(newevent,event)
         }
-	
-	//detail
-
 
         return newevent,nil
 
@@ -170,66 +157,39 @@ func decodeStatusOsdmap(data map[string]interface{}) (common.MapStr,error) {
 }
 
 
-func decodeStatusPgmap(data map[string]interface{}) ([]common.MapStr,error) {
+func decodeStatusPgmap(data map[string]interface{}) (common.MapStr,error) {
 	pgmap, ok := data["pgmap"].(map[string]interface{})
 	if !ok {
 		return nil,fmt.Errorf("WARNING %s - unable to decode pgmap", measurement)
 	}
-	fields := make(map[string]interface{})
 	
-	myEvents := []common.MapStr{}
+	newevent := common.MapStr{}
 
 	for key, value := range pgmap {
-		switch value.(type) {
-		case float64:
-			event := common.MapStr{
-        	            fields[key].(string) : value,
-	                }
+			if(key != "pgs_by_state"){
+				event := common.MapStr{
+        	           		"pgmap."+ key : value,
+	                	}
 
-			myEvents = append(myEvents, event)
-		}
-	}
+				newevent = common.MapStrUnion(newevent,event)
+			}else{
+				for _, state := range value.([]interface{}) {
+                                	state_map, ok := state.(map[string]interface{})
+                                	if !ok {
+                                        	return nil,fmt.Errorf("WARNING %s - unable to decode pg state", measurement)
+                                	}
 
-	return myEvents,nil
-}
-
-func decodeStatusPgmapState(data map[string]interface{}) ([]common.MapStr,error) {
-	pgmap, ok := data["pgmap"].(map[string]interface{})
-	if !ok {
-		return nil,fmt.Errorf("WARNING %s - unable to decode pgmap", measurement)
-	}
-	fields := make(map[string]interface{})
-
-	myEvents := []common.MapStr{}
-
-	for key, value := range pgmap {
-		switch value.(type) {
-		case []interface{}:
-			if key != "pgs_by_state" {
-				continue
+					for tag, datapoints := range state_map{
+                                                event := common.MapStr{
+                                                        "pgmap.pgs_by_state."+tag: datapoints,
+                                                }
+                                                newevent = common.MapStrUnion(newevent,event)
+                                        }
+                        	}
+	
 			}
-			for _, state := range value.([]interface{}) {
-				state_map, ok := state.(map[string]interface{})
-				if !ok {
-					return nil,fmt.Errorf("WARNING %s - unable to decode pg state", measurement)
-				}
-				state_name, ok := state_map["state_name"].(string)
-				if !ok {
-					return nil,fmt.Errorf("WARNING %s - unable to decode pg state name", measurement)
-				}
-				state_count, ok := state_map["count"].(float64)
-				if !ok {
-					return nil,fmt.Errorf("WARNING %s - unable to decode pg state count", measurement)
-				}
-
-				 event := common.MapStr{
-						fields[state_name].(string) : state_count,
-                        		}
-
-				myEvents = append(myEvents, event)
-			}
-		}
 	}
-	return myEvents,nil
+
+	return newevent,nil
 }
 

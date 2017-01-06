@@ -1,0 +1,9 @@
+- name: df
+  type: group
+  description: >
+    df
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
