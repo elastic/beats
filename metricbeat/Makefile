@@ -56,12 +56,13 @@ imports:
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
+ifeq ($(BEATNAME), metricbeat)
 	# disable the system/load metricset on windows
 	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.yml
 	rm $(PREFIX)/metricbeat-win.yml.bk
 	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.full.yml
 	rm $(PREFIX)/metricbeat-win.full.yml.bk
-
+endif
 # Runs all collection steps and updates afterwards
 .PHONY: collect
 collect: fields collect-docs configs kibana imports
