@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/jsontransform"
@@ -43,7 +42,7 @@ func init() {
 	processors.RegisterPlugin("decode_json_fields",
 		configChecked(newDecodeJSONFields,
 			requireFields("fields"),
-			allowedFields("fields", "max_depth", "overwrite_keys", "process_array", "target")))
+			allowedFields("fields", "max_depth", "overwrite_keys", "process_array", "target", "when")))
 }
 
 func newDecodeJSONFields(c common.Config) (processors.Processor, error) {
@@ -88,44 +87,7 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 					default:
 						errs = append(errs, errors.New("Error trying to add target to root.").Error())
 					case map[string]interface{}:
-						for k, v := range t {
-							if f.overwriteKeys {
-								if k == "@timestamp" {
-									vstr, ok := v.(string)
-									if !ok {
-										logp.Err("JSON: Won't overwrite @timestamp because value is not string")
-										event["json_error"] = "@timestamp not overwritten (not string)"
-										continue
-									}
-
-									// @timestamp must be of format RFC3339
-									ts, err := time.Parse(time.RFC3339, vstr)
-									if err != nil {
-										logp.Err("JSON: Won't overwrite @timestamp because of parsing error: %v", err)
-										event["json_error"] = fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr)
-										continue
-									}
-									event[k] = common.Time(ts)
-								} else if k == "type" {
-									vstr, ok := v.(string)
-									if !ok {
-										logp.Err("JSON: Won't overwrite type because value is not string")
-										event["json_error"] = "type not overwritten (not string)"
-										continue
-									}
-									if len(vstr) == 0 || vstr[0] == '_' {
-										logp.Err("JSON: Won't overwrite type because value is empty or starts with an underscore")
-										event["json_error"] = fmt.Sprintf("type not overwritten (invalid value [%s])", vstr)
-										continue
-									}
-									event[k] = vstr
-								} else {
-									event[k] = v
-								}
-							} else if _, exists := event[k]; !exists {
-								event[k] = v
-							}
-						}
+						jsontransform.WriteJSONKeys(event, t, f.overwriteKeys, "json_error")
 					}
 				}
 			} else {
