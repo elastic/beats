@@ -30,7 +30,6 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	dialInfo     *mgo.DialInfo
 	mongoSession *mgo.Session
 }
 
@@ -52,7 +51,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		dialInfo:      dialInfo,
 		mongoSession:  mongoSession,
 	}, nil
 }
