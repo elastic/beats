@@ -1054,7 +1054,11 @@
             "dbstats": {
               "properties": {
                 "avg_obj_size": {
-                  "type": "long"
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "collections": {
                   "type": "long"
@@ -1070,7 +1074,11 @@
                   }
                 },
                 "data_size": {
-                  "type": "long"
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "db": {
                   "ignore_above": 1024,
@@ -1082,15 +1090,27 @@
                       "type": "long"
                     },
                     "size": {
-                      "type": "long"
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
                     }
                   }
                 },
                 "file_size": {
-                  "type": "long"
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "index_size": {
-                  "type": "long"
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "indexes": {
                   "type": "long"
@@ -1105,7 +1125,11 @@
                   "type": "long"
                 },
                 "storage_size": {
-                  "type": "long"
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },

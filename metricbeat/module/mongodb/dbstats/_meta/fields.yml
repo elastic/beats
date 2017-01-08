@@ -4,23 +4,27 @@
     dbstats provides an overview of a particular mongo database. This document
     is most concerned with data volumes of a database.
   fields:
-    - name: avg_obj_size
+    - name: avg_obj_size.bytes
       type: long
+      format: bytes
 
     - name: collections
       type: integer
 
-    - name: data_size
+    - name: data_size.bytes
       type: long
+      format: bytes
 
     - name: db
       type: keyword
 
-    - name: file_size
+    - name: file_size.bytes
       type: long
+      format: bytes
 
-    - name: index_size
+    - name: index_size.bytes
       type: long
+      format: bytes
 
     - name: indexes
       type: long
@@ -31,8 +35,9 @@
     - name: objects
       type: long
 
-    - name: storage_size
+    - name: storage_size.bytes
       type: long
+      format: bytes
 
     - name: ns_size_mb
       type: long
@@ -52,5 +57,6 @@
         - name: num
           type: long
 
-        - name: size
+        - name: size.bytes
           type: long
+          format: bytes
