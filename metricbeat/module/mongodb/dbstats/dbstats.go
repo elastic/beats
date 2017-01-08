@@ -3,11 +3,12 @@ package dbstats
 import (
 	"errors"
 
+	"gopkg.in/mgo.v2"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
-	"gopkg.in/mgo.v2"
 )
 
 // init registers the MetricSet with the central registry.
