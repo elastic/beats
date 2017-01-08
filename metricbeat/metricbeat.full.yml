@@ -117,7 +117,7 @@ metricbeat.modules:
 
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
-  #metricsets: ["status", "dbstats"]
+  #metricsets: ["dbstats", "status"]
   #enabled: true
   #period: 10s
 
