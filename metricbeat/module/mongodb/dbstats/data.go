@@ -16,19 +16,19 @@ var schema = s.Schema{
 	"indexes":      c.Int("indexes"),
 	"index_size":   c.Int("indexSize"),
 	// mmapv1 only
-	"ns_size_mb": c.Int("nsSizeMB"),
+	"ns_size_mb": c.Int("nsSizeMB", s.Optional),
 	// mmapv1 only
-	"file_size": c.Int("fileSize"),
+	"file_size": c.Int("fileSize", s.Optional),
 	// mmapv1 only
 	"data_file_version": c.Dict("dataFileVersion", s.Schema{
 		"major": c.Int("major"),
 		"minor": c.Int("minor"),
-	}),
+	}, c.DictOptional),
 	// mmapv1 only
 	"extent_free_list": c.Dict("extentFreeList", s.Schema{
 		"num":  c.Int("num"),
 		"size": c.Int("size"),
-	}),
+	}, c.DictOptional),
 }
 
 var eventMapping = schema.Apply
