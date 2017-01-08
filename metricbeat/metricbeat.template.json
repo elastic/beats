@@ -1116,7 +1116,11 @@
                   "type": "long"
                 },
                 "ns_size_mb": {
-                  "type": "long"
+                  "properties": {
+                    "mb": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "num_extents": {
                   "type": "long"

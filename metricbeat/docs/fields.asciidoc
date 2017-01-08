@@ -2127,7 +2127,7 @@ type: long
 format: bytes
 
 [float]
-=== mongodb.dbstats.ns_size_mb
+=== mongodb.dbstats.ns_size_mb.mb
 
 type: long
 
