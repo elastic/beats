@@ -39,7 +39,7 @@
       type: long
       format: bytes
 
-    - name: ns_size_mb
+    - name: ns_size_mb.mb
       type: long
 
     - name: data_file_version
