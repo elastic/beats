@@ -1,8 +1,6 @@
 package beater
 
 import (
-	"sync"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -57,46 +55,24 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // within the same Module and MetricSet from collection.
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 
-	bt.client = b.Publisher.Connect()
-
-	// Start each module.
-	var cs []<-chan common.MapStr
-
-	for _, mw := range bt.modules {
-		c := mw.Start(bt.done)
-		cs = append(cs, c)
+	for _, m := range bt.modules {
+		r := NewModuleRunner(b.Publisher.Connect, m)
+		r.Start()
+		defer r.Stop()
 	}
-
-	// Consume data from all modules and publish it. When the modules stop they
-	// close their output channels. When all the modules' channels are closed
-	// PublishChannels exit.
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		PublishChannels(bt.client, cs...)
-	}()
 
 	if bt.config.ReloadModules.IsEnabled() {
 		logp.Warn("EXPERIMENTAL feature dynamic configuration reloading is enabled.")
-		configReloader := NewConfigReloader(bt.config.ReloadModules, b.Publisher)
 
+		configReloader := NewConfigReloader(bt.config.ReloadModules, b.Publisher)
 		// Start
-		wg.Add(1)
 		go func() {
-			defer wg.Done()
 			configReloader.Run()
 		}()
-
-		// Stop
-		go func() {
-			<-bt.done
-			configReloader.Stop()
-		}()
+		defer configReloader.Stop()
 	}
 
-	// Wait for PublishChannels to stop publishing.
-	wg.Wait()
+	<-bt.done
 	return nil
 }
 
@@ -106,6 +82,5 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 // Stop should only be called a single time. Calling it more than once may
 // result in undefined behavior.
 func (bt *Metricbeat) Stop() {
-	bt.client.Close()
 	close(bt.done)
 }

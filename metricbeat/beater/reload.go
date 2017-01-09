@@ -142,15 +142,13 @@ func (r *ConfigReloader) Stop() {
 func (r *ConfigReloader) StartModules(list []*ModuleWrapper) {
 
 	logp.Info("Starting %v modules ...", len(list))
-	for _, w := range list {
-		go func(mw *ModuleWrapper) {
-			mr := NewModuleRunner(r.client, mw)
-			mr.Start()
-			r.registry.Add(mw.Hash(), mr)
-			moduleStarts.Add(1)
-			moduleRunning.Add(1)
-			debugr("New Module Started: %v", mw.Hash())
-		}(w)
+	for _, mw := range list {
+		mr := NewModuleRunner(r.client, mw)
+		mr.Start()
+		r.registry.Add(mw.Hash(), mr)
+		moduleStarts.Add(1)
+		moduleRunning.Add(1)
+		debugr("New Module Started: %v", mw.Hash())
 	}
 }
 
