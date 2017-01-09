@@ -14,6 +14,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.4.5]
+
+### Changed
+- merging sub-configs enforces strict variable expansion #85
+
+### Fixed
+- fix merging nil sub-configs #85
+
 ## [0.4.4]
 
 ### Added
@@ -160,7 +168,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.4.4...HEAD
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.4.5...HEAD
+[0.4.5]: https://github.com/elastic/go-ucfg/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/elastic/go-ucfg/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/elastic/go-ucfg/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/elastic/go-ucfg/compare/v0.4.1...v0.4.2
