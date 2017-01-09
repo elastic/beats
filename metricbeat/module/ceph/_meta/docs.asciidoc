@@ -2,3 +2,8 @@
 
 This is the ceph Module.
 
+We used code/reference from:
+https://github.com/influxdata/telegraf/blob/master/plugins/inputs/ceph/ceph.go
+https://github.com/elastic/beats/blob/master/metricbeat/module/docker/
+
+Thanks!

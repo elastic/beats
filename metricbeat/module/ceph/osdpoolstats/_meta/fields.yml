@@ -1,0 +1,9 @@
+- name: osdpoolstats
+  type: group
+  description: >
+    osdpoolstats
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

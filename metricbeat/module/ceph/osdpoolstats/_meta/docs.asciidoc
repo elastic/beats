@@ -1,0 +1,3 @@
+=== ceph osdpoolstats MetricSet
+
+This is the osdpoolstats metricset of the module ceph.

@@ -53,7 +53,6 @@ func formatTagName(oldtag string) (string){
 
 	// Replace '::' fields
 	r := strings.NewReplacer("::",".",":.",".",":",".")
-	logp.Warn("newtag: %s", r.Replace(oldtag))
 
 	return r.Replace(oldtag)
 
