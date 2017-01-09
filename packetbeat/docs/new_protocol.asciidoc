@@ -42,8 +42,8 @@ following commands:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ mkdir -p $GOPATH/src/github.com/elastic
-$ cd $GOPATH/src/github.com/elastic
+$ mkdir -p ${GOPATH%%:*}/src/github.com/elastic
+$ cd ${GOPATH%%:*}/src/github.com/elastic
 $ git clone https://github.com/elastic/beats.git
 ----------------------------------------------------------------------
 

@@ -3,10 +3,11 @@ SNAPSHOT?=yes
 
 BEATS_BUILDER_IMAGE?=tudorg/beats-builder
 BEATS_BUILDER_DEB6_IMAGE?=tudorg/beats-builder-deb6
+BEATS_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 
 makefile_abspath:=$(abspath $(lastword $(MAKEFILE_LIST)))
 packer_absdir=$(shell dirname ${makefile_abspath})
-beat_abspath=${GOPATH}/src/${BEAT_DIR}
+beat_abspath=${BEATS_GOPATH}/src/${BEAT_DIR}
 
 
 %/deb: ${BUILD_DIR}/god-linux-386 ${BUILD_DIR}/god-linux-amd64 fpm-image
