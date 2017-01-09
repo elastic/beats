@@ -114,7 +114,7 @@ For example, the following condition checks if the process name starts with
 
 [source,yaml]
 -----
-reqexp:
+regexp:
   system.process.name: "foo.*"
 -----
 
