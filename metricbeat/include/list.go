@@ -11,6 +11,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/apache"
 	_ "github.com/elastic/beats/metricbeat/module/apache/status"
 	_ "github.com/elastic/beats/metricbeat/module/ceph"
+	_ "github.com/elastic/beats/metricbeat/module/ceph/df"
+	_ "github.com/elastic/beats/metricbeat/module/ceph/osdpoolstats"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/perf"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/status"
 	_ "github.com/elastic/beats/metricbeat/module/couchbase"

@@ -55,9 +55,17 @@ ceph:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-ceph-df,df>>
+
+* <<metricbeat-metricset-ceph-osdpoolstats,osdpoolstats>>
+
 * <<metricbeat-metricset-ceph-perf,perf>>
 
 * <<metricbeat-metricset-ceph-status,status>>
+
+include::ceph/df.asciidoc[]
+
+include::ceph/osdpoolstats.asciidoc[]
 
 include::ceph/perf.asciidoc[]
 
