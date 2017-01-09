@@ -186,11 +186,11 @@ func raiseIndexOutOfBounds(opts *options, value value, idx int) Error {
 	return raisePathErr(reason, value.meta(), message, ctx.path("."))
 }
 
-func raiseInvalidTopLevelType(v interface{}) Error {
-	// most likely developers fault
+func raiseInvalidTopLevelType(v interface{}, meta *Meta) Error {
+	// could be developers or user fault
 	t := chaseTypePointers(chaseValue(reflect.ValueOf(v)).Type())
-	message := fmt.Sprintf("can not use go type '%v' for merging/unpacking configurations", t)
-	return raiseCritical(ErrTypeMismatch, message)
+	message := fmt.Sprintf("type '%v' is not supported on top level of config, only dictionary or list", t)
+	return raiseErr(ErrTypeMismatch, messageMeta(message, meta))
 }
 
 func raiseKeyInvalidTypeUnpack(t reflect.Type, from *Config) Error {

@@ -83,6 +83,7 @@ class Test(BaseTest):
         assert len(objects) > 0
         for obj in objects:
             self.assert_fields_are_documented(obj)
+            # assert "error" not in obj  # no parsing errors
 
         if os.path.exists(test_file + "-expected.json"):
             with open(test_file + "-expected.json", "r") as f:
