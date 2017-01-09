@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-apache>>
 * <<exported-fields-beat>>
+* <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-couchbase>>
@@ -409,6 +410,79 @@ Arbitrary tags that can be set per Beat and per transaction type.
 type: dict
 
 Contains user configurable fields.
+
+
+[[exported-fields-ceph]]
+== ceph Fields
+
+ceph Module
+
+
+
+[float]
+== ceph Fields
+
+
+
+
+[float]
+== df Fields
+
+df
+
+
+
+[float]
+=== ceph.df.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== osdpoolstats Fields
+
+osdpoolstats
+
+
+
+[float]
+=== ceph.osdpoolstats.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== perf Fields
+
+perf
+
+
+
+[float]
+=== ceph.perf.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== status Fields
+
+status
+
+
+
+[float]
+=== ceph.status.example
+
+type: keyword
+
+Example field
 
 
 [[exported-fields-cloud]]

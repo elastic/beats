@@ -1,30 +1,25 @@
 - module: ceph
-  metricsets: ["perf"]
+  metricsets: ["perf","status","df","osdpoolstats"]
   enabled: true
-  period: 1s
+  period: 5s
 
-ceph:  
+  ceph:  
   # location of ceph binary
-  binary_path = "/usr/bin/ceph"
-  #
-  #####
-  ### MetricSet perf gather statistics via the admin socket, requires socket_dir, mon_prefix, osd_prefix and socket_suffix
-  #####
+  binary_path: "/usr/bin/ceph"
+  # MetricSet perf gather statistics via the admin socket, requires socket_dir, mon_prefix, osd_prefix and socket_suffix
   # directory in which to look for socket files
-  socket_dir = "/var/run/ceph"
+  socket_dir: "/var/run/ceph"
   # prefix of MON and OSD socket files, used to determine socket type
-  mon_prefix = "ceph-mon"
-  osd_prefix = "ceph-osd"
+  mon_prefix: "ceph-mon"
+  osd_prefix: "ceph-osd"
   # suffix used to identify socket files
-  socket_suffix = "asok"
+  socket_suffix: "asok"
   #
-  #####
-  ### MetricSets status,df and poolio gather statistics via ceph commands, requires ceph_user and ceph_config
-  #####
+  # MetricSets status,df and poolio gather statistics via ceph commands, requires ceph_user and ceph_config
   # Ceph user to authenticate as, ceph will search for the corresponding keyring
   # e.g. client.admin.keyring in /etc/ceph
   # Consult the ceph documentation for more detail on keyring generation.
-  user = "client.admin"
+  user: "client.admin"
   # Ceph configuration to use to locate the cluster
-  config_path = "/etc/ceph/ceph.conf"
+  config_path: "/etc/ceph/ceph.conf"
 
