@@ -11,7 +11,7 @@ fi
 # beatnames must be passed as parameters. Example: packetbeat filebeat
 for name in $*
 do
-  index="$GOPATH/src/github.com/elastic/beats/${name}/docs/index.asciidoc"
+  index="${GOPATH%%:*}/src/github.com/elastic/beats/${name}/docs/index.asciidoc"
   echo $index
   if [ -f "$index" ]; then
     echo "Building docs for ${name}..."

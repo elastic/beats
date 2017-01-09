@@ -54,7 +54,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Fetches GOPATH and current execution directory. It is expected to run this script from the Makefile.
-    gopath = os.environ['GOPATH']
+    gopath = os.environ['GOPATH'].split(os.pathsep)[0]
     # Normalise go path
     gopath = os.path.abspath(gopath)
     abs_path = os.path.abspath("./")

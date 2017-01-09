@@ -30,7 +30,7 @@ type Registrar struct {
 var (
 	statesUpdate   = expvar.NewInt("registrar.states.update")
 	statesCleanup  = expvar.NewInt("registrar.states.cleanup")
-	statesCurrent  = expvar.NewInt("registar.states.current")
+	statesCurrent  = expvar.NewInt("registrar.states.current")
 	registryWrites = expvar.NewInt("registrar.writes")
 )
 

@@ -1,5 +1,6 @@
 BEATNAME={{cookiecutter.beat}}
 BEAT_DIR={{cookiecutter.beat_path}}/{{cookiecutter.beat}}
+BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
 ES_BEATS?=./vendor/github.com/elastic/beats
@@ -18,7 +19,7 @@ setup: copy-vendor
 .PHONY: copy-vendor
 copy-vendor:
 	mkdir -p vendor/github.com/elastic/
-	cp -R ${GOPATH}/src/github.com/elastic/beats vendor/github.com/elastic/
+	cp -R ${BEAT_GOPATH}/src/github.com/elastic/beats vendor/github.com/elastic/
 	rm -rf vendor/github.com/elastic/beats/.git
 
 .PHONY: git-init

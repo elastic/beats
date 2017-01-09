@@ -4,8 +4,10 @@ BEATNAME?=libbeat ## @packaging Name of the application
 BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash ## @packaging Description of the application
 BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
 BEAT_LICENSE?=ASL 2.0 ## @packaging Software license of the application
+BEAT_URL?=https://${BEAT_DIR} ## @packaging Link to the homepage of the application
 BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEATNAME}/current/index.html ## @packaging Link to the user documentation of the application
 BEAT_DIR?=github.com/elastic/beats/${BEATNAME}
+BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats
 GOPACKAGES?=${BEAT_DIR}/...## @community_beat Must be set to $(shell glide novendor)
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make package"
@@ -38,10 +40,11 @@ ES_HOST?="elasticsearch"
 PWD=$(shell pwd)
 BUILD_DIR?=$(shell pwd)/build
 COVERAGE_DIR=${BUILD_DIR}/coverage
-COVERAGE_TOOL=${GOPATH}/bin/gotestcover
+COVERAGE_TOOL=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 PROCESSES?= 4
 TIMEOUT?= 90
+NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer ## @testing the options to pass when calling nosetests
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
@@ -149,7 +152,7 @@ integration-tests-environment: prepare-tests build-image
 .PHONY: system-tests
 system-tests: ## @testing Runs the system tests
 system-tests: ${BEATNAME}.test prepare-tests python-env ${ES_BEATS}/libbeat/dashboards/import_dashboards
-	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
+	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} nosetests -w tests/system ${NOSETESTS_OPTIONS}
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs the system tests
@@ -272,7 +275,7 @@ docs:  ## @build Builds the documents for the beat
 .PHONY: docs-preview
 docs-preview:  ## @build Preview the documents for the beat in the browser
 	if [ ! -d "build/docs" ]; then $(MAKE) docs; fi;
-	${BUILD_DIR}/docs/build_docs.pl --chunk=1 -open chunk=1 -open --doc ${GOPATH}/src/github.com/elastic/beats/${BEATNAME}/docs/index.asciidoc -out ${BUILD_DIR}/html_docs
+	${BUILD_DIR}/docs/build_docs.pl --chunk=1 -open chunk=1 -open --doc ${BEAT_GOPATH}/src/github.com/elastic/beats/${BEATNAME}/docs/index.asciidoc -out ${BUILD_DIR}/html_docs
 
 
 ### KIBANA FILES HANDLING ###
@@ -395,7 +398,7 @@ package: package-setup
 
 	# Generates the package.yml file with all information needed to create packages
 	echo "beat_name: ${BEATNAME}" > ${BUILD_DIR}/package.yml
-	echo "beat_url: https://${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
+	echo "beat_url: ${BEAT_URL}" >> ${BUILD_DIR}/package.yml
 	echo "beat_repo: ${BEAT_DIR}" >> ${BUILD_DIR}/package.yml
 	echo "beat_description: ${BEAT_DESCRIPTION}" >> ${BUILD_DIR}/package.yml
 	echo "beat_vendor: ${BEAT_VENDOR}" >> ${BUILD_DIR}/package.yml
