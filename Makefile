@@ -113,3 +113,9 @@ upload-package:
 .PHONY: release-upload
 upload-release:
 	aws s3 cp --recursive --acl public-read build/upload s3://download.elasticsearch.org/beats/
+
+.PHONY: notice
+notice: 
+	python dev-tools/generate_notice.py .
+
+
