@@ -21,4 +21,5 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 * <<configuration-logging>>
 * <<configuration-processors>>
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/reference/configuration/metricbeat-options.asciidoc ?>]
 include::configuration/metricbeat-options.asciidoc[]
