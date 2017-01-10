@@ -1,6 +1,8 @@
 package beater
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -55,10 +57,11 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // within the same Module and MetricSet from collection.
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 
+	var runners []ModuleRunner
 	for _, m := range bt.modules {
 		r := NewModuleRunner(b.Publisher.Connect, m)
 		r.Start()
-		defer r.Stop()
+		runners = append(runners, r)
 	}
 
 	if bt.config.ReloadModules.IsEnabled() {
@@ -73,6 +76,17 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	<-bt.done
+
+	wg := sync.WaitGroup{}
+	// Stop runners in parallel
+	for _, r := range runners {
+		wg.Add(1)
+		func() {
+			defer wg.Done()
+			r.Stop()
+		}()
+	}
+	wg.Wait()
 	return nil
 }
 
