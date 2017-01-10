@@ -49,7 +49,7 @@ def main():
 
     print args
 
-    tmp_branch = "backport_{}".format(args.pr_number)
+    tmp_branch = "backport_{}_{}".format(args.pr_number, args.to_branch)
 
     if not vars(args)["continue"]:
         if not args.yes and raw_input("This will destroy all local changes. " +
