@@ -74,6 +74,11 @@ func HandleFlags() error {
 	}
 
 	defaults.SetString("path.home", -1, home)
+
+	if len(overwrites.GetFields()) > 0 {
+		overwrites.PrintDebugf("CLI setting overwrites (-E flag):")
+	}
+
 	return nil
 }
 
@@ -120,11 +125,17 @@ func Load(path string) (*common.Config, error) {
 		return nil, err
 	}
 
-	return common.MergeConfigs(
+	config, err = common.MergeConfigs(
 		defaults,
 		config,
 		overwrites,
 	)
+	if err != nil {
+		return nil, err
+	}
+
+	config.PrintDebugf("Complete configuration loaded:")
+	return config, nil
 }
 
 // GetPathConfig returns ${path.config}. If ${path.config} is not set, ${path.home} is returned.
