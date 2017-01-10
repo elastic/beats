@@ -48,6 +48,8 @@ NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer ## @testing the opt
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
+GOX_OSARCH?=!darwin/arm ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
+GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "make crosscompile".
 TESTING_ENVIRONMENT?=snapshot ## @testing The name of the environment under test
 DOCKER_COMPOSE_PROJECT_NAME?=${BEATNAME}_${TESTING_ENVIRONMENT} ## @testing The name of the docker-compose project used by the integration and system tests
 DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
@@ -92,7 +94,7 @@ crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS var
 crosscompile: $(GOFILES)
 	go get github.com/mitchellh/gox
 	mkdir -p ${BUILD_DIR}/bin
-	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="${GOX_OS}" ${GOX_FLAGS}
+	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
 
 
 .PHONY: check
