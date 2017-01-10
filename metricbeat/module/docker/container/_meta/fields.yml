@@ -54,7 +54,7 @@
           description: >
             Healthcheck start date
         - name: event_output
-          type: long
+          type: keyword
           description: >
             Healthcheck output
         - name: event_exit_code
