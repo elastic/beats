@@ -403,7 +403,7 @@ type: keyword
 
 required: True
 
-The file from which the line was read. This field contains the full path to the file. For example: `/var/log/system.log`.
+The file from which the line was read. This field contains the absolute path to the file. For example: `/var/log/system.log`.
 
 
 [float]
