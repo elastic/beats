@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Added support to `github.com/gosigar/sys/windows` for querying and enabling
   privileges in a process token.
 - Added utility code for interfacing with linux NETLINK_INET_DIAG. #60
+- Added `ProcEnv` for getting a process's environment variables. #61
 
 ### Changed
 - Changed several `OpenProcess` calls on Windows to request the lowest possible

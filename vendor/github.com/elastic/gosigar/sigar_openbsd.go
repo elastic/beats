@@ -357,6 +357,10 @@ func (self *ProcArgs) Get(pid int) error {
 	return nil
 }
 
+func (self *ProcEnv) Get(pid int) error {
+	return ErrNotImplemented{runtime.GOOS}
+}
+
 func (self *ProcState) Get(pid int) error {
 	return nil
 }
