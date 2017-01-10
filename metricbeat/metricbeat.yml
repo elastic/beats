@@ -10,14 +10,21 @@
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
+#------------------------------- Docker Module -------------------------------
+- module: docker
+  metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
+  hosts: ["unix:///var/run/docker.sock"]
+  enabled: true
+  period: 10s
+
 #------------------------------- System Module -------------------------------
-- module: system
-  metricsets:
+#- module: system
+  #metricsets:
     # CPU stats
-    - cpu
+    #- cpu
 
     # System Load stats
-    - load
+    #- load
 
     # Per CPU core stats
     #- core
@@ -26,25 +33,25 @@ metricbeat.modules:
     #- diskio
 
     # Per filesystem stats
-    - filesystem
+    #- filesystem
 
     # File system summary stats
-    - fsstat
+    #- fsstat
 
     # Memory stats
-    - memory
+    #- memory
 
     # Network stats
-    - network
+    #- network
 
     # Per process stats
-    - process
+    #- process
 
     # Sockets (linux only)
     #- socket
-  enabled: true
-  period: 10s
-  processes: ['.*']
+  #enabled: true
+  #period: 10s
+  #processes: ['.*']
 
 
 
