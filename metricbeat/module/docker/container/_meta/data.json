@@ -31,5 +31,13 @@
         "name": "container",
         "rtt": 115
     },
+    "health": {
+          "event_end_date": "2017-01-09T20:38:13.080472813+01:00",
+          "event_exit_code": 0,
+          "event_output": "0.005",
+          "event_start_date": "2017-01-09T20:38:12.999970865+01:00",
+          "failingstreak": 0,
+          "status": "healthy"
+    },
     "type": "metricsets"
 }

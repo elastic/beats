@@ -40,3 +40,23 @@
           type: long
           description: >
              Size of the files that have been created or changed since creation.
+    - name: health
+      type: group
+      description: >
+        Container health metrics.
+    - name: event_end_date
+      type: date
+      description: >
+        Healthcheck end date
+    - name: event_start_date
+      type: date
+      description: >
+        Healthcheck start date
+    - name: event_output
+      type: long
+      description: >
+        Healthcheck output
+    - name: event_exit_code
+      type: integer
+      description: >
+        Healthcheck status code
