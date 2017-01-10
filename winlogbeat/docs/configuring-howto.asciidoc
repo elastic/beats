@@ -21,5 +21,6 @@ The following topics describe how to configure Winlogbeat:
 
 --
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/winlogbeat/docs/reference/configuration.asciidoc ?>]
 include::reference/configuration.asciidoc[]
 
