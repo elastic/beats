@@ -50,6 +50,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-docker-network,network>>
 
+* <<metricbeat-metricset-docker-node,node>>
+
 include::docker/container.asciidoc[]
 
 include::docker/cpu.asciidoc[]
@@ -61,4 +63,6 @@ include::docker/info.asciidoc[]
 include::docker/memory.asciidoc[]
 
 include::docker/network.asciidoc[]
+
+include::docker/node.asciidoc[]
 

@@ -44,20 +44,19 @@
       type: group
       description: >
         Container health metrics.
-      fields:
-        - name: event_end_date
-          type: date
-          description: >
-            Healthcheck end date
-        - name: event_start_date
-          type: date
-          description: >
-            Healthcheck start date
-        - name: event_output
-          type: long
-          description: >
-            Healthcheck output
-        - name: event_exit_code
-          type: integer
-          description: >
-            Healthcheck status code
+    - name: event_end_date
+      type: date
+      description: >
+        Healthcheck end date
+    - name: event_start_date
+      type: date
+      description: >
+        Healthcheck start date
+    - name: event_output
+      type: long
+      description: >
+        Healthcheck output
+    - name: event_exit_code
+      type: integer
+      description: >
+        Healthcheck status code

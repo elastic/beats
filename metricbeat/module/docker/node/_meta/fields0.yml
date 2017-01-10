@@ -1,0 +1,103 @@
+- name: node
+  type: group
+  description: >
+    Docker node metrics.
+  fields:
+    - name: createdat
+      type: date
+      description: >
+        date where the node has been added to the cluster
+    - name: updatedad
+      type: date
+      description: >
+        last gossip message
+    - name: id
+      type: keyword
+      description: >
+        Unique node id.
+    - name: hostname
+      type: keyword
+      description: >
+        hostname of the node
+    #- name: spec
+    #  type: group
+    #  description: >
+    #    Configured status
+      #fields:
+      #  - name: role
+      #  type: keyword
+      #  description: >
+      #    wanted role.
+      #  - name: avaiability
+      #    type: keyword
+      #    description: >
+      #      wanted status.
+      - name: platform
+        type: group
+        description: >
+          Node information hardware and system
+        fields:
+        - name: architecture
+          type: keyword
+          description: >
+             Cpu architecture of the node.
+        - name: os
+          type: keyword
+          description: >
+             OS node.
+      - name: ressources
+        type: group
+        description: >
+          available ressources on the node
+      fields:
+        - name: nanocpus
+          type: long
+          description: >
+            available CPU ressources
+        - name: memorybytes
+          type: long
+          description: >
+            available Memory ressources
+      - name: engine
+        type: group
+        description: >
+          docker engine information
+      fields:
+        - name: engine_version
+          type: keyword
+          description: >
+            Docker engine version number
+        - name: plugin
+          type: keyword
+          description: >
+            Docker plugin installed on the node
+      - name: status
+        type: group
+        description: >
+          docker swarm node status
+      fields:
+        - name: state
+          type: keyword
+          description: >
+            Docker engine state
+        - name: addr
+          type: keyword
+          description: >
+            docker
+      - name: managerstatus
+        type: group
+        description: >
+          docker swarm manager status
+      fields:
+        - name: leader
+          type: boolean
+          description: >
+            Docker engine manager state
+        - name: reachability
+          type: keyword
+          description: >
+            docker
+        - name: addr
+          type: keyword
+          description: >
+            docker manager listenning addr

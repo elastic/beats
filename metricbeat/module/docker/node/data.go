@@ -8,7 +8,6 @@ import (
 
 	"strings"
 	dc "github.com/fsouza/go-dockerclient"
-	"fmt"
 )
 
 func eventsMapping(containersList []dc.APIContainers, m *MetricSet) []common.MapStr {
@@ -34,7 +33,6 @@ func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
 	}
 
 	if strings.Contains(cont.Status, "(") && strings.Contains(cont.Status, ")") {
-		fmt.Println("HealthCheck !!\n")
 		container, _ := m.dockerClient.InspectContainer(cont.ID)
 		last_event :=  len(container.State.Health.Log)-1
 
@@ -47,8 +45,6 @@ func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
 			"event_output": container.State.Health.Log[last_event].Output,
 		}
 		event["health"] = health
-	} else {
-		fmt.Println("No health check lets continue\n")
 	}
 
 	labels := docker.DeDotLabels(cont.Labels)
