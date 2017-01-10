@@ -136,8 +136,8 @@
           type: long
           description: >
             Number of requests that encountered an error trying to
-            connect to a backend server. The backend stat is the sum of the stat
-            for all servers of that backend, plus any connection errors not
+            connect to a server. For backends, this field reports the sum of
+            the stat for all backend servers, plus any connection errors not
             associated with a particular server (such as the backend having no
             active servers).
 
@@ -346,12 +346,13 @@
         - name: active
           type: integer
           description: >
-            Number of active servers (backend), server is active (server).
+            Number of backend servers that are active, meaning that they are
+            healthy and can receive requests from the load balancer. 
 
         - name: backup
           type: integer
           description: >
-            Number of backup servers (backend), server is backup (server).
+            Number of backend servers that are backup servers.
 
 
     - name: compressor

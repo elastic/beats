@@ -1534,7 +1534,7 @@ Number of times a request was redispatched to another server. For servers, this 
 
 type: long
 
-Number of requests that encountered an error trying to connect to a backend server. The backend stat is the sum of the stat for all servers of that backend, plus any connection errors not associated with a particular server (such as the backend having no active servers).
+Number of requests that encountered an error trying to connect to a server. For backends, this field reports the sum of the stat for all backend servers, plus any connection errors not associated with a particular server (such as the backend having no active servers).
 
 
 [float]
@@ -1816,7 +1816,7 @@ Number of data transfers aborted by the server. This value is included in haprox
 
 type: integer
 
-Number of active servers (backend), server is active (server).
+Number of backend servers that are active, meaning that they are healthy and can receive requests from the load balancer. 
 
 
 [float]
@@ -1824,7 +1824,7 @@ Number of active servers (backend), server is active (server).
 
 type: integer
 
-Number of backup servers (backend), server is backup (server).
+Number of backend servers that are backup servers.
 
 
 [float]
