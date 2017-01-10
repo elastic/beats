@@ -3,8 +3,10 @@ package swarm
 import (
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
+	"github.com/fsouza/go-dockerclient/external/github.com/docker/api/types/container"
+	"github.com/fsouza/go-dockerclient/external/github.com/docker/api/types/mount"
+	//"github.com/docker/docker/api/types/container"
+	//"github.com/docker/docker/api/types/mount"
 )
 
 // DNSConfig specifies DNS related configurations in resolver configuration file (resolv.conf)
