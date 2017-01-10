@@ -57,35 +57,31 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // within the same Module and MetricSet from collection.
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 
-	var runners []ModuleRunner
+	var wg sync.WaitGroup
+
 	for _, m := range bt.modules {
 		r := NewModuleRunner(b.Publisher.Connect, m)
 		r.Start()
-		runners = append(runners, r)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			<-bt.done
+			r.Stop()
+		}()
 	}
 
 	if bt.config.ReloadModules.IsEnabled() {
 		logp.Warn("EXPERIMENTAL feature dynamic configuration reloading is enabled.")
-
 		configReloader := NewConfigReloader(bt.config.ReloadModules, b.Publisher)
-		// Start
-		go func() {
-			configReloader.Run()
-		}()
-		defer configReloader.Stop()
-	}
-
-	<-bt.done
-
-	wg := sync.WaitGroup{}
-	// Stop runners in parallel
-	for _, r := range runners {
+		go configReloader.Run()
 		wg.Add(1)
-		func() {
+		go func() {
 			defer wg.Done()
-			r.Stop()
+			<-bt.done
+			configReloader.Stop()
 		}()
 	}
+
 	wg.Wait()
 	return nil
 }
