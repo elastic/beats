@@ -3,8 +3,10 @@ package container
 import (
 	"time"
 
-	"github.com/docker/docker/api/types/strslice"
-	"github.com/docker/go-connections/nat"
+	//"github.com/docker/docker/api/types/strslice"
+	"github.com/fsouza/go-dockerclient/external/github.com/docker/api/types/strslice"
+	"github.com/fsouza/go-dockerclient/external/github.com/docker/go-connections/nat"
+	//"github.com/docker/go-connections/nat"
 )
 
 // HealthConfig holds configuration settings for the HEALTHCHECK feature.

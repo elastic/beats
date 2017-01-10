@@ -3,11 +3,16 @@ package container
 import (
 	"strings"
 
-	"github.com/docker/docker/api/types/blkiodev"
-	"github.com/docker/docker/api/types/mount"
-	"github.com/docker/docker/api/types/strslice"
-	"github.com/docker/go-connections/nat"
-	"github.com/docker/go-units"
+	"github.com/fsouza/go-dockerclient/external/github.com/docker/api/types/blkiodev"
+	"github.com/fsouza/go-dockerclient/external/github.com/docker/api/types/strslice"
+	"github.com/fsouza/go-dockerclient/external/github.com/docker/api/types/mount"
+	"github.com/fsouza/go-dockerclient/external/github.com/docker/go-units"
+	"github.com/fsouza/go-dockerclient/external/github.com/docker/go-connections/nat"
+	//"github.com/docker/docker/api/types/blkiodev"
+	//"github.com/docker/docker/api/types/mount"
+	//"github.com/docker/docker/api/types/strslice"
+	//"github.com/docker/go-connections/nat"
+	//"github.com/docker/go-units"
 )
 
 // NetworkMode represents the container network stack.
