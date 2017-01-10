@@ -1,6 +1,6 @@
 = Metricbeat Reference
 
-include::./version.asciidoc[]
+include::../../libbeat/docs/version.asciidoc[]
 
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
@@ -13,41 +13,60 @@ include::./version.asciidoc[]
 
 include::./overview.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/gettingstarted.asciidoc ?>]
 include::./gettingstarted.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/command-line.asciidoc ?>]
 include::./command-line.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-directory-layout.asciidoc ?>]
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/upgrading.asciidoc ?>]
 include::./upgrading.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/how-metricbeat-works.asciidoc ?>]
 include::./how-metricbeat-works.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/metricbeat-in-a-container.asciidoc ?>]
 include::./metricbeat-in-a-container.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/configuring-howto.asciidoc ?>]
 include::./configuring-howto.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/metricbeat-filtering.asciidoc ?>]
 include::./metricbeat-filtering.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-config-ingest.asciidoc ?>]
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-logstash-config.asciidoc ?>]
 include::./configuring-logstash.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-env-vars.asciidoc ?>]
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
 :allplatforms:
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/yaml.asciidoc ?>]
 include::../../libbeat/docs/yaml.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/regexp.asciidoc ?>]
 include::../../libbeat/docs/regexp.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/modules.asciidoc ?>]
 include::./modules.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/fields.asciidoc ?>]
 include::./fields.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/securing-metricbeat.asciidoc ?>]
 include::./securing-metricbeat.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/troubleshooting.asciidoc ?>]
 include::./troubleshooting.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/faq.asciidoc ?>]
 include::./faq.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/developer-guide/index.asciidoc ?>]
 include::./developer-guide/index.asciidoc[]

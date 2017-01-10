@@ -13,6 +13,7 @@ import (
 
 	"github.com/Shopify/sarama"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode/modetest"
@@ -62,6 +63,20 @@ func TestKafkaPublish(t *testing.T) {
 				"@timestamp": common.Time(time.Now()),
 				"host":       "test-host",
 				"type":       logType,
+				"message":    id,
+			}),
+		},
+		{
+			"publish single event with formating to test topic",
+			map[string]interface{}{
+				"writer.type":   "FormatStringWriter",
+				"writer.format": "%{[message]}",
+			},
+			testTopic,
+			single(common.MapStr{
+				"@timestamp": common.Time(time.Now()),
+				"host":       "test-host",
+				"type":       "log",
 				"message":    id,
 			}),
 		},
@@ -200,16 +215,24 @@ func TestKafkaPublish(t *testing.T) {
 			}
 
 			for i, d := range expected {
-				var decoded map[string]interface{}
-				err := json.Unmarshal(stored[i].Value, &decoded)
-				if err != nil {
-					t.Errorf("can not json decode event value: %v", stored[i].Value)
-					return
-				}
-				event := d.Event
+				if test.config["writer.type"] == "FormatStringWriter" {
+					fmtString := fmtstr.MustCompileEvent(test.config["writer.format"].(string))
+					expectedMessage, _ := fmtString.Run(d.Event)
+					assert.Equal(t, string(expectedMessage), string(stored[i].Value))
+				} else {
 
-				assert.Equal(t, decoded["type"], event["type"])
-				assert.Equal(t, decoded["message"], event["message"])
+					var decoded map[string]interface{}
+					err := json.Unmarshal(stored[i].Value, &decoded)
+					if err != nil {
+						t.Errorf("can not json decode event value: %v", stored[i].Value)
+						return
+					}
+					event := d.Event
+
+					assert.Equal(t, decoded["type"], event["type"])
+					assert.Equal(t, decoded["message"], event["message"])
+
+				}
 			}
 		}()
 	}

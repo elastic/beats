@@ -12,6 +12,7 @@ import (
 
 	"github.com/Shopify/sarama"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,7 +25,7 @@ const (
 func TestData(t *testing.T) {
 	generateKafkaData(t, "metricbeat-generate-data")
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
+	f := mbtest.NewEventsFetcher(t, getConfig(""))
 	err := mbtest.WriteEvents(f, t)
 	if err != nil {
 		t.Fatal("write", err)
@@ -32,17 +33,25 @@ func TestData(t *testing.T) {
 }
 
 func TestTopic(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"kafka"})
+	}
+
 	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
 	testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
 	// Create initial topic
 	generateKafkaData(t, testTopic)
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
+	f := mbtest.NewEventsFetcher(t, getConfig(testTopic))
 	dataBefore, err := f.Fetch()
 	if err != nil {
 		t.Fatal("write", err)
 	}
+	if len(dataBefore) == 0 {
+		t.Errorf("No offsets fetched from topic (before): %v", testTopic)
+	}
+	t.Logf("before: %v", dataBefore)
 
 	var n int64 = 10
 	var i int64 = 0
@@ -55,6 +64,10 @@ func TestTopic(t *testing.T) {
 	if err != nil {
 		t.Fatal("write", err)
 	}
+	if len(dataAfter) == 0 {
+		t.Errorf("No offsets fetched from topic (after): %v", testTopic)
+	}
+	t.Logf("after: %v", dataAfter)
 
 	// Checks that no new topics / partitions were added
 	assert.True(t, len(dataBefore) == len(dataAfter))
@@ -84,7 +97,10 @@ func TestTopic(t *testing.T) {
 }
 
 func generateKafkaData(t *testing.T, topic string) {
+	t.Logf("Send Kafka Event to topic: %v", topic)
+
 	config := sarama.NewConfig()
+	config.Producer.Return.Successes = true
 	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
 	if err != nil {
 		t.Errorf("%s", err)
@@ -109,11 +125,17 @@ func generateKafkaData(t *testing.T, topic string) {
 	client.RefreshMetadata(topic)
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(topic string) map[string]interface{} {
+	var topics []string
+	if topic != "" {
+		topics = []string{topic}
+	}
+
 	return map[string]interface{}{
 		"module":     "kafka",
 		"metricsets": []string{"partition"},
 		"hosts":      []string{getTestKafkaHost()},
+		"topics":     topics,
 	}
 }
 

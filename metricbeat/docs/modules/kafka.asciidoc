@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-kafka]]
 == kafka Module
 
+experimental[]
+
 This is the kafka Module.
 
 
@@ -51,7 +53,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-kafka-consumergroup,consumergroup>>
+
 * <<metricbeat-metricset-kafka-partition,partition>>
+
+include::kafka/consumergroup.asciidoc[]
 
 include::kafka/partition.asciidoc[]
 

@@ -1,6 +1,6 @@
 = Filebeat Reference
 
-include::./version.asciidoc[]
+include::../../libbeat/docs/version.asciidoc[]
 
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
 :packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
@@ -16,41 +16,60 @@ include::./version.asciidoc[]
 
 include::./overview.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/getting-started.asciidoc ?>]
 include::./getting-started.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/command-line.asciidoc ?>]
 include::./command-line.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-directory-layout.asciidoc ?>]
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/upgrading.asciidoc ?>]
 include::./upgrading.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/how-filebeat-works.asciidoc ?>]
 include::./how-filebeat-works.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/configuring-howto.asciidoc ?>]
 include::./configuring-howto.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/filebeat-filtering.asciidoc ?>]
 include::./filebeat-filtering.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/multiline.asciidoc ?>]
 include::./multiline.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-config-ingest.asciidoc ?>]
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-env-vars.asciidoc ?>]
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/multiple-prospectors.asciidoc ?>]
 include::./multiple-prospectors.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/load-balancing.asciidoc ?>]
 include::./load-balancing.asciidoc[]
 
 :allplatforms:
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/yaml.asciidoc ?>]
 include::../../libbeat/docs/yaml.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/regexp.asciidoc ?>]
 include::../../libbeat/docs/regexp.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/fields.asciidoc ?>]
 include::./fields.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/securing-filebeat.asciidoc ?>]
 include::./securing-filebeat.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/troubleshooting.asciidoc ?>]
 include::./troubleshooting.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/faq.asciidoc ?>]
 include::./faq.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/migration.asciidoc ?>]
 include::./migration.asciidoc[]

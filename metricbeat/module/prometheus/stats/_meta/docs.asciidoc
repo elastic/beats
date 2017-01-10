@@ -1,0 +1,3 @@
+=== prometheus stats MetricSet
+
+This is the stats metricset of the module prometheus.

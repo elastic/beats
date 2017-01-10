@@ -14,7 +14,7 @@ CGO=true
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO.
 GOX_OS=solaris netbsd linux windows
-GOX_FLAGS='-arch=amd64 386 arm ppc64 ppc64le'
+GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
@@ -44,24 +44,27 @@ collect-docs: python-env
 # Collects all module configs
 .PHONY: configs
 configs: python-env
-	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEATNAME} $(PWD) > _meta/beat.yml
-	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEATNAME} --full $(PWD) > _meta/beat.full.yml
+	cat ${ES_BEATS}/metricbeat/_meta/common.yml > _meta/beat.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEATNAME} $(PWD) >> _meta/beat.yml
+	cat ${ES_BEATS}/metricbeat/_meta/common.full.yml > _meta/beat.full.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEATNAME} --full $(PWD) >> _meta/beat.full.yml
 
 # Generates imports for all modules and metricsets
 .PHONY: imports
 imports:
 	mkdir -p include
-	python ${ES_BEATS}/metricbeat/scripts/generate_imports.py ${BEAT_DIR} ${BEATNAME} > include/list.go
+	python ${ES_BEATS}/metricbeat/scripts/generate_imports.py ${BEAT_DIR} > include/list.go
 
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
+ifeq ($(BEATNAME), metricbeat)
 	# disable the system/load metricset on windows
 	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.yml
 	rm $(PREFIX)/metricbeat-win.yml.bk
 	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.full.yml
 	rm $(PREFIX)/metricbeat-win.full.yml.bk
-
+endif
 # Runs all collection steps and updates afterwards
 .PHONY: collect
 collect: fields collect-docs configs kibana imports

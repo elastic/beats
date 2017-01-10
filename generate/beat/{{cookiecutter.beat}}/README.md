@@ -99,8 +99,8 @@ make clean
 To clone {{cookiecutter.beat|capitalize}} from the git repository, run the following commands:
 
 ```
-mkdir -p ${GOPATH}/{{cookiecutter.beat_path}}
-cd ${GOPATH}/{{cookiecutter.beat_path}}
+mkdir -p ${GOPATH%%:*}/{{cookiecutter.beat_path}}
+cd ${GOPATH%%:*}/{{cookiecutter.beat_path}}
 git clone https://{{cookiecutter.beat_path}}/{{cookiecutter.beat}}
 ```
 

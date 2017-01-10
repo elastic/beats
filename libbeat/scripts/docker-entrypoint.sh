@@ -81,7 +81,7 @@ waitFor() {
     done
 
     echo
-    echo >&2 '${3} is not available'
+    echo >&2 "${3} is not available"
     echo >&2 "Address: ${1}:${2}"
 }
 

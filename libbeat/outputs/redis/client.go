@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"encoding/json"
 	"errors"
 	"regexp"
 	"strconv"
@@ -32,6 +31,7 @@ type client struct {
 	key      outil.Selector
 	password string
 	publish  publishFn
+	writer   outputs.Writer
 }
 
 type redisDataType uint16
@@ -41,13 +41,14 @@ const (
 	redisChannelType
 )
 
-func newClient(tc *transport.Client, pass string, db int, key outil.Selector, dt redisDataType) *client {
+func newClient(tc *transport.Client, pass string, db int, key outil.Selector, dt redisDataType, writer outputs.Writer) *client {
 	return &client{
 		Client:   tc,
 		password: pass,
 		db:       db,
 		dataType: dt,
 		key:      key,
+		writer:   writer,
 	}
 }
 
@@ -66,7 +67,7 @@ func (c *client) Connect(to time.Duration) error {
 	}()
 
 	if err = initRedisConn(conn, c.password, c.db); err == nil {
-		c.publish, err = makePublish(conn, c.key, c.dataType)
+		c.publish, err = makePublish(conn, c.key, c.dataType, c.writer)
 	}
 	return err
 }
@@ -109,17 +110,18 @@ func makePublish(
 	conn redis.Conn,
 	key outil.Selector,
 	dt redisDataType,
+	writer outputs.Writer,
 ) (publishFn, error) {
 	if dt == redisChannelType {
-		return makePublishPUBLISH(conn)
+		return makePublishPUBLISH(conn, writer)
 	}
-	return makePublishRPUSH(conn, key)
+	return makePublishRPUSH(conn, key, writer)
 }
 
-func makePublishRPUSH(conn redis.Conn, key outil.Selector) (publishFn, error) {
+func makePublishRPUSH(conn redis.Conn, key outil.Selector, writer outputs.Writer) (publishFn, error) {
 	if !key.IsConst() {
 		// TODO: more clever bulk handling batching events with same key
-		return publishEventsPipeline(conn, "RPUSH"), nil
+		return publishEventsPipeline(conn, "RPUSH", writer), nil
 	}
 
 	var major, minor int
@@ -158,23 +160,23 @@ func makePublishRPUSH(conn redis.Conn, key outil.Selector) (publishFn, error) {
 	// See: http://redis.io/commands/rpush
 	multiValue := major > 2 || (major == 2 && minor >= 4)
 	if multiValue {
-		return publishEventsBulk(conn, key, "RPUSH"), nil
+		return publishEventsBulk(conn, key, "RPUSH", writer), nil
 	}
-	return publishEventsPipeline(conn, "RPUSH"), nil
+	return publishEventsPipeline(conn, "RPUSH", writer), nil
 }
 
-func makePublishPUBLISH(conn redis.Conn) (publishFn, error) {
-	return publishEventsPipeline(conn, "PUBLISH"), nil
+func makePublishPUBLISH(conn redis.Conn, writer outputs.Writer) (publishFn, error) {
+	return publishEventsPipeline(conn, "PUBLISH", writer), nil
 }
 
-func publishEventsBulk(conn redis.Conn, key outil.Selector, command string) publishFn {
+func publishEventsBulk(conn redis.Conn, key outil.Selector, command string, writer outputs.Writer) publishFn {
 	// XXX: requires key.IsConst() == true
 	dest, _ := key.Select(common.MapStr{})
 	return func(_ outil.Selector, data []outputs.Data) ([]outputs.Data, error) {
 		args := make([]interface{}, 1, len(data)+1)
 		args[0] = dest
 
-		data, args = serializeEvents(args, 1, data)
+		data, args = serializeEvents(args, 1, data, writer)
 		if (len(args) - 1) == 0 {
 			return nil, nil
 		}
@@ -190,11 +192,11 @@ func publishEventsBulk(conn redis.Conn, key outil.Selector, command string) publ
 	}
 }
 
-func publishEventsPipeline(conn redis.Conn, command string) publishFn {
+func publishEventsPipeline(conn redis.Conn, command string, writer outputs.Writer) publishFn {
 	return func(key outil.Selector, data []outputs.Data) ([]outputs.Data, error) {
 		var okEvents []outputs.Data
 		serialized := make([]interface{}, 0, len(data))
-		okEvents, serialized = serializeEvents(serialized, 0, data)
+		okEvents, serialized = serializeEvents(serialized, 0, data, writer)
 		if len(serialized) == 0 {
 			return nil, nil
 		}
@@ -245,15 +247,17 @@ func serializeEvents(
 	to []interface{},
 	i int,
 	data []outputs.Data,
+	writer outputs.Writer,
 ) ([]outputs.Data, []interface{}) {
+
 	succeeded := data
 	for _, d := range data {
-		jsonEvent, err := json.Marshal(d.Event)
+		serializedEvent, err := writer.Write(d.Event)
 		if err != nil {
-			logp.Err("Failed to convert the event to JSON (%v): %#v", err, d.Event)
 			goto failLoop
 		}
-		to = append(to, jsonEvent)
+
+		to = append(to, serializedEvent)
 		i++
 	}
 	return succeeded, to
@@ -262,13 +266,12 @@ failLoop:
 	succeeded = data[:i]
 	rest := data[i+1:]
 	for _, d := range rest {
-		jsonEvent, err := json.Marshal(d.Event)
+		serializedEvent, err := writer.Write(d.Event)
 		if err != nil {
-			logp.Err("Failed to convert the event to JSON (%v): %#v", err, d.Event)
 			i++
 			continue
 		}
-		to = append(to, jsonEvent)
+		to = append(to, serializedEvent)
 		i++
 	}
 

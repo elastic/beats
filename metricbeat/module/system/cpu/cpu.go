@@ -52,7 +52,10 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 	m.cpu.AddCpuPercentage(stat)
 
+	cpuCores := GetCores()
+
 	cpuStat := common.MapStr{
+		"cores": cpuCores,
 		"user": common.MapStr{
 			"pct": stat.UserPercent,
 		},

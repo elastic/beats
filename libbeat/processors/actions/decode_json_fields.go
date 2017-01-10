@@ -14,15 +14,19 @@ import (
 )
 
 type decodeJSONFields struct {
-	fields       []string
-	maxDepth     int
-	processArray bool
+	fields        []string
+	maxDepth      int
+	overwriteKeys bool
+	processArray  bool
+	target        *string
 }
 
 type config struct {
-	Fields       []string `config:"fields"`
-	MaxDepth     int      `config:"maxDepth" validate:"min=1"`
-	ProcessArray bool     `config:"processArray"`
+	Fields        []string `config:"fields"`
+	MaxDepth      int      `config:"max_depth" validate:"min=1"`
+	OverwriteKeys bool     `config:"overwrite_keys"`
+	ProcessArray  bool     `config:"process_array"`
+	Target        *string  `config:"target"`
 }
 
 var (
@@ -38,7 +42,7 @@ func init() {
 	processors.RegisterPlugin("decode_json_fields",
 		configChecked(newDecodeJSONFields,
 			requireFields("fields"),
-			allowedFields("fields", "maxDepth", "processArray")))
+			allowedFields("fields", "max_depth", "overwrite_keys", "process_array", "target", "when")))
 }
 
 func newDecodeJSONFields(c common.Config) (processors.Processor, error) {
@@ -51,7 +55,7 @@ func newDecodeJSONFields(c common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the decode_json_fields configuration: %s", err)
 	}
 
-	f := decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, processArray: config.ProcessArray}
+	f := decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, overwriteKeys: config.OverwriteKeys, processArray: config.ProcessArray, target: config.Target}
 	return f, nil
 }
 
@@ -75,7 +79,21 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 				continue
 			}
 
-			_, err = event.Put(field, output)
+			if f.target != nil {
+				if len(*f.target) > 0 {
+					_, err = event.Put(*f.target, output)
+				} else {
+					switch t := output.(type) {
+					default:
+						errs = append(errs, errors.New("Error trying to add target to root.").Error())
+					case map[string]interface{}:
+						jsontransform.WriteJSONKeys(event, t, f.overwriteKeys, "json_error")
+					}
+				}
+			} else {
+				_, err = event.Put(field, output)
+			}
+
 			if err != nil {
 				debug("Error trying to Put value %v for field : %s", output, field)
 				errs = append(errs, err.Error())
