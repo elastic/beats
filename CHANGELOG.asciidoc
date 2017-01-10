@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 
 *Filebeat*
 - Fix registry cleanup issue when files falling under ignore_older after restart. {issue}2818[2818]
+- Fix registry migration issue from old states were files were only harvested after second restart. {pull}3322[3322]
 
 *Winlogbeat*
 - Fix for "The array bounds are invalid" error when reading large events. {issue}3076[3076]
