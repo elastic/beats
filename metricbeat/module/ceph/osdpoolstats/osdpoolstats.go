@@ -19,8 +19,7 @@ type MetricSet struct {
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
-	config := ceph.Config{}
-
+	config := ceph.CheckConfig()
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -28,17 +27,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		cfg: config.CEPH,
+		cfg:           &config,
 	}, nil
 }
 
-
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-        output, err := ceph.Execute(m.cfg,"osd pool stats")
-        if err != nil {
-                return nil,err
-        }
+	output, err := ceph.Execute(m.cfg, "osd pool stats")
+	if err != nil {
+		return nil, err
+	}
 
 	return eventsMapping(output), nil
 }
-
