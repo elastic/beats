@@ -222,7 +222,7 @@ def fill_field_properties(args, field, defaults, path):
                 "type": "ip"
             }
 
-    elif field["type"] in ["geo_point", "date", "long", "integer",
+    elif field["type"] in ["geo_point", "date", "long", "integer", "short", "byte",
                            "double", "float", "half_float", "scaled_float",
                            "boolean"]:
         # Convert all integer fields to long

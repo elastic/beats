@@ -55,7 +55,7 @@ def field_to_json(desc, path, output,
     }
     # find the kibana types based on the field type
     if "type" in desc:
-        if desc["type"] in ["half_float", "scaled_float", "float", "integer", "long"]:
+        if desc["type"] in ["half_float", "scaled_float", "float", "integer", "long", "short", "byte"]:
             field["type"] = "number"
         elif desc["type"] in ["text", "keyword"]:
             field["type"] = "string"
