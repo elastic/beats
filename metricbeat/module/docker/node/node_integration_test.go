@@ -1,6 +1,6 @@
 // +build integration
 
-package container
+package node
 
 import (
 	"testing"
@@ -19,7 +19,7 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "docker",
-		"metricsets": []string{"container"},
+		"metricsets": []string{"node"},
 		"hosts":      []string{"unix:///var/run/docker.sock"},
 	}
 }

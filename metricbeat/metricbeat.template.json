@@ -584,6 +584,23 @@
                 "created": {
                   "type": "date"
                 },
+                "health": {
+                  "properties": {
+                    "event_end_date": {
+                      "type": "date"
+                    },
+                    "event_exit_code": {
+                      "type": "long"
+                    },
+                    "event_output": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "event_start_date": {
+                      "type": "date"
+                    }
+                  }
+                },
                 "id": {
                   "ignore_above": 1024,
                   "type": "keyword"
@@ -779,6 +796,97 @@
                       "type": "long"
                     }
                   }
+                }
+              }
+            },
+            "node": {
+              "properties": {
+                "createdat": {
+                  "type": "date"
+                },
+                "engine": {
+                  "properties": {
+                    "engine_version": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "plugin": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "id": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "managerstatus": {
+                  "properties": {
+                    "addr": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "leader": {
+                      "type": "boolean"
+                    },
+                    "reachability": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "platform": {
+                  "properties": {
+                    "architecture": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "os": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "ressources": {
+                  "properties": {
+                    "memorybytes": {
+                      "type": "long"
+                    },
+                    "nanocpus": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "spec": {
+                  "properties": {
+                    "avaiability": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "role": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "status": {
+                  "properties": {
+                    "addr": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "state": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "updatedad": {
+                  "type": "date"
                 }
               }
             }

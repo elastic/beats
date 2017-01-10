@@ -1,62 +1,104 @@
-- name: container
+- name: node
   type: group
   description: >
-    Docker container metrics.
+    Docker node metrics.
   fields:
-    - name: command
-      type: keyword
-      description: >
-        Command that was executed in the Docker container.
-    - name: created
+
+    - name: createdat
       type: date
       description: >
-        Date when the container was created.
+        date where the node has been added to the cluster
+    - name: updatedad
+      type: date
+      description: >
+        last gossip message
     - name: id
       type: keyword
       description: >
-        Unique container id.
-    - name: image
+        Unique node id.
+    - name: hostname
       type: keyword
       description: >
-        Name of the image the container was built on.
-    - name: name
-      type: keyword
-      description: >
-        Container name.
-    - name: status
-      type: keyword
-      description: >
-        Container status.
-    - name: size
+        hostname of the node
+    - name: spec
       type: group
       description: >
-        Container size metrics.
+        Configured status
       fields:
-        - name: root_fs
-          type: long
+        - name: role
+          type: keyword
           description: >
-             Total size of all the files in the container.
-        - name: rw
-          type: long
+            Wanted role
+        - name: avaiability
+          type: keyword
           description: >
-             Size of the files that have been created or changed since creation.
-    - name: health
+            wanted status.
+    - name: platform
       type: group
       description: >
-        Container health metrics.
-    - name: event_end_date
-      type: date
+        Node information hardware and system
+      fields:
+        - name: architecture
+          type: keyword
+          description: >
+           Cpu architecture of the node.
+        - name: os
+          type: keyword
+          description: >
+             OS node.
+    - name: ressources
+      type: group
       description: >
-        Healthcheck end date
-    - name: event_start_date
-      type: date
+        available ressources on the node
+      fields:
+        - name: nanocpus
+          type: long
+          description: >
+            available CPU ressources
+        - name: memorybytes
+          type: long
+          description: >
+            available Memory ressources
+    - name: engine
+      type: group
       description: >
-        Healthcheck start date
-    - name: event_output
-      type: long
+        docker engine information
+      fields:
+        - name: engine_version
+          type: keyword
+          description: >
+            Docker engine version number
+        - name: plugin
+          type: keyword
+          description: >
+            Docker plugin installed on the node
+    - name: status
+      type: group
       description: >
-        Healthcheck output
-    - name: event_exit_code
-      type: integer
+        docker swarm node status
+      fields:
+        - name: state
+          type: keyword
+          description: >
+            Docker engine state
+        - name: addr
+          type: keyword
+          description: >
+            docker
+    - name: managerstatus
+      type: group
       description: >
-        Healthcheck status code
+        docker swarm manager status
+      fields:
+        - name: leader
+          type: boolean
+          description: >
+            Docker engine manager state
+        - name: reachability
+          type: keyword
+          description: >
+            docker
+        - name: addr
+          type: keyword
+          description: >
+            docker manager listenning addr

@@ -1077,8 +1077,9 @@ Size of the files that have been created or changed since creation.
 Container health metrics.
 
 
+
 [float]
-=== docker.container.event_end_date
+=== docker.container.health.event_end_date
 
 type: date
 
@@ -1086,7 +1087,7 @@ Healthcheck end date
 
 
 [float]
-=== docker.container.event_start_date
+=== docker.container.health.event_start_date
 
 type: date
 
@@ -1094,15 +1095,15 @@ Healthcheck start date
 
 
 [float]
-=== docker.container.event_output
+=== docker.container.health.event_output
 
-type: long
+type: keyword
 
 Healthcheck output
 
 
 [float]
-=== docker.container.event_exit_code
+=== docker.container.health.event_exit_code
 
 type: integer
 
@@ -1455,119 +1456,188 @@ Total number of outgoing packets.
 
 
 [float]
-== container Fields
+== node Fields
 
-Docker container metrics.
+Docker node metrics.
 
-
-
-[float]
-=== docker.container.command
-
-type: keyword
-
-Command that was executed in the Docker container.
 
 
 [float]
-=== docker.container.created
+=== docker.node.createdat
 
 type: date
 
-Date when the container was created.
+date where the node has been added to the cluster
 
 
 [float]
-=== docker.container.id
-
-type: keyword
-
-Unique container id.
-
-
-[float]
-=== docker.container.image
-
-type: keyword
-
-Name of the image the container was built on.
-
-
-[float]
-=== docker.container.name
-
-type: keyword
-
-Container name.
-
-
-[float]
-=== docker.container.status
-
-type: keyword
-
-Container status.
-
-
-[float]
-== size Fields
-
-Container size metrics.
-
-
-
-[float]
-=== docker.container.size.root_fs
-
-type: long
-
-Total size of all the files in the container.
-
-
-[float]
-=== docker.container.size.rw
-
-type: long
-
-Size of the files that have been created or changed since creation.
-
-
-[float]
-== health Fields
-
-Container health metrics.
-
-
-[float]
-=== docker.container.event_end_date
+=== docker.node.updatedad
 
 type: date
 
-Healthcheck end date
+last gossip message
 
 
 [float]
-=== docker.container.event_start_date
+=== docker.node.id
 
-type: date
+type: keyword
 
-Healthcheck start date
+Unique node id.
 
 
 [float]
-=== docker.container.event_output
+=== docker.node.hostname
+
+type: keyword
+
+hostname of the node
+
+
+[float]
+== spec Fields
+
+Configured status
+
+
+
+[float]
+=== docker.node.spec.role
+
+type: keyword
+
+Wanted role
+
+
+[float]
+=== docker.node.spec.avaiability
+
+type: keyword
+
+wanted status.
+
+
+[float]
+== platform Fields
+
+Node information hardware and system
+
+
+
+[float]
+=== docker.node.platform.architecture
+
+type: keyword
+
+Cpu architecture of the node.
+
+
+[float]
+=== docker.node.platform.os
+
+type: keyword
+
+OS node.
+
+
+[float]
+== ressources Fields
+
+available ressources on the node
+
+
+
+[float]
+=== docker.node.ressources.nanocpus
 
 type: long
 
-Healthcheck output
+available CPU ressources
 
 
 [float]
-=== docker.container.event_exit_code
+=== docker.node.ressources.memorybytes
 
-type: integer
+type: long
 
-Healthcheck status code
+available Memory ressources
+
+
+[float]
+== engine Fields
+
+docker engine information
+
+
+
+[float]
+=== docker.node.engine.engine_version
+
+type: keyword
+
+Docker engine version number
+
+
+[float]
+=== docker.node.engine.plugin
+
+type: keyword
+
+Docker plugin installed on the node
+
+
+[float]
+== status Fields
+
+docker swarm node status
+
+
+
+[float]
+=== docker.node.status.state
+
+type: keyword
+
+Docker engine state
+
+
+[float]
+=== docker.node.status.addr
+
+type: keyword
+
+docker
+
+
+[float]
+== managerstatus Fields
+
+docker swarm manager status
+
+
+
+[float]
+=== docker.node.managerstatus.leader
+
+type: boolean
+
+Docker engine manager state
+
+
+[float]
+=== docker.node.managerstatus.reachability
+
+type: keyword
+
+docker
+
+
+[float]
+=== docker.node.managerstatus.addr
+
+type: keyword
+
+docker manager listenning addr
 
 
 [[exported-fields-haproxy]]

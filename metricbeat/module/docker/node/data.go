@@ -1,56 +1,64 @@
-package container
+package node
 
 import (
-	"time"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/docker"
 
-	"strings"
-	dc "github.com/fsouza/go-dockerclient"
+	"github.com/fsouza/go-dockerclient/external/github.com/docker/api/types/swarm"
 )
 
-func eventsMapping(containersList []dc.APIContainers, m *MetricSet) []common.MapStr {
+func eventsMapping(nodesList []swarm.Node, m *MetricSet) []common.MapStr {
 	myEvents := []common.MapStr{}
-	for _, container := range containersList {
-		myEvents = append(myEvents, eventMapping(&container, m))
+
+	for _, node := range nodesList {
+		myEvents = append(myEvents, eventMapping(&node, m))
 	}
+
 	return myEvents
 }
 
-func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
+func eventMapping(node *swarm.Node, m *MetricSet) common.MapStr {
 	event := common.MapStr{
-		"created": common.Time(time.Unix(cont.Created, 0)),
-		"id":      cont.ID,
-		"name":    docker.ExtractContainerName(cont.Names),
-		"command": cont.Command,
-		"image":   cont.Image,
-		"size": common.MapStr{
-			"root_fs": cont.SizeRootFs,
-			"rw":      cont.SizeRw,
+		"createdat": node.Meta.CreatedAt,
+		"updatedat": node.Meta.UpdatedAt,
+		"id":      node.ID,
+		"hostname":    node.Description.Hostname,
+		"spec": common.MapStr{
+			"role": node.Spec.Role,
+			"avaiability": node.Spec.Availability,
 		},
-		"status": cont.Status,
+		"platform": common.MapStr{
+			"architecture": node.Description.Platform.Architecture,
+			"os": node.Description.Platform.OS,
+		},
+		"status": common.MapStr{
+			"state": node.Status.State,
+			"addr": node.Status.Addr,
+		},
+		"ressources": common.MapStr{
+			"nanocpus": node.Description.Resources.NanoCPUs,
+			"memorybytes": node.Description.Resources.MemoryBytes,
+		},
+		"engine.version": node.Description.Engine.EngineVersion,
 	}
 
-	if strings.Contains(cont.Status, "(") && strings.Contains(cont.Status, ")") {
-		container, _ := m.dockerClient.InspectContainer(cont.ID)
-		last_event :=  len(container.State.Health.Log)-1
-
-		health := common.MapStr{
-			"status": container.State.Health.Status,
-			"failingstreak": container.State.Health.FailingStreak,
-			"event_start_date": container.State.Health.Log[last_event].Start,
-			"event_end_date": container.State.Health.Log[last_event].End,
-			"event_exit_code": container.State.Health.Log[last_event].ExitCode,
-			"event_output": container.State.Health.Log[last_event].Output,
+	if node.Spec.Role == "manager" {
+		//fmt.Println("this is a manager ",node.ManagerStatus.Leader)
+		manager := common.MapStr{
+			"leader": node.ManagerStatus.Leader,
+			"reachability": node.ManagerStatus.Reachability,
+			"addr": node.ManagerStatus.Addr,
 		}
-		event["health"] = health
+		event["manager"] = manager
 	}
 
-	labels := docker.DeDotLabels(cont.Labels)
-
-	if len(labels) > 0 {
-		event["labels"] = labels
+	swarm_labels := docker.DeDotLabels(node.Spec.Annotations.Labels)
+	if len(swarm_labels) > 0 {
+		event["labels"] = swarm_labels
+	}
+	engine_labels := docker.DeDotLabels(node.Description.Engine.Labels)
+	if len(engine_labels) > 0 {
+		event["engine.labels"] = engine_labels
 	}
 
 	return event
