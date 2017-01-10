@@ -3649,6 +3649,7 @@ type: long
 
 type: long
 
+The number of DELETE queries since startup.
 
 
 [float]
@@ -3656,6 +3657,7 @@ type: long
 
 type: long
 
+The number of INSERT queries since startup.
 
 
 [float]
@@ -3663,6 +3665,7 @@ type: long
 
 type: long
 
+The number of SELECT queries since startup.
 
 
 [float]
@@ -3670,6 +3673,7 @@ type: long
 
 type: long
 
+The number of UPDATE queries since startup.
 
 
 [[exported-fields-nginx]]

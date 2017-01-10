@@ -118,15 +118,7 @@ func (r *Registrar) loadStates() error {
 		return fmt.Errorf("Error decoding states: %s", err)
 	}
 
-	// Set all states to finished and disable TTL on restart
-	// For all states covered by a prospector, TTL will be overwritten with the prospector value
-	for key, state := range states {
-		state.Finished = true
-		// Set ttl to -2 to easily spot which states are not managed by a prospector
-		state.TTL = -2
-		states[key] = state
-	}
-
+	states = resetStates(states)
 	r.states.SetStates(states)
 	logp.Info("States Loaded from registrar: %+v", len(states))
 
@@ -176,6 +168,7 @@ func (r *Registrar) loadAndConvertOldState(f *os.File) bool {
 	// Convert old states to new states
 	logp.Info("Old registry states found: %v", len(oldStates))
 	states := convertOldStates(oldStates)
+	states = resetStates(states)
 	r.states.SetStates(states)
 
 	// Rewrite registry in new format
@@ -184,6 +177,19 @@ func (r *Registrar) loadAndConvertOldState(f *os.File) bool {
 	logp.Info("Old states converted to new states and written to registrar: %v", len(oldStates))
 
 	return true
+}
+
+// resetStates sets all states to finished and disable TTL on restart
+// For all states covered by a prospector, TTL will be overwritten with the prospector value
+func resetStates(states []file.State) []file.State {
+
+	for key, state := range states {
+		state.Finished = true
+		// Set ttl to -2 to easily spot which states are not managed by a prospector
+		state.TTL = -2
+		states[key] = state
+	}
+	return states
 }
 
 func convertOldStates(oldStates map[string]file.State) []file.State {

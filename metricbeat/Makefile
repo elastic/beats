@@ -14,7 +14,7 @@ CGO=true
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO.
 GOX_OS=solaris netbsd linux windows
-GOX_FLAGS='-arch=amd64 386 arm ppc64 ppc64le'
+GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
@@ -53,7 +53,7 @@ configs: python-env
 .PHONY: imports
 imports:
 	mkdir -p include
-	python ${ES_BEATS}/metricbeat/scripts/generate_imports.py ${BEAT_DIR} ${BEATNAME} > include/list.go
+	python ${ES_BEATS}/metricbeat/scripts/generate_imports.py ${BEAT_DIR} > include/list.go
 
 # This is called by the beats packer before building starts
 .PHONY: before-build
