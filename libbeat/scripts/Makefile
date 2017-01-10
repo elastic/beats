@@ -48,7 +48,7 @@ NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer ## @testing the opt
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
-GOX_OSARCH?=!darwin/arm ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
+GOX_OSARCH?=!darwin/arm !darwin/arm64 !darwin/386 ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
 GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "make crosscompile".
 TESTING_ENVIRONMENT?=snapshot ## @testing The name of the environment under test
 DOCKER_COMPOSE_PROJECT_NAME?=${BEATNAME}_${TESTING_ENVIRONMENT} ## @testing The name of the docker-compose project used by the integration and system tests
