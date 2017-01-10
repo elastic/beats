@@ -22,6 +22,7 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 * <<configuration-logging>>
 * <<configuration-processors>>
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/winlogbeat/docs/reference/configuration/winlogbeat-options.asciidoc ?>]
 include::configuration/winlogbeat-options.asciidoc[]
 
 
