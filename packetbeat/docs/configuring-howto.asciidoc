@@ -27,5 +27,6 @@ The following topics describe how to configure Packetbeat:
 
 --
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/reference/configuration.asciidoc ?>]
 include::reference/configuration.asciidoc[]
 
