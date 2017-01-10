@@ -1,8 +1,12 @@
 package common
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
+	"strings"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
 	cfgflag "github.com/elastic/go-ucfg/flag"
@@ -10,6 +14,27 @@ import (
 )
 
 type Config ucfg.Config
+
+const (
+	selectorConfig             = "config"
+	selectorConfigWithPassword = "config-with-passwords"
+)
+
+var debugBlacklist = MakeStringSet(
+	"password",
+	"passphrase",
+	"key_passphrase",
+	"pass",
+	"proxy_url",
+	"url",
+	"urls",
+	"host",
+	"hosts",
+)
+
+// make hasSelector and configDebugf available for unit testing
+var hasSelector = logp.HasSelector
+var configDebugf = logp.Debug
 
 type flagOverwrite struct {
 	config *ucfg.Config
@@ -111,14 +136,20 @@ func NewFlagOverwrite(
 
 func LoadFile(path string) (*Config, error) {
 	c, err := yaml.NewConfigWithFile(path, configOpts...)
-	return fromConfig(c), err
+	if err != nil {
+		return nil, err
+	}
+
+	cfg := fromConfig(c)
+	cfg.PrintDebugf("load config file '%v' =>", path)
+	return cfg, err
 }
 
 func LoadFiles(paths ...string) (*Config, error) {
 	merger := cfgutil.NewCollector(nil, configOpts...)
 	for _, path := range paths {
-		err := merger.Add(yaml.NewConfigWithFile(path, configOpts...))
-		if err != nil {
+		cfg, err := LoadFile(path)
+		if err := merger.Add(cfg.access(), err); err != nil {
 			return nil, err
 		}
 	}
@@ -190,6 +221,32 @@ func (c *Config) SetChild(name string, idx int, value *Config) error {
 	return c.access().SetChild(name, idx, value.access(), configOpts...)
 }
 
+func (c *Config) IsDict() bool {
+	return c.access().IsDict()
+}
+
+func (c *Config) IsArray() bool {
+	return c.access().IsArray()
+}
+
+func (c *Config) PrintDebugf(msg string, params ...interface{}) {
+	selector := selectorConfigWithPassword
+	filtered := false
+	if !hasSelector(selector) {
+		selector = selectorConfig
+		filtered = true
+
+		if !hasSelector(selector) {
+			return
+		}
+	}
+
+	debugStr := configDebugString(c, filtered)
+	if debugStr != "" {
+		configDebugf(selector, "%s\n%s", fmt.Sprintf(msg, params...), debugStr)
+	}
+}
+
 func (c *Config) Enabled() bool {
 	testEnabled := struct {
 		Enabled bool `config:"enabled"`
@@ -239,4 +296,60 @@ func (f *flagOverwrite) Set(v string) error {
 
 func (f *flagOverwrite) Get() interface{} {
 	return f.value
+}
+
+func configDebugString(c *Config, filterPrivate bool) string {
+	var bufs []string
+
+	if c.IsDict() {
+		var content map[string]interface{}
+		if err := c.Unpack(&content); err != nil {
+			return fmt.Sprintf("<config error> %v", err)
+		}
+		if filterPrivate {
+			filterDebugObject(content)
+		}
+		j, _ := json.MarshalIndent(content, "", "  ")
+		bufs = append(bufs, string(j))
+	}
+	if c.IsArray() {
+		var content []interface{}
+		if err := c.Unpack(&content); err != nil {
+			return fmt.Sprintf("<config error> %v", err)
+		}
+		if filterPrivate {
+			filterDebugObject(content)
+		}
+		j, _ := json.MarshalIndent(content, "", "  ")
+		bufs = append(bufs, string(j))
+	}
+
+	if len(bufs) == 0 {
+		return ""
+	}
+	return strings.Join(bufs, "\n")
+}
+
+func filterDebugObject(c interface{}) {
+	switch cfg := c.(type) {
+	case map[string]interface{}:
+		for k, v := range cfg {
+			if debugBlacklist.Has(k) {
+				if arr, ok := v.([]interface{}); ok {
+					for i := range arr {
+						arr[i] = "xxxxx"
+					}
+				} else {
+					cfg[k] = "xxxxx"
+				}
+			} else {
+				filterDebugObject(v)
+			}
+		}
+
+	case []interface{}:
+		for _, elem := range cfg {
+			filterDebugObject(elem)
+		}
+	}
 }

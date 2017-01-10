@@ -91,6 +91,8 @@ func InitOutputs(
 		if !exists {
 			continue
 		}
+
+		config.PrintDebugf("Configure output plugin '%v' with:", name)
 		if !config.Enabled() {
 			continue
 		}

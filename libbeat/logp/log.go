@@ -28,7 +28,7 @@ type Logger struct {
 	toStderr          bool
 	toFile            bool
 	level             Priority
-	selectors         map[string]bool
+	selectors         map[string]struct{}
 	debugAllSelectors bool
 
 	logger  *log.Logger
@@ -36,17 +36,43 @@ type Logger struct {
 	rotator *FileRotator
 }
 
-var _log Logger
+// pre-init logger to debug mode + stderr before init
+
+const stderrLogFlags = log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC | log.Lshortfile
+
+var _log = Logger{}
+
+// TODO: remove toSyslog and toStderr from the init function
+func LogInit(level Priority, prefix string, toSyslog bool, toStderr bool, debugSelectors []string) {
+	_log.toSyslog = toSyslog
+	_log.toStderr = toStderr
+	_log.level = level
+
+	_log.selectors, _log.debugAllSelectors = parseSelectors(debugSelectors)
+
+	if _log.toSyslog {
+		SetToSyslog(true, prefix)
+	}
+
+	if _log.toStderr {
+		SetToStderr(true, prefix)
+	}
+}
+
+func parseSelectors(selectors []string) (map[string]struct{}, bool) {
+	all := false
+	set := map[string]struct{}{}
+	for _, selector := range selectors {
+		set[selector] = struct{}{}
+		if selector == "*" {
+			all = true
+		}
+	}
+	return set, all
+}
 
 func debugMessage(calldepth int, selector, format string, v ...interface{}) {
-	if _log.level >= LOG_DEBUG {
-		if !_log.debugAllSelectors {
-			selected := _log.selectors[selector]
-			if !selected {
-				return
-			}
-		}
-
+	if _log.level >= LOG_DEBUG && IsDebug(selector) {
 		send(calldepth+1, LOG_DEBUG, "DBG  ", format, v...)
 	}
 }
@@ -76,7 +102,12 @@ func MakeDebug(selector string) func(string, ...interface{}) {
 }
 
 func IsDebug(selector string) bool {
-	return _log.debugAllSelectors || _log.selectors[selector]
+	return _log.debugAllSelectors || HasSelector(selector)
+}
+
+func HasSelector(selector string) bool {
+	_, selected := _log.selectors[selector]
+	return selected
 }
 
 func msg(level Priority, prefix string, format string, v ...interface{}) {
@@ -115,35 +146,11 @@ func Recover(msg string) {
 	}
 }
 
-// TODO: remove toSyslog and toStderr from the init function
-func LogInit(level Priority, prefix string, toSyslog bool, toStderr bool, debugSelectors []string) {
-	_log.toSyslog = toSyslog
-	_log.toStderr = toStderr
-	_log.level = level
-
-	_log.selectors = make(map[string]bool)
-	for _, selector := range debugSelectors {
-		_log.selectors[selector] = true
-		if selector == "*" {
-			_log.debugAllSelectors = true
-		}
-	}
-
-	if _log.toSyslog {
-		SetToSyslog(true, prefix)
-	}
-
-	if _log.toStderr {
-		SetToStderr(true, prefix)
-	}
-}
-
 func SetToStderr(toStderr bool, prefix string) {
 	_log.toStderr = toStderr
 	if _log.toStderr {
 		// Add timestamp
-		flag := log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC | log.Lshortfile
-		_log.logger = log.New(os.Stderr, prefix, flag)
+		_log.logger = log.New(os.Stderr, prefix, stderrLogFlags)
 	}
 }
 
