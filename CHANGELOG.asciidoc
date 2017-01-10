@@ -135,7 +135,7 @@ https://github.com/elastic/beats/compare/v5.0.2...v5.1.1[View commits]
 - Add support for MongoDB 3.4 and WiredTiger metrics. {pull}2999[2999]
 - Add experimental kafka module with partition metricset. {pull}2969[2969]
 - Add raw config option for mysql/status metricset. {pull}3001[3001]
-- Add command fileds for mysql/status metricset. {pull}3251[3251]
+- Add command fields for mysql/status metricset. {pull}3251[3251]
 
 *Filebeat*
 
