@@ -29,7 +29,7 @@ func NewProspectorStdin(p *Prospector) (*ProspectorStdin, error) {
 	return prospectorer, nil
 }
 
-func (p *ProspectorStdin) Init(states file.States) error {
+func (p *ProspectorStdin) Init(states []file.State) error {
 	p.started = false
 	return nil
 }
