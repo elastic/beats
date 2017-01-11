@@ -3,10 +3,10 @@
 set -e
 
 BEAT_PATH=/go/src/${1}
-# BEATNAME is in the $PACK variable
-BEATNAME=$PACK
+# BEAT_NAME is in the $PACK variable
+BEAT_NAME=$PACK
 
-if [ $BEATNAME = "packetbeat" ]; then
+if [ $BEAT_NAME = "packetbeat" ]; then
 	patch -p1 < /gopacket_pcap.patch
 fi
 
@@ -35,7 +35,7 @@ for TARGET in $TARGETS; do
 	XGOOS=`echo $TARGET | cut -d '/' -f 1`
 	XGOARCH=`echo $TARGET | cut -d '/' -f 2`
 
-	GOOS=$XGOOS GOARCH=$XGOARCH go build -ldflags "-X main.beat=${BEATNAME}" -o $PREFIX/import_dashboards-$XGOOS-$XGOARCH $LIBBEAT_PATH/dashboards/import_dashboards.go
+	GOOS=$XGOOS GOARCH=$XGOARCH go build -ldflags "-X main.beat=${BEAT_NAME}" -o $PREFIX/import_dashboards-$XGOOS-$XGOARCH $LIBBEAT_PATH/dashboards/import_dashboards.go
 done
 
 if [ -n "BUILDID" ]; then
@@ -57,20 +57,20 @@ sed -i -e 's/:doc-branch/doc_branch/g' ${PREFIX}/package.yml
 /go/bin/gotpl /templates/readme.md.j2 < ${PREFIX}/package.yml > ${PREFIX}/homedir/README.md
 
 # Copy template
-cp $BEATNAME.template.json $PREFIX/$BEATNAME.template.json
-cp $BEATNAME.template-es2x.json $PREFIX/$BEATNAME.template-es2x.json
+cp $BEAT_NAME.template.json $PREFIX/$BEAT_NAME.template.json
+cp $BEAT_NAME.template-es2x.json $PREFIX/$BEAT_NAME.template-es2x.json
 
 # linux
-cp $BEATNAME.yml $PREFIX/$BEATNAME-linux.yml
-cp $BEATNAME.full.yml $PREFIX/$BEATNAME-linux.full.yml
+cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-linux.yml
+cp $BEAT_NAME.full.yml $PREFIX/$BEAT_NAME-linux.full.yml
 
 # darwin
-cp $BEATNAME.yml $PREFIX/$BEATNAME-darwin.yml
-cp $BEATNAME.full.yml $PREFIX/$BEATNAME-darwin.full.yml
+cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-darwin.yml
+cp $BEAT_NAME.full.yml $PREFIX/$BEAT_NAME-darwin.full.yml
 
 # win
-cp $BEATNAME.yml $PREFIX/$BEATNAME-win.yml
-cp $BEATNAME.full.yml $PREFIX/$BEATNAME-win.full.yml
+cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-win.yml
+cp $BEAT_NAME.full.yml $PREFIX/$BEAT_NAME-win.full.yml
 
 # Contains beat specific adjustments. As it is platform specific knowledge, it should be in packer not the beats itself
 PREFIX=$PREFIX make before-build

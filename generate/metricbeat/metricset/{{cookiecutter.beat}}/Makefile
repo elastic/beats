@@ -1,5 +1,6 @@
-BEATNAME={{cookiecutter.beat}}
-BEAT_DIR={{cookiecutter.beat_path}}/{{cookiecutter.beat}}
+BEAT_NAME={{cookiecutter.beat}}
+BEAT_PATH={{cookiecutter.beat_path}}/{{cookiecutter.beat}}
+BEAT_URL=https://${BEAT_PATH}
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
 ES_BEATS?=./vendor/github.com/elastic/beats

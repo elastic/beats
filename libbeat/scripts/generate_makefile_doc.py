@@ -22,9 +22,9 @@ import re
 #    doc => Runs the unit tests without coverage reports.
 #
 # Example 2:
-# ${BEATNAME}: $(GOFILES_ALL) ## @build build the beat application
+# ${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
 #    name => None
-#    varname => BEATNAME
+#    varname => BEAT_NAME
 #    category => testing
 #    doc => Runs the unit tests without coverage reports.
 regexp_target_doc = re.compile(r'^((?P<name>(-|_|\w)+)|(\${(?P<varname>(-|_|\w)+)}))\s*:.*\#\#+\s*@(?P<category>(\w+))\s+(?P<doc>(.*))')
@@ -41,8 +41,8 @@ regexp_target_doc = re.compile(r'^((?P<name>(-|_|\w)+)|(\${(?P<varname>(-|_|\w)+
 #    doc => Software license of the application
 #
 ## Example 2:
-# BEATNAME?=filebeat
-#    name => BEATNAME
+# BEAT_NAME?=filebeat
+#    name => BEAT_NAME
 #    default => libbeat
 #    category => None
 #    doc => None
@@ -50,7 +50,7 @@ regexp_target_doc = re.compile(r'^((?P<name>(-|_|\w)+)|(\${(?P<varname>(-|_|\w)+
 regexp_var_help = re.compile(r'^(?P<name>(\w)+)\s*(\?)?=\s*(?P<default>([^\#]+))(\s+\#\#+\s*@(?P<category>(\w+))(:)?\s+(?P<doc>(.*))|\s*$)')
 
 
-# Parse a Makefile line according to the given regexp 
+# Parse a Makefile line according to the given regexp
 # - insert the dict { name, default, is_variable, category, doc} to the categories dictionary
 # - insert the category to the categories_set
 # - return a pair [name, value] if the line is a Makefile variable assignement
@@ -73,7 +73,7 @@ def parse_line(line, regexp, categories, categories_set):
         if not name:
             name = matches.group("name")
             is_variable = False
-        
+
         if name:
             variable = [name, default]
 
@@ -82,10 +82,10 @@ def parse_line(line, regexp, categories, categories_set):
             category = category.replace("_", " ").capitalize()
             doc = matches.group("doc").rstrip('.').rstrip()
             doc = doc[0].capitalize() + doc[1:] # Capitalize the first word
- 
+
             if category not in categories_set:
                 categories_set.append(category)
-                categories[category] = []        
+                categories[category] = []
 
             categories[category].append({
                 "name": name,
@@ -100,11 +100,11 @@ def parse_line(line, regexp, categories, categories_set):
 #
 # Example in Makefile:
 #
-# ${BEATNAME}: $(GOFILES_ALL) ## @build build the beat application
+# ${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
 # 	go build
 #
-# BEATNAME is a Makefile target whose name ${BEATNAME} is a Makefile variable.
-# The name of the rule is changed from "BEATNAME" to "filebeat"
+# BEAT_NAME is a Makefile target whose name ${BEAT_NAME} is a Makefile variable.
+# The name of the rule is changed from "BEAT_NAME" to "filebeat"
 #
 def substitute_variable_targets(targets, variables):
     target_variables = ([target for category in targets for target in targets[category] if target['is_variable']])
@@ -153,7 +153,7 @@ if __name__ == "__main__":
             if variable and variable[0] not in variables:
                 variables[variable[0]] = variable[1]
 
-    substitute_variable_targets(categories_targets, variables)  
+    substitute_variable_targets(categories_targets, variables)
 
     if not args.variables:
         print ("Usage: make [target] [VARIABLE=value]")
