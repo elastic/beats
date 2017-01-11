@@ -32,6 +32,7 @@ func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
 		"status": cont.Status,
 	}
 
+// Check id container have health metrics configured
 if strings.Contains(cont.Status, "(") && strings.Contains(cont.Status, ")") {
 	container, _ := m.dockerClient.InspectContainer(cont.ID)
 

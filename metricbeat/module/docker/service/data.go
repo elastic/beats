@@ -27,6 +27,7 @@ func eventMapping(service *swarm.Service) common.MapStr {
 		"name": service.Spec.Annotations.Name,
 	}
 
+	// Do not insert updatestatus map if no updatestatus is present
 	if service.UpdateStatus.Message != "" {
 		updatestatus := common.MapStr{
 			"state": service.UpdateStatus.State,
@@ -37,6 +38,7 @@ func eventMapping(service *swarm.Service) common.MapStr {
 		event["updatestatus"] = updatestatus
 	}
 
+	// Check service mode
 	if service.Spec.Mode.Replicated != nil {
 		event["mode"] = "Replicated"
 		event["replicas"] = service.Spec.Mode.Replicated.Replicas
@@ -55,6 +57,7 @@ func eventMapping(service *swarm.Service) common.MapStr {
 		spec_labels = docker.DeDotLabels(service.Spec.Annotations.Labels)
 	}
 
+	// Print previous label only if they have been modify
 	if len(spec_labels) != 0 || len(previousspec_labels) != 0 {
 		if len(spec_labels) != 0 && len(previousspec_labels) != 0 {
 			if reflect.DeepEqual(spec_labels, previousspec_labels) {
