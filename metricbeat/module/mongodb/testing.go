@@ -16,7 +16,7 @@ func GetEnvHost() string {
 	return host
 }
 
-// GetMongodbEnvPort returns the port of the Mongodb server to use for testing.
+// GetEnvPort returns the port of the Mongodb server to use for testing.
 // It reads the value from the MONGODB_PORT environment variable and returns
 // 27017 if it is not set.
 func GetEnvPort() string {
