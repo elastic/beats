@@ -7,17 +7,17 @@ import (
 	"github.com/fsouza/go-dockerclient/external/github.com/docker/api/types/swarm"
 )
 
-func eventsMapping(nodesList []swarm.Node, m *MetricSet) []common.MapStr {
+func eventsMapping(nodesList []swarm.Node) []common.MapStr {
 	myEvents := []common.MapStr{}
 
 	for _, node := range nodesList {
-		myEvents = append(myEvents, eventMapping(&node, m))
+		myEvents = append(myEvents, eventMapping(&node))
 	}
 
 	return myEvents
 }
 
-func eventMapping(node *swarm.Node, m *MetricSet) common.MapStr {
+func eventMapping(node *swarm.Node) common.MapStr {
 	event := common.MapStr{
 		"createdat": node.Meta.CreatedAt,
 		"updatedat": node.Meta.UpdatedAt,

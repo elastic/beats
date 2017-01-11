@@ -103,7 +103,7 @@ metricbeat.modules:
 
 #------------------------------- Docker Module -------------------------------
 #- module: docker
-  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container", "node"]
+  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container", "node", "service"]
   #hosts: ["unix:///var/run/docker.sock"]
   #enabled: true
   #period: 10s
@@ -865,3 +865,4 @@ logging.files:
 
   # Number of rotated log files to keep. Oldest files will be deleted first.
   #keepfiles: 7
+

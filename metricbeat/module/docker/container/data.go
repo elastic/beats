@@ -32,10 +32,11 @@ func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
 		"status": cont.Status,
 	}
 
-	if strings.Contains(cont.Status, "(") && strings.Contains(cont.Status, ")") {
-		container, _ := m.dockerClient.InspectContainer(cont.ID)
-		last_event :=  len(container.State.Health.Log)-1
+if strings.Contains(cont.Status, "(") && strings.Contains(cont.Status, ")") {
+	container, _ := m.dockerClient.InspectContainer(cont.ID)
 
+	last_event :=  len(container.State.Health.Log)-1
+	if last_event >= 0 {
 		health := common.MapStr{
 			"status": container.State.Health.Status,
 			"failingstreak": container.State.Health.FailingStreak,
@@ -46,6 +47,7 @@ func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
 		}
 		event["health"] = health
 	}
+}
 
 	labels := docker.DeDotLabels(cont.Labels)
 

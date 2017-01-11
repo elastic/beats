@@ -1640,6 +1640,116 @@ type: keyword
 docker manager listenning addr
 
 
+[float]
+== service Fields
+
+Docker service metrics.
+
+
+
+[float]
+=== docker.service.id
+
+type: keyword
+
+service id
+
+
+[float]
+=== docker.service.createdat
+
+type: date
+
+date where the service has been created
+
+
+[float]
+=== docker.service.name
+
+type: keyword
+
+service name
+
+
+[float]
+=== docker.service.updatedad
+
+type: date
+
+last service specification change date
+
+
+[float]
+=== docker.service.mode
+
+type: keyword
+
+Service mode (replicated or global)
+
+
+[float]
+=== docker.service.replicas
+
+type: integer
+
+number of replicas if service mode is replicated
+
+
+[float]
+=== docker.service.healtcheck_enabled
+
+type: boolean
+
+check if healthcheck is activated in container specifications
+
+
+[float]
+=== docker.service.version
+
+type: integer
+
+service update versionning
+
+
+[float]
+== updatestatus Fields
+
+check update status
+
+
+
+[float]
+=== docker.service.updatestatus.state
+
+type: keyword
+
+update state
+
+
+[float]
+=== docker.service.updatestatus.startedat
+
+type: date
+
+update started date
+
+
+[float]
+=== docker.service.updatestatus.completedat
+
+type: date
+
+update completed date
+
+
+[float]
+=== docker.service.updatestatus.message
+
+type: text
+
+update message
+
+
 [[exported-fields-haproxy]]
 == HAProxy Fields
 
