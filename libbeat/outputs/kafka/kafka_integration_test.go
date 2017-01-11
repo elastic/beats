@@ -12,12 +12,17 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode/modetest"
-	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/libbeat/outputs/codecs/format"
+	_ "github.com/elastic/beats/libbeat/outputs/codecs/json"
 )
 
 const (
@@ -69,8 +74,7 @@ func TestKafkaPublish(t *testing.T) {
 		{
 			"publish single event with formating to test topic",
 			map[string]interface{}{
-				"writer.type":   "FormatStringWriter",
-				"writer.format": "%{[message]}",
+				"codec.format.string": "%{[message]}",
 			},
 			testTopic,
 			single(common.MapStr{
@@ -214,27 +218,37 @@ func TestKafkaPublish(t *testing.T) {
 				return
 			}
 
+			validate := validateJSON
+			if fmt, exists := test.config["codec.format.string"]; exists {
+				validate = makeValidateFmtStr(fmt.(string))
+			}
+
 			for i, d := range expected {
-				if test.config["writer.type"] == "FormatStringWriter" {
-					fmtString := fmtstr.MustCompileEvent(test.config["writer.format"].(string))
-					expectedMessage, _ := fmtString.Run(d.Event)
-					assert.Equal(t, string(expectedMessage), string(stored[i].Value))
-				} else {
-
-					var decoded map[string]interface{}
-					err := json.Unmarshal(stored[i].Value, &decoded)
-					if err != nil {
-						t.Errorf("can not json decode event value: %v", stored[i].Value)
-						return
-					}
-					event := d.Event
-
-					assert.Equal(t, decoded["type"], event["type"])
-					assert.Equal(t, decoded["message"], event["message"])
-
-				}
+				validate(t, stored[i].Value, d.Event)
 			}
 		}()
+	}
+}
+
+func validateJSON(t *testing.T, value []byte, event common.MapStr) {
+	var decoded map[string]interface{}
+	err := json.Unmarshal(value, &decoded)
+	if err != nil {
+		t.Errorf("can not json decode event value: %v", value)
+		return
+	}
+	assert.Equal(t, decoded["type"], event["type"])
+	assert.Equal(t, decoded["message"], event["message"])
+}
+
+func makeValidateFmtStr(fmt string) func(*testing.T, []byte, common.MapStr) {
+	fmtString := fmtstr.MustCompileEvent(fmt)
+	return func(t *testing.T, value []byte, event common.MapStr) {
+		expectedMessage, err := fmtString.Run(event)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, string(expectedMessage), string(value))
 	}
 }
 
