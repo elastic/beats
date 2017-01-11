@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/beater"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/module"
 )
 
 var (
@@ -57,7 +57,7 @@ func createEvent(event common.MapStr, m mb.MetricSet) error {
 
 	startTime, _ := time.Parse(time.RFC3339Nano, "2016-05-23T08:05:34.853Z")
 
-	build := beater.EventBuilder{
+	build := module.EventBuilder{
 		ModuleName:    m.Module().Name(),
 		MetricSetName: m.Name(),
 		Host:          m.Host(),

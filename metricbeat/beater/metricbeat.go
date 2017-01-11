@@ -8,15 +8,16 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/module"
 
 	"github.com/pkg/errors"
 )
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done    chan struct{}    // Channel used to initiate shutdown.
-	modules []*ModuleWrapper // Active list of modules.
-	client  publisher.Client // Publisher client.
+	done    chan struct{}     // Channel used to initiate shutdown.
+	modules []*module.Wrapper // Active list of modules.
+	client  publisher.Client  // Publisher client.
 	config  Config
 }
 
@@ -25,17 +26,17 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	// List all registered modules and metricsets.
 	logp.Info("%s", mb.Registry.String())
 
-	config := DefaultConfig
+	config := Config{}
 
 	err := rawConfig.Unpack(&config)
 	if err != nil {
 		return nil, errors.Wrap(err, "error reading configuration file")
 	}
 
-	modules, err := NewModuleWrappers(config.Modules, mb.Registry)
+	modules, err := module.NewWrappers(config.Modules, mb.Registry)
 	if err != nil {
 		// Empty config is fine if dynamic config is enabled
-		if !config.ReloadModules.IsEnabled() {
+		if !config.ReloadModules.Enabled() {
 			return nil, err
 		} else if err != mb.ErrEmptyConfig && err != mb.ErrAllModulesDisabled {
 			return nil, err
@@ -60,7 +61,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	var wg sync.WaitGroup
 
 	for _, m := range bt.modules {
-		r := NewModuleRunner(b.Publisher.Connect, m)
+		r := module.NewRunner(b.Publisher.Connect, m)
 		r.Start()
 		wg.Add(1)
 		go func() {
@@ -70,9 +71,9 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		}()
 	}
 
-	if bt.config.ReloadModules.IsEnabled() {
+	if bt.config.ReloadModules.Enabled() {
 		logp.Warn("EXPERIMENTAL feature dynamic configuration reloading is enabled.")
-		configReloader := NewConfigReloader(bt.config.ReloadModules, b.Publisher)
+		configReloader := module.NewReloader(bt.config.ReloadModules, b.Publisher)
 		go configReloader.Run()
 		wg.Add(1)
 		go func() {

@@ -1,4 +1,4 @@
-package beater
+package module
 
 import (
 	"time"

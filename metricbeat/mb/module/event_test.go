@@ -1,6 +1,6 @@
 // +build !integration
 
-package beater
+package module
 
 import (
 	"errors"
