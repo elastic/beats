@@ -14,7 +14,7 @@ func init() {
 type fileOutput struct {
 	beatName string
 	rotator  logp.FileRotator
-	writer   outputs.Writer
+	codec    outputs.Codec
 }
 
 // New instantiates a new file output instance.
@@ -44,7 +44,12 @@ func (out *fileOutput) init(config config) error {
 		out.rotator.Name = out.beatName
 	}
 
-	out.writer = outputs.CreateWriter(config.WriterConfig)
+	codec, err := outputs.CreateEncoder(config.Codec)
+	if err != nil {
+		return err
+	}
+
+	out.codec = codec
 
 	logp.Info("File output path set to: %v", out.rotator.Path)
 	logp.Info("File output base filename set to: %v", out.rotator.Name)
@@ -83,7 +88,7 @@ func (out *fileOutput) PublishEvent(
 	var serializedEvent []byte
 	var err error
 
-	serializedEvent, err = out.writer.Write(data.Event)
+	serializedEvent, err = out.codec.Encode(data.Event)
 	if err != nil {
 		op.SigCompleted(sig)
 		return err
