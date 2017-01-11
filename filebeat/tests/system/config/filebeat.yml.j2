@@ -70,6 +70,16 @@ filebeat.prospectors:
   {% endif %}
 {% endif %}
 
+{% if prospector_name %}
+filebeat.prospectors.{{ prospector_name}}:
+  {% if named_paths %}paths:
+    - {{ named_paths }}{% endif %}
+  scan_frequency: 0.1s
+  backoff: 0.1s
+  backoff_factor: 1
+  max_backoff: 0.1s
+{% endif %}
+
 filebeat.spool_size:
 filebeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
 filebeat.idle_timeout: 0.1s
