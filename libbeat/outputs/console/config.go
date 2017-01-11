@@ -5,6 +5,8 @@ import (
 )
 
 type Config struct {
-	Pretty       bool                 `config:"pretty"`
-	WriterConfig outputs.WriterConfig `config:"writer"`
+	Codec outputs.CodecConfig `config:"codec"`
+
+	// old pretty settings to use if no codec is configured
+	Pretty bool `config:"pretty"`
 }

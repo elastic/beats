@@ -142,28 +142,34 @@ func (r *ConfigReloader) Stop() {
 func (r *ConfigReloader) StartModules(list []*ModuleWrapper) {
 
 	logp.Info("Starting %v modules ...", len(list))
-	for _, w := range list {
-		go func(mw *ModuleWrapper) {
-			mr := NewModuleRunner(r.client, mw)
-			mr.Start()
-			r.registry.Add(mw.Hash(), mr)
-			moduleStarts.Add(1)
-			moduleRunning.Add(1)
-			debugr("New Module Started: %v", mw.Hash())
-		}(w)
+	for _, mw := range list {
+		mr := NewModuleRunner(r.client, mw)
+		mr.Start()
+		r.registry.Add(mw.Hash(), mr)
+		moduleStarts.Add(1)
+		moduleRunning.Add(1)
+		debugr("New Module Started: %v", mw.Hash())
 	}
 }
 
 func (r *ConfigReloader) StopModules(list map[uint64]ModuleRunner) {
 	logp.Info("Stopping %v modules ...", len(list))
 
+	wg := sync.WaitGroup{}
 	for hash, w := range list {
-		w.Stop()
-		r.registry.Remove(hash)
-		moduleStops.Add(1)
-		moduleRunning.Add(-1)
-		debugr("Module stopped: %v", hash)
+		wg.Add(1)
+		// Stop modules in parallel
+		func() {
+			defer wg.Done()
+			w.Stop()
+			r.registry.Remove(hash)
+			moduleStops.Add(1)
+			moduleRunning.Add(-1)
+			debugr("Module stopped: %v", hash)
+		}()
 	}
+
+	wg.Wait()
 }
 
 // LoadConfigs loads the configs data from the given file

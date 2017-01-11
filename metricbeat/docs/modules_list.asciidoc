@@ -6,7 +6,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-ceph,ceph>>
   * <<metricbeat-module-couchbase,couchbase>>
   * <<metricbeat-module-docker,Docker>>
-  * <<metricbeat-module-haproxy,haproxy>>
+  * <<metricbeat-module-haproxy,HAProxy>>
   * <<metricbeat-module-kafka,kafka>>
   * <<metricbeat-module-mongodb,MongoDB>>
   * <<metricbeat-module-mysql,MySQL>>

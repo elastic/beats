@@ -9,11 +9,16 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/garyburd/redigo/redis"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/garyburd/redigo/redis"
-	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/libbeat/outputs/codecs/format"
+	_ "github.com/elastic/beats/libbeat/outputs/codecs/json"
 )
 
 const (
@@ -224,13 +229,12 @@ func TestPublishChannelTCPWithFormatting(t *testing.T) {
 	db := 0
 	key := "test_pubchan_tcp"
 	redisConfig := map[string]interface{}{
-		"hosts":         []string{getRedisAddr()},
-		"key":           key,
-		"db":            db,
-		"datatype":      "channel",
-		"timeout":       "5s",
-		"writer.type":   "FormatStringWriter",
-		"writer.format": "%{[message]}",
+		"hosts":               []string{getRedisAddr()},
+		"key":                 key,
+		"db":                  db,
+		"datatype":            "channel",
+		"timeout":             "5s",
+		"codec.format.string": "%{[message]}",
 	}
 
 	testPublishChannel(t, redisConfig)
@@ -299,10 +303,9 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 	assert.Equal(t, total, len(messages))
 	for i, raw := range messages {
 		evt := struct{ Message int }{}
-		if cfg["writer.type"] == "FormatStringWriter" {
-			fmtString := fmtstr.MustCompileEvent(cfg["writer.format"].(string))
+		if fmt, hasFmt := cfg["codec.format.string"]; hasFmt {
+			fmtString := fmtstr.MustCompileEvent(fmt.(string))
 			expectedMessage, _ := fmtString.Run(createEvent(i + 1))
-
 			assert.NoError(t, err)
 			assert.Equal(t, string(expectedMessage), string(raw))
 		} else {

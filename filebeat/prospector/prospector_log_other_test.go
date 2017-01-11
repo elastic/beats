@@ -140,7 +140,7 @@ func TestInit(t *testing.T) {
 		}
 		states := file.NewStates()
 		states.SetStates(test.states)
-		err := p.Init(*states)
+		err := p.Init(states.GetStates())
 		assert.NoError(t, err)
 		assert.Equal(t, test.count, p.Prospector.states.Count())
 	}
