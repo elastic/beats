@@ -78,7 +78,7 @@ func MergeConfigs(cfgs ...*Config) (*Config, error) {
 func NewConfigWithYAML(in []byte, source string) (*Config, error) {
 	opts := append(
 		[]ucfg.Option{
-			ucfg.MetaData(ucfg.Meta{source}),
+			ucfg.MetaData(ucfg.Meta{Source: source}),
 		},
 		configOpts...,
 	)
@@ -94,7 +94,7 @@ func NewFlagConfig(
 ) *Config {
 	opts := append(
 		[]ucfg.Option{
-			ucfg.MetaData(ucfg.Meta{"command line flag"}),
+			ucfg.MetaData(ucfg.Meta{Source: "command line flag"}),
 		},
 		configOpts...,
 	)
@@ -289,7 +289,7 @@ func (f *flagOverwrite) String() string {
 func (f *flagOverwrite) Set(v string) error {
 	opts := append(
 		[]ucfg.Option{
-			ucfg.MetaData(ucfg.Meta{"command line flag"}),
+			ucfg.MetaData(ucfg.Meta{Source: "command line flag"}),
 		},
 		configOpts...,
 	)

@@ -2,6 +2,7 @@ package prospector
 
 import (
 	"expvar"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -34,16 +35,21 @@ func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
 	return prospectorer, nil
 }
 
-// Init sets up the prospector
+// LoadStates loads states into prospector
 // It goes through all states coming from the registry. Only the states which match the glob patterns of
 // the prospector will be loaded and updated. All other states will not be touched.
-func (p *ProspectorLog) Init(states []file.State) error {
+func (p *ProspectorLog) LoadStates(states []file.State) error {
 	logp.Debug("prospector", "exclude_files: %s", p.config.ExcludeFiles)
 
 	for _, state := range states {
 		// Check if state source belongs to this prospector. If yes, update the state.
 		if p.matchesFile(state.Source) {
 			state.TTL = -1
+
+			// In case a prospector is tried to be started with an unfinished state matching the glob pattern
+			if !state.Finished {
+				return fmt.Errorf("Can only start a prospector when all related states are finished: %+v", state)
+			}
 
 			// Update prospector states and send new states to registry
 			err := p.Prospector.updateState(input.NewEvent(state))
