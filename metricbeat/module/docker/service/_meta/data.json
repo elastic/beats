@@ -7,7 +7,7 @@
     },
     "docker": {
         "service": {
-            "Replicas": 2,
+            "replicas": 2,
             "createdat": "2017-01-11T11:35:53.432238684Z",
             "healtcheck_enabled": true,
             "id": "1vyemp33ktfmk7xpfmlg29ns0",
