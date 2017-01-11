@@ -889,6 +889,55 @@
                   "type": "date"
                 }
               }
+            },
+            "service": {
+              "properties": {
+                "createdat": {
+                  "type": "date"
+                },
+                "healtcheck_enabled": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "mode": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "replicas": {
+                  "type": "long"
+                },
+                "updatedad": {
+                  "type": "date"
+                },
+                "updatestatus": {
+                  "properties": {
+                    "completedat": {
+                      "type": "date"
+                    },
+                    "message": {
+                      "norms": false,
+                      "type": "text"
+                    },
+                    "startedat": {
+                      "type": "date"
+                    },
+                    "state": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "version": {
+                  "type": "long"
+                }
+              }
             }
           }
         },

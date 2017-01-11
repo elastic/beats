@@ -1,0 +1,59 @@
+- name: service
+  type: group
+  description: >
+    Docker service metrics.
+  fields:
+
+    - name: id
+      type: keyword
+      description: >
+        service id
+    - name: createdat
+      type: date
+      description: >
+        date where the service has been created
+    - name: name
+      type: keyword
+      description: >
+        service name
+    - name: updatedad
+      type: date
+      description: >
+        last service specification change date
+    - name: mode
+      type: keyword
+      description: >
+        Service mode (replicated or global)
+    - name: replicas
+      type: integer
+      description: >
+        number of replicas if service mode is replicated
+    - name: healtcheck_enabled
+      type: boolean
+      description: >
+        check if healthcheck is activated in container specifications
+    - name: version
+      type: integer
+      description: >
+        service update versionning
+    - name: updatestatus
+      type: group
+      description: >
+        check update status
+      fields:
+        - name: "state"
+          type: keyword
+          description: >
+            update state
+        - name: "startedat"
+          type: date
+          description: >
+            update started date
+        - name: "completedat"
+          type: date
+          description: >
+            update completed date
+        - name: "message"
+          type: "text"
+          description: >
+            update message

@@ -1,0 +1,30 @@
+{
+    "@timestamp": "2017-01-11T15:45:19.162Z",
+    "beat": {
+        "hostname": "smusso-ThinkPad",
+        "name": "smusso-ThinkPad",
+        "version": "6.0.0-alpha1"
+    },
+    "docker": {
+        "service": {
+            "Replicas": 2,
+            "createdat": "2017-01-11T11:35:53.432238684Z",
+            "healtcheck_enabled": true,
+            "id": "1vyemp33ktfmk7xpfmlg29ns0",
+            "labels": {
+                "label1": "thisisatest"
+            },
+            "mode": "Replicated",
+            "name": "elasticsearch",
+            "updatedat": "2017-01-11T15:45:03.726977327Z",
+            "version": 905
+        }
+    },
+    "metricset": {
+        "host": "/var/run/docker.sock",
+        "module": "docker",
+        "name": "service",
+        "rtt": 3967
+    },
+    "type": "metricsets"
+}
