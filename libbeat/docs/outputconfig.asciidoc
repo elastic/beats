@@ -1129,7 +1129,7 @@ The client certificate key used for client authentication. This option is requir
 
 The passphrase used to decrypt an encrypted key stored in the configured `key` file.
 
-===== versions
+===== supported_protocols
 
 List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
 not configured, the connection will be dropped during or after the handshake. The
