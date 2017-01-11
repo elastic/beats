@@ -147,7 +147,7 @@ metricbeat.modules:
 
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
-  #metricsets: ["status"]
+  #metricsets: ["dbstats", "status"]
   #enabled: true
   #period: 10s
 
@@ -163,7 +163,6 @@ metricbeat.modules:
 
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
-
 
 #-------------------------------- MySQL Module -------------------------------
 #- module: mysql
