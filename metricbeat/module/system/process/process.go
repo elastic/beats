@@ -34,13 +34,13 @@ type MetricSet struct {
 // New creates and returns a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
-		Procs   []string `config:"processes"` // collect all processes by default
-		Cgroups bool     `config:"cgroups"`
+		Procs        []string `config:"processes"` // collect all processes by default
+		Cgroups      bool     `config:"cgroups"`
+		EnvWhitelist []string `config:"process.env.whitelist"`
 	}{
 		Procs:   []string{".*"},
 		Cgroups: false,
 	}
-
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -48,7 +48,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	m := &MetricSet{
 		BaseMetricSet: base,
 		stats: &ProcStats{
-			Procs: config.Procs,
+			Procs:        config.Procs,
+			EnvWhitelist: config.EnvWhitelist,
 		},
 	}
 	err := m.stats.InitProcStats()
