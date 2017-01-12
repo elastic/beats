@@ -1,0 +1,9 @@
+- name: diagnostics
+  type: group
+  description: >
+    diagnostics
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
