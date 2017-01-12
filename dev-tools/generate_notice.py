@@ -25,7 +25,7 @@ def get_library_name(license):
         path, x = os.path.split(path)
         if len(lib) == 0:
             lib = x
-        else:
+        elif len(x) > 0:
             lib = x + "/" + lib
 
     return lib
