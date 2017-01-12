@@ -1,6 +1,6 @@
 // +build !integration
 
-package beater_test
+package module_test
 
 import (
 	"testing"
@@ -8,13 +8,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/publisher"
 	pubtest "github.com/elastic/beats/libbeat/publisher/testing"
-	metricbeat "github.com/elastic/beats/metricbeat/beater"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/module"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestModuleRunner(t *testing.T) {
+func TestRunner(t *testing.T) {
 	pubClient, factory := newPubClientFactory()
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
@@ -25,14 +25,14 @@ func TestModuleRunner(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Create a new ModuleWrapper based on the configuration.
-	module, err := metricbeat.NewModuleWrapper(config, mb.Registry)
+	// Create a new Wrapper based on the configuration.
+	m, err := module.NewWrapper(config, mb.Registry)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// Create the ModuleRunner facade.
-	runner := metricbeat.NewModuleRunner(factory, module)
+	// Create the Runner facade.
+	runner := module.NewRunner(factory, m)
 
 	// Start the module and have it publish to a new publisher.Client.
 	runner.Start()

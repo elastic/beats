@@ -1,14 +1,14 @@
 // +build !integration
 
-package beater_test
+package module_test
 
 import (
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	metricbeat "github.com/elastic/beats/metricbeat/beater"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/module"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -61,7 +61,7 @@ func newConfig(t testing.TB, moduleConfig interface{}) *common.Config {
 
 // test cases
 
-func TestModuleWrapper(t *testing.T) {
+func TestWrapper(t *testing.T) {
 	hosts := []string{"alpha", "beta"}
 	c := newConfig(t, map[string]interface{}{
 		"module":     moduleName,
@@ -69,13 +69,13 @@ func TestModuleWrapper(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	module, err := metricbeat.NewModuleWrapper(c, newTestRegistry(t))
+	m, err := module.NewWrapper(c, newTestRegistry(t))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	done := make(chan struct{})
-	output := module.Start(done)
+	output := m.Start(done)
 
 	<-output
 	<-output

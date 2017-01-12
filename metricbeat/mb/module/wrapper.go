@@ -1,4 +1,4 @@
-package beater
+package module
 
 import (
 	"expvar"
@@ -24,16 +24,16 @@ const (
 )
 
 var (
-	debugf      = logp.MakeDebug("metricbeat")
+	debugf      = logp.MakeDebug("module")
 	fetchesLock = sync.Mutex{}
 	fetches     = expvar.NewMap("fetches")
 )
 
-// ModuleWrapper contains the Module and the private data associated with
+// Wrapper contains the Module and the private data associated with
 // running the Module and its MetricSets.
 //
-// Use NewModuleWrapper or NewModuleWrappers to construct new ModuleWrappers.
-type ModuleWrapper struct {
+// Use NewWrapper or NewWrappers to construct new Wrappers.
+type Wrapper struct {
 	mb.Module
 	filters    *processors.Processors
 	metricSets []*metricSetWrapper // List of pointers to its associated MetricSets.
@@ -44,15 +44,15 @@ type ModuleWrapper struct {
 // running the MetricSet. It contains a pointer to the parent Module.
 type metricSetWrapper struct {
 	mb.MetricSet
-	module *ModuleWrapper // Parent Module.
-	stats  *expvar.Map    // expvar stats for this MetricSet.
+	module *Wrapper    // Parent Module.
+	stats  *expvar.Map // expvar stats for this MetricSet.
 }
 
-// NewModuleWrapper create a new Module and its associated MetricSets based
+// NewWrapper create a new Module and its associated MetricSets based
 // on the given configuration. It constructs the supporting filters and stores
-// them in the ModuleWrapper.
-func NewModuleWrapper(moduleConfig *common.Config, r *mb.Register) (*ModuleWrapper, error) {
-	mws, err := NewModuleWrappers([]*common.Config{moduleConfig}, r)
+// them in the Wrapper.
+func NewWrapper(moduleConfig *common.Config, r *mb.Register) (*Wrapper, error) {
+	mws, err := NewWrappers([]*common.Config{moduleConfig}, r)
 	if err != nil {
 		return nil, err
 	}
@@ -64,17 +64,17 @@ func NewModuleWrapper(moduleConfig *common.Config, r *mb.Register) (*ModuleWrapp
 	return mws[0], nil
 }
 
-// NewModuleWrappers creates new Modules and their associated MetricSets based
+// NewWrappers creates new Modules and their associated MetricSets based
 // on the given configuration. It constructs the supporting filters and stores
-// them all in a ModuleWrapper.
-func NewModuleWrappers(modulesConfig []*common.Config, r *mb.Register) ([]*ModuleWrapper, error) {
+// them all in a Wrapper.
+func NewWrappers(modulesConfig []*common.Config, r *mb.Register) ([]*Wrapper, error) {
 	modules, err := mb.NewModules(modulesConfig, r)
 	if err != nil {
 		return nil, err
 	}
 
 	// Wrap the Modules and MetricSet's.
-	var wrappers []*ModuleWrapper
+	var wrappers []*Wrapper
 	var errs multierror.Errors
 	for k, v := range modules {
 		debugf("Initializing Module type '%s': %T=%+v", k.Name(), k, k)
@@ -84,7 +84,7 @@ func NewModuleWrappers(modulesConfig []*common.Config, r *mb.Register) ([]*Modul
 			continue
 		}
 
-		mw := &ModuleWrapper{
+		mw := &Wrapper{
 			Module:  k,
 			filters: f,
 		}
@@ -113,7 +113,7 @@ func NewModuleWrappers(modulesConfig []*common.Config, r *mb.Register) ([]*Modul
 	return wrappers, errs.Err()
 }
 
-// ModuleWrapper methods
+// Wrapper methods
 
 // Start starts the Module's MetricSet workers which are responsible for
 // fetching metrics. The workers will continue to periodically fetch until the
@@ -123,8 +123,8 @@ func NewModuleWrappers(modulesConfig []*common.Config, r *mb.Register) ([]*Modul
 // The returned channel is buffered with a length one one. It must drained to
 // prevent blocking the operation of the MetricSets.
 //
-// Start should be called only once in the life of a ModuleWrapper.
-func (mw *ModuleWrapper) Start(done <-chan struct{}) <-chan common.MapStr {
+// Start should be called only once in the life of a Wrapper.
+func (mw *Wrapper) Start(done <-chan struct{}) <-chan common.MapStr {
 	debugf("Starting %s", mw)
 	defer debugf("Stopped %s", mw)
 
@@ -149,15 +149,15 @@ func (mw *ModuleWrapper) Start(done <-chan struct{}) <-chan common.MapStr {
 	return out
 }
 
-// String returns a string representation of ModuleWrapper.
-func (mw *ModuleWrapper) String() string {
-	return fmt.Sprintf("ModuleWrapper[name=%s, len(metricSetWrappers)=%d]",
+// String returns a string representation of Wrapper.
+func (mw *Wrapper) String() string {
+	return fmt.Sprintf("Wrapper[name=%s, len(metricSetWrappers)=%d]",
 		mw.Name(), len(mw.metricSets))
 }
 
 // Hash returns the hash value of the module wrapper
 // This allows to check if two modules are the same / have the same config
-func (mw *ModuleWrapper) Hash() uint64 {
+func (mw *Wrapper) Hash() uint64 {
 	// Check if hash was calculated previously
 	if mw.configHash > 0 {
 		return mw.configHash
