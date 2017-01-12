@@ -20,6 +20,7 @@ var (
 	moduleRunning = expvar.NewInt("metricbeat.config.module.running")
 )
 
+// Reloader is used to register and reload modules
 type Reloader struct {
 	registry *registry
 	config   ReloaderConfig
@@ -28,6 +29,7 @@ type Reloader struct {
 	wg       sync.WaitGroup
 }
 
+// NewReloader creates new Reloader instance for the given config
 func NewReloader(cfg *common.Config, p publisher.Publisher) *Reloader {
 
 	config := DefaultReloaderConfig
@@ -41,6 +43,7 @@ func NewReloader(cfg *common.Config, p publisher.Publisher) *Reloader {
 	}
 }
 
+// Run runs the reloader
 func (r *Reloader) Run() {
 
 	logp.Info("Config reloader started")
@@ -49,7 +52,7 @@ func (r *Reloader) Run() {
 	defer r.wg.Done()
 
 	// Stop all running modules when method finishes
-	defer r.StopModules(r.registry.CopyList())
+	defer r.stopModules(r.registry.CopyList())
 
 	path := r.config.Path
 	if !filepath.IsAbs(path) {
@@ -124,18 +127,19 @@ func (r *Reloader) Run() {
 				}
 			}
 
-			r.StopModules(stopList)
-			r.StartModules(startList)
+			r.stopModules(stopList)
+			r.startModules(startList)
 		}
 	}
 }
 
+// Stop stops the reloader and waits for all modules to properly stop
 func (r *Reloader) Stop() {
 	close(r.done)
 	r.wg.Wait()
 }
 
-func (r *Reloader) StartModules(list []*Wrapper) {
+func (r *Reloader) startModules(list []*Wrapper) {
 
 	logp.Info("Starting %v modules ...", len(list))
 	for _, mw := range list {
@@ -148,7 +152,7 @@ func (r *Reloader) StartModules(list []*Wrapper) {
 	}
 }
 
-func (r *Reloader) StopModules(list map[uint64]Runner) {
+func (r *Reloader) stopModules(list map[uint64]Runner) {
 	logp.Info("Stopping %v modules ...", len(list))
 
 	wg := sync.WaitGroup{}

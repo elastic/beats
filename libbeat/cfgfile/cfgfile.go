@@ -139,18 +139,18 @@ func Load(path string) (*common.Config, error) {
 	return config, nil
 }
 
-// LoadConfigs loads a list of configs data from the given file
+// LoadList loads a list of configs data from the given file.
 func LoadList(file string) ([]*common.Config, error) {
 	logp.Debug("cfgfile", "Load config from file: %s", file)
 	rawConfig, err := common.LoadFile(file)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid config: %s", err)
+		return nil, fmt.Errorf("invalid config: %s", err)
 	}
 
 	var c []*common.Config
 	err = rawConfig.Unpack(&c)
 	if err != nil {
-		return nil, fmt.Errorf("Error reading configuration from file %s: %s", file, err)
+		return nil, fmt.Errorf("error reading configuration from file %s: %s", file, err)
 	}
 
 	return c, nil
