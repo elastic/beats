@@ -1,8 +1,7 @@
-package beater
+package module
 
 import (
 	"expvar"
-	"fmt"
 	"path/filepath"
 	"sync"
 	"time"
@@ -15,29 +14,28 @@ import (
 )
 
 var (
-	debugr        = logp.MakeDebug("reloader")
 	configReloads = expvar.NewInt("metricbeat.config.reloads")
 	moduleStarts  = expvar.NewInt("metricbeat.config.module.starts")
 	moduleStops   = expvar.NewInt("metricbeat.config.module.stops")
 	moduleRunning = expvar.NewInt("metricbeat.config.module.running")
 )
 
-type ConfigReloader struct {
-	registry *runningRegistry
-	config   ModulesReloadConfig
+// Reloader is used to register and reload modules
+type Reloader struct {
+	registry *registry
+	config   ReloaderConfig
 	client   func() publisher.Client
 	done     chan struct{}
 	wg       sync.WaitGroup
 }
 
-type runningRegistry struct {
-	sync.Mutex
-	List map[uint64]ModuleRunner
-}
+// NewReloader creates new Reloader instance for the given config
+func NewReloader(cfg *common.Config, p publisher.Publisher) *Reloader {
 
-func NewConfigReloader(config ModulesReloadConfig, p publisher.Publisher) *ConfigReloader {
+	config := DefaultReloaderConfig
+	cfg.Unpack(&config)
 
-	return &ConfigReloader{
+	return &Reloader{
 		registry: newRunningRegistry(),
 		config:   config,
 		client:   p.Connect,
@@ -45,7 +43,8 @@ func NewConfigReloader(config ModulesReloadConfig, p publisher.Publisher) *Confi
 	}
 }
 
-func (r *ConfigReloader) Run() {
+// Run runs the reloader
+func (r *Reloader) Run() {
 
 	logp.Info("Config reloader started")
 
@@ -53,14 +52,14 @@ func (r *ConfigReloader) Run() {
 	defer r.wg.Done()
 
 	// Stop all running modules when method finishes
-	defer r.StopModules(r.registry.CopyList())
+	defer r.stopModules(r.registry.CopyList())
 
 	path := r.config.Path
 	if !filepath.IsAbs(path) {
 		path = filepath.Join(cfgfile.GetPathConfig(), path)
 	}
 
-	gw := NewGlobWatcher(path)
+	gw := cfgfile.NewGlobWatcher(path)
 
 	for {
 		select {
@@ -69,7 +68,7 @@ func (r *ConfigReloader) Run() {
 			return
 		case <-time.After(r.config.Period):
 
-			debugr("Scan for new config files")
+			debugf("Scan for new config files")
 			configReloads.Add(1)
 
 			files, updated, err := gw.Scan()
@@ -87,7 +86,7 @@ func (r *ConfigReloader) Run() {
 			// Load all config objects
 			configs := []*common.Config{}
 			for _, file := range files {
-				c, err := LoadConfigs(file)
+				c, err := cfgfile.LoadList(file)
 				if err != nil {
 					logp.Err("Error loading config: %s", err)
 					continue
@@ -97,7 +96,7 @@ func (r *ConfigReloader) Run() {
 			}
 
 			// Check which configs do not exist anymore
-			s, err := NewModuleWrappers(configs, mb.Registry)
+			s, err := NewWrappers(configs, mb.Registry)
 			if err != nil {
 				if err != mb.ErrAllModulesDisabled && err != mb.ErrEmptyConfig {
 					// Continuing as only some modules could have an error
@@ -105,9 +104,9 @@ func (r *ConfigReloader) Run() {
 				}
 			}
 
-			debugr("Number of module wrappers created: %v", len(s))
+			debugf("Number of module wrappers created: %v", len(s))
 
-			var startList []*ModuleWrapper
+			var startList []*Wrapper
 			stopList := r.registry.CopyList()
 
 			for _, w := range s {
@@ -117,42 +116,43 @@ func (r *ConfigReloader) Run() {
 					continue
 				}
 
-				debugr("Remove from stoplist: %v", w.Hash())
+				debugf("Remove from stoplist: %v", w.Hash())
 				delete(stopList, w.Hash())
 
 				// As module already exist, it must be removed from the stop list and not started
 				if !r.registry.Has(w.Hash()) {
-					debugr("Add to startlist: %v", w.Hash())
+					debugf("Add to startlist: %v", w.Hash())
 					startList = append(startList, w)
 					continue
 				}
 			}
 
-			r.StopModules(stopList)
-			r.StartModules(startList)
+			r.stopModules(stopList)
+			r.startModules(startList)
 		}
 	}
 }
 
-func (r *ConfigReloader) Stop() {
+// Stop stops the reloader and waits for all modules to properly stop
+func (r *Reloader) Stop() {
 	close(r.done)
 	r.wg.Wait()
 }
 
-func (r *ConfigReloader) StartModules(list []*ModuleWrapper) {
+func (r *Reloader) startModules(list []*Wrapper) {
 
 	logp.Info("Starting %v modules ...", len(list))
 	for _, mw := range list {
-		mr := NewModuleRunner(r.client, mw)
+		mr := NewRunner(r.client, mw)
 		mr.Start()
 		r.registry.Add(mw.Hash(), mr)
 		moduleStarts.Add(1)
 		moduleRunning.Add(1)
-		debugr("New Module Started: %v", mw.Hash())
+		debugf("New Module Started: %v", mw.Hash())
 	}
 }
 
-func (r *ConfigReloader) StopModules(list map[uint64]ModuleRunner) {
+func (r *Reloader) stopModules(list map[uint64]Runner) {
 	logp.Info("Stopping %v modules ...", len(list))
 
 	wg := sync.WaitGroup{}
@@ -165,64 +165,9 @@ func (r *ConfigReloader) StopModules(list map[uint64]ModuleRunner) {
 			r.registry.Remove(hash)
 			moduleStops.Add(1)
 			moduleRunning.Add(-1)
-			debugr("Module stopped: %v", hash)
+			debugf("Module stopped: %v", hash)
 		}()
 	}
 
 	wg.Wait()
-}
-
-// LoadConfigs loads the configs data from the given file
-func LoadConfigs(file string) ([]*common.Config, error) {
-	debugr("Load config from file: %s", file)
-	rawConfig, err := common.LoadFile(file)
-	if err != nil {
-		return nil, fmt.Errorf("Invalid config: %s", err)
-	}
-
-	var c []*common.Config
-	err = rawConfig.Unpack(&c)
-	if err != nil {
-		return nil, fmt.Errorf("Error reading configuration from file %s: %s", file, err)
-	}
-
-	return c, nil
-}
-
-func newRunningRegistry() *runningRegistry {
-	return &runningRegistry{
-		List: map[uint64]ModuleRunner{},
-	}
-}
-
-func (r *runningRegistry) Add(hash uint64, m ModuleRunner) {
-	r.Lock()
-	defer r.Unlock()
-	r.List[hash] = m
-}
-
-func (r *runningRegistry) Remove(hash uint64) {
-	r.Lock()
-	defer r.Unlock()
-	delete(r.List, hash)
-}
-
-func (r *runningRegistry) Has(hash uint64) bool {
-	r.Lock()
-	defer r.Unlock()
-
-	_, ok := r.List[hash]
-	return ok
-}
-
-func (r *runningRegistry) CopyList() map[uint64]ModuleRunner {
-	r.Lock()
-	defer r.Unlock()
-
-	// Create a copy of the list
-	list := map[uint64]ModuleRunner{}
-	for k, v := range r.List {
-		list[k] = v
-	}
-	return list
 }
