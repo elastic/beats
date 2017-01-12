@@ -32,7 +32,6 @@ https://github.com/elastic/beats/compare/v5.1.2...5.1[Check the HEAD diff]
 *Packetbeat*
 
 *Filebeat*
-- Fix registry migration issue from old states were files were only harvested after second restart. {pull}3322[3322]
 
 *Winlogbeat*
 
@@ -67,6 +66,10 @@ https://github.com/elastic/beats/compare/v5.1.2...5.1[Check the HEAD diff]
 https://github.com/elastic/beats/compare/v5.1.1...v5.1.2[View commits]
 
 ==== Bugfixes
+
+*Filebeat*
+
+- Fix registry migration issue from old states were files were only harvested after second restart. {pull}3322[3322]
 
 *Packetbeat*
 
