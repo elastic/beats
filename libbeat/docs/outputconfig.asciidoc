@@ -617,7 +617,8 @@ Valid values are `0.8.2.0`, `0.8.2.1`, `0.8.2.2`, `0.8.2`, `0.8`, `0.9.0.0`,
 
 ===== username
 
-The username for connecting to Kafka. If username is configured, the passowrd must be configured as well. Only SASL/PLAIN is supported.
+The username for connecting to Kafka. If username is configured, the password
+must be configured as well. Only SASL/PLAIN is supported.
 
 ===== password
 
@@ -657,7 +658,7 @@ Kafka output broker event partitioning strategy. Must be one of `random`,
 
 *`random.group_events`*: Sets the number of events to be published to the same
  partition, before the partitioner selects a new partition by random. The
- default value is 1 meaning after each event a new parition is picked randomly.
+ default value is 1 meaning after each event a new partition is picked randomly.
 
 *`round_robin.group_events`*: Sets the number of events to be published to the
  same partition, before the partitioner selects the next partition. The default
@@ -689,7 +690,7 @@ The number of concurrent load-balanced Kafka output workers.
 Kafka metadata update settings. The metadata do contain information about
 brokers, topics, partition, and active leaders to use for publishing.
 
-*`refresh_frequency`*:: Metadata refreash interval. Defaults to 10 minutes.
+*`refresh_frequency`*:: Metadata refresh interval. Defaults to 10 minutes.
 
 *`retry.max`*:: Total number of metadata update retries when cluster is in middle of leader election. The default is 3.
 
@@ -1104,7 +1105,7 @@ The client certificate key used for client authentication. This option is requir
 
 The passphrase used to decrypt an encrypted key stored in the configured `key` file.
 
-===== versions
+===== supported_protocols
 
 List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
 not configured, the connection will be dropped during or after the handshake. The

@@ -944,24 +944,24 @@ Total number of outgoing packets.
 
 
 [[exported-fields-haproxy]]
-== haproxy Fields
+== HAProxy Fields
 
 experimental[]
-haproxy Module
+HAProxy Module
 
 
 
 [float]
 == haproxy Fields
 
-HAProx metrics.
+HAProxy metrics.
 
 
 
 [float]
 == info Fields
 
-General infomration collected on HAProxy process
+General information about HAProxy processes.
 
 
 
@@ -970,7 +970,7 @@ General infomration collected on HAProxy process
 
 type: long
 
-Number of processes
+Number of processes.
 
 
 [float]
@@ -978,7 +978,7 @@ Number of processes
 
 type: long
 
-Process number
+Process number.
 
 
 [float]
@@ -986,7 +986,7 @@ Process number
 
 type: long
 
-Process ID
+Process ID.
 
 
 [float]
@@ -1008,7 +1008,7 @@ type: long
 
 type: long
 
-Current uptime in seconds
+Current uptime in seconds.
 
 
 [float]
@@ -1018,7 +1018,7 @@ type: long
 
 format: bytes
 
-Max number of memory usage in bytes (The 'Memmax_MB' value converted to bytes)
+Maximum amount of memory usage in bytes (the 'Memmax_MB' value converted to bytes).
 
 
 [float]
@@ -1026,7 +1026,7 @@ Max number of memory usage in bytes (The 'Memmax_MB' value converted to bytes)
 
 type: long
 
-Max number of open files for process
+Maximum number of open files for the process.
 
 
 [float]
@@ -1100,7 +1100,7 @@ type: long
 
 type: long
 
-Current Connections
+Current connections.
 
 
 [float]
@@ -1108,7 +1108,7 @@ Current Connections
 
 type: long
 
-Total Connections
+Total connections.
 
 
 [float]
@@ -1116,7 +1116,7 @@ Total Connections
 
 type: long
 
-Current ssl Connections
+Current SSL connections.
 
 
 [float]
@@ -1124,7 +1124,7 @@ Current ssl Connections
 
 type: long
 
-Current Connections
+Total SSL connections.
 
 
 [float]
@@ -1132,7 +1132,7 @@ Current Connections
 
 type: long
 
-Current Connections
+Maximum SSL connections.
 
 
 [float]
@@ -1140,7 +1140,7 @@ Current Connections
 
 type: long
 
-Max connections
+Maximum connections.
 
 
 [float]
@@ -1347,7 +1347,7 @@ format: percent
 [float]
 == stat Fields
 
-Stats collected from HAProxy process
+Stats collected from HAProxy processes.
 
 
 
@@ -1356,7 +1356,7 @@ Stats collected from HAProxy process
 
 type: keyword
 
-status (UP/DOWN/NOLB/MAINT/MAINT(via)...)
+Status (UP, DOWN, NOLB, MAINT, or MAINT(via)...).
 
 
 [float]
@@ -1364,7 +1364,7 @@ status (UP/DOWN/NOLB/MAINT/MAINT(via)...)
 
 type: long
 
-total weight (backend), server weight (server)
+Total weight (for backends), or server weight (for servers).
 
 
 [float]
@@ -1372,7 +1372,7 @@ total weight (backend), server weight (server)
 
 type: long
 
-total downtime (in seconds). The value for the backend is the downtime for the whole backend, not the sum of the server downtime.
+Total downtime (in seconds). For backends, this value is the downtime for the whole backend, not the sum of the downtime for the servers.
 
 
 [float]
@@ -1380,7 +1380,7 @@ total downtime (in seconds). The value for the backend is the downtime for the w
 
 type: integer
 
-(0=frontend, 1=backend, 2=server, 3=socket/listener)
+Component type (0=frontend, 1=backend, 2=server, or 3=socket/listener).
 
 
 [float]
@@ -1388,7 +1388,7 @@ type: integer
 
 type: integer
 
-process id (0 for first instance, 1 for second, ...)
+Process ID (0 for first instance, 1 for second, and so on).
 
 
 [float]
@@ -1396,7 +1396,7 @@ process id (0 for first instance, 1 for second, ...)
 
 type: keyword
 
-service name (FRONTEND for frontend, BACKEND for backend, any name for server/listener)
+Service name (FRONTEND for frontend, BACKEND for backend, or any name for server/listener).
 
 
 [float]
@@ -1406,7 +1406,7 @@ type: long
 
 format: bytes
 
-bytes in
+Bytes in.
 
 
 [float]
@@ -1416,7 +1416,7 @@ type: long
 
 format: bytes
 
-bytes out
+Bytes out.
 
 
 [float]
@@ -1424,7 +1424,7 @@ bytes out
 
 type: integer
 
-number of seconds since the last UP<->DOWN transition
+Number of seconds since the last UP->DOWN or DOWN->UP transition.
 
 
 [float]
@@ -1434,7 +1434,7 @@ type: scaled_float
 
 format: percentage
 
-current throttle percentage for the server, when slowstart is active, or no value if not in slowstart.
+Current throttle percentage for the server when slowstart is active, or no value if slowstart is inactive.
 
 
 [float]
@@ -1442,7 +1442,7 @@ current throttle percentage for the server, when slowstart is active, or no valu
 
 type: long
 
-total number of times a server was selected, either for new sessions, or when re-dispatching. The server counter is the number of times that server was selected.
+Total number of times a server was selected, either for new sessions, or when re-dispatching. For servers, this field reports the the number of times the server was selected.
 
 
 [float]
@@ -1450,7 +1450,7 @@ total number of times a server was selected, either for new sessions, or when re
 
 type: long
 
-id of proxy/server if tracking is enabled.
+ID of the proxy/server if tracking is enabled.
 
 
 
@@ -1459,7 +1459,7 @@ id of proxy/server if tracking is enabled.
 
 type: long
 
-cumulative number of connections
+Cumulative number of connections.
 
 
 [float]
@@ -1467,7 +1467,7 @@ cumulative number of connections
 
 type: long
 
-number of times a connection to a server was retried.
+Number of times a connection to a server was retried.
 
 
 [float]
@@ -1475,7 +1475,7 @@ number of times a connection to a server was retried.
 
 type: long
 
-the average connect time in ms over the 1024 last requests
+Average connect time in ms over the last 1024 requests.
 
 
 
@@ -1484,9 +1484,10 @@ the average connect time in ms over the 1024 last requests
 
 type: long
 
-requests denied because of security concerns.
-  * For tcp this is because of a matched tcp-request content rule.
-  * For http this is because of a matched http-request or tarpit rule.
+Requests denied because of security concerns.
+
+  * For TCP this is because of a matched tcp-request content rule.
+  * For HTTP this is because of a matched http-request or tarpit rule.
 
 
 [float]
@@ -1494,7 +1495,7 @@ requests denied because of security concerns.
 
 type: long
 
-current queued requests. For the backend this reports the number queued without a server assigned
+Current queued requests. For backends, this field reports the number of requests queued without a server assigned.
 
 
 [float]
@@ -1502,7 +1503,7 @@ current queued requests. For the backend this reports the number queued without 
 
 type: long
 
-max value of queued.current
+Maximum value of queued.current.
 
 
 [float]
@@ -1510,8 +1511,9 @@ max value of queued.current
 
 type: long
 
-request errors. Some of the possible causes are:
-  * early termination from the client, before the request has been sent.
+Request errors. Some of the possible causes are:
+
+  * early termination from the client, before the request has been sent
   * read error from the client
   * client timeout
   * client closed connection
@@ -1524,7 +1526,7 @@ request errors. Some of the possible causes are:
 
 type: long
 
-number of times a request was redispatched to another server. The server value counts the number of times that server was switched away from.
+Number of times a request was redispatched to another server. For servers, this field reports the number of times the server was switched away from.
 
 
 [float]
@@ -1532,7 +1534,7 @@ number of times a request was redispatched to another server. The server value c
 
 type: long
 
-number of requests that encountered an error trying to connect to a backend server. The backend stat is the sum of the stat for all servers of that backend, plus any connection errors not associated with a particular server (such as the backend having no active servers).
+Number of requests that encountered an error trying to connect to a server. For backends, this field reports the sum of the stat for all backend servers, plus any connection errors not associated with a particular server (such as the backend having no active servers).
 
 
 [float]
@@ -1546,7 +1548,7 @@ number of requests that encountered an error trying to connect to a backend serv
 
 type: long
 
-HTTP requests per second over last elapsed second
+Number of HTTP requests per second over the last elapsed second.
 
 
 [float]
@@ -1554,7 +1556,7 @@ HTTP requests per second over last elapsed second
 
 type: long
 
-max number of HTTP requests per second observed
+Maximum number of HTTP requests per second.
 
 
 [float]
@@ -1562,7 +1564,7 @@ max number of HTTP requests per second observed
 
 type: long
 
-total number of HTTP requests received
+Total number of HTTP requests received.
 
 
 
@@ -1571,7 +1573,8 @@ total number of HTTP requests received
 
 type: long
 
-response errors. srv_abrt will be counted here also. Some other errors are: * write error on the client socket (won't be counted for the server stat) * failure applying filters to the respons
+Number of response errors. This value includes the number of data transfers aborted by the server (haproxy.stat.server.aborted).  Some other errors are:
+* write errors on the client socket (won't be counted for the server stat) * failure applying filters to the response
 
 
 [float]
@@ -1579,7 +1582,7 @@ response errors. srv_abrt will be counted here also. Some other errors are: * wr
 
 type: long
 
-the average response time in ms over the 1024 last requests (0 for TCP)
+Average response time in ms over the last 1024 requests (0 for TCP).
 
 
 [float]
@@ -1587,8 +1590,7 @@ the average response time in ms over the 1024 last requests (0 for TCP)
 
 type: integer
 
-responses denied because of security concerns.
-  * For http this is because of a matched http-request rule, or "option checkcache".
+Responses denied because of security concerns. For HTTP this is because of a matched http-request rule, or "option checkcache".
 
 
 [float]
@@ -1602,7 +1604,7 @@ responses denied because of security concerns.
 
 type: long
 
-http responses with 1xx code
+HTTP responses with 1xx code.
 
 
 [float]
@@ -1610,7 +1612,7 @@ http responses with 1xx code
 
 type: long
 
-http responses with 2xx code
+HTTP responses with 2xx code.
 
 
 [float]
@@ -1618,7 +1620,7 @@ http responses with 2xx code
 
 type: long
 
-http responses with 3xx code
+HTTP responses with 3xx code.
 
 
 [float]
@@ -1626,7 +1628,7 @@ http responses with 3xx code
 
 type: long
 
-http responses with 4xx code
+HTTP responses with 4xx code.
 
 
 [float]
@@ -1634,7 +1636,7 @@ http responses with 4xx code
 
 type: long
 
-http responses with 5xx code
+HTTP responses with 5xx code.
 
 
 [float]
@@ -1642,7 +1644,7 @@ http responses with 5xx code
 
 type: long
 
-http responses with other codes (protocol error)
+HTTP responses with other codes (protocol error).
 
 
 
@@ -1651,7 +1653,7 @@ http responses with other codes (protocol error)
 
 type: long
 
-current sessions
+Number of current sessions.
 
 
 [float]
@@ -1659,7 +1661,7 @@ current sessions
 
 type: long
 
-max sessions
+Maximum number of sessions.
 
 
 [float]
@@ -1667,7 +1669,7 @@ max sessions
 
 type: long
 
-configured session limit
+Configured session limit.
 
 
 
@@ -1676,7 +1678,7 @@ configured session limit
 
 type: integer
 
-number of sessions per second over last elapsed second
+Number of sessions per second over the last elapsed second.
 
 
 [float]
@@ -1684,7 +1686,7 @@ number of sessions per second over last elapsed second
 
 type: integer
 
-configured limit on new sessions per second
+Configured limit on new sessions per second.
 
 
 [float]
@@ -1692,7 +1694,7 @@ configured limit on new sessions per second
 
 type: integer
 
-max number of new sessions per second
+Maximum number of new sessions per second.
 
 
 [float]
@@ -1706,7 +1708,8 @@ max number of new sessions per second
 
 type: keyword
 
-status of last health check, one of:
+Status of the last health check. One of:
+
   UNK     -> unknown
   INI     -> initializing
   SOCKERR -> socket error
@@ -1730,7 +1733,7 @@ status of last health check, one of:
 
 type: long
 
-layer5-7 code, if available
+Layer 5-7 code, if available.
 
 
 [float]
@@ -1738,7 +1741,7 @@ layer5-7 code, if available
 
 type: long
 
-time in ms took to finish last health check
+Time in ms that it took to finish the last health check.
 
 
 [float]
@@ -1767,7 +1770,7 @@ type: integer
 
 type: long
 
-number of failed checks. (Only counts checks failed when the server is up.)
+Number of checks that failed while the server was up.
 
 
 [float]
@@ -1775,7 +1778,7 @@ number of failed checks. (Only counts checks failed when the server is up.)
 
 type: long
 
-number of UP->DOWN transitions. The backend counter counts transitions to the whole backend being down, rather than the sum of the counters for each server.
+Number of UP->DOWN transitions. For backends, this value is the number of transitions to the whole backend being down, rather than the sum of the transitions for each server.
 
 
 [float]
@@ -1783,7 +1786,7 @@ number of UP->DOWN transitions. The backend counter counts transitions to the wh
 
 type: integer
 
-number of data transfers aborted by the client
+Number of data transfers aborted by the client.
 
 
 [float]
@@ -1797,7 +1800,7 @@ number of data transfers aborted by the client
 
 type: integer
 
-server id (unique inside a proxy)
+Server ID (unique inside a proxy).
 
 
 [float]
@@ -1805,7 +1808,7 @@ server id (unique inside a proxy)
 
 type: integer
 
-number of data transfers aborted by the server (inc. in eresp)
+Number of data transfers aborted by the server. This value is included in haproxy.stat.response.errors.
 
 
 [float]
@@ -1813,7 +1816,7 @@ number of data transfers aborted by the server (inc. in eresp)
 
 type: integer
 
-number of active servers (backend), server is active (server)
+Number of backend servers that are active, meaning that they are healthy and can receive requests from the load balancer. 
 
 
 [float]
@@ -1821,7 +1824,7 @@ number of active servers (backend), server is active (server)
 
 type: integer
 
-number of backup servers (backend), server is backup (server)
+Number of backend servers that are backup servers.
 
 
 [float]
@@ -1837,7 +1840,7 @@ type: long
 
 format: bytes
 
-number of HTTP response bytes fed to the compressor
+Number of HTTP response bytes fed to the compressor.
 
 
 [float]
@@ -1847,7 +1850,7 @@ type: integer
 
 format: bytes
 
-number of HTTP response bytes emitted by the compressor
+Number of HTTP response bytes emitted by the compressor.
 
 
 [float]
@@ -1857,7 +1860,7 @@ type: long
 
 format: bytes
 
-number of bytes that bypassed the HTTP compressor (CPU/BW limit)
+Number of bytes that bypassed the HTTP compressor (CPU/BW limit).
 
 
 [float]
@@ -1867,7 +1870,7 @@ type: long
 
 format: bytes
 
-number of HTTP responses that were compressed
+Number of HTTP responses that were compressed.
 
 
 [float]
@@ -1881,7 +1884,7 @@ number of HTTP responses that were compressed
 
 type: integer
 
-unique proxy id
+Unique proxy ID.
 
 
 [float]
@@ -1889,7 +1892,7 @@ unique proxy id
 
 type: keyword
 
-proxy name
+Proxy name.
 
 
 [float]
@@ -1903,7 +1906,7 @@ proxy name
 
 type: integer
 
-configured maxqueue for the server, or nothing in the value is 0 (default, meaning no limit)
+Configured queue limit (maxqueue) for the server, or nothing if the value of maxqueue is 0 (meaning no limit).
 
 
 [float]
@@ -1911,7 +1914,7 @@ configured maxqueue for the server, or nothing in the value is 0 (default, meani
 
 type: integer
 
-the average queue time in ms over the 1024 last requests
+The average queue time in ms over the last 1024 requests.
 
 
 [[exported-fields-kafka]]
