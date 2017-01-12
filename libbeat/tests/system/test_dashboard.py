@@ -10,6 +10,7 @@ from nose.plugins.skip import Skip, SkipTest
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
+@unittest.skip("this test will be refactored in a future commit")
 class Test(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
