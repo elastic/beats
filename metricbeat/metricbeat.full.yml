@@ -179,7 +179,7 @@ ceph:
 
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
-  #metricsets: ["status"]
+  #metricsets: ["dbstats", "status"]
   #enabled: true
   #period: 10s
 
@@ -195,7 +195,6 @@ ceph:
 
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
-
 
 #-------------------------------- MySQL Module -------------------------------
 #- module: mysql
