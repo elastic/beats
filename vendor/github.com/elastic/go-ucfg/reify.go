@@ -142,7 +142,7 @@ func reifyInto(opts *options, to reflect.Value, from *Config) Error {
 		return nil
 	}
 
-	return raiseInvalidTopLevelType(to.Interface())
+	return raiseInvalidTopLevelType(to.Interface(), opts.meta)
 }
 
 func reifyMap(opts *options, to reflect.Value, from *Config) Error {

@@ -28,6 +28,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
+- Fix overwriting explicit empty config sections {issue}2918[2918]
 
 *Metricbeat*
 
