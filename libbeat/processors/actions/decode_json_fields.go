@@ -165,6 +165,10 @@ func DecodeJSON(text []byte, to *interface{}) error {
 		return err
 	}
 
+	if dec.More() {
+		return errors.New("Multiple json elements found")
+	}
+
 	switch O := interface{}(*to).(type) {
 	case map[string]interface{}:
 		jsontransform.TransformNumbers(O)
