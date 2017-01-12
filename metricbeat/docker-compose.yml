@@ -4,6 +4,7 @@ services:
     build: ${PWD}/.
     depends_on:
       - apache
+      - ceph
       - couchbase
       - mongodb
       - haproxy
@@ -46,12 +47,25 @@ services:
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
       - /var/run/docker.sock:/var/run/docker.sock
+      - datavolume:/etc/ceph
+      - datavolume1:/var/run/ceph
     command: make
     entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
 
   # Modules
   apache:
     build: ${PWD}/module/apache/_meta
+
+  ceph:
+    image: ceph/demo
+    container_name: metricbeatceph
+    network_mode: "host"
+    environment:
+      - MON_IP=172.17.0.1
+      - CEPH_PUBLIC_NETWORK=172.17.0.0/24
+    volumes:
+      - datavolume:/etc/ceph
+      - datavolume1:/var/run/ceph
 
   couchbase:
     build: ${PWD}/module/couchbase/_meta
@@ -91,3 +105,7 @@ services:
 
   zookeeper:
     image: jplock/zookeeper:3.4.8
+
+volumes:
+  datavolume: {}
+  datavolume1: {}

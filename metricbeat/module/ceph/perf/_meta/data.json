@@ -1,19 +1,33 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"mysql",
-        "name":"status",
-        "rtt":44269
-    },
-    "ceph":{
-        "perf":{
-            "example": "perf"
+    "ceph": {
+        "perf": {
+            "throttle-mon_client_bytes": {
+                "get": 126,
+                "get_or_fail_fail": 0,
+                "get_or_fail_success": 0,
+                "get_sum": 8817,
+                "max": 1.048576e+08,
+                "put": 126,
+                "put_sum": 8817,
+                "take": 0,
+                "take_sum": 0,
+                "val": 0,
+                "wait": {
+                    "avgcount": 0,
+                    "sum": 0
+                }
+            }
         }
     },
-    "type":"metricsets"
+    "metricset": {
+        "module": "ceph",
+        "name": "perf",
+        "rtt": 115
+    },
+    "type": "metricsets"
 }

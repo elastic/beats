@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/module/ceph"
 	"os/exec"
 	"strings"
 )
@@ -87,6 +88,8 @@ func formatTagName(oldtag string) string {
 }*/
 
 func perfDump(binary string, socket *socket) (string, error) {
+	var output string
+
 	cmdArgs := []string{"--admin-daemon", socket.socket}
 	if socket.sockType == typeOsd {
 		cmdArgs = append(cmdArgs, "perf", "dump")
@@ -96,18 +99,26 @@ func perfDump(binary string, socket *socket) (string, error) {
 		return "", fmt.Errorf("[Unknown socket type] %s", socket.sockType)
 	}
 
-	cmd := exec.Command(binary, cmdArgs...)
+	if strings.Contains(binary, "docker") {
+		cmdCeph := []string{"/usr/bin/ceph"}
+		cmdDockerExec := append(cmdCeph, cmdArgs...)
+		output = ceph.ExecInContainer(cmdDockerExec)
+	} else {
+		cmd := exec.Command(binary, cmdArgs...)
 
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
+		var out bytes.Buffer
+		cmd.Stdout = &out
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
 
-	err := cmd.Run()
-	if err != nil {
-		return "", fmt.Errorf("[Error running ceph dump command] %s", stderr.String())
+		err := cmd.Run()
+		if err != nil {
+			return "", fmt.Errorf("[Error running ceph dump command] %s", stderr.String())
+		}
+		output = out.String()
 	}
-	return out.String(), nil
+
+	return output, nil
 
 }
 
