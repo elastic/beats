@@ -81,7 +81,7 @@ parse_args() {
       exit 0
       ;;
     -r|--race)
-      RACE_DETECTOR=1
+      export RACE_DETECTOR=1
       shift
       ;;
     -v|--verbose)

@@ -44,7 +44,8 @@ install_gimme() {
     chmod +x ${HOME}/bin/gimme
   fi
 
-  debug "Gimme version $(gimme version)"
+  GIMME="${HOME}/bin/gimme"
+  debug "Gimme version $(${GIMME} version)"
 }
 
 # setup_go_root "version"
@@ -57,7 +58,7 @@ setup_go_root() {
   install_gimme
 
   # Setup GOROOT and add go to the PATH.
-  gimme "${version}" > /dev/null
+  ${GIMME} "${version}" > /dev/null
   source "${HOME}/.gimme/envs/go${version}.env" 2> /dev/null
 
   debug "$(go version)"
