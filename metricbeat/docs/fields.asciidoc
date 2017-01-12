@@ -5798,6 +5798,14 @@ The username of the user that created the process. If the username cannot be det
 
 
 [float]
+=== system.process.env
+
+type: dict
+
+The environment variables used to start the process. The data is available on FreeBSD, Linux, and OS X.
+
+
+[float]
 == cpu Fields
 
 CPU-specific statistics per process.

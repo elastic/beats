@@ -35,6 +35,12 @@
         cannot be determined, the field will contain the user's
         numeric identifier (UID). On Windows, this field includes the user's
         domain and is formatted as `domain\username`.
+    - name: env
+      type: dict
+      dict-type: keyword
+      description: >
+        The environment variables used to start the process. The data is
+        available on FreeBSD, Linux, and OS X.
     - name: cpu
       type: group
       prefix: "[float]"
