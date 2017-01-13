@@ -32,8 +32,6 @@ type Prospector struct {
 	states           *file.States
 	wg               sync.WaitGroup
 	channelWg        sync.WaitGroup // Separate waitgroup for channels as not stopped on completion
-	ID               uint64
-	Once             bool
 }
 
 type Prospectorer interface {
