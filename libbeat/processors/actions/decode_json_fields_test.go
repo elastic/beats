@@ -61,6 +61,22 @@ func TestInvalidJSON(t *testing.T) {
 
 }
 
+func TestInvalidJSONMultiple(t *testing.T) {
+	input := common.MapStr{
+		"msg":      "11:38:04,323 |-INFO testing",
+		"pipeline": "us1",
+	}
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg":      "11:38:04,323 |-INFO testing",
+		"pipeline": "us1",
+	}
+	assert.Equal(t, expected.String(), actual.String())
+
+}
+
 func TestValidJSONDepthOne(t *testing.T) {
 	input := common.MapStr{
 		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
