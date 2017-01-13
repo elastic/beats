@@ -19,10 +19,10 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: nifi
-  metricsets: ["heap"]
+  metricsets: ["flowfilerepostorage", "heap"]
   enabled: true
   period: 1s
-  hosts: ["localhost"]
+  hosts: ["localhost:8080"]
 ----
 
 [float]
@@ -30,7 +30,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-nifi-flowfilerepostorage,flowfilerepostorage>>
+
 * <<metricbeat-metricset-nifi-heap,heap>>
+
+include::nifi/flowfilerepostorage.asciidoc[]
 
 include::nifi/heap.asciidoc[]
 

@@ -2152,6 +2152,14 @@
         },
         "nifi": {
           "properties": {
+            "flowfilerepostorage": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
             "heap": {
               "properties": {
                 "example": {

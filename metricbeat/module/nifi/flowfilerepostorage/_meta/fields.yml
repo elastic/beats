@@ -1,0 +1,9 @@
+- name: flowfilerepostorage
+  type: group
+  description: >
+    flowfilerepostorage
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

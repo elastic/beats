@@ -48,9 +48,9 @@ metricbeat.modules:
 
 #-------------------------------- nifi Module --------------------------------
 - module: nifi
-  metricsets: ["heap"]
+  metricsets: ["flowfilerepostorage", "heap"]
   enabled: true
   period: 1s
-  hosts: ["localhost"]
+  hosts: ["localhost:8080"]
 
 

@@ -35,6 +35,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/nginx"
 	_ "github.com/elastic/beats/metricbeat/module/nginx/stubstatus"
 	_ "github.com/elastic/beats/metricbeat/module/nifi"
+	_ "github.com/elastic/beats/metricbeat/module/nifi/flowfilerepostorage"
 	_ "github.com/elastic/beats/metricbeat/module/nifi/heap"
 	_ "github.com/elastic/beats/metricbeat/module/postgresql"
 	_ "github.com/elastic/beats/metricbeat/module/postgresql/activity"

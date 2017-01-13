@@ -2170,6 +2170,15 @@
         },
         "nifi": {
           "properties": {
+            "flowfilerepostorage": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            },
             "heap": {
               "properties": {
                 "example": {
