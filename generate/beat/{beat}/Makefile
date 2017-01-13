@@ -1,5 +1,5 @@
-BEATNAME={{cookiecutter.beat}}
-BEAT_DIR={{cookiecutter.beat_path}}/{{cookiecutter.beat}}
+BEATNAME={beat}
+BEAT_DIR={beat_path}/{beat}
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
@@ -33,7 +33,7 @@ git-init:
 	git commit -m "Add git settings"
 	git add .
 	git reset -- .travis.yml
-	git commit -m "Add {{cookiecutter.beat}}"
+	git commit -m "Add {beat}"
 	git add .travis.yml
 	git commit -m "Add Travis CI"
 

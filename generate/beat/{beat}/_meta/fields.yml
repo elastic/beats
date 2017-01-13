@@ -1,5 +1,5 @@
-- key: {{ cookiecutter.beat }}
-  title: {{ cookiecutter.beat }}
+- key: {beat}
+  title: {beat}
   description:
   fields:
     - name: counter
