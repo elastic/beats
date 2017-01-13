@@ -51,7 +51,8 @@ def fields_to_es_template(args, input, output, index, version):
         "mappings": {
             "_default_": {
                 "_all": {
-                    "norms": False
+                    "norms": False,
+                    "enabled": True,
                 },
                 "properties": {},
                 "_meta": {

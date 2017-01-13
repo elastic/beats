@@ -3,9 +3,7 @@
     "_default_": {
       "_all": {
         "enabled": true,
-        "norms": {
-          "enabled": false
-        }
+        "norms": false
       },
       "dynamic_templates": [
         {
