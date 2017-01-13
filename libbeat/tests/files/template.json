@@ -1,12 +1,6 @@
 {
   "mappings": {
     "_default_": {
-      "_all": {
-        "enabled": true,
-        "norms": {
-          "enabled": false
-        }
-      },
       "dynamic_templates": [
         {
           "template1": {

@@ -50,9 +50,6 @@ def fields_to_es_template(args, input, output, index, version):
         },
         "mappings": {
             "_default_": {
-                "_all": {
-                    "norms": False
-                },
                 "properties": {},
                 "_meta": {
                     "version": version,
@@ -61,10 +58,19 @@ def fields_to_es_template(args, input, output, index, version):
         }
     }
 
+    # should be done only for es5x. For es6x, any "_all" setting results
+    # in an error.
+    # TODO: https://github.com/elastic/beats/issues/3368
+    # template["mappings"]["_default"]["_all"] = {
+    #     "norms": False
+    # }
+
     if args.es2x:
         # different syntax for norms
-        template["mappings"]["_default_"]["_all"]["norms"] = {
-            "enabled": False
+        template["mappings"]["_default_"]["_all"] = {
+            "norms": {
+                "enabled": False
+            }
         }
     else:
         # For ES 5.x, increase the limit on the max number of fields.
