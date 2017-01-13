@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file based on the
 - Make testing dependent on local version of beats
 
 ### Backward Compatibility Breaks
+- Remove dependency on cookiecutter
 
 ### Bugfixes
 

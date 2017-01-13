@@ -28,10 +28,10 @@ addons:
 
 before_install:
   # Redo the travis setup but with the elastic/libbeat path. This is needed so the package path is correct
-  - mkdir -p $HOME/gopath/src/github.com/{{cookiecutter.github_name|lower}}/{{cookiecutter.beat}}/
-  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/{{cookiecutter.github_name|lower}}/{{cookiecutter.beat}}/
-  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/{{cookiecutter.github_name|lower}}/{{cookiecutter.beat}}/
-  - cd $HOME/gopath/src/github.com/{{cookiecutter.github_name|lower}}/{{cookiecutter.beat}}/
+  - mkdir -p $HOME/gopath/src/github.com/{github_name}/{beat}/
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/{github_name}/{beat}/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/{github_name}/{beat}/
+  - cd $HOME/gopath/src/github.com/{github_name}/{beat}/
 
 install:
   - true

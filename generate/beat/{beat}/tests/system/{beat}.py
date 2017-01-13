@@ -6,6 +6,6 @@ class BaseTest(TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.beat_name = "{{cookiecutter.beat}}"
+        self.beat_name = "{beat}"
         self.build_path = "../../build/system-tests/"
-        self.beat_path = "../../{{cookiecutter.beat}}.test"
+        self.beat_path = "../../{beat}.test"

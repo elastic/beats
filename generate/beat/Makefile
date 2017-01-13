@@ -8,17 +8,13 @@ ES_BEATS=${GOPATH}/src/github.com/elastic/beats
 .PHONY: test
 test: python-env
 
-	# Create copy of cookiecutter for building with defaults
-	mkdir -p build/src/beatpath
-	cp -r \{\{cookiecutter.beat\}\} build
-	cp tests/cookiecutter.json build/
-
-	mkdir -p ${BEAT_PATH}
-	. ${PYTHON_ENV}/bin/activate && cookiecutter --no-input -o build/src/beatpath -f  build ;
-
 	# Makes sure to use current version of beats for testing
 	mkdir -p ${BUILD_DIR}/src/github.com/elastic/beats/
-	rsync -a --exclude=generate ${PWD}/../../* ${BUILD_DIR}/src/github.com/elastic/beats/
+	rsync -a --exclude=build ${PWD}/../../* ${BUILD_DIR}/src/github.com/elastic/beats/
+
+	mkdir -p ${BEAT_PATH}
+	export GOPATH=${PWD}/build ; \
+	. ${PYTHON_ENV}/bin/activate && python ${PWD}/build/src/github.com/elastic/beats/generate/beat.py --project_name=Testbeat --github_name=ruflin --beat_path=beatpath --full_name="Nicolas Ruflin"
 
 	. ${PYTHON_ENV}/bin/activate; \
 	export GOPATH=${PWD}/build ; \
@@ -45,7 +41,7 @@ test-build: test
 .PHONY: python-env
 python-env:
 	test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
-	. ${PYTHON_ENV}/bin/activate && pip install --upgrade pip cookiecutter PyYAML
+	. ${PYTHON_ENV}/bin/activate && pip install --upgrade pip PyYAML
 
 # Cleans up environment
 .PHONY: clean

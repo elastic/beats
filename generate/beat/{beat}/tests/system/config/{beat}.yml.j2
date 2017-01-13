@@ -17,9 +17,9 @@ output:
     path: {{ '{{' }} output_file_path|default(beat.working_dir + "/output") {{ '}}' }}
 
 
-    # Name of the generated files. The default is `{{cookiecutter.beat}}` and it generates
-    # files: `{{cookiecutter.beat}}`, `{{cookiecutter.beat}}.1`, `{{cookiecutter.beat}}.2`, etc.
-    filename: "{{ '{{' }} output_file_filename|default("{{cookiecutter.beat}}") {{ '}}' }}"
+    # Name of the generated files. The default is `{beat}` and it generates
+    # files: `{beat}`, `{beat}.1`, `{beat}.2`, etc.
+    filename: "{{ '{{' }} output_file_filename|default("{beat}") {{ '}}' }}"
 
     # Maximum size in kilobytes of each file. When this size is reached, the files are
     # rotated. The default value is 10 MB.
@@ -65,10 +65,10 @@ output:
 
   #files:
     # The directory where the log files will written to.
-    #path: /var/log/{{cookiecutter.beat}}
+    #path: /var/log/{beat}
 
     # The name of the files where the logs are written to.
-    #name: {{cookiecutter.beat}}
+    #name: {beat}
 
     # Configure log file size limit. If limit is reached, log file will be
     # automatically rotated

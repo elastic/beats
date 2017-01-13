@@ -1,18 +1,18 @@
-# {{cookiecutter.beat|capitalize}}
+# {Beat}
 
-Welcome to {{cookiecutter.beat|capitalize}}.
+Welcome to {Beat}.
 
 Ensure that this folder is at the following location:
-`${GOPATH}/{{cookiecutter.beat_path}}`
+`${GOPATH}/{beat_path}`
 
-## Getting Started with {{cookiecutter.beat|capitalize}}
+## Getting Started with {Beat}
 
 ### Requirements
 
 * [Golang](https://golang.org/dl/) 1.7
 
 ### Init Project
-To get running with {{cookiecutter.beat|capitalize}} and also install the
+To get running with {Beat} and also install the
 dependencies, run the following command:
 
 ```
@@ -21,10 +21,10 @@ make setup
 
 It will create a clean git history for each major step. Note that you can always rewrite the history if you wish before pushing your changes.
 
-To push {{cookiecutter.beat|capitalize}} in the git repository, run the following commands:
+To push {Beat} in the git repository, run the following commands:
 
 ```
-git remote set-url origin https://{{cookiecutter.beat_path}}/{{cookiecutter.beat}}
+git remote set-url origin https://{beat_path}/{beat}
 git push origin master
 ```
 
@@ -32,8 +32,8 @@ For further development, check out the [beat developer guide](https://www.elasti
 
 ### Build
 
-To build the binary for {{cookiecutter.beat|capitalize}} run the command below. This will generate a binary
-in the same directory with the name {{cookiecutter.beat}}.
+To build the binary for {Beat} run the command below. This will generate a binary
+in the same directory with the name {beat}.
 
 ```
 make
@@ -42,16 +42,16 @@ make
 
 ### Run
 
-To run {{cookiecutter.beat|capitalize}} with debugging output enabled, run:
+To run {Beat} with debugging output enabled, run:
 
 ```
-./{{cookiecutter.beat}} -c {{cookiecutter.beat}}.yml -e -d "*"
+./{beat} -c {beat}.yml -e -d "*"
 ```
 
 
 ### Test
 
-To test {{cookiecutter.beat|capitalize}}, run the following command:
+To test {Beat}, run the following command:
 
 ```
 make testsuite
@@ -71,7 +71,7 @@ The test coverage is reported in the folder `./build/coverage/`
 
 Each beat has a template for the mapping in elasticsearch and a documentation for the fields
 which is automatically generated based on `etc/fields.yml`.
-To generate etc/{{cookiecutter.beat}}.template.json and etc/{{cookiecutter.beat}}.asciidoc
+To generate etc/{beat}.template.json and etc/{beat}.asciidoc
 
 ```
 make update
@@ -80,7 +80,7 @@ make update
 
 ### Cleanup
 
-To clean  {{cookiecutter.beat|capitalize}} source code, run the following commands:
+To clean  {Beat} source code, run the following commands:
 
 ```
 make fmt
@@ -96,12 +96,12 @@ make clean
 
 ### Clone
 
-To clone {{cookiecutter.beat|capitalize}} from the git repository, run the following commands:
+To clone {Beat} from the git repository, run the following commands:
 
 ```
-mkdir -p ${GOPATH%%:*}/{{cookiecutter.beat_path}}
-cd ${GOPATH%%:*}/{{cookiecutter.beat_path}}
-git clone https://{{cookiecutter.beat_path}}/{{cookiecutter.beat}}
+mkdir -p ${GOPATH}/{beat_path}
+cd ${GOPATH}/{beat_path}
+git clone https://{beat_path}/{beat}
 ```
 
 
