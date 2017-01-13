@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
+* <<exported-fields-nifi>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-prometheus>>
 * <<exported-fields-redis>>
@@ -3800,6 +3801,34 @@ The current number of connections where Nginx is writing the response back to th
 type: long
 
 The current number of idle client connections waiting for a request.
+
+
+[[exported-fields-nifi]]
+== nifi Fields
+
+nifi Module
+
+
+
+[float]
+== nifi Fields
+
+
+
+
+[float]
+== heap Fields
+
+heap
+
+
+
+[float]
+=== nifi.heap.example
+
+type: keyword
+
+Example field
 
 
 [[exported-fields-postgresql]]

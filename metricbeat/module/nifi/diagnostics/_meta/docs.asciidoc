@@ -1,3 +1,0 @@
-=== nifi diagnostics MetricSet
-
-This is the diagnostics metricset of the module nifi.

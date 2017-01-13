@@ -2150,6 +2150,18 @@
             }
           }
         },
+        "nifi": {
+          "properties": {
+            "heap": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
         "postgresql": {
           "properties": {
             "activity": {

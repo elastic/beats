@@ -11,8 +11,8 @@
         "rtt":44269
     },
     "nifi":{
-        "diagnostics":{
-            "example": "diagnostics"
+        "heap":{
+            "example": "heap"
         }
     },
     "type":"metricsets"

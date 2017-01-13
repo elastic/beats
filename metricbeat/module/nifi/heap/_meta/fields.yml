@@ -1,7 +1,7 @@
-- name: diagnostics
+- name: heap
   type: group
   description: >
-    diagnostics
+    heap
   fields:
     - name: example
       type: keyword

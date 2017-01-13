@@ -1,6 +1,5 @@
 - module: nifi
-  metricsets: ["diagnostics"]
+  metricsets: ["heap"]
   enabled: true
   period: 1s
   hosts: ["localhost"]
-
