@@ -23,6 +23,7 @@ var (
 )
 
 type Prospector struct {
+	// harvesterCount MUST be first field in struct. See https://github.com/golang/go/issues/599
 	harvesterCounter uint64         // Must be 8-byte aligned. Ensured if first field in struct
 	cfg              *common.Config // Raw config
 	config           prospectorConfig
