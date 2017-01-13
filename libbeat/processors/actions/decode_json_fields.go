@@ -166,7 +166,7 @@ func DecodeJSON(text []byte, to *interface{}) error {
 	}
 
 	if dec.More() {
-		return errors.New("Multiple json elements found")
+		return errors.New("multiple json elements found")
 	}
 
 	switch O := interface{}(*to).(type) {
