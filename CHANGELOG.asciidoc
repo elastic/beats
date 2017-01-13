@@ -37,6 +37,8 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix issue where some Cassandra visualizations were showing data from all protocols. {issue}3314[3314]
+
 *Topbeat*
 
 *Filebeat*
