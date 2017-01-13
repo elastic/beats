@@ -23,6 +23,7 @@ var (
 )
 
 type Prospector struct {
+	harvesterCounter uint64         // Must be 8-byte aligned. Ensured if first field in struct
 	cfg              *common.Config // Raw config
 	config           prospectorConfig
 	prospectorer     Prospectorer
@@ -32,7 +33,6 @@ type Prospector struct {
 	states           *file.States
 	wg               sync.WaitGroup
 	channelWg        sync.WaitGroup // Separate waitgroup for channels as not stopped on completion
-	harvesterCounter uint64
 	ID               uint64
 	Once             bool
 }
