@@ -59,34 +59,6 @@ func formatTagName(oldtag string) string {
 
 }
 
-/*func formatDataPointName(oldDatapoint string) (string){
-
-        // Remove repeated fields
-        // Example:
-        // leveldb.leveldb_submit_latency.avgcount must be leveldb.submit_latency.avgcount
-
-        splitedDataPoint := strings.Split(oldDatapoint, ".")
-
-        newDatapoint := splitedDataPoint[0]
-        oldslice := ""
-
-        for i, slice := range splitedDataPoint {
-
-                if(strings.Contains(slice, oldslice)){
-                        r := strings.NewReplacer(oldslice + "_","")
-                        slice = r.Replace(slice)
-                }
-
-                oldslice = slice
-
-                if(i>0){ newDatapoint = newDatapoint + "." + slice }
-
-        }
-
-
-        return newDatapoint
-}*/
-
 func perfDump(binary string, socket *socket) (string, error) {
 	var output string
 
