@@ -6,18 +6,20 @@ import (
 
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector"
+	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 type Crawler struct {
-	prospectors       []*prospector.Prospector
+	prospectors       map[uint64]*prospector.Prospector
 	prospectorConfigs []*common.Config
 	out               prospector.Outlet
 	wg                sync.WaitGroup
+	once              bool
 }
 
-func New(out prospector.Outlet, prospectorConfigs []*common.Config) (*Crawler, error) {
+func New(out prospector.Outlet, prospectorConfigs []*common.Config, once bool) (*Crawler, error) {
 
 	if len(prospectorConfigs) == 0 {
 		return nil, fmt.Errorf("No prospectors defined. You must have at least one prospector defined in the config file.")
@@ -25,42 +27,53 @@ func New(out prospector.Outlet, prospectorConfigs []*common.Config) (*Crawler, e
 
 	return &Crawler{
 		out:               out,
+		prospectors:       map[uint64]*prospector.Prospector{},
 		prospectorConfigs: prospectorConfigs,
+		once:              once,
 	}, nil
 }
 
-func (c *Crawler) Start(states file.States, once bool) error {
+func (c *Crawler) Start(r *registrar.Registrar) error {
 
 	logp.Info("Loading Prospectors: %v", len(c.prospectorConfigs))
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, prospectorConfig := range c.prospectorConfigs {
-
-		prospector, err := prospector.NewProspector(prospectorConfig, states, c.out)
+		err := c.startProspector(prospectorConfig, r.GetStates())
 		if err != nil {
-			return fmt.Errorf("Error in initing prospector: %s", err)
-		}
-		if prospector.IsEnabled() {
-			c.prospectors = append(c.prospectors, prospector)
+			return err
 		}
 	}
 
-	logp.Info("Loading Prospectors completed. Number of prospectors: %v", len(c.prospectors))
+	logp.Info("Loading and starting Prospectors completed. Enabled prospectors: %v", len(c.prospectors))
 
-	for i, p := range c.prospectors {
-		c.wg.Add(1)
+	return nil
+}
 
-		go func(id int, prospector *prospector.Prospector) {
-			defer func() {
-				c.wg.Done()
-				logp.Debug("crawler", "Prospector %v stopped", id)
-			}()
-			logp.Debug("crawler", "Starting prospector %v", id)
-			prospector.Run(once)
-		}(i, p)
+func (c *Crawler) startProspector(config *common.Config, states []file.State) error {
+	if !config.Enabled() {
+		return nil
+	}
+	prospector, err := prospector.NewProspector(config, states, c.out)
+	if err != nil {
+		return fmt.Errorf("Error in initing prospector: %s", err)
+	}
+	prospector.Once = c.once
+
+	if _, ok := c.prospectors[prospector.ID]; ok {
+		return fmt.Errorf("Prospector with same ID already exists: %v", prospector.ID)
 	}
 
-	logp.Info("All prospectors are initialised and running with %d states to persist", states.Count())
+	c.prospectors[prospector.ID] = prospector
+	c.wg.Add(1)
+
+	go func() {
+		logp.Debug("crawler", "Starting prospector: %v", prospector.ID)
+		defer logp.Debug("crawler", "Prospector stopped: %v", prospector.ID)
+
+		defer c.wg.Done()
+		prospector.Run()
+	}()
 
 	return nil
 }

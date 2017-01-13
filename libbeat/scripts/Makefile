@@ -7,6 +7,7 @@ BEAT_LICENSE?=ASL 2.0 ## @packaging Software license of the application
 BEAT_URL?=https://${BEAT_DIR} ## @packaging Link to the homepage of the application
 BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEATNAME}/current/index.html ## @packaging Link to the user documentation of the application
 BEAT_DIR?=github.com/elastic/beats/${BEATNAME}
+BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats
 GOPACKAGES?=${BEAT_DIR}/...## @community_beat Must be set to $(shell glide novendor)
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make package"
@@ -39,7 +40,7 @@ ES_HOST?="elasticsearch"
 PWD=$(shell pwd)
 BUILD_DIR?=$(shell pwd)/build
 COVERAGE_DIR=${BUILD_DIR}/coverage
-COVERAGE_TOOL=${GOPATH}/bin/gotestcover
+COVERAGE_TOOL=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 PROCESSES?= 4
 TIMEOUT?= 90
@@ -47,9 +48,11 @@ NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer ## @testing the opt
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
+GOX_OSARCH?=!darwin/arm !darwin/arm64 !darwin/386 ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
+GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "make crosscompile".
 TESTING_ENVIRONMENT?=snapshot ## @testing The name of the environment under test
 DOCKER_COMPOSE_PROJECT_NAME?=${BEATNAME}_${TESTING_ENVIRONMENT} ## @testing The name of the docker-compose project used by the integration and system tests
-DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
+DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
 DOCKER_CACHE?=1 ## @miscellaneous If set to 0, all docker images are created without cache
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 PYTHON_ENV?=${BUILD_DIR}/python-env
@@ -91,7 +94,7 @@ crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS var
 crosscompile: $(GOFILES)
 	go get github.com/mitchellh/gox
 	mkdir -p ${BUILD_DIR}/bin
-	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="${GOX_OS}" ${GOX_FLAGS}
+	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
 
 
 .PHONY: check
@@ -151,14 +154,14 @@ integration-tests-environment: prepare-tests build-image
 .PHONY: system-tests
 system-tests: ## @testing Runs the system tests
 system-tests: ${BEATNAME}.test prepare-tests python-env ${ES_BEATS}/libbeat/dashboards/import_dashboards
-	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} nosetests -w tests/system ${NOSETESTS_OPTIONS}
+	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} nosetests -w tests/system ${NOSETESTS_OPTIONS}
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs the system tests
 .PHONY: system-tests-environment
 system-tests-environment:  ## @testing Runs the system tests inside a virtual environment. This can be run on any docker-machine (local, remote)
 system-tests-environment: prepare-tests build-image
-	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 beat make system-tests
+	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} beat make system-tests
 
 
 .PHONY: fast-system-tests
@@ -274,7 +277,7 @@ docs:  ## @build Builds the documents for the beat
 .PHONY: docs-preview
 docs-preview:  ## @build Preview the documents for the beat in the browser
 	if [ ! -d "build/docs" ]; then $(MAKE) docs; fi;
-	${BUILD_DIR}/docs/build_docs.pl --chunk=1 -open chunk=1 -open --doc ${GOPATH}/src/github.com/elastic/beats/${BEATNAME}/docs/index.asciidoc -out ${BUILD_DIR}/html_docs
+	${BUILD_DIR}/docs/build_docs.pl --chunk=1 -open chunk=1 -open --doc ${BEAT_GOPATH}/src/github.com/elastic/beats/${BEATNAME}/docs/index.asciidoc -out ${BUILD_DIR}/html_docs
 
 
 ### KIBANA FILES HANDLING ###

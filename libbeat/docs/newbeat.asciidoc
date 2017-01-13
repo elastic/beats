@@ -57,7 +57,7 @@ on a specific version of libbeat, check out the specific branch ({doc-branch} in
 
 ["source","sh",subs="attributes"]
 ----
-cd $GOPATH/src/github.com/elastic/beats
+cd ${GOPATH%%:*}/src/github.com/elastic/beats
 git checkout {doc-branch}
 ----
 
@@ -135,15 +135,15 @@ Now create a directory under $GOPATH for your repository and change to the new d
 
 [source,shell]
 --------------------
-mkdir $GOPATH/src/github.com/{user}
-cd $GOPATH/src/github.com/{user}
+mkdir ${GOPATH%%:*}/src/github.com/{user}
+cd ${GOPATH%%:*}/src/github.com/{user}
 --------------------
 
 Run cookiecutter and specify the path to the Beat generator:
 
 [source,shell]
 --------------------
-cookiecutter $GOPATH/src/github.com/elastic/beats/generate/beat
+cookiecutter ${GOPATH%%:*}/src/github.com/elastic/beats/generate/beat
 --------------------
 
 Cookiecutter will prompt you to enter information about your Beat. For the `project_name`, enter `Countbeat`.
@@ -174,7 +174,7 @@ To fetch dependencies and set up the Beat, run:
 
 [source,shell]
 ---------
-cd $GOPATH/src/github.com/{user}/countbeat
+cd ${GOPATH%%:*}/src/github.com/{user}/countbeat
 make setup
 ---------
 

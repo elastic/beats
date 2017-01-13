@@ -1,0 +1,27 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "mongodb:27017",
+        "module": "mongodb",
+        "name": "dbstats",
+        "rtt": 115
+    },
+    "mongodb": {
+        "dbstats": {
+            "avg_obj_size": 59,
+            "collections": 1,
+            "data_size": 59,
+            "db": "admin",
+            "index_size": 32768,
+            "indexes": 2,
+            "num_extents": 0,
+            "objects": 1,
+            "storage_size": 16384
+        }
+    },
+    "type": "metricsets"
+}

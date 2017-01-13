@@ -67,6 +67,10 @@ metricbeat.modules:
   # EXPERIMENTAL: cgroups can be enabled for the process metricset.
   #cgroups: false
 
+  # A list of regular expressions used to whitelist environment variables
+  # reported with the process metricset's events. Defaults to empty.
+  #process.env.whitelist: []
+
   # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
   #socket.reverse_lookup.enabled: false
   #socket.reverse_lookup.success_ttl: 60s
@@ -110,7 +114,7 @@ metricbeat.modules:
     #certificate:           "/etc/pki/client/cert.pem"
     #key:                   "/etc/pki/client/cert.key"
 
-#------------------------------- haproxy Module ------------------------------
+#------------------------------- HAProxy Module ------------------------------
 #- module: haproxy
   #metricsets: ["info", "stat"]
   #enabled: true
@@ -147,7 +151,7 @@ metricbeat.modules:
 
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
-  #metricsets: ["status"]
+  #metricsets: ["dbstats", "status"]
   #enabled: true
   #period: 10s
 
@@ -163,7 +167,6 @@ metricbeat.modules:
 
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
-
 
 #-------------------------------- MySQL Module -------------------------------
 #- module: mysql

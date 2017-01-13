@@ -240,7 +240,9 @@ When this option is enabled, Filebeat closes a file as soon as the end of a file
 
 WARNING: Only use this option if you understand that data loss is a potential side effect. Another side effect is that multiline events might not be completely sent before the timeout expires.
 
-When this option is enabled, Filebeat gives every harvester a predefined lifetime. Regardless of where the reader is in the file, reading will stop after the `close_timeout` period has elapsed. This option can be useful for older log files when you want to spend only a predefined amount of time on the files.  If you set `close_timeout` to equal `ignore_older`, the file will not be picked up if it's modified while the harvester is closed. This combination of settings normally leads to data loss, and the complete file is not sent.
+When this option is enabled, Filebeat gives every harvester a predefined lifetime. Regardless of where the reader is in the file, reading will stop after the `close_timeout` period has elapsed. This option can be useful for older log files when you want to spend only a predefined amount of time on the files.  While `close_timeout` will close the file after the predefined timeout, if the file is still being updated, the prospector will start a new harvester again per the defined `scan_frequency`. And the close_timeout for this harvester will start again with the countdown for the timeout.  
+
+If you set `close_timeout` to equal `ignore_older`, the file will not be picked up if it's modified while the harvester is closed. This combination of settings normally leads to data loss, and the complete file is not sent.
 
 When you use `close_timeout` for logs that contain multiline events, the harvester might stop in the middle of a multiline event, which means that only parts of the event will be sent. If the harvester is started again and the file still exists, only the second part of the event will be sent.
 
@@ -567,13 +569,18 @@ Example configuration:
 filebeat.shutdown_timeout: 5s
 -------------------------------------------------------------------------------------
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/generalconfig.asciidoc ?>]
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/outputconfig.asciidoc ?>]
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-path-config.asciidoc ?>]
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/loggingconfig.asciidoc ?>]
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/processors-config.asciidoc ?>]
 include::../../../../libbeat/docs/processors-config.asciidoc[]
 

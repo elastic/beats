@@ -16,28 +16,39 @@ include::./version.asciidoc[]
 
 include::./overview.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/communitybeats.asciidoc ?>]
 include::./communitybeats.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/gettingstarted.asciidoc ?>]
 include::./gettingstarted.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/installing-beats.asciidoc ?>]
 include::./installing-beats.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/repositories.asciidoc ?>]
 include::./repositories.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/breaking.asciidoc ?>]
 include::./breaking.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/upgrading.asciidoc ?>]
 include::./upgrading.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/config-file-format.asciidoc ?>]
 include::./config-file-format.asciidoc[]
 
 pass::[<?page_header Always refer to the documentation in master for the latest information about contributing to Beats.?>]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/newbeat.asciidoc ?>]
 include::./newbeat.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/event-conventions.asciidoc ?>]
 include::./event-conventions.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/newdashboards.asciidoc ?>]
 include::./newdashboards.asciidoc[]
 
 pass::[<?page_header ?>]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/release.asciidoc ?>]
 include::./release.asciidoc[]

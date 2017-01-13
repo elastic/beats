@@ -1,4 +1,4 @@
-package beater
+package cfgfile
 
 import (
 	"os"

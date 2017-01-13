@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Command line flags.
@@ -74,6 +75,11 @@ func HandleFlags() error {
 	}
 
 	defaults.SetString("path.home", -1, home)
+
+	if len(overwrites.GetFields()) > 0 {
+		overwrites.PrintDebugf("CLI setting overwrites (-E flag):")
+	}
+
 	return nil
 }
 
@@ -120,11 +126,34 @@ func Load(path string) (*common.Config, error) {
 		return nil, err
 	}
 
-	return common.MergeConfigs(
+	config, err = common.MergeConfigs(
 		defaults,
 		config,
 		overwrites,
 	)
+	if err != nil {
+		return nil, err
+	}
+
+	config.PrintDebugf("Complete configuration loaded:")
+	return config, nil
+}
+
+// LoadList loads a list of configs data from the given file.
+func LoadList(file string) ([]*common.Config, error) {
+	logp.Debug("cfgfile", "Load config from file: %s", file)
+	rawConfig, err := common.LoadFile(file)
+	if err != nil {
+		return nil, fmt.Errorf("invalid config: %s", err)
+	}
+
+	var c []*common.Config
+	err = rawConfig.Unpack(&c)
+	if err != nil {
+		return nil, fmt.Errorf("error reading configuration from file %s: %s", file, err)
+	}
+
+	return c, nil
 }
 
 // GetPathConfig returns ${path.config}. If ${path.config} is not set, ${path.home} is returned.

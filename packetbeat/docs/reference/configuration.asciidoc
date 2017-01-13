@@ -28,6 +28,7 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 NOTE: Packetbeat maintains a real-time topology map of all the servers in your network.
 See <<maintaining-topology>> for more details.
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/reference/configuration/packetbeat-options.asciidoc ?>]
 include::configuration/packetbeat-options.asciidoc[]
 
 
