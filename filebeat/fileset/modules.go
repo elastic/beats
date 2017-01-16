@@ -8,6 +8,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
@@ -239,4 +240,30 @@ func (reg *ModuleRegistry) GetProspectorConfigs() ([]*common.Config, error) {
 		}
 	}
 	return result, nil
+}
+
+func (reg *ModuleRegistry) Setup(esClient *elasticsearch.Client) error {
+	for module, filesets := range reg.registry {
+		for name, fileset := range filesets {
+			pipelineID, content, err := fileset.GetPipeline()
+			if err != nil {
+				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
+			}
+			err = loadPipeline(esClient, pipelineID, content)
+			if err != nil {
+				return fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
+			}
+		}
+	}
+	return nil
+}
+
+func loadPipeline(esClient *elasticsearch.Client, pipelineID string, content map[string]interface{}) error {
+	path := "/_ingest/pipeline/" + pipelineID
+	err := esClient.LoadJSON(path, content)
+	if err != nil {
+		return fmt.Errorf("couldn't load template: %v", err)
+	}
+	logp.Info("Elasticsearch pipeline with ID '%s' loaded", pipelineID)
+	return nil
 }

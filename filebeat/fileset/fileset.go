@@ -7,6 +7,7 @@ package fileset
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -242,7 +243,31 @@ func (fs *Fileset) getPipelineID() (string, error) {
 		return "", fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
 	}
 
-	return fmt.Sprintf("%s-%s-%s", fs.mcfg.Module, fs.name, removeExt(filepath.Base(path))), nil
+	return formatPipelineID(fs.mcfg.Module, fs.name, path), nil
+}
+
+func (fs *Fileset) GetPipeline() (pipelineID string, content map[string]interface{}, err error) {
+	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline)
+	if err != nil {
+		return "", nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
+	}
+
+	f, err := os.Open(filepath.Join(fs.modulePath, fs.name, path))
+	if err != nil {
+		return "", nil, fmt.Errorf("Error reading pipeline file %s: %v", path, err)
+	}
+
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&content)
+	if err != nil {
+		return "", nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %v", path, err)
+	}
+	return formatPipelineID(fs.mcfg.Module, fs.name, path), content, nil
+}
+
+// formatPipelineID generates the ID to be used for the pipeline ID in Elasticsearch
+func formatPipelineID(module, fileset, path string) string {
+	return fmt.Sprintf("%s-%s-%s", module, fileset, removeExt(filepath.Base(path)))
 }
 
 // removeExt returns the file name without the extension. If no dot is found,
