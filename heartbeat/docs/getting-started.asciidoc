@@ -215,9 +215,11 @@ PS C:\Program Files\Heartbeat> Start-Service heartbeat
 
 By default, Windows log files are stored in +C:\ProgramData\heartbeat\Logs+.
 
-Heartbeat is now ready to send log files to your defined output.
+Heartbeat is now ready to check the status of your services and send
+events to your defined output.
 
 //TODO: Add content about sample dashboards when the dashboards are available.
 
-:allplatforms:
-include::../../libbeat/docs/dashboards.asciidoc[]
+//:allplatforms:
+
+//include::../../libbeat/docs/dashboards.asciidoc[]
