@@ -168,10 +168,11 @@ def fill_section_properties(args, section, defaults, path):
     properties = {}
     dynamic_templates = []
 
-    for field in section["fields"]:
-        prop, dynamic = fill_field_properties(args, field, defaults, path)
-        properties.update(prop)
-        dynamic_templates.extend(dynamic)
+    if "fields" in section:
+        for field in section["fields"]:
+            prop, dynamic = fill_field_properties(args, field, defaults, path)
+            properties.update(prop)
+            dynamic_templates.extend(dynamic)
 
     return properties, dynamic_templates
 
@@ -298,12 +299,12 @@ def fill_field_properties(args, field, defaults, path):
             path = field["name"]
         prop, dynamic = fill_section_properties(args, field, defaults, path)
 
+        properties[field.get("name")] = {
+            "type": "nested",
+            "properties": {}
+        }
         # Only add properties if they have a content
         if len(prop) is not 0:
-            properties[field.get("name")] = {
-                "type": "nested",
-                "properties": {}
-            }
             properties[field.get("name")]["properties"] = prop
 
         dynamic_templates.extend(dynamic)
