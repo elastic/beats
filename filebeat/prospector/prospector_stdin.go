@@ -2,6 +2,7 @@ package prospector
 
 import (
 	"fmt"
+	"sync/atomic"
 
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
@@ -9,8 +10,9 @@ import (
 )
 
 type ProspectorStdin struct {
-	harvester *harvester.Harvester
-	started   bool
+	harvester  *harvester.Harvester
+	Prospector *Prospector
+	started    bool
 }
 
 // NewProspectorStdin creates a new stdin prospector
@@ -18,6 +20,7 @@ type ProspectorStdin struct {
 func NewProspectorStdin(p *Prospector) (*ProspectorStdin, error) {
 
 	prospectorer := &ProspectorStdin{}
+	prospectorer.Prospector = p
 
 	var err error
 
@@ -43,7 +46,18 @@ func (p *ProspectorStdin) Run() {
 			logp.Err("Error starting stdin harvester: %s", err)
 			return
 		}
-		go p.harvester.Harvest(reader)
-		p.started = true
+
+		p.Prospector.wg.Add(1)
+		atomic.AddUint64(&p.Prospector.harvesterCounter, 1)
+
+		go func() {
+			defer func() {
+				atomic.AddUint64(&p.Prospector.harvesterCounter, ^uint64(0))
+				p.Prospector.wg.Done()
+			}()
+
+			p.harvester.Harvest(reader)
+			p.started = true
+		}()
 	}
 }
