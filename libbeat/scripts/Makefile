@@ -9,6 +9,7 @@ BEAT_DIR?=github.com/elastic/beats/${BEATNAME}
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats
 GOPACKAGES?=${BEAT_DIR}/...## @community_beat Must be set to $(shell glide novendor)
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make package"
+NOTICE_FILE?=../NOTICE
 
 # Makefile for a custom beat that includes this libbeat/scripts/Makefile:
 # if glide is used to manage vendor dependencies,
@@ -329,6 +330,9 @@ HOME_PREFIX?=/tmp/${BEATNAME}
 install-home:
 	install -d -m 755 ${HOME_PREFIX}/scripts/
 	install -m 755 ${ES_BEATS}/libbeat/scripts/migrate_beat_config_1_x_to_5_0.py ${HOME_PREFIX}/scripts/
+	if [ -a ${NOTICE_FILE} ]; then \
+		install -m 644 ${NOTICE_FILE} ${HOME_PREFIX}/; \
+	fi
 
 # Prepares for packaging. Builds binaries and creates homedir data
 .PHONY: prepare-package

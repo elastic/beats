@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Added new flags to import_dashboards (-cacert, -cert, -key, -insecure). {pull}3139[3139] {pull}3163[3163]
 - The limit for the number of fields is increased via the mapping template. {pull}3275[3275]
 - Updated to Go 1.7.4. {pull}3277[3277]
+- Added a NOTICE file containing the notices and licenses of the dependencies. {pull}3334[3334].
 
 *Metricbeat*
 - Kafka module broker matching enhancements. {pull}3129[3129]
