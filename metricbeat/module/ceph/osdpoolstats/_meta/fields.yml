@@ -3,7 +3,8 @@
   description: >
     osdpoolstats
   fields:
-    - name: example
+    - name: name
       type: keyword
       description: >
-        Example field
+        name of pool
+        

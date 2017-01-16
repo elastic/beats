@@ -188,25 +188,52 @@
           "properties": {
             "df": {
               "properties": {
-                "example": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
+                "pools": {
+                  "properties": {
+                    "id": {
+                      "type": "long"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "stats": {
+                      "properties": {
+                        "bytes_used": {
+                          "type": "long"
+                        },
+                        "kb_used": {
+                          "type": "long"
+                        },
+                        "max_avail": {
+                          "type": "long"
+                        },
+                        "objects": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "stats": {
+                  "properties": {
+                    "total_avail_bytes": {
+                      "type": "long"
+                    },
+                    "total_bytes": {
+                      "type": "long"
+                    },
+                    "total_used_bytes": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
             "osdpoolstats": {
               "properties": {
-                "example": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
-                }
-              }
-            },
-            "perf": {
-              "properties": {
-                "example": {
+                "name": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
@@ -215,10 +242,137 @@
             },
             "status": {
               "properties": {
-                "example": {
+                "health": {
+                  "properties": {
+                    "mons": {
+                      "properties": {
+                        "avail_percent": {
+                          "type": "long"
+                        },
+                        "health": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "kb_avail": {
+                          "type": "long"
+                        },
+                        "kb_total": {
+                          "type": "long"
+                        },
+                        "kb_used": {
+                          "type": "long"
+                        },
+                        "last_updated": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "name": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "store_stats": {
+                          "properties": {
+                            "bytes_log": {
+                              "type": "long"
+                            },
+                            "bytes_misc": {
+                              "type": "long"
+                            },
+                            "bytes_sst": {
+                              "type": "long"
+                            },
+                            "bytes_total": {
+                              "type": "long"
+                            },
+                            "last_updated": {
+                              "ignore_above": 1024,
+                              "index": "not_analyzed",
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "timechecks": {
+                      "properties": {
+                        "epoch": {
+                          "type": "long"
+                        },
+                        "round": {
+                          "type": "long"
+                        },
+                        "round_stats": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "osdmap": {
+                  "properties": {
+                    "epoch": {
+                      "type": "long"
+                    },
+                    "full": {
+                      "type": "boolean"
+                    },
+                    "nearfull": {
+                      "type": "boolean"
+                    },
+                    "num_in_osds": {
+                      "type": "long"
+                    },
+                    "num_osds": {
+                      "type": "long"
+                    },
+                    "num_remapped_pgs": {
+                      "type": "long"
+                    },
+                    "num_up_osds": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "overall_status": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
+                },
+                "pgmap": {
+                  "properties": {
+                    "bytes_avail": {
+                      "type": "long"
+                    },
+                    "bytes_total": {
+                      "type": "long"
+                    },
+                    "bytes_used": {
+                      "type": "long"
+                    },
+                    "data_bytes": {
+                      "type": "long"
+                    },
+                    "num_pgs": {
+                      "type": "long"
+                    },
+                    "pgs_by_state": {
+                      "properties": {
+                        "count": {
+                          "type": "long"
+                        },
+                        "state_name": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

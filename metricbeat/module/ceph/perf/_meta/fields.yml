@@ -1,9 +1,0 @@
-- name: perf
-  type: group
-  description: >
-    perf
-  fields:
-    - name: example
-      type: keyword
-      description: >
-        Example field

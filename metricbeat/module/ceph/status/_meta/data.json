@@ -6,6 +6,20 @@
     },
     "ceph": {
         "status": {
+            "health.mons.avail_percent": 67,
+            "health.mons.health": "HEALTH_OK",
+            "health.mons.kb_avail": 4.237448e+06,
+            "health.mons.kb_total": 6.281216e+06,
+            "health.mons.kb_used": 2.043768e+06,
+            "health.mons.last_updated": "2017-01-16 11:03:21.749879",
+            "health.mons.name": "prcdsrvv1619",
+            "health.mons.store_stats": {
+                "bytes_log": 1.536809e+06,
+                "bytes_misc": 840,
+                "bytes_sst": 0,
+                "bytes_total": 1.537649e+06,
+                "last_updated": "0.000000"
+            },
             "health.timechecks.epoch": 3,
             "health.timechecks.round": 0,
             "health.timechecks.round_status": "finished",

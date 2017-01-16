@@ -3,7 +3,124 @@
   description: >
     status
   fields:
-    - name: example
+    - name: health.mons.avail_percent
+      type: long
+      description: >
+        Available percent
+    - name: health.mons.health
+      type: keyword
+      description: >
+        Status healt
+    - name: health.mons.kb_avail
+      type: long
+      description: >
+        Available kbytes
+    - name: health.mons.kb_total
+      type: long
+      description: >
+        Total kbytes
+    - name: health.mons.kb_used
+      type: long
+      description: >
+        Used kbytes
+    - name: health.mons.last_updated
+      type: keyword
+      description: >
+        Last updated
+    - name: health.mons.name
+      type: keyword
+      description: >
+        MON name
+    - name: health.mons.store_stats.bytes_log
+      type: long
+      description: >
+        Used bytes for log
+    - name: health.mons.store_stats.bytes_misc
+      type: long
+      description: >
+        Used bytes for misc
+    - name: health.mons.store_stats.bytes_sst
+      type: long
+      description: >
+        Used bytes for sst
+    - name: health.mons.store_stats.bytes_total
+      type: long
+      description: >
+        Total bytes
+    - name: health.mons.store_stats.last_updated
+      type: keyword
+      description: >
+        Last updated
+    - name: health.timechecks.epoch
+      type: long
+      description: >
+        Example field
+    - name: health.timechecks.round
+      type: long
+      description: >
+        Example field
+    - name: health.timechecks.round_stats
       type: keyword
       description: >
         Example field
+    - name: osdmap.epoch
+      type: long
+      description: >
+        Example field
+    - name: osdmap.full
+      type: boolean
+      description: >
+        Example field
+    - name: osdmap.nearfull
+      type: boolean
+      description: >
+        Example field
+    - name: osdmap.num_in_osds
+      type: long
+      description: >
+        Example field
+    - name: osdmap.num_osds
+      type: long
+      description: >
+        Example field
+    - name: osdmap.num_remapped_pgs
+      type: long
+      description: >
+        Example field
+    - name: osdmap.num_up_osds
+      type: long
+      description: >
+        Example field
+    - name: overall_status
+      type: keyword
+      description: >
+        Example field
+    - name: pgmap.bytes_avail
+      type: long
+      description: >
+        Example field
+    - name: pgmap.bytes_total
+      type: long
+      description: >
+        Example field
+    - name: pgmap.bytes_used
+      type: long
+      description: >
+        Example field
+    - name: pgmap.data_bytes
+      type: long
+      description: >
+        Example field
+    - name: pgmap.num_pgs
+      type: long
+      description: >
+        Example field
+    - name: pgmap.pgs_by_state.count
+      type: long
+      description: >
+        Example field
+    - name: pgmap.pgs_by_state.state_name
+      type: keyword
+      description: >
+        Example field
+

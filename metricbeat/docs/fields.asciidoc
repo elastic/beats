@@ -433,11 +433,75 @@ df
 
 
 [float]
-=== ceph.df.example
+=== ceph.df.pools.id
+
+type: long
+
+Id of the pool
+
+
+[float]
+=== ceph.df.pools.name
 
 type: keyword
 
-Example field
+Name of the pool
+
+
+[float]
+=== ceph.df.pools.stats.bytes_used
+
+type: long
+
+Used bytes of the pool
+
+
+[float]
+=== ceph.df.pools.stats.kb_used
+
+type: long
+
+Used kb of the pool
+
+
+[float]
+=== ceph.df.pools.stats.max_avail
+
+type: long
+
+Free space of the pool
+
+
+[float]
+=== ceph.df.pools.stats.objects
+
+type: long
+
+Notional number of objects stored per pool
+
+
+[float]
+=== ceph.df.stats.total_avail_bytes
+
+type: long
+
+Free bytes of cluster
+
+
+[float]
+=== ceph.df.stats.total_bytes
+
+type: long
+
+Total bytes of cluster
+
+
+[float]
+=== ceph.df.stats.total_used_bytes
+
+type: long
+
+Used bytes of cluster
 
 
 [float]
@@ -448,26 +512,11 @@ osdpoolstats
 
 
 [float]
-=== ceph.osdpoolstats.example
+=== ceph.osdpoolstats.name
 
 type: keyword
 
-Example field
-
-
-[float]
-== perf Fields
-
-perf
-
-
-
-[float]
-=== ceph.perf.example
-
-type: keyword
-
-Example field
+name of pool
 
 
 [float]
@@ -478,7 +527,239 @@ status
 
 
 [float]
-=== ceph.status.example
+=== ceph.status.health.mons.avail_percent
+
+type: long
+
+Available percent
+
+
+[float]
+=== ceph.status.health.mons.health
+
+type: keyword
+
+Status healt
+
+
+[float]
+=== ceph.status.health.mons.kb_avail
+
+type: long
+
+Available kbytes
+
+
+[float]
+=== ceph.status.health.mons.kb_total
+
+type: long
+
+Total kbytes
+
+
+[float]
+=== ceph.status.health.mons.kb_used
+
+type: long
+
+Used kbytes
+
+
+[float]
+=== ceph.status.health.mons.last_updated
+
+type: keyword
+
+Last updated
+
+
+[float]
+=== ceph.status.health.mons.name
+
+type: keyword
+
+MON name
+
+
+[float]
+=== ceph.status.health.mons.store_stats.bytes_log
+
+type: long
+
+Used bytes for log
+
+
+[float]
+=== ceph.status.health.mons.store_stats.bytes_misc
+
+type: long
+
+Used bytes for misc
+
+
+[float]
+=== ceph.status.health.mons.store_stats.bytes_sst
+
+type: long
+
+Used bytes for sst
+
+
+[float]
+=== ceph.status.health.mons.store_stats.bytes_total
+
+type: long
+
+Total bytes
+
+
+[float]
+=== ceph.status.health.mons.store_stats.last_updated
+
+type: keyword
+
+Last updated
+
+
+[float]
+=== ceph.status.health.timechecks.epoch
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.health.timechecks.round
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.health.timechecks.round_stats
+
+type: keyword
+
+Example field
+
+
+[float]
+=== ceph.status.osdmap.epoch
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.osdmap.full
+
+type: boolean
+
+Example field
+
+
+[float]
+=== ceph.status.osdmap.nearfull
+
+type: boolean
+
+Example field
+
+
+[float]
+=== ceph.status.osdmap.num_in_osds
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.osdmap.num_osds
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.osdmap.num_remapped_pgs
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.osdmap.num_up_osds
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.overall_status
+
+type: keyword
+
+Example field
+
+
+[float]
+=== ceph.status.pgmap.bytes_avail
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.pgmap.bytes_total
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.pgmap.bytes_used
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.pgmap.data_bytes
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.pgmap.num_pgs
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.pgmap.pgs_by_state.count
+
+type: long
+
+Example field
+
+
+[float]
+=== ceph.status.pgmap.pgs_by_state.state_name
 
 type: keyword
 

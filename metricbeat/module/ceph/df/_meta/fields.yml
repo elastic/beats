@@ -3,7 +3,39 @@
   description: >
     df
   fields:
-    - name: example
+    - name: pools.id
+      type: long
+      description: >
+        Id of the pool
+    - name: pools.name
       type: keyword
       description: >
-        Example field
+        Name of the pool
+    - name: pools.stats.bytes_used
+      type: long
+      description: >
+        Used bytes of the pool
+    - name: pools.stats.kb_used
+      type: long
+      description: >
+        Used kb of the pool
+    - name: pools.stats.max_avail
+      type: long
+      description: >
+        Free space of the pool
+    - name: pools.stats.objects
+      type: long
+      description: >
+         Notional number of objects stored per pool
+    - name: stats.total_avail_bytes
+      type: long
+      description: >
+        Free bytes of cluster
+    - name: stats.total_bytes
+      type: long
+      description: >
+        Total bytes of cluster
+    - name: stats.total_used_bytes
+      type: long
+      description: >
+        Used bytes of cluster
