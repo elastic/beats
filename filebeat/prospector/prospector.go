@@ -23,6 +23,8 @@ var (
 )
 
 type Prospector struct {
+	// harvesterCounter MUST be first field in struct. See https://github.com/golang/go/issues/599
+	harvesterCounter uint64
 	cfg              *common.Config // Raw config
 	config           prospectorConfig
 	prospectorer     Prospectorer
@@ -32,7 +34,6 @@ type Prospector struct {
 	states           *file.States
 	wg               sync.WaitGroup
 	channelWg        sync.WaitGroup // Separate waitgroup for channels as not stopped on completion
-	harvesterCounter uint64
 	ID               uint64
 	Once             bool
 }
