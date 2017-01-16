@@ -31,27 +31,29 @@ func ExecInContainer(cmd []string) string {
 	}
 
 	var (
-		dExec *docker.Exec
+		dExec          *docker.Exec
+		stdout, stderr bytes.Buffer
 	)
 
 	if dExec, err = client.CreateExec(de); err != nil {
 		logp.Warn("CreateExec Error: %s", err)
-	}
+	} else {
 
-	// exec command
-	var stdout, stderr bytes.Buffer
-	var reader = strings.NewReader("send value")
+		// exec command
+		var reader = strings.NewReader("send value")
 
-	execId := dExec.ID
-	opts := docker.StartExecOptions{
-		OutputStream: &stdout,
-		ErrorStream:  &stderr,
-		InputStream:  reader,
-		RawTerminal:  false,
-	}
+		execId := dExec.ID
 
-	if err = client.StartExec(execId, opts); err != nil {
-		logp.Warn("StartExec Error: %s", err)
+		opts := docker.StartExecOptions{
+			OutputStream: &stdout,
+			ErrorStream:  &stderr,
+			InputStream:  reader,
+			RawTerminal:  false,
+		}
+
+		if err = client.StartExec(execId, opts); err != nil {
+			logp.Warn("StartExec Error: %s", err)
+		}
 	}
 
 	return stdout.String()

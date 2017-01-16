@@ -10,7 +10,7 @@
     - name: health.mons.health
       type: keyword
       description: >
-        Status healt
+        Status health
     - name: health.mons.kb_avail
       type: long
       description: >
@@ -54,73 +54,73 @@
     - name: health.timechecks.epoch
       type: long
       description: >
-        Example field
+        Map version
     - name: health.timechecks.round
       type: long
       description: >
-        Example field
+        Round of timecheck
     - name: health.timechecks.round_stats
       type: keyword
       description: >
-        Example field
+        Round status
     - name: osdmap.epoch
       type: long
       description: >
-        Example field
+        Osdmap version
     - name: osdmap.full
       type: boolean
       description: >
-        Example field
+        True if osdmap is full
     - name: osdmap.nearfull
       type: boolean
       description: >
-        Example field
+        True if osdmap is nearfull
     - name: osdmap.num_in_osds
       type: long
       description: >
-        Example field
+        OSD number participating
     - name: osdmap.num_osds
       type: long
       description: >
-        Example field
+        Number of known OSDs
     - name: osdmap.num_remapped_pgs
       type: long
       description: >
-        Example field
+        Number of placement groups remapped
     - name: osdmap.num_up_osds
       type: long
       description: >
-        Example field
+        OSD number up
     - name: overall_status
       type: keyword
       description: >
-        Example field
+        Overall health status
     - name: pgmap.bytes_avail
       type: long
       description: >
-        Example field
+        PG available bytes
     - name: pgmap.bytes_total
       type: long
       description: >
-        Example field
+        PG total bytes
     - name: pgmap.bytes_used
       type: long
       description: >
-        Example field
+        PG used bytes
     - name: pgmap.data_bytes
       type: long
       description: >
-        Example field
+        PG data bytes
     - name: pgmap.num_pgs
       type: long
       description: >
-        Example field
+        PG number
     - name: pgmap.pgs_by_state.count
       type: long
       description: >
-        Example field
+        Pgs by state
     - name: pgmap.pgs_by_state.state_name
       type: keyword
       description: >
-        Example field
+        Pg state name
 

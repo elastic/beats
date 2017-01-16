@@ -26,6 +26,10 @@ func eventsMapping(input string) []common.MapStr {
 func decodeOsdPoolStats(osdmap []map[string]interface{}) ([]common.MapStr, error) {
 	myEvents := []common.MapStr{}
 
+	newevent := common.MapStr{}
+
+	myEvents = append(myEvents, newevent)
+
 	// ceph.pool.stats: records pre pool IO and recovery throughput
 	for _, pool := range osdmap {
 		pool_name, ok := pool["pool_name"].(string)
@@ -49,7 +53,7 @@ func decodeOsdPoolStats(osdmap []map[string]interface{}) ([]common.MapStr, error
 			}
 			for key, value := range objectdata {
 				event := common.MapStr{
-					key: value,
+					object + "." + key: value,
 				}
 				osdevent = common.MapStrUnion(osdevent, event)
 			}

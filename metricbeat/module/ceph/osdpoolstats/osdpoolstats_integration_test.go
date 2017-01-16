@@ -23,9 +23,6 @@ func TestFetch(t *testing.T) {
 
 	assert.True(t, len(events) > 0)
 
-	event := events[0]
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-
 }
 
 func getConfig() map[string]interface{} {

@@ -25,7 +25,6 @@ func TestFetch(t *testing.T) {
 
 	event := events[0]
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-
 }
 
 func getConfig() map[string]interface{} {

@@ -7,4 +7,31 @@
       type: keyword
       description: >
         name of pool
-        
+    - name: client_io_rate.read_bytes_sec
+      type: long
+      description: >
+        Bytes readed per sec
+    - name: client_io_rate.write_bytes_sec
+      type: long
+      description: >
+        Bytes written per sec
+    - name: client_io_rate.read_op_per_sec
+      type: long
+      description: >
+        Read operations per sec
+    - name: client_io_rate.write_op_per_sec
+      type: long
+      description: >
+        Write operations per sec
+    - name: recovery_rate.recovering_objects_per_sec
+      type: long
+      description: >
+        Recovering objects per sec
+    - name: recovery_rate.recovering_bytes_per_sec
+      type: long
+      description: >
+        Recovering bytes per sec
+    - name: recovery_rate.recovering_keys_per_sec
+      type: long
+      description: >
+        Recovering keys per sec
