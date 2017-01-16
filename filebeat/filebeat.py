@@ -37,7 +37,7 @@ def main():
         print("You need to specify at least a module")
         sys.exit(1)
 
-    load_dashboards(args)
+    # load_dashboards(args)
     load_datasets(args, modules)
 
 
@@ -49,7 +49,6 @@ def load_dashboards(args):
 
 
 def load_datasets(args, modules):
-    prospectors = ""
     for module in modules:
         path = os.path.join("module", module)
         if not os.path.isdir(path):
@@ -63,30 +62,27 @@ def load_datasets(args, modules):
         print("Found filesets: {}".format(filesets))
 
         for fileset in filesets:
-            prospectors += load_fileset(args, module, fileset,
-                                        os.path.join(path, fileset))
+            load_fileset(args, module, fileset,
+                         os.path.join(path, fileset))
 
-    print("Generated configuration: {}".format(prospectors))
-    run_filebeat(args, prospectors)
+    run_filebeat(args)
 
 
 def load_fileset(args, module, fileset, path):
     manifest = yaml.load(file(os.path.join(path, "manifest.yml"), "r"))
-    var = evaluate_vars(args, manifest["vars"], module, fileset)
+    var = evaluate_vars(args, manifest["var"], module, fileset)
     var["beat"] = dict(module=module, fileset=fileset, path=path, args=args)
     print("Evaluated variables: {}".format(var))
 
     load_pipeline(var, manifest["ingest_pipeline"])
-    generate_prospectors(var, manifest["prospectors"])
-
-    return var["beat"]["prospectors"]
 
 
 def evaluate_vars(args, var_in, module, fileset):
     var = {
         "builtin": get_builtin_vars()
     }
-    for name, vals in var_in.items():
+    for vals in var_in:
+        name = vals["name"]
         var[name] = vals["default"]
         if sys.platform == "darwin" and "os.darwin" in vals:
             var[name] = vals["os.darwin"]
@@ -94,25 +90,17 @@ def evaluate_vars(args, var_in, module, fileset):
             var[name] = vals["os.windows"]
 
         if isinstance(var[name], basestring):
-            var[name] = Template(var[name]).render(var)
+            var[name] = apply_template(var[name], var)
         elif isinstance(var[name], list):
             # only supports array of strings atm
-            var[name] = [Template(x).render(var) for x in var[name]]
-
-    # overrides
-    if args.M is not None:
-        for pair in args.M:
-            key, val = pair.partition("=")[::2]
-            if key.startswith("{}.{}.".format(module, fileset)):
-                key = key[len("{}.{}.".format(module, fileset)):]
-
-                # this is a hack in the prototype only, because
-                # here we don't know the type of each variable type.
-                if key == "paths":
-                    val = val.split(",")
-                var[key] = val
+            var[name] = [apply_template(x, var) for x in var[name]]
 
     return var
+
+
+def apply_template(tpl, var):
+    tpl = tpl.replace("{{.", "{{")     # Go templates
+    return Template(tpl).render(var)
 
 
 def get_builtin_vars():
@@ -126,7 +114,7 @@ def get_builtin_vars():
 
 
 def load_pipeline(var, pipeline):
-    path = os.path.join(var["beat"]["path"], Template(pipeline).render(var))
+    path = os.path.join(var["beat"]["path"], apply_template(pipeline, var))
     print("Loading ingest pipeline: {}".format(path))
     var["beat"]["pipeline_id"] = var["beat"]["module"] + '-' + var["beat"]["fileset"] + \
         '-' + os.path.splitext(os.path.basename(path))[0]
@@ -144,11 +132,8 @@ def load_pipeline(var, pipeline):
         sys.exit(1)
 
 
-def run_filebeat(args, prospectors):
+def run_filebeat(args):
     cfg_template = """
-filebeat.prospectors:
-{{prospectors}}
-
 output.elasticsearch.hosts: ["{{es}}"]
 output.elasticsearch.pipeline: "%{[fields.pipeline_id]}"
 """
@@ -165,32 +150,21 @@ output.elasticsearch.pipeline: "%{[fields.pipeline_id]}"
                                  text=True)
     with open(fname, "w") as cfgfile:
         cfgfile.write(Template(cfg_template).render(
-            dict(prospectors=prospectors, es=args.es)))
+            dict(es=args.es)))
         print("Wrote configuration file: {}".format(cfgfile.name))
     os.close(fd)
 
     cmd = ["./filebeat.test", "-systemTest",
+           "-modules", args.modules,
            "-e", "-c", cfgfile.name, "-d", "*"]
+    for override in args.M:
+        cmd.extend(["-M", override])
     if args.once:
+        cmd.extend(["-M", "*.*.prospector.close_eof=true"])
         cmd.append("-once")
     print("Starting filebeat: " + " ".join(cmd))
 
     subprocess.Popen(cmd).wait()
-
-
-def generate_prospectors(var, prospectors):
-    var["beat"]["prospectors"] = ""
-    for pr in prospectors:
-        path = os.path.join(var["beat"]["path"], Template(pr).render(var))
-        with open(path, "r") as f:
-            contents = Template(f.read()).render(var)
-        if var["beat"]["args"].once:
-            contents += "\n  close_eof: true"
-            contents += "\n  scan_frequency: 0.2s"
-            if "multiline" in contents:
-                contents += "\n  multiline.timeout: 0.2s"
-
-        var["beat"]["prospectors"] += "\n" + contents
 
 
 if __name__ == "__main__":

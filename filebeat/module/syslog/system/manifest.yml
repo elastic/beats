@@ -1,7 +1,7 @@
-module_version: 1.0
+module_version: "1.0"
 
-vars:
-  paths:
+var:
+  - name: paths
     default:
       - /var/log/messages*
       - /var/log/syslog*
@@ -10,5 +10,4 @@ vars:
     os.windows: []
 
 ingest_pipeline: ingest/pipeline.json
-prospectors:
-  - config/system.yml
+prospector: config/system.yml

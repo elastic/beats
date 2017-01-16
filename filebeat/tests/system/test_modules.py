@@ -62,7 +62,7 @@ class Test(BaseTest):
             self.filebeat,
             "--once",
             "--modules={}".format(module),
-            "-M", "{module}.{fileset}.paths={test_file}".format(
+            "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file),
             "--es", self.elasticsearch_url,
             "--index", index_name,
