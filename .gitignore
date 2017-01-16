@@ -12,6 +12,7 @@
 /beats.iml
 *.dev.yml
 *.generated.yml
+coverage.out
 
 # Editor swap files
 *.swp

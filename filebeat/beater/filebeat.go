@@ -1,6 +1,7 @@
 package beater
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"sync"
@@ -11,6 +12,7 @@ import (
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/crawler"
+	"github.com/elastic/beats/filebeat/fileset"
 	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/filebeat/spooler"
@@ -20,8 +22,9 @@ var once = flag.Bool("once", false, "Run filebeat only once until all harvesters
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
-	config *cfg.Config
-	done   chan struct{}
+	config         *cfg.Config
+	moduleRegistry *fileset.ModuleRegistry
+	done           chan struct{}
 }
 
 // New creates a new Filebeat pointer instance.
@@ -30,13 +33,32 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	if err := rawConfig.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
+
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules)
+	if err != nil {
+		return nil, err
+	}
+
+	moduleProspectors, err := moduleRegistry.GetProspectorConfigs()
+	if err != nil {
+		return nil, err
+	}
+
 	if err := config.FetchConfigs(); err != nil {
 		return nil, err
 	}
 
+	// Add prospectors created by the modules
+	config.Prospectors = append(config.Prospectors, moduleProspectors...)
+
+	if len(config.Prospectors) == 0 {
+		return nil, errors.New("No prospectors defined. What files do you want me to watch?")
+	}
+
 	fb := &Filebeat{
-		done:   make(chan struct{}),
-		config: &config,
+		done:           make(chan struct{}),
+		config:         &config,
+		moduleRegistry: moduleRegistry,
 	}
 	return fb, nil
 }

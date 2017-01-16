@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"log"
 	"os"
 	"path/filepath"
@@ -26,6 +25,7 @@ type Config struct {
 	RegistryFile    string           `config:"registry_file"`
 	ConfigDir       string           `config:"config_dir"`
 	ShutdownTimeout time.Duration    `config:"shutdown_timeout"`
+	Modules         []*common.Config `config:"modules"`
 }
 
 var (
@@ -122,12 +122,6 @@ func (config *Config) FetchConfigs() error {
 	err = mergeConfigFiles(configFiles, config)
 	if err != nil {
 		log.Fatal("Error merging config files: ", err)
-		return err
-	}
-
-	if len(config.Prospectors) == 0 {
-		err := errors.New("No paths given. What files do you want me to watch?")
-		log.Fatalf("%v", err)
 		return err
 	}
 
