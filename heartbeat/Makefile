@@ -1,4 +1,4 @@
-BEATNAME=heartbeat
+BEAT_NAME=heartbeat
 BEAT_DESCRIPTION?=Ping remote services for availability and log results to Elasticsearch or send to Logstash.
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false

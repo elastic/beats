@@ -1,6 +1,7 @@
-BEATNAME={beat}
-BEAT_DIR={beat_path}/{beat}
+BEAT_NAME={beat}
+BEAT_PATH={beat_path}/{beat}
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
+BEAT_URL=https://${BEAT_PATH}
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
 ES_BEATS?=./vendor/github.com/elastic/beats
