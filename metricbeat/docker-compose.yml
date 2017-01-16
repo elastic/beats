@@ -3,7 +3,18 @@ services:
   beat:
     build: ${PWD}/.
     depends_on:
+      - apache
       - ceph
+      - couchbase
+      - mongodb
+      - haproxy
+      - kafka
+      - mysql
+      - nginx
+      - postgresql
+      - prometheus
+      - redis
+      - zookeeper
     environment:
       - APACHE_HOST=apache
       - APACHE_PORT=80
@@ -39,6 +50,11 @@ services:
       - datavolume:/etc/ceph
       - datavolume1:/var/run/ceph
     command: make
+    entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
+
+  # Modules
+  apache:
+    build: ${PWD}/module/apache/_meta
 
   ceph:
     image: ceph/demo
@@ -51,6 +67,46 @@ services:
       - datavolume:/etc/ceph
       - datavolume1:/var/run/ceph
 
+  couchbase:
+    build: ${PWD}/module/couchbase/_meta
+
+  kafka:
+    image: spotify/kafka
+    expose:
+      - 9092
+      - 2181
+    environment:
+      - ADVERTISED_HOST=kafka
+
+  mongodb:
+    image: mongo:3.4
+
+  mysql:
+    image: mysql:5.7.12
+    environment:
+      - MYSQL_ROOT_PASSWORD=test
+
+  nginx:
+    build: ${PWD}/module/nginx/_meta
+
+  haproxy:
+    build: ${PWD}/module/haproxy/_meta
+
+  postgresql:
+    image: postgres:9.5.3
+
+  prometheus:
+    image: prom/prometheus
+    expose:
+      - 9090
+
+  redis:
+    image: redis:3.2.4-alpine
+
+  zookeeper:
+    image: jplock/zookeeper:3.4.8
+
 volumes:
   datavolume: {}
   datavolume1: {}
+

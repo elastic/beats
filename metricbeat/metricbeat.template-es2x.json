@@ -233,10 +233,39 @@
             },
             "osdpoolstats": {
               "properties": {
+                "client_io_rate": {
+                  "properties": {
+                    "read_bytes_sec": {
+                      "type": "long"
+                    },
+                    "read_op_per_sec": {
+                      "type": "long"
+                    },
+                    "write_bytes_sec": {
+                      "type": "long"
+                    },
+                    "write_op_per_sec": {
+                      "type": "long"
+                    }
+                  }
+                },
                 "name": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
+                },
+                "recovery_rate": {
+                  "properties": {
+                    "recovering_bytes_per_sec": {
+                      "type": "long"
+                    },
+                    "recovering_keys_per_sec": {
+                      "type": "long"
+                    },
+                    "recovering_objects_per_sec": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },

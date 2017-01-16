@@ -520,6 +520,62 @@ name of pool
 
 
 [float]
+=== ceph.osdpoolstats.client_io_rate.read_bytes_sec
+
+type: long
+
+Bytes readed per sec
+
+
+[float]
+=== ceph.osdpoolstats.client_io_rate.write_bytes_sec
+
+type: long
+
+Bytes written per sec
+
+
+[float]
+=== ceph.osdpoolstats.client_io_rate.read_op_per_sec
+
+type: long
+
+Read operations per sec
+
+
+[float]
+=== ceph.osdpoolstats.client_io_rate.write_op_per_sec
+
+type: long
+
+Write operations per sec
+
+
+[float]
+=== ceph.osdpoolstats.recovery_rate.recovering_objects_per_sec
+
+type: long
+
+Recovering objects per sec
+
+
+[float]
+=== ceph.osdpoolstats.recovery_rate.recovering_bytes_per_sec
+
+type: long
+
+Recovering bytes per sec
+
+
+[float]
+=== ceph.osdpoolstats.recovery_rate.recovering_keys_per_sec
+
+type: long
+
+Recovering keys per sec
+
+
+[float]
 == status Fields
 
 status
@@ -539,7 +595,7 @@ Available percent
 
 type: keyword
 
-Status healt
+Status health
 
 
 [float]
@@ -627,7 +683,7 @@ Last updated
 
 type: long
 
-Example field
+Map version
 
 
 [float]
@@ -635,7 +691,7 @@ Example field
 
 type: long
 
-Example field
+Round of timecheck
 
 
 [float]
@@ -643,7 +699,7 @@ Example field
 
 type: keyword
 
-Example field
+Round status
 
 
 [float]
@@ -651,7 +707,7 @@ Example field
 
 type: long
 
-Example field
+Osdmap version
 
 
 [float]
@@ -659,7 +715,7 @@ Example field
 
 type: boolean
 
-Example field
+True if osdmap is full
 
 
 [float]
@@ -667,7 +723,7 @@ Example field
 
 type: boolean
 
-Example field
+True if osdmap is nearfull
 
 
 [float]
@@ -675,7 +731,7 @@ Example field
 
 type: long
 
-Example field
+OSD number participating
 
 
 [float]
@@ -683,7 +739,7 @@ Example field
 
 type: long
 
-Example field
+Number of known OSDs
 
 
 [float]
@@ -691,7 +747,7 @@ Example field
 
 type: long
 
-Example field
+Number of placement groups remapped
 
 
 [float]
@@ -699,7 +755,7 @@ Example field
 
 type: long
 
-Example field
+OSD number up
 
 
 [float]
@@ -707,7 +763,7 @@ Example field
 
 type: keyword
 
-Example field
+Overall health status
 
 
 [float]
@@ -715,7 +771,7 @@ Example field
 
 type: long
 
-Example field
+PG available bytes
 
 
 [float]
@@ -723,7 +779,7 @@ Example field
 
 type: long
 
-Example field
+PG total bytes
 
 
 [float]
@@ -731,7 +787,7 @@ Example field
 
 type: long
 
-Example field
+PG used bytes
 
 
 [float]
@@ -739,7 +795,7 @@ Example field
 
 type: long
 
-Example field
+PG data bytes
 
 
 [float]
@@ -747,7 +803,7 @@ Example field
 
 type: long
 
-Example field
+PG number
 
 
 [float]
@@ -755,7 +811,7 @@ Example field
 
 type: long
 
-Example field
+Pgs by state
 
 
 [float]
@@ -763,7 +819,7 @@ Example field
 
 type: keyword
 
-Example field
+Pg state name
 
 
 [[exported-fields-cloud]]
