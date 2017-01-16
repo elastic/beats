@@ -74,7 +74,7 @@ curl -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@/etc/{beatname_lc}
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-cd {beatname_lc}-{version}-darwin
+cd {beatname_lc}-{version}-darwin-x86_64
 curl -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@{beatname_lc}.template.json
 ----------------------------------------------------------------------
 
