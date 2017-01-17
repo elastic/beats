@@ -13,6 +13,7 @@ import (
 	_ "github.com/elastic/beats/packetbeat/protos/dns"
 	_ "github.com/elastic/beats/packetbeat/protos/http"
 	_ "github.com/elastic/beats/packetbeat/protos/icmp"
+	_ "github.com/elastic/beats/packetbeat/protos/kafka"
 	_ "github.com/elastic/beats/packetbeat/protos/memcache"
 	_ "github.com/elastic/beats/packetbeat/protos/mongodb"
 	_ "github.com/elastic/beats/packetbeat/protos/mysql"
