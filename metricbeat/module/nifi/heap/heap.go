@@ -8,6 +8,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
+
+	"github.com/elastic/beats/metricbeat/module/nifi"
 )
 
 // init registers the MetricSet with the central registry.
@@ -24,7 +26,9 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	client *http.Client
+	client    *http.Client
+	nodes     map[string]string
+	isCluster bool
 }
 
 // New create a new instance of the MetricSet
@@ -39,9 +43,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	arbHost := base.Module().Config().Hosts[0]
+
+	client := &http.Client{Timeout: base.Module().Config().Timeout}
+
+	isCluster := nifi.IsCluster(arbHost, client)
+
+	var nodes map[string]string
+
+	if isCluster {
+		nodes = nifi.GetNodeMap(arbHost, client)
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
-		client:        &http.Client{Timeout: base.Module().Config().Timeout},
+		client:        client,
+		nodes:         nodes,
+		isCluster:     isCluster,
 	}, nil
 }
 
@@ -72,4 +90,12 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	event := eventMapping(resp.Body)
 	fmt.Printf("%v", event)
 	return event, nil
+}
+
+func (m *MetricSet) formatURL() string {
+
+	if m.isCluster {
+		url := fmt.Sprintf("http://%s/nifi-api/system-diagnostics", m.HostData().URI)
+	}
+	url := fmt.Sprintf("http://%s/nifi-api/system-diagnostics", m.HostData().URI)
 }

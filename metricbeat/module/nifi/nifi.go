@@ -1,6 +1,9 @@
 package nifi
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -23,4 +26,32 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	}
 
 	return &base, nil
+}
+
+// IsCluster ...
+func IsCluster(host string, client *http.Client) bool {
+	url := fmt.Sprintf("http://%s/nifi-api/controller/cluster", host)
+
+	req, _ := http.NewRequest("GET", url, nil)
+
+	resp, _ := client.Do(req)
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		return true
+	}
+	return false
+}
+
+// GetNodeMap ...
+func GetNodeMap(host string, client *http.Client) map[string]string {
+	url := fmt.Sprintf("https://%s/nifi-api/controller/cluster", host)
+
+	req, _ := http.NewRequest("GET", url, nil)
+
+	resp, _ := client.Do(req)
+
+	defer resp.Body.Close()
+
 }
