@@ -58,6 +58,11 @@ packetbeat.protocols:
   # the HTTP protocol by commenting out the list of ports.
   ports: [80, 8080, 8000, 5000, 8002]
 
+- type: kafka:
+  # Configure the ports where to listen for Kafka traffic. You can disable
+  # the Kafka protocol by commenting out the list of ports.
+  ports: [9092]
+
 - type: memcache
   # Configure the ports where to listen for memcache traffic. You can disable
   # the Memcache protocol by commenting out the list of ports.

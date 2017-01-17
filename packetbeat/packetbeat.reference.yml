@@ -207,6 +207,27 @@ packetbeat.protocols:
   # be trimmed to this size. Default is 10 MB.
   #max_message_size: 10485760
 
+- type: kafka
+  # Enable Kafka monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for Kafka traffic. You can disable
+  # the Kafka protocol by commenting out the list of ports.
+  ports: [9092]
+
+  # Kafka transaction type to ignore. Message parsing is skipped for ignore
+  # transactions.
+  #ignore: []
+
+  # If this option is enabled, transaction details will be included. If set to false,
+  # the message content will not be parsed.
+  #send_details: true
+
+  # Transaction timeout. Expired transactions will no longer be correlated to
+  # incoming responses, but sent to Elasticsearch immediately.
+  #transaction_timeout: 10s
+
+
 - type: memcache
   # Enable memcache monitoring. Default: true
   #enabled: true
