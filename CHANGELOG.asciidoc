@@ -61,6 +61,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - The limit for the number of fields is increased via the mapping template. {pull}3275[3275]
 - Updated to Go 1.7.4. {pull}3277[3277]
 - Added a NOTICE file containing the notices and licenses of the dependencies. {pull}3334[3334].
+- Files created by Beats (logs, registry, file output) will have 0600 permissions. {pull}3387[3387].
 - RPM/deb packages will now install the config file with 0600 permissions. {pull}3382[3382]
 
 *Metricbeat*
