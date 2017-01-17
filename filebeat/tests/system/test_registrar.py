@@ -1196,6 +1196,10 @@ class Test(BaseTest):
             lambda: self.log_contains("Flushing spooler because of timeout. Events flushed: ", logfile="filebeat2.log"),
             max_timeout=10)
 
+        self.wait_until(
+            lambda: self.log_contains("Registry file updated",
+                                      logfile="filebeat2.log"), max_timeout=10)
+
         filebeat.check_kill_and_wait()
 
         # Check that ttl was reset correctly
