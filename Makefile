@@ -96,6 +96,8 @@ package: update beats-dashboards
 	mkdir -p build/upload/
 	$(foreach var,$(BEATS),cp -r $(var)/build/upload/ build/upload/$(var)  || exit 1;)
 	cp -r build/dashboards-upload build/upload/dashboards
+	# Run tests on the generated packages.
+	go test ./dev-tools/package_test.go -files "${shell pwd}/build/upload/*/*"
 
 # Upload nightly builds to S3
 .PHONY: upload-nightlies-s3
