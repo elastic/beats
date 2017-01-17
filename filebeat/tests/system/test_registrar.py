@@ -1116,6 +1116,10 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=30)
 
+        self.wait_until(
+            lambda: self.log_contains("Registry file updated. 1 states written.",
+            logfile="filebeat.log"), max_timeout=10)
+
         filebeat.check_kill_and_wait()
 
         # Check that ttl > 0 was set because of clean_inactive
@@ -1136,6 +1140,10 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.log_contains("Flushing spooler because of timeout. Events flushed: ", logfile="filebeat2.log"),
             max_timeout=10)
+
+        self.wait_until(
+            lambda: self.log_contains("Registry file updated",
+            logfile="filebeat2.log"), max_timeout=10)
 
         filebeat.check_kill_and_wait()
 

@@ -62,14 +62,17 @@ cp $BEAT_NAME.template-es2x.json $PREFIX/$BEAT_NAME.template-es2x.json
 
 # linux
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-linux.yml
+chmod 0600 $PREFIX/$BEAT_NAME-linux.yml
 cp $BEAT_NAME.full.yml $PREFIX/$BEAT_NAME-linux.full.yml
 
 # darwin
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-darwin.yml
+chmod 0600 $PREFIX/$BEAT_NAME-darwin.yml
 cp $BEAT_NAME.full.yml $PREFIX/$BEAT_NAME-darwin.full.yml
 
 # win
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-win.yml
+chmod 0600 $PREFIX/$BEAT_NAME-win.yml
 cp $BEAT_NAME.full.yml $PREFIX/$BEAT_NAME-win.full.yml
 
 # Contains beat specific adjustments. As it is platform specific knowledge, it should be in packer not the beats itself
