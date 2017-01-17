@@ -21,7 +21,6 @@
 # Download the canonical import path (may fail, don't allow failures beyond)
 SRC_FOLDER=$SOURCE
 
-BEAT_PATH=$1
 DST_FOLDER=`dirname $GOPATH/src/$BEAT_PATH`
 GIT_REPO=$BEAT_PATH
 
@@ -110,8 +109,8 @@ if [ "$STATIC" == "true" ]; then LDARGS=--ldflags\ \'-extldflags\ \"-static\"\';
 
 if [ -n $BEFORE_BUILD ]; then
 	chmod +x /scripts/$BEFORE_BUILD
-	echo "Execute /scripts/$BEFORE_BUILD ${BEAT_PATH}"
-	/scripts/$BEFORE_BUILD ${BEAT_PATH}
+	echo "Execute /scripts/$BEFORE_BUILD ${BEAT_PATH} ${ES_BEATS}"
+	/scripts/$BEFORE_BUILD
 fi
 
 

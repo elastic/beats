@@ -340,8 +340,10 @@ prepare-package:
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS} \
 		-e BUILDID=${BUILDID} \
-		${BEATS_BUILDER_IMAGE} \
-		${BEAT_PATH}
+		-e ES_BEATS=${ES_BEATS} \
+		-e BEAT_PATH=${BEAT_PATH} \
+		-e BEAT_NAME=${BEAT_NAME} \
+		${BEATS_BUILDER_IMAGE}
 
 # Prepares for packaging. Builds binaries with cgo
 .PHONY: prepare-package-cgo
@@ -358,8 +360,10 @@ prepare-package-cgo:
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS} \
 		-e BUILDID=${BUILDID} \
-		${BEATS_BUILDER_IMAGE} \
-		${BEAT_PATH}
+		-e ES_BEATS=${ES_BEATS} \
+		-e BEAT_PATH=${BEAT_PATH} \
+		-e BEAT_NAME=${BEAT_NAME} \
+		${BEATS_BUILDER_IMAGE}
 
 	# linux builds on debian 6 for compatibility
 	docker run --rm \
@@ -372,8 +376,10 @@ prepare-package-cgo:
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS_OLD} \
 		-e BUILDID=${BUILDID} \
-		${BEATS_BUILDER_DEB6_IMAGE} \
-		${BEAT_PATH}
+		-e ES_BEATS=${ES_BEATS} \
+		-e BEAT_PATH=${BEAT_PATH} \
+		-e BEAT_NAME=${BEAT_NAME} \
+        ${BEATS_BUILDER_DEB6_IMAGE}
 
 # Prepares images for packaging
 .PHONY: package-setup
