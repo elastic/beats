@@ -1,0 +1,18 @@
+package: github.com/elastic/beats/dev-tools
+import: []
+testImports:
+- name: github.com/blakesmith/ar
+  version: 8bd4349a67f2533b078dbc524689d15dba0f4659
+- name: github.com/cavaliercoder/go-rpm
+  version: 9664735b838ea0a81e4aace3197ebe0d4040f952
+- name: golang.org/x/crypto
+  version: 2f8be38b9a7533b8763d48273737ff6e90428a96
+  subpackages:
+  - cast5
+  - openpgp
+  - openpgp/armor
+  - openpgp/elgamal
+  - openpgp/errors
+  - openpgp/packet
+  - openpgp/s2k
+
