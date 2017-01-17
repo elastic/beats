@@ -1,3 +1,0 @@
-=== ceph df MetricSet
-
-This is the df metricset of the module ceph.

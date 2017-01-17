@@ -1,3 +1,0 @@
-#!/bin/bash
-export DOCKERID=`docker ps|grep ceph|awk '{print $1}'`
-docker exec -i $DOCKERID /usr/bin/ceph $*
