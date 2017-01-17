@@ -52,7 +52,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	var nodes map[string]string
 
 	if isCluster {
-		nodes = nifi.GetNodeMap(arbHost, client)
+		nodes, err := nifi.GetNodeMap(arbHost, client)
+		if err != nil {
+			logp.Err(err.Error())
+			return nil, err
+		}
 	}
 
 	return &MetricSet{
@@ -67,6 +71,45 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
+
+	if m.isCluster {
+		event, err := m.fetchNodewise()
+	} else {
+		event, err := m.fetchAggregate()
+	}
+
+	return event, nil
+}
+
+func (m *MetricSet) fetchNodewise() (common.MapStr, error) {
+	host := m.HostData().URI
+	nodeID := m.nodeData[host]
+
+	url := fmt.Sprintf("http://%s/nifi-api/system-diagnostics?clusterNodeId=%s", host, nodeID)
+
+	req, _ := http.NewRequest("GET", url, nil)
+
+	resp, err := m.client.Do(req)
+	if err != nil {
+		msg := fmt.Sprintf("Error making HTTP request: %v", err)
+		logp.Err(msg)
+		return nil, errors.New(msg)
+	}
+
+	if resp.StatusCode != 200 {
+		msg := fmt.Sprintf("Non-200 Response returned from NiFi request: %d: %s", resp.StatusCode, resp.Status)
+		logp.Err(msg)
+		return nil, errors.New(msg)
+	}
+
+	event := nodewiseEventMapping(resp.Body, nodeID)
+	fmt.Printf("%v", event)
+
+	return event, nil
+
+}
+
+func (m *MetricSet) fetchAggregate() (common.MapStr, error) {
 	url := fmt.Sprintf("http://%s/nifi-api/system-diagnostics", m.HostData().URI)
 	fmt.Println(url)
 
@@ -89,6 +132,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	event := eventMapping(resp.Body)
 	fmt.Printf("%v", event)
+
 	return event, nil
 }
 
