@@ -1,16 +1,42 @@
 #!/usr/bin/env python
-import os
 import argparse
+import os
+import re
+import sys
 from subprocess import check_call
 
-template_go = '''package beat
+vendored_libbeat = os.path.normpath("vendor/github.com/elastic/beats")
 
-const defaultBeatVersion = "{}"
+
+goversion_template = '''package main
+
+const appVersion = "{version}"
 '''
 
-template_packer = '''version: "{version}"
+goversion_template_libbeat = '''package beat
+
+const defaultBeatVersion = "{version}"
 '''
 
+
+yamlversion_template = '''version: "{version}"
+'''
+
+def get_rootfolder():
+    vendored_libbeat = os.path.normpath("vendor/github.com/elastic/beats")
+    script_directory = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+    index = script_directory.find(vendored_libbeat)
+    if index > 0:
+        # Community beat detected, version files are stored at the root folder of the project
+        return os.path.abspath(script_directory[:index])
+
+    # Libbeat detected
+    return os.path.dirname(script_directory)
+
+def create_from_template(filename, template, version):
+    with open(filename, "w") as f:
+        f.write(template.format(version=version))
+        print ("Set version {} in file {}".format(version, filename))
 
 def main():
     parser = argparse.ArgumentParser(
@@ -18,21 +44,27 @@ def main():
     parser.add_argument("version",
                         help="The new version")
     args = parser.parse_args()
-
-    dir = os.path.dirname(os.path.realpath(__file__))
-    with open(dir + "/../libbeat/beat/version.go", "w") as f:
-        f.write(template_go.format(args.version))
-
     version = args.version
-    with open(dir + "/packer/version.yml", "w") as f:
-        f.write(template_packer.format(
-            version=version,
-        ))
 
-    # Updates all files with the new templates
-    os.chdir(dir + "/../")
+    is_libbeat = vendored_libbeat not in os.path.realpath(__file__)
+    if is_libbeat:
+        goversion_filepath  = os.path.join(get_rootfolder(), "libbeat","beat", "version.go")
+        ymlversion_filepath = os.path.join(get_rootfolder(), "dev-tools", "packer", "version.yml")
+        go_template = goversion_template_libbeat
+    else:
+        goversion_filepath  = os.path.join(get_rootfolder(), "version.go")
+        ymlversion_filepath = os.path.join(get_rootfolder(), "version.yml")
+        go_template = goversion_template
+
+    # Create version.go and version.yml files
+    create_from_template(goversion_filepath, go_template, version)
+    create_from_template(ymlversion_filepath, yamlversion_template, version)
+
+    # Updates all version files with the new templates
+    os.chdir(get_rootfolder())
     print("Update build files")
     check_call("make update", shell=True)
 
 if __name__ == "__main__":
     main()
+    

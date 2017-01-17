@@ -5,15 +5,14 @@ import (
 	"testing"
 	"time"
 
-	dc "github.com/fsouza/go-dockerclient"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/docker"
+
+	dc "github.com/fsouza/go-dockerclient"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMemoryService_GetMemoryStats(t *testing.T) {
-
 	//Container  + dockerstats
 	containerID := "containerID"
 	labels := map[string]string{
@@ -36,7 +35,7 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	memoryService := &MemoryService{}
 	memorystats := getMemoryStats(time.Now(), 1)
 
-	memoryRawStats := docker.DockerStat{}
+	memoryRawStats := docker.Stat{}
 	memoryRawStats.Container = container
 	memoryRawStats.Stats = memorystats
 
@@ -45,7 +44,6 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 			"container": common.MapStr{
 				"id":     containerID,
 				"name":   "name1",
-				"socket": docker.GetSocket(),
 				"labels": docker.DeDotLabels(labels),
 			},
 		},
@@ -128,6 +126,5 @@ func getMemoryStats(read time.Time, number uint64) dc.Stats {
 	return myMemoryStats
 }
 func equalEvent(expectedEvent common.MapStr, event common.MapStr) bool {
-
 	return reflect.DeepEqual(expectedEvent, event)
 }

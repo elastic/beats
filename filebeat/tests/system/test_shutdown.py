@@ -42,7 +42,7 @@ class Test(BaseTest):
 
         # Wait until first flush
         self.wait_until(
-            lambda: self.log_contains("Flushing spooler because spooler full"),
+            lambda: self.log_contains_count("Flushing spooler") > 1,
             max_timeout=15)
 
         filebeat.check_kill_and_wait()

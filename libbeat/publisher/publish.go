@@ -21,6 +21,10 @@ import (
 	_ "github.com/elastic/beats/libbeat/outputs/kafka"
 	_ "github.com/elastic/beats/libbeat/outputs/logstash"
 	_ "github.com/elastic/beats/libbeat/outputs/redis"
+
+	// load support output codec
+	_ "github.com/elastic/beats/libbeat/outputs/codecs/format"
+	_ "github.com/elastic/beats/libbeat/outputs/codecs/json"
 )
 
 // command line flags

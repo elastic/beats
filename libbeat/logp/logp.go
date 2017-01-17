@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -22,10 +23,6 @@ var (
 	// Beat start time
 	startTime time.Time
 )
-
-func init() {
-	startTime = time.Now()
-}
 
 type Logging struct {
 	Selectors []string
@@ -46,10 +43,37 @@ var (
 )
 
 func init() {
+	startTime = time.Now()
+
 	// Adds logging specific flags: -v, -e and -d.
 	verbose = flag.Bool("v", false, "Log at INFO level")
 	toStderr = flag.Bool("e", false, "Log to stderr and disable syslog/file output")
 	debugSelectorsStr = flag.String("d", "", "Enable certain debug selectors")
+
+}
+
+func HandleFlags(name string) error {
+	level := _log.level
+	if *verbose {
+		if LOG_INFO > level {
+			level = LOG_INFO
+		}
+	}
+
+	selectors := strings.Split(*debugSelectorsStr, ",")
+	debugSelectors, debugAll := parseSelectors(selectors)
+	if debugAll || len(debugSelectors) > 0 {
+		level = LOG_DEBUG
+	}
+
+	// flags are handled before config file is read => log to stderr for now
+	_log.level = level
+	_log.toStderr = true
+	_log.logger = log.New(os.Stderr, name, stderrLogFlags)
+	_log.selectors = debugSelectors
+	_log.debugAllSelectors = debugAll
+
+	return nil
 }
 
 // Init combines the configuration from config with the command line
@@ -57,6 +81,8 @@ func init() {
 // standard output is always enabled. You can make it respect the command
 // line flag with a later SetStderr call.
 func Init(name string, config *Logging) error {
+	// reset settings from HandleFlags
+	_log = Logger{}
 
 	logLevel, err := getLogLevel(config)
 	if err != nil {

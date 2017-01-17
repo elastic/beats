@@ -1,7 +1,7 @@
 - name: network
   type: group
   description: >
-    Netowrk metrics.
+    Network metrics.
   fields:
 
     - name: interface

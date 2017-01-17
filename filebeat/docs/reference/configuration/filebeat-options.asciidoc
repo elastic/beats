@@ -240,7 +240,9 @@ When this option is enabled, Filebeat closes a file as soon as the end of a file
 
 WARNING: Only use this option if you understand that data loss is a potential side effect. Another side effect is that multiline events might not be completely sent before the timeout expires.
 
-When this option is enabled, Filebeat gives every harvester a predefined lifetime. Regardless of where the reader is in the file, reading will stop after the `close_timeout` period has elapsed. This option can be useful for older log files when you want to spend only a predefined amount of time on the files.  If you set `close_timeout` to equal `ignore_older`, the file will not be picked up if it's modified while the harvester is closed. This combination of settings normally leads to data loss, and the complete file is not sent.
+When this option is enabled, Filebeat gives every harvester a predefined lifetime. Regardless of where the reader is in the file, reading will stop after the `close_timeout` period has elapsed. This option can be useful for older log files when you want to spend only a predefined amount of time on the files.  While `close_timeout` will close the file after the predefined timeout, if the file is still being updated, the prospector will start a new harvester again per the defined `scan_frequency`. And the close_timeout for this harvester will start again with the countdown for the timeout.  
+
+If you set `close_timeout` to equal `ignore_older`, the file will not be picked up if it's modified while the harvester is closed. This combination of settings normally leads to data loss, and the complete file is not sent.
 
 When you use `close_timeout` for logs that contain multiline events, the harvester might stop in the middle of a multiline event, which means that only parts of the event will be sent. If the harvester is started again and the file still exists, only the second part of the event will be sent.
 
@@ -320,15 +322,10 @@ Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-json.message_key: log
 json.keys_under_root: true
 json.add_error_key: true
+json.message_key: log
 -------------------------------------------------------------------------------------
-
-
-*`message_key`*:: JSON key on which to apply the line filtering and multiline settings. This key must be top level
-and its value must be string, otherwise it is ignored. If no text key is defined, the line
-filtering and multiline features cannot be used.
 
 *`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key in the output document.
 If you enable this setting, the keys are copied top level in the output document. The default is false.
@@ -337,7 +334,14 @@ If you enable this setting, the keys are copied top level in the output document
 JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.) in case of conflicts.
 
 *`add_error_key`*:: If this setting is enabled, Filebeat adds a "json_error" key in case of JSON
-unmarshaling errors or when a text key is defined in the configuration but cannot be used.
+unmarshalling errors or when a `message_key` is defined in the configuration but cannot be used.
+
+*`message_key`*:: An optional configuration setting that specifies a JSON key on
+which to apply the line filtering and multiline settings. If specified the
+key must be at the top level in the JSON object and the value associated with
+the key must be a string, otherwise no filtering or multiline aggregation will
+occur.
+
 
 [[multiline]]
 ===== multiline
@@ -460,6 +464,10 @@ Currently if a new harvester can be started again, the harvester is picked rando
 This configuration option applies per prospector. You can use this option to indirectly set higher priorities on certain prospectors
 by assigning a higher limit of harvesters.
 
+===== enabled
+
+The `enabled` option can be used with each prospector to define if a prospector is enabled or not. By default, enabled is set to true.
+
 [[configuration-global-options]]
 === Filebeat Global Configuration
 
@@ -481,6 +489,8 @@ See <<load-balancing>> for more information about how this setting affects load 
 
 ===== publish_async
 
+experimental[]
+
 If enabled, the publisher pipeline in Filebeat operates in async mode preparing
 a new batch of lines while waiting for ACK. This option can improve load-balancing
 throughput at the cost of increased memory usage. The default value is false.
@@ -501,7 +511,7 @@ filebeat.idle_timeout: 5s
 ===== registry_file
 
 The name of the registry file. If a relative path is used, it is considered relative to the
-data path. See the <<directory-layout>> section for details. The default is `registry`.
+data path. See the <<directory-layout>> section for details. The default is `${path.data}/registry`.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -509,6 +519,9 @@ filebeat.registry_file: registry
 -------------------------------------------------------------------------------------
 
 It is not possible to use a symlink as registry file.
+
+NOTE: The registry file is only updated when new events are flushed and not on a predefined period.
+That means in case there are some states where the TTL expired, these are only removed when new event are processed.
 
 
 ===== config_dir
@@ -556,13 +569,18 @@ Example configuration:
 filebeat.shutdown_timeout: 5s
 -------------------------------------------------------------------------------------
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/generalconfig.asciidoc ?>]
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/processors-config.asciidoc[]
-
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/outputconfig.asciidoc ?>]
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-path-config.asciidoc ?>]
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/loggingconfig.asciidoc ?>]
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
+
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/processors-config.asciidoc ?>]
+include::../../../../libbeat/docs/processors-config.asciidoc[]
 

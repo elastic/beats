@@ -31,7 +31,7 @@ func TestConfigValidation(t *testing.T) {
 				"metricsets": []string{"status"},
 				"hosts":      []string{"127.0.0.1"},
 			},
-			err: "config error for host '127.0.0.1': invalid DSN: missing the slash separating the database name",
+			err: "error parsing mysql host: invalid DSN: missing the slash separating the database name",
 		},
 		{
 			// Local unix socket

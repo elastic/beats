@@ -1,6 +1,6 @@
 = Winlogbeat Reference
 
-include::./version.asciidoc[]
+include::../../libbeat/docs/version.asciidoc[]
 
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
 :packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
@@ -16,29 +16,42 @@ include::./version.asciidoc[]
 
 include::./overview.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/winlogbeat/docs/getting-started.asciidoc ?>]
 include::./getting-started.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/winlogbeat/docs/command-line.asciidoc ?>]
 include::./command-line.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-directory-layout.asciidoc ?>]
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/winlogbeat/docs/upgrading.asciidoc ?>]
 include::./upgrading.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/winlogbeat/docs/configuring-howto.asciidoc ?>]
 include::./configuring-howto.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/winlogbeat/docs/winlogbeat-filtering.asciidoc ?>]
 include::./winlogbeat-filtering.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-config-ingest.asciidoc ?>]
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-env-vars.asciidoc ?>]
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
 :win:
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/yaml.asciidoc ?>]
 include::../../libbeat/docs/yaml.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/winlogbeat/docs/fields.asciidoc ?>]
 include::./fields.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/winlogbeat/docs/securing-winlogbeat.asciidoc ?>]
 include::./securing-winlogbeat.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/winlogbeat/docs/troubleshooting.asciidoc ?>]
 include::./troubleshooting.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/winlogbeat/docs/faq.asciidoc ?>]
 include::./faq.asciidoc[]

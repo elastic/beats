@@ -1,34 +1,38 @@
 BUILDID?=$(shell git rev-parse HEAD)
 SNAPSHOT?=yes
 
+BEATS_BUILDER_IMAGE?=tudorg/beats-builder
+BEATS_BUILDER_DEB6_IMAGE?=tudorg/beats-builder-deb6
+BEATS_GOPATH=$(firstword $(subst :, ,${GOPATH}))
+
 makefile_abspath:=$(abspath $(lastword $(MAKEFILE_LIST)))
 packer_absdir=$(shell dirname ${makefile_abspath})
-beat_abspath=${GOPATH}/src/${BEAT_DIR}
+beat_abspath=${BEATS_GOPATH}/src/${BEAT_PATH}
 
 
 %/deb: ${BUILD_DIR}/god-linux-386 ${BUILD_DIR}/god-linux-amd64 fpm-image
 	echo Creating DEB packages for $(@D)
-	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
+	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
 
 %/rpm: ${BUILD_DIR}/god-linux-386 ${BUILD_DIR}/god-linux-amd64 fpm-image
 	echo Creating RPM packages for $(@D)
-	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
+	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
 
 %/darwin:
 	echo Creating Darwin packages for $(@D)
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/darwin/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/darwin/build.sh
 
 %/win:
 	echo Creating Darwin packages for $(@D)
-	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
+	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
 
 %/bin:
 	echo Creating Linux packages for $(@D)
-	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
+	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
 
 .PHONY: package-dashboards
 package-dashboards:
@@ -73,29 +77,29 @@ run-interactive-builder-deb6:
 	docker run -t -i -v $(shell pwd)/build:/build \
 		-v $(shell pwd)/xgo-scripts/:/scripts \
 		-v $(shell pwd)/../..:/source \
-		--entrypoint=bash tudorg/beats-builder-deb6
+		--entrypoint=bash ${BEATS_BUILDER_DEB6_IMAGE}
 
 .PHONY: run-interactive-builder
 run-interactive-builder:
 	docker run -t -i -v $(shell pwd)/build:/build \
 		-v $(packer_absdir)/xgo-scripts/:/scripts \
 		-v $(shell pwd)/../..:/source \
-		--entrypoint=bash tudorg/beats-builder
+		--entrypoint=bash ${BEATS_BUILDER_IMAGE}
 
 .PHONY: images
 images: xgo-image fpm-image go-daemon-image
 
 .PHONY: push-images
 push-images:
-	docker push tudorg/beats-builder
-	docker push tudorg/beats-builder-deb6
+	docker push ${BEATS_BUILDER_IMAGE}
+	docker push ${BEATS_BUILDER_DEB6_IMAGE}
 	docker push tudorg/fpm
 	docker push tudorg/go-daemon
 
 .PHONY: pull-images
 pull-images:
-	docker pull tudorg/beats-builder
-	docker pull tudorg/beats-builder-deb6
+	docker pull ${BEATS_BUILDER_IMAGE}
+	docker pull ${BEATS_BUILDER_DEB6_IMAGE}
 	docker pull tudorg/fpm
 	docker pull tudorg/go-daemon
 
@@ -115,8 +119,8 @@ endef
 
 .PHONY: clean-images
 clean-images:
-	@$(call rm-image,tudorg/beats-builder-deb6)
-	@$(call rm-image,tudorg/beats-builder)
+	@$(call rm-image, ${BEATS_BUILDER_DEB6_IMAGE})
+	@$(call rm-image, ${BEATS_BUILDER_IMAGE})
 
 .PHONY: clean
 clean:

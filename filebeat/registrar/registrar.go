@@ -30,7 +30,7 @@ type Registrar struct {
 var (
 	statesUpdate   = expvar.NewInt("registrar.states.update")
 	statesCleanup  = expvar.NewInt("registrar.states.cleanup")
-	statesCurrent  = expvar.NewInt("registar.states.current")
+	statesCurrent  = expvar.NewInt("registrar.states.current")
 	registryWrites = expvar.NewInt("registrar.writes")
 )
 
@@ -57,7 +57,7 @@ func (r *Registrar) Init() error {
 
 	// Create directory if it does not already exist.
 	registryPath := filepath.Dir(r.registryFile)
-	err := os.MkdirAll(registryPath, 0755)
+	err := os.MkdirAll(registryPath, 0750)
 	if err != nil {
 		return fmt.Errorf("Failed to created registry file dir %s: %v", registryPath, err)
 	}
@@ -88,8 +88,8 @@ func (r *Registrar) Init() error {
 }
 
 // GetStates return the registrar states
-func (r *Registrar) GetStates() file.States {
-	return *r.states
+func (r *Registrar) GetStates() []file.State {
+	return r.states.GetStates()
 }
 
 // loadStates fetches the previous reading state from the configure RegistryFile file
@@ -118,15 +118,7 @@ func (r *Registrar) loadStates() error {
 		return fmt.Errorf("Error decoding states: %s", err)
 	}
 
-	// Set all states to finished and disable TTL on restart
-	// For all states covered by a prospector, TTL will be overwritten with the prospector value
-	for key, state := range states {
-		state.Finished = true
-		// Set ttl to -2 to easily spot which states are not managed by a prospector
-		state.TTL = -2
-		states[key] = state
-	}
-
+	states = resetStates(states)
 	r.states.SetStates(states)
 	logp.Info("States Loaded from registrar: %+v", len(states))
 
@@ -176,6 +168,7 @@ func (r *Registrar) loadAndConvertOldState(f *os.File) bool {
 	// Convert old states to new states
 	logp.Info("Old registry states found: %v", len(oldStates))
 	states := convertOldStates(oldStates)
+	states = resetStates(states)
 	r.states.SetStates(states)
 
 	// Rewrite registry in new format
@@ -184,6 +177,19 @@ func (r *Registrar) loadAndConvertOldState(f *os.File) bool {
 	logp.Info("Old states converted to new states and written to registrar: %v", len(oldStates))
 
 	return true
+}
+
+// resetStates sets all states to finished and disable TTL on restart
+// For all states covered by a prospector, TTL will be overwritten with the prospector value
+func resetStates(states []file.State) []file.State {
+
+	for key, state := range states {
+		state.Finished = true
+		// Set ttl to -2 to easily spot which states are not managed by a prospector
+		state.TTL = -2
+		states[key] = state
+	}
+	return states
 }
 
 func convertOldStates(oldStates map[string]file.State) []file.State {
@@ -292,7 +298,7 @@ func (r *Registrar) writeRegistry() error {
 	logp.Debug("registrar", "Write registry file: %s", r.registryFile)
 
 	tempfile := r.registryFile + ".new"
-	f, err := os.Create(tempfile)
+	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		logp.Err("Failed to create tempfile (%s) for writing: %s", tempfile, err)
 		return err

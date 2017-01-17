@@ -13,9 +13,8 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "docker",
             "metricsets": ["container"],
-            "hosts": ["localhost"],
+            "hosts": ["unix:///var/run/docker.sock"],
             "period": "1s",
-            "socket": "unix:///var/run/docker.sock",
         }])
 
         proc = self.start_beat()
@@ -29,7 +28,7 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        evt = self.remove_labels_and_ports(evt)
+        evt = self.remove_labels(evt)
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -40,7 +39,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "docker",
             "metricsets": ["cpu"],
-            "hosts": ["localhost"],
+            "hosts": ["unix:///var/run/docker.sock"],
             "period": "1s"
         }])
 
@@ -55,10 +54,10 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        evt = self.remove_labels_and_ports(evt)
+        evt = self.remove_labels(evt)
 
-        if 'per_cpu' in evt["docker"]["cpu"]["usage"]:
-            del evt["docker"]["cpu"]["usage"]["per_cpu"]
+        if 'core' in evt["docker"]["cpu"]:
+            del evt["docker"]["cpu"]["core"]
 
         self.assert_fields_are_documented(evt)
 
@@ -70,7 +69,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "docker",
             "metricsets": ["diskio"],
-            "hosts": ["localhost"],
+            "hosts": ["unix:///var/run/docker.sock"],
             "period": "1s"
         }])
 
@@ -85,7 +84,7 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        evt = self.remove_labels_and_ports(evt)
+        evt = self.remove_labels(evt)
 
         self.assert_fields_are_documented(evt)
 
@@ -97,7 +96,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "docker",
             "metricsets": ["info"],
-            "hosts": ["localhost"],
+            "hosts": ["unix:///var/run/docker.sock"],
             "period": "1s"
         }])
 
@@ -122,7 +121,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "docker",
             "metricsets": ["memory"],
-            "hosts": ["localhost"],
+            "hosts": ["unix:///var/run/docker.sock"],
             "period": "1s"
         }])
 
@@ -137,7 +136,7 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        evt = self.remove_labels_and_ports(evt)
+        evt = self.remove_labels(evt)
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -148,7 +147,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "docker",
             "metricsets": ["network"],
-            "hosts": ["localhost"],
+            "hosts": ["unix:///var/run/docker.sock"],
             "period": "1s"
         }])
 
@@ -163,14 +162,12 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        evt = self.remove_labels_and_ports(evt)
+        evt = self.remove_labels(evt)
         self.assert_fields_are_documented(evt)
 
-    def remove_labels_and_ports(self, evt):
+    def remove_labels(self, evt):
 
         if 'labels' in evt["docker"]["container"]:
             del evt["docker"]["container"]["labels"]
-        if 'ports' in evt["docker"]["container"]:
-            del evt["docker"]["container"]["ports"]
 
         return evt

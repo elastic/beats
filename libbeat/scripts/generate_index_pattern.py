@@ -16,6 +16,7 @@ import sys
 
 unique_fields = []
 
+
 def fields_to_json(section, path, output):
 
     for field in section["fields"]:
@@ -30,12 +31,14 @@ def fields_to_json(section, path, output):
             field_to_json(field, newpath, output)
 
 
-def field_to_json(desc, path, output):
+def field_to_json(desc, path, output,
+                  indexed=True, analyzed=False, doc_values=True,
+                  searchable=True, aggregatable=True):
 
     global unique_fields
 
     if path in unique_fields:
-        print "ERROR: Field", path, "is duplicated. Please delete it and try again. Fields already are", unique_fields
+        print("ERROR: Field {} is duplicated. Please delete it and try again. Fields already are {}".format(path, ", ".join(unique_fields)))
         sys.exit(1)
     else:
         unique_fields.append(path)
@@ -44,15 +47,15 @@ def field_to_json(desc, path, output):
         "name": path,
         "count": 0,
         "scripted": False,
-        "indexed": True,
-        "analyzed": False,
-        "doc_values": True,
-        "searchable": True,
-        "aggregatable": True,
+        "indexed": indexed,
+        "analyzed": analyzed,
+        "doc_values": doc_values,
+        "searchable": searchable,
+        "aggregatable": aggregatable,
     }
     # find the kibana types based on the field type
     if "type" in desc:
-        if desc["type"] in ["half_float", "scaled_float", "float", "integer", "long"]:
+        if desc["type"] in ["half_float", "scaled_float", "float", "integer", "long", "short", "byte"]:
             field["type"] = "number"
         elif desc["type"] in ["text", "keyword"]:
             field["type"] = "string"
@@ -60,6 +63,8 @@ def field_to_json(desc, path, output):
                 field["aggregatable"] = False
         elif desc["type"] == "date":
             field["type"] = "date"
+        elif desc["type"] == "geo_point":
+            field["type"] = "geo_point"
     else:
         field["type"] = "string"
 
@@ -89,6 +94,24 @@ def fields_to_index_pattern(args, input):
 
     for k, section in enumerate(docs["fields"]):
         fields_to_json(section, "", output)
+
+    # add meta fields
+
+    field_to_json({"name": "_id", "type": "keyword"}, "_id", output,
+                  indexed=False, analyzed=False, doc_values=False,
+                  searchable=False, aggregatable=False)
+
+    field_to_json({"name": "_type", "type": "keyword"}, "_type", output,
+                  indexed=False, analyzed=False, doc_values=False,
+                  searchable=True, aggregatable=True)
+
+    field_to_json({"name": "_index", "type": "keyword"}, "_index", output,
+                  indexed=False, analyzed=False, doc_values=False,
+                  searchable=False, aggregatable=False)
+
+    field_to_json({"name": "_score", "type": "integer"}, "_score", output,
+                  indexed=False, analyzed=False, doc_values=False,
+                  searchable=False, aggregatable=False)
 
     output["fields"] = json.dumps(output["fields"])
     output["fieldFormatMap"] = json.dumps(output["fieldFormatMap"])

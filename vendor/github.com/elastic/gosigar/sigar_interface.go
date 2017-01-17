@@ -160,6 +160,10 @@ type ProcArgs struct {
 	List []string
 }
 
+type ProcEnv struct {
+	Vars map[string]string
+}
+
 type ProcExe struct {
 	Name string
 	Cwd  string

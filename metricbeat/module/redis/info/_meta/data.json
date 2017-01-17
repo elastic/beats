@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
+        "host": "redis:6379",
         "module": "redis",
         "name": "info",
         "rtt": 115

@@ -4,18 +4,23 @@
 version: '2'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:latest
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.1.1
     environment:
-        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-        - "network.host="
-        - "transport.host=127.0.0.1"
-        - "http.host=0.0.0.0"
-        - "xpack.security.enabled=false"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "network.host="
+      - "transport.host=127.0.0.1"
+      - "http.host=0.0.0.0"
+      - "xpack.security.enabled=false"
 
   logstash:
     build:
       context: docker/logstash
-      dockerfile: Dockerfile-latest
+      dockerfile: Dockerfile
+      args:
+        LS_VERSION: 5.1.1
+        LS_DOWNLOAD_URL: https://artifacts.elastic.co/downloads/logstash
+    environment:
+      - ES_HOST=elasticsearch
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:latest
+    image: docker.elastic.co/kibana/kibana:5.1.1

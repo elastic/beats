@@ -6,9 +6,6 @@
   # Redis hosts
   #hosts: ["127.0.0.1:6379"]
 
-  # Enabled defines if the module is enabled. Default: true
-  #enabled: true
-
   # Timeout after which time a metricset should return an error
   # Timeout is by default defined as period, as a fetch of a metricset
   # should never take longer then period, as otherwise calls can pile up.

@@ -188,7 +188,7 @@ func (c *Checkpoint) flush() error {
 	if os.IsNotExist(err) {
 		// Try to create directory if it does not exist.
 		if createDirErr := c.createDir(); createDirErr == nil {
-			file, err = os.Create(tempFile)
+			file, err = create(tempFile)
 		}
 	}
 

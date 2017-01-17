@@ -1,0 +1,79 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "couchbase": {
+        "cluster": {
+            "hdd": {
+                "free": {
+                    "bytes": 50705599693
+                },
+                "quota": {
+                    "total": {
+                        "bytes": 63381999616
+                    }
+                },
+                "total": {
+                    "bytes": 63381999616
+                },
+                "used": {
+                    "by_data": {
+                        "bytes": 16368995
+                    },
+                    "value": {
+                        "bytes": 12676399923
+                    }
+                }
+            },
+            "max_bucket_count": 10,
+            "quota": {
+                "index_memory": {
+                    "mb": 300
+                },
+                "memory": {
+                    "mb": 300
+                }
+            },
+            "ram": {
+                "quota": {
+                    "total": {
+                        "per_node": {
+                            "bytes": 314572800
+                        },
+                        "value": {
+                            "bytes": 314572800
+                        }
+                    },
+                    "used": {
+                        "per_node": {
+                            "bytes": 104857600
+                        },
+                        "value": {
+                            "bytes": 104857600
+                        }
+                    }
+                },
+                "total": {
+                    "bytes": 8360542208
+                },
+                "used": {
+                    "by_data": {
+                        "bytes": 53962160
+                    },
+                    "value": {
+                        "bytes": 7660535808
+                    }
+                }
+            }
+        }
+    },
+    "metricset": {
+        "host": "couchbase:8091",
+        "module": "couchbase",
+        "name": "cluster",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

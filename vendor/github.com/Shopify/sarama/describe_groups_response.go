@@ -172,3 +172,15 @@ func (gmd *GroupMemberDescription) decode(pd packetDecoder) (err error) {
 
 	return nil
 }
+
+func (gmd *GroupMemberDescription) GetMemberAssignment() (*ConsumerGroupMemberAssignment, error) {
+	assignment := new(ConsumerGroupMemberAssignment)
+	err := decode(gmd.MemberAssignment, assignment)
+	return assignment, err
+}
+
+func (gmd *GroupMemberDescription) GetMemberMetadata() (*ConsumerGroupMemberMetadata, error) {
+	metadata := new(ConsumerGroupMemberMetadata)
+	err := decode(gmd.MemberMetadata, metadata)
+	return metadata, err
+}

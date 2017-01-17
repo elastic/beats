@@ -1,0 +1,23 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "127.0.0.1:9090",
+        "module": "prometheus",
+        "name": "collector",
+        "namespace": "collector",
+        "rtt": 115
+    },
+    "prometheus": {
+        "collector": {
+            "label": {
+                "type": "quarantine_completed"
+            },
+            "prometheus_local_storage_series_ops_total": 0
+        }
+    },
+    "type": "metricsets"
+}

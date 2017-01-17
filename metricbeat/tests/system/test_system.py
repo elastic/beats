@@ -5,10 +5,10 @@ import metricbeat
 import getpass
 import os
 
-SYSTEM_CPU_FIELDS = ["idle.pct", "iowait.pct", "irq.pct", "nice.pct",
+SYSTEM_CPU_FIELDS = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                      "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
-SYSTEM_CPU_FIELDS_ALL = ["idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
+SYSTEM_CPU_FIELDS_ALL = ["cores", "idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
                      "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks"]
 
 SYSTEM_LOAD_FIELDS = ["1", "5", "15", "norm.1", "norm.5", "norm.15"]
@@ -327,7 +327,10 @@ class SystemTest(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "system",
             "metricsets": ["process"],
-            "period": "5s"
+            "period": "5s",
+            "extras": {
+                "process.env.whitelist": ["PATH"]
+            }
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
@@ -341,22 +344,36 @@ class SystemTest(metricbeat.BaseTest):
         self.assertGreater(len(output), 0)
 
         found_cmdline = False
+        found_env = False
         found_fd = False
         for evt in output:
-            self.assert_fields_are_documented(evt)
             process = evt["system"]["process"]
+
+            # Remove 'env' prior to checking documented fields because its keys are dynamic.
+            env = process.pop("env", None)
+            if env is not None:
+                found_env = True
+
+            self.assert_fields_are_documented(evt)
+
+            # Remove optional keys.
             cmdline = process.pop("cmdline", None)
             if cmdline is not None:
                 found_cmdline = True
             fd = process.pop("fd", None)
             if fd is not None:
                 found_fd = True
+
             self.assertItemsEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
         self.assertTrue(found_cmdline, "cmdline not found in any process events")
 
         if sys.platform.startswith("linux") or sys.platform.startswith("freebsd"):
             self.assertTrue(found_fd, "fd not found in any process events")
+
+        if sys.platform.startswith("linux") or sys.platform.startswith("freebsd")\
+            or sys.platform.startswith("darwin"):
+            self.assertTrue(found_env, "env not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_metricbeat(self):

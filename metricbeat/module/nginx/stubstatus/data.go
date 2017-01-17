@@ -62,10 +62,10 @@ func eventMapping(m *MetricSet, body io.ReadCloser, hostname string, metricset s
 
 	// Derived request status.
 	dropped = accepts - handled
-	current = requests - m.requests
+	current = requests - m.previousNumRequests
 
 	// Kept for next run.
-	m.requests = requests
+	m.previousNumRequests = requests
 
 	// Parse connection status.
 	scanner.Scan()

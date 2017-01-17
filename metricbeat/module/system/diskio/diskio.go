@@ -5,13 +5,14 @@ package diskio
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/disk"
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "diskio", New); err != nil {
+	if err := mb.Registry.AddMetricSet("system", "diskio", New, parse.EmptyHostParser); err != nil {
 		panic(err)
 	}
 }

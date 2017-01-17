@@ -1,9 +1,6 @@
 {
   "mappings": {
     "_default_": {
-      "_all": {
-        "norms": false
-      },
       "_meta": {
         "version": "6.0.0-alpha1"
       },
@@ -171,6 +168,7 @@
   },
   "order": 0,
   "settings": {
+    "index.mapping.total_fields.limit": 10000,
     "index.refresh_interval": "5s"
   },
   "template": "winlogbeat-*"

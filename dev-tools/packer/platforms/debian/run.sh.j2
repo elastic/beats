@@ -20,8 +20,8 @@ fi
 # create deb
 fpm --force -s dir -t deb \
         -n {{.beat_name}} -v ${VERSION} \
-        --vendor "Elastic" \
-        --license "ASL 2.0" \
+        --vendor "{{.beat_vendor}}"  \
+        --license "{{.beat_license}}"  \
         --architecture {{.deb_arch}} \
         --description "{{.beat_description}}" \
         --url {{.beat_url}} \

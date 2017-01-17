@@ -35,18 +35,21 @@ func TestCheckTemplate(t *testing.T) {
 
 func TestLoadTemplate(t *testing.T) {
 
+	// Setup ES
+	client := GetTestingElasticsearch()
+	err := client.Connect(5 * time.Second)
+	assert.Nil(t, err)
+
 	// Load template
 	absPath, err := filepath.Abs("../../tests/files/")
 	assert.NotNil(t, absPath)
 	assert.Nil(t, err)
 
 	templatePath := absPath + "/template.json"
+	if strings.HasPrefix(client.Connection.version, "2.") {
+		templatePath = absPath + "/template-es2x.json"
+	}
 	content, err := readTemplate(templatePath)
-	assert.Nil(t, err)
-
-	// Setup ES
-	client := GetTestingElasticsearch()
-	err = client.Connect(5 * time.Second)
 	assert.Nil(t, err)
 
 	templateName := "testbeat"

@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
 
 	"github.com/elastic/gosigar/cgroup"
@@ -18,7 +19,7 @@ import (
 var debugf = logp.MakeDebug("system-process")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "process", New); err != nil {
+	if err := mb.Registry.AddMetricSet("system", "process", New, parse.EmptyHostParser); err != nil {
 		panic(err)
 	}
 }
@@ -33,13 +34,13 @@ type MetricSet struct {
 // New creates and returns a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
-		Procs   []string `config:"processes"` // collect all processes by default
-		Cgroups bool     `config:"cgroups"`
+		Procs        []string `config:"processes"` // collect all processes by default
+		Cgroups      bool     `config:"cgroups"`
+		EnvWhitelist []string `config:"process.env.whitelist"`
 	}{
 		Procs:   []string{".*"},
 		Cgroups: false,
 	}
-
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -47,8 +48,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	m := &MetricSet{
 		BaseMetricSet: base,
 		stats: &ProcStats{
-			ProcStats: true,
-			Procs:     config.Procs,
+			Procs:        config.Procs,
+			EnvWhitelist: config.EnvWhitelist,
 		},
 	}
 	err := m.stats.InitProcStats()

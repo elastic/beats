@@ -48,7 +48,7 @@ func newIncludeFields(c common.Config) (processors.Processor, error) {
 
 func (f includeFields) Run(event common.MapStr) (common.MapStr, error) {
 	filtered := common.MapStr{}
-	errs := []string{}
+	var errs []string
 
 	for _, field := range f.Fields {
 		err := event.CopyFieldsTo(filtered, field)
@@ -58,7 +58,10 @@ func (f includeFields) Run(event common.MapStr) (common.MapStr, error) {
 		}
 	}
 
-	return filtered, fmt.Errorf(strings.Join(errs, ", "))
+	if len(errs) > 0 {
+		return filtered, fmt.Errorf(strings.Join(errs, ", "))
+	}
+	return filtered, nil
 }
 
 func (f includeFields) String() string {

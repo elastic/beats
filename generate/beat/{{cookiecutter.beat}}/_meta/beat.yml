@@ -1,7 +1,0 @@
-################### {{cookiecutter.beat|capitalize}} Configuration Example #########################
-
-############################# {{cookiecutter.beat|capitalize}} ######################################
-
-{{cookiecutter.beat}}:
-  # Defines how often an event is sent to the output
-  period: 1s
