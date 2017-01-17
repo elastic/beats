@@ -12,6 +12,7 @@
  - Mysql
  - PostgreSQL
  - Redis
+ - Kafka
  - Thrift-RPC
  - MongoDB
  - Memcache
