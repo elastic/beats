@@ -43,3 +43,6 @@ find $DIR_LIST -type f -name "*.cfg" -exec rm -r {} \;
 
 ## Removing all *.bat files
 find $DIR_LIST -type f -name "*.bat" -exec rm -r {} \;
+
+## Removing all *.tar files
+find $DIR_LIST -type f -name "*.tar" -exec rm -r {} \;
