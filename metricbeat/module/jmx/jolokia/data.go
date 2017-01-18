@@ -62,7 +62,7 @@ func getValue(key string, data map[string]string) (string, error) {
 
 func parseSingleResponse(mbeanName string, attributeName string, attibuteValue interface{}, event map[string]interface{}, mapping map[string]string) map[string]interface{} {
 	//create metric name by merging mbean and attribute fields
-	var metricName = mbeanName + ":::" + attributeName
+	var metricName = mbeanName + "_" + attributeName
 	//find alias for the metric
 	var alias, err = getValue(metricName, mapping)
 	if err != nil {

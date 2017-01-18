@@ -8,18 +8,63 @@ metricbeat.modules:
   metricsets: ["jolokia"]
   enabled: true
   period: 10s
+  namespace: "jolokia_metrics"
   mappings:
       #common jvm metrics like uptime, heap, gc, etc.
     -
       host: localhost:4008
-      mapping: '{"java.lang:type=Runtime:::Uptime":"uptime","java.lang:type=GarbageCollector,name=ConcurrentMarkSweep:::CollectionTime":"gc.cms_collection_time","java.lang:type=GarbageCollector,name=ConcurrentMarkSweep:::CollectionCount":"gc.cms_collection_count","java.lang:type=GarbageCollector,name=ParNew:::CollectionTime":"gc.parnew_collection_time","java.lang:type=GarbageCollector,name=ParNew:::CollectionCount":"gc.parnew_collection_count","java.lang:type=Memory:::HeapMemoryUsage":"memory.heap_usage","java.lang:type=Memory:::NonHeapMemoryUsage":"memory.non_heap_usage"}'
+      mapping:
+        - mbean: 'java.lang:type=Runtime'
+          attr: Uptime
+          field: uptime
+          field_type: integer
+        - mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
+          attr: CollectionTime
+          field: gc.cms_collection_time
+          field_type: integer
+        - mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
+          attr: CollectionCount
+          field: gc.cms_collection_count
+          field_type: integer
+        - mbean: 'java.lang:type=Memory'
+          attr: HeapMemoryUsage
+          field: memory.heap_usage
+          field_type: integer
+        - mbean: 'java.lang:type=Memory'
+          attr: NonHeapMemoryUsage
+          field: memory.non_heap_usage
+          field_type: integer
       application: application1
       instance: instance1
 
       #some application specific metrics, e.g. for latency and compaction stats for cassandra
     -
       host: localhost:4002
-      mapping: '{"org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency:::OneMinuteRate":"client_request.read_latency_one_min_rate","org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency:::Count":"client_request.read_latency","org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency:::OneMinuteRate":"client_request.write_latency_one_min_rate","org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency:::Count":"client_request.write_latency","org.apache.cassandra.metrics:type=Compaction,name=CompletedTasks:::Value":"compaction.completed_tasks","org.apache.cassandra.metrics:type=Compaction,name=PendingTasks:::Value":"compaction.pending_tasks"}'
+      mapping:
+        - mbean: 'org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency'
+          attr: OneMinuteRate
+          field: client_request.read_latency_one_min_rate
+          field_type: integer
+        - mbean: 'org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency'
+          attr: Count
+          field: client_request.read_latency
+          field_type: integer
+        - mbean: 'org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency'
+          attr: OneMinuteRate
+          field: client_request.write_latency_one_min_rate
+          field_type: integer
+        - mbean: 'org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency'
+          attr: Count
+          field: client_request.write_latency
+          field_type: integer
+        - mbean: 'org.apache.cassandra.metrics:type=Compaction,name=CompletedTasks'
+          attr: Value
+          field: compaction.completed_tasks
+          field_type: integer
+        - mbean: 'org.apache.cassandra.metrics:type=Compaction,name=PendingTasks'
+          attr: Value
+          field: compaction.pending_tasks
+          field_type: integer
       application: cassandra
 #================================ Outputs =====================================
 

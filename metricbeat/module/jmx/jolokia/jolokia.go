@@ -26,28 +26,36 @@ func init() {
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	client          *http.Client      // HTTP client that is reused across requests
-	metricSetConfig []MetricSetConfig // array containing urls, bodies and mappings
+	client                *http.Client      // HTTP client that is reused across requests
+	metricSetConfig       []MetricSetConfig // array containing urls, bodies and mappings
+	namespace             string
+	updateElasticTemplate bool              // not implemented yet
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Additional configuration options
 	config := struct {
-		JolokiaConfigInput []MetricSetConfigInput `config:"mappings"`
+		ModuleConfigInput     []MetricSetConfigInput `config:"mappings"`
+		Namespace             string `config:"namespace" validate:"required"`
+		UpdateElasticTemplate bool `config:"updateElasticTemplate"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	if jolokiaConfig, parseErr := parseConfig(config.JolokiaConfigInput); parseErr != nil {
+	if moduleConfig, parseErr := parseConfig(config.ModuleConfigInput); parseErr != nil {
 		return nil, parseErr
 	} else {
+		if config.UpdateElasticTemplate {
+			// TODO: build and send an updated template to Elastic
+		}
 		return &MetricSet{
 			BaseMetricSet:   base,
-			metricSetConfig: jolokiaConfig,
+			metricSetConfig: moduleConfig,
 			client:          &http.Client{Timeout: base.Module().Config().Timeout},
+			namespace:     config.Namespace,
 		}, nil
 	}
 
@@ -83,6 +91,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			continue
 		}
 
+		event["_namespace"] = m.namespace
 		events = append(events, event)
 	}
 	if events != nil {
