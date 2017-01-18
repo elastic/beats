@@ -3,7 +3,67 @@
   description: >
     health
   fields:
-    - name: example
+    - name: cluster.overall_status
       type: keyword
       description: >
-        Example field
+        Overall status of the cluster
+    - name: cluster.timechecks.epoch
+      type: long
+      description: >
+        Map version
+    - name: cluster.timechecks.round
+      type: long
+      description: >
+        timecheck round
+    - name: cluster.timechecks.round_status
+      type: keyword
+      description: >
+        Status of the round
+    - name: mon.avail_percent
+      type: long
+      description: >
+        Available percent of the MON
+    - name: mon.health
+      type: keyword
+      description: >
+        Health of the MON
+    - name: mon.kb_avail
+      type: long
+      description: >
+        Available KB of the MON
+    - name: mon.kb_total
+      type: long
+      description: >
+        Total KB of the MON
+    - name: mon.kb_used
+      type: long
+      description: >
+        Used KB of the MON
+    - name: mon.last_updated
+      type: date
+      description: >
+        Time when was updated
+    - name: mon.name
+      type: keyword
+      description: >
+        Name of the MON
+    - name: mon.store_stats.bytes_log
+      type: long
+      description: >
+        Log bytes of MON
+    - name: mon.store_stats.bytes_misc
+      type: long
+      description: >
+        Misc bytes of MON
+    - name: mon.store_stats.bytes_sst
+      type: long
+      description: >
+        SST bytes of MON
+    - name: mon.store_stats.bytes_total
+      type: long
+      description: >
+        Total bytes of MON
+    - name: mon.store_stats.last_updated
+      type: long
+      description: >
+        Last updated

@@ -15,7 +15,7 @@
         }
     },
     "metricset": {
-        "host": "172.17.0.1:5000",
+        "host": "ceph:5000",
         "module": "ceph",
         "name": "health",
         "rtt": 115

@@ -3,7 +3,6 @@ package health
 import (
 	"fmt"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
@@ -16,19 +15,6 @@ func TestData(t *testing.T) {
 	}
 }
 
-func TestFetch(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	events, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
-
-	assert.True(t, len(events) > 0)
-
-	event := events[0]
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-
-}
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
