@@ -4,6 +4,8 @@ package elasticsearch
 
 import (
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
@@ -270,4 +272,39 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 			b.Fail()
 		}
 	}
+}
+
+func TestClientWithHeaders(t *testing.T) {
+	requestCount := 0
+	// start a mock HTTP server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "testing value", r.Header.Get("X-Test"))
+		requestCount += 1
+		fmt.Fprintln(w, "Hello, client")
+	}))
+	defer ts.Close()
+
+	client, err := NewClient(ClientSettings{
+		URL:   ts.URL,
+		Index: outil.MakeSelector(outil.ConstSelectorExpr("test")),
+		Headers: map[string]string{
+			"X-Test": "testing value",
+		},
+	}, nil)
+	assert.NoError(t, err)
+
+	// simple ping
+	client.Ping(1 * time.Second)
+	assert.Equal(t, 1, requestCount)
+
+	// bulk request
+	event := outputs.Data{Event: common.MapStr{
+		"@timestamp": common.Time(time.Now()),
+		"type":       "libbeat",
+		"message":    "Test message from libbeat",
+	}}
+	events := []outputs.Data{event, event, event}
+	_, err = client.PublishEvents(events)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, requestCount)
 }

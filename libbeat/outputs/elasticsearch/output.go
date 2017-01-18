@@ -144,6 +144,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 			Username:         config.Username,
 			Password:         config.Password,
 			Parameters:       params,
+			Headers:          config.Headers,
 			Timeout:          config.Timeout,
 			CompressionLevel: config.CompressionLevel,
 		}, nil)
@@ -368,6 +369,7 @@ func makeClientFactory(
 			Username:         config.Username,
 			Password:         config.Password,
 			Parameters:       params,
+			Headers:          config.Headers,
 			Timeout:          config.Timeout,
 			CompressionLevel: config.CompressionLevel,
 		}, onConnected)

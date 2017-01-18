@@ -10,6 +10,7 @@ type elasticsearchConfig struct {
 	Protocol         string             `config:"protocol"`
 	Path             string             `config:"path"`
 	Params           map[string]string  `config:"parameters"`
+	Headers          map[string]string  `config:"headers"`
 	Username         string             `config:"username"`
 	Password         string             `config:"password"`
 	ProxyURL         string             `config:"proxy_url"`
