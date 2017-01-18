@@ -80,8 +80,6 @@ https://github.com/elastic/beats/compare/v5.1.2...v5.2.0[View commits]
 
 *Filebeat*
 
-- Fix registry cleanup issue when files falling under ignore_older after restart. {issue}2818[2818]
-- Fix registry migration issue from old states were files were only harvested after second restart. {pull}3322[3322]
 - Fix alignment issue were Filebeat compiled with Go 1.7.4 was crashing on 32 bits system. {issue}3273[3273]
 
 *Metricbeat*
@@ -93,10 +91,6 @@ https://github.com/elastic/beats/compare/v5.1.2...v5.2.0[View commits]
 *Packetbeat*
 
 - Fix issue where some Cassandra visualizations were showing data from all protocols. {issue}3314[3314]
-
-*Winlogbeat*
-
-- Fix for "The array bounds are invalid" error when reading large events. {issue}3076[3076]
 
 ==== Added
 
@@ -129,7 +123,7 @@ https://github.com/elastic/beats/compare/v5.1.2...v5.2.0[View commits]
 
 *Winlogbeat*
 
-- Reduced amount of memory allocated while reading event log records. {pull}3113[3113] {pull}3118[3113]
+- Reduced amount of memory allocated while reading event log records. {pull}3113[3113] {pull}3118[3118]
 
 [[release-notes-5.1.2]]
 === Beats version 5.1.2
@@ -139,7 +133,7 @@ https://github.com/elastic/beats/compare/v5.1.1...v5.1.2[View commits]
 
 *Filebeat*
 
-- Fix registry migration issue from old states were files were only harvested after second restart. {pull}3322[3322]
+- Fix registry migration issue from old states where files were only harvested after second restart. {pull}3322[3322]
 
 *Packetbeat*
 
