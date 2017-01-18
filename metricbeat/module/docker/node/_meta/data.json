@@ -1,0 +1,54 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "docker": {
+        "node": {
+            "createdat": "2017-01-10T05:37:07.548757912Z",
+            "updatedat": "2017-01-10T05:37:08.159552729Z",
+            "id": "4be260de8fc1213c9ff58789b8221e70c53f5af5d5a3915ff7de4b81b357d851",
+            "hostname": "thisisatest",
+            "labels": {
+                "swarm_labels_toto": "valueoftotolabel",
+                "swarm_number": "1"
+            },
+            "spec": {
+                "role": "manager",
+                "avaiability": "active"
+            },
+            "platform": {
+                "architecture": "x86_64",
+                "os": "Linux"
+            },
+            "ressources": {
+                "nanocpus": 4000000000,
+                "memorybytes": 8115884032
+            },
+            "status": {
+                "state": "ready",
+                "addr": "127.0.0.1"
+            },
+            "manager": {
+                "leader": true,
+                "reachability": "reachable",
+                "addr": "192.168.1.38:2377"
+            },
+            "engine": {
+                "version": "1.13.0-rc5",
+                "labels":
+                {
+                  "enginelabel1=enginelabel1value"
+                }
+            }
+        }
+    },
+    "metricset": {
+        "host": "/var/run/docker.sock",
+        "module": "docker",
+        "name": "node",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

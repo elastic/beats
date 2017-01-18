@@ -1,0 +1,4 @@
+=== Docker Service Metricset
+
+The Docker Swarm `service` metricset collects information and statistics about
+running services in Docker cluster.

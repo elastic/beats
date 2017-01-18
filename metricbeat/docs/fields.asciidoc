@@ -1072,6 +1072,45 @@ Size of the files that have been created or changed since creation.
 
 
 [float]
+== health Fields
+
+Container health metrics.
+
+
+
+[float]
+=== docker.container.health.event_end_date
+
+type: date
+
+Healthcheck end date
+
+
+[float]
+=== docker.container.health.event_start_date
+
+type: date
+
+Healthcheck start date
+
+
+[float]
+=== docker.container.health.event_output
+
+type: keyword
+
+Healthcheck output
+
+
+[float]
+=== docker.container.health.event_exit_code
+
+type: integer
+
+Healthcheck status code
+
+
+[float]
 == cpu Fields
 
 Runtime CPU metrics.
@@ -1414,6 +1453,301 @@ Total errors on outgoing packets.
 type: long
 
 Total number of outgoing packets.
+
+
+[float]
+== node Fields
+
+Docker node metrics.
+
+
+
+[float]
+=== docker.node.createdat
+
+type: date
+
+date where the node has been added to the cluster
+
+
+[float]
+=== docker.node.updatedad
+
+type: date
+
+last gossip message
+
+
+[float]
+=== docker.node.id
+
+type: keyword
+
+Unique node id.
+
+
+[float]
+=== docker.node.hostname
+
+type: keyword
+
+hostname of the node
+
+
+[float]
+== spec Fields
+
+Configured status
+
+
+
+[float]
+=== docker.node.spec.role
+
+type: keyword
+
+Wanted role
+
+
+[float]
+=== docker.node.spec.avaiability
+
+type: keyword
+
+wanted status.
+
+
+[float]
+== platform Fields
+
+Node information hardware and system
+
+
+
+[float]
+=== docker.node.platform.architecture
+
+type: keyword
+
+Cpu architecture of the node.
+
+
+[float]
+=== docker.node.platform.os
+
+type: keyword
+
+OS node.
+
+
+[float]
+== ressources Fields
+
+available ressources on the node
+
+
+
+[float]
+=== docker.node.ressources.nanocpus
+
+type: long
+
+available CPU ressources
+
+
+[float]
+=== docker.node.ressources.memorybytes
+
+type: long
+
+available Memory ressources
+
+
+[float]
+== engine Fields
+
+docker engine information
+
+
+
+[float]
+=== docker.node.engine.engine_version
+
+type: keyword
+
+Docker engine version number
+
+
+[float]
+=== docker.node.engine.plugin
+
+type: keyword
+
+Docker plugin installed on the node
+
+
+[float]
+== status Fields
+
+docker swarm node status
+
+
+
+[float]
+=== docker.node.status.state
+
+type: keyword
+
+Docker engine state
+
+
+[float]
+=== docker.node.status.addr
+
+type: keyword
+
+docker
+
+
+[float]
+== managerstatus Fields
+
+docker swarm manager status
+
+
+
+[float]
+=== docker.node.managerstatus.leader
+
+type: boolean
+
+Docker engine manager state
+
+
+[float]
+=== docker.node.managerstatus.reachability
+
+type: keyword
+
+docker
+
+
+[float]
+=== docker.node.managerstatus.addr
+
+type: keyword
+
+docker manager listenning addr
+
+
+[float]
+== service Fields
+
+Docker service metrics.
+
+
+
+[float]
+=== docker.service.id
+
+type: keyword
+
+service id
+
+
+[float]
+=== docker.service.createdat
+
+type: date
+
+date where the service has been created
+
+
+[float]
+=== docker.service.name
+
+type: keyword
+
+service name
+
+
+[float]
+=== docker.service.updatedad
+
+type: date
+
+last service specification change date
+
+
+[float]
+=== docker.service.mode
+
+type: keyword
+
+Service mode (replicated or global)
+
+
+[float]
+=== docker.service.replicas
+
+type: integer
+
+number of replicas if service mode is replicated
+
+
+[float]
+=== docker.service.healtcheck_enabled
+
+type: boolean
+
+check if healthcheck is activated in container specifications
+
+
+[float]
+=== docker.service.version
+
+type: integer
+
+service update versionning
+
+
+[float]
+== updatestatus Fields
+
+check update status
+
+
+
+[float]
+=== docker.service.updatestatus.state
+
+type: keyword
+
+update state
+
+
+[float]
+=== docker.service.updatestatus.startedat
+
+type: date
+
+update started date
+
+
+[float]
+=== docker.service.updatestatus.completedat
+
+type: date
+
+update completed date
+
+
+[float]
+=== docker.service.updatestatus.message
+
+type: text
+
+update message
 
 
 [[exported-fields-haproxy]]

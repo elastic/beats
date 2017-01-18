@@ -1,0 +1,4 @@
+=== Docker Node Metricset
+
+The Docker Swarm `node` metricset collects information and statistics about
+running nodes in Docker cluster.

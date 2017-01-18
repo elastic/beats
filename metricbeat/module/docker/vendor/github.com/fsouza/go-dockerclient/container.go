@@ -99,6 +99,21 @@ func (p Port) Proto() string {
 	return parts[1]
 }
 
+// HealthCheck represents one check of health.
+type HealthCheck struct {
+	Start    time.Time `json:"Start,omitempty" yaml:"Start,omitempty"`
+	End      time.Time `json:"End,omitempty" yaml:"End,omitempty"`
+	ExitCode int       `json:"ExitCode,omitempty" yaml:"ExitCode,omitempty"`
+	Output   string    `json:"Output,omitempty" yaml:"Output,omitempty"`
+}
+
+// Health represents the health of a container.
+type Health struct {
+	Status        string        `json:"Status,omitempty" yaml:"Status,omitempty"`
+	FailingStreak int           `json:"FailingStreak,omitempty" yaml:"FailingStreak,omitempty"`
+	Log           []HealthCheck `json:"Log,omitempty" yaml:"Log,omitempty"`
+}
+
 // State represents the state of a container.
 type State struct {
 	Status            string    `json:"Status,omitempty" yaml:"Status,omitempty"`
@@ -113,6 +128,7 @@ type State struct {
 	Error             string    `json:"Error,omitempty" yaml:"Error,omitempty"`
 	StartedAt         time.Time `json:"StartedAt,omitempty" yaml:"StartedAt,omitempty"`
 	FinishedAt        time.Time `json:"FinishedAt,omitempty" yaml:"FinishedAt,omitempty"`
+	Health            Health    `json:"Health,omitempty" yaml:"Health,omitempty"`
 }
 
 // String returns a human-readable description of the state
