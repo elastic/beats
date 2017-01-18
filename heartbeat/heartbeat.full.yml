@@ -1,5 +1,12 @@
 ################### Heartbeat Configuration Example #########################
 
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains
+# only some common options, please see heartbeat.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/heartbeat/index.html
+
 ############################# Heartbeat ######################################
 
 # Configure monitors
@@ -67,7 +74,7 @@ heartbeat.monitors:
   #     Using `tls`/`ssl`, an SSL connection is established. If no ssl is configured,
   #     system defaults will be used (not supported on windows).
   #     If `port` is missing in url, the ports setting is required.
-  hosts: ["localhost:12345"]
+  hosts: ["localhost:9200"]
 
   # Configure IP protocol types to ping on if hostnames are configured.
   # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
@@ -115,7 +122,7 @@ heartbeat.monitors:
 - type: http # monitor type `http`. Connect via HTTP an optionally verify response
 
   # Monitor name used for job name and document type
-  #name: tcp
+  #name: http
 
   # Enable/Disable monitor
   #enabled: true
@@ -124,7 +131,7 @@ heartbeat.monitors:
   schedule: '@every 5s' # every 5 seconds from start of beat
 
   # Configure URLs to ping
-  urls: ["http://localhost:80"]
+  urls: ["http://localhost:9200"]
 
   # Configure IP protocol types to ping on if hostnames are configured.
   # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
