@@ -68,9 +68,11 @@ func buildRequestBodyAndMapping(mapping []MetricSetup) (string, map[string]strin
 func marshalJSONRequest(this SliceSet) string {
 	result := "["
 	for mbean, attributes := range this {
-		singleRequest := "{\"type\":\"read\",\"mbean\":\"" + mbean + "\",\"attribute\":["
+		safeMBeanString := strings.Replace(mbean, "\"", "\\\"", -1)
+		singleRequest := "{\"type\":\"read\",\"mbean\":\"" + safeMBeanString + "\",\"attribute\":["
 		for _, attribute := range attributes {
-			singleRequest = singleRequest + "\"" + attribute + "\","
+			safeAttributeString := strings.Replace(attribute, "\"", "\\\"", -1)
+			singleRequest = singleRequest + "\"" + safeAttributeString + "\","
 		}
 		result = result + strings.TrimRight(singleRequest, ",") + "]},"
 	}
