@@ -9,7 +9,7 @@ import (
 
 type execLookupConfig struct {
 	Key    []string           `config:"key"`
-	Cache  lutool.CacheConfig `config:"inline"`
+	Cache  lutool.CacheConfig `config:",inline"`
 	Runner execRunnerConfig   `config:",inline"`
 }
 
