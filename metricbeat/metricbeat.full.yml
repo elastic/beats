@@ -200,6 +200,14 @@ metricbeat.modules:
   # Path to server status. Default server-status
   #server_status_path: "server-status"
 
+#------------------------------- php_fpm Module ------------------------------
+- module: php_fpm
+  metricsets: ["pool"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost"]
+
+
 #----------------------------- PostgreSQL Module -----------------------------
 #- module: postgresql
   #metricsets:

@@ -1,0 +1,78 @@
+- name: pool
+  type: group
+  description: >
+    `pool` contains the metrics that were obtained from the PHP-FPM process
+    pool.
+  fields:
+    - name: pool
+      type: keyword
+      description: >
+        The name of the pool.
+
+    - name: process_manager
+      type: keyword
+      description: >
+        `static`, `dynamic` or `ondemand`.
+
+    - name: start_time
+      type: long
+      description: >
+        The date and time FPM has started.
+
+    - name: start_since
+      type: long
+      description: >
+        Number of seconds since FPM has started.
+
+    - name: accepted_conn
+      type: long
+      description: >
+        The number of request accepted by the pool.
+
+    - name: listen_queue
+      type: long
+      description: >
+        The number of request in the queue of pending connections.
+
+    - name: max_listen_queue
+      type: long
+      description: >
+        The maximum number of requests in the queue of pending connections
+        since FPM has started.
+
+    - name: listen_queue_len
+      type: long
+      description: >
+        The size of the socket queue of pending connections.
+
+    - name: idle_processes
+      type: long
+      description: >
+        The number of idle processes.
+
+    - name: active_processes
+      type: long
+      description: >
+        The number of active processes.
+
+    - name: total_processes
+      type: long
+      description: >
+        The number of idle + active processes.
+
+    - name: max_active_processes
+      type: long
+      description: >
+        The maximum number of active processes since FPM has started.
+
+    - name: max_children_reached
+      type: long
+      description: >
+        Number of times, the process limit has been reached, when pm tries to
+        start more children (works only for pm `dynamic` and `ondemand`)
+
+    - name: slow_requests
+      type: long
+      description: >
+        Number of times a request execution time has exceeded
+        `request_slowlog_timeout`.

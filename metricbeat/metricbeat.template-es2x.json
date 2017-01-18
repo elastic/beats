@@ -2168,6 +2168,115 @@
             }
           }
         },
+        "php_fpm": {
+          "properties": {
+            "pool": {
+              "properties": {
+                "accepted_conn": {
+                  "type": "long"
+                },
+                "active_processes": {
+                  "type": "long"
+                },
+                "idle_processes": {
+                  "type": "long"
+                },
+                "listen_queue": {
+                  "type": "long"
+                },
+                "listen_queue_len": {
+                  "type": "long"
+                },
+                "max_active_processes": {
+                  "type": "long"
+                },
+                "max_children_reached": {
+                  "type": "long"
+                },
+                "max_listen_queue": {
+                  "type": "long"
+                },
+                "pool": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "process_manager": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "slow_requests": {
+                  "type": "long"
+                },
+                "start_since": {
+                  "type": "long"
+                },
+                "start_time": {
+                  "type": "long"
+                },
+                "total_processes": {
+                  "type": "long"
+                }
+              }
+            },
+            "proc": {
+              "properties": {
+                "content_length": {
+                  "type": "long"
+                },
+                "last_request_cpu": {
+                  "type": "float"
+                },
+                "last_request_memory": {
+                  "type": "long"
+                },
+                "pid": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "request_duration": {
+                  "type": "long"
+                },
+                "request_method": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "request_uri": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "requests": {
+                  "type": "long"
+                },
+                "script": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "start_since": {
+                  "type": "long"
+                },
+                "start_time": {
+                  "type": "long"
+                },
+                "state": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "user": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
         "postgresql": {
           "properties": {
             "activity": {

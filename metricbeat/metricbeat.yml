@@ -46,6 +46,14 @@ metricbeat.modules:
   period: 10s
   processes: ['.*']
 
+#------------------------------- php_fpm Module ------------------------------
+- module: php_fpm
+  metricsets: ["pool"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost"]
+
+
 
 
 #================================ General =====================================
