@@ -14,21 +14,73 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 
 *Affecting all Beats*
 
+*Filebeat*
+
+*Heartbeat*
+
 *Metricbeat*
 
 *Packetbeat*
 
-*Topbeat*
-
-*Filebeat*
-
 *Winlogbeat*
-
 
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix overwriting explicit empty config sections {issue}2918[2918]
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+==== Added
+
+*Affecting all Beats*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Filebeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+==== Deprecated
+
+*Affecting all Beats*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+////////////////////////////////////////////////////////////
+
+[[release-notes-5.2.0]]
+=== Beats version 5.2.0
+https://github.com/elastic/beats/compare/v5.1.2...v5.2.0[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix overwriting explicit empty config sections. {issue}2918[2918]
+
+*Filebeat*
+
+- Fix alignment issue were Filebeat compiled with Go 1.7.4 was crashing on 32 bits system. {issue}3273[3273]
 
 *Metricbeat*
 
@@ -40,19 +92,10 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 
 - Fix issue where some Cassandra visualizations were showing data from all protocols. {issue}3314[3314]
 
-*Topbeat*
-
-*Filebeat*
-- Fix registry cleanup issue when files falling under ignore_older after restart. {issue}2818[2818]
-- Fix registry migration issue from old states were files were only harvested after second restart. {pull}3322[3322]
-- Fix alignment issue were Filebeat compiled with Go 1.7.4 was crashing on 32 bits system. {issue}3273[3273]
-
-*Winlogbeat*
-- Fix for "The array bounds are invalid" error when reading large events. {issue}3076[3076]
-
 ==== Added
 
 *Affecting all Beats*
+
 - Add support for passing list and dictionary settings via -E flag.
 - Support for parsing list and dictionary setting from environment variables.
 - Added new flags to import_dashboards (-cacert, -cert, -key, -insecure). {pull}3139[3139] {pull}3163[3163]
@@ -60,42 +103,47 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Updated to Go 1.7.4. {pull}3277[3277]
 - Added a NOTICE file containing the notices and licenses of the dependencies. {pull}3334[3334].
 
+*Heartbeat*
+
+- First release, containing monitors for ICMP, TCP, and HTTP.
+
+*Filebeat*
+
+- Add enabled config option to prospectors. {pull}3157[3157]
+- Add target option for decoded_json_field. {pull}3169[3169]
+
 *Metricbeat*
+
 - Kafka module broker matching enhancements. {pull}3129[3129]
 - Add a couchbase module with metricsets for node, cluster and bucket. {pull}3081[3081]
-- Export number of cores for cpu module. {pull}3192[3192]
+- Export number of cores for CPU module. {pull}3192[3192]
 - Experimental Prometheus module. {pull}3202[3202]
 - Add system socket module that reports all TCP sockets. {pull}3246[3246]
 - Kafka consumer groups metricset. {pull}3240[3240]
 
-*Packetbeat*
-
-*Topbeat*
-
-*Filebeat*
-- Add enabled config option to prospectors. {pull}3157[3157]
-- Add target option for decoded_json_field. {pull}3169[3169]
-
 *Winlogbeat*
 
-- Reduced amount of memory allocated while reading event log records. {pull}3113[3113] {pull}3118[3113]
+- Reduced amount of memory allocated while reading event log records. {pull}3113[3113] {pull}3118[3118]
 
-==== Deprecated
+[[release-notes-5.1.2]]
+=== Beats version 5.1.2
+https://github.com/elastic/beats/compare/v5.1.1...v5.1.2[View commits]
 
-*Affecting all Beats*
-
-*Metricbeat*
-
-*Packetbeat*
-
-*Topbeat*
-- Fix error on importing dashboards due to colons in the Caassandra dashboard. {issue}3140[3140]
+==== Bugfixes
 
 *Filebeat*
 
+- Fix registry migration issue from old states where files were only harvested after second restart. {pull}3322[3322]
+
+*Packetbeat*
+
+- Fix error on importing dashboards due to colons in the Cassandra dashboard. {issue}3140[3140]
+- Fix error on importing dashboards due to the wrong type for the geo_point fields. {pull}3147[3147]
+
 *Winlogbeat*
 
-////////////////////////////////////////////////////////////
+- Fix for "The array bounds are invalid" error when reading large events. {issue}3076[3076]
+
 
 [[release-notes-5.1.1]]
 === Beats version 5.1.1
