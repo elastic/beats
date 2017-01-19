@@ -182,6 +182,23 @@ heartbeat.monitors:
     # Required response contents.
     #body:
 
+# Configure monitors default settings shared by all monitors.
+heartbeat.defaults.monitors:
+  # Enable/Disable monitor
+  #enabled: true
+
+  # Configure default task scheduler
+  #schedule: '@every 30s'
+
+  # Configure IP protocol types to ping on if hostnames are configured.
+  # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
+  #ipv4: true
+  #ipv6: true
+  #mode: all
+
+  # Total running time per ping test.
+  #timeout: 16s
+
 heartbeat.scheduler:
   # Limit number of concurrent tasks executed by heartbeat. The task limit if
   # disabled if set to 0. The default is 0.

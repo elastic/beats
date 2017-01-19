@@ -7,8 +7,9 @@ import "github.com/elastic/beats/libbeat/common"
 
 type Config struct {
 	// Modules is a list of module specific configuration data.
-	Monitors  []*common.Config `config:"monitors"         validate:"required"`
-	Scheduler Scheduler        `config:"scheduler"`
+	Monitors  []*common.Config          `config:"monitors"         validate:"required"`
+	Scheduler Scheduler                 `config:"scheduler"`
+	Defaults  map[string]*common.Config `config:"defaults"`
 }
 
 type Scheduler struct {
