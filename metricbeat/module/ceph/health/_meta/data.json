@@ -6,16 +6,20 @@
     },
     "ceph": {
         "health": {
-            "cluster.overall_status": "HEALTH_OK",
-            "cluster.timechecks": {
-                "epoch": 3,
-                "round": 0,
-                "round_status": "finished"
+            "cluster": {
+                "overall_stats": "HEALTH_OK",
+                "timechecks": {
+                    "epoch": 3,
+                    "round": {
+                        "status": "finished",
+                        "value": 0
+                    }
+                }
             }
         }
     },
     "metricset": {
-        "host": "ceph:5000",
+        "host": "172.17.0.1:5000",
         "module": "ceph",
         "name": "health",
         "rtt": 115

@@ -15,7 +15,6 @@ func TestData(t *testing.T) {
 	}
 }
 
-
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "ceph",

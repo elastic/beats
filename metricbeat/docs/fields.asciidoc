@@ -434,11 +434,139 @@ health
 
 
 [float]
-=== ceph.health.example
+=== ceph.health.cluster.overall_status
 
 type: keyword
 
-Example field
+Overall status of the cluster
+
+
+[float]
+=== ceph.health.cluster.timechecks.epoch
+
+type: long
+
+Map version
+
+
+[float]
+=== ceph.health.cluster.timechecks.round.value
+
+type: long
+
+timecheck round
+
+
+[float]
+=== ceph.health.cluster.timechecks.round.status
+
+type: keyword
+
+Status of the round
+
+
+[float]
+=== ceph.health.mon.available.pct
+
+type: long
+
+Available percent of the MON
+
+
+[float]
+=== ceph.health.mon.health
+
+type: keyword
+
+Health of the MON
+
+
+[float]
+=== ceph.health.mon.available.kb
+
+type: long
+
+Available KB of the MON
+
+
+[float]
+=== ceph.health.mon.total.kb
+
+type: long
+
+Total KB of the MON
+
+
+[float]
+=== ceph.health.mon.used.kb
+
+type: long
+
+Used KB of the MON
+
+
+[float]
+=== ceph.health.mon.last_updated
+
+type: date
+
+Time when was updated
+
+
+[float]
+=== ceph.health.mon.name
+
+type: keyword
+
+Name of the MON
+
+
+[float]
+=== ceph.health.mon.store_stats.log.bytes
+
+type: long
+
+format: bytes
+
+Log bytes of MON
+
+
+[float]
+=== ceph.health.mon.store_stats.misc.bytes
+
+type: long
+
+format: bytes
+
+Misc bytes of MON
+
+
+[float]
+=== ceph.health.mon.store_stats.sst.bytes
+
+type: long
+
+format: bytes
+
+SST bytes of MON
+
+
+[float]
+=== ceph.health.mon.store_stats.total.bytes
+
+type: long
+
+format: bytes
+
+Total bytes of MON
+
+
+[float]
+=== ceph.health.mon.store_stats.last_updated
+
+type: long
+
+Last updated
 
 
 [[exported-fields-cloud]]

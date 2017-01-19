@@ -2,10 +2,11 @@ package health
 
 import (
 	"encoding/json"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"io"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type Tick struct {
@@ -79,11 +80,15 @@ func eventsMapping(body io.Reader) []common.MapStr {
 	events := []common.MapStr{}
 
 	event := common.MapStr{
-		"cluster.overall_status": d.Output.OverallStatus,
-		"cluster.timechecks": common.MapStr{
-			"round_status": d.Output.Timechecks.RoundStatus,
-			"epoch":        d.Output.Timechecks.Epoch,
-			"round":        d.Output.Timechecks.Round,
+		"cluster": common.MapStr{
+			"overall_stats": d.Output.OverallStatus,
+			"timechecks": common.MapStr{
+				"epoch": d.Output.Timechecks.Epoch,
+				"round": common.MapStr{
+					"value":  d.Output.Timechecks.Round,
+					"status": d.Output.Timechecks.RoundStatus,
+				},
+			},
 		},
 	}
 
@@ -93,19 +98,33 @@ func eventsMapping(body io.Reader) []common.MapStr {
 		for _, Mon := range HealthService.Mons {
 			event := common.MapStr{
 				"mon": common.MapStr{
-					"last_updated":  Mon.LastUpdated,
-					"name":          Mon.Name,
-					"avail_percent": Mon.AvailPercent,
-					"kb_total":      Mon.KbTotal,
-					"kb_avail":      Mon.KbAvail,
-					"health":        Mon.Health,
-					"kb_used":       Mon.KbUsed,
+					"last_updated": Mon.LastUpdated,
+					"name":         Mon.Name,
+					"available": common.MapStr{
+						"pct": Mon.AvailPercent,
+						"kb":  Mon.KbAvail,
+					},
+					"total": common.MapStr{
+						"kb": Mon.KbTotal,
+					},
+					"health": Mon.Health,
+					"used": common.MapStr{
+						"kb": Mon.KbUsed,
+					},
 					"store_stats": common.MapStr{
-						"bytes_total":  Mon.StoreStats.BytesTotal,
-						"bytes_log":    Mon.StoreStats.BytesLog,
+						"log": common.MapStr{
+							"bytes": Mon.StoreStats.BytesLog,
+						},
+						"misc": common.MapStr{
+							"bytes": Mon.StoreStats.BytesMisc,
+						},
+						"sst": common.MapStr{
+							"bytes": Mon.StoreStats.BytesSSt,
+						},
+						"total": common.MapStr{
+							"bytes": Mon.StoreStats.BytesTotal,
+						},
 						"last_updated": Mon.StoreStats.LastUpdated,
-						"bytes_misc":   Mon.StoreStats.BytesMisc,
-						"bytes_sst":    Mon.StoreStats.BytesSSt,
 					},
 				},
 			}
