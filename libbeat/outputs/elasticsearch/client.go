@@ -259,6 +259,7 @@ func (client *Client) PublishEvents(
 	}
 
 	ackedEvents.Add(int64(len(data) - len(failedEvents)))
+	outputs.AckedEvents.Add(int64(len(data) - len(failedEvents)))
 	eventsNotAcked.Add(int64(len(failedEvents)))
 	if len(failedEvents) > 0 {
 		if sendErr == nil {

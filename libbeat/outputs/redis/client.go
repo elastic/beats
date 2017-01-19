@@ -2,6 +2,7 @@ package redis
 
 import (
 	"errors"
+	"expvar"
 	"regexp"
 	"strconv"
 	"time"
@@ -17,6 +18,9 @@ import (
 
 var (
 	versionRegex = regexp.MustCompile(`redis_version:(\d+).(\d+)`)
+
+	ackedEvents    = expvar.NewInt("libbeat.redis.published_and_acked_events")
+	eventsNotAcked = expvar.NewInt("libbeat.redis.published_but_not_acked_events")
 )
 
 type publishFn func(
@@ -186,7 +190,10 @@ func publishEventsBulk(conn redis.Conn, key outil.Selector, command string, code
 		if err != nil {
 			logp.Err("Failed to %v to redis list with %v", command, err)
 			return data, err
+
 		}
+		ackedEvents.Add(int64(len(data)))
+		outputs.AckedEvents.Add(int64(len(data)))
 
 		return nil, nil
 	}
@@ -239,6 +246,9 @@ func publishEventsPipeline(conn redis.Conn, command string, codec outputs.Codec)
 				}
 			}
 		}
+		ackedEvents.Add(int64(len(okEvents) - len(failed)))
+		outputs.AckedEvents.Add(int64(len(okEvents) - len(failed)))
+		eventsNotAcked.Add(int64(len(failed)))
 		return failed, lastErr
 	}
 }
