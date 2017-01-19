@@ -136,11 +136,11 @@ For a description of each field in the metricset, see the
             f.write(module_file)
 
     module_list_output = generated_note
-    for m, title in sorted(modules_list.iteritems()):
+    for m, title in sorted(modules_list.items()):
         module_list_output += "  * <<metricbeat-module-" + m + "," + title + ">>\n"
 
     module_list_output += "\n\n--\n\n"
-    for m, title in sorted(modules_list.iteritems()):
+    for m, title in sorted(modules_list.items()):
         module_list_output += "include::modules/"+ m + ".asciidoc[]\n"
 
     # Write module link list

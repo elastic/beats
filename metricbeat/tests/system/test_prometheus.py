@@ -29,7 +29,7 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(PROMETHEUS_FIELDS), evt.keys(), evt)
+        self.assertItemsEqual(self.de_dot(PROMETHEUS_FIELDS), list(evt.keys()), evt)
 
         self.assert_fields_are_documented(evt)
 

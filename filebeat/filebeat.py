@@ -27,7 +27,7 @@ def main():
                         help="Run filebeat with the -once flag")
 
     args = parser.parse_args()
-    print args
+    print(args)
 
     # changing directory because we use paths relative to the binary
     os.chdir(os.path.dirname(sys.argv[0]))
@@ -52,14 +52,14 @@ def load_datasets(args, modules):
     for module in modules:
         path = os.path.join("module", module)
         if not os.path.isdir(path):
-            print("Module {} not found".format(module))
+            print(("Module {} not found".format(module)))
             sys.exit(1)
-        print("Found module {} in {}".format(module, path))
+        print(("Found module {} in {}".format(module, path)))
 
         filesets = [name for name in os.listdir(path) if
                     os.path.isfile(os.path.join(path, name, "manifest.yml"))]
 
-        print("Found filesets: {}".format(filesets))
+        print(("Found filesets: {}".format(filesets)))
 
         for fileset in filesets:
             load_fileset(args, module, fileset,
@@ -72,7 +72,7 @@ def load_fileset(args, module, fileset, path):
     manifest = yaml.load(file(os.path.join(path, "manifest.yml"), "r"))
     var = evaluate_vars(args, manifest["var"], module, fileset)
     var["beat"] = dict(module=module, fileset=fileset, path=path, args=args)
-    print("Evaluated variables: {}".format(var))
+    print(("Evaluated variables: {}".format(var)))
 
     load_pipeline(var, manifest["ingest_pipeline"])
 
@@ -89,7 +89,7 @@ def evaluate_vars(args, var_in, module, fileset):
         elif sys.platform == "windows" and "os.windows" in vals:
             var[name] = vals["os.windows"]
 
-        if isinstance(var[name], basestring):
+        if isinstance(var[name], str):
             var[name] = apply_template(var[name], var)
         elif isinstance(var[name], list):
             # only supports array of strings atm
@@ -115,10 +115,10 @@ def get_builtin_vars():
 
 def load_pipeline(var, pipeline):
     path = os.path.join(var["beat"]["path"], apply_template(pipeline, var))
-    print("Loading ingest pipeline: {}".format(path))
+    print(("Loading ingest pipeline: {}".format(path)))
     var["beat"]["pipeline_id"] = var["beat"]["module"] + '-' + var["beat"]["fileset"] + \
         '-' + os.path.splitext(os.path.basename(path))[0]
-    print("Pipeline id: {}".format(var["beat"]["pipeline_id"]))
+    print(("Pipeline id: {}".format(var["beat"]["pipeline_id"])))
 
     with open(path, "r") as f:
         contents = f.read()
@@ -128,7 +128,7 @@ def load_pipeline(var, pipeline):
                              var["beat"]["pipeline_id"]),
                      data=contents)
     if r.status_code >= 300:
-        print("Error posting pipeline: {}".format(r.text))
+        print(("Error posting pipeline: {}".format(r.text)))
         sys.exit(1)
 
 
@@ -151,7 +151,7 @@ output.elasticsearch.pipeline: "%{[fields.pipeline_id]}"
     with open(fname, "w") as cfgfile:
         cfgfile.write(Template(cfg_template).render(
             dict(es=args.es)))
-        print("Wrote configuration file: {}".format(cfgfile.name))
+        print(("Wrote configuration file: {}".format(cfgfile.name)))
     os.close(fd)
 
     cmd = ["./filebeat.test", "-systemTest",
@@ -162,7 +162,7 @@ output.elasticsearch.pipeline: "%{[fields.pipeline_id]}"
     if args.once:
         cmd.extend(["-M", "*.*.prospector.close_eof=true"])
         cmd.append("-once")
-    print("Starting filebeat: " + " ".join(cmd))
+    print(("Starting filebeat: " + " ".join(cmd)))
 
     subprocess.Popen(cmd).wait()
 

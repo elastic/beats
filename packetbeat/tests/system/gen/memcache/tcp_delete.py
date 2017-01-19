@@ -8,7 +8,7 @@ def run(mc):
 
     mc.set('key', 'abc')
     mc.delete('key')
-    print(mc.get('key'))
+    print((mc.get('key')))
 
 if __name__ == '__main__':
     mc.run_tcp(run)

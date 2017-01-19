@@ -31,5 +31,5 @@ class Test(BaseTest):
         assert objs[5]["status"] == "OK"
         assert objs[5]["bytes_out"] == 118
 
-        assert all(["bytes_in" in o.keys() for o in objs])
-        assert all(["bytes_out" in o.keys() for o in objs])
+        assert all(["bytes_in" in list(o.keys()) for o in objs])
+        assert all(["bytes_out" in list(o.keys()) for o in objs])

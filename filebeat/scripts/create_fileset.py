@@ -12,8 +12,8 @@ def generate_fileset(base_path, metricbeat_path, module, fileset):
     meta_path = fileset_path + "/_meta"
 
     if os.path.isdir(fileset_path):
-        print("Fileset already exists. Skipping creating fileset {}"
-              .format(fileset))
+        print(("Fileset already exists. Skipping creating fileset {}"
+              .format(fileset)))
         return
 
     os.makedirs(meta_path)
@@ -39,7 +39,7 @@ def generate_fileset(base_path, metricbeat_path, module, fileset):
     with open("{}/manifest.yml".format(fileset_path), "w") as f:
         f.write(content)
 
-    print("Fileset {} created.".format(fileset))
+    print(("Fileset {} created.".format(fileset)))
 
 
 def generate_module(base_path, metricbeat_path, module, fileset):
@@ -48,8 +48,8 @@ def generate_module(base_path, metricbeat_path, module, fileset):
     meta_path = module_path + "/_meta"
 
     if os.path.isdir(module_path):
-        print("Module already exists. Skipping creating module {}"
-              .format(module))
+        print(("Module already exists. Skipping creating module {}"
+              .format(module)))
         return
 
     os.makedirs(meta_path)
@@ -60,7 +60,7 @@ def generate_module(base_path, metricbeat_path, module, fileset):
     with open(meta_path + "/fields.yml", "w") as f:
         f.write(content)
 
-    print("Module {} created.".format(module))
+    print(("Module {} created.".format(module)))
 
 
 def load_file(file, module, fileset):
@@ -84,17 +84,17 @@ if __name__ == "__main__":
 
     if args.path is None:
         args.path = './'
-        print "Set default path for beat path: " + args.path
+        print("Set default path for beat path: " + args.path)
 
     if args.es_beats is None:
         args.es_beats = '../'
-        print "Set default path for es_beats path: " + args.es_beats
+        print("Set default path for es_beats path: " + args.es_beats)
 
     if args.module is None or args.module == '':
-        args.module = raw_input("Module name: ")
+        args.module = input("Module name: ")
 
     if args.fileset is None or args.fileset == '':
-        args.fileset = raw_input("Fileset name: ")
+        args.fileset = input("Fileset name: ")
 
     path = os.path.abspath(args.path)
     filebeat_path = os.path.abspath(args.es_beats + "/filebeat")

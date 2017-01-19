@@ -66,7 +66,7 @@ class SystemTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         cpu = evt["system"]["cpu"]
-        self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS), cpu.keys())
+        self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS), list(cpu.keys()))
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu_ticks_option(self):
@@ -95,7 +95,7 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             cpuStats = evt["system"]["cpu"]
-            self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS_ALL), cpuStats.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_CPU_FIELDS_ALL), list(cpuStats.keys()))
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core(self):
@@ -121,7 +121,7 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             core = evt["system"]["core"]
-            self.assertItemsEqual(self.de_dot(SYSTEM_CORE_FIELDS), core.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_CORE_FIELDS), list(core.keys()))
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core_with_cpu_ticks(self):
@@ -150,7 +150,7 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             core = evt["system"]["core"]
-            self.assertItemsEqual(self.de_dot(SYSTEM_CORE_FIELDS_ALL), core.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_CORE_FIELDS_ALL), list(core.keys()))
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_load(self):
@@ -176,7 +176,7 @@ class SystemTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         cpu = evt["system"]["load"]
-        self.assertItemsEqual(self.de_dot(SYSTEM_LOAD_FIELDS), cpu.keys())
+        self.assertItemsEqual(self.de_dot(SYSTEM_LOAD_FIELDS), list(cpu.keys()))
 
     @unittest.skipUnless(re.match("(?i)win|linux|freebsd", sys.platform), "os")
     def test_diskio(self):
@@ -202,7 +202,7 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             diskio = evt["system"]["diskio"]
-            self.assertItemsEqual(self.de_dot(SYSTEM_DISKIO_FIELDS), diskio.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_DISKIO_FIELDS), list(diskio.keys()))
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
@@ -228,7 +228,7 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             filesystem = evt["system"]["filesystem"]
-            self.assertItemsEqual(self.de_dot(SYSTEM_FILESYSTEM_FIELDS), filesystem.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_FILESYSTEM_FIELDS), list(filesystem.keys()))
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_fsstat(self):
@@ -254,7 +254,7 @@ class SystemTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         fsstat = evt["system"]["fsstat"]
-        self.assertItemsEqual(SYSTEM_FSSTAT_FIELDS, fsstat.keys())
+        self.assertItemsEqual(SYSTEM_FSSTAT_FIELDS, list(fsstat.keys()))
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_memory(self):
@@ -280,7 +280,7 @@ class SystemTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         memory = evt["system"]["memory"]
-        self.assertItemsEqual(self.de_dot(SYSTEM_MEMORY_FIELDS), memory.keys())
+        self.assertItemsEqual(self.de_dot(SYSTEM_MEMORY_FIELDS), list(memory.keys()))
 
         # Check that percentages are calculated.
         mem = memory
@@ -317,7 +317,7 @@ class SystemTest(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             network = evt["system"]["network"]
-            self.assertItemsEqual(self.de_dot(SYSTEM_NETWORK_FIELDS), network.keys())
+            self.assertItemsEqual(self.de_dot(SYSTEM_NETWORK_FIELDS), list(network.keys()))
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
@@ -364,7 +364,7 @@ class SystemTest(metricbeat.BaseTest):
             if fd is not None:
                 found_fd = True
 
-            self.assertItemsEqual(SYSTEM_PROCESS_FIELDS, process.keys())
+            self.assertItemsEqual(SYSTEM_PROCESS_FIELDS, list(process.keys()))
 
         self.assertTrue(found_cmdline, "cmdline not found in any process events")
 
@@ -396,8 +396,8 @@ class SystemTest(metricbeat.BaseTest):
 
         assert re.match("(?i)metricbeat.test(.exe)?", output["system.process.name"])
         assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["system.process.cmdline"])
-        assert isinstance(output["system.process.state"], basestring)
-        assert isinstance(output["system.process.cpu.start_time"], basestring)
+        assert isinstance(output["system.process.state"], str)
+        assert isinstance(output["system.process.cpu.start_time"], str)
         self.check_username(output["system.process.username"])
 
     def check_username(self, observed, expected = None):
@@ -406,7 +406,7 @@ class SystemTest(metricbeat.BaseTest):
 
         if os.name == 'nt':
             parts = observed.split("\\", 2)
-            assert len(parts) == 2, "Expected proc.username to be of form DOMAIN\username, but was %s" % observed
+            assert len(parts) == 2, "Expected proc.username to be of form DOMAIN\\username, but was %s" % observed
             observed = parts[1]
 
         assert expected == observed, "proc.username = %s, but expected %s" % (observed, expected)

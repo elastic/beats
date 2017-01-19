@@ -39,9 +39,9 @@ class Test(BaseTest):
         # the rest should be successful
         assert all([o["status"] == "OK" for o in objs[3:]])
         assert all(["redis.return_value" in o for o in objs[3:]])
-        assert all([isinstance(o["method"], basestring) for o in objs[3:]])
-        assert all([isinstance(o["resource"], basestring) for o in objs[3:]])
-        assert all([isinstance(o["query"], basestring) for o in objs[3:]])
+        assert all([isinstance(o["method"], str) for o in objs[3:]])
+        assert all([isinstance(o["resource"], str) for o in objs[3:]])
+        assert all([isinstance(o["query"], str) for o in objs[3:]])
 
         assert all(["bytes_in" in o for o in objs])
         assert all(["bytes_out" in o for o in objs])

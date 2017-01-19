@@ -31,17 +31,17 @@ class TestProcessors(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         print(evt)
-        print(evt.keys())
+        print((list(evt.keys())))
         self.assertItemsEqual(self.de_dot([
             'beat', '@timestamp', 'system', 'metricset.module',
             'metricset.rtt', 'type', 'metricset.name'
-        ]), evt.keys())
+        ]), list(evt.keys()))
         cpu = evt["system"]["cpu"]
-        print(cpu.keys())
+        print((list(cpu.keys())))
         self.assertItemsEqual(self.de_dot([
             "system", "cores", "user", "softirq", "iowait",
             "idle", "irq", "steal", "nice"
-        ]), cpu.keys())
+        ]), list(cpu.keys()))
 
 
     def test_dropfields_with_condition(self):

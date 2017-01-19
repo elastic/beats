@@ -12,8 +12,8 @@ def generate_metricset(base_path, metricbeat_path, module, metricset):
     meta_path = metricset_path + "/_meta"
 
     if os.path.isdir(metricset_path):
-        print("Metricset already exists. Skipping creating metricset {}"
-              .format(metricset))
+        print(("Metricset already exists. Skipping creating metricset {}"
+              .format(metricset)))
         return
 
     os.makedirs(meta_path)
@@ -36,7 +36,7 @@ def generate_metricset(base_path, metricbeat_path, module, metricset):
     with open(meta_path + "/data.json", "w") as f:
         f.write(content)
 
-    print("Metricset {} created.".format(metricset))
+    print(("Metricset {} created.".format(metricset)))
 
 
 def generate_module(base_path, metricbeat_path, module, metricset):
@@ -45,8 +45,8 @@ def generate_module(base_path, metricbeat_path, module, metricset):
     meta_path = module_path + "/_meta"
 
     if os.path.isdir(module_path):
-        print("Module already exists. Skipping creating module {}"
-              .format(module))
+        print(("Module already exists. Skipping creating module {}"
+              .format(module)))
         return
 
     os.makedirs(meta_path)
@@ -69,7 +69,7 @@ def generate_module(base_path, metricbeat_path, module, metricset):
     with open(module_path + "/doc.go", "w") as f:
         f.write(content)
 
-    print("Module {} created.".format(module))
+    print(("Module {} created.".format(module)))
 
 
 def load_file(file, module, metricset):
@@ -94,17 +94,17 @@ if __name__ == "__main__":
 
     if args.path is None:
         args.path = './'
-        print "Set default path for beat path: " + args.path
+        print("Set default path for beat path: " + args.path)
 
     if args.es_beats is None:
         args.es_beats = '../'
-        print "Set default path for es_beats path: " + args.es_beats
+        print("Set default path for es_beats path: " + args.es_beats)
 
     if args.module is None or args.module == '':
-        args.module = raw_input("Module name: ")
+        args.module = input("Module name: ")
 
     if args.metricset is None or args.metricset == '':
-        args.metricset = raw_input("Metricset name: ")
+        args.metricset = input("Metricset name: ")
 
     path = os.path.abspath(args.path)
     metricbeat_path = os.path.abspath(args.es_beats + "/metricbeat")

@@ -2,7 +2,7 @@ import os
 import metricbeat
 import unittest
 from nose.plugins.attrib import attr
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import time
 
 APACHE_FIELDS = metricbeat.COMMON_FIELDS + ["apache"]
@@ -35,7 +35,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
         found = False
         # Waits until CPULoad is part of the status
         while found == False:
-            res = urllib2.urlopen(hosts[0] + "/server-status?auto").read()
+            res = urllib.request.urlopen(hosts[0] + "/server-status?auto").read()
             if "CPULoad"  in res:
                 found = True
             time.sleep(0.5)
@@ -53,10 +53,10 @@ class ApacheStatusTest(metricbeat.BaseTest):
         evt = output[0]
 
         # Verify the required fields are present.
-        self.assertItemsEqual(self.de_dot(APACHE_FIELDS), evt.keys())
+        self.assertItemsEqual(self.de_dot(APACHE_FIELDS), list(evt.keys()))
         apache_status = evt["apache"]["status"]
-        self.assertItemsEqual(self.de_dot(APACHE_STATUS_FIELDS), apache_status.keys())
-        self.assertItemsEqual(self.de_dot(CPU_FIELDS), apache_status["cpu"].keys())
+        self.assertItemsEqual(self.de_dot(APACHE_STATUS_FIELDS), list(apache_status.keys()))
+        self.assertItemsEqual(self.de_dot(CPU_FIELDS), list(apache_status["cpu"].keys()))
         # There are more fields that could be checked.
 
         # Verify all fields present are documented.

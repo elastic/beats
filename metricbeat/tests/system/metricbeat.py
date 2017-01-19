@@ -24,7 +24,7 @@ class BaseTest(TestCase):
         expected_fields, _ = self.load_fields()
         flat = self.flatten_object(evt, [])
 
-        for key in flat.keys():
+        for key in list(flat.keys()):
             if key not in expected_fields:
                 raise Exception("Key '{}' found in event is not documented!".format(key))
 

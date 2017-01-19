@@ -110,7 +110,7 @@ def migrate_tls_settings(content):
 
         v_start = get_old_tls_version(v_start, "1.0")
         v_end = get_old_tls_version(v_end, "1.2")
-        versions = (ssl_versions_new[i] for i in xrange(v_start, v_end+1))
+        versions = (ssl_versions_new[i] for i in range(v_start, v_end+1))
 
         line = indent * ' ' + ('#' if commented_out else '')
         line += "supported_protocols:"
@@ -227,7 +227,7 @@ def main():
         print(content)
     else:
         os.rename(args.file, args.file + ".bak")
-        print("Backup file created: {}".format(args.file + ".bak"))
+        print(("Backup file created: {}".format(args.file + ".bak")))
         with open(args.file, "w") as f:
             f.write(content)
 

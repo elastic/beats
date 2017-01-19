@@ -101,7 +101,7 @@ class TestCase(unittest.TestCase):
 
         # Create build path
         build_dir = "../../build"
-        if 'BUILD_DIR' in os.environ.keys() and os.environ['BUILD_DIR'] != '':
+        if 'BUILD_DIR' in list(os.environ.keys()) and os.environ['BUILD_DIR'] != '':
             build_dir = os.environ['BUILD_DIR']
         self.build_path = build_dir + "/system-tests/"
 
@@ -208,7 +208,7 @@ class TestCase(unittest.TestCase):
                 try:
                     jsons.append(self.flatten_object(json.loads(line), []))
                 except:
-                    print("Fail to load the json {}".format(line))
+                    print(("Fail to load the json {}".format(line)))
                     raise
 
         self.all_have_fields(jsons, required_fields or BEAT_REQUIRED_FIELDS)
@@ -371,7 +371,7 @@ class TestCase(unittest.TestCase):
         given list of expected fields.
         """
         for o in objs:
-            for key in o.keys():
+            for key in list(o.keys()):
                 if key not in dict_fields and key not in expected_fields:
                     raise Exception("Unexpected key '{}' found"
                                     .format(key))
@@ -430,7 +430,7 @@ class TestCase(unittest.TestCase):
 
     def flatten_object(self, obj, dict_fields, prefix=""):
         result = {}
-        for key, value in obj.items():
+        for key, value in list(obj.items()):
             if isinstance(value, dict) and prefix + key not in dict_fields:
                 new_prefix = prefix + key + "."
                 result.update(self.flatten_object(value, dict_fields,

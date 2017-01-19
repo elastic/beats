@@ -8,10 +8,10 @@ def generate_packer(es_beats, abs_path, beat, beat_path, version):
     # create dev-tools/packer
     packer_path = abs_path + "/dev-tools/packer"
 
-    print packer_path
+    print(packer_path)
 
     if os.path.isdir(packer_path):
-        print "Dev tools already exists. Stopping..."
+        print("Dev tools already exists. Stopping...")
         return
 
     # create all directories needed
@@ -33,7 +33,7 @@ def generate_packer(es_beats, abs_path, beat, beat_path, version):
     with open(packer_path + "/beats/" + beat + ".yml", "w") as f:
         f.write(content)
 
-    print "Packer directories created"
+    print("Packer directories created")
 
 
 def load_file(file, beat, beat_path, version):
@@ -62,8 +62,8 @@ if __name__ == "__main__":
     # Removes the gopath + /src/ from the directory name to fetch the path
     beat_path = abs_path[len(gopath)+5:]
 
-    print beat_path
-    print abs_path
+    print(beat_path)
+    print(abs_path)
 
     es_beats = os.path.abspath(args.es_beats)
     generate_packer(es_beats, abs_path, args.beat, beat_path, args.version)

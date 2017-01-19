@@ -19,17 +19,17 @@ def read_input():
     global project_name, github_name, beat, beat_path, full_name
 
     if project_name == "":
-        project_name = raw_input("Beat Name [Examplebeat]: ") or "examplebeat"
+        project_name = input("Beat Name [Examplebeat]: ") or "examplebeat"
 
     if github_name == "":
-        github_name = raw_input("Your Github Name [your-github-name]: ") or "your-github-name"
+        github_name = input("Your Github Name [your-github-name]: ") or "your-github-name"
     beat = project_name.lower()
 
     if beat_path == "":
-        beat_path = raw_input("Beat Path [github.com/" + github_name + "]: ") or "github.com/" + github_name
+        beat_path = input("Beat Path [github.com/" + github_name + "]: ") or "github.com/" + github_name
 
     if full_name == "":
-        full_name = raw_input("Firstname Lastname: ") or "Firstname Lastname"
+        full_name = input("Firstname Lastname: ") or "Firstname Lastname"
 
 def process_file():
 

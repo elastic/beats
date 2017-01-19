@@ -76,37 +76,37 @@ class Test(BaseTest):
         assert sets['k2']['memcache.request.bytes'] == 20
         assert sets['k3']['memcache.request.bytes'] == 10
         assert all(o['memcache.request.opcode'] == 'Set'
-                   for o in sets.itervalues())
+                   for o in sets.values())
         assert all('memcache.response.cas_unique' in o
-                   for o in sets.itervalues())
+                   for o in sets.values())
         assert all(o['memcache.response.status'] == 'Success'
-                   for o in sets.itervalues())
+                   for o in sets.values())
         assert all((o['memcache.request.opaque'] ==
                     o['memcache.response.opaque'])
-                   for o in sets.itervalues())
+                   for o in sets.values())
 
         gets = dict([(o['memcache.request.keys'][0], o) for o in objs[3:8]])
         # check all gets are quiet (transaction piping)
         assert all(o['memcache.request.opcode'] == 'GetKQ'
-                   for o in gets.itervalues())
+                   for o in gets.values())
         assert all(o['memcache.request.command'] == 'get'
-                   for o in gets.itervalues())
+                   for o in gets.values())
         assert all(o['memcache.request.quiet']
-                   for o in gets.itervalues())
+                   for o in gets.values())
         assert 'memcache.response.opcode' not in gets['x']
         assert 'memcache.response.opcode' not in gets['y']
 
         # gets with actual return values
         gets = dict((k, v)
-                    for k, v in gets.iteritems()
+                    for k, v in gets.items()
                     if k in ['k1', 'k2', 'k3'])
         assert all('memcache.response.cas_unique' in o
-                   for o in gets.itervalues())
+                   for o in gets.values())
         assert all(o['memcache.response.status'] == 'Success'
-                   for o in gets.itervalues())
+                   for o in gets.values())
         assert all((o['memcache.request.opaque'] ==
                     o['memcache.response.opaque'])
-                   for o in gets.itervalues())
+                   for o in gets.values())
 
         noop = objs[8]
         assert noop['memcache.request.command'] == 'noop'
