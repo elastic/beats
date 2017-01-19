@@ -153,7 +153,7 @@ func createPingFactory(
 }
 
 func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Request, error) {
-	method := strings.ToUpper(config.Check.Method)
+	method := strings.ToUpper(config.Check.Request.Method)
 	request, err := http.NewRequest(method, addr, nil)
 	if err != nil {
 		return nil, err
@@ -163,7 +163,7 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 	if config.Username != "" {
 		request.SetBasicAuth(config.Username, config.Password)
 	}
-	for k, v := range config.Check.SendHeaders {
+	for k, v := range config.Check.Request.SendHeaders {
 		request.Header.Add(k, v)
 	}
 
