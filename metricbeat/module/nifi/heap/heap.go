@@ -148,7 +148,7 @@ func (m *MetricSet) fetchAggregate() (common.MapStr, error) {
 		return nil, errors.New(msg)
 	}
 
-	event := eventMapping(resp.Body)
+	event := aggregateEventMapping(resp.Body)
 	fmt.Printf("%v", event)
 
 	return event, nil
