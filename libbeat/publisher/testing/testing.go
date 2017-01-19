@@ -60,7 +60,8 @@ func (c *ChanClient) PublishEvent(event common.MapStr, opts ...publisher.ClientO
 // PublishEvents publishes all event on the configured channel. Options will be ignored.
 // Always returns true.
 func (c *ChanClient) PublishEvents(events []common.MapStr, opts ...publisher.ClientOption) bool {
-	msg := PublishMessage{publisher.MakeContext(opts), events}
+	_, ctx := publisher.MakeContext(opts)
+	msg := PublishMessage{ctx, events}
 	select {
 	case <-c.done:
 		return false
