@@ -8,7 +8,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
@@ -242,7 +241,14 @@ func (reg *ModuleRegistry) GetProspectorConfigs() ([]*common.Config, error) {
 	return result, nil
 }
 
-func (reg *ModuleRegistry) Setup(esClient *elasticsearch.Client) error {
+// PipelineLoader is a subset of the Elasticsearch client API capable of loading
+// the pipelines.
+type PipelineLoader interface {
+	LoadJSON(path string, json map[string]interface{}) error
+}
+
+// Setup is called on -setup and loads the pipelines for each configured fileset.
+func (reg *ModuleRegistry) Setup(esClient PipelineLoader) error {
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
 			pipelineID, content, err := fileset.GetPipeline()
@@ -258,7 +264,7 @@ func (reg *ModuleRegistry) Setup(esClient *elasticsearch.Client) error {
 	return nil
 }
 
-func loadPipeline(esClient *elasticsearch.Client, pipelineID string, content map[string]interface{}) error {
+func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string]interface{}) error {
 	path := "/_ingest/pipeline/" + pipelineID
 	err := esClient.LoadJSON(path, content)
 	if err != nil {
