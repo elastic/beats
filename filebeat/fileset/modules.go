@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
@@ -82,6 +83,13 @@ func newModuleRegistry(modulesPath string,
 // NewModuleRegistry reads and loads the configured module into the registry.
 func NewModuleRegistry(moduleConfigs []*common.Config) (*ModuleRegistry, error) {
 	modulesPath := paths.Resolve(paths.Home, "module")
+
+	stat, err := os.Stat(modulesPath)
+	if err != nil || !stat.IsDir() {
+		logp.Info("Not loading modules. Module directory not found: %s")
+		return nil, nil
+	}
+
 	modulesCLIList, modulesOverrides, err := getModulesCLIConfig()
 	if err != nil {
 		return nil, err
