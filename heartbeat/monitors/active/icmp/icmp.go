@@ -57,6 +57,10 @@ func create(
 		return nil, loopErr
 	}
 
+	if err := loop.checkNetworkMode(ipVersion); err != nil {
+		return nil, err
+	}
+
 	typ := config.Name
 	network := config.Mode.Network()
 	pingFactory := monitors.MakePingIPFactory(nil, createPingIPFactory(&config))
