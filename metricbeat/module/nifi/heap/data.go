@@ -71,15 +71,16 @@ func eventMapping(body io.Reader) common.MapStr {
 	return event
 }
 
-// NodeSnapShot
+// NodeSnapshot ...
 type NodeSnapshot struct {
+	NodeID   string `json:"nodeId"`
 	Address  string `json:"address"`
 	Snapshot struct {
 		Heap
-		NodeID string `json:"nodeId"`
 	} `json:"snapshot"`
 }
 
+// NodewiseData ...
 type NodewiseData struct {
 	SystemDiagnostics struct {
 		NodeSnapshots []NodeSnapshot `json:"nodeSnapshots"`
@@ -93,13 +94,12 @@ func nodewiseEventMapping(body io.Reader, nodeID string) (common.MapStr, error) 
 		logp.Err("Error: ", err)
 	}
 
-	snapshots := data.SystemDiagnostics.Nodesnapshots
-
-	var slice NodeSnapshot
+	snapshots := data.SystemDiagnostics.NodeSnapshots
+	var slice Heap
 
 	for i, snapshot := range snapshots {
 		if snapshot.NodeID == nodeID {
-			slice = snapshot
+			slice = snapshot.Snapshot.Heap
 			break
 		}
 		if i == len(snapshots)-1 {
@@ -127,5 +127,5 @@ func nodewiseEventMapping(body io.Reader, nodeID string) (common.MapStr, error) 
 		"heap_utilization":     slice.HeapUtilization,
 	}
 
-	return event
+	return event, nil
 }

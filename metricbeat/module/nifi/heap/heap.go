@@ -52,11 +52,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	var nodes map[string]string
 
 	if isCluster {
-		nodes, err := nifi.GetNodeMap(arbHost, client)
+		nodesTmp, err := nifi.GetNodeMap(arbHost, client)
 		if err != nil {
 			logp.Err(err.Error())
 			return nil, err
 		}
+		nodes = nodesTmp
 	}
 
 	return &MetricSet{
@@ -72,10 +73,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 
+	var event common.MapStr
+
 	if m.isCluster {
-		event, err := m.fetchNodewise()
+		eventTmp, err := m.fetchNodewise()
+		if err != nil {
+			logp.Err(err.Error())
+			return nil, err
+		}
+		event = eventTmp
+
 	} else {
-		event, err := m.fetchAggregate()
+		eventTmp, err := m.fetchAggregate()
+		if err != nil {
+			logp.Err(err.Error())
+			return nil, err
+		}
+		event = eventTmp
 	}
 
 	return event, nil
@@ -83,7 +97,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 func (m *MetricSet) fetchNodewise() (common.MapStr, error) {
 	host := m.HostData().URI
-	nodeID := m.nodeData[host]
+	nodeID := m.nodes[host]
 
 	url := fmt.Sprintf("http://%s/nifi-api/system-diagnostics?clusterNodeId=%s", host, nodeID)
 
@@ -102,7 +116,11 @@ func (m *MetricSet) fetchNodewise() (common.MapStr, error) {
 		return nil, errors.New(msg)
 	}
 
-	event := nodewiseEventMapping(resp.Body, nodeID)
+	event, err := nodewiseEventMapping(resp.Body, nodeID)
+	if err != nil {
+		logp.Err(err.Error())
+		return nil, err
+	}
 	fmt.Printf("%v", event)
 
 	return event, nil
@@ -134,12 +152,4 @@ func (m *MetricSet) fetchAggregate() (common.MapStr, error) {
 	fmt.Printf("%v", event)
 
 	return event, nil
-}
-
-func (m *MetricSet) formatURL() string {
-
-	if m.isCluster {
-		url := fmt.Sprintf("http://%s/nifi-api/system-diagnostics", m.HostData().URI)
-	}
-	url := fmt.Sprintf("http://%s/nifi-api/system-diagnostics", m.HostData().URI)
 }

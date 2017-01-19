@@ -70,11 +70,19 @@ type Node struct {
 // GetNodeMap ...
 func GetNodeMap(host string, client *http.Client) (map[string]string, error) {
 
-	url := fmt.Sprintf("https://%s/nifi-api/controller/cluster", host)
+	url := fmt.Sprintf("http://%s/nifi-api/controller/cluster", host)
 
-	req, _ := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		logp.Err(err.Error())
+		return nil, err
+	}
 
-	resp, _ := client.Do(req)
+	resp, err := client.Do(req)
+	if err != nil {
+		logp.Err(err.Error())
+		return nil, err
+	}
 
 	defer resp.Body.Close()
 
@@ -95,5 +103,4 @@ func GetNodeMap(host string, client *http.Client) (map[string]string, error) {
 	}
 
 	return nodeMap, nil
-
 }
