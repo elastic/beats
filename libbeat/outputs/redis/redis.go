@@ -107,6 +107,8 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 			Write:       statWriteBytes,
 			ReadErrors:  statReadErrors,
 			WriteErrors: statWriteErrors,
+			SendBytes:   outputs.SendBytes,
+			Failures:    outputs.Failures,
 		},
 	}
 

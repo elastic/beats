@@ -133,6 +133,8 @@ func NewClient(
 		Write:       statWriteBytes,
 		ReadErrors:  statReadErrors,
 		WriteErrors: statWriteErrors,
+		SendBytes:   outputs.SendBytes,
+		Failures:    outputs.Failures,
 	}
 	dialer = transport.StatsDialer(dialer, iostats)
 	tlsDialer = transport.StatsDialer(tlsDialer, iostats)
