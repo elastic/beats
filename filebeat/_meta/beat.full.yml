@@ -143,6 +143,10 @@ filebeat.prospectors:
   # this can mean that the first entries of a new file are skipped.
   #tail_files: false
 
+  # The Ingest Node pipeline ID associated with this prospector. If this is set, it
+  # overwrites the pipeline option from the Elasticsearch output.
+  #pipeline:
+
   # Experimental: If symlinks is enabled, symlinks are opened and harvested. The harvester is openening the
   # original for harvesting but will report the symlink name as source.
   #symlinks: false
