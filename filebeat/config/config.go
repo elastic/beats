@@ -106,6 +106,8 @@ func (config *Config) FetchConfigs() error {
 		return nil
 	}
 
+	logp.Warn("Config option filebeat.config_dir is deprecated.")
+
 	// If configDir is relative, consider it relative to the config path
 	configDir = paths.Resolve(paths.Config, configDir)
 
