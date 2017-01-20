@@ -1,8 +1,6 @@
 package healthcheck
 
 import (
-	//"time"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
@@ -14,13 +12,11 @@ import (
 
 func eventsMapping(containersList []dc.APIContainers, m *MetricSet) []common.MapStr {
 	myEvents := []common.MapStr{}
-	// Set an empty map in order to detect empty healthcheck event
-	emptyEvent := common.MapStr{}
 	for _, container := range containersList {
 		returnevent := eventMapping(&container, m)
 		// Compare event to empty event
-		if !reflect.DeepEqual(emptyEvent, returnevent) {
-			myEvents = append(myEvents, eventMapping(&container, m))
+		if !reflect.ValueOf(returnevent).IsNil() {
+			myEvents = append(myEvents, returnevent)
 		}
 	}
 	return myEvents
@@ -40,15 +36,17 @@ func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
 						"name": docker.ExtractContainerName(cont.Names),
 					},
 				},
-				"status":           container.State.Health.Status,
-				"failingstreak":    container.State.Health.FailingStreak,
-				"event_start_date": common.Time(container.State.Health.Log[last_event].Start),
-				"event_end_date":   common.Time(container.State.Health.Log[last_event].End),
-				"event_exit_code":  container.State.Health.Log[last_event].ExitCode,
-				"event_output":     container.State.Health.Log[last_event].Output,
+				"status":        container.State.Health.Status,
+				"failingstreak": container.State.Health.FailingStreak,
+				"event": common.MapStr{
+					"start_date": common.Time(container.State.Health.Log[last_event].Start),
+					"end_date":   common.Time(container.State.Health.Log[last_event].End),
+					"exit_code":  container.State.Health.Log[last_event].ExitCode,
+					"output":     container.State.Health.Log[last_event].Output,
+				},
 			}
+			return event
 		}
 	}
-
-	return event
+	return nil
 }

@@ -3,22 +3,6 @@
   description: >
     Docker container metrics.
   fields:
-    - name: event_end_date
-      type: date
-      description: >
-        Healthcheck end date
-    - name: event_start_date
-      type: date
-      description: >
-        Healthcheck start date
-    - name: event_output
-      type: keyword
-      description: >
-        Healthcheck output
-    - name: event_exit_code
-      type: integer
-      description: >
-        Healthcheck status code
     - name: failingstreak
       type: integer
       description: >
@@ -27,3 +11,24 @@
       type: keyword
       description: >
         Healthcheck status code
+    - name: event
+      type: group
+      description: >
+        event fields.
+      fields:
+        - name: end_date
+          type: date
+          description: >
+            Healthcheck end date
+        - name: start_date
+          type: date
+          description: >
+            Healthcheck start date
+        - name: output
+          type: keyword
+          description: >
+            Healthcheck output
+        - name: exit_code
+          type: integer
+          description: >
+            Healthcheck status code
