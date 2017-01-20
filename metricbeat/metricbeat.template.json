@@ -581,23 +581,6 @@
                 "created": {
                   "type": "date"
                 },
-                "health": {
-                  "properties": {
-                    "event_end_date": {
-                      "type": "date"
-                    },
-                    "event_exit_code": {
-                      "type": "long"
-                    },
-                    "event_output": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "event_start_date": {
-                      "type": "date"
-                    }
-                  }
-                },
                 "id": {
                   "ignore_above": 1024,
                   "type": "keyword"
@@ -684,6 +667,30 @@
                 "writes": {
                   "scaling_factor": 1000,
                   "type": "scaled_float"
+                }
+              }
+            },
+            "healthcheck": {
+              "properties": {
+                "event_end_date": {
+                  "type": "date"
+                },
+                "event_exit_code": {
+                  "type": "long"
+                },
+                "event_output": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "event_start_date": {
+                  "type": "date"
+                },
+                "failingstreak": {
+                  "type": "long"
+                },
+                "status": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
                 }
               }
             },
@@ -793,146 +800,6 @@
                       "type": "long"
                     }
                   }
-                }
-              }
-            },
-            "node": {
-              "properties": {
-                "createdat": {
-                  "type": "date"
-                },
-                "engine": {
-                  "properties": {
-                    "engine_version": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "plugin": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
-                  }
-                },
-                "hostname": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "id": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "managerstatus": {
-                  "properties": {
-                    "addr": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "leader": {
-                      "type": "boolean"
-                    },
-                    "reachability": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
-                  }
-                },
-                "platform": {
-                  "properties": {
-                    "architecture": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "os": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
-                  }
-                },
-                "ressources": {
-                  "properties": {
-                    "memorybytes": {
-                      "type": "long"
-                    },
-                    "nanocpus": {
-                      "type": "long"
-                    }
-                  }
-                },
-                "spec": {
-                  "properties": {
-                    "avaiability": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "role": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
-                  }
-                },
-                "status": {
-                  "properties": {
-                    "addr": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "state": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
-                  }
-                },
-                "updatedad": {
-                  "type": "date"
-                }
-              }
-            },
-            "service": {
-              "properties": {
-                "createdat": {
-                  "type": "date"
-                },
-                "healtcheck_enabled": {
-                  "type": "boolean"
-                },
-                "id": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "mode": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "name": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "replicas": {
-                  "type": "long"
-                },
-                "updatedad": {
-                  "type": "date"
-                },
-                "updatestatus": {
-                  "properties": {
-                    "completedat": {
-                      "type": "date"
-                    },
-                    "message": {
-                      "norms": false,
-                      "type": "text"
-                    },
-                    "startedat": {
-                      "type": "date"
-                    },
-                    "state": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
-                  }
-                },
-                "version": {
-                  "type": "long"
                 }
               }
             }

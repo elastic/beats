@@ -582,24 +582,6 @@
                 "created": {
                   "type": "date"
                 },
-                "health": {
-                  "properties": {
-                    "event_end_date": {
-                      "type": "date"
-                    },
-                    "event_exit_code": {
-                      "type": "long"
-                    },
-                    "event_output": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    },
-                    "event_start_date": {
-                      "type": "date"
-                    }
-                  }
-                },
                 "id": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
@@ -683,6 +665,32 @@
                 },
                 "writes": {
                   "type": "float"
+                }
+              }
+            },
+            "healthcheck": {
+              "properties": {
+                "event_end_date": {
+                  "type": "date"
+                },
+                "event_exit_code": {
+                  "type": "long"
+                },
+                "event_output": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "event_start_date": {
+                  "type": "date"
+                },
+                "failingstreak": {
+                  "type": "long"
+                },
+                "status": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
                 }
               }
             },
@@ -789,165 +797,6 @@
                       "type": "long"
                     }
                   }
-                }
-              }
-            },
-            "node": {
-              "properties": {
-                "createdat": {
-                  "type": "date"
-                },
-                "engine": {
-                  "properties": {
-                    "engine_version": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    },
-                    "plugin": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    }
-                  }
-                },
-                "hostname": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
-                },
-                "id": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
-                },
-                "managerstatus": {
-                  "properties": {
-                    "addr": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    },
-                    "leader": {
-                      "type": "boolean"
-                    },
-                    "reachability": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    }
-                  }
-                },
-                "platform": {
-                  "properties": {
-                    "architecture": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    },
-                    "os": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    }
-                  }
-                },
-                "ressources": {
-                  "properties": {
-                    "memorybytes": {
-                      "type": "long"
-                    },
-                    "nanocpus": {
-                      "type": "long"
-                    }
-                  }
-                },
-                "spec": {
-                  "properties": {
-                    "avaiability": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    },
-                    "role": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    }
-                  }
-                },
-                "status": {
-                  "properties": {
-                    "addr": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    },
-                    "state": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    }
-                  }
-                },
-                "updatedad": {
-                  "type": "date"
-                }
-              }
-            },
-            "service": {
-              "properties": {
-                "createdat": {
-                  "type": "date"
-                },
-                "healtcheck_enabled": {
-                  "type": "boolean"
-                },
-                "id": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
-                },
-                "mode": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
-                },
-                "name": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
-                },
-                "replicas": {
-                  "type": "long"
-                },
-                "updatedad": {
-                  "type": "date"
-                },
-                "updatestatus": {
-                  "properties": {
-                    "completedat": {
-                      "type": "date"
-                    },
-                    "message": {
-                      "index": "analyzed",
-                      "norms": {
-                        "enabled": false
-                      },
-                      "type": "string"
-                    },
-                    "startedat": {
-                      "type": "date"
-                    },
-                    "state": {
-                      "ignore_above": 1024,
-                      "index": "not_analyzed",
-                      "type": "string"
-                    }
-                  }
-                },
-                "version": {
-                  "type": "long"
                 }
               }
             }

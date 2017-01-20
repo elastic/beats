@@ -21,7 +21,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 #- module: docker
-  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container", "node", "service"]
+  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container", "healthcheck"]
   #hosts: ["unix:///var/run/docker.sock"]
   #enabled: true
   #period: 10s
@@ -44,15 +44,13 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-docker-diskio,diskio>>
 
+* <<metricbeat-metricset-docker-healthcheck,healthcheck>>
+
 * <<metricbeat-metricset-docker-info,info>>
 
 * <<metricbeat-metricset-docker-memory,memory>>
 
 * <<metricbeat-metricset-docker-network,network>>
-
-* <<metricbeat-metricset-docker-node,node>>
-
-* <<metricbeat-metricset-docker-service,service>>
 
 include::docker/container.asciidoc[]
 
@@ -60,13 +58,11 @@ include::docker/cpu.asciidoc[]
 
 include::docker/diskio.asciidoc[]
 
+include::docker/healthcheck.asciidoc[]
+
 include::docker/info.asciidoc[]
 
 include::docker/memory.asciidoc[]
 
 include::docker/network.asciidoc[]
-
-include::docker/node.asciidoc[]
-
-include::docker/service.asciidoc[]
 
