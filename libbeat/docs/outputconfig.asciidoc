@@ -363,31 +363,9 @@ Every event sent to Logstash contains additional metadata for indexing and filte
 In Logstash, you can configure the Elasticsearch output plugin to use the
 metadata and event type for indexing.
 
-The following *Logstash 1.5* configuration file sets Logstash to use the index and
-document type reported by Beats for indexing events into Elasticsearch.
+The following Logstash configuration file for the versions 2.x and 5.x sets Logstash to
+use the index and document type reported by Beats for indexing events into Elasticsearch.
 The index used will depend on the `@timestamp` field as identified by Logstash.
-
-[source,logstash]
-------------------------------------------------------------------------------
-
-input {
-  beats {
-    port => 5044
-  }
-}
-
-output {
-  elasticsearch {
-    host => "localhost"
-    port => "9200"
-    protocol => "http"
-    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
-    document_type => "%{[@metadata][type]}"
-  }
-}
-------------------------------------------------------------------------------
-
-Here is the same configuration for *Logstash 2.x* releases:
 
 [source,logstash]
 ------------------------------------------------------------------------------
