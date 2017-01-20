@@ -7,7 +7,7 @@
             "mapping": {
               "doc_values": true,
               "ignore_above": 1024,
-              "index": "not_analyzed",
+              "index": "false",
               "type": "{dynamic_type}"
             },
             "match": "*"
@@ -20,7 +20,7 @@
         },
         "message": {
           "type": "text",
-          "index": "analyzed"
+          "index": "true"
         },
         "offset": {
           "type": "long",
