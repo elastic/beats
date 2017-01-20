@@ -1072,6 +1072,44 @@ Size of the files that have been created or changed since creation.
 
 
 [float]
+== health Fields
+
+Container health metrics.
+
+
+[float]
+=== docker.container.event_end_date
+
+type: date
+
+Healthcheck end date
+
+
+[float]
+=== docker.container.event_start_date
+
+type: date
+
+Healthcheck start date
+
+
+[float]
+=== docker.container.event_output
+
+type: long
+
+Healthcheck output
+
+
+[float]
+=== docker.container.event_exit_code
+
+type: integer
+
+Healthcheck status code
+
+
+[float]
 == cpu Fields
 
 Runtime CPU metrics.
@@ -1414,6 +1452,122 @@ Total errors on outgoing packets.
 type: long
 
 Total number of outgoing packets.
+
+
+[float]
+== container Fields
+
+Docker container metrics.
+
+
+
+[float]
+=== docker.container.command
+
+type: keyword
+
+Command that was executed in the Docker container.
+
+
+[float]
+=== docker.container.created
+
+type: date
+
+Date when the container was created.
+
+
+[float]
+=== docker.container.id
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== docker.container.image
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== docker.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.container.status
+
+type: keyword
+
+Container status.
+
+
+[float]
+== size Fields
+
+Container size metrics.
+
+
+
+[float]
+=== docker.container.size.root_fs
+
+type: long
+
+Total size of all the files in the container.
+
+
+[float]
+=== docker.container.size.rw
+
+type: long
+
+Size of the files that have been created or changed since creation.
+
+
+[float]
+== health Fields
+
+Container health metrics.
+
+
+[float]
+=== docker.container.event_end_date
+
+type: date
+
+Healthcheck end date
+
+
+[float]
+=== docker.container.event_start_date
+
+type: date
+
+Healthcheck start date
+
+
+[float]
+=== docker.container.event_output
+
+type: long
+
+Healthcheck output
+
+
+[float]
+=== docker.container.event_exit_code
+
+type: integer
+
+Healthcheck status code
 
 
 [[exported-fields-haproxy]]
