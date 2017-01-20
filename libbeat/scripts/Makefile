@@ -191,7 +191,7 @@ test: unit
 
 .PHONY: testsuite
 testsuite: ## @testing Runs all tests and generates the coverage reports
-testsuite: clean collect
+testsuite: clean update
 	$(MAKE) unit-tests
 
 	# Setups environment if TEST_ENVIRONMENT is set to true

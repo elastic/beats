@@ -40,8 +40,7 @@ coverage-report:
 
 .PHONY: update
 update:
-	$(MAKE) -C libbeat collect
-	$(foreach var,$(BEATS),$(MAKE) -C $(var) update || exit 1;)
+	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) update || exit 1;)
 
 .PHONY: clean
 clean:
@@ -117,7 +116,7 @@ upload-release:
 	aws s3 cp --recursive --acl public-read build/upload s3://download.elasticsearch.org/beats/
 
 .PHONY: notice
-notice: 
+notice:
 	python dev-tools/generate_notice.py .
 
 
