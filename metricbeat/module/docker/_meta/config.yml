@@ -1,5 +1,5 @@
 #- module: docker
-  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container", "node", "service"]
+  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container", "healthcheck"]
   #hosts: ["unix:///var/run/docker.sock"]
   #enabled: true
   #period: 10s
