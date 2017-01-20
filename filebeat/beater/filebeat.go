@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/crawler"
@@ -18,7 +19,10 @@ import (
 	"github.com/elastic/beats/filebeat/spooler"
 )
 
-var once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
+var (
+	once  = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
+	setup = flag.Bool("setup", false, "Run the setup phase for the modules")
+)
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
@@ -67,10 +71,32 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	return fb, nil
 }
 
+// Setup is called on user request (the -setup flag) to do the initial Beat setup.
+func (fb *Filebeat) Setup(b *beat.Beat) error {
+	esConfig := b.Config.Output["elasticsearch"]
+	if esConfig == nil || !esConfig.Enabled() {
+		return fmt.Errorf("Setup requested but the Elasticsearch output is not configured/enabled")
+	}
+	esClient, err := elasticsearch.NewConnectedClient(esConfig)
+	if err != nil {
+		return fmt.Errorf("Error creating ES client: %v", err)
+	}
+	defer esClient.Close()
+
+	return fb.moduleRegistry.Setup(esClient)
+}
+
 // Run allows the beater to be run as a beat.
 func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
+
+	if *setup {
+		err = fb.Setup(b)
+		if err != nil {
+			return err
+		}
+	}
 
 	waitFinished := newSignalWait()
 	waitEvents := newSignalWait()

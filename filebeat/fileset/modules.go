@@ -240,3 +240,36 @@ func (reg *ModuleRegistry) GetProspectorConfigs() ([]*common.Config, error) {
 	}
 	return result, nil
 }
+
+// PipelineLoader is a subset of the Elasticsearch client API capable of loading
+// the pipelines.
+type PipelineLoader interface {
+	LoadJSON(path string, json map[string]interface{}) error
+}
+
+// Setup is called on -setup and loads the pipelines for each configured fileset.
+func (reg *ModuleRegistry) Setup(esClient PipelineLoader) error {
+	for module, filesets := range reg.registry {
+		for name, fileset := range filesets {
+			pipelineID, content, err := fileset.GetPipeline()
+			if err != nil {
+				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
+			}
+			err = loadPipeline(esClient, pipelineID, content)
+			if err != nil {
+				return fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
+			}
+		}
+	}
+	return nil
+}
+
+func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string]interface{}) error {
+	path := "/_ingest/pipeline/" + pipelineID
+	err := esClient.LoadJSON(path, content)
+	if err != nil {
+		return fmt.Errorf("couldn't load template: %v", err)
+	}
+	logp.Info("Elasticsearch pipeline with ID '%s' loaded", pipelineID)
+	return nil
+}
