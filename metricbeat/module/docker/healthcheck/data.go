@@ -14,9 +14,11 @@ import (
 
 func eventsMapping(containersList []dc.APIContainers, m *MetricSet) []common.MapStr {
 	myEvents := []common.MapStr{}
+	// Set an empty map in order to detect empty healthcheck event
 	emptyEvent := common.MapStr{}
 	for _, container := range containersList {
 		returnevent := eventMapping(&container, m)
+		// Compare event to empty event
 		if !reflect.DeepEqual(emptyEvent, returnevent) {
 			myEvents = append(myEvents, eventMapping(&container, m))
 		}
@@ -26,9 +28,11 @@ func eventsMapping(containersList []dc.APIContainers, m *MetricSet) []common.Map
 
 func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
 	event := common.MapStr{}
+	// Detect if healthcheck is available for container
 	if strings.Contains(cont.Status, "(") && strings.Contains(cont.Status, ")") {
 		container, _ := m.dockerClient.InspectContainer(cont.ID)
 		last_event := len(container.State.Health.Log) - 1
+		// Detect if an healthcheck already occured
 		if last_event >= 0 {
 			event = common.MapStr{
 				mb.ModuleData: common.MapStr{

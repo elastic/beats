@@ -1,4 +1,4 @@
-=== Docker Container Metricset
+=== Docker healthcheck Metricset
 
-The Docker `container` metricset collects information and statistics about
+The Docker `healthcheck` metricset collects information and statistics about
 running Docker containers.

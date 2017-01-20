@@ -20,7 +20,7 @@ type MetricSet struct {
 	dockerClient *dc.Client
 }
 
-// New creates a new instance of the docker container MetricSet.
+// New creates a new instance of the docker healthcheck MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logp.Warn("EXPERIMENTAL: The docker healthcheck metricset is experimental")
 
