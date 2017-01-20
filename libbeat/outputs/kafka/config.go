@@ -30,6 +30,7 @@ type kafkaConfig struct {
 	ChanBufferSize  int                       `config:"channel_buffer_size" validate:"min=1"`
 	Username        string                    `config:"username"`
 	Password        string                    `config:"password"`
+	Codec           outputs.CodecConfig       `config:"codec"`
 }
 
 type metaConfig struct {

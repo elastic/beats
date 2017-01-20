@@ -1,5 +1,5 @@
 
-BEATNAME=libbeat
+BEAT_NAME=libbeat
 TEST_ENVIRONMENT=true
 SYSTEM_TESTS=true
 

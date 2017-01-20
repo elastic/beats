@@ -1,0 +1,5 @@
+[[config-heartbeat-logstash]]
+== Configuring Heartbeat to Use Logstash
+
+:allplatforms:
+include::../../libbeat/docs/shared-logstash-config.asciidoc[]

@@ -7,6 +7,21 @@
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
+#============================  Config Reloading ===============================
+
+# Config reloading allows to dynamically load modules. Each file which is
+# monitored must contain one or multiple modules as a list.
+metricbeat.modules.reload:
+
+  # Glob pattern for configuration reloading
+  path: ${path.config}/conf.d/*.yml
+
+  # Period on which files under path should be checked for chagnes
+  period: 10s
+
+  # Set to true to enable config reloading
+  enabled: false
+
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
@@ -52,6 +67,10 @@ metricbeat.modules:
   # EXPERIMENTAL: cgroups can be enabled for the process metricset.
   #cgroups: false
 
+  # A list of regular expressions used to whitelist environment variables
+  # reported with the process metricset's events. Defaults to empty.
+  #process.env.whitelist: []
+
   # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
   #socket.reverse_lookup.enabled: false
   #socket.reverse_lookup.success_ttl: 60s
@@ -95,7 +114,7 @@ metricbeat.modules:
     #certificate:           "/etc/pki/client/cert.pem"
     #key:                   "/etc/pki/client/cert.key"
 
-#------------------------------- haproxy Module ------------------------------
+#------------------------------- HAProxy Module ------------------------------
 #- module: haproxy
   #metricsets: ["info", "stat"]
   #enabled: true
@@ -132,7 +151,7 @@ metricbeat.modules:
 
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
-  #metricsets: ["status"]
+  #metricsets: ["dbstats", "status"]
   #enabled: true
   #period: 10s
 
@@ -148,7 +167,6 @@ metricbeat.modules:
 
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
-
 
 #-------------------------------- MySQL Module -------------------------------
 #- module: mysql

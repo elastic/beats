@@ -115,6 +115,11 @@ func (k *kafka) init(cfg *common.Config) error {
 		return err
 	}
 
+	// validate codec
+	if _, err := outputs.CreateEncoder(config.Codec); err != nil {
+		return err
+	}
+
 	topic, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "topic",
 		MultiKey:         "topics",
@@ -161,8 +166,14 @@ func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
 	var clients []mode.AsyncProtocolClient
 	hosts := k.config.Hosts
 	topic := k.topic
+
 	for i := 0; i < worker; i++ {
-		client, err := newKafkaClient(hosts, k.config.Key, topic, libCfg)
+		codec, err := outputs.CreateEncoder(k.config.Codec)
+		if err != nil {
+			return nil, err
+		}
+
+		client, err := newKafkaClient(hosts, k.config.Key, topic, codec, libCfg)
 		if err != nil {
 			logp.Err("Failed to create kafka client: %v", err)
 			return nil, err

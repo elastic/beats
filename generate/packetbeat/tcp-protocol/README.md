@@ -7,8 +7,10 @@ want to create the protocol analyzer (stand-alone, within packetbeat based
 project or packetbeat itself):
 
 ```
-cookiecutter $GOPATH/src/github.com/elastic/beats/generate/tcp-protocol
+cookiecutter ${GOPATH}/src/github.com/elastic/beats/generate/packetbeat/tcp-protocol
 ```
+
+Note: If you have multiple go paths use `${GOPATH%%:*}`instead of `${GOPATH}`.
 
 This requires [python](https://www.python.org/downloads/) and [cookiecutter](https://github.com/audreyr/cookiecutter) to be installed. More details on how to install cookiecutter can be found [here](http://cookiecutter.readthedocs.io/en/latest/installation.html).
 
@@ -100,8 +102,8 @@ func echo(sock net.Conn) {
 Create analyzer skeleton from code generator template. 
 
 ```
-  $ cd $GOPATH/src/github.com/elastic/beats/packetbeat/protos
-  $ cookiecutter $GOPATH/src/github.com/elastic/beats/generate/tcp-protocol
+  $ cd ${GOPATH}/src/github.com/elastic/beats/packetbeat/protos
+  $ cookiecutter ${GOPATH}/src/github.com/elastic/beats/generate/packetbeat/tcp-protocol
 ```
 
 Load plugin into packetbeat by adding `_ "github.com/elastic/beats/packetbeat/protos/echo"` to packetbeat import list in `$GOPATH/src/github.com/elastic/beats/packetbeat/main.go`
@@ -117,8 +119,8 @@ packetbeat later by copying the final plugin to
 Create custom beat (e.g. github.com/<username>/pb_echo):
 
 ```
-$ mkdir -p $GOPATH/src/github.com/<username>/pb_echo
-$ cd $GOPATH/src/github.com/<username>/pb_echo
+$ mkdir -p ${GOPATH}/src/github.com/<username>/pb_echo
+$ cd ${GOPATH}/src/github.com/<username>/pb_echo
 ```
 
 Add main.go importing packetbeat + new protocol (to be added to pb_echo/proto)
@@ -139,7 +141,7 @@ var Name = "pb_echo"
 
 // Setups and Runs Packetbeat
 func main() {
-	if err := beat.Run(Name, "", beater.New()); err != nil {
+	if err := beat.Run(Name, "", beater.New); err != nil {
 		os.Exit(1)
 	}
 }
@@ -150,7 +152,7 @@ Create protocol analyzer module (use name ‘echo’ for new protocol):
 ```
 $ mkdir proto
 $ cd proto
-$ cookiecutter $GOPATH/src/github.com/elastic/beats/generate/tcp-protocol
+$ cookiecutter ${GOPATH}/src/github.com/elastic/beats/generate/packetbeat/tcp-protocol
 ```
 
 ### 3 Implement application layer analyzer
@@ -234,13 +236,13 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 	responseTime := int32(resp.Ts.Sub(requ.Ts).Nanoseconds() / 1e6)
 
 	src := &common.Endpoint{
-		Ip:   requ.Tuple.Src_ip.String(),
-		Port: requ.Tuple.Src_port,
+		IP:   requ.Tuple.SrcIP.String(),
+		Port: requ.Tuple.SrcPort,
 		Proc: string(requ.CmdlineTuple.Src),
 	}
 	dst := &common.Endpoint{
-		Ip:   requ.Tuple.Dst_ip.String(),
-		Port: requ.Tuple.Dst_port,
+		IP:   requ.Tuple.DstIP.String(),
+		Port: requ.Tuple.DstPort,
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
 

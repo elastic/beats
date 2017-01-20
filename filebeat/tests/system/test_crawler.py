@@ -465,7 +465,7 @@ class Test(BaseTest):
 
         testfile = self.working_dir + "/log/test.log"
         with open(testfile, 'w') as f:
-            # Write lines before registar started
+            # Write lines before registrar started
             f.write("hello world 1\n")
             f.write("hello world 2\n")
             f.flush()
@@ -514,7 +514,7 @@ class Test(BaseTest):
 
         # Add utf-8 Chars for the first time
         with codecs.open(testfile, "w", "utf-8") as f:
-            # Write lines before registar started
+            # Write lines before registrar started
 
             # Special encoding needed?!?
             f.write("ニコラスRuflin".decode("utf-8") + "\n")

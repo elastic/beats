@@ -32,10 +32,11 @@ on a specific version of libbeat, check out the specific branch ({doc-branch} in
 
 ["source","sh",subs="attributes"]
 ----
-cd $GOPATH/src/github.com/elastic/beats
+cd ${GOPATH}/src/github.com/elastic/beats
 git checkout {doc-branch}
 ----
 
+Note: If you have multiple go paths use `${GOPATH%%:*}`instead of `${GOPATH}`.
 
 Now change to the directory where you want to create the beat.
 This directory is normally located under `$GOPATH/src/github.com/{your-github-name}`. Inside this directory, run the command to create the beat.
@@ -48,7 +49,7 @@ Run the command:
 
 [source,bash]
 ----
-cookiecutter $GOPATH/src/github.com/elastic/beats/generate/metricbeat/metricset
+cookiecutter ${GOPATH}/src/github.com/elastic/beats/generate/metricbeat/metricset
 ----
 
 When prompted, enter the Beat name and path.

@@ -1510,6 +1510,93 @@
         },
         "mongodb": {
           "properties": {
+            "dbstats": {
+              "properties": {
+                "avg_obj_size": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "collections": {
+                  "type": "long"
+                },
+                "data_file_version": {
+                  "properties": {
+                    "major": {
+                      "type": "long"
+                    },
+                    "minor": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "data_size": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "db": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "extent_free_list": {
+                  "properties": {
+                    "num": {
+                      "type": "long"
+                    },
+                    "size": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "file_size": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "index_size": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "indexes": {
+                  "type": "long"
+                },
+                "ns_size_mb": {
+                  "properties": {
+                    "mb": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "num_extents": {
+                  "type": "long"
+                },
+                "objects": {
+                  "type": "long"
+                },
+                "storage_size": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
+            },
             "status": {
               "properties": {
                 "asserts": {

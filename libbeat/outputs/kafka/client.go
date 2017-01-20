@@ -1,7 +1,6 @@
 package kafka
 
 import (
-	"encoding/json"
 	"expvar"
 	"fmt"
 	"sync"
@@ -21,6 +20,7 @@ type client struct {
 	hosts  []string
 	topic  outil.Selector
 	key    *fmtstr.EventFormatString
+	codec  outputs.Codec
 	config sarama.Config
 
 	producer sarama.AsyncProducer
@@ -47,12 +47,14 @@ func newKafkaClient(
 	hosts []string,
 	key *fmtstr.EventFormatString,
 	topic outil.Selector,
+	writer outputs.Codec,
 	cfg *sarama.Config,
 ) (*client, error) {
 	c := &client{
 		hosts:  hosts,
 		topic:  topic,
 		key:    key,
+		codec:  writer,
 		config: *cfg,
 	}
 	return c, nil
@@ -146,11 +148,12 @@ func (c *client) getEventMessage(data *outputs.Data) (*message, error) {
 	}
 	msg.topic = topic
 
-	jsonEvent, err := json.Marshal(event)
+	serializedEvent, err := c.codec.Encode(event)
 	if err != nil {
-		return nil, fmt.Errorf("json encoding failed with %v", err)
+		return nil, err
 	}
-	msg.value = jsonEvent
+
+	msg.value = serializedEvent
 
 	// message timestamps have been added to kafka with version 0.10.0.0
 	var ts time.Time

@@ -50,9 +50,6 @@ def fields_to_es_template(args, input, output, index, version):
         },
         "mappings": {
             "_default_": {
-                "_all": {
-                    "norms": False
-                },
                 "properties": {},
                 "_meta": {
                     "version": version,
@@ -61,10 +58,19 @@ def fields_to_es_template(args, input, output, index, version):
         }
     }
 
+    # should be done only for es5x. For es6x, any "_all" setting results
+    # in an error.
+    # TODO: https://github.com/elastic/beats/issues/3368
+    # template["mappings"]["_default"]["_all"] = {
+    #     "norms": False
+    # }
+
     if args.es2x:
         # different syntax for norms
-        template["mappings"]["_default_"]["_all"]["norms"] = {
-            "enabled": False
+        template["mappings"]["_default_"]["_all"] = {
+            "norms": {
+                "enabled": False
+            }
         }
     else:
         # For ES 5.x, increase the limit on the max number of fields.
@@ -162,10 +168,11 @@ def fill_section_properties(args, section, defaults, path):
     properties = {}
     dynamic_templates = []
 
-    for field in section["fields"]:
-        prop, dynamic = fill_field_properties(args, field, defaults, path)
-        properties.update(prop)
-        dynamic_templates.extend(dynamic)
+    if "fields" in section:
+        for field in section["fields"]:
+            prop, dynamic = fill_field_properties(args, field, defaults, path)
+            properties.update(prop)
+            dynamic_templates.extend(dynamic)
 
     return properties, dynamic_templates
 
@@ -222,7 +229,7 @@ def fill_field_properties(args, field, defaults, path):
                 "type": "ip"
             }
 
-    elif field["type"] in ["geo_point", "date", "long", "integer",
+    elif field["type"] in ["geo_point", "date", "long", "integer", "short", "byte",
                            "double", "float", "half_float", "scaled_float",
                            "boolean"]:
         # Convert all integer fields to long
@@ -292,12 +299,12 @@ def fill_field_properties(args, field, defaults, path):
             path = field["name"]
         prop, dynamic = fill_section_properties(args, field, defaults, path)
 
+        properties[field.get("name")] = {
+            "type": "nested",
+            "properties": {}
+        }
         # Only add properties if they have a content
         if len(prop) is not 0:
-            properties[field.get("name")] = {
-                "type": "nested",
-                "properties": {}
-            }
             properties[field.get("name")]["properties"] = prop
 
         dynamic_templates.extend(dynamic)

@@ -53,7 +53,7 @@ class Test(BaseTest):
 
         # wait until filebeat is fully running
         self.wait_until(
-            lambda: self.log_contains("All prospectors are initialised and running"),
+            lambda: self.log_contains("Loading and starting Prospectors completed."),
             max_timeout=15)
 
         # Start logging and rotating

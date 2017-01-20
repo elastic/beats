@@ -37,10 +37,10 @@ func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
 // Init sets up the prospector
 // It goes through all states coming from the registry. Only the states which match the glob patterns of
 // the prospector will be loaded and updated. All other states will not be touched.
-func (p *ProspectorLog) Init(states file.States) error {
+func (p *ProspectorLog) Init(states []file.State) error {
 	logp.Debug("prospector", "exclude_files: %s", p.config.ExcludeFiles)
 
-	for _, state := range states.GetStates() {
+	for _, state := range states {
 		// Check if state source belongs to this prospector. If yes, update the state.
 		if p.matchesFile(state.Source) {
 			state.TTL = -1

@@ -1,0 +1,225 @@
+[[heartbeat-getting-started]]
+== Getting Started With Heartbeat
+
+To get started with your own Heartbeat setup, install and configure these
+related products:
+
+ * Elasticsearch for storage and indexing the data.
+ * Kibana for the UI.
+ * Logstash (optional) for inserting data into Elasticsearch.
+ 
+See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack]
+for more information.
+
+After installing the Elastic Stack, read the following topics to learn how to
+install, configure, and run Heartbeat:
+
+* <<heartbeat-installation>>
+* <<heartbeat-configuration>>
+* <<heartbeat-template>>
+* <<heartbeat-starting>>
+* <<heartbeat-command-line>>
+* <<directory-layout>>
+
+
+[[heartbeat-installation]]
+=== Step 1: Installing Heartbeat
+
+Unlike most Beats, which you install on edge nodes, you typically install
+Heartbeat as part of monitoring service that runs on a separate machine
+and possibly even outside of the network where the services that you want to
+monitor are running. 
+
+//TODO: Add a separate topic that explores deployment scenarios in more detail (like installing on a sub-network where there's a firewall etc. 
+
+To download and install Heartbeat, use the commands that work with your
+system (<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora,
+<<mac,mac>> for OS X, and <<win, win>> for Windows).
+
+[NOTE]
+==================================================
+If you use Apt or Yum, you can {libbeat}/setup-repositories.html[install Heartbeat from our repositories] to update to the newest version more easily.
+
+See our https://www.elastic.co/downloads/beats/heartbeat[download page] for other installation options, such as 32-bit images.
+
+==================================================
+
+[[deb]]
+*deb:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+curl -L -O {downloads}/heartbeat/heartbeat-{version}-amd64.deb
+sudo dpkg -i heartbeat-{version}-amd64.deb
+----------------------------------------------------------------------
+
+[[rpm]]
+*rpm:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+curl -L -O {downloads}/heartbeat/heartbeat-{version}-x86_64.rpm
+sudo rpm -vi heartbeat-{version}-x86_64.rpm
+----------------------------------------------------------------------
+
+[[mac]]
+*mac:*
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O {downloads}/heartbeat/heartbeat-{version}-darwin-x86_64.tar.gz
+tar xzvf heartbeat-{version}-darwin-x86_64.tar.gz
+------------------------------------------------
+
+[[win]]
+*win:*
+
+. Download the Heartbeat Windows zip file from the
+https://www.elastic.co/downloads/beats/heartbeat[downloads page].
+
+. Extract the contents of the zip file into `C:\Program Files`.
+
+. Rename the +heartbeat-<version>-windows+ directory to +Heartbeat+.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select *Run As Administrator*). If you are running Windows XP, you may need
+to download and install PowerShell.
+
+. Run the following commands to install Heartbeat as a Windows service:
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+PS > cd 'C:\Program Files\Heartbeat'
+PS C:\Program Files\Heartbeat> .\install-service-heartbeat.ps1
+----------------------------------------------------------------------
+
+NOTE: If script execution is disabled on your system, you need to set the
+execution policy for the current session to allow the script to run. For
+example:
++PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-heartbeat.ps1+.
+
+Before starting Heartbeat, you should look at the configuration options in
+the configuration file, for example +C:\Program Files\Heartbeat\heartbeat.yml+
+or +/etc/heartbeat/heartbeat.yml+. For more information about these
+options, see <<heartbeat-configuration-details>>.
+
+[[heartbeat-configuration]]
+=== Step 2: Configuring Heartbeat
+
+To configure Heartbeat, you edit the configuration file. For rpm and deb,
+you'll find the configuration file at +/etc/heartbeat/heartbeat.yml+.
+For mac and win, look in the archive that you just extracted.
+
+Heartbeat provides monitors to check the status of hosts at set intervals.
+You configure each monitor individually. Heartbeat currently provides monitors
+for ICMP, TCP, and HTTP (see <<heartbeat-overview>> for more about these
+monitors). Here is an example that configures Heartbeat to use an `icmp`
+monitor:
+
+[source,yaml]
+----------------------------------------------------------------------
+heartbeat.monitors:
+- type: icmp 
+  schedule: '*/5 * * * * * *' 
+  hosts: ["myhost"]
+output.elasticsearch:
+  hosts: ["myhost:9200"]
+----------------------------------------------------------------------
+
+To configure Heartbeat:
+
+. Specify the list of monitors that you want to enable. Each item in the list
+begins with a dash (-). The following example configures Heartbeat to use two
+monitors, an `icmp` monitor and a `tcp` monitor:
++
+[source,yaml]
+----------------------------------------------------------------------
+heartbeat.monitors:
+- type: icmp
+  schedule: '*/5 * * * * * *' <1>
+  hosts: ["myhost"]
+- type: tcp 
+  schedule: '@every 5s' <2>
+  hosts: ["myhost:12345"]
+  mode: any <3>
+----------------------------------------------------------------------
+<1> The `icmp` monitor is scheduled to run exactly every 5 seconds (10:00:00,
+10:00:05, and so on). The `schedule` option uses a cron-like syntax based on
+https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementation].
+<2> The `tcp` monitor is set to run every 5 seconds from the time when Heartbeat
+was started. Heartbeat adds the `@every` keyword to the syntax provided by the
+`cronexpr` package.
+<3> The `mode` specifies whether to ping one IP (`any`) or all resolvable IPs
+(`all`).
++
+See <<heartbeat-configuration-details>> for a full description of each
+configuration option.
+
+. If you are sending output to Elasticsearch, set the IP address and port where
+Heartbeat can find the Elasticsearch installation:
++
+[source,yaml]
+----------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["192.168.1.42:9200"]
+----------------------------------------------------------------------
++
+If you are sending output to Logstash, see <<config-heartbeat-logstash>>
+instead.
+
+TIP: To test your configuration file, change to the directory where the
+Heartbeat binary is installed, and run Heartbeat in the foreground with
+the following options specified: +./heartbeat -configtest -e+. Make sure
+your config files are in the path expected by Heartbeat
+(see <<directory-layout>>). If you installed from DEB or RPM packages, run
++./heartbeat.sh -configtest -e+.
+
+[[heartbeat-template]]
+=== Step 3: Loading the Index Template in Elasticsearch
+
+:allplatforms:
+include::../../libbeat/docs/shared-template-load.asciidoc[]
+
+[[heartbeat-starting]]
+=== Step 4: Starting Heartbeat
+
+Start Heartbeat by issuing the appropriate command for your platform.
+
+*deb:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo /etc/init.d/ start
+----------------------------------------------------------------------
+
+*rpm:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo /etc/init.d/heartbeat start
+----------------------------------------------------------------------
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo ./heartbeat -e -c heartbeat.yml -d "publish"
+----------------------------------------------------------------------
+
+*win:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+PS C:\Program Files\Heartbeat> Start-Service heartbeat
+----------------------------------------------------------------------
+
+By default, Windows log files are stored in +C:\ProgramData\heartbeat\Logs+.
+
+Heartbeat is now ready to check the status of your services and send
+events to your defined output.
+
+//TODO: Add content about sample dashboards when the dashboards are available.
+
+//:allplatforms:
+
+//include::../../libbeat/docs/dashboards.asciidoc[]

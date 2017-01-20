@@ -8,6 +8,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/mitchellh/hashstructure"
+
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
@@ -21,6 +23,8 @@ var (
 )
 
 type Prospector struct {
+	// harvesterCounter MUST be first field in struct. See https://github.com/golang/go/issues/599
+	harvesterCounter uint64
 	cfg              *common.Config // Raw config
 	config           prospectorConfig
 	prospectorer     Prospectorer
@@ -30,11 +34,12 @@ type Prospector struct {
 	states           *file.States
 	wg               sync.WaitGroup
 	channelWg        sync.WaitGroup // Separate waitgroup for channels as not stopped on completion
-	harvesterCounter uint64
+	ID               uint64
+	Once             bool
 }
 
 type Prospectorer interface {
-	Init(states file.States) error
+	Init(states []file.State) error
 	Run()
 }
 
@@ -42,7 +47,7 @@ type Outlet interface {
 	OnEvent(event *input.Event) bool
 }
 
-func NewProspector(cfg *common.Config, states file.States, outlet Outlet) (*Prospector, error) {
+func NewProspector(cfg *common.Config, states []file.State, outlet Outlet) (*Prospector, error) {
 	prospector := &Prospector{
 		cfg:           cfg,
 		config:        defaultConfig,
@@ -52,16 +57,22 @@ func NewProspector(cfg *common.Config, states file.States, outlet Outlet) (*Pros
 		wg:            sync.WaitGroup{},
 		states:        &file.States{},
 		channelWg:     sync.WaitGroup{},
+		Once:          false,
 	}
 
-	if err := cfg.Unpack(&prospector.config); err != nil {
-		return nil, err
-	}
-	if err := prospector.config.Validate(); err != nil {
+	var err error
+	if err = cfg.Unpack(&prospector.config); err != nil {
 		return nil, err
 	}
 
-	err := prospector.Init(states)
+	var h map[string]interface{}
+	cfg.Unpack(&h)
+	prospector.ID, err = hashstructure.Hash(h, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = prospector.Init(states)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +83,7 @@ func NewProspector(cfg *common.Config, states file.States, outlet Outlet) (*Pros
 }
 
 // Init sets up default config for prospector
-func (p *Prospector) Init(states file.States) error {
+func (p *Prospector) Init(states []file.State) error {
 
 	var prospectorer Prospectorer
 	var err error
@@ -106,17 +117,19 @@ func (p *Prospector) Init(states file.States) error {
 }
 
 // Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
-func (p *Prospector) Run(once bool) {
+func (p *Prospector) Run() {
 
-	logp.Info("Starting prospector of type: %v", p.config.InputType)
+	logp.Info("Starting prospector of type: %v; id: %v ", p.config.InputType, p.ID)
 
-	// This waitgroup is not needed if run only once
-	// Waitgroup has to be added here to prevent panic in case Stop is called immediately afterwards
-	if !once {
-		// Add waitgroup to make sure prospectors finished
-		p.wg.Add(1)
-		defer p.wg.Done()
+	if p.Once {
+		// If only run once, waiting for completion of prospector / harvesters
+		defer p.wg.Wait()
 	}
+
+	// Add waitgroup to make sure prospectors finished
+	p.wg.Add(1)
+	defer p.wg.Done()
+
 	// Open channel to receive events from harvester and forward them to spooler
 	// Here potential filtering can happen
 	p.channelWg.Add(1)
@@ -139,10 +152,8 @@ func (p *Prospector) Run(once bool) {
 	// Initial prospector run
 	p.prospectorer.Run()
 
-	// Shuts down after the first complete scan of all prospectors
-	// As all harvesters are part of the prospector waitgroup, this waits for the closing of all harvesters
-	if once {
-		p.wg.Wait()
+	// Shuts down after the first complete run of all prospectors
+	if p.Once {
 		return
 	}
 
@@ -156,11 +167,6 @@ func (p *Prospector) Run(once bool) {
 			p.prospectorer.Run()
 		}
 	}
-}
-
-// IsEnabled returns true if the prospector is eanbled
-func (p *Prospector) IsEnabled() bool {
-	return p.config.Enabled
 }
 
 // updateState updates the prospector state and forwards the event to the spooler
@@ -183,7 +189,7 @@ func (p *Prospector) updateState(event *input.Event) error {
 }
 
 func (p *Prospector) Stop() {
-	logp.Info("Stopping Prospector")
+	logp.Info("Stopping Prospector: %v", p.ID)
 	close(p.done)
 	p.channelWg.Wait()
 	p.wg.Wait()

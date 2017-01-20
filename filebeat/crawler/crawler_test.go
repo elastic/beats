@@ -12,7 +12,7 @@ import (
 func TestNewCrawlerNoProspectorsError(t *testing.T) {
 	prospectorConfigs := []*common.Config{}
 
-	_, error := New(nil, prospectorConfigs)
+	_, error := New(nil, prospectorConfigs, false)
 
 	assert.Error(t, error)
 }

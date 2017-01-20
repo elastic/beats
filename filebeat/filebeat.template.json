@@ -1,9 +1,6 @@
 {
   "mappings": {
     "_default_": {
-      "_all": {
-        "norms": false
-      },
       "_meta": {
         "version": "5.3.0"
       },
@@ -21,6 +18,128 @@
       "properties": {
         "@timestamp": {
           "type": "date"
+        },
+        "apache2": {
+          "properties": {
+            "access": {
+              "properties": {
+                "agent": {
+                  "norms": false,
+                  "type": "text"
+                },
+                "body_sent": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "geoip": {
+                  "properties": {
+                    "continent_name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "country_iso_code": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "location": {
+                      "type": "geo_point"
+                    }
+                  }
+                },
+                "http_version": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "method": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "referrer": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "remote_ip": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "response_code": {
+                  "type": "long"
+                },
+                "url": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "user_agent": {
+                  "properties": {
+                    "device": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "major": {
+                      "type": "long"
+                    },
+                    "minor": {
+                      "type": "long"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "os": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "os_major": {
+                      "type": "long"
+                    },
+                    "os_minor": {
+                      "type": "long"
+                    },
+                    "os_name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "patch": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "user_name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "error": {
+              "properties": {
+                "client": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "level": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "message": {
+                  "norms": false,
+                  "type": "text"
+                },
+                "module": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "tid": {
+                  "type": "long"
+                }
+              }
+            }
+          }
         },
         "beat": {
           "properties": {
