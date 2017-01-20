@@ -2,11 +2,11 @@ package node
 
 import (
 	"encoding/json"
-	"io"
+
+	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"strconv"
 )
 
 type NodeSystemStats struct {
@@ -56,10 +56,10 @@ type Data struct {
 	Nodes []Node `json:"nodes"`
 }
 
-func eventsMapping(body io.Reader) []common.MapStr {
+func eventsMapping(content []byte) []common.MapStr {
 
 	var d Data
-	err := json.NewDecoder(body).Decode(&d)
+	err := json.Unmarshal(content, &d)
 	if err != nil {
 		logp.Err("Error: ", err)
 	}
