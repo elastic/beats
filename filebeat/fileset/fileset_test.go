@@ -1,3 +1,5 @@
+// +build !integration
+
 package fileset
 
 import (
@@ -176,7 +178,18 @@ func TestGetProspectorConfigNginxOverrides(t *testing.T) {
 	assert.True(t, cfg.HasField("paths"))
 	assert.True(t, cfg.HasField("exclude_files"))
 	assert.True(t, cfg.HasField("close_eof"))
-	pipeline_id := fs.vars["beat"].(map[string]interface{})["pipeline_id"]
-	assert.Equal(t, "nginx-access-with_plugins", pipeline_id)
+	pipelineID := fs.vars["beat"].(map[string]interface{})["pipeline_id"]
+	assert.Equal(t, "nginx-access-with_plugins", pipelineID)
 
+}
+
+func TestGetPipelineNginx(t *testing.T) {
+	fs := getModuleForTesting(t, "nginx", "access")
+	assert.NoError(t, fs.Read())
+
+	pipelineID, content, err := fs.GetPipeline()
+	assert.NoError(t, err)
+	assert.Equal(t, "nginx-access-with_plugins", pipelineID)
+	assert.Contains(t, content, "description")
+	assert.Contains(t, content, "processors")
 }

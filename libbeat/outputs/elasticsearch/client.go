@@ -27,6 +27,7 @@ type Client struct {
 	index    outil.Selector
 	pipeline *outil.Selector
 	params   map[string]string
+	timeout  time.Duration
 
 	// buffered bulk requests
 	bulkRequ *bulkRequest
@@ -173,6 +174,7 @@ func NewClient(
 		index:     s.Index,
 		pipeline:  pipeline,
 		params:    params,
+		timeout:   s.Timeout,
 
 		bulkRequ: bulkRequ,
 
@@ -584,7 +586,7 @@ func (client *Client) LoadTemplate(templateName string, template map[string]inte
 }
 
 func (client *Client) LoadJSON(path string, json map[string]interface{}) error {
-	status, _, err := client.request("PUT", path, "", nil, json)
+	status, _, err := client.Request("PUT", path, "", nil, json)
 	if err != nil {
 		return fmt.Errorf("couldn't load json. Error: %s", err)
 	}
@@ -599,7 +601,7 @@ func (client *Client) LoadJSON(path string, json map[string]interface{}) error {
 // and only if Elasticsearch returns with HTTP status code 200.
 func (client *Client) CheckTemplate(templateName string) bool {
 
-	status, _, _ := client.request("HEAD", "/_template/"+templateName, "", nil, nil)
+	status, _, _ := client.Request("HEAD", "/_template/"+templateName, "", nil, nil)
 
 	if status != 200 {
 		return false
@@ -657,7 +659,7 @@ func (conn *Connection) Close() error {
 	return nil
 }
 
-func (conn *Connection) request(
+func (conn *Connection) Request(
 	method, path string,
 	pipeline string,
 	params map[string]string,

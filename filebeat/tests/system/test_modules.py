@@ -21,7 +21,9 @@ class Test(BaseTest):
                                             "/../../../../module")
 
         self.filebeat = os.path.abspath(self.working_dir +
-                                        "/../../../../filebeat.py")
+                                        "/../../../../filebeat.test")
+
+        self.index_name = "test-filebeat-modules"
 
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
@@ -33,6 +35,14 @@ class Test(BaseTest):
             modules = modules.split(",")
         else:
             modules = os.listdir(self.modules_path)
+
+        # generate a minimal configuration
+        cfgfile = os.path.join(self.working_dir, "filebeat.yml")
+        self.render_config_template(
+            template="filebeat_modules.yml.j2",
+            output=cfgfile,
+            index_name=self.index_name,
+            elasticsearch_url=self.elasticsearch_url)
 
         for module in modules:
             path = os.path.join(self.modules_path, module)
@@ -47,28 +57,28 @@ class Test(BaseTest):
                     self.run_on_file(
                         module=module,
                         fileset=fileset,
-                        test_file=test_file)
+                        test_file=test_file,
+                        cfgfile=cfgfile)
 
-    def run_on_file(self, module, fileset, test_file):
+    def run_on_file(self, module, fileset, test_file, cfgfile):
         print("Testing {}/{} on {}".format(module, fileset, test_file))
 
-        index_name = "test-filebeat-modules"
         try:
-            self.es.indices.delete(index=index_name)
+            self.es.indices.delete(index=self.index_name)
         except:
             pass
 
         cmd = [
-            self.filebeat,
-            "--once",
-            "--modules={}".format(module),
+            self.filebeat, "-systemTest",
+            "-e", "-d", "*", "-once", "-setup",
+            "-c", cfgfile,
+            "-modules={}".format(module),
             "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file),
-            "--es", self.elasticsearch_url,
-            "--index", index_name,
-            "--registry", self.working_dir + "/registry"
+            "-M", "*.*.prospector.close_eof=true",
         ]
         output = open(os.path.join(self.working_dir, "output.log"), "ab")
+        output.write(" ".join(cmd) + "\n")
         subprocess.Popen(cmd,
                          stdin=None,
                          stdout=output,
@@ -76,10 +86,10 @@ class Test(BaseTest):
                          bufsize=0).wait()
 
         # Make sure index exists
-        self.wait_until(lambda: self.es.indices.exists(index_name))
+        self.wait_until(lambda: self.es.indices.exists(self.index_name))
 
-        self.es.indices.refresh(index=index_name)
-        res = self.es.search(index=index_name,
+        self.es.indices.refresh(index=self.index_name)
+        res = self.es.search(index=self.index_name,
                              body={"query": {"match_all": {}}})
         objects = [o["_source"] for o in res["hits"]["hits"]]
         assert len(objects) > 0
