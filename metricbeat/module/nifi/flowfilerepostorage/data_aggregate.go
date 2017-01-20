@@ -9,19 +9,8 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// FlowFileRepositoryStorageUsage ...
-type FlowFileRepositoryStorageUsage struct {
-	FreeSpace       string `json:"freeSpace"`
-	FreeSpaceBytes  uint64 `json:"freeSpaceBytes"`
-	TotalSpace      string `json:"totalSpace"`
-	TotalSpaceBytes uint64 `json:"totalSpaceBytes"`
-	UsedSpace       string `json:"usedSpace"`
-	UsedSpaceBytes  uint64 `json:"usedSpaceBytes"`
-	Utilization     string `json:"utilization"`
-}
-
-// Data ...
-type Data struct {
+// AggregateFlowFileRepositoryStorageUsage ...
+type AggregateFlowFileRepositoryStorageUsage struct {
 	SystemDiagnostics struct {
 		AggregateSnapshot struct {
 			FlowFileRepositoryStorageUsage `json:"flowFileRepositoryStorageUsage"`
@@ -29,8 +18,8 @@ type Data struct {
 	} `json:"systemDiagnostics"`
 }
 
-func eventMapping(body io.Reader) common.MapStr {
-	var data Data
+func aggregateEventMapping(body io.Reader) common.MapStr {
+	var data AggregateFlowFileRepositoryStorageUsage
 	err := json.NewDecoder(body).Decode(&data)
 	if err != nil {
 		logp.Err("Error: ", err)
