@@ -14,6 +14,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/monitoring/adapter"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
@@ -270,6 +272,15 @@ func (k *kafka) newKafkaConfig() (*sarama.Config, error) {
 	}
 
 	cfg.Producer.Partitioner = k.partitioner
+
+	// TODO: figure out which metrics we want to collect
+	cfg.MetricRegistry = adapter.GetGoMetrics(
+		monitoring.Default,
+		"libbeat.output.kafka",
+		adapter.Rename("incoming-byte-rate", "bytes_read"),
+		adapter.Rename("outgoing-byte-rate", "bytes_write"),
+		adapter.GoMetricsNilify,
+	)
 	return cfg, nil
 }
 
