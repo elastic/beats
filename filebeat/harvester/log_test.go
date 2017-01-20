@@ -132,7 +132,7 @@ func TestInitRegexp(t *testing.T) {
 
 // readLine reads a full line into buffer and returns it.
 // In case of partial lines, readLine does return an error and an empty string
-// This could potentialy be improved / replaced by https://github.com/elastic/beats/libbeat/tree/master/common/streambuf
+// This could potentially be improved / replaced by https://github.com/elastic/beats/libbeat/tree/master/common/streambuf
 func readLine(reader reader.Reader) (time.Time, string, int, common.MapStr, error) {
 	message, err := reader.Next()
 
