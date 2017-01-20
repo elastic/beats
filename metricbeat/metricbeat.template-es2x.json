@@ -670,19 +670,23 @@
             },
             "healthcheck": {
               "properties": {
-                "event_end_date": {
-                  "type": "date"
-                },
-                "event_exit_code": {
-                  "type": "long"
-                },
-                "event_output": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
-                },
-                "event_start_date": {
-                  "type": "date"
+                "event": {
+                  "properties": {
+                    "end_date": {
+                      "type": "date"
+                    },
+                    "exit_code": {
+                      "type": "long"
+                    },
+                    "output": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "start_date": {
+                      "type": "date"
+                    }
+                  }
                 },
                 "failingstreak": {
                   "type": "long"
