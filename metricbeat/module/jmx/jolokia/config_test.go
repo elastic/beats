@@ -9,12 +9,16 @@ import (
 
 func TestConfigParser(t *testing.T) {
 	metricSetupOK := []MetricSetup {
-		{"java.lang:type=Runtime","Uptime","uptime","integer"},
-		{"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep","CollectionTime","gc.cms_collection_time","integer"},
-		{"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep","CollectionCount","gc.cms_collection_count","integer"},
+		{"java.lang:type=Runtime",
+			[]Attribute {{"Uptime", "uptime"}}},
+		{"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep",
+			[]Attribute {{"CollectionTime","gc.cms_collection_time"},{"CollectionCount","gc.cms_collection_count"}},
+		},
 	}
+
 	metricSetupWithQuotes := []MetricSetup {
-		{"java.lang:type=SomeWeirdType\"1\"","A \"strange\" value","special_value","integer"},
+		{"java.lang:type=SomeWeirdType\"1\"",
+			[]Attribute {{"A \"strange\" value","special_value"}}},
 	}
 	jolokiaConfigInput := []MetricSetConfigInput{
 		{"localhost:4008", metricSetupOK, "application1", "instance1"},
@@ -42,7 +46,6 @@ func TestConfigParser(t *testing.T) {
 		"\"attribute\":[\"A \\\"strange\\\" value\"]}]"),
 		&expectedBodySpecial)
 
-	t.Log(expectedBodySpecial)
 	var actualBodyOK []Entry
 	err = json.Unmarshal([]byte(jolokiaConfig[0].Body), &actualBodyOK)
 	assert.Nil(t, err)

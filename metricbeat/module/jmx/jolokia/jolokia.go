@@ -29,7 +29,6 @@ type MetricSet struct {
 	client                *http.Client      // HTTP client that is reused across requests
 	metricSetConfig       []MetricSetConfig // array containing urls, bodies and mappings
 	namespace             string
-	updateElasticTemplate bool              // not implemented yet
 }
 
 // New create a new instance of the MetricSet
@@ -38,7 +37,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
 		ModuleConfigInput     []MetricSetConfigInput `config:"mappings"`
 		Namespace             string `config:"namespace" validate:"required"`
-		UpdateElasticTemplate bool `config:"updateElasticTemplate"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -48,9 +46,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if moduleConfig, parseErr := parseConfig(config.ModuleConfigInput); parseErr != nil {
 		return nil, parseErr
 	} else {
-		if config.UpdateElasticTemplate {
-			// TODO: build and send an updated template to Elastic
-		}
 		return &MetricSet{
 			BaseMetricSet:   base,
 			metricSetConfig: moduleConfig,

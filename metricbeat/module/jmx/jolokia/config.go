@@ -14,9 +14,12 @@ type MetricSetConfigInput struct {
 
 type MetricSetup struct {
 	MBean      string
+	Attributes []Attribute
+}
+
+type Attribute struct {
 	Attr       string
 	Field      string
-	Field_type string
 }
 
 type MetricSetConfig struct {
@@ -59,8 +62,10 @@ func buildRequestBodyAndMapping(mapping []MetricSetup) (string, map[string]strin
 	var requestBodyStructure = make(SliceSet)
 	var responseMapping = make(map[string]string)
 	for _, metricSetup := range mapping {
-		requestBodyStructure.Add(metricSetup.MBean, metricSetup.Attr)
-		responseMapping[metricSetup.MBean + "_" + metricSetup.Attr] = metricSetup.Field
+		for _, attribute := range metricSetup.Attributes {
+			requestBodyStructure.Add(metricSetup.MBean, attribute.Attr)
+			responseMapping[metricSetup.MBean + "_" + attribute.Attr] = attribute.Field
+		}
 	}
 	return marshalJSONRequest(requestBodyStructure), responseMapping
 }
