@@ -102,11 +102,11 @@ metricbeat.modules:
   #hosts: ["localhost:8091"]
 
 #------------------------------- Docker Module -------------------------------
-- module: docker
-  metricsets: ["cpu", "info", "memory", "network", "diskio", "container", "healthcheck"]
-  hosts: ["unix:///var/run/docker.sock"]
-  enabled: true
-  period: 10s
+#- module: docker
+  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container", "healthcheck"]
+  #hosts: ["unix:///var/run/docker.sock"]
+  #enabled: true
+  #period: 10s
 
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:
@@ -865,4 +865,3 @@ logging.files:
 
   # Number of rotated log files to keep. Oldest files will be deleted first.
   #keepfiles: 7
-
