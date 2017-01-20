@@ -41,13 +41,13 @@ func TestLoadTemplate(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Load template
-	absPath, err := filepath.Abs("../../tests/files/")
+	absPath, err := filepath.Abs("../../")
 	assert.NotNil(t, absPath)
 	assert.Nil(t, err)
 
-	templatePath := absPath + "/template.json"
+	templatePath := absPath + "/libbeat.template.json"
 	if strings.HasPrefix(client.Connection.version, "2.") {
-		templatePath = absPath + "/template-es2x.json"
+		templatePath = absPath + "/libbeat.template-es2x.json"
 	}
 	content, err := readTemplate(templatePath)
 	assert.Nil(t, err)
@@ -96,6 +96,8 @@ func TestLoadBeatsTemplate(t *testing.T) {
 
 	beats := []string{
 		"filebeat",
+		"heartbeat",
+		"libbeat",
 		"packetbeat",
 		"metricbeat",
 		"winlogbeat",
@@ -155,10 +157,10 @@ func TestOutputLoadTemplate(t *testing.T) {
 	// Make sure template is not yet there
 	assert.False(t, client.CheckTemplate("libbeat"))
 
-	templatePath := "../../../packetbeat/packetbeat.template.json"
+	templatePath := "../../libbeat.template.json"
 
 	if strings.HasPrefix(client.Connection.version, "2.") {
-		templatePath = "../../../packetbeat/packetbeat.template-es2x.json"
+		templatePath = "../../libbeat.template-es2x.json"
 	}
 
 	tPath, err := filepath.Abs(templatePath)
