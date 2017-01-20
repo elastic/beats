@@ -113,7 +113,7 @@ class Test(BaseTest):
         assert len(objs) == 3
         assert all([o["type"] == "http" for o in objs])
 
-        print(objs[0])
+        print((objs[0]))
         assert "response" not in objs[0]
         assert "request" not in objs[0]
 

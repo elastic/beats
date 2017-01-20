@@ -31,9 +31,9 @@ def fields_to_es_template(args, input, output, index, version):
         return
 
     # Each template needs defaults
-    if "defaults" not in docs.keys():
-        print("No defaults are defined. Each template needs at" +
-              " least defaults defined.")
+    if "defaults" not in list(docs.keys()):
+        print(("No defaults are defined. Each template needs at" +
+              " least defaults defined."))
         return
 
     defaults = docs["defaults"]
@@ -154,7 +154,7 @@ def dedot(group):
             fields.append(dedot(field))
         else:
             fields.append(field)
-    for _, field in dedotted.items():
+    for _, field in list(dedotted.items()):
         fields.append(dedot(field))
     group["fields"] = fields
     return group
@@ -185,7 +185,7 @@ def fill_field_properties(args, field, defaults, path):
     properties = {}
     dynamic_templates = []
 
-    for key in defaults.keys():
+    for key in list(defaults.keys()):
         if key not in field:
             field[key] = defaults[key]
 

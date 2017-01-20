@@ -7,7 +7,7 @@ pprint = lambda x: PrettyPrinter().pprint(x)
 
 
 def check_fields(flow, fields):
-    for k, v in fields.iteritems():
+    for k, v in fields.items():
         assert flow[k] == v
 
 

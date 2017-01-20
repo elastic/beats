@@ -24,8 +24,8 @@ class Test(BaseTest):
         assert o["type"] == "http"
         assert o["http.request.params"] == "pass=xxxxx&user=monica"
         assert o["path"] == "/login"
-        for _, val in o.items():
-            if isinstance(val, basestring):
+        for _, val in list(o.items()):
+            if isinstance(val, str):
                 assert "secret" not in val
 
     def test_http_hide_get(self):
@@ -45,8 +45,8 @@ class Test(BaseTest):
         assert o["type"] == "http"
         assert o["http.request.params"] == "pass=xxxxx&user=monica"
         assert o["path"] == "/login"
-        for _, val in o.items():
-            if isinstance(val, basestring):
+        for _, val in list(o.items()):
+            if isinstance(val, str):
                 assert "secret" not in val
 
     def test_http_hide_post_default(self):

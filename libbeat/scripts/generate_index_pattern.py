@@ -38,7 +38,7 @@ def field_to_json(desc, path, output,
     global unique_fields
 
     if path in unique_fields:
-        print("ERROR: Field {} is duplicated. Please delete it and try again. Fields already are {}".format(path, ", ".join(unique_fields)))
+        print(("ERROR: Field {} is duplicated. Please delete it and try again. Fields already are {}".format(path, ", ".join(unique_fields))))
         sys.exit(1)
     else:
         unique_fields.append(path)
@@ -165,4 +165,4 @@ if __name__ == "__main__":
     with open(target_file, 'w') as f:
         f.write(output)
 
-    print ("The index pattern was created under {}".format(target_file))
+    print(("The index pattern was created under {}".format(target_file)))

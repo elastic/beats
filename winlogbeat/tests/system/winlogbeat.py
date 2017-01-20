@@ -104,17 +104,17 @@ class WriteReadTest(BaseTest):
         if msg == None:
             assert "message" not in evt
         else:
-            self.assertEquals(evt["message"], msg)
+            self.assertEqual(evt["message"], msg)
             self.assertDictContainsSubset({"event_data.param1": msg}, evt)
 
         if sid == None:
-            self.assertEquals(evt["user.identifier"], self.get_sid_string())
-            self.assertEquals(evt["user.name"].lower(),
+            self.assertEqual(evt["user.identifier"], self.get_sid_string())
+            self.assertEqual(evt["user.name"].lower(),
                               win32api.GetUserName().lower())
-            self.assertEquals(evt["user.type"], "User")
+            self.assertEqual(evt["user.type"], "User")
             assert "user.domain" in evt
         else:
-            self.assertEquals(evt["user.identifier"], sid)
+            self.assertEqual(evt["user.identifier"], sid)
             assert "user.name" not in evt
             assert "user.type" not in evt
 

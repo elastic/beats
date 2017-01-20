@@ -64,9 +64,9 @@ class Test(BaseTest):
         assert sets['k2']['memcache.request.bytes'] == 20
         assert sets['k3']['memcache.request.bytes'] == 10
         assert all(o['memcache.request.opcode'] == 'SetQ'
-                   for o in sets.itervalues())
+                   for o in sets.values())
         assert all(o['memcache.request.quiet']
-                   for o in sets.itervalues())
+                   for o in sets.values())
 
     def test_delete(self):
         objs = self._run('memcache/memcache_bin_udp_delete.pcap')

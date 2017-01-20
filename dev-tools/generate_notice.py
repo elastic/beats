@@ -8,7 +8,7 @@ import argparse
 def read_file(filename):
 
     if not os.path.isfile(filename):
-        print("File not found {}".format(filename))
+        print(("File not found {}".format(filename)))
         return ""
 
     with open(filename, 'r') as f:
@@ -92,7 +92,7 @@ if __name__ == "__main__":
                                    '**/**/**/LICENSE*')
             licenses.append(license)
 
-    print("Get the licenses available from {}".format(licenses))
+    print(("Get the licenses available from {}".format(licenses)))
     create_notice(notice, args.beat, args.copyright, licenses)
 
-    print("Available at {}\n".format(notice))
+    print(("Available at {}\n".format(notice)))

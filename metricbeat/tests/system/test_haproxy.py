@@ -29,7 +29,7 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS), evt.keys(), evt)
+        self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS), list(evt.keys()), evt)
 
         self.assert_fields_are_documented(evt)
 
@@ -56,8 +56,8 @@ class Test(metricbeat.BaseTest):
         self.assertGreater(len(output), 0)
 
         for evt in output:
-            print evt
-            self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS), evt.keys(), evt)
+            print(evt)
+            self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS), list(evt.keys()), evt)
             self.assert_fields_are_documented(evt)
 
     def get_hosts(self):

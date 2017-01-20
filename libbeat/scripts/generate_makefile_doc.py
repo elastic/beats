@@ -116,17 +116,17 @@ def substitute_variable_targets(targets, variables):
 def print_help(categories, categories_set):
     column_size = max(len(rule["name"]) for category in categories_set for rule in categories[category])
     for category in categories_set:
-        print ("\n{}:".format(category))
+        print(("\n{}:".format(category)))
         for rule in categories[category]:
             if "name" in rule:
                 name = rule["name"]
             if "varname" in rule:
                 name = rule["varname"]
             default = rule["default"]
-            print ("\t{target: <{fill}}\t{doc}.{default}".format(
+            print(("\t{target: <{fill}}\t{doc}.{default}".format(
                 target=rule["name"], fill=column_size,
                  doc=rule["doc"],
-            default=(" Default: {}".format(default) if default else "")))
+            default=(" Default: {}".format(default) if default else ""))))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

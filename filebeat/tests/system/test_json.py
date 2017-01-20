@@ -194,8 +194,8 @@ class Test(BaseTest):
 
         output = self.read_output()
         assert len(output) == 5
-        assert all(isinstance(o["@timestamp"], basestring) for o in output)
-        assert all(isinstance(o["type"], basestring) for o in output)
+        assert all(isinstance(o["@timestamp"], str) for o in output)
+        assert all(isinstance(o["type"], str) for o in output)
         assert output[0]["@timestamp"] == "2016-04-05T18:47:18.444Z"
 
         assert output[1]["@timestamp"] != "invalid"
@@ -237,8 +237,8 @@ class Test(BaseTest):
 
         output = self.read_output()
         assert len(output) == 3
-        assert all(isinstance(o["@timestamp"], basestring) for o in output)
-        assert all(isinstance(o["type"], basestring) for o in output)
+        assert all(isinstance(o["@timestamp"], str) for o in output)
+        assert all(isinstance(o["type"], str) for o in output)
         assert output[0]["type"] == "test"
 
         assert output[1]["type"] == "log"
