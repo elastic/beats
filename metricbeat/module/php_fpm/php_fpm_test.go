@@ -12,9 +12,9 @@ func TestHostParser(t *testing.T) {
 	tests := []struct {
 		host, expected string
 	}{
-		{"localhost", "http://localhost/status"},
-		{"localhost:123", "http://localhost:123/status"},
-		{"http://localhost:123", "http://localhost:123/status"},
+		{"localhost", "http://localhost/status?json="},
+		{"localhost:123", "http://localhost:123/status?json="},
+		{"http://localhost:123", "http://localhost:123/status?json="},
 	}
 
 	m := mbtest.NewTestModule(t, map[string]interface{}{})

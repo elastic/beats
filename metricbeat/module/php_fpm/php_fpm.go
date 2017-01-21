@@ -18,6 +18,7 @@ const (
 var HostParser = parse.URLHostParserBuilder{
 	DefaultScheme: defaultScheme,
 	DefaultPath:   defaultPath,
+	QueryParams:   "json",
 	PathConfigKey: "status_path",
 }.Build()
 
@@ -32,7 +33,7 @@ type StatsClient struct {
 // NewStatsClient creates a new StatsClient
 func NewStatsClient(m mb.BaseMetricSet, isFullStats bool) *StatsClient {
 	var address string
-	address = m.HostData().SanitizedURI + "?json"
+	address = m.HostData().SanitizedURI
 	if isFullStats {
 		address += "&full"
 	}
