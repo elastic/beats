@@ -3807,6 +3807,7 @@ The current number of idle client connections waiting for a request.
 == php_fpm Fields
 
 PHP-FPM server status metrics collected from PHP-FPM.
+experimental[]
 
 
 

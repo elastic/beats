@@ -2,6 +2,9 @@
   title: "php_fpm"
   description: >
     PHP-FPM server status metrics collected from PHP-FPM.
+
+    experimental[]
+  short_config: false
   fields:
     - name: php_fpm
       type: group
