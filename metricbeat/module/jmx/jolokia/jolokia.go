@@ -26,17 +26,17 @@ func init() {
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	client                *http.Client      // HTTP client that is reused across requests
-	metricSetConfig       []MetricSetConfig // array containing urls, bodies and mappings
-	namespace             string
+	client          *http.Client      // HTTP client that is reused across requests
+	metricSetConfig []MetricSetConfig // array containing urls, bodies and mappings
+	namespace       string
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Additional configuration options
 	config := struct {
-		ModuleConfigInput     []MetricSetConfigInput `config:"mappings"`
-		Namespace             string `config:"namespace" validate:"required"`
+		ModuleConfigInput []MetricSetConfigInput `config:"mappings"`
+		Namespace         string                 `config:"namespace" validate:"required"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -50,7 +50,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			BaseMetricSet:   base,
 			metricSetConfig: moduleConfig,
 			client:          &http.Client{Timeout: base.Module().Config().Timeout},
-			namespace:     config.Namespace,
+			namespace:       config.Namespace,
 		}, nil
 	}
 

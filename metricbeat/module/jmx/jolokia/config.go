@@ -6,10 +6,10 @@ import (
 )
 
 type MetricSetConfigInput struct {
-	Host        string `yaml:"host"`
+	Host        string        `yaml:"host"`
 	Mapping     []MetricSetup `yaml:"mapping"`
-	Application string `yaml:"application"`
-	Instance    string `yaml:"instance"`
+	Application string        `yaml:"application"`
+	Instance    string        `yaml:"instance"`
 }
 
 type MetricSetup struct {
@@ -18,8 +18,8 @@ type MetricSetup struct {
 }
 
 type Attribute struct {
-	Attr       string
-	Field      string
+	Attr  string
+	Field string
 }
 
 type MetricSetConfig struct {
@@ -64,7 +64,7 @@ func buildRequestBodyAndMapping(mapping []MetricSetup) (string, map[string]strin
 	for _, metricSetup := range mapping {
 		for _, attribute := range metricSetup.Attributes {
 			requestBodyStructure.Add(metricSetup.MBean, attribute.Attr)
-			responseMapping[metricSetup.MBean + "_" + attribute.Attr] = attribute.Field
+			responseMapping[metricSetup.MBean+"_"+attribute.Attr] = attribute.Field
 		}
 	}
 	return marshalJSONRequest(requestBodyStructure), responseMapping

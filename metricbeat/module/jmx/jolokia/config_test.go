@@ -8,17 +8,17 @@ import (
 )
 
 func TestConfigParser(t *testing.T) {
-	metricSetupOK := []MetricSetup {
+	metricSetupOK := []MetricSetup{
 		{"java.lang:type=Runtime",
-			[]Attribute {{"Uptime", "uptime"}}},
+			[]Attribute{{"Uptime", "uptime"}}},
 		{"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep",
-			[]Attribute {{"CollectionTime","gc.cms_collection_time"},{"CollectionCount","gc.cms_collection_count"}},
+			[]Attribute{{"CollectionTime", "gc.cms_collection_time"}, {"CollectionCount", "gc.cms_collection_count"}},
 		},
 	}
 
-	metricSetupWithQuotes := []MetricSetup {
+	metricSetupWithQuotes := []MetricSetup{
 		{"java.lang:type=SomeWeirdType\"1\"",
-			[]Attribute {{"A \"strange\" value","special_value"}}},
+			[]Attribute{{"A \"strange\" value", "special_value"}}},
 	}
 	jolokiaConfigInput := []MetricSetConfigInput{
 		{"localhost:4008", metricSetupOK, "application1", "instance1"},
@@ -29,8 +29,8 @@ func TestConfigParser(t *testing.T) {
 	assert.Nil(t, err)
 
 	mappingConfigOK := map[string]string{
-		"java.lang:type=Runtime_Uptime": "uptime",
-		"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep_CollectionTime": "gc.cms_collection_time",
+		"java.lang:type=Runtime_Uptime":                                            "uptime",
+		"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep_CollectionTime":  "gc.cms_collection_time",
 		"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep_CollectionCount": "gc.cms_collection_count",
 	}
 	mappingConfigSpecial := map[string]string{
@@ -42,7 +42,7 @@ func TestConfigParser(t *testing.T) {
 		"\"attribute\":[\"CollectionTime\",\"CollectionCount\"]}]"), &expectedBodyOK)
 
 	var expectedBodySpecial []Entry
-	json.Unmarshal([]byte("[{\"type\":\"read\",\"mbean\":\"java.lang:type=SomeWeirdType\\\"1\\\"\"," +
+	json.Unmarshal([]byte("[{\"type\":\"read\",\"mbean\":\"java.lang:type=SomeWeirdType\\\"1\\\"\","+
 		"\"attribute\":[\"A \\\"strange\\\" value\"]}]"),
 		&expectedBodySpecial)
 
