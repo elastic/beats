@@ -1,0 +1,78 @@
+[[creating-metricbeat-module]]
+== Creating a Metricbeat Module
+
+Metricbeat modules are used to group multiple metricsets together and to implement shared functionality
+of the metricsets. In most cases, no implementation of the module is needed and the default module
+implementation is automatically picked.
+
+It's important to complete the configuration and documentation files for a module. When you create a new
+metricset by running `make create-metricset`, default versions of these files are generated in the `_meta` directory.
+
+[float]
+=== Module Files
+
+* `config.yml` and `config.full.yml`
+* `docs.asciidoc`
+* `fields.yml`
+
+After updating any of these files, make sure you run `make collect` in your beat directory so all generated
+files are updated.
+
+
+[float]
+==== config.yml and config.full.yml
+
+The `config.yml` file contains the basic configuration options and looks like this:
+
+[source,yaml]
+----
+include::../../scripts/module/config.yml[]
+----
+
+It contains the module name, your metricset, and the default period. If you have multiple
+metricsets in your module, make sure that you extend the metricset array:
+
+[source,yaml]
+----
+  metricsets: ["{metricset1}", "{metricset2}"]
+----
+
+The `full.config.yml` file is optional and by default has the same content as the `config.yml`. It is used
+to add and document more advanced configuration options that should not be part of the minimal
+config file shipped by default.
+
+[float]
+==== docs.asciidoc
+
+The `dosc.asciidoc` file contains the documentation about your module. During generation of the
+documentation, the default config file will be appended to the docs. Use this file to describe your
+module in more detail and to document specific configuration options.
+
+[source,asciidoc]
+----
+include::../../scripts/module/docs.asciidoc[]
+----
+
+[float]
+==== fields.yml
+
+The `fields.yml` file contains the top level structure for the fields in your metricset. It's used in combination with
+the `fields.yml` file in each metricset to generate the template and documentation for the fields.
+
+The default file looks like this:
+
+[source,yaml]
+----
+include::../../scripts/module/fields.yml[]
+----
+
+Make sure that you update at least the description of the module.
+
+
+[float]
+=== Testing
+
+It's a common pattern to use a `testing.go` file in the module package to share some testing functionality among
+the metricsets. This file does not have `_test.go` in the name because otherwise it would not be compiled for sub packages.
+
+To see an example of the `testing.go` file, look at the https://github.com/elastic/beats/tree/master/metricbeat/module/mysql[mysql module].

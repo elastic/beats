@@ -1,0 +1,12 @@
+- key: mysql
+  title: "MySQL"
+  description: >
+    MySQL server status metrics collected from MySQL.
+  short_config: false
+  fields:
+    - name: mysql
+      type: group
+      description: >
+        `mysql` contains the metrics that were obtained from MySQL
+        query.
+      fields:

@@ -9,7 +9,10 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/codecs/format"
+	"github.com/elastic/beats/libbeat/outputs/codecs/json"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -46,30 +49,41 @@ func event(k, v string) common.MapStr {
 	return common.MapStr{k: v}
 }
 
-func run(c *console, events ...common.MapStr) (string, error) {
+func run(codec outputs.Codec, events ...common.MapStr) (string, error) {
 	return withStdout(func() {
+		c, _ := newConsole(codec)
 		for _, event := range events {
-			c.PublishEvent(nil, outputs.Options{}, event)
+			c.PublishEvent(nil, outputs.Options{}, outputs.Data{Event: event})
 		}
 	})
 }
 
 func TestConsoleOneEvent(t *testing.T) {
-	lines, err := run(newConsole(false), event("event", "myevent"))
+	lines, err := run(json.New(false), event("event", "myevent"))
 	assert.Nil(t, err)
 	expected := "{\"event\":\"myevent\"}\n"
 	assert.Equal(t, expected, lines)
 }
 
 func TestConsoleOneEventIndented(t *testing.T) {
-	lines, err := run(newConsole(true), event("event", "myevent"))
+	lines, err := run(json.New(true), event("event", "myevent"))
 	assert.Nil(t, err)
 	expected := "{\n  \"event\": \"myevent\"\n}\n"
 	assert.Equal(t, expected, lines)
 }
 
+func TestConsoleOneEventFormatted(t *testing.T) {
+	lines, err := run(
+		format.New(fmtstr.MustCompileEvent("%{[event]}")),
+		event("event", "myevent"),
+	)
+	assert.Nil(t, err)
+	expected := "myevent\n"
+	assert.Equal(t, expected, lines)
+}
+
 func TestConsoleMultipleEvents(t *testing.T) {
-	lines, err := run(newConsole(false),
+	lines, err := run(json.New(false),
 		event("event", "event1"),
 		event("event", "event2"),
 		event("event", "event3"),
@@ -81,7 +95,7 @@ func TestConsoleMultipleEvents(t *testing.T) {
 }
 
 func TestConsoleMultipleEventsIndented(t *testing.T) {
-	lines, err := run(newConsole(true),
+	lines, err := run(json.New(true),
 		event("event", "event1"),
 		event("event", "event2"),
 		event("event", "event3"),

@@ -1,45 +1,25 @@
 package logstash
 
 import (
-	"errors"
-	"expvar"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/go-lumber/client/v2"
+
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
-
-// Metrics that can retrieved through the expvar web interface.
-var (
-	ackedEvents            = expvar.NewInt("libbeatLogstashPublishedAndAckedEvents")
-	eventsNotAcked         = expvar.NewInt("libbeatLogstashPublishedButNotAckedEvents")
-	publishEventsCallCount = expvar.NewInt("libbeatLogstashPublishEventsCallCount")
-)
-
-// client implements the ProtocolClient interface to be used
-// with different mode. The client implements slow start with low window sizes +
-// window size backoff in case of long running transactions.
-//
-// it is suggested to use lumberjack in conjunction with roundRobinConnectionMode
-// if logstash becomes unresponsive
-type client struct {
-	*transport.Client
-	*protocol
-
-	win             window
-	countTimeoutErr int
-}
 
 const (
 	minWindowSize             int = 1
 	defaultStartMaxWindowSize int = 10
 )
 
-// errors
-var (
-	ErrNotConnected = errors.New("lumberjack client is not connected")
-)
+type client struct {
+	*transport.Client
+	client *v2.SyncClient
+	win    window
+}
 
 func newLumberjackClient(
 	conn *transport.Client,
@@ -48,54 +28,65 @@ func newLumberjackClient(
 	timeout time.Duration,
 	beat string,
 ) (*client, error) {
-	p, err := newClientProcol(conn, timeout, compressLevel, beat)
+	c := &client{}
+	c.Client = conn
+	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
+
+	enc, err := makeLogstashEventEncoder(beat)
 	if err != nil {
 		return nil, err
 	}
 
-	c := &client{Client: conn, protocol: p}
-	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
+	cl, err := v2.NewSyncClientWithConn(conn,
+		v2.JSONEncoder(enc),
+		v2.Timeout(timeout),
+		v2.CompressionLevel(compressLevel))
+	if err != nil {
+		return nil, err
+	}
+
+	c.client = cl
 	return c, nil
 }
 
-func (l *client) Connect(timeout time.Duration) error {
+func (c *client) Connect(timeout time.Duration) error {
 	logp.Debug("logstash", "connect")
-	return l.Client.Connect()
+	return c.Client.Connect()
 }
 
-func (l *client) Close() error {
+func (c *client) Close() error {
 	logp.Debug("logstash", "close connection")
-	return l.Client.Close()
+	return c.Client.Close()
 }
 
-func (l *client) PublishEvent(event common.MapStr) error {
-	_, err := l.PublishEvents([]common.MapStr{event})
+func (c *client) PublishEvent(data outputs.Data) error {
+	_, err := c.PublishEvents([]outputs.Data{data})
 	return err
 }
 
 // PublishEvents sends all events to logstash. On error a slice with all events
 // not published or confirmed to be processed by logstash will be returned.
-func (l *client) PublishEvents(
-	events []common.MapStr,
-) ([]common.MapStr, error) {
+func (c *client) PublishEvents(
+	data []outputs.Data,
+) ([]outputs.Data, error) {
 	publishEventsCallCount.Add(1)
-	totalNumberOfEvents := len(events)
-	for len(events) > 0 {
-		n, err := l.publishWindowed(events)
+	totalNumberOfEvents := len(data)
+	for len(data) > 0 {
+		n, err := c.publishWindowed(data)
 
 		debug("%v events out of %v events sent to logstash. Continue sending",
-			n, len(events))
+			n, len(data))
 
-		events = events[n:]
+		data = data[n:]
 		if err != nil {
-			l.win.shrinkWindow()
-			_ = l.Close()
+			c.win.shrinkWindow()
+			_ = c.Close()
 
 			logp.Err("Failed to publish events caused by: %v", err)
 
-			eventsNotAcked.Add(int64(len(events)))
-			ackedEvents.Add(int64(totalNumberOfEvents - len(events)))
-			return events, err
+			eventsNotAcked.Add(int64(len(data)))
+			ackedEvents.Add(int64(totalNumberOfEvents - len(data)))
+			return data, err
 		}
 	}
 	ackedEvents.Add(int64(totalNumberOfEvents))
@@ -105,34 +96,38 @@ func (l *client) PublishEvents(
 // publishWindowed published events with current maximum window size to logstash
 // returning the total number of events sent (due to window size, or acks until
 // failure).
-func (l *client) publishWindowed(events []common.MapStr) (int, error) {
-	if len(events) == 0 {
+func (c *client) publishWindowed(data []outputs.Data) (int, error) {
+	if len(data) == 0 {
 		return 0, nil
 	}
 
-	batchSize := len(events)
-	windowSize := l.win.get()
+	batchSize := len(data)
+	windowSize := c.win.get()
 	debug("Try to publish %v events to logstash with window size %v",
 		batchSize, windowSize)
 
 	// prepare message payload
 	if batchSize > windowSize {
-		events = events[:windowSize]
+		data = data[:windowSize]
 	}
 
-	outEvents, err := l.sendEvents(events)
-	count := uint32(len(outEvents))
+	n, err := c.sendEvents(data)
 	if err != nil {
-		if err == errAllEventsEncoding {
-			return len(events), nil
-		}
-		return 0, err
+		return n, err
 	}
 
-	if seq, err := l.awaitACK(count); err != nil {
-		return int(seq), err
+	c.win.tryGrowWindow(batchSize)
+	return len(data), nil
+}
+
+func (c *client) sendEvents(data []outputs.Data) (int, error) {
+	if len(data) == 0 {
+		return 0, nil
 	}
 
-	l.win.tryGrowWindow(batchSize)
-	return len(events), nil
+	window := make([]interface{}, len(data))
+	for i, d := range data {
+		window[i] = d
+	}
+	return c.client.Send(window)
 }

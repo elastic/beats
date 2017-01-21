@@ -1,10 +1,10 @@
 # Installs golang on Windows.
 #
 # # Run script:
-# .\install-go.ps1 -version 1.5.3 
+# .\install-go.ps1 -version 1.7.3
 #
 # # Download and run script:
-# $env:GOVERSION = '1.5.3'
+# $env:GOVERSION = '1.7.3'
 # iex ((new-object net.webclient).DownloadString('SCRIPT_URL_HERE'))
 Param(
     [String]$version,
@@ -20,7 +20,7 @@ Download and install Golang on Windows. It sets the GOROOT environment
 variable and adds GOROOT\bin to the PATH environment variable.
 
 Usage:
-  $SCRIPT -version 1.5.3
+  $SCRIPT -version 1.7.3
 Options:
   -h | -help
     Print the help menu.

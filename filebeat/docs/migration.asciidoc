@@ -4,9 +4,7 @@
 [partintro]
 --
 Filebeat is based on the Logstash Forwarder source code and replaces Logstash Forwarder as the method
-to use for tailing log files and forwarding them to Logstash. This guide contains
-information to help you migrate from
-https://github.com/elastic/logstash-forwarder[Logstash Forwarder] to Filebeat.
+to use for tailing log files and forwarding them to Logstash. 
 
 Filebeat introduces the following major changes:
 
@@ -17,8 +15,18 @@ Filebeat introduces the following major changes:
 * Configuration options for outputs are now inherited from libbeat. For details, see the {libbeat}/index.html[Beats Platform Reference].
 * The https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] is required.
 
+The following topics describe how to migrate from
+https://github.com/elastic/logstash-forwarder[Logstash Forwarder] to Filebeat:
+
+* <<migration-input-plugin>>
+* <<migration-registry-file>>
+* <<migration-configuration>>
+* <<migration-changed-cli>>
+* <<migration-changed-fields>>
+* <<migration-other-changes>>
 --
 
+[[migration-input-plugin]]
 == Migrating to the Beats Input Plugin for Logstash
 
 Filebeat requires the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash].
@@ -35,16 +43,17 @@ Beats input plugin on the same Logstash instances, but set up the Beats input pl
 all the machines to Filebeat, you can remove the Lumberjack plugin.
 
 We realize that opening additional ports may not be feasible in your organization. Another option for phased migration
-to Filebeat is to ship data from Logstash Forwarder directly to the Beats input plugin. 
+to Filebeat is to ship data from Logstash Forwarder directly to the Beats input plugin.
 
 IMPORTANT: This data shipping path is only supported for migrating to Filebeat and will no longer be supported when Logstash Forwarder reaches https://www.elastic.co/support/eol[End of Life].
 
 What's required?
 
-* The https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] 
+* The https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash]
 version 2.2.8 or later.
 * SSL must be explicitly enabled in the Beats input plugin (`ssl => true`) because SSL is on by default with Logstash Forwarder. The SSL/TLS configs should be the same for both the Logstash Forwarder and Filebeat instances.
 
+[[migration-registry-file]]
 ==  Updating the Registry File
 
 The registry file stores the state and location information that Filebeat uses to track
@@ -68,6 +77,7 @@ Filebeat configuration file to true.
 Using this approach allows you to keep the old Logstash Forwarder running and then
 slowly migrate over to Filebeat.
 
+[[migration-configuration]]
 == Migrating Your Configuration
 
 Although Filebeat is based on Logstash Forwarder, Filebeat uses YAML for its configuration
@@ -124,24 +134,22 @@ The equivalent `prospectors` section would look like this:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  # List of prospectors to fetch data.
-  prospectors:
-    # Each - is a prospector. Below are the prospector specific configurations
-    - input_type: log
-      paths:
-        - /var/log/messages
-        - "/var/log/*.log"
-      document_type: syslog <1>
-      fields:
-        service: apache
-        zone: us-east-1
-    - input_type: stdin <2>
-      document_type: stdin
-    - input_type: log
-      paths:
-        - "/var/log/apache2/httpd-*.log"
-      document_type: apache
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /var/log/messages
+    - /var/log/*.log
+  document_type: syslog <1>
+  fields:
+    service: apache
+    zone: us-east-1
+  fields_under_root: true
+- input_type: stdin <2>
+  document_type: stdin
+- input_type: log
+  paths:
+    - /var/log/apache2/httpd-*.log
+  document_type: apache
 -------------------------------------------------------------------------------------
 
 <1> The `document_type` option controls the output `type` field, which is used by the
@@ -201,34 +209,23 @@ The equivalent in Filebeat would look like this:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-output:
-  logstash:
-    # The Logstash hosts. <1>
-    hosts:
-      - localhost:5043
-
-    # Network timeout in seconds.
-    timeout: 15
-
-    tls: <2>
-      # List of root certificates for HTTPS server verifications
-      certificate_authorities:
-        - ./logstash-forwarder.crt
-
-      # Certificate for TLS client authentication
-      certificate: ./logstash-forwarder.crt
-
-      # Client Certificate Key
-      certificate_key: ./logstash-forwarder.key
+output.logstash:
+  hosts: <1>
+    - localhost:5043
+  timeout: 15
+  ssl.certificate_authorities: <2>
+    - ./logstash-forwarder.crt
+  ssl.certificate: ./logstash-forwarder.crt
+  ssl.key: ./logstash-forwarder.key
 -------------------------------------------------------------------------------------
 
 <1> When multiple hosts are defined, the default behavior in Filebeat is to
     pick a random host for new connections, similar to the Logstash Forwarder
     behavior. Filebeat can optionally do load balancing. For more details, see the
     <<loadbalance>> configuration option.
-<2> Note that if the `tls` section is missing, then TLS is disabled. TLS is
-    automatically enabled when you add the `tls` section. For more information about
-    specific configuration options, see <<configuration-output-tls>>.
+<2> Note that if the `ssl` settings are missing, then SSL is disabled. SSL is
+    automatically enabled when you add any of the `ssl` options. For more information about
+    specific configuration options, see <<configuration-output-ssl>>.
 
 
 [[changed-configuration-options]]
@@ -286,19 +283,18 @@ Filebeat configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    - input_type: log
-      paths:
-        - "/var/log/*.log"
-      document_type: syslog
-      fields:
-        service: test01
-output:
-  elasticsearch:
-    hosts: ["http://localhost:5043"]
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /var/log/*.log
+  document_type: syslog
+  fields:
+    service: test01
+output.elasticsearch:
+  hosts: ["http://localhost:5043"]
 -------------------------------------------------------------------------------------
 
+[[migration-changed-cli]]
 == Changes to Command Line Options
 
 Most command line options available in Logstash Forwarder have been removed and
@@ -357,7 +353,7 @@ The `config_dir` option specifies the path to the directory that contains additi
 
 |===
 
-
+[[migration-changed-fields]]
 == Changes to the Output Fields
 
 In the default configuration, Filebeat structures its output documents a little
@@ -375,15 +371,14 @@ you can use the <<fields-under-root>> configuration option:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    - input_type: log
-      paths:
-        - "/var/log/*.log"
-      document_type: syslog
-      fields:
-        service: test01
-      fields_under_root: true
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /var/log/*.log
+  document_type: syslog
+  fields:
+    service: test01
+  fields_under_root: true
 -------------------------------------------------------------------------------------
 
 [float]
@@ -419,6 +414,7 @@ The `line` field was removed. This field wasn't correct after restarts, and
 making it correct would have resulted in a performance penalty. We recommend
 using the `offset` field instead.
 
+[[migration-other-changes]]
 == Other Changes
 
 The following list of implementation changes should not affect your experience migrating
@@ -447,10 +443,10 @@ Behind the scenes, Filebeat uses a sightly improved protocol for communicating
 with Logstash.
 
 [float]
-=== TLS Is Off by Default
+=== SSL Is Off by Default
 
-If you follow the section on migrating the configuration, you will have TLS
-enabled. However, you must be aware that if the `tls` section is missing from the
+If you follow the section on migrating the configuration, you will have SSL
+enabled. However, you must be aware that if the `ssl` section is missing from the
 configuration file, Filebeat uses an unencrypted connection to talk to Logstash.
 
 [float]

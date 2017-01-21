@@ -11,7 +11,7 @@ type Dialer interface {
 	Dial(network, address string) (net.Conn, error)
 }
 
-type DialerFunc func(netowrk, address string) (net.Conn, error)
+type DialerFunc func(network, address string) (net.Conn, error)
 
 var (
 	ErrNotConnected = errors.New("client is not connected")

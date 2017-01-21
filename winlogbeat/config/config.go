@@ -31,10 +31,25 @@ type Settings struct {
 	Raw        map[string]interface{} `config:",inline"`
 }
 
+var (
+	DefaultSettings = Settings{
+		Winlogbeat: WinlogbeatConfig{
+			RegistryFile: DefaultRegistryFile,
+		},
+	}
+)
+
 // Validate validates the Settings data and returns an error describing
 // all problems or nil if there are none.
 func (s Settings) Validate() error {
-	validKeys := []string{"filters", "logging", "output", "shipper", "winlogbeat"}
+	// TODO: winlogbeat should not try to validate top-level beats config
+
+	validKeys := []string{
+		"fields", "fields_under_root", "tags",
+		"name", "refresh_topology_freq", "topology_expire", "geoip",
+		"queue_size", "bulk_queue_size", "max_procs",
+		"processors", "logging", "output", "path", "winlogbeat",
+	}
 	sort.Strings(validKeys)
 
 	// Check for invalid top-level keys.

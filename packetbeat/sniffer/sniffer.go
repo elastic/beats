@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"strconv"
 	"syscall"
 	"time"
@@ -19,8 +20,8 @@ import (
 
 type SnifferSetup struct {
 	pcapHandle     *pcap.Handle
-	afpacketHandle *AfpacketHandle
-	pfringHandle   *PfringHandle
+	afpacketHandle *afpacketHandle
+	pfringHandle   *pfringHandle
 	config         *config.InterfacesConfig
 	isAlive        bool
 	dumper         *pcap.Dumper
@@ -37,30 +38,30 @@ type Worker interface {
 	OnPacket(data []byte, ci *gopacket.CaptureInfo)
 }
 
-type WorkerFactory func(layers.LinkType) (Worker, string, error)
+type WorkerFactory func(layers.LinkType) (Worker, error)
 
 // Computes the block_size and the num_blocks in such a way that the
 // allocated mmap buffer is close to but smaller than target_size_mb.
 // The restriction is that the block_size must be divisible by both the
 // frame size and page size.
-func afpacketComputeSize(target_size_mb int, snaplen int, page_size int) (
-	frame_size int, block_size int, num_blocks int, err error) {
+func afpacketComputeSize(targetSizeMb int, snaplen int, pageSize int) (
+	frameSize int, blockSize int, numBlocks int, err error) {
 
-	if snaplen < page_size {
-		frame_size = page_size / (page_size / snaplen)
+	if snaplen < pageSize {
+		frameSize = pageSize / (pageSize / snaplen)
 	} else {
-		frame_size = (snaplen/page_size + 1) * page_size
+		frameSize = (snaplen/pageSize + 1) * pageSize
 	}
 
 	// 128 is the default from the gopacket library so just use that
-	block_size = frame_size * 128
-	num_blocks = (target_size_mb * 1024 * 1024) / block_size
+	blockSize = frameSize * 128
+	numBlocks = (targetSizeMb * 1024 * 1024) / blockSize
 
-	if num_blocks == 0 {
+	if numBlocks == 0 {
 		return 0, 0, 0, fmt.Errorf("Buffer size too small")
 	}
 
-	return frame_size, block_size, num_blocks, nil
+	return frameSize, blockSize, numBlocks, nil
 }
 
 func deviceNameFromIndex(index int, devices []string) (string, error) {
@@ -74,8 +75,9 @@ func deviceNameFromIndex(index int, devices []string) (string, error) {
 
 // ListDevicesNames returns the list of adapters available for sniffing on
 // this computer. If the withDescription parameter is set to true, a human
-// readable version of the adapter name is added.
-func ListDeviceNames(withDescription bool) ([]string, error) {
+// readable version of the adapter name is added. If the withIP parameter
+// is set to true, IP address of the adatper is added.
+func ListDeviceNames(withDescription bool, withIP bool) ([]string, error) {
 	devices, err := pcap.FindAllDevs()
 	if err != nil {
 		return []string{}, err
@@ -83,15 +85,34 @@ func ListDeviceNames(withDescription bool) ([]string, error) {
 
 	ret := []string{}
 	for _, dev := range devices {
+		r := dev.Name
+
 		if withDescription {
 			desc := "No description available"
 			if len(dev.Description) > 0 {
 				desc = dev.Description
 			}
-			ret = append(ret, fmt.Sprintf("%s (%s)", dev.Name, desc))
-		} else {
-			ret = append(ret, dev.Name)
+			r += fmt.Sprintf(" (%s)", desc)
 		}
+
+		if withIP {
+			ips := "Not assigned ip address"
+			if len(dev.Addresses) > 0 {
+				ips = ""
+
+				for i, address := range []pcap.InterfaceAddress(dev.Addresses) {
+					// Add a space between the IP address.
+					if i > 0 {
+						ips += " "
+					}
+
+					ips += fmt.Sprintf("%s", address.IP.String())
+				}
+			}
+			r += fmt.Sprintf(" (%s)", ips)
+
+		}
+		ret = append(ret, r)
 	}
 	return ret, nil
 }
@@ -113,7 +134,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 	}
 
 	if index, err := strconv.Atoi(sniffer.config.Device); err == nil { // Device is numeric
-		devices, err := ListDeviceNames(false)
+		devices, err := ListDeviceNames(false, false)
 		if err != nil {
 			return fmt.Errorf("Error getting devices list: %v", err)
 		}
@@ -159,23 +180,23 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.pcapHandle)
 
 	case "af_packet":
-		if sniffer.config.Buffer_size_mb == 0 {
-			sniffer.config.Buffer_size_mb = 24
+		if sniffer.config.BufferSizeMb == 0 {
+			sniffer.config.BufferSizeMb = 24
 		}
 
-		frame_size, block_size, num_blocks, err := afpacketComputeSize(
-			sniffer.config.Buffer_size_mb,
+		frameSize, blockSize, numBlocks, err := afpacketComputeSize(
+			sniffer.config.BufferSizeMb,
 			sniffer.config.Snaplen,
 			os.Getpagesize())
 		if err != nil {
 			return err
 		}
 
-		sniffer.afpacketHandle, err = NewAfpacketHandle(
+		sniffer.afpacketHandle, err = newAfpacketHandle(
 			sniffer.config.Device,
-			frame_size,
-			block_size,
-			num_blocks,
+			frameSize,
+			blockSize,
+			numBlocks,
 			500*time.Millisecond)
 		if err != nil {
 			return err
@@ -188,7 +209,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.afpacketHandle)
 	case "pfring", "pf_ring":
-		sniffer.pfringHandle, err = NewPfringHandle(
+		sniffer.pfringHandle, err = newPfringHandle(
 			sniffer.config.Device,
 			sniffer.config.Snaplen,
 			true)
@@ -241,21 +262,31 @@ func (sniffer *SnifferSetup) Datalink() layers.LinkType {
 	return layers.LinkTypeEthernet
 }
 
-func (sniffer *SnifferSetup) Init(test_mode bool, factory WorkerFactory, interfaces *config.InterfacesConfig) error {
+func (sniffer *SnifferSetup) Init(testMode bool, filter string, factory WorkerFactory, interfaces *config.InterfacesConfig) error {
 	var err error
 
-	if !test_mode {
+	if !testMode {
+		sniffer.filter = filter
+		logp.Debug("sniffer", "BPF filter: '%s'", sniffer.filter)
 		err = sniffer.setFromConfig(interfaces)
 		if err != nil {
 			return fmt.Errorf("Error creating sniffer: %v", err)
 		}
 	}
 
-	sniffer.worker, sniffer.filter, err = factory(sniffer.Datalink())
+	if len(interfaces.File) == 0 {
+		if interfaces.Device == "any" {
+			// OS X or Windows
+			if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
+				return fmt.Errorf("any interface is not supported on %s", runtime.GOOS)
+			}
+		}
+	}
+
+	sniffer.worker, err = factory(sniffer.Datalink())
 	if err != nil {
 		return fmt.Errorf("Error creating decoder: %v", err)
 	}
-	logp.Debug("sniffer", "BPF filter: '%s'", sniffer.filter)
 
 	if sniffer.config.Dumpfile != "" {
 		p, err := pcap.OpenDead(sniffer.Datalink(), 65535)
@@ -276,8 +307,8 @@ func (sniffer *SnifferSetup) Init(test_mode bool, factory WorkerFactory, interfa
 func (sniffer *SnifferSetup) Run() error {
 	counter := 0
 	loopCount := 1
-	var lastPktTime *time.Time = nil
-	var ret_error error
+	var lastPktTime *time.Time
+	var retError error
 
 	for sniffer.isAlive {
 		if sniffer.config.OneAtATime {
@@ -294,7 +325,7 @@ func (sniffer *SnifferSetup) Run() error {
 
 		if err == io.EOF {
 			logp.Debug("sniffer", "End of file")
-			loopCount += 1
+			loopCount++
 			if sniffer.config.Loop > 0 && loopCount > sniffer.config.Loop {
 				// give a bit of time to the publish goroutine
 				// to flush
@@ -306,7 +337,7 @@ func (sniffer *SnifferSetup) Run() error {
 			logp.Debug("sniffer", "Reopening the file")
 			err = sniffer.Reopen()
 			if err != nil {
-				ret_error = fmt.Errorf("Error reopening file: %s", err)
+				retError = fmt.Errorf("Error reopening file: %s", err)
 				sniffer.isAlive = false
 				continue
 			}
@@ -315,7 +346,7 @@ func (sniffer *SnifferSetup) Run() error {
 		}
 
 		if err != nil {
-			ret_error = fmt.Errorf("Sniffing error: %s", err)
+			retError = fmt.Errorf("Sniffing error: %s", err)
 			sniffer.isAlive = false
 			continue
 		}
@@ -356,7 +387,7 @@ func (sniffer *SnifferSetup) Run() error {
 		sniffer.dumper.Close()
 	}
 
-	return ret_error
+	return retError
 }
 
 func (sniffer *SnifferSetup) Close() error {

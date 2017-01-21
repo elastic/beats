@@ -1,5 +1,6 @@
 import yaml
-import sys
+import os
+import argparse
 
 def document_fields(output, section, sections, path):
     if "anchor" in section:
@@ -8,9 +9,12 @@ def document_fields(output, section, sections, path):
     if "prefix" in section:
         output.write("{}\n".format(section["prefix"]))
 
-    output.write("=== {} Fields\n\n".format(section["name"]))
+    # Intermediate level titles
+    if "description" in section and "prefix" not in section and "anchor" not in section:
+        output.write("[float]\n")
 
     if "description" in section:
+        output.write("== {} Fields\n\n".format(section["name"]))
         output.write("{}\n\n".format(section["description"]))
 
     if "fields" not in section or not section["fields"]:
@@ -25,14 +29,6 @@ def document_fields(output, section, sections, path):
             newpath = path + "." + field["name"]
 
         if "type" in field and field["type"] == "group":
-
-            for value in sections:
-                sec = value[0]
-                name = value[1]
-                if sec == field["name"]:
-                    field["anchor"] = field["name"]
-                    field["name"] = name
-                    break
             document_fields(output, field, sections, newpath)
         else:
             document_field(output, field, newpath)
@@ -43,7 +39,7 @@ def document_field(output, field, path):
     if "path" not in field:
         field["path"] = path
 
-    output.write("==== {}\n\n".format(field["path"]))
+    output.write("[float]\n=== {}\n\n".format(field["path"]))
 
     if "type" in field:
         output.write("type: {}\n\n".format(field["type"]))
@@ -64,12 +60,15 @@ def fields_to_asciidoc(input, output, beat):
 
     output.write("""
 ////
-This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-== Exported Fields
+= Exported Fields
 
+[partintro]
+
+--
 This document describes the fields that are exported by {beat}. They are
 grouped in the following categories:
 
@@ -80,53 +79,56 @@ grouped in the following categories:
 
     # fields file is empty
     if docs is None:
-        print "fields.yml file is empty. fields.asciidoc cannot be generated."
+        print("fields.yml file is empty. fields.asciidoc cannot be generated.")
         return
 
-    # If no sections are defined, docs can't be generated
-    if "sections" not in docs.keys():
-        print "Sections is not defined in fields.yml. fields.asciidoc cannot be generated."
-        return
+    # Create sections from available fields
+    sections = {}
+    for v in docs["fields"]:
+        sections[v["key"]] = v["title"]
 
-    sections = docs["sections"]
+    for key in sorted(sections):
+        output.write("* <<exported-fields-{}>>\n".format(key))
+    output.write("\n--\n")
 
-    # Check if sections is define
-    if sections is None:
-        print "No sections are defined in fields.yml. fields.asciidoc cannot be generated."
-        return
-
-    for doc, _ in sections:
-        output.write("* <<exported-fields-{}>>\n".format(doc))
-    output.write("\n")
-
-    for value in sections:
-
-        doc = value[0]
-        name = value[1]
-
-        if doc in docs:
-            section = docs[doc]
-            if "type" in section:
-                if section["type"] == "group":
-                    section["name"] = name
-                    section["anchor"] = doc
-                    document_fields(output, section, sections, "")
-
+    # Sort alphabetically by key
+    for section in sorted(docs["fields"], key=lambda field: field["key"]):
+        section["name"] = section["title"]
+        section["anchor"] = section["key"]
+        document_fields(output, section, sections, "")
 
 if __name__ == "__main__":
 
-    if len(sys.argv) != 3:
-        print "Usage: %s beatpath beatname" % sys.argv[0]
-        sys.exit(1)
 
-    beat_path = sys.argv[1]
-    beat_name = sys.argv[2]
+    parser = argparse.ArgumentParser(
+        description="Generates the documentation for a Beat.")
+    parser.add_argument("path", help="Path to the beat folder")
+    parser.add_argument("beatname", help="The beat name")
+    parser.add_argument("es_beats", help="The path to the general beats folder")
 
-    input = open(beat_path + "/etc/fields.yml", 'r')
+    args = parser.parse_args()
+
+    beat_path = args.path
+    beat_name = args.beatname
+    es_beats = args.es_beats
+
+    fields_yml = beat_path + "/_meta/fields.generated.yml"
+
+    # Not all beats have a fields.generated.yml. Fall back to fields.yml
+    if not os.path.isfile(fields_yml):
+        fields_yml = beat_path + "/_meta/fields.yml"
+
+    # Read fields.yml
+    with open(fields_yml) as f:
+        fields = f.read()
+
+    # Prepends beat fields from libbeat
+    with open(es_beats + "/libbeat/_meta/fields.generated.yml") as f:
+        fields = f.read() + fields
+
     output = open(beat_path + "/docs/fields.asciidoc", 'w')
 
     try:
-        fields_to_asciidoc(input, output, beat_name.title())
+        fields_to_asciidoc(fields, output, beat_name.title())
     finally:
-        input.close()
         output.close()

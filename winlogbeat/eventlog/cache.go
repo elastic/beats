@@ -14,7 +14,7 @@ import (
 
 // Stats for the message file caches.
 var (
-	cacheStats = expvar.NewMap("msgFileCacheStats")
+	cacheStats = expvar.NewMap("msg_file_cache")
 )
 
 // Constants that control the cache behavior.

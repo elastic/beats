@@ -1,44 +1,6 @@
 package harvester
 
-import (
-	"regexp"
-	"time"
-
-	"github.com/elastic/beats/filebeat/harvester/processor"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-)
-
-// readLine reads a full line into buffer and returns it.
-// In case of partial lines, readLine does return and error and en empty string
-// This could potentialy be improved / replaced by https://github.com/elastic/beats/libbeat/tree/master/common/streambuf
-func readLine(reader processor.LineProcessor) (time.Time, string, int, common.MapStr, error) {
-	l, err := reader.Next()
-
-	// Full line read to be returned
-	if l.Bytes != 0 && err == nil {
-		return l.Ts, string(l.Content), l.Bytes, l.Fields, err
-	}
-
-	return time.Time{}, "", 0, nil, err
-}
-
-// InitRegexps initializes a list of compiled regular expressions.
-func InitRegexps(exprs []string) ([]*regexp.Regexp, error) {
-
-	result := []*regexp.Regexp{}
-
-	for _, exp := range exprs {
-
-		rexp, err := regexp.CompilePOSIX(exp)
-		if err != nil {
-			logp.Err("Fail to compile the regexp %s: %s", exp, err)
-			return nil, err
-		}
-		result = append(result, rexp)
-	}
-	return result, nil
-}
+import "regexp"
 
 // MatchAnyRegexps checks if the text matches any of the regular expressions
 func MatchAnyRegexps(regexps []*regexp.Regexp, text string) bool {

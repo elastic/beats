@@ -1,0 +1,19 @@
+{
+	"comment": "",
+	"ignore": "",
+	"package": [
+		{
+			"checksumSHA1": "Y2M44k2lygN97UGTFDyiQJLabDU=",
+			"path": "github.com/gocarina/gocsv",
+			"revision": "80ac68b8d188bc11f9bc83b372a83bc65d4e5cde",
+			"revisionTime": "2016-08-03T06:53:29Z"
+		},
+		{
+			"checksumSHA1": "Z0I4guD8AejM1hB3ltS/pTS60nQ=",
+			"path": "github.com/mitchellh/mapstructure",
+			"revision": "ca63d7c062ee3c9f34db231e352b60012b4fd0c1",
+			"revisionTime": "2016-08-08T18:12:53Z"
+		}
+	],
+	"rootPath": "github.com/elastic/beats"
+}

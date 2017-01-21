@@ -1,0 +1,356 @@
+- name: info
+  type: group
+  description: >
+    `info` contains the information and statistics returned by the `INFO` command.
+  fields:
+    - name: clients
+      type: group
+      description: >
+        Redis client stats.
+      fields:
+        - name: connected
+          type: long
+          description: >
+            Number of client connections (excluding connections from slaves).
+
+        - name: longest_output_list
+          type: long
+          description: >
+            Longest output list among current client connections.
+
+        - name: biggest_input_buf
+          type: long
+          description: >
+            Biggest input buffer among current client connections.
+
+        - name: blocked
+          type: long
+          description: >
+            Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH).
+
+    - name: cluster
+      type: group
+      description: >
+        Redis cluster information.
+      fields:
+        - name: enabled
+          type: boolean
+          description: >
+            Indicates that the Redis cluster is enabled.
+
+    - name: cpu
+      type: group
+      description: >
+        Redis CPU stats
+      fields:
+        - name: used.sys
+          type: scaled_float
+          description: >
+            System CPU consumed by the Redis server.
+
+        - name: used.sys_children
+          type: scaled_float
+          description: >
+            User CPU consumed by the Redis server.
+
+        - name: used.user
+          type: scaled_float
+          description: >
+            System CPU consumed by the background processes.
+
+        - name: used.user_children
+          type: scaled_float
+          description: >
+            User CPU consumed by the background processes.
+
+    - name: memory
+      type: group
+      description: >
+        Redis memory stats.
+      fields:
+        - name: used.value
+          type: long
+          description: >
+          format: bytes
+            Used memory.
+
+        - name: used.rss
+          type: long
+          format: bytes
+          description: >
+            Used memory rss.
+
+        - name: used.peak
+          type: long
+          format: bytes
+          description: >
+            Used memory peak.
+
+        - name: used.lua
+          type: long
+          format: bytes
+          description: >
+            Used memory lua.
+
+        - name: allocator
+          type: keyword
+          description: >
+            Memory allocator.
+
+    - name: persistence
+      type: group
+      description: >
+        Redis CPU stats.
+      fields:
+        - name: loading
+          type: boolean
+          description:
+
+        - name: rdb
+          type: group
+          description:
+          fields:
+            - name: last_save.changes_since
+              type: long
+              description:
+
+            - name: bgsave.in_progress
+              type: boolean
+              description:
+
+            - name: last_save.time
+              type: long
+              description:
+
+            - name: bgsave.last_status
+              type: keyword
+              description:
+
+            - name: bgsave.last_time.sec
+              type: long
+              description:
+
+            - name: bgsave.current_time.sec
+              type: long
+              description:
+
+        - name: aof
+          type: group
+          description:
+          fields:
+            - name: enabled
+              type: boolean
+              description:
+
+            - name: rewrite.in_progress
+              type: boolean
+              description:
+
+            - name: rewrite.scheduled
+              type: boolean
+              description:
+
+            - name: rewrite.last_time.sec
+              type: long
+              description:
+
+            - name: rewrite.current_time.sec
+              type: long
+              description:
+
+            - name: bgrewrite.last_status
+              type: keyword
+              description:
+
+            - name: write.last_status
+              type: keyword
+              description:
+
+    - name: replication
+      type: group
+      description: >
+        Replication
+      fields:
+        - name: role
+          type: keyword
+          description:
+
+        - name: connected_slaves
+          type: long
+          description:
+
+        - name: master_offset
+          type: long
+          description:
+
+        - name: backlog.active
+          type: long
+          description:
+
+        - name: backlog.size
+          type: long
+          description:
+
+        - name: backlog.first_byte_offset
+          type: long
+          description:
+
+        - name: backlog.histlen
+          type: long
+          description:
+
+    - name: server
+      type: group
+      description: >
+        Server info
+      fields:
+        - name: version
+          type: keyword
+          description:
+
+        - name: git_sha1
+          type: keyword
+          description:
+
+        - name: git_dirty
+          type: keyword
+          description:
+
+        - name: build_id
+          type: keyword
+          description:
+
+        - name: mode
+          type: keyword
+          description:
+
+        - name: os
+          type: keyword
+          description:
+
+        - name: arch_bits
+          type: keyword
+          description:
+
+        - name: multiplexing_api
+          type: keyword
+          description:
+
+        - name: gcc_version
+          type: keyword
+          description:
+
+        - name: process_id
+          type: long
+          description:
+
+        - name: run_id
+          type: keyword
+          description:
+
+        - name: tcp_port
+          type: long
+          description:
+
+        - name: uptime
+          type: long
+          description:
+
+        - name: hz
+          type: long
+          description:
+
+        - name: lru_clock
+          type: long
+          description:
+
+        - name: config_file
+          type: keyword
+          description:
+
+    - name: stats
+      type: group
+      description: >
+        Redis stats.
+      fields:
+        - name: connections.received
+          type: long
+          description:
+            Total number of connections received.
+
+        - name: connections.rejected
+          type: long
+          description:
+            Total number of connections rejected.
+
+        - name: commands_processed
+          type: long
+          description:
+            Total number of commands preocessed.
+
+        - name: net.input.bytes
+          type: long
+          description:
+            Total network input in bytes.
+
+        - name: net.output.bytes
+          type: long
+          description:
+            Total network output in bytes.
+
+        - name: instantaneous.ops_per_sec
+          type: long
+          description:
+
+        - name: instantaneous.input_kbps
+          type: scaled_float
+          description:
+
+        - name: instantaneous.output_kbps
+          type: scaled_float
+          description:
+
+        - name: sync.full
+          type: long
+          description:
+
+        - name: sync.partial.ok
+          type: long
+          description:
+
+        - name: sync.partial.err
+          type: long
+          description:
+
+        - name: keys.expired
+          type: long
+          description:
+
+        - name: keys.evicted
+          type: long
+          description:
+
+        - name: keyspace.hits
+          type: long
+          description:
+
+        - name: keyspace.misses
+          type: long
+          description:
+
+        - name: pubsub.channels
+          type: long
+          description:
+
+        - name: pubsub.patterns
+          type: long
+          description:
+
+        - name: latest_fork_usec
+          type: long
+          description:
+
+        - name: migrate_cached_sockets
+          type: long
+          description:
+

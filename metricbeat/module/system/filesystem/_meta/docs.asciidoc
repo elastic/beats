@@ -1,0 +1,30 @@
+=== System Filesystem Metricset
+
+The System `filesystem` metricset provides file system statistics. For each file
+system, one document is provided.
+
+This metricset is available on:
+
+- Darwin
+- FreeBSD
+- Linux
+- OpenBSD
+- Windows
+
+[float]
+=== Filtering
+
+Often there are mounted filesystems that you do not want Metricbeat to report
+metrics on. A simple strategy to deal with these filesystems is to configure a
+drop_event filter that matches the `mount_point` using a regular expression.
+Below is an example.
+
+[source,yaml]
+----
+metricbeat.modules:
+  - module: system
+    period: 30s
+    metricsets: ["filesystem"]
+    filters:
+      - drop_event.when.regexp.mount_point: '^/(sys|cgroup|proc|dev|etc|host)($|/)'
+----

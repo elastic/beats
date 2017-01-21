@@ -8,8 +8,10 @@ import (
 
 // AsyncProducer implements sarama's Producer interface for testing purposes.
 // Before you can send messages to it's Input channel, you have to set expectations
-// so it knows how to handle the input. This way you can easily test success and
-// failure scenarios.
+// so it knows how to handle the input; it returns an error if the number of messages
+// received is bigger then the number of expectations set. You can also set a
+// function in each expectation so that the message value is checked by this function
+// and an error is returned if the match fails.
 type AsyncProducer struct {
 	l            sync.Mutex
 	t            ErrorReporter
@@ -52,6 +54,18 @@ func NewAsyncProducer(t ErrorReporter, config *sarama.Config) *AsyncProducer {
 			} else {
 				expectation := mp.expectations[0]
 				mp.expectations = mp.expectations[1:]
+				if expectation.CheckFunction != nil {
+					if val, err := msg.Value.Encode(); err != nil {
+						mp.t.Errorf("Input message encoding failed: %s", err.Error())
+						mp.errors <- &sarama.ProducerError{Err: err, Msg: msg}
+					} else {
+						err = expectation.CheckFunction(val)
+						if err != nil {
+							mp.t.Errorf("Check function returned an error: %s", err.Error())
+							mp.errors <- &sarama.ProducerError{Err: err, Msg: msg}
+						}
+					}
+				}
 				if expectation.Result == errProduceSuccess {
 					mp.lastOffset++
 					if config.Producer.Return.Successes {
@@ -122,21 +136,39 @@ func (mp *AsyncProducer) Errors() <-chan *sarama.ProducerError {
 // Setting expectations
 ////////////////////////////////////////////////
 
+// ExpectInputWithCheckerFunctionAndSucceed sets an expectation on the mock producer that a message
+// will be provided on the input channel. The mock producer will call the given function to check
+// the message value. If an error is returned it will be made available on the Errors channel
+// otherwise the mock will handle the message as if it produced successfully, i.e. it will make
+// it available on the Successes channel if the Producer.Return.Successes setting is set to true.
+func (mp *AsyncProducer) ExpectInputWithCheckerFunctionAndSucceed(cf ValueChecker) {
+	mp.l.Lock()
+	defer mp.l.Unlock()
+	mp.expectations = append(mp.expectations, &producerExpectation{Result: errProduceSuccess, CheckFunction: cf})
+}
+
+// ExpectInputWithCheckerFunctionAndSucceed sets an expectation on the mock producer that a message
+// will be provided on the input channel. The mock producer will first call the given function to
+// check the message value. If an error is returned it will be made available on the Errors channel
+// otherwise the mock will handle the message as if it failed to produce successfully. This means
+// it will make a ProducerError available on the Errors channel.
+func (mp *AsyncProducer) ExpectInputWithCheckerFunctionAndFail(cf ValueChecker, err error) {
+	mp.l.Lock()
+	defer mp.l.Unlock()
+	mp.expectations = append(mp.expectations, &producerExpectation{Result: err, CheckFunction: cf})
+}
+
 // ExpectInputAndSucceed sets an expectation on the mock producer that a message will be provided
 // on the input channel. The mock producer will handle the message as if it is produced successfully,
 // i.e. it will make it available on the Successes channel if the Producer.Return.Successes setting
 // is set to true.
 func (mp *AsyncProducer) ExpectInputAndSucceed() {
-	mp.l.Lock()
-	defer mp.l.Unlock()
-	mp.expectations = append(mp.expectations, &producerExpectation{Result: errProduceSuccess})
+	mp.ExpectInputWithCheckerFunctionAndSucceed(nil)
 }
 
 // ExpectInputAndFail sets an expectation on the mock producer that a message will be provided
 // on the input channel. The mock producer will handle the message as if it failed to produce
 // successfully. This means it will make a ProducerError available on the Errors channel.
 func (mp *AsyncProducer) ExpectInputAndFail(err error) {
-	mp.l.Lock()
-	defer mp.l.Unlock()
-	mp.expectations = append(mp.expectations, &producerExpectation{Result: err})
+	mp.ExpectInputWithCheckerFunctionAndFail(nil, err)
 }

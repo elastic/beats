@@ -4,34 +4,4 @@
 The following command line options are available for Metricbeat. To use these
 options, you need to start Metricbeat in the foreground.
 
-[source,shell]
----------------------------------------------------------
-
-$ ./metricbeat -h
-Usage of ./metricbeat:
-  -N	Disable actual publishing for testing
-  -c string
-    	Configuration file (defaults to metricbeat.yml in the same dir as metricbeat)
-  -configtest
-    	Test configuration and exit.
-  -cpuprofile string
-    	Write cpu profile to file
-  -d string
-    	Enable certain debug selectors
-  -e	Log to stderr and disable syslog/file output
-  -httpprof string
-    	Start pprof http server
-  -memprofile string
-    	Write memory profile to this file
-  -path.config string
-    	Configuration path
-  -path.data string
-    	Data path
-  -path.home string
-    	Home path
-  -v	Log at INFO level
-  -version
-    	Print the version and exit
----------------------------------------------------------
-
 include::../../libbeat/docs/shared-command-line.asciidoc[]

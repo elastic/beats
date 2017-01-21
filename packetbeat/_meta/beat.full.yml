@@ -1,0 +1,454 @@
+###################### Packetbeat Configuration Example #######################
+
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see packetbeat.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/packetbeat/index.html
+
+#============================== Network device ================================
+
+# Select the network interface to sniff the data. You can use the "any"
+# keyword to sniff on all connected interfaces.
+packetbeat.interfaces.device: any
+
+# Packetbeat supports three sniffer types:
+# * pcap, which uses the libpcap library and works on most platforms, but it's
+# not the fastest option.
+# * af_packet, which uses memory-mapped sniffing. This option is faster than
+# libpcap and doesn't require a kernel module, but it's Linux-specific.
+# * pf_ring, which makes use of an ntop.org project. This setting provides the
+# best sniffing speed, but it requires a kernel module, and it's Linux-specific.
+# The default sniffer type is pcap.
+#packetbeat.interfaces.type: pcap
+
+# The maximum size of the packets to capture. The default is 65535, which is
+# large enough for almost all networks and interface types. If you sniff on a
+# physical network interface, the optimal setting is the MTU size. On virtual
+# interfaces, however, it's safer to accept the default value.
+#packetbeat.interfaces.snaplen: 65535
+
+# The maximum size of the shared memory buffer to use between the kernel and
+# user space. A bigger buffer usually results in lower CPU usage, but consumes
+# more memory. This setting is only available for the af_packet sniffer type.
+# The default is 30 MB.
+#packetbeat.interfaces.buffer_size_mb: 30
+
+# Packetbeat automatically generates a BPF for capturing only the traffic on
+# ports where it expects to find known protocols. Use this settings to tell
+# Packetbeat to generate a BPF filter that accepts VLAN tags.
+#packetbeat.interfaces.with_vlans: true
+
+# Use this setting to override the automatically generated BPF filter.
+#packetbeat.interfaces.bpf_filter:
+
+#================================== Flows =====================================
+
+packetbeat.flows:
+  # Enable Network flows. Default: true
+  #enabled: true
+
+  # Set network flow timeout. Flow is killed if no packet is received before being
+  # timed out.
+  timeout: 30s
+
+  # Configure reporting period. If set to -1, only killed flows will be reported
+  period: 10s
+
+#========================== Transaction protocols =============================
+
+packetbeat.protocols.icmp:
+  # Enable ICMPv4 and ICMPv6 monitoring. Default: true
+  #enabled: true
+
+packetbeat.protocols.amqp:
+  # Enable AMQP monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for AMQP traffic. You can disable
+  # the AMQP protocol by commenting out the list of ports.
+  ports: [5672]
+  # Truncate messages that are published and avoid huge messages being
+  # indexed.
+  # Default: 1000
+  #max_body_length: 1000
+
+  # Hide the header fields in header frames.
+  # Default: false
+  #parse_headers: false
+
+  # Hide the additional arguments of method frames.
+  # Default: false
+  #parse_arguments: false
+
+  # Hide all methods relative to connection negociation between server and
+  # client.
+  # Default: true
+  #hide_connection_information: true
+
+  # If this option is enabled, the raw message of the request (`request` field)
+  # is sent to Elasticsearch. The default is false.
+  #send_request: false
+
+  # If this option is enabled, the raw message of the response (`response`
+  # field) is sent to Elasticsearch. The default is false.
+  #send_response: false
+
+  # Transaction timeout. Expired transactions will no longer be correlated to
+  # incoming responses, but sent to Elasticsearch immediately.
+  #transaction_timeout: 10s
+
+packetbeat.protocols.cassandra:
+  #Cassandra port for traffic monitoring.
+  ports: [9042]
+
+  # If this option is enabled, the raw message of the request (`cassandra_request` field)
+  # is included in published events. The default is true.
+  #send_request: true
+
+  # If this option is enabled, the raw message of the response (`cassandra_request.request_headers` field)
+  # is included in published events. The default is true. enable `send_request` first before enable this option.
+  #send_request_header: true
+
+  # If this option is enabled, the raw message of the response (`cassandra_response` field)
+  # is included in published events. The default is true.
+  #send_response: true
+
+  # If this option is enabled, the raw message of the response (`cassandra_response.response_headers` field)
+  # is included in published events. The default is true. enable `send_response` first before enable this option.
+  #send_response_header: true
+
+  # Configures the default compression algorithm being used to uncompress compressed frames by name. Currently only `snappy` is can be configured.
+  # By default no compressor is configured.
+  #compressor: "snappy"
+
+  # This option indicates which Operator/Operators will be ignored.
+  #ignored_ops: ["SUPPORTED","OPTIONS"]
+
+packetbeat.protocols.dns:
+  # Enable DNS monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for DNS traffic. You can disable
+  # the DNS protocol by commenting out the list of ports.
+  ports: [53]
+
+  # include_authorities controls whether or not the dns.authorities field
+  # (authority resource records) is added to messages.
+  # Default: false
+  include_authorities: true
+  # include_additionals controls whether or not the dns.additionals field
+  # (additional resource records) is added to messages.
+  # Default: false
+  include_additionals: true
+
+  # send_request and send_response control whether or not the stringified DNS
+  # request and response message are added to the result.
+  # Nearly all data about the request/response is available in the dns.*
+  # fields, but this can be useful if you need visibility specifically
+  # into the request or the response.
+  # Default: false
+  # send_request:  true
+  # send_response: true
+
+  # Transaction timeout. Expired transactions will no longer be correlated to
+  # incoming responses, but sent to Elasticsearch immediately.
+  #transaction_timeout: 10s
+
+packetbeat.protocols.http:
+  # Enable HTTP monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for HTTP traffic. You can disable
+  # the HTTP protocol by commenting out the list of ports.
+  ports: [80, 8080, 8000, 5000, 8002]
+
+  # Uncomment the following to hide certain parameters in URL or forms attached
+  # to HTTP requests. The names of the parameters are case insensitive.
+  # The value of the parameters will be replaced with the 'xxxxx' string.
+  # This is generally useful for avoiding storing user passwords or other
+  # sensitive information.
+  # Only query parameters and top level form parameters are replaced.
+  # hide_keywords: ['pass', 'password', 'passwd']
+
+  # A list of header names to capture and send to Elasticsearch. These headers
+  # are placed under the `headers` dictionary in the resulting JSON.
+  #send_headers: false
+
+  # Instead of sending a white list of headers to Elasticsearch, you can send
+  # all headers by setting this option to true. The default is false.
+  #send_all_headers: false
+
+  # The list of content types for which Packetbeat includes the full HTTP
+  # payload in the response field.
+  #include_body_for: []
+
+  # If the Cookie or Set-Cookie headers are sent, this option controls whether
+  # they are split into individual values.
+  #split_cookie: false
+
+  # The header field to extract the real IP from. This setting is useful when
+  # you want to capture traffic behind a reverse proxy, but you want to get the
+  # geo-location information.
+  #real_ip_header:
+
+  # If this option is enabled, the raw message of the request (`request` field)
+  # is sent to Elasticsearch. The default is false.
+  #send_request: false
+
+  # If this option is enabled, the raw message of the response (`response`
+  # field) is sent to Elasticsearch. The default is false.
+  #send_response: false
+
+  # Transaction timeout. Expired transactions will no longer be correlated to
+  # incoming responses, but sent to Elasticsearch immediately.
+  #transaction_timeout: 10s
+
+  # Maximum message size. If an HTTP message is larger than this, it will
+  # be trimmed to this size. Default is 10 MB.
+  #max_message_size: 10485760
+
+packetbeat.protocols.memcache:
+  # Enable memcache monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for memcache traffic. You can disable
+  # the Memcache protocol by commenting out the list of ports.
+  ports: [11211]
+
+  # Uncomment the parseunknown option to force the memcache text protocol parser
+  # to accept unknown commands.
+  # Note: All unknown commands MUST not contain any data parts!
+  # Default: false
+  # parseunknown: true
+
+  # Update the maxvalue option to store the values - base64 encoded - in the
+  # json output.
+  # possible values:
+  #    maxvalue: -1  # store all values (text based protocol multi-get)
+  #    maxvalue: 0   # store no values at all
+  #    maxvalue: N   # store up to N values
+  # Default: 0
+  # maxvalues: -1
+
+  # Use maxbytespervalue to limit the number of bytes to be copied per value element.
+  # Note: Values will be base64 encoded, so actual size in json document
+  #       will be 4 times maxbytespervalue.
+  # Default: unlimited
+  # maxbytespervalue: 100
+
+  # UDP transaction timeout in milliseconds.
+  # Note: Quiet messages in UDP binary protocol will get response only in error case.
+  #       The memcached analyzer will wait for udptransactiontimeout milliseconds
+  #       before publishing quiet messages. Non quiet messages or quiet requests with
+  #       error response will not have to wait for the timeout.
+  # Default: 200
+  # udptransactiontimeout: 1000
+
+  # If this option is enabled, the raw message of the request (`request` field)
+  # is sent to Elasticsearch. The default is false.
+  #send_request: false
+
+  # If this option is enabled, the raw message of the response (`response`
+  # field) is sent to Elasticsearch. The default is false.
+  #send_response: false
+
+  # Transaction timeout. Expired transactions will no longer be correlated to
+  # incoming responses, but sent to Elasticsearch immediately.
+  #transaction_timeout: 10s
+
+packetbeat.protocols.mysql:
+  # Enable mysql monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for MySQL traffic. You can disable
+  # the MySQL protocol by commenting out the list of ports.
+  ports: [3306]
+
+  # If this option is enabled, the raw message of the request (`request` field)
+  # is sent to Elasticsearch. The default is false.
+  #send_request: false
+
+  # If this option is enabled, the raw message of the response (`response`
+  # field) is sent to Elasticsearch. The default is false.
+  #send_response: false
+
+  # Transaction timeout. Expired transactions will no longer be correlated to
+  # incoming responses, but sent to Elasticsearch immediately.
+  #transaction_timeout: 10s
+
+packetbeat.protocols.pgsql:
+  # Enable pgsql monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for Pgsql traffic. You can disable
+  # the Pgsql protocol by commenting out the list of ports.
+  ports: [5432]
+
+  # If this option is enabled, the raw message of the request (`request` field)
+  # is sent to Elasticsearch. The default is false.
+  #send_request: false
+
+  # If this option is enabled, the raw message of the response (`response`
+  # field) is sent to Elasticsearch. The default is false.
+  #send_response: false
+
+  # Transaction timeout. Expired transactions will no longer be correlated to
+  # incoming responses, but sent to Elasticsearch immediately.
+  #transaction_timeout: 10s
+
+packetbeat.protocols.redis:
+  # Enable redis monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for Redis traffic. You can disable
+  # the Redis protocol by commenting out the list of ports.
+  ports: [6379]
+
+  # If this option is enabled, the raw message of the request (`request` field)
+  # is sent to Elasticsearch. The default is false.
+  #send_request: false
+
+  # If this option is enabled, the raw message of the response (`response`
+  # field) is sent to Elasticsearch. The default is false.
+  #send_response: false
+
+  # Transaction timeout. Expired transactions will no longer be correlated to
+  # incoming responses, but sent to Elasticsearch immediately.
+  #transaction_timeout: 10s
+
+packetbeat.protocols.thrift:
+  # Enable thrift monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for Thrift-RPC traffic. You can disable
+  # the Thrift-RPC protocol by commenting out the list of ports.
+  ports: [9090]
+
+  # The Thrift transport type. Currently this option accepts the values socket
+  # for TSocket, which is the default Thrift transport, and framed for the
+  # TFramed Thrift transport. The default is socket.
+  #transport_type: socket
+
+  # The Thrift protocol type. Currently the only accepted value is binary for
+  # the TBinary protocol, which is the default Thrift protocol.
+  #protocol_type: binary
+
+  # The Thrift interface description language (IDL) files for the service that
+  # Packetbeat is monitoring.  Providing the IDL enables Packetbeat to include
+  # parameter and exception names.
+  #idl_files: []
+
+  # The maximum length for strings in parameters or return values. If a string
+  # is longer than this value, the string is automatically truncated to this
+  # length.
+  #string_max_size: 200
+
+  # The maximum number of elements in a Thrift list, set, map, or structure.
+  #collection_max_size: 15
+
+  # If this option is set to false, Packetbeat decodes the method name from the
+  # reply and simply skips the rest of the response message.
+  #capture_reply: true
+
+  # If this option is set to true, Packetbeat replaces all strings found in
+  # method parameters, return codes, or exception structures with the "*"
+  # string.
+  #obfuscate_strings: false
+
+  # The maximum number of fields that a structure can have before Packetbeat
+  # ignores the whole transaction.
+  #drop_after_n_struct_fields: 500
+
+  # If this option is enabled, the raw message of the request (`request` field)
+  # is sent to Elasticsearch. The default is false.
+  #send_request: false
+
+  # If this option is enabled, the raw message of the response (`response`
+  # field) is sent to Elasticsearch. The default is false.
+  #send_response: false
+
+  # Transaction timeout. Expired transactions will no longer be correlated to
+  # incoming responses, but sent to Elasticsearch immediately.
+  #transaction_timeout: 10s
+
+packetbeat.protocols.mongodb:
+  # Enable mongodb monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for MongoDB traffic. You can disable
+  # the MongoDB protocol by commenting out the list of ports.
+  ports: [27017]
+
+
+  # The maximum number of documents from the response to index in the `response`
+  # field. The default is 10.
+  #max_docs: 10
+
+  # The maximum number of characters in a single document indexed in the
+  # `response` field. The default is 5000. You can set this to 0 to index an
+  # unlimited number of characters per document.
+  #max_doc_length: 5000
+
+  # If this option is enabled, the raw message of the request (`request` field)
+  # is sent to Elasticsearch. The default is false.
+  #send_request: false
+
+  # If this option is enabled, the raw message of the response (`response`
+  # field) is sent to Elasticsearch. The default is false.
+  #send_response: false
+
+  # Transaction timeout. Expired transactions will no longer be correlated to
+  # incoming responses, but sent to Elasticsearch immediately.
+  #transaction_timeout: 10s
+
+packetbeat.protocols.nfs:
+  # Enable NFS monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for NFS traffic. You can disable
+  # the NFS protocol by commenting out the list of ports.
+  ports: [2049]
+
+  # If this option is enabled, the raw message of the request (`request` field)
+  # is sent to Elasticsearch. The default is false.
+  #send_request: false
+
+  # If this option is enabled, the raw message of the response (`response`
+  # field) is sent to Elasticsearch. The default is false.
+  #send_response: false
+
+  # Transaction timeout. Expired transactions will no longer be correlated to
+  # incoming responses, but sent to Elasticsearch immediately.
+  #transaction_timeout: 10s
+
+#=========================== Monitored processes ==============================
+
+# Configure the processes to be monitored and how to find them. If a process is
+# monitored then Packetbeat attempts to use it's name to fill in the `proc` and
+# `client_proc` fields.
+# The processes can be found by searching their command line by a given string.
+#
+# Process matching is optional and can be enabled by uncommenting the following
+# lines.
+#
+#packetbeat.procs:
+#  enabled: false
+#  monitored:
+#    - process: mysqld
+#      cmdline_grep: mysqld
+#
+#    - process: pgsql
+#      cmdline_grep: postgres
+#
+#    - process: nginx
+#      cmdline_grep: nginx
+#
+#    - process: app
+#      cmdline_grep: gunicorn
+
+# Uncomment the following if you want to ignore transactions created
+# by the server on which the shipper is installed. This option is useful
+# to remove duplicates if shippers are installed on multiple servers.
+#packetbeat.ignore_outgoing: true

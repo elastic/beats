@@ -1,0 +1,217 @@
+[[upgrading]]
+== Upgrading
+
+This section gives general recommendations for upgrading the Beats:
+
+* <<upgrading-minor-versions>>
+* <<upgrading-1-to-5>>
+* <<upgrade-mapping-template>>
+
+[[upgrading-minor-versions]]
+=== Upgrading Between Minor Versions
+
+As a general rule, upgrading between minor versions (e.g. 5.x to 5.y, where x <
+y) can be done by simply installing the new release and restarting the Beat
+process, because the Beats keep backwards compatibility when it comes to
+configuration and exported fields. Please review the <<release-notes,release
+notes>> for potential exceptions.
+
+While we keep the backwards compatibility when it comes to the exported fields,
+a new minor version can add new fields (e.g. a new Metricbeat module is added).
+This can be problematic if the Elasticsearch mapping settings are not updated as
+well.
+
+Please see the <<upgrade-mapping-template>> section for possible strategies in
+upgrading the Elasticsearch mapping templates.
+
+[[upgrading-1-to-5]]
+=== Upgrading from 1.x to 5.x
+
+Before upgrading your Beats, please review the <<breaking-changes, breaking
+changes>> doc.
+
+In addition to the subsections here, please read <<upgrade-mapping-template>>.
+
+==== Migrating Configuration Files
+
+Beats 5.0 comes with several backwards incompatible configuration changes.
+However, we provide a script that can automatically fixup the most common
+settings in your configuration files.
+
+You can find this script in the Beats download packages. For the `.tar.gz` and
+`.zip` archives, look under:
+
+[source,shell]
+------------------------------------------------------------------------------
+./scripts/migrate_beat_config_1_x_to_5_0.py
+------------------------------------------------------------------------------
+
+For the `.deb` and `.rpm` packages, look under the
+`/usr/share/<beatname>/scripts/` folder, for example:
+
+
+[source,shell]
+------------------------------------------------------------------------------
+/usr/share/packetbeat/scripts/migrate_beat_config_1_x_to_5_0.py
+------------------------------------------------------------------------------
+
+Python 2.7 or later is required for executing the migration script.
+
+To upgrade your configuration file automatically, simply pass it as an argument
+to the migration script, for example:
+
+[source,shell]
+------------------------------------------------------------------------------
+> ./scripts/migrate_beat_config_1_x_to_5_0.py packetbeat.yml
+Backup file created: packetbeat.yml.bak
+------------------------------------------------------------------------------
+
+The script will automatically create a backup file and overwrite the input file
+with the upgraded version. You can also use the `--dry` option, which doesn't
+modify the input file, but outputs the upgraded version to stdout instead.
+
+==== Filebeat Registry File Location and Format
+
+Filebeat stores the read offset in a registry file that it persists to disk.
+The format of this file has changed in version 5.0, but Filebeat automatically
+upgrades the format on the first run, so there's normally no action required on
+upgrading.
+
+If you have installed Filebeat from the DEB or RPM packages, the location of the
+file stays the same as well (`/var/lib/filebeat/registry`). Also if you've
+installed Filebeat as a service on Windows, the location stays the same
+(`C:\ProgramData\filebeat\registry`).
+
+If you are running Filebeat from the `tar.gz` archive, however, the location of
+the registry file has changed. In version 1.x it was by default named
+`.filebeat` in the current working directory. In version 5.0, it is
+`data/registry` relative to the binary location. For upgrading in this case, we
+recommend copying the `.filebeat` file to `data/registry`.
+
+==== Upgrading Topbeat to Metricbeat
+
+NOTE: When upgrading to Metricbeat, keep in mind that any data you've collected
+with Topbeat is not compatible with the 5.0 version of the Beats dashboards
+because the underlying event data structures have changed. 
+
+With the Beats 5.0 release, Topbeat is replaced by Metricbeat, which offers more
+functionality. More precisely, the Topbeat functionality is roughly equivalent
+to the "system" module in Metricbeat.
+
+While there is no automatic way to convert a Topbeat configuration file to the
+equivalent of a Metricbeat configuration file, both configurations are simple
+enough that migrating shouldn't take long.
+
+For example, this is the input section of the Topbeat configuration file:
+
+[source,yaml]
+------------------------------------------------------------------------------
+input:
+  # In seconds, defines how often to read server statistics
+  period: 10
+
+  # Regular expression to match the processes that are monitored
+  # By default, all the processes are monitored
+  procs: [".*"]
+
+  # Statistics to collect (all enabled by default)
+  stats:
+    # per system statistics, by default is true
+    system: true
+
+    # per process statistics, by default is true
+    process: true
+
+    # file system information, by default is true
+    filesystem: true
+
+    # cpu usage per core, by default is false
+    cpu_per_core: false
+------------------------------------------------------------------------------
+
+And here is the equivalent configuration for the system module in Metricbeat:
+
+[source,yaml]
+------------------------------------------------------------------------------
+metricbeat.modules:
+
+#------------------------------- System Module -------------------------------
+- module: system
+  metricsets:
+    # CPU stats
+    - cpu
+
+    # System Load stats
+    - load
+
+    # Per filesystem stats
+    - filesystem
+
+    # Memory stats
+    - memory
+
+    # Network stats
+    - network
+
+    # Per process stats
+    - process
+  enabled: true
+  period: 10s
+  processes: ['.*']
+------------------------------------------------------------------------------
+
+The remaining configuration options (outputs, name, tags) stay the same or can
+be upgraded using the migration script.
+
+[[upgrade-mapping-template]]
+=== Upgrading the Elasticsearch Mapping Template
+
+By default, the Elasticsearch mapping template that comes with the Beats is not
+re-installed if it already exists.  This means that if the new Beats version
+adds new fields (e.g. a new module in Metricbeat), they won't be reflected in
+the Elasticsearch mapping, which can result in visualization problems or
+incorrect data.
+
+You can set the `output.elasticsearch.template.overwrite` option to `true` to
+make the Beats install the new mapping template even if a template with the same
+name already exists. You can set this option in the configuration file or as a
+CLI flag, for example:
+
+[source,shell]
+------------------------------------------------------------------------------
+packetbeat -e -E output.elasticsearch.template.overwrite=true
+------------------------------------------------------------------------------
+
+However, the mapping template is applied on index creation, so it won't affect
+the current index if it was already created with the old version.
+
+You can force the start of a new index by renaming the old index before starting
+the new version of the Beat. As of Elasticsearch 5.0, this can be done via the
+re-index API:
+
+
+[source,json]
+------------------------------------------------------------------------------
+POST /_reindex
+{
+  "source": {
+    "index": "packetbeat-2016.09.20"
+  },
+  "dest": {
+    "index": "packetbeat-2016.09.20-old"
+  }
+}
+DELETE /packetbeat-2016.09.20
+------------------------------------------------------------------------------
+
+Note that the reindex API command can take a long time, depending on the size of
+the index. It is recommended that you stop the Beat during this time, so the
+order of operations should be:
+
+1. Stop the old version of the Beat
+2. Rename the index of the current day
+3. Start the new version of the Beat
+
+If downtime is not acceptable, another possible approach is to configure a
+different index pattern in the new Beat version, but this will likely require
+adjustments to your Kibana dashboards.

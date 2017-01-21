@@ -1,0 +1,211 @@
+- key: common
+  title: "Common Winlogbeat"
+  description: >
+    Contains common fields available in all event types.
+  fields:
+    - name: type
+      required: true
+      description: >
+        The event log API type used to read the record. The possible values are
+        "wineventlog" for the Windows Event Log API or "eventlogging" for the
+        Event Logging API.
+
+        The Event Logging API was designed for Windows Server 2003, Windows XP,
+        or Windows 2000 operating systems. In Windows Vista, the event logging
+        infrastructure was redesigned. On Windows Vista or later operating
+        systems, the Windows Event Log API is used. Winlogbeat automatically
+        detects which API to use for reading event logs.
+
+
+- key: eventlog
+  title: Event Log Record
+  description: >
+    Contains data from a Windows event log record.
+  fields:
+    - name: activity_id
+      type: keyword
+      required: false
+      description: >
+        A globally unique identifier that identifies the current activity. The
+        events that are published with this identifier are part of the same
+        activity.
+
+    - name: computer_name
+      type: keyword
+      required: true
+      description: >
+        The name of the computer that generated the record. When using Windows
+        event forwarding, this name can differ from the `beat.hostname`.
+
+    - name: event_data
+      type: dict
+      dict-type: keyword
+      required: false
+      description: >
+        The event-specific data. This field is mutually exclusive with
+        `user_data`. If you are capturing event data on versions prior
+        to Windows Vista, the parameters in `event_data` are named `param1`,
+        `param2`, and so on, because event log parameters are unnamed in
+        earlier versions of Windows. 
+
+    - name: event_id
+      type: long
+      required: true
+      description: >
+        The event identifier. The value is specific to the source of the event.
+
+    - name: keywords
+      type: keyword
+      required: false
+      description: >
+        The keywords are used to classify an event.
+
+    - name: log_name
+      type: keyword
+      required: true
+      description: >
+        The name of the event log from which this record was read. This value is
+        one of the names from the `event_logs` collection in the configuration.
+
+    - name: level
+      type: keyword
+      required: false
+      description: >
+        The level of the event. There are five levels of events that can be
+        logged: Success, Information, Warning, Error, Audit Success, and Audit
+        Failure.
+
+    - name: message
+      type: text
+      required: false
+      description: >
+        The message from the event log record.
+
+    - name: message_error
+      type: keyword
+      required: false
+      description: >
+        The error that occurred while reading and formatting the message from
+        the log.
+
+    - name: record_number
+      type: keyword
+      required: true
+      description: >
+        The record number of the event log record. The first record written
+        to an event log is record number 1, and other records are numbered
+        sequentially. If the record number reaches the maximum value (2^32^
+        for the Event Logging API and 2^64^ for the Windows Event Log API),
+        the next record number will be 0.
+
+    - name: related_activity_id
+      type: keyword
+      required: false
+      description: >
+        A globally unique identifier that identifies the activity to which
+        control was transferred to. The related events would then have this
+        identifier as their `activity_id` identifier.
+
+    - name: opcode
+      type: keyword
+      required: false
+      description: >
+        The opcode defined in the event. Task and opcode are typically used to
+        identify the location in the application from where the event was
+        logged.
+
+    - name: provider_guid
+      type: keyword
+      required: false
+      description: >
+        A globally unique identifier that identifies the provider that logged
+        the event.
+
+    - name: process_id
+      type: long
+      required: false
+      description: >
+        The process_id identifies the process that generated the event.
+
+    - name: source_name
+      type: keyword
+      required: true
+      description: >
+        The source of the event log record (the application or service that
+        logged the record).
+
+    - name: task
+      type: keyword
+      required: false
+      description: >
+        The task defined in the event. Task and opcode are typically used to
+        identify the location in the application from where the event was
+        logged. The category used by the Event Logging API (on pre Windows Vista
+        operating systems) is written to this field.
+
+    - name: thread_id
+      type: long
+      required: false
+      description: >
+        The thread_id identifies the thread that generated the event.
+
+    - name: user_data
+      type: dict
+      dict-type: keyword
+      required: false
+      description: >
+        The event specific data. This field is mutually exclusive with
+        `event_data`.
+
+    - name: user.identifier
+      type: keyword
+      required: false
+      example: S-1-5-21-3541430928-2051711210-1391384369-1001
+      description: >
+        The Windows security identifier (SID) of the account associated with
+        this event.
+
+
+        If Winlogbeat cannot resolve the SID to a name, then the `user.name`,
+        `user.domain`, and `user.type` fields will be omitted from the event.
+        If you discover Winlogbeat not resolving SIDs, review the log for
+        clues as to what the problem may be.
+
+    - name: user.name
+      type: keyword
+      required: false
+      description: >
+        The name of the account associated with this event.
+
+    - name: user.domain
+      type: keyword
+      required: false
+      description: >
+        The domain that the account associated with this event is a member of.
+
+    - name: user.type
+      type: keyword
+      required: false
+      description: >
+        The type of account associated with this event.
+
+    - name: version
+      type: long
+      required: false
+      description: The version number of the event's definition.
+
+    - name: xml
+      type: keyword
+      type: text
+      required: false
+      description: >
+        The raw XML representation of the event obtained from Windows. This
+        field is only available on operating systems supporting the Windows
+        Event Log API (Microsoft Windows Vista and newer). This field is not
+        included by default and must be enabled by setting `include_xml: true`
+        as a configuration option for an individual event log.
+
+
+        The XML representation of the event is useful for troubleshooting
+        purposes. The data in the fields reported by Winlogbeat can be compared
+        to the data in the XML to diagnose problems.

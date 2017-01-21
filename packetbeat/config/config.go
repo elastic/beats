@@ -9,34 +9,32 @@ import (
 )
 
 type Config struct {
-	Packetbeat PacketbeatConfig
-}
-
-type PacketbeatConfig struct {
-	Interfaces InterfacesConfig
-	Flows      *Flows
-	Protocols  map[string]*common.Config
-	Procs      procs.ProcsConfig
-	RunOptions droppriv.RunOptions
+	Interfaces     InterfacesConfig          `config:"interfaces"`
+	Flows          *Flows                    `config:"flows"`
+	Protocols      map[string]*common.Config `config:"protocols"`
+	Procs          procs.ProcsConfig         `config:"procs"`
+	IgnoreOutgoing bool                      `config:"ignore_outgoing"`
+	RunOptions     droppriv.RunOptions
 }
 
 type InterfacesConfig struct {
-	Device         string
-	Type           string
-	File           string
-	With_vlans     bool
-	Bpf_filter     string
-	Snaplen        int
-	Buffer_size_mb int
-	TopSpeed       bool
-	Dumpfile       string
-	OneAtATime     bool
-	Loop           int
+	Device       string
+	Type         string
+	File         string
+	WithVlans    bool
+	BpfFilter    string
+	Snaplen      int
+	BufferSizeMb int
+	TopSpeed     bool
+	Dumpfile     string
+	OneAtATime   bool
+	Loop         int
 }
 
 type Flows struct {
-	Timeout string
-	Period  string
+	Enabled *bool  `config:"enabled"`
+	Timeout string `config:"timeout"`
+	Period  string `config:"period"`
 }
 
 type ProtocolCommon struct {
@@ -44,4 +42,8 @@ type ProtocolCommon struct {
 	SendRequest        bool          `config:"send_request"`
 	SendResponse       bool          `config:"send_response"`
 	TransactionTimeout time.Duration `config:"transaction_timeout"`
+}
+
+func (f *Flows) IsEnabled() bool {
+	return f != nil && (f.Enabled == nil || *f.Enabled)
 }

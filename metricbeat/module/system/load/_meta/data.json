@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "system",
+        "name": "load",
+        "rtt": 115
+    },
+    "system": {
+        "load": {
+            "1": 1.09,
+            "15": 0.49,
+            "5": 0.65,
+            "norm": {
+                "1": 0.545,
+                "15": 0.245,
+                "5": 0.325
+            }
+        }
+    },
+    "type": "metricsets"
+}

@@ -5,6 +5,10 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io/ioutil"
+	"time"
+
+	"github.com/eapache/go-xerial-snappy"
+	"github.com/pierrec/lz4"
 )
 
 // CompressionCodec represents the various compression codecs recognized by Kafka in messages.
@@ -17,28 +21,32 @@ const (
 	CompressionNone   CompressionCodec = 0
 	CompressionGZIP   CompressionCodec = 1
 	CompressionSnappy CompressionCodec = 2
+	CompressionLZ4    CompressionCodec = 3
 )
 
-// The spec just says: "This is a version id used to allow backwards compatible evolution of the message
-// binary format." but it doesn't say what the current value is, so presumably 0...
-const messageFormat int8 = 0
-
 type Message struct {
-	Codec CompressionCodec // codec used to compress the message contents
-	Key   []byte           // the message key, may be nil
-	Value []byte           // the message contents
-	Set   *MessageSet      // the message set a message might wrap
+	Codec     CompressionCodec // codec used to compress the message contents
+	Key       []byte           // the message key, may be nil
+	Value     []byte           // the message contents
+	Set       *MessageSet      // the message set a message might wrap
+	Version   int8             // v1 requires Kafka 0.10
+	Timestamp time.Time        // the timestamp of the message (version 1+ only)
 
 	compressedCache []byte
+	compressedSize  int // used for computing the compression ratio metrics
 }
 
 func (m *Message) encode(pe packetEncoder) error {
 	pe.push(&crc32Field{})
 
-	pe.putInt8(messageFormat)
+	pe.putInt8(m.Version)
 
 	attributes := int8(m.Codec) & compressionCodecMask
 	pe.putInt8(attributes)
+
+	if m.Version >= 1 {
+		pe.putInt64(m.Timestamp.UnixNano() / int64(time.Millisecond))
+	}
 
 	err := pe.putBytes(m.Key)
 	if err != nil {
@@ -50,7 +58,7 @@ func (m *Message) encode(pe packetEncoder) error {
 	if m.compressedCache != nil {
 		payload = m.compressedCache
 		m.compressedCache = nil
-	} else {
+	} else if m.Value != nil {
 		switch m.Codec {
 		case CompressionNone:
 			payload = m.Value
@@ -66,12 +74,26 @@ func (m *Message) encode(pe packetEncoder) error {
 			m.compressedCache = buf.Bytes()
 			payload = m.compressedCache
 		case CompressionSnappy:
-			tmp := snappyEncode(m.Value)
+			tmp := snappy.Encode(m.Value)
 			m.compressedCache = tmp
 			payload = m.compressedCache
+		case CompressionLZ4:
+			var buf bytes.Buffer
+			writer := lz4.NewWriter(&buf)
+			if _, err = writer.Write(m.Value); err != nil {
+				return err
+			}
+			if err = writer.Close(); err != nil {
+				return err
+			}
+			m.compressedCache = buf.Bytes()
+			payload = m.compressedCache
+
 		default:
 			return PacketEncodingError{fmt.Sprintf("unsupported compression codec (%d)", m.Codec)}
 		}
+		// Keep in mind the compressed payload size for metric gathering
+		m.compressedSize = len(payload)
 	}
 
 	if err = pe.putBytes(payload); err != nil {
@@ -87,12 +109,9 @@ func (m *Message) decode(pd packetDecoder) (err error) {
 		return err
 	}
 
-	format, err := pd.getInt8()
+	m.Version, err = pd.getInt8()
 	if err != nil {
 		return err
-	}
-	if format != messageFormat {
-		return PacketDecodingError{"unexpected messageFormat"}
 	}
 
 	attribute, err := pd.getInt8()
@@ -100,6 +119,14 @@ func (m *Message) decode(pd packetDecoder) (err error) {
 		return err
 	}
 	m.Codec = CompressionCodec(attribute & compressionCodecMask)
+
+	if m.Version >= 1 {
+		millis, err := pd.getInt64()
+		if err != nil {
+			return err
+		}
+		m.Timestamp = time.Unix(millis/1000, (millis%1000)*int64(time.Millisecond))
+	}
 
 	m.Key, err = pd.getBytes()
 	if err != nil {
@@ -111,12 +138,16 @@ func (m *Message) decode(pd packetDecoder) (err error) {
 		return err
 	}
 
+	// Required for deep equal assertion during tests but might be useful
+	// for future metrics about the compression ratio in fetch requests
+	m.compressedSize = len(m.Value)
+
 	switch m.Codec {
 	case CompressionNone:
 		// nothing to do
 	case CompressionGZIP:
 		if m.Value == nil {
-			return PacketDecodingError{"GZIP compression specified, but no data to uncompress"}
+			break
 		}
 		reader, err := gzip.NewReader(bytes.NewReader(m.Value))
 		if err != nil {
@@ -130,14 +161,26 @@ func (m *Message) decode(pd packetDecoder) (err error) {
 		}
 	case CompressionSnappy:
 		if m.Value == nil {
-			return PacketDecodingError{"Snappy compression specified, but no data to uncompress"}
+			break
 		}
-		if m.Value, err = snappyDecode(m.Value); err != nil {
+		if m.Value, err = snappy.Decode(m.Value); err != nil {
 			return err
 		}
 		if err := m.decodeSet(); err != nil {
 			return err
 		}
+	case CompressionLZ4:
+		if m.Value == nil {
+			break
+		}
+		reader := lz4.NewReader(bytes.NewReader(m.Value))
+		if m.Value, err = ioutil.ReadAll(reader); err != nil {
+			return err
+		}
+		if err := m.decodeSet(); err != nil {
+			return err
+		}
+
 	default:
 		return PacketDecodingError{fmt.Sprintf("invalid compression specified (%d)", m.Codec)}
 	}

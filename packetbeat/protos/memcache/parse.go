@@ -145,11 +145,11 @@ func (p *parser) appendMessageData(data []byte) {
 		}
 		msg.values = append(msg.values, msg.data)
 	}
-	msg.count_values++
+	msg.countValues++
 }
 
 func parseFailing(parser *parser, buf *streambuf.Buffer) parseResult {
-	return parser.failing(ErrParserCaughtInError)
+	return parser.failing(errParserCaughtInError)
 }
 
 // required to break initialization loop warning
@@ -161,12 +161,11 @@ func doParseCommand(parser *parser, buf *streambuf.Buffer) parseResult {
 		return parser.needMore()
 	}
 	magic := buf.Bytes()[0]
-	is_binary := magic == MemcacheMagicRequest || magic == MemcacheMagicResponse
-	if is_binary {
+	isBinary := magic == memcacheMagicRequest || magic == memcacheMagicResponse
+	if isBinary {
 		return parser.contWith(buf, parseStateBinaryCommand)
-	} else {
-		return parser.contWith(buf, parseStateTextCommand)
 	}
+	return parser.contWith(buf, parseStateTextCommand)
 }
 
 func argparseNoop(p *parser, h, b *streambuf.Buffer) error {

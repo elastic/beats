@@ -7,7 +7,6 @@ import (
 	"expvar"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -15,11 +14,11 @@ import (
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	messagesDropped = expvar.NewInt("libbeatMessagesDropped")
+	messagesDropped = expvar.NewInt("libbeat.outputs.messages_dropped")
 )
 
 // ErrNoHostsConfigured indicates missing host or hosts configuration
-var ErrNoHostsConfigured = errors.New("no host configuration found")
+var ErrNoHostsConfigured = errors.New("no hosts configuration found")
 
 // ConnectionMode takes care of connecting to hosts
 // and potentially doing load balancing and/or failover
@@ -30,10 +29,10 @@ type ConnectionMode interface {
 
 	// PublishEvents will send all events (potentially asynchronous) to its
 	// clients.
-	PublishEvents(sig op.Signaler, opts outputs.Options, events []common.MapStr) error
+	PublishEvents(sig op.Signaler, opts outputs.Options, data []outputs.Data) error
 
 	// PublishEvent will send an event to its clients.
-	PublishEvent(sig op.Signaler, opts outputs.Options, event common.MapStr) error
+	PublishEvent(sig op.Signaler, opts outputs.Options, data outputs.Data) error
 }
 
 type Connectable interface {
@@ -45,12 +44,6 @@ type Connectable interface {
 
 	// Close closes the established connection.
 	Close() error
-
-	// IsConnected indicates the clients connection state. If connection has
-	// been lost while publishing events, IsConnected must return false. As long as
-	// IsConnected returns false, an output plugin might try to re-establish the
-	// connection by calling Connect.
-	IsConnected() bool
 }
 
 // ProtocolClient interface is a output plugin specific client implementation
@@ -61,28 +54,25 @@ type ProtocolClient interface {
 	Connectable
 
 	// PublishEvents sends events to the clients sink. On failure or timeout err
-	// must be set. If connection has been lost, IsConnected must return false
-	// in future calls.
+	// must be set.
 	// PublishEvents is free to publish only a subset of given events, even in
 	// error case. On return nextEvents contains all events not yet published.
-	PublishEvents(events []common.MapStr) (nextEvents []common.MapStr, err error)
+	PublishEvents(data []outputs.Data) (nextEvents []outputs.Data, err error)
 
 	// PublishEvent sends one event to the clients sink. On failure and error is
 	// returned.
-	PublishEvent(event common.MapStr) error
+	PublishEvent(data outputs.Data) error
 }
 
-// AsyncProtocolClient interface is a output plugin specfic client implementation
+// AsyncProtocolClient interface is a output plugin specific client implementation
 // for asynchronous encoding and publishing events.
 type AsyncProtocolClient interface {
 	Connectable
 
-	AsyncPublishEvents(cb func([]common.MapStr, error), events []common.MapStr) error
+	AsyncPublishEvents(cb func([]outputs.Data, error), data []outputs.Data) error
 
-	AsyncPublishEvent(cb func(error), event common.MapStr) error
+	AsyncPublishEvent(cb func(error), data outputs.Data) error
 }
-
-type ClientFactory func(host string) (ProtocolClient, error)
 
 var (
 	// ErrTempBulkFailure indicates PublishEvents fail temporary to retry.
@@ -93,118 +83,6 @@ var (
 	debug = logp.MakeDebug("output")
 )
 
-func NewConnectionMode(
-	clients []ProtocolClient,
-	failover bool,
-	maxAttempts int,
-	waitRetry, timeout, maxWaitRetry time.Duration,
-) (ConnectionMode, error) {
-	if failover {
-		clients = NewFailoverClient(clients)
-	}
-
-	if len(clients) == 1 {
-		return NewSingleConnectionMode(clients[0], maxAttempts,
-			waitRetry, timeout, maxWaitRetry)
-	}
-	return NewLoadBalancerMode(clients, maxAttempts,
-		waitRetry, timeout, maxWaitRetry)
-}
-
-func NewAsyncConnectionMode(
-	clients []AsyncProtocolClient,
-	failover bool,
-	maxAttempts int,
-	waitRetry, timeout, maxWaitRetry time.Duration,
-) (ConnectionMode, error) {
-	if failover {
-		clients = NewAsyncFailoverClient(clients)
-	}
-	return NewAsyncLoadBalancerMode(clients, maxAttempts,
-		waitRetry, timeout, maxWaitRetry)
-}
-
-// MakeClients will create a list from of ProtocolClient instances from
-// outputer configuration host list and client factory function.
-func MakeClients(
-	config *common.Config,
-	newClient ClientFactory,
-) ([]ProtocolClient, error) {
-	hosts, err := ReadHostList(config)
-	if err != nil {
-		return nil, err
-	}
-	if len(hosts) == 0 {
-		return nil, ErrNoHostsConfigured
-	}
-
-	clients := make([]ProtocolClient, 0, len(hosts))
-	for _, host := range hosts {
-		client, err := newClient(host)
-		if err != nil {
-			// on error destroy all client instance created
-			for _, client := range clients {
-				_ = client.Close() // ignore error
-			}
-			return nil, err
-		}
-		clients = append(clients, client)
-	}
-	return clients, nil
-}
-
-func MakeAsyncClients(
-	config *common.Config,
-	newClient func(string) (AsyncProtocolClient, error),
-) ([]AsyncProtocolClient, error) {
-	hosts, err := ReadHostList(config)
-	if err != nil {
-		return nil, err
-	}
-	if len(hosts) == 0 {
-		return nil, ErrNoHostsConfigured
-	}
-
-	clients := make([]AsyncProtocolClient, 0, len(hosts))
-	for _, host := range hosts {
-		client, err := newClient(host)
-		if err != nil {
-			// on error destroy all client instance created
-			for _, client := range clients {
-				_ = client.Close() // ignore error
-			}
-			return nil, err
-		}
-		clients = append(clients, client)
-	}
-	return clients, nil
-}
-
-func ReadHostList(cfg *common.Config) ([]string, error) {
-	config := struct {
-		Hosts  []string `config:"hosts"`
-		Worker int      `config:"worker"`
-	}{
-		Worker: 1,
-	}
-
-	err := cfg.Unpack(&config)
-	if err != nil {
-		return nil, err
-	}
-
-	lst := config.Hosts
-	if len(lst) == 0 || config.Worker <= 1 {
-		return lst, nil
-	}
-
-	// duplicate entries config.Workers times
-	hosts := make([]string, 0, len(lst)*config.Worker)
-	for _, entry := range lst {
-		for i := 0; i < config.Worker; i++ {
-			hosts = append(hosts, entry)
-		}
-	}
-
-	return hosts, nil
+func Dropped(i int) {
+	messagesDropped.Add(int64(i))
 }

@@ -1,0 +1,100 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "haproxy": {
+        "info": {
+            "compress": {
+                "bps": {
+                    "in": 0,
+                    "out": 0,
+                    "rate_limit": 0
+                }
+            },
+            "connection": {
+                "current": 0,
+                "hard_max": 4000,
+                "max": 4000,
+                "rate": {
+                    "limit": 0,
+                    "max": 0,
+                    "value": 0
+                },
+                "ssl": {
+                    "current": 0,
+                    "max": 0,
+                    "total": 0
+                },
+                "total": 15
+            },
+            "idle": {
+                "pct": 1
+            },
+            "memory": {
+                "max": {
+                    "bytes": 0
+                }
+            },
+            "pid": 8,
+            "pipes": {
+                "free": 0,
+                "max": 0,
+                "used": 0
+            },
+            "process_num": 1,
+            "processes": 1,
+            "requests": {
+                "total": 15
+            },
+            "run_queue": 1,
+            "session": {
+                "rate": {
+                    "limit": 0,
+                    "max": 0,
+                    "value": 0
+                }
+            },
+            "sockets": {
+                "max": 8032
+            },
+            "ssl": {
+                "backend": {
+                    "key_rate": {
+                        "max": 0,
+                        "value": 0
+                    }
+                },
+                "cache_misses": 0,
+                "cached_lookups": 0,
+                "frontend": {
+                    "key_rate": {
+                        "max": 0,
+                        "value": 0
+                    },
+                    "session_reuse": {
+                        "pct": 0
+                    }
+                },
+                "rate": {
+                    "limit": 0,
+                    "max": 0,
+                    "value": 0
+                }
+            },
+            "tasks": 5,
+            "ulimit_n": 8032,
+            "uptime": {
+                "sec": 733
+            },
+            "zlib_mem_usage": {
+                "max": 0,
+                "value": 0
+            }
+        }
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "haproxy",
+        "name": "info",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

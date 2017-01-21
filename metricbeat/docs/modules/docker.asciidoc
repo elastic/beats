@@ -1,0 +1,64 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-docker]]
+== Docker Module
+
+experimental[]
+
+This module fetches metrics from https://www.docker.com/[Docker] containers.
+
+
+
+[float]
+=== Example Configuration
+
+The Docker module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+#- module: docker
+  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
+  #hosts: ["unix:///var/run/docker.sock"]
+  #enabled: true
+  #period: 10s
+
+  # To connect to Docker over TLS you must specify a client and CA certificate.
+  #ssl:
+    #certificate_authority: "/etc/pki/root/ca.pem"
+    #certificate:           "/etc/pki/client/cert.pem"
+    #key:                   "/etc/pki/client/cert.key"
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-docker-container,container>>
+
+* <<metricbeat-metricset-docker-cpu,cpu>>
+
+* <<metricbeat-metricset-docker-diskio,diskio>>
+
+* <<metricbeat-metricset-docker-info,info>>
+
+* <<metricbeat-metricset-docker-memory,memory>>
+
+* <<metricbeat-metricset-docker-network,network>>
+
+include::docker/container.asciidoc[]
+
+include::docker/cpu.asciidoc[]
+
+include::docker/diskio.asciidoc[]
+
+include::docker/info.asciidoc[]
+
+include::docker/memory.asciidoc[]
+
+include::docker/network.asciidoc[]
+

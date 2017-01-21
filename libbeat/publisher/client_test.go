@@ -13,7 +13,7 @@ import (
 // ClientOptions.
 func TestGetClient(t *testing.T) {
 	c := &client{
-		publisher: &Publisher{},
+		publisher: &BeatPublisher{},
 	}
 	c.publisher.pipelines.async = &asyncPipeline{}
 	c.publisher.pipelines.sync = &syncPipeline{}
@@ -36,7 +36,7 @@ func TestGetClient(t *testing.T) {
 
 	for _, test := range testCases {
 		expected := reflect.ValueOf(test.out)
-		_, client := c.getPipeline(test.in)
+		_, _, client := c.getPipeline(test.in)
 		actual := reflect.ValueOf(client)
 		assert.Equal(t, expected.Pointer(), actual.Pointer())
 	}

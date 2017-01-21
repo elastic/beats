@@ -1,0 +1,10 @@
+{
+  "visState": "{\n  \"title\": \"HTTP error codes\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": false,\n    \"mode\": \"stacked\",\n    \"defaultYExtents\": false,\n    \"scale\": \"linear\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"type\": \"cardinality\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"type\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"http.response.code\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}", 
+  "description": "", 
+  "title": "HTTP error codes", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\n  \"filter\": [\n    {\n      \"$state\": {\n        \"store\": \"appState\"\n      },\n      \"meta\": {\n        \"disabled\": false,\n        \"index\": \"packetbeat-*\",\n        \"key\": \"type\",\n        \"negate\": false,\n        \"value\": \"http\",\n        \"alias\": null\n      },\n      \"query\": {\n        \"match\": {\n          \"type\": {\n            \"query\": \"http\",\n            \"type\": \"phrase\"\n          }\n        }\n      }\n    }\n  ],\n  \"index\": \"packetbeat-*\",\n  \"highlight\": {\n    \"pre_tags\": [\n      \"@kibana-highlighted-field@\"\n    ],\n    \"post_tags\": [\n      \"@/kibana-highlighted-field@\"\n    ],\n    \"fields\": {\n      \"*\": {}\n    }\n  },\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"http.response.code: [300 TO *]\",\n      \"analyze_wildcard\": true\n    }\n  }\n}"
+  }
+}

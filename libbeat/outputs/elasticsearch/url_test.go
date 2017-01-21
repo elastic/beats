@@ -14,7 +14,7 @@ func TestUrlEncode(t *testing.T) {
 	params := map[string]string{
 		"q": "agent:appserver1",
 	}
-	url := urlEncode(params)
+	url := urlEncode("", params)
 
 	if url != "q=agent%3Aappserver1" {
 		t.Errorf("Fail to encode params: %s", url)
@@ -25,7 +25,7 @@ func TestUrlEncode(t *testing.T) {
 		"husband": "joe",
 	}
 
-	url = urlEncode(params)
+	url = urlEncode("", params)
 
 	if url != "husband=joe&wife=sarah" {
 		t.Errorf("Fail to encode params: %s", url)

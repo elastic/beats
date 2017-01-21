@@ -16,28 +16,29 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	mkdns "github.com/miekg/dns"
 	"github.com/stretchr/testify/assert"
 )
 
 // Test Constants
 const (
-	ServerIp   = "192.168.0.1"
-	ServerPort = 53
-	ClientIp   = "10.0.0.1"
-	ClientPort = 34898
+	serverIP   = "192.168.0.1"
+	serverPort = 53
+	clientIP   = "10.0.0.1"
+	clientPort = 34898
 )
 
 // DnsTestMessage holds the data that is expected to be returned when parsing
 // the raw DNS layer payloads for the request and response packet.
-type DnsTestMessage struct {
+type dnsTestMessage struct {
 	id          uint16
 	opcode      string
 	flags       []string
 	rcode       string
-	q_class     string
-	q_type      string
-	q_name      string
-	q_etld      string
+	qClass      string
+	qType       string
+	qName       string
+	qEtld       string
 	answers     []string
 	authorities []string
 	additionals []string
@@ -47,15 +48,15 @@ type DnsTestMessage struct {
 
 // Request and response addresses.
 var (
-	forward = common.NewIpPortTuple(4,
-		net.ParseIP(ServerIp), ServerPort,
-		net.ParseIP(ClientIp), ClientPort)
-	reverse = common.NewIpPortTuple(4,
-		net.ParseIP(ClientIp), ClientPort,
-		net.ParseIP(ServerIp), ServerPort)
+	forward = common.NewIPPortTuple(4,
+		net.ParseIP(serverIP), serverPort,
+		net.ParseIP(clientIP), clientPort)
+	reverse = common.NewIPPortTuple(4,
+		net.ParseIP(clientIP), clientPort,
+		net.ParseIP(serverIP), serverPort)
 )
 
-func newDns(verbose bool) *Dns {
+func newDNS(verbose bool) *dnsPlugin {
 	if verbose {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"dns"})
 	} else {
@@ -64,7 +65,7 @@ func newDns(verbose bool) *Dns {
 
 	results := &publish.ChanTransactions{make(chan common.MapStr, 100)}
 	cfg, _ := common.NewConfigFrom(map[string]interface{}{
-		"ports":               []int{ServerPort},
+		"ports":               []int{serverPort},
 		"include_authorities": true,
 		"include_additionals": true,
 		"send_request":        true,
@@ -75,10 +76,10 @@ func newDns(verbose bool) *Dns {
 		panic(err)
 	}
 
-	return dns.(*Dns)
+	return dns.(*dnsPlugin)
 }
 
-func newPacket(t common.IpPortTuple, payload []byte) *protos.Packet {
+func newPacket(t common.IPPortTuple, payload []byte) *protos.Packet {
 	return &protos.Packet{
 		Ts:      time.Now(),
 		Tuple:   t,
@@ -88,7 +89,7 @@ func newPacket(t common.IpPortTuple, payload []byte) *protos.Packet {
 
 // expectResult returns one MapStr result from the Dns results channel. If
 // no result is available then the test fails.
-func expectResult(t testing.TB, dns *Dns) common.MapStr {
+func expectResult(t testing.TB, dns *dnsPlugin) common.MapStr {
 	client := dns.results.(*publish.ChanTransactions)
 	select {
 	case result := <-client.Channel:
@@ -157,7 +158,7 @@ func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
 //     dns.authorities
 //     dns.additionals_count
 //     dns.additionals
-func assertMapStrData(t testing.TB, m common.MapStr, q DnsTestMessage) {
+func assertMapStrData(t testing.TB, m common.MapStr, q dnsTestMessage) {
 	assertRequest(t, m, q)
 
 	// Answers
@@ -203,20 +204,20 @@ func assertMapStrData(t testing.TB, m common.MapStr, q DnsTestMessage) {
 	}
 }
 
-func assertRequest(t testing.TB, m common.MapStr, q DnsTestMessage) {
+func assertRequest(t testing.TB, m common.MapStr, q dnsTestMessage) {
 	assert.Equal(t, "dns", mapValue(t, m, "type"))
 	assertAddress(t, forward, mapValue(t, m, "src"))
 	assertAddress(t, reverse, mapValue(t, m, "dst"))
-	assert.Equal(t, fmt.Sprintf("class %s, type %s, %s", q.q_class, q.q_type, q.q_name),
+	assert.Equal(t, fmt.Sprintf("class %s, type %s, %s", q.qClass, q.qType, q.qName),
 		mapValue(t, m, "query"))
-	assert.Equal(t, q.q_name, mapValue(t, m, "resource"))
+	assert.Equal(t, q.qName, mapValue(t, m, "resource"))
 	assert.Equal(t, q.opcode, mapValue(t, m, "method"))
 	assert.Equal(t, q.id, mapValue(t, m, "dns.id"))
 	assert.Equal(t, q.opcode, mapValue(t, m, "dns.op_code"))
-	assert.Equal(t, q.q_class, mapValue(t, m, "dns.question.class"))
-	assert.Equal(t, q.q_type, mapValue(t, m, "dns.question.type"))
-	assert.Equal(t, q.q_name, mapValue(t, m, "dns.question.name"))
-	assert.Equal(t, q.q_etld, mapValue(t, m, "dns.question.etld_plus_one"))
+	assert.Equal(t, q.qClass, mapValue(t, m, "dns.question.class"))
+	assert.Equal(t, q.qType, mapValue(t, m, "dns.question.type"))
+	assert.Equal(t, q.qName, mapValue(t, m, "dns.question.name"))
+	assert.Equal(t, q.qEtld, mapValue(t, m, "dns.question.etld_plus_one"))
 }
 
 // Assert that the specified flags are set.
@@ -252,12 +253,36 @@ func assertFlags(t testing.TB, m common.MapStr, flags []string) {
 
 // Assert that the given Endpoint matches the IP and port in the given
 // IpPortTuple.
-func assertAddress(t testing.TB, expected common.IpPortTuple, endpoint interface{}) {
+func assertAddress(t testing.TB, expected common.IPPortTuple, endpoint interface{}) {
 	e, ok := endpoint.(*common.Endpoint)
 	if !ok {
 		t.Errorf("Expected a common.Endpoint but got %v", endpoint)
 	}
 
-	assert.Equal(t, expected.Src_ip.String(), e.Ip)
-	assert.Equal(t, expected.Src_port, e.Port)
+	assert.Equal(t, expected.SrcIP.String(), e.IP)
+	assert.Equal(t, expected.SrcPort, e.Port)
+}
+
+func TestRRsToMapStrsWithOPTRecord(t *testing.T) {
+	o := new(mkdns.OPT)
+	o.Hdr.Name = "." // MUST be the root zone, per definition.
+	o.Hdr.Rrtype = mkdns.TypeOPT
+
+	r := new(mkdns.MX)
+	r.Hdr = mkdns.RR_Header{Name: "miek.nl.", Rrtype: mkdns.TypeMX,
+		Class: mkdns.ClassINET, Ttl: 3600}
+	r.Preference = 10
+	r.Mx = "mx.miek.nl."
+
+	// The OPT record is a pseudo-record so it doesn't become a real record
+	// in our conversion, and there will be 1 entry instead of 2.
+	mapStrs := rrsToMapStrs([]mkdns.RR{o, r})
+	assert.Len(t, mapStrs, 1)
+
+	mapStr := mapStrs[0]
+	assert.Equal(t, "IN", mapStr["class"])
+	assert.Equal(t, "MX", mapStr["type"])
+	assert.Equal(t, "mx.miek.nl.", mapStr["data"])
+	assert.Equal(t, "miek.nl.", mapStr["name"])
+	assert.EqualValues(t, 10, mapStr["preference"])
 }

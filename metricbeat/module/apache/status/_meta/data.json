@@ -1,0 +1,66 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "apache": {
+        "status": {
+            "bytes_per_request": 1024,
+            "bytes_per_sec": 0.201113,
+            "connections": {
+                "async": {
+                    "closing": 0,
+                    "keep_alive": 0,
+                    "writing": 0
+                },
+                "total": 0
+            },
+            "cpu": {
+                "children_system": 0,
+                "children_user": 0,
+                "load": 0.00652482,
+                "system": 1.46,
+                "user": 1.53
+            },
+            "hostname": "apache",
+            "load": {
+                "1": 0.55,
+                "15": 0.31,
+                "5": 0.31
+            },
+            "requests_per_sec": 0.000196399,
+            "scoreboard": {
+                "closing_connection": 0,
+                "dns_lookup": 0,
+                "gracefully_finishing": 0,
+                "idle_cleanup": 0,
+                "keepalive": 0,
+                "logging": 0,
+                "open_slot": 325,
+                "reading_request": 0,
+                "sending_reply": 1,
+                "starting_up": 0,
+                "total": 400,
+                "waiting_for_connection": 74
+            },
+            "total_accesses": 9,
+            "total_kbytes": 9,
+            "uptime": {
+                "server_uptime": 45825,
+                "uptime": 45825
+            },
+            "workers": {
+                "busy": 1,
+                "idle": 74
+            }
+        }
+    },
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "apache",
+        "module": "apache",
+        "name": "status",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

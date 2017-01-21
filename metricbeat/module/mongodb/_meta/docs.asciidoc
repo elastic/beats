@@ -1,0 +1,49 @@
+== MongoDB Module
+
+This module periodically fetches metrics from https://www.mongodb.com[MongoDB]
+servers.
+
+[float]
+=== Module-Specific Configuration Notes
+
+When configuring the `hosts` option, you must use MongoDB URLs of the following
+format:
+
+-----------------------------------
+[mongodb://][user:pass@]host[:port][?options]
+-----------------------------------
+
+The URL can be as simple as:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["localhost"]
+----------------------------------------------------------------------
+
+Or more complex like:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["mongodb://myuser:mypass@localhost:40001", "otherhost:40001"]
+----------------------------------------------------------------------
+
+The username and password can be included in the URL or they can be set using
+the respective configuration options. The credentials in the URL take precedence
+over the username and password configuration options.
+
+[source,yaml]
+----
+- module: mongodb
+  metricsets: ["status"]
+  hosts: ["localhost:27017"]
+  username: root
+  password: test
+----
+
+[float]
+=== Compatibility
+
+The MongoDB metricsets were tested with MongoDB 3.4 and 3.0 and are expected to
+work with all versions >= 2.8.

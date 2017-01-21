@@ -3,10 +3,10 @@ package publisher
 import "github.com/elastic/beats/libbeat/common/op"
 
 type syncPipeline struct {
-	pub *Publisher
+	pub *BeatPublisher
 }
 
-func newSyncPipeline(pub *Publisher, hwm, bulkHWM int) *syncPipeline {
+func newSyncPipeline(pub *BeatPublisher, hwm, bulkHWM int) *syncPipeline {
 	return &syncPipeline{pub: pub}
 }
 
@@ -34,7 +34,7 @@ func (p *syncPipeline) publish(m message) bool {
 	// ignore any signal and drop events no matter if send or not.
 	select {
 	case <-client.canceler.Done():
-		return true
+		return false // return false, indicating events potentially not being send
 	case sig := <-sync.C:
 		sig.Apply(signal)
 		return sig == op.SignalCompleted

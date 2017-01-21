@@ -6,17 +6,18 @@ import (
 	"io"
 )
 
-type requestBody interface {
+type protocolBody interface {
 	encoder
-	decoder
+	versionedDecoder
 	key() int16
 	version() int16
+	requiredVersion() KafkaVersion
 }
 
 type request struct {
 	correlationID int32
 	clientID      string
-	body          requestBody
+	body          protocolBody
 }
 
 func (r *request) encode(pe packetEncoder) (err error) {
@@ -53,40 +54,42 @@ func (r *request) decode(pd packetDecoder) (err error) {
 	if r.body == nil {
 		return PacketDecodingError{fmt.Sprintf("unknown request key (%d)", key)}
 	}
-	return r.body.decode(pd)
+	return r.body.decode(pd, version)
 }
 
-func decodeRequest(r io.Reader) (req *request, err error) {
+func decodeRequest(r io.Reader) (req *request, bytesRead int, err error) {
 	lengthBytes := make([]byte, 4)
 	if _, err := io.ReadFull(r, lengthBytes); err != nil {
-		return nil, err
+		return nil, bytesRead, err
 	}
+	bytesRead += len(lengthBytes)
 
 	length := int32(binary.BigEndian.Uint32(lengthBytes))
 	if length <= 4 || length > MaxRequestSize {
-		return nil, PacketDecodingError{fmt.Sprintf("message of length %d too large or too small", length)}
+		return nil, bytesRead, PacketDecodingError{fmt.Sprintf("message of length %d too large or too small", length)}
 	}
 
 	encodedReq := make([]byte, length)
 	if _, err := io.ReadFull(r, encodedReq); err != nil {
-		return nil, err
+		return nil, bytesRead, err
 	}
+	bytesRead += len(encodedReq)
 
 	req = &request{}
 	if err := decode(encodedReq, req); err != nil {
-		return nil, err
+		return nil, bytesRead, err
 	}
-	return req, nil
+	return req, bytesRead, nil
 }
 
-func allocateBody(key, version int16) requestBody {
+func allocateBody(key, version int16) protocolBody {
 	switch key {
 	case 0:
 		return &ProduceRequest{}
 	case 1:
 		return &FetchRequest{}
 	case 2:
-		return &OffsetRequest{}
+		return &OffsetRequest{Version: version}
 	case 3:
 		return &MetadataRequest{}
 	case 8:
@@ -107,6 +110,10 @@ func allocateBody(key, version int16) requestBody {
 		return &DescribeGroupsRequest{}
 	case 16:
 		return &ListGroupsRequest{}
+	case 17:
+		return &SaslHandshakeRequest{}
+	case 18:
+		return &ApiVersionsRequest{}
 	}
 	return nil
 }

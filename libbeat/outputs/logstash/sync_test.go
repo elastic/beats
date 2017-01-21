@@ -7,8 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/streambuf"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
@@ -37,33 +36,12 @@ func TestClientStructuredEvent(t *testing.T) {
 	testStructuredEvent(t, makeTestClient)
 }
 
-func TestClientCloseAfterWindowSize(t *testing.T) {
-	testCloseAfterWindowSize(t, makeTestClient)
-}
-
 func TestClientMultiFailMaxTimeouts(t *testing.T) {
 	testMultiFailMaxTimeouts(t, makeTestClient)
 }
 
 func newClientServerTCP(t *testing.T, to time.Duration) *clientServer {
 	return &clientServer{transptest.NewMockServerTCP(t, to, "", nil)}
-}
-
-func (s *clientServer) connectPair(compressLevel int) (*mockConn, *client, error) {
-	client, transp, err := s.MockServer.ConnectPair()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	lc, err := newLumberjackClient(transp, compressLevel,
-		defaultConfig.BulkMaxSize, 100*time.Millisecond,
-		"test")
-	if err != nil {
-		return nil, nil, err
-	}
-
-	conn := &mockConn{client, streambuf.New(nil)}
-	return conn, lc, nil
 }
 
 func makeTestClient(conn *transport.Client) testClientDriver {
@@ -90,9 +68,13 @@ func newClientTestDriver(client mode.ProtocolClient) *testSyncDriver {
 			switch cmd.code {
 			case driverCmdQuit:
 				return
+			case driverCmdConnect:
+				driver.client.Connect(1 * time.Second)
+			case driverCmdClose:
+				driver.client.Close()
 			case driverCmdPublish:
-				events, err := driver.client.PublishEvents(cmd.events)
-				n := len(cmd.events) - len(events)
+				events, err := driver.client.PublishEvents(cmd.data)
+				n := len(cmd.data) - len(events)
 				driver.returns = append(driver.returns, testClientReturn{n, err})
 			}
 		}
@@ -111,8 +93,16 @@ func (t *testSyncDriver) Stop() {
 	}
 }
 
-func (t *testSyncDriver) Publish(events []common.MapStr) {
-	t.ch <- testDriverCommand{code: driverCmdPublish, events: events}
+func (t *testSyncDriver) Connect() {
+	t.ch <- testDriverCommand{code: driverCmdConnect}
+}
+
+func (t *testSyncDriver) Close() {
+	t.ch <- testDriverCommand{code: driverCmdClose}
+}
+
+func (t *testSyncDriver) Publish(data []outputs.Data) {
+	t.ch <- testDriverCommand{code: driverCmdPublish, data: data}
 }
 
 func (t *testSyncDriver) Returns() []testClientReturn {

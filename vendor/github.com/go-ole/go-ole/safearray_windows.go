@@ -205,15 +205,16 @@ func safeArrayGetElementSize(safearray *SafeArray) (length *uint32, err error) {
 }
 
 // safeArrayGetElement retrieves element at given index.
-func safeArrayGetElement(safearray *SafeArray, index int64, pv unsafe.Pointer) error {
-	return convertHresultToError(
+func safeArrayGetElement(safearray *SafeArray, index int64) (element uintptr, err error) {
+	err = convertHresultToError(
 		procSafeArrayGetElement.Call(
 			uintptr(unsafe.Pointer(safearray)),
 			uintptr(unsafe.Pointer(&index)),
-			uintptr(pv)))
+			uintptr(unsafe.Pointer(&element))))
+	return
 }
 
-// safeArrayGetElementString retrieves element at given index and converts to string.
+// safeArrayGetElement retrieves element at given index and converts to string.
 func safeArrayGetElementString(safearray *SafeArray, index int64) (str string, err error) {
 	var element *int16
 	err = convertHresultToError(

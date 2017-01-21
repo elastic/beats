@@ -1,0 +1,32 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "localhost",
+        "module": "system",
+        "name": "diskio",
+        "rtt": 115
+    },
+    "system": {
+        "diskio": {
+            "io": {
+                "time": 4130
+            },
+            "name": "vda1",
+            "read": {
+                "bytes": 204800,
+                "count": 36,
+                "time": 960
+            },
+            "write": {
+                "bytes": 2281472,
+                "count": 224,
+                "time": 29700
+            }
+        }
+    },
+    "type": "metricsets"
+}

@@ -6,6 +6,10 @@ import (
 	"github.com/elastic/beats/libbeat/publisher"
 )
 
+type TestPublisher struct {
+	client publisher.Client
+}
+
 // given channel only.
 type ChanClient struct {
 	done    chan struct{}
@@ -17,6 +21,14 @@ type ChanClient struct {
 type PublishMessage struct {
 	Context publisher.Context
 	Events  []common.MapStr
+}
+
+func PublisherWithClient(client publisher.Client) publisher.Publisher {
+	return &TestPublisher{client}
+}
+
+func (pub *TestPublisher) Connect() publisher.Client {
+	return pub.client
 }
 
 func NewChanClient(bufSize int) *ChanClient {
@@ -48,7 +60,8 @@ func (c *ChanClient) PublishEvent(event common.MapStr, opts ...publisher.ClientO
 // PublishEvents publishes all event on the configured channel. Options will be ignored.
 // Always returns true.
 func (c *ChanClient) PublishEvents(events []common.MapStr, opts ...publisher.ClientOption) bool {
-	msg := PublishMessage{publisher.MakeContext(opts), events}
+	_, ctx := publisher.MakeContext(opts)
+	msg := PublishMessage{ctx, events}
 	select {
 	case <-c.done:
 		return false

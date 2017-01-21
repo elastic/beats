@@ -142,6 +142,14 @@ func (ip *IPv4) DecodeFromBytes(data []byte, df gopacket.DecodeFeedback) error {
 	// Set up an initial guess for contents/payload... we'll reset these soon.
 	ip.BaseLayer = BaseLayer{Contents: data}
 
+	// This code is added for the following enviroment:
+	// * Windows 10 with TSO option activated. ( tested on Hyper-V, RealTek ethernet driver )
+	if ip.Length == 0 {
+		// If using TSO(TCP Segmentation Offload), length is zero.
+		// The actual packet length is the length of data.
+		ip.Length = uint16(len(data))
+	}
+
 	if ip.Length < 20 {
 		return fmt.Errorf("Invalid (too small) IP length (%d < 20)", ip.Length)
 	} else if ip.IHL < 5 {

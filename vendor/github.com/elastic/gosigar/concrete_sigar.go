@@ -67,3 +67,9 @@ func (c *ConcreteSigar) GetFileSystemUsage(path string) (FileSystemUsage, error)
 	err := f.Get(path)
 	return f, err
 }
+
+func (c *ConcreteSigar) GetFDUsage() (FDUsage, error) {
+	fd := FDUsage{}
+	err := fd.Get()
+	return fd, err
+}

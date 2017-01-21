@@ -16,53 +16,45 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-Before using {beatname_uc}, you need to load the
-http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
-template], which lets Elasticsearch know which fields should be analyzed
-in which way.
+In Elasticsearch, {elasticsearch}/indices-templates.html[index
+templates] are used to define settings and mappings that determine how fields should be analyzed. 
 
-The recommended template file is installed by the {beatname_uc} packages. By default, {beatname_uc} 
-loads the template automatically when you start the Beat if no template was previously loaded.
-However, if you want to disable automatic template loading, or you want to load your own template, 
+The recommended index template file for {beatname_uc} is installed by the {beatname_uc} packages. If you accept
+the default configuration for template loading in the +{beatname_lc}.yml+ config file, 
+{beatname_uc} loads the template automatically after successfully connecting to Elasticsearch. If the template
+already exists, it's not overwritten unless you configure {beatname_uc} to do so.
+
+If you want to disable automatic template loading, or you want to load your own template, 
 you can change the settings for template loading in the {beatname_uc} configuration file. If you 
 choose to disable automatic template loading, you need to load the template manually. 
 For more information, see:
 
-* <<load-template-auto>>
-* <<load-template-manually>>
+* <<load-template-auto>> - supported for Elasticsearch output only
+* <<load-template-manually>> - required for Logstash output
 
 [[load-template-auto]]
 ==== Configuring Template Loading
 
 By default, {beatname_uc} automatically loads the recommended template file, +{beatname_lc}.template.json+,
-if elasticsearch output is enabled. You can configure {beatname_lc} to load a different template
-by adjusting the `name` and `path` options under `template` in +{beatname_lc}.yml+ file:
+if Elasticsearch output is enabled. You can configure {beatname_lc} to load a different template
+by adjusting the `template.name` and `template.path` options in +{beatname_lc}.yml+ file:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-output:
-  elasticsearch:
-    hosts: ["localhost:9200"]
-
-    # A template is used to set the mapping in Elasticsearch
-    # By default template loading is disabled and no template is loaded.
-    # These settings can be adjusted to load your own template or overwrite existing ones
-    template:
-
-      # Template name. By default the template name is {beatname_lc}.
-      name: "{beatname_lc}"
-
-      # Path to template file
-      path: "{beatname_lc}.template.json"
-
-      # Overwrite existing template
-      overwrite: false
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  template.name: "{beatname_lc}"
+  template.path: "{beatname_lc}.template.json"
+  template.overwrite: false
 ----------------------------------------------------------------------
 
 By default, if a template already exists in the index, it is not overwritten. To overwrite an existing
-template, set `overwrite: true` in the configuration file.
+template, set `template.overwrite: true` in the configuration file.
 
-To disable automatic template loading, comment out the template part under elasticsearch output.
+To disable automatic template loading, comment out the template part under the Elasticsearch output.
+
+The options for auto loading the template are not supported if you are using the
+Logstash output.
 
 [[load-template-manually]]
 ==== Loading the Template Manually
@@ -82,13 +74,13 @@ curl -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@/etc/{beatname_lc}
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-cd {beatname_lc}-{version}-darwin
+cd {beatname_lc}-{version}-darwin-x86_64
 curl -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@{beatname_lc}.template.json
 ----------------------------------------------------------------------
 
-endif::allplatforms[]
-
 *win:*
+
+endif::allplatforms[]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------

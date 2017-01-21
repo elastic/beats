@@ -1,0 +1,24 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "module": "system",
+        "name": "fsstat",
+        "rtt": 115
+    },
+    "system": {
+        "fsstat": {
+            "count": 35,
+            "total_files": 82867556,
+            "total_size": {
+                "free": 8357919805440,
+                "total": 64217933451264,
+                "used": 55860013645824
+            }
+        }
+    },
+    "type": "metricsets"
+}

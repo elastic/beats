@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Disk space overview\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":\"30\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.fsstat.total_size.total\",\"customLabel\":\"Total disk space\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.fsstat.total_size.used\",\"customLabel\":\"Used disk space\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"system.fsstat.total_files\",\"customLabel\":\"Total files\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Disk space overview", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Fsstats", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

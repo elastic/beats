@@ -1,0 +1,11 @@
+=== System CPU Metricset
+
+The System `cpu` metricset provides CPU statistics.
+
+This metricset is available on:
+
+- Darwin
+- FreeBSD
+- Linux
+- OpenBSD
+- Windows

@@ -1,0 +1,103 @@
+- name: core
+  type: group
+  description: >
+    `system-core` contains local CPU core stats.
+  fields:
+    - name: id
+      type: long
+      description: >
+        CPU Core number.
+
+    - name: user.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
+        For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+
+    - name: user.ticks
+      type: long
+      description: >
+       The amount of CPU time spent in user space.
+
+    - name: system.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percentage of CPU time spent in kernel space.
+
+    - name: system.ticks
+      type: long
+      description: >
+        The amount of CPU time spent in kernel space.
+
+    - name: nice.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percentage of CPU time spent on low-priority processes.
+
+    - name: nice.ticks
+      type: long
+      description: >
+        The amount of CPU time spent on low-priority processes.
+
+    - name: idle.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percentage of CPU time spent idle.
+
+    - name: idle.ticks
+      type: long
+      description: >
+        The amount of CPU time spent idle.
+
+    - name: iowait.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percentage of CPU time spent in wait (on disk).
+
+    - name: iowait.ticks
+      type: long
+      description: >
+        The amount of CPU time spent in wait (on disk).
+
+    - name: irq.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percentage of CPU time spent servicing and handling hardware interrupts.
+
+    - name: irq.ticks
+      type: long
+      description: >
+        The amount of CPU time spent servicing and handling hardware interrupts.
+
+    - name: softirq.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percentage of CPU time spent servicing and handling software interrupts.
+
+    - name: softirq.ticks
+      type: long
+      description: >
+        The amount of CPU time spent servicing and handling software interrupts.
+
+    - name: steal.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+        was servicing another processor.
+        Available only on Unix.
+
+    - name: steal.ticks
+      type: long
+      description: >
+        The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+        was servicing another processor.
+        Available only on Unix.
+

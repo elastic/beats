@@ -1,71 +1,83 @@
-/*
-  The harvester package harvest different inputs for new information. Currently
-  two harvester types exist:
-
-   * log
-   * stdin
-
-  The log harvester reads a file line by line. In case the end of a file is found
-  with an incomplete line, the line pointer stays at the beginning of the incomplete
-  line. As soon as the line is completed, it is read and returned.
-
-  The stdin harvesters reads data from stdin.
-*/
+// Package harvester harvests different inputs for new information. Currently
+// two harvester types exist:
+//
+//   * log
+//   * stdin
+//
+//  The log harvester reads a file line by line. In case the end of a file is found
+//  with an incomplete line, the line pointer stays at the beginning of the incomplete
+//  line. As soon as the line is completed, it is read and returned.
+//
+//  The stdin harvesters reads data from stdin.
 package harvester
 
 import (
+	"errors"
 	"fmt"
-	"regexp"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/common"
+)
+
+var (
+	ErrFileTruncate = errors.New("detected file being truncated")
+	ErrRenamed      = errors.New("file was renamed")
+	ErrRemoved      = errors.New("file was removed")
+	ErrInactive     = errors.New("file inactive")
+	ErrClosed       = errors.New("reader closed")
 )
 
 type Harvester struct {
-	Path               string /* the file path to harvest */
-	Config             *config.HarvesterConfig
-	offset             int64
-	Stat               *input.FileStat
-	SpoolerChan        chan *input.FileEvent
-	encoding           encoding.EncodingFactory
-	file               FileSource /* the file being watched */
-	ExcludeLinesRegexp []*regexp.Regexp
-	IncludeLinesRegexp []*regexp.Regexp
+	config          harvesterConfig
+	state           file.State
+	prospectorChan  chan *input.Event
+	file            source.FileSource /* the file being watched */
+	fileReader      *LogFile
+	encodingFactory encoding.EncodingFactory
+	encoding        encoding.Encoding
+	done            chan struct{}
 }
 
 func NewHarvester(
-	cfg *config.HarvesterConfig,
-	path string,
-	stat *input.FileStat,
-	spooler chan *input.FileEvent,
+	cfg *common.Config,
+	state file.State,
+	prospectorChan chan *input.Event,
+	done chan struct{},
 ) (*Harvester, error) {
 
-	var err error
-	encoding, ok := encoding.FindEncoding(cfg.Encoding)
-	if !ok || encoding == nil {
-		return nil, fmt.Errorf("unknown encoding('%v')", cfg.Encoding)
+	h := &Harvester{
+		config:         defaultConfig,
+		state:          state,
+		prospectorChan: prospectorChan,
+		done:           done,
 	}
 
-	h := &Harvester{
-		Path:        path,
-		Config:      cfg,
-		Stat:        stat,
-		SpoolerChan: spooler,
-		encoding:    encoding,
+	if err := cfg.Unpack(&h.config); err != nil {
+		return nil, err
 	}
-	h.ExcludeLinesRegexp, err = InitRegexps(cfg.ExcludeLines)
-	if err != nil {
-		return h, err
+
+	encodingFactory, ok := encoding.FindEncoding(h.config.Encoding)
+	if !ok || encodingFactory == nil {
+		return nil, fmt.Errorf("unknown encoding('%v')", h.config.Encoding)
 	}
-	h.IncludeLinesRegexp, err = InitRegexps(cfg.IncludeLines)
-	if err != nil {
-		return h, err
-	}
+	h.encodingFactory = encodingFactory
+
 	return h, nil
 }
 
-func (h *Harvester) Start() {
-	// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
-	go h.Harvest()
+// open does open the file given under h.Path and assigns the file handler to h.file
+func (h *Harvester) open() error {
+
+	switch h.config.InputType {
+	case config.StdinInputType:
+		return h.openStdin()
+	case config.LogInputType:
+		return h.openFile()
+	default:
+		return fmt.Errorf("Invalid input type")
+	}
 }

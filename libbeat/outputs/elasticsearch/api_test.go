@@ -2,42 +2,10 @@
 package elasticsearch
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-const ElasticsearchDefaultHost = "localhost"
-const ElasticsearchDefaultPort = "9200"
-
-func GetEsPort() string {
-	port := os.Getenv("ES_PORT")
-
-	if len(port) == 0 {
-		port = ElasticsearchDefaultPort
-	}
-	return port
-}
-
-// Returns
-func GetEsHost() string {
-
-	host := os.Getenv("ES_HOST")
-
-	if len(host) == 0 {
-		host = ElasticsearchDefaultHost
-	}
-
-	return host
-}
-
-func GetTestingElasticsearch() *Client {
-	var address = "http://" + GetEsHost() + ":" + GetEsPort()
-	username := os.Getenv("ES_USER")
-	pass := os.Getenv("ES_PASS")
-	return NewClient(address, "", nil, nil, username, pass, nil, nil)
-}
 
 func GetValidQueryResult() QueryResult {
 	result := QueryResult{
@@ -161,4 +129,8 @@ func TestReadSearchResult_invalid(t *testing.T) {
 	results, err := readSearchResult(json)
 	assert.Nil(t, results)
 	assert.Error(t, err)
+}
+
+func newTestClient(url string) *Client {
+	return newTestClientAuth(url, "", "")
 }

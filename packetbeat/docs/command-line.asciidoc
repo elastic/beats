@@ -2,40 +2,9 @@
 === Command Line Options
 
 The following command line options are available for Packetbeat. To use these options,
-you need to start Packetbeat in the foreground.
+you need to start Packetbeat in the foreground. 
 
-[source,shell]
-------------------------------------------------------------------------
-$ ./packetbeat -h
-Usage of ./packetbeat:
-  -I string
-      file
-  -N  Disable actual publishing for testing
-  -O  Read packets one at a time (press Enter)
-  -c string
-      Configuration file (default "/etc/packetbeat/packetbeat.yml")
-  -configtest
-      Test configuration and exit.
-  -cpuprofile string
-      Write cpu profile to file
-  -d string
-      Enable certain debug selectors
-  -devices
-      Print the list of devices and exit
-  -dump string
-      Write all captured packets to this libpcap file
-  -e  Log to stderr and disable syslog/file output
-  -l int
-      Loop file. 0 - loop forever (default 1)
-  -memprofile string
-      Write memory profile to this file
-  -t  Read packets as fast as possible, without sleeping
-  -v  Log at INFO level
-  -version
-      Print version and exit
-  -waitstop int
-      Additional seconds to wait before shutting down
-----------------------------------------------------------------------------
+TIP: Run `./packetbeat -h` to see the full list of options from the command line.
 
 ==== Packet-Beat Specific Options
 These command line options are specific to Packetbeat:

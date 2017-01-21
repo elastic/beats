@@ -1,0 +1,86 @@
+[[running-in-container]]
+== Running Metricbeat in a Container
+
+Elastic does not provide any official container images for Metricbeat. The
+examples on this page assume you are using your own Metricbeat container image.
+
+When executing Metricbeat in a container, there are some important 
+things to be aware of if you want to monitor the host machine or other
+containers. Let's walk-through some examples using Docker as our container
+orchestration tool.
+
+[float]
+[[monitoring-host]]
+=== Monitoring the Host Machine
+
+This example highlights the changes required to make the system module
+work properly inside of a container. This enables Metricbeat to monitor the
+host machine from within the container.
+
+[source,sh]
+---
+sudo docker run \
+  --volume=/proc:/hostfs/proc:ro \ <1>
+  --volume=/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro \ <2>
+  --volume=/:/hostfs:ro \ <3>
+  --net=host <4>
+  my/metricbeat:latest -system.hostfs=/hostfs
+---
+
+<1> Metricbeat's <<metricbeat-module-system,system module>> collects much of its data through the Linux proc
+filesystem, which is normally located at `/proc`. Because containers
+are isolated as much as possible from the host, the data inside of the
+container's `/proc` is different than the host's `/proc`. To account for this, you
+can mount the host's `/proc` filesystem inside of the container and tell
+Metricbeat to look inside the `/hostfs` directory when looking for `/proc` by
+using the `-system.hostfs=/hostfs` CLI flag.
+<2> If you have enabled cgroup reporting (an experimental feature) from the
+<<metricbeat-metricset-system-process,system process metricset>>, then you need to mount the host's cgroup mountpoints
+within the container. They need to be mounted inside the directory specified by
+the `-system.hostfs` CLI flag.
+<3> If you want to be able to monitor filesystems from the host by using the
+<<metricbeat-metricset-system-filesystem,system filesystem metricset>>, then those filesystems need to be mounted inside
+of the container. They can be mounted at any location.
+<4> The <<metricbeat-metricset-system-network,system network metricset>> uses data from `/proc/net/dev`, or
+`/hostfs/proc/net/dev` when using `-system.hostfs=/hostfs`. The only way
+to make this file contain the host's network devices is to use the `--net=host`
+flag. This is due to Linux namespacing; simply bind mounting the host's `/proc`
+to `/hostfs/proc` is not sufficient.
+
+[float]
+[[monitoring-service]]
+=== Monitoring a Service in Another Container
+
+Next let's look at an example of monitoring a containerized service from a
+Metricbeat container.
+
+[source,sh]
+---
+sudo docker run \
+  --link some-mysql:mysql \ <1>
+  -e MYSQL_PASSWORD=secret \ <2>
+  my/metricbeat:latest
+---
+
+<1> Linking the containers enables Metricbeat access the exposed ports of the
+mysql container, and it makes the hostname `mysql` resolvable to Metricbeat.
+<2> If you do not want to hardcode certain values into your Metricbeat
+configuration, then you can pass them into the container either as environment
+variables or as command line flags to Metricbeat (see the `-E` CLI flag in <<command-line-options>>).
+
+The mysql module configuration would look like this:
+
+[source,yaml]
+---
+metricbeat.modules:
+- module: mysql
+  metricsets: ["status"]
+  hosts: ["mysql:3306"] <1>
+  username: root
+  password: ${MYSQL_PASSWORD} <2>
+---
+
+<1> The `mysql` hostname will resolve to the `some-mysql` container's address.
+<2> The `MYSQL_PASSWORD` variable will be evaluated at startup. If the variable
+is not set, this will lead to an error at startup.
+

@@ -1,452 +1,149 @@
-################### Packetbeat Configuration Example ##########################
+#################### Packetbeat Configuration Example #########################
 
-# This file contains an overview of various configuration settings. Please consult
-# the docs at https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-configuration.html
-# for more details.
+# This file is an example configuration file highlighting only the most common
+# options. The packetbeat.full.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/packetbeat/index.html
 
-# The Packetbeat shipper works by sniffing the network traffic between your
-# application components. It inserts meta-data about each transaction into
-# Elasticsearch.
+#============================== Network device ================================
 
-############################# Sniffer #########################################
+# Select the network interface to sniff the data. On Linux, you can use the
+# "any" keyword to sniff on all connected interfaces.
+packetbeat.interfaces.device: any
 
-# Select the network interfaces to sniff the data. You can use the "any"
-# keyword to sniff on all connected interfaces.
-packetbeat.interfaces:
-  device: any
+#================================== Flows =====================================
 
+# Set `enabled: false` or comment out all options to disable flows reporting.
 packetbeat.flows:
   # Set network flow timeout. Flow is killed if no packet is received before being
   # timed out.
-  #timeout: 30s
+  timeout: 30s
 
   # Configure reporting period. If set to -1, only killed flows will be reported
-  #period: 10s
+  period: 10s
 
-############################# Protocols #######################################
-packetbeat.protocols:
-  icmp:
-    # Enable ICMPv4 and ICMPv6 monitoring. Default: false
-    enabled: true
+#========================== Transaction protocols =============================
 
-  amqp:
-    # Configure the ports where to listen for AMQP traffic. You can disable
-    # the AMQP protocol by commenting out the list of ports.
-    ports: [5672]
-    # Truncate messages that are published and avoid huge messages being
-    # indexed.
-    # Default: 1000
-    #max_body_length: 1000
+packetbeat.protocols.icmp:
+  # Enable ICMPv4 and ICMPv6 monitoring. Default: false
+  enabled: true
 
-    # Hide the header fields in header frames.
-    # Default: false
-    #parse_headers: false
+packetbeat.protocols.amqp:
+  # Configure the ports where to listen for AMQP traffic. You can disable
+  # the AMQP protocol by commenting out the list of ports.
+  ports: [5672]
 
-    # Hide the additional arguments of method frames.
-    # Default: false
-    #parse_arguments: false
+packetbeat.protocols.cassandra:
+  #Cassandra port for traffic monitoring.
+  ports: [9042]
 
-    # Hide all methods relative to connection negociation between server and
-    # client.
-    # Default: true
-    #hide_connection_information: true
+packetbeat.protocols.dns:
+  # Configure the ports where to listen for DNS traffic. You can disable
+  # the DNS protocol by commenting out the list of ports.
+  ports: [53]
 
-  dns:
-    # Configure the ports where to listen for DNS traffic. You can disable
-    # the DNS protocol by commenting out the list of ports.
-    ports: [53]
+  # include_authorities controls whether or not the dns.authorities field
+  # (authority resource records) is added to messages.
+  include_authorities: true
 
-    # include_authorities controls whether or not the dns.authorities field
-    # (authority resource records) is added to messages.
-    # Default: false
-    include_authorities: true
-    # include_additionals controls whether or not the dns.additionals field
-    # (additional resource records) is added to messages.
-    # Default: false
-    include_additionals: true
+  # include_additionals controls whether or not the dns.additionals field
+  # (additional resource records) is added to messages.
+  include_additionals: true
 
-    # send_request and send_response control whether or not the stringified DNS
-    # request and response message are added to the result.
-    # Nearly all data about the request/response is available in the dns.*
-    # fields, but this can be useful if you need visibility specifically
-    # into the request or the response.
-    # Default: false
-    # send_request:  true
-    # send_response: true
+packetbeat.protocols.http:
+  # Configure the ports where to listen for HTTP traffic. You can disable
+  # the HTTP protocol by commenting out the list of ports.
+  ports: [80, 8080, 8000, 5000, 8002]
 
-  http:
-    # Configure the ports where to listen for HTTP traffic. You can disable
-    # the HTTP protocol by commenting out the list of ports.
-    ports: [80, 8080, 8000, 5000, 8002]
+packetbeat.protocols.memcache:
+  # Configure the ports where to listen for memcache traffic. You can disable
+  # the Memcache protocol by commenting out the list of ports.
+  ports: [11211]
 
-    # Uncomment the following to hide certain parameters in URL or forms attached
-    # to HTTP requests. The names of the parameters are case insensitive.
-    # The value of the parameters will be replaced with the 'xxxxx' string.
-    # This is generally useful for avoiding storing user passwords or other
-    # sensitive information.
-    # Only query parameters and top level form parameters are replaced.
-    # hide_keywords: ['pass', 'password', 'passwd']
+packetbeat.protocols.mysql:
+  # Configure the ports where to listen for MySQL traffic. You can disable
+  # the MySQL protocol by commenting out the list of ports.
+  ports: [3306]
 
-  memcache:
-    # Configure the ports where to listen for memcache traffic. You can disable
-    # the Memcache protocol by commenting out the list of ports.
-    ports: [11211]
+packetbeat.protocols.pgsql:
+  # Configure the ports where to listen for Pgsql traffic. You can disable
+  # the Pgsql protocol by commenting out the list of ports.
+  ports: [5432]
 
-    # Uncomment the parseunknown option to force the memcache text protocol parser
-    # to accept unknown commands.
-    # Note: All unknown commands MUST not contain any data parts!
-    # Default: false
-    # parseunknown: true
+packetbeat.protocols.redis:
+  # Configure the ports where to listen for Redis traffic. You can disable
+  # the Redis protocol by commenting out the list of ports.
+  ports: [6379]
 
-    # Update the maxvalue option to store the values - base64 encoded - in the
-    # json output.
-    # possible values:
-    #    maxvalue: -1  # store all values (text based protocol multi-get)
-    #    maxvalue: 0   # store no values at all
-    #    maxvalue: N   # store up to N values
-    # Default: 0
-    # maxvalues: -1
+packetbeat.protocols.thrift:
+  # Configure the ports where to listen for Thrift-RPC traffic. You can disable
+  # the Thrift-RPC protocol by commenting out the list of ports.
+  ports: [9090]
 
-    # Use maxbytespervalue to limit the number of bytes to be copied per value element.
-    # Note: Values will be base64 encoded, so actual size in json document
-    #       will be 4 times maxbytespervalue.
-    # Default: unlimited
-    # maxbytespervalue: 100
+packetbeat.protocols.mongodb:
+  # Configure the ports where to listen for MongoDB traffic. You can disable
+  # the MongoDB protocol by commenting out the list of ports.
+  ports: [27017]
 
-    # UDP transaction timeout in milliseconds.
-    # Note: Quiet messages in UDP binary protocol will get response only in error case.
-    #       The memcached analyzer will wait for udptransactiontimeout milliseconds
-    #       before publishing quiet messages. Non quiet messages or quiet requests with
-    #       error response will not have to wait for the timeout.
-    # Default: 200
-    # udptransactiontimeout: 1000
+packetbeat.protocols.nfs:
+  # Configure the ports where to listen for NFS traffic. You can disable
+  # the NFS protocol by commenting out the list of ports.
+  ports: [2049]
 
-  mysql:
-    # Configure the ports where to listen for MySQL traffic. You can disable
-    # the MySQL protocol by commenting out the list of ports.
-    ports: [3306]
+#================================ General =====================================
 
-  pgsql:
-    # Configure the ports where to listen for Pgsql traffic. You can disable
-    # the Pgsql protocol by commenting out the list of ports.
-    ports: [5432]
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+#name:
 
-  redis:
-    # Configure the ports where to listen for Redis traffic. You can disable
-    # the Redis protocol by commenting out the list of ports.
-    ports: [6379]
+# The tags of the shipper are included in their own field with each
+# transaction published.
+#tags: ["service-X", "web-tier"]
 
-  thrift:
-    # Configure the ports where to listen for Thrift-RPC traffic. You can disable
-    # the Thrift-RPC protocol by commenting out the list of ports.
-    ports: [9090]
+# Optional fields that you can specify to add additional information to the
+# output.
+#fields:
+#  env: staging
 
-  mongodb:
-    # Configure the ports where to listen for MongoDB traffic. You can disable
-    # the MongoDB protocol by commenting out the list of ports.
-    ports: [27017]
-
-  nfs:
-    # Configure the ports where to listen for NFS traffic. You can disable
-    # the NFS protocol by commenting out the list of ports.
-    ports: [2049]
-
-############################# Processes #######################################
-
-# Configure the processes to be monitored and how to find them. If a process is
-# monitored then Packetbeat attempts to use it's name to fill in the `proc` and
-# `client_proc` fields.
-# The processes can be found by searching their command line by a given string.
-#
-# Process matching is optional and can be enabled by uncommenting the following
-# lines.
-#
-#packetbeat.procs:
-#  enabled: false
-#  monitored:
-#    - process: mysqld
-#      cmdline_grep: mysqld
-#
-#    - process: pgsql
-#      cmdline_grep: postgres
-#
-#    - process: nginx
-#      cmdline_grep: nginx
-#
-#    - process: app
-#      cmdline_grep: gunicorn
-###############################################################################
-############################# Libbeat Config ##################################
-# Base config file used by all other beats for using libbeat features
-
-############################# Output ##########################################
+#================================ Outputs =====================================
 
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
-output:
 
-  ### Elasticsearch as output
-  elasticsearch:
-    # Array of hosts to connect to.
-    # Scheme and port can be left out and will be set to the default (http and 9200)
-    # In case you specify and additional path, the scheme is required: http://localhost:9200/path
-    # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
-    hosts: ["localhost:9200"]
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
 
-    # Optional protocol and basic auth credentials.
-    #protocol: "https"
-    #username: "admin"
-    #password: "s3cr3t"
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
 
-    # Dictionary of HTTP parameters to pass within the url with index operations.
-    #parameters:
-      #param1: value1
-      #param2: value2
+#----------------------------- Logstash output --------------------------------
+#output.logstash:
+  # The Logstash hosts
+  #hosts: ["localhost:5044"]
 
-    # Number of workers per Elasticsearch host.
-    #worker: 1
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-    # Optional index name. The default is "packetbeat" and generates
-    # [packetbeat-]YYYY.MM.DD keys.
-    #index: "packetbeat"
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
 
-    # A template is used to set the mapping in Elasticsearch
-    # By default template loading is enabled and the template is loaded.
-    # These settings can be adjusted to load your own template or overwrite existing ones
-    template:
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
 
-      # Template name. By default the template name is packetbeat.
-      name: "packetbeat"
+#================================ Logging =====================================
 
-      # Path to template file
-      path: "packetbeat.template.json"
+# Sets log level. The default log level is info.
+# Available log levels are: critical, error, warning, info, debug
+#logging.level: debug
 
-      # Overwrite existing template
-      overwrite: false
-
-    # Optional HTTP Path
-    #path: "/elasticsearch"
-
-    # Proxy server url
-    #proxy_url: http://proxy:3128
-
-    # The number of times a particular Elasticsearch index operation is attempted. If
-    # the indexing operation doesn't succeed after this many retries, the events are
-    # dropped. The default is 3.
-    #max_retries: 3
-
-    # The maximum number of events to bulk in a single Elasticsearch bulk API index request.
-    # The default is 50.
-    #bulk_max_size: 50
-
-    # Configure http request timeout before failing an request to Elasticsearch.
-    #timeout: 90
-
-    # The number of seconds to wait for new events between two bulk API index requests.
-    # If `bulk_max_size` is reached before this interval expires, addition bulk index
-    # requests are made.
-    #flush_interval: 1
-
-    # Boolean that sets if the topology is kept in Elasticsearch. The default is
-    # false. This option makes sense only for Packetbeat.
-    #save_topology: false
-
-    # The time to live in seconds for the topology information that is stored in
-    # Elasticsearch. The default is 15 seconds.
-    #topology_expire: 15
-
-    # tls configuration. By default is off.
-    #tls:
-      # List of root certificates for HTTPS server verifications
-      #certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-      # Certificate for TLS client authentication
-      #certificate: "/etc/pki/client/cert.pem"
-
-      # Client Certificate Key
-      #certificate_key: "/etc/pki/client/cert.key"
-
-      # Controls whether the client verifies server certificates and host name.
-      # If insecure is set to true, all server host names and certificates will be
-      # accepted. In this mode TLS based connections are susceptible to
-      # man-in-the-middle attacks. Use only for testing.
-      #insecure: true
-
-      # Configure cipher suites to be used for TLS connections
-      #cipher_suites: []
-
-      # Configure curve types for ECDHE based cipher suites
-      #curve_types: []
-
-      # Configure minimum TLS version allowed for connection to logstash
-      #min_version: 1.0
-
-      # Configure maximum TLS version allowed for connection to logstash
-      #max_version: 1.2
-
-
-  ### Logstash as output
-  #logstash:
-    # The Logstash hosts
-    #hosts: ["localhost:5044"]
-
-    # Number of workers per Logstash host.
-    #worker: 1
-
-    # Set gzip compression level.
-    #compression_level: 3
-
-    # Optional load balance the events between the Logstash hosts
-    #loadbalance: true
-
-    # Optional index name. The default index name is set to name of the beat
-    # in all lowercase.
-    #index: packetbeat
-
-    # SOCKS5 proxy server URL
-    #proxy_url: socks5://user:password@socks5-server:2233
-
-    # Resolve names locally when using a proxy server. Defaults to false.
-    #proxy_use_local_resolver: false
-
-    # Optional TLS. By default is off.
-    #tls:
-      # List of root certificates for HTTPS server verifications
-      #certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-      # Certificate for TLS client authentication
-      #certificate: "/etc/pki/client/cert.pem"
-
-      # Client Certificate Key
-      #certificate_key: "/etc/pki/client/cert.key"
-
-      # Controls whether the client verifies server certificates and host name.
-      # If insecure is set to true, all server host names and certificates will be
-      # accepted. In this mode TLS based connections are susceptible to
-      # man-in-the-middle attacks. Use only for testing.
-      #insecure: true
-
-      # Configure cipher suites to be used for TLS connections
-      #cipher_suites: []
-
-      # Configure curve types for ECDHE based cipher suites
-      #curve_types: []
-
-
-  ### File as output
-  #file:
-    # Path to the directory where to save the generated files. The option is mandatory.
-    #path: "/tmp/packetbeat"
-
-    # Name of the generated files. The default is `packetbeat` and it generates files: `packetbeat`, `packetbeat.1`, `packetbeat.2`, etc.
-    #filename: packetbeat
-
-    # Maximum size in kilobytes of each file. When this size is reached, the files are
-    # rotated. The default value is 10240 kB.
-    #rotate_every_kb: 10000
-
-    # Maximum number of files under path. When this number of files is reached, the
-    # oldest file is deleted and the rest are shifted from last to first. The default
-    # is 7 files.
-    #number_of_files: 7
-
-
-  ### Console output
-  # console:
-    # Pretty print json event
-    #pretty: false
-
-
-############################# Shipper #########################################
-
-shipper:
-  # The name of the shipper that publishes the network data. It can be used to group
-  # all the transactions sent by a single shipper in the web interface.
-  # If this options is not defined, the hostname is used.
-  #name:
-
-  # The tags of the shipper are included in their own field with each
-  # transaction published. Tags make it easy to group servers by different
-  # logical properties.
-  #tags: ["service-X", "web-tier"]
-
-  # Optional fields that you can specify to add additional information to the
-  # output. Fields can be scalar values, arrays, dictionaries, or any nested
-  # combination of these.
-  #fields:
-  #  env: staging
-
-  # If this option is set to true, the custom fields are stored as top-level
-  # fields in the output document instead of being grouped under a fields
-  # sub-dictionary. Default is false.
-  #fields_under_root: false
-
-  # Uncomment the following if you want to ignore transactions created
-  # by the server on which the shipper is installed. This option is useful
-  # to remove duplicates if shippers are installed on multiple servers.
-  #ignore_outgoing: true
-
-  # How often (in seconds) shippers are publishing their IPs to the topology map.
-  # The default is 10 seconds.
-  #refresh_topology_freq: 10
-
-  # Expiration time (in seconds) of the IPs published by a shipper to the topology map.
-  # All the IPs will be deleted afterwards. Note, that the value must be higher than
-  # refresh_topology_freq. The default is 15 seconds.
-  #topology_expire: 15
-
-  # Internal queue size for single events in processing pipeline
-  #queue_size: 1000
-
-  # Sets the maximum number of CPUs that can be executing simultaneously. The
-  # default is the number of logical CPUs available in the system.
-  #max_procs:
-
-  # Configure local GeoIP database support.
-  # If no paths are not configured geoip is disabled.
-  #geoip:
-    #paths:
-    #  - "/usr/share/GeoIP/GeoLiteCity.dat"
-    #  - "/usr/local/var/GeoIP/GeoLiteCity.dat"
-
-
-############################# Logging #########################################
-
-# There are three options for the log output: syslog, file, stderr.
-# Under Windows systems, the log files are per default sent to the file output,
-# under all other system per default to syslog.
-logging:
-
-  # Send all logging output to syslog. On Windows default is false, otherwise
-  # default is true.
-  #to_syslog: true
-
-  # Write all logging output to files. Beats automatically rotate files if rotateeverybytes
-  # limit is reached.
-  #to_files: false
-
-  # To enable logging to files, to_files option has to be set to true
-  files:
-    # The directory where the log files will written to.
-    #path: /var/log/mybeat
-
-    # The name of the files where the logs are written to.
-    #name: mybeat
-
-    # Configure log file size limit. If limit is reached, log file will be
-    # automatically rotated
-    rotateeverybytes: 10485760 # = 10MB
-
-    # Number of rotated log files to keep. Oldest files will be deleted first.
-    #keepfiles: 7
-
-  # Enable debug output for selected components. To enable all selectors use ["*"]
-  # Other available selectors are beat, publish, service
-  # Multiple selectors can be chained.
-  #selectors: [ ]
-
-  # Sets log level. The default log level is error.
-  # Available log levels are: critical, error, warning, info, debug
-  #level: error
-
-
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]

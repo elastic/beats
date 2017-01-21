@@ -344,7 +344,6 @@ func (f Form) firstBoundary(src input, nsrc int) int {
 	// We should call ss.first here, but we can't as the first rune is
 	// skipped already. This means FirstBoundary can't really determine
 	// CGJ insertion points correctly. Luckily it doesn't have to.
-	// TODO: consider adding NextBoundary
 	for {
 		info := fd.info(src, i)
 		if info.size == 0 {
@@ -367,6 +366,56 @@ func (f Form) firstBoundary(src input, nsrc int) int {
 // or -1 if s contains no boundary.
 func (f Form) FirstBoundaryInString(s string) int {
 	return f.firstBoundary(inputString(s), len(s))
+}
+
+// NextBoundary reports the index of the boundary between the first and next
+// segment in b or -1 if atEOF is false and there are not enough bytes to
+// determine this boundary.
+func (f Form) NextBoundary(b []byte, atEOF bool) int {
+	return f.nextBoundary(inputBytes(b), len(b), atEOF)
+}
+
+// NextBoundaryInString reports the index of the boundary between the first and
+// next segment in b or -1 if atEOF is false and there are not enough bytes to
+// determine this boundary.
+func (f Form) NextBoundaryInString(s string, atEOF bool) int {
+	return f.nextBoundary(inputString(s), len(s), atEOF)
+}
+
+func (f Form) nextBoundary(src input, nsrc int, atEOF bool) int {
+	if nsrc == 0 {
+		if atEOF {
+			return 0
+		}
+		return -1
+	}
+	fd := formTable[f]
+	info := fd.info(src, 0)
+	if info.size == 0 {
+		if atEOF {
+			return 1
+		}
+		return -1
+	}
+	ss := streamSafe(0)
+	ss.first(info)
+
+	for i := int(info.size); i < nsrc; i += int(info.size) {
+		info = fd.info(src, i)
+		if info.size == 0 {
+			if atEOF {
+				return i
+			}
+			return -1
+		}
+		if s := ss.next(info); s != ssSuccess {
+			return i
+		}
+	}
+	if !atEOF && !info.BoundaryAfter() && !ss.isMax() {
+		return -1
+	}
+	return nsrc
 }
 
 // LastBoundary returns the position i of the last boundary in b

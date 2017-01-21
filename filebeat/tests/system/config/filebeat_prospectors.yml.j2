@@ -1,20 +1,15 @@
-filebeat:
-  prospectors:
-  {% for prospector in prospectors %}
-    -
-      paths:
-        - {{prospector.path}}
-      input: log
-      scan_frequency: 0.5s
-      encoding: {{prospector.encoding | default("plain") }}
-  {% endfor %}
-  idle_timeout: 0.5s
-  registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
+filebeat.prospectors:
+{% for prospector in prospectors %}
+- paths:
+    - {{prospector.path}}
+  scan_frequency: 0.5s
+  encoding: {{prospector.encoding | default("plain") }}
+{% endfor %}
+filebeat.idle_timeout: 0.5s
+filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
 
-output:
-  file:
-    enabled: true
-    path: {{ output_file_path|default(beat.working_dir + "/output") }}
-    filename: "{{ output_file_filename|default("filebeat") }}"
-    rotate_every_kb: 1000
-    #number_of_files: 7
+output.file:
+  path: {{ output_file_path|default(beat.working_dir + "/output") }}
+  filename: "{{ output_file_filename|default("filebeat") }}"
+  rotate_every_kb: 1000
+  #number_of_files: 7

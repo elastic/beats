@@ -1,10 +1,9 @@
-/etc/filebeat.dev.yml
-.idea
+/_meta/filebeat.dev.yml
 .vagrant
-/data/
 /docs/html_docs
 
 filebeat
 
 build
+_meta/kibana
 /tests/load/logs

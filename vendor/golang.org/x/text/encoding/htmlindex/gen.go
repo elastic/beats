@@ -113,8 +113,9 @@ var consts = map[string]string{
 	"windows-1257":   "windows1257",
 	"windows-1258":   "windows1258",
 	"x-mac-cyrillic": "macintoshCyrillic",
+	"gbk":            "gbk",
 	"gb18030":        "gb18030",
-	"hz-gb-2312":     "hzgb2312",
+	// "hz-gb-2312":     "hzgb2312", // Was removed from WhatWG
 	"big5":           "big5",
 	"euc-jp":         "eucjp",
 	"iso-2022-jp":    "iso2022jp",

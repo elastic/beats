@@ -1,0 +1,4 @@
+== {module} Module
+
+This is the {module} Module.
+

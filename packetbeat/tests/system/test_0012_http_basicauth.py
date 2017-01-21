@@ -21,7 +21,7 @@ class Test(BaseTest):
 
         assert len(objs) >= 1
         assert all([o["type"] == "http" for o in objs])
-        assert all([o["http.request_headers"]["authorization"] == "*"
+        assert all([o["http.request.headers"]["authorization"] == "*"
                    is not None for o in objs])
 
 

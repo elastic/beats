@@ -63,17 +63,18 @@ func TestFilterEvent(t *testing.T) {
 
 func TestDirectionOut(t *testing.T) {
 	publisher := newTestPublisher([]string{"192.145.2.4"})
+	ppub, _ := NewPublisher(publisher, 1000, 1, false)
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
-			Ip:      "192.145.2.4",
+			IP:      "192.145.2.4",
 			Port:    3267,
 			Name:    "server1",
 			Cmdline: "proc1 start",
 			Proc:    "proc1",
 		},
 		"dst": &common.Endpoint{
-			Ip:      "192.145.2.5",
+			IP:      "192.145.2.5",
 			Port:    32232,
 			Name:    "server2",
 			Cmdline: "proc2 start",
@@ -81,24 +82,25 @@ func TestDirectionOut(t *testing.T) {
 		},
 	}
 
-	assert.True(t, normalizeTransAddr(publisher, event))
+	assert.True(t, ppub.normalizeTransAddr(event))
 	assert.True(t, event["client_ip"] == "192.145.2.4")
 	assert.True(t, event["direction"] == "out")
 }
 
 func TestDirectionIn(t *testing.T) {
 	publisher := newTestPublisher([]string{"192.145.2.5"})
+	ppub, _ := NewPublisher(publisher, 1000, 1, false)
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
-			Ip:      "192.145.2.4",
+			IP:      "192.145.2.4",
 			Port:    3267,
 			Name:    "server1",
 			Cmdline: "proc1 start",
 			Proc:    "proc1",
 		},
 		"dst": &common.Endpoint{
-			Ip:      "192.145.2.5",
+			IP:      "192.145.2.5",
 			Port:    32232,
 			Name:    "server2",
 			Cmdline: "proc2 start",
@@ -106,30 +108,31 @@ func TestDirectionIn(t *testing.T) {
 		},
 	}
 
-	assert.True(t, normalizeTransAddr(publisher, event))
+	assert.True(t, ppub.normalizeTransAddr(event))
 	assert.True(t, event["client_ip"] == "192.145.2.4")
 	assert.True(t, event["direction"] == "in")
 }
 
-func newTestPublisher(ips []string) *publisher.Publisher {
-	p := &publisher.Publisher{}
-	p.IpAddrs = ips
+func newTestPublisher(ips []string) *publisher.BeatPublisher {
+	p := &publisher.BeatPublisher{}
+	p.IPAddrs = ips
 	return p
 }
 
 func TestNoDirection(t *testing.T) {
 	publisher := newTestPublisher([]string{"192.145.2.6"})
+	ppub, _ := NewPublisher(publisher, 1000, 1, false)
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
-			Ip:      "192.145.2.4",
+			IP:      "192.145.2.4",
 			Port:    3267,
 			Name:    "server1",
 			Cmdline: "proc1 start",
 			Proc:    "proc1",
 		},
 		"dst": &common.Endpoint{
-			Ip:      "192.145.2.5",
+			IP:      "192.145.2.5",
 			Port:    32232,
 			Name:    "server2",
 			Cmdline: "proc2 start",
@@ -137,7 +140,7 @@ func TestNoDirection(t *testing.T) {
 		},
 	}
 
-	assert.True(t, normalizeTransAddr(publisher, event))
+	assert.True(t, ppub.normalizeTransAddr(event))
 	assert.True(t, event["client_ip"] == "192.145.2.4")
 	_, ok := event["direction"]
 	assert.False(t, ok)

@@ -1,0 +1,9 @@
+- name: {metricset}
+  type: group
+  description: >
+    {metricset}
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

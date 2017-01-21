@@ -1,0 +1,13 @@
+{
+  "optionsJSON": "{\"darkTheme\":false}",
+  "timeRestore": false,
+  "description": "",
+  "hits": 0,
+  "title": "Metricbeat - Apache HTTPD server status",
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+  },
+  "version": 1,
+  "panelsJSON": "[{\"id\":\"Apache-HTTPD-CPU\",\"type\":\"visualization\",\"panelIndex\":1,\"size_x\":6,\"size_y\":3,\"col\":7,\"row\":10},{\"id\":\"Apache-HTTPD-Hostname-list\",\"type\":\"visualization\",\"panelIndex\":2,\"size_x\":3,\"size_y\":3,\"col\":1,\"row\":1},{\"id\":\"Apache-HTTPD-Load1-slash-5-slash-15\",\"type\":\"visualization\",\"panelIndex\":3,\"size_x\":6,\"size_y\":3,\"col\":1,\"row\":10},{\"id\":\"Apache-HTTPD-Scoreboard\",\"type\":\"visualization\",\"panelIndex\":4,\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":7},{\"id\":\"Apache-HTTPD-Total-accesses-and-kbytes\",\"type\":\"visualization\",\"panelIndex\":5,\"size_x\":6,\"size_y\":3,\"col\":7,\"row\":1},{\"id\":\"Apache-HTTPD-Uptime\",\"type\":\"visualization\",\"panelIndex\":6,\"size_x\":3,\"size_y\":3,\"col\":4,\"row\":1},{\"id\":\"Apache-HTTPD-Workers\",\"type\":\"visualization\",\"panelIndex\":7,\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":4}]",
+  "uiStateJSON": "{\"P-2\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}"
+}

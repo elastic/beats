@@ -1,0 +1,20 @@
+=== System Process Metricset
+
+The System `process` metricset provides process statistics. One document is
+provided for each process.
+
+This metricset is available on:
+
+- Darwin
+- FreeBSD
+- Linux
+- Windows
+
+[float]
+=== Control Group (cgroup) Metrics
+
+On Linux this metricset can collect metrics from any cgroups that the process
+is a member of. This feature is currently experimental, and it is not enabled by
+default so you must add `cgroup: true` to the system module configuration to
+enable it.
+

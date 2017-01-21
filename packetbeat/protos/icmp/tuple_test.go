@@ -11,20 +11,20 @@ import (
 
 func TestIcmpTupleReverse(t *testing.T) {
 	tuple := icmpTuple{
-		IcmpVersion: 4,
-		SrcIp:       net.IPv4(192, 168, 0, 1),
-		DstIp:       net.IPv4(192, 168, 0, 2),
-		Id:          256,
-		Seq:         1,
+		icmpVersion: 4,
+		srcIP:       net.IPv4(192, 168, 0, 1),
+		dstIP:       net.IPv4(192, 168, 0, 2),
+		id:          256,
+		seq:         1,
 	}
 
 	actualReverse := tuple.Reverse()
 	expectedReverse := icmpTuple{
-		IcmpVersion: 4,
-		SrcIp:       net.IPv4(192, 168, 0, 2),
-		DstIp:       net.IPv4(192, 168, 0, 1),
-		Id:          256,
-		Seq:         1,
+		icmpVersion: 4,
+		srcIP:       net.IPv4(192, 168, 0, 2),
+		dstIP:       net.IPv4(192, 168, 0, 1),
+		id:          256,
+		seq:         1,
 	}
 
 	assert.Equal(t, expectedReverse, actualReverse)
@@ -32,11 +32,11 @@ func TestIcmpTupleReverse(t *testing.T) {
 
 func BenchmarkIcmpTupleReverse(b *testing.B) {
 	tuple := icmpTuple{
-		IcmpVersion: 4,
-		SrcIp:       net.IPv4(192, 168, 0, 1),
-		DstIp:       net.IPv4(192, 168, 0, 2),
-		Id:          256,
-		Seq:         1,
+		icmpVersion: 4,
+		srcIP:       net.IPv4(192, 168, 0, 1),
+		dstIP:       net.IPv4(192, 168, 0, 2),
+		id:          256,
+		seq:         1,
 	}
 
 	b.ResetTimer()
@@ -48,11 +48,11 @@ func BenchmarkIcmpTupleReverse(b *testing.B) {
 
 func TestIcmpTupleHashable(t *testing.T) {
 	tuple := icmpTuple{
-		IcmpVersion: 4,
-		SrcIp:       net.IPv4(192, 168, 0, 1),
-		DstIp:       net.IPv4(192, 168, 0, 2),
-		Id:          256,
-		Seq:         1,
+		icmpVersion: 4,
+		srcIP:       net.IPv4(192, 168, 0, 1),
+		dstIP:       net.IPv4(192, 168, 0, 2),
+		id:          256,
+		seq:         1,
 	}
 
 	actualHashable := tuple.Hashable()
@@ -68,11 +68,11 @@ func TestIcmpTupleHashable(t *testing.T) {
 
 func BenchmarkIcmpTupleHashable(b *testing.B) {
 	tuple := icmpTuple{
-		IcmpVersion: 4,
-		SrcIp:       net.IPv4(192, 168, 0, 1),
-		DstIp:       net.IPv4(192, 168, 0, 2),
-		Id:          256,
-		Seq:         1,
+		icmpVersion: 4,
+		srcIP:       net.IPv4(192, 168, 0, 1),
+		dstIP:       net.IPv4(192, 168, 0, 2),
+		id:          256,
+		seq:         1,
 	}
 
 	b.ResetTimer()
@@ -84,11 +84,11 @@ func BenchmarkIcmpTupleHashable(b *testing.B) {
 
 func TestIcmpTupleToString(t *testing.T) {
 	tuple := icmpTuple{
-		IcmpVersion: 4,
-		SrcIp:       net.IPv4(192, 168, 0, 1),
-		DstIp:       net.IPv4(192, 168, 0, 2),
-		Id:          256,
-		Seq:         1,
+		icmpVersion: 4,
+		srcIP:       net.IPv4(192, 168, 0, 1),
+		dstIP:       net.IPv4(192, 168, 0, 2),
+		id:          256,
+		seq:         1,
 	}
 
 	actualString := tuple.String()

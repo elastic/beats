@@ -1,0 +1,7 @@
+- module: apache
+  metricsets: ["status"]
+  enabled: true
+  period: 10s
+
+  # Apache hosts
+  hosts: ["http://127.0.0.1"]

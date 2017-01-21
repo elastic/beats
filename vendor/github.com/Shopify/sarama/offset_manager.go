@@ -136,10 +136,14 @@ type PartitionOffsetManager interface {
 	// was committed for this partition yet.
 	NextOffset() (int64, string)
 
-	// MarkOffset marks the provided offset as processed, alongside a metadata string
+	// MarkOffset marks the provided offset, alongside a metadata string
 	// that represents the state of the partition consumer at that point in time. The
 	// metadata string can be used by another consumer to restore that state, so it
 	// can resume consumption.
+	//
+	// To follow upstream conventions, you are expected to mark the offset of the
+	// next message to read, not the last message read. Thus, when calling `MarkOffset`
+	// you should typically add one to the offset of the last consumed message.
 	//
 	// Note: calling MarkOffset does not necessarily commit the offset to the backend
 	// store immediately for efficiency reasons, and it may never be committed if
@@ -176,7 +180,7 @@ type partitionOffsetManager struct {
 	offset   int64
 	metadata string
 	dirty    bool
-	clean    chan none
+	clean    sync.Cond
 	broker   *brokerOffsetManager
 
 	errors    chan *ConsumerError
@@ -189,11 +193,11 @@ func (om *offsetManager) newPartitionOffsetManager(topic string, partition int32
 		parent:    om,
 		topic:     topic,
 		partition: partition,
-		clean:     make(chan none),
 		errors:    make(chan *ConsumerError, om.conf.ChannelBufferSize),
 		rebalance: make(chan none, 1),
 		dying:     make(chan none),
 	}
+	pom.clean.L = &pom.lock
 
 	if err := pom.selectBroker(); err != nil {
 		return nil, err
@@ -331,11 +335,7 @@ func (pom *partitionOffsetManager) updateCommitted(offset int64, metadata string
 
 	if pom.offset == offset && pom.metadata == metadata {
 		pom.dirty = false
-
-		select {
-		case pom.clean <- none{}:
-		default:
-		}
+		pom.clean.Signal()
 	}
 }
 
@@ -344,7 +344,7 @@ func (pom *partitionOffsetManager) NextOffset() (int64, string) {
 	defer pom.lock.Unlock()
 
 	if pom.offset >= 0 {
-		return pom.offset + 1, pom.metadata
+		return pom.offset, pom.metadata
 	}
 
 	return pom.parent.conf.Consumer.Offsets.Initial, ""
@@ -353,11 +353,10 @@ func (pom *partitionOffsetManager) NextOffset() (int64, string) {
 func (pom *partitionOffsetManager) AsyncClose() {
 	go func() {
 		pom.lock.Lock()
-		dirty := pom.dirty
-		pom.lock.Unlock()
+		defer pom.lock.Unlock()
 
-		if dirty {
-			<-pom.clean
+		for pom.dirty {
+			pom.clean.Wait()
 		}
 
 		close(pom.dying)
@@ -462,11 +461,25 @@ func (bom *brokerOffsetManager) flushToBroker() {
 		case ErrNoError:
 			block := request.blocks[s.topic][s.partition]
 			s.updateCommitted(block.offset, block.metadata)
-			break
-		case ErrUnknownTopicOrPartition, ErrNotLeaderForPartition, ErrLeaderNotAvailable:
+		case ErrNotLeaderForPartition, ErrLeaderNotAvailable,
+			ErrConsumerCoordinatorNotAvailable, ErrNotCoordinatorForConsumer:
+			// not a critical error, we just need to redispatch
 			delete(bom.subscriptions, s)
 			s.rebalance <- none{}
+		case ErrOffsetMetadataTooLarge, ErrInvalidCommitOffsetSize:
+			// nothing we can do about this, just tell the user and carry on
+			s.handleError(err)
+		case ErrOffsetsLoadInProgress:
+			// nothing wrong but we didn't commit, we'll get it next time round
+			break
+		case ErrUnknownTopicOrPartition:
+			// let the user know *and* try redispatching - if topic-auto-create is
+			// enabled, redispatching should trigger a metadata request and create the
+			// topic; if not then re-dispatching won't help, but we've let the user
+			// know and it shouldn't hurt either (see https://github.com/Shopify/sarama/issues/706)
+			fallthrough
 		default:
+			// dunno, tell the user and try redispatching
 			s.handleError(err)
 			delete(bom.subscriptions, s)
 			s.rebalance <- none{}
@@ -475,16 +488,29 @@ func (bom *brokerOffsetManager) flushToBroker() {
 }
 
 func (bom *brokerOffsetManager) constructRequest() *OffsetCommitRequest {
-	r := &OffsetCommitRequest{
-		Version:                 1,
-		ConsumerGroup:           bom.parent.group,
-		ConsumerGroupGeneration: GroupGenerationUndefined,
+	var r *OffsetCommitRequest
+	var perPartitionTimestamp int64
+	if bom.parent.conf.Consumer.Offsets.Retention == 0 {
+		perPartitionTimestamp = ReceiveTime
+		r = &OffsetCommitRequest{
+			Version:                 1,
+			ConsumerGroup:           bom.parent.group,
+			ConsumerGroupGeneration: GroupGenerationUndefined,
+		}
+	} else {
+		r = &OffsetCommitRequest{
+			Version:                 2,
+			RetentionTime:           int64(bom.parent.conf.Consumer.Offsets.Retention / time.Millisecond),
+			ConsumerGroup:           bom.parent.group,
+			ConsumerGroupGeneration: GroupGenerationUndefined,
+		}
+
 	}
 
 	for s := range bom.subscriptions {
 		s.lock.Lock()
 		if s.dirty {
-			r.AddBlock(s.topic, s.partition, s.offset, ReceiveTime, s.metadata)
+			r.AddBlock(s.topic, s.partition, s.offset, perPartitionTimestamp, s.metadata)
 		}
 		s.lock.Unlock()
 	}

@@ -14,27 +14,51 @@ import (
 	"golang.org/x/text/language"
 )
 
-// Value is an amount-currency pair configured for language-specific formatting.
-type Value struct {
-	amount   interface{}
-	currency Currency
-	format   *options
+// Amount is an amount-currency unit pair.
+type Amount struct {
+	amount   interface{} // Change to decimal(64|128).
+	currency Unit
 }
 
-// Verify implementation
-var _ fmt.Formatter = Value{}
+// Currency reports the currency unit of this amount.
+func (a Amount) Currency() Unit { return a.currency }
 
-// Currency reports the Currency of this value.
-func (v Value) Currency() Currency { return v.currency }
-
-// Amount reports the amount of this Value
-func (v Value) Amount() interface{} { return v.amount }
+// TODO: based on decimal type, but may make sense to customize a bit.
+// func (a Amount) Decimal()
+// func (a Amount) Int() (int64, error)
+// func (a Amount) Fraction() (int64, error)
+// func (a Amount) Rat() *big.Rat
+// func (a Amount) Float() (float64, error)
+// func (a Amount) Scale() uint
+// func (a Amount) Precision() uint
+// func (a Amount) Sign() int
+//
+// Add/Sub/Div/Mul/Round.
 
 var space = []byte(" ")
 
 // Format implements fmt.Formatter. It accepts format.State for
 // language-specific rendering.
-func (v Value) Format(s fmt.State, verb rune) {
+func (a Amount) Format(s fmt.State, verb rune) {
+	v := formattedValue{
+		currency: a.currency,
+		amount:   a.amount,
+		format:   defaultFormat,
+	}
+	v.Format(s, verb)
+}
+
+// formattedValue is currency amount or unit that implements language-sensitive
+// formatting.
+type formattedValue struct {
+	currency Unit
+	amount   interface{} // Amount, Unit, or number.
+	format   *options
+}
+
+// Format implements fmt.Formatter. It accepts format.State for
+// language-specific rendering.
+func (v formattedValue) Format(s fmt.State, verb rune) {
 	var lang int
 	if state, ok := s.(format.State); ok {
 		lang, _ = language.CompactIndex(state.Language())
@@ -65,12 +89,14 @@ func (v Value) Format(s fmt.State, verb rune) {
 	}
 }
 
-// Formatter decorates a given number, Currency or Value with formatting options.
-type Formatter func(value interface{}) Value
+// Formatter decorates a given number, Unit or Amount with formatting options.
+type Formatter func(amount interface{}) formattedValue
+
+// func (f Formatter) Options(opts ...Option) Formatter
 
 // TODO: call this a Formatter or FormatFunc?
 
-var dummy = USD.Value(0)
+var dummy = USD.Amount(0)
 
 // adjust creates a new Formatter based on the adjustments of fn on f.
 func (f Formatter) adjust(fn func(*options)) Formatter {
@@ -79,13 +105,13 @@ func (f Formatter) adjust(fn func(*options)) Formatter {
 	return o.format
 }
 
-// Default creates a new Formatter that defaults to currency c if a numeric
+// Default creates a new Formatter that defaults to currency unit c if a numeric
 // value is passed that is not associated with a currency.
-func (f Formatter) Default(c Currency) Formatter {
-	return f.adjust(func(o *options) { o.currency = c })
+func (f Formatter) Default(currency Unit) Formatter {
+	return f.adjust(func(o *options) { o.currency = currency })
 }
 
-// Kind sets the kind of the underlying currency.
+// Kind sets the kind of the underlying currency unit.
 func (f Formatter) Kind(k Kind) Formatter {
 	return f.adjust(func(o *options) { o.kind = k })
 }
@@ -104,34 +130,29 @@ var (
 
 	// TODO:
 	// // Use full name as symbol.
-	// SpellOut Formatter
-	//
-	// // SpellOutAll causes symbol and numbers to be spelled wide. If used in
-	// // combination with the Symbol option, the symbol will be written in ISO
-	// // format.
-	// SpellOutAll Formatter
+	// Name Formatter
 )
 
-// options configures rendering and rounding options for a Value.
+// options configures rendering and rounding options for an Amount.
 type options struct {
-	currency Currency
+	currency Unit
 	kind     Kind
 
-	symbol func(compactIndex int, c Currency) string
+	symbol func(compactIndex int, c Unit) string
 }
 
-func (o *options) format(value interface{}) Value {
-	v := Value{format: o}
-	switch x := value.(type) {
-	case Value:
-		v.currency = x.currency
+func (o *options) format(amount interface{}) formattedValue {
+	v := formattedValue{format: o}
+	switch x := amount.(type) {
+	case Amount:
 		v.amount = x.amount
-	case *Value:
 		v.currency = x.currency
+	case *Amount:
 		v.amount = x.amount
-	case Currency:
+		v.currency = x.currency
+	case Unit:
 		v.currency = x
-	case *Currency:
+	case *Unit:
 		v.currency = *x
 	default:
 		if o.currency.index == 0 {
@@ -139,6 +160,7 @@ func (o *options) format(value interface{}) Value {
 		}
 		// TODO: Must be a number.
 		v.amount = x
+		v.currency = o.currency
 	}
 	return v
 }
@@ -151,13 +173,13 @@ var (
 
 // These need to be functions, rather than curried methods, as curried methods
 // are evaluated at init time, causing tables to be included unconditionally.
-func formISO(x interface{}) Value    { return optISO.format(x) }
-func formSymbol(x interface{}) Value { return optSymbol.format(x) }
-func formNarrow(x interface{}) Value { return optNarrow.format(x) }
+func formISO(x interface{}) formattedValue    { return optISO.format(x) }
+func formSymbol(x interface{}) formattedValue { return optSymbol.format(x) }
+func formNarrow(x interface{}) formattedValue { return optNarrow.format(x) }
 
-func lookupISO(x int, c Currency) string    { return c.String() }
-func lookupSymbol(x int, c Currency) string { return normalSymbol.lookup(x, c) }
-func lookupNarrow(x int, c Currency) string { return narrowSymbol.lookup(x, c) }
+func lookupISO(x int, c Unit) string    { return c.String() }
+func lookupSymbol(x int, c Unit) string { return normalSymbol.lookup(x, c) }
+func lookupNarrow(x int, c Unit) string { return narrowSymbol.lookup(x, c) }
 
 type symbolIndex struct {
 	index []uint16 // position corresponds with compact index of language.
@@ -169,7 +191,7 @@ var (
 	narrowSymbol = symbolIndex{narrowLangIndex, narrowSymIndex}
 )
 
-func (x *symbolIndex) lookup(lang int, c Currency) string {
+func (x *symbolIndex) lookup(lang int, c Unit) string {
 	for {
 		index := x.data[x.index[lang]:x.index[lang+1]]
 		i := sort.Search(len(index), func(i int) bool {

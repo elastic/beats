@@ -67,7 +67,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
-            shipperName="testShipperName"
+            shipper_name="testShipperName"
         )
 
         with open(self.working_dir + "/test.log", "w") as f:

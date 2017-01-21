@@ -11,6 +11,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
+	"fmt"
+
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 	"github.com/elastic/beats/packetbeat/publish"
@@ -19,22 +21,27 @@ import (
 var debugf = logp.MakeDebug("rpc")
 
 const (
-	RPC_LAST_FRAG = 0x80000000
-	RPC_SIZE_MASK = 0x7fffffff
+	rpcLastFrag = 0x80000000
+	rpcSizeMask = 0x7fffffff
 )
 
-type RpcStream struct {
-	tcpTuple *common.TcpTuple
+const (
+	rpcCall  = 0
+	rpcReply = 1
+)
+
+type rpcStream struct {
+	tcpTuple *common.TCPTuple
 	rawData  []byte
 }
 
 type rpcConnectionData struct {
-	Streams [2]*RpcStream
+	streams [2]*rpcStream
 }
 
-type Rpc struct {
+type rpc struct {
 	// Configuration data.
-	Ports              []int
+	ports              []int
 	callsSeen          *common.Cache
 	transactionTimeout time.Duration
 
@@ -50,7 +57,7 @@ func New(
 	results publish.Transactions,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
-	p := &Rpc{}
+	p := &rpc{}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -66,39 +73,48 @@ func New(
 	return p, nil
 }
 
-func (rpc *Rpc) init(results publish.Transactions, config *rpcConfig) error {
-	rpc.setFromConfig(config)
-	rpc.results = results
-	rpc.callsSeen = common.NewCache(rpc.transactionTimeout,
-		protos.DefaultTransactionHashSize)
+func (r *rpc) init(results publish.Transactions, config *rpcConfig) error {
+	r.setFromConfig(config)
+	r.results = results
+	r.callsSeen = common.NewCacheWithRemovalListener(
+		r.transactionTimeout,
+		protos.DefaultTransactionHashSize,
+		func(k common.Key, v common.Value) {
+			nfs, ok := v.(*nfs)
+			if !ok {
+				logp.Err("Expired value is not a MapStr (%T).", v)
+				return
+			}
+			r.handleExpiredPacket(nfs)
+		})
 
-	rpc.callsSeen.StartJanitor(rpc.transactionTimeout)
+	r.callsSeen.StartJanitor(r.transactionTimeout)
 	return nil
 }
 
-func (rpc *Rpc) setFromConfig(config *rpcConfig) error {
-	rpc.Ports = config.Ports
-	rpc.transactionTimeout = config.TransactionTimeout
+func (r *rpc) setFromConfig(config *rpcConfig) error {
+	r.ports = config.Ports
+	r.transactionTimeout = config.TransactionTimeout
 	return nil
 }
 
-func (rpc *Rpc) GetPorts() []int {
-	return rpc.Ports
+func (r *rpc) GetPorts() []int {
+	return r.ports
 }
 
 // Called when TCP payload data is available for parsing.
-func (rpc *Rpc) Parse(
+func (r *rpc) Parse(
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
 
 	defer logp.Recover("ParseRPC exception")
 
-	conn := ensureRpcConnection(private)
+	conn := ensureRPCConnection(private)
 
-	conn = rpc.handleRpcFragment(conn, pkt, tcptuple, dir)
+	conn = r.handleRPCFragment(conn, pkt, tcptuple, dir)
 	if conn == nil {
 		return nil
 	}
@@ -106,46 +122,42 @@ func (rpc *Rpc) Parse(
 }
 
 // Called when the FIN flag is seen in the TCP stream.
-func (rpc *Rpc) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+func (r *rpc) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ReceivedFinRpc exception")
 
 	// forced by TCP interface
-
-	// TODO
 	return private
 }
 
 // Called when a packets are missing from the tcp
 // stream.
-func (rpc *Rpc) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+func (r *rpc) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	defer logp.Recover("GapInRpcStream exception")
 
 	// forced by TCP interface
-
-	// TODO
 	return private, false
 }
 
 // ConnectionTimeout returns the per stream connection timeout.
 // Return <=0 to set default tcp module transaction timeout.
-func (rpc *Rpc) ConnectionTimeout() time.Duration {
+func (r *rpc) ConnectionTimeout() time.Duration {
 	// forced by TCP interface
-	return rpc.transactionTimeout
+	return r.transactionTimeout
 }
 
-func ensureRpcConnection(private protos.ProtocolData) *rpcConnectionData {
-	conn := getRpcConnection(private)
+func ensureRPCConnection(private protos.ProtocolData) *rpcConnectionData {
+	conn := getRPCConnection(private)
 	if conn == nil {
 		conn = &rpcConnectionData{}
 	}
 	return conn
 }
 
-func getRpcConnection(private protos.ProtocolData) *rpcConnectionData {
+func getRPCConnection(private protos.ProtocolData) *rpcConnectionData {
 	if private == nil {
 		return nil
 	}
@@ -164,23 +176,23 @@ func getRpcConnection(private protos.ProtocolData) *rpcConnectionData {
 }
 
 // Parse function is used to process TCP payloads.
-func (rpc *Rpc) handleRpcFragment(
+func (r *rpc) handleRPCFragment(
 	conn *rpcConnectionData,
 	pkt *protos.Packet,
-	tcptuple *common.TcpTuple,
+	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *rpcConnectionData {
 
-	st := conn.Streams[dir]
+	st := conn.streams[dir]
 	if st == nil {
 		st = newStream(pkt, tcptuple)
-		conn.Streams[dir] = st
+		conn.streams[dir] = st
 	} else {
 		// concatenate bytes
 		st.rawData = append(st.rawData, pkt.Payload...)
-		if len(st.rawData) > tcp.TCP_MAX_DATA_IN_STREAM {
+		if len(st.rawData) > tcp.TCPMaxDataInStream {
 			debugf("Stream data too large, dropping TCP stream")
-			conn.Streams[dir] = nil
+			conn.streams[dir] = nil
 			return conn
 		}
 	}
@@ -193,8 +205,8 @@ func (rpc *Rpc) handleRpcFragment(
 		}
 
 		marker := uint32(binary.BigEndian.Uint32(st.rawData[0:4]))
-		size := int(marker & RPC_SIZE_MASK)
-		islast := (marker & RPC_LAST_FRAG) != 0
+		size := int(marker & rpcSizeMask)
+		islast := (marker & rpcLastFrag) != 0
 
 		if len(st.rawData)-4 < size {
 			debugf("Wainting for more data")
@@ -206,36 +218,35 @@ func (rpc *Rpc) handleRpcFragment(
 			break
 		}
 
-		xdr := Xdr{data: st.rawData[4 : 4+size], offset: 0}
-		msg := &RpcMessage{ts: pkt.Ts, xdr: xdr}
-
-		src := common.Endpoint{
-			Ip:   tcptuple.Src_ip.String(),
-			Port: tcptuple.Src_port,
-		}
-		dst := common.Endpoint{
-			Ip:   tcptuple.Dst_ip.String(),
-			Port: tcptuple.Dst_port,
-		}
-
-		event := common.MapStr{}
-		event["@timestamp"] = common.Time(pkt.Ts)
-		event["status"] = common.OK_STATUS // all packes are OK for now
-		event["src"] = &src
-		event["dst"] = &dst
-
-		msg.fillEvent(event, rpc, size)
-
+		xdr := newXDR(st.rawData[4 : 4+size])
+		// keep the rest of the next fragment
 		st.rawData = st.rawData[4+size:]
+
+		r.handleRPCPacket(xdr, pkt.Ts, tcptuple, dir)
 	}
 
 	return conn
 }
 
-func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *RpcStream {
-	return &RpcStream{
-		tcpTuple: tcptuple,
+func (r *rpc) handleRPCPacket(xdr *xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
+
+	xid := fmt.Sprintf("%.8x", xdr.getUInt())
+
+	msgType := xdr.getUInt()
+
+	switch msgType {
+	case rpcCall:
+		r.handleCall(xid, xdr, ts, tcptuple, dir)
+	case rpcReply:
+		r.handleReply(xid, xdr, ts, tcptuple, dir)
+	default:
+		logp.Warn("Bad RPC message")
 	}
 }
 
-//
+func newStream(pkt *protos.Packet, tcptuple *common.TCPTuple) *rpcStream {
+	return &rpcStream{
+		tcpTuple: tcptuple,
+		rawData:  pkt.Payload,
+	}
+}

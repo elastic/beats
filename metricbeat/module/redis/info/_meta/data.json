@@ -1,0 +1,152 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "redis:6379",
+        "module": "redis",
+        "name": "info",
+        "rtt": 115
+    },
+    "redis": {
+        "info": {
+            "clients": {
+                "biggest_input_buf": 0,
+                "blocked": 0,
+                "connected": 2,
+                "longest_output_list": 0
+            },
+            "cluster": {
+                "enabled": false
+            },
+            "cpu": {
+                "used": {
+                    "sys": 0.33,
+                    "sys_children": 0,
+                    "user": 0.39,
+                    "user_children": 0
+                }
+            },
+            "memory": {
+                "allocator": "jemalloc-4.0.3",
+                "used": {
+                    "lua": 37888,
+                    "peak": 883992,
+                    "rss": 4030464,
+                    "value": 883032
+                }
+            },
+            "persistence": {
+                "aof": {
+                    "bgrewrite": {
+                        "last_status": "ok"
+                    },
+                    "enabled": false,
+                    "rewrite": {
+                        "current_time": {
+                            "sec": -1
+                        },
+                        "in_progress": false,
+                        "last_time": {
+                            "sec": -1
+                        },
+                        "scheduled": false
+                    },
+                    "write": {
+                        "last_status": "ok"
+                    }
+                },
+                "loading": false,
+                "rdb": {
+                    "bgsave": {
+                        "current_time": {
+                            "sec": -1
+                        },
+                        "in_progress": false,
+                        "last_status": "ok",
+                        "last_time": {
+                            "sec": -1
+                        }
+                    },
+                    "last_save": {
+                        "changes_since": 2,
+                        "time": 1475698251
+                    }
+                }
+            },
+            "replication": {
+                "backlog": {
+                    "active": 0,
+                    "first_byte_offset": 0,
+                    "histlen": 0,
+                    "size": 1048576
+                },
+                "connected_slaves": 0,
+                "master_offset": 0,
+                "role": "master"
+            },
+            "server": {
+                "arch_bits": "64",
+                "build_id": "5575d747b4b3b12c",
+                "config_file": "",
+                "gcc_version": "4.9.2",
+                "git_dirty": "0",
+                "git_sha1": "00000000",
+                "hz": 10,
+                "lru_clock": 16080842,
+                "mode": "standalone",
+                "multiplexing_api": "epoll",
+                "os": "Linux 4.4.22-moby x86_64",
+                "process_id": 1,
+                "run_id": "d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6",
+                "tcp_port": 6379,
+                "uptime": 383,
+                "version": "3.2.4"
+            },
+            "stats": {
+                "commands_processed": 70,
+                "connections": {
+                    "received": 17,
+                    "rejected": 0
+                },
+                "instantaneous": {
+                    "input_kbps": 0.07,
+                    "ops_per_sec": 2,
+                    "output_kbps": 0.07
+                },
+                "keys": {
+                    "evicted": 0,
+                    "expired": 0
+                },
+                "keyspace": {
+                    "hits": 0,
+                    "misses": 0
+                },
+                "latest_fork_usec": 0,
+                "migrate_cached_sockets": 0,
+                "net": {
+                    "input": {
+                        "bytes": 1949
+                    },
+                    "output": {
+                        "bytes": 4956554
+                    }
+                },
+                "pubsub": {
+                    "channels": 0,
+                    "patterns": 0
+                },
+                "sync": {
+                    "full": 0,
+                    "partial": {
+                        "err": 0,
+                        "ok": 0
+                    }
+                }
+            }
+        }
+    },
+    "type": "metricsets"
+}

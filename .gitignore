@@ -2,12 +2,17 @@
 /.vagrant
 /.idea
 /build
+/*/data
+/*/logs
+/*/_meta/kibana/index-pattern
 
 # Files
 .DS_Store
 /glide.lock
 /beats.iml
 *.dev.yml
+*.generated.yml
+coverage.out
 
 # Editor swap files
 *.swp

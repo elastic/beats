@@ -1,0 +1,97 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-mongodb]]
+== MongoDB Module
+
+This module periodically fetches metrics from https://www.mongodb.com[MongoDB]
+servers.
+
+[float]
+=== Module-Specific Configuration Notes
+
+When configuring the `hosts` option, you must use MongoDB URLs of the following
+format:
+
+-----------------------------------
+[mongodb://][user:pass@]host[:port][?options]
+-----------------------------------
+
+The URL can be as simple as:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["localhost"]
+----------------------------------------------------------------------
+
+Or more complex like:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["mongodb://myuser:mypass@localhost:40001", "otherhost:40001"]
+----------------------------------------------------------------------
+
+The username and password can be included in the URL or they can be set using
+the respective configuration options. The credentials in the URL take precedence
+over the username and password configuration options.
+
+[source,yaml]
+----
+- module: mongodb
+  metricsets: ["status"]
+  hosts: ["localhost:27017"]
+  username: root
+  password: test
+----
+
+[float]
+=== Compatibility
+
+The MongoDB metricsets were tested with MongoDB 3.4 and 3.0 and are expected to
+work with all versions >= 2.8.
+
+
+[float]
+=== Example Configuration
+
+The MongoDB module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+#- module: mongodb
+  #metricsets: ["dbstats", "status"]
+  #enabled: true
+  #period: 10s
+
+  # The hosts must be passed as MongoDB URLs in the format:
+  # [mongodb://][user:pass@]host[:port].
+  # The username and password can also be set using the respective configuration
+  # options. The credentials in the URL take precedence over the username and
+  # password configuration options.
+  #hosts: ["localhost:27017"]
+
+  # Username to use when connecting to MongoDB. Empty by default.
+  #username: user
+
+  # Password to use when connecting to MongoDB. Empty by default.
+  #password: pass
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-mongodb-dbstats,dbstats>>
+
+* <<metricbeat-metricset-mongodb-status,status>>
+
+include::mongodb/dbstats.asciidoc[]
+
+include::mongodb/status.asciidoc[]
+

@@ -1,0 +1,42 @@
+- name: container
+  type: group
+  description: >
+    Docker container metrics.
+  fields:
+    - name: command
+      type: keyword
+      description: >
+        Command that was executed in the Docker container.
+    - name: created
+      type: date
+      description: >
+        Date when the container was created.
+    - name: id
+      type: keyword
+      description: >
+        Unique container id.
+    - name: image
+      type: keyword
+      description: >
+        Name of the image the container was built on.
+    - name: name
+      type: keyword
+      description: >
+        Container name.
+    - name: status
+      type: keyword
+      description: >
+        Container status.
+    - name: size
+      type: group
+      description: >
+        Container size metrics.
+      fields:
+        - name: root_fs
+          type: long
+          description: >
+             Total size of all the files in the container.
+        - name: rw
+          type: long
+          description: >
+             Size of the files that have been created or changed since creation.

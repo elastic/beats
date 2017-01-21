@@ -6,6 +6,7 @@ import codecs
 import os
 import time
 from nose.plugins.skip import Skip, SkipTest
+import shutil
 
 # Additional tests to be added:
 # * Check what happens when file renamed -> no recrawling should happen
@@ -213,7 +214,8 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            clean_removed="false",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -270,14 +272,19 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*",
-            force_close_files="true",
-            scan_frequency="0.1s"
+            path=os.path.abspath(self.working_dir) + "/log/*.log",
+            close_removed="true",
+            scan_frequency="0.1s",
+            clean_removed="false",
         )
         os.mkdir(self.working_dir + "/log/")
 
         testfile = self.working_dir + "/log/test.log"
+        testfilenew = self.working_dir + "/log/hiddenfile"
         file = open(testfile, 'w')
+
+        # Creates testfile now, to prevent inode reuse
+        open(testfilenew, 'a').close()
 
         iterations1 = 5
         for n in range(0, iterations1):
@@ -296,10 +303,11 @@ class Test(BaseTest):
         # Wait until error shows up on windows
         self.wait_until(
             lambda: self.log_contains(
-                "Force close file"),
+                "Closing because close_removed is enabled"),
             max_timeout=15)
 
-        # Create new file with same name to see if it is picked up
+        # Move file to old file name
+        shutil.move(testfilenew, testfile)
         file = open(testfile, 'w')
 
         iterations2 = 6
@@ -318,71 +326,13 @@ class Test(BaseTest):
         data = self.get_registry()
 
         # Make sure new file was picked up. As it has the same file name,
-        # only one entry exists
-        assert len(data) == 1
+        # one entry for the new file and one for the old should exist
+        assert len(data) == 2
 
         # Make sure output has 11 entries, the new file was started
         # from scratch
         output = self.read_output()
         assert len(output) == 5 + 6
-
-    def test_force_close(self):
-        """
-        Checks that a file is closed in case it is rotated
-        """
-
-        self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/test.log",
-            force_close_files="true",
-            scan_frequency="0.1s"
-        )
-        os.mkdir(self.working_dir + "/log/")
-
-        testfile1 = self.working_dir + "/log/test.log"
-        testfile2 = self.working_dir + "/log/test.log.rotated"
-        file = open(testfile1, 'w')
-
-        iterations1 = 5
-        for n in range(0, iterations1):
-            file.write("rotation file")
-            file.write("\n")
-
-        file.close()
-
-        filebeat = self.start_beat()
-
-        # Let it read the file
-        self.wait_until(
-            lambda: self.output_has(lines=iterations1), max_timeout=10)
-
-        os.rename(testfile1, testfile2)
-
-        file = open(testfile1, 'w', 0)
-        file.write("Hello World\n")
-        file.close()
-
-        # Wait until error shows up on windows
-        self.wait_until(
-            lambda: self.log_contains(
-                "Force close file"),
-            max_timeout=15)
-
-        # Let it read the file
-        self.wait_until(
-            lambda: self.output_has(lines=iterations1 + 1), max_timeout=10)
-
-        filebeat.check_kill_and_wait()
-
-        data = self.get_registry()
-
-        # Make sure new file was picked up. As it has the same file name,
-        # only one entry exists
-        assert len(data) == 1
-
-        # Make sure output has 11 entries, the new file was started
-        # from scratch
-        output = self.read_output()
-        #assert len(output) == 5 + 6
 
     def test_new_line_on_existing_file(self):
         """
@@ -509,13 +459,13 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            tailFiles="true"
+            tail_files="true"
         )
         os.mkdir(self.working_dir + "/log/")
 
         testfile = self.working_dir + "/log/test.log"
         with open(testfile, 'w') as f:
-            # Write lines before registar started
+            # Write lines before registrar started
             f.write("hello world 1\n")
             f.write("hello world 2\n")
             f.flush()
@@ -564,7 +514,7 @@ class Test(BaseTest):
 
         # Add utf-8 Chars for the first time
         with codecs.open(testfile, "w", "utf-8") as f:
-            # Write lines before registar started
+            # Write lines before registrar started
 
             # Special encoding needed?!?
             f.write("ニコラスRuflin".decode("utf-8") + "\n")
@@ -686,9 +636,6 @@ class Test(BaseTest):
             lambda: self.output_has(40),
             max_timeout=15)
 
-        # TODO: Find better solution when filebeat did crawl the file
-        # Idea: Special flag to filebeat so that filebeat is only doing and
-        # crawl and then finishes
         filebeat.check_kill_and_wait()
 
         output = self.read_output()
@@ -726,9 +673,6 @@ class Test(BaseTest):
             lambda: self.output_has(60),
             max_timeout=15)
 
-        # TODO: Find better solution when filebeat did crawl the file
-        # Idea: Special flag to filebeat so that filebeat is only doing and
-        # crawl and then finishes
         filebeat.check_kill_and_wait()
 
         output = self.read_output()
@@ -767,9 +711,6 @@ class Test(BaseTest):
             lambda: self.output_has(40),
             max_timeout=15)
 
-        # TODO: Find better solution when filebeat did crawl the file
-        # Idea: Special flag to filebeat so that filebeat is only doing and
-        # crawl and then finishes
         filebeat.check_kill_and_wait()
 
         output = self.read_output()
@@ -809,9 +750,6 @@ class Test(BaseTest):
             lambda: self.output_has(20),
             max_timeout=15)
 
-        # TODO: Find better solution when filebeat did crawl the file
-        # Idea: Special flag to filebeat so that filebeat is only doing and
-        # crawl and then finishes
         filebeat.check_kill_and_wait()
 
         output = self.read_output()
@@ -823,6 +761,9 @@ class Test(BaseTest):
         """
         Checks that filebeat handles files without reading permission well
         """
+        if os.name != "nt" and os.geteuid() == 0:
+            # root ignores permission flags, so we have to skip the test
+            raise SkipTest
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",

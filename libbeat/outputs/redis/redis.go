@@ -2,7 +2,7 @@ package redis
 
 import (
 	"errors"
-	"fmt"
+	"expvar"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -10,16 +10,25 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 type redisOut struct {
 	mode mode.ConnectionMode
 	topology
+	beatName string
 }
 
+var debugf = logp.MakeDebug("redis")
+
+// Metrics that can retrieved through the expvar web interface.
 var (
-	debugf = logp.MakeDebug("redis")
+	statReadBytes   = expvar.NewInt("libbeat.redis.publish.read_bytes")
+	statWriteBytes  = expvar.NewInt("libbeat.redis.publish.write_bytes")
+	statReadErrors  = expvar.NewInt("libbeat.redis.publish.read_errors")
+	statWriteErrors = expvar.NewInt("libbeat.redis.publish.write_errors")
 )
 
 const (
@@ -31,8 +40,8 @@ func init() {
 	outputs.RegisterOutputPlugin("redis", new)
 }
 
-func new(cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
-	r := &redisOut{}
+func new(beatName string, cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
+	r := &redisOut{beatName: beatName}
 	if err := r.init(cfg, expireTopo); err != nil {
 		return nil, err
 	}
@@ -61,9 +70,27 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		return errors.New("Bad Redis data type")
 	}
 
-	index := []byte(config.Index)
-	if len(index) == 0 {
-		return fmt.Errorf("missing %v", cfg.PathOf("index"))
+	if cfg.HasField("index") && !cfg.HasField("key") {
+		s, err := cfg.String("index", -1)
+		if err != nil {
+			return err
+		}
+		if err := cfg.SetString("key", -1, s); err != nil {
+			return err
+		}
+	}
+	if !cfg.HasField("key") {
+		cfg.SetString("key", -1, r.beatName)
+	}
+
+	key, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "key",
+		MultiKey:         "keys",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+	})
+	if err != nil {
+		return err
 	}
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
@@ -75,6 +102,12 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		Timeout: config.Timeout,
 		Proxy:   &config.Proxy,
 		TLS:     tls,
+		Stats: &transport.IOStats{
+			Read:        statReadBytes,
+			Write:       statWriteBytes,
+			ReadErrors:  statReadErrors,
+			WriteErrors: statWriteErrors,
+		},
 	}
 
 	// configure topology support
@@ -86,20 +119,32 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 	})
 
 	// configure publisher clients
-	clients, err := mode.MakeClients(cfg, func(host string) (mode.ProtocolClient, error) {
+	clients, err := modeutil.MakeClients(cfg, func(host string) (mode.ProtocolClient, error) {
+
 		t, err := transport.NewClient(transp, "tcp", host, config.Port)
 		if err != nil {
 			return nil, err
 		}
-		return newClient(t, config.Password, config.Db, index, dataType), nil
+
+		codec, err := outputs.CreateEncoder(config.Codec)
+		if err != nil {
+			return nil, err
+		}
+
+		return newClient(t, config.Password, config.Db, key, dataType, codec), nil
 	})
 	if err != nil {
 		return err
 	}
 
 	logp.Info("Max Retries set to: %v", sendRetries)
-	m, err := mode.NewConnectionMode(clients, !config.LoadBalance,
-		maxAttempts, defaultWaitRetry, config.Timeout, defaultMaxWaitRetry)
+	m, err := modeutil.NewConnectionMode(clients, modeutil.Settings{
+		Failover:     !config.LoadBalance,
+		MaxAttempts:  maxAttempts,
+		Timeout:      config.Timeout,
+		WaitRetry:    defaultWaitRetry,
+		MaxWaitRetry: defaultMaxWaitRetry,
+	})
 	if err != nil {
 		return err
 	}
@@ -115,15 +160,15 @@ func (r *redisOut) Close() error {
 func (r *redisOut) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
-	return r.mode.PublishEvent(signaler, opts, event)
+	return r.mode.PublishEvent(signaler, opts, data)
 }
 
 func (r *redisOut) BulkPublish(
 	signaler op.Signaler,
 	opts outputs.Options,
-	events []common.MapStr,
+	data []outputs.Data,
 ) error {
-	return r.mode.PublishEvents(signaler, opts, events)
+	return r.mode.PublishEvents(signaler, opts, data)
 }

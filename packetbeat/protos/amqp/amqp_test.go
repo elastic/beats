@@ -12,25 +12,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func AmqpModForTests() *Amqp {
-	var amqp Amqp
+func amqpModForTests() *amqpPlugin {
+	var amqp amqpPlugin
 	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
 	config := defaultConfig
 	amqp.init(results, &config)
 	return &amqp
 }
 
-func testTcpTuple() *common.TcpTuple {
-	t := &common.TcpTuple{
-		Ip_length: 4,
-		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
-		Src_port: 6512, Dst_port: 3306,
+func testTCPTuple() *common.TCPTuple {
+	t := &common.TCPTuple{
+		IPLength: 4,
+		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+		SrcPort: 6512, DstPort: 3306,
 	}
 	t.ComputeHashebles()
 	return t
 }
 
-func expectTransaction(t *testing.T, amqp *Amqp) common.MapStr {
+func expectTransaction(t *testing.T, amqp *amqpPlugin) common.MapStr {
 	client := amqp.results.(*publish.ChanTransactions)
 	select {
 	case trans := <-client.Channel:
@@ -46,11 +46,11 @@ func TestAmqp_UnknownMethod(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("0100010000000f006e000c0000075465737447657401ce")
 	assert.Nil(t, err)
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
 
 	if ok {
@@ -66,13 +66,13 @@ func TestAmqp_FrameSize(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	//incomplete frame
 	data, err := hex.DecodeString("0100000000000c000a001fffff000200")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
 
 	if !ok {
@@ -88,13 +88,13 @@ func TestAmqp_WrongShortStringSize(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("02000100000019003c000000000000000000058000ac" +
 		"746578742f706c61696ece")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, _ := amqp.amqpMessageParser(stream)
 
 	if ok {
@@ -107,13 +107,13 @@ func TestAmqp_QueueDeclaration(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("0100010000001a0032000a00000e5468697320697" +
 		"3206120544553541800000000ce")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 
 	m := stream.message
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -124,13 +124,13 @@ func TestAmqp_QueueDeclaration(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	assert.Equal(t, "This is a TEST", m.Fields["queue"])
-	assert.Equal(t, false, m.Fields["passive"])
-	assert.Equal(t, false, m.Fields["durable"])
-	assert.Equal(t, false, m.Fields["exclusive"])
-	assert.Equal(t, true, m.Fields["auto-delete"])
-	assert.Equal(t, true, m.Fields["no-wait"])
-	_, exists := m.Fields["arguments"].(common.MapStr)
+	assert.Equal(t, "This is a TEST", m.fields["queue"])
+	assert.Equal(t, false, m.fields["passive"])
+	assert.Equal(t, false, m.fields["durable"])
+	assert.Equal(t, false, m.fields["exclusive"])
+	assert.Equal(t, true, m.fields["auto-delete"])
+	assert.Equal(t, true, m.fields["no-wait"])
+	_, exists := m.fields["arguments"].(common.MapStr)
 	if exists {
 		t.Errorf("Arguments field should not be present")
 	}
@@ -141,13 +141,13 @@ func TestAmqp_ExchangeDeclaration(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("0100010000001c0028000a00000a6c6f67735f746f7" +
 		"0696305746f7069630200000000ce")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 
 	m := stream.message
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -158,14 +158,14 @@ func TestAmqp_ExchangeDeclaration(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	assert.Equal(t, "exchange.declare", m.Method)
-	assert.Equal(t, "logs_topic", m.Fields["exchange"])
-	assert.Equal(t, "logs_topic", m.Request)
-	assert.Equal(t, true, m.Fields["durable"])
-	assert.Equal(t, false, m.Fields["passive"])
-	assert.Equal(t, false, m.Fields["no-wait"])
-	assert.Equal(t, "topic", m.Fields["exchange-type"])
-	_, exists := m.Fields["arguments"].(common.MapStr)
+	assert.Equal(t, "exchange.declare", m.method)
+	assert.Equal(t, "logs_topic", m.fields["exchange"])
+	assert.Equal(t, "logs_topic", m.request)
+	assert.Equal(t, true, m.fields["durable"])
+	assert.Equal(t, false, m.fields["passive"])
+	assert.Equal(t, false, m.fields["no-wait"])
+	assert.Equal(t, "topic", m.fields["exchange-type"])
+	_, exists := m.fields["arguments"].(common.MapStr)
 	if exists {
 		t.Errorf("Arguments field should not be present")
 	}
@@ -176,13 +176,13 @@ func TestAmqp_BasicConsume(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("01000100000028003c001400000e4957616e74" +
 		"546f436f6e73756d650d6d6973746572436f6e73756d650300000000ce")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 
 	m := stream.message
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -193,14 +193,14 @@ func TestAmqp_BasicConsume(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	assert.Equal(t, "basic.consume", m.Method)
-	assert.Equal(t, "IWantToConsume", m.Fields["queue"])
-	assert.Equal(t, "misterConsume", m.Fields["consumer-tag"])
-	assert.Equal(t, true, m.Fields["no-ack"])
-	assert.Equal(t, false, m.Fields["exclusive"])
-	assert.Equal(t, true, m.Fields["no-local"])
-	assert.Equal(t, false, m.Fields["no-wait"])
-	_, exists := m.Fields["arguments"].(common.MapStr)
+	assert.Equal(t, "basic.consume", m.method)
+	assert.Equal(t, "IWantToConsume", m.fields["queue"])
+	assert.Equal(t, "misterConsume", m.fields["consumer-tag"])
+	assert.Equal(t, true, m.fields["no-ack"])
+	assert.Equal(t, false, m.fields["exclusive"])
+	assert.Equal(t, true, m.fields["no-local"])
+	assert.Equal(t, false, m.fields["no-wait"])
+	_, exists := m.fields["arguments"].(common.MapStr)
 	if exists {
 		t.Errorf("Arguments field should not be present")
 	}
@@ -211,13 +211,13 @@ func TestAmqp_ExchangeDeletion(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("010001000000100028001400000844656c65746" +
 		"54d6501ce")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 
 	m := stream.message
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -228,11 +228,11 @@ func TestAmqp_ExchangeDeletion(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	assert.Equal(t, "exchange.delete", m.Method)
-	assert.Equal(t, "DeleteMe", m.Fields["exchange"])
-	assert.Equal(t, "DeleteMe", m.Request)
-	assert.Equal(t, true, m.Fields["if-unused"])
-	assert.Equal(t, false, m.Fields["no-wait"])
+	assert.Equal(t, "exchange.delete", m.method)
+	assert.Equal(t, "DeleteMe", m.fields["exchange"])
+	assert.Equal(t, "DeleteMe", m.request)
+	assert.Equal(t, true, m.fields["if-unused"])
+	assert.Equal(t, false, m.fields["no-wait"])
 }
 
 //this method is exclusive to RabbitMQ
@@ -241,13 +241,13 @@ func TestAmqp_ExchangeBind(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("0100010000001c0028001e0000057465737431" +
 		"057465737432044d5346540000000000ce")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 
 	m := stream.message
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -258,13 +258,13 @@ func TestAmqp_ExchangeBind(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	assert.Equal(t, "exchange.bind", m.Method)
-	assert.Equal(t, "test1", m.Fields["destination"])
-	assert.Equal(t, "test2", m.Fields["source"])
-	assert.Equal(t, "MSFT", m.Fields["routing-key"])
-	assert.Equal(t, "test2 test1", m.Request)
-	assert.Equal(t, false, m.Fields["no-wait"])
-	_, exists := m.Fields["arguments"].(common.MapStr)
+	assert.Equal(t, "exchange.bind", m.method)
+	assert.Equal(t, "test1", m.fields["destination"])
+	assert.Equal(t, "test2", m.fields["source"])
+	assert.Equal(t, "MSFT", m.fields["routing-key"])
+	assert.Equal(t, "test2 test1", m.request)
+	assert.Equal(t, false, m.fields["no-wait"])
+	_, exists := m.fields["arguments"].(common.MapStr)
 	if exists {
 		t.Errorf("Arguments field should not be present")
 	}
@@ -276,8 +276,8 @@ func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.SendRequest = true
+	amqp := amqpModForTests()
+	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("0100010000001c00280028000005746573743105" +
 		"7465737432044d5346540000000000ce")
@@ -285,13 +285,13 @@ func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 	data2, err := hex.DecodeString("0100010000000400280033ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 1, private)
+	amqp.Parse(&req, tcptuple, 1, private)
 
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "exchange.unbind", trans["method"])
@@ -314,8 +314,8 @@ func TestAmqp_PublishMessage(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.SendRequest = true
+	amqp := amqpModForTests()
+	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("0100010000001b003c002800000a6c6f67735f746f70" +
 		"696308414d51507465737400ce")
@@ -327,7 +327,7 @@ func TestAmqp_PublishMessage(t *testing.T) {
 		"2049276d20686f6d6520616761696ece")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -339,7 +339,7 @@ func TestAmqp_PublishMessage(t *testing.T) {
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data3}
 	//body frame
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, amqp)
 
@@ -365,8 +365,8 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.SendResponse = true
+	amqp := amqpModForTests()
+	amqp.sendResponse = true
 
 	data, err := hex.DecodeString("01000100000034003c003c0d6d6973746572436f6e73" +
 		"756d650000000000000002000c7465737445786368616e67650b7465737444656c697" +
@@ -378,7 +378,7 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 	data3, err := hex.DecodeString("030001000000056b696b6f6fce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -390,7 +390,7 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data3}
 	//body frame
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, amqp)
 
@@ -413,8 +413,8 @@ func TestAmqp_MessagePropertiesFields(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.SendResponse = true
+	amqp := amqpModForTests()
+	amqp.sendResponse = true
 
 	data, err := hex.DecodeString("01000100000013003c00280000000a546573744865" +
 		"6164657200ce02000100000061003c0000000000000000001ab8e00a746578742f706c" +
@@ -424,7 +424,7 @@ func TestAmqp_MessagePropertiesFields(t *testing.T) {
 		"65766572ce")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
 	m := stream.message
 	if !ok {
@@ -433,19 +433,19 @@ func TestAmqp_MessagePropertiesFields(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	assert.Equal(t, "basic.publish", m.Method)
-	assert.Equal(t, "persistent", m.Fields["delivery-mode"])
-	assert.Equal(t, "el mensaje", m.Fields["message-id"])
-	assert.Equal(t, "love message", m.Fields["type"])
-	assert.Equal(t, "text/plain", m.Fields["content-type"])
+	assert.Equal(t, "basic.publish", m.method)
+	assert.Equal(t, "persistent", m.fields["delivery-mode"])
+	assert.Equal(t, "el mensaje", m.fields["message-id"])
+	assert.Equal(t, "love message", m.fields["type"])
+	assert.Equal(t, "text/plain", m.fields["content-type"])
 	//assert.Equal(t, "September 15 15:31:44 2015", m.Fields["timestamp"])
-	priority, ok := m.Fields["priority"].(uint8)
+	priority, ok := m.fields["priority"].(uint8)
 	if !ok {
 		t.Errorf("Field should be present")
 	} else if ok && priority != 6 {
 		t.Errorf("Wrong argument")
 	}
-	headers, ok := m.Fields["headers"].(common.MapStr)
+	headers, ok := m.fields["headers"].(common.MapStr)
 	if !ok {
 		t.Errorf("Headers should be present")
 	}
@@ -460,7 +460,7 @@ func TestAmqp_ChannelError(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	data1, err := hex.DecodeString("0100010000009000140028019685505245434f4e444" +
 		"954494f4e5f4641494c4544202d20696e6571756976616c656e74206172672027617574" +
@@ -469,7 +469,7 @@ func TestAmqp_ChannelError(t *testing.T) {
 		"42063757272656e74206973202766616c7365270028000ace")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data1, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data1, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
 	m := stream.message
 
@@ -479,20 +479,20 @@ func TestAmqp_ChannelError(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	assert.Equal(t, "channel.close", m.Method)
-	class, ok := m.Fields["class-id"].(uint16)
+	assert.Equal(t, "channel.close", m.method)
+	class, ok := m.fields["class-id"].(uint16)
 	if !ok {
 		t.Errorf("Field should be present")
 	} else if ok && class != 40 {
 		t.Errorf("Wrong argument")
 	}
-	method, ok := m.Fields["method-id"].(uint16)
+	method, ok := m.fields["method-id"].(uint16)
 	if !ok {
 		t.Errorf("Field should be present")
 	} else if ok && method != 10 {
 		t.Errorf("Wrong argument")
 	}
-	code, ok := m.Fields["reply-code"].(uint16)
+	code, ok := m.fields["reply-code"].(uint16)
 	if !ok {
 		t.Errorf("Field should be present")
 	} else if ok && code != 406 {
@@ -501,7 +501,7 @@ func TestAmqp_ChannelError(t *testing.T) {
 	text := "PRECONDITION_FAILED - inequivalent arg 'auto_delete' for" +
 		" exchange 'testExchange' in vhost '/': received 'true' but current is " +
 		"'false'"
-	assert.Equal(t, text, m.Fields["reply-text"])
+	assert.Equal(t, text, m.fields["reply-text"])
 }
 
 func TestAmqp_NoWaitQueueDeleteMethod(t *testing.T) {
@@ -509,19 +509,19 @@ func TestAmqp_NoWaitQueueDeleteMethod(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.SendRequest = true
+	amqp := amqpModForTests()
+	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("010001000000120032002800000a546573745468" +
 		"6f6d617304ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, amqp)
 
@@ -543,19 +543,19 @@ func TestAmqp_RejectMessage(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.SendRequest = true
+	amqp := amqpModForTests()
+	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("0100010000000d003c005a000000000000000101ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 
 	//method frame
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, amqp)
 
@@ -575,8 +575,8 @@ func TestAmqp_GetEmptyMethod(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.SendRequest = true
+	amqp := amqpModForTests()
+	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("01000100000013003c004600000b526f626269" +
 		"654b65616e6501ce")
@@ -584,13 +584,13 @@ func TestAmqp_GetEmptyMethod(t *testing.T) {
 	data2, err := hex.DecodeString("01000100000005003c004800ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 1, private)
+	amqp.Parse(&req, tcptuple, 1, private)
 
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "basic.get-empty", trans["method"])
@@ -604,9 +604,9 @@ func TestAmqp_GetMethod(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.SendRequest = true
-	amqp.SendResponse = true
+	amqp := amqpModForTests()
+	amqp.sendRequest = true
+	amqp.sendResponse = true
 
 	data, err := hex.DecodeString("0100010000000f003c0046000007546573744" +
 		"7657401ce")
@@ -617,13 +617,13 @@ func TestAmqp_GetMethod(t *testing.T) {
 		"f752064617265ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 1, private)
+	amqp.Parse(&req, tcptuple, 1, private)
 
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "basic.get", trans["method"])
@@ -638,16 +638,16 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.MaxBodyLength = 10
-	amqp.SendRequest = true
+	amqp := amqpModForTests()
+	amqp.maxBodyLength = 10
+	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("01000100000010003c002800000007546573744d617" +
 		"800ce02000100000019003c0000000000000000001680000a746578742f706c61696ece" +
 		"0300010000001649276d2061207665727920626967206d657373616765ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -678,13 +678,13 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 		"414141414141414141414141414141414141414141414141414141414141ce")
 	assert.Nil(t, err)
 
-	tcptuple = testTcpTuple()
+	tcptuple = testTCPTuple()
 
 	req = protos.Packet{Payload: data}
 	private = protos.ProtocolData(new(amqpPrivateData))
 
 	//method frame
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans = expectTransaction(t, amqp)
 
@@ -709,17 +709,17 @@ func TestAmqp_HideArguments(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.SendRequest = true
-	amqp.ParseHeaders = false
-	amqp.ParseArguments = false
+	amqp := amqpModForTests()
+	amqp.sendRequest = true
+	amqp.parseHeaders = false
+	amqp.parseArguments = false
 
 	//parse args
 	data, err := hex.DecodeString("0100010000004d0032000a00000a5465737448656164" +
 		"6572180000003704626f6f6c74010362697462050568656c6c6f530000001f4869206461" +
 		"726c696e6720c3aac3aac3aac3aac3aac3aac3aae697a5e69cacce")
 	assert.Nil(t, err)
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
@@ -745,10 +745,10 @@ func TestAmqp_HideArguments(t *testing.T) {
 		"e02060a656c206d656e73616a65ce0300010000001a54657374206865616465722066696" +
 		"56c647320666f7265766572ce")
 	assert.Nil(t, err)
-	tcptuple = testTcpTuple()
+	tcptuple = testTCPTuple()
 	req = protos.Packet{Payload: data}
 	private = protos.ProtocolData(new(amqpPrivateData))
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 	trans = expectTransaction(t, amqp)
 	assert.Equal(t, "basic.publish", trans["method"])
 	assert.Equal(t, "amqp", trans["type"])
@@ -772,21 +772,21 @@ func TestAmqp_RecoverMethod(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.SendRequest = true
+	amqp := amqpModForTests()
+	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("01000100000005003c006e01ce")
 	assert.Nil(t, err)
 	data2, err := hex.DecodeString("01000100000004003c006fce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 1, private)
+	amqp.Parse(&req, tcptuple, 1, private)
 
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "basic.recover", trans["method"])
@@ -802,12 +802,12 @@ func TestAmqp_BasicNack(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	data1, err := hex.DecodeString("0100010000000d003c0078000000000000000102ce")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data1, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data1, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
 	m := stream.message
 
@@ -817,9 +817,9 @@ func TestAmqp_BasicNack(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	assert.Equal(t, "basic.nack", m.Method)
-	assert.Equal(t, false, m.Fields["multiple"])
-	assert.Equal(t, true, m.Fields["requeue"])
+	assert.Equal(t, "basic.nack", m.method)
+	assert.Equal(t, false, m.fields["multiple"])
+	assert.Equal(t, true, m.fields["requeue"])
 }
 
 func TestAmqp_GetTable(t *testing.T) {
@@ -827,7 +827,7 @@ func TestAmqp_GetTable(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("010001000000890032000a00000a5465737448656164" +
 		"657218000000730974696d657374616d70540000000055f7e40903626974620507646563" +
@@ -836,7 +836,7 @@ func TestAmqp_GetTable(t *testing.T) {
 		"6174664124cccd04626f6f6c7401ce")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
 	m := stream.message
 
@@ -846,7 +846,7 @@ func TestAmqp_GetTable(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	args, ok := m.Fields["arguments"].(common.MapStr)
+	args, ok := m.fields["arguments"].(common.MapStr)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -874,13 +874,13 @@ func TestAmqp_GetTable(t *testing.T) {
 	assert.Equal(t, "Hi darling êêêêêêê日本", args["hello"])
 	assert.Equal(t, true, args["bool"])
 	assert.Equal(t, "154.85189", args["decimal"])
-	assert.Equal(t, "queue.declare", m.Method)
-	assert.Equal(t, false, m.Fields["durable"])
-	assert.Equal(t, true, m.Fields["no-wait"])
-	assert.Equal(t, true, m.Fields["auto-delete"])
-	assert.Equal(t, false, m.Fields["exclusive"])
+	assert.Equal(t, "queue.declare", m.method)
+	assert.Equal(t, false, m.fields["durable"])
+	assert.Equal(t, true, m.fields["no-wait"])
+	assert.Equal(t, true, m.fields["auto-delete"])
+	assert.Equal(t, false, m.fields["exclusive"])
 	//assert.Equal(t, "September 15 11:25:29 2015", args["timestamp"])
-	assert.Equal(t, "TestHeader", m.Request)
+	assert.Equal(t, "TestHeader", m.request)
 }
 
 func TestAmqp_TableInception(t *testing.T) {
@@ -888,7 +888,7 @@ func TestAmqp_TableInception(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("010001000000860028000a000005746573743105" +
 		"746f706963020000006f09696e63657074696f6e460000005006696e636570315300" +
@@ -897,7 +897,7 @@ func TestAmqp_TableInception(t *testing.T) {
 		"69746f06626967496e746c00071afd498d0000ce")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
 	m := stream.message
 
@@ -907,14 +907,14 @@ func TestAmqp_TableInception(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	assert.Equal(t, "exchange.declare", m.Method)
-	assert.Equal(t, "test1", m.Fields["exchange"])
+	assert.Equal(t, "exchange.declare", m.method)
+	assert.Equal(t, "test1", m.fields["exchange"])
 
-	args, ok := m.Fields["arguments"].(common.MapStr)
+	args, ok := m.fields["arguments"].(common.MapStr)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
-	assert.Nil(t, m.Notes)
+	assert.Nil(t, m.notes)
 
 	bigInt, ok := args["bigInt"].(uint64)
 	if !ok {
@@ -942,14 +942,14 @@ func TestAmqp_ArrayFields(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	//byte array, rabbitMQ specific field
 	data, err := hex.DecodeString("010001000000260028000a0000057465737431057" +
 		"46f706963020000000f05617272617978000000040a007dd2ce")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
 	m := stream.message
 
@@ -959,11 +959,11 @@ func TestAmqp_ArrayFields(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	args, ok := m.Fields["arguments"].(common.MapStr)
+	args, ok := m.fields["arguments"].(common.MapStr)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
-	assert.Nil(t, m.Notes)
+	assert.Nil(t, m.notes)
 	assert.Equal(t, "[10, 0, 125, 210]", args["array"])
 
 	data, err = hex.DecodeString("010001000000b60028000a000005746573743105746" +
@@ -974,7 +974,7 @@ func TestAmqp_ArrayFields(t *testing.T) {
 		"9d090d0bdd0bdd0b020d09ad0b0d180d0b5d0bdd0b8d0bdd0b0ce")
 	assert.Nil(t, err)
 
-	stream = &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream = &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete = amqp.amqpMessageParser(stream)
 	m = stream.message
 	if !ok {
@@ -983,7 +983,7 @@ func TestAmqp_ArrayFields(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	args, ok = m.Fields["arguments"].(common.MapStr)
+	args, ok = m.fields["arguments"].(common.MapStr)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -1021,7 +1021,7 @@ func TestAmqp_WrongTable(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	//declared table size too big
 	data, err := hex.DecodeString("010001000000890032000a00000a54657374486561646" +
@@ -1031,7 +1031,7 @@ func TestAmqp_WrongTable(t *testing.T) {
 		"174664124cccd04626f6f6c7401ce")
 	assert.Nil(t, err)
 
-	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
 	m := stream.message
 	if !ok {
@@ -1040,11 +1040,11 @@ func TestAmqp_WrongTable(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	_, exists := m.Fields["arguments"].(common.MapStr)
+	_, exists := m.fields["arguments"].(common.MapStr)
 	if exists {
 		t.Errorf("Field should not exist")
 	}
-	assert.Equal(t, []string{"Failed to parse additional arguments"}, m.Notes)
+	assert.Equal(t, []string{"Failed to parse additional arguments"}, m.notes)
 
 	//table size ok, but total non-sense inside
 	data, err = hex.DecodeString("010001000000890032000a00000a54657374486561646" +
@@ -1054,7 +1054,7 @@ func TestAmqp_WrongTable(t *testing.T) {
 		"90b664124cc1904626f6f6c7401ce")
 	assert.Nil(t, err)
 
-	stream = &AmqpStream{data: data, message: new(AmqpMessage)}
+	stream = &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete = amqp.amqpMessageParser(stream)
 	m = stream.message
 	if !ok {
@@ -1063,30 +1063,30 @@ func TestAmqp_WrongTable(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	_, exists = m.Fields["arguments"].(common.MapStr)
+	_, exists = m.fields["arguments"].(common.MapStr)
 	if exists {
 		t.Errorf("Field should not exist")
 	}
-	assert.Equal(t, []string{"Failed to parse additional arguments"}, m.Notes)
+	assert.Equal(t, []string{"Failed to parse additional arguments"}, m.notes)
 }
 
 func TestAmqp_isError(t *testing.T) {
-	trans := &AmqpTransaction{
-		Method: "channel.close",
-		Amqp: common.MapStr{
+	trans := &amqpTransaction{
+		method: "channel.close",
+		amqp: common.MapStr{
 			"reply-code": 200,
 		},
 	}
 	assert.Equal(t, false, isError(trans))
-	trans.Amqp["reply-code"] = uint16(300)
+	trans.amqp["reply-code"] = uint16(300)
 	assert.Equal(t, true, isError(trans))
-	trans.Amqp["reply-code"] = uint16(403)
+	trans.amqp["reply-code"] = uint16(403)
 	assert.Equal(t, true, isError(trans))
-	trans.Method = "basic.reject"
+	trans.method = "basic.reject"
 	assert.Equal(t, true, isError(trans))
-	trans.Method = "basic.return"
+	trans.method = "basic.return"
 	assert.Equal(t, true, isError(trans))
-	trans.Method = "basic.publish"
+	trans.method = "basic.publish"
 	assert.Equal(t, false, isError(trans))
 }
 
@@ -1095,7 +1095,7 @@ func TestAmqp_ChannelCloseErrorMethod(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
+	amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("0100010000009000140028019685505245434f4e444" +
 		"954494f4e5f4641494c4544202d20696e6571756976616c656e74206172672027617574" +
@@ -1106,13 +1106,13 @@ func TestAmqp_ChannelCloseErrorMethod(t *testing.T) {
 	data2, err := hex.DecodeString("0100010000000400280033ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 1, private)
+	amqp.Parse(&req, tcptuple, 1, private)
 
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "channel.close", trans["method"])
@@ -1126,21 +1126,21 @@ func TestAmqp_ConnectionCloseNoError(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.HideConnectionInformation = false
+	amqp := amqpModForTests()
+	amqp.hideConnectionInformation = false
 
 	data, err := hex.DecodeString("01000000000012000a003200c8076b74687862616900000000ce")
 	assert.Nil(t, err)
 	data2, err := hex.DecodeString("01000000000004000a0033ce")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 1, private)
+	amqp.Parse(&req, tcptuple, 1, private)
 
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "connection.close", trans["method"])
@@ -1160,8 +1160,8 @@ func TestAmqp_MultipleBodyFrames(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := AmqpModForTests()
-	amqp.SendRequest = true
+	amqp := amqpModForTests()
+	amqp.sendRequest = true
 	data, err := hex.DecodeString("0100010000000e003c00280000000568656c6c6f00ce" +
 		"02000100000021003c0000000000000000002a80400a746578742f706c61696e00000000" +
 		"56a22873ce030001000000202a2a2a68656c6c6f2049206c696b6520746f207075626c69" +
@@ -1170,12 +1170,12 @@ func TestAmqp_MultipleBodyFrames(t *testing.T) {
 	data2, err := hex.DecodeString("0300010000000a657373616765732a2a2ace")
 	assert.Nil(t, err)
 
-	tcptuple := testTcpTuple()
+	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 	trans := expectTransaction(t, amqp)
 	assert.Equal(t, "basic.publish", trans["method"])
 	assert.Equal(t, "***hello I like to publish big messages***", trans["request"])

@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Docker containers per host\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"docker.container.id\",\"customLabel\":\"Number of containers\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"beat.hostname\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Hosts\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Docker containers per host", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Metricbeat-Docker", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

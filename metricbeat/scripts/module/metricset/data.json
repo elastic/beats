@@ -1,0 +1,19 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"{module}",
+        "name":"{metricset}",
+        "rtt":44269
+    },
+    "{module}":{
+        "{metricset}":{
+            "example": "{metricset}"
+        }
+    },
+    "type":"metricsets"
+}

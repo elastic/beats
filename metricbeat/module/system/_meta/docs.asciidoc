@@ -1,0 +1,51 @@
+== System Module
+
+The System module allows you to monitor your servers. Because the System module always applies to the local
+server, the `hosts` config option is not needed.
+
+[float]
+=== Module-Specific Configuration Notes
+
+The System module has these additional config options:
+
+*`processes`*:: When the `process` metricset is enabled, you can use the `processes` option to define a list of
+regexp expressions to filter the processes that are reported. For more complex filtering, you should use the
+<<configuration-processors, processors>> configuration option.
++
+The following example config returns metrics for all processes:
++
+[source,yaml]
+----
+metricbeat.modules:
+- module: system
+  metricsets: ["process"]
+  processes: ['.*']
+----
+*`cgroups`*:: When the `process` metricset is enabled, you can use the boolean
+`cgroups` option to enable the experimental cgroup metrics on Linux.
++
+The following example config enables cgroups metrics on Linux.
++
+[source,yaml]
+----
+metricbeat.modules:
+- module: system
+  metricsets: ["process"]
+  cgroups: true
+----
+*`cpu_ticks`*:: When the `cpu` or `core` metricset is enabled, you can specify `cpu_ticks: true` to report CPU ticks in addition to CPU percentages stats. For example:
++
+[source,yaml]
+----
+metricbeat.modules:
+- module: system
+  metricsets: ["cpu", "core"]
+  cpu_ticks: true
+----
+
+[float]
+=== Dashboard
+
+The System module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_system_dashboard.png[]

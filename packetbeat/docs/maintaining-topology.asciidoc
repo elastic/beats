@@ -1,5 +1,7 @@
 [[maintaining-topology]]
-=== Maintaining the Real-Time State of the Network Topology
+== Maintaining the Real-Time State of the Network Topology
+
+deprecated[5.0.0]
 
 One important feature of Packetbeat is that it knows the name of the source and
 destination servers for each transaction. It does this without needing to maintain
@@ -8,16 +10,13 @@ where the Beat runs, and maps the hostname to the list of IP addresses of that s
 
 Packetbeat stores the topology information in an Elasticsearch index, so to save
 the network topology, you need to use Elasticsearch as output and set the
-`save_topology` configuration option to true. 
+`save_topology` configuration option to true.
 
 For example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-output:
-
-  elasticsearch:
-    hosts: ["localhost:9200"]
-
-    save_topology: true
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  save_topology: true
 ------------------------------------------------------------------------------

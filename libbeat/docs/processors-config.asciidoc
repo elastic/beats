@@ -1,0 +1,428 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/processors-config.asciidoc[]
+//// Make sure this content appears below a level 2 heading.
+//////////////////////////////////////////////////////////////////////////
+
+[[configuration-processors]]
+== Processors
+
+include::../../libbeat/docs/processors.asciidoc[]
+
+To define a processor, you specify the processor name, an optional condition,
+and a set of parameters: 
+
+[source,yaml]
+------
+processors:
+ - <processor_name>:
+     when:
+        <condition>
+     <parameters>
+ - <processor_name>:
+     when:
+        <condition>
+     <parameters>
+...
+
+------
+
+Where:
+
+* <processor_name> specifies a <<processors,processor>> that performs some kind
+of action, such as selecting the fields that are exported or adding metadata to
+the event.
+* <when: condition> specifies an optional <<conditions,condition>>. If the
+condition is present, then the action is executed only if the condition is
+fulfilled. If no condition is passed, then the action is always executed.
+* <parameters> is the list of parameters to pass to the processor. 
+
+See <<filtering-and-enhancing-data>> for specific {beatname_uc} examples.
+
+[float]
+[[conditions]]
+=== Conditions
+
+Each condition receives a field to compare. You can specify multiple fields
+under the same condition by using `AND` between the fields (for example,
+`field1 AND field2`). 
+
+For each field, you can specify a simple field name or a nested map, for
+example `dns.question.name`.
+
+See <<exported-fields>> for a list of all the fields that are exported by
+{beatname_uc}.
+
+The supported conditions are:
+
+* <<condition-equals,`equals`>>
+* <<condition-contains,`contains`>>
+* <<condition-regexp,`regexp`>>
+* <<condition-range, `range`>>
+* <<condition-or, `or`>>
+* <<condition-and, `and`>>
+* <<condition-not, `not`>>
+
+
+[float]
+[[condition-equals]]
+==== equals
+
+With the `equals` condition, you can compare if a field has a certain value.
+The condition accepts only an integer or a string value.
+
+For example, the following condition checks if the response code of the HTTP
+transaction is 200:
+
+[source,yaml]
+-------
+equals:
+  http.response.code: 200
+-------
+
+[float]
+[[condition-contains]]
+==== contains
+
+The `contains` condition checks if a value is part of a field. The field can be
+a string or an array of strings. The condition accepts only a string value.
+
+For example, the following condition checks if an error is part of the
+transaction status:
+
+[source,yaml]
+------
+contains:
+  status: "Specific error"
+------
+
+[float]
+[[condition-regexp]]
+==== regexp
+
+The `regexp` condition checks the field against a regular expression. The
+condition accepts only strings.
+
+For example, the following condition checks if the process name starts with
+`foo`:
+
+[source,yaml]
+-----
+regexp:
+  system.process.name: "foo.*"
+-----
+
+[float]
+[[condition-range]]
+==== range
+
+The `range` condition checks if the field is in a certain range of values. The
+condition supports `lt`, `lte`, `gt` and `gte`. The condition accepts only
+integer or float values.
+
+For example, the following condition checks for failed HTTP transactions by
+comparing the `http.response.code` field with 400.
+
+
+[source,yaml]
+------
+range:
+    http.response.code:
+        gte: 400
+------
+
+This can also be written as:
+
+[source,yaml]
+----
+range:
+    http.response.code.gte: 400
+----
+
+The following condition checks if the CPU usage in percentage has a value
+between 0.5 and 0.8.
+
+[source,yaml]
+------
+range:
+    system.cpu.user.pct.gte: 0.5
+    system.cpu.user.pct.lt: 0.8
+------
+
+
+[float]
+[[condition-or]]
+==== OR
+
+The `or` operator receives a list of conditions. 
+
+[source,yaml]
+-------
+or:
+  - <condition1>
+  - <condition2>
+  - <condition3>
+  ...
+
+-------
+
+For example, to configure the condition
+`http.response.code = 304 OR http.response.code = 404`: 
+
+[source,yaml]
+------
+or:
+  - equals:
+      http.response.code: 304
+  - equals:
+      http.response.code: 404
+------
+
+[float]
+[[condition-and]]
+==== AND
+
+The `and` operator receives a list of conditions. 
+
+[source,yaml]
+-------
+and:
+  - <condition1>
+  - <condition2>
+  - <condition3>
+  ...
+
+-------
+
+For example, to configure the condition
+`http.response.code = 200 AND status = OK`: 
+
+[source,yaml]
+------
+and:
+  - equals:
+      http.response.code: 200
+  - equals:
+      status: OK
+------
+
+To configure a condition like `<condition1> OR <condition2> AND <condition3>`:
+
+[source,yaml]
+------
+or:
+ - <condition1>
+ - and:
+    - <condition2>
+    - <condition3>
+
+------
+
+[float]
+[[condition-not]]
+==== NOT
+
+The `not` operator receives the condition to negate.
+
+[source,yaml]
+-------
+not:
+  <condition>
+
+-------
+
+For example, to configure the condition `NOT status = OK`: 
+
+[source,yaml]
+------
+not:
+  equals:
+    status: OK
+------
+
+[float]
+[[processors]]
+=== Processors
+
+The supported processors are:
+
+ * <<add-cloud-metadata,`add_cloud_metadata`>>
+ * <<decode-json-fields,`decode_json_fields`>>
+ * <<drop-event,`drop_event`>>
+ * <<drop-fields,`drop_fields`>>
+ * <<include-fields,`include_fields`>>
+
+[[add-cloud-metadata]]
+=== add_cloud_metadata
+
+The `add_cloud_metadata` processor enriches each event with instance metadata
+from the machine's hosting provider. At startup it will detect the hosting
+provider and cache the instance metadata.
+
+Three cloud providers are supported.
+
+- Amazon Elastic Compute Cloud (EC2)
+- Digital Ocean
+- Google Compute Engine (GCE)
+
+The simple configuration below enables the processor.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_cloud_metadata:
+-------------------------------------------------------------------------------
+
+The `add_cloud_metadata` processor has one optional configuration setting named
+`timeout` that specifies the maximum amount of time to wait for a successful
+response when detecting the hosting provider. The default timeout value is
+`3s`.
+
+If a timeout occurs then no instance metadata will be added to the events. This
+makes it possible to enable this processor for all your deployments (in the
+cloud or on-premise).
+
+The metadata that is added to events varies by hosting provider. Below are
+examples for each of the supported providers.
+
+_EC2_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "meta": {
+    "cloud": {
+      "availability_zone": "us-east-1c",
+      "instance_id": "i-4e123456",
+      "machine_type": "t2.medium",
+      "provider": "ec2",
+      "region": "us-east-1"
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+_Digital Ocean_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "meta": {
+    "cloud": {
+      "instance_id": "1234567",
+      "provider": "digitalocean",
+      "region": "nyc2"
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+_GCE_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "meta": {
+    "cloud": {
+      "availability_zone": "projects/1234567890/zones/us-east1-b",
+      "instance_id": "1234556778987654321",
+      "machine_type": "projects/1234567890/machineTypes/f1-micro",
+      "project_id": "my-dev",
+      "provider": "gce"
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+[[decode-json-fields]]
+=== decode_json_fields
+
+The `decode_json_fields` processor decodes fields containing JSON strings and
+replaces the strings with valid JSON objects.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - decode_json_fields:
+     fields: ["field1", "field2", ...]
+     process_array: false 
+     max_depth: 1
+-----------------------------------------------------
+
+The `decode_json_fields` processor has the following configuration settings:
+
+`fields`:: The fields containing JSON strings to decode.
+`process_array`:: (Optional) A boolean that specifies whether to process
+arrays. The default is false.
+`max_depth`:: (Optional) The maximum parsing depth. The default is 1.
+
+[[drop-event]]
+=== drop_event
+
+The `drop_event` processor drops the entire event if the associated condition
+is fulfilled. The condition is mandatory, because without one, all the events
+are dropped. 
+
+[source,yaml]
+------
+processors:
+ - drop_event:
+     when:
+        condition
+------
+
+See <<conditions>> for a list of supported conditions.
+
+[[drop-fields]]
+=== drop_fields
+
+The `drop_fields` processor specifies which fields to drop if a certain
+condition is fulfilled. The condition is optional. If it's missing, the
+specified fields are always dropped. The `@timestamp` and `type` fields cannot
+be dropped, even if they show up in the `drop_fields` list. 
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - drop_fields:
+     when:
+        condition
+     fields: ["field1", "field2", ...]
+-----------------------------------------------------
+
+See <<conditions>> for a list of supported conditions.
+
+NOTE: If you define an empty list of fields under `drop_fields`, then no fields
+are dropped.
+
+[[include-fields]]
+=== include_fields
+
+The `include_fields` processor specifies which fields to export if a certain
+condition is fulfilled. The condition is optional. If it's missing, the
+specified fields are always exported. The `@timestamp` and `type` fields are
+always exported, even if they are not defined in the `include_fields` list.
+
+[source,yaml]
+-------
+processors:
+ - include_fields:
+     when:
+        condition
+     fields: ["field1", "field2", ...]
+-------
+
+See <<conditions>> for a list of supported conditions.
+
+You can specify multiple `include_fields` processors under the `processors`
+section.
+
+NOTE: If you define an empty list of fields under `include_fields`, then only
+the required fields, `@timestamp` and `type`, are exported.
+

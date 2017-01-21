@@ -1,7 +1,6 @@
 package transport
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net"
 	"sync"
@@ -19,8 +18,9 @@ type Client struct {
 
 type Config struct {
 	Proxy   *ProxyConfig
-	TLS     *tls.Config
+	TLS     *TLSConfig
 	Timeout time.Duration
+	Stats   *IOStats
 }
 
 func MakeDialer(c *Config) (Dialer, error) {
@@ -30,7 +30,13 @@ func MakeDialer(c *Config) (Dialer, error) {
 	if err != nil {
 		return nil, err
 	}
-	dialer = TLSDialer(c.TLS, c.Timeout, dialer)
+	if c.Stats != nil {
+		dialer = StatsDialer(dialer, c.Stats)
+	}
+
+	if c.TLS != nil {
+		return TLSDialer(dialer, c.TLS, c.Timeout)
+	}
 	return dialer, nil
 }
 
@@ -122,7 +128,6 @@ func (c *Client) Read(b []byte) (int, error) {
 		return 0, ErrNotConnected
 	}
 
-	debugf("try read: %v", len(b))
 	n, err := conn.Read(b)
 	return n, c.handleError(err)
 }

@@ -24,9 +24,15 @@ func (foldTransform) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err
 			}
 			for nSrc++; nSrc < end && src[nSrc] < utf8.RuneSelf; nSrc++ {
 			}
-			nDst += copy(dst[nDst:], src[start:nSrc])
-			if nDst == len(dst) && nSrc < len(src) && src[nSrc] < utf8.RuneSelf {
-				return nDst, nSrc, transform.ErrShortDst
+			n := copy(dst[nDst:], src[start:nSrc])
+			if nDst += n; nDst == len(dst) {
+				nSrc = start + n
+				if nSrc == len(src) {
+					return nDst, nSrc, nil
+				}
+				if src[nSrc] < utf8.RuneSelf {
+					return nDst, nSrc, transform.ErrShortDst
+				}
 			}
 			continue
 		}
@@ -74,9 +80,15 @@ func (narrowTransform) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, e
 			}
 			for nSrc++; nSrc < end && src[nSrc] < utf8.RuneSelf; nSrc++ {
 			}
-			nDst += copy(dst[nDst:], src[start:nSrc])
-			if nDst == len(dst) && nSrc < len(src) && src[nSrc] < utf8.RuneSelf {
-				return nDst, nSrc, transform.ErrShortDst
+			n := copy(dst[nDst:], src[start:nSrc])
+			if nDst += n; nDst == len(dst) {
+				nSrc = start + n
+				if nSrc == len(src) {
+					return nDst, nSrc, nil
+				}
+				if src[nSrc] < utf8.RuneSelf {
+					return nDst, nSrc, transform.ErrShortDst
+				}
 			}
 			continue
 		}

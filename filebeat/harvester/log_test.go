@@ -12,6 +12,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/harvester/reader"
+	"github.com/elastic/beats/filebeat/harvester/source"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,39 +56,51 @@ func TestReadLine(t *testing.T) {
 	defer readFile.Close()
 	assert.Nil(t, err)
 
-	h := Harvester{}
+	f := source.File{readFile}
+
+	h := Harvester{
+		config: harvesterConfig{
+			CloseInactive: 500 * time.Millisecond,
+			Backoff:       100 * time.Millisecond,
+			MaxBackoff:    1 * time.Second,
+			BackoffFactor: 2,
+			BufferSize:    100,
+			MaxBytes:      1000,
+		},
+		file: f,
+	}
 	assert.NotNil(t, h)
 
-	// Read only 10 bytes which is not the end of the file
-	codec, _ := encoding.Plain(file)
-	readConfig := logFileReaderConfig{
-		closeOlder:         500 * time.Millisecond,
-		backoffDuration:    100 * time.Millisecond,
-		maxBackoffDuration: 1 * time.Second,
-		backoffFactor:      2,
-	}
-	reader, _ := createLineReader(fileSource{readFile}, codec, 100, 1000, readConfig, nil, nil)
+	var ok bool
+	h.encodingFactory, ok = encoding.FindEncoding(h.config.Encoding)
+	assert.True(t, ok)
+
+	h.encoding, err = h.encodingFactory(readFile)
+	assert.NoError(t, err)
+
+	r, err := h.newLogFileReader()
+	assert.NoError(t, err)
 
 	// Read third line
-	_, text, bytesread, _, err := readLine(reader)
+	_, text, bytesread, _, err := readLine(r)
 	fmt.Printf("received line: '%s'\n", text)
 	assert.Nil(t, err)
 	assert.Equal(t, text, firstLineString[0:len(firstLineString)-1])
 	assert.Equal(t, bytesread, len(firstLineString))
 
 	// read second line
-	_, text, bytesread, _, err = readLine(reader)
+	_, text, bytesread, _, err = readLine(r)
 	fmt.Printf("received line: '%s'\n", text)
 	assert.Equal(t, text, secondLineString[0:len(secondLineString)-1])
 	assert.Equal(t, bytesread, len(secondLineString))
 	assert.Nil(t, err)
 
 	// Read third line, which doesn't exist
-	_, text, bytesread, _, err = readLine(reader)
+	_, text, bytesread, _, err = readLine(r)
 	fmt.Printf("received line: '%s'\n", text)
 	assert.Equal(t, "", text)
 	assert.Equal(t, bytesread, 0)
-	assert.Equal(t, err, errInactive)
+	assert.Equal(t, err, ErrInactive)
 }
 
 func TestExcludeLine(t *testing.T) {
@@ -113,4 +128,18 @@ func TestInitRegexp(t *testing.T) {
 
 	_, err := InitRegexps([]string{"((((("})
 	assert.NotNil(t, err)
+}
+
+// readLine reads a full line into buffer and returns it.
+// In case of partial lines, readLine does return an error and an empty string
+// This could potentialy be improved / replaced by https://github.com/elastic/beats/libbeat/tree/master/common/streambuf
+func readLine(reader reader.Reader) (time.Time, string, int, common.MapStr, error) {
+	message, err := reader.Next()
+
+	// Full line read to be returned
+	if message.Bytes != 0 && err == nil {
+		return message.Ts, string(message.Content), message.Bytes, message.Fields, err
+	}
+
+	return time.Time{}, "", 0, nil, err
 }

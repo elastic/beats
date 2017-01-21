@@ -1,48 +1,72 @@
-// +build darwin linux openbsd windows
+// +build darwin freebsd linux openbsd windows
+
+// +build darwin freebsd linux openbsd windows
 
 package memory
 
 import (
-	"github.com/elastic/beats/metricbeat/helper"
-
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/topbeat/system"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
+
+	"github.com/pkg/errors"
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("system", "memory", New)
+	if err := mb.Registry.AddMetricSet("system", "memory", New, parse.EmptyHostParser); err != nil {
+		panic(err)
+	}
 }
 
-// New creates new instance of MetricSeter
-func New() helper.MetricSeter {
-	return &MetricSeter{}
+// MetricSet for fetching system memory metrics.
+type MetricSet struct {
+	mb.BaseMetricSet
 }
 
-type MetricSeter struct{}
-
-func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
-	return nil
+// New is a mb.MetricSetFactory that returns a memory.MetricSet.
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return &MetricSet{base}, nil
 }
 
-func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.MapStr, err error) {
-
-	memStat, err := system.GetMemory()
+// Fetch fetches memory metrics from the OS.
+func (m *MetricSet) Fetch() (event common.MapStr, err error) {
+	memStat, err := GetMemory()
 	if err != nil {
-		logp.Warn("Getting memory details: %v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "memory")
 	}
+	AddMemPercentage(memStat)
 
-	swapStat, err := system.GetSwap()
+	swapStat, err := GetSwap()
 	if err != nil {
-		logp.Warn("Getting swap details: %v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "swap")
+	}
+	AddSwapPercentage(swapStat)
+
+	memory := common.MapStr{
+		"total": memStat.Total,
+		"used": common.MapStr{
+			"bytes": memStat.Used,
+			"pct":   memStat.UsedPercent,
+		},
+		"free": memStat.Free,
+		"actual": common.MapStr{
+			"free": memStat.ActualFree,
+			"used": common.MapStr{
+				"pct":   memStat.ActualUsedPercent,
+				"bytes": memStat.ActualUsed,
+			},
+		},
 	}
 
-	event = common.MapStr{
-		"mem":  system.GetMemoryEvent(memStat),
-		"swap": system.GetSwapEvent(swapStat),
+	swap := common.MapStr{
+		"total": swapStat.Total,
+		"used": common.MapStr{
+			"bytes": swapStat.Used,
+			"pct":   swapStat.UsedPercent,
+		},
+		"free": swapStat.Free,
 	}
 
-	return event, nil
+	memory["swap"] = swap
+	return memory, nil
 }

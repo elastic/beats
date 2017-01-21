@@ -96,6 +96,22 @@ func (c *Consumer) Partitions(topic string) ([]int32, error) {
 	return c.metadata[topic], nil
 }
 
+func (c *Consumer) HighWaterMarks() map[string]map[int32]int64 {
+	c.l.Lock()
+	defer c.l.Unlock()
+
+	hwms := make(map[string]map[int32]int64, len(c.partitionConsumers))
+	for topic, partitionConsumers := range c.partitionConsumers {
+		hwm := make(map[int32]int64, len(partitionConsumers))
+		for partition, pc := range partitionConsumers {
+			hwm[partition] = pc.HighWaterMarkOffset()
+		}
+		hwms[topic] = hwm
+	}
+
+	return hwms
+}
+
 // Close implements the Close method from the sarama.Consumer interface. It will close
 // all registered PartitionConsumer instances.
 func (c *Consumer) Close() error {
@@ -126,7 +142,7 @@ func (c *Consumer) SetTopicMetadata(metadata map[string][]int32) {
 
 // ExpectConsumePartition will register a topic/partition, so you can set expectations on it.
 // The registered PartitionConsumer will be returned, so you can set expectations
-// on it using method chanining. Once a topic/partition is registered, you are
+// on it using method chaining. Once a topic/partition is registered, you are
 // expected to start consuming it using ConsumePartition. If that doesn't happen,
 // an error will be written to the error reporter once the mock consumer is closed. It will
 // also expect that the

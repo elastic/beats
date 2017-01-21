@@ -1,12 +1,11 @@
 package elasticsearch
 
 import (
-	"bytes"
-	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/url"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -16,16 +15,23 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
+	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
 type elasticsearchOutput struct {
-	index string
-	mode  mode.ConnectionMode
+	index    outil.Selector
+	beatName string
+	pipeline *outil.Selector
+
+	mode mode.ConnectionMode
 	topology
 
-	templateContents []byte
-	templateMutex    sync.Mutex
+	template      map[string]interface{}
+	template2x    map[string]interface{}
+	templateMutex sync.Mutex
 }
 
 func init() {
@@ -33,7 +39,7 @@ func init() {
 }
 
 var (
-	debug = logp.MakeDebug("elasticsearch")
+	debugf = logp.MakeDebug("elasticsearch")
 )
 
 var (
@@ -44,21 +50,112 @@ var (
 	ErrJSONEncodeFailed = errors.New("json encode failed")
 
 	// ErrResponseRead indicates error parsing Elasticsearch response
-	ErrResponseRead = errors.New("bulk item status parse failed.")
+	ErrResponseRead = errors.New("bulk item status parse failed")
 )
 
-// NewOutput instantiates a new output plugin instance publishing to elasticsearch.
-func New(cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
+// New instantiates a new output plugin instance publishing to elasticsearch.
+func New(beatName string, cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
 	if !cfg.HasField("bulk_max_size") {
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
 
-	output := &elasticsearchOutput{}
+	if !cfg.HasField("index") {
+		pattern := fmt.Sprintf("%v-%%{+yyyy.MM.dd}", beatName)
+		cfg.SetString("index", -1, pattern)
+	}
+
+	output := &elasticsearchOutput{beatName: beatName}
 	err := output.init(cfg, topologyExpire)
 	if err != nil {
 		return nil, err
 	}
 	return output, nil
+}
+
+// NewConnectedClient creates a new Elasticsearch client based on the given config.
+// It uses the NewElasticsearchClients to create a list of clients then returns
+// the first from the list that successfully connects.
+func NewConnectedClient(cfg *common.Config) (*Client, error) {
+	clients, err := NewElasticsearchClients(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, client := range clients {
+		err = client.Connect(client.timeout)
+		if err != nil {
+			logp.Err("Error connecting to Elasticsearch: %s", client.Connection.URL)
+			continue
+		}
+		return &client, nil
+	}
+	return nil, fmt.Errorf("Couldn't connect to any of the configured Elasticsearch hosts")
+}
+
+// NewElasticsearchClients returns a list of Elasticsearch clients based on the given
+// configuration. It accepts the same configuration parameters as the output,
+// except for the output specific configuration options (index, pipeline,
+// template) .If multiple hosts are defined in the configuration, a client is returned
+// for each of them.
+func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
+
+	hosts, err := modeutil.ReadHostList(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	config := defaultConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, err
+	}
+
+	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return nil, err
+	}
+
+	var proxyURL *url.URL
+	if config.ProxyURL != "" {
+		proxyURL, err = parseProxyURL(config.ProxyURL)
+		if err != nil {
+			return nil, err
+		}
+
+		logp.Info("Using proxy URL: %s", proxyURL)
+	}
+
+	params := config.Params
+	if len(params) == 0 {
+		params = nil
+	}
+
+	clients := []Client{}
+	for _, host := range hosts {
+		esURL, err := getURL(config.Protocol, config.Path, host)
+		if err != nil {
+			logp.Err("Invalid host param set: %s, Error: %v", host, err)
+			return nil, err
+		}
+
+		client, err := NewClient(ClientSettings{
+			URL:              esURL,
+			Proxy:            proxyURL,
+			TLS:              tlsConfig,
+			Username:         config.Username,
+			Password:         config.Password,
+			Parameters:       params,
+			Timeout:          config.Timeout,
+			CompressionLevel: config.CompressionLevel,
+		}, nil)
+		if err != nil {
+			return clients, err
+		}
+		clients = append(clients, *client)
+	}
+	if len(clients) == 0 {
+		return clients, fmt.Errorf("No hosts defined in the Elasticsearch output")
+	}
+	return clients, nil
 }
 
 func (out *elasticsearchOutput) init(
@@ -70,17 +167,42 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
+	index, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "index",
+		MultiKey:         "indices",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+	})
+	if err != nil {
+		return err
+	}
+
 	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return err
 	}
 
-	err = out.readTemplate(config.Template)
+	err = out.readTemplate(&config.Template)
 	if err != nil {
 		return err
 	}
 
-	clients, err := mode.MakeClients(cfg, makeClientFactory(tlsConfig, &config, out))
+	out.index = index
+	pipeline, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "pipeline",
+		MultiKey:         "pipelines",
+		EnableSingleOnly: true,
+		FailEmpty:        false,
+	})
+	if err != nil {
+		return err
+	}
+
+	if !pipeline.IsEmpty() {
+		out.pipeline = &pipeline
+	}
+
+	clients, err := modeutil.MakeClients(cfg, makeClientFactory(tlsConfig, &config, out))
 	if err != nil {
 		return err
 	}
@@ -96,66 +218,86 @@ func (out *elasticsearchOutput) init(
 
 	out.clients = clients
 	loadBalance := config.LoadBalance
-	m, err := mode.NewConnectionMode(clients, !loadBalance,
-		maxAttempts, waitRetry, config.Timeout, maxWaitRetry)
+	m, err := modeutil.NewConnectionMode(clients, modeutil.Settings{
+		Failover:     !loadBalance,
+		MaxAttempts:  maxAttempts,
+		Timeout:      config.Timeout,
+		WaitRetry:    waitRetry,
+		MaxWaitRetry: maxWaitRetry,
+	})
 	if err != nil {
 		return err
 	}
 
-	if config.SaveTopology {
-		err := out.EnableTTL()
-		if err != nil {
-			logp.Err("Fail to set _ttl mapping: %s", err)
-			// keep trying in the background
-			go func() {
-				for {
-					err := out.EnableTTL()
-					if err == nil {
-						break
-					}
-					logp.Err("Fail to set _ttl mapping: %s", err)
-					time.Sleep(5 * time.Second)
-				}
-			}()
-		}
-	}
-
-	out.TopologyExpire = 15000
-	if topologyExpire != 0 {
-		out.TopologyExpire = topologyExpire * 1000 // millisec
-	}
-
 	out.mode = m
-	out.index = config.Index
 
 	return nil
 }
 
 // readTemplates reads the ES mapping template from the disk, if configured.
-func (out *elasticsearchOutput) readTemplate(config Template) error {
-	if len(config.Name) > 0 {
+func (out *elasticsearchOutput) readTemplate(config *Template) error {
+	if config.Enabled {
+		// Set the defaults that depend on the beat name
+		if config.Name == "" {
+			config.Name = out.beatName
+		}
+		if config.Path == "" {
+			config.Path = fmt.Sprintf("%s.template.json", out.beatName)
+		}
+		if config.Versions.Es2x.Path == "" {
+			config.Versions.Es2x.Path = fmt.Sprintf("%s.template-es2x.json", out.beatName)
+		}
+
 		// Look for the template in the configuration path, if it's not absolute
 		templatePath := paths.Resolve(paths.Config, config.Path)
-
 		logp.Info("Loading template enabled. Reading template file: %v", templatePath)
 
-		var err error
-		out.templateContents, err = ioutil.ReadFile(templatePath)
+		template, err := readTemplate(templatePath)
 		if err != nil {
 			return fmt.Errorf("Error loading template %s: %v", templatePath, err)
+		}
+		out.template = template
+
+		if config.Versions.Es2x.Enabled {
+			// Read the version of the template compatible with ES 2.x
+			templatePath := paths.Resolve(paths.Config, config.Versions.Es2x.Path)
+			logp.Info("Loading template enabled for Elasticsearch 2.x. Reading template file: %v", templatePath)
+
+			template, err := readTemplate(templatePath)
+			if err != nil {
+				return fmt.Errorf("Error loading template %s: %v", templatePath, err)
+			}
+			out.template2x = template
 		}
 	}
 	return nil
 }
 
+func readTemplate(filename string) (map[string]interface{}, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	var template map[string]interface{}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&template)
+	if err != nil {
+		return nil, err
+	}
+
+	return template, nil
+}
+
 // loadTemplate checks if the index mapping template should be loaded
-// In case the template is not already loaded or overwritting is enabled, the
+// In case the template is not already loaded or overwriting is enabled, the
 // template is written to index
 func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) error {
 	out.templateMutex.Lock()
 	defer out.templateMutex.Unlock()
 
-	logp.Info("Trying to load template for client: %s", client)
+	logp.Info("Trying to load template for client: %s", client.Connection.URL)
 
 	// Check if template already exist or should be overwritten
 	exists := client.CheckTemplate(config.Name)
@@ -165,8 +307,13 @@ func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) er
 			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
 		}
 
-		reader := bytes.NewReader(out.templateContents)
-		err := client.LoadTemplate(config.Name, reader)
+		template := out.template
+		if config.Versions.Es2x.Enabled && strings.HasPrefix(client.Connection.version, "2.") {
+			logp.Info("Detected Elasticsearch 2.x. Automatically selecting the 2.x version of the template")
+			template = out.template2x
+		}
+
+		err := client.LoadTemplate(config.Name, template)
 		if err != nil {
 			return fmt.Errorf("Could not load template: %v", err)
 		}
@@ -178,7 +325,7 @@ func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) er
 }
 
 func makeClientFactory(
-	tls *tls.Config,
+	tls *transport.TLSConfig,
 	config *elasticsearchConfig,
 	out *elasticsearchOutput,
 ) func(string) (mode.ProtocolClient, error) {
@@ -206,17 +353,24 @@ func makeClientFactory(
 
 		// define a callback to be called on connection
 		var onConnected connectCallback
-		if len(out.templateContents) > 0 {
+		if out.template != nil {
 			onConnected = func(client *Client) error {
 				return out.loadTemplate(config.Template, client)
 			}
 		}
 
-		client := NewClient(
-			esURL, config.Index, proxyURL, tls,
-			config.Username, config.Password,
-			params, onConnected)
-		return client, nil
+		return NewClient(ClientSettings{
+			URL:              esURL,
+			Index:            out.index,
+			Pipeline:         out.pipeline,
+			Proxy:            proxyURL,
+			TLS:              tls,
+			Username:         config.Username,
+			Password:         config.Password,
+			Parameters:       params,
+			Timeout:          config.Timeout,
+			CompressionLevel: config.CompressionLevel,
+		}, onConnected)
 	}
 }
 
@@ -227,17 +381,17 @@ func (out *elasticsearchOutput) Close() error {
 func (out *elasticsearchOutput) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
-	event common.MapStr,
+	data outputs.Data,
 ) error {
-	return out.mode.PublishEvent(signaler, opts, event)
+	return out.mode.PublishEvent(signaler, opts, data)
 }
 
 func (out *elasticsearchOutput) BulkPublish(
 	trans op.Signaler,
 	opts outputs.Options,
-	events []common.MapStr,
+	data []outputs.Data,
 ) error {
-	return out.mode.PublishEvents(trans, opts, events)
+	return out.mode.PublishEvents(trans, opts, data)
 }
 
 func parseProxyURL(raw string) (*url.URL, error) {

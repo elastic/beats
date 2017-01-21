@@ -4,19 +4,35 @@
 [partintro]
 --
 If you have issues installing or running Packetbeat, read the
-following tips.
+following tips:
+
+* <<getting-help>>
+* <<enable-packetbeat-debugging>>
+* <<recording-trace>>
+* <<faq>>
+
+//sets block macro for getting-help.asciidoc included in next section
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/getting-help.asciidoc ?>]
 
 --
 
+[[getting-help]]
 == Getting Help
 
 include::../../libbeat/docs/getting-help.asciidoc[]
+
+//sets block macro for debugging.asciidoc included in next section
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/debugging.asciidoc ?>]
 
 [[enable-packetbeat-debugging]]
 == Debugging
 
 include::../../libbeat/docs/debugging.asciidoc[]
 
+//sets block macro for recording-trace content included in next section
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/troubleshooting.asciidoc ?>]
+
+[[recording-trace]]
 == Recording a Trace
 
 If you are having an issue, it's often useful to record a full network trace

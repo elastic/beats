@@ -1,53 +1,90 @@
 = Packetbeat Reference
-:libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/master/
-:version: 5.0.0-alpha1
+
+include::../../libbeat/docs/version.asciidoc[]
+
+:libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
+:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
+:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
+:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
+:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/x-pack/5.0
+:kibanadoc: https://www.elastic.co/guide/en/kibana/{doc-branch}
+:plugindoc: https://www.elastic.co/guide/en/elasticsearch/plugins/{doc-branch}
+:version: {stack-version}
 :beatname_lc: packetbeat
 :beatname_uc: Packetbeat
 :security: X-Pack Security
 
 include::./overview.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/gettingstarted.asciidoc ?>]
 include::./gettingstarted.asciidoc[]
 
+
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/command-line.asciidoc ?>]
 include::./command-line.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-directory-layout.asciidoc ?>]
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/upgrading.asciidoc ?>]
+include::./upgrading.asciidoc[]
+
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/configuring-howto.asciidoc ?>]
 include::./configuring-howto.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/packetbeat-filtering.asciidoc ?>]
 include::./packetbeat-filtering.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-config-ingest.asciidoc ?>]
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/packetbeat-geoip.asciidoc ?>]
+include::./packetbeat-geoip.asciidoc[]
+
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-logstash-config.asciidoc ?>]
 include::./configuring-logstash.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-env-vars.asciidoc ?>]
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/capturing.asciidoc ?>]
 include::./capturing.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/thrift.asciidoc ?>]
 include::./thrift.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/maintaining-topology.asciidoc ?>]
 include::./maintaining-topology.asciidoc[]
 
-include::./securing-packetbeat.asciidoc[]
+:allplatforms:
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/yaml.asciidoc ?>]
+include::../../libbeat/docs/yaml.asciidoc[]
 
-include::../../libbeat/docs/https.asciidoc[]
-
-include::../../libbeat/docs/shared-tls-logstash-config.asciidoc[]
-
-include::./visualizing-data-packetbeat.asciidoc[]
-
-include::./filtering.asciidoc[]
-
-include::./kibana3.asciidoc[]
-
-include::./troubleshooting.asciidoc[]
-
-include::./faq.asciidoc[]
-
-include::./reference.asciidoc[]
-
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/fields.asciidoc ?>]
 include::./fields.asciidoc[]
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/securing-packetbeat.asciidoc ?>]
+include::./securing-packetbeat.asciidoc[]
+
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/visualizing-data-packetbeat.asciidoc ?>]
+include::./visualizing-data-packetbeat.asciidoc[]
+
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/filtering.asciidoc ?>]
+include::./filtering.asciidoc[]
+
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/troubleshooting.asciidoc ?>]
+include::./troubleshooting.asciidoc[]
+
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/faq.asciidoc ?>]
+include::./faq.asciidoc[]
+
+pass::[<?page_header We are working on updating this section. Some content might be out of date. While you're waiting for updates, you might want to try out the TCP protocol generator at https://github.com/elastic/beats/tree/master/generate/packetbeat/tcp-protocol. ?>]
+
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/new_protocol.asciidoc ?>]
 include::./new_protocol.asciidoc[]
+
+pass::[<?page_header ?>]
+

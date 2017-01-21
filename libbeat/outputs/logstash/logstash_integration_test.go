@@ -10,9 +10,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -68,17 +70,29 @@ func esConnect(t *testing.T, index string) *esConnection {
 	ts := time.Now().UTC()
 
 	host := getElasticsearchHost()
-	index = fmt.Sprintf("%s-%02d.%02d.%02d",
-		index, ts.Year(), ts.Month(), ts.Day())
+	indexFmt := fmtstr.MustCompileEvent(fmt.Sprintf("%s-%%{+yyyy.MM.dd}", index))
+	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(indexFmt, ""))
+	index, _ = indexSel.Select(common.MapStr{
+		"@timestamp": common.Time(ts),
+	})
 
 	username := os.Getenv("ES_USER")
 	password := os.Getenv("ES_PASS")
-	client := elasticsearch.NewClient(host, "", nil, nil, username, password, nil, nil)
+	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
+		URL:      host,
+		Index:    indexSel,
+		Username: username,
+		Password: password,
+		Timeout:  60 * time.Second,
+	}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// try to drop old index if left over from failed test
 	_, _, _ = client.Delete(index, "", "", nil) // ignore error
 
-	_, _, err := client.CreateIndex(index, common.MapStr{
+	_, _, err = client.CreateIndex(index, common.MapStr{
 		"settings": common.MapStr{
 			"number_of_shards":   1,
 			"number_of_replicas": 0,
@@ -109,8 +123,8 @@ func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 	}
 	if tls {
 		config["hosts"] = []string{getLogstashTLSHost()}
-		config["tls.insecure"] = false
-		config["tls.certificate_authorities"] = []string{
+		config["ssl.verification_mode"] = "full"
+		config["ssl.certificate_authorities"] = []string{
 			"../../../testing/environments/docker/logstash/pki/tls/certs/logstash.crt",
 		}
 	}
@@ -137,15 +151,16 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	flushInterval := 0
 	bulkSize := 0
 	config, _ := common.NewConfigFrom(map[string]interface{}{
-		"hosts":          []string{getElasticsearchHost()},
-		"index":          index,
-		"flush_interval": &flushInterval,
-		"bulk_max_size":  &bulkSize,
-		"username":       os.Getenv("ES_USER"),
-		"password":       os.Getenv("ES_PASS"),
+		"hosts":            []string{getElasticsearchHost()},
+		"index":            connection.index,
+		"flush_interval":   &flushInterval,
+		"bulk_max_size":    &bulkSize,
+		"username":         os.Getenv("ES_USER"),
+		"password":         os.Getenv("ES_PASS"),
+		"template.enabled": false,
 	})
 
-	output, err := plugin(config, 10)
+	output, err := plugin("libbeat", config, 10)
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}
@@ -243,16 +258,17 @@ func TestSendMessageViaLogstashTLS(t *testing.T) {
 }
 
 func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
+	enableLogging([]string{"*"})
 
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 
-	event := common.MapStr{
+	event := outputs.Data{Event: common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"host":       "test-host",
 		"type":       "log",
 		"message":    "hello world",
-	}
+	}}
 	ls.PublishEvent(nil, testOptions, event)
 
 	// wait for logstash event flush + elasticsearch
@@ -281,12 +297,12 @@ func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 	for i := 0; i < 10; i++ {
-		event := common.MapStr{
+		event := outputs.Data{Event: common.MapStr{
 			"@timestamp": common.Time(time.Now()),
 			"host":       "test-host",
 			"type":       "log",
 			"message":    fmt.Sprintf("hello world - %v", i),
-		}
+		}}
 		ls.PublishEvent(nil, testOptions, event)
 	}
 
@@ -338,16 +354,16 @@ func testSendMultipleBatchesViaLogstash(
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 
-	batches := make([][]common.MapStr, 0, numBatches)
+	batches := make([][]outputs.Data, 0, numBatches)
 	for i := 0; i < numBatches; i++ {
-		batch := make([]common.MapStr, 0, batchSize)
+		batch := make([]outputs.Data, 0, batchSize)
 		for j := 0; j < batchSize; j++ {
-			event := common.MapStr{
+			event := outputs.Data{Event: common.MapStr{
 				"@timestamp": common.Time(time.Now()),
 				"host":       "test-host",
 				"type":       "log",
 				"message":    fmt.Sprintf("batch hello world - %v", i*batchSize+j),
-			}
+			}}
 			batch = append(batch, event)
 		}
 		batches = append(batches, batch)
@@ -393,17 +409,17 @@ func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string,
 	defer es.Cleanup()
 
 	ts := time.Now()
-	event := common.MapStr{
+	event := outputs.Data{Event: common.MapStr{
 		"@timestamp": common.Time(ts),
 		"host":       "test-host",
 		"type":       "log",
 		"message":    "hello world",
-	}
+	}}
 
 	es.PublishEvent(nil, testOptions, event)
-	waitUntilTrue(timeout, checkIndex(es, 1))
-
 	ls.PublishEvent(nil, testOptions, event)
+
+	waitUntilTrue(timeout, checkIndex(es, 1))
 	waitUntilTrue(timeout, checkIndex(ls, 1))
 
 	// search value in logstash elasticsearch index
@@ -434,6 +450,9 @@ func TestLogstashElasticOutputPluginBulkCompatibleMessageTLS(t *testing.T) {
 }
 
 func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name string, tls bool) {
+	if testing.Verbose() {
+		enableLogging([]string{"*"})
+	}
 
 	timeout := 10 * time.Second
 
@@ -444,19 +463,22 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 	defer es.Cleanup()
 
 	ts := time.Now()
-	events := []common.MapStr{
+	events := []outputs.Data{
 		{
-			"@timestamp": common.Time(ts),
-			"host":       "test-host",
-			"type":       "log",
-			"message":    "hello world",
+			Event: common.MapStr{
+				"@timestamp": common.Time(ts),
+				"host":       "test-host",
+				"type":       "log",
+				"message":    "hello world",
+			},
 		},
 	}
-	es.BulkPublish(nil, testOptions, events)
-	waitUntilTrue(timeout, checkIndex(es, 1))
 
 	ls.BulkPublish(nil, testOptions, events)
+	es.BulkPublish(nil, testOptions, events)
+
 	waitUntilTrue(timeout, checkIndex(ls, 1))
+	waitUntilTrue(timeout, checkIndex(es, 1))
 
 	// search value in logstash elasticsearch index
 	lsResp, err := ls.Read()
@@ -469,9 +491,10 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 	}
 
 	// validate
-	assert.Equal(t, len(lsResp), len(esResp))
-	if len(lsResp) != 1 {
-		t.Fatalf("wrong number of results: %d", len(lsResp))
+	if len(lsResp) != len(esResp) {
+		assert.Equal(t, len(lsResp), len(esResp))
+		t.Fatalf("wrong number of results: es=%d, ls=%d",
+			len(esResp), len(lsResp))
 	}
 
 	checkEvent(t, lsResp[0], esResp[0])

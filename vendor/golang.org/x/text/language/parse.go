@@ -8,9 +8,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 
 	"golang.org/x/text/internal/tag"
 )
@@ -763,49 +763,71 @@ func nextExtension(s string, p int) int {
 	return len(s)
 }
 
-var (
-	acceptRe = regexp.MustCompile(`^ *(?:([\w-]+|\*)(?: *; *q *= *([0-9\.]+))?)? *$`)
-)
+var errInvalidWeight = errors.New("ParseAcceptLanguage: invalid weight")
 
 // ParseAcceptLanguage parses the contents of a Accept-Language header as
-// defined in http://www.ietf.org/rfc/rfc2616.txt
-// and returns a list of Tags and a list of corresponding quality weights.
+// defined in http://www.ietf.org/rfc/rfc2616.txt and returns a list of Tags and
+// a list of corresponding quality weights. It is more permissive than RFC 2616
+// and may return non-nil slices even if the input is not valid.
 // The Tags will be sorted by highest weight first and then by first occurrence.
 // Tags with a weight of zero will be dropped. An error will be returned if the
 // input could not be parsed.
 func ParseAcceptLanguage(s string) (tag []Tag, q []float32, err error) {
-	for start, end := 0, 0; start < len(s); start = end + 1 {
-		for end = start; end < len(s) && s[end] != ','; end++ {
+	var entry string
+	for s != "" {
+		if entry, s = split(s, ','); entry == "" {
+			continue
 		}
-		m := acceptRe.FindStringSubmatch(s[start:end])
-		if m == nil {
-			return nil, nil, errSyntax
-		}
-		if len(m[1]) > 0 {
-			w := 1.0
-			if len(m[2]) > 0 {
-				if w, err = strconv.ParseFloat(m[2], 32); err != nil {
-					return nil, nil, err
-				}
-				// Drop tags with a quality weight of 0.
-				if w <= 0 {
-					continue
-				}
+
+		entry, weight := split(entry, ';')
+
+		// Scan the language.
+		t, err := Parse(entry)
+		if err != nil {
+			id, ok := acceptFallback[entry]
+			if !ok {
+				return nil, nil, err
 			}
-			t, err := Parse(m[1])
-			if err != nil {
-				id, ok := acceptFallback[m[1]]
-				if !ok {
-					return nil, nil, err
-				}
-				t = Tag{lang: id}
-			}
-			tag = append(tag, t)
-			q = append(q, float32(w))
+			t = Tag{lang: id}
 		}
+
+		// Scan the optional weight.
+		w := 1.0
+		if weight != "" {
+			weight = consume(weight, 'q')
+			weight = consume(weight, '=')
+			// consume returns the empty string when a token could not be
+			// consumed, resulting in an error for ParseFloat.
+			if w, err = strconv.ParseFloat(weight, 32); err != nil {
+				return nil, nil, errInvalidWeight
+			}
+			// Drop tags with a quality weight of 0.
+			if w <= 0 {
+				continue
+			}
+		}
+
+		tag = append(tag, t)
+		q = append(q, float32(w))
 	}
 	sortStable(&tagSort{tag, q})
 	return tag, q, nil
+}
+
+// consume removes a leading token c from s and returns the result or the empty
+// string if there is no such token.
+func consume(s string, c byte) string {
+	if s == "" || s[0] != c {
+		return ""
+	}
+	return strings.TrimSpace(s[1:])
+}
+
+func split(s string, c byte) (head, tail string) {
+	if i := strings.IndexByte(s, c); i >= 0 {
+		return strings.TrimSpace(s[:i]), strings.TrimSpace(s[i+1:])
+	}
+	return strings.TrimSpace(s), ""
 }
 
 // Add hack mapping to deal with a small number of cases that that occur

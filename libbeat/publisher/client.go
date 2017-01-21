@@ -8,11 +8,12 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	publishedEvents = expvar.NewInt("libbeatPublishedEvents")
+	publishedEvents = expvar.NewInt("libbeat.publisher.published_events")
 )
 
 var (
@@ -62,12 +63,12 @@ type Client interface {
 type client struct {
 	canceler *op.Canceler
 
-	publisher           *Publisher
+	publisher           *BeatPublisher
 	beatMeta            common.MapStr        // Beat metadata that is added to all events.
 	globalEventMetadata common.EventMetadata // Fields and tags that are added to all events.
 }
 
-func newClient(pub *Publisher) *client {
+func newClient(pub *BeatPublisher) *client {
 	c := &client{
 		canceler: op.NewCanceler(),
 
@@ -75,6 +76,7 @@ func newClient(pub *Publisher) *client {
 		beatMeta: common.MapStr{
 			"name":     pub.name,
 			"hostname": pub.hostname,
+			"version":  pub.version,
 		},
 		globalEventMetadata: pub.globalEventMetadata,
 	}
@@ -82,6 +84,10 @@ func newClient(pub *Publisher) *client {
 }
 
 func (c *client) Close() error {
+	if c == nil {
+		return nil
+	}
+
 	c.canceler.Cancel()
 
 	// atomic decrement clients counter
@@ -97,32 +103,64 @@ func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
 		return false
 	}
 
-	ctx, pipeline := c.getPipeline(opts)
+	var values *outputs.Values
+	meta, ctx, pipeline := c.getPipeline(opts)
+	if len(meta) != 0 {
+		if len(meta) != 1 {
+			logp.Debug("publish", "too many metadata, pick first")
+			meta = meta[:1]
+		}
+		values = outputs.ValuesWithMetadata(nil, meta[0])
+	}
+
 	publishedEvents.Add(1)
-	return pipeline.publish(message{client: c, context: ctx, event: *publishEvent})
+	return pipeline.publish(message{
+		client:  c,
+		context: ctx,
+		datum:   outputs.Data{Event: *publishEvent, Values: values},
+	})
 }
 
 func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
-	// optimization: shares the backing array and capacity
-	publishEvents := events[:0]
+	var valuesAll *outputs.Values
 
-	for _, event := range events {
-		c.annotateEvent(event)
-
-		publishEvent := c.filterEvent(event)
-		if publishEvent != nil {
-			publishEvents = append(publishEvents, *publishEvent)
+	meta, ctx, pipeline := c.getPipeline(opts)
+	if len(meta) != 0 && len(events) != len(meta) {
+		if len(meta) != 1 {
+			logp.Debug("publish",
+				"Number of metadata elements does not match number of events => dropping metadata")
+			meta = nil
+		} else {
+			valuesAll = outputs.ValuesWithMetadata(nil, meta[0])
+			meta = nil
 		}
 	}
 
-	ctx, pipeline := c.getPipeline(opts)
-	if len(publishEvents) == 0 {
+	data := make([]outputs.Data, 0, len(events))
+	for i, event := range events {
+		c.annotateEvent(event)
+
+		publishEvent := c.filterEvent(event)
+		if publishEvent == nil {
+			continue
+		}
+
+		evt := outputs.Data{Event: *publishEvent, Values: valuesAll}
+		if meta != nil {
+			if m := meta[i]; m != nil {
+				evt.Values = outputs.ValuesWithMetadata(valuesAll, meta[i])
+			}
+		}
+		data = append(data, evt)
+	}
+
+	if len(data) == 0 {
 		logp.Debug("filter", "No events to publish")
 		return true
 	}
 
-	publishedEvents.Add(int64(len(publishEvents)))
-	return pipeline.publish(message{client: c, context: ctx, events: events})
+	publishedEvents.Add(int64(len(data)))
+	return pipeline.publish(message{client: c, context: ctx, data: data})
 }
 
 // annotateEvent adds fields that are common to all events. This adds the 'beat'
@@ -165,26 +203,40 @@ func (c *client) filterEvent(event common.MapStr) *common.MapStr {
 
 	}
 
-	// filter the event by applying the configured rules
-	publishEvent := c.publisher.Filters.Filter(event)
+	// process the event by applying the configured actions
+	publishEvent := c.publisher.Processors.Run(event)
+	if publishEvent == nil {
+		// the event is dropped
+		logp.Debug("publish", "Drop event %s", event.StringToPrint())
+		return nil
+	}
 	if logp.IsDebug("publish") {
 		logp.Debug("publish", "Publish: %s", publishEvent.StringToPrint())
 	}
 	return &publishEvent
 }
 
-func (c *client) getPipeline(opts []ClientOption) (Context, pipeline) {
-	ctx := MakeContext(opts)
+func (c *client) getPipeline(opts []ClientOption) ([]common.MapStr, Context, pipeline) {
+	values, ctx := MakeContext(opts)
 	if ctx.Sync {
-		return ctx, c.publisher.pipelines.sync
+		return values, ctx, c.publisher.pipelines.sync
 	}
-	return ctx, c.publisher.pipelines.async
+	return values, ctx, c.publisher.pipelines.async
 }
 
-func MakeContext(opts []ClientOption) Context {
+func MakeContext(opts []ClientOption) ([]common.MapStr, Context) {
 	var ctx Context
+	var meta []common.MapStr
 	for _, opt := range opts {
-		ctx = opt(ctx)
+		var m []common.MapStr
+		m, ctx = opt(ctx)
+		if m != nil {
+			if meta == nil {
+				meta = m
+			} else {
+				meta = append(meta, m...)
+			}
+		}
 	}
-	return ctx
+	return nil, ctx
 }

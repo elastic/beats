@@ -21,10 +21,11 @@ func LoadGeoIPData(config Geoip) *libgeo.GeoIP {
 		geoipPaths = *config.Paths
 	}
 	if len(geoipPaths) == 0 {
-		logp.Info("GeoIP disabled: No paths were set under shipper.geoip.paths")
 		// disabled
 		return nil
 	}
+
+	logp.Warn("GeoIP lookup support is deprecated and will be removed in version 6.0.")
 
 	// look for the first existing path
 	var geoipPath string

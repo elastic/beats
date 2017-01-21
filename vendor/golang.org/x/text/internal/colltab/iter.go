@@ -87,6 +87,9 @@ func (i *Iter) appendNext() bool {
 	} else {
 		i.Elems, sz = i.Weighter.AppendNext(i.Elems, i.bytes[i.pNext:])
 	}
+	if sz == 0 {
+		sz = 1
+	}
 	i.pNext += sz
 	return true
 }

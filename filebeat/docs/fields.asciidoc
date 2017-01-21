@@ -1,72 +1,403 @@
 
 ////
-This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-== Exported Fields
+= Exported Fields
 
+[partintro]
+
+--
 This document describes the fields that are exported by Filebeat. They are
 grouped in the following categories:
 
-* <<exported-fields-env>>
+* <<exported-fields-apache2>>
+* <<exported-fields-beat>>
+* <<exported-fields-cloud>>
 * <<exported-fields-log>>
+* <<exported-fields-mysql>>
+* <<exported-fields-nginx>>
+* <<exported-fields-syslog>>
 
-[[exported-fields-env]]
-=== Common Fields
+--
+[[exported-fields-apache2]]
+== Apache2 Fields
 
-Contains common fields available in all event types.
-
-
-
-=== beat Fields
-
-
-==== beat.name
-
-The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+Apache2 Module
 
 
-==== beat.hostname
+
+[float]
+== apache2 Fields
+
+Apache2 fields.
+
+
+
+[float]
+== access Fields
+
+Contains fields for the Apache2 HTTPD access logs.
+
+
+
+[float]
+=== apache2.access.remote_ip
+
+type: keyword
+
+Client IP address.
+
+
+[float]
+=== apache2.access.user_name
+
+type: keyword
+
+The user name used when basic authentication is used.
+
+
+[float]
+=== apache2.access.method
+
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+[float]
+=== apache2.access.url
+
+type: keyword
+
+The request HTTP URL.
+
+
+[float]
+=== apache2.access.http_version
+
+type: keyword
+
+The HTTP version.
+
+
+[float]
+=== apache2.access.response_code
+
+type: long
+
+The HTTP response code.
+
+
+[float]
+=== apache2.access.body_sent.bytes
+
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+[float]
+=== apache2.access.referrer
+
+type: keyword
+
+The HTTP referrer.
+
+
+[float]
+=== apache2.access.agent
+
+type: text
+
+Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
+
+
+[float]
+== user_agent Fields
+
+Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== apache2.access.user_agent.device
+
+type: keyword
+
+The name of the physical device.
+
+
+[float]
+=== apache2.access.user_agent.major
+
+type: long
+
+The major version of the user agent.
+
+
+[float]
+=== apache2.access.user_agent.minor
+
+type: long
+
+The minor version of the user agent.
+
+
+[float]
+=== apache2.access.user_agent.patch
+
+type: long
+
+The patch version of the user agent.
+
+
+[float]
+=== apache2.access.user_agent.name
+
+type: keyword
+
+example: Chrome
+
+The name of the user agent.
+
+
+[float]
+=== apache2.access.user_agent.os
+
+type: keyword
+
+The name of the operating system.
+
+
+[float]
+=== apache2.access.user_agent.os_major
+
+type: long
+
+The major version of the operating system.
+
+
+[float]
+=== apache2.access.user_agent.os_minor
+
+type: long
+
+The minor version of the operating system.
+
+
+[float]
+=== apache2.access.user_agent.os_name
+
+type: keyword
+
+The name of the operating system.
+
+
+[float]
+== geoip Fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== apache2.access.geoip.continent_name
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== apache2.access.geoip.country_iso_code
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== apache2.access.geoip.location
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
+== error Fields
+
+Fields from the Apache error logs.
+
+
+
+[float]
+=== apache2.error.level
+
+type: keyword
+
+The severity level of the message.
+
+
+[float]
+=== apache2.error.client
+
+type: keyword
+
+The IP address of the client that generated the error.
+
+
+[float]
+=== apache2.error.message
+
+type: text
+
+The logged message.
+
+
+[float]
+=== apache2.error.pid
+
+type: long
+
+The process ID.
+
+
+[float]
+=== apache2.error.tid
+
+type: long
+
+The thread ID.
+
+
+[float]
+=== apache2.error.module
+
+type: keyword
+
+The module producing the logged message.
+
+
+[[exported-fields-beat]]
+== Beat Fields
+
+Contains common beat fields available in all event types.
+
+
+
+[float]
+=== beat.name
+
+The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
+
+
+[float]
+=== beat.hostname
 
 The hostname as returned by the operating system on which the Beat is running.
 
 
-==== @timestamp
+[float]
+=== beat.version
+
+The version of the beat that generated this event.
+
+
+[float]
+=== @timestamp
 
 type: date
 
-example: 2015-01-24 14:06:05.071000
+example: August 26th 2016, 12:35:53.332
 
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The timestamp when the log line was read. The precision is in milliseconds. The timezone is UTC.
-
-
-==== type
+format: date
 
 required: True
 
-The name of the log event. This field is set to the value specified for the `document_type` option in the prospector section of the Filebeat config file.
+The timestamp when the event log record was generated.
 
 
-==== input_type
+[float]
+=== tags
 
-required: True
+Arbitrary tags that can be set per Beat and per transaction type.
 
-The input type from which the event was generated. This field is set to the value specified for the `input_type` option in the prospector section of the Filebeat config file.
+
+[float]
+=== fields
+
+type: dict
+
+Contains user configurable fields.
+
+
+[[exported-fields-cloud]]
+== Cloud Provider Metadata Fields
+
+Metadata from cloud providers added by the add_cloud_metadata processor.
+
+
+
+[float]
+=== meta.cloud.provider
+
+example: ec2
+
+Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
+
+
+[float]
+=== meta.cloud.instance_id
+
+Instance ID of the host machine.
+
+
+[float]
+=== meta.cloud.machine_type
+
+example: t2.medium
+
+Machine type of the host machine.
+
+
+[float]
+=== meta.cloud.availability_zone
+
+example: us-east-1c
+
+Availability zone in which this host is running.
+
+
+[float]
+=== meta.cloud.project_id
+
+example: project-x
+
+Name of the project in Google Cloud.
+
+
+[float]
+=== meta.cloud.region
+
+Region in which this host is running.
 
 
 [[exported-fields-log]]
-=== Log File Content Fields
+== Log File Content Fields
 
 Contains log file lines.
 
 
 
-==== source
+[float]
+=== source
 
 type: keyword
 
@@ -75,7 +406,8 @@ required: True
 The file from which the line was read. This field contains the full path to the file. For example: `/var/log/system.log`.
 
 
-==== offset
+[float]
+=== offset
 
 type: long
 
@@ -84,7 +416,8 @@ required: False
 The file offset the reported line starts at.
 
 
-==== message
+[float]
+=== message
 
 type: text
 
@@ -93,10 +426,467 @@ required: True
 The content of the line read from the log file.
 
 
-==== fields
+[float]
+=== type
 
-type: dict
+required: True
 
-Contains user configurable fields.
+The name of the log event. This field is set to the value specified for the `document_type` option in the prospector section of the Filebeat config file.
+
+
+[float]
+=== input_type
+
+required: True
+
+The input type from which the event was generated. This field is set to the value specified for the `input_type` option in the prospector section of the Filebeat config file.
+
+
+[float]
+=== error
+
+Ingestion pipeline error message, added in case there are errors reported by the Ingest Node in Elasticsearch.
+
+
+[float]
+=== read_timestamp
+
+In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
+
+
+[[exported-fields-mysql]]
+== MySQL Fields
+
+Module for parsing the MySQL log files.
+
+
+
+[float]
+== mysql Fields
+
+Fields from the MySQL log files.
+
+
+
+[float]
+== error Fields
+
+Contains fields from the MySQL error logs.
+
+
+
+[float]
+=== mysql.error.timestamp
+
+The timestamp from the log line.
+
+
+[float]
+=== mysql.error.thread_id
+
+type: long
+
+As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this field contains the process id.
+
+
+[float]
+=== mysql.error.level
+
+example: Warning
+
+The log level.
+
+[float]
+=== mysql.error.message
+
+type: text
+
+The logged message.
+
+
+[float]
+== slowlog Fields
+
+Contains fields from the MySQL slow logs.
+
+
+
+[float]
+=== mysql.slowlog.user
+
+The MySQL user that created the query.
+
+
+[float]
+=== mysql.slowlog.host
+
+The host from where the user that created the query logged in.
+
+
+[float]
+=== mysql.slowlog.ip
+
+The IP address from where the user that created the query logged in.
+
+
+[float]
+=== mysql.slowlog.query_time.sec
+
+type: float
+
+The total time the query took, in seconds, as a floating point number.
+
+
+[float]
+=== mysql.slowlog.lock_time.sec
+
+type: float
+
+The amount of time the query waited for the lock to be available. The value is in seconds, as a floating point number.
+
+
+[float]
+=== mysql.slowlog.rows_sent
+
+type: long
+
+The number of rows returned by the query.
+
+
+[float]
+=== mysql.slowlog.rows_examined
+
+type: long
+
+The number of rows scanned by the query.
+
+
+[float]
+=== mysql.slowlog.timestamp
+
+type: long
+
+The unix timestamp taken from the `SET timestamp` query.
+
+
+[float]
+=== mysql.slowlog.query
+
+The slow query.
+
+
+[float]
+=== mysql.slowlog.id
+
+type: long
+
+The connection ID for the query.
+
+
+[[exported-fields-nginx]]
+== Nginx Fields
+
+Module for parsing the Nginx log files.
+
+
+
+[float]
+== nginx Fields
+
+Fields from the Nginx log files.
+
+
+
+[float]
+== access Fields
+
+Contains fields for the Nginx access logs.
+
+
+
+[float]
+=== nginx.access.remote_ip
+
+type: keyword
+
+Client IP address.
+
+
+[float]
+=== nginx.access.user_name
+
+type: keyword
+
+The user name used when basic authentication is used.
+
+
+[float]
+=== nginx.access.method
+
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+[float]
+=== nginx.access.url
+
+type: keyword
+
+The request HTTP URL.
+
+
+[float]
+=== nginx.access.http_version
+
+type: keyword
+
+The HTTP version.
+
+
+[float]
+=== nginx.access.response_code
+
+type: long
+
+The HTTP response code.
+
+
+[float]
+=== nginx.access.body_sent.bytes
+
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+[float]
+=== nginx.access.referrer
+
+type: keyword
+
+The HTTP referrer.
+
+
+[float]
+=== nginx.access.agent
+
+type: text
+
+Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
+
+
+[float]
+== user_agent Fields
+
+Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== nginx.access.user_agent.device
+
+type: keyword
+
+The name of the physical device.
+
+
+[float]
+=== nginx.access.user_agent.major
+
+type: long
+
+The major version of the user agent.
+
+
+[float]
+=== nginx.access.user_agent.minor
+
+type: long
+
+The minor version of the user agent.
+
+
+[float]
+=== nginx.access.user_agent.patch
+
+type: long
+
+The patch version of the user agent.
+
+
+[float]
+=== nginx.access.user_agent.name
+
+type: keyword
+
+example: Chrome
+
+The name of the user agent.
+
+
+[float]
+=== nginx.access.user_agent.os
+
+type: keyword
+
+The name of the operating system.
+
+
+[float]
+=== nginx.access.user_agent.os_major
+
+type: long
+
+The major version of the operating system.
+
+
+[float]
+=== nginx.access.user_agent.os_minor
+
+type: long
+
+The minor version of the operating system.
+
+
+[float]
+=== nginx.access.user_agent.os_name
+
+type: keyword
+
+The name of the operating system.
+
+
+[float]
+== geoip Fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== nginx.access.geoip.continent_name
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== nginx.access.geoip.country_iso_code
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== nginx.access.geoip.location
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
+== error Fields
+
+Contains fields for the Nginx error logs.
+
+
+
+[float]
+=== nginx.error.level
+
+type: keyword
+
+Error level (e.g. error, critical).
+
+
+[float]
+=== nginx.error.pid
+
+type: long
+
+Process identifier (PID).
+
+
+[float]
+=== nginx.error.tid
+
+type: long
+
+Thread identifier.
+
+
+[float]
+=== nginx.error.connection_id
+
+type: long
+
+Connection identifier.
+
+
+[float]
+=== nginx.error.message
+
+type: text
+
+The error message
+
+
+[[exported-fields-syslog]]
+== Syslog Fields
+
+Module for parsing syslog files.
+
+
+
+[float]
+== syslog Fields
+
+Fields from the syslog files.
+
+
+
+[float]
+== system Fields
+
+Contains fields from the syslog system logs.
+
+
+
+[float]
+=== syslog.system.timestamp
+
+The timestamp as read from the syslog message.
+
+
+[float]
+=== syslog.system.hostname
+
+The hostname as read from the syslog message.
+
+
+[float]
+=== syslog.system.program
+
+The process name as read from the syslog message.
+
+
+[float]
+=== syslog.system.pid
+
+The PID of the process that sent the syslog message.
+
+
+[float]
+=== syslog.system.message
+
+The message in the log line.
 
 

@@ -1,48 +1,17 @@
 {
   "mappings": {
     "_default_": {
-      "_all": {
-        "norms": false
+      "_meta": {
+        "version": "6.0.0-alpha1"
       },
       "dynamic_templates": [
         {
-          "fields": {
+          "strings_as_keyword": {
             "mapping": {
               "ignore_above": 1024,
               "type": "keyword"
             },
-            "match_mapping_type": "string",
-            "path_match": "fields.*"
-          }
-        },
-        {
-          "amqp.headers": {
-            "mapping": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "match_mapping_type": "string",
-            "path_match": "amqp.headers.*"
-          }
-        },
-        {
-          "http.request_headers": {
-            "mapping": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "match_mapping_type": "string",
-            "path_match": "http.request_headers.*"
-          }
-        },
-        {
-          "http.response_headers": {
-            "mapping": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "match_mapping_type": "string",
-            "path_match": "http.response_headers.*"
+            "match_mapping_type": "string"
           }
         }
       ],
@@ -60,10 +29,10 @@
               "type": "boolean"
             },
             "class-id": {
-              "type": "integer"
+              "type": "long"
             },
             "consumer-count": {
-              "type": "integer"
+              "type": "long"
             },
             "consumer-tag": {
               "ignore_above": 1024,
@@ -82,10 +51,11 @@
               "type": "keyword"
             },
             "delivery-mode": {
-              "type": "integer"
+              "ignore_above": 1024,
+              "type": "keyword"
             },
             "delivery-tag": {
-              "type": "integer"
+              "type": "long"
             },
             "durable": {
               "type": "boolean"
@@ -118,14 +88,14 @@
               "type": "boolean"
             },
             "message-count": {
-              "type": "integer"
+              "type": "long"
             },
             "message-id": {
               "ignore_above": 1024,
               "type": "keyword"
             },
             "method-id": {
-              "type": "integer"
+              "type": "long"
             },
             "multiple": {
               "type": "boolean"
@@ -143,7 +113,7 @@
               "type": "boolean"
             },
             "priority": {
-              "type": "integer"
+              "type": "long"
             },
             "queue": {
               "ignore_above": 1024,
@@ -153,7 +123,7 @@
               "type": "boolean"
             },
             "reply-code": {
-              "type": "integer"
+              "type": "long"
             },
             "reply-text": {
               "ignore_above": 1024,
@@ -164,7 +134,8 @@
               "type": "keyword"
             },
             "routing-key": {
-              "type": "integer"
+              "ignore_above": 1024,
+              "type": "keyword"
             },
             "timestamp": {
               "ignore_above": 1024,
@@ -189,6 +160,10 @@
             "name": {
               "ignore_above": 1024,
               "type": "keyword"
+            },
+            "version": {
+              "ignore_above": 1024,
+              "type": "keyword"
             }
           }
         },
@@ -197,6 +172,339 @@
         },
         "bytes_out": {
           "type": "long"
+        },
+        "cassandra": {
+          "properties": {
+            "request": {
+              "properties": {
+                "headers": {
+                  "properties": {
+                    "flags": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "length": {
+                      "type": "long"
+                    },
+                    "op": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "stream": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "version": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "query": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "response": {
+              "properties": {
+                "authentication": {
+                  "properties": {
+                    "class": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "error": {
+                  "properties": {
+                    "code": {
+                      "type": "long"
+                    },
+                    "details": {
+                      "properties": {
+                        "alive": {
+                          "type": "long"
+                        },
+                        "arg_types": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "blockfor": {
+                          "type": "long"
+                        },
+                        "data_present": {
+                          "type": "boolean"
+                        },
+                        "function": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "keyspace": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "num_failures": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "read_consistency": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "received": {
+                          "type": "long"
+                        },
+                        "required": {
+                          "type": "long"
+                        },
+                        "stmt_id": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "table": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "write_type": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "msg": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "type": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "event": {
+                  "properties": {
+                    "change": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "host": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "port": {
+                      "type": "long"
+                    },
+                    "schema_change": {
+                      "properties": {
+                        "args": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "change": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "keyspace": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "name": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "object": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "table": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "target": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "type": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "headers": {
+                  "properties": {
+                    "flags": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "length": {
+                      "type": "long"
+                    },
+                    "op": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "stream": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "version": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "result": {
+                  "properties": {
+                    "keyspace": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "prepared": {
+                      "properties": {
+                        "prepared_id": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "req_meta": {
+                          "properties": {
+                            "col_count": {
+                              "type": "long"
+                            },
+                            "flags": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            },
+                            "keyspace": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            },
+                            "paging_state": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            },
+                            "pkey_columns": {
+                              "type": "long"
+                            },
+                            "table": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            }
+                          }
+                        },
+                        "resp_meta": {
+                          "properties": {
+                            "col_count": {
+                              "type": "long"
+                            },
+                            "flags": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            },
+                            "keyspace": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            },
+                            "paging_state": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            },
+                            "pkey_columns": {
+                              "type": "long"
+                            },
+                            "table": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "rows": {
+                      "properties": {
+                        "meta": {
+                          "properties": {
+                            "col_count": {
+                              "type": "long"
+                            },
+                            "flags": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            },
+                            "keyspace": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            },
+                            "paging_state": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            },
+                            "pkey_columns": {
+                              "type": "long"
+                            },
+                            "table": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            }
+                          }
+                        },
+                        "num_rows": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "schema_change": {
+                      "properties": {
+                        "args": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "change": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "keyspace": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "name": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "object": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "table": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "target": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "type": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "warnings": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "client_geoip": {
+          "properties": {
+            "location": {
+              "type": "geo_point"
+            }
+          }
         },
         "client_ip": {
           "ignore_above": 1024,
@@ -272,12 +580,10 @@
             "stats": {
               "properties": {
                 "net_bytes_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 },
                 "net_packets_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 }
               }
             }
@@ -304,7 +610,7 @@
                   "type": "keyword"
                 },
                 "ttl": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "type": {
                   "ignore_above": 1024,
@@ -313,7 +619,7 @@
               }
             },
             "additionals_count": {
-              "type": "integer"
+              "type": "long"
             },
             "answers": {
               "properties": {
@@ -330,7 +636,7 @@
                   "type": "keyword"
                 },
                 "ttl": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "type": {
                   "ignore_above": 1024,
@@ -339,7 +645,7 @@
               }
             },
             "answers_count": {
-              "type": "integer"
+              "type": "long"
             },
             "authorities": {
               "properties": {
@@ -358,7 +664,7 @@
               }
             },
             "authorities_count": {
-              "type": "integer"
+              "type": "long"
             },
             "flags": {
               "properties": {
@@ -383,7 +689,7 @@
               }
             },
             "id": {
-              "type": "integer"
+              "type": "long"
             },
             "op_code": {
               "ignore_above": 1024,
@@ -399,7 +705,7 @@
                   "type": "keyword"
                 },
                 "udp_size": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "version": {
                   "ignore_above": 1024,
@@ -449,16 +755,33 @@
         },
         "http": {
           "properties": {
-            "code": {
-              "ignore_above": 1024,
-              "type": "keyword"
+            "request": {
+              "properties": {
+                "body": {
+                  "norms": false,
+                  "type": "text"
+                },
+                "params": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
             },
-            "content_length": {
-              "type": "long"
-            },
-            "phrase": {
-              "ignore_above": 1024,
-              "type": "keyword"
+            "response": {
+              "properties": {
+                "body": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "code": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "phrase": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
             }
           }
         },
@@ -467,28 +790,28 @@
             "request": {
               "properties": {
                 "code": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "message": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
                 "type": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             },
             "response": {
               "properties": {
                 "code": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "message": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
                 "type": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             },
@@ -535,22 +858,22 @@
                   "type": "keyword"
                 },
                 "count_values": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "delta": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "dest_class": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "exptime": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "flags": {
                   "type": "long"
                 },
                 "initial": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "line": {
                   "ignore_above": 1024,
@@ -560,14 +883,14 @@
                   "type": "boolean"
                 },
                 "opaque": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "opcode": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
                 "opcode_value": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "quiet": {
                   "type": "boolean"
@@ -580,17 +903,17 @@
                   "type": "long"
                 },
                 "source_class": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "type": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
                 "vbucket": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "verbosity": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             },
@@ -607,7 +930,7 @@
                   "type": "keyword"
                 },
                 "count_values": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "error_msg": {
                   "ignore_above": 1024,
@@ -617,21 +940,21 @@
                   "type": "long"
                 },
                 "opaque": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "opcode": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
                 "opcode_value": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "status": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
                 "status_code": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "type": {
                   "ignore_above": 1024,
@@ -641,6 +964,38 @@
                   "type": "long"
                 },
                 "version": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "meta": {
+          "properties": {
+            "cloud": {
+              "properties": {
+                "availability_zone": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "instance_id": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "machine_type": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "project_id": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "provider": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "region": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 }
@@ -667,13 +1022,13 @@
               "type": "keyword"
             },
             "numberReturned": {
-              "type": "integer"
+              "type": "long"
             },
             "numberToReturn": {
-              "type": "integer"
+              "type": "long"
             },
             "numberToSkip": {
-              "type": "integer"
+              "type": "long"
             },
             "query": {
               "ignore_above": 1024,
@@ -700,10 +1055,10 @@
         "mysql": {
           "properties": {
             "affected_rows": {
-              "type": "integer"
+              "type": "long"
             },
             "error_code": {
-              "type": "integer"
+              "type": "long"
             },
             "error_message": {
               "ignore_above": 1024,
@@ -733,7 +1088,7 @@
         "nfs": {
           "properties": {
             "minor_version": {
-              "type": "integer"
+              "type": "long"
             },
             "opcode": {
               "ignore_above": 1024,
@@ -748,7 +1103,7 @@
               "type": "keyword"
             },
             "version": {
-              "type": "integer"
+              "type": "long"
             }
           }
         },
@@ -771,7 +1126,7 @@
         "pgsql": {
           "properties": {
             "error_code": {
-              "type": "integer"
+              "type": "long"
             },
             "error_message": {
               "ignore_above": 1024,
@@ -852,12 +1207,12 @@
               "type": "keyword"
             },
             "call_size": {
-              "type": "integer"
+              "type": "long"
             },
             "cred": {
               "properties": {
                 "gid": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "gids": {
                   "ignore_above": 1024,
@@ -868,15 +1223,15 @@
                   "type": "keyword"
                 },
                 "stamp": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "uid": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             },
             "reply_size": {
-              "type": "integer"
+              "type": "long"
             },
             "status": {
               "ignore_above": 1024,
@@ -944,12 +1299,10 @@
             "stats": {
               "properties": {
                 "net_bytes_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 },
                 "net_packets_total": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                  "type": "long"
                 }
               }
             }
@@ -1003,6 +1356,7 @@
   },
   "order": 0,
   "settings": {
+    "index.mapping.total_fields.limit": 10000,
     "index.refresh_interval": "5s"
   },
   "template": "packetbeat-*"

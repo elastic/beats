@@ -1,17 +1,23 @@
+[[metricbeat-overview]]
 == Overview
 
 Metricbeat is a lightweight shipper that you can install on your servers to
-periodically collect metrics from the operating system and the services running
-on the server.
+periodically collect metrics from the operating system and from services running
+on the server. Metricbeat takes the metrics and statistics that it collects and
+ships them to the output that you specify, such as Elasticsearch or Logstash.
 
-Metricbeat helps you monitor your servers by collecting metrics from services
-like:
+Metricbeat helps you monitor your servers by collecting metrics from the system
+and the following services:
 
-*Service metrics*
-
-  * <<metricbeat-apache-module,Apache HTTPD>>
-  * <<metricbeat-mysql-module,MySQL>>
-  * <<metricbeat-redis-module,Redis>>
+  * <<metricbeat-module-apache,Apache>>
+  * <<metricbeat-module-haproxy,HAProxy>>
+  * <<metricbeat-module-mongodb,MongoDB>>
+  * <<metricbeat-module-mysql,MySQL>>
+  * <<metricbeat-module-nginx,Nginx>>
+  * <<metricbeat-module-postgresql,PostgreSQL>>
+  * <<metricbeat-module-redis,Redis>>
+  * <<metricbeat-module-system,System>>
+  * <<metricbeat-module-zookeeper,Zookeeper>>
 
 Metricbeat can insert the collected metrics directly into Elasticsearch
 or send them to Logstash, Redis, or Kafka.

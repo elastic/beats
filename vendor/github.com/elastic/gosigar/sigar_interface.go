@@ -4,12 +4,30 @@ import (
 	"time"
 )
 
+type ErrNotImplemented struct {
+	OS string
+}
+
+func (e ErrNotImplemented) Error() string {
+	return "not implemented on " + e.OS
+}
+
+func IsNotImplemented(err error) bool {
+	switch err.(type) {
+	case ErrNotImplemented, *ErrNotImplemented:
+		return true
+	default:
+		return false
+	}
+}
+
 type Sigar interface {
 	CollectCpuStats(collectionInterval time.Duration) (<-chan Cpu, chan<- struct{})
 	GetLoadAverage() (LoadAverage, error)
 	GetMem() (Mem, error)
 	GetSwap() (Swap, error)
 	GetFileSystemUsage(string) (FileSystemUsage, error)
+	GetFDUsage() (FDUsage, error)
 }
 
 type Cpu struct {
@@ -67,6 +85,12 @@ type CpuList struct {
 	List []Cpu
 }
 
+type FDUsage struct {
+	Open   uint64
+	Unused uint64
+	Max    uint64
+}
+
 type FileSystem struct {
 	DirName     string
 	DevName     string
@@ -109,6 +133,7 @@ type ProcState struct {
 	Username  string
 	State     RunState
 	Ppid      int
+	Pgid      int
 	Tty       int
 	Priority  int
 	Nice      int
@@ -135,8 +160,18 @@ type ProcArgs struct {
 	List []string
 }
 
+type ProcEnv struct {
+	Vars map[string]string
+}
+
 type ProcExe struct {
 	Name string
 	Cwd  string
 	Root string
+}
+
+type ProcFDUsage struct {
+	Open      uint64
+	SoftLimit uint64
+	HardLimit uint64
 }
