@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/elastic/beats/metricbeat/module/php_fpm"
@@ -31,13 +32,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
-	config := struct{}{}
-
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
-
+	logp.Warn("EXPERIMENTAL: The php-fpm pool metricset is experimental")
 	return &MetricSet{
 		BaseMetricSet: base,
 		client:        php_fpm.NewStatsClient(base, false),
@@ -56,7 +51,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	defer body.Close()
 
-	stats := &php_fpm.PoolStats{}
+	stats := &poolStats{}
 	err = json.NewDecoder(body).Decode(stats)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing json: %v", err)
