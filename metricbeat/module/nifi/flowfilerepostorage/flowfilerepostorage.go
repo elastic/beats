@@ -97,6 +97,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 func (m *MetricSet) fetchNodewise() (common.MapStr, error) {
 	host := m.HostData().URI
 	nodeID := m.nodes[host]
+	fmt.Printf("NODEID: %s", nodeID)
 
 	url := fmt.Sprintf("http://%s/nifi-api/system-diagnostics?clusterNodeId=%s", host, nodeID)
 

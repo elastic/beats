@@ -3,10 +3,10 @@ package flowfilerepostorage
 // FlowFileRepositoryStorageUsage ...
 type FlowFileRepositoryStorageUsage struct {
 	FreeSpace       string `json:"freeSpace"`
-	FreeSpaceBytes  uint64 `json:"freeSpaceBytes"`
+	FreeSpaceBytes  int64  `json:"freeSpaceBytes"`
 	TotalSpace      string `json:"totalSpace"`
-	TotalSpaceBytes uint64 `json:"totalSpaceBytes"`
+	TotalSpaceBytes int64  `json:"totalSpaceBytes"`
 	UsedSpace       string `json:"usedSpace"`
-	UsedSpaceBytes  uint64 `json:"usedSpaceBytes"`
+	UsedSpaceBytes  int64  `json:"usedSpaceBytes"`
 	Utilization     string `json:"utilization"`
 }

@@ -14,7 +14,7 @@ type NodeFlowFileRepositoryStorageSnapshot struct {
 	NodeID   string `json:"nodeId"`
 	Address  string `json:"address"`
 	Snapshot struct {
-		FlowFileRepositoryStorageUsage
+		FlowFileRepositoryStorageUsage `json:"flowFileRepositoryStorageUsage"`
 	} `json:"snapshot"`
 }
 
@@ -40,6 +40,7 @@ func nodewiseEventMapping(body io.Reader, nodeID string) (common.MapStr, error) 
 			slice = snapshot.Snapshot.FlowFileRepositoryStorageUsage
 			break
 		}
+
 		if i == len(snapshots)-1 {
 			return nil, errors.New("Failed to find data for specific nodeID")
 		}
