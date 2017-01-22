@@ -9,10 +9,10 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 
-	"{beat_path}/{beat}/config"
+	"{{cookiecutter.beat_path}}/{{cookiecutter.beat}}/config"
 )
 
-type {Beat} struct {
+type {{cookiecutter.beat|capitalize}} struct {
 	done   chan struct{}
 	config config.Config
 	client publisher.Client
@@ -25,15 +25,15 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	bt := &{Beat}{
+	bt := &{{cookiecutter.beat|capitalize}}{
 		done:   make(chan struct{}),
 		config: config,
 	}
 	return bt, nil
 }
 
-func (bt *{Beat}) Run(b *beat.Beat) error {
-	logp.Info("{beat} is running! Hit CTRL-C to stop it.")
+func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
+	logp.Info("{{cookiecutter.beat}} is running! Hit CTRL-C to stop it.")
 
 	bt.client = b.Publisher.Connect()
 	ticker := time.NewTicker(bt.config.Period)
@@ -56,7 +56,7 @@ func (bt *{Beat}) Run(b *beat.Beat) error {
 	}
 }
 
-func (bt *{Beat}) Stop() {
+func (bt *{{cookiecutter.beat|capitalize}}) Stop() {
 	bt.client.Close()
 	close(bt.done)
 }
