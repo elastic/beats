@@ -34,9 +34,19 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 func IsCluster(host string, client *http.Client) bool {
 	url := fmt.Sprintf("http://%s/nifi-api/controller/cluster", host)
 
-	req, _ := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		logp.Err(err.Error())
+		return false
+	}
 
-	resp, _ := client.Do(req)
+	resp, err := client.Do(req)
+	if err != nil {
+		logp.Err(err.Error())
+		return false
+	}
+
+	defer resp.Body.Close()
 
 	defer resp.Body.Close()
 
@@ -48,8 +58,10 @@ func IsCluster(host string, client *http.Client) bool {
 
 // ClusterResponse ...
 type ClusterResponse struct {
-	Nodes     []Node `json:"nodes"`
-	Generated string `json:"generated"`
+	Cluster struct {
+		Nodes     []Node `json:"nodes"`
+		Generated string `json:"generated"`
+	} `json:"cluster"`
 }
 
 // Node ...
@@ -86,17 +98,18 @@ func GetNodeMap(host string, client *http.Client) (map[string]string, error) {
 
 	defer resp.Body.Close()
 
-	var nodeMap map[string]string
+	nodeMap := map[string]string{}
 
 	if resp.StatusCode == 200 {
 		var data ClusterResponse
+
 		err := json.NewDecoder(resp.Body).Decode(&data)
 		if err != nil {
 			logp.Err("Error: ", err)
 			return nil, err
 		}
 
-		for _, node := range data.Nodes {
+		for _, node := range data.Cluster.Nodes {
 			nodeMap[fmt.Sprintf("%s:%d", node.Address, node.APIPort)] = node.NodeID
 		}
 		return nodeMap, nil
