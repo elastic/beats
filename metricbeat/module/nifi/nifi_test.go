@@ -27,7 +27,14 @@ func TestGetNodeMap(t *testing.T) {
 	client := &http.Client{}
 
 	result, err := GetNodeMap(host, client)
+
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(result))
-	fmt.Printf("%v", result)
+
+	// try to access the nodeID in the map using the host string as indexi w
+	if val, ok := result[host]; ok {
+		assert.True(t, len([]rune(val)) > 0)
+	} else {
+		assert.Fail(t, "Key with hostname does not exist")
+	}
 }
