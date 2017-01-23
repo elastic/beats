@@ -139,8 +139,13 @@ func TestInit(t *testing.T) {
 			},
 		}
 		states := file.NewStates()
+		// Set states to finished
+		for i, state := range test.states {
+			state.Finished = true
+			test.states[i] = state
+		}
 		states.SetStates(test.states)
-		err := p.Init(states.GetStates())
+		err := p.LoadStates(states.GetStates())
 		assert.NoError(t, err)
 		assert.Equal(t, test.count, p.Prospector.states.Count())
 	}
