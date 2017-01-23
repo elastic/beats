@@ -427,6 +427,95 @@ experimental[] ceph Module
 
 
 [float]
+== df Fields
+
+df
+
+
+
+[float]
+=== ceph.df.stats.available.bytes
+
+type: long
+
+format: bytes
+
+Available bytes of the cluster
+
+
+[float]
+=== ceph.df.stats.total.bytes
+
+type: long
+
+format: bytes
+
+Total bytes of the cluster
+
+
+[float]
+=== ceph.df.stats.used.bytes
+
+type: long
+
+format: bytes
+
+Used bytes of the cluster
+
+
+[float]
+=== ceph.df.pool.id
+
+type: long
+
+Id of the pool
+
+
+[float]
+=== ceph.df.pool.name
+
+type: keyword
+
+Name of the pool
+
+
+[float]
+=== ceph.df.pool.stats.available.bytes
+
+type: long
+
+format: bytes
+
+Available bytes of the pool
+
+
+[float]
+=== ceph.df.pool.stats.objects
+
+type: long
+
+Number of objects of the pool
+
+
+[float]
+=== ceph.df.pool.stats.used.bytes
+
+type: long
+
+format: bytes
+
+Used bytes of the pool
+
+
+[float]
+=== ceph.df.pool.stats.used.kb
+
+type: long
+
+Used kb of the pool
+
+
+[float]
 == health Fields
 
 health

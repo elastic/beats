@@ -187,6 +187,70 @@
         },
         "ceph": {
           "properties": {
+            "df": {
+              "properties": {
+                "pool": {
+                  "properties": {
+                    "id": {
+                      "type": "long"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "stats": {
+                      "properties": {
+                        "available": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "objects": {
+                          "type": "long"
+                        },
+                        "used": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            },
+                            "kb": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "stats": {
+                  "properties": {
+                    "available": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "total": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "health": {
               "properties": {
                 "cluster": {
