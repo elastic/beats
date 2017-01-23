@@ -6,7 +6,6 @@ import (
 	"github.com/elastic/beats/metricbeat/module/docker"
 
 	dc "github.com/fsouza/go-dockerclient"
-	"reflect"
 	"strings"
 )
 
@@ -15,7 +14,7 @@ func eventsMapping(containersList []dc.APIContainers, m *MetricSet) []common.Map
 	for _, container := range containersList {
 		returnevent := eventMapping(&container, m)
 		// Compare event to empty event
-		if !reflect.ValueOf(returnevent).IsNil() {
+		if returnevent != nil {
 			myEvents = append(myEvents, returnevent)
 		}
 	}
@@ -34,6 +33,7 @@ func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
 				mb.ModuleData: common.MapStr{
 					"container": common.MapStr{
 						"name": docker.ExtractContainerName(cont.Names),
+						"id":   cont.ID,
 					},
 				},
 				"status":        container.State.Health.Status,

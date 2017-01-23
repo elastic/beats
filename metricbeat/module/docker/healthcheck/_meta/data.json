@@ -8,13 +8,11 @@
         "healthcheck": {
             "failingstreak": 0,
             "status": "healthy",
-            "healthcheck": {
-                "event": {
-                  "end_date": "2017-01-09T20:38:13.080472813+01:00",
-                  "exit_code": 0,
-                  "output": "this is an event output",
-                  "start_date": "2017-01-09T20:38:12.999970865+01:00",
-                }
+            "event": {
+              "end_date": "2017-01-09T20:38:13.080472813+01:00",
+              "exit_code": 0,
+              "output": "this is an event output",
+              "start_date": "2017-01-09T20:38:12.999970865+01:00",
             }
         }
     },
