@@ -62,11 +62,12 @@ func (e *Event) ToMapStr() common.MapStr {
 // Metadata creates a common.MapStr containing the metadata to
 // be associated with the event.
 func (e *Event) Metadata() common.MapStr {
-	meta := common.MapStr{}
-	if len(e.Pipeline) > 0 {
-		meta["pipeline"] = e.Pipeline
+	if e.Pipeline != "" {
+		return common.MapStr{
+			"pipeline": e.Pipeline,
+		}
 	}
-	return meta
+	return nil
 }
 
 // HasData returns true if the event itself contains data
