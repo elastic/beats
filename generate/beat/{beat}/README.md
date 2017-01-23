@@ -24,7 +24,7 @@ It will create a clean git history for each major step. Note that you can always
 To push {Beat} in the git repository, run the following commands:
 
 ```
-git remote set-url origin https://{beat_path}/{beat}
+git remote set-url origin https://{beat_path}
 git push origin master
 ```
 
@@ -101,7 +101,7 @@ To clone {Beat} from the git repository, run the following commands:
 ```
 mkdir -p ${GOPATH}/{beat_path}
 cd ${GOPATH}/{beat_path}
-git clone https://{beat_path}/{beat}
+git clone https://{beat_path}
 ```
 
 
