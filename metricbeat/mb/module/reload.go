@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -23,7 +24,7 @@ var (
 // Reloader is used to register and reload modules
 type Reloader struct {
 	registry *registry
-	config   ReloaderConfig
+	config   cfgfile.ReloadConfig
 	client   func() publisher.Client
 	done     chan struct{}
 	wg       sync.WaitGroup
@@ -32,7 +33,7 @@ type Reloader struct {
 // NewReloader creates new Reloader instance for the given config
 func NewReloader(cfg *common.Config, p publisher.Publisher) *Reloader {
 
-	config := DefaultReloaderConfig
+	config := cfgfile.DefaultReloadConfig
 	cfg.Unpack(&config)
 
 	return &Reloader{
@@ -56,7 +57,7 @@ func (r *Reloader) Run() {
 
 	path := r.config.Path
 	if !filepath.IsAbs(path) {
-		path = filepath.Join(cfgfile.GetPathConfig(), path)
+		path = paths.Resolve(paths.Config, path)
 	}
 
 	gw := cfgfile.NewGlobWatcher(path)
