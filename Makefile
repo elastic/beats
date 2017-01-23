@@ -57,7 +57,7 @@ clean-vendor:
 .PHONY: check
 check:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
-	# Validate that all updates were commited
+	# Validate that all updates were committed
 	$(MAKE) update
 	git update-index --refresh
 	git diff-index --exit-code HEAD --

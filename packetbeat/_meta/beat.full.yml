@@ -82,7 +82,7 @@ packetbeat.protocols.amqp:
   # Default: false
   #parse_arguments: false
 
-  # Hide all methods relative to connection negociation between server and
+  # Hide all methods relative to connection negotiation between server and
   # client.
   # Default: true
   #hide_connection_information: true
