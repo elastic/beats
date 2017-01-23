@@ -1,31 +1,31 @@
-package module
+package cfgfile
 
 import "sync"
 
-type registry struct {
+type Registry struct {
 	sync.Mutex
 	List map[uint64]Runner
 }
 
-func newRunningRegistry() *registry {
-	return &registry{
+func NewRegistry() *Registry {
+	return &Registry{
 		List: map[uint64]Runner{},
 	}
 }
 
-func (r *registry) Add(hash uint64, m Runner) {
+func (r *Registry) Add(hash uint64, m Runner) {
 	r.Lock()
 	defer r.Unlock()
 	r.List[hash] = m
 }
 
-func (r *registry) Remove(hash uint64) {
+func (r *Registry) Remove(hash uint64) {
 	r.Lock()
 	defer r.Unlock()
 	delete(r.List, hash)
 }
 
-func (r *registry) Has(hash uint64) bool {
+func (r *Registry) Has(hash uint64) bool {
 	r.Lock()
 	defer r.Unlock()
 
@@ -33,7 +33,7 @@ func (r *registry) Has(hash uint64) bool {
 	return ok
 }
 
-func (r *registry) CopyList() map[uint64]Runner {
+func (r *Registry) CopyList() map[uint64]Runner {
 	r.Lock()
 	defer r.Unlock()
 

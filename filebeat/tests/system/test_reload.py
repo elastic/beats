@@ -71,7 +71,7 @@ class Test(BaseTest):
 
         # Wait until prospector is stopped
         self.wait_until(
-            lambda: self.log_contains("Prospector stopped:"),
+            lambda: self.log_contains("Runner stopped:"),
             max_timeout=15)
 
         with open(logfile, 'a') as f:
@@ -117,7 +117,7 @@ class Test(BaseTest):
 
         # Wait until prospector is stopped
         self.wait_until(
-            lambda: self.log_contains("Prospector stopped:"),
+            lambda: self.log_contains("Runner stopped:"),
             max_timeout=15)
 
         with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
