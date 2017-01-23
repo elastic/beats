@@ -1009,7 +1009,7 @@ class Test(BaseTest):
         assert len(data) == 1
         assert data[0]["ttl"] > 0
 
-        # No config file which does not match the exisitng state
+        # No config file which does not match the existing state
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test2.log",
             clean_inactive="10s",
@@ -1127,7 +1127,7 @@ class Test(BaseTest):
         assert len(data) == 1
         assert data[0]["ttl"] == 20 * 1000 * 1000 * 1000
 
-        # new config file whith other clean_inactive
+        # new config file with other clean_inactive
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test file.log",
             clean_inactive="40s",

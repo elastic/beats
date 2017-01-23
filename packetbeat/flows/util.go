@@ -66,7 +66,7 @@ func (w *worker) tick(t *time.Ticker) bool {
 	}
 }
 
-func (w *worker) periodicaly(tick time.Duration, fn func() error) {
+func (w *worker) periodically(tick time.Duration, fn func() error) {
 	defer debugf("stop periodic loop")
 
 	ticker := time.NewTicker(tick)

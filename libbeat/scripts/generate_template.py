@@ -309,7 +309,7 @@ def fill_field_properties(args, field, defaults, path):
 
         dynamic_templates.extend(dynamic)
     else:
-        raise ValueError("Unkown type found: " + field.get("type"))
+        raise ValueError("Unknown type found: " + field.get("type"))
 
     return properties, dynamic_templates
 

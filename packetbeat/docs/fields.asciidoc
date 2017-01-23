@@ -2064,7 +2064,7 @@ type: long
 
 format: bytes
 
-The byte count of the values being transfered.
+The byte count of the values being transferred.
 
 
 [float]
@@ -2074,7 +2074,7 @@ type: long
 
 format: bytes
 
-The byte count of the values being transfered.
+The byte count of the values being transferred.
 
 
 [float]
