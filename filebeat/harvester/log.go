@@ -137,6 +137,7 @@ func (h *Harvester) Harvest(r reader.Reader) {
 			event.InputType = h.config.InputType
 			event.DocumentType = h.config.DocumentType
 			event.JSONConfig = h.config.JSON
+			event.Pipeline = h.config.Pipeline
 		}
 
 		// Always send event to update state, also if lines was skipped

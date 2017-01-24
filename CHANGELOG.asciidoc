@@ -93,6 +93,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 *Filebeat*
 - Add enabled config option to prospectors. {pull}3157[3157]
 - Add target option for decoded_json_field. {pull}3169[3169]
+- Add the `pipeline` config option at the prospector level, for configuring the Ingest Node pipeline ID. {pull}3433[3433]
 
 *Winlogbeat*
 

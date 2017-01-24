@@ -52,6 +52,7 @@ type harvesterConfig struct {
 	MaxBytes             int                     `config:"max_bytes" validate:"min=0,nonzero"`
 	Multiline            *reader.MultilineConfig `config:"multiline"`
 	JSON                 *reader.JSONConfig      `config:"json"`
+	Pipeline             string                  `config:"pipeline"`
 }
 
 func (config *harvesterConfig) Validate() error {

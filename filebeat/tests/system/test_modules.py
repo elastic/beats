@@ -110,3 +110,65 @@ class Test(BaseTest):
                     if not found:
                         raise Exception("The following expected object was" +
                                         " not found: {}".format(obj))
+
+    @unittest.skipIf(not INTEGRATION_TESTS or
+                     os.getenv("TESTING_ENVIRONMENT") == "2x",
+                     "integration test not available on 2.x")
+    def test_prospector_pipeline_config(self):
+        """
+        Tests that the pipeline configured in the prospector overwrites
+        the one from the output.
+        """
+        self.init()
+        index_name = "filebeat-test-prospector"
+        try:
+            self.es.indices.delete(index=index_name)
+        except:
+            pass
+        self.wait_until(lambda: not self.es.indices.exists(index_name))
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            elasticsearch=dict(
+                host=self.elasticsearch_url,
+                pipeline="estest",
+                index=index_name),
+            pipeline="test",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile = self.working_dir + "/log/test.log"
+        with open(testfile, 'a') as file:
+            file.write("Hello World1\n")
+
+        # put pipeline
+        self.es.transport.perform_request("PUT", "/_ingest/pipeline/test",
+                                          body={
+                                              "processors": [{
+                                                  "set": {
+                                                      "field": "x-pipeline",
+                                                      "value": "test-pipeline",
+                                                  }
+                                              }]})
+
+        filebeat = self.start_beat()
+
+        # Wait until the event is in ES
+        self.wait_until(lambda: self.es.indices.exists(index_name))
+
+        def search_objects():
+            try:
+                self.es.indices.refresh(index=index_name)
+                res = self.es.search(index=index_name,
+                                     body={"query": {"match_all": {}}})
+                return [o["_source"] for o in res["hits"]["hits"]]
+            except:
+                return []
+
+        self.wait_until(lambda: len(search_objects()) > 0, max_timeout=20)
+        filebeat.check_kill_and_wait()
+
+        objects = search_objects()
+        assert len(objects) == 1
+        o = objects[0]
+        assert o["x-pipeline"] == "test-pipeline"
