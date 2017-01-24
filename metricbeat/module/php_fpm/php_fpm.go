@@ -31,13 +31,9 @@ type StatsClient struct {
 }
 
 // NewStatsClient creates a new StatsClient
-func NewStatsClient(m mb.BaseMetricSet, isFullStats bool) *StatsClient {
-	address := m.HostData().SanitizedURI
-	if isFullStats {
-		address += "&full"
-	}
+func NewStatsClient(m mb.BaseMetricSet) *StatsClient {
 	return &StatsClient{
-		address:  address,
+		address:  m.HostData().SanitizedURI,
 		user:     m.HostData().User,
 		password: m.HostData().Password,
 		http:     &http.Client{Timeout: m.Module().Config().Timeout},

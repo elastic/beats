@@ -35,7 +35,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logp.Warn("EXPERIMENTAL: The php-fpm pool metricset is experimental")
 	return &MetricSet{
 		BaseMetricSet: base,
-		client:        php_fpm.NewStatsClient(base, false),
+		client:        php_fpm.NewStatsClient(base),
 	}, nil
 }
 
