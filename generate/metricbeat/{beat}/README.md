@@ -1,6 +1,6 @@
-# {{cookiecutter.project_name}}
+# {project_name}
 
-{{cookiecutter.project_name}} is a beat based on metricbeat which was generated with metricbeat/metricset generator.
+{project_name} is a beat based on metricbeat which was generated with metricbeat/metricset generator.
 
 
 ## Getting started
@@ -16,7 +16,7 @@ It will ask you for the module and metricset name. Insert the name accordingly.
 To compile your beat run `make`. Then you can run the following command to see the first output:
 
 ```
-{{cookiecutter.beat}} -e -d "*"
+{beat} -e -d "*"
 ```
 
 In case further modules are metricsets should be added, run:
@@ -68,7 +68,7 @@ git add .gitignore
 git commit -m "Add git settings"
 git add .
 git reset -- .travis.yml
-git commit -m "Add {{cookiecutter.beat}}"
+git commit -m "Add {beat}"
 ```
 
 ## Packaging

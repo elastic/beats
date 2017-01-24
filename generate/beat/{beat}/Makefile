@@ -1,5 +1,5 @@
 BEAT_NAME={beat}
-BEAT_PATH={beat_path}/{beat}
+BEAT_PATH={beat_path}
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 BEAT_URL=https://${BEAT_PATH}
 SYSTEM_TESTS=false
