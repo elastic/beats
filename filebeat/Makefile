@@ -27,10 +27,16 @@ fields:
 	cat ${ES_BEATS}/filebeat/_meta/fields.common.yml > _meta/fields.generated.yml
 	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
 
+# Collects all modules files to be packaged in a temporary folder
+.PHONY: modules
+modules:
+	mkdir -p _meta/
+	rm -rf _meta/module.generated
+	rsync -av module/ _meta/module.generated --exclude "_meta" --exclude "*/*/test"
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields kibana
+collect: fields kibana modules
 
 
 # Creates a new fileset. Requires the params MODULE and FILESET
