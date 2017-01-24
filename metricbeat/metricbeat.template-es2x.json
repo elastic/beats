@@ -2168,6 +2168,42 @@
             }
           }
         },
+        "php_fpm": {
+          "properties": {
+            "pool": {
+              "properties": {
+                "connections": {
+                  "properties": {
+                    "accepted": {
+                      "type": "long"
+                    },
+                    "queued": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "pool": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "processes": {
+                  "properties": {
+                    "active": {
+                      "type": "long"
+                    },
+                    "idle": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "slow_requests": {
+                  "type": "long"
+                }
+              }
+            }
+          }
+        },
         "postgresql": {
           "properties": {
             "activity": {

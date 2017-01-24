@@ -1,0 +1,25 @@
+{
+  "@timestamp": "2017-01-18T23:57:23.960Z",
+  "beat": {
+    "hostname": "host.example.com",
+    "name": "host.example.com"
+  },
+  "metricset": {
+    "host": "localhost:8081",
+    "module": "php_fpm",
+    "name": "pool",
+    "rtt": 1237
+  },
+  "php_fpm": {
+    "pool": {
+      "connections.accepted": 803,
+      "connections.queued": 0,
+      "hostname": "localhost:8081",
+      "pool": "www",
+      "processes.active": 1,
+      "processes.idle": 2,
+      "requests.slow": 0
+    }
+  },
+  "type": "metricsets"
+}

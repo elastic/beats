@@ -2147,6 +2147,41 @@
             }
           }
         },
+        "php_fpm": {
+          "properties": {
+            "pool": {
+              "properties": {
+                "connections": {
+                  "properties": {
+                    "accepted": {
+                      "type": "long"
+                    },
+                    "queued": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "pool": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "processes": {
+                  "properties": {
+                    "active": {
+                      "type": "long"
+                    },
+                    "idle": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "slow_requests": {
+                  "type": "long"
+                }
+              }
+            }
+          }
+        },
         "postgresql": {
           "properties": {
             "activity": {
