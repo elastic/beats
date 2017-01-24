@@ -3834,30 +3834,6 @@ The name of the pool.
 
 
 [float]
-=== php_fpm.pool.process_manager
-
-type: keyword
-
-`static`, `dynamic` or `ondemand`.
-
-
-[float]
-=== php_fpm.pool.start_time
-
-type: long
-
-The date and time FPM has started.
-
-
-[float]
-=== php_fpm.pool.start_since
-
-type: long
-
-Number of seconds since FPM has started.
-
-
-[float]
 === php_fpm.pool.accepted_conn
 
 type: long

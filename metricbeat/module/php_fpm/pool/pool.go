@@ -61,18 +61,10 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		"hostname": m.Host(),
 
 		"pool":                 stats.Pool,
-		"process_manager":      stats.ProcessManager,
-		"start_time":           stats.StartTime,
-		"start_since":          stats.StartSince,
-		"accepted_conn":        stats.AcceptedConn,
-		"listen_queue":         stats.ListenQueue,
-		"max_list_queue":       stats.MaxListQueue,
-		"listen_queue_len":     stats.ListenQueueLen,
-		"idle_processes":       stats.IdleProcesses,
-		"active_processes":     stats.ActiveProcesses,
-		"total_processes":      stats.TotalProcesses,
-		"max_active_processes": stats.MaxActiveProcesses,
-		"max_children_reached": stats.MaxChildrenReached,
-		"slow_requests":        stats.SlowRequests,
+		"connections.queued":   stats.ListenQueue,
+		"connections.accepted": stats.AcceptedConn,
+		"processes.idle":       stats.IdleProcesses,
+		"processes.active":     stats.ActiveProcesses,
+		"requests.slow":        stats.SlowRequests,
 	}, nil
 }

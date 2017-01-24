@@ -2179,17 +2179,7 @@
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
-                "process_manager": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
                 "slow_requests": {
-                  "type": "long"
-                },
-                "start_since": {
-                  "type": "long"
-                },
-                "start_time": {
                   "type": "long"
                 },
                 "total_processes": {

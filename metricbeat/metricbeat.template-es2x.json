@@ -2201,18 +2201,7 @@
                   "index": "not_analyzed",
                   "type": "string"
                 },
-                "process_manager": {
-                  "ignore_above": 1024,
-                  "index": "not_analyzed",
-                  "type": "string"
-                },
                 "slow_requests": {
-                  "type": "long"
-                },
-                "start_since": {
-                  "type": "long"
-                },
-                "start_time": {
                   "type": "long"
                 },
                 "total_processes": {

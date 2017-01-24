@@ -7,7 +7,7 @@ type poolStats struct {
 	StartSince         int    `json:"start since"`
 	AcceptedConn       int    `json:"accepted conn"`
 	ListenQueue        int    `json:"listen queue"`
-	MaxListQueue       int    `json:"max list queue"`
+	MaxListenQueue     int    `json:"max listen queue"`
 	ListenQueueLen     int    `json:"listen queue len"`
 	IdleProcesses      int    `json:"idle processes"`
 	ActiveProcesses    int    `json:"active processes"`

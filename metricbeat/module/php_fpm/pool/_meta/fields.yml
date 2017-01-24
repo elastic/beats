@@ -9,70 +9,42 @@
       description: >
         The name of the pool.
 
-    - name: process_manager
-      type: keyword
-      description: >
-        `static`, `dynamic` or `ondemand`.
-
-    - name: start_time
+    - name: connections.accepted
       type: long
       description: >
-        The date and time FPM has started.
+        The number of incoming requests that the PHP-FPM server has accepted;
+        when a connection is accepted it is removed from the listen queue
+        (displayed in real time).
 
-    - name: start_since
+    - name: connections.queued
       type: long
       description: >
-        Number of seconds since FPM has started.
+        The current number of connections that have been initiated, but not yet
+        accepted. If this value is non-zero it typically means that all the
+        available server processes are currently busy, and there are no
+        processes available to serve the next request. Raising `pm.max_children`
+        (provided the server can handle it) should help keep this number low.
+        This property follows from the fact that PHP-FPM listens via a socket
+        (TCP or file based), and thus inherits some of the characteristics of
+        sockets..
 
-    - name: accepted_conn
+    - name: processes.idle
       type: long
       description: >
-        The number of request accepted by the pool.
+        The number of servers in the `waiting to process` state (i.e. not
+        currently serving a page). This value should fall between the
+        `pm.min_spare_servers` and `pm.max_spare_servers` values when the
+        process manager is `dynamic`. (updated once per second)
 
-    - name: listen_queue
+    - name: processes.active
       type: long
       description: >
-        The number of request in the queue of pending connections.
+        The number of servers current processing a page - the minimum is `1` (so
+        even on a fully idle server, the result will be not read `0`). (updated
+        once per second)
 
-    - name: max_listen_queue
+    - name: requests.slow
       type: long
       description: >
-        The maximum number of requests in the queue of pending connections
-        since FPM has started.
-
-    - name: listen_queue_len
-      type: long
-      description: >
-        The size of the socket queue of pending connections.
-
-    - name: idle_processes
-      type: long
-      description: >
-        The number of idle processes.
-
-    - name: active_processes
-      type: long
-      description: >
-        The number of active processes.
-
-    - name: total_processes
-      type: long
-      description: >
-        The number of idle + active processes.
-
-    - name: max_active_processes
-      type: long
-      description: >
-        The maximum number of active processes since FPM has started.
-
-    - name: max_children_reached
-      type: long
-      description: >
-        Number of times, the process limit has been reached, when pm tries to
-        start more children (works only for pm `dynamic` and `ondemand`)
-
-    - name: slow_requests
-      type: long
-      description: >
-        Number of times a request execution time has exceeded
+        The number of times a request execution time has exceeded
         `request_slowlog_timeout`.
