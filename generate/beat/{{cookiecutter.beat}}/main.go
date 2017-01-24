@@ -5,11 +5,11 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 
-	"{beat_path}/{beat}/beater"
+	"{{cookiecutter.beat_path}}/{{cookiecutter.beat}}/beater"
 )
 
 func main() {
-	err := beat.Run("{beat}", "", beater.New)
+	err := beat.Run("{{cookiecutter.beat}}", "", beater.New)
 	if err != nil {
 		os.Exit(1)
 	}
