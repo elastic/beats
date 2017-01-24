@@ -38,3 +38,7 @@ fields:
 .PHONY: benchmark
 benchmark:
 	go test -short -bench=. ./... -cpu=2
+
+.PHONY: create-tcp-protocol
+create-tcp-protocol:
+	python scripts/create_tcp_protocol.py

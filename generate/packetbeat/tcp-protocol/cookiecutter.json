@@ -1,6 +1,0 @@
-{
-    "protocol": "",
-    "module": "{{ cookiecutter.protocol|lower }}",
-    "plugin_type": "{{ cookiecutter.protocol|lower }}Plugin",
-    "plugin_var": "{{ cookiecutter.plugin_type[0]|lower }}p"
-}

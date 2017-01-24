@@ -1,4 +1,4 @@
-package {{ cookiecutter.module }}
+package {protocol}
 
 import (
 	"github.com/elastic/beats/libbeat/common"
@@ -42,7 +42,7 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 
 	event := common.MapStr{
 		"@timestamp":   common.Time(requ.Ts),
-		"type":         "{{ cookiecutter.module }}",
+		"type":         "{protocol}",
 		"status":       status,
 		"responsetime": responseTime,
 		"bytes_in":     requ.Size,

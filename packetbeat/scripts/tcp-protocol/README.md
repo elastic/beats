@@ -7,12 +7,12 @@ want to create the protocol analyzer (stand-alone, within packetbeat based
 project or packetbeat itself):
 
 ```
-cookiecutter ${GOPATH}/src/github.com/elastic/beats/generate/packetbeat/tcp-protocol
+python ${GOPATH}/src/github.com/elastic/beats/packetbeat/scripts/create_tcp_protocol.py
 ```
 
 Note: If you have multiple go paths use `${GOPATH%%:*}`instead of `${GOPATH}`.
 
-This requires [python](https://www.python.org/downloads/) and [cookiecutter](https://github.com/audreyr/cookiecutter) to be installed. More details on how to install cookiecutter can be found [here](http://cookiecutter.readthedocs.io/en/latest/installation.html).
+This requires [python](https://www.python.org/downloads/) to be installed.
 
 ## Tutorial (TODO):
 
@@ -103,7 +103,7 @@ Create analyzer skeleton from code generator template.
 
 ```
   $ cd ${GOPATH}/src/github.com/elastic/beats/packetbeat/protos
-  $ cookiecutter ${GOPATH}/src/github.com/elastic/beats/generate/packetbeat/tcp-protocol
+  $ python ${GOPATH}/src/github.com/elastic/beats/packetbeat/script/create_tcp_protocol.py
 ```
 
 Load plugin into packetbeat by adding `_ "github.com/elastic/beats/packetbeat/protos/echo"` to packetbeat import list in `$GOPATH/src/github.com/elastic/beats/packetbeat/main.go`
@@ -152,7 +152,7 @@ Create protocol analyzer module (use name ‘echo’ for new protocol):
 ```
 $ mkdir proto
 $ cd proto
-$ cookiecutter ${GOPATH}/src/github.com/elastic/beats/generate/packetbeat/tcp-protocol
+$ python ${GOPATH}/src/github.com/elastic/beats/packetbeat/script/create_tcp_protocol.py
 ```
 
 ### 3 Implement application layer analyzer
