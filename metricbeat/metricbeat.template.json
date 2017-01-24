@@ -185,6 +185,114 @@
             }
           }
         },
+        "ceph": {
+          "properties": {
+            "health": {
+              "properties": {
+                "cluster": {
+                  "properties": {
+                    "overall_status": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "timechecks": {
+                      "properties": {
+                        "epoch": {
+                          "type": "long"
+                        },
+                        "round": {
+                          "properties": {
+                            "status": {
+                              "ignore_above": 1024,
+                              "type": "keyword"
+                            },
+                            "value": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "mon": {
+                  "properties": {
+                    "available": {
+                      "properties": {
+                        "kb": {
+                          "type": "long"
+                        },
+                        "pct": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "health": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "last_updated": {
+                      "type": "date"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "store_stats": {
+                      "properties": {
+                        "last_updated": {
+                          "type": "long"
+                        },
+                        "log": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "misc": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "sst": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "total": {
+                          "properties": {
+                            "bytes": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "total": {
+                      "properties": {
+                        "kb": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "used": {
+                      "properties": {
+                        "kb": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "couchbase": {
           "properties": {
             "bucket": {

@@ -3,6 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
   * <<metricbeat-module-apache,Apache>>
+  * <<metricbeat-module-ceph,ceph>>
   * <<metricbeat-module-couchbase,couchbase>>
   * <<metricbeat-module-docker,Docker>>
   * <<metricbeat-module-haproxy,HAProxy>>
@@ -21,6 +22,7 @@ This file is generated! See scripts/docs_collector.py
 --
 
 include::modules/apache.asciidoc[]
+include::modules/ceph.asciidoc[]
 include::modules/couchbase.asciidoc[]
 include::modules/docker.asciidoc[]
 include::modules/haproxy.asciidoc[]

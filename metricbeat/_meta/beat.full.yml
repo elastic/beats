@@ -94,6 +94,13 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
+#-------------------------------- ceph Module --------------------------------
+#- module: ceph
+#  metricsets: ["health"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost:5000"]
+
 #------------------------------ couchbase Module -----------------------------
 #- module: couchbase
   #metricsets: ["cluster", "node", "bucket"]
