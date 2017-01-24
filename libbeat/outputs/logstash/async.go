@@ -15,6 +15,7 @@ type asyncClient struct {
 	*transport.Client
 	client *v2.AsyncClient
 	win    window
+	ttl    <-chan time.Time
 
 	connect func() error
 }
@@ -34,11 +35,13 @@ func newAsyncLumberjackClient(
 	compressLevel int,
 	maxWindowSize int,
 	timeout time.Duration,
+	ttl time.Duration,
 	beat string,
 ) (*asyncClient, error) {
 	c := &asyncClient{}
 	c.Client = conn
 	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
+	c.ttl = time.Tick(ttl)
 
 	enc, err := makeLogstashEventEncoder(beat)
 	if err != nil {
@@ -128,6 +131,18 @@ func (c *asyncClient) publishWindowed(
 	ref *msgRef,
 	data []outputs.Data,
 ) (int, error) {
+	if c.ttl != nil {
+		select {
+		case <-c.ttl:
+			if err := c.Close(); err != nil {
+				return 0, err
+			}
+			if err := c.Connect(0); err != nil {
+				return 0, err
+			}
+		default:
+		}
+	}
 	batchSize := len(data)
 	windowSize := c.win.get()
 	debug("Try to publish %v events to logstash with window size %v",

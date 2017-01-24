@@ -41,7 +41,7 @@ func makeAsyncTestClient(conn *transport.Client) testClientDriver {
 
 func newAsyncTestClient(conn *transport.Client) *asyncClient {
 	c, err := newAsyncLumberjackClient(conn,
-		1, 3, testMaxWindowSize, 100*time.Millisecond, "testbeat")
+		1, 3, testMaxWindowSize, 100*time.Millisecond, 5*time.Second, "testbeat")
 	if err != nil {
 		panic(err)
 	}
