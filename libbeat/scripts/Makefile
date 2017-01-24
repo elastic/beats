@@ -209,12 +209,12 @@ testsuite: clean update
 		fi \
 	fi
 
-	$(MAKE) benchmark-tests
-	$(MAKE) coverage-report
-
 	if [ $(TEST_ENVIRONMENT) = true ]; then \
 		$(MAKE) fix-permissions; \
 	fi
+
+	$(MAKE) benchmark-tests
+	$(MAKE) coverage-report
 
 # Generates a coverage report from the existing coverage files
 .PHONY: coverage-report
