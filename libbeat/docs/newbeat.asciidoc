@@ -142,7 +142,7 @@ Run python and specify the path to the Beat generator:
 
 [source,shell]
 --------------------
-python $GOPATH/src/github.com/elastic/beats/generate/beat.py
+python $GOPATH/src/github.com/elastic/beats/script/generate.py
 --------------------
 
 Python will prompt you to enter information about your Beat. For the `project_name`, enter `Countbeat`.

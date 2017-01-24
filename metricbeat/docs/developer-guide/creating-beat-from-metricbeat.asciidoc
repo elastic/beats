@@ -47,7 +47,7 @@ Run the command:
 
 [source,bash]
 ----
-python ${GOPATH}/src/github.com/elastic/beats/generate/metricbeat.py
+python ${GOPATH}/src/github.com/elastic/beats/script/generate.py --type=metricbeat
 ----
 
 When prompted, enter the Beat name and path.
