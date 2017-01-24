@@ -1,0 +1,230 @@
+{
+   "systemDiagnostics" : {
+      "aggregateSnapshot" : {
+         "maxHeap" : "1,024 MB",
+         "maxHeapBytes" : 1073741824,
+         "contentRepositoryStorageUsage" : [
+            {
+               "totalSpace" : "35.75 GB",
+               "usedSpaceBytes" : 14368333824,
+               "freeSpaceBytes" : 24022114304,
+               "usedSpace" : "13.38 GB",
+               "identifier" : "default",
+               "totalSpaceBytes" : 38390448128,
+               "utilization" : "37.0%",
+               "freeSpace" : "22.37 GB"
+            }
+         ],
+         "availableProcessors" : 6,
+         "maxNonHeap" : "-2 bytes",
+         "flowFileRepositoryStorageUsage" : {
+            "totalSpace" : "35.75 GB",
+            "usedSpaceBytes" : 14368333824,
+            "freeSpaceBytes" : 24022114304,
+            "utilization" : "37.0%",
+            "totalSpaceBytes" : 38390448128,
+            "freeSpace" : "22.37 GB",
+            "usedSpace" : "13.38 GB"
+         },
+         "processorLoadAverage" : 1.98,
+         "garbageCollection" : [
+            {
+               "collectionCount" : 0,
+               "collectionMillis" : 0,
+               "collectionTime" : "00:00:00.000",
+               "name" : "G1 Old Generation"
+            },
+            {
+               "collectionCount" : 266,
+               "collectionMillis" : 1775,
+               "collectionTime" : "00:00:01.775",
+               "name" : "G1 Young Generation"
+            }
+         ],
+         "usedNonHeap" : "196.76 MB",
+         "usedNonHeapBytes" : 206321024,
+         "freeNonHeapBytes" : 11111040,
+         "usedHeap" : "417 MB",
+         "freeHeap" : "607 MB",
+         "totalNonHeapBytes" : 217432064,
+         "nonHeapUtilization" : "-1.726116608E9%",
+         "totalHeapBytes" : 1073741824,
+         "totalHeap" : "1,024 MB",
+         "freeHeapBytes" : 636485648,
+         "totalNonHeap" : "207.36 MB",
+         "freeNonHeap" : "10.6 MB",
+         "maxNonHeapBytes" : -2,
+         "totalThreads" : 173,
+         "heapUtilization" : "41.0%",
+         "statsLastRefreshed" : "15:53:20 UTC",
+         "usedHeapBytes" : 437256176,
+         "daemonThreads" : 84,
+         "versionInfo" : {
+            "osArchitecture" : "amd64",
+            "buildBranch" : "NIFI-3203-rc1",
+            "osVersion" : "4.4.41-boot2docker",
+            "buildTimestamp" : "12/19/2016 20:56:10 UTC",
+            "buildRevision" : "986e716",
+            "javaVersion" : "1.8.0_111",
+            "javaVendor" : "Oracle Corporation",
+            "buildTag" : "nifi-1.1.1-RC1",
+            "niFiVersion" : "1.1.1",
+            "osName" : "Linux"
+         }
+      },
+      "nodeSnapshots" : [
+         {
+            "nodeId" : "b433584a-87aa-40b9-996c-de8072a215e5",
+            "apiPort" : 8080,
+            "snapshot" : {
+               "usedHeap" : "202 MB",
+               "freeNonHeapBytes" : 5322008,
+               "usedNonHeapBytes" : 103230184,
+               "usedNonHeap" : "98.45 MB",
+               "totalHeap" : "512 MB",
+               "totalHeapBytes" : 536870912,
+               "totalNonHeapBytes" : 108552192,
+               "freeHeap" : "310 MB",
+               "maxHeapBytes" : 536870912,
+               "maxHeap" : "512 MB",
+               "garbageCollection" : [
+                  {
+                     "name" : "G1 Old Generation",
+                     "collectionMillis" : 0,
+                     "collectionCount" : 0,
+                     "collectionTime" : "00:00:00.000"
+                  },
+                  {
+                     "name" : "G1 Young Generation",
+                     "collectionTime" : "00:00:00.836",
+                     "collectionMillis" : 836,
+                     "collectionCount" : 133
+                  }
+               ],
+               "flowFileRepositoryStorageUsage" : {
+                  "usedSpaceBytes" : 7184166912,
+                  "totalSpace" : "17.88 GB",
+                  "freeSpace" : "11.19 GB",
+                  "usedSpace" : "6.69 GB",
+                  "totalSpaceBytes" : 19195224064,
+                  "freeSpaceBytes" : 12011057152,
+                  "utilization" : "37.0%"
+               },
+               "processorLoadAverage" : 0.99,
+               "maxNonHeap" : "-1 bytes",
+               "contentRepositoryStorageUsage" : [
+                  {
+                     "usedSpace" : "6.69 GB",
+                     "freeSpaceBytes" : 12011057152,
+                     "usedSpaceBytes" : 7184166912,
+                     "totalSpace" : "17.88 GB",
+                     "freeSpace" : "11.19 GB",
+                     "totalSpaceBytes" : 19195224064,
+                     "utilization" : "37.0%",
+                     "identifier" : "default"
+                  }
+               ],
+               "availableProcessors" : 3,
+               "usedHeapBytes" : 211812336,
+               "daemonThreads" : 40,
+               "versionInfo" : {
+                  "buildBranch" : "NIFI-3203-rc1",
+                  "osVersion" : "4.4.41-boot2docker",
+                  "osArchitecture" : "amd64",
+                  "buildTimestamp" : "12/19/2016 20:56:10 UTC",
+                  "buildRevision" : "986e716",
+                  "niFiVersion" : "1.1.1",
+                  "osName" : "Linux",
+                  "javaVendor" : "Oracle Corporation",
+                  "javaVersion" : "1.8.0_111",
+                  "buildTag" : "nifi-1.1.1-RC1"
+               },
+               "freeHeapBytes" : 325058576,
+               "statsLastRefreshed" : "15:53:20 UTC",
+               "totalThreads" : 82,
+               "heapUtilization" : "39.0%",
+               "maxNonHeapBytes" : -1,
+               "totalNonHeap" : "103.52 MB",
+               "freeNonHeap" : "5.08 MB"
+            },
+            "address" : "node1.nifi"
+         },
+         {
+            "snapshot" : {
+               "freeHeapBytes" : 311427072,
+               "freeNonHeap" : "5.52 MB",
+               "totalNonHeap" : "103.84 MB",
+               "totalThreads" : 91,
+               "maxNonHeapBytes" : -1,
+               "heapUtilization" : "42.0%",
+               "statsLastRefreshed" : "15:53:20 UTC",
+               "usedHeapBytes" : 225443840,
+               "daemonThreads" : 44,
+               "versionInfo" : {
+                  "osArchitecture" : "amd64",
+                  "osVersion" : "4.4.41-boot2docker",
+                  "buildBranch" : "NIFI-3203-rc1",
+                  "buildTag" : "nifi-1.1.1-RC1",
+                  "javaVendor" : "Oracle Corporation",
+                  "javaVersion" : "1.8.0_111",
+                  "osName" : "Linux",
+                  "niFiVersion" : "1.1.1",
+                  "buildRevision" : "986e716",
+                  "buildTimestamp" : "12/19/2016 20:56:10 UTC"
+               },
+               "maxHeap" : "512 MB",
+               "maxHeapBytes" : 536870912,
+               "availableProcessors" : 3,
+               "contentRepositoryStorageUsage" : [
+                  {
+                     "totalSpace" : "17.88 GB",
+                     "usedSpaceBytes" : 7184166912,
+                     "freeSpaceBytes" : 12011057152,
+                     "usedSpace" : "6.69 GB",
+                     "identifier" : "default",
+                     "utilization" : "37.0%",
+                     "totalSpaceBytes" : 19195224064,
+                     "freeSpace" : "11.19 GB"
+                  }
+               ],
+               "maxNonHeap" : "-1 bytes",
+               "processorLoadAverage" : 0.99,
+               "flowFileRepositoryStorageUsage" : {
+                  "totalSpaceBytes" : 19195224064,
+                  "utilization" : "37.0%",
+                  "freeSpaceBytes" : 12011057152,
+                  "usedSpace" : "6.69 GB",
+                  "freeSpace" : "11.19 GB",
+                  "totalSpace" : "17.88 GB",
+                  "usedSpaceBytes" : 7184166912
+               },
+               "garbageCollection" : [
+                  {
+                     "name" : "G1 Old Generation",
+                     "collectionCount" : 0,
+                     "collectionMillis" : 0,
+                     "collectionTime" : "00:00:00.000"
+                  },
+                  {
+                     "name" : "G1 Young Generation",
+                     "collectionTime" : "00:00:00.939",
+                     "collectionMillis" : 939,
+                     "collectionCount" : 133
+                  }
+               ],
+               "usedNonHeapBytes" : 103090840,
+               "usedNonHeap" : "98.32 MB",
+               "freeNonHeapBytes" : 5789032,
+               "usedHeap" : "215 MB",
+               "totalNonHeapBytes" : 108879872,
+               "freeHeap" : "297 MB",
+               "totalHeapBytes" : 536870912,
+               "totalHeap" : "512 MB"
+            },
+            "nodeId" : "92ba726d-6c40-4426-bfb6-d5266700d4f5",
+            "apiPort" : 8080,
+            "address" : "node2.nifi"
+         }
+      ]
+   }
+}

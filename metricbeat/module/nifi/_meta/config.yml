@@ -1,0 +1,5 @@
+- module: nifi
+  metricsets: ["flowfilerepostorage", "heap"]
+  enabled: true
+  period: 1s
+  hosts: ["localhost:8080"]

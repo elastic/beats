@@ -1,0 +1,9 @@
+- name: heap
+  type: group
+  description: >
+    heap
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

@@ -2147,6 +2147,26 @@
             }
           }
         },
+        "nifi": {
+          "properties": {
+            "flowfilerepostorage": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "heap": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
         "postgresql": {
           "properties": {
             "activity": {

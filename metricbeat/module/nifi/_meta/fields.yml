@@ -1,0 +1,9 @@
+- key: nifi
+  title: "nifi"
+  description: >
+    nifi Module
+  fields:
+    - name: nifi
+      type: group
+      description: >
+      fields:
