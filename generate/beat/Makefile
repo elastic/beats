@@ -14,7 +14,7 @@ test: python-env
 
 	mkdir -p ${BEAT_PATH}
 	export GOPATH=${PWD}/build ; \
-	. ${PYTHON_ENV}/bin/activate && python ${PWD}/build/src/github.com/elastic/beats/generate/beat.py --project_name=Testbeat --github_name=ruflin --beat_path=beatpath --full_name="Nicolas Ruflin"
+	. ${PYTHON_ENV}/bin/activate && python ${PWD}/build/src/github.com/elastic/beats/generate/beat.py --project_name=Testbeat --github_name=ruflin --beat_path=beatpath/testbeat --full_name="Nicolas Ruflin"
 
 	. ${PYTHON_ENV}/bin/activate; \
 	export GOPATH=${PWD}/build ; \

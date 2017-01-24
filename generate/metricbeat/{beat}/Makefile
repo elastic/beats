@@ -1,5 +1,5 @@
-BEAT_NAME={{cookiecutter.beat}}
-BEAT_PATH={{cookiecutter.beat_path}}/{{cookiecutter.beat}}
+BEAT_NAME={beat}
+BEAT_PATH={beat_path}
 BEAT_URL=https://${BEAT_PATH}
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false

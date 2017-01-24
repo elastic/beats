@@ -74,7 +74,7 @@ matrix:
 
     # Generators
     - os: linux
-      env: TARGETS="-C generate/metricbeat/metricset test"
+      env: TARGETS="-C generate/metricbeat test"
       go: *go_version
     - os: linux
       env: TARGETS="-C generate/beat test"
