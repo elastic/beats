@@ -1,4 +1,4 @@
-package {{ cookiecutter.module }}
+package {protocol}
 
 import (
 	"time"
@@ -11,8 +11,8 @@ import (
 	"github.com/elastic/beats/packetbeat/publish"
 )
 
-// {{ cookiecutter.plugin_type }} application level protocol analyzer plugin
-type {{ cookiecutter.plugin_type }} struct {
+// {plugin_type} application level protocol analyzer plugin
+type {plugin_type} struct {
 	ports        protos.PortsConfig
 	parserConfig parserConfig
 	transConfig  transactionConfig
@@ -31,7 +31,7 @@ type stream struct {
 }
 
 var (
-	debugf = logp.MakeDebug("{{ cookiecutter.module }}")
+	debugf = logp.MakeDebug("{protocol}")
 
 	// use isDebug/isDetailed to guard debugf/detailedf to minimize allocations
 	// (garbage collection) when debug log is disabled.
@@ -39,16 +39,16 @@ var (
 )
 
 func init() {
-	protos.Register("{{ cookiecutter.module }}", New)
+	protos.Register("{protocol}", New)
 }
 
-// New create and initializes a new {{ cookiecutter.protocol }} protocol analyzer instance.
+// New create and initializes a new {protocol} protocol analyzer instance.
 func New(
 	testMode bool,
 	results publish.Transactions,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
-	p := &{{ cookiecutter.plugin_type }}{}
+	p := &{plugin_type}{}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -62,33 +62,33 @@ func New(
 	return p, nil
 }
 
-func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) init(results publish.Transactions, config *{{ cookiecutter.module }}Config) error {
-	if err := {{ cookiecutter.plugin_var }}.setFromConfig(config); err != nil {
+func ({plugin_var} *{plugin_type}) init(results publish.Transactions, config *{protocol}Config) error {
+	if err := {plugin_var}.setFromConfig(config); err != nil {
 		return err
 	}
-	{{ cookiecutter.plugin_var }}.pub.results = results
+	{plugin_var}.pub.results = results
 
 	isDebug = logp.IsDebug("http")
 	return nil
 }
 
-func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) setFromConfig(config *{{ cookiecutter.module }}Config) error {
+func ({plugin_var} *{plugin_type}) setFromConfig(config *{protocol}Config) error {
 
 	// set module configuration
-	if err := {{ cookiecutter.plugin_var }}.ports.Set(config.Ports); err != nil {
+	if err := {plugin_var}.ports.Set(config.Ports); err != nil {
 		return err
 	}
 
 	// set parser configuration
-	parser := &{{ cookiecutter.plugin_var }}.parserConfig
+	parser := &{plugin_var}.parserConfig
 	parser.maxBytes = tcp.TCPMaxDataInStream
 
 	// set transaction correlator configuration
-	trans := &{{ cookiecutter.plugin_var }}.transConfig
+	trans := &{plugin_var}.transConfig
 	trans.transactionTimeout = config.TransactionTimeout
 
 	// set transaction publisher configuration
-	pub := &{{ cookiecutter.plugin_var }}.pub
+	pub := &{plugin_var}.pub
 	pub.sendRequest = config.SendRequest
 	pub.sendResponse = config.SendResponse
 
@@ -97,29 +97,29 @@ func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) setFromConf
 
 // ConnectionTimeout returns the per stream connection timeout.
 // Return <=0 to set default tcp module transaction timeout.
-func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) ConnectionTimeout() time.Duration {
-	return {{ cookiecutter.plugin_var }}.transConfig.transactionTimeout
+func ({plugin_var} *{plugin_type}) ConnectionTimeout() time.Duration {
+	return {plugin_var}.transConfig.transactionTimeout
 }
 
 // GetPorts returns the ports numbers packets shall be processed for.
-func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) GetPorts() []int {
-	return {{ cookiecutter.plugin_var }}.ports.Ports
+func ({plugin_var} *{plugin_type}) GetPorts() []int {
+	return {plugin_var}.ports.Ports
 }
 
 // Parse processes a TCP packet. Return nil if connection
 // state shall be dropped (e.g. parser not in sync with tcp stream)
-func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) Parse(
+func ({plugin_var} *{plugin_type}) Parse(
 	pkt *protos.Packet,
 	tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("Parse {{ cookiecutter.plugin_type }} exception")
+	defer logp.Recover("Parse {plugin_type} exception")
 
-	conn := {{ cookiecutter.plugin_var }}.ensureConnection(private)
+	conn := {plugin_var}.ensureConnection(private)
 	st := conn.streams[dir]
 	if st == nil {
 		st = &stream{}
-		st.parser.init(&{{ cookiecutter.plugin_var }}.parserConfig, func(msg *message) error {
+		st.parser.init(&{plugin_var}.parserConfig, func(msg *message) error {
 			return conn.trans.onMessage(tcptuple.IPPort(), dir, msg)
 		})
 		conn.streams[dir] = st
@@ -127,14 +127,14 @@ func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) Parse(
 
 	if err := st.parser.feed(pkt.Ts, pkt.Payload); err != nil {
 		debugf("%v, dropping TCP stream for error in direction %v.", err, dir)
-		{{ cookiecutter.plugin_var }}.onDropConnection(conn)
+		{plugin_var}.onDropConnection(conn)
 		return nil
 	}
 	return conn
 }
 
 // ReceivedFin handles TCP-FIN packet.
-func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) ReceivedFin(
+func ({plugin_var} *{plugin_type}) ReceivedFin(
 	tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
@@ -142,13 +142,13 @@ func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) ReceivedFin
 }
 
 // GapInStream handles lost packets in tcp-stream.
-func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) GapInStream(tcptuple *common.TCPTuple, dir uint8,
+func ({plugin_var} *{plugin_type}) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int,
 	private protos.ProtocolData,
 ) (protos.ProtocolData, bool) {
 	conn := getConnection(private)
 	if conn != nil {
-		{{ cookiecutter.plugin_var }}.onDropConnection(conn)
+		{plugin_var}.onDropConnection(conn)
 	}
 
 	return nil, true
@@ -156,14 +156,14 @@ func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) GapInStream
 
 // onDropConnection processes and optionally sends incomplete
 // transaction in case of connection being dropped due to error
-func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) onDropConnection(conn *connection) {
+func ({plugin_var} *{plugin_type}) onDropConnection(conn *connection) {
 }
 
-func ({{ cookiecutter.plugin_var }} *{{ cookiecutter.plugin_type }}) ensureConnection(private protos.ProtocolData) *connection {
+func ({plugin_var} *{plugin_type}) ensureConnection(private protos.ProtocolData) *connection {
 	conn := getConnection(private)
 	if conn == nil {
 		conn = &connection{}
-		conn.trans.init(&{{ cookiecutter.plugin_var }}.transConfig, {{ cookiecutter.plugin_var }}.pub.onTransaction)
+		conn.trans.init(&{plugin_var}.transConfig, {plugin_var}.pub.onTransaction)
 	}
 	return conn
 }
@@ -180,11 +180,11 @@ func getConnection(private protos.ProtocolData) *connection {
 
 	priv, ok := private.(*connection)
 	if !ok {
-		logp.Warn("{{ cookiecutter.module }} connection type error")
+		logp.Warn("{protocol} connection type error")
 		return nil
 	}
 	if priv == nil {
-		logp.Warn("Unexpected: {{ cookiecutter.module }} connection data not set")
+		logp.Warn("Unexpected: {protocol} connection data not set")
 		return nil
 	}
 	return priv
