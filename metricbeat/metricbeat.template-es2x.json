@@ -2197,12 +2197,8 @@
                     }
                   }
                 },
-                "requests": {
-                  "properties": {
-                    "slow": {
-                      "type": "long"
-                    }
-                  }
+                "slow_requests": {
+                  "type": "long"
                 }
               }
             }

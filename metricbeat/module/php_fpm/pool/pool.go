@@ -60,11 +60,15 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	return common.MapStr{
 		"hostname": m.Host(),
 
-		"pool":                 stats.Pool,
-		"connections.queued":   stats.ListenQueue,
-		"connections.accepted": stats.AcceptedConn,
-		"processes.idle":       stats.IdleProcesses,
-		"processes.active":     stats.ActiveProcesses,
-		"requests.slow":        stats.SlowRequests,
+		"pool": stats.Pool,
+		"connections": common.MapStr{
+			"queue":    stats.ListenQueue,
+			"accepted": stats.AcceptedConn,
+		},
+		"processes": common.MapStr{
+			"idle":   stats.IdleProcesses,
+			"active": stats.ActiveProcesses,
+		},
+		"slow_requests": stats.SlowRequests,
 	}, nil
 }
