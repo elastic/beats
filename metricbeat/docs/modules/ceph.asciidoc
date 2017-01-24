@@ -1,0 +1,36 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-ceph]]
+== ceph Module
+
+This is the ceph Module. Metrics are collected submitting HTTP GET requests to ceph-rest-api.
+Reference: http://docs.ceph.com/docs/master/man/8/ceph-rest-api/
+
+
+[float]
+=== Example Configuration
+
+The ceph module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+#- module: ceph
+#  metricsets: ["health"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost:5000"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-ceph-health,health>>
+
+include::ceph/health.asciidoc[]
+

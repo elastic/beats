@@ -1,0 +1,28 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "ceph": {
+        "health": {
+            "cluster": {
+                "overall_stats": "HEALTH_OK",
+                "timechecks": {
+                    "epoch": 3,
+                    "round": {
+                        "status": "finished",
+                        "value": 0
+                    }
+                }
+            }
+        }
+    },
+    "metricset": {
+        "host": "172.17.0.1:5000",
+        "module": "ceph",
+        "name": "health",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

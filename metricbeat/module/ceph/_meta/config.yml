@@ -1,0 +1,5 @@
+#- module: ceph
+#  metricsets: ["health"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost:5000"]
