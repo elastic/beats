@@ -10,6 +10,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-mongodb,MongoDB>>
   * <<metricbeat-module-mysql,MySQL>>
   * <<metricbeat-module-nginx,Nginx>>
+  * <<metricbeat-module-php_fpm,php_fpm>>
   * <<metricbeat-module-postgresql,PostgreSQL>>
   * <<metricbeat-module-prometheus,Prometheus>>
   * <<metricbeat-module-redis,Redis>>
@@ -27,6 +28,7 @@ include::modules/kafka.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nginx.asciidoc[]
+include::modules/php_fpm.asciidoc[]
 include::modules/postgresql.asciidoc[]
 include::modules/prometheus.asciidoc[]
 include::modules/redis.asciidoc[]

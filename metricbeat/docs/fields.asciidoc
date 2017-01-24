@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
+* <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-prometheus>>
 * <<exported-fields-redis>>
@@ -3800,6 +3801,90 @@ The current number of connections where Nginx is writing the response back to th
 type: long
 
 The current number of idle client connections waiting for a request.
+
+
+[[exported-fields-php_fpm]]
+== php_fpm Fields
+
+PHP-FPM server status metrics collected from PHP-FPM.
+experimental[]
+
+
+
+[float]
+== php_fpm Fields
+
+`php_fpm` contains the metrics that were obtained from PHP-FPM status page call.
+
+
+
+[float]
+== pool Fields
+
+`pool` contains the metrics that were obtained from the PHP-FPM process pool.
+
+
+
+[float]
+=== php_fpm.pool.pool
+
+type: keyword
+
+The name of the pool.
+
+
+[float]
+== connections Fields
+
+Connection state specific statistics.
+
+
+
+[float]
+=== php_fpm.pool.connections.accepted
+
+type: long
+
+The number of incoming requests that the PHP-FPM server has accepted; when a connection is accepted it is removed from the listen queue.
+
+
+[float]
+=== php_fpm.pool.connections.queued
+
+type: long
+
+The current number of connections that have been initiated, but not yet accepted. If this value is non-zero it typically means that all the available server processes are currently busy, and there are no processes available to serve the next request. Raising `pm.max_children` (provided the server can handle it) should help keep this number low. This property follows from the fact that PHP-FPM listens via a socket (TCP or file based), and thus inherits some of the characteristics of sockets.
+
+
+[float]
+== processes Fields
+
+Process state specific statistics.
+
+
+
+[float]
+=== php_fpm.pool.processes.idle
+
+type: long
+
+The number of servers in the `waiting to process` state (i.e. not currently serving a page). This value should fall between the `pm.min_spare_servers` and `pm.max_spare_servers` values when the process manager is `dynamic`.
+
+
+[float]
+=== php_fpm.pool.processes.active
+
+type: long
+
+The number of servers current processing a page - the minimum is `1` (so even on a fully idle server, the result will be not read `0`).
+
+
+[float]
+=== php_fpm.pool.slow_requests
+
+type: long
+
+The number of times a request execution time has exceeded `request_slowlog_timeout`.
 
 
 [[exported-fields-postgresql]]
