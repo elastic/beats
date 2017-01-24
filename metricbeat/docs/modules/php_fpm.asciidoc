@@ -57,9 +57,5 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-php_fpm-pool,pool>>
 
-* <<metricbeat-metricset-php_fpm-proc,proc>>
-
 include::php_fpm/pool.asciidoc[]
-
-include::php_fpm/proc.asciidoc[]
 
