@@ -58,7 +58,9 @@ func (p *syncLogPublisher) Publish() error {
 	case events = <-p.in:
 	}
 
-	ok := p.client.PublishEvents(getDataEvents(events), publisher.Sync, publisher.Guaranteed)
+	dataEvents, meta := getDataEvents(events)
+	ok := p.client.PublishEvents(dataEvents, publisher.Sync, publisher.Guaranteed,
+		publisher.MetadataBatch(meta))
 	if !ok {
 		// PublishEvents will only returns false, if p.client has been closed.
 		return sigPublisherStop

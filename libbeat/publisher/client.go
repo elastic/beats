@@ -238,5 +238,5 @@ func MakeContext(opts []ClientOption) ([]common.MapStr, Context) {
 			}
 		}
 	}
-	return nil, ctx
+	return meta, ctx
 }

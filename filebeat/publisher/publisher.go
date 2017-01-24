@@ -45,12 +45,15 @@ var (
 )
 
 // getDataEvents returns all events which contain data (not only state updates)
-func getDataEvents(events []*input.Event) []common.MapStr {
-	dataEvents := make([]common.MapStr, 0, len(events))
+// together with their associated metadata
+func getDataEvents(events []*input.Event) (dataEvents []common.MapStr, meta []common.MapStr) {
+	dataEvents = make([]common.MapStr, 0, len(events))
+	meta = make([]common.MapStr, 0, len(events))
 	for _, event := range events {
 		if event.HasData() {
 			dataEvents = append(dataEvents, event.ToMapStr())
+			meta = append(meta, event.Metadata())
 		}
 	}
-	return dataEvents
+	return dataEvents, meta
 }
