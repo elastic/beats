@@ -63,7 +63,6 @@ func FetchStats(client *docker.Client) ([]Stat, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	var wg sync.WaitGroup
 
 	containersList := []Stat{}
