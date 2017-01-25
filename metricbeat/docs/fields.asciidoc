@@ -1331,6 +1331,68 @@ Number of reads and writes combined.
 
 
 [float]
+== healthcheck Fields
+
+Docker container metrics.
+
+
+
+[float]
+=== docker.healthcheck.failingstreak
+
+type: integer
+
+concurent failed check
+
+
+[float]
+=== docker.healthcheck.status
+
+type: keyword
+
+Healthcheck status code
+
+
+[float]
+== event Fields
+
+event fields.
+
+
+
+[float]
+=== docker.healthcheck.event.end_date
+
+type: date
+
+Healthcheck end date
+
+
+[float]
+=== docker.healthcheck.event.start_date
+
+type: date
+
+Healthcheck start date
+
+
+[float]
+=== docker.healthcheck.event.output
+
+type: keyword
+
+Healthcheck output
+
+
+[float]
+=== docker.healthcheck.event.exit_code
+
+type: integer
+
+Healthcheck status code
+
+
+[float]
 == info Fields
 
 experimental[]
