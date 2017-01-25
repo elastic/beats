@@ -22,7 +22,7 @@ type snapshot struct {
 	strings map[string]string
 }
 
-// logExpvars logs at Info level the integer expvars that have changed in the
+// logMetrics logs at Info level the integer expvars that have changed in the
 // last interval. For each expvar, the delta from the beginning of the interval
 // is logged.
 func logMetrics(metricsCfg *LoggingMetricsConfig) {
@@ -53,6 +53,7 @@ func logMetrics(metricsCfg *LoggingMetricsConfig) {
 	}
 }
 
+// LogTotalExpvars logs all registered expvar metrics.
 func LogTotalExpvars(cfg *Logging) {
 	if cfg.Metrics.Enabled != nil && *cfg.Metrics.Enabled == false {
 		return
