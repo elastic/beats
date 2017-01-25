@@ -92,7 +92,7 @@ check:  ## @build Checks project and source code if everything is according to s
 
 .PHONY: fmt
 fmt: ## @build Runs gofmt -w on the project's source code, modifying any files that do not match its style.
-	gofmt -l -w ${GOFILES_NOVENDOR}
+	gofmt -s -l -w ${GOFILES_NOVENDOR}
 
 .PHONY: simplify
 simplify: ## @build Runs gofmt -s -w on the project's source code, modifying any files that do not match its style.

@@ -78,46 +78,46 @@ var initStateTests = []struct {
 }{
 	{
 		[]file.State{
-			file.State{Source: "test"},
+			{Source: "test"},
 		},
 		[]string{"test"},
 		1,
 	},
 	{
 		[]file.State{
-			file.State{Source: "notest"},
+			{Source: "notest"},
 		},
 		[]string{"test"},
 		0,
 	},
 	{
 		[]file.State{
-			file.State{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
-			file.State{Source: "test2.log", FileStateOS: file.StateOS{Inode: 2}},
+			{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
+			{Source: "test2.log", FileStateOS: file.StateOS{Inode: 2}},
 		},
 		[]string{"*.log"},
 		2,
 	},
 	{
 		[]file.State{
-			file.State{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
-			file.State{Source: "test2.log", FileStateOS: file.StateOS{Inode: 2}},
+			{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
+			{Source: "test2.log", FileStateOS: file.StateOS{Inode: 2}},
 		},
 		[]string{"test1.log"},
 		1,
 	},
 	{
 		[]file.State{
-			file.State{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
-			file.State{Source: "test2.log", FileStateOS: file.StateOS{Inode: 2}},
+			{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
+			{Source: "test2.log", FileStateOS: file.StateOS{Inode: 2}},
 		},
 		[]string{"test.log"},
 		0,
 	},
 	{
 		[]file.State{
-			file.State{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
-			file.State{Source: "test2.log", FileStateOS: file.StateOS{Inode: 1}},
+			{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
+			{Source: "test2.log", FileStateOS: file.StateOS{Inode: 1}},
 		},
 		[]string{"*.log"},
 		1, // Expecting only 1 state because of some inode (this is only a theoretical case)
