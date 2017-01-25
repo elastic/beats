@@ -42,7 +42,7 @@ func TestSetupNginx(t *testing.T) {
 	assert.NoError(t, err)
 
 	configs := []ModuleConfig{
-		ModuleConfig{Module: "nginx"},
+		{Module: "nginx"},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil)
