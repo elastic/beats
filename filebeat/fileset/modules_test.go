@@ -24,9 +24,9 @@ func TestNewModuleRegistry(t *testing.T) {
 	assert.NoError(t, err)
 
 	configs := []ModuleConfig{
-		ModuleConfig{Module: "nginx"},
-		ModuleConfig{Module: "mysql"},
-		ModuleConfig{Module: "syslog"},
+		{Module: "nginx"},
+		{Module: "mysql"},
+		{Module: "syslog"},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil)
@@ -34,9 +34,9 @@ func TestNewModuleRegistry(t *testing.T) {
 	assert.NotNil(t, reg)
 
 	expectedModules := map[string][]string{
-		"nginx":  []string{"access", "error"},
-		"mysql":  []string{"slowlog", "error"},
-		"syslog": []string{"system"},
+		"nginx":  {"access", "error"},
+		"mysql":  {"slowlog", "error"},
+		"syslog": {"system"},
 	}
 
 	assert.Equal(t, len(expectedModules), len(reg.registry))
@@ -69,12 +69,12 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 		{
 			Module: "nginx",
 			Filesets: map[string]*FilesetConfig{
-				"access": &FilesetConfig{
+				"access": {
 					Var: map[string]interface{}{
 						"paths": []interface{}{"/hello/test"},
 					},
 				},
-				"error": &FilesetConfig{
+				"error": {
 					Enabled: &falseVar,
 				},
 			},
@@ -207,7 +207,7 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 				{
 					Module: "moduleB",
 					Filesets: map[string]*FilesetConfig{
-						"fileset": &FilesetConfig{
+						"fileset": {
 							Var: map[string]interface{}{
 								"paths": "test",
 							},
@@ -220,7 +220,7 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 				{
 					Module: "moduleB",
 					Filesets: map[string]*FilesetConfig{
-						"fileset": &FilesetConfig{
+						"fileset": {
 							Var: map[string]interface{}{
 								"paths": "test",
 							},
@@ -238,7 +238,7 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 					Module:  "moduleB",
 					Enabled: &falseVar,
 					Filesets: map[string]*FilesetConfig{
-						"fileset": &FilesetConfig{
+						"fileset": {
 							Var: map[string]interface{}{
 								"paths": "test",
 							},
@@ -252,7 +252,7 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 					Module:  "moduleB",
 					Enabled: &falseVar,
 					Filesets: map[string]*FilesetConfig{
-						"fileset": &FilesetConfig{
+						"fileset": {
 							Var: map[string]interface{}{
 								"paths": "test",
 							},
@@ -289,7 +289,7 @@ func TestMcfgFromConfig(t *testing.T) {
 			expected: ModuleConfig{
 				Module: "nginx",
 				Filesets: map[string]*FilesetConfig{
-					"error": &FilesetConfig{
+					"error": {
 						Enabled: &falseVar,
 					},
 				},
@@ -304,7 +304,7 @@ func TestMcfgFromConfig(t *testing.T) {
 			expected: ModuleConfig{
 				Module: "nginx",
 				Filesets: map[string]*FilesetConfig{
-					"access": &FilesetConfig{
+					"access": {
 						Var: map[string]interface{}{
 							"test": false,
 						},
