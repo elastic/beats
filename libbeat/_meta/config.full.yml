@@ -112,6 +112,10 @@ output.elasticsearch:
   # Optional HTTP Path
   #path: "/elasticsearch"
 
+  # Custom HTTP headers to add to each request
+  #headers:
+  #  X-My-Header: Contents of the header
+
   # Proxy server url
   #proxy_url: http://proxy:3128
 
