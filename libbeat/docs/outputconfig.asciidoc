@@ -135,6 +135,20 @@ An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
 the cases where Elasticsearch listens behind an HTTP reverse proxy that exports
 the API under a custom prefix.
 
+===== headers
+
+Custom HTTP headers to add to each request created by the Elasticsearch output.
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.elasticsearch.headers:
+  X-My-Header: Header contents
+------------------------------------------------------------------------------
+
+It is generally possible to specify multiple header values for the same header
+name by separating them with a comma.
+
 ===== proxy_url
 
 The URL of the proxy to use when connecting to the Elasticsearch servers. The

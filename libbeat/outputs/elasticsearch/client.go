@@ -46,6 +46,7 @@ type ClientSettings struct {
 	TLS                *transport.TLSConfig
 	Username, Password string
 	Parameters         map[string]string
+	Headers            map[string]string
 	Index              outil.Selector
 	Pipeline           *outil.Selector
 	Timeout            time.Duration
@@ -58,6 +59,7 @@ type Connection struct {
 	URL      string
 	Username string
 	Password string
+	Headers  map[string]string
 
 	http              *http.Client
 	onConnectCallback func() error
@@ -160,6 +162,7 @@ func NewClient(
 			URL:      s.URL,
 			Username: s.Username,
 			Password: s.Password,
+			Headers:  s.Headers,
 			http: &http.Client{
 				Transport: &http.Transport{
 					Dial:    dialer.Dial,
@@ -208,6 +211,7 @@ func (client *Client) Clone() *Client {
 			Username:         client.Username,
 			Password:         client.Password,
 			Parameters:       nil, // XXX: do not pass params?
+			Headers:          client.Headers,
 			Timeout:          client.http.Timeout,
 			CompressionLevel: client.compressionLevel,
 		},
@@ -698,6 +702,10 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	req.Header.Add("Accept", "application/json")
 	if conn.Username != "" || conn.Password != "" {
 		req.SetBasicAuth(conn.Username, conn.Password)
+	}
+
+	for name, value := range conn.Headers {
+		req.Header.Add(name, value)
 	}
 
 	resp, err := conn.http.Do(req)
