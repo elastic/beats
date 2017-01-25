@@ -4046,7 +4046,7 @@ experimental[]
 
 
 [float]
-=== php_fpm.pool.pool
+=== php_fpm.pool.name
 
 type: keyword
 
