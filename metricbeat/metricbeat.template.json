@@ -778,6 +778,34 @@
                 }
               }
             },
+            "healthcheck": {
+              "properties": {
+                "event": {
+                  "properties": {
+                    "end_date": {
+                      "type": "date"
+                    },
+                    "exit_code": {
+                      "type": "long"
+                    },
+                    "output": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "start_date": {
+                      "type": "date"
+                    }
+                  }
+                },
+                "failingstreak": {
+                  "type": "long"
+                },
+                "status": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
             "info": {
               "properties": {
                 "containers": {
