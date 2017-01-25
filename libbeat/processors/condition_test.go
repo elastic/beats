@@ -236,6 +236,61 @@ func TestRegexpCondition(t *testing.T) {
 	assert.False(t, conds[2].Check(event1))
 }
 
+func TestMatchCondition(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+
+	configs := []ConditionConfig{
+		{
+			Match: &ConditionFields{fields: map[string]interface{}{
+				"source": "apache2/error.*",
+			}},
+		},
+
+		{
+			Match: &ConditionFields{fields: map[string]interface{}{
+				"source": "apache2/access.*",
+			}},
+		},
+
+		{
+			Match: &ConditionFields{fields: map[string]interface{}{
+				"source":  "apache2/error.*",
+				"message": "[client 1.2.3.4]",
+			}},
+		},
+	}
+
+	conds := GetConditions(t, configs)
+
+	event := common.MapStr{
+		"@timestamp": "2016-04-14T20:41:06.258Z",
+		"message":    `[Fri Dec 16 01:46:23 2005] [error] [client 1.2.3.4] Directory index forbidden by rule: /home/test/`,
+		"source":     "/var/log/apache2/error.log",
+		"type":       "log",
+		"input_type": "log",
+		"offset":     30,
+	}
+
+	event1 := common.MapStr{
+		"@timestamp": "2016-04-14T20:41:06.258Z",
+		"message":    `127.0.0.1 - - [28/Jul/2006:10:27:32 -0300] "GET /hidden/ HTTP/1.0" 404 7218`,
+		"source":     "/var/log/apache2/access.log",
+		"type":       "log",
+		"input_type": "log",
+		"offset":     30,
+	}
+
+	assert.True(t, conds[0].Check(event))
+	assert.False(t, conds[1].Check(event))
+	assert.True(t, conds[2].Check(event))
+
+	assert.True(t, conds[1].Check(event1))
+	assert.False(t, conds[2].Check(event1))
+}
+
 func TestRangeCondition(t *testing.T) {
 
 	if testing.Verbose() {
