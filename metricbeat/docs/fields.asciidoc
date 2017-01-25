@@ -14,7 +14,6 @@ grouped in the following categories:
 
 * <<exported-fields-apache>>
 * <<exported-fields-beat>>
-* <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-couchbase>>
@@ -24,7 +23,6 @@ grouped in the following categories:
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
-* <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-prometheus>>
 * <<exported-fields-redis>>
@@ -411,163 +409,6 @@ Arbitrary tags that can be set per Beat and per transaction type.
 type: dict
 
 Contains user configurable fields.
-
-
-[[exported-fields-ceph]]
-== ceph Fields
-
-experimental[] ceph Module
-
-
-
-[float]
-== ceph Fields
-
-`ceph` contains the metrics that were scraped from CEPH.
-
-
-
-[float]
-== health Fields
-
-health
-
-
-
-[float]
-=== ceph.health.cluster.overall_status
-
-type: keyword
-
-Overall status of the cluster
-
-
-[float]
-=== ceph.health.cluster.timechecks.epoch
-
-type: long
-
-Map version
-
-
-[float]
-=== ceph.health.cluster.timechecks.round.value
-
-type: long
-
-timecheck round
-
-
-[float]
-=== ceph.health.cluster.timechecks.round.status
-
-type: keyword
-
-Status of the round
-
-
-[float]
-=== ceph.health.mon.available.pct
-
-type: long
-
-Available percent of the MON
-
-
-[float]
-=== ceph.health.mon.health
-
-type: keyword
-
-Health of the MON
-
-
-[float]
-=== ceph.health.mon.available.kb
-
-type: long
-
-Available KB of the MON
-
-
-[float]
-=== ceph.health.mon.total.kb
-
-type: long
-
-Total KB of the MON
-
-
-[float]
-=== ceph.health.mon.used.kb
-
-type: long
-
-Used KB of the MON
-
-
-[float]
-=== ceph.health.mon.last_updated
-
-type: date
-
-Time when was updated
-
-
-[float]
-=== ceph.health.mon.name
-
-type: keyword
-
-Name of the MON
-
-
-[float]
-=== ceph.health.mon.store_stats.log.bytes
-
-type: long
-
-format: bytes
-
-Log bytes of MON
-
-
-[float]
-=== ceph.health.mon.store_stats.misc.bytes
-
-type: long
-
-format: bytes
-
-Misc bytes of MON
-
-
-[float]
-=== ceph.health.mon.store_stats.sst.bytes
-
-type: long
-
-format: bytes
-
-SST bytes of MON
-
-
-[float]
-=== ceph.health.mon.store_stats.total.bytes
-
-type: long
-
-format: bytes
-
-Total bytes of MON
-
-
-[float]
-=== ceph.health.mon.store_stats.last_updated
-
-type: long
-
-Last updated
 
 
 [[exported-fields-cloud]]
@@ -1331,65 +1172,18 @@ Number of reads and writes combined.
 
 
 [float]
-== healthcheck Fields
+== image Fields
 
-Docker container metrics.
+image
 
-
-
-[float]
-=== docker.healthcheck.failingstreak
-
-type: integer
-
-concurent failed check
 
 
 [float]
-=== docker.healthcheck.status
+=== docker.image.example
 
 type: keyword
 
-Healthcheck status code
-
-
-[float]
-== event Fields
-
-event fields.
-
-
-
-[float]
-=== docker.healthcheck.event.end_date
-
-type: date
-
-Healthcheck end date
-
-
-[float]
-=== docker.healthcheck.event.start_date
-
-type: date
-
-Healthcheck start date
-
-
-[float]
-=== docker.healthcheck.event.output
-
-type: keyword
-
-Healthcheck output
-
-
-[float]
-=== docker.healthcheck.event.exit_code
-
-type: integer
-
-Healthcheck status code
+Example field
 
 
 [float]
@@ -4021,90 +3815,6 @@ The current number of connections where Nginx is writing the response back to th
 type: long
 
 The current number of idle client connections waiting for a request.
-
-
-[[exported-fields-php_fpm]]
-== php_fpm Fields
-
-PHP-FPM server status metrics collected from PHP-FPM.
-experimental[]
-
-
-
-[float]
-== php_fpm Fields
-
-`php_fpm` contains the metrics that were obtained from PHP-FPM status page call.
-
-
-
-[float]
-== pool Fields
-
-`pool` contains the metrics that were obtained from the PHP-FPM process pool.
-
-
-
-[float]
-=== php_fpm.pool.pool
-
-type: keyword
-
-The name of the pool.
-
-
-[float]
-== connections Fields
-
-Connection state specific statistics.
-
-
-
-[float]
-=== php_fpm.pool.connections.accepted
-
-type: long
-
-The number of incoming requests that the PHP-FPM server has accepted; when a connection is accepted it is removed from the listen queue.
-
-
-[float]
-=== php_fpm.pool.connections.queued
-
-type: long
-
-The current number of connections that have been initiated, but not yet accepted. If this value is non-zero it typically means that all the available server processes are currently busy, and there are no processes available to serve the next request. Raising `pm.max_children` (provided the server can handle it) should help keep this number low. This property follows from the fact that PHP-FPM listens via a socket (TCP or file based), and thus inherits some of the characteristics of sockets.
-
-
-[float]
-== processes Fields
-
-Process state specific statistics.
-
-
-
-[float]
-=== php_fpm.pool.processes.idle
-
-type: long
-
-The number of servers in the `waiting to process` state (i.e. not currently serving a page). This value should fall between the `pm.min_spare_servers` and `pm.max_spare_servers` values when the process manager is `dynamic`.
-
-
-[float]
-=== php_fpm.pool.processes.active
-
-type: long
-
-The number of servers current processing a page - the minimum is `1` (so even on a fully idle server, the result will be not read `0`).
-
-
-[float]
-=== php_fpm.pool.slow_requests
-
-type: long
-
-The number of times a request execution time has exceeded `request_slowlog_timeout`.
 
 
 [[exported-fields-postgresql]]
