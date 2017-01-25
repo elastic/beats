@@ -44,6 +44,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-docker-diskio,diskio>>
 
+* <<metricbeat-metricset-docker-image,image>>
+
 * <<metricbeat-metricset-docker-info,info>>
 
 * <<metricbeat-metricset-docker-memory,memory>>
@@ -55,6 +57,8 @@ include::docker/container.asciidoc[]
 include::docker/cpu.asciidoc[]
 
 include::docker/diskio.asciidoc[]
+
+include::docker/image.asciidoc[]
 
 include::docker/info.asciidoc[]
 

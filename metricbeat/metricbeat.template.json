@@ -670,6 +670,14 @@
                 }
               }
             },
+            "image": {
+              "properties": {
+                "example": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
             "info": {
               "properties": {
                 "containers": {
