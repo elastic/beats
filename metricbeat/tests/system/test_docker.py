@@ -165,6 +165,32 @@ class Test(metricbeat.BaseTest):
         evt = self.remove_labels(evt)
         self.assert_fields_are_documented(evt)
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_health_fields(self):
+        """
+        test health fields
+        """
+        self.render_config_template(modules=[{
+            "name": "docker",
+            "metricsets": ["healthcheck"],
+            "hosts": ["unix:///var/run/docker.sock"],
+            "period": "1s",
+        }])
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        proc.check_kill_and_wait()
+
+        # Ensure no errors or warnings exist in the log.
+        log = self.get_log()
+        self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
+
+        output = self.read_output_json()
+        evt = output[0]
+
+        evt = self.remove_labels(evt)
+        self.assert_fields_are_documented(evt)
+
     def remove_labels(self, evt):
 
         if 'labels' in evt["docker"]["container"]:

@@ -1,52 +1,64 @@
 package healthcheck
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"strings"
 
 	dc "github.com/fsouza/go-dockerclient"
-	"strings"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
-func eventsMapping(containersList []dc.APIContainers, m *MetricSet) []common.MapStr {
-	myEvents := []common.MapStr{}
-	for _, container := range containersList {
-		returnevent := eventMapping(&container, m)
-		// Compare event to empty event
-		if returnevent != nil {
-			myEvents = append(myEvents, returnevent)
+func eventsMapping(containers []dc.APIContainers, m *MetricSet) []common.MapStr {
+	var events []common.MapStr
+	for _, container := range containers {
+		event := eventMapping(&container, m)
+		if event != nil {
+			events = append(events, event)
 		}
 	}
-	return myEvents
+	return events
 }
 
 func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
-	event := common.MapStr{}
-	// Detect if healthcheck is available for container
-	if strings.Contains(cont.Status, "(") && strings.Contains(cont.Status, ")") {
-		container, _ := m.dockerClient.InspectContainer(cont.ID)
-		last_event := len(container.State.Health.Log) - 1
-		// Detect if an healthcheck already occured
-		if last_event >= 0 {
-			event = common.MapStr{
-				mb.ModuleData: common.MapStr{
-					"container": common.MapStr{
-						"name": docker.ExtractContainerName(cont.Names),
-						"id":   cont.ID,
-					},
-				},
-				"status":        container.State.Health.Status,
-				"failingstreak": container.State.Health.FailingStreak,
-				"event": common.MapStr{
-					"start_date": common.Time(container.State.Health.Log[last_event].Start),
-					"end_date":   common.Time(container.State.Health.Log[last_event].End),
-					"exit_code":  container.State.Health.Log[last_event].ExitCode,
-					"output":     container.State.Health.Log[last_event].Output,
-				},
-			}
-			return event
-		}
+	if !hasHealthCheck(cont.Status) {
+		return nil
 	}
-	return nil
+
+	container, err := m.dockerClient.InspectContainer(cont.ID)
+	if err != nil {
+		logp.Err("Error inpsecting container %v: %v", cont.ID, err)
+		return nil
+	}
+	lastEvent := len(container.State.Health.Log) - 1
+
+	// Checks if a healthcheck already happened
+	if lastEvent < 0 {
+		return nil
+	}
+
+	return common.MapStr{
+		mb.ModuleData: common.MapStr{
+			"container": common.MapStr{
+				"name": docker.ExtractContainerName(cont.Names),
+				"id":   cont.ID,
+			},
+		},
+		"status":        container.State.Health.Status,
+		"failingstreak": container.State.Health.FailingStreak,
+		"event": common.MapStr{
+			"start_date": common.Time(container.State.Health.Log[lastEvent].Start),
+			"end_date":   common.Time(container.State.Health.Log[lastEvent].End),
+			"exit_code":  container.State.Health.Log[lastEvent].ExitCode,
+			"output":     container.State.Health.Log[lastEvent].Output,
+		},
+	}
+
+}
+
+// hasHealthCheck detects if healthcheck is available for container
+func hasHealthCheck(status string) bool {
+	return strings.Contains(status, "(") && strings.Contains(status, ")")
 }
