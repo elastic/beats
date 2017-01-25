@@ -161,7 +161,7 @@ fast-system-tests: ${BEAT_NAME}.test python-env
 
 # Run benchmark tests
 .PHONY: benchmark-tests
-benchmark-tests: ## @testing Runs bechmarks (NOT YET IMPLEMENTED)
+benchmark-tests: ## @testing Runs benchmarks (NOT YET IMPLEMENTED)
 	# No benchmark tests exist so far
 	#go test -bench=. ${GOPACKAGES}
 
@@ -195,7 +195,7 @@ testsuite: clean update
 	$(MAKE) unit-tests
 
 	# Setups environment if TEST_ENVIRONMENT is set to true
-	# Only runs integration tests with test environemtn
+	# Only runs integration tests with test environment
 	if [ $(TEST_ENVIRONMENT) = true ]; then \
 		 $(MAKE) integration-tests-environment; \
 	fi
@@ -434,7 +434,7 @@ package-dashboards: package-setup
 
 fix-permissions:
 	# Change ownership of all files inside /build folder from root/root to current user/group
-	docker run -v ${BUILD_DIR}:/build alpine:3.4 sh -c "chown -R $(shell id -u):$(shell id -g) /build"
+	docker run -v ${PWD}:/beat alpine:3.4 sh -c "find /beat -user 0 -exec chown $(shell id -u):$(shell id -g) {} \;"
 
 set_version: ## @packaging VERSION=x.y.z set the version of the beat to x.y.z
 	${ES_BEATS}/dev-tools/set_version ${VERSION}
