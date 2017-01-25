@@ -6,11 +6,12 @@ services:
       - apache
       - ceph
       - couchbase
-      - mongodb
       - haproxy
       - kafka
+      - mongodb
       - mysql
       - nginx
+      - phpfpm
       - postgresql
       - prometheus
       - redis
@@ -36,6 +37,8 @@ services:
       - MYSQL_DSN=root:test@tcp(mysql:3306)/
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
+      - PHPFPM_HOST=phpfpm
+      - PHPFPM_PORT=81
       - POSTGRESQL_DSN=postgres://postgresql:5432?sslmode=disable
       - POSTGRESQL_HOST=postgresql
       - POSTGRESQL_PORT=5432
@@ -89,6 +92,9 @@ services:
 
   haproxy:
     build: ${PWD}/module/haproxy/_meta
+
+  phpfpm:
+    build: ${PWD}/module/php_fpm/_meta
 
   postgresql:
     image: postgres:9.5.3

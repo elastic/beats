@@ -6,69 +6,58 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
-
-	"github.com/elastic/beats/metricbeat/module/php_fpm"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 )
 
 // init registers the MetricSet with the central registry.
-// The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("php_fpm", "pool", New, php_fpm.HostParser); err != nil {
+	if err := mb.Registry.AddMetricSet("php_fpm", "pool", New, HostParser); err != nil {
 		panic(err)
 	}
 }
 
+const (
+	defaultScheme = "http"
+	defaultPath   = "/status"
+)
+
+// HostParser is used for parsing the configured php-fpm hosts.
+var HostParser = parse.URLHostParserBuilder{
+	DefaultScheme: defaultScheme,
+	DefaultPath:   defaultPath,
+	QueryParams:   "json",
+	PathConfigKey: "status_path",
+}.Build()
+
 // MetricSet type defines all fields of the MetricSet
-// As a minimum it must inherit the mb.BaseMetricSet fields, but can be extended with
-// additional entries. These variables can be used to persist data or configuration between
-// multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	client *php_fpm.StatsClient // StatsClient that is reused across requests.
+	*helper.HTTP
 }
 
 // New create a new instance of the MetricSet
-// Part of new is also setting up the configuration by processing additional
-// configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logp.Warn("EXPERIMENTAL: The php-fpm pool metricset is experimental")
 	return &MetricSet{
-		BaseMetricSet: base,
-		client:        php_fpm.NewStatsClient(base),
+		base,
+		helper.NewHTTP(base),
 	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-// It returns the event which is then forward to the output. In case of an error, a
-// descriptive error must be returned.
+// Fetch gathers data for the pool metricset
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-	body, err := m.client.Fetch()
-
+	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		return nil, err
 	}
 
-	defer body.Close()
-
-	stats := &poolStats{}
-	err = json.NewDecoder(body).Decode(stats)
+	var stats map[string]interface{}
+	err = json.Unmarshal(content, &stats)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing json: %v", err)
 	}
 
-	return common.MapStr{
-		"hostname": m.Host(),
-
-		"pool": stats.Pool,
-		"connections": common.MapStr{
-			"queue":    stats.ListenQueue,
-			"accepted": stats.AcceptedConn,
-		},
-		"processes": common.MapStr{
-			"idle":   stats.IdleProcesses,
-			"active": stats.ActiveProcesses,
-		},
-		"slow_requests": stats.SlowRequests,
-	}, nil
+	return schema.Apply(stats), nil
 }
