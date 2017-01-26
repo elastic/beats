@@ -12,7 +12,6 @@ type ConditionConfig struct {
 	Equals   *ConditionFields  `config:"equals"`
 	Contains *ConditionFields  `config:"contains"`
 	Regexp   *ConditionFields  `config:"regexp"`
-	Match    *ConditionFields  `config:"match"`
 	Range    *ConditionFields  `config:"range"`
 	OR       []ConditionConfig `config:"or"`
 	AND      []ConditionConfig `config:"and"`

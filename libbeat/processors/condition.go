@@ -25,14 +25,15 @@ type EqualsValue struct {
 }
 
 type Condition struct {
-	equals   map[string]EqualsValue
-	matches  map[string]match.Matcher
-	contains map[string]match.Matcher
-	regexp   map[string]match.Matcher
-	rangexp  map[string]RangeValue
-	or       []Condition
-	and      []Condition
-	not      *Condition
+	equals  map[string]EqualsValue
+	matches struct {
+		name    string
+		filters map[string]match.Matcher
+	}
+	rangexp map[string]RangeValue
+	or      []Condition
+	and     []Condition
+	not     *Condition
 }
 
 type WhenProcessor struct {
@@ -66,11 +67,11 @@ func NewCondition(config *ConditionConfig) (*Condition, error) {
 	case config.Equals != nil:
 		err = c.setEquals(config.Equals)
 	case config.Contains != nil:
-		err = c.setContains(config.Contains)
+		c.matches.name = "contains"
+		c.matches.filters, err = compileMatches(config.Contains.fields, match.CompileString)
 	case config.Regexp != nil:
-		err = c.setRegexp(config.Regexp)
-	case config.Match != nil:
-		err = c.setMatches(config.Match)
+		c.matches.name = "regexp"
+		c.matches.filters, err = compileMatches(config.Regexp.fields, match.Compile)
 	case config.Range != nil:
 		err = c.setRange(config.Range)
 	case len(config.OR) > 0:
@@ -123,39 +124,10 @@ func (c *Condition) setEquals(cfg *ConditionFields) error {
 	return nil
 }
 
-func (c *Condition) setContains(cfg *ConditionFields) error {
-
-	if c.matches == nil {
-		c.matches = map[string]match.Matcher{}
-	}
-
-	for field, value := range cfg.fields {
-		switch v := value.(type) {
-		case string:
-			m, err := match.CompileString(v)
-			if err != nil {
-				return err
-			}
-			c.matches[field] = m
-		default:
-			return fmt.Errorf("unexpected type %T of %v", value, value)
-		}
-	}
-
-	return nil
-}
-
-func (c *Condition) setRegexp(cfg *ConditionFields) (err error) {
-	c.regexp, err = compileMatches(cfg.fields)
-	return
-}
-
-func (c *Condition) setMatches(cfg *ConditionFields) (err error) {
-	c.matches, err = compileMatches(cfg.fields)
-	return
-}
-
-func compileMatches(fields map[string]interface{}) (map[string]match.Matcher, error) {
+func compileMatches(
+	fields map[string]interface{},
+	compile func(string) (match.Matcher, error),
+) (map[string]match.Matcher, error) {
 	if len(fields) == 0 {
 		return nil, nil
 	}
@@ -166,7 +138,7 @@ func compileMatches(fields map[string]interface{}) (map[string]match.Matcher, er
 
 		switch v := value.(type) {
 		case string:
-			out[field], err = match.Compile(v)
+			out[field], err = compile(v)
 			if err != nil {
 				return nil, err
 			}
@@ -239,8 +211,6 @@ func (c *Condition) Check(event common.MapStr) bool {
 	}
 
 	return c.checkEquals(event) &&
-		c.checkContains(event) &&
-		c.checkRegexp(event) &&
 		c.checkMatches(event) &&
 		c.checkRange(event)
 }
@@ -275,23 +245,8 @@ func (c *Condition) checkEquals(event common.MapStr) bool {
 
 }
 
-func (c *Condition) checkContains(event common.MapStr) bool {
-	return checkMatchers("contains", c.contains, event)
-}
-
-func (c *Condition) checkRegexp(event common.MapStr) bool {
-	return checkMatchers("regexp", c.regexp, event)
-}
-
 func (c *Condition) checkMatches(event common.MapStr) bool {
-	return checkMatchers("match", c.matches, event)
-}
-
-func checkMatchers(
-	typ string,
-	matchers map[string]match.Matcher,
-	event common.MapStr,
-) bool {
+	matchers := c.matches.filters
 	if matchers == nil {
 		return true
 	}
@@ -316,7 +271,7 @@ func checkMatchers(
 		default:
 			str, err := extractString(value)
 			if err != nil {
-				logp.Warn("unexpected type %T in %v condition as it accepts only strings.", value, typ)
+				logp.Warn("unexpected type %T in %v condition as it accepts only strings.", value, c.matches.name)
 				return false
 			}
 
@@ -429,14 +384,8 @@ func (c Condition) String() string {
 	if len(c.equals) > 0 {
 		s = s + fmt.Sprintf("equals: %v", c.equals)
 	}
-	if len(c.contains) > 0 {
-		s = s + fmt.Sprintf("contains: %v", c.contains)
-	}
-	if len(c.regexp) > 0 {
-		s = s + fmt.Sprintf("regexp: %v", c.regexp)
-	}
-	if len(c.matches) > 0 {
-		s = s + fmt.Sprintf("match: %v", c.matches)
+	if len(c.matches.filters) > 0 {
+		s = s + fmt.Sprintf("%v: %v", c.matches.name, c.matches.filters)
 	}
 	if len(c.rangexp) > 0 {
 		s = s + fmt.Sprintf("range: %v", c.rangexp)
