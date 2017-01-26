@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/paths"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -323,4 +324,23 @@ func TestMcfgFromConfig(t *testing.T) {
 			assert.Equal(t, fileset, result.Filesets[name])
 		}
 	}
+}
+
+func TestMissingModuleFolder(t *testing.T) {
+	home := paths.Paths.Home
+	paths.Paths.Home = "/no/such/path"
+	defer func() { paths.Paths.Home = home }()
+
+	configs := []*common.Config{
+		load(t, map[string]interface{}{"module": "nginx"}),
+	}
+
+	reg, err := NewModuleRegistry(configs)
+	assert.NoError(t, err)
+	assert.NotNil(t, reg)
+
+	// this should return an empty list, but no error
+	prospectors, err := reg.GetProspectorConfigs()
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(prospectors))
 }
