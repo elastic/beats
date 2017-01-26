@@ -8,4 +8,4 @@ multiline:
   pattern: "^\\s"
   match: after
 fields:
-  source_type: syslog-system
+  source_type: system-syslog

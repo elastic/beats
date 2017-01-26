@@ -5,7 +5,7 @@
 			"grok": {
 				"field": "message",
 				"patterns": [
-					"%{SYSLOGTIMESTAMP:syslog.system.timestamp} %{SYSLOGHOST:syslog.system.hostname} %{DATA:syslog.system.program}(?:\\[%{POSINT:syslog.system.pid}\\])?: %{GREEDYMULTILINE:syslog.system.message}"
+					"%{SYSLOGTIMESTAMP:system.syslog.timestamp} %{SYSLOGHOST:system.syslog.hostname} %{DATA:system.syslog.program}(?:\\[%{POSINT:system.syslog.pid}\\])?: %{GREEDYMULTILINE:system.syslog.message}"
 				],
         "pattern_definitions" : {
           "GREEDYMULTILINE" : "(.|\n)*"
@@ -20,7 +20,7 @@
     },
 		{
       "date": {
-        "field": "syslog.system.timestamp",
+        "field": "system.syslog.timestamp",
         "target_field": "@timestamp",
         "formats": [
 					"MMM  d HH:mm:ss",

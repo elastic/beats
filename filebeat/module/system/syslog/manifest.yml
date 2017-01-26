@@ -10,4 +10,4 @@ var:
     os.windows: []
 
 ingest_pipeline: ingest/pipeline.json
-prospector: config/system.yml
+prospector: config/syslog.yml
