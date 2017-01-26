@@ -43,13 +43,9 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	var moduleProspectors []*common.Config
-	if moduleRegistry != nil {
-		var err error
-		moduleProspectors, err = moduleRegistry.GetProspectorConfigs()
-		if err != nil {
-			return nil, err
-		}
+	moduleProspectors, err := moduleRegistry.GetProspectorConfigs()
+	if err != nil {
+		return nil, err
 	}
 
 	if err := config.FetchConfigs(); err != nil {

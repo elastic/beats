@@ -86,8 +86,8 @@ func NewModuleRegistry(moduleConfigs []*common.Config) (*ModuleRegistry, error) 
 
 	stat, err := os.Stat(modulesPath)
 	if err != nil || !stat.IsDir() {
-		logp.Info("Not loading modules. Module directory not found: %s")
-		return nil, nil
+		logp.Err("Not loading modules. Module directory not found: %s", modulesPath)
+		return &ModuleRegistry{}, nil // empty registry, no error
 	}
 
 	modulesCLIList, modulesOverrides, err := getModulesCLIConfig()
