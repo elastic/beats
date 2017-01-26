@@ -27,6 +27,7 @@ type Fileset struct {
 	modulePath string
 	manifest   *manifest
 	vars       map[string]interface{}
+	pipelineID string
 }
 
 // New allocates a new Fileset object with the given configuration.
@@ -62,12 +63,9 @@ func (fs *Fileset) Read() error {
 		return err
 	}
 
-	pipeline_id, err := fs.getPipelineID()
+	fs.pipelineID, err = fs.getPipelineID()
 	if err != nil {
 		return err
-	}
-	fs.vars["beat"] = map[string]interface{}{
-		"pipeline_id": pipeline_id,
 	}
 
 	return nil
@@ -229,6 +227,12 @@ func (fs *Fileset) getProspectorConfig() (*common.Config, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Error applying config overrides: %v", err)
 		}
+	}
+
+	// force our pipeline ID
+	err = cfg.SetString("pipeline", -1, fs.pipelineID)
+	if err != nil {
+		return nil, fmt.Errorf("Error setting the pipeline ID in the prospector config: %v", err)
 	}
 
 	cfg.PrintDebugf("Merged prospector config for fileset %s/%s", fs.mcfg.Module, fs.name)

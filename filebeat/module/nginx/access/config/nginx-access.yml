@@ -6,4 +6,3 @@ paths:
 exclude_files: [".gz$"]
 fields:
   source_type: nginx-access
-  pipeline_id: {{.beat.pipeline_id}}
