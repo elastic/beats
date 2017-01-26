@@ -9,4 +9,3 @@ multiline:
   match: after
 fields:
   source_type: syslog-system
-  pipeline_id: {{.beat.pipeline_id}}

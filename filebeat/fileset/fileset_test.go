@@ -156,8 +156,10 @@ func TestGetProspectorConfigNginx(t *testing.T) {
 
 	assert.True(t, cfg.HasField("paths"))
 	assert.True(t, cfg.HasField("exclude_files"))
-	pipeline_id := fs.vars["beat"].(map[string]interface{})["pipeline_id"]
-	assert.Equal(t, "nginx-access-with_plugins", pipeline_id)
+	assert.True(t, cfg.HasField("pipeline"))
+	pipelineID, err := cfg.String("pipeline", -1)
+	assert.NoError(t, err)
+	assert.Equal(t, "nginx-access-with_plugins", pipelineID)
 }
 
 func TestGetProspectorConfigNginxOverrides(t *testing.T) {
@@ -178,7 +180,9 @@ func TestGetProspectorConfigNginxOverrides(t *testing.T) {
 	assert.True(t, cfg.HasField("paths"))
 	assert.True(t, cfg.HasField("exclude_files"))
 	assert.True(t, cfg.HasField("close_eof"))
-	pipelineID := fs.vars["beat"].(map[string]interface{})["pipeline_id"]
+	assert.True(t, cfg.HasField("pipeline"))
+	pipelineID, err := cfg.String("pipeline", -1)
+	assert.NoError(t, err)
 	assert.Equal(t, "nginx-access-with_plugins", pipelineID)
 
 }
