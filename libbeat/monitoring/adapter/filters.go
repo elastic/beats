@@ -3,6 +3,7 @@ package adapter
 import (
 	"strings"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
@@ -26,6 +27,7 @@ type varFilter func(state) state
 type state struct {
 	kind   kind
 	action action
+	mode   monitoring.Mode
 	reg    *monitoring.Registry
 	name   string
 	metric interface{}
@@ -90,16 +92,27 @@ func WhitelistIf(pred func(string) bool) MetricFilter {
 	return ApplyIf(pred, Accept)
 }
 
+// NameIn checks a metrics name matching any of the set names
+func NameIn(names ...string) func(string) bool {
+	return common.MakeStringSet(names...).Has
+}
+
 // Whitelist sets a list of metric names to be accepted.
 func Whitelist(names ...string) MetricFilter {
-	return WhitelistIf(func(name string) bool {
-		for _, n := range names {
-			if name == n {
-				return true
-			}
-		}
-		return false
-	})
+	return WhitelistIf(NameIn(names...))
+}
+
+// ReportIf sets variable report mode for all metrics satisfying the predicate.
+func ReportIf(pred func(string) bool) MetricFilter {
+	return ApplyIf(pred, withVarFilter(func(st state) state {
+		st.mode = monitoring.Reported
+		return st
+	}))
+}
+
+// ReportNames enables reporting for all metrics matching any of the given names.
+func ReportNames(names ...string) MetricFilter {
+	return ReportIf(NameIn(names...))
 }
 
 // ModifyName changes a metric its name using the provided
