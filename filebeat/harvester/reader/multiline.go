@@ -3,8 +3,9 @@ package reader
 import (
 	"errors"
 	"fmt"
-	"regexp"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common/match"
 )
 
 // MultiLine reader combining multiple line events into one multi-line event.
@@ -55,7 +56,7 @@ func NewMultiline(
 	maxBytes int,
 	config *MultilineConfig,
 ) (*Multiline, error) {
-	types := map[string]func(*regexp.Regexp) (matcher, error){
+	types := map[string]func(match.Matcher) (matcher, error){
 		"before": beforeMatcher,
 		"after":  afterMatcher,
 	}
@@ -280,14 +281,14 @@ func (mlr *Multiline) setState(next func(mlr *Multiline) (Message, error)) {
 
 // matchers
 
-func afterMatcher(regex *regexp.Regexp) (matcher, error) {
-	return genPatternMatcher(regex, func(last, current []byte) []byte {
+func afterMatcher(pat match.Matcher) (matcher, error) {
+	return genPatternMatcher(pat, func(last, current []byte) []byte {
 		return current
 	})
 }
 
-func beforeMatcher(regex *regexp.Regexp) (matcher, error) {
-	return genPatternMatcher(regex, func(last, current []byte) []byte {
+func beforeMatcher(pat match.Matcher) (matcher, error) {
+	return genPatternMatcher(pat, func(last, current []byte) []byte {
 		return last
 	})
 }
@@ -299,12 +300,12 @@ func negatedMatcher(m matcher) matcher {
 }
 
 func genPatternMatcher(
-	regex *regexp.Regexp,
+	pat match.Matcher,
 	sel func(last, current []byte) []byte,
 ) (matcher, error) {
 	matcher := func(last, current []byte) bool {
 		line := sel(last, current)
-		return regex.Match(line)
+		return pat.Match(line)
 	}
 	return matcher, nil
 }

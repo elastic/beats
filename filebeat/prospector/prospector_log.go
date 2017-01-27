@@ -342,7 +342,7 @@ func (p *ProspectorLog) handleIgnoreOlder(lastState, newState file.State) error 
 // isFileExcluded checks if the given path should be excluded
 func (p *ProspectorLog) isFileExcluded(file string) bool {
 	patterns := p.config.ExcludeFiles
-	return len(patterns) > 0 && harvester.MatchAnyRegexps(patterns, file)
+	return len(patterns) > 0 && harvester.MatchAny(patterns, file)
 }
 
 // isIgnoreOlder checks if the given state reached ignore_older

@@ -3,11 +3,11 @@
 package prospector
 
 import (
-	"regexp"
 	"testing"
 
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/common/match"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +15,7 @@ import (
 var matchTests = []struct {
 	file         string
 	paths        []string
-	excludeFiles []*regexp.Regexp
+	excludeFiles []match.Matcher
 	result       bool
 }{
 	{
@@ -45,13 +45,13 @@ var matchTests = []struct {
 	{
 		"test/test.log",
 		[]string{"test/*"},
-		[]*regexp.Regexp{regexp.MustCompile("test.log")},
+		[]match.Matcher{match.MustCompile("test.log")},
 		false,
 	},
 	{
 		"test/test.log",
 		[]string{"test/*"},
-		[]*regexp.Regexp{regexp.MustCompile("test2.log")},
+		[]match.Matcher{match.MustCompile("test2.log")},
 		true,
 	},
 }
