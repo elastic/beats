@@ -1,4 +1,4 @@
-##################$$$###### Filebeat Configuration ############################
+######################## Filebeat Configuration ############################
 
 # This file is a full configuration example documenting all non-deprecated
 # options in comments. For a shorter configuration example, that contains only
@@ -6,6 +6,113 @@
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/filebeat/index.html
+
+
+#==========================  Modules configuration ============================
+filebeat.modules:
+
+#------------------------------- System Module -------------------------------
+#- module: system
+  # Syslog
+  #syslog:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+#------------------------------- Apache2 Module ------------------------------
+#- module: apache2
+  # Access logs
+  #access:
+    #enabled: true
+
+    # Ingest Node pipeline to use. Options are `with_plugins` (default)
+    # and `no_plugins`. Use `no_plugins` if you don't have the geoip or
+    # the user agent Node ingest plugins installed.
+    #var.pipeline: with_plugins
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+  # Error logs
+  #error:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+#-------------------------------- MySQL Module -------------------------------
+#- module: mysql
+  # Error logs
+  #error:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+  # Slow logs
+  #slowlog:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+#-------------------------------- Nginx Module -------------------------------
+#- module: nginx
+  # Access logs
+  #access:
+    #enabled: true
+
+    # Ingest Node pipeline to use. Options are `with_plugins` (default)
+    # and `no_plugins`. Use `no_plugins` if you don't have the geoip or
+    # the user agent Node ingest plugins installed.
+    #var.pipeline: with_plugins
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+  # Error logs
+  #error:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
 
 #=========================== Filebeat prospectors =============================
 
