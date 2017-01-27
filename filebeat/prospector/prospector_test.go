@@ -3,12 +3,12 @@
 package prospector
 
 import (
-	"regexp"
 	"testing"
 
-	"github.com/elastic/beats/filebeat/input/file"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/common/match"
 )
 
 func TestProspectorInitInputTypeLogError(t *testing.T) {
@@ -28,7 +28,7 @@ func TestProspectorFileExclude(t *testing.T) {
 
 	prospector := Prospector{
 		config: prospectorConfig{
-			ExcludeFiles: []*regexp.Regexp{regexp.MustCompile(`\.gz$`)},
+			ExcludeFiles: []match.Matcher{match.MustCompile(`\.gz$`)},
 		},
 	}
 

@@ -37,6 +37,15 @@ func MustCompileExact(pattern string) ExactMatcher {
 	return m
 }
 
+// CompileString matches a substring only, the input is not interpreted as
+// regular expression
+func CompileString(in string) (Matcher, error) {
+	if in == "" {
+		return Matcher{(*emptyStringMatcher)(nil)}, nil
+	}
+	return Matcher{&substringMatcher{in, []byte(in)}}, nil
+}
+
 // Compile regular expression to string matcher. String matcher by default uses
 // regular expressions as provided by regexp library, but tries to optimize some
 // common cases, replacing expensive patterns with cheaper custom implementations
@@ -93,6 +102,22 @@ func (m *Matcher) Unpack(s string) error {
 	return nil
 }
 
+func (m *Matcher) MatchAnyString(strs []string) bool {
+	return matchAnyStrings(m.stringMatcher, strs)
+}
+
+func (m *Matcher) MatchAllStrings(strs []string) bool {
+	return matchAllStrings(m.stringMatcher, strs)
+}
+
+func (m *ExactMatcher) MatchAnyString(strs []string) bool {
+	return matchAnyStrings(m.stringMatcher, strs)
+}
+
+func (m *ExactMatcher) MatchAllStrings(strs []string) bool {
+	return matchAllStrings(m.stringMatcher, strs)
+}
+
 func (m *ExactMatcher) Unpack(s string) error {
 	tmp, err := CompileExact(s)
 	if err != nil {
@@ -101,4 +126,22 @@ func (m *ExactMatcher) Unpack(s string) error {
 
 	*m = tmp
 	return nil
+}
+
+func matchAnyStrings(m stringMatcher, strs []string) bool {
+	for _, s := range strs {
+		if m.MatchString(s) {
+			return true
+		}
+	}
+	return false
+}
+
+func matchAllStrings(m stringMatcher, strs []string) bool {
+	for _, s := range strs {
+		if !m.MatchString(s) {
+			return false
+		}
+	}
+	return true
 }

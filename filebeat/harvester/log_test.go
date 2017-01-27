@@ -104,29 +104,23 @@ func TestReadLine(t *testing.T) {
 }
 
 func TestExcludeLine(t *testing.T) {
-
-	regexp, err := InitRegexps([]string{"^DBG"})
-
+	regexp, err := InitMatchers("^DBG")
 	assert.Nil(t, err)
-
-	assert.True(t, MatchAnyRegexps(regexp, "DBG: a debug message"))
-	assert.False(t, MatchAnyRegexps(regexp, "ERR: an error message"))
+	assert.True(t, MatchAny(regexp, "DBG: a debug message"))
+	assert.False(t, MatchAny(regexp, "ERR: an error message"))
 }
 
 func TestIncludeLine(t *testing.T) {
-
-	regexp, err := InitRegexps([]string{"^ERR", "^WARN"})
+	regexp, err := InitMatchers("^ERR", "^WARN")
 
 	assert.Nil(t, err)
-
-	assert.False(t, MatchAnyRegexps(regexp, "DBG: a debug message"))
-	assert.True(t, MatchAnyRegexps(regexp, "ERR: an error message"))
-	assert.True(t, MatchAnyRegexps(regexp, "WARNING: a simple warning message"))
+	assert.False(t, MatchAny(regexp, "DBG: a debug message"))
+	assert.True(t, MatchAny(regexp, "ERR: an error message"))
+	assert.True(t, MatchAny(regexp, "WARNING: a simple warning message"))
 }
 
 func TestInitRegexp(t *testing.T) {
-
-	_, err := InitRegexps([]string{"((((("})
+	_, err := InitMatchers("(((((")
 	assert.NotNil(t, err)
 }
 
