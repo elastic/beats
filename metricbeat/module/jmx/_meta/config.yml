@@ -1,6 +1,0 @@
-- module: jmx
-  metricsets: ["jolokia"]
-  enabled: true
-  period: 1s
-  hosts: ["localhost"]
-

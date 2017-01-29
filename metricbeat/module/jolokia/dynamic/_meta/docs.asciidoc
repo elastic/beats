@@ -1,6 +1,6 @@
-=== jmx jolokia MetricSet
+=== jolokia dynamic MetricSet
 
-This is the jolokia metricset of the module jmx.
+This is the dynamic metricset of the module jolokia.
 
 [float]
 === Features and configuration
@@ -10,7 +10,7 @@ Metrics to be collected from each Jolokia instance are defined in the mapping se
 an array of Attributes to be requested with Elastic field names under which the return values should be saved.
 
 For example: to get the "Uptime" attribute from the "java.lang:type=Runtime" MBean and map it to something like
-"uptime" (actually "jmx.jolokia.uptime", the prexif is added by beats framework) you have to configure following
+"uptime" (actually "jolokia.dynamic.uptime", the prexif is added by beats framework) you have to configure following
 mapping:
 ....
  - mbean: 'java.lang:type=Runtime'
@@ -23,12 +23,13 @@ In case the underlying attribute is an object (e.g. see HeapMemoryUsage attribut
 structure will be published to Elastic "as is".
 
 It is possible to configure nested metric aliases by using dots in the mapping name, although
-nesting depth is limited to 1 at the moment (e.g. gc.cms_collection_time). For examples please refer to the /jmx/jolokia/test/config.yml.
+nesting depth is limited to 1 at the moment (e.g. gc.cms_collection_time). For examples please refer to the
+/jolokia/dynamic/test/config.yml.
 
 All metrics from a single mapping will be POSTed to the defined host/port and sent to Elastic as a single event.
 To make it possible to differentiate between metrics from multiple similar applications running on the same host, please
- use fields "application" and "instance" in the config file. These two will be added into the event under jmx
- .jolokia.application and jmx.jolokia.instance if set.
+ use fields "application" and "instance" in the config file. These two will be added into the event under jolokia
+ .dynamic.application and jolokia.dynamic.instance if set.
 
 It is required to set a namespace in the general module config section.
 

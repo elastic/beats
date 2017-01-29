@@ -1,4 +1,4 @@
-package jolokia
+package dynamic
 
 import (
 	"fmt"
@@ -44,7 +44,7 @@ func (s SliceSet) Add(key, value string) {
 func parseConfig(metricSetConfigInput []MetricSetConfigInput) ([]MetricSetConfig, error) {
 	var metricSetConfig []MetricSetConfig
 	if len(metricSetConfigInput) == 0 {
-		return nil, fmt.Errorf("The jolokia module config is empty!")
+		return nil, fmt.Errorf("The dynamic module config is empty!")
 	}
 
 	for _, currConfig := range metricSetConfigInput {

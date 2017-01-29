@@ -4,8 +4,8 @@
         "hostname": "seu",
         "name": "seu"
     },
-    "jmx": {
-        "jolokia": {
+    "jolokia": {
+        "dynamic": {
             "gc": {
                 "cms_collection_count": 3,
                 "cms_collection_time": 207
@@ -28,8 +28,8 @@
         }
     },
     "metricset": {
-        "module": "jmx",
-        "name": "jolokia",
+        "module": "jolokia",
+        "name": "dynamic",
         "rtt": 53279
     },
     "type": "metricsets"

@@ -1,4 +1,4 @@
-package jolokia
+package dynamic
 
 import (
 	"fmt"
@@ -13,12 +13,12 @@ import (
 )
 
 var (
-	debugf = logp.MakeDebug("jmx-jolokia")
+	debugf = logp.MakeDebug("jolokia-dynamic")
 )
 
 // init registers the MetricSet with the central registry.
 func init() {
-	if err := mb.Registry.AddMetricSet("jmx", "jolokia", New); err != nil {
+	if err := mb.Registry.AddMetricSet("jolokia", "dynamic", New); err != nil {
 		panic(err)
 	}
 }

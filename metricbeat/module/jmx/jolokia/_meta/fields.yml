@@ -1,9 +1,0 @@
-- name: jmx
-  type: group
-  description: >
-    jmx
-  fields:
-    - name: example
-      type: keyword
-      description: >
-        Example field

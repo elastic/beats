@@ -1,4 +1,4 @@
-package jolokia
+package dynamic
 
 import (
 	"path/filepath"

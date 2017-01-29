@@ -1313,6 +1313,26 @@
             }
           }
         },
+        "jolokia": {
+          "properties": {
+            "dynamic": {
+              "properties": {
+                "_namespace": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "application": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "instance": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
         "kafka": {
           "properties": {
             "consumergroup": {

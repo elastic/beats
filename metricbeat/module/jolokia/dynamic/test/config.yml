@@ -3,9 +3,9 @@
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
-#------------------------------ jmx Module -----------------------------
-- module: jmx
-  metricsets: ["jolokia"]
+#------------------------------ jolokia Module -----------------------------
+- module: jolokia
+  metricsets: ["dynamic"]
   enabled: true
   period: 10s
   namespace: "jolokia_metrics"
