@@ -122,12 +122,12 @@ metricbeat.modules:
   #hosts: ["tcp://127.0.0.1:14567"]
 
 #------------------------------- Jolokia Module ------------------------------
-#- module: jolokia
-  #metricsets: ["dynamic"]
-  #enabled: true
-  #period: 10s
-  #hosts: ["localhost"]
-  #namespace: "jolokia_metrics"
+- module: jolokia
+  metricsets: ["dynamic"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost"]
+  namespace: "jolokia_metrics"
 
 #-------------------------------- kafka Module -------------------------------
 #- module: kafka

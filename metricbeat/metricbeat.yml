@@ -46,7 +46,13 @@ metricbeat.modules:
   period: 10s
   processes: ['.*']
 
-
+#------------------------------- Jolokia Module ------------------------------
+- module: jolokia
+  metricsets: ["dynamic"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost"]
+  namespace: "jolokia_metrics"
 
 #================================ General =====================================
 
