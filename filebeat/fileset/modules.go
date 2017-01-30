@@ -247,8 +247,8 @@ type PipelineLoader interface {
 	LoadJSON(path string, json map[string]interface{}) error
 }
 
-// Setup is called on -setup and loads the pipelines for each configured fileset.
-func (reg *ModuleRegistry) Setup(esClient PipelineLoader) error {
+// LoadPipelines loads the pipelines for each configured fileset.
+func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader) error {
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
 			pipelineID, content, err := fileset.GetPipeline()
@@ -272,4 +272,12 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 	}
 	logp.Info("Elasticsearch pipeline with ID '%s' loaded", pipelineID)
 	return nil
+}
+
+func (reg *ModuleRegistry) Empty() bool {
+	count := 0
+	for _, filesets := range reg.registry {
+		count += len(filesets)
+	}
+	return count == 0
 }

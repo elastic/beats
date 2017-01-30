@@ -44,7 +44,9 @@ import (
 
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/dashboards/dashboards"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
 	"github.com/elastic/beats/libbeat/processors"
@@ -100,10 +102,12 @@ type BeatConfig struct {
 	Logging    logp.Logging              `config:"logging"`
 	Processors processors.PluginConfig   `config:"processors"`
 	Path       paths.Path                `config:"path"`
+	Dashboards *common.Config            `config:"dashboards"`
 }
 
 var (
 	printVersion = flag.Bool("version", false, "Print the version and exit")
+	setup        = flag.Bool("setup", false, "Load the sample Kibana dashboards")
 )
 
 var debugf = logp.MakeDebug("beat")
@@ -209,6 +213,11 @@ func (b *Beat) launch(bt Creator) error {
 
 	svc.HandleSignals(beater.Stop)
 
+	err = b.loadDashboards()
+	if err != nil {
+		return err
+	}
+
 	logp.Info("%s start running.", b.Name)
 	defer logp.Info("%s stopped.", b.Name)
 	defer logp.LogTotalExpvars(&b.Config.Logging)
@@ -280,6 +289,39 @@ func (b *Beat) configure() error {
 		if maxProcs > 0 {
 			runtime.GOMAXPROCS(maxProcs)
 		}
+	}
+
+	return nil
+}
+
+func (b *Beat) loadDashboards() error {
+	if *setup {
+		// -setup implies dashboards.enabled=true
+		if b.Config.Dashboards == nil {
+			b.Config.Dashboards = common.NewConfig()
+		}
+		err := b.Config.Dashboards.SetBool("enabled", -1, true)
+		if err != nil {
+			return fmt.Errorf("Error setting dashboard.enabled=true: %v", err)
+		}
+	}
+
+	if b.Config.Dashboards != nil && b.Config.Dashboards.Enabled() {
+		esConfig := b.Config.Output["elasticsearch"]
+		if esConfig == nil || !esConfig.Enabled() {
+			return fmt.Errorf("Dashboard loading requested but the Elasticsearch output is not configured/enabled")
+		}
+		esClient, err := elasticsearch.NewConnectedClient(esConfig)
+		if err != nil {
+			return fmt.Errorf("Error creating ES client: %v", err)
+		}
+		defer esClient.Close()
+
+		err = dashboards.ImportDashboards(b.Name, b.Version, esClient, b.Config.Dashboards)
+		if err != nil {
+			return fmt.Errorf("Error importing Kibana dashboards: %v", err)
+		}
+		logp.Info("Kibana dashboards successfully loaded.")
 	}
 
 	return nil
