@@ -255,9 +255,6 @@ update: python-env collect
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME} ${ES_BEATS}
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME} ${ES_BEATS}
 
-	# Update docs version
-	cp ${ES_BEATS}/libbeat/docs/version.asciidoc docs/version.asciidoc
-
 	# Generate index-pattern
 	echo "Generate index pattern"
 	-rm -f $(PWD)/_meta/kibana/index-pattern/${BEATNAME}.json
