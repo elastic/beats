@@ -398,9 +398,9 @@
           "ignore_above": 1024,
           "type": "keyword"
         },
-        "syslog": {
+        "system": {
           "properties": {
-            "system": {
+            "syslog": {
               "properties": {
                 "hostname": {
                   "ignore_above": 1024,
