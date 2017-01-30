@@ -1,0 +1,10 @@
+- key: jolokia
+  title: "Jolokia"
+  description: >
+    Jolokia Module
+  fields:
+    - name: jolokia
+      type: group
+      description: >
+          jolokia contains metrics exposed via jolokia agent
+      fields:

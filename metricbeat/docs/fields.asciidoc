@@ -20,6 +20,7 @@ grouped in the following categories:
 * <<exported-fields-couchbase>>
 * <<exported-fields-docker>>
 * <<exported-fields-haproxy>>
+* <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -2510,7 +2511,7 @@ Number of data transfers aborted by the server. This value is included in haprox
 
 type: integer
 
-Number of backend servers that are active, meaning that they are healthy and can receive requests from the load balancer. 
+Number of backend servers that are active, meaning that they are healthy and can receive requests from the load balancer.
 
 
 [float]
@@ -2609,6 +2610,47 @@ Configured queue limit (maxqueue) for the server, or nothing if the value of max
 type: integer
 
 The average queue time in ms over the last 1024 requests.
+
+
+[[exported-fields-jolokia]]
+== Jolokia Fields
+
+Jolokia Module
+
+
+
+[float]
+== jolokia Fields
+
+
+
+
+[float]
+== dynamic Fields
+
+dynamic
+
+
+[float]
+=== jolokia.dynamic._namespace
+
+type: keyword
+
+Namespace
+
+[float]
+=== jolokia.dynamic.application
+
+type: keyword
+
+Monitored Application
+
+[float]
+=== jolokia.dynamic.instance
+
+type: keyword
+
+Monitored Application Instance
 
 
 [[exported-fields-kafka]]
