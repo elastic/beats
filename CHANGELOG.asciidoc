@@ -166,7 +166,6 @@ https://github.com/elastic/beats/compare/v5.0.2...v5.1.1[View commits]
 - Add raw config option for mysql/status metricset. {pull}3001[3001]
 - Add command fields for mysql/status metricset. {pull}3251[3251]
 
-
 *Filebeat*
 
 - Add command line option `-once` to run Filebeat only once and then close. {pull}2456[2456]
