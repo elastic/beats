@@ -192,7 +192,7 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_container_fields(self):
+    def test_image_fields(self):
         """
         test image fields
         """
@@ -217,9 +217,9 @@ class Test(metricbeat.BaseTest):
         evt = self.remove_labels(evt)
         self.assert_fields_are_documented(evt)
 
-def remove_labels(self, evt):
+    def remove_labels(self, evt):
 
-    if 'labels' in evt["docker"]["container"]:
-        del evt["docker"]["container"]["labels"]
+        if 'labels' in evt["docker"]["container"]:
+            del evt["docker"]["container"]["labels"]
 
-    return evt
+        return evt
