@@ -37,6 +37,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Kafka module case sensitive host name matching. {pull}3193[3193]
 - Fix interface conversion panic in couchbase module {pull}3272[3272]
 - Fix overwriting explicit empty config sections {issue}2918[2918]
+- Fix go routine leak in docker module. {pull}3492[3492]
 
 *Packetbeat*
 
