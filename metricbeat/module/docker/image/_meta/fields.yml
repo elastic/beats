@@ -1,0 +1,9 @@
+- name: image
+  type: group
+  description: >
+    image
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

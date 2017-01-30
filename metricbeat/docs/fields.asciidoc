@@ -1393,6 +1393,21 @@ Healthcheck status code
 
 
 [float]
+== image Fields
+
+image
+
+
+
+[float]
+=== docker.image.example
+
+type: keyword
+
+Example field
+
+
+[float]
 == info Fields
 
 experimental[]

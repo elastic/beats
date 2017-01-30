@@ -88,6 +88,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Kafka consumer groups metricset. {pull}3240[3240]
 - Add dynamic configuration reloading for modules. {pull}3281[3281]
 - Add docker health metricset {pull}3357[3357]
+- Add docker image metricset {pull}3467[3467]
 - System module uses new matchers for white-listing processes. {pull}3469[3469]
 
 *Packetbeat*
@@ -164,6 +165,7 @@ https://github.com/elastic/beats/compare/v5.0.2...v5.1.1[View commits]
 - Add experimental kafka module with partition metricset. {pull}2969[2969]
 - Add raw config option for mysql/status metricset. {pull}3001[3001]
 - Add command fields for mysql/status metricset. {pull}3251[3251]
+
 
 *Filebeat*
 
