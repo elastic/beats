@@ -1,4 +1,4 @@
-#- module: nginx
+#- module: apache2
   # Access logs
   #access:
     #enabled: true
