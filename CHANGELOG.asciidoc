@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.2.0...master[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
+- Fix go routine leak in docker module. {pull}3492[3492]
 
 *Packetbeat*
 
