@@ -23,6 +23,8 @@ type Heartbeat struct {
 }
 
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+	logp.Warn("Beta: Heartbeat is beta software")
+
 	config := config.DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)

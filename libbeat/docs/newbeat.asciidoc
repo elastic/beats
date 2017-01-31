@@ -57,9 +57,11 @@ on a specific version of libbeat, check out the specific branch ({doc-branch} in
 
 ["source","sh",subs="attributes"]
 ----
-cd ${GOPATH%%:*}/src/github.com/elastic/beats
+cd ${GOPATH}/src/github.com/elastic/beats
 git checkout {doc-branch}
 ----
+
+Note: If you have multiple go paths use `${GOPATH%%:*}`instead of `${GOPATH}`.
 
 [[newbeat-overview]]
 === Overview
@@ -132,8 +134,8 @@ Now create a directory under $GOPATH for your repository and change to the new d
 
 [source,shell]
 --------------------
-mkdir ${GOPATH%%:*}/src/github.com/{user}
-cd ${GOPATH%%:*}/src/github.com/{user}
+mkdir ${GOPATH}/src/github.com/{user}
+cd ${GOPATH}/src/github.com/{user}
 --------------------
 
 Run python and specify the path to the Beat generator:
@@ -170,7 +172,7 @@ To fetch dependencies and set up the Beat, run:
 
 [source,shell]
 ---------
-cd ${GOPATH%%:*}/src/github.com/{user}/countbeat
+cd ${GOPATH}/src/github.com/{user}/countbeat
 make setup
 ---------
 

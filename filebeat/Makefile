@@ -27,10 +27,26 @@ fields:
 	cat ${ES_BEATS}/filebeat/_meta/fields.common.yml > _meta/fields.generated.yml
 	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
 
+# Collects all modules files to be packaged in a temporary folder
+.PHONY: modules
+modules:
+	mkdir -p _meta/
+	rm -rf _meta/module.generated
+	rsync -av module/ _meta/module.generated --exclude "_meta" --exclude "*/*/test"
+
+# Collects all module configs
+.PHONY: configs
+configs: python-env
+	cat ${ES_BEATS}/filebeat/_meta/common.p1.yml > _meta/beat.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEAT_NAME} $(PWD) >> _meta/beat.yml
+	cat ${ES_BEATS}/filebeat/_meta/common.p2.yml >> _meta/beat.yml
+	cat ${ES_BEATS}/filebeat/_meta/common.full.p1.yml > _meta/beat.full.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.full.yml
+	cat ${ES_BEATS}/filebeat/_meta/common.full.p2.yml >> _meta/beat.full.yml
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields kibana
+collect: fields kibana modules configs
 
 
 # Creates a new fileset. Requires the params MODULE and FILESET

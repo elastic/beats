@@ -192,5 +192,5 @@ func (es *Connection) apiCall(
 	if err != nil {
 		return 0, nil, err
 	}
-	return es.request(method, path, pipeline, params, body)
+	return es.Request(method, path, pipeline, params, body)
 }

@@ -6,12 +6,12 @@ import (
 	"bytes"
 	"errors"
 	"os"
-	"regexp"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,7 +26,7 @@ func (p bufferSource) Continuable() bool          { return false }
 func TestMultilineAfterOK(t *testing.T) {
 	testMultilineOK(t,
 		MultilineConfig{
-			Pattern: regexp.MustCompile(`^[ \t] +`), // next line is indented by spaces
+			Pattern: match.MustCompile(`^[ \t] +`), // next line is indented by spaces
 			Match:   "after",
 		},
 		2,
@@ -38,7 +38,7 @@ func TestMultilineAfterOK(t *testing.T) {
 func TestMultilineBeforeOK(t *testing.T) {
 	testMultilineOK(t,
 		MultilineConfig{
-			Pattern: regexp.MustCompile(`\\$`), // previous line ends with \
+			Pattern: match.MustCompile(`\\$`), // previous line ends with \
 			Match:   "before",
 		},
 		2,
@@ -50,7 +50,7 @@ func TestMultilineBeforeOK(t *testing.T) {
 func TestMultilineAfterNegateOK(t *testing.T) {
 	testMultilineOK(t,
 		MultilineConfig{
-			Pattern: regexp.MustCompile(`^-`), // first line starts with '-' at beginning of line
+			Pattern: match.MustCompile(`^-`), // first line starts with '-' at beginning of line
 			Negate:  true,
 			Match:   "after",
 		},
@@ -63,7 +63,7 @@ func TestMultilineAfterNegateOK(t *testing.T) {
 func TestMultilineBeforeNegateOK(t *testing.T) {
 	testMultilineOK(t,
 		MultilineConfig{
-			Pattern: regexp.MustCompile(`;$`), // last line ends with ';'
+			Pattern: match.MustCompile(`;$`), // last line ends with ';'
 			Negate:  true,
 			Match:   "before",
 		},
@@ -76,7 +76,7 @@ func TestMultilineBeforeNegateOK(t *testing.T) {
 func TestMultilineBeforeNegateOKWithEmptyLine(t *testing.T) {
 	testMultilineOK(t,
 		MultilineConfig{
-			Pattern: regexp.MustCompile(`;$`), // last line ends with ';'
+			Pattern: match.MustCompile(`;$`), // last line ends with ';'
 			Negate:  true,
 			Match:   "before",
 		},

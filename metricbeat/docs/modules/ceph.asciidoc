@@ -30,11 +30,16 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+<<<<<<< HEAD
 * <<metricbeat-metricset-ceph-df,df>>
 
 * <<metricbeat-metricset-ceph-health,health>>
 
 include::ceph/df.asciidoc[]
 
+=======
+* <<metricbeat-metricset-ceph-health,health>>
+
+>>>>>>> upstream/master
 include::ceph/health.asciidoc[]
 

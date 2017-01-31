@@ -12,10 +12,8 @@ must be set up correctly. In addition, the following tools are quired:
 
 * https://www.python.org/downloads/[python]
 * https://virtualenv.pypa.io/en/stable/[virtualenv]
-* https://github.com/audreyr/cookiecutter[cookiecutter]
 
-Virtualenv and Cookiecutter are easiest installed with your package manager or https://pip.pypa.io/en/stable/[pip]. For more details on how to
-install cookiecutter, see the http://cookiecutter.readthedocs.io/en/latest/installation.html[cookiecutter installation docs].
+Virtualenv is easiest installed with your package manager or https://pip.pypa.io/en/stable/[pip].
 
 [float]
 === Step 1 - Get the metricbeat source code
@@ -32,10 +30,11 @@ on a specific version of libbeat, check out the specific branch ({doc-branch} in
 
 ["source","sh",subs="attributes"]
 ----
-cd ${GOPATH%%:*}/src/github.com/elastic/beats
+cd ${GOPATH}/src/github.com/elastic/beats
 git checkout {doc-branch}
 ----
 
+Note: If you have multiple go paths use `${GOPATH%%:*}`instead of `${GOPATH}`.
 
 Now change to the directory where you want to create the beat.
 This directory is normally located under `$GOPATH/src/github.com/{your-github-name}`. Inside this directory, run the command to create the beat.
@@ -48,7 +47,7 @@ Run the command:
 
 [source,bash]
 ----
-cookiecutter ${GOPATH%%:*}/src/github.com/elastic/beats/generate/metricbeat/metricset
+python ${GOPATH}/src/github.com/elastic/beats/generate/metricbeat.py
 ----
 
 When prompted, enter the Beat name and path.

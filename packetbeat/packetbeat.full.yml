@@ -82,7 +82,7 @@ packetbeat.protocols.amqp:
   # Default: false
   #parse_arguments: false
 
-  # Hide all methods relative to connection negociation between server and
+  # Hide all methods relative to connection negotiation between server and
   # client.
   # Default: true
   #hide_connection_information: true
@@ -565,6 +565,10 @@ output.elasticsearch:
 
   # Optional HTTP Path
   #path: "/elasticsearch"
+
+  # Custom HTTP headers to add to each request
+  #headers:
+  #  X-My-Header: Contents of the header
 
   # Proxy server url
   #proxy_url: http://proxy:3128

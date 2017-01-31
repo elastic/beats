@@ -20,6 +20,7 @@ type Event struct {
 	JSONConfig   *reader.JSONConfig
 	State        file.State
 	Data         common.MapStr // Use in readers to add data to the event
+	Pipeline     string
 }
 
 func NewEvent(state file.State) *Event {
@@ -56,6 +57,17 @@ func (e *Event) ToMapStr() common.MapStr {
 	}
 
 	return event
+}
+
+// Metadata creates a common.MapStr containing the metadata to
+// be associated with the event.
+func (e *Event) Metadata() common.MapStr {
+	if e.Pipeline != "" {
+		return common.MapStr{
+			"pipeline": e.Pipeline,
+		}
+	}
+	return nil
 }
 
 // HasData returns true if the event itself contains data

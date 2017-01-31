@@ -84,10 +84,12 @@ func (p *asyncLogPublisher) Start() {
 					flag:   0,
 					events: events,
 				}
+				dataEvents, meta := getDataEvents(events)
 				p.client.PublishEvents(
-					getDataEvents(events),
+					dataEvents,
 					publisher.Signal(batch),
-					publisher.Guaranteed)
+					publisher.Guaranteed,
+					publisher.MetadataBatch(meta))
 
 				p.active.append(batch)
 			case <-ticker.C:

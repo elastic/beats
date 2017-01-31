@@ -1,7 +1,7 @@
 module_version: 1.0
 
-vars:
-  paths:
+var:
+  - name: paths
     default:
       - /var/log/apache2/error.log*
     os.darwin:
@@ -10,5 +10,4 @@ vars:
       - "C:/Program Files/Apache Software Foundation/Apache2.4/logs/error.log*"
 
 ingest_pipeline: ingest/pipeline.json
-prospectors:
-  - config/error.yml
+prospector: config/error.yml

@@ -2,10 +2,10 @@ package prospector
 
 import (
 	"fmt"
-	"regexp"
 	"time"
 
 	cfg "github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/libbeat/common/match"
 )
 
 var (
@@ -23,17 +23,17 @@ var (
 )
 
 type prospectorConfig struct {
-	Enabled        bool             `config:"enabled"`
-	ExcludeFiles   []*regexp.Regexp `config:"exclude_files"`
-	IgnoreOlder    time.Duration    `config:"ignore_older"`
-	Paths          []string         `config:"paths"`
-	ScanFrequency  time.Duration    `config:"scan_frequency" validate:"min=0,nonzero"`
-	InputType      string           `config:"input_type"`
-	CleanInactive  time.Duration    `config:"clean_inactive" validate:"min=0"`
-	CleanRemoved   bool             `config:"clean_removed"`
-	HarvesterLimit uint64           `config:"harvester_limit" validate:"min=0"`
-	Symlinks       bool             `config:"symlinks"`
-	TailFiles      bool             `config:"tail_files"`
+	Enabled        bool            `config:"enabled"`
+	ExcludeFiles   []match.Matcher `config:"exclude_files"`
+	IgnoreOlder    time.Duration   `config:"ignore_older"`
+	Paths          []string        `config:"paths"`
+	ScanFrequency  time.Duration   `config:"scan_frequency" validate:"min=0,nonzero"`
+	InputType      string          `config:"input_type"`
+	CleanInactive  time.Duration   `config:"clean_inactive" validate:"min=0"`
+	CleanRemoved   bool            `config:"clean_removed"`
+	HarvesterLimit uint64          `config:"harvester_limit" validate:"min=0"`
+	Symlinks       bool            `config:"symlinks"`
+	TailFiles      bool            `config:"tail_files"`
 }
 
 func (config *prospectorConfig) Validate() error {
