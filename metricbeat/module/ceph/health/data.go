@@ -2,7 +2,6 @@ package health
 
 import (
 	"encoding/json"
-	"io"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -69,10 +68,10 @@ type HealthRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventsMapping(body io.Reader) []common.MapStr {
+func eventsMapping(content []byte) []common.MapStr {
 
 	var d HealthRequest
-	err := json.NewDecoder(body).Decode(&d)
+	err := json.Unmarshal(content, &d)
 	if err != nil {
 		logp.Err("Error: ", err)
 	}
@@ -81,7 +80,7 @@ func eventsMapping(body io.Reader) []common.MapStr {
 
 	event := common.MapStr{
 		"cluster": common.MapStr{
-			"overall_stats": d.Output.OverallStatus,
+			"overall_status": d.Output.OverallStatus,
 			"timechecks": common.MapStr{
 				"epoch": d.Output.Timechecks.Epoch,
 				"round": common.MapStr{

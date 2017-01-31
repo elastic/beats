@@ -19,7 +19,7 @@ func TestFetchEventContents(t *testing.T) {
 	response, err := ioutil.ReadFile(absPath + "/sample_response.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "appication/json;")
+		w.Header().Set("Content-Type", "application/json;")
 		w.Write([]byte(response))
 	}))
 	defer server.Close()
@@ -40,7 +40,7 @@ func TestFetchEventContents(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
 	cluster := event["cluster"].(common.MapStr)
-	assert.EqualValues(t, "HEALTH_OK", cluster["overall_stats"])
+	assert.EqualValues(t, "HEALTH_OK", cluster["overall_status"])
 
 	timechecks := cluster["timechecks"].(common.MapStr)
 	assert.EqualValues(t, 3, timechecks["epoch"])
