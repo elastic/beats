@@ -4,6 +4,7 @@ import yaml
 
 # Collects config for all modules
 
+
 def collect(beat_name, beat_path, full=False):
 
     base_dir = beat_path + "/module"
@@ -63,7 +64,7 @@ def collect(beat_name, beat_path, full=False):
 
         config_yml += "\n"
     # output string so it can be concatenated
-    print config_yml
+    print(config_yml)
 
 
 # Makes sure every title line is 79 + newline chars long

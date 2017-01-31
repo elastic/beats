@@ -2,7 +2,7 @@ import time
 import sys
 
 for x in range(0, 100):
-    print x
+    print(x)
     time.sleep(1)
     sys.stdout.flush()
 

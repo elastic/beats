@@ -7,9 +7,11 @@ protocol = ""
 plugin_type = ""
 plugin_var = ""
 
+
 def generate_protocol():
     read_input()
     process_file()
+
 
 def read_input():
     """Requests input form the command line for empty variables if needed.
@@ -37,7 +39,7 @@ def process_file():
 
             full_path = root + "/" + file
 
-            ## load file
+            # load file
             content = ""
             with open(full_path) as f:
                 content = f.read()
@@ -63,6 +65,7 @@ def process_file():
             with open(write_file, 'w') as f:
                 f.write(content)
 
+
 def replace_variables(content):
     """Replace all template variables with the actual values
     """
@@ -78,10 +81,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-
     if args.protocol is not None:
         protocol = args.protocol
 
     generate_protocol()
-
-

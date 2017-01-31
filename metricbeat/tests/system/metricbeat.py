@@ -9,7 +9,9 @@ COMMON_FIELDS = ["@timestamp", "beat", "metricset.name", "metricset.host",
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
+
 class BaseTest(TestCase):
+
     @classmethod
     def setUpClass(self):
         self.beat_name = "metricbeat"
