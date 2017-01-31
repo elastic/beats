@@ -53,13 +53,13 @@ class ConfigTest(metricbeat.BaseTest):
             fullLine = fullLog[i]
 
             if shortLine not in fullLog:
-                print shortLine
-                print fullLine
+                print(shortLine)
+                print(fullLine)
                 same = False
 
             if fullLine not in shortLog:
-                print shortLine
-                print fullLine
+                print(shortLine)
+                print(fullLine)
                 same = False
 
         assert same == True

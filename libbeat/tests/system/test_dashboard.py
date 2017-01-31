@@ -30,7 +30,7 @@ class Test(BaseTest):
                 command = "go run ..\..\dashboards\import_dashboards.go -es http:\\" + \
                     self.get_elasticsearch_host() + " -dir ..\..\..\\" + beat + "\_meta\kibana"
 
-            print command
+            print(command)
             p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             content, err = p.communicate()
 
@@ -66,7 +66,7 @@ class Test(BaseTest):
                 command = "python ..\..\..\dev-tools/export_dashboards.py --url http://" + \
                     self.get_elasticsearch_host() + " --dir " + path + " --regex " + beat + "-*"
 
-            print command
+            print(command)
 
             p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             content, err = p.communicate()

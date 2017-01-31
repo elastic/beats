@@ -174,7 +174,7 @@ class Test(BaseTest):
 
         total_lines = number_of_files * lines_per_file
 
-        print total_lines
+        print(total_lines)
         # wait until all lines are read
         self.wait_until(
             lambda: self.output_has(lines=total_lines),

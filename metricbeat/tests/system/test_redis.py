@@ -115,7 +115,7 @@ class Test(metricbeat.BaseTest):
 
         self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         redis_info = evt["redis"]["info"]
-        print redis_info
+        print(redis_info)
         self.assertItemsEqual(fields, redis_info.keys())
         self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
         self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())

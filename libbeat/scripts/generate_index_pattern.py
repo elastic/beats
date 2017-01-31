@@ -168,4 +168,4 @@ if __name__ == "__main__":
     with open(target_file, 'w') as f:
         f.write(output)
 
-    print ("The index pattern was created under {}".format(target_file))
+    print("The index pattern was created under {}".format(target_file))

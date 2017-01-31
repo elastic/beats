@@ -91,7 +91,7 @@ class Test(BaseTest):
         self.run_packetbeat(pcap="cassandra/v4/cassandra_insert.pcap", debug_selectors=["*"])
         objs = self.read_output()
         o = objs[0]
-        print o
+        print(o)
         assert o["type"] == "cassandra"
         assert o["port"] == 9042
 
@@ -193,7 +193,7 @@ class Test(BaseTest):
         assert o["bytes_in"] == 55
         assert o["bytes_out"] == 62
         assert o["cassandra.request.query"] == "DROP KEYSPACE mykeyspace;"
-        print o
+        print(o)
 
         assert o["cassandra.request.headers.version"] == "4"
         assert o["cassandra.request.headers.op"] == "QUERY"
@@ -225,7 +225,7 @@ class Test(BaseTest):
         self.run_packetbeat(pcap="cassandra/v4/cassandra_select_via_index.pcap", debug_selectors=["*"])
         objs = self.read_output()
         o = objs[0]
-        print o
+        print(o)
         assert o["type"] == "cassandra"
         assert o["port"] == 9042
 
@@ -260,7 +260,7 @@ class Test(BaseTest):
         objs = self.read_output()
 
         o = objs[0]
-        print o
+        print(o)
         assert o["type"] == "cassandra"
         assert o["port"] == 9042
         assert o["bytes_in"] == 9
@@ -279,7 +279,7 @@ class Test(BaseTest):
         assert o["cassandra.response.headers.stream"] == 0
 
         o = objs[1]
-        print o
+        print(o)
         assert o["type"] == "cassandra"
         assert o["port"] == 9042
         assert o["bytes_in"] == 31
@@ -298,7 +298,7 @@ class Test(BaseTest):
         assert o["cassandra.response.headers.stream"] == 1
 
         o = objs[2]
-        print o
+        print(o)
         assert o["type"] == "cassandra"
         assert o["port"] == 9042
         assert o["bytes_in"] == 58
@@ -385,7 +385,7 @@ class Test(BaseTest):
         objs = self.read_output()
 
         o = objs[0]
-        print o
+        print(o)
         assert o["type"] == "cassandra"
         assert o["port"] == 9042
         assert o["bytes_in"] == 52
@@ -404,7 +404,7 @@ class Test(BaseTest):
         assert o["cassandra.response.headers.stream"] == 0
 
         o = objs[1]
-        print o
+        print(o)
         assert o["type"] == "cassandra"
         assert o["port"] == 9042
         assert o["bytes_in"] == 53
@@ -423,7 +423,7 @@ class Test(BaseTest):
         assert o["cassandra.response.headers.stream"] == 64
 
         o = objs[2]
-        print o
+        print(o)
         assert o["type"] == "cassandra"
         assert o["port"] == 9042
         assert o["bytes_in"] == 62

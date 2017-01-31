@@ -32,7 +32,7 @@ def generate(go_beat_path):
     list_file += ")"
 
     # output string so it can be concatenated
-    print list_file
+    print(list_file)
 
 if __name__ == "__main__":
     # First argument is the beat path under GOPATH.

@@ -138,7 +138,7 @@ class Test(BaseTest):
         objs = self.read_output()
         assert len(objs) == 1
         o = objs[0]
-        print o
+        print(o)
 
         assert len(o["http.request.headers"]) > 0
         assert len(o["http.response.headers"]) > 0
