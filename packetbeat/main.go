@@ -4,8 +4,10 @@ import (
 	"os"
 
 	"github.com/elastic/beats/libbeat/beat"
-	_ "github.com/elastic/beats/metricbeat/include"
 	"github.com/elastic/beats/packetbeat/beater"
+
+	// import protocol modules
+	_ "github.com/elastic/beats/packetbeat/include"
 )
 
 var Name = "packetbeat"
