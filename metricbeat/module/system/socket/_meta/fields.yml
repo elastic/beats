@@ -32,7 +32,7 @@
       type: ip
       example: 192.0.2.1 or 2001:0DB8:ABED:8536::1
       description: >
-        Remote IP address. This can be an IPv4 or IPv6 address
+        Remote IP address. This can be an IPv4 or IPv6 address.
 
     - name: remote.port
       type: long
