@@ -25,5 +25,6 @@ Each Beat is a separately installable product. To get up and running quickly wit
 * {metricbeat}/metricbeat-getting-started.html[Metricbeat]
 * {filebeat}/filebeat-getting-started.html[Filebeat]
 * {winlogbeat}/winlogbeat-getting-started.html[Winlogbeat]
+* {heartbeat}/heartbeat-getting-started.html[Heartbeat]
 
 
