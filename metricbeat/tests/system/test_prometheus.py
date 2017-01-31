@@ -5,7 +5,9 @@ from nose.plugins.attrib import attr
 
 PROMETHEUS_FIELDS = metricbeat.COMMON_FIELDS + ["prometheus"]
 
+
 class Test(metricbeat.BaseTest):
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stats(self):
         """

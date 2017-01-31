@@ -78,11 +78,11 @@ class Test(BaseTest):
         Special about this log file is that it has empty new lines
         """
         self.render_config_template(
-                path=os.path.abspath(self.working_dir) + "/log/*",
-                multiline=True,
-                pattern="^=[A-Z]+",
-                match="after",
-                negate="true",
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            multiline=True,
+            pattern="^=[A-Z]+",
+            match="after",
+            negate="true",
         )
 
         logentry = """=ERROR REPORT==== 3-Feb-2016::03:10:32 ===
@@ -106,8 +106,8 @@ connection <0.23893.109>, channel 3 - soft error:
 
         # wait for the "Skipping file" log message
         self.wait_until(
-                lambda: self.output_has(lines=3),
-                max_timeout=10)
+            lambda: self.output_has(lines=3),
+            max_timeout=10)
 
         proc.check_kill_and_wait()
 
@@ -293,7 +293,6 @@ connection <0.23893.109>, channel 3 - soft error:
         assert 3 == len(output)
 
     def test_consecutive_newline(self):
-
         """
         Test if consecutive multilines have an affect on multiline
         """
@@ -317,7 +316,6 @@ X-Forwarded-For:
 SetAdCodeMiddleware.default_ad_code referer
 SetAdCodeMiddleware.default_ad_code path /health_check
 SetAdCodeMiddleware.default_ad_code route """
-
 
         os.mkdir(self.working_dir + "/log/")
 

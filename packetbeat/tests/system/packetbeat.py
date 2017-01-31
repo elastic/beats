@@ -61,7 +61,8 @@ class BaseTest(TestCase):
                                     stdout=outputfile,
                                     stderr=subprocess.STDOUT)
             actual_exit_code = proc.wait()
-            assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (exit_code, actual_exit_code)
+            assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (
+                exit_code, actual_exit_code)
             return actual_exit_code
 
     def start_packetbeat(self,
@@ -106,11 +107,10 @@ class BaseTest(TestCase):
         self.all_fields_are_expected(jsons, self.expected_fields)
         return jsons
 
-
     def setUp(self):
 
         self.template_env = jinja2.Environment(
-                loader=jinja2.FileSystemLoader("config")
+            loader=jinja2.FileSystemLoader("config")
         )
 
         # create working dir

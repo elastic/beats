@@ -21,7 +21,7 @@ class Test(BaseTest):
         assert o["type"] == "http"
         assert len(o["http.request.params"]) > 0
         assert o["http.request.params"] == "address=anklamerstr.14b&telephon=8932784368&" +\
-                              "user=monica"
+            "user=monica"
 
     def test_http_get(self):
         """

@@ -7,9 +7,9 @@ def run(mc):
     print('run')
 
     res = mc.set_multi({
-        "k1": 100*'a',
-        "k2": 20*'b',
-        "k3": 10*'c',
+        "k1": 100 * 'a',
+        "k2": 20 * 'b',
+        "k3": 10 * 'c',
     })
     print(res)
     if len(res) > 0:

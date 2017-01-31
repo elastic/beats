@@ -5,6 +5,7 @@ from nose.plugins.attrib import attr
 
 
 class Test(metricbeat.BaseTest):
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_partition(self):
         """

@@ -2,6 +2,7 @@ import yaml
 import os
 import argparse
 
+
 def document_fields(output, section, sections, path):
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
@@ -74,7 +75,6 @@ grouped in the following categories:
 
 """.format(**dict))
 
-
     docs = yaml.load(input)
 
     # fields file is empty
@@ -98,7 +98,6 @@ grouped in the following categories:
         document_fields(output, section, sections, "")
 
 if __name__ == "__main__":
-
 
     parser = argparse.ArgumentParser(
         description="Generates the documentation for a Beat.")

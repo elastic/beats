@@ -5,7 +5,9 @@ from nose.plugins.attrib import attr
 
 HAPROXY_FIELDS = metricbeat.COMMON_FIELDS + ["haproxy"]
 
+
 class Test(metricbeat.BaseTest):
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_info(self):
         """
@@ -63,4 +65,3 @@ class Test(metricbeat.BaseTest):
     def get_hosts(self):
         return ["tcp://" + os.getenv('HAPROXY_HOST', 'localhost') + ':' +
                 os.getenv('HAPROXY_PORT', '14567')]
-

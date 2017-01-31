@@ -37,7 +37,6 @@ def generate(go_beat_path):
 
             list_file += '	_ "' + go_beat_path + '/module/' + module + '/' + metricset + '"\n'
 
-
     list_file += ")"
 
     # output string so it can be concatenated

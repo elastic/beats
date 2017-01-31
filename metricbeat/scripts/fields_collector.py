@@ -25,7 +25,6 @@ def collect():
             tmp = f.read()
             fields_yml += tmp
 
-
         # Iterate over all metricsets
         for metricset in sorted(os.listdir(base_dir + "/" + module)):
 
@@ -52,6 +51,3 @@ def collect():
 
 if __name__ == "__main__":
     collect()
-
-
-

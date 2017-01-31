@@ -3,6 +3,7 @@ import argparse
 
 # Adds dev-tools/packer directory with the necessary files to a beat
 
+
 def generate_packer(es_beats, abs_path, beat, beat_path, version):
 
     # create dev-tools/packer
@@ -23,11 +24,9 @@ def generate_packer(es_beats, abs_path, beat, beat_path, version):
     with open(packer_path + "/version.yml", "w") as f:
         f.write(content)
 
-
     content = load_file(templates + "/Makefile", beat, beat_path, version)
     with open(packer_path + "/Makefile", "w") as f:
         f.write(content)
-
 
     content = load_file(templates + "/config.yml", beat, beat_path, version)
     with open(packer_path + "/beats/" + beat + ".yml", "w") as f:
@@ -60,7 +59,7 @@ if __name__ == "__main__":
     abs_path = os.path.abspath("./")
 
     # Removes the gopath + /src/ from the directory name to fetch the path
-    beat_path = abs_path[len(gopath)+5:]
+    beat_path = abs_path[len(gopath) + 5:]
 
     print beat_path
     print abs_path

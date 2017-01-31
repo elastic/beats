@@ -4,6 +4,7 @@ import yaml
 
 # Collects config for all modules
 
+
 def collect(beat_name, beat_path, full=False):
 
     base_dir = beat_path + "/module"
