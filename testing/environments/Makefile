@@ -1,4 +1,4 @@
-ENV?=latest.yml
+ENV?=snapshot.yml
 BASE_COMMAND=docker-compose -f ${ENV} -f local.yml
 
 start:
