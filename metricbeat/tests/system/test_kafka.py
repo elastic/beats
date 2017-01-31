@@ -5,6 +5,7 @@ from nose.plugins.attrib import attr
 
 
 class Test(metricbeat.BaseTest):
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_partition(self):
         """
@@ -23,7 +24,7 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         self.assertTrue(len(output) >= 1)
         evt = output[0]
-        print evt
+        print(evt)
 
         self.assert_fields_are_documented(evt)
 

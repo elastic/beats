@@ -2,6 +2,7 @@ from packetbeat import BaseTest
 
 
 class Test(BaseTest):
+
     def test_select(self):
         self.render_config_template(
             pgsql_ports=[5432],

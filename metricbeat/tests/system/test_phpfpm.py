@@ -5,7 +5,9 @@ from nose.plugins.attrib import attr
 
 PHPFPM_FIELDS = metricbeat.COMMON_FIELDS + ["php_fpm"]
 
+
 class Test(metricbeat.BaseTest):
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_info(self):
         """

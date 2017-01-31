@@ -2,6 +2,7 @@ from packetbeat import BaseTest
 
 
 class Test(BaseTest):
+
     def test_mysql_with_spaces(self):
         self.render_config_template(
             mysql_ports=[3306]

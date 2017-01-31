@@ -13,6 +13,7 @@ prospectorConfigTemplate = """
   scan_frequency: 1s
 """
 
+
 class Test(BaseTest):
 
     def test_reload(self):

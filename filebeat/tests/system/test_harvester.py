@@ -65,7 +65,6 @@ class Test(BaseTest):
         # one entry for the new and one for the old should exist
         assert len(data) == 2
 
-
     def test_close_removed(self):
         """
         Checks that a file is closed if removed
@@ -115,7 +114,6 @@ class Test(BaseTest):
         # Make sure the state for the file was persisted
         assert len(data) == 1
 
-
     def test_close_eof(self):
         """
         Checks that a file is closed if eof is reached
@@ -143,7 +141,6 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=iterations1), max_timeout=10)
 
-
         # Wait until error shows up on windows
         self.wait_until(
             lambda: self.log_contains(
@@ -156,7 +153,6 @@ class Test(BaseTest):
 
         # Make sure the state for the file was persisted
         assert len(data) == 1
-
 
     def test_empty_line(self):
         """
@@ -206,7 +202,6 @@ class Test(BaseTest):
 
         # Make sure the state for the file was persisted
         assert len(data) == 1
-
 
     def test_empty_lines_only(self):
         """
@@ -326,7 +321,6 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-
     def test_truncated_file_closed(self):
         """
         Checks if it is correctly detected if a closed file is truncated
@@ -443,7 +437,6 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
     def test_boms(self):
-
         """
         Test bom log files if bom is removed properly
         """
@@ -525,7 +518,6 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-
     def test_symlinks_enabled(self):
         """
         Test if symlinks are harvested
@@ -557,7 +549,6 @@ class Test(BaseTest):
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
-
 
     def test_symlink_rotated(self):
         """
@@ -621,7 +612,6 @@ class Test(BaseTest):
         # Check if two different files are in registry
         data = self.get_registry()
         assert len(data) == 2
-
 
     def test_symlink_removed(self):
         """
@@ -770,14 +760,13 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 1
 
-
     def test_decode_error(self):
         """
         Tests that in case of a decoding error it is handled gracefully
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            encoding="GBK", # Set invalid encoding for entry below which is actually uft-8
+            encoding="GBK",  # Set invalid encoding for entry below which is actually uft-8
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -810,7 +799,3 @@ class Test(BaseTest):
 
         output = self.read_output_json()
         assert output[2]["message"] == "hello world2"
-
-
-
-

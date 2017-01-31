@@ -6,7 +6,7 @@ from nose.plugins.attrib import attr
 MYSQL_FIELDS = metricbeat.COMMON_FIELDS + ["mysql"]
 
 MYSQL_STATUS_FIELDS = ["clients", "cluster", "cpu", "keyspace", "memory",
-                     "persistence", "replication", "server", "stats"]
+                       "persistence", "replication", "server", "stats"]
 
 
 class Test(metricbeat.BaseTest):
@@ -42,4 +42,3 @@ class Test(metricbeat.BaseTest):
 
     def get_hosts(self):
         return [os.getenv('MYSQL_DSN', 'root:test@tcp(localhost:3306)/')]
-

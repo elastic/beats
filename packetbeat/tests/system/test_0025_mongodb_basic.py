@@ -180,7 +180,7 @@ class Test(BaseTest):
                             debug_selectors=["mongodb"])
 
         objs = self.read_output()
-        print len(objs)
+        print(len(objs))
         assert len([o for o in objs if o["method"] == "insert"]) == 2
         assert len([o for o in objs if o["method"] == "update"]) == 1
         assert len([o for o in objs if o["method"] == "findandmodify"]) == 1
