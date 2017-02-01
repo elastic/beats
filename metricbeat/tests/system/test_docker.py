@@ -214,7 +214,9 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        evt = self.remove_labels(evt)
+        if 'labels' in evt["docker"]["image"] | 'tags' in evt["docker"]["image"]:
+            del evt["docker"]["image"]["labels"]
+            del evt["docker"]["image"]["tags"]
         self.assert_fields_are_documented(evt)
 
     def remove_labels(self, evt):
