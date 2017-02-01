@@ -1,4 +1,4 @@
-package monitor
+package monitor_health
 
 import (
 	"encoding/json"

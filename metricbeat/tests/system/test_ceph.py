@@ -5,13 +5,13 @@ import unittest
 
 class Test(metricbeat.BaseTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_cluster(self):
+    def test_cluster_health(self):
         """
-        ceph health metricset test
+        ceph cluster_health metricset test
         """
         self.render_config_template(modules=[{
             "name": "ceph",
-            "metricsets": ["cluster"],
+            "metricsets": ["cluster_health"],
             "hosts": self.get_hosts(),
             "period": "1s"
         }])
@@ -27,13 +27,13 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_monitor(self):
+    def test_monitor_health(self):
         """
-        ceph monitor metricset test
+        ceph monitor_health metricset test
         """
         self.render_config_template(modules=[{
             "name": "ceph",
-            "metricsets": ["monitor"],
+            "metricsets": ["monitor_health"],
             "hosts": self.get_hosts(),
             "period": "1s"
         }])

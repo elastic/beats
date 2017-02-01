@@ -1,7 +1,7 @@
-- name: cluster
+- name: cluster_health
   type: group
   description: >
-    cluster
+    cluster_health
   fields:
     - name: overall_status
       type: keyword

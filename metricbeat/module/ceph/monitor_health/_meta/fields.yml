@@ -1,7 +1,7 @@
-- name: monitor
+- name: monitor_health
   type: group
   description: >
-    monitor stats data
+    monitor_health stats data
   fields:
     - name: available.pct
       type: long

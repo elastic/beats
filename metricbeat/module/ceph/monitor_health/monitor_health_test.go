@@ -1,4 +1,4 @@
-package monitor
+package monitor_health
 
 import (
 	"io/ioutil"
@@ -26,7 +26,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	config := map[string]interface{}{
 		"module":     "ceph",
-		"metricsets": []string{"monitor"},
+		"metricsets": []string{"monitor_health"},
 		"hosts":      []string{server.URL},
 	}
 

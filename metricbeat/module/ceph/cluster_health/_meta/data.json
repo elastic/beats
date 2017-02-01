@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "ceph": {
-        "cluster": {
+        "cluster_health": {
             "overall_status": "HEALTH_OK",
             "timechecks": {
                 "epoch": 3,
@@ -19,7 +19,7 @@
     "metricset": {
         "host": "127.0.0.1:5000",
         "module": "ceph",
-        "name": "cluster",
+        "name": "cluster_health",
         "rtt": 115
     },
     "type": "metricsets"

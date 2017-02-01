@@ -1,4 +1,4 @@
-package cluster
+package cluster_health
 
 import (
 	"encoding/json"

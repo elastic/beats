@@ -187,7 +187,7 @@
         },
         "ceph": {
           "properties": {
-            "cluster": {
+            "cluster_health": {
               "properties": {
                 "overall_status": {
                   "ignore_above": 1024,
@@ -213,7 +213,7 @@
                 }
               }
             },
-            "monitor": {
+            "monitor_health": {
               "properties": {
                 "available": {
                   "properties": {

@@ -1,4 +1,4 @@
-package cluster
+package cluster_health
 
 import (
 	"io/ioutil"
@@ -29,7 +29,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	config := map[string]interface{}{
 		"module":     "ceph",
-		"metricsets": []string{"cluster"},
+		"metricsets": []string{"cluster_health"},
 		"hosts":      []string{server.URL},
 	}
 

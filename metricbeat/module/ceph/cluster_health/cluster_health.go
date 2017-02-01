@@ -1,4 +1,4 @@
-package cluster
+package cluster_health
 
 import (
 	"github.com/elastic/beats/libbeat/common"
@@ -21,7 +21,7 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("ceph", "cluster", New, hostParser); err != nil {
+	if err := mb.Registry.AddMetricSet("ceph", "cluster_health", New, hostParser); err != nil {
 		panic(err)
 	}
 }
@@ -32,7 +32,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The ceph cluster metricset is experimental")
+	logp.Warn("EXPERIMENTAL: The ceph cluster_health metricset is experimental")
 
 	http := helper.NewHTTP(base)
 	http.SetHeader("Accept", "application/json")

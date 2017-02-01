@@ -1,4 +1,4 @@
-package monitor
+package monitor_health
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("ceph", "monitor", New, hostParser); err != nil {
+	if err := mb.Registry.AddMetricSet("ceph", "monitor_health", New, hostParser); err != nil {
 		panic(err)
 	}
 }
@@ -34,7 +34,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The ceph monitor metricset is experimental")
+	logp.Warn("EXPERIMENTAL: The ceph monitor_health metricset is experimental")
 
 	http := helper.NewHTTP(base)
 	http.SetHeader("Accept", "application/json")

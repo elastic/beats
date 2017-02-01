@@ -1,4 +1,4 @@
-package monitor
+package cluster_health
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
+	f := mbtest.NewEventFetcher(t, getConfig())
+	err := mbtest.WriteEvent(f, t)
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -19,7 +19,7 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "ceph",
-		"metricsets": []string{"monitor"},
+		"metricsets": []string{"cluster_health"},
 		"hosts":      getTestCephHost(),
 	}
 }
