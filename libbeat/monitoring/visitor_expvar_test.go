@@ -19,7 +19,7 @@ func TestIterExpvarIgnoringMonitoringVars(t *testing.T) {
 
 	reg := NewRegistry(PublishExpvar)
 	for name, v := range vars {
-		i := reg.NewInt(name)
+		i := NewInt(reg, name, Report)
 		i.Add(v)
 	}
 

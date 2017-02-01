@@ -46,11 +46,11 @@ func TestRegistryGet(t *testing.T) {
 	name3 := nameSub2 + "." + name1
 
 	// register top-level and recursive metric
-	v1 := NewInt(name1)
+	v1 := NewInt(Default, name1, Report)
 	sub1 := Default.NewRegistry(nameSub1)
 	sub2 := Default.NewRegistry(nameSub2)
-	v2 := NewString(name2)
-	v3 := sub2.NewFloat(name1)
+	v2 := NewString(nil, name2, Report)
+	v3 := NewFloat(sub2, name1, Report)
 
 	// get values
 	v := Get(name1)
@@ -86,11 +86,11 @@ func TestRegistryRemove(t *testing.T) {
 	name3 := nameSub2 + "." + name1
 
 	// register top-level and recursive metric
-	NewInt(name1)
+	NewInt(Default, name1, Report)
 	sub1 := Default.NewRegistry(nameSub1)
 	sub2 := Default.NewRegistry(nameSub2)
-	NewInt(name2)
-	sub2.NewInt(name1)
+	NewInt(Default, name2, Report)
+	NewInt(sub2, name1, Report)
 
 	// remove metrics:
 	Remove(name1)
@@ -113,12 +113,12 @@ func TestRegistryIter(t *testing.T) {
 	}
 
 	for name, v := range vars {
-		i := NewInt(name)
+		i := NewInt(Default, name, Report)
 		i.Add(v)
 	}
 
 	collected := map[string]int64{}
-	err := Do(func(name string, v interface{}) error {
+	err := Do(Full, func(name string, v interface{}) error {
 		collected[name] = v.(int64)
 		return nil
 	})

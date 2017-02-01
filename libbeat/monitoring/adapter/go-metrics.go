@@ -127,7 +127,7 @@ func (r *GoMetricsRegistry) doRegister(name string, metric interface{}) interfac
 	if st.action == actAccept {
 		w, ok := goMetricsWrap(st.metric)
 		if ok {
-			r.reg.Add(st.name, w)
+			r.reg.Add(st.name, w, st.mode)
 		}
 	}
 
@@ -171,6 +171,7 @@ func (r *GoMetricsRegistry) stateWith(k kind, name string, metric interface{}) s
 		action: actIgnore,
 		reg:    r.reg,
 		name:   name,
+		mode:   monitoring.Full,
 		metric: metric,
 	})
 }

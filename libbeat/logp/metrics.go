@@ -4,23 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/monitoring"
 )
-
-type snapshotVisitor struct {
-	snapshot snapshot
-	level    []string
-}
-
-type snapshot struct {
-	bools   map[string]bool
-	ints    map[string]int64
-	floats  map[string]float64
-	strings map[string]string
-}
 
 // logMetrics logs at Info level the integer expvars that have changed in the
 // last interval. For each expvar, the delta from the beginning of the interval
@@ -37,7 +24,7 @@ func logMetrics(metricsCfg *LoggingMetricsConfig) {
 
 	ticker := time.NewTicker(*metricsCfg.Period)
 
-	prevVals := makeSnapshot()
+	prevVals := monitoring.MakeFlatSnapshot()
 	for range ticker.C {
 		snapshot := snapshotMetrics()
 		delta := snapshotDelta(prevVals, snapshot)
@@ -59,109 +46,39 @@ func LogTotalExpvars(cfg *Logging) {
 		return
 	}
 
-	metrics := formatMetrics(snapshotDelta(makeSnapshot(), snapshotMetrics()))
+	zero := monitoring.MakeFlatSnapshot()
+	metrics := formatMetrics(snapshotDelta(zero, snapshotMetrics()))
 	Info("Total non-zero values: %s", metrics)
 	Info("Uptime: %s", time.Now().Sub(startTime))
 }
 
-func snapshotMetrics() snapshot {
-	vs := newSnapshotVisitor()
-	monitoring.Default.Visit(vs)
-	monitoring.VisitExpvars(vs)
-	return vs.snapshot
+func snapshotMetrics() monitoring.FlatSnapshot {
+	return monitoring.CollectFlatSnapshot(monitoring.Default, true)
 }
 
-func newSnapshotVisitor() *snapshotVisitor {
-	return &snapshotVisitor{snapshot: makeSnapshot()}
-}
-
-func makeSnapshot() snapshot {
-	return snapshot{
-		bools:   map[string]bool{},
-		ints:    map[string]int64{},
-		floats:  map[string]float64{},
-		strings: map[string]string{},
-	}
-}
-
-func (vs *snapshotVisitor) OnRegistryStart() error {
-	return nil
-}
-
-func (vs *snapshotVisitor) OnRegistryFinished() error {
-	if len(vs.level) > 0 {
-		vs.dropName()
-	}
-	return nil
-}
-
-func (vs *snapshotVisitor) OnKey(name string) error {
-	vs.level = append(vs.level, name)
-	return nil
-}
-
-func (vs *snapshotVisitor) OnKeyNext() error { return nil }
-
-func (vs *snapshotVisitor) getName() string {
-	defer vs.dropName()
-	if len(vs.level) == 1 {
-		return vs.level[0]
-	}
-	return strings.Join(vs.level, ".")
-}
-
-func (vs *snapshotVisitor) dropName() {
-	vs.level = vs.level[:len(vs.level)-1]
-}
-
-func (vs *snapshotVisitor) OnString(s string) error {
-	vs.snapshot.strings[vs.getName()] = s
-	return nil
-}
-
-func (vs *snapshotVisitor) OnBool(b bool) error {
-	vs.snapshot.bools[vs.getName()] = b
-	return nil
-}
-
-func (vs *snapshotVisitor) OnNil() error {
-	vs.snapshot.strings[vs.getName()] = "<nil>"
-	return nil
-}
-
-func (vs *snapshotVisitor) OnInt(i int64) error {
-	vs.snapshot.ints[vs.getName()] = i
-	return nil
-}
-
-func (vs *snapshotVisitor) OnFloat(f float64) error {
-	vs.snapshot.floats[vs.getName()] = f
-	return nil
-}
-
-func snapshotDelta(prev, cur snapshot) map[string]interface{} {
+func snapshotDelta(prev, cur monitoring.FlatSnapshot) map[string]interface{} {
 	out := map[string]interface{}{}
 
-	for k, b := range cur.bools {
-		if p, ok := prev.bools[k]; !ok || p != b {
+	for k, b := range cur.Bools {
+		if p, ok := prev.Bools[k]; !ok || p != b {
 			out[k] = b
 		}
 	}
 
-	for k, s := range cur.strings {
-		if p, ok := prev.strings[k]; !ok || p != s {
+	for k, s := range cur.Strings {
+		if p, ok := prev.Strings[k]; !ok || p != s {
 			out[k] = s
 		}
 	}
 
-	for k, i := range cur.ints {
-		if p := prev.ints[k]; p != i {
+	for k, i := range cur.Ints {
+		if p := prev.Ints[k]; p != i {
 			out[k] = i - p
 		}
 	}
 
-	for k, f := range cur.floats {
-		if p := prev.floats[k]; p != f {
+	for k, f := range cur.Floats {
+		if p := prev.Floats[k]; p != f {
 			out[k] = f - p
 		}
 	}

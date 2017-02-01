@@ -1,11 +1,8 @@
 package monitoring
 
 import (
-	"encoding/json"
 	"errors"
-	"expvar"
 	"fmt"
-	"strconv"
 	"strings"
 	"sync"
 )
@@ -17,9 +14,14 @@ type Registry struct {
 	mu sync.RWMutex
 
 	name    string
-	entries map[string]Var
+	entries map[string]entry
 
 	opts *options
+}
+
+type entry struct {
+	Var
+	Mode
 }
 
 // Var interface required for every metric to implement.
@@ -31,18 +33,26 @@ type Var interface {
 func NewRegistry(opts ...Option) *Registry {
 	return &Registry{
 		opts:    applyOpts(nil, opts),
-		entries: map[string]Var{},
+		entries: map[string]entry{},
 	}
 }
 
-func (r *Registry) Do(f func(string, interface{}) error) error {
-	return r.Visit(NewKeyValueVisitor(f))
+func (r *Registry) Do(mode Mode, f func(string, interface{}) error) error {
+	return r.doVisit(mode, NewKeyValueVisitor(f))
+}
+
+func (r *Registry) VisitMode(mode Mode, vs Visitor) error {
+	return r.doVisit(mode, vs)
 }
 
 // Visit uses the Visitor interface to iterate the complete metrics hieararchie.
 // In case of the visitor reporting an error, Visit will return immediately,
 // reporting the very same error.
 func (r *Registry) Visit(vs Visitor) error {
+	return r.doVisit(Full, vs)
+}
+
+func (r *Registry) doVisit(mode Mode, vs Visitor) error {
 	if err := vs.OnRegistryStart(); err != nil {
 		return err
 	}
@@ -52,19 +62,30 @@ func (r *Registry) Visit(vs Visitor) error {
 
 	first := true
 	for key, v := range r.entries {
+		var err error
+
+		if v.Mode > mode {
+			continue
+		}
+
 		if first {
 			first = false
 		} else {
-			if err := vs.OnKeyNext(); err != nil {
+			if err = vs.OnKeyNext(); err != nil {
 				return err
 			}
 		}
 
-		if err := vs.OnKey(key); err != nil {
+		if err = vs.OnKey(key); err != nil {
 			return err
 		}
 
-		if err := v.Visit(vs); err != nil {
+		if reg, ok := v.Var.(*Registry); ok {
+			err = reg.doVisit(mode, vs)
+		} else {
+			err = v.Var.Visit(vs)
+		}
+		if err != nil {
 			return err
 		}
 	}
@@ -75,73 +96,31 @@ func (r *Registry) Visit(vs Visitor) error {
 // NewRegistry creates and register a new registry
 func (r *Registry) NewRegistry(name string, opts ...Option) *Registry {
 	v := &Registry{
-		name:    r.fullName(name),
+		name:    fullName(r, name),
 		opts:    applyOpts(r.opts, opts),
-		entries: map[string]Var{},
+		entries: map[string]entry{},
 	}
-	r.Add(name, v)
-	return v
-}
-
-// NewInt creates and registers a new integer variable.
-//
-// Note: If the registry is configured to publish variables to expvar, the
-// variable will be available via expvars package as well, but can not be removed
-// anymore.
-func (r *Registry) NewInt(name string) *Int {
-	v := &Int{}
-	r.Add(name, v)
-	r.publish(name, makeExpvar(func() string {
-		return strconv.FormatInt(v.Get(), 10)
-	}))
-	return v
-}
-
-// NewFloat creates and registers a new float variable.
-//
-// Note: If the registry is configured to publish variables to expvar, the
-// variable will be available via expvars package as well, but can not be removed
-// anymore.
-func (r *Registry) NewFloat(name string) *Float {
-	v := &Float{}
-	r.Add(name, v)
-	r.publish(name, makeExpvar(func() string {
-		return strconv.FormatFloat(v.Get(), 'g', -1, 64)
-	}))
-	return v
-}
-
-// NewString creates and registers a new string variable.
-//
-// Note: If the registry is configured to publish variables to expvar, the
-// variable will be available via expvars package as well, but can not be removed
-// anymore.
-func (r *Registry) NewString(name string) *String {
-	v := &String{}
-	r.Add(name, v)
-	r.publish(name, makeExpvar(func() string {
-		b, _ := json.Marshal(v.Get())
-		return string(b)
-	}))
+	r.Add(name, v, v.opts.mode)
 	return v
 }
 
 // Get tries to find a registered variable by name.
-func (r *Registry) Get(name string) interface{} {
+func (r *Registry) Get(name string) Var {
 	v, err := r.find(name)
 	if err != nil {
 		return nil
 	}
-	return v
+	return v.Var
 }
 
 // GetRegistry tries to find a sub-registry by name.
 func (r *Registry) GetRegistry(name string) *Registry {
-	v, err := r.find(name)
+	e, err := r.find(name)
 	if err != nil {
 		return nil
 	}
 
+	v := e.Var
 	if v == nil {
 		return nil
 	}
@@ -168,32 +147,17 @@ func (r *Registry) Clear() error {
 		return errors.New("Can not clear registry with metrics being exported via expvar")
 	}
 
-	r.entries = map[string]Var{}
+	r.entries = map[string]entry{}
 	return nil
-}
-
-func (r *Registry) publish(name string, v expvar.Var) {
-	if !r.opts.publishExpvar {
-		return
-	}
-
-	expvar.Publish(r.fullName(name), v)
-}
-
-func (r *Registry) fullName(name string) string {
-	if r.name == "" {
-		return name
-	}
-	return r.name + "." + name
 }
 
 // Add adds a new variable to the registry. The method panics if the variables
 // name is already in use.
-func (r *Registry) Add(name string, v Var) {
-	panicErr(r.addNames(strings.Split(name, "."), v))
+func (r *Registry) Add(name string, v Var, m Mode) {
+	panicErr(r.addNames(strings.Split(name, "."), v, m))
 }
 
-func (r *Registry) addNames(names []string, v Var) error {
+func (r *Registry) addNames(names []string, v Var, m Mode) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -203,37 +167,37 @@ func (r *Registry) addNames(names []string, v Var) error {
 			return fmt.Errorf("name %v already used", name)
 		}
 
-		r.entries[name] = v
+		r.entries[name] = entry{v, m}
 		return nil
 	}
 
 	if tmp, found := r.entries[name]; found {
-		reg, ok := tmp.(*Registry)
+		reg, ok := tmp.Var.(*Registry)
 		if !ok {
 			return fmt.Errorf("name %v already used", name)
 		}
 
-		return reg.addNames(names[1:], v)
+		return reg.addNames(names[1:], v, m)
 	}
 
 	sub := NewRegistry()
 	sub.opts = r.opts
-	if err := sub.addNames(names[1:], v); err != nil {
+	if err := sub.addNames(names[1:], v, m); err != nil {
 		return err
 	}
 
-	r.entries[name] = sub
+	r.entries[name] = entry{sub, sub.opts.mode}
 	return nil
 }
 
-func (r *Registry) find(name string) (interface{}, error) {
+func (r *Registry) find(name string) (entry, error) {
 	return r.findNames(strings.Split(name, "."))
 }
 
-func (r *Registry) findNames(names []string) (interface{}, error) {
+func (r *Registry) findNames(names []string) (entry, error) {
 	switch len(names) {
 	case 0:
-		return r, nil
+		return entry{r, r.opts.mode}, nil
 	case 1:
 		r.mu.RLock()
 		defer r.mu.RUnlock()
@@ -241,17 +205,17 @@ func (r *Registry) findNames(names []string) (interface{}, error) {
 	}
 
 	r.mu.RLock()
-	next := r.entries[names[0]]
+	next, exist := r.entries[names[0]]
 	r.mu.RUnlock()
 
-	if next == nil {
-		return nil, errNotFound
+	if !exist {
+		return entry{}, errNotFound
 	}
 
-	if reg, ok := next.(*Registry); ok {
+	if reg, ok := next.Var.(*Registry); ok {
 		return reg.findNames(names[1:])
 	}
-	return nil, errInvalidName
+	return entry{}, errInvalidName
 }
 
 func (r *Registry) removeNames(names []string) {
@@ -267,10 +231,14 @@ func (r *Registry) removeNames(names []string) {
 
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	next := r.entries[names[0]]
-	sub, ok := next.(*Registry)
+	next, exists := r.entries[names[0]]
 
 	// if name does not exist => don't remove anything
+	if !exists {
+		return
+	}
+
+	sub, ok := next.Var.(*Registry)
 	if ok {
 		sub.removeNames(names[1:])
 		sub.mu.RLock()
