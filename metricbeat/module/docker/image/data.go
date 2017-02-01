@@ -27,7 +27,7 @@ func eventMapping(image *dc.APIImages) common.MapStr {
 			"regular": image.Size,
 			"virtual": image.VirtualSize,
 		},
-		"repoTags": image.RepoTags,
+		"tags": image.RepoTags,
 	}
 	labels := docker.DeDotLabels(image.Labels)
 	if len(labels) > 0 {

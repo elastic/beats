@@ -1,9 +1,41 @@
 - name: image
   type: group
   description: >
-    image
+    Docker image metrics.
   fields:
-    - name: example
-      type: keyword
+    - name: id
+      type: group
       description: >
-        Example field
+        The image layers ID.
+      fields:
+        - name: current
+          type: keyword
+          description: >
+             Unique image ID given upon its creation.
+        - name: parent
+          type: keyword
+          description: >
+             ID of the image, if it exists, from which the current image directly descends.
+    - name: created
+      type: date
+      description: >
+        Date and time when the image was created.
+    - name: size
+      type: group
+      description: >
+        Image size layers.
+      fields:
+        - name: virtual
+          type: long
+          description: >
+             Size of the image.
+        - name: regular
+          type: long
+          description: >
+             Total size of the all cached images associated to the current image.
+
+# TODO : How to describe tags & labels list ?
+#    - name: tags
+#      type: list ?
+#      description: >
+#        Descriptive or given name(s) to the image.
