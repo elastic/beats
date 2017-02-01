@@ -215,10 +215,10 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        if 'tags' in evt["docker"]["image"] :
+        if 'tags' in evt["docker"]["image"]:
             del evt["docker"]["image"]["tags"]
 
-        if 'labels' in evt["docker"]["image"] :
+        if 'labels' in evt["docker"]["image"]:
             del evt["docker"]["image"]["labels"]
 
         self.assert_fields_are_documented(evt)
