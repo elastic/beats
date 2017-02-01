@@ -7,15 +7,34 @@ type Visitor interface {
 }
 
 type ValueVisitor interface {
-	OnString(s string) error
-	OnBool(b bool) error
-	OnInt(i int64) error
-	OnFloat(f float64) error
+	OnString(s string)
+	OnBool(b bool)
+	OnInt(i int64)
+	OnFloat(f float64)
 }
 
 type RegistryVisitor interface {
-	OnRegistryStart() error
-	OnRegistryFinished() error
-	OnKey(s string) error
-	OnKeyNext() error
+	OnRegistryStart()
+	OnRegistryFinished()
+	OnKey(s string)
+}
+
+func ReportString(V Visitor, name string, value string) {
+	V.OnKey(name)
+	V.OnString(value)
+}
+
+func ReportBool(V Visitor, name string, value bool) {
+	V.OnKey(name)
+	V.OnString(name)
+}
+
+func ReportInt(V Visitor, name string, value int64) {
+	V.OnKey(name)
+	V.OnInt(value)
+}
+
+func ReportFloat(V Visitor, name string, value float64) {
+	V.OnKey(name)
+	V.OnFloat(value)
 }

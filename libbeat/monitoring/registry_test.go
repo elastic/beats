@@ -118,11 +118,9 @@ func TestRegistryIter(t *testing.T) {
 	}
 
 	collected := map[string]int64{}
-	err := Do(Full, func(name string, v interface{}) error {
+	Do(Full, func(name string, v interface{}) {
 		collected[name] = v.(int64)
-		return nil
 	})
 
-	assert.Nil(t, err)
 	assert.Equal(t, vars, collected)
 }

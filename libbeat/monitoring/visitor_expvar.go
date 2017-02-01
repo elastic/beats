@@ -16,23 +16,13 @@ func VisitExpvars(vs Visitor) {
 }
 
 func DoExpvars(f func(string, interface{})) {
-	VisitExpvars(NewKeyValueVisitor(func(name string, v interface{}) error {
-		f(name, v)
-		return nil
-	}))
+	VisitExpvars(NewKeyValueVisitor(f))
 }
 
 func makeExparVisitor(level int, vs Visitor) func(expvar.KeyValue) {
-	first := true
 	return func(kv expvar.KeyValue) {
 		if ignoreExpvar(level, kv) {
 			return
-		}
-
-		if first {
-			first = false
-		} else {
-			vs.OnKeyNext()
 		}
 
 		name := kv.Key
