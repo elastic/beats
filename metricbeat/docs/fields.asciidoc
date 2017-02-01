@@ -1402,7 +1402,7 @@ Docker image metrics.
 [float]
 == id Fields
 
-The image layers ID.
+The image layers identifier.
 
 
 
@@ -1411,7 +1411,7 @@ The image layers ID.
 
 type: keyword
 
-Unique image ID given upon its creation.
+Unique image identifier given upon its creation.
 
 
 [float]
@@ -1419,7 +1419,7 @@ Unique image ID given upon its creation.
 
 type: keyword
 
-ID of the image, if it exists, from which the current image directly descends.
+Identifier of the image, if it exists, from which the current image directly descends.
 
 
 [float]
