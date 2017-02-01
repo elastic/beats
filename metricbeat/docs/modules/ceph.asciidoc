@@ -19,7 +19,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 #- module: ceph
-#  metricsets: ["health"]
+#  metricsets: ["health", "monitor"]
 #  enabled: true
 #  period: 10s
 #  hosts: ["localhost:5000"]
@@ -30,7 +30,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* <<metricbeat-metricset-ceph-health,health>>
+* <<metricbeat-metricset-ceph-cluster,cluster>>
 
-include::ceph/health.asciidoc[]
+* <<metricbeat-metricset-ceph-monitor,monitor>>
+
+include::ceph/cluster.asciidoc[]
+
+include::ceph/monitor.asciidoc[]
 

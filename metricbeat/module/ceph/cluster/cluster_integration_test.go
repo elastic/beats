@@ -1,15 +1,16 @@
-package health
+package cluster
 
 import (
 	"fmt"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"os"
 	"testing"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
+	f := mbtest.NewEventFetcher(t, getConfig())
+	err := mbtest.WriteEvent(f, t)
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -18,13 +19,13 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "ceph",
-		"metricsets": []string{"health"},
+		"metricsets": []string{"cluster"},
 		"hosts":      getTestCephHost(),
 	}
 }
 
 const (
-	cephDefaultHost = "172.17.0.1"
+	cephDefaultHost = "127.0.0.1"
 	cephDefaultPort = "5000"
 )
 
