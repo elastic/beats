@@ -69,7 +69,6 @@ func TestReadLine(t *testing.T) {
 		},
 		file: f,
 	}
-	assert.NotNil(t, h)
 
 	var ok bool
 	h.encodingFactory, ok = encoding.FindEncoding(h.config.Encoding)
