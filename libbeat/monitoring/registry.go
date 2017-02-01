@@ -26,7 +26,7 @@ type entry struct {
 
 // Var interface required for every metric to implement.
 type Var interface {
-	Visit(Visitor) error
+	Visit(Mode, Visitor)
 }
 
 // NewRegistry create a new empty unregistered registry
@@ -37,60 +37,32 @@ func NewRegistry(opts ...Option) *Registry {
 	}
 }
 
-func (r *Registry) Do(mode Mode, f func(string, interface{}) error) error {
-	return r.doVisit(mode, NewKeyValueVisitor(f))
-}
-
-func (r *Registry) VisitMode(mode Mode, vs Visitor) error {
-	return r.doVisit(mode, vs)
+func (r *Registry) Do(mode Mode, f func(string, interface{})) {
+	r.doVisit(mode, NewKeyValueVisitor(f))
 }
 
 // Visit uses the Visitor interface to iterate the complete metrics hieararchie.
 // In case of the visitor reporting an error, Visit will return immediately,
 // reporting the very same error.
-func (r *Registry) Visit(vs Visitor) error {
-	return r.doVisit(Full, vs)
+func (r *Registry) Visit(mode Mode, vs Visitor) {
+	r.doVisit(mode, vs)
 }
 
-func (r *Registry) doVisit(mode Mode, vs Visitor) error {
-	if err := vs.OnRegistryStart(); err != nil {
-		return err
-	}
+func (r *Registry) doVisit(mode Mode, vs Visitor) {
+	vs.OnRegistryStart()
+	defer vs.OnRegistryFinished()
 
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	first := true
 	for key, v := range r.entries {
-		var err error
-
 		if v.Mode > mode {
 			continue
 		}
 
-		if first {
-			first = false
-		} else {
-			if err = vs.OnKeyNext(); err != nil {
-				return err
-			}
-		}
-
-		if err = vs.OnKey(key); err != nil {
-			return err
-		}
-
-		if reg, ok := v.Var.(*Registry); ok {
-			err = reg.doVisit(mode, vs)
-		} else {
-			err = v.Var.Visit(vs)
-		}
-		if err != nil {
-			return err
-		}
+		vs.OnKey(key)
+		v.Var.Visit(mode, vs)
 	}
-
-	return vs.OnRegistryFinished()
 }
 
 // NewRegistry creates and register a new registry

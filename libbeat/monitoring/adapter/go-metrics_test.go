@@ -80,10 +80,9 @@ func TestGoMetricsAdapter(t *testing.T) {
 			t.Errorf("metric %v should not have been reported by each", name)
 		}
 	})
-	monReg.Do(monitoring.Full, func(name string, v interface{}) error {
+	monReg.Do(monitoring.Full, func(name string, v interface{}) {
 		if !strings.HasPrefix(name, "test.mon") {
 			t.Errorf("metric %v should not have been reported by each", name)
 		}
-		return nil
 	})
 }

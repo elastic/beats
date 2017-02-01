@@ -94,7 +94,7 @@ func metricsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	first := true
-	report := func(key string, value interface{}) error {
+	report := func(key string, value interface{}) {
 		if !first {
 			fmt.Fprintf(w, ",\n")
 		}
@@ -104,7 +104,6 @@ func metricsHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			fmt.Fprintf(w, "%q: %v", key, value)
 		}
-		return nil
 	}
 
 	fmt.Fprintf(w, "{\n")
