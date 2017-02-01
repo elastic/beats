@@ -1395,16 +1395,62 @@ Healthcheck status code
 [float]
 == image Fields
 
-image
+Docker image metrics.
 
 
 
 [float]
-=== docker.image.example
+== id Fields
+
+The image layers ID.
+
+
+
+[float]
+=== docker.image.id.current
 
 type: keyword
 
-Example field
+Unique image ID given upon its creation.
+
+
+[float]
+=== docker.image.id.parent
+
+type: keyword
+
+ID of the image, if it exists, from which the current image directly descends.
+
+
+[float]
+=== docker.image.created
+
+type: date
+
+Date and time when the image was created.
+
+
+[float]
+== size Fields
+
+Image size layers.
+
+
+
+[float]
+=== docker.image.size.virtual
+
+type: long
+
+Size of the image.
+
+
+[float]
+=== docker.image.size.regular
+
+type: long
+
+Total size of the all cached images associated to the current image.
 
 
 [float]
