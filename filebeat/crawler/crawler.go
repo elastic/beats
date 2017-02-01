@@ -19,15 +19,17 @@ type Crawler struct {
 	wg                sync.WaitGroup
 	reloader          *cfgfile.Reloader
 	once              bool
+	beatDone          chan struct{}
 }
 
-func New(out prospector.Outlet, prospectorConfigs []*common.Config, once bool) (*Crawler, error) {
+func New(out prospector.Outlet, prospectorConfigs []*common.Config, beatDone chan struct{}, once bool) (*Crawler, error) {
 
 	return &Crawler{
 		out:               out,
 		prospectors:       map[uint64]*prospector.Prospector{},
 		prospectorConfigs: prospectorConfigs,
 		once:              once,
+		beatDone:          beatDone,
 	}, nil
 }
 
@@ -47,7 +49,7 @@ func (c *Crawler) Start(r *registrar.Registrar, reloaderConfig *common.Config) e
 		logp.Warn("BETA feature dynamic configuration reloading is enabled.")
 
 		c.reloader = cfgfile.NewReloader(reloaderConfig)
-		factory := prospector.NewFactory(c.out, r)
+		factory := prospector.NewFactory(c.out, r, c.beatDone)
 		go func() {
 			c.reloader.Run(factory)
 		}()
@@ -62,7 +64,7 @@ func (c *Crawler) startProspector(config *common.Config, states []file.State) er
 	if !config.Enabled() {
 		return nil
 	}
-	p, err := prospector.NewProspector(config, c.out)
+	p, err := prospector.NewProspector(config, c.out, c.beatDone)
 	if err != nil {
 		return fmt.Errorf("Error in initing prospector: %s", err)
 	}
