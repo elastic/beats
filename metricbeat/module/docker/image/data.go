@@ -5,6 +5,7 @@ import (
 
 	"github.com/elastic/beats/metricbeat/module/docker"
 	dc "github.com/fsouza/go-dockerclient"
+	"time"
 )
 
 func eventsMapping(imagesList []dc.APIImages) []common.MapStr {
@@ -21,7 +22,7 @@ func eventMapping(image *dc.APIImages) common.MapStr {
 			"current": image.ID,
 			"parent":  image.ParentID,
 		},
-		"created": image.Created,
+		"created": common.Time(time.Unix(image.Created, 0)),
 		"size": common.MapStr{
 			"regular": image.Size,
 			"virtual": image.VirtualSize,
