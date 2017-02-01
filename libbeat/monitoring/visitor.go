@@ -9,12 +9,7 @@ type Visitor interface {
 type ValueVisitor interface {
 	OnString(s string) error
 	OnBool(b bool) error
-	OnNil() error
-
-	// int
 	OnInt(i int64) error
-
-	// float
 	OnFloat(f float64) error
 }
 
