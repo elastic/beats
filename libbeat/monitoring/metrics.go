@@ -32,12 +32,12 @@ func NewInt(r *Registry, name string, opts ...Option) *Int {
 	return v
 }
 
-func (v *Int) Get() int64             { return atomic.LoadInt64(&v.i) }
-func (v *Int) Set(value int64)        { atomic.StoreInt64(&v.i, value) }
-func (v *Int) Add(delta int64)        { atomic.AddInt64(&v.i, delta) }
-func (v *Int) Inc()                   { atomic.AddInt64(&v.i, 1) }
-func (v *Int) Dec()                   { atomic.AddInt64(&v.i, -1) }
-func (v *Int) Visit(vs Visitor) error { return vs.OnInt(v.Get()) }
+func (v *Int) Get() int64               { return atomic.LoadInt64(&v.i) }
+func (v *Int) Set(value int64)          { atomic.StoreInt64(&v.i, value) }
+func (v *Int) Add(delta int64)          { atomic.AddInt64(&v.i, delta) }
+func (v *Int) Inc()                     { atomic.AddInt64(&v.i, 1) }
+func (v *Int) Dec()                     { atomic.AddInt64(&v.i, -1) }
+func (v *Int) Visit(_ Mode, vs Visitor) { vs.OnInt(v.Get()) }
 
 // Float is a 64 bit float variable satisfying the Var interface.
 type Float struct{ f uint64 }
@@ -59,10 +59,10 @@ func NewFloat(r *Registry, name string, opts ...Option) *Float {
 	return v
 }
 
-func (v *Float) Get() float64           { return math.Float64frombits(atomic.LoadUint64(&v.f)) }
-func (v *Float) Set(value float64)      { atomic.StoreUint64(&v.f, math.Float64bits(value)) }
-func (v *Float) Sub(delta float64)      { v.Add(-delta) }
-func (v *Float) Visit(vs Visitor) error { return vs.OnFloat(v.Get()) }
+func (v *Float) Get() float64             { return math.Float64frombits(atomic.LoadUint64(&v.f)) }
+func (v *Float) Set(value float64)        { atomic.StoreUint64(&v.f, math.Float64bits(value)) }
+func (v *Float) Sub(delta float64)        { v.Add(-delta) }
+func (v *Float) Visit(_ Mode, vs Visitor) { vs.OnFloat(v.Get()) }
 
 func (v *Float) Add(delta float64) {
 	for {
@@ -98,8 +98,8 @@ func NewString(r *Registry, name string, opts ...Option) *String {
 	return v
 }
 
-func (v *String) Visit(vs Visitor) error {
-	return vs.OnString(v.Get())
+func (v *String) Visit(_ Mode, vs Visitor) {
+	vs.OnString(v.Get())
 }
 
 func (v *String) Get() string {

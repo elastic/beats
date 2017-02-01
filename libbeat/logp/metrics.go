@@ -53,7 +53,7 @@ func LogTotalExpvars(cfg *Logging) {
 }
 
 func snapshotMetrics() monitoring.FlatSnapshot {
-	return monitoring.CollectFlatSnapshot(monitoring.Default, true)
+	return monitoring.CollectFlatSnapshot(monitoring.Default, monitoring.Full, true)
 }
 
 func snapshotDelta(prev, cur monitoring.FlatSnapshot) map[string]interface{} {
