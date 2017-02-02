@@ -54,7 +54,7 @@ def read_input():
 def process_file(beat_type):
 
     # Load path information
-    template_path = os.path.dirname(os.path.realpath(__file__)) + '/../template'
+    template_path = os.path.dirname(os.path.realpath(__file__)) + '/../generator'
     go_path = os.environ['GOPATH']
 
     for root, dirs, files in os.walk(template_path + '/' + beat_type + '/{beat}'):

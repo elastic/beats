@@ -74,10 +74,10 @@ matrix:
 
     # Generators
     - os: linux
-      env: TARGETS="-C template/metricbeat test"
+      env: TARGETS="-C generator/metricbeat test"
       go: *go_version
     - os: linux
-      env: TARGETS="-C template/beat test"
+      env: TARGETS="-C generator/beat test"
       go: *go_version
 
 addons:

@@ -11,7 +11,7 @@ SNAPSHOT?=yes
 .PHONY: testsuite
 testsuite:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
-	#$(MAKE) -C template test
+	#$(MAKE) -C generator test
 
 stop-environments:
 	$(foreach var,$(PROJECTS_ENV),$(MAKE) -C $(var) stop-environment || exit 0;)
@@ -46,7 +46,7 @@ update:
 clean:
 	rm -rf build
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) clean || exit 1;)
-	$(MAKE) -C template clean
+	$(MAKE) -C generator clean
 
 # Cleans up the vendor directory from unnecessary files
 # This should always be run after updating the dependencies
