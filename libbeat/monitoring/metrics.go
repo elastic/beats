@@ -146,7 +146,7 @@ func (m makeExpvar) String() string { return m() }
 
 func addVar(r *Registry, name string, opts []Option, v Var, ev expvar.Var) {
 	O := varOpts(r.opts, opts)
-	r.Add(name, v, O.mode)
+	r.doAdd(name, v, O)
 	if O.publishExpvar && ev != nil {
 		expvar.Publish(fullName(r, name), ev)
 	}

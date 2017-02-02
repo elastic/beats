@@ -47,7 +47,7 @@ func (bt *{Beat}) Run(b *beat.Beat) error {
 
 		event := common.MapStr{
 			"@timestamp": common.Time(time.Now()),
-			"type":       b.Name,
+			"type":       b.Info.Name,
 			"counter":    counter,
 		}
 		bt.client.PublishEvent(event)
