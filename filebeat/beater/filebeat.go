@@ -37,7 +37,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules)
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Version)
 	if err != nil {
 		return nil, err
 	}
