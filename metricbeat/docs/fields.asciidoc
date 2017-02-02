@@ -4106,8 +4106,13 @@ Time at which these statistics were last reset.
 [[exported-fields-prometheus]]
 == Prometheus Fields
 
+<<<<<<< HEAD
 Prometheus Module
 experimental[]
+=======
+beta[]
+Stats collected from Prometheus.
+>>>>>>> 72efc03... Add edits for prometheus module docs
 
 
 
@@ -4120,14 +4125,14 @@ experimental[]
 [float]
 == stats Fields
 
-stats
+Stats about the Prometheus server.
 
 
 
 [float]
 == notifications Fields
 
-Notification stats
+Notification stats.
 
 
 
@@ -4136,7 +4141,7 @@ Notification stats
 
 type: long
 
-Current queue length
+Current queue length.
 
 
 [float]
@@ -4144,7 +4149,7 @@ Current queue length
 
 type: long
 
-Dropped queue events
+Number of dropped queue events.
 
 
 [float]
@@ -4152,7 +4157,7 @@ Dropped queue events
 
 type: long
 
-Open file descriptors gauge
+Number of open file descriptors.
 
 
 [float]
@@ -4160,7 +4165,7 @@ Open file descriptors gauge
 
 type: long
 
-Gauge on chunks which are not persisted to disk yet
+Number of memory chunks that are not yet persisted to disk.
 
 
 [[exported-fields-redis]]
