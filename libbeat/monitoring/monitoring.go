@@ -2,21 +2,35 @@ package monitoring
 
 import "errors"
 
+type Mode uint8
+
+const (
+	// Reported mode, is lowest report level with most basic metrics only
+	Reported Mode = iota
+
+	// Full reports all metrics
+	Full
+)
+
 // Default is the global default metrics registry provided by the monitoring package.
 var Default = NewRegistry()
 
 var errNotFound = errors.New("Name unknown")
 var errInvalidName = errors.New("Name does not point to a valid variable")
 
-func Visit(vs Visitor) error {
-	return Default.Visit(vs)
+func VisitMode(mode Mode, vs Visitor) {
+	Default.Visit(mode, vs)
 }
 
-func Do(f func(string, interface{}) error) error {
-	return Default.Do(f)
+func Visit(vs Visitor) {
+	Default.Visit(Full, vs)
 }
 
-func Get(name string) interface{} {
+func Do(mode Mode, f func(string, interface{})) {
+	Default.Do(mode, f)
+}
+
+func Get(name string) Var {
 	return Default.Get(name)
 }
 

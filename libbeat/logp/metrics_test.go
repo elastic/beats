@@ -14,7 +14,7 @@ func TestSnapshotExpvars(t *testing.T) {
 	test.Add(42)
 
 	vals := snapshotMetrics()
-	assert.Equal(t, vals.ints["test"], int64(42))
+	assert.Equal(t, vals.Ints["test"], int64(42))
 }
 
 func TestSnapshotExpvarsMap(t *testing.T) {
@@ -27,8 +27,8 @@ func TestSnapshotExpvarsMap(t *testing.T) {
 
 	vals := snapshotMetrics()
 
-	assert.Equal(t, vals.ints["testMap.hello"], int64(42))
-	assert.Equal(t, vals.ints["testMap.map2.test"], int64(5))
+	assert.Equal(t, vals.Ints["testMap.hello"], int64(42))
+	assert.Equal(t, vals.Ints["testMap.map2.test"], int64(5))
 }
 
 func TestBuildMetricsOutput(t *testing.T) {

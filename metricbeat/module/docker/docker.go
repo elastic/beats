@@ -66,24 +66,26 @@ func FetchStats(client *docker.Client) ([]Stat, error) {
 
 	var wg sync.WaitGroup
 
-	containersList := []Stat{}
+	containersList := make([]Stat, 0, len(containers))
 	queue := make(chan Stat, 1)
 	wg.Add(len(containers))
 
 	for _, container := range containers {
 		go func(container docker.APIContainers) {
+			defer wg.Done()
 			queue <- exportContainerStats(client, &container)
 		}(container)
 	}
 
 	go func() {
-		for container := range queue {
-			containersList = append(containersList, container)
-			wg.Done()
-		}
+		wg.Wait()
+		close(queue)
 	}()
 
-	wg.Wait()
+	// This will break after the queue has been drained and queue is closed.
+	for container := range queue {
+		containersList = append(containersList, container)
+	}
 
 	return containersList, err
 }

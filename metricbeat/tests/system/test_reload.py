@@ -15,6 +15,7 @@ import time
 # * Test empty file
 
 class Test(metricbeat.BaseTest):
+
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_reload(self):
         """
@@ -26,9 +27,7 @@ class Test(metricbeat.BaseTest):
         )
         proc = self.start_beat()
 
-
         os.mkdir(self.working_dir + "/configs/")
-
 
         systemConfig = """
 - module: system
@@ -41,7 +40,6 @@ class Test(metricbeat.BaseTest):
 
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_start_stop(self):
@@ -87,6 +85,5 @@ class Test(metricbeat.BaseTest):
 
         # Make sure no new lines were added since stopping
         assert lines == self.output_lines()
-
 
         proc.check_kill_and_wait()

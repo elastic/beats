@@ -45,7 +45,7 @@ It is useful to sometimes access the containers from a browser, especially for K
 http://docker-machine-ip:5601/
 ```
 
-Often de default ip is `192.168.99.100`.
+Often the default address is `localhost`.
 
 
 ## Cleanup

@@ -9,18 +9,18 @@ SYSTEM_CPU_FIELDS = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                      "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
 SYSTEM_CPU_FIELDS_ALL = ["cores", "idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
-                     "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks"]
+                         "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks"]
 
 SYSTEM_LOAD_FIELDS = ["1", "5", "15", "norm.1", "norm.5", "norm.15"]
 
 SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
-               "softirq.pct", "steal.pct", "system.pct", "user.pct"]
+                      "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
 SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
-               "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks"]
+                                               "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks"]
 
 SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
-                      "write.bytes", "read.time", "write.time", "io.time"]
+                        "write.bytes", "read.time", "write.time", "io.time"]
 
 SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "files", "free",
                             "free_files", "mount_point", "total", "used.bytes",
@@ -42,6 +42,7 @@ SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "pgid",
 
 
 class SystemTest(metricbeat.BaseTest):
+
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu(self):
         """
@@ -372,7 +373,7 @@ class SystemTest(metricbeat.BaseTest):
             self.assertTrue(found_fd, "fd not found in any process events")
 
         if sys.platform.startswith("linux") or sys.platform.startswith("freebsd")\
-            or sys.platform.startswith("darwin"):
+                or sys.platform.startswith("darwin"):
             self.assertTrue(found_env, "env not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
@@ -400,7 +401,7 @@ class SystemTest(metricbeat.BaseTest):
         assert isinstance(output["system.process.cpu.start_time"], basestring)
         self.check_username(output["system.process.username"])
 
-    def check_username(self, observed, expected = None):
+    def check_username(self, observed, expected=None):
         if expected == None:
             expected = getpass.getuser()
 

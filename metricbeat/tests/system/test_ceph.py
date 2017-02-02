@@ -1,19 +1,17 @@
 import os
 import metricbeat
 import unittest
-from nose.plugins.attrib import attr
 
 
 class Test(metricbeat.BaseTest):
-
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_partition(self):
+    def test_health(self):
         """
-        kafka partition metricset test
+        ceph health metricset test
         """
         self.render_config_template(modules=[{
-            "name": "kafka",
-            "metricsets": ["partition"],
+            "name": "ceph",
+            "metricsets": ["health"],
             "hosts": self.get_hosts(),
             "period": "1s"
         }])
@@ -24,10 +22,10 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         self.assertTrue(len(output) >= 1)
         evt = output[0]
-        print(evt)
+        print evt
 
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [os.getenv('KAFKA_HOST', 'localhost') + ':' +
-                os.getenv('KAFKA_PORT', '9092')]
+        return [os.getenv('CEPH_HOST', 'localhost') + ':' +
+                os.getenv('CEPH_PORT', '5000')]

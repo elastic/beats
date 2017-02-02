@@ -1,11 +1,9 @@
 package health
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
@@ -30,33 +28,24 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	client *http.Client
+	*helper.HTTP
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logp.Warn("EXPERIMENTAL: The ceph health metricset is experimental")
 
 	return &MetricSet{
-		BaseMetricSet: base,
-		client:        &http.Client{Timeout: base.Module().Config().Timeout},
+		base,
+		helper.NewHTTP(base),
 	}, nil
 }
 
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
-	req, err := http.NewRequest("GET", m.HostData().SanitizedURI, nil)
-
-	req.Header.Set("Accept", "application/json")
-
-	resp, err := m.client.Do(req)
+	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		return nil, fmt.Errorf("error making http request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
+		return nil, err
 	}
 
-	return eventsMapping(resp.Body), nil
+	return eventsMapping(content), nil
 }

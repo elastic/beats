@@ -6,6 +6,7 @@ import subprocess
 
 
 class Test(BaseTest):
+
     def test_base(self):
         """
         Basic test with exiting Mockbeat normally

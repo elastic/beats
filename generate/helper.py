@@ -9,6 +9,7 @@ beat = ""
 beat_path = ""
 full_name = ""
 
+
 def generate_beat(template_path, args):
 
     global project_name, github_name, beat, beat_path, full_name
@@ -28,6 +29,7 @@ def generate_beat(template_path, args):
     read_input()
     process_file(template_path)
 
+
 def read_input():
     """Requests input form the command line for empty variables if needed.
     """
@@ -41,10 +43,12 @@ def read_input():
     beat = project_name.lower()
 
     if beat_path == "":
-        beat_path = raw_input("Beat Path [github.com/" + github_name + "/" + beat + "]: ") or "github.com/" + github_name + "/" + beat
+        beat_path = raw_input("Beat Path [github.com/" + github_name + "/" + beat +
+                              "]: ") or "github.com/" + github_name + "/" + beat
 
     if full_name == "":
         full_name = raw_input("Firstname Lastname: ") or "Firstname Lastname"
+
 
 def process_file(template_path):
 
@@ -58,7 +62,7 @@ def process_file(template_path):
 
             full_path = root + "/" + file
 
-            ## load file
+            # load file
             content = ""
             with open(full_path) as f:
                 content = f.read()
@@ -84,6 +88,7 @@ def process_file(template_path):
             with open(write_file, 'w') as f:
                 f.write(content)
 
+
 def replace_variables(content):
     """Replace all template variables with the actual values
     """
@@ -105,4 +110,3 @@ def get_parser():
     parser.add_argument("--full_name", help="Full name")
 
     return parser
-
