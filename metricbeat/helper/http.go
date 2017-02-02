@@ -12,15 +12,17 @@ import (
 )
 
 type HTTP struct {
-	base   mb.BaseMetricSet
-	client *http.Client // HTTP client that is reused across requests.
+	base    mb.BaseMetricSet
+	client  *http.Client // HTTP client that is reused across requests.
+	headers map[string]string
 }
 
 // NewHTTP creates new http helper
 func NewHTTP(base mb.BaseMetricSet) *HTTP {
 	return &HTTP{
-		base:   base,
-		client: &http.Client{Timeout: base.Module().Config().Timeout},
+		base:    base,
+		client:  &http.Client{Timeout: base.Module().Config().Timeout},
+		headers: map[string]string{},
 	}
 }
 
@@ -32,12 +34,21 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 	if h.base.HostData().User != "" || h.base.HostData().Password != "" {
 		req.SetBasicAuth(h.base.HostData().User, h.base.HostData().Password)
 	}
+
+	for k, v := range h.headers {
+		req.Header.Set(k, v)
+	}
+
 	resp, err := h.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error making http request: %v", err)
 	}
 
 	return resp, nil
+}
+
+func (h *HTTP) SetHeader(key, value string) {
+	h.headers[key] = value
 }
 
 // FetchContent makes an HTTP request to the configured url and returns the body content.

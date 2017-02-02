@@ -1,4 +1,4 @@
-package health
+package monitor_health
 
 import (
 	"io/ioutil"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-	absPath, err := filepath.Abs("./testdata/")
+	absPath, err := filepath.Abs("../_meta/testdata/")
 
 	response, err := ioutil.ReadFile(absPath + "/sample_response.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +26,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	config := map[string]interface{}{
 		"module":     "ceph",
-		"metricsets": []string{"health"},
+		"metricsets": []string{"monitor_health"},
 		"hosts":      []string{server.URL},
 	}
 
@@ -39,24 +39,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
-	cluster := event["cluster"].(common.MapStr)
-	assert.EqualValues(t, "HEALTH_OK", cluster["overall_status"])
-
-	timechecks := cluster["timechecks"].(common.MapStr)
-	assert.EqualValues(t, 3, timechecks["epoch"])
-
-	round := timechecks["round"].(common.MapStr)
-	assert.EqualValues(t, 0, round["value"])
-	assert.EqualValues(t, "finished", round["status"])
-
-	event = events[1]
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
-
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
-
-	mon := event["mon"].(common.MapStr)
+	mon := event
 	assert.EqualValues(t, "HEALTH_OK", mon["health"])
 	assert.EqualValues(t, "ceph", mon["name"])
 	assert.EqualValues(t, "2017-01-19 11:34:50.700723 +0000 UTC", mon["last_updated"].(Tick).Time.String())

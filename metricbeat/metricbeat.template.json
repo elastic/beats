@@ -196,105 +196,101 @@
         },
         "ceph": {
           "properties": {
-            "health": {
+            "cluster_health": {
               "properties": {
-                "cluster": {
+                "overall_status": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "timechecks": {
                   "properties": {
-                    "overall_status": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
+                    "epoch": {
+                      "type": "long"
                     },
-                    "timechecks": {
+                    "round": {
                       "properties": {
-                        "epoch": {
-                          "type": "long"
+                        "status": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
                         },
-                        "round": {
-                          "properties": {
-                            "status": {
-                              "ignore_above": 1024,
-                              "type": "keyword"
-                            },
-                            "value": {
-                              "type": "long"
-                            }
-                          }
+                        "value": {
+                          "type": "long"
                         }
                       }
                     }
                   }
-                },
-                "mon": {
+                }
+              }
+            },
+            "monitor_health": {
+              "properties": {
+                "available": {
                   "properties": {
-                    "available": {
+                    "kb": {
+                      "type": "long"
+                    },
+                    "pct": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "health": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "last_updated": {
+                  "type": "date"
+                },
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "store_stats": {
+                  "properties": {
+                    "last_updated": {
+                      "type": "long"
+                    },
+                    "log": {
                       "properties": {
-                        "kb": {
-                          "type": "long"
-                        },
-                        "pct": {
+                        "bytes": {
                           "type": "long"
                         }
                       }
                     },
-                    "health": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "last_updated": {
-                      "type": "date"
-                    },
-                    "name": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "store_stats": {
+                    "misc": {
                       "properties": {
-                        "last_updated": {
+                        "bytes": {
                           "type": "long"
-                        },
-                        "log": {
-                          "properties": {
-                            "bytes": {
-                              "type": "long"
-                            }
-                          }
-                        },
-                        "misc": {
-                          "properties": {
-                            "bytes": {
-                              "type": "long"
-                            }
-                          }
-                        },
-                        "sst": {
-                          "properties": {
-                            "bytes": {
-                              "type": "long"
-                            }
-                          }
-                        },
-                        "total": {
-                          "properties": {
-                            "bytes": {
-                              "type": "long"
-                            }
-                          }
+                        }
+                      }
+                    },
+                    "sst": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
                         }
                       }
                     },
                     "total": {
                       "properties": {
-                        "kb": {
+                        "bytes": {
                           "type": "long"
                         }
                       }
-                    },
-                    "used": {
-                      "properties": {
-                        "kb": {
-                          "type": "long"
-                        }
-                      }
+                    }
+                  }
+                },
+                "total": {
+                  "properties": {
+                    "kb": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "used": {
+                  "properties": {
+                    "kb": {
+                      "type": "long"
                     }
                   }
                 }
