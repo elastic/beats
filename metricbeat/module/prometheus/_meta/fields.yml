@@ -2,8 +2,8 @@
   title: "Prometheus"
   description: >
     beta[]
-
-    Prometheus Module
+    
+    Stats collected from Prometheus.
   short_config: false
   fields:
     - name: prometheus
