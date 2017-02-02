@@ -54,6 +54,9 @@
             }
           }
         },
+        "fields": {
+          "properties": {}
+        },
         "host": {
           "ignore_above": 1024,
           "type": "keyword"

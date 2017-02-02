@@ -43,8 +43,14 @@
           "ignore_above": 1024,
           "type": "keyword"
         },
+        "event_data": {
+          "properties": {}
+        },
         "event_id": {
           "type": "long"
+        },
+        "fields": {
+          "properties": {}
         },
         "keywords": {
           "ignore_above": 1024,
@@ -155,6 +161,9 @@
               "type": "keyword"
             }
           }
+        },
+        "user_data": {
+          "properties": {}
         },
         "version": {
           "type": "long"
