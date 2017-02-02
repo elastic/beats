@@ -1,5 +1,5 @@
 #- module: ceph
-#  metricsets: ["health"]
+#  metricsets: ["cluster_health", "monitor_health"]
 #  enabled: true
 #  period: 10s
 #  hosts: ["localhost:5000"]

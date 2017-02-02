@@ -428,14 +428,14 @@ experimental[] ceph Module
 
 
 [float]
-== health Fields
+== cluster_health Fields
 
-health
+cluster_health
 
 
 
 [float]
-=== ceph.health.cluster.overall_status
+=== ceph.cluster_health.overall_status
 
 type: keyword
 
@@ -443,7 +443,7 @@ Overall status of the cluster
 
 
 [float]
-=== ceph.health.cluster.timechecks.epoch
+=== ceph.cluster_health.timechecks.epoch
 
 type: long
 
@@ -451,7 +451,7 @@ Map version
 
 
 [float]
-=== ceph.health.cluster.timechecks.round.value
+=== ceph.cluster_health.timechecks.round.value
 
 type: long
 
@@ -459,7 +459,7 @@ timecheck round
 
 
 [float]
-=== ceph.health.cluster.timechecks.round.status
+=== ceph.cluster_health.timechecks.round.status
 
 type: keyword
 
@@ -467,7 +467,14 @@ Status of the round
 
 
 [float]
-=== ceph.health.mon.available.pct
+== monitor_health Fields
+
+monitor_health stats data
+
+
+
+[float]
+=== ceph.monitor_health.available.pct
 
 type: long
 
@@ -475,7 +482,7 @@ Available percent of the MON
 
 
 [float]
-=== ceph.health.mon.health
+=== ceph.monitor_health.health
 
 type: keyword
 
@@ -483,7 +490,7 @@ Health of the MON
 
 
 [float]
-=== ceph.health.mon.available.kb
+=== ceph.monitor_health.available.kb
 
 type: long
 
@@ -491,7 +498,7 @@ Available KB of the MON
 
 
 [float]
-=== ceph.health.mon.total.kb
+=== ceph.monitor_health.total.kb
 
 type: long
 
@@ -499,7 +506,7 @@ Total KB of the MON
 
 
 [float]
-=== ceph.health.mon.used.kb
+=== ceph.monitor_health.used.kb
 
 type: long
 
@@ -507,7 +514,7 @@ Used KB of the MON
 
 
 [float]
-=== ceph.health.mon.last_updated
+=== ceph.monitor_health.last_updated
 
 type: date
 
@@ -515,7 +522,7 @@ Time when was updated
 
 
 [float]
-=== ceph.health.mon.name
+=== ceph.monitor_health.name
 
 type: keyword
 
@@ -523,7 +530,7 @@ Name of the MON
 
 
 [float]
-=== ceph.health.mon.store_stats.log.bytes
+=== ceph.monitor_health.store_stats.log.bytes
 
 type: long
 
@@ -533,7 +540,7 @@ Log bytes of MON
 
 
 [float]
-=== ceph.health.mon.store_stats.misc.bytes
+=== ceph.monitor_health.store_stats.misc.bytes
 
 type: long
 
@@ -543,7 +550,7 @@ Misc bytes of MON
 
 
 [float]
-=== ceph.health.mon.store_stats.sst.bytes
+=== ceph.monitor_health.store_stats.sst.bytes
 
 type: long
 
@@ -553,7 +560,7 @@ SST bytes of MON
 
 
 [float]
-=== ceph.health.mon.store_stats.total.bytes
+=== ceph.monitor_health.store_stats.total.bytes
 
 type: long
 
@@ -563,7 +570,7 @@ Total bytes of MON
 
 
 [float]
-=== ceph.health.mon.store_stats.last_updated
+=== ceph.monitor_health.store_stats.last_updated
 
 type: long
 

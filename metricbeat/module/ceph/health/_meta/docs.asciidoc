@@ -1,3 +1,0 @@
-=== ceph health MetricSet
-
-This is the health metricset of the module ceph.

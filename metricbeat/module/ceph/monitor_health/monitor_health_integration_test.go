@@ -1,10 +1,11 @@
-package health
+package monitor_health
 
 import (
 	"fmt"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"os"
 	"testing"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
@@ -18,13 +19,13 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "ceph",
-		"metricsets": []string{"health"},
+		"metricsets": []string{"monitor_health"},
 		"hosts":      getTestCephHost(),
 	}
 }
 
 const (
-	cephDefaultHost = "172.17.0.1"
+	cephDefaultHost = "127.0.0.1"
 	cephDefaultPort = "5000"
 )
 
