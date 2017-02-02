@@ -1,6 +1,7 @@
 package beater
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"sync"
@@ -107,7 +108,7 @@ func (pb *packetbeat) init(b *beat.Beat) error {
 	}
 
 	logp.Debug("main", "Initializing protocol plugins")
-	err = protos.Protos.Init(false, pb.pub, cfg.Protocols)
+	err = protos.Protos.Init(false, pb.pub, cfg.Protocols, cfg.ProtocolsList)
 	if err != nil {
 		return fmt.Errorf("Initializing protocol analyzers failed: %v", err)
 	}
@@ -189,8 +190,13 @@ func (pb *packetbeat) Stop() {
 func (pb *packetbeat) setupSniffer() error {
 	config := &pb.config
 
+	icmp, err := pb.icmpConfig()
+	if err != nil {
+		return err
+	}
+
 	withVlans := config.Interfaces.WithVlans
-	withICMP := config.Protocols["icmp"].Enabled()
+	withICMP := icmp.Enabled()
 
 	filter := config.Interfaces.BpfFilter
 	if filter == "" && !config.Flows.IsEnabled() {
@@ -215,7 +221,11 @@ func (pb *packetbeat) createWorker(dl layers.LinkType) (sniffer.Worker, error) {
 
 	var icmp4 icmp.ICMPv4Processor
 	var icmp6 icmp.ICMPv6Processor
-	if cfg := config.Protocols["icmp"]; cfg.Enabled() {
+	cfg, err := pb.icmpConfig()
+	if err != nil {
+		return nil, err
+	}
+	if cfg.Enabled() {
 		icmp, err := icmp.New(false, pb.pub, cfg)
 		if err != nil {
 			return nil, err
@@ -244,4 +254,33 @@ func (pb *packetbeat) createWorker(dl layers.LinkType) (sniffer.Worker, error) {
 		pb.services = append(pb.services, f)
 	}
 	return worker, nil
+}
+
+func (pb *packetbeat) icmpConfig() (*common.Config, error) {
+	var icmp *common.Config
+	if pb.config.Protocols["icmp"].Enabled() {
+		icmp = pb.config.Protocols["icmp"]
+	}
+
+	for _, cfg := range pb.config.ProtocolsList {
+		info := struct {
+			Type string `config:"type" validate:"required"`
+		}{}
+
+		if err := cfg.Unpack(&info); err != nil {
+			return nil, err
+		}
+
+		if info.Type != "icmp" {
+			continue
+		}
+
+		if icmp != nil {
+			return nil, errors.New("More then one icmp confgigurations found")
+		}
+
+		icmp = cfg
+	}
+
+	return icmp, nil
 }
