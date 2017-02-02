@@ -1,4 +1,4 @@
-package df
+package pool_disk
 
 import (
 	"io/ioutil"
@@ -26,7 +26,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	config := map[string]interface{}{
 		"module":     "ceph",
-		"metricsets": []string{"df"},
+		"metricsets": []string{"pool_disk"},
 		"hosts":      []string{server.URL},
 	}
 
@@ -39,35 +39,16 @@ func TestFetchEventContents(t *testing.T) {
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
-	statsCluster := event["stats"].(common.MapStr)
+	assert.EqualValues(t, "rbd", event["name"])
+	assert.EqualValues(t, 0, event["id"])
 
-	used := statsCluster["used"].(common.MapStr)
-	assert.EqualValues(t, 1428520960, used["bytes"])
+	stats := event["stats"].(common.MapStr)
 
-	total := statsCluster["total"].(common.MapStr)
-	assert.EqualValues(t, 6431965184, total["bytes"])
-
-	available := statsCluster["available"].(common.MapStr)
-	assert.EqualValues(t, 5003444224, available["bytes"])
-
-	event = events[1]
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
-
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
-
-	pool := event["pool"].(common.MapStr)
-	assert.EqualValues(t, "rbd", pool["name"])
-	assert.EqualValues(t, 0, pool["id"])
-
-	stats := pool["stats"].(common.MapStr)
-
-	used = stats["used"].(common.MapStr)
+	used := stats["used"].(common.MapStr)
 	assert.EqualValues(t, 0, used["bytes"])
 	assert.EqualValues(t, 0, used["kb"])
 
-	available = stats["available"].(common.MapStr)
+	available := stats["available"].(common.MapStr)
 	assert.EqualValues(t, 5003444224, available["bytes"])
 
 }

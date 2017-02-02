@@ -96,7 +96,11 @@ metricbeat.modules:
 
 #-------------------------------- ceph Module --------------------------------
 #- module: ceph
+<<<<<<< HEAD
+#  metricsets: ["health","df"]
+=======
 #  metricsets: ["health"]
+>>>>>>> upstream/master
 #  enabled: true
 #  period: 10s
 #  hosts: ["localhost:5000"]

@@ -428,14 +428,14 @@ experimental[] ceph Module
 
 
 [float]
-== df Fields
+== cluster_disk Fields
 
-df
+cluster_disk
 
 
 
 [float]
-=== ceph.df.stats.available.bytes
+=== ceph.cluster_disk.stats.available.bytes
 
 type: long
 
@@ -445,7 +445,7 @@ Available bytes of the cluster
 
 
 [float]
-=== ceph.df.stats.total.bytes
+=== ceph.cluster_disk.stats.total.bytes
 
 type: long
 
@@ -455,65 +455,13 @@ Total bytes of the cluster
 
 
 [float]
-=== ceph.df.stats.used.bytes
+=== ceph.cluster_disk.stats.used.bytes
 
 type: long
 
 format: bytes
 
 Used bytes of the cluster
-
-
-[float]
-=== ceph.df.pool.id
-
-type: long
-
-Id of the pool
-
-
-[float]
-=== ceph.df.pool.name
-
-type: keyword
-
-Name of the pool
-
-
-[float]
-=== ceph.df.pool.stats.available.bytes
-
-type: long
-
-format: bytes
-
-Available bytes of the pool
-
-
-[float]
-=== ceph.df.pool.stats.objects
-
-type: long
-
-Number of objects of the pool
-
-
-[float]
-=== ceph.df.pool.stats.used.bytes
-
-type: long
-
-format: bytes
-
-Used bytes of the pool
-
-
-[float]
-=== ceph.df.pool.stats.used.kb
-
-type: long
-
-Used kb of the pool
 
 
 [float]
@@ -657,6 +605,65 @@ Total bytes of MON
 type: long
 
 Last updated
+
+
+[float]
+== pool_disk Fields
+
+pool_disk
+
+
+
+[float]
+=== ceph.pool_disk.id
+
+type: long
+
+Id of the pool
+
+
+[float]
+=== ceph.pool_disk.name
+
+type: keyword
+
+Name of the pool
+
+
+[float]
+=== ceph.pool_disk.stats.available.bytes
+
+type: long
+
+format: bytes
+
+Available bytes of the pool
+
+
+[float]
+=== ceph.pool_disk.stats.objects
+
+type: long
+
+Number of objects of the pool
+
+
+[float]
+=== ceph.pool_disk.stats.used.bytes
+
+type: long
+
+format: bytes
+
+Used bytes of the pool
+
+
+[float]
+=== ceph.pool_disk.stats.used.kb
+
+type: long
+
+Used kb of the pool
 
 
 [[exported-fields-cloud]]

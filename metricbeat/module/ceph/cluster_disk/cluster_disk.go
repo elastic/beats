@@ -1,4 +1,4 @@
-package df
+package cluster_disk
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("ceph", "df", New, hostParser); err != nil {
+	if err := mb.Registry.AddMetricSet("ceph", "cluster_disk", New, hostParser); err != nil {
 		panic(err)
 	}
 }
@@ -34,7 +34,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The ceph df metricset is experimental")
+	logp.Warn("EXPERIMENTAL: The ceph cluster_disk metricset is experimental")
 
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -42,7 +42,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	req, err := http.NewRequest("GET", m.HostData().SanitizedURI, nil)
 
@@ -58,5 +58,5 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
 	}
 
-	return eventsMapping(resp.Body), nil
+	return eventMapping(resp.Body), nil
 }

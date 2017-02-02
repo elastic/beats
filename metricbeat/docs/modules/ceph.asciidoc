@@ -19,7 +19,11 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 #- module: ceph
+<<<<<<< HEAD
+#  metricsets: ["health","df"]
+=======
 #  metricsets: ["health"]
+>>>>>>> upstream/master
 #  enabled: true
 #  period: 10s
 #  hosts: ["localhost:5000"]
@@ -30,16 +34,15 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-<<<<<<< HEAD
-* <<metricbeat-metricset-ceph-df,df>>
+* <<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>
 
 * <<metricbeat-metricset-ceph-health,health>>
 
-include::ceph/df.asciidoc[]
+* <<metricbeat-metricset-ceph-pool_disk,pool_disk>>
 
-=======
-* <<metricbeat-metricset-ceph-health,health>>
+include::ceph/cluster_disk.asciidoc[]
 
->>>>>>> upstream/master
 include::ceph/health.asciidoc[]
+
+include::ceph/pool_disk.asciidoc[]
 

@@ -187,43 +187,8 @@
         },
         "ceph": {
           "properties": {
-            "df": {
+            "cluster_disk": {
               "properties": {
-                "pool": {
-                  "properties": {
-                    "id": {
-                      "type": "long"
-                    },
-                    "name": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "stats": {
-                      "properties": {
-                        "available": {
-                          "properties": {
-                            "bytes": {
-                              "type": "long"
-                            }
-                          }
-                        },
-                        "objects": {
-                          "type": "long"
-                        },
-                        "used": {
-                          "properties": {
-                            "bytes": {
-                              "type": "long"
-                            },
-                            "kb": {
-                              "type": "long"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
                 "stats": {
                   "properties": {
                     "available": {
@@ -346,6 +311,41 @@
                     },
                     "used": {
                       "properties": {
+                        "kb": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "pool_disk": {
+              "properties": {
+                "id": {
+                  "type": "long"
+                },
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "stats": {
+                  "properties": {
+                    "available": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "objects": {
+                      "type": "long"
+                    },
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        },
                         "kb": {
                           "type": "long"
                         }
