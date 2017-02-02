@@ -13,6 +13,15 @@
             },
             "match_mapping_type": "string"
           }
+        },
+        {
+          "system.process.cgroup.cpuacct.percpu": {
+            "mapping": {
+              "type": "long"
+            },
+            "match_mapping_type": "long",
+            "path_match": "system.process.cgroup.cpuacct.percpu.*"
+          }
         }
       ],
       "properties": {
@@ -917,6 +926,9 @@
             }
           }
         },
+        "fields": {
+          "properties": {}
+        },
         "haproxy": {
           "properties": {
             "info": {
@@ -1544,6 +1556,9 @@
                     },
                     "insync_replica": {
                       "type": "boolean"
+                    },
+                    "isr": {
+                      "properties": {}
                     },
                     "leader": {
                       "type": "long"
@@ -3491,6 +3506,9 @@
                           "ignore_above": 1024,
                           "type": "keyword"
                         },
+                        "percpu": {
+                          "properties": {}
+                        },
                         "stats": {
                           "properties": {
                             "system": {
@@ -3779,6 +3797,9 @@
                       "type": "long"
                     }
                   }
+                },
+                "env": {
+                  "properties": {}
                 },
                 "fd": {
                   "properties": {

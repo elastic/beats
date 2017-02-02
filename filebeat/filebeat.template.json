@@ -161,6 +161,9 @@
           "ignore_above": 1024,
           "type": "keyword"
         },
+        "fields": {
+          "properties": {}
+        },
         "input_type": {
           "ignore_above": 1024,
           "type": "keyword"

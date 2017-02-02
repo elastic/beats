@@ -192,6 +192,9 @@
           "index": "not_analyzed",
           "type": "string"
         },
+        "fields": {
+          "properties": {}
+        },
         "input_type": {
           "ignore_above": 1024,
           "index": "not_analyzed",
