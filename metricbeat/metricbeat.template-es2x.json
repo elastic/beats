@@ -815,6 +815,37 @@
                 }
               }
             },
+            "image": {
+              "properties": {
+                "created": {
+                  "type": "date"
+                },
+                "id": {
+                  "properties": {
+                    "current": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "parent": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "size": {
+                  "properties": {
+                    "regular": {
+                      "type": "long"
+                    },
+                    "virtual": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
+            },
             "info": {
               "properties": {
                 "containers": {
