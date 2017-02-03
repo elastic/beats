@@ -1,7 +1,7 @@
 import os
 import argparse
 
-# Creates a new beat based on the given parameters
+# Creates a new beat or metricbeat based on the given parameters
 
 project_name = ""
 github_name = ""
@@ -10,7 +10,8 @@ beat_path = ""
 full_name = ""
 
 
-def generate_beat(template_path, args):
+def generate_beat(args):
+
 
     global project_name, github_name, beat, beat_path, full_name
 
@@ -27,7 +28,7 @@ def generate_beat(template_path, args):
         full_name = args.full_name
 
     read_input()
-    process_file(template_path)
+    process_file(args.type)
 
 
 def read_input():
@@ -50,13 +51,13 @@ def read_input():
         full_name = raw_input("Firstname Lastname: ") or "Firstname Lastname"
 
 
-def process_file(template_path):
+def process_file(beat_type):
 
     # Load path information
-    generator_path = os.path.dirname(os.path.realpath(__file__))
+    template_path = os.path.dirname(os.path.realpath(__file__)) + '/../generator'
     go_path = os.environ['GOPATH']
 
-    for root, dirs, files in os.walk(generator_path + '/' + template_path + '/{beat}'):
+    for root, dirs, files in os.walk(template_path + '/' + beat_type + '/{beat}'):
 
         for file in files:
 
@@ -74,7 +75,7 @@ def process_file(template_path):
             new_path = replace_variables(full_path).replace(".go.tmpl", ".go")
 
             # remove generator info and beat name from path
-            file_path = new_path.replace(generator_path + "/" + template_path + "/" + beat, "")
+            file_path = new_path.replace(template_path + "/" + beat_type + "/" + beat, "")
 
             # New file path to write file content to
             write_file = go_path + "/src/" + beat_path + "/" + file_path
@@ -108,5 +109,16 @@ def get_parser():
     parser.add_argument("--github_name", help="Github name")
     parser.add_argument("--beat_path", help="Beat path")
     parser.add_argument("--full_name", help="Full name")
+    parser.add_argument("--type", help="Beat type", default="beat")
 
     return parser
+
+
+if __name__ == "__main__":
+
+    parser = get_parser()
+    args = parser.parse_args()
+
+    generate_beat(args)
+
+
