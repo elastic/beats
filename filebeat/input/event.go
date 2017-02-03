@@ -105,6 +105,6 @@ func mergeJSONFields(e *Event, event common.MapStr) {
 			}
 		}
 	} else {
-		event[e.JSONConfig.Target] = e.JSONFields
+		event["json"] = e.JSONFields
 	}
 }

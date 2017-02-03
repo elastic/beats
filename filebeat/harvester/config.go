@@ -28,7 +28,6 @@ var (
 		CloseEOF:        false,
 		CloseTimeout:    0,
 		ForceCloseFiles: false,
-		JSON:            &reader.JSONConfig{Target: "json"},
 	}
 )
 
