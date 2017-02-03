@@ -14,7 +14,7 @@ Notes
 - Topics has a list of partitions
 - Each partition has an offset
 - Topic can be across brokers
-- Each broker has a list of paritions
+- Each broker has a list of partitions
 
 */
 package kafka

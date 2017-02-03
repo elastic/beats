@@ -2,31 +2,45 @@ package sarama
 
 type offsetRequestBlock struct {
 	time       int64
-	maxOffsets int32
+	maxOffsets int32 // Only used in version 0
 }
 
-func (b *offsetRequestBlock) encode(pe packetEncoder) error {
+func (b *offsetRequestBlock) encode(pe packetEncoder, version int16) error {
 	pe.putInt64(int64(b.time))
-	pe.putInt32(b.maxOffsets)
+	if version == 0 {
+		pe.putInt32(b.maxOffsets)
+	}
+
 	return nil
 }
 
-func (b *offsetRequestBlock) decode(pd packetDecoder) (err error) {
+func (b *offsetRequestBlock) decode(pd packetDecoder, version int16) (err error) {
 	if b.time, err = pd.getInt64(); err != nil {
 		return err
 	}
-	if b.maxOffsets, err = pd.getInt32(); err != nil {
-		return err
+	if version == 0 {
+		if b.maxOffsets, err = pd.getInt32(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 type OffsetRequest struct {
-	blocks map[string]map[int32]*offsetRequestBlock
+	Version        int16
+	replicaID      *int32
+	storeReplicaID int32
+	blocks         map[string]map[int32]*offsetRequestBlock
 }
 
 func (r *OffsetRequest) encode(pe packetEncoder) error {
-	pe.putInt32(-1) // replica ID is always -1 for clients
+	if r.replicaID == nil {
+		// default replica ID is always -1 for clients
+		pe.putInt32(-1)
+	} else {
+		pe.putInt32(*r.replicaID)
+	}
+
 	err := pe.putArrayLength(len(r.blocks))
 	if err != nil {
 		return err
@@ -42,7 +56,7 @@ func (r *OffsetRequest) encode(pe packetEncoder) error {
 		}
 		for partition, block := range partitions {
 			pe.putInt32(partition)
-			if err = block.encode(pe); err != nil {
+			if err = block.encode(pe, r.Version); err != nil {
 				return err
 			}
 		}
@@ -51,6 +65,8 @@ func (r *OffsetRequest) encode(pe packetEncoder) error {
 }
 
 func (r *OffsetRequest) decode(pd packetDecoder, version int16) error {
+	r.Version = version
+
 	// Ignore replica ID
 	if _, err := pd.getInt32(); err != nil {
 		return err
@@ -79,7 +95,7 @@ func (r *OffsetRequest) decode(pd packetDecoder, version int16) error {
 				return err
 			}
 			block := &offsetRequestBlock{}
-			if err := block.decode(pd); err != nil {
+			if err := block.decode(pd, version); err != nil {
 				return err
 			}
 			r.blocks[topic][partition] = block
@@ -93,11 +109,21 @@ func (r *OffsetRequest) key() int16 {
 }
 
 func (r *OffsetRequest) version() int16 {
-	return 0
+	return r.Version
 }
 
 func (r *OffsetRequest) requiredVersion() KafkaVersion {
-	return minVersion
+	switch r.Version {
+	case 1:
+		return V0_10_1_0
+	default:
+		return minVersion
+	}
+}
+
+func (r *OffsetRequest) SetReplicaID(id int32) {
+	r.storeReplicaID = id
+	r.replicaID = &r.storeReplicaID
 }
 
 func (r *OffsetRequest) AddBlock(topic string, partitionID int32, time int64, maxOffsets int32) {
@@ -111,7 +137,9 @@ func (r *OffsetRequest) AddBlock(topic string, partitionID int32, time int64, ma
 
 	tmp := new(offsetRequestBlock)
 	tmp.time = time
-	tmp.maxOffsets = maxOffsets
+	if r.Version == 0 {
+		tmp.maxOffsets = maxOffsets
+	}
 
 	r.blocks[topic][partitionID] = tmp
 }

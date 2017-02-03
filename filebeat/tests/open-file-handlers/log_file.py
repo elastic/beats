@@ -20,7 +20,7 @@ logger.addHandler(handler)
 # Start logging and rotating
 i = 0
 while True:
-#for i in range(0, 10000):
+    # for i in range(0, 10000):
     time.sleep(random.uniform(0, 0.1))
     i = i + 1
     # Tries to cause some more heavy peaks

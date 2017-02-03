@@ -1,45 +1,33 @@
 package mb_test
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 )
+
+var hostParser = parse.URLHostParserBuilder{DefaultScheme: "http"}.Build()
 
 func init() {
 	// Register the MetricSetFactory function for the "status" MetricSet.
-	if err := mb.Registry.AddMetricSet("someapp", "status", NewMetricSet); err != nil {
+	if err := mb.Registry.AddMetricSet("someapp", "status", NewMetricSet, hostParser); err != nil {
 		panic(err)
 	}
 }
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	username string
-	password string
 }
 
 func NewMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	// Unpack additional configuration options.
-	config := struct {
-		Username string `config:"username"`
-		Password string `config:"password"`
-	}{
-		Username: "",
-		Password: "",
-	}
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
-
-	return &MetricSet{
-		BaseMetricSet: base,
-		username:      config.Username,
-		password:      config.Password,
-	}, nil
+	fmt.Println("someapp-status url=", base.HostData().SanitizedURI)
+	return &MetricSet{BaseMetricSet: base}, nil
 }
 
 func (ms *MetricSet) Fetch() (common.MapStr, error) {
-	// Fetch data from host and return the data.
+	// Fetch data from the host (using ms.HostData().URI) and return the data.
 	return common.MapStr{
 		"someParam":  "value",
 		"otherParam": 42,

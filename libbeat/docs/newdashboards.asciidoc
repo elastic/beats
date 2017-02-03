@@ -59,7 +59,7 @@ Elasticsearch running on localhost for a single Beat (eg. Metricbeat):
 ./scripts/import_dashboards -file metricbeat-dashboards-1.1.zip
 ----------------------------------------------------------------------
 
-- from the official zip archive available under http://artifacts.elastic.co/:
+- from the official zip archive available at {dashboards}:
 +
 [source,shell]
 ----------------------------------------------------------------------
@@ -151,6 +151,13 @@ The Beat name. The Beat name is required when importing from a zip archive. When
 the Beat. When running the script from source, the default value is "", so you need to set this option in order to install the index pattern and
 the dashboards for a single Beat. Otherwise the script imports the index pattern and the dashboards for all Beats.
 
+*`-cacert <certificate_authority>`*::
+The Certificate Authority to use for server verification.
+
+*`-cert <client_certificate>`*::
+The certificate to use for SSL client authentication. The certificate must be in
+PEM format.
+
 *`-dir <local_dir>`*::
 Local directory that contains the subdirectories: dashboard, visualization, search, and index-pattern. The default value is the current directory.
 
@@ -164,8 +171,14 @@ Local zip archive with the dashboards. The archive can contain Kibana dashboards
 You should only use this option if you want to change the index pattern name that's used by default. For example, if the
 default is `metricbeat-*`, you can change it to `custombeat-*`.
 
+*`-insecure`*::
+If specified, "insecure" SSL connections are allowed.
+
 *`-k <kibana_index>`*::
 The Elasticsearch index pattern where Kibana saves its configuration. The default value is `.kibana`.
+
+*`-key <client_key>`*::
+The client certificate key. The key must be in PEM format.
 
 *`-only-dashboards`*::
 If specified, then only the dashboards, along with their visualizations and searches, are imported. The index pattern is

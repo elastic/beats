@@ -16,6 +16,7 @@ LOAD_TESTS = os.environ.get('LOAD_TESTS', False)
 
 
 class Test(BaseTest):
+
     def test_no_missing_events(self):
         """
         Test that filebeat does not loose any events under heavy file rotation and load
@@ -44,7 +45,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            rotate_every_kb=(total_lines * (line_length +1)),    # With filepath, each line can be up to 1KB is assumed
+            rotate_every_kb=(total_lines * (line_length + 1)),    # With filepath, each line can be up to 1KB is assumed
             clean_removed="false",
         )
 
@@ -53,7 +54,7 @@ class Test(BaseTest):
 
         # wait until filebeat is fully running
         self.wait_until(
-            lambda: self.log_contains("All prospectors are initialised and running"),
+            lambda: self.log_contains("Loading and starting Prospectors completed."),
             max_timeout=15)
 
         # Start logging and rotating
@@ -79,15 +80,15 @@ class Test(BaseTest):
 
         ### This lines can be uncomemnted for debugging ###
         # Prints out the missing entries
-        #for i in range(total_lines):
+        # for i in range(total_lines):
         #    if i not in entry_list:
         #        print i
         # Stats about the files read
         #unique_entries = len(set(entry_list))
-        #print "Total lines: " + str(total_lines)
-        #print "Total unique entries: " + str(unique_entries)
-        #print "Total entries: " + str(len(entry_list))
-        #print "Registry entries: " + str(len(data))
+        # print "Total lines: " + str(total_lines)
+        # print "Total unique entries: " + str(unique_entries)
+        # print "Total entries: " + str(len(entry_list))
+        # print "Registry entries: " + str(len(data))
 
         # Check that file exist
         data = self.get_registry()
@@ -102,7 +103,6 @@ class Test(BaseTest):
         assert len(set(entry_list)) == total_lines
         assert len(entry_list) == total_lines
 
-
     @unittest.skipUnless(LOAD_TESTS, "load test")
     @attr('load')
     def test_large_number_of_files(self):
@@ -116,22 +116,21 @@ class Test(BaseTest):
         # Create content for each file
         content = ""
         for n in range(lines_per_file):
-            content += "Line " + str(n+1) + "\n"
+            content += "Line " + str(n + 1) + "\n"
 
         os.mkdir(self.working_dir + "/log/")
         testfile = self.working_dir + "/log/test"
 
         for n in range(number_of_files):
-            with open(testfile + "-" + str(n+1), 'w') as f:
+            with open(testfile + "-" + str(n + 1), 'w') as f:
                 f.write(content)
-
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             rotate_every_kb=number_of_files * lines_per_file * 12 * 2,
             scan_frequency="40s",
-            #close_inactive="5s",
-            #close_eof=True,
+            # close_inactive="5s",
+            # close_eof=True,
         )
         filebeat = self.start_beat()
 
@@ -146,7 +145,6 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == number_of_files
 
-
     @unittest.skipUnless(LOAD_TESTS, "load test")
     @attr('load')
     def test_concurrent_harvesters(self):
@@ -159,15 +157,14 @@ class Test(BaseTest):
         # Create content for each file
         content = ""
         for n in range(lines_per_file):
-            content += "Line " + str(n+1) + "\n"
+            content += "Line " + str(n + 1) + "\n"
 
         os.mkdir(self.working_dir + "/log/")
         testfile = self.working_dir + "/log/test"
 
         for n in range(number_of_files):
-            with open(testfile + "-" + str(n+1), 'w') as f:
+            with open(testfile + "-" + str(n + 1), 'w') as f:
                 f.write(content)
-
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
@@ -177,7 +174,7 @@ class Test(BaseTest):
 
         total_lines = number_of_files * lines_per_file
 
-        print total_lines
+        print(total_lines)
         # wait until all lines are read
         self.wait_until(
             lambda: self.output_has(lines=total_lines),

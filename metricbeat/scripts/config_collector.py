@@ -4,28 +4,6 @@ import yaml
 
 # Collects config for all modules
 
-header_full = """
-# This file is a full configuration example documenting all non-deprecated
-# options in comments. For a shorter configuration example, that contains only
-# the most common options, please see metricbeat.yml in the same directory.
-#
-# You can find the full configuration reference here:
-# https://www.elastic.co/guide/en/beats/metricbeat/index.html
-
-#==========================  Modules configuration ============================
-"""
-
-header_short = """
-# This file is an example configuration file highlighting only the most common
-# options. The metricbeat.full.yml file from the same directory contains all the
-# supported options with more comments. You can use it as a reference.
-#
-# You can find the full configuration reference here:
-# https://www.elastic.co/guide/en/beats/metricbeat/index.html
-
-#==========================  Modules configuration ============================
-"""
-
 
 def collect(beat_name, beat_path, full=False):
 
@@ -34,11 +12,7 @@ def collect(beat_name, beat_path, full=False):
 
     # yml file
 
-    if full:
-        config_yml = "########################## " + beat_name.title() + " Configuration ###########################\n" + header_full
-    else:
-        config_yml = "###################### " + beat_name.title() + " Configuration Example #######################\n" + header_short
-
+    config_yml = "\n#==========================  Modules configuration ============================\n"
     config_yml += beat_name + """.modules:
 
 """
@@ -90,7 +64,7 @@ def collect(beat_name, beat_path, full=False):
 
         config_yml += "\n"
     # output string so it can be concatenated
-    print config_yml
+    print(config_yml)
 
 
 # Makes sure every title line is 79 + newline chars long

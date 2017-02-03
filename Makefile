@@ -3,6 +3,7 @@ BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
 BEATS=packetbeat filebeat winlogbeat metricbeat heartbeat
 PROJECTS=libbeat ${BEATS}
+PROJECTS_ENV=libbeat filebeat metricbeat
 SNAPSHOT?=yes
 
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
@@ -11,6 +12,9 @@ SNAPSHOT?=yes
 testsuite:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
 	#$(MAKE) -C generate test
+
+stop-environments:
+	$(foreach var,$(PROJECTS_ENV),$(MAKE) -C $(var) stop-environment || exit 0;)
 
 # Runs unit and system tests without coverage and race detection.
 .PHONY: test
@@ -36,8 +40,7 @@ coverage-report:
 
 .PHONY: update
 update:
-	$(MAKE) -C libbeat collect
-	$(foreach var,$(BEATS),$(MAKE) -C $(var) update || exit 1;)
+	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) update || exit 1;)
 
 .PHONY: clean
 clean:
@@ -54,7 +57,7 @@ clean-vendor:
 .PHONY: check
 check:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
-	# Validate that all updates were commited
+	# Validate that all updates were committed
 	$(MAKE) update
 	git update-index --refresh
 	git diff-index --exit-code HEAD --
@@ -71,7 +74,7 @@ simplify:
 .PHONY: beats-dashboards
 beats-dashboards:
 	mkdir -p build/dashboards
-	$(foreach var,$(BEATS),-cp -r $(var)/_meta/kibana/ build/dashboards/$(var)  || exit 1;)
+	$(foreach var,$(BEATS),cp -r $(var)/_meta/kibana/ build/dashboards/$(var)  || exit 1;)
 
 # Builds the documents for each beat
 .PHONY: docs
@@ -92,6 +95,8 @@ package: update beats-dashboards
 	mkdir -p build/upload/
 	$(foreach var,$(BEATS),cp -r $(var)/build/upload/ build/upload/$(var)  || exit 1;)
 	cp -r build/dashboards-upload build/upload/dashboards
+	# Run tests on the generated packages.
+	go test ./dev-tools/package_test.go -files "${shell pwd}/build/upload/*/*"
 
 # Upload nightly builds to S3
 .PHONY: upload-nightlies-s3
@@ -109,3 +114,9 @@ upload-package:
 .PHONY: release-upload
 upload-release:
 	aws s3 cp --recursive --acl public-read build/upload s3://download.elasticsearch.org/beats/
+
+.PHONY: notice
+notice:
+	python dev-tools/generate_notice.py .
+
+

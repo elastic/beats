@@ -1,7 +1,6 @@
 package docker
 
 import (
-	"sort"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -10,21 +9,17 @@ import (
 )
 
 type Container struct {
-	Id     string
+	ID     string
 	Name   string
-	Labels []common.MapStr
-	Socket *string
+	Labels common.MapStr
 }
 
 func (c *Container) ToMapStr() common.MapStr {
 	m := common.MapStr{
-		"id":   c.Id,
+		"id":   c.ID,
 		"name": c.Name,
-		// TODO: Is this really needed
-		"socket": GetSocket(),
 	}
 
-	// Only add labels array if not 0
 	if len(c.Labels) > 0 {
 		m["labels"] = c.Labels
 	}
@@ -33,16 +28,16 @@ func (c *Container) ToMapStr() common.MapStr {
 
 func NewContainer(container *docker.APIContainers) *Container {
 	return &Container{
-		Id:     container.ID,
+		ID:     container.ID,
 		Name:   ExtractContainerName(container.Names),
-		Labels: BuildLabelArray(container.Labels),
+		Labels: DeDotLabels(container.Labels),
 	}
 }
 
 func ExtractContainerName(names []string) string {
 	output := names[0]
 
-	if cap(names) > 1 {
+	if len(names) > 1 {
 		for _, name := range names {
 			if strings.Count(output, "/") > strings.Count(name, "/") {
 				output = name
@@ -52,24 +47,16 @@ func ExtractContainerName(names []string) string {
 	return strings.Trim(output, "/")
 }
 
-func BuildLabelArray(labels map[string]string) []common.MapStr {
-
-	outputLabels := make([]common.MapStr, len(labels))
-	i := 0
-	var keys []string
-	for key := range labels {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-	for _, k := range keys {
-		// Replace all . in the labels by _
-		// TODO: WHY?
+// DeDotLabels returns a new common.MapStr containing a copy of the labels
+// where the dots in each label name have been changed to an underscore.
+func DeDotLabels(labels map[string]string) common.MapStr {
+	outputLabels := common.MapStr{}
+	for k, v := range labels {
+		// This is necessary so that ES does not interpret '.' fields as new
+		// nested JSON objects, and also makes this compatible with ES 2.x.
 		label := strings.Replace(k, ".", "_", -1)
-		outputLabels[i] = common.MapStr{
-			"key":   label,
-			"value": labels[k],
-		}
-		i++
+		outputLabels.Put(label, v)
 	}
+
 	return outputLabels
 }

@@ -1,0 +1,8 @@
+input_type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+fields:
+  source_type: apache2-error

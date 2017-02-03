@@ -1,0 +1,87 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "couchbase": {
+        "node": {
+            "cmd_get": 0,
+            "couch": {
+                "docs": {
+                    "actual_disk_size": {
+                        "bytes": 13575997
+                    },
+                    "data_size": {
+                        "bytes": 9804800
+                    }
+                },
+                "spacial": {
+                    "data_size": {
+                        "bytes": 0
+                    },
+                    "disk_size": {
+                        "bytes": 0
+                    }
+                },
+                "views": {
+                    "actual_disk_size": {
+                        "bytes": 2792998
+                    },
+                    "data_size": {
+                        "bytes": 2792998
+                    }
+                }
+            },
+            "cpu_utilization_rate": {
+                "pct": 87.08791
+            },
+            "current_items": {
+                "total": 7303,
+                "value": 7303
+            },
+            "ep_bg_fetched": 0,
+            "get_hits": 0,
+            "hostname": "172.22.0.9:8091",
+            "mcd_memory": {
+                "allocated": {
+                    "bytes": 6378
+                },
+                "reserved": {
+                    "bytes": 6378
+                }
+            },
+            "memory": {
+                "free": {
+                    "bytes": 2273726464
+                },
+                "total": {
+                    "bytes": 8360542208
+                },
+                "used": {
+                    "bytes": 53962160
+                }
+            },
+            "ops": 0,
+            "swap": {
+                "total": {
+                    "bytes": 4189057024
+                },
+                "used": {
+                    "bytes": 58044416
+                }
+            },
+            "uptime": {
+                "sec": 50492
+            },
+            "vb_replica_curr_items": 0
+        }
+    },
+    "metricset": {
+        "host": "couchbase:8091",
+        "module": "couchbase",
+        "name": "node",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

@@ -7,12 +7,13 @@ package memory
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "memory", New); err != nil {
+	if err := mb.Registry.AddMetricSet("system", "memory", New, parse.EmptyHostParser); err != nil {
 		panic(err)
 	}
 }

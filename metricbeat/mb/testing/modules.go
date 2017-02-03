@@ -45,6 +45,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type TestModule struct {
+	ModName   string
+	ModConfig mb.ModuleConfig
+	RawConfig *common.Config
+}
+
+func (m *TestModule) Name() string                      { return m.ModName }
+func (m *TestModule) Config() mb.ModuleConfig           { return m.ModConfig }
+func (m *TestModule) UnpackConfig(to interface{}) error { return m.RawConfig.Unpack(to) }
+
+func NewTestModule(t testing.TB, config interface{}) *TestModule {
+	c, err := common.NewConfigFrom(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return &TestModule{RawConfig: c}
+}
+
 // newMetricSet instantiates a new MetricSet using the given configuration.
 // The ModuleFactory and MetricSetFactory are obtained from the global
 // Registry.

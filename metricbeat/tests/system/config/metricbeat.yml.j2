@@ -14,6 +14,10 @@ metricbeat.modules:
     {% endfor %}
   {% endif -%}
 
+  {% if m.socket -%}
+  socket: "{{ m.socket }}"
+  {% endif -%}
+
   {% if m.username -%}
   username: {{ m.username }}
   {% endif -%}
@@ -75,6 +79,13 @@ metricbeat.modules:
   {% endfor %}
   {% endif -%}
 {%- endfor %}
+
+{% if reload -%}
+metricbeat.reload.modules:
+  path: {{ reload_path }}
+  period: 1s
+  enabled: true
+{% endif -%}
 
 #================================ General =====================================
 

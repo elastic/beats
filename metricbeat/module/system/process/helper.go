@@ -5,12 +5,12 @@ package process
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"runtime"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/system"
 	"github.com/elastic/beats/metricbeat/module/system/memory"
@@ -31,19 +31,23 @@ type Process struct {
 	Cpu      sigar.ProcTime
 	Ctime    time.Time
 	FD       sigar.ProcFDUsage
+	Env      common.MapStr
 }
 
 type ProcStats struct {
-	ProcStats bool
-	Procs     []string
-	regexps   []*regexp.Regexp
-	ProcsMap  ProcsMap
-	CpuTicks  bool
+	Procs        []string
+	ProcsMap     ProcsMap
+	CpuTicks     bool
+	EnvWhitelist []string
+
+	procRegexps []match.Matcher // List of regular expressions used to whitelist processes.
+	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
 }
 
-// newProcess creates a new Process object based on the state information.
-func newProcess(pid int) (*Process, error) {
-
+// newProcess creates a new Process object and initializes it with process
+// state information. If the process's command line and environment variables
+// are known they should be passed in to avoid re-fetching the information.
+func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 	state := sigar.ProcState{}
 	if err := state.Get(pid); err != nil {
 		return nil, fmt.Errorf("error getting process state for pid=%d: %v", pid, err)
@@ -54,17 +58,22 @@ func newProcess(pid int) (*Process, error) {
 		Ppid:     state.Ppid,
 		Pgid:     state.Pgid,
 		Name:     state.Name,
-		State:    getProcState(byte(state.State)),
 		Username: state.Username,
+		State:    getProcState(byte(state.State)),
+		CmdLine:  cmdline,
 		Ctime:    time.Now(),
+		Env:      env,
 	}
 
 	return &proc, nil
 }
 
-// getDetails fills in CPU, memory, FD usage, and command line details for the process.
-func (proc *Process) getDetails(cmdline string) error {
-
+// getDetails fetches CPU, memory, FD usage, command line arguments, and
+// environment variables for the process. The envPredicate parameter is an
+// optional predicate function that should return true if an environment
+// variable should be saved with the process. If the argument is nil then all
+// environment variables are stored.
+func (proc *Process) getDetails(envPredicate func(string) bool) error {
 	proc.Mem = sigar.ProcMem{}
 	if err := proc.Mem.Get(proc.Pid); err != nil {
 		return fmt.Errorf("error getting process mem for pid=%d: %v", proc.Pid, err)
@@ -75,20 +84,25 @@ func (proc *Process) getDetails(cmdline string) error {
 		return fmt.Errorf("error getting process cpu time for pid=%d: %v", proc.Pid, err)
 	}
 
-	if cmdline == "" {
+	if proc.CmdLine == "" {
 		args := sigar.ProcArgs{}
 		if err := args.Get(proc.Pid); err != nil && !sigar.IsNotImplemented(err) {
 			return fmt.Errorf("error getting process arguments for pid=%d: %v", proc.Pid, err)
 		}
 		proc.CmdLine = strings.Join(args.List, " ")
-	} else {
-		proc.CmdLine = cmdline
 	}
 
 	if fd, err := getProcFDUsage(proc.Pid); err != nil {
 		return fmt.Errorf("error getting process file descriptor usage for pid=%d: %v", proc.Pid, err)
 	} else if fd != nil {
 		proc.FD = *fd
+	}
+
+	if proc.Env == nil {
+		proc.Env = common.MapStr{}
+		if err := getProcEnv(proc.Pid, proc.Env, envPredicate); err != nil {
+			return fmt.Errorf("error getting process environment variables for pid=%d: %v", proc.Pid, err)
+		}
 	}
 
 	return nil
@@ -121,10 +135,38 @@ func getProcFDUsage(pid int) (*sigar.ProcFDUsage, error) {
 	return &fd, nil
 }
 
+// getProcEnv gets the process's environment variables and writes them to the
+// out parameter. It handles ErrNotImplemented and permission errors. Any other
+// errors are returned.
+//
+// The filter function should return true if a given environment variable should
+// be added to the out parameter.
+//
+// On Linux you must be root to read other processes' environment variables.
+func getProcEnv(pid int, out common.MapStr, filter func(v string) bool) error {
+	env := &sigar.ProcEnv{}
+	if err := env.Get(pid); err != nil {
+		switch {
+		case sigar.IsNotImplemented(err):
+			return nil
+		case os.IsPermission(err):
+			return nil
+		default:
+			return err
+		}
+	}
+
+	for k, v := range env.Vars {
+		if filter == nil || filter(k) {
+			out[k] = v
+		}
+	}
+	return nil
+}
+
 func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
 
 	// in unit tests, total_phymem is set to a value greater than zero
-
 	if totalPhyMem == 0 {
 		memStat, err := memory.GetMemory()
 		if err != nil {
@@ -188,6 +230,10 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 		proc["cmdline"] = process.CmdLine
 	}
 
+	if len(process.Env) > 0 {
+		proc["env"] = process.Env
+	}
+
 	if procStats.CpuTicks {
 		proc["cpu"] = common.MapStr{
 			"user":   process.Cpu.User,
@@ -235,7 +281,7 @@ func GetProcCpuPercentage(last *Process, current *Process) float64 {
 
 func (procStats *ProcStats) MatchProcess(name string) bool {
 
-	for _, reg := range procStats.regexps {
+	for _, reg := range procStats.procRegexps {
 		if reg.MatchString(name) {
 			return true
 		}
@@ -251,32 +297,22 @@ func (procStats *ProcStats) InitProcStats() error {
 		return nil
 	}
 
-	procStats.regexps = []*regexp.Regexp{}
+	procStats.procRegexps = []match.Matcher{}
 	for _, pattern := range procStats.Procs {
-		reg, err := regexp.Compile(pattern)
+		reg, err := match.Compile(pattern)
 		if err != nil {
 			return fmt.Errorf("Failed to compile regexp [%s]: %v", pattern, err)
 		}
-		procStats.regexps = append(procStats.regexps, reg)
+		procStats.procRegexps = append(procStats.procRegexps, reg)
 	}
 
-	pids, err := Pids()
-	if err != nil {
-		logp.Warn("Getting the initial list of pids: %v", err)
-	}
-
-	for _, pid := range pids {
-		process, err := newProcess(pid)
+	procStats.envRegexps = make([]match.Matcher, 0, len(procStats.EnvWhitelist))
+	for _, pattern := range procStats.EnvWhitelist {
+		reg, err := match.Compile(pattern)
 		if err != nil {
-			logp.Debug("metricbeat", "Skip process pid=%d: %v", pid, err)
-			continue
+			return fmt.Errorf("failed to compile env whitelist regexp [%v]: %v", pattern, err)
 		}
-		err = process.getDetails("")
-		if err != nil {
-			logp.Err("Error getting process details pid=%d: %v", pid, err)
-			continue
-		}
-		procStats.ProcsMap[process.Pid] = process
+		procStats.envRegexps = append(procStats.envRegexps, reg)
 	}
 
 	return nil
@@ -299,18 +335,20 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 
 	for _, pid := range pids {
 		var cmdline string
+		var env common.MapStr
 		if previousProc := procStats.ProcsMap[pid]; previousProc != nil {
 			cmdline = previousProc.CmdLine
+			env = previousProc.Env
 		}
 
-		process, err := newProcess(pid)
+		process, err := newProcess(pid, cmdline, env)
 		if err != nil {
 			logp.Debug("metricbeat", "Skip process pid=%d: %v", pid, err)
 			continue
 		}
 
 		if procStats.MatchProcess(process.Name) {
-			err = process.getDetails(cmdline)
+			err = process.getDetails(procStats.isWhitelistedEnvVar)
 			if err != nil {
 				logp.Err("Error getting process details. pid=%d: %v", process.Pid, err)
 				continue
@@ -318,7 +356,7 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 
 			newProcs[process.Pid] = process
 
-			last, _ := procStats.ProcsMap[process.Pid]
+			last := procStats.ProcsMap[process.Pid]
 			proc := procStats.GetProcessEvent(process, last)
 
 			processes = append(processes, proc)
@@ -329,24 +367,19 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 	return processes, nil
 }
 
-func (procStats *ProcStats) GetProcStatsEvents() ([]common.MapStr, error) {
-	processes, err := procStats.GetProcStats()
-	if err != nil {
-		return nil, err
+// isWhitelistedEnvVar returns true if the given variable name is a match for
+// the whitelist. If the whitelist is empty it returns false.
+func (p ProcStats) isWhitelistedEnvVar(varName string) bool {
+	if len(p.envRegexps) == 0 {
+		return false
 	}
 
-	events := make([]common.MapStr, len(processes))
-	for _, proc := range processes {
-		event := common.MapStr{
-			"@timestamp": common.Time(time.Now()),
-			"type":       "process",
-			"proc":       proc,
+	for _, p := range p.envRegexps {
+		if p.MatchString(varName) {
+			return true
 		}
-
-		events = append(events, event)
 	}
-
-	return events, nil
+	return false
 }
 
 // unixTimeMsToTime converts a unix time given in milliseconds since Unix epoch

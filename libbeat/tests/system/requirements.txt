@@ -5,3 +5,4 @@ PyYAML
 nose-timer
 redis
 elasticsearch
+requests

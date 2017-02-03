@@ -1,0 +1,9 @@
+- input_type: log
+  paths:
+  {%- for path in paths %}
+   - {{path}}
+  {%- endfor %}
+  exclude_files: [".gz$"]
+  fields:
+    source_type: {module}-{fileset}
+    pipeline_id: {{beat.pipeline_id}}

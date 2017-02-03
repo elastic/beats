@@ -42,10 +42,12 @@ following commands:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ mkdir -p $GOPATH/src/github.com/elastic
-$ cd $GOPATH/src/github.com/elastic
+$ mkdir -p ${GOPATH}/src/github.com/elastic
+$ cd ${GOPATH}/src/github.com/elastic
 $ git clone https://github.com/elastic/beats.git
 ----------------------------------------------------------------------
+
+Note: If you have multiple go paths use `${GOPATH%%:*}`instead of `${GOPATH}`.
 
 Then you can compile it with:
 
@@ -401,7 +403,7 @@ through the publisher client interface, which is received by the `Init`
 function. The publisher client accepts structures of type `common.MapStr`, which
 is essentially a `map[string]interface{}` with a few more convenience methods
 added (see the `beats/libbeat/common` package in the https://github.com/elastic/beats[Beats GitHub repository]).
- 
+
 As an example, here is the relevant code from the Redis module:
 
 [source,go]
@@ -426,7 +428,7 @@ As an example, here is the relevant code from the Redis module:
 	if redis.SendResponse {
 		event["response"] = resp.Message
 	}
-    
+
     return event
 ----------------------------------------------------------------------
 
@@ -583,8 +585,8 @@ test cases containing the inputs and expected outputs. For an example, see the
 in the https://github.com/elastic/beats[Beats GitHub repository].
 
 You can also have unit tests that treat the whole module as a black box, calling
-its interface functions, then reading the result and checking it. This pattern 
-is especially useful for checking corner cases related to packet boundaries or 
+its interface functions, then reading the result and checking it. This pattern
+is especially useful for checking corner cases related to packet boundaries or
 correlation issues. Here is an example from the HTTP module:
 
 [source,go]

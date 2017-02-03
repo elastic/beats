@@ -13,6 +13,11 @@ All notable changes to this project will be documented in this file based on the
 - Make testing dependent on local version of beats
 
 ### Backward Compatibility Breaks
+- Remove dependency on cookiecutter
+
+- Renamed BEAT_DIR to BEAT_PATH.
+- Renamed BEATNAME to BEAT_NAME.
+- Community beats now required BEAT_URL for packaging.
 
 ### Bugfixes
 

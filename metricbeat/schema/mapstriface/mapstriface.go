@@ -85,6 +85,14 @@ func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]inte
 	event[key] = subEvent
 }
 
+func (convMap ConvMap) HasKey(key string) bool {
+	if convMap.Key == key {
+		return true
+	}
+
+	return convMap.Schema.HasKey(key)
+}
+
 func Dict(key string, s schema.Schema, opts ...DictSchemaOption) ConvMap {
 	return dictSetOptions(ConvMap{Key: key, Schema: s}, opts)
 }

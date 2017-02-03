@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -39,11 +41,11 @@ func TestParseUrl(t *testing.T) {
 			Expected: "host=host1 password=secret port=5432 user=user",
 		},
 		{
-			Name:     "user/pass override",
+			Name:     "user/pass in URL take precedence",
 			URL:      "postgres://user1:pass@host1:5432",
 			Username: "user",
 			Password: "secret",
-			Expected: "host=host1 password=secret port=5432 user=user",
+			Expected: "host=host1 password=pass port=5432 user=user1",
 		},
 		{
 			Name:     "timeout no override",
@@ -57,18 +59,32 @@ func TestParseUrl(t *testing.T) {
 			Expected: "connect_timeout=3 host=host1 port=5432",
 		},
 		{
-			Name:     "user/pass override, and timeout override",
+			Name:     "user/pass in URL take precedence, and timeout override",
 			URL:      "postgres://user1:pass@host1:5432?connect_timeout=2",
 			Username: "user",
 			Password: "secret",
 			Timeout:  3 * time.Second,
-			Expected: "connect_timeout=3 host=host1 password=secret port=5432 user=user",
+			Expected: "connect_timeout=3 host=host1 password=pass port=5432 user=user1",
+		},
+		{
+			Name:     "unix socket",
+			URL:      "postgresql:///dbname?host=/var/lib/postgresql",
+			Expected: "dbname=dbname host=/var/lib/postgresql",
 		},
 	}
 
 	for _, test := range tests {
-		url, err := ParseURL(test.URL, test.Username, test.Password, test.Timeout)
-		assert.NoError(t, err, test.Name)
-		assert.Equal(t, test.Expected, url, test.Name)
+		mod := mbtest.NewTestModule(t, map[string]interface{}{
+			"username": test.Username,
+			"password": test.Password,
+		})
+		mod.ModConfig.Timeout = test.Timeout
+		hostData, err := ParseURL(mod, test.URL)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		assert.Equal(t, test.Expected, hostData.URI, test.Name)
 	}
 }

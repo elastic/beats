@@ -2,7 +2,9 @@ version: '2'
 services:
   beat:
     build: ${PWD}/.
-    links:
+    depends_on:
+      - logstash
+      - elasticsearch
       - redis
       - sredis
       - kafka
@@ -28,8 +30,16 @@ services:
     command: make
     entrypoint: /go/src/github.com/elastic/beats/libbeat/scripts/docker-entrypoint.sh
 
+  elasticsearch:
+    extends:
+      file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+
   # This host name is fixed because of the certificate
   logstash:
+    extends:
+      file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: logstash
     env_file:
       - ${PWD}/build/test.env
 
@@ -54,9 +64,5 @@ services:
     expose:
       - 9092
       - 2181
-
-  # Overloading kibana with a simple image as it is not needed here
-  kibana:
-    build:
-      context: ${PWD}/../testing/environments/
-      dockerfile: Dockerfile
+    environment:
+      - ADVERTISED_HOST=kafka

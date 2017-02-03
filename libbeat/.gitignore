@@ -26,3 +26,8 @@ _testmain.go
 .idea
 .jenkins
 
+/libbeat.template-es2x.json
+/libbeat.yml
+/libbeat.full.yml
+/libbeat.template.json
+/docs/fields.asciidoc

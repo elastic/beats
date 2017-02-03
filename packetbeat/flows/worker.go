@@ -96,7 +96,7 @@ func makeWorker(
 		nPeriod := ticksPeriod
 		reportPeriodically := ticksPeriod > 0
 		debugf("start flows worker loop")
-		w.periodicaly(tickDuration, func() error {
+		w.periodically(tickDuration, func() error {
 			nTimeout--
 			nPeriod--
 			debugf("worker tick, nTimeout=%v, nPeriod=%v", nTimeout, nPeriod)

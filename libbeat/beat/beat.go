@@ -46,6 +46,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/libbeat/plugin"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher"
 	svc "github.com/elastic/beats/libbeat/service"
@@ -155,6 +156,10 @@ func (b *Beat) launch(bt Creator) error {
 		return err
 	}
 
+	if err := plugin.Initialize(); err != nil {
+		return err
+	}
+
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
@@ -228,9 +233,13 @@ func (b *Beat) handleFlags() error {
 		return GracefulExit
 	}
 
+	if err := logp.HandleFlags(b.Name); err != nil {
+		return err
+	}
 	if err := cfgfile.HandleFlags(); err != nil {
 		return err
 	}
+
 	return handleFlags(b)
 }
 

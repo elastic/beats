@@ -24,9 +24,10 @@ type redisConfig struct {
 	Db       int    `config:"db"`
 	DataType string `config:"datatype"`
 
-	HostTopology     string `config:"host_topology"`
-	PasswordTopology string `config:"password_topology"`
-	DbTopology       int    `config:"db_topology"`
+	HostTopology     string              `config:"host_topology"`
+	PasswordTopology string              `config:"password_topology"`
+	DbTopology       int                 `config:"db_topology"`
+	Codec            outputs.CodecConfig `config:"codec"`
 }
 
 var (

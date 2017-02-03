@@ -6,19 +6,85 @@ package postgresql
 import (
 	"database/sql"
 	"fmt"
-	"net"
-	nurl "net/url"
-	"sort"
+	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 )
 
-func QueryStats(db *sql.DB, query string) ([]map[string]interface{}, error) {
+func init() {
+	// Register the ModuleFactory function for the "postgresql" module.
+	if err := mb.Registry.AddModule("postgresql", NewModule); err != nil {
+		panic(err)
+	}
+}
 
+func NewModule(base mb.BaseModule) (mb.Module, error) {
+	// Validate that at least one host has been specified.
+	config := struct {
+		Hosts []string `config:"hosts"    validate:"nonzero,required"`
+	}{}
+	if err := base.UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	return &base, nil
+}
+
+func ParseURL(mod mb.Module, rawURL string) (mb.HostData, error) {
+	c := struct {
+		Username string `config:"username"`
+		Password string `config:"password"`
+	}{}
+	if err := mod.UnpackConfig(&c); err != nil {
+		return mb.HostData{}, err
+	}
+
+	if parts := strings.SplitN(rawURL, "://", 2); len(parts) != 2 {
+		// Add scheme.
+		rawURL = fmt.Sprintf("postgres://%s", rawURL)
+	}
+
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return mb.HostData{}, fmt.Errorf("error parsing URL: %v", err)
+	}
+
+	parse.SetURLUser(u, c.Username, c.Password)
+
+	if timeout := mod.Config().Timeout; timeout > 0 {
+		q := u.Query()
+		q.Set("connect_timeout", strconv.Itoa(int(timeout.Seconds())))
+		u.RawQuery = q.Encode()
+	}
+
+	// https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING
+	connString, err := pq.ParseURL(u.String())
+	if err != nil {
+		return mb.HostData{}, err
+	}
+
+	h := parse.NewHostDataFromURL(u)
+
+	// Store the connection string instead of URL to avoid the cost of sql.Open
+	// parsing the URL on each call.
+	h.URI = connString
+
+	// Postgres URLs can use a host query param to specify the host. This is
+	// used for unix domain sockets (postgres:///dbname?host=/var/lib/postgres).
+	if host := u.Query().Get("host"); u.Host == "" && host != "" {
+		h.Host = host
+	}
+
+	return h, nil
+}
+
+func QueryStats(db *sql.DB, query string) ([]map[string]interface{}, error) {
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -51,65 +117,4 @@ func QueryStats(db *sql.DB, query string) ([]map[string]interface{}, error) {
 		results = append(results, result)
 	}
 	return results, nil
-}
-
-// ParseURL parses the given URL and overrides the values of username, password and timeout
-// if given. Returns a connection string in the form of `user=pass` ready to be passed to the
-// sql.Open call.
-// Code adapted from the pg driver: https://github.com/lib/pq/blob/master/url.go#L32
-func ParseURL(url, username, password string, timeout time.Duration) (string, error) {
-	u, err := nurl.Parse(url)
-	if err != nil {
-		return "", err
-	}
-
-	if u.Scheme != "postgres" && u.Scheme != "postgresql" {
-		return "", fmt.Errorf("invalid connection protocol: %s", u.Scheme)
-	}
-
-	var kvs []string
-	escaper := strings.NewReplacer(` `, `\ `, `'`, `\'`, `\`, `\\`)
-	accrue := func(k, v string) {
-		if v != "" {
-			kvs = append(kvs, k+"="+escaper.Replace(v))
-		}
-	}
-
-	if len(username) > 0 {
-		accrue("user", username)
-		accrue("password", password)
-	} else {
-		if u.User != nil {
-			v := u.User.Username()
-			accrue("user", v)
-
-			v, _ = u.User.Password()
-			accrue("password", v)
-		}
-	}
-
-	if host, port, err := net.SplitHostPort(u.Host); err != nil {
-		accrue("host", u.Host)
-	} else {
-		accrue("host", host)
-		accrue("port", port)
-	}
-
-	if u.Path != "" {
-		accrue("dbname", u.Path[1:])
-	}
-
-	q := u.Query()
-	for k := range q {
-		if k == "connect_timeout" && timeout != 0 {
-			continue
-		}
-		accrue(k, q.Get(k))
-	}
-	if timeout != 0 {
-		accrue("connect_timeout", strconv.Itoa(int(timeout.Seconds())))
-	}
-
-	sort.Strings(kvs) // Makes testing easier (not a performance concern)
-	return strings.Join(kvs, " "), nil
 }

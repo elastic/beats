@@ -16,6 +16,7 @@ BEAT_REQUIRED_FIELDS = ["@timestamp", "type",
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
+
 class Proc(object):
     """
     Slim wrapper on subprocess.Popen that redirects
@@ -68,7 +69,8 @@ class Proc(object):
 
     def check_wait(self, exit_code=0):
         actual_exit_code = self.wait()
-        assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (exit_code, actual_exit_code)
+        assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (
+            exit_code, actual_exit_code)
         return actual_exit_code
 
     def kill_and_wait(self):
@@ -96,6 +98,7 @@ class Proc(object):
 
 
 class TestCase(unittest.TestCase):
+
     @classmethod
     def setUpClass(self):
 
@@ -201,7 +204,7 @@ class TestCase(unittest.TestCase):
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
-                if len(line) == 0 or line[len(line)-1] != "\n":
+                if len(line) == 0 or line[len(line) - 1] != "\n":
                     # hit EOF
                     break
 
@@ -224,7 +227,7 @@ class TestCase(unittest.TestCase):
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
-                if len(line) == 0 or line[len(line)-1] != "\n":
+                if len(line) == 0 or line[len(line) - 1] != "\n":
                     # hit EOF
                     break
 
@@ -285,7 +288,7 @@ class TestCase(unittest.TestCase):
             logfile = self.beat_name + ".log"
 
         with open(os.path.join(self.working_dir, logfile), 'r') as f:
-            data=f.read()
+            data = f.read()
 
         return data
 
@@ -401,7 +404,7 @@ class TestCase(unittest.TestCase):
                     dictfields.extend(subdictfields)
                 else:
                     fields.append(newName)
-                    if field.get("type") == "dict":
+                    if field.get("type") in ["dict", "geo_point"]:
                         dictfields.append(newName)
             return fields, dictfields
 
@@ -462,3 +465,13 @@ class TestCase(unittest.TestCase):
                 return pred(len([1 for line in f]))
         except IOError:
             return False
+
+    def get_elasticsearch_url(self):
+        """
+        Returns an elasticsearch.Elasticsearch instance built from the
+        env variables like the integration tests.
+        """
+        return "http://{host}:{port}".format(
+            host=os.getenv("ES_HOST", "localhost"),
+            port=os.getenv("ES_PORT", "9200"),
+        )

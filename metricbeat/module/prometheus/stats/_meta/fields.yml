@@ -1,0 +1,26 @@
+- name: stats
+  type: group
+  description: >
+    stats
+  fields:
+    - name: notifications
+      type: group
+      description: >
+        Notification stats
+      fields:
+        - name: queue_length
+          type: long
+          description: >
+            Current queue length
+        - name: dropped
+          type: long
+          description: >
+            Dropped queue events
+    - name: processes.open_fds
+      type: long
+      description: >
+        Open file descriptors gauge
+    - name: storage.chunks_to_persist
+      type: long
+      description: >
+        Gauge on chunks which are not persisted to disk yet

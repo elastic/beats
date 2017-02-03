@@ -132,11 +132,12 @@ func (h *Harvester) Harvest(r reader.Reader) {
 			event.ReadTime = message.Ts
 			event.Bytes = message.Bytes
 			event.Text = &text
-			event.JSONFields = message.Fields
 			event.EventMetadata = h.config.EventMetadata
+			event.Data = message.Fields
 			event.InputType = h.config.InputType
 			event.DocumentType = h.config.DocumentType
 			event.JSONConfig = h.config.JSON
+			event.Pipeline = h.config.Pipeline
 		}
 
 		// Always send event to update state, also if lines was skipped
@@ -162,14 +163,14 @@ func (h *Harvester) sendEvent(event *input.Event) bool {
 // the include_lines and exclude_lines options.
 func (h *Harvester) shouldExportLine(line string) bool {
 	if len(h.config.IncludeLines) > 0 {
-		if !MatchAnyRegexps(h.config.IncludeLines, line) {
+		if !MatchAny(h.config.IncludeLines, line) {
 			// drop line
 			logp.Debug("harvester", "Drop line as it does not match any of the include patterns %s", line)
 			return false
 		}
 	}
 	if len(h.config.ExcludeLines) > 0 {
-		if MatchAnyRegexps(h.config.ExcludeLines, line) {
+		if MatchAny(h.config.ExcludeLines, line) {
 			// drop line
 			logp.Debug("harvester", "Drop line as it does match one of the exclude patterns%s", line)
 			return false

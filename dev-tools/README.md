@@ -44,7 +44,7 @@ pip install -r requirements.txt
 
 This creates the environment that contains all the python packages required to
 run the `export_dashboards.py` script. Thus, for the next runs you just need
-to enable the enviroment:
+to enable the environment:
 
 ```
 . env/bin/activate

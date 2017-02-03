@@ -55,7 +55,7 @@ func New() *Path {
 
 // InitPaths sets the default paths in the configuration based on CLI flags,
 // configuration file and default values. It also tries to create the data
-// path with mode 0755 and returns an error on failure.
+// path with mode 0750 and returns an error on failure.
 func (paths *Path) InitPaths(cfg *Path) error {
 	err := paths.initPaths(cfg)
 	if err != nil {
@@ -63,7 +63,7 @@ func (paths *Path) InitPaths(cfg *Path) error {
 	}
 
 	// make sure the data path exists
-	err = os.MkdirAll(paths.Data, 0755)
+	err = os.MkdirAll(paths.Data, 0750)
 	if err != nil {
 		return fmt.Errorf("Failed to create data path %s: %v", paths.Data, err)
 	}
@@ -73,7 +73,7 @@ func (paths *Path) InitPaths(cfg *Path) error {
 
 // InitPaths sets the default paths in the configuration based on CLI flags,
 // configuration file and default values. It also tries to create the data
-// path with mode 0755 and returns an error on failure.
+// path with mode 0750 and returns an error on failure.
 func InitPaths(cfg *Path) error {
 	return Paths.InitPaths(cfg)
 }

@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
+        "host": "nginx",
         "module": "nginx",
         "name": "stubstatus",
         "rtt": 115

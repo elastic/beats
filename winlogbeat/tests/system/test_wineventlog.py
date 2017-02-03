@@ -14,6 +14,7 @@ Contains tests for reading from the Windows Event Log API (MS Vista and newer).
 
 @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
 class Test(WriteReadTest):
+
     @classmethod
     def setUpClass(self):
         self.api = "wineventlog"
@@ -189,15 +190,14 @@ class Test(WriteReadTest):
         self.assertTrue(len(evts), 1)
         self.assertEqual(evts[0]["level"], "Warning")
 
-
     def test_query_level_multiple(self):
         """
         wineventlog - Query by level (error, warning)
         """
-        self.write_event_log("success", level=win32evtlog.EVENTLOG_SUCCESS) # Level 0, Info
-        self.write_event_log("error", level=win32evtlog.EVENTLOG_ERROR_TYPE) # Level 2
-        self.write_event_log("warning", level=win32evtlog.EVENTLOG_WARNING_TYPE) # Level 3
-        self.write_event_log("information", level=win32evtlog.EVENTLOG_INFORMATION_TYPE) # Level 4
+        self.write_event_log("success", level=win32evtlog.EVENTLOG_SUCCESS)  # Level 0, Info
+        self.write_event_log("error", level=win32evtlog.EVENTLOG_ERROR_TYPE)  # Level 2
+        self.write_event_log("warning", level=win32evtlog.EVENTLOG_WARNING_TYPE)  # Level 3
+        self.write_event_log("information", level=win32evtlog.EVENTLOG_INFORMATION_TYPE)  # Level 4
         evts = self.read_events(config={
             "event_logs": [
                 {

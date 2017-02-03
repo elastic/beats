@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+set -e
+
+# Script directory:
+SDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SNAME="$(basename "$0")"
+
+source "${SDIR}/common.bash"
+
+usage() {
+cat << EOF
+  Usage: $SNAME [-d] [-h] [-v] [-r] [-w=WORKSPACE] (-g|-b|-c)
+
+  Description: Executes a build using the project's Go version.
+
+  Options:
+    -w=WORKSPACE           Required. Specifies the path to the Jenkins workspace.
+                           If not set then the WORKSPACE environment variable is
+                           used. The workspace will be treated as the GOPATH.
+    -b | --build           Perform a build which includes make targets: check,
+                           testsuite, coverage-report, and docs.
+    -c | --cleanup         Clean up after the build by removing the checkout of
+                           elastic/docs and stopping any running containers
+                           started by the build. This cannot be specified with
+                           --build.
+    -g | --go-version      Optional. Write the project's Go version to stdout
+                           and then exits. Can be used to setup Go with
+                           eval "\$(gimme \$(./jenkins_ci -g))".
+    -i | --install-gimme   Optional. Installs gimme to HOME/bin.
+    -r | --race            Optional. Enable the Go race detector for tests that
+                           are run.
+    -d | --debug           Optional. Runs the script with 'set -x' to log a trace
+                           of all commands and their arguments being executed.
+    -v | --verbose         Optional. Enable verbose logging from this script to stderr.
+    -h | --help            Optional. Print this usage information.
+
+  Examples:
+    Print project Go version: ./$SNAME --go-version
+    Build with race detector: ./$SNAME -b -r
+    Stop test environment:    ./$SNAME -c
+
+  Jenkins Setup:
+
+  1) Jenkins should be setup to checkout elastic/beats into
+     \$WORKSPACE/src/github.com/elastic/
+  2) The single build script should be added that executes
+     \$WORKSPACE/src/github.com/elastic/beats/dev-tools/$SNAME -d -v -b --race
+  3) A post build action should be added that executes
+     \$WORKSPACE/src/github.com/elastic/beats/dev-tools/$SNAME -d -v -c
+EOF
+}
+
+# Parse command line arguments.
+parse_args() {
+  for i in "$@"
+  do
+  case $i in
+    -b|--build)
+      BUILD=true
+      shift
+      ;;
+    -c|--cleanup)
+      CLEANUP=true
+      shift
+      ;;
+    -d|--debug)
+      set -x
+      shift
+      ;;
+    -g|--go-version)
+      get_go_version
+      echo "${GO_VERSION}"
+      exit 0
+      ;;
+    -h|--help)
+      usage
+      exit 1
+      ;;
+    -i|--install-gimme)
+      install_gimme
+      exit 0
+      ;;
+    -r|--race)
+      export RACE_DETECTOR=1
+      shift
+      ;;
+    -v|--verbose)
+      VERBOSE=true
+      shift
+      ;;
+    -w=*|--workspace=*)
+      WORKSPACE="${i#*=}"
+      shift
+      ;;
+    *)
+      echo "Invalid argument: $i"
+      usage
+      exit 1
+      ;;
+  esac
+  done
+
+  if [ -z "$WORKSPACE" ]; then
+    err "WORKSPACE env var must be set or --workspace must be specified"
+    exit 1
+  fi
+}
+
+build() {
+  make check
+  make testsuite
+  make coverage-report
+  make docs
+}
+
+cleanup() {
+  # Remove the checkout of elastic/docs if it exists.
+  rm -rf "${SDIR}/../build/docs"
+
+  make stop-environments
+}
+
+main() {
+  cd "${SDIR}/.."
+  parse_args $*
+  get_go_version
+  setup_go_root ${GO_VERSION}
+  setup_go_path ${WORKSPACE}
+
+  if [ "$BUILD" == "true" ] && [ "$CLEANUP" == "true" ]; then
+    err "--build and --cleanup cannot be used together"
+    exit 1
+  elif [ "$BUILD" == "true" ]; then
+    build
+  elif [ "$CLEANUP" == "true" ]; then
+    cleanup
+  else
+    err "Use either --build or --cleanup"
+    exit 1
+  fi
+}
+
+main $*

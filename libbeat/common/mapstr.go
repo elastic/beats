@@ -148,7 +148,7 @@ func MapStrUnion(dict1 MapStr, dict2 MapStr) MapStr {
 // An error is returned if underRoot is true and the value of ms.fields is not a
 // MapStr.
 func MergeFields(ms, fields MapStr, underRoot bool) error {
-	if ms == nil || fields == nil {
+	if ms == nil || len(fields) == 0 {
 		return nil
 	}
 

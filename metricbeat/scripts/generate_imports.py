@@ -37,19 +37,14 @@ def generate(go_beat_path):
 
             list_file += '	_ "' + go_beat_path + '/module/' + module + '/' + metricset + '"\n'
 
-
     list_file += ")"
 
     # output string so it can be concatenated
-    print list_file
+    print(list_file)
 
 if __name__ == "__main__":
     # First argument is the beat path under GOPATH.
     # (e.g. github.com/elastic/beats/metricbeat)
     go_beat_path = sys.argv[1]
-    beat_name = sys.argv[2]
-
-    if go_beat_path != "github.com/elastic/beats/metricbeat":
-        go_beat_path += "/" + beat_name
 
     generate(go_beat_path)

@@ -1,38 +1,46 @@
 - name: info
   type: group
   description: >
-    General infomration collected on HAProxy process
+    General information about HAProxy processes.
   fields:
-    - name: nb_proc
-      type: integer
+    - name: processes
+      type: long
       description: >
-        Number of processes
+        Number of processes.
 
     - name: process_num
-      type: integer
+      type: long
       description: >
-        Process number
+        Process number.
 
     - name: pid
-      type: integer
+      type: long
       description: >
-        Process ID
+        Process ID.
 
-    - name: uptime_sec
-      type: integer
+    - name: run_queue
+      type: long
       description: >
-        Current uptime in seconds
 
-    - name: mem_max_bytes
-      type: integer
+    - name: tasks
+      type: long
+      description: >
+
+    - name: uptime.sec
+      type: long
+      description: >
+        Current uptime in seconds.
+
+    - name: memory.max.bytes
+      type: long
       format: bytes
       description: >
-        Max number of memory usage in bytes (The 'Memmax_MB' value converted to bytes)
+        Maximum amount of memory usage in bytes (the 'Memmax_MB' value converted to bytes).
 
     - name: ulimit_n
-      type: integer
+      type: long
       description: >
-        Max number of open files for process
+        Maximum number of open files for the process.
 
     - name: compress
       type: group
@@ -45,18 +53,18 @@
 
           fields:
             - name: in
-              type: integer
+              type: long
               description: >
 
             - name: out
-              type: integer
+              type: long
               description: >
 
             - name: rate_limit
-              type: integer
+              type: long
               description: >
 
-    - name: conn
+    - name: connection
       type: group
       description: >
 
@@ -67,89 +75,66 @@
 
           fields:
             - name: value
-              type: integer
+              type: long
               description: >
 
             - name: limit
-              type: integer
+              type: long
               description: >
 
-    - name: curr
-      type: group
+            - name: max
+              type: long
+              description: >
+
+        - name: current
+          type: long
+          description: >
+            Current connections.
+
+        - name: total
+          type: long
+          description: >
+            Total connections.
+
+        - name: ssl.current
+          type: long
+          description: >
+            Current SSL connections.
+
+        - name: ssl.total
+          type: long
+          description: >
+            Total SSL connections.
+
+        - name: ssl.max
+          type: long
+          description: >
+            Maximum SSL connections.
+
+        - name: max
+          type: long
+          description: >
+            Maximum connections.
+
+        - name: hard_max
+          type: long
+          description: >
+
+    - name: requests.total
+      type: long
       description: >
 
-      fields:
-        - name: conns
-          type: integer
-          description: >
-
-        - name: ssl_conns
-          type: integer
-          description: >
-
-    - name: cum
-      type: group
+    - name: sockets.max
+      type: long
       description: >
 
-      fields:
-        - name: conns
-          type: integer
-          description: >
-
-        - name: req
-          type: integer
-          description: >
-
-        - name: ssl_conns
-          type: integer
-          description: >
-
-
-    - name: max
-      type: group
-      description: Maximum values reported by HAProxy.
-
-      fields:
-        - name: hard_conn
-          type: integer
-          description: HardMaxconn
-
-        - name: ssl.conns
-          type: integer
-          description: MaxSslConns
-
-        - name: ssl.rate
-          type: integer
-          description: MaxSslRate
-
-        - name: sock
-          type: integer
-          description: Maxsock
-
-        - name: conn.value
-          type: integer
-          description: Maxconn
-
-        - name: conn.rate
-          type: integer
-          description: MaxConnRate
-
-        - name: sess_rate
-          type: integer
-          description: MaxSessRate
-
-        - name: pipes
-          type: integer
-          description: Maxpipes
-
-        - name: zlib_mem_usage
-          type: integer
-          description: MaxZlibMemUsage
+    - name: requests.max
+      type: long
+      description: >
 
     - name: pipes
       type: group
       description: >
-
       fields:
         - name: used
           type: integer
@@ -159,93 +144,93 @@
           type: integer
           description: >
 
-    - name: sess
-      type: group
-      description: >
-
-      fields:
-        - name: rate
-          type: group
+        - name: max
+          type: integer
           description: >
 
-          fields:
-            - name: value
-              type: integer
-              description: >
+    - name: session
+      type: group
+      description:
+      fields:
+        - name: rate.value
+          type: integer
+          description: >
 
-            - name: limit
-              type: integer
-              description: >
+        - name: rate.limit
+          type: integer
+          description: >
+
+        - name: rate.max
+          type: integer
+          description: >
+
 
     - name: ssl
       type: group
-      description: >
-
+      description:
       fields:
-        - name: rate
-          type: group
-          description: >
+        - name: rate.value
+          type: integer
+          description:
 
-          fields:
-            - name: value
-              type: integer
-              description: >
+        - name: rate.limit
+          type: integer
+          description:
 
-            - name: limit
-              type: integer
-              description: >
+        - name: rate.max
+          type: integer
+          description:
 
         - name: frontend
           type: group
-          description: >
-
+          description:
           fields:
-            - name: key_rate
+            - name: key_rate.value
               type: integer
-              description: >
+              description:
 
-            - name: max_key_rate
+            - name: key_rate.max
               type: integer
-              description: >
+              description:
 
-            - name: session_reuse_pct
-              type: integer
-              description: >
+            - name: session_reuse.pct
+              type: scaled_float
+              format: percent
+              description:
 
         - name: backend
           type: group
-          description: >
-
+          description:
           fields:
-            - name: key_rate
+            - name: key_rate.value
               type: integer
-              description: >
+              description:
 
-            - name: max_key_rate
+            - name: key_rate.max
               type: integer
-              description: >
-
+              description: MaxConnRate
         - name: cached_lookups
-          type: integer
-          description: >
-
+          type: long
+          description:
         - name: cache_misses
-          type: integer
-          description: >
+          type: long
+          description:
+
 
     - name: zlib_mem_usage
-      type: integer
+      type: group
       description: >
 
-    - name: tasks
-      type: integer
-      description: >
+      fields:
+        - name: value
+          type: integer
+          description: >
 
-    - name: run_queue
-      type: integer
-      description: >
+        - name: max
+          type: integer
+          description: >
 
-    - name: idle_pct
+    - name: idle.pct
       type: scaled_float
       format: percent
       description: >

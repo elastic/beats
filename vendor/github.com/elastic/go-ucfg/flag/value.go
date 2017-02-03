@@ -2,10 +2,10 @@ package flag
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/internal/parse"
 )
 
 // NewFlagKeyValue implements the flag.Value interface for
@@ -32,6 +32,7 @@ func NewFlagKeyValue(cfg *ucfg.Config, autoBool bool, opts ...ucfg.Option) *Flag
 	return newFlagValue(cfg, opts, func(arg string) (*ucfg.Config, error, error) {
 		var key string
 		var val interface{}
+		var err error
 
 		args := strings.SplitN(arg, "=", 2)
 		if len(args) < 2 {
@@ -44,39 +45,14 @@ func NewFlagKeyValue(cfg *ucfg.Config, autoBool bool, opts ...ucfg.Option) *Flag
 			val = true
 		} else {
 			key = args[0]
-			val = parseCLIValue(args[1])
+			val, err = parse.Value(args[1])
+			if err != nil {
+				return nil, err, err
+			}
 		}
 
 		tmp := map[string]interface{}{key: val}
 		cfg, err := ucfg.NewFrom(tmp, opts...)
 		return cfg, err, err
 	})
-}
-
-func parseCLIValue(value string) interface{} {
-	if b, ok := parseBoolValue(value); ok {
-		return b
-	}
-
-	if n, err := strconv.ParseUint(value, 0, 64); err == nil {
-		return n
-	}
-	if n, err := strconv.ParseInt(value, 0, 64); err == nil {
-		return n
-	}
-	if n, err := strconv.ParseFloat(value, 64); err == nil {
-		return n
-	}
-
-	return value
-}
-
-func parseBoolValue(str string) (value bool, ok bool) {
-	switch str {
-	case "1", "t", "T", "true", "TRUE", "True", "on", "ON":
-		return true, true
-	case "0", "f", "F", "false", "FALSE", "False", "off", "OFF":
-		return false, true
-	}
-	return false, false
 }
