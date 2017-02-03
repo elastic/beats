@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
+	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -16,7 +17,7 @@ type Crawler struct {
 	prospectorConfigs []*common.Config
 	out               prospector.Outlet
 	wg                sync.WaitGroup
-	reloader          *prospector.ProspectorReloader
+	reloader          *cfgfile.Reloader
 	once              bool
 }
 
@@ -45,9 +46,10 @@ func (c *Crawler) Start(r *registrar.Registrar, reloaderConfig *common.Config) e
 	if reloaderConfig.Enabled() {
 		logp.Warn("EXPERIMENTAL feature dynamic configuration reloading is enabled.")
 
-		c.reloader = prospector.NewProspectorReloader(reloaderConfig, c.out, r)
+		c.reloader = cfgfile.NewReloader(reloaderConfig)
+		factory := prospector.NewFactory(c.out, r)
 		go func() {
-			c.reloader.Run()
+			c.reloader.Run(factory)
 		}()
 	}
 
@@ -66,25 +68,18 @@ func (c *Crawler) startProspector(config *common.Config, states []file.State) er
 	}
 	p.Once = c.once
 
-	if _, ok := c.prospectors[p.ID]; ok {
-		return fmt.Errorf("Prospector with same ID already exists: %v", p.ID)
+	if _, ok := c.prospectors[p.ID()]; ok {
+		return fmt.Errorf("Prospector with same ID already exists: %v", p.ID())
 	}
 
 	err = p.LoadStates(states)
 	if err != nil {
-		return fmt.Errorf("error loading states for propsector %v: %v", p.ID, err)
+		return fmt.Errorf("error loading states for propsector %v: %v", p.ID(), err)
 	}
 
-	c.prospectors[p.ID] = p
-	c.wg.Add(1)
+	c.prospectors[p.ID()] = p
 
-	go func() {
-		logp.Debug("crawler", "Starting prospector: %v", p.ID)
-		defer logp.Debug("crawler", "Prospector stopped: %v", p.ID)
-
-		defer c.wg.Done()
-		p.Run()
-	}()
+	p.Start()
 
 	return nil
 }
