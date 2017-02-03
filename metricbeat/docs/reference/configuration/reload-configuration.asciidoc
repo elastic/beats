@@ -12,10 +12,10 @@ The configuration in the main metricbeat.yml config file looks as following:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-metricbeat.reload.modules:
-  enabled: true
+metricbeat.config.modules:
   path: configs/*.yml
-  period: 10s
+  reload.enabled: true
+  reload.period: 10s
 ------------------------------------------------------------------------------
 
 A path with a glob must be defined on which files should be checked for changes. A period is set on how often
