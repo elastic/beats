@@ -1,9 +1,5 @@
 #- module: ceph
-<<<<<<< HEAD
-#  metricsets: ["health","df"]
-=======
-#  metricsets: ["health"]
->>>>>>> upstream/master
+#  metricsets: ["cluster_health", "monitor_health","cluster_disk","pool_disk"]
 #  enabled: true
 #  period: 10s
 #  hosts: ["localhost:5000"]

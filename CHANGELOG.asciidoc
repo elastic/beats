@@ -14,6 +14,8 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Change beat generator. Use `$GOPATH/src/github.com/elastic/beats/script/generate.py` to generate a beat. {pull}3452[3452]
+
 *Metricbeat*
 
 *Packetbeat*
@@ -66,6 +68,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - RPM/deb packages will now install the config file with 0600 permissions. {pull}3382[3382]
 - Add the option to pass custom HTTP headers to the Elasticsearch output. {pull}3400[3400]
 - Unify `regexp` and `contains` conditionals, for both to support array of strings and convert numbers to strings if required. {pull}3469[3469]
+- Add the option to load the sample dashboards during the Beat startup phase. {pull}3506[3506]
 
 *Metricbeat*
 
@@ -89,6 +92,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Kafka consumer groups metricset. {pull}3240[3240]
 - Add dynamic configuration reloading for modules. {pull}3281[3281]
 - Add docker health metricset {pull}3357[3357]
+- Add docker image metricset {pull}3467[3467]
 - System module uses new matchers for white-listing processes. {pull}3469[3469]
 - Add CEPH module with health metricset. {pull}3311[3311]
 - Add php_fpm module with pool metricset. {pull}3415[3415]

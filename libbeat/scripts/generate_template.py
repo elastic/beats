@@ -279,6 +279,29 @@ def fill_field_properties(args, field, defaults, path):
                     }
                 })
 
+        if field.get("dict-type") == "long":
+            if len(path) > 0:
+                name = path + "." + field["name"]
+            else:
+                name = field["name"]
+
+            dynamic_templates.append({
+                name: {
+                    "mapping": {
+                        "type": "long",
+                    },
+                    "match_mapping_type": "long",
+                    "path_match": name + ".*"
+                }
+            })
+
+
+        properties[field["name"]] = {
+            "properties": {}
+        }
+
+
+
     elif field.get("type") == "group":
         if len(path) > 0:
             path = path + "." + field["name"]

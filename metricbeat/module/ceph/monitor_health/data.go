@@ -1,4 +1,4 @@
-package health
+package monitor_health
 
 import (
 	"encoding/json"
@@ -78,59 +78,41 @@ func eventsMapping(content []byte) []common.MapStr {
 
 	events := []common.MapStr{}
 
-	event := common.MapStr{
-		"cluster": common.MapStr{
-			"overall_status": d.Output.OverallStatus,
-			"timechecks": common.MapStr{
-				"epoch": d.Output.Timechecks.Epoch,
-				"round": common.MapStr{
-					"value":  d.Output.Timechecks.Round,
-					"status": d.Output.Timechecks.RoundStatus,
-				},
-			},
-		},
-	}
-
-	events = append(events, event)
-
 	for _, HealthService := range d.Output.Health.HealthServices {
 		for _, Mon := range HealthService.Mons {
 			event := common.MapStr{
-				"mon": common.MapStr{
-					"last_updated": Mon.LastUpdated,
-					"name":         Mon.Name,
-					"available": common.MapStr{
-						"pct": Mon.AvailPercent,
-						"kb":  Mon.KbAvail,
+				"last_updated": Mon.LastUpdated,
+				"name":         Mon.Name,
+				"available": common.MapStr{
+					"pct": Mon.AvailPercent,
+					"kb":  Mon.KbAvail,
+				},
+				"total": common.MapStr{
+					"kb": Mon.KbTotal,
+				},
+				"health": Mon.Health,
+				"used": common.MapStr{
+					"kb": Mon.KbUsed,
+				},
+				"store_stats": common.MapStr{
+					"log": common.MapStr{
+						"bytes": Mon.StoreStats.BytesLog,
+					},
+					"misc": common.MapStr{
+						"bytes": Mon.StoreStats.BytesMisc,
+					},
+					"sst": common.MapStr{
+						"bytes": Mon.StoreStats.BytesSSt,
 					},
 					"total": common.MapStr{
-						"kb": Mon.KbTotal,
+						"bytes": Mon.StoreStats.BytesTotal,
 					},
-					"health": Mon.Health,
-					"used": common.MapStr{
-						"kb": Mon.KbUsed,
-					},
-					"store_stats": common.MapStr{
-						"log": common.MapStr{
-							"bytes": Mon.StoreStats.BytesLog,
-						},
-						"misc": common.MapStr{
-							"bytes": Mon.StoreStats.BytesMisc,
-						},
-						"sst": common.MapStr{
-							"bytes": Mon.StoreStats.BytesSSt,
-						},
-						"total": common.MapStr{
-							"bytes": Mon.StoreStats.BytesTotal,
-						},
-						"last_updated": Mon.StoreStats.LastUpdated,
-					},
+					"last_updated": Mon.StoreStats.LastUpdated,
 				},
 			}
 
 			events = append(events, event)
 		}
-
 	}
 
 	return events
