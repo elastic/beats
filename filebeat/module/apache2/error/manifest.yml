@@ -7,7 +7,8 @@ var:
     os.darwin:
       - /usr/local/var/log/apache2/error_log*
     os.windows:
-      - "C:/Program Files/Apache Software Foundation/Apache2.4/logs/error.log*"
+      - "C:/tools/Apache/httpd-2.*/Apache24/logs/error.log*"
+      - "C:/Program Files/Apache Software Foundation/Apache2.*/logs/error.log*"
 
 ingest_pipeline: ingest/pipeline.json
 prospector: config/error.yml
