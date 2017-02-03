@@ -3,6 +3,7 @@
 package fileset
 
 import (
+	"encoding/json"
 	"path/filepath"
 	"testing"
 
@@ -29,8 +30,23 @@ func TestLoadPipeline(t *testing.T) {
 	err := loadPipeline(client, "my-pipeline-id", content)
 	assert.NoError(t, err)
 
-	status, _, _ := client.Request("GET", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
+	status, _, err := client.Request("GET", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
+	assert.NoError(t, err)
 	assert.Equal(t, 200, status)
+
+	// loading again shouldn't actually update the pipeline
+	content["description"] = "describe pipeline 2"
+	err = loadPipeline(client, "my-pipeline-id", content)
+	assert.NoError(t, err)
+
+	status, response, err := client.Request("GET", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, 200, status)
+
+	var res map[string]interface{}
+	err = json.Unmarshal(response, &res)
+	assert.NoError(t, err)
+	assert.Equal(t, "describe pipeline", res["my-pipeline-id"].(map[string]interface{})["description"], string(response))
 }
 
 func TestSetupNginx(t *testing.T) {
