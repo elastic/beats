@@ -20,8 +20,7 @@ import (
 )
 
 var (
-	once  = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
-	setup = flag.Bool("setup", false, "Run the setup phase for the modules")
+	once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
 )
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
@@ -71,11 +70,12 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	return fb, nil
 }
 
-// Setup is called on user request (the -setup flag) to do the initial Beat setup.
-func (fb *Filebeat) Setup(b *beat.Beat) error {
+// modulesSetup is called when modules are configured to do the initial
+// setup.
+func (fb *Filebeat) modulesSetup(b *beat.Beat) error {
 	esConfig := b.Config.Output["elasticsearch"]
 	if esConfig == nil || !esConfig.Enabled() {
-		return fmt.Errorf("Setup requested but the Elasticsearch output is not configured/enabled")
+		return fmt.Errorf("Filebeat modules configured but the Elasticsearch output is not configured/enabled")
 	}
 	esClient, err := elasticsearch.NewConnectedClient(esConfig)
 	if err != nil {
@@ -83,7 +83,12 @@ func (fb *Filebeat) Setup(b *beat.Beat) error {
 	}
 	defer esClient.Close()
 
-	return fb.moduleRegistry.Setup(esClient)
+	err = fb.moduleRegistry.LoadPipelines(esClient)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Run allows the beater to be run as a beat.
@@ -91,8 +96,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
 
-	if *setup {
-		err = fb.Setup(b)
+	if !fb.moduleRegistry.Empty() {
+		err = fb.modulesSetup(b)
 		if err != nil {
 			return err
 		}

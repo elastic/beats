@@ -48,7 +48,7 @@ func TestSetupNginx(t *testing.T) {
 	reg, err := newModuleRegistry(modulesPath, configs, nil)
 	assert.NoError(t, err)
 
-	err = reg.Setup(client)
+	err = reg.LoadPipelines(client)
 	assert.NoError(t, err)
 
 	status, _, _ := client.Request("GET", "/_ingest/pipeline/nginx-access-with_plugins", "", nil, nil)
