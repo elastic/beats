@@ -454,7 +454,7 @@ output.elasticsearch:
 
   # Optional index name. The default is "filebeat" plus date
   # and generates [filebeat-]YYYY.MM.DD keys.
-  #index: "filebeat-%{+yyyy.MM.dd}"
+  #index: "filebeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -494,6 +494,8 @@ output.elasticsearch:
   #template.enabled: true
 
   # Template name. By default the template name is filebeat.
+  # The version of the beat will always be appended to the given name
+  # so the final name is filebeat-%{[beat.version]}.
   #template.name: "filebeat"
 
   # Path to template file

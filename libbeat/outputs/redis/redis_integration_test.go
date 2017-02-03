@@ -354,7 +354,7 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) *redisOut {
 		t.Fatalf("Failed to unpack topology_expire: %v", err)
 	}
 
-	out, err := plugin("libbeat", config, params.Expire)
+	out, err := plugin(common.BeatInfo{Beat: "libbeat"}, config, params.Expire)
 	if err != nil {
 		t.Fatalf("Failed to initialize redis output: %v", err)
 	}

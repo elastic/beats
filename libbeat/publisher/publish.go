@@ -221,7 +221,8 @@ func (publisher *BeatPublisher) init(
 	publisher.wsOutput.Init()
 
 	if !publisher.disabled {
-		plugins, err := outputs.InitOutputs(beat.Beat, configs, shipper.TopologyExpire)
+		plugins, err := outputs.InitOutputs(beat, configs, shipper.TopologyExpire)
+
 		if err != nil {
 			return err
 		}

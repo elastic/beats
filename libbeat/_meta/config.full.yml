@@ -104,7 +104,7 @@ output.elasticsearch:
 
   # Optional index name. The default is "beatname" plus date
   # and generates [beatname-]YYYY.MM.DD keys.
-  #index: "beatname-%{+yyyy.MM.dd}"
+  #index: "beatname-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -144,6 +144,8 @@ output.elasticsearch:
   #template.enabled: true
 
   # Template name. By default the template name is beatname.
+  # The version of the beat will always be appended to the given name
+  # so the final name is beatname-%{[beat.version]}.
   #template.name: "beatname"
 
   # Path to template file

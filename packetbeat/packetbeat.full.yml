@@ -558,7 +558,7 @@ output.elasticsearch:
 
   # Optional index name. The default is "packetbeat" plus date
   # and generates [packetbeat-]YYYY.MM.DD keys.
-  #index: "packetbeat-%{+yyyy.MM.dd}"
+  #index: "packetbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -598,6 +598,8 @@ output.elasticsearch:
   #template.enabled: true
 
   # Template name. By default the template name is packetbeat.
+  # The version of the beat will always be appended to the given name
+  # so the final name is packetbeat-%{[beat.version]}.
   #template.name: "packetbeat"
 
   # Path to template file

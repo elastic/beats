@@ -4186,5 +4186,5 @@
   "settings": {
     "index.refresh_interval": "5s"
   },
-  "template": "metricbeat-*"
+  "template": "metricbeat-6.0.0-alpha1-*"
 }

@@ -53,7 +53,7 @@ type BulkOutputer interface {
 }
 
 // Create and initialize the output plugin
-type OutputBuilder func(beatName string, config *common.Config, topologyExpire int) (Outputer, error)
+type OutputBuilder func(beat common.BeatInfo, config *common.Config, topologyExpire int) (Outputer, error)
 
 // Functions to be exported by a output plugin
 type OutputInterface interface {
@@ -90,7 +90,7 @@ func FindOutputPlugin(name string) OutputBuilder {
 }
 
 func InitOutputs(
-	beatName string,
+	beat common.BeatInfo,
 	configs map[string]*common.Config,
 	topologyExpire int,
 ) ([]OutputPlugin, error) {
@@ -106,7 +106,7 @@ func InitOutputs(
 			continue
 		}
 
-		output, err := plugin(beatName, config, topologyExpire)
+		output, err := plugin(beat, config, topologyExpire)
 		if err != nil {
 			logp.Err("failed to initialize %s plugin as output: %s", name, err)
 			return nil, err

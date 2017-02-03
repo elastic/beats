@@ -219,5 +219,5 @@
   "settings": {
     "index.refresh_interval": "5s"
   },
-  "template": "winlogbeat-*"
+  "template": "winlogbeat-6.0.0-alpha1-*"
 }

@@ -302,7 +302,7 @@ output.elasticsearch:
 
   # Optional index name. The default is "heartbeat" plus date
   # and generates [heartbeat-]YYYY.MM.DD keys.
-  #index: "heartbeat-%{+yyyy.MM.dd}"
+  #index: "heartbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -342,6 +342,8 @@ output.elasticsearch:
   #template.enabled: true
 
   # Template name. By default the template name is heartbeat.
+  # The version of the beat will always be appended to the given name
+  # so the final name is heartbeat-%{[beat.version]}.
   #template.name: "heartbeat"
 
   # Path to template file
