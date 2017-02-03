@@ -71,7 +71,7 @@ class Test(BaseTest):
 
         cmd = [
             self.filebeat, "-systemTest",
-            "-e", "-d", "*", "-once", "-setup",
+            "-e", "-d", "*", "-once",
             "-c", cfgfile,
             "-modules={}".format(module),
             "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
