@@ -2,7 +2,6 @@ package cluster_disk
 
 import (
 	"encoding/json"
-	"io"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -23,10 +22,10 @@ type DfRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventMapping(body io.Reader) common.MapStr {
+func eventMapping(content []byte) common.MapStr {
 
 	var d DfRequest
-	err := json.NewDecoder(body).Decode(&d)
+	err := json.Unmarshal(content, &d)
 	if err != nil {
 		logp.Err("Error: ", err)
 	}

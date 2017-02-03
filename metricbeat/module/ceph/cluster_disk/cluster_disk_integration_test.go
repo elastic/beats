@@ -24,7 +24,7 @@ func getConfig() map[string]interface{} {
 }
 
 const (
-	cephDefaultHost = "172.17.0.1"
+	cephDefaultHost = "127.0.0.1"
 	cephDefaultPort = "5000"
 )
 

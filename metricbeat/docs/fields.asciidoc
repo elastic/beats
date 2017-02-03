@@ -465,8 +465,6 @@ Used bytes of the cluster
 
 
 [float]
-== health Fields
-=======
 == cluster_health Fields
 
 cluster_health
