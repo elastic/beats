@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
 
+	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/pkg/errors"
 )
 
@@ -73,13 +74,15 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	if bt.config.ReloadModules.Enabled() {
 		logp.Warn("EXPERIMENTAL feature dynamic configuration reloading is enabled.")
-		configReloader := module.NewReloader(bt.config.ReloadModules, b.Publisher)
-		go configReloader.Run()
+		moduleReloader := cfgfile.NewReloader(bt.config.ReloadModules)
+		factory := module.NewFactory(b.Publisher)
+
+		go moduleReloader.Run(factory)
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			<-bt.done
-			configReloader.Stop()
+			moduleReloader.Stop()
 		}()
 	}
 

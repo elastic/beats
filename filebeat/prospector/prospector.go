@@ -34,7 +34,7 @@ type Prospector struct {
 	states           *file.States
 	wg               sync.WaitGroup
 	channelWg        sync.WaitGroup // Separate waitgroup for channels as not stopped on completion
-	ID               uint64
+	id               uint64
 	Once             bool
 }
 
@@ -67,7 +67,7 @@ func NewProspector(cfg *common.Config, outlet Outlet) (*Prospector, error) {
 
 	var h map[string]interface{}
 	cfg.Unpack(&h)
-	prospector.ID, err = hashstructure.Hash(h, nil)
+	prospector.id, err = hashstructure.Hash(h, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -111,10 +111,8 @@ func (p *Prospector) LoadStates(states []file.State) error {
 	return nil
 }
 
-// Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
-func (p *Prospector) Run() {
-
-	logp.Info("Starting prospector of type: %v; id: %v ", p.config.InputType, p.ID)
+func (p *Prospector) Start() {
+	logp.Info("Starting prospector of type: %v; id: %v ", p.config.InputType, p.ID())
 
 	if p.Once {
 		// If only run once, waiting for completion of prospector / harvesters
@@ -123,7 +121,16 @@ func (p *Prospector) Run() {
 
 	// Add waitgroup to make sure prospectors finished
 	p.wg.Add(1)
-	defer p.wg.Done()
+
+	go func() {
+		defer p.wg.Done()
+		p.Run()
+	}()
+
+}
+
+// Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
+func (p *Prospector) Run() {
 
 	// Open channel to receive events from harvester and forward them to spooler
 	// Here potential filtering can happen
@@ -164,6 +171,11 @@ func (p *Prospector) Run() {
 	}
 }
 
+// ID returns prospector identifier
+func (p *Prospector) ID() uint64 {
+	return p.id
+}
+
 // updateState updates the prospector state and forwards the event to the spooler
 // All state updates done by the prospector itself are synchronous to make sure not states are overwritten
 func (p *Prospector) updateState(event *input.Event) error {
@@ -184,7 +196,7 @@ func (p *Prospector) updateState(event *input.Event) error {
 }
 
 func (p *Prospector) Stop() {
-	logp.Info("Stopping Prospector: %v", p.ID)
+	logp.Info("Stopping Prospector: %v", p.ID())
 	close(p.done)
 	p.channelWg.Wait()
 	p.wg.Wait()
