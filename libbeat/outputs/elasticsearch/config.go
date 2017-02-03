@@ -10,11 +10,11 @@ type elasticsearchConfig struct {
 	Protocol         string             `config:"protocol"`
 	Path             string             `config:"path"`
 	Params           map[string]string  `config:"parameters"`
-	Headers          map[string]string  `config:"headers"`
 	Username         string             `config:"username"`
 	Password         string             `config:"password"`
 	ProxyURL         string             `config:"proxy_url"`
 	LoadBalance      bool               `config:"loadbalance"`
+	CacheRedirect    bool               `config:"cache_redirect"`
 	CompressionLevel int                `config:"compression_level" validate:"min=0, max=9"`
 	TLS              *outputs.TLSConfig `config:"ssl"`
 	MaxRetries       int                `config:"max_retries"`
@@ -57,6 +57,7 @@ var (
 		CompressionLevel: 0,
 		TLS:              nil,
 		LoadBalance:      true,
+		CacheRedirect:    false,
 		Template: Template{
 			Enabled:  true,
 			Versions: TemplateVersions{Es2x: TemplateVersion{Enabled: true}},
