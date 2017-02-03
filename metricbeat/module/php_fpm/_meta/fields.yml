@@ -1,9 +1,9 @@
 - key: php_fpm
   title: "php_fpm"
   description: >
-    PHP-FPM server status metrics collected from PHP-FPM.
+    beta[]
 
-    experimental[]
+    PHP-FPM server status metrics collected from PHP-FPM.
   short_config: false
   fields:
     - name: php_fpm

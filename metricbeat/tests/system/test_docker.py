@@ -24,7 +24,7 @@ class Test(metricbeat.BaseTest):
 
         # Ensure no errors or warnings exist in the log.
         log = self.get_log()
-        self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
+        self.assertNotRegexpMatches(log.replace("WARN BETA", ""), "ERR|WARN")
 
         output = self.read_output_json()
         evt = output[0]
@@ -50,7 +50,7 @@ class Test(metricbeat.BaseTest):
 
         # Ensure no errors or warnings exist in the log.
         log = self.get_log()
-        self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
+        self.assertNotRegexpMatches(log.replace("WARN BETA", ""), "ERR|WARN")
 
         output = self.read_output_json()
         evt = output[0]
@@ -80,7 +80,7 @@ class Test(metricbeat.BaseTest):
 
         # Ensure no errors or warnings exist in the log.
         log = self.get_log()
-        self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
+        self.assertNotRegexpMatches(log.replace("WARN BETA", ""), "ERR|WARN")
 
         output = self.read_output_json()
         evt = output[0]
@@ -107,7 +107,7 @@ class Test(metricbeat.BaseTest):
 
         # Ensure no errors or warnings exist in the log.
         log = self.get_log()
-        self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
+        self.assertNotRegexpMatches(log.replace("WARN BETA", ""), "ERR|WARN")
 
         output = self.read_output_json()
         evt = output[0]
@@ -132,7 +132,7 @@ class Test(metricbeat.BaseTest):
 
         # Ensure no errors or warnings exist in the log.
         log = self.get_log()
-        self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
+        self.assertNotRegexpMatches(log.replace("WARN BETA", ""), "ERR|WARN")
 
         output = self.read_output_json()
         evt = output[0]
@@ -158,7 +158,7 @@ class Test(metricbeat.BaseTest):
 
         # Ensure no errors or warnings exist in the log.
         log = self.get_log()
-        self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
+        self.assertNotRegexpMatches(log.replace("WARN BETA", ""), "ERR|WARN")
 
         output = self.read_output_json()
         evt = output[0]
@@ -184,7 +184,7 @@ class Test(metricbeat.BaseTest):
 
         # Ensure no errors or warnings exist in the log.
         log = self.get_log()
-        self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
+        self.assertNotRegexpMatches(log.replace("WARN BETA", ""), "ERR|WARN")
 
         output = self.read_output_json()
         evt = output[0]
@@ -210,7 +210,7 @@ class Test(metricbeat.BaseTest):
 
         # Ensure no errors or warnings exist in the log.
         log = self.get_log()
-        self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
+        self.assertNotRegexpMatches(log.replace("WARN BETA", ""), "ERR|WARN")
 
         output = self.read_output_json()
         evt = output[0]

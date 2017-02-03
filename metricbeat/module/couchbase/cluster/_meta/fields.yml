@@ -1,7 +1,7 @@
 - name: cluster
   type: group
   description: >
-    experimental[]
+    beta[]
 
     Couchbase Cluster metrics
   fields:

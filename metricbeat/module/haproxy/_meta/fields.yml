@@ -1,8 +1,6 @@
 - key: haproxy
   title: "HAProxy"
   description: >
-    experimental[]
-
     HAProxy Module
   short_config: false
   fields:

@@ -1,7 +1,7 @@
 [[filebeat-configuration-reloading]]
 === Reload Configuration
 
-experimental[]
+beta[]
 
 Reload configuration allows to dynamically reload prospector configuration files. A glob can be defined which should be watched
  for prospector configuration changes. New prospectors will be started / stopped accordingly. This is especially useful in
