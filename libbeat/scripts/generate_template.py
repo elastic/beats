@@ -50,6 +50,7 @@ def fields_to_es_template(args, input, output, index, version):
         },
         "mappings": {
             "_default_": {
+                "date_detection": False,
                 "properties": {},
                 "_meta": {
                     "version": version,
