@@ -46,6 +46,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-docker-healthcheck,healthcheck>>
 
+* <<metricbeat-metricset-docker-image,image>>
+
 * <<metricbeat-metricset-docker-info,info>>
 
 * <<metricbeat-metricset-docker-memory,memory>>
@@ -59,6 +61,8 @@ include::docker/cpu.asciidoc[]
 include::docker/diskio.asciidoc[]
 
 include::docker/healthcheck.asciidoc[]
+
+include::docker/image.asciidoc[]
 
 include::docker/info.asciidoc[]
 
