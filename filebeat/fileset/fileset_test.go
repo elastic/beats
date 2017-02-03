@@ -149,7 +149,7 @@ func TestResolveVariable(t *testing.T) {
 
 func TestGetProspectorConfigNginx(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
-	assert.NoError(t, fs.Read())
+	assert.NoError(t, fs.Read("5.2.0"))
 
 	cfg, err := fs.getProspectorConfig()
 	assert.NoError(t, err)
@@ -159,7 +159,7 @@ func TestGetProspectorConfigNginx(t *testing.T) {
 	assert.True(t, cfg.HasField("pipeline"))
 	pipelineID, err := cfg.String("pipeline", -1)
 	assert.NoError(t, err)
-	assert.Equal(t, "nginx-access-with_plugins", pipelineID)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-with_plugins", pipelineID)
 }
 
 func TestGetProspectorConfigNginxOverrides(t *testing.T) {
@@ -172,7 +172,7 @@ func TestGetProspectorConfigNginxOverrides(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	assert.NoError(t, fs.Read())
+	assert.NoError(t, fs.Read("5.2.0"))
 
 	cfg, err := fs.getProspectorConfig()
 	assert.NoError(t, err)
@@ -183,17 +183,17 @@ func TestGetProspectorConfigNginxOverrides(t *testing.T) {
 	assert.True(t, cfg.HasField("pipeline"))
 	pipelineID, err := cfg.String("pipeline", -1)
 	assert.NoError(t, err)
-	assert.Equal(t, "nginx-access-with_plugins", pipelineID)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-with_plugins", pipelineID)
 
 }
 
 func TestGetPipelineNginx(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
-	assert.NoError(t, fs.Read())
+	assert.NoError(t, fs.Read("5.2.0"))
 
 	pipelineID, content, err := fs.GetPipeline()
 	assert.NoError(t, err)
-	assert.Equal(t, "nginx-access-with_plugins", pipelineID)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-with_plugins", pipelineID)
 	assert.Contains(t, content, "description")
 	assert.Contains(t, content, "processors")
 }

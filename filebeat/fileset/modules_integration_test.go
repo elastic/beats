@@ -51,8 +51,8 @@ func TestLoadPipeline(t *testing.T) {
 
 func TestSetupNginx(t *testing.T) {
 	client := elasticsearch.GetTestingElasticsearch()
-	client.Request("DELETE", "/_ingest/pipeline/nginx-access-with_plugins", "", nil, nil)
-	client.Request("DELETE", "/_ingest/pipeline/nginx-error-pipeline", "", nil, nil)
+	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-with_plugins", "", nil, nil)
+	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-error-pipeline", "", nil, nil)
 
 	modulesPath, err := filepath.Abs("../module")
 	assert.NoError(t, err)
@@ -61,14 +61,14 @@ func TestSetupNginx(t *testing.T) {
 		{Module: "nginx"},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
 	assert.NoError(t, err)
 
 	err = reg.LoadPipelines(client)
 	assert.NoError(t, err)
 
-	status, _, _ := client.Request("GET", "/_ingest/pipeline/nginx-access-with_plugins", "", nil, nil)
+	status, _, _ := client.Request("GET", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-with_plugins", "", nil, nil)
 	assert.Equal(t, 200, status)
-	status, _, _ = client.Request("GET", "/_ingest/pipeline/nginx-error-pipeline", "", nil, nil)
+	status, _, _ = client.Request("GET", "/_ingest/pipeline/filebeat-5.2.0-nginx-error-pipeline", "", nil, nil)
 	assert.Equal(t, 200, status)
 }
