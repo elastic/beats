@@ -17,58 +17,41 @@ include::../../libbeat/docs/version.asciidoc[]
 
 include::./overview.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/getting-started.asciidoc ?>]
 include::./getting-started.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/command-line.asciidoc ?>]
 include::./command-line.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-directory-layout.asciidoc ?>]
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
-//pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/upgrading.asciidoc ?>]
-
+//
 //include::./upgrading.asciidoc[]
 
-//pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/how-heartbeat-works.asciidoc ?>]
-
+//
 //include::./how-heartbeat-works.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/configuring-howto.asciidoc ?>] 
 include::./configuring-howto.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/heartbeat-filtering.asciidoc ?>] 
 include::./heartbeat-filtering.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-config-ingest.asciidoc ?>] 
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 //points to shared topic because configuring-logstash.asciidoc is just a wrapper
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-logstash-config.asciidoc ?>] 
 include::./configuring-logstash.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-env-vars.asciidoc ?>] 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
 :allplatforms:
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/yaml.asciidoc ?>] 
 include::../../libbeat/docs/yaml.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/regexp.asciidoc ?>] 
 include::../../libbeat/docs/regexp.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/fields.asciidoc ?>] 
 include::./fields.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/securing-heartbeat.asciidoc ?>] 
 include::./securing-heartbeat.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/troubleshooting.asciidoc ?>] 
 include::./troubleshooting.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/faq.asciidoc ?>] 
 include::./faq.asciidoc[]
 
-// pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/heartbeat-devguide.asciidoc ?>] 
-
+// 
 //include::./heartbeat-devguide.asciidoc[]

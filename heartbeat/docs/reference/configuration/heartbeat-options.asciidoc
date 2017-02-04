@@ -446,18 +446,13 @@ specify for `limit` should be below the configured ulimit.
 
 The timezone for the scheduler. By default the scheduler uses localtime.
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/generalconfig.asciidoc ?>] 
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/outputconfig.asciidoc ?>] 
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-path-config.asciidoc ?>] 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/loggingconfig.asciidoc ?>] 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/processors-config.asciidoc ?>] 
 include::../../../../libbeat/docs/processors-config.asciidoc[]
 
