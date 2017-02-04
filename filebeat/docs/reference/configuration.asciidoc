@@ -23,7 +23,6 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 * <<configuration-logging>>
 * <<configuration-processors>>
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/filebeat/docs/reference/configuration/filebeat-options.asciidoc ?>]
 include::configuration/filebeat-options.asciidoc[]
 
 
