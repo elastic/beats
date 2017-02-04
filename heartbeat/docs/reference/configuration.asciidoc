@@ -22,7 +22,6 @@ configuration settings, you need to restart Heartbeat to pick up the changes.
 * <<configuration-logging>>
 * <<configuration-processors>>
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/reference/configuration/heartbeat-options.asciidoc ?>] 
 include::configuration/heartbeat-options.asciidoc[]
 
 

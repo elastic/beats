@@ -792,22 +792,16 @@ periodically afterwards, it scans the process table for
 processes that match the values specified for this option. The match is done against the
 process' command line as read from `/proc/<pid>/cmdline`.
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/generalconfig.asciidoc ?>]
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/outputconfig.asciidoc ?>]
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-path-config.asciidoc ?>]
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/loggingconfig.asciidoc ?>]
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/packetbeat/docs/reference/configuration/runconfig.asciidoc ?>]
 include::./runconfig.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/processors-config.asciidoc ?>]
 include::../../../../libbeat/docs/processors-config.asciidoc[]
 
 
