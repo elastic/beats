@@ -27,5 +27,4 @@ The following topics describe how to configure Heartbeat:
 
 --
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/heartbeat/docs/reference/configuration.asciidoc ?>]
 include::reference/configuration.asciidoc[]
