@@ -36,8 +36,8 @@
   # if true, exports the CPU usage in ticks, together with the percentage values
   #cpu_ticks: false
 
-  # EXPERIMENTAL: cgroups can be enabled for the process metricset.
-  #cgroups: false
+  # Enable collection of cgroup metrics from processes on Linux.
+  #process.cgroups.enabled: true
 
   # A list of regular expressions used to whitelist environment variables
   # reported with the process metricset's events. Defaults to empty.
