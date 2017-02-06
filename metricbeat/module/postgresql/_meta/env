@@ -1,0 +1,4 @@
+POSTGRESQL_DSN=postgres://postgresql:5432?sslmode=disable
+POSTGRESQL_HOST=postgresql
+POSTGRESQL_PORT=5432
+POSTGRESQL_USERNAME=postgres
