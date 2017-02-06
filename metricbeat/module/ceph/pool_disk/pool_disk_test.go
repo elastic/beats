@@ -14,9 +14,9 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-	absPath, err := filepath.Abs("./testdata/")
+	absPath, err := filepath.Abs("../_meta/testdata/")
 
-	response, err := ioutil.ReadFile(absPath + "/sample_response.json")
+	response, err := ioutil.ReadFile(absPath + "/df_sample_response.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "appication/json;")

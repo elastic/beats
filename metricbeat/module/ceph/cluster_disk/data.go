@@ -31,16 +31,14 @@ func eventMapping(content []byte) common.MapStr {
 	}
 
 	return common.MapStr{
-		"stats": common.MapStr{
-			"used": common.MapStr{
-				"bytes": d.Output.StatsCluster.TotalUsedBytes,
-			},
-			"total": common.MapStr{
-				"bytes": d.Output.StatsCluster.TotalBytes,
-			},
-			"available": common.MapStr{
-				"bytes": d.Output.StatsCluster.TotalAvailBytes,
-			},
+		"used": common.MapStr{
+			"bytes": d.Output.StatsCluster.TotalUsedBytes,
+		},
+		"total": common.MapStr{
+			"bytes": d.Output.StatsCluster.TotalBytes,
+		},
+		"available": common.MapStr{
+			"bytes": d.Output.StatsCluster.TotalAvailBytes,
 		},
 	}
 }

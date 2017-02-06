@@ -14,10 +14,10 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-	absPath, err := filepath.Abs("./testdata/")
+	absPath, err := filepath.Abs("../_meta/testdata/")
 	assert.NoError(t, err)
 
-	response, err := ioutil.ReadFile(absPath + "/sample_response.json")
+	response, err := ioutil.ReadFile(absPath + "/df_sample_response.json")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -38,14 +38,12 @@ func TestFetchEventContents(t *testing.T) {
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
-	statsCluster := event["stats"].(common.MapStr)
-
-	used := statsCluster["used"].(common.MapStr)
+	used := event["used"].(common.MapStr)
 	assert.EqualValues(t, 1428520960, used["bytes"])
 
-	total := statsCluster["total"].(common.MapStr)
+	total := event["total"].(common.MapStr)
 	assert.EqualValues(t, 6431965184, total["bytes"])
 
-	available := statsCluster["available"].(common.MapStr)
+	available := event["available"].(common.MapStr)
 	assert.EqualValues(t, 5003444224, available["bytes"])
 }

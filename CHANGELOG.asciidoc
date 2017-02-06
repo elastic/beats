@@ -100,6 +100,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - System module uses new matchers for white-listing processes. {pull}3469[3469]
 - Add CEPH module with health metricset. {pull}3311[3311]
 - Add php_fpm module with pool metricset. {pull}3415[3415]
+- Add cluster_disk and pool_disk metricsets to CEPH module. {pull}3499[3499]
 
 *Packetbeat*
 
