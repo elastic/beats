@@ -1,0 +1,3 @@
+=== ceph pool_disk MetricSet
+
+This is the pool_disk metricset of the module ceph.

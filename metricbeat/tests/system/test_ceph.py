@@ -5,6 +5,28 @@ import unittest
 
 class Test(metricbeat.BaseTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_cluster_disk(self):
+        """
+        ceph cluster_disk metricset test
+        """
+        self.render_config_template(modules=[{
+            "name": "ceph",
+            "metricsets": ["cluster_disk"],
+            "hosts": self.get_hosts(),
+            "period": "1s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        proc.check_kill_and_wait()
+
+        output = self.read_output_json()
+        self.assertTrue(len(output) >= 1)
+        evt = output[0]
+        print evt
+
+        self.assert_fields_are_documented(evt)
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_cluster_health(self):
         """
         ceph cluster_health metricset test
@@ -34,6 +56,28 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "ceph",
             "metricsets": ["monitor_health"],
+            "hosts": self.get_hosts(),
+            "period": "1s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        proc.check_kill_and_wait()
+
+        output = self.read_output_json()
+        self.assertTrue(len(output) >= 1)
+        evt = output[0]
+        print evt
+
+        self.assert_fields_are_documented(evt)
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_pool_disk(self):
+        """
+        ceph pool_disk metricset test
+        """
+        self.render_config_template(modules=[{
+            "name": "ceph",
+            "metricsets": ["pool_disk"],
             "hosts": self.get_hosts(),
             "period": "1s"
         }])

@@ -1,0 +1,3 @@
+=== ceph cluster_disk MetricSet
+
+This is the cluster_disk metricset of the module ceph.
