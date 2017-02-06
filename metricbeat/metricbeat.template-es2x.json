@@ -196,6 +196,31 @@
         },
         "ceph": {
           "properties": {
+            "cluster_disk": {
+              "properties": {
+                "available": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "total": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "used": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
+            },
             "cluster_health": {
               "properties": {
                 "overall_status": {
@@ -295,6 +320,42 @@
                   "properties": {
                     "kb": {
                       "type": "long"
+                    }
+                  }
+                }
+              }
+            },
+            "pool_disk": {
+              "properties": {
+                "id": {
+                  "type": "long"
+                },
+                "name": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "stats": {
+                  "properties": {
+                    "available": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        }
+                      }
+                    },
+                    "objects": {
+                      "type": "long"
+                    },
+                    "used": {
+                      "properties": {
+                        "bytes": {
+                          "type": "long"
+                        },
+                        "kb": {
+                          "type": "long"
+                        }
+                      }
                     }
                   }
                 }

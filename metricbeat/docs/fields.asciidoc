@@ -428,6 +428,43 @@ experimental[] ceph Module
 
 
 [float]
+== cluster_disk Fields
+
+cluster_disk
+
+
+
+[float]
+=== ceph.cluster_disk.available.bytes
+
+type: long
+
+format: bytes
+
+Available bytes of the cluster
+
+
+[float]
+=== ceph.cluster_disk.total.bytes
+
+type: long
+
+format: bytes
+
+Total bytes of the cluster
+
+
+[float]
+=== ceph.cluster_disk.used.bytes
+
+type: long
+
+format: bytes
+
+Used bytes of the cluster
+
+
+[float]
 == cluster_health Fields
 
 cluster_health
@@ -575,6 +612,65 @@ Total bytes of MON
 type: long
 
 Last updated
+
+
+[float]
+== pool_disk Fields
+
+pool_disk
+
+
+
+[float]
+=== ceph.pool_disk.id
+
+type: long
+
+Id of the pool
+
+
+[float]
+=== ceph.pool_disk.name
+
+type: keyword
+
+Name of the pool
+
+
+[float]
+=== ceph.pool_disk.stats.available.bytes
+
+type: long
+
+format: bytes
+
+Available bytes of the pool
+
+
+[float]
+=== ceph.pool_disk.stats.objects
+
+type: long
+
+Number of objects of the pool
+
+
+[float]
+=== ceph.pool_disk.stats.used.bytes
+
+type: long
+
+format: bytes
+
+Used bytes of the pool
+
+
+[float]
+=== ceph.pool_disk.stats.used.kb
+
+type: long
+
+Used kb of the pool
 
 
 [[exported-fields-cloud]]
