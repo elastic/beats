@@ -8,5 +8,3 @@ multiline:
   pattern: "^# User@Host: "
   negate: true
   match: after
-fields:
-  source_type: mysql-slowlog

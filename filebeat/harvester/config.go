@@ -53,6 +53,8 @@ type harvesterConfig struct {
 	Multiline            *reader.MultilineConfig `config:"multiline"`
 	JSON                 *reader.JSONConfig      `config:"json"`
 	Pipeline             string                  `config:"pipeline"`
+	Module               string                  `config:"_module_name"`  // hidden option to set the module name
+	Fileset              string                  `config:"_fileset_name"` // hidden option to set the fileset name
 }
 
 func (config *harvesterConfig) Validate() error {

@@ -165,6 +165,18 @@
         "fields": {
           "properties": {}
         },
+        "fileset": {
+          "properties": {
+            "module": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            }
+          }
+        },
         "input_type": {
           "ignore_above": 1024,
           "type": "keyword"

@@ -235,6 +235,16 @@ func (fs *Fileset) getProspectorConfig() (*common.Config, error) {
 		return nil, fmt.Errorf("Error setting the pipeline ID in the prospector config: %v", err)
 	}
 
+	// force our the module/fileset name
+	err = cfg.SetString("_module_name", -1, fs.mcfg.Module)
+	if err != nil {
+		return nil, fmt.Errorf("Error setting the _module_name cfg in the prospector config: %v", err)
+	}
+	err = cfg.SetString("_fileset_name", -1, fs.name)
+	if err != nil {
+		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the prospector config: %v", err)
+	}
+
 	cfg.PrintDebugf("Merged prospector config for fileset %s/%s", fs.mcfg.Module, fs.name)
 
 	return cfg, nil
