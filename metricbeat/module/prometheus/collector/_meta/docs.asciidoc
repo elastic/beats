@@ -2,6 +2,6 @@
 
 The Prometheus `collector` metricset fetches data from https://prometheus.io/docs/instrumenting/exporters/[prometheus exporters].
 
-All events with the same labels are grouped together as one event.
-
-//REVIEWERS: Should we say something about which Prometheus exporters are supported? Users might follow the link and think that all the exporters listed on the page are supported, but I'm not sure if that's true.
+All events with the same labels are grouped together as one event. The fields
+exported by this metricset vary depending on the Prometheus exporter that you're
+using.
