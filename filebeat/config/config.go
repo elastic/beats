@@ -26,7 +26,7 @@ type Config struct {
 	ConfigDir        string           `config:"config_dir"`
 	ShutdownTimeout  time.Duration    `config:"shutdown_timeout"`
 	Modules          []*common.Config `config:"modules"`
-	ProspectorReload *common.Config   `config:"reload.prospectors"`
+	ProspectorReload *common.Config   `config:"config.prospectors"`
 }
 
 var (

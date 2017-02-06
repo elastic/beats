@@ -6,5 +6,5 @@ import "github.com/elastic/beats/libbeat/common"
 type Config struct {
 	// Modules is a list of module specific configuration data.
 	Modules       []*common.Config `config:"modules"`
-	ReloadModules *common.Config   `config:"reload.modules"`
+	ReloadModules *common.Config   `config:"config.modules"`
 }

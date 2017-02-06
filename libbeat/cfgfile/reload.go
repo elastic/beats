@@ -13,8 +13,10 @@ import (
 
 var (
 	DefaultReloadConfig = ReloadConfig{
-		Period:  10 * time.Second,
-		Enabled: false,
+		Reload: Reload{
+			Period:  10 * time.Second,
+			Enabled: false,
+		},
 	}
 
 	debugf = logp.MakeDebug("cfgfile")
@@ -27,7 +29,11 @@ var (
 
 type ReloadConfig struct {
 	// If path is a relative path, it is relative to the ${path.config}
-	Path    string        `config:"path"`
+	Path   string `config:"path"`
+	Reload Reload `config:"reload"`
+}
+
+type Reload struct {
 	Period  time.Duration `config:"period"`
 	Enabled bool          `config:"enabled"`
 }
@@ -86,7 +92,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 		case <-rl.done:
 			logp.Info("Dynamic config reloader stopped")
 			return
-		case <-time.After(rl.config.Period):
+		case <-time.After(rl.config.Reload.Period):
 
 			debugf("Scan for new config files")
 			configReloads.Add(1)
