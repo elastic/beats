@@ -4106,13 +4106,8 @@ Time at which these statistics were last reset.
 [[exported-fields-prometheus]]
 == Prometheus Fields
 
-<<<<<<< HEAD
-Prometheus Module
-experimental[]
-=======
 beta[]
 Stats collected from Prometheus.
->>>>>>> 72efc03... Add edits for prometheus module docs
 
 
 
