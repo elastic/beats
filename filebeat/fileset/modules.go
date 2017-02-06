@@ -18,7 +18,8 @@ type ModuleRegistry struct {
 // newModuleRegistry reads and loads the configured module into the registry.
 func newModuleRegistry(modulesPath string,
 	moduleConfigs []ModuleConfig,
-	overrides *ModuleOverrides) (*ModuleRegistry, error) {
+	overrides *ModuleOverrides,
+	beatVersion string) (*ModuleRegistry, error) {
 
 	var reg ModuleRegistry
 	reg.registry = map[string]map[string]*Fileset{}
@@ -53,7 +54,7 @@ func newModuleRegistry(modulesPath string,
 			if err != nil {
 				return nil, err
 			}
-			err = fileset.Read()
+			err = fileset.Read(beatVersion)
 			if err != nil {
 				return nil, fmt.Errorf("Error reading fileset %s/%s: %v", mcfg.Module, filesetName, err)
 			}
@@ -81,7 +82,7 @@ func newModuleRegistry(modulesPath string,
 }
 
 // NewModuleRegistry reads and loads the configured module into the registry.
-func NewModuleRegistry(moduleConfigs []*common.Config) (*ModuleRegistry, error) {
+func NewModuleRegistry(moduleConfigs []*common.Config, beatVersion string) (*ModuleRegistry, error) {
 	modulesPath := paths.Resolve(paths.Home, "module")
 
 	stat, err := os.Stat(modulesPath)
@@ -106,7 +107,7 @@ func NewModuleRegistry(moduleConfigs []*common.Config) (*ModuleRegistry, error) 
 	if err != nil {
 		return nil, err
 	}
-	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides)
+	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatVersion)
 }
 
 func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
@@ -245,6 +246,7 @@ func (reg *ModuleRegistry) GetProspectorConfigs() ([]*common.Config, error) {
 // the pipelines.
 type PipelineLoader interface {
 	LoadJSON(path string, json map[string]interface{}) error
+	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 }
 
 // LoadPipelines loads the pipelines for each configured fileset.
@@ -266,6 +268,11 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader) error {
 
 func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string]interface{}) error {
 	path := "/_ingest/pipeline/" + pipelineID
+	status, _, _ := esClient.Request("GET", path, "", nil, nil)
+	if status == 200 {
+		logp.Debug("modules", "Pipeline %s already loaded", pipelineID)
+		return nil
+	}
 	err := esClient.LoadJSON(path, content)
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %v", err)

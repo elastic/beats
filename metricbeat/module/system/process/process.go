@@ -34,12 +34,11 @@ type MetricSet struct {
 // New creates and returns a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
-		Procs        []string `config:"processes"` // collect all processes by default
-		Cgroups      bool     `config:"cgroups"`
+		Procs        []string `config:"processes"`
+		Cgroups      *bool    `config:"process.cgroups.enabled"`
 		EnvWhitelist []string `config:"process.env.whitelist"`
 	}{
-		Procs:   []string{".*"},
-		Cgroups: false,
+		Procs: []string{".*"}, // collect all processes by default
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -63,8 +62,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			return nil, fmt.Errorf("unexpected module type")
 		}
 
-		if config.Cgroups {
-			logp.Warn("EXPERIMENTAL: Cgroup is enabled for the system.process MetricSet.")
+		if config.Cgroups == nil || *config.Cgroups {
+			debugf("process cgroup data collection is enabled")
 			m.cgroup, err = cgroup.NewReader(systemModule.HostFS, true)
 			if err != nil {
 				return nil, errors.Wrap(err, "error initializing cgroup reader")

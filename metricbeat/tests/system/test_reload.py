@@ -66,7 +66,7 @@ class Test(metricbeat.BaseTest):
 
         # Wait until offset for new line is updated
         self.wait_until(
-            lambda: self.log_contains("Starting 1 modules"),
+            lambda: self.log_contains("Starting 1 runner"),
             max_timeout=10)
 
         self.wait_until(lambda: self.output_lines() > 0)
@@ -76,7 +76,7 @@ class Test(metricbeat.BaseTest):
 
         # Wait until offset for new line is updated
         self.wait_until(
-            lambda: self.log_contains("Module stopped:"),
+            lambda: self.log_contains("Runner stopped:"),
             max_timeout=10)
 
         lines = self.output_lines()

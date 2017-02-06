@@ -8,7 +8,8 @@ var:
     os.darwin:
       - /usr/local/var/log/apache2/access_log*
     os.windows:
-      - "C:/Program Files/Apache Software Foundation/Apache2.4/logs/access.log*"
+      - "C:/tools/Apache/httpd-2.*/Apache24/logs/access.log*"
+      - "C:/Program Files/Apache Software Foundation/Apache2.*/logs/access.log*"
   - name: pipeline
     # options: with_plugins, no_plugins
     default: with_plugins

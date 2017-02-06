@@ -58,17 +58,12 @@ directly from the service itself and not via a third-party tool. The goal is to
 have as few movable parts as possible and for Metricbeat to run as close as
 possible to the service that it needs to monitor.
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/developer-guide/create-metricset.asciidoc ?>]
 include::./create-metricset.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/developer-guide/metricset-details.asciidoc ?>]
 include::./metricset-details.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/developer-guide/create-module.asciidoc ?>]
 include::./create-module.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/developer-guide/creating-beat-from-metricbeat.asciidoc ?>]
 include::./creating-beat-from-metricbeat.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/metricbeat/docs/developer-guide/faq.asciidoc ?>]
 include::./faq.asciidoc[]

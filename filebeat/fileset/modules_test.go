@@ -30,7 +30,7 @@ func TestNewModuleRegistry(t *testing.T) {
 		{Module: "system"},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
 	assert.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -86,7 +86,7 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
 	assert.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -335,7 +335,7 @@ func TestMissingModuleFolder(t *testing.T) {
 		load(t, map[string]interface{}{"module": "nginx"}),
 	}
 
-	reg, err := NewModuleRegistry(configs)
+	reg, err := NewModuleRegistry(configs, "5.2.0")
 	assert.NoError(t, err)
 	assert.NotNil(t, reg)
 
