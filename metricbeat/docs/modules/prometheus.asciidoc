@@ -3,7 +3,6 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-prometheus]]
-
 == Prometheus Module
 
 beta[]
