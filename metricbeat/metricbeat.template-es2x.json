@@ -198,28 +198,24 @@
           "properties": {
             "cluster_disk": {
               "properties": {
-                "stats": {
+                "available": {
                   "properties": {
-                    "available": {
-                      "properties": {
-                        "bytes": {
-                          "type": "long"
-                        }
-                      }
-                    },
-                    "total": {
-                      "properties": {
-                        "bytes": {
-                          "type": "long"
-                        }
-                      }
-                    },
-                    "used": {
-                      "properties": {
-                        "bytes": {
-                          "type": "long"
-                        }
-                      }
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "total": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "used": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
                     }
                   }
                 }
