@@ -1,0 +1,3 @@
+COUCHBASE_HOST=couchbase
+COUCHBASE_PORT=8091
+COUCHBASE_DSN=http://Administrator:password@couchbase:8091
