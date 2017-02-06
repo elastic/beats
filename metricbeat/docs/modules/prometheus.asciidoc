@@ -3,14 +3,9 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-prometheus]]
-
-<<<<<<< HEAD
-This is the prometheus Module.
-=======
 == Prometheus Module
 
 beta[]
->>>>>>> 72efc03... Add edits for prometheus module docs
 
 This module periodically fetches metrics from
 https://prometheus.io/docs/[Prometheus].
