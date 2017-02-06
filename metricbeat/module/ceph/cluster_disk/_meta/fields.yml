@@ -3,17 +3,17 @@
   description: >
     cluster_disk
   fields:
-    - name: stats.available.bytes
+    - name: available.bytes
       type: long
       description: >
         Available bytes of the cluster
       format: bytes
-    - name: stats.total.bytes
+    - name: total.bytes
       type: long
       description: >
         Total bytes of the cluster
       format: bytes
-    - name: stats.used.bytes
+    - name: used.bytes
       type: long
       description: >
         Used bytes of the cluster
