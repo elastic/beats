@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"HTTP monitors status\",\"type\":\"pie\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"monitor\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"segment\",\"params\":{\"filters\":[{\"input\":{\"query\":{\"query_string\":{\"query\":\"up: true\",\"analyze_wildcard\":true}}},\"label\":\"\"},{\"input\":{\"query\":{\"query_string\":{\"query\":\"up: false\",\"analyze_wildcard\":true}}}}]}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"response.status\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "HTTP monitors status", 
+  "uiStateJSON": "{\"vis\":{\"colors\":{\"200\":\"#B7DBAB\",\"up: true\":\"#629E51\",\"up: false\":\"#E24D42\"},\"legendOpen\":true}}", 
+  "version": 1, 
+  "savedSearchId": "c49bd160-eb17-11e6-be20-559646f8b9ba", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}
