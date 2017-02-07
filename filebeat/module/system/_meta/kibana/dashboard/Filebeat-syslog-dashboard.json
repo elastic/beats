@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Filebeat syslog dashboard", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"id\":\"Syslog-events-by-hostname\",\"type\":\"visualization\",\"panelIndex\":1,\"size_x\":8,\"size_y\":4,\"col\":1,\"row\":1},{\"id\":\"Syslog-hostnames-and-processes\",\"type\":\"visualization\",\"panelIndex\":2,\"size_x\":4,\"size_y\":4,\"col\":9,\"row\":1},{\"id\":\"Syslog-system-logs\",\"type\":\"search\",\"panelIndex\":3,\"size_x\":12,\"size_y\":7,\"col\":1,\"row\":5,\"columns\":[\"system.syslog.hostname\",\"system.syslog.program\",\"system.syslog.message\"],\"sort\":[\"@timestamp\",\"desc\"]}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+  }
+}

@@ -1,7 +1,7 @@
 - key: couchbase
   title: "couchbase"
   description: >
-    experimental[]
+    beta[]
 
     couchbase Module
   short_config: false

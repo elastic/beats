@@ -5,12 +5,12 @@ package process
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"runtime"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/system"
 	"github.com/elastic/beats/metricbeat/module/system/memory"
@@ -40,8 +40,8 @@ type ProcStats struct {
 	CpuTicks     bool
 	EnvWhitelist []string
 
-	procRegexps []*regexp.Regexp // List of regular expressions used to whitelist processes.
-	envRegexps  []*regexp.Regexp // List of regular expressions used to whitelist env vars.
+	procRegexps []match.Matcher // List of regular expressions used to whitelist processes.
+	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
 }
 
 // newProcess creates a new Process object and initializes it with process
@@ -297,18 +297,18 @@ func (procStats *ProcStats) InitProcStats() error {
 		return nil
 	}
 
-	procStats.procRegexps = []*regexp.Regexp{}
+	procStats.procRegexps = []match.Matcher{}
 	for _, pattern := range procStats.Procs {
-		reg, err := regexp.Compile(pattern)
+		reg, err := match.Compile(pattern)
 		if err != nil {
 			return fmt.Errorf("Failed to compile regexp [%s]: %v", pattern, err)
 		}
 		procStats.procRegexps = append(procStats.procRegexps, reg)
 	}
 
-	procStats.envRegexps = make([]*regexp.Regexp, 0, len(procStats.EnvWhitelist))
+	procStats.envRegexps = make([]match.Matcher, 0, len(procStats.EnvWhitelist))
 	for _, pattern := range procStats.EnvWhitelist {
-		reg, err := regexp.Compile(pattern)
+		reg, err := match.Compile(pattern)
 		if err != nil {
 			return fmt.Errorf("failed to compile env whitelist regexp [%v]: %v", pattern, err)
 		}

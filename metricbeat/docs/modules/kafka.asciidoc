@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-kafka]]
 == kafka Module
 
-experimental[]
+beta[]
 
 This is the kafka Module.
 

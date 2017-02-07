@@ -2,7 +2,6 @@ package status
 
 import (
 	"bufio"
-	"io"
 	"regexp"
 	"strings"
 
@@ -55,7 +54,7 @@ var (
 )
 
 // Map body to MapStr
-func eventMapping(body io.ReadCloser, hostname string) common.MapStr {
+func eventMapping(scanner *bufio.Scanner, hostname string) common.MapStr {
 	var (
 		totalS          int
 		totalR          int
@@ -72,7 +71,6 @@ func eventMapping(body io.ReadCloser, hostname string) common.MapStr {
 	)
 
 	fullEvent := map[string]interface{}{}
-	scanner := bufio.NewScanner(body)
 
 	// Iterate through all events to gather data
 	for scanner.Scan() {

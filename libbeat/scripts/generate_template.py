@@ -50,6 +50,7 @@ def fields_to_es_template(args, input, output, index, version):
         },
         "mappings": {
             "_default_": {
+                "date_detection": False,
                 "properties": {},
                 "_meta": {
                     "version": version,
@@ -279,6 +280,29 @@ def fill_field_properties(args, field, defaults, path):
                     }
                 })
 
+        if field.get("dict-type") == "long":
+            if len(path) > 0:
+                name = path + "." + field["name"]
+            else:
+                name = field["name"]
+
+            dynamic_templates.append({
+                name: {
+                    "mapping": {
+                        "type": "long",
+                    },
+                    "match_mapping_type": "long",
+                    "path_match": name + ".*"
+                }
+            })
+
+
+        properties[field["name"]] = {
+            "properties": {}
+        }
+
+
+
     elif field.get("type") == "group":
         if len(path) > 0:
             path = path + "." + field["name"]
@@ -309,7 +333,7 @@ def fill_field_properties(args, field, defaults, path):
 
         dynamic_templates.extend(dynamic)
     else:
-        raise ValueError("Unkown type found: " + field.get("type"))
+        raise ValueError("Unknown type found: " + field.get("type"))
 
     return properties, dynamic_templates
 

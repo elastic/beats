@@ -9,6 +9,7 @@ Contains tests for config parsing.
 
 @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
 class Test(BaseTest):
+
     def test_valid_config(self):
         """
         configtest - valid config

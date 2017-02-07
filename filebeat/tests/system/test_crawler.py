@@ -199,7 +199,7 @@ class Test(BaseTest):
 
         # expecting 6 more events
         self.wait_until(
-            lambda: self.output_has(lines=iterations1+iterations2), max_timeout=10)
+            lambda: self.output_has(lines=iterations1 + iterations2), max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -360,7 +360,7 @@ class Test(BaseTest):
             f.write("hello world 2\n")
 
         self.wait_until(
-            lambda: self.output_has(lines=1+2), max_timeout=10)
+            lambda: self.output_has(lines=1 + 2), max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -531,7 +531,7 @@ class Test(BaseTest):
             f.flush()
 
             self.wait_until(
-                lambda: self.output_has(lines=1+2), max_timeout=10)
+                lambda: self.output_has(lines=1 + 2), max_timeout=10)
 
         filebeat.check_kill_and_wait()
 

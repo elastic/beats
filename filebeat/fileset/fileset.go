@@ -7,6 +7,7 @@ package fileset
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -26,6 +27,7 @@ type Fileset struct {
 	modulePath string
 	manifest   *manifest
 	vars       map[string]interface{}
+	pipelineID string
 }
 
 // New allocates a new Fileset object with the given configuration.
@@ -49,7 +51,7 @@ func New(
 }
 
 // Read reads the manifest file and evaluates the variables.
-func (fs *Fileset) Read() error {
+func (fs *Fileset) Read(beatVersion string) error {
 	var err error
 	fs.manifest, err = fs.readManifest()
 	if err != nil {
@@ -61,12 +63,9 @@ func (fs *Fileset) Read() error {
 		return err
 	}
 
-	pipeline_id, err := fs.getPipelineID()
+	fs.pipelineID, err = fs.getPipelineID(beatVersion)
 	if err != nil {
 		return err
-	}
-	fs.vars["beat"] = map[string]interface{}{
-		"pipeline_id": pipeline_id,
 	}
 
 	return nil
@@ -230,19 +229,59 @@ func (fs *Fileset) getProspectorConfig() (*common.Config, error) {
 		}
 	}
 
+	// force our pipeline ID
+	err = cfg.SetString("pipeline", -1, fs.pipelineID)
+	if err != nil {
+		return nil, fmt.Errorf("Error setting the pipeline ID in the prospector config: %v", err)
+	}
+
+	// force our the module/fileset name
+	err = cfg.SetString("_module_name", -1, fs.mcfg.Module)
+	if err != nil {
+		return nil, fmt.Errorf("Error setting the _module_name cfg in the prospector config: %v", err)
+	}
+	err = cfg.SetString("_fileset_name", -1, fs.name)
+	if err != nil {
+		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the prospector config: %v", err)
+	}
+
 	cfg.PrintDebugf("Merged prospector config for fileset %s/%s", fs.mcfg.Module, fs.name)
 
 	return cfg, nil
 }
 
 // getPipelineID returns the Ingest Node pipeline ID
-func (fs *Fileset) getPipelineID() (string, error) {
+func (fs *Fileset) getPipelineID(beatVersion string) (string, error) {
 	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline)
 	if err != nil {
 		return "", fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
 	}
 
-	return fmt.Sprintf("%s-%s-%s", fs.mcfg.Module, fs.name, removeExt(filepath.Base(path))), nil
+	return formatPipelineID(fs.mcfg.Module, fs.name, path, beatVersion), nil
+}
+
+func (fs *Fileset) GetPipeline() (pipelineID string, content map[string]interface{}, err error) {
+	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline)
+	if err != nil {
+		return "", nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
+	}
+
+	f, err := os.Open(filepath.Join(fs.modulePath, fs.name, path))
+	if err != nil {
+		return "", nil, fmt.Errorf("Error reading pipeline file %s: %v", path, err)
+	}
+
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&content)
+	if err != nil {
+		return "", nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %v", path, err)
+	}
+	return fs.pipelineID, content, nil
+}
+
+// formatPipelineID generates the ID to be used for the pipeline ID in Elasticsearch
+func formatPipelineID(module, fileset, path, beatVersion string) string {
+	return fmt.Sprintf("filebeat-%s-%s-%s-%s", beatVersion, module, fileset, removeExt(filepath.Base(path)))
 }
 
 // removeExt returns the file name without the extension. If no dot is found,

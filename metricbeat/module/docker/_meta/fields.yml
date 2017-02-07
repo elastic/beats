@@ -1,7 +1,7 @@
 - key: docker
   title: "Docker"
   description: >
-    experimental[]
+    beta[]
 
     Docker stats collected from Docker.
   short_config: false

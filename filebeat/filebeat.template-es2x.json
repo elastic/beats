@@ -9,6 +9,7 @@
       "_meta": {
         "version": "5.3.0"
       },
+      "date_detection": false,
       "dynamic_templates": [
         {
           "strings_as_keyword": {
@@ -191,6 +192,23 @@
           "ignore_above": 1024,
           "index": "not_analyzed",
           "type": "string"
+        },
+        "fields": {
+          "properties": {}
+        },
+        "fileset": {
+          "properties": {
+            "module": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            }
+          }
         },
         "input_type": {
           "ignore_above": 1024,
@@ -469,9 +487,9 @@
           "index": "not_analyzed",
           "type": "string"
         },
-        "syslog": {
+        "system": {
           "properties": {
-            "system": {
+            "syslog": {
               "properties": {
                 "hostname": {
                   "ignore_above": 1024,

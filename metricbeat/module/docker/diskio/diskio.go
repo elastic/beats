@@ -23,7 +23,7 @@ type MetricSet struct {
 
 // New create a new instance of the docker diskio MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The docker diskio metricset is experimental")
+	logp.Warn("BETA: The docker diskio metricset is beta")
 
 	config := docker.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {

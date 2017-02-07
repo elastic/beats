@@ -94,11 +94,11 @@ if __name__ == "__main__":
 
     if args.path is None:
         args.path = './'
-        print "Set default path for beat path: " + args.path
+        print("Set default path for beat path: " + args.path)
 
     if args.es_beats is None:
         args.es_beats = '../'
-        print "Set default path for es_beats path: " + args.es_beats
+        print("Set default path for es_beats path: " + args.es_beats)
 
     if args.module is None or args.module == '':
         args.module = raw_input("Module name: ")

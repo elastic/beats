@@ -3,7 +3,7 @@
   description: >
     kafka Module
 
-    experimental[]
+    beta[]
   short_config: false
   fields:
     - name: kafka

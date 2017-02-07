@@ -38,7 +38,8 @@ def field_to_json(desc, path, output,
     global unique_fields
 
     if path in unique_fields:
-        print("ERROR: Field {} is duplicated. Please delete it and try again. Fields already are {}".format(path, ", ".join(unique_fields)))
+        print("ERROR: Field {} is duplicated. Please delete it and try again. Fields already are {}".format(
+            path, ", ".join(unique_fields)))
         sys.exit(1)
     else:
         unique_fields.append(path)
@@ -154,15 +155,17 @@ if __name__ == "__main__":
     # dump output to a json file
     fileName = get_index_pattern_name(args.index)
     target_dir = os.path.join(args.beat, "_meta", "kibana", "index-pattern")
-    target_file =os.path.join(target_dir, fileName + ".json")
+    target_file = os.path.join(target_dir, fileName + ".json")
 
-    try: os.makedirs(target_dir)
+    try:
+        os.makedirs(target_dir)
     except OSError as exception:
-        if exception.errno != errno.EEXIST: raise
+        if exception.errno != errno.EEXIST:
+            raise
 
     output = json.dumps(output, indent=2)
 
     with open(target_file, 'w') as f:
         f.write(output)
 
-    print ("The index pattern was created under {}".format(target_file))
+    print("The index pattern was created under {}".format(target_file))

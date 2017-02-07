@@ -96,11 +96,10 @@ PS > scripts\import_dashboards.exe -es https://xyz.found.io -user user -pass pas
 After importing the dashboards, launch the Kibana web interface by pointing your browser
 to port 5601. For example, http://127.0.0.1:5601[http://127.0.0.1:5601].
 
-If Kibana shows a `No default index pattern` warning, you must select or create
-an index pattern to continue. To resolve the issue, select the
-predefined +{beatname_lc}-*+ index pattern and set it as the default.
+On the *Discover* page, make sure that the predefined +{beatname_lc}-*+ index
+pattern is selected to see {beatname_uc} data.
 
-image:./images/kibana-created-indexes.png[Kibana configured indexes]
+image:./images/kibana-created-indexes.png[Discover tab with index selected]
 
 To open the loaded dashboards, go to the *Dashboard* page and click *Open*.
 Select the dashboard that you want to open. 

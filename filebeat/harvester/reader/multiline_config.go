@@ -2,15 +2,16 @@ package reader
 
 import (
 	"fmt"
-	"regexp"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common/match"
 )
 
 type MultilineConfig struct {
 	Negate   bool           `config:"negate"`
 	Match    string         `config:"match"       validate:"required"`
 	MaxLines *int           `config:"max_lines"`
-	Pattern  *regexp.Regexp `config:"pattern"`
+	Pattern  match.Matcher  `config:"pattern"`
 	Timeout  *time.Duration `config:"timeout"     validate:"positive"`
 }
 

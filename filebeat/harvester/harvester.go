@@ -14,6 +14,7 @@ package harvester
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
@@ -39,6 +40,8 @@ type Harvester struct {
 	fileReader      *LogFile
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
+	prospectorDone  chan struct{}
+	once            sync.Once
 	done            chan struct{}
 }
 
@@ -53,7 +56,8 @@ func NewHarvester(
 		config:         defaultConfig,
 		state:          state,
 		prospectorChan: prospectorChan,
-		done:           done,
+		prospectorDone: done,
+		done:           make(chan struct{}),
 	}
 
 	if err := cfg.Unpack(&h.config); err != nil {

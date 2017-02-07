@@ -1,0 +1,5 @@
+FROM spotify/kafka
+
+EXPOSE 2181 9092
+
+ENV ADVERTISED_HOST kafka

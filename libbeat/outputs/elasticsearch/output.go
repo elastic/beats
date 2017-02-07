@@ -72,6 +72,93 @@ func New(beatName string, cfg *common.Config, topologyExpire int) (outputs.Outpu
 	return output, nil
 }
 
+// NewConnectedClient creates a new Elasticsearch client based on the given config.
+// It uses the NewElasticsearchClients to create a list of clients then returns
+// the first from the list that successfully connects.
+func NewConnectedClient(cfg *common.Config) (*Client, error) {
+	clients, err := NewElasticsearchClients(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, client := range clients {
+		err = client.Connect(client.timeout)
+		if err != nil {
+			logp.Err("Error connecting to Elasticsearch: %s", client.Connection.URL)
+			continue
+		}
+		return &client, nil
+	}
+	return nil, fmt.Errorf("Couldn't connect to any of the configured Elasticsearch hosts")
+}
+
+// NewElasticsearchClients returns a list of Elasticsearch clients based on the given
+// configuration. It accepts the same configuration parameters as the output,
+// except for the output specific configuration options (index, pipeline,
+// template) .If multiple hosts are defined in the configuration, a client is returned
+// for each of them.
+func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
+
+	hosts, err := modeutil.ReadHostList(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	config := defaultConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, err
+	}
+
+	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return nil, err
+	}
+
+	var proxyURL *url.URL
+	if config.ProxyURL != "" {
+		proxyURL, err = parseProxyURL(config.ProxyURL)
+		if err != nil {
+			return nil, err
+		}
+
+		logp.Info("Using proxy URL: %s", proxyURL)
+	}
+
+	params := config.Params
+	if len(params) == 0 {
+		params = nil
+	}
+
+	clients := []Client{}
+	for _, host := range hosts {
+		esURL, err := getURL(config.Protocol, config.Path, host)
+		if err != nil {
+			logp.Err("Invalid host param set: %s, Error: %v", host, err)
+			return nil, err
+		}
+
+		client, err := NewClient(ClientSettings{
+			URL:              esURL,
+			Proxy:            proxyURL,
+			TLS:              tlsConfig,
+			Username:         config.Username,
+			Password:         config.Password,
+			Parameters:       params,
+			Headers:          config.Headers,
+			Timeout:          config.Timeout,
+			CompressionLevel: config.CompressionLevel,
+		}, nil)
+		if err != nil {
+			return clients, err
+		}
+		clients = append(clients, *client)
+	}
+	if len(clients) == 0 {
+		return clients, fmt.Errorf("No hosts defined in the Elasticsearch output")
+	}
+	return clients, nil
+}
+
 func (out *elasticsearchOutput) init(
 	cfg *common.Config,
 	topologyExpire int,
@@ -282,6 +369,7 @@ func makeClientFactory(
 			Username:         config.Username,
 			Password:         config.Password,
 			Parameters:       params,
+			Headers:          config.Headers,
 			Timeout:          config.Timeout,
 			CompressionLevel: config.CompressionLevel,
 		}, onConnected)

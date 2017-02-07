@@ -1,0 +1,30 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "docker": {
+        "container": {
+            "id": "6d01caff41f2f9118c0ced423579d70b6161eec614270e3cbf1b72e2bb40f84e",
+            "name": "gifted_hugle"
+        },
+        "healthcheck": {
+            "event": {
+                "end_date": "2017-01-25T10:58:51.171Z",
+                "exit_code": 0,
+                "output": "",
+                "start_date": "2017-01-25T10:58:51.114Z"
+            },
+            "failingstreak": 0,
+            "status": "healthy"
+        }
+    },
+    "metricset": {
+        "host": "/var/run/docker.sock",
+        "module": "docker",
+        "name": "healthcheck",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

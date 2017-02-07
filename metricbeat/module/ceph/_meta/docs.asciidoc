@@ -1,0 +1,6 @@
+== ceph Module
+
+beta[]
+
+This is the ceph Module. Metrics are collected submitting HTTP GET requests to ceph-rest-api.
+Reference: http://docs.ceph.com/docs/master/man/8/ceph-rest-api/

@@ -74,6 +74,8 @@ include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
+include::../../../../libbeat/docs/dashboardsconfig.asciidoc[]
+
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
 include::./reload-configuration.asciidoc[]

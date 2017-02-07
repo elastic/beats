@@ -12,10 +12,8 @@ must be set up correctly. In addition, the following tools are quired:
 
 * https://www.python.org/downloads/[python]
 * https://virtualenv.pypa.io/en/stable/[virtualenv]
-* https://github.com/audreyr/cookiecutter[cookiecutter]
 
-Virtualenv and Cookiecutter are easiest installed with your package manager or https://pip.pypa.io/en/stable/[pip]. For more details on how to
-install cookiecutter, see the http://cookiecutter.readthedocs.io/en/latest/installation.html[cookiecutter installation docs].
+Virtualenv is easiest installed with your package manager or https://pip.pypa.io/en/stable/[pip].
 
 [float]
 === Step 1 - Get the metricbeat source code
@@ -49,7 +47,7 @@ Run the command:
 
 [source,bash]
 ----
-cookiecutter ${GOPATH}/src/github.com/elastic/beats/generate/metricbeat/metricset
+python ${GOPATH}/src/github.com/elastic/beats/script/generate.py --type=metricbeat
 ----
 
 When prompted, enter the Beat name and path.

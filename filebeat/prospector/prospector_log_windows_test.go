@@ -1,18 +1,18 @@
-// +build windows
+// +build !integration
 
 package prospector
 
 import (
-	"regexp"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/stretchr/testify/assert"
 )
 
 var matchTestsWindows = []struct {
 	file         string
 	paths        []string
-	excludeFiles []*regexp.Regexp
+	excludeFiles []match.Matcher
 	result       bool
 }{
 	{

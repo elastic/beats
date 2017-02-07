@@ -81,10 +81,10 @@ metricbeat.modules:
 {%- endfor %}
 
 {% if reload -%}
-metricbeat.reload.modules:
+metricbeat.config.modules:
   path: {{ reload_path }}
-  period: 1s
-  enabled: true
+  reload.period: 1s
+  reload.enabled: true
 {% endif -%}
 
 #================================ General =====================================

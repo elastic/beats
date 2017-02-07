@@ -7,7 +7,7 @@ var:
     os.darwin:
       - /usr/local/var/log/nginx/access.log*
     os.windows:
-      - c:/programfiles/nginx/logs/access.log*
+      - c:/programdata/nginx/logs/*access.log*
   - name: pipeline
     # options: with_plugins, no_plugins
     default: with_plugins
