@@ -129,6 +129,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Fix error on importing dashboards due to colons in the Caassandra dashboard. {issue}3140[3140]
 
 *Filebeat*
+- Config option filebeat.config_dir is deprecated. It will be replaced in version 6.0 with a new implementation that also supports configuration reloading. {issue}3430[3430]
 
 *Winlogbeat*
 
