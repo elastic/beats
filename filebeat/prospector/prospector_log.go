@@ -215,6 +215,11 @@ func (p *ProspectorLog) scan() {
 		default:
 		}
 
+		var err error
+		path, err = filepath.Abs(path)
+		if err != nil {
+			logp.Err("could not fetch abs path for file %s: %s", path, err)
+		}
 		logp.Debug("prospector", "Check file for harvesting: %s", path)
 
 		// Create new state for comparison
