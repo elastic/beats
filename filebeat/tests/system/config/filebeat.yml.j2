@@ -29,6 +29,7 @@ filebeat.prospectors:
   harvester_limit: {{harvester_limit | default(0) }}
   symlinks: {{symlinks}}
   pipeline: {{pipeline}}
+  compression: {{compression}}
 
   {% if fields %}
   fields:

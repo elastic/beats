@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"expvar"
+	"fmt"
 	"io"
 	"os"
 	"time"
 
 	"golang.org/x/text/transform"
-
-	"fmt"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/reader"
@@ -202,8 +201,8 @@ func (h *Harvester) openFile() error {
 		return err
 	}
 
-	h.file = source.File{f}
-	return nil
+	h.file, err = source.NewFile(f, h.config.Compression)
+	return err
 }
 
 func (h *Harvester) validateFile(f *os.File) error {
@@ -286,6 +285,19 @@ func (h *Harvester) close() {
 	// Make sure file is closed as soon as harvester exits
 	// If file was never opened, it can't be closed
 	if h.file != nil {
+
+		// This is required for GZIP compressed files as the offset reported by the harvester
+		// does not correspond with the file size which is used for comparison in the prospector.
+		// Normally offset > Size() because of the compression. This sets the offset after
+		// the gzip finished reading to its size.
+		if h.config.Compression == config.GZipCompression {
+			stat, err := h.file.Stat()
+			if err != nil {
+				logp.Err("Error when fetch stat for compressed file file: ", err)
+			} else {
+				h.state.Offset = stat.Size()
+			}
+		}
 
 		h.file.Close()
 
