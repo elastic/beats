@@ -301,7 +301,8 @@ stop-environment:
 .PHONY: write-environment
 write-environment:
 	mkdir -p ${BUILD_DIR}
-	echo "ES_HOST=${ES_HOST}" > ${BUILD_DIR}/test.env
+	echo "BEAT_STRICT_PERMS=false" > ${BUILD_DIR}/test.env
+	echo "ES_HOST=${ES_HOST}" >> ${BUILD_DIR}/test.env
 	echo "ES_PORT=9200" >> ${BUILD_DIR}/test.env
 	echo "ES_USER=beats" >> ${BUILD_DIR}/test.env
 	echo "ES_PASS=testing" >> ${BUILD_DIR}/test.env

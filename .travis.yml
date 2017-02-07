@@ -88,6 +88,8 @@ addons:
       - geoip-database
 
 before_install:
+  - umask 022
+  - chmod -R go-w $GOPATH/src/github.com/elastic/beats
   # Docker-compose installation
   - sudo rm /usr/local/bin/docker-compose || true
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose

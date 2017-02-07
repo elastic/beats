@@ -45,8 +45,9 @@ func TestLoadPipeline(t *testing.T) {
 
 	var res map[string]interface{}
 	err = json.Unmarshal(response, &res)
-	assert.NoError(t, err)
-	assert.Equal(t, "describe pipeline", res["my-pipeline-id"].(map[string]interface{})["description"], string(response))
+	if assert.NoError(t, err) {
+		assert.Equal(t, "describe pipeline", res["my-pipeline-id"].(map[string]interface{})["description"], string(response))
+	}
 }
 
 func TestSetupNginx(t *testing.T) {
@@ -62,10 +63,14 @@ func TestSetupNginx(t *testing.T) {
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	err = reg.LoadPipelines(client)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	status, _, _ := client.Request("GET", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-with_plugins", "", nil, nil)
 	assert.Equal(t, 200, status)
