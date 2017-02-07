@@ -7,5 +7,3 @@ exclude_files: [".gz$"]
 multiline:
   pattern: "^\\s"
   match: after
-fields:
-  source_type: system-syslog

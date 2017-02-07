@@ -196,6 +196,20 @@
         "fields": {
           "properties": {}
         },
+        "fileset": {
+          "properties": {
+            "module": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            }
+          }
+        },
         "input_type": {
           "ignore_above": 1024,
           "index": "not_analyzed",

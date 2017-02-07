@@ -185,6 +185,14 @@ func TestGetProspectorConfigNginxOverrides(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "filebeat-5.2.0-nginx-access-with_plugins", pipelineID)
 
+	moduleName, err := cfg.String("_module_name", -1)
+	assert.NoError(t, err)
+	assert.Equal(t, "nginx", moduleName)
+
+	filesetName, err := cfg.String("_fileset_name", -1)
+	assert.NoError(t, err)
+	assert.Equal(t, "access", filesetName)
+
 }
 
 func TestGetPipelineNginx(t *testing.T) {

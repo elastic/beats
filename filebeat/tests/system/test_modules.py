@@ -97,6 +97,7 @@ class Test(BaseTest):
         for obj in objects:
             self.assert_fields_are_documented(obj)
             # assert "error" not in obj  # no parsing errors
+            assert obj["fileset"]["module"] == module
 
         if os.path.exists(test_file + "-expected.json"):
             with open(test_file + "-expected.json", "r") as f:

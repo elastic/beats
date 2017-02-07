@@ -21,6 +21,8 @@ type Event struct {
 	State        file.State
 	Data         common.MapStr // Use in readers to add data to the event
 	Pipeline     string
+	Fileset      string
+	Module       string
 }
 
 func NewEvent(state file.State) *Event {
@@ -37,6 +39,13 @@ func (e *Event) ToMapStr() common.MapStr {
 		"offset":                e.State.Offset, // Offset here is the offset before the starting char.
 		"type":                  e.DocumentType,
 		"input_type":            e.InputType,
+	}
+
+	if e.Fileset != "" && e.Module != "" {
+		event["fileset"] = common.MapStr{
+			"name":   e.Fileset,
+			"module": e.Module,
+		}
 	}
 
 	// Add data fields which are added by the readers
