@@ -101,7 +101,7 @@ metricbeat.modules:
 #  period: 10s
 #  hosts: ["localhost:5000"]
 
-#------------------------------ couchbase Module -----------------------------
+#------------------------------ Couchbase Module -----------------------------
 #- module: couchbase
   #metricsets: ["cluster", "node", "bucket"]
   #enabled: true

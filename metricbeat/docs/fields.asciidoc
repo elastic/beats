@@ -779,11 +779,10 @@ The document type. Always set to "metricsets".
 
 
 [[exported-fields-couchbase]]
-== couchbase Fields
+== Couchbase Fields
 
 beta[]
-couchbase Module
-
+Metrics collected from Couchbase servers.
 
 
 [float]
@@ -796,8 +795,7 @@ couchbase Module
 [float]
 == bucket Fields
 
-beta[]
-Couchbase bucket metrics
+Couchbase bucket metrics.
 
 
 
@@ -806,7 +804,7 @@ Couchbase bucket metrics
 
 type: keyword
 
-name of the bucket
+Name of the bucket.
 
 
 [float]
@@ -814,7 +812,7 @@ name of the bucket
 
 type: keyword
 
-type of the bucket
+Type of the bucket.
 
 
 [float]
@@ -832,7 +830,7 @@ Size of user data within buckets of the specified state that are resident in RAM
 
 type: long
 
-Number of disk fetches
+Number of disk fetches.
 
 
 [float]
@@ -842,7 +840,7 @@ type: long
 
 format: bytes
 
-Amount of disk used (bytes)
+Amount of disk used (bytes).
 
 
 [float]
@@ -852,7 +850,7 @@ type: long
 
 format: bytes
 
-Amount of memory used by the bucket (bytes)
+Amount of memory used by the bucket (bytes).
 
 
 [float]
@@ -862,7 +860,7 @@ type: long
 
 format: bytes
 
-Amount of RAM used by the bucket (bytes)
+Amount of RAM used by the bucket (bytes).
 
 
 [float]
@@ -872,7 +870,7 @@ type: scaled_float
 
 format: percent
 
-Percentage of RAM used (for active objects) against the configure bucket size.(%)
+Percentage of RAM used (for active objects) against the configured bucket size (%).
 
 
 [float]
@@ -880,7 +878,7 @@ Percentage of RAM used (for active objects) against the configure bucket size.(%
 
 type: long
 
-Number of operations per second
+Number of operations per second.
 
 
 [float]
@@ -888,14 +886,13 @@ Number of operations per second
 
 type: long
 
-Number of items associated with the bucket
+Number of items associated with the bucket.
 
 
 [float]
 == cluster Fields
 
-beta[]
-Couchbase Cluster metrics
+Couchbase cluster metrics.
 
 
 
@@ -906,7 +903,7 @@ type: long
 
 format: bytes
 
-Free harddrive space in the cluster (bytes)
+Free hard drive space in the cluster (bytes).
 
 
 [float]
@@ -916,7 +913,7 @@ type: long
 
 format: bytes
 
-Harddrive quota total for the cluster (bytes)
+Hard drive quota total for the cluster (bytes).
 
 
 [float]
@@ -926,7 +923,7 @@ type: long
 
 format: bytes
 
-Total harddrive space available to cluster (bytes)
+Total hard drive space available to the cluster (bytes).
 
 
 [float]
@@ -936,7 +933,7 @@ type: long
 
 format: bytes
 
-Harddrive space used by the cluster (bytes)
+Hard drive space used by the cluster (bytes).
 
 
 [float]
@@ -946,7 +943,7 @@ type: long
 
 format: bytes
 
-Harddrive use by the data in the cluster(bytes)
+Hard drive space used by the data in the cluster (bytes).
 
 
 [float]
@@ -954,7 +951,7 @@ Harddrive use by the data in the cluster(bytes)
 
 type: long
 
-Setting of Max Bucket Count
+Max bucket count setting.
 
 
 [float]
@@ -962,7 +959,7 @@ Setting of Max Bucket Count
 
 type: long
 
-Setting of Memory quota for the Index service (Mbyte)
+Memory quota setting for the Index service (Mbyte).
 
 
 [float]
@@ -970,7 +967,7 @@ Setting of Memory quota for the Index service (Mbyte)
 
 type: long
 
-Setting of Memory quota for the cluster (Mbyte)
+Memory quota setting for the cluster (Mbyte).
 
 
 [float]
@@ -980,7 +977,7 @@ type: long
 
 format: bytes
 
-Ram quota total for the cluster (bytes)
+RAM quota total for the cluster (bytes).
 
 
 [float]
@@ -990,7 +987,7 @@ type: long
 
 format: bytes
 
-Ram quota used by the current node in the cluster (bytes)
+RAM quota used by the current node in the cluster (bytes).
 
 
 [float]
@@ -1000,7 +997,7 @@ type: long
 
 format: bytes
 
-Ram quota used by the cluster (bytes)
+RAM quota used by the cluster (bytes).
 
 
 [float]
@@ -1020,7 +1017,7 @@ type: long
 
 format: bytes
 
-Total ram available to cluster (bytes)
+Total RAM available to cluster (bytes).
 
 
 [float]
@@ -1030,7 +1027,7 @@ type: long
 
 format: bytes
 
-Ram used by the cluster (bytes)
+RAM used by the cluster (bytes).
 
 
 [float]
@@ -1040,14 +1037,13 @@ type: long
 
 format: bytes
 
-Ram used by the data in the cluster (bytes)
+RAM used by the data in the cluster (bytes).
 
 
 [float]
 == node Fields
 
-beta[]
-Couchbase node metrics
+Couchbase node metrics.
 
 
 
@@ -1056,7 +1052,7 @@ Couchbase node metrics
 
 type: long
 
-Number of get commands
+Number of get commands.
 
 
 [float]
@@ -1066,7 +1062,7 @@ type: long
 
 format: bytes
 
-Amount of disk space used by Couch docs.(bytes)
+Amount of disk space used by Couch docs (bytes).
 
 
 [float]
@@ -1076,7 +1072,7 @@ type: long
 
 format: bytes
 
-Data size of couch documents associated with a node (bytes)
+Data size of Couch docs associated with a node (bytes).
 
 
 [float]
@@ -1084,7 +1080,7 @@ Data size of couch documents associated with a node (bytes)
 
 type: long
 
-couchSpatialDataSize field
+Size of object data for spatial views (bytes).
 
 
 [float]
@@ -1092,7 +1088,7 @@ couchSpatialDataSize field
 
 type: long
 
-couchSpatialDiskSize field
+Amount of disk space used by spatial views (bytes).
 
 
 [float]
@@ -1100,7 +1096,7 @@ couchSpatialDiskSize field
 
 type: long
 
-Amount of disk space occupied by Couch views (bytes)
+Amount of disk space used by Couch views (bytes).
 
 
 [float]
@@ -1108,7 +1104,7 @@ Amount of disk space occupied by Couch views (bytes)
 
 type: long
 
-Size of object data for Couch views (bytes)
+Size of object data for Couch views (bytes).
 
 
 [float]
@@ -1116,7 +1112,7 @@ Size of object data for Couch views (bytes)
 
 type: scaled_float
 
-The CPU utilization rate (%)
+The CPU utilization rate (%).
 
 
 [float]
@@ -1124,7 +1120,7 @@ The CPU utilization rate (%)
 
 type: long
 
-Number of current items
+Number of current items.
 
 
 [float]
@@ -1132,7 +1128,7 @@ Number of current items
 
 type: long
 
-Total number of items associated with node
+Total number of items associated with the node.
 
 
 [float]
@@ -1140,7 +1136,7 @@ Total number of items associated with node
 
 type: long
 
-Number of disk fetches performed since server was started
+Number of disk fetches performed since the server was started.
 
 
 [float]
@@ -1148,7 +1144,7 @@ Number of disk fetches performed since server was started
 
 type: long
 
-Number of get hits
+Number of get hits.
 
 
 [float]
@@ -1156,7 +1152,7 @@ Number of get hits
 
 type: keyword
 
-The hostname of the Node
+The hostname of the node.
 
 
 [float]
@@ -1166,7 +1162,7 @@ type: long
 
 format: bytes
 
-Amount of memcached memory allocated (bytes)
+Amount of memcached memory allocated (bytes).
 
 
 [float]
@@ -1174,7 +1170,7 @@ Amount of memcached memory allocated (bytes)
 
 type: long
 
-Amount of memcached memory reserved (bytes)
+Amount of memcached memory reserved (bytes).
 
 
 [float]
@@ -1182,7 +1178,7 @@ Amount of memcached memory reserved (bytes)
 
 type: long
 
-Amount of memory free for the node (bytes)
+Amount of memory free for the node (bytes).
 
 
 [float]
@@ -1190,7 +1186,7 @@ Amount of memory free for the node (bytes)
 
 type: long
 
-Total memory available to the node (bytes)
+Total memory available to the node (bytes).
 
 
 [float]
@@ -1198,7 +1194,7 @@ Total memory available to the node (bytes)
 
 type: long
 
-Memory used by the node (bytes)
+Memory used by the node (bytes).
 
 
 [float]
@@ -1206,7 +1202,7 @@ Memory used by the node (bytes)
 
 type: long
 
-Number of operations performed on Couchbase
+Number of operations performed on Couchbase.
 
 
 [float]
@@ -1214,7 +1210,7 @@ Number of operations performed on Couchbase
 
 type: long
 
-Total swap size allocated (bytes)
+Total swap size allocated (bytes).
 
 
 [float]
@@ -1222,7 +1218,7 @@ Total swap size allocated (bytes)
 
 type: long
 
-Amount of swap space used.(bytes)
+Amount of swap space used (bytes).
 
 
 [float]
@@ -1230,7 +1226,7 @@ Amount of swap space used.(bytes)
 
 type: long
 
-Time during which the node was in operation (sec)
+Time during which the node was in operation (sec).
 
 
 [float]
@@ -1238,7 +1234,7 @@ Time during which the node was in operation (sec)
 
 type: long
 
-Number of items/documents that are replicas
+Number of items/documents that are replicas.
 
 
 [[exported-fields-docker]]
