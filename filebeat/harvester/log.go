@@ -58,13 +58,14 @@ func (h *Harvester) Harvest(r reader.Reader) {
 	defer h.close()
 
 	// Channel to stop internal harvester routines
-	harvestDone := make(chan struct{})
-	defer close(harvestDone)
+	defer h.stop()
 
 	// Closes reader after timeout or when done channel is closed
 	// This routine is also responsible to properly stop the reader
 	go func() {
-		var closeTimeout <-chan time.Time
+
+		closeTimeout := make(<-chan time.Time)
+		// starts close_timeout timer
 		if h.config.CloseTimeout > 0 {
 			closeTimeout = time.After(h.config.CloseTimeout)
 		}
@@ -72,12 +73,14 @@ func (h *Harvester) Harvest(r reader.Reader) {
 		select {
 		// Applies when timeout is reached
 		case <-closeTimeout:
-			logp.Info("Closing harvester because close_timeout was reached: %s", h.state.Source)
+			logp.Info("Closing harvester because close_timeout was reached.")
 		// Required for shutdown when hanging inside reader
-		case <-h.done:
+		case <-h.prospectorDone:
 		// Required when reader loop returns and reader finished
-		case <-harvestDone:
+		case <-h.done:
 		}
+
+		h.stop()
 		h.fileReader.Close()
 	}()
 
@@ -122,9 +125,10 @@ func (h *Harvester) Harvest(r reader.Reader) {
 		// Update offset
 		h.state.Offset += int64(message.Bytes)
 
-		// Create state event
-		event := input.NewEvent(h.getState())
+		state := h.getState()
 
+		// Create state event
+		event := input.NewEvent(state)
 		text := string(message.Content)
 
 		// Check if data should be added to event. Only export non empty events.
@@ -147,17 +151,41 @@ func (h *Harvester) Harvest(r reader.Reader) {
 		if !h.sendEvent(event) {
 			return
 		}
+		// Update state of harvester as successfully sent
+		h.state = state
 	}
+}
+
+func (h *Harvester) stop() {
+	h.once.Do(func() {
+		close(h.done)
+	})
 }
 
 // sendEvent sends event to the spooler channel
 // Return false if event was not sent
 func (h *Harvester) sendEvent(event *input.Event) bool {
+
 	select {
 	case <-h.done:
 		return false
 	case h.prospectorChan <- event: // ship the new event downstream
 		return true
+	}
+}
+
+// sendStateUpdate send an empty event with the current state to update the registry
+// close_timeout does not apply here to make sure a harvester is closed properly. In
+// case the output is blocked the harvester will stay open to make sure no new harvester
+// is started. As soon as the output becomes available again, the finished state is written
+// and processing can continue.
+func (h *Harvester) sendStateUpdate() {
+	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
+	event := input.NewEvent(h.state)
+
+	select {
+	case <-h.prospectorDone:
+	case h.prospectorChan <- event: // ship the new event downstream
 	}
 }
 
@@ -260,22 +288,18 @@ func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
 	return file.Seek(0, os.SEEK_CUR)
 }
 
-// sendStateUpdate send an empty event with the current state to update the registry
-func (h *Harvester) sendStateUpdate() bool {
-	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
-	event := input.NewEvent(h.getState())
-	return h.sendEvent(event)
-}
-
+// getState returns an updated copy of the harvester state
 func (h *Harvester) getState() file.State {
 
 	if h.config.InputType == config.StdinInputType {
 		return file.State{}
 	}
 
+	state := h.state
+
 	// refreshes the values in State with the values from the harvester itself
-	h.state.FileStateOS = file.GetOSState(h.state.Fileinfo)
-	return h.state
+	state.FileStateOS = file.GetOSState(h.state.Fileinfo)
+	return state
 }
 
 func (h *Harvester) close() {
@@ -289,6 +313,7 @@ func (h *Harvester) close() {
 	// If file was never opened, it can't be closed
 	if h.file != nil {
 
+		// close file handler
 		h.file.Close()
 
 		logp.Debug("harvester", "Closing file: %s", h.state.Source)
@@ -350,9 +375,3 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 
 	return reader.NewLimit(r, h.config.MaxBytes), nil
 }
-
-/*
-
-TODO: introduce new structure: log_file —[raw bytes]—> (line —[utf8 bytes]—> encode) —[message]—> …`
-
-*/

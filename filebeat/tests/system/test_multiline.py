@@ -247,7 +247,7 @@ connection <0.23893.109>, channel 3 - soft error:
             pattern="^\[",
             negate="true",
             match="after",
-            close_timeout="1s",
+            close_timeout="2s",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -286,7 +286,7 @@ connection <0.23893.109>, channel 3 - soft error:
         # close_timeout must have closed the reader exactly twice
         self.wait_until(
             lambda: self.log_contains_count(
-                "Closing harvester because close_timeout was reached") == 2,
+                "Closing harvester because close_timeout was reached") >= 1,
             max_timeout=15)
 
         output = self.read_output()
@@ -302,7 +302,7 @@ connection <0.23893.109>, channel 3 - soft error:
             pattern="^\[",
             negate="true",
             match="after",
-            close_timeout="1s",
+            close_timeout="2s",
         )
 
         logentry1 = """[2016-09-02 19:54:23 +0000] Started 2016-09-02 19:54:23 +0000 "GET" for /gaq?path=%2FCA%2FFallbrook%2F1845-Acacia-Ln&referer=http%3A%2F%2Fwww.xxxxx.com%2FAcacia%2BLn%2BFallbrook%2BCA%2Baddresses&search_bucket=none&page_controller=v9%2Faddresses&page_action=show at 23.235.47.31
