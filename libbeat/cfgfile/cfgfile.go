@@ -91,7 +91,7 @@ func HandleFlags() error {
 func Read(out interface{}, path string) error {
 	config, err := Load(path)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return config.Unpack(out)
