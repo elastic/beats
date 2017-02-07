@@ -785,6 +785,7 @@ beta[]
 Metrics collected from Couchbase servers.
 
 
+
 [float]
 == couchbase Fields
 
@@ -1052,7 +1053,7 @@ Couchbase node metrics.
 
 type: long
 
-Number of get commands.
+Number of get commands
 
 
 [float]
