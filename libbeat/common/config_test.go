@@ -2,6 +2,9 @@ package common
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -108,5 +111,40 @@ func TestConfigPrintDebug(t *testing.T) {
 
 		// validate debug output
 		assert.Equal(t, test.expected, buf)
+	}
+}
+
+func TestConfigFilePermissions(t *testing.T) {
+	if !IsStrictPerms() {
+		t.Skip("Skipping test because strict.perms is disabled")
+	}
+
+	f, err := ioutil.TempFile("", "writableConfig.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(f.Name())
+	defer f.Close()
+
+	f.WriteString(`test.data: [1, 2, 3, 4]`)
+	f.Sync()
+
+	if _, err = LoadFile(f.Name()); err != nil {
+		t.Fatal(err)
+	}
+
+	// Permissions checking isn't implemented for Windows DACLs.
+	if runtime.GOOS == "windows" {
+		return
+	}
+
+	if err = os.Chmod(f.Name(), 0460); err != nil {
+		t.Fatal(err)
+	}
+
+	// Read will fail because config is group writable.
+	_, err = LoadFile(f.Name())
+	if assert.Error(t, err, "expected writable error") {
+		assert.Contains(t, err.Error(), "writable")
 	}
 }

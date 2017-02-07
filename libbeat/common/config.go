@@ -5,14 +5,28 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"os"
+	"runtime"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
 	cfgflag "github.com/elastic/go-ucfg/flag"
 	"github.com/elastic/go-ucfg/yaml"
 )
+
+var flagStrictPerms = flag.Bool("strict.perms", true, "Strict permission checking on config files")
+
+// IsStrictPerms returns true if strict permission checking on config files is
+// enabled.
+func IsStrictPerms() bool {
+	if !*flagStrictPerms || os.Getenv("BEAT_STRICT_PERMS") == "false" {
+		return false
+	}
+	return true
+}
 
 // Config object to store hierarchical configurations into.
 // See https://godoc.org/github.com/elastic/go-ucfg#Config
@@ -143,6 +157,12 @@ func NewFlagOverwrite(
 }
 
 func LoadFile(path string) (*Config, error) {
+	if IsStrictPerms() {
+		if err := ownerHasExclusiveWritePerms(path); err != nil {
+			return nil, err
+		}
+	}
+
 	c, err := yaml.NewConfigWithFile(path, configOpts...)
 	if err != nil {
 		return nil, err
@@ -389,4 +409,36 @@ func filterDebugObject(c interface{}) {
 			filterDebugObject(elem)
 		}
 	}
+}
+
+// ownerHasExclusiveWritePerms asserts that the current user is the
+// owner of the config file and that the config file is (at most) writable by
+// the owner (e.g. group and other cannot have write access).
+func ownerHasExclusiveWritePerms(name string) error {
+	if runtime.GOOS == "windows" {
+		return nil
+	}
+
+	info, err := file.Stat(name)
+	if err != nil {
+		return err
+	}
+
+	euid := os.Geteuid()
+	fileUID, _ := info.UID()
+	perm := info.Mode().Perm()
+
+	if euid != fileUID {
+		return fmt.Errorf(`config file ("%v") must be owned by the beat user `+
+			`(uid=%v)`, name, euid)
+	}
+
+	// Test if group or other have write permissions.
+	if perm&0022 > 0 {
+		return fmt.Errorf(`config file ("%v") can only be writable by the `+
+			`owner but the permissions are "%v"`,
+			name, perm)
+	}
+
+	return nil
 }
