@@ -1,7 +1,7 @@
 - name: node
   type: group
   description: >
-    experimental[]
+    beta[]
 
     Couchbase node metrics
   fields:

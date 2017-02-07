@@ -1,7 +1,8 @@
 - key: ceph
   title: "ceph"
   description: >
-    experimental[]
+    beta[]
+
     ceph Module
   short_config: false
   fields:

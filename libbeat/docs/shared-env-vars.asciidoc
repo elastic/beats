@@ -12,8 +12,6 @@
 [[using-environ-vars]]
 == Using Environment Variables in the Configuration
 
-experimental[]
-
 You can use environment variable references in the +{beatname_lc}.yml+ file to
 set values that need to be configurable during deployment. To do this, use:
 

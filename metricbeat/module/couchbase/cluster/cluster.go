@@ -36,7 +36,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The couchbase cluster metricset is experimental")
+	logp.Warn("BETA: The couchbase cluster metricset is beta")
 
 	return &MetricSet{
 		BaseMetricSet: base,

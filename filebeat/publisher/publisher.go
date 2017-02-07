@@ -34,7 +34,7 @@ func New(
 	pub publisher.Publisher,
 ) LogPublisher {
 	if async {
-		logp.Warn("Using publish_async is experimental!")
+		logp.Warn("publish_async is experimental and will be removed in a future version!")
 		return newAsyncLogPublisher(in, out, pub)
 	}
 	return newSyncLogPublisher(in, out, pub)

@@ -1,7 +1,6 @@
 import os
 import metricbeat
 import unittest
-from nose.plugins.attrib import attr
 
 PROMETHEUS_FIELDS = metricbeat.COMMON_FIELDS + ["prometheus"]
 
@@ -25,7 +24,7 @@ class Test(metricbeat.BaseTest):
 
         # Ensure no errors or warnings exist in the log.
         log = self.get_log()
-        self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
+        self.assertNotRegexpMatches(log.replace("WARN BETA", ""), "ERR|WARN")
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)

@@ -31,7 +31,7 @@ type MetricSet struct {
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
-	logp.Warn("EXPERIMENTAL: The docker info metricset is experimental")
+	logp.Warn("BETA: The docker info metricset is beta")
 
 	config := docker.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {

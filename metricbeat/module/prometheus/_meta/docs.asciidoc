@@ -1,4 +1,6 @@
 == prometheus Module
 
+beta[]
+
 This is the prometheus Module.
 

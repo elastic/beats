@@ -416,7 +416,8 @@ Contains user configurable fields.
 [[exported-fields-ceph]]
 == ceph Fields
 
-experimental[] ceph Module
+beta[]
+ceph Module
 
 
 
@@ -780,7 +781,7 @@ The document type. Always set to "metricsets".
 [[exported-fields-couchbase]]
 == couchbase Fields
 
-experimental[]
+beta[]
 couchbase Module
 
 
@@ -795,7 +796,7 @@ couchbase Module
 [float]
 == bucket Fields
 
-experimental[]
+beta[]
 Couchbase bucket metrics
 
 
@@ -893,7 +894,7 @@ Number of items associated with the bucket
 [float]
 == cluster Fields
 
-experimental[]
+beta[]
 Couchbase Cluster metrics
 
 
@@ -1045,7 +1046,7 @@ Ram used by the data in the cluster (bytes)
 [float]
 == node Fields
 
-experimental[]
+beta[]
 Couchbase node metrics
 
 
@@ -1243,7 +1244,7 @@ Number of items/documents that are replicas
 [[exported-fields-docker]]
 == Docker Fields
 
-experimental[]
+beta[]
 Docker stats collected from Docker.
 
 
@@ -1559,7 +1560,7 @@ Total size of the all cached images associated to the current image.
 [float]
 == info Fields
 
-experimental[]
+beta[]
 Info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information.
 
 
@@ -1804,7 +1805,6 @@ Total number of outgoing packets.
 [[exported-fields-haproxy]]
 == HAProxy Fields
 
-experimental[]
 HAProxy Module
 
 
@@ -2779,7 +2779,7 @@ The average queue time in ms over the last 1024 requests.
 == kafka Fields
 
 kafka Module
-experimental[]
+beta[]
 
 
 
@@ -4190,8 +4190,8 @@ The current number of idle client connections waiting for a request.
 [[exported-fields-php_fpm]]
 == php_fpm Fields
 
+beta[]
 PHP-FPM server status metrics collected from PHP-FPM.
-experimental[]
 
 
 
@@ -4675,8 +4675,8 @@ Time at which these statistics were last reset.
 [[exported-fields-prometheus]]
 == Prometheus Fields
 
+beta[]
 Prometheus Module
-experimental[]
 
 
 

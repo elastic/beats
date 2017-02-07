@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-couchbase]]
 == couchbase Module
 
-experimental[]
+beta[]
 
 This is the couchbase Module.
 

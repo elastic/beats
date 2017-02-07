@@ -415,8 +415,6 @@ NOTE: The pipeline ID can also be configured in the Elasticsearch output, but th
 
 ===== symlinks
 
-experimental[]
-
 The `symlinks` option allows Filebeat to harvest symlinks in addition to regular files. When harvesting symlinks, Filebeat opens and reads the original file even though it reports the path of the symlink.
 
 When you configure a symlink for harvesting, make sure the original path is excluded. If a single prospector is configured to harvest both the symlink and the original file, the prospector will detect the problem and only process the first file it finds. However, if two different prospectors are configured (one to read the symlink and the other the original path), both paths will be harvested, causing Filebeat to send duplicate data and the prospectors to overwrite each other's state.
@@ -457,8 +455,6 @@ lines. The `backoff` value will be multiplied each time with the `backoff_factor
 [[harvester-limit]]
 ===== harvester_limit
 
-experimental[]
-
 The `harvester_limit` option limits the number of harvesters that are started in parallel for one prospector. This directly relates
 to the maximum number of file handlers that are opened. The default for `harvester_limit` is 0, which means there is no limit. This
 configuration is useful if the number of files to be harvested exceeds the open file handler limit of the operating system.
@@ -498,6 +494,7 @@ See <<load-balancing>> for more information about how this setting affects load 
 ===== publish_async
 
 experimental[]
+deprecated[5.3.0]
 
 If enabled, the publisher pipeline in Filebeat operates in async mode preparing
 a new batch of lines while waiting for ACK. This option can improve load-balancing
