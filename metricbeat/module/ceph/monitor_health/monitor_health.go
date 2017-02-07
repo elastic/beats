@@ -34,7 +34,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The ceph monitor_health metricset is experimental")
+	logp.Warn("BETA: The ceph monitor_health metricset is beta")
 
 	http := helper.NewHTTP(base)
 	http.SetHeader("Accept", "application/json")

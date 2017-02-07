@@ -34,7 +34,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The prometheus stats metricset is experimental")
+	logp.Warn("BETA: The prometheus stats metricset is beta")
 
 	return &MetricSet{
 		BaseMetricSet: base,

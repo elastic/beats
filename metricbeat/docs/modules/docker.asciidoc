@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-docker]]
 == Docker Module
 
-experimental[]
+beta[]
 
 This module fetches metrics from https://www.docker.com/[Docker] containers.
 

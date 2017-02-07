@@ -44,7 +44,7 @@ func (c *Crawler) Start(r *registrar.Registrar, reloaderConfig *common.Config) e
 	}
 
 	if reloaderConfig.Enabled() {
-		logp.Warn("EXPERIMENTAL feature dynamic configuration reloading is enabled.")
+		logp.Warn("BETA feature dynamic configuration reloading is enabled.")
 
 		c.reloader = cfgfile.NewReloader(reloaderConfig)
 		factory := prospector.NewFactory(c.out, r)
