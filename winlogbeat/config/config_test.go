@@ -44,7 +44,7 @@ func TestConfigValidate(t *testing.T) {
 				},
 				map[string]interface{}{"other": "value"},
 			},
-			"1 error: Invalid top-level key 'other' found. Valid keys are bulk_queue_size, " +
+			"1 error: Invalid top-level key 'other' found. Valid keys are bulk_queue_size, dashboards, " +
 				"fields, fields_under_root, geoip, logging, max_procs, " +
 				"name, output, path, processors, queue_size, refresh_topology_freq, tags, topology_expire, winlogbeat",
 		},
