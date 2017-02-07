@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"regexp"
 	"time"
+	"unicode"
+	"unicode/utf8"
 )
 
 // Merge a map, a slice, a struct or another Config object into c.
@@ -39,6 +41,9 @@ import (
 //  // field is processed as if keys are part of outer struct (type can be a
 //  // struct, a slice, an array, a map or of type *Config)
 //  Field map[string]interface{} `config:",inline"`
+//
+//  // field is ignored by Merge
+//  Field string `config:",ignore"`
 //
 //
 // Returns an error if merging fails to normalize and validate the from value.
@@ -232,7 +237,16 @@ func normalizeStructInto(cfg *Config, opts *options, from reflect.Value) Error {
 	for i := 0; i < numField; i++ {
 		var err Error
 		stField := v.Type().Field(i)
+
+		// ignore non exported fields
+		if rune, _ := utf8.DecodeRuneInString(stField.Name); !unicode.IsUpper(rune) {
+			continue
+		}
+
 		name, tagOpts := parseTags(stField.Tag.Get(opts.tag))
+		if tagOpts.ignore {
+			continue
+		}
 
 		if tagOpts.squash {
 			vField := chaseValue(v.Field(i))
