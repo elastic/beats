@@ -8,22 +8,22 @@
         "cluster": {
             "hdd": {
                 "free": {
-                    "bytes": 50705599693
+                    "bytes": 49181251462
                 },
                 "quota": {
                     "total": {
-                        "bytes": 63381999616
+                        "bytes": 67371577344
                     }
                 },
                 "total": {
-                    "bytes": 63381999616
+                    "bytes": 67371577344
                 },
                 "used": {
                     "by_data": {
-                        "bytes": 16368995
+                        "bytes": 16356812
                     },
                     "value": {
-                        "bytes": 12676399923
+                        "bytes": 18190325882
                     }
                 }
             },
@@ -56,21 +56,21 @@
                     }
                 },
                 "total": {
-                    "bytes": 8360542208
+                    "bytes": 2096275456
                 },
                 "used": {
                     "by_data": {
                         "bytes": 53962160
                     },
                     "value": {
-                        "bytes": 7660535808
+                        "bytes": 1235513344
                     }
                 }
             }
         }
     },
     "metricset": {
-        "host": "couchbase:8091",
+        "host": "localhost:8091",
         "module": "couchbase",
         "name": "cluster",
         "rtt": 115
