@@ -21,7 +21,7 @@ func TestFetchEventContents(t *testing.T) {
 	response, err := ioutil.ReadFile(absPath + "/sample_response.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "appication/json;")
+		w.Header().Set("Content-Type", "application/json;")
 		w.Write([]byte(response))
 	}))
 	defer server.Close()
@@ -46,22 +46,22 @@ func TestFetchEventContents(t *testing.T) {
 	couch := event["couch"].(common.MapStr)
 
 	couch_docs := couch["docs"].(common.MapStr)
-	couch_docs_actual_disk_size := couch_docs["actual_disk_size"].(common.MapStr)
-	assert.EqualValues(t, 13563791, couch_docs_actual_disk_size["bytes"])
+	couch_docs_disk_size := couch_docs["disk_size"].(common.MapStr)
+	assert.EqualValues(t, 13563791, couch_docs_disk_size["bytes"])
 
 	couch_docs_data_size := couch_docs["data_size"].(common.MapStr)
 	assert.EqualValues(t, 9792512, couch_docs_data_size["bytes"])
 
-	couch_spacial := couch["spacial"].(common.MapStr)
-	couch_spacial_data_size := couch_spacial["data_size"].(common.MapStr)
-	assert.EqualValues(t, 0, couch_spacial_data_size["bytes"])
+	couch_spatial := couch["spatial"].(common.MapStr)
+	couch_spatial_data_size := couch_spatial["data_size"].(common.MapStr)
+	assert.EqualValues(t, 0, couch_spatial_data_size["bytes"])
 
-	couch_spacial_disk_size := couch_spacial["disk_size"].(common.MapStr)
-	assert.EqualValues(t, 0, couch_spacial_disk_size["bytes"])
+	couch_spatial_disk_size := couch_spatial["disk_size"].(common.MapStr)
+	assert.EqualValues(t, 0, couch_spatial_disk_size["bytes"])
 
 	couch_views := couch["views"].(common.MapStr)
-	couch_views_actual_disk_size := couch_views["actual_disk_size"].(common.MapStr)
-	assert.EqualValues(t, 2805219, couch_views_actual_disk_size["bytes"])
+	couch_views_disk_size := couch_views["disk_size"].(common.MapStr)
+	assert.EqualValues(t, 2805219, couch_views_disk_size["bytes"])
 
 	couch_views_data_size := couch_views["data_size"].(common.MapStr)
 	assert.EqualValues(t, 2805219, couch_views_data_size["bytes"])

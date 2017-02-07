@@ -5,6 +5,11 @@ set -e
 # verify that all services are running before executing the command provided
 # to the docker container.
 
+BASEDIR=$(dirname "$0")
+
+source $BASEDIR/wait_for.sh
+
+
 setDefaults() {
   # Use default ports and hosts if not specified.
   : ${ES_HOST:=localhost}
@@ -65,25 +70,6 @@ waitForElasticsearch() {
   exit 1
 }
 
-# Wait for. Params: host, port, service
-waitFor() {
-    echo -n "Waiting for ${3}(${1}:${2}) to start."
-    for ((i=1; i<=90; i++)) do
-        if nc -vz ${1} ${2} 2>/dev/null; then
-            echo
-            echo "${3} is ready!"
-            return 0
-        fi
-
-        ((i++))
-        echo -n '.'
-        sleep 1
-    done
-
-    echo
-    echo >&2 "${3} is not available"
-    echo >&2 "Address: ${1}:${2}"
-}
 
 # Main
 setDefaults

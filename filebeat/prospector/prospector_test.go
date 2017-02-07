@@ -3,12 +3,12 @@
 package prospector
 
 import (
-	"regexp"
 	"testing"
 
-	"github.com/elastic/beats/filebeat/input/file"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/common/match"
 )
 
 func TestProspectorInitInputTypeLogError(t *testing.T) {
@@ -19,7 +19,7 @@ func TestProspectorInitInputTypeLogError(t *testing.T) {
 
 	states := file.NewStates()
 	states.SetStates([]file.State{})
-	err := prospector.Init(states.GetStates())
+	err := prospector.LoadStates(states.GetStates())
 	// Error should be returned because no path is set
 	assert.Error(t, err)
 }
@@ -28,7 +28,7 @@ func TestProspectorFileExclude(t *testing.T) {
 
 	prospector := Prospector{
 		config: prospectorConfig{
-			ExcludeFiles: []*regexp.Regexp{regexp.MustCompile(`\.gz$`)},
+			ExcludeFiles: []match.Matcher{match.MustCompile(`\.gz$`)},
 		},
 	}
 

@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-docker]]
 == Docker Module
 
-experimental[]
+beta[]
 
 This module fetches metrics from https://www.docker.com/[Docker] containers.
 
@@ -21,7 +21,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 #- module: docker
-  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
+  #metricsets: ["container", "cpu", "diskio", "healthcheck", "info", "memory", "network"]
   #hosts: ["unix:///var/run/docker.sock"]
   #enabled: true
   #period: 10s
@@ -44,6 +44,10 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-docker-diskio,diskio>>
 
+* <<metricbeat-metricset-docker-healthcheck,healthcheck>>
+
+* <<metricbeat-metricset-docker-image,image>>
+
 * <<metricbeat-metricset-docker-info,info>>
 
 * <<metricbeat-metricset-docker-memory,memory>>
@@ -55,6 +59,10 @@ include::docker/container.asciidoc[]
 include::docker/cpu.asciidoc[]
 
 include::docker/diskio.asciidoc[]
+
+include::docker/healthcheck.asciidoc[]
+
+include::docker/image.asciidoc[]
 
 include::docker/info.asciidoc[]
 

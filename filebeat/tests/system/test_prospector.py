@@ -311,7 +311,6 @@ class Test(BaseTest):
 
         filebeat.check_wait(exit_code=1)
 
-
     def test_files_added_late(self):
         """
         Tests that prospectors stay running even though no harvesters are started yet
@@ -361,9 +360,9 @@ class Test(BaseTest):
 
         # wait for first  "Start next scan" log message
         self.wait_until(
-                lambda: self.log_contains(
-                        "Start next scan"),
-                max_timeout=10)
+            lambda: self.log_contains(
+                "Start next scan"),
+            max_timeout=10)
 
         lines = 0
 
@@ -374,14 +373,14 @@ class Test(BaseTest):
 
         # wait for log to be read
         self.wait_until(
-                lambda: self.output_has(lines=lines),
-                max_timeout=15)
+            lambda: self.output_has(lines=lines),
+            max_timeout=15)
 
         # wait for file to be closed due to close_inactive
         self.wait_until(
-                lambda: self.log_contains(
-                        "Closing file: {}\n".format(os.path.abspath(testfile))),
-                max_timeout=10)
+            lambda: self.log_contains(
+                "Closing file: {}\n".format(os.path.abspath(testfile))),
+            max_timeout=10)
 
         # write second line
         lines += 1
@@ -389,9 +388,9 @@ class Test(BaseTest):
             file.write("Line {}\n".format(lines))
 
         self.wait_until(
-                # allow for events to be sent multiple times due to log rotation
-                lambda: self.output_count(lambda x: x >= lines),
-                max_timeout=5)
+            # allow for events to be sent multiple times due to log rotation
+            lambda: self.output_count(lambda x: x >= lines),
+            max_timeout=5)
 
         filebeat.check_kill_and_wait()
 
@@ -413,9 +412,9 @@ class Test(BaseTest):
 
         # wait for first  "Start next scan" log message
         self.wait_until(
-                lambda: self.log_contains(
-                        "Start next scan"),
-                max_timeout=10)
+            lambda: self.log_contains(
+                "Start next scan"),
+            max_timeout=10)
 
         lines = 0
 
@@ -426,19 +425,18 @@ class Test(BaseTest):
 
         # wait for log to be read
         self.wait_until(
-                lambda: self.output_has(lines=lines),
-                max_timeout=15)
+            lambda: self.output_has(lines=lines),
+            max_timeout=15)
 
         os.remove(testfile)
 
         # wait for file to be closed due to close_inactive
         self.wait_until(
-                lambda: self.log_contains(
-                        "Closing file: {}\n".format(os.path.abspath(testfile))),
-                max_timeout=10)
+            lambda: self.log_contains(
+                "Closing file: {}\n".format(os.path.abspath(testfile))),
+            max_timeout=10)
 
         filebeat.check_kill_and_wait()
-
 
     def test_close_inactive_file_rotation_and_removal(self):
         """
@@ -459,9 +457,9 @@ class Test(BaseTest):
 
         # wait for first  "Start next scan" log message
         self.wait_until(
-                lambda: self.log_contains(
-                        "Start next scan"),
-                max_timeout=10)
+            lambda: self.log_contains(
+                "Start next scan"),
+            max_timeout=10)
 
         lines = 0
 
@@ -472,21 +470,20 @@ class Test(BaseTest):
 
         # wait for log to be read
         self.wait_until(
-                lambda: self.output_has(lines=lines),
-                max_timeout=15)
+            lambda: self.output_has(lines=lines),
+            max_timeout=15)
 
         os.rename(testfile, renamed_file)
         os.remove(renamed_file)
 
         # wait for file to be closed due to close_inactive
         self.wait_until(
-                lambda: self.log_contains(
-                    # Still checking for old file name as filename does not change in harvester
-                    "Closing file: "),
-                max_timeout=10)
+            lambda: self.log_contains(
+                # Still checking for old file name as filename does not change in harvester
+                "Closing file: "),
+            max_timeout=10)
 
         filebeat.check_kill_and_wait()
-
 
     def test_close_inactive_file_rotation_and_removal_while_new_file_created(self):
         """
@@ -508,9 +505,9 @@ class Test(BaseTest):
 
         # wait for first  "Start next scan" log message
         self.wait_until(
-                lambda: self.log_contains(
-                        "Start next scan"),
-                max_timeout=10)
+            lambda: self.log_contains(
+                "Start next scan"),
+            max_timeout=10)
 
         lines = 0
 
@@ -521,8 +518,8 @@ class Test(BaseTest):
 
         # wait for log to be read
         self.wait_until(
-                lambda: self.output_has(lines=lines),
-                max_timeout=15)
+            lambda: self.output_has(lines=lines),
+            max_timeout=15)
 
         os.rename(testfile, renamed_file)
 
@@ -533,17 +530,17 @@ class Test(BaseTest):
 
         # wait for log to be read
         self.wait_until(
-                lambda: self.output_has(lines=lines),
-                max_timeout=15)
+            lambda: self.output_has(lines=lines),
+            max_timeout=15)
 
         os.remove(renamed_file)
 
         # Wait until both files are closed
         self.wait_until(
-                lambda: self.log_contains_count(
-                        # Checking if two files were closed
-                        "Closing file: ") == 2,
-                max_timeout=10)
+            lambda: self.log_contains_count(
+                # Checking if two files were closed
+                "Closing file: ") == 2,
+            max_timeout=10)
 
         filebeat.check_kill_and_wait()
 

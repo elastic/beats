@@ -11,7 +11,7 @@ SNAPSHOT?=yes
 .PHONY: testsuite
 testsuite:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
-	#$(MAKE) -C generate test
+	#$(MAKE) -C generator test
 
 stop-environments:
 	$(foreach var,$(PROJECTS_ENV),$(MAKE) -C $(var) stop-environment || exit 0;)
@@ -46,18 +46,18 @@ update:
 clean:
 	rm -rf build
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) clean || exit 1;)
-	$(MAKE) -C generate clean
+	$(MAKE) -C generator clean
 
 # Cleans up the vendor directory from unnecessary files
 # This should always be run after updating the dependencies
 .PHONY: clean-vendor
 clean-vendor:
-	sh scripts/clean_vendor.sh
+	sh script/clean_vendor.sh
 
 .PHONY: check
 check:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
-	# Validate that all updates were commited
+	# Validate that all updates were committed
 	$(MAKE) update
 	git update-index --refresh
 	git diff-index --exit-code HEAD --
@@ -118,5 +118,3 @@ upload-release:
 .PHONY: notice
 notice:
 	python dev-tools/generate_notice.py .
-
-

@@ -19,6 +19,7 @@ configuration settings, you need to restart Heartbeat to pick up the changes.
 * <<console-output>>
 * <<configuration-output-ssl>>
 * <<configuration-path>>
+* <<configuration-dashboards>>
 * <<configuration-logging>>
 * <<configuration-processors>>
 

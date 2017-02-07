@@ -1,3 +1,5 @@
+// +build !integration
+
 package fileset
 
 import (
@@ -147,15 +149,17 @@ func TestResolveVariable(t *testing.T) {
 
 func TestGetProspectorConfigNginx(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
-	assert.NoError(t, fs.Read())
+	assert.NoError(t, fs.Read("5.2.0"))
 
 	cfg, err := fs.getProspectorConfig()
 	assert.NoError(t, err)
 
 	assert.True(t, cfg.HasField("paths"))
 	assert.True(t, cfg.HasField("exclude_files"))
-	pipeline_id := fs.vars["beat"].(map[string]interface{})["pipeline_id"]
-	assert.Equal(t, "nginx-access-with_plugins", pipeline_id)
+	assert.True(t, cfg.HasField("pipeline"))
+	pipelineID, err := cfg.String("pipeline", -1)
+	assert.NoError(t, err)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-with_plugins", pipelineID)
 }
 
 func TestGetProspectorConfigNginxOverrides(t *testing.T) {
@@ -168,7 +172,7 @@ func TestGetProspectorConfigNginxOverrides(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	assert.NoError(t, fs.Read())
+	assert.NoError(t, fs.Read("5.2.0"))
 
 	cfg, err := fs.getProspectorConfig()
 	assert.NoError(t, err)
@@ -176,7 +180,28 @@ func TestGetProspectorConfigNginxOverrides(t *testing.T) {
 	assert.True(t, cfg.HasField("paths"))
 	assert.True(t, cfg.HasField("exclude_files"))
 	assert.True(t, cfg.HasField("close_eof"))
-	pipeline_id := fs.vars["beat"].(map[string]interface{})["pipeline_id"]
-	assert.Equal(t, "nginx-access-with_plugins", pipeline_id)
+	assert.True(t, cfg.HasField("pipeline"))
+	pipelineID, err := cfg.String("pipeline", -1)
+	assert.NoError(t, err)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-with_plugins", pipelineID)
 
+	moduleName, err := cfg.String("_module_name", -1)
+	assert.NoError(t, err)
+	assert.Equal(t, "nginx", moduleName)
+
+	filesetName, err := cfg.String("_fileset_name", -1)
+	assert.NoError(t, err)
+	assert.Equal(t, "access", filesetName)
+
+}
+
+func TestGetPipelineNginx(t *testing.T) {
+	fs := getModuleForTesting(t, "nginx", "access")
+	assert.NoError(t, fs.Read("5.2.0"))
+
+	pipelineID, content, err := fs.GetPipeline()
+	assert.NoError(t, err)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-with_plugins", pipelineID)
+	assert.Contains(t, content, "description")
+	assert.Contains(t, content, "processors")
 }

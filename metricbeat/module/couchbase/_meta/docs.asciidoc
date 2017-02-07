@@ -1,6 +1,6 @@
 == couchbase Module
 
-experimental[]
+beta[]
 
 This is the couchbase Module.
 

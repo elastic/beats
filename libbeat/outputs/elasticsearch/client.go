@@ -27,6 +27,7 @@ type Client struct {
 	index    outil.Selector
 	pipeline *outil.Selector
 	params   map[string]string
+	timeout  time.Duration
 
 	// buffered bulk requests
 	bulkRequ *bulkRequest
@@ -45,6 +46,7 @@ type ClientSettings struct {
 	TLS                *transport.TLSConfig
 	Username, Password string
 	Parameters         map[string]string
+	Headers            map[string]string
 	Index              outil.Selector
 	Pipeline           *outil.Selector
 	Timeout            time.Duration
@@ -57,6 +59,7 @@ type Connection struct {
 	URL      string
 	Username string
 	Password string
+	Headers  map[string]string
 
 	http              *http.Client
 	onConnectCallback func() error
@@ -159,6 +162,7 @@ func NewClient(
 			URL:      s.URL,
 			Username: s.Username,
 			Password: s.Password,
+			Headers:  s.Headers,
 			http: &http.Client{
 				Transport: &http.Transport{
 					Dial:    dialer.Dial,
@@ -173,6 +177,7 @@ func NewClient(
 		index:     s.Index,
 		pipeline:  pipeline,
 		params:    params,
+		timeout:   s.Timeout,
 
 		bulkRequ: bulkRequ,
 
@@ -206,6 +211,7 @@ func (client *Client) Clone() *Client {
 			Username:         client.Username,
 			Password:         client.Password,
 			Parameters:       nil, // XXX: do not pass params?
+			Headers:          client.Headers,
 			Timeout:          client.http.Timeout,
 			CompressionLevel: client.compressionLevel,
 		},
@@ -584,7 +590,7 @@ func (client *Client) LoadTemplate(templateName string, template map[string]inte
 }
 
 func (client *Client) LoadJSON(path string, json map[string]interface{}) error {
-	status, _, err := client.request("PUT", path, "", nil, json)
+	status, _, err := client.Request("PUT", path, "", nil, json)
 	if err != nil {
 		return fmt.Errorf("couldn't load json. Error: %s", err)
 	}
@@ -599,7 +605,7 @@ func (client *Client) LoadJSON(path string, json map[string]interface{}) error {
 // and only if Elasticsearch returns with HTTP status code 200.
 func (client *Client) CheckTemplate(templateName string) bool {
 
-	status, _, _ := client.request("HEAD", "/_template/"+templateName, "", nil, nil)
+	status, _, _ := client.Request("HEAD", "/_template/"+templateName, "", nil, nil)
 
 	if status != 200 {
 		return false
@@ -657,7 +663,7 @@ func (conn *Connection) Close() error {
 	return nil
 }
 
-func (conn *Connection) request(
+func (conn *Connection) Request(
 	method, path string,
 	pipeline string,
 	params map[string]string,
@@ -696,6 +702,10 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	req.Header.Add("Accept", "application/json")
 	if conn.Username != "" || conn.Password != "" {
 		req.SetBasicAuth(conn.Username, conn.Password)
+	}
+
+	for name, value := range conn.Headers {
+		req.Header.Add(name, value)
 	}
 
 	resp, err := conn.http.Do(req)

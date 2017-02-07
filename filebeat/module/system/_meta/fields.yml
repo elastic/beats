@@ -1,0 +1,10 @@
+- key: system
+  title: "System"
+  description: >
+    Module for parsing system log files.
+  fields:
+    - name: system
+      type: group
+      description: >
+        Fields from the system log files.
+      fields:

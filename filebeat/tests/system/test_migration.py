@@ -48,7 +48,8 @@ class Test(BaseTest):
         assert self.get_registry_entry_by_path("logs/log2.log")["offset"] == 6
 
         # Compare first entry
-        oldJson = json.loads('{"source":"logs/hello.log","offset":4,"FileStateOS":{"inode":30178938,"device":16777220}}')
+        oldJson = json.loads(
+            '{"source":"logs/hello.log","offset":4,"FileStateOS":{"inode":30178938,"device":16777220}}')
         newJson = self.get_registry_entry_by_path("logs/hello.log")
         del newJson["timestamp"]
         del newJson["ttl"]
@@ -152,7 +153,6 @@ class Test(BaseTest):
         # Overwrite registry
         with open(registry_file, 'w') as f:
             json.dump(old_registry, f)
-
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",

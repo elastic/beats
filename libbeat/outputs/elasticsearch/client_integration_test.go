@@ -62,7 +62,7 @@ func TestLoadTemplate(t *testing.T) {
 	assert.True(t, client.CheckTemplate(templateName))
 
 	// Delete template again to clean up
-	client.request("DELETE", "/_template/"+templateName, "", nil, nil)
+	client.Request("DELETE", "/_template/"+templateName, "", nil, nil)
 
 	// Make sure it was removed
 	assert.False(t, client.CheckTemplate(templateName))
@@ -134,7 +134,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		assert.True(t, client.CheckTemplate(templateName))
 
 		// Delete template again to clean up
-		client.request("DELETE", "/_template/"+templateName, "", nil, nil)
+		client.Request("DELETE", "/_template/"+templateName, "", nil, nil)
 
 		// Make sure it was removed
 		assert.False(t, client.CheckTemplate(templateName))
@@ -152,7 +152,7 @@ func TestOutputLoadTemplate(t *testing.T) {
 	}
 
 	// delete template if it exists
-	client.request("DELETE", "/_template/libbeat", "", nil, nil)
+	client.Request("DELETE", "/_template/libbeat", "", nil, nil)
 
 	// Make sure template is not yet there
 	assert.False(t, client.CheckTemplate("libbeat"))

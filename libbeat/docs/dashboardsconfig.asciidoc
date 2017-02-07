@@ -1,0 +1,87 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/dashboardsconfig.asciidoc[]
+//// Make sure this content appears below a level 2 heading.
+//////////////////////////////////////////////////////////////////////////
+
+[[configuration-dashboards]]
+=== Dashboards Configuration
+
+beta[]
+
+The `dashboards` section of the +{beatname_lc}.yml+ config file contains options
+for the automatic loading of the sample Beats dashboards. The loading of the
+dashboards is disabled by default, but can be enabled either from the configuration
+file or by using the `-setup` CLI flag.
+
+If dashboard loading is enabled, {beatname_uc} attempts to configure Kibana by
+writing directly in the Elasticsearch index for the Kibana configuration (by
+default, `.kibana`). To connect to Elasticsearch, it uses the settings defined
+in the Eleasticsearch output. If the Elasticsearch output is not configured or
+not enabled, {beatname_uc} will stop with an error. Loading the dashboards is
+only attempted at the Beat start, if Elasticsearch is not available when the
+Beat starts, {beatname_uc} will stop with an error.
+
+[source,yaml]
+------------------------------------------------------------------------------
+dashboards.enabled: true
+------------------------------------------------------------------------------
+
+==== Dashboards Loading Options
+
+You can specify the following options in the `dashboards` section of the
++{beatname_lc}.yml+ config file:
+
+===== enabled
+
+If enabled, load the sample Kibana dashboards on startup. If no other options
+are set, the dashboards archive is downloaded from the elastic.co website.
+
+===== url
+
+The URL from where to download the dashboards archive. By default this URL has a
+value which is computed based on the Beat name and version. For released
+versions, this URL points to the dashboard archive on the artifacts.elastic.co
+website.
+
+===== directory
+
+The directory from where to read the dashboards. It is used instead of the URL
+when it has a value.
+
+===== file
+
+The file archive (zip file) from where to read the dashboards. It is used
+instead of the URL when it has a value.
+
+===== snapshot
+
+If this option is set to true, the snapshot URL is used instead of the default
+URL.
+
+===== snapshot_url
+
+The URL from where to download the snapshot version of the dashboards. By
+default this has a value which is computed based on the Beat name and version.
+
+===== beat
+
+In case the archive contains the dashboards from multiple Beats, this lets you
+select which one to load. You can load all the dashboards in the archive by
+setting this to the empty string. The default is "{beatname_lc}".
+
+===== kibana_index
+
+The name of the Kibana index to use for setting the configuration. Default is
+".kibana"
+
+===== index
+
+The Elasticsearch index name. This overwrites the index name defined in the
+dashboards and index pattern. Example: "testbeat-*"

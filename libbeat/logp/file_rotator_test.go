@@ -24,7 +24,7 @@ func Test_Rotator(t *testing.T) {
 		return
 	}
 
-	Debug("rotator", "Direcotry: %s", dir)
+	Debug("rotator", "Directory: %s", dir)
 
 	rotateeverybytes := uint64(1000)
 	keepfiles := 3
@@ -118,7 +118,7 @@ func Test_Rotator_By_Bytes(t *testing.T) {
 		return
 	}
 
-	Debug("rotator", "Direcotry: %s", dir)
+	Debug("rotator", "Directory: %s", dir)
 
 	rotateeverybytes := uint64(100)
 	keepfiles := 3

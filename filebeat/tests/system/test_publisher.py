@@ -34,7 +34,7 @@ class Test(BaseTest):
 
         iterations = 5
         for n in range(0, iterations):
-            file.write("line " + str(n+1))
+            file.write("line " + str(n + 1))
             file.write("\n")
 
         file.close()
@@ -57,4 +57,3 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 1
         assert self.output_has(lines=iterations)
-

@@ -29,7 +29,7 @@ func TestGlobWatcher(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Make sure not inside compensation time
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	files, changed, err := gcd.Scan()
 	assert.Equal(t, 2, len(files))

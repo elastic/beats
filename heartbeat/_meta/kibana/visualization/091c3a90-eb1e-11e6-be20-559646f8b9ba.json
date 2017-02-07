@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"HTTP up status\",\"type\":\"area\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"interpolate\":\"linear\",\"mode\":\"percentage\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"group\",\"params\":{\"filters\":[{\"input\":{\"query\":{\"query_string\":{\"query\":\"up:true\",\"analyze_wildcard\":true}}},\"label\":\"\"},{\"input\":{\"query\":{\"query_string\":{\"query\":\"up:false\",\"analyze_wildcard\":true}}}}]}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "HTTP up status", 
+  "uiStateJSON": "{\"vis\":{\"colors\":{\"up:false\":\"#BF1B00\",\"up:true\":\"#629E51\"}}}", 
+  "version": 1, 
+  "savedSearchId": "c49bd160-eb17-11e6-be20-559646f8b9ba", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

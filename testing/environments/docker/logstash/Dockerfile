@@ -1,10 +1,10 @@
 FROM java:8-jre
 
-ARG LS_DOWNLOAD_URL
-ARG LS_VERSION
+ARG DOWNLOAD_URL
+ARG ELASTIC_VERSION
 
-ENV URL ${LS_DOWNLOAD_URL}/logstash-${LS_VERSION}.tar.gz
-ENV PATH $PATH:/opt/logstash-${LS_VERSION}/bin
+ENV URL ${DOWNLOAD_URL}/logstash/logstash-${ELASTIC_VERSION}.tar.gz
+ENV PATH $PATH:/opt/logstash-${ELASTIC_VERSION}/bin
 
 # Cache variable can be set during building to invalidate the build cache with `--build-arg CACHE=$(date +%s) .`
 ARG CACHE=1

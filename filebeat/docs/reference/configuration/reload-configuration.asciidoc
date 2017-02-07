@@ -1,0 +1,41 @@
+[[filebeat-configuration-reloading]]
+=== Reload Configuration
+
+beta[]
+
+Reload configuration allows to dynamically reload prospector configuration files. A glob can be defined which should be watched
+ for prospector configuration changes. New prospectors will be started / stopped accordingly. This is especially useful in
+ container environments where 1 container is used to tail logs from services in other containers on the same host.
+
+The configuration in the main filebeat.yml config file looks as following:
+
+[source,yaml]
+------------------------------------------------------------------------------
+filebeat.config.prospectors:
+  path: configs/*.yml
+  reload.enabled: true
+  reload.period: 10s
+------------------------------------------------------------------------------
+
+A path with a glob must be defined on which files should be checked for changes. A period is set on how often
+the files are checked for changes. Do not set period below 1s as the modification time of files is often stored in seconds.
+Setting it below 1s will cause an unnecessary overhead.
+
+The configuration inside the files which are found by the glob look as following:
+[source,yaml]
+------------------------------------------------------------------------------
+- input_type: log
+  paths:
+    - /var/log/mysql.log
+  scan_frequency: 10s
+
+- input_type: log
+  paths:
+    - /var/log/apache.log
+  scan_frequency: 5s
+------------------------------------------------------------------------------
+
+Each file directly contains a list of prospectors. Each file can contain one or multiple prospector definitions.
+
+WARNING: It is critical that two running prospectors DO NOT have overlapping file paths defined. If more then one prospector
+harvests the same file at the same time, it can lead to unexpected behaviour.

@@ -18,7 +18,7 @@ grouped in the following categories:
 * <<exported-fields-log>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
-* <<exported-fields-syslog>>
+* <<exported-fields-system>>
 
 --
 [[exported-fields-apache2]]
@@ -403,7 +403,7 @@ type: keyword
 
 required: True
 
-The file from which the line was read. This field contains the full path to the file. For example: `/var/log/system.log`.
+The file from which the line was read. This field contains the absolute path to the file. For example: `/var/log/system.log`.
 
 
 [float]
@@ -452,6 +452,18 @@ Ingestion pipeline error message, added in case there are errors reported by the
 === read_timestamp
 
 In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
+
+
+[float]
+=== fileset.module
+
+The Filebeat module that generated this event.
+
+
+[float]
+=== fileset.name
+
+The Filebeat fileset that generated this event.
 
 
 [[exported-fields-mysql]]
@@ -839,53 +851,53 @@ type: text
 The error message
 
 
-[[exported-fields-syslog]]
-== Syslog Fields
+[[exported-fields-system]]
+== System Fields
 
-Module for parsing syslog files.
-
-
-
-[float]
-== syslog Fields
-
-Fields from the syslog files.
+Module for parsing system log files.
 
 
 
 [float]
 == system Fields
 
+Fields from the system log files.
+
+
+
+[float]
+== syslog Fields
+
 Contains fields from the syslog system logs.
 
 
 
 [float]
-=== syslog.system.timestamp
+=== system.syslog.timestamp
 
 The timestamp as read from the syslog message.
 
 
 [float]
-=== syslog.system.hostname
+=== system.syslog.hostname
 
 The hostname as read from the syslog message.
 
 
 [float]
-=== syslog.system.program
+=== system.syslog.program
 
 The process name as read from the syslog message.
 
 
 [float]
-=== syslog.system.pid
+=== system.syslog.pid
 
 The PID of the process that sent the syslog message.
 
 
 [float]
-=== syslog.system.message
+=== system.syslog.message
 
 The message in the log line.
 

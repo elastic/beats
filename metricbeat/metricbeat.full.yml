@@ -11,16 +11,16 @@
 
 # Config reloading allows to dynamically load modules. Each file which is
 # monitored must contain one or multiple modules as a list.
-metricbeat.modules.reload:
+metricbeat.config.modules:
 
   # Glob pattern for configuration reloading
   path: ${path.config}/conf.d/*.yml
 
   # Period on which files under path should be checked for chagnes
-  period: 10s
+  reload.period: 10s
 
   # Set to true to enable config reloading
-  enabled: false
+  reload.enabled: false
 
 #==========================  Modules configuration ============================
 metricbeat.modules:
@@ -64,8 +64,8 @@ metricbeat.modules:
   # if true, exports the CPU usage in ticks, together with the percentage values
   #cpu_ticks: false
 
-  # EXPERIMENTAL: cgroups can be enabled for the process metricset.
-  #cgroups: false
+  # Enable collection of cgroup metrics from processes on Linux.
+  #process.cgroups.enabled: true
 
   # A list of regular expressions used to whitelist environment variables
   # reported with the process metricset's events. Defaults to empty.
@@ -94,6 +94,13 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
+#-------------------------------- ceph Module --------------------------------
+#- module: ceph
+#  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost:5000"]
+
 #------------------------------ couchbase Module -----------------------------
 #- module: couchbase
   #metricsets: ["cluster", "node", "bucket"]
@@ -103,7 +110,7 @@ metricbeat.modules:
 
 #------------------------------- Docker Module -------------------------------
 #- module: docker
-  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
+  #metricsets: ["container", "cpu", "diskio", "healthcheck", "info", "memory", "network"]
   #hosts: ["unix:///var/run/docker.sock"]
   #enabled: true
   #period: 10s
@@ -199,6 +206,14 @@ metricbeat.modules:
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
+
+#------------------------------- php_fpm Module ------------------------------
+#- module: php_fpm
+  #metricsets: ["pool"]
+  #enabled: true
+  #period: 10s
+  #status_path: "/status"
+  #hosts: ["localhost:8080"]
 
 #----------------------------- PostgreSQL Module -----------------------------
 #- module: postgresql
@@ -390,6 +405,10 @@ output.elasticsearch:
 
   # Optional HTTP Path
   #path: "/elasticsearch"
+
+  # Custom HTTP headers to add to each request
+  #headers:
+  #  X-My-Header: Contents of the header
 
   # Proxy server url
   #proxy_url: http://proxy:3128
@@ -821,6 +840,45 @@ output.elasticsearch:
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag.
+#dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#dashboards.url:
+
+# The directory from where to read the dashboards. It is used instead of the URL
+# when it has a value.
+#dashboards.directory:
+
+# The file archive (zip file) from where to read the dashboards. It is used instead
+# of the URL when it has a value.
+#dashboards.file:
+
+# If this option is enabled, the snapshot URL is used instead of the default URL.
+#dashboard.snapshot: false
+
+# The URL from where to download the snapshot version of the dashboards. By default
+# this has a value which is computed based on the Beat name and version.
+#dashboard.snapshot_url
+
+# In case the archive contains the dashboards from multiple Beats, this lets you
+# select which one to load. You can load all the dashboards in the archive by
+# setting this to the empty string.
+#dashboard.beat: metricbeat
+
+# The name of the Kibana index to use for setting the configuration. Default is ".kibana"
+#dashboards.kibana_index: .kibana
+
+# The Elasticsearch index name. This overwrites the index name defined in the
+# dashboards and index pattern. Example: testbeat-*
+#dashboards.index:
 
 #================================ Logging ======================================
 # There are three options for the log output: syslog, file, stderr.
