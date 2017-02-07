@@ -763,6 +763,9 @@
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
+                "labels": {
+                  "properties": {}
+                },
                 "name": {
                   "ignore_above": 1024,
                   "type": "keyword"
@@ -780,6 +783,9 @@
                 "status": {
                   "ignore_above": 1024,
                   "type": "keyword"
+                },
+                "tags": {
+                  "properties": {}
                 }
               }
             },
@@ -889,6 +895,9 @@
                     }
                   }
                 },
+                "labels": {
+                  "properties": {}
+                },
                 "size": {
                   "properties": {
                     "regular": {
@@ -898,6 +907,9 @@
                       "type": "long"
                     }
                   }
+                },
+                "tags": {
+                  "properties": {}
                 }
               }
             },

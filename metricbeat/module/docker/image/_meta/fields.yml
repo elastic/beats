@@ -34,8 +34,14 @@
           description: >
              Total size of the all cached images associated to the current image.
 
-# TODO : How to describe tags & labels list ?
-#    - name: tags
-#      type: list ?
-#      description: >
-#        Descriptive or given name(s) to the image.
+    - name: labels
+      type: dict
+      dict-type: keyword
+      description: >
+        Image labels.
+
+    - name: tags
+      type: list
+      dict-type: keyword
+      description: >
+        Image tags.

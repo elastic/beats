@@ -771,6 +771,9 @@
                   "index": "not_analyzed",
                   "type": "string"
                 },
+                "labels": {
+                  "properties": {}
+                },
                 "name": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
@@ -790,6 +793,9 @@
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
+                },
+                "tags": {
+                  "properties": {}
                 }
               }
             },
@@ -896,6 +902,9 @@
                     }
                   }
                 },
+                "labels": {
+                  "properties": {}
+                },
                 "size": {
                   "properties": {
                     "regular": {
@@ -905,6 +914,9 @@
                       "type": "long"
                     }
                   }
+                },
+                "tags": {
+                  "properties": {}
                 }
               }
             },
