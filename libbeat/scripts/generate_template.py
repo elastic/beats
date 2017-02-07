@@ -59,13 +59,6 @@ def fields_to_es_template(args, input, output, index, version):
         }
     }
 
-    # should be done only for es5x. For es6x, any "_all" setting results
-    # in an error.
-    # TODO: https://github.com/elastic/beats/issues/3368
-    # template["mappings"]["_default"]["_all"] = {
-    #     "norms": False
-    # }
-
     if args.es2x:
         # different syntax for norms
         template["mappings"]["_default_"]["_all"] = {
@@ -78,6 +71,13 @@ def fields_to_es_template(args, input, output, index, version):
         # In a typical scenario, most fields are not used, so increasing the
         # limit shouldn't be that bad.
         template["settings"]["index.mapping.total_fields.limit"] = 10000
+
+        # should be done only for es5x. For es6x, any "_all" setting results
+        # in an error.
+        # TODO: https://github.com/elastic/beats/issues/3368
+        template["mappings"]["_default_"]["_all"] = {
+            "norms": False
+        }
 
     properties = {}
     dynamic_templates = []
