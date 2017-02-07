@@ -1060,7 +1060,7 @@ Number of get commands
 
 
 [float]
-=== couchbase.node.couch.docs.actual_disk_size.bytes
+=== couchbase.node.couch.docs.disk_size.bytes
 
 type: long
 
@@ -1096,7 +1096,7 @@ couchSpatialDiskSize field
 
 
 [float]
-=== couchbase.node.couch.views.actual_disk_size.bytes
+=== couchbase.node.couch.views.disk_size.bytes
 
 type: long
 

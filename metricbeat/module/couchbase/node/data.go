@@ -73,14 +73,14 @@ func eventsMapping(content []byte) []common.MapStr {
 			"cmd_get": NodeItem.InterestingStats.CmdGet,
 			"couch": common.MapStr{
 				"docs": common.MapStr{
-					"actual_disk_size": common.MapStr{
+					"disk_size": common.MapStr{
 						"bytes": NodeItem.InterestingStats.CouchDocsActualDiskSize,
 					},
 					"data_size": common.MapStr{
 						"bytes": NodeItem.InterestingStats.CouchDocsDataSize,
 					},
 				},
-				"spacial": common.MapStr{
+				"spatial": common.MapStr{
 					"data_size": common.MapStr{
 						"bytes": NodeItem.InterestingStats.CouchSpatialDataSize,
 					},
@@ -89,7 +89,7 @@ func eventsMapping(content []byte) []common.MapStr {
 					},
 				},
 				"views": common.MapStr{
-					"actual_disk_size": common.MapStr{
+					"disk_size": common.MapStr{
 						"bytes": NodeItem.InterestingStats.CouchViewsActualDiskSize,
 					},
 					"data_size": common.MapStr{
