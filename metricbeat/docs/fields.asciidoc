@@ -518,14 +518,9 @@ The document type. Always set to "metricsets".
 [[exported-fields-couchbase]]
 == Couchbase Fields
 
-<<<<<<< HEAD
 experimental[]
-couchbase Module
-
-=======
-beta[]
 Metrics collected from Couchbase servers.
->>>>>>> 81d1154... Add edits for couchbase module
+
 
 
 [float]
@@ -538,12 +533,7 @@ Metrics collected from Couchbase servers.
 [float]
 == bucket Fields
 
-<<<<<<< HEAD
-experimental[]
-Couchbase bucket metrics
-=======
 Couchbase bucket metrics.
->>>>>>> 81d1154... Add edits for couchbase module
 
 
 
@@ -640,12 +630,7 @@ Number of items associated with the bucket.
 [float]
 == cluster Fields
 
-<<<<<<< HEAD
-experimental[]
-Couchbase Cluster metrics
-=======
 Couchbase cluster metrics.
->>>>>>> 81d1154... Add edits for couchbase module
 
 
 
@@ -796,12 +781,7 @@ RAM used by the data in the cluster (bytes).
 [float]
 == node Fields
 
-<<<<<<< HEAD
-experimental[]
-Couchbase node metrics
-=======
 Couchbase node metrics.
->>>>>>> 81d1154... Add edits for couchbase module
 
 
 
@@ -810,7 +790,7 @@ Couchbase node metrics.
 
 type: long
 
-Number of get commands.
+Number of get commands
 
 
 [float]
@@ -850,7 +830,7 @@ Amount of disk space used by spatial views (bytes).
 
 
 [float]
-=== couchbase.node.couch.views.actual_disk_size.bytes
+=== couchbase.node.couch.views.disk_size.bytes
 
 type: long
 

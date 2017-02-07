@@ -3,12 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
   * <<metricbeat-module-apache,Apache>>
-<<<<<<< HEAD
-  * <<metricbeat-module-couchbase,couchbase>>
-=======
-  * <<metricbeat-module-ceph,ceph>>
   * <<metricbeat-module-couchbase,Couchbase>>
->>>>>>> 81d1154... Add edits for couchbase module
   * <<metricbeat-module-docker,Docker>>
   * <<metricbeat-module-haproxy,HAProxy>>
   * <<metricbeat-module-kafka,kafka>>
