@@ -14,6 +14,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.4.6]
+
+### Added
+- Introduce ,ignore struct tag option to optionally ignore exported fields. #89
+- Add support for custom Unpacker method with `*Config` being convertible to first parameter. The custom method must be compatible to `ConfigUnpacker`. #90
+
+### Fixed
+- Ignore private struct fields when merging a struct into a config. #89
+
 ## [0.4.5]
 
 ### Changed
@@ -168,7 +177,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.4.5...HEAD
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.4.6...HEAD
+[0.4.6]: https://github.com/elastic/go-ucfg/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/elastic/go-ucfg/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/elastic/go-ucfg/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/elastic/go-ucfg/compare/v0.4.2...v0.4.3
