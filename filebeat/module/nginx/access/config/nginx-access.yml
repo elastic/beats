@@ -4,5 +4,3 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-fields:
-  source_type: nginx-access

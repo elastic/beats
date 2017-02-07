@@ -454,6 +454,18 @@ Ingestion pipeline error message, added in case there are errors reported by the
 In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
 
 
+[float]
+=== fileset.module
+
+The Filebeat module that generated this event.
+
+
+[float]
+=== fileset.name
+
+The Filebeat fileset that generated this event.
+
+
 [[exported-fields-mysql]]
 == MySQL Fields
 
