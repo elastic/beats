@@ -75,7 +75,7 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
-#------------------------------ couchbase Module -----------------------------
+#------------------------------ Couchbase Module -----------------------------
 #- module: couchbase
   #metricsets: ["cluster", "node", "bucket"]
   #enabled: true
