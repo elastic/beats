@@ -1335,6 +1335,22 @@ Size of the files that have been created or changed since creation.
 
 
 [float]
+=== docker.container.labels
+
+type: dict
+
+Image labels.
+
+
+[float]
+=== docker.container.tags
+
+type: list
+
+Image tags.
+
+
+[float]
 == cpu Fields
 
 Runtime CPU metrics.
@@ -1555,6 +1571,22 @@ Size of the image.
 type: long
 
 Total size of the all cached images associated to the current image.
+
+
+[float]
+=== docker.image.labels
+
+type: dict
+
+Image labels.
+
+
+[float]
+=== docker.image.tags
+
+type: list
+
+Image tags.
 
 
 [float]
