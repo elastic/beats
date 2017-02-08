@@ -1,5 +1,7 @@
-=== prometheus collector MetricSet
+=== Prometheus Collector Metricset
 
-This is the collector metricset of the module prometheus. It allows to fetch data from https://prometheus.io/docs/instrumenting/exporters/[prometheus exporters].
+The Prometheus `collector` metricset fetches data from https://prometheus.io/docs/instrumenting/exporters/[prometheus exporters].
 
-All events with the same labels are grouped together as one event.
+All events with the same labels are grouped together as one event. The fields
+exported by this metricset vary depending on the Prometheus exporter that you're
+using.
