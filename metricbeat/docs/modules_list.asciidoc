@@ -4,7 +4,7 @@ This file is generated! See scripts/docs_collector.py
 
   * <<metricbeat-module-apache,Apache>>
   * <<metricbeat-module-ceph,ceph>>
-  * <<metricbeat-module-couchbase,couchbase>>
+  * <<metricbeat-module-couchbase,Couchbase>>
   * <<metricbeat-module-docker,Docker>>
   * <<metricbeat-module-haproxy,HAProxy>>
   * <<metricbeat-module-kafka,kafka>>
