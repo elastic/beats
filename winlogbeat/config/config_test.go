@@ -18,8 +18,10 @@ func (v validationTestCase) run(t *testing.T) {
 		assert.NoError(t, v.config.Validate())
 	} else {
 		err := v.config.Validate()
-		if assert.Error(t, err, "expected '%s'", v.errMsg) {
+		if err != nil {
 			assert.Contains(t, err.Error(), v.errMsg)
+		} else {
+			t.Errorf("expected error with '%s'", v.errMsg)
 		}
 	}
 }
