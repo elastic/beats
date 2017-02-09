@@ -7,8 +7,8 @@ services:
       context: ./docker/elasticsearch
       dockerfile: Dockerfile-snapshot
       args:
-        ELASTIC_VERSION: 5.2.0
-        ES_DOWNLOAD_URL: https://staging.elastic.co/5.2.0-6ee3d9ba/downloads/elasticsearch
+        ELASTIC_VERSION: 5.2.1
+        ES_DOWNLOAD_URL: https://staging.elastic.co/5.2.1-f614a4d5/downloads/elasticsearch
         #XPACK: http://snapshots.elastic.co/downloads/packs/x-pack/x-pack-6.0.0-alpha1-SNAPSHOT.zip
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -21,8 +21,8 @@ services:
       context: ./docker/logstash
       dockerfile: Dockerfile
       args:
-        LS_VERSION: 5.2.0
-        LS_DOWNLOAD_URL: https://staging.elastic.co/5.2.0-6ee3d9ba/downloads/logstash
+        LS_VERSION: 5.2.1
+        LS_DOWNLOAD_URL: https://staging.elastic.co/5.2.1-f614a4d5/downloads/logstash
     environment:
       - ES_HOST=elasticsearch
 
