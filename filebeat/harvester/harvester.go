@@ -44,9 +44,10 @@ type Harvester struct {
 	encoding        encoding.Encoding
 	once            sync.Once
 	done            chan struct{}
-	wg              sync.WaitGroup
+	wg              *sync.WaitGroup
 	ID              uuid.UUID
 	beatDone        chan struct{}
+	eventCounter    *sync.WaitGroup
 }
 
 func NewHarvester(
@@ -54,6 +55,7 @@ func NewHarvester(
 	state file.State,
 	prospectorChan chan *input.Event,
 	beatDone chan struct{},
+	eventCounter *sync.WaitGroup,
 ) (*Harvester, error) {
 
 	h := &Harvester{
@@ -62,8 +64,9 @@ func NewHarvester(
 		prospectorChan: prospectorChan,
 		done:           make(chan struct{}),
 		ID:             uuid.NewV4(),
-		wg:             sync.WaitGroup{},
+		wg:             &sync.WaitGroup{},
 		beatDone:       beatDone,
+		eventCounter:   eventCounter,
 	}
 
 	if err := cfg.Unpack(&h.config); err != nil {

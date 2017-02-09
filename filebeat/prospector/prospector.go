@@ -33,15 +33,16 @@ type Prospector struct {
 	harvesterChan    chan *input.Event
 	channelDone      chan struct{}
 	runDone          chan struct{}
-	runWg            sync.WaitGroup
+	runWg            *sync.WaitGroup
 	states           *file.States
-	wg               sync.WaitGroup
-	channelWg        sync.WaitGroup // Separate waitgroup for channels as not stopped on completion
+	wg               *sync.WaitGroup
+	channelWg        *sync.WaitGroup // Separate waitgroup for channels as not stopped on completion
 	id               uint64
 	Once             bool
 	harvesters       map[uuid.UUID]*harvester.Harvester
 	harvestersMutex  sync.Mutex
 	beatDone         chan struct{}
+	eventCounter     *sync.WaitGroup
 }
 
 type Prospectorer interface {
@@ -60,14 +61,15 @@ func NewProspector(cfg *common.Config, outlet Outlet, beatDone chan struct{}) (*
 		outlet:        outlet,
 		harvesterChan: make(chan *input.Event),
 		channelDone:   make(chan struct{}),
-		wg:            sync.WaitGroup{},
+		wg:            &sync.WaitGroup{},
 		runDone:       make(chan struct{}),
-		runWg:         sync.WaitGroup{},
+		runWg:         &sync.WaitGroup{},
 		states:        &file.States{},
-		channelWg:     sync.WaitGroup{},
+		channelWg:     &sync.WaitGroup{},
 		Once:          false,
 		harvesters:    map[uuid.UUID]*harvester.Harvester{},
 		beatDone:      beatDone,
+		eventCounter:  &sync.WaitGroup{},
 	}
 
 	var err error
@@ -151,6 +153,8 @@ func (p *Prospector) Start() {
 				return
 			case event := <-p.harvesterChan:
 				err := p.updateState(event)
+				p.eventCounter.Done()
+				// TODO: should we really return here? Because we need to drain the channel
 				if err != nil {
 					return
 				}
@@ -250,8 +254,20 @@ func (p *Prospector) Stop() {
 
 	// Wait for completion of sending events
 	// TODO: If not beatDone, it should be waited until channel is drained -> how?
-	close(p.channelDone)
-	p.channelWg.Wait()
+	done := make(chan struct{})
+
+	// Drain the channel
+	// TODO: how to stop this go routine?
+	go func() {
+		p.eventCounter.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		close(p.channelDone)
+	case <-p.beatDone:
+	}
 
 	// Makes sure all prospector go routines are stopped
 	p.wg.Wait()
@@ -265,6 +281,7 @@ func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, er
 		state,
 		p.harvesterChan,
 		p.beatDone,
+		p.eventCounter,
 	)
 
 	return h, err

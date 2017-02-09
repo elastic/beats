@@ -177,9 +177,11 @@ func (h *Harvester) Stop() {
 // sendEvent sends event to the spooler channel
 // Return false if event was not sent
 func (h *Harvester) sendEvent(event *input.Event) bool {
+	h.eventCounter.Add(1)
 
 	select {
 	case <-h.done:
+		h.eventCounter.Done()
 		return false
 	case h.prospectorChan <- event: // ship the new event downstream
 		return true
@@ -195,8 +197,11 @@ func (h *Harvester) sendStateUpdate() {
 	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
 	event := input.NewEvent(h.state)
 
+	h.eventCounter.Add(1)
+
 	select {
 	case <-h.beatDone:
+		h.eventCounter.Done()
 	case h.prospectorChan <- event: // ship the new event downstream
 	}
 }
