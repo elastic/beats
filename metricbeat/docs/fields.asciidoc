@@ -830,7 +830,7 @@ Amount of disk space used by spatial views (bytes).
 
 
 [float]
-=== couchbase.node.couch.views.disk_size.bytes
+=== couchbase.node.couch.views.actual_disk_size.bytes
 
 type: long
 

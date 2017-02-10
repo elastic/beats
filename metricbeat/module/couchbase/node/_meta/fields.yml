@@ -25,7 +25,7 @@
       type: long
       description: >
         Amount of disk space used by spatial views (bytes).
-    - name: couch.views.disk_size.bytes
+    - name: couch.views.actual_disk_size.bytes
       type: long
       description: >
         Amount of disk space used by Couch views (bytes).
