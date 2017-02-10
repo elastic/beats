@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -89,7 +90,10 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 		tmpConfig := struct {
 			Filebeat Config
 		}{}
-		cfgfile.Read(&tmpConfig, file)
+		err := cfgfile.Read(&tmpConfig, file)
+		if err != nil {
+			return fmt.Errorf("Failed to read %s: %s", file, err)
+		}
 
 		config.Prospectors = append(config.Prospectors, tmpConfig.Filebeat.Prospectors...)
 	}
