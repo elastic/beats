@@ -446,14 +446,14 @@
                     },
                     "views": {
                       "properties": {
-                        "data_size": {
+                        "actual_disk_size": {
                           "properties": {
                             "bytes": {
                               "type": "long"
                             }
                           }
                         },
-                        "disk_size": {
+                        "data_size": {
                           "properties": {
                             "bytes": {
                               "type": "long"
