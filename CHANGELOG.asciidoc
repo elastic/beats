@@ -33,7 +33,6 @@ https://github.com/elastic/beats/compare/v5.2.0...master[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
-- Fix go routine leak in docker module. {pull}3492[3492]
 
 *Packetbeat*
 
@@ -68,6 +67,25 @@ https://github.com/elastic/beats/compare/v5.2.0...master[Check the HEAD diff]
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.2.1]]
+=== Beats version 5.2.1
+https://github.com/elastic/beats/compare/v5.2.0...v5.2.1[View commits]
+
+==== Bugfixes
+
+*Metricbeat*
+
+- Fix go routine leak in docker module. {pull}3492[3492]
+
+*Packetbeat*
+
+- Fix error in the NFS sample dashboard. {pull}3548[3548]
+
+*Winlogbeat*
+
+- Fix error in the Winlogbeat sample dashboard. {pull}3548[3548]
+
 
 [[release-notes-5.2.0]]
 === Beats version 5.2.0
