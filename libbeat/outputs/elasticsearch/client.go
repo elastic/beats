@@ -51,6 +51,7 @@ type ClientSettings struct {
 	Pipeline           *outil.Selector
 	Timeout            time.Duration
 	CompressionLevel   int
+	CacheRedirect      bool
 }
 
 type connectCallback func(client *Client) error
@@ -183,6 +184,36 @@ func NewClient(
 
 		compressionLevel: compression,
 		proxyURL:         s.Proxy,
+	}
+
+	if s.CacheRedirect {
+		client.Connection.http.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			if len(via) != 1 {
+				return nil
+			}
+
+			if via[0].Method != "GET" {
+				return http.ErrUseLastResponse
+			}
+
+			newURL := req.URL.String()
+
+			logp.Info("Caching ES HTTP API Redirect: %s", newURL)
+
+			s.URL = newURL
+
+			newClient, err := NewClient(s, onConnectCallback)
+
+			if err != nil {
+				logp.Err("Failed to Cache ES HTTP API Redirect to %s: %s", newURL, err)
+				return http.ErrUseLastResponse
+			}
+
+			client.bulkRequ = newClient.bulkRequ
+			client.Connection = newClient.Connection
+
+			return http.ErrUseLastResponse
+		}
 	}
 
 	client.Connection.onConnectCallback = func() error {

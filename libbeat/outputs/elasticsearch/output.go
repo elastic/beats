@@ -372,6 +372,7 @@ func makeClientFactory(
 			Headers:          config.Headers,
 			Timeout:          config.Timeout,
 			CompressionLevel: config.CompressionLevel,
+			CacheRedirect:    config.CacheRedirect,
 		}, onConnected)
 	}
 }
