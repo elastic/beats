@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/mitchellh/hashstructure"
+	"github.com/satori/go.uuid"
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
@@ -30,12 +31,18 @@ type Prospector struct {
 	prospectorer     Prospectorer
 	outlet           Outlet
 	harvesterChan    chan *input.Event
-	done             chan struct{}
+	channelDone      chan struct{}
+	runDone          chan struct{}
+	runWg            *sync.WaitGroup
 	states           *file.States
-	wg               sync.WaitGroup
-	channelWg        sync.WaitGroup // Separate waitgroup for channels as not stopped on completion
+	wg               *sync.WaitGroup
+	channelWg        *sync.WaitGroup // Separate waitgroup for channels as not stopped on completion
 	id               uint64
 	Once             bool
+	harvesters       map[uuid.UUID]*harvester.Harvester
+	harvestersMutex  sync.Mutex
+	beatDone         chan struct{}
+	eventCounter     *sync.WaitGroup
 }
 
 type Prospectorer interface {
@@ -47,17 +54,22 @@ type Outlet interface {
 	OnEvent(event *input.Event) bool
 }
 
-func NewProspector(cfg *common.Config, outlet Outlet) (*Prospector, error) {
+func NewProspector(cfg *common.Config, outlet Outlet, beatDone chan struct{}) (*Prospector, error) {
 	prospector := &Prospector{
 		cfg:           cfg,
 		config:        defaultConfig,
 		outlet:        outlet,
 		harvesterChan: make(chan *input.Event),
-		done:          make(chan struct{}),
-		wg:            sync.WaitGroup{},
+		channelDone:   make(chan struct{}),
+		wg:            &sync.WaitGroup{},
+		runDone:       make(chan struct{}),
+		runWg:         &sync.WaitGroup{},
 		states:        &file.States{},
-		channelWg:     sync.WaitGroup{},
+		channelWg:     &sync.WaitGroup{},
 		Once:          false,
+		harvesters:    map[uuid.UUID]*harvester.Harvester{},
+		beatDone:      beatDone,
+		eventCounter:  &sync.WaitGroup{},
 	}
 
 	var err error
@@ -115,22 +127,14 @@ func (p *Prospector) Start() {
 	logp.Info("Starting prospector of type: %v; id: %v ", p.config.InputType, p.ID())
 
 	if p.Once {
-		// If only run once, waiting for completion of prospector / harvesters
-		defer p.wg.Wait()
+		// If only run once, waiting for completion of scan and prospector stopping
+		defer func() {
+			// Wait until run is finished
+			p.runWg.Wait()
+			// Wait until all harvesters are stopped
+			p.wg.Wait()
+		}()
 	}
-
-	// Add waitgroup to make sure prospectors finished
-	p.wg.Add(1)
-
-	go func() {
-		defer p.wg.Done()
-		p.Run()
-	}()
-
-}
-
-// Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
-func (p *Prospector) Run() {
 
 	// Open channel to receive events from harvester and forward them to spooler
 	// Here potential filtering can happen
@@ -139,17 +143,36 @@ func (p *Prospector) Run() {
 		defer p.channelWg.Done()
 		for {
 			select {
-			case <-p.done:
+
+			case <-p.channelDone:
+				// TODO: Introduce same magic here as we have for shutdown_timeout to drain channel
+				logp.Info("Prospector channel stopped")
+				return
+			case <-p.beatDone:
 				logp.Info("Prospector channel stopped")
 				return
 			case event := <-p.harvesterChan:
 				err := p.updateState(event)
+				p.eventCounter.Done()
+				// TODO: should we really return here? Because we need to drain the channel
 				if err != nil {
 					return
 				}
 			}
 		}
 	}()
+
+	// Add waitgroup to make sure prospectors finished
+	p.runWg.Add(1)
+	go func() {
+		defer p.runWg.Done()
+		p.Run()
+	}()
+
+}
+
+// Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
+func (p *Prospector) Run() {
 
 	// Initial prospector run
 	p.prospectorer.Run()
@@ -161,7 +184,7 @@ func (p *Prospector) Run() {
 
 	for {
 		select {
-		case <-p.done:
+		case <-p.runDone:
 			logp.Info("Prospector ticker stopped")
 			return
 		case <-time.After(p.config.ScanFrequency):
@@ -204,10 +227,58 @@ func (p *Prospector) updateState(event *input.Event) error {
 	return nil
 }
 
+// Stop stops the prospector and with it all harvesters
+//
+// The shutdown order is as follwoing
+// - stop run and scanning
+// - wait until last scan finishes to make sure no new harvesters are added
+// - stop harvesters
+// - wait until all harvester finished
+// - stop communication channel
+// - wait on internal waitgroup to make sure all prospector go routines are stopped
 func (p *Prospector) Stop() {
 	logp.Info("Stopping Prospector: %v", p.ID())
-	close(p.done)
-	p.channelWg.Wait()
+
+	// Stop scanning and wait for completion
+	close(p.runDone)
+	p.runWg.Wait()
+
+	wg := sync.WaitGroup{}
+
+	// Stop all harvesters
+	// In case the beatDone channel is closed, this will not wait for completion
+	// Otherwise Stop will wait until output is complete
+	p.harvestersMutex.Lock()
+	for _, hv := range p.harvesters {
+		wg.Add(1)
+		go func(h *harvester.Harvester) {
+			defer wg.Done()
+			h.Stop()
+		}(hv)
+	}
+	p.harvestersMutex.Unlock()
+
+	// Waits on stopping all harvesters to make sure all events made it into the channel
+	wg.Wait()
+
+	// Wait for completion of sending events
+	// TODO: If not beatDone, it should be waited until channel is drained -> how?
+	done := make(chan struct{})
+
+	// Drain the channel
+	// TODO: how to stop this go routine?
+	go func() {
+		p.eventCounter.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		close(p.channelDone)
+	case <-p.beatDone:
+	}
+
+	// Makes sure all prospector go routines are stopped
 	p.wg.Wait()
 }
 
@@ -218,7 +289,8 @@ func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, er
 		p.cfg,
 		state,
 		p.harvesterChan,
-		p.done,
+		p.beatDone,
+		p.eventCounter,
 	)
 
 	return h, err
@@ -255,19 +327,40 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 		return err
 	}
 
-	p.wg.Add(1)
 	// startHarvester is not run concurrently, but atomic operations are need for the decrementing of the counter
 	// inside the following go routine
 	atomic.AddUint64(&p.harvesterCounter, 1)
+	p.wg.Add(1)
 	go func() {
-		defer func() {
-			atomic.AddUint64(&p.harvesterCounter, ^uint64(0))
-			p.wg.Done()
-		}()
 
+		p.addHarvester(h)
+		defer func() {
+			p.removeHarvester(h)
+			p.wg.Done()
+			atomic.AddUint64(&p.harvesterCounter, ^uint64(0))
+
+		}()
 		// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
 		h.Harvest(reader)
 	}()
 
 	return nil
+}
+
+func (p *Prospector) addHarvester(h *harvester.Harvester) {
+	p.harvestersMutex.Lock()
+	defer p.harvestersMutex.Unlock()
+	p.harvesters[h.ID] = h
+}
+
+func (p *Prospector) removeHarvester(h *harvester.Harvester) {
+	p.harvestersMutex.Lock()
+	defer p.harvestersMutex.Unlock()
+	delete(p.harvesters, h.ID)
+}
+
+func (p *Prospector) getHarvesters() map[uuid.UUID]*harvester.Harvester {
+	p.harvestersMutex.Lock()
+	defer p.harvestersMutex.Unlock()
+	return p.harvesters
 }
