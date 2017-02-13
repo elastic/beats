@@ -18,7 +18,7 @@ The directory layout of an installation is as follows:
 |=======================================================================
 | Type   | Description | Default Location | Config Option
 | home   | Home of the {beatname_uc} installation. | | path.home
-| bin    | The location for the binary files. | {path.home} |
+| bin    | The location for the binary files. | {path.home}/bin |
 | config | The location for configuration files. | {path.home} | path.config
 | data   | The location for persistent data files. | {path.home}/data| path.data
 | logs   | The location for the logs created by {beatname_uc}. | {path.home}/logs | path.logs
@@ -37,7 +37,7 @@ file.
 |=======================================================================
 | Type   | Description | Location
 | home   | Home of the {beatname_uc} installation. | /usr/share/{beatname_lc}
-| bin    | The location for the binary files. | /usr/share/{beatname_lc}
+| bin    | The location for the binary files. | /usr/share/{beatname_lc}/bin
 | config | The location for configuration files. | /etc/{beatname_lc}
 | data   | The location for persistent data files. | /var/lib/{beatname_lc}
 | logs   | The location for the logs created by {beatname_uc}. | /var/log/{beatname_lc}
