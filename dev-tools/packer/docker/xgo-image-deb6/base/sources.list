@@ -1,2 +1,2 @@
-deb http://130.89.148.13/debian/ squeeze main contrib
-deb http://130.89.148.13/debian/ squeeze-lts main
+deb http://archive.debian.org/debian/ squeeze main contrib
+deb http://archive.debian.org/debian/ squeeze-lts main
