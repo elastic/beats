@@ -19,6 +19,18 @@ type RegistryVisitor interface {
 	OnKey(s string)
 }
 
+func ReportNamespace(V Visitor, name string, f func()) {
+	V.OnKey(name)
+	V.OnRegistryStart()
+	f()
+	V.OnRegistryFinished()
+}
+
+func ReportVar(V Visitor, name string, m Mode, v Var) {
+	V.OnKey(name)
+	v.Visit(m, V)
+}
+
 func ReportString(V Visitor, name string, value string) {
 	V.OnKey(name)
 	V.OnString(value)
