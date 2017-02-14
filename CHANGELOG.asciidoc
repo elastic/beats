@@ -170,6 +170,7 @@ https://github.com/elastic/beats/compare/v5.1.2...v5.2.0[View commits]
 - Experimental Prometheus module. {pull}3202[3202]
 - Add system socket module that reports all TCP sockets. {pull}3246[3246]
 - Kafka consumer groups metricset. {pull}3240[3240]
+- Add jolokia module with dynamic jmx metricset. {pull}3570[3570]
 
 *Winlogbeat*
 
