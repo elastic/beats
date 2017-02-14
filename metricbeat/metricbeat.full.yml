@@ -128,6 +128,18 @@ metricbeat.modules:
   #period: 10s
   #hosts: ["tcp://127.0.0.1:14567"]
 
+#------------------------------- Jolokia Module ------------------------------
+#- module: jolokia
+#  metricsets: ["jmx"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost"]
+#  namespace: "metrics"
+#  path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+#  jmx.mapping:
+#  jmx.application:
+#  jmx.instance:
+
 #-------------------------------- kafka Module -------------------------------
 #- module: kafka
   #metricsets: ["partition"]

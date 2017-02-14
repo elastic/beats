@@ -135,6 +135,10 @@ def dedot(group):
     fields = []
     dedotted = {}
 
+    # Need in case there are no fields
+    if group["fields"] is None:
+        group["fields"] = {}
+
     for field in group["fields"]:
         if "." in field["name"]:
             # dedot

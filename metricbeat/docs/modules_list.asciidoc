@@ -7,6 +7,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-couchbase,Couchbase>>
   * <<metricbeat-module-docker,Docker>>
   * <<metricbeat-module-haproxy,HAProxy>>
+  * <<metricbeat-module-jolokia,Jolokia>>
   * <<metricbeat-module-kafka,kafka>>
   * <<metricbeat-module-mongodb,MongoDB>>
   * <<metricbeat-module-mysql,MySQL>>
@@ -26,6 +27,7 @@ include::modules/ceph.asciidoc[]
 include::modules/couchbase.asciidoc[]
 include::modules/docker.asciidoc[]
 include::modules/haproxy.asciidoc[]
+include::modules/jolokia.asciidoc[]
 include::modules/kafka.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mysql.asciidoc[]

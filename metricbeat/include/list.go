@@ -31,6 +31,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/haproxy"
 	_ "github.com/elastic/beats/metricbeat/module/haproxy/info"
 	_ "github.com/elastic/beats/metricbeat/module/haproxy/stat"
+	_ "github.com/elastic/beats/metricbeat/module/jolokia"
+	_ "github.com/elastic/beats/metricbeat/module/jolokia/jmx"
 	_ "github.com/elastic/beats/metricbeat/module/kafka"
 	_ "github.com/elastic/beats/metricbeat/module/kafka/consumergroup"
 	_ "github.com/elastic/beats/metricbeat/module/kafka/partition"

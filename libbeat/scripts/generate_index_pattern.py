@@ -19,6 +19,10 @@ unique_fields = []
 
 def fields_to_json(section, path, output):
 
+    # Need in case there are no fields
+    if section["fields"] is None:
+        section["fields"] = {}
+
     for field in section["fields"]:
         if path == "":
             newpath = field["name"]
