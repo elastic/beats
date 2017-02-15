@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"expvar"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/outil"
@@ -70,14 +70,14 @@ type Connection struct {
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	ackedEvents            = expvar.NewInt("libbeat.es.published_and_acked_events")
-	eventsNotAcked         = expvar.NewInt("libbeat.es.published_but_not_acked_events")
-	publishEventsCallCount = expvar.NewInt("libbeat.es.call_count.PublishEvents")
+	ackedEvents            = monitoring.NewInt(outputs.Metrics, "elasticsearch.events.acked")
+	eventsNotAcked         = monitoring.NewInt(outputs.Metrics, "elasticsearch.events.not_acked")
+	publishEventsCallCount = monitoring.NewInt(outputs.Metrics, "elasticsearch.publishEvents.call.count")
 
-	statReadBytes   = expvar.NewInt("libbeat.es.publish.read_bytes")
-	statWriteBytes  = expvar.NewInt("libbeat.es.publish.write_bytes")
-	statReadErrors  = expvar.NewInt("libbeat.es.publish.read_errors")
-	statWriteErrors = expvar.NewInt("libbeat.es.publish.write_errors")
+	statReadBytes   = monitoring.NewInt(outputs.Metrics, "elasticsearch.read.bytes")
+	statWriteBytes  = monitoring.NewInt(outputs.Metrics, "elasticsearch.write.bytes")
+	statReadErrors  = monitoring.NewInt(outputs.Metrics, "elasticsearch.read.errors")
+	statWriteErrors = monitoring.NewInt(outputs.Metrics, "elasticsearch.write.errors")
 )
 
 var (
@@ -132,10 +132,12 @@ func NewClient(
 	}
 
 	iostats := &transport.IOStats{
-		Read:        statReadBytes,
-		Write:       statWriteBytes,
-		ReadErrors:  statReadErrors,
-		WriteErrors: statWriteErrors,
+		Read:               statReadBytes,
+		Write:              statWriteBytes,
+		ReadErrors:         statReadErrors,
+		WriteErrors:        statWriteErrors,
+		OutputsWrite:       outputs.WriteBytes,
+		OutputsWriteErrors: outputs.WriteErrors,
 	}
 	dialer = transport.StatsDialer(dialer, iostats)
 	tlsDialer = transport.StatsDialer(tlsDialer, iostats)
@@ -265,6 +267,7 @@ func (client *Client) PublishEvents(
 	}
 
 	ackedEvents.Add(int64(len(data) - len(failedEvents)))
+	outputs.AckedEvents.Add(int64(len(data) - len(failedEvents)))
 	eventsNotAcked.Add(int64(len(failedEvents)))
 	if len(failedEvents) > 0 {
 		if sendErr == nil {

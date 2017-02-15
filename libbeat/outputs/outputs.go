@@ -4,6 +4,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 type Options struct {
@@ -71,6 +72,14 @@ type bulkOutputAdapter struct {
 }
 
 var outputsPlugins = make(map[string]OutputBuilder)
+
+var (
+	Metrics = monitoring.Default.NewRegistry("output")
+
+	AckedEvents = monitoring.NewInt(Metrics, "events.acked", monitoring.Report)
+	WriteBytes  = monitoring.NewInt(Metrics, "write.bytes", monitoring.Report)
+	WriteErrors = monitoring.NewInt(Metrics, "write.errors", monitoring.Report)
+)
 
 func RegisterOutputPlugin(name string, builder OutputBuilder) {
 	outputsPlugins[name] = builder
