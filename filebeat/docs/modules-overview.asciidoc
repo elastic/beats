@@ -10,7 +10,7 @@ A typical module (say, for the Nginx logs) is composed of one ore
 more filesets (in the case of Nginx, `access` and `error`). A fileset contains
 the following:
 
-* Filebeat prospector configurations, which contain the default paths were to
+* Filebeat prospector configurations, which contain the default paths where to
   look or the log files. These default paths depend on the operating system.
   The Filebeat configuration is also responsible with stitching together
   multiline events when needed.
@@ -45,6 +45,8 @@ Elasticsearch home path:
 $ sudo bin/elasticsearch-plugin install ingest-geoip
 $ sudo bin/elasticsearch-plugin install ingest-user-agent
 ----------------------------------------------------------------------
+
+You need to restart Elasticsearch after running these commands.
 
 If you are using an https://cloud.elastic.co/[Elastic Cloud] instance, you can
 enable the two plugins from the configuration page.
