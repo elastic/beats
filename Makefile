@@ -7,6 +7,7 @@ PROJECTS_ENV=libbeat filebeat metricbeat
 SNAPSHOT?=yes
 PYTHON_ENV?=${BUILD_DIR}/python-env
 VIRTUALENV_PARAMS?=
+FIND=find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
@@ -60,7 +61,7 @@ clean-vendor:
 check: python-env
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
 	# Checks also python files which are not part of the beats
-	find . -type f -name *.py -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*" -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	${FIND} -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	# Validate that all updates were committed
 	$(MAKE) update
 	git update-index --refresh
@@ -70,7 +71,7 @@ check: python-env
 .PHONY: misspell
 misspell:
 	go get github.com/client9/misspell
-	find . -type f -name '*' -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*" -exec misspell -w {} \;
+	${FIND} -name '*'  -exec misspell -w {} \;
 
 .PHONY: fmt
 fmt: python-env
