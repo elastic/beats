@@ -165,6 +165,7 @@ func (r *msgRef) callback(seq uint32, err error) {
 
 func (r *msgRef) done(n uint32) {
 	ackedEvents.Add(int64(n))
+	outputs.AckedEvents.Add(int64(n))
 	r.batch = r.batch[n:]
 	r.win.tryGrowWindow(r.batchSize)
 	r.dec()
@@ -172,6 +173,7 @@ func (r *msgRef) done(n uint32) {
 
 func (r *msgRef) fail(n uint32, err error) {
 	ackedEvents.Add(int64(n))
+	outputs.AckedEvents.Add(int64(n))
 	r.err = err
 	r.batch = r.batch[n:]
 	r.win.shrinkWindow()

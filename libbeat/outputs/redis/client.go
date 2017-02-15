@@ -10,6 +10,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -17,6 +18,11 @@ import (
 
 var (
 	versionRegex = regexp.MustCompile(`redis_version:(\d+).(\d+)`)
+)
+
+var (
+	ackedEvents    = monitoring.NewInt(outputs.Metrics, "redis.events.acked")
+	eventsNotAcked = monitoring.NewInt(outputs.Metrics, "redis.events.not_acked")
 )
 
 type publishFn func(
@@ -186,7 +192,10 @@ func publishEventsBulk(conn redis.Conn, key outil.Selector, command string, code
 		if err != nil {
 			logp.Err("Failed to %v to redis list with %v", command, err)
 			return data, err
+
 		}
+		ackedEvents.Add(int64(len(data)))
+		outputs.AckedEvents.Add(int64(len(data)))
 
 		return nil, nil
 	}
@@ -239,6 +248,9 @@ func publishEventsPipeline(conn redis.Conn, command string, codec outputs.Codec)
 				}
 			}
 		}
+		ackedEvents.Add(int64(len(okEvents) - len(failed)))
+		outputs.AckedEvents.Add(int64(len(okEvents) - len(failed)))
+		eventsNotAcked.Add(int64(len(failed)))
 		return failed, lastErr
 	}
 }
