@@ -234,12 +234,14 @@ func (r *msgRef) dec() {
 		eventsNotAcked.Add(int64(failed))
 		if success > 0 {
 			ackedEvents.Add(int64(success))
+			outputs.AckedEvents.Add(int64(success))
 		}
 
 		debugf("Kafka publish failed with: %v", err)
 		r.cb(r.failed, err)
 	} else {
 		ackedEvents.Add(int64(r.total))
+		outputs.AckedEvents.Add(int64(r.total))
 		r.cb(nil, nil)
 	}
 }
