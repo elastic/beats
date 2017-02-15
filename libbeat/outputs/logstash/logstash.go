@@ -84,6 +84,8 @@ func (lj *logstash) init(cfg *common.Config) error {
 			Write:       statWriteBytes,
 			ReadErrors:  statReadErrors,
 			WriteErrors: statWriteErrors,
+			SendBytes:   outputs.SendBytes,
+			Failures:    outputs.Failures,
 		},
 	}
 

@@ -136,6 +136,8 @@ func NewClient(
 		Write:       statWriteBytes,
 		ReadErrors:  statReadErrors,
 		WriteErrors: statWriteErrors,
+		SendBytes:   outputs.SendBytes,
+		Failures:    outputs.Failures,
 	}
 	dialer = transport.StatsDialer(dialer, iostats)
 	tlsDialer = transport.StatsDialer(tlsDialer, iostats)
@@ -265,6 +267,7 @@ func (client *Client) PublishEvents(
 	}
 
 	ackedEvents.Add(int64(len(data) - len(failedEvents)))
+	outputs.AckedEvents.Add(int64(len(data) - len(failedEvents)))
 	eventsNotAcked.Add(int64(len(failedEvents)))
 	if len(failedEvents) > 0 {
 		if sendErr == nil {
