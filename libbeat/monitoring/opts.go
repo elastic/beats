@@ -31,7 +31,16 @@ func Report(o options) options {
 	return o
 }
 
-func varOpts(regOpts *options, opts []Option) options {
+func DoNotReport(o options) options {
+	o.mode = Full
+	return o
+}
+
+func varOpts(regOpts *options, opts []Option) *options {
+	if regOpts != nil && len(opts) == 0 {
+		return regOpts
+	}
+
 	O := defaultOptions
 	if regOpts != nil {
 		O = *regOpts
@@ -40,7 +49,7 @@ func varOpts(regOpts *options, opts []Option) options {
 	for _, opt := range opts {
 		O = opt(O)
 	}
-	return O
+	return &O
 }
 
 func applyOpts(in *options, opts []Option) *options {

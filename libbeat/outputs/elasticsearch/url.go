@@ -9,7 +9,7 @@ import (
 
 // Creates the url based on the url configuration.
 // Adds missing parts with defaults (scheme, host, port)
-func getURL(defaultScheme string, defaultPath string, rawURL string) (string, error) {
+func MakeURL(defaultScheme string, defaultPath string, rawURL string) (string, error) {
 
 	if defaultScheme == "" {
 		defaultScheme = "http"
@@ -113,4 +113,20 @@ func makePath(index string, docType string, id string) (string, error) {
 		}
 	}
 	return path, nil
+}
+
+// TODO: make this reusable. Same definition in elasticsearch monitoring module
+func parseProxyURL(raw string) (*url.URL, error) {
+	if raw == "" {
+		return nil, nil
+	}
+
+	url, err := url.Parse(raw)
+	if err == nil && strings.HasPrefix(url.Scheme, "http") {
+		return url, err
+	}
+
+	// Proxy was bogus. Try prepending "http://" to it and
+	// see if that parses correctly.
+	return url.Parse("http://" + raw)
 }
