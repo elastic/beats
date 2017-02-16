@@ -31,6 +31,7 @@ type Process struct {
 	Cpu      sigar.ProcTime
 	Ctime    time.Time
 	FD       sigar.ProcFDUsage
+	Cwd      string `json:"cwd"`
 }
 
 type ProcStats struct {
