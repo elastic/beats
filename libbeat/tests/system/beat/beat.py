@@ -408,7 +408,7 @@ class TestCase(unittest.TestCase):
                     dictfields.extend(subdictfields)
                 else:
                     fields.append(newName)
-                    if field.get("type") in ["dict", "geo_point"]:
+                    if field.get("type") in ["object", "geo_point"]:
                         dictfields.append(newName)
             return fields, dictfields
 

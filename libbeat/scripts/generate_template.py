@@ -252,10 +252,15 @@ def fill_field_properties(args, field, defaults, path):
             properties[field["name"]]["scaling_factor"] = \
                 field.get("scaling_factor", 1000)
 
-    elif field["type"] in ["dict", "list"]:
-        if field.get("dict-type") == "text":
+    elif field["type"] in ["array"]:
+        properties[field["name"]] = {
+            "properties": {}
+        }
+
+    elif field["type"] in ["object"]:
+        if field.get("object-type") == "text":
             # add a dynamic template to set all members of
-            # the dict as text
+            # the object as text
             if len(path) > 0:
                 name = path + "." + field["name"]
             else:
@@ -283,7 +288,7 @@ def fill_field_properties(args, field, defaults, path):
                     }
                 })
 
-        if field.get("dict-type") == "long":
+        if field.get("object-type") == "long":
             if len(path) > 0:
                 name = path + "." + field["name"]
             else:

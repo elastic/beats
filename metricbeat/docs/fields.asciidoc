@@ -409,7 +409,7 @@ Arbitrary tags that can be set per Beat and per transaction type.
 [float]
 === fields
 
-type: dict
+type: object
 
 Contains user configurable fields.
 
@@ -1335,7 +1335,7 @@ Size of the files that have been created or changed since creation.
 [float]
 === docker.container.labels
 
-type: dict
+type: object
 
 Image labels.
 
@@ -1343,7 +1343,7 @@ Image labels.
 [float]
 === docker.container.tags
 
-type: list
+type: array
 
 Image tags.
 
@@ -1574,7 +1574,7 @@ Total size of the all cached images associated to the current image.
 [float]
 === docker.image.labels
 
-type: dict
+type: object
 
 Image labels.
 
@@ -1582,7 +1582,7 @@ Image labels.
 [float]
 === docker.image.tags
 
-type: list
+type: array
 
 Image tags.
 
@@ -2990,7 +2990,7 @@ Leader id (broker).
 [float]
 === kafka.partition.partition.isr
 
-type: list
+type: array
 
 List of isr ids.
 
@@ -6313,7 +6313,7 @@ The username of the user that created the process. If the username cannot be det
 [float]
 === system.process.env
 
-type: dict
+type: object
 
 The environment variables used to start the process. The data is available on FreeBSD, Linux, and OS X.
 
@@ -6597,7 +6597,7 @@ CPU time consumed by tasks in user (kernel) mode.
 [float]
 === system.process.cgroup.cpuacct.percpu
 
-type: dict
+type: object
 
 CPU time (in nanoseconds) consumed on each CPU by all tasks in this cgroup.
 
