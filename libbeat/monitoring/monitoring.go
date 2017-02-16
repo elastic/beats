@@ -4,6 +4,7 @@ import "errors"
 
 type Mode uint8
 
+//go:generate stringer -type=Mode
 const (
 	// Reported mode, is lowest report level with most basic metrics only
 	Reported Mode = iota
