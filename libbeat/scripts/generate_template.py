@@ -30,16 +30,16 @@ def fields_to_es_template(args, input, output, index, version):
         print("fields.yml is empty. Cannot generate template.")
         return
 
-    # Each template needs defaults
-    if "defaults" not in docs.keys():
-        print("No defaults are defined. Each template needs at" +
-              " least defaults defined.")
-        return
+    defaults = {
+        "type": "keyword",
+        "required": False,
+        "index": True,
+        "doc_values": True,
+        "ignore_above": 1024,
+    }
 
-    defaults = docs["defaults"]
-
-    for k, section in enumerate(docs["fields"]):
-        docs["fields"][k] = dedot(section)
+    for k, section in enumerate(docs):
+        docs[k] = dedot(section)
 
     # skeleton
     template = {
@@ -105,9 +105,8 @@ def fields_to_es_template(args, input, output, index, version):
             }
         })
 
-    for section in docs["fields"]:
-        prop, dynamic = fill_section_properties(args, section,
-                                                defaults, "")
+    for section in docs:
+        prop, dynamic = fill_section_properties(args, section, defaults, "")
         properties.update(prop)
         dynamic_templates.extend(dynamic)
 

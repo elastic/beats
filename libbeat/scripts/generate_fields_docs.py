@@ -84,7 +84,7 @@ grouped in the following categories:
 
     # Create sections from available fields
     sections = {}
-    for v in docs["fields"]:
+    for v in docs:
         sections[v["key"]] = v["title"]
 
     for key in sorted(sections):
@@ -92,7 +92,7 @@ grouped in the following categories:
     output.write("\n--\n")
 
     # Sort alphabetically by key
-    for section in sorted(docs["fields"], key=lambda field: field["key"]):
+    for section in sorted(docs, key=lambda field: field["key"]):
         section["name"] = section["title"]
         section["anchor"] = section["key"]
         document_fields(output, section, sections, "")
