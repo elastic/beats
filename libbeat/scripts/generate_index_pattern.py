@@ -97,7 +97,7 @@ def fields_to_index_pattern(args, input):
 
     }
 
-    for k, section in enumerate(docs["fields"]):
+    for k, section in enumerate(docs):
         fields_to_json(section, "", output)
 
     # add meta fields
@@ -149,9 +149,10 @@ if __name__ == "__main__":
     with open(fields_yml, 'r') as f:
         fields = f.read()
 
-        # Prepend beat fields from libbeat
-        with open(args.libbeat + "/_meta/fields.generated.yml") as f:
-            fields = f.read() + fields
+        if os.path.basename(args.beat) != "libbeat":
+            # Prepend beat fields from libbeat
+            with open(args.libbeat + "/_meta/fields.generated.yml") as f:
+                fields = f.read() + fields
 
         # with open(target, 'w') as output:
         output = fields_to_index_pattern(args, fields)
