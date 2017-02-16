@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
+        "host": "mysql:3306",
         "module": "mysql",
         "name": "status",
         "rtt": 115
@@ -13,8 +13,8 @@
     "mysql": {
         "status": {
             "aborted": {
-                "clients": 13,
-                "connects": 16
+                "clients": 4,
+                "connects": 2
             },
             "binlog": {
                 "cache": {
@@ -23,10 +23,16 @@
                 }
             },
             "bytes": {
-                "received": 2100,
-                "sent": 92281
+                "received": 992,
+                "sent": 40657
             },
-            "connections": 33,
+            "command": {
+              "delete": 0,
+              "insert": 0,
+              "select": 9,
+              "update": 0
+            },
+            "connections": 11,
             "created": {
                 "tmp": {
                     "disk_tables": 0,
@@ -40,13 +46,19 @@
                 "writes": 0
             },
             "flush_commands": 1,
-            "max_used_connections": 2,
+            "max_used_connections": 3,
             "open": {
                 "files": 14,
                 "streams": 0,
-                "tables": 106
+                "tables": 103
             },
-            "opened_tables": 113
+            "opened_tables": 110,
+            "threads": {
+                "cached": 0,
+                "connected": 3,
+                "created": 3,
+                "running": 1
+            }
         }
     },
     "type": "metricsets"

@@ -1,4 +1,4 @@
-##################$$$###### Filebeat Configuration ############################
+######################## Filebeat Configuration ############################
 
 # This file is a full configuration example documenting all non-deprecated
 # options in comments. For a shorter configuration example, that contains only
@@ -6,6 +6,113 @@
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/filebeat/index.html
+
+
+#==========================  Modules configuration ============================
+filebeat.modules:
+
+#------------------------------- System Module -------------------------------
+#- module: system
+  # Syslog
+  #syslog:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+#------------------------------- Apache2 Module ------------------------------
+#- module: apache2
+  # Access logs
+  #access:
+    #enabled: true
+
+    # Ingest Node pipeline to use. Options are `with_plugins` (default)
+    # and `no_plugins`. Use `no_plugins` if you don't have the geoip or
+    # the user agent Node ingest plugins installed.
+    #var.pipeline: with_plugins
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+  # Error logs
+  #error:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+#-------------------------------- MySQL Module -------------------------------
+#- module: mysql
+  # Error logs
+  #error:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+  # Slow logs
+  #slowlog:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+#-------------------------------- Nginx Module -------------------------------
+#- module: nginx
+  # Access logs
+  #access:
+    #enabled: true
+
+    # Ingest Node pipeline to use. Options are `with_plugins` (default)
+    # and `no_plugins`. Use `no_plugins` if you don't have the geoip or
+    # the user agent Node ingest plugins installed.
+    #var.pipeline: with_plugins
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
+  # Error logs
+  #error:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
 
 #=========================== Filebeat prospectors =============================
 
@@ -143,7 +250,11 @@ filebeat.prospectors:
   # this can mean that the first entries of a new file are skipped.
   #tail_files: false
 
-  # Experimental: If symlinks is enabled, symlinks are opened and harvested. The harvester is openening the
+  # The Ingest Node pipeline ID associated with this prospector. If this is set, it
+  # overwrites the pipeline option from the Elasticsearch output.
+  #pipeline:
+
+  # If symlinks is enabled, symlinks are opened and harvested. The harvester is openening the
   # original for harvesting but will report the symlink name as source.
   #symlinks: false
 
@@ -165,7 +276,7 @@ filebeat.prospectors:
   # The backoff value will be multiplied each time with the backoff_factor until max_backoff is reached
   #backoff_factor: 2
 
-  # Experimental: Max number of harvesters that are started in parallel.
+  # Max number of harvesters that are started in parallel.
   # Default is 0 which means unlimited
   #harvester_limit: 0
 
@@ -204,6 +315,9 @@ filebeat.prospectors:
   # By default this option is disabled.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_timeout: 0
+
+  # Defines if prospectors is enabled
+  #enabled: true
 
 #----------------------------- Stdin prospector -------------------------------
 # Configuration to use stdin input
@@ -347,6 +461,10 @@ output.elasticsearch:
 
   # Optional HTTP Path
   #path: "/elasticsearch"
+
+  # Custom HTTP headers to add to each request
+  #headers:
+  #  X-My-Header: Contents of the header
 
   # Proxy server url
   #proxy_url: http://proxy:3128
@@ -778,6 +896,45 @@ output.elasticsearch:
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag.
+#dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#dashboards.url:
+
+# The directory from where to read the dashboards. It is used instead of the URL
+# when it has a value.
+#dashboards.directory:
+
+# The file archive (zip file) from where to read the dashboards. It is used instead
+# of the URL when it has a value.
+#dashboards.file:
+
+# If this option is enabled, the snapshot URL is used instead of the default URL.
+#dashboard.snapshot: false
+
+# The URL from where to download the snapshot version of the dashboards. By default
+# this has a value which is computed based on the Beat name and version.
+#dashboard.snapshot_url
+
+# In case the archive contains the dashboards from multiple Beats, this lets you
+# select which one to load. You can load all the dashboards in the archive by
+# setting this to the empty string.
+#dashboard.beat: filebeat
+
+# The name of the Kibana index to use for setting the configuration. Default is ".kibana"
+#dashboards.kibana_index: .kibana
+
+# The Elasticsearch index name. This overwrites the index name defined in the
+# dashboards and index pattern. Example: testbeat-*
+#dashboards.index:
 
 #================================ Logging ======================================
 # There are three options for the log output: syslog, file, stderr.

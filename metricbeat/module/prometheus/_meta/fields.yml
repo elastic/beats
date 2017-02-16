@@ -1,0 +1,12 @@
+- key: prometheus
+  title: "Prometheus"
+  description: >
+    beta[]
+    
+    Stats collected from Prometheus.
+  short_config: false
+  fields:
+    - name: prometheus
+      type: group
+      description: >
+      fields:

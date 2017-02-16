@@ -2,78 +2,88 @@ version: '2'
 services:
   beat:
     build: ${PWD}/.
-    links:
-      - apache
-      - filebeat
-      - mongodb
-      - mysql
-      - nginx
-      - postgresql
-      - redis
-      - zookeeper
-      - haproxy
     environment:
-      - APACHE_HOST=apache
-      - APACHE_PORT=80
-      - FILEBEAT_HOST=filebeat
-      - FILEBEAT_PORT=6060
-      - NGINX_HOST=nginx
-      - NGINX_PORT=80
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - MONGODB_HOST=mongodb
-      - MONGODB_PORT=27017
-      - MYSQL_DSN=root:test@tcp(mysql:3306)/
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
-      - POSTGRESQL_DSN=postgres://postgresql:5432?sslmode=disable
-      - POSTGRESQL_HOST=postgresql
-      - POSTGRESQL_PORT=5432
-      - POSTGRESQL_USERNAME=postgres
-      - ZOOKEEPER_HOST=zookeeper
-      - ZOOKEEPER_PORT=2181
-      - HAPROXY_HOST=haproxy
-      - HAPROXY_PORT=14567
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/metricbeat
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
+      # This is required for the docker module tests
+      - /var/run/docker.sock:/var/run/docker.sock
     command: make
     entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
 
-  # Overloading kibana with a simple image as it is not needed here
-  kibana:
-    build:
-      context: ${PWD}/../testing/environments/
-      dockerfile: Dockerfile
+    # Module specific dependencies
+    depends_on:
+      - apache
+      - ceph
+      - couchbase
+      - haproxy
+      - jolokia
+      - kafka
+      - mongodb
+      - mysql
+      - nginx
+      - phpfpm
+      - postgresql
+      - prometheus
+      - redis
+      - zookeeper
+
+    env_file:
+      - ${PWD}/module/apache/_meta/env
+      - ${PWD}/module/ceph/_meta/env
+      - ${PWD}/module/couchbase/_meta/env
+      - ${PWD}/module/haproxy/_meta/env
+      - ${PWD}/module/jolokia/_meta/env
+      - ${PWD}/module/kafka/_meta/env
+      - ${PWD}/module/mongodb/_meta/env
+      - ${PWD}/module/mysql/_meta/env
+      - ${PWD}/module/nginx/_meta/env
+      - ${PWD}/module/php_fpm/_meta/env
+      - ${PWD}/module/postgresql/_meta/env
+      - ${PWD}/module/prometheus/_meta/env
+      - ${PWD}/module/redis/_meta/env
+      - ${PWD}/module/zookeeper/_meta/env
 
   # Modules
   apache:
     build: ${PWD}/module/apache/_meta
 
-  filebeat:
-    build: ${PWD}/module/beats/filebeat/_meta
+  ceph:
+    build: ${PWD}/module/ceph/_meta
 
-  mongodb:
-    image: mongo:3.0
-
-  mysql:
-    image: mysql:5.7.12
-    environment:
-      - MYSQL_ROOT_PASSWORD=test
-
-  nginx:
-    build: ${PWD}/module/nginx/_meta
+  couchbase:
+    build: ${PWD}/module/couchbase/_meta
 
   haproxy:
     build: ${PWD}/module/haproxy/_meta
 
+  jolokia:
+    build: ${PWD}/module/jolokia/_meta
+
+  kafka:
+    build: ${PWD}/module/kafka/_meta
+
+  mongodb:
+    build: ${PWD}/module/mongodb/_meta
+
+  mysql:
+    build: ${PWD}/module/mysql/_meta
+
+  nginx:
+    build: ${PWD}/module/nginx/_meta
+
+  phpfpm:
+    build: ${PWD}/module/php_fpm/_meta
+
   postgresql:
-    image: postgres:9.5.3
+    build: ${PWD}/module/postgresql/_meta
+
+  prometheus:
+    build: ${PWD}/module/prometheus/_meta
 
   redis:
-    image: redis:3.2.4-alpine
+    build: ${PWD}/module/redis/_meta
 
   zookeeper:
-    image: jplock/zookeeper:3.4.8
-
+    build: ${PWD}/module/zookeeper/_meta

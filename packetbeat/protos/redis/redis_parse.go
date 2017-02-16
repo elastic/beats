@@ -15,26 +15,26 @@ type parser struct {
 }
 
 type redisMessage struct {
-	Ts time.Time
+	ts time.Time
 
-	TCPTuple     common.TCPTuple
-	CmdlineTuple *common.CmdlineTuple
-	Direction    uint8
+	tcpTuple     common.TCPTuple
+	cmdlineTuple *common.CmdlineTuple
+	direction    uint8
 
-	IsRequest bool
-	IsError   bool
-	Size      int
-	Message   common.NetString
-	Method    common.NetString
-	Path      common.NetString
+	isRequest bool
+	isError   bool
+	size      int
+	message   common.NetString
+	method    common.NetString
+	path      common.NetString
 
 	next *redisMessage
 }
 
 const (
-	Start = iota
-	BulkArray
-	SimpleMessage
+	start = iota
+	bulkArray
+	simpleMessage
 )
 
 var (
@@ -259,9 +259,9 @@ func (p *parser) parse(buf *streambuf.Buffer) (bool, bool) {
 		return ok, complete
 	}
 
-	p.message.IsError = iserror
-	p.message.Size = buf.BufferConsumed()
-	p.message.Message = content
+	p.message.isError = iserror
+	p.message.size = buf.BufferConsumed()
+	p.message.message = content
 	return true, true
 }
 
@@ -411,10 +411,10 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString,
 
 	// handle top-level request command
 	if depth == 0 && isRedisCommand(content[0]) {
-		p.message.IsRequest = true
-		p.message.Method = content[0]
+		p.message.isRequest = true
+		p.message.method = content[0]
 		if len(content) > 1 {
-			p.message.Path = content[1]
+			p.message.path = content[1]
 		}
 
 		var value common.NetString

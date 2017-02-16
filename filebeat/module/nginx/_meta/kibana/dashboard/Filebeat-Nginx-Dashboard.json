@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Filebeat Nginx Dashboard", 
+  "uiStateJSON": "{\"P-4\":{\"vis\":{\"legendOpen\":true}},\"P-8\":{\"mapCenter\":[50.51342652633956,-0.17578125]}}", 
+  "panelsJSON": "[{\"col\":9,\"id\":\"Errors-over-time\",\"panelIndex\":2,\"row\":4,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nginx-Access-Browsers\",\"panelIndex\":3,\"row\":10,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Nginx-Access-OSes\",\"panelIndex\":4,\"row\":10,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"New-Visualization\",\"panelIndex\":5,\"row\":4,\"size_x\":8,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nginx-Access-Response-codes-by-top-URLs\",\"panelIndex\":6,\"row\":7,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Sent-sizes\",\"panelIndex\":7,\"row\":10,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"id\":\"Nginx-Access-Map\",\"type\":\"visualization\",\"panelIndex\":8,\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":1}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

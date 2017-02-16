@@ -1,6 +1,6 @@
 = Packetbeat Reference
 
-include::./version.asciidoc[]
+include::../../libbeat/docs/version.asciidoc[]
 
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
 :packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
@@ -9,7 +9,7 @@ include::./version.asciidoc[]
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
 :elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
 :logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/x-pack/5.0
+:securitydoc: https://www.elastic.co/guide/en/x-pack/5.2
 :kibanadoc: https://www.elastic.co/guide/en/kibana/{doc-branch}
 :plugindoc: https://www.elastic.co/guide/en/elasticsearch/plugins/{doc-branch}
 :version: {stack-version}
@@ -20,6 +20,7 @@ include::./version.asciidoc[]
 include::./overview.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
+
 
 include::./command-line.asciidoc[]
 

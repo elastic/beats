@@ -1,38 +1,36 @@
 package network
 
 import (
-	dc "github.com/fsouza/go-dockerclient"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
+
+	dc "github.com/fsouza/go-dockerclient"
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("docker", "network", New); err != nil {
+	if err := mb.Registry.AddMetricSet("docker", "network", New, docker.HostParser); err != nil {
 		panic(err)
 	}
 }
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	netService   *NETService
+	netService   *NetService
 	dockerClient *dc.Client
 }
 
-// New create a new instance of the docker network MetricSet
+// New creates a new instance of the docker network MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	logp.Warn("BETA: The docker network metricset is beta")
 
-	logp.Warn("EXPERIMENTAL: The network metricset is experimental")
-
-	config := docker.GetDefaultConf()
-
+	config := docker.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	client, err := docker.NewDockerClient(&config)
+	client, err := docker.NewDockerClient(base.HostData().URI, config)
 	if err != nil {
 		return nil, err
 	}
@@ -40,20 +38,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		dockerClient:  client,
-		netService: &NETService{
-			NetworkStatPerContainer: make(map[string]map[string]NETRaw),
+		netService: &NetService{
+			NetworkStatPerContainer: make(map[string]map[string]NetRaw),
 		},
 	}, nil
 }
 
-// Fetch methods creates a list of network events for each container
+// Fetch methods creates a list of network events for each container.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
 	stats, err := docker.FetchStats(m.dockerClient)
 	if err != nil {
 		return nil, err
 	}
 
-	formatedStats := m.netService.getNetworkStatsPerContainer(stats)
-	return eventsMapping(formatedStats), nil
+	formattedStats := m.netService.getNetworkStatsPerContainer(stats)
+	return eventsMapping(formattedStats), nil
 }

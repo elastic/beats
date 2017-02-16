@@ -5,10 +5,10 @@ import (
 	"time"
 )
 
-var oldNetRaw = make([]NETRaw, 3)
-var newNetRaw = make([]NETRaw, 3)
-var netService = &NETService{
-	NetworkStatPerContainer: make(map[string]map[string]NETRaw),
+var oldNetRaw = make([]NetRaw, 3)
+var newNetRaw = make([]NetRaw, 3)
+var netService = &NetService{
+	NetworkStatPerContainer: make(map[string]map[string]NetRaw),
 }
 
 func TestGetRxBytesPerSecond(t *testing.T) {
@@ -20,8 +20,8 @@ func TestGetRxBytesPerSecond(t *testing.T) {
 		newNetRaw[index].RxBytes = newRxBytes[index]
 	}
 	rxBytesTest := []struct {
-		givenOld NETRaw
-		givenNew NETRaw
+		givenOld NetRaw
+		givenNew NetRaw
 		expected float64
 	}{
 		{oldNetRaw[0], newNetRaw[0], 50},
@@ -35,8 +35,8 @@ func TestGetRxBytesPerSecond(t *testing.T) {
 		}
 	}
 }
-func TestGetRxDroppedPerSeconde(t *testing.T) {
 
+func TestGetRxDroppedPerSeconde(t *testing.T) {
 	oldRxDroppedBytes := []uint64{40, 645789, 0}
 	newRxDroppedBytes := []uint64{240, 12345, 0}
 	for index := range oldNetRaw {
@@ -45,8 +45,8 @@ func TestGetRxDroppedPerSeconde(t *testing.T) {
 		newNetRaw[index].RxDropped = newRxDroppedBytes[index]
 	}
 	rxDroppedTest := []struct {
-		givenOld NETRaw
-		givenNew NETRaw
+		givenOld NetRaw
+		givenNew NetRaw
 		expected float64
 	}{
 		{oldNetRaw[0], newNetRaw[0], 100},
@@ -70,8 +70,8 @@ func TestGetRxPacketsPerSeconde(t *testing.T) {
 		newNetRaw[index].RxPackets = newRxPacketsBytes[index]
 	}
 	rxPacketTest := []struct {
-		givenOld NETRaw
-		givenNew NETRaw
+		givenOld NetRaw
+		givenNew NetRaw
 		expected float64
 	}{
 		{oldNetRaw[0], newNetRaw[0], 50},
@@ -95,8 +95,8 @@ func TestGetRxErrorsPerSeconde(t *testing.T) {
 		newNetRaw[index].RxErrors = newRxErrorsBytes[index]
 	}
 	rxPacketTest := []struct {
-		givenOld NETRaw
-		givenNew NETRaw
+		givenOld NetRaw
+		givenNew NetRaw
 		expected float64
 	}{
 		{oldNetRaw[0], newNetRaw[0], 0},
@@ -120,8 +120,8 @@ func TestGetTxBytesPerSecond(t *testing.T) {
 		newNetRaw[index].TxBytes = newTxBytes[index]
 	}
 	txBytesTest := []struct {
-		givenOld NETRaw
-		givenNew NETRaw
+		givenOld NetRaw
+		givenNew NetRaw
 		expected float64
 	}{
 		{oldNetRaw[0], newNetRaw[0], 0},
@@ -135,6 +135,7 @@ func TestGetTxBytesPerSecond(t *testing.T) {
 		}
 	}
 }
+
 func TestGetTxDroppedPerSeconde(t *testing.T) {
 	oldTxDropped := []uint64{0, 5, 1236}
 	newTxDropped := []uint64{0, 15, 569}
@@ -144,8 +145,8 @@ func TestGetTxDroppedPerSeconde(t *testing.T) {
 		newNetRaw[index].TxDropped = newTxDropped[index]
 	}
 	txDroppedTest := []struct {
-		givenOld NETRaw
-		givenNew NETRaw
+		givenOld NetRaw
+		givenNew NetRaw
 		expected float64
 	}{
 		{oldNetRaw[0], newNetRaw[0], 0},
@@ -169,8 +170,8 @@ func TestGetTxPacketsPerSeconde(t *testing.T) {
 		newNetRaw[index].TxPackets = newTxPacket[index]
 	}
 	txPacketTest := []struct {
-		givenOld NETRaw
-		givenNew NETRaw
+		givenOld NetRaw
+		givenNew NetRaw
 		expected float64
 	}{
 		{oldNetRaw[0], newNetRaw[0], 1000},
@@ -184,8 +185,8 @@ func TestGetTxPacketsPerSeconde(t *testing.T) {
 		}
 	}
 }
-func TestGetTxErrorsPerSecond(t *testing.T) {
 
+func TestGetTxErrorsPerSecond(t *testing.T) {
 	oldTxErrors := []uint64{995, 0, 30}
 	newTxErrors := []uint64{1995, 0, 10}
 	for index := range oldNetRaw {
@@ -194,8 +195,8 @@ func TestGetTxErrorsPerSecond(t *testing.T) {
 		newNetRaw[index].TxErrors = newTxErrors[index]
 	}
 	txErrorsTest := []struct {
-		givenOld NETRaw
-		givenNew NETRaw
+		givenOld NetRaw
+		givenNew NetRaw
 		expected float64
 	}{
 		{oldNetRaw[0], newNetRaw[0], 500},

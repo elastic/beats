@@ -1,17 +1,16 @@
-# TODO: Currently ports and labels are not added to the template yet
 - name: container
   type: group
   description: >
-    Docker container metrics
+    Docker container metrics.
   fields:
     - name: command
       type: keyword
       description: >
-        Executed command in docker container.
+        Command that was executed in the Docker container.
     - name: created
       type: date
       description: >
-        Date then the container was created.
+        Date when the container was created.
     - name: id
       type: keyword
       description: >
@@ -40,4 +39,13 @@
         - name: rw
           type: long
           description: >
-             Size of the files which have been created or changed since creation.
+             Size of the files that have been created or changed since creation.
+    - name: labels
+      type: object
+      object-type: keyword
+      description: >
+        Image labels.
+    - name: tags
+      type: array
+      description: >
+        Image tags.

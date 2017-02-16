@@ -1,0 +1,1 @@
+type 'string' is not supported on top level of config, only dictionary or list (source:'test.source')

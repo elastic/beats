@@ -13,7 +13,6 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 * <<configuration-protocols>>
 * <<configuration-processes>>
 * <<configuration-general>>
-* <<configuration-processors>>
 * <<elasticsearch-output>>
 * <<logstash-output>>
 * <<kafka-output>>
@@ -22,8 +21,10 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 * <<console-output>>
 * <<configuration-output-ssl>>
 * <<configuration-path>>
+* <<configuration-dashboards>>
 * <<configuration-logging>>
 * <<configuration-run-options>>
+* <<configuration-processors>>
 
 NOTE: Packetbeat maintains a real-time topology map of all the servers in your network.
 See <<maintaining-topology>> for more details.

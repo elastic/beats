@@ -13,7 +13,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig())
+	f := mbtest.NewEventFetcher(t, getConfig(false))
 	event, err := f.Fetch()
 	if !assert.NoError(t, err) {
 		t.FailNow()
@@ -34,8 +34,32 @@ func TestFetch(t *testing.T) {
 	assert.True(t, openStreams == 0)
 }
 
+func TestFetchRaw(t *testing.T) {
+	f := mbtest.NewEventFetcher(t, getConfig(true))
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+	// Check event fields
+	cachedThreads := event["threads"].(common.MapStr)["cached"].(int64)
+	assert.True(t, cachedThreads >= 0)
+
+	rawData := event["raw"].(common.MapStr)
+
+	// Make sure field was removed from raw fields as in schema
+	_, exists := rawData["Threads_cached"]
+	assert.False(t, exists)
+
+	// Check a raw field if it is available
+	_, exists = rawData["Slow_launch_threads"]
+	assert.True(t, exists)
+}
+
 func TestData(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig())
+	f := mbtest.NewEventFetcher(t, getConfig(false))
 
 	err := mbtest.WriteEvent(f, t)
 	if err != nil {
@@ -43,10 +67,11 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(raw bool) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "mysql",
 		"metricsets": []string{"status"},
 		"hosts":      []string{mysql.GetMySQLEnvDSN()},
+		"raw":        raw,
 	}
 }

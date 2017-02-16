@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
 
 	"github.com/elastic/gosigar/cgroup"
@@ -18,7 +19,7 @@ import (
 var debugf = logp.MakeDebug("system-process")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "process", New); err != nil {
+	if err := mb.Registry.AddMetricSet("system", "process", New, parse.EmptyHostParser); err != nil {
 		panic(err)
 	}
 }
@@ -33,13 +34,12 @@ type MetricSet struct {
 // New creates and returns a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
-		Procs   []string `config:"processes"` // collect all processes by default
-		Cgroups bool     `config:"cgroups"`
+		Procs        []string `config:"processes"`
+		Cgroups      *bool    `config:"process.cgroups.enabled"`
+		EnvWhitelist []string `config:"process.env.whitelist"`
 	}{
-		Procs:   []string{".*"},
-		Cgroups: false,
+		Procs: []string{".*"}, // collect all processes by default
 	}
-
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -47,8 +47,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	m := &MetricSet{
 		BaseMetricSet: base,
 		stats: &ProcStats{
-			ProcStats: true,
-			Procs:     config.Procs,
+			Procs:        config.Procs,
+			EnvWhitelist: config.EnvWhitelist,
 		},
 	}
 	err := m.stats.InitProcStats()
@@ -62,8 +62,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			return nil, fmt.Errorf("unexpected module type")
 		}
 
-		if config.Cgroups {
-			logp.Warn("EXPERIMENTAL: Cgroup is enabled for the system.process MetricSet.")
+		if config.Cgroups == nil || *config.Cgroups {
+			debugf("process cgroup data collection is enabled")
 			m.cgroup, err = cgroup.NewReader(systemModule.HostFS, true)
 			if err != nil {
 				return nil, errors.Wrap(err, "error initializing cgroup reader")

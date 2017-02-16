@@ -1,5 +1,57 @@
-= Heartbeat Docs
+= Heartbeat Reference
 
-Welcome to the Heartbeat documentation.
+include::../../libbeat/docs/version.asciidoc[]
 
+:libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
+:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
+:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
+:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/x-pack/5.2
+:downloads: https://artifacts.elastic.co/downloads/beats
+:version: {stack-version}
+:beatname_lc: heartbeat
+:beatname_uc: Heartbeat
+:security: X-Pack Security
 
+include::./overview.asciidoc[]
+
+include::./getting-started.asciidoc[]
+
+include::./command-line.asciidoc[]
+
+include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+
+//
+//include::./upgrading.asciidoc[]
+
+//
+//include::./how-heartbeat-works.asciidoc[]
+
+include::./configuring-howto.asciidoc[]
+
+include::./heartbeat-filtering.asciidoc[]
+
+include::../../libbeat/docs/shared-config-ingest.asciidoc[]
+
+//points to shared topic because configuring-logstash.asciidoc is just a wrapper
+include::./configuring-logstash.asciidoc[]
+
+include::../../libbeat/docs/shared-env-vars.asciidoc[]
+
+:allplatforms:
+include::../../libbeat/docs/yaml.asciidoc[]
+
+include::../../libbeat/docs/regexp.asciidoc[]
+
+include::./fields.asciidoc[]
+
+include::./securing-heartbeat.asciidoc[]
+
+include::./troubleshooting.asciidoc[]
+
+include::./faq.asciidoc[]
+
+// 
+//include::./heartbeat-devguide.asciidoc[]

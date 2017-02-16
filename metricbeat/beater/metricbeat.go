@@ -8,15 +8,18 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/module"
 
+	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/pkg/errors"
 )
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done    chan struct{}    // Channel used to initiate shutdown.
-	modules []*ModuleWrapper // Active list of modules.
-	client  publisher.Client // Publisher client.
+	done    chan struct{}     // Channel used to initiate shutdown.
+	modules []*module.Wrapper // Active list of modules.
+	client  publisher.Client  // Publisher client.
+	config  Config
 }
 
 // New creates and returns a new Metricbeat instance.
@@ -25,19 +28,26 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	logp.Info("%s", mb.Registry.String())
 
 	config := Config{}
+
 	err := rawConfig.Unpack(&config)
 	if err != nil {
 		return nil, errors.Wrap(err, "error reading configuration file")
 	}
 
-	modules, err := NewModuleWrappers(config.Modules, mb.Registry)
+	modules, err := module.NewWrappers(config.Modules, mb.Registry)
 	if err != nil {
-		return nil, err
+		// Empty config is fine if dynamic config is enabled
+		if !config.ReloadModules.Enabled() {
+			return nil, err
+		} else if err != mb.ErrEmptyConfig && err != mb.ErrAllModulesDisabled {
+			return nil, err
+		}
 	}
 
 	mb := &Metricbeat{
 		done:    make(chan struct{}),
 		modules: modules,
+		config:  config,
 	}
 	return mb, nil
 }
@@ -49,26 +59,33 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // within the same Module and MetricSet from collection.
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 
-	bt.client = b.Publisher.Connect()
+	var wg sync.WaitGroup
 
-	// Start each module.
-	var cs []<-chan common.MapStr
-	for _, mw := range bt.modules {
-		c := mw.Start(bt.done)
-		cs = append(cs, c)
+	for _, m := range bt.modules {
+		r := module.NewRunner(b.Publisher.Connect, m)
+		r.Start()
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			<-bt.done
+			r.Stop()
+		}()
 	}
 
-	// Consume data from all modules and publish it. When the modules stop they
-	// close their output channels. When all the modules' channels are closed
-	// PublishChannels exit.
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		PublishChannels(bt.client, cs...)
-	}()
+	if bt.config.ReloadModules.Enabled() {
+		logp.Warn("EXPERIMENTAL feature dynamic configuration reloading is enabled.")
+		moduleReloader := cfgfile.NewReloader(bt.config.ReloadModules)
+		factory := module.NewFactory(b.Publisher)
 
-	// Wait for PublishChannels to stop publishing.
+		go moduleReloader.Run(factory)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			<-bt.done
+			moduleReloader.Stop()
+		}()
+	}
+
 	wg.Wait()
 	return nil
 }
@@ -79,6 +96,5 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 // Stop should only be called a single time. Calling it more than once may
 // result in undefined behavior.
 func (bt *Metricbeat) Stop() {
-	bt.client.Close()
 	close(bt.done)
 }

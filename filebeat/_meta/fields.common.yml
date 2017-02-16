@@ -1,0 +1,53 @@
+- key: log
+  title: Log File Content
+  description: >
+    Contains log file lines.
+  fields:
+    - name: source
+      type: keyword
+      required: true
+      description: >
+        The file from which the line was read. This field contains the absolute path to the file.
+        For example: `/var/log/system.log`.
+
+    - name: offset
+      type: long
+      required: false
+      description: >
+        The file offset the reported line starts at.
+
+    - name: message
+      type: text
+      ignore_above: 0
+      required: true
+      description: >
+        The content of the line read from the log file.
+
+    - name: type
+      required: true
+      description: >
+        The name of the log event. This field is set to the value specified for the `document_type` option in the prospector section of the Filebeat config file.
+
+    - name: input_type
+      required: true
+      description: >
+        The input type from which the event was generated. This field is set to the value specified for the `input_type` option in the prospector section of the Filebeat config file.
+
+    - name: error
+      description: >
+        Ingestion pipeline error message, added in case there are errors reported by
+        the Ingest Node in Elasticsearch.
+
+    - name: read_timestamp
+      description: >
+        In case the ingest pipeline parses the timestamp from the log contents, it stores
+        the original `@timestamp` (representing the time when the log line was read) in this
+        field.
+
+    - name: fileset.module
+      description: >
+        The Filebeat module that generated this event.
+
+    - name: fileset.name
+      description: >
+        The Filebeat fileset that generated this event.

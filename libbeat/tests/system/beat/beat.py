@@ -16,6 +16,7 @@ BEAT_REQUIRED_FIELDS = ["@timestamp", "type",
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
+
 class Proc(object):
     """
     Slim wrapper on subprocess.Popen that redirects
@@ -68,7 +69,8 @@ class Proc(object):
 
     def check_wait(self, exit_code=0):
         actual_exit_code = self.wait()
-        assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (exit_code, actual_exit_code)
+        assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (
+            exit_code, actual_exit_code)
         return actual_exit_code
 
     def kill_and_wait(self):
@@ -96,6 +98,7 @@ class Proc(object):
 
 
 class TestCase(unittest.TestCase):
+
     @classmethod
     def setUpClass(self):
 
@@ -201,7 +204,7 @@ class TestCase(unittest.TestCase):
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
-                if len(line) == 0 or line[len(line)-1] != "\n":
+                if len(line) == 0 or line[len(line) - 1] != "\n":
                     # hit EOF
                     break
 
@@ -224,7 +227,7 @@ class TestCase(unittest.TestCase):
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
-                if len(line) == 0 or line[len(line)-1] != "\n":
+                if len(line) == 0 or line[len(line) - 1] != "\n":
                     # hit EOF
                     break
 
@@ -285,7 +288,7 @@ class TestCase(unittest.TestCase):
             logfile = self.beat_name + ".log"
 
         with open(os.path.join(self.working_dir, logfile), 'r') as f:
-            data=f.read()
+            data = f.read()
 
         return data
 
@@ -376,7 +379,7 @@ class TestCase(unittest.TestCase):
                     raise Exception("Unexpected key '{}' found"
                                     .format(key))
 
-    def load_fields(self, fields_doc="../../etc/fields.generated.yml"):
+    def load_fields(self, fields_doc="../../_meta/fields.generated.yml"):
         """
         Returns a list of fields to expect in the output dictionaries
         and a second list that contains the fields that have a
@@ -387,6 +390,10 @@ class TestCase(unittest.TestCase):
         def extract_fields(doc_list, name):
             fields = []
             dictfields = []
+
+            if doc_list is None:
+                return fields, dictfields
+
             for field in doc_list:
 
                 # Chain together names
@@ -401,27 +408,28 @@ class TestCase(unittest.TestCase):
                     dictfields.extend(subdictfields)
                 else:
                     fields.append(newName)
-                    if field.get("type") == "dict":
+                    if field.get("type") in ["object", "geo_point"]:
                         dictfields.append(newName)
             return fields, dictfields
 
         # Not all beats have a fields.generated.yml. Fall back to fields.yml
         if not os.path.isfile(fields_doc):
-            fields_doc = "../../etc/fields.yml"
+            fields_doc = "../../_meta/fields.yml"
 
         # TODO: Make fields_doc path more generic to work with beat-generator
         with open(fields_doc, "r") as f:
             # TODO: Make this path more generic to work with beat-generator.
-            with open("../../../libbeat/_meta/fields.yml") as f2:
+            with open("../../../libbeat/_meta/fields.common.yml") as f2:
                 content = f2.read()
 
+            #content = "fields:\n"
             content += f.read()
             doc = yaml.load(content)
 
             fields = []
             dictfields = []
 
-            for item in doc["fields"]:
+            for item in doc:
                 subfields, subdictfields = extract_fields(item["fields"], "")
                 fields.extend(subfields)
                 dictfields.extend(subdictfields)
@@ -461,3 +469,13 @@ class TestCase(unittest.TestCase):
                 return pred(len([1 for line in f]))
         except IOError:
             return False
+
+    def get_elasticsearch_url(self):
+        """
+        Returns an elasticsearch.Elasticsearch instance built from the
+        env variables like the integration tests.
+        """
+        return "http://{host}:{port}".format(
+            host=os.getenv("ES_HOST", "localhost"),
+            port=os.getenv("ES_PORT", "9200"),
+        )

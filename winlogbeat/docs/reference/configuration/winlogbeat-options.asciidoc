@@ -55,8 +55,11 @@ winlogbeat.event_logs:
 
 ===== event_logs.batch_read_size
 
+experimental[]
+
 The maximum number of event log records to read from the Windows API in a single
-batch. The default batch size is 100. *{vista_and_newer}*
+batch. The default batch size is 100. Most Windows versions return an error if
+the value is larger than 1024. *{vista_and_newer}*
 
 Winlogbeat starts a goroutine (a lightweight thread) to read from each
 individual event log. The goroutine reads a batch of event log records using the
@@ -159,6 +162,38 @@ winlogbeat.event_logs:
   - name: Security
     event_id: 4624, 4625, 4700-4800, -4735
 --------------------------------------------------------------------------------
+
+[WARNING]
+=======================================
+If you specify more that 22 event IDs to include or 22 event IDs to exclude,
+Windows will prevent Winlogbeat from reading the event log because it limits the
+number of conditions that can be used in an event log query. If this occurs a similar
+warning as shown below will be logged by Winlogbeat, and it will continue
+processing data from other event logs. For more information, see
+https://support.microsoft.com/en-us/kb/970453. 
+
+`WARN EventLog[Application] Open() error. No events will be read from this
+source. The specified query is invalid.`
+
+If you have more than 22 event IDs, you can workaround this Windows limitation
+by using a drop_event[drop-event] processor to do the filtering after
+Winlogbeat has received the events from Windows. The filter shown below is
+equivalent to `event_id: 903, 1024, 4624` but can be expanded beyond 22
+event IDs.
+
+[source,yaml]
+--------------------------------------------------------------------------------
+processors:                   
+- drop_event.when.and:               
+    - equals.log_name: Security      
+    - not.or:                   
+        - equals.event_id: 903     
+        - equals.event_id: 1024    
+        - equals.event_id: 4624
+--------------------------------------------------------------------------------
+
+=======================================
+
 
 ===== event_logs.level
 
@@ -316,10 +351,13 @@ The metrics are served as a JSON document. The metrics include:
 
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/processors-config.asciidoc[]
-
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
+include::../../../../libbeat/docs/dashboardsconfig.asciidoc[]
+
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
+
+include::../../../../libbeat/docs/processors-config.asciidoc[]
+

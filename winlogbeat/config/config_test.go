@@ -18,8 +18,10 @@ func (v validationTestCase) run(t *testing.T) {
 		assert.NoError(t, v.config.Validate())
 	} else {
 		err := v.config.Validate()
-		if assert.Error(t, err, "expected '%s'", v.errMsg) {
+		if err != nil {
 			assert.Contains(t, err.Error(), v.errMsg)
+		} else {
+			t.Errorf("expected error with '%s'", v.errMsg)
 		}
 	}
 }
@@ -44,7 +46,7 @@ func TestConfigValidate(t *testing.T) {
 				},
 				map[string]interface{}{"other": "value"},
 			},
-			"1 error: Invalid top-level key 'other' found. Valid keys are bulk_queue_size, " +
+			"1 error: Invalid top-level key 'other' found. Valid keys are bulk_queue_size, dashboards, " +
 				"fields, fields_under_root, geoip, logging, max_procs, " +
 				"name, output, path, processors, queue_size, refresh_topology_freq, tags, topology_expire, winlogbeat",
 		},

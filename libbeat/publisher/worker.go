@@ -10,7 +10,7 @@ import (
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	messagesInWorkerQueues = expvar.NewInt("libbeat.publisher.messages_in_worker_queues")
+	messagesInWorkerQueues = expvar.NewInt("publisher.queue.messages.count")
 )
 
 type worker interface {

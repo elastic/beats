@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Sources\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"source_name\",\"size\":7,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Sources", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"winlogbeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

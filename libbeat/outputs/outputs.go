@@ -4,6 +4,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 type Options struct {
@@ -72,6 +73,14 @@ type bulkOutputAdapter struct {
 
 var outputsPlugins = make(map[string]OutputBuilder)
 
+var (
+	Metrics = monitoring.Default.NewRegistry("output")
+
+	AckedEvents = monitoring.NewInt(Metrics, "events.acked", monitoring.Report)
+	WriteBytes  = monitoring.NewInt(Metrics, "write.bytes", monitoring.Report)
+	WriteErrors = monitoring.NewInt(Metrics, "write.errors", monitoring.Report)
+)
+
 func RegisterOutputPlugin(name string, builder OutputBuilder) {
 	outputsPlugins[name] = builder
 }
@@ -91,6 +100,8 @@ func InitOutputs(
 		if !exists {
 			continue
 		}
+
+		config.PrintDebugf("Configure output plugin '%v' with:", name)
 		if !config.Enabled() {
 			continue
 		}
@@ -135,4 +146,14 @@ func (b *bulkOutputAdapter) BulkPublish(
 
 func (d *Data) AddValue(key, value interface{}) {
 	d.Values = d.Values.Append(key, value)
+}
+
+type EventEncoder interface {
+	// Encode event
+	Encode(event common.MapStr, options interface{}) ([]byte, error)
+}
+
+type EventFormatter interface {
+	// Format event
+	Format(event common.MapStr, format string) ([]byte, error)
 }

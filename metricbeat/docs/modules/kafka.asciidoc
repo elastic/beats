@@ -1,0 +1,63 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-kafka]]
+== kafka Module
+
+beta[]
+
+This is the kafka Module.
+
+
+
+[float]
+=== Example Configuration
+
+The kafka module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+#- module: kafka
+  #metricsets: ["partition"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:9092"]
+
+  #client_id: metricbeat
+  #retries: 3
+  #backoff: 250ms
+
+  # List of Topics to query metadata for. If empty, all topics will be queried.
+  #topics: []
+
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # SASL authentication
+  #username: ""
+  #password: ""
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-kafka-consumergroup,consumergroup>>
+
+* <<metricbeat-metricset-kafka-partition,partition>>
+
+include::kafka/consumergroup.asciidoc[]
+
+include::kafka/partition.asciidoc[]
+

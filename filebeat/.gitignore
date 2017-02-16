@@ -1,8 +1,12 @@
-/etc/filebeat.dev.yml
+/_meta/filebeat.dev.yml
 .vagrant
 /docs/html_docs
 
 filebeat
 
 build
+_meta/kibana
+_meta/module.generated
+_meta/beat.yml
+_meta/beat.full.yml
 /tests/load/logs

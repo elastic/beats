@@ -3,15 +3,17 @@ package yaml
 import (
 	"io/ioutil"
 
-	"github.com/elastic/go-ucfg"
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/go-ucfg"
 )
 
 func NewConfig(in []byte, opts ...ucfg.Option) (*ucfg.Config, error) {
-	var m map[string]interface{}
+	var m interface{}
 	if err := yaml.Unmarshal(in, &m); err != nil {
 		return nil, err
 	}
+
 	return ucfg.NewFrom(m, opts...)
 }
 

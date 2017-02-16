@@ -11,7 +11,7 @@ following tips:
 * <<recording-trace>>
 * <<faq>>
 
-
+//sets block macro for getting-help.asciidoc included in next section
 
 --
 
@@ -20,10 +20,14 @@ following tips:
 
 include::../../libbeat/docs/getting-help.asciidoc[]
 
+//sets block macro for debugging.asciidoc included in next section
+
 [[enable-packetbeat-debugging]]
 == Debugging
 
 include::../../libbeat/docs/debugging.asciidoc[]
+
+//sets block macro for recording-trace content included in next section
 
 [[recording-trace]]
 == Recording a Trace

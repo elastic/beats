@@ -28,6 +28,10 @@ func TestFileSystemList(t *testing.T) {
 		}
 
 		stat, err := GetFileSystemStat(fs)
+		if os.IsPermission(err) {
+			continue
+		}
+
 		if assert.NoError(t, err, "%v", err) {
 			assert.True(t, (stat.Total >= 0))
 			assert.True(t, (stat.Free >= 0))

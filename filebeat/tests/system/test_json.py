@@ -7,6 +7,7 @@ Tests for the JSON decoding functionality.
 
 
 class Test(BaseTest):
+
     def test_docker_logs(self):
         """
         Should be able to interpret docker logs.
@@ -179,7 +180,7 @@ class Test(BaseTest):
                 message_key="msg",
                 keys_under_root=True,
                 overwrite_keys=True
-                ),
+            ),
         )
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_timestamp.log"],
@@ -222,7 +223,7 @@ class Test(BaseTest):
                 message_key="msg",
                 keys_under_root=True,
                 overwrite_keys=True
-                ),
+            ),
         )
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_type.log"],
@@ -261,8 +262,8 @@ class Test(BaseTest):
                 message_key="message",
                 keys_under_root=True,
                 overwrite_keys=True,
-                add_error_key=True,
-                ),
+                add_error_key=True
+            ),
             processors=[{
                 "drop_fields": {
                     "fields": ["headers.request-id"],
@@ -305,8 +306,8 @@ class Test(BaseTest):
                 message_key="message",
                 keys_under_root=True,
                 overwrite_keys=True,
-                add_error_key=True,
-                ),
+                add_error_key=True
+            ),
             processors=[{
                 "drop_fields": {
                     "fields": ["headers", "res"],
@@ -346,7 +347,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*",
             json=dict(
                 keys_under_root=True,
-                ),
+            ),
             processors=[{
                 "drop_event": {
                     "when": "equals.status: 200",

@@ -9,6 +9,7 @@
       "_meta": {
         "version": "6.0.0-alpha1"
       },
+      "date_detection": false,
       "dynamic_templates": [
         {
           "strings_as_keyword": {
@@ -66,6 +67,9 @@
               "type": "string"
             }
           }
+        },
+        "fields": {
+          "properties": {}
         },
         "host": {
           "ignore_above": 1024,

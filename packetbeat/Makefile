@@ -1,5 +1,5 @@
 
-BEATNAME?=packetbeat
+BEAT_NAME?=packetbeat
 BEAT_DESCRIPTION?=Packetbeat analyzes network traffic and sends the data to Elasticsearch.
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
@@ -28,13 +28,23 @@ before-build:
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: fields
+collect: fields imports
 
 .PHONY: fields
 fields:
-	cat etc/fields_base.yml > etc/fields.yml
-	cat protos/*/_meta/fields.yml >> etc/fields.yml
+	cat _meta/fields_base.yml > _meta/fields.yml
+	cat protos/*/_meta/fields.yml >> _meta/fields.yml
 
 .PHONY: benchmark
 benchmark:
 	go test -short -bench=. ./... -cpu=2
+
+.PHONY: create-tcp-protocol
+create-tcp-protocol:
+	python scripts/create_tcp_protocol.py
+
+# Generates imports for all modules and metricsets
+.PHONY: imports
+imports:
+	mkdir -p include
+	python ${ES_BEATS}/packetbeat/scripts/generate_imports.py ${BEAT_PATH} > include/list.go

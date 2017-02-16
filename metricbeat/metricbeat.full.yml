@@ -7,6 +7,21 @@
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
+#============================  Config Reloading ===============================
+
+# Config reloading allows to dynamically load modules. Each file which is
+# monitored must contain one or multiple modules as a list.
+metricbeat.config.modules:
+
+  # Glob pattern for configuration reloading
+  path: ${path.config}/conf.d/*.yml
+
+  # Period on which files under path should be checked for chagnes
+  reload.period: 10s
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
@@ -39,6 +54,9 @@ metricbeat.modules:
 
     # Per process stats
     - process
+
+    # Sockets and connection info (linux only)
+    #- socket
   enabled: true
   period: 10s
   processes: ['.*']
@@ -46,8 +64,17 @@ metricbeat.modules:
   # if true, exports the CPU usage in ticks, together with the percentage values
   #cpu_ticks: false
 
-  # EXPERIMENTAL: cgroups can be enabled for the process metricset.
-  #cgroups: false
+  # Enable collection of cgroup metrics from processes on Linux.
+  #process.cgroups.enabled: true
+
+  # A list of regular expressions used to whitelist environment variables
+  # reported with the process metricset's events. Defaults to empty.
+  #process.env.whitelist: []
+
+  # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
+  #socket.reverse_lookup.enabled: false
+  #socket.reverse_lookup.success_ttl: 60s
+  #socket.reverse_lookup.failure_ttl: 60s
 
 #------------------------------- Apache Module -------------------------------
 #- module: apache
@@ -67,48 +94,91 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
-#-------------------------------- beats Module -------------------------------
-#- module: beats
-  #metricsets: ["filebeat", "libbeat"]
+#-------------------------------- ceph Module --------------------------------
+#- module: ceph
+#  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost:5000"]
+
+#------------------------------ Couchbase Module -----------------------------
+#- module: couchbase
+  #metricsets: ["cluster", "node", "bucket"]
   #enabled: true
   #period: 10s
-  #hosts: ["localhost:6060"]
+  #hosts: ["localhost:8091"]
 
-  # Path to httpprof variables
-  #vars_path: /debug/vars
-
-
-#------------------------------- docker Module -------------------------------
+#------------------------------- Docker Module -------------------------------
 #- module: docker
-  #metricsets: ["cpu", "info", "memory", "network", "diskio", "container"]
+  #metricsets: ["container", "cpu", "diskio", "healthcheck", "info", "memory", "network"]
+  #hosts: ["unix:///var/run/docker.sock"]
   #enabled: true
   #period: 10s
-  #hosts: ["localhost"]
-  #socket: unix:///var/run/docker.sock
 
-  # If dockerbeat has to deal with a TLS-enabled docker daemon, you need to enable TLS and configure path for key and certificates.
-  #tls:
-    # By default, TLS is disabled
-    #enabled: false
+  # To connect to Docker over TLS you must specify a client and CA certificate.
+  #ssl:
+    #certificate_authority: "/etc/pki/root/ca.pem"
+    #certificate:           "/etc/pki/client/cert.pem"
+    #key:                   "/etc/pki/client/cert.key"
 
-#------------------------------- haproxy Module ------------------------------
+#------------------------------- HAProxy Module ------------------------------
 #- module: haproxy
   #metricsets: ["info", "stat"]
   #enabled: true
   #period: 10s
   #hosts: ["tcp://127.0.0.1:14567"]
 
+#------------------------------- Jolokia Module ------------------------------
+#- module: jolokia
+#  metricsets: ["jmx"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost"]
+#  namespace: "metrics"
+#  path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+#  jmx.mapping:
+#  jmx.application:
+#  jmx.instance:
+
+#-------------------------------- kafka Module -------------------------------
+#- module: kafka
+  #metricsets: ["partition"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:9092"]
+
+  #client_id: metricbeat
+  #retries: 3
+  #backoff: 250ms
+
+  # List of Topics to query metadata for. If empty, all topics will be queried.
+  #topics: []
+
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # SASL authentication
+  #username: ""
+  #password: ""
+
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
-  #metricsets: ["status"]
+  #metricsets: ["dbstats", "status"]
   #enabled: true
   #period: 10s
 
   # The hosts must be passed as MongoDB URLs in the format:
   # [mongodb://][user:pass@]host[:port].
-  # Warning: specifying the user/password in the hosts array is possible
-  # but it will result in the password being present in the output documents.
-  # We recommend using the username and password options instead.
+  # The username and password can also be set using the respective configuration
+  # options. The credentials in the URL take precedence over the username and
+  # password configuration options.
   #hosts: ["localhost:27017"]
 
   # Username to use when connecting to MongoDB. Empty by default.
@@ -117,22 +187,25 @@ metricbeat.modules:
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
 
-
 #-------------------------------- MySQL Module -------------------------------
 #- module: mysql
   #metricsets: ["status"]
   #enabled: true
   #period: 10s
 
-  # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
-  # The username and password can either be set in the DSN or for all hosts in username and password config option
-  #hosts: ["root@tcp(127.0.0.1:3306)/"]
+  # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # The username and password can either be set in the DSN or using the username
+  # and password config options. Those specified in the DSN take precedence.
+  #hosts: ["root:secret@tcp(127.0.0.1:3306)/"]
 
-  # Username of hosts. Empty by default
+  # Username of hosts. Empty by default.
   #username: root
 
-  # Password of hosts. Empty by default
-  #password: test
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # By setting raw to true, all raw fields from the status metricset will be added to the event.
+  #raw: false
 
 #-------------------------------- Nginx Module -------------------------------
 #- module: nginx
@@ -145,6 +218,14 @@ metricbeat.modules:
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
+
+#------------------------------- php_fpm Module ------------------------------
+#- module: php_fpm
+  #metricsets: ["pool"]
+  #enabled: true
+  #period: 10s
+  #status_path: "/status"
+  #hosts: ["localhost:8080"]
 
 #----------------------------- PostgreSQL Module -----------------------------
 #- module: postgresql
@@ -161,14 +242,10 @@ metricbeat.modules:
   #enabled: true
   #period: 10s
 
-  # The host must be passed as PostgreSQL DSN. Example:
+  # The host must be passed as PostgreSQL URL. Example:
   # postgres://localhost:5432?sslmode=disable
   # The available parameters are documented here:
   # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
-  #
-  # Warning: specifying the user/password in the hosts array is possible
-  # but it will result in the password being present in the output documents.
-  # We recommend using the username and password options instead.
   #hosts: ["postgres://localhost:5432"]
 
   # Username to use when connecting to PostgreSQL. Empty by default.
@@ -178,6 +255,15 @@ metricbeat.modules:
   #password: pass
 
 
+#----------------------------- Prometheus Module -----------------------------
+#- module: prometheus
+  #metricsets: ["stats"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:9090"]
+  #metrics_path: /metrics
+  #namespace: example
+
 #-------------------------------- Redis Module -------------------------------
 #- module: redis
   #metricsets: ["info", "keyspace"]
@@ -186,9 +272,6 @@ metricbeat.modules:
 
   # Redis hosts
   #hosts: ["127.0.0.1:6379"]
-
-  # Enabled defines if the module is enabled. Default: true
-  #enabled: true
 
   # Timeout after which time a metricset should return an error
   # Timeout is by default defined as period, as a fetch of a metricset
@@ -334,6 +417,10 @@ output.elasticsearch:
 
   # Optional HTTP Path
   #path: "/elasticsearch"
+
+  # Custom HTTP headers to add to each request
+  #headers:
+  #  X-My-Header: Contents of the header
 
   # Proxy server url
   #proxy_url: http://proxy:3128
@@ -765,6 +852,45 @@ output.elasticsearch:
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag.
+#dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#dashboards.url:
+
+# The directory from where to read the dashboards. It is used instead of the URL
+# when it has a value.
+#dashboards.directory:
+
+# The file archive (zip file) from where to read the dashboards. It is used instead
+# of the URL when it has a value.
+#dashboards.file:
+
+# If this option is enabled, the snapshot URL is used instead of the default URL.
+#dashboard.snapshot: false
+
+# The URL from where to download the snapshot version of the dashboards. By default
+# this has a value which is computed based on the Beat name and version.
+#dashboard.snapshot_url
+
+# In case the archive contains the dashboards from multiple Beats, this lets you
+# select which one to load. You can load all the dashboards in the archive by
+# setting this to the empty string.
+#dashboard.beat: metricbeat
+
+# The name of the Kibana index to use for setting the configuration. Default is ".kibana"
+#dashboards.kibana_index: .kibana
+
+# The Elasticsearch index name. This overwrites the index name defined in the
+# dashboards and index pattern. Example: testbeat-*
+#dashboards.index:
 
 #================================ Logging ======================================
 # There are three options for the log output: syslog, file, stderr.

@@ -16,6 +16,8 @@ This file is generated! See scripts/docs_collector.py
 
 """
 
+    modules_list = {}
+
     # Iterate over all modules
     for module in sorted(os.listdir(base_dir)):
 
@@ -36,10 +38,12 @@ This file is generated! See scripts/docs_collector.py
 
         beat_path = path + "/" + module + "/_meta"
 
-         # Load title from fields.yml
+        # Load title from fields.yml
         with open(beat_path + "/fields.yml") as f:
             fields = yaml.load(f.read())
             title = fields[0]["title"]
+
+        modules_list[module] = title
 
         config_file = beat_path + "/config.yml"
 
@@ -70,7 +74,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
         module_file += "[float]\n"
         module_file += "=== Metricsets\n\n"
         module_file += "The following metricsets are available:\n\n"
-
 
         module_links = ""
         module_includes = ""
@@ -131,6 +134,19 @@ For a description of each field in the metricset, see the
         with open(os.path.abspath("docs") + "/modules/" + module + ".asciidoc", 'w') as f:
             f.write(module_file)
 
+    module_list_output = generated_note
+    for m, title in sorted(modules_list.iteritems()):
+        module_list_output += "  * <<metricbeat-module-" + m + "," + title + ">>\n"
+
+    module_list_output += "\n\n--\n\n"
+    for m, title in sorted(modules_list.iteritems()):
+        module_list_output += "include::modules/" + m + ".asciidoc[]\n"
+
+    # Write module link list
+    with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w') as f:
+        f.write(module_list_output)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Collects modules docs")
@@ -140,6 +156,3 @@ if __name__ == "__main__":
     beat_name = args.beat
 
     collect(beat_name)
-
-
-

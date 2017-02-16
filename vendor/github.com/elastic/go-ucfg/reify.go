@@ -4,8 +4,103 @@ import (
 	"reflect"
 	"regexp"
 	"time"
+	"unicode"
+	"unicode/utf8"
 )
 
+// Unpack unpacks c into a struct, a map, or a slice allocating maps, slices,
+// and pointers as necessary.
+//
+// Unpack supports the options: PathSep, StructTag, ValidatorTag, Env, Resolve,
+// ResolveEnv.
+//
+// When unpacking into a value, Unpack first will try to call Unpack if the
+// value implements the Unpacker interface. Otherwise, Unpack tries to convert
+// the internal value into the target type:
+//
+//  # Primitive types
+//
+//  bool: requires setting of type bool or string which parses into a
+//     boolean value (true, false, on, off)
+//  int(8, 16, 32, 64): requires any number type convertible to int or a string
+//      parsing to int. Fails if the target value would overflow.
+//  uint(8, 16, 32, 64): requires any number type convertible to int or a string
+//       parsing to int. Fails if the target value is negative or would overflow.
+//  float(32, 64): requires any number type convertible to float or a string
+//       parsing to float. Fails if the target value is negative or would overflow.
+//  string: requires any primitive value which is serialized into a string.
+//
+//  # Special types:
+//
+//  time.Duration: requires a number setting converted to seconds or a string
+//       parsed into time.Duration via time.ParseDuration.
+//  *regexp.Regexp: requires a string being compiled into a regular expression
+//       using regexp.Compile.
+//  *Config: requires a Config object to be stored by pointer into the target
+//       value. Can be used to capture a sub-Config without interpreting
+//       the settings yet.
+//
+//   # Arrays/Slices:
+//
+//  Requires a Config object with indexed entries. Named entries will not be
+//  unpacked into the Array/Slice. Primitive values will be handled like arrays
+//  of length 1.
+//
+//  # Map
+//
+//  Requires a Config object with all named top-level entries being unpacked into
+//  the map.
+//
+//  # Struct
+//
+//  Requires a Config object. All named values in the Config object will be unpacked
+//  into the struct its fields, if the name is available in the struct.
+//  A field its name is set using the `config` struct tag (configured by StructTag)
+//  If tag is missing or no field name is configured in the tag, the field name
+//  itself will be used.
+//  If the tag sets the `,ignore` flag, the field will not be overwritten.
+//  If the tag sets the `,inline` or `,squash` flag, Unpack will apply the current
+//  configuration namespace to the fields.
+//
+//
+// Fields available in a struct or a map, but not in the Config object, will not
+// be touched. Default values should be set in the target value before calling Unpack.
+//
+// Type aliases like "type myTypeAlias T" are unpacked using Unpack if the alias
+// implements the Unpacker interface. Otherwise unpacking rules for type T will be used.
+//
+// When unpacking a value, the Validate method will be called if the value
+// implements the Validator interface. Unpacking a struct field the validator
+// options will be applied to the unpacked value as well.
+//
+// Struct field validators are set using the `validate` tag (configurable by
+// ValidatorTag). Default validators options are:
+//
+//  required: check value is set and not empty
+//  nonzero: check numeric value != 0 or string/slice not being empty
+//  positive: check numeric value >= 0
+//  min=<value>: check numeric value >= <value>. If target type is time.Duration,
+//       <value> can be a duration.
+//  max=<value>: check numeric value <= <value>. If target type is time.Duration,
+//     <value> can be a duration.
+//
+// If a config value is not the convertible to the target type, or overflows the
+// target type, Unpack will abort immediately and return the appropriate error.
+//
+// If validator tags or validation provided by Validate or Unmarshal fails,
+// Unpack will abort immediately and return the validate error.
+//
+// When unpacking into an interface{} value, Unpack will store a value of one of
+// these types in the value:
+//
+//   bool for boolean values
+//   int64 for signed integer values
+//   uint64 for unsigned integer values
+//   float64 for floating point values
+//   string for string values
+//   []interface{} for list-only Config objects
+//   map[string]interface{} for Config objects
+//   nil for pointers if key has a nil value
 func (c *Config) Unpack(to interface{}, options ...Option) error {
 	opts := makeOptions(options)
 
@@ -52,7 +147,7 @@ func reifyInto(opts *options, to reflect.Value, from *Config) Error {
 		return nil
 	}
 
-	return raiseInvalidTopLevelType(to.Interface())
+	return raiseInvalidTopLevelType(to.Interface(), opts.meta)
 }
 
 func reifyMap(opts *options, to reflect.Value, from *Config) Error {
@@ -98,22 +193,26 @@ func reifyStruct(opts *options, orig reflect.Value, cfg *Config) Error {
 		to.Set(orig)
 	}
 
-	if v, ok := implementsUnpacker(to); ok {
-		reified, err := cfgSub{cfg}.reify(opts)
+	if v, ok := valueIsUnpacker(to); ok {
+		err := unpackWith(opts, v, cfgSub{cfg})
 		if err != nil {
-			return raisePathErr(err, cfg.metadata, "", cfg.Path("."))
-		}
-
-		if err := unpackWith(cfg.ctx, cfg.metadata, v, reified); err != nil {
 			return err
 		}
 	} else {
 		numField := to.NumField()
 		for i := 0; i < numField; i++ {
 			stField := to.Type().Field(i)
-			vField := to.Field(i)
-			name, tagOpts := parseTags(stField.Tag.Get(opts.tag))
 
+			// ignore non exported fields
+			if rune, _ := utf8.DecodeRuneInString(stField.Name); !unicode.IsUpper(rune) {
+				continue
+			}
+			name, tagOpts := parseTags(stField.Tag.Get(opts.tag))
+			if tagOpts.ignore {
+				continue
+			}
+
+			vField := to.Field(i)
 			validators, err := parseValidatorTags(stField.Tag.Get(opts.validatorTag))
 			if err != nil {
 				return raiseCritical(err, "")
@@ -273,6 +372,15 @@ func reifyMergeValue(
 	}
 
 	baseType := chaseTypePointers(old.Type())
+
+	if v, ok := valueIsUnpacker(old); ok {
+		err := unpackWith(opts.opts, v, val)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return old, nil
+	}
+
 	if tConfig.ConvertibleTo(baseType) {
 		sub, err := val.toConfig(opts.opts)
 		if err != nil {
@@ -328,18 +436,6 @@ func reifyMergeValue(
 		return reifySlice(opts, baseType, val)
 	}
 
-	if v, ok := implementsUnpacker(old); ok {
-		reified, err := val.reify(opts.opts)
-		if err != nil {
-			ctx := val.Context()
-			return reflect.Value{}, raisePathErr(err, val.meta(), "", ctx.path("."))
-		}
-
-		if err := unpackWith(val.Context(), val.meta(), v, reified); err != nil {
-			return reflect.Value{}, err
-		}
-		return old, nil
-	}
 	return reifyPrimitive(opts, val, t, baseType)
 }
 
@@ -400,10 +496,10 @@ func castArr(opts *options, v value) ([]value, Error) {
 	if sub, ok := v.(cfgSub); ok {
 		return sub.c.fields.array(), nil
 	}
-	if ref, ok := v.(*cfgRef); ok {
-		unrefed, err := ref.resolve(opts)
+	if ref, ok := v.(*cfgDynamic); ok {
+		unrefed, err := ref.getValue(opts)
 		if err != nil {
-			return nil, raiseMissing(ref.ctx.getParent(), ref.ref.String())
+			return nil, raiseMissingMsg(ref.ctx.getParent(), ref.ctx.field, err.Error())
 		}
 
 		if sub, ok := unrefed.(cfgSub); ok {
@@ -439,13 +535,8 @@ func reifyPrimitive(
 	var ok bool
 
 	if v, ok = typeIsUnpacker(baseType); ok {
-		reified, err := val.reify(opts.opts)
+		err := unpackWith(opts.opts, v, val)
 		if err != nil {
-			ctx := val.Context()
-			return reflect.Value{}, raisePathErr(err, val.meta(), "", ctx.path("."))
-		}
-
-		if err := unpackWith(val.Context(), val.meta(), v, reified); err != nil {
 			return reflect.Value{}, err
 		}
 	} else {

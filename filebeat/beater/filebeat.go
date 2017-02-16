@@ -1,6 +1,7 @@
 package beater
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"sync"
@@ -8,20 +9,25 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/crawler"
+	"github.com/elastic/beats/filebeat/fileset"
 	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/filebeat/spooler"
 )
 
-var once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
+var (
+	once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
+)
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
-	config *cfg.Config
-	done   chan struct{}
+	config         *cfg.Config
+	moduleRegistry *fileset.ModuleRegistry
+	done           chan struct{}
 }
 
 // New creates a new Filebeat pointer instance.
@@ -30,21 +36,72 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	if err := rawConfig.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
+
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Version)
+	if err != nil {
+		return nil, err
+	}
+
+	moduleProspectors, err := moduleRegistry.GetProspectorConfigs()
+	if err != nil {
+		return nil, err
+	}
+
 	if err := config.FetchConfigs(); err != nil {
 		return nil, err
 	}
 
+	// Add prospectors created by the modules
+	config.Prospectors = append(config.Prospectors, moduleProspectors...)
+
+	if !config.ProspectorReload.Enabled() && len(config.Prospectors) == 0 {
+		return nil, errors.New("No prospectors defined. What files do you want me to watch?")
+	}
+
+	if *once && config.ProspectorReload.Enabled() {
+		return nil, errors.New("prospector reloading and -once cannot be used together.")
+	}
+
 	fb := &Filebeat{
-		done:   make(chan struct{}),
-		config: &config,
+		done:           make(chan struct{}),
+		config:         &config,
+		moduleRegistry: moduleRegistry,
 	}
 	return fb, nil
+}
+
+// modulesSetup is called when modules are configured to do the initial
+// setup.
+func (fb *Filebeat) modulesSetup(b *beat.Beat) error {
+	esConfig := b.Config.Output["elasticsearch"]
+	if esConfig == nil || !esConfig.Enabled() {
+		return fmt.Errorf("Filebeat modules configured but the Elasticsearch output is not configured/enabled")
+	}
+	esClient, err := elasticsearch.NewConnectedClient(esConfig)
+	if err != nil {
+		return fmt.Errorf("Error creating ES client: %v", err)
+	}
+	defer esClient.Close()
+
+	err = fb.moduleRegistry.LoadPipelines(esClient)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Run allows the beater to be run as a beat.
 func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
+
+	if !fb.moduleRegistry.Empty() {
+		err = fb.modulesSetup(b)
+		if err != nil {
+			return err
+		}
+	}
 
 	waitFinished := newSignalWait()
 	waitEvents := newSignalWait()
@@ -76,7 +133,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	crawler, err := crawler.New(newSpoolerOutlet(fb.done, spooler, wgEvents), config.Prospectors)
+	crawler, err := crawler.New(newSpoolerOutlet(fb.done, spooler, wgEvents), config.Prospectors, fb.done, *once)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err
@@ -118,7 +175,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		spooler.Stop()
 	}()
 
-	err = crawler.Start(registrar.GetStates(), *once)
+	err = crawler.Start(registrar, config.ProspectorReload)
 	if err != nil {
 		return err
 	}

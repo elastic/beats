@@ -1,5 +1,7 @@
 package outputs
 
+import "github.com/elastic/beats/libbeat/common"
+
 // Values is a recursive key/value store for use by output plugins and publisher
 // pipeline to share context-dependent values.
 type Values struct {
@@ -39,4 +41,25 @@ func (v *Values) Get(key interface{}) (interface{}, bool) {
 		return v.value, true
 	}
 	return v.parent.Get(key)
+}
+
+// standard outputs values utilities
+
+type keyMetadata int
+
+func ValuesWithMetadata(parent *Values, meta common.MapStr) *Values {
+	return parent.Append(keyMetadata(0), meta)
+}
+
+func GetMetadata(v *Values) common.MapStr {
+	value, ok := v.Get(keyMetadata(0))
+	if !ok {
+		return nil
+	}
+
+	if m, ok := value.(common.MapStr); ok {
+		return m
+	}
+	return nil
+
 }

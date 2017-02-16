@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"HTTP duration heatmap\",\"type\":\"heatmap\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"enableHover\":false,\"legendPosition\":\"right\",\"times\":[],\"colorsNumber\":10,\"colorSchema\":\"Blues\",\"setColorRange\":false,\"colorsRange\":[],\"invertColors\":false,\"percentageMode\":false,\"valueAxes\":[{\"show\":false,\"id\":\"ValueAxis-1\",\"type\":\"value\",\"scale\":{\"type\":\"linear\",\"defaultYExtents\":false},\"labels\":{\"show\":false,\"rotate\":0,\"color\":\"#555\"}}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"histogram\",\"schema\":\"group\",\"params\":{\"field\":\"duration.us\",\"interval\":50000,\"extended_bounds\":{}}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "HTTP duration heatmap", 
+  "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 2\":\"rgb(247,251,255)\",\"2 - 3\":\"rgb(227,238,249)\",\"3 - 4\":\"rgb(208,225,242)\",\"4 - 5\":\"rgb(182,212,233)\",\"5 - 6\":\"rgb(148,196,223)\",\"6 - 8\":\"rgb(107,174,214)\",\"8 - 9\":\"rgb(74,152,201)\",\"9 - 10\":\"rgb(46,126,188)\",\"10 - 11\":\"rgb(23,100,171)\",\"11 - 12\":\"rgb(8,74,145)\"}}}", 
+  "version": 1, 
+  "savedSearchId": "c49bd160-eb17-11e6-be20-559646f8b9ba", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

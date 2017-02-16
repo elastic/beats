@@ -1,6 +1,6 @@
 
 ////
-This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
@@ -66,7 +66,7 @@ Arbitrary tags that can be set per Beat and per transaction type.
 [float]
 === fields
 
-type: dict
+type: object
 
 Contains user configurable fields.
 
@@ -168,11 +168,11 @@ The name of the computer that generated the record. When using Windows event for
 [float]
 === event_data
 
-type: dict
+type: object
 
 required: False
 
-The event-specific data. This field is mutually exclusive with `user_data`. If you are capturing event data on versions prior to Windows Vista, the parameters in `event_data` are named `param1`, `param2`, and so on, because event log parameters are unnamed in earlier versions of Windows. 
+The event-specific data. This field is mutually exclusive with `user_data`. If you are capturing event data on versions prior to Windows Vista, the parameters in `event_data` are named `param1`, `param2`, and so on, because event log parameters are unnamed in earlier versions of Windows.
 
 
 [float]
@@ -318,7 +318,7 @@ The thread_id identifies the thread that generated the event.
 [float]
 === user_data
 
-type: dict
+type: object
 
 required: False
 

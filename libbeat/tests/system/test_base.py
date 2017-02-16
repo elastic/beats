@@ -6,6 +6,7 @@ import subprocess
 
 
 class Test(BaseTest):
+
     def test_base(self):
         """
         Basic test with exiting Mockbeat normally
@@ -153,7 +154,7 @@ class Test(BaseTest):
         )
         proc = self.start_beat(logging_args=["-e"])
         self.wait_until(
-            lambda: self.log_contains("No non-zero metrics in the last 100ms"),
+            lambda: self.log_contains("Non-zero metrics in the last 100ms:"),
             max_timeout=2)
         proc.check_kill_and_wait()
         self.wait_until(

@@ -1,16 +1,16 @@
 package memory
 
 import (
-	dc "github.com/fsouza/go-dockerclient"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
+
+	dc "github.com/fsouza/go-dockerclient"
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("docker", "memory", New); err != nil {
+	if err := mb.Registry.AddMetricSet("docker", "memory", New, docker.HostParser); err != nil {
 		panic(err)
 	}
 }
@@ -21,18 +21,16 @@ type MetricSet struct {
 	dockerClient  *dc.Client
 }
 
-// New create a new instance of the  docker memory MetricSet
+// New creates a new instance of the docker memory MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	logp.Warn("BETA: The docker memory metricset is beta")
 
-	logp.Warn("EXPERIMENTAL: The memory metricset is experimental")
-
-	config := docker.GetDefaultConf()
-
+	config := docker.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	client, err := docker.NewDockerClient(&config)
+	client, err := docker.NewDockerClient(base.HostData().URI, config)
 	if err != nil {
 		return nil, err
 	}
@@ -44,9 +42,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch creates a list of memory events for each container
+// Fetch creates a list of memory events for each container.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
 	stats, err := docker.FetchStats(m.dockerClient)
 	if err != nil {
 		return nil, err

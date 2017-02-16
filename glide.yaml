@@ -25,7 +25,9 @@ import:
   subpackages:
   - /difflib
 - package: github.com/elastic/gosigar
-  version: 0ba14c25cb14e2d939b563ca49a504c3117680c6
+  version: b49e01eb1e5c68c469392a63feaccae9352ceb12
+- package: github.com/elastic/procfs
+  version: abf152e5f3e97f2fafac028d2cc06c1feb87ffa5
 - package: github.com/samuel/go-parser
   version: ca8abbf65d0e61dedf061f98bd3850f250e27539
 - package: github.com/samuel/go-thrift
@@ -62,7 +64,7 @@ import:
 - package: github.com/miekg/dns
   version: 5d001d020961ae1c184f9f8152fdc73810481677
 - package: github.com/Shopify/sarama
-  version: fix/sasl-handshake
+  version: v1.11/enh/offset-replica-id
   repo: https://github.com/urso/sarama
 - package: github.com/rcrowley/go-metrics
   version: ab2277b1c5d15c3cba104e9cbddbdfc622df5ad8
@@ -81,7 +83,7 @@ import:
 - package: github.com/dustin/go-humanize
   version: 499693e27ee0d14ffab67c31ad065fdb3d34ea75
 - package: github.com/elastic/go-ucfg
-  version: v0.3.7
+  version: v0.4.6
 - package: github.com/armon/go-socks5
   version: 3a873e99f5400ad7706e464e905ffcc94b3ff247
 - package: github.com/pkg/errors
@@ -103,7 +105,13 @@ import:
   - zlib
 - package: github.com/klauspost/cpuid
   version: v1.0
-- package: https://github.com/go-inf/inf
+- package: github.com/go-inf/inf
   version: v0.9.0
 - package: github.com/gorhill/cronexpr
   version: f0984319b44273e83de132089ae42b1810f4933b
+- package: github.com/pierrec/lz4
+  version: 5c9560bfa9ace2bf86080bf40d46b34ae44604df
+- package: github.com/pierrec/xxHash
+  version: 5a004441f897722c627870a981d02b29924215fa
+- package: github.com/mitchellh/hashstructure
+  version: b098c52ef6beab8cd82bc4a32422cf54b890e8fa

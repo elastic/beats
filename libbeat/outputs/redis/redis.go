@@ -2,12 +2,12 @@ package redis
 
 import (
 	"errors"
-	"expvar"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
@@ -25,10 +25,10 @@ var debugf = logp.MakeDebug("redis")
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	statReadBytes   = expvar.NewInt("libbeat.redis.publish.read_bytes")
-	statWriteBytes  = expvar.NewInt("libbeat.redis.publish.write_bytes")
-	statReadErrors  = expvar.NewInt("libbeat.redis.publish.read_errors")
-	statWriteErrors = expvar.NewInt("libbeat.redis.publish.write_errors")
+	statReadBytes   = monitoring.NewInt(outputs.Metrics, "redis.read.bytes")
+	statWriteBytes  = monitoring.NewInt(outputs.Metrics, "redis.write.bytes")
+	statReadErrors  = monitoring.NewInt(outputs.Metrics, "redis.read.errors")
+	statWriteErrors = monitoring.NewInt(outputs.Metrics, "redis.write.errors")
 )
 
 const (
@@ -103,10 +103,12 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		Proxy:   &config.Proxy,
 		TLS:     tls,
 		Stats: &transport.IOStats{
-			Read:        statReadBytes,
-			Write:       statWriteBytes,
-			ReadErrors:  statReadErrors,
-			WriteErrors: statWriteErrors,
+			Read:               statReadBytes,
+			Write:              statWriteBytes,
+			ReadErrors:         statReadErrors,
+			WriteErrors:        statWriteErrors,
+			OutputsWrite:       outputs.WriteBytes,
+			OutputsWriteErrors: outputs.WriteErrors,
 		},
 	}
 
@@ -120,11 +122,18 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 
 	// configure publisher clients
 	clients, err := modeutil.MakeClients(cfg, func(host string) (mode.ProtocolClient, error) {
+
 		t, err := transport.NewClient(transp, "tcp", host, config.Port)
 		if err != nil {
 			return nil, err
 		}
-		return newClient(t, config.Password, config.Db, key, dataType), nil
+
+		codec, err := outputs.CreateEncoder(config.Codec)
+		if err != nil {
+			return nil, err
+		}
+
+		return newClient(t, config.Password, config.Db, key, dataType, codec), nil
 	})
 	if err != nil {
 		return err

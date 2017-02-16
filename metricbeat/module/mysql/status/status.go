@@ -22,7 +22,7 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("mysql", "status", New); err != nil {
+	if err := mb.Registry.AddMetricSet("mysql", "status", New, mysql.ParseDSN); err != nil {
 		panic(err)
 	}
 }
@@ -30,43 +30,19 @@ func init() {
 // MetricSet for fetching MySQL server status.
 type MetricSet struct {
 	mb.BaseMetricSet
-	dsn string
-	db  *sql.DB
+	db *sql.DB
 }
 
 // New creates and returns a new MetricSet instance.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	// Unpack additional configuration options.
-	config := struct {
-		Hosts    []string `config:"hosts"    validate:"nonzero,required"`
-		Username string   `config:"username"`
-		Password string   `config:"password"`
-	}{
-		Username: "",
-		Password: "",
-	}
-	err := base.Module().UnpackConfig(&config)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create and validate the data source name.
-	dsn, err := mysql.CreateDSN(base.Host(), config.Username, config.Password, base.Module().Config().Timeout)
-	if err != nil {
-		return nil, err
-	}
-
-	return &MetricSet{
-		BaseMetricSet: base,
-		dsn:           dsn,
-	}, nil
+	return &MetricSet{BaseMetricSet: base}, nil
 }
 
 // Fetch fetches status messages from a mysql host.
-func (m *MetricSet) Fetch() (event common.MapStr, err error) {
+func (m *MetricSet) Fetch() (common.MapStr, error) {
 	if m.db == nil {
 		var err error
-		m.db, err = mysql.NewDB(m.dsn)
+		m.db, err = mysql.NewDB(m.HostData().URI)
 		if err != nil {
 			return nil, errors.Wrap(err, "mysql-status fetch failed")
 		}
@@ -77,7 +53,12 @@ func (m *MetricSet) Fetch() (event common.MapStr, err error) {
 		return nil, err
 	}
 
-	return eventMapping(status), nil
+	event := eventMapping(status)
+
+	if m.Module().Config().Raw {
+		event["raw"] = rawEventMapping(status)
+	}
+	return event, nil
 }
 
 // loadStatus loads all status entries from the given database into an array.

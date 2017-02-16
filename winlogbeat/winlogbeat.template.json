@@ -1,12 +1,10 @@
 {
   "mappings": {
     "_default_": {
-      "_all": {
-        "norms": false
-      },
       "_meta": {
         "version": "6.0.0-alpha1"
       },
+      "date_detection": false,
       "dynamic_templates": [
         {
           "strings_as_keyword": {
@@ -46,8 +44,14 @@
           "ignore_above": 1024,
           "type": "keyword"
         },
+        "event_data": {
+          "properties": {}
+        },
         "event_id": {
           "type": "long"
+        },
+        "fields": {
+          "properties": {}
         },
         "keywords": {
           "ignore_above": 1024,
@@ -159,6 +163,9 @@
             }
           }
         },
+        "user_data": {
+          "properties": {}
+        },
         "version": {
           "type": "long"
         },
@@ -171,6 +178,7 @@
   },
   "order": 0,
   "settings": {
+    "index.mapping.total_fields.limit": 10000,
     "index.refresh_interval": "5s"
   },
   "template": "winlogbeat-*"

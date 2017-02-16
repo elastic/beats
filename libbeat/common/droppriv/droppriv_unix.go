@@ -27,7 +27,7 @@ func DropPrivileges(config RunOptions) error {
 		return errors.New("GID must be specified for dropping privileges")
 	}
 
-	logp.Info("Switching to user: %d.%d", config.UID, config.GID)
+	logp.Info("Switching to user: %d.%d", *config.UID, *config.GID)
 
 	if err = syscall.Setgid(*config.GID); err != nil {
 		return fmt.Errorf("setgid: %s", err.Error())

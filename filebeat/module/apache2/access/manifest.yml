@@ -1,0 +1,18 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/apache2/access.log*
+      - /var/log/apache2/other_vhosts_access.log*
+    os.darwin:
+      - /usr/local/var/log/apache2/access_log*
+    os.windows:
+      - "C:/tools/Apache/httpd-2.*/Apache24/logs/access.log*"
+      - "C:/Program Files/Apache Software Foundation/Apache2.*/logs/access.log*"
+  - name: pipeline
+    # options: with_plugins, no_plugins
+    default: with_plugins
+
+ingest_pipeline: ingest/{{.pipeline}}.json
+prospector: config/access.yml

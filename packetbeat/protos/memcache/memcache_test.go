@@ -11,13 +11,13 @@ import (
 )
 
 type memcacheTest struct {
-	mc           *Memcache
+	mc           *memcache
 	transactions []*transaction
 }
 
 func newMemcacheTest(config memcacheConfig) *memcacheTest {
 	mct := &memcacheTest{}
-	mc := &Memcache{}
+	mc := &memcache{}
 	mc.init(nil, &config)
 	mc.handler = mct
 	mct.mc = mc

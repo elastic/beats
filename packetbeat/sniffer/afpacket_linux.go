@@ -9,14 +9,14 @@ import (
 	"github.com/tsg/gopacket/afpacket"
 )
 
-type AfpacketHandle struct {
+type afpacketHandle struct {
 	TPacket *afpacket.TPacket
 }
 
-func NewAfpacketHandle(device string, snaplen int, block_size int, num_blocks int,
-	timeout time.Duration) (*AfpacketHandle, error) {
+func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks int,
+	timeout time.Duration) (*afpacketHandle, error) {
 
-	var h AfpacketHandle
+	h := &afpacketHandle{}
 	var err error
 
 	if device == "any" {
@@ -34,17 +34,17 @@ func NewAfpacketHandle(device string, snaplen int, block_size int, num_blocks in
 			afpacket.OptPollTimeout(timeout))
 	}
 
-	return &h, err
+	return h, err
 }
 
-func (h *AfpacketHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
+func (h *afpacketHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
 	return h.TPacket.ReadPacketData()
 }
 
-func (h *AfpacketHandle) SetBPFFilter(expr string) (_ error) {
+func (h *afpacketHandle) SetBPFFilter(expr string) (_ error) {
 	return h.TPacket.SetBPFFilter(expr)
 }
 
-func (h *AfpacketHandle) Close() {
+func (h *afpacketHandle) Close() {
 	h.TPacket.Close()
 }

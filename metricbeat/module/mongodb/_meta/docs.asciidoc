@@ -6,10 +6,11 @@ servers.
 [float]
 === Module-Specific Configuration Notes
 
-When configuring the `hosts` option, you must use MongoDB URLs of the following format:
+When configuring the `hosts` option, you must use MongoDB URLs of the following
+format:
 
 -----------------------------------
-[mongodb://host[:port][?options]
+[mongodb://][user:pass@]host[:port][?options]
 -----------------------------------
 
 The URL can be as simple as:
@@ -28,10 +29,9 @@ Or more complex like:
   hosts: ["mongodb://myuser:mypass@localhost:40001", "otherhost:40001"]
 ----------------------------------------------------------------------
 
-WARNING: In case you use username and password in the hosts array, this
-information will be sent with each event as part of the `metricset.host` field.
-To prevent sending username and password the config options `username` and
-`password` can be used.
+The username and password can be included in the URL or they can be set using
+the respective configuration options. The credentials in the URL take precedence
+over the username and password configuration options.
 
 [source,yaml]
 ----
@@ -42,9 +42,8 @@ To prevent sending username and password the config options `username` and
   password: test
 ----
 
-
-
 [float]
 === Compatibility
 
-The MongoDB metricsets were tested with MongoDB 3.0 and are expected to work with all versions >= 2.8.
+The MongoDB metricsets were tested with MongoDB 3.4 and 3.0 and are expected to
+work with all versions >= 2.8.

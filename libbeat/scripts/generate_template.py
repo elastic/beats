@@ -2,7 +2,7 @@
 
 """
 This script generates the ES template file (packetbeat.template.json) from
-the etc/fields.yml file.
+the _meta/fields.yml file.
 
 Example usage:
 
@@ -30,29 +30,27 @@ def fields_to_es_template(args, input, output, index, version):
         print("fields.yml is empty. Cannot generate template.")
         return
 
-    # Each template needs defaults
-    if "defaults" not in docs.keys():
-        print("No defaults are defined. Each template needs at" +
-              " least defaults defined.")
-        return
+    defaults = {
+        "type": "keyword",
+        "required": False,
+        "index": True,
+        "doc_values": True,
+        "ignore_above": 1024,
+    }
 
-    defaults = docs["defaults"]
-
-    for k, section in enumerate(docs["fields"]):
-        docs["fields"][k] = dedot(section)
+    for k, section in enumerate(docs):
+        docs[k] = dedot(section)
 
     # skeleton
     template = {
         "template": index,
         "order": 0,
         "settings": {
-            "index.refresh_interval": "5s"
+            "index.refresh_interval": "5s",
         },
         "mappings": {
             "_default_": {
-                "_all": {
-                    "norms": False
-                },
+                "date_detection": False,
                 "properties": {},
                 "_meta": {
                     "version": version,
@@ -61,11 +59,25 @@ def fields_to_es_template(args, input, output, index, version):
         }
     }
 
+    # should be done only for es5x. For es6x, any "_all" setting results
+    # in an error.
+    # TODO: https://github.com/elastic/beats/issues/3368
+    # template["mappings"]["_default"]["_all"] = {
+    #     "norms": False
+    # }
+
     if args.es2x:
         # different syntax for norms
-        template["mappings"]["_default_"]["_all"]["norms"] = {
-            "enabled": False
+        template["mappings"]["_default_"]["_all"] = {
+            "norms": {
+                "enabled": False
+            }
         }
+    else:
+        # For ES 5.x, increase the limit on the max number of fields.
+        # In a typical scenario, most fields are not used, so increasing the
+        # limit shouldn't be that bad.
+        template["settings"]["index.mapping.total_fields.limit"] = 10000
 
     properties = {}
     dynamic_templates = []
@@ -93,9 +105,8 @@ def fields_to_es_template(args, input, output, index, version):
             }
         })
 
-    for section in docs["fields"]:
-        prop, dynamic = fill_section_properties(args, section,
-                                                defaults, "")
+    for section in docs:
+        prop, dynamic = fill_section_properties(args, section, defaults, "")
         properties.update(prop)
         dynamic_templates.extend(dynamic)
 
@@ -122,6 +133,10 @@ def dedot(group):
     """
     fields = []
     dedotted = {}
+
+    # Need in case there are no fields
+    if group["fields"] is None:
+        group["fields"] = {}
 
     for field in group["fields"]:
         if "." in field["name"]:
@@ -157,10 +172,11 @@ def fill_section_properties(args, section, defaults, path):
     properties = {}
     dynamic_templates = []
 
-    for field in section["fields"]:
-        prop, dynamic = fill_field_properties(args, field, defaults, path)
-        properties.update(prop)
-        dynamic_templates.extend(dynamic)
+    if "fields" in section:
+        for field in section["fields"]:
+            prop, dynamic = fill_field_properties(args, field, defaults, path)
+            properties.update(prop)
+            dynamic_templates.extend(dynamic)
 
     return properties, dynamic_templates
 
@@ -205,7 +221,19 @@ def fill_field_properties(args, field, defaults, path):
                 "ignore_above": 1024
             }
 
-    elif field["type"] in ["geo_point", "date", "long", "integer",
+    elif field["type"] == "ip":
+        if args.es2x:
+            properties[field["name"]] = {
+                "type": "string",
+                "index": "not_analyzed",
+                "ignore_above": 1024
+            }
+        else:
+            properties[field["name"]] = {
+                "type": "ip"
+            }
+
+    elif field["type"] in ["geo_point", "date", "long", "integer", "short", "byte",
                            "double", "float", "half_float", "scaled_float",
                            "boolean"]:
         # Convert all integer fields to long
@@ -224,10 +252,15 @@ def fill_field_properties(args, field, defaults, path):
             properties[field["name"]]["scaling_factor"] = \
                 field.get("scaling_factor", 1000)
 
-    elif field["type"] in ["dict", "list"]:
-        if field.get("dict-type") == "text":
+    elif field["type"] in ["array"]:
+        properties[field["name"]] = {
+            "properties": {}
+        }
+
+    elif field["type"] in ["object"]:
+        if field.get("object-type") == "text":
             # add a dynamic template to set all members of
-            # the dict as text
+            # the object as text
             if len(path) > 0:
                 name = path + "." + field["name"]
             else:
@@ -255,6 +288,29 @@ def fill_field_properties(args, field, defaults, path):
                     }
                 })
 
+        if field.get("object-type") == "long":
+            if len(path) > 0:
+                name = path + "." + field["name"]
+            else:
+                name = field["name"]
+
+            dynamic_templates.append({
+                name: {
+                    "mapping": {
+                        "type": "long",
+                    },
+                    "match_mapping_type": "long",
+                    "path_match": name + ".*"
+                }
+            })
+
+
+        properties[field["name"]] = {
+            "properties": {}
+        }
+
+
+
     elif field.get("type") == "group":
         if len(path) > 0:
             path = path + "." + field["name"]
@@ -275,17 +331,17 @@ def fill_field_properties(args, field, defaults, path):
             path = field["name"]
         prop, dynamic = fill_section_properties(args, field, defaults, path)
 
+        properties[field.get("name")] = {
+            "type": "nested",
+            "properties": {}
+        }
         # Only add properties if they have a content
         if len(prop) is not 0:
-            properties[field.get("name")] = {
-                "type": "nested",
-                "properties": {}
-            }
             properties[field.get("name")]["properties"] = prop
 
         dynamic_templates.extend(dynamic)
     else:
-        raise ValueError("Unkown type found: " + field.get("type"))
+        raise ValueError("Unknown type found: " + field.get("type"))
 
     return properties, dynamic_templates
 
@@ -307,17 +363,17 @@ if __name__ == "__main__":
         target += "-es2x"
     target += ".json"
 
-    fields_yml = args.path + "/etc/fields.generated.yml"
+    fields_yml = args.path + "/_meta/fields.generated.yml"
 
     # Not all beats have a fields.generated.yml. Fall back to fields.yml
     if not os.path.isfile(fields_yml):
-        fields_yml = args.path + "/etc/fields.yml"
+        fields_yml = args.path + "/_meta/fields.yml"
 
     with open(fields_yml, 'r') as f:
         fields = f.read()
 
         # Prepend beat fields from libbeat
-        with open(args.es_beats + "/libbeat/_meta/fields.yml") as f:
+        with open(args.es_beats + "/libbeat/_meta/fields.generated.yml") as f:
             fields = f.read() + fields
 
         with open(args.es_beats + "/dev-tools/packer/version.yml") as file:

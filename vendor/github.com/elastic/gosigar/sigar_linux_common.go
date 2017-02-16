@@ -305,6 +305,34 @@ func (self *ProcArgs) Get(pid int) error {
 	return nil
 }
 
+func (self *ProcEnv) Get(pid int) error {
+	contents, err := readProcFile(pid, "environ")
+	if err != nil {
+		return err
+	}
+
+	if self.Vars == nil {
+		self.Vars = map[string]string{}
+	}
+
+	pairs := bytes.Split(contents, []byte{0})
+	for _, kv := range pairs {
+		parts := bytes.SplitN(kv, []byte{'='}, 2)
+		if len(parts) != 2 {
+			continue
+		}
+
+		key := string(bytes.TrimSpace(parts[0]))
+		if key == "" {
+			continue
+		}
+
+		self.Vars[key] = string(bytes.TrimSpace(parts[1]))
+	}
+
+	return nil
+}
+
 func (self *ProcExe) Get(pid int) error {
 	fields := map[string]*string{
 		"exe":  &self.Name,

@@ -2,7 +2,7 @@
 == Load Balancing
 
 Filebeat provides configuration options that you can use to fine
-tune load balancing when sending events to multiple hosts. 
+tune load balancing when sending events to multiple hosts.
 
 To enable load balancing, you specify `loadbalance: true` when you configure
 the output. For example:
@@ -24,7 +24,7 @@ Filebeat can send events in a few different modes:
 By default, when you configure Filebeat to send events to multiple hosts
 (`loadbalance: true`), Filebeat will send the events to one host after
 another. This mode requires the least memory and CPU usage. This is not
-true load balancing in the sense that Filebeat does account for the load
+true load balancing in the sense that Filebeat doesn't account for the load
 being processed by each host.
 +
 The load balancer also supports multiple workers per host. The default is
@@ -32,7 +32,7 @@ The load balancer also supports multiple workers per host. The default is
 connections will be used.  The total number of workers participating
 in load balancing is `number of hosts * workers`.
 +
-Example: 
+Example:
 +
 [source,yaml]
 -------------------------------------------------------------------------------
@@ -46,13 +46,17 @@ output.logstash:
   worker: 2
 -------------------------------------------------------------------------------
 +
-In this example, there are 4 workers participating in load balancing. 
+In this example, there are 4 workers participating in load balancing.
 
 * **Send events to `N` hosts in lock-step:**
 +
 You can configure Filebeat to send events to `N` hosts in lock-step by setting
-`spool_size = N * bulk_max_size`. This mode requires more memory and CPU usage
-than the previous mode.
+`spool_size = N * bulk_max_size`. In lock-step mode, the batch collected by the
+spooler is split up into smaller batches of size `bulk_max_size`. These smaller
+batches are load balanced between available connections. Filebeat waits for all
+sub-batches to be published before it retrieves another batch from the spooler.
++
+This mode requires more memory and CPU usage than the previous mode.
 +
 Example:
 +
@@ -68,26 +72,3 @@ output.logstash:
   loadbalance: true
   bulk_max_size: 2048
 -------------------------------------------------------------------------------
-
-* **Send events in parallel and asynchronously:**
-+
-You can configure Filebeat to send events in parallel and asynchronously by
-setting `publish_async: true`. With this setting, Filebeat pushes a batch of
-lines and then prepares a new batch of lines while waiting for the output to
-ACK. This mode can improve load-balancing throughput, but requires the most
-memory and CPU usage. 
-+
-Example:
-+
-[source,yaml]
--------------------------------------------------------------------------------
-filebeat.prospectors:
-- input_type: log
-  paths:
-    - /var/log/*.log
-filebeat.publish_async: true
-output.logstash:
-  hosts: ["localhost:5044", "localhost:5045"]
-  loadbalance: true
--------------------------------------------------------------------------------
-

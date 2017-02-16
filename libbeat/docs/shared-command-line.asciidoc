@@ -60,6 +60,10 @@ Set the default location for miscellaneous files. See the <<directory-layout>> s
 *`-path.logs`*::
 Set the default location for log files. See the <<directory-layout>> section for details.
 
+*`-setup`*::
+Load the sample Kibana dashboards. By default, this downloads an archive file containing the Beats dashboards
+from the elastic.co website. See the <<configuration-dashboards>> section for more details and more options.
+
 *`-v`*::
 Enable verbose output to show INFO-level messages.
 

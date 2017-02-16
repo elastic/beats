@@ -1,5 +1,5 @@
-ENV?=latest.yml
-BASE_COMMAND=docker-compose -f base.yml -f ports.yml -f ${ENV}
+ENV?=snapshot.yml
+BASE_COMMAND=docker-compose -f ${ENV} -f local.yml
 
 start:
 	# This is run every time to make sure the environment is up-to-date

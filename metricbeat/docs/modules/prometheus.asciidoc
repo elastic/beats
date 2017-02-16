@@ -1,0 +1,44 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-prometheus]]
+== Prometheus Module
+
+beta[]
+
+This module periodically fetches metrics from
+https://prometheus.io/docs/[Prometheus].
+
+
+[float]
+=== Example Configuration
+
+The Prometheus module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+#- module: prometheus
+  #metricsets: ["stats"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:9090"]
+  #metrics_path: /metrics
+  #namespace: example
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-prometheus-collector,collector>>
+
+* <<metricbeat-metricset-prometheus-stats,stats>>
+
+include::prometheus/collector.asciidoc[]
+
+include::prometheus/stats.asciidoc[]
+

@@ -1,0 +1,51 @@
+{
+  "description": "Pipeline for parsing Nginx access logs. Requires the geoip and user_agent plugins.",
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns":[
+        "%{IPORHOST:nginx.access.remote_ip} - %{DATA:nginx.access.user_name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{WORD:nginx.access.method} %{DATA:nginx.access.url} HTTP/%{NUMBER:nginx.access.http_version}\" %{NUMBER:nginx.access.response_code} %{NUMBER:nginx.access.body_sent.bytes} \"%{DATA:nginx.access.referrer}\" \"%{DATA:nginx.access.agent}\""
+        ],
+      "ignore_missing": true
+    }
+  },{
+    "remove":{
+      "field": "message"
+    }
+  }, {
+    "rename": {
+      "field": "@timestamp",
+      "target_field": "read_timestamp"
+    }
+  }, {
+    "date": {
+      "field": "nginx.access.time",
+      "target_field": "@timestamp",
+      "formats": ["dd/MMM/YYYY:H:m:s Z"]
+    }
+  }, {
+    "remove": {
+      "field": "nginx.access.time"
+    }
+  }, {
+    "user_agent": {
+      "field": "nginx.access.agent",
+      "target_field": "nginx.access.user_agent"
+    }
+  }, {
+    "remove": {
+      "field": "nginx.access.agent"
+    }
+  }, {
+    "geoip": {
+      "field": "nginx.access.remote_ip",
+      "target_field": "nginx.access.geoip"
+    }
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

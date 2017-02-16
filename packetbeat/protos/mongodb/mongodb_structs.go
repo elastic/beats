@@ -8,14 +8,14 @@ import (
 )
 
 type mongodbMessage struct {
-	Ts time.Time
+	ts time.Time
 
-	TCPTuple     common.TCPTuple
-	CmdlineTuple *common.CmdlineTuple
-	Direction    uint8
+	tcpTuple     common.TCPTuple
+	cmdlineTuple *common.CmdlineTuple
+	direction    uint8
 
-	IsResponse      bool
-	ExpectsResponse bool
+	isResponse      bool
+	expectsResponse bool
 
 	// Standard message header fields from mongodb wire protocol
 	// see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#standard-message-header
@@ -55,25 +55,21 @@ func (st *stream) PrepareForNewMessage() {
 // The private data of a parser instance
 // is composed of 2 potentially active streams: incoming, outgoing
 type mongodbConnectionData struct {
-	Streams [2]*stream
+	streams [2]*stream
 }
 
 // Represent a full mongodb transaction (request/reply)
 // These transactions are the end product of this parser
 type transaction struct {
-	Type         string
-	tuple        common.TCPTuple
 	cmdline      *common.CmdlineTuple
-	Src          common.Endpoint
-	Dst          common.Endpoint
-	ResponseTime int32
-	Ts           int64
-	JsTs         time.Time
+	src          common.Endpoint
+	dst          common.Endpoint
+	responseTime int32
 	ts           time.Time
-	BytesOut     int
-	BytesIn      int
+	bytesOut     int
+	bytesIn      int
 
-	Mongodb common.MapStr
+	mongodb common.MapStr
 
 	event     common.MapStr
 	method    string
@@ -129,7 +125,7 @@ func awaitsReply(c opCode) bool {
 //
 // This list was obtained by calling db.listCommands() and some grepping.
 // They are compared cased insensitive
-var DatabaseCommands = []string{
+var databaseCommands = []string{
 	"getLastError",
 	"connPoolSync",
 	"top",

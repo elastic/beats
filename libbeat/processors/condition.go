@@ -1,13 +1,14 @@
 package processors
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
-	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -24,13 +25,15 @@ type EqualsValue struct {
 }
 
 type Condition struct {
-	equals   map[string]EqualsValue
-	contains map[string]string
-	regexp   map[string]*regexp.Regexp
-	rangexp  map[string]RangeValue
-	or       []Condition
-	and      []Condition
-	not      *Condition
+	equals  map[string]EqualsValue
+	matches struct {
+		name    string
+		filters map[string]match.Matcher
+	}
+	rangexp map[string]RangeValue
+	or      []Condition
+	and     []Condition
+	not     *Condition
 }
 
 type WhenProcessor struct {
@@ -52,7 +55,6 @@ func NewConditional(
 }
 
 func NewCondition(config *ConditionConfig) (*Condition, error) {
-
 	c := Condition{}
 
 	if config == nil {
@@ -60,50 +62,46 @@ func NewCondition(config *ConditionConfig) (*Condition, error) {
 		return nil, nil
 	}
 
-	if config.Equals != nil {
-		if err := c.setEquals(config.Equals); err != nil {
-			return nil, err
-		}
-	} else if config.Contains != nil {
-		if err := c.setContains(config.Contains); err != nil {
-			return nil, err
-		}
-	} else if config.Regexp != nil {
-		if err := c.setRegexp(config.Regexp); err != nil {
-			return nil, err
-		}
-	} else if config.Range != nil {
-		if err := c.setRange(config.Range); err != nil {
-			return nil, err
-		}
-	} else if len(config.OR) > 0 {
-		for _, condConfig := range config.OR {
-			cond, err := NewCondition(&condConfig)
-			if err != nil {
-				return nil, err
-			}
-			c.or = append(c.or, *cond)
-		}
-	} else if len(config.AND) > 0 {
-		for _, condConfig := range config.AND {
-			cond, err := NewCondition(&condConfig)
-			if err != nil {
-				return nil, err
-			}
-			c.and = append(c.and, *cond)
-		}
-	} else if config.NOT != nil {
-		cond, err := NewCondition(config.NOT)
-		if err != nil {
-			return nil, err
-		}
-		c.not = cond
-	} else {
-		return nil, fmt.Errorf("missing condition")
+	var err error
+	switch {
+	case config.Equals != nil:
+		err = c.setEquals(config.Equals)
+	case config.Contains != nil:
+		c.matches.name = "contains"
+		c.matches.filters, err = compileMatches(config.Contains.fields, match.CompileString)
+	case config.Regexp != nil:
+		c.matches.name = "regexp"
+		c.matches.filters, err = compileMatches(config.Regexp.fields, match.Compile)
+	case config.Range != nil:
+		err = c.setRange(config.Range)
+	case len(config.OR) > 0:
+		c.or, err = NewConditionList(config.OR)
+	case len(config.AND) > 0:
+		c.and, err = NewConditionList(config.AND)
+	case config.NOT != nil:
+		c.not, err = NewCondition(config.NOT)
+	default:
+		err = errors.New("missing condition")
+	}
+	if err != nil {
+		return nil, err
 	}
 
 	logp.Debug("processors", "New condition %s", c)
 	return &c, nil
+}
+
+func NewConditionList(config []ConditionConfig) ([]Condition, error) {
+	out := make([]Condition, len(config))
+	for i, condConfig := range config {
+		cond, err := NewCondition(&condConfig)
+		if err != nil {
+			return nil, err
+		}
+
+		out[i] = *cond
+	}
+	return out, nil
 }
 
 func (c *Condition) setEquals(cfg *ConditionFields) error {
@@ -126,40 +124,30 @@ func (c *Condition) setEquals(cfg *ConditionFields) error {
 	return nil
 }
 
-func (c *Condition) setContains(cfg *ConditionFields) error {
-
-	c.contains = map[string]string{}
-
-	for field, value := range cfg.fields {
-		switch v := value.(type) {
-		case string:
-			c.contains[field] = v
-		default:
-			return fmt.Errorf("unexpected type %T of %v", value, value)
-		}
+func compileMatches(
+	fields map[string]interface{},
+	compile func(string) (match.Matcher, error),
+) (map[string]match.Matcher, error) {
+	if len(fields) == 0 {
+		return nil, nil
 	}
 
-	return nil
-}
+	out := map[string]match.Matcher{}
+	for field, value := range fields {
+		var err error
 
-func (c *Condition) setRegexp(cfg *ConditionFields) error {
-
-	var err error
-
-	c.regexp = map[string]*regexp.Regexp{}
-	for field, value := range cfg.fields {
 		switch v := value.(type) {
 		case string:
-			c.regexp[field], err = regexp.Compile(v)
+			out[field], err = compile(v)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 		default:
-			return fmt.Errorf("unexpected type %T of %v", value, value)
+			return nil, fmt.Errorf("unexpected type %T of %v", value, value)
 		}
 	}
-	return nil
+	return out, nil
 }
 
 func (c *Condition) setRange(cfg *ConditionFields) error {
@@ -222,20 +210,9 @@ func (c *Condition) Check(event common.MapStr) bool {
 		return c.checkNOT(event)
 	}
 
-	if !c.checkEquals(event) {
-		return false
-	}
-	if !c.checkContains(event) {
-		return false
-	}
-	if !c.checkRegexp(event) {
-		return false
-	}
-	if !c.checkRange(event) {
-		return false
-	}
-
-	return true
+	return c.checkEquals(event) &&
+		c.checkMatches(event) &&
+		c.checkRange(event)
 }
 
 func (c *Condition) checkEquals(event common.MapStr) bool {
@@ -268,56 +245,43 @@ func (c *Condition) checkEquals(event common.MapStr) bool {
 
 }
 
-func (c *Condition) checkContains(event common.MapStr) bool {
-outer:
-	for field, equalValue := range c.contains {
+func (c *Condition) checkMatches(event common.MapStr) bool {
+	matchers := c.matches.filters
+	if matchers == nil {
+		return true
+	}
+
+	for field, matcher := range matchers {
 		value, err := event.GetValue(field)
 		if err != nil {
 			return false
 		}
 
-		switch value.(type) {
+		switch v := value.(type) {
 		case string:
-			if !strings.Contains(value.(string), equalValue) {
+			if !matcher.MatchString(v) {
 				return false
 			}
+
 		case []string:
-			for _, s := range value.([]string) {
-				if strings.Contains(s, equalValue) {
-					continue outer
-				}
+			if !matcher.MatchAnyString(v) {
+				return false
 			}
-			return false
+
 		default:
-			logp.Warn("unexpected type %T in contains condition as it accepts only strings.", value)
-			return false
+			str, err := extractString(value)
+			if err != nil {
+				logp.Warn("unexpected type %T in %v condition as it accepts only strings.", value, c.matches.name)
+				return false
+			}
+
+			if !matcher.MatchString(str) {
+				return false
+			}
 		}
 	}
 
 	return true
-}
-
-func (c *Condition) checkRegexp(event common.MapStr) bool {
-
-	for field, equalValue := range c.regexp {
-
-		value, err := event.GetValue(field)
-		if err != nil {
-			return false
-		}
-
-		sValue, err := extractString(value)
-		if err != nil {
-			logp.Warn("unexpected type %T in regexp condition as it accepts only strings. ", value)
-			return false
-		}
-		if !equalValue.MatchString(sValue) {
-			return false
-		}
-	}
-
-	return true
-
 }
 
 func (c *Condition) checkRange(event common.MapStr) bool {
@@ -420,11 +384,8 @@ func (c Condition) String() string {
 	if len(c.equals) > 0 {
 		s = s + fmt.Sprintf("equals: %v", c.equals)
 	}
-	if len(c.contains) > 0 {
-		s = s + fmt.Sprintf("contains: %v", c.contains)
-	}
-	if len(c.regexp) > 0 {
-		s = s + fmt.Sprintf("regexp: %v", c.regexp)
+	if len(c.matches.filters) > 0 {
+		s = s + fmt.Sprintf("%v: %v", c.matches.name, c.matches.filters)
 	}
 	if len(c.rangexp) > 0 {
 		s = s + fmt.Sprintf("range: %v", c.rangexp)

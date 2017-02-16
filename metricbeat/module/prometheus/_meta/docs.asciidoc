@@ -1,0 +1,6 @@
+== Prometheus Module
+
+beta[]
+
+This module periodically fetches metrics from
+https://prometheus.io/docs/[Prometheus].

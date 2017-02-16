@@ -1,0 +1,26 @@
+- name: stats
+  type: group
+  description: >
+    Stats about the Prometheus server.
+  fields:
+    - name: notifications
+      type: group
+      description: >
+        Notification stats.
+      fields:
+        - name: queue_length
+          type: long
+          description: >
+            Current queue length.
+        - name: dropped
+          type: long
+          description: >
+            Number of dropped queue events.
+    - name: processes.open_fds
+      type: long
+      description: >
+        Number of open file descriptors.
+    - name: storage.chunks_to_persist
+      type: long
+      description: >
+        Number of memory chunks that are not yet persisted to disk.

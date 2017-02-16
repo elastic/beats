@@ -1,0 +1,50 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-ceph]]
+== ceph Module
+
+beta[]
+
+This is the ceph Module. Metrics are collected submitting HTTP GET requests to ceph-rest-api.
+Reference: http://docs.ceph.com/docs/master/man/8/ceph-rest-api/
+
+
+[float]
+=== Example Configuration
+
+The ceph module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+#- module: ceph
+#  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost:5000"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>
+
+* <<metricbeat-metricset-ceph-cluster_health,cluster_health>>
+
+* <<metricbeat-metricset-ceph-monitor_health,monitor_health>>
+
+* <<metricbeat-metricset-ceph-pool_disk,pool_disk>>
+
+include::ceph/cluster_disk.asciidoc[]
+
+include::ceph/cluster_health.asciidoc[]
+
+include::ceph/monitor_health.asciidoc[]
+
+include::ceph/pool_disk.asciidoc[]
+

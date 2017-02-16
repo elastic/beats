@@ -233,18 +233,22 @@ WINDOWS:  If your Windows log rotation system shows errors because it can't rota
 
 WARNING: Only use this option if you understand that data loss is a potential side effect.
 
-When this option is enabled, Filebeat closes a file as soon as the end of a file is reached. This is useful when your files are only written once and not updated from time to time. For example, this happens when you are writing every single log event to a new file.
+When this option is enabled, Filebeat closes a file as soon as the end of a file is reached. This is useful when your files are only written once and not updated from time to time. For example, this happens when you are writing every single log event to a new file. This option is disabled by default.
 
 [[close-timeout]]
 ===== close_timeout
 
 WARNING: Only use this option if you understand that data loss is a potential side effect. Another side effect is that multiline events might not be completely sent before the timeout expires.
 
-When this option is enabled, Filebeat gives every harvester a predefined lifetime. Regardless of where the reader is in the file, reading will stop after the `close_timeout` period has elapsed. This option can be useful for older log files when you want to spend only a predefined amount of time on the files.  If you set `close_timeout` to equal `ignore_older`, the file will not be picked up if it's modified while the harvester is closed. This combination of settings normally leads to data loss, and the complete file is not sent.
+When this option is enabled, Filebeat gives every harvester a predefined lifetime. Regardless of where the reader is in the file, reading will stop after the `close_timeout` period has elapsed. This option can be useful for older log files when you want to spend only a predefined amount of time on the files.  While `close_timeout` will close the file after the predefined timeout, if the file is still being updated, the prospector will start a new harvester again per the defined `scan_frequency`. And the close_timeout for this harvester will start again with the countdown for the timeout.
+
+If you set `close_timeout` to equal `ignore_older`, the file will not be picked up if it's modified while the harvester is closed. This combination of settings normally leads to data loss, and the complete file is not sent.
 
 When you use `close_timeout` for logs that contain multiline events, the harvester might stop in the middle of a multiline event, which means that only parts of the event will be sent. If the harvester is started again and the file still exists, only the second part of the event will be sent.
 
 The `close_timeout` setting won't apply if your output is stalled and no further events can be sent. At least one event must be sent after `close_timeout` elapses so the harvester can be closed after sending the event.
+
+This option is set to 0 by default which means it is disabled.
 
 
 [[clean-options]]
@@ -318,15 +322,10 @@ Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-json.message_key: log
 json.keys_under_root: true
 json.add_error_key: true
+json.message_key: log
 -------------------------------------------------------------------------------------
-
-
-*`message_key`*:: JSON key on which to apply the line filtering and multiline settings. This key must be top level
-and its value must be string, otherwise it is ignored. If no text key is defined, the line
-filtering and multiline features cannot be used.
 
 *`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key in the output document.
 If you enable this setting, the keys are copied top level in the output document. The default is false.
@@ -335,7 +334,14 @@ If you enable this setting, the keys are copied top level in the output document
 JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.) in case of conflicts.
 
 *`add_error_key`*:: If this setting is enabled, Filebeat adds a "json_error" key in case of JSON
-unmarshaling errors or when a text key is defined in the configuration but cannot be used.
+unmarshalling errors or when a `message_key` is defined in the configuration but cannot be used.
+
+*`message_key`*:: An optional configuration setting that specifies a JSON key on
+which to apply the line filtering and multiline settings. If specified the
+key must be at the top level in the JSON object and the value associated with
+the key must be a string, otherwise no filtering or multiline aggregation will
+occur.
+
 
 [[multiline]]
 ===== multiline
@@ -367,7 +373,8 @@ See <<multiline-examples>> for more configuration examples.
 
 You specify the following settings under `multiline` to control how Filebeat combines the lines in the message:
 
-*`pattern`*:: Specifies the regular expression pattern to match. See <<regexp-support>> for a list of supported regexp patterns.
+*`pattern`*:: Specifies the regular expression pattern to match. Note that the regexp patterns supported by Filebeat differ
+somewhat from the patterns supported by Logstash. See <<regexp-support>> for a list of supported regexp patterns.
 
 *`negate`*:: Defines whether the pattern is negated. The default is `false`.
 
@@ -398,9 +405,15 @@ This option applies to files that Filebeat has not already processed. If you ran
 
 NOTE: You can use this setting to avoid indexing old log lines when you run Filebeat on a set of log files for the first time. After the first run, we recommend disabling this option, or you risk losing lines during file rotation.
 
-===== symlinks
+===== pipeline
 
-experimental[]
+The Ingest Node pipeline ID to set for the events generated by this prospector.
+
+NOTE: The pipeline ID can also be configured in the Elasticsearch output, but this
+  option usually results in simpler configuration files. If the pipeline is configured both
+  in the prospector and in the output, the option from the prospector is the one used.
+
+===== symlinks
 
 The `symlinks` option allows Filebeat to harvest symlinks in addition to regular files. When harvesting symlinks, Filebeat opens and reads the original file even though it reports the path of the symlink.
 
@@ -442,8 +455,6 @@ lines. The `backoff` value will be multiplied each time with the `backoff_factor
 [[harvester-limit]]
 ===== harvester_limit
 
-experimental[]
-
 The `harvester_limit` option limits the number of harvesters that are started in parallel for one prospector. This directly relates
 to the maximum number of file handlers that are opened. The default for `harvester_limit` is 0, which means there is no limit. This
 configuration is useful if the number of files to be harvested exceeds the open file handler limit of the operating system.
@@ -456,6 +467,10 @@ Currently if a new harvester can be started again, the harvester is picked rando
 
 This configuration option applies per prospector. You can use this option to indirectly set higher priorities on certain prospectors
 by assigning a higher limit of harvesters.
+
+===== enabled
+
+The `enabled` option can be used with each prospector to define if a prospector is enabled or not. By default, enabled is set to true.
 
 [[configuration-global-options]]
 === Filebeat Global Configuration
@@ -478,6 +493,9 @@ See <<load-balancing>> for more information about how this setting affects load 
 
 ===== publish_async
 
+experimental[]
+deprecated[5.3.0]
+
 If enabled, the publisher pipeline in Filebeat operates in async mode preparing
 a new batch of lines while waiting for ACK. This option can improve load-balancing
 throughput at the cost of increased memory usage. The default value is false.
@@ -498,7 +516,7 @@ filebeat.idle_timeout: 5s
 ===== registry_file
 
 The name of the registry file. If a relative path is used, it is considered relative to the
-data path. See the <<directory-layout>> section for details. The default is `registry`.
+data path. See the <<directory-layout>> section for details. The default is `${path.data}/registry`.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -506,6 +524,9 @@ filebeat.registry_file: registry
 -------------------------------------------------------------------------------------
 
 It is not possible to use a symlink as registry file.
+
+NOTE: The registry file is only updated when new events are flushed and not on a predefined period.
+That means in case there are some states where the TTL expired, these are only removed when new event are processed.
 
 
 ===== config_dir
@@ -555,11 +576,15 @@ filebeat.shutdown_timeout: 5s
 
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/processors-config.asciidoc[]
+include::./reload-configuration.asciidoc[]
 
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
+include::../../../../libbeat/docs/dashboardsconfig.asciidoc[]
+
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
+
+include::../../../../libbeat/docs/processors-config.asciidoc[]
 

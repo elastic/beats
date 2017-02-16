@@ -1,0 +1,39 @@
+=== Reload Configuration
+
+experimental[]
+
+Reload configuration allows to dynamically reload module configuration files. A glob can be defined which should be watched
+ for module configuration changes. New modules will started / stopped accordingly. This is especially useful in
+ container environments where 1 container is used to monitor all services in other containers on the same host.
+ New containers appear and disappear dynamically which requires changes to which modules
+ are needed and which hosts must be monitored.
+
+The configuration in the main metricbeat.yml config file looks as following:
+
+[source,yaml]
+------------------------------------------------------------------------------
+metricbeat.config.modules:
+  path: configs/*.yml
+  reload.enabled: true
+  reload.period: 10s
+------------------------------------------------------------------------------
+
+A path with a glob must be defined on which files should be checked for changes. A period is set on how often
+the files are checked for changes. Do not set period below 1s as the modification time of files is often stored in seconds.
+Setting it below 1s will have an unnecessary overhead.
+
+The configuration inside the files which are found by the glob look as following:
+[source,yaml]
+------------------------------------------------------------------------------
+- module: system
+  metricsets: ["cpu"]
+  enabled: false
+  perdiod: 1s
+
+- module: system
+  metricsets: ["network"]
+  enabled: true
+  period: 10s
+------------------------------------------------------------------------------
+
+Each file directly contains a list of modules. Each file can contain one or multiple module definitions.

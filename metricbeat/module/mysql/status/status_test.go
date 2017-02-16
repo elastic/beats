@@ -31,7 +31,7 @@ func TestConfigValidation(t *testing.T) {
 				"metricsets": []string{"status"},
 				"hosts":      []string{"127.0.0.1"},
 			},
-			err: "config error for host '127.0.0.1': invalid DSN: missing the slash separating the database name",
+			err: "error parsing mysql host: invalid DSN: missing the slash separating the database name",
 		},
 		{
 			// Local unix socket
@@ -72,8 +72,12 @@ func TestConfigValidation(t *testing.T) {
 			t.Errorf("unexpected error in testcase %d: %v", i, err)
 			continue
 		}
-		if test.err != "" && assert.Error(t, err, "expected '%v' in testcase %d", test.err, i) {
-			assert.Contains(t, err.Error(), test.err, "testcase %d", i)
+		if test.err != "" {
+			if err != nil {
+				assert.Contains(t, err.Error(), test.err, "testcase %d", i)
+			} else {
+				t.Errorf("expected error '%v' in testcase %d", test.err, i)
+			}
 			continue
 		}
 	}

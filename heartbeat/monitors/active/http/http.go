@@ -36,16 +36,16 @@ func create(
 	var body []byte
 	var enc contentEncoder
 
-	if config.Check.SendBody != "" {
+	if config.Check.Request.SendBody != "" {
 		var err error
-		compression := config.Check.Compression
+		compression := config.Check.Request.Compression
 		enc, err = getContentEncoder(compression.Type, compression.Level)
 		if err != nil {
 			return nil, err
 		}
 
 		buf := bytes.NewBuffer(nil)
-		err = enc.Encode(buf, bytes.NewBufferString(config.Check.SendBody))
+		err = enc.Encode(buf, bytes.NewBufferString(config.Check.Request.SendBody))
 		if err != nil {
 			return nil, err
 		}
@@ -53,7 +53,7 @@ func create(
 		body = buf.Bytes()
 	}
 
-	validator := makeValidateResponse(&config.Check)
+	validator := makeValidateResponse(&config.Check.Response)
 
 	jobs := make([]monitors.Job, len(config.URLs))
 

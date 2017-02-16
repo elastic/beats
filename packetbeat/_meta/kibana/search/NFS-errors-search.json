@@ -1,0 +1,16 @@
+{
+  "sort": [
+    "@timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "NFS errors search", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[{\"meta\":{\"negate\":false,\"index\":\"packetbeat-*\",\"key\":\"type\",\"value\":\"nfs\",\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"type\":{\"query\":\"nfs\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"negate\":true,\"index\":\"packetbeat-*\",\"key\":\"nfs.status\",\"value\":\"NFSERR_NOENT\",\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"nfs.status\":{\"query\":\"NFSERR_NOENT\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"negate\":true,\"index\":\"packetbeat-*\",\"key\":\"nfs.status\",\"value\":\"NFS_OK\",\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"nfs.status\":{\"query\":\"NFS_OK\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+  }, 
+  "columns": [
+    "_source"
+  ]
+}

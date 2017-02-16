@@ -1,0 +1,43 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-jolokia]]
+== Jolokia Module
+
+beta[]
+
+This is the Jolokia Module.
+
+
+
+[float]
+=== Example Configuration
+
+The Jolokia module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+#- module: jolokia
+#  metricsets: ["jmx"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost"]
+#  namespace: "metrics"
+#  path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+#  jmx.mapping:
+#  jmx.application:
+#  jmx.instance:
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-jolokia-jmx,jmx>>
+
+include::jolokia/jmx.asciidoc[]
+

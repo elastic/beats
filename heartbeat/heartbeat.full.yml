@@ -1,5 +1,12 @@
 ################### Heartbeat Configuration Example #########################
 
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains
+# only some common options, please see heartbeat.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/heartbeat/index.html
+
 ############################# Heartbeat ######################################
 
 # Configure monitors
@@ -67,7 +74,7 @@ heartbeat.monitors:
   #     Using `tls`/`ssl`, an SSL connection is established. If no ssl is configured,
   #     system defaults will be used (not supported on windows).
   #     If `port` is missing in url, the ports setting is required.
-  hosts: ["localhost:12345"]
+  hosts: ["localhost:9200"]
 
   # Configure IP protocol types to ping on if hostnames are configured.
   # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
@@ -115,7 +122,7 @@ heartbeat.monitors:
 - type: http # monitor type `http`. Connect via HTTP an optionally verify response
 
   # Monitor name used for job name and document type
-  #name: tcp
+  #name: http
 
   # Enable/Disable monitor
   #enabled: true
@@ -124,7 +131,7 @@ heartbeat.monitors:
   schedule: '@every 5s' # every 5 seconds from start of beat
 
   # Configure URLs to ping
-  urls: ["http://localhost:80"]
+  urls: ["http://localhost:9200"]
 
   # Configure IP protocol types to ping on if hostnames are configured.
   # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
@@ -302,6 +309,10 @@ output.elasticsearch:
 
   # Optional HTTP Path
   #path: "/elasticsearch"
+
+  # Custom HTTP headers to add to each request
+  #headers:
+  #  X-My-Header: Contents of the header
 
   # Proxy server url
   #proxy_url: http://proxy:3128
@@ -733,6 +744,45 @@ output.elasticsearch:
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag.
+#dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#dashboards.url:
+
+# The directory from where to read the dashboards. It is used instead of the URL
+# when it has a value.
+#dashboards.directory:
+
+# The file archive (zip file) from where to read the dashboards. It is used instead
+# of the URL when it has a value.
+#dashboards.file:
+
+# If this option is enabled, the snapshot URL is used instead of the default URL.
+#dashboard.snapshot: false
+
+# The URL from where to download the snapshot version of the dashboards. By default
+# this has a value which is computed based on the Beat name and version.
+#dashboard.snapshot_url
+
+# In case the archive contains the dashboards from multiple Beats, this lets you
+# select which one to load. You can load all the dashboards in the archive by
+# setting this to the empty string.
+#dashboard.beat: heartbeat
+
+# The name of the Kibana index to use for setting the configuration. Default is ".kibana"
+#dashboards.kibana_index: .kibana
+
+# The Elasticsearch index name. This overwrites the index name defined in the
+# dashboards and index pattern. Example: testbeat-*
+#dashboards.index:
 
 #================================ Logging ======================================
 # There are three options for the log output: syslog, file, stderr.

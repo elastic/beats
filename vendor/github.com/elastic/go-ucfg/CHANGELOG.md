@@ -14,6 +14,65 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.4.6]
+
+### Added
+- Introduce ,ignore struct tag option to optionally ignore exported fields. #89
+- Add support for custom Unpacker method with `*Config` being convertible to first parameter. The custom method must be compatible to `ConfigUnpacker`. #90
+
+### Fixed
+- Ignore private struct fields when merging a struct into a config. #89
+
+## [0.4.5]
+
+### Changed
+- merging sub-configs enforces strict variable expansion #85
+
+### Fixed
+- fix merging nil sub-configs #85
+
+## [0.4.4]
+
+### Added
+- Add support for pure array config files #82 
+
+### Changed
+- Invalid top-level types return non-critical error (no stack-trace) on merge #82
+
+### Fixed
+- Fix panic when merging or creating a config from nil interface value #82
+
+## [0.4.3]
+
+### Changed
+- Add per element type stop set for handling unquoted strings (reduces need for quoting strings in environment variables) #80
+
+### Fixed
+- fix issue unpacking array from environment variable into struct array fields #80
+- fix unparsed values being used for unpacking #80
+
+## [0.4.2]
+
+### Fixed
+- Treat `,` character as only special character in non quoted top-level strings. #78
+
+## [0.4.1]
+
+### Fixed
+- Fix parsing empty string or nil objects from environment variables. #76
+
+## [0.4.0]
+
+### Added
+- Syntax for passing lists and dictionaries to flags. #72
+- Add Unpacker interface specializations for primitive types. #73
+- Variable expansion parsing lists and dictionaries with parser introduced in
+  #72. #74
+
+### Fixed
+- Fix Unpacker interface not applied if some 'old' value is already present on
+  target and is struct implementing Unpack. #73
+
 ## [0.3.7]
 
 ### Fixed
@@ -118,7 +177,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.3.7...HEAD
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.4.6...HEAD
+[0.4.6]: https://github.com/elastic/go-ucfg/compare/v0.4.5...v0.4.6
+[0.4.5]: https://github.com/elastic/go-ucfg/compare/v0.4.4...v0.4.5
+[0.4.4]: https://github.com/elastic/go-ucfg/compare/v0.4.3...v0.4.4
+[0.4.3]: https://github.com/elastic/go-ucfg/compare/v0.4.2...v0.4.3
+[0.4.2]: https://github.com/elastic/go-ucfg/compare/v0.4.1...v0.4.2
+[0.4.1]: https://github.com/elastic/go-ucfg/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/elastic/go-ucfg/compare/v0.3.7...v0.4.0
 [0.3.7]: https://github.com/elastic/go-ucfg/compare/v0.3.6...v0.3.7
 [0.3.6]: https://github.com/elastic/go-ucfg/compare/v0.3.5...v0.3.6
 [0.3.5]: https://github.com/elastic/go-ucfg/compare/v0.3.4...v0.3.5

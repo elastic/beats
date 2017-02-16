@@ -8,12 +8,14 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	metrics "github.com/rcrowley/go-metrics"
+	gometrics "github.com/rcrowley/go-metrics"
 	"github.com/rcrowley/go-metrics/exp"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/monitoring/adapter"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
@@ -38,12 +40,12 @@ const (
 	defaultMaxWaitRetry = 60 * time.Second
 )
 
-var kafkaMetricsRegistryInstance metrics.Registry
+var kafkaMetricsRegistryInstance gometrics.Registry
 
 func init() {
 	sarama.Logger = kafkaLogger{}
 
-	reg := metrics.NewPrefixedRegistry("libbeat.kafka.")
+	reg := gometrics.NewPrefixedRegistry("libbeat.kafka.")
 
 	// Note: registers /debug/metrics handler for displaying all expvar counters
 	exp.Exp(reg)
@@ -54,7 +56,7 @@ func init() {
 
 var kafkaMetricsOnce sync.Once
 
-func kafkaMetricsRegistry() metrics.Registry {
+func kafkaMetricsRegistry() gometrics.Registry {
 	return kafkaMetricsRegistryInstance
 }
 
@@ -91,7 +93,9 @@ var (
 		"0.10.0.0": sarama.V0_10_0_0,
 		"0.10.0.1": sarama.V0_10_0_1,
 		"0.10.0":   sarama.V0_10_0_1,
-		"0.10":     sarama.V0_10_0_1,
+		"0.10.1.0": sarama.V0_10_1_0,
+		"0.10.1":   sarama.V0_10_1_0,
+		"0.10":     sarama.V0_10_1_0,
 	}
 )
 
@@ -110,6 +114,11 @@ func (k *kafka) init(cfg *common.Config) error {
 
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
+		return err
+	}
+
+	// validate codec
+	if _, err := outputs.CreateEncoder(config.Codec); err != nil {
 		return err
 	}
 
@@ -159,8 +168,14 @@ func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
 	var clients []mode.AsyncProtocolClient
 	hosts := k.config.Hosts
 	topic := k.topic
+
 	for i := 0; i < worker; i++ {
-		client, err := newKafkaClient(hosts, k.config.Key, topic, libCfg)
+		codec, err := outputs.CreateEncoder(k.config.Codec)
+		if err != nil {
+			return nil, err
+		}
+
+		client, err := newKafkaClient(hosts, k.config.Key, topic, codec, libCfg)
 		if err != nil {
 			logp.Err("Failed to create kafka client: %v", err)
 			return nil, err
@@ -257,6 +272,15 @@ func (k *kafka) newKafkaConfig() (*sarama.Config, error) {
 	}
 
 	cfg.Producer.Partitioner = k.partitioner
+
+	// TODO: figure out which metrics we want to collect
+	cfg.MetricRegistry = adapter.GetGoMetrics(
+		monitoring.Default,
+		"libbeat.output.kafka",
+		adapter.Rename("incoming-byte-rate", "bytes_read"),
+		adapter.Rename("outgoing-byte-rate", "bytes_write"),
+		adapter.GoMetricsNilify,
+	)
 	return cfg, nil
 }
 

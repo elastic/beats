@@ -14,6 +14,10 @@ metricbeat.modules:
     {% endfor %}
   {% endif -%}
 
+  {% if m.socket -%}
+  socket: "{{ m.socket }}"
+  {% endif -%}
+
   {% if m.username -%}
   username: {{ m.username }}
   {% endif -%}
@@ -35,6 +39,10 @@ metricbeat.modules:
 
   {% if m.timeout -%}
   timeout: {{ m.timeout }}
+  {% endif -%}
+
+  {% if m.namespace -%}
+  namespace: {{ m.namespace }}
   {% endif -%}
 
   {% if m.processes -%}
@@ -74,7 +82,17 @@ metricbeat.modules:
   {{ k }}: {{ v }}
   {% endfor %}
   {% endif -%}
+  {% if m.additional_content -%}
+  {{ m.additional_content }}
+  {% endif -%}
 {%- endfor %}
+
+{% if reload -%}
+metricbeat.config.modules:
+  path: {{ reload_path }}
+  reload.period: 1s
+  reload.enabled: true
+{% endif -%}
 
 #================================ General =====================================
 

@@ -11,6 +11,7 @@ from packetbeat import BaseTest
 
 
 class Test(BaseTest):
+
     def _run(self, pcap):
         self.render_config_template(
             memcache_udp_transaction_timeout=10

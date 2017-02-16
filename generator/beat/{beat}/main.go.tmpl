@@ -1,0 +1,16 @@
+package main
+
+import (
+	"os"
+
+	"github.com/elastic/beats/libbeat/beat"
+
+	"{beat_path}/beater"
+)
+
+func main() {
+	err := beat.Run("{beat}", "", beater.New)
+	if err != nil {
+		os.Exit(1)
+	}
+}

@@ -13,7 +13,7 @@ import (
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	publishedEvents = expvar.NewInt("libbeat.publisher.published_events")
+	publishedEvents = expvar.NewInt("publisher.events.count")
 )
 
 var (
@@ -103,27 +103,57 @@ func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
 		return false
 	}
 
-	ctx, pipeline := c.getPipeline(opts)
+	var values *outputs.Values
+	meta, ctx, pipeline := c.getPipeline(opts)
+	if len(meta) != 0 {
+		if len(meta) != 1 {
+			logp.Debug("publish", "too many metadata, pick first")
+			meta = meta[:1]
+		}
+		values = outputs.ValuesWithMetadata(nil, meta[0])
+	}
+
 	publishedEvents.Add(1)
 	return pipeline.publish(message{
 		client:  c,
 		context: ctx,
-		datum:   outputs.Data{Event: *publishEvent},
+		datum:   outputs.Data{Event: *publishEvent, Values: values},
 	})
 }
 
 func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
-	data := make([]outputs.Data, 0, len(events))
-	for _, event := range events {
-		c.annotateEvent(event)
+	var valuesAll *outputs.Values
 
-		publishEvent := c.filterEvent(event)
-		if publishEvent != nil {
-			data = append(data, outputs.Data{Event: *publishEvent})
+	meta, ctx, pipeline := c.getPipeline(opts)
+	if len(meta) != 0 && len(events) != len(meta) {
+		if len(meta) != 1 {
+			logp.Debug("publish",
+				"Number of metadata elements does not match number of events => dropping metadata")
+			meta = nil
+		} else {
+			valuesAll = outputs.ValuesWithMetadata(nil, meta[0])
+			meta = nil
 		}
 	}
 
-	ctx, pipeline := c.getPipeline(opts)
+	data := make([]outputs.Data, 0, len(events))
+	for i, event := range events {
+		c.annotateEvent(event)
+
+		publishEvent := c.filterEvent(event)
+		if publishEvent == nil {
+			continue
+		}
+
+		evt := outputs.Data{Event: *publishEvent, Values: valuesAll}
+		if meta != nil {
+			if m := meta[i]; m != nil {
+				evt.Values = outputs.ValuesWithMetadata(valuesAll, meta[i])
+			}
+		}
+		data = append(data, evt)
+	}
+
 	if len(data) == 0 {
 		logp.Debug("filter", "No events to publish")
 		return true
@@ -186,18 +216,27 @@ func (c *client) filterEvent(event common.MapStr) *common.MapStr {
 	return &publishEvent
 }
 
-func (c *client) getPipeline(opts []ClientOption) (Context, pipeline) {
-	ctx := MakeContext(opts)
+func (c *client) getPipeline(opts []ClientOption) ([]common.MapStr, Context, pipeline) {
+	values, ctx := MakeContext(opts)
 	if ctx.Sync {
-		return ctx, c.publisher.pipelines.sync
+		return values, ctx, c.publisher.pipelines.sync
 	}
-	return ctx, c.publisher.pipelines.async
+	return values, ctx, c.publisher.pipelines.async
 }
 
-func MakeContext(opts []ClientOption) Context {
+func MakeContext(opts []ClientOption) ([]common.MapStr, Context) {
 	var ctx Context
+	var meta []common.MapStr
 	for _, opt := range opts {
-		ctx = opt(ctx)
+		var m []common.MapStr
+		m, ctx = opt(ctx)
+		if m != nil {
+			if meta == nil {
+				meta = m
+			} else {
+				meta = append(meta, m...)
+			}
+		}
 	}
-	return ctx
+	return meta, ctx
 }

@@ -87,7 +87,7 @@ func (r *reference) String() string {
 	return fmt.Sprintf("${%v}", r.Path)
 }
 
-func (r *reference) resolve(cfg *Config, opts *options) (value, error) {
+func (r *reference) resolveRef(cfg *Config, opts *options) (value, error) {
 	env := opts.env
 	var err error
 
@@ -114,7 +114,12 @@ func (r *reference) resolve(cfg *Config, opts *options) (value, error) {
 		env = env[:len(env)-1]
 	}
 
-	// try callbacks
+	return nil, err
+}
+
+func (r *reference) resolveEnv(cfg *Config, opts *options) (string, error) {
+	var err error
+
 	if len(opts.resolvers) > 0 {
 		key := r.Path.String()
 		for i := len(opts.resolvers) - 1; i >= 0; i-- {
@@ -122,12 +127,26 @@ func (r *reference) resolve(cfg *Config, opts *options) (value, error) {
 			resolver := opts.resolvers[i]
 			v, err = resolver(key)
 			if err == nil {
-				return newString(context{field: key}, nil, v), nil
+				return v, nil
 			}
 		}
 	}
 
-	return nil, err
+	return "", err
+}
+
+func (r *reference) resolve(cfg *Config, opts *options) (value, error) {
+	v, err := r.resolveRef(cfg, opts)
+	if v != nil || err != nil {
+		return v, err
+	}
+
+	s, err := r.resolveEnv(cfg, opts)
+	if s == "" || err != nil {
+		return nil, err
+	}
+
+	return newString(context{field: r.Path.String()}, nil, s), nil
 }
 
 func (r *reference) eval(cfg *Config, opts *options) (string, error) {
@@ -390,9 +409,7 @@ func lexer(in string) (<-chan token, <-chan error) {
 }
 
 func parseVarExp(lex <-chan token, pathSep string) (varEvaler, error) {
-	stack := []parseState{
-		parseState{st: stLeft},
-	}
+	stack := []parseState{{st: stLeft}}
 
 	// parser loop
 	for tok := range lex {

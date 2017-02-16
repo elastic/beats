@@ -51,15 +51,17 @@ Beats](https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.
 
 The Beats are Go programs, so install the latest version of
 [golang](http://golang.org/) if you don't have it already. The current Go version
-used for development is Golang 1.7.1.
+used for development is Golang 1.7.4.
 
 The location where you clone is important. Please clone under the source
 directory of your `GOPATH`. If you don't have `GOPATH` already set, you can
 simply set it to your home directory (`export GOPATH=$HOME`).
 
-    $ mkdir -p $GOPATH/src/github.com/elastic
-    $ cd $GOPATH/src/github.com/elastic
+    $ mkdir -p ${GOPATH}/src/github.com/elastic
+    $ cd ${GOPATH}/src/github.com/elastic
     $ git clone https://github.com/elastic/beats.git
+
+Note: If you have multiple go paths use `${GOPATH%%:*}`instead of `${GOPATH}`.
 
 Then you can compile a particular Beat by using the Makefile. For example, for
 Packetbeat:

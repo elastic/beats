@@ -1,8 +1,6 @@
 package kafka
 
 import (
-	"encoding/json"
-	"expvar"
 	"fmt"
 	"sync"
 	"sync/atomic"
@@ -13,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
@@ -21,6 +20,7 @@ type client struct {
 	hosts  []string
 	topic  outil.Selector
 	key    *fmtstr.EventFormatString
+	codec  outputs.Codec
 	config sarama.Config
 
 	producer sarama.AsyncProducer
@@ -38,21 +38,23 @@ type msgRef struct {
 }
 
 var (
-	ackedEvents            = expvar.NewInt("libbeat.kafka.published_and_acked_events")
-	eventsNotAcked         = expvar.NewInt("libbeat.kafka.published_but_not_acked_events")
-	publishEventsCallCount = expvar.NewInt("libbeat.kafka.call_count.PublishEvents")
+	ackedEvents            = monitoring.NewInt(outputs.Metrics, "kafka.events.acked")
+	eventsNotAcked         = monitoring.NewInt(outputs.Metrics, "kafka.events.not_acked")
+	publishEventsCallCount = monitoring.NewInt(outputs.Metrics, "kafka.publishEvents.call.count")
 )
 
 func newKafkaClient(
 	hosts []string,
 	key *fmtstr.EventFormatString,
 	topic outil.Selector,
+	writer outputs.Codec,
 	cfg *sarama.Config,
 ) (*client, error) {
 	c := &client{
 		hosts:  hosts,
 		topic:  topic,
 		key:    key,
+		codec:  writer,
 		config: *cfg,
 	}
 	return c, nil
@@ -146,11 +148,12 @@ func (c *client) getEventMessage(data *outputs.Data) (*message, error) {
 	}
 	msg.topic = topic
 
-	jsonEvent, err := json.Marshal(event)
+	serializedEvent, err := c.codec.Encode(event)
 	if err != nil {
-		return nil, fmt.Errorf("json encoding failed with %v", err)
+		return nil, err
 	}
-	msg.value = jsonEvent
+
+	msg.value = serializedEvent
 
 	// message timestamps have been added to kafka with version 0.10.0.0
 	var ts time.Time
@@ -231,12 +234,14 @@ func (r *msgRef) dec() {
 		eventsNotAcked.Add(int64(failed))
 		if success > 0 {
 			ackedEvents.Add(int64(success))
+			outputs.AckedEvents.Add(int64(success))
 		}
 
 		debugf("Kafka publish failed with: %v", err)
 		r.cb(r.failed, err)
 	} else {
 		ackedEvents.Add(int64(r.total))
+		outputs.AckedEvents.Add(int64(r.total))
 		r.cb(nil, nil)
 	}
 }

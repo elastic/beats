@@ -1,9 +1,9 @@
 - name: info
   type: group
   description: >
-    experimental[]
+    beta[]
 
-    info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information
+    Info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information.
   fields:
     - name: containers
       type: group
@@ -29,7 +29,7 @@
     - name: id
       type: keyword
       description: >
-        Unique docker host identifier.
+        Unique Docker host identifier.
 
     - name: images
       type: long

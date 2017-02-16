@@ -9,12 +9,16 @@ If you have issues installing or running Winlogbeat, read the following tips:
 * <<enable-winlogbeat-debugging>>
 * <<faq>>
 
+//sets block macro for getting-help.asciidoc included in next section
+
 --
 
 [[getting-help]]
 == Getting Help
 
 include::../../libbeat/docs/getting-help.asciidoc[]
+
+//sets block macro for debugging.asciidoc included in next section
 
 
 [[enable-winlogbeat-debugging]]

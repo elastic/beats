@@ -1,6 +1,6 @@
 
 ////
-This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
@@ -65,7 +65,7 @@ Arbitrary tags that can be set per Beat and per transaction type.
 [float]
 === fields
 
-type: dict
+type: object
 
 Contains user configurable fields.
 
@@ -125,20 +125,6 @@ Region in which this host is running.
 == Common monitoring fields Fields
 
 None
-
-
-[float]
-=== @timestamp
-
-type: date
-
-example: 2015-01-24 14:06:05.071000
-
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The timestamp of the event, as measured either by the Beat or by a common collector point. The precision is in milliseconds. The timezone is UTC.
 
 
 [float]

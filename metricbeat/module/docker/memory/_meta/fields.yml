@@ -16,7 +16,7 @@
     - name: rss
       type: group
       description: >
-        Rss memory stats.
+        RSS memory stats.
       fields:
         - name: total
           type: long

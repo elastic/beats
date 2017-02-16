@@ -12,8 +12,16 @@ import re
 import json
 import os
 import errno
+import sys
+
+unique_fields = []
+
 
 def fields_to_json(section, path, output):
+
+    # Need in case there are no fields
+    if section["fields"] is None:
+        section["fields"] = {}
 
     for field in section["fields"]:
         if path == "":
@@ -27,21 +35,32 @@ def fields_to_json(section, path, output):
             field_to_json(field, newpath, output)
 
 
-def field_to_json(desc, path, output):
+def field_to_json(desc, path, output,
+                  indexed=True, analyzed=False, doc_values=True,
+                  searchable=True, aggregatable=True):
+
+    global unique_fields
+
+    if path in unique_fields:
+        print("ERROR: Field {} is duplicated. Please delete it and try again. Fields already are {}".format(
+            path, ", ".join(unique_fields)))
+        sys.exit(1)
+    else:
+        unique_fields.append(path)
 
     field = {
         "name": path,
         "count": 0,
         "scripted": False,
-        "indexed": True,
-        "analyzed": False,
-        "doc_values": True,
-        "searchable": True,
-        "aggregatable": True,
+        "indexed": indexed,
+        "analyzed": analyzed,
+        "doc_values": doc_values,
+        "searchable": searchable,
+        "aggregatable": aggregatable,
     }
     # find the kibana types based on the field type
     if "type" in desc:
-        if desc["type"] in ["half_float", "scaled_float", "float", "integer", "long"]:
+        if desc["type"] in ["half_float", "scaled_float", "float", "integer", "long", "short", "byte"]:
             field["type"] = "number"
         elif desc["type"] in ["text", "keyword"]:
             field["type"] = "string"
@@ -49,6 +68,8 @@ def field_to_json(desc, path, output):
                 field["aggregatable"] = False
         elif desc["type"] == "date":
             field["type"] = "date"
+        elif desc["type"] == "geo_point":
+            field["type"] = "geo_point"
     else:
         field["type"] = "string"
 
@@ -76,8 +97,26 @@ def fields_to_index_pattern(args, input):
 
     }
 
-    for k, section in enumerate(docs["fields"]):
+    for k, section in enumerate(docs):
         fields_to_json(section, "", output)
+
+    # add meta fields
+
+    field_to_json({"name": "_id", "type": "keyword"}, "_id", output,
+                  indexed=False, analyzed=False, doc_values=False,
+                  searchable=False, aggregatable=False)
+
+    field_to_json({"name": "_type", "type": "keyword"}, "_type", output,
+                  indexed=False, analyzed=False, doc_values=False,
+                  searchable=True, aggregatable=True)
+
+    field_to_json({"name": "_index", "type": "keyword"}, "_index", output,
+                  indexed=False, analyzed=False, doc_values=False,
+                  searchable=False, aggregatable=False)
+
+    field_to_json({"name": "_score", "type": "integer"}, "_score", output,
+                  indexed=False, analyzed=False, doc_values=False,
+                  searchable=False, aggregatable=False)
 
     output["fields"] = json.dumps(output["fields"])
     output["fieldFormatMap"] = json.dumps(output["fieldFormatMap"])
@@ -100,35 +139,38 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    fields_yml = args.beat + "/etc/fields.generated.yml"
+    fields_yml = args.beat + "/_meta/fields.generated.yml"
 
     # Not all beats have a fields.generated.yml. Fall back to fields.yml
     if not os.path.isfile(fields_yml):
-        fields_yml = args.beat + "/etc/fields.yml"
+        fields_yml = args.beat + "/_meta/fields.yml"
 
     # generate the index-pattern content
     with open(fields_yml, 'r') as f:
         fields = f.read()
 
-        # Prepend beat fields from libbeat
-        with open(args.libbeat + "/_meta/fields.yml") as f:
-            fields = f.read() + fields
+        if os.path.basename(args.beat) != "libbeat":
+            # Prepend beat fields from libbeat
+            with open(args.libbeat + "/_meta/fields.generated.yml") as f:
+                fields = f.read() + fields
 
         # with open(target, 'w') as output:
         output = fields_to_index_pattern(args, fields)
 
     # dump output to a json file
     fileName = get_index_pattern_name(args.index)
-    target_dir = os.path.join(args.beat, "etc", "kibana", "index-pattern")
-    target_file =os.path.join(target_dir, fileName + ".json")
+    target_dir = os.path.join(args.beat, "_meta", "kibana", "index-pattern")
+    target_file = os.path.join(target_dir, fileName + ".json")
 
-    try: os.makedirs(target_dir)
+    try:
+        os.makedirs(target_dir)
     except OSError as exception:
-        if exception.errno != errno.EEXIST: raise
+        if exception.errno != errno.EEXIST:
+            raise
 
     output = json.dumps(output, indent=2)
 
     with open(target_file, 'w') as f:
         f.write(output)
 
-    print ("The index pattern was created under {}".format(target_file))
+    print("The index pattern was created under {}".format(target_file))

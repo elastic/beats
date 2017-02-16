@@ -21,6 +21,7 @@ framework for creating Beats, and all the officially supported Beats:
 Beat  | Description
 --- | ---
 [Filebeat](https://github.com/elastic/beats/tree/master/filebeat) | Tails and ships log files
+[Heartbeat](https://github.com/elastic/beats/tree/master/heartbeat) | Ping remote services for availability
 [Metricbeat](https://github.com/elastic/beats/tree/master/metricbeat) | Fetches sets of metrics from the operating system and services
 [Packetbeat](https://github.com/elastic/beats/tree/master/packetbeat) | Monitors the network and applications by sniffing packets
 [Winlogbeat](https://github.com/elastic/beats/tree/master/winlogbeat) | Fetches and ships Windows Event logs
@@ -38,6 +39,7 @@ on the [elastic.co site](https://www.elastic.co/guide/):
 
 * [Beats platform](https://www.elastic.co/guide/en/beats/libbeat/current/index.html)
 * [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html)
+* [Heartbeat](https://www.elastic.co/guide/en/beats/heartbeat/current/index.html)
 * [Metricbeat](https://www.elastic.co/guide/en/beats/metricbeat/current/index.html)
 * [Packetbeat](https://www.elastic.co/guide/en/beats/packetbeat/current/index.html)
 * [Winlogbeat](https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html)

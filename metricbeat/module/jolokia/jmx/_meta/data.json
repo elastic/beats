@@ -1,0 +1,34 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "jolokia": {
+        "testnamespace": {
+            "memory": {
+                "heap_usage": {
+                    "committed": 1.09051904e+08,
+                    "init": 3.2753408e+07,
+                    "max": 6.20756992e+08,
+                    "used": 5.8796168e+07
+                },
+                "non_heap_usage": {
+                    "committed": 3.244032e+07,
+                    "init": 2.4576e+07,
+                    "max": 2.24395264e+08,
+                    "used": 1.7975176e+07
+                }
+            },
+            "uptime": 6.1802139e+07
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:8778",
+        "module": "jolokia",
+        "name": "jmx",
+        "namespace": "testnamespace",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}
