@@ -30,16 +30,16 @@ def fields_to_es_template(args, input, output, index, version):
         print("fields.yml is empty. Cannot generate template.")
         return
 
-    # Each template needs defaults
-    if "defaults" not in docs.keys():
-        print("No defaults are defined. Each template needs at" +
-              " least defaults defined.")
-        return
+    defaults = {
+        "type": "keyword",
+        "required": False,
+        "index": True,
+        "doc_values": True,
+        "ignore_above": 1024,
+    }
 
-    defaults = docs["defaults"]
-
-    for k, section in enumerate(docs["fields"]):
-        docs["fields"][k] = dedot(section)
+    for k, section in enumerate(docs):
+        docs[k] = dedot(section)
 
     # skeleton
     template = {
@@ -105,9 +105,8 @@ def fields_to_es_template(args, input, output, index, version):
             }
         })
 
-    for section in docs["fields"]:
-        prop, dynamic = fill_section_properties(args, section,
-                                                defaults, "")
+    for section in docs:
+        prop, dynamic = fill_section_properties(args, section, defaults, "")
         properties.update(prop)
         dynamic_templates.extend(dynamic)
 
@@ -253,10 +252,15 @@ def fill_field_properties(args, field, defaults, path):
             properties[field["name"]]["scaling_factor"] = \
                 field.get("scaling_factor", 1000)
 
-    elif field["type"] in ["dict", "list"]:
-        if field.get("dict-type") == "text":
+    elif field["type"] in ["array"]:
+        properties[field["name"]] = {
+            "properties": {}
+        }
+
+    elif field["type"] in ["object"]:
+        if field.get("object-type") == "text":
             # add a dynamic template to set all members of
-            # the dict as text
+            # the object as text
             if len(path) > 0:
                 name = path + "." + field["name"]
             else:
@@ -284,7 +288,7 @@ def fill_field_properties(args, field, defaults, path):
                     }
                 })
 
-        if field.get("dict-type") == "long":
+        if field.get("object-type") == "long":
             if len(path) > 0:
                 name = path + "." + field["name"]
             else:

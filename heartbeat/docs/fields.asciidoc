@@ -65,7 +65,7 @@ Arbitrary tags that can be set per Beat and per transaction type.
 [float]
 === fields
 
-type: dict
+type: object
 
 Contains user configurable fields.
 
