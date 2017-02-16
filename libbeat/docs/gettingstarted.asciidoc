@@ -112,14 +112,15 @@ You should see a response similar to this:
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 {
-  "name" : "Angela Del Toro",
+  "name" : "ofgAtrJ",
   "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "3h9xSrVlRJmDHgQ8FLnByA",
   "version" : {
     "number" : "{ES-version}",
-    "build_hash" : "8ff36d139e16f8720f2947ef62c8167a888992fe",
-    "build_timestamp" : "2016-01-27T13:32:39Z",
+    "build_hash" : "db0d481",
+    "build_date" : "2017-02-09T22:05:32.386Z",
     "build_snapshot" : false,
-    "lucene_version" : "6.1.0"
+    "lucene_version" : "6.4.1"
   },
   "tagline" : "You Know, for Search"
 }
