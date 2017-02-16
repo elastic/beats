@@ -49,6 +49,11 @@ func newProcess(pid int) (*Process, error) {
 		return nil, fmt.Errorf("error getting process state for pid=%d: %v", pid, err)
 	}
 
+	exe := sigar.ProcExe{}
+	if err := exe.Get(pid); err != nil {
+		return nil, fmt.Errorf("error getting process exe for pid=%d: %v", pid, err)
+	}
+
 	proc := Process{
 		Pid:      pid,
 		Ppid:     state.Ppid,
@@ -57,6 +62,7 @@ func newProcess(pid int) (*Process, error) {
 		State:    getProcState(byte(state.State)),
 		Username: state.Username,
 		Ctime:    time.Now(),
+		Cwd:      exe.Cwd,
 	}
 
 	return &proc, nil
@@ -181,6 +187,7 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 			},
 			"share": process.Mem.Share,
 		},
+		"cwd":      process.Cwd,
 	}
 
 	if process.CmdLine != "" {
