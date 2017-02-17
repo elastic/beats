@@ -42,7 +42,7 @@ coverage-report:
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 
 .PHONY: update
-update:
+update: notice
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) update || exit 1;)
 
 .PHONY: clean
@@ -64,6 +64,7 @@ check: python-env
 	${FIND} -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	# Validate that all updates were committed
 	$(MAKE) update
+	git diff | cat
 	git update-index --refresh
 	git diff-index --exit-code HEAD --
 
