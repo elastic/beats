@@ -7,6 +7,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-mysql>>
   * <<filebeat-module-nginx>>
   * <<filebeat-module-system>>
+  * <<filebeat-modules-devguide>>
 
 
 --
@@ -16,3 +17,4 @@ include::modules/apache2.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nginx.asciidoc[]
 include::modules/system.asciidoc[]
+include::modules-dev-guide.asciidoc[]
