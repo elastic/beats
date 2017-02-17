@@ -431,7 +431,7 @@ The default value is true.
 ===== hosts
 
 The list of known Logstash servers to connect to. If load balancing is disabled, but 
-mutliple hosts are configured, one host is selected randomly (there is no precedence). 
+multiple hosts are configured, one host is selected randomly (there is no precedence). 
 If one host becomes unreachable, another one is selected randomly.
 
 All entries in this list can contain a port number. If no port number is given, the 

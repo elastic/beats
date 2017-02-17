@@ -4,6 +4,7 @@ import unittest
 
 
 class Test(metricbeat.BaseTest):
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_cluster_disk(self):
         """

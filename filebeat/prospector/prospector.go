@@ -221,7 +221,7 @@ func (p *Prospector) updateState(event *input.Event) error {
 
 // Stop stops the prospector and with it all harvesters
 //
-// The shutdown order is as follwoing
+// The shutdown order is as following
 // - stop run and scanning
 // - wait until last scan finishes to make sure no new harvesters are added
 // - stop harvesters
