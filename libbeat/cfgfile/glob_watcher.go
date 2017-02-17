@@ -59,7 +59,7 @@ func (gw *GlobWatcher) Scan() ([]string, bool, error) {
 		// File modification time can be in seconds. -1 + truncation is to cover for files which
 		// were created during this second.
 		// If the last scan was at 09:02:15.00001 it will pick up files which were modified also 09:02:14
-		// As this scan no necessarly picked up files form 09:02:14
+		// As this scan no necessarily picked up files form 09:02:14
 		// TODO: How could this be improved / simplified? Behaviour was sometimes flaky. Is ModTime updated with delay?
 		if info.ModTime().After(gw.lastScan.Add(-1 * time.Second).Truncate(time.Second)) {
 			updatedFiles = true

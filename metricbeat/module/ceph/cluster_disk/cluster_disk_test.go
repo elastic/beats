@@ -22,7 +22,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "appication/json;")
+		w.Header().Set("Content-Type", "application/json;")
 		w.Write([]byte(response))
 	}))
 	defer server.Close()
