@@ -100,7 +100,8 @@ more information about these options, see <<packetbeat-configuration>>.
 
 To configure Packetbeat, you edit the configuration file. For rpm and deb, you'll
 find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac and win, look in
-the archive that you just extracted.
+the archive that you just extracted. There’s also a full example configuration file called
+`packetbeat.full.yml` that shows all non-deprecated options.
 
 To configure Packetbeat:
 
@@ -204,7 +205,11 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 [[packetbeat-starting]]
 === Step 4: Starting Packetbeat
 
-Run Packetbeat by issuing the following command:
+Run Packetbeat by issuing the command that is appropriate for your platform.
+
+NOTE: If you use an init.d script to start Packetbeat on deb or rpm, you can't
+specify command line flags (see <<packetbeat-command>>). To specify flags,
+start Packetbeat in the foreground.
 
 *deb:*
 
