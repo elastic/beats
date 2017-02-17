@@ -9,6 +9,8 @@ include::./version.asciidoc[]
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
 :heartbeat: http://www.elastic.co/guide/en/beats/heartbeat/{doc-branch}
 :securitydoc: https://www.elastic.co/guide/en/x-pack/5.2
+:beatname_lc: beatname
+:beatname_uc: a Beat
 :security: X-Pack Security
 :ES-version: {stack-version}
 :LS-version: {stack-version}
