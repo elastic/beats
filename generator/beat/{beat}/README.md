@@ -3,7 +3,7 @@
 Welcome to {Beat}.
 
 Ensure that this folder is at the following location:
-`${GOPATH}/{beat_path}`
+`${GOPATH}/src/{beat_path}`
 
 ## Getting Started with {Beat}
 
@@ -99,9 +99,8 @@ make clean
 To clone {Beat} from the git repository, run the following commands:
 
 ```
-mkdir -p ${GOPATH}/{beat_path}
-cd ${GOPATH}/{beat_path}
-git clone https://{beat_path}
+mkdir -p ${GOPATH}/src/{beat_path}
+git clone https://{beat_path} ${GOPATH}/src/{beat_path}
 ```
 
 

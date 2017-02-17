@@ -229,7 +229,7 @@ Acknowledge multiple messages.
 [float]
 === amqp.arguments
 
-type: dict
+type: object
 
 Optional additional arguments passed to some methods. Can be of various types.
 
@@ -271,7 +271,7 @@ MIME content encoding.
 [float]
 === amqp.headers
 
-type: dict
+type: object
 
 Message header field table.
 
@@ -404,7 +404,7 @@ Arbitrary tags that can be set per Beat and per transaction type.
 [float]
 === fields
 
-type: dict
+type: object
 
 Contains user configurable fields.
 
@@ -770,7 +770,7 @@ The paging_state is a bytes value that should be used in QUERY/EXECUTE to contin
 [float]
 === cassandra.response.supported
 
-type: dict
+type: object
 
 Indicates which startup options are supported by the server. This message comes as a response to an OPTIONS message.
 
@@ -1300,7 +1300,7 @@ The effective top-level domain (eTLD) plus one more label. For example, the eTLD
 [float]
 === dns.answers
 
-type: dict
+type: object
 
 An array containing a dictionary about each answer section returned by the server.
 
@@ -1351,7 +1351,7 @@ The data describing the resource. The meaning of this data depends on the type a
 [float]
 === dns.authorities
 
-type: dict
+type: object
 
 An array containing a dictionary for each authority section from the answer.
 
@@ -1388,7 +1388,7 @@ The class of DNS data contained in this resource record.
 [float]
 === dns.additionals
 
-type: dict
+type: object
 
 An array containing a dictionary for each additional section from the answer.
 
@@ -1774,7 +1774,7 @@ The query parameters or form values. The query parameters are available in the R
 [float]
 === http.request.headers
 
-type: dict
+type: object
 
 A map containing the captured header fields from the request. Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
 
@@ -1809,7 +1809,7 @@ The HTTP status phrase.
 [float]
 === http.response.headers
 
-type: dict
+type: object
 
 A map containing the captured header fields from the response. Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
 
@@ -2012,7 +2012,7 @@ The status code value returned in the response (binary protocol only).
 [float]
 === memcache.request.keys
 
-type: list
+type: array
 
 The list of keys sent in the store or load commands.
 
@@ -2020,7 +2020,7 @@ The list of keys sent in the store or load commands.
 [float]
 === memcache.response.keys
 
-type: list
+type: array
 
 The list of keys returned for the load command (if present).
 
@@ -2044,7 +2044,7 @@ The number of values found in the memcache response message. If the command does
 [float]
 === memcache.request.values
 
-type: list
+type: array
 
 The list of base64 encoded values sent with the request (if present).
 
@@ -2052,7 +2052,7 @@ The list of base64 encoded values sent with the request (if present).
 [float]
 === memcache.response.values
 
-type: list
+type: array
 
 The list of base64 encoded values sent with the response (if present).
 
@@ -2208,7 +2208,7 @@ The CAS (compare-and-swap) identifier to be used with CAS-based updates (if pres
 [float]
 === memcache.response.stats
 
-type: list
+type: array
 
 The list of statistic values returned. Each entry is a dictionary with the fields "name" and "value".
 

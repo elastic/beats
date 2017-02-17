@@ -64,7 +64,7 @@ func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading configuration file. %v", err)
 	}
 
-	// reslove registry file path
+	// resolve registry file path
 	config.Winlogbeat.RegistryFile = paths.Resolve(
 		paths.Data, config.Winlogbeat.RegistryFile)
 	logp.Info("State will be read from and persisted to %s",

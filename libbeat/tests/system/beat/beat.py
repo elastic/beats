@@ -390,6 +390,10 @@ class TestCase(unittest.TestCase):
         def extract_fields(doc_list, name):
             fields = []
             dictfields = []
+
+            if doc_list is None:
+                return fields, dictfields
+
             for field in doc_list:
 
                 # Chain together names
@@ -404,7 +408,7 @@ class TestCase(unittest.TestCase):
                     dictfields.extend(subdictfields)
                 else:
                     fields.append(newName)
-                    if field.get("type") in ["dict", "geo_point"]:
+                    if field.get("type") in ["object", "geo_point"]:
                         dictfields.append(newName)
             return fields, dictfields
 
@@ -425,7 +429,7 @@ class TestCase(unittest.TestCase):
             fields = []
             dictfields = []
 
-            for item in doc["fields"]:
+            for item in doc:
                 subfields, subdictfields = extract_fields(item["fields"], "")
                 fields.extend(subfields)
                 dictfields.extend(subdictfields)

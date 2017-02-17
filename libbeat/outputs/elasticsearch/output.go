@@ -114,13 +114,11 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 		return nil, err
 	}
 
-	var proxyURL *url.URL
-	if config.ProxyURL != "" {
-		proxyURL, err = parseProxyURL(config.ProxyURL)
-		if err != nil {
-			return nil, err
-		}
-
+	proxyURL, err := parseProxyURL(config.ProxyURL)
+	if err != nil {
+		return nil, err
+	}
+	if proxyURL != nil {
 		logp.Info("Using proxy URL: %s", proxyURL)
 	}
 
@@ -131,7 +129,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 
 	clients := []Client{}
 	for _, host := range hosts {
-		esURL, err := getURL(config.Protocol, config.Path, host)
+		esURL, err := MakeURL(config.Protocol, config.Path, host)
 		if err != nil {
 			logp.Err("Invalid host param set: %s, Error: %v", host, err)
 			return nil, err
@@ -331,7 +329,7 @@ func makeClientFactory(
 	out *elasticsearchOutput,
 ) func(string) (mode.ProtocolClient, error) {
 	return func(host string) (mode.ProtocolClient, error) {
-		esURL, err := getURL(config.Protocol, config.Path, host)
+		esURL, err := MakeURL(config.Protocol, config.Path, host)
 		if err != nil {
 			logp.Err("Invalid host param set: %s, Error: %v", host, err)
 			return nil, err
@@ -394,15 +392,4 @@ func (out *elasticsearchOutput) BulkPublish(
 	data []outputs.Data,
 ) error {
 	return out.mode.PublishEvents(trans, opts, data)
-}
-
-func parseProxyURL(raw string) (*url.URL, error) {
-	url, err := url.Parse(raw)
-	if err == nil && strings.HasPrefix(url.Scheme, "http") {
-		return url, err
-	}
-
-	// Proxy was bogus. Try prepending "http://" to it and
-	// see if that parses correctly.
-	return url.Parse("http://" + raw)
 }

@@ -13,7 +13,7 @@ import (
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	publishedEvents = expvar.NewInt("libbeat.publisher.published_events")
+	publishedEvents = expvar.NewInt("publisher.events.count")
 )
 
 var (

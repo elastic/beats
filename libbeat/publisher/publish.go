@@ -3,7 +3,6 @@ package publisher
 import (
 	"errors"
 	"flag"
-	"os"
 	"sync/atomic"
 	"time"
 
@@ -186,15 +185,14 @@ func (publisher *BeatPublisher) PublishTopology(params ...string) error {
 
 // Create new PublisherType
 func New(
-	beatName string,
-	beatVersion string,
+	beat common.BeatInfo,
 	configs map[string]*common.Config,
 	shipper ShipperConfig,
 	processors *processors.Processors,
 ) (*BeatPublisher, error) {
 
 	publisher := BeatPublisher{}
-	err := publisher.init(beatName, beatVersion, configs, shipper, processors)
+	err := publisher.init(beat, configs, shipper, processors)
 	if err != nil {
 		return nil, err
 	}
@@ -202,8 +200,7 @@ func New(
 }
 
 func (publisher *BeatPublisher) init(
-	beatName string,
-	beatVersion string,
+	beat common.BeatInfo,
 	configs map[string]*common.Config,
 	shipper ShipperConfig,
 	processors *processors.Processors,
@@ -224,7 +221,7 @@ func (publisher *BeatPublisher) init(
 	publisher.wsOutput.Init()
 
 	if !publisher.disabled {
-		plugins, err := outputs.InitOutputs(beatName, configs, shipper.TopologyExpire)
+		plugins, err := outputs.InitOutputs(beat.Beat, configs, shipper.TopologyExpire)
 		if err != nil {
 			return err
 		}
@@ -282,8 +279,8 @@ func (publisher *BeatPublisher) init(
 	}
 
 	publisher.shipperName = shipper.Name
-	publisher.hostname, err = os.Hostname()
-	publisher.version = beatVersion
+	publisher.hostname = beat.Hostname
+	publisher.version = beat.Version
 	if err != nil {
 		return err
 	}

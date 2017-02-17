@@ -12,7 +12,6 @@ full_name = ""
 
 def generate_beat(args):
 
-
     global project_name, github_name, beat, beat_path, full_name
 
     if args.project_name is not None:
@@ -120,5 +119,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     generate_beat(args)
-
-
