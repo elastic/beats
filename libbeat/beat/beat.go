@@ -31,6 +31,7 @@ package beat
 
 import (
 	cryptRand "crypto/rand"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -42,6 +43,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/satori/go.uuid"
+
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/dashboards/dashboards"
@@ -53,7 +57,6 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher"
 	svc "github.com/elastic/beats/libbeat/service"
-	"github.com/satori/go.uuid"
 
 	// Register default processors.
 	_ "github.com/elastic/beats/libbeat/processors/actions"
@@ -314,6 +317,13 @@ func (b *Beat) configure() error {
 	// log paths values to help with troubleshooting
 	logp.Info(paths.Paths.String())
 
+	err = b.loadMeta()
+	if err != nil {
+		return err
+	}
+
+	logp.Info("Beat UUID: %v", b.Info.UUID)
+
 	if b.Config.Shipper.MaxProcs != nil {
 		maxProcs := *b.Config.Shipper.MaxProcs
 		if maxProcs > 0 {
@@ -322,6 +332,77 @@ func (b *Beat) configure() error {
 	}
 
 	return nil
+}
+
+func (b *Beat) loadMeta() error {
+	type meta struct {
+		UUID uuid.UUID `json:"uuid"`
+	}
+
+	metaPath := paths.Resolve(paths.Data, "meta.json")
+	logp.Info("Beat metadata path: %v", metaPath)
+
+	f, err := openRegular(metaPath)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("Beat meta file failed to open: %s", err)
+	}
+
+	if err == nil {
+		m := meta{}
+		if err := json.NewDecoder(f).Decode(&m); err != nil {
+			f.Close()
+			return fmt.Errorf("Beat meta file reading error: %v", err)
+		}
+
+		f.Close()
+		valid := !uuid.Equal(m.UUID, uuid.Nil)
+		if valid {
+			b.Info.UUID = m.UUID
+			return nil
+		}
+	}
+
+	// file does not exist or UUID is invalid, let's create a new one
+
+	// write temporary file first
+	tempFile := metaPath + ".new"
+	f, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		return fmt.Errorf("Failed to create Beat meta file: %s", err)
+	}
+
+	err = json.NewEncoder(f).Encode(meta{UUID: b.Info.UUID})
+	f.Close()
+	if err != nil {
+		return fmt.Errorf("Beat meta file failed to write: %s", err)
+	}
+
+	// move temporary file into final location
+	err = file.SafeFileRotate(metaPath, tempFile)
+	return err
+}
+
+func openRegular(filename string) (*os.File, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return f, err
+	}
+
+	info, err := f.Stat()
+	if err != nil {
+		f.Close()
+		return nil, err
+	}
+
+	if !info.Mode().IsRegular() {
+		f.Close()
+		if info.IsDir() {
+			return nil, fmt.Errorf("%s is a directory", filename)
+		}
+		return nil, fmt.Errorf("%s is not a regular file", filename)
+	}
+
+	return f, nil
 }
 
 func (b *Beat) loadDashboards() error {
