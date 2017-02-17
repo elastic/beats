@@ -3526,6 +3526,10 @@
                     }
                   }
                 },
+                "cwd": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
                 "fd": {
                   "properties": {
                     "limit": {
