@@ -5,7 +5,7 @@ Welcome to Heartbeat.
 This is a new EXPERIMENTAL beat for testing service availability using PING based on ICMP, TCP or higher level protocols.
 
 Ensure that this folder is at the following location:
-`${GOPATH}/github.com/elastic/beats`
+`${GOPATH}/src/github.com/elastic/beats`
 
 ## Getting Started with Heartbeat
 
