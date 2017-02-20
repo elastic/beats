@@ -147,7 +147,8 @@ We recommend that you use all three when you create a metricset. Unit tests are
 written in Golang and have no dependencies. Integration tests are also written
 in Golang but require the service from which the module collects metrics to also be running.
 System tests for Metricbeat also require the service to be running in most cases and are
-written in Python based on our small Python test framework.
+written in Python based on our small Python test framework. We use `virtualenv` to deal with Python dependences,
+it’s simply to use command `make python-env` and then `. build/python-env/bin/activate`.
 
 You should use a combination of the three test types to test your metricsets because
 each method has advantages and disadvantages. To get started with your own tests, it's best
@@ -207,6 +208,11 @@ the given address and port.
 To run all the tests, run `make testsuite`. To only run unit tests, run
 `make unit-tests` or for integration tests `make integration-tests-environment`. Be aware that
 a running Docker environment is needed for integration and system tests.
+
+Sometimes you may just want to run specify single integration test, such as `apache` module, firstly, start the docker service by run
+`docker-compose run -p port:port apache` (if your module doesn't need a docker service like `golang` module, you can just ignore this)
+and then run `cd tests/system`, as the integration test is under this folder, and then run `INTEGRATION_TESTS=true nosetests test_apache.py`,
+remember to replace `test_apache.py` to your own test file.
 
 [float]
 == Documentation
