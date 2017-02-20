@@ -24,5 +24,6 @@ ADD bin/kibana-docker /usr/local/bin/
 
 RUN usermod --home /usr/share/kibana kibana
 USER kibana
+ENV BABEL_CACHE_PATH /usr/share/kibana/optimize/.babelcache.json
 ENV PATH=/usr/share/kibana/bin:$PATH
 CMD /usr/local/bin/kibana-docker
