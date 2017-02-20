@@ -44,6 +44,7 @@ func newSpoolerOutlet(
 	}
 }
 
+//filebeat/crawler/crawler.go Start() -> prospector.go p.outlet.OnEvent
 func (o *spoolerOutlet) OnEvent(event *input.Event) bool {
 	open := atomic.LoadInt32(&o.isOpen) == 1
 	if !open {

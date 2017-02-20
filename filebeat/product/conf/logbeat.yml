@@ -1,0 +1,65 @@
+##################$$$###### Filebeat Configuration ############################
+
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see filebeat.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/filebeat/index.html
+
+#=========================== Filebeat prospectors =============================
+
+# List of prospectors to fetch data.
+filebeat.prospectors:
+#------------------------------ Log prospector --------------------------------
+- input_type: log
+  paths:
+    - "/disk1/mesos/slaves/*/frameworks/*/executors/*/runs/latest/stdout"
+  document_type: stdout
+  scan_frequency: 20s
+  ignore_older: 1h
+  clean_inactive: 2h
+  clean_removed: true
+
+- input_type: log
+  paths:
+    - "/disk1/mesos/slaves/*/frameworks/*/executors/*/runs/latest/stderr"
+  document_type: stderr
+  scan_frequency: 20s
+  ignore_older: 1h
+  clean_inactive: 2h
+  clean_removed: true
+
+- input_type: log
+  paths:
+    - "/disk1/mesos/slaves/*/frameworks/*/executors/*/runs/latest/*/*"
+  document_type: sandbox
+  scan_frequency: 20s
+  ignore_older: 1h
+  clean_inactive: 2h
+  clean_removed: true
+
+#========================= Filebeat global options ============================
+
+filebeat.registry_file: /home/qboxserver/logbeat/data/registry
+
+#================================ Outputs ======================================
+
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+
+#-------------------------- Pandora output -------------------------------
+output.pandora:
+  endpoint: "https://pipeline.pandora.com"
+  ak: ""
+  sk: ""
+  region: "cs"
+  batch: 10
+  max_retries: 3
+#================================ Logging ======================================
+logging.to_files: true
+logging.files:
+  path: /home/qboxserver/logbeat/log_beat
+  name: logbeat
+  rotateeverybytes: 10485760 # = 10MB
+  keepfiles: 7

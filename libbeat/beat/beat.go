@@ -150,7 +150,7 @@ func newBeat(name, version string) *Beat {
 }
 
 func (b *Beat) launch(bt Creator) error {
-	err := b.handleFlags()
+	err := b.handleFlags() //cmdline
 	if err != nil {
 		return err
 	}
@@ -158,7 +158,7 @@ func (b *Beat) launch(bt Creator) error {
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
-	if err := b.configure(); err != nil {
+	if err := b.configure(); err != nil { //config file
 		return err
 	}
 

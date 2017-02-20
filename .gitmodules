@@ -1,0 +1,3 @@
+[submodule "vendor/github.com/qbox/pandora-sdk"]
+   path = vendor/github.com/qbox/pandora-sdk
+   url = git@github.com:qbox/pandora-sdk.git

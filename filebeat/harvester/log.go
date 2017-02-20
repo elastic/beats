@@ -110,6 +110,9 @@ func (h *Harvester) Harvest(r reader.Reader) {
 			default:
 				logp.Err("Read line error: %s; File: ", err, h.state.Source)
 			}
+			if h.file != nil {
+				h.file.Close()
+			}
 			return
 		}
 

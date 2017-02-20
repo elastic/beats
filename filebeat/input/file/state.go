@@ -87,6 +87,39 @@ func (s *States) findPrevious(newState State) (int, State) {
 
 	return -1, State{}
 }
+func (s *States) CleanupWithFunc(fn func(state State)) int {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	statesBefore := len(s.states)
+	currentTime := time.Now()
+	states := s.states[:0]
+
+	for _, state := range s.states {
+
+		ttl := state.TTL
+
+		if ttl == 0 || (ttl > 0 && currentTime.Sub(state.Timestamp) > ttl) {
+			if state.Finished {
+				logp.Debug("state", "CleanupWithFunc State removed for %v because of older: %v", state.Source, ttl)
+				fn(state)
+				continue // drop state
+
+			} else {
+				fn(state)
+				logp.Err("CleanupWithFunc State for %s should have been dropped, but couldn't as state is not finished.", state.Source)
+
+			}
+
+		}
+
+		states = append(states, state) // in-place copy old state
+
+	}
+	s.states = states
+
+	return statesBefore - len(s.states)
+}
 
 // Cleanup cleans up the state array. All states which are older then `older` are removed
 // The number of states that were cleaned up is returned

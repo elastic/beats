@@ -91,6 +91,9 @@ func (p *ProspectorLog) Run() {
 			if err != nil {
 				// Only clean up files where state is Finished
 				if state.Finished {
+					// 此处设置state.TTL为0，updateState操作会
+					// 1. 通知下游的registrar，这个记录失效，registrar会将这条记录删除
+					// 2. 更新p.Prospector.state自己的缓存，下一次p.Prospector.states.Cleanup()的时候会被删除
 					state.TTL = 0
 					err := p.Prospector.updateState(input.NewEvent(state))
 					if err != nil {

@@ -181,7 +181,7 @@ func (c *client) filterEvent(event common.MapStr) *common.MapStr {
 		return nil
 	}
 	if logp.IsDebug("publish") {
-		logp.Debug("publish", "Publish: %s", publishEvent.StringToPrint())
+		logp.Debug("publish", "libbeat publisher  Publish: %s", len(publishEvent.StringToPrint()))
 	}
 	return &publishEvent
 }

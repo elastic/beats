@@ -24,7 +24,7 @@ type Filebeat struct {
 	done   chan struct{}
 }
 
-// New creates a new Filebeat pointer instance.
+// New creates a new Filebeat pointer instance. creates a new  beater(Filebeat)
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	config := cfg.DefaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
@@ -66,7 +66,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Channel from spooler to harvester
 	publisherChan := newPublisherChannel()
 
-	// Publishes event to output
+	// Publishes event to output , in =publisherChan.ch ,out =registrarChannel, registrarChannel -> registrar.Channel
 	publisher := publisher.New(config.PublishAsync, publisherChan.ch, registrarChannel, b.Publisher)
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
