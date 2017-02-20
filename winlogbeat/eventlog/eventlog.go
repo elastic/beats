@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/sys"
+	"time"
 )
 
 // Debug selectors used in this package.
@@ -64,6 +65,7 @@ func (e Record) ToMapStr() common.MapStr {
 		"type":                  e.API,
 		common.EventMetadataKey: e.EventMetadata,
 		"@timestamp":            common.Time(e.TimeCreated.SystemTime),
+		"@localtimestamp":       e.TimeCreated.SystemTime.In(time.Local),
 		"log_name":              e.Channel,
 		"source_name":           e.Provider.Name,
 		"computer_name":         e.Computer,
