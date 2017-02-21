@@ -39,7 +39,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) *elasticsear
 		"template.enabled": false,
 	})
 
-	output := &elasticsearchOutput{beatName: "test"}
+	output := &elasticsearchOutput{beat: common.BeatInfo{Beat: "test"}}
 	output.init(config, 10)
 	return output
 }

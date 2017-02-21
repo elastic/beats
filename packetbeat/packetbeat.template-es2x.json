@@ -1599,5 +1599,5 @@
   "settings": {
     "index.refresh_interval": "5s"
   },
-  "template": "packetbeat-*"
+  "template": "packetbeat-6.0.0-alpha1-*"
 }
