@@ -24,8 +24,6 @@ include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
 include::../../libbeat/docs/repositories.asciidoc[]
 
-include::./modules.asciidoc[]
-
 include::./upgrading.asciidoc[]
 
 include::./how-filebeat-works.asciidoc[]
