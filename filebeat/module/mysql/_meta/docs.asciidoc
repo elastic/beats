@@ -1,0 +1,33 @@
+== MySQL module
+
+This module collects and parses the slow logs and error logs created by https://www.mysql.com/[MySQL].
+
+=== Compatibility
+
+The MySQL module was tested with logs from versions 5.5 and 5.7.
+
+On Windows, the module was tested with MySQL installed from the Chocolatey repository.
+
+=== Dashboard
+
+This module comes with a sample dashboard.
+
+image::./images/kibana-mysql.png[]
+
+[float]
+=== Error logs fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.
+
+[float]
+=== Slow logs fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.

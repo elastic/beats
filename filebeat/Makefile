@@ -45,9 +45,16 @@ configs: python-env
 	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.full.yml
 	cat ${ES_BEATS}/filebeat/_meta/common.full.p2.yml >> _meta/beat.full.yml
 
+# Collects all module docs
+.PHONY: collect-docs
+collect-docs: python-env
+	-rm -rf docs/modules
+	mkdir -p docs/modules
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/filebeat/scripts/docs_collector.py --beat ${BEAT_NAME}
+
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields kibana modules configs
+collect: fields kibana modules configs collect-docs
 
 
 # Creates a new fileset. Requires the params MODULE and FILESET
