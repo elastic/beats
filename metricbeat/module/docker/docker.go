@@ -7,6 +7,8 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 
+	"time"
+
 	"github.com/fsouza/go-dockerclient"
 )
 
@@ -58,7 +60,7 @@ func NewDockerClient(endpoint string, config Config) (*docker.Client, error) {
 }
 
 // FetchStats returns a list of running containers with all related stats inside
-func FetchStats(client *docker.Client) ([]Stat, error) {
+func FetchStats(client *docker.Client, timeout time.Duration) ([]Stat, error) {
 	containers, err := client.ListContainers(docker.ListContainersOptions{})
 	if err != nil {
 		return nil, err
@@ -67,24 +69,27 @@ func FetchStats(client *docker.Client) ([]Stat, error) {
 	var wg sync.WaitGroup
 
 	containersList := make([]Stat, 0, len(containers))
-	queue := make(chan Stat, 1)
+	statsQueue := make(chan Stat, 1)
 	wg.Add(len(containers))
 
 	for _, container := range containers {
 		go func(container docker.APIContainers) {
 			defer wg.Done()
-			queue <- exportContainerStats(client, &container)
+			statsQueue <- exportContainerStats(client, &container, timeout)
 		}(container)
 	}
 
 	go func() {
 		wg.Wait()
-		close(queue)
+		close(statsQueue)
 	}()
 
 	// This will break after the queue has been drained and queue is closed.
-	for container := range queue {
-		containersList = append(containersList, container)
+	for stat := range statsQueue {
+		// If names is empty, there is not data inside
+		if len(stat.Container.Names) != 0 {
+			containersList = append(containersList, stat)
+		}
 	}
 
 	return containersList, err
@@ -95,7 +100,7 @@ func FetchStats(client *docker.Client) ([]Stat, error) {
 // This is currently very inefficient as docker calculates the average for each request,
 // means each request will take at least 2s: https://github.com/docker/docker/blob/master/cli/command/container/stats_helpers.go#L148
 // Getting all stats at once is implemented here: https://github.com/docker/docker/pull/25361
-func exportContainerStats(client *docker.Client, container *docker.APIContainers) Stat {
+func exportContainerStats(client *docker.Client, container *docker.APIContainers, timeout time.Duration) Stat {
 	var wg sync.WaitGroup
 	var event Stat
 
@@ -105,7 +110,7 @@ func exportContainerStats(client *docker.Client, container *docker.APIContainers
 		ID:      container.ID,
 		Stats:   statsC,
 		Stream:  false,
-		Timeout: -1,
+		Timeout: timeout,
 	}
 
 	wg.Add(2)
