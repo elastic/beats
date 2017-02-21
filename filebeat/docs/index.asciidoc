@@ -49,6 +49,8 @@ include::../../libbeat/docs/yaml.asciidoc[]
 
 include::../../libbeat/docs/regexp.asciidoc[]
 
+include::./modules.asciidoc[]
+
 include::./fields.asciidoc[]
 
 include::./securing-filebeat.asciidoc[]

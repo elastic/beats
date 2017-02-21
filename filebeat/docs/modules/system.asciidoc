@@ -1,0 +1,37 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-system]]
+== System module
+
+This module collects and parses logs created by system logging server of common Unix/Linux based
+distributions.
+
+=== Compatibility
+
+This module was tested with logs from OSes like Ubuntu 12.04, Centos 7, macOS Sierra, and others.
+
+This module is not available for Windows.
+
+=== Dashboard
+
+This module comes with a sample dashboard.
+
+image::./images/kibana-system.png[]
+
+[float]
+=== Syslog fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.
+
+
+=== Fields
+
+For a description of each field in the metricset, see the
+<<exported-fields-system,exported fields>> section.
+
