@@ -14,6 +14,18 @@
             },
             "match_mapping_type": "string"
           }
+        },
+        {
+          "params_as_strings": {
+            "match_pattern": "regex",
+            "mapping": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "match_mapping_type": "*",
+            "match": "^param\\d+$"
+          }
         }
       ],
       "properties": {
