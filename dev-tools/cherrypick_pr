@@ -112,7 +112,8 @@ def main():
         original_pr = s.get(base+"/pulls/"+args.pr_number).json()
 
         # get the github username from the remote where we pushed
-        remote_url = check_output("git remote get-url {}".format(remote))
+        remote_url = check_output("git remote get-url {}".format(remote),
+                                  shell=True)
         remote_user = re.search("github.com:(.+)/beats", remote_url).group(1)
 
         # create PR
