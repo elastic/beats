@@ -46,7 +46,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods creates a list of network events for each container.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	stats, err := docker.FetchStats(m.dockerClient)
+	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
 	if err != nil {
 		return nil, err
 	}
