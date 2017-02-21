@@ -60,6 +60,10 @@ def generate_module(base_path, metricbeat_path, module, fileset):
     with open(meta_path + "/fields.yml", "w") as f:
         f.write(content)
 
+    content = load_file(templates + "docs.asciidoc", module, "")
+    with open(meta_path + "/docs.asciidoc", "w") as f:
+        f.write(content)
+
     print("Module {} created.".format(module))
 
 

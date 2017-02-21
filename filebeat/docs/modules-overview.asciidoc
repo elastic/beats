@@ -1,0 +1,184 @@
+[[filebeat-modules-overview]]
+== Modules overview
+
+beta[]
+
+Filebeat modules simplify the collection, parsing, and visualization of common
+log formats.
+
+A typical module (say, for the Nginx logs) is composed of one ore
+more filesets (in the case of Nginx, `access` and `error`). A fileset contains
+the following:
+
+* Filebeat prospector configurations, which contain the default paths where to
+  look or the log files. These default paths depend on the operating system.
+  The Filebeat configuration is also responsible with stitching together
+  multiline events when needed.
+
+* Elasticsearch {elasticsearch}/ingest.html[Ingest Node] pipeline definition,
+  which is used to parse the log lines.
+
+* Fields definitions, which are used to configure Elasticsearch with the
+  correct types for each field. They also contain short descriptions for each
+  of the fields.
+
+* Sample Kibana dashboards, which can be used to visualize the log files.
+
+Filebeat automatically adjusts these configurations based on your environment
+and loads them to the respective Elastic stack components.
+
+NOTE: At the moment, Filebeat modules require using the Elasticsearch
+{elasticsearch}/ingest.html[Ingest Node]. In the future, Filebeat Modules will
+be able to also configure Logstash as a more powerful alternative to Ingest
+Node.
+
+=== Tutorial
+
+This tutorial assumes you have Elasticsearch and Kibana installed and
+accessible from Filebeat (see the <<filebeat-getting-started,getting started>>
+section). It also assumes that the Ingest Node GeoIP and User Agent plugins are
+installed, which you can do with the following two commands executed in the
+Elasticsearch home path:
+
+[source,shell]
+----------------------------------------------------------------------
+$ sudo bin/elasticsearch-plugin install ingest-geoip
+$ sudo bin/elasticsearch-plugin install ingest-user-agent
+----------------------------------------------------------------------
+
+You need to restart Elasticsearch after running these commands.
+
+If you are using an https://cloud.elastic.co/[Elastic Cloud] instance, you can
+enable the two plugins from the configuration page.
+
+This also assumes you have Nginx installed and writing logs in the default
+location and format. If you want to monitor another service for which a module
+exists, feel free to adjust the tutorial.
+
+You can start Filebeat with the following command:
+
+[source,shell]
+----------------------------------------------------------------------
+$ filebeat -e -modules=nginx -setup
+----------------------------------------------------------------------
+
+The `-e` flag tells Filebeat to output its logs to standard error, instead of
+syslog.
+
+The `-modules=nginx` flag loads the Nginx module.
+
+The `-setup` flag tells Filebeat to load the associated sample Kibana
+dashboards. This setup phase, in which the dashboards are loaded, doesn't have
+to be executed each time, and because it's a relatively heavy operation, we
+recommend executing it only once after installing or upgrading Filebeat. That
+is why, the next commands from this tutorial are omitting the `-setup` flag.
+
+Visiting the Kibana web interface now, open the Nginx dashboard and you should
+already see your logs parsed and visualized in several widgets.
+
+image:./images/kibana-nginx.png[]
+
+You can also start multiple modules at once:
+
+[source,shell]
+----------------------------------------------------------------------
+$ filebeat -e -modules=nginx,mysql,system
+----------------------------------------------------------------------
+
+While enabling the modules from the CLI file is handy for getting started and
+for testing, you will probably want to use the configuration file for the
+production setup. The equivalent of the above in the configuration file is:
+
+
+[source,yaml]
+----------------------------------------------------------------------
+modules:
+- name: nginx
+- name: mysql
+- name: syslog
+----------------------------------------------------------------------
+
+Then you can start Filebeat simply with: `./filebeat -e`.
+
+==== Variable overrides
+
+Each module and fileset has a set of "variables" which allow adjusting their
+behaviour. To see the available variables, you can consult the
+`filebeat.full.yml` file. For example, all filesets allow setting a custom
+`paths` value, which is a list of Globs where the log files are searched.
+
+These variables have default values, sometimes depending on the operating
+system. You can override them either from the CLI via the `-M` flag, or from
+the configuration file.
+
+In the case of Nginx, for example, you can use the following if the access
+files are in a custom location:
+
+[source,shell]
+----------------------------------------------------------------------
+$ filebeat -e -modules=nginx -M "nginx.access.var.paths=[/opt/apache2/logs/access.log*]"
+----------------------------------------------------------------------
+
+Or via the configuration file:
+
+[source,yaml]
+----------------------------------------------------------------------
+modules:
+- name: nginx
+  access:
+    var.paths = ["/opt/apache2/logs/access.log*"]
+----------------------------------------------------------------------
+
+The Nginx `access` fileset also has a `pipeline` variables which allows
+selecting which of the available Ingest Node pipelines is used for parsing. At
+the moment, two such pipelines are available, one that requires the two ingest
+plugins (`ingest-geoip` and `ingest-user-agent`) and one that doesn't. If you
+cannot install the plugins, you can use the following:
+
+
+[source,shell]
+----------------------------------------------------------------------
+$ filebeat -e -modules=nginx -M "nginx.access.var.pipeline=no_plugins"
+----------------------------------------------------------------------
+
+==== Advanced settings
+
+Behind the scenes, each module starts a Filebeat prospector. For advanced
+users, it's possible to add or overwrite any of the prospector settings. For
+example, enabling <<close-eof,close_eof>> can be done like this:
+
+
+[source,yaml]
+----------------------------------------------------------------------
+modules:
+- name: nginx
+  access:
+    prospector:
+      close_eof: true
+----------------------------------------------------------------------
+
+Or like this:
+
+
+[source,shell]
+----------------------------------------------------------------------
+$ filebeat -e -modules=nginx -M "nginx.access.prospector.close_eof=true"
+----------------------------------------------------------------------
+
+From the CLI, it's possible to change variables or settings for multiple
+modules/fileset at once. For example, the following works and will enable
+`close_eof` for all the filesets in the nginx module:
+
+[source,shell]
+----------------------------------------------------------------------
+$ filebeat -e -modules=nginx -M "nginx.*.prospector.close_eof=true"
+----------------------------------------------------------------------
+
+The following also works and will enable `close_eof` for all prospectors
+created by any of the modules:
+
+[source,shell]
+----------------------------------------------------------------------
+filebeat -e -modules=nginx,mysql -M "*.*.prospector.close_eof=true"
+----------------------------------------------------------------------
+
