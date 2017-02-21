@@ -98,8 +98,8 @@ var:
 
 There's quite a lot going on in the above, so let's break it down:
 
-* The name of the variable is `paths` and the default value is
-  `["/example/test.log*"]`.
+* The name of the variable is `paths` and the default value is an array with one
+  element: `"/example/test.log*"`.
 * Note that variable values don't have to be strings,
   they can be also numbers, objects, or like in this example, arrays.
 * We will use the `paths` variable to set the prospector
@@ -117,7 +117,7 @@ sections):
 [source,yaml]
 ----
 ingest_pipeline: ingest/pipeline.json
-prospectors: config/testfileset.yml
+prospector: config/testfileset.yml
 ----
 
 These should point to the respective files from the fileset.
@@ -177,7 +177,6 @@ multiline:
   pattern: "^# User@Host: "
   negate: true
   match: after
-input_type: log
 ----
 
 While you can add multiple configuration files under the `config/` folder, only
@@ -295,7 +294,7 @@ them, you can build them visually in Kibana and then run the following command:
 [source,shell]
 ----
 $ cd filebeat/module/{module}/
-python ../dev-tools/export_dashboards.py --regex {module} --dir _meta/kibana
+python ../../../dev-tools/export_dashboards.py --regex {module} --dir _meta/kibana
 ----
 
 Where the `--regex` parameter should match the dashboard you want to export.
