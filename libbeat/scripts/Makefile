@@ -245,6 +245,7 @@ update: python-env collect
 	$(MAKE) -C ${ES_BEATS}/libbeat fields
 
 	# Update docs
+	mkdir -p docs
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_NAME} ${ES_BEATS}
 
 	# Generate index templates
