@@ -537,5 +537,5 @@
   "settings": {
     "index.refresh_interval": "5s"
   },
-  "template": "filebeat-*"
+  "template": "filebeat-6.0.0-alpha1-*"
 }

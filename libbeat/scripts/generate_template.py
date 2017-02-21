@@ -377,4 +377,5 @@ if __name__ == "__main__":
             version_data = yaml.load(file)
 
         with open(target, 'w') as output:
-            fields_to_es_template(args, fields, output, args.beatname + "-*", version_data['version'])
+            fields_to_es_template(args, fields, output, args.beatname + "-" +
+                                  version_data['version'] + "-*", version_data['version'])

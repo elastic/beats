@@ -410,7 +410,7 @@ output.elasticsearch:
 
   # Optional index name. The default is "metricbeat" plus date
   # and generates [metricbeat-]YYYY.MM.DD keys.
-  #index: "metricbeat-%{+yyyy.MM.dd}"
+  #index: "metricbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -450,6 +450,8 @@ output.elasticsearch:
   #template.enabled: true
 
   # Template name. By default the template name is metricbeat.
+  # The version of the beat will always be appended to the given name
+  # so the final name is metricbeat-%{[beat.version]}.
   #template.name: "metricbeat"
 
   # Path to template file

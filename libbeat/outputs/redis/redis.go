@@ -18,7 +18,7 @@ import (
 type redisOut struct {
 	mode mode.ConnectionMode
 	topology
-	beatName string
+	beat common.BeatInfo
 }
 
 var debugf = logp.MakeDebug("redis")
@@ -40,8 +40,8 @@ func init() {
 	outputs.RegisterOutputPlugin("redis", new)
 }
 
-func new(beatName string, cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
-	r := &redisOut{beatName: beatName}
+func new(beat common.BeatInfo, cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
+	r := &redisOut{beat: beat}
 	if err := r.init(cfg, expireTopo); err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		}
 	}
 	if !cfg.HasField("key") {
-		cfg.SetString("key", -1, r.beatName)
+		cfg.SetString("key", -1, r.beat.Beat)
 	}
 
 	key, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{

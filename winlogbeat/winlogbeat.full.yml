@@ -139,7 +139,7 @@ output.elasticsearch:
 
   # Optional index name. The default is "winlogbeat" plus date
   # and generates [winlogbeat-]YYYY.MM.DD keys.
-  #index: "winlogbeat-%{+yyyy.MM.dd}"
+  #index: "winlogbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -179,6 +179,8 @@ output.elasticsearch:
   #template.enabled: true
 
   # Template name. By default the template name is winlogbeat.
+  # The version of the beat will always be appended to the given name
+  # so the final name is winlogbeat-%{[beat.version]}.
   #template.name: "winlogbeat"
 
   # Path to template file
