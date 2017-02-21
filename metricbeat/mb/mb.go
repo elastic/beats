@@ -183,7 +183,6 @@ func (c ModuleConfig) GoString() string { return c.String() }
 var defaultModuleConfig = ModuleConfig{
 	Enabled: true,
 	Period:  time.Second * 10,
-	Timeout: time.Second,
 }
 
 // DefaultModuleConfig returns a ModuleConfig with the default values populated.
