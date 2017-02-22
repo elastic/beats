@@ -58,11 +58,12 @@ packetbeat.flows:
 
 #========================== Transaction protocols =============================
 
-packetbeat.protocols.icmp:
+packetbeat.protocols:
+- type: icmp
   # Enable ICMPv4 and ICMPv6 monitoring. Default: true
   #enabled: true
 
-packetbeat.protocols.amqp:
+- type: amqp
   # Enable AMQP monitoring. Default: true
   #enabled: true
 
@@ -99,7 +100,7 @@ packetbeat.protocols.amqp:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.cassandra:
+- type: cassandra
   #Cassandra port for traffic monitoring.
   ports: [9042]
 
@@ -126,7 +127,7 @@ packetbeat.protocols.cassandra:
   # This option indicates which Operator/Operators will be ignored.
   #ignored_ops: ["SUPPORTED","OPTIONS"]
 
-packetbeat.protocols.dns:
+- type: dns
   # Enable DNS monitoring. Default: true
   #enabled: true
 
@@ -156,7 +157,7 @@ packetbeat.protocols.dns:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.http:
+- type: http
   # Enable HTTP monitoring. Default: true
   #enabled: true
 
@@ -209,7 +210,7 @@ packetbeat.protocols.http:
   # be trimmed to this size. Default is 10 MB.
   #max_message_size: 10485760
 
-packetbeat.protocols.memcache:
+- type: memcache
   # Enable memcache monitoring. Default: true
   #enabled: true
 
@@ -258,7 +259,7 @@ packetbeat.protocols.memcache:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.mysql:
+- type: mysql
   # Enable mysql monitoring. Default: true
   #enabled: true
 
@@ -278,7 +279,7 @@ packetbeat.protocols.mysql:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.pgsql:
+- type: pgsql
   # Enable pgsql monitoring. Default: true
   #enabled: true
 
@@ -298,7 +299,7 @@ packetbeat.protocols.pgsql:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.redis:
+- type: redis
   # Enable redis monitoring. Default: true
   #enabled: true
 
@@ -318,7 +319,7 @@ packetbeat.protocols.redis:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.thrift:
+- type: thrift
   # Enable thrift monitoring. Default: true
   #enabled: true
 
@@ -373,7 +374,7 @@ packetbeat.protocols.thrift:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.mongodb:
+- type: mongodb
   # Enable mongodb monitoring. Default: true
   #enabled: true
 
@@ -403,7 +404,7 @@ packetbeat.protocols.mongodb:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.nfs:
+- type: nfs
   # Enable NFS monitoring. Default: true
   #enabled: true
 
