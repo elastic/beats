@@ -119,7 +119,7 @@ class Test(BaseTest):
             close_eof="true",
         )
 
-        args = [self.beat_path,
+        args = [self.test_binary,
                 "-systemTest",
                 "-test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
