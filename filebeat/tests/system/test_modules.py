@@ -40,7 +40,7 @@ class Test(BaseTest):
         # generate a minimal configuration
         cfgfile = os.path.join(self.working_dir, "filebeat.yml")
         self.render_config_template(
-            template="filebeat_modules.yml.j2",
+            template_name="filebeat_modules",
             output=cfgfile,
             index_name=self.index_name,
             elasticsearch_url=self.elasticsearch_url)

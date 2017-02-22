@@ -42,7 +42,7 @@ SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "pgid",
                          "state", "username", "cgroup"]
 
 
-class SystemTest(metricbeat.BaseTest):
+class Test(metricbeat.BaseTest):
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu(self):

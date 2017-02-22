@@ -33,7 +33,7 @@ class Test(BaseTest):
         """
         Checks stop on invalid config
         """
-        shutil.copy("../files/invalid.yml",
+        shutil.copy(self.beat_path + "/tests/files/invalid.yml",
                     os.path.join(self.working_dir, "invalid.yml"))
 
         exit_code = self.run_beat(config="invalid.yml")
@@ -68,7 +68,7 @@ class Test(BaseTest):
         """
         Checks if -configtest works as expected
         """
-        shutil.copy("../../_meta/config.yml",
+        shutil.copy(self.beat_path + "/_meta/config.yml",
                     os.path.join(self.working_dir, "libbeat.yml"))
         with open(self.working_dir + "/mockbeat.template.json", "w") as f:
             f.write('{"template": true}')
@@ -94,7 +94,7 @@ class Test(BaseTest):
         """
         Checks if version param works
         """
-        args = ["../../libbeat.test"]
+        args = [self.beat_path + "/libbeat.test"]
 
         args.extend(["-version",
                      "-e",
