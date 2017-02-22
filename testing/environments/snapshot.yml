@@ -1,8 +1,6 @@
-# This should test the environment with the latest snapshots
-# This is based on base.yml
+# This should start the environment with the latest snapshots.
 
-
-version: '2'
+version: '2.1'
 services:
   elasticsearch:
     extends:
@@ -34,5 +32,3 @@ services:
     build:
       context: ./docker/kibana
       dockerfile: Dockerfile-snapshot
-
-

@@ -1,5 +1,8 @@
 FROM java:8-jre
 
+RUN apt-get update && \
+    apt-get install -y netcat
+
 ARG LOGSTASH_VERSION
 
 ENV DEB_URL https://download.elastic.co/logstash/logstash/packages/debian/logstash-${LOGSTASH_VERSION}_all.deb
@@ -23,8 +26,8 @@ COPY docker-entrypoint.sh /entrypoint.sh
 
 COPY pki /etc/pki
 
+HEALTHCHECK CMD nc -z localhost 5044
+
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD logstash agent -f /logstash.conf
-
-

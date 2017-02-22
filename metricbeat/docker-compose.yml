@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 services:
   beat:
     build: ${PWD}/.
@@ -10,24 +10,10 @@ services:
       # This is required for the docker module tests
       - /var/run/docker.sock:/var/run/docker.sock
     command: make
-    entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
 
-    # Module specific dependencies
+    # Wait for all services to be up and healthy.
     depends_on:
-      - apache
-      - ceph
-      - couchbase
-      - haproxy
-      - jolokia
-      - kafka
-      - mongodb
-      - mysql
-      - nginx
-      - phpfpm
-      - postgresql
-      - prometheus
-      - redis
-      - zookeeper
+      - proxy_dep
 
     env_file:
       - ${PWD}/module/apache/_meta/env
@@ -44,6 +30,26 @@ services:
       - ${PWD}/module/prometheus/_meta/env
       - ${PWD}/module/redis/_meta/env
       - ${PWD}/module/zookeeper/_meta/env
+
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      apache:     { condition: service_healthy }
+      ceph:       { condition: service_healthy }
+      couchbase:  { condition: service_healthy }
+      haproxy:    { condition: service_healthy }
+      jolokia:    { condition: service_healthy }
+      kafka:      { condition: service_healthy }
+      mongodb:    { condition: service_healthy }
+      mysql:      { condition: service_healthy }
+      nginx:      { condition: service_healthy }
+      phpfpm:     { condition: service_healthy }
+      postgresql: { condition: service_healthy }
+      prometheus: { condition: service_healthy }
+      redis:      { condition: service_healthy }
+      zookeeper:  { condition: service_healthy }
 
   # Modules
   apache:
