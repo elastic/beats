@@ -3,7 +3,7 @@
 # Name can be overwritten, as Metricbeat is also a library
 BEAT_NAME?=metricbeat
 BEAT_DESCRIPTION?=Metricbeat sends metrics to Elasticsearch.
-SYSTEM_TESTS=true
+SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
 GOPACKAGES=$(shell go list ${BEAT_PATH}/... | grep -v /vendor/)
 ES_BEATS?=..
