@@ -17,6 +17,8 @@ services:
       dockerfile: Dockerfile-2x
       args:
         LOGSTASH_VERSION: 2.4.1
+    environment:
+      - ES_HOST=elasticsearch
 
   kibana:
     build:
