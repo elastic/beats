@@ -102,8 +102,6 @@ class TestCase(unittest.TestCase):
     @classmethod
     def setUpClass(self):
 
-
-
         # Path to test binary
         if not hasattr(self, 'beat_name'):
             self.beat_name = "beat"
