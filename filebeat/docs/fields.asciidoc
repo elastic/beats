@@ -866,6 +866,246 @@ Fields from the system log files.
 
 
 [float]
+== auth Fields
+
+Fields from the Linux authorization logs.
+
+
+
+[float]
+=== system.auth.timestamp
+
+The timestamp as read from the auth message.
+
+
+[float]
+=== system.auth.hostname
+
+The hostname as read from the auth message.
+
+
+[float]
+=== system.auth.program
+
+The process name as read from the auth message.
+
+
+[float]
+=== system.auth.pid
+
+type: long
+
+The PID of the process that sent the auth message.
+
+
+[float]
+=== system.auth.message
+
+The message in the log line.
+
+
+[float]
+=== system.auth.user
+
+The Unix user that this event refers to.
+
+
+[float]
+== ssh Fields
+
+Fields specific to SSH login events.
+
+
+
+[float]
+=== system.auth.ssh.event
+
+The SSH login event. Can be one of "Accepted", "Failed", or "Invalid". "Accepted" means a successful login. "Invalid" means that the user is not configured on the system. "Failed" means that the SSH login attempt has failed.
+
+
+[float]
+=== system.auth.ssh.method
+
+The SSH authentication method. Can be one of "password" or "publickey".
+
+
+[float]
+=== system.auth.ssh.ip
+
+type: ip
+
+The client IP from where the login attempt was made.
+
+
+[float]
+=== system.auth.ssh.dropped_ip
+
+type: ip
+
+The client IP from SSH connections that are open and immediately dropped.
+
+
+[float]
+=== system.auth.ssh.port
+
+type: long
+
+The client port from where the login attempt was made.
+
+
+[float]
+=== system.auth.ssh.signature
+
+The signature of the client public key.
+
+
+[float]
+== geoip Fields
+
+Contains GeoIP information gathered based on the `system.auth.ip` field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== system.auth.ssh.geoip.continent_name
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== system.auth.ssh.geoip.city_name
+
+type: keyword
+
+The name of the city.
+
+
+[float]
+=== system.auth.ssh.geoip.region_name
+
+type: keyword
+
+The name of the region.
+
+
+[float]
+=== system.auth.ssh.geoip.country_iso_code
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== system.auth.ssh.geoip.location
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
+== sudo Fields
+
+Fields specific to events created by the `sudo` command.
+
+
+
+[float]
+=== system.auth.sudo.error
+
+example: user NOT in sudoers
+
+The error message in case the sudo command failed.
+
+
+[float]
+=== system.auth.sudo.tty
+
+The TTY where the sudo command is executed.
+
+
+[float]
+=== system.auth.sudo.pwd
+
+The current directory where the sudo command is executed.
+
+
+[float]
+=== system.auth.sudo.user
+
+example: root
+
+The target user to which the sudo command is switching.
+
+
+[float]
+=== system.auth.sudo.command
+
+The command executed via sudo.
+
+
+[float]
+== useradd Fields
+
+Fields specific to events created by the `useradd` command.
+
+
+
+[float]
+=== system.auth.useradd.name
+
+The user name being added.
+
+
+[float]
+=== system.auth.useradd.uid
+
+type: long
+
+The user ID.
+
+[float]
+=== system.auth.useradd.gid
+
+type: long
+
+The group ID.
+
+[float]
+=== system.auth.useradd.home
+
+The home folder for the new user.
+
+[float]
+=== system.auth.useradd.shell
+
+The default shell for the new user.
+
+[float]
+== groupadd Fields
+
+Fields specific to events created by the `groupadd` command.
+
+
+
+[float]
+=== system.auth.groupadd.name
+
+The name of the new group.
+
+
+[float]
+=== system.auth.groupadd.gid
+
+type: long
+
+The ID of the new group.
+
+
+[float]
 == syslog Fields
 
 Contains fields from the syslog system logs.
