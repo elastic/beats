@@ -597,7 +597,7 @@
 
         - name: headers
           type: object
-          object-type: keyword
+          object_type: keyword
           description: >
             Message header field table.
 
@@ -829,7 +829,7 @@
 
             - name: supported
               type: object
-              object-type: keyword
+              object_type: keyword
               description:  Indicates which startup options are supported by the server. This message comes as a response to an OPTIONS message.
 
             - name: authentication
@@ -1177,7 +1177,7 @@
                 and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
             - name: headers
               type: object
-              object-type: keyword
+              object_type: keyword
               description: >
                 A map containing the captured header fields from the request.
                 Which headers to capture is configurable. If headers with the same
@@ -1201,7 +1201,7 @@
 
             - name: headers
               type: object
-              object-type: keyword
+              object_type: keyword
               description: >
                 A map containing the captured header fields from the response.
                 Which headers to capture is configurable. If headers with the

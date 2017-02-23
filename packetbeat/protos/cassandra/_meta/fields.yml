@@ -176,7 +176,7 @@
 
             - name: supported
               type: object
-              object-type: keyword
+              object_type: keyword
               description:  Indicates which startup options are supported by the server. This message comes as a response to an OPTIONS message.
 
             - name: authentication
