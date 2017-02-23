@@ -10,4 +10,4 @@ var:
       - c:/programdata/example/logs/test.log*
 
 ingest_pipeline: ingest/pipeline.json
-prospectors: config/{fileset}.yml
+prospector: config/{fileset}.yml

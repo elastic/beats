@@ -53,7 +53,7 @@ enable the two plugins from the configuration page.
 
 This also assumes you have Nginx installed and writing logs in the default
 location and format. If you want to monitor another service for which a module
-exists, feel free to adjust the tutorial.
+exists, adjust the commands in the tutorial accordingly.
 
 You can start Filebeat with the following command:
 
