@@ -90,6 +90,7 @@ functionality of the metricset and `Fetch` method from the data mapping.
 The `fields.yml` file is used for different purposes:
 
 * Creates the Elasticsearch template
+* Creates the Kibana index pattern configuration
 * Creates the Exported Fields documentation for the metricset
 
 To make sure the Elasticsearch template is correct, it's important to keep this file up-to-date

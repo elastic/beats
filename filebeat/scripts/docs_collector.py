@@ -60,11 +60,13 @@ For a description of each field in the metricset, see the
     module_list_output += "  * <<filebeat-modules-overview>>\n"
     for m, title in sorted(modules_list.iteritems()):
         module_list_output += "  * <<filebeat-module-" + m + ">>\n"
+    module_list_output += "  * <<filebeat-modules-devguide>>\n"
 
     module_list_output += "\n\n--\n\n"
     module_list_output += "include::modules-overview.asciidoc[]\n"
     for m, title in sorted(modules_list.iteritems()):
         module_list_output += "include::modules/" + m + ".asciidoc[]\n"
+    module_list_output += "include::modules-dev-guide.asciidoc[]\n"
 
     # Write module link list
     with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w') as f:
