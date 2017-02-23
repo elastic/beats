@@ -191,7 +191,7 @@ Node pipelines are responsible with parsing the log lines and doing other
 manipulations on the data.
 
 The files in this folder are JSON documents representing
-{elasticsearch}pipeline.html[pipeline definitions]. Just like with the `config/`
+{elasticsearch}/pipeline.html[pipeline definitions]. Just like with the `config/`
 folder, you can define multiple pipelines, but a single one is loaded at runtime
 based on the information from `manifest.yml`.
 
