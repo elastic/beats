@@ -97,8 +97,8 @@ You can run the whole testsuite with the following command:
 Running the testsuite has the following requirements:
 
 * Python >=2.7.9
-* Docker >=1.10.0
-* Docker-compose >= 1.8.0
+* Docker >=1.12
+* Docker-compose >= 1.11
 
 
 ## Documentation
