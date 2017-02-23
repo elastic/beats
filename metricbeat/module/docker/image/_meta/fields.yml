@@ -36,7 +36,7 @@
 
     - name: labels
       type: object
-      object-type: keyword
+      object_type: keyword
       description: >
         Image labels.
 

@@ -37,7 +37,7 @@
         domain and is formatted as `domain\username`.
     - name: env
       type: object
-      object-type: keyword
+      object_type: keyword
       description: >
         The environment variables used to start the process. The data is
         available on FreeBSD, Linux, and OS X.
@@ -236,7 +236,7 @@
 
             - name: percpu
               type: object
-              object-type: long
+              object_type: long
               description: >
                 CPU time (in nanoseconds) consumed on each CPU by all tasks in
                 this cgroup.

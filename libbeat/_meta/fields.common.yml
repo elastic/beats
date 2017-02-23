@@ -34,7 +34,7 @@
 
     - name: fields
       type: object
-      object-type: keyword
+      object_type: keyword
       description: >
         Contains user configurable fields.
 
