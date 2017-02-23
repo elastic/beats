@@ -39,7 +39,7 @@
 
     - name: event_data
       type: object
-      object-type: keyword
+      object_type: keyword
       required: false
       description: >
         The event-specific data. This field is mutually exclusive with
@@ -151,7 +151,7 @@
 
     - name: user_data
       type: object
-      object-type: keyword
+      object_type: keyword
       required: false
       description: >
         The event specific data. This field is mutually exclusive with

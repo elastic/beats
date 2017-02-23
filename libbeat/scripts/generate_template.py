@@ -258,7 +258,7 @@ def fill_field_properties(args, field, defaults, path):
         }
 
     elif field["type"] in ["object"]:
-        if field.get("object-type") == "text":
+        if field.get("object_type") == "text":
             # add a dynamic template to set all members of
             # the object as text
             if len(path) > 0:
@@ -288,7 +288,7 @@ def fill_field_properties(args, field, defaults, path):
                     }
                 })
 
-        if field.get("object-type") == "long":
+        if field.get("object_type") == "long":
             if len(path) > 0:
                 name = path + "." + field["name"]
             else:

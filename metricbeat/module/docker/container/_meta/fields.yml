@@ -42,7 +42,7 @@
              Size of the files that have been created or changed since creation.
     - name: labels
       type: object
-      object-type: keyword
+      object_type: keyword
       description: >
         Image labels.
     - name: tags
