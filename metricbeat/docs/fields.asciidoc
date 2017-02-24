@@ -19,6 +19,7 @@ grouped in the following categories:
 * <<exported-fields-common>>
 * <<exported-fields-couchbase>>
 * <<exported-fields-docker>>
+* <<exported-fields-golang>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
@@ -1830,6 +1831,275 @@ Total errors on outgoing packets.
 type: long
 
 Total number of outgoing packets.
+
+
+[[exported-fields-golang]]
+== golang Fields
+
+golang Module
+
+
+
+[float]
+== golang Fields
+
+
+
+
+[float]
+== expvar Fields
+
+expvar
+
+
+
+[float]
+=== golang.expvar.cmdline
+
+type: keyword
+
+The cmdline of this golang program start with.
+
+
+[float]
+== heap Fields
+
+The golang program heap information exposed by expvar.
+
+
+
+[float]
+=== golang.heap.cmdline
+
+type: keyword
+
+The cmdline of this golang program start with.
+
+
+[float]
+== gc Fields
+
+Garbage collector summary.
+
+
+
+[float]
+== total_pause Fields
+
+Total GC pause duration over lifetime of process.
+
+
+
+[float]
+=== golang.heap.gc.total_pause.ns
+
+type: long
+
+Duration in Ns.
+
+
+[float]
+=== golang.heap.gc.total_count
+
+type: long
+
+Total number of GC was happened.
+
+
+[float]
+=== golang.heap.gc.next_gc_limit
+
+type: long
+
+format: bytes
+
+Next collection will happen when HeapAlloc > this amount.
+
+
+[float]
+=== golang.heap.gc.cpu_fraction
+
+type: long
+
+Fraction of CPU time used by GC.
+
+
+[float]
+== pause Fields
+
+Last GC pause durations during the monitoring period.
+
+
+
+[float]
+=== golang.heap.gc.pause.count
+
+type: long
+
+Count of GC pause duration during this collect period.
+
+
+[float]
+== sum Fields
+
+Total GC pause duration during this collect period.
+
+
+
+[float]
+=== golang.heap.gc.pause.sum.ns
+
+type: long
+
+Duration in Ns.
+
+
+[float]
+== max Fields
+
+Max GC pause duration during this collect period.
+
+
+
+[float]
+=== golang.heap.gc.pause.max.ns
+
+type: long
+
+Duration in Ns.
+
+
+[float]
+== avg Fields
+
+Average GC pause duration during this collect period.
+
+
+
+[float]
+=== golang.heap.gc.pause.avg.ns
+
+type: long
+
+Duration in Ns.
+
+
+[float]
+== system Fields
+
+Heap summary,which bytes was obtained from system.
+
+
+
+[float]
+=== golang.heap.system.total
+
+type: long
+
+format: bytes
+
+Total bytes obtained from system (sum of XxxSys below).
+
+
+[float]
+=== golang.heap.system.optained
+
+type: long
+
+format: bytes
+
+Via HeapSys, bytes obtained from system. heap_sys = heap_idle + heap_inuse.
+
+
+[float]
+=== golang.heap.system.stack
+
+type: long
+
+format: bytes
+
+Bytes used by stack allocator, and these bytes was obtained from system.
+
+
+[float]
+=== golang.heap.system.released
+
+type: long
+
+format: bytes
+
+Bytes released to the OS.
+
+
+[float]
+== allocations Fields
+
+Heap allocations summary.
+
+
+
+[float]
+=== golang.heap.allocations.mallocs
+
+type: long
+
+Number of mallocs.
+
+
+[float]
+=== golang.heap.allocations.frees
+
+type: long
+
+Number of frees.
+
+
+[float]
+=== golang.heap.allocations.objects
+
+type: long
+
+Total number of allocated objects.
+
+
+[float]
+=== golang.heap.allocations.total
+
+type: long
+
+format: bytes
+
+Bytes allocated (even if freed) throughout the lifetime.
+
+
+[float]
+=== golang.heap.allocations.allocated
+
+type: long
+
+format: bytes
+
+Bytes allocated and not yet freed (same as Alloc above).
+
+
+[float]
+=== golang.heap.allocations.idle
+
+type: long
+
+format: bytes
+
+Bytes in idle spans.
+
+
+[float]
+=== golang.heap.allocations.active
+
+type: long
+
+format: bytes
+
+Bytes in non-idle span.
 
 
 [[exported-fields-haproxy]]
