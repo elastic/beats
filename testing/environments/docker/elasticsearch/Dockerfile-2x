@@ -37,9 +37,10 @@ VOLUME /usr/share/elasticsearch/data
 
 COPY docker-entrypoint.sh /
 
+HEALTHCHECK CMD curl -f http://localhost:9200
+
 EXPOSE 9200 9300
 
 CMD ["elasticsearch"]
-
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
