@@ -249,9 +249,9 @@ update: python-env collect
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_NAME} ${ES_BEATS}
 
 	# Generate index templates
-	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -files ${PWD}/${ES_BEATS}/libbeat/_meta/fields.generated.yml,${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.yml,${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.generated.yml -es-version 5.0.0 -beatname ${BEAT_NAME} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template.json
+	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -beat.name ${BEAT_NAME} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template.json ${PWD}/${ES_BEATS}/libbeat/_meta/fields.generated.yml ${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.yml ${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.generated.yml
 
-	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -files ${PWD}/${ES_BEATS}/libbeat/_meta/fields.generated.yml,${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.yml,${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.generated.yml -es-version 2.0.0 -beatname ${BEAT_NAME} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template-es2x.json
+	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -es.version 2.0.0 -beat.name ${BEAT_NAME} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template-es2x.json ${PWD}/${ES_BEATS}/libbeat/_meta/fields.generated.yml ${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.yml ${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.generated.yml
 
 	# Generate index-pattern
 	echo "Generate index pattern"

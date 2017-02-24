@@ -40,7 +40,7 @@ func (f Fields) process(path string, esVersion Version) common.MapStr {
 		case "array":
 			mapping = field.array()
 		case "group":
-			var newPath = ""
+			var newPath string
 			if path == "" {
 				newPath = field.Name
 			} else {

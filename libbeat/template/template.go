@@ -5,6 +5,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/go-ucfg/yaml"
 )
 
 var (
@@ -104,7 +105,8 @@ func createTemplate(properties common.MapStr, version string, esVersion Version,
 
 func loadYaml(path string) (Fields, error) {
 	keys := []Field{}
-	cfg, err := common.LoadFile(path)
+
+	cfg, err := yaml.NewConfigWithFile(path)
 	if err != nil {
 		return nil, err
 	}
