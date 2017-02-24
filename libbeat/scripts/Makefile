@@ -8,7 +8,7 @@ BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEAT_NAME}/current/index.h
 BEAT_LICENSE?=ASL 2.0 ## @packaging Software license of the application
 BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
-ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats
+ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
 GOPACKAGES?=${BEAT_PATH}/...## @community_beat Must be set to $(shell glide novendor)
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make package"
 NOTICE_FILE?=../NOTICE
@@ -249,8 +249,9 @@ update: python-env collect
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_NAME} ${ES_BEATS}
 
 	# Generate index templates
-	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEAT_NAME} ${ES_BEATS}
-	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEAT_NAME} ${ES_BEATS}
+	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -beat.name ${BEAT_NAME} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template.json ${PWD}/${ES_BEATS}/libbeat/_meta/fields.generated.yml ${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.yml ${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.generated.yml
+
+	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -es.version 2.0.0 -beat.name ${BEAT_NAME} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template-es2x.json ${PWD}/${ES_BEATS}/libbeat/_meta/fields.generated.yml ${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.yml ${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.generated.yml
 
 	# Generate index-pattern
 	echo "Generate index pattern"
