@@ -23,6 +23,7 @@ type config struct {
 	Period           time.Duration      `config:"period"`
 	BulkMaxSize      int                `config:"bulk_max_size" validate:"min=0"`
 	BufferSize       int                `config:"buffer_size"`
+	Tags             []string           `config:"tags"`
 }
 
 var defaultConfig = config{
@@ -40,4 +41,5 @@ var defaultConfig = config{
 	Period:           10 * time.Second,
 	BulkMaxSize:      50,
 	BufferSize:       50,
+	Tags:             nil,
 }

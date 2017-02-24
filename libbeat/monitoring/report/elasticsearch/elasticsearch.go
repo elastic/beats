@@ -38,6 +38,7 @@ type reporter struct {
 
 	// event metadata
 	beatMeta common.MapStr
+	tags     []string
 }
 
 var debugf = logp.MakeDebug("monitoring")
@@ -98,6 +99,7 @@ func New(beat common.BeatInfo, cfg *common.Config) (report.Reporter, error) {
 		retry:      retry,
 		period:     config.Period,
 		beatMeta:   makeMeta(beat),
+		tags:       config.Tags,
 	}
 	go r.initLoop()
 
@@ -155,15 +157,19 @@ func (r *reporter) snapshotLoop() {
 			continue
 		}
 
-		event := outputs.Data{Event: common.MapStr{
+		event := common.MapStr{
 			"timestamp": common.Time(ts),
 			"beat":      r.beatMeta,
 			"metrics":   snapshot,
-		}}
+		}
+		if len(r.tags) > 0 {
+			event["tags"] = r.tags
+		}
+
 		select {
 		case <-r.done.C():
 			return
-		case r.ch <- event:
+		case r.ch <- outputs.Data{Event: event}:
 		}
 	}
 }
