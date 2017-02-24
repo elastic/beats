@@ -211,7 +211,7 @@
       }
     }
   },
-  "order": 0,
+  "order": 1,
   "settings": {
     "index.refresh_interval": "5s"
   },

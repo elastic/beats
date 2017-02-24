@@ -86,7 +86,7 @@ func createTemplate(properties common.MapStr, version string, esVersion Version,
 				"properties":        properties,
 			},
 		},
-		"order": 0,
+		"order": 1,
 		"settings": common.MapStr{
 			"index.refresh_interval": "5s",
 		},
