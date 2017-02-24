@@ -1,16 +1,22 @@
-version: '2'
+version: '2.1'
 services:
   beat:
     build: ${PWD}/.
     depends_on:
-      - elasticsearch
+      - proxy_dep
     env_file:
       - ${PWD}/build/test.env
     working_dir: /go/src/github.com/elastic/beats/filebeat
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
     command: make
-    entrypoint: /go/src/github.com/elastic/beats/filebeat/docker-entrypoint.sh
+
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
 
   elasticsearch:
     extends:

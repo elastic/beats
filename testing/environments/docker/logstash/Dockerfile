@@ -1,5 +1,8 @@
 FROM java:8-jre
 
+RUN apt-get update && \
+    apt-get install -y netcat
+
 ARG DOWNLOAD_URL
 ARG ELASTIC_VERSION
 
@@ -20,6 +23,8 @@ COPY logstash.conf.tmpl /logstash.conf.tmpl
 COPY docker-entrypoint.sh /entrypoint.sh
 
 COPY pki /etc/pki
+
+HEALTHCHECK CMD nc -z localhost 5044
 
 ENTRYPOINT ["/entrypoint.sh"]
 
