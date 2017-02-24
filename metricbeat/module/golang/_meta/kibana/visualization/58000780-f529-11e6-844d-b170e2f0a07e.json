@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Golang: Heap Summary\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.total\\\").label(\\\"System Total Memory\\\").yaxis(label=\\\"Bytes\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"min:golang.heap.allocations.allocated\\\").label(\\\"Bytes Allocated(min)\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.allocations.allocated\\\").label(\\\"Bytes Allocated(max)\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.gc.next_gc_limit\\\").label(\\\"GC Limit\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.gc.pause.count\\\").condition(lt,1, null).points().label(\\\"GC Cycles(count)\\\").yaxis(2,label=\\\"Count\\\")\",\"interval\":\"10s\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Golang: Heap Summary", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

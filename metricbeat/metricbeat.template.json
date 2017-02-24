@@ -1027,6 +1027,115 @@
         "fields": {
           "properties": {}
         },
+        "golang": {
+          "properties": {
+            "expvar": {
+              "properties": {
+                "cmdline": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "heap": {
+              "properties": {
+                "allocations": {
+                  "properties": {
+                    "active": {
+                      "type": "long"
+                    },
+                    "allocated": {
+                      "type": "long"
+                    },
+                    "frees": {
+                      "type": "long"
+                    },
+                    "idle": {
+                      "type": "long"
+                    },
+                    "mallocs": {
+                      "type": "long"
+                    },
+                    "objects": {
+                      "type": "long"
+                    },
+                    "total": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "cmdline": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "gc": {
+                  "properties": {
+                    "cpu_fraction": {
+                      "type": "long"
+                    },
+                    "next_gc_limit": {
+                      "type": "long"
+                    },
+                    "pause": {
+                      "properties": {
+                        "avg": {
+                          "properties": {
+                            "ns": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "count": {
+                          "type": "long"
+                        },
+                        "max": {
+                          "properties": {
+                            "ns": {
+                              "type": "long"
+                            }
+                          }
+                        },
+                        "sum": {
+                          "properties": {
+                            "ns": {
+                              "type": "long"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "total_count": {
+                      "type": "long"
+                    },
+                    "total_pause": {
+                      "properties": {
+                        "ns": {
+                          "type": "long"
+                        }
+                      }
+                    }
+                  }
+                },
+                "system": {
+                  "properties": {
+                    "optained": {
+                      "type": "long"
+                    },
+                    "released": {
+                      "type": "long"
+                    },
+                    "stack": {
+                      "type": "long"
+                    },
+                    "total": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "haproxy": {
           "properties": {
             "info": {
