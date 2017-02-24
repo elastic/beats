@@ -7,21 +7,21 @@
       "date_detection": false,
       "dynamic_templates": [
         {
-          "strings_as_keyword": {
-            "mapping": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "match_mapping_type": "string"
-          }
-        },
-        {
           "system.process.cgroup.cpuacct.percpu": {
             "mapping": {
               "type": "long"
             },
             "match_mapping_type": "long",
             "path_match": "system.process.cgroup.cpuacct.percpu.*"
+          }
+        },
+        {
+          "strings_as_keyword": {
+            "mapping": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "match_mapping_type": "string"
           }
         }
       ],
@@ -1667,6 +1667,9 @@
               }
             }
           }
+        },
+        "jolokia": {
+          "properties": {}
         },
         "kafka": {
           "properties": {
@@ -4234,7 +4237,13 @@
   },
   "order": 0,
   "settings": {
-    "index.mapping.total_fields.limit": 10000,
+    "index": {
+      "mapping": {
+        "total_fields": {
+          "limit": 10000
+        }
+      }
+    },
     "index.refresh_interval": "5s"
   },
   "template": "metricbeat-6.0.0-alpha1-*"
