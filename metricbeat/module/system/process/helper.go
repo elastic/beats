@@ -223,7 +223,6 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 		"name":     process.Name,
 		"state":    process.State,
 		"username": process.Username,
-		"cwd":      process.Cwd,
 		"memory": common.MapStr{
 			"size": process.Mem.Size,
 			"rss": common.MapStr{
@@ -236,6 +235,10 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 
 	if process.CmdLine != "" {
 		proc["cmdline"] = process.CmdLine
+	}
+
+	if process.Cwd != "" {
+		proc["cwd"] = process.Cwd
 	}
 
 	if len(process.Env) > 0 {
