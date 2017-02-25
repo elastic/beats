@@ -329,6 +329,9 @@ class Test(metricbeat.BaseTest):
         if not sys.platform.startswith("linux") and "cgroup" in SYSTEM_PROCESS_FIELDS:
             SYSTEM_PROCESS_FIELDS.remove("cgroup")
 
+        if not sys.platform.startswith("linux") and "cwd" in SYSTEM_PROCESS_FIELDS:
+            SYSTEM_PROCESS_FIELDS.remove("cwd")
+
         self.render_config_template(modules=[{
             "name": "system",
             "metricsets": ["process"],
