@@ -38,7 +38,8 @@
     - name: cwd
       type: keyword
       description: >
-        The current working directory of the process.
+        The current working directory of the process. This field is only
+        available on Linux.
     - name: env
       type: object
       object_type: keyword
