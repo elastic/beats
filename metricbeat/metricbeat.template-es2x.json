@@ -4049,6 +4049,11 @@
                     }
                   }
                 },
+                "cwd": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
                 "env": {
                   "properties": {}
                 },

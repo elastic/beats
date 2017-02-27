@@ -6581,6 +6581,14 @@ The username of the user that created the process. If the username cannot be det
 
 
 [float]
+=== system.process.cwd
+
+type: keyword
+
+The current working directory of the process. This field is only available on Linux.
+
+
+[float]
 === system.process.env
 
 type: object

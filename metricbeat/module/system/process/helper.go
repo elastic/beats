@@ -27,6 +27,7 @@ type Process struct {
 	Username string `json:"username"`
 	State    string `json:"state"`
 	CmdLine  string `json:"cmdline"`
+	Cwd      string `json:"cwd"`
 	Mem      sigar.ProcMem
 	Cpu      sigar.ProcTime
 	Ctime    time.Time
@@ -53,6 +54,11 @@ func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 		return nil, fmt.Errorf("error getting process state for pid=%d: %v", pid, err)
 	}
 
+	exe := sigar.ProcExe{}
+	if err := exe.Get(pid); err != nil && !sigar.IsNotImplemented(err) && !os.IsPermission(err) {
+		return nil, fmt.Errorf("error getting process exe for pid=%d: %v", pid, err)
+	}
+
 	proc := Process{
 		Pid:      pid,
 		Ppid:     state.Ppid,
@@ -61,6 +67,7 @@ func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 		Username: state.Username,
 		State:    getProcState(byte(state.State)),
 		CmdLine:  cmdline,
+		Cwd:      exe.Cwd,
 		Ctime:    time.Now(),
 		Env:      env,
 	}
@@ -228,6 +235,10 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 
 	if process.CmdLine != "" {
 		proc["cmdline"] = process.CmdLine
+	}
+
+	if process.Cwd != "" {
+		proc["cwd"] = process.Cwd
 	}
 
 	if len(process.Env) > 0 {
