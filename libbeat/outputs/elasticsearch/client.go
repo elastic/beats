@@ -584,7 +584,7 @@ func (client *Client) PublishEvent(data outputs.Data) error {
 func (client *Client) LoadTemplate(templateName string, template map[string]interface{}) error {
 
 	path := "/_template/" + templateName
-	err, body := client.LoadJSON(path, template)
+	body, err := client.LoadJSON(path, template)
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, body)
 	}
@@ -592,16 +592,16 @@ func (client *Client) LoadTemplate(templateName string, template map[string]inte
 	return nil
 }
 
-func (client *Client) LoadJSON(path string, json map[string]interface{}) (error, []byte) {
+func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte, error) {
 	status, body, err := client.Request("PUT", path, "", nil, json)
 	if err != nil {
-		return fmt.Errorf("couldn't load json. Error: %s", err), body
+		return body, fmt.Errorf("couldn't load json. Error: %s", err)
 	}
 	if status > 300 {
-		return fmt.Errorf("couldn't load json. Status: %v", status), body
+		return body, fmt.Errorf("couldn't load json. Status: %v", status)
 	}
 
-	return nil, []byte{}
+	return body, nil
 }
 
 // CheckTemplate checks if a given template already exist. It returns true if

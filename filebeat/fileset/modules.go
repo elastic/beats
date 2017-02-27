@@ -247,7 +247,7 @@ func (reg *ModuleRegistry) GetProspectorConfigs() ([]*common.Config, error) {
 // PipelineLoader is a subset of the Elasticsearch client API capable of loading
 // the pipelines.
 type PipelineLoader interface {
-	LoadJSON(path string, json map[string]interface{}) (error, []byte)
+	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 }
 
@@ -275,7 +275,7 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 		logp.Debug("modules", "Pipeline %s already loaded", pipelineID)
 		return nil
 	}
-	err, body := esClient.LoadJSON(path, content)
+	body, err := esClient.LoadJSON(path, content)
 	if err != nil {
 		return interpretError(err, body)
 	}
