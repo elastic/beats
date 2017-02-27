@@ -55,7 +55,7 @@ func TestCPUService_PerCpuUsage(t *testing.T) {
 }
 
 func TestCPUService_TotalUsage(t *testing.T) {
-	oldTotalValuesTest := []uint64{100, 50, 100, 10}
+	oldTotalValuesTest := []uint64{100, 50, 10}
 	totalValuesTest := []uint64{2, 500000050, 10}
 	for index := range statsList {
 		statsList[index].PreCPUStats.CPUUsage.TotalUsage = oldTotalValuesTest[index]
