@@ -185,12 +185,12 @@ func (b *Beat) launch(bt Creator) error {
 		return err
 	}
 
-	svc.BeforeRun()
-	defer svc.Cleanup()
-
 	if err := b.configure(); err != nil {
 		return err
 	}
+
+	svc.BeforeRun()
+	defer svc.Cleanup()
 
 	// load the beats config section
 	var sub *common.Config

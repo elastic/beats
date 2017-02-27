@@ -71,8 +71,8 @@ func BeforeRun() {
 	}
 
 	if *httpprof != "" {
+		logp.Info("start pprof endpoint")
 		go func() {
-			logp.Info("start pprof endpoint")
 			mux := http.NewServeMux()
 
 			// register pprof handler
