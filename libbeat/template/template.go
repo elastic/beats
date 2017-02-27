@@ -3,7 +3,6 @@ package template
 import (
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/go-ucfg/yaml"
 )
@@ -17,44 +16,61 @@ var (
 	dynamicTemplates []common.MapStr
 )
 
-// GetTemplate creates a template based on the given inputs
-func GetTemplate(version string, beatName string, files []string) (common.MapStr, error) {
+type Template struct {
+	index       string
+	beatVersion Version
+	esVersion   Version
+}
 
-	beatVersion := beat.GetDefaultVersion()
+// New creates a new template instance
+func New(beatVersion string, esVersion string, index string) (*Template, error) {
 
-	// In case no esVersion is set, it is assumed the same as beat version
-	if version == "" {
-		version = beatVersion
-	}
-
-	esVersion, err := NewVersion(version)
+	bV, err := NewVersion(beatVersion)
 	if err != nil {
 		return nil, err
 	}
 
-	fields := Fields{}
-
-	for _, file := range files {
-		f, err := loadYaml(file)
-		if err != nil {
-			return nil, err
-		}
-		fields = append(fields, f...)
+	// In case no esVersion is set, it is assumed the same as beat version
+	if esVersion == "" {
+		esVersion = beatVersion
 	}
 
-	// Start processing at the root
-	properties := fields.process("", *esVersion)
+	esV, err := NewVersion(esVersion)
+	if err != nil {
+		return nil, err
+	}
 
-	indexPattern := fmt.Sprintf("%s-%s-*", beatName, beatVersion)
-	output := createTemplate(properties, beatVersion, *esVersion, indexPattern, dynamicTemplates)
-
-	return output, nil
+	return &Template{
+		index:       index,
+		beatVersion: *bV,
+		esVersion:   *esV,
+	}, nil
 
 }
 
-// createTemplate creates the full template
+// Load the given input and generates the input based on it
+func (t *Template) Load(file string) (common.MapStr, error) {
+
+	fields, err := loadYaml(file)
+	if err != nil {
+		return nil, err
+	}
+
+	// Start processing at the root
+	properties := fields.process("", t.esVersion)
+	output := t.generate(properties, dynamicTemplates)
+
+	return output, nil
+}
+
+// GetName returns the name of the template which is {index}-{version}
+func (t *Template) GetName() string {
+	return fmt.Sprintf("%s-%s", t.index, t.beatVersion.String())
+}
+
+// generate generates the full template
 // The default values are taken from the default variable.
-func createTemplate(properties common.MapStr, version string, esVersion Version, indexPattern string, dynamicTemplates []common.MapStr) common.MapStr {
+func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 
 	// Add base dynamic template
 	var dynamicTemplateBase = common.MapStr{
@@ -67,7 +83,7 @@ func createTemplate(properties common.MapStr, version string, esVersion Version,
 		},
 	}
 
-	if esVersion.IsMajor(2) {
+	if t.esVersion.IsMajor(2) {
 		dynamicTemplateBase.Put("strings_as_keyword.mapping.type", "string")
 		dynamicTemplateBase.Put("strings_as_keyword.mapping.index", "not_analyzed")
 	}
@@ -79,7 +95,7 @@ func createTemplate(properties common.MapStr, version string, esVersion Version,
 		"mappings": common.MapStr{
 			"_default_": common.MapStr{
 				"_meta": common.MapStr{
-					"version": version,
+					"version": t.beatVersion.String(),
 				},
 				"date_detection":    defaultDateDetection,
 				"dynamic_templates": dynamicTemplates,
@@ -90,10 +106,10 @@ func createTemplate(properties common.MapStr, version string, esVersion Version,
 		"settings": common.MapStr{
 			"index.refresh_interval": "5s",
 		},
-		"template": indexPattern,
+		"template": t.GetName() + "-*",
 	}
 
-	if esVersion.IsMajor(2) {
+	if t.esVersion.IsMajor(2) {
 		basicStructure.Put("mappings._default_._all.norms.enabled", false)
 	} else {
 		// Metricbeat exceeds the default of 1000 fields

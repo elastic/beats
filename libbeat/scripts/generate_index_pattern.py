@@ -139,7 +139,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    fields_yml = args.beat + "/_meta/fields.full.generated.yml"
+    fields_yml = args.beat + "/fields.yml"
 
     # generate the index-pattern content
     with open(fields_yml, 'r') as f:
