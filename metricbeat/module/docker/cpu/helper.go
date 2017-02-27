@@ -67,7 +67,7 @@ func perCpuUsage(stats *dc.Stats) common.MapStr {
 		output = common.MapStr{}
 		for index := range stats.CPUStats.CPUUsage.PercpuUsage {
 			cpu := common.MapStr{}
-			cpu["pct"] = calculateLoad(stats.CPUStats.CPUUsage.PercpuUsage[index] - stats.PreCPUStats.CPUUsage.PercpuUsage[index])
+			cpu["pct"] = calculateLoad(stats.CPUStats.CPUUsage.PercpuUsage[index], stats.PreCPUStats.CPUUsage.PercpuUsage[index])
 			cpu["ticks"] = stats.CPUStats.CPUUsage.PercpuUsage[index]
 			output[strconv.Itoa(index)] = cpu
 		}
@@ -78,21 +78,25 @@ func perCpuUsage(stats *dc.Stats) common.MapStr {
 // TODO: These helper should be merged with the cpu helper in system/cpu
 
 func totalUsage(stats *dc.Stats) float64 {
-	return calculateLoad(stats.CPUStats.CPUUsage.TotalUsage - stats.PreCPUStats.CPUUsage.TotalUsage)
+	return calculateLoad(stats.CPUStats.CPUUsage.TotalUsage, stats.PreCPUStats.CPUUsage.TotalUsage)
 }
 
 func usageInKernelmode(stats *dc.Stats) float64 {
-	return calculateLoad(stats.CPUStats.CPUUsage.UsageInKernelmode - stats.PreCPUStats.CPUUsage.UsageInKernelmode)
+	return calculateLoad(stats.CPUStats.CPUUsage.UsageInKernelmode, stats.PreCPUStats.CPUUsage.UsageInKernelmode)
 }
 
 func usageInUsermode(stats *dc.Stats) float64 {
-	return calculateLoad(stats.CPUStats.CPUUsage.UsageInUsermode - stats.PreCPUStats.CPUUsage.UsageInUsermode)
+	return calculateLoad(stats.CPUStats.CPUUsage.UsageInUsermode, stats.PreCPUStats.CPUUsage.UsageInUsermode)
 }
 
 func systemUsage(stats *dc.Stats) float64 {
-	return calculateLoad(stats.CPUStats.SystemCPUUsage - stats.PreCPUStats.SystemCPUUsage)
+	return calculateLoad(stats.CPUStats.SystemCPUUsage, stats.PreCPUStats.SystemCPUUsage)
 }
 
-func calculateLoad(value uint64) float64 {
-	return float64(value) / float64(1000000000)
+func calculateLoad(newValue uint64, oldValue uint64) float64 {
+	value := float64(newValue) - float64(oldValue)
+	if value < 0 {
+		value = 0
+	}
+	return value / float64(1000000000)
 }
