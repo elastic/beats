@@ -549,7 +549,6 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 // PublishEvent publishes an event.
 func (client *Client) PublishEvent(data outputs.Data) error {
 	// insert the events one by one
-
 	event := data.Event
 	index := getIndex(event, client.index)
 
@@ -596,6 +595,7 @@ func (client *Client) PublishEvent(data outputs.Data) error {
 // then use CheckTemplate prior to calling this method.
 func (client *Client) LoadTemplate(templateName string, template map[string]interface{}) error {
 
+	logp.Info("load template: %s", templateName)
 	path := "/_template/" + templateName
 	body, err := client.LoadJSON(path, template)
 	if err != nil {
