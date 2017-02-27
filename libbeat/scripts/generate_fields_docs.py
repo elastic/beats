@@ -111,19 +111,11 @@ if __name__ == "__main__":
     beat_name = args.beatname
     es_beats = args.es_beats
 
-    fields_yml = beat_path + "/_meta/fields.generated.yml"
-
-    # Not all beats have a fields.generated.yml. Fall back to fields.yml
-    if not os.path.isfile(fields_yml):
-        fields_yml = beat_path + "/_meta/fields.yml"
+    fields_yml = beat_path + "/_meta/fields.full.generated.yml"
 
     # Read fields.yml
     with open(fields_yml) as f:
         fields = f.read()
-
-    # Prepends beat fields from libbeat
-    with open(es_beats + "/libbeat/_meta/fields.generated.yml") as f:
-        fields = f.read() + fields
 
     output = open(beat_path + "/docs/fields.asciidoc", 'w')
 
