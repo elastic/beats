@@ -139,20 +139,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    fields_yml = args.beat + "/_meta/fields.generated.yml"
-
-    # Not all beats have a fields.generated.yml. Fall back to fields.yml
-    if not os.path.isfile(fields_yml):
-        fields_yml = args.beat + "/_meta/fields.yml"
+    fields_yml = args.beat + "/_meta/fields.full.generated.yml"
 
     # generate the index-pattern content
     with open(fields_yml, 'r') as f:
         fields = f.read()
-
-        if os.path.basename(args.beat) != "libbeat":
-            # Prepend beat fields from libbeat
-            with open(args.libbeat + "/_meta/fields.generated.yml") as f:
-                fields = f.read() + fields
 
         # with open(target, 'w') as output:
         output = fields_to_index_pattern(args, fields)
