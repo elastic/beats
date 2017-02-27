@@ -37,7 +37,7 @@ func TestNewModuleRegistry(t *testing.T) {
 	expectedModules := map[string][]string{
 		"nginx":  {"access", "error"},
 		"mysql":  {"slowlog", "error"},
-		"system": {"syslog"},
+		"system": {"syslog", "auth"},
 	}
 
 	assert.Equal(t, len(expectedModules), len(reg.registry))

@@ -489,6 +489,163 @@
         },
         "system": {
           "properties": {
+            "auth": {
+              "properties": {
+                "groupadd": {
+                  "properties": {
+                    "gid": {
+                      "type": "long"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "message": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "program": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "ssh": {
+                  "properties": {
+                    "dropped_ip": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "event": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "geoip": {
+                      "properties": {
+                        "city_name": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "continent_name": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "country_iso_code": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        },
+                        "location": {
+                          "type": "geo_point"
+                        },
+                        "region_name": {
+                          "ignore_above": 1024,
+                          "index": "not_analyzed",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "ip": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "method": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "port": {
+                      "type": "long"
+                    },
+                    "signature": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "sudo": {
+                  "properties": {
+                    "command": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "error": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "pwd": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "tty": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "user": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    }
+                  }
+                },
+                "timestamp": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "user": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "useradd": {
+                  "properties": {
+                    "gid": {
+                      "type": "long"
+                    },
+                    "home": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "shell": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "uid": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
+            },
             "syslog": {
               "properties": {
                 "hostname": {
