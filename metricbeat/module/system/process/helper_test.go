@@ -57,6 +57,11 @@ func TestGetProcess(t *testing.T) {
 	case "darwin", "linux", "freebsd":
 		assert.True(t, len(process.Env) > 0, "empty environment")
 	}
+
+	switch runtime.GOOS {
+	case "linux":
+		assert.True(t, (len(process.Cwd) > 0))
+	}
 }
 
 func TestProcState(t *testing.T) {

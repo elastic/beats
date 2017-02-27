@@ -4008,6 +4008,10 @@
                     }
                   }
                 },
+                "cwd": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
                 "env": {
                   "properties": {}
                 },

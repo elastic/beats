@@ -35,6 +35,11 @@
         cannot be determined, the field will contain the user's
         numeric identifier (UID). On Windows, this field includes the user's
         domain and is formatted as `domain\username`.
+    - name: cwd
+      type: keyword
+      description: >
+        The current working directory of the process. This field is only
+        available on Linux.
     - name: env
       type: object
       object_type: keyword
