@@ -1,0 +1,20 @@
+{
+  "sort": [
+    "@timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "SSH login attempts", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:system.auth.ssh.event\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }, 
+  "columns": [
+    "system.auth.ssh.event", 
+    "system.auth.ssh.method", 
+    "system.auth.user", 
+    "system.auth.ssh.ip", 
+    "system.auth.ssh.geoip.country_iso_code"
+  ]
+}

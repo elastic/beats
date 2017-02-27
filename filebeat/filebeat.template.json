@@ -419,6 +419,138 @@
         },
         "system": {
           "properties": {
+            "auth": {
+              "properties": {
+                "groupadd": {
+                  "properties": {
+                    "gid": {
+                      "type": "long"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "message": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "program": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "ssh": {
+                  "properties": {
+                    "dropped_ip": {
+                      "type": "ip"
+                    },
+                    "event": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "geoip": {
+                      "properties": {
+                        "city_name": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "continent_name": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "country_iso_code": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "location": {
+                          "type": "geo_point"
+                        },
+                        "region_name": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "ip": {
+                      "type": "ip"
+                    },
+                    "method": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "port": {
+                      "type": "long"
+                    },
+                    "signature": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "sudo": {
+                  "properties": {
+                    "command": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "error": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "pwd": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "tty": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "user": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "timestamp": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "user": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "useradd": {
+                  "properties": {
+                    "gid": {
+                      "type": "long"
+                    },
+                    "home": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "shell": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "uid": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
+            },
             "syslog": {
               "properties": {
                 "hostname": {
