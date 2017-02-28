@@ -111,7 +111,7 @@ if __name__ == "__main__":
     beat_name = args.beatname
     es_beats = args.es_beats
 
-    fields_yml = beat_path + "/_meta/fields.full.generated.yml"
+    fields_yml = beat_path + "/fields.yml"
 
     # Read fields.yml
     with open(fields_yml) as f:

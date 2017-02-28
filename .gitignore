@@ -5,6 +5,7 @@
 /*/data
 /*/logs
 /*/_meta/kibana/index-pattern
+/*/fields.yml
 
 # Files
 .DS_Store
