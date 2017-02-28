@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 
 *Filebeat*
 - Always use absolute path for event and registry. {pull}3328[3328]
+- Fix empty registry file on machine crash. {issue}3537[3537]
 
 *Heartbeat*
 
