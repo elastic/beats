@@ -725,7 +725,7 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return status, nil, err
+		return status, nil, retErr
 	}
 	return status, obj, retErr
 }

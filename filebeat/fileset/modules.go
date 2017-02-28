@@ -302,13 +302,13 @@ func interpretError(initialErr error, body []byte) error {
 		var response1x struct {
 			Error string `json:"error"`
 		}
-		json.Unmarshal(body, &response1x)
-		if response1x.Error != "" {
+		err1x := json.Unmarshal(body, &response1x)
+		if err1x == nil && response1x.Error != "" {
 			return fmt.Errorf("The Filebeat modules require Elasticsearch >= 5.0. "+
 				"This is the response I got from Elasticsearch: %s", body)
 		}
 
-		return fmt.Errorf("couldn't load pipeline: %v. Additionally, error decoding response body: %s.",
+		return fmt.Errorf("couldn't load pipeline: %v. Additionally, error decoding response body: %s",
 			initialErr, body)
 	}
 

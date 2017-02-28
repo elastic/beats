@@ -379,6 +379,17 @@ func TestInterpretError(t *testing.T) {
 			Input:  `{"error":"InvalidIndexNameException[[_ingest] Invalid index name [_ingest], must not start with '_']","status":400}`,
 			Output: `The Filebeat modules require Elasticsearch >= 5.0. This is the response I got from Elasticsearch: {"error":"InvalidIndexNameException[[_ingest] Invalid index name [_ingest], must not start with '_']","status":400}`,
 		},
+		{
+			Test:   "bad json",
+			Input:  `blah`,
+			Output: `couldn't load pipeline: test. Additionally, error decoding response body: blah`,
+		},
+		{
+			Test:  "another error",
+			Input: `{"error":{"root_cause":[{"type":"test","reason":""}],"type":"test","reason":""},"status":400}`,
+			Output: "couldn't load pipeline: test. Response body: " +
+				`{"error":{"root_cause":[{"type":"test","reason":""}],"type":"test","reason":""},"status":400}`,
+		},
 	}
 
 	for _, test := range tests {
