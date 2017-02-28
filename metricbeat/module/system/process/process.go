@@ -63,10 +63,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 
 		if config.Cgroups == nil || *config.Cgroups {
-			debugf("process cgroup data collection is enabled")
+			debugf("process cgroup data collection is enabled, using hostfs='%v'", systemModule.HostFS)
 			m.cgroup, err = cgroup.NewReader(systemModule.HostFS, true)
 			if err != nil {
-				return nil, errors.Wrap(err, "error initializing cgroup reader")
+				if err == cgroup.ErrCgroupsMissing {
+					logp.Warn("cgroup data collection will be disabled: %v", err)
+				} else {
+					return nil, errors.Wrap(err, "error initializing cgroup reader")
+				}
 			}
 		}
 	}

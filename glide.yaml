@@ -25,7 +25,7 @@ import:
   subpackages:
   - /difflib
 - package: github.com/elastic/gosigar
-  version: b49e01eb1e5c68c469392a63feaccae9352ceb12
+  version: v0.2.0
 - package: github.com/elastic/procfs
   version: abf152e5f3e97f2fafac028d2cc06c1feb87ffa5
 - package: github.com/samuel/go-parser
