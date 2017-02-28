@@ -102,7 +102,7 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 				"properties":        properties,
 			},
 		},
-		"order": 0,
+		"order": 1,
 		"settings": common.MapStr{
 			"index.refresh_interval": "5s",
 		},
