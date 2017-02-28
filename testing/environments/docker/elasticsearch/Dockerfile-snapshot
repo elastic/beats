@@ -34,8 +34,8 @@ USER elasticsearch
 
 
 
-RUN elasticsearch-plugin install --batch https://staging.elastic.co/5.2.1-f614a4d5/downloads/elasticsearch-plugins/ingest-user-agent/ingest-user-agent-5.2.1.zip
-RUN elasticsearch-plugin install --batch https://staging.elastic.co/5.2.1-f614a4d5/downloads/elasticsearch-plugins/ingest-geoip/ingest-geoip-5.2.1.zip
+RUN elasticsearch-plugin install --batch https://staging.elastic.co/5.2.2-9f7879a1/downloads/elasticsearch-plugins/ingest-user-agent/ingest-user-agent-5.2.2.zip
+RUN elasticsearch-plugin install --batch https://staging.elastic.co/5.2.2-9f7879a1/downloads/elasticsearch-plugins/ingest-geoip/ingest-geoip-5.2.2.zip
 
 COPY config/elasticsearch.yml config/
 COPY config/log4j2.properties config/
