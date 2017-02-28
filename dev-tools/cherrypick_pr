@@ -25,8 +25,8 @@ This script does the following:
 * after fixing the merge errors (if needed), pushes the branch to your
   remote
 * if the --create_pr flag is used, it uses the GitHub API to create the PR
-  for you. Note that this requires you to have a Github token in the
-  `~/.github_token` file.
+  for you. Note that this requires you to have a Github token with the
+  public_repo scope in the `~/.github_token` file
 
 Note that you need to take the commit hashes from `git log` on the
 from_branch, copying the IDs from Github doesn't work in case we squashed the
