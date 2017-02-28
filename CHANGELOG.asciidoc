@@ -15,7 +15,8 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 *Affecting all Beats*
 
 - Change beat generator. Use `$GOPATH/src/github.com/elastic/beats/script/generate.py` to generate a beat. {pull}3452[3452]
-- Configuration files must not be writable by other users. {pull}3544[3544]
+- Configuration files must be owned by the user running the beat or by root, and
+  they must not be writable by others. {pull}3544[3544] {pull}3689[3689]
 
 *Filebeat*
 - Always use absolute path for event and registry. This can lead to issues when relative paths were used before. {pull}3328[3328]
