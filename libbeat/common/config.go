@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -411,9 +412,9 @@ func filterDebugObject(c interface{}) {
 	}
 }
 
-// ownerHasExclusiveWritePerms asserts that the current user is the
+// ownerHasExclusiveWritePerms asserts that the current user or root is the
 // owner of the config file and that the config file is (at most) writable by
-// the owner (e.g. group and other cannot have write access).
+// the owner or root (e.g. group and other cannot have write access).
 func ownerHasExclusiveWritePerms(name string) error {
 	if runtime.GOOS == "windows" {
 		return nil
@@ -428,16 +429,21 @@ func ownerHasExclusiveWritePerms(name string) error {
 	fileUID, _ := info.UID()
 	perm := info.Mode().Perm()
 
-	if euid != fileUID {
+	if fileUID != 0 && euid != fileUID {
 		return fmt.Errorf(`config file ("%v") must be owned by the beat user `+
-			`(uid=%v)`, name, euid)
+			`(uid=%v) or root`, name, euid)
 	}
 
 	// Test if group or other have write permissions.
 	if perm&0022 > 0 {
+		nameAbs, err := filepath.Abs(name)
+		if err != nil {
+			nameAbs = name
+		}
 		return fmt.Errorf(`config file ("%v") can only be writable by the `+
-			`owner but the permissions are "%v"`,
-			name, perm)
+			`owner but the permissions are "%v" (to fix the permissions use: `+
+			`'chmod go-w %v')`,
+			name, perm, nameAbs)
 	}
 
 	return nil
