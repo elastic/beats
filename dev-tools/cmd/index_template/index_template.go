@@ -13,32 +13,27 @@ import (
 // main generates index templates for the beats
 func main() {
 
-	beatName := flag.String("beat.name", "", ": Base index name. Normally {beat_name} (required)")
+	beatVersion := beat.GetDefaultVersion()
+	index := flag.String("index", "", "Base index name. Normally {beat_name} (required)")
 	output := flag.String("output", "", "Required: Full path to the output file (required)")
-	version := flag.String("es.version", beat.GetDefaultVersion(), "Elasticsearch version")
+	version := flag.String("es.version", beatVersion, "Elasticsearch version")
+	file := flag.String("file", "", "Path to fields.yml file")
 
 	flag.Parse()
 
-	var existingFiles []string
-	files := flag.Args()
-
-	if len(files) == 0 {
-		fmt.Fprintf(os.Stderr, "No fields.yml files provided. At least one file must be added.")
+	if len(*file) == 0 {
+		fmt.Fprintf(os.Stderr, "File path cannot be empty")
 		os.Exit(1)
 	}
 
-	if *beatName == "" {
-		fmt.Fprintf(os.Stderr, "beat.name is empty. It must be set.")
+	if *index == "" {
+		fmt.Fprintf(os.Stderr, "index is empty. It must be set.")
 		os.Exit(1)
 	}
 
-	// Skip some of the passed files, as not all beats have the same files
-	for _, f := range files {
-		if _, err := os.Stat(f); err != nil {
-			fmt.Printf("Skipping file because it does not exist: %s", f)
-			continue
-		}
-		existingFiles = append(existingFiles, f)
+	if _, err := os.Stat(*file); err != nil {
+		fmt.Fprintf(os.Stderr, "Error during loading -file %s with error: %s", *file, err)
+		os.Exit(1)
 	}
 
 	// Make it compatible with the sem versioning
@@ -46,7 +41,13 @@ func main() {
 		*version = "2.0.0"
 	}
 
-	templateString, err := template.GetTemplate(*version, *beatName, existingFiles)
+	tmpl, err := template.New(beatVersion, *version, *index)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
+		os.Exit(1)
+	}
+
+	templateString, err := tmpl.Load(*file)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
 		os.Exit(1)

@@ -247,17 +247,17 @@ update: python-env collect
 	# Generate full fields for each beat. Create fields.generated.yml in case it does not exist yet.
 	# Most beats have their own way of generating it.
 	test -s  _meta/fields.generated.yml || cp _meta/fields.yml _meta/fields.generated.yml
-	cat ${ES_BEATS}/libbeat/_meta/fields.generated.yml _meta/fields.generated.yml > _meta/fields.full.generated.yml
+	cat ${ES_BEATS}/libbeat/_meta/fields.generated.yml _meta/fields.generated.yml > fields.yml
 	# Revert changes to libbeat fields as it otherwise contains duplicates in full
-	cat ${ES_BEATS}/libbeat/_meta/fields.generated.yml > ${ES_BEATS}/libbeat/_meta/fields.full.generated.yml
+	cat ${ES_BEATS}/libbeat/_meta/fields.generated.yml > ${ES_BEATS}/libbeat/fields.yml
 
 	# Update docs
 	mkdir -p docs
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_NAME} ${ES_BEATS}
 
 	# Generate index templates
-	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -beat.name ${BEAT_NAME} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template.json ${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.full.generated.yml
-	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -es.version 2.0.0 -beat.name ${BEAT_NAME} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template-es2x.json ${BEAT_GOPATH}/src/${BEAT_PATH}/_meta/fields.full.generated.yml
+	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -index ${BEAT_NAME} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template.json -file ${BEAT_GOPATH}/src/${BEAT_PATH}/fields.yml
+	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -es.version 2.0.0 -index ${BEAT_NAME} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template-es2x.json -file ${BEAT_GOPATH}/src/${BEAT_PATH}/fields.yml
 
 	# Generate index-pattern
 	echo "Generate index pattern"
