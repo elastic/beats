@@ -581,24 +581,24 @@ func (client *Client) PublishEvent(data outputs.Data) error {
 func (client *Client) LoadTemplate(templateName string, template map[string]interface{}) error {
 
 	path := "/_template/" + templateName
-	err := client.LoadJSON(path, template)
+	body, err := client.LoadJSON(path, template)
 	if err != nil {
-		return fmt.Errorf("couldn't load template: %v", err)
+		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, body)
 	}
 	logp.Info("Elasticsearch template with name '%s' loaded", templateName)
 	return nil
 }
 
-func (client *Client) LoadJSON(path string, json map[string]interface{}) error {
-	status, _, err := client.Request("PUT", path, "", nil, json)
+func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte, error) {
+	status, body, err := client.Request("PUT", path, "", nil, json)
 	if err != nil {
-		return fmt.Errorf("couldn't load json. Error: %s", err)
+		return body, fmt.Errorf("couldn't load json. Error: %s", err)
 	}
 	if status > 300 {
-		return fmt.Errorf("couldn't load json. Status: %v", status)
+		return body, fmt.Errorf("couldn't load json. Status: %v", status)
 	}
 
-	return nil
+	return body, nil
 }
 
 // CheckTemplate checks if a given template already exist. It returns true if
@@ -715,15 +715,16 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	defer closing(resp.Body)
 
 	status := resp.StatusCode
+	var retErr error
 	if status >= 300 {
-		return status, nil, fmt.Errorf("%v", resp.Status)
+		retErr = fmt.Errorf("%v", resp.Status)
 	}
 
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return status, nil, err
+		return status, nil, retErr
 	}
-	return status, obj, nil
+	return status, obj, retErr
 }
 
 func closing(c io.Closer) {

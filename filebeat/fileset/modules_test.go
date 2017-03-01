@@ -3,6 +3,7 @@
 package fileset
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"testing"
@@ -343,4 +344,56 @@ func TestMissingModuleFolder(t *testing.T) {
 	prospectors, err := reg.GetProspectorConfigs()
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(prospectors))
+}
+
+func TestInterpretError(t *testing.T) {
+	tests := []struct {
+		Test   string
+		Input  string
+		Output string
+	}{
+		{
+			Test:   "geoip not installed",
+			Input:  `{"error":{"root_cause":[{"type":"parse_exception","reason":"No processor type exists with name [geoip]","header":{"processor_type":"geoip"}}],"type":"parse_exception","reason":"No processor type exists with name [geoip]","header":{"processor_type":"geoip"}},"status":400}`,
+			Output: "This module requires the ingest-geoip plugin to be installed in Elasticsearch. You can installing using the following command in the Elasticsearch home directory:\n    sudo bin/elasticsearch-plugin install ingest-geoip",
+		},
+		{
+			Test:   "user-agent not installed",
+			Input:  `{"error":{"root_cause":[{"type":"parse_exception","reason":"No processor type exists with name [user_agent]","header":{"processor_type":"user_agent"}}],"type":"parse_exception","reason":"No processor type exists with name [user_agent]","header":{"processor_type":"user_agent"}},"status":400}`,
+			Output: "This module requires the ingest-user-agent plugin to be installed in Elasticsearch. You can installing using the following command in the Elasticsearch home directory:\n    sudo bin/elasticsearch-plugin install ingest-user-agent",
+		},
+		{
+			Test:  "other plugin not installed",
+			Input: `{"error":{"root_cause":[{"type":"parse_exception","reason":"No processor type exists with name [hello_test]","header":{"processor_type":"hello_test"}}],"type":"parse_exception","reason":"No processor type exists with name [hello_test]","header":{"processor_type":"hello_test"}},"status":400}`,
+			Output: "This module requires an Elasticsearch plugin that provides the hello_test processor. " +
+				"Please visit the Elasticsearch documentation for instructions on how to install this plugin. " +
+				"Response body: " + `{"error":{"root_cause":[{"type":"parse_exception","reason":"No processor type exists with name [hello_test]","header":{"processor_type":"hello_test"}}],"type":"parse_exception","reason":"No processor type exists with name [hello_test]","header":{"processor_type":"hello_test"}},"status":400}`,
+		},
+		{
+			Test:   "Elasticsearch 2.4",
+			Input:  `{"error":{"root_cause":[{"type":"invalid_index_name_exception","reason":"Invalid index name [_ingest], must not start with '_'","index":"_ingest"}],"type":"invalid_index_name_exception","reason":"Invalid index name [_ingest], must not start with '_'","index":"_ingest"},"status":400}`,
+			Output: `The Ingest Node functionality seems to be missing from Elasticsearch. The Filebeat modules require Elasticsearch >= 5.0. This is the response I got from Elasticsearch: {"error":{"root_cause":[{"type":"invalid_index_name_exception","reason":"Invalid index name [_ingest], must not start with '_'","index":"_ingest"}],"type":"invalid_index_name_exception","reason":"Invalid index name [_ingest], must not start with '_'","index":"_ingest"},"status":400}`,
+		},
+		{
+			Test:   "Elasticsearch 1.7",
+			Input:  `{"error":"InvalidIndexNameException[[_ingest] Invalid index name [_ingest], must not start with '_']","status":400}`,
+			Output: `The Filebeat modules require Elasticsearch >= 5.0. This is the response I got from Elasticsearch: {"error":"InvalidIndexNameException[[_ingest] Invalid index name [_ingest], must not start with '_']","status":400}`,
+		},
+		{
+			Test:   "bad json",
+			Input:  `blah`,
+			Output: `couldn't load pipeline: test. Additionally, error decoding response body: blah`,
+		},
+		{
+			Test:  "another error",
+			Input: `{"error":{"root_cause":[{"type":"test","reason":""}],"type":"test","reason":""},"status":400}`,
+			Output: "couldn't load pipeline: test. Response body: " +
+				`{"error":{"root_cause":[{"type":"test","reason":""}],"type":"test","reason":""},"status":400}`,
+		},
+	}
+
+	for _, test := range tests {
+		errResult := interpretError(errors.New("test"), []byte(test.Input))
+		assert.Equal(t, errResult.Error(), test.Output, test.Test)
+	}
 }
