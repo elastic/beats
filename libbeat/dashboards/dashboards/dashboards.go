@@ -10,7 +10,7 @@ import (
 // DashboardLoader is a subset of the Elasticsearch client API capable of
 // loading the dashboards.
 type DashboardLoader interface {
-	LoadJSON(path string, json map[string]interface{}) error
+	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
 	CreateIndex(index string, body interface{}) (int, *elasticsearch.QueryResult, error)
 }
 
