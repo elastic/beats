@@ -56,7 +56,7 @@ func TestReadLine(t *testing.T) {
 	defer readFile.Close()
 	assert.Nil(t, err)
 
-	f := source.File{readFile}
+	f := source.File{File: readFile}
 
 	h := Harvester{
 		config: harvesterConfig{

@@ -60,7 +60,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 	result := map[string]interface{}{}
-	if err := m.mongoSession.DB("admin").Run(bson.D{{"serverStatus", 1}}, &result); err != nil {
+	if err := m.mongoSession.DB("admin").Run(bson.D{{Name: "serverStatus", Value: 1}}, &result); err != nil {
 		return nil, err
 	}
 

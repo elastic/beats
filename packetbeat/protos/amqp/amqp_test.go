@@ -14,7 +14,7 @@ import (
 
 func amqpModForTests() *amqpPlugin {
 	var amqp amqpPlugin
-	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
+	results := &publish.ChanTransactions{Channel: make(chan common.MapStr, 10)}
 	config := defaultConfig
 	amqp.init(results, &config)
 	return &amqp
