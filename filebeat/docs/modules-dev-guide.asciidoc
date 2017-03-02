@@ -9,38 +9,39 @@ build Filebeat (which you will need for testing), please follow the general
 Beats https://github.com/elastic/beats/blob/master/CONTRIBUTING.md[CONTRIBUTING]
 guide.
 
+[float]
 === Overview
 
-Each Filebeat module is composed by one or more "filesets". We usually create a
+Each Filebeat module is composed of one or more "filesets". We usually create a
 module for each service that we support (`nginx` for Nginx, `mysql` for Mysql,
-etc.) and a fileset for each type of logs that that service creates. For
+and so on) and a fileset for each type of log that the service creates. For
 example, the Nginx module has `access` and `error` filesets. You can contribute
-a new module (with at least one fileset) or only a new fileset into an existing
+a new module (with at least one fileset), or a new fileset for an existing
 module.
 
+[float]
 === Creating a new fileset
 
-Regardless of whether you are creating a fielset in a new module or in an
-existing module, the procedure is similar. Run the following command in the
-`filebeat` folder:
+Regardless of whether you are creating a fileset in a new or existing module,
+the procedure is similar. Run the following command in the `filebeat` folder:
 
 [source,bash]
 ----
-make create-metricset
+make create-fileset
 ----
 
-You'll be prompted to enter a module and metricset name. Only use characters
+You'll be prompted to enter a module and fileset name. Only use characters
 `[a-z]` and, if required, underscores (`_`). No other characters are allowed.
 For the module name, you can us either a new module name or an existing module
 name. If the module doesn't exist, it will be created.
 
-In this guide we use `{fileset}` and `{module}` as placeholders for the fileset
-and module names. You need to replace these with the actual names you entered in
-the previous command.
+NOTE: In this guide we use `{fileset}` and `{module}` as placeholders for the
+fileset and module names. You need to replace these with the actual names you
+entered when your created the module and fileset.
 
-After running the above make command, you'll find the fileset, along with its
-generated files, under `module/{module}/{fileset}`. This directory
-contains the following files:
+After running the `make create-fileset` command, you'll find the fileset,
+along with its generated files, under `module/{module}/{fileset}`. This
+directory contains the following files:
 
 [source,bash]
 ----
@@ -57,17 +58,17 @@ module/{module}/{fileset}
 
 Let's look at these files one by one.
 
+[float]
 ==== manifest.yml
 
 The `manifest.yml` is the control file for the module, where variables are
 defined and the other files are referenced. It is a YAML file, but in many
-places in it, built-in or defined variables can be used using the
+places in the file, you can use built-in or defined variables by using the
 `{{.variable}}` syntax.
 
 The `var` section of the file defines the fileset variables and their default
-values. The module variables can be referenced in the rest of the configuration
-files, and their value can be overridden at runtime via the Filebeat
-configuration.
+values. The module variables can be referenced in other configuration files,
+and their value can be overridden at runtime by the Filebeat configuration.
 
 As the fileset creator, you can use any names for the variables you define. Each
 variable must have a default value. So in it's simplest form, this is how you
@@ -80,8 +81,8 @@ var:
     default: with_plugins
 ----
 
-Most fileset should have a `paths` variable defined, in which the default paths
-where the log files are found should be set:
+Most fileset should have a `paths` variable defined, which sets the default
+paths where the log files are located:
 
 [source,yaml]
 ----
@@ -96,15 +97,15 @@ var:
       - c:/programdata/example/logs/test.log*
 ----
 
-There's quite a lot going on in the above, so let's break it down:
+There's quite a lot going on in this file, so let's break it down:
 
 * The name of the variable is `paths` and the default value is an array with one
   element: `"/example/test.log*"`.
-* Note that variable values don't have to be strings,
-  they can be also numbers, objects, or like in this example, arrays.
+* Note that variable values don't have to be strings.
+  They can be also numbers, objects, or as shown in this example, arrays.
 * We will use the `paths` variable to set the prospector
   <<prospector-paths,paths>> setting, so "glob" values can be used here.
-* Besides the `default` value, the above also defines values for particular
+* Besides the `default` value, the file defines values for particular
   operating systems: a default for darwin/OS X/macOS systems and a default for
   Windows systems. These are introduced via the `os.darwin` and `os.windows`
   keywords. The values under these keys become the default for the variable, if
@@ -122,27 +123,29 @@ prospector: config/testfileset.yml
 
 These should point to the respective files from the fileset.
 
-Note that when evaluating both of these, the variables are expanded, which
-enables you to select one file or the other depending on the value of a
-variable. For example:
+Note that when evaluating the contents of these files, the variables are
+expanded, which enables you to select one file or the other depending on the
+value of a variable. For example:
 
 [source,yaml]
 ----
 ingest_pipeline: ingest/{{.pipeline}}.json
 ----
 
-This will the ingest pipeline file that matches the `pipeline` variable value in
-the file name.
+This example selects the ingest pipeline file based on the value of the
+`pipeline` variable. For the `pipeline` variable shown earlier, the path would
+resolve to `ingest/with_plugins.json` (assuming the variable value isn't
+overridden at runtime.)
 
+[float]
 ==== config/*.yml
 
-Under the `config/` folder there are the template files that generate Filebeat
-prospector configurations. The Filebeat prospectors are primarily responsible
-with tailing the files, filtering, and multi-line stitching, so that is what is
-configured here.
+The `config/` folder contains template files that generate Filebeat prospector
+configurations. The Filebeat prospectors are primarily responsible for tailing
+files, filtering, and multi-line stitching, so that's what you configure in the
+template files.
 
-A typical example, which is also what is automatically generated, looks like
-this:
+A typical example looks like this:
 
 [source,yaml]
 ----
@@ -154,14 +157,17 @@ paths:
 exclude_files: [".gz$"]
 ----
 
-The template needs to generate a valid Filebeat prospector configuration in the
-YAML format. The options accepted by the prospector configuration can be found
-in this <<configuration-filebeat-options,section>>.
+You'll find this example in the template file that gets generated automatically
+when you run `make create-fileset`. In this example, the `paths` variable is
+used to construct the `paths` list for the <<prospector-paths>> option. 
 
-The templating language used in these files is the one defined in the
-https://golang.org/pkg/text/template/[Golang standard library]. In this example,
-the `paths` variable is used to construct the `paths` list for the
-<<prospector-paths>> option.
+Any template files that you add to the `config/` folder need to generate a valid
+Filebeat prospector configuration in YAML format. The options accepted by the
+prospector configuration are documented in this
+<<configuration-filebeat-options,section>>.
+
+The template files use the templating language defined by the
+https://golang.org/pkg/text/template/[Golang standard library]. 
 
 Here is another example that also configures multiline stitching:
 
@@ -179,15 +185,16 @@ multiline:
   match: after
 ----
 
-While you can add multiple configuration files under the `config/` folder, only
-the one indicated by the `manifest.yml` file will be loaded. You can use
+Although you can add multiple configuration files under the `config/` folder,
+only the file indicated by the `manifest.yml` file will be loaded. You can use
 variables to dynamically switch between configurations.
 
+[float]
 ==== ingest/*.json
 
-Under the `ingest/` folder there are the Elasticsearch
+The `ingest/` folder contains Elasticsearch 
 {elasticsearch}/ingest.html[Ingest Node] pipeline configurations. The Ingest
-Node pipelines are responsible with parsing the log lines and doing other
+Node pipelines are responsible for parsing the log lines and doing other
 manipulations on the data.
 
 The files in this folder are JSON documents representing
@@ -213,9 +220,10 @@ The generator creates a JSON object similar to this one:
 ----
 
 From here, you would typically add processors to the `processors` array to do
-the actual parsing. For details on how to use the Ingest Node processors, please
-visit the respective {elasticsearch}/ingest-processors.html[documentation]. In
-particular, you will likely find the Grok processor to be useful for parsing.
+the actual parsing. For details on how to use ingest node processors, see the
+{elasticsearch}/ingest-processors.html[ingest node documentation]. In 
+particular, you will likely find the
+{elasticsearch}/grok-processor.html[Grok processor] to be useful for parsing.
 Here is an example for parsing the Nginx access logs.
 
 [source,json]
@@ -240,10 +248,11 @@ While developing the pipeline definition, we recommend making use of the
 {elasticsearch}/simulate-pipeline-api.html[Simulate Pipeline API] for testing
 and quick iteration.
 
+[float]
 ==== _meta/fields.yml
 
-The `fields.yml` file contains the top level structure for the fields in your
-fieldset. It is used as the source of truth for:
+The `fields.yml` file contains the top-level structure for the fields in your
+fileset. It is used as the source of truth for:
 
 * the generated Elasticsearch mapping template
 * the generated Kibana index pattern
@@ -255,9 +264,10 @@ should contain the fields defined at the module level, and the description of
 the module itself. In most cases, you should add the fields at the fileset
 level.
 
+[float]
 ==== test
 
-In the `test/` directory you should place sample log files generated by the
+In the `test/` directory, you should place sample log files generated by the
 service. We have integration tests, automatically executed by CI, that will run
 Filebeat on each of the log files under the `test/` folder and check that there
 are no parsing errors and that all fields are documented.
@@ -268,28 +278,31 @@ documents as they are found via an Elasticsearch search. In this case, the
 integration tests will automatically check that the result is the same on each
 run.
 
-=== Module level files
+[float]
+=== Module-level files
 
 Besides the files in the fileset folder, there is also data that needs to be
 filled at the module level.
 
+[float]
 ==== _meta/docs.asciidoc
 
-This file contains module specific documentation. You should include information
-about which versions of the service were tested and about which variables is
-each fileset defining.
+This file contains module-specific documentation. You should include information
+about which versions of the service were tested and the variables that are
+defined in each fileset.
 
+[float]
 ==== _meta/fields.yml
 
-The module level `fields.yml` contains descriptions for the module level fields.
+The module level `fields.yml` contains descriptions for the module-level fields.
 Please review and update the title and the descriptions in this file. The title
-is used as a title in the docs, so it's best to use capitalize it.
+is used as a title in the docs, so it's best to capitalize it.
 
+[float]
 ==== _meta/kibana
 
 This folder contains the sample Kibana dashboards for this module. To create
 them, you can build them visually in Kibana and then run the following command:
-
 
 [source,shell]
 ----
@@ -300,4 +313,4 @@ python ../../../dev-tools/export_dashboards.py --regex {module} --dir _meta/kiba
 Where the `--regex` parameter should match the dashboard you want to export.
 
 You can find more details about the process of creating and exporting the Kibana
-dashboards by reading this {libbeat}/new-dashboards.html[this guide].
+dashboards by reading {libbeat}/new-dashboards.html[this guide].
