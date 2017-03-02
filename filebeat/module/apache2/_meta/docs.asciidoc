@@ -6,6 +6,11 @@ https://httpd.apache.org/[Apache HTTP] server.
 [float]
 === Compatibility
 
+This module requires the
+{elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent] and
+{elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugins.
+
+
 The Apache2 module was tested with logs from versions 2.2.22 and 2.4.23.
 
 On Windows, the module was tested with Apache2 installed from the Chocolatey
@@ -26,13 +31,6 @@ image::./images/kibana-apache2.png[]
 
 An array of paths where to look for the log files. If left empty, Filebeat
 will choose the paths depending on your operating systems.
-
-[float]
-==== var.pipeline
-
-Ingest Node pipeline to use. Options are `with_plugins` (default) and
-`no_plugins`. Use `no_plugins` if you don't have the GeoIP or the user agent
-Node ingest plugins installed.
 
 [float]
 === Error logs fileset settings
