@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix handling of empty strings in event_data. {pull}3705[3705]
 
 ==== Added
 
