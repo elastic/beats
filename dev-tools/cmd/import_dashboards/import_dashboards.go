@@ -9,7 +9,7 @@ import (
 
 	lbeat "github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/dashboards/dashboards"
+	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outil"

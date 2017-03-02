@@ -48,7 +48,7 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/dashboards/dashboards"
+	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring/report"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"

@@ -141,7 +141,7 @@ integration-tests-environment: prepare-tests build-image
 # Runs the system tests
 .PHONY: system-tests
 system-tests: ## @testing Runs the system tests
-system-tests: ${BEAT_NAME}.test prepare-tests python-env ${ES_BEATS}/libbeat/dashboards/import_dashboards
+system-tests: ${BEAT_NAME}.test prepare-tests python-env ${ES_BEATS}/dev-tools/cmd/import_dashboards/import_dashboards
 	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} nosetests -w tests/system ${NOSETESTS_OPTIONS}
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
@@ -283,12 +283,12 @@ ES_URL?=http://localhost:9200
 export-dashboards: python-env update
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/_meta/kibana --regex ${BEAT_NAME}-*
 
-${ES_BEATS}/libbeat/dashboards/import_dashboards:
-	$(MAKE) -C ${ES_BEATS}/libbeat/dashboards import_dashboards
+${ES_BEATS}/dev-tools/cmd/import_dashboards/import_dashboards:
+	$(MAKE) -C ${ES_BEATS}/dev-tools/cmd/import_dashboards import_dashboards
 
 .PHONY: import-dashboards
-import-dashboards: update ${ES_BEATS}/libbeat/dashboards/import_dashboards
-	${ES_BEATS}/libbeat/dashboards/import_dashboards -es ${ES_URL} -dir ${PWD}/_meta/kibana
+import-dashboards: update ${ES_BEATS}/dev-tools/cmd/import_dashboards/import_dashboards
+	${ES_BEATS}/dev-tools/cmd/import_dashboards/import_dashboards -es ${ES_URL} -dir ${PWD}/_meta/kibana
 
 ### CONTAINER ENVIRONMENT ####
 
