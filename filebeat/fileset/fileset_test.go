@@ -26,16 +26,13 @@ func TestLoadManifestNginx(t *testing.T) {
 	manifest, err := fs.readManifest()
 	assert.NoError(t, err)
 	assert.Equal(t, manifest.ModuleVersion, "1.0")
-	assert.Equal(t, manifest.IngestPipeline, "ingest/{{.pipeline}}.json")
+	assert.Equal(t, manifest.IngestPipeline, "ingest/default.json")
 	assert.Equal(t, manifest.Prospector, "config/nginx-access.yml")
 
 	vars := manifest.Vars
 	assert.Equal(t, "paths", vars[0]["name"])
 	path := (vars[0]["default"]).([]interface{})[0].(string)
 	assert.Equal(t, path, "/var/log/nginx/access.log*")
-
-	assert.Equal(t, "pipeline", vars[1]["name"])
-	assert.Equal(t, "with_plugins", vars[1]["default"])
 }
 
 func TestGetBuiltinVars(t *testing.T) {
@@ -62,7 +59,6 @@ func TestEvaluateVarsNginx(t *testing.T) {
 	assert.IsType(t, "a-mac-with-esc-key", builtin["hostname"])
 	assert.IsType(t, "local", builtin["domain"])
 
-	assert.Equal(t, "with_plugins", vars["pipeline"])
 	assert.IsType(t, []interface{}{"/usr/local/var/log/nginx/access.log*"}, vars["paths"])
 }
 
@@ -159,7 +155,7 @@ func TestGetProspectorConfigNginx(t *testing.T) {
 	assert.True(t, cfg.HasField("pipeline"))
 	pipelineID, err := cfg.String("pipeline", -1)
 	assert.NoError(t, err)
-	assert.Equal(t, "filebeat-5.2.0-nginx-access-with_plugins", pipelineID)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
 }
 
 func TestGetProspectorConfigNginxOverrides(t *testing.T) {
@@ -183,7 +179,7 @@ func TestGetProspectorConfigNginxOverrides(t *testing.T) {
 	assert.True(t, cfg.HasField("pipeline"))
 	pipelineID, err := cfg.String("pipeline", -1)
 	assert.NoError(t, err)
-	assert.Equal(t, "filebeat-5.2.0-nginx-access-with_plugins", pipelineID)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
 
 	moduleName, err := cfg.String("_module_name", -1)
 	assert.NoError(t, err)
@@ -201,7 +197,7 @@ func TestGetPipelineNginx(t *testing.T) {
 
 	pipelineID, content, err := fs.GetPipeline()
 	assert.NoError(t, err)
-	assert.Equal(t, "filebeat-5.2.0-nginx-access-with_plugins", pipelineID)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
 	assert.Contains(t, content, "description")
 	assert.Contains(t, content, "processors")
 }
