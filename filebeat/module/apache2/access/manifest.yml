@@ -16,3 +16,9 @@ var:
 
 ingest_pipeline: ingest/{{.pipeline}}.json
 prospector: config/access.yml
+
+requires.processors:
+- name: user_agent
+  plugin: ingest-user-agent
+- name: geoip
+  plugin: ingest-geoip
