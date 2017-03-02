@@ -33,8 +33,11 @@ formats, such as Nginx, Apache2, and MySQL, and can be run by issuing a simple
 command.  
 
 This topic shows you how to run the basic modules out of the box without extra
-configuration. For detailed documentation and the full list of supported
+configuration. For detailed documentation and the full list of available
 modules, see <<filebeat-modules>>.
+
+Skip this topic and go to <<filebeat-installation>> if you are using a log file
+type that isn't supported by one of the available Filebeat modules.
 
 ==== Prerequisites
 
