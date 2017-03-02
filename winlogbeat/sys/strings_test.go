@@ -55,7 +55,7 @@ func TestUTF16BytesToStringOffset(t *testing.T) {
 }
 
 func TestUTF16BytesToStringOffsetWithEmptyString(t *testing.T) {
-	in := bytes.Join([][]byte{toUTF16Bytes(""), toUTF16Bytes("two"), }, []byte{0, 0})
+	in := bytes.Join([][]byte{toUTF16Bytes(""), toUTF16Bytes("two")}, []byte{0, 0})
 
 	output, offset, err := UTF16BytesToString(in)
 	if err != nil {
