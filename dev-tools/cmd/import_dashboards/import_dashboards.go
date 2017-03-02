@@ -7,13 +7,13 @@ import (
 	"os"
 	"time"
 
-	lbeat "github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/libbeat/version"
 )
 
 var usage = fmt.Sprintf(`
@@ -84,7 +84,7 @@ func DefineCommandLine() (*CommandLine, error) {
 	cl.flagSet.StringVar(&cl.opt.Dir, "dir", "", "Directory containing the subdirectories: dashboard, visualization, search, index-pattern. Example: etc/kibana/")
 	cl.flagSet.StringVar(&cl.opt.File, "file", "", "Zip archive file containing the Beats dashboards. The archive contains a directory for each Beat.")
 	cl.flagSet.StringVar(&cl.opt.URL, "url",
-		fmt.Sprintf("https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-%s.zip", lbeat.GetDefaultVersion()),
+		fmt.Sprintf("https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-%s.zip", version.GetDefaultVersion()),
 		"URL to the zip archive containing the Beats dashboards")
 	cl.flagSet.StringVar(&cl.opt.Beat, "beat", beat, "The Beat name that is used to select what dashboards to install from a zip. An empty string selects all.")
 	cl.flagSet.BoolVar(&cl.opt.OnlyDashboards, "only-dashboards", false, "Import only dashboards together with visualizations and searches. By default import both, dashboards and the index-pattern.")
@@ -146,7 +146,7 @@ func New() (*dashboards.Importer, error) {
 		OnlyDashboards: cl.opt.OnlyDashboards,
 		OnlyIndex:      cl.opt.OnlyIndex,
 		Snapshot:       cl.opt.Snapshot,
-		SnapshotURL:    fmt.Sprintf("https://beats-nightlies.s3.amazonaws.com/dashboards/beats-dashboards-%s-SNAPSHOT.zip", lbeat.GetDefaultVersion()),
+		SnapshotURL:    fmt.Sprintf("https://beats-nightlies.s3.amazonaws.com/dashboards/beats-dashboards-%s-SNAPSHOT.zip", version.GetDefaultVersion()),
 	}
 
 	/* prepare the Elasticsearch index pattern */

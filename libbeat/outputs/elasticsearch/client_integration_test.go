@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/version"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -186,7 +187,7 @@ func TestOutputLoadTemplate(t *testing.T) {
 		"type":       "libbeat",
 		"message":    "Test message from libbeat",
 		"beat": common.MapStr{
-			"version": "1.2.3",
+			"version": version.GetDefaultVersion(),
 		},
 	}}
 
