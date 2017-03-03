@@ -299,16 +299,24 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 		return err
 	}
 
-	reader, err := h.Setup()
-	if err != nil {
-		return fmt.Errorf("Error setting up harvester: %s", err)
-	}
-
-	// State is directly updated and not through channel to make state update immediate
-	// State is only updated after setup is completed successfully
+	// State is directly updated and not through channel to make state update synchronous
 	err = p.updateState(input.NewEvent(state))
 	if err != nil {
 		return err
+	}
+
+	reader, err := h.Setup()
+	if err != nil {
+		// Set state to finished True again in case of setup failure to make sure
+		// file can be picked up again by a future harvester
+		state.Finished = true
+
+		updateErr := p.updateState(input.NewEvent(state))
+		// This should only happen in the case that filebeat is stopped
+		if updateErr != nil {
+			logp.Err("Error updating state: %v", updateErr)
+		}
+		return fmt.Errorf("Error setting up harvester: %s", err)
 	}
 
 	p.registry.start(h, reader)
