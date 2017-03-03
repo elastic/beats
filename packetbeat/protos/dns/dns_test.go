@@ -63,7 +63,7 @@ func newDNS(verbose bool) *dnsPlugin {
 		logp.LogInit(logp.LOG_EMERG, "", false, true, []string{"dns"})
 	}
 
-	results := &publish.ChanTransactions{make(chan common.MapStr, 100)}
+	results := &publish.ChanTransactions{Channel: make(chan common.MapStr, 100)}
 	cfg, _ := common.NewConfigFrom(map[string]interface{}{
 		"ports":               []int{serverPort},
 		"include_authorities": true,
