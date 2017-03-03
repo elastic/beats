@@ -46,6 +46,7 @@ import (
 	"github.com/satori/go.uuid"
 
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/dashboards"
@@ -110,6 +111,7 @@ type BeatConfig struct {
 	Processors processors.PluginConfig   `config:"processors"`
 	Path       paths.Path                `config:"path"`
 	Dashboards *common.Config            `config:"dashboards"`
+	Http       *common.Config            `config:"http"`
 }
 
 var (
@@ -251,6 +253,10 @@ func (b *Beat) launch(bt Creator) error {
 	logp.Info("%s start running.", b.Info.Beat)
 	defer logp.Info("%s stopped.", b.Info.Beat)
 	defer logp.LogTotalExpvars(&b.Config.Logging)
+
+	if b.Config.Http.Enabled() {
+		api.Start(b.Config.Http, b.Info)
+	}
 
 	return beater.Run(b)
 }
