@@ -77,3 +77,27 @@ func TestSetupNginx(t *testing.T) {
 	status, _, _ = client.Request("GET", "/_ingest/pipeline/filebeat-5.2.0-nginx-error-pipeline", "", nil, nil)
 	assert.Equal(t, 200, status)
 }
+
+func TestAvailableProcessors(t *testing.T) {
+	client := elasticsearch.GetTestingElasticsearch()
+
+	// these exists on our integration test setup
+	requiredProcessors := []ProcessorRequirement{
+		{Name: "user_agent", Plugin: "ingest-user-agent"},
+		{Name: "geoip", Plugin: "ingest-geoip"},
+	}
+
+	err := checkAvailableProcessors(client, requiredProcessors)
+	assert.NoError(t, err)
+
+	// these don't exists on our integration test setup
+	requiredProcessors = []ProcessorRequirement{
+		{Name: "test", Plugin: "ingest-test"},
+		{Name: "hello", Plugin: "ingest-hello"},
+	}
+
+	err = checkAvailableProcessors(client, requiredProcessors)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "ingest-test")
+	assert.Contains(t, err.Error(), "ingest-hello")
+}

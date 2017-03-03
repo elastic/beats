@@ -2,6 +2,7 @@ package fileset
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -255,6 +256,16 @@ type PipelineLoader interface {
 func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader) error {
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
+			// check that all the required Ingest Node plugins are available
+			requiredProcessors := fileset.GetRequiredProcessors()
+			logp.Debug("modules", "Required processors: %s", requiredProcessors)
+			if len(requiredProcessors) > 0 {
+				err := checkAvailableProcessors(esClient, requiredProcessors)
+				if err != nil {
+					return fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
+				}
+			}
+
 			pipelineID, content, err := fileset.GetPipeline()
 			if err != nil {
 				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
@@ -265,6 +276,66 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader) error {
 			}
 		}
 	}
+	return nil
+}
+
+// checkAvailableProcessors calls the /_nodes/ingest API and verifies that all processors listed
+// in the requiredProcessors list are available in Elasticsearch. Returns nil if all required
+// processors are available.
+func checkAvailableProcessors(esClient PipelineLoader, requiredProcessors []ProcessorRequirement) error {
+
+	var response struct {
+		Nodes map[string]struct {
+			Ingest struct {
+				Processors []struct {
+					Type string `json:"type"`
+				} `json:"processors"`
+			} `json:"ingest"`
+		} `json:"nodes"`
+	}
+	status, body, err := esClient.Request("GET", "/_nodes/ingest", "", nil, nil)
+	if err != nil {
+		return fmt.Errorf("Error querying _nodes/ingest: %v", err)
+	}
+	if status > 299 {
+		return fmt.Errorf("Error querying _nodes/ingest. Status: %d. Response body: %s", status, body)
+	}
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return fmt.Errorf("Error unmarshaling json when querying _nodes/ingest. Body: %s", body)
+	}
+
+	missing := []ProcessorRequirement{}
+	for _, requiredProcessor := range requiredProcessors {
+		for _, node := range response.Nodes {
+			available := false
+			for _, availableProcessor := range node.Ingest.Processors {
+				if requiredProcessor.Name == availableProcessor.Type {
+					available = true
+					break
+				}
+			}
+			if !available {
+				missing = append(missing, requiredProcessor)
+				break
+			}
+		}
+	}
+
+	if len(missing) > 0 {
+		missingPlugins := []string{}
+		for _, proc := range missing {
+			missingPlugins = append(missingPlugins, proc.Plugin)
+		}
+		errorMsg := fmt.Sprintf("This module requires the following Elasticsearch plugins: %s. "+
+			"You can install them by running the following commands on all the Elasticsearch nodes:",
+			strings.Join(missingPlugins, ", "))
+		for _, plugin := range missingPlugins {
+			errorMsg += fmt.Sprintf("\n    sudo bin/elasticsearch-plugin install %s", plugin)
+		}
+		return errors.New(errorMsg)
+	}
+
 	return nil
 }
 
@@ -330,7 +401,7 @@ func interpretError(initialErr error, body []byte) error {
 		}
 
 		return fmt.Errorf("This module requires the %s plugin to be installed in Elasticsearch. "+
-			"You can installing using the following command in the Elasticsearch home directory:\n"+
+			"You can install it using the following command in the Elasticsearch home directory:\n"+
 			"    sudo bin/elasticsearch-plugin install %s", plugin, plugin)
 	}
 
