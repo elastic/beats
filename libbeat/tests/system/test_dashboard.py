@@ -23,11 +23,11 @@ class Test(BaseTest):
         beats = ["metricbeat", "packetbeat", "filebeat", "winlogbeat"]
 
         for beat in beats:
-            command = "go run ../../dashboards/import_dashboards.go -es http://" + \
+            command = "go run ../../../dev-tools/cmd/import_dashboards/import_dashboards.go -es http://" + \
                 self.get_elasticsearch_host() + " -dir ../../../" + beat + "/_meta/kibana"
 
             if os.name == "nt":
-                command = "go run ..\..\dashboards\import_dashboards.go -es http:\\" + \
+                command = "go run ..\..\..\dev_tools\import_dashboards\import_dashboards.go -es http:\\" + \
                     self.get_elasticsearch_host() + " -dir ..\..\..\\" + beat + "\_meta\kibana"
 
             print(command)

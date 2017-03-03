@@ -25,8 +25,6 @@ Import / export the dashboards of a single Beat:
 
 | File                  | Description |
 |-----------------------|-------------|
-| import_dashboards.sh  | Bash script to import the Beat dashboards from a local directory in Elasticsearch |
-| import_dashboards.ps1 | Powershell script to import the Beat dashboards from a local directory in Elasticsearch |
 | export_dashboards.py  | Python script to export the Beat dashboards from Elasticsearch to a local directory|
 
 Running export_dashboards.py in environment
