@@ -13,7 +13,7 @@ goversion_template = '''package main
 const appVersion = "{version}"
 '''
 
-goversion_template_libbeat = '''package beat
+goversion_template_libbeat = '''package version
 
 const defaultBeatVersion = "{version}"
 '''
@@ -48,7 +48,7 @@ def main():
 
     is_libbeat = vendored_libbeat not in os.path.realpath(__file__)
     if is_libbeat:
-        goversion_filepath  = os.path.join(get_rootfolder(), "libbeat","beat", "version.go")
+        goversion_filepath  = os.path.join(get_rootfolder(), "libbeat", "version", "version.go")
         ymlversion_filepath = os.path.join(get_rootfolder(), "dev-tools", "packer", "version.yml")
         go_template = goversion_template_libbeat
     else:
@@ -67,4 +67,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
+

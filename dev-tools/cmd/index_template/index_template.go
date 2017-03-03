@@ -6,14 +6,14 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/template"
+	"github.com/elastic/beats/libbeat/version"
 )
 
 // main generates index templates for the beats
 func main() {
 
-	beatVersion := beat.GetDefaultVersion()
+	beatVersion := version.GetDefaultVersion()
 	index := flag.String("index", "", "Base index name. Normally {beat_name} (required)")
 	output := flag.String("output", "", "Required: Full path to the output file (required)")
 	version := flag.String("es.version", beatVersion, "Elasticsearch version")
