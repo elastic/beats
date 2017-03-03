@@ -95,12 +95,7 @@ func TestLoadInvalidTemplate(t *testing.T) {
 func TestLoadBeatsTemplate(t *testing.T) {
 
 	beats := []string{
-		"filebeat",
-		"heartbeat",
 		"libbeat",
-		"packetbeat",
-		"metricbeat",
-		"winlogbeat",
 	}
 
 	for _, beat := range beats {
