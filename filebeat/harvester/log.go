@@ -226,7 +226,7 @@ func (h *Harvester) openFile() error {
 		return err
 	}
 
-	h.file = source.File{f}
+	h.file = source.File{File: f}
 	return nil
 }
 

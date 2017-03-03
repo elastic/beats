@@ -18,7 +18,7 @@ import (
 
 func pgsqlModForTests() *pgsqlPlugin {
 	var pgsql pgsqlPlugin
-	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
+	results := &publish.ChanTransactions{Channel: make(chan common.MapStr, 10)}
 	config := defaultConfig
 	pgsql.init(results, &config)
 	return &pgsql
