@@ -57,6 +57,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher"
 	svc "github.com/elastic/beats/libbeat/service"
+	"github.com/elastic/beats/libbeat/version"
 
 	// Register default processors.
 	_ "github.com/elastic/beats/libbeat/processors/actions"
@@ -154,9 +155,9 @@ func Run(name, version string, bt Creator) error {
 }
 
 // newBeat creates a new beat instance
-func newBeat(name, version string) (*Beat, error) {
-	if version == "" {
-		version = defaultBeatVersion
+func newBeat(name, v string) (*Beat, error) {
+	if v == "" {
+		v = version.GetDefaultVersion()
 	}
 
 	hostname, err := os.Hostname()
@@ -167,7 +168,7 @@ func newBeat(name, version string) (*Beat, error) {
 	return &Beat{
 		Info: common.BeatInfo{
 			Beat:     name,
-			Version:  version,
+			Version:  v,
 			Name:     hostname,
 			Hostname: hostname,
 			UUID:     uuid.NewV4(),
@@ -267,7 +268,7 @@ func (b *Beat) handleFlags() error {
 
 	if *printVersion {
 		fmt.Printf("%s version %s (%s), libbeat %s\n",
-			b.Info.Beat, b.Info.Version, runtime.GOARCH, defaultBeatVersion)
+			b.Info.Beat, b.Info.Version, runtime.GOARCH, version.GetDefaultVersion())
 		return GracefulExit
 	}
 
@@ -450,9 +451,4 @@ func handleError(err error) error {
 	logp.Critical("Exiting: %v", err)
 	fmt.Fprintf(os.Stderr, "Exiting: %v\n", err)
 	return err
-}
-
-// GetDefaultVersion returns the current libbeat version.
-func GetDefaultVersion() string {
-	return defaultBeatVersion
 }
