@@ -52,7 +52,7 @@ func TestLoadPipeline(t *testing.T) {
 
 func TestSetupNginx(t *testing.T) {
 	client := elasticsearch.GetTestingElasticsearch()
-	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-with_plugins", "", nil, nil)
+	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-default", "", nil, nil)
 	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-error-pipeline", "", nil, nil)
 
 	modulesPath, err := filepath.Abs("../module")
@@ -72,7 +72,7 @@ func TestSetupNginx(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	status, _, _ := client.Request("GET", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-with_plugins", "", nil, nil)
+	status, _, _ := client.Request("GET", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-default", "", nil, nil)
 	assert.Equal(t, 200, status)
 	status, _, _ = client.Request("GET", "/_ingest/pipeline/filebeat-5.2.0-nginx-error-pipeline", "", nil, nil)
 	assert.Equal(t, 200, status)
