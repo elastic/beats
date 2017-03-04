@@ -1037,6 +1037,144 @@ Output codec configuration. If the `codec` section is missing, events will be js
 
 See <<configuration-output-codec>> for more information.
 
+[[awscwl-output]]
+=== AWS CloudWatch Logs Output
+
+When you specify AWS CloudWatch Logs for the output, the Beat sends the transactions
+directly to AWS CloudWatch logs using the https://aws.amazon.com/sdk-for-go/[AWS SDK for Go].
+
+The logs are sent in bulk every `bulk_max_size` records or `flush_interval`, whichever comes first.
+
+Check https://aws.amazon.com/cloudwatch/pricing/[CloudWatch Log Pricing] first so you understand
+the costs involved.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.awscwl:
+  codec.format:
+     string: '%{[message]}'
+  region: "us-east-1"
+  log_group_name: "/prod/linux/syslog"
+  log_stream_name_prefix: "MY_IP"
+  # access_key_id: XXXXXX
+  # secret_access_key: XXXXXX
+  # session_token: XXXXXX
+  # bulk_max_size: 1024 # default 1024 events in bulk publish
+  # flush_interval: 60 # default 60 seconds
+------------------------------------------------------------------------------
+
+The CloudWatch Log Group must already exist in your environment.  This plugin only creates
+streams within an existing group.  You would typically set a different `log_stream_name_prefix`
+for each server so the logs don't all get jumbled together.  Use whatever identifier
+makes sense for your environment (instance-id, ip address, etc.).
+
+The credentials for AWS are provided using the default credentials provider
+chain as documented http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html[here].
+In most deployments using this output, credentials are provided automatically
+to EC2 instances with an IAM Role.  If you are deploying via a docker container
+you should use one of the common mechanisms used today (environment variables or
+bind mount a credentials file).
+
+The credentials must be granted the following actions as demonstrated in this sample policy
+(although you should probably restrict the `Resource` to adhere to
+https://en.wikipedia.org/wiki/Principle_of_least_privilege[the principle of least privilege]):
+
+["source","json"]
+------------------------------------------------------------------------------
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:*"
+    }
+  ]
+}
+------------------------------------------------------------------------------
+
+==== AWS CloudWatch Logs Output Options
+
+You can specify the following options in the `awscwl` section of the +{beatname_lc}.yml+
+config file:
+
+===== enabled
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
+===== region
+
+Since CloudWatch Logs are region specific, a required parameter is the destination region.
+Keep https://aws.amazon.com/ec2/pricing/[cross region data transfer costs] in
+mind should you set this to a different region than where you are running {beatname_lc}.
+
+===== log_group_name
+
+The destination CloudWatch
+http://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatchLogsConcepts.html[Log Group]
+that will hold the output.
+
+Be sure to set sensible
+http://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatchLogsConcepts.html[Retention Settings]
+to keep your archival costs down.  Don't keep more than what you need.
+
+===== log_stream_name_prefix
+
+The target CloudWatch
+http://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatchLogsConcepts.html[Log Stream]
+to create or append records.
+
+Usually, you want this to be unique to the source of the data (ip, instance-id, whatever).
+
+===== access_key_id
+
+You can override the
+http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html[default credentials chain]
+by specifying AWS API keys directly (mostly used for testing).
+
+===== secret_access_key
+
+You can override the
+http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html[default credentials chain]
+by specifying AWS API keys directly (mostly used for testing).
+
+===== session_token
+
+You can override the
+http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html[default credentials chain]
+by specifying AWS API keys directly (mostly used for testing).
+
+`session_token` should only be specified if the `access_key_id`/`secret_access_key` pair are
+http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html[temporary keys from STS].
+
+===== bulk_max_size
+
+The maximum number of records to push in one API call.  When this size is reached
+the records are sent even if the `flush_interval` hasn't passed.  The default value
+is 1024 (records).
+
+===== flush_interval
+
+The number of seconds between bulk sends to CloudWatch Logs.  Any unsent records will be sent on this
+interval.  The default value is 60 (seconds).
+
+===== codec
+
+Output codec configuration. If the `codec` section is missing, events will be json encoded.
+
+See <<configuration-output-codec>> for more information.
+
+The example configuration above uses a simple line format for the payload.
+
 [[console-output]]
 === Console Output
 
