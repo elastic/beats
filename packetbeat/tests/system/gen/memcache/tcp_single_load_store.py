@@ -14,5 +14,6 @@ def run(mc):
     if v != mc.get('test_key'):
         raise RuntimeError("returned value differs")
 
+
 if __name__ == '__main__':
     mc.run_tcp(run)

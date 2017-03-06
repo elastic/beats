@@ -49,5 +49,6 @@ def collect():
     # output string so it can be concatenated
     print(fields_yml)
 
+
 if __name__ == "__main__":
     collect()

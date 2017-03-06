@@ -97,6 +97,7 @@ grouped in the following categories:
         section["anchor"] = section["key"]
         document_fields(output, section, sections, "")
 
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
