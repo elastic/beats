@@ -11,5 +11,6 @@ def run(mc):
     mc.decr('cnt', 5)
     print(mc.get('cnt'))
 
+
 if __name__ == '__main__':
     mc.run_tcp(run)
