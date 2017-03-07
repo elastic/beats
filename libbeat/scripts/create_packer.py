@@ -42,6 +42,7 @@ def load_file(file, beat, beat_path, version):
 
     return content.replace("{beat}", beat).replace("{beat_path}", beat_path).replace("{version}", version)
 
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Creates the beats packer structure")

@@ -9,5 +9,6 @@ def run(mc):
     print(mc.get('key'))
     print(mc.get_stats())
 
+
 if __name__ == '__main__':
     mc.run_tcp(run)

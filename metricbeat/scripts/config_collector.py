@@ -78,6 +78,7 @@ def get_title_line(title):
 
     return line[0:78] + "\n"
 
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
