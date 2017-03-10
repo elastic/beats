@@ -10,12 +10,15 @@
 //////////////////////////////////////////////////////////////////////////
 
 *`-E <setting>=<value>`*::
-Overwrite an individual setting in the config file. For example:
+Override a specific configuration setting. For example:
 +
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo ./{beatname_lc} -c {beatname_lc}.yml -E name=mybeat
 ----------------------------------------------------------------------
++
+This setting is applied to the currently running {beatname_uc} process.
+The {beatname_uc} configuration file is not changed. 
 
 *`-N`*::
 Disable the publishing of events to the defined output. This option is useful only
