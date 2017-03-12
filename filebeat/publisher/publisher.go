@@ -2,16 +2,16 @@ package publisher
 
 import (
 	"errors"
-	"expvar"
 
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/publisher"
 )
 
 var (
-	eventsSent = expvar.NewInt("publish.events")
+	eventsSent = monitoring.NewInt(nil, "publish.events")
 )
 
 // LogPublisher provides functionality to start and stop a publisher worker.

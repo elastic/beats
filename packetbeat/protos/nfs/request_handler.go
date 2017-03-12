@@ -3,11 +3,11 @@ package nfs
 // This file contains methods process RPC calls
 
 import (
-	"expvar"
 	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
@@ -23,7 +23,7 @@ var acceptStatus = [...]string{
 }
 
 var (
-	unmatchedRequests = expvar.NewInt("nfs.unmatched_requests")
+	unmatchedRequests = monitoring.NewInt(nil, "nfs.unmatched_requests")
 )
 
 // called by Cache, when re reply seen within expected time window

@@ -4,12 +4,12 @@ package memcache
 
 import (
 	"encoding/json"
-	"expvar"
 	"math"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
@@ -101,9 +101,9 @@ type memcacheStat struct {
 var debug = logp.MakeDebug("memcache")
 
 var (
-	unmatchedRequests      = expvar.NewInt("memcache.unmatched_requests")
-	unmatchedResponses     = expvar.NewInt("memcache.unmatched_responses")
-	unfinishedTransactions = expvar.NewInt("memcache.unfinished_transactions")
+	unmatchedRequests      = monitoring.NewInt(nil, "memcache.unmatched_requests")
+	unmatchedResponses     = monitoring.NewInt(nil, "memcache.unmatched_responses")
+	unfinishedTransactions = monitoring.NewInt(nil, "memcache.unfinished_transactions")
 )
 
 func init() {

@@ -1,13 +1,13 @@
 package cfgfile
 
 import (
-	"expvar"
 	"path/filepath"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
@@ -21,10 +21,10 @@ var (
 
 	debugf = logp.MakeDebug("cfgfile")
 
-	configReloads = expvar.NewInt("libbeat.config.reloads")
-	moduleStarts  = expvar.NewInt("libbeat.config.module.starts")
-	moduleStops   = expvar.NewInt("libbeat.config.module.stops")
-	moduleRunning = expvar.NewInt("libbeat.config.module.running")
+	configReloads = monitoring.NewInt(nil, "libbeat.config.reloads")
+	moduleStarts  = monitoring.NewInt(nil, "libbeat.config.module.starts")
+	moduleStops   = monitoring.NewInt(nil, "libbeat.config.module.stops")
+	moduleRunning = monitoring.NewInt(nil, "libbeat.config.module.running")
 )
 
 type ReloadConfig struct {

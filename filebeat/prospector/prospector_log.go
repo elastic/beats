@@ -1,7 +1,6 @@
 package prospector
 
 import (
-	"expvar"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -13,11 +12,12 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 var (
-	filesRenamed   = expvar.NewInt("filebeat.prospector.log.files.renamed")
-	filesTruncated = expvar.NewInt("filebeat.prospector.log.files.truncated")
+	filesRenamed   = monitoring.NewInt(nil, "filebeat.prospector.log.files.renamed")
+	filesTruncated = monitoring.NewInt(nil, "filebeat.prospector.log.files.truncated")
 )
 
 type ProspectorLog struct {
