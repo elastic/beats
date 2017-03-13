@@ -60,7 +60,23 @@ func New(beat common.BeatInfo, cfg *common.Config, topologyExpire int) (outputs.
 	}
 
 	if !cfg.HasField("index") {
-		pattern := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.Beat, beat.Version)
+		pattern := ""
+		if cfg.HasField("timezone") {
+			zone, err := cfg.String("timezone", -1)
+			if err != nil {
+				return nil, err
+			}
+			loc, err := time.LoadLocation(zone)
+			if err != nil {
+				logp.Err(err.Error())
+				pattern = fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.Beat, beat.Version)
+			} else {
+				pattern = fmt.Sprintf("%v-%v-"+time.Now().In(loc).Format("2006.01.02"), beat.Beat, beat.Version)
+			}
+		} else {
+			pattern = fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.Beat, beat.Version)
+		}
+
 		cfg.SetString("index", -1, pattern)
 	}
 
