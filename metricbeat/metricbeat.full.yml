@@ -284,6 +284,9 @@ metricbeat.modules:
   # Redis hosts
   #hosts: ["127.0.0.1:6379"]
 
+  # Password to authenticate to the hosts
+  #password: ""
+
   # Timeout after which time a metricset should return an error
   # Timeout is by default defined as period, as a fetch of a metricset
   # should never take longer then period, as otherwise calls can pile up.
@@ -948,4 +951,3 @@ logging.files:
 
   # Number of rotated log files to keep. Oldest files will be deleted first.
   #keepfiles: 7
-
