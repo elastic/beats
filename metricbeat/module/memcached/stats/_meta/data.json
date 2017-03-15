@@ -28,7 +28,9 @@
                 "bytes": 6
             },
             "threads": 4,
-            "uptime": 7,
+            "uptime": {
+                "sec": 7
+            },
             "written": {
                 "bytes": 0
             }

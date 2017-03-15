@@ -7,8 +7,10 @@ import (
 
 var (
 	schema = s.Schema{
-		"pid":     c.Int("pid"),
-		"uptime":  c.Int("uptime"),
+		"pid": c.Int("pid"),
+		"uptime": s.Object{
+			"sec": c.Int("uptime"),
+		},
 		"threads": c.Int("threads"),
 		"connections": s.Object{
 			"current": c.Int("curr_connections"),

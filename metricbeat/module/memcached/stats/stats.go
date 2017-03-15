@@ -22,7 +22,7 @@ type MetricSet struct {
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
-	logp.Warn("BETA: The docker container metricset is beta")
+	logp.Warn("BETA: The memcached stats metricset is beta")
 
 	return &MetricSet{
 		BaseMetricSet: base,

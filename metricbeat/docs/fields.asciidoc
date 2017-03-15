@@ -3352,7 +3352,7 @@ Current process ID of the Memcached task.
 
 
 [float]
-=== memcached.stats.uptime
+=== memcached.stats.uptime.sec
 
 type: long
 

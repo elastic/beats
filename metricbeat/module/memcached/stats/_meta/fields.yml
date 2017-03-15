@@ -8,7 +8,7 @@
       description: >
         Current process ID of the Memcached task.
 
-    - name: uptime
+    - name: uptime.sec
       type: long
       description: >
         Memcached server uptime.
