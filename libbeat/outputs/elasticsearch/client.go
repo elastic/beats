@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
+// Client is an elasticsearch client.
 type Client struct {
 	Connection
 	tlsConfig *transport.TLSConfig
@@ -40,6 +41,7 @@ type Client struct {
 	proxyURL         *url.URL
 }
 
+// ClientSettings contains the settings for a client.
 type ClientSettings struct {
 	URL                string
 	Proxy              *url.URL
@@ -55,6 +57,7 @@ type ClientSettings struct {
 
 type connectCallback func(client *Client) error
 
+// Connection manages the connection for a given client.
 type Connection struct {
 	URL      string
 	Username string
@@ -93,6 +96,7 @@ var (
 	errExcpectedObjectEnd    = errors.New("expected end of object")
 )
 
+// NewClient instantiates a new client.
 func NewClient(
 	s ClientSettings,
 	onConnectCallback connectCallback,
@@ -197,6 +201,7 @@ func NewClient(
 	return client, nil
 }
 
+// Clone clones a client.
 func (client *Client) Clone() *Client {
 	// when cloning the connection callback and params are not copied. A
 	// client's close is for example generated for topology-map support. With params
@@ -473,6 +478,10 @@ func itemStatus(reader *jsonReader) (int, []byte, error) {
 
 	// parse actual item response code and error message
 	status, msg, err := itemStatusInner(reader)
+	if err != nil {
+		logp.Err("Failed to parse bulk response item: %s", err)
+		return 0, nil, err
+	}
 
 	// close dictionary. Expect outer dictionary to have only one element
 	kind, _, err = reader.step()
@@ -533,6 +542,7 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 	return status, msg, nil
 }
 
+// PublishEvent publishes an event.
 func (client *Client) PublishEvent(data outputs.Data) error {
 	// insert the events one by one
 
@@ -592,6 +602,7 @@ func (client *Client) LoadTemplate(templateName string, template map[string]inte
 	return nil
 }
 
+// LoadJSON creates a PUT request based on a JSON document.
 func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte, error) {
 	status, body, err := client.Request("PUT", path, "", nil, json)
 	if err != nil {
@@ -617,6 +628,7 @@ func (client *Client) CheckTemplate(templateName string) bool {
 	return true
 }
 
+// Connect connects the client.
 func (conn *Connection) Connect(timeout time.Duration) error {
 	var err error
 	conn.version, err = conn.Ping(timeout)
@@ -631,7 +643,7 @@ func (conn *Connection) Connect(timeout time.Duration) error {
 	return nil
 }
 
-// Ping sends a GET request to the Elasticsearch
+// Ping sends a GET request to the Elasticsearch.
 func (conn *Connection) Ping(timeout time.Duration) (string, error) {
 	debugf("ES Ping(url=%v, timeout=%v)", conn.URL, timeout)
 
@@ -662,10 +674,12 @@ func (conn *Connection) Ping(timeout time.Duration) (string, error) {
 	return response.Version.Number, nil
 }
 
+// Close closes a connection.
 func (conn *Connection) Close() error {
 	return nil
 }
 
+// Request sends a request via the connection.
 func (conn *Connection) Request(
 	method, path string,
 	pipeline string,
