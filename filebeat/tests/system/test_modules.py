@@ -74,6 +74,8 @@ class Test(BaseTest):
             "-e", "-d", "*", "-once",
             "-c", cfgfile,
             "-modules={}".format(module),
+            "-M", "{module}.*.enabled=false".format(module=module),
+            "-M", "{module}.{fileset}.enabled=true".format(module=module, fileset=fileset),
             "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file),
             "-M", "*.*.prospector.close_eof=true",
