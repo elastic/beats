@@ -3,7 +3,6 @@ package harvester
 import (
 	"bytes"
 	"errors"
-	"expvar"
 	"io"
 	"os"
 	"time"
@@ -18,14 +17,17 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 var (
-	harvesterStarted   = expvar.NewInt("filebeat.harvester.started")
-	harvesterClosed    = expvar.NewInt("filebeat.harvester.closed")
-	harvesterRunning   = expvar.NewInt("filebeat.harvester.running")
-	harvesterOpenFiles = expvar.NewInt("filebeat.harvester.open_files")
-	filesTruncated     = expvar.NewInt("filebeat.harvester.files.truncated")
+	harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
+
+	harvesterStarted   = monitoring.NewInt(harvesterMetrics, "started")
+	harvesterClosed    = monitoring.NewInt(harvesterMetrics, "closed")
+	harvesterRunning   = monitoring.NewInt(harvesterMetrics, "running")
+	harvesterOpenFiles = monitoring.NewInt(harvesterMetrics, "open_files")
+	filesTruncated     = monitoring.NewInt(harvesterMetrics, "files.truncated")
 )
 
 // Setup opens the file handler and creates the reader for the harvester

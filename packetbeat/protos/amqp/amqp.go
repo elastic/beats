@@ -1,13 +1,13 @@
 package amqp
 
 import (
-	"expvar"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 	"github.com/elastic/beats/packetbeat/publish"
@@ -35,8 +35,8 @@ type amqpPlugin struct {
 }
 
 var (
-	unmatchedRequests  = expvar.NewInt("amqp.unmatched_requests")
-	unmatchedResponses = expvar.NewInt("amqp.unmatched_responses")
+	unmatchedRequests  = monitoring.NewInt(nil, "amqp.unmatched_requests")
+	unmatchedResponses = monitoring.NewInt(nil, "amqp.unmatched_responses")
 )
 
 func init() {

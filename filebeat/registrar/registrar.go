@@ -2,7 +2,6 @@ package registrar
 
 import (
 	"encoding/json"
-	"expvar"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -15,6 +14,7 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
@@ -28,10 +28,10 @@ type Registrar struct {
 }
 
 var (
-	statesUpdate   = expvar.NewInt("registrar.states.update")
-	statesCleanup  = expvar.NewInt("registrar.states.cleanup")
-	statesCurrent  = expvar.NewInt("registrar.states.current")
-	registryWrites = expvar.NewInt("registrar.writes")
+	statesUpdate   = monitoring.NewInt(nil, "registrar.states.update")
+	statesCleanup  = monitoring.NewInt(nil, "registrar.states.cleanup")
+	statesCurrent  = monitoring.NewInt(nil, "registrar.states.current")
+	registryWrites = monitoring.NewInt(nil, "registrar.writes")
 )
 
 func New(registryFile string, out publisher.SuccessLogger) (*Registrar, error) {
