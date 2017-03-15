@@ -56,8 +56,10 @@ func (r *Registry) doVisit(mode Mode, vs Visitor) {
 	defer r.mu.RUnlock()
 
 	for key, v := range r.entries {
-		if v.Mode > mode {
-			continue
+		if _, isReg := v.Var.(*Registry); !isReg {
+			if v.Mode > mode {
+				continue
+			}
 		}
 
 		vs.OnKey(key)
