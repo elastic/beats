@@ -1,0 +1,13 @@
+- module: windows
+  metricsets: ["perfmon"]
+  enabled: true
+  period: 1s
+  counters:
+    - group: "processor"  
+      collectors:
+        - alias: "processor_perfomance"
+          query: "\\Processor Information(_Total)\\% Processor Performance"
+    - group: "disk"
+      collectors:
+        - alias: "bytes_written"
+          query: "\\FileSystem Disk Activity(_Total)\\FileSystem Bytes Written"
