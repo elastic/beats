@@ -1,7 +1,7 @@
 - key: windows
-  title: "windows"
+  title: "Windows"
   description: >
-    windows Module
+    Module for Windows
   fields:
     - name: windows
       type: group

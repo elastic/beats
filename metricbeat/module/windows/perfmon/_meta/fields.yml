@@ -1,7 +1,5 @@
-- key: windows
-  title: "Windows"
-  description: >
-    Metrics collected from Windows
+- name: perfmon
+  type: group
   fields:
     - name: counters
       type: group
@@ -12,6 +10,7 @@
           type: string
           description: >
             Name of the group. For example `processor` or `disk`
+
         - name: collectors
           type: group
           fields:
@@ -19,6 +18,7 @@
               type: string
               description: >
                 Short form for the query
+                
             - name: query
               type: string
               description: >
