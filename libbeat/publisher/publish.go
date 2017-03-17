@@ -10,7 +10,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/nranchev/go-libGeoIP"
 
 	// load supported output plugins
 	_ "github.com/elastic/beats/libbeat/outputs/console"
@@ -61,7 +60,6 @@ type BeatPublisher struct {
 	disabled    bool
 	Index       string
 	Output      []*outputWorker
-	geoLite     *libgeo.GeoIP
 	Processors  *processors.Processors
 
 	globalEventMetadata common.EventMetadata // Fields and tags to add to each event.
@@ -85,7 +83,6 @@ type BeatPublisher struct {
 type ShipperConfig struct {
 	common.EventMetadata `config:",inline"` // Fields and tags to add to each event.
 	Name                 string             `config:"name"`
-	Geoip                common.Geoip       `config:"geoip"`
 
 	// internal publisher queue sizes
 	QueueSize     *int `config:"queue_size"`
@@ -127,10 +124,6 @@ func (publisher *BeatPublisher) GetServerName(ip string) string {
 	return ""
 }
 
-func (publisher *BeatPublisher) GeoLite() *libgeo.GeoIP {
-	return publisher.geoLite
-}
-
 func (publisher *BeatPublisher) Connect() Client {
 	atomic.AddUint32(&publisher.numClients, 1)
 	return newClient(publisher)
@@ -167,8 +160,6 @@ func (publisher *BeatPublisher) init(
 	}
 
 	shipper.InitShipperConfig()
-
-	publisher.geoLite = common.LoadGeoIPData(shipper.Geoip)
 
 	publisher.wsPublisher.Init()
 	publisher.wsOutput.Init()
