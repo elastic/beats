@@ -313,7 +313,7 @@ class Test(BaseTest):
 
         # Check that 3 files are part of the registrar file. The deleted file
         # should never have been detected, but the rotated one should be in
-        assert len(data) == 3
+        assert len(data) == 3, "Expected 3 files but got: %s" % data
 
     def test_restart_continue(self):
         """
@@ -373,7 +373,8 @@ class Test(BaseTest):
         assert os.stat(testfile).st_ino == self.get_registry_entry_by_path(
             os.path.abspath(testfile))["FileStateOS"]["inode"]
 
-        # Check that 1 files are part of the registrar file. The deleted file should never have been detected
+        # Check that 1 files are part of the registrar file. The deleted file
+        # should never have been detected
         assert len(data) == 1
 
         output = self.read_output()
@@ -699,7 +700,7 @@ class Test(BaseTest):
 
         # Check that the first two files were removed from the registry
         data = self.get_registry()
-        assert len(data) == 1
+        assert len(data) == 1, "Expected a single file but got: %s" % data
 
         # Make sure the last file in the registry is the correct one and has the correct offset
         if os.name == "nt":
@@ -923,7 +924,8 @@ class Test(BaseTest):
 
         # Make sure states written appears one more time
         self.wait_until(
-            lambda: self.log_contains("CRIT Exiting: Could not start registrar: Error loading state"),
+            lambda: self.log_contains(
+                "CRIT Exiting: Could not start registrar: Error loading state"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait(exit_code=1)
@@ -976,12 +978,14 @@ class Test(BaseTest):
 
         # Make sure all 4 states are persisted
         self.wait_until(
-            lambda: self.log_contains("Prospector states cleaned up. Before: 4, After: 4", logfile="filebeat2.log"),
+            lambda: self.log_contains(
+                "Prospector states cleaned up. Before: 4, After: 4", logfile="filebeat2.log"),
             max_timeout=10)
 
         # Wait until registry file is cleaned
         self.wait_until(
-            lambda: self.log_contains("Prospector states cleaned up. Before: 0, After: 0", logfile="filebeat2.log"),
+            lambda: self.log_contains(
+                "Prospector states cleaned up. Before: 0, After: 0", logfile="filebeat2.log"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
@@ -1028,7 +1032,8 @@ class Test(BaseTest):
 
         # Wait until prospectors are started
         self.wait_until(
-            lambda: self.log_contains_count("Starting prospector of type: log", logfile="filebeat2.log") >= 1,
+            lambda: self.log_contains_count(
+                "Starting prospector of type: log", logfile="filebeat2.log") >= 1,
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
@@ -1146,7 +1151,8 @@ class Test(BaseTest):
 
         # Wait until new state is written
         self.wait_until(
-            lambda: self.log_contains("Flushing spooler because of timeout. Events flushed: ", logfile="filebeat2.log"),
+            lambda: self.log_contains(
+                "Flushing spooler because of timeout. Events flushed: ", logfile="filebeat2.log"),
             max_timeout=10)
 
         self.wait_until(
@@ -1200,7 +1206,8 @@ class Test(BaseTest):
 
         # Wait until prospectors are started
         self.wait_until(
-            lambda: self.log_contains("Flushing spooler because of timeout. Events flushed: ", logfile="filebeat2.log"),
+            lambda: self.log_contains(
+                "Flushing spooler because of timeout. Events flushed: ", logfile="filebeat2.log"),
             max_timeout=10)
 
         self.wait_until(
@@ -1287,7 +1294,8 @@ class Test(BaseTest):
             max_timeout=10)
 
         self.wait_until(
-            lambda: self.log_contains("Do not write state for ignore_older because clean_inactive reached"),
+            lambda: self.log_contains(
+                "Do not write state for ignore_older because clean_inactive reached"),
             max_timeout=10)
 
         # Make sure state is loaded for file
