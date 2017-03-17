@@ -17,7 +17,6 @@ import (
 
 type redisOut struct {
 	mode mode.ConnectionMode
-	topology
 	beat common.BeatInfo
 }
 
@@ -40,15 +39,15 @@ func init() {
 	outputs.RegisterOutputPlugin("redis", new)
 }
 
-func new(beat common.BeatInfo, cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
+func new(beat common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
 	r := &redisOut{beat: beat}
-	if err := r.init(cfg, expireTopo); err != nil {
+	if err := r.init(cfg); err != nil {
 		return nil, err
 	}
 	return r, nil
 }
 
-func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
+func (r *redisOut) init(cfg *common.Config) error {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return err
@@ -111,14 +110,6 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 			OutputsWriteErrors: outputs.WriteErrors,
 		},
 	}
-
-	// configure topology support
-	r.topology.init(transp, topoConfig{
-		host:     config.HostTopology,
-		password: config.PasswordTopology,
-		db:       config.DbTopology,
-		expire:   time.Duration(expireTopo) * time.Second,
-	})
 
 	// configure publisher clients
 	clients, err := modeutil.MakeClients(cfg, func(host string) (mode.ProtocolClient, error) {
