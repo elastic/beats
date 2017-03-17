@@ -18,35 +18,59 @@ var (
 	procPdhGetFormattedCounterValue = modpdh.NewProc("PdhGetFormattedCounterValue")
 )
 
-func _PdhOpenQuery(dataSource uintptr, userData uintptr, query *uintptr) (err int) {
-	r0, _, _ := syscall.Syscall(procPdhOpenQuery.Addr(), 3, uintptr(dataSource), uintptr(userData), uintptr(unsafe.Pointer(query)))
-	err = int(r0)
+func _PdhOpenQuery(dataSource *string, userData uintptr, query *uintptr) (err error) {
+	r1, _, e1 := syscall.Syscall(procPdhOpenQuery.Addr(), 3, uintptr(unsafe.Pointer(dataSource)), uintptr(userData), uintptr(unsafe.Pointer(query)))
+	if r1 == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
 	return
 }
 
-func _PdhAddCounter(query uintptr, counterPath string, userData uintptr, counter *uintptr) (err int) {
+func _PdhAddCounter(query uintptr, counterPath string, userData uintptr, counter *uintptr) (err error) {
 	var _p0 *uint16
-	_p0, e := syscall.UTF16PtrFromString(counterPath)
-	if e != nil {
+	_p0, err = syscall.UTF16PtrFromString(counterPath)
+	if err != nil {
 		return
 	}
 	return __PdhAddCounter(query, _p0, userData, counter)
 }
 
-func __PdhAddCounter(query uintptr, counterPath *uint16, userData uintptr, counter *uintptr) (err int) {
-	r0, _, _ := syscall.Syscall6(procPdhAddEnglishCounterW.Addr(), 4, uintptr(query), uintptr(unsafe.Pointer(counterPath)), uintptr(userData), uintptr(unsafe.Pointer(counter)), 0, 0)
-	err = int(r0)
+func __PdhAddCounter(query uintptr, counterPath *uint16, userData uintptr, counter *uintptr) (err error) {
+	r1, _, e1 := syscall.Syscall6(procPdhAddEnglishCounterW.Addr(), 4, uintptr(query), uintptr(unsafe.Pointer(counterPath)), uintptr(userData), uintptr(unsafe.Pointer(counter)), 0, 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
 	return
 }
 
-func _PdhCollectQueryData(query uintptr) (err int) {
-	r0, _, _ := syscall.Syscall(procPdhCollectQueryData.Addr(), 1, uintptr(query), 0, 0)
-	err = int(r0)
+func _PdhCollectQueryData(query uintptr) (err error) {
+	r1, _, e1 := syscall.Syscall(procPdhCollectQueryData.Addr(), 1, uintptr(query), 0, 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
 	return
 }
 
-func _PdhGetFormattedCounterValue(counter uintptr, format uint32, counterType int, value *PdhCounterValue) (err int) {
-	r0, _, _ := syscall.Syscall6(procPdhGetFormattedCounterValue.Addr(), 4, uintptr(counter), uintptr(format), uintptr(counterType), uintptr(unsafe.Pointer(value)), 0, 0)
-	err = int(r0)
+func _PdhGetFormattedCounterValue(counter uintptr, format uint32, counterType int, value *PdhCounterValue) (err error) {
+	r1, _, e1 := syscall.Syscall6(procPdhGetFormattedCounterValue.Addr(), 4, uintptr(counter), uintptr(format), uintptr(counterType), uintptr(unsafe.Pointer(value)), 0, 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
 	return
 }

@@ -2,7 +2,7 @@
   metricsets: ["perfmon"]
   enabled: true
   period: 1s
-  counters:
+  perfmon.counters:
     - group: "processor"  
       collectors:
         - alias: "processor_perfomance"

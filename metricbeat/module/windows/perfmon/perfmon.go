@@ -1,22 +1,22 @@
+// +build windows
+
 package perfmon
 
 import (
 	"errors"
-	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
 type CounterConfig struct {
-	Name  string               `config:"group"`
-	Group []CounterConfigGroup `config:"collectors"`
+	Name  string               `config:"group" validate:"required"`
+	Group []CounterConfigGroup `config:"collectors" validate:"required"`
 }
 
 type CounterConfigGroup struct {
-	Alias string `config:"alias"`
-	Query string `config:"query"`
+	Alias string `config:"alias" validate:"required"`
+	Query string `config:"query" validate:"required"`
 }
 
 // init registers the MetricSet with the central registry.
@@ -43,33 +43,17 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config := struct {
-		CounterConfig []CounterConfig `config:"counters"`
+		CounterConfig []CounterConfig `config:"perfmon.counters" validate:"required"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	for _, v := range config.CounterConfig {
-		if len(v.Name) <= 0 {
-			err := errors.New("Group cannot be empty")
-			logp.Err("%v", err)
-			return nil, err
-		}
-		for _, v1 := range v.Group {
-			if len(v1.Alias) <= 0 {
-				err := errors.New("Alias for counter cannot be empty")
-				logp.Err("%v", err)
-				return nil, err
-			}
-		}
-	}
-
 	query, err := getHandle(config.CounterConfig)
 
-	if err != 0 {
-		logp.Err("%v", err)
-		return nil, errors.New("Initialization fails with error: " + strconv.Itoa(err))
+	if err != nil {
+		return nil, errors.New("nitialization fails with error: " + err.Error())
 	}
 
 	return &MetricSet{
@@ -85,9 +69,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	data, err := m.handle.readData()
-	if err != 0 {
-		logp.Err("%v", err)
-		return nil, errors.New("Fetching fails wir error: " + strconv.Itoa(err))
+	if err != nil {
+		return nil, errors.New("Fetching fails wir error: " + err.Error())
 	}
 
 	return data, nil
