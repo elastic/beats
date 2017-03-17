@@ -105,7 +105,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 	}
 
 	config := defaultConfig
-	if err := cfg.Unpack(&config); err != nil {
+	if err = cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
