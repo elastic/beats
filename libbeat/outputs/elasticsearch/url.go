@@ -10,7 +10,7 @@ import (
 
 var hasScheme = regexp.MustCompile(`^([a-z][a-z0-9+\-.]*)://`)
 
-// Creates the url based on the url configuration.
+// MakeURL creates the url based on the url configuration.
 // Adds missing parts with defaults (scheme, host, port)
 func MakeURL(defaultScheme string, defaultPath string, rawURL string) (string, error) {
 

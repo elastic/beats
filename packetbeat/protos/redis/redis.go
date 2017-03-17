@@ -2,11 +2,11 @@ package redis
 
 import (
 	"bytes"
-	"expvar"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -49,7 +49,7 @@ var (
 )
 
 var (
-	unmatchedResponses = expvar.NewInt("redis.unmatched_responses")
+	unmatchedResponses = monitoring.NewInt(nil, "redis.unmatched_responses")
 )
 
 func init() {

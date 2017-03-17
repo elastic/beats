@@ -2,7 +2,6 @@ package prospector
 
 import (
 	"errors"
-	"expvar"
 	"fmt"
 	"sync"
 	"time"
@@ -16,10 +15,11 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 var (
-	harvesterSkipped = expvar.NewInt("filebeat.harvester.skipped")
+	harvesterSkipped = monitoring.NewInt(nil, "filebeat.harvester.skipped")
 )
 
 type Prospector struct {
