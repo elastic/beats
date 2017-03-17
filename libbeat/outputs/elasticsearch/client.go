@@ -93,6 +93,11 @@ var (
 	errExcpectedObjectEnd    = errors.New("expected end of object")
 )
 
+const (
+	eventType = "doc"
+)
+
+// NewClient instantiates a new client.
 func NewClient(
 	s ClientSettings,
 	onConnectCallback connectCallback,
@@ -320,7 +325,7 @@ func createEventBulkMeta(
 		return bulkMeta{
 			Index: bulkMetaIndex{
 				Index:   getIndex(event, index),
-				DocType: event["type"].(string),
+				DocType: eventType,
 			},
 		}
 	}
@@ -338,7 +343,7 @@ func createEventBulkMeta(
 		Index: bulkMetaIndex{
 			Index:    getIndex(event, index),
 			Pipeline: pipeline,
-			DocType:  event["type"].(string),
+			DocType:  eventType,
 		},
 	}
 }
@@ -535,7 +540,6 @@ func (client *Client) PublishEvent(data outputs.Data) error {
 
 	event := data.Event
 	index := getIndex(event, client.index)
-	typ := event["type"].(string)
 
 	debugf("Publish event: %s", event)
 
@@ -549,9 +553,9 @@ func (client *Client) PublishEvent(data outputs.Data) error {
 
 	var status int
 	if pipeline == "" {
-		status, _, err = client.Index(index, typ, "", client.params, event)
+		status, _, err = client.Index(index, eventType, "", client.params, event)
 	} else {
-		status, _, err = client.Ingest(index, typ, pipeline, "", client.params, event)
+		status, _, err = client.Ingest(index, eventType, pipeline, "", client.params, event)
 	}
 
 	// check indexing error
