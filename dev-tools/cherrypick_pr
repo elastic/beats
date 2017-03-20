@@ -35,7 +35,7 @@ PR.
 """
 
 
-def main():  # pylint: disable=too-many-statements
+def main():
     """Main"""
     parser = argparse.ArgumentParser(
         description="Creates a PR for merging two branches")
@@ -57,13 +57,13 @@ def main():  # pylint: disable=too-many-statements
                         "(requires token in ~/.github_token)")
     args = parser.parse_args()
 
-    print args
+    print(args)
 
     tmp_branch = "backport_{}_{}".format(args.pr_number, args.to_branch)
 
     if not vars(args)["continue"]:
-        if not args.yes and raw_input("This will destroy all local changes. " +
-                                      "Continue? [y/n]: ") != "y":
+        if not args.yes and input("This will destroy all local changes. " +
+                                  "Continue? [y/n]: ") != "y":
             return 1
         check_call("git reset --hard", shell=True)
         check_call("git clean -df", shell=True)
@@ -79,10 +79,10 @@ def main():  # pylint: disable=too-many-statements
         check_call("git checkout -b {}".format(tmp_branch), shell=True)
         if call("git cherry-pick -x {}".format(" ".join(args.commit_hashes)),
                 shell=True) != 0:
-            print "Looks like you have cherry-pick errors."
-            print "Fix them, then run: "
-            print "    git cherry-pick --continue"
-            print "    {} --continue".format(" ".join(sys.argv))
+            print("Looks like you have cherry-pick errors.")
+            print("Fix them, then run: ")
+            print("    git cherry-pick --continue")
+            print("    {} --continue".format(" ".join(sys.argv)))
             return 1
 
     if len(check_output("git status -s", shell=True).strip()) > 0:
@@ -92,11 +92,11 @@ def main():  # pylint: disable=too-many-statements
 
     if len(check_output("git log HEAD...{}".format(args.to_branch),
                         shell=True).strip()) == 0:
-        print "No commit to push"
+        print("No commit to push")
         return 1
 
-    print "Ready to push branch."
-    remote = raw_input("To which remote should I push? (your fork): ")
+    print("Ready to push branch.")
+    remote = input("To which remote should I push? (your fork): ")
     call("git push {} :{} > /dev/null".format(remote, tmp_branch),
          shell=True)
     check_call("git push --set-upstream {} {}"
@@ -127,7 +127,7 @@ def main():  # pylint: disable=too-many-statements
             .format(args.pr_number, args.to_branch, original_pr["body"])
         ))
         if request.status_code > 299:
-            print "Creating PR failed: {}".format(request.json())
+            print("Creating PR failed: {}".format(request.json()))
             sys.exit(1)
         new_pr = request.json()
 
@@ -135,8 +135,8 @@ def main():  # pylint: disable=too-many-statements
         session.post(
             base + "/issues/{}/labels".format(new_pr["number"]), json=["backport", "review"])
 
-        print "\nDone. PR created: {}".format(new_pr["html_url"])
-        print "Please go and check it and add the review tags"
+        print("\nDone. PR created: {}".format(new_pr["html_url"]))
+        print("Please go and check it and add the review tags")
 
 
 if __name__ == "__main__":
