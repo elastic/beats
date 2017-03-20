@@ -34,8 +34,9 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	counters []CounterConfig
-	handle   *Handle
+	counters   []CounterConfig
+	handle     *Handle
+	firstFetch bool
 }
 
 // New create a new instance of the MetricSet
@@ -62,6 +63,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		counters:      config.CounterConfig,
 		handle:        query,
+		firstFetch:    true,
 	}, nil
 }
 
@@ -70,9 +72,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 
-	data, err := m.handle.readData()
+	data, err := m.handle.readData(m.firstFetch)
 	if err != nil {
 		return nil, errors.New("Fetching fails wir error: " + err.Error())
+	}
+
+	if m.firstFetch {
+		m.firstFetch = false
 	}
 
 	return data, nil

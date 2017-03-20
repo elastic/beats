@@ -5,6 +5,8 @@ package perfmon
 import (
 	"unsafe"
 
+	"time"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -51,9 +53,15 @@ func getHandle(config []CounterConfig) (*Handle, error) {
 	return q, nil
 }
 
-func (q *Handle) readData() (common.MapStr, error) {
+func (q *Handle) readData(firstFetch bool) (common.MapStr, error) {
 
 	err := _PdhCollectQueryData(q.query)
+
+	if firstFetch {
+		// Most counters require two sample values in order to compute a displayable value. So wait and then collect the second value
+		time.Sleep(2000)
+		err = _PdhCollectQueryData(q.query)
+	}
 
 	if err != nil {
 		return nil, err
