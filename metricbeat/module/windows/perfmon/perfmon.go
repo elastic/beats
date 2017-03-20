@@ -74,7 +74,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	data, err := m.handle.readData(m.firstFetch)
 	if err != nil {
-		return nil, errors.New("Fetching fails wir error: " + err.Error())
+		return nil, errors.New("fetching fails wir error: " + err.Error())
 	}
 
 	if m.firstFetch {
