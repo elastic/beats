@@ -31,6 +31,7 @@ type elasticsearchOutput struct {
 
 	template      map[string]interface{}
 	template2x    map[string]interface{}
+	template6x    map[string]interface{}
 	templateMutex sync.Mutex
 }
 
@@ -248,6 +249,9 @@ func (out *elasticsearchOutput) readTemplate(config *Template) error {
 		if config.Versions.Es2x.Path == "" {
 			config.Versions.Es2x.Path = fmt.Sprintf("%s.template-es2x.json", out.beatName)
 		}
+		if config.Versions.Es6x.Path == "" {
+			config.Versions.Es6x.Path = fmt.Sprintf("%s.template-es6x.json", out.beatName)
+		}
 
 		// Look for the template in the configuration path, if it's not absolute
 		templatePath := paths.Resolve(paths.Config, config.Path)
@@ -269,6 +273,18 @@ func (out *elasticsearchOutput) readTemplate(config *Template) error {
 				return fmt.Errorf("Error loading template %s: %v", templatePath, err)
 			}
 			out.template2x = template
+		}
+
+		if config.Versions.Es6x.Enabled {
+			// Read the version of the template compatible with ES 6.x
+			templatePath := paths.Resolve(paths.Config, config.Versions.Es6x.Path)
+			logp.Info("Loading template enabled for Elasticsearch 6.x. Reading template file: %v", templatePath)
+
+			template, err := readTemplate(templatePath)
+			if err != nil {
+				return fmt.Errorf("Error loading template %s: %v", templatePath, err)
+			}
+			out.template6x = template
 		}
 	}
 	return nil
@@ -312,6 +328,9 @@ func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) er
 		if config.Versions.Es2x.Enabled && strings.HasPrefix(client.Connection.version, "2.") {
 			logp.Info("Detected Elasticsearch 2.x. Automatically selecting the 2.x version of the template")
 			template = out.template2x
+		} else if config.Versions.Es6x.Enabled && strings.HasPrefix(client.Connection.version, "6.") {
+			logp.Info("Detected Elasticsearch 6.x. Automatically selecting the 6.x version of the template")
+			template = out.template6x
 		}
 
 		err := client.LoadTemplate(config.Name, template)

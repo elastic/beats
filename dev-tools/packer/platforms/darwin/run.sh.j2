@@ -18,6 +18,7 @@ cp {{.beat_name}}-darwin.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_na
 cp {{.beat_name}}-darwin.full.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}.full.yml
 cp {{.beat_name}}.template.json /{{.beat_name}}-${VERSION}-darwin-x86_64/
 cp {{.beat_name}}.template-es2x.json /{{.beat_name}}-${VERSION}-darwin-x86_64/
+cp {{.beat_name}}.template-es6x.json /{{.beat_name}}-${VERSION}-darwin-x86_64/
 
 mkdir -p upload
 tar czvf upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz /{{.beat_name}}-${VERSION}-darwin-x86_64

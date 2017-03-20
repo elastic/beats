@@ -33,6 +33,7 @@ type Template struct {
 
 type TemplateVersions struct {
 	Es2x TemplateVersion `config:"2x"`
+	Es6x TemplateVersion `config:"6x"`
 }
 
 type TemplateVersion struct {
@@ -58,8 +59,11 @@ var (
 		TLS:              nil,
 		LoadBalance:      true,
 		Template: Template{
-			Enabled:  true,
-			Versions: TemplateVersions{Es2x: TemplateVersion{Enabled: true}},
+			Enabled: true,
+			Versions: TemplateVersions{
+				Es2x: TemplateVersion{Enabled: true},
+				Es6x: TemplateVersion{Enabled: true},
+			},
 		},
 	}
 )
