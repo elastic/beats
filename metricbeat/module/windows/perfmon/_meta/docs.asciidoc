@@ -1,3 +1,26 @@
 === windows perfmon MetricSet
 
 This is the perfmon metricset of the module windows.
+
+[float]
+=== Features and configuration
+
+Metricset to collect performance counters.
+Example configuration:
+```
+- module: windows
+  metricsets: ["perfmon"]
+  enabled: true
+  period: 10s
+  perfmon.counters:
+    - group: "processor"  
+      collectors:
+        - alias: "processor_perfomance"
+          query: '\Processor Information(_Total)\% Processor Performance'
+        - alias: "processor_time"
+          query: "\\Processor Information(_Total)\\% Performance Limit"
+    - group: "disk"
+      collectors:
+        - alias: "bytes_written"
+          query: '\FileSystem Disk Activity(_Total)\FileSystem Bytes Written'
+```

@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -41,6 +42,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	logp.Warn("BETA: The perfmon metricset is beta")
 
 	config := struct {
 		CounterConfig []CounterConfig `config:"perfmon.counters" validate:"required"`
@@ -53,7 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	query, err := getHandle(config.CounterConfig)
 
 	if err != nil {
-		return nil, errors.New("nitialization fails with error: " + err.Error())
+		return nil, errors.New("initialization fails with error: " + err.Error())
 	}
 
 	return &MetricSet{

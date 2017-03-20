@@ -18,13 +18,13 @@ var (
 	procPdhGetFormattedCounterValue = modpdh.NewProc("PdhGetFormattedCounterValue")
 )
 
-func _PdhOpenQuery(dataSource *string, userData uintptr, query *uintptr) (err error) {
-	r1, _, e1 := syscall.Syscall(procPdhOpenQuery.Addr(), 3, uintptr(unsafe.Pointer(dataSource)), uintptr(userData), uintptr(unsafe.Pointer(query)))
+func _PdhOpenQuery(dataSource uintptr, userData uintptr, query *uintptr) (err error) {
+	r1, _, e1 := syscall.Syscall(procPdhOpenQuery.Addr(), 3, uintptr(dataSource), uintptr(userData), uintptr(unsafe.Pointer(query)))
 	if r1 == 0 {
 		if e1 != 0 {
 			err = error(e1)
 		} else {
-			err = syscall.EINVAL
+			err = nil
 		}
 	}
 	return
@@ -42,10 +42,11 @@ func _PdhAddCounter(query uintptr, counterPath string, userData uintptr, counter
 func __PdhAddCounter(query uintptr, counterPath *uint16, userData uintptr, counter *uintptr) (err error) {
 	r1, _, e1 := syscall.Syscall6(procPdhAddEnglishCounterW.Addr(), 4, uintptr(query), uintptr(unsafe.Pointer(counterPath)), uintptr(userData), uintptr(unsafe.Pointer(counter)), 0, 0)
 	if r1 == 0 {
-		if e1 != 0 {
+		// Ignoring error 2147485649. This error means PDH_CSTATUS_NO_INSTANCE. See here for description https://msdn.microsoft.com/en-us/library/windows/desktop/aa371894%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
+		if e1 != 0 && e1 != 2147485649 {
 			err = error(e1)
 		} else {
-			err = syscall.EINVAL
+			err = nil
 		}
 	}
 	return
@@ -57,7 +58,7 @@ func _PdhCollectQueryData(query uintptr) (err error) {
 		if e1 != 0 {
 			err = error(e1)
 		} else {
-			err = syscall.EINVAL
+			err = nil
 		}
 	}
 	return
@@ -69,7 +70,7 @@ func _PdhGetFormattedCounterValue(counter uintptr, format uint32, counterType in
 		if e1 != 0 {
 			err = error(e1)
 		} else {
-			err = syscall.EINVAL
+			err = nil
 		}
 	}
 	return
