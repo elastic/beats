@@ -1,4 +1,4 @@
-"""Test the registrar"""  # pylint: disable=too-many-lines
+"""Test the registrar"""
 
 import os
 import platform
@@ -14,7 +14,7 @@ from nose.plugins.skip import SkipTest
 # * Check what happens when registrar file is deleted
 
 
-class Test(BaseTest):  # pylint: disable=too-many-public-methods
+class Test(BaseTest):
     """Test class"""
 
     def test_registrar_file_content(self):
@@ -131,7 +131,7 @@ class Test(BaseTest):  # pylint: disable=too-many-public-methods
         # Check that 2 files are port of the registrar file
         assert len(data) == 2
 
-    def test_custom_registry_file_location(self):  # pylint: disable=invalid-name
+    def test_custom_registry_file_location(self):
         """
         Check that when a custom registry file is used, the path
         is created automatically.
@@ -557,7 +557,7 @@ class Test(BaseTest):  # pylint: disable=too-many-public-methods
             assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 9
             assert self.get_registry_entry_by_path(os.path.abspath(testfile_path2))["offset"] == 8
 
-    def test_state_after_rotation_ignore_older(self):  # pylint: disable=invalid-name
+    def test_state_after_rotation_ignore_older(self):
         """
         Checks that the state is written correctly after rotation and ignore older
         """
@@ -774,7 +774,7 @@ class Test(BaseTest):  # pylint: disable=too-many-public-methods
         else:
             assert data[0]["offset"] == len("make sure registry is written\n" + "2\n")
 
-    def test_clean_removed_with_clean_inactive(self):  # pylint: disable=invalid-name
+    def test_clean_removed_with_clean_inactive(self):
         """
         Checks that files which were removed, the state is removed
         """
@@ -1103,7 +1103,7 @@ class Test(BaseTest):  # pylint: disable=too-many-public-methods
         assert len(data) == 1
         assert data[0]["ttl"] == 40 * 1000 * 1000 * 1000
 
-    def test_restart_state_reset_ttl_with_space(self):  # pylint: disable=invalid-name
+    def test_restart_state_reset_ttl_with_space(self):
         """
         Test that ttl is reset after restart if clean_inactive changes
         This time it is tested with a space in the filename to see if everything is loaded as
@@ -1166,7 +1166,7 @@ class Test(BaseTest):  # pylint: disable=too-many-public-methods
         assert len(data) == 1
         assert data[0]["ttl"] == 40 * 1000 * 1000 * 1000
 
-    def test_restart_state_reset_ttl_no_clean_inactive(self):  # pylint: disable=invalid-name
+    def test_restart_state_reset_ttl_no_clean_inactive(self):
         """
         Test that ttl is reset after restart if clean_inactive is disabled
         """
@@ -1266,7 +1266,7 @@ class Test(BaseTest):  # pylint: disable=too-many-public-methods
         # Check that offset is set to the end of the file
         assert data[0]["offset"] == os.path.getsize(testfile_path1)
 
-    def test_ignore_older_state_clean_inactive(self):  # pylint: disable=invalid-name
+    def test_ignore_older_state_clean_inactive(self):
         """
         Check that state for ignore_older is not persisted when falling under clean_inactive
         """
