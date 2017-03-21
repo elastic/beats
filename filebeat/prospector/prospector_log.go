@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester"
@@ -182,11 +180,9 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 func (p *ProspectorLog) matchesFile(filePath string) bool {
 	for _, glob := range p.config.Paths {
 
-		if runtime.GOOS == "windows" {
-			// Windows allows / slashes which makes glob patterns with / work
-			// But for match we need paths with \ as only file names are compared and no lookup happens
-			glob = strings.Replace(glob, "/", "\\", -1)
-		}
+		// Path and glob are cleaned to ensure we always compare clean paths
+		glob = filepath.Clean(glob)
+		filePath = filepath.Clean(filePath)
 
 		// Evaluate if glob matches filePath
 		match, err := filepath.Match(glob, filePath)
