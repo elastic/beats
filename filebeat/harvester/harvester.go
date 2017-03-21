@@ -53,7 +53,7 @@ type Harvester struct {
 	encoding        encoding.Encoding
 	done            chan struct{}
 	stopOnce        sync.Once
-	stopWg          *sync.WaitGroup
+	StopWg          *sync.WaitGroup
 	outlet          Outlet
 	ID              uuid.UUID
 	processors      *processors.Processors
@@ -71,7 +71,7 @@ func NewHarvester(
 		state:  state,
 		states: states,
 		done:   make(chan struct{}),
-		stopWg: &sync.WaitGroup{},
+		StopWg: &sync.WaitGroup{},
 		outlet: outlet,
 		ID:     uuid.NewV4(),
 	}
