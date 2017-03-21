@@ -234,23 +234,17 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 		proc["env"] = process.Env
 	}
 
+	proc["cpu"] = common.MapStr{
+		"total": common.MapStr{
+			"pct": GetProcCpuPercentage(last, process),
+		},
+		"start_time": unixTimeMsToTime(process.Cpu.StartTime),
+	}
+
 	if procStats.CpuTicks {
-		proc["cpu"] = common.MapStr{
-			"user":   process.Cpu.User,
-			"system": process.Cpu.Sys,
-			"total": common.MapStr{
-				"ticks": process.Cpu.Total,
-				"pct":   GetProcCpuPercentage(last, process),
-			},
-			"start_time": unixTimeMsToTime(process.Cpu.StartTime),
-		}
-	} else {
-		proc["cpu"] = common.MapStr{
-			"total": common.MapStr{
-				"pct": GetProcCpuPercentage(last, process),
-			},
-			"start_time": unixTimeMsToTime(process.Cpu.StartTime),
-		}
+		proc.Put("cpu.user", process.Cpu.User)
+		proc.Put("cpu.system", process.Cpu.Sys)
+		proc.Put("cpu.total.ticks", process.Cpu.Total)
 	}
 
 	if process.FD != (sigar.ProcFDUsage{}) {
