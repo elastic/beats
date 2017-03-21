@@ -29,10 +29,10 @@ type Counter struct {
 	displayValue PdhCounterValue
 }
 
-func getHandle(config []CounterConfig) (*Handle, error) {
+func GetHandle(config []CounterConfig) (*Handle, uint32) {
 	q := &Handle{}
 	err := _PdhOpenQuery(0, 0, &q.query)
-	if err != nil {
+	if err != ERROR_SUCCESS {
 		return nil, err
 	}
 
@@ -44,16 +44,16 @@ func getHandle(config []CounterConfig) (*Handle, error) {
 		for j, v1 := range v.Group {
 			counterGroups[i].Counters[j] = Counter{counterName: v1.Alias, counterPath: v1.Query}
 			err := _PdhAddCounter(q.query, counterGroups[i].Counters[j].counterPath, 0, &counterGroups[i].Counters[j].counter)
-			if err != nil {
-				return q, err
+			if err != ERROR_SUCCESS {
+				return nil, err
 			}
 		}
 	}
 
-	return q, nil
+	return q, 0
 }
 
-func (q *Handle) readData(firstFetch bool) (common.MapStr, error) {
+func (q *Handle) ReadData(firstFetch bool) (common.MapStr, uint32) {
 
 	err := _PdhCollectQueryData(q.query)
 
@@ -63,7 +63,7 @@ func (q *Handle) readData(firstFetch bool) (common.MapStr, error) {
 		err = _PdhCollectQueryData(q.query)
 	}
 
-	if err != nil {
+	if err != ERROR_SUCCESS {
 		return nil, err
 	}
 
@@ -73,7 +73,7 @@ func (q *Handle) readData(firstFetch bool) (common.MapStr, error) {
 		groupVal := make(map[string]interface{})
 		for _, v1 := range v.Counters {
 			err := _PdhGetFormattedCounterValue(v1.counter, PdhFmtDouble, q.counterType, &v1.displayValue)
-			if err != nil {
+			if err != ERROR_SUCCESS {
 				return nil, err
 			}
 			doubleValue := (*float64)(unsafe.Pointer(&v1.displayValue.LongValue))
@@ -82,12 +82,22 @@ func (q *Handle) readData(firstFetch bool) (common.MapStr, error) {
 		}
 		result[v.GroupName] = groupVal
 	}
-	return result, nil
+	return result, 0
+}
+
+func CloseQuery(q uintptr) uint32 {
+	err := _PdhCloseQuery(q)
+	if err != ERROR_SUCCESS {
+		return err
+	}
+
+	return 0
 }
 
 //go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -output pdh_windows.go pdh.go
 // Windows API calls
-//sys   _PdhOpenQuery(dataSource uintptr, userData uintptr, query *uintptr) (err error) = pdh.PdhOpenQuery
-//sys   _PdhAddCounter(query uintptr, counterPath string, userData uintptr, counter *uintptr) (err error) = pdh.PdhAddEnglishCounterW
-//sys   _PdhCollectQueryData(query uintptr) (err error) = pdh.PdhCollectQueryData
-//sys   _PdhGetFormattedCounterValue(counter uintptr, format uint32, counterType int, value *PdhCounterValue) (err error) = pdh.PdhGetFormattedCounterValue
+//sys   _PdhOpenQuery(dataSource uintptr, userData uintptr, query *uintptr) (err uint32) = pdh.PdhOpenQuery
+//sys   _PdhAddCounter(query uintptr, counterPath string, userData uintptr, counter *uintptr) (err uint32) = pdh.PdhAddEnglishCounterW
+//sys   _PdhCollectQueryData(query uintptr) (err uint32) = pdh.PdhCollectQueryData
+//sys   _PdhGetFormattedCounterValue(counter uintptr, format uint32, counterType int, value *PdhCounterValue) (err uint32) = pdh.PdhGetFormattedCounterValue
+//sys   _PdhCloseQuery(query uintptr) (err uint32) = pdh.PdhCloseQuery

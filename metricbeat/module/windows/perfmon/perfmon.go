@@ -5,6 +5,8 @@ package perfmon
 import (
 	"errors"
 
+	"strconv"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -53,10 +55,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	query, err := getHandle(config.CounterConfig)
+	query, err := GetHandle(config.CounterConfig)
 
-	if err != nil {
-		return nil, errors.New("initialization fails with error: " + err.Error())
+	if err != ERROR_SUCCESS {
+		return nil, errors.New("initialization fails with error: " + strconv.FormatUint(uint64(err), 10))
 	}
 
 	return &MetricSet{
@@ -72,9 +74,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 
-	data, err := m.handle.readData(m.firstFetch)
-	if err != nil {
-		return nil, errors.New("fetching fails wir error: " + err.Error())
+	data, err := m.handle.ReadData(m.firstFetch)
+	if err != ERROR_SUCCESS {
+		return nil, errors.New("fetching fails wir error: " + strconv.FormatUint(uint64(err), 10))
 	}
 
 	if m.firstFetch {
