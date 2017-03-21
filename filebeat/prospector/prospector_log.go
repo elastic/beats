@@ -178,11 +178,14 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 
 // matchesFile returns true in case the given filePath is part of this prospector, means matches its glob patterns
 func (p *ProspectorLog) matchesFile(filePath string) bool {
+
+	// Path is cleaned to ensure we always compare clean paths
+	filePath = filepath.Clean(filePath)
+
 	for _, glob := range p.config.Paths {
 
-		// Path and glob are cleaned to ensure we always compare clean paths
+		// Glob is cleaned to ensure we always compare clean paths
 		glob = filepath.Clean(glob)
-		filePath = filepath.Clean(filePath)
 
 		// Evaluate if glob matches filePath
 		match, err := filepath.Match(glob, filePath)
