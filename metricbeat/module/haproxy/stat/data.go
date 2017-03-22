@@ -49,12 +49,12 @@ var (
 			"time.avg": c.Int("Rtime", s.Optional),
 			"denied":   c.Int("Dresp"),
 			"http": s.Object{
-				"1xx":   c.Int("Hrsp1xx"),
-				"2xx":   c.Int("Hrsp2xx"),
-				"3xx":   c.Int("Hrsp3xx"),
-				"4xx":   c.Int("Hrsp4xx"),
-				"5xx":   c.Int("Hrsp5xx"),
-				"other": c.Int("HrspOther"),
+				"1xx":   c.Int("Hrsp1xx", s.Optional),
+				"2xx":   c.Int("Hrsp2xx", s.Optional),
+				"3xx":   c.Int("Hrsp3xx", s.Optional),
+				"4xx":   c.Int("Hrsp4xx", s.Optional),
+				"5xx":   c.Int("Hrsp5xx", s.Optional),
+				"other": c.Int("HrspOther", s.Optional),
 			},
 		},
 
