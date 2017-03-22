@@ -89,27 +89,6 @@ fields:
   region: us-east-1
 ------------------------------------------------------------------------------
 
-===== refresh_topology_freq
-
-deprecated[5.0.0]
-
-The refresh interval of the topology map in
-seconds. In other words, this setting specifies how often each Beat publishes its
-IP addresses to the topology map. The default is 10 seconds.
-
-===== topology_expire
-
-deprecated[5.0.0]
-
-The expiration time for the topology in seconds. This is useful in case a Beat
-stops publishing its IP addresses. The IP addresses are removed automatically
-from the topology map after expiration.
-
-This setting is used only by the Redis output. The other outputs don't support
-expiring entries.
-
-The default is 15 seconds.
-
 ===== queue_size
 
 The internal queue size for single events in the processing pipeline. The default

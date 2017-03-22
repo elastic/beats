@@ -279,7 +279,7 @@ func TestClientWithHeaders(t *testing.T) {
 	// start a mock HTTP server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "testing value", r.Header.Get("X-Test"))
-		requestCount += 1
+		requestCount++
 		fmt.Fprintln(w, "Hello, client")
 	}))
 	defer ts.Close()

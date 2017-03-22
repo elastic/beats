@@ -5,6 +5,7 @@ package elasticsearch
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
@@ -81,7 +82,10 @@ func TestIngest(t *testing.T) {
 		t.Skip("Skipping tests as pipeline not available in 2.x releases")
 	}
 
-	_, _, err := client.DeletePipeline(pipeline, nil)
+	status, _, err := client.DeletePipeline(pipeline, nil)
+	if err != nil && status != http.StatusNotFound {
+		t.Fatal(err)
+	}
 
 	_, resp, err := client.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {

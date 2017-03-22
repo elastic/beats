@@ -46,7 +46,7 @@ func init() {
 	outputs.RegisterOutputPlugin("logstash", new)
 }
 
-func new(beat common.BeatInfo, cfg *common.Config, _ int) (outputs.Outputer, error) {
+func new(beat common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
 
 	if !cfg.HasField("index") {
 		cfg.SetString("index", -1, beat.Beat)
