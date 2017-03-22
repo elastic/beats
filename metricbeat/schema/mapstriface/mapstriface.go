@@ -54,10 +54,9 @@ Note that this allows for converting, renaming, and restructuring the data.
 package mapstriface
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
-
-	"encoding/json"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -71,18 +70,27 @@ type ConvMap struct {
 }
 
 // Map drills down in the data dictionary by using the key
-func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]interface{}) {
+func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]interface{}) *schema.Errors {
+
 	subData, ok := data[convMap.Key].(map[string]interface{})
 	if !ok {
-		if !convMap.Optional {
+		err := schema.NewError(convMap.Key, "Error accessing sub-dictionary")
+		if convMap.Optional {
+			err.SetType(schema.OptionalType)
+		} else {
 			logp.Err("Error accessing sub-dictionary `%s`", convMap.Key)
 		}
-		return
+
+		errors := schema.NewErrors()
+		errors.AddError(err)
+
+		return errors
 	}
 
 	subEvent := common.MapStr{}
 	convMap.Schema.ApplyTo(subEvent, subData)
 	event[key] = subEvent
+	return nil
 }
 
 func (convMap ConvMap) HasKey(key string) bool {

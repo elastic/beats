@@ -53,6 +53,6 @@ func TestConversions(t *testing.T) {
 		},
 	}
 
-	output := schema.Apply(input)
+	output, _ := schema.Apply(input)
 	assert.Equal(t, output, expected)
 }
