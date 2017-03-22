@@ -54,7 +54,7 @@ var (
 )
 
 // New instantiates a new output plugin instance publishing to elasticsearch.
-func New(beat common.BeatInfo, cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
+func New(beat common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
 	if !cfg.HasField("bulk_max_size") {
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
@@ -65,7 +65,7 @@ func New(beat common.BeatInfo, cfg *common.Config, topologyExpire int) (outputs.
 	}
 
 	output := &elasticsearchOutput{beat: beat}
-	err := output.init(cfg, topologyExpire)
+	err := output.init(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,6 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 
 func (out *elasticsearchOutput) init(
 	cfg *common.Config,
-	topologyExpire int,
 ) error {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {

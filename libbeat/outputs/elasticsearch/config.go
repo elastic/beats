@@ -19,7 +19,6 @@ type elasticsearchConfig struct {
 	TLS              *outputs.TLSConfig `config:"ssl"`
 	MaxRetries       int                `config:"max_retries"`
 	Timeout          time.Duration      `config:"timeout"`
-	SaveTopology     bool               `config:"save_topology"`
 	Template         Template           `config:"template"`
 }
 

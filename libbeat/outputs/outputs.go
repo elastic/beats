@@ -37,14 +37,6 @@ type Outputer interface {
 	Close() error
 }
 
-type TopologyOutputer interface {
-	// Register the agent name and its IPs to the topology map
-	PublishIPs(name string, localAddrs []string) error
-
-	// Get the agent name with a specific IP from the topology map
-	GetNameByIP(ip string) string
-}
-
 // BulkOutputer adds BulkPublish to publish batches of events without looping.
 // Outputers still might loop on events or use more efficient bulk-apis if present.
 type BulkOutputer interface {
@@ -53,12 +45,11 @@ type BulkOutputer interface {
 }
 
 // Create and initialize the output plugin
-type OutputBuilder func(beat common.BeatInfo, config *common.Config, topologyExpire int) (Outputer, error)
+type OutputBuilder func(beat common.BeatInfo, config *common.Config) (Outputer, error)
 
 // Functions to be exported by a output plugin
 type OutputInterface interface {
 	Outputer
-	TopologyOutputer
 }
 
 type OutputPlugin struct {
@@ -92,7 +83,6 @@ func FindOutputPlugin(name string) OutputBuilder {
 func InitOutputs(
 	beat common.BeatInfo,
 	configs map[string]*common.Config,
-	topologyExpire int,
 ) ([]OutputPlugin, error) {
 	var plugins []OutputPlugin
 	for name, plugin := range outputsPlugins {
@@ -106,7 +96,7 @@ func InitOutputs(
 			continue
 		}
 
-		output, err := plugin(beat, config, topologyExpire)
+		output, err := plugin(beat, config)
 		if err != nil {
 			logp.Err("failed to initialize %s plugin as output: %s", name, err)
 			return nil, err

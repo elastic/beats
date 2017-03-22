@@ -177,7 +177,7 @@ func TestOutputLoadTemplate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	output, err := New(common.BeatInfo{Beat: "libbeat"}, cfg, 0)
+	output, err := New(common.BeatInfo{Beat: "libbeat"}, cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -422,7 +422,7 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.BulkOutputer, *Client
 		t.Fatal(err)
 	}
 
-	output, err := New(common.BeatInfo{Beat: "libbeat"}, config, 0)
+	output, err := New(common.BeatInfo{Beat: "libbeat"}, config)
 	if err != nil {
 		t.Fatal(err)
 	}
