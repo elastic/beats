@@ -18,7 +18,7 @@ Example configuration:
         - alias: "processor_perfomance"
           query: '\Processor Information(_Total)\% Processor Performance'
         - alias: "processor_time"
-          query: "\\Processor Information(_Total)\\% Performance Limit"
+          query: '\Processor Information(_Total)\% Processor Time'
     - group: "disk"
       collectors:
         - alias: "bytes_written"

@@ -1,6 +1,7 @@
 package perfmon
 
 import (
+	"strconv"
 	"unsafe"
 
 	"time"
@@ -25,6 +26,17 @@ type Counter struct {
 	counter      uintptr
 	counterPath  string
 	displayValue PdhCounterValue
+}
+
+var errorMapping = map[uint32]string{
+	PDH_INVALID_DATA:        `PDH_INVALID_DATA`,
+	PDH_INVALID_HANDLE:      `PDH_INVALID_HANDLE`,
+	PDH_NO_DATA:             `PDH_NO_DATA`,
+	PDH_NO_MORE_DATA:        `PDH_NO_MORE_DATA`,
+	PDH_STATUS_INVALID_DATA: `PDH_STATUS_INVALID_DATA`,
+	PDH_STATUS_NEW_DATA:     `PDH_STATUS_NEW_DATA`,
+	PDH_STATUS_NO_COUNTER:   `PDH_STATUS_NO_COUNTER`,
+	PDH_STATUS_NO_OBJECT:    `PDH_STATUS_NO_OBJECT`,
 }
 
 func GetHandle(config []CounterConfig) (*Handle, uint32) {
@@ -90,6 +102,13 @@ func CloseQuery(q uintptr) uint32 {
 	}
 
 	return 0
+}
+
+func GetError(err uint32) string {
+	if val, ok := errorMapping[err]; ok {
+		return val
+	}
+	return strconv.FormatUint(uint64(err), 10)
 }
 
 //go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -output syscall_windows.go pdh.go
