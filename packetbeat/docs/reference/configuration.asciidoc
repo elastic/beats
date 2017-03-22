@@ -25,3 +25,5 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 * <<configuration-logging>>
 * <<configuration-run-options>>
 * <<configuration-processors>>
+
+include::configuration/packetbeat-options.asciidoc[]
