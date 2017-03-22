@@ -37,7 +37,7 @@ func TestIsCleanInactive(t *testing.T) {
 
 	for _, test := range cleanInactiveTests {
 
-		prospector := ProspectorLog{
+		l := Log{
 			config: prospectorConfig{
 				CleanInactive: test.cleanInactive,
 			},
@@ -48,7 +48,7 @@ func TestIsCleanInactive(t *testing.T) {
 			},
 		}
 
-		assert.Equal(t, test.result, prospector.isCleanInactive(state))
+		assert.Equal(t, test.result, l.isCleanInactive(state))
 	}
 }
 
