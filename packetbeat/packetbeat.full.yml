@@ -614,6 +614,14 @@ output.elasticsearch:
   # Path to the Elasticsearch 2.x version of the template file.
   #template.versions.2x.path: "${path.config}/packetbeat.template-es2x.json"
 
+  # If set to true, packetbeat checks the Elasticsearch version at connect time, and if it
+  # is 6.x, it loads the file specified by the template.versions.6x.path setting. The
+  # default is true.
+  #template.versions.6x.enabled: true
+
+  # Path to the Elasticsearch 6.x version of the template file.
+  #template.versions.6x.path: "${path.config}/packetbeat.template-es6x.json"
+
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
 

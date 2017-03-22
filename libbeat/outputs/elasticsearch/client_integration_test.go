@@ -48,6 +48,8 @@ func TestLoadTemplate(t *testing.T) {
 	templatePath := absPath + "/libbeat.template.json"
 	if strings.HasPrefix(client.Connection.version, "2.") {
 		templatePath = absPath + "/libbeat.template-es2x.json"
+	} else if strings.HasPrefix(client.Connection.version, "6.") {
+		templatePath = absPath + "/libbeat.template-es6x.json"
 	}
 	content, err := readTemplate(templatePath)
 	assert.Nil(t, err)
@@ -116,6 +118,8 @@ func TestLoadBeatsTemplate(t *testing.T) {
 
 		if strings.HasPrefix(client.Connection.version, "2.") {
 			templatePath = absPath + "/" + beat + ".template-es2x.json"
+		} else if strings.HasPrefix(client.Connection.version, "6.") {
+			templatePath = absPath + "/" + beat + ".template-es6x.json"
 		}
 
 		content, err := readTemplate(templatePath)
@@ -161,6 +165,8 @@ func TestOutputLoadTemplate(t *testing.T) {
 
 	if strings.HasPrefix(client.Connection.version, "2.") {
 		templatePath = "../../libbeat.template-es2x.json"
+	} else if strings.HasPrefix(client.Connection.version, "6.") {
+		templatePath = "../../libbeat.template-es6x.json"
 	}
 
 	tPath, err := filepath.Abs(templatePath)
@@ -173,6 +179,7 @@ func TestOutputLoadTemplate(t *testing.T) {
 			"name":                "libbeat",
 			"path":                tPath,
 			"versions.2x.enabled": false,
+			"versions.6x.enabled": false,
 		},
 	}
 

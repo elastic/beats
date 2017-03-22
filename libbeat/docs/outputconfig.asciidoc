@@ -283,6 +283,12 @@ Elasticsearch versions 2.x.y. The default is +{beatname_lc}.template-es2x.json+.
 *`2x.enabled`*:: If set to +false+, the +2x.path+ option is ignored and the
 default template is loaded regardless of the Elasticsearch version.
 
+*`6x.path`*:: The path to the template file to load for
+Elasticsearch versions 6.x.y. The default is +{beatname_lc}.template-es6x.json+.
+
+*`6x.enabled`*:: If set to +false+, the +6x.path+ option is ignored and the
+default template is loaded regardless of the Elasticsearch version.
+
 For example:
 
 ["source","yaml",subs="attributes,callouts"]
@@ -430,11 +436,11 @@ The default value is true.
 [[hosts]]
 ===== hosts
 
-The list of known Logstash servers to connect to. If load balancing is disabled, but 
-mutliple hosts are configured, one host is selected randomly (there is no precedence). 
+The list of known Logstash servers to connect to. If load balancing is disabled, but
+mutliple hosts are configured, one host is selected randomly (there is no precedence).
 If one host becomes unreachable, another one is selected randomly.
 
-All entries in this list can contain a port number. If no port number is given, the 
+All entries in this list can contain a port number. If no port number is given, the
 value specified for <<port>> is used as the default port number.
 
 ===== compression_level

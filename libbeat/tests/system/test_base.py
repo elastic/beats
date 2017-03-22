@@ -73,6 +73,8 @@ class Test(BaseTest):
             f.write('{"template": true}')
         with open(self.working_dir + "/mockbeat.template-es2x.json", "w") as f:
             f.write('{"template": true}')
+        with open(self.working_dir + "/mockbeat.template-es6x.json", "w") as f:
+            f.write('{"template": true}')
 
         exit_code = self.run_beat(
             config="libbeat.yml",
