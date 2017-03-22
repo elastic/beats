@@ -26,7 +26,6 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) *elasticsear
 	}
 
 	config, _ := common.NewConfigFrom(map[string]interface{}{
-		"save_topology":    true,
 		"hosts":            []string{GetEsHost()},
 		"port":             esPort,
 		"username":         os.Getenv("ES_USER"),
@@ -40,7 +39,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) *elasticsear
 	})
 
 	output := &elasticsearchOutput{beat: common.BeatInfo{Beat: "test"}}
-	output.init(config, 10)
+	output.init(config)
 	return output
 }
 
