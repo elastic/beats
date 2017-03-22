@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/mattn/go-zglob"
 )
 
 var (
@@ -117,7 +118,7 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 
 	for _, glob := range p.config.Paths {
 		// Evaluate the path as a wildcards/shell glob
-		matches, err := filepath.Glob(glob)
+		matches, err := zglob.Glob(glob)
 		if err != nil {
 			logp.Err("glob(%s) failed: %v", glob, err)
 			continue
