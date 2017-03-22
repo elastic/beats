@@ -32,6 +32,7 @@ import:
   version: ca8abbf65d0e61dedf061f98bd3850f250e27539
 - package: github.com/samuel/go-thrift
   version: 2187045faa54fce7f5028706ffeb2f2fc342aa7e
+# This is the same as labix.org/v2/mgo. See https://github.com/Masterminds/glide/issues/221#issuecomment-179817757
 - package: gopkg.in/mgo.v2
   version: 29cc868a5ca65f401ff318143f9408d02f4799cc
 - package: github.com/tsg/gopacket
