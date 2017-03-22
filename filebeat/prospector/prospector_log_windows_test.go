@@ -16,14 +16,38 @@ var matchTestsWindows = []struct {
 	result       bool
 }{
 	{
-		"C:\\\\hello\\test\\test.log",      // Path are always in windows format
-		[]string{"C:\\\\hello/test/*.log"}, // Globs can also be with forward slashes
+		`C:\\hello\test\test.log`,
+		[]string{`C:\\hello/test/*.log`},
 		nil,
 		true,
 	},
 	{
-		"C:\\\\hello\\test\\test.log",       // Path are always in windows format
-		[]string{"C:\\\\hello\\test/*.log"}, // Globs can also be mixed
+		`C:\\hello\test\test.log`,
+		[]string{`C:\\hello\test/*.log`},
+		nil,
+		true,
+	},
+	{
+		`C:\\hello\test\test.log`,
+		[]string{`C://hello/test/*.log`},
+		nil,
+		true,
+	},
+	{
+		`C:\\hello\test\test.log`,
+		[]string{`C://hello//test//*.log`},
+		nil,
+		true,
+	},
+	{
+		`C://hello/test/test.log`,
+		[]string{`C:\\hello\test\*.log`},
+		nil,
+		true,
+	},
+	{
+		`C://hello/test/test.log`,
+		[]string{`C:/hello/test/*.log`},
 		nil,
 		true,
 	},
