@@ -29,9 +29,9 @@ type reporter struct {
 
 	// client/connection objects for publishing events and checking availablity
 	// of monitoring endpoint
-	clients []mode.ProtocolClient
-	conn    mode.ConnectionMode
-	retry   time.Duration
+	clients    []mode.ProtocolClient
+	conn       mode.ConnectionMode
+	checkRetry time.Duration
 
 	// metrics report interval
 	period time.Duration
@@ -71,14 +71,16 @@ func New(beat common.BeatInfo, cfg *common.Config) (report.Reporter, error) {
 		return nil, err
 	}
 
-	retry := 30 * time.Second
+	// backoff parameters
+	backoff := 1 * time.Second
+	maxBackoff := 60 * time.Second
 
 	// TODO: make Settings configurable
 	conn, err := modeutil.NewConnectionMode(clients, modeutil.Settings{
 		Failover:     true,
-		MaxAttempts:  3, // retry indexing metrics up to 3 times
-		WaitRetry:    retry,
-		MaxWaitRetry: retry,
+		MaxAttempts:  1, // try to send data at most once, no retry
+		WaitRetry:    backoff,
+		MaxWaitRetry: maxBackoff,
 		Timeout:      60 * time.Second,
 	})
 	if err != nil {
@@ -89,6 +91,8 @@ func New(beat common.BeatInfo, cfg *common.Config) (report.Reporter, error) {
 	if windowSize <= 0 {
 		windowSize = 1
 	}
+	// check endpoint availablity on startup only every 30 seconds
+	checkRetry := 30 * time.Second
 
 	r := &reporter{
 		done:       newStopper(),
@@ -96,7 +100,7 @@ func New(beat common.BeatInfo, cfg *common.Config) (report.Reporter, error) {
 		windowSize: windowSize,
 		clients:    clients,
 		conn:       conn,
-		retry:      retry,
+		checkRetry: checkRetry,
 		period:     config.Period,
 		beatMeta:   makeMeta(beat),
 		tags:       config.Tags,
@@ -126,7 +130,7 @@ func (r *reporter) initLoop() {
 		select {
 		case <-r.done.C():
 			return
-		case <-time.After(r.retry):
+		case <-time.After(r.checkRetry):
 		}
 	}
 
