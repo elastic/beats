@@ -59,6 +59,7 @@ https://github.com/cleesmith/unifiedbeat[unifiedbeat]:: Reads records from Unifi
 network intrusion detection software and indexes the records in Elasticsearch.
 https://github.com/mrkschan/uwsgibeat[uwsgibeat]:: Reads stats from uWSGI.
 https://github.com/eskibars/wmibeat[wmibeat]:: Uses WMI to grab your favorite, configurable Windows metrics.
+https://github.com/deepujain/nvidiagpubeat/[nvidiagpubeat]:: Uses nvidia-smi to grab metrics of NVIDIA GPUs.
 
 
 Have you created a Beat that's not listed? If so, add the name and description of your Beat to the source document for
