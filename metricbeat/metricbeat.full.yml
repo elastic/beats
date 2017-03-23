@@ -179,6 +179,14 @@ metricbeat.modules:
   #username: ""
   #password: ""
 
+#------------------------------ memcached Module -----------------------------
+- module: memcached
+  metricsets: ["stats"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:11211"]
+
+
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
   #metricsets: ["dbstats", "status"]
