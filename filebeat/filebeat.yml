@@ -45,15 +45,15 @@ filebeat.prospectors:
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
   # matching any regular expression from the list.
-  #exclude_lines: ["^DBG"]
+  #exclude_lines: ['^DBG']
 
   # Include lines. A list of regular expressions to match. It exports the lines that are
   # matching any regular expression from the list.
-  #include_lines: ["^ERR", "^WARN"]
+  #include_lines: ['^ERR', '^WARN']
 
   # Exclude files. A list of regular expressions to match. Filebeat drops the files that
   # are matching any regular expression from the list. By default, no files are dropped.
-  #exclude_files: [".gz$"]
+  #exclude_files: ['.gz$']
 
   # Optional additional fields. These field can be freely picked
   # to add additional information to the crawled log files for filtering
