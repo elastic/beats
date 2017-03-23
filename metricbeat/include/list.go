@@ -39,6 +39,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/kafka"
 	_ "github.com/elastic/beats/metricbeat/module/kafka/consumergroup"
 	_ "github.com/elastic/beats/metricbeat/module/kafka/partition"
+	_ "github.com/elastic/beats/metricbeat/module/memcached"
+	_ "github.com/elastic/beats/metricbeat/module/memcached/stats"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb/dbstats"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb/status"

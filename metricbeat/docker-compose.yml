@@ -22,6 +22,7 @@ services:
       - ${PWD}/module/haproxy/_meta/env
       - ${PWD}/module/jolokia/_meta/env
       - ${PWD}/module/kafka/_meta/env
+      - ${PWD}/module/memcached/_meta/env
       - ${PWD}/module/mongodb/_meta/env
       - ${PWD}/module/mysql/_meta/env
       - ${PWD}/module/nginx/_meta/env
@@ -42,6 +43,7 @@ services:
       haproxy:    { condition: service_healthy }
       jolokia:    { condition: service_healthy }
       kafka:      { condition: service_healthy }
+      memcached:  { condition: service_healthy }
       mongodb:    { condition: service_healthy }
       mysql:      { condition: service_healthy }
       nginx:      { condition: service_healthy }
@@ -69,6 +71,9 @@ services:
 
   kafka:
     build: ${PWD}/module/kafka/_meta
+
+  memcached:
+    build: ${PWD}/module/memcached/_meta
 
   mongodb:
     build: ${PWD}/module/mongodb/_meta
