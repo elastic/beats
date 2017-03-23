@@ -50,10 +50,10 @@ type requestParameters struct {
 
 type responseParameters struct {
 	// expected HTTP response configuration
-	Status      		uint16            `config:"status" verify:"min=0, max=699"`
-	RecvHeaders 		map[string]string `config:"headers"`
-	RecvBody    		string            `config:"body"`
-	RecvBodyContains	string		  `config:"body_contains"`
+	Status           uint16            `config:"status" verify:"min=0, max=699"`
+	RecvHeaders      map[string]string `config:"headers"`
+	RecvBody         string            `config:"body"`
+	RecvBodyContains string            `config:"body_contains"`
 }
 
 type compressionConfig struct {
