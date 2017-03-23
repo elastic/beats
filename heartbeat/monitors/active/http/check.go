@@ -32,6 +32,10 @@ func makeValidateResponse(config *responseParameters) RespCheck {
 		checks = append(checks, checkBody([]byte(config.RecvBody)))
 	}
 
+	if len(config.RecvBodyContains) > 0 {
+		checks = append(checks, checkBodyContains([]byte(config.RecvBodyContains)))
+	}
+
 	return checkAll(checks...)
 }
 
@@ -94,6 +98,20 @@ func checkBody(body []byte) RespCheck {
 		}
 
 		if !bytes.Equal(body, content) {
+			return errBodyMismatch
+		}
+		return nil
+	}
+}
+
+func checkBodyContains(bodyContains []byte) RespCheck {
+	return func(r *http.Response) error {
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			return err
+		}
+
+		if !bytes.Contains(body, bodyContains) {
 			return errBodyMismatch
 		}
 		return nil
