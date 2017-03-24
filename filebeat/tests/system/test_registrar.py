@@ -1,12 +1,11 @@
-from filebeat import BaseTest
+"""Test the registrar"""
 
 import os
 import platform
 import time
 import shutil
-import json
-import stat
-from nose.plugins.skip import Skip, SkipTest
+from filebeat import BaseTest
+from nose.plugins.skip import SkipTest
 
 
 # Additional tests: to be implemented
@@ -16,10 +15,10 @@ from nose.plugins.skip import Skip, SkipTest
 
 
 class Test(BaseTest):
+    """Test class"""
 
     def test_registrar_file_content(self):
-        """
-        Check if registrar file is created correctly and content is as expected
+        """Check if registrar file is created correctly and content is as expected
         """
 
         self.render_config_template(
@@ -31,13 +30,13 @@ class Test(BaseTest):
         line = "hello world\n"
         line_len = len(line) - 1 + len(os.linesep)
         iterations = 5
-        testfile = self.working_dir + "/log/test.log"
-        file = open(testfile, 'w')
-        file.write(iterations * line)
-        file.close()
+        testfile_path = self.working_dir + "/log/test.log"
+        testfile = open(testfile_path, 'w')
+        testfile.write(iterations * line)
+        testfile.close()
 
         filebeat = self.start_beat()
-        c = self.log_contains_count("states written")
+        count = self.log_contains_count("states written")
 
         self.wait_until(
             lambda: self.output_has(lines=5),
@@ -45,7 +44,7 @@ class Test(BaseTest):
 
         # Make sure states written appears one more time
         self.wait_until(
-            lambda: self.log_contains("states written") > c,
+            lambda: self.log_contains("states written") > count,
             max_timeout=10)
 
         # wait until the registry file exist. Needed to avoid a race between
@@ -60,11 +59,11 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 1
 
-        logFileAbsPath = os.path.abspath(testfile)
-        record = self.get_registry_entry_by_path(logFileAbsPath)
+        logfile_abs_path = os.path.abspath(testfile_path)
+        record = self.get_registry_entry_by_path(logfile_abs_path)
 
         self.assertDictContainsSubset({
-            "source": logFileAbsPath,
+            "source": logfile_abs_path,
             "offset": iterations * line_len,
         }, record)
         self.assertTrue("FileStateOS" in record)
@@ -75,14 +74,14 @@ class Test(BaseTest):
             # TODO: Check for IdxHi, IdxLo, Vol in FileStateOS on Windows.
             self.assertEqual(len(file_state_os), 3)
         elif platform.system() == "SunOS":
-            stat = os.stat(logFileAbsPath)
+            stat = os.stat(logfile_abs_path)
             self.assertEqual(file_state_os["inode"], stat.st_ino)
 
             # Python does not return the same st_dev value as Golang or the
             # command line stat tool so just check that it's present.
             self.assertTrue("device" in file_state_os)
         else:
-            stat = os.stat(logFileAbsPath)
+            stat = os.stat(logfile_abs_path)
             self.assertDictContainsSubset({
                 "inode": stat.st_ino,
                 "device": stat.st_dev,
@@ -98,13 +97,13 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
 
-        testfile1 = self.working_dir + "/log/test1.log"
-        testfile2 = self.working_dir + "/log/test2.log"
-        file1 = open(testfile1, 'w')
-        file2 = open(testfile2, 'w')
+        testfile_path1 = self.working_dir + "/log/test1.log"
+        testfile_path2 = self.working_dir + "/log/test2.log"
+        file1 = open(testfile_path1, 'w')
+        file2 = open(testfile_path2, 'w')
 
         iterations = 5
-        for n in range(0, iterations):
+        for _ in range(0, iterations):
             file1.write("hello world")  # 11 chars
             file1.write("\n")  # 1 char
             file2.write("goodbye world")  # 11 chars
@@ -142,9 +141,9 @@ class Test(BaseTest):
             registryFile="a/b/c/registry",
         )
         os.mkdir(self.working_dir + "/log/")
-        testfile = self.working_dir + "/log/test.log"
-        with open(testfile, 'w') as f:
-            f.write("hello world\n")
+        testfile_path = self.working_dir + "/log/test.log"
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("hello world\n")
         filebeat = self.start_beat()
         self.wait_until(
             lambda: self.output_has(lines=1),
@@ -170,21 +169,21 @@ class Test(BaseTest):
         )
 
         os.mkdir(self.working_dir + "/log/")
-        testfile = self.working_dir + "/log/test.log"
+        testfile_path = self.working_dir + "/log/test.log"
 
         filebeat = self.start_beat()
 
-        with open(testfile, 'w') as f:
-            f.write("offset 9\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("offset 9\n")
 
         self.wait_until(lambda: self.output_has(lines=1),
                         max_timeout=10)
 
         testfilerenamed = self.working_dir + "/log/test.1.log"
-        os.rename(testfile, testfilerenamed)
+        os.rename(testfile_path, testfilerenamed)
 
-        with open(testfile, 'w') as f:
-            f.write("offset 10\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("offset 10\n")
 
         self.wait_until(lambda: self.output_has(lines=2),
                         max_timeout=10)
@@ -204,10 +203,10 @@ class Test(BaseTest):
 
         # Make sure the offsets are correctly set
         if os.name == "nt":
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile))["offset"] == 11
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path))["offset"] == 11
             assert self.get_registry_entry_by_path(os.path.abspath(testfilerenamed))["offset"] == 10
         else:
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile))["offset"] == 10
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path))["offset"] == 10
             assert self.get_registry_entry_by_path(os.path.abspath(testfilerenamed))["offset"] == 9
 
         # Check that 2 files are port of the registrar file
@@ -222,8 +221,8 @@ class Test(BaseTest):
             path_data=self.working_dir + "/datapath",
             skip_registry_config=True,
         )
-        with open(self.working_dir + "/test.log", "w") as f:
-            f.write("test message\n")
+        with open(self.working_dir + "/test.log", "w") as testfile:
+            testfile.write("test message\n")
         filebeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
         filebeat.check_kill_and_wait()
@@ -244,26 +243,26 @@ class Test(BaseTest):
             raise SkipTest
 
         os.mkdir(self.working_dir + "/log/")
-        testfile = self.working_dir + "/log/input"
+        testfile_path = self.working_dir + "/log/input"
 
         filebeat = self.start_beat()
 
-        with open(testfile, 'w') as f:
-            f.write("entry1\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("entry1\n")
 
         self.wait_until(
             lambda: self.output_has(lines=1),
             max_timeout=10)
 
         data = self.get_registry()
-        assert os.stat(testfile).st_ino == self.get_registry_entry_by_path(
-            os.path.abspath(testfile))["FileStateOS"]["inode"]
+        assert os.stat(testfile_path).st_ino == self.get_registry_entry_by_path(
+            os.path.abspath(testfile_path))["FileStateOS"]["inode"]
 
         testfilerenamed1 = self.working_dir + "/log/input.1"
-        os.rename(testfile, testfilerenamed1)
+        os.rename(testfile_path, testfilerenamed1)
 
-        with open(testfile, 'w') as f:
-            f.write("entry2\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("entry2\n")
 
         self.wait_until(
             lambda: self.output_has(lines=2),
@@ -279,23 +278,23 @@ class Test(BaseTest):
 
         data = self.get_registry()
 
-        assert os.stat(testfile).st_ino == self.get_registry_entry_by_path(
-            os.path.abspath(testfile))["FileStateOS"]["inode"]
+        assert os.stat(testfile_path).st_ino == self.get_registry_entry_by_path(
+            os.path.abspath(testfile_path))["FileStateOS"]["inode"]
         assert os.stat(testfilerenamed1).st_ino == self.get_registry_entry_by_path(
             os.path.abspath(testfilerenamed1))["FileStateOS"]["inode"]
 
         # Rotate log file, create a new empty one and remove it afterwards
         testfilerenamed2 = self.working_dir + "/log/input.2"
         os.rename(testfilerenamed1, testfilerenamed2)
-        os.rename(testfile, testfilerenamed1)
+        os.rename(testfile_path, testfilerenamed1)
 
-        with open(testfile, 'w') as f:
-            f.write("")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("")
 
         os.remove(testfilerenamed2)
 
-        with open(testfile, 'w') as f:
-            f.write("entry3\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("entry3\n")
 
         self.wait_until(
             lambda: self.output_has(lines=3),
@@ -306,8 +305,8 @@ class Test(BaseTest):
         data = self.get_registry()
 
         # Compare file inodes and the one in the registry
-        assert os.stat(testfile).st_ino == self.get_registry_entry_by_path(
-            os.path.abspath(testfile))["FileStateOS"]["inode"]
+        assert os.stat(testfile_path).st_ino == self.get_registry_entry_by_path(
+            os.path.abspath(testfile_path))["FileStateOS"]["inode"]
         assert os.stat(testfilerenamed1).st_ino == self.get_registry_entry_by_path(
             os.path.abspath(testfilerenamed1))["FileStateOS"]["inode"]
 
@@ -328,12 +327,12 @@ class Test(BaseTest):
             raise SkipTest
 
         os.mkdir(self.working_dir + "/log/")
-        testfile = self.working_dir + "/log/input"
+        testfile_path = self.working_dir + "/log/input"
 
         filebeat = self.start_beat()
 
-        with open(testfile, 'w') as f:
-            f.write("entry1\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("entry1\n")
 
         self.wait_until(
             lambda: self.output_has(lines=1),
@@ -342,8 +341,8 @@ class Test(BaseTest):
         # Wait a momemt to make sure registry is completely written
         time.sleep(1)
 
-        assert os.stat(testfile).st_ino == self.get_registry_entry_by_path(
-            os.path.abspath(testfile))["FileStateOS"]["inode"]
+        assert os.stat(testfile_path).st_ino == self.get_registry_entry_by_path(
+            os.path.abspath(testfile_path))["FileStateOS"]["inode"]
 
         filebeat.check_kill_and_wait()
 
@@ -351,8 +350,8 @@ class Test(BaseTest):
         shutil.copyfile(self.working_dir + "/registry", self.working_dir + "/registry.first")
 
         # Append file
-        with open(testfile, 'a') as f:
-            f.write("entry2\n")
+        with open(testfile_path, 'a') as testfile:
+            testfile.write("entry2\n")
 
         filebeat = self.start_beat(output="filebeat2.log")
 
@@ -370,8 +369,8 @@ class Test(BaseTest):
         data = self.get_registry()
 
         # Compare file inodes and the one in the registry
-        assert os.stat(testfile).st_ino == self.get_registry_entry_by_path(
-            os.path.abspath(testfile))["FileStateOS"]["inode"]
+        assert os.stat(testfile_path).st_ino == self.get_registry_entry_by_path(
+            os.path.abspath(testfile_path))["FileStateOS"]["inode"]
 
         # Check that 1 files are part of the registrar file. The deleted file
         # should never have been detected
@@ -380,7 +379,7 @@ class Test(BaseTest):
         output = self.read_output()
 
         # Check that output file has the same number of lines as the log file
-        assert 1 == len(output)
+        assert len(output) == 1
         assert output[0]["message"] == "entry2"
 
     def test_rotating_file_with_restart(self):
@@ -397,12 +396,12 @@ class Test(BaseTest):
             raise SkipTest
 
         os.mkdir(self.working_dir + "/log/")
-        testfile = self.working_dir + "/log/input"
+        testfile_path = self.working_dir + "/log/input"
 
         filebeat = self.start_beat()
 
-        with open(testfile, 'w') as f:
-            f.write("entry1\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("entry1\n")
 
         self.wait_until(
             lambda: self.output_has(lines=1),
@@ -412,14 +411,14 @@ class Test(BaseTest):
         time.sleep(1)
 
         data = self.get_registry()
-        assert os.stat(testfile).st_ino == self.get_registry_entry_by_path(
-            os.path.abspath(testfile))["FileStateOS"]["inode"]
+        assert os.stat(testfile_path).st_ino == self.get_registry_entry_by_path(
+            os.path.abspath(testfile_path))["FileStateOS"]["inode"]
 
         testfilerenamed1 = self.working_dir + "/log/input.1"
-        os.rename(testfile, testfilerenamed1)
+        os.rename(testfile_path, testfilerenamed1)
 
-        with open(testfile, 'w') as f:
-            f.write("entry2\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("entry2\n")
 
         self.wait_until(
             lambda: self.output_has(lines=2),
@@ -436,8 +435,8 @@ class Test(BaseTest):
 
         data = self.get_registry()
 
-        assert os.stat(testfile).st_ino == self.get_registry_entry_by_path(
-            os.path.abspath(testfile))["FileStateOS"]["inode"]
+        assert os.stat(testfile_path).st_ino == self.get_registry_entry_by_path(
+            os.path.abspath(testfile_path))["FileStateOS"]["inode"]
         assert os.stat(testfilerenamed1).st_ino == self.get_registry_entry_by_path(
             os.path.abspath(testfilerenamed1))["FileStateOS"]["inode"]
 
@@ -449,15 +448,15 @@ class Test(BaseTest):
         # Rotate log file, create a new empty one and remove it afterwards
         testfilerenamed2 = self.working_dir + "/log/input.2"
         os.rename(testfilerenamed1, testfilerenamed2)
-        os.rename(testfile, testfilerenamed1)
+        os.rename(testfile_path, testfilerenamed1)
 
-        with open(testfile, 'w') as f:
-            f.write("")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("")
 
         os.remove(testfilerenamed2)
 
-        with open(testfile, 'w') as f:
-            f.write("entry3\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("entry3\n")
 
         filebeat = self.start_beat(output="filebeat2.log")
 
@@ -475,8 +474,8 @@ class Test(BaseTest):
         data = self.get_registry()
 
         # Compare file inodes and the one in the registry
-        assert os.stat(testfile).st_ino == self.get_registry_entry_by_path(
-            os.path.abspath(testfile))["FileStateOS"]["inode"]
+        assert os.stat(testfile_path).st_ino == self.get_registry_entry_by_path(
+            os.path.abspath(testfile_path))["FileStateOS"]["inode"]
         assert os.stat(testfilerenamed1).st_ino == self.get_registry_entry_by_path(
             os.path.abspath(testfilerenamed1))["FileStateOS"]["inode"]
 
@@ -496,15 +495,15 @@ class Test(BaseTest):
         )
 
         os.mkdir(self.working_dir + "/log/")
-        testfile1 = self.working_dir + "/log/input"
-        testfile2 = self.working_dir + "/log/input.1"
-        testfile3 = self.working_dir + "/log/input.2"
+        testfile_path1 = self.working_dir + "/log/input"
+        testfile_path2 = self.working_dir + "/log/input.1"
+        testfile_path3 = self.working_dir + "/log/input.2"
 
-        with open(testfile1, 'w') as f:
-            f.write("entry10\n")
+        with open(testfile_path1, 'w') as testfile:
+            testfile.write("entry10\n")
 
-        with open(testfile2, 'w') as f:
-            f.write("entry0\n")
+        with open(testfile_path2, 'w') as testfile:
+            testfile.write("entry0\n")
 
         filebeat = self.start_beat()
 
@@ -514,26 +513,26 @@ class Test(BaseTest):
 
         # Wait a moment to make sure file exists
         time.sleep(1)
-        data = self.get_registry()
+        self.get_registry()
 
         # Check that offsets are correct
         if os.name == "nt":
             # Under windows offset is +1 because of additional newline char
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile1))["offset"] == 9
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile2))["offset"] == 8
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 9
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path2))["offset"] == 8
         else:
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile1))["offset"] == 8
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile2))["offset"] == 7
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 8
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path2))["offset"] == 7
 
         # Rotate files and remove old one
-        os.rename(testfile2, testfile3)
-        os.rename(testfile1, testfile2)
+        os.rename(testfile_path2, testfile_path3)
+        os.rename(testfile_path1, testfile_path2)
 
-        with open(testfile1, 'w') as f:
-            f.write("entry200\n")
+        with open(testfile_path1, 'w') as testfile1:
+            testfile1.write("entry200\n")
 
         # Remove file afterwards to make sure not inode reuse happens
-        os.remove(testfile3)
+        os.remove(testfile_path3)
 
         # Now wait until rotation is detected
         self.wait_until(
@@ -552,11 +551,11 @@ class Test(BaseTest):
         # Check that offsets are correct
         if os.name == "nt":
             # Under windows offset is +1 because of additional newline char
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile1))["offset"] == 10
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile2))["offset"] == 9
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 10
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path2))["offset"] == 9
         else:
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile1))["offset"] == 9
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile2))["offset"] == 8
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 9
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path2))["offset"] == 8
 
     def test_state_after_rotation_ignore_older(self):
         """
@@ -570,19 +569,19 @@ class Test(BaseTest):
         )
 
         os.mkdir(self.working_dir + "/log/")
-        testfile1 = self.working_dir + "/log/input"
-        testfile2 = self.working_dir + "/log/input.1"
-        testfile3 = self.working_dir + "/log/input.2"
+        testfile_path1 = self.working_dir + "/log/input"
+        testfile_path2 = self.working_dir + "/log/input.1"
+        testfile_path3 = self.working_dir + "/log/input.2"
 
-        with open(testfile1, 'w') as f:
-            f.write("entry10\n")
+        with open(testfile_path1, 'w') as testfile1:
+            testfile1.write("entry10\n")
 
-        with open(testfile2, 'w') as f:
-            f.write("entry0\n")
+        with open(testfile_path2, 'w') as testfile2:
+            testfile2.write("entry0\n")
 
         # Change modification time so file extends ignore_older
         yesterday = time.time() - 3600 * 24
-        os.utime(testfile2, (yesterday, yesterday))
+        os.utime(testfile_path2, (yesterday, yesterday))
 
         filebeat = self.start_beat()
 
@@ -592,24 +591,24 @@ class Test(BaseTest):
 
         # Wait a moment to make sure file exists
         time.sleep(1)
-        data = self.get_registry()
+        self.get_registry()
 
         # Check that offsets are correct
         if os.name == "nt":
             # Under windows offset is +1 because of additional newline char
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile1))["offset"] == 9
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 9
         else:
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile1))["offset"] == 8
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 8
 
         # Rotate files and remove old one
-        os.rename(testfile2, testfile3)
-        os.rename(testfile1, testfile2)
+        os.rename(testfile_path2, testfile_path3)
+        os.rename(testfile_path1, testfile_path2)
 
-        with open(testfile1, 'w') as f:
-            f.write("entry200\n")
+        with open(testfile_path1, 'w') as testfile1:
+            testfile1.write("entry200\n")
 
         # Remove file afterwards to make sure not inode reuse happens
-        os.remove(testfile3)
+        os.remove(testfile_path3)
 
         # Now wait until rotation is detected
         self.wait_until(
@@ -629,11 +628,11 @@ class Test(BaseTest):
         # Check that offsets are correct
         if os.name == "nt":
             # Under windows offset is +1 because of additional newline char
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile1))["offset"] == 10
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile2))["offset"] == 9
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 10
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path2))["offset"] == 9
         else:
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile1))["offset"] == 9
-            assert self.get_registry_entry_by_path(os.path.abspath(testfile2))["offset"] == 8
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 9
+            assert self.get_registry_entry_by_path(os.path.abspath(testfile_path2))["offset"] == 8
 
     def test_clean_inactive(self):
         """
@@ -648,15 +647,15 @@ class Test(BaseTest):
         )
 
         os.mkdir(self.working_dir + "/log/")
-        testfile1 = self.working_dir + "/log/input1"
-        testfile2 = self.working_dir + "/log/input2"
-        testfile3 = self.working_dir + "/log/input3"
+        testfile_path1 = self.working_dir + "/log/input1"
+        testfile_path2 = self.working_dir + "/log/input2"
+        testfile_path3 = self.working_dir + "/log/input3"
 
-        with open(testfile1, 'w') as f:
-            f.write("first file\n")
+        with open(testfile_path1, 'w') as testfile1:
+            testfile1.write("first file\n")
 
-        with open(testfile2, 'w') as f:
-            f.write("second file\n")
+        with open(testfile_path2, 'w') as testfile2:
+            testfile2.write("second file\n")
 
         filebeat = self.start_beat()
 
@@ -682,8 +681,8 @@ class Test(BaseTest):
                 "State removed for") == 2,
             max_timeout=15)
 
-        with open(testfile3, 'w') as f:
-            f.write("2\n")
+        with open(testfile_path3, 'w') as testfile3:
+            testfile3.write("2\n")
 
         # Write new file to make sure registrar is flushed again
         self.wait_until(
@@ -720,14 +719,14 @@ class Test(BaseTest):
         )
 
         os.mkdir(self.working_dir + "/log/")
-        testfile1 = self.working_dir + "/log/input1"
-        testfile2 = self.working_dir + "/log/input2"
+        testfile_path1 = self.working_dir + "/log/input1"
+        testfile_path2 = self.working_dir + "/log/input2"
 
-        with open(testfile1, 'w') as f:
-            f.write("file to be removed\n")
+        with open(testfile_path1, 'w') as testfile1:
+            testfile1.write("file to be removed\n")
 
-        with open(testfile2, 'w') as f:
-            f.write("2\n")
+        with open(testfile_path2, 'w') as testfile2:
+            testfile2.write("2\n")
 
         filebeat = self.start_beat()
 
@@ -747,7 +746,7 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 2
 
-        os.remove(testfile1)
+        os.remove(testfile_path1)
 
         # Wait until states are removed from prospectors
         self.wait_until(
@@ -756,8 +755,8 @@ class Test(BaseTest):
             max_timeout=15)
 
         # Add one more line to make sure registry is written
-        with open(testfile2, 'a') as f:
-            f.write("make sure registry is written\n")
+        with open(testfile_path2, 'a') as testfile2:
+            testfile2.write("make sure registry is written\n")
 
         self.wait_until(
             lambda: self.output_has(lines=3),
@@ -789,14 +788,14 @@ class Test(BaseTest):
         )
 
         os.mkdir(self.working_dir + "/log/")
-        testfile1 = self.working_dir + "/log/input1"
-        testfile2 = self.working_dir + "/log/input2"
+        testfile_path1 = self.working_dir + "/log/input1"
+        testfile_path2 = self.working_dir + "/log/input2"
 
-        with open(testfile1, 'w') as f:
-            f.write("file to be removed\n")
+        with open(testfile_path1, 'w') as testfile1:
+            testfile1.write("file to be removed\n")
 
-        with open(testfile2, 'w') as f:
-            f.write("2\n")
+        with open(testfile_path2, 'w') as testfile2:
+            testfile2.write("2\n")
 
         filebeat = self.start_beat()
 
@@ -812,7 +811,7 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 2
 
-        os.remove(testfile1)
+        os.remove(testfile_path1)
 
         # Wait until states are removed from prospectors
         self.wait_until(
@@ -821,8 +820,8 @@ class Test(BaseTest):
             max_timeout=15)
 
         # Add one more line to make sure registry is written
-        with open(testfile2, 'a') as f:
-            f.write("make sure registry is written\n")
+        with open(testfile_path2, 'a') as testfile2:
+            testfile2.write("make sure registry is written\n")
 
         self.wait_until(
             lambda: self.output_has(lines=3),
@@ -854,9 +853,9 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/log/")
         os.mkdir(self.working_dir + "/registrar/")
 
-        testfile = self.working_dir + "/log/test.log"
-        with open(testfile, 'w') as file:
-            file.write("Hello World\n")
+        testfile_path = self.working_dir + "/log/test.log"
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("Hello World\n")
 
         filebeat = self.start_beat()
 
@@ -877,16 +876,16 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
 
-        testfile = self.working_dir + "/log/test.log"
-        with open(testfile, 'w') as file:
-            file.write("Hello World\n")
+        testfile_path = self.working_dir + "/log/test.log"
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("Hello World\n")
 
         registryfile = self.working_dir + "/registry"
-        with open(registryfile, 'w') as file:
-            file.write("[]")
+        with open(registryfile, 'w') as testfile:
+            testfile.write("[]")
 
         if os.name == "nt":
-            import win32file
+            import win32file  # pylint: disable=import-error
             win32file.CreateSymbolicLink(self.working_dir + "/registry_symlink", registryfile, 0)
         else:
             os.symlink(registryfile, self.working_dir + "/registry_symlink")
@@ -911,14 +910,14 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/log/")
         registry_file = self.working_dir + "/registry"
 
-        testfile = self.working_dir + "/log/test.log"
-        with open(testfile, 'w') as file:
-            file.write("Hello World\n")
+        testfile_path = self.working_dir + "/log/test.log"
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("Hello World\n")
 
-        registry_file = self.working_dir + "/registry"
-        with open(registry_file, 'w') as file:
+        registry_file_path = self.working_dir + "/registry"
+        with open(registry_file_path, 'w') as registry_file:
             # Write invalid state
-            file.write("Hello World")
+            registry_file.write("Hello World")
 
         filebeat = self.start_beat()
 
@@ -942,17 +941,17 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
 
-        testfile1 = self.working_dir + "/log/test1.log"
-        testfile2 = self.working_dir + "/log/test2.log"
-        testfile3 = self.working_dir + "/log/test3.log"
-        testfile4 = self.working_dir + "/log/test4.log"
+        testfile_path1 = self.working_dir + "/log/test1.log"
+        testfile_path2 = self.working_dir + "/log/test2.log"
+        testfile_path3 = self.working_dir + "/log/test3.log"
+        testfile_path4 = self.working_dir + "/log/test4.log"
 
-        with open(testfile1, 'w') as file:
-            file.write("Hello World\n")
-        with open(testfile2, 'w') as file:
-            file.write("Hello World\n")
-        with open(testfile3, 'w') as file:
-            file.write("Hello World\n")
+        with open(testfile_path1, 'w') as testfile1:
+            testfile1.write("Hello World\n")
+        with open(testfile_path2, 'w') as testfile2:
+            testfile2.write("Hello World\n")
+        with open(testfile_path3, 'w') as testfile3:
+            testfile3.write("Hello World\n")
 
         filebeat = self.start_beat()
 
@@ -973,8 +972,8 @@ class Test(BaseTest):
         filebeat = self.start_beat(output="filebeat2.log")
 
         # Write additional file
-        with open(testfile4, 'w') as file:
-            file.write("Hello World\n")
+        with open(testfile_path4, 'w') as testfile4:
+            testfile4.write("Hello World\n")
 
         # Make sure all 4 states are persisted
         self.wait_until(
@@ -1002,10 +1001,10 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
 
-        testfile = self.working_dir + "/log/test.log"
+        testfile_path = self.working_dir + "/log/test.log"
 
-        with open(testfile, 'w') as file:
-            file.write("Hello World\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("Hello World\n")
 
         filebeat = self.start_beat()
 
@@ -1055,10 +1054,10 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
 
-        testfile = self.working_dir + "/log/test.log"
+        testfile_path = self.working_dir + "/log/test.log"
 
-        with open(testfile, 'w') as file:
-            file.write("Hello World\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("Hello World\n")
 
         filebeat = self.start_beat()
 
@@ -1107,7 +1106,8 @@ class Test(BaseTest):
     def test_restart_state_reset_ttl_with_space(self):
         """
         Test that ttl is reset after restart if clean_inactive changes
-        This time it is tested with a space in the filename to see if everything is loaded as expected
+        This time it is tested with a space in the filename to see if everything is loaded as
+        expected
         """
 
         self.render_config_template(
@@ -1117,10 +1117,10 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
 
-        testfile = self.working_dir + "/log/test file.log"
+        testfile_path = self.working_dir + "/log/test file.log"
 
-        with open(testfile, 'w') as file:
-            file.write("Hello World\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("Hello World\n")
 
         filebeat = self.start_beat()
 
@@ -1178,10 +1178,10 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
 
-        testfile = self.working_dir + "/log/test.log"
+        testfile_path = self.working_dir + "/log/test.log"
 
-        with open(testfile, 'w') as file:
-            file.write("Hello World\n")
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("Hello World\n")
 
         filebeat = self.start_beat()
 
@@ -1234,10 +1234,10 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
 
-        testfile1 = self.working_dir + "/log/test.log"
+        testfile_path1 = self.working_dir + "/log/test.log"
 
-        with open(testfile1, 'w') as file:
-            file.write("Hello World\n")
+        with open(testfile_path1, 'w') as testfile1:
+            testfile1.write("Hello World\n")
 
         time.sleep(1)
 
@@ -1264,7 +1264,7 @@ class Test(BaseTest):
         assert len(data) == 1
 
         # Check that offset is set to the end of the file
-        assert data[0]["offset"] == os.path.getsize(testfile1)
+        assert data[0]["offset"] == os.path.getsize(testfile_path1)
 
     def test_ignore_older_state_clean_inactive(self):
         """
@@ -1279,10 +1279,10 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
 
-        testfile1 = self.working_dir + "/log/test.log"
+        testfile_path1 = self.working_dir + "/log/test.log"
 
-        with open(testfile1, 'w') as file:
-            file.write("Hello World\n")
+        with open(testfile_path1, 'w') as testfile1:
+            testfile1.write("Hello World\n")
 
         time.sleep(2)
 
