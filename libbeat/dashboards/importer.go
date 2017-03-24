@@ -404,12 +404,12 @@ func (imp Importer) ImportArchive() error {
 		url := imp.cfg.SnapshotURL
 		archive, err = imp.downloadFile(url, target)
 		if err != nil {
-			return fmt.Errorf("Failed to download snapshot file: %s", url)
+			return fmt.Errorf("Failed to download snapshot file: %s. Error: %v", url, err)
 		}
 	} else if imp.cfg.URL != "" {
 		archive, err = imp.downloadFile(imp.cfg.URL, target)
 		if err != nil {
-			return fmt.Errorf("Failed to download file: %s", imp.cfg.URL)
+			return fmt.Errorf("Failed to download file: %s. Error: %v", imp.cfg.URL, err)
 		}
 	} else {
 		return errors.New("No archive file or URL is set - please use -file or -url option")
