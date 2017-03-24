@@ -56,7 +56,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	query, err := GetHandle(config.CounterConfig)
 
 	if err != ERROR_SUCCESS {
-		return nil, errors.New("initialization fails with error: " + GetError(err))
+		return nil, errors.New("initialization fails with error: " + err.Error())
 	}
 
 	return &MetricSet{
@@ -74,7 +74,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	data, err := m.handle.ReadData(m.firstFetch)
 	if err != ERROR_SUCCESS {
-		return nil, errors.New("fetching fails wir error: " + GetError(err))
+		return nil, errors.New("fetching fails wir error: " + err.Error())
 	}
 
 	if m.firstFetch {

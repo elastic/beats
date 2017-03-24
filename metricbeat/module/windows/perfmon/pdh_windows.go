@@ -28,7 +28,9 @@ type Counter struct {
 	displayValue PdhCounterValue
 }
 
-var errorMapping = map[uint32]string{
+type PdhError uint32
+
+var errorMapping = map[PdhError]string{
 	PDH_INVALID_DATA:        `PDH_INVALID_DATA`,
 	PDH_INVALID_HANDLE:      `PDH_INVALID_HANDLE`,
 	PDH_NO_DATA:             `PDH_NO_DATA`,
@@ -39,11 +41,11 @@ var errorMapping = map[uint32]string{
 	PDH_STATUS_NO_OBJECT:    `PDH_STATUS_NO_OBJECT`,
 }
 
-func GetHandle(config []CounterConfig) (*Handle, uint32) {
+func GetHandle(config []CounterConfig) (*Handle, PdhError) {
 	q := &Handle{}
 	err := _PdhOpenQuery(0, 0, &q.query)
 	if err != ERROR_SUCCESS {
-		return nil, err
+		return nil, PdhError(err)
 	}
 
 	counterGroups := make([]CounterGroup, len(config))
@@ -55,7 +57,7 @@ func GetHandle(config []CounterConfig) (*Handle, uint32) {
 			counterGroups[i].Counters[j] = Counter{counterName: v1.Alias, counterPath: v1.Query}
 			err := _PdhAddCounter(q.query, counterGroups[i].Counters[j].counterPath, 0, &counterGroups[i].Counters[j].counter)
 			if err != ERROR_SUCCESS {
-				return nil, err
+				return nil, PdhError(err)
 			}
 		}
 	}
@@ -63,7 +65,7 @@ func GetHandle(config []CounterConfig) (*Handle, uint32) {
 	return q, 0
 }
 
-func (q *Handle) ReadData(firstFetch bool) (common.MapStr, uint32) {
+func (q *Handle) ReadData(firstFetch bool) (common.MapStr, PdhError) {
 
 	err := _PdhCollectQueryData(q.query)
 
@@ -74,7 +76,7 @@ func (q *Handle) ReadData(firstFetch bool) (common.MapStr, uint32) {
 	}
 
 	if err != ERROR_SUCCESS {
-		return nil, err
+		return nil, PdhError(err)
 	}
 
 	result := common.MapStr{}
@@ -84,7 +86,7 @@ func (q *Handle) ReadData(firstFetch bool) (common.MapStr, uint32) {
 		for _, v1 := range v.Counters {
 			err := _PdhGetFormattedCounterValue(v1.counter, PdhFmtDouble, q.counterType, &v1.displayValue)
 			if err != ERROR_SUCCESS {
-				return nil, err
+				return nil, PdhError(err)
 			}
 			doubleValue := (*float64)(unsafe.Pointer(&v1.displayValue.LongValue))
 			groupVal[v1.counterName] = *doubleValue
@@ -95,20 +97,20 @@ func (q *Handle) ReadData(firstFetch bool) (common.MapStr, uint32) {
 	return result, 0
 }
 
-func CloseQuery(q uintptr) uint32 {
+func CloseQuery(q uintptr) PdhError {
 	err := _PdhCloseQuery(q)
 	if err != ERROR_SUCCESS {
-		return err
+		return PdhError(err)
 	}
 
 	return 0
 }
 
-func GetError(err uint32) string {
-	if val, ok := errorMapping[err]; ok {
+func (e PdhError) Error() string {
+	if val, ok := errorMapping[e]; ok {
 		return val
 	}
-	return strconv.FormatUint(uint64(err), 10)
+	return strconv.FormatUint(uint64(e), 10)
 }
 
 //go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -output syscall_windows.go pdh.go
