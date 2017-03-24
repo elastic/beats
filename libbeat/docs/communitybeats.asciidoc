@@ -28,6 +28,7 @@ https://github.com/YaSuenag/hsbeat[hsbeat]:: Reads all performance counters in J
 https://github.com/christiangalsterer/httpbeat[httpbeat]:: Polls multiple HTTP(S) endpoints and sends the data to
 Logstash or Elasticsearch. Supports all HTTP methods and proxies.
 https://github.com/jasperla/hwsensorsbeat[hwsensorsbeat]:: Reads sensors information from OpenBSD.
+https://github.com/icinga/icingabeat[icingabeat]:: Icingabeat ships events and states from Icinga 2 to Elasticsearch or Logstash.
 https://github.com/devopsmakers/iobeat[iobeat]:: Reads IO stats from /proc/diskstats on Linux.
 https://github.com/radoondas/jmxproxybeat[jmxproxybeat]:: Reads Tomcat JMX metrics exposed over 'JMX Proxy Servlet' to HTTP.
 https://github.com/mheese/journalbeat[journalbeat]:: Used for log shipping from systemd/journald based Linux systems.
@@ -39,6 +40,7 @@ https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and
 https://github.com/PhaedrusTheGreek/nagioscheckbeat[nagioscheckbeat]:: For Nagios checks and performance data.
 https://github.com/mrkschan/nginxbeat[nginxbeat]:: Reads status from Nginx.
 https://github.com/2Fast2BCn/nginxupstreambeat[nginxupstreambeat]:: Reads upstream status from nginx upstream module.
+https://github.com/deepujain/nvidiagpubeat/[nvidiagpubeat]:: Uses nvidia-smi to grab metrics of NVIDIA GPUs.
 https://github.com/aristanetworks/openconfigbeat[openconfigbeat]:: Streams data from http://openconfig.net[OpenConfig]-enabled network devices
 https://github.com/joehillen/packagebeat[packagebeat]:: Collects information about system packages from package
 managers.
