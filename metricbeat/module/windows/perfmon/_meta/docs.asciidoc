@@ -14,13 +14,11 @@ Example configuration:
   period: 10s
   perfmon.counters:
     - group: "processor"  
-      collectors:
-        - alias: "processor_perfomance"
-          query: '\Processor Information(_Total)\% Processor Performance'
+      collectors:        
         - alias: "processor_time"
           query: '\Processor Information(_Total)\% Processor Time'
     - group: "disk"
       collectors:
         - alias: "bytes_written"
-          query: '\FileSystem Disk Activity(_Total)\FileSystem Bytes Written'
+          query: '\PhysicalDisk(_Total)\Disk Writes/sec'
 ```

@@ -12,15 +12,15 @@ func TestExistingCounter(t *testing.T) {
 	config := make([]CounterConfig, 1)
 	config[0].Name = "process"
 	config[0].Group = make([]CounterConfigGroup, 1)
-	config[0].Group[0].Alias = "processor_performance"
-	config[0].Group[0].Query = "\\Processor Information(_Total)\\% Processor Performance"
+	config[0].Group[0].Alias = "processor_time"
+	config[0].Group[0].Query = "\\Processor Information(_Total)\\% Processor Time"
 	handle, err := GetHandle(config)
 
-	assert.Empty(t, err)
+	assert.Zero(t, err)
 
 	err = CloseQuery(handle.query)
 
-	assert.Empty(t, err)
+	assert.Zero(t, err)
 }
 
 func TestNonExistingCounter(t *testing.T) {
@@ -36,7 +36,7 @@ func TestNonExistingCounter(t *testing.T) {
 	if handle != nil {
 		err = CloseQuery(handle.query)
 
-		assert.Empty(t, err)
+		assert.Zero(t, err)
 	}
 }
 
@@ -53,6 +53,6 @@ func TestNonExistingObject(t *testing.T) {
 	if handle != nil {
 		err = CloseQuery(handle.query)
 
-		assert.Empty(t, err)
+		assert.Zero(t, err)
 	}
 }

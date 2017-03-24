@@ -86,7 +86,18 @@ func (q *Handle) ReadData(firstFetch bool) (common.MapStr, PdhError) {
 		for _, v1 := range v.Counters {
 			err := _PdhGetFormattedCounterValue(v1.counter, PdhFmtDouble, q.counterType, &v1.displayValue)
 			if err != ERROR_SUCCESS {
-				return nil, PdhError(err)
+				switch err {
+				case PDH_CALC_NEGATIVE_DENOMINATOR:
+					{
+						//Sometimes counters return negative values. We can ignore this error. See here for a good explanation https://www.netiq.com/support/kb/doc.php?id=7010545
+						groupVal[v1.counterName] = 0
+						continue
+					}
+				default:
+					{
+						return nil, PdhError(err)
+					}
+				}
 			}
 			doubleValue := (*float64)(unsafe.Pointer(&v1.displayValue.LongValue))
 			groupVal[v1.counterName] = *doubleValue
