@@ -268,8 +268,16 @@ By default, Windows log files are stored in +C:\ProgramData\heartbeat\Logs+.
 Heartbeat is now ready to check the status of your services and send
 events to your defined output.
 
-//TODO: Add content about sample dashboards when the dashboards are available.
+[[heartbeat-sample-dashboards]]
+=== Step 5: Loading Sample Kibana Dashboards
 
-//:allplatforms:
+To make it easier for you to visualize the status of your services, we have
+created sample Heartbeat dashboards. The dashboards are provided as
+examples. We recommend that you
+http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
+to meet your needs.
 
-//include::../../libbeat/docs/dashboards.asciidoc[]
+image:./images/heartbeat-statistics.png[Heartbeat statistics]
+
+:allplatforms:
+include::../../libbeat/docs/dashboards.asciidoc[]
