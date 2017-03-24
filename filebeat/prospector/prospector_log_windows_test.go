@@ -59,13 +59,13 @@ func TestMatchFileWindows(t *testing.T) {
 
 	for _, test := range matchTestsWindows {
 
-		p := ProspectorLog{
+		l := Log{
 			config: prospectorConfig{
 				Paths:        test.paths,
 				ExcludeFiles: test.excludeFiles,
 			},
 		}
 
-		assert.Equal(t, test.result, p.matchesFile(test.file))
+		assert.Equal(t, test.result, l.matchesFile(test.file))
 	}
 }
