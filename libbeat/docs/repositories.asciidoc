@@ -25,6 +25,14 @@ to sign all our packages. It is available from https://pgp.mit.edu.
 [float]
 ==== APT
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Beats has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 To add the Beats repository for APT:
 
 . Download and install the Public Signing Key:
@@ -77,8 +85,18 @@ sudo apt-get update && sudo apt-get install {beatname_lc}
 sudo update-rc.d {beatname_lc} defaults 95 10
 --------------------------------------------------
 
+endif::[]
+
 [float]
 ==== YUM
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Beats has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 To add the Beats repository for YUM:
 
@@ -118,3 +136,6 @@ sudo yum install {beatname_lc}
 --------------------------------------------------
 sudo chkconfig --add {beatname_lc}
 --------------------------------------------------
+
+endif::[]
+
