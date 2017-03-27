@@ -132,6 +132,13 @@ func Critical(format string, v ...interface{}) {
 	msg(LOG_CRIT, "CRIT ", format, v...)
 }
 
+// Deprecate logs a deprecation message
+// The version string contains the version when the future willb e removed
+func Deprecate(version string, format string, v ...interface{}) {
+	postfix := fmt.Sprintf(" Will be removed in version: %s", version)
+	msg(LOG_WARNING, "WARN DEPRECATED: ", format+postfix, v...)
+}
+
 // WTF prints the message at CRIT level and panics immediately with the same
 // message
 func WTF(format string, v ...interface{}) {

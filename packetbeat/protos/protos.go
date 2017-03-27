@@ -92,7 +92,7 @@ func (s ProtocolsStruct) Init(
 	listConfigs []*common.Config,
 ) error {
 	if len(configs) > 0 {
-		logp.Warn("Deprecated: dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration.")
+		logp.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration.")
 	}
 
 	for proto := range protocolSyms {
