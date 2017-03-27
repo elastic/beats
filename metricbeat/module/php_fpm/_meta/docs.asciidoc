@@ -26,5 +26,5 @@ location ~ /status {
 [float]
 === Compatibility
 
-The PHP-FPM metricsets were tested with PHP 5.6.29 and are expected to
+The PHP-FPM metricsets were tested with PHP 7.1.1 and are expected to
 work with all versions >= 5.
