@@ -99,34 +99,13 @@ func init() {
 	publishDisabled = flag.Bool("N", false, "Disable actual publishing for testing")
 }
 
-func (publisher *BeatPublisher) IsPublisherIP(ip string) bool {
-	for _, myip := range publisher.IPAddrs {
-		if myip == ip {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (publisher *BeatPublisher) GetServerName(ip string) string {
-	// in case the IP is localhost, return current shipper name
-	islocal, err := common.IsLoopback(ip)
-	if err != nil {
-		logp.Err("Parsing IP %s fails with: %s", ip, err)
-		return ""
-	}
-
-	if islocal {
-		return publisher.name
-	}
-
-	return ""
-}
-
 func (publisher *BeatPublisher) Connect() Client {
 	atomic.AddUint32(&publisher.numClients, 1)
 	return newClient(publisher)
+}
+
+func (publisher *BeatPublisher) GetName() string {
+	return publisher.name
 }
 
 // Create new PublisherType

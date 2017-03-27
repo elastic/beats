@@ -20,28 +20,20 @@ type redisConfig struct {
 	MaxRetries  int                   `config:"max_retries"`
 	TLS         *outputs.TLSConfig    `config:"ssl"`
 	Proxy       transport.ProxyConfig `config:",inline"`
-
-	Db       int    `config:"db"`
-	DataType string `config:"datatype"`
-
-	HostTopology     string              `config:"host_topology"`
-	PasswordTopology string              `config:"password_topology"`
-	DbTopology       int                 `config:"db_topology"`
-	Codec            outputs.CodecConfig `config:"codec"`
+	Codec       outputs.CodecConfig   `config:"codec"`
+	Db          int                   `config:"db"`
+	DataType    string                `config:"datatype"`
 }
 
 var (
 	defaultConfig = redisConfig{
-		Port:             6379,
-		LoadBalance:      true,
-		Timeout:          5 * time.Second,
-		MaxRetries:       3,
-		TLS:              nil,
-		Db:               0,
-		DataType:         "list",
-		HostTopology:     "",
-		PasswordTopology: "",
-		DbTopology:       1,
+		Port:        6379,
+		LoadBalance: true,
+		Timeout:     5 * time.Second,
+		MaxRetries:  3,
+		TLS:         nil,
+		Db:          0,
+		DataType:    "list",
 	}
 )
 

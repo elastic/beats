@@ -25,9 +25,9 @@ type elasticsearchOutput struct {
 	index    outil.Selector
 	beat     common.BeatInfo
 	pipeline *outil.Selector
+	clients  []mode.ProtocolClient
 
 	mode mode.ConnectionMode
-	topology
 
 	template      map[string]interface{}
 	template2x    map[string]interface{}
