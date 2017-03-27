@@ -16,14 +16,38 @@ var matchTestsWindows = []struct {
 	result       bool
 }{
 	{
-		"C:\\\\hello\\test\\test.log",      // Path are always in windows format
-		[]string{"C:\\\\hello/test/*.log"}, // Globs can also be with forward slashes
+		`C:\\hello\test\test.log`,
+		[]string{`C:\\hello/test/*.log`},
 		nil,
 		true,
 	},
 	{
-		"C:\\\\hello\\test\\test.log",       // Path are always in windows format
-		[]string{"C:\\\\hello\\test/*.log"}, // Globs can also be mixed
+		`C:\\hello\test\test.log`,
+		[]string{`C:\\hello\test/*.log`},
+		nil,
+		true,
+	},
+	{
+		`C:\\hello\test\test.log`,
+		[]string{`C://hello/test/*.log`},
+		nil,
+		true,
+	},
+	{
+		`C:\\hello\test\test.log`,
+		[]string{`C://hello//test//*.log`},
+		nil,
+		true,
+	},
+	{
+		`C://hello/test/test.log`,
+		[]string{`C:\\hello\test\*.log`},
+		nil,
+		true,
+	},
+	{
+		`C://hello/test/test.log`,
+		[]string{`C:/hello/test/*.log`},
 		nil,
 		true,
 	},
@@ -35,13 +59,13 @@ func TestMatchFileWindows(t *testing.T) {
 
 	for _, test := range matchTestsWindows {
 
-		p := ProspectorLog{
+		l := Log{
 			config: prospectorConfig{
 				Paths:        test.paths,
 				ExcludeFiles: test.excludeFiles,
 			},
 		}
 
-		assert.Equal(t, test.result, p.matchesFile(test.file))
+		assert.Equal(t, test.result, l.matchesFile(test.file))
 	}
 }

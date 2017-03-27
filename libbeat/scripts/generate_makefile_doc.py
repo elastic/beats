@@ -131,6 +131,7 @@ def print_help(categories, categories_set):
                 doc=rule["doc"],
                 default=(" Default: {}".format(default) if default else "")))
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Generate documentation from a list of Makefile files")

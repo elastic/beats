@@ -80,6 +80,7 @@ def load_file(file, module, metricset):
     return content.replace("{module}", module).replace("{metricset}",
                                                        metricset)
 
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Creates a metricset")

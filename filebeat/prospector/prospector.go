@@ -2,7 +2,6 @@ package prospector
 
 import (
 	"errors"
-	"expvar"
 	"fmt"
 	"sync"
 	"time"
@@ -16,12 +15,14 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 var (
-	harvesterSkipped = expvar.NewInt("filebeat.harvester.skipped")
+	harvesterSkipped = monitoring.NewInt(nil, "filebeat.harvester.skipped")
 )
 
+// Prospector contains the prospector
 type Prospector struct {
 	cfg           *common.Config // Raw config
 	config        prospectorConfig
@@ -41,15 +42,18 @@ type Prospector struct {
 	eventCounter  *sync.WaitGroup
 }
 
+// Prospectorer is the interface common to all prospectors
 type Prospectorer interface {
 	LoadStates(states []file.State) error
 	Run()
 }
 
+// Outlet is the outlet for a prospector
 type Outlet interface {
 	OnEvent(event *input.Event) bool
 }
 
+// NewProspector instantiates a new prospector
 func NewProspector(cfg *common.Config, outlet Outlet, beatDone chan struct{}) (*Prospector, error) {
 	prospector := &Prospector{
 		cfg:           cfg,
@@ -85,7 +89,7 @@ func NewProspector(cfg *common.Config, outlet Outlet, beatDone chan struct{}) (*
 	return prospector, nil
 }
 
-// Init sets up default config for prospector
+// LoadStates sets up default config for prospector
 func (p *Prospector) LoadStates(states []file.State) error {
 
 	var prospectorer Prospectorer
@@ -93,9 +97,9 @@ func (p *Prospector) LoadStates(states []file.State) error {
 
 	switch p.config.InputType {
 	case cfg.StdinInputType:
-		prospectorer, err = NewProspectorStdin(p)
+		prospectorer, err = NewStdin(p)
 	case cfg.LogInputType:
-		prospectorer, err = NewProspectorLog(p)
+		prospectorer, err = NewLog(p)
 	default:
 		return fmt.Errorf("Invalid input type: %v", p.config.InputType)
 	}
@@ -119,6 +123,7 @@ func (p *Prospector) LoadStates(states []file.State) error {
 	return nil
 }
 
+// Start starts the prospector
 func (p *Prospector) Start() {
 	p.wg.Add(1)
 	logp.Info("Starting prospector of type: %v; id: %v ", p.config.InputType, p.ID())
@@ -163,7 +168,7 @@ func (p *Prospector) Start() {
 
 }
 
-// Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
+// Run starts scanning through all the file paths and fetch the related files. Start a harvester for each file
 func (p *Prospector) Run() {
 
 	// Initial prospector run
@@ -295,7 +300,7 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 
 	if p.config.HarvesterLimit > 0 && p.registry.len() >= p.config.HarvesterLimit {
 		harvesterSkipped.Add(1)
-		return fmt.Errorf("Harvester limit reached.")
+		return fmt.Errorf("Harvester limit reached")
 	}
 
 	state.Offset = offset
@@ -308,16 +313,24 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 		return err
 	}
 
-	reader, err := h.Setup()
-	if err != nil {
-		return fmt.Errorf("Error setting up harvester: %s", err)
-	}
-
-	// State is directly updated and not through channel to make state update immediate
-	// State is only updated after setup is completed successfully
+	// State is directly updated and not through channel to make state update synchronous
 	err = p.updateState(input.NewEvent(state))
 	if err != nil {
 		return err
+	}
+
+	reader, err := h.Setup()
+	if err != nil {
+		// Set state to finished True again in case of setup failure to make sure
+		// file can be picked up again by a future harvester
+		state.Finished = true
+
+		updateErr := p.updateState(input.NewEvent(state))
+		// This should only happen in the case that filebeat is stopped
+		if updateErr != nil {
+			logp.Err("Error updating state: %v", updateErr)
+		}
+		return fmt.Errorf("Error setting up harvester: %s", err)
 	}
 
 	p.registry.start(h, reader)

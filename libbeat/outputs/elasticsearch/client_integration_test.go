@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/version"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -95,12 +96,7 @@ func TestLoadInvalidTemplate(t *testing.T) {
 func TestLoadBeatsTemplate(t *testing.T) {
 
 	beats := []string{
-		"filebeat",
-		"heartbeat",
 		"libbeat",
-		"packetbeat",
-		"metricbeat",
-		"winlogbeat",
 	}
 
 	for _, beat := range beats {
@@ -181,7 +177,7 @@ func TestOutputLoadTemplate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	output, err := New(common.BeatInfo{Beat: "libbeat"}, cfg, 0)
+	output, err := New(common.BeatInfo{Beat: "libbeat"}, cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -191,7 +187,7 @@ func TestOutputLoadTemplate(t *testing.T) {
 		"type":       "libbeat",
 		"message":    "Test message from libbeat",
 		"beat": common.MapStr{
-			"version": "1.2.3",
+			"version": version.GetDefaultVersion(),
 		},
 	}}
 
@@ -426,7 +422,7 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.BulkOutputer, *Client
 		t.Fatal(err)
 	}
 
-	output, err := New(common.BeatInfo{Beat: "libbeat"}, config, 0)
+	output, err := New(common.BeatInfo{Beat: "libbeat"}, config)
 	if err != nil {
 		t.Fatal(err)
 	}

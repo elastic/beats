@@ -69,7 +69,7 @@ matrix:
 
     # Dashboards
     - os: linux
-      env: TARGETS="-C libbeat/dashboards"
+      env: TARGETS="-C dev-tools/cmd/import_dashboards"
       go: *go_version
 
     # Generators

@@ -333,16 +333,6 @@ The number of seconds to wait for new events between two bulk API index requests
 If `bulk_max_size` is reached before this interval expires, additional bulk index
 requests are made.
 
-[[save_topology]]
-===== save_topology
-
-deprecated[5.0.0]
-
-A Boolean that specifies whether the topology is kept in Elasticsearch. The default is
-false.
-
-This option is relevant for Packetbeat only.
-
 ===== ssl
 
 Configuration options for SSL parameters like the certificate authority to use
@@ -430,11 +420,11 @@ The default value is true.
 [[hosts]]
 ===== hosts
 
-The list of known Logstash servers to connect to. If load balancing is disabled, but 
-multiple hosts are configured, one host is selected randomly (there is no precedence). 
+The list of known Logstash servers to connect to. If load balancing is disabled, but
+multiple hosts are configured, one host is selected randomly (there is no precedence).
 If one host becomes unreachable, another one is selected randomly.
 
-All entries in this list can contain a port number. If no port number is given, the 
+All entries in this list can contain a port number. If no port number is given, the
 value specified for <<port>> is used as the default port number.
 
 ===== compression_level

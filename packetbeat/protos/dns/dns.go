@@ -8,7 +8,6 @@ package dns
 
 import (
 	"bytes"
-	"expvar"
 	"fmt"
 	"net"
 	"sort"
@@ -18,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/publish"
@@ -58,8 +58,8 @@ const (
 type transport uint8
 
 var (
-	unmatchedRequests  = expvar.NewInt("dns.unmatched_requests")
-	unmatchedResponses = expvar.NewInt("dns.unmatched_responses")
+	unmatchedRequests  = monitoring.NewInt(nil, "dns.unmatched_requests")
+	unmatchedResponses = monitoring.NewInt(nil, "dns.unmatched_responses")
 )
 
 const (

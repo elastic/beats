@@ -19,7 +19,7 @@ import (
 
 func mysqlModForTests() *mysqlPlugin {
 	var mysql mysqlPlugin
-	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
+	results := &publish.ChanTransactions{Channel: make(chan common.MapStr, 10)}
 	config := defaultConfig
 	mysql.init(results, &config)
 	return &mysql

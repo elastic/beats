@@ -47,14 +47,32 @@ See our https://www.elastic.co/downloads/beats/heartbeat[download page] for othe
 [[deb]]
 *deb:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 curl -L -O {downloads}/heartbeat/heartbeat-{version}-amd64.deb
 sudo dpkg -i heartbeat-{version}-amd64.deb
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[rpm]]
 *rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
@@ -62,8 +80,18 @@ curl -L -O {downloads}/heartbeat/heartbeat-{version}-x86_64.rpm
 sudo rpm -vi heartbeat-{version}-x86_64.rpm
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[mac]]
 *mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------
@@ -71,8 +99,18 @@ curl -L -O {downloads}/heartbeat/heartbeat-{version}-darwin-x86_64.tar.gz
 tar xzvf heartbeat-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 
+endif::[]
+
 [[win]]
 *win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . Download the Heartbeat Windows zip file from the
 https://www.elastic.co/downloads/beats/heartbeat[downloads page].
@@ -97,6 +135,8 @@ NOTE: If script execution is disabled on your system, you need to set the
 execution policy for the current session to allow the script to run. For
 example:
 +PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-heartbeat.ps1+.
+
+endif::[]
 
 Before starting Heartbeat, you should look at the configuration options in
 the configuration file, for example +C:\Program Files\Heartbeat\heartbeat.yml+

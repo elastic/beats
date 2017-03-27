@@ -100,7 +100,7 @@ var (
 )
 
 // New instantiates a new kafka output instance.
-func New(_ common.BeatInfo, cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
+func New(_ common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
 	output := &kafka{}
 	err := output.init(cfg)
 	if err != nil {

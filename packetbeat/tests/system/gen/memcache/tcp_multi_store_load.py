@@ -18,5 +18,6 @@ def run(mc):
     res = mc.get_multi(["x", "k1", "k2", "k3", "y"])
     print(res)
 
+
 if __name__ == '__main__':
     mc.run_tcp(run)

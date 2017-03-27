@@ -1,13 +1,13 @@
 package mongodb
 
 import (
-	"expvar"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -37,7 +37,7 @@ type transactionKey struct {
 }
 
 var (
-	unmatchedRequests = expvar.NewInt("mongodb.unmatched_requests")
+	unmatchedRequests = monitoring.NewInt(nil, "mongodb.unmatched_requests")
 )
 
 func init() {
