@@ -44,7 +44,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch returns a list of docker CPU stats.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	stats, err := docker.FetchStats(m.dockerClient)
+	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
 	if err != nil {
 		return nil, err
 	}

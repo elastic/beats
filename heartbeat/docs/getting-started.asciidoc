@@ -38,7 +38,7 @@ system (<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora,
 
 [NOTE]
 ==================================================
-If you use Apt or Yum, you can {libbeat}/setup-repositories.html[install Heartbeat from our repositories] to update to the newest version more easily.
+If you use Apt or Yum, you can <<setup-repositories,install Heartbeat from our repositories>> to update to the newest version more easily.
 
 See our https://www.elastic.co/downloads/beats/heartbeat[download page] for other installation options, such as 32-bit images.
 
@@ -108,7 +108,9 @@ options, see <<heartbeat-configuration-details>>.
 
 To configure Heartbeat, you edit the configuration file. For rpm and deb,
 you'll find the configuration file at +/etc/heartbeat/heartbeat.yml+.
-For mac and win, look in the archive that you just extracted.
+For mac and win, look in the archive that you just extracted. There’s also a
+full example configuration file called `heartbeat.full.yml` that shows all
+non-deprecated options.
 
 Heartbeat provides monitors to check the status of hosts at set intervals.
 You configure each monitor individually. Heartbeat currently provides monitors
@@ -184,6 +186,10 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 === Step 4: Starting Heartbeat
 
 Start Heartbeat by issuing the appropriate command for your platform.
+
+NOTE: If you use an init.d script to start Heartbeat on deb or rpm, you can't
+specify command line flags (see <<heartbeat-command-line>>). To specify flags,
+start Heartbeat in the foreground.
 
 *deb:*
 

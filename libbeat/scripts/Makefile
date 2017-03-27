@@ -328,6 +328,7 @@ install-home:
 	if [ -d _meta/module.generated ]; then \
 		install -d -m 755 ${HOME_PREFIX}/module; \
 		rsync -av _meta/module.generated/ ${HOME_PREFIX}/module/; \
+		chmod -R go-w _meta/module.generated; \
 	fi
 
 # Prepares for packaging. Builds binaries and creates homedir data

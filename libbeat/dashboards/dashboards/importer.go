@@ -105,9 +105,9 @@ func (imp Importer) ImportJSONFile(fileType string, file string) error {
 	json.Unmarshal(reader, &jsonContent)
 	fileBase := strings.TrimSuffix(filepath.Base(file), filepath.Ext(file))
 
-	err = imp.client.LoadJSON(path+"/"+fileBase, jsonContent)
+	body, err := imp.client.LoadJSON(path+"/"+fileBase, jsonContent)
 	if err != nil {
-		return fmt.Errorf("Failed to load %s under %s/%s: %s", file, path, fileBase, err)
+		return fmt.Errorf("Failed to load %s under %s/%s: %s. Response body: %s", file, path, fileBase, err, body)
 	}
 
 	return nil
@@ -271,7 +271,7 @@ func (imp Importer) ImportSearch(file string) error {
 	path := "/" + imp.cfg.KibanaIndex + "/search/" + searchName
 	imp.statusMsg("Import search %s", file)
 
-	if err = imp.client.LoadJSON(path, searchContent); err != nil {
+	if _, err = imp.client.LoadJSON(path, searchContent); err != nil {
 		return err
 	}
 
@@ -301,7 +301,7 @@ func (imp Importer) ImportIndex(file string) error {
 	path := "/" + imp.cfg.KibanaIndex + "/index-pattern/" + indexName
 	imp.statusMsg("Import index to %s from %s\n", path, file)
 
-	if err = imp.client.LoadJSON(path, indexContent); err != nil {
+	if _, err = imp.client.LoadJSON(path, indexContent); err != nil {
 		return err
 	}
 	return nil

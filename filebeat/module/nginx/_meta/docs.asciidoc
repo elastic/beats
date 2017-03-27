@@ -1,0 +1,42 @@
+== Nginx module
+
+This module parses access and error logs created by the http://nginx.org/[Nginx]
+HTTP server.
+
+[float]
+=== Compatibility
+
+This module requires the
+{elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent] and
+{elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugins.
+
+The Nginx module was tested with logs from version 1.10.
+
+On Windows, the module was tested with Nginx installed from the Chocolatey
+repository.
+
+[float]
+=== Dashboard
+
+This module comes with a sample dashboard.
+
+image::./images/kibana-nginx.png[]
+
+[float]
+=== Access logs fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.
+
+[float]
+=== Error logs fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.
+

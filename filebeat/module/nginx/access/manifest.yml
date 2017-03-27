@@ -8,9 +8,12 @@ var:
       - /usr/local/var/log/nginx/access.log*
     os.windows:
       - c:/programdata/nginx/logs/*access.log*
-  - name: pipeline
-    # options: with_plugins, no_plugins
-    default: with_plugins
 
-ingest_pipeline: ingest/{{.pipeline}}.json
+ingest_pipeline: ingest/default.json
 prospector: config/nginx-access.yml
+
+requires.processors:
+- name: user_agent
+  plugin: ingest-user-agent
+- name: geoip
+  plugin: ingest-geoip
