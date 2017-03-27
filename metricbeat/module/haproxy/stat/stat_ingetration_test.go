@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/haproxy"
 )
 
 func TestData(t *testing.T) {
@@ -20,6 +21,6 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "haproxy",
 		"metricsets": []string{"stat"},
-		"hosts":      []string{"tcp://127.0.0.1:14567"},
+		"hosts":      []string{"tcp://" + haproxy.GetEnvHost() + ":" + haproxy.GetEnvPort()},
 	}
 }
