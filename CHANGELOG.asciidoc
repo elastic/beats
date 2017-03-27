@@ -24,10 +24,10 @@ https://github.com/elastic/beats/compare/v5.3.0...master[Check the HEAD diff]
 
 *Winlogbeat*
 
-
 ==== Bugfixes
 
 *Affecting all Beats*
+
 
 *Filebeat*
 
@@ -39,9 +39,12 @@ https://github.com/elastic/beats/compare/v5.3.0...master[Check the HEAD diff]
 
 *Winlogbeat*
 
+
 ==== Added
 
 *Affecting all Beats*
+
+- Update index mappings to support future Elasticsearch 6.X. {pull}3778[3778]
 
 *Filebeat*
 
@@ -80,7 +83,6 @@ https://github.com/elastic/beats/compare/v5.3.0...master[Check the HEAD diff]
 *Packetbeat*
 
 *Winlogbeat*
-
 
 ////////////////////////////////////////////////////////////
 
@@ -134,7 +136,6 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 - Add the option to load the sample dashboards during the Beat startup phase. {pull}3506[3506]
 - Disabled date detection in Elasticsearch index templates. Date fields must be explicitly defined in index templates. {pull}3528[3528]
 - Using environment variables in the configuration file is now GA, instead of experimental. {pull}3525[3525]
-- Update index mappings to support future Elasticsearch 6.X. {pull}3778[3778]
 
 *Filebeat*
 
