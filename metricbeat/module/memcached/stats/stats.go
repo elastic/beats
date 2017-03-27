@@ -59,6 +59,6 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		}
 	}
 
-	event := schema.Apply(data)
+	event, _ := schema.Apply(data)
 	return event, nil
 }

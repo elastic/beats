@@ -123,7 +123,9 @@ func eventMapping(info []*haproxy.Stat) []common.MapStr {
 			source[typeOfT.Field(i).Name] = f.Interface()
 
 		}
-		events = append(events, schema.Apply(source))
+
+		data, _ := schema.Apply(source)
+		events = append(events, data)
 	}
 
 	return events

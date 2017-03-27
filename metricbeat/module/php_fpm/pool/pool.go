@@ -59,5 +59,6 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, fmt.Errorf("error parsing json: %v", err)
 	}
 
-	return schema.Apply(stats), nil
+	data, _ := schema.Apply(stats)
+	return data, nil
 }

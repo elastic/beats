@@ -57,7 +57,7 @@ func eventMapping(response io.Reader) common.MapStr {
 		}
 	}
 
-	event := schema.Apply(fullEvent)
+	event, _ := schema.Apply(fullEvent)
 
 	// only exposed by the Leader
 	if _, ok := fullEvent["zk_followers"]; ok {
