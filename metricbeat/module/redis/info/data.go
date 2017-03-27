@@ -152,5 +152,6 @@ func eventMapping(info map[string]string) common.MapStr {
 	for key, val := range info {
 		source[key] = val
 	}
-	return schema.Apply(source)
+	data, _ := schema.Apply(source)
+	return data
 }

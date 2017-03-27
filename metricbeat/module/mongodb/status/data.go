@@ -129,5 +129,3 @@ var wiredTigerSchema = s.Schema{
 		"syncs":         c.Int("log sync operations"),
 	}),
 }
-
-var eventMapping = schema.Apply

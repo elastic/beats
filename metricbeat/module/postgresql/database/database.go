@@ -45,7 +45,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	events := []common.MapStr{}
 	for _, result := range results {
-		events = append(events, eventMapping(result))
+		data, _ := schema.Apply(result)
+		events = append(events, data)
 	}
 
 	return events, nil

@@ -22,5 +22,6 @@ var (
 )
 
 func eventMapping(entries map[string]interface{}) (common.MapStr, error) {
-	return schema.Apply(entries), nil
+	data, _ := schema.Apply(entries)
+	return data, nil
 }

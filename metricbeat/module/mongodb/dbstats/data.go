@@ -30,5 +30,3 @@ var schema = s.Schema{
 		"size": c.Int("size"),
 	}, c.DictOptional),
 }
-
-var eventMapping = schema.Apply
