@@ -54,7 +54,7 @@ var (
 )
 
 // Map body to MapStr
-func eventMapping(scanner *bufio.Scanner, hostname string) common.MapStr {
+func eventMapping(scanner *bufio.Scanner, hostname string) (common.MapStr, *s.Errors) {
 	var (
 		totalS          int
 		totalR          int
@@ -140,9 +140,9 @@ func eventMapping(scanner *bufio.Scanner, hostname string) common.MapStr {
 			"total":                  totalAll,
 		},
 	}
-	schema.ApplyTo(event, fullEvent)
+	_, err := schema.ApplyTo(event, fullEvent)
 
-	return event
+	return event, err
 }
 
 /*
