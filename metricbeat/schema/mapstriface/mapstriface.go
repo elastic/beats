@@ -199,11 +199,22 @@ func toTime(key string, data map[string]interface{}) (interface{}, error) {
 	if !exists {
 		return common.Time(time.Unix(0, 0)), fmt.Errorf("Key %s not found", key)
 	}
-	ts, ok := emptyIface.(time.Time)
-	if !ok {
-		return common.Time(time.Unix(0, 0)), fmt.Errorf("Expected date, found %T", emptyIface)
+
+	switch emptyIface.(type) {
+	case time.Time:
+		ts, ok := emptyIface.(time.Time)
+		if ok {
+			return common.Time(ts), nil
+		}
+	case common.Time:
+		ts, ok := emptyIface.(common.Time)
+		if ok {
+			return ts, nil
+		}
 	}
-	return common.Time(ts), nil
+
+	return common.Time(time.Unix(0, 0)), fmt.Errorf("Expected date, found %T", emptyIface)
+
 }
 
 // Time creates a Conv object for converting Time objects.
