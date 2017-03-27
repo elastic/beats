@@ -52,13 +52,19 @@ func (h *Harvester) Harvest(r reader.Reader) {
 
 	harvesterStarted.Add(1)
 	harvesterRunning.Add(1)
-	defer harvesterRunning.Add(-1)
 
-	// Makes sure file is properly closed when the harvester is stopped
-	defer h.close()
+	h.stopWg.Add(1)
+	defer func() {
+		// Channel to stop internal harvester routines
+		h.stop()
+		// Makes sure file is properly closed when the harvester is stopped
+		h.close()
 
-	// Channel to stop internal harvester routines
-	defer h.stop()
+		harvesterRunning.Add(-1)
+
+		// Marks harvester stopping completed
+		h.stopWg.Done()
+	}()
 
 	// Closes reader after timeout or when done channel is closed
 	// This routine is also responsible to properly stop the reader
@@ -74,8 +80,6 @@ func (h *Harvester) Harvest(r reader.Reader) {
 		// Applies when timeout is reached
 		case <-closeTimeout:
 			logp.Info("Closing harvester because close_timeout was reached.")
-		// Required for shutdown when hanging inside reader
-		case <-h.prospectorDone:
 		// Required when reader loop returns and reader finished
 		case <-h.done:
 		}
@@ -156,22 +160,23 @@ func (h *Harvester) Harvest(r reader.Reader) {
 	}
 }
 
+// stop is intended for internal use and closed the done channel to stop execution
 func (h *Harvester) stop() {
-	h.once.Do(func() {
+	h.stopOnce.Do(func() {
 		close(h.done)
 	})
+}
+
+// Stop stops harvester and waits for completion
+func (h *Harvester) Stop() {
+	h.stop()
+	h.stopWg.Wait()
 }
 
 // sendEvent sends event to the spooler channel
 // Return false if event was not sent
 func (h *Harvester) sendEvent(event *input.Event) bool {
-
-	select {
-	case <-h.done:
-		return false
-	case h.prospectorChan <- event: // ship the new event downstream
-		return true
-	}
+	return h.outlet.OnEventSignal(event)
 }
 
 // sendStateUpdate send an empty event with the current state to update the registry
@@ -182,11 +187,7 @@ func (h *Harvester) sendEvent(event *input.Event) bool {
 func (h *Harvester) sendStateUpdate() {
 	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
 	event := input.NewEvent(h.state)
-
-	select {
-	case <-h.prospectorDone:
-	case h.prospectorChan <- event: // ship the new event downstream
-	}
+	h.outlet.OnEvent(event)
 }
 
 // shouldExportLine decides if the line is exported or not based on

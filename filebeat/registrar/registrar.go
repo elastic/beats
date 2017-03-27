@@ -298,7 +298,7 @@ func (r *Registrar) writeRegistry() error {
 	logp.Debug("registrar", "Write registry file: %s", r.registryFile)
 
 	tempfile := r.registryFile + ".new"
-	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC|os.O_SYNC, 0600)
 	if err != nil {
 		logp.Err("Failed to create tempfile (%s) for writing: %s", tempfile, err)
 		return err

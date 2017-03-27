@@ -23,7 +23,7 @@ This file is generated! See scripts/docs_collector.py
 
         module_doc = path + "/" + module + "/_meta/docs.asciidoc"
 
-        # Only check folders where fields.yml exists
+        # Only check folders where docs.asciidoc exists
         if os.path.isfile(module_doc) == False:
             continue
 

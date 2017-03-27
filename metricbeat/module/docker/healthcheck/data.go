@@ -41,10 +41,7 @@ func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
 
 	return common.MapStr{
 		mb.ModuleData: common.MapStr{
-			"container": common.MapStr{
-				"name": docker.ExtractContainerName(cont.Names),
-				"id":   cont.ID,
-			},
+			"container": docker.NewContainer(cont).ToMapStr(),
 		},
 		"status":        container.State.Health.Status,
 		"failingstreak": container.State.Health.FailingStreak,
@@ -55,7 +52,6 @@ func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
 			"output":     container.State.Health.Log[lastEvent].Output,
 		},
 	}
-
 }
 
 // hasHealthCheck detects if healthcheck is available for container

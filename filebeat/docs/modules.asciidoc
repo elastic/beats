@@ -1,0 +1,12 @@
+[[filebeat-modules]]
+= Modules
+
+[partintro]
+--
+This section contains an <<filebeat-modules-overview,overview>> of the Filebeat
+modules feature as well as details about each of the currently supported
+modules.
+
+//pass macro block used here to remove Edit links from modules documentation because it is generated
+pass::[<?edit_url?>]
+include::modules_list.asciidoc[]
