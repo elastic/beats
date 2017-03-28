@@ -3,9 +3,9 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-windows]]
-== windows Module
+== Windows Module
 
-This is the windows Module.
+This is the Windows module.
 
 
 [float]
@@ -21,7 +21,8 @@ metricbeat.modules:
 #  metricsets: ["perfmon"]
 #  enabled: true
 #  period: 10s
-#  perfmon.counters:----
+#  perfmon.counters:
+----
 
 [float]
 === Metricsets
