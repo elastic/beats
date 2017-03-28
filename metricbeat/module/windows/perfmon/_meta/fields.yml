@@ -1,0 +1,26 @@
+- name: perfmon
+  type: group
+  fields:
+    - name: counters
+      type: group
+      description: >
+        Grouping of different counters
+      fields: 
+        - name: group
+          type: string
+          description: >
+            Name of the group. For example `processor` or `disk`
+
+        - name: collectors
+          type: group
+          fields:
+            - name: alias
+              type: string
+              description: >
+                Short form for the query
+                
+            - name: query
+              type: string
+              description: >
+                The query. For example `\\Processor Information(_Total)\\% Processor Performance`. Backslashes have to be escaped.
+

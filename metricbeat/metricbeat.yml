@@ -46,6 +46,12 @@ metricbeat.modules:
   period: 10s
   processes: ['.*']
 
+#------------------------------- Windows Module ------------------------------
+#- module: windows
+#  metricsets: ["perfmon"]
+#  enabled: true
+#  period: 10s
+#  perfmon.counters:
 
 
 #================================ General =====================================

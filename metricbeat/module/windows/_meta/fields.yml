@@ -1,0 +1,10 @@
+- key: windows
+  title: "Windows"
+  description: >
+    []beta
+    Module for Windows
+  fields:
+    - name: windows
+      type: group
+      description: >
+      fields:
