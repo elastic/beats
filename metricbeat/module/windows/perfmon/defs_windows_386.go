@@ -1,4 +1,4 @@
-﻿package perfmon
+package perfmon
 
 const (
 	ERROR_SUCCESS                 = 0x0

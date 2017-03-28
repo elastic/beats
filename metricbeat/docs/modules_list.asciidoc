@@ -19,6 +19,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-prometheus,Prometheus>>
   * <<metricbeat-module-redis,Redis>>
   * <<metricbeat-module-system,System>>
+  * <<metricbeat-module-windows,Windows>>
   * <<metricbeat-module-zookeeper,ZooKeeper>>
 
 
@@ -41,4 +42,5 @@ include::modules/postgresql.asciidoc[]
 include::modules/prometheus.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/system.asciidoc[]
+include::modules/windows.asciidoc[]
 include::modules/zookeeper.asciidoc[]
