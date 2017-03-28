@@ -21,7 +21,8 @@ metricbeat.modules:
 #  metricsets: ["perfmon"]
 #  enabled: true
 #  period: 10s
-#  perfmon.counters:----
+#  perfmon.counters:
+----
 
 [float]
 === Metricsets
