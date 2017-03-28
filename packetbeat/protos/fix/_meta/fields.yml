@@ -1,0 +1,16 @@
+- key: fix
+  title: "FIX"
+  description: >
+    FIX-specific event fields.
+  fields:
+    - name: fix
+      type: group
+      fields:
+        - name: version
+          description: >
+           Version of FIX protocol used
+
+        - name: msg_type
+          description: >
+           Type of FIX message
+
