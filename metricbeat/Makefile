@@ -19,6 +19,13 @@ GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
 
+.PHONY: clean
+clean::
+	# Clean generated dashbord directories
+	rm -rf _meta/kibana/dashboard _meta/kibana/search _meta/kibana/visualization
+	# Clean module docs
+	rm -rf docs/modules
+
 # Collects all module dashboards
 .PHONY: kibana
 kibana:
@@ -65,6 +72,7 @@ ifeq ($(BEAT_NAME), metricbeat)
 	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.full.yml
 	rm $(PREFIX)/metricbeat-win.full.yml.bk
 endif
+
 # Runs all collection steps and updates afterwards
 .PHONY: collect
 collect: fields collect-docs configs kibana imports
@@ -79,4 +87,3 @@ create-metricset:
 .PHONY: generate-json
 generate-json: build-image
 	 ${DOCKER_COMPOSE} run beat go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data
-
