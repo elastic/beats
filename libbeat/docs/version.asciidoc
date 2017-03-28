@@ -5,4 +5,4 @@
 //////////
 release-state can be: released | prerelease | unreleased
 //////////
-:release-state: unreleased
+:release-state: released
