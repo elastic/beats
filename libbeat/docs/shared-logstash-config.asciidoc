@@ -9,6 +9,10 @@
 //// include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
+*Prerequisite:* To use Logstash as an output, you must also
+{libbeat}/logstash-installation.html#logstash-setup[set up Logstash] to receive events
+from Beats. 
+
 If you want to use Logstash to perform additional processing on the data collected by
 {beatname_uc}, you need to configure {beatname_uc} to use Logstash.
 
@@ -47,7 +51,4 @@ options specified: +.\winlogbeat.exe -c .\winlogbeat.yml -configtest -e+.
 
 endif::win[]
 
-To use this configuration, you must also
-{libbeat}/logstash-installation.html#logstash-setup[set up Logstash] to receive events
-from Beats.
 

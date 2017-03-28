@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-general]]
-=== General Configuration
+=== General
 
 The general section of the +{beatname_lc}.yml+ config file contains configuration options for the Beat and some
 general settings that control its behaviour.
