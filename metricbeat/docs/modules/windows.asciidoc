@@ -3,9 +3,9 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-windows]]
-== windows Module
+== Windows Module
 
-This is the windows Module.
+This is the Windows module.
 
 
 [float]
