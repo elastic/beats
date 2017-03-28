@@ -1,8 +1,4 @@
 :stack-version: 6.0.0-alpha1
 :doc-branch: master
 :go-version: 1.7.4
-
-//////////
-release-state can be: released | prerelease | unreleased
-//////////
 :release-state: unreleased
