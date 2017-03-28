@@ -111,6 +111,7 @@ build() {
   make testsuite
   make coverage-report
   make docs
+  REVIEWDOG_OPTIONS="-ci jenkins" make lint
 }
 
 cleanup() {
