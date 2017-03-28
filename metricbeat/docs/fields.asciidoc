@@ -32,6 +32,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-windows>>
 * <<exported-fields-zookeeper>>
 
 --
@@ -7516,6 +7517,52 @@ UID of the user running the process.
 type: keyword
 
 Name of the user running the process.
+
+
+[[exported-fields-windows]]
+== Windows Fields
+
+[]beta Module for Windows
+
+
+
+[float]
+== windows Fields
+
+
+
+
+
+[float]
+== counters Fields
+
+Grouping of different counters
+
+
+
+[float]
+=== windows.perfmon.counters.group
+
+type: string
+
+Name of the group. For example `processor` or `disk`
+
+
+
+[float]
+=== windows.perfmon.counters.collectors.alias
+
+type: string
+
+Short form for the query
+
+
+[float]
+=== windows.perfmon.counters.collectors.query
+
+type: string
+
+The query. For example `\\Processor Information(_Total)\\% Processor Performance`. Backslashes have to be escaped.
 
 
 [[exported-fields-zookeeper]]

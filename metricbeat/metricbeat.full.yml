@@ -315,6 +315,12 @@ metricbeat.modules:
   # Redis AUTH password. Empty by default.
   #password: foobared
 
+#------------------------------- Windows Module ------------------------------
+#- module: windows
+#  metricsets: ["perfmon"]
+#  enabled: true
+#  period: 10s
+#  perfmon.counters:
 #------------------------------ ZooKeeper Module -----------------------------
 #- module: zookeeper
   #metricsets: ["mntr"]
