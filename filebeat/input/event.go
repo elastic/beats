@@ -65,6 +65,10 @@ func (e *Event) ToMapStr() common.MapStr {
 		event["message"] = *e.Text
 	}
 
+	meta := e.Metadata(); if meta != nil {
+		event["meta"] = meta
+	}
+
 	return event
 }
 

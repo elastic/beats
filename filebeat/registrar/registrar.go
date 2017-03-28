@@ -8,16 +8,16 @@ import (
 	"sync"
 
 	cfg "github.com/elastic/beats/filebeat/config"
-	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type Registrar struct {
-	Channel      chan []*input.Event
+	Channel      chan []*common.MapStr
 	out          publisher.SuccessLogger
 	done         chan struct{}
 	registryFile string       // Path to the Registry File
@@ -38,7 +38,7 @@ func New(registryFile string, out publisher.SuccessLogger) (*Registrar, error) {
 		registryFile: registryFile,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
-		Channel:      make(chan []*input.Event, 1),
+		Channel:      make(chan []*common.MapStr, 1),
 		out:          out,
 		wg:           sync.WaitGroup{},
 	}
@@ -153,7 +153,7 @@ func (r *Registrar) Run() {
 	}()
 
 	for {
-		var events []*input.Event
+		var events []*common.MapStr
 
 		select {
 		case <-r.done:
@@ -183,18 +183,28 @@ func (r *Registrar) Run() {
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
-func (r *Registrar) processEventStates(events []*input.Event) {
+func (r *Registrar) processEventStates(events []*common.MapStr) {
 	logp.Debug("registrar", "Processing %d events", len(events))
 
 	// Take the last event found for each file source
 	for _, event := range events {
 
 		// skip stdin
-		if event.InputType == cfg.StdinInputType {
-			continue
+		inputIface, err := event.GetValue("input_type"); if err == nil {
+			input_string, ok := inputIface.(string); if ok {
+				if input_string == cfg.StdinInputType {
+					continue
+				}
+			}
 		}
-		r.states.Update(event.State)
-		statesUpdate.Add(1)
+
+		stateIface, err := event.GetValue("state"); if err == nil {
+			state, ok := stateIface.(file.State); if ok {
+				r.states.Update(state)
+				statesUpdate.Add(1)
+			}
+		}
+
 	}
 }
 

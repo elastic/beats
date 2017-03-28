@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
+	"github.com/elastic/beats/libbeat/processors"
 )
 
 var (
@@ -43,6 +44,7 @@ type prospectorConfig struct {
 	Pipeline             string             `config:"pipeline"`
 	Module               string             `config:"_module_name"`  // hidden option to set the module name
 	Fileset              string             `config:"_fileset_name"` // hidden option to set the fileset name
+	Filters              processors.PluginConfig `config:"filters"`
 }
 
 func (config *prospectorConfig) Validate() error {

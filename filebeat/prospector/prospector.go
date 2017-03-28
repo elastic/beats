@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/processors"
 )
 
 var (
@@ -40,6 +41,7 @@ type Prospector struct {
 	registry      *harvesterRegistry
 	beatDone      chan struct{}
 	eventCounter  *sync.WaitGroup
+	filters       *processors.Processors
 }
 
 // Prospectorer is the interface common to all prospectors
@@ -50,7 +52,7 @@ type Prospectorer interface {
 
 // Outlet is the outlet for a prospector
 type Outlet interface {
-	OnEvent(event *input.Event) bool
+	OnEvent(event *common.MapStr) bool
 }
 
 // NewProspector instantiates a new prospector
@@ -83,6 +85,13 @@ func NewProspector(cfg *common.Config, outlet Outlet, beatDone chan struct{}) (*
 	if err != nil {
 		return nil, err
 	}
+
+	f, err := processors.New(prospector.config.Filters)
+	if err != nil {
+		return nil, err
+	}
+
+	prospector.filters = f
 
 	logp.Debug("prospector", "File Configs: %v", prospector.config.Paths)
 
@@ -214,11 +223,19 @@ func (p *Prospector) updateState(event *input.Event) error {
 	event.Module = p.config.Module
 	event.Fileset = p.config.Fileset
 
-	ok := p.outlet.OnEvent(event)
-	if !ok {
-		logp.Info("Prospector outlet closed")
-		return errors.New("prospector outlet closed")
+	eventMap := event.ToMapStr()
+
+	//run the filters before sending to
+	eventMap = p.filters.Run(eventMap)
+	if eventMap != nil {
+		//processor might decide to drop the event
+		ok := p.outlet.OnEvent(&eventMap)
+		if !ok {
+			logp.Info("Prospector outlet closed")
+			return errors.New("prospector outlet closed")
+		}
 	}
+
 
 	p.states.Update(event.State)
 	return nil
