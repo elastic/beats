@@ -1,4 +1,4 @@
-//+build integration windows
+// +build integration windows
 
 package perfmon
 
