@@ -18,10 +18,9 @@ type Flows interface {
 }
 
 type PacketbeatPublisher struct {
-	pub    publisher.Publisher
-	client publisher.Client
+	beatPublisher *publisher.BeatPublisher
+	client        publisher.Client
 
-	topo           topologyProvider
 	ignoreOutgoing bool
 
 	wg   sync.WaitGroup
@@ -33,14 +32,6 @@ type PacketbeatPublisher struct {
 
 type ChanTransactions struct {
 	Channel chan common.MapStr
-}
-
-// XXX: currently implemented by libbeat publisher. This functionality is only
-// required by packetbeat. Source for TopologyProvider should become local to
-// packetbeat.
-type topologyProvider interface {
-	IsPublisherIP(ip string) bool
-	GetServerName(ip string) string
 }
 
 func (t *ChanTransactions) PublishTransaction(event common.MapStr) bool {
@@ -55,14 +46,9 @@ func NewPublisher(
 	hwm, bulkHWM int,
 	ignoreOutgoing bool,
 ) (*PacketbeatPublisher, error) {
-	topo, ok := pub.(topologyProvider)
-	if !ok {
-		return nil, errors.New("Requires topology provider")
-	}
 
 	return &PacketbeatPublisher{
-		pub:            pub,
-		topo:           topo,
+		beatPublisher:  pub.(*publisher.BeatPublisher),
 		ignoreOutgoing: ignoreOutgoing,
 		client:         pub.Connect(),
 		done:           make(chan struct{}),
@@ -152,6 +138,33 @@ func (p *PacketbeatPublisher) onFlow(events []common.MapStr) {
 	p.client.PublishEvents(pub)
 }
 
+func (p *PacketbeatPublisher) IsPublisherIP(ip string) bool {
+
+	for _, myip := range p.beatPublisher.IPAddrs {
+		if myip == ip {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (p *PacketbeatPublisher) GetServerName(ip string) string {
+
+	// in case the IP is localhost, return current shipper name
+	islocal, err := common.IsLoopback(ip)
+	if err != nil {
+		logp.Err("Parsing IP %s fails with: %s", ip, err)
+		return ""
+	}
+
+	if islocal {
+		return p.beatPublisher.GetName()
+	}
+
+	return ""
+}
+
 // filterEvent validates an event for common required fields with types.
 // If event is to be filtered out the reason is returned as error.
 func validateEvent(event common.MapStr) error {
@@ -186,7 +199,7 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 	debugf("has src: %v", ok)
 	if ok {
 		// check if it's outgoing transaction (as client)
-		isOutgoing := p.topo.IsPublisherIP(src.IP)
+		isOutgoing := p.IsPublisherIP(src.IP)
 		if isOutgoing {
 			if p.ignoreOutgoing {
 				// duplicated transaction -> ignore it
@@ -198,7 +211,7 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 			event["direction"] = "out"
 		}
 
-		srcServer = p.topo.GetServerName(src.IP)
+		srcServer = p.GetServerName(src.IP)
 		event["client_ip"] = src.IP
 		event["client_port"] = src.Port
 		event["client_proc"] = src.Proc
@@ -209,7 +222,7 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 	dst, ok := event["dst"].(*common.Endpoint)
 	debugf("has dst: %v", ok)
 	if ok {
-		dstServer = p.topo.GetServerName(dst.IP)
+		dstServer = p.GetServerName(dst.IP)
 		event["ip"] = dst.IP
 		event["port"] = dst.Port
 		event["proc"] = dst.Proc
@@ -217,7 +230,7 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 		delete(event, "dst")
 
 		//check if it's incoming transaction (as server)
-		if p.topo.IsPublisherIP(dst.IP) {
+		if p.IsPublisherIP(dst.IP) {
 			// incoming transaction
 			event["direction"] = "in"
 		}

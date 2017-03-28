@@ -1,6 +1,7 @@
 package elasticsearch
 
 import (
+	"math/rand"
 	"os"
 	"time"
 
@@ -61,4 +62,15 @@ func newTestClientAuth(url, user, pass string) *Client {
 		panic(err)
 	}
 	return client
+}
+
+func (t *elasticsearchOutput) randomClient() *Client {
+	switch len(t.clients) {
+	case 0:
+		return nil
+	case 1:
+		return t.clients[0].(*Client).Clone()
+	default:
+		return t.clients[rand.Intn(len(t.clients))].(*Client).Clone()
+	}
 }
