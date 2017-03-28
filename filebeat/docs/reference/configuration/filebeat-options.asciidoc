@@ -1,5 +1,5 @@
 [[configuration-filebeat-options]]
-=== Filebeat Prospectors Configuration
+=== Filebeat Prospectors
 
 The `filebeat` section of the +{beatname_lc}.yml+ config file specifies a list of `prospectors` that Filebeat
 uses to locate and process log files. Each prospector item begins with a dash (-)
@@ -294,6 +294,7 @@ If you require log lines to be sent in near real time do not use a very low `sca
 
 The default setting is 10s.
 
+[[filebeat-document-type]]
 ===== document_type
 
 The event type to use for published lines read by harvesters. For Elasticsearch
@@ -474,7 +475,7 @@ by assigning a higher limit of harvesters.
 The `enabled` option can be used with each prospector to define if a prospector is enabled or not. By default, enabled is set to true.
 
 [[configuration-global-options]]
-=== Filebeat Global Configuration
+=== Filebeat Global
 
 You can specify configuration options in the +{beatname_lc}.yml+ config file to control Filebeat behavior at a global level.
 
