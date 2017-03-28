@@ -62,7 +62,8 @@ func parseKeyspaceStats(keyspaceMap map[string]string) map[string]common.MapStr 
 					db[stats[0]] = stats[1]
 				}
 			}
-			keyspace[k] = schema.Apply(db)
+			data, _ := schema.Apply(db)
+			keyspace[k] = data
 		}
 	}
 	return keyspace

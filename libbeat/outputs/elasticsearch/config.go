@@ -19,10 +19,10 @@ type elasticsearchConfig struct {
 	TLS              *outputs.TLSConfig `config:"ssl"`
 	MaxRetries       int                `config:"max_retries"`
 	Timeout          time.Duration      `config:"timeout"`
-	SaveTopology     bool               `config:"save_topology"`
 	Template         Template           `config:"template"`
 }
 
+// Template contains the elasticsearch template.
 type Template struct {
 	Enabled   bool             `config:"enabled"`
 	Name      string           `config:"name"`
@@ -31,10 +31,12 @@ type Template struct {
 	Versions  TemplateVersions `config:"versions"`
 }
 
+// TemplateVersions contains the template versions.
 type TemplateVersions struct {
 	Es2x TemplateVersion `config:"2x"`
 }
 
+// TemplateVersion contains a template version.
 type TemplateVersion struct {
 	Enabled bool   `config:"enabled"`
 	Path    string `config:"path"`

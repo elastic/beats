@@ -3,9 +3,12 @@
 package status
 
 import (
+	"bufio"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -219,5 +222,20 @@ func TestHostParser(t *testing.T) {
 		} else if assert.NoError(t, err, "unexpected error") {
 			assert.Equal(t, test.url, hostData.URI)
 		}
+	}
+}
+
+// Test event mapping for different apache status outputs
+func TestStatusOutputs(t *testing.T) {
+	files, err := filepath.Glob("./_meta/test/status_*")
+	assert.NoError(t, err)
+
+	for _, filename := range files {
+		f, err := os.Open(filename)
+		assert.NoError(t, err, "cannot open test file "+filename)
+		scanner := bufio.NewScanner(f)
+
+		_, errors := eventMapping(scanner, "localhost")
+		assert.False(t, errors.HasRequiredErrors(), "error mapping "+filename)
 	}
 }

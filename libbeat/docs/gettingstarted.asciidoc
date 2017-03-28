@@ -39,6 +39,14 @@ mac>> for OS X, and <<win, win>> for Windows):
 
 [[deb]]*deb:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Elasticsearch has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-8-jre
@@ -47,7 +55,17 @@ sudo dpkg -i elasticsearch-{ES-version}.deb
 sudo /etc/init.d/elasticsearch start
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[rpm]]*rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Elasticsearch has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -57,7 +75,17 @@ sudo rpm -i elasticsearch-{ES-version}.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[mac]]*mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Elasticsearch has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -68,7 +96,17 @@ cd elasticsearch-{ES-version}
 ./bin/elasticsearch
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[win]]*win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Elasticsearch has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . If necessary, download and install the latest version of the Java from https://www.java.com[www.java.com].
 
@@ -90,6 +128,8 @@ cd C:\Program Files\elasticsearch-{ES-version}
 ----------------------------------------------------------------------
 bin\elasticsearch.bat
 ----------------------------------------------------------------------
+
+endif::[]
 
 You can learn more about installing, configuring, and running Elasticsearch in the
 https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html[Elasticsearch Reference].
@@ -147,6 +187,14 @@ with your system:
 
 *deb:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Logstash has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-8-jre
@@ -154,7 +202,17 @@ curl -L -O https://artifacts.elastic.co/downloads/logstash/logstash-{LS-version}
 sudo dpkg -i logstash-{LS-version}.deb
 ----------------------------------------------------------------------
 
+endif::[]
+
 *rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Logstash has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -163,7 +221,17 @@ curl -L -O https://artifacts.elastic.co/downloads/logstash/logstash-{LS-version}
 sudo rpm -i logstash-{LS-version}.rpm
 ----------------------------------------------------------------------
 
+endif::[]
+
 *mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Logstash has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -172,7 +240,17 @@ curl -L -O https://artifacts.elastic.co/downloads/logstash/logstash-{LS-version}
 unzip logstash-{LS-version}.zip
 ----------------------------------------------------------------------
 
+endif::[]
+
 *win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Logstash has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . If necessary, download and install the latest version of the Java from https://www.java.com[www.java.com].
 
@@ -182,6 +260,8 @@ https://www.elastic.co/downloads/logstash[downloads page].
 . Extract the contents of the zip file to a directory on your computer, for example, `C:\Program Files`.
 
 Don't start Logstash yet. You need to set a couple of configuration options first.
+
+endif::[]
 
 [[logstash-setup]]
 ==== Setting Up Logstash
@@ -334,6 +414,14 @@ Use the following commands to download and run Kibana.
 
 *deb or rpm:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Kibana has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 curl -L -O https://artifacts.elastic.co/downloads/kibana/kibana-{Kibana-version}-linux-x86_64.tar.gz
@@ -342,7 +430,17 @@ cd kibana-{Kibana-version}-linux-x86_64/
 ./bin/kibana
 ----------------------------------------------------------------------
 
+endif::[]
+
 *mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Kibana has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -352,7 +450,17 @@ cd kibana-{Kibana-version}-darwin-x86_64/
 ./bin/kibana
 ----------------------------------------------------------------------
 
+endif::[]
+
 *win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Kibana has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . Download the Kibana {Kibana-version} Windows zip file from the
 https://www.elastic.co/downloads/kibana[downloads page].
@@ -373,6 +481,8 @@ cd C:\Program Files\kibana-{Kibana-version}-windows
 ----------------------------------------------------------------------
 bin\kibana.bat
 ----------------------------------------------------------------------
+
+endif::[]
 
 You can find Kibana binaries for other operating systems on the
 https://www.elastic.co/downloads/kibana[Kibana downloads page].

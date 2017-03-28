@@ -41,12 +41,12 @@ var (
 		"machine_type":      c.Str("instanceType"),
 		"region":            c.Str("region"),
 		"availability_zone": c.Str("availabilityZone"),
-	}.Apply
+	}.ApplyNoError
 
 	doSchema = s.Schema{
 		"instance_id": c.StrFromNum("droplet_id"),
 		"region":      c.Str("region"),
-	}.Apply
+	}.ApplyNoError
 
 	gceHeaders = map[string]string{"Metadata-Flavor": "Google"}
 	gceSchema  = func(m map[string]interface{}) common.MapStr {

@@ -61,5 +61,6 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
-	return eventMapping(scanner, m.Host()), nil
+	data, _ := eventMapping(scanner, m.Host())
+	return data, nil
 }

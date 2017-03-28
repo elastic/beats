@@ -113,16 +113,6 @@ tags: [
   {%- endif -%}
 ]
 
-{% if geoip_paths is not none %}
-geoip:
-  paths: [
-      {%- for path in geoip_paths -%}
-          "{{ beat.working_dir + '/' + path }}"
-          {%- if not loop.last %}, {% endif -%}
-      {%- endfor -%}
-  ]
-{%- endif %}
-
 {%- if processors %}
 
 #================================ Filters =====================================

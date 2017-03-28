@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// QueryResult contains the result of a query.
 type QueryResult struct {
 	Ok           bool            `json:"ok"`
 	Index        string          `json:"_index"`
@@ -20,6 +21,7 @@ type QueryResult struct {
 	Matches      []string        `json:"matches"`
 }
 
+// SearchResults contains the results of a search.
 type SearchResults struct {
 	Took   int                        `json:"took"`
 	Shards json.RawMessage            `json:"_shards"`
@@ -27,11 +29,13 @@ type SearchResults struct {
 	Aggs   map[string]json.RawMessage `json:"aggregations"`
 }
 
+// Hits contains the hits.
 type Hits struct {
 	Total int
 	Hits  []json.RawMessage `json:"hits"`
 }
 
+// CountResults contains the count of results.
 type CountResults struct {
 	Count  int             `json:"count"`
 	Shards json.RawMessage `json:"_shards"`
@@ -109,6 +113,7 @@ func (es *Connection) Index(
 	return withQueryResult(es.apiCall(method, index, docType, id, "", params, body))
 }
 
+// Ingest pushes a pipeline of updates.
 func (es *Connection) Ingest(
 	index, docType, pipeline, id string,
 	params map[string]string,
@@ -160,7 +165,7 @@ func (es *Connection) DeletePipeline(
 	return withQueryResult(es.apiCall("DELETE", "_ingest", "pipeline", id, "", params, nil))
 }
 
-// A search request can be executed purely using a URI by providing request parameters.
+// SearchURI executes a search request using a URI by providing request parameters.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html
 func (es *Connection) SearchURI(index string, docType string, params map[string]string) (int, *SearchResults, error) {
 	status, resp, err := es.apiCall("GET", index, docType, "_search", "", params, nil)
@@ -171,6 +176,7 @@ func (es *Connection) SearchURI(index string, docType string, params map[string]
 	return status, result, err
 }
 
+// CountSearchURI counts the results for a search request.
 func (es *Connection) CountSearchURI(
 	index string, docType string,
 	params map[string]string,

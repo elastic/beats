@@ -85,7 +85,6 @@ addons:
     packages:
       - python-virtualenv
       - libpcap-dev
-      - geoip-database
 
 before_install:
   - umask 022

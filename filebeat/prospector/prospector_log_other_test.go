@@ -60,14 +60,14 @@ func TestMatchFile(t *testing.T) {
 
 	for _, test := range matchTests {
 
-		p := ProspectorLog{
+		l := Log{
 			config: prospectorConfig{
 				Paths:        test.paths,
 				ExcludeFiles: test.excludeFiles,
 			},
 		}
 
-		assert.Equal(t, test.result, p.matchesFile(test.file))
+		assert.Equal(t, test.result, l.matchesFile(test.file))
 	}
 }
 
@@ -129,7 +129,7 @@ var initStateTests = []struct {
 func TestInit(t *testing.T) {
 
 	for _, test := range initStateTests {
-		p := ProspectorLog{
+		l := Log{
 			Prospector: &Prospector{
 				states: &file.States{},
 				outlet: TestOutlet{},
@@ -145,9 +145,9 @@ func TestInit(t *testing.T) {
 			test.states[i] = state
 		}
 		states.SetStates(test.states)
-		err := p.LoadStates(states.GetStates())
+		err := l.LoadStates(states.GetStates())
 		assert.NoError(t, err)
-		assert.Equal(t, test.count, p.Prospector.states.Count())
+		assert.Equal(t, test.count, l.Prospector.states.Count())
 	}
 
 }

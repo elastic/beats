@@ -89,27 +89,6 @@ fields:
   region: us-east-1
 ------------------------------------------------------------------------------
 
-===== refresh_topology_freq
-
-deprecated[5.0.0]
-
-The refresh interval of the topology map in
-seconds. In other words, this setting specifies how often each Beat publishes its
-IP addresses to the topology map. The default is 10 seconds.
-
-===== topology_expire
-
-deprecated[5.0.0]
-
-The expiration time for the topology in seconds. This is useful in case a Beat
-stops publishing its IP addresses. The IP addresses are removed automatically
-from the topology map after expiration.
-
-This setting is used only by the Redis output. The other outputs don't support
-expiring entries.
-
-The default is 15 seconds.
-
 ===== queue_size
 
 The internal queue size for single events in the processing pipeline. The default
@@ -123,32 +102,3 @@ value is 1000.
 
 Sets the maximum number of CPUs that can be executing simultaneously. The
 default is the number of logical CPUs available in the system.
-
-===== geoip.paths
-
-deprecated[5.0.0, Please use the https://www.elastic.co/guide/en/elasticsearch/plugins/master/ingest-geoip.html[Geoip processor in Ingest Node] or the https://www.elastic.co/guide/en/logstash/current/plugins-filters-geoip.html[Logstash GeoIP filter] instead]
-
-This configuration option is currently used by Packetbeat only and it will be removed in version 6.0.
-
-The paths to search for GeoIP databases. The Beat loads the first installed GeoIP database
-that if finds. Then, for each transaction, the Beat exports the GeoIP location of the client.
-
-The recommended values for geoip.paths are `/usr/share/GeoIP/GeoLiteCity.dat`
-and `/usr/local/var/GeoIP/GeoLiteCity.dat`.
-
-If no paths are configured, GeoIP is disabled.
-
-Example:
-
-[source,yaml]
-------------------------------------------------------------------------------
-geoip:
-  paths:
-    - "/usr/share/GeoIP/GeoLiteCity.dat"
-    - "/usr/local/var/GeoIP/GeoLiteCity.dat"
-------------------------------------------------------------------------------
-
-*Important*: For GeoIP support to function correctly, the
-https://dev.maxmind.com/geoip/legacy/geolite/[GeoLite City database] is required.
-
-

@@ -18,7 +18,7 @@ type fileOutput struct {
 }
 
 // New instantiates a new file output instance.
-func New(beat common.BeatInfo, cfg *common.Config, _ int) (outputs.Outputer, error) {
+func New(beat common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err

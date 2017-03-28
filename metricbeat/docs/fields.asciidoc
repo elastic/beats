@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-haproxy>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
+* <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
@@ -3319,6 +3320,139 @@ Broker id
 type: keyword
 
 Broker address
+
+
+[[exported-fields-memcached]]
+== memcached Fields
+
+[]beta
+memcached Module
+
+
+
+[float]
+== memcached Fields
+
+
+
+
+[float]
+== stats Fields
+
+stats
+
+
+
+[float]
+=== memcached.stats.pid
+
+type: long
+
+Current process ID of the Memcached task.
+
+
+[float]
+=== memcached.stats.uptime.sec
+
+type: long
+
+Memcached server uptime.
+
+
+[float]
+=== memcached.stats.threads
+
+type: long
+
+Number of threads used by the current Memcached server process.
+
+
+[float]
+=== memcached.stats.connections.current
+
+type: long
+
+Number of open connections to this Memcached server, should be the same value on all servers during normal operation.
+
+
+[float]
+=== memcached.stats.connections.total
+
+type: long
+
+Numer of successful connect attempts to this server since it has been started.
+
+
+[float]
+=== memcached.stats.get.hits
+
+type: long
+
+Number of successful "get" commands (cache hits) since startup, divide them by the "cmd_get" value to get the cache hitrate.
+
+
+[float]
+=== memcached.stats.get.misses
+
+type: long
+
+Number of failed "get" requests because nothing was cached for this key or the cached value was too old.
+
+
+[float]
+=== memcached.stats.cmd.get
+
+type: long
+
+Number of "get" commands received since server startup not counting if they were successful or not.
+
+
+[float]
+=== memcached.stats.cmd.set
+
+type: long
+
+Number of "set" commands serviced since startup.
+
+
+[float]
+=== memcached.stats.read.bytes
+
+type: long
+
+Total number of bytes received from the network by this server.
+
+
+[float]
+=== memcached.stats.written.bytes
+
+type: long
+
+Total number of bytes send to the network by this server.
+
+
+[float]
+=== memcached.stats.items.current
+
+type: long
+
+Number of items currently in this server's cache.
+
+
+[float]
+=== memcached.stats.items.total
+
+type: long
+
+Number of items stored ever stored on this server. This is no "maximum item count" value but a counted increased by every new item stored in the cache.
+
+
+[float]
+=== memcached.stats.evictions
+
+type: long
+
+Number of objects removed from the cache to free up memory for new items because Memcached reached it's maximum memory setting (limit_maxbytes).
 
 
 [[exported-fields-mongodb]]

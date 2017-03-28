@@ -2,13 +2,11 @@ package publish
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/nranchev/go-libGeoIP"
 )
 
 type Transactions interface {
@@ -24,7 +22,6 @@ type PacketbeatPublisher struct {
 	client publisher.Client
 
 	topo           topologyProvider
-	geoLite        *libgeo.GeoIP
 	ignoreOutgoing bool
 
 	wg   sync.WaitGroup
@@ -44,7 +41,6 @@ type ChanTransactions struct {
 type topologyProvider interface {
 	IsPublisherIP(ip string) bool
 	GetServerName(ip string) string
-	GeoLite() *libgeo.GeoIP
 }
 
 func (t *ChanTransactions) PublishTransaction(event common.MapStr) bool {
@@ -67,7 +63,6 @@ func NewPublisher(
 	return &PacketbeatPublisher{
 		pub:            pub,
 		topo:           topo,
-		geoLite:        topo.GeoLite(),
 		ignoreOutgoing: ignoreOutgoing,
 		client:         pub.Connect(),
 		done:           make(chan struct{}),
@@ -151,10 +146,6 @@ func (p *PacketbeatPublisher) onFlow(events []common.MapStr) {
 			continue
 		}
 
-		if !p.addGeoIPToFlow(event) {
-			continue
-		}
-
 		pub = append(pub, event)
 	}
 
@@ -232,79 +223,6 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 		}
 
 	}
-
-	if p.geoLite != nil {
-		realIP, exists := event["real_ip"]
-		if exists && len(realIP.(common.NetString)) > 0 {
-			loc := p.geoLite.GetLocationByIP(string(realIP.(common.NetString)))
-			if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
-				loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
-				event["client_location"] = loc
-			}
-		} else {
-			if len(srcServer) == 0 && src != nil { // only for external IP addresses
-				loc := p.geoLite.GetLocationByIP(src.IP)
-				if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
-					loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
-					event["client_location"] = loc
-				}
-			}
-		}
-	}
-
-	return true
-}
-
-func (p *PacketbeatPublisher) addGeoIPToFlow(event common.MapStr) bool {
-
-	getLocation := func(host common.MapStr, ip_type string) string {
-
-		ip, exists := host[ip_type]
-		if !exists {
-			return ""
-		}
-
-		str, ok := ip.(string)
-		if !ok {
-			logp.Warn("IP address must be string")
-			return ""
-		}
-		loc := p.geoLite.GetLocationByIP(str)
-		if loc == nil || loc.Latitude == 0 || loc.Longitude == 0 {
-			return ""
-		}
-
-		return fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
-	}
-
-	if p.geoLite == nil {
-		return true
-	}
-
-	ipFieldNames := [][]string{
-		{"ip", "ip_location"},
-		{"outter_ip", "outter_ip_location"},
-		{"ipv6", "ipv6_location"},
-		{"outter_ipv6", "outter_ipv6_location"},
-	}
-
-	source := event["source"].(common.MapStr)
-	dest := event["dest"].(common.MapStr)
-
-	for _, name := range ipFieldNames {
-
-		loc := getLocation(source, name[0])
-		if loc != "" {
-			source[name[1]] = loc
-		}
-
-		loc = getLocation(dest, name[0])
-		if loc != "" {
-			dest[name[1]] = loc
-		}
-	}
-	event["source"] = source
-	event["dest"] = dest
 
 	return true
 }

@@ -4,8 +4,6 @@ import:
   version: v1.0.0
 - package: gopkg.in/yaml.v2
   version: a83829b6f1293c91addabc89d0571c246397bbf4
-- package: github.com/nranchev/go-libGeoIP
-  version: c78e8bd2dd3599feb21fd30886043979e82fe948
 - package: golang.org/x/sys
   version: 62bee037599929a6e9146f29d10dd5208c43507d
   subpackages:
