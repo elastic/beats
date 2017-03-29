@@ -1,0 +1,19 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"path": "appengine/cloudsql",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "xmTgJXWHguGKHPuZE50FIbs88L0=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "a0583e0143b1624142adab07e0e97fe106d99561",
+			"revisionTime": "2016-12-01T11:50:36Z",
+			"version": "v1.3",
+			"versionExact": "v1.3"
+		}
+	],
+	"rootPath": "github.com/elastic/beats/metricbeat/module/mysql"
+}
