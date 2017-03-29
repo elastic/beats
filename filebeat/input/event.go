@@ -81,7 +81,7 @@ func (e *Event) ToMapStr() common.MapStr {
 	return event
 }
 
-func (e *Event) GetEventHolder() Data {
+func (e *Event) GetData() Data {
 	return Data{
 		Event: e.ToMapStr(),
 		Metadata: EventMeta{

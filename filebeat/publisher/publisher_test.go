@@ -37,7 +37,7 @@ func makeEvents(name string, n int) []*input.Data {
 			},
 		}
 
-		eventHolder := event.GetEventHolder()
+		eventHolder := event.GetData()
 		events = append(events, &eventHolder)
 	}
 	return events

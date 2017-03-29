@@ -214,7 +214,7 @@ func (p *Prospector) updateState(event *input.Event) error {
 	event.Module = p.config.Module
 	event.Fileset = p.config.Fileset
 
-	eventHolder := event.GetEventHolder()
+	eventHolder := event.GetData()
 	ok := p.outlet.OnEvent(&eventHolder)
 
 	if !ok {
