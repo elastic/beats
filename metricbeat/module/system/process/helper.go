@@ -40,6 +40,8 @@ type ProcStats struct {
 	ProcsMap     ProcsMap
 	CpuTicks     bool
 	EnvWhitelist []string
+	MinCpu       float64
+	MinMemory    uint64
 
 	procRegexps []match.Matcher // List of regular expressions used to whitelist processes.
 	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
@@ -364,7 +366,12 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 			last := procStats.ProcsMap[process.Pid]
 			proc := procStats.GetProcessEvent(process, last)
 
-			processes = append(processes, proc)
+			currentCpu := proc["cpu"].(common.MapStr)["total"].(common.MapStr)["pct"].(float64)
+			currentMemory := proc["memory"].(common.MapStr)["rss"].(common.MapStr)["bytes"].(uint64)
+
+			if currentCpu >= procStats.MinCpu || currentMemory >= procStats.MinMemory {
+				processes = append(processes, proc)
+			}
 		}
 	}
 

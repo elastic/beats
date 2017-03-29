@@ -33,6 +33,12 @@
   period: 10s
   processes: ['.*']
 
+  # Min cpu percent require to send data of the process. Default : 0.
+  #minCpu: 0.0000
+
+  # Min rss memory in bytes requite to send data of the process. Default : 0.
+  #minMemory: 0
+
   # if true, exports the CPU usage in ticks, together with the percentage values
   #cpu_ticks: false
 

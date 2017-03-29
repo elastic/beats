@@ -38,6 +38,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Cgroups      *bool    `config:"process.cgroups.enabled"`
 		EnvWhitelist []string `config:"process.env.whitelist"`
 		CPUTicks     bool     `config:"cpu_ticks"`
+		MinCpu       float64  `config:"minCpu"`
+		MinMemory    uint64   `config:"minMemory"`
 	}{
 		Procs: []string{".*"}, // collect all processes by default
 	}
@@ -51,6 +53,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			Procs:        config.Procs,
 			EnvWhitelist: config.EnvWhitelist,
 			CpuTicks:     config.CPUTicks,
+			MinCpu:       config.MinCpu,
+			MinMemory:    config.MinMemory,
 		},
 	}
 	err := m.stats.InitProcStats()
