@@ -19,18 +19,18 @@ type Event struct {
 }
 
 type EventMeta struct {
+	common.EventMetadata
 	Pipeline     string
 	Fileset      string
 	Module       string
 	InputType    string
 	DocumentType string
-	common.EventMetadata
-	ReadTime time.Time
-	Bytes    int
-	State    file.State
+	ReadTime     time.Time
+	Bytes        int
+	State        file.State
 }
 
-type EventHolder struct {
+type Data struct {
 	Event    common.MapStr
 	Metadata EventMeta
 }
@@ -81,8 +81,8 @@ func (e *Event) ToMapStr() common.MapStr {
 	return event
 }
 
-func (e *Event) GetEventHolder() EventHolder {
-	return EventHolder{
+func (e *Event) GetEventHolder() Data {
+	return Data{
 		Event: e.ToMapStr(),
 		Metadata: EventMeta{
 			Pipeline:      e.Pipeline,
@@ -98,7 +98,7 @@ func (e *Event) GetEventHolder() EventHolder {
 
 // Metadata creates a common.MapStr containing the metadata to
 // be associated with the event.
-func (eh *EventHolder) GetMetadata() common.MapStr {
+func (eh *Data) GetMetadata() common.MapStr {
 	if eh.Metadata.Pipeline != "" {
 		return common.MapStr{
 			"pipeline": eh.Metadata.Pipeline,
@@ -109,7 +109,7 @@ func (eh *EventHolder) GetMetadata() common.MapStr {
 
 // HasData returns true if the event itself contains data
 // Events without data are only state updates
-func (eh *EventHolder) HasData() bool {
+func (eh *Data) HasData() bool {
 	return eh.Metadata.Bytes > 0
 }
 

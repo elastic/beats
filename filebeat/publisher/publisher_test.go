@@ -16,17 +16,17 @@ import (
 
 type collectLogger struct {
 	wg     *sync.WaitGroup
-	events [][]*input.EventHolder
+	events [][]*input.Data
 }
 
-func (l *collectLogger) Published(events []*input.EventHolder) bool {
+func (l *collectLogger) Published(events []*input.Data) bool {
 	l.wg.Done()
 	l.events = append(l.events, events)
 	return true
 }
 
-func makeEvents(name string, n int) []*input.EventHolder {
-	var events []*input.EventHolder
+func makeEvents(name string, n int) []*input.Data {
+	var events []*input.Data
 	for i := 0; i < n; i++ {
 		event := &input.Event{
 			EventMeta: input.EventMeta{
@@ -59,7 +59,7 @@ func TestPublisherModes(t *testing.T) {
 
 		wg := sync.WaitGroup{}
 
-		pubChan := make(chan []*input.EventHolder, len(test.order)+1)
+		pubChan := make(chan []*input.Data, len(test.order)+1)
 		collector := &collectLogger{&wg, nil}
 		client := pubtest.NewChanClient(0)
 
@@ -67,7 +67,7 @@ func TestPublisherModes(t *testing.T) {
 			pubtest.PublisherWithClient(client))
 		pub.Start()
 
-		var events [][]*input.EventHolder
+		var events [][]*input.Data
 		for i := range test.order {
 			tmp := makeEvents(fmt.Sprintf("msg: %v", i), 1)
 			wg.Add(1)

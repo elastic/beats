@@ -24,12 +24,12 @@ type LogPublisher interface {
 type SuccessLogger interface {
 
 	// Published will be run after events have been acknowledged by the outputs.
-	Published(events []*input.EventHolder) bool
+	Published(events []*input.Data) bool
 }
 
 func New(
 	async bool,
-	in chan []*input.EventHolder,
+	in chan []*input.Data,
 	out SuccessLogger,
 	pub publisher.Publisher,
 ) LogPublisher {
@@ -46,7 +46,7 @@ var (
 
 // getDataEvents returns all events which contain data (not only state updates)
 // together with their associated metadata
-func getDataEvents(events []*input.EventHolder) (dataEvents []common.MapStr, meta []common.MapStr) {
+func getDataEvents(events []*input.Data) (dataEvents []common.MapStr, meta []common.MapStr) {
 	dataEvents = make([]common.MapStr, 0, len(events))
 	meta = make([]common.MapStr, 0, len(events))
 	for _, event := range events {

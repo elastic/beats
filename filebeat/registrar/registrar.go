@@ -17,7 +17,7 @@ import (
 )
 
 type Registrar struct {
-	Channel      chan []*input.EventHolder
+	Channel      chan []*input.Data
 	out          publisher.SuccessLogger
 	done         chan struct{}
 	registryFile string       // Path to the Registry File
@@ -38,7 +38,7 @@ func New(registryFile string, out publisher.SuccessLogger) (*Registrar, error) {
 		registryFile: registryFile,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
-		Channel:      make(chan []*input.EventHolder, 1),
+		Channel:      make(chan []*input.Data, 1),
 		out:          out,
 		wg:           sync.WaitGroup{},
 	}
@@ -153,7 +153,7 @@ func (r *Registrar) Run() {
 	}()
 
 	for {
-		var events []*input.EventHolder
+		var events []*input.Data
 
 		select {
 		case <-r.done:
@@ -183,7 +183,7 @@ func (r *Registrar) Run() {
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
-func (r *Registrar) processEventStates(events []*input.EventHolder) {
+func (r *Registrar) processEventStates(events []*input.Data) {
 	logp.Debug("registrar", "Processing %d events", len(events))
 
 	// skip stdin
