@@ -90,7 +90,7 @@ fmt: python-env
 .PHONY: lint
 lint:
 	@go get $(GOLINT_REPO) $(REVIEWDOG_REPO)
-	$(GOLINT) ./... | $(REVIEWDOG) $(REVIEWDOG_OPTIONS)
+	$(GOLINT) $(go list ./... | grep -v /vendor/) | $(REVIEWDOG) $(REVIEWDOG_OPTIONS)
 
 # Collects all dashboards and generates dashboard folder for https://github.com/elastic/beats-dashboards/tree/master/dashboards
 .PHONY: beats-dashboards
