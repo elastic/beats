@@ -13,11 +13,11 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/filebeat/input"
 )
 
 type Registrar struct {
-	Channel      chan []*common.MapStr
+	Channel      chan []*input.EventHolder
 	out          publisher.SuccessLogger
 	done         chan struct{}
 	registryFile string       // Path to the Registry File
@@ -38,7 +38,7 @@ func New(registryFile string, out publisher.SuccessLogger) (*Registrar, error) {
 		registryFile: registryFile,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
-		Channel:      make(chan []*common.MapStr, 1),
+		Channel:      make(chan []*input.EventHolder, 1),
 		out:          out,
 		wg:           sync.WaitGroup{},
 	}
@@ -153,7 +153,7 @@ func (r *Registrar) Run() {
 	}()
 
 	for {
-		var events []*common.MapStr
+		var events []*input.EventHolder
 
 		select {
 		case <-r.done:
@@ -183,28 +183,19 @@ func (r *Registrar) Run() {
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
-func (r *Registrar) processEventStates(events []*common.MapStr) {
+func (r *Registrar) processEventStates(events []*input.EventHolder) {
 	logp.Debug("registrar", "Processing %d events", len(events))
 
-	// Take the last event found for each file source
+
+	// skip stdin
 	for _, event := range events {
 
 		// skip stdin
-		inputIface, err := event.GetValue("input_type"); if err == nil {
-			input_string, ok := inputIface.(string); if ok {
-				if input_string == cfg.StdinInputType {
-					continue
-				}
-			}
+		if event.Metadata.InputType == cfg.StdinInputType {
+			continue
 		}
-
-		stateIface, err := event.GetValue("state"); if err == nil {
-			state, ok := stateIface.(file.State); if ok {
-				r.states.Update(state)
-				statesUpdate.Add(1)
-			}
-		}
-
+		r.states.Update(event.Metadata.State)
+		statesUpdate.Add(1)
 	}
 }
 

@@ -41,7 +41,7 @@ type Prospector struct {
 	registry      *harvesterRegistry
 	beatDone      chan struct{}
 	eventCounter  *sync.WaitGroup
-	filters       *processors.Processors
+	processors    *processors.Processors
 }
 
 // Prospectorer is the interface common to all prospectors
@@ -52,7 +52,7 @@ type Prospectorer interface {
 
 // Outlet is the outlet for a prospector
 type Outlet interface {
-	OnEvent(event *common.MapStr) bool
+	OnEvent(event *input.EventHolder) bool
 }
 
 // NewProspector instantiates a new prospector
@@ -86,12 +86,12 @@ func NewProspector(cfg *common.Config, outlet Outlet, beatDone chan struct{}) (*
 		return nil, err
 	}
 
-	f, err := processors.New(prospector.config.Filters)
+	f, err := processors.New(prospector.config.Processors)
 	if err != nil {
 		return nil, err
 	}
 
-	prospector.filters = f
+	prospector.processors = f
 
 	logp.Debug("prospector", "File Configs: %v", prospector.config.Paths)
 
@@ -223,19 +223,26 @@ func (p *Prospector) updateState(event *input.Event) error {
 	event.Module = p.config.Module
 	event.Fileset = p.config.Fileset
 
-	eventMap := event.ToMapStr()
-
+	eventHolder := event.GetEventHolder()
 	//run the filters before sending to
-	eventMap = p.filters.Run(eventMap)
-	if eventMap != nil {
-		//processor might decide to drop the event
-		ok := p.outlet.OnEvent(&eventMap)
-		if !ok {
-			logp.Info("Prospector outlet closed")
-			return errors.New("prospector outlet closed")
-		}
+	if event.Bytes > 0 {
+		eventHolder.Event = p.processors.Run(eventHolder.Event)
 	}
 
+	var ok bool
+	if eventHolder.Event != nil {
+		//processor might decide to drop the event
+		ok = p.outlet.OnEvent(&eventHolder)
+
+	} else {
+		eventHolder.Metadata.Bytes = 0
+		ok = p.outlet.OnEvent(&eventHolder)
+	}
+
+	if !ok {
+		logp.Info("Prospector outlet closed")
+		return errors.New("prospector outlet closed")
+	}
 
 	p.states.Update(event.State)
 	return nil

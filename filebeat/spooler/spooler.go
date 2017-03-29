@@ -6,7 +6,7 @@ import (
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/filebeat/input"
 )
 
 var debugf = logp.MakeDebug("spooler")
@@ -16,16 +16,16 @@ const channelSize = 16
 
 // Spooler aggregates the events and sends the aggregated data to the publisher.
 type Spooler struct {
-	Channel chan *common.MapStr // Channel is the input to the Spooler.
+	Channel chan *input.EventHolder // Channel is the input to the Spooler.
 	config  spoolerConfig
 	output  Output         // batch event output on flush
-	spool   []*common.MapStr // Events being held by the Spooler.
+	spool   []*input.EventHolder // Events being held by the Spooler.
 	wg      sync.WaitGroup // WaitGroup used to control the shutdown.
 }
 
 // Output spooler sends event to through Send method
 type Output interface {
-	Send(events []*common.MapStr) bool
+	Send(events []*input.EventHolder) bool
 }
 
 type spoolerConfig struct {
@@ -40,13 +40,13 @@ func New(
 	out Output,
 ) (*Spooler, error) {
 	return &Spooler{
-		Channel: make(chan *common.MapStr, channelSize),
+		Channel: make(chan *input.EventHolder, channelSize),
 		config: spoolerConfig{
 			idleTimeout: config.IdleTimeout,
 			spoolSize:   config.SpoolSize,
 		},
 		output: out,
-		spool:  make([]*common.MapStr, 0, config.SpoolSize),
+		spool:  make([]*input.EventHolder, 0, config.SpoolSize),
 	}, nil
 }
 
@@ -111,7 +111,7 @@ func (s *Spooler) Stop() {
 // queue queues a single event to be spooled. If the queue reaches spoolSize
 // while calling this method then all events in the queue will be flushed to
 // the publisher.
-func (s *Spooler) queue(event *common.MapStr) bool {
+func (s *Spooler) queue(event *input.EventHolder) bool {
 	flushed := false
 	s.spool = append(s.spool, event)
 	if len(s.spool) == cap(s.spool) {
@@ -131,7 +131,7 @@ func (s *Spooler) flush() int {
 	}
 
 	// copy buffer
-	tmpCopy := make([]*common.MapStr, count)
+	tmpCopy := make([]*input.EventHolder, count)
 	copy(tmpCopy, s.spool)
 
 	// clear buffer

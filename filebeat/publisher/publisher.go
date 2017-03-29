@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/filebeat/input"
 )
 
 var (
@@ -23,12 +24,12 @@ type LogPublisher interface {
 type SuccessLogger interface {
 
 	// Published will be run after events have been acknowledged by the outputs.
-	Published(events []*common.MapStr) bool
+	Published(events []*input.EventHolder) bool
 }
 
 func New(
 	async bool,
-	in chan []*common.MapStr,
+	in chan []*input.EventHolder,
 	out SuccessLogger,
 	pub publisher.Publisher,
 ) LogPublisher {
@@ -45,18 +46,14 @@ var (
 
 // getDataEvents returns all events which contain data (not only state updates)
 // together with their associated metadata
-func getDataEvents(events []*common.MapStr) (dataEvents []common.MapStr, meta []common.MapStr) {
+func getDataEvents(events []*input.EventHolder) (dataEvents []common.MapStr, meta []common.MapStr) {
 	dataEvents = make([]common.MapStr, 0, len(events))
 	meta = make([]common.MapStr, 0, len(events))
 	for _, event := range events {
-		if ok, _ := event.HasKey("meta"); ok {
-			mIface, err := event.GetValue("meta"); if err != nil {
-				meta = append(meta, mIface.(common.MapStr))
-			}
-			event.Delete("meta")
+		if event.HasData() {
+			dataEvents = append(dataEvents, event.Event)
+			meta = append(meta, event.GetMetadata())
 		}
-		dataEvents = append(dataEvents, *event)
-
 	}
 	return dataEvents, meta
 }

@@ -11,24 +11,38 @@ import (
 
 // Event is sent to the output and must contain all relevant information
 type Event struct {
-	common.EventMetadata
-	ReadTime     time.Time
-	InputType    string
-	DocumentType string
-	Bytes        int
+	*EventMeta
 	Text         *string
 	JSONConfig   *reader.JSONConfig
-	State        file.State
 	Data         common.MapStr // Use in readers to add data to the event
+
+}
+
+type EventMeta struct {
 	Pipeline     string
 	Fileset      string
 	Module       string
+	InputType    string
+	DocumentType string
+	common.EventMetadata
+	ReadTime     time.Time
+	Bytes        int
+	State        file.State
+}
+
+type EventHolder struct {
+	Event common.MapStr
+	Metadata EventMeta
+
 }
 
 func NewEvent(state file.State) *Event {
 	return &Event{
-		State: state,
+		EventMeta: &EventMeta{
+			State: state,
+		},
 	}
+
 }
 
 func (e *Event) ToMapStr() common.MapStr {
@@ -40,6 +54,7 @@ func (e *Event) ToMapStr() common.MapStr {
 		"type":                  e.DocumentType,
 		"input_type":            e.InputType,
 	}
+
 
 	if e.Fileset != "" && e.Module != "" {
 		event["fileset"] = common.MapStr{
@@ -65,19 +80,31 @@ func (e *Event) ToMapStr() common.MapStr {
 		event["message"] = *e.Text
 	}
 
-	meta := e.Metadata(); if meta != nil {
-		event["meta"] = meta
-	}
-
 	return event
 }
 
+func (e *Event) GetEventHolder() EventHolder {
+	return EventHolder{
+		Event: e.ToMapStr(),
+		Metadata: EventMeta{
+			Pipeline: e.Pipeline,
+			Bytes: e.Bytes,
+			State: e.State,
+			Fileset: e.Fileset,
+			Module: e.Module,
+			ReadTime: e.ReadTime,
+			EventMetadata: e.EventMetadata,
+		},
+	}
+}
+
+
 // Metadata creates a common.MapStr containing the metadata to
 // be associated with the event.
-func (e *Event) Metadata() common.MapStr {
-	if e.Pipeline != "" {
+func (eh *EventHolder) GetMetadata() common.MapStr {
+	if eh.Metadata.Pipeline != "" {
 		return common.MapStr{
-			"pipeline": e.Pipeline,
+			"pipeline": eh.Metadata.Pipeline,
 		}
 	}
 	return nil
@@ -85,8 +112,8 @@ func (e *Event) Metadata() common.MapStr {
 
 // HasData returns true if the event itself contains data
 // Events without data are only state updates
-func (e *Event) HasData() bool {
-	return e.Bytes > 0
+func (eh *EventHolder) HasData() bool {
+	return eh.Metadata.Bytes > 0
 }
 
 // mergeJSONFields writes the JSON fields in the event map,

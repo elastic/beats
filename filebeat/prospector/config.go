@@ -44,7 +44,7 @@ type prospectorConfig struct {
 	Pipeline             string             `config:"pipeline"`
 	Module               string             `config:"_module_name"`  // hidden option to set the module name
 	Fileset              string             `config:"_fileset_name"` // hidden option to set the fileset name
-	Filters              processors.PluginConfig `config:"filters"`
+	Processors              processors.PluginConfig `config:"processors"`
 }
 
 func (config *prospectorConfig) Validate() error {

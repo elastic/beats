@@ -7,13 +7,13 @@ import (
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/filebeat/input"
 )
 
 type asyncLogPublisher struct {
 	pub    publisher.Publisher
 	client publisher.Client
-	in     chan []*common.MapStr
+	in     chan []*input.EventHolder
 	out    SuccessLogger
 
 	// list of in-flight batches
@@ -29,7 +29,7 @@ type asyncLogPublisher struct {
 type eventsBatch struct {
 	next   *eventsBatch
 	flag   int32
-	events []*common.MapStr
+	events []*input.EventHolder
 }
 
 type batchList struct {
@@ -50,7 +50,7 @@ const (
 )
 
 func newAsyncLogPublisher(
-	in chan []*common.MapStr,
+	in chan []*input.EventHolder,
 	out SuccessLogger,
 	pub publisher.Publisher,
 ) *asyncLogPublisher {

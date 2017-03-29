@@ -5,13 +5,13 @@ import (
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/filebeat/input"
 )
 
 type syncLogPublisher struct {
 	pub    publisher.Publisher
 	client publisher.Client
-	in     chan []*common.MapStr
+	in     chan []*input.EventHolder
 	out    SuccessLogger
 
 	done chan struct{}
@@ -19,7 +19,7 @@ type syncLogPublisher struct {
 }
 
 func newSyncLogPublisher(
-	in chan []*common.MapStr,
+	in chan []*input.EventHolder,
 	out SuccessLogger,
 	pub publisher.Publisher,
 ) *syncLogPublisher {
@@ -51,7 +51,7 @@ func (p *syncLogPublisher) Start() {
 }
 
 func (p *syncLogPublisher) Publish() error {
-	var events []*common.MapStr
+	var events []*input.EventHolder
 	select {
 	case <-p.done:
 		return sigPublisherStop
