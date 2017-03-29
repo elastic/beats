@@ -70,6 +70,21 @@ the following:
 Simply delete the `deb-src` entry from the `/etc/apt/sources.list` file, and the installation should work as expected.
 ==================================================
 
+ifeval::["{beatname_uc}"=="Heartbeat"]
+
+. On Debian or Ubuntu, pin the repository before installing to ensure that the
+correct Elastic Heartbeat package is installed. To do this, edit 
+`/etc/apt/preferences` (or `/etc/apt/preferences.d/heartbeat`) as follows:
++
+[source,shell]
+--------------------------------------------------
+Package: heartbeat
+Pin: origin artifacts.elastic.co
+Pin-Priority: 700
+--------------------------------------------------
+
+endif::[]
+
 . Run `apt-get update`, and the repository is ready for use. For example, you can
 install {beatname_uc} by running:
 +
