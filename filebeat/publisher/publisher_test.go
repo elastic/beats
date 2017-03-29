@@ -16,25 +16,29 @@ import (
 
 type collectLogger struct {
 	wg     *sync.WaitGroup
-	events [][]*input.Event
+	events [][]*input.EventHolder
 }
 
-func (l *collectLogger) Published(events []*input.Event) bool {
+func (l *collectLogger) Published(events []*input.EventHolder) bool {
 	l.wg.Done()
 	l.events = append(l.events, events)
 	return true
 }
 
-func makeEvents(name string, n int) []*input.Event {
-	var events []*input.Event
+func makeEvents(name string, n int) []*input.EventHolder {
+	var events []*input.EventHolder
 	for i := 0; i < n; i++ {
 		event := &input.Event{
-			ReadTime:     time.Now(),
-			InputType:    "log",
-			DocumentType: "log",
-			Bytes:        100,
+			EventMeta: input.EventMeta{
+				ReadTime:     time.Now(),
+				InputType:    "log",
+				DocumentType: "log",
+				Bytes:        100,
+			},
 		}
-		events = append(events, event)
+
+		eventHolder := event.GetEventHolder()
+		events = append(events, &eventHolder)
 	}
 	return events
 }
@@ -55,7 +59,7 @@ func TestPublisherModes(t *testing.T) {
 
 		wg := sync.WaitGroup{}
 
-		pubChan := make(chan []*input.Event, len(test.order)+1)
+		pubChan := make(chan []*input.EventHolder, len(test.order)+1)
 		collector := &collectLogger{&wg, nil}
 		client := pubtest.NewChanClient(0)
 
@@ -63,7 +67,7 @@ func TestPublisherModes(t *testing.T) {
 			pubtest.PublisherWithClient(client))
 		pub.Start()
 
-		var events [][]*input.Event
+		var events [][]*input.EventHolder
 		for i := range test.order {
 			tmp := makeEvents(fmt.Sprintf("msg: %v", i), 1)
 			wg.Add(1)

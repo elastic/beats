@@ -8,12 +8,12 @@ import (
 	"sync"
 
 	cfg "github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/filebeat/input"
 )
 
 type Registrar struct {
@@ -185,7 +185,6 @@ func (r *Registrar) Run() {
 // processEventStates gets the states from the events and writes them to the registrar state
 func (r *Registrar) processEventStates(events []*input.EventHolder) {
 	logp.Debug("registrar", "Processing %d events", len(events))
-
 
 	// skip stdin
 	for _, event := range events {

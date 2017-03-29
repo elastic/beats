@@ -3,9 +3,9 @@ package publisher
 import (
 	"sync"
 
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/filebeat/input"
 )
 
 type syncLogPublisher struct {

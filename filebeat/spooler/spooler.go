@@ -5,8 +5,8 @@ import (
 	"time"
 
 	cfg "github.com/elastic/beats/filebeat/config"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 var debugf = logp.MakeDebug("spooler")
@@ -18,9 +18,9 @@ const channelSize = 16
 type Spooler struct {
 	Channel chan *input.EventHolder // Channel is the input to the Spooler.
 	config  spoolerConfig
-	output  Output         // batch event output on flush
+	output  Output               // batch event output on flush
 	spool   []*input.EventHolder // Events being held by the Spooler.
-	wg      sync.WaitGroup // WaitGroup used to control the shutdown.
+	wg      sync.WaitGroup       // WaitGroup used to control the shutdown.
 }
 
 // Output spooler sends event to through Send method

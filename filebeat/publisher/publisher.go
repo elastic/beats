@@ -3,11 +3,11 @@ package publisher
 import (
 	"errors"
 
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/filebeat/input"
 )
 
 var (

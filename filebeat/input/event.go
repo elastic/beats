@@ -11,10 +11,10 @@ import (
 
 // Event is sent to the output and must contain all relevant information
 type Event struct {
-	*EventMeta
-	Text         *string
-	JSONConfig   *reader.JSONConfig
-	Data         common.MapStr // Use in readers to add data to the event
+	EventMeta
+	Text       *string
+	JSONConfig *reader.JSONConfig
+	Data       common.MapStr // Use in readers to add data to the event
 
 }
 
@@ -25,20 +25,19 @@ type EventMeta struct {
 	InputType    string
 	DocumentType string
 	common.EventMetadata
-	ReadTime     time.Time
-	Bytes        int
-	State        file.State
+	ReadTime time.Time
+	Bytes    int
+	State    file.State
 }
 
 type EventHolder struct {
-	Event common.MapStr
+	Event    common.MapStr
 	Metadata EventMeta
-
 }
 
 func NewEvent(state file.State) *Event {
 	return &Event{
-		EventMeta: &EventMeta{
+		EventMeta: EventMeta{
 			State: state,
 		},
 	}
@@ -54,7 +53,6 @@ func (e *Event) ToMapStr() common.MapStr {
 		"type":                  e.DocumentType,
 		"input_type":            e.InputType,
 	}
-
 
 	if e.Fileset != "" && e.Module != "" {
 		event["fileset"] = common.MapStr{
@@ -87,17 +85,16 @@ func (e *Event) GetEventHolder() EventHolder {
 	return EventHolder{
 		Event: e.ToMapStr(),
 		Metadata: EventMeta{
-			Pipeline: e.Pipeline,
-			Bytes: e.Bytes,
-			State: e.State,
-			Fileset: e.Fileset,
-			Module: e.Module,
-			ReadTime: e.ReadTime,
+			Pipeline:      e.Pipeline,
+			Bytes:         e.Bytes,
+			State:         e.State,
+			Fileset:       e.Fileset,
+			Module:        e.Module,
+			ReadTime:      e.ReadTime,
 			EventMetadata: e.EventMetadata,
 		},
 	}
 }
-
 
 // Metadata creates a common.MapStr containing the metadata to
 // be associated with the event.
