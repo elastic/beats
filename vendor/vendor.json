@@ -3,7 +3,7 @@
 	"ignore": "test github.com/elastic/beats/metricbeat/module github.com/elastic/beats/dev-tools",
 	"package": [
 		{
-			"checksumSHA1": "NCedHsLo1e/0Okb2ZxpAScSwYS4=",
+			"checksumSHA1": "WfQhuFTJ3zYmzVjeghW+9e76Yq0=",
 			"origin": "github.com/urso/sarama",
 			"path": "github.com/Shopify/sarama",
 			"revision": "f0996189c86dc27338468f2a9b10077c6d572b34",
@@ -262,6 +262,13 @@
 			"revisionTime": "2016-01-12T16:53:51Z"
 		},
 		{
+			"checksumSHA1": "jFvSgd78ZfuFULvWd6uFD5mi+94=",
+			"path": "github.com/pierrre/gotestcover",
+			"revision": "7b94f124d338b6ae06df22bc2ee7909af27aae85",
+			"revisionTime": "2016-01-13T21:25:33Z",
+			"tree": true
+		},
+		{
 			"checksumSHA1": "ynJSWoF6v+3zMnh9R0QmmG6iGV8=",
 			"path": "github.com/pkg/errors",
 			"revision": "ff09b135c25aae272398c51a07235b90a75aa4f0",
@@ -328,7 +335,7 @@
 			"revisionTime": "2015-09-28T12:21:52Z"
 		},
 		{
-			"checksumSHA1": "//nq52B3yPi7FCVgt4DjFnpzoMs=",
+			"checksumSHA1": "Z7NuzgpfDQhKRvVq4qsbD/v9cIY=",
 			"path": "github.com/stretchr/testify",
 			"revision": "f390dcf405f7b83c997eac1b06768bb9f44dec18",
 			"revisionTime": "2016-01-09T20:38:47Z",
