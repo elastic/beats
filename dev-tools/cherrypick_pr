@@ -120,7 +120,7 @@ def main():
 
         # create PR
         request = session.post(base + "/pulls", json=dict(
-            title="Cherry-pick to {}: {}".format(args.to_branch, original_pr["title"]),
+            title="Cherry-pick #{} to {}: {}".format(args.pr_number, args.to_branch, original_pr["title"]),
             head=remote_user + ":" + tmp_branch,
             base=args.to_branch,
             body="Cherry-pick of PR #{} to {} branch. Original message: \n\n{}"
@@ -134,6 +134,9 @@ def main():
         # add labels
         session.post(
             base + "/issues/{}/labels".format(new_pr["number"]), json=["backport", "review"])
+
+        # remove needs backport label from the original PR
+        session.delete(base + "/issues/{}/labels/needs_backport".format(args.pr_number))
 
         print("\nDone. PR created: {}".format(new_pr["html_url"]))
         print("Please go and check it and add the review tags")
