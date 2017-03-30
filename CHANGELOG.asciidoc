@@ -88,6 +88,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - The `symlinks` and `harverster_limit` settings are now GA, instead of experimental. {pull}3525[3525]
 - close_timeout is also applied when the output is blocking. {pull}3511[3511]
 - Improve handling of different path variants on Windows. {pull}3781[3781]
+- Restructure input.Event to be inline with outputs.Data {pull}3823[3823]
 
 *Heartbeat*
 
