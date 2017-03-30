@@ -2,7 +2,9 @@
 
 package ole
 
-import "unsafe"
+import (
+	"unsafe"
+)
 
 type SafeArrayConversion struct {
 	Array *SafeArray
@@ -24,8 +26,74 @@ func (sac *SafeArrayConversion) ToByteArray() (bytes []byte) {
 	bytes = make([]byte, totalElements)
 
 	for i := int64(0); i < totalElements; i++ {
-		ptr, _ := safeArrayGetElement(sac.Array, i)
-		bytes[int32(i)] = *(*byte)(unsafe.Pointer(&ptr))
+		safeArrayGetElement(sac.Array, i, unsafe.Pointer(&bytes[int32(i)]))
+	}
+
+	return
+}
+
+func (sac *SafeArrayConversion) ToValueArray() (values []interface{}) {
+	totalElements, _ := sac.TotalElements(0)
+	values = make([]interface{}, totalElements)
+	vt, _ := safeArrayGetVartype(sac.Array)
+
+	for i := 0; i < int(totalElements); i++ {
+		switch VT(vt) {
+		case VT_BOOL:
+			var v bool
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v
+		case VT_I1:
+			var v int8
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v
+		case VT_I2:
+			var v int16
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v
+		case VT_I4:
+			var v int32
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v
+		case VT_I8:
+			var v int64
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v
+		case VT_UI1:
+			var v uint8
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v
+		case VT_UI2:
+			var v uint16
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v
+		case VT_UI4:
+			var v uint32
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v
+		case VT_UI8:
+			var v uint64
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v
+		case VT_R4:
+			var v float32
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v
+		case VT_R8:
+			var v float64
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v
+		case VT_BSTR:
+			var v string
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v
+		case VT_VARIANT:
+			var v VARIANT
+			safeArrayGetElement(sac.Array, int64(i), unsafe.Pointer(&v))
+			values[i] = v.Value()
+		default:
+			// TODO
+		}
 	}
 
 	return
