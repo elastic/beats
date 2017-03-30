@@ -1,6 +1,6 @@
 === Reload Configuration
 
-experimental[]
+beta[]
 
 Reload configuration allows to dynamically reload module configuration files. A glob can be defined which should be watched
  for module configuration changes. New modules will started / stopped accordingly. This is especially useful in
