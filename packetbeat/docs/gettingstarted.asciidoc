@@ -143,6 +143,10 @@ find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac and win
 the archive that you just extracted. There’s also a full example configuration file called
 `packetbeat.full.yml` that shows all non-deprecated options.
 
+See the
+{libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
+
 To configure Packetbeat:
 
 . Select the network interface from which to capture the traffic.

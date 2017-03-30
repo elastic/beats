@@ -59,13 +59,16 @@ Before starting Winlogbeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Winlogbeat\winlogbeat.yml`.
 There’s also a full example configuration file called `winlogbeat.full.yml` that
 shows all non-deprecated options. For more information about these options, see
-<<winlogbeat-configuration-details>>.
+<<winlogbeat-configuration-details>>. 
 
 [[winlogbeat-configuration]]
 === Step 2: Configuring Winlogbeat
 
-To configure Winlogbeat, you edit the `winlogbeat.yml` configuration file. Here
-is a sample of the `winlogbeat.yml` file:
+To configure Winlogbeat, you edit the `winlogbeat.yml` configuration file. See the
+{libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
+
+Here is a sample of the `winlogbeat.yml` file:
 
 [source,yaml]
 --------------------------------------------------------------------------------
