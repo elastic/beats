@@ -16,7 +16,7 @@ import (
 
 func getsockoptIPMreqn(fd, name int) (*net.Interface, error) {
 	var mreqn sysIPMreqn
-	l := sysSockoptLen(sysSizeofIPMreqn)
+	l := uint32(sysSizeofIPMreqn)
 	if err := getsockopt(fd, iana.ProtocolIP, name, unsafe.Pointer(&mreqn), &l); err != nil {
 		return nil, os.NewSyscallError("getsockopt", err)
 	}

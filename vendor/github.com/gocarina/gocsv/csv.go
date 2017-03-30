@@ -24,6 +24,10 @@ var FailIfUnmatchedStructTags = false
 // in the csv header.
 var FailIfDoubleHeaderNames = false
 
+// ShouldAlignDuplicateHeadersWithStructFieldOrder indicates whether we should align duplicate CSV
+// headers per their alignment in the struct definition.
+var ShouldAlignDuplicateHeadersWithStructFieldOrder = false
+
 // TagSeparator defines seperator string for multiple csv tags in struct fields
 var TagSeparator = ","
 
@@ -34,7 +38,15 @@ var selfCSVWriter = DefaultCSVWriter
 
 // DefaultCSVWriter is the default CSV writer used to format CSV (cf. csv.NewWriter)
 func DefaultCSVWriter(out io.Writer) *csv.Writer {
-	return csv.NewWriter(out)
+	writer := csv.NewWriter(out)
+
+	// As only one rune can be defined as a CSV separator, we are going to trim
+	// the custom tag separator and use the first rune.
+	if runes := []rune(strings.TrimSpace(TagSeparator)); len(runes) > 0 {
+		writer.Comma = runes[0]
+	}
+
+	return writer
 }
 
 // SetCSVWriter sets the CSV writer used to format CSV.
@@ -102,7 +114,13 @@ func MarshalBytes(in interface{}) (out []byte, err error) {
 // Marshal returns the CSV in writer from the interface.
 func Marshal(in interface{}, out io.Writer) (err error) {
 	writer := getCSVWriter(out)
-	return writeTo(writer, in)
+	return writeTo(writer, in, false)
+}
+
+// Marshal returns the CSV in writer from the interface.
+func MarshalWithoutHeaders(in interface{}, out io.Writer) (err error) {
+	writer := getCSVWriter(out)
+	return writeTo(writer, in, true)
 }
 
 // MarshalChan returns the CSV read from the channel.
@@ -112,7 +130,7 @@ func MarshalChan(c <-chan interface{}, out *csv.Writer) error {
 
 // MarshalCSV returns the CSV in writer from the interface.
 func MarshalCSV(in interface{}, out *csv.Writer) (err error) {
-	return writeTo(out, in)
+	return writeTo(out, in, false)
 }
 
 // --------------------------------------------------------------------------
@@ -139,25 +157,28 @@ func Unmarshal(in io.Reader, out interface{}) (err error) {
 }
 
 // UnmarshalCSV parses the CSV from the reader in the interface.
-func UnmarshalCSV(in *csv.Reader, out interface{}) error {
+func UnmarshalCSV(in CSVReader, out interface{}) error {
 	return readTo(csvDecoder{in}, out)
 }
 
 // UnmarshalToChan parses the CSV from the reader and send each value in the chan c.
 // The channel must have a concrete type.
-func UnmarshalToChan(in io.Reader, c interface{}) (err error) {
+func UnmarshalToChan(in io.Reader, c interface{}) error {
+	if c == nil {
+		return fmt.Errorf("goscv: channel is %v", c)
+	}
 	return readEach(newDecoder(in), c)
 }
 
 // UnmarshalStringToChan parses the CSV from the string and send each value in the chan c.
 // The channel must have a concrete type.
-func UnmarshalStringToChan(in string, c interface{}) (err error) {
+func UnmarshalStringToChan(in string, c interface{}) error {
 	return UnmarshalToChan(strings.NewReader(in), c)
 }
 
 // UnmarshalBytesToChan parses the CSV from the bytes and send each value in the chan c.
 // The channel must have a concrete type.
-func UnmarshalBytesToChan(in []byte, c interface{}) (err error) {
+func UnmarshalBytesToChan(in []byte, c interface{}) error {
 	return UnmarshalToChan(bytes.NewReader(in), c)
 }
 
@@ -196,4 +217,26 @@ func UnmarshalBytesToCallback(in []byte, f interface{}) (err error) {
 // The func must look like func(Struct).
 func UnmarshalStringToCallback(in string, c interface{}) (err error) {
 	return UnmarshalToCallback(strings.NewReader(in), c)
+}
+
+func CSVToMap(in io.Reader) (map[string]string, error) {
+	decoder := newDecoder(in)
+	header, err := decoder.getCSVRow()
+	if err != nil {
+		return nil, err
+	}
+	if len(header) != 2 {
+		return nil, fmt.Errorf("maps can only be created for csv of two columns")
+	}
+	m := make(map[string]string)
+	for {
+		line, err := decoder.getCSVRow()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return nil, err
+		}
+		m[line[0]] = line[1]
+	}
+	return m, nil
 }

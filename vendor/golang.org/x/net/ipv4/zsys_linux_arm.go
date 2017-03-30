@@ -55,6 +55,9 @@ const (
 	sysSO_EE_ORIGIN_TXSTATUS     = 0x4
 	sysSO_EE_ORIGIN_TIMESTAMPING = 0x4
 
+	sysSOL_SOCKET       = 0x1
+	sysSO_ATTACH_FILTER = 0x1a
+
 	sysSizeofKernelSockaddrStorage = 0x80
 	sysSizeofSockaddrInet          = 0x10
 	sysSizeofInetPktinfo           = 0xc
@@ -127,4 +130,17 @@ type sysGroupSourceReq struct {
 
 type sysICMPFilter struct {
 	Data uint32
+}
+
+type sysSockFProg struct {
+	Len       uint16
+	Pad_cgo_0 [2]byte
+	Filter    *sysSockFilter
+}
+
+type sysSockFilter struct {
+	Code uint16
+	Jt   uint8
+	Jf   uint8
+	K    uint32
 }

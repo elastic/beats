@@ -14,6 +14,8 @@ package ipv4
 #include <linux/errqueue.h>
 #include <linux/icmp.h>
 #include <linux/in.h>
+#include <linux/filter.h>
+#include <sys/socket.h>
 */
 import "C"
 
@@ -76,6 +78,9 @@ const (
 	sysSO_EE_ORIGIN_TXSTATUS     = C.SO_EE_ORIGIN_TXSTATUS
 	sysSO_EE_ORIGIN_TIMESTAMPING = C.SO_EE_ORIGIN_TIMESTAMPING
 
+	sysSOL_SOCKET       = C.SOL_SOCKET
+	sysSO_ATTACH_FILTER = C.SO_ATTACH_FILTER
+
 	sysSizeofKernelSockaddrStorage = C.sizeof_struct___kernel_sockaddr_storage
 	sysSizeofSockaddrInet          = C.sizeof_struct_sockaddr_in
 	sysSizeofInetPktinfo           = C.sizeof_struct_in_pktinfo
@@ -109,3 +114,7 @@ type sysGroupReq C.struct_group_req
 type sysGroupSourceReq C.struct_group_source_req
 
 type sysICMPFilter C.struct_icmp_filter
+
+type sysSockFProg C.struct_sock_fprog
+
+type sysSockFilter C.struct_sock_filter
