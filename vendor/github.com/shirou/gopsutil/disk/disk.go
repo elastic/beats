@@ -2,7 +2,15 @@ package disk
 
 import (
 	"encoding/json"
+
+	"github.com/shirou/gopsutil/internal/common"
 )
+
+var invoke common.Invoker
+
+func init() {
+	invoke = common.Invoke{}
+}
 
 type UsageStat struct {
 	Path              string  `json:"path"`
@@ -25,15 +33,19 @@ type PartitionStat struct {
 }
 
 type IOCountersStat struct {
-	ReadCount    uint64 `json:"readCount"`
-	WriteCount   uint64 `json:"writeCount"`
-	ReadBytes    uint64 `json:"readBytes"`
-	WriteBytes   uint64 `json:"writeBytes"`
-	ReadTime     uint64 `json:"readTime"`
-	WriteTime    uint64 `json:"writeTime"`
-	Name         string `json:"name"`
-	IoTime       uint64 `json:"ioTime"`
-	SerialNumber string `json:"serialNumber"`
+	ReadCount        uint64 `json:"readCount"`
+	MergedReadCount  uint64 `json:"mergedReadCount"`
+	WriteCount       uint64 `json:"writeCount"`
+	MergedWriteCount uint64 `json:"mergedWriteCount"`
+	ReadBytes        uint64 `json:"readBytes"`
+	WriteBytes       uint64 `json:"writeBytes"`
+	ReadTime         uint64 `json:"readTime"`
+	WriteTime        uint64 `json:"writeTime"`
+	IopsInProgress   uint64 `json:"iopsInProgress"`
+	IoTime           uint64 `json:"ioTime"`
+	WeightedIO       uint64 `json:"weightedIO"`
+	Name             string `json:"name"`
+	SerialNumber     string `json:"serialNumber"`
 }
 
 func (d UsageStat) String() string {

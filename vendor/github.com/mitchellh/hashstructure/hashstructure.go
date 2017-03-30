@@ -26,7 +26,9 @@ type HashOptions struct {
 // Hash returns the hash value of an arbitrary value.
 //
 // If opts is nil, then default options will be used. See HashOptions
-// for the default values.
+// for the default values. The same *HashOptions value cannot be used
+// concurrently. None of the values within a *HashOptions struct are 
+// safe to read/write while hashing is being done. 
 //
 // Notes on the value:
 //
