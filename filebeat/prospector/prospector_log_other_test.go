@@ -155,4 +155,4 @@ func TestInit(t *testing.T) {
 // TestOutlet is an empty outlet for testing
 type TestOutlet struct{}
 
-func (o TestOutlet) OnEvent(event *input.Event) bool { return true }
+func (o TestOutlet) OnEvent(event *input.Data) bool { return true }

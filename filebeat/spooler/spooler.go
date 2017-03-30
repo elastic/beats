@@ -16,16 +16,16 @@ const channelSize = 16
 
 // Spooler aggregates the events and sends the aggregated data to the publisher.
 type Spooler struct {
-	Channel chan *input.Event // Channel is the input to the Spooler.
+	Channel chan *input.Data // Channel is the input to the Spooler.
 	config  spoolerConfig
 	output  Output         // batch event output on flush
-	spool   []*input.Event // Events being held by the Spooler.
+	spool   []*input.Data  // Events being held by the Spooler.
 	wg      sync.WaitGroup // WaitGroup used to control the shutdown.
 }
 
 // Output spooler sends event to through Send method
 type Output interface {
-	Send(events []*input.Event) bool
+	Send(events []*input.Data) bool
 }
 
 type spoolerConfig struct {
@@ -40,13 +40,13 @@ func New(
 	out Output,
 ) (*Spooler, error) {
 	return &Spooler{
-		Channel: make(chan *input.Event, channelSize),
+		Channel: make(chan *input.Data, channelSize),
 		config: spoolerConfig{
 			idleTimeout: config.IdleTimeout,
 			spoolSize:   config.SpoolSize,
 		},
 		output: out,
-		spool:  make([]*input.Event, 0, config.SpoolSize),
+		spool:  make([]*input.Data, 0, config.SpoolSize),
 	}, nil
 }
 
@@ -74,7 +74,6 @@ func (s *Spooler) run() {
 			if !ok {
 				return
 			}
-
 			if event != nil {
 				flushed := s.queue(event)
 				if flushed {
@@ -112,7 +111,7 @@ func (s *Spooler) Stop() {
 // queue queues a single event to be spooled. If the queue reaches spoolSize
 // while calling this method then all events in the queue will be flushed to
 // the publisher.
-func (s *Spooler) queue(event *input.Event) bool {
+func (s *Spooler) queue(event *input.Data) bool {
 	flushed := false
 	s.spool = append(s.spool, event)
 	if len(s.spool) == cap(s.spool) {
@@ -132,7 +131,7 @@ func (s *Spooler) flush() int {
 	}
 
 	// copy buffer
-	tmpCopy := make([]*input.Event, count)
+	tmpCopy := make([]*input.Data, count)
 	copy(tmpCopy, s.spool)
 
 	// clear buffer

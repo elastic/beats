@@ -50,7 +50,7 @@ type Prospectorer interface {
 
 // Outlet is the outlet for a prospector
 type Outlet interface {
-	OnEvent(event *input.Event) bool
+	OnEvent(event *input.Data) bool
 }
 
 // NewProspector instantiates a new prospector
@@ -214,7 +214,9 @@ func (p *Prospector) updateState(event *input.Event) error {
 	event.Module = p.config.Module
 	event.Fileset = p.config.Fileset
 
-	ok := p.outlet.OnEvent(event)
+	eventHolder := event.GetData()
+	ok := p.outlet.OnEvent(&eventHolder)
+
 	if !ok {
 		logp.Info("Prospector outlet closed")
 		return errors.New("prospector outlet closed")
