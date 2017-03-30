@@ -9,6 +9,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// Windows API calls
+//sys   _PdhOpenQuery(dataSource uintptr, userData uintptr, query *uintptr) (err uint32) = pdh.PdhOpenQuery
+//sys   _PdhAddCounter(query uintptr, counterPath string, userData uintptr, counter *uintptr) (err uint32) = pdh.PdhAddEnglishCounterW
+//sys   _PdhCollectQueryData(query uintptr) (err uint32) = pdh.PdhCollectQueryData
+//sys   _PdhGetFormattedCounterValue(counter uintptr, format uint32, counterType int, value *PdhCounterValue) (err uint32) = pdh.PdhGetFormattedCounterValue
+//sys   _PdhCloseQuery(query uintptr) (err uint32) = pdh.PdhCloseQuery
+
 type Handle struct {
 	status      error
 	query       uintptr
@@ -123,11 +130,3 @@ func (e PdhError) Error() string {
 	}
 	return strconv.FormatUint(uint64(e), 10)
 }
-
-//go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -output syscall_windows.go pdh.go
-// Windows API calls
-//sys   _PdhOpenQuery(dataSource uintptr, userData uintptr, query *uintptr) (err uint32) = pdh.PdhOpenQuery
-//sys   _PdhAddCounter(query uintptr, counterPath string, userData uintptr, counter *uintptr) (err uint32) = pdh.PdhAddEnglishCounterW
-//sys   _PdhCollectQueryData(query uintptr) (err uint32) = pdh.PdhCollectQueryData
-//sys   _PdhGetFormattedCounterValue(counter uintptr, format uint32, counterType int, value *PdhCounterValue) (err uint32) = pdh.PdhGetFormattedCounterValue
-//sys   _PdhCloseQuery(query uintptr) (err uint32) = pdh.PdhCloseQuery
