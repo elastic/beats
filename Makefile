@@ -10,8 +10,6 @@ VIRTUALENV_PARAMS?=
 FIND=find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 GOLINT=golint
 GOLINT_REPO=github.com/golang/lint/golint
-MISSPELL=misspell
-MISSPELL_REPO=github.com/client9/misspell
 REVIEWDOG=reviewdog
 REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
@@ -78,8 +76,8 @@ check: python-env
 # Corrects spelling errors
 .PHONY: misspell
 misspell:
-	go get $(MISSPELL_REPO)
-	$(FIND) -name '*'  -exec $(MISSPELL) -w {} \;
+	go get github.com/client9/misspell
+	$(FIND) -name '*'  -exec misspell -w {} \;
 
 .PHONY: fmt
 fmt: python-env
@@ -90,7 +88,7 @@ fmt: python-env
 .PHONY: lint
 lint:
 	@go get $(GOLINT_REPO) $(REVIEWDOG_REPO)
-	$(GOLINT) $(go list ./... | grep -v /vendor/) | $(REVIEWDOG) $(REVIEWDOG_OPTIONS)
+	$(REVIEWDOG) $(REVIEWDOG_OPTIONS)
 
 # Collects all dashboards and generates dashboard folder for https://github.com/elastic/beats-dashboards/tree/master/dashboards
 .PHONY: beats-dashboards
