@@ -156,6 +156,10 @@ and win, look in the archive that you just extracted. There’s also a full
 example configuration file called `metricbeat.full.yml` that shows all
 non-deprecated options.
 
+See the
+{libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
+
 Metricbeat uses <<metricbeat-modules,modules>> to collect metrics. You configure
 each module individually. The following example shows the default configuration
 in the `metricbeat.yml` file. The system status module is enabled by default to

@@ -260,6 +260,10 @@ find the configuration file at `/etc/filebeat/filebeat.yml`. For mac and win, lo
 the archive that you just extracted. There’s also a full example configuration file
 called `filebeat.full.yml` that shows all non-deprecated options.
 
+See the
+{libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
+
 Here is a sample of the `filebeat` section of the `filebeat.yml` file. Filebeat uses predefined
 default values for most configuration options.
 
