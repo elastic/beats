@@ -30,7 +30,7 @@ Filebeat provides a set of pre-built modules that you can use to rapidly
 implement and deploy a log monitoring solution, complete with sample dashboards
 and data visualizations, in about 5 minutes. These modules support common log
 formats, such as Nginx, Apache2, and MySQL, and can be run by issuing a simple
-command.  
+command.
 
 This topic shows you how to run the basic modules out of the box without extra
 configuration. For detailed documentation and the full list of available
@@ -43,12 +43,12 @@ type that isn't supported by one of the available Filebeat modules.
 
 Before running Filebeat with modules enabled, you need to:
 
-* Install and configure the Elastic stack. See 
+* Install and configure the Elastic stack. See
 {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack].
 
 * Complete the Filebeat installation instructions described in
 <<filebeat-installation>>. After installing Filebeat, return to this
-quick start page. 
+quick start page.
 
 * Install the Ingest Node GeoIP and User Agent plugins, which you can do by
 running the following commands in the Elasticsearch home path:
@@ -83,9 +83,9 @@ For subsequent runs of Filebeat, do not specify this flag.
 
 NOTE: Depending on how you've installed Filebeat, you might see errors
 related to file ownership or permissions when you try to run Filebeat modules.
-See {libbeat}config-file-permissions.html[Config File Ownership and Permissions]
+See {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_ if you encounter errors related to file
-ownership or permissions. 
+ownership or permissions.
 
 The following example starts Filebeat with the `system` module enabled and
 loads the sample Kibana dashboards:
@@ -97,7 +97,7 @@ filebeat -e -modules=system -setup
 
 This command takes care of configuring Filebeat, loading the recommended index
 template for writing to Elasticsearch, and deploying the sample dashboards
-for visualizing the data in Kibana. 
+for visualizing the data in Kibana.
 
 To start Filebeat with the `system`, `nginx`, and `mysql` modules enabled
 and load the sample dashboards, run:
@@ -132,7 +132,7 @@ After you've confirmed that Filebeat is sending events to Elasticsearch, launch
 the Kibana web interface by pointing your browser to port 5601. For example,
 http://127.0.0.1:5601[http://127.0.0.1:5601].
 
-Open the dashboard and explore the visualizations for your parsed logs. 
+Open the dashboard and explore the visualizations for your parsed logs.
 
 Here's an example of the syslog dashboard:
 
@@ -141,7 +141,7 @@ image:./images/kibana-system.png[Sylog dashboard]
 [[filebeat-installation]]
 === Step 1: Installing Filebeat
 
-Before running Filebeat, you need to install and configure the Elastic stack. See 
+Before running Filebeat, you need to install and configure the Elastic stack. See
 {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack].
 
 To download and install Filebeat, use the commands that work with your system
@@ -338,7 +338,7 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 [[filebeat-starting]]
 === Step 5: Starting Filebeat
 
-Start Filebeat by issuing the appropriate command for your platform. 
+Start Filebeat by issuing the appropriate command for your platform.
 
 NOTE: If you use an init.d script to start Filebeat on deb or rpm, you can't
 specify command line flags (see <<filebeat-command-line>>). To specify flags,
@@ -367,7 +367,7 @@ sudo ./filebeat -e -c filebeat.yml -d "publish"
 ----------------------------------------------------------------------
 <1> You'll be running Filebeat as root, so you need to change ownership
 of the configuration file (see
-{libbeat}config-file-permissions.html[Config File Ownership and Permissions]
+{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_).
 
 *win:*
