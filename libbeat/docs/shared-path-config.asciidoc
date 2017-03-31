@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-path]]
-=== Paths Configuration
+=== Paths
 
 The `path` section of the +{beatname_lc}.yml+ config file contains configuration
 options that define where the Beat looks for its files. For example, all Beats

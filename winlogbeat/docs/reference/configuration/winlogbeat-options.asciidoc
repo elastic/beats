@@ -2,7 +2,7 @@
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).
 
 [[configuration-winlogbeat-options]]
-=== Winlogbeat Configuration
+=== Winlogbeat
 
 The `winlogbeat` section of the +{beatname_lc}.yml+ config file specifies all options that are specific to Winlogbeat.
 Most importantly, it contains the list of event logs to monitor.
