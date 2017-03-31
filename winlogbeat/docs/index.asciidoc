@@ -33,6 +33,7 @@ include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
+:standalone:
 :win:
 include::../../libbeat/docs/yaml.asciidoc[]
 
