@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"regexp"
 	"strings"
 )
+
+var hasScheme = regexp.MustCompile(`^([a-z][a-z0-9+\-.]*)://`)
 
 // Creates the url based on the url configuration.
 // Adds missing parts with defaults (scheme, host, port)
@@ -13,6 +16,10 @@ func getURL(defaultScheme string, defaultPath string, rawURL string) (string, er
 
 	if defaultScheme == "" {
 		defaultScheme = "http"
+	}
+
+	if !hasScheme.MatchString(rawURL) {
+		rawURL = fmt.Sprintf("%v://%v", defaultScheme, rawURL)
 	}
 
 	addr, err := url.Parse(rawURL)
@@ -23,22 +30,6 @@ func getURL(defaultScheme string, defaultPath string, rawURL string) (string, er
 	scheme := addr.Scheme
 	host := addr.Host
 	port := "9200"
-
-	// sanitize parse errors if url does not contain scheme
-	// if parse url looks funny, prepend schema and try again:
-	if addr.Scheme == "" || (addr.Host == "" && addr.Path == "" && addr.Opaque != "") {
-		rawURL = fmt.Sprintf("%v://%v", defaultScheme, rawURL)
-		if tmpAddr, err := url.Parse(rawURL); err == nil {
-			addr = tmpAddr
-			scheme = addr.Scheme
-			host = addr.Host
-		} else {
-			// If url doesn't have a scheme, host is written into path. For example: 192.168.3.7
-			scheme = defaultScheme
-			host = addr.Path
-			addr.Path = ""
-		}
-	}
 
 	if host == "" {
 		host = "localhost"
