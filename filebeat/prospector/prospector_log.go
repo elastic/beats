@@ -24,7 +24,7 @@ type Log struct {
 	config     prospectorConfig
 }
 
-// NewProspectorLog instantiates a new Log
+// NewLog instantiates a new Log
 func NewLog(p *Prospector) (*Log, error) {
 
 	prospectorer := &Log{
