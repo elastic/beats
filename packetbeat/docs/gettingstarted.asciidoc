@@ -273,8 +273,13 @@ sudo /etc/init.d/packetbeat start
 
 [source,shell]
 ----------------------------------------------------------------------
+sudo chown root packetbeat.yml <1>
 sudo ./packetbeat -e -c packetbeat.yml -d "publish"
 ----------------------------------------------------------------------
+<1> You'll be running Packetbeat as root, so you need to change ownership
+of the configuration file (see 
+{libbeat}config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_).
 
 *win:*
 
