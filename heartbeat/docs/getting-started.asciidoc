@@ -7,7 +7,7 @@ related products:
  * Elasticsearch for storage and indexing the data.
  * Kibana for the UI.
  * Logstash (optional) for inserting data into Elasticsearch.
- 
+
 See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack]
 for more information.
 
@@ -28,9 +28,9 @@ install, configure, and run Heartbeat:
 Unlike most Beats, which you install on edge nodes, you typically install
 Heartbeat as part of monitoring service that runs on a separate machine
 and possibly even outside of the network where the services that you want to
-monitor are running. 
+monitor are running.
 
-//TODO: Add a separate topic that explores deployment scenarios in more detail (like installing on a sub-network where there's a firewall etc. 
+//TODO: Add a separate topic that explores deployment scenarios in more detail (like installing on a sub-network where there's a firewall etc.
 
 To download and install Heartbeat, use the commands that work with your
 system (<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora,
@@ -165,8 +165,8 @@ monitor:
 [source,yaml]
 ----------------------------------------------------------------------
 heartbeat.monitors:
-- type: icmp 
-  schedule: '*/5 * * * * * *' 
+- type: icmp
+  schedule: '*/5 * * * * * *'
   hosts: ["myhost"]
 output.elasticsearch:
   hosts: ["myhost:9200"]
@@ -184,7 +184,7 @@ heartbeat.monitors:
 - type: icmp
   schedule: '*/5 * * * * * *' <1>
   hosts: ["myhost"]
-- type: tcp 
+- type: tcp
   schedule: '@every 5s' <2>
   hosts: ["myhost:12345"]
   mode: any <3>
@@ -258,7 +258,7 @@ sudo ./heartbeat -e -c heartbeat.yml -d "publish"
 ----------------------------------------------------------------------
 <1> You'll be running Heartbeat as root, so you need to change ownership
 of the configuration file (see
-{libbeat}config-file-permissions.html[Config File Ownership and Permissions]
+{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_).
 
 *win:*
