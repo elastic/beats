@@ -73,13 +73,13 @@ var (
 func ReadPackageHeader(r io.Reader) (*Header, error) {
 	// read the "header structure header"
 	header := make([]byte, 16)
-	n, err := r.Read(header)
+	_, err := io.ReadFull(r, header)
 	if err != nil {
-		return nil, err
-	}
+		if err == io.EOF || err == io.ErrUnexpectedEOF {
+			return nil, ErrBadHeaderLength
+		}
 
-	if n != 16 {
-		return nil, ErrBadHeaderLength
+		return nil, err
 	}
 
 	// check magic number
@@ -112,13 +112,12 @@ func ReadPackageHeader(r io.Reader) (*Header, error) {
 	// read indexes
 	indexLength := 16 * h.IndexCount
 	indexes := make([]byte, indexLength)
-	n, err = r.Read(indexes)
+	_, err = io.ReadFull(r, indexes)
 	if err != nil {
+		if err == io.EOF || err == io.ErrUnexpectedEOF {
+			return nil, ErrBadIndexLength
+		}
 		return nil, err
-	}
-
-	if n != indexLength {
-		return nil, ErrBadIndexLength
 	}
 
 	for x := 0; x < h.IndexCount; x++ {
@@ -141,13 +140,13 @@ func ReadPackageHeader(r io.Reader) (*Header, error) {
 
 	// read the "store"
 	store := make([]byte, h.Length)
-	n, err = r.Read(store)
+	_, err = io.ReadFull(r, store)
 	if err != nil {
-		return nil, err
-	}
+		if err == io.EOF || err == io.ErrUnexpectedEOF {
+			return nil, ErrBadStoreLength
+		}
 
-	if n != h.Length {
-		return nil, ErrBadStoreLength
+		return nil, err
 	}
 
 	// parse the value of each index from the store
@@ -260,7 +259,7 @@ func ReadPackageHeader(r io.Reader) (*Header, error) {
 			index.Value = vals
 
 		case IndexDataTypeNull:
-			// nothing to do here
+		// nothing to do here
 
 		default:
 			// unknown data type
@@ -277,13 +276,9 @@ func ReadPackageHeader(r io.Reader) (*Header, error) {
 	// seek to the end of the header
 	if o > 0 && o < 8 {
 		pad := make([]byte, o)
-		n, err = r.Read(pad)
+		_, err = io.ReadFull(r, pad)
 		if err != nil {
 			return nil, fmt.Errorf("Error seeking beyond header padding of %d bytes: %v", o, err)
-		}
-
-		if n != o {
-			return nil, fmt.Errorf("Error seeking beyond header padding of %d bytes: only %d bytes returned", o, n)
 		}
 	}
 
