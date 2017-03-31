@@ -873,23 +873,17 @@ Fields from the Linux audit logs. Not all fields are documented here because the
 
 
 [float]
-=== system.audit.type
+=== system.audit.record_type
 
 The audit event type.
 
 
 [float]
-=== system.audit.epoch
-
-The unix epoch timestamp from the audit log.
-
-
-[float]
-=== system.audit.counter
+=== system.audit.sequence
 
 type: long
 
-The audit event counter.
+The audit event sequence number.
 
 
 [float]

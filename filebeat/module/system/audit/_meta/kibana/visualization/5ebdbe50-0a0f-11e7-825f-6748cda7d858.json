@@ -5,6 +5,6 @@
   "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}", 
   "version": 1, 
   "kibanaSavedObjectMeta": {
-    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"system.audit.type:EXECVE\",\"analyze_wildcard\":true}},\"filter\":[]}"
+    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"system.audit.record_type:EXECVE\",\"analyze_wildcard\":true}},\"filter\":[]}"
   }
 }

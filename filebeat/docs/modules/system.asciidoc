@@ -11,8 +11,8 @@ Unix/Linux based distributions.
 [float]
 === Compatibility
 
-This module was tested with logs from OSes like Ubuntu 12.04, Centos 7, macOS
-Sierra, and others.
+This module was tested with logs from OSes like Ubuntu 12.04, Centos 7, and
+macOS Sierra.
 
 This module is not available for Windows.
 

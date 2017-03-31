@@ -11,6 +11,8 @@
     "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:system.audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
   }, 
   "columns": [
-    "message"
+    "system.audit.record_type", 
+    "system.audit.sequence", 
+    "system.audit.acct"
   ]
 }

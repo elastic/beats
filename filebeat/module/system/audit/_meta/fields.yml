@@ -4,16 +4,13 @@
     Fields from the Linux audit logs. Not all fields are documented here because
     they are dynamic and vary by audit event type.
   fields:
-    - name: type
+    - name: record_type
       description: >
         The audit event type.
-    - name: epoch
-      description: >
-        The unix epoch timestamp from the audit log.
-    - name: counter
+    - name: sequence
       type: long
       description: >
-        The audit event counter.
+        The audit event sequence number.
     - name: pid
       type: long
       description: >
