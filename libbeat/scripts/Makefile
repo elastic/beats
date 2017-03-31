@@ -9,7 +9,7 @@ BEAT_LICENSE?=ASL 2.0 ## @packaging Software license of the application
 BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
-GOPACKAGES?=${BEAT_PATH}/...## @community_beat Must be set to $(shell glide novendor)
+GOPACKAGES?=${BEAT_PATH}/...## @community_beat Must be set to $(shell govendor list +local)
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make package"
 NOTICE_FILE?=../NOTICE
 
