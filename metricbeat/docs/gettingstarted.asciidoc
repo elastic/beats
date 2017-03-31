@@ -259,8 +259,13 @@ sudo /etc/init.d/metricbeat start
 
 [source,shell]
 ----------------------------------------------------------------------
+sudo chown root metricbeat.yml <1>
 sudo ./metricbeat -e -c metricbeat.yml -d "publish"
 ----------------------------------------------------------------------
+<1> You'll be running Metricbeat as root, so you need to change ownership
+of the configuration file (see
+{libbeat}config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_).
 
 *win:*
 

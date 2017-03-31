@@ -81,8 +81,14 @@ modules) that you want to enable. The `-e` flag is optional and sends output
 to standard error instead of syslog. The `-setup` flag is a one-time setup step.
 For subsequent runs of Filebeat, do not specify this flag.
 
-For example, to start Filebeat with the `system` module enabled and load the
-sample Kibana dashboards, run:
+NOTE: Depending on how you've installed Filebeat, you might see errors
+related to file ownership or permissions when you try to run Filebeat modules.
+See {libbeat}config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_ if you encounter errors related to file
+ownership or permissions. 
+
+The following example starts Filebeat with the `system` module enabled and
+loads the sample Kibana dashboards:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -332,7 +338,7 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 [[filebeat-starting]]
 === Step 5: Starting Filebeat
 
-Start Filebeat by issuing the appropriate command for your platform.
+Start Filebeat by issuing the appropriate command for your platform. 
 
 NOTE: If you use an init.d script to start Filebeat on deb or rpm, you can't
 specify command line flags (see <<filebeat-command-line>>). To specify flags,
@@ -356,8 +362,13 @@ sudo /etc/init.d/filebeat start
 
 [source,shell]
 ----------------------------------------------------------------------
+sudo chown root filebeat.yml <1>
 sudo ./filebeat -e -c filebeat.yml -d "publish"
 ----------------------------------------------------------------------
+<1> You'll be running Filebeat as root, so you need to change ownership
+of the configuration file (see
+{libbeat}config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_).
 
 *win:*
 
