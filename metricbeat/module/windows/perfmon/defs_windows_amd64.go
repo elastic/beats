@@ -1,3 +1,6 @@
+// Created by cgo -godefs - DO NOT EDIT
+// cgo.exe -godefs defs_windows.go
+
 package perfmon
 
 const (
@@ -12,9 +15,9 @@ const (
 	PDH_INVALID_DATA              = 0xc0000bc6
 	PDH_NO_MORE_DATA              = 0xc0000bcc
 	PDH_CALC_NEGATIVE_DENOMINATOR = 0x800007d6
-	PdhFmtDouble                  = 0x00000200
-	PdhFmtLarge                   = 0x00000400
-	PdhFmtLong                    = 0x00000100
+	PdhFmtDouble                  = 0x200
+	PdhFmtLarge                   = 0x400
+	PdhFmtLong                    = 0x100
 )
 
 type PdhCounterValue struct {
