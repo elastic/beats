@@ -174,12 +174,6 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 }
 
 func (r *PerfmonReader) Read() (common.MapStr, error) {
-	if !r.executed {
-		// Most counters require two sample values in order to compute a
-		// displayable value. So initial perform two samples.
-		r.query.Execute()
-		r.executed = true
-	}
 	if err := r.query.Execute(); err != nil {
 		return nil, err
 	}
@@ -195,20 +189,24 @@ func (r *PerfmonReader) Read() (common.MapStr, error) {
 	var errs multierror.Errors
 
 	for counterPath, value := range values {
-		if value.Err != nil {
-			// XXX: Sometimes counters return negative values. We can ignore
-			// this error. For an explanation see:
-			// https://www.netiq.com/support/kb/doc.php?id=7010545
-			if err == PDH_CALC_NEGATIVE_DENOMINATOR {
-				result.Put(counterPath, 0)
-				continue
-			}
-			errs = append(errs, value.Err)
-			continue
-		}
-
 		key := r.pathToKey[counterPath]
 		result.Put(key, value.Num)
+
+		if value.Err != nil {
+			switch value.Err {
+			case PDH_CALC_NEGATIVE_DENOMINATOR:
+			case PDH_INVALID_DATA:
+				if r.executed {
+					errs = append(errs, errors.Wrapf(value.Err, "key=%v", key))
+				}
+			default:
+				errs = append(errs, errors.Wrapf(value.Err, "key=%v", key))
+			}
+		}
+	}
+
+	if !r.executed {
+		r.executed = true
 	}
 
 	return result, errs.Err()
