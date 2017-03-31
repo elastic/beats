@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"DNS Query Summary\",\"type\":\"metric\",\"params\":{\"fontSize\":\"17\",\"handleNoResults\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_in\",\"customLabel\":\"Bytes In\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_out\",\"customLabel\":\"Bytes Out\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"responsetime\",\"customLabel\":\"Avg Response Time (ms)\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "DNS Query Summary", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "DNS", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}
