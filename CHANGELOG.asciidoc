@@ -111,6 +111,8 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 *Affecting all Beats*
 
 - Add `_id`, `_type`, `_index` and `_score` fields in the generated index pattern. {pull}3282[3282]
+- Fix potential elasticsearch output URL parsing error if protocol scheme is missing. {pull}3671[3671]
+- Improve error message when downloading the dashboards fails. {pull}3805[3805]
 
 *Filebeat*
 
