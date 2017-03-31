@@ -7,6 +7,23 @@
     - name: record_type
       description: >
         The audit event type.
+    - name: old_auid
+      description: >
+        For login events this is the old audit ID used for the user prior to
+        this login.
+    - name: new_auid
+      description: >
+        For login events this is the new audit ID. The audit ID can be used to
+        trace future events to the user even if their identity changes (like
+        becoming root).
+    - name: old_ses
+      description: >
+        For login events this is the old session ID used for the user prior to
+        this login.
+    - name: new_ses
+      description: >
+        For login events this is the new session ID. It can be used to tie a
+        user to future events by session ID.
     - name: sequence
       type: long
       description: >
