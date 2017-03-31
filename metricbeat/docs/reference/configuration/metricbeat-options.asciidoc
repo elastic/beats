@@ -1,5 +1,5 @@
 [[configuration-metricbeat]]
-=== Modules Configuration
+=== Modules
 
 The `metricbeat.modules` section of the +{beatname_lc}.yml+ config file contains an array with the enabled <<metricbeat-modules,modules>>. The following example shows a configuration where the Apache and MySQL modules are enabled:
 
