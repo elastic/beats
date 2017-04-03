@@ -10,6 +10,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-haproxy,HAProxy>>
   * <<metricbeat-module-jolokia,Jolokia>>
   * <<metricbeat-module-kafka,kafka>>
+  * <<metricbeat-module-kibana,kibana>>
   * <<metricbeat-module-kubelet,kubelet>>
   * <<metricbeat-module-memcached,memcached>>
   * <<metricbeat-module-mongodb,MongoDB>>
@@ -34,6 +35,7 @@ include::modules/golang.asciidoc[]
 include::modules/haproxy.asciidoc[]
 include::modules/jolokia.asciidoc[]
 include::modules/kafka.asciidoc[]
+include::modules/kibana.asciidoc[]
 include::modules/kubelet.asciidoc[]
 include::modules/memcached.asciidoc[]
 include::modules/mongodb.asciidoc[]
