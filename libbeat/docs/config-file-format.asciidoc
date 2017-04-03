@@ -199,8 +199,8 @@ field references `[fieldname]`. Optional default values can be specified in case
 field name is missing from the event.
 
 You can also format time stored in the
-`@timestamp` field using the `+FORMAT` syntax where FORMAT is a valid (time
-format)[https://godoc.org/github.com/elastic/beats/libbeat/common/dtfmt].
+`@timestamp` field using the `+FORMAT` syntax where FORMAT is a valid https://godoc.org/github.com/elastic/beats/libbeat/common/dtfmt[time
+format].
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------

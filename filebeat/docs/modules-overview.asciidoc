@@ -92,10 +92,10 @@ production setup. The equivalent of the above in the configuration file is:
 
 [source,yaml]
 ----------------------------------------------------------------------
-modules:
-- name: nginx
-- name: mysql
-- name: syslog
+filebeat.modules:
+- module: nginx
+- module: mysql
+- module: syslog
 ----------------------------------------------------------------------
 
 Then you can start Filebeat simply with: `./filebeat -e`.
@@ -116,17 +116,17 @@ files are in a custom location:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ filebeat -e -modules=nginx -M "nginx.access.var.paths=[/opt/apache2/logs/access.log*]"
+$ filebeat -e -modules=nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]"
 ----------------------------------------------------------------------
 
 Or via the configuration file:
 
 [source,yaml]
 ----------------------------------------------------------------------
-modules:
-- name: nginx
+filebeat.modules:
+- module: nginx
   access:
-    var.paths = ["/opt/apache2/logs/access.log*"]
+    var.paths = ["/var/log/nginx/access.log*"]
 ----------------------------------------------------------------------
 
 The Nginx `access` fileset also has a `pipeline` variables which allows
@@ -150,8 +150,8 @@ example, enabling <<close-eof,close_eof>> can be done like this:
 
 [source,yaml]
 ----------------------------------------------------------------------
-modules:
-- name: nginx
+filebeat.modules:
+- module: nginx
   access:
     prospector:
       close_eof: true
@@ -181,4 +181,3 @@ created by any of the modules:
 ----------------------------------------------------------------------
 filebeat -e -modules=nginx,mysql -M "*.*.prospector.close_eof=true"
 ----------------------------------------------------------------------
-

@@ -39,6 +39,14 @@ See our https://www.elastic.co/downloads/beats/packetbeat[download page] for oth
 [[deb]]
 *deb:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install libpcap0.8
@@ -46,8 +54,18 @@ curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{v
 sudo dpkg -i packetbeat-{version}-amd64.deb
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[rpm]]
 *rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -56,8 +74,18 @@ curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{v
 sudo rpm -vi packetbeat-{version}-x86_64.rpm
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[mac]]
 *mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -65,8 +93,18 @@ curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{v
 tar xzvf packetbeat-{version}-darwin-x86_64.tar.gz
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[win]]
 *win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . Download and install WinPcap from this
 http://www.winpcap.org/install/default.htm[page]. WinPcap is a library that uses
@@ -91,6 +129,8 @@ PS C:\Program Files\Packetbeat> .\install-service-packetbeat.ps1
 
 NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-packetbeat.ps1`.
 
+endif::[]
+
 Before starting Packetbeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Packetbeat\packetbeat.yml` or `/etc/packetbeat/packetbeat.yml`. For
 more information about these options, see <<packetbeat-configuration>>.
@@ -102,6 +142,10 @@ To configure Packetbeat, you edit the configuration file. For rpm and deb, you'l
 find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac and win, look in
 the archive that you just extracted. There’s also a full example configuration file called
 `packetbeat.full.yml` that shows all non-deprecated options.
+
+See the
+{libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
 
 To configure Packetbeat:
 
