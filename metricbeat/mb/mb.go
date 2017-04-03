@@ -71,6 +71,12 @@ type MetricSet interface {
 	HostData() HostData // HostData returns the parsed host data.
 }
 
+// Closer is an optional interface that a MetricSet can implement in order to
+// cleanup any resources it has open at shutdown.
+type Closer interface {
+	Close() error
+}
+
 // EventFetcher is a MetricSet that returns a single event when collecting data.
 type EventFetcher interface {
 	MetricSet
@@ -82,6 +88,42 @@ type EventFetcher interface {
 type EventsFetcher interface {
 	MetricSet
 	Fetch() ([]common.MapStr, error)
+}
+
+// Reporter is used by a MetricSet to report events, errors, or errors with
+// metadata. The methods return false iff publishing failed because the
+// MetricSet is being closed.
+type Reporter interface {
+	Event(event common.MapStr) bool
+	ErrorWith(err error, meta common.MapStr) bool
+	Error(error) bool
+}
+
+// PushReporter is used by a MetricSet to report events, errors, or errors with
+// metadata. It provides a done channel used to signal that reporter should
+// stop.
+type PushReporter interface {
+	Reporter
+
+	// Done returns a channel that's closed when work done on behalf of this
+	// reporter should be canceled.
+	Done() <-chan struct{}
+}
+
+// ReportingFetcher is a MetricSet that reports events or errors through the
+// Reporter interface.
+type ReportingFetcher interface {
+	MetricSet
+	Fetch(r Reporter)
+}
+
+// PushMetricSet is a MetricSet that pushes events (rather than pulling them
+// periodically via a Fetch callback). Run is invoked to start the event
+// subscription and it should block until the MetricSet is ready to stop or
+// the PushReporter's done channel is closed.
+type PushMetricSet interface {
+	MetricSet
+	Run(r PushReporter)
 }
 
 // HostData contains values parsed from the 'host' configuration. Other

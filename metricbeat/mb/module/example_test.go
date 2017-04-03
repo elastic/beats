@@ -20,7 +20,7 @@ func ExampleWrapper() {
 	// Build a configuration object.
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"module":     moduleName,
-		"metricsets": []string{metricSetName},
+		"metricsets": []string{eventFetcherName},
 	})
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -68,13 +68,13 @@ func ExampleWrapper() {
 	//     "Tags": null
 	//   },
 	//   "fake": {
-	//     "status": {
+	//     "eventfetcher": {
 	//       "metric": 1
 	//     }
 	//   },
 	//   "metricset": {
 	//     "module": "fake",
-	//     "name": "status",
+	//     "name": "eventfetcher",
 	//     "rtt": 111
 	//   },
 	//   "type": "metricsets"
@@ -91,7 +91,7 @@ func ExampleRunner() {
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"module":     moduleName,
-		"metricsets": []string{metricSetName},
+		"metricsets": []string{eventFetcherName},
 	})
 	if err != nil {
 		return
