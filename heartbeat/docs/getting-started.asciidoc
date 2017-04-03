@@ -47,14 +47,32 @@ See our https://www.elastic.co/downloads/beats/heartbeat[download page] for othe
 [[deb]]
 *deb:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 curl -L -O {downloads}/heartbeat/heartbeat-{version}-amd64.deb
 sudo dpkg -i heartbeat-{version}-amd64.deb
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[rpm]]
 *rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
@@ -62,8 +80,18 @@ curl -L -O {downloads}/heartbeat/heartbeat-{version}-x86_64.rpm
 sudo rpm -vi heartbeat-{version}-x86_64.rpm
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[mac]]
 *mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------
@@ -71,8 +99,18 @@ curl -L -O {downloads}/heartbeat/heartbeat-{version}-darwin-x86_64.tar.gz
 tar xzvf heartbeat-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 
+endif::[]
+
 [[win]]
 *win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . Download the Heartbeat Windows zip file from the
 https://www.elastic.co/downloads/beats/heartbeat[downloads page].
@@ -98,6 +136,8 @@ execution policy for the current session to allow the script to run. For
 example:
 +PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-heartbeat.ps1+.
 
+endif::[]
+
 Before starting Heartbeat, you should look at the configuration options in
 the configuration file, for example +C:\Program Files\Heartbeat\heartbeat.yml+
 or +/etc/heartbeat/heartbeat.yml+. For more information about these
@@ -111,6 +151,10 @@ you'll find the configuration file at +/etc/heartbeat/heartbeat.yml+.
 For mac and win, look in the archive that you just extracted. There’s also a
 full example configuration file called `heartbeat.full.yml` that shows all
 non-deprecated options.
+
+See the
+{libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
 
 Heartbeat provides monitors to check the status of hosts at set intervals.
 You configure each monitor individually. Heartbeat currently provides monitors
@@ -195,7 +239,7 @@ start Heartbeat in the foreground.
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/ start
+sudo /etc/init.d/heartbeat start
 ----------------------------------------------------------------------
 
 *rpm:*
@@ -224,8 +268,16 @@ By default, Windows log files are stored in +C:\ProgramData\heartbeat\Logs+.
 Heartbeat is now ready to check the status of your services and send
 events to your defined output.
 
-//TODO: Add content about sample dashboards when the dashboards are available.
+[[heartbeat-sample-dashboards]]
+=== Step 5: Loading Sample Kibana Dashboards
 
-//:allplatforms:
+To make it easier for you to visualize the status of your services, we have
+created sample Heartbeat dashboards. The dashboards are provided as
+examples. We recommend that you
+http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
+to meet your needs.
 
-//include::../../libbeat/docs/dashboards.asciidoc[]
+image:./images/heartbeat-statistics.png[Heartbeat statistics]
+
+:allplatforms:
+include::../../libbeat/docs/dashboards.asciidoc[]

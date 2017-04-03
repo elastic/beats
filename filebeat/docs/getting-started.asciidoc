@@ -153,14 +153,32 @@ See our https://www.elastic.co/downloads/beats/filebeat[download page] for other
 [[deb]]
 *deb:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
 curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-amd64.deb
 sudo dpkg -i filebeat-{version}-amd64.deb
 ------------------------------------------------
 
+endif::[]
+
 [[rpm]]
 *rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -168,8 +186,18 @@ curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{versi
 sudo rpm -vi filebeat-{version}-x86_64.rpm
 ------------------------------------------------
 
+endif::[]
+
 [[mac]]
 *mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -177,8 +205,18 @@ curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{versi
 tar xzvf filebeat-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 
+endif::[]
+
 [[win]]
 *win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . Download the Filebeat Windows zip file from the
 https://www.elastic.co/downloads/beats/filebeat[downloads page].
@@ -198,6 +236,8 @@ PS C:\Program Files\Filebeat> .\install-service-filebeat.ps1
 ----------------------------------------------------------------------
 
 NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-filebeat.ps1`.
+
+endif::[]
 
 If you're using modules to get started with Filebeat, go back to the
 <<filebeat-modules-quickstart>> page.
@@ -219,6 +259,10 @@ To configure Filebeat, you edit the configuration file. For rpm and deb, you'll
 find the configuration file at `/etc/filebeat/filebeat.yml`. For mac and win, look in
 the archive that you just extracted. There’s also a full example configuration file
 called `filebeat.full.yml` that shows all non-deprecated options.
+
+See the
+{libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
 
 Here is a sample of the `filebeat` section of the `filebeat.yml` file. Filebeat uses predefined
 default values for most configuration options.

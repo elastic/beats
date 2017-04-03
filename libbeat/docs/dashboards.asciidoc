@@ -101,7 +101,7 @@ pattern is selected to see {beatname_uc} data.
 
 image:./images/kibana-created-indexes.png[Discover tab with index selected]
 
-To open the loaded dashboards, go to the *Dashboard* page and click *Open*.
-Select the dashboard that you want to open. 
+To open the loaded dashboards, go to the *Dashboard* page and select the
+dashboard that you want to open. 
 
 image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]

@@ -31,9 +31,13 @@ https://github.com/elastic/beats/compare/v5.3.0...master[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix modules default file permissions. {pull}3879[3879]
+
 *Heartbeat*
 
 *Metricbeat*
+
+- Avoid errors when some Apache status fields are missing. {issue}3074[3074]
 
 *Packetbeat*
 

@@ -14,6 +14,10 @@ configuration file at +/etc/heartbeat/heartbeat.full.yml+ that shows
 all non-deprecated options. For mac and win, look in the archive that you
 extracted.
 
+See the
+{libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
+
 The following topics describe how to configure Heartbeat:
 
 * <<heartbeat-configuration-details>>
