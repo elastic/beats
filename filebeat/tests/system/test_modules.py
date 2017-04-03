@@ -74,6 +74,8 @@ class Test(BaseTest):
             "-e", "-d", "*", "-once",
             "-c", cfgfile,
             "-modules={}".format(module),
+            "-M", "{module}.*.enabled=false".format(module=module),
+            "-M", "{module}.{fileset}.enabled=true".format(module=module, fileset=fileset),
             "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file),
             "-M", "*.*.prospector.close_eof=true",
@@ -95,14 +97,21 @@ class Test(BaseTest):
         objects = [o["_source"] for o in res["hits"]["hits"]]
         assert len(objects) > 0
         for obj in objects:
-            self.assert_fields_are_documented(obj)
-            # assert "error" not in obj  # no parsing errors
-            assert obj["fileset"]["module"] == module
+            assert obj["fileset"]["module"] == module, "expected fileset.module={} but got {}".format(
+                module, obj["fileset"]["module"])
+
+            if not (module == "mysql" and fileset == "slowlog") and not (module == "system" and fileset == "auth"):
+                # TODO: There are errors parsing the test logs from these modules.
+                assert "error" not in obj
+
+            if module != "auditd" and fileset != "log":
+                # There are dynamic fields in audit logs that are not documented.
+                self.assert_fields_are_documented(obj)
 
         if os.path.exists(test_file + "-expected.json"):
             with open(test_file + "-expected.json", "r") as f:
                 expected = json.load(f)
-                assert len(expected) == len(objects)
+                assert len(expected) == len(objects), "expected {} but got {}".format(len(expected), len(objects))
                 for ev in expected:
                     found = False
                     for obj in objects:

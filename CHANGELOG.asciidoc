@@ -153,6 +153,7 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 - The `symlinks` and `harverster_limit` settings are now GA, instead of experimental. {pull}3525[3525]
 - close_timeout is also applied when the output is blocking. {pull}3511[3511]
 - Improve handling of different path variants on Windows. {pull}3781[3781]
+- Add auditd module for reading audit logs on Linux. {pull}3750[3750] {pull}3941[3941]
 
 
 *Metricbeat*

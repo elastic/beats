@@ -1,17 +1,20 @@
 == System module
 
-This module collects and parses logs created by system logging server of common Unix/Linux based
-distributions.
+This module collects and parses logs created by system logging server of common
+Unix/Linux based distributions.
 
+[float]
 === Compatibility
 
-This module was tested with logs from OSes like Ubuntu 12.04, Centos 7, macOS Sierra, and others.
+This module was tested with logs from OSes like Ubuntu 12.04, Centos 7, and
+macOS Sierra.
 
 This module is not available for Windows.
 
+[float]
 === Dashboard
 
-This module comes with a sample dashboard.
+This module comes with a sample dashboard showing syslog data.
 
 image::./images/kibana-system.png[]
 
