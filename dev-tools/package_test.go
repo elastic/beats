@@ -21,13 +21,15 @@ import (
 )
 
 const (
-	expectedConfigMode = os.FileMode(0600)
-	expectedConfigUID  = 0
-	expectedConfigGID  = 0
+	expectedConfigMode   = os.FileMode(0600)
+	expectedManifestMode = os.FileMode(0644)
+	expectedConfigUID    = 0
+	expectedConfigGID    = 0
 )
 
 var (
-	configFilePattern = regexp.MustCompile(`.*beat\.yml`)
+	configFilePattern   = regexp.MustCompile(`.*beat\.yml`)
+	manifestFilePattern = regexp.MustCompile(`manifest.yml`)
 )
 
 var (
@@ -73,6 +75,9 @@ func checkRPM(t *testing.T, file string) {
 	}
 
 	checkConfigPermissions(t, p)
+	checkConfigOwner(t, p)
+	checkManifestPermissions(t, p)
+	checkManifestOwner(t, p)
 }
 
 func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
@@ -84,6 +89,8 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 
 	checkConfigPermissions(t, p)
 	checkConfigOwner(t, p)
+	checkManifestPermissions(t, p)
+	checkManifestOwner(t, p)
 }
 
 func checkTar(t *testing.T, file string) {
@@ -95,6 +102,7 @@ func checkTar(t *testing.T, file string) {
 
 	checkConfigPermissions(t, p)
 	checkConfigOwner(t, p)
+	checkManifestPermissions(t, p)
 }
 
 func checkZip(t *testing.T, file string) {
@@ -105,6 +113,7 @@ func checkZip(t *testing.T, file string) {
 	}
 
 	checkConfigPermissions(t, p)
+	checkManifestPermissions(t, p)
 }
 
 // Verify that the main configuration file is installed with a 0600 file mode.
@@ -115,7 +124,7 @@ func checkConfigPermissions(t *testing.T, p *packageFile) {
 				mode := entry.Mode.Perm()
 				if expectedConfigMode != mode {
 					t.Errorf("file %v has wrong permissions: expected=%v actual=%v",
-						entry.Mode, expectedConfigMode, mode)
+						entry.File, expectedConfigMode, mode)
 				}
 				return
 			}
@@ -138,6 +147,37 @@ func checkConfigOwner(t *testing.T, p *packageFile) {
 			}
 		}
 		t.Errorf("no config file found matching %v", configFilePattern)
+	})
+}
+
+// Verify that the modules manifest.yml files are installed with a 0644 file mode.
+func checkManifestPermissions(t *testing.T, p *packageFile) {
+	t.Run(p.Name+" manifest file permissions", func(t *testing.T) {
+		for _, entry := range p.Contents {
+			if manifestFilePattern.MatchString(entry.File) {
+				mode := entry.Mode.Perm()
+				if expectedManifestMode != mode {
+					t.Errorf("file %v has wrong permissions: expected=%v actual=%v",
+						entry.File, expectedManifestMode, mode)
+				}
+			}
+		}
+	})
+}
+
+// Verify that the manifest owner is root
+func checkManifestOwner(t *testing.T, p *packageFile) {
+	t.Run(p.Name+" manifest file owner", func(t *testing.T) {
+		for _, entry := range p.Contents {
+			if manifestFilePattern.MatchString(entry.File) {
+				if expectedConfigUID != entry.UID {
+					t.Errorf("file %v should be owned by user %v, owner=%v", entry.File, expectedConfigGID, entry.UID)
+				}
+				if expectedConfigGID != entry.GID {
+					t.Errorf("file %v should be owned by group %v, group=%v", entry.File, expectedConfigGID, entry.GID)
+				}
+			}
+		}
 	})
 }
 
