@@ -30,6 +30,8 @@ COVERAGE_DIR=${BUILD_DIR}/coverage
 COVERAGE_TOOL=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 TESTIFY_TOOL_REPO=github.com/elastic/beats/vendor/github.com/stretchr/testify
+GOX=${BEAT_GOPATH}/bin/gox
+GOX_REPO=github.com/mitchellh/gox
 PROCESSES?= 4
 TIMEOUT?= 90
 NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer ## @testing the options to pass when calling nosetests
@@ -81,9 +83,9 @@ ${BEAT_NAME}.test: $(GOFILES_ALL)
 .PHONY: crosscompile
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
 crosscompile: $(GOFILES)
-	go get github.com/mitchellh/gox
+	go get ${GOX_REPO}
 	mkdir -p ${BUILD_DIR}/bin
-	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
+	${GOX} -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
 
 .PHONY: check
 check: python-env ## @build Checks project and source code if everything is according to standard
