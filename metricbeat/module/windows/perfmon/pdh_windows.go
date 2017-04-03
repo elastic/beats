@@ -1,132 +1,235 @@
+// +build windows
+
 package perfmon
 
 import (
 	"strconv"
+	"syscall"
+	"unicode/utf16"
 	"unsafe"
 
-	"time"
-
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+	"golang.org/x/sys/windows"
 )
 
 // Windows API calls
-//sys   _PdhOpenQuery(dataSource uintptr, userData uintptr, query *uintptr) (err uint32) = pdh.PdhOpenQuery
-//sys   _PdhAddCounter(query uintptr, counterPath string, userData uintptr, counter *uintptr) (err uint32) = pdh.PdhAddEnglishCounterW
-//sys   _PdhCollectQueryData(query uintptr) (err uint32) = pdh.PdhCollectQueryData
-//sys   _PdhGetFormattedCounterValue(counter uintptr, format uint32, counterType int, value *PdhCounterValue) (err uint32) = pdh.PdhGetFormattedCounterValue
-//sys   _PdhCloseQuery(query uintptr) (err uint32) = pdh.PdhCloseQuery
+//sys _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhOpenQueryW
+//sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
+//sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
+//sys _PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
+//sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
 
-type Handle struct {
-	status      error
-	query       uintptr
-	counterType int
-	counters    []CounterGroup
-}
+type PdhQueryHandle uintptr
 
-type CounterGroup struct {
-	GroupName string
-	Counters  []Counter
-}
+var InvalidQueryHandle = ^PdhQueryHandle(0)
 
-type Counter struct {
-	counterName  string
-	counter      uintptr
-	counterPath  string
-	displayValue PdhCounterValue
-}
+type PdhCounterHandle uintptr
 
-type PdhError uint32
+var InvalidCounterHandle = ^PdhCounterHandle(0)
 
-var errorMapping = map[PdhError]string{
-	PDH_INVALID_DATA:        `PDH_INVALID_DATA`,
-	PDH_INVALID_HANDLE:      `PDH_INVALID_HANDLE`,
-	PDH_NO_DATA:             `PDH_NO_DATA`,
-	PDH_NO_MORE_DATA:        `PDH_NO_MORE_DATA`,
-	PDH_STATUS_INVALID_DATA: `PDH_STATUS_INVALID_DATA`,
-	PDH_STATUS_NEW_DATA:     `PDH_STATUS_NEW_DATA`,
-	PDH_STATUS_NO_COUNTER:   `PDH_STATUS_NO_COUNTER`,
-	PDH_STATUS_NO_OBJECT:    `PDH_STATUS_NO_OBJECT`,
-}
-
-func GetHandle(config []CounterConfig) (*Handle, PdhError) {
-	q := &Handle{}
-	err := _PdhOpenQuery(0, 0, &q.query)
-	if err != ERROR_SUCCESS {
-		return nil, PdhError(err)
-	}
-
-	counterGroups := make([]CounterGroup, len(config))
-	q.counters = counterGroups
-
-	for i, v := range config {
-		counterGroups[i] = CounterGroup{GroupName: v.Name, Counters: make([]Counter, len(v.Group))}
-		for j, v1 := range v.Group {
-			counterGroups[i].Counters[j] = Counter{counterName: v1.Alias, counterPath: v1.Query}
-			err := _PdhAddCounter(q.query, counterGroups[i].Counters[j].counterPath, 0, &counterGroups[i].Counters[j].counter)
-			if err != ERROR_SUCCESS {
-				return nil, PdhError(err)
-			}
+func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
+	var dataSourcePtr *uint16
+	if dataSource != "" {
+		var err error
+		dataSourcePtr, err = syscall.UTF16PtrFromString(dataSource)
+		if err != nil {
+			return InvalidQueryHandle, err
 		}
 	}
 
-	return q, 0
+	var handle PdhQueryHandle
+	if err := _PdhOpenQuery(dataSourcePtr, userData, &handle); err != nil {
+		return InvalidQueryHandle, PdhErrno(err.(syscall.Errno))
+	}
+
+	return handle, nil
 }
 
-func (q *Handle) ReadData(firstFetch bool) (common.MapStr, PdhError) {
-
-	err := _PdhCollectQueryData(q.query)
-
-	if firstFetch {
-		// Most counters require two sample values in order to compute a displayable value. So wait and then collect the second value
-		time.Sleep(2000)
-		err = _PdhCollectQueryData(q.query)
+func PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr) (PdhCounterHandle, error) {
+	var handle PdhCounterHandle
+	if err := _PdhAddCounter(query, counterPath, userData, &handle); err != nil {
+		return InvalidCounterHandle, PdhErrno(err.(syscall.Errno))
 	}
 
-	if err != ERROR_SUCCESS {
-		return nil, PdhError(err)
+	return handle, nil
+}
+
+func PdhCollectQueryData(query PdhQueryHandle) error {
+	if err := _PdhCollectQueryData(query); err != nil {
+		return PdhErrno(err.(syscall.Errno))
 	}
 
+	return nil
+}
+
+func PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat) (uint32, *PdhCounterValue, error) {
+	var counterType uint32
+	var value PdhCounterValue
+	if err := _PdhGetFormattedCounterValue(counter, format, &counterType, &value); err != nil {
+		return 0, nil, PdhErrno(err.(syscall.Errno))
+	}
+
+	return counterType, &value, nil
+}
+
+func PdhCloseQuery(query PdhQueryHandle) error {
+	if err := _PdhCloseQuery(query); err != nil {
+		return PdhErrno(err.(syscall.Errno))
+	}
+
+	return nil
+}
+
+type Query struct {
+	handle   PdhQueryHandle
+	counters map[string]PdhCounterHandle
+}
+
+func NewQuery(dataSource string) (*Query, error) {
+	h, err := PdhOpenQuery(dataSource, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Query{
+		handle:   h,
+		counters: map[string]PdhCounterHandle{},
+	}, nil
+}
+
+func (q *Query) AddCounter(counterPath string) error {
+	if _, found := q.counters[counterPath]; found {
+		return errors.New("counter already added")
+	}
+
+	h, err := PdhAddCounter(q.handle, counterPath, 0)
+	if err != nil {
+		return errors.Wrapf(err, `failed to add counter (path="%v")`, counterPath)
+	}
+
+	q.counters[counterPath] = h
+	return nil
+}
+
+func (q *Query) Execute() error {
+	return PdhCollectQueryData(q.handle)
+}
+
+type Value struct {
+	Num float64
+	Err error
+}
+
+func (q *Query) Values() (map[string]Value, error) {
+	rtn := make(map[string]Value, len(q.counters))
+	for path, handle := range q.counters {
+		_, value, err := PdhGetFormattedCounterValue(handle, PdhFmtDouble|PdhFmtNoCap100)
+		if err != nil {
+			rtn[path] = Value{Err: err}
+			continue
+		}
+
+		rtn[path] = Value{Num: *(*float64)(unsafe.Pointer(&value.LongValue))}
+	}
+
+	return rtn, nil
+}
+
+// Closes the query and all of its counters.
+func (q *Query) Close() error {
+	return PdhCloseQuery(q.handle)
+}
+
+type PerfmonReader struct {
+	query     *Query            // PDH Query
+	pathToKey map[string]string // Mapping of counter path to key used in output.
+	executed  bool              // Indicates if the query has been executed.
+}
+
+func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
+	query, err := NewQuery("")
+	if err != nil {
+		return nil, err
+	}
+
+	r := &PerfmonReader{
+		query:     query,
+		pathToKey: map[string]string{},
+	}
+
+	for _, group := range config {
+		for _, collector := range group.Group {
+			if err := query.AddCounter(collector.Query); err != nil {
+				query.Close()
+				return nil, err
+			}
+
+			r.pathToKey[collector.Query] = group.Name + "." + collector.Alias
+		}
+	}
+
+	return r, nil
+}
+
+func (r *PerfmonReader) Read() (common.MapStr, error) {
+	if err := r.query.Execute(); err != nil {
+		return nil, err
+	}
+
+	// Get the values.
+	values, err := r.query.Values()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed formatting counter values")
+	}
+
+	// Write the values into the map.
 	result := common.MapStr{}
+	var errs multierror.Errors
 
-	for _, v := range q.counters {
-		groupVal := make(map[string]interface{})
-		for _, v1 := range v.Counters {
-			err := _PdhGetFormattedCounterValue(v1.counter, PdhFmtDouble, q.counterType, &v1.displayValue)
-			if err != ERROR_SUCCESS {
-				switch err {
-				case PDH_CALC_NEGATIVE_DENOMINATOR:
-					{
-						//Sometimes counters return negative values. We can ignore this error. See here for a good explanation https://www.netiq.com/support/kb/doc.php?id=7010545
-						groupVal[v1.counterName] = 0
-						continue
-					}
-				default:
-					{
-						return nil, PdhError(err)
-					}
+	for counterPath, value := range values {
+		key := r.pathToKey[counterPath]
+		result.Put(key, value.Num)
+
+		if value.Err != nil {
+			switch value.Err {
+			case PDH_CALC_NEGATIVE_DENOMINATOR:
+			case PDH_INVALID_DATA:
+				if r.executed {
+					errs = append(errs, errors.Wrapf(value.Err, "key=%v", key))
 				}
+			default:
+				errs = append(errs, errors.Wrapf(value.Err, "key=%v", key))
 			}
-			doubleValue := (*float64)(unsafe.Pointer(&v1.displayValue.LongValue))
-			groupVal[v1.counterName] = *doubleValue
-
 		}
-		result[v.GroupName] = groupVal
 	}
-	return result, 0
+
+	if !r.executed {
+		r.executed = true
+	}
+
+	return result, errs.Err()
 }
 
-func CloseQuery(q uintptr) PdhError {
-	err := _PdhCloseQuery(q)
-	if err != ERROR_SUCCESS {
-		return PdhError(err)
+func (e PdhErrno) Error() string {
+	// If the value is not one of the known PDH errors then assume its a
+	// general windows error.
+	if _, found := pdhErrors[e]; !found {
+		return syscall.Errno(e).Error()
 	}
 
-	return 0
-}
-
-func (e PdhError) Error() string {
-	if val, ok := errorMapping[e]; ok {
-		return val
+	// Use FormatMessage to convert the PDH errno to a string.
+	// Example: https://msdn.microsoft.com/en-us/library/windows/desktop/aa373046(v=vs.85).aspx
+	var flags uint32 = windows.FORMAT_MESSAGE_FROM_HMODULE | windows.FORMAT_MESSAGE_ARGUMENT_ARRAY | windows.FORMAT_MESSAGE_IGNORE_INSERTS
+	b := make([]uint16, 300)
+	n, err := windows.FormatMessage(flags, modpdh.Handle(), uint32(e), 0, b, nil)
+	if err != nil {
+		return "pdh error #" + strconv.Itoa(int(e))
 	}
-	return strconv.FormatUint(uint64(e), 10)
+
+	// Trim terminating \r and \n
+	for ; n > 0 && (b[n-1] == '\n' || b[n-1] == '\r'); n-- {
+	}
+	return string(utf16.Decode(b[:n]))
 }
