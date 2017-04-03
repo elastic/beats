@@ -481,7 +481,7 @@ output.elasticsearch:
   #template.name: "metricbeat"
 
   # Path to fields.yml file to generate the template
-  #template.path: "${path.config}/fields.yml"
+  #template.fields: "${path.config}/fields.yml"
 
   # Overwrite existing template
   #template.overwrite: false

@@ -26,7 +26,7 @@ type elasticsearchConfig struct {
 type Template struct {
 	Enabled   bool   `config:"enabled"`
 	Name      string `config:"name"`
-	Path      string `config:"path"`
+	Fields    string `config:"fields"`
 	Overwrite bool   `config:"overwrite"`
 }
 
@@ -60,7 +60,7 @@ var (
 		LoadBalance:      true,
 		Template: Template{
 			Enabled: true,
-			Path:    "fields.yml",
+			Fields:  "fields.yml",
 		},
 	}
 )

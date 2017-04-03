@@ -247,7 +247,7 @@ func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) er
 			return fmt.Errorf("error creating template instance: %v", err)
 		}
 
-		fieldsPath := paths.Resolve(paths.Config, config.Path)
+		fieldsPath := paths.Resolve(paths.Config, config.Fields)
 
 		output, err := tmpl.Load(fieldsPath)
 		if err != nil {

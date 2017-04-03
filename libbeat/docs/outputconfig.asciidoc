@@ -23,7 +23,7 @@ Example configuration:
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
   template.enabled: true
-  template.path: "fields.yml"
+  template.fields: "fields.yml"
   template.overwrite: false
   index: "{beatname_lc}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -267,7 +267,7 @@ For example:
 output.elasticsearch:
   hosts: ["localhost:9200"]
   template.name: "{beatname_lc}"
-  template.path: "fields.yml"
+  template.fields: "fields.yml"
   template.overwrite: false
 ----------------------------------------------------------------------
 
@@ -289,7 +289,7 @@ For example:
 ----------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["localhost:9200"]
-  template.path: "{beatname_lc}.template.json"
+  template.fields: "{beatname_lc}.template.json"
   template.overwrite: false
 ----------------------------------------------------------------------
 

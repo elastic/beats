@@ -161,8 +161,8 @@ func TestOutputLoadTemplate(t *testing.T) {
 	config := map[string]interface{}{
 		"hosts": GetEsHost(),
 		"template": map[string]interface{}{
-			"name": "libbeat",
-			"path": tPath,
+			"name":   "libbeat",
+			"fields": tPath,
 		},
 	}
 
