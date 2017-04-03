@@ -121,11 +121,47 @@ func TestMatchers(t *testing.T) {
 			},
 		},
 		{
+			`^\d\d\d\d-\d\d-\d\d`,
+			typeOf((*prefixNumDate)(nil)),
+			[]string{
+				"2017-01-02 should match",
+				"2017-01-03 should also match",
+			},
+			[]string{
+				"- 2017-01-02 should not match",
+				"fail",
+			},
+		},
+		{
 			`^\d{4}-\d{2}-\d{2}`,
 			typeOf((*prefixNumDate)(nil)),
 			[]string{
 				"2017-01-02 should match",
 				"2017-01-03 should also match",
+			},
+			[]string{
+				"- 2017-01-02 should not match",
+				"fail",
+			},
+		},
+		{
+			`^(\d{2}){2}-\d{2}-\d{2}`,
+			typeOf((*prefixNumDate)(nil)),
+			[]string{
+				"2017-01-02 should match",
+				"2017-01-03 should also match",
+			},
+			[]string{
+				"- 2017-01-02 should not match",
+				"fail",
+			},
+		},
+		{
+			`^\d{4}-\d{2}-\d{2} - `,
+			typeOf((*prefixNumDate)(nil)),
+			[]string{
+				"2017-01-02 - should match",
+				"2017-01-03 - should also match",
 			},
 			[]string{
 				"- 2017-01-02 should not match",
