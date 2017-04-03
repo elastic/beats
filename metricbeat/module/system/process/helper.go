@@ -40,6 +40,7 @@ type ProcStats struct {
 	ProcsMap     ProcsMap
 	CpuTicks     bool
 	EnvWhitelist []string
+	CacheCmdLine bool
 
 	procRegexps []match.Matcher // List of regular expressions used to whitelist processes.
 	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
@@ -342,7 +343,9 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 		var cmdline string
 		var env common.MapStr
 		if previousProc := procStats.ProcsMap[pid]; previousProc != nil {
-			cmdline = previousProc.CmdLine
+			if procStats.CacheCmdLine {
+				cmdline = previousProc.CmdLine
+			}
 			env = previousProc.Env
 		}
 
