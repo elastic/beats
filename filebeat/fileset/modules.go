@@ -44,13 +44,13 @@ func newModuleRegistry(modulesPath string,
 				fcfg = &defaultFilesetConfig
 			}
 
-			if fcfg.Enabled != nil && (*fcfg.Enabled) == false {
-				continue
-			}
-
 			fcfg, err = applyOverrides(fcfg, mcfg.Module, filesetName, overrides)
 			if err != nil {
 				return nil, fmt.Errorf("Error applying overrides on fileset %s/%s: %v", mcfg.Module, filesetName, err)
+			}
+
+			if fcfg.Enabled != nil && (*fcfg.Enabled) == false {
+				continue
 			}
 
 			fileset, err := New(modulesPath, filesetName, &mcfg, fcfg)

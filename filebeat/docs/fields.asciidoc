@@ -866,6 +866,130 @@ Fields from the system log files.
 
 
 [float]
+== audit Fields
+
+Fields from the Linux audit logs. Not all fields are documented here because they are dynamic and vary by audit event type.
+
+
+
+[float]
+=== system.audit.record_type
+
+The audit event type.
+
+
+[float]
+=== system.audit.old_auid
+
+For login events this is the old audit ID used for the user prior to this login.
+
+
+[float]
+=== system.audit.new_auid
+
+For login events this is the new audit ID. The audit ID can be used to trace future events to the user even if their identity changes (like becoming root).
+
+
+[float]
+=== system.audit.old_ses
+
+For login events this is the old session ID used for the user prior to this login.
+
+
+[float]
+=== system.audit.new_ses
+
+For login events this is the new session ID. It can be used to tie a user to future events by session ID.
+
+
+[float]
+=== system.audit.sequence
+
+type: long
+
+The audit event sequence number.
+
+
+[float]
+=== system.audit.pid
+
+type: long
+
+The ID of the process.
+
+
+[float]
+=== system.audit.ppid
+
+type: long
+
+The ID of the process.
+
+
+[float]
+=== system.audit.items
+
+type: long
+
+The number of items in an event.
+
+
+[float]
+=== system.audit.item
+
+type: long
+
+The item field indicates which item out of the total number of items. This number is zero-based; a value of 0 means it is the first item.
+
+
+[float]
+== geoip Fields
+
+Contains GeoIP information gathered based on the `system.audit.addr` field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== system.audit.geoip.continent_name
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== system.audit.geoip.city_name
+
+type: keyword
+
+The name of the city.
+
+
+[float]
+=== system.audit.geoip.region_name
+
+type: keyword
+
+The name of the region.
+
+
+[float]
+=== system.audit.geoip.country_iso_code
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== system.audit.geoip.location
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
 == auth Fields
 
 Fields from the Linux authorization logs.
