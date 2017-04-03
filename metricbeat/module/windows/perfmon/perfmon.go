@@ -3,11 +3,10 @@
 package perfmon
 
 import (
-	"errors"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/pkg/errors"
 )
 
 type CounterConfig struct {
@@ -20,28 +19,18 @@ type CounterConfigGroup struct {
 	Query string `config:"query" validate:"required"`
 }
 
-// init registers the MetricSet with the central registry.
-// The New method will be called after the setup of the module and before starting to fetch data
 func init() {
 	if err := mb.Registry.AddMetricSet("windows", "perfmon", New); err != nil {
 		panic(err)
 	}
 }
 
-// MetricSet type defines all fields of the MetricSet
-// As a minimum it must inherit the mb.BaseMetricSet fields, but can be extended with
-// additional entries. These variables can be used to persist data or configuration between
-// multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	counters   []CounterConfig
-	handle     *Handle
-	firstFetch bool
+	reader *PerfmonReader
 }
 
-// New create a new instance of the MetricSet
-// Part of new is also setting up the configuration by processing additional
-// configuration entries if needed.
+// New create a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logp.Warn("BETA: The perfmon metricset is beta")
 
@@ -53,32 +42,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	query, err := GetHandle(config.CounterConfig)
-
-	if err != ERROR_SUCCESS {
-		return nil, errors.New("initialization fails with error: " + err.Error())
+	reader, err := NewPerfmonReader(config.CounterConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "initialization failed")
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		counters:      config.CounterConfig,
-		handle:        query,
-		firstFetch:    true,
+		reader:        reader,
 	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-// It returns the event which is then forward to the output. In case of an error, a
-// descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-
-	data, err := m.handle.ReadData(m.firstFetch)
-	if err != ERROR_SUCCESS {
-		return nil, errors.New("fetching fails wir error: " + err.Error())
-	}
-
-	if m.firstFetch {
-		m.firstFetch = false
+	data, err := m.reader.Read()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed reading counters")
 	}
 
 	return data, nil
