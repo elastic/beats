@@ -113,6 +113,7 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 *Affecting all Beats*
 
 - Add `_id`, `_type`, `_index` and `_score` fields in the generated index pattern. {pull}3282[3282]
+- Fix panic when testing regex-AST to match against date patterns. {issue}3889[3889]
 
 *Filebeat*
 
