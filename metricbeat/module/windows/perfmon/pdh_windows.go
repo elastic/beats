@@ -20,12 +20,7 @@ type Handle struct {
 	status      error
 	query       uintptr
 	counterType int
-	counters    []CounterGroup
-}
-
-type CounterGroup struct {
-	GroupName string
-	Counters  []Counter
+	counters    []Counter
 }
 
 type Counter struct {
@@ -48,24 +43,21 @@ var errorMapping = map[PdhError]string{
 	PDH_STATUS_NO_OBJECT:    `PDH_STATUS_NO_OBJECT`,
 }
 
-func GetHandle(config []CounterConfig) (*Handle, PdhError) {
+func GetHandle(config []CounterConfigGroup) (*Handle, PdhError) {
 	q := &Handle{}
 	err := _PdhOpenQuery(0, 0, &q.query)
 	if err != ERROR_SUCCESS {
 		return nil, PdhError(err)
 	}
 
-	counterGroups := make([]CounterGroup, len(config))
-	q.counters = counterGroups
+	counters := make([]Counter, len(config))
+	q.counters = counters
 
 	for i, v := range config {
-		counterGroups[i] = CounterGroup{GroupName: v.Name, Counters: make([]Counter, len(v.Group))}
-		for j, v1 := range v.Group {
-			counterGroups[i].Counters[j] = Counter{counterName: v1.Alias, counterPath: v1.Query}
-			err := _PdhAddCounter(q.query, counterGroups[i].Counters[j].counterPath, 0, &counterGroups[i].Counters[j].counter)
-			if err != ERROR_SUCCESS {
-				return nil, PdhError(err)
-			}
+		counters[i] = Counter{counterName: v.Alias, counterPath: v.Query}
+		err := _PdhAddCounter(q.query, counters[i].counterPath, 0, &counters[i].counter)
+		if err != ERROR_SUCCESS {
+			return nil, PdhError(err)
 		}
 	}
 
@@ -89,28 +81,24 @@ func (q *Handle) ReadData(firstFetch bool) (common.MapStr, PdhError) {
 	result := common.MapStr{}
 
 	for _, v := range q.counters {
-		groupVal := make(map[string]interface{})
-		for _, v1 := range v.Counters {
-			err := _PdhGetFormattedCounterValue(v1.counter, PdhFmtDouble, q.counterType, &v1.displayValue)
-			if err != ERROR_SUCCESS {
-				switch err {
-				case PDH_CALC_NEGATIVE_DENOMINATOR:
-					{
-						//Sometimes counters return negative values. We can ignore this error. See here for a good explanation https://www.netiq.com/support/kb/doc.php?id=7010545
-						groupVal[v1.counterName] = 0
-						continue
-					}
-				default:
-					{
-						return nil, PdhError(err)
-					}
+		err := _PdhGetFormattedCounterValue(v.counter, PdhFmtDouble, q.counterType, &v.displayValue)
+		if err != ERROR_SUCCESS {
+			switch err {
+			case PDH_CALC_NEGATIVE_DENOMINATOR:
+				{
+					//Sometimes counters return negative values. We can ignore this error. See here for a good explanation https://www.netiq.com/support/kb/doc.php?id=7010545
+					result[v.counterName] = 0
+					continue
+				}
+			default:
+				{
+					return nil, PdhError(err)
 				}
 			}
-			doubleValue := (*float64)(unsafe.Pointer(&v1.displayValue.LongValue))
-			groupVal[v1.counterName] = *doubleValue
-
 		}
-		result[v.GroupName] = groupVal
+		doubleValue := (*float64)(unsafe.Pointer(&v.displayValue.LongValue))
+
+		result[v.counterName] = *doubleValue
 	}
 	return result, 0
 }

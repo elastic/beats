@@ -7534,23 +7534,14 @@ Name of the user running the process.
 
 
 [float]
-== counters Fields
+== perfmon.counters Fields
 
-Grouping of different counters
-
-
-
-[float]
-=== windows.perfmon.counters.group
-
-type: string
-
-Name of the group. For example `processor` or `disk`
+Grouping of different counters   
 
 
 
 [float]
-=== windows.perfmon.counters.collectors.alias
+=== windows.perfmon.perfmon.counters.alias
 
 type: string
 
@@ -7558,7 +7549,7 @@ Short form for the query
 
 
 [float]
-=== windows.perfmon.counters.collectors.query
+=== windows.perfmon.perfmon.counters.query
 
 type: string
 

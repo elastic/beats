@@ -10,11 +10,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-type CounterConfig struct {
-	Name  string               `config:"group" validate:"required"`
-	Group []CounterConfigGroup `config:"collectors" validate:"required"`
-}
-
 type CounterConfigGroup struct {
 	Alias string `config:"alias" validate:"required"`
 	Query string `config:"query" validate:"required"`
@@ -34,7 +29,7 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	counters   []CounterConfig
+	counters   []CounterConfigGroup
 	handle     *Handle
 	firstFetch bool
 }
@@ -46,14 +41,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logp.Warn("BETA: The perfmon metricset is beta")
 
 	config := struct {
-		CounterConfig []CounterConfig `config:"perfmon.counters" validate:"required"`
+		CounterConfigGroup []CounterConfigGroup `config:"perfmon.counters" validate:"required"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	query, err := GetHandle(config.CounterConfig)
+	query, err := GetHandle(config.CounterConfigGroup)
 
 	if err != ERROR_SUCCESS {
 		return nil, errors.New("initialization fails with error: " + err.Error())
@@ -61,7 +56,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		counters:      config.CounterConfig,
+		counters:      config.CounterConfigGroup,
 		handle:        query,
 		firstFetch:    true,
 	}, nil
