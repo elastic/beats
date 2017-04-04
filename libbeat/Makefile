@@ -14,3 +14,6 @@ fields:
 # Collects all dependencies and then calls update
 .PHONY: collect
 collect: fields
+
+clean::
+	rm -rf libbeat.full.yml libbeat.yml

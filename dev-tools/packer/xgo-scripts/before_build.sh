@@ -12,9 +12,8 @@ cd $GOPATH/src/$BEAT_PATH
 
 PREFIX=/build
 
-# Copy template
-cp $BEAT_NAME.template.json $PREFIX/$BEAT_NAME.template.json
-cp $BEAT_NAME.template-es2x.json $PREFIX/$BEAT_NAME.template-es2x.json
+# Copy fields.yml
+cp fields.yml $PREFIX/fields.yml
 
 # linux
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-linux.yml

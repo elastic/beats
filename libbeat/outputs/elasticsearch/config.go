@@ -24,11 +24,10 @@ type elasticsearchConfig struct {
 
 // Template contains the elasticsearch template.
 type Template struct {
-	Enabled   bool             `config:"enabled"`
-	Name      string           `config:"name"`
-	Path      string           `config:"path"`
-	Overwrite bool             `config:"overwrite"`
-	Versions  TemplateVersions `config:"versions"`
+	Enabled   bool   `config:"enabled"`
+	Name      string `config:"name"`
+	Fields    string `config:"fields"`
+	Overwrite bool   `config:"overwrite"`
 }
 
 // TemplateVersions contains the template versions.
@@ -60,8 +59,8 @@ var (
 		TLS:              nil,
 		LoadBalance:      true,
 		Template: Template{
-			Enabled:  true,
-			Versions: TemplateVersions{Es2x: TemplateVersion{Enabled: true}},
+			Enabled: true,
+			Fields:  "fields.yml",
 		},
 	}
 )

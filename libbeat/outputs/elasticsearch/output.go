@@ -1,12 +1,9 @@
 package elasticsearch
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
-	"os"
-	"strings"
 	"sync"
 	"time"
 
@@ -19,6 +16,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/libbeat/template"
 )
 
 type elasticsearchOutput struct {
@@ -29,8 +27,6 @@ type elasticsearchOutput struct {
 
 	mode mode.ConnectionMode
 
-	template      map[string]interface{}
-	template2x    map[string]interface{}
 	templateMutex sync.Mutex
 }
 
@@ -180,11 +176,6 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
-	err = out.readTemplate(&config.Template)
-	if err != nil {
-		return err
-	}
-
 	out.index = index
 	pipeline, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "pipeline",
@@ -232,62 +223,6 @@ func (out *elasticsearchOutput) init(
 	return nil
 }
 
-// readTemplates reads the ES mapping template from the disk, if configured.
-func (out *elasticsearchOutput) readTemplate(config *Template) error {
-	if config.Enabled {
-		// Set the defaults that depend on the beat name
-		if config.Name == "" {
-			config.Name = out.beat.Beat + "-" + out.beat.Version
-		}
-		if config.Path == "" {
-			config.Path = fmt.Sprintf("%s.template.json", out.beat.Beat)
-		}
-		if config.Versions.Es2x.Path == "" {
-			config.Versions.Es2x.Path = fmt.Sprintf("%s.template-es2x.json", out.beat.Beat)
-		}
-
-		// Look for the template in the configuration path, if it's not absolute
-		templatePath := paths.Resolve(paths.Config, config.Path)
-		logp.Info("Loading template enabled. Reading template file: %v", templatePath)
-
-		template, err := readTemplate(templatePath)
-		if err != nil {
-			return fmt.Errorf("Error loading template %s: %v", templatePath, err)
-		}
-		out.template = template
-
-		if config.Versions.Es2x.Enabled {
-			// Read the version of the template compatible with ES 2.x
-			templatePath := paths.Resolve(paths.Config, config.Versions.Es2x.Path)
-			logp.Info("Loading template enabled for Elasticsearch 2.x. Reading template file: %v", templatePath)
-
-			template, err := readTemplate(templatePath)
-			if err != nil {
-				return fmt.Errorf("Error loading template %s: %v", templatePath, err)
-			}
-			out.template2x = template
-		}
-	}
-	return nil
-}
-
-func readTemplate(filename string) (map[string]interface{}, error) {
-	f, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	var template map[string]interface{}
-	dec := json.NewDecoder(f)
-	err = dec.Decode(&template)
-	if err != nil {
-		return nil, err
-	}
-
-	return template, nil
-}
-
 // loadTemplate checks if the index mapping template should be loaded
 // In case the template is not already loaded or overwriting is enabled, the
 // template is written to index
@@ -301,19 +236,27 @@ func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) er
 	exists := client.CheckTemplate(config.Name)
 	if !exists || config.Overwrite {
 
+		logp.Info("Loading template for elasticsearch version: %s", client.Connection.version)
+
 		if config.Overwrite {
 			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
 		}
 
-		template := out.template
-		if config.Versions.Es2x.Enabled && strings.HasPrefix(client.Connection.version, "2.") {
-			logp.Info("Detected Elasticsearch 2.x. Automatically selecting the 2.x version of the template")
-			template = out.template2x
+		tmpl, err := template.New(out.beat.Version, client.Connection.version, config.Name)
+		if err != nil {
+			return fmt.Errorf("error creating template instance: %v", err)
 		}
 
-		err := client.LoadTemplate(config.Name, template)
+		fieldsPath := paths.Resolve(paths.Config, config.Fields)
+
+		output, err := tmpl.Load(fieldsPath)
 		if err != nil {
-			return fmt.Errorf("Could not load template: %v", err)
+			return fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
+		}
+
+		err = client.LoadTemplate(tmpl.GetName(), output)
+		if err != nil {
+			return fmt.Errorf("could not load template: %v", err)
 		}
 	} else {
 		logp.Info("Template already exists and will not be overwritten.")
@@ -349,9 +292,14 @@ func makeClientFactory(
 			params = nil
 		}
 
-		// define a callback to be called on connection
 		var onConnected connectCallback
-		if out.template != nil {
+		// TODO: should we check if fields.yml exists?
+		if config.Template.Enabled {
+			// Set beat name as default if name not set
+			if config.Template.Name == "" {
+				config.Template.Name = out.beat.Beat
+			}
+			// define a callback to be called on connection
 			onConnected = func(client *Client) error {
 				return out.loadTemplate(config.Template, client)
 			}

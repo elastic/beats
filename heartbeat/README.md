@@ -35,8 +35,7 @@ To run Heartbeat with debugging output enabled, run:
 ### Update
 
 Each beat has a template for the mapping in elasticsearch and a documentation for the fields
-which is automatically generated based on `etc/fields.yml`.
-To generate etc/heartbeat.template.json and etc/heartbeat.asciidoc
+which is automatically generated based on `fields.yml`.
 
 ```
 make update
