@@ -2,6 +2,7 @@ package actions
 
 import (
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -9,34 +10,17 @@ import (
 )
 
 func TestExportTimeZone(t *testing.T) {
-	var testConfig, _ = common.NewConfigFrom(map[string]interface{}{
-		"timezone": "America/Curacao",
-	})
+	var testConfig = common.NewConfig()
 
 	input := common.MapStr{}
+
+	zone, _ := time.Now().In(time.Local).Zone()
 
 	actual := getActualValue(t, testConfig, input)
 
 	expected := common.MapStr{
 		"beat": map[string]string{
-			"timezone": "America/Curacao",
-		},
-	}
-
-	assert.Equal(t, expected.String(), actual.String())
-}
-
-func TestExportDefaultTimeZone(t *testing.T) {
-	var testConfig, _ = common.NewConfigFrom(map[string]interface{}{
-		"timezone": "",
-	})
-	input := common.MapStr{}
-
-	actual := getActualValue(t, testConfig, input)
-
-	expected := common.MapStr{
-		"beat": map[string]string{
-			"timezone": "UTC",
+			"timezone": zone,
 		},
 	}
 
