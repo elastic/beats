@@ -1,12 +1,9 @@
 package elasticsearch
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
-	"os"
-	"strings"
 	"sync"
 	"time"
 
@@ -19,18 +16,17 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/libbeat/template"
 )
 
 type elasticsearchOutput struct {
 	index    outil.Selector
-	beatName string
+	beat     common.BeatInfo
 	pipeline *outil.Selector
+	clients  []mode.ProtocolClient
 
 	mode mode.ConnectionMode
-	topology
 
-	template      map[string]interface{}
-	template2x    map[string]interface{}
 	templateMutex sync.Mutex
 }
 
@@ -54,18 +50,18 @@ var (
 )
 
 // New instantiates a new output plugin instance publishing to elasticsearch.
-func New(beatName string, cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
+func New(beat common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
 	if !cfg.HasField("bulk_max_size") {
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
 
 	if !cfg.HasField("index") {
-		pattern := fmt.Sprintf("%v-%%{+yyyy.MM.dd}", beatName)
+		pattern := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.Beat, beat.Version)
 		cfg.SetString("index", -1, pattern)
 	}
 
-	output := &elasticsearchOutput{beatName: beatName}
-	err := output.init(cfg, topologyExpire)
+	output := &elasticsearchOutput{beat: beat}
+	err := output.init(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +101,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 	}
 
 	config := defaultConfig
-	if err := cfg.Unpack(&config); err != nil {
+	if err = cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
@@ -114,13 +110,11 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 		return nil, err
 	}
 
-	var proxyURL *url.URL
-	if config.ProxyURL != "" {
-		proxyURL, err = parseProxyURL(config.ProxyURL)
-		if err != nil {
-			return nil, err
-		}
-
+	proxyURL, err := parseProxyURL(config.ProxyURL)
+	if err != nil {
+		return nil, err
+	}
+	if proxyURL != nil {
 		logp.Info("Using proxy URL: %s", proxyURL)
 	}
 
@@ -131,7 +125,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 
 	clients := []Client{}
 	for _, host := range hosts {
-		esURL, err := getURL(config.Protocol, config.Path, host)
+		esURL, err := MakeURL(config.Protocol, config.Path, host)
 		if err != nil {
 			logp.Err("Invalid host param set: %s, Error: %v", host, err)
 			return nil, err
@@ -161,7 +155,6 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 
 func (out *elasticsearchOutput) init(
 	cfg *common.Config,
-	topologyExpire int,
 ) error {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
@@ -179,11 +172,6 @@ func (out *elasticsearchOutput) init(
 	}
 
 	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return err
-	}
-
-	err = out.readTemplate(&config.Template)
 	if err != nil {
 		return err
 	}
@@ -235,62 +223,6 @@ func (out *elasticsearchOutput) init(
 	return nil
 }
 
-// readTemplates reads the ES mapping template from the disk, if configured.
-func (out *elasticsearchOutput) readTemplate(config *Template) error {
-	if config.Enabled {
-		// Set the defaults that depend on the beat name
-		if config.Name == "" {
-			config.Name = out.beatName
-		}
-		if config.Path == "" {
-			config.Path = fmt.Sprintf("%s.template.json", out.beatName)
-		}
-		if config.Versions.Es2x.Path == "" {
-			config.Versions.Es2x.Path = fmt.Sprintf("%s.template-es2x.json", out.beatName)
-		}
-
-		// Look for the template in the configuration path, if it's not absolute
-		templatePath := paths.Resolve(paths.Config, config.Path)
-		logp.Info("Loading template enabled. Reading template file: %v", templatePath)
-
-		template, err := readTemplate(templatePath)
-		if err != nil {
-			return fmt.Errorf("Error loading template %s: %v", templatePath, err)
-		}
-		out.template = template
-
-		if config.Versions.Es2x.Enabled {
-			// Read the version of the template compatible with ES 2.x
-			templatePath := paths.Resolve(paths.Config, config.Versions.Es2x.Path)
-			logp.Info("Loading template enabled for Elasticsearch 2.x. Reading template file: %v", templatePath)
-
-			template, err := readTemplate(templatePath)
-			if err != nil {
-				return fmt.Errorf("Error loading template %s: %v", templatePath, err)
-			}
-			out.template2x = template
-		}
-	}
-	return nil
-}
-
-func readTemplate(filename string) (map[string]interface{}, error) {
-	f, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	var template map[string]interface{}
-	dec := json.NewDecoder(f)
-	err = dec.Decode(&template)
-	if err != nil {
-		return nil, err
-	}
-
-	return template, nil
-}
-
 // loadTemplate checks if the index mapping template should be loaded
 // In case the template is not already loaded or overwriting is enabled, the
 // template is written to index
@@ -304,19 +236,27 @@ func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) er
 	exists := client.CheckTemplate(config.Name)
 	if !exists || config.Overwrite {
 
+		logp.Info("Loading template for elasticsearch version: %s", client.Connection.version)
+
 		if config.Overwrite {
 			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
 		}
 
-		template := out.template
-		if config.Versions.Es2x.Enabled && strings.HasPrefix(client.Connection.version, "2.") {
-			logp.Info("Detected Elasticsearch 2.x. Automatically selecting the 2.x version of the template")
-			template = out.template2x
+		tmpl, err := template.New(out.beat.Version, client.Connection.version, config.Name)
+		if err != nil {
+			return fmt.Errorf("error creating template instance: %v", err)
 		}
 
-		err := client.LoadTemplate(config.Name, template)
+		fieldsPath := paths.Resolve(paths.Config, config.Fields)
+
+		output, err := tmpl.Load(fieldsPath)
 		if err != nil {
-			return fmt.Errorf("Could not load template: %v", err)
+			return fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
+		}
+
+		err = client.LoadTemplate(tmpl.GetName(), output)
+		if err != nil {
+			return fmt.Errorf("could not load template: %v", err)
 		}
 	} else {
 		logp.Info("Template already exists and will not be overwritten.")
@@ -331,7 +271,7 @@ func makeClientFactory(
 	out *elasticsearchOutput,
 ) func(string) (mode.ProtocolClient, error) {
 	return func(host string) (mode.ProtocolClient, error) {
-		esURL, err := getURL(config.Protocol, config.Path, host)
+		esURL, err := MakeURL(config.Protocol, config.Path, host)
 		if err != nil {
 			logp.Err("Invalid host param set: %s, Error: %v", host, err)
 			return nil, err
@@ -352,9 +292,14 @@ func makeClientFactory(
 			params = nil
 		}
 
-		// define a callback to be called on connection
 		var onConnected connectCallback
-		if out.template != nil {
+		// TODO: should we check if fields.yml exists?
+		if config.Template.Enabled {
+			// Set beat name as default if name not set
+			if config.Template.Name == "" {
+				config.Template.Name = out.beat.Beat
+			}
+			// define a callback to be called on connection
 			onConnected = func(client *Client) error {
 				return out.loadTemplate(config.Template, client)
 			}
@@ -395,15 +340,4 @@ func (out *elasticsearchOutput) BulkPublish(
 	data []outputs.Data,
 ) error {
 	return out.mode.PublishEvents(trans, opts, data)
-}
-
-func parseProxyURL(raw string) (*url.URL, error) {
-	url, err := url.Parse(raw)
-	if err == nil && strings.HasPrefix(url.Scheme, "http") {
-		return url, err
-	}
-
-	// Proxy was bogus. Try prepending "http://" to it and
-	// see if that parses correctly.
-	return url.Parse("http://" + raw)
 }

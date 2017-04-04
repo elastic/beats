@@ -106,11 +106,21 @@ parse_args() {
   fi
 }
 
+lint() {
+  if [ -z $ghprbPullId ]; then
+    return
+  fi
+  export REVIEWDOG_OPTIONS="-ci common"
+  IFS='/' read -a repo <<< "$ghprbGhRepository"
+  CI_PULL_REQUEST=$ghprbPullId CI_COMMIT=$ghprbActualCommit CI_REPO_OWNER=${repo[0]} CI_REPO_NAME=${repo[1]} make lint
+}
+
 build() {
   make check
   make testsuite
   make coverage-report
   make docs
+  lint
 }
 
 cleanup() {

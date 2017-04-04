@@ -37,7 +37,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Version)
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info.Version)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	crawler, err := crawler.New(newSpoolerOutlet(fb.done, spooler, wgEvents), config.Prospectors, *once)
+	crawler, err := crawler.New(newSpoolerOutlet(fb.done, spooler, wgEvents), config.Prospectors, fb.done, *once)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err

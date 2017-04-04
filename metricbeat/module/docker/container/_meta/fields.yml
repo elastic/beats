@@ -41,12 +41,11 @@
           description: >
              Size of the files that have been created or changed since creation.
     - name: labels
-      type: dict
-      dict-type: keyword
+      type: object
+      object_type: keyword
       description: >
         Image labels.
     - name: tags
-      type: list
-      dict-type: keyword
+      type: array
       description: >
         Image tags.

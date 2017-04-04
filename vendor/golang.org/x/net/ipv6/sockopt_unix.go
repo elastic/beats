@@ -17,7 +17,7 @@ func getInt(fd int, opt *sockOpt) (int, error) {
 		return 0, errOpNoSupport
 	}
 	var i int32
-	l := sysSockoptLen(4)
+	l := uint32(4)
 	if err := getsockopt(fd, opt.level, opt.name, unsafe.Pointer(&i), &l); err != nil {
 		return 0, os.NewSyscallError("getsockopt", err)
 	}
@@ -29,7 +29,7 @@ func setInt(fd int, opt *sockOpt, v int) error {
 		return errOpNoSupport
 	}
 	i := int32(v)
-	return os.NewSyscallError("setsockopt", setsockopt(fd, opt.level, opt.name, unsafe.Pointer(&i), sysSockoptLen(4)))
+	return os.NewSyscallError("setsockopt", setsockopt(fd, opt.level, opt.name, unsafe.Pointer(&i), 4))
 }
 
 func getInterface(fd int, opt *sockOpt) (*net.Interface, error) {
@@ -37,7 +37,7 @@ func getInterface(fd int, opt *sockOpt) (*net.Interface, error) {
 		return nil, errOpNoSupport
 	}
 	var i int32
-	l := sysSockoptLen(4)
+	l := uint32(4)
 	if err := getsockopt(fd, opt.level, opt.name, unsafe.Pointer(&i), &l); err != nil {
 		return nil, os.NewSyscallError("getsockopt", err)
 	}
@@ -59,7 +59,7 @@ func setInterface(fd int, opt *sockOpt, ifi *net.Interface) error {
 	if ifi != nil {
 		i = int32(ifi.Index)
 	}
-	return os.NewSyscallError("setsockopt", setsockopt(fd, opt.level, opt.name, unsafe.Pointer(&i), sysSockoptLen(4)))
+	return os.NewSyscallError("setsockopt", setsockopt(fd, opt.level, opt.name, unsafe.Pointer(&i), 4))
 }
 
 func getICMPFilter(fd int, opt *sockOpt) (*ICMPFilter, error) {
@@ -67,7 +67,7 @@ func getICMPFilter(fd int, opt *sockOpt) (*ICMPFilter, error) {
 		return nil, errOpNoSupport
 	}
 	var f ICMPFilter
-	l := sysSockoptLen(sysSizeofICMPv6Filter)
+	l := uint32(sysSizeofICMPv6Filter)
 	if err := getsockopt(fd, opt.level, opt.name, unsafe.Pointer(&f.sysICMPv6Filter), &l); err != nil {
 		return nil, os.NewSyscallError("getsockopt", err)
 	}
@@ -86,7 +86,7 @@ func getMTUInfo(fd int, opt *sockOpt) (*net.Interface, int, error) {
 		return nil, 0, errOpNoSupport
 	}
 	var mi sysIPv6Mtuinfo
-	l := sysSockoptLen(sysSizeofIPv6Mtuinfo)
+	l := uint32(sysSizeofIPv6Mtuinfo)
 	if err := getsockopt(fd, opt.level, opt.name, unsafe.Pointer(&mi), &l); err != nil {
 		return nil, 0, os.NewSyscallError("getsockopt", err)
 	}

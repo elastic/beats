@@ -19,8 +19,11 @@ grouped in the following categories:
 * <<exported-fields-common>>
 * <<exported-fields-couchbase>>
 * <<exported-fields-docker>>
+* <<exported-fields-golang>>
 * <<exported-fields-haproxy>>
+* <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
+* <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
@@ -29,6 +32,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-windows>>
 * <<exported-fields-zookeeper>>
 
 --
@@ -408,7 +412,7 @@ Arbitrary tags that can be set per Beat and per transaction type.
 [float]
 === fields
 
-type: dict
+type: object
 
 Contains user configurable fields.
 
@@ -1334,7 +1338,7 @@ Size of the files that have been created or changed since creation.
 [float]
 === docker.container.labels
 
-type: dict
+type: object
 
 Image labels.
 
@@ -1342,7 +1346,7 @@ Image labels.
 [float]
 === docker.container.tags
 
-type: list
+type: array
 
 Image tags.
 
@@ -1573,7 +1577,7 @@ Total size of the all cached images associated to the current image.
 [float]
 === docker.image.labels
 
-type: dict
+type: object
 
 Image labels.
 
@@ -1581,7 +1585,7 @@ Image labels.
 [float]
 === docker.image.tags
 
-type: list
+type: array
 
 Image tags.
 
@@ -1829,6 +1833,275 @@ Total errors on outgoing packets.
 type: long
 
 Total number of outgoing packets.
+
+
+[[exported-fields-golang]]
+== golang Fields
+
+golang Module
+
+
+
+[float]
+== golang Fields
+
+
+
+
+[float]
+== expvar Fields
+
+expvar
+
+
+
+[float]
+=== golang.expvar.cmdline
+
+type: keyword
+
+The cmdline of this golang program start with.
+
+
+[float]
+== heap Fields
+
+The golang program heap information exposed by expvar.
+
+
+
+[float]
+=== golang.heap.cmdline
+
+type: keyword
+
+The cmdline of this golang program start with.
+
+
+[float]
+== gc Fields
+
+Garbage collector summary.
+
+
+
+[float]
+== total_pause Fields
+
+Total GC pause duration over lifetime of process.
+
+
+
+[float]
+=== golang.heap.gc.total_pause.ns
+
+type: long
+
+Duration in Ns.
+
+
+[float]
+=== golang.heap.gc.total_count
+
+type: long
+
+Total number of GC was happened.
+
+
+[float]
+=== golang.heap.gc.next_gc_limit
+
+type: long
+
+format: bytes
+
+Next collection will happen when HeapAlloc > this amount.
+
+
+[float]
+=== golang.heap.gc.cpu_fraction
+
+type: long
+
+Fraction of CPU time used by GC.
+
+
+[float]
+== pause Fields
+
+Last GC pause durations during the monitoring period.
+
+
+
+[float]
+=== golang.heap.gc.pause.count
+
+type: long
+
+Count of GC pause duration during this collect period.
+
+
+[float]
+== sum Fields
+
+Total GC pause duration during this collect period.
+
+
+
+[float]
+=== golang.heap.gc.pause.sum.ns
+
+type: long
+
+Duration in Ns.
+
+
+[float]
+== max Fields
+
+Max GC pause duration during this collect period.
+
+
+
+[float]
+=== golang.heap.gc.pause.max.ns
+
+type: long
+
+Duration in Ns.
+
+
+[float]
+== avg Fields
+
+Average GC pause duration during this collect period.
+
+
+
+[float]
+=== golang.heap.gc.pause.avg.ns
+
+type: long
+
+Duration in Ns.
+
+
+[float]
+== system Fields
+
+Heap summary,which bytes was obtained from system.
+
+
+
+[float]
+=== golang.heap.system.total
+
+type: long
+
+format: bytes
+
+Total bytes obtained from system (sum of XxxSys below).
+
+
+[float]
+=== golang.heap.system.optained
+
+type: long
+
+format: bytes
+
+Via HeapSys, bytes obtained from system. heap_sys = heap_idle + heap_inuse.
+
+
+[float]
+=== golang.heap.system.stack
+
+type: long
+
+format: bytes
+
+Bytes used by stack allocator, and these bytes was obtained from system.
+
+
+[float]
+=== golang.heap.system.released
+
+type: long
+
+format: bytes
+
+Bytes released to the OS.
+
+
+[float]
+== allocations Fields
+
+Heap allocations summary.
+
+
+
+[float]
+=== golang.heap.allocations.mallocs
+
+type: long
+
+Number of mallocs.
+
+
+[float]
+=== golang.heap.allocations.frees
+
+type: long
+
+Number of frees.
+
+
+[float]
+=== golang.heap.allocations.objects
+
+type: long
+
+Total number of allocated objects.
+
+
+[float]
+=== golang.heap.allocations.total
+
+type: long
+
+format: bytes
+
+Bytes allocated (even if freed) throughout the lifetime.
+
+
+[float]
+=== golang.heap.allocations.allocated
+
+type: long
+
+format: bytes
+
+Bytes allocated and not yet freed (same as Alloc above).
+
+
+[float]
+=== golang.heap.allocations.idle
+
+type: long
+
+format: bytes
+
+Bytes in idle spans.
+
+
+[float]
+=== golang.heap.allocations.active
+
+type: long
+
+format: bytes
+
+Bytes in non-idle span.
 
 
 [[exported-fields-haproxy]]
@@ -2804,6 +3077,20 @@ type: integer
 The average queue time in ms over the last 1024 requests.
 
 
+[[exported-fields-jolokia]]
+== Jolokia Fields
+
+[]beta
+Jolokia Module
+
+
+
+[float]
+== jolokia Fields
+
+jolokia contains metrics exposed via jolokia agent
+
+
 [[exported-fields-kafka]]
 == kafka Fields
 
@@ -2975,7 +3262,7 @@ Leader id (broker).
 [float]
 === kafka.partition.partition.isr
 
-type: list
+type: array
 
 List of isr ids.
 
@@ -3034,6 +3321,139 @@ Broker id
 type: keyword
 
 Broker address
+
+
+[[exported-fields-memcached]]
+== memcached Fields
+
+[]beta
+memcached Module
+
+
+
+[float]
+== memcached Fields
+
+
+
+
+[float]
+== stats Fields
+
+stats
+
+
+
+[float]
+=== memcached.stats.pid
+
+type: long
+
+Current process ID of the Memcached task.
+
+
+[float]
+=== memcached.stats.uptime.sec
+
+type: long
+
+Memcached server uptime.
+
+
+[float]
+=== memcached.stats.threads
+
+type: long
+
+Number of threads used by the current Memcached server process.
+
+
+[float]
+=== memcached.stats.connections.current
+
+type: long
+
+Number of open connections to this Memcached server, should be the same value on all servers during normal operation.
+
+
+[float]
+=== memcached.stats.connections.total
+
+type: long
+
+Numer of successful connect attempts to this server since it has been started.
+
+
+[float]
+=== memcached.stats.get.hits
+
+type: long
+
+Number of successful "get" commands (cache hits) since startup, divide them by the "cmd_get" value to get the cache hitrate.
+
+
+[float]
+=== memcached.stats.get.misses
+
+type: long
+
+Number of failed "get" requests because nothing was cached for this key or the cached value was too old.
+
+
+[float]
+=== memcached.stats.cmd.get
+
+type: long
+
+Number of "get" commands received since server startup not counting if they were successful or not.
+
+
+[float]
+=== memcached.stats.cmd.set
+
+type: long
+
+Number of "set" commands serviced since startup.
+
+
+[float]
+=== memcached.stats.read.bytes
+
+type: long
+
+Total number of bytes received from the network by this server.
+
+
+[float]
+=== memcached.stats.written.bytes
+
+type: long
+
+Total number of bytes send to the network by this server.
+
+
+[float]
+=== memcached.stats.items.current
+
+type: long
+
+Number of items currently in this server's cache.
+
+
+[float]
+=== memcached.stats.items.total
+
+type: long
+
+Number of items stored ever stored on this server. This is no "maximum item count" value but a counted increased by every new item stored in the cache.
+
+
+[float]
+=== memcached.stats.evictions
+
+type: long
+
+Number of objects removed from the cache to free up memory for new items because Memcached reached it's maximum memory setting (limit_maxbytes).
 
 
 [[exported-fields-mongodb]]
@@ -6296,9 +6716,17 @@ The username of the user that created the process. If the username cannot be det
 
 
 [float]
+=== system.process.cwd
+
+type: keyword
+
+The current working directory of the process. This field is only available on Linux.
+
+
+[float]
 === system.process.env
 
-type: dict
+type: object
 
 The environment variables used to start the process. The data is available on FreeBSD, Linux, and OS X.
 
@@ -6582,7 +7010,7 @@ CPU time consumed by tasks in user (kernel) mode.
 [float]
 === system.process.cgroup.cpuacct.percpu
 
-type: dict
+type: object
 
 CPU time (in nanoseconds) consumed on each CPU by all tasks in this cgroup.
 
@@ -7089,6 +7517,18 @@ UID of the user running the process.
 type: keyword
 
 Name of the user running the process.
+
+
+[[exported-fields-windows]]
+== Windows Fields
+
+[]beta Module for Windows
+
+
+
+[float]
+== windows Fields
+
 
 
 [[exported-fields-zookeeper]]

@@ -1,25 +1,21 @@
 package elasticsearch
 
 import (
+	"math/rand"
 	"os"
 	"time"
 
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
-const ElasticsearchDefaultHost = "localhost"
-const ElasticsearchDefaultPort = "9200"
+const (
+	// ElasticsearchDefaultHost is the default host for elasticsearch.
+	ElasticsearchDefaultHost = "localhost"
+	// ElasticsearchDefaultPort is the default port for elasticsearch.
+	ElasticsearchDefaultPort = "9200"
+)
 
-func GetEsPort() string {
-	port := os.Getenv("ES_PORT")
-
-	if len(port) == 0 {
-		port = ElasticsearchDefaultPort
-	}
-	return port
-}
-
-// Returns
+// GetEsHost returns the elasticsearch host.
 func GetEsHost() string {
 
 	host := os.Getenv("ES_HOST")
@@ -31,6 +27,17 @@ func GetEsHost() string {
 	return host
 }
 
+// GetEsPort returns the elasticsearch port.
+func GetEsPort() string {
+	port := os.Getenv("ES_PORT")
+
+	if len(port) == 0 {
+		port = ElasticsearchDefaultPort
+	}
+	return port
+}
+
+// GetTestingElasticsearch creates a test client.
 func GetTestingElasticsearch() *Client {
 	var address = "http://" + GetEsHost() + ":" + GetEsPort()
 	username := os.Getenv("ES_USER")
@@ -55,4 +62,15 @@ func newTestClientAuth(url, user, pass string) *Client {
 		panic(err)
 	}
 	return client
+}
+
+func (t *elasticsearchOutput) randomClient() *Client {
+	switch len(t.clients) {
+	case 0:
+		return nil
+	case 1:
+		return t.clients[0].(*Client).Clone()
+	default:
+		return t.clients[rand.Intn(len(t.clients))].(*Client).Clone()
+	}
 }

@@ -86,10 +86,12 @@ func (c *client) PublishEvents(
 
 			eventsNotAcked.Add(int64(len(data)))
 			ackedEvents.Add(int64(totalNumberOfEvents - len(data)))
+			outputs.AckedEvents.Add(int64(totalNumberOfEvents - len(data)))
 			return data, err
 		}
 	}
 	ackedEvents.Add(int64(totalNumberOfEvents))
+	outputs.AckedEvents.Add(int64(totalNumberOfEvents))
 	return nil, nil
 }
 

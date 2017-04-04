@@ -1,10 +1,13 @@
 # Directories
 /.vagrant
 /.idea
+/.vscode
 /build
 /*/data
 /*/logs
 /*/_meta/kibana/index-pattern
+/*/fields.yml
+/*/*.template*.json
 
 # Files
 .DS_Store

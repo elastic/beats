@@ -14,8 +14,8 @@ https://github.com/goomzee/burrowbeat[burrowbeat]:: Monitors Kafka consumer lag 
 https://github.com/goomzee/cassandrabeat[cassandrabeat]:: Uses Cassandra's nodetool cfstats utility to monitor Cassandra database nodes and lag.
 https://github.com/hartfordfive/cloudflarebeat[cloudflarebeat]:: Indexes log entries from the Cloudflare Enterprise Log Share API.
 https://github.com/aidan-/cloudtrailbeat[cloudtrailbeat]:: Reads events from Amazon Web Services' https://aws.amazon.com/cloudtrail/[CloudTrail].
-https://github.com/raboof/connbeat[connbeat]:: Exposes metadata about TCP connections
-https://github.com/Pravoru/consulbeat[consulbeat]:: Reads services health checks from consul and pushes them to elastic.
+https://github.com/raboof/connbeat[connbeat]:: Exposes metadata about TCP connections.
+https://github.com/Pravoru/consulbeat[consulbeat]:: Reads services health checks from consul and pushes them to Elastic.
 https://github.com/Ingensi/dockbeat[dockbeat]:: Reads Docker container
 statistics and indexes them in Elasticsearch.
 https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from an Elasticsearch cluster and indexes them in Elasticsearch.
@@ -23,26 +23,31 @@ https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes
 Logstash or Elasticsearch.
 https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
 https://github.com/FStelzer/flowbeat[flowbeat]:: Collects, parses, and indexes http://www.sflow.org/index.php[sflow] samples.
+https://github.com/hpcugent/gpfsbeat[gpfsbeat]:: Collects GPFS metric and quota information.
 https://github.com/YaSuenag/hsbeat[hsbeat]:: Reads all performance counters in Java HotSpot VM.
 https://github.com/christiangalsterer/httpbeat[httpbeat]:: Polls multiple HTTP(S) endpoints and sends the data to
 Logstash or Elasticsearch. Supports all HTTP methods and proxies.
 https://github.com/jasperla/hwsensorsbeat[hwsensorsbeat]:: Reads sensors information from OpenBSD.
+https://github.com/icinga/icingabeat[icingabeat]:: Icingabeat ships events and states from Icinga 2 to Elasticsearch or Logstash.
+https://github.com/devopsmakers/iobeat[iobeat]:: Reads IO stats from /proc/diskstats on Linux.
 https://github.com/radoondas/jmxproxybeat[jmxproxybeat]:: Reads Tomcat JMX metrics exposed over 'JMX Proxy Servlet' to HTTP.
 https://github.com/mheese/journalbeat[journalbeat]:: Used for log shipping from systemd/journald based Linux systems.
 https://github.com/eskibars/lmsensorsbeat[lmsensorsbeat]:: Collects data from lm-sensors (such as CPU temperatures, fan speeds, and voltages from i2c and smbus).
 https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Logstash monitoring API (v5 onwards) and indexes them in Elasticsearch.
+https://github.com/yedamao/mcqbeat[mcqbeat]:: Reads the status of queues from memcacheq.
 https://github.com/scottcrespo/mongobeat[mongobeat]:: Monitors MongoDB instances and can be configured to send multiple document types to Elasticsearch.
 https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and send results to Elasticsearch.
 https://github.com/PhaedrusTheGreek/nagioscheckbeat[nagioscheckbeat]:: For Nagios checks and performance data.
 https://github.com/mrkschan/nginxbeat[nginxbeat]:: Reads status from Nginx.
 https://github.com/2Fast2BCn/nginxupstreambeat[nginxupstreambeat]:: Reads upstream status from nginx upstream module.
+https://github.com/deepujain/nvidiagpubeat/[nvidiagpubeat]:: Uses nvidia-smi to grab metrics of NVIDIA GPUs.
 https://github.com/aristanetworks/openconfigbeat[openconfigbeat]:: Streams data from http://openconfig.net[OpenConfig]-enabled network devices
 https://github.com/joehillen/packagebeat[packagebeat]:: Collects information about system packages from package
 managers.
 https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM.
 https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list
 of targets and stores the round trip time (RTT) in Elasticsearch.
-https://github.com/carlpett/prombeat[prombeat]:: Index https://prometheus.io[Prometheus] metrics
+https://github.com/carlpett/prombeat[prombeat]:: Indexes https://prometheus.io[Prometheus] metrics.
 https://github.com/voigt/redditbeat[redditbeat]:: Collects new Reddit Submissions of one or multiple Subreddits.
 https://github.com/chrsblck/redisbeat[redisbeat]:: Used for Redis monitoring.
 https://github.com/consulthys/retsbeat[retsbeat]:: Collects counts of http://www.reso.org[RETS] resource/class records from https://en.wikipedia.org/wiki/Multiple_listing_service[Multiple Listing Service] (MLS) servers.

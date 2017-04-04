@@ -1,0 +1,10 @@
+{
+  "visState": "{\"aggs\":[],\"listeners\":{},\"params\":{\"expression\":\".es(*, metric='avg:mysql.status.opened_tables').derivative().label(\\\"Opened tables\\\")\",\"interval\":\"1m\"},\"title\":\"MySQL table opens\",\"type\":\"timelion\"}", 
+  "description": "", 
+  "title": "MySQL table opens", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

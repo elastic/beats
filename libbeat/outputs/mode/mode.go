@@ -4,17 +4,17 @@ package mode
 
 import (
 	"errors"
-	"expvar"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	messagesDropped = expvar.NewInt("libbeat.outputs.messages_dropped")
+	messagesDropped = monitoring.NewInt(outputs.Metrics, "messages.dropped")
 )
 
 // ErrNoHostsConfigured indicates missing host or hosts configuration

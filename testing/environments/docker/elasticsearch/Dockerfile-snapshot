@@ -45,4 +45,6 @@ RUN chown elasticsearch:elasticsearch config/elasticsearch.yml config/log4j2.pro
 USER elasticsearch
 CMD ["/bin/bash", "bin/es-docker"]
 
+HEALTHCHECK CMD curl -f http://localhost:9200
+
 EXPOSE 9200 9300

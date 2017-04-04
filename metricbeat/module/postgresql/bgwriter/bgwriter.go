@@ -47,5 +47,6 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, fmt.Errorf("No results from the pg_stat_bgwriter query")
 	}
 
-	return schema.Apply(results[0]), nil
+	data, _ := schema.Apply(results[0])
+	return data, nil
 }

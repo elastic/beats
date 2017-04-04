@@ -79,7 +79,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			logp.Err("Failed to retrieve stats for db %s", dbName)
 			continue
 		}
-		events = append(events, eventMapping(result))
+		data, _ := schema.Apply(result)
+		events = append(events, data)
 	}
 
 	if len(events) == 0 {

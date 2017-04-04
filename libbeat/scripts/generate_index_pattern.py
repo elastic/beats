@@ -19,6 +19,10 @@ unique_fields = []
 
 def fields_to_json(section, path, output):
 
+    # Need in case there are no fields
+    if section["fields"] is None:
+        section["fields"] = {}
+
     for field in section["fields"]:
         if path == "":
             newpath = field["name"]
@@ -93,7 +97,7 @@ def fields_to_index_pattern(args, input):
 
     }
 
-    for k, section in enumerate(docs["fields"]):
+    for k, section in enumerate(docs):
         fields_to_json(section, "", output)
 
     # add meta fields
@@ -135,19 +139,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    fields_yml = args.beat + "/_meta/fields.generated.yml"
-
-    # Not all beats have a fields.generated.yml. Fall back to fields.yml
-    if not os.path.isfile(fields_yml):
-        fields_yml = args.beat + "/_meta/fields.yml"
+    fields_yml = args.beat + "/fields.yml"
 
     # generate the index-pattern content
     with open(fields_yml, 'r') as f:
         fields = f.read()
-
-        # Prepend beat fields from libbeat
-        with open(args.libbeat + "/_meta/fields.generated.yml") as f:
-            fields = f.read() + fields
 
         # with open(target, 'w') as output:
         output = fields_to_index_pattern(args, fields)

@@ -577,7 +577,7 @@ class Test(BaseTest):
                 "encoding": enc_go
             })
         self.render_config_template(
-            template="filebeat_prospectors.yml.j2",
+            template_name="filebeat_prospectors",
             prospectors=prospectors
         )
 

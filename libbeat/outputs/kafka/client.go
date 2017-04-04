@@ -1,7 +1,6 @@
 package kafka
 
 import (
-	"expvar"
 	"fmt"
 	"sync"
 	"sync/atomic"
@@ -12,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
@@ -38,9 +38,9 @@ type msgRef struct {
 }
 
 var (
-	ackedEvents            = expvar.NewInt("libbeat.kafka.published_and_acked_events")
-	eventsNotAcked         = expvar.NewInt("libbeat.kafka.published_but_not_acked_events")
-	publishEventsCallCount = expvar.NewInt("libbeat.kafka.call_count.PublishEvents")
+	ackedEvents            = monitoring.NewInt(outputs.Metrics, "kafka.events.acked")
+	eventsNotAcked         = monitoring.NewInt(outputs.Metrics, "kafka.events.not_acked")
+	publishEventsCallCount = monitoring.NewInt(outputs.Metrics, "kafka.publishEvents.call.count")
 )
 
 func newKafkaClient(
@@ -234,12 +234,14 @@ func (r *msgRef) dec() {
 		eventsNotAcked.Add(int64(failed))
 		if success > 0 {
 			ackedEvents.Add(int64(success))
+			outputs.AckedEvents.Add(int64(success))
 		}
 
 		debugf("Kafka publish failed with: %v", err)
 		r.cb(r.failed, err)
 	} else {
 		ackedEvents.Add(int64(r.total))
+		outputs.AckedEvents.Add(int64(r.total))
 		r.cb(nil, nil)
 	}
 }

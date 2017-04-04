@@ -16,8 +16,7 @@ install -D -m 755 import_dashboards-linux-{{.arch}} /{{.beat_name}}-${VERSION}-l
 cp {{.beat_name}}-linux-{{.arch}} /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}
 cp {{.beat_name}}-linux.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}.yml
 cp {{.beat_name}}-linux.full.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}.full.yml
-cp {{.beat_name}}.template.json /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/
-cp {{.beat_name}}.template-es2x.json /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/
+cp fields.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/
 
 mkdir -p upload
 tar czvf upload/{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}.tar.gz /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}

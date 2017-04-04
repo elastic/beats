@@ -76,7 +76,7 @@ func UTF16BytesToString(b []byte) (string, int, error) {
 	offset := -1
 
 	// Find the null terminator if it exists and re-slice the b.
-	if nullIndex := indexNullTerminator(b); nullIndex > 0 {
+	if nullIndex := indexNullTerminator(b); nullIndex > -1 {
 		if len(b) > nullIndex+2 {
 			offset = nullIndex + 2
 		}

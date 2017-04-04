@@ -90,6 +90,7 @@ functionality of the metricset and `Fetch` method from the data mapping.
 The `fields.yml` file is used for different purposes:
 
 * Creates the Elasticsearch template
+* Creates the Kibana index pattern configuration
 * Creates the Exported Fields documentation for the metricset
 
 To make sure the Elasticsearch template is correct, it's important to keep this file up-to-date
@@ -148,6 +149,8 @@ written in Golang and have no dependencies. Integration tests are also written
 in Golang but require the service from which the module collects metrics to also be running.
 System tests for Metricbeat also require the service to be running in most cases and are
 written in Python based on our small Python test framework.
+We use `virtualenv` to deal with Python dependencies.
+You can simply run the command `make python-env`  and then `. build/python-env/bin/activate` .
 
 You should use a combination of the three test types to test your metricsets because
 each method has advantages and disadvantages. To get started with your own tests, it's best
@@ -207,6 +210,19 @@ the given address and port.
 To run all the tests, run `make testsuite`. To only run unit tests, run
 `make unit-tests` or for integration tests `make integration-tests-environment`. Be aware that
 a running Docker environment is needed for integration and system tests.
+
+Sometimes you may want to run a single integration test, for example, to test a
+module such as the `apache` module. To do this, you can:
+
+. Start the Docker service by running
+`docker-compose run -p port:port apache`. You can skip this step if, like the
+`golang` module, your module doesn't need a Docker service.
+
+. Run `cd tests/system` to change to the folder that contains the integration
+tests.
+
+. Run `INTEGRATION_TESTS=true nosetests test_apache.py`,
+remembering to replace `test_apache.py` with your own test file.
 
 [float]
 == Documentation

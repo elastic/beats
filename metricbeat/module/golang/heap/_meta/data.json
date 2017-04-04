@@ -1,0 +1,55 @@
+{
+    "@timestamp": "2017-02-22T08:29:22.819Z",
+    "beat": {
+        "hostname": "MacBook-Pro.local",
+        "name": "MacBook-Pro.local",
+        "version": "6.0.0-alpha1"
+    },
+    "golang": {
+        "heap": {
+            "allocations": {
+                "active": 20619264,
+                "allocated": 19317104,
+                "frees": 56786,
+                "idle": 2383872,
+                "mallocs": 77939,
+                "objects": 21153,
+                "total": 42590064
+            },
+            "cmdline": "./bin/gopa --pprof",
+            "gc": {
+                "cpu_fraction": 0.000006,
+                "next_gc_limit": 33694576,
+                "pause": {
+                    "avg": {
+                        "ns": 0
+                    },
+                    "count": 0,
+                    "max": {
+                        "ns": 0
+                    },
+                    "sum": {
+                        "ns": 0
+                    }
+                },
+                "total_count": 7,
+                "total_pause": {
+                    "ns": 527378
+                }
+            },
+            "system": {
+                "optained": 23003136,
+                "released": 0,
+                "stack": 1114112,
+                "total": 28956920
+            }
+        }
+    },
+    "metricset": {
+        "host": "localhost:6060",
+        "module": "golang",
+        "name": "heap",
+        "rtt": 1159
+    },
+    "type": "metricsets"
+}

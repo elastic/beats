@@ -4,15 +4,17 @@ package elasticsearch
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
-	"path/filepath"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/template"
+	"github.com/elastic/beats/libbeat/version"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -45,27 +47,26 @@ func TestLoadTemplate(t *testing.T) {
 	assert.NotNil(t, absPath)
 	assert.Nil(t, err)
 
-	templatePath := absPath + "/libbeat.template.json"
-	if strings.HasPrefix(client.Connection.version, "2.") {
-		templatePath = absPath + "/libbeat.template-es2x.json"
-	}
-	content, err := readTemplate(templatePath)
-	assert.Nil(t, err)
+	fieldsPath := absPath + "/fields.yml"
+	index := "testbeat"
 
-	templateName := "testbeat"
+	tmpl, err := template.New(version.GetDefaultVersion(), client.Connection.version, index)
+	assert.NoError(t, err)
+	content, err := tmpl.Load(fieldsPath)
+	assert.NoError(t, err)
 
 	// Load template
-	err = client.LoadTemplate(templateName, content)
+	err = client.LoadTemplate(tmpl.GetName(), content)
 	assert.Nil(t, err)
 
 	// Make sure template was loaded
-	assert.True(t, client.CheckTemplate(templateName))
+	assert.True(t, client.CheckTemplate(tmpl.GetName()))
 
 	// Delete template again to clean up
-	client.Request("DELETE", "/_template/"+templateName, "", nil, nil)
+	client.Request("DELETE", "/_template/"+tmpl.GetName(), "", nil, nil)
 
 	// Make sure it was removed
-	assert.False(t, client.CheckTemplate(templateName))
+	assert.False(t, client.CheckTemplate(tmpl.GetName()))
 
 }
 
@@ -95,12 +96,7 @@ func TestLoadInvalidTemplate(t *testing.T) {
 func TestLoadBeatsTemplate(t *testing.T) {
 
 	beats := []string{
-		"filebeat",
-		"heartbeat",
 		"libbeat",
-		"packetbeat",
-		"metricbeat",
-		"winlogbeat",
 	}
 
 	for _, beat := range beats {
@@ -112,32 +108,29 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		// Setup ES
 		client := GetTestingElasticsearch()
 
-		templatePath := absPath + "/" + beat + ".template.json"
-
-		if strings.HasPrefix(client.Connection.version, "2.") {
-			templatePath = absPath + "/" + beat + ".template-es2x.json"
-		}
-
-		content, err := readTemplate(templatePath)
-		assert.Nil(t, err)
-
 		err = client.Connect(5 * time.Second)
 		assert.Nil(t, err)
 
-		templateName := beat
+		fieldsPath := absPath + "/fields.yml"
+		index := beat
+
+		tmpl, err := template.New(version.GetDefaultVersion(), client.Connection.version, index)
+		assert.NoError(t, err)
+		content, err := tmpl.Load(fieldsPath)
+		assert.NoError(t, err)
 
 		// Load template
-		err = client.LoadTemplate(templateName, content)
+		err = client.LoadTemplate(tmpl.GetName(), content)
 		assert.Nil(t, err)
 
 		// Make sure template was loaded
-		assert.True(t, client.CheckTemplate(templateName))
+		assert.True(t, client.CheckTemplate(tmpl.GetName()))
 
 		// Delete template again to clean up
-		client.Request("DELETE", "/_template/"+templateName, "", nil, nil)
+		client.Request("DELETE", "/_template/"+tmpl.GetName(), "", nil, nil)
 
 		// Make sure it was removed
-		assert.False(t, client.CheckTemplate(templateName))
+		assert.False(t, client.CheckTemplate(tmpl.GetName()))
 	}
 }
 
@@ -151,28 +144,25 @@ func TestOutputLoadTemplate(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	templateName := "libbeat-" + version.GetDefaultVersion()
+
 	// delete template if it exists
-	client.Request("DELETE", "/_template/libbeat", "", nil, nil)
+	client.Request("DELETE", "/_template/"+templateName, "", nil, nil)
 
 	// Make sure template is not yet there
-	assert.False(t, client.CheckTemplate("libbeat"))
+	assert.False(t, client.CheckTemplate(templateName))
 
-	templatePath := "../../libbeat.template.json"
-
-	if strings.HasPrefix(client.Connection.version, "2.") {
-		templatePath = "../../libbeat.template-es2x.json"
-	}
-
+	templatePath := "../../fields.yml"
 	tPath, err := filepath.Abs(templatePath)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	config := map[string]interface{}{
 		"hosts": GetEsHost(),
 		"template": map[string]interface{}{
-			"name":                "libbeat",
-			"path":                tPath,
-			"versions.2x.enabled": false,
+			"name":   "libbeat",
+			"fields": tPath,
 		},
 	}
 
@@ -181,15 +171,19 @@ func TestOutputLoadTemplate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	output, err := New("libbeat", cfg, 0)
+	output, err := New(common.BeatInfo{Beat: "libbeat", Version: version.GetDefaultVersion()}, cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	event := outputs.Data{Event: common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"host":       "test-host",
 		"type":       "libbeat",
 		"message":    "Test message from libbeat",
+		"beat": common.MapStr{
+			"version": version.GetDefaultVersion(),
+		},
 	}}
 
 	err = output.PublishEvent(nil, outputs.Options{Guaranteed: true}, event)
@@ -198,9 +192,7 @@ func TestOutputLoadTemplate(t *testing.T) {
 	}
 
 	// Guaranteed publish, so the template should be there
-
-	assert.True(t, client.CheckTemplate("libbeat"))
-
+	assert.True(t, client.CheckTemplate(templateName))
 }
 
 func TestClientPublishEvent(t *testing.T) {
@@ -423,7 +415,7 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.BulkOutputer, *Client
 		t.Fatal(err)
 	}
 
-	output, err := New("libbeat", config, 0)
+	output, err := New(common.BeatInfo{Beat: "libbeat"}, config)
 	if err != nil {
 		t.Fatal(err)
 	}

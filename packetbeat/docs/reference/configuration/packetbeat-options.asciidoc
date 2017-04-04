@@ -1,5 +1,5 @@
 [[configuration-interfaces]]
-=== Network Device Configuration
+=== Network Device (Interfaces)
 
 The `interfaces` section of the +{beatname_lc}.yml+ config file configures the sniffer. Here is an example configuration:
 
@@ -198,7 +198,7 @@ see the following published transactions (when `ignore_outgoing` is true):
 
 
 [[configuration-flows]]
-=== Flows Configuration
+=== Flows
 
 The `flows` section of the +{beatname_lc}.yml+ config file contains configuration options for bidirectional network
 flows. If section is missing from configuration file, network flows are
@@ -236,7 +236,7 @@ disabled, flows are still reported once being timed out. The default value is
 
 
 [[configuration-protocols]]
-=== Transaction Protocols Configuration
+=== Transaction Protocols
 
 The `protocols` section of the +{beatname_lc}.yml+ config file contains configuration options for each supported protocol,
 including common options like `enabled`, `ports`, `send_request`, `send_response`, and options that are protocol-specific.
@@ -249,34 +249,36 @@ Example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols.icmp:
+packetbeat.protocols:
+
+- type: icmp
   enabled: true
 
-packetbeat.protocols.dns:
+- type: dns
   ports: [53]
 
-packetbeat.protocols.http:
+- type: http
   ports: [80, 8080, 8000, 5000, 8002]
 
-packetbeat.protocols.amqp:
+- type: amqp
   ports: [5672]
 
-packetbeat.protocols.cassandra:
+- type: cassandra
   ports: [9042]
 
-packetbeat.protocols.memcache:
+- type: memcache
   ports: [11211]
 
-packetbeat.protocols.mysql:
+- type: mysql
   ports: [3306]
 
-packetbeat.protocols.redis:
+- type: redis
   ports: [6379]
 
-packetbeat.protocols.pgsql:
+- type: pgsql
   ports: [5432]
 
-packetbeat.protocols.thrift:
+- type: thrift
   ports: [9090]
 
 
@@ -324,6 +326,36 @@ by default, only the HTTP headers.
 
 The per protocol transaction timeout. Expired transactions will no longer be correlated to incoming responses, but sent to Elasticsearch immediately.
 
+[[packetbeat-configuration-fields]]
+===== fields
+
+Optional fields that you can specify to add additional information to the
+output. For example, you might add fields that you can use for filtering log
+data. Fields can be scalar values, arrays, dictionaries, or any nested
+combination of these. By default, the fields that you specify here will be
+grouped under a `fields` sub-dictionary in the output document. To store the
+custom fields as top-level fields, set the `fields_under_root` option to true.
+If a duplicate field is declared in the general configuration, then its value
+will be overwritten by the value declared here.
+
+[source,yaml]
+--------------------------------------------------------------------------------
+packetbeat.protocols:
+- type: http
+  ports: [80]
+  fields:
+    service_id: nginx
+--------------------------------------------------------------------------------
+
+[[packetbeat-fields-under-root]]
+===== fields_under_root
+
+If this option is set to true, the custom <<packetbeat-configuration-fields>>
+are stored as top-level fields in the output document instead of being grouped
+under a `fields` sub-dictionary. If the custom field names conflict with other
+field names added by Packetbeat, then the custom fields overwrite the other
+fields.
+
 ==== ICMP Configuration Options
 
 You can specify the following options in the `icmp` section of the +{beatname_lc}.yml+ config file:
@@ -340,7 +372,8 @@ The `dns` section of the +{beatname_lc}.yml+ config file specifies configuration
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols.dns:
+packetbeat.protocols:
+- type: dns
   ports: [53]
   include_authorities: true
   include_additionals: true
@@ -363,7 +396,8 @@ sample configuration for the `http` section of the +{beatname_lc}.yml+ config fi
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols.http:
+packetbeat.protocols:
+- type: http
   ports: [80, 8080, 8000, 5000, 8002]
   hide_keywords: ["pass", "password", "passwd"]
   send_headers: ["User-Agent", "Cookie", "Set-Cookie"]
@@ -423,7 +457,8 @@ In the following example, the HTML attachments of the HTTP responses are exporte
 
 [source,yml]
 ------------------------------------------------------------------------------
-packetbeat.protocols.http:
+packetbeat.protocols:
+- type: http
   ports: [80, 8080]
   send_response: true
   include_body_for: ["text/html"]
@@ -484,7 +519,8 @@ protocol. Here is a sample configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols.amqp:
+packetbeat.protocols:
+- type: amqp
   ports: [5672]
   max_body_length: 1000
   parse_headers: true
@@ -526,7 +562,8 @@ configuration for the `cassandra` section of the +{beatname_lc}.yml+ config file
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols.cassandra:
+packetbeat.protocols:
+- type: cassandra
   send_request_header: true
   send_response_header: true
   compressor: "snappy"
@@ -563,7 +600,8 @@ protocol. Here is a sample configuration section for memcache:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols.memcache:
+packetbeat.protocols:
+- type: memcache
   ports: [11211]
   parseunknown: false
   maxvalues: 0
@@ -629,7 +667,8 @@ sample configuration for the `thrift` section of the +{beatname_lc}.yml+ config 
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols.thrift:
+packetbeat.protocols:
+- type: thrift
   transport_type: socket
   protocol_type: binary
   idl_files: ["tutorial.thrift", "shared.thrift"]
@@ -699,7 +738,8 @@ configuration for the `mongodb` section of the +{beatname_lc}.yml+ config file:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols.mongodb:
+packetbeat.protocols:
+- type: mongodb
   send_request: true
   send_response: true
   max_docs: 0
@@ -731,7 +771,7 @@ formatted JSON objects.
 
 
 [[configuration-processes]]
-=== Monitored Processes Configuration
+=== Monitored Processes
 
 This section of the +{beatname_lc}.yml+ config file is optional, but configuring
 the processes enables Packetbeat to show you not only the servers that the

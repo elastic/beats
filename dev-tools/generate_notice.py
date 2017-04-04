@@ -1,5 +1,4 @@
 import glob
-import sys
 import os
 import datetime
 import argparse
@@ -34,7 +33,7 @@ def get_library_name(license):
 def add_licenses(f, licenses):
 
     for license in licenses:
-        for license_file in glob.glob(license):
+        for license_file in sorted(glob.glob(license)):
             f.write("\n--------------------------------------------------------------------\n")
             f.write("{}\n".format(get_library_name(license_file)))
             f.write("--------------------------------------------------------------------\n")
@@ -86,6 +85,7 @@ if __name__ == "__main__":
     licenses = []
 
     for root, dirs, files in os.walk(args.vendor):
+        dirs.sort()
         if 'vendor' in dirs:
             license = os.path.join(os.path.join(root, 'vendor'),
                                    '**/**/**/LICENSE*')

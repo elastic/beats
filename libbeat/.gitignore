@@ -8,7 +8,6 @@ _output
 /docs/html_docs
 .vagrant
 build
-/dashboards/import_dashboards
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -26,8 +25,6 @@ _testmain.go
 .idea
 .jenkins
 
-/libbeat.template-es2x.json
 /libbeat.yml
 /libbeat.full.yml
-/libbeat.template.json
 /docs/fields.asciidoc

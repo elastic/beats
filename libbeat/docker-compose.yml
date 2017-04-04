@@ -1,13 +1,9 @@
-version: '2'
+version: '2.1'
 services:
   beat:
     build: ${PWD}/.
     depends_on:
-      - logstash
-      - elasticsearch
-      - redis
-      - sredis
-      - kafka
+      - proxy_dep
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -28,31 +24,46 @@ services:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
     working_dir: /go/src/github.com/elastic/beats/libbeat
     command: make
-    entrypoint: /go/src/github.com/elastic/beats/libbeat/scripts/docker-entrypoint.sh
+
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+      logstash:      { condition: service_healthy }
+      kafka:         { condition: service_healthy }
+      redis:         { condition: service_healthy }
+      sredis:        { condition: service_healthy }
+      kafka:         { condition: service_healthy }
 
   elasticsearch:
     extends:
       file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
 
-  # This host name is fixed because of the certificate
+  # This host name is static because of the certificate.
   logstash:
     extends:
       file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
       service: logstash
     env_file:
       - ${PWD}/build/test.env
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
 
   redis:
-    image: redis:3.2.4-alpine
+    build: ${PWD}/../testing/environments/docker/redis
 
-  # This host name is fixed because of the certificate
+  # This host name is static because of the certificate.
   sredis: # stunnel proxy for redis
     build: ${PWD}/../testing/environments/docker/sredis
     expose:
       - 6380
-    links:
-      - redis
+    depends_on:
+      redis:
+        condition: service_healthy
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -60,7 +71,7 @@ services:
       - ${PWD}/build/test.env
 
   kafka:
-    image: spotify/kafka
+    build: ${PWD}/../testing/environments/docker/kafka
     expose:
       - 9092
       - 2181

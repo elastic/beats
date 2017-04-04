@@ -121,12 +121,35 @@ metricbeat.modules:
     #certificate:           "/etc/pki/client/cert.pem"
     #key:                   "/etc/pki/client/cert.key"
 
+#------------------------------- golang Module -------------------------------
+#- module: golang
+#  metricsets: ["expvar","heap"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost:6060"]
+#  heap.path: "/debug/vars"
+#  expvar:
+#    namespace: "example"
+#    path: "/debug/vars"
+
 #------------------------------- HAProxy Module ------------------------------
 #- module: haproxy
   #metricsets: ["info", "stat"]
   #enabled: true
   #period: 10s
   #hosts: ["tcp://127.0.0.1:14567"]
+
+#------------------------------- Jolokia Module ------------------------------
+#- module: jolokia
+#  metricsets: ["jmx"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost"]
+#  namespace: "metrics"
+#  path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+#  jmx.mapping:
+#  jmx.application:
+#  jmx.instance:
 
 #-------------------------------- kafka Module -------------------------------
 #- module: kafka
@@ -155,6 +178,14 @@ metricbeat.modules:
   # SASL authentication
   #username: ""
   #password: ""
+
+#------------------------------ memcached Module -----------------------------
+- module: memcached
+  metricsets: ["stats"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:11211"]
+
 
 #------------------------------- MongoDB Module ------------------------------
 #- module: mongodb
@@ -284,6 +315,13 @@ metricbeat.modules:
   # Redis AUTH password. Empty by default.
   #password: foobared
 
+#------------------------------- Windows Module ------------------------------
+#- module: windows
+#  metricsets: ["perfmon"]
+#  enabled: true
+#  period: 10s
+#  perfmon.counters:
+
 #------------------------------ ZooKeeper Module -----------------------------
 #- module: zookeeper
   #metricsets: ["mntr"]
@@ -398,7 +436,7 @@ output.elasticsearch:
 
   # Optional index name. The default is "metricbeat" plus date
   # and generates [metricbeat-]YYYY.MM.DD keys.
-  #index: "metricbeat-%{+yyyy.MM.dd}"
+  #index: "metricbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -438,21 +476,15 @@ output.elasticsearch:
   #template.enabled: true
 
   # Template name. By default the template name is metricbeat.
+  # The version of the beat will always be appended to the given name
+  # so the final name is metricbeat-%{[beat.version]}.
   #template.name: "metricbeat"
 
-  # Path to template file
-  #template.path: "${path.config}/metricbeat.template.json"
+  # Path to fields.yml file to generate the template
+  #template.fields: "${path.config}/fields.yml"
 
   # Overwrite existing template
   #template.overwrite: false
-
-  # If set to true, metricbeat checks the Elasticsearch version at connect time, and if it
-  # is 2.x, it loads the file specified by the template.versions.2x.path setting. The
-  # default is true.
-  #template.versions.2x.enabled: true
-
-  # Path to the Elasticsearch 2.x version of the template file.
-  #template.versions.2x.path: "${path.config}/metricbeat.template-es2x.json"
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
@@ -862,16 +894,16 @@ output.elasticsearch:
 #dashboards.file:
 
 # If this option is enabled, the snapshot URL is used instead of the default URL.
-#dashboard.snapshot: false
+#dashboards.snapshot: false
 
 # The URL from where to download the snapshot version of the dashboards. By default
 # this has a value which is computed based on the Beat name and version.
-#dashboard.snapshot_url
+#dashboards.snapshot_url
 
 # In case the archive contains the dashboards from multiple Beats, this lets you
 # select which one to load. You can load all the dashboards in the archive by
 # setting this to the empty string.
-#dashboard.beat: metricbeat
+#dashboards.beat: metricbeat
 
 # The name of the Kibana index to use for setting the configuration. Default is ".kibana"
 #dashboards.kibana_index: .kibana
@@ -879,6 +911,19 @@ output.elasticsearch:
 # The Elasticsearch index name. This overwrites the index name defined in the
 # dashboards and index pattern. Example: testbeat-*
 #dashboards.index:
+
+#================================ HTTP Endpoint ======================================
+# Each beat can expose internal data points through a http endpoint. For security
+# reason the endpoint is disabled by default. This feature is currently in beta.
+
+# Defines if http endpoint is enabled
+#http.enabled: false
+
+# Host to expose the http endpoint to. It is recommended to use only localhost.
+#http.host: localhost
+
+# Port on which the http endpoint is exposed. Default is 5066
+#http.port: 5066
 
 #================================ Logging ======================================
 # There are three options for the log output: syslog, file, stderr.

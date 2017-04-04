@@ -5,6 +5,14 @@ BEATS=packetbeat filebeat winlogbeat metricbeat heartbeat
 PROJECTS=libbeat ${BEATS}
 PROJECTS_ENV=libbeat filebeat metricbeat
 SNAPSHOT?=yes
+PYTHON_ENV?=${BUILD_DIR}/python-env
+VIRTUALENV_PARAMS?=
+FIND=find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
+GOLINT=golint
+GOLINT_REPO=github.com/golang/lint/golint
+REVIEWDOG=reviewdog
+REVIEWDOG_OPTIONS?=-diff "git diff master"
+REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
 
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
@@ -39,7 +47,7 @@ coverage-report:
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 
 .PHONY: update
-update:
+update: notice
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) update || exit 1;)
 
 .PHONY: clean
@@ -55,20 +63,32 @@ clean-vendor:
 	sh script/clean_vendor.sh
 
 .PHONY: check
-check:
+check: python-env
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
+	# Checks also python files which are not part of the beats
+	${FIND} -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	# Validate that all updates were committed
 	$(MAKE) update
+	git diff | cat
 	git update-index --refresh
 	git diff-index --exit-code HEAD --
 
-.PHONY: fmt
-fmt:
-	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) fmt || exit 1;)
+# Corrects spelling errors
+.PHONY: misspell
+misspell:
+	go get github.com/client9/misspell
+	$(FIND) -name '*'  -exec misspell -w {} \;
 
-.PHONY: simplify
-simplify:
-	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) simplify || exit 1;)
+.PHONY: fmt
+fmt: python-env
+	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) fmt || exit 1;)
+	# Cleans also python files which are not part of the beats
+	find . -type f -name *.py -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*" -exec autopep8 --in-place --max-line-length 120  {} \;
+
+.PHONY: lint
+lint:
+	@go get $(GOLINT_REPO) $(REVIEWDOG_REPO)
+	$(REVIEWDOG) $(REVIEWDOG_OPTIONS)
 
 # Collects all dashboards and generates dashboard folder for https://github.com/elastic/beats-dashboards/tree/master/dashboards
 .PHONY: beats-dashboards
@@ -118,3 +138,9 @@ upload-release:
 .PHONY: notice
 notice:
 	python dev-tools/generate_notice.py .
+
+# Sets up the virtual python environment
+.PHONY: python-env
+python-env:
+	@test -d ${PYTHON_ENV} || virtualenv ${VIRTUALENV_PARAMS} ${PYTHON_ENV}
+	@. ${PYTHON_ENV}/bin/activate && pip install -q --upgrade pip autopep8

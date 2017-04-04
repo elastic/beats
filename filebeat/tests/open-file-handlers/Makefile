@@ -1,4 +1,3 @@
-
 ES_USER?=admin
 ES_PASSWORD?=secure
 ES_HOST?=http://localhost:9200/

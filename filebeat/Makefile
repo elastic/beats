@@ -2,11 +2,12 @@
 
 BEAT_NAME?=filebeat
 BEAT_DESCRIPTION?=Filebeat sends log files to Logstash or directly to Elasticsearch.
-SYSTEM_TESTS=true
+SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
+ES_BEATS?=..
 
-include ../libbeat/scripts/Makefile
+include ${ES_BEATS}/libbeat/scripts/Makefile
 
 # This is called by the beats packer before building starts
 .PHONY: before-build
@@ -44,9 +45,16 @@ configs: python-env
 	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.full.yml
 	cat ${ES_BEATS}/filebeat/_meta/common.full.p2.yml >> _meta/beat.full.yml
 
+# Collects all module docs
+.PHONY: collect-docs
+collect-docs: python-env
+	-rm -rf docs/modules
+	mkdir -p docs/modules
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/filebeat/scripts/docs_collector.py --beat ${BEAT_NAME}
+
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields kibana modules configs
+collect: fields kibana modules configs collect-docs
 
 
 # Creates a new fileset. Requires the params MODULE and FILESET

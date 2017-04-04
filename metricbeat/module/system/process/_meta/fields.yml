@@ -35,9 +35,14 @@
         cannot be determined, the field will contain the user's
         numeric identifier (UID). On Windows, this field includes the user's
         domain and is formatted as `domain\username`.
+    - name: cwd
+      type: keyword
+      description: >
+        The current working directory of the process. This field is only
+        available on Linux.
     - name: env
-      type: dict
-      dict-type: keyword
+      type: object
+      object_type: keyword
       description: >
         The environment variables used to start the process. The data is
         available on FreeBSD, Linux, and OS X.
@@ -235,8 +240,8 @@
               description: CPU time consumed by tasks in user (kernel) mode.
 
             - name: percpu
-              type: dict
-              dict-type: long
+              type: object
+              object_type: long
               description: >
                 CPU time (in nanoseconds) consumed on each CPU by all tasks in
                 this cgroup.

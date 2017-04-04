@@ -1,0 +1,4 @@
+=== golang heap MetricSet
+
+This is the heap metricset of the module golang.
+It will collect the memstats information from the expvar api.

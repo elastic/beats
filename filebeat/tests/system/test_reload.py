@@ -139,3 +139,65 @@ class Test(BaseTest):
         assert output[0]["message"] == first_line
         assert output[1]["message"] == second_line
         assert self.output_lines() == 2
+
+    def test_reload_same_prospector(self):
+        """
+        Test reloading same prospector
+        """
+        self.render_config_template(
+            reload=True,
+            reload_path=self.working_dir + "/configs/*.yml",
+            prospectors=False,
+        )
+
+        proc = self.start_beat()
+
+        os.mkdir(self.working_dir + "/logs/")
+        logfile = self.working_dir + "/logs/test.log"
+        os.mkdir(self.working_dir + "/configs/")
+        first_line = "First log file"
+        second_line = "Second log file"
+
+        config = prospectorConfigTemplate.format(self.working_dir + "/logs/test.log")
+        config = config + """
+  close_eof: true
+"""
+        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
+            f.write(config)
+
+        with open(logfile, 'w') as f:
+            f.write(first_line + "\n")
+
+        self.wait_until(lambda: self.output_lines() == 1)
+
+        # Overwrite prospector with same path but new fields
+        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
+            config = config + """
+  fields:
+    hello: world
+"""
+            f.write(config)
+
+        # Wait until prospector is stopped
+        self.wait_until(
+            lambda: self.log_contains("Runner stopped:"),
+            max_timeout=15)
+
+        # Update both log files, only 1 change should be picke dup
+        with open(logfile, 'a') as f:
+            f.write(second_line + "\n")
+
+        self.wait_until(lambda: self.output_lines() == 2)
+
+        proc.check_kill_and_wait()
+
+        output = self.read_output()
+
+        # Make sure the correct lines were picked up
+        assert self.output_lines() == 2
+        assert output[0]["message"] == first_line
+        # Check no fields exist
+        assert ("fields" in output[0]) == False
+        assert output[1]["message"] == second_line
+        # assert that fields are added
+        assert output[1]["fields.hello"] == "world"

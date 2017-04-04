@@ -1,16 +1,16 @@
 package publisher
 
 import (
-	"expvar"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common/op"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	messagesInWorkerQueues = expvar.NewInt("libbeat.publisher.messages_in_worker_queues")
+	messagesInWorkerQueues = monitoring.NewInt(nil, "publisher.queue.messages.count")
 )
 
 type worker interface {

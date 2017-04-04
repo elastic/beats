@@ -2,18 +2,18 @@ package publisher
 
 import (
 	"errors"
-	"expvar"
 	"sync/atomic"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	publishedEvents = expvar.NewInt("libbeat.publisher.published_events")
+	publishedEvents = monitoring.NewInt(nil, "publisher.events.count")
 )
 
 var (

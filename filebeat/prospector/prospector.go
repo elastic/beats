@@ -2,62 +2,74 @@ package prospector
 
 import (
 	"errors"
-	"expvar"
 	"fmt"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/mitchellh/hashstructure"
 
+	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 var (
-	harvesterSkipped = expvar.NewInt("filebeat.harvester.skipped")
+	harvesterSkipped = monitoring.NewInt(nil, "filebeat.harvester.skipped")
 )
 
+// Prospector contains the prospector
 type Prospector struct {
-	// harvesterCounter MUST be first field in struct. See https://github.com/golang/go/issues/599
-	harvesterCounter uint64
-	cfg              *common.Config // Raw config
-	config           prospectorConfig
-	prospectorer     Prospectorer
-	outlet           Outlet
-	harvesterChan    chan *input.Event
-	done             chan struct{}
-	states           *file.States
-	wg               sync.WaitGroup
-	channelWg        sync.WaitGroup // Separate waitgroup for channels as not stopped on completion
-	id               uint64
-	Once             bool
+	cfg           *common.Config // Raw config
+	config        prospectorConfig
+	prospectorer  Prospectorer
+	outlet        Outlet
+	harvesterChan chan *input.Event
+	channelDone   chan struct{}
+	runDone       chan struct{}
+	runWg         *sync.WaitGroup
+	states        *file.States
+	wg            *sync.WaitGroup
+	channelWg     *sync.WaitGroup // Separate waitgroup for channels as not stopped on completion
+	id            uint64
+	Once          bool
+	registry      *harvesterRegistry
+	beatDone      chan struct{}
+	eventCounter  *sync.WaitGroup
 }
 
+// Prospectorer is the interface common to all prospectors
 type Prospectorer interface {
 	LoadStates(states []file.State) error
 	Run()
 }
 
+// Outlet is the outlet for a prospector
 type Outlet interface {
-	OnEvent(event *input.Event) bool
+	OnEvent(event *input.Data) bool
 }
 
-func NewProspector(cfg *common.Config, outlet Outlet) (*Prospector, error) {
+// NewProspector instantiates a new prospector
+func NewProspector(cfg *common.Config, outlet Outlet, beatDone chan struct{}) (*Prospector, error) {
 	prospector := &Prospector{
 		cfg:           cfg,
 		config:        defaultConfig,
 		outlet:        outlet,
 		harvesterChan: make(chan *input.Event),
-		done:          make(chan struct{}),
-		wg:            sync.WaitGroup{},
+		channelDone:   make(chan struct{}),
+		wg:            &sync.WaitGroup{},
+		runDone:       make(chan struct{}),
+		runWg:         &sync.WaitGroup{},
 		states:        &file.States{},
-		channelWg:     sync.WaitGroup{},
+		channelWg:     &sync.WaitGroup{},
 		Once:          false,
+		registry:      newHarvesterRegistry(),
+		beatDone:      beatDone,
+		eventCounter:  &sync.WaitGroup{},
 	}
 
 	var err error
@@ -77,7 +89,7 @@ func NewProspector(cfg *common.Config, outlet Outlet) (*Prospector, error) {
 	return prospector, nil
 }
 
-// Init sets up default config for prospector
+// LoadStates sets up default config for prospector
 func (p *Prospector) LoadStates(states []file.State) error {
 
 	var prospectorer Prospectorer
@@ -85,9 +97,9 @@ func (p *Prospector) LoadStates(states []file.State) error {
 
 	switch p.config.InputType {
 	case cfg.StdinInputType:
-		prospectorer, err = NewProspectorStdin(p)
+		prospectorer, err = NewStdin(p)
 	case cfg.LogInputType:
-		prospectorer, err = NewProspectorLog(p)
+		prospectorer, err = NewLog(p)
 	default:
 		return fmt.Errorf("Invalid input type: %v", p.config.InputType)
 	}
@@ -111,26 +123,10 @@ func (p *Prospector) LoadStates(states []file.State) error {
 	return nil
 }
 
+// Start starts the prospector
 func (p *Prospector) Start() {
-	logp.Info("Starting prospector of type: %v; id: %v ", p.config.InputType, p.ID())
-
-	if p.Once {
-		// If only run once, waiting for completion of prospector / harvesters
-		defer p.wg.Wait()
-	}
-
-	// Add waitgroup to make sure prospectors finished
 	p.wg.Add(1)
-
-	go func() {
-		defer p.wg.Done()
-		p.Run()
-	}()
-
-}
-
-// Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
-func (p *Prospector) Run() {
+	logp.Info("Starting prospector of type: %v; id: %v ", p.config.InputType, p.ID())
 
 	// Open channel to receive events from harvester and forward them to spooler
 	// Here potential filtering can happen
@@ -139,17 +135,41 @@ func (p *Prospector) Run() {
 		defer p.channelWg.Done()
 		for {
 			select {
-			case <-p.done:
+			case <-p.channelDone:
+				logp.Info("Prospector channel stopped")
+				return
+			case <-p.beatDone:
 				logp.Info("Prospector channel stopped")
 				return
 			case event := <-p.harvesterChan:
-				err := p.updateState(event)
-				if err != nil {
-					return
-				}
+				// No stopping on error, because on error it is expected that beatDone is closed
+				// in the next run. If not, this will further drain the channel.
+				p.updateState(event)
+				p.eventCounter.Done()
 			}
 		}
 	}()
+
+	if p.Once {
+		// Makes sure prospectors can complete first scan before stopped
+		defer p.runWg.Wait()
+	}
+
+	// Add waitgroup to make sure prospectors finished
+	p.runWg.Add(1)
+	go func() {
+		defer func() {
+			p.runWg.Done()
+			p.stop()
+		}()
+
+		p.Run()
+	}()
+
+}
+
+// Run starts scanning through all the file paths and fetch the related files. Start a harvester for each file
+func (p *Prospector) Run() {
 
 	// Initial prospector run
 	p.prospectorer.Run()
@@ -161,7 +181,7 @@ func (p *Prospector) Run() {
 
 	for {
 		select {
-		case <-p.done:
+		case <-p.runDone:
 			logp.Info("Prospector ticker stopped")
 			return
 		case <-time.After(p.config.ScanFrequency):
@@ -194,7 +214,9 @@ func (p *Prospector) updateState(event *input.Event) error {
 	event.Module = p.config.Module
 	event.Fileset = p.config.Fileset
 
-	ok := p.outlet.OnEvent(event)
+	eventHolder := event.GetData()
+	ok := p.outlet.OnEvent(&eventHolder)
+
 	if !ok {
 		logp.Info("Prospector outlet closed")
 		return errors.New("prospector outlet closed")
@@ -204,21 +226,71 @@ func (p *Prospector) updateState(event *input.Event) error {
 	return nil
 }
 
+// Stop stops the prospector and with it all harvesters
+//
+// The shutdown order is as following
+// - stop run and scanning
+// - wait until last scan finishes to make sure no new harvesters are added
+// - stop harvesters
+// - wait until all harvester finished
+// - stop communication channel
+// - wait on internal waitgroup to make sure all prospector go routines are stopped
+// - wait until all events are forwarded to the spooler
 func (p *Prospector) Stop() {
-	logp.Info("Stopping Prospector: %v", p.ID())
-	close(p.done)
-	p.channelWg.Wait()
+	// Stop scanning and wait for completion
+	close(p.runDone)
 	p.wg.Wait()
+}
+
+func (p *Prospector) stop() {
+	defer p.wg.Done()
+
+	logp.Info("Stopping Prospector: %v", p.ID())
+
+	// In case of once, it will be waited until harvesters close itself
+	if p.Once {
+		p.registry.waitForCompletion()
+	}
+
+	// Wait for finishing of the running prospectors
+	// This ensure no new harvesters are added.
+	p.runWg.Wait()
+
+	// Stop all harvesters
+	// In case the beatDone channel is closed, this will not wait for completion
+	// Otherwise Stop will wait until output is complete
+	p.registry.Stop()
+
+	// Waits on stopping all harvesters to make sure all events made it into the channel
+	p.waitEvents()
+}
+
+// Wait for completion of sending events
+func (p *Prospector) waitEvents() {
+
+	done := make(chan struct{})
+	go func() {
+		p.eventCounter.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		close(p.channelDone)
+	case <-p.beatDone:
+	}
+	// Waits until channel go-routine properly stopped
+	p.channelWg.Wait()
 }
 
 // createHarvester creates a new harvester instance from the given state
 func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, error) {
 
+	outlet := channel.NewOutlet(p.beatDone, p.harvesterChan, p.eventCounter)
 	h, err := harvester.NewHarvester(
 		p.cfg,
 		state,
-		p.harvesterChan,
-		p.done,
+		outlet,
 	)
 
 	return h, err
@@ -228,9 +300,9 @@ func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, er
 // In case the HarvesterLimit is reached, an error is returned
 func (p *Prospector) startHarvester(state file.State, offset int64) error {
 
-	if p.config.HarvesterLimit > 0 && atomic.LoadUint64(&p.harvesterCounter) >= p.config.HarvesterLimit {
+	if p.config.HarvesterLimit > 0 && p.registry.len() >= p.config.HarvesterLimit {
 		harvesterSkipped.Add(1)
-		return fmt.Errorf("Harvester limit reached.")
+		return fmt.Errorf("Harvester limit reached")
 	}
 
 	state.Offset = offset
@@ -243,31 +315,27 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 		return err
 	}
 
-	reader, err := h.Setup()
-	if err != nil {
-		return fmt.Errorf("Error setting up harvester: %s", err)
-	}
-
-	// State is directly updated and not through channel to make state update immediate
-	// State is only updated after setup is completed successfully
+	// State is directly updated and not through channel to make state update synchronous
 	err = p.updateState(input.NewEvent(state))
 	if err != nil {
 		return err
 	}
 
-	p.wg.Add(1)
-	// startHarvester is not run concurrently, but atomic operations are need for the decrementing of the counter
-	// inside the following go routine
-	atomic.AddUint64(&p.harvesterCounter, 1)
-	go func() {
-		defer func() {
-			atomic.AddUint64(&p.harvesterCounter, ^uint64(0))
-			p.wg.Done()
-		}()
+	reader, err := h.Setup()
+	if err != nil {
+		// Set state to finished True again in case of setup failure to make sure
+		// file can be picked up again by a future harvester
+		state.Finished = true
 
-		// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
-		h.Harvest(reader)
-	}()
+		updateErr := p.updateState(input.NewEvent(state))
+		// This should only happen in the case that filebeat is stopped
+		if updateErr != nil {
+			logp.Err("Error updating state: %v", updateErr)
+		}
+		return fmt.Errorf("Error setting up harvester: %s", err)
+	}
+
+	p.registry.start(h, reader)
 
 	return nil
 }

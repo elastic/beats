@@ -35,13 +35,12 @@
              Total size of the all cached images associated to the current image.
 
     - name: labels
-      type: dict
-      dict-type: keyword
+      type: object
+      object_type: keyword
       description: >
         Image labels.
 
     - name: tags
-      type: list
-      dict-type: keyword
+      type: array
       description: >
         Image tags.

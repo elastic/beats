@@ -6,8 +6,11 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-ceph,ceph>>
   * <<metricbeat-module-couchbase,Couchbase>>
   * <<metricbeat-module-docker,Docker>>
+  * <<metricbeat-module-golang,golang>>
   * <<metricbeat-module-haproxy,HAProxy>>
+  * <<metricbeat-module-jolokia,Jolokia>>
   * <<metricbeat-module-kafka,kafka>>
+  * <<metricbeat-module-memcached,memcached>>
   * <<metricbeat-module-mongodb,MongoDB>>
   * <<metricbeat-module-mysql,MySQL>>
   * <<metricbeat-module-nginx,Nginx>>
@@ -16,6 +19,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-prometheus,Prometheus>>
   * <<metricbeat-module-redis,Redis>>
   * <<metricbeat-module-system,System>>
+  * <<metricbeat-module-windows,Windows>>
   * <<metricbeat-module-zookeeper,ZooKeeper>>
 
 
@@ -25,8 +29,11 @@ include::modules/apache.asciidoc[]
 include::modules/ceph.asciidoc[]
 include::modules/couchbase.asciidoc[]
 include::modules/docker.asciidoc[]
+include::modules/golang.asciidoc[]
 include::modules/haproxy.asciidoc[]
+include::modules/jolokia.asciidoc[]
 include::modules/kafka.asciidoc[]
+include::modules/memcached.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nginx.asciidoc[]
@@ -35,4 +42,5 @@ include::modules/postgresql.asciidoc[]
 include::modules/prometheus.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/system.asciidoc[]
+include::modules/windows.asciidoc[]
 include::modules/zookeeper.asciidoc[]

@@ -11,8 +11,6 @@ import (
 	"syscall"
 )
 
-type sysSockoptLen int32
-
 var (
 	ctlOpts = [ctlMax]ctlOpt{
 		ctlTTL:       {sysIP_RECVTTL, 1, marshalTTL, parseTTL},

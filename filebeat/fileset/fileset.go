@@ -78,6 +78,16 @@ type manifest struct {
 	Vars           []map[string]interface{} `config:"var"`
 	IngestPipeline string                   `config:"ingest_pipeline"`
 	Prospector     string                   `config:"prospector"`
+	Requires       struct {
+		Processors []ProcessorRequirement `config:"processors"`
+	} `config:"requires"`
+}
+
+// ProcessorRequirement represents the declaration of a dependency to a particular
+// Ingest Node processor / plugin.
+type ProcessorRequirement struct {
+	Name   string `config:"name"`
+	Plugin string `config:"plugin"`
 }
 
 // readManifest reads the manifest file of the fileset.
@@ -293,4 +303,10 @@ func removeExt(path string) string {
 		}
 	}
 	return path
+}
+
+// GetRequiredProcessors returns the list of processors on which this
+// fileset depends.
+func (fs *Fileset) GetRequiredProcessors() []ProcessorRequirement {
+	return fs.manifest.Requires.Processors
 }

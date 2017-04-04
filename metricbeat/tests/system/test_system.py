@@ -39,10 +39,10 @@ SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
 # is not available on all OSes and requires root to read for all processes.
 # cgroup is only available on linux.
 SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "pgid",
-                         "state", "username", "cgroup"]
+                         "state", "username", "cgroup", "cwd"]
 
 
-class SystemTest(metricbeat.BaseTest):
+class Test(metricbeat.BaseTest):
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu(self):
@@ -328,6 +328,9 @@ class SystemTest(metricbeat.BaseTest):
         """
         if not sys.platform.startswith("linux") and "cgroup" in SYSTEM_PROCESS_FIELDS:
             SYSTEM_PROCESS_FIELDS.remove("cgroup")
+
+        if not sys.platform.startswith("linux") and "cwd" in SYSTEM_PROCESS_FIELDS:
+            SYSTEM_PROCESS_FIELDS.remove("cwd")
 
         self.render_config_template(modules=[{
             "name": "system",

@@ -7,21 +7,26 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// Factory is a factory for registrars
 type Factory struct {
 	outlet    Outlet
 	registrar *registrar.Registrar
+	beatDone  chan struct{}
 }
 
-func NewFactory(outlet Outlet, registrar *registrar.Registrar) *Factory {
+// NewFactory instantiates a new Factory
+func NewFactory(outlet Outlet, registrar *registrar.Registrar, beatDone chan struct{}) *Factory {
 	return &Factory{
 		outlet:    outlet,
 		registrar: registrar,
+		beatDone:  beatDone,
 	}
 }
 
+// Create creates a prospector based on a config
 func (r *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
 
-	p, err := NewProspector(c, r.outlet)
+	p, err := NewProspector(c, r.outlet, r.beatDone)
 	if err != nil {
 		logp.Err("Error creating prospector: %s", err)
 		return nil, err

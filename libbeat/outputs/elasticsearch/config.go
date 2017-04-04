@@ -20,22 +20,23 @@ type elasticsearchConfig struct {
 	TLS              *outputs.TLSConfig `config:"ssl"`
 	MaxRetries       int                `config:"max_retries"`
 	Timeout          time.Duration      `config:"timeout"`
-	SaveTopology     bool               `config:"save_topology"`
 	Template         Template           `config:"template"`
 }
 
+// Template contains the elasticsearch template.
 type Template struct {
-	Enabled   bool             `config:"enabled"`
-	Name      string           `config:"name"`
-	Path      string           `config:"path"`
-	Overwrite bool             `config:"overwrite"`
-	Versions  TemplateVersions `config:"versions"`
+	Enabled   bool   `config:"enabled"`
+	Name      string `config:"name"`
+	Fields    string `config:"fields"`
+	Overwrite bool   `config:"overwrite"`
 }
 
+// TemplateVersions contains the template versions.
 type TemplateVersions struct {
 	Es2x TemplateVersion `config:"2x"`
 }
 
+// TemplateVersion contains a template version.
 type TemplateVersion struct {
 	Enabled bool   `config:"enabled"`
 	Path    string `config:"path"`
@@ -60,8 +61,8 @@ var (
 		LoadBalance:      true,
 		CacheRedirect:    false,
 		Template: Template{
-			Enabled:  true,
-			Versions: TemplateVersions{Es2x: TemplateVersion{Enabled: true}},
+			Enabled: true,
+			Fields:  "fields.yml",
 		},
 	}
 )

@@ -38,23 +38,23 @@ var (
 			"children_system": c.Float("CPUChildrenSystem"),
 		},
 		"connections": s.Object{
-			"total": c.Int("ConnsTotal"),
+			"total": c.Int("ConnsTotal", s.Optional),
 			"async": s.Object{
-				"writing":    c.Int("ConnsAsyncWriting"),
-				"keep_alive": c.Int("ConnsAsyncKeepAlive"),
-				"closing":    c.Int("ConnsAsyncClosing"),
+				"writing":    c.Int("ConnsAsyncWriting", s.Optional),
+				"keep_alive": c.Int("ConnsAsyncKeepAlive", s.Optional),
+				"closing":    c.Int("ConnsAsyncClosing", s.Optional),
 			},
 		},
 		"load": s.Object{
-			"1":  c.Float("Load1"),
-			"5":  c.Float("Load5"),
-			"15": c.Float("Load15"),
+			"1":  c.Float("Load1", s.Optional),
+			"5":  c.Float("Load5", s.Optional),
+			"15": c.Float("Load15", s.Optional),
 		},
 	}
 )
 
 // Map body to MapStr
-func eventMapping(scanner *bufio.Scanner, hostname string) common.MapStr {
+func eventMapping(scanner *bufio.Scanner, hostname string) (common.MapStr, *s.Errors) {
 	var (
 		totalS          int
 		totalR          int
@@ -140,9 +140,9 @@ func eventMapping(scanner *bufio.Scanner, hostname string) common.MapStr {
 			"total":                  totalAll,
 		},
 	}
-	schema.ApplyTo(event, fullEvent)
+	_, err := schema.ApplyTo(event, fullEvent)
 
-	return event
+	return event, err
 }
 
 /*

@@ -3,6 +3,7 @@
 package disk
 
 import (
+	"path"
 	"syscall"
 	"unsafe"
 
@@ -74,6 +75,12 @@ func Partitions(all bool) ([]PartitionStat, error) {
 			Fstype:     common.IntToString(stat.Fstypename[:]),
 			Opts:       opts,
 		}
+		if all == false {
+			if !path.IsAbs(d.Device) || !common.PathExists(d.Device) {
+				continue
+			}
+		}
+
 		ret = append(ret, d)
 	}
 

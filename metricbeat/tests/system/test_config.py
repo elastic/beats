@@ -8,6 +8,7 @@ import time
 
 class ConfigTest(metricbeat.BaseTest):
 
+    @unittest.skip("This is test is currently skipped as it is flaky every time log messages change.")
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_compare_config(self):

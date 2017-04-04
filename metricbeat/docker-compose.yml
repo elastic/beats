@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 services:
   beat:
     build: ${PWD}/.
@@ -10,30 +10,19 @@ services:
       # This is required for the docker module tests
       - /var/run/docker.sock:/var/run/docker.sock
     command: make
-    entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
 
-    # Module specific dependencies
+    # Wait for all services to be up and healthy.
     depends_on:
-      - apache
-      - ceph
-      - couchbase
-      - haproxy
-      - kafka
-      - mongodb
-      - mysql
-      - nginx
-      - phpfpm
-      - postgresql
-      - prometheus
-      - redis
-      - zookeeper
+      - proxy_dep
 
     env_file:
       - ${PWD}/module/apache/_meta/env
       - ${PWD}/module/ceph/_meta/env
       - ${PWD}/module/couchbase/_meta/env
       - ${PWD}/module/haproxy/_meta/env
+      - ${PWD}/module/jolokia/_meta/env
       - ${PWD}/module/kafka/_meta/env
+      - ${PWD}/module/memcached/_meta/env
       - ${PWD}/module/mongodb/_meta/env
       - ${PWD}/module/mysql/_meta/env
       - ${PWD}/module/nginx/_meta/env
@@ -42,6 +31,27 @@ services:
       - ${PWD}/module/prometheus/_meta/env
       - ${PWD}/module/redis/_meta/env
       - ${PWD}/module/zookeeper/_meta/env
+
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      apache:     { condition: service_healthy }
+      ceph:       { condition: service_healthy }
+      couchbase:  { condition: service_healthy }
+      haproxy:    { condition: service_healthy }
+      jolokia:    { condition: service_healthy }
+      kafka:      { condition: service_healthy }
+      memcached:  { condition: service_healthy }
+      mongodb:    { condition: service_healthy }
+      mysql:      { condition: service_healthy }
+      nginx:      { condition: service_healthy }
+      phpfpm:     { condition: service_healthy }
+      postgresql: { condition: service_healthy }
+      prometheus: { condition: service_healthy }
+      redis:      { condition: service_healthy }
+      zookeeper:  { condition: service_healthy }
 
   # Modules
   apache:
@@ -56,8 +66,14 @@ services:
   haproxy:
     build: ${PWD}/module/haproxy/_meta
 
+  jolokia:
+    build: ${PWD}/module/jolokia/_meta
+
   kafka:
     build: ${PWD}/module/kafka/_meta
+
+  memcached:
+    build: ${PWD}/module/memcached/_meta
 
   mongodb:
     build: ${PWD}/module/mongodb/_meta

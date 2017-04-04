@@ -2,12 +2,12 @@ package redis
 
 import (
 	"errors"
-	"expvar"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
@@ -17,18 +17,17 @@ import (
 
 type redisOut struct {
 	mode mode.ConnectionMode
-	topology
-	beatName string
+	beat common.BeatInfo
 }
 
 var debugf = logp.MakeDebug("redis")
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	statReadBytes   = expvar.NewInt("libbeat.redis.publish.read_bytes")
-	statWriteBytes  = expvar.NewInt("libbeat.redis.publish.write_bytes")
-	statReadErrors  = expvar.NewInt("libbeat.redis.publish.read_errors")
-	statWriteErrors = expvar.NewInt("libbeat.redis.publish.write_errors")
+	statReadBytes   = monitoring.NewInt(outputs.Metrics, "redis.read.bytes")
+	statWriteBytes  = monitoring.NewInt(outputs.Metrics, "redis.write.bytes")
+	statReadErrors  = monitoring.NewInt(outputs.Metrics, "redis.read.errors")
+	statWriteErrors = monitoring.NewInt(outputs.Metrics, "redis.write.errors")
 )
 
 const (
@@ -40,15 +39,15 @@ func init() {
 	outputs.RegisterOutputPlugin("redis", new)
 }
 
-func new(beatName string, cfg *common.Config, expireTopo int) (outputs.Outputer, error) {
-	r := &redisOut{beatName: beatName}
-	if err := r.init(cfg, expireTopo); err != nil {
+func new(beat common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
+	r := &redisOut{beat: beat}
+	if err := r.init(cfg); err != nil {
 		return nil, err
 	}
 	return r, nil
 }
 
-func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
+func (r *redisOut) init(cfg *common.Config) error {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return err
@@ -80,7 +79,7 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		}
 	}
 	if !cfg.HasField("key") {
-		cfg.SetString("key", -1, r.beatName)
+		cfg.SetString("key", -1, r.beat.Beat)
 	}
 
 	key, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
@@ -103,20 +102,14 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 		Proxy:   &config.Proxy,
 		TLS:     tls,
 		Stats: &transport.IOStats{
-			Read:        statReadBytes,
-			Write:       statWriteBytes,
-			ReadErrors:  statReadErrors,
-			WriteErrors: statWriteErrors,
+			Read:               statReadBytes,
+			Write:              statWriteBytes,
+			ReadErrors:         statReadErrors,
+			WriteErrors:        statWriteErrors,
+			OutputsWrite:       outputs.WriteBytes,
+			OutputsWriteErrors: outputs.WriteErrors,
 		},
 	}
-
-	// configure topology support
-	r.topology.init(transp, topoConfig{
-		host:     config.HostTopology,
-		password: config.PasswordTopology,
-		db:       config.DbTopology,
-		expire:   time.Duration(expireTopo) * time.Second,
-	})
 
 	// configure publisher clients
 	clients, err := modeutil.MakeClients(cfg, func(host string) (mode.ProtocolClient, error) {

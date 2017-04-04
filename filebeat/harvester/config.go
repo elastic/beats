@@ -6,7 +6,6 @@ import (
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/reader"
-	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/dustin/go-humanize"
 	"github.com/elastic/beats/libbeat/common/match"
@@ -14,56 +13,40 @@ import (
 
 var (
 	defaultConfig = harvesterConfig{
-		BufferSize:      16 * humanize.KiByte,
-		InputType:       cfg.DefaultInputType,
-		Backoff:         1 * time.Second,
-		BackoffFactor:   2,
-		MaxBackoff:      10 * time.Second,
-		CloseInactive:   5 * time.Minute,
-		MaxBytes:        10 * humanize.MiByte,
-		CloseRemoved:    true,
-		CloseRenamed:    false,
-		CloseEOF:        false,
-		CloseTimeout:    0,
-		ForceCloseFiles: false,
+		BufferSize:    16 * humanize.KiByte,
+		InputType:     cfg.DefaultInputType,
+		Backoff:       1 * time.Second,
+		BackoffFactor: 2,
+		MaxBackoff:    10 * time.Second,
+		CloseInactive: 5 * time.Minute,
+		MaxBytes:      10 * humanize.MiByte,
+		CloseRemoved:  true,
+		CloseRenamed:  false,
+		CloseEOF:      false,
+		CloseTimeout:  0,
 	}
 )
 
 type harvesterConfig struct {
-	BufferSize      int                     `config:"harvester_buffer_size"`
-	Encoding        string                  `config:"encoding"`
-	InputType       string                  `config:"input_type"`
-	Backoff         time.Duration           `config:"backoff" validate:"min=0,nonzero"`
-	BackoffFactor   int                     `config:"backoff_factor" validate:"min=1"`
-	MaxBackoff      time.Duration           `config:"max_backoff" validate:"min=0,nonzero"`
-	CloseInactive   time.Duration           `config:"close_inactive"`
-	CloseOlder      time.Duration           `config:"close_older"`
-	CloseRemoved    bool                    `config:"close_removed"`
-	CloseRenamed    bool                    `config:"close_renamed"`
-	CloseEOF        bool                    `config:"close_eof"`
-	CloseTimeout    time.Duration           `config:"close_timeout" validate:"min=0"`
-	ForceCloseFiles bool                    `config:"force_close_files"`
-	ExcludeLines    []match.Matcher         `config:"exclude_lines"`
-	IncludeLines    []match.Matcher         `config:"include_lines"`
-	MaxBytes        int                     `config:"max_bytes" validate:"min=0,nonzero"`
-	Multiline       *reader.MultilineConfig `config:"multiline"`
-	JSON            *reader.JSONConfig      `config:"json"`
+	BufferSize    int                     `config:"harvester_buffer_size"`
+	Encoding      string                  `config:"encoding"`
+	InputType     string                  `config:"input_type"`
+	Backoff       time.Duration           `config:"backoff" validate:"min=0,nonzero"`
+	BackoffFactor int                     `config:"backoff_factor" validate:"min=1"`
+	MaxBackoff    time.Duration           `config:"max_backoff" validate:"min=0,nonzero"`
+	CloseInactive time.Duration           `config:"close_inactive"`
+	CloseRemoved  bool                    `config:"close_removed"`
+	CloseRenamed  bool                    `config:"close_renamed"`
+	CloseEOF      bool                    `config:"close_eof"`
+	CloseTimeout  time.Duration           `config:"close_timeout" validate:"min=0"`
+	ExcludeLines  []match.Matcher         `config:"exclude_lines"`
+	IncludeLines  []match.Matcher         `config:"include_lines"`
+	MaxBytes      int                     `config:"max_bytes" validate:"min=0,nonzero"`
+	Multiline     *reader.MultilineConfig `config:"multiline"`
+	JSON          *reader.JSONConfig      `config:"json"`
 }
 
 func (config *harvesterConfig) Validate() error {
-
-	// DEPRECATED: remove in 6.0
-	if config.ForceCloseFiles {
-		config.CloseRemoved = true
-		config.CloseRenamed = true
-		logp.Warn("DEPRECATED: force_close_files was set to true. Use close_removed + close_rename")
-	}
-
-	// DEPRECATED: remove in 6.0
-	if config.CloseOlder > 0 {
-		config.CloseInactive = config.CloseOlder
-		logp.Warn("DEPRECATED: close_older is deprecated. Use close_inactive")
-	}
 
 	// Check input type
 	if _, ok := cfg.ValidInputType[config.InputType]; !ok {

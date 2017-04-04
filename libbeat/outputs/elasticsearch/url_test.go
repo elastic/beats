@@ -79,6 +79,8 @@ func TestGetUrl(t *testing.T) {
 		"http://localhost/":    "http://localhost:9200/",
 
 		// no schema + hostname
+		"33f3600fd5c1bb599af557c36a4efb08.host":       "http://33f3600fd5c1bb599af557c36a4efb08.host:9200",
+		"33f3600fd5c1bb599af557c36a4efb08.host:12345": "http://33f3600fd5c1bb599af557c36a4efb08.host:12345",
 		"localhost":        "http://localhost:9200",
 		"localhost:80":     "http://localhost:80",
 		"localhost:80/":    "http://localhost:80/",
@@ -117,7 +119,7 @@ func TestGetUrl(t *testing.T) {
 	}
 
 	for input, output := range inputOutput {
-		urlNew, err := getURL("", "", input)
+		urlNew, err := MakeURL("", "", input)
 		assert.Nil(t, err)
 		assert.Equal(t, output, urlNew, fmt.Sprintf("input: %v", input))
 	}
@@ -128,7 +130,7 @@ func TestGetUrl(t *testing.T) {
 		"http://username:password@es.found.io:9324": "http://username:password@es.found.io:9324/hello",
 	}
 	for input, output := range inputOutputWithDefaults {
-		urlNew, err := getURL("https", "/hello", input)
+		urlNew, err := MakeURL("https", "/hello", input)
 		assert.Nil(t, err)
 		assert.Equal(t, output, urlNew)
 	}

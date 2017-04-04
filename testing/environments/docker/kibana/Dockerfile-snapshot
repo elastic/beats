@@ -5,6 +5,7 @@ MAINTAINER Elastic Docker Team <docker@elastic.co>
 ARG DOWNLOAD_URL
 ARG ELASTIC_VERSION
 
+HEALTHCHECK CMD curl -f http://localhost:5601
 EXPOSE 5601
 
 WORKDIR /usr/share/kibana
@@ -24,5 +25,6 @@ ADD bin/kibana-docker /usr/local/bin/
 
 RUN usermod --home /usr/share/kibana kibana
 USER kibana
+ENV BABEL_CACHE_PATH /usr/share/kibana/optimize/.babelcache.json
 ENV PATH=/usr/share/kibana/bin:$PATH
 CMD /usr/local/bin/kibana-docker

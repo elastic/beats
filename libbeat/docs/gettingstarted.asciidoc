@@ -39,6 +39,14 @@ mac>> for OS X, and <<win, win>> for Windows):
 
 [[deb]]*deb:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Elasticsearch has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-8-jre
@@ -47,7 +55,17 @@ sudo dpkg -i elasticsearch-{ES-version}.deb
 sudo /etc/init.d/elasticsearch start
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[rpm]]*rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Elasticsearch has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -57,7 +75,17 @@ sudo rpm -i elasticsearch-{ES-version}.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[mac]]*mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Elasticsearch has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -68,7 +96,17 @@ cd elasticsearch-{ES-version}
 ./bin/elasticsearch
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[win]]*win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Elasticsearch has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . If necessary, download and install the latest version of the Java from https://www.java.com[www.java.com].
 
@@ -91,6 +129,8 @@ cd C:\Program Files\elasticsearch-{ES-version}
 bin\elasticsearch.bat
 ----------------------------------------------------------------------
 
+endif::[]
+
 You can learn more about installing, configuring, and running Elasticsearch in the
 https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html[Elasticsearch Reference].
 
@@ -112,14 +152,15 @@ You should see a response similar to this:
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 {
-  "name" : "Angela Del Toro",
+  "name" : "ofgAtrJ",
   "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "3h9xSrVlRJmDHgQ8FLnByA",
   "version" : {
     "number" : "{ES-version}",
-    "build_hash" : "8ff36d139e16f8720f2947ef62c8167a888992fe",
-    "build_timestamp" : "2016-01-27T13:32:39Z",
+    "build_hash" : "db0d481",
+    "build_date" : "2017-02-09T22:05:32.386Z",
     "build_snapshot" : false,
-    "lucene_version" : "6.1.0"
+    "lucene_version" : "6.4.1"
   },
   "tagline" : "You Know, for Search"
 }
@@ -146,6 +187,14 @@ with your system:
 
 *deb:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Logstash has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-8-jre
@@ -153,7 +202,17 @@ curl -L -O https://artifacts.elastic.co/downloads/logstash/logstash-{LS-version}
 sudo dpkg -i logstash-{LS-version}.deb
 ----------------------------------------------------------------------
 
+endif::[]
+
 *rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Logstash has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -162,7 +221,17 @@ curl -L -O https://artifacts.elastic.co/downloads/logstash/logstash-{LS-version}
 sudo rpm -i logstash-{LS-version}.rpm
 ----------------------------------------------------------------------
 
+endif::[]
+
 *mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Logstash has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -171,7 +240,17 @@ curl -L -O https://artifacts.elastic.co/downloads/logstash/logstash-{LS-version}
 unzip logstash-{LS-version}.zip
 ----------------------------------------------------------------------
 
+endif::[]
+
 *win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Logstash has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . If necessary, download and install the latest version of the Java from https://www.java.com[www.java.com].
 
@@ -182,13 +261,14 @@ https://www.elastic.co/downloads/logstash[downloads page].
 
 Don't start Logstash yet. You need to set a couple of configuration options first.
 
+endif::[]
+
 [[logstash-setup]]
 ==== Setting Up Logstash
 
 In this setup, the Beat sends events to Logstash. Logstash receives
-these events by using the
-https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] and then sends the transaction to Elasticsearch by using the
-http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html[Elasticsearch
+these events by using the {logstashdoc}/plugins-inputs-beats.html[Beats input plugin for Logstash] and then sends the transaction to Elasticsearch by using the
+{logstashdoc}/plugins-outputs-elasticsearch.html[Elasticsearch
 output plugin for Logstash]. The Elasticsearch output plugin uses the bulk API, making
 indexing very efficient.
 
@@ -224,6 +304,7 @@ and to index into Elasticsearch. You configure Logstash by creating a
 configuration file. For example, you can save the following example configuration
 to a file called `logstash.conf`:
 +
+--
 [source,ruby]
 ------------------------------------------------------------------------------
 input {
@@ -236,15 +317,22 @@ output {
   elasticsearch {
     hosts => "localhost:9200"
     manage_template => false
-    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
-    document_type => "%{[@metadata][type]}"
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}" <1>
+    document_type => "%{[@metadata][type]}" <2>
   }
 }
 ------------------------------------------------------------------------------
-+
+<1> `%{[@metadata][beat]}` sets the first part of the index name to the value
+of the `beat` metadata field, and `%{+YYYY.MM.dd}` sets the second part of the
+name to a date based on the Logstash `@timestamp` field. For example:
++{beatname_lc}-2017.03.29+.
+<2> `%{[@metadata][type]}` sets the document type based on the value of the `type`
+metadata field.
+
 Logstash uses this configuration to index events in Elasticsearch in the same
 way that the Beat would, but you get additional buffering and other capabilities
 provided by Logstash.
+--
 
 To use this setup, you'll also need to configure your Beat to use Logstash. For more information, see the documentation for the Beat.
 
@@ -333,6 +421,14 @@ Use the following commands to download and run Kibana.
 
 *deb or rpm:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Kibana has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 curl -L -O https://artifacts.elastic.co/downloads/kibana/kibana-{Kibana-version}-linux-x86_64.tar.gz
@@ -341,7 +437,17 @@ cd kibana-{Kibana-version}-linux-x86_64/
 ./bin/kibana
 ----------------------------------------------------------------------
 
+endif::[]
+
 *mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Kibana has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -351,7 +457,17 @@ cd kibana-{Kibana-version}-darwin-x86_64/
 ./bin/kibana
 ----------------------------------------------------------------------
 
+endif::[]
+
 *win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Kibana has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . Download the Kibana {Kibana-version} Windows zip file from the
 https://www.elastic.co/downloads/kibana[downloads page].
@@ -372,6 +488,8 @@ cd C:\Program Files\kibana-{Kibana-version}-windows
 ----------------------------------------------------------------------
 bin\kibana.bat
 ----------------------------------------------------------------------
+
+endif::[]
 
 You can find Kibana binaries for other operating systems on the
 https://www.elastic.co/downloads/kibana[Kibana downloads page].

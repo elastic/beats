@@ -3,9 +3,7 @@ package config
 
 import (
 	"fmt"
-	"net"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/joeshaw/multierror"
@@ -45,8 +43,7 @@ func (s Settings) Validate() error {
 	// TODO: winlogbeat should not try to validate top-level beats config
 
 	validKeys := []string{
-		"fields", "fields_under_root", "tags",
-		"name", "refresh_topology_freq", "topology_expire", "geoip",
+		"fields", "fields_under_root", "tags", "name",
 		"queue_size", "bulk_queue_size", "max_procs",
 		"processors", "logging", "output", "path", "winlogbeat",
 		"dashboards",
@@ -75,7 +72,6 @@ func (s Settings) Validate() error {
 // WinlogbeatConfig contains all of Winlogbeat configuration data.
 type WinlogbeatConfig struct {
 	EventLogs    []map[string]interface{} `config:"event_logs"`
-	Metrics      MetricsConfig            `config:"metrics"`
 	RegistryFile string                   `config:"registry_file"`
 }
 
@@ -89,46 +85,5 @@ func (ebc WinlogbeatConfig) Validate() error {
 			"configured as part of event_logs"))
 	}
 
-	if err := ebc.Metrics.Validate(); err != nil {
-		errs = append(errs, err)
-	}
-
 	return errs.Err()
-}
-
-// MetricsConfig holds the configuration data for the HTTP metric service.
-type MetricsConfig struct {
-	BindAddress string // Bind address for the metric service. Format is host:port.
-}
-
-// Validate validates the MetricsConfig data and returns an error describing any
-// problems or nil.
-func (mc MetricsConfig) Validate() error {
-	if mc.BindAddress == "" {
-		return nil
-	}
-
-	host, portStr, err := net.SplitHostPort(mc.BindAddress)
-	if err != nil {
-		return fmt.Errorf("bind_address must be formatted as host:port but "+
-			"was '%s' (%v)", mc.BindAddress, err)
-	}
-
-	if len(host) == 0 {
-		return fmt.Errorf("bind_address value ('%s') is missing a host",
-			mc.BindAddress)
-	}
-
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		return fmt.Errorf("bind_address port value ('%s') must be a number "+
-			"(%v)", portStr, err)
-	}
-
-	if port < 1 || port > 65535 {
-		return fmt.Errorf("bind_address port must be within [1-65535] but "+
-			"was '%d'", port)
-	}
-
-	return nil
 }

@@ -19,12 +19,12 @@ type spoolerOutlet struct {
 
 type publisherChannel struct {
 	done chan struct{}
-	ch   chan []*input.Event
+	ch   chan []*input.Data
 }
 
 type registrarLogger struct {
 	done chan struct{}
-	ch   chan<- []*input.Event
+	ch   chan<- []*input.Data
 }
 
 type finishedLogger struct {
@@ -44,7 +44,7 @@ func newSpoolerOutlet(
 	}
 }
 
-func (o *spoolerOutlet) OnEvent(event *input.Event) bool {
+func (o *spoolerOutlet) OnEvent(event *input.Data) bool {
 	open := atomic.LoadInt32(&o.isOpen) == 1
 	if !open {
 		return false
@@ -69,12 +69,12 @@ func (o *spoolerOutlet) OnEvent(event *input.Event) bool {
 func newPublisherChannel() *publisherChannel {
 	return &publisherChannel{
 		done: make(chan struct{}),
-		ch:   make(chan []*input.Event, 1),
+		ch:   make(chan []*input.Data, 1),
 	}
 }
 
 func (c *publisherChannel) Close() { close(c.done) }
-func (c *publisherChannel) Send(events []*input.Event) bool {
+func (c *publisherChannel) Send(events []*input.Data) bool {
 	select {
 	case <-c.done:
 		// set ch to nil, so no more events will be send after channel close signal
@@ -96,7 +96,7 @@ func newRegistrarLogger(reg *registrar.Registrar) *registrarLogger {
 }
 
 func (l *registrarLogger) Close() { close(l.done) }
-func (l *registrarLogger) Published(events []*input.Event) bool {
+func (l *registrarLogger) Published(events []*input.Data) bool {
 	select {
 	case <-l.done:
 		// set ch to nil, so no more events will be send after channel close signal
@@ -114,7 +114,7 @@ func newFinishedLogger(wg *sync.WaitGroup) *finishedLogger {
 	return &finishedLogger{wg}
 }
 
-func (l *finishedLogger) Published(events []*input.Event) bool {
+func (l *finishedLogger) Published(events []*input.Data) bool {
 	for range events {
 		l.wg.Done()
 	}

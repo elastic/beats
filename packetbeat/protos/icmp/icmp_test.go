@@ -45,7 +45,7 @@ func BenchmarkIcmpProcessICMPv4(b *testing.B) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"icmp", "icmpdetailed"})
 	}
 
-	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
+	results := &publish.ChanTransactions{Channel: make(chan common.MapStr, 10)}
 	icmp, err := New(true, results, common.NewConfig())
 	if err != nil {
 		b.Error("Failed to create ICMP processor")

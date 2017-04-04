@@ -12,9 +12,8 @@ cd $GOPATH/src/$BEAT_PATH
 
 PREFIX=/build
 
-# Copy template
-cp $BEAT_NAME.template.json $PREFIX/$BEAT_NAME.template.json
-cp $BEAT_NAME.template-es2x.json $PREFIX/$BEAT_NAME.template-es2x.json
+# Copy fields.yml
+cp fields.yml $PREFIX/fields.yml
 
 # linux
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-linux.yml
@@ -44,7 +43,7 @@ for TARGET in $TARGETS; do
 	XGOOS=`echo $TARGET | cut -d '/' -f 1`
 	XGOARCH=`echo $TARGET | cut -d '/' -f 2`
 
-	GOOS=$XGOOS GOARCH=$XGOARCH go build -ldflags "-X main.beat=${BEAT_NAME}" -o $PREFIX/import_dashboards-$XGOOS-$XGOARCH ${ES_BEATS}/libbeat/dashboards/import_dashboards.go
+	GOOS=$XGOOS GOARCH=$XGOARCH go build -ldflags "-X main.beat=${BEAT_NAME}" -o $PREFIX/import_dashboards-$XGOOS-$XGOARCH ${ES_BEATS}/dev-tools/cmd/import_dashboards/import_dashboards.go
 done
 
 if [ -n "BUILDID" ]; then

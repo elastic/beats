@@ -84,7 +84,7 @@ grouped in the following categories:
 
     # Create sections from available fields
     sections = {}
-    for v in docs["fields"]:
+    for v in docs:
         sections[v["key"]] = v["title"]
 
     for key in sorted(sections):
@@ -92,10 +92,11 @@ grouped in the following categories:
     output.write("\n--\n")
 
     # Sort alphabetically by key
-    for section in sorted(docs["fields"], key=lambda field: field["key"]):
+    for section in sorted(docs, key=lambda field: field["key"]):
         section["name"] = section["title"]
         section["anchor"] = section["key"]
         document_fields(output, section, sections, "")
+
 
 if __name__ == "__main__":
 
@@ -111,19 +112,11 @@ if __name__ == "__main__":
     beat_name = args.beatname
     es_beats = args.es_beats
 
-    fields_yml = beat_path + "/_meta/fields.generated.yml"
-
-    # Not all beats have a fields.generated.yml. Fall back to fields.yml
-    if not os.path.isfile(fields_yml):
-        fields_yml = beat_path + "/_meta/fields.yml"
+    fields_yml = beat_path + "/fields.yml"
 
     # Read fields.yml
     with open(fields_yml) as f:
         fields = f.read()
-
-    # Prepends beat fields from libbeat
-    with open(es_beats + "/libbeat/_meta/fields.generated.yml") as f:
-        fields = f.read() + fields
 
     output = open(beat_path + "/docs/fields.asciidoc", 'w')
 

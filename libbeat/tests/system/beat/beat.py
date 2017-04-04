@@ -102,19 +102,20 @@ class TestCase(unittest.TestCase):
     @classmethod
     def setUpClass(self):
 
-        # Create build path
-        build_dir = "../../build"
-        if 'BUILD_DIR' in os.environ.keys() and os.environ['BUILD_DIR'] != '':
-            build_dir = os.environ['BUILD_DIR']
-        self.build_path = build_dir + "/system-tests/"
-
         # Path to test binary
         if not hasattr(self, 'beat_name'):
             self.beat_name = "beat"
 
-        # Path to test binary
         if not hasattr(self, 'beat_path'):
-            self.beat_path = "../../" + self.beat_name + ".test"
+            self.beat_path = "."
+
+        # Path to test binary
+        if not hasattr(self, 'test_binary'):
+            self.test_binary = os.path.abspath(self.beat_path + "/" + self.beat_name + ".test")
+
+        # Create build path
+        build_dir = self.beat_path + "/build"
+        self.build_path = build_dir + "/system-tests/"
 
     def run_beat(self,
                  cmd=None,
@@ -150,7 +151,7 @@ class TestCase(unittest.TestCase):
 
         # Init defaults
         if cmd is None:
-            cmd = self.beat_path
+            cmd = self.test_binary
 
         if config is None:
             config = self.beat_name + ".yml"
@@ -175,17 +176,19 @@ class TestCase(unittest.TestCase):
         proc.start()
         return proc
 
-    def render_config_template(self, template=None,
+    def render_config_template(self, template_name=None,
                                output=None, **kargs):
 
         # Init defaults
-        if template is None:
-            template = self.beat_name + ".yml.j2"
+        if template_name is None:
+            template_name = self.beat_name
+
+        template_path = "./tests/system/config/" + template_name + ".yml.j2"
 
         if output is None:
             output = self.beat_name + ".yml"
 
-        template = self.template_env.get_template(template)
+        template = self.template_env.get_template(template_path)
 
         kargs["beat"] = self
         output_str = template.render(**kargs)
@@ -242,7 +245,7 @@ class TestCase(unittest.TestCase):
     def setUp(self):
 
         self.template_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader("config")
+            loader=jinja2.FileSystemLoader(self.beat_path)
         )
 
         # create working dir
@@ -379,7 +382,7 @@ class TestCase(unittest.TestCase):
                     raise Exception("Unexpected key '{}' found"
                                     .format(key))
 
-    def load_fields(self, fields_doc="../../_meta/fields.generated.yml"):
+    def load_fields(self, fields_doc=None):
         """
         Returns a list of fields to expect in the output dictionaries
         and a second list that contains the fields that have a
@@ -387,9 +390,17 @@ class TestCase(unittest.TestCase):
 
         Reads these lists from the fields documentation.
         """
+
+        if fields_doc is None:
+            fields_doc = self.beat_path + "/_meta/fields.generated.yml"
+
         def extract_fields(doc_list, name):
             fields = []
             dictfields = []
+
+            if doc_list is None:
+                return fields, dictfields
+
             for field in doc_list:
 
                 # Chain together names
@@ -404,18 +415,18 @@ class TestCase(unittest.TestCase):
                     dictfields.extend(subdictfields)
                 else:
                     fields.append(newName)
-                    if field.get("type") in ["dict", "geo_point"]:
+                    if field.get("type") in ["object", "geo_point"]:
                         dictfields.append(newName)
             return fields, dictfields
 
         # Not all beats have a fields.generated.yml. Fall back to fields.yml
         if not os.path.isfile(fields_doc):
-            fields_doc = "../../_meta/fields.yml"
+            fields_doc = self.beat_path + "/_meta/fields.yml"
 
         # TODO: Make fields_doc path more generic to work with beat-generator
         with open(fields_doc, "r") as f:
-            # TODO: Make this path more generic to work with beat-generator.
-            with open("../../../libbeat/_meta/fields.common.yml") as f2:
+            path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.common.yml")
+            with open(path) as f2:
                 content = f2.read()
 
             #content = "fields:\n"
@@ -425,7 +436,7 @@ class TestCase(unittest.TestCase):
             fields = []
             dictfields = []
 
-            for item in doc["fields"]:
+            for item in doc:
                 subfields, subdictfields = extract_fields(item["fields"], "")
                 fields.extend(subfields)
                 dictfields.extend(subdictfields)

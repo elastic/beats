@@ -18,7 +18,7 @@ import (
 // in tests. It publishes the transactions in the results channel.
 func mongodbModForTests() *mongodbPlugin {
 	var mongodb mongodbPlugin
-	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
+	results := &publish.ChanTransactions{Channel: make(chan common.MapStr, 10)}
 	config := defaultConfig
 	mongodb.init(results, &config)
 	return &mongodb

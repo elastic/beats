@@ -132,6 +132,23 @@ func Critical(format string, v ...interface{}) {
 	msg(LOG_CRIT, "CRIT ", format, v...)
 }
 
+// Deprecate logs a deprecation message.
+// The version string contains the version when the future will be removed
+func Deprecate(version string, format string, v ...interface{}) {
+	postfix := fmt.Sprintf(" Will be removed in version: %s", version)
+	Warn("DEPRECATED: "+format+postfix, v...)
+}
+
+// Experimental logs the usage of an experimental feature.
+func Experimental(format string, v ...interface{}) {
+	Warn("EXPERIMENTAL: "+format, v...)
+}
+
+// Beta logs the usage of an beta feature.
+func Beta(format string, v ...interface{}) {
+	Warn("BETA: "+format, v...)
+}
+
 // WTF prints the message at CRIT level and panics immediately with the same
 // message
 func WTF(format string, v ...interface{}) {

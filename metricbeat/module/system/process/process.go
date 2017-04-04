@@ -37,6 +37,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Procs        []string `config:"processes"`
 		Cgroups      *bool    `config:"process.cgroups.enabled"`
 		EnvWhitelist []string `config:"process.env.whitelist"`
+		CPUTicks     bool     `config:"cpu_ticks"`
 	}{
 		Procs: []string{".*"}, // collect all processes by default
 	}
@@ -49,6 +50,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		stats: &ProcStats{
 			Procs:        config.Procs,
 			EnvWhitelist: config.EnvWhitelist,
+			CpuTicks:     config.CPUTicks,
 		},
 	}
 	err := m.stats.InitProcStats()
@@ -63,10 +65,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 
 		if config.Cgroups == nil || *config.Cgroups {
-			debugf("process cgroup data collection is enabled")
+			debugf("process cgroup data collection is enabled, using hostfs='%v'", systemModule.HostFS)
 			m.cgroup, err = cgroup.NewReader(systemModule.HostFS, true)
 			if err != nil {
-				return nil, errors.Wrap(err, "error initializing cgroup reader")
+				if err == cgroup.ErrCgroupsMissing {
+					logp.Warn("cgroup data collection will be disabled: %v", err)
+				} else {
+					return nil, errors.Wrap(err, "error initializing cgroup reader")
+				}
 			}
 		}
 	}

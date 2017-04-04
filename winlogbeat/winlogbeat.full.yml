@@ -14,12 +14,6 @@
 # in the directory in which it was started.
 #winlogbeat.registry_file: .winlogbeat.yml
 
-# Diagnostic metrics that can retrieved through a web interface if a
-# bindaddress value (host:port) is specified. The web address will be
-# http://<bindaddress>/debug/vars
-#winlogbeat.metrics:
-#  bindaddress: 'localhost:8123'
-
 # event_logs specifies a list of event logs to monitor as well as any
 # accompanying options. The YAML data type of event_logs is a list of
 # dictionaries.
@@ -139,7 +133,7 @@ output.elasticsearch:
 
   # Optional index name. The default is "winlogbeat" plus date
   # and generates [winlogbeat-]YYYY.MM.DD keys.
-  #index: "winlogbeat-%{+yyyy.MM.dd}"
+  #index: "winlogbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -179,21 +173,15 @@ output.elasticsearch:
   #template.enabled: true
 
   # Template name. By default the template name is winlogbeat.
+  # The version of the beat will always be appended to the given name
+  # so the final name is winlogbeat-%{[beat.version]}.
   #template.name: "winlogbeat"
 
-  # Path to template file
-  #template.path: "${path.config}/winlogbeat.template.json"
+  # Path to fields.yml file to generate the template
+  #template.fields: "${path.config}/fields.yml"
 
   # Overwrite existing template
   #template.overwrite: false
-
-  # If set to true, winlogbeat checks the Elasticsearch version at connect time, and if it
-  # is 2.x, it loads the file specified by the template.versions.2x.path setting. The
-  # default is true.
-  #template.versions.2x.enabled: true
-
-  # Path to the Elasticsearch 2.x version of the template file.
-  #template.versions.2x.path: "${path.config}/winlogbeat.template-es2x.json"
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
@@ -603,16 +591,16 @@ output.elasticsearch:
 #dashboards.file:
 
 # If this option is enabled, the snapshot URL is used instead of the default URL.
-#dashboard.snapshot: false
+#dashboards.snapshot: false
 
 # The URL from where to download the snapshot version of the dashboards. By default
 # this has a value which is computed based on the Beat name and version.
-#dashboard.snapshot_url
+#dashboards.snapshot_url
 
 # In case the archive contains the dashboards from multiple Beats, this lets you
 # select which one to load. You can load all the dashboards in the archive by
 # setting this to the empty string.
-#dashboard.beat: winlogbeat
+#dashboards.beat: winlogbeat
 
 # The name of the Kibana index to use for setting the configuration. Default is ".kibana"
 #dashboards.kibana_index: .kibana
@@ -620,6 +608,19 @@ output.elasticsearch:
 # The Elasticsearch index name. This overwrites the index name defined in the
 # dashboards and index pattern. Example: testbeat-*
 #dashboards.index:
+
+#================================ HTTP Endpoint ======================================
+# Each beat can expose internal data points through a http endpoint. For security
+# reason the endpoint is disabled by default. This feature is currently in beta.
+
+# Defines if http endpoint is enabled
+#http.enabled: false
+
+# Host to expose the http endpoint to. It is recommended to use only localhost.
+#http.host: localhost
+
+# Port on which the http endpoint is exposed. Default is 5066
+#http.port: 5066
 
 #================================ Logging ======================================
 # There are three options for the log output: syslog, file, stderr.

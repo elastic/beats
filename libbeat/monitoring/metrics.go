@@ -26,7 +26,7 @@ func NewInt(r *Registry, name string, opts ...Option) *Int {
 	}
 
 	v := &Int{}
-	addVar(r, name, varOpts(r.opts, opts), v, makeExpvar(func() string {
+	addVar(r, name, opts, v, makeExpvar(func() string {
 		return strconv.FormatInt(v.Get(), 10)
 	}))
 	return v
@@ -53,7 +53,7 @@ func NewFloat(r *Registry, name string, opts ...Option) *Float {
 	}
 
 	v := &Float{}
-	addVar(r, name, varOpts(r.opts, opts), v, makeExpvar(func() string {
+	addVar(r, name, opts, v, makeExpvar(func() string {
 		return strconv.FormatFloat(v.Get(), 'g', -1, 64)
 	}))
 	return v
@@ -91,7 +91,7 @@ func NewString(r *Registry, name string, opts ...Option) *String {
 	}
 
 	v := &String{}
-	addVar(r, name, varOpts(r.opts, opts), v, makeExpvar(func() string {
+	addVar(r, name, opts, v, makeExpvar(func() string {
 		b, _ := json.Marshal(v.Get())
 		return string(b)
 	}))
@@ -122,11 +122,32 @@ func (v *String) Fail(err error) {
 	v.Set(err.Error())
 }
 
+type FuncVar func(Mode, Visitor)
+
+func (f FuncVar) Visit(m Mode, vs Visitor) { f(m, vs) }
+
+type Func struct {
+	f FuncVar
+}
+
+func NewFunc(r *Registry, name string, f func(Mode, Visitor), opts ...Option) *Func {
+	if r == nil {
+		r = Default
+	}
+
+	v := &Func{f}
+	addVar(r, name, opts, v, nil)
+	return v
+}
+
+func (f *Func) Visit(m Mode, vs Visitor) { f.f(m, vs) }
+
 func (m makeExpvar) String() string { return m() }
 
-func addVar(r *Registry, name string, opts options, v Var, ev expvar.Var) {
-	r.Add(name, v, opts.mode)
-	if opts.publishExpvar {
+func addVar(r *Registry, name string, opts []Option, v Var, ev expvar.Var) {
+	O := varOpts(r.opts, opts)
+	r.doAdd(name, v, O)
+	if O.publishExpvar && ev != nil {
 		expvar.Publish(fullName(r, name), ev)
 	}
 }

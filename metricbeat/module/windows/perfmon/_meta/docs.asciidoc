@@ -1,0 +1,22 @@
+=== Windows Perfmon MetricSet
+
+This is the perfmon metricset of the Windows module. It reads Windows
+performance counters.
+
+[float]
+=== Configuration
+
+You must configure queries for the Windows performance counters that you wish
+to collect. The example below collects processor time and disk writes.
+
+[source,yaml]
+----
+- module: windows
+  metricsets: ["perfmon"]
+  period: 10s
+  perfmon.counters:
+    - alias: "processor.time.total.pct"
+      query: '\Processor Information(_Total)\% Processor Time'
+    - alias: "diskio.write.bytes"
+      query: '\PhysicalDisk(_Total)\Disk Writes/sec'
+----

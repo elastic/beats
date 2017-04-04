@@ -171,7 +171,7 @@ func doPublishWith(
 
 	var expectedData [][]outputs.Data
 	ch := make(chan op.SignalResponse, numSignals)
-	signal := &op.SignalChannel{ch}
+	signal := &op.SignalChannel{C: ch}
 	idx := 0
 	for _, pubEvents := range data {
 		if pubEvents.Single {

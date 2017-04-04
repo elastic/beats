@@ -41,14 +41,6 @@
         the `client_ip` for non proxy clients.
       format: Dotted notation.
 
-    - name: client_location
-      type: geo_point
-      example: 40.715, -74.011
-      description: >
-        DEPRECATED. Please use `client_geoip` instead.
-        The GeoIP location of the `real_ip` IP address or of the `client_ip` address if the `real_ip` is
-        disabled. The field is a string containing the latitude and longitude separated by a comma.
-
     - name: client_geoip
       description: The GeoIP information of the client.
       type: group
@@ -569,7 +561,7 @@
             Acknowledge multiple messages.
 
         - name: arguments
-          type: dict
+          type: object
           description: >
             Optional additional arguments passed to some methods. Can be of
             various types.
@@ -596,8 +588,8 @@
             MIME content encoding.
 
         - name: headers
-          type: dict
-          dict-type: keyword
+          type: object
+          object_type: keyword
           description: >
             Message header field table.
 
@@ -828,8 +820,8 @@
                           description: The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
 
             - name: supported
-              type: dict
-              dict-type: keyword
+              type: object
+              object_type: keyword
               description:  Indicates which startup options are supported by the server. This message comes as a response to an OPTIONS message.
 
             - name: authentication
@@ -1046,7 +1038,7 @@
           example: amazon.co.uk.
 
         - name: answers
-          type: dict
+          type: object
           description: >
             An array containing a dictionary about each answer section returned by
             the server.
@@ -1082,7 +1074,7 @@
             on the type and class of the resource record.
 
         - name: authorities
-          type: dict
+          type: object
           description: >
             An array containing a dictionary for each authority section from the
             answer.
@@ -1107,7 +1099,7 @@
           example: IN
 
         - name: additionals
-          type: dict
+          type: object
           description: >
             An array containing a dictionary for each additional section from the
             answer.
@@ -1176,8 +1168,8 @@
                 The query parameters or form values. The query parameters are available in the Request-URI
                 and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
             - name: headers
-              type: dict
-              dict-type: keyword
+              type: object
+              object_type: keyword
               description: >
                 A map containing the captured header fields from the request.
                 Which headers to capture is configurable. If headers with the same
@@ -1200,8 +1192,8 @@
               example: Not found.
 
             - name: headers
-              type: dict
-              dict-type: keyword
+              type: object
+              object_type: keyword
               description: >
                 A map containing the captured header fields from the response.
                 Which headers to capture is configurable. If headers with the
@@ -1352,12 +1344,12 @@
             The status code value returned in the response (binary protocol only).
 
         - name: request.keys
-          type: list
+          type: array
           description: >
             The list of keys sent in the store or load commands.
 
         - name: response.keys
-          type: list
+          type: array
           description: >
             The list of keys returned for the load command (if present).
 
@@ -1374,12 +1366,12 @@
             If the command does not send any data, this field is missing.
 
         - name: request.values
-          type: list
+          type: array
           description: >
             The list of base64 encoded values sent with the request (if present).
 
         - name: response.values
-          type: list
+          type: array
           description: >
             The list of base64 encoded values sent with the response (if present).
 
@@ -1482,7 +1474,7 @@
             (if present).
 
         - name: response.stats
-          type: list
+          type: array
           description: >
             The list of statistic values returned. Each entry is a dictionary with the
             fields "name" and "value".
