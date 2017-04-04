@@ -117,7 +117,6 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Add `fields` and `fields_under_root` to packetbeat protocols configurations. {pull}3518[3518]
 - Add list style packetbeat protocols configurations. This change supports specifying multiple configurations of the same protocol analyzer. {pull}3518[3518]
 - Add DNS dashboard for an overview the DNS traffic. {pull}3883[3883]
-- Add list style packetbeat protocols configurations. This change supports specifying multiple configurations of the same protocol analyzer. {pull]3518[3518]
 - Add DNS Tunneling dashboard to highlight domains with large numbers of subdomains or high data volume. {pull}3884[3884]
 
 *Winlogbeat*
