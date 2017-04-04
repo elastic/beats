@@ -127,6 +127,7 @@ func (paths *Path) Resolve(fileType FileType, path string) string {
 // Resolve resolves a path to a location in one of the default
 // folders. For example, Resolve(Home, "test") returns an absolute
 // path for "test" in the home path.
+// In case path is already an absolute path, the path itself is returned.
 func Resolve(fileType FileType, path string) string {
 	return Paths.Resolve(fileType, path)
 }

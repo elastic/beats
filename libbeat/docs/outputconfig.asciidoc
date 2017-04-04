@@ -23,7 +23,7 @@ Example configuration:
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
   template.enabled: true
-  template.path: "{beatname_lc}.template.json"
+  template.fields: "fields.yml"
   template.overwrite: false
   index: "{beatname_lc}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -253,7 +253,7 @@ you must <<load-template-manually,load the template manually>>.
 
 *`name`*:: The name of the template. The default is +{beatname_lc}+.
 
-*`path`*:: The path to the template file. The default is +{beatname_lc}.template.json+. If a relative
+*`path`*:: The path to the template file. The default is +fields.yml+. If a relative
 path is set, it is considered relative to the config path. See the <<directory-layout>> section for
 details.
 
@@ -267,7 +267,7 @@ For example:
 output.elasticsearch:
   hosts: ["localhost:9200"]
   template.name: "{beatname_lc}"
-  template.path: "{beatname_lc}.template.json"
+  template.fields: "fields.yml"
   template.overwrite: false
 ----------------------------------------------------------------------
 
@@ -289,9 +289,8 @@ For example:
 ----------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["localhost:9200"]
-  template.path: "{beatname_lc}.template.json"
+  template.fields: "{beatname_lc}.template.json"
   template.overwrite: false
-  template.versions.2x.path: "{beatname_lc}.template-es2x.json
 ----------------------------------------------------------------------
 
 ===== max_retries

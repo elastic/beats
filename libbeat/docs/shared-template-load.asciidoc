@@ -17,16 +17,16 @@
 
 
 In Elasticsearch, {elasticsearch}/indices-templates.html[index
-templates] are used to define settings and mappings that determine how fields should be analyzed. 
+templates] are used to define settings and mappings that determine how fields should be analyzed.
 
 The recommended index template file for {beatname_uc} is installed by the {beatname_uc} packages. If you accept
-the default configuration for template loading in the +{beatname_lc}.yml+ config file, 
+the default configuration for template loading in the +{beatname_lc}.yml+ config file,
 {beatname_uc} loads the template automatically after successfully connecting to Elasticsearch. If the template
 already exists, it's not overwritten unless you configure {beatname_uc} to do so.
 
-If you want to disable automatic template loading, or you want to load your own template, 
-you can change the settings for template loading in the {beatname_uc} configuration file. If you 
-choose to disable automatic template loading, you need to load the template manually. 
+If you want to disable automatic template loading, or you want to load your own template,
+you can change the settings for template loading in the {beatname_uc} configuration file. If you
+choose to disable automatic template loading, you need to load the template manually.
 For more information, see:
 
 * <<load-template-auto>> - supported for Elasticsearch output only
@@ -35,16 +35,16 @@ For more information, see:
 [[load-template-auto]]
 ==== Configuring Template Loading
 
-By default, {beatname_uc} automatically loads the recommended template file, +{beatname_lc}.template.json+,
+By default, {beatname_uc} automatically loads the recommended template file, +fields.yml+,
 if Elasticsearch output is enabled. You can configure {beatname_lc} to load a different template
-by adjusting the `template.name` and `template.path` options in +{beatname_lc}.yml+ file:
+by adjusting the `template.name` and `template.fields` options in +{beatname_lc}.yml+ file:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["localhost:9200"]
   template.name: "{beatname_lc}"
-  template.path: "{beatname_lc}.template.json"
+  template.fields: "fields.yml"
   template.overwrite: false
 ----------------------------------------------------------------------
 

@@ -148,19 +148,11 @@ output.elasticsearch:
   # so the final name is beatname-%{[beat.version]}.
   #template.name: "beatname"
 
-  # Path to template file
-  #template.path: "${path.config}/beatname.template.json"
+  # Path to fields.yml file to generate the template
+  #template.fields: "${path.config}/fields.yml"
 
   # Overwrite existing template
   #template.overwrite: false
-
-  # If set to true, beatname checks the Elasticsearch version at connect time, and if it
-  # is 2.x, it loads the file specified by the template.versions.2x.path setting. The
-  # default is true.
-  #template.versions.2x.enabled: true
-
-  # Path to the Elasticsearch 2.x version of the template file.
-  #template.versions.2x.path: "${path.config}/beatname.template-es2x.json"
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
