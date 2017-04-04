@@ -116,6 +116,11 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 - Fix panic when testing regex-AST to match against date patterns. {issue}3889[3889]
 
 *Filebeat*
+- Always use absolute path for event and registry. {pull}3328[3328]
+- Raise an exception in case there is a syntax error in one of the configuration files available under
+  filebeat.config_dir. {pull}3573[3573]
+- Fix empty registry file on machine crash. {issue}3537[3537]
+- Allow `-` in Apache access log byte count. {pull}3863[3863]
 
 - Fix empty registry file on machine crash. {issue}3537[3537]
 
