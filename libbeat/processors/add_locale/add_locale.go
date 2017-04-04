@@ -5,7 +5,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/pkg/errors"
 )
 
 type addLocale struct {
@@ -17,14 +16,6 @@ func init() {
 }
 
 func newAddLocale(c common.Config) (processors.Processor, error) {
-	config := struct {
-	}{}
-
-	err := c.Unpack(&config)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to unpack add_locale config")
-	}
-
 	zone, _ := time.Now().In(time.Local).Zone()
 
 	l := addLocale{timezone: zone}
