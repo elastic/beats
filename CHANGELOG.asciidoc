@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
   metricset. The configuration option for the feature was renamed from
   `cgroups` to `process.cgroups.enabled`. {pull}3519[3519]
 - Change fieldnames couchbase.node.couch.*.actual_disk_size.* to couchbase.node.couch.*.disk_size.* {pull}3545[3545]
+
 *Packetbeat*
 - Remove deprecated geoip. {pull}3766[3766]
 
@@ -114,7 +115,8 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 
 *Packetbeat*
 - Add `fields` and `fields_under_root` to packetbeat protocols configurations. {pull}3518[3518]
-- Add list style packetbeat protocols configurations. This change supports specifying multiple configurations of the same protocol analyzer. {pull]3518[3518]
+- Add list style packetbeat protocols configurations. This change supports specifying multiple configurations of the same protocol analyzer. {pull}3518[3518]
+- Add DNS dashboard for an overview the DNS traffic. {pull}3883[3883]
 - Add DNS Tunneling dashboard to highlight domains with large numbers of subdomains or high data volume. {pull}3884[3884]
 
 *Winlogbeat*
