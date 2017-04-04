@@ -8,6 +8,11 @@ SNAPSHOT?=yes
 PYTHON_ENV?=${BUILD_DIR}/python-env
 VIRTUALENV_PARAMS?=
 FIND=find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
+GOLINT=golint
+GOLINT_REPO=github.com/golang/lint/golint
+REVIEWDOG=reviewdog
+REVIEWDOG_OPTIONS?=-diff "git diff master"
+REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
 
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
@@ -72,13 +77,18 @@ check: python-env
 .PHONY: misspell
 misspell:
 	go get github.com/client9/misspell
-	${FIND} -name '*'  -exec misspell -w {} \;
+	$(FIND) -name '*'  -exec misspell -w {} \;
 
 .PHONY: fmt
 fmt: python-env
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) fmt || exit 1;)
 	# Cleans also python files which are not part of the beats
 	find . -type f -name *.py -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*" -exec autopep8 --in-place --max-line-length 120  {} \;
+
+.PHONY: lint
+lint:
+	@go get $(GOLINT_REPO) $(REVIEWDOG_REPO)
+	$(REVIEWDOG) $(REVIEWDOG_OPTIONS)
 
 # Collects all dashboards and generates dashboard folder for https://github.com/elastic/beats-dashboards/tree/master/dashboards
 .PHONY: beats-dashboards
