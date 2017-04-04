@@ -18,7 +18,6 @@ func init() {
 
 func newAddLocale(c common.Config) (processors.Processor, error) {
 	config := struct {
-		TimeZone string `config:"timezone"`
 	}{}
 
 	err := c.Unpack(&config)
@@ -26,19 +25,16 @@ func newAddLocale(c common.Config) (processors.Processor, error) {
 		return nil, errors.Wrap(err, "failed to unpack add_locale config")
 	}
 
-	l := addLocale{timezone: config.TimeZone}
+	zone, _ := time.Now().In(time.Local).Zone()
+
+	l := addLocale{timezone: zone}
 
 	return l, nil
 }
 
 func (l addLocale) Run(event common.MapStr) (common.MapStr, error) {
-	zone, err := time.LoadLocation(l.timezone)
+	event.Put("beat.timezone", l.timezone)
 
-	if err != nil {
-		return event, err
-	}
-
-	event.Put("beat.timezone", zone.String())
 	return event, nil
 }
 
