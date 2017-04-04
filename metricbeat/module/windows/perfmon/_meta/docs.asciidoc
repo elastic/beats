@@ -15,12 +15,8 @@ to collect. The example below collects processor time and disk writes.
   metricsets: ["perfmon"]
   period: 10s
   perfmon.counters:
-    - group: "processor"
-      collectors:
-        - alias: "processor_time"
-          query: '\Processor Information(_Total)\% Processor Time'
-    - group: "disk"
-      collectors:
-        - alias: "bytes_written"
-          query: '\PhysicalDisk(_Total)\Disk Writes/sec'
+    - alias: "processor.time.total.pct"
+      query: '\Processor Information(_Total)\% Processor Time'
+    - alias: "diskio.write.bytes"
+      query: '\PhysicalDisk(_Total)\Disk Writes/sec'
 ----
