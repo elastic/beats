@@ -124,6 +124,14 @@ metricbeat.modules:
     #certificate:           "/etc/pki/client/cert.pem"
     #key:                   "/etc/pki/client/cert.key"
 
+#---------------------------- elasticsearch Module ---------------------------
+#- module: elasticsearch
+#  metricsets: ["stats"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost:9200"]
+
+
 #------------------------------- golang Module -------------------------------
 #- module: golang
 #  metricsets: ["expvar","heap"]
