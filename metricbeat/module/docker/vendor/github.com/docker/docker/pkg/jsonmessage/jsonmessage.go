@@ -32,7 +32,6 @@ type JSONProgress struct {
 }
 
 func (p *JSONProgress) String() string {
-	// Always return "" in non terminal usage
 	return ""
 }
 
