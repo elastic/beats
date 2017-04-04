@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Unique FQDNs per eTLD+1\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"scale\":\"linear\",\"mode\":\"grouped\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":true,\"setYExtents\":false,\"yAxis\":{},\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"dns.question.name\",\"customLabel\":\"Unique Subdomain Count\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"dns.question.etld_plus_one\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Domains\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Unique FQDNs per eTLD+1", 
+  "uiStateJSON": "{\"vis\":{\"colors\":{\"Unique count of dns.question.name\":\"#E0752D\",\"Count\":\"#1F78C1\"}}}", 
+  "version": 1, 
+  "savedSearchId": "DNS", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}
