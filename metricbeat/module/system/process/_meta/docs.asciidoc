@@ -15,7 +15,7 @@ This metricset is available on:
 
 This metricset caches the command line args for a running process. This means if you alter
 the command line for a process while this metricset is running, these changes are not detected.
-This feature can disabled by adding
+This feature can be disabled by adding
 `process.cmdline.cache: false` to the system module configuration.
 
 [float]
