@@ -1,6 +1,7 @@
 # Directories
 /.vagrant
 /.idea
+/.vscode
 /build
 /*/data
 /*/logs
