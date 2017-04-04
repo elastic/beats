@@ -254,6 +254,12 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=10)
 
+        # Wait until rotation is detected
+        self.wait_until(
+            lambda: self.log_contains_count(
+                "Registry file updated. 1 states written") == 1,
+            max_timeout=10)
+
         data = self.get_registry()
         assert os.stat(testfile_path).st_ino == self.get_registry_entry_by_path(
             os.path.abspath(testfile_path))["FileStateOS"]["inode"]
