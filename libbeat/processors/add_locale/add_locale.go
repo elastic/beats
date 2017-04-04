@@ -12,11 +12,8 @@ type addLocale struct {
 	timezone string
 }
 
-// init registers the add_locale processor.
 func init() {
-	processors.RegisterPlugin("add_locale",
-		configChecked(newAddLocale,
-			requireFields("timezone")))
+	processors.RegisterPlugin("add_locale", newAddLocale)
 }
 
 func newAddLocale(c common.Config) (processors.Processor, error) {
