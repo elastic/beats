@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Remove code to convert states from 1.x. {pull}3767[3767]
 - Remove deprecated config options force_close_files and close_older. {pull}3768[3768]
 - Change clean_removed behaviour to also remove states for files which cannot be found anymore under the same name. {pull}3827[3827]
+- Add Icinga module. {pull}3904[3904]
 
 *Heartbeat*
 
