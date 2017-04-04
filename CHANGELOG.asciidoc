@@ -37,6 +37,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Remove deprecated geoip. {pull}3766[3766]
 
 *Winlogbeat*
+- Remove metrics endpoint. Replaced by http endpoint in libbeat (see #3717). {pull}3901[3901]
 
 
 ==== Bugfixes

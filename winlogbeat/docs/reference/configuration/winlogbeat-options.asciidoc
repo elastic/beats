@@ -170,7 +170,7 @@ Windows will prevent Winlogbeat from reading the event log because it limits the
 number of conditions that can be used in an event log query. If this occurs a similar
 warning as shown below will be logged by Winlogbeat, and it will continue
 processing data from other event logs. For more information, see
-https://support.microsoft.com/en-us/kb/970453. 
+https://support.microsoft.com/en-us/kb/970453.
 
 `WARN EventLog[Application] Open() error. No events will be read from this
 source. The specified query is invalid.`
@@ -183,12 +183,12 @@ event IDs.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-processors:                   
-- drop_event.when.and:               
-    - equals.log_name: Security      
-    - not.or:                   
-        - equals.event_id: 903     
-        - equals.event_id: 1024    
+processors:
+- drop_event.when.and:
+    - equals.log_name: Security
+    - not.or:
+        - equals.event_id: 903
+        - equals.event_id: 1024
         - equals.event_id: 4624
 --------------------------------------------------------------------------------
 
@@ -325,29 +325,6 @@ are stored as top-level fields in the output document instead of being grouped
 under a `fields` sub-dictionary. If the custom field names conflict with other
 field names added by Winlogbeat, then the custom fields overwrite the other
 fields.
-
-===== metrics.bindaddress
-
-The hostname and port where the Beat will host an HTTP web service that provides
-metrics. This field is optional.
-
-The following example specifies that the metrics service is available at
-http://localhost:8128/debug/vars:
-
-[source,yaml]
---------------------------------------------------------------------------------
-winlogbeat.metrics:
-  bindaddress: 'localhost:8123'
---------------------------------------------------------------------------------
-
-The metrics are served as a JSON document. The metrics include:
-
-- memory stats
-- number of published events from each log
-- total number of failures while publishing
-- total number of filtered events
-- total number of successfully published events
-- uptime
 
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
