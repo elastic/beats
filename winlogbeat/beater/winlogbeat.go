@@ -7,8 +7,6 @@ package beater
 import (
 	"expvar"
 	"fmt"
-	"net"
-	"net/http"
 	"sync"
 	"time"
 
@@ -35,8 +33,7 @@ func init() {
 
 // Debug logging functions for this package.
 var (
-	debugf    = logp.MakeDebug("winlogbeat")
-	memstatsf = logp.MakeDebug("memstats")
+	debugf = logp.MakeDebug("winlogbeat")
 )
 
 // Time the application was started.
@@ -113,21 +110,6 @@ func (eb *Winlogbeat) setup(b *beat.Beat) error {
 	eb.checkpoint, err = checkpoint.NewCheckpoint(config.RegistryFile, 10, 5*time.Second)
 	if err != nil {
 		return err
-	}
-
-	if config.Metrics.BindAddress != "" {
-		bindAddress := config.Metrics.BindAddress
-		sock, err := net.Listen("tcp", bindAddress)
-		if err != nil {
-			return err
-		}
-		go func() {
-			logp.Info("Metrics hosted at http://%s/debug/vars", bindAddress)
-			err := http.Serve(sock, nil)
-			if err != nil {
-				logp.Warn("Unable to launch HTTP service for metrics. %v", err)
-			}
-		}()
 	}
 
 	return nil
