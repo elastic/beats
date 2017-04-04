@@ -36,9 +36,10 @@ type altPrefixMatcher struct {
 
 type prefixNumDate struct {
 	minLen int
-	digits []int
 	prefix []byte
+	digits []int
 	seps   [][]byte
+	suffix []byte
 }
 
 type emptyStringMatcher struct{}
@@ -179,6 +180,12 @@ func (m *prefixNumDate) Match(in []byte) bool {
 			if !('0' <= v && v <= '9') {
 				return false
 			}
+		}
+	}
+
+	if sfx := m.suffix; len(sfx) > 0 {
+		if !bytes.HasPrefix(in[pos:], sfx) {
+			return false
 		}
 	}
 
