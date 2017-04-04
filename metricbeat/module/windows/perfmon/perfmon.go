@@ -10,11 +10,6 @@ import (
 )
 
 type CounterConfig struct {
-	Name  string               `config:"group" validate:"required"`
-	Group []CounterConfigGroup `config:"collectors" validate:"required"`
-}
-
-type CounterConfigGroup struct {
 	Alias string `config:"alias" validate:"required"`
 	Query string `config:"query" validate:"required"`
 }

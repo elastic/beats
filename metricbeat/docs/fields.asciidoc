@@ -7531,40 +7531,6 @@ Name of the user running the process.
 
 
 
-
-
-[float]
-== counters Fields
-
-Grouping of different counters
-
-
-
-[float]
-=== windows.perfmon.counters.group
-
-type: string
-
-Name of the group. For example `processor` or `disk`
-
-
-
-[float]
-=== windows.perfmon.counters.collectors.alias
-
-type: string
-
-Short form for the query
-
-
-[float]
-=== windows.perfmon.counters.collectors.query
-
-type: string
-
-The query. For example `\\Processor Information(_Total)\\% Processor Performance`. Backslashes have to be escaped.
-
-
 [[exported-fields-zookeeper]]
 == ZooKeeper Fields
 

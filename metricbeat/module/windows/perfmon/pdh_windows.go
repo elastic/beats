@@ -159,15 +159,14 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 		pathToKey: map[string]string{},
 	}
 
-	for _, group := range config {
-		for _, collector := range group.Group {
-			if err := query.AddCounter(collector.Query); err != nil {
-				query.Close()
-				return nil, err
-			}
-
-			r.pathToKey[collector.Query] = group.Name + "." + collector.Alias
+	for _, counter := range config {
+		if err := query.AddCounter(counter.Query); err != nil {
+			query.Close()
+			return nil, err
 		}
+
+		r.pathToKey[counter.Query] = counter.Alias
+
 	}
 
 	return r, nil
