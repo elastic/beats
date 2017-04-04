@@ -16,7 +16,7 @@ func init() {
 }
 
 func newAddLocale(c common.Config) (processors.Processor, error) {
-	zone, _ := time.Now().In(time.Local).Zone()
+	zone, _ := time.Now().Zone()
 
 	l := addLocale{timezone: zone}
 
