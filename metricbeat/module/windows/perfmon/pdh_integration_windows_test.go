@@ -47,7 +47,7 @@ func TestQuery(t *testing.T) {
 
 func TestExistingCounter(t *testing.T) {
 	config := make([]CounterConfig, 1)
-	config[0].Alias = "process.processor_time"
+	config[0].Alias = "processor.time.total.pct"
 	config[0].Query = processorTimeCounter
 	handle, err := NewPerfmonReader(config)
 	if err != nil {
@@ -65,7 +65,7 @@ func TestExistingCounter(t *testing.T) {
 
 func TestNonExistingCounter(t *testing.T) {
 	config := make([]CounterConfig, 1)
-	config[0].Alias = "process.processor_performance"
+	config[0].Alias = "processor.time.total.pct"
 	config[0].Query = "\\Processor Information(_Total)\\not existing counter"
 	handle, err := NewPerfmonReader(config)
 	if assert.Error(t, err) {
@@ -80,7 +80,7 @@ func TestNonExistingCounter(t *testing.T) {
 
 func TestNonExistingObject(t *testing.T) {
 	config := make([]CounterConfig, 1)
-	config[0].Alias = "process.processor_performance"
+	config[0].Alias = "processor.time.total.pct"
 	config[0].Query = "\\non existing object\\% Processor Performance"
 	handle, err := NewPerfmonReader(config)
 	if assert.Error(t, err) {
