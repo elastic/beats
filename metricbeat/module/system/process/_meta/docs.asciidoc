@@ -11,6 +11,14 @@ This metricset is available on:
 - Windows
 
 [float]
+=== Cache CmdLine
+
+This metricset caches the command line args for a running process. This means if you alter
+the command line for a process while this metricset is running, these changes are not detected.
+This feature can be disabled by adding
+`process.cmdline.cache.enabled: false` to the system module configuration.
+
+[float]
 === Control Group (cgroup) Metrics
 
 On Linux this metricset will collect metrics from any cgroups that the process
