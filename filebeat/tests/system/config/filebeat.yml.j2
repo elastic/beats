@@ -28,7 +28,20 @@ filebeat.prospectors:
   harvester_limit: {{harvester_limit | default(0) }}
   symlinks: {{symlinks}}
   pipeline: {{pipeline}}
-
+  {%- if prospector_processors %}
+  processors:
+    {%- for processor in prospector_processors %}
+    {%- for name, settings in processor.iteritems() %}
+    - {{name}}:
+      {%- if settings %}
+      {%- for k, v in settings.iteritems() %}
+        {{k}}:
+          {{v | default([])}}
+      {%- endfor %}
+      {%- endif %}
+    {%- endfor %}
+    {%- endfor %}
+  {% endif %}
   {% if fields %}
   fields:
   {% for k,v in fields.items() %}
