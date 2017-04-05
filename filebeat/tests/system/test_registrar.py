@@ -1319,3 +1319,79 @@ class Test(BaseTest):
 
         data = self.get_registry()
         assert len(data) == 0
+
+    def test_registrar_files_with_prospector_level_processors(self):
+        """
+        Check that multiple files are put into registrar file with drop event processor
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            prospector_processors=[{
+                "drop_event": {},
+            }]
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile_path1 = self.working_dir + "/log/test1.log"
+        testfile_path2 = self.working_dir + "/log/test2.log"
+        file1 = open(testfile_path1, 'w')
+        file2 = open(testfile_path2, 'w')
+
+        iterations = 5
+        for _ in range(0, iterations):
+            file1.write("hello world")  # 11 chars
+            file1.write("\n")  # 1 char
+            file2.write("goodbye world")  # 11 chars
+            file2.write("\n")  # 1 char
+
+        file1.close()
+        file2.close()
+
+        filebeat = self.start_beat()
+
+        # wait until the registry file exist. Needed to avoid a race between
+        # the logging and actual writing the file. Seems to happen on Windows.
+        self.wait_until(
+            lambda: os.path.isfile(os.path.join(self.working_dir,
+                                                "registry")),
+            max_timeout=10)
+
+        # Wait a momemt to make sure registry is completely written
+        time.sleep(2)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that file exist
+        data = self.get_registry()
+
+        # Check that 2 files are port of the registrar file
+        assert len(data) == 2
+
+        logfile_abs_path = os.path.abspath(testfile_path1)
+        record = self.get_registry_entry_by_path(logfile_abs_path)
+
+        self.assertDictContainsSubset({
+            "source": logfile_abs_path,
+            "offset": iterations * (len("hello world") + len(os.linesep)),
+        }, record)
+        self.assertTrue("FileStateOS" in record)
+        file_state_os = record["FileStateOS"]
+
+        if os.name == "nt":
+            # Windows checks
+            # TODO: Check for IdxHi, IdxLo, Vol in FileStateOS on Windows.
+            self.assertEqual(len(file_state_os), 3)
+        elif platform.system() == "SunOS":
+            stat = os.stat(logfile_abs_path)
+            self.assertEqual(file_state_os["inode"], stat.st_ino)
+
+            # Python does not return the same st_dev value as Golang or the
+            # command line stat tool so just check that it's present.
+            self.assertTrue("device" in file_state_os)
+        else:
+            stat = os.stat(logfile_abs_path)
+            self.assertDictContainsSubset({
+                "inode": stat.st_ino,
+                "device": stat.st_dev,
+            }, file_state_os)
