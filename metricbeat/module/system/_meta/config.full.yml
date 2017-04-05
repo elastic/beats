@@ -37,7 +37,7 @@
   #cpu_ticks: false
 
   # If false, cmdline of a process is not cached.
-  #process.cmdline.cache: true
+  #process.cmdline.cache.enabled: true
 
   # Enable collection of cgroup metrics from processes on Linux.
   #process.cgroups.enabled: true

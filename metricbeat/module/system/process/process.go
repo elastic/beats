@@ -39,7 +39,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Cgroups      *bool    `config:"process.cgroups.enabled"`
 		EnvWhitelist []string `config:"process.env.whitelist"`
 		CPUTicks     bool     `config:"cpu_ticks"`
-		CacheCmdLine bool     `config:"process.cmdline.cache"`
+		CacheCmdLine bool     `config:"process.cmdline.cache.enabled"`
 	}{
 		Procs:        []string{".*"}, // collect all processes by default
 		CacheCmdLine: true,
