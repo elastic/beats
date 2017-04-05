@@ -217,10 +217,19 @@ func splitHostnamePort(requ *http.Request) (string, uint16, error) {
 	if err != nil {
 		return "", 0, err
 	}
-
-	p, err := strconv.ParseUint(port, 10, 16)
-	if err != nil {
-		return "", 0, fmt.Errorf("'%v' is no valid port number in '%v'", port, requ.URL.Host)
+	var p uint64
+	if port == "" {
+		switch requ.URL.Scheme {
+		case urlSchemaHTTP:
+			p = 80
+		case urlSchemaHTTPS:
+			p = 443
+		}
+	} else {
+		p, err = strconv.ParseUint(port, 10, 16)
+		if err != nil {
+			return "", 0, fmt.Errorf("'%v' is no valid port number in '%v'", port, requ.URL.Host)
+		}
 	}
 
 	return host, uint16(p), nil
