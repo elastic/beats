@@ -354,7 +354,7 @@ processors:
 - add_locale:
 -------------------------------------------------------------------------------
 
-NOTE: Please consider that `add_locale` differentiate between DST and regular time.
+NOTE: Please consider that `add_locale` differentiates between DST and regular time.
 For example `CET` and `CEST`.
 
 
