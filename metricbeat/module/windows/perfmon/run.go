@@ -35,9 +35,9 @@ func run() error {
 	cmd := exec.Command(parts[0], parts[1:]...)
 	cmd.Env = os.Environ()
 
-	if *goarch != "" {
-		cmd.Env = append(cmd.Env, "GOARCH"+*goarch)
-	}
+	// if *goarch != "" {
+	// 	cmd.Env = append(cmd.Env, "GOARCH"+*goarch)
+	// }
 
 	if *output != "" {
 		outputBytes, err := cmd.Output()
