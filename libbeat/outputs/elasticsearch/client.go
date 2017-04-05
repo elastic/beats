@@ -54,6 +54,7 @@ type ClientSettings struct {
 	Timeout            time.Duration
 	CompressionLevel   int
 	CacheRedirect      bool
+	TrustRedirect      bool
 }
 
 type connectCallback func(client *Client) error
@@ -129,7 +130,7 @@ func NewClient(
 		s.URL = u.String()
 	}
 
-	logp.Info("Elasticsearch url: %s", s.URL)
+	logp.Info("Elasticsearch UUUUurl: %s", s.URL)
 
 	// TODO: add socks5 proxy support
 	var dialer, tlsDialer transport.Dialer
@@ -197,32 +198,78 @@ func NewClient(
 	}
 
 	if s.CacheRedirect {
+		logp.Info("Enabling HTTP Redirect Caching")
 		client.Connection.http.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-			if len(via) != 1 {
-				return nil
+			// Stop after 10 redirects like the default CheckRedirect
+			if len(via) > 10 {
+				return errors.New("stopped after 10 redirects")
 			}
 
-			if via[0].Method != "GET" {
-				return http.ErrUseLastResponse
+			// Get the redirect response code and previous request method
+			code := req.Response.StatusCode
+			method := via[0].Method
+			cacheRedirect := false
+
+			// For current RFC definitions, see:
+			//     https://tools.ietf.org/html/rfc7231#section-6.4
+			//     https://tools.ietf.org/html/rfc7238#section-3
+			//
+			// For current Go implementation, see the net/http client
+			// redirectBehavior method at
+			//     https://golang.org/src/net/http/client.go?#L416
+			//
+			// 301 Moved Permanently
+			//     The redirect will ONLY be cached for GET and HEAD.
+			//     Although RFC7231 allows redirection with any method,
+			//     go maintains backward compatibility with RFC 2616 and
+			//     rewrites methods that are not GET or HEAD to GET.
+			// 302 Found
+			//     This is a temporary redirection and will not be cached.
+			// 303 See Other
+			//     This will not be cached. From RFC7321§6.4.4: Note that the new URI
+			//     in the Location header field is not considered equivalent to the
+			//     effective request URI.
+			// 307 Temporary Redirect
+			//     This is a temporary redirection and will not be cached.
+			// 308 Permanent Redirect
+			//     This is a permanent redirect and the request method will not be
+			//     modified, so it is appropriate to cache the redirection for all
+			//     HTTP methods.
+			switch code {
+			case 302:
+				if method == http.MethodGet || method == http.MethodHead {
+					cacheRedirect = true
+				}
+			case 308:
+				cacheRedirect = true
 			}
 
-			newURL := req.URL.String()
-
-			logp.Info("Caching ES HTTP API Redirect: %s", newURL)
-
-			s.URL = newURL
-
-			newClient, err := NewClient(s, onConnectCallback)
-
-			if err != nil {
-				logp.Err("Failed to Cache ES HTTP API Redirect to %s: %s", newURL, err)
-				return http.ErrUseLastResponse
+			if cacheRedirect {
+				if loc := req.Response.Header.Get("Location"); loc != "" {
+					if bulkRequ, err := newBulkRequest(loc, "", "", params, nil); err != nil {
+						logp.Err("Could not create new bulk request to cache redirect url %s", loc)
+					} else {
+						logp.Info("Caching ES HTTP API Redirect: %s", loc)
+						client.bulkRequ = bulkRequ
+						client.Connection.URL = loc
+					}
+				}
 			}
 
-			client.bulkRequ = newClient.bulkRequ
-			client.Connection = newClient.Connection
+			// Golang will only forward sensitive headers if the subdomains match. The
+			// TrustRedirect option allows users to specify that they want these headers
+			// sent with the redirect. See:
+			//     https://golang.org/src/net/http/client.go?#L38
+			//
+			if s.TrustRedirect {
+				for _, header := range []string{"Authorization", "WWW-Authenticate", "Cookie"} {
+					if value := via[0].Header.Get(header); value != "" {
+						req.Header.Set(header, value)
+					}
+				}
+			}
 
-			return http.ErrUseLastResponse
+			return nil
 		}
 	}
 

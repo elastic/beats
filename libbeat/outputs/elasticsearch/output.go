@@ -318,6 +318,7 @@ func makeClientFactory(
 			Timeout:          config.Timeout,
 			CompressionLevel: config.CompressionLevel,
 			CacheRedirect:    config.CacheRedirect,
+			TrustRedirect:    config.TrustRedirect,
 		}, onConnected)
 	}
 }
