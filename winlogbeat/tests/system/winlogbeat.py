@@ -1,3 +1,5 @@
+import os
+import platform
 import sys
 
 if sys.platform.startswith("win"):
@@ -93,7 +95,7 @@ class WriteReadTest(BaseTest):
 
     def assert_common_fields(self, evt, msg=None, eventID=10, sid=None,
                              level="Information", extra=None):
-        assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
+        assert evt["computer_name"].lower() == platform.node().lower()
         assert "record_number" in evt
         self.assertDictContainsSubset({
             "event_id": eventID,
