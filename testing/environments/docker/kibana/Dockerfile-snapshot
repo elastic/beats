@@ -2,7 +2,7 @@
 FROM docker.elastic.co/kibana/kibana-ubuntu-base:latest
 MAINTAINER Elastic Docker Team <docker@elastic.co>
 
-ARG KIBANA_DOWNLOAD_URL=https://staging.elastic.co/5.2.2-9f7879a1/downloads/kibana/kibana-5.2.2-linux-x86_64.tar.gz
+ARG KIBANA_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/kibana/kibana-5.2.2-linux-x86_64.tar.gz
 ARG X_PACK_URL
 
 EXPOSE 5601
