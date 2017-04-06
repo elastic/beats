@@ -15,8 +15,8 @@ type elasticsearchConfig struct {
 	Password         string             `config:"password"`
 	ProxyURL         string             `config:"proxy_url"`
 	LoadBalance      bool               `config:"loadbalance"`
-	CacheRedirect    bool               `config:"cache_redirect"`
-	TrustRedirect    bool               `config:"trust_redirect"`
+	RedirectCache    bool               `config:"redirect.cache.enabled"`
+	RedirectTrust    bool               `config:"redirect.trust"`
 	CompressionLevel int                `config:"compression_level" validate:"min=0, max=9"`
 	TLS              *outputs.TLSConfig `config:"ssl"`
 	MaxRetries       int                `config:"max_retries"`
@@ -60,8 +60,8 @@ var (
 		CompressionLevel: 0,
 		TLS:              nil,
 		LoadBalance:      true,
-		CacheRedirect:    false,
-		TrustRedirect:    false,
+		RedirectCache:    false,
+		RedirectTrust:    false,
 		Template: Template{
 			Enabled: true,
 			Fields:  "fields.yml",

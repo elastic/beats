@@ -53,8 +53,8 @@ type ClientSettings struct {
 	Pipeline           *outil.Selector
 	Timeout            time.Duration
 	CompressionLevel   int
-	CacheRedirect      bool
-	TrustRedirect      bool
+	RedirectCache      bool
+	RedirectTrust      bool
 }
 
 type connectCallback func(client *Client) error
@@ -130,7 +130,7 @@ func NewClient(
 		s.URL = u.String()
 	}
 
-	logp.Info("Elasticsearch UUUUurl: %s", s.URL)
+	logp.Info("Elasticsearch url: %s", s.URL)
 
 	// TODO: add socks5 proxy support
 	var dialer, tlsDialer transport.Dialer
@@ -197,7 +197,7 @@ func NewClient(
 		proxyURL:         s.Proxy,
 	}
 
-	if s.CacheRedirect {
+	if s.RedirectCache {
 		logp.Info("Enabling HTTP Redirect Caching")
 		client.Connection.http.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 			// Stop after 10 redirects like the default CheckRedirect
@@ -257,11 +257,11 @@ func NewClient(
 			}
 
 			// Golang will only forward sensitive headers if the subdomains match. The
-			// TrustRedirect option allows users to specify that they want these headers
+			// RedirectTrust option allows users to specify that they want these headers
 			// sent with the redirect. See:
 			//     https://golang.org/src/net/http/client.go?#L38
 			//
-			if s.TrustRedirect {
+			if s.RedirectTrust {
 				for _, header := range []string{"Authorization", "WWW-Authenticate", "Cookie"} {
 					if value := via[0].Header.Get(header); value != "" {
 						req.Header.Set(header, value)
