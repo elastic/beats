@@ -43,8 +43,9 @@ SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run un
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
 GOX_OSARCH?=!darwin/arm !darwin/arm64 !darwin/386 ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
 GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "make crosscompile".
-TESTING_ENVIRONMENT?=snapshot ## @testing The name of the environment under test
-DOCKER_COMPOSE_PROJECT_NAME?=${BEAT_NAME}_${TESTING_ENVIRONMENT} ## @testing The name of the docker-compose project used by the integration and system tests
+TESTING_ENVIRONMENT?=snapshot## @testing The name of the environment under test
+BEAT_VERSION=$(shell head -n 1 ${ES_BEATS}/libbeat/docs/version.asciidoc | cut -c 17- )
+DOCKER_COMPOSE_PROJECT_NAME?=${BEAT_NAME}_${TESTING_ENVIRONMENT}_${BEAT_VERSION} ## @testing The name of the docker-compose project used by the integration and system tests
 DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
 DOCKER_CACHE?=1 ## @miscellaneous If set to 0, all docker images are created without cache
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
