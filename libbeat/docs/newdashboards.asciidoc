@@ -98,11 +98,11 @@ See <<import-dashboard-options>> for a description of other import options.
 [[import-dashboards-for-development]]
 ==== Import Dashboards for Development
 
-For development or community Beats, it's easier to run the `import_dashboards` script from the https://github.com/elastic/beats/tree/master/libbeat/dashboards[beats/libbeat/dashboards] directory. In this case, you need to first compile the script:
+For development or community Beats, it's easier to run the `import_dashboards` script from the https://github.com/elastic/beats/tree/master/dev-tools/cmd/import_dashboards[beats/dev-tools/cmd/import_dashboards] directory. In this case, you need to first compile the script:
 
 [source,shell]
 -----------------------
-cd beats/libbeat/dashboards
+cd beats/dev-tools/cmd/import_dashboards
 make
 -----------------------
 
@@ -114,7 +114,7 @@ searches, and the Metricbeat index pattern:
 
 [source,shell]
 -----------------
-beats/libbeat/dashboards/import_dashboards -beat metricbeat
+beats/dev-tools/cmd/import_dashboards -beat metricbeat
 -----------------
 
 For this example, you must specify `-beat metricbeat`. If the `-beat` option is not
