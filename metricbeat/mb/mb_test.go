@@ -353,7 +353,7 @@ func TestNewModulesMetricSetTypes(t *testing.T) {
 		for _, metricSets := range modules {
 			if assert.Len(t, metricSets, 1) {
 				metricSet := metricSets[0]
-				_, ok := metricSet.(ReportingFetcher)
+				_, ok := metricSet.(ReportingMetricSet)
 				assert.True(t, ok, name+" not implemented")
 			}
 		}

@@ -49,13 +49,13 @@ type metricSetWrapper struct {
 	stats  *stats   // stats for this MetricSet.
 }
 
-// stats bundles common metricset stats
+// stats bundles common metricset stats.
 type stats struct {
-	key      string // full stats key
-	ref      uint32 // number of modules/metricsets reusing stats instance
-	success  *monitoring.Int
-	failures *monitoring.Int
-	events   *monitoring.Int
+	key      string          // full stats key
+	ref      uint32          // number of modules/metricsets reusing stats instance
+	success  *monitoring.Int // Total success events.
+	failures *monitoring.Int // Total error events.
+	events   *monitoring.Int // Total events published.
 }
 
 // NewWrapper create a new Module and its associated MetricSets based
@@ -201,11 +201,11 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- common.MapStr)
 	switch ms := msw.MetricSet.(type) {
 	case mb.PushMetricSet:
 		ms.Run(reporter)
-	case mb.EventFetcher, mb.EventsFetcher, mb.ReportingFetcher:
+	case mb.EventFetcher, mb.EventsFetcher, mb.ReportingMetricSet:
 		msw.startPeriodicFetching(reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
-		logp.Err("MetricSet '%s/%s' does not implement a Fetcher interface",
+		logp.Err("MetricSet '%s/%s' does not implement an event producing interface",
 			msw.Module().Name(), msw.Name())
 	}
 }
@@ -239,7 +239,7 @@ func (msw *metricSetWrapper) fetch(reporter *eventReporter) {
 		msw.singleEventFetch(fetcher, reporter)
 	case mb.EventsFetcher:
 		msw.multiEventFetch(fetcher, reporter)
-	case mb.ReportingFetcher:
+	case mb.ReportingMetricSet:
 		msw.reportingFetch(fetcher, reporter)
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
@@ -260,7 +260,7 @@ func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher, reporter 
 	}
 }
 
-func (msw *metricSetWrapper) reportingFetch(fetcher mb.ReportingFetcher, reporter *eventReporter) {
+func (msw *metricSetWrapper) reportingFetch(fetcher mb.ReportingMetricSet, reporter *eventReporter) {
 	reporter.startFetchTimer()
 	fetcher.Fetch(reporter)
 }
@@ -332,7 +332,11 @@ func (r *eventReporter) ErrorWith(err error, meta common.MapStr) bool {
 		return false
 	}
 
-	return writeEvent(r.done, r.out, event)
+	if !writeEvent(r.done, r.out, event) {
+		return false
+	}
+	r.msw.stats.events.Add(1)
+	return true
 }
 
 // other utility functions

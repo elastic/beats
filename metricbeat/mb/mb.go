@@ -78,25 +78,33 @@ type Closer interface {
 }
 
 // EventFetcher is a MetricSet that returns a single event when collecting data.
+// Use ReportingMetricSet for new MetricSet implementations.
 type EventFetcher interface {
 	MetricSet
 	Fetch() (common.MapStr, error)
 }
 
 // EventsFetcher is a MetricSet that returns a multiple events when collecting
-// data.
+// data. Use ReportingMetricSet for new MetricSet implementations.
 type EventsFetcher interface {
 	MetricSet
 	Fetch() ([]common.MapStr, error)
 }
 
 // Reporter is used by a MetricSet to report events, errors, or errors with
-// metadata. The methods return false iff publishing failed because the
-// MetricSet is being closed.
+// metadata. The methods return false if and only if publishing failed because
+// the MetricSet is being closed.
 type Reporter interface {
-	Event(event common.MapStr) bool
-	ErrorWith(err error, meta common.MapStr) bool
-	Error(error) bool
+	Event(event common.MapStr) bool               // Event reports a single successful event.
+	ErrorWith(err error, meta common.MapStr) bool // ErrorWith reports a single error event with the additional metadata.
+	Error(err error) bool                         // Error reports a single error event.
+}
+
+// ReportingMetricSet is a MetricSet that reports events or errors through the
+// Reporter interface. Fetch is called periodically to collect events.
+type ReportingMetricSet interface {
+	MetricSet
+	Fetch(r Reporter)
 }
 
 // PushReporter is used by a MetricSet to report events, errors, or errors with
@@ -108,13 +116,6 @@ type PushReporter interface {
 	// Done returns a channel that's closed when work done on behalf of this
 	// reporter should be canceled.
 	Done() <-chan struct{}
-}
-
-// ReportingFetcher is a MetricSet that reports events or errors through the
-// Reporter interface.
-type ReportingFetcher interface {
-	MetricSet
-	Fetch(r Reporter)
 }
 
 // PushMetricSet is a MetricSet that pushes events (rather than pulling them

@@ -227,8 +227,8 @@ func mustImplementFetcher(ms MetricSet) error {
 		ifcs = append(ifcs, "EventsFetcher")
 	}
 
-	if _, ok := ms.(ReportingFetcher); ok {
-		ifcs = append(ifcs, "ReportingFetcher")
+	if _, ok := ms.(ReportingMetricSet); ok {
+		ifcs = append(ifcs, "ReportingMetricSet")
 	}
 
 	if _, ok := ms.(PushMetricSet); ok {
@@ -239,7 +239,7 @@ func mustImplementFetcher(ms MetricSet) error {
 	case 0:
 		return fmt.Errorf("MetricSet '%s/%s' does not implement an event "+
 			"producing interface (EventFetcher, EventsFetcher, "+
-			"ReportingFetcher, or PushMetricSet)",
+			"ReportingMetricSet, or PushMetricSet)",
 			ms.Module().Name(), ms.Name())
 	case 1:
 		return nil
