@@ -27,8 +27,9 @@ func init() {
 // MetricSet that fetches process metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	stats  *ProcStats
-	cgroup *cgroup.Reader
+	stats        *ProcStats
+	cgroup       *cgroup.Reader
+	cacheCmdLine bool
 }
 
 // New creates and returns a new MetricSet.
@@ -38,8 +39,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Cgroups      *bool    `config:"process.cgroups.enabled"`
 		EnvWhitelist []string `config:"process.env.whitelist"`
 		CPUTicks     bool     `config:"cpu_ticks"`
+		CacheCmdLine bool     `config:"process.cmdline.cache.enabled"`
 	}{
-		Procs: []string{".*"}, // collect all processes by default
+		Procs:        []string{".*"}, // collect all processes by default
+		CacheCmdLine: true,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -51,6 +54,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			Procs:        config.Procs,
 			EnvWhitelist: config.EnvWhitelist,
 			CpuTicks:     config.CPUTicks,
+			CacheCmdLine: config.CacheCmdLine,
 		},
 	}
 	err := m.stats.InitProcStats()

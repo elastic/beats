@@ -3,6 +3,7 @@
   description: >
     []beta
     Module for Windows
+  short_config: false
   fields:
     - name: windows
       type: group
