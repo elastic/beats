@@ -8,16 +8,16 @@
         "_source": {
             "offset": 172,
             "input_type": "log",
-            "source": "/Users/me/go/src/github.com/elastic/beats/filebeat/module/system/audit/test/test.log",
+            "source": "/Users/me/go/src/github.com/elastic/beats/filebeat/module/auditd/log/test/test.log",
             "fileset": {
-                "module": "system",
-                "name": "audit"
+                "module": "auditd",
+                "name": "log"
             },
             "type": "log",
             "error": "",
             "@timestamp": "2017-01-31T20:18:46.912Z",
-            "system": {
-                "audit": {
+            "auditd": {
+                "log": {
                     "ses": "4294967295",
                     "op": "SPD-delete",
                     "res": "1",
@@ -46,16 +46,16 @@
         "_source": {
             "offset": 534,
             "input_type": "log",
-            "source": "/Users/me/go/src/github.com/elastic/beats/filebeat/module/system/audit/test/test.log",
+            "source": "/Users/me/go/src/github.com/elastic/beats/filebeat/module/auditd/log/test/test.log",
             "fileset": {
-                "module": "system",
-                "name": "audit"
+                "module": "auditd",
+                "name": "log"
             },
             "type": "log",
             "error": "",
             "@timestamp": "2017-01-31T20:18:46.912Z",
-            "system": {
-                "audit": {
+            "auditd": {
+                "log": {
                     "syscall": "44",
                     "gid": "0",
                     "fsgid": "0",

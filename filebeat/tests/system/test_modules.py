@@ -104,7 +104,7 @@ class Test(BaseTest):
                 # TODO: There are errors parsing the test logs from these modules.
                 assert "error" not in obj
 
-            if module != "system" and fileset != "audit":
+            if module != "auditd" and fileset != "log":
                 # There are dynamic fields in audit logs that are not documented.
                 self.assert_fields_are_documented(obj)
 

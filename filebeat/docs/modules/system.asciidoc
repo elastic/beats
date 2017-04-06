@@ -19,14 +19,9 @@ This module is not available for Windows.
 [float]
 === Dashboard
 
-This module comes with sample dashboards. The first is a more generic syslog
-dashboard that shows syslog data.
+This module comes with a sample dashboard showing syslog data.
 
 image::./images/kibana-system.png[]
-
-And second is the audit dashboard that shows audit log data.
-
-image::./images/kibana-system-audit.png[]
 
 [float]
 === Syslog fileset settings
