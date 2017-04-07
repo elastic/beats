@@ -98,6 +98,11 @@ winlogbeat.event_logs:
 #processors:
 #- add_cloud_metadata:
 #
+# The following example enriches each event with the local timezone.
+#
+#processors:
+#- add_locale:
+#
 
 #================================ Outputs ======================================
 

@@ -253,6 +253,7 @@ not:
 The supported processors are:
 
  * <<add-cloud-metadata,`add_cloud_metadata`>>
+ * <<add-locale,`add_locale`>>
  * <<decode-json-fields,`decode_json_fields`>>
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
@@ -339,6 +340,23 @@ _GCE_
   }
 }
 -------------------------------------------------------------------------------
+
+[[add-locale]]
+=== add_locale
+
+The `add_locale` processor enriches each event with the machine's time zone.
+
+The simple configuration below enables the processor.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_locale:
+-------------------------------------------------------------------------------
+
+NOTE: Please consider that `add_locale` differentiates between DST and regular time.
+For example `CET` and `CEST`.
+
 
 [[decode-json-fields]]
 === decode_json_fields
