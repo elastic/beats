@@ -42,3 +42,18 @@ func getActualValue(t *testing.T, config *common.Config, input common.MapStr) co
 
 	return actual
 }
+
+func BenchmarkConstruct(b *testing.B) {
+	var testConfig = common.NewConfig()
+
+	input := common.MapStr{}
+
+	p, err := newAddLocale(*testConfig)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		_, err = p.Run(input)
+	}
+}
