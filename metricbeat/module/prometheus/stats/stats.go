@@ -59,7 +59,10 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		if line[0] == '#' || strings.Contains(line, "quantile=") {
 			continue
 		}
-		split := strings.Split(line, " ")
+
+		splitPos := strings.LastIndex(line, " ")
+		split := []string{line[:splitPos], line[splitPos+1:]}
+
 		entries[split[0]] = split[1]
 	}
 

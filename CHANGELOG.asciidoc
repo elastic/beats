@@ -67,7 +67,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Add labels to the Docker healthcheck metricset output. {pull}3707[3707]
 - Make system process metricset honor the cpu_ticks config option. {issue}3590[3590]
 - Support common.Time in mapstriface.toTime() {pull}3812[3812]
-
+- Fixing panic on prometheus collector when label has , {pull}3947[3947]
 *Packetbeat*
 
 *Winlogbeat*
