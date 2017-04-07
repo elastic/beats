@@ -34,14 +34,10 @@ include::./upgrading.asciidoc[]
 
 include::./config-file-format.asciidoc[]
 
-pass::[<?page_header Always refer to the documentation in master for the latest information about contributing to Beats.?>]
-
 include::./newbeat.asciidoc[]
 
 include::./event-conventions.asciidoc[]
 
 include::./newdashboards.asciidoc[]
-
-pass::[<?page_header ?>]
 
 include::./release.asciidoc[]
