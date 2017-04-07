@@ -59,7 +59,7 @@
                     "syscall": "44",
                     "gid": "0",
                     "fsgid": "0",
-                    "pid": 1281,
+                    "pid": "1281",
                     "suid": "0",
                     "record_type": "SYSCALL",
                     "uid": "0",
@@ -72,7 +72,7 @@
                     "euid": "0",
                     "sequence": 18877199,
                     "a0": "9",
-                    "ppid": 1240,
+                    "ppid": "1240",
                     "a1": "7f564b2672a0",
                     "fsuid": "0",
                     "exit": "184",
@@ -81,7 +81,7 @@
                     "success": "yes",
                     "tty": "(none)",
                     "arch": "x86_64",
-                    "items": 0
+                    "items": "0"
                 }
             },
             "beat": {
