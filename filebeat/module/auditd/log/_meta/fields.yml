@@ -46,10 +46,10 @@
         This number is zero-based; a value of 0 means it is the first item.
     - name: a0
       description: >
-        This first argument to the system call.
+        The first argument to the system call.
     - name: res
       description: >
-        This result of the system call (success or failure).
+        The result of the system call (success or failure).
     - name: geoip
       type: group
       description: >
