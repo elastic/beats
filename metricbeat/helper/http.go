@@ -8,7 +8,10 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 
+	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -22,10 +25,42 @@ type HTTP struct {
 
 // NewHTTP creates new http helper
 func NewHTTP(base mb.BaseMetricSet) *HTTP {
+	config := struct {
+		TLS     *outputs.TLSConfig `config:"ssl"`
+		Timeout time.Duration      `config:"timeout"`
+		Headers map[string]string  `config:"headers"`
+	}{}
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil
+	}
+
+	if config.Headers == nil {
+		config.Headers = map[string]string{}
+	}
+
+	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return nil
+	}
+
+	var dialer, tlsDialer transport.Dialer
+
+	dialer = transport.NetDialer(config.Timeout)
+	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.Timeout)
+	if err != nil {
+		return nil
+	}
+
 	return &HTTP{
-		base:    base,
-		client:  &http.Client{Timeout: base.Module().Config().Timeout},
-		headers: map[string]string{},
+		base: base,
+		client: &http.Client{
+			Transport: &http.Transport{
+				Dial:    dialer.Dial,
+				DialTLS: tlsDialer.Dial,
+			},
+			Timeout: config.Timeout,
+		},
+		headers: config.Headers,
 		method:  "GET",
 		body:    nil,
 	}
