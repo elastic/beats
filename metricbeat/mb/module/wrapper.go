@@ -49,13 +49,13 @@ type metricSetWrapper struct {
 	stats  *stats   // stats for this MetricSet.
 }
 
-// stats bundles common metricset stats
+// stats bundles common metricset stats.
 type stats struct {
-	key      string // full stats key
-	ref      uint32 // number of modules/metricsets reusing stats instance
-	success  *monitoring.Int
-	failures *monitoring.Int
-	events   *monitoring.Int
+	key      string          // full stats key
+	ref      uint32          // number of modules/metricsets reusing stats instance
+	success  *monitoring.Int // Total success events.
+	failures *monitoring.Int // Total error events.
+	events   *monitoring.Int // Total events published.
 }
 
 // NewWrapper create a new Module and its associated MetricSets based
@@ -142,7 +142,8 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan common.MapStr {
 		go func(msw *metricSetWrapper) {
 			defer releaseStats(msw.stats)
 			defer wg.Done()
-			msw.startFetching(done, out)
+			defer msw.close()
+			msw.run(done, out)
 		}(msw)
 	}
 
@@ -170,7 +171,8 @@ func (mw *Wrapper) Hash() uint64 {
 	}
 	var err error
 
-	// Config is unpacked into map[string]interface{} to also take metricset configs into account for the hash
+	// Config is unpacked into map[string]interface{} to also take metricset
+	// configs into account for the hash.
 	var c map[string]interface{}
 	mw.UnpackConfig(&c)
 	mw.configHash, err = hashstructure.Hash(c, nil)
@@ -182,34 +184,48 @@ func (mw *Wrapper) Hash() uint64 {
 
 // metricSetWrapper methods
 
-// startFetching performs an immediate fetch for the MetricSet then it
-// begins a continuous timer scheduled loop to fetch data. To stop the loop the
-// done channel should be closed.
-func (msw *metricSetWrapper) startFetching(
-	done <-chan struct{},
-	out chan<- common.MapStr,
-) {
+func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- common.MapStr) {
+	defer logp.Recover(fmt.Sprintf("recovered from panic while fetching "+
+		"'%s/%s' for host '%s'", msw.module.Name(), msw.Name(), msw.Host()))
+
 	debugf("Starting %s", msw)
 	defer debugf("Stopped %s", msw)
 
-	// Fetch immediately.
-	err := msw.fetch(done, out)
-	if err != nil {
-		logp.Err("%v", err)
+	// Events and errors are reported through this.
+	reporter := &eventReporter{
+		msw:  msw,
+		out:  out,
+		done: done,
 	}
+
+	switch ms := msw.MetricSet.(type) {
+	case mb.PushMetricSet:
+		ms.Run(reporter)
+	case mb.EventFetcher, mb.EventsFetcher, mb.ReportingMetricSet:
+		msw.startPeriodicFetching(reporter)
+	default:
+		// Earlier startup stages prevent this from happening.
+		logp.Err("MetricSet '%s/%s' does not implement an event producing interface",
+			msw.Module().Name(), msw.Name())
+	}
+}
+
+// startPeriodicFetching performs an immediate fetch for the MetricSet then it
+// begins a continuous timer scheduled loop to fetch data. To stop the loop the
+// done channel should be closed.
+func (msw *metricSetWrapper) startPeriodicFetching(reporter *eventReporter) {
+	// Fetch immediately.
+	msw.fetch(reporter)
 
 	// Start timer for future fetches.
 	t := time.NewTicker(msw.Module().Config().Period)
 	defer t.Stop()
 	for {
 		select {
-		case <-done:
+		case <-reporter.done:
 			return
 		case <-t.C:
-			err := msw.fetch(done, out)
-			if err != nil {
-				logp.Err("%v", err)
-			}
+			msw.fetch(reporter)
 		}
 	}
 }
@@ -217,93 +233,110 @@ func (msw *metricSetWrapper) startFetching(
 // fetch invokes the appropriate Fetch method for the MetricSet and publishes
 // the result using the publisher client. This method will recover from panics
 // and log a stack track if one occurs.
-func (msw *metricSetWrapper) fetch(done <-chan struct{}, out chan<- common.MapStr) error {
-	defer logp.Recover(fmt.Sprintf("recovered from panic while fetching "+
-		"'%s/%s' for host '%s'", msw.module.Name(), msw.Name(), msw.Host()))
-
+func (msw *metricSetWrapper) fetch(reporter *eventReporter) {
 	switch fetcher := msw.MetricSet.(type) {
 	case mb.EventFetcher:
-		event, err := msw.singleEventFetch(fetcher)
-		if err != nil {
-			return err
-		}
-		if event != nil {
-			msw.stats.events.Add(1)
-			writeEvent(done, out, event)
-		}
+		msw.singleEventFetch(fetcher, reporter)
 	case mb.EventsFetcher:
-		events, err := msw.multiEventFetch(fetcher)
-		if err != nil {
-			return err
-		}
-		for _, event := range events {
-			msw.stats.events.Add(1)
-			if !writeEvent(done, out, event) {
-				break
-			}
-		}
+		msw.multiEventFetch(fetcher, reporter)
+	case mb.ReportingMetricSet:
+		msw.reportingFetch(fetcher, reporter)
 	default:
-		return fmt.Errorf("MetricSet '%s/%s' does not implement a Fetcher "+
-			"interface", msw.Module().Name(), msw.Name())
+		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
 	}
-
-	return nil
 }
 
-func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher) (common.MapStr, error) {
-	start := time.Now()
+func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher, reporter *eventReporter) {
+	reporter.startFetchTimer()
 	event, err := fetcher.Fetch()
-	elapsed := time.Since(start)
-
-	if err == nil {
-		msw.stats.success.Add(1)
-	} else {
-		msw.stats.failures.Add(1)
-	}
-
-	if event, err = createEvent(msw, event, err, start, elapsed); err != nil {
-		return nil, errors.Wrap(err, "createEvent failed")
-	}
-
-	return event, nil
+	reporter.ErrorWith(err, event)
 }
 
-func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher) ([]common.MapStr, error) {
-	start := time.Now()
+func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher, reporter *eventReporter) {
+	reporter.startFetchTimer()
 	events, err := fetcher.Fetch()
-	elapsed := time.Since(start)
-
-	var rtnEvents []common.MapStr
-	if err == nil {
-		msw.stats.success.Add(1)
-
-		for _, event := range events {
-			if event, err = createEvent(msw, event, nil, start, elapsed); err != nil {
-				return nil, errors.Wrap(err, "createEvent failed")
-			}
-			if event != nil {
-				rtnEvents = append(rtnEvents, event)
-			}
-		}
-	} else {
-		msw.stats.failures.Add(1)
-
-		event, err := createEvent(msw, nil, err, start, elapsed)
-		if err != nil {
-			return nil, errors.Wrap(err, "createEvent failed")
-		}
-		if event != nil {
-			rtnEvents = append(rtnEvents, event)
-		}
+	for _, event := range events {
+		reporter.ErrorWith(err, event)
 	}
+}
 
-	return rtnEvents, nil
+func (msw *metricSetWrapper) reportingFetch(fetcher mb.ReportingMetricSet, reporter *eventReporter) {
+	reporter.startFetchTimer()
+	fetcher.Fetch(reporter)
+}
+
+// close closes the underlying MetricSet if it implements the mb.Closer
+// interface.
+func (msw *metricSetWrapper) close() error {
+	if closer, ok := msw.MetricSet.(mb.Closer); ok {
+		return closer.Close()
+	}
+	return nil
 }
 
 // String returns a string representation of metricSetWrapper.
 func (msw *metricSetWrapper) String() string {
 	return fmt.Sprintf("metricSetWrapper[module=%s, name=%s, host=%s]",
 		msw.module.Name(), msw.Name(), msw.Host())
+}
+
+// Reporter implementation
+
+// eventReporter implements the Reporter interface which is a callback interface
+// used by MetricSet implementations to report an event(s), an error, or an error
+// with some additional metadata.
+type eventReporter struct {
+	msw   *metricSetWrapper
+	done  <-chan struct{}
+	out   chan<- common.MapStr
+	start time.Time // Start time of the current fetch (or zero for push sources).
+}
+
+// startFetchTimer demarcates the start of a new fetch. The elapsed time of a
+// fetch is computed based on the time of this call.
+func (r *eventReporter) startFetchTimer() {
+	r.start = time.Now()
+}
+
+func (r *eventReporter) Done() <-chan struct{} {
+	return r.done
+}
+
+func (r *eventReporter) Event(event common.MapStr) bool {
+	return r.ErrorWith(nil, event)
+}
+
+func (r *eventReporter) Error(err error) bool {
+	return r.ErrorWith(err, nil)
+}
+
+func (r *eventReporter) ErrorWith(err error, meta common.MapStr) bool {
+	timestamp := r.start
+	elapsed := time.Duration(0)
+
+	if !timestamp.IsZero() {
+		elapsed = time.Since(timestamp)
+	} else {
+		timestamp = time.Now()
+	}
+
+	if err == nil {
+		r.msw.stats.success.Add(1)
+	} else {
+		r.msw.stats.failures.Add(1)
+	}
+
+	event, err := createEvent(r.msw, meta, err, timestamp, elapsed)
+	if err != nil {
+		logp.Err("createEvent failed: %v", err)
+		return false
+	}
+
+	if !writeEvent(r.done, r.out, event) {
+		return false
+	}
+	r.msw.stats.events.Add(1)
+	return true
 }
 
 // other utility functions

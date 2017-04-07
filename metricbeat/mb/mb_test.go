@@ -20,6 +20,8 @@ func (m testModule) ParseHost(host string) (HostData, error) {
 	return m.hostParser(host)
 }
 
+// EventFetcher
+
 type testMetricSet struct {
 	BaseMetricSet
 }
@@ -27,6 +29,32 @@ type testMetricSet struct {
 func (m *testMetricSet) Fetch() (common.MapStr, error) {
 	return nil, nil
 }
+
+// EventsFetcher
+
+type testMetricSetEventsFetcher struct {
+	BaseMetricSet
+}
+
+func (m *testMetricSetEventsFetcher) Fetch() ([]common.MapStr, error) {
+	return nil, nil
+}
+
+// ReportingFetcher
+
+type testMetricSetReportingFetcher struct {
+	BaseMetricSet
+}
+
+func (m *testMetricSetReportingFetcher) Fetch(r Reporter) {}
+
+// PushMetricSet
+
+type testPushMetricSet struct {
+	BaseMetricSet
+}
+
+func (m *testPushMetricSet) Run(r PushReporter) {}
 
 func TestModuleConfig(t *testing.T) {
 	tests := []struct {
@@ -169,7 +197,7 @@ func TestNewModulesDuplicateHosts(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestNewModules(t *testing.T) {
+func TestNewModulesHostParser(t *testing.T) {
 	const (
 		name = "HostParser"
 		host = "example.com"
@@ -234,6 +262,131 @@ func TestNewModules(t *testing.T) {
 			return
 		}
 		assert.FailNow(t, "no modules found")
+	})
+
+}
+
+func TestNewModulesMetricSetTypes(t *testing.T) {
+	r := newTestRegistry(t)
+
+	factory := func(base BaseMetricSet) (MetricSet, error) {
+		return &testMetricSet{base}, nil
+	}
+
+	name := "EventFetcher"
+	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run(name+" MetricSet", func(t *testing.T) {
+		c := newConfig(t, map[string]interface{}{
+			"module":     moduleName,
+			"metricsets": []string{name},
+		})
+
+		modules, err := NewModules(c, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Len(t, modules, 1)
+
+		for _, metricSets := range modules {
+			if assert.Len(t, metricSets, 1) {
+				metricSet := metricSets[0]
+				_, ok := metricSet.(EventFetcher)
+				assert.True(t, ok, name+" not implemented")
+			}
+		}
+	})
+
+	factory = func(base BaseMetricSet) (MetricSet, error) {
+		return &testMetricSetEventsFetcher{base}, nil
+	}
+
+	name = "EventsFetcher"
+	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run(name+" MetricSet", func(t *testing.T) {
+		c := newConfig(t, map[string]interface{}{
+			"module":     moduleName,
+			"metricsets": []string{name},
+		})
+
+		modules, err := NewModules(c, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Len(t, modules, 1)
+
+		for _, metricSets := range modules {
+			if assert.Len(t, metricSets, 1) {
+				metricSet := metricSets[0]
+				_, ok := metricSet.(EventsFetcher)
+				assert.True(t, ok, name+" not implemented")
+			}
+		}
+	})
+
+	factory = func(base BaseMetricSet) (MetricSet, error) {
+		return &testMetricSetReportingFetcher{base}, nil
+	}
+
+	name = "ReportingFetcher"
+	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run(name+" MetricSet", func(t *testing.T) {
+		c := newConfig(t, map[string]interface{}{
+			"module":     moduleName,
+			"metricsets": []string{name},
+		})
+
+		modules, err := NewModules(c, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Len(t, modules, 1)
+
+		for _, metricSets := range modules {
+			if assert.Len(t, metricSets, 1) {
+				metricSet := metricSets[0]
+				_, ok := metricSet.(ReportingMetricSet)
+				assert.True(t, ok, name+" not implemented")
+			}
+		}
+	})
+
+	factory = func(base BaseMetricSet) (MetricSet, error) {
+		return &testPushMetricSet{base}, nil
+	}
+
+	name = "Push"
+	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run(name+" MetricSet", func(t *testing.T) {
+		c := newConfig(t, map[string]interface{}{
+			"module":     moduleName,
+			"metricsets": []string{name},
+		})
+
+		modules, err := NewModules(c, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Len(t, modules, 1)
+
+		for _, metricSets := range modules {
+			if assert.Len(t, metricSets, 1) {
+				metricSet := metricSets[0]
+				_, ok := metricSet.(PushMetricSet)
+				assert.True(t, ok, name+" not implemented")
+			}
+		}
 	})
 }
 
