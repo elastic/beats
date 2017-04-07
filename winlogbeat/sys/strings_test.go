@@ -107,6 +107,20 @@ func TestUTF16ToUTF8(t *testing.T) {
 	assert.Equal(t, []byte(input), outputBuf.Bytes())
 }
 
+func TestUTF16BytesToStringTrimNullTerm(t *testing.T) {
+	input := "abc"
+	utf16Bytes := append(toUTF16Bytes(input), []byte{0, 0, 0, 0, 0, 0}...)
+
+	outputBuf := &bytes.Buffer{}
+	err := UTF16ToUTF8Bytes(utf16Bytes, outputBuf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := outputBuf.Bytes()
+	assert.Len(t, b, 3)
+	assert.Equal(t, input, string(b))
+}
+
 func BenchmarkUTF16ToUTF8(b *testing.B) {
 	utf16Bytes := toUTF16Bytes("A logon was attempted using explicit credentials.")
 	outputBuf := &bytes.Buffer{}

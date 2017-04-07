@@ -40,6 +40,10 @@ func UTF16ToUTF8Bytes(in []byte, out io.Writer) error {
 	var v1, v2 uint16
 	for i := 0; i < len(in); i += 2 {
 		v1 = uint16(in[i]) | uint16(in[i+1])<<8
+		// Stop at null-terminator.
+		if v1 == 0 {
+			return nil
+		}
 
 		switch {
 		case v1 < surr1, surr3 <= v1:
