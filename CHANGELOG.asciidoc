@@ -116,6 +116,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Add experimental metricset `perfmon` to Windows module. {pull}3758[3758]
 - Add memcached module with stats metricset. {pull}3693[3693]
 - Add the `process.cmdline.cache.enabled` config option to the System Process Metricset. {pull}3891[3891]
+- Adding support for custom http headers and TLS for metricbeat modules {pull}3945[3945]
 - Add new MetricSet interfaces for developers (`Closer`, `ReportingFetcher`, and `PushMetricSet`). {pull}3908[3908]
 
 *Packetbeat*
