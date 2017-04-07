@@ -96,6 +96,7 @@ $ git push --set-upstream tsg cool_new_protocol
 [[protocol-modules]]
 == Protocol Modules
 
+<<<<<<< HEAD
 Packetbeat's source code is split up in Go packages or modules. The protocol
 modules can be found in individual folders in the `beats/packetbeat/protos` directory
 in the https://github.com/elastic/beats[Beats GitHub repository].
@@ -565,10 +566,16 @@ application layer transaction type to make use of it. Here is an example from th
 
 Use `applayer.Message` in conjunction with `applayer.Transaction` for creating the
 transaction and `applayer.Stream` to manage your stream buffers for parsing.
+=======
+We are working on updating this section. While you're waiting for updates, you
+might want to try out the TCP protocol generator at
+https://github.com/elastic/beats/tree/master/packetbeat/scripts/tcp-protocol.
+>>>>>>> a0564574... Remove outdated content from packetbeat dev guide
 
 [[testing]]
 == Testing
 
+<<<<<<< HEAD
 [float]
 === Unit Tests
 
@@ -727,3 +734,6 @@ $ cd last_run
 $ ls
 output packetbeat.log packetbeat.yml
 ----------------------------------------------------------------------
+=======
+We are working on updating this section. 
+>>>>>>> a0564574... Remove outdated content from packetbeat dev guide
