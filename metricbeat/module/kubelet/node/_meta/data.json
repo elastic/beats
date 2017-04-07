@@ -9,7 +9,9 @@
         "node": {
             "cpu": {
                 "usage": {
-                    "corenanoseconds": 7247863769557035,
+                    "core" : {
+                        "ns": 7247863769557035
+                    },
                     "nanocores": 1662117892
                 }
             },

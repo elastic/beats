@@ -21,8 +21,10 @@ func eventMapping(content []byte) (common.MapStr, error) {
 
 		"cpu": common.MapStr{
 			"usage": common.MapStr{
-				"nanocores":       node.CPU.UsageNanoCores,
-				"corenanoseconds": node.CPU.UsageCoreNanoSeconds,
+				"nanocores": node.CPU.UsageNanoCores,
+				"core": common.MapStr{
+					"ns": node.CPU.UsageCoreNanoSeconds,
+				},
 			},
 		},
 

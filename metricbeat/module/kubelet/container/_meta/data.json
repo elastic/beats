@@ -9,7 +9,9 @@
         "container": {
             "cpu": {
                 "usage": {
-                    "corenanoseconds": 3305756719,
+                    "core": {
+                        "ns": 3305756719
+                    },
                     "nanocores": 5992
                 }
             },

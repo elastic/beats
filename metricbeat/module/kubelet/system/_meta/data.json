@@ -13,7 +13,9 @@
             "container": "kubelet",
             "cpu": {
                 "usage": {
-                    "corenanoseconds": 1424273250468228,
+                    "core": {
+                        "ns": 1424273250468228
+                    },
                     "nanocores": 382404825
                 }
             },
