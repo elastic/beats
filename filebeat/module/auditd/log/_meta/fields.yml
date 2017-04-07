@@ -1,7 +1,7 @@
-- name: audit
+- name: log
   type: group
   description: >
-    Fields from the Linux audit logs. Not all fields are documented here because
+    Fields from the Linux audit log. Not all fields are documented here because
     they are dynamic and vary by audit event type.
   fields:
     - name: record_type
@@ -48,7 +48,7 @@
     - name: geoip
       type: group
       description: >
-        Contains GeoIP information gathered based on the `system.audit.addr`
+        Contains GeoIP information gathered based on the `auditd.log.addr`
         field. Only present if the GeoIP Elasticsearch plugin is available and
         used.
       fields:

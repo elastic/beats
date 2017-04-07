@@ -99,6 +99,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Improve handling of different path variants on Windows. {pull}3781[3781]
 - Restructure input.Event to be inline with outputs.Data {pull}3823[3823]
 - Add base for supporting prospector level processors {pull}3853[3853]
+- Add auditd module for reading audit logs on Linux. {pull}3750[3750] {pull}3941[3941]
 
 *Heartbeat*
 
