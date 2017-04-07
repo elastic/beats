@@ -213,25 +213,24 @@ func execPing(
 }
 
 func splitHostnamePort(requ *http.Request) (string, uint16, error) {
-	host, port, err := net.SplitHostPort(requ.URL.Host)
+	host := requ.URL.Host
+	// Try to add a default port if needed
+	if strings.LastIndex(host, ":") == -1 {
+		switch requ.URL.Scheme {
+		case urlSchemaHTTP:
+			host += ":80"
+		case urlSchemaHTTPS:
+			host += ":443"
+		}
+	}
+	host, port, err := net.SplitHostPort(host)
 	if err != nil {
 		return "", 0, err
 	}
-	var p uint64
-	if port == "" {
-		switch requ.URL.Scheme {
-		case urlSchemaHTTP:
-			p = 80
-		case urlSchemaHTTPS:
-			p = 443
-		}
-	} else {
-		p, err = strconv.ParseUint(port, 10, 16)
-		if err != nil {
-			return "", 0, fmt.Errorf("'%v' is no valid port number in '%v'", port, requ.URL.Host)
-		}
+	p, err := strconv.ParseUint(port, 10, 16)
+	if err != nil {
+		return "", 0, fmt.Errorf("'%v' is no valid port number in '%v'", port, requ.URL.Host)
 	}
-
 	return host, uint16(p), nil
 }
 
