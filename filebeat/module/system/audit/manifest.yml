@@ -4,7 +4,7 @@ var:
   - name: paths
     default:
       - /var/log/audit/audit.log*
-    os.darwin: []
+    os.darwin: [""]
     os.windows: []
 
 ingest_pipeline: ingest/pipeline.json

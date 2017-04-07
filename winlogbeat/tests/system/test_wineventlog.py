@@ -142,6 +142,7 @@ class Test(WriteReadTest):
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg)
         self.assertTrue("xml" in evts[0])
+        self.assertTrue(evts[0]["xml"].endswith('</Event>'), 'xml value: "{}"'.format(evts[0]["xml"]))
 
     def test_query_event_id(self):
         """

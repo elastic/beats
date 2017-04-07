@@ -67,12 +67,13 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Add labels to the Docker healthcheck metricset output. {pull}3707[3707]
 - Make system process metricset honor the cpu_ticks config option. {issue}3590[3590]
 - Support common.Time in mapstriface.toTime() {pull}3812[3812]
-
+- Fixing panic on prometheus collector when label has , {pull}3947[3947]
 *Packetbeat*
 
 *Winlogbeat*
 
 - Fix handling of empty strings in event_data. {pull}3705[3705]
+- Fix null terminators include in raw XML string when include_xml is enabled. {pull}3943[3943]
 
 ==== Added
 
@@ -116,6 +117,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Add memcached module with stats metricset. {pull}3693[3693]
 - Add the `process.cmdline.cache.enabled` config option to the System Process Metricset. {pull}3891[3891]
 - Adding support for custom http headers and TLS for metricbeat modules {pull}3945[3945]
+- Add new MetricSet interfaces for developers (`Closer`, `ReportingFetcher`, and `PushMetricSet`). {pull}3908[3908]
 
 *Packetbeat*
 - Add `fields` and `fields_under_root` to packetbeat protocols configurations. {pull}3518[3518]
