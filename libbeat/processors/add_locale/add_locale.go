@@ -7,28 +7,23 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 )
 
-type addLocale struct {
-	timezone string
-}
+type addLocale struct{}
 
 func init() {
 	processors.RegisterPlugin("add_locale", newAddLocale)
 }
 
 func newAddLocale(c common.Config) (processors.Processor, error) {
-	zone, _ := time.Now().Zone()
-
-	l := addLocale{timezone: zone}
-
-	return l, nil
+	return addLocale{}, nil
 }
 
 func (l addLocale) Run(event common.MapStr) (common.MapStr, error) {
-	event.Put("beat.timezone", l.timezone)
+	zone, _ := time.Now().Zone()
+	event.Put("beat.timezone", zone)
 
 	return event, nil
 }
 
 func (l addLocale) String() string {
-	return "add_locale=" + l.timezone
+	return "add_locale"
 }
