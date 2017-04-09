@@ -346,9 +346,13 @@ The audit event sequence number.
 
 
 [float]
-=== auditd.log.pid
+=== auditd.log.acct
 
-type: long
+The user account name associated with the event.
+
+
+[float]
+=== auditd.log.pid
 
 The ID of the process.
 
@@ -356,15 +360,11 @@ The ID of the process.
 [float]
 === auditd.log.ppid
 
-type: long
-
 The ID of the process.
 
 
 [float]
 === auditd.log.items
-
-type: long
 
 The number of items in an event.
 
@@ -372,9 +372,19 @@ The number of items in an event.
 [float]
 === auditd.log.item
 
-type: long
-
 The item field indicates which item out of the total number of items. This number is zero-based; a value of 0 means it is the first item.
+
+
+[float]
+=== auditd.log.a0
+
+The first argument to the system call.
+
+
+[float]
+=== auditd.log.res
+
+The result of the system call (success or failure).
 
 
 [float]
