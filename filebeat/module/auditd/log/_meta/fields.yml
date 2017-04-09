@@ -28,23 +28,28 @@
       type: long
       description: >
         The audit event sequence number.
+    - name: acct
+      description: >
+        The user account name associated with the event.
     - name: pid
-      type: long
       description: >
         The ID of the process.
     - name: ppid
-      type: long
       description: >
         The ID of the process.
     - name: items
-      type: long
       description: >
         The number of items in an event.
     - name: item
-      type: long
       description: >
         The item field indicates which item out of the total number of items.
         This number is zero-based; a value of 0 means it is the first item.
+    - name: a0
+      description: >
+        The first argument to the system call.
+    - name: res
+      description: >
+        The result of the system call (success or failure).
     - name: geoip
       type: group
       description: >
