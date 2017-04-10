@@ -443,7 +443,7 @@ func bulkCollectPublishFails(
 			continue
 		}
 
-		logp.Info("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+		debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
 		failed = append(failed, data[i])
 	}
 
