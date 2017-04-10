@@ -182,6 +182,14 @@ metricbeat.modules:
   #username: ""
   #password: ""
 
+#------------------------------- kibana Module -------------------------------
+- module: kibana
+  metricsets: ["status"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:5601"]
+
+
 #------------------------------- kubelet Module ------------------------------
 #- module: kubelet
 #  metricsets: ["node","container","volume","pod","system"]

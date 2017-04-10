@@ -1,0 +1,11 @@
+- key: kibana
+  title: "kibana"
+  description: >
+    []experimental
+
+    kibana Module
+  fields:
+    - name: kibana
+      type: group
+      description: >
+      fields:

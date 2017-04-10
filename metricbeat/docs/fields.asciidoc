@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-haproxy>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
+* <<exported-fields-kibana>>
 * <<exported-fields-kubelet>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
@@ -3328,6 +3329,97 @@ Broker id
 type: keyword
 
 Broker address
+
+
+[[exported-fields-kibana]]
+== kibana Fields
+
+[]experimental
+kibana Module
+
+
+
+[float]
+== kibana Fields
+
+
+
+
+[float]
+== status Fields
+
+Status fields
+
+
+
+[float]
+=== kibana.status.name
+
+type: keyword
+
+Kibana instance name.
+
+
+[float]
+=== kibana.status.uuid
+
+type: keyword
+
+Kibana instance uuid.
+
+
+[float]
+=== kibana.status.version.number
+
+type: keyword
+
+Kibana version number.
+
+
+[float]
+=== kibana.status.status.overall.state
+
+type: keyword
+
+Kibana overall state.
+
+
+[float]
+== metrics Fields
+
+Metrics fields
+
+
+
+[float]
+=== kibana.status.metrics.concurrent_connections
+
+type: long
+
+Current concurrent connections.
+
+
+[float]
+== requests Fields
+
+Request statistics.
+
+
+
+[float]
+=== kibana.status.metrics.requests.disconnects
+
+type: long
+
+Total number of disconnected connections.
+
+
+[float]
+=== kibana.status.metrics.requests.total
+
+type: long
+
+Total number of connections.
 
 
 [[exported-fields-kubelet]]
