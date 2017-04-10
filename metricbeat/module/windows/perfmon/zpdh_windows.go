@@ -5,12 +5,14 @@ package perfmon
 import (
 	"syscall"
 	"unsafe"
+
+	"golang.org/x/sys/windows"
 )
 
 var _ unsafe.Pointer
 
 var (
-	modpdh = syscall.NewLazyDLL("pdh.dll")
+	modpdh = windows.NewLazySystemDLL("pdh.dll")
 
 	procPdhOpenQueryW                   = modpdh.NewProc("PdhOpenQueryW")
 	procPdhAddEnglishCounterW           = modpdh.NewProc("PdhAddEnglishCounterW")
