@@ -5,9 +5,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 
+	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -15,14 +19,50 @@ type HTTP struct {
 	base    mb.BaseMetricSet
 	client  *http.Client // HTTP client that is reused across requests.
 	headers map[string]string
+	method  string
+	body    []byte
 }
 
 // NewHTTP creates new http helper
 func NewHTTP(base mb.BaseMetricSet) *HTTP {
+	config := struct {
+		TLS     *outputs.TLSConfig `config:"ssl"`
+		Timeout time.Duration      `config:"timeout"`
+		Headers map[string]string  `config:"headers"`
+	}{}
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil
+	}
+
+	if config.Headers == nil {
+		config.Headers = map[string]string{}
+	}
+
+	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return nil
+	}
+
+	var dialer, tlsDialer transport.Dialer
+
+	dialer = transport.NetDialer(config.Timeout)
+	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.Timeout)
+	if err != nil {
+		return nil
+	}
+
 	return &HTTP{
-		base:    base,
-		client:  &http.Client{Timeout: base.Module().Config().Timeout},
-		headers: map[string]string{},
+		base: base,
+		client: &http.Client{
+			Transport: &http.Transport{
+				Dial:    dialer.Dial,
+				DialTLS: tlsDialer.Dial,
+			},
+			Timeout: config.Timeout,
+		},
+		headers: config.Headers,
+		method:  "GET",
+		body:    nil,
 	}
 }
 
@@ -30,7 +70,14 @@ func NewHTTP(base mb.BaseMetricSet) *HTTP {
 // It's important that resp.Body has to be closed if this method is used. Before using this method
 // check if one of the other Fetch* methods could be used as they ensure that the Body is properly closed.
 func (h *HTTP) FetchResponse() (*http.Response, error) {
-	req, err := http.NewRequest("GET", h.base.HostData().SanitizedURI, nil)
+
+	// Create a fresh reader every time
+	var reader io.Reader
+	if h.body != nil {
+		reader = bytes.NewReader(h.body)
+	}
+
+	req, err := http.NewRequest(h.method, h.base.HostData().SanitizedURI, reader)
 	if h.base.HostData().User != "" || h.base.HostData().Password != "" {
 		req.SetBasicAuth(h.base.HostData().User, h.base.HostData().Password)
 	}
@@ -49,6 +96,14 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 
 func (h *HTTP) SetHeader(key, value string) {
 	h.headers[key] = value
+}
+
+func (h *HTTP) SetMethod(method string) {
+	h.method = method
+}
+
+func (h *HTTP) SetBody(body []byte) {
+	h.body = body
 }
 
 // FetchContent makes an HTTP request to the configured url and returns the body content.
