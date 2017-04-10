@@ -36,17 +36,23 @@ const (
 var debugf = logp.MakeDebug("filters")
 
 var (
-	ec2Schema = s.Schema{
-		"instance_id":       c.Str("instanceId"),
-		"machine_type":      c.Str("instanceType"),
-		"region":            c.Str("region"),
-		"availability_zone": c.Str("availabilityZone"),
-	}.ApplyNoError
+	ec2Schema = func(m map[string]interface{}) common.MapStr {
+		out, _ := s.Schema{
+			"instance_id":       c.Str("instanceId"),
+			"machine_type":      c.Str("instanceType"),
+			"region":            c.Str("region"),
+			"availability_zone": c.Str("availabilityZone"),
+		}.Apply(m)
+		return out
+	}
 
-	doSchema = s.Schema{
-		"instance_id": c.StrFromNum("droplet_id"),
-		"region":      c.Str("region"),
-	}.ApplyNoError
+	doSchema = func(m map[string]interface{}) common.MapStr {
+		out, _ := s.Schema{
+			"instance_id": c.StrFromNum("droplet_id"),
+			"region":      c.Str("region"),
+		}.Apply(m)
+		return out
+	}
 
 	gceHeaders = map[string]string{"Metadata-Flavor": "Google"}
 	gceSchema  = func(m map[string]interface{}) common.MapStr {

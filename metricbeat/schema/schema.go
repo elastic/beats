@@ -76,12 +76,6 @@ func (s Schema) ApplyTo(event common.MapStr, data map[string]interface{}) (commo
 	return event, errors
 }
 
-// Apply converts the fields extracted from data, using the schema, into a new map.
-func (s Schema) ApplyNoError(data map[string]interface{}) common.MapStr {
-	event, _ := s.ApplyTo(common.MapStr{}, data)
-	return event
-}
-
 // Apply converts the fields extracted from data, using the schema, into a new map and reports back the errors.
 func (s Schema) Apply(data map[string]interface{}) (common.MapStr, *Errors) {
 	return s.ApplyTo(common.MapStr{}, data)
