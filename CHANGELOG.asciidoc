@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Downgrade Elasticsearch per batch item failure log to debug level. {issue}3953[3953]
 
 *Heartbeat*
+- Add default ports in HTTP monitor. {pull}3924[3924]
 
 *Metricbeat*
 
