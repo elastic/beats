@@ -18,6 +18,10 @@ var (
 	filesTruncated = monitoring.NewInt(nil, "filebeat.prospector.log.files.truncated")
 )
 
+const (
+	doubleWildcardMaxDepth = 16
+)
+
 // Log contains the prospector and its config
 type Log struct {
 	Prospector *Prospector
@@ -112,15 +116,37 @@ func (l *Log) Run() {
 	}
 }
 
+// glob detects the use of "**" and expands it to standard glob patterns up to a max depth
+func glob(g string) ([]string, error) {
+	var globs []string
+	if filepath.Base(g) == "**" {
+		globs = []string{filepath.Join(filepath.Dir(g), "*")}
+		for level := 1; level < doubleWildcardMaxDepth; level++ {
+			globs = append(globs, filepath.Join(globs[level-1], "*"))
+		}
+	} else {
+		globs = []string{g}
+	}
+	var matches []string
+	for _, g := range globs {
+		// Evaluate the path as a wildcards/shell glob
+		match, err := filepath.Glob(g)
+		if err != nil {
+			return nil, err
+		}
+		matches = append(matches, match...)
+	}
+	return matches, nil
+}
+
 // getFiles returns all files which have to be harvested
 // All globs are expanded and then directory and excluded files are removed
 func (l *Log) getFiles() map[string]os.FileInfo {
 
 	paths := map[string]os.FileInfo{}
 
-	for _, glob := range l.config.Paths {
-		// Evaluate the path as a wildcards/shell glob
-		matches, err := filepath.Glob(glob)
+	for _, path := range l.config.Paths {
+		matches, err := glob(path)
 		if err != nil {
 			logp.Err("glob(%s) failed: %v", glob, err)
 			continue
