@@ -35,11 +35,11 @@ This updates all fields and docs with the most recent changes.
 
 ## Use vendoring
 
-We recommend to use vendoring for your beat. This means the dependencies are put into your beat folder. The beats team currently uses [glide](https://github.com/Masterminds/glide) for vendoring.
+We recommend to use vendoring for your beat. This means the dependencies are put into your beat folder. The beats team currently uses [govendor](https://github.com/kardianos/govendor) for vendoring.
 
 ```
-glide init
-glide update --quick
+govendor init
+govendor update +e
 ```
 
 This will create a directory `vendor` inside your repository. To make sure all dependencies for the Makefile commands are loaded from the vendor directory, find the following line in your Makefile:
