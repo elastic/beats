@@ -188,9 +188,9 @@ type PdhCounterFormat uint32
 const (
 	PdhFmtDouble PdhCounterFormat = 0x200
 
-	PdhFmtLarge = 0x400
+	PdhFmtLarge PdhCounterFormat = 0x400
 
-	PdhFmtLong = 0x100
+	PdhFmtLong PdhCounterFormat = 0x100
 
 	PdhFmtNoScale = 0x1000
 

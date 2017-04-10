@@ -200,9 +200,9 @@ const (
 	// PdhFmtDouble returns data as a double-precision floating point real.
 	PdhFmtDouble PdhCounterFormat = C.PDH_FMT_DOUBLE
 	// PdhFmtLarge returns data as a 64-bit integer.
-	PdhFmtLarge = C.PDH_FMT_LARGE
+	PdhFmtLarge PdhCounterFormat = C.PDH_FMT_LARGE
 	// PdhFmtLong returns data as a long integer.
-	PdhFmtLong = C.PDH_FMT_LONG
+	PdhFmtLong PdhCounterFormat = C.PDH_FMT_LONG
 
 	// Use bitwise operators to combine these values with the counter type to scale the value.
 

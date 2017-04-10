@@ -10,8 +10,9 @@ import (
 )
 
 type CounterConfig struct {
-	Alias string `config:"alias" validate:"required"`
-	Query string `config:"query" validate:"required"`
+	Alias  string `config:"alias" validate:"required"`
+	Query  string `config:"query" validate:"required"`
+	Format string `config:"format"`
 }
 
 func init() {
