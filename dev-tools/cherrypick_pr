@@ -8,7 +8,7 @@ import re
 from subprocess import check_call, call, check_output
 import requests
 
-"""
+usage = """
 Example usage:
 
 ./dev-tools/cherrypick_pr --create_pr 5.0 2565 6490604aa0cf7fa61932a90700e6ca988fc8a527
@@ -38,7 +38,9 @@ PR.
 def main():
     """Main"""
     parser = argparse.ArgumentParser(
-        description="Creates a PR for merging two branches")
+        description="Creates a PR for merging two branches",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=usage)
     parser.add_argument("to_branch",
                         help="To branch (e.g 5.0)")
     parser.add_argument("pr_number",
