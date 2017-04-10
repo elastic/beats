@@ -112,7 +112,8 @@ inside the folder for the Beat. This will automatically open your browser with t
 ## Dependencies
 
 To manage the `vendor/` folder we use
-[glide](https://github.com/Masterminds/glide), which uses
-[glide.yaml](glide.yaml) as a manifest file for the dependencies. Please see
-the glide documentation on how to add or update vendored dependencies.
+[govendor](https://github.com/kardianos/govendor). Please see
+the govendor documentation on how to add or update vendored dependencies.
+
+In most cases `govendor fetch your/dependency@version +out` will get the job done.
 
