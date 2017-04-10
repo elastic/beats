@@ -27,7 +27,7 @@ This script does the following:
   remote
 * if the --create_pr flag is used, it uses the GitHub API to create the PR
   for you. Note that this requires you to have a Github token with the
-  public_repo scope in the `~/.github_token` file
+  public_repo scope in the `~/.elastic/github.token` file
 
 Note that you need to take the commit hashes from `git log` on the
 from_branch, copying the IDs from Github doesn't work in case we squashed the
@@ -56,7 +56,7 @@ def main():
                         help="From branch")
     parser.add_argument("--create_pr", action="store_true",
                         help="Create a PR using the Github API " +
-                        "(requires token in ~/.github_token)")
+                        "(requires token in ~/.elastic/github.token)")
     args = parser.parse_args()
 
     print(args)
@@ -108,7 +108,7 @@ def main():
               "https://github.com/elastic/beats/compare/{}...{}:{}?expand=1"
               .format(args.to_branch, remote, tmp_branch))
     else:
-        token = open(expanduser("~/.github_token"), "r").read().strip()
+        token = open(expanduser("~/.elastic/github.token"), "r").read().strip()
         base = "https://api.github.com/repos/elastic/beats"
         session = requests.Session()
         session.headers.update({"Authorization": "token " + token})
