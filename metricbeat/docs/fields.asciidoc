@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-haproxy>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
+* <<exported-fields-kubelet>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -3327,6 +3328,95 @@ Broker id
 type: keyword
 
 Broker address
+
+
+[[exported-fields-kubelet]]
+== kubelet Fields
+
+beta[]
+kubelet Module
+
+
+
+[float]
+== kubelet Fields
+
+
+
+
+[float]
+== container Fields
+
+node
+
+
+
+[float]
+=== kubelet.container.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== node Fields
+
+node
+
+
+
+[float]
+=== kubelet.node.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== pod Fields
+
+node
+
+
+
+[float]
+=== kubelet.pod.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== system Fields
+
+node
+
+
+
+[float]
+=== kubelet.system.example
+
+type: keyword
+
+Example field
+
+
+[float]
+== volume Fields
+
+node
+
+
+
+[float]
+=== kubelet.volume.example
+
+type: keyword
+
+Example field
 
 
 [[exported-fields-memcached]]

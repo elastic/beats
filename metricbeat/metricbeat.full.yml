@@ -182,6 +182,14 @@ metricbeat.modules:
   #username: ""
   #password: ""
 
+#------------------------------- kubelet Module ------------------------------
+#- module: kubelet
+#  metricsets: ["node","container","volume","pod","system"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["localhost:10255"]
+
+
 #------------------------------ memcached Module -----------------------------
 - module: memcached
   metricsets: ["stats"]

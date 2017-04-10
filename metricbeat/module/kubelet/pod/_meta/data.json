@@ -1,0 +1,33 @@
+{
+    "@timestamp": "2017-04-06T15:29:27.150Z",
+    "beat": {
+        "hostname": "beathost",
+        "name": "beathost",
+        "version": "6.0.0-alpha1"
+    },
+    "kubelet": {
+        "pod": {
+            "name": "nginx-3137573019-pcfzh",
+            "namespace": "ns",
+            "network": {
+                "rx": {
+                    "bytes": 18999261,
+                    "errors": 0
+                },
+                "tx": {
+                    "bytes": 28580621,
+                    "errors": 0
+                }
+            },
+            "node": "localhost",
+            "start_time": "2017-04-06T12:09:05Z"
+        }
+    },
+    "metricset": {
+        "host": "localhost:10255",
+        "module": "kubelet",
+        "name": "pod",
+        "rtt": 636230
+    },
+    "type": "metricsets"
+}

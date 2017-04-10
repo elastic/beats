@@ -1,0 +1,12 @@
+- key: kubelet
+  title: "kubelet"
+  description: >
+    beta[]
+
+    kubelet Module
+  short_config: false
+  fields:
+    - name: kubelet
+      type: group
+      description: >
+      fields:
