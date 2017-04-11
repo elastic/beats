@@ -168,12 +168,10 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 - The Docker, Kafka, and Prometheus modules are now Beta, instead of experimental. {pull}3525[3525]
 - The HAProxy module is now GA, instead of experimental. {pull}3525[3525]
 - Add the ability to collect the environment variables from system processes. {pull}3337[3337]
+- Adding support for custom http headers and TLS for metricbeat modules {pull}3945[3945]
 
 *Packetbeat*
 - Add DNS Tunneling dashboard to highlight domains with large numbers of subdomains or high data volume. {pull}3884[3884]
-
-*Winlogbeat*
-- Adding support for custom http headers and TLS for metricbeat modules {pull}3945[3945]
 
 ==== Deprecated
 
