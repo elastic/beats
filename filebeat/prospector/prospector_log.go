@@ -1,9 +1,11 @@
 package prospector
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester"
@@ -16,10 +18,6 @@ import (
 var (
 	filesRenamed   = monitoring.NewInt(nil, "filebeat.prospector.log.files.renamed")
 	filesTruncated = monitoring.NewInt(nil, "filebeat.prospector.log.files.truncated")
-)
-
-const (
-	doubleWildcardMaxDepth = 16
 )
 
 // Log contains the prospector and its config
@@ -116,21 +114,51 @@ func (l *Log) Run() {
 	}
 }
 
-// glob detects the use of "**" and expands it to standard glob patterns up to a max depth
-func glob(g string) ([]string, error) {
-	var globs []string
-	if filepath.Base(g) == "**" {
-		globs = []string{filepath.Join(filepath.Dir(g), "*")}
-		for level := 1; level < doubleWildcardMaxDepth; level++ {
-			globs = append(globs, filepath.Join(globs[level-1], "*"))
+// globPattern detects the use of "**" and expands it to standard glob patterns up to a max depth
+func (l *Log) globPatterns(pattern string) ([]string, error) {
+	if l.config.DoubleWildcardMaxDepth == 0 {
+		return []string{pattern}, nil
+	}
+	var patterns []string
+	isAbs := filepath.IsAbs(pattern)
+	patternList := strings.Split(pattern, "/")
+	for i, dir := range patternList {
+		if len(patterns) > 0 {
+			if dir == "**" {
+				err := fmt.Sprintf("glob(%s) failed: cannot specify multiple ** within a pattern", pattern)
+				logp.Err(err)
+				return nil, errors.New(err)
+			}
+			for i := range patterns {
+				patterns[i] = filepath.Join(patterns[i], dir)
+			}
+		} else if dir == "**" {
+			prefix := filepath.Join(patternList[:i]...)
+			if isAbs {
+				prefix = "/" + prefix
+			}
+			wildcards := ""
+			for j := uint8(0); j < l.config.DoubleWildcardMaxDepth; j++ {
+				wildcards = filepath.Join(wildcards, "*")
+				patterns = append(patterns, filepath.Join(prefix, wildcards))
+			}
 		}
-	} else {
-		globs = []string{g}
+	}
+	if len(patterns) == 0 {
+		patterns = []string{pattern}
+	}
+	return patterns, nil
+}
+
+func (l *Log) glob(pattern string) ([]string, error) {
+	patterns, err := l.globPatterns(pattern)
+	if err != nil {
+		return nil, err
 	}
 	var matches []string
-	for _, g := range globs {
+	for _, p := range patterns {
 		// Evaluate the path as a wildcards/shell glob
-		match, err := filepath.Glob(g)
+		match, err := filepath.Glob(p)
 		if err != nil {
 			return nil, err
 		}
@@ -146,9 +174,9 @@ func (l *Log) getFiles() map[string]os.FileInfo {
 	paths := map[string]os.FileInfo{}
 
 	for _, path := range l.config.Paths {
-		matches, err := glob(path)
+		matches, err := l.glob(path)
 		if err != nil {
-			logp.Err("glob(%s) failed: %v", glob, err)
+			logp.Err("glob(%s) failed: %v", path, err)
 			continue
 		}
 

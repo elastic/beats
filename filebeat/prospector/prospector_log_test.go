@@ -93,7 +93,6 @@ func TestGlob(t *testing.T) {
 			[]string{
 				"foo",
 				"foo/bar",
-				"foo/bar/baz",
 			},
 		},
 		{
@@ -109,24 +108,43 @@ func TestGlob(t *testing.T) {
 				"foo/bar/baz",
 			},
 		},
+		{
+			"foo/**/baz",
+			[]string{
+				"foo/bar/baz",
+			},
+		},
+		{
+			"foo/**/bazz",
+			[]string{},
+		},
 	}
 	root, err := ioutil.TempDir("", "testglob")
 	if err != nil {
 		t.Fatal(err)
 	}
-	os.MkdirAll(filepath.Join(root, "foo/bar/baz"), 0755)
+	os.MkdirAll(filepath.Join(root, "foo/bar/baz/qux"), 0755)
+	log := &Log{
+		config: prospectorConfig{
+			DoubleWildcardMaxDepth: 2,
+		},
+	}
 	for _, test := range tests {
-		matches, err := glob(filepath.Join(root, test.pattern))
+		pattern := filepath.Join(root, test.pattern)
+		matches, err := log.glob(pattern)
 		if err != nil {
 			t.Error(err)
 			continue
 		}
 		var normalizedMatches []string
 		for _, m := range matches {
+			if len(m) < len(root)+1 {
+				t.Fatalf("Matches are expected to be under %s and %q is not", root, m)
+			}
 			normalizedMatches = append(normalizedMatches, m[len(root)+1:])
 		}
 		matchError := func() {
-			t.Errorf("Pattern %q matched %q instead of %q", test.pattern, normalizedMatches, test.expectedMatches)
+			t.Fatalf("Pattern %q matched %q instead of %q", test.pattern, normalizedMatches, test.expectedMatches)
 		}
 		if len(normalizedMatches) != len(test.expectedMatches) {
 			matchError()
