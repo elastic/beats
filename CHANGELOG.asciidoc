@@ -128,6 +128,10 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 
 - Fix empty registry file on machine crash. {issue}3537[3537]
 
+*Heartbeat*
+
+- Add default ports in HTTP monitor. {pull}3924[3924]
+
 *Metricbeat*
 
 - Add error handling to system process metricset for when Linux cgroups are missing from the kernel. {pull}3692[3692]
@@ -157,6 +161,7 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 - The `symlinks` and `harverster_limit` settings are now GA, instead of experimental. {pull}3525[3525]
 - close_timeout is also applied when the output is blocking. {pull}3511[3511]
 - Improve handling of different path variants on Windows. {pull}3781[3781]
+- Add auditd module for reading audit logs on Linux. {pull}3750[3750] {pull}3941[3941]
 
 
 *Metricbeat*
@@ -174,14 +179,11 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 - Add the ability to collect the environment variables from system processes. {pull}3337[3337]
 - Add experimental metricset `perfmon` to Windows module. {pull}3758[3758]
 - Add memcached module with stats metricset. {pull}3693[3693]
+- Adding support for custom http headers and TLS for metricbeat modules {pull}3945[3945]
 
 *Packetbeat*
-- Add `fields` and `fields_under_root` to packetbeat protocols configurations. {pull}3518[3518]
-- Add list style packetbeat protocols configurations. This change supports specifying multiple configurations of the same protocol analyzer. {pull}3518[3518]
 - Add DNS dashboard for an overview the DNS traffic. {pull}3883[3883]
 - Add DNS Tunneling dashboard to highlight domains with large numbers of subdomains or high data volume. {pull}3884[3884]
-
-*Winlogbeat*
 
 ==== Deprecated
 

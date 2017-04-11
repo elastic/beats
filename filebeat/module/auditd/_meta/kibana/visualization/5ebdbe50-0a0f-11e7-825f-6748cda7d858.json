@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Audit Top Exec Commands\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"auditd.log.a0\",\"size\":30,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Command (arg 0)\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Audit Top Exec Commands", 
+  "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"auditd.log.record_type:EXECVE\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}
