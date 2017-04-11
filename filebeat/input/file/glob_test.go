@@ -1,5 +1,3 @@
-//+build !windows
-
 package file
 
 import (
@@ -9,76 +7,18 @@ import (
 	"testing"
 )
 
+type globTest struct {
+	pattern         string
+	expectedMatches []string
+}
+
 func TestGlob(t *testing.T) {
-	var tests = []struct {
-		pattern         string
-		expectedMatches []string
-	}{
-		{
-			"*",
-			[]string{
-				"foo",
-			},
-		},
-		{
-			"foo/*",
-			[]string{
-				"foo/bar",
-			},
-		},
-		{
-			"*/*",
-			[]string{
-				"foo/bar",
-			},
-		},
-		{
-			"**",
-			[]string{
-				"foo",
-				"foo/bar",
-				"foo/bar/baz",
-				"foo/bar/baz/qux",
-			},
-		},
-		{
-			"foo**",
-			[]string{
-				"foo",
-			},
-		},
-		{
-			"foo/**",
-			[]string{
-				"foo/bar",
-				"foo/bar/baz",
-				"foo/bar/baz/qux",
-				"foo/bar/baz/qux/quux",
-			},
-		},
-		{
-			"foo/**/baz",
-			[]string{
-				"foo/bar/baz",
-			},
-		},
-		{
-			"foo/**/bazz",
-			[]string{},
-		},
-		{
-			"foo//bar",
-			[]string{
-				"foo/bar",
-			},
-		},
-	}
 	root, err := ioutil.TempDir("", "testglob")
 	if err != nil {
 		t.Fatal(err)
 	}
 	os.MkdirAll(filepath.Join(root, "foo/bar/baz/qux/quux"), 0755)
-	for _, test := range tests {
+	for _, test := range globTests {
 		pattern := filepath.Join(root, test.pattern)
 		matches, err := Glob(pattern, 4)
 		if err != nil {
@@ -87,10 +27,16 @@ func TestGlob(t *testing.T) {
 		}
 		var normalizedMatches []string
 		for _, m := range matches {
-			if len(m) < len(root)+1 {
-				t.Fatalf("Matches are expected to be under %s and %q is not", root, m)
+			if len(m) < len(root) {
+				t.Fatalf("Matches for %q are expected to be under %s and %q is not", test.pattern, root, m)
 			}
-			normalizedMatches = append(normalizedMatches, m[len(root)+1:])
+			var normalizedMatch string
+			if len(m) > len(root) {
+				normalizedMatch = m[len(root)+1:]
+			} else {
+				normalizedMatch = m[len(root):]
+			}
+			normalizedMatches = append(normalizedMatches, normalizedMatch)
 		}
 		matchError := func() {
 			t.Fatalf("Pattern %q matched %q instead of %q", test.pattern, normalizedMatches, test.expectedMatches)

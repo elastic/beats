@@ -34,9 +34,9 @@ func globPatterns(pattern string, doubleStarPatternDepth uint8) ([]string, error
 				prefix = string(os.PathSeparator) + prefix
 			}
 			wildcards := ""
-			for j := uint8(0); j < doubleStarPatternDepth; j++ {
-				wildcards = filepath.Join(wildcards, "*")
+			for j := uint8(0); j <= doubleStarPatternDepth; j++ {
 				patterns = append(patterns, filepath.Join(prefix, wildcards))
+				wildcards = filepath.Join(wildcards, "*")
 			}
 		}
 	}
