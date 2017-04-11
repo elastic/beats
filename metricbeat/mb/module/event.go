@@ -103,7 +103,9 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 
 	// Adds error to event in case error happened
 	if b.fetchErr != nil {
-		event["error"] = b.fetchErr.Error()
+		event["error"] = common.MapStr{
+			"message": b.fetchErr.Error(),
+		}
 	}
 
 	return event, nil
