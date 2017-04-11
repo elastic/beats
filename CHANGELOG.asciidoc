@@ -123,7 +123,9 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 *Filebeat*
 
 - Fix empty registry file on machine crash. {issue}3537[3537]
+
 *Heartbeat*
+
 - Add default ports in HTTP monitor. {pull}3924[3924]
 
 *Metricbeat*
