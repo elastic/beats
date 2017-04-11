@@ -46,6 +46,7 @@ include::./capturing.asciidoc[]
 
 include::./thrift.asciidoc[]
 
+:standalone:
 :allplatforms:
 include::../../libbeat/docs/yaml.asciidoc[]
 
