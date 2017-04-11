@@ -1,0 +1,38 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "stats": {
+            "docs": {
+                "count": 4,
+                "deleted": 0
+            },
+            "segments": {
+                "count": 4,
+                "memory": {
+                    "bytes": 6647
+                }
+            },
+            "shards": {
+                "failed": 0,
+                "successful": 11,
+                "total": 22
+            },
+            "store": {
+                "size": {
+                    "bytes": 16148
+                }
+            }
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:9200",
+        "module": "elasticsearch",
+        "name": "stats",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

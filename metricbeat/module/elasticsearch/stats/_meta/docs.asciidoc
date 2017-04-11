@@ -1,0 +1,3 @@
+=== elasticsearch stats MetricSet
+
+This is the stats metricset of the module elasticsearch. This provides statistics across all indices.

@@ -19,6 +19,7 @@ grouped in the following categories:
 * <<exported-fields-common>>
 * <<exported-fields-couchbase>>
 * <<exported-fields-docker>>
+* <<exported-fields-elasticsearch>>
 * <<exported-fields-golang>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-jolokia>>
@@ -1841,6 +1842,93 @@ Total errors on outgoing packets.
 type: long
 
 Total number of outgoing packets.
+
+
+[[exported-fields-elasticsearch]]
+== elasticsearch Fields
+
+[]experimental
+elasticsearch Module
+
+
+
+[float]
+== elasticsearch Fields
+
+
+
+
+[float]
+== stats Fields
+
+stats
+
+
+
+[float]
+=== elasticsearch.stats.docs.count
+
+type: long
+
+Total number of existing documents.
+
+
+[float]
+=== elasticsearch.stats.docs.deleted
+
+type: long
+
+Total number of deleted documents.
+
+
+[float]
+=== elasticsearch.stats.segments.count
+
+type: long
+
+Total number of segments.
+
+
+[float]
+=== elasticsearch.stats.segments.memory.bytes
+
+type: long
+
+format: bytes
+
+Total size of segments in bytes.
+
+
+[float]
+=== elasticsearch.stats.shards.failed
+
+type: long
+
+Number of failed shards.
+
+
+[float]
+=== elasticsearch.stats.shards.successful
+
+type: long
+
+Number of successful shards.
+
+
+[float]
+=== elasticsearch.stats.shards.total
+
+type: long
+
+Total number of shards.
+
+
+[float]
+=== elasticsearch.stats.store.size.bytes
+
+type: long
+
+Total size of the store in bytes.
 
 
 [[exported-fields-golang]]
