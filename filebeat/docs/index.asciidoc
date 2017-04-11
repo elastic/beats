@@ -46,6 +46,7 @@ include::./multiple-prospectors.asciidoc[]
 
 include::./load-balancing.asciidoc[]
 
+:standalone:
 :allplatforms:
 include::../../libbeat/docs/yaml.asciidoc[]
 
