@@ -41,7 +41,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("BETA: The kubelet volume metricset is alpha")
+	logp.Beta("The kubelet volume metricset is beta")
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          helper.NewHTTP(base),
