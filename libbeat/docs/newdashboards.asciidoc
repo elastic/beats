@@ -32,7 +32,7 @@ The following topics provide more detail about importing and working with Beats 
 
 You can use the `import_dashboards` script to import all the dashboards and the index pattern for a Beat, including the dependencies such as visualizations and searches.
 The `import_dashboards` script is available under
-https://github.com/elastic/beats/tree/master/libbeat/dashboards[beats/libbeat/dashboards]. It's also available in each Beat package under the `scripts` directory.
+https://github.com/elastic/beats/tree/master/dev-tools/cmd/import_dashboards[beats/dev-tools/cmd/import_dashboards]. It's also available in each Beat package under the `scripts` directory.
 
 There are a couple of common use cases for importing dashboards:
 
@@ -99,11 +99,11 @@ See <<import-dashboard-options>> for a description of other import options.
 [[import-dashboards-for-development]]
 ==== Import Dashboards for Development
 
-For development or community Beats, it's easier to run the `import_dashboards` script from the https://github.com/elastic/beats/tree/master/libbeat/dashboards[beats/libbeat/dashboards] directory. In this case, you need to first compile the script:
+For development or community Beats, it's easier to run the `import_dashboards` script from the https://github.com/elastic/beats/tree/master/dev-tools/cmd/import_dashboards[beats/dev-tools/cmd/import_dashboards] directory. In this case, you need to first compile the script:
 
 [source,shell]
 -----------------------
-cd beats/libbeat/dashboards
+cd beats/dev-tools/cmd/import_dashboards
 make
 -----------------------
 
@@ -115,7 +115,7 @@ searches, and the Metricbeat index pattern:
 
 [source,shell]
 -----------------
-beats/libbeat/dashboards/import_dashboards -beat metricbeat
+beats/dev-tools/cmd/import_dashboards/import_dashboards -beat metricbeat
 -----------------
 
 For this example, you must specify `-beat metricbeat`. If the `-beat` option is not
@@ -126,7 +126,7 @@ dashboards. If Elasticsearch is running on localhost, then you can run the follo
 
 [source,shell]
 --------------------------------
-make import-dashboards
+make -C <beat> import-dashboards
 --------------------------------
 
 If Elasticsearch is running on a different host, then you can use the `ES_URL` variable:
