@@ -18,7 +18,7 @@ func TestQuery(t *testing.T) {
 	}
 	defer q.Close()
 
-	err = q.AddCounter(processorTimeCounter)
+	err = q.AddCounter(processorTimeCounter, "float")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,6 +49,7 @@ func TestExistingCounter(t *testing.T) {
 	config := make([]CounterConfig, 1)
 	config[0].Alias = "processor.time.total.pct"
 	config[0].Query = processorTimeCounter
+	config[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
 	if err != nil {
 		t.Fatal(err)
@@ -67,6 +68,7 @@ func TestNonExistingCounter(t *testing.T) {
 	config := make([]CounterConfig, 1)
 	config[0].Alias = "processor.time.total.pct"
 	config[0].Query = "\\Processor Information(_Total)\\not existing counter"
+	config[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
 	if assert.Error(t, err) {
 		assert.EqualValues(t, PDH_CSTATUS_NO_COUNTER, errors.Cause(err))
@@ -82,6 +84,7 @@ func TestNonExistingObject(t *testing.T) {
 	config := make([]CounterConfig, 1)
 	config[0].Alias = "processor.time.total.pct"
 	config[0].Query = "\\non existing object\\% Processor Performance"
+	config[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
 	if assert.Error(t, err) {
 		assert.EqualValues(t, PDH_CSTATUS_NO_OBJECT, errors.Cause(err))
