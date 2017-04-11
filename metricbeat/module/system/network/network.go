@@ -54,7 +54,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch fetches disk IO metrics from the OS.
+// Fetch fetches network IO metrics from the OS.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	stats, err := net.IOCounters(true)
 	if err != nil {
