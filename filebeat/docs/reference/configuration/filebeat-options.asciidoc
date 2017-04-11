@@ -41,11 +41,18 @@ supported by https://golang.org/pkg/path/filepath/#Glob[Golang Glob] are also
 supported here. For example, to fetch all files from a predefined level of
 subdirectories, the following pattern can be used: `/var/log/*/*.log`. This
 fetches all `.log` files from the subfolders of `/var/log`. It does not
-fetch log files from the `/var/log` folder itself. Currently it is not possible
-to recursively fetch all files in all subdirectories of a directory.
+fetch log files from the `/var/log` folder itself.
+It is possible to recursively fetch all files in all subdirectories of a directory
+using the optional <<double_star_pattern_depth>> setting.
 
 Filebeat starts a harvester for each file that it finds under the specified
 paths. You can specify one path per line. Each line begins with a dash (-).
+
+===== double_star_pattern_depth
+
+The maximum depth for `**` patterns. This setting is disabled by default, i.e.,
+`**` is not expanded. When it's set to a positive value, a single `**` per
+path is allowed up to the value of the setting.
 
 ===== encoding
 
@@ -589,4 +596,3 @@ include::../../../../libbeat/docs/dashboardsconfig.asciidoc[]
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
 include::../../../../libbeat/docs/processors-config.asciidoc[]
-

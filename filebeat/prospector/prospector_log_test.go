@@ -3,9 +3,7 @@
 package prospector
 
 import (
-	"io/ioutil"
 	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -64,96 +62,3 @@ func (t TestFileInfo) Mode() os.FileMode  { return 0 }
 func (t TestFileInfo) ModTime() time.Time { return t.time }
 func (t TestFileInfo) IsDir() bool        { return false }
 func (t TestFileInfo) Sys() interface{}   { return nil }
-
-func TestGlob(t *testing.T) {
-	var tests = []struct {
-		pattern         string
-		expectedMatches []string
-	}{
-		{
-			"*",
-			[]string{
-				"foo",
-			},
-		},
-		{
-			"foo/*",
-			[]string{
-				"foo/bar",
-			},
-		},
-		{
-			"*/*",
-			[]string{
-				"foo/bar",
-			},
-		},
-		{
-			"**",
-			[]string{
-				"foo",
-				"foo/bar",
-			},
-		},
-		{
-			"foo**",
-			[]string{
-				"foo",
-			},
-		},
-		{
-			"foo/**",
-			[]string{
-				"foo/bar",
-				"foo/bar/baz",
-			},
-		},
-		{
-			"foo/**/baz",
-			[]string{
-				"foo/bar/baz",
-			},
-		},
-		{
-			"foo/**/bazz",
-			[]string{},
-		},
-	}
-	root, err := ioutil.TempDir("", "testglob")
-	if err != nil {
-		t.Fatal(err)
-	}
-	os.MkdirAll(filepath.Join(root, "foo/bar/baz/qux"), 0755)
-	log := &Log{
-		config: prospectorConfig{
-			DoubleWildcardMaxDepth: 2,
-		},
-	}
-	for _, test := range tests {
-		pattern := filepath.Join(root, test.pattern)
-		matches, err := log.glob(pattern)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-		var normalizedMatches []string
-		for _, m := range matches {
-			if len(m) < len(root)+1 {
-				t.Fatalf("Matches are expected to be under %s and %q is not", root, m)
-			}
-			normalizedMatches = append(normalizedMatches, m[len(root)+1:])
-		}
-		matchError := func() {
-			t.Fatalf("Pattern %q matched %q instead of %q", test.pattern, normalizedMatches, test.expectedMatches)
-		}
-		if len(normalizedMatches) != len(test.expectedMatches) {
-			matchError()
-			continue
-		}
-		for i, expectedMatch := range test.expectedMatches {
-			if normalizedMatches[i] != expectedMatch {
-				matchError()
-			}
-		}
-	}
-}

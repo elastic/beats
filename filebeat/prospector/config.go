@@ -13,16 +13,11 @@ import (
 
 var (
 	defaultConfig = prospectorConfig{
-		Enabled:        true,
-		DocumentType:   "log",
-		IgnoreOlder:    0,
-		ScanFrequency:  10 * time.Second,
-		InputType:      cfg.DefaultInputType,
-		CleanInactive:  0,
-		CleanRemoved:   true,
-		HarvesterLimit: 0,
-		Symlinks:       false,
-		TailFiles:      false,
+		Enabled:       true,
+		DocumentType:  "log",
+		ScanFrequency: 10 * time.Second,
+		InputType:     cfg.DefaultInputType,
+		CleanRemoved:  true,
 	}
 )
 
@@ -45,7 +40,7 @@ type prospectorConfig struct {
 	Module                 string                  `config:"_module_name"`  // hidden option to set the module name
 	Fileset                string                  `config:"_fileset_name"` // hidden option to set the fileset name
 	Processors             processors.PluginConfig `config:"processors"`
-	DoubleWildcardMaxDepth uint8                   `config:"double_wildcard_max_depth"`
+	DoubleStarPatternDepth uint8                   `config:"double_star_pattern_depth"`
 }
 
 func (config *prospectorConfig) Validate() error {

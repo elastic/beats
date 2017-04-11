@@ -1,11 +1,9 @@
 package prospector
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester"
@@ -114,59 +112,6 @@ func (l *Log) Run() {
 	}
 }
 
-// globPattern detects the use of "**" and expands it to standard glob patterns up to a max depth
-func (l *Log) globPatterns(pattern string) ([]string, error) {
-	if l.config.DoubleWildcardMaxDepth == 0 {
-		return []string{pattern}, nil
-	}
-	var patterns []string
-	isAbs := filepath.IsAbs(pattern)
-	patternList := strings.Split(pattern, "/")
-	for i, dir := range patternList {
-		if len(patterns) > 0 {
-			if dir == "**" {
-				err := fmt.Sprintf("glob(%s) failed: cannot specify multiple ** within a pattern", pattern)
-				logp.Err(err)
-				return nil, errors.New(err)
-			}
-			for i := range patterns {
-				patterns[i] = filepath.Join(patterns[i], dir)
-			}
-		} else if dir == "**" {
-			prefix := filepath.Join(patternList[:i]...)
-			if isAbs {
-				prefix = "/" + prefix
-			}
-			wildcards := ""
-			for j := uint8(0); j < l.config.DoubleWildcardMaxDepth; j++ {
-				wildcards = filepath.Join(wildcards, "*")
-				patterns = append(patterns, filepath.Join(prefix, wildcards))
-			}
-		}
-	}
-	if len(patterns) == 0 {
-		patterns = []string{pattern}
-	}
-	return patterns, nil
-}
-
-func (l *Log) glob(pattern string) ([]string, error) {
-	patterns, err := l.globPatterns(pattern)
-	if err != nil {
-		return nil, err
-	}
-	var matches []string
-	for _, p := range patterns {
-		// Evaluate the path as a wildcards/shell glob
-		match, err := filepath.Glob(p)
-		if err != nil {
-			return nil, err
-		}
-		matches = append(matches, match...)
-	}
-	return matches, nil
-}
-
 // getFiles returns all files which have to be harvested
 // All globs are expanded and then directory and excluded files are removed
 func (l *Log) getFiles() map[string]os.FileInfo {
@@ -174,7 +119,7 @@ func (l *Log) getFiles() map[string]os.FileInfo {
 	paths := map[string]os.FileInfo{}
 
 	for _, path := range l.config.Paths {
-		matches, err := l.glob(path)
+		matches, err := file.Glob(path, l.config.DoubleStarPatternDepth)
 		if err != nil {
 			logp.Err("glob(%s) failed: %v", path, err)
 			continue
