@@ -1,0 +1,94 @@
+[
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "log",
+        "_id": "AVrNfcrUJruQA3hgXR1I",
+        "_version": 1,
+        "_score": null,
+        "_source": {
+            "offset": 172,
+            "input_type": "log",
+            "source": "/Users/me/go/src/github.com/elastic/beats/filebeat/module/auditd/log/test/test.log",
+            "fileset": {
+                "module": "auditd",
+                "name": "log"
+            },
+            "type": "log",
+            "error": "",
+            "@timestamp": "2017-01-31T20:18:46.912Z",
+            "auditd": {
+                "log": {
+                    "ses": "4294967295",
+                    "op": "SPD-delete",
+                    "res": "1",
+                    "auid": "4294967295",
+                    "dst": "192.168.0.0",
+                    "src": "192.168.2.0",
+                    "sequence": 18877201,
+                    "src_prefixlen": "24",
+                    "record_type": "MAC_IPSEC_EVENT",
+                    "dst_prefixlen": "16"
+                }
+            },
+            "beat": {
+                "hostname": "macbook.local",
+                "name": "macbook.local",
+                "version": "6.0.0-alpha1"
+            }
+        }
+    },
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "log",
+        "_id": "AVrNfcrUJruQA3hgXR1J",
+        "_version": 1,
+        "_score": null,
+        "_source": {
+            "offset": 534,
+            "input_type": "log",
+            "source": "/Users/me/go/src/github.com/elastic/beats/filebeat/module/auditd/log/test/test.log",
+            "fileset": {
+                "module": "auditd",
+                "name": "log"
+            },
+            "type": "log",
+            "error": "",
+            "@timestamp": "2017-01-31T20:18:46.912Z",
+            "auditd": {
+                "log": {
+                    "syscall": "44",
+                    "gid": "0",
+                    "fsgid": "0",
+                    "pid": "1281",
+                    "suid": "0",
+                    "record_type": "SYSCALL",
+                    "uid": "0",
+                    "egid": "0",
+                    "exe": "/usr/libexec/strongswan/charon (deleted)",
+                    "sgid": "0",
+                    "ses": "4294967295",
+                    "auid": "4294967295",
+                    "comm": "charon",
+                    "euid": "0",
+                    "sequence": 18877199,
+                    "a0": "9",
+                    "ppid": "1240",
+                    "a1": "7f564b2672a0",
+                    "fsuid": "0",
+                    "exit": "184",
+                    "a2": "b8",
+                    "a3": "0",
+                    "success": "yes",
+                    "tty": "(none)",
+                    "arch": "x86_64",
+                    "items": "0"
+                }
+            },
+            "beat": {
+                "hostname": "macbook.local",
+                "name": "macbook.local",
+                "version": "6.0.0-alpha1"
+            }
+        }
+    }
+]

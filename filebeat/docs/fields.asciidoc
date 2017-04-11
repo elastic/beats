@@ -13,6 +13,7 @@ This document describes the fields that are exported by Filebeat. They are
 grouped in the following categories:
 
 * <<exported-fields-apache2>>
+* <<exported-fields-auditd>>
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-log>>
@@ -283,6 +284,154 @@ The thread ID.
 type: keyword
 
 The module producing the logged message.
+
+
+[[exported-fields-auditd]]
+== Auditd Fields
+
+Module for parsing auditd logs.
+
+
+
+[float]
+== auditd Fields
+
+Fields from the auditd logs.
+
+
+
+[float]
+== log Fields
+
+Fields from the Linux audit log. Not all fields are documented here because they are dynamic and vary by audit event type.
+
+
+
+[float]
+=== auditd.log.record_type
+
+The audit event type.
+
+
+[float]
+=== auditd.log.old_auid
+
+For login events this is the old audit ID used for the user prior to this login.
+
+
+[float]
+=== auditd.log.new_auid
+
+For login events this is the new audit ID. The audit ID can be used to trace future events to the user even if their identity changes (like becoming root).
+
+
+[float]
+=== auditd.log.old_ses
+
+For login events this is the old session ID used for the user prior to this login.
+
+
+[float]
+=== auditd.log.new_ses
+
+For login events this is the new session ID. It can be used to tie a user to future events by session ID.
+
+
+[float]
+=== auditd.log.sequence
+
+type: long
+
+The audit event sequence number.
+
+
+[float]
+=== auditd.log.acct
+
+The user account name associated with the event.
+
+
+[float]
+=== auditd.log.pid
+
+The ID of the process.
+
+
+[float]
+=== auditd.log.ppid
+
+The ID of the process.
+
+
+[float]
+=== auditd.log.items
+
+The number of items in an event.
+
+
+[float]
+=== auditd.log.item
+
+The item field indicates which item out of the total number of items. This number is zero-based; a value of 0 means it is the first item.
+
+
+[float]
+=== auditd.log.a0
+
+The first argument to the system call.
+
+
+[float]
+=== auditd.log.res
+
+The result of the system call (success or failure).
+
+
+[float]
+== geoip Fields
+
+Contains GeoIP information gathered based on the `auditd.log.addr` field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== auditd.log.geoip.continent_name
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== auditd.log.geoip.city_name
+
+type: keyword
+
+The name of the city.
+
+
+[float]
+=== auditd.log.geoip.region_name
+
+type: keyword
+
+The name of the region.
+
+
+[float]
+=== auditd.log.geoip.country_iso_code
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== auditd.log.geoip.location
+
+type: geo_point
+
+The longitude and latitude.
 
 
 [[exported-fields-beat]]
