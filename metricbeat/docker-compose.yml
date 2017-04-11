@@ -19,6 +19,7 @@ services:
       - ${PWD}/module/apache/_meta/env
       - ${PWD}/module/ceph/_meta/env
       - ${PWD}/module/couchbase/_meta/env
+      - ${PWD}/module/elasticsearch/_meta/env
       - ${PWD}/module/haproxy/_meta/env
       - ${PWD}/module/jolokia/_meta/env
       - ${PWD}/module/kafka/_meta/env
@@ -38,22 +39,23 @@ services:
   proxy_dep:
     image: busybox
     depends_on:
-      apache:     { condition: service_healthy }
-      ceph:       { condition: service_healthy }
-      couchbase:  { condition: service_healthy }
-      haproxy:    { condition: service_healthy }
-      jolokia:    { condition: service_healthy }
-      kafka:      { condition: service_healthy }
-      kibana:      { condition: service_healthy }
-      memcached:  { condition: service_healthy }
-      mongodb:    { condition: service_healthy }
-      mysql:      { condition: service_healthy }
-      nginx:      { condition: service_healthy }
-      phpfpm:     { condition: service_healthy }
-      postgresql: { condition: service_healthy }
-      prometheus: { condition: service_healthy }
-      redis:      { condition: service_healthy }
-      zookeeper:  { condition: service_healthy }
+      apache:         { condition: service_healthy }
+      ceph:           { condition: service_healthy }
+      couchbase:      { condition: service_healthy }
+      elasticsearch:  { condition: service_healthy }
+      haproxy:        { condition: service_healthy }
+      jolokia:        { condition: service_healthy }
+      kafka:          { condition: service_healthy }
+      kibana:         { condition: service_healthy }
+      memcached:      { condition: service_healthy }
+      mongodb:        { condition: service_healthy }
+      mysql:          { condition: service_healthy }
+      nginx:          { condition: service_healthy }
+      phpfpm:         { condition: service_healthy }
+      postgresql:     { condition: service_healthy }
+      prometheus:     { condition: service_healthy }
+      redis:          { condition: service_healthy }
+      zookeeper:      { condition: service_healthy }
 
   # Modules
   apache:
@@ -64,6 +66,11 @@ services:
 
   couchbase:
     build: ${PWD}/module/couchbase/_meta
+
+  elasticsearch:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
 
   haproxy:
     build: ${PWD}/module/haproxy/_meta
