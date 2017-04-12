@@ -8,11 +8,12 @@ import (
 )
 
 type MultilineConfig struct {
-	Negate   bool           `config:"negate"`
-	Match    string         `config:"match"       validate:"required"`
-	MaxLines *int           `config:"max_lines"`
-	Pattern  match.Matcher  `config:"pattern"`
-	Timeout  *time.Duration `config:"timeout"     validate:"positive"`
+	Negate       bool           `config:"negate"`
+	Match        string         `config:"match"       validate:"required"`
+	MaxLines     *int           `config:"max_lines"`
+	Pattern      match.Matcher  `config:"pattern"`
+	Timeout      *time.Duration `config:"timeout"     validate:"positive"`
+	FlushPattern *match.Matcher `config:"flush_pattern"`
 }
 
 func (c *MultilineConfig) Validate() error {
