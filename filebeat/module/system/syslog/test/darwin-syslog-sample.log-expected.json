@@ -58,5 +58,33 @@
       },
       "type" : "log"
     }
+  },
+  {
+    "_index": "test-filebeat-modules",
+    "_type": "doc",
+    "_id": "AVtFVFY1nbkdi71WgGxo",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2017-04-04T03:39:57.000Z",
+      "system": {
+        "syslog": {
+          "message": "--- last message repeated 1 time ---",
+          "timestamp": "Apr 4 03:39:57"
+        }
+      },
+      "offset": 1228,
+      "beat": {
+        "hostname": "a-mac-with-esc-key-2.local",
+        "name": "a-mac-with-esc-key-2.local",
+        "version": "6.0.0-alpha1"
+      },
+      "input_type": "log",
+      "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/syslog/test/darwin-syslog-sample.log",
+      "fileset": {
+        "module": "system",
+        "name": "syslog"
+      },
+      "type": "log"
+    }
   }
 ]
