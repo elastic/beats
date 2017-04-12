@@ -48,6 +48,7 @@ include::./thrift.asciidoc[]
 
 include::./maintaining-topology.asciidoc[]
 
+:standalone:
 :allplatforms:
 include::../../libbeat/docs/yaml.asciidoc[]
 
