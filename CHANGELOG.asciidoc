@@ -38,6 +38,10 @@ https://github.com/elastic/beats/compare/v5.3.0...master[Check the HEAD diff]
 *Metricbeat*
 
 - Avoid errors when some Apache status fields are missing. {issue}3074[3074]
+- Linux cgroup metrics are now enabled by default for the system process
+  metricset. The configuration option for the feature was renamed from
+  `cgroups` to `process.cgroups.enabled`. {pull}3519[3519]
+- Change fieldnames couchbase.node.couch.*.actual_disk_size.* to couchbase.node.couch.*.disk_size.* {pull}3545[3545]
 
 *Packetbeat*
 
@@ -181,6 +185,8 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 - The Docker, Kafka, and Prometheus modules are now Beta, instead of experimental. {pull}3525[3525]
 - The HAProxy module is now GA, instead of experimental. {pull}3525[3525]
 - Add the ability to collect the environment variables from system processes. {pull}3337[3337]
+- Add experimental metricset `perfmon` to Windows module. {pull}3758[3758]
+- Add memcached module with stats metricset. {pull}3693[3693]
 - Adding support for custom http headers and TLS for metricbeat modules {pull}3945[3945]
 - Add experimental metricset `perfmon` to Windows module. {pull}3758[3758]
 - Add memcached module with stats metricset. {pull}3693[3693]
@@ -197,6 +203,10 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 *Winlogbeat*
 
 *Packetbeat*
+- Add DNS Tunneling dashboard to highlight domains with large numbers of subdomains or high data volume. {pull}3884[3884]
+
+*Packetbeat*
+- Add DNS dashboard for an overview the DNS traffic. {pull}3883[3883]
 - Add DNS Tunneling dashboard to highlight domains with large numbers of subdomains or high data volume. {pull}3884[3884]
 
 ==== Deprecated
