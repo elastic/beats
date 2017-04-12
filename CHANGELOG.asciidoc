@@ -196,6 +196,9 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 
 *Winlogbeat*
 
+*Packetbeat*
+- Add DNS Tunneling dashboard to highlight domains with large numbers of subdomains or high data volume. {pull}3884[3884]
+
 ==== Deprecated
 
 *Affecting all Beats*
