@@ -426,6 +426,37 @@ type: object
 Contains user configurable fields.
 
 
+[float]
+== error Fields
+
+Error fields containing additional info in case of errors.
+
+
+
+[float]
+=== error.message
+
+type: text
+
+Error message.
+
+
+[float]
+=== error.code
+
+type: long
+
+Error code.
+
+
+[float]
+=== error.type
+
+type: keyword
+
+Error type.
+
+
 [[exported-fields-ceph]]
 == ceph Fields
 
