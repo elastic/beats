@@ -64,6 +64,7 @@ updateConfigFile() {
 
 # Main
 
+readParams
 updateConfigFile
 waitForElasticsearch
 exec "$@"

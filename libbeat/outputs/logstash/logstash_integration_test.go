@@ -219,15 +219,18 @@ func (es *esConnection) Count() (int, error) {
 	return resp.Count, nil
 }
 
-func waitUntilTrue(duration time.Duration, fn func() bool) bool {
+func waitUntilTrue(duration time.Duration, fn func() bool) (bool, time.Duration) {
 	end := time.Now().Add(duration)
+	var timeSlept time.Duration
+	sleepTime := 100 * time.Millisecond
 	for time.Now().Before(end) {
 		if fn() {
-			return true
+			return true, timeSlept
 		}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(sleepTime)
+		timeSlept += sleepTime
 	}
-	return false
+	return false, timeSlept
 }
 
 func checkIndex(reader esCountReader, minValues int) func() bool {
@@ -269,10 +272,18 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 		"type":       "log",
 		"message":    "hello world",
 	}}
-	ls.PublishEvent(nil, testOptions, event)
+	err := ls.PublishEvent(nil, testOptions, event)
+	if err != nil {
+		t.Fatalf("failed to publish to Logstash: %s", err)
+	}
 
 	// wait for logstash event flush + elasticsearch
-	waitUntilTrue(5*time.Second, checkIndex(ls, 1))
+	timeout := 5 * time.Second
+	if ok, waited := waitUntilTrue(timeout, checkIndex(ls, 1)); !ok {
+		t.Fatalf("Logstash event flush timed out after %s", timeout)
+	} else {
+		t.Logf("Logstash event flushed after %s", waited)
+	}
 
 	// search value in logstash elasticsearch index
 	resp, err := ls.Read()
@@ -377,8 +388,9 @@ func testSendMultipleBatchesViaLogstash(
 	}
 
 	// wait for logstash event flush + elasticsearch
-	ok := waitUntilTrue(5*time.Second, checkIndex(ls, numBatches*batchSize))
+	ok, waited := waitUntilTrue(5*time.Second, checkIndex(ls, numBatches*batchSize))
 	assert.True(t, ok) // check number of events matches total number of events
+	t.Logf("Logstash event flushed after %s", waited)
 
 	// search value in logstash elasticsearch index
 	resp, err := ls.Read()
