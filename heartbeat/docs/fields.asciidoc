@@ -76,6 +76,37 @@ type: object
 Contains user configurable fields.
 
 
+[float]
+== error Fields
+
+Error fields containing additional info in case of errors.
+
+
+
+[float]
+=== error.message
+
+type: text
+
+Error message.
+
+
+[float]
+=== error.code
+
+type: long
+
+Error code.
+
+
+[float]
+=== error.type
+
+type: keyword
+
+Error type.
+
+
 [[exported-fields-cloud]]
 == Cloud Provider Metadata Fields
 
@@ -323,28 +354,5 @@ type: boolean
 required: True
 
 Boolean indicator if monitor could validate the service to be available.
-
-
-[float]
-== error Fields
-
-Reason monitor flagging a service as down.
-
-
-
-[float]
-=== error.type
-
-type: keyword
-
-Failure type. For example `io` or `validate`.
-
-
-[float]
-=== error.message
-
-type: text
-
-Failure description.
 
 

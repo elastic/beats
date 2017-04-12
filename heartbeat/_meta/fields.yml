@@ -130,17 +130,3 @@
       description: >
         Boolean indicator if monitor could validate the service to be available.
 
-    - name: error
-      type: group
-      description: >
-        Reason monitor flagging a service as down.
-      fields:
-        - name: type
-          type: keyword
-          description: >
-            Failure type. For example `io` or `validate`.
-
-        - name: message
-          type: text
-          description: >
-            Failure description.

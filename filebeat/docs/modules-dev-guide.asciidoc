@@ -159,7 +159,7 @@ exclude_files: [".gz$"]
 
 You'll find this example in the template file that gets generated automatically
 when you run `make create-fileset`. In this example, the `paths` variable is
-used to construct the `paths` list for the <<prospector-paths>> option. 
+used to construct the `paths` list for the <<prospector-paths>> option.
 
 Any template files that you add to the `config/` folder need to generate a valid
 Filebeat prospector configuration in YAML format. The options accepted by the
@@ -167,7 +167,7 @@ prospector configuration are documented in this
 <<configuration-filebeat-options,section>>.
 
 The template files use the templating language defined by the
-https://golang.org/pkg/text/template/[Golang standard library]. 
+https://golang.org/pkg/text/template/[Golang standard library].
 
 Here is another example that also configures multiline stitching:
 
@@ -192,7 +192,7 @@ variables to dynamically switch between configurations.
 [float]
 ==== ingest/*.json
 
-The `ingest/` folder contains Elasticsearch 
+The `ingest/` folder contains Elasticsearch
 {elasticsearch}/ingest.html[Ingest Node] pipeline configurations. The Ingest
 Node pipelines are responsible for parsing the log lines and doing other
 manipulations on the data.
@@ -212,7 +212,7 @@ The generator creates a JSON object similar to this one:
     ],
   "on_failure" : [{
     "set" : {
-      "field" : "error",
+      "field" : "error.message",
       "value" : "{{ _ingest.on_failure_message }}"
     }
   }]
@@ -221,7 +221,7 @@ The generator creates a JSON object similar to this one:
 
 From here, you would typically add processors to the `processors` array to do
 the actual parsing. For details on how to use ingest node processors, see the
-{elasticsearch}/ingest-processors.html[ingest node documentation]. In 
+{elasticsearch}/ingest-processors.html[ingest node documentation]. In
 particular, you will likely find the
 {elasticsearch}/grok-processor.html[Grok processor] to be useful for parsing.
 Here is an example for parsing the Nginx access logs.

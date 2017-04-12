@@ -65,7 +65,7 @@ func TestEventBuilderError(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, errFetch.Error(), event["error"])
+	assert.Equal(t, errFetch.Error(), event["error"].(common.MapStr)["message"])
 }
 
 func TestEventBuilderNoHost(t *testing.T) {
