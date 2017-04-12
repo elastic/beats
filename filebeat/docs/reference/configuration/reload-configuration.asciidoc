@@ -3,11 +3,17 @@
 
 beta[]
 
-Reload configuration allows to dynamically reload prospector configuration files. A glob can be defined which should be watched
- for prospector configuration changes. New prospectors will be started / stopped accordingly. This is especially useful in
- container environments where 1 container is used to tail logs from services in other containers on the same host.
+You can configure Filebeat to dynamically reload prospector configuration files
+when there are changes. To do this, you specify a path 
+(https://golang.org/pkg/path/filepath/#Glob[Glob]) to watch for prospector
+configuration changes. When the files found by the Glob change, new prospectors
+are started/stopped according to changes in the configuration files.
 
-The configuration in the main filebeat.yml config file looks as following:
+This feature is especially useful in container environments where one container
+is used to tail logs for services running in other containers on the same host.
+
+To enable dynamic config reloading, you specify the `path` and `reload` options
+in the main `filebeat.yml` config file. For example: 
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -17,11 +23,16 @@ filebeat.config.prospectors:
   reload.period: 10s
 ------------------------------------------------------------------------------
 
-A path with a glob must be defined on which files should be checked for changes. A period is set on how often
-the files are checked for changes. Do not set period below 1s as the modification time of files is often stored in seconds.
-Setting it below 1s will cause an unnecessary overhead.
+`path`:: A Glob that defines the files to check for changes. 
+`reload.enabled`:: When set to `true`, enables dynamic config reload. 
+`reload.period`:: Specifies how often the files are checked for changes. Do not
+set the `period` to less than 1s because the modification time of files is often
+stored in seconds. Setting the `period` to less than 1s will result in
+unnecessary overhead.
 
-The configuration inside the files which are found by the glob look as following:
+Each file found by the Glob must contain a list of one or more prospector
+definitions. For example: 
+
 [source,yaml]
 ------------------------------------------------------------------------------
 - input_type: log
@@ -35,7 +46,6 @@ The configuration inside the files which are found by the glob look as following
   scan_frequency: 5s
 ------------------------------------------------------------------------------
 
-Each file directly contains a list of prospectors. Each file can contain one or multiple prospector definitions.
-
-WARNING: It is critical that two running prospectors DO NOT have overlapping file paths defined. If more then one prospector
-harvests the same file at the same time, it can lead to unexpected behaviour.
+WARNING: It is critical that two running prospectors DO NOT have overlapping
+file paths defined. If more than one prospector harvests the same file at the
+same time, it can lead to unexpected behaviour.
