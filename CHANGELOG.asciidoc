@@ -143,6 +143,7 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 *Winlogbeat*
 
 - Fix handling of empty strings in event_data. {pull}3705[3705]
+- Fix null terminators include in raw XML string when include_xml is enabled. {pull}3943[3943]
 
 ==== Added
 
