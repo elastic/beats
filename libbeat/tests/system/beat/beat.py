@@ -390,6 +390,10 @@ class TestCase(unittest.TestCase):
         def extract_fields(doc_list, name):
             fields = []
             dictfields = []
+
+            if not doc_list:
+                return fields, dictfields
+
             for field in doc_list:
 
                 # Chain together names

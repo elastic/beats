@@ -135,6 +135,10 @@ def dedot(group):
     fields = []
     dedotted = {}
 
+    if not group["fields"]:
+        return
+
+
     for field in group["fields"]:
         if "." in field["name"]:
             # dedot
@@ -169,8 +173,10 @@ def fill_section_properties(args, section, defaults, path):
     properties = {}
     dynamic_templates = []
 
-    if "fields" in section:
+    if "fields" in section and section["fields"]:
         for field in section["fields"]:
+            if not field:
+                continue
             prop, dynamic = fill_field_properties(args, field, defaults, path)
             properties.update(prop)
             dynamic_templates.extend(dynamic)
@@ -185,6 +191,9 @@ def fill_field_properties(args, field, defaults, path):
     """
     properties = {}
     dynamic_templates = []
+
+    if not field:
+        return
 
     for key in defaults.keys():
         if key not in field:
