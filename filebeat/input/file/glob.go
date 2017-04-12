@@ -1,13 +1,10 @@
 package file
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // globPattern detects the use of "**" and expands it to standard glob patterns up to a max depth
@@ -21,9 +18,7 @@ func globPatterns(pattern string, doubleStarPatternDepth uint8) ([]string, error
 	for i, dir := range patternList {
 		if len(patterns) > 0 {
 			if dir == "**" {
-				err := fmt.Sprintf("glob(%s) failed: cannot specify multiple ** within a pattern", pattern)
-				logp.Err(err)
-				return nil, errors.New(err)
+				return nil, fmt.Errorf("multiple ** in %q", pattern)
 			}
 			for i := range patterns {
 				patterns[i] = filepath.Join(patterns[i], dir)
