@@ -178,6 +178,19 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 - The HAProxy module is now GA, instead of experimental. {pull}3525[3525]
 - Add the ability to collect the environment variables from system processes. {pull}3337[3337]
 - Adding support for custom http headers and TLS for metricbeat modules {pull}3945[3945]
+- Add experimental metricset `perfmon` to Windows module. {pull}3758[3758]
+- Add memcached module with stats metricset. {pull}3693[3693]
+- Add the `process.cmdline.cache.enabled` config option to the System Process Metricset. {pull}3891[3891]
+- Adding support for custom http headers and TLS for metricbeat modules {pull}3945[3945]
+- Add new MetricSet interfaces for developers (`Closer`, `ReportingFetcher`, and `PushMetricSet`). {pull}3908[3908]
+
+*Packetbeat*
+- Add `fields` and `fields_under_root` to packetbeat protocols configurations. {pull}3518[3518]
+- Add list style packetbeat protocols configurations. This change supports specifying multiple configurations of the same protocol analyzer. {pull}3518[3518]
+- Add DNS dashboard for an overview the DNS traffic. {pull}3883[3883]
+- Add DNS Tunneling dashboard to highlight domains with large numbers of subdomains or high data volume. {pull}3884[3884]
+
+*Winlogbeat*
 
 ==== Deprecated
 
