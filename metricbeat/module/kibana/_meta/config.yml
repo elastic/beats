@@ -3,4 +3,3 @@
   enabled: false
   period: 10s
   hosts: ["localhost:5601"]
-
