@@ -1,0 +1,3 @@
+=== elasticsearch node_stats MetricSet
+
+This is the node_stats metricset of the module elasticsearch. It fetches data from `/_nodes/_local/stats`. The data received is only for the local node so this metricset has to be run on each elasticsearch node.

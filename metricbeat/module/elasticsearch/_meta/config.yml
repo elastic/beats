@@ -1,5 +1,5 @@
 #- module: elasticsearch
-#  metricsets: ["node", "stats"]
+#  metricsets: ["node", "node_stats", "stats"]
 #  enabled: true
 #  period: 10s
 #  hosts: ["localhost:9200"]
