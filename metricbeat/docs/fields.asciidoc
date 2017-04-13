@@ -1890,6 +1890,14 @@ elasticsearch Module
 
 
 [float]
+=== elasticsearch.cluster.name
+
+type: keyword
+
+Elasticsearch cluster name.
+
+
+[float]
 == node Fields
 
 node

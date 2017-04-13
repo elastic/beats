@@ -7,29 +7,29 @@
     "elasticsearch": {
         "stats": {
             "docs": {
-                "count": 4,
+                "count": 1,
                 "deleted": 0
             },
             "segments": {
-                "count": 4,
+                "count": 1,
                 "memory": {
-                    "bytes": 6647
+                    "bytes": 1433
                 }
             },
             "shards": {
                 "failed": 0,
-                "successful": 11,
-                "total": 22
+                "successful": 6,
+                "total": 12
             },
             "store": {
                 "size": {
-                    "bytes": 16148
+                    "bytes": 3732
                 }
             }
         }
     },
     "metricset": {
-        "host": "127.0.0.1:9200",
+        "host": "elasticsearch:9200",
         "module": "elasticsearch",
         "name": "stats",
         "rtt": 115
