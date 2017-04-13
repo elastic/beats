@@ -8,7 +8,6 @@ This file is generated! See scripts/docs_collector.py
 This is the elasticsearch Module. The elasticsearch module contains a minimal set of metrics to enable monitoring of elasticsearch across multiple versions.
 
 
-
 [float]
 === Example Configuration
 
@@ -19,7 +18,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 #- module: elasticsearch
-#  metricsets: ["stats"]
+#  metricsets: ["node", "stats"]
 #  enabled: true
 #  period: 10s
 #  hosts: ["localhost:9200"]
@@ -31,7 +30,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-elasticsearch-node,node>>
+
 * <<metricbeat-metricset-elasticsearch-stats,stats>>
+
+include::elasticsearch/node.asciidoc[]
 
 include::elasticsearch/stats.asciidoc[]
 

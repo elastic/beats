@@ -1,0 +1,28 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "node": {
+            "jvm": {
+                "memory": {
+                    "heap_init": {
+                        "bytes": 536870912
+                    }
+                },
+                "version": "1.8.0_92-internal"
+            },
+            "name": "4Il1NmqoQEi-x8a50GNUIw",
+            "version": "6.0.0-alpha1"
+        }
+    },
+    "metricset": {
+        "host": "elasticsearch:9200",
+        "module": "elasticsearch",
+        "name": "node",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}
