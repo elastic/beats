@@ -1890,6 +1890,47 @@ elasticsearch Module
 
 
 [float]
+== node Fields
+
+node
+
+
+
+[float]
+=== elasticsearch.node.jvm.memory.heap_init.bytes
+
+type: long
+
+format: bytes
+
+Heap init used by the JVM in bytes.
+
+
+[float]
+=== elasticsearch.node.jvm.version
+
+type: keyword
+
+JVM version.
+
+
+[float]
+=== elasticsearch.node.name
+
+type: keyword
+
+Node name.
+
+
+[float]
+=== elasticsearch.node.version
+
+type: keyword
+
+Node version.
+
+
+[float]
 == stats Fields
 
 stats
