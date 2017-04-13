@@ -126,7 +126,7 @@ metricbeat.modules:
 
 #---------------------------- elasticsearch Module ---------------------------
 #- module: elasticsearch
-#  metricsets: ["stats"]
+#  metricsets: ["node", "stats"]
 #  enabled: true
 #  period: 10s
 #  hosts: ["localhost:9200"]
