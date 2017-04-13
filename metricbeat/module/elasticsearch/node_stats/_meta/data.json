@@ -1,0 +1,67 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "node_stats": {
+            "jvm": {
+                "mem": {
+                    "pools": {
+                        "old": {
+                            "max": {
+                                "bytes": 362414080
+                            },
+                            "peak": {
+                                "bytes": 212130904
+                            },
+                            "peak_max": {
+                                "bytes": 362414080
+                            },
+                            "used": {
+                                "bytes": 154487944
+                            }
+                        },
+                        "survivor": {
+                            "max": {
+                                "bytes": 17432576
+                            },
+                            "peak": {
+                                "bytes": 17432576
+                            },
+                            "peak_max": {
+                                "bytes": 17432576
+                            },
+                            "used": {
+                                "bytes": 7878680
+                            }
+                        },
+                        "young": {
+                            "max": {
+                                "bytes": 139591680
+                            },
+                            "peak": {
+                                "bytes": 139591680
+                            },
+                            "peak_max": {
+                                "bytes": 139591680
+                            },
+                            "used": {
+                                "bytes": 100266128
+                            }
+                        }
+                    }
+                }
+            },
+            "name": "4Il1NmqoQEi-x8a50GNUIw"
+        }
+    },
+    "metricset": {
+        "host": "elasticsearch:9200",
+        "module": "elasticsearch",
+        "name": "node_stats",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

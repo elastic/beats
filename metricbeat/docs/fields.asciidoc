@@ -1931,6 +1931,157 @@ Node version.
 
 
 [float]
+== node_stats Fields
+
+node_stats
+
+
+
+[float]
+=== elasticsearch.node_stats.name
+
+type: keyword
+
+Node name.
+
+
+[float]
+== jvm.mem.pools Fields
+
+JVM memory pool stats
+
+
+
+[float]
+== old Fields
+
+Old memory pool stats.
+
+
+
+[float]
+=== elasticsearch.node_stats.jvm.mem.pools.old.max.bytes
+
+type: long
+
+format: bytes
+
+Max bytes.
+
+[float]
+=== elasticsearch.node_stats.jvm.mem.pools.old.peak.bytes
+
+type: long
+
+format: bytes
+
+Peak bytes.
+
+[float]
+=== elasticsearch.node_stats.jvm.mem.pools.old.peak_max.bytes
+
+type: long
+
+format: bytes
+
+Peak max bytes.
+
+[float]
+=== elasticsearch.node_stats.jvm.mem.pools.old.used.bytes
+
+type: long
+
+format: bytes
+
+Used bytes.
+
+[float]
+== young Fields
+
+Young memory pool stats.
+
+
+
+[float]
+=== elasticsearch.node_stats.jvm.mem.pools.young.max.bytes
+
+type: long
+
+format: bytes
+
+Max bytes.
+
+[float]
+=== elasticsearch.node_stats.jvm.mem.pools.young.peak.bytes
+
+type: long
+
+format: bytes
+
+Peak bytes.
+
+[float]
+=== elasticsearch.node_stats.jvm.mem.pools.young.peak_max.bytes
+
+type: long
+
+format: bytes
+
+Peak max bytes.
+
+[float]
+=== elasticsearch.node_stats.jvm.mem.pools.young.used.bytes
+
+type: long
+
+format: bytes
+
+Used bytes.
+
+[float]
+== survivor Fields
+
+Survivor memory pool stats.
+
+
+
+[float]
+=== elasticsearch.node_stats.jvm.mem.pools.survivor.max.bytes
+
+type: long
+
+format: bytes
+
+Max bytes.
+
+[float]
+=== elasticsearch.node_stats.jvm.mem.pools.survivor.peak.bytes
+
+type: long
+
+format: bytes
+
+Peak bytes.
+
+[float]
+=== elasticsearch.node_stats.jvm.mem.pools.survivor.peak_max.bytes
+
+type: long
+
+format: bytes
+
+Peak max bytes.
+
+[float]
+=== elasticsearch.node_stats.jvm.mem.pools.survivor.used.bytes
+
+type: long
+
+format: bytes
+
+Used bytes.
+
+[float]
 == stats Fields
 
 stats
