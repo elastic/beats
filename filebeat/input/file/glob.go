@@ -14,7 +14,12 @@ func globPatterns(pattern string, doubleStarPatternDepth uint8) ([]string, error
 	}
 	var patterns []string
 	isAbs := filepath.IsAbs(pattern)
-	patternList := strings.Split(pattern, string(os.PathSeparator))
+	separators := string(os.PathSeparator)
+	// Allow Windows to use /
+	if separators == "\\" {
+		separators += "/"
+	}
+	patternList := strings.Split(pattern, separators)
 	for i, dir := range patternList {
 		if len(patterns) > 0 {
 			if dir == "**" {
@@ -26,7 +31,7 @@ func globPatterns(pattern string, doubleStarPatternDepth uint8) ([]string, error
 		} else if dir == "**" {
 			prefix := filepath.Join(patternList[:i]...)
 			if isAbs {
-				prefix = string(os.PathSeparator) + prefix
+				prefix = string(separators[0]) + prefix
 			}
 			wildcards := ""
 			for j := uint8(0); j <= doubleStarPatternDepth; j++ {
