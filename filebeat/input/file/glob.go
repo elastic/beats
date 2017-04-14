@@ -2,46 +2,46 @@ package file
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
-	"strings"
 )
+
+func wildcards(doubleStarPatternDepth uint8) []string {
+	wildcardList := []string{}
+	w := ""
+	for i := uint8(0); i <= doubleStarPatternDepth; i++ {
+		wildcardList = append(wildcardList, w)
+		w = filepath.Join(w, "*")
+	}
+	return wildcardList
+}
 
 // globPattern detects the use of "**" and expands it to standard glob patterns up to a max depth
 func globPatterns(pattern string, doubleStarPatternDepth uint8) ([]string, error) {
 	if doubleStarPatternDepth == 0 {
 		return []string{pattern}, nil
 	}
-	var patterns []string
-	isAbs := filepath.IsAbs(pattern)
-	separators := string(os.PathSeparator)
-	// Allow Windows to use /
-	if separators == "\\" {
-		separators += "/"
-	}
-	patternList := strings.Split(pattern, separators)
-	for i, dir := range patternList {
-		if len(patterns) > 0 {
-			if dir == "**" {
+	var wildcardList []string
+	var prefix string
+	var suffix string
+	dir, file := filepath.Split(filepath.Clean(pattern))
+	for file != "" {
+		if file == "**" {
+			if len(wildcardList) > 0 {
 				return nil, fmt.Errorf("multiple ** in %q", pattern)
 			}
-			for i := range patterns {
-				patterns[i] = filepath.Join(patterns[i], dir)
-			}
-		} else if dir == "**" {
-			prefix := filepath.Join(patternList[:i]...)
-			if isAbs {
-				prefix = string(separators[0]) + prefix
-			}
-			wildcards := ""
-			for j := uint8(0); j <= doubleStarPatternDepth; j++ {
-				patterns = append(patterns, filepath.Join(prefix, wildcards))
-				wildcards = filepath.Join(wildcards, "*")
-			}
+			wildcardList = wildcards(doubleStarPatternDepth)
+			prefix = dir
+		} else if len(wildcardList) == 0 {
+			suffix = filepath.Join(file, suffix)
 		}
+		dir, file = filepath.Split(filepath.Clean(dir))
 	}
-	if len(patterns) == 0 {
-		patterns = []string{pattern}
+	if len(wildcardList) == 0 {
+		return []string{pattern}, nil
+	}
+	var patterns []string
+	for _, w := range wildcardList {
+		patterns = append(patterns, filepath.Join(prefix, w, suffix))
 	}
 	return patterns, nil
 }

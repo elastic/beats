@@ -22,7 +22,7 @@ func TestGlob(t *testing.T) {
 		pattern := filepath.Join(root, test.pattern)
 		matches, err := Glob(pattern, 4)
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 			continue
 		}
 		var normalizedMatches []string

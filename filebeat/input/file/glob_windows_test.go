@@ -16,6 +16,12 @@ var globTests = []globTest{
 		},
 	},
 	{
+		"foo/*",
+		[]string{
+			"foo\\bar",
+		},
+	},
+	{
 		"*\\*",
 		[]string{
 			"foo\\bar",
@@ -54,6 +60,12 @@ var globTests = []globTest{
 		},
 	},
 	{
+		"foo/**\\baz",
+		[]string{
+			"foo\\bar\\baz",
+		},
+	},
+	{
 		"foo\\**\\bazz",
 		[]string{},
 	},
@@ -67,12 +79,6 @@ var globTests = []globTest{
 		"foo\\\\bar",
 		[]string{
 			"foo\\bar",
-		},
-	},
-	{
-		"c:\\foo\\**\\bar",
-		[]string{
-			"c:\\foo\\**\\bar",
 		},
 	},
 }
