@@ -5,10 +5,16 @@ import (
 	"path/filepath"
 )
 
-func wildcards(doubleStarPatternDepth uint8) []string {
+func wildcards(doubleStarPatternDepth uint8, dir string, suffix string) []string {
 	wildcardList := []string{}
 	w := ""
-	for i := uint8(0); i <= doubleStarPatternDepth; i++ {
+	i := uint8(0)
+	if dir == "" && suffix == "" {
+		// Don't expand to "" on relative paths
+		w = "*"
+		i = 1
+	}
+	for ; i <= doubleStarPatternDepth; i++ {
 		wildcardList = append(wildcardList, w)
 		w = filepath.Join(w, "*")
 	}
@@ -24,12 +30,12 @@ func globPatterns(pattern string, doubleStarPatternDepth uint8) ([]string, error
 	var prefix string
 	var suffix string
 	dir, file := filepath.Split(filepath.Clean(pattern))
-	for file != "" {
+	for file != "" && file != "." {
 		if file == "**" {
 			if len(wildcardList) > 0 {
 				return nil, fmt.Errorf("multiple ** in %q", pattern)
 			}
-			wildcardList = wildcards(doubleStarPatternDepth)
+			wildcardList = wildcards(doubleStarPatternDepth, dir, suffix)
 			prefix = dir
 		} else if len(wildcardList) == 0 {
 			suffix = filepath.Join(file, suffix)

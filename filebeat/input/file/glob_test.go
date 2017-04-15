@@ -52,3 +52,31 @@ func TestGlob(t *testing.T) {
 		}
 	}
 }
+
+type globPatternsTest struct {
+	pattern          string
+	expectedPatterns []string
+	expectedError    bool
+}
+
+func TestGlobPatterns(t *testing.T) {
+	for _, test := range globPatternsTests {
+		patterns, err := globPatterns(test.pattern, 2)
+		if err != nil {
+			if test.expectedError {
+				continue
+			}
+			t.Fatal(err)
+		}
+		if len(patterns) != len(test.expectedPatterns) {
+			t.Fatalf("%q expanded to %q (%d) instead of %q (%d)", test.pattern, patterns, len(patterns),
+				test.expectedPatterns, len(test.expectedPatterns))
+		}
+		for i, p := range patterns {
+			if p != test.expectedPatterns[i] {
+				t.Fatalf("%q expanded to %q instead of %q", test.pattern, patterns, test.expectedPatterns)
+				break
+			}
+		}
+	}
+}

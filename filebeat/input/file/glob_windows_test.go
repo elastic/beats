@@ -82,3 +82,11 @@ var globTests = []globTest{
 		},
 	},
 }
+
+var globPatternsTests = []globPatternsTest{
+	{
+		"C:\\foo\\**\\bar",
+		[]string{"C:\\foo\\bar", "C:\\foo\\*\\bar", "C:\\foo\\*\\*\\bar"},
+		false,
+	},
+}
