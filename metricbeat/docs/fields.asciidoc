@@ -19,6 +19,7 @@ grouped in the following categories:
 * <<exported-fields-common>>
 * <<exported-fields-couchbase>>
 * <<exported-fields-docker>>
+* <<exported-fields-dropwizard>>
 * <<exported-fields-elasticsearch>>
 * <<exported-fields-golang>>
 * <<exported-fields-haproxy>>
@@ -1873,6 +1874,19 @@ Total errors on outgoing packets.
 type: long
 
 Total number of outgoing packets.
+
+
+[[exported-fields-dropwizard]]
+== Dropwizard Fields
+
+beta[]
+Stats collected from Dropwizard.
+
+
+
+[float]
+== dropwizard Fields
+
 
 
 [[exported-fields-elasticsearch]]
