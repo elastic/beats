@@ -3,9 +3,8 @@
 package perfmon
 
 import (
-	"strings"
-
 	"fmt"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -44,14 +43,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	for _, value := range config.CounterConfig {
 		form := strings.ToLower(value.Format)
-		if len(form) <= 0 {
+		switch form {
+		case "":
 			value.Format = "float"
-			break
-		}
-		if form != "float" && form != "uint32" && form != "uint64" {
+		case "float", "long":
+		default:
 			err := fmt.Errorf("format '%s' for counter '%s' are not valid", value.Format, value.Alias)
 			return nil, errors.Wrap(err, "initialization failed")
 		}
+
 	}
 
 	reader, err := NewPerfmonReader(config.CounterConfig)

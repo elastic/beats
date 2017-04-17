@@ -120,10 +120,8 @@ func (q *Query) AddCounter(counterPath string, format string) error {
 	switch format {
 	case "float":
 		q.counters[counterPath].format = PdhFmtDouble
-	case "uint64":
+	case "long":
 		q.counters[counterPath].format = PdhFmtLarge
-	case "uint32":
-		q.counters[counterPath].format = PdhFmtLong
 	}
 	return nil
 }
@@ -151,8 +149,6 @@ func (q *Query) Values() (map[string]Value, error) {
 			rtn[path] = Value{Num: *(*float64)(unsafe.Pointer(&value.LongValue))}
 		case PdhFmtLarge:
 			rtn[path] = Value{Num: *(*int64)(unsafe.Pointer(&value.LongValue))}
-		case PdhFmtLong:
-			rtn[path] = Value{Num: *(*int32)(unsafe.Pointer(&value.LongValue))}
 		}
 
 	}
