@@ -67,7 +67,7 @@ ifdef::allplatforms[]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@/etc/{beatname_lc}/{beatname_lc}.template.json
+curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@/etc/{beatname_lc}/{beatname_lc}.template.json
 ----------------------------------------------------------------------
 
 *mac:*
@@ -75,7 +75,7 @@ curl -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@/etc/{beatname_lc}
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 cd {beatname_lc}-{version}-darwin-x86_64
-curl -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@{beatname_lc}.template.json
+curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@{beatname_lc}.template.json
 ----------------------------------------------------------------------
 
 *win:*
@@ -84,7 +84,7 @@ endif::allplatforms[]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-PS C:\Program Files{backslash}{beatname_uc}> Invoke-WebRequest -Method Put -InFile {beatname_lc}.template.json -Uri http://localhost:9200/_template/{beatname_lc}?pretty
+PS C:\Program Files{backslash}{beatname_uc}> Invoke-WebRequest -Method Put -InFile {beatname_lc}.template.json -Uri  http://localhost:9200/_template/{beatname_lc}?pretty -ContentType application/json
 ----------------------------------------------------------------------
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.

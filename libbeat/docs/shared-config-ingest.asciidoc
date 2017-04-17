@@ -50,7 +50,7 @@ To add the pipeline in Elasticsearch, you would run:
 
 [source,shell]
 ------------------------------------------------------------------------------
-curl -XPUT 'http://localhost:9200/_ingest/pipeline/test-pipeline' -d@pipeline.json
+curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_ingest/pipeline/test-pipeline' -d@pipeline.json
 ------------------------------------------------------------------------------
 
 Then in the +{beatname_lc}.yml+ file, you would specify:
