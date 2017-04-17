@@ -776,7 +776,7 @@ func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	// If enough data was received, send it to the
 	// next layer but mark it as incomplete.
 	stream := pgsqlData.Data[dir]
-	if messageHasEnoughData(stream.message) {
+	if stream != nil && messageHasEnoughData(stream.message) {
 		logp.Debug("pgsql", "Message not complete, but sending to the next layer")
 		m := stream.message
 		m.toExport = true
