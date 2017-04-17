@@ -35,6 +35,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-vsphere>>
 * <<exported-fields-windows>>
 * <<exported-fields-zookeeper>>
 
@@ -8016,6 +8017,80 @@ UID of the user running the process.
 type: keyword
 
 Name of the user running the process.
+
+
+[[exported-fields-vsphere]]
+== vsphere Fields
+
+vsphere Module
+
+
+
+[float]
+== vsphere Fields
+
+
+
+
+[float]
+== datastore_usage Fields
+
+datastore_usage
+
+
+
+[float]
+=== vsphere.datastore_usage.datacenter
+
+type: keyword
+
+Datacenter name
+
+
+[float]
+=== vsphere.datastore_usage.fstype
+
+type: keyword
+
+Filesystem type
+
+
+[float]
+=== vsphere.datastore_usage.capacity.bytes
+
+type: long
+
+format: bytes
+
+Total bytes of the datastore
+
+
+[float]
+=== vsphere.datastore_usage.freespace.bytes
+
+type: long
+
+format: bytes
+
+Free bytes of the datastore
+
+
+[float]
+=== vsphere.datastore_usage.usedspace.bytes
+
+type: long
+
+format: bytes
+
+Used bytes of the datastore
+
+
+[float]
+=== vsphere.datastore_usage.usedspace.percent
+
+type: long
+
+Used percent of the datastore
 
 
 [[exported-fields-windows]]

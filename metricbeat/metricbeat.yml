@@ -54,6 +54,18 @@ metricbeat.modules:
   hosts: ["localhost:5601"]
 
 
+#------------------------------- vsphere Module ------------------------------
+#- module: vsphere
+#  metricsets: ["datastore_usage"]
+#  enabled: true
+#  period: 10s
+#  hosts: ["https://localhost/sdk"]
+
+#  username: "user"
+#  password: "password"
+  # If insecure is true, don't verify the server's certificate chain
+#  insecure: false
+
 
 
 #================================ General =====================================

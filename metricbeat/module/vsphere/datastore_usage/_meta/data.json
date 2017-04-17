@@ -1,0 +1,19 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"vsphere",
+        "name":"datastore_usage",
+        "rtt":44269
+    },
+    "vsphere":{
+        "datastore_usage":{
+            "example": "datastore_usage"
+        }
+    },
+    "type":"metricsets"
+}
