@@ -18,16 +18,7 @@ func TestFetchEventContents(t *testing.T) {
 	ts := model.Service.NewServer()
 	defer ts.Close()
 
-	config := map[string]interface{}{
-		"module":     "vsphere",
-		"metricsets": []string{"datastore"},
-		"hosts":      []string{ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path},
-		"username":   "user",
-		"password":   "pass",
-		"insecure":   true,
-	}
-
-	f := mbtest.NewEventsFetcher(t, config)
+	f := mbtest.NewEventsFetcher(t, getConfig(ts))
 	events, err := f.Fetch()
 	if err != nil {
 		t.Fatal("fetch error", err)
@@ -64,5 +55,35 @@ func isNonNegativeInt64(t testing.TB, field string, v interface{}) {
 	if i < 0 {
 		t.Errorf("%v: value is negative (%v)", field, i)
 		return
+	}
+}
+
+func TestData(t *testing.T) {
+	model := simulator.ESX()
+	if err := model.Create(); err != nil {
+		t.Fatal(err)
+	}
+
+	ts := model.Service.NewServer()
+	defer ts.Close()
+
+	f := mbtest.NewEventsFetcher(t, getConfig(ts))
+
+	if err := mbtest.WriteEvents(f, t); err != nil {
+		t.Fatal("write", err)
+	}
+
+}
+
+func getConfig(ts *simulator.Server) map[string]interface{} {
+	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
+
+	return map[string]interface{}{
+		"module":     "vsphere",
+		"metricsets": []string{"datastore"},
+		"hosts":      []string{urlSimulator},
+		"username":   "user",
+		"password":   "pass",
+		"insecure":   true,
 	}
 }

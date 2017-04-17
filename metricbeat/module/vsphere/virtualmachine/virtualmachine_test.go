@@ -12,36 +12,21 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-
 	model := simulator.ESX()
-
-	err := model.Create()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	if err := model.Create(); err != nil {
+		t.Fatal(err)
 	}
 
 	ts := model.Service.NewServer()
 	defer ts.Close()
 
-	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
-
-	config := map[string]interface{}{
-		"module":     "vsphere",
-		"metricsets": []string{"virtualmachine"},
-		"hosts":      []string{urlSimulator},
-		"username":   "user",
-		"password":   "pass",
-		"insecure":   true,
-	}
-
-	f := mbtest.NewEventsFetcher(t, config)
-
+	f := mbtest.NewEventsFetcher(t, getConfig(ts))
 	events, err := f.Fetch()
+	if err != nil {
+		t.Fatal("fetch error", err)
+	}
 
 	event := events[0]
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
@@ -68,4 +53,33 @@ func TestFetchEventContents(t *testing.T) {
 	memoryFree := memory["free"].(common.MapStr)
 	memoryFreeGuest := memoryFree["guest"].(common.MapStr)
 	assert.EqualValues(t, uint64(33554432), memoryFreeGuest["bytes"])
+}
+
+func TestData(t *testing.T) {
+	model := simulator.ESX()
+	if err := model.Create(); err != nil {
+		t.Fatal(err)
+	}
+
+	ts := model.Service.NewServer()
+	defer ts.Close()
+
+	f := mbtest.NewEventsFetcher(t, getConfig(ts))
+
+	if err := mbtest.WriteEvents(f, t); err != nil {
+		t.Fatal("write", err)
+	}
+}
+
+func getConfig(ts *simulator.Server) map[string]interface{} {
+	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
+
+	return map[string]interface{}{
+		"module":     "vsphere",
+		"metricsets": []string{"virtualmachine"},
+		"hosts":      []string{urlSimulator},
+		"username":   "user",
+		"password":   "pass",
+		"insecure":   true,
+	}
 }
