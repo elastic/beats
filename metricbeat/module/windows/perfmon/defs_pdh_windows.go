@@ -207,13 +207,13 @@ const (
 	// Use bitwise operators to combine these values with the counter type to scale the value.
 
 	// Do not apply the counter's default scaling factor.
-	PdhFmtNoScale = C.PDH_FMT_NOSCALE
+	PdhFmtNoScale PdhCounterFormat = C.PDH_FMT_NOSCALE
 	// Counter values greater than 100 (for example, counter values measuring
 	// the processor load on multiprocessor computers) will not be reset to 100.
 	// The default behavior is that counter values are capped at a value of 100.
-	PdhFmtNoCap100 = C.PDH_FMT_NOCAP100
+	PdhFmtNoCap100 PdhCounterFormat = C.PDH_FMT_NOCAP100
 	// Multiply the actual value by 1,000.
-	PdhFmtMultiply1000 = C.PDH_FMT_1000
+	PdhFmtMultiply1000 PdhCounterFormat = C.PDH_FMT_1000
 )
 
 // PdhCounterValue is the structure that receives the counter value.
