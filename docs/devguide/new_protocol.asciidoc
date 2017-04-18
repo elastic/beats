@@ -1,19 +1,14 @@
 [[new-protocol]]
-= Developer Guide: Adding a New Protocol
+== Adding a New Protocol to Packetbeat
 
-
-[partintro]
---
 The following topics describe how to add a new protocol to Packetbeat:
 
 * <<getting-ready-new-protocol>>
 * <<protocol-modules>>
 * <<testing>>
 
---
-
 [[getting-ready-new-protocol]]
-== Getting Ready
+=== Getting Ready
 
 Packetbeat is written in http://golang.org/[Go], so having Go installed and knowing the basics are prerequisites for understanding this guide. But don't worry if you aren't a Go expert. Go is a relatively new language, and very few people are experts in it. In fact, several people learned Go by contributing to Packetbeat and libbeat, including the original Packetbeat authors.
 
@@ -28,12 +23,10 @@ parsing and decoding of the protocol. If the particular protocol has a Go
 implementation with a liberal enough license, you might be able to use it to
 parse and decode individual messages instead of writing your own parser.
 
-Before starting, please also read the
-https://github.com/elastic/beats/blob/master/packetbeat/CONTRIBUTING.md[CONTRIBUTING]
-file on GitHub.
+Before starting, please also read the <<beats-contributing>>.
 
 [float]
-=== Cloning and Compiling
+==== Cloning and Compiling
 
 After you have https://golang.org/doc/install[installed Go] and set up the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
@@ -96,13 +89,13 @@ $ git push --set-upstream tsg cool_new_protocol
   provide feedback and perhaps help you with it.
 
 [[protocol-modules]]
-== Protocol Modules
+=== Protocol Modules
 
 We are working on updating this section. While you're waiting for updates, you
 might want to try out the TCP protocol generator at
 https://github.com/elastic/beats/tree/master/packetbeat/scripts/tcp-protocol.
 
 [[testing]]
-== Testing
+=== Testing
 
 We are working on updating this section. 
