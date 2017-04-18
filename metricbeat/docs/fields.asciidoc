@@ -2082,6 +2082,55 @@ format: bytes
 Used bytes.
 
 [float]
+== gc.collectors Fields
+
+GC collector stats.
+
+
+
+[float]
+== old.collection Fields
+
+Old colletion gc.
+
+
+
+[float]
+=== elasticsearch.node_stats.gc.collectors.old.collection.count
+
+type: long
+
+
+
+[float]
+=== elasticsearch.node_stats.gc.collectors.old.collection.ms
+
+type: long
+
+
+
+[float]
+== young.collection Fields
+
+Young collection gc.
+
+
+
+[float]
+=== elasticsearch.node_stats.gc.collectors.young.collection.count
+
+type: long
+
+
+
+[float]
+=== elasticsearch.node_stats.gc.collectors.young.collection.ms
+
+type: long
+
+
+
+[float]
 == stats Fields
 
 stats
