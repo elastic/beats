@@ -17,6 +17,9 @@ import (
 	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/filebeat/spooler"
+
+	//Add filebeat level processors
+	_ "github.com/elastic/beats/filebeat/processor/annotate/kubernetes"
 )
 
 var (
