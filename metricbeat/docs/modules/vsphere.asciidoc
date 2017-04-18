@@ -37,5 +37,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-vsphere-datastore_usage,datastore_usage>>
 
+* <<metricbeat-metricset-vsphere-host_usage,host_usage>>
+
 include::vsphere/datastore_usage.asciidoc[]
+
+include::vsphere/host_usage.asciidoc[]
 

@@ -1,8 +1,7 @@
-package datastore_usage
+package host_usage
 
 import (
 	"context"
-	"errors"
 	"net/url"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -16,7 +15,7 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("vsphere", "datastore_usage", New); err != nil {
+	if err := mb.Registry.AddMetricSet("vsphere", "host_usage", New); err != nil {
 		panic(err)
 	}
 }
@@ -65,7 +64,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	f := find.NewFinder(c.Client, true)
 	if f == nil {
-		return nil, errors.New("Finder undefined for vsphere.")
+		return nil, err
 	}
 
 	// Get all datacenters
@@ -80,45 +79,55 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 		f.SetDatacenter(dc)
 
-		dss, err := f.DatastoreList(ctx, "*")
+		// Get all hosts
+		hss, err := f.HostSystemList(ctx, "*")
 		if err != nil {
 			return nil, err
 		}
 
 		pc := property.DefaultCollector(c.Client)
 
-		// Convert datastores into list of references
+		// Convert hosts into list of references
 		var refs []types.ManagedObjectReference
-		for _, ds := range dss {
-			refs = append(refs, ds.Reference())
+		for _, hs := range hss {
+			refs = append(refs, hs.Reference())
 		}
 
-		// Retrieve summary property
-		var dst []mo.Datastore
-		err = pc.Retrieve(ctx, refs, []string{"summary"}, &dst)
+		// Get summary property (HostListSummary)
+		var hst []mo.HostSystem
+		err = pc.Retrieve(ctx, refs, []string{"summary"}, &hst)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, ds := range dst {
-
-			usedSpacePercent := 100 * (ds.Summary.Capacity - ds.Summary.FreeSpace) / ds.Summary.Capacity
-			usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
+		for _, hs := range hst {
+			totalCpu := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
+			freeCpu := int64(totalCpu) - int64(hs.Summary.QuickStats.OverallCpuUsage)
+			freeMemory := int64(hs.Summary.Hardware.MemorySize) - (int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024)
 
 			event := common.MapStr{
 				"datacenter": dc.Name(),
-				"name":       ds.Summary.Name,
-				"fstype":     ds.Summary.Type,
-				"capacity": common.MapStr{
+				"name":       hs.Summary.Config.Name,
+				"cpu": common.MapStr{
+					"used": common.MapStr{
+						"mhz": hs.Summary.QuickStats.OverallCpuUsage,
+					},
 					"total": common.MapStr{
-						"bytes": ds.Summary.Capacity,
+						"mhz": totalCpu,
 					},
 					"free": common.MapStr{
-						"bytes": ds.Summary.FreeSpace,
+						"mhz": freeCpu,
 					},
+				},
+				"memory": common.MapStr{
 					"used": common.MapStr{
-						"bytes":   usedSpaceBytes,
-						"percent": usedSpacePercent,
+						"bytes": hs.Summary.QuickStats.OverallMemoryUsage * 1024,
+					},
+					"total": common.MapStr{
+						"bytes": hs.Summary.Hardware.MemorySize,
+					},
+					"free": common.MapStr{
+						"bytes": freeMemory,
 					},
 				},
 			}

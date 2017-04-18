@@ -8048,6 +8048,14 @@ Datacenter name
 
 
 [float]
+=== vsphere.datastore_usage.name
+
+type: keyword
+
+Datastore name
+
+
+[float]
 === vsphere.datastore_usage.fstype
 
 type: keyword
@@ -8056,7 +8064,7 @@ Filesystem type
 
 
 [float]
-=== vsphere.datastore_usage.capacity.bytes
+=== vsphere.datastore_usage.capacity.total.bytes
 
 type: long
 
@@ -8066,7 +8074,7 @@ Total bytes of the datastore
 
 
 [float]
-=== vsphere.datastore_usage.freespace.bytes
+=== vsphere.datastore_usage.capacity.free.bytes
 
 type: long
 
@@ -8076,7 +8084,7 @@ Free bytes of the datastore
 
 
 [float]
-=== vsphere.datastore_usage.usedspace.bytes
+=== vsphere.datastore_usage.capacity.used.bytes
 
 type: long
 
@@ -8086,11 +8094,88 @@ Used bytes of the datastore
 
 
 [float]
-=== vsphere.datastore_usage.usedspace.percent
+=== vsphere.datastore_usage.capacity.used.percent
 
 type: long
 
 Used percent of the datastore
+
+
+[float]
+== host_usage Fields
+
+host_usage
+
+
+
+[float]
+=== vsphere.host_usage.datacenter
+
+type: keyword
+
+Datacenter name
+
+
+[float]
+=== vsphere.host_usage.name
+
+type: keyword
+
+Host name
+
+
+[float]
+=== vsphere.host_usage.cpu.used.mhz
+
+type: long
+
+Used CPU in Mhz
+
+
+[float]
+=== vsphere.host_usage.cpu.total.mhz
+
+type: long
+
+Total CPU in Mhz
+
+
+[float]
+=== vsphere.host_usage.cpu.free.mhz
+
+type: long
+
+Free CPU in Mhz
+
+
+[float]
+=== vsphere.host_usage.memory.used.bytes
+
+type: long
+
+format: bytes
+
+Used Memory in bytes
+
+
+[float]
+=== vsphere.host_usage.memory.total.bytes
+
+type: long
+
+format: bytes
+
+Total Memory in bytes
+
+
+[float]
+=== vsphere.host_usage.memory.free.bytes
+
+type: long
+
+format: bytes
+
+Free Memory in bytes
 
 
 [[exported-fields-windows]]
