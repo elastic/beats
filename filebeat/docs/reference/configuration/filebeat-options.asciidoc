@@ -273,13 +273,11 @@ NOTE: Every time a file is renamed, the file state is updated and the counter fo
 [[clean-removed]]
 ===== clean_removed
 
-When this option is enabled, Filebeat cleans files from the registry if they cannot be found on disk anymore. This setting does not apply to renamed files or files that were moved to another directory that is still visible to Filebeat. This option is enabled by default.
-
+When this option is enabled, Filebeat cleans files from the registry if they cannot be found on disk anymore under the last known name. This means also files which were renamed after the harvester was finished will be removed. This option is enabled by default.
 
 If a shared drive disappears for a short period and appears again, all files will be read again from the beginning because the states were removed from the registry file. In such cases, we recommend that you disable the `clean_removed` option.
 
 You must disable this option if you also disable `close_removed`.
-
 
 [[scan-frequency]]
 ===== scan_frequency
