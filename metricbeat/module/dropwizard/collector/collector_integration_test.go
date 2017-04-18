@@ -15,16 +15,20 @@ func TestFetch(t *testing.T) {
 	f := mbtest.NewEventsFetcher(t, getConfig())
 	events, err := f.Fetch()
 
+	hasTag := false
+	doesntHaveTag := false
 	for _, event := range events {
-		ok, _ := event.HasKey("my_counter")
+
+		ok, _ := event.HasKey("my_histogram")
 		if ok {
 			_, err := event.GetValue("tags")
 			if err == nil {
 				t.Fatal("write", "my_counter not supposed to have tags")
 			}
+			doesntHaveTag = true
 		}
 
-		ok, _ = event.HasKey("my_counter2")
+		ok, _ = event.HasKey("my_counter")
 		if ok {
 			tagsRaw, err := event.GetValue("tags")
 			if err != nil {
@@ -35,10 +39,13 @@ func TestFetch(t *testing.T) {
 					t.Fatal("write", "unable to cast tags to common.MapStr")
 				} else {
 					assert.Equal(t, len(tags), 1)
+					hasTag = true
 				}
 			}
 		}
 	}
+	assert.Equal(t, hasTag, true)
+	assert.Equal(t, doesntHaveTag, true)
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
@@ -67,17 +74,18 @@ func getEnvPort() string {
 	port := os.Getenv("DROPWIZARD_PORT")
 
 	if len(port) == 0 {
-		port = "9090"
+		port = "8080"
 	}
 	return port
 }
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "dropwizard",
-		"metricsets": []string{"collector"},
-		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
-		"namespace":  "testnamespace",
-		"enabled":    true,
+		"module":       "dropwizard",
+		"metricsets":   []string{"collector"},
+		"hosts":        []string{getEnvHost() + ":" + getEnvPort()},
+		"namespace":    "testnamespace",
+		"metrics_path": "/test/metrics",
+		"enabled":      true,
 	}
 }

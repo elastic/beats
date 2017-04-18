@@ -1,4 +1,4 @@
 == dropwizard Module
 
-This is the dropwizard Module.
+This is the http://dropwizard.io[Dropwizard] Module.
 

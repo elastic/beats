@@ -1,8 +1,8 @@
-FROM golang:1.7
-RUN apt-get update && apt-get install curl
-COPY main.go /go
+FROM maven:3.3-jdk-8
+COPY test /test
 
-HEALTHCHECK CMD curl -f http://localhost:9090/metrics/metrics
-EXPOSE 9090
+HEALTHCHECK CMD curl -f http://localhost:8080/test/helloworld
+EXPOSE 8080
 
-CMD go run /go/main.go
+WORKDIR /test
+CMD mvn jetty:run

@@ -15,11 +15,12 @@ class Test(metricbeat.BaseTest):
             "name": "dropwizard",
             "metricsets": ["collector"],
             "hosts": self.get_hosts(),
+            "path": "/test/metrics",
             "period": "1s",
             "namespace": "test",
         }])
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=10)
         proc.check_kill_and_wait()
 
         output = self.read_output_json()
@@ -27,4 +28,4 @@ class Test(metricbeat.BaseTest):
 
     def get_hosts(self):
         return [os.getenv('DROPWIZARD_HOST', 'localhost') + ':' +
-                os.getenv('DROPWIZARD_PORT', '9090')]
+                os.getenv('DROPWIZARD_PORT', '8080')]
