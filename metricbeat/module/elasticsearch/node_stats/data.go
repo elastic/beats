@@ -18,6 +18,12 @@ var (
 					"old":      c.Dict("old", poolSchema),
 				}),
 			}),
+			"gc": c.Dict("gc", s.Schema{
+				"collectors": c.Dict("collectors", s.Schema{
+					"young": c.Dict("young", collectorSchema),
+					"old":   c.Dict("old", collectorSchema),
+				}),
+			}),
 		}),
 	}
 
@@ -33,6 +39,13 @@ var (
 		},
 		"peak_max": s.Object{
 			"bytes": c.Int("peak_max_in_bytes"),
+		},
+	}
+
+	collectorSchema = s.Schema{
+		"collection": s.Object{
+			"count": c.Int("collection_count"),
+			"ms":    c.Int("collection_time_in_millis"),
 		},
 	}
 )
