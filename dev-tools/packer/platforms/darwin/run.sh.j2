@@ -16,8 +16,7 @@ install -D -m 755 import_dashboards-darwin-{{.arch}} /{{.beat_name}}-${VERSION}-
 cp {{.beat_name}}-darwin-amd64 /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}
 cp {{.beat_name}}-darwin.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}.yml
 cp {{.beat_name}}-darwin.full.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}.full.yml
-cp {{.beat_name}}.template.json /{{.beat_name}}-${VERSION}-darwin-x86_64/
-cp {{.beat_name}}.template-es2x.json /{{.beat_name}}-${VERSION}-darwin-x86_64/
+cp fields.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/
 
 mkdir -p upload
 tar czvf upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz /{{.beat_name}}-${VERSION}-darwin-x86_64

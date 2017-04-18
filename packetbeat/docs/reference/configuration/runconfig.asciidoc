@@ -1,5 +1,5 @@
 [[configuration-run-options]]
-=== Run Options Configuration
+=== Run Options
 
 The Beat can drop privileges after creating the sniffing socket.
 Root access is required for opening the socket, but everything else requires no
@@ -16,8 +16,8 @@ Example configuration for the `runoptions` section of the +{beatname_lc}.yml+ co
 [source,yaml]
 ------------------------------------------------------------------------------
 packetbeat.runoptions:
-  uid=501
-  gid=501
+  uid: 501
+  gid: 501
 ------------------------------------------------------------------------------
 
 The `runoptions` configuration is supported on Linux only.

@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Top Domains by Data Volume\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_in\",\"customLabel\":\"Bytes In\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"dns.question.etld_plus_one\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"3\",\"customLabel\":\"ETLD+1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_out\",\"customLabel\":\"Bytes Out\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Top Domains by Data Volume", 
+  "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"query\":{\"query_string\":{\"query\":\"type:dns\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

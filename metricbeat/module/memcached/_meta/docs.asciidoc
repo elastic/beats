@@ -1,0 +1,4 @@
+== memcached Module
+
+This is the memcached Module. These metricsets were tested with memcached version 1.4.35.
+

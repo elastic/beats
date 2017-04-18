@@ -1,0 +1,21 @@
+Dec 13 11:35:28 a-mac-with-esc-key GoogleSoftwareUpdateAgent[21412]: 2016-12-13 11:35:28.420 GoogleSoftwareUpdateAgent[21412/0x700007399000] [lvl=2] -[KSAgentApp updateProductWithProductID:usingEngine:] Checking for updates for "All Products" using engine <KSUpdateEngine:0x100341a00
+		ticketStore=<KSPersistentTicketStore:0x100204520 store=<KSKeyedPersistentStore:0x100213290
+			path="/Users/tsg/Library/Google/GoogleSoftwareUpdate/TicketStore/Keystone.ticketstore"
+			lockFile=<KSLockFile:0x1002160e0
+				path="/Users/tsg/Library/Google/GoogleSoftwareUpdate/TicketStore/Keystone.ticketstore.lock"
+				locked=NO
+			>
+		>>
+		processor=<KSActionProcessor:0x1003bb5f0
+			delegate=<KSUpdateEngine:0x100341a00>
+			isProcessing=NO actionsCompleted=0 progress=0.00
+			errors=0 currentActionErrors=0
+			events=0 currentActionEvents=0
+			actionQueue=( )
+		>
+		delegate=(null)
+		serverInfoStore=(null)
+		errors=0
+	>
+Dec 13 11:35:28 a-mac-with-esc-key GoogleSoftwareUpdateAgent[21412]: 2016-12-13 11:35:28.421 GoogleSoftwareUpdateAgent[21412/0x700007399000] [lvl=2] -[KSUpdateEngine updateAllExceptProduct:] KSUpdateEngine updating all installed products, except:'com.google.Keystone'.
+Apr 4 03:39:57 --- last message repeated 1 time ---

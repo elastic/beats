@@ -24,6 +24,9 @@ RUN \
 	unzip `basename $WPDPACK_URL` -d /libpcap/win && \
 	rm `basename $WPDPACK_URL`
 
+# Load gotpl
+RUN go get github.com/tsg/gotpl
+
 # Add patch for gopacket.
 ADD gopacket_pcap.patch /gopacket_pcap.patch
 

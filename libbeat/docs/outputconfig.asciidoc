@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[elasticsearch-output]]
-=== Elasticsearch Output Configuration
+=== Elasticsearch Output
 
 When you specify Elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
 
@@ -23,7 +23,7 @@ Example configuration:
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
   template.enabled: true
-  template.path: "{beatname_lc}.template.json"
+  template.fields: "fields.yml"
   template.overwrite: false
   index: "{beatname_lc}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -135,6 +135,20 @@ An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
 the cases where Elasticsearch listens behind an HTTP reverse proxy that exports
 the API under a custom prefix.
 
+===== headers
+
+Custom HTTP headers to add to each request created by the Elasticsearch output.
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.elasticsearch.headers:
+  X-My-Header: Header contents
+------------------------------------------------------------------------------
+
+It is generally possible to specify multiple header values for the same header
+name by separating them with a comma.
+
 ===== proxy_url
 
 The URL of the proxy to use when connecting to the Elasticsearch servers. The
@@ -239,7 +253,7 @@ you must <<load-template-manually,load the template manually>>.
 
 *`name`*:: The name of the template. The default is +{beatname_lc}+.
 
-*`path`*:: The path to the template file. The default is +{beatname_lc}.template.json+. If a relative
+*`path`*:: The path to the template file. The default is +fields.yml+. If a relative
 path is set, it is considered relative to the config path. See the <<directory-layout>> section for
 details.
 
@@ -253,7 +267,7 @@ For example:
 output.elasticsearch:
   hosts: ["localhost:9200"]
   template.name: "{beatname_lc}"
-  template.path: "{beatname_lc}.template.json"
+  template.fields: "fields.yml"
   template.overwrite: false
 ----------------------------------------------------------------------
 
@@ -275,9 +289,8 @@ For example:
 ----------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["localhost:9200"]
-  template.path: "{beatname_lc}.template.json"
+  template.fields: "{beatname_lc}.template.json"
   template.overwrite: false
-  template.versions.2x.path: "{beatname_lc}.template-es2x.json
 ----------------------------------------------------------------------
 
 ===== max_retries
@@ -319,16 +332,6 @@ The number of seconds to wait for new events between two bulk API index requests
 If `bulk_max_size` is reached before this interval expires, additional bulk index
 requests are made.
 
-[[save_topology]]
-===== save_topology
-
-deprecated[5.0.0]
-
-A Boolean that specifies whether the topology is kept in Elasticsearch. The default is
-false.
-
-This option is relevant for Packetbeat only.
-
 ===== ssl
 
 Configuration options for SSL parameters like the certificate authority to use
@@ -339,55 +342,54 @@ See <<configuration-output-ssl>> for more information.
 
 
 [[logstash-output]]
-=== Logstash Output Configuration
+=== Logstash Output
+
+*Prerequisite:* To use Logstash as an output, you must
+{libbeat}/logstash-installation.html#logstash-setup[install and configure] the Beats input
+plugin for Logstash. 
 
 The Logstash output sends the events directly to Logstash by using the lumberjack
-protocol, which runs over TCP. To use this option, you must
-{libbeat}/logstash-installation.html#logstash-setup[install and configure] the Beats input
-plugin for Logstash. Logstash allows for additional processing and routing of
+protocol, which runs over TCP. Logstash allows for additional processing and routing of
 generated events.
 
-Every event sent to Logstash contains additional metadata for indexing and filtering:
+Here is an example of how to configure {beatname_uc} to use Logstash:
 
-[source,json]
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.logstash:
+  hosts: ["localhost:5044"]
+------------------------------------------------------------------------------
+
+==== Accessing Metadata Fields
+
+Every event sent to Logstash contains the following metadata fields that you can
+use in Logstash for indexing and filtering:
+
+["source","json",subs="attributes"]
 ------------------------------------------------------------------------------
 {
     ...
-    "@metadata": {
-      "beat": "<beat>",
-      "type": "<event type>"
+    "@metadata": { <1>
+      "beat": "{beatname_lc}", <2>
+      "type": "<event type>" <3>
     }
 }
 ------------------------------------------------------------------------------
+<1> {beatname_uc} uses the `@metadata` field to send metadata to Logstash. The
+contents of the `@metadata` field only exist in Logstash and are not part of any
+events sent from Logstash. See the 
+{logstashdoc}/event-dependent-configuration.html#metadata[Logstash documentation]
+for more about the `@metadata` field.
+<2> The default is {beatname_lc}. To change this value, set the
+<<logstash-index,`index`>> option in the {beatname_uc} config file.
+<3> The value of `type` varies depending on the event type. 
+ 
+You can access this metadata from within the Logstash config file to set values
+dynamically based on the contents of the metadata.
 
-In Logstash, you can configure the Elasticsearch output plugin to use the
-metadata and event type for indexing.
-
-The following *Logstash 1.5* configuration file sets Logstash to use the index and
-document type reported by Beats for indexing events into Elasticsearch.
-The index used will depend on the `@timestamp` field as identified by Logstash.
-
-[source,logstash]
-------------------------------------------------------------------------------
-
-input {
-  beats {
-    port => 5044
-  }
-}
-
-output {
-  elasticsearch {
-    host => "localhost"
-    port => "9200"
-    protocol => "http"
-    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
-    document_type => "%{[@metadata][type]}"
-  }
-}
-------------------------------------------------------------------------------
-
-Here is the same configuration for *Logstash 2.x* releases:
+For example, the following Logstash configuration file for versions 2.x and
+5.x sets Logstash to use the index and document type reported by Beats for
+indexing events into Elasticsearch:
 
 [source,logstash]
 ------------------------------------------------------------------------------
@@ -401,23 +403,20 @@ input {
 output {
   elasticsearch {
     hosts => ["http://localhost:9200"]
-    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
-    document_type => "%{[@metadata][type]}"
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}" <1>
+    document_type => "%{[@metadata][type]}" <2>
   }
 }
 ------------------------------------------------------------------------------
+<1> `%{[@metadata][beat]}` sets the first part of the index name to the value
+of the `beat` metadata field, and `%{+YYYY.MM.dd}` sets the second part of the
+name to a date based on the Logstash `@timestamp` field. For example:
++{beatname_lc}-2017.03.29+.
+<2> `%{[@metadata][type]}` sets the document type based on the value of the `type`
+metadata field.
 
 Events indexed into Elasticsearch with the Logstash configuration shown here
 will be similar to events directly indexed by Beats into Elasticsearch.
-
-Here is an example of how to configure the Beat to use Logstash:
-
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
-output.logstash:
-  hosts: ["localhost:5044"]
-  index: {beatname_lc}
-------------------------------------------------------------------------------
 
 ==== Compatibility
 
@@ -438,9 +437,12 @@ The default value is true.
 [[hosts]]
 ===== hosts
 
-The list of known Logstash servers to connect to. All entries in this list can
-contain a port number. If no port number is given, the value specified for <<port>>
-is used as the default port number.
+The list of known Logstash servers to connect to. If load balancing is disabled, but
+multiple hosts are configured, one host is selected randomly (there is no precedence).
+If one host becomes unreachable, another one is selected randomly.
+
+All entries in this list can contain a port number. If no port number is given, the
+value specified for <<port>> is used as the default port number.
 
 ===== compression_level
 
@@ -515,6 +517,7 @@ The `proxy_use_local_resolver` option determines if Logstash hostnames are
 resolved locally when using a proxy. The default value is false which means
 that when a proxy is used the name resolution occurs on the proxy server.
 
+[[logstash-index]]
 ===== index
 
 The index root name to write events to. The default is the Beat name.
@@ -561,7 +564,7 @@ Elasticsearch. Beats that publish data in batches (such as Filebeat) send events
 spooler size.
 
 [[kafka-output]]
-=== Kafka Output Configuration
+=== Kafka Output
 
 The Kafka output sends the events to Apache Kafka.
 
@@ -617,7 +620,8 @@ Valid values are `0.8.2.0`, `0.8.2.1`, `0.8.2.2`, `0.8.2`, `0.8`, `0.9.0.0`,
 
 ===== username
 
-The username for connecting to Kafka. If username is configured, the passowrd must be configured as well. Only SASL/PLAIN is supported.
+The username for connecting to Kafka. If username is configured, the password
+must be configured as well. Only SASL/PLAIN is supported.
 
 ===== password
 
@@ -657,7 +661,7 @@ Kafka output broker event partitioning strategy. Must be one of `random`,
 
 *`random.group_events`*: Sets the number of events to be published to the same
  partition, before the partitioner selects a new partition by random. The
- default value is 1 meaning after each event a new parition is picked randomly.
+ default value is 1 meaning after each event a new partition is picked randomly.
 
 *`round_robin.group_events`*: Sets the number of events to be published to the
  same partition, before the partitioner selects the next partition. The default
@@ -695,7 +699,7 @@ See <<configuration-output-codec>> for more information.
 Kafka metadata update settings. The metadata do contain information about
 brokers, topics, partition, and active leaders to use for publishing.
 
-*`refresh_frequency`*:: Metadata refreash interval. Defaults to 10 minutes.
+*`refresh_frequency`*:: Metadata refresh interval. Defaults to 10 minutes.
 
 *`retry.max`*:: Total number of metadata update retries when cluster is in middle of leader election. The default is 3.
 
@@ -758,7 +762,7 @@ Configuration options for SSL parameters like the root CA for Kafka connections.
 <<configuration-output-ssl>> for more information.
 
 [[redis-output]]
-=== Redis Output Configuration
+=== Redis Output
 
 The Redis output inserts the events into a Redis list or a Redis channel.
 This output plugin is compatible with
@@ -979,7 +983,7 @@ This option determines whether Redis hostnames are resolved locally when using a
 The default value is false, which means that name resolution occurs on the proxy server.
 
 [[file-output]]
-=== File Output Configuration
+=== File Output
 
 The File output dumps the transactions into a file where each transaction is in a JSON format.
 Currently, this output is used for testing, but it can be used as input for
@@ -1034,7 +1038,7 @@ Output codec configuration. If the `codec` section is missing, events will be js
 See <<configuration-output-codec>> for more information.
 
 [[console-output]]
-=== Console Output Configuration
+=== Console Output
 
 The Console output writes events in JSON format to stdout.
 
@@ -1077,7 +1081,7 @@ Setting `bulk_max_size` to 0 disables buffering in libbeat.
 
 [[configuration-output-ssl]]
 
-=== SSL Configuration
+=== SSL
 
 You can specify SSL options for any output that supports SSL.
 
@@ -1129,7 +1133,7 @@ The client certificate key used for client authentication. This option is requir
 
 The passphrase used to decrypt an encrypted key stored in the configured `key` file.
 
-===== versions
+===== supported_protocols
 
 List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
 not configured, the connection will be dropped during or after the handshake. The
@@ -1213,7 +1217,7 @@ The following elliptic curve types are available:
 * P-521
 
 [[configuration-output-codec]]
-=== Output Codec Configuration
+=== Output Codec
 
 For outputs that do not require a specific encoding, you can change the encoding
 by using the codec configuration. You can specify either the `json` or `format`

@@ -7,6 +7,7 @@ Contains tests for filtering.
 
 
 class Test(BaseTest):
+
     def test_dropfields(self):
         """
         Check drop_fields filtering action

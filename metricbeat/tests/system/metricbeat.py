@@ -1,7 +1,8 @@
 import sys
 import os
 
-sys.path.append('../../../libbeat/tests/system')
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
+
 from beat.beat import TestCase
 
 COMMON_FIELDS = ["@timestamp", "beat", "metricset.name", "metricset.host",
@@ -9,12 +10,14 @@ COMMON_FIELDS = ["@timestamp", "beat", "metricset.name", "metricset.host",
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
+
 class BaseTest(TestCase):
+
     @classmethod
     def setUpClass(self):
         self.beat_name = "metricbeat"
-        self.build_path = "../../build/system-tests/"
-        self.beat_path = "../../metricbeat.test"
+        self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+        super(BaseTest, self).setUpClass()
 
     def assert_fields_are_documented(self, evt):
         """

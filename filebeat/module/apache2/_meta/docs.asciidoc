@@ -1,0 +1,42 @@
+== Apache2 module
+
+This module parses access and error logs created by the
+https://httpd.apache.org/[Apache HTTP] server.
+
+[float]
+=== Compatibility
+
+This module requires the
+{elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent] and
+{elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugins.
+
+
+The Apache2 module was tested with logs from versions 2.2.22 and 2.4.23.
+
+On Windows, the module was tested with Apache2 installed from the Chocolatey
+repository.
+
+[float]
+=== Dashboard
+
+This module comes with a sample dashboard.
+
+image::./images/kibana-apache2.png[]
+
+[float]
+=== Access logs fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.
+
+[float]
+=== Error logs fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.

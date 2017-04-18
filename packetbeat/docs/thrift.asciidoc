@@ -45,7 +45,8 @@ Here is an example configuration section for the Thrift protocol:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols.thrift:
+packetbeat.protocols:
+- type: thrift
   transport_type: socket
   protocol_type: binary
   idl_files: ["tutorial.thrift", "shared.thrift"]

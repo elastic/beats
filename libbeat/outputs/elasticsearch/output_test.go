@@ -26,7 +26,6 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) *elasticsear
 	}
 
 	config, _ := common.NewConfigFrom(map[string]interface{}{
-		"save_topology":    true,
 		"hosts":            []string{GetEsHost()},
 		"port":             esPort,
 		"username":         os.Getenv("ES_USER"),
@@ -39,49 +38,9 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) *elasticsear
 		"template.enabled": false,
 	})
 
-	output := &elasticsearchOutput{beatName: "test"}
-	output.init(config, 10)
+	output := &elasticsearchOutput{beat: common.BeatInfo{Beat: "test"}}
+	output.init(config)
 	return output
-}
-
-func TestTopologyInES(t *testing.T) {
-
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
-
-	elasticsearchOutput1 := createElasticsearchConnection(0, 0)
-	elasticsearchOutput2 := createElasticsearchConnection(0, 0)
-	elasticsearchOutput3 := createElasticsearchConnection(0, 0)
-
-	elasticsearchOutput1.PublishIPs("proxy1", []string{"10.1.0.4"})
-	elasticsearchOutput2.PublishIPs("proxy2", []string{"10.1.0.9",
-		"fe80::4e8d:79ff:fef2:de6a"})
-	elasticsearchOutput3.PublishIPs("proxy3", []string{"10.1.0.10"})
-
-	name2 := elasticsearchOutput3.GetNameByIP("10.1.0.9")
-	if name2 != "proxy2" {
-		t.Errorf("Failed to update proxy2 in topology: name=%s", name2)
-	}
-
-	elasticsearchOutput1.PublishIPs("proxy1", []string{"10.1.0.4"})
-	elasticsearchOutput2.PublishIPs("proxy2", []string{"10.1.0.9"})
-	elasticsearchOutput3.PublishIPs("proxy3", []string{"192.168.1.2"})
-
-	name3 := elasticsearchOutput3.GetNameByIP("192.168.1.2")
-	if name3 != "proxy3" {
-		t.Errorf("Failed to add a new IP")
-	}
-
-	name3 = elasticsearchOutput3.GetNameByIP("10.1.0.10")
-	if name3 != "" {
-		t.Errorf("Failed to delete old IP of proxy3: %s", name3)
-	}
-
-	name2 = elasticsearchOutput3.GetNameByIP("fe80::4e8d:79ff:fef2:de6a")
-	if name2 != "" {
-		t.Errorf("Failed to delete old IP of proxy2: %s", name2)
-	}
 }
 
 func TestOneEvent(t *testing.T) {
@@ -159,7 +118,7 @@ func TestOneEvent(t *testing.T) {
 func TestEvents(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"output_elasticsearch"})
 	}
 
 	ts := time.Now()
@@ -299,7 +258,7 @@ func testBulkWithParams(t *testing.T, output *elasticsearchOutput) {
 func TestBulkEvents(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch", "elasticsearch"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"output_elasticsearch", "elasticsearch"})
 	}
 
 	testBulkWithParams(t, createElasticsearchConnection(50, 2))

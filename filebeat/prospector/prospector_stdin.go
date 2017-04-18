@@ -9,18 +9,21 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-type ProspectorStdin struct {
-	harvester  *harvester.Harvester
-	Prospector *Prospector
-	started    bool
+// Stdin is a prospector for stdin
+type Stdin struct {
+	harvester *harvester.Harvester
+  Prospector *Prospector
+	started   bool
 }
 
-// NewProspectorStdin creates a new stdin prospector
+// NewStdin creates a new stdin prospector
 // This prospector contains one harvester which is reading from stdin
-func NewProspectorStdin(p *Prospector) (*ProspectorStdin, error) {
+func NewStdin(p *Prospector) (*Stdin, error) {
 
-	prospectorer := &ProspectorStdin{}
-	prospectorer.Prospector = p
+	prospectorer := &Stdin{
+		started: false,
+	}
+  prospectorer.Prospector = p
 
 	var err error
 
@@ -32,32 +35,31 @@ func NewProspectorStdin(p *Prospector) (*ProspectorStdin, error) {
 	return prospectorer, nil
 }
 
-func (p *ProspectorStdin) Init(states []file.State) error {
-	p.started = false
+// LoadStates loads the states
+func (s *Stdin) LoadStates(states []file.State) error {
 	return nil
 }
 
-func (p *ProspectorStdin) Run() {
+// Run runs the prospector
+func (s *Stdin) Run() {
 
 	// Make sure stdin harvester is only started once
-	if !p.started {
-		reader, err := p.harvester.Setup()
+	if !s.started {
+		reader, err := s.harvester.Setup()
 		if err != nil {
 			logp.Err("Error starting stdin harvester: %s", err)
 			return
 		}
 
-		p.Prospector.wg.Add(1)
-		atomic.AddUint64(&p.Prospector.harvesterCounter, 1)
+		s.Prospector.wg.Add(1)
 
 		go func() {
 			defer func() {
-				atomic.AddUint64(&p.Prospector.harvesterCounter, ^uint64(0))
 				p.Prospector.wg.Done()
 			}()
 
-			p.harvester.Harvest(reader)
-			p.started = true
+			s.harvester.Harvest(reader)
+			s.started = true
 		}()
 	}
 }

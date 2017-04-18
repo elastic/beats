@@ -1,0 +1,4 @@
+== golang Module
+
+This is the golang Module. Metrics are collected submitting HTTP GET requests to golang-expvar-api.
+Reference: https://golang.org/pkg/expvar/

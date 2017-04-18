@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"regexp"
 	"time"
+	"unicode"
+	"unicode/utf8"
 )
 
 // Unpack unpacks c into a struct, a map, or a slice allocating maps, slices,
@@ -56,6 +58,9 @@ import (
 //  A field its name is set using the `config` struct tag (configured by StructTag)
 //  If tag is missing or no field name is configured in the tag, the field name
 //  itself will be used.
+//  If the tag sets the `,ignore` flag, the field will not be overwritten.
+//  If the tag sets the `,inline` or `,squash` flag, Unpack will apply the current
+//  configuration namespace to the fields.
 //
 //
 // Fields available in a struct or a map, but not in the Config object, will not
@@ -197,9 +202,17 @@ func reifyStruct(opts *options, orig reflect.Value, cfg *Config) Error {
 		numField := to.NumField()
 		for i := 0; i < numField; i++ {
 			stField := to.Type().Field(i)
-			vField := to.Field(i)
-			name, tagOpts := parseTags(stField.Tag.Get(opts.tag))
 
+			// ignore non exported fields
+			if rune, _ := utf8.DecodeRuneInString(stField.Name); !unicode.IsUpper(rune) {
+				continue
+			}
+			name, tagOpts := parseTags(stField.Tag.Get(opts.tag))
+			if tagOpts.ignore {
+				continue
+			}
+
+			vField := to.Field(i)
 			validators, err := parseValidatorTags(stField.Tag.Get(opts.validatorTag))
 			if err != nil {
 				return raiseCritical(err, "")

@@ -1,7 +1,9 @@
 package service
 
 import (
+	"expvar"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -11,10 +13,9 @@ import (
 	"syscall"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 
 	"net/http"
-
-	// blank pprof import to load HTTP handler for debugging endpoint
 	_ "net/http/pprof"
 )
 
@@ -70,11 +71,47 @@ func BeforeRun() {
 	}
 
 	if *httpprof != "" {
+		logp.Info("start pprof endpoint")
 		go func() {
-			logp.Info("start pprof endpoint")
-			logp.Info("finished pprof endpoint: %v", http.ListenAndServe(*httpprof, nil))
+			mux := http.NewServeMux()
+
+			// register pprof handler
+			mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
+				http.DefaultServeMux.ServeHTTP(w, r)
+			})
+
+			// register metrics handler
+			mux.HandleFunc("/debug/vars", metricsHandler)
+
+			endpoint := http.ListenAndServe(*httpprof, mux)
+			logp.Info("finished pprof endpoint: %v", endpoint)
 		}()
 	}
+}
+
+// report expvar and all libbeat/monitoring metrics
+func metricsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+	first := true
+	report := func(key string, value interface{}) {
+		if !first {
+			fmt.Fprintf(w, ",\n")
+		}
+		first = false
+		if str, ok := value.(string); ok {
+			fmt.Fprintf(w, "%q: %q", key, str)
+		} else {
+			fmt.Fprintf(w, "%q: %v", key, value)
+		}
+	}
+
+	fmt.Fprintf(w, "{\n")
+	monitoring.Do(monitoring.Full, report)
+	expvar.Do(func(kv expvar.KeyValue) {
+		report(kv.Key, kv.Value)
+	})
+	fmt.Fprintf(w, "\n}\n")
 }
 
 // Cleanup handles cleaning up the runtime and OS environments. This includes

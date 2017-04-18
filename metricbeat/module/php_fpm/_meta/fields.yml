@@ -1,0 +1,14 @@
+- key: php_fpm
+  title: "php_fpm"
+  description: >
+    beta[]
+
+    PHP-FPM server status metrics collected from PHP-FPM.
+  short_config: false
+  fields:
+    - name: php_fpm
+      type: group
+      description: >
+        `php_fpm` contains the metrics that were obtained from PHP-FPM status
+        page call.
+      fields:

@@ -4,7 +4,6 @@ package logstash
 // registered with all output plugins
 
 import (
-	"expvar"
 	"time"
 
 	"github.com/elastic/go-lumber/log"
@@ -12,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
@@ -22,14 +22,14 @@ var debug = logp.MakeDebug("logstash")
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	ackedEvents            = expvar.NewInt("libbeat.logstash.published_and_acked_events")
-	eventsNotAcked         = expvar.NewInt("libbeat.logstash.published_but_not_acked_events")
-	publishEventsCallCount = expvar.NewInt("libbeat.logstash.call_count.PublishEvents")
+	ackedEvents            = monitoring.NewInt(outputs.Metrics, "logstash.events.acked")
+	eventsNotAcked         = monitoring.NewInt(outputs.Metrics, "logstash.events.not_acked")
+	publishEventsCallCount = monitoring.NewInt(outputs.Metrics, "logstash.publishEvents.call.count")
 
-	statReadBytes   = expvar.NewInt("libbeat.logstash.publish.read_bytes")
-	statWriteBytes  = expvar.NewInt("libbeat.logstash.publish.write_bytes")
-	statReadErrors  = expvar.NewInt("libbeat.logstash.publish.read_errors")
-	statWriteErrors = expvar.NewInt("libbeat.logstash.publish.write_errors")
+	statReadBytes   = monitoring.NewInt(outputs.Metrics, "logstash.read.bytes")
+	statWriteBytes  = monitoring.NewInt(outputs.Metrics, "logstash.write.bytes")
+	statReadErrors  = monitoring.NewInt(outputs.Metrics, "logstash.read.errors")
+	statWriteErrors = monitoring.NewInt(outputs.Metrics, "logstash.write.errors")
 )
 
 const (
@@ -46,10 +46,10 @@ func init() {
 	outputs.RegisterOutputPlugin("logstash", new)
 }
 
-func new(beatName string, cfg *common.Config, _ int) (outputs.Outputer, error) {
+func new(beat common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
 
 	if !cfg.HasField("index") {
-		cfg.SetString("index", -1, beatName)
+		cfg.SetString("index", -1, beat.Beat)
 	}
 
 	output := &logstash{}
@@ -80,10 +80,12 @@ func (lj *logstash) init(cfg *common.Config) error {
 		Proxy:   &config.Proxy,
 		TLS:     tls,
 		Stats: &transport.IOStats{
-			Read:        statReadBytes,
-			Write:       statWriteBytes,
-			ReadErrors:  statReadErrors,
-			WriteErrors: statWriteErrors,
+			Read:               statReadBytes,
+			Write:              statWriteBytes,
+			ReadErrors:         statReadErrors,
+			WriteErrors:        statWriteErrors,
+			OutputsWrite:       outputs.WriteBytes,
+			OutputsWriteErrors: outputs.WriteErrors,
 		},
 	}
 

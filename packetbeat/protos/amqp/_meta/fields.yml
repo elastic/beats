@@ -125,7 +125,7 @@
             Acknowledge multiple messages.
 
         - name: arguments
-          type: dict
+          type: object
           description: >
             Optional additional arguments passed to some methods. Can be of
             various types.
@@ -152,8 +152,8 @@
             MIME content encoding.
 
         - name: headers
-          type: dict
-          dict-type: keyword
+          type: object
+          object_type: keyword
           description: >
             Message header field table.
 

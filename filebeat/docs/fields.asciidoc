@@ -13,12 +13,13 @@ This document describes the fields that are exported by Filebeat. They are
 grouped in the following categories:
 
 * <<exported-fields-apache2>>
+* <<exported-fields-auditd>>
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-log>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
-* <<exported-fields-syslog>>
+* <<exported-fields-system>>
 
 --
 [[exported-fields-apache2]]
@@ -285,6 +286,154 @@ type: keyword
 The module producing the logged message.
 
 
+[[exported-fields-auditd]]
+== Auditd Fields
+
+Module for parsing auditd logs.
+
+
+
+[float]
+== auditd Fields
+
+Fields from the auditd logs.
+
+
+
+[float]
+== log Fields
+
+Fields from the Linux audit log. Not all fields are documented here because they are dynamic and vary by audit event type.
+
+
+
+[float]
+=== auditd.log.record_type
+
+The audit event type.
+
+
+[float]
+=== auditd.log.old_auid
+
+For login events this is the old audit ID used for the user prior to this login.
+
+
+[float]
+=== auditd.log.new_auid
+
+For login events this is the new audit ID. The audit ID can be used to trace future events to the user even if their identity changes (like becoming root).
+
+
+[float]
+=== auditd.log.old_ses
+
+For login events this is the old session ID used for the user prior to this login.
+
+
+[float]
+=== auditd.log.new_ses
+
+For login events this is the new session ID. It can be used to tie a user to future events by session ID.
+
+
+[float]
+=== auditd.log.sequence
+
+type: long
+
+The audit event sequence number.
+
+
+[float]
+=== auditd.log.acct
+
+The user account name associated with the event.
+
+
+[float]
+=== auditd.log.pid
+
+The ID of the process.
+
+
+[float]
+=== auditd.log.ppid
+
+The ID of the process.
+
+
+[float]
+=== auditd.log.items
+
+The number of items in an event.
+
+
+[float]
+=== auditd.log.item
+
+The item field indicates which item out of the total number of items. This number is zero-based; a value of 0 means it is the first item.
+
+
+[float]
+=== auditd.log.a0
+
+The first argument to the system call.
+
+
+[float]
+=== auditd.log.res
+
+The result of the system call (success or failure).
+
+
+[float]
+== geoip Fields
+
+Contains GeoIP information gathered based on the `auditd.log.addr` field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== auditd.log.geoip.continent_name
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== auditd.log.geoip.city_name
+
+type: keyword
+
+The name of the city.
+
+
+[float]
+=== auditd.log.geoip.region_name
+
+type: keyword
+
+The name of the region.
+
+
+[float]
+=== auditd.log.geoip.country_iso_code
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== auditd.log.geoip.location
+
+type: geo_point
+
+The longitude and latitude.
+
+
 [[exported-fields-beat]]
 == Beat Fields
 
@@ -302,6 +451,12 @@ The name of the Beat sending the log messages. If the Beat name is set in the co
 === beat.hostname
 
 The hostname as returned by the operating system on which the Beat is running.
+
+
+[float]
+=== beat.timezone
+
+The timezone as returned by the operating system on which the Beat is running.
 
 
 [float]
@@ -333,9 +488,40 @@ Arbitrary tags that can be set per Beat and per transaction type.
 [float]
 === fields
 
-type: dict
+type: object
 
 Contains user configurable fields.
+
+
+[float]
+== error Fields
+
+Error fields containing additional info in case of errors.
+
+
+
+[float]
+=== error.message
+
+type: text
+
+Error message.
+
+
+[float]
+=== error.code
+
+type: long
+
+Error code.
+
+
+[float]
+=== error.type
+
+type: keyword
+
+Error type.
 
 
 [[exported-fields-cloud]]
@@ -403,7 +589,7 @@ type: keyword
 
 required: True
 
-The file from which the line was read. This field contains the full path to the file. For example: `/var/log/system.log`.
+The file from which the line was read. This field contains the absolute path to the file. For example: `/var/log/system.log`.
 
 
 [float]
@@ -452,6 +638,18 @@ Ingestion pipeline error message, added in case there are errors reported by the
 === read_timestamp
 
 In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
+
+
+[float]
+=== fileset.module
+
+The Filebeat module that generated this event.
+
+
+[float]
+=== fileset.name
+
+The Filebeat fileset that generated this event.
 
 
 [[exported-fields-mysql]]
@@ -839,53 +1037,293 @@ type: text
 The error message
 
 
-[[exported-fields-syslog]]
-== Syslog Fields
+[[exported-fields-system]]
+== System Fields
 
-Module for parsing syslog files.
-
-
-
-[float]
-== syslog Fields
-
-Fields from the syslog files.
+Module for parsing system log files.
 
 
 
 [float]
 == system Fields
 
+Fields from the system log files.
+
+
+
+[float]
+== auth Fields
+
+Fields from the Linux authorization logs.
+
+
+
+[float]
+=== system.auth.timestamp
+
+The timestamp as read from the auth message.
+
+
+[float]
+=== system.auth.hostname
+
+The hostname as read from the auth message.
+
+
+[float]
+=== system.auth.program
+
+The process name as read from the auth message.
+
+
+[float]
+=== system.auth.pid
+
+type: long
+
+The PID of the process that sent the auth message.
+
+
+[float]
+=== system.auth.message
+
+The message in the log line.
+
+
+[float]
+=== system.auth.user
+
+The Unix user that this event refers to.
+
+
+[float]
+== ssh Fields
+
+Fields specific to SSH login events.
+
+
+
+[float]
+=== system.auth.ssh.event
+
+The SSH login event. Can be one of "Accepted", "Failed", or "Invalid". "Accepted" means a successful login. "Invalid" means that the user is not configured on the system. "Failed" means that the SSH login attempt has failed.
+
+
+[float]
+=== system.auth.ssh.method
+
+The SSH authentication method. Can be one of "password" or "publickey".
+
+
+[float]
+=== system.auth.ssh.ip
+
+type: ip
+
+The client IP from where the login attempt was made.
+
+
+[float]
+=== system.auth.ssh.dropped_ip
+
+type: ip
+
+The client IP from SSH connections that are open and immediately dropped.
+
+
+[float]
+=== system.auth.ssh.port
+
+type: long
+
+The client port from where the login attempt was made.
+
+
+[float]
+=== system.auth.ssh.signature
+
+The signature of the client public key.
+
+
+[float]
+== geoip Fields
+
+Contains GeoIP information gathered based on the `system.auth.ip` field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== system.auth.ssh.geoip.continent_name
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== system.auth.ssh.geoip.city_name
+
+type: keyword
+
+The name of the city.
+
+
+[float]
+=== system.auth.ssh.geoip.region_name
+
+type: keyword
+
+The name of the region.
+
+
+[float]
+=== system.auth.ssh.geoip.country_iso_code
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== system.auth.ssh.geoip.location
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
+== sudo Fields
+
+Fields specific to events created by the `sudo` command.
+
+
+
+[float]
+=== system.auth.sudo.error
+
+example: user NOT in sudoers
+
+The error message in case the sudo command failed.
+
+
+[float]
+=== system.auth.sudo.tty
+
+The TTY where the sudo command is executed.
+
+
+[float]
+=== system.auth.sudo.pwd
+
+The current directory where the sudo command is executed.
+
+
+[float]
+=== system.auth.sudo.user
+
+example: root
+
+The target user to which the sudo command is switching.
+
+
+[float]
+=== system.auth.sudo.command
+
+The command executed via sudo.
+
+
+[float]
+== useradd Fields
+
+Fields specific to events created by the `useradd` command.
+
+
+
+[float]
+=== system.auth.useradd.name
+
+The user name being added.
+
+
+[float]
+=== system.auth.useradd.uid
+
+type: long
+
+The user ID.
+
+[float]
+=== system.auth.useradd.gid
+
+type: long
+
+The group ID.
+
+[float]
+=== system.auth.useradd.home
+
+The home folder for the new user.
+
+[float]
+=== system.auth.useradd.shell
+
+The default shell for the new user.
+
+[float]
+== groupadd Fields
+
+Fields specific to events created by the `groupadd` command.
+
+
+
+[float]
+=== system.auth.groupadd.name
+
+The name of the new group.
+
+
+[float]
+=== system.auth.groupadd.gid
+
+type: long
+
+The ID of the new group.
+
+
+[float]
+== syslog Fields
+
 Contains fields from the syslog system logs.
 
 
 
 [float]
-=== syslog.system.timestamp
+=== system.syslog.timestamp
 
 The timestamp as read from the syslog message.
 
 
 [float]
-=== syslog.system.hostname
+=== system.syslog.hostname
 
 The hostname as read from the syslog message.
 
 
 [float]
-=== syslog.system.program
+=== system.syslog.program
 
 The process name as read from the syslog message.
 
 
 [float]
-=== syslog.system.pid
+=== system.syslog.pid
 
 The PID of the process that sent the syslog message.
 
 
 [float]
-=== syslog.system.message
+=== system.syslog.message
 
 The message in the log line.
 

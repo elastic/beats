@@ -1,5 +1,5 @@
 
-BEATNAME=libbeat
+BEAT_NAME=libbeat
 TEST_ENVIRONMENT=true
 SYSTEM_TESTS=true
 
@@ -14,3 +14,6 @@ fields:
 # Collects all dependencies and then calls update
 .PHONY: collect
 collect: fields
+
+clean::
+	rm -rf libbeat.full.yml libbeat.yml

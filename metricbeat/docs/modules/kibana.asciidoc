@@ -1,0 +1,37 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-kibana]]
+== kibana Module
+
+This is the kibana Module.
+
+
+
+[float]
+=== Example Configuration
+
+The kibana module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: kibana
+  metricsets: ["status"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:5601"]
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-kibana-status,status>>
+
+include::kibana/status.asciidoc[]
+

@@ -11,13 +11,13 @@
 
 # Config reloading allows to dynamically load modules. Each file which is
 # monitored must contain one or multiple modules as a list.
-metricbeat.modules.reload:
+metricbeat.config.modules:
 
   # Glob pattern for configuration reloading
   path: ${path.config}/conf.d/*.yml
 
   # Period on which files under path should be checked for chagnes
-  period: 10s
+  reload.period: 10s
 
   # Set to true to enable config reloading
-  enabled: false
+  reload.enabled: false

@@ -1,10 +1,13 @@
 FROM java:8-jre
 
-ARG LS_DOWNLOAD_URL
-ARG LS_VERSION
+RUN apt-get update && \
+    apt-get install -y netcat
 
-ENV URL ${LS_DOWNLOAD_URL}/logstash-${LS_VERSION}.tar.gz
-ENV PATH $PATH:/opt/logstash-${LS_VERSION}/bin
+ARG DOWNLOAD_URL
+ARG ELASTIC_VERSION
+
+ENV URL ${DOWNLOAD_URL}/logstash/logstash-${ELASTIC_VERSION}.tar.gz
+ENV PATH $PATH:/opt/logstash-${ELASTIC_VERSION}/bin
 
 # Cache variable can be set during building to invalidate the build cache with `--build-arg CACHE=$(date +%s) .`
 ARG CACHE=1
@@ -20,6 +23,8 @@ COPY logstash.conf.tmpl /logstash.conf.tmpl
 COPY docker-entrypoint.sh /entrypoint.sh
 
 COPY pki /etc/pki
+
+HEALTHCHECK CMD nc -z localhost 5044
 
 ENTRYPOINT ["/entrypoint.sh"]
 

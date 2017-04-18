@@ -57,9 +57,11 @@ The location where you clone is important. Please clone under the source
 directory of your `GOPATH`. If you don't have `GOPATH` already set, you can
 simply set it to your home directory (`export GOPATH=$HOME`).
 
-    $ mkdir -p ${GOPATH%%:*}/src/github.com/elastic
-    $ cd ${GOPATH%%:*}/src/github.com/elastic
+    $ mkdir -p ${GOPATH}/src/github.com/elastic
+    $ cd ${GOPATH}/src/github.com/elastic
     $ git clone https://github.com/elastic/beats.git
+
+Note: If you have multiple go paths use `${GOPATH%%:*}`instead of `${GOPATH}`.
 
 Then you can compile a particular Beat by using the Makefile. For example, for
 Packetbeat:
@@ -95,8 +97,8 @@ You can run the whole testsuite with the following command:
 Running the testsuite has the following requirements:
 
 * Python >=2.7.9
-* Docker >=1.10.0
-* Docker-compose >= 1.8.0
+* Docker >=1.12
+* Docker-compose >= 1.11
 
 
 ## Documentation
@@ -110,7 +112,8 @@ inside the folder for the Beat. This will automatically open your browser with t
 ## Dependencies
 
 To manage the `vendor/` folder we use
-[glide](https://github.com/Masterminds/glide), which uses
-[glide.yaml](glide.yaml) as a manifest file for the dependencies. Please see
-the glide documentation on how to add or update vendored dependencies.
+[govendor](https://github.com/kardianos/govendor). Please see
+the govendor documentation on how to add or update vendored dependencies.
+
+In most cases `govendor fetch your/dependency@version +out` will get the job done.
 

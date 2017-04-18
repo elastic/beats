@@ -1,0 +1,28 @@
+== System module
+
+This module collects and parses logs created by system logging server of common
+Unix/Linux based distributions.
+
+[float]
+=== Compatibility
+
+This module was tested with logs from OSes like Ubuntu 12.04, Centos 7, and
+macOS Sierra.
+
+This module is not available for Windows.
+
+[float]
+=== Dashboard
+
+This module comes with a sample dashboard showing syslog data.
+
+image::./images/kibana-system.png[]
+
+[float]
+=== Syslog fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.

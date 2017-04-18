@@ -7,7 +7,11 @@ include::./version.asciidoc[]
 :metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/x-pack/5.0
+:heartbeat: http://www.elastic.co/guide/en/beats/heartbeat/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/x-pack/5.2
+:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
+:beatname_lc: beatname
+:beatname_uc: a Beat
 :security: X-Pack Security
 :ES-version: {stack-version}
 :LS-version: {stack-version}
@@ -16,39 +20,28 @@ include::./version.asciidoc[]
 
 include::./overview.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/communitybeats.asciidoc ?>]
 include::./communitybeats.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/gettingstarted.asciidoc ?>]
 include::./gettingstarted.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/installing-beats.asciidoc ?>]
 include::./installing-beats.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/repositories.asciidoc ?>]
 include::./repositories.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/breaking.asciidoc ?>]
 include::./breaking.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/upgrading.asciidoc ?>]
 include::./upgrading.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/config-file-format.asciidoc ?>]
 include::./config-file-format.asciidoc[]
 
 pass::[<?page_header Always refer to the documentation in master for the latest information about contributing to Beats.?>]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/newbeat.asciidoc ?>]
 include::./newbeat.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/event-conventions.asciidoc ?>]
 include::./event-conventions.asciidoc[]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/newdashboards.asciidoc ?>]
 include::./newdashboards.asciidoc[]
 
 pass::[<?page_header ?>]
 
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/release.asciidoc ?>]
 include::./release.asciidoc[]

@@ -13,6 +13,8 @@ import (
 func TestConversions(t *testing.T) {
 	ts := time.Now()
 
+	cTs := common.Time{}
+
 	input := map[string]interface{}{
 		"testString":       "hello",
 		"testInt":          42,
@@ -26,6 +28,7 @@ func TestConversions(t *testing.T) {
 		},
 		"testNonNestedObj": "hello from top level",
 		"testTime":         ts,
+		"commonTime":       cTs,
 
 		// wrong types
 		"testErrorInt":    "42",
@@ -44,6 +47,7 @@ func TestConversions(t *testing.T) {
 		"test_string_from_json_num": StrFromNum("testJsonNumber"),
 		"test_bool":                 Bool("testBool"),
 		"test_time":                 Time("testTime"),
+		"common_time":               Time("commonTime"),
 		"test_obj_1": s.Object{
 			"test": Str("testNonNestedObj"),
 		},
@@ -66,6 +70,7 @@ func TestConversions(t *testing.T) {
 		"test_string_from_json_num": "3910564293633576924",
 		"test_bool":                 true,
 		"test_time":                 common.Time(ts),
+		"common_time":               cTs,
 		"test_obj_1": common.MapStr{
 			"test": "hello from top level",
 		},
@@ -74,6 +79,6 @@ func TestConversions(t *testing.T) {
 		},
 	}
 
-	output := schema.Apply(input)
+	output, _ := schema.Apply(input)
 	assert.Equal(t, output, expected)
 }

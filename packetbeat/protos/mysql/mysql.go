@@ -2,13 +2,13 @@ package mysql
 
 import (
 	"errors"
-	"expvar"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -24,8 +24,8 @@ const (
 const maxPayloadSize = 100 * 1024
 
 var (
-	unmatchedRequests  = expvar.NewInt("mysql.unmatched_requests")
-	unmatchedResponses = expvar.NewInt("mysql.unmatched_responses")
+	unmatchedRequests  = monitoring.NewInt(nil, "mysql.unmatched_requests")
+	unmatchedResponses = monitoring.NewInt(nil, "mysql.unmatched_responses")
 )
 
 type mysqlMessage struct {

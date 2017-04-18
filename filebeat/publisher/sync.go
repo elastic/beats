@@ -11,7 +11,7 @@ import (
 type syncLogPublisher struct {
 	pub    publisher.Publisher
 	client publisher.Client
-	in     chan []*input.Event
+	in     chan []*input.Data
 	out    SuccessLogger
 
 	done chan struct{}
@@ -19,7 +19,7 @@ type syncLogPublisher struct {
 }
 
 func newSyncLogPublisher(
-	in chan []*input.Event,
+	in chan []*input.Data,
 	out SuccessLogger,
 	pub publisher.Publisher,
 ) *syncLogPublisher {
@@ -51,14 +51,16 @@ func (p *syncLogPublisher) Start() {
 }
 
 func (p *syncLogPublisher) Publish() error {
-	var events []*input.Event
+	var events []*input.Data
 	select {
 	case <-p.done:
 		return sigPublisherStop
 	case events = <-p.in:
 	}
 
-	ok := p.client.PublishEvents(getDataEvents(events), publisher.Sync, publisher.Guaranteed)
+	dataEvents, meta := getDataEvents(events)
+	ok := p.client.PublishEvents(dataEvents, publisher.Sync, publisher.Guaranteed,
+		publisher.MetadataBatch(meta))
 	if !ok {
 		// PublishEvents will only returns false, if p.client has been closed.
 		return sigPublisherStop

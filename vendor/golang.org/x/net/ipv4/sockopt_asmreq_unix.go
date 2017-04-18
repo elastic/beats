@@ -24,7 +24,7 @@ func setsockoptIPMreq(fd, name int, ifi *net.Interface, grp net.IP) error {
 
 func getsockoptInterface(fd, name int) (*net.Interface, error) {
 	var b [4]byte
-	l := sysSockoptLen(4)
+	l := uint32(4)
 	if err := getsockopt(fd, iana.ProtocolIP, name, unsafe.Pointer(&b[0]), &l); err != nil {
 		return nil, os.NewSyscallError("getsockopt", err)
 	}
@@ -42,5 +42,5 @@ func setsockoptInterface(fd, name int, ifi *net.Interface) error {
 	}
 	var b [4]byte
 	copy(b[:], ip)
-	return os.NewSyscallError("setsockopt", setsockopt(fd, iana.ProtocolIP, name, unsafe.Pointer(&b[0]), sysSockoptLen(4)))
+	return os.NewSyscallError("setsockopt", setsockopt(fd, iana.ProtocolIP, name, unsafe.Pointer(&b[0]), uint32(4)))
 }

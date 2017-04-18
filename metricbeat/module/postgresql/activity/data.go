@@ -32,5 +32,3 @@ var schema = s.Schema{
 	"state":             c.Str("state"),
 	"query":             c.Str("query"),
 }
-
-var eventMapping = schema.Apply

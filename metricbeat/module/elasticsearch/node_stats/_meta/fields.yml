@@ -1,0 +1,117 @@
+- name: node_stats
+  type: group
+  description: >
+    node_stats
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        Node name.
+    - name: jvm.mem.pools
+      type: group
+      description: >
+        JVM memory pool stats
+      fields:
+        - name: old
+          type: group
+          description: >
+            Old memory pool stats.
+          fields:
+            - name: max.bytes
+              type: long
+              format: bytes
+              description:
+                Max bytes.
+            - name: peak.bytes
+              type: long
+              format: bytes
+              description:
+                Peak bytes.
+            - name: peak_max.bytes
+              type: long
+              format: bytes
+              description:
+                Peak max bytes.
+            - name: used.bytes
+              type: long
+              format: bytes
+              description:
+                Used bytes.
+        - name: young
+          type: group
+          description: >
+            Young memory pool stats.
+          fields:
+            - name: max.bytes
+              type: long
+              format: bytes
+              description:
+                Max bytes.
+            - name: peak.bytes
+              type: long
+              format: bytes
+              description:
+                Peak bytes.
+            - name: peak_max.bytes
+              type: long
+              format: bytes
+              description:
+                Peak max bytes.
+            - name: used.bytes
+              type: long
+              format: bytes
+              description:
+                Used bytes.
+        - name: survivor
+          type: group
+          description: >
+            Survivor memory pool stats.
+          fields:
+            - name: max.bytes
+              type: long
+              format: bytes
+              description:
+                Max bytes.
+            - name: peak.bytes
+              type: long
+              format: bytes
+              description:
+                Peak bytes.
+            - name: peak_max.bytes
+              type: long
+              format: bytes
+              description:
+                Peak max bytes.
+            - name: used.bytes
+              type: long
+              format: bytes
+              description:
+                Used bytes.
+
+    - name: gc.collectors
+      type: group
+      description: >
+        GC collector stats.
+      fields:
+        - name: old.collection
+          type: group
+          description: >
+            Old colletion gc.
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: ms
+              type: long
+              description: >
+        - name: young.collection
+          type: group
+          description: >
+            Young collection gc.
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: ms
+              type: long
+              description: >

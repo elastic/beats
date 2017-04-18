@@ -10,12 +10,15 @@
 //////////////////////////////////////////////////////////////////////////
 
 *`-E <setting>=<value>`*::
-Overwrite an individual setting in the config file. For example:
+Override a specific configuration setting. For example:
 +
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo ./{beatname_lc} -c {beatname_lc}.yml -E name=mybeat
 ----------------------------------------------------------------------
++
+This setting is applied to the currently running {beatname_uc} process.
+The {beatname_uc} configuration file is not changed. 
 
 *`-N`*::
 Disable the publishing of events to the defined output. This option is useful only
@@ -59,6 +62,10 @@ Set the default location for miscellaneous files. See the <<directory-layout>> s
 
 *`-path.logs`*::
 Set the default location for log files. See the <<directory-layout>> section for details.
+
+*`-setup`*::
+Load the sample Kibana dashboards. By default, this downloads an archive file containing the Beats dashboards
+from the elastic.co website. See the <<configuration-dashboards>> section for more details and more options.
 
 *`-v`*::
 Enable verbose output to show INFO-level messages.

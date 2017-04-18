@@ -1,4 +1,4 @@
-=== system load MetricSet
+=== System Load Metricset
 
 The System `load` metricset provides load statistics.
 

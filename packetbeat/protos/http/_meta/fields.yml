@@ -15,8 +15,8 @@
                 The query parameters or form values. The query parameters are available in the Request-URI
                 and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
             - name: headers
-              type: dict
-              dict-type: keyword
+              type: object
+              object_type: keyword
               description: >
                 A map containing the captured header fields from the request.
                 Which headers to capture is configurable. If headers with the same
@@ -39,8 +39,8 @@
               example: Not found.
 
             - name: headers
-              type: dict
-              dict-type: keyword
+              type: object
+              object_type: keyword
               description: >
                 A map containing the captured header fields from the response.
                 Which headers to capture is configurable. If headers with the

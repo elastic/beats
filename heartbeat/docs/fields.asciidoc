@@ -37,6 +37,12 @@ The hostname as returned by the operating system on which the Beat is running.
 
 
 [float]
+=== beat.timezone
+
+The timezone as returned by the operating system on which the Beat is running.
+
+
+[float]
 === beat.version
 
 The version of the beat that generated this event.
@@ -65,9 +71,40 @@ Arbitrary tags that can be set per Beat and per transaction type.
 [float]
 === fields
 
-type: dict
+type: object
 
 Contains user configurable fields.
+
+
+[float]
+== error Fields
+
+Error fields containing additional info in case of errors.
+
+
+
+[float]
+=== error.message
+
+type: text
+
+Error message.
+
+
+[float]
+=== error.code
+
+type: long
+
+Error code.
+
+
+[float]
+=== error.type
+
+type: keyword
+
+Error type.
 
 
 [[exported-fields-cloud]]
@@ -317,28 +354,5 @@ type: boolean
 required: True
 
 Boolean indicator if monitor could validate the service to be available.
-
-
-[float]
-== error Fields
-
-Reason monitor flagging a service as down.
-
-
-
-[float]
-=== error.type
-
-type: keyword
-
-Failure type. For example `io` or `validate`.
-
-
-[float]
-=== error.message
-
-type: text
-
-Failure description.
 
 

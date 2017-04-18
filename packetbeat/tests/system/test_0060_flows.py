@@ -3,7 +3,7 @@ from packetbeat import (BaseTest, FLOWS_REQUIRED_FIELDS)
 from pprint import PrettyPrinter
 
 
-pprint = lambda x: PrettyPrinter().pprint(x)
+def pprint(x): return PrettyPrinter().pprint(x)
 
 
 def check_fields(flow, fields):
@@ -12,6 +12,7 @@ def check_fields(flow, fields):
 
 
 class Test(BaseTest):
+
     def test_mysql_flow(self):
         self.render_config_template(
             flows=True,

@@ -38,15 +38,15 @@
         event forwarding, this name can differ from the `beat.hostname`.
 
     - name: event_data
-      type: dict
-      dict-type: keyword
+      type: object
+      object_type: keyword
       required: false
       description: >
         The event-specific data. This field is mutually exclusive with
         `user_data`. If you are capturing event data on versions prior
         to Windows Vista, the parameters in `event_data` are named `param1`,
         `param2`, and so on, because event log parameters are unnamed in
-        earlier versions of Windows. 
+        earlier versions of Windows.
 
     - name: event_id
       type: long
@@ -150,8 +150,8 @@
         The thread_id identifies the thread that generated the event.
 
     - name: user_data
-      type: dict
-      dict-type: keyword
+      type: object
+      object_type: keyword
       required: false
       description: >
         The event specific data. This field is mutually exclusive with

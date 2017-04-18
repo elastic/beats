@@ -1,0 +1,3 @@
+runner:
+  golint:
+    cmd: golint $(go list ./... | grep -v /vendor/) | grep -v "don't use an underscore in package name"

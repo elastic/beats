@@ -1,0 +1,4 @@
+=== golang expvar MetricSet
+
+This is the expvar metricset of the module golang.
+Golang can exposes it's variables by expvar api, with this metricset, user can collect all the expvar exposed variables.

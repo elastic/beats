@@ -98,7 +98,9 @@ reachable:
     "hostname": "host.example.com",
     "name": "host.example.com"
   },
-  "error": "Get http://127.0.0.1/server-status?auto: dial tcp 127.0.0.1:80: getsockopt: connection refused",
+  "error": {
+    "message": "Get http://127.0.0.1/server-status?auto: dial tcp 127.0.0.1:80: getsockopt: connection refused",
+  },
   "metricset": {
     "module": "apache",
     "name": "status",
@@ -157,8 +159,6 @@ Elasticsearch, and it can optimize storage.
 
 Basic meta information about each metric (such as the host) is also sent as part
 of each event.
-
-//QUESTION: I didn't mention the ability to provide additional information, like unit, because it sounds like that's no implemented, right?
 
 [[multiple-events-in-one]]
 ==== Multiple Metrics in One Event

@@ -74,7 +74,7 @@ func newTestLumberjackOutput(
 	}
 
 	cfg, _ := common.NewConfigFrom(config)
-	output, err := plugin("", cfg, 0)
+	output, err := plugin(common.BeatInfo{}, cfg)
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)
 	}

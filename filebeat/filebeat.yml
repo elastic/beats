@@ -7,6 +7,30 @@
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/filebeat/index.html
 
+
+#==========================  Modules configuration ============================
+filebeat.modules:
+
+#------------------------------- System Module -------------------------------
+#- module: system
+
+#------------------------------- Auditd Module -------------------------------
+#- module: auditd
+
+#-------------------------------- MySQL Module -------------------------------
+#- module: mysql
+
+#-------------------------------- Nginx Module -------------------------------
+#- module: nginx
+  # Ingest Node pipeline to use. Options are `with_plugins` (default)
+  # and `no_plugins`. Use `no_plugins` if you don't have the geoip or
+  # the user agent Node ingest plugins installed.
+  #access.var.pipeline: with_plugins
+
+
+# For more available modules and options, please see the filebeat.full.yml sample
+# configuration file.
+
 #=========================== Filebeat prospectors =============================
 
 filebeat.prospectors:
@@ -24,15 +48,15 @@ filebeat.prospectors:
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
   # matching any regular expression from the list.
-  #exclude_lines: ["^DBG"]
+  #exclude_lines: ['^DBG']
 
   # Include lines. A list of regular expressions to match. It exports the lines that are
   # matching any regular expression from the list.
-  #include_lines: ["^ERR", "^WARN"]
+  #include_lines: ['^ERR', '^WARN']
 
   # Exclude files. A list of regular expressions to match. Filebeat drops the files that
   # are matching any regular expression from the list. By default, no files are dropped.
-  #exclude_files: [".gz$"]
+  #exclude_files: ['.gz$']
 
   # Optional additional fields. These field can be freely picked
   # to add additional information to the crawled log files for filtering

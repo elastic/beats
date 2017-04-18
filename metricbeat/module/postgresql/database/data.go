@@ -39,5 +39,3 @@ var schema = s.Schema{
 	"deadlocks":   c.Int("deadlocks"),
 	"stats_reset": c.Time(time.RFC3339Nano, "stats_reset", s.Optional),
 }
-
-var eventMapping = schema.Apply

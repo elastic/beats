@@ -91,6 +91,18 @@ func TestEventFormatString(t *testing.T) {
 			"timestamp: 2015.05.01",
 			[]string{"key"},
 		},
+		{
+			"test timestamp formatter",
+			"%{[@timestamp]}: %{+YYYY.MM.dd}",
+			common.MapStr{
+				"@timestamp": common.Time(
+					time.Date(2015, 5, 1, 20, 12, 34, 0, time.Local),
+				),
+				"key": "timestamp",
+			},
+			"2015-05-01T20:12:34.000Z: 2015.05.01",
+			[]string{"@timestamp"},
+		},
 	}
 
 	for i, test := range tests {

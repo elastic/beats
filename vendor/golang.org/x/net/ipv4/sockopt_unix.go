@@ -21,10 +21,10 @@ func getInt(fd int, opt *sockOpt) (int, error) {
 	var i int32
 	var b byte
 	p := unsafe.Pointer(&i)
-	l := sysSockoptLen(4)
+	l := uint32(4)
 	if opt.typ == ssoTypeByte {
 		p = unsafe.Pointer(&b)
-		l = sysSockoptLen(1)
+		l = 1
 	}
 	if err := getsockopt(fd, iana.ProtocolIP, opt.name, p, &l); err != nil {
 		return 0, os.NewSyscallError("getsockopt", err)
@@ -42,11 +42,11 @@ func setInt(fd int, opt *sockOpt, v int) error {
 	i := int32(v)
 	var b byte
 	p := unsafe.Pointer(&i)
-	l := sysSockoptLen(4)
+	l := uint32(4)
 	if opt.typ == ssoTypeByte {
 		b = byte(v)
 		p = unsafe.Pointer(&b)
-		l = sysSockoptLen(1)
+		l = 1
 	}
 	return os.NewSyscallError("setsockopt", setsockopt(fd, iana.ProtocolIP, opt.name, p, l))
 }
@@ -84,7 +84,7 @@ func getICMPFilter(fd int, opt *sockOpt) (*ICMPFilter, error) {
 		return nil, errOpNoSupport
 	}
 	var f ICMPFilter
-	l := sysSockoptLen(sysSizeofICMPFilter)
+	l := uint32(sysSizeofICMPFilter)
 	if err := getsockopt(fd, iana.ProtocolReserved, opt.name, unsafe.Pointer(&f.sysICMPFilter), &l); err != nil {
 		return nil, os.NewSyscallError("getsockopt", err)
 	}

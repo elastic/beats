@@ -7,6 +7,8 @@ import time
 
 
 class ConfigTest(metricbeat.BaseTest):
+
+    @unittest.skip("This is test is currently skipped as it is flaky every time log messages change.")
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_compare_config(self):
@@ -25,9 +27,8 @@ class ConfigTest(metricbeat.BaseTest):
         time.sleep(1)
         proc.check_kill_and_wait()
 
-
         proc = self.start_beat(config="metricbeat.full.yml", output="full.log",
-                                extra_args=["-E", "output.elasticsearch.hosts=['" + self.get_host() + "']"])
+                               extra_args=["-E", "output.elasticsearch.hosts=['" + self.get_host() + "']"])
         time.sleep(1)
         proc.check_kill_and_wait()
 
@@ -53,17 +54,16 @@ class ConfigTest(metricbeat.BaseTest):
             fullLine = fullLog[i]
 
             if shortLine not in fullLog:
-                print shortLine
-                print fullLine
+                print(shortLine)
+                print(fullLine)
                 same = False
 
             if fullLine not in shortLog:
-                print shortLine
-                print fullLine
+                print(shortLine)
+                print(fullLine)
                 same = False
 
         assert same == True
-
 
     def get_host(self):
         return 'http://' + os.getenv('ELASTICSEARCH_HOST', 'localhost') + ':' + os.getenv('ELASTICSEARCH_PORT', '9200')

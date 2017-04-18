@@ -51,6 +51,21 @@ func TestDecodeLine(t *testing.T) {
 				},
 			},
 		},
+		{
+			Line: `apiserver_request_count{client="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",code="200",contentType="",resource="elasticsearchclusters",verb="LIST"} 1`,
+			Event: PromEvent{
+				key:       "apiserver_request_count",
+				value:     int64(1),
+				labelHash: `client="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",code="200",contentType="",resource="elasticsearchclusters",verb="LIST"`,
+				labels: common.MapStr{
+					"client":      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
+					"code":        int64(200),
+					"contentType": "",
+					"resource":    "elasticsearchclusters",
+					"verb":        "LIST",
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {

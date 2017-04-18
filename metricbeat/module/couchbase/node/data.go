@@ -2,11 +2,11 @@ package node
 
 import (
 	"encoding/json"
-	"io"
+
+	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"strconv"
 )
 
 type NodeSystemStats struct {
@@ -56,10 +56,10 @@ type Data struct {
 	Nodes []Node `json:"nodes"`
 }
 
-func eventsMapping(body io.Reader) []common.MapStr {
+func eventsMapping(content []byte) []common.MapStr {
 
 	var d Data
-	err := json.NewDecoder(body).Decode(&d)
+	err := json.Unmarshal(content, &d)
 	if err != nil {
 		logp.Err("Error: ", err)
 	}
@@ -73,14 +73,14 @@ func eventsMapping(body io.Reader) []common.MapStr {
 			"cmd_get": NodeItem.InterestingStats.CmdGet,
 			"couch": common.MapStr{
 				"docs": common.MapStr{
-					"actual_disk_size": common.MapStr{
+					"disk_size": common.MapStr{
 						"bytes": NodeItem.InterestingStats.CouchDocsActualDiskSize,
 					},
 					"data_size": common.MapStr{
 						"bytes": NodeItem.InterestingStats.CouchDocsDataSize,
 					},
 				},
-				"spacial": common.MapStr{
+				"spatial": common.MapStr{
 					"data_size": common.MapStr{
 						"bytes": NodeItem.InterestingStats.CouchSpatialDataSize,
 					},
@@ -89,7 +89,7 @@ func eventsMapping(body io.Reader) []common.MapStr {
 					},
 				},
 				"views": common.MapStr{
-					"actual_disk_size": common.MapStr{
+					"disk_size": common.MapStr{
 						"bytes": NodeItem.InterestingStats.CouchViewsActualDiskSize,
 					},
 					"data_size": common.MapStr{

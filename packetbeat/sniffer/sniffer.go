@@ -76,7 +76,7 @@ func deviceNameFromIndex(index int, devices []string) (string, error) {
 // ListDevicesNames returns the list of adapters available for sniffing on
 // this computer. If the withDescription parameter is set to true, a human
 // readable version of the adapter name is added. If the withIP parameter
-// is set to true, IP address of the adatper is added.
+// is set to true, IP address of the adapter is added.
 func ListDeviceNames(withDescription bool, withIP bool) ([]string, error) {
 	devices, err := pcap.FindAllDevs()
 	if err != nil {

@@ -1,0 +1,38 @@
+- name: stats
+  type: group
+  description: >
+    stats
+  fields:
+    - name: docs.count
+      type: long
+      description: >
+        Total number of existing documents.
+    - name: docs.deleted
+      type: long
+      description: >
+        Total number of deleted documents.
+    - name: segments.count
+      type: long
+      description: >
+        Total number of segments.
+    - name: segments.memory.bytes
+      type: long
+      format: bytes
+      description: >
+        Total size of segments in bytes.
+    - name: shards.failed
+      type: long
+      description: >
+        Number of failed shards.
+    - name: shards.successful
+      type: long
+      description: >
+        Number of successful shards.
+    - name: shards.total
+      type: long
+      description: >
+        Total number of shards.
+    - name: store.size.bytes
+      type: long
+      description: >
+        Total size of the store in bytes.

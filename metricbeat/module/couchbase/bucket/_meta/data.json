@@ -8,13 +8,13 @@
         "bucket": {
             "data": {
                 "used": {
-                    "bytes": 12597798
+                    "bytes": 12585517
                 }
             },
             "disk": {
                 "fetches": 0,
                 "used": {
-                    "bytes": 16368995
+                    "bytes": 16356812
                 }
             },
             "item_count": 7303,
@@ -36,7 +36,7 @@
         }
     },
     "metricset": {
-        "host": "couchbase:8091",
+        "host": "localhost:8091",
         "module": "couchbase",
         "name": "bucket",
         "rtt": 115

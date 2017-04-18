@@ -144,5 +144,6 @@ func eventMapping(info *haproxy.Info) (common.MapStr, error) {
 
 	}
 
-	return schema.Apply(source), nil
+	data, _ := schema.Apply(source)
+	return data, nil
 }

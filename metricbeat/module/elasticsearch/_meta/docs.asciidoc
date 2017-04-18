@@ -1,0 +1,3 @@
+== elasticsearch Module
+
+This is the elasticsearch Module. The elasticsearch module contains a minimal set of metrics to enable monitoring of elasticsearch across multiple versions.

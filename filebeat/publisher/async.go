@@ -13,7 +13,7 @@ import (
 type asyncLogPublisher struct {
 	pub    publisher.Publisher
 	client publisher.Client
-	in     chan []*input.Event
+	in     chan []*input.Data
 	out    SuccessLogger
 
 	// list of in-flight batches
@@ -29,7 +29,7 @@ type asyncLogPublisher struct {
 type eventsBatch struct {
 	next   *eventsBatch
 	flag   int32
-	events []*input.Event
+	events []*input.Data
 }
 
 type batchList struct {
@@ -50,7 +50,7 @@ const (
 )
 
 func newAsyncLogPublisher(
-	in chan []*input.Event,
+	in chan []*input.Data,
 	out SuccessLogger,
 	pub publisher.Publisher,
 ) *asyncLogPublisher {
@@ -84,10 +84,12 @@ func (p *asyncLogPublisher) Start() {
 					flag:   0,
 					events: events,
 				}
+				dataEvents, meta := getDataEvents(events)
 				p.client.PublishEvents(
-					getDataEvents(events),
+					dataEvents,
 					publisher.Signal(batch),
-					publisher.Guaranteed)
+					publisher.Guaranteed,
+					publisher.MetadataBatch(meta))
 
 				p.active.append(batch)
 			case <-ticker.C:

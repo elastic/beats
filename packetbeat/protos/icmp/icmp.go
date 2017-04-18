@@ -1,12 +1,12 @@
 package icmp
 
 import (
-	"expvar"
 	"net"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 
 	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -51,9 +51,9 @@ const (
 )
 
 var (
-	unmatchedRequests  = expvar.NewInt("icmp.unmatched_requests")
-	unmatchedResponses = expvar.NewInt("icmp.unmatched_responses")
-	duplicateRequests  = expvar.NewInt("icmp.duplicate_requests")
+	unmatchedRequests  = monitoring.NewInt(nil, "icmp.unmatched_requests")
+	unmatchedResponses = monitoring.NewInt(nil, "icmp.unmatched_responses")
+	duplicateRequests  = monitoring.NewInt(nil, "icmp.duplicate_requests")
 )
 
 func New(testMode bool, results publish.Transactions, cfg *common.Config) (*icmpPlugin, error) {

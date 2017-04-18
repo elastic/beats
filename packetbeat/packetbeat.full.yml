@@ -58,11 +58,12 @@ packetbeat.flows:
 
 #========================== Transaction protocols =============================
 
-packetbeat.protocols.icmp:
+packetbeat.protocols:
+- type: icmp
   # Enable ICMPv4 and ICMPv6 monitoring. Default: true
   #enabled: true
 
-packetbeat.protocols.amqp:
+- type: amqp
   # Enable AMQP monitoring. Default: true
   #enabled: true
 
@@ -82,7 +83,7 @@ packetbeat.protocols.amqp:
   # Default: false
   #parse_arguments: false
 
-  # Hide all methods relative to connection negociation between server and
+  # Hide all methods relative to connection negotiation between server and
   # client.
   # Default: true
   #hide_connection_information: true
@@ -99,7 +100,7 @@ packetbeat.protocols.amqp:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.cassandra:
+- type: cassandra
   #Cassandra port for traffic monitoring.
   ports: [9042]
 
@@ -126,7 +127,7 @@ packetbeat.protocols.cassandra:
   # This option indicates which Operator/Operators will be ignored.
   #ignored_ops: ["SUPPORTED","OPTIONS"]
 
-packetbeat.protocols.dns:
+- type: dns
   # Enable DNS monitoring. Default: true
   #enabled: true
 
@@ -156,7 +157,7 @@ packetbeat.protocols.dns:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.http:
+- type: http
   # Enable HTTP monitoring. Default: true
   #enabled: true
 
@@ -209,7 +210,7 @@ packetbeat.protocols.http:
   # be trimmed to this size. Default is 10 MB.
   #max_message_size: 10485760
 
-packetbeat.protocols.memcache:
+- type: memcache
   # Enable memcache monitoring. Default: true
   #enabled: true
 
@@ -258,7 +259,7 @@ packetbeat.protocols.memcache:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.mysql:
+- type: mysql
   # Enable mysql monitoring. Default: true
   #enabled: true
 
@@ -278,7 +279,7 @@ packetbeat.protocols.mysql:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.pgsql:
+- type: pgsql
   # Enable pgsql monitoring. Default: true
   #enabled: true
 
@@ -298,7 +299,7 @@ packetbeat.protocols.pgsql:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.redis:
+- type: redis
   # Enable redis monitoring. Default: true
   #enabled: true
 
@@ -318,7 +319,7 @@ packetbeat.protocols.redis:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.thrift:
+- type: thrift
   # Enable thrift monitoring. Default: true
   #enabled: true
 
@@ -373,7 +374,7 @@ packetbeat.protocols.thrift:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.mongodb:
+- type: mongodb
   # Enable mongodb monitoring. Default: true
   #enabled: true
 
@@ -403,7 +404,7 @@ packetbeat.protocols.mongodb:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-packetbeat.protocols.nfs:
+- type: nfs
   # Enable NFS monitoring. Default: true
   #enabled: true
 
@@ -523,6 +524,11 @@ packetbeat.protocols.nfs:
 #processors:
 #- add_cloud_metadata:
 #
+# The following example enriches each event with the local timezone.
+#
+#processors:
+#- add_locale:
+#
 
 #================================ Outputs ======================================
 
@@ -558,13 +564,17 @@ output.elasticsearch:
 
   # Optional index name. The default is "packetbeat" plus date
   # and generates [packetbeat-]YYYY.MM.DD keys.
-  #index: "packetbeat-%{+yyyy.MM.dd}"
+  #index: "packetbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
 
   # Optional HTTP Path
   #path: "/elasticsearch"
+
+  # Custom HTTP headers to add to each request
+  #headers:
+  #  X-My-Header: Contents of the header
 
   # Proxy server url
   #proxy_url: http://proxy:3128
@@ -594,21 +604,15 @@ output.elasticsearch:
   #template.enabled: true
 
   # Template name. By default the template name is packetbeat.
+  # The version of the beat will always be appended to the given name
+  # so the final name is packetbeat-%{[beat.version]}.
   #template.name: "packetbeat"
 
-  # Path to template file
-  #template.path: "${path.config}/packetbeat.template.json"
+  # Path to fields.yml file to generate the template
+  #template.fields: "${path.config}/fields.yml"
 
   # Overwrite existing template
   #template.overwrite: false
-
-  # If set to true, packetbeat checks the Elasticsearch version at connect time, and if it
-  # is 2.x, it loads the file specified by the template.versions.2x.path setting. The
-  # default is true.
-  #template.versions.2x.enabled: true
-
-  # Path to the Elasticsearch 2.x version of the template file.
-  #template.versions.2x.path: "${path.config}/packetbeat.template-es2x.json"
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
@@ -996,6 +1000,58 @@ output.elasticsearch:
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag.
+#dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#dashboards.url:
+
+# The directory from where to read the dashboards. It is used instead of the URL
+# when it has a value.
+#dashboards.directory:
+
+# The file archive (zip file) from where to read the dashboards. It is used instead
+# of the URL when it has a value.
+#dashboards.file:
+
+# If this option is enabled, the snapshot URL is used instead of the default URL.
+#dashboards.snapshot: false
+
+# The URL from where to download the snapshot version of the dashboards. By default
+# this has a value which is computed based on the Beat name and version.
+#dashboards.snapshot_url
+
+# In case the archive contains the dashboards from multiple Beats, this lets you
+# select which one to load. You can load all the dashboards in the archive by
+# setting this to the empty string.
+#dashboards.beat: packetbeat
+
+# The name of the Kibana index to use for setting the configuration. Default is ".kibana"
+#dashboards.kibana_index: .kibana
+
+# The Elasticsearch index name. This overwrites the index name defined in the
+# dashboards and index pattern. Example: testbeat-*
+#dashboards.index:
+
+#================================ HTTP Endpoint ======================================
+# Each beat can expose internal data points through a http endpoint. For security
+# reason the endpoint is disabled by default. This feature is currently in beta.
+
+# Defines if http endpoint is enabled
+#http.enabled: false
+
+# Host to expose the http endpoint to. It is recommended to use only localhost.
+#http.host: localhost
+
+# Port on which the http endpoint is exposed. Default is 5066
+#http.port: 5066
 
 #================================ Logging ======================================
 # There are three options for the log output: syslog, file, stderr.

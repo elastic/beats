@@ -31,13 +31,21 @@ Redhat/Centos/Fedora, <<mac, mac>> for OS X, and <<win, win>> for Windows).
 
 [NOTE]
 ==================================================
-If you use Apt or Yum, you can {libbeat}/setup-repositories.html[install Packetbeat from our repositories] to update to the newest version more easily.
+If you use Apt or Yum, you can <<setup-repositories,install Packetbeat from our repositories>> to update to the newest version more easily.
 
 See our https://www.elastic.co/downloads/beats/packetbeat[download page] for other installation options, such as 32-bit images.
 ==================================================
 
 [[deb]]
 *deb:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -46,8 +54,18 @@ curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{v
 sudo dpkg -i packetbeat-{version}-amd64.deb
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[rpm]]
 *rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -56,8 +74,18 @@ curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{v
 sudo rpm -vi packetbeat-{version}-x86_64.rpm
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[mac]]
 *mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -65,8 +93,18 @@ curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{v
 tar xzvf packetbeat-{version}-darwin-x86_64.tar.gz
 ----------------------------------------------------------------------
 
+endif::[]
+
 [[win]]
 *win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . Download and install WinPcap from this
 http://www.winpcap.org/install/default.htm[page]. WinPcap is a library that uses
@@ -91,6 +129,8 @@ PS C:\Program Files\Packetbeat> .\install-service-packetbeat.ps1
 
 NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-packetbeat.ps1`.
 
+endif::[]
+
 Before starting Packetbeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Packetbeat\packetbeat.yml` or `/etc/packetbeat/packetbeat.yml`. For
 more information about these options, see <<packetbeat-configuration>>.
@@ -100,7 +140,12 @@ more information about these options, see <<packetbeat-configuration>>.
 
 To configure Packetbeat, you edit the configuration file. For rpm and deb, you'll
 find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac and win, look in
-the archive that you just extracted.
+the archive that you just extracted. There’s also a full example configuration file called
+`packetbeat.full.yml` that shows all non-deprecated options.
+
+See the
+{libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
 
 To configure Packetbeat:
 
@@ -145,34 +190,36 @@ default values should do just fine.
 +
 [source,yaml]
 ----------------------------------------------------------------------
-packetbeat.protocols.dns:
+packetbeat.protocols:
+
+- type: dns
   ports: [53]
 
   include_authorities: true
   include_additionals: true
 
-packetbeat.protocols.http:
+- type: http
   ports: [80, 8080, 8081, 5000, 8002]
 
-packetbeat.protocols.memcache:
+- type: memcache
   ports: [11211]
 
-packetbeat.protocols.mysql:
+- type: mysql
   ports: [3306]
 
-packetbeat.protocols.pgsql:
+- type: pgsql
   ports: [5432]
 
-packetbeat.protocols.redis:
+- type: redis
   ports: [6379]
 
-packetbeat.protocols.thrift:
+- type: thrift
   ports: [9090]
 
-packetbeat.protocols.mongodb:
+- type: mongodb
   ports: [27017]
 
-packetbeat.protocols.cassandra:
+- type: cassandra
   ports: [9042]
 
 ----------------------------------------------------------------------
@@ -194,6 +241,9 @@ binary is installed, and run Packetbeat in the foreground with the following
 options specified: +sudo ./packetbeat -configtest -e+. Make sure your config files are
 in the path expected by Packetbeat (see <<directory-layout>>). If you
 installed from DEB or RPM packages, run +sudo ./packetbeat.sh -configtest -e+.
+Depending on your OS, you might run into file ownership issues when you run this
+test. See {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_ for more information.
 
 [[packetbeat-template]]
 === Step 3: Loading the Index Template in Elasticsearch
@@ -204,7 +254,11 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 [[packetbeat-starting]]
 === Step 4: Starting Packetbeat
 
-Run Packetbeat by issuing the following command:
+Run Packetbeat by issuing the command that is appropriate for your platform.
+
+NOTE: If you use an init.d script to start Packetbeat on deb or rpm, you can't
+specify command line flags (see <<packetbeat-command>>). To specify flags,
+start Packetbeat in the foreground.
 
 *deb:*
 
@@ -224,8 +278,13 @@ sudo /etc/init.d/packetbeat start
 
 [source,shell]
 ----------------------------------------------------------------------
+sudo chown root packetbeat.yml <1>
 sudo ./packetbeat -e -c packetbeat.yml -d "publish"
 ----------------------------------------------------------------------
+<1> You'll be running Packetbeat as root, so you need to change ownership
+of the configuration file (see
+{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_).
 
 *win:*
 

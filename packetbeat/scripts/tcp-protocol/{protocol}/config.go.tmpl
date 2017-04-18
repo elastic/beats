@@ -1,0 +1,22 @@
+package {protocol}
+
+import (
+	"github.com/elastic/beats/packetbeat/config"
+	"github.com/elastic/beats/packetbeat/protos"
+)
+
+type {protocol}Config struct {
+	config.ProtocolCommon `config:",inline"`
+}
+
+var (
+	defaultConfig = {protocol}Config{
+		ProtocolCommon: config.ProtocolCommon{
+			TransactionTimeout: protos.DefaultTransactionExpiration,
+		},
+	}
+)
+
+func (c *{protocol}Config) Validate() error {
+	return nil
+}

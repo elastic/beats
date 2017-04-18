@@ -3,10 +3,12 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-prometheus]]
-== prometheus Module
+== Prometheus Module
 
-This is the prometheus Module.
+beta[]
 
+This module periodically fetches metrics from
+https://prometheus.io/docs/[Prometheus].
 
 
 [float]

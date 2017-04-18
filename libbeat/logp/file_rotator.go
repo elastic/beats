@@ -31,7 +31,7 @@ func (rotator *FileRotator) CreateDirectory() error {
 	}
 
 	if os.IsNotExist(err) {
-		err = os.MkdirAll(rotator.Path, 0755)
+		err = os.MkdirAll(rotator.Path, 0750)
 		if err != nil {
 			return err
 		}
@@ -145,7 +145,7 @@ func (rotator *FileRotator) Rotate() error {
 
 	// create the new file
 	path := rotator.FilePath(0)
-	current, err := os.Create(path)
+	current, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}

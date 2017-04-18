@@ -7,8 +7,6 @@ package beater
 import (
 	"expvar"
 	"fmt"
-	"net"
-	"net/http"
 	"sync"
 	"time"
 
@@ -35,8 +33,7 @@ func init() {
 
 // Debug logging functions for this package.
 var (
-	debugf    = logp.MakeDebug("winlogbeat")
-	memstatsf = logp.MakeDebug("memstats")
+	debugf = logp.MakeDebug("winlogbeat")
 )
 
 // Time the application was started.
@@ -64,7 +61,7 @@ func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading configuration file. %v", err)
 	}
 
-	// reslove registry file path
+	// resolve registry file path
 	config.Winlogbeat.RegistryFile = paths.Resolve(
 		paths.Data, config.Winlogbeat.RegistryFile)
 	logp.Info("State will be read from and persisted to %s",
@@ -113,21 +110,6 @@ func (eb *Winlogbeat) setup(b *beat.Beat) error {
 	eb.checkpoint, err = checkpoint.NewCheckpoint(config.RegistryFile, 10, 5*time.Second)
 	if err != nil {
 		return err
-	}
-
-	if config.Metrics.BindAddress != "" {
-		bindAddress := config.Metrics.BindAddress
-		sock, err := net.Listen("tcp", bindAddress)
-		if err != nil {
-			return err
-		}
-		go func() {
-			logp.Info("Metrics hosted at http://%s/debug/vars", bindAddress)
-			err := http.Serve(sock, nil)
-			if err != nil {
-				logp.Warn("Unable to launch HTTP service for metrics. %v", err)
-			}
-		}()
 	}
 
 	return nil

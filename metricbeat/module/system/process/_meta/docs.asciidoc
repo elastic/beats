@@ -11,10 +11,35 @@ This metricset is available on:
 - Windows
 
 [float]
+=== Cache CmdLine
+
+This metricset caches the command line args for a running process. This means if you alter
+the command line for a process while this metricset is running, these changes are not detected.
+This feature can be disabled by adding
+`process.cmdline.cache.enabled: false` to the system module configuration.
+
+[float]
 === Control Group (cgroup) Metrics
 
-On Linux this metricset can collect metrics from any cgroups that the process
-is a member of. This feature is currently experimental, and it is not enabled by
-default so you must add `cgroup: true` to the system module configuration to
-enable it.
+On Linux this metricset will collect metrics from any cgroups that the process
+is a member of. This feature is enabled by default and can be disabled by adding
+`process.cgroup.enabled: false` to the system module configuration.
 
+[float]
+=== Process Environment Variables
+
+This metricset can collect the environment variables that were used to start the
+process. This feature is available on Linux, Darwin, and FreeBSD. No environment
+variables are collected by default because they could contain sensitive information.
+You must configure the environment variables that you wish to collect by
+specifying a list of regular expressions that match the variable name.
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: system
+  metricsets: ["process"]
+  process.env.whitelist:
+  - '^PATH$'
+  - '^SSH_.*'
+----

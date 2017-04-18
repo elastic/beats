@@ -1,0 +1,13 @@
+- key: jolokia
+  title: "Jolokia"
+  description: >
+    []beta
+
+    Jolokia Module
+  short_config: false
+  fields:
+    - name: jolokia
+      type: group
+      description: >
+          jolokia contains metrics exposed via jolokia agent
+      fields:

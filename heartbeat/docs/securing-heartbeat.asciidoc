@@ -1,0 +1,27 @@
+[[securing-heartbeat]]
+= Securing Heartbeat
+
+[partintro]
+
+--
+The following topics describe how to secure communication between Heartbeat
+and other products in the Elastic stack:
+
+* <<securing-communication-elasticsearch>>
+* <<configuring-ssl-logstash>>
+
+//sets block macro for https.asciidoc included in next section
+
+--
+
+[[securing-communication-elasticsearch]]
+== Securing Communication With Elasticsearch
+
+include::../../libbeat/docs/https.asciidoc[]
+
+//sets block macro for shared-ssl-logstash-config.asciidoc included in next section
+
+[[configuring-ssl-logstash]]
+== Securing Communication With Logstash by Using SSL
+
+include::../../libbeat/docs/shared-ssl-logstash-config.asciidoc[]

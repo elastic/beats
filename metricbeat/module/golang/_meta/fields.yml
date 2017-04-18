@@ -1,0 +1,10 @@
+- key: golang
+  title: "golang"
+  description: >
+    golang Module
+  short_config: false
+  fields:
+    - name: golang
+      type: group
+      description: >
+      fields:

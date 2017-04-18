@@ -1,0 +1,11 @@
+- key: windows
+  title: "Windows"
+  description: >
+    []beta
+    Module for Windows
+  short_config: false
+  fields:
+    - name: windows
+      type: group
+      description: >
+      fields:

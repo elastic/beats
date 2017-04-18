@@ -1,9 +1,9 @@
 - key: couchbase
-  title: "couchbase"
+  title: "Couchbase"
   description: >
-    experimental[]
+    beta[]
 
-    couchbase Module
+    Metrics collected from Couchbase servers.
   short_config: false
   fields:
     - name: couchbase

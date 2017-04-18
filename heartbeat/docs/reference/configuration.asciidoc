@@ -1,0 +1,34 @@
+
+[[heartbeat-configuration-details]]
+== Configuration Options (Reference)
+
+Before modifying configuration settings, make sure you've completed the
+<<heartbeat-configuration,configuration steps>> in the Getting Started.
+
+The Heartbeat configuration file, +heartbeat.yml+, uses http://yaml.org/[YAML] for its syntax. See the
+{libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
+
+The configuration options are described in the following sections. After changing
+configuration settings, you need to restart Heartbeat to pick up the changes.
+
+* <<configuration-heartbeat-options>>
+* <<configuration-general>>
+* <<elasticsearch-output>>
+* <<logstash-output>>
+* <<kafka-output>>
+* <<redis-output>>
+* <<file-output>>
+* <<console-output>>
+* <<configuration-output-ssl>>
+* <<configuration-output-codec>>
+* <<configuration-path>>
+* <<configuration-dashboards>>
+* <<configuration-logging>>
+* <<configuration-processors>>
+
+include::configuration/heartbeat-options.asciidoc[]
+
+
+
+

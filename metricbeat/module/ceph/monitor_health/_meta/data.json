@@ -1,0 +1,46 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "ceph": {
+        "monitor_health": {
+            "available": {
+                "kb": 45658840,
+                "pct": 69
+            },
+            "health": "HEALTH_OK",
+            "last_updated": "2017-01-31T16:10:38.389302Z",
+            "name": "ceph",
+            "store_stats": {
+                "last_updated": "0.000000",
+                "log": {
+                    "bytes": 3065797
+                },
+                "misc": {
+                    "bytes": 832
+                },
+                "sst": {
+                    "bytes": 0
+                },
+                "total": {
+                    "bytes": 3066629
+                }
+            },
+            "total": {
+                "kb": 65792556
+            },
+            "used": {
+                "kb": 16761940
+            }
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:5000",
+        "module": "ceph",
+        "name": "monitor_health",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

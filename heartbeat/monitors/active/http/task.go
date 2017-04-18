@@ -153,7 +153,7 @@ func createPingFactory(
 }
 
 func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Request, error) {
-	method := strings.ToUpper(config.Check.Method)
+	method := strings.ToUpper(config.Check.Request.Method)
 	request, err := http.NewRequest(method, addr, nil)
 	if err != nil {
 		return nil, err
@@ -163,7 +163,7 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 	if config.Username != "" {
 		request.SetBasicAuth(config.Username, config.Password)
 	}
-	for k, v := range config.Check.SendHeaders {
+	for k, v := range config.Check.Request.SendHeaders {
 		request.Header.Add(k, v)
 	}
 
@@ -213,16 +213,24 @@ func execPing(
 }
 
 func splitHostnamePort(requ *http.Request) (string, uint16, error) {
-	host, port, err := net.SplitHostPort(requ.URL.Host)
+	host := requ.URL.Host
+	// Try to add a default port if needed
+	if strings.LastIndex(host, ":") == -1 {
+		switch requ.URL.Scheme {
+		case urlSchemaHTTP:
+			host += ":80"
+		case urlSchemaHTTPS:
+			host += ":443"
+		}
+	}
+	host, port, err := net.SplitHostPort(host)
 	if err != nil {
 		return "", 0, err
 	}
-
 	p, err := strconv.ParseUint(port, 10, 16)
 	if err != nil {
 		return "", 0, fmt.Errorf("'%v' is no valid port number in '%v'", port, requ.URL.Host)
 	}
-
 	return host, uint16(p), nil
 }
 

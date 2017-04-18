@@ -2,12 +2,12 @@ package pgsql
 
 import (
 	"errors"
-	"expvar"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -113,7 +113,7 @@ var (
 )
 
 var (
-	unmatchedResponses = expvar.NewInt("pgsql.unmatched_responses")
+	unmatchedResponses = monitoring.NewInt(nil, "pgsql.unmatched_responses")
 )
 
 func init() {

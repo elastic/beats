@@ -13,16 +13,15 @@ type RespCheck func(*http.Response) error
 
 var (
 	errBodyMismatch = errors.New("body mismatch")
-	errStatus404    = errors.New("file not found")
 )
 
-func makeValidateResponse(config *checkConfig) RespCheck {
+func makeValidateResponse(config *responseParameters) RespCheck {
 	var checks []RespCheck
 
 	if config.Status > 0 {
 		checks = append(checks, checkStatus(config.Status))
 	} else {
-		checks = append(checks, checkStatusNot404)
+		checks = append(checks, checkStatusOK)
 	}
 
 	if len(config.RecvHeaders) > 0 {
@@ -33,20 +32,20 @@ func makeValidateResponse(config *checkConfig) RespCheck {
 		checks = append(checks, checkBody([]byte(config.RecvBody)))
 	}
 
-	switch len(checks) {
-	case 0:
-		return checkOK
-	case 1:
-		return checks[0]
-	default:
-		return checkAll(checks...)
-	}
+	return checkAll(checks...)
 }
 
 func checkOK(_ *http.Response) error { return nil }
 
 // TODO: collect all errors into on error message.
 func checkAll(checks ...RespCheck) RespCheck {
+	switch len(checks) {
+	case 0:
+		return checkOK
+	case 1:
+		return checks[0]
+	}
+
 	return func(r *http.Response) error {
 		for _, check := range checks {
 			if err := check(r); err != nil {
@@ -66,9 +65,9 @@ func checkStatus(status uint16) RespCheck {
 	}
 }
 
-func checkStatusNot404(r *http.Response) error {
-	if r.StatusCode == 404 {
-		return errStatus404
+func checkStatusOK(r *http.Response) error {
+	if r.StatusCode >= 400 {
+		return errors.New(r.Status)
 	}
 	return nil
 }

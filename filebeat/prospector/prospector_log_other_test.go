@@ -3,11 +3,11 @@
 package prospector
 
 import (
-	"regexp"
 	"testing"
 
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/common/match"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +15,7 @@ import (
 var matchTests = []struct {
 	file         string
 	paths        []string
-	excludeFiles []*regexp.Regexp
+	excludeFiles []match.Matcher
 	result       bool
 }{
 	{
@@ -45,13 +45,13 @@ var matchTests = []struct {
 	{
 		"test/test.log",
 		[]string{"test/*"},
-		[]*regexp.Regexp{regexp.MustCompile("test.log")},
+		[]match.Matcher{match.MustCompile("test.log")},
 		false,
 	},
 	{
 		"test/test.log",
 		[]string{"test/*"},
-		[]*regexp.Regexp{regexp.MustCompile("test2.log")},
+		[]match.Matcher{match.MustCompile("test2.log")},
 		true,
 	},
 }
@@ -60,14 +60,14 @@ func TestMatchFile(t *testing.T) {
 
 	for _, test := range matchTests {
 
-		p := ProspectorLog{
+		l := Log{
 			config: prospectorConfig{
 				Paths:        test.paths,
 				ExcludeFiles: test.excludeFiles,
 			},
 		}
 
-		assert.Equal(t, test.result, p.matchesFile(test.file))
+		assert.Equal(t, test.result, l.matchesFile(test.file))
 	}
 }
 
@@ -78,46 +78,46 @@ var initStateTests = []struct {
 }{
 	{
 		[]file.State{
-			file.State{Source: "test"},
+			{Source: "test"},
 		},
 		[]string{"test"},
 		1,
 	},
 	{
 		[]file.State{
-			file.State{Source: "notest"},
+			{Source: "notest"},
 		},
 		[]string{"test"},
 		0,
 	},
 	{
 		[]file.State{
-			file.State{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
-			file.State{Source: "test2.log", FileStateOS: file.StateOS{Inode: 2}},
+			{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
+			{Source: "test2.log", FileStateOS: file.StateOS{Inode: 2}},
 		},
 		[]string{"*.log"},
 		2,
 	},
 	{
 		[]file.State{
-			file.State{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
-			file.State{Source: "test2.log", FileStateOS: file.StateOS{Inode: 2}},
+			{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
+			{Source: "test2.log", FileStateOS: file.StateOS{Inode: 2}},
 		},
 		[]string{"test1.log"},
 		1,
 	},
 	{
 		[]file.State{
-			file.State{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
-			file.State{Source: "test2.log", FileStateOS: file.StateOS{Inode: 2}},
+			{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
+			{Source: "test2.log", FileStateOS: file.StateOS{Inode: 2}},
 		},
 		[]string{"test.log"},
 		0,
 	},
 	{
 		[]file.State{
-			file.State{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
-			file.State{Source: "test2.log", FileStateOS: file.StateOS{Inode: 1}},
+			{Source: "test1.log", FileStateOS: file.StateOS{Inode: 1}},
+			{Source: "test2.log", FileStateOS: file.StateOS{Inode: 1}},
 		},
 		[]string{"*.log"},
 		1, // Expecting only 1 state because of some inode (this is only a theoretical case)
@@ -129,7 +129,7 @@ var initStateTests = []struct {
 func TestInit(t *testing.T) {
 
 	for _, test := range initStateTests {
-		p := ProspectorLog{
+		l := Log{
 			Prospector: &Prospector{
 				states: &file.States{},
 				outlet: TestOutlet{},
@@ -139,10 +139,15 @@ func TestInit(t *testing.T) {
 			},
 		}
 		states := file.NewStates()
+		// Set states to finished
+		for i, state := range test.states {
+			state.Finished = true
+			test.states[i] = state
+		}
 		states.SetStates(test.states)
-		err := p.Init(states.GetStates())
+		err := l.LoadStates(states.GetStates())
 		assert.NoError(t, err)
-		assert.Equal(t, test.count, p.Prospector.states.Count())
+		assert.Equal(t, test.count, l.Prospector.states.Count())
 	}
 
 }
@@ -150,4 +155,4 @@ func TestInit(t *testing.T) {
 // TestOutlet is an empty outlet for testing
 type TestOutlet struct{}
 
-func (o TestOutlet) OnEvent(event *input.Event) bool { return true }
+func (o TestOutlet) OnEvent(event *input.Data) bool { return true }

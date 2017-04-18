@@ -20,6 +20,8 @@ func (m testModule) ParseHost(host string) (HostData, error) {
 	return m.hostParser(host)
 }
 
+// EventFetcher
+
 type testMetricSet struct {
 	BaseMetricSet
 }
@@ -27,6 +29,32 @@ type testMetricSet struct {
 func (m *testMetricSet) Fetch() (common.MapStr, error) {
 	return nil, nil
 }
+
+// EventsFetcher
+
+type testMetricSetEventsFetcher struct {
+	BaseMetricSet
+}
+
+func (m *testMetricSetEventsFetcher) Fetch() ([]common.MapStr, error) {
+	return nil, nil
+}
+
+// ReportingFetcher
+
+type testMetricSetReportingFetcher struct {
+	BaseMetricSet
+}
+
+func (m *testMetricSetReportingFetcher) Fetch(r Reporter) {}
+
+// PushMetricSet
+
+type testPushMetricSet struct {
+	BaseMetricSet
+}
+
+func (m *testPushMetricSet) Run(r PushReporter) {}
 
 func TestModuleConfig(t *testing.T) {
 	tests := []struct {
@@ -61,7 +89,7 @@ func TestModuleConfig(t *testing.T) {
 				MetricSets: []string{"test"},
 				Enabled:    true,
 				Period:     time.Second * 10,
-				Timeout:    time.Second,
+				Timeout:    0,
 			},
 		},
 		{
@@ -94,9 +122,12 @@ func TestModuleConfig(t *testing.T) {
 			t.Errorf("unexpected error while unpacking in testcase %d: %v", i, err)
 			continue
 		}
-		if test.err != "" &&
-			assert.Error(t, err, "expected '%v' in testcase %d", test.err, i) {
-			assert.Contains(t, err.Error(), test.err, "testcase %d", i)
+		if test.err != "" {
+			if err != nil {
+				assert.Contains(t, err.Error(), test.err, "testcase %d", i)
+			} else {
+				t.Errorf("expected error '%v' in testcase %d", test.err, i)
+			}
 			continue
 		}
 
@@ -124,7 +155,7 @@ func TestModuleConfigDefaults(t *testing.T) {
 
 	assert.Equal(t, true, mc.Enabled)
 	assert.Equal(t, time.Second*10, mc.Period)
-	assert.Equal(t, time.Second, mc.Timeout)
+	assert.Equal(t, time.Second*0, mc.Timeout)
 	assert.Empty(t, mc.Hosts)
 }
 
@@ -166,7 +197,7 @@ func TestNewModulesDuplicateHosts(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestNewModules(t *testing.T) {
+func TestNewModulesHostParser(t *testing.T) {
 	const (
 		name = "HostParser"
 		host = "example.com"
@@ -232,6 +263,131 @@ func TestNewModules(t *testing.T) {
 		}
 		assert.FailNow(t, "no modules found")
 	})
+
+}
+
+func TestNewModulesMetricSetTypes(t *testing.T) {
+	r := newTestRegistry(t)
+
+	factory := func(base BaseMetricSet) (MetricSet, error) {
+		return &testMetricSet{base}, nil
+	}
+
+	name := "EventFetcher"
+	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run(name+" MetricSet", func(t *testing.T) {
+		c := newConfig(t, map[string]interface{}{
+			"module":     moduleName,
+			"metricsets": []string{name},
+		})
+
+		modules, err := NewModules(c, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Len(t, modules, 1)
+
+		for _, metricSets := range modules {
+			if assert.Len(t, metricSets, 1) {
+				metricSet := metricSets[0]
+				_, ok := metricSet.(EventFetcher)
+				assert.True(t, ok, name+" not implemented")
+			}
+		}
+	})
+
+	factory = func(base BaseMetricSet) (MetricSet, error) {
+		return &testMetricSetEventsFetcher{base}, nil
+	}
+
+	name = "EventsFetcher"
+	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run(name+" MetricSet", func(t *testing.T) {
+		c := newConfig(t, map[string]interface{}{
+			"module":     moduleName,
+			"metricsets": []string{name},
+		})
+
+		modules, err := NewModules(c, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Len(t, modules, 1)
+
+		for _, metricSets := range modules {
+			if assert.Len(t, metricSets, 1) {
+				metricSet := metricSets[0]
+				_, ok := metricSet.(EventsFetcher)
+				assert.True(t, ok, name+" not implemented")
+			}
+		}
+	})
+
+	factory = func(base BaseMetricSet) (MetricSet, error) {
+		return &testMetricSetReportingFetcher{base}, nil
+	}
+
+	name = "ReportingFetcher"
+	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run(name+" MetricSet", func(t *testing.T) {
+		c := newConfig(t, map[string]interface{}{
+			"module":     moduleName,
+			"metricsets": []string{name},
+		})
+
+		modules, err := NewModules(c, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Len(t, modules, 1)
+
+		for _, metricSets := range modules {
+			if assert.Len(t, metricSets, 1) {
+				metricSet := metricSets[0]
+				_, ok := metricSet.(ReportingMetricSet)
+				assert.True(t, ok, name+" not implemented")
+			}
+		}
+	})
+
+	factory = func(base BaseMetricSet) (MetricSet, error) {
+		return &testPushMetricSet{base}, nil
+	}
+
+	name = "Push"
+	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run(name+" MetricSet", func(t *testing.T) {
+		c := newConfig(t, map[string]interface{}{
+			"module":     moduleName,
+			"metricsets": []string{name},
+		})
+
+		modules, err := NewModules(c, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Len(t, modules, 1)
+
+		for _, metricSets := range modules {
+			if assert.Len(t, metricSets, 1) {
+				metricSet := metricSets[0]
+				_, ok := metricSet.(PushMetricSet)
+				assert.True(t, ok, name+" not implemented")
+			}
+		}
+	})
 }
 
 // TestNewBaseModuleFromModuleConfigStruct tests the creation a new BaseModule.
@@ -249,7 +405,7 @@ func TestNewBaseModuleFromModuleConfigStruct(t *testing.T) {
 	assert.Equal(t, moduleName, baseModule.Config().Module)
 	assert.Equal(t, true, baseModule.Config().Enabled)
 	assert.Equal(t, time.Second*10, baseModule.Config().Period)
-	assert.Equal(t, time.Second, baseModule.Config().Timeout)
+	assert.Equal(t, time.Second*10, baseModule.Config().Timeout)
 	assert.Empty(t, baseModule.Config().Hosts)
 }
 

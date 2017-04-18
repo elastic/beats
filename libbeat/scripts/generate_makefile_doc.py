@@ -22,13 +22,13 @@ import re
 #    doc => Runs the unit tests without coverage reports.
 #
 # Example 2:
-# ${BEATNAME}: $(GOFILES_ALL) ## @build build the beat application
+# ${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
 #    name => None
-#    varname => BEATNAME
+#    varname => BEAT_NAME
 #    category => testing
 #    doc => Runs the unit tests without coverage reports.
-regexp_target_doc = re.compile(r'^((?P<name>(-|_|\w)+)|(\${(?P<varname>(-|_|\w)+)}))\s*:.*\#\#+\s*@(?P<category>(\w+))\s+(?P<doc>(.*))')
-
+regexp_target_doc = re.compile(
+    r'^((?P<name>(-|_|\w)+)|(\${(?P<varname>(-|_|\w)+)}))\s*:.*\#\#+\s*@(?P<category>(\w+))\s+(?P<doc>(.*))')
 
 
 # Parse a Makefile variable assignement:
@@ -40,17 +40,18 @@ regexp_target_doc = re.compile(r'^((?P<name>(-|_|\w)+)|(\${(?P<varname>(-|_|\w)+
 #    category => packaging
 #    doc => Software license of the application
 #
-## Example 2:
-# BEATNAME?=filebeat
-#    name => BEATNAME
+# Example 2:
+# BEAT_NAME?=filebeat
+#    name => BEAT_NAME
 #    default => libbeat
 #    category => None
 #    doc => None
 #
-regexp_var_help = re.compile(r'^(?P<name>(\w)+)\s*(\?)?=\s*(?P<default>([^\#]+))(\s+\#\#+\s*@(?P<category>(\w+))(:)?\s+(?P<doc>(.*))|\s*$)')
+regexp_var_help = re.compile(
+    r'^(?P<name>(\w)+)\s*(\?)?=\s*(?P<default>([^\#]+))(\s+\#\#+\s*@(?P<category>(\w+))(:)?\s+(?P<doc>(.*))|\s*$)')
 
 
-# Parse a Makefile line according to the given regexp 
+# Parse a Makefile line according to the given regexp
 # - insert the dict { name, default, is_variable, category, doc} to the categories dictionary
 # - insert the category to the categories_set
 # - return a pair [name, value] if the line is a Makefile variable assignement
@@ -73,7 +74,7 @@ def parse_line(line, regexp, categories, categories_set):
         if not name:
             name = matches.group("name")
             is_variable = False
-        
+
         if name:
             variable = [name, default]
 
@@ -81,11 +82,11 @@ def parse_line(line, regexp, categories, categories_set):
         if category:
             category = category.replace("_", " ").capitalize()
             doc = matches.group("doc").rstrip('.').rstrip()
-            doc = doc[0].capitalize() + doc[1:] # Capitalize the first word
- 
+            doc = doc[0].capitalize() + doc[1:]  # Capitalize the first word
+
             if category not in categories_set:
                 categories_set.append(category)
-                categories[category] = []        
+                categories[category] = []
 
             categories[category].append({
                 "name": name,
@@ -100,11 +101,11 @@ def parse_line(line, regexp, categories, categories_set):
 #
 # Example in Makefile:
 #
-# ${BEATNAME}: $(GOFILES_ALL) ## @build build the beat application
+# ${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
 # 	go build
 #
-# BEATNAME is a Makefile target whose name ${BEATNAME} is a Makefile variable.
-# The name of the rule is changed from "BEATNAME" to "filebeat"
+# BEAT_NAME is a Makefile target whose name ${BEAT_NAME} is a Makefile variable.
+# The name of the rule is changed from "BEAT_NAME" to "filebeat"
 #
 def substitute_variable_targets(targets, variables):
     target_variables = ([target for category in targets for target in targets[category] if target['is_variable']])
@@ -113,31 +114,34 @@ def substitute_variable_targets(targets, variables):
         variable['variable'] = False
 
 # Display the help to stdout
+
+
 def print_help(categories, categories_set):
     column_size = max(len(rule["name"]) for category in categories_set for rule in categories[category])
     for category in categories_set:
-        print ("\n{}:".format(category))
+        print("\n{}:".format(category))
         for rule in categories[category]:
             if "name" in rule:
                 name = rule["name"]
             if "varname" in rule:
                 name = rule["varname"]
             default = rule["default"]
-            print ("\t{target: <{fill}}\t{doc}.{default}".format(
+            print("\t{target: <{fill}}\t{doc}.{default}".format(
                 target=rule["name"], fill=column_size,
-                 doc=rule["doc"],
-            default=(" Default: {}".format(default) if default else "")))
+                doc=rule["doc"],
+                default=(" Default: {}".format(default) if default else "")))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Generate documentation from a list of Makefile files")
 
-    parser.add_argument( "--variables", dest='variables',
-                    action='store_true')
+    parser.add_argument("--variables", dest='variables',
+                        action='store_true')
 
-    parser.add_argument( "files", nargs="+", type=argparse.FileType('r'),
-                    help="list of Makefiles to analyze",
-                    default=None)
+    parser.add_argument("files", nargs="+", type=argparse.FileType('r'),
+                        help="list of Makefiles to analyze",
+                        default=None)
     args = parser.parse_args()
 
     categories_targets = {}
@@ -153,11 +157,10 @@ if __name__ == "__main__":
             if variable and variable[0] not in variables:
                 variables[variable[0]] = variable[1]
 
-    substitute_variable_targets(categories_targets, variables)  
+    substitute_variable_targets(categories_targets, variables)
 
     if not args.variables:
-        print ("Usage: make [target] [VARIABLE=value]")
+        print("Usage: make [target] [VARIABLE=value]")
         print_help(categories_targets, categories_targets_set)
     else:
         print_help(categories_vars, categories_vars_set)
-

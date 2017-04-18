@@ -5,16 +5,6 @@ This section contains frequently asked questions about Packetbeat. Also check ou
 https://discuss.elastic.co/c/beats/packetbeat[Packetbeat discussion forum].
 
 [float]
-[[client-server-fields-empty]]
-=== Client_server and server fields are empty?
-
-The `client_server` and `server` fields are empty when Packetbeat is not configured
-to capture information about the network topology.
-
-To capture information about the network topology, set the `save_topology` configuration option to true and make sure that
-you are sending the output to Elasticsearch.
-
-[float]
 [[dashboard-fields-incorrect]]
 === Dashboard in Kibana is breaking up data fields incorrectly?
 
@@ -38,8 +28,8 @@ For example: `ip link set enp5s0f1 promisc on`
 === Packetbeat can't capture traffic from Windows loopback interface?
 
 Packetbeat is unable to capture traffic from the loopback device (127.0.0.1 traffic)
-because the Windows TCP/IP stack does not implement a network loopback interface, 
-making it difficult for Windows packet capture drivers like WinPcap to sniff traffic. 
+because the Windows TCP/IP stack does not implement a network loopback interface,
+making it difficult for Windows packet capture drivers like WinPcap to sniff traffic.
 
 As a workaround, you can try installing https://github.com/nmap/npcap/releases[Npcap],
 an update of WinPcap. Make sure that you restart Windows after installing Npcap.
@@ -64,11 +54,11 @@ PS C:\Users\vagrant\Desktop\packetbeat-1.2.0-windows> .\packetbeat.exe -devices
 === Packetbeat is missing long running transactions?
 
 Packetbeat has an internal timeout that it uses to time out transactions and TCP connections
-when no packets have been seen for a long time. 
+when no packets have been seen for a long time.
 
 To process long running transactions, you can specify a larger value for the <<transaction-timeout-option,`transaction_timeout`>>
 option. However, keep in mind that very large timeout values can increase memory usage if messages are lost or transaction
-response messages are not sent. 
+response messages are not sent.
 
 include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
 include::../../libbeat/docs/shared-faq.asciidoc[]

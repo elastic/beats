@@ -196,7 +196,7 @@ func TestKafkaPublish(t *testing.T) {
 		// create output within function scope to guarantee
 		// output is properly closed between single tests
 		func() {
-			tmp, err := New("libbeat", cfg, 0)
+			tmp, err := New(common.BeatInfo{Beat: "libbeat"}, cfg)
 			if err != nil {
 				t.Fatal(err)
 			}

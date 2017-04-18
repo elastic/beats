@@ -26,20 +26,21 @@ packetbeat.flows:
 
 #========================== Transaction protocols =============================
 
-packetbeat.protocols.icmp:
+packetbeat.protocols:
+- type: icmp
   # Enable ICMPv4 and ICMPv6 monitoring. Default: false
   enabled: true
 
-packetbeat.protocols.amqp:
+- type: amqp
   # Configure the ports where to listen for AMQP traffic. You can disable
   # the AMQP protocol by commenting out the list of ports.
   ports: [5672]
 
-packetbeat.protocols.cassandra:
+- type: cassandra
   #Cassandra port for traffic monitoring.
   ports: [9042]
 
-packetbeat.protocols.dns:
+- type: dns
   # Configure the ports where to listen for DNS traffic. You can disable
   # the DNS protocol by commenting out the list of ports.
   ports: [53]
@@ -52,42 +53,42 @@ packetbeat.protocols.dns:
   # (additional resource records) is added to messages.
   include_additionals: true
 
-packetbeat.protocols.http:
+- type: http
   # Configure the ports where to listen for HTTP traffic. You can disable
   # the HTTP protocol by commenting out the list of ports.
   ports: [80, 8080, 8000, 5000, 8002]
 
-packetbeat.protocols.memcache:
+- type: memcache
   # Configure the ports where to listen for memcache traffic. You can disable
   # the Memcache protocol by commenting out the list of ports.
   ports: [11211]
 
-packetbeat.protocols.mysql:
+- type: mysql
   # Configure the ports where to listen for MySQL traffic. You can disable
   # the MySQL protocol by commenting out the list of ports.
   ports: [3306]
 
-packetbeat.protocols.pgsql:
+- type: pgsql
   # Configure the ports where to listen for Pgsql traffic. You can disable
   # the Pgsql protocol by commenting out the list of ports.
   ports: [5432]
 
-packetbeat.protocols.redis:
+- type: redis
   # Configure the ports where to listen for Redis traffic. You can disable
   # the Redis protocol by commenting out the list of ports.
   ports: [6379]
 
-packetbeat.protocols.thrift:
+- type: thrift
   # Configure the ports where to listen for Thrift-RPC traffic. You can disable
   # the Thrift-RPC protocol by commenting out the list of ports.
   ports: [9090]
 
-packetbeat.protocols.mongodb:
+- type: mongodb
   # Configure the ports where to listen for MongoDB traffic. You can disable
   # the MongoDB protocol by commenting out the list of ports.
   ports: [27017]
 
-packetbeat.protocols.nfs:
+- type: nfs
   # Configure the ports where to listen for NFS traffic. You can disable
   # the NFS protocol by commenting out the list of ports.
   ports: [2049]

@@ -2,13 +2,11 @@ package publish
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/nranchev/go-libGeoIP"
 )
 
 type Transactions interface {
@@ -20,11 +18,9 @@ type Flows interface {
 }
 
 type PacketbeatPublisher struct {
-	pub    publisher.Publisher
-	client publisher.Client
+	beatPublisher *publisher.BeatPublisher
+	client        publisher.Client
 
-	topo           topologyProvider
-	geoLite        *libgeo.GeoIP
 	ignoreOutgoing bool
 
 	wg   sync.WaitGroup
@@ -36,15 +32,6 @@ type PacketbeatPublisher struct {
 
 type ChanTransactions struct {
 	Channel chan common.MapStr
-}
-
-// XXX: currently implemented by libbeat publisher. This functionality is only
-// required by packetbeat. Source for TopologyProvider should become local to
-// packetbeat.
-type topologyProvider interface {
-	IsPublisherIP(ip string) bool
-	GetServerName(ip string) string
-	GeoLite() *libgeo.GeoIP
 }
 
 func (t *ChanTransactions) PublishTransaction(event common.MapStr) bool {
@@ -59,15 +46,9 @@ func NewPublisher(
 	hwm, bulkHWM int,
 	ignoreOutgoing bool,
 ) (*PacketbeatPublisher, error) {
-	topo, ok := pub.(topologyProvider)
-	if !ok {
-		return nil, errors.New("Requires topology provider")
-	}
 
 	return &PacketbeatPublisher{
-		pub:            pub,
-		topo:           topo,
-		geoLite:        topo.GeoLite(),
+		beatPublisher:  pub.(*publisher.BeatPublisher),
 		ignoreOutgoing: ignoreOutgoing,
 		client:         pub.Connect(),
 		done:           make(chan struct{}),
@@ -151,14 +132,37 @@ func (p *PacketbeatPublisher) onFlow(events []common.MapStr) {
 			continue
 		}
 
-		if !p.addGeoIPToFlow(event) {
-			continue
-		}
-
 		pub = append(pub, event)
 	}
 
 	p.client.PublishEvents(pub)
+}
+
+func (p *PacketbeatPublisher) IsPublisherIP(ip string) bool {
+
+	for _, myip := range p.beatPublisher.IPAddrs {
+		if myip == ip {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (p *PacketbeatPublisher) GetServerName(ip string) string {
+
+	// in case the IP is localhost, return current shipper name
+	islocal, err := common.IsLoopback(ip)
+	if err != nil {
+		logp.Err("Parsing IP %s fails with: %s", ip, err)
+		return ""
+	}
+
+	if islocal {
+		return p.beatPublisher.GetName()
+	}
+
+	return ""
 }
 
 // filterEvent validates an event for common required fields with types.
@@ -195,7 +199,7 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 	debugf("has src: %v", ok)
 	if ok {
 		// check if it's outgoing transaction (as client)
-		isOutgoing := p.topo.IsPublisherIP(src.IP)
+		isOutgoing := p.IsPublisherIP(src.IP)
 		if isOutgoing {
 			if p.ignoreOutgoing {
 				// duplicated transaction -> ignore it
@@ -207,7 +211,7 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 			event["direction"] = "out"
 		}
 
-		srcServer = p.topo.GetServerName(src.IP)
+		srcServer = p.GetServerName(src.IP)
 		event["client_ip"] = src.IP
 		event["client_port"] = src.Port
 		event["client_proc"] = src.Proc
@@ -218,7 +222,7 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 	dst, ok := event["dst"].(*common.Endpoint)
 	debugf("has dst: %v", ok)
 	if ok {
-		dstServer = p.topo.GetServerName(dst.IP)
+		dstServer = p.GetServerName(dst.IP)
 		event["ip"] = dst.IP
 		event["port"] = dst.Port
 		event["proc"] = dst.Proc
@@ -226,85 +230,12 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 		delete(event, "dst")
 
 		//check if it's incoming transaction (as server)
-		if p.topo.IsPublisherIP(dst.IP) {
+		if p.IsPublisherIP(dst.IP) {
 			// incoming transaction
 			event["direction"] = "in"
 		}
 
 	}
-
-	if p.geoLite != nil {
-		realIP, exists := event["real_ip"]
-		if exists && len(realIP.(common.NetString)) > 0 {
-			loc := p.geoLite.GetLocationByIP(string(realIP.(common.NetString)))
-			if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
-				loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
-				event["client_location"] = loc
-			}
-		} else {
-			if len(srcServer) == 0 && src != nil { // only for external IP addresses
-				loc := p.geoLite.GetLocationByIP(src.IP)
-				if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
-					loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
-					event["client_location"] = loc
-				}
-			}
-		}
-	}
-
-	return true
-}
-
-func (p *PacketbeatPublisher) addGeoIPToFlow(event common.MapStr) bool {
-
-	getLocation := func(host common.MapStr, ip_type string) string {
-
-		ip, exists := host[ip_type]
-		if !exists {
-			return ""
-		}
-
-		str, ok := ip.(string)
-		if !ok {
-			logp.Warn("IP address must be string")
-			return ""
-		}
-		loc := p.geoLite.GetLocationByIP(str)
-		if loc == nil || loc.Latitude == 0 || loc.Longitude == 0 {
-			return ""
-		}
-
-		return fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
-	}
-
-	if p.geoLite == nil {
-		return true
-	}
-
-	ipFieldNames := [][]string{
-		{"ip", "ip_location"},
-		{"outter_ip", "outter_ip_location"},
-		{"ipv6", "ipv6_location"},
-		{"outter_ipv6", "outter_ipv6_location"},
-	}
-
-	source := event["source"].(common.MapStr)
-	dest := event["dest"].(common.MapStr)
-
-	for _, name := range ipFieldNames {
-
-		loc := getLocation(source, name[0])
-		if loc != "" {
-			source[name[1]] = loc
-		}
-
-		loc = getLocation(dest, name[0])
-		if loc != "" {
-			dest[name[1]] = loc
-		}
-	}
-	event["source"] = source
-	event["dest"] = dest
 
 	return true
 }

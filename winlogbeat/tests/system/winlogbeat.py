@@ -1,3 +1,5 @@
+import os
+import platform
 import sys
 
 if sys.platform.startswith("win"):
@@ -7,15 +9,19 @@ if sys.platform.startswith("win"):
     import win32security
     import win32evtlogutil
 
-sys.path.append('../../../libbeat/tests/system')
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
+
 from beat.beat import TestCase
 
 
 class BaseTest(TestCase):
+
     @classmethod
     def setUpClass(self):
         self.beat_name = "winlogbeat"
+        self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
         super(BaseTest, self).setUpClass()
+
 
 class WriteReadTest(BaseTest):
     providerName = "WinlogbeatTestPython"
@@ -91,7 +97,7 @@ class WriteReadTest(BaseTest):
 
     def assert_common_fields(self, evt, msg=None, eventID=10, sid=None,
                              level="Information", extra=None):
-        assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
+        assert evt["computer_name"].lower() == platform.node().lower()
         assert "record_number" in evt
         self.assertDictContainsSubset({
             "event_id": eventID,

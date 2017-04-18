@@ -21,17 +21,18 @@ metricbeat.modules:
   metricsets: ["process"]
   processes: ['.*']
 ----
-*`cgroups`*:: When the `process` metricset is enabled, you can use the boolean
-`cgroups` option to enable the experimental cgroup metrics on Linux.
+*`process.cgroups.enabled`*:: When the `process` metricset is enabled, you can
+use this boolean configuration option to disable cgroup metrics. By default
+cgroup metrics collection is enabled.
 +
-The following example config enables cgroups metrics on Linux.
+The following example config disables cgroup metrics on Linux.
 +
 [source,yaml]
 ----
 metricbeat.modules:
 - module: system
   metricsets: ["process"]
-  cgroups: true
+  process.cgroups.enabled: false
 ----
 *`cpu_ticks`*:: When the `cpu` or `core` metricset is enabled, you can specify `cpu_ticks: true` to report CPU ticks in addition to CPU percentages stats. For example:
 +
@@ -42,6 +43,9 @@ metricbeat.modules:
   metricsets: ["cpu", "core"]
   cpu_ticks: true
 ----
+
+It is strongly recommended to not run docker metricsets with a period smaller then 3 seconds. The request to the docker
+API already takes up to 2s seconds. Otherwise all the requests would timeout and no data is reported.
 
 [float]
 === Dashboard

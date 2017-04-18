@@ -2,14 +2,15 @@
 FROM docker.elastic.co/kibana/kibana-ubuntu-base:latest
 MAINTAINER Elastic Docker Team <docker@elastic.co>
 
-ARG KIBANA_DOWNLOAD_URL=https://snapshots.elastic.co/downloads/kibana/kibana-6.0.0-alpha1-SNAPSHOT-linux-x86_64.tar.gz
-ARG X_PACK_URL
+ARG DOWNLOAD_URL
+ARG ELASTIC_VERSION
 
+HEALTHCHECK CMD curl -f http://localhost:5601
 EXPOSE 5601
 
 WORKDIR /usr/share/kibana
-RUN curl -Ls ${KIBANA_DOWNLOAD_URL} | tar --strip-components=1 -zxf - && \
-    #bin/kibana-plugin install ${X_PACK_URL} && \
+RUN curl -Ls ${DOWNLOAD_URL}/kibana/kibana-${ELASTIC_VERSION}-linux-x86_64.tar.gz | tar --strip-components=1 -zxf - && \
+    #bin/kibana-plugin install ${DOWNLOAD_URL}/kibana-plugins/x-pack/x-pack-${ELASTIC_VERSION}.zip} && \
     ln -s /usr/share/kibana /opt/kibana
 
 # Set some Kibana configuration defaults.
@@ -24,5 +25,6 @@ ADD bin/kibana-docker /usr/local/bin/
 
 RUN usermod --home /usr/share/kibana kibana
 USER kibana
+ENV BABEL_CACHE_PATH /usr/share/kibana/optimize/.babelcache.json
 ENV PATH=/usr/share/kibana/bin:$PATH
 CMD /usr/local/bin/kibana-docker

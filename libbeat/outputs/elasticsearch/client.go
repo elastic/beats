@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"expvar"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,12 +13,14 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
+// Client is an elasticsearch client.
 type Client struct {
 	Connection
 	tlsConfig *transport.TLSConfig
@@ -27,6 +28,7 @@ type Client struct {
 	index    outil.Selector
 	pipeline *outil.Selector
 	params   map[string]string
+	timeout  time.Duration
 
 	// buffered bulk requests
 	bulkRequ *bulkRequest
@@ -39,12 +41,14 @@ type Client struct {
 	proxyURL         *url.URL
 }
 
+// ClientSettings contains the settings for a client.
 type ClientSettings struct {
 	URL                string
 	Proxy              *url.URL
 	TLS                *transport.TLSConfig
 	Username, Password string
 	Parameters         map[string]string
+	Headers            map[string]string
 	Index              outil.Selector
 	Pipeline           *outil.Selector
 	Timeout            time.Duration
@@ -53,10 +57,12 @@ type ClientSettings struct {
 
 type connectCallback func(client *Client) error
 
+// Connection manages the connection for a given client.
 type Connection struct {
 	URL      string
 	Username string
 	Password string
+	Headers  map[string]string
 
 	http              *http.Client
 	onConnectCallback func() error
@@ -67,14 +73,14 @@ type Connection struct {
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	ackedEvents            = expvar.NewInt("libbeat.es.published_and_acked_events")
-	eventsNotAcked         = expvar.NewInt("libbeat.es.published_but_not_acked_events")
-	publishEventsCallCount = expvar.NewInt("libbeat.es.call_count.PublishEvents")
+	ackedEvents            = monitoring.NewInt(outputs.Metrics, "elasticsearch.events.acked")
+	eventsNotAcked         = monitoring.NewInt(outputs.Metrics, "elasticsearch.events.not_acked")
+	publishEventsCallCount = monitoring.NewInt(outputs.Metrics, "elasticsearch.publishEvents.call.count")
 
-	statReadBytes   = expvar.NewInt("libbeat.es.publish.read_bytes")
-	statWriteBytes  = expvar.NewInt("libbeat.es.publish.write_bytes")
-	statReadErrors  = expvar.NewInt("libbeat.es.publish.read_errors")
-	statWriteErrors = expvar.NewInt("libbeat.es.publish.write_errors")
+	statReadBytes   = monitoring.NewInt(outputs.Metrics, "elasticsearch.read.bytes")
+	statWriteBytes  = monitoring.NewInt(outputs.Metrics, "elasticsearch.write.bytes")
+	statReadErrors  = monitoring.NewInt(outputs.Metrics, "elasticsearch.read.errors")
+	statWriteErrors = monitoring.NewInt(outputs.Metrics, "elasticsearch.write.errors")
 )
 
 var (
@@ -90,6 +96,11 @@ var (
 	errExcpectedObjectEnd    = errors.New("expected end of object")
 )
 
+const (
+	eventType = "doc"
+)
+
+// NewClient instantiates a new client.
 func NewClient(
 	s ClientSettings,
 	onConnectCallback connectCallback,
@@ -129,10 +140,12 @@ func NewClient(
 	}
 
 	iostats := &transport.IOStats{
-		Read:        statReadBytes,
-		Write:       statWriteBytes,
-		ReadErrors:  statReadErrors,
-		WriteErrors: statWriteErrors,
+		Read:               statReadBytes,
+		Write:              statWriteBytes,
+		ReadErrors:         statReadErrors,
+		WriteErrors:        statWriteErrors,
+		OutputsWrite:       outputs.WriteBytes,
+		OutputsWriteErrors: outputs.WriteErrors,
 	}
 	dialer = transport.StatsDialer(dialer, iostats)
 	tlsDialer = transport.StatsDialer(tlsDialer, iostats)
@@ -159,6 +172,7 @@ func NewClient(
 			URL:      s.URL,
 			Username: s.Username,
 			Password: s.Password,
+			Headers:  s.Headers,
 			http: &http.Client{
 				Transport: &http.Transport{
 					Dial:    dialer.Dial,
@@ -173,6 +187,7 @@ func NewClient(
 		index:     s.Index,
 		pipeline:  pipeline,
 		params:    params,
+		timeout:   s.Timeout,
 
 		bulkRequ: bulkRequ,
 
@@ -190,6 +205,7 @@ func NewClient(
 	return client, nil
 }
 
+// Clone clones a client.
 func (client *Client) Clone() *Client {
 	// when cloning the connection callback and params are not copied. A
 	// client's close is for example generated for topology-map support. With params
@@ -206,6 +222,7 @@ func (client *Client) Clone() *Client {
 			Username:         client.Username,
 			Password:         client.Password,
 			Parameters:       nil, // XXX: do not pass params?
+			Headers:          client.Headers,
 			Timeout:          client.http.Timeout,
 			CompressionLevel: client.compressionLevel,
 		},
@@ -259,6 +276,7 @@ func (client *Client) PublishEvents(
 	}
 
 	ackedEvents.Add(int64(len(data) - len(failedEvents)))
+	outputs.AckedEvents.Add(int64(len(data) - len(failedEvents)))
 	eventsNotAcked.Add(int64(len(failedEvents)))
 	if len(failedEvents) > 0 {
 		if sendErr == nil {
@@ -278,16 +296,9 @@ func bulkEncodePublishRequest(
 	pipeline *outil.Selector,
 	data []outputs.Data,
 ) []outputs.Data {
-	var mkMeta func(outil.Selector, *outil.Selector, outputs.Data) interface{}
-
-	mkMeta = eventBulkMeta
-	if pipeline != nil {
-		mkMeta = eventIngestBulkMeta
-	}
-
 	okEvents := data[:0]
 	for _, datum := range data {
-		meta := mkMeta(index, pipeline, datum)
+		meta := createEventBulkMeta(index, pipeline, datum)
 		if err := body.Add(meta, datum.Event); err != nil {
 			logp.Err("Failed to encode event: %s", err)
 			continue
@@ -297,34 +308,35 @@ func bulkEncodePublishRequest(
 	return okEvents
 }
 
-func eventBulkMeta(
-	index outil.Selector,
-	_ *outil.Selector,
-	data outputs.Data,
-) interface{} {
-	type bulkMetaIndex struct {
-		Index   string `json:"_index"`
-		DocType string `json:"_type"`
-	}
-	type bulkMeta struct {
-		Index bulkMetaIndex `json:"index"`
-	}
-
-	event := data.Event
-	meta := bulkMeta{
-		Index: bulkMetaIndex{
-			Index:   getIndex(event, index),
-			DocType: event["type"].(string),
-		},
-	}
-	return meta
-}
-
-func eventIngestBulkMeta(
+func createEventBulkMeta(
 	index outil.Selector,
 	pipelineSel *outil.Selector,
 	data outputs.Data,
 ) interface{} {
+	event := data.Event
+
+	pipeline, err := getPipeline(data, pipelineSel)
+	if err != nil {
+		logp.Err("Failed to select pipeline: %v", err)
+	}
+
+	if pipeline == "" {
+		type bulkMetaIndex struct {
+			Index   string `json:"_index"`
+			DocType string `json:"_type"`
+		}
+		type bulkMeta struct {
+			Index bulkMetaIndex `json:"index"`
+		}
+
+		return bulkMeta{
+			Index: bulkMetaIndex{
+				Index:   getIndex(event, index),
+				DocType: eventType,
+			},
+		}
+	}
+
 	type bulkMetaIndex struct {
 		Index    string `json:"_index"`
 		DocType  string `json:"_type"`
@@ -334,19 +346,29 @@ func eventIngestBulkMeta(
 		Index bulkMetaIndex `json:"index"`
 	}
 
-	event := data.Event
-	pipeline, _ := pipelineSel.Select(event)
-	if pipeline == "" {
-		return eventBulkMeta(index, nil, data)
-	}
-
 	return bulkMeta{
 		Index: bulkMetaIndex{
 			Index:    getIndex(event, index),
 			Pipeline: pipeline,
-			DocType:  event["type"].(string),
+			DocType:  eventType,
 		},
 	}
+}
+
+func getPipeline(data outputs.Data, pipelineSel *outil.Selector) (string, error) {
+	if meta := outputs.GetMetadata(data.Values); meta != nil {
+		if pipeline, exists := meta["pipeline"]; exists {
+			if p, ok := pipeline.(string); ok {
+				return p, nil
+			}
+			return "", errors.New("pipeline metadata is no string")
+		}
+	}
+
+	if pipelineSel != nil {
+		return pipelineSel.Select(data.Event)
+	}
+	return "", nil
 }
 
 // getIndex returns the full index name
@@ -433,7 +455,7 @@ func bulkCollectPublishFails(
 			continue
 		}
 
-		logp.Info("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+		debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
 		failed = append(failed, data[i])
 	}
 
@@ -460,6 +482,10 @@ func itemStatus(reader *jsonReader) (int, []byte, error) {
 
 	// parse actual item response code and error message
 	status, msg, err := itemStatusInner(reader)
+	if err != nil {
+		logp.Err("Failed to parse bulk response item: %s", err)
+		return 0, nil, err
+	}
 
 	// close dictionary. Expect outer dictionary to have only one element
 	kind, _, err = reader.step()
@@ -520,32 +546,27 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 	return status, msg, nil
 }
 
+// PublishEvent publishes an event.
 func (client *Client) PublishEvent(data outputs.Data) error {
 	// insert the events one by one
-
 	event := data.Event
 	index := getIndex(event, client.index)
-	typ := event["type"].(string)
 
 	debugf("Publish event: %s", event)
 
-	pipeline := ""
-	if client.pipeline != nil {
-		var err error
-		pipeline, err = client.pipeline.Select(event)
-		if err != nil {
-			logp.Err("Failed to select pipeline: %v", err)
-			return err
-		}
+	pipeline, err := getPipeline(data, client.pipeline)
+	if err != nil {
+		logp.Err("Failed to select pipeline: %v", err)
+	}
+	if pipeline != "" {
 		debugf("select pipeline: %v", pipeline)
 	}
 
 	var status int
-	var err error
 	if pipeline == "" {
-		status, _, err = client.Index(index, typ, "", client.params, event)
+		status, _, err = client.Index(index, eventType, "", client.params, event)
 	} else {
-		status, _, err = client.Ingest(index, typ, pipeline, "", client.params, event)
+		status, _, err = client.Ingest(index, eventType, pipeline, "", client.params, event)
 	}
 
 	// check indexing error
@@ -574,32 +595,34 @@ func (client *Client) PublishEvent(data outputs.Data) error {
 // then use CheckTemplate prior to calling this method.
 func (client *Client) LoadTemplate(templateName string, template map[string]interface{}) error {
 
+	logp.Info("load template: %s", templateName)
 	path := "/_template/" + templateName
-	err := client.LoadJSON(path, template)
+	body, err := client.LoadJSON(path, template)
 	if err != nil {
-		return fmt.Errorf("couldn't load template: %v", err)
+		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, body)
 	}
 	logp.Info("Elasticsearch template with name '%s' loaded", templateName)
 	return nil
 }
 
-func (client *Client) LoadJSON(path string, json map[string]interface{}) error {
-	status, _, err := client.request("PUT", path, "", nil, json)
+// LoadJSON creates a PUT request based on a JSON document.
+func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte, error) {
+	status, body, err := client.Request("PUT", path, "", nil, json)
 	if err != nil {
-		return fmt.Errorf("couldn't load json. Error: %s", err)
+		return body, fmt.Errorf("couldn't load json. Error: %s", err)
 	}
 	if status > 300 {
-		return fmt.Errorf("couldn't load json. Status: %v", status)
+		return body, fmt.Errorf("couldn't load json. Status: %v", status)
 	}
 
-	return nil
+	return body, nil
 }
 
 // CheckTemplate checks if a given template already exist. It returns true if
 // and only if Elasticsearch returns with HTTP status code 200.
 func (client *Client) CheckTemplate(templateName string) bool {
 
-	status, _, _ := client.request("HEAD", "/_template/"+templateName, "", nil, nil)
+	status, _, _ := client.Request("HEAD", "/_template/"+templateName, "", nil, nil)
 
 	if status != 200 {
 		return false
@@ -608,6 +631,7 @@ func (client *Client) CheckTemplate(templateName string) bool {
 	return true
 }
 
+// Connect connects the client.
 func (conn *Connection) Connect(timeout time.Duration) error {
 	var err error
 	conn.version, err = conn.Ping(timeout)
@@ -622,7 +646,7 @@ func (conn *Connection) Connect(timeout time.Duration) error {
 	return nil
 }
 
-// Ping sends a GET request to the Elasticsearch
+// Ping sends a GET request to the Elasticsearch.
 func (conn *Connection) Ping(timeout time.Duration) (string, error) {
 	debugf("ES Ping(url=%v, timeout=%v)", conn.URL, timeout)
 
@@ -653,11 +677,13 @@ func (conn *Connection) Ping(timeout time.Duration) (string, error) {
 	return response.Version.Number, nil
 }
 
+// Close closes a connection.
 func (conn *Connection) Close() error {
 	return nil
 }
 
-func (conn *Connection) request(
+// Request sends a request via the connection.
+func (conn *Connection) Request(
 	method, path string,
 	pipeline string,
 	params map[string]string,
@@ -698,6 +724,10 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
+	for name, value := range conn.Headers {
+		req.Header.Add(name, value)
+	}
+
 	resp, err := conn.http.Do(req)
 	if err != nil {
 		return 0, nil, err
@@ -705,15 +735,16 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	defer closing(resp.Body)
 
 	status := resp.StatusCode
+	var retErr error
 	if status >= 300 {
-		return status, nil, fmt.Errorf("%v", resp.Status)
+		retErr = fmt.Errorf("%v", resp.Status)
 	}
 
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return status, nil, err
+		return status, nil, retErr
 	}
-	return status, obj, nil
+	return status, obj, retErr
 }
 
 func closing(c io.Closer) {

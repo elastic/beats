@@ -10,7 +10,6 @@ The following topics describe how to secure communication between Packetbeat and
 * <<configuring-ssl-logstash>>
 
 //sets block macro for https.asciidoc included in next section
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/https.asciidoc ?>]
 
 --
 
@@ -19,7 +18,6 @@ pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/http
 include::../../libbeat/docs/https.asciidoc[]
 
 //sets block macro for shared-ssl-logstash-config.asciidoc included in next section
-pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/shared-ssl-logstash-config.asciidoc ?>]
 
 [[configuring-ssl-logstash]]
 == Securing Communication With Logstash by Using SSL

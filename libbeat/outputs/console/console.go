@@ -21,7 +21,7 @@ type console struct {
 	codec outputs.Codec
 }
 
-func New(_ string, config *common.Config, _ int) (outputs.Outputer, error) {
+func New(_ common.BeatInfo, config *common.Config) (outputs.Outputer, error) {
 	var unpackedConfig Config
 	err := config.Unpack(&unpackedConfig)
 	if err != nil {

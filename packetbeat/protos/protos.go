@@ -35,6 +35,11 @@ type PortsConfig struct {
 	Ports []int
 }
 
+type enhTransactions struct {
+	t    publish.Transactions
+	meta common.EventMetadata
+}
+
 func (p *PortsConfig) Init(ports ...int) error {
 	return p.Set(ports)
 }
@@ -84,44 +89,91 @@ func (s ProtocolsStruct) Init(
 	testMode bool,
 	results publish.Transactions,
 	configs map[string]*common.Config,
+	listConfigs []*common.Config,
 ) error {
+	if len(configs) > 0 {
+		logp.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration.")
+	}
+
 	for proto := range protocolSyms {
 		logp.Info("registered protocol plugin: %v", proto)
 	}
 
 	for name, config := range configs {
-		// XXX: icmp is special, ignore here :/
-		if name == "icmp" {
-			continue
+		if err := s.configureProtocol(testMode, results, name, config); err != nil {
+			return err
 		}
+	}
 
-		proto, exists := protocolSyms[name]
-		if !exists {
-			logp.Err("Unknown protocol plugin: %v", name)
-			continue
-		}
-
-		plugin, exists := protocolPlugins[proto]
-		if !exists {
-			logp.Err("Protocol plugin '%v' not registered (%v).", name, proto.String())
-			continue
-		}
-
-		if !config.Enabled() {
-			logp.Info("Protocol plugin '%v' disabled by config", name)
-			continue
-		}
-
-		inst, err := plugin(testMode, results, config)
-		if err != nil {
-			logp.Err("Failed to register protocol plugin: %v", err)
+	for _, config := range listConfigs {
+		module := struct {
+			Name string `config:"type" validate:"required"`
+		}{}
+		if err := config.Unpack(&module); err != nil {
 			return err
 		}
 
-		s.register(proto, inst)
+		if err := s.configureProtocol(testMode, results, module.Name, config); err != nil {
+			return err
+		}
 	}
 
 	return nil
+}
+
+func (s ProtocolsStruct) configureProtocol(
+	testMode bool,
+	results publish.Transactions,
+	name string,
+	config *common.Config,
+) error {
+	// XXX: icmp is special, ignore here :/
+	if name == "icmp" {
+		return nil
+	}
+
+	proto, exists := protocolSyms[name]
+	if !exists {
+		logp.Err("Unknown protocol plugin: %v", name)
+		return nil
+	}
+
+	plugin, exists := protocolPlugins[proto]
+	if !exists {
+		logp.Err("Protocol plugin '%v' not registered (%v).", name, proto.String())
+		return nil
+	}
+
+	if !config.Enabled() {
+		logp.Info("Protocol plugin '%v' disabled by config", name)
+		return nil
+	}
+
+	meta := struct {
+		Config common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+	}{}
+	if err := config.Unpack(&meta); err != nil {
+		return err
+	}
+
+	inst, err := plugin(testMode, resultsChannel(results, meta.Config), config)
+	if err != nil {
+		logp.Err("Failed to register protocol plugin: %v", err)
+		return err
+	}
+
+	s.register(proto, inst)
+	return nil
+}
+
+func resultsChannel(
+	results publish.Transactions,
+	meta common.EventMetadata,
+) publish.Transactions {
+	if len(meta.Fields) == 0 && len(meta.Tags) == 0 {
+		return results
+	}
+	return &enhTransactions{results, meta}
 }
 
 func (s ProtocolsStruct) GetTCP(proto Protocol) TCPPlugin {
@@ -224,4 +276,20 @@ func (s ProtocolsStruct) register(proto Protocol, plugin Plugin) {
 	if !success {
 		logp.Warn("Protocol (%s) register failed, port: %v", proto.String(), plugin.GetPorts())
 	}
+}
+
+func (e *enhTransactions) PublishTransaction(event common.MapStr) bool {
+	err := common.MergeFields(event, e.meta.Fields, e.meta.FieldsUnderRoot)
+	if err != nil {
+		logp.Err("Failed to merge fields: %v", err)
+		return false
+	}
+
+	err = common.AddTags(event, e.meta.Tags)
+	if err != nil {
+		logp.Err("Failed to add tags: %v", err)
+		return false
+	}
+
+	return e.t.PublishTransaction(event)
 }

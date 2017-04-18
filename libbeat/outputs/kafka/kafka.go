@@ -8,12 +8,14 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	metrics "github.com/rcrowley/go-metrics"
+	gometrics "github.com/rcrowley/go-metrics"
 	"github.com/rcrowley/go-metrics/exp"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/monitoring/adapter"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
@@ -38,12 +40,12 @@ const (
 	defaultMaxWaitRetry = 60 * time.Second
 )
 
-var kafkaMetricsRegistryInstance metrics.Registry
+var kafkaMetricsRegistryInstance gometrics.Registry
 
 func init() {
 	sarama.Logger = kafkaLogger{}
 
-	reg := metrics.NewPrefixedRegistry("libbeat.kafka.")
+	reg := gometrics.NewPrefixedRegistry("libbeat.kafka.")
 
 	// Note: registers /debug/metrics handler for displaying all expvar counters
 	exp.Exp(reg)
@@ -54,7 +56,7 @@ func init() {
 
 var kafkaMetricsOnce sync.Once
 
-func kafkaMetricsRegistry() metrics.Registry {
+func kafkaMetricsRegistry() gometrics.Registry {
 	return kafkaMetricsRegistryInstance
 }
 
@@ -98,7 +100,7 @@ var (
 )
 
 // New instantiates a new kafka output instance.
-func New(beatName string, cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
+func New(_ common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
 	output := &kafka{}
 	err := output.init(cfg)
 	if err != nil {
@@ -270,6 +272,15 @@ func (k *kafka) newKafkaConfig() (*sarama.Config, error) {
 	}
 
 	cfg.Producer.Partitioner = k.partitioner
+
+	// TODO: figure out which metrics we want to collect
+	cfg.MetricRegistry = adapter.GetGoMetrics(
+		monitoring.Default,
+		"libbeat.output.kafka",
+		adapter.Rename("incoming-byte-rate", "bytes_read"),
+		adapter.Rename("outgoing-byte-rate", "bytes_write"),
+		adapter.GoMetricsNilify,
+	)
 	return cfg, nil
 }
 

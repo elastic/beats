@@ -3,7 +3,6 @@ package thrift
 import (
 	"encoding/binary"
 	"encoding/hex"
-	"expvar"
 	"fmt"
 	"math"
 	"strconv"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -155,8 +155,8 @@ const (
 )
 
 var (
-	unmatchedRequests  = expvar.NewInt("thrift.unmatched_requests")
-	unmatchedResponses = expvar.NewInt("thrift.unmatched_responses")
+	unmatchedRequests  = monitoring.NewInt(nil, "thrift.unmatched_requests")
+	unmatchedResponses = monitoring.NewInt(nil, "thrift.unmatched_responses")
 )
 
 func init() {

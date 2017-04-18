@@ -2,11 +2,8 @@
 package stubstatus
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
@@ -21,8 +18,6 @@ const (
 )
 
 var (
-	debugf = logp.MakeDebug("nginx-status")
-
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		PathConfigKey: "server_status_path",
@@ -39,33 +34,24 @@ func init() {
 // MetricSet for fetching Nginx stub status.
 type MetricSet struct {
 	mb.BaseMetricSet
-	client              *http.Client // HTTP client that is reused across requests.
-	previousNumRequests int          // Total number of requests as returned in the previous fetch.
+	http                *helper.HTTP
+	previousNumRequests int // Total number of requests as returned in the previous fetch.
 }
 
 // New creates new instance of MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
-		client:        &http.Client{Timeout: base.Module().Config().Timeout},
+		http:          helper.NewHTTP(base),
 	}, nil
 }
 
 // Fetch makes an HTTP request to fetch status metrics from the stubstatus endpoint.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-	req, err := http.NewRequest("GET", m.HostData().SanitizedURI, nil)
-	if m.HostData().User != "" || m.HostData().Password != "" {
-		req.SetBasicAuth(m.HostData().User, m.HostData().Password)
-	}
-	resp, err := m.client.Do(req)
+	scanner, err := m.http.FetchScanner()
 	if err != nil {
-		return nil, fmt.Errorf("error making http request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
+		return nil, err
 	}
 
-	return eventMapping(m, resp.Body, m.Host(), m.Name())
+	return eventMapping(scanner, m)
 }

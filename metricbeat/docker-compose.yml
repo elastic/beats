@@ -1,93 +1,114 @@
-version: '2'
+version: '2.1'
 services:
   beat:
     build: ${PWD}/.
-    depends_on:
-      - apache
-      - couchbase
-      - mongodb
-      - haproxy
-      - kafka
-      - mysql
-      - nginx
-      - postgresql
-      - prometheus
-      - redis
-      - zookeeper
     environment:
-      - APACHE_HOST=apache
-      - APACHE_PORT=80
-      - COUCHBASE_HOST=couchbase
-      - COUCHBASE_PORT=8091
-      - COUCHBASE_DSN=http://Administrator:password@couchbase:8091
-      - HAPROXY_HOST=haproxy
-      - HAPROXY_PORT=14567
-      - KAFKA_HOST=kafka
-      - KAFKA_PORT=9092
-      - NGINX_HOST=nginx
-      - NGINX_PORT=80
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - MONGODB_HOST=mongodb
-      - MONGODB_PORT=27017
-      - MYSQL_DSN=root:test@tcp(mysql:3306)/
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
-      - POSTGRESQL_DSN=postgres://postgresql:5432?sslmode=disable
-      - POSTGRESQL_HOST=postgresql
-      - POSTGRESQL_PORT=5432
-      - POSTGRESQL_USERNAME=postgres
-      - PROMETHEUS_HOST=prometheus
-      - PROMETHEUS_PORT=9090
-      - ZOOKEEPER_HOST=zookeeper
-      - ZOOKEEPER_PORT=2181
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/metricbeat
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
+      # This is required for the docker module tests
       - /var/run/docker.sock:/var/run/docker.sock
     command: make
-    entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
+
+    # Wait for all services to be up and healthy.
+    depends_on:
+      - proxy_dep
+
+    env_file:
+      - ${PWD}/module/apache/_meta/env
+      - ${PWD}/module/ceph/_meta/env
+      - ${PWD}/module/couchbase/_meta/env
+      - ${PWD}/module/elasticsearch/_meta/env
+      - ${PWD}/module/haproxy/_meta/env
+      - ${PWD}/module/jolokia/_meta/env
+      - ${PWD}/module/kafka/_meta/env
+      - ${PWD}/module/kibana/_meta/env
+      - ${PWD}/module/memcached/_meta/env
+      - ${PWD}/module/mongodb/_meta/env
+      - ${PWD}/module/mysql/_meta/env
+      - ${PWD}/module/nginx/_meta/env
+      - ${PWD}/module/php_fpm/_meta/env
+      - ${PWD}/module/postgresql/_meta/env
+      - ${PWD}/module/prometheus/_meta/env
+      - ${PWD}/module/redis/_meta/env
+      - ${PWD}/module/zookeeper/_meta/env
+
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      apache:         { condition: service_healthy }
+      ceph:           { condition: service_healthy }
+      couchbase:      { condition: service_healthy }
+      elasticsearch:  { condition: service_healthy }
+      haproxy:        { condition: service_healthy }
+      jolokia:        { condition: service_healthy }
+      kafka:          { condition: service_healthy }
+      kibana:         { condition: service_healthy }
+      memcached:      { condition: service_healthy }
+      mongodb:        { condition: service_healthy }
+      mysql:          { condition: service_healthy }
+      nginx:          { condition: service_healthy }
+      phpfpm:         { condition: service_healthy }
+      postgresql:     { condition: service_healthy }
+      prometheus:     { condition: service_healthy }
+      redis:          { condition: service_healthy }
+      zookeeper:      { condition: service_healthy }
 
   # Modules
   apache:
     build: ${PWD}/module/apache/_meta
 
+  ceph:
+    build: ${PWD}/module/ceph/_meta
+
   couchbase:
     build: ${PWD}/module/couchbase/_meta
 
-  kafka:
-    image: spotify/kafka
-    expose:
-      - 9092
-      - 2181
-    environment:
-      - ADVERTISED_HOST=kafka
-
-  mongodb:
-    image: mongo:3.4
-
-  mysql:
-    image: mysql:5.7.12
-    environment:
-      - MYSQL_ROOT_PASSWORD=test
-
-  nginx:
-    build: ${PWD}/module/nginx/_meta
+  elasticsearch:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
 
   haproxy:
     build: ${PWD}/module/haproxy/_meta
 
+  jolokia:
+    build: ${PWD}/module/jolokia/_meta
+
+  kafka:
+    build: ${PWD}/module/kafka/_meta
+
+  kibana:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: kibana
+
+  memcached:
+    build: ${PWD}/module/memcached/_meta
+
+  mongodb:
+    build: ${PWD}/module/mongodb/_meta
+
+  mysql:
+    build: ${PWD}/module/mysql/_meta
+
+  nginx:
+    build: ${PWD}/module/nginx/_meta
+
+  phpfpm:
+    build: ${PWD}/module/php_fpm/_meta
+
   postgresql:
-    image: postgres:9.5.3
+    build: ${PWD}/module/postgresql/_meta
 
   prometheus:
-    image: prom/prometheus
-    expose:
-      - 9090
+    build: ${PWD}/module/prometheus/_meta
 
   redis:
-    image: redis:3.2.4-alpine
+    build: ${PWD}/module/redis/_meta
 
   zookeeper:
-    image: jplock/zookeeper:3.4.8
+    build: ${PWD}/module/zookeeper/_meta

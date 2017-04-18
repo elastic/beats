@@ -1,3 +1,14 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/setup-repositories.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
 [[setup-repositories]]
 === Repositories for APT and YUM
 
@@ -13,6 +24,14 @@ to sign all our packages. It is available from https://pgp.mit.edu.
 
 [float]
 ==== APT
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Beats has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 To add the Beats repository for APT:
 
@@ -51,23 +70,48 @@ the following:
 Simply delete the `deb-src` entry from the `/etc/apt/sources.list` file, and the installation should work as expected.
 ==================================================
 
-. Run `apt-get update`, and the repository is ready for use. For example, you can
-install Filebeat by running:
+ifeval::["{beatname_uc}"=="Heartbeat"]
+
+. On Debian or Ubuntu, pin the repository before installing to ensure that the
+correct Elastic Heartbeat package is installed. To do this, edit 
+`/etc/apt/preferences` (or `/etc/apt/preferences.d/heartbeat`) as follows:
 +
-[source,sh]
+[source,shell]
 --------------------------------------------------
-sudo apt-get update && sudo apt-get install filebeat
+Package: heartbeat
+Pin: origin artifacts.elastic.co
+Pin-Priority: 700
 --------------------------------------------------
 
-. To configure the beat to start automatically during boot, run:
+endif::[]
+
+. Run `apt-get update`, and the repository is ready for use. For example, you can
+install {beatname_uc} by running:
 +
-[source,sh]
+["source","sh",subs="attributes"]
 --------------------------------------------------
-sudo update-rc.d filebeat defaults 95 10
+sudo apt-get update && sudo apt-get install {beatname_lc}
 --------------------------------------------------
+
+. To configure the Beat to start automatically during boot, run:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+sudo update-rc.d {beatname_lc} defaults 95 10
+--------------------------------------------------
+
+endif::[]
 
 [float]
 ==== YUM
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Beats has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 To add the Beats repository for YUM:
 
@@ -93,17 +137,20 @@ autorefresh=1
 type=rpm-md
 --------------------------------------------------
 +
-Your repository is ready to use. For example, you can install Filebeat by
+Your repository is ready to use. For example, you can install {beatname_uc} by
 running:
 +
-[source,sh]
+["source","sh",subs="attributes"]
 --------------------------------------------------
-sudo yum install filebeat
+sudo yum install {beatname_lc}
 --------------------------------------------------
 
-. To configure the beat to start automatically during boot, run:
+. To configure the Beat to start automatically during boot, run:
 +
-[source,sh]
+["source","sh",subs="attributes"]
 --------------------------------------------------
-sudo chkconfig --add filebeat
+sudo chkconfig --add {beatname_lc}
 --------------------------------------------------
+
+endif::[]
+

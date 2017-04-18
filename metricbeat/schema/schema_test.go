@@ -27,7 +27,7 @@ func TestSchema(t *testing.T) {
 		"other_key": "meh",
 	}
 
-	event := schema.Apply(source)
+	event, _ := schema.Apply(source)
 	assert.Equal(t, event, common.MapStr{
 		"test": "hello",
 		"test_obj": common.MapStr{
