@@ -10,3 +10,7 @@
       type: group
       description: >
       fields:
+        - name: cluster.name
+          type: keyword
+          description: >
+            Elasticsearch cluster name.

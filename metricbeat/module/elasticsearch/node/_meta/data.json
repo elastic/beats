@@ -5,6 +5,9 @@
         "name": "host.example.com"
     },
     "elasticsearch": {
+        "cluster": {
+            "name": "elasticsearch"
+        },
         "node": {
             "jvm": {
                 "memory": {
@@ -12,9 +15,9 @@
                         "bytes": 536870912
                     }
                 },
-                "version": "1.8.0_92-internal"
+                "version": "1.8.0_121"
             },
-            "name": "4Il1NmqoQEi-x8a50GNUIw",
+            "name": "fLk5w1-IR2a03fUrs5KbWA",
             "version": "6.0.0-alpha1"
         }
     },
