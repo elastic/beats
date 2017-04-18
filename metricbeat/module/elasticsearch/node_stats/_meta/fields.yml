@@ -87,3 +87,31 @@
               format: bytes
               description:
                 Used bytes.
+
+    - name: gc.collectors
+      type: group
+      description: >
+        GC collector stats.
+      fields:
+        - name: old.collection
+          type: group
+          description: >
+            Old colletion gc.
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: ms
+              type: long
+              description: >
+        - name: young.collection
+          type: group
+          description: >
+            Young collection gc.
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: ms
+              type: long
+              description: >
