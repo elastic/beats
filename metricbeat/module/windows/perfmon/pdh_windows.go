@@ -94,6 +94,13 @@ type Query struct {
 	counters Counters
 }
 
+type Format int
+
+const (
+	FLOAT Format = iota
+	LONG
+)
+
 func NewQuery(dataSource string) (*Query, error) {
 	h, err := PdhOpenQuery(dataSource, 0)
 	if err != nil {
@@ -106,7 +113,7 @@ func NewQuery(dataSource string) (*Query, error) {
 	}, nil
 }
 
-func (q *Query) AddCounter(counterPath string, format string) error {
+func (q *Query) AddCounter(counterPath string, format Format) error {
 	if _, found := q.counters[counterPath]; found {
 		return errors.New("counter already added")
 	}
@@ -118,9 +125,9 @@ func (q *Query) AddCounter(counterPath string, format string) error {
 
 	q.counters[counterPath] = &Counter{handle: h}
 	switch format {
-	case "float":
+	case FLOAT:
 		q.counters[counterPath].format = PdhFmtDouble
-	case "long":
+	case LONG:
 		q.counters[counterPath].format = PdhFmtLarge
 	}
 	return nil
