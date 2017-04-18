@@ -211,10 +211,9 @@ filebeat.prospectors:
   # This is especially useful for multiline log messages which can get large.
   #max_bytes: 10485760
 
-  # Maximum depth for "**" patterns. This setting is disabled by default, i.e.,
-  # "**" is not expanded. When it's set to a positive value, a single "**" per
-  # path is allowed up to the value of the setting.
-  #double_star_pattern_depth: 0
+  # Maximum depth for "**" patterns. When it's set to a positive value, "**"
+  # patterns are expanded up to the specified depth.
+  #recursive_glob_depth: 16
 
   ### JSON configuration
 
@@ -1009,4 +1008,3 @@ logging.files:
 
   # Number of rotated log files to keep. Oldest files will be deleted first.
   #keepfiles: 7
-

@@ -119,7 +119,7 @@ func (l *Log) getFiles() map[string]os.FileInfo {
 	paths := map[string]os.FileInfo{}
 
 	for _, path := range l.config.Paths {
-		matches, err := file.Glob(path, l.config.DoubleStarPatternDepth)
+		matches, err := file.Glob(path, l.config.RecursiveGlobDepth)
 		if err != nil {
 			logp.Err("glob(%s) failed: %v", path, err)
 			continue
