@@ -46,7 +46,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("BETA: The dropwizard collector metricset is beta")
+	logp.Beta("The dropwizard collector metricset is beta")
 	config := struct {
 		Namespace string `config:"namespace" validate:"required"`
 	}{}
