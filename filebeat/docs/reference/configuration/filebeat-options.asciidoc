@@ -216,11 +216,11 @@ You specify the following settings under `multiline` to control how Filebeat com
 +
 [options="header"]
 |=======================
-|Setting for `negate` | Setting for `match` | Result
-|`false`              | `after`             | Consecutive lines that match the pattern are appended to the previous line that doesn't match.
-|`false`              | `before`            | Consecutive lines that match the pattern are prepended to the next line that doesn't match.
-|`true`               | `after`             | Consecutive lines that don't match the pattern are appended to the previous line that does match.
-|`true`               | `before`            | Consecutive lines that don't match the pattern are prepended to the next line that does match.
+|Setting for `negate` | Setting for `match` | Result                                                                                           | Vizualisation
+|`false`              | `after`             | Consecutive lines that match the pattern are appended to the previous line that doesn't match.   | test
+|`false`              | `before`            | Consecutive lines that match the pattern are prepended to the next line that doesn't match.      | test
+|`true`               | `after`             | Consecutive lines that don't match the pattern are appended to the previous line that does match.| test
+|`true`               | `before`            | Consecutive lines that don't match the pattern are prepended to the next line that does match.   | test
 |=======================
 +
 NOTE: The `after` setting is equivalent to `previous` in https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html[Logstash], and `before` is equivalent to `next`.
@@ -351,4 +351,6 @@ include::../../../../libbeat/docs/outputconfig.asciidoc[]
 include::../../../../libbeat/docs/shipperconfig.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
+
+include::../../../../libbeat/docs/runconfig.asciidoc[]
 
