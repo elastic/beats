@@ -8143,7 +8143,7 @@ Used bytes of the datastore
 
 
 [float]
-=== vsphere.datastore_usage.capacity.used.percent
+=== vsphere.datastore_usage.capacity.used.pct
 
 type: long
 
@@ -8225,6 +8225,93 @@ type: long
 format: bytes
 
 Free Memory in bytes
+
+
+[float]
+== virtualmachine_usage Fields
+
+virtualmachine_usage
+
+
+
+[float]
+=== vsphere.virtualmachine_usage.datacenter
+
+type: keyword
+
+Datacenter name
+
+
+[float]
+=== vsphere.virtualmachine_usage.name
+
+type: keyword
+
+Virtual Machine name
+
+
+[float]
+=== vsphere.virtualmachine_usage.cpu.used.mhz
+
+type: long
+
+Used CPU in Mhz
+
+
+[float]
+=== vsphere.virtualmachine_usage.cpu.total.mhz
+
+type: long
+
+Total CPU in Mhz
+
+
+[float]
+=== vsphere.virtualmachine_usage.cpu.free.mhz
+
+type: long
+
+Free CPU in Mhz
+
+
+[float]
+=== vsphere.virtualmachine_usage.memory.used.guest.bytes
+
+type: long
+
+format: bytes
+
+Used Memory of Guest in bytes
+
+
+[float]
+=== vsphere.virtualmachine_usage.memory.used.host.bytes
+
+type: long
+
+format: bytes
+
+Used Memory of Host in bytes
+
+
+[float]
+=== vsphere.virtualmachine_usage.memory.total.guest.bytes
+
+type: long
+
+format: bytes
+
+Total Memory of Guest in bytes
+
+
+[float]
+=== vsphere.virtualmachine_usage.memory.free.guest.bytes
+
+type: long
+
+format: bytes
+
+Free Memory of Guest in bytes
 
 
 [[exported-fields-windows]]

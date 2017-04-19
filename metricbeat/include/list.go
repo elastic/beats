@@ -86,6 +86,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/vsphere"
 	_ "github.com/elastic/beats/metricbeat/module/vsphere/datastore_usage"
 	_ "github.com/elastic/beats/metricbeat/module/vsphere/host_usage"
+	_ "github.com/elastic/beats/metricbeat/module/vsphere/virtualmachine_usage"
 	_ "github.com/elastic/beats/metricbeat/module/windows"
 	_ "github.com/elastic/beats/metricbeat/module/windows/perfmon"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper"

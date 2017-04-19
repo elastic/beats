@@ -117,8 +117,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 						"bytes": ds.Summary.FreeSpace,
 					},
 					"used": common.MapStr{
-						"bytes":   usedSpaceBytes,
-						"percent": usedSpacePercent,
+						"bytes": usedSpaceBytes,
+						"pct":   usedSpacePercent,
 					},
 				},
 			}
