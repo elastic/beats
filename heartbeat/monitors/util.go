@@ -304,12 +304,37 @@ func annotated(start time.Time, typ string, fn func() (common.MapStr, []TaskRunn
 		}
 
 		if event != nil {
-			event.Update(common.MapStr{
+
+			monitor := common.MapStr{
+				"type":     typ,
+				"duration": look.RTT(time.Now().Sub(start)),
+				"status":   "down",
+			}
+
+			if err == nil {
+				monitor["status"] = "up"
+			}
+
+			if host, ok := event["host"]; ok {
+				monitor["host"] = host
+				delete(event, "host")
+			}
+
+			if ip, ok := event["ip"]; ok {
+				monitor["ip"] = ip
+				delete(event, "ip")
+			}
+
+			if duration, ok := event["duration"]; ok {
+				monitor["duration"] = duration
+				delete(event, "duration")
+			}
+
+			event = common.MapStr{
 				"@timestamp": look.Timestamp(start),
-				"duration":   look.RTT(time.Now().Sub(start)),
-				"type":       typ,
-				"up":         err == nil,
-			})
+				"monitor":    monitor,
+				typ:          event,
+			}
 		}
 
 		for i := range cont {
