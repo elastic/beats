@@ -5,20 +5,26 @@
         "name": "host.example.com"
     },
     "elasticsearch": {
+        "cluster": {
+            "name": "elasticsearch"
+        },
+        "node": {
+            "name": "hU3Tsxk0TXCAs8vIfBNJ2g"
+        },
         "node_stats": {
             "jvm": {
                 "gc": {
                     "collectors": {
                         "old": {
                             "collection": {
-                                "count": 2,
-                                "ms": 884
+                                "count": 1,
+                                "ms": 187
                             }
                         },
                         "young": {
                             "collection": {
-                                "count": 5,
-                                "ms": 2796
+                                "count": 4,
+                                "ms": 2125
                             }
                         }
                     }
@@ -30,13 +36,13 @@
                                 "bytes": 362414080
                             },
                             "peak": {
-                                "bytes": 73126424
+                                "bytes": 13945280
                             },
                             "peak_max": {
                                 "bytes": 362414080
                             },
                             "used": {
-                                "bytes": 73126424
+                                "bytes": 13945280
                             }
                         },
                         "survivor": {
@@ -44,13 +50,13 @@
                                 "bytes": 17432576
                             },
                             "peak": {
-                                "bytes": 17432576
+                                "bytes": 17432560
                             },
                             "peak_max": {
                                 "bytes": 17432576
                             },
                             "used": {
-                                "bytes": 9680488
+                                "bytes": 17432560
                             }
                         },
                         "young": {
@@ -64,13 +70,12 @@
                                 "bytes": 139591680
                             },
                             "used": {
-                                "bytes": 21138856
+                                "bytes": 137025152
                             }
                         }
                     }
                 }
-            },
-            "name": "fLk5w1-IR2a03fUrs5KbWA"
+            }
         }
     },
     "metricset": {

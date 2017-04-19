@@ -146,3 +146,27 @@ class Test(BaseTest):
         self.copy_files(["logs/nasa-50k.log"],
                         source_dir="../files",
                         target_dir="log")
+
+    def test_stopping_empty_path(self):
+        """
+        Test filebeat stops properly when 1 prospector has an invalid config.
+        """
+
+        prospector_raw = """
+- input_type: log
+  paths: []
+"""
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            prospector_raw=prospector_raw,
+        )
+        filebeat = self.start_beat()
+        time.sleep(2)
+
+        # Wait until first flush
+        self.wait_until(
+            lambda: self.log_contains_count("No paths were defined for prospector") >= 1,
+            max_timeout=5)
+
+        filebeat.check_wait(exit_code=1)

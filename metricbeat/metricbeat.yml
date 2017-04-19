@@ -66,8 +66,6 @@ metricbeat.modules:
   # If insecure is true, don't verify the server's certificate chain
 #  insecure: false
 
-
-
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group

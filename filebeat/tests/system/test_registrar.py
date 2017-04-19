@@ -396,7 +396,8 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
             scan_frequency="1s",
-            close_inactive="1s"
+            close_inactive="1s",
+            clean_removed="false"
         )
 
         if os.name == "nt":

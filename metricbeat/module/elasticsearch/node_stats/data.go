@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
 	s "github.com/elastic/beats/metricbeat/schema"
 	c "github.com/elastic/beats/metricbeat/schema/mapstriface"
 )
@@ -53,7 +54,8 @@ var (
 func eventsMapping(content []byte) ([]common.MapStr, error) {
 
 	nodesStruct := struct {
-		Nodes map[string]map[string]interface{} `json:"nodes"`
+		ClusterName string                            `json:"cluster_name"`
+		Nodes       map[string]map[string]interface{} `json:"nodes"`
 	}{}
 
 	json.Unmarshal(content, &nodesStruct)
@@ -64,7 +66,14 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	for name, node := range nodesStruct.Nodes {
 		event, errs := schema.Apply(node)
 		// Write name here as full name only available as key
-		event["name"] = name
+		event[mb.ModuleData] = common.MapStr{
+			"node": common.MapStr{
+				"name": name,
+			},
+			"cluster": common.MapStr{
+				"name": nodesStruct.ClusterName,
+			},
+		}
 		events = append(events, event)
 		errors.AddErrors(errs)
 	}

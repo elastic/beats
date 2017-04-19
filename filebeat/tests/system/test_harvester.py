@@ -20,6 +20,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test.log",
             close_renamed="true",
+            clean_removed="false",
             scan_frequency="0.1s"
         )
         os.mkdir(self.working_dir + "/log/")
@@ -620,7 +621,8 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/symlink.log",
             symlinks="true",
-            clean_removed="false"
+            clean_removed="false",
+            close_removed="false",
         )
 
         os.mkdir(self.working_dir + "/log/")
