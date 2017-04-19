@@ -30,7 +30,7 @@ func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
 	var jsonFields map[string]interface{}
 
 	err := unmarshal(text, &jsonFields)
-	if err != nil {
+	if err != nil || jsonFields == nil {
 		logp.Err("Error decoding JSON: %v", err)
 		if r.cfg.AddErrorKey {
 			jsonFields = common.MapStr{JsonErrorKey: fmt.Sprintf("Error decoding JSON: %v", err)}
