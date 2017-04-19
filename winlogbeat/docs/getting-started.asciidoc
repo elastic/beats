@@ -177,3 +177,5 @@ to meet your needs.
 image:./images/winlogbeat-dashboard.png[Winlogbeat statistics]
 
 include::../../libbeat/docs/dashboards.asciidoc[]
+
+

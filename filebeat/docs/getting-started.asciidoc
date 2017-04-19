@@ -275,7 +275,7 @@ that's provided for importing dashboards:
 ----------------------------------------------------------------------
 
 For more information about running the script, see
-{libbeat}/import-dashboards.html[Importing Existing Beat Dashboards] in the _Beats Platform Reference_.
+{beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards] in the _Beats Platform Reference_.
 
 After you've created the index pattern, you can select the `filebeat-*` index pattern in Kibana to explore
 Filebeat data.
