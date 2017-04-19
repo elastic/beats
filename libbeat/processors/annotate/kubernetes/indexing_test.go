@@ -8,10 +8,12 @@ import (
 	"testing"
 )
 
+var metagen = &GenDefaultMeta{}
+
 func TestPodIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	podIndexer, err := NewPodNameIndexer(*testConfig)
+	podIndexer, err := NewPodNameIndexer(*testConfig, metagen)
 	assert.Nil(t, err)
 
 	podName := "testpod"
@@ -49,7 +51,7 @@ func TestPodIndexer(t *testing.T) {
 func TestContainerIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	conIndexer, err := NewContainerIndexer(*testConfig)
+	conIndexer, err := NewContainerIndexer(*testConfig, metagen)
 	assert.Nil(t, err)
 
 	podName := "testpod"
@@ -132,4 +134,72 @@ func TestFieldMatcher(t *testing.T) {
 
 	out = matcher.MetadataIndex(nonMatchInput)
 	assert.Equal(t, out, "")
+}
+
+func TestFilteredGenMeta(t *testing.T) {
+	var testConfig = common.NewConfig()
+
+	filteredGen := &GenDefaultMeta{}
+	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
+	assert.Nil(t, err)
+
+	podName := "testpod"
+	ns := "testns"
+	pod := corev1.Pod{
+		Metadata: &metav1.ObjectMeta{
+			Name:      &podName,
+			Namespace: &ns,
+			Labels: map[string]string{
+				"foo": "bar",
+				"x":   "y",
+			},
+			Annotations: map[string]string{
+				"a": "b",
+				"c": "d",
+			},
+		},
+		Spec: &corev1.PodSpec{},
+	}
+
+	indexers := podIndexer.GetMetadata(&pod)
+	assert.Equal(t, len(indexers), 1)
+
+	rawLabels, _ := indexers[0].Data["labels"]
+	assert.NotNil(t, rawLabels)
+
+	labelMap, ok := rawLabels.(common.MapStr)
+	assert.Equal(t, ok, true)
+	assert.Equal(t, len(labelMap), 2)
+
+	rawAnnotations := indexers[0].Data["annotations"]
+	assert.Nil(t, rawAnnotations)
+
+	filteredGen.labels = []string{"foo"}
+	filteredGen.annotations = []string{"a"}
+
+	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
+	assert.Nil(t, err)
+
+	indexers = podIndexer.GetMetadata(&pod)
+	assert.Equal(t, len(indexers), 1)
+
+	rawLabels, _ = indexers[0].Data["labels"]
+	assert.NotNil(t, rawLabels)
+
+	labelMap, ok = rawLabels.(common.MapStr)
+	assert.Equal(t, ok, true)
+	assert.Equal(t, len(labelMap), 1)
+
+	ok, _ = labelMap.HasKey("foo")
+	assert.Equal(t, ok, true)
+
+	rawAnnotations = indexers[0].Data["annotations"]
+	assert.NotNil(t, rawAnnotations)
+	annotationsMap, ok := rawAnnotations.(common.MapStr)
+
+	assert.Equal(t, ok, true)
+	assert.Equal(t, len(annotationsMap), 1)
+
+	ok, _ = annotationsMap.HasKey("a")
+	assert.Equal(t, ok, true)
 }
