@@ -76,7 +76,7 @@ func (c *Crawler) startProspector(config *common.Config, states []file.State) er
 
 	err = p.LoadStates(states)
 	if err != nil {
-		return fmt.Errorf("error loading states for propsector %v: %v", p.ID(), err)
+		return fmt.Errorf("error loading states for prospector %v: %v", p.ID(), err)
 	}
 
 	c.prospectors[p.ID()] = p
