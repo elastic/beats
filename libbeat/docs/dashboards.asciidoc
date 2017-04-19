@@ -19,7 +19,7 @@ visualizations, and searches for {beatname_uc}. The script also creates an index
 +{beatname_lc}-*+, for {beatname_uc}. 
 
 The steps in this section show how to import {beatname_uc} dashboards. You may want to import dashboards for more than
-one Beat or specify import options that aren't described here. See {libbeat}/import-dashboards.html[Importing Existing Beat Dashboards]
+one Beat or specify import options that aren't described here. See {beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards]
 in the _Beats Platform Reference_ for a full list of command-line options.
 
 To import the Kibana dashboards for {beatname_uc}:
@@ -105,3 +105,5 @@ To open the loaded dashboards, go to the *Dashboard* page and select the
 dashboard that you want to open. 
 
 image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
+
+
