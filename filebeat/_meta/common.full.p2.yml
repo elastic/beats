@@ -232,3 +232,10 @@ filebeat.prospectors:
 # How long filebeat waits on shutdown for the publisher to finish.
 # Default is 0, not waiting.
 #filebeat.shutdown_timeout: 0
+
+# Enable filebeat config reloading
+#filebeat.config.prospectors:
+  #enabled: false
+  #path: configs/*.yml
+  #reload.enabled: true
+  #reload.period: 10s
