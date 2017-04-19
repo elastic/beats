@@ -52,18 +52,43 @@ func newKubernetesAnnotator(cfg common.Config) (processors.Processor, error) {
 		return nil, err
 	}
 
+	//Load default indexer configs
+	if config.DefaultIndexers.Enabled == true {
+		Indexing.RLock()
+		for key, cfg := range Indexing.defaultIndexerConfigs {
+			config.Indexers = append(config.Indexers, map[string]common.Config{key: cfg})
+		}
+		Indexing.RUnlock()
+	}
+
+	//Load default matcher configs
+	if config.DefaultMatchers.Enabled == true {
+		Indexing.RLock()
+		for key, cfg := range Indexing.defaultMatcherConfigs {
+			config.Matchers = append(config.Matchers, map[string]common.Config{key: cfg})
+		}
+		Indexing.RUnlock()
+	}
+
+	metaGen := &GenDefaultMeta{
+		labels:      config.IncludeLabels,
+		annotations: config.IncludeAnnotations,
+	}
+
 	indexers := Indexers{
 		indexers: []Indexer{},
 	}
 
+	//Create all configured indexers
 	for _, pluginConfigs := range config.Indexers {
 		for name, pluginConfig := range pluginConfigs {
 			indexFunc := Indexing.GetIndexer(name)
 			if indexFunc == nil {
 				logp.Warn("Unable to find indexing plugin %s", name)
+				continue
 			}
 
-			indexer, err := indexFunc(pluginConfig)
+			indexer, err := indexFunc(pluginConfig, metaGen)
 			if err != nil {
 				logp.Warn("Unable to initialize indexing plugin %s due to error %v", name, err)
 			}
@@ -77,6 +102,7 @@ func newKubernetesAnnotator(cfg common.Config) (processors.Processor, error) {
 		matchers: []Matcher{},
 	}
 
+	//Create all configured matchers
 	for _, pluginConfigs := range config.Matchers {
 		for name, pluginConfig := range pluginConfigs {
 			matchFunc := Indexing.GetMatcher(name)
@@ -91,18 +117,6 @@ func newKubernetesAnnotator(cfg common.Config) (processors.Processor, error) {
 
 			matchers.matchers = append(matchers.matchers, matcher)
 
-		}
-	}
-
-	if config.DefaultIndexers.Enabled == true {
-		for _, indexer := range Indexing.defaultIndexers {
-			indexers.indexers = append(indexers.indexers, indexer)
-		}
-	}
-
-	if config.DefaultMatchers.Enabled == true {
-		for _, matcher := range Indexing.defaultMatchers {
-			matchers.matchers = append(matchers.matchers, matcher)
 		}
 	}
 
