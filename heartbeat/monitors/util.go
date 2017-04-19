@@ -193,8 +193,10 @@ func MakeByHostJob(
 
 			dnsEnd := time.Now()
 			dnsRTT := dnsEnd.Sub(dnsStart)
-			event["resolve_rtt"] = look.RTT(dnsRTT)
-			event["ip"] = ip.String()
+			event["resolve"] = common.MapStr{
+				"rtt": look.RTT(dnsRTT),
+				"ip":  ip.String(),
+			}
 
 			return WithFields(event, pingFactory(ip)).Run()
 		}), nil
@@ -325,6 +327,12 @@ func annotated(start time.Time, typ string, fn func() (common.MapStr, []TaskRunn
 				delete(event, "ip")
 			}
 
+			var resolve common.MapStr
+			if r, ok := event["resolve"]; ok {
+				resolve = r.(common.MapStr)
+				delete(event, "resolve")
+			}
+
 			if duration, ok := event["duration"]; ok {
 				monitor["duration"] = duration
 				delete(event, "duration")
@@ -334,6 +342,10 @@ func annotated(start time.Time, typ string, fn func() (common.MapStr, []TaskRunn
 				"@timestamp": look.Timestamp(start),
 				"monitor":    monitor,
 				typ:          event,
+			}
+
+			if resolve != nil {
+				event["resolve"] = resolve
 			}
 		}
 

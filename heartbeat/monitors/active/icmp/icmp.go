@@ -94,7 +94,7 @@ func createPingIPFactory(config *Config) func(*net.IPAddr) (common.MapStr, error
 		}
 
 		return common.MapStr{
-			"icmp_rtt": look.RTT(rtt),
+			"rtt": look.RTT(rtt),
 		}, nil
 	}
 }

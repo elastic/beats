@@ -11,13 +11,13 @@
 
 # Configure monitors
 heartbeat.monitors:
-- type: http
+- type: icmp
 
   # List or urls to query
-  urls: ["http://localhost:9200"]
+  hosts: ["localhost"]
 
   # Configure task schedule
-  schedule: '@every 10s'
+  schedule: '@every 1s'
 
   # Total test connection and data exchange timeout
   #timeout: 16s
