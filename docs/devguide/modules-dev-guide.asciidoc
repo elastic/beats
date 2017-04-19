@@ -1,13 +1,12 @@
 [[filebeat-modules-devguide]]
-== Developer guide: creating a new module
+== Creating a New Filebeat Module
 
 This guide will walk you through creating a new Filebeat module.
 
 All Filebeat modules currently live in the main
 https://github.com/elastic/beats[Beats] repository. To clone the repository and
 build Filebeat (which you will need for testing), please follow the general
-Beats https://github.com/elastic/beats/blob/master/CONTRIBUTING.md[CONTRIBUTING]
-guide.
+instructions in <<beats-contributing>>.
 
 [float]
 === Overview
@@ -104,7 +103,8 @@ There's quite a lot going on in this file, so let's break it down:
 * Note that variable values don't have to be strings.
   They can be also numbers, objects, or as shown in this example, arrays.
 * We will use the `paths` variable to set the prospector
-  <<prospector-paths,paths>> setting, so "glob" values can be used here.
+  {filebeat}/configuration-filebeat-options.html#prospector-paths[paths]
+  setting, so "glob" values can be used here.
 * Besides the `default` value, the file defines values for particular
   operating systems: a default for darwin/OS X/macOS systems and a default for
   Windows systems. These are introduced via the `os.darwin` and `os.windows`
@@ -159,12 +159,13 @@ exclude_files: [".gz$"]
 
 You'll find this example in the template file that gets generated automatically
 when you run `make create-fileset`. In this example, the `paths` variable is
-used to construct the `paths` list for the <<prospector-paths>> option.
+used to construct the `paths` list for the {filebeat}/configuration-filebeat-options.html#prospector-paths[paths] option.
 
 Any template files that you add to the `config/` folder need to generate a valid
 Filebeat prospector configuration in YAML format. The options accepted by the
-prospector configuration are documented in this
-<<configuration-filebeat-options,section>>.
+prospector configuration are documented in the
+{filebeat}/configuration-filebeat-options.html[Filebeat Prospectors] section of
+the Filebeat documentation.
 
 The template files use the templating language defined by the
 https://golang.org/pkg/text/template/[Golang standard library].
@@ -241,8 +242,7 @@ Here is an example for parsing the Nginx access logs.
 
 Note that you should follow the convention of naming of fields prefixed with the
 module and fileset name: `{module}.{fileset}.field`, e.g.
-`nginx.access.remote_ip`. Also, please review our
-{libbeat}/event-conventions.html[field naming conventions].
+`nginx.access.remote_ip`. Also, please review our <<event-conventions>>.
 
 While developing the pipeline definition, we recommend making use of the
 {elasticsearch}/simulate-pipeline-api.html[Simulate Pipeline API] for testing
@@ -313,4 +313,4 @@ python ../../../dev-tools/export_dashboards.py --regex {module} --dir _meta/kiba
 Where the `--regex` parameter should match the dashboard you want to export.
 
 You can find more details about the process of creating and exporting the Kibana
-dashboards by reading {libbeat}/new-dashboards.html[this guide].
+dashboards by reading {beatsdevguide}/new-dashboards.html[this guide].

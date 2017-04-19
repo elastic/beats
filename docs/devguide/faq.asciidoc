@@ -1,10 +1,10 @@
 [[dev-faq]]
-== Metricbeat Developer Guide FAQ
+=== Metricbeat Developer FAQ
 
 This is a list of common questions when creating a metricset and the potential answers.
 
 [float]
-=== Metricset is not compiled
+==== Metricset is not compiled
 
 You are compiling your Beat, but the newly created metricset is not compiled?
 
@@ -12,7 +12,7 @@ Make sure that the path to your module and metricset are added as an import path
 file or your `include/list.go` file. You can do this manually or by running `make imports`.
 
 [float]
-=== Metricset is not started
+==== Metricset is not started
 
 The metricset is compiled, but not started when starting Metricbeat?
 

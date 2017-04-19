@@ -1,5 +1,5 @@
 [[new-beat]]
-== Developer Guide: Creating a New Beat
+== Creating a New Beat
 
 This guide walks you through the steps for creating a new Elastic Beat.  The
 Beats are a collection of lightweight daemons that collect operational data from
@@ -37,8 +37,7 @@ language, and very few people are experts in it. In fact, several
 people learned Go by contributing to Packetbeat and libbeat, including the
 original Packetbeat authors.
 
-For general information about contributing to Beats, see our
-https://github.com/elastic/beats/blob/master/CONTRIBUTING.md[Contributing Guide].
+For general information about contributing to Beats, see <<beats-contributing>>.
 
 After you have https://golang.org/doc/install[installed Go] and set up the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
@@ -61,7 +60,7 @@ cd ${GOPATH}/src/github.com/elastic/beats
 git checkout {doc-branch}
 ----
 
-Note: If you have multiple go paths use `${GOPATH%%:*}`instead of `${GOPATH}`.
+NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
 
 [[newbeat-overview]]
 === Overview
@@ -503,4 +502,4 @@ that describes how to build Lsbeat from scratch. You can refer to the Lsbeat imp
 === Sharing Your Beat with the Community
 
 When you're done with your new Beat, how about letting everyone know? Open
-a pull request to add your link <<community-beats, here>>.
+a pull request to add your link to the {libbeat}/community-beats.html[Community Beats] list.
