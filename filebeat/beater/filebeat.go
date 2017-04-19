@@ -177,6 +177,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	err = crawler.Start(registrar, config.ProspectorReload)
 	if err != nil {
+		crawler.Stop()
 		return err
 	}
 
