@@ -5,6 +5,8 @@ package perfmon
 import (
 	"testing"
 
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +20,7 @@ func TestQuery(t *testing.T) {
 	}
 	defer q.Close()
 
-	err = q.AddCounter(processorTimeCounter, "float")
+	err = q.AddCounter(processorTimeCounter, FLOAT)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,4 +96,72 @@ func TestNonExistingObject(t *testing.T) {
 		err = handle.query.Close()
 		assert.NoError(t, err)
 	}
+}
+
+func TestLongOutputFormat(t *testing.T) {
+	query, err := NewQuery("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer query.Close()
+
+	err = query.AddCounter(processorTimeCounter, LONG)
+	if err != nil && err != PDH_NO_MORE_DATA {
+		t.Fatal(err)
+	}
+
+	err = query.Execute()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	time.Sleep(time.Millisecond * 1000)
+
+	err = query.Execute()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	values, err := query.Values()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, okLong := values[processorTimeCounter].Num.(int64)
+
+	assert.True(t, okLong)
+}
+
+func TestFloatOutputFormat(t *testing.T) {
+	query, err := NewQuery("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer query.Close()
+
+	err = query.AddCounter(processorTimeCounter, FLOAT)
+	if err != nil && err != PDH_NO_MORE_DATA {
+		t.Fatal(err)
+	}
+
+	err = query.Execute()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	time.Sleep(time.Millisecond * 1000)
+
+	err = query.Execute()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	values, err := query.Values()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, okFloat := values[processorTimeCounter].Num.(float64)
+
+	assert.True(t, okFloat)
 }
