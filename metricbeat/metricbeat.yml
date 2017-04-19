@@ -46,14 +46,6 @@ metricbeat.modules:
   period: 10s
   processes: ['.*']
 
-#------------------------------- kibana Module -------------------------------
-- module: kibana
-  metricsets: ["status"]
-  enabled: true
-  period: 10s
-  hosts: ["localhost:5601"]
-
-
 
 
 #================================ General =====================================
