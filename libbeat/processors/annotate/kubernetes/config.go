@@ -6,15 +6,17 @@ import (
 )
 
 type kubeAnnotatorConfig struct {
-	InCluster       bool          `config:"in_cluster"`
-	KubeConfig      string        `config:"kube_config"`
-	Host            string        `config:"host"`
-	Namespace       string        `config:"namespace"`
-	SyncPeriod      time.Duration `config:"sync_period"`
-	Indexers        PluginConfig  `config:"indexers"`
-	Matchers        PluginConfig  `config:"matchers"`
-	DefaultMatchers Enabled       `config:"default_matchers"`
-	DefaultIndexers Enabled       `config:"default_indexers"`
+	InCluster          bool          `config:"in_cluster"`
+	KubeConfig         string        `config:"kube_config"`
+	Host               string        `config:"host"`
+	Namespace          string        `config:"namespace"`
+	SyncPeriod         time.Duration `config:"sync_period"`
+	Indexers           PluginConfig  `config:"indexers"`
+	Matchers           PluginConfig  `config:"matchers"`
+	DefaultMatchers    Enabled       `config:"default_matchers"`
+	DefaultIndexers    Enabled       `config:"default_indexers"`
+	IncludeLabels      []string      `config:"include_labels"`
+	IncludeAnnotations []string      `config:"include_annotations"`
 }
 
 type Enabled struct {

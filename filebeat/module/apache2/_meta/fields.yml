@@ -2,6 +2,7 @@
   title: "Apache2"
   description: >
     Apache2 Module
+  short_config: true
   fields:
     - name: apache2
       type: group

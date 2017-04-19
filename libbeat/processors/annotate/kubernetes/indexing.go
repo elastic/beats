@@ -48,6 +48,12 @@ type Matcher interface {
 	MetadataIndex(event common.MapStr) string
 }
 
+//GenMeta takes in pods to generate metadata for them
+type GenMeta interface {
+	//GenerateMetaData generates metadata by taking in a pod as an input
+	GenerateMetaData(pod *corev1.Pod) common.MapStr
+}
+
 type Indexers struct {
 	sync.RWMutex
 	indexers []Indexer
@@ -64,11 +70,11 @@ type Register struct {
 	indexers map[string]IndexConstructor
 	matchers map[string]MatcherConstructor
 
-	defaultIndexers []Indexer
-	defaultMatchers []Matcher
+	defaultIndexerConfigs map[string]common.Config
+	defaultMatcherConfigs map[string]common.Config
 }
 
-type IndexConstructor func(config common.Config) (Indexer, error)
+type IndexConstructor func(config common.Config, genMeta GenMeta) (Indexer, error)
 type MatcherConstructor func(config common.Config) (Matcher, error)
 
 // NewRegister creates and returns a new Register.
@@ -77,8 +83,8 @@ func NewRegister() *Register {
 		indexers: make(map[string]IndexConstructor, 0),
 		matchers: make(map[string]MatcherConstructor, 0),
 
-		defaultIndexers: make([]Indexer, 0),
-		defaultMatchers: make([]Matcher, 0),
+		defaultIndexerConfigs: make(map[string]common.Config, 0),
+		defaultMatcherConfigs: make(map[string]common.Config, 0),
 	}
 }
 
@@ -97,13 +103,13 @@ func (r *Register) AddMatcher(name string, matcher MatcherConstructor) {
 }
 
 // AddIndexer to the register
-func (r *Register) AddDefaultIndexer(indexer Indexer) {
-	r.defaultIndexers = append(r.defaultIndexers, indexer)
+func (r *Register) AddDefaultIndexerConfig(name string, config common.Config) {
+	r.defaultIndexerConfigs[name] = config
 }
 
 // AddMatcher to the register
-func (r *Register) AddDefaultMatcher(matcher Matcher) {
-	r.defaultMatchers = append(r.defaultMatchers, matcher)
+func (r *Register) AddDefaultMatcherConfig(name string, config common.Config) {
+	r.defaultMatcherConfigs[name] = config
 }
 
 // AddIndexer to the register
@@ -167,28 +173,69 @@ func (m *Matchers) MetadataIndex(event common.MapStr) string {
 	return ""
 }
 
-// GenMetadata generates default metadata for the given pod
-func GenMetadata(pod *corev1.Pod) common.MapStr {
+type GenDefaultMeta struct {
+	annotations []string
+	labels      []string
+}
+
+// GenerateMetaData generates default metadata for the given pod taking to account certain filters
+func (g *GenDefaultMeta) GenerateMetaData(pod *corev1.Pod) common.MapStr {
 	labelMap := common.MapStr{}
-	for k, v := range pod.Metadata.Labels {
-		labelMap[k] = v
+	annotationsMap := common.MapStr{}
+
+	if len(g.labels) == 0 {
+		for k, v := range pod.Metadata.Labels {
+			labelMap[k] = v
+		}
+	} else {
+		labelMap = generateMapSubset(pod.Metadata.Labels, g.labels)
 	}
-	return common.MapStr{
+
+	annotationsMap = generateMapSubset(pod.Metadata.Annotations, g.annotations)
+
+	meta := common.MapStr{
 		"pod":       pod.Metadata.GetName(),
 		"namespace": pod.Metadata.GetNamespace(),
-		"labels":    labelMap,
 	}
+
+	if len(labelMap) != 0 {
+		meta["labels"] = labelMap
+	}
+
+	if len(annotationsMap) != 0 {
+		meta["annotations"] = annotationsMap
+	}
+
+	return meta
+}
+
+func generateMapSubset(input map[string]string, keys []string) common.MapStr {
+	output := common.MapStr{}
+	if input == nil {
+		return output
+	}
+
+	for _, key := range keys {
+		value, ok := input[key]
+		if ok {
+			output[key] = value
+		}
+	}
+
+	return output
 }
 
 // PodNameIndexer implements default indexer based on pod name
-type PodNameIndexer struct{}
+type PodNameIndexer struct {
+	genMeta GenMeta
+}
 
-func NewPodNameIndexer(_ common.Config) (Indexer, error) {
-	return &PodNameIndexer{}, nil
+func NewPodNameIndexer(_ common.Config, genMeta GenMeta) (Indexer, error) {
+	return &PodNameIndexer{genMeta: genMeta}, nil
 }
 
 func (p *PodNameIndexer) GetMetadata(pod *corev1.Pod) []MetadataIndex {
-	data := GenMetadata(pod)
+	data := p.genMeta.GenerateMetaData(pod)
 	return []MetadataIndex{
 		{
 			Index: pod.Metadata.GetName(),
@@ -202,14 +249,16 @@ func (p *PodNameIndexer) GetIndexes(pod *corev1.Pod) []string {
 }
 
 // ContainerIndexer indexes pods based on all their containers IDs
-type ContainerIndexer struct{}
+type ContainerIndexer struct {
+	genMeta GenMeta
+}
 
-func NewContainerIndexer(_ common.Config) (Indexer, error) {
-	return &ContainerIndexer{}, nil
+func NewContainerIndexer(_ common.Config, genMeta GenMeta) (Indexer, error) {
+	return &ContainerIndexer{genMeta: genMeta}, nil
 }
 
 func (c *ContainerIndexer) GetMetadata(pod *corev1.Pod) []MetadataIndex {
-	commonMeta := GenMetadata(pod)
+	commonMeta := c.genMeta.GenerateMetaData(pod)
 	containers := c.GetIndexes(pod)
 	var metadata []MetadataIndex
 	for i := 0; i < len(containers); i++ {

@@ -3,16 +3,19 @@ package kubernetes
 import (
 	"fmt"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/processors/annotate/kubernetes"
 	corev1 "github.com/ericchiang/k8s/api/v1"
 	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
+var metagen = &kubernetes.GenDefaultMeta{}
+
 func TestIpPortIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	ipIndexer, err := newIpPortIndexer(*testConfig)
+	ipIndexer, err := newIpPortIndexer(*testConfig, metagen)
 	assert.Nil(t, err)
 
 	podName := "testpod"

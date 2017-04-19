@@ -32,6 +32,10 @@ func NewLog(p *Prospector) (*Log, error) {
 		config:     p.config,
 	}
 
+	if len(p.config.Paths) == 0 {
+		return nil, fmt.Errorf("each prospector must have at least one path defined")
+	}
+
 	return prospectorer, nil
 }
 
@@ -94,22 +98,40 @@ func (l *Log) Run() {
 	if l.config.CleanRemoved {
 		for _, state := range l.Prospector.states.GetStates() {
 			// os.Stat will return an error in case the file does not exist
-			_, err := os.Stat(state.Source)
+			stat, err := os.Stat(state.Source)
 			if err != nil {
-				// Only clean up files where state is Finished
-				if state.Finished {
-					state.TTL = 0
-					err := l.Prospector.updateState(input.NewEvent(state))
-					if err != nil {
-						logp.Err("File cleanup state update error: %s", err)
-					}
+				if os.IsNotExist(err) {
+					l.removeState(state)
 					logp.Debug("prospector", "Remove state for file as file removed: %s", state.Source)
 				} else {
-					logp.Debug("prospector", "State for file not removed because not finished: %s", state.Source)
+					logp.Err("Prospector state for %s was not removed: %s", state.Source, err)
+				}
+			} else {
+				// Check if existing source on disk and state are the same. Remove if not the case.
+				newState := file.NewState(stat, state.Source)
+				if !newState.FileStateOS.IsSame(state.FileStateOS) {
+					l.removeState(state)
+					logp.Debug("prospector", "Remove state for file as file removed or renamed: %s", state.Source)
 				}
 			}
 		}
 	}
+}
+
+func (l *Log) removeState(state file.State) {
+
+	// Only clean up files where state is Finished
+	if !state.Finished {
+		logp.Debug("prospector", "State for file not removed because harvester not finished: %s", state.Source)
+		return
+	}
+
+	state.TTL = 0
+	err := l.Prospector.updateState(input.NewEvent(state))
+	if err != nil {
+		logp.Err("File cleanup state update error: %s", err)
+	}
+
 }
 
 // getFiles returns all files which have to be harvested
