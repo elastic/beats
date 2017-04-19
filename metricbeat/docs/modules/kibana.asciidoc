@@ -20,7 +20,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: kibana
   metricsets: ["status"]
-  enabled: true
+  enabled: false
   period: 10s
   hosts: ["localhost:5601"]
 
