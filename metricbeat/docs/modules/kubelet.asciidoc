@@ -5,8 +5,9 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-kubelet]]
 == kubelet Module
 
-This is the kubelet Module.
+beta[]
 
+This module fetches metrics from Kubernetes https://kubernetes.io/docs/admin/kubelet/[kubelet] agent.
 
 
 [float]
