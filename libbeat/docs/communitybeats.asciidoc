@@ -74,8 +74,3 @@ discussion forum.
 Have a question about a community Beat? You can post questions and discuss issues in the
 https://discuss.elastic.co/c/beats/community-beats[Community Beats] category of the Beats discussion forum.
 
-[float]
-[[contributing-beats]]
-=== Contributing to Beats
-
-Remember, you can be a Beats developer, too. <<new-beat, Learn how>>
