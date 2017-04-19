@@ -186,7 +186,14 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 	}
 
 	for _, counter := range config {
-		if err := query.AddCounter(counter.Query, counter.Format); err != nil {
+		var format Format
+		switch counter.Format {
+		case "float":
+			format = FLOAT
+		case "long":
+			format = LONG
+		}
+		if err := query.AddCounter(counter.Query, format); err != nil {
 			query.Close()
 			return nil, err
 		}

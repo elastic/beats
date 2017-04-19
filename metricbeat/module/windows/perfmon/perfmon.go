@@ -13,10 +13,9 @@ import (
 )
 
 type CounterConfig struct {
-	Alias       string `config:"alias" validate:"required"`
-	Query       string `config:"query" validate:"required"`
-	FormatInput string `config:"format"`
-	Format      Format
+	Alias  string `config:"alias" validate:"required"`
+	Query  string `config:"query" validate:"required"`
+	Format string `config:"format"`
 }
 
 func init() {
@@ -43,14 +42,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	for _, value := range config.CounterConfig {
-		var form Format
-		switch strings.ToLower(value.FormatInput) {
+		form := strings.ToLower(value.Format)
+		switch form {
 		case "":
-			value.Format = FLOAT
-		case "float":
-			value.Format = FLOAT
-		case "long":
-			value.Format = LONG
+			value.Format = "float"
+		case "float", "long":
 		default:
 			err := fmt.Errorf("format '%s' for counter '%s' are not valid", value.Format, value.Alias)
 			return nil, errors.Wrap(err, "initialization failed")
