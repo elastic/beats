@@ -28,6 +28,7 @@ func TestProspectorFileExclude(t *testing.T) {
 
 	prospector := Prospector{
 		config: prospectorConfig{
+			Paths:        []string{"test.log"},
 			ExcludeFiles: []match.Matcher{match.MustCompile(`\.gz$`)},
 		},
 	}

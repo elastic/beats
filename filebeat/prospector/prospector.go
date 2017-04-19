@@ -134,7 +134,7 @@ func (p *Prospector) Start() {
 				logp.Info("Prospector channel stopped")
 				return
 			case <-p.beatDone:
-				logp.Info("Prospector channel stopped")
+				logp.Info("Prospector channel stopped because beat is stopping.")
 				return
 			case event := <-p.harvesterChan:
 				// No stopping on error, because on error it is expected that beatDone is closed
