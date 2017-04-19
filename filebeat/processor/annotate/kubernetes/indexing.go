@@ -11,37 +11,13 @@ import (
 
 func init() {
 	kubernetes.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
+	cfg := common.NewConfig()
 
-	indexer := kubernetes.Indexing.GetIndexer(kubernetes.ContainerIndexerName)
-	//Add a container indexer by default.
-	if indexer != nil {
-		cfg := common.NewConfig()
-		container, err := indexer(*cfg)
-
-		if err == nil {
-			kubernetes.Indexing.AddDefaultIndexer(container)
-		} else {
-			logp.Err("Unable to load indexer plugin due to error: %v", err)
-		}
-	} else {
-		logp.Err("Unable to get indexer plugin %s", kubernetes.ContainerIndexerName)
-	}
+	//Add a container indexer config by default.
+	kubernetes.Indexing.AddDefaultIndexerConfig(kubernetes.ContainerIndexerName, *cfg)
 
 	//Add a log path matcher which can extract container ID from the "source" field.
-	matcher := kubernetes.Indexing.GetMatcher(LogPathMatcherName)
-
-	if matcher != nil {
-		cfg := common.NewConfig()
-		logsPathMatcher, err := matcher(*cfg)
-		if err == nil {
-			kubernetes.Indexing.AddDefaultMatcher(logsPathMatcher)
-		} else {
-			logp.Err("Unable to load matcher plugin due to error: %v", err)
-		}
-	} else {
-		logp.Err("Unable to get matcher plugin %s", LogPathMatcherName)
-	}
-
+	kubernetes.Indexing.AddDefaultMatcherConfig(LogPathMatcherName, *cfg)
 }
 
 const LogPathMatcherName = "logs_path"
