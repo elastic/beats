@@ -39,10 +39,10 @@ modules:
 .PHONY: configs
 configs: python-env
 	cat ${ES_BEATS}/filebeat/_meta/common.p1.yml > _meta/beat.yml
-	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEAT_NAME} $(PWD) >> _meta/beat.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} $(PWD) >> _meta/beat.yml
 	cat ${ES_BEATS}/filebeat/_meta/common.p2.yml >> _meta/beat.yml
 	cat ${ES_BEATS}/filebeat/_meta/common.full.p1.yml > _meta/beat.full.yml
-	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.full.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.full.yml
 	cat ${ES_BEATS}/filebeat/_meta/common.full.p2.yml >> _meta/beat.full.yml
 
 # Collects all module docs

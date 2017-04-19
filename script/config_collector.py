@@ -31,7 +31,7 @@ def collect(beat_name, beat_path, full=False):
         module_configs = beat_path + "/config.yml"
 
         # By default, short config is read if short is set
-        short_config = True
+        short_config = False
 
         # Check if full config exists
         if full:
