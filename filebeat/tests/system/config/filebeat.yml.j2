@@ -70,6 +70,9 @@ filebeat.prospectors:
     max_lines: {{ max_lines|default(500) }}
   {% endif %}
 {% endif %}
+{% if prospector_raw %}
+{{prospector_raw}}
+{% endif %}
 
 filebeat.spool_size:
 filebeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}

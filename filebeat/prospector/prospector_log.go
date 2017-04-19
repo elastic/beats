@@ -30,6 +30,10 @@ func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
 		config:     p.config,
 	}
 
+	if len(p.config.Paths) == 0 {
+		return nil, fmt.Errorf("each prospector must have at least one path defined")
+	}
+
 	return prospectorer, nil
 }
 
