@@ -2,12 +2,14 @@
 
 This module collects and parses the slow logs and error logs created by https://www.mysql.com/[MySQL].
 
+[float]
 === Compatibility
 
 The MySQL module was tested with logs from versions 5.5 and 5.7.
 
 On Windows, the module was tested with MySQL installed from the Chocolatey repository.
 
+[float]
 === Dashboard
 
 This module comes with a sample dashboard.

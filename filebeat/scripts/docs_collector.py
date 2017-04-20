@@ -44,6 +44,7 @@ This file is generated! See scripts/docs_collector.py
 
         module_file += """
 
+[float]
 === Fields
 
 For a description of each field in the metricset, see the

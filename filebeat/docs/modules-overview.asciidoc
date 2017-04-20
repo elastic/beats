@@ -6,7 +6,7 @@ beta[]
 Filebeat modules simplify the collection, parsing, and visualization of common
 log formats.
 
-A typical module (say, for the Nginx logs) is composed of one ore
+A typical module (say, for the Nginx logs) is composed of one or
 more filesets (in the case of Nginx, `access` and `error`). A fileset contains
 the following:
 
@@ -103,6 +103,7 @@ filebeat.modules:
 
 Then you can start Filebeat simply with: `./filebeat -e`.
 
+[[module-varialbe-overrides]]
 ==== Variable overrides
 
 Each module and fileset has a set of "variables" which allow adjusting their
@@ -132,7 +133,7 @@ filebeat.modules:
     var.paths = ["/var/log/nginx/access.log*"]
 ----------------------------------------------------------------------
 
-The Nginx `access` fileset also has a `pipeline` variables which allows
+The Nginx `access` fileset also has a `pipeline` variable which allows
 selecting which of the available Ingest Node pipelines is used for parsing. At
 the moment, two such pipelines are available, one that requires the two ingest
 plugins (`ingest-geoip` and `ingest-user-agent`) and one that doesn't. If you
