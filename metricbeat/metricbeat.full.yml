@@ -124,6 +124,15 @@ metricbeat.modules:
     #certificate:           "/etc/pki/client/cert.pem"
     #key:                   "/etc/pki/client/cert.key"
 
+#----------------------------- Dropwizard Module -----------------------------
+#- module: dropwizard
+  #metricsets: ["collector"]
+  #enabled: true
+  #period: 10s
+  #hosts: ["localhost:8080"]
+  #metrics_path: /metrics/metrics
+  #namespace: example
+
 #---------------------------- elasticsearch Module ---------------------------
 #- module: elasticsearch
 #  metricsets: ["node", "node_stats", "stats"]
