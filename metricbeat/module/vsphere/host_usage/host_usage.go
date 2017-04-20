@@ -11,6 +11,7 @@ import (
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/property"
+	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 )
@@ -23,8 +24,7 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	hostUrl  *url.URL
-	insecure bool
+	Client *vim25.Client
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -46,27 +46,26 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	u.User = url.UserPassword(config.Username, config.Password)
 
+	c, err := govmomi.NewClient(context.TODO(), u, config.Insecure)
+	if err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
-		hostUrl:       u,
-		insecure:      config.Insecure,
+		Client:        c.Client,
 	}, nil
 }
 
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	c, err := govmomi.NewClient(ctx, m.hostUrl, m.insecure)
-	if err != nil {
-		return nil, err
-	}
-
-	f := find.NewFinder(c.Client, true)
+	f := find.NewFinder(m.Client, true)
 	if f == nil {
 		return nil, errors.New("Finder undefined for vsphere.")
 	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// Get all datacenters
 	dcs, err := f.DatacenterList(ctx, "*")
@@ -86,7 +85,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			return nil, err
 		}
 
-		pc := property.DefaultCollector(c.Client)
+		pc := property.DefaultCollector(m.Client)
 
 		// Convert hosts into list of references
 		var refs []types.ManagedObjectReference
