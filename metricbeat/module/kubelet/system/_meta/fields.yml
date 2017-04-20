@@ -34,6 +34,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Total memory usage
         - name: rss
@@ -41,6 +42,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 RSS memory usage
         - name: workingset
@@ -48,6 +50,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Working set memory usage
         - name: pagefaults

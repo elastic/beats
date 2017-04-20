@@ -23,6 +23,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Received bytes
             - name: errors
@@ -34,6 +35,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Transmitted bytes
             - name: errors

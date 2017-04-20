@@ -3858,6 +3858,8 @@ Logs info
 
 type: long
 
+format: bytes
+
 Logs available capacity in bytes
 
 
@@ -3867,6 +3869,8 @@ Logs available capacity in bytes
 
 type: long
 
+format: bytes
+
 Logs total capacity in bytes
 
 
@@ -3875,6 +3879,8 @@ Logs total capacity in bytes
 === kubelet.container.logs.used.bytes
 
 type: long
+
+format: bytes
 
 Logs used capacity in bytes
 
@@ -3911,6 +3917,8 @@ Total used inodes
 
 type: long
 
+format: bytes
+
 Total available memory
 
 
@@ -3919,6 +3927,8 @@ Total available memory
 === kubelet.container.memory.usage.bytes
 
 type: long
+
+format: bytes
 
 Total memory usage
 
@@ -3929,6 +3939,8 @@ Total memory usage
 
 type: long
 
+format: bytes
+
 RSS memory usage
 
 
@@ -3937,6 +3949,8 @@ RSS memory usage
 === kubelet.container.memory.workingset.bytes
 
 type: long
+
+format: bytes
 
 Working set memory usage
 
@@ -3964,6 +3978,8 @@ Number of major page faults
 
 type: long
 
+format: bytes
+
 Root filesystem total capacity in bytes
 
 
@@ -3973,6 +3989,8 @@ Root filesystem total capacity in bytes
 
 type: long
 
+format: bytes
+
 Root filesystem total available in bytes
 
 
@@ -3981,6 +3999,8 @@ Root filesystem total available in bytes
 === kubelet.container.rootfs.used.bytes
 
 type: long
+
+format: bytes
 
 Root filesystem total used in bytes
 
@@ -4041,6 +4061,8 @@ CPU used nanocores
 
 type: long
 
+format: bytes
+
 Total available memory
 
 
@@ -4049,6 +4071,8 @@ Total available memory
 === kubelet.node.memory.usage.bytes
 
 type: long
+
+format: bytes
 
 Total memory usage
 
@@ -4059,6 +4083,8 @@ Total memory usage
 
 type: long
 
+format: bytes
+
 RSS memory usage
 
 
@@ -4067,6 +4093,8 @@ RSS memory usage
 === kubelet.node.memory.workingset.bytes
 
 type: long
+
+format: bytes
 
 Working set memory usage
 
@@ -4094,6 +4122,8 @@ Number of major page faults
 
 type: long
 
+format: bytes
+
 Received bytes
 
 
@@ -4110,6 +4140,8 @@ Rx errors
 === kubelet.node.network.tx.bytes
 
 type: long
+
+format: bytes
 
 Transmitted bytes
 
@@ -4129,6 +4161,8 @@ Tx errors
 
 type: long
 
+format: bytes
+
 Filesystem total capacity in bytes
 
 
@@ -4138,6 +4172,8 @@ Filesystem total capacity in bytes
 
 type: long
 
+format: bytes
+
 Filesystem total available in bytes
 
 
@@ -4146,6 +4182,8 @@ Filesystem total available in bytes
 === kubelet.node.fs.used.bytes
 
 type: long
+
+format: bytes
 
 Filesystem total used in bytes
 
@@ -4158,6 +4196,8 @@ Filesystem total used in bytes
 
 type: long
 
+format: bytes
+
 Image filesystem total capacity in bytes
 
 
@@ -4167,6 +4207,8 @@ Image filesystem total capacity in bytes
 
 type: long
 
+format: bytes
+
 Image filesystem total available in bytes
 
 
@@ -4175,6 +4217,8 @@ Image filesystem total available in bytes
 === kubelet.node.runtime.imagefs.used.bytes
 
 type: long
+
+format: bytes
 
 Image filesystem total used in bytes
 
@@ -4217,6 +4261,8 @@ Pod node
 
 type: long
 
+format: bytes
+
 Received bytes
 
 
@@ -4233,6 +4279,8 @@ Rx errors
 === kubelet.pod.network.tx.bytes
 
 type: long
+
+format: bytes
 
 Transmitted bytes
 
@@ -4292,6 +4340,8 @@ CPU used nanocores
 
 type: long
 
+format: bytes
+
 Total memory usage
 
 
@@ -4301,6 +4351,8 @@ Total memory usage
 
 type: long
 
+format: bytes
+
 RSS memory usage
 
 
@@ -4309,6 +4361,8 @@ RSS memory usage
 === kubelet.system.memory.workingset.bytes
 
 type: long
+
+format: bytes
 
 Working set memory usage
 
@@ -4351,6 +4405,8 @@ Volume name
 
 type: long
 
+format: bytes
+
 Filesystem total capacity in bytes
 
 
@@ -4360,6 +4416,8 @@ Filesystem total capacity in bytes
 
 type: long
 
+format: bytes
+
 Filesystem total available in bytes
 
 
@@ -4368,6 +4426,8 @@ Filesystem total available in bytes
 === kubelet.volume.fs.used.bytes
 
 type: long
+
+format: bytes
 
 Filesystem total used in bytes
 

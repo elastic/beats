@@ -15,6 +15,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Filesystem total capacity in bytes
         - name: available
@@ -22,6 +23,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Filesystem total available in bytes
         - name: used
@@ -29,6 +31,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Filesystem total used in bytes
         - name: inodes

@@ -34,6 +34,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Total available memory
         - name: usage
@@ -41,6 +42,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Total memory usage
         - name: rss
@@ -48,6 +50,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 RSS memory usage
         - name: workingset
@@ -55,6 +58,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Working set memory usage
         - name: pagefaults
@@ -73,6 +77,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Received bytes
             - name: errors
@@ -84,6 +89,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Transmitted bytes
             - name: errors
@@ -98,6 +104,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Filesystem total capacity in bytes
         - name: available
@@ -105,6 +112,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Filesystem total available in bytes
         - name: used
@@ -112,6 +120,7 @@
           fields:
             - name: bytes
               type: long
+              format: bytes
               description: >
                 Filesystem total used in bytes
     - name: runtime
@@ -125,6 +134,7 @@
               fields:
                 - name: bytes
                   type: long
+                  format: bytes
                   description: >
                     Image filesystem total capacity in bytes
             - name: available
@@ -132,6 +142,7 @@
               fields:
                 - name: bytes
                   type: long
+                  format: bytes
                   description: >
                     Image filesystem total available in bytes
             - name: used
@@ -139,5 +150,6 @@
               fields:
                 - name: bytes
                   type: long
+                  format: bytes
                   description: >
                     Image filesystem total used in bytes
