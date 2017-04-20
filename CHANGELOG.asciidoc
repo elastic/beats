@@ -101,6 +101,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Updated to Go 1.8.1. {pull}4033[4033]
 - Add kubernetes processor {pull}3888[3888]
 - Add support for include_labels and include_annotations in kubernetes processor {pull}4043[4043]
+- Support new `index_patterns` field when loading templates for Elasticsearch >= 6.0 {pull}4056[4056]
 
 *Filebeat*
 
