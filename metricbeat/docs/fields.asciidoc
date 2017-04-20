@@ -8267,22 +8267,6 @@ Used CPU in Mhz
 
 
 [float]
-=== vsphere.virtualmachine_usage.cpu.total.mhz
-
-type: long
-
-Total CPU in Mhz
-
-
-[float]
-=== vsphere.virtualmachine_usage.cpu.free.mhz
-
-type: long
-
-Free CPU in Mhz
-
-
-[float]
 === vsphere.virtualmachine_usage.memory.used.guest.bytes
 
 type: long

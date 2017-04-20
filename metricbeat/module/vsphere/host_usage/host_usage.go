@@ -2,6 +2,7 @@ package host_usage
 
 import (
 	"context"
+	"errors"
 	"net/url"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -64,7 +65,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	f := find.NewFinder(c.Client, true)
 	if f == nil {
-		return nil, err
+		return nil, errors.New("Finder undefined for vsphere.")
 	}
 
 	// Get all datacenters
