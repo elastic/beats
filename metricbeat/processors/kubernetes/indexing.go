@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors/annotate/kubernetes"
+	"github.com/elastic/beats/libbeat/processors/kubernetes"
 	corev1 "github.com/ericchiang/k8s/api/v1"
 )
 
@@ -59,7 +59,9 @@ func (h *IpPortIndexer) GetMetadata(pod *corev1.Pod) []kubernetes.MetadataIndex 
 					continue
 				}
 				if strings.Index(hostPorts[i], fmt.Sprintf("%s:%d", *pod.Status.PodIP, *port.ContainerPort)) != -1 {
-					containerMeta["container"] = container.Name
+					containerMeta["container"] = common.MapStr{
+						"name": container.Name,
+					}
 					dobreak = true
 					break
 				}

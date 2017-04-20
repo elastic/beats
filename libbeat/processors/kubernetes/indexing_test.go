@@ -1,11 +1,12 @@
 package kubernetes
 
 import (
+	"testing"
+
 	"github.com/elastic/beats/libbeat/common"
 	corev1 "github.com/ericchiang/k8s/api/v1"
 	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var metagen = &GenDefaultMeta{}
@@ -34,7 +35,9 @@ func TestPodIndexer(t *testing.T) {
 	assert.Equal(t, indexers[0].Index, podName)
 
 	expected := common.MapStr{
-		"pod":       "testpod",
+		"pod": common.MapStr{
+			"name": "testpod",
+		},
 		"namespace": "testns",
 		"labels": common.MapStr{
 			"labelkey": "labelvalue",
@@ -76,7 +79,9 @@ func TestContainerIndexer(t *testing.T) {
 	assert.Equal(t, len(indexers), 0)
 	assert.Equal(t, len(indices), 0)
 	expected := common.MapStr{
-		"pod":       "testpod",
+		"pod": common.MapStr{
+			"name": "testpod",
+		},
 		"namespace": "testns",
 		"labels": common.MapStr{
 			"labelkey": "labelvalue",
@@ -91,7 +96,9 @@ func TestContainerIndexer(t *testing.T) {
 			ContainerID: &cid,
 		},
 	}
-	expected["container"] = container
+	expected["container"] = common.MapStr{
+		"name": container,
+	}
 
 	indexers = conIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)

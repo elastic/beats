@@ -21,6 +21,7 @@ grouped in the following categories:
 * <<exported-fields-flows_event>>
 * <<exported-fields-http>>
 * <<exported-fields-icmp>>
+* <<exported-fields-kubernetes>>
 * <<exported-fields-memcache>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -1900,6 +1901,53 @@ The response type.
 type: long
 
 The response code.
+
+[[exported-fields-kubernetes]]
+== Kubernetes info Fields
+
+Kubernetes metadata added by the kubernetes processor
+
+
+
+[float]
+=== kubernetes.pod.name
+
+type: keyword
+
+Kubernetes pod name
+
+
+[float]
+=== kubernetes.namespace
+
+type: keyword
+
+Kubernetes namespace
+
+
+[float]
+=== kubernetes.labels
+
+type: object
+
+Kubernetes labels map
+
+
+[float]
+=== kubernetes.annotations
+
+type: object
+
+Kubernetes annotations map
+
+
+[float]
+=== kubernetes.container.name
+
+type: keyword
+
+Kubernetes container name
+
 
 [[exported-fields-memcache]]
 == Memcache Fields

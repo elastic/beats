@@ -40,6 +40,8 @@ func init() {
 }
 
 func newKubernetesAnnotator(cfg common.Config) (processors.Processor, error) {
+	logp.Beta("The kubernetes processor is beta")
+
 	config := defaultKuberentesAnnotatorConfig()
 
 	err := cfg.Unpack(&config)
@@ -182,7 +184,6 @@ func newKubernetesAnnotator(cfg common.Config) (processors.Processor, error) {
 }
 
 func (k kubernetesAnnotator) Run(event common.MapStr) (common.MapStr, error) {
-
 	index := k.matchers.MetadataIndex(event)
 	if index == "" {
 		return event, nil
@@ -194,15 +195,15 @@ func (k kubernetesAnnotator) Run(event common.MapStr) (common.MapStr, error) {
 	}
 
 	meta := common.MapStr{}
-	metaIface, ok := event["metadata"]
+	metaIface, ok := event["kubernetes"]
 	if !ok {
-		event["metadata"] = common.MapStr{}
+		event["kubernetes"] = common.MapStr{}
 	} else {
 		meta = metaIface.(common.MapStr)
 	}
 
-	meta["kubernetes"] = metadata
-	event["metadata"] = meta
+	meta.Update(metadata)
+	event["kubernetes"] = meta
 
 	return event, nil
 }
@@ -210,7 +211,7 @@ func (k kubernetesAnnotator) Run(event common.MapStr) (common.MapStr, error) {
 func (k kubernetesAnnotator) String() string { return "kubernetes" }
 
 func validate(config kubeAnnotatorConfig) error {
-	if config.KubeConfig == "" {
+	if !config.InCluster && config.KubeConfig == "" {
 		return errors.New("`kube_config` path can't be empty when in_cluster is set to false")
 	}
 	return nil
