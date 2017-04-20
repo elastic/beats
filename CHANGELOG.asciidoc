@@ -66,6 +66,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 
 *Heartbeat*
 - Add default ports in HTTP monitor. {pull}3924[3924]
+- Use IP type of elasticsearch for ip field. {pull}3926[3926]
 
 *Metricbeat*
 
