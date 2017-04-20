@@ -34,14 +34,17 @@ const (
 
 	// Tencent Clound Metadata Service
 	qcloudMetadataHost          = "metadata.tencentyun.com"
-	qcloudMetadataInstanceIdURI = "/meta-data/instance-id"
+	qcloudMetadataInstanceIDURI = "/meta-data/instance-id"
 	qcloudMetadataRegionURI     = "/meta-data/placement/region"
 	qcloudMetadataZoneURI       = "/meta-data/placement/zone"
+
+	// Default config
+	defaultTimeOut = 3 * time.Second
 )
 
 var debugf = logp.MakeDebug("filters")
 
-// metadata schemas for all prividers
+// metadata schemas for all prividers.
 var (
 	ec2Schema = func(m map[string]interface{}) common.MapStr {
 		out, _ := s.Schema{
@@ -83,12 +86,7 @@ var (
 	}
 
 	qcloudSchema = func(m map[string]interface{}) common.MapStr {
-		out, _ := s.Schema{
-			"instance_id":       c.Str("instance_id"),
-			"region":            c.Str("region"),
-			"availability_zone": c.Str("zone"),
-		}.Apply(m)
-		return out
+		return common.MapStr(m)
 	}
 )
 
@@ -99,21 +97,23 @@ func init() {
 
 type schemaConv func(m map[string]interface{}) common.MapStr
 
-type pick func([]byte, *result) error
+// responseHandler is the callback function that used to write something
+// to the result according the HTTP response.
+type responseHandler func(all []byte, res *result) error
 
 type metadataFetcher struct {
-	provider string
-	headers  map[string]string
-	pickers  map[string]pick
-	conv     schemaConv
+	provider         string
+	headers          map[string]string
+	responseHandlers map[string]responseHandler
+	conv             schemaConv
 }
 
-// fetchRaw query raw metadata from a hosting provider's metadata service.
+// fetchRaw queries raw metadata from a hosting provider's metadata service.
 func (f *metadataFetcher) fetchRaw(
 	ctx context.Context,
 	client http.Client,
 	url string,
-	pick pick,
+	responseHandler responseHandler,
 	result *result,
 ) {
 	req, err := http.NewRequest("GET", url, nil)
@@ -145,7 +145,7 @@ func (f *metadataFetcher) fetchRaw(
 	}
 
 	// Decode JSON.
-	err = pick(all, result)
+	err = responseHandler(all, result)
 	if err != nil {
 		result.err = err
 		return
@@ -154,13 +154,13 @@ func (f *metadataFetcher) fetchRaw(
 	return
 }
 
-// fetchMetadata query metadata from a hosting provider's metadata service.
-// some providers require multiple HTTP request to gather the whole metadata
-// len(f.pickers)  > 1 indicates that multiple requesting is needed
+// fetchMetadata queries metadata from a hosting provider's metadata service.
+// Some providers require multiple HTTP requests to gather the whole metadata,
+// len(f.responseHandlers)  > 1 indicates that multiple requests are needed.
 func (f *metadataFetcher) fetchMetadata(ctx context.Context, client http.Client) result {
 	res := result{provider: f.provider, metadata: common.MapStr{}}
-	for url, pick := range f.pickers {
-		f.fetchRaw(ctx, client, url, pick, &res)
+	for url, responseHandler := range f.responseHandlers {
+		f.fetchRaw(ctx, client, url, responseHandler, &res)
 		if res.err != nil {
 			return res
 		}
@@ -248,15 +248,13 @@ func fetchMetadata(metadataFetchers []*metadataFetcher, timeout time.Duration) *
 	return nil
 }
 
-// getMetadataURL loads config and generate metadata url
-func getMetadataURL(c common.Config, defaultHost string, timeout time.Duration, metadataURIs []string) ([]string, error) {
+// getMetadataURLs loads config and generates the metadata URLs.
+func getMetadataURLs(c common.Config, defaultHost string, metadataURIs []string) ([]string, error) {
 	var urls []string
 	config := struct {
-		MetadataHostAndPort string        `config:"host"`    // Specifies the host and port of the metadata service (for testing purposes only).
-		Timeout             time.Duration `config:"timeout"` // Amount of time to wait for responses from the metadata services.
+		MetadataHostAndPort string `config:"host"` // Specifies the host and port of the metadata service (for testing purposes only).
 	}{
 		MetadataHostAndPort: defaultHost,
-		Timeout:             timeout,
 	}
 	err := c.Unpack(&config)
 	if err != nil {
@@ -268,8 +266,9 @@ func getMetadataURL(c common.Config, defaultHost string, timeout time.Duration, 
 	return urls, nil
 }
 
-// makeCommomJSONPicker generate fetch function which query json metadata from a hosting provider's HTTP response
-func makeCommomJSONPicker(provider string) pick {
+// makeJSONPicker returns a responseHandler function that unmarshals JSON
+// from a hosting provider's HTTP response and writes it to the result.
+func makeJSONPicker(provider string) responseHandler {
 	return func(all []byte, res *result) error {
 		dec := json.NewDecoder(bytes.NewReader(all))
 		dec.UseNumber()
@@ -282,58 +281,51 @@ func makeCommomJSONPicker(provider string) pick {
 	}
 }
 
-// newMetadataFetcher return metadataFetcher with one pass json picker
+// newMetadataFetcher return metadataFetcher with one pass JSON responseHandler.
 func newMetadataFetcher(
 	c common.Config,
-	timeout time.Duration,
 	provider string,
 	headers map[string]string,
 	host string,
 	conv schemaConv,
-	uris []string,
+	uri string,
 ) (*metadataFetcher, error) {
-	urls, err := getMetadataURL(c, host, timeout, uris)
+	urls, err := getMetadataURLs(c, host, []string{uri})
 	if err != nil {
 		return nil, err
 	}
-	picker := map[string]pick{urls[0]: makeCommomJSONPicker(provider)}
-	fetcher := &metadataFetcher{provider, headers, picker, conv}
+	responseHandlers := map[string]responseHandler{urls[0]: makeJSONPicker(provider)}
+	fetcher := &metadataFetcher{provider, headers, responseHandlers, conv}
 	return fetcher, nil
 }
 
-func newDoMetadataFetcher(c common.Config, timeout time.Duration) (*metadataFetcher, error) {
-	fetcher, err := newMetadataFetcher(c, timeout, "digitalocean", nil, metadataHost, doSchema, []string{
-		doMetadataURI,
-	})
+func newDoMetadataFetcher(c common.Config) (*metadataFetcher, error) {
+	fetcher, err := newMetadataFetcher(c, "digitalocean", nil, metadataHost, doSchema, doMetadataURI)
 	return fetcher, err
 }
 
-func newEc2MetadataFetcher(c common.Config, timeout time.Duration) (*metadataFetcher, error) {
-	fetcher, err := newMetadataFetcher(c, timeout, "ec2", nil, metadataHost, ec2Schema, []string{
-		ec2InstanceIdentityURI,
-	})
+func newEc2MetadataFetcher(c common.Config) (*metadataFetcher, error) {
+	fetcher, err := newMetadataFetcher(c, "ec2", nil, metadataHost, ec2Schema, ec2InstanceIdentityURI)
 	return fetcher, err
 }
 
-func newGceMetadataFetcher(c common.Config, timeout time.Duration) (*metadataFetcher, error) {
-	fetcher, err := newMetadataFetcher(c, timeout, "gce", gceHeaders, metadataHost, gceSchema, []string{
-		gceMetadataURI,
-	})
+func newGceMetadataFetcher(c common.Config) (*metadataFetcher, error) {
+	fetcher, err := newMetadataFetcher(c, "gce", gceHeaders, metadataHost, gceSchema, gceMetadataURI)
 	return fetcher, err
 }
 
 // newQcloudMetadataFetcher return the concrete metadata fetcher for qcloud provider
-// which requires more than one way to assemble the metadata
-func newQcloudMetadataFetcher(c common.Config, timeout time.Duration) (*metadataFetcher, error) {
-	urls, err := getMetadataURL(c, qcloudMetadataHost, timeout, []string{
-		qcloudMetadataInstanceIdURI,
+// which requires more than one way to assemble the metadata.
+func newQcloudMetadataFetcher(c common.Config) (*metadataFetcher, error) {
+	urls, err := getMetadataURLs(c, qcloudMetadataHost, []string{
+		qcloudMetadataInstanceIDURI,
 		qcloudMetadataRegionURI,
 		qcloudMetadataZoneURI,
 	})
 	if err != nil {
 		return nil, err
 	}
-	picker := map[string]pick{
+	responseHandlers := map[string]responseHandler{
 		urls[0]: func(all []byte, result *result) error {
 			result.metadata["instance_id"] = string(all)
 			return nil
@@ -343,42 +335,59 @@ func newQcloudMetadataFetcher(c common.Config, timeout time.Duration) (*metadata
 			return nil
 		},
 		urls[2]: func(all []byte, result *result) error {
-			result.metadata["zone"] = string(all)
+			result.metadata["availability_zone"] = string(all)
 			return nil
 		},
 	}
-	fetcher := &metadataFetcher{"qcloud", nil, picker, qcloudSchema}
+	fetcher := &metadataFetcher{"qcloud", nil, responseHandlers, qcloudSchema}
 	return fetcher, nil
 }
 
-func newCloudMetadata(c common.Config) (processors.Processor, error) {
-	timeout := 3 * time.Second
+func setupFetchers(c common.Config) ([]*metadataFetcher, error) {
+	var fetchers []*metadataFetcher
+	doFetcher, err := newDoMetadataFetcher(c)
+	if err != nil {
+		return fetchers, err
+	}
+	ec2Fetcher, err := newEc2MetadataFetcher(c)
+	if err != nil {
+		return fetchers, err
+	}
+	gceFetcher, err := newGceMetadataFetcher(c)
+	if err != nil {
+		return fetchers, err
+	}
+	qcloudFetcher, err := newQcloudMetadataFetcher(c)
+	if err != nil {
+		return fetchers, err
+	}
 
-	doFetcher, err := newDoMetadataFetcher(c, timeout)
-	if err != nil {
-		return nil, err
-	}
-	ec2Fetcher, err := newEc2MetadataFetcher(c, timeout)
-	if err != nil {
-		return nil, err
-	}
-	gceFetcher, err := newGceMetadataFetcher(c, timeout)
-	if err != nil {
-		return nil, err
-	}
-	qcloudFetcher, err := newQcloudMetadataFetcher(c, timeout)
-	if err != nil {
-		return nil, err
-	}
-
-	var fetchers = []*metadataFetcher{
+	fetchers = []*metadataFetcher{
 		doFetcher,
 		ec2Fetcher,
 		gceFetcher,
 		qcloudFetcher,
 	}
+	return fetchers, nil
+}
 
-	result := fetchMetadata(fetchers, timeout)
+func newCloudMetadata(c common.Config) (processors.Processor, error) {
+	config := struct {
+		Timeout time.Duration `config:"timeout"` // Amount of time to wait for responses from the metadata services.
+	}{
+		Timeout: defaultTimeOut,
+	}
+	err := c.Unpack(&config)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unpack add_cloud_metadata config")
+	}
+
+	fetchers, err := setupFetchers(c)
+	if err != nil {
+		return nil, err
+	}
+
+	result := fetchMetadata(fetchers, config.Timeout)
 	if result == nil {
 		logp.Info("add_cloud_metadata: hosting provider type not detected.")
 		return addCloudMetadata{}, nil
