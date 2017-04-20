@@ -1,3 +1,6 @@
 === elasticsearch node MetricSet
 
-This is the node metricset of the module elasticsearch. It fetches stats from the `_nodes` https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-stats.html[API endpoint]. This metricset only fetches the data from the `_local` node so it must run on each elasticsearch node.
+This is the node metricset of the module elasticsearch. It interrogates the
+https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster-nodes-info.html[Cluster API endpoint] of
+Elasticsearch to get cluster nodes information. This metricset only fetches the data from the `_local` node so it must
+run on each Elasticsearch node.
