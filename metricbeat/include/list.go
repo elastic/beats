@@ -28,6 +28,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/docker/info"
 	_ "github.com/elastic/beats/metricbeat/module/docker/memory"
 	_ "github.com/elastic/beats/metricbeat/module/docker/network"
+	_ "github.com/elastic/beats/metricbeat/module/dropwizard"
+	_ "github.com/elastic/beats/metricbeat/module/dropwizard/collector"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node_stats"

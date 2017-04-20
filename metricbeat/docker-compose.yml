@@ -19,6 +19,7 @@ services:
       - ${PWD}/module/apache/_meta/env
       - ${PWD}/module/ceph/_meta/env
       - ${PWD}/module/couchbase/_meta/env
+      - ${PWD}/module/dropwizard/_meta/env
       - ${PWD}/module/elasticsearch/_meta/env
       - ${PWD}/module/haproxy/_meta/env
       - ${PWD}/module/jolokia/_meta/env
@@ -42,6 +43,7 @@ services:
       apache:         { condition: service_healthy }
       ceph:           { condition: service_healthy }
       couchbase:      { condition: service_healthy }
+      dropwizard:     { condition: service_healthy }
       elasticsearch:  { condition: service_healthy }
       haproxy:        { condition: service_healthy }
       jolokia:        { condition: service_healthy }
@@ -66,6 +68,9 @@ services:
 
   couchbase:
     build: ${PWD}/module/couchbase/_meta
+
+  dropwizard:
+    build: ${PWD}/module/dropwizard/_meta
 
   elasticsearch:
     extends:
