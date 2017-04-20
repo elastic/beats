@@ -39,7 +39,7 @@ func (s *State) IsEmpty() bool {
 // States handles list of FileState
 type States struct {
 	states []State
-	sync.Mutex
+	sync.RWMutex
 }
 
 func NewStates() *States {
@@ -66,9 +66,8 @@ func (s *States) Update(newState State) {
 }
 
 func (s *States) FindPrevious(newState State) State {
-	// TODO: This currently blocks writing updates every time state is fetched. Should be improved for performance
-	s.Lock()
-	defer s.Unlock()
+	s.RLock()
+	defer s.RUnlock()
 	_, state := s.findPrevious(newState)
 	return state
 }
@@ -122,16 +121,16 @@ func (s *States) Cleanup() int {
 
 // Count returns number of states
 func (s *States) Count() int {
-	s.Lock()
-	defer s.Unlock()
+	s.RLock()
+	defer s.RUnlock()
 
 	return len(s.states)
 }
 
 // Returns a copy of the file states
 func (s *States) GetStates() []State {
-	s.Lock()
-	defer s.Unlock()
+	s.RLock()
+	defer s.RUnlock()
 
 	newStates := make([]State, len(s.states))
 	copy(newStates, s.states)

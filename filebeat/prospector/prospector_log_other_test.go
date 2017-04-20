@@ -155,4 +155,7 @@ func TestInit(t *testing.T) {
 // TestOutlet is an empty outlet for testing
 type TestOutlet struct{}
 
-func (o TestOutlet) OnEvent(event *input.Data) bool { return true }
+func (o TestOutlet) OnEvent(event *input.Data) bool       { return true }
+func (o TestOutlet) OnEventSignal(event *input.Data) bool { return true }
+func (o TestOutlet) SetSignal(signal <-chan struct{})     {}
+func (o TestOutlet) Copy() Outlet                         { return o }
