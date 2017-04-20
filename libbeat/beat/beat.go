@@ -112,7 +112,7 @@ type BeatConfig struct {
 	Logging    logp.Logging              `config:"logging"`
 	Processors processors.PluginConfig   `config:"processors"`
 	Path       paths.Path                `config:"path"`
-	Dashboards *common.Config            `config:"dashboards"`
+	Dashboards *common.Config            `config:"setup.dashboards"`
 	Http       *common.Config            `config:"http"`
 }
 

@@ -308,3 +308,5 @@ image:./images/metricbeat_system_dashboard.png[Metricbeat Dashboard]
 
 :allplatforms:
 include::../../libbeat/docs/dashboards.asciidoc[]
+
+

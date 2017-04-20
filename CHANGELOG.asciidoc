@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Usage of field `_type` is now ignored and hardcoded to `doc`. {pull}3757[3757]
 - Change vendor manager from glide to govendor. {pull}3851[3851]
 - Rename `error` field to `error.message`. {pull}3987[3987]
+- Change `dashboards.*` config options to `setup.dashboards.*`. {pull}3921[3921]
 
 *Filebeat*
 - Always use absolute path for event and registry. This can lead to issues when relative paths were used before. {pull}3328[3328]
@@ -65,6 +66,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 
 *Heartbeat*
 - Add default ports in HTTP monitor. {pull}3924[3924]
+- Use IP type of elasticsearch for ip field. {pull}3926[3926]
 
 *Metricbeat*
 
@@ -100,6 +102,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Updated to Go 1.8.1. {pull}4033[4033]
 - Add kubernetes processor {pull}3888[3888]
 - Add support for include_labels and include_annotations in kubernetes processor {pull}4043[4043]
+- Support new `index_patterns` field when loading templates for Elasticsearch >= 6.0 {pull}4056[4056]
 
 *Filebeat*
 
@@ -133,6 +136,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Adding support for custom http headers and TLS for metricbeat modules {pull}3945[3945]
 - Add new MetricSet interfaces for developers (`Closer`, `ReportingFetcher`, and `PushMetricSet`). {pull}3908[3908]
 - Add kubelet module {pull}3916[3916]
+- Add dropwizard module {pull}4022[4022]
 
 *Packetbeat*
 - Add `fields` and `fields_under_root` to packetbeat protocols configurations. {pull}3518[3518]

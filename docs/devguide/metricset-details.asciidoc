@@ -1,5 +1,5 @@
 [[metricset-details]]
-== Metricset Details
+=== Metricset Details
 
 This topic provides additional details about creating metricsets.
 
@@ -54,7 +54,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 
 [float]
-=== Timeout Connections to Services
+==== Timeout Connections to Services
 
 Each time the `Fetch` method is called, it makes a request to the service, so it's
 important to handle the connections correctly. We recommended that you set up the
@@ -74,7 +74,7 @@ the metricset.
 
 
 [float]
-=== Data Transformation
+==== Data Transformation
 
 If the data transformation that has to happen in the `Fetch` method is
 extensive, we recommend that you create a second file called `data.go` in the same package
@@ -85,7 +85,7 @@ functionality of the metricset and `Fetch` method from the data mapping.
 
 
 [float]
-=== fields.yml
+==== fields.yml
 
 The `fields.yml` file is used for different purposes:
 
@@ -101,7 +101,7 @@ Here an example for the `fields.yml` file from the MySQL module.
 
 [source,yaml]
 ----
-include::../../module/mysql/_meta/fields.yml[]
+include::../../metricbeat/module/mysql/_meta/fields.yml[]
 ----
 
 There is another `fields.yml` file under `module/{module}/{metricset}/_meta/fields.yml` that contains all fields retrieved
@@ -136,7 +136,7 @@ As you can see, if there are nested fields, you must use the type `group`.
 // TODO: Add link to general fields.yml developer guide
 
 [float]
-=== Testing
+==== Testing
 
 It's important to also add tests for your metricset. There are three different types of tests that you need for testing a Beat:
 
@@ -160,7 +160,7 @@ tests are under `tests/systems`.
 
 
 [float]
-==== Adding a Test Environment
+===== Adding a Test Environment
 
 Integration and system tests need an environment that's running the service. You
 can create this environment by using Docker and a docker-compose file. If you add a
@@ -205,7 +205,7 @@ The environment expects your service to be available as soon as it receives a re
 the given address and port.
 
 [float]
-==== Running the Tests
+===== Running the Tests
 
 To run all the tests, run `make testsuite`. To only run unit tests, run
 `make unit-tests` or for integration tests `make integration-tests-environment`. Be aware that
@@ -225,7 +225,7 @@ tests.
 remembering to replace `test_apache.py` with your own test file.
 
 [float]
-== Documentation
+=== Documentation
 
 Each module must be documented. The documentation is based on asciidoc and is in
 the file `module/{module}/_meta/docs.asciidoc` for the module and in `module/{module}/{metricset}/_meta/docs.asciidoc`

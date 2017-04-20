@@ -3,16 +3,19 @@
 include::../../libbeat/docs/version.asciidoc[]
 
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
+:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
 :logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
 :elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/x-pack/5.2
+:securitydoc: https://www.elastic.co/guide/en/x-pack/current
 :version: {stack-version}
 :beatname_lc: metricbeat
 :beatname_uc: Metricbeat
 :security: X-Pack Security
 
 include::./overview.asciidoc[]
+
+include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
 
@@ -53,5 +56,3 @@ include::./securing-metricbeat.asciidoc[]
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
-
-include::./developer-guide/index.asciidoc[]
