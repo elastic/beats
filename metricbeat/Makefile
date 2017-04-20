@@ -87,3 +87,15 @@ create-metricset:
 .PHONY: generate-json
 generate-json: build-image
 	 ${DOCKER_COMPOSE} run beat go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data
+
+.PHONY: run-module
+run-module: ## @testing Runs the given module with exposing the port. Needs $MODULE and $PORT as param
+run-module:
+	${DOCKER_COMPOSE} build ${MODULE}
+	${DOCKER_COMPOSE} run -p ${PORT}:${PORT} ${MODULE}
+
+.PHONY: test-module
+test-module: ## @testing Tests the given module. Needs $MODULE as param an run-module must be started first.
+test-module: python-env
+	go test -tags=integration ${BEAT_PATH}/module/${MODULE}/... -v
+	. ${PYTHON_ENV}/bin/activate && INTEGRATION_TESTS=1 nosetests tests/system/test_${MODULE}.py
