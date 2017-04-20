@@ -47,6 +47,7 @@ An array of paths where to look for the log files. If left empty, Filebeat
 will choose the paths depending on your operating systems.
 
 
+[float]
 === Fields
 
 For a description of each field in the metricset, see the
