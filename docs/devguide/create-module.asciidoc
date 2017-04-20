@@ -76,3 +76,26 @@ It's a common pattern to use a `testing.go` file in the module package to share 
 the metricsets. This file does not have `_test.go` in the name because otherwise it would not be compiled for sub packages.
 
 To see an example of the `testing.go` file, look at the https://github.com/elastic/beats/tree/master/metricbeat/module/mysql[mysql module].
+
+[float]
+===== Run Environment tests for one module
+
+All the environments are setup with docker. `make integration-tests-environment` and `make system-tests-environment` can be used to run tests for all modules. In case you are developing a module it is convenient to run the tests only for one module and directly run it on your machine.
+
+First you need to start the environment for your module to test and expose the port to your local machien. For this you can run the following command inside the metricbeat directory:
+
+[source,bash]
+----
+MODULE=apache PORT=80 make run-module
+----
+
+Note: The apache module with port 80 is taken here as an example. You must put the name and port for your own module here.
+
+This will start the environment and you must wait until the service is completely started. After that you can run the test which require an environment:
+
+[source,bash]
+----
+MODULE=apache make test-module
+----
+
+This will run the integration and system tests connecting to the environment in your docker container.
