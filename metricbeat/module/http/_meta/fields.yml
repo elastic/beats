@@ -1,0 +1,9 @@
+- key: http
+  title: "http"
+  description: >
+    http Module
+  fields:
+    - name: http
+      type: group
+      description: >
+      fields:

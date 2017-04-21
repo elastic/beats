@@ -1,0 +1,6 @@
+- module: http
+  metricsets: ["json"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost"]
+
