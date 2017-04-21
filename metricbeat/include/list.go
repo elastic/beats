@@ -33,7 +33,6 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node_stats"
-	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/stats"
 	_ "github.com/elastic/beats/metricbeat/module/golang"
 	_ "github.com/elastic/beats/metricbeat/module/golang/expvar"
 	_ "github.com/elastic/beats/metricbeat/module/golang/heap"
