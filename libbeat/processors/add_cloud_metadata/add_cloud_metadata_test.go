@@ -194,6 +194,25 @@ func initGCETestServer() *httptest.Server {
 	}))
 }
 
+func initQCloundTestServer() *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.RequestURI == "/meta-data/instance-id" {
+			w.Write([]byte("ins-qcloudv5"))
+			return
+		}
+		if r.RequestURI == "/meta-data/placement/region" {
+			w.Write([]byte("china-south-gz"))
+			return
+		}
+		if r.RequestURI == "/meta-data/placement/zone" {
+			w.Write([]byte("gz-azone2"))
+			return
+		}
+
+		http.Error(w, "not found", http.StatusNotFound)
+	}))
+}
+
 func TestRetrieveAWSMetadata(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
@@ -303,6 +322,45 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 				"machine_type":      "projects/111111111111/machineTypes/f1-micro",
 				"availability_zone": "projects/111111111111/zones/us-east1-b",
 				"project_id":        "test-dev",
+			},
+		},
+	}
+	assert.Equal(t, expected, actual)
+}
+
+func TestRetrieveQCloudMetadata(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+
+	server := initQCloundTestServer()
+	defer server.Close()
+
+	config, err := common.NewConfigFrom(map[string]interface{}{
+		"host": server.Listener.Addr().String(),
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p, err := newCloudMetadata(*config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	actual, err := p.Run(common.MapStr{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := common.MapStr{
+		"meta": common.MapStr{
+			"cloud": common.MapStr{
+				"provider":          "qcloud",
+				"instance_id":       "ins-qcloudv5",
+				"region":            "china-south-gz",
+				"availability_zone": "gz-azone2",
 			},
 		},
 	}
