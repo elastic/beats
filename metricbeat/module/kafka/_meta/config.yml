@@ -1,8 +1,8 @@
-#- module: kafka
-  #metricsets: ["partition"]
-  #enabled: true
-  #period: 10s
-  #hosts: ["localhost:9092"]
+- module: kafka
+  metricsets: ["partition"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost:9092"]
 
   #client_id: metricbeat
   #retries: 3

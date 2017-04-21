@@ -63,17 +63,17 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
-#- module: mongodb
-  #metricsets: ["dbstats", "status"]
-  #enabled: true
-  #period: 10s
+- module: mongodb
+  metricsets: ["dbstats", "status"]
+  enabled: false
+  period: 10s
 
   # The hosts must be passed as MongoDB URLs in the format:
   # [mongodb://][user:pass@]host[:port].
   # The username and password can also be set using the respective configuration
   # options. The credentials in the URL take precedence over the username and
   # password configuration options.
-  #hosts: ["localhost:27017"]
+  hosts: ["localhost:27017"]
 
   # Username to use when connecting to MongoDB. Empty by default.
   #username: user

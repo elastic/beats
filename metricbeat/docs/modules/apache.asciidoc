@@ -34,7 +34,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: apache
   metricsets: ["status"]
-  enabled: true
+  enabled: false
   period: 10s
 
   # Apache hosts
