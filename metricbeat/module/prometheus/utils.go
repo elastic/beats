@@ -2,9 +2,10 @@ package prometheus
 
 import (
 	"fmt"
+	"net/http"
+
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
-	"net/http"
 )
 
 func GetMetricFamiliesFromResponse(resp *http.Response) ([]*dto.MetricFamily, error) {

@@ -13,7 +13,7 @@
     },
     "prometheus": {
         "collector": {
-            "labels": {
+            "label": {
                 "type": "quarantine_completed"
             },
             "prometheus_local_storage_series_ops_total": {

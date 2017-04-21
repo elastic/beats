@@ -1,13 +1,13 @@
 package collector
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-
-	"fmt"
 	"github.com/elastic/beats/metricbeat/module/prometheus"
 )
 
@@ -78,7 +78,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 				// Add labels
 				if len(promEvent.labels) > 0 {
-					eventList[promEvent.labelHash]["labels"] = promEvent.labels
+					eventList[promEvent.labelHash]["label"] = promEvent.labels
 				}
 
 			}

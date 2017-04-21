@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/golang/protobuf/proto"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
@@ -93,8 +94,8 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 				value: common.MapStr{
 					"count": uint64(10),
 					"sum":   float64(10),
-					"percentiles": common.MapStr{
-						"p99": float64(10),
+					"percentile": common.MapStr{
+						"99": float64(10),
 					},
 				},
 				labelHash: "#",
@@ -125,7 +126,7 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 				value: common.MapStr{
 					"count": uint64(10),
 					"sum":   float64(10),
-					"buckets": common.MapStr{
+					"bucket": common.MapStr{
 						"0.99": uint64(10),
 					},
 				},

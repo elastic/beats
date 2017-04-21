@@ -1,10 +1,12 @@
 package collector
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	dto "github.com/prometheus/client_model/go"
 	"math"
 	"strconv"
+
+	"github.com/elastic/beats/libbeat/common"
+
+	dto "github.com/prometheus/client_model/go"
 )
 
 type PromEvent struct {
@@ -61,13 +63,13 @@ func GetPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 				key := strconv.FormatFloat((100 * quantile.GetQuantile()), 'f', -1, 64)
 
 				if math.IsNaN(quantile.GetValue()) == false {
-					percentileMap["p"+key] = quantile.GetValue()
+					percentileMap[key] = quantile.GetValue()
 				}
 
 			}
 
 			if len(percentileMap) != 0 {
-				value["percentiles"] = percentileMap
+				value["percentile"] = percentileMap
 			}
 		}
 
@@ -82,7 +84,7 @@ func GetPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 				bucketMap[key] = bucket.GetCumulativeCount()
 			}
 
-			value["buckets"] = bucketMap
+			value["bucket"] = bucketMap
 		}
 
 		event.value = value
