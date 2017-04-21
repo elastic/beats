@@ -44,12 +44,12 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
-#- module: php_fpm
-  #metricsets: ["pool"]
-  #enabled: true
-  #period: 10s
-  #status_path: "/status"
-  #hosts: ["localhost:8080"]
+- module: php_fpm
+  metricsets: ["pool"]
+  enabled: false
+  period: 10s
+  status_path: "/status"
+  hosts: ["localhost:8080"]
 ----
 
 [float]
