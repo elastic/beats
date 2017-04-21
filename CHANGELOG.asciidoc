@@ -114,6 +114,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Restructure input.Event to be inline with outputs.Data {pull}3823[3823]
 - Add base for supporting prospector level processors {pull}3853[3853]
 - Add auditd module for reading audit logs on Linux. {pull}3750[3750] {pull}3941[3941]
+- Add filebeat.config.path as replacement for config_dir. {pull}4051[4051]
 
 *Heartbeat*
 

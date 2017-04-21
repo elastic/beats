@@ -33,7 +33,8 @@ func New(out prospector.Outlet, prospectorConfigs []*common.Config, beatDone cha
 	}, nil
 }
 
-func (c *Crawler) Start(r *registrar.Registrar, reloaderConfig *common.Config) error {
+// Start starts the crawler with all prospectors
+func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config) error {
 
 	logp.Info("Loading Prospectors: %v", len(c.prospectorConfigs))
 
@@ -45,10 +46,10 @@ func (c *Crawler) Start(r *registrar.Registrar, reloaderConfig *common.Config) e
 		}
 	}
 
-	if reloaderConfig.Enabled() {
-		logp.Warn("BETA feature dynamic configuration reloading is enabled.")
+	if configProspectors.Enabled() {
+		logp.Beta("Loading separate prospectors is enabled.")
 
-		c.reloader = cfgfile.NewReloader(reloaderConfig)
+		c.reloader = cfgfile.NewReloader(configProspectors)
 		factory := prospector.NewFactory(c.out, r, c.beatDone)
 		go func() {
 			c.reloader.Run(factory)

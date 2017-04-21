@@ -57,12 +57,12 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	// Add prospectors created by the modules
 	config.Prospectors = append(config.Prospectors, moduleProspectors...)
 
-	if !config.ProspectorReload.Enabled() && len(config.Prospectors) == 0 {
+	if !config.ConfigProspector.Enabled() && len(config.Prospectors) == 0 {
 		return nil, errors.New("No prospectors defined. What files do you want me to watch?")
 	}
 
-	if *once && config.ProspectorReload.Enabled() {
-		return nil, errors.New("prospector reloading and -once cannot be used together.")
+	if *once && config.ConfigProspector.Enabled() {
+		return nil, errors.New("prospector configs and -once cannot be used together")
 	}
 
 	fb := &Filebeat{
@@ -182,7 +182,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		spooler.Stop()
 	}()
 
-	err = crawler.Start(registrar, config.ProspectorReload)
+	err = crawler.Start(registrar, config.ConfigProspector)
 	if err != nil {
 		crawler.Stop()
 		return err
