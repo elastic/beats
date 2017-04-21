@@ -26,16 +26,15 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) *elasticsear
 	}
 
 	config, _ := common.NewConfigFrom(map[string]interface{}{
-		"hosts":            []string{GetEsHost()},
-		"port":             esPort,
-		"username":         os.Getenv("ES_USER"),
-		"password":         os.Getenv("ES_PASS"),
-		"path":             "",
-		"index":            fmt.Sprintf("%v-%%{+yyyy.MM.dd}", index),
-		"protocol":         "http",
-		"flush_interval":   flushInterval,
-		"bulk_max_size":    bulkSize,
-		"template.enabled": false,
+		"hosts":          []string{GetEsHost()},
+		"port":           esPort,
+		"username":       os.Getenv("ES_USER"),
+		"password":       os.Getenv("ES_PASS"),
+		"path":           "",
+		"index":          fmt.Sprintf("%v-%%{+yyyy.MM.dd}", index),
+		"protocol":       "http",
+		"flush_interval": flushInterval,
+		"bulk_max_size":  bulkSize,
 	})
 
 	output := &elasticsearchOutput{beat: common.BeatInfo{Beat: "test"}}

@@ -1,0 +1,4 @@
+
+
+include::./dashboardsconfig.asciidoc[]
+include::./template-config.asciidoc[]
