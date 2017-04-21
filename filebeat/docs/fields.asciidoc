@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
+* <<exported-fields-icinga>>
 * <<exported-fields-log>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
@@ -573,6 +574,112 @@ Name of the project in Google Cloud.
 === meta.cloud.region
 
 Region in which this host is running.
+
+
+[[exported-fields-icinga]]
+== Icinga Fields
+
+Icinga Module
+
+
+
+[float]
+== icinga Fields
+
+
+
+
+[float]
+== debug Fields
+
+Contains fields for the Icinga debug logs.
+
+
+
+[float]
+=== icinga.debug.facility
+
+type: keyword
+
+Specifies what component of Icinga logged the message.
+
+
+[float]
+=== icinga.debug.severity
+
+type: keyword
+
+Possible values are "debug", "notice", "information", "warning" or "critical".
+
+
+[float]
+=== icinga.debug.message
+
+type: text
+
+The logged message.
+
+
+[float]
+== main Fields
+
+Contains fields for the Icinga main logs.
+
+
+
+[float]
+=== icinga.main.facility
+
+type: keyword
+
+Specifies what component of Icinga logged the message.
+
+
+[float]
+=== icinga.main.severity
+
+type: keyword
+
+Possible values are "debug", "notice", "information", "warning" or "critical".
+
+
+[float]
+=== icinga.main.message
+
+type: text
+
+The logged message.
+
+
+[float]
+== startup Fields
+
+Contains fields for the Icinga startup logs.
+
+
+
+[float]
+=== icinga.startup.facility
+
+type: keyword
+
+Specifies what component of Icinga logged the message.
+
+
+[float]
+=== icinga.startup.severity
+
+type: keyword
+
+Possible values are "debug", "notice", "information", "warning" or "critical".
+
+
+[float]
+=== icinga.startup.message
+
+type: text
+
+The logged message.
 
 
 [[exported-fields-log]]
