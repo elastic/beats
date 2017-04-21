@@ -1,5 +1,5 @@
 [[configuration-interfaces]]
-=== Network Device Configuration
+=== Network Device (Interfaces)
 
 The `interfaces` section of the +{beatname_lc}.yml+ config file configures the sniffer. Here is an example configuration:
 
@@ -198,7 +198,7 @@ see the following published transactions (when `ignore_outgoing` is true):
 
 
 [[configuration-flows]]
-=== Flows Configuration
+=== Flows
 
 The `flows` section of the +{beatname_lc}.yml+ config file contains configuration options for bidirectional network
 flows. If section is missing from configuration file, network flows are
@@ -236,7 +236,7 @@ disabled, flows are still reported once being timed out. The default value is
 
 
 [[configuration-protocols]]
-=== Transaction Protocols Configuration
+=== Transaction Protocols
 
 The `protocols` section of the +{beatname_lc}.yml+ config file contains configuration options for each supported protocol,
 including common options like `enabled`, `ports`, `send_request`, `send_response`, and options that are protocol-specific.
@@ -731,7 +731,7 @@ formatted JSON objects.
 
 
 [[configuration-processes]]
-=== Monitored Processes Configuration
+=== Monitored Processes
 
 This section of the +{beatname_lc}.yml+ config file is optional, but configuring
 the processes enables Packetbeat to show you not only the servers that the

@@ -6,7 +6,7 @@ beta[]
 Filebeat modules simplify the collection, parsing, and visualization of common
 log formats.
 
-A typical module (say, for the Nginx logs) is composed of one ore
+A typical module (say, for the Nginx logs) is composed of one or
 more filesets (in the case of Nginx, `access` and `error`). A fileset contains
 the following:
 
@@ -37,13 +37,14 @@ Node.
 This tutorial assumes you have Elasticsearch and Kibana installed and
 accessible from Filebeat (see the <<filebeat-getting-started,getting started>>
 section). It also assumes that the Ingest Node GeoIP and User Agent plugins are
-installed, which you can do with the following two commands executed in the
-Elasticsearch home path:
+installed. These plugins are required to capture the geographical location and
+browser information used by some of the visualizations available in the sample
+dashboards. You can install these plugins by running the following commands in the Elasticsearch home path:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ sudo bin/elasticsearch-plugin install ingest-geoip
-$ sudo bin/elasticsearch-plugin install ingest-user-agent
+sudo bin/elasticsearch-plugin install ingest-geoip
+sudo bin/elasticsearch-plugin install ingest-user-agent
 ----------------------------------------------------------------------
 
 You need to restart Elasticsearch after running these commands.
@@ -59,7 +60,7 @@ You can start Filebeat with the following command:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ filebeat -e -modules=nginx -setup
+./filebeat -e -modules=nginx -setup
 ----------------------------------------------------------------------
 
 The `-e` flag tells Filebeat to output its logs to standard error, instead of
@@ -82,8 +83,10 @@ You can also start multiple modules at once:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ filebeat -e -modules=nginx,mysql,system
+./filebeat -e -modules=nginx,mysql,system
 ----------------------------------------------------------------------
+
+include::system-module-note.asciidoc[]
 
 While enabling the modules from the CLI file is handy for getting started and
 for testing, you will probably want to use the configuration file for the
@@ -95,11 +98,12 @@ production setup. The equivalent of the above in the configuration file is:
 filebeat.modules:
 - module: nginx
 - module: mysql
-- module: syslog
+- module: system
 ----------------------------------------------------------------------
 
 Then you can start Filebeat simply with: `./filebeat -e`.
 
+[[module-varialbe-overrides]]
 ==== Variable overrides
 
 Each module and fileset has a set of "variables" which allow adjusting their
@@ -116,7 +120,7 @@ files are in a custom location:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ filebeat -e -modules=nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]"
+./filebeat -e -modules=nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]"
 ----------------------------------------------------------------------
 
 Or via the configuration file:
@@ -129,7 +133,7 @@ filebeat.modules:
     var.paths = ["/var/log/nginx/access.log*"]
 ----------------------------------------------------------------------
 
-The Nginx `access` fileset also has a `pipeline` variables which allows
+The Nginx `access` fileset also has a `pipeline` variable which allows
 selecting which of the available Ingest Node pipelines is used for parsing. At
 the moment, two such pipelines are available, one that requires the two ingest
 plugins (`ingest-geoip` and `ingest-user-agent`) and one that doesn't. If you
@@ -138,7 +142,7 @@ cannot install the plugins, you can use the following:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ filebeat -e -modules=nginx -M "nginx.access.var.pipeline=no_plugins"
+./filebeat -e -modules=nginx -M "nginx.access.var.pipeline=no_plugins"
 ----------------------------------------------------------------------
 
 ==== Advanced settings
@@ -162,7 +166,7 @@ Or like this:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ filebeat -e -modules=nginx -M "nginx.access.prospector.close_eof=true"
+./filebeat -e -modules=nginx -M "nginx.access.prospector.close_eof=true"
 ----------------------------------------------------------------------
 
 From the CLI, it's possible to change variables or settings for multiple
@@ -171,7 +175,7 @@ modules/fileset at once. For example, the following works and will enable
 
 [source,shell]
 ----------------------------------------------------------------------
-$ filebeat -e -modules=nginx -M "nginx.*.prospector.close_eof=true"
+./filebeat -e -modules=nginx -M "nginx.*.prospector.close_eof=true"
 ----------------------------------------------------------------------
 
 The following also works and will enable `close_eof` for all prospectors
@@ -179,5 +183,5 @@ created by any of the modules:
 
 [source,shell]
 ----------------------------------------------------------------------
-filebeat -e -modules=nginx,mysql -M "*.*.prospector.close_eof=true"
+./filebeat -e -modules=nginx,mysql -M "*.*.prospector.close_eof=true"
 ----------------------------------------------------------------------

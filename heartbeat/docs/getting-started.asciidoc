@@ -253,8 +253,13 @@ sudo /etc/init.d/heartbeat start
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
+sudo chown root heartbeat.yml <1>
 sudo ./heartbeat -e -c heartbeat.yml -d "publish"
 ----------------------------------------------------------------------
+<1> You'll be running Heartbeat as root, so you need to change ownership
+of the configuration file (see
+{libbeat}config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_).
 
 *win:*
 

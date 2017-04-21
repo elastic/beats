@@ -375,44 +375,5 @@ individual settings can be overwritten using `-E <setting>=<value>`.
 [[config-file-format-tips]]
 === YAML Tips and Gotchas
 
-When you edit the configuration file, there are a few things that you should know.
-
-[float]
-==== Use Spaces for Indentation
-
-Indentation is meaningful in YAML. Make sure that you use spaces, rather than
-tab characters, to indent sections.
-
-In the default configuration files and in all the examples in the documentation,
-we use 2 spaces per indentation level. We recommend you do the same.
-
-[float]
-==== Look at the Default Config File for Structure
-
-The best way to understand where to define a configuration option is by looking
-at the provided sample configuration files. The configuration files contain most
-of the default configurations that are available per beat. To change a setting,
-simply uncomment the line and change the values.
-
-[float]
-==== Test Your Config File
-
-You can test your configuration file to verify that the structure is valid.
-Simply change to the directory where the binary is installed, and run
-your Beat in the foreground with the `-configtest` flag specified. For example:
-
-["source","yaml",subs="attributes,callouts"]
-----------------------------------------------------------------------
-filebeat -c filebeat.yml -configtest
-----------------------------------------------------------------------
-
-You'll see a message if an error in the configuration file is found.
-
-[float]
-==== Wrap Regular Expressions in Single Quotation Marks
-
-If you need to specify a regular expression in a YAML file, it's a good idea to
-wrap the regular expression in single quotation marks to work around YAML's
-tricky rules for string escaping.
-
-For more information about YAML, see http://yaml.org/.
+:allplatforms:
+include::yaml.asciidoc[]
