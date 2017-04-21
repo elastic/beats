@@ -30,14 +30,17 @@ func TestFetch(t *testing.T) {
 		objects := event["objects"].(int64)
 		assert.True(t, objects > 0)
 
-		avgObjSize := event["avg_obj_size"].(int64)
-		assert.True(t, avgObjSize > 0)
+		avgObjSize, err := event.GetValue("avg_obj_size.bytes")
+		assert.NoError(t, err)
+		assert.True(t, avgObjSize.(int64) > 0)
 
-		dataSize := event["data_size"].(int64)
-		assert.True(t, dataSize > 0)
+		dataSize, err := event.GetValue("data_size.bytes")
+		assert.NoError(t, err)
+		assert.True(t, dataSize.(int64) > 0)
 
-		storageSize := event["storage_size"].(int64)
-		assert.True(t, storageSize > 0)
+		storageSize, err := event.GetValue("storage_size.bytes")
+		assert.NoError(t, err)
+		assert.True(t, storageSize.(int64) > 0)
 
 		numExtents := event["num_extents"].(int64)
 		assert.True(t, numExtents >= 0)
@@ -45,8 +48,9 @@ func TestFetch(t *testing.T) {
 		indexes := event["indexes"].(int64)
 		assert.True(t, indexes >= 0)
 
-		indexSize := event["index_size"].(int64)
-		assert.True(t, indexSize > 0)
+		indexSize, err := event.GetValue("index_size.bytes")
+		assert.NoError(t, err)
+		assert.True(t, indexSize.(int64) > 0)
 	}
 }
 
