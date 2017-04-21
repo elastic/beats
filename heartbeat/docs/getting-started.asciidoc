@@ -286,3 +286,4 @@ image:./images/heartbeat-statistics.png[Heartbeat statistics]
 
 :allplatforms:
 include::../../libbeat/docs/dashboards.asciidoc[]
+
