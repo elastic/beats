@@ -6,13 +6,13 @@ import unittest
 class Test(metricbeat.BaseTest):
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_stats(self):
+    def test_node(self):
         """
-        elasticsearch stats metricset test
+        elasticsearch node metricset test
         """
         self.render_config_template(modules=[{
             "name": "elasticsearch",
-            "metricsets": ["stats"],
+            "metricsets": ["node"],
             "hosts": self.get_hosts(),
             "period": "1s",
         }])
@@ -28,13 +28,13 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_node(self):
+    def test_node_stats(self):
         """
-        elasticsearch node metricset test
+        elasticsearch node_stats metricset test
         """
         self.render_config_template(modules=[{
             "name": "elasticsearch",
-            "metricsets": ["node"],
+            "metricsets": ["node_stats"],
             "hosts": self.get_hosts(),
             "period": "1s",
         }])

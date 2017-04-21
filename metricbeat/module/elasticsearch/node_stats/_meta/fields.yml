@@ -7,6 +7,32 @@
       type: keyword
       description: >
         Node name.
+    - name: indices
+      type: group
+      description: >
+        Node indices stats
+      fields:
+        - name: docs.count
+          type: long
+          description: >
+            Total number of existing documents.
+        - name: docs.deleted
+          type: long
+          description: >
+            Total number of deleted documents.
+        - name: segments.count
+          type: long
+          description: >
+            Total number of segments.
+        - name: segments.memory.bytes
+          type: long
+          format: bytes
+          description: >
+            Total size of segments in bytes.
+        - name: store.size.bytes
+          type: long
+          description: >
+            Total size of the store in bytes.
     - name: jvm.mem.pools
       type: group
       description: >
@@ -88,7 +114,7 @@
               description:
                 Used bytes.
 
-    - name: gc.collectors
+    - name: jvm.gc.collectors
       type: group
       description: >
         GC collector stats.
@@ -96,7 +122,7 @@
         - name: old.collection
           type: group
           description: >
-            Old colletion gc.
+            Old collection gc.
           fields:
             - name: count
               type: long

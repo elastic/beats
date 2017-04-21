@@ -1968,6 +1968,55 @@ Node name.
 
 
 [float]
+== indices Fields
+
+Node indices stats
+
+
+
+[float]
+=== elasticsearch.node_stats.indices.docs.count
+
+type: long
+
+Total number of existing documents.
+
+
+[float]
+=== elasticsearch.node_stats.indices.docs.deleted
+
+type: long
+
+Total number of deleted documents.
+
+
+[float]
+=== elasticsearch.node_stats.indices.segments.count
+
+type: long
+
+Total number of segments.
+
+
+[float]
+=== elasticsearch.node_stats.indices.segments.memory.bytes
+
+type: long
+
+format: bytes
+
+Total size of segments in bytes.
+
+
+[float]
+=== elasticsearch.node_stats.indices.store.size.bytes
+
+type: long
+
+Total size of the store in bytes.
+
+
+[float]
 == jvm.mem.pools Fields
 
 JVM memory pool stats
@@ -2104,7 +2153,7 @@ format: bytes
 Used bytes.
 
 [float]
-== gc.collectors Fields
+== jvm.gc.collectors Fields
 
 GC collector stats.
 
@@ -2113,19 +2162,19 @@ GC collector stats.
 [float]
 == old.collection Fields
 
-Old colletion gc.
+Old collection gc.
 
 
 
 [float]
-=== elasticsearch.node_stats.gc.collectors.old.collection.count
+=== elasticsearch.node_stats.jvm.gc.collectors.old.collection.count
 
 type: long
 
 
 
 [float]
-=== elasticsearch.node_stats.gc.collectors.old.collection.ms
+=== elasticsearch.node_stats.jvm.gc.collectors.old.collection.ms
 
 type: long
 
@@ -2139,90 +2188,17 @@ Young collection gc.
 
 
 [float]
-=== elasticsearch.node_stats.gc.collectors.young.collection.count
+=== elasticsearch.node_stats.jvm.gc.collectors.young.collection.count
 
 type: long
 
 
 
 [float]
-=== elasticsearch.node_stats.gc.collectors.young.collection.ms
+=== elasticsearch.node_stats.jvm.gc.collectors.young.collection.ms
 
 type: long
 
-
-
-[float]
-== stats Fields
-
-stats
-
-
-
-[float]
-=== elasticsearch.stats.docs.count
-
-type: long
-
-Total number of existing documents.
-
-
-[float]
-=== elasticsearch.stats.docs.deleted
-
-type: long
-
-Total number of deleted documents.
-
-
-[float]
-=== elasticsearch.stats.segments.count
-
-type: long
-
-Total number of segments.
-
-
-[float]
-=== elasticsearch.stats.segments.memory.bytes
-
-type: long
-
-format: bytes
-
-Total size of segments in bytes.
-
-
-[float]
-=== elasticsearch.stats.shards.failed
-
-type: long
-
-Number of failed shards.
-
-
-[float]
-=== elasticsearch.stats.shards.successful
-
-type: long
-
-Number of successful shards.
-
-
-[float]
-=== elasticsearch.stats.shards.total
-
-type: long
-
-Total number of shards.
-
-
-[float]
-=== elasticsearch.stats.store.size.bytes
-
-type: long
-
-Total size of the store in bytes.
 
 
 [[exported-fields-golang]]

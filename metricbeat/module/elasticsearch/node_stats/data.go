@@ -26,6 +26,23 @@ var (
 				}),
 			}),
 		}),
+		"indices": c.Dict("indices", s.Schema{
+			"docs": c.Dict("docs", s.Schema{
+				"count":   c.Int("count"),
+				"deleted": c.Int("deleted"),
+			}),
+			"store": c.Dict("store", s.Schema{
+				"size": s.Object{
+					"bytes": c.Int("size_in_bytes"),
+				},
+			}),
+			"segments": c.Dict("segments", s.Schema{
+				"count": c.Int("count"),
+				"memory": s.Object{
+					"bytes": c.Int("memory_in_bytes"),
+				},
+			}),
+		}),
 	}
 
 	poolSchema = s.Schema{

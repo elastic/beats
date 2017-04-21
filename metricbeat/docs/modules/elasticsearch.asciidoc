@@ -18,10 +18,11 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: elasticsearch
-  metricsets: ["node", "node_stats", "stats"]
+  metricsets: ["node", "node_stats"]
   enabled: false
   period: 10s
   hosts: ["localhost:9200"]
+
 
 ----
 
@@ -34,11 +35,7 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-elasticsearch-node_stats,node_stats>>
 
-* <<metricbeat-metricset-elasticsearch-stats,stats>>
-
 include::elasticsearch/node.asciidoc[]
 
 include::elasticsearch/node_stats.asciidoc[]
-
-include::elasticsearch/stats.asciidoc[]
 
