@@ -1,0 +1,9 @@
+- name: json
+  type: group
+  description: >
+    json
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
