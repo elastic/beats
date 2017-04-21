@@ -3808,89 +3808,667 @@ Total number of connections.
 == kubelet Fields
 
 beta[]
-kubelet Module
+kubelet metrics
 
 
 
 [float]
 == kubelet Fields
 
+Information and statistics of pods managed by kubelet.
 
 
 
 [float]
 == container Fields
 
-node
+kubelet container metrics
 
 
 
 [float]
-=== kubelet.container.example
+=== kubelet.container.name
 
 type: keyword
 
-Example field
+Container name
+
+
+[float]
+== cpu Fields
+
+CPU usage metrics
+
+
+
+
+
+[float]
+=== kubelet.container.cpu.usage.core.ns
+
+type: long
+
+Container CPU Core usage nanoseconds
+
+
+[float]
+=== kubelet.container.cpu.usage.nanocores
+
+type: long
+
+CPU used nanocores
+
+
+[float]
+== logs Fields
+
+Logs info
+
+
+
+
+[float]
+=== kubelet.container.logs.available.bytes
+
+type: long
+
+format: bytes
+
+Logs available capacity in bytes
+
+
+
+[float]
+=== kubelet.container.logs.capacity.bytes
+
+type: long
+
+format: bytes
+
+Logs total capacity in bytes
+
+
+
+[float]
+=== kubelet.container.logs.used.bytes
+
+type: long
+
+format: bytes
+
+Logs used capacity in bytes
+
+
+
+[float]
+=== kubelet.container.logs.inodes.count
+
+type: long
+
+Total available inodes
+
+
+[float]
+=== kubelet.container.logs.inodes.free
+
+type: long
+
+Total free inodes
+
+
+[float]
+=== kubelet.container.logs.inodes.used
+
+type: long
+
+Total used inodes
+
+
+
+
+[float]
+=== kubelet.container.memory.available.bytes
+
+type: long
+
+format: bytes
+
+Total available memory
+
+
+
+[float]
+=== kubelet.container.memory.usage.bytes
+
+type: long
+
+format: bytes
+
+Total memory usage
+
+
+
+[float]
+=== kubelet.container.memory.rss.bytes
+
+type: long
+
+format: bytes
+
+RSS memory usage
+
+
+
+[float]
+=== kubelet.container.memory.workingset.bytes
+
+type: long
+
+format: bytes
+
+Working set memory usage
+
+
+[float]
+=== kubelet.container.memory.pagefaults
+
+type: long
+
+Number of page faults
+
+
+[float]
+=== kubelet.container.memory.majorpagefaults
+
+type: long
+
+Number of major page faults
+
+
+
+
+[float]
+=== kubelet.container.rootfs.capacity.bytes
+
+type: long
+
+format: bytes
+
+Root filesystem total capacity in bytes
+
+
+
+[float]
+=== kubelet.container.rootfs.available.bytes
+
+type: long
+
+format: bytes
+
+Root filesystem total available in bytes
+
+
+
+[float]
+=== kubelet.container.rootfs.used.bytes
+
+type: long
+
+format: bytes
+
+Root filesystem total used in bytes
+
+
+
+[float]
+=== kubelet.container.rootfs.inodes.used
+
+type: long
+
+Used inodes
 
 
 [float]
 == node Fields
 
-node
+kubelet node metrics
 
 
 
 [float]
-=== kubelet.node.example
+=== kubelet.node.name
 
 type: keyword
 
-Example field
+Node name
+
+
+[float]
+== cpu Fields
+
+CPU usage metrics
+
+
+
+
+
+[float]
+=== kubelet.node.cpu.usage.core.ns
+
+type: long
+
+Node CPU Core usage nanoseconds
+
+
+[float]
+=== kubelet.node.cpu.usage.nanocores
+
+type: long
+
+CPU used nanocores
+
+
+
+
+[float]
+=== kubelet.node.memory.available.bytes
+
+type: long
+
+format: bytes
+
+Total available memory
+
+
+
+[float]
+=== kubelet.node.memory.usage.bytes
+
+type: long
+
+format: bytes
+
+Total memory usage
+
+
+
+[float]
+=== kubelet.node.memory.rss.bytes
+
+type: long
+
+format: bytes
+
+RSS memory usage
+
+
+
+[float]
+=== kubelet.node.memory.workingset.bytes
+
+type: long
+
+format: bytes
+
+Working set memory usage
+
+
+[float]
+=== kubelet.node.memory.pagefaults
+
+type: long
+
+Number of page faults
+
+
+[float]
+=== kubelet.node.memory.majorpagefaults
+
+type: long
+
+Number of major page faults
+
+
+
+
+[float]
+=== kubelet.node.network.rx.bytes
+
+type: long
+
+format: bytes
+
+Received bytes
+
+
+[float]
+=== kubelet.node.network.rx.errors
+
+type: long
+
+Rx errors
+
+
+
+[float]
+=== kubelet.node.network.tx.bytes
+
+type: long
+
+format: bytes
+
+Transmitted bytes
+
+
+[float]
+=== kubelet.node.network.tx.errors
+
+type: long
+
+Tx errors
+
+
+
+
+[float]
+=== kubelet.node.fs.capacity.bytes
+
+type: long
+
+format: bytes
+
+Filesystem total capacity in bytes
+
+
+
+[float]
+=== kubelet.node.fs.available.bytes
+
+type: long
+
+format: bytes
+
+Filesystem total available in bytes
+
+
+
+[float]
+=== kubelet.node.fs.used.bytes
+
+type: long
+
+format: bytes
+
+Filesystem total used in bytes
+
+
+
+
+
+[float]
+=== kubelet.node.runtime.imagefs.capacity.bytes
+
+type: long
+
+format: bytes
+
+Image filesystem total capacity in bytes
+
+
+
+[float]
+=== kubelet.node.runtime.imagefs.available.bytes
+
+type: long
+
+format: bytes
+
+Image filesystem total available in bytes
+
+
+
+[float]
+=== kubelet.node.runtime.imagefs.used.bytes
+
+type: long
+
+format: bytes
+
+Image filesystem total used in bytes
 
 
 [float]
 == pod Fields
 
-node
+kubelet pod metrics
 
 
 
 [float]
-=== kubelet.pod.example
+=== kubelet.pod.name
 
 type: keyword
 
-Example field
+Pod name
+
+
+[float]
+=== kubelet.pod.namespace
+
+type: keyword
+
+Pod namespace
+
+
+[float]
+=== kubelet.pod.node
+
+type: keyword
+
+Pod node
+
+
+
+
+[float]
+=== kubelet.pod.network.rx.bytes
+
+type: long
+
+format: bytes
+
+Received bytes
+
+
+[float]
+=== kubelet.pod.network.rx.errors
+
+type: long
+
+Rx errors
+
+
+
+[float]
+=== kubelet.pod.network.tx.bytes
+
+type: long
+
+format: bytes
+
+Transmitted bytes
+
+
+[float]
+=== kubelet.pod.network.tx.errors
+
+type: long
+
+Tx errors
 
 
 [float]
 == system Fields
 
-node
+kubelet system containers metrics
 
 
 
 [float]
-=== kubelet.system.example
+=== kubelet.system.container
 
 type: keyword
 
-Example field
+Container name
+
+
+[float]
+== cpu Fields
+
+CPU usage metrics
+
+
+
+
+
+[float]
+=== kubelet.system.cpu.usage.core.ns
+
+type: long
+
+CPU Core usage nanoseconds
+
+
+[float]
+=== kubelet.system.cpu.usage.nanocores
+
+type: long
+
+CPU used nanocores
+
+
+
+
+[float]
+=== kubelet.system.memory.usage.bytes
+
+type: long
+
+format: bytes
+
+Total memory usage
+
+
+
+[float]
+=== kubelet.system.memory.rss.bytes
+
+type: long
+
+format: bytes
+
+RSS memory usage
+
+
+
+[float]
+=== kubelet.system.memory.workingset.bytes
+
+type: long
+
+format: bytes
+
+Working set memory usage
+
+
+[float]
+=== kubelet.system.memory.pagefaults
+
+type: long
+
+Number of page faults
+
+
+[float]
+=== kubelet.system.memory.majorpagefaults
+
+type: long
+
+Number of major page faults
 
 
 [float]
 == volume Fields
 
-node
+kubelet volume metrics
 
 
 
 [float]
-=== kubelet.volume.example
+=== kubelet.volume.name
 
 type: keyword
 
-Example field
+Volume name
+
+
+
+
+[float]
+=== kubelet.volume.fs.capacity.bytes
+
+type: long
+
+format: bytes
+
+Filesystem total capacity in bytes
+
+
+
+[float]
+=== kubelet.volume.fs.available.bytes
+
+type: long
+
+format: bytes
+
+Filesystem total available in bytes
+
+
+
+[float]
+=== kubelet.volume.fs.used.bytes
+
+type: long
+
+format: bytes
+
+Filesystem total used in bytes
+
+
+
+[float]
+=== kubelet.volume.fs.inodes.used
+
+type: long
+
+Used inodes
+
+
+[float]
+=== kubelet.volume.fs.inodes.free
+
+type: long
+
+Free inodes
+
+
+[float]
+=== kubelet.volume.fs.inodes.count
+
+type: long
+
+Total inodes
 
 
 [[exported-fields-memcached]]

@@ -1,4 +1,4 @@
-package node
+package pod
 
 import (
 	"encoding/json"
