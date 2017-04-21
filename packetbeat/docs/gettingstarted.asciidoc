@@ -327,3 +327,4 @@ image:./images/packetbeat-statistics.png[Packetbeat statistics]
 
 :allplatforms:
 include::../../libbeat/docs/dashboards.asciidoc[]
+
