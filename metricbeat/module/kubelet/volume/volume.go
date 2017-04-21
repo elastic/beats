@@ -1,4 +1,4 @@
-package node
+package volume
 
 import (
 	"github.com/elastic/beats/libbeat/common"

@@ -1,9 +1,44 @@
 - name: pod
   type: group
   description: >
-    node
+    kubelet pod metrics
   fields:
-    - name: example
+    - name: name
       type: keyword
       description: >
-        Example field
+        Pod name
+    - name: namespace
+      type: keyword
+      description: >
+        Pod namespace
+    - name: node
+      type: keyword
+      description: >
+        Pod node
+    - name: network
+      type: group
+      fields:
+        - name: rx
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Received bytes
+            - name: errors
+              type: long
+              description: >
+                Rx errors
+        - name: tx
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Transmitted bytes
+            - name: errors
+              type: long
+              description: >
+                Tx errors
