@@ -135,10 +135,11 @@ metricbeat.modules:
 
 #---------------------------- elasticsearch Module ---------------------------
 - module: elasticsearch
-  metricsets: ["node", "node_stats", "stats"]
+  metricsets: ["node", "node_stats"]
   enabled: false
   period: 10s
   hosts: ["localhost:9200"]
+
 
 
 #------------------------------- golang Module -------------------------------
