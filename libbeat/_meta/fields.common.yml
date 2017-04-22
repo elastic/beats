@@ -11,15 +11,15 @@
         set in the configuration file, then that value is used. If it is not
         set, the hostname is used. To set the Beat name, use the `name`
         option in the configuration file.
-      format: url
-      params: 
-        urlTemplate: "../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8?_a=(query:(query_string:(analyze_wildcard:!t,query:'beat.hostname:{{value}}')))"
-        labelTemplate: "{{value}}"
-
     - name: beat.hostname
       description: >
         The hostname as returned by the operating system on which the Beat is
         running.
+      metricbeat.format: url
+      metricbeat.params:
+        urlTemplate: "../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8?_a=(query:(query_string:(analyze_wildcard:!t,query:'beat.hostname:{{value}}')))"
+        labelTemplate: "{{value}}"
+
     - name: beat.timezone
       description: >
         The timezone as returned by the operating system on which the Beat is
