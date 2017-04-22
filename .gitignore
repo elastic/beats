@@ -9,6 +9,13 @@
 /*/fields.yml
 /*/*.template*.json
 
+# Debug binary files
+/filebeat/debug
+/heartbeat/debug
+/metricbeat/debug
+/packetbeat/debug
+/winlogbeat/debug
+
 # Files
 .DS_Store
 /beats.iml
