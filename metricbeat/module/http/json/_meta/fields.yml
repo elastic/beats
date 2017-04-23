@@ -8,16 +8,32 @@
       description: >
           HTTP request information
       fields:
+        - name: header
+          type: nested
+          description: >
+          The HTTP headers sent
         - name: method
-          type: string
+          type: keyword
           description: >
             The HTTP method used
+        - name: body
+          type: keyword
+          description: >
+            The HTTP payload sent
     - name: response
       type: group
       description: >
           HTTP response information
       fields:
-        - name: body
-          type: string
+        - name: header
+          type: nested
           description: >
-            The HTTP payload returned
+          The HTTP headers received
+        - name: status_code
+          type: keyword
+          description: >
+            The HTTP status code
+        - name: body
+          type: keyword
+          description: >
+            The HTTP payload received
