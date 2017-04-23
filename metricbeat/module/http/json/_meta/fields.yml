@@ -1,9 +1,23 @@
 - name: json
   type: group
   description: >
-    json
+    json metricset
   fields:
-    - name: example
-      type: keyword
+    - name: request
+      type: group
       description: >
-        Example field
+          HTTP request information
+      fields:
+        - name: method
+          type: string
+          description: >
+            The HTTP method used
+    - name: response
+      type: group
+      description: >
+          HTTP response information
+      fields:
+        - name: body
+          type: string
+          description: >
+            The HTTP payload returned

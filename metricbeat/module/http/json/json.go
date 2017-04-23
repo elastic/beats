@@ -2,6 +2,7 @@ package json
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -19,7 +20,9 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	counter int
+	http      *helper.HTTP
+	body      string
+	headers   map[string]string
 }
 
 // New create a new instance of the MetricSet
@@ -27,15 +30,28 @@ type MetricSet struct {
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
-	config := struct{}{}
+	config := struct {
+		Method string       		`config:"method"`
+		Body string       		`config:"body"`
+		Headers map[string]string 	`config:"headers"`
+	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
+	http := helper.NewHTTP(base)
+	http.SetMethod(config.Method)
+	http.SetBody([]byte(config.Body))
+	for key, value := range config.Headers {
+		http.SetHeader(key,value)
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
-		counter:       1,
+		http:          http,
+		body:          config.Body,
+		headers:       config.Headers,
 	}, nil
 }
 
@@ -44,10 +60,28 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 
-	event := common.MapStr{
-		"counter": m.counter,
+	response, err := m.http.FetchResponse()
+	if err != nil {
+		return nil, err
 	}
-	m.counter++
+	defer response.Body.Close()
+
+	event := common.MapStr{
+		"response.status_code": response.StatusCode,
+	}
+
+	event["request"] = common.MapStr{
+		"header": response.Request.Header,
+		"method": response.Request.Method,
+		"body": response.Request.Body,
+
+	}
+
+	event["response"] = common.MapStr{
+		"status_code": response.StatusCode,
+		"header": response.Header,
+		"body": response.Body,
+	}
 
 	return event, nil
 }
