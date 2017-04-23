@@ -97,8 +97,8 @@ type Query struct {
 type Format int
 
 const (
-	FLOAT Format = iota
-	LONG
+	FloatFlormat Format = iota
+	LongFormat
 )
 
 func NewQuery(dataSource string) (*Query, error) {
@@ -125,9 +125,9 @@ func (q *Query) AddCounter(counterPath string, format Format) error {
 
 	q.counters[counterPath] = &Counter{handle: h}
 	switch format {
-	case FLOAT:
+	case FloatFlormat:
 		q.counters[counterPath].format = PdhFmtDouble
-	case LONG:
+	case LongFormat:
 		q.counters[counterPath].format = PdhFmtLarge
 	}
 	return nil
@@ -189,9 +189,9 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 		var format Format
 		switch counter.Format {
 		case "float":
-			format = FLOAT
+			format = FloatFlormat
 		case "long":
-			format = LONG
+			format = LongFormat
 		}
 		if err := query.AddCounter(counter.Query, format); err != nil {
 			query.Close()
