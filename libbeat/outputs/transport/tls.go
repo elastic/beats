@@ -13,6 +13,7 @@ import (
 )
 
 type TLSConfig struct {
+
 	// List of allowed SSL/TLS protocol versions. Connections might be dropped
 	// after handshake succeeded, if TLS version in use is not listed.
 	Versions []TLSVersion

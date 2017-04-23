@@ -36,6 +36,8 @@ type Monitor struct {
 }
 
 type MonitorTask struct {
+	name, typ string
+
 	job      monitors.Job
 	schedule scheduler.Schedule
 	cancel   JobCanceller
@@ -48,6 +50,8 @@ type JobControl interface {
 type JobCanceller func() error
 
 var defaultFilePollInterval = 5 * time.Second
+
+const defaultEventType = "monitor"
 
 func newMonitorManager(
 	client publisher.Client,
@@ -151,6 +155,8 @@ func (m *Monitor) Update(configs []*common.Config) error {
 		}
 
 		shared := struct {
+			Name     string             `config:"name"`
+			Type     string             `config:"type"`
 			Schedule *schedule.Schedule `config:"schedule" validate:"required"`
 		}{}
 		if err := config.Unpack(&shared); err != nil {
@@ -164,8 +170,15 @@ func (m *Monitor) Update(configs []*common.Config) error {
 			return err
 		}
 
+		name := shared.Name
+		if name == "" {
+			name = shared.Type
+		}
+
 		for _, job := range jobs {
 			all[job.Name()] = MonitorTask{
+				name:     name,
+				typ:      shared.Type,
 				job:      job,
 				schedule: shared.Schedule,
 			}
@@ -179,10 +192,10 @@ func (m *Monitor) Update(configs []*common.Config) error {
 	m.active = map[string]MonitorTask{}
 
 	// start new and reconfigured tasks
-	for name, t := range all {
-		job := createJob(m.manager.client, name, t.job)
-		t.cancel = m.manager.jobControl.Add(t.schedule, name, job)
-		m.active[name] = t
+	for id, t := range all {
+		job := createJob(m.manager.client, t.job, t.name, t.typ)
+		t.cancel = m.manager.jobControl.Add(t.schedule, id, job)
+		m.active[id] = t
 	}
 
 	return nil
@@ -221,19 +234,11 @@ func createWatchUpdater(monitor *Monitor) func(content []byte) {
 	}
 }
 
-func createJob(
-	client publisher.Client,
-	name string,
-	r monitors.Job,
-) scheduler.TaskFunc {
-	return createJobTask(client, name, r)
+func createJob(client publisher.Client, r monitors.Job, name, typ string) scheduler.TaskFunc {
+	return createJobTask(client, r, name, typ)
 }
 
-func createJobTask(
-	client publisher.Client,
-	name string,
-	r monitors.TaskRunner,
-) scheduler.TaskFunc {
+func createJobTask(client publisher.Client, r monitors.TaskRunner, name, typ string) scheduler.TaskFunc {
 	return func() []scheduler.TaskFunc {
 		event, next, err := r.Run()
 		if err != nil {
@@ -241,7 +246,16 @@ func createJobTask(
 		}
 
 		if event != nil {
-			event["monitor"] = name
+			event.DeepUpdate(common.MapStr{
+				"monitor": common.MapStr{
+					"name": name,
+					"type": typ,
+				},
+			})
+
+			if _, exists := event["type"]; !exists {
+				event["type"] = defaultEventType
+			}
 			client.PublishEvent(event)
 		}
 
@@ -251,7 +265,7 @@ func createJobTask(
 
 		cont := make([]scheduler.TaskFunc, len(next))
 		for i, n := range next {
-			cont[i] = createJobTask(client, name, n)
+			cont[i] = createJobTask(client, n, name, typ)
 		}
 		return cont
 	}

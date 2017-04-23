@@ -61,23 +61,17 @@ func create(
 		return nil, err
 	}
 
-	typ := config.Name
 	network := config.Mode.Network()
-	pingFactory := monitors.MakePingIPFactory(nil, createPingIPFactory(&config))
+	pingFactory := monitors.MakePingIPFactory(createPingIPFactory(&config))
 
 	for _, host := range config.Hosts {
-		ip := net.ParseIP(host)
-		if ip != nil {
-			name := fmt.Sprintf("icmp-ip@%v", ip.String())
-			err := addJob(monitors.MakeByIPJob(name, typ, ip, pingFactory))
-			if err != nil {
-				return nil, err
-			}
-			continue
+		jobName := fmt.Sprintf("icmp-%v-host-%v@%v", config.Name, network, host)
+		if ip := net.ParseIP(host); ip != nil {
+			jobName = fmt.Sprintf("icmp-%v-ip@%v", config.Name, ip.String())
 		}
 
-		name := fmt.Sprintf("%v-host-%v@%v", config.Name, network, host)
-		err := addJob(monitors.MakeByHostJob(name, typ, host, config.Mode, pingFactory))
+		settings := monitors.MakeHostJobSettings(jobName, host, config.Mode)
+		err := addJob(monitors.MakeByHostJob(settings, pingFactory))
 		if err != nil {
 			return nil, err
 		}
@@ -88,13 +82,14 @@ func create(
 
 func createPingIPFactory(config *Config) func(*net.IPAddr) (common.MapStr, error) {
 	return func(ip *net.IPAddr) (common.MapStr, error) {
-		rtt, _, err := loop.ping(ip, config.Timeout, config.Wait)
-		if err != nil {
-			return nil, err
+		rtt, n, err := loop.ping(ip, config.Timeout, config.Wait)
+
+		fields := common.MapStr{"requests": n}
+		if err == nil {
+			fields["rtt"] = look.RTT(rtt)
 		}
 
-		return common.MapStr{
-			"icmp_rtt": look.RTT(rtt),
-		}, nil
+		event := common.MapStr{"icmp": fields}
+		return event, err
 	}
 }
