@@ -3,6 +3,7 @@
 package common
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -23,6 +24,48 @@ func TestMapStrUpdate(t *testing.T) {
 	a.Update(b)
 
 	assert.Equal(a, MapStr{"a": 1, "b": 3, "c": 4})
+}
+
+func TestMapStrDeepUpdate(t *testing.T) {
+	tests := []struct {
+		a, b, expected MapStr
+	}{
+		{
+			MapStr{"a": 1},
+			MapStr{"b": 2},
+			MapStr{"a": 1, "b": 2},
+		},
+		{
+			MapStr{"a": 1},
+			MapStr{"a": 2},
+			MapStr{"a": 2},
+		},
+		{
+			MapStr{"a": 1},
+			MapStr{"a": MapStr{"b": 1}},
+			MapStr{"a": MapStr{"b": 1}},
+		},
+		{
+			MapStr{"a": MapStr{"b": 1}},
+			MapStr{"a": MapStr{"c": 2}},
+			MapStr{"a": MapStr{"b": 1, "c": 2}},
+		},
+		{
+			MapStr{"a": MapStr{"b": 1}},
+			MapStr{"a": 1},
+			MapStr{"a": 1},
+		},
+	}
+
+	for i, test := range tests {
+		a, b, expected := test.a, test.b, test.expected
+		name := fmt.Sprintf("%v: %v + %v = %v", i, a, b, expected)
+
+		t.Run(name, func(t *testing.T) {
+			a.DeepUpdate(b)
+			assert.Equal(t, expected, a)
+		})
+	}
 }
 
 func TestMapStrUnion(t *testing.T) {
