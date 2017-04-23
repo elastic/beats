@@ -4,9 +4,9 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
+	"io/ioutil"
 	"net/http"
 	"strings"
-	"io/ioutil"
 )
 
 // init registers the MetricSet with the central registry.
@@ -25,9 +25,8 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	http    *helper.HTTP
 	headers map[string]string
-	method string
+	method  string
 	body    string
-
 }
 
 // New create a new instance of the MetricSet
@@ -58,7 +57,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		headers:       config.Headers,
 		method:        config.Method,
 		body:          config.Body,
-
 	}, nil
 }
 
