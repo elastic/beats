@@ -11,7 +11,7 @@
         - name: header
           type: nested
           description: >
-          The HTTP headers sent
+            The HTTP headers sent
         - name: method
           type: keyword
           description: >
@@ -28,7 +28,7 @@
         - name: header
           type: nested
           description: >
-          The HTTP headers received
+            The HTTP headers received
         - name: status_code
           type: keyword
           description: >
