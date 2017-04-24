@@ -96,6 +96,7 @@ https://github.com/elastic/beats/compare/v5.3.0...v5.3.1[View commits]
 *Affecting all Beats*
 
 - Fix panic when testing regex-AST to match against date patterns. {issue}3889[3889]
+- Fix panic due to race condition in kafka output. {pull}4098[4098]
 
 *Filebeat*
 

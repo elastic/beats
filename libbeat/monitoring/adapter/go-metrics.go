@@ -3,6 +3,7 @@ package adapter
 import (
 	"fmt"
 	"reflect"
+	"sync"
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -21,6 +22,8 @@ import (
 //       It's recommended to not mix go-metrics with other metrics types
 //       in the same namespace.
 type GoMetricsRegistry struct {
+	mutex sync.Mutex
+
 	reg     *monitoring.Registry
 	filters *metricFilters
 
@@ -80,6 +83,12 @@ func (r *GoMetricsRegistry) find(name string) interface{} {
 //       It's recommended to not mix go-metrics with other metrics types in one
 //       namespace.
 func (r *GoMetricsRegistry) Get(name string) interface{} {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	return r.get(name)
+}
+
+func (r *GoMetricsRegistry) get(name string) interface{} {
 	m := r.find(name)
 	if m == nil {
 		return r.shadow.Get(name)
@@ -95,7 +104,10 @@ func (r *GoMetricsRegistry) Get(name string) interface{} {
 // GetOrRegister retries an existing metric via `Get` or registers a new one
 // if the metric is unknown. For lazy instantiation metric can be a function.
 func (r *GoMetricsRegistry) GetOrRegister(name string, metric interface{}) interface{} {
-	v := r.Get(name)
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	v := r.get(name)
 	if v != nil {
 		return v
 	}
@@ -106,7 +118,10 @@ func (r *GoMetricsRegistry) GetOrRegister(name string, metric interface{}) inter
 // Register adds a new metric.
 // An error is returned if the metric is already known.
 func (r *GoMetricsRegistry) Register(name string, metric interface{}) error {
-	if r.Get(name) != nil {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	if r.get(name) != nil {
 		return fmt.Errorf("metric '%v' already registered", name)
 	}
 
@@ -139,6 +154,9 @@ func (r *GoMetricsRegistry) RunHealthchecks() {}
 
 // Unregister removes a metric.
 func (r *GoMetricsRegistry) Unregister(name string) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
 	st := r.rmState(name)
 	r.reg.Remove(st.name)
 	r.shadow.Unregister(name)
@@ -146,6 +164,9 @@ func (r *GoMetricsRegistry) Unregister(name string) {
 
 // UnregisterAll calls `Clear` on the underlying monitoring.Registry
 func (r *GoMetricsRegistry) UnregisterAll() {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
 	r.shadow.UnregisterAll()
 	err := r.reg.Clear()
 	if err != nil {
