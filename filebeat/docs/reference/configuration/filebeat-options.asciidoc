@@ -54,7 +54,7 @@ paths. You can specify one path per line. Each line begins with a dash (-).
 the rightmost `**` in each path is expanded into a fixed
 number of glob patterns. For example: `/foo/**` expands to `/foo`, `/foo/*`,
 `/foo/*/*`, and so on. The feature is disabled by default, and if enabled it expands a single `**`
-into a 32-level deep `*` pattern.
+into a 8-level deep `*` pattern.
 
 ===== encoding
 

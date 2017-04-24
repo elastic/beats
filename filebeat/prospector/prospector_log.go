@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	recursiveGlobDepth = 32
+	recursiveGlobDepth = 8
 )
 
 var (
