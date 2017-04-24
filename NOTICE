@@ -2192,6 +2192,37 @@ github.com/vmware/govmomi
 --------------------------------------------------------------------
 Apache License
 
+=======
+github.com/matttproud/golang_protobuf_extensions
+--------------------------------------------------------------------
+Apache License
+
+-------NOTICE-----
+Copyright 2012 Matt T. Proud (matt.proud@gmail.com)
+
+--------------------------------------------------------------------
+github.com/prometheus/client_model
+--------------------------------------------------------------------
+Apache License
+
+-------NOTICE-----
+Data model artifacts for Prometheus.
+Copyright 2012-2015 The Prometheus Authors
+
+This product includes software developed at
+SoundCloud Ltd. (http://soundcloud.com/).
+
+--------------------------------------------------------------------
+github.com/prometheus/common
+--------------------------------------------------------------------
+Apache License
+
+-------NOTICE-----
+Common libraries shared by Prometheus Go components.
+Copyright 2015 The Prometheus Authors
+
+This product includes software developed at
+SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
 github.com/davecgh/go-spew

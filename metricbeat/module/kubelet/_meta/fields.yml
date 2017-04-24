@@ -3,10 +3,11 @@
   description: >
     beta[]
 
-    kubelet Module
+    kubelet metrics
   short_config: false
   fields:
     - name: kubelet
       type: group
       description: >
+        Information and statistics of pods managed by kubelet.
       fields:

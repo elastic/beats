@@ -5,8 +5,9 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-kubelet]]
 == kubelet Module
 
-This is the kubelet Module.
+beta[]
 
+This module fetches metrics from Kubernetes https://kubernetes.io/docs/admin/kubelet/[kubelet] agent.
 
 
 [float]
@@ -18,11 +19,11 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
-#- module: kubelet
-#  metricsets: ["node","container","volume","pod","system"]
-#  enabled: true
-#  period: 10s
-#  hosts: ["localhost:10255"]
+- module: kubelet
+  metricsets: ["node","container","volume","pod","system"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost:10255"]
 
 ----
 

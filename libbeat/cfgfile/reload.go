@@ -87,6 +87,11 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 	gw := NewGlobWatcher(path)
 
+	// If reloading is disable, config files should be loaded immidiately
+	if !rl.config.Reload.Enabled {
+		rl.config.Reload.Period = 0
+	}
+
 	for {
 		select {
 		case <-rl.done:
@@ -152,6 +157,16 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 			rl.stopRunners(stopList)
 			rl.startRunners(startList)
+		}
+
+		// Path loading is enabled but not reloading. Loads files only once and then stops.
+		if !rl.config.Reload.Enabled {
+			logp.Info("Loading of config files completed.")
+			select {
+			case <-rl.done:
+				logp.Info("Dynamic config reloader stopped")
+				return
+			}
 		}
 	}
 }

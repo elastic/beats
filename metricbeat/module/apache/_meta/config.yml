@@ -1,6 +1,6 @@
 - module: apache
   metricsets: ["status"]
-  enabled: true
+  enabled: false
   period: 10s
 
   # Apache hosts

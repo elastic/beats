@@ -1,16 +1,16 @@
-#- module: apache
-  #metricsets: ["status"]
-  #enabled: true
-  #period: 10s
+- module: apache
+  metricsets: ["status"]
+  enabled: false
+  period: 10s
 
   # Apache hosts
-  #hosts: ["http://127.0.0.1"]
+  hosts: ["http://127.0.0.1"]
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
 
   # Username of hosts.  Empty by default
-  #username: test
+  #username: username
 
   # Password of hosts. Empty by default
-  #password: test123
+  #password: password

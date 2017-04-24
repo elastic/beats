@@ -9,22 +9,39 @@
             "name": "elasticsearch"
         },
         "node": {
-            "name": "hU3Tsxk0TXCAs8vIfBNJ2g"
+            "name": "OIBwp_5vSAG16PyX6B4eUA"
         },
         "node_stats": {
+            "indices": {
+                "docs": {
+                    "count": 2,
+                    "deleted": 0
+                },
+                "segments": {
+                    "count": 2,
+                    "memory": {
+                        "bytes": 3476
+                    }
+                },
+                "store": {
+                    "size": {
+                        "bytes": 8078
+                    }
+                }
+            },
             "jvm": {
                 "gc": {
                     "collectors": {
                         "old": {
                             "collection": {
                                 "count": 1,
-                                "ms": 187
+                                "ms": 71
                             }
                         },
                         "young": {
                             "collection": {
                                 "count": 4,
-                                "ms": 2125
+                                "ms": 193
                             }
                         }
                     }
@@ -36,13 +53,13 @@
                                 "bytes": 362414080
                             },
                             "peak": {
-                                "bytes": 13945280
+                                "bytes": 16151432
                             },
                             "peak_max": {
                                 "bytes": 362414080
                             },
                             "used": {
-                                "bytes": 13945280
+                                "bytes": 16151432
                             }
                         },
                         "survivor": {
@@ -50,13 +67,13 @@
                                 "bytes": 17432576
                             },
                             "peak": {
-                                "bytes": 17432560
+                                "bytes": 17432568
                             },
                             "peak_max": {
                                 "bytes": 17432576
                             },
                             "used": {
-                                "bytes": 17432560
+                                "bytes": 17432568
                             }
                         },
                         "young": {
@@ -70,7 +87,7 @@
                                 "bytes": 139591680
                             },
                             "used": {
-                                "bytes": 137025152
+                                "bytes": 136064336
                             }
                         }
                     }
@@ -79,7 +96,7 @@
         }
     },
     "metricset": {
-        "host": "elasticsearch:9200",
+        "host": "127.0.0.1:9200",
         "module": "elasticsearch",
         "name": "node_stats",
         "rtt": 115

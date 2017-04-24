@@ -201,3 +201,53 @@ class Test(BaseTest):
         assert output[1]["message"] == second_line
         # assert that fields are added
         assert output[1]["fields.hello"] == "world"
+
+    def test_load_configs(self):
+        """
+        Test loading separate prospectors configs
+        """
+        self.render_config_template(
+            reload_path=self.working_dir + "/configs/*.yml",
+            prospectors=False,
+        )
+
+        os.mkdir(self.working_dir + "/logs/")
+        logfile = self.working_dir + "/logs/test.log"
+        os.mkdir(self.working_dir + "/configs/")
+
+        first_line = "First log file"
+        second_line = "Second log file"
+
+        config = prospectorConfigTemplate.format(self.working_dir + "/logs/test.log")
+        config = config + """
+  close_eof: true
+"""
+        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
+            f.write(config)
+
+        with open(logfile, 'w') as f:
+            f.write(first_line + "\n")
+
+        proc = self.start_beat()
+
+        self.wait_until(lambda: self.output_lines() == 1)
+
+        # Update both log files, only 1 change should be picke dup
+        with open(logfile, 'a') as f:
+            f.write(second_line + "\n")
+
+        self.wait_until(lambda: self.output_lines() == 2)
+
+        proc.check_kill_and_wait()
+
+        output = self.read_output()
+
+        # Reloading stopped.
+        self.wait_until(
+            lambda: self.log_contains("Loading of config files completed."),
+            max_timeout=15)
+
+        # Make sure the correct lines were picked up
+        assert self.output_lines() == 2
+        assert output[0]["message"] == first_line
+        assert output[1]["message"] == second_line

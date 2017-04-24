@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Remove code to convert states from 1.x. {pull}3767[3767]
 - Remove deprecated config options force_close_files and close_older. {pull}3768[3768]
 - Change clean_removed behaviour to also remove states for files which cannot be found anymore under the same name. {pull}3827[3827]
+- Add Icinga module. {pull}3904[3904]
 
 *Heartbeat*
 
@@ -35,6 +36,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
   metricset. The configuration option for the feature was renamed from
   `cgroups` to `process.cgroups.enabled`. {pull}3519[3519]
 - Change fieldnames couchbase.node.couch.*.actual_disk_size.* to couchbase.node.couch.*.disk_size.* {pull}3545[3545]
+- Fixing prometheus collector to aggregate metrics based on metric family. {pull}4075[4075]
 
 *Packetbeat*
 - Remove deprecated geoip. {pull}3766[3766]
@@ -78,6 +80,9 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Make system process metricset honor the cpu_ticks config option. {issue}3590[3590]
 - Support common.Time in mapstriface.toTime() {pull}3812[3812]
 - Fixing panic on prometheus collector when label has , {pull}3947[3947]
+- Fix MongoDB dbstats fields mapping. {pull}4025[4025]
+- Fixing prometheus collector to aggregate metrics based on metric family. {pull}4075[4075]
+
 *Packetbeat*
 
 *Winlogbeat*
@@ -114,6 +119,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Restructure input.Event to be inline with outputs.Data {pull}3823[3823]
 - Add base for supporting prospector level processors {pull}3853[3853]
 - Add auditd module for reading audit logs on Linux. {pull}3750[3750] {pull}3941[3941]
+- Add filebeat.config.path as replacement for config_dir. {pull}4051[4051]
 
 *Heartbeat*
 
@@ -282,6 +288,7 @@ https://github.com/elastic/beats/compare/v5.0.2...v5.1.1[View commits]
 
 - Add add_cloud_metadata processor for collecting cloud provider metadata. {pull}2728[2728]
 - Added decode_json_fields processor for decoding fields containing JSON strings. {pull}2605[2605]
+- Add Tencent Cloud provider for add_cloud_metadata processor. {pull}4023[4023]
 
 *Metricbeat*
 

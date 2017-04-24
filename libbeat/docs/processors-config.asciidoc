@@ -267,11 +267,12 @@ The `add_cloud_metadata` processor enriches each event with instance metadata
 from the machine's hosting provider. At startup it will detect the hosting
 provider and cache the instance metadata.
 
-Three cloud providers are supported.
+The following cloud providers are supported:
 
 - Amazon Elastic Compute Cloud (EC2)
 - Digital Ocean
 - Google Compute Engine (GCE)
+- https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
 
 The simple configuration below enables the processor.
 
@@ -337,6 +338,22 @@ _GCE_
       "machine_type": "projects/1234567890/machineTypes/f1-micro",
       "project_id": "my-dev",
       "provider": "gce"
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+_Tencent Clound_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "meta": {
+    "cloud": {
+      "availability_zone": "gz-azone2",
+      "instance_id": "ins-qcloudv5",
+      "provider": "qcloud",
+      "region": "china-south-gz"
     }
   }
 }

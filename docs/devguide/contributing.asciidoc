@@ -94,7 +94,7 @@ make update
 
 This command has the following dependencies:
 
-* Python {python}
+* Python >= {python}
 * https://virtualenv.pypa.io/en/latest/[virtualenv] for Python
 
 Virtualenv can be installed with the command `easy_install virtualenv` or `pip install virtualenv`.
@@ -113,9 +113,9 @@ make testsuite
 
 Running the testsuite has the following requirements:
 
-* Python {python}
-* Docker {docker}
-* Docker-compose {docker-compose}
+* Python >= {python}
+* Docker >= {docker}
+* Docker-compose >= {docker-compose}
 
 
 [float]

@@ -20,11 +20,11 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
-#- module: ceph
-#  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk"]
-#  enabled: true
-#  period: 10s
-#  hosts: ["localhost:5000"]
+- module: ceph
+  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost:5000"]
 ----
 
 [float]

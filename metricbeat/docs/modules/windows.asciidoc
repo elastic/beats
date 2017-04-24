@@ -17,11 +17,11 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
-#- module: windows
-#  metricsets: ["perfmon"]
-#  enabled: true
-#  period: 10s
-#  perfmon.counters:
+- module: windows
+  metricsets: ["perfmon"]
+  enabled: false
+  period: 10s
+  perfmon.counters:
 ----
 
 [float]
