@@ -82,9 +82,10 @@ filebeat.prospectors:
   # This is especially useful for multiline log messages which can get large.
   #max_bytes: 10485760
 
-  # Maximum depth for "**" patterns. When it's set to a positive value, "**"
-  # patterns are expanded up to the specified depth.
-  #recursive_glob_depth: 16
+  ### Recursive glob configuration
+
+  # Expand "**" patterns into regular glob patterns.
+  #recursive_glob.enabled: true
 
   ### JSON configuration
 

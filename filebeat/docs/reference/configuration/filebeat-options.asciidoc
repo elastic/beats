@@ -48,12 +48,13 @@ using the optional <<recursive_glob_depth>> setting.
 Filebeat starts a harvester for each file that it finds under the specified
 paths. You can specify one path per line. Each line begins with a dash (-).
 
-===== recursive_glob_depth
+===== recursive_glob
 
-Enable expanding `**` into recursive glob patterns. A positive value results in
+*`enabled`*:: Enable expanding `**` into recursive glob patterns. With this feature enabled,
 the rightmost `**` in each path is expanded into a fixed
 number of glob patterns. For example: `/foo/**` expands to `/foo`, `/foo/*`,
-`/foo/*/*`, and so on. The default is 0, i.e., the feature is disabled.
+`/foo/*/*`, and so on. The feature is disabled by default, and if enabled it expands a single `**`
+into a 32-level deep `*` pattern.
 
 ===== encoding
 
