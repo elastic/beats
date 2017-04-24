@@ -188,6 +188,8 @@ To compile the Beat, make sure you are in the Beat directory (`$GOPATH/src/githu
 make
 ---------
 
+NOTE: we don't support the `-j` option for make at the moment.
+
 Running this command creates the binary called `countbeat` in `$GOPATH/src/github.com/{user}/countbeat`.
 
 Now run the Beat:

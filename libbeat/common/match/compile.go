@@ -88,14 +88,21 @@ func compilePrefixNumDate(r *syntax.Regexp) (stringMatcher, error) {
 	i++
 
 	for i < len(r.Sub) {
-		seps = append(seps, []byte(string(r.Sub[i].Rune)))
+		lit := []byte(string(r.Sub[i].Rune))
 		i++
 
+		// capture literal suffix
+		if i == len(r.Sub) {
+			m.suffix = lit
+			break
+		}
+
+		seps = append(seps, lit)
 		digits = append(digits, digitLen(r.Sub[i]))
 		i++
 	}
 
-	minLen := len(m.prefix)
+	minLen := len(m.prefix) + len(m.suffix)
 	for _, d := range digits {
 		minLen += d
 	}

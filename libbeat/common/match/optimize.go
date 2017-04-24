@@ -11,6 +11,7 @@ var transformations = []trans{
 	trimRight,
 	unconcat,
 	concatRepetition,
+	flattenRepetition,
 }
 
 // optimize runs minimal regular expression optimizations
@@ -112,8 +113,8 @@ func unconcat(r *syntax.Regexp) (bool, *syntax.Regexp) {
 	return false, r
 }
 
-// concatRepetition concatenates multiple repeated sub-patterns into
-// a repetition of exactly N.
+// concatRepetition concatenates 2 consecutive repeated sub-patterns into a
+// repetition of length 2.
 func concatRepetition(r *syntax.Regexp) (bool, *syntax.Regexp) {
 
 	if r.Op != syntax.OpConcat {
@@ -203,4 +204,55 @@ func concatRepetition(r *syntax.Regexp) (bool, *syntax.Regexp) {
 		Flags: r.Flags,
 	}
 	return changed, r
+}
+
+// flattenRepetition flattens nested repetitions
+func flattenRepetition(r *syntax.Regexp) (bool, *syntax.Regexp) {
+	if r.Op != syntax.OpConcat {
+		// don't iterate sub-expressions if top-level is no OpConcat
+		return false, r
+	}
+
+	sub := r.Sub
+	inRepetition := false
+	if isConcatRepetition(r) {
+		sub = sub[:1]
+		inRepetition = true
+
+		// create flattened regex repetition mulitplying count
+		// if nexted expression is also a repetition
+		if s := sub[0]; isConcatRepetition(s) {
+			count := len(s.Sub) * len(r.Sub)
+			return true, &syntax.Regexp{
+				Op:    syntax.OpRepeat,
+				Sub:   s.Sub[:1],
+				Min:   count,
+				Max:   count,
+				Flags: r.Flags | s.Flags,
+			}
+		}
+	}
+
+	// recursively check if we can flatten sub-expressions
+	changed := false
+	for i, s := range sub {
+		upd, tmp := flattenRepetition(s)
+		changed = changed || upd
+		sub[i] = tmp
+	}
+
+	if !changed {
+		return false, r
+	}
+
+	// fix up top-level repetition with modified one
+	tmp := *r
+	if inRepetition {
+		for i := range r.Sub {
+			tmp.Sub[i] = sub[0]
+		}
+	} else {
+		tmp.Sub = sub
+	}
+	return changed, &tmp
 }

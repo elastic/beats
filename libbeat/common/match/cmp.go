@@ -90,7 +90,7 @@ func isPrefixNumDate(r *syntax.Regexp) bool {
 		i++
 	}
 
-	// check digits
+	// check starts with digits `\d{n}` or `[0-9]{n}`
 	if !isMultiDigits(r.Sub[i]) {
 		return false
 	}
@@ -102,6 +102,11 @@ func isPrefixNumDate(r *syntax.Regexp) bool {
 			return false
 		}
 		i++
+
+		// regex has 'OpLiteral' suffix, without any more digits/patterns following
+		if i == len(r.Sub) {
+			return true
+		}
 
 		// check digits
 		if !isMultiDigits(r.Sub[i]) {
