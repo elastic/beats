@@ -13,17 +13,17 @@ import (
 
 var (
 	defaultConfig = prospectorConfig{
-		Enabled:            true,
-		DocumentType:       "log",
-		IgnoreOlder:        0,
-		ScanFrequency:      10 * time.Second,
-		InputType:          cfg.DefaultInputType,
-		CleanInactive:      0,
-		CleanRemoved:       true,
-		HarvesterLimit:     0,
-		Symlinks:           false,
-		TailFiles:          false,
-		RecursiveGlobDepth: 0,
+		Enabled:        true,
+		DocumentType:   "log",
+		IgnoreOlder:    0,
+		ScanFrequency:  10 * time.Second,
+		InputType:      cfg.DefaultInputType,
+		CleanInactive:  0,
+		CleanRemoved:   true,
+		HarvesterLimit: 0,
+		Symlinks:       false,
+		TailFiles:      false,
+		recursiveGlob:  &recursiveGlobConfig{},
 	}
 )
 
@@ -46,7 +46,11 @@ type prospectorConfig struct {
 	Module               string                  `config:"_module_name"`  // hidden option to set the module name
 	Fileset              string                  `config:"_fileset_name"` // hidden option to set the fileset name
 	Processors           processors.PluginConfig `config:"processors"`
-	RecursiveGlobDepth   uint8                   `config:"recursive_glob_depth"`
+	recursiveGlob        *recursiveGlobConfig    `config:"recursive_glob"`
+}
+
+type recursiveGlobConfig struct {
+	enabled bool `config:"enabled"`
 }
 
 func (config *prospectorConfig) Validate() error {
