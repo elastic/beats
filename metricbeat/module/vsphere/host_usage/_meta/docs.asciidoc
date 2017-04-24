@@ -1,3 +1,0 @@
-=== vsphere host_usage MetricSet
-
-This is the host_usage metricset of the module vsphere.

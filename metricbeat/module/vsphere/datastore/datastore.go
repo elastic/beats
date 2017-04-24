@@ -1,12 +1,12 @@
-package virtualmachine_usage
+package datastore
 
 import (
 	"context"
 	"errors"
 	"net/url"
-	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/vmware/govmomi"
@@ -18,7 +18,7 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("vsphere", "virtualmachine_usage", New); err != nil {
+	if err := mb.Registry.AddMetricSet("vsphere", "datastore", New); err != nil {
 		panic(err)
 	}
 }
@@ -29,6 +29,8 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+
+	logp.Warn("EXPERIMENTAL: The vsphere datastore metricset is experimental")
 
 	config := struct {
 		Username string `config:"username"`
@@ -75,79 +77,57 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	}
 
 	events := []common.MapStr{}
-	var wg sync.WaitGroup
 
 	for _, dc := range dcs {
 
 		f.SetDatacenter(dc)
 
-		// Get all virtual machines
-		vms, err := f.VirtualMachineList(ctx, "*")
+		dss, err := f.DatastoreList(ctx, "*")
 		if err != nil {
 			return nil, err
 		}
 
 		pc := property.DefaultCollector(m.Client)
 
-		// Convert virtual machines into list of references
+		// Convert datastores into list of references
 		var refs []types.ManagedObjectReference
-		for _, vm := range vms {
-			refs = append(refs, vm.Reference())
+		for _, ds := range dss {
+			refs = append(refs, ds.Reference())
 		}
 
-		// Get summary property (VirtualMachineSummary)
-		var vmt []mo.VirtualMachine
-		err = pc.Retrieve(ctx, refs, []string{"summary"}, &vmt)
+		// Retrieve summary property
+		var dst []mo.Datastore
+		err = pc.Retrieve(ctx, refs, []string{"summary"}, &dst)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, vm := range vmt {
+		for _, ds := range dst {
 
-			wg.Add(1)
+			usedSpacePercent := 100 * (ds.Summary.Capacity - ds.Summary.FreeSpace) / ds.Summary.Capacity
+			usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
 
-			go func(vm mo.VirtualMachine) {
-
-				defer wg.Done()
-
-				freeMemory := (int64(vm.Summary.Config.MemorySizeMB) * 1024) - (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024)
-
-				event := common.MapStr{
-					"datacenter": dc.Name(),
-					"name":       vm.Summary.Config.Name,
-					"cpu": common.MapStr{
-						"used": common.MapStr{
-							"mhz": vm.Summary.QuickStats.OverallCpuUsage,
-						},
+			event := common.MapStr{
+				"datacenter": dc.Name(),
+				"name":       ds.Summary.Name,
+				"fstype":     ds.Summary.Type,
+				"capacity": common.MapStr{
+					"total": common.MapStr{
+						"bytes": ds.Summary.Capacity,
 					},
-					"memory": common.MapStr{
-						"used": common.MapStr{
-							"guest": common.MapStr{
-								"bytes": vm.Summary.QuickStats.GuestMemoryUsage * 1024,
-							},
-							"host": common.MapStr{
-								"bytes": vm.Summary.QuickStats.HostMemoryUsage * 1024,
-							},
-						},
-						"total": common.MapStr{
-							"guest": common.MapStr{
-								"bytes": vm.Summary.Config.MemorySizeMB * 1024,
-							},
-						},
-						"free": common.MapStr{
-							"guest": common.MapStr{
-								"bytes": freeMemory,
-							},
-						},
+					"free": common.MapStr{
+						"bytes": ds.Summary.FreeSpace,
 					},
-				}
+					"used": common.MapStr{
+						"bytes": usedSpaceBytes,
+						"pct":   usedSpacePercent,
+					},
+				},
+			}
 
-				events = append(events, event)
-			}(vm)
+			events = append(events, event)
 		}
 	}
-
-	wg.Wait()
 
 	return events, nil
 }

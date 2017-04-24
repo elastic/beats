@@ -1,7 +1,7 @@
-- name: virtualmachine_usage
+- name: host
   type: group
   description: >
-    virtualmachine_usage
+    host
   fields:
     - name: datacenter
       type: keyword
@@ -10,28 +10,31 @@
     - name: name
       type: keyword
       description: >
-        Virtual Machine name
+        Host name
     - name: cpu.used.mhz
       type: long
       description: >
         Used CPU in Mhz
-    - name: memory.used.guest.bytes
+    - name: cpu.total.mhz
       type: long
       description: >
-        Used Memory of Guest in bytes
+        Total CPU in Mhz
+    - name: cpu.free.mhz
+      type: long
+      description: >
+        Free CPU in Mhz
+    - name: memory.used.bytes
+      type: long
+      description: >
+        Used Memory in bytes
       format: bytes
-    - name: memory.used.host.bytes
+    - name: memory.total.bytes
       type: long
       description: >
-        Used Memory of Host in bytes
+        Total Memory in bytes
       format: bytes
-    - name: memory.total.guest.bytes
+    - name: memory.free.bytes
       type: long
       description: >
-        Total Memory of Guest in bytes
-      format: bytes
-    - name: memory.free.guest.bytes
-      type: long
-      description: >
-        Free Memory of Guest in bytes
+        Free Memory in bytes
       format: bytes

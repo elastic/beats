@@ -1,3 +1,0 @@
-=== vsphere virtualmachine_usage MetricSet
-
-This is the virtualmachine_usage metricset of the module vsphere.

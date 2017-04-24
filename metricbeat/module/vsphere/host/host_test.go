@@ -1,4 +1,4 @@
-package virtualmachine_usage
+package host
 
 import (
 	"github.com/stretchr/testify/assert"

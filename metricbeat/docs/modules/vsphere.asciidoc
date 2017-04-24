@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-vsphere]]
 == vsphere Module
 
-This is the vsphere Module.
+This is the vsphere Module that uses the library Govmomi (https://github.com/vmware/govmomi) to collect metrics from any Vmware SDK URL (ESXi/VCenter). This library is built for and tested against ESXi and vCenter 5.5, 6.0 and 6.5.
 
 
 
@@ -18,16 +18,16 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
-#- module: vsphere
-#  metricsets: ["datastore_usage"]
-#  enabled: true
-#  period: 10s
-#  hosts: ["https://localhost/sdk"]
+- module: vsphere
+  metricsets: ["datastore, host, virtualmachine"]
+  enabled: false
+  period: 10s
+  hosts: ["https://localhost/sdk"]
 
-#  username: "user"
-#  password: "password"
+  username: "user"
+  password: "password"
   # If insecure is true, don't verify the server's certificate chain
-#  insecure: false
+  insecure: false
 ----
 
 [float]
@@ -35,15 +35,15 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* <<metricbeat-metricset-vsphere-datastore_usage,datastore_usage>>
+* <<metricbeat-metricset-vsphere-datastore,datastore>>
 
-* <<metricbeat-metricset-vsphere-host_usage,host_usage>>
+* <<metricbeat-metricset-vsphere-host,host>>
 
-* <<metricbeat-metricset-vsphere-virtualmachine_usage,virtualmachine_usage>>
+* <<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>>
 
-include::vsphere/datastore_usage.asciidoc[]
+include::vsphere/datastore.asciidoc[]
 
-include::vsphere/host_usage.asciidoc[]
+include::vsphere/host.asciidoc[]
 
-include::vsphere/virtualmachine_usage.asciidoc[]
+include::vsphere/virtualmachine.asciidoc[]
 

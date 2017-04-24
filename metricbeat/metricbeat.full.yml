@@ -352,16 +352,16 @@ metricbeat.modules:
   #password: foobared
 
 #------------------------------- vsphere Module ------------------------------
-#- module: vsphere
-#  metricsets: ["datastore_usage"]
-#  enabled: true
-#  period: 10s
-#  hosts: ["https://localhost/sdk"]
+- module: vsphere
+  metricsets: ["datastore, host, virtualmachine"]
+  enabled: false
+  period: 10s
+  hosts: ["https://localhost/sdk"]
 
-#  username: "user"
-#  password: "password"
+  username: "user"
+  password: "password"
   # If insecure is true, don't verify the server's certificate chain
-#  insecure: false
+  insecure: false
 
 #------------------------------- Windows Module ------------------------------
 #- module: windows

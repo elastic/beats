@@ -1,6 +1,6 @@
 {
 	"comment": "",
-	"ignore": "test",
+	"ignore": "test github.com/elastic/beats",
 	"package": [
 		{
 			"checksumSHA1": "VK+9fon/pJt+ZebKV+iCx3ILZFI=",

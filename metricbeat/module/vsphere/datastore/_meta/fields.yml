@@ -1,7 +1,7 @@
-- name: datastore_usage
+- name: datastore
   type: group
   description: >
-    datastore_usage
+    datastore
   fields:
     - name: datacenter
       type: keyword
@@ -34,4 +34,5 @@
       type: long
       description: >
         Used percent of the datastore
+      format: percent
 

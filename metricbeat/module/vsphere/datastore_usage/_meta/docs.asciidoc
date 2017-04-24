@@ -1,3 +1,0 @@
-=== vsphere datastore_usage MetricSet
-
-This is the datastore_usage metricset of the module vsphere.

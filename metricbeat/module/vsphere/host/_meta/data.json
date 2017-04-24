@@ -7,12 +7,12 @@
     "metricset":{
         "host":"localhost",
         "module":"vsphere",
-        "name":"datastore_usage",
+        "name":"host",
         "rtt":44269
     },
     "vsphere":{
-        "datastore_usage":{
-            "example": "datastore_usage"
+        "host":{
+            "example": "host"
         }
     },
     "type":"metricsets"

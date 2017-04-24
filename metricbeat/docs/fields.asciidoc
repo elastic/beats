@@ -8104,14 +8104,14 @@ vsphere Module
 
 
 [float]
-== datastore_usage Fields
+== datastore Fields
 
-datastore_usage
+datastore
 
 
 
 [float]
-=== vsphere.datastore_usage.datacenter
+=== vsphere.datastore.datacenter
 
 type: keyword
 
@@ -8119,7 +8119,7 @@ Datacenter name
 
 
 [float]
-=== vsphere.datastore_usage.name
+=== vsphere.datastore.name
 
 type: keyword
 
@@ -8127,7 +8127,7 @@ Datastore name
 
 
 [float]
-=== vsphere.datastore_usage.fstype
+=== vsphere.datastore.fstype
 
 type: keyword
 
@@ -8135,7 +8135,7 @@ Filesystem type
 
 
 [float]
-=== vsphere.datastore_usage.capacity.total.bytes
+=== vsphere.datastore.capacity.total.bytes
 
 type: long
 
@@ -8145,7 +8145,7 @@ Total bytes of the datastore
 
 
 [float]
-=== vsphere.datastore_usage.capacity.free.bytes
+=== vsphere.datastore.capacity.free.bytes
 
 type: long
 
@@ -8155,7 +8155,7 @@ Free bytes of the datastore
 
 
 [float]
-=== vsphere.datastore_usage.capacity.used.bytes
+=== vsphere.datastore.capacity.used.bytes
 
 type: long
 
@@ -8165,22 +8165,24 @@ Used bytes of the datastore
 
 
 [float]
-=== vsphere.datastore_usage.capacity.used.pct
+=== vsphere.datastore.capacity.used.pct
 
 type: long
+
+format: percent
 
 Used percent of the datastore
 
 
 [float]
-== host_usage Fields
+== host Fields
 
-host_usage
+host
 
 
 
 [float]
-=== vsphere.host_usage.datacenter
+=== vsphere.host.datacenter
 
 type: keyword
 
@@ -8188,7 +8190,7 @@ Datacenter name
 
 
 [float]
-=== vsphere.host_usage.name
+=== vsphere.host.name
 
 type: keyword
 
@@ -8196,7 +8198,7 @@ Host name
 
 
 [float]
-=== vsphere.host_usage.cpu.used.mhz
+=== vsphere.host.cpu.used.mhz
 
 type: long
 
@@ -8204,7 +8206,7 @@ Used CPU in Mhz
 
 
 [float]
-=== vsphere.host_usage.cpu.total.mhz
+=== vsphere.host.cpu.total.mhz
 
 type: long
 
@@ -8212,7 +8214,7 @@ Total CPU in Mhz
 
 
 [float]
-=== vsphere.host_usage.cpu.free.mhz
+=== vsphere.host.cpu.free.mhz
 
 type: long
 
@@ -8220,7 +8222,7 @@ Free CPU in Mhz
 
 
 [float]
-=== vsphere.host_usage.memory.used.bytes
+=== vsphere.host.memory.used.bytes
 
 type: long
 
@@ -8230,7 +8232,7 @@ Used Memory in bytes
 
 
 [float]
-=== vsphere.host_usage.memory.total.bytes
+=== vsphere.host.memory.total.bytes
 
 type: long
 
@@ -8240,7 +8242,7 @@ Total Memory in bytes
 
 
 [float]
-=== vsphere.host_usage.memory.free.bytes
+=== vsphere.host.memory.free.bytes
 
 type: long
 
@@ -8250,14 +8252,14 @@ Free Memory in bytes
 
 
 [float]
-== virtualmachine_usage Fields
+== virtualmachine Fields
 
-virtualmachine_usage
+virtualmachine
 
 
 
 [float]
-=== vsphere.virtualmachine_usage.datacenter
+=== vsphere.virtualmachine.datacenter
 
 type: keyword
 
@@ -8265,7 +8267,7 @@ Datacenter name
 
 
 [float]
-=== vsphere.virtualmachine_usage.name
+=== vsphere.virtualmachine.name
 
 type: keyword
 
@@ -8273,7 +8275,7 @@ Virtual Machine name
 
 
 [float]
-=== vsphere.virtualmachine_usage.cpu.used.mhz
+=== vsphere.virtualmachine.cpu.used.mhz
 
 type: long
 
@@ -8281,7 +8283,7 @@ Used CPU in Mhz
 
 
 [float]
-=== vsphere.virtualmachine_usage.memory.used.guest.bytes
+=== vsphere.virtualmachine.memory.used.guest.bytes
 
 type: long
 
@@ -8291,7 +8293,7 @@ Used Memory of Guest in bytes
 
 
 [float]
-=== vsphere.virtualmachine_usage.memory.used.host.bytes
+=== vsphere.virtualmachine.memory.used.host.bytes
 
 type: long
 
@@ -8301,7 +8303,7 @@ Used Memory of Host in bytes
 
 
 [float]
-=== vsphere.virtualmachine_usage.memory.total.guest.bytes
+=== vsphere.virtualmachine.memory.total.guest.bytes
 
 type: long
 
@@ -8311,7 +8313,7 @@ Total Memory of Guest in bytes
 
 
 [float]
-=== vsphere.virtualmachine_usage.memory.free.guest.bytes
+=== vsphere.virtualmachine.memory.free.guest.bytes
 
 type: long
 

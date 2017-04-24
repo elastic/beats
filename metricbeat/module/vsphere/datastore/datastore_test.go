@@ -1,4 +1,4 @@
-package host_usage
+package datastore
 
 import (
 	"github.com/stretchr/testify/assert"

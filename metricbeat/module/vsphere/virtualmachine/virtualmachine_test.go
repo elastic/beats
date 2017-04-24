@@ -1,4 +1,4 @@
-package datastore_usage
+package virtualmachine
 
 import (
 	"github.com/stretchr/testify/assert"
