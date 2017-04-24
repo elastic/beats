@@ -106,7 +106,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		for _, hs := range hst {
 			totalCpu := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
 			freeCpu := int64(totalCpu) - int64(hs.Summary.QuickStats.OverallCpuUsage)
-			freeMemory := int64(hs.Summary.Hardware.MemorySize) - (int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024)
+			freeMemory := int64(hs.Summary.Hardware.MemorySize) - (int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024)
 
 			event := common.MapStr{
 				"datacenter": dc.Name(),
@@ -124,7 +124,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 				},
 				"memory": common.MapStr{
 					"used": common.MapStr{
-						"bytes": hs.Summary.QuickStats.OverallMemoryUsage * 1024,
+						"bytes": hs.Summary.QuickStats.OverallMemoryUsage * 1024 * 1024,
 					},
 					"total": common.MapStr{
 						"bytes": hs.Summary.Hardware.MemorySize,

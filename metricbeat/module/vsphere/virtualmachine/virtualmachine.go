@@ -113,7 +113,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 				defer wg.Done()
 
-				freeMemory := (int64(vm.Summary.Config.MemorySizeMB) * 1024) - (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024)
+				freeMemory := (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024) - (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024)
 
 				event := common.MapStr{
 					"datacenter": dc.Name(),
@@ -126,15 +126,15 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 					"memory": common.MapStr{
 						"used": common.MapStr{
 							"guest": common.MapStr{
-								"bytes": vm.Summary.QuickStats.GuestMemoryUsage * 1024,
+								"bytes": vm.Summary.QuickStats.GuestMemoryUsage * 1024 * 1024,
 							},
 							"host": common.MapStr{
-								"bytes": vm.Summary.QuickStats.HostMemoryUsage * 1024,
+								"bytes": vm.Summary.QuickStats.HostMemoryUsage * 1024 * 1024,
 							},
 						},
 						"total": common.MapStr{
 							"guest": common.MapStr{
-								"bytes": vm.Summary.Config.MemorySizeMB * 1024,
+								"bytes": vm.Summary.Config.MemorySizeMB * 1024 * 1024,
 							},
 						},
 						"free": common.MapStr{
