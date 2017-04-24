@@ -1,8 +1,15 @@
 [[multiline-examples]]
 == Managing Multiline Messages
 
-You can specify `multiline` settings in the +{beatname_lc}.yml+ file to control how Filebeat deals with messages that
-span multiple lines. At a minimum, you need to configure:
+The files harvested by {beatname_uc} may contain messages that span multiple lines of text. In order to correctly handle
+these multiline events, you need to configure `multiline` settings in the +{beatname_lc}.yml+ file to specify which
+lines are part of a single event. 
+
+IMPORTANT: If you are sending multiline events to Logstash, use the options described here to handle multiline events
+before sending the event data to Logstash. Trying to implement multiline event handling in Logstash (for example, by
+using the Logstash multiline codec) may result in the mixing of streams and corrupted data. 
+
+At a minimum, you need to configure these `multiline` options:
 
 * the `pattern` option, which specifies a regular expression. Depending on how you configure other multiline options, 
 lines that match the specified regular expression are considered either continuations of a previous line or the start of a new multiline event. You can set the `negate` option to negate the pattern.
