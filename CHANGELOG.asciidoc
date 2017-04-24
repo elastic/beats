@@ -125,6 +125,7 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 - Fix potential elasticsearch output URL parsing error if protocol scheme is missing. {pull}3671[3671]
 - Improve error message when downloading the dashboards fails. {pull}3805[3805]
 - Downgrade Elasticsearch per batch item failure log to debug level. {issue}3953[3953]
+- Fix panic due to race condition in kafka output. {pull}4098[4098]
 
 *Filebeat*
 
