@@ -117,6 +117,13 @@ func TestDecodeJSON(t *testing.T) {
 			ExpectedMap:  nil,
 		},
 		{
+			// in case the JSON is "null", we should just not panic
+			Text:         `null`,
+			Config:       JSONConfig{MessageKey: "value", AddErrorKey: true},
+			ExpectedText: `null`,
+			ExpectedMap:  common.MapStr{"json_error": "Error decoding JSON: <nil>"},
+		},
+		{
 			// Add key error helps debugging this
 			Text:         `{"message": "test", "value": "`,
 			Config:       JSONConfig{MessageKey: "value", AddErrorKey: true},
