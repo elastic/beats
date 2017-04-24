@@ -1,4 +1,4 @@
-package actions
+package add_cloud_metadata
 
 import (
 	"bytes"
