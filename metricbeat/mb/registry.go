@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -46,6 +47,8 @@ type metricSetFactoryInfo struct {
 // Register contains the factory functions for creating new Modules and new
 // MetricSets.
 type Register struct {
+	//Lock to control concurrent read/writes
+	sync.RWMutex
 	// A map of module name to ModuleFactory.
 	modules map[string]ModuleFactory
 	// A map of module name to nested map of MetricSet name to metricSetFactoryInfo.
@@ -144,9 +147,42 @@ func (r *Register) metricSetFactory(module, name string) (MetricSetFactory, Host
 	return info.factory, info.hostParser, nil
 }
 
+//Modules returns the list of module names that are registered
+func (r *Register) Modules() []string {
+	r.RLock()
+	defer r.RUnlock()
+
+	modules := []string{}
+	for module := range r.modules {
+		modules = append(modules, module)
+	}
+
+	return modules
+}
+
+//MetricSets returns the list of metricsets registered for a given module
+func (r *Register) MetricSets(module string) []string {
+	r.RLock()
+	defer r.RUnlock()
+
+	metricsets := []string{}
+
+	sets, ok := r.metricSets[module]
+	if ok {
+		for name := range sets {
+			metricsets = append(metricsets, name)
+		}
+	}
+
+	return metricsets
+}
+
 // String return a string representation of the registered ModuleFactory's and
 // MetricSetFactory's.
-func (r Register) String() string {
+func (r *Register) String() string {
+	r.RLock()
+	defer r.RUnlock()
+
 	var modules []string
 	for module := range r.modules {
 		modules = append(modules, module)
