@@ -311,6 +311,10 @@ func (r *eventReporter) Error(err error) bool {
 }
 
 func (r *eventReporter) ErrorWith(err error, meta common.MapStr) bool {
+	// Skip nil events without error
+	if err == nil && meta == nil {
+		return true
+	}
 	timestamp := r.start
 	elapsed := time.Duration(0)
 
