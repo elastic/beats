@@ -2188,11 +2188,6 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/vmware/govmomi
---------------------------------------------------------------------
-Apache License
-
-=======
 github.com/matttproud/golang_protobuf_extensions
 --------------------------------------------------------------------
 Apache License
@@ -2223,6 +2218,12 @@ Copyright 2015 The Prometheus Authors
 
 This product includes software developed at
 SoundCloud Ltd. (http://soundcloud.com/).
+
+--------------------------------------------------------------------
+github.com/vmware/govmomi
+--------------------------------------------------------------------
+Apache License
+
 
 --------------------------------------------------------------------
 github.com/davecgh/go-spew
