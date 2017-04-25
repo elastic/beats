@@ -144,6 +144,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Add new MetricSet interfaces for developers (`Closer`, `ReportingFetcher`, and `PushMetricSet`). {pull}3908[3908]
 - Add kubelet module {pull}3916[3916]
 - Add dropwizard module {pull}4022[4022]
+- Adding query APIs for metricsets and modules from metricbeat registry {pull}4102[4102]
 
 *Packetbeat*
 - Add `fields` and `fields_under_root` to packetbeat protocols configurations. {pull}3518[3518]
