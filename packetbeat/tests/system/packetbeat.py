@@ -29,8 +29,7 @@ class BaseTest(TestCase):
                        output="packetbeat.log",
                        extra_args=[],
                        debug_selectors=[],
-                       exit_code=0,
-                       wait_stop=0):
+                       exit_code=0):
         """
         Executes packetbeat on an input pcap file.
         Waits for the process to finish before returning to
@@ -49,7 +48,6 @@ class BaseTest(TestCase):
             "-t",
             "-systemTest",
             "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov"),
-            "-waitstop", str(wait_stop),
         ])
 
         if extra_args:
