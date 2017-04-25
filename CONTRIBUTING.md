@@ -55,7 +55,7 @@ used for development is Golang 1.8.1.
 
 The location where you clone is important. Please clone under the source
 directory of your `GOPATH`. If you don't have `GOPATH` already set, you can
-simply set it to your home directory (`export GOPATH=$HOME`).
+simply set it to the `go` directory in your home (`export GOPATH=$HOME/go`).
 
     $ mkdir -p ${GOPATH}/src/github.com/elastic
     $ cd ${GOPATH}/src/github.com/elastic
@@ -116,4 +116,3 @@ To manage the `vendor/` folder we use
 the govendor documentation on how to add or update vendored dependencies.
 
 In most cases `govendor fetch your/dependency@version +out` will get the job done.
-
