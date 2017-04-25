@@ -57,8 +57,16 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	// Add prospectors created by the modules
 	config.Prospectors = append(config.Prospectors, moduleProspectors...)
 
-	if !config.ConfigProspector.Enabled() && len(config.Prospectors) == 0 {
-		return nil, errors.New("No prospectors defined. What files do you want me to watch?")
+	haveEnabledProspectors := false
+	for _, prospector := range config.Prospectors {
+		if prospector.Enabled() {
+			haveEnabledProspectors = true
+			break
+		}
+	}
+
+	if !config.ConfigProspector.Enabled() && !haveEnabledProspectors {
+		return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
 	}
 
 	if *once && config.ConfigProspector.Enabled() {
