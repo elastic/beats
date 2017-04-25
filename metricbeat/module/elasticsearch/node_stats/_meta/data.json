@@ -1,0 +1,105 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "cluster": {
+            "name": "elasticsearch"
+        },
+        "node": {
+            "name": "OIBwp_5vSAG16PyX6B4eUA"
+        },
+        "node_stats": {
+            "indices": {
+                "docs": {
+                    "count": 2,
+                    "deleted": 0
+                },
+                "segments": {
+                    "count": 2,
+                    "memory": {
+                        "bytes": 3476
+                    }
+                },
+                "store": {
+                    "size": {
+                        "bytes": 8078
+                    }
+                }
+            },
+            "jvm": {
+                "gc": {
+                    "collectors": {
+                        "old": {
+                            "collection": {
+                                "count": 1,
+                                "ms": 71
+                            }
+                        },
+                        "young": {
+                            "collection": {
+                                "count": 4,
+                                "ms": 193
+                            }
+                        }
+                    }
+                },
+                "mem": {
+                    "pools": {
+                        "old": {
+                            "max": {
+                                "bytes": 362414080
+                            },
+                            "peak": {
+                                "bytes": 16151432
+                            },
+                            "peak_max": {
+                                "bytes": 362414080
+                            },
+                            "used": {
+                                "bytes": 16151432
+                            }
+                        },
+                        "survivor": {
+                            "max": {
+                                "bytes": 17432576
+                            },
+                            "peak": {
+                                "bytes": 17432568
+                            },
+                            "peak_max": {
+                                "bytes": 17432576
+                            },
+                            "used": {
+                                "bytes": 17432568
+                            }
+                        },
+                        "young": {
+                            "max": {
+                                "bytes": 139591680
+                            },
+                            "peak": {
+                                "bytes": 139591680
+                            },
+                            "peak_max": {
+                                "bytes": 139591680
+                            },
+                            "used": {
+                                "bytes": 136064336
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:9200",
+        "module": "elasticsearch",
+        "name": "node_stats",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

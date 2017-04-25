@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Icinga Startup Errors", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"size_x\":12,\"size_y\":2,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"a59b5e00-2417-11e7-a83b-d5f4cebac9ff\",\"col\":1,\"row\":1},{\"size_x\":12,\"size_y\":13,\"panelIndex\":2,\"type\":\"search\",\"id\":\"710043e0-2417-11e7-a83b-d5f4cebac9ff\",\"col\":1,\"row\":3,\"columns\":[\"icinga.startup.facility\",\"icinga.startup.severity\",\"icinga.startup.message\"],\"sort\":[\"@timestamp\",\"desc\"]}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+  }
+}

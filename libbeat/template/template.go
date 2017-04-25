@@ -106,12 +106,20 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 		"settings": common.MapStr{
 			"index.refresh_interval": "5s",
 		},
-		"template": t.GetName() + "-*",
 	}
 
-	if t.esVersion.IsMajor(2) {
-		basicStructure.Put("mappings._default_._all.norms.enabled", false)
+	// ES 6 moved from template to index_patterns: https://github.com/elastic/elasticsearch/pull/21009
+	if t.esVersion.major >= 6 {
+		basicStructure.Put("index_patterns", []string{t.GetName() + "-*"})
 	} else {
+		basicStructure.Put("template", t.GetName()+"-*")
+	}
+
+	if t.esVersion.IsMajor(2) || t.esVersion.IsMajor(5) {
+		basicStructure.Put("mappings._default_._all.norms.enabled", false)
+	}
+
+	if t.esVersion.major >= 5 {
 		// Metricbeat exceeds the default of 1000 fields
 		basicStructure.Put("settings.index.mapping.total_fields.limit", defaultTotalFieldsLimit)
 	}

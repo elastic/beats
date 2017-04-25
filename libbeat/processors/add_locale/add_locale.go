@@ -1,4 +1,4 @@
-package actions
+package add_locale
 
 import (
 	"time"

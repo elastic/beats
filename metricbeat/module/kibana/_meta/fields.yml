@@ -1,0 +1,12 @@
+- key: kibana
+  title: "kibana"
+  description: >
+    []experimental
+
+    kibana Module
+  short_config: false
+  fields:
+    - name: kibana
+      type: group
+      description: >
+      fields:

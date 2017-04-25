@@ -64,6 +64,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/actions"
 	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
+	_ "github.com/elastic/beats/libbeat/processors/annotate/kubernetes"
 
 	// Register default monitoring reporting
 	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
@@ -111,7 +112,7 @@ type BeatConfig struct {
 	Logging    logp.Logging              `config:"logging"`
 	Processors processors.PluginConfig   `config:"processors"`
 	Path       paths.Path                `config:"path"`
-	Dashboards *common.Config            `config:"dashboards"`
+	Dashboards *common.Config            `config:"setup.dashboards"`
 	Http       *common.Config            `config:"http"`
 }
 

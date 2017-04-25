@@ -1,0 +1,3 @@
+== Kibana Module
+
+This is the Kibana Module and only tracks the high level metrics. To monitor more Kibana metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.

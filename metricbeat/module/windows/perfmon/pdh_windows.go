@@ -19,6 +19,9 @@ import (
 //sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
 //sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
 //sys _PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
+//sys _PdhGetRawCounterValue(counter PdhCounterHandle, counterType *uint32, value *PdhRawCounter) (errcode error) [failretval!=0] = pdh.PdhGetRawCounterValue
+//sys _PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhCalculateCounterFromRawValue
+//sys _PdhFormatFromRawValue(counterType uint32, format PdhCounterFormat, timeBase *uint64, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhFormatFromRawValue
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
 
 type PdhQueryHandle uintptr
@@ -72,6 +75,36 @@ func PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterForm
 	}
 
 	return counterType, &value, nil
+}
+
+func PdhGetRawCounterValue(counter PdhCounterHandle) (uint32, *PdhRawCounter, error) {
+	var counterType uint32
+	var value PdhRawCounter
+	if err := _PdhGetRawCounterValue(counter, &counterType, &value); err != nil {
+		return 0, nil, PdhErrno(err.(syscall.Errno))
+	}
+
+	return counterType, &value, nil
+}
+
+func PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter) (*PdhCounterValue, error) {
+	var value PdhCounterValue
+	if err := _PdhCalculateCounterFromRawValue(counter, format, rawValue1, rawValue2, &value); err != nil {
+		return nil, PdhErrno(err.(syscall.Errno))
+	}
+
+	return &value, nil
+}
+
+func PdhFormatFromRawValue(format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter) (*PdhCounterValue, error) {
+	var counterType uint32
+	var value PdhCounterValue
+	var timeBase uint64
+	if err := _PdhFormatFromRawValue(counterType, format, &timeBase, rawValue1, rawValue2, &value); err != nil {
+		return nil, PdhErrno(err.(syscall.Errno))
+	}
+
+	return &value, nil
 }
 
 func PdhCloseQuery(query PdhQueryHandle) error {

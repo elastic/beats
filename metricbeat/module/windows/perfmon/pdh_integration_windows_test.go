@@ -165,3 +165,54 @@ func TestFloatOutputFormat(t *testing.T) {
 
 	assert.True(t, okFloat)
 }
+
+func TestRawValues(t *testing.T) {
+	query, err := NewQuery("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer query.Close()
+
+	err = query.AddCounter(processorTimeCounter)
+	if err != nil && err != PDH_NO_MORE_DATA {
+		t.Fatal(err)
+	}
+
+	var values []float64
+
+	for i := 0; i < 2; i++ {
+
+		if err = query.Execute(); err != nil {
+			t.Fatal(err)
+		}
+
+		_, rawvalue1, err := PdhGetRawCounterValue(query.counters[processorTimeCounter])
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		time.Sleep(time.Millisecond * 1000)
+
+		if err = query.Execute(); err != nil {
+			t.Fatal(err)
+		}
+
+		_, rawvalue2, err := PdhGetRawCounterValue(query.counters[processorTimeCounter])
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		value, err := PdhCalculateCounterFromRawValue(query.counters[processorTimeCounter], PdhFmtDouble|PdhFmtNoCap100, rawvalue2, rawvalue1)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		values = append(values, *(*float64)(unsafe.Pointer(&value.LongValue)))
+
+	}
+
+	t.Log(values)
+}

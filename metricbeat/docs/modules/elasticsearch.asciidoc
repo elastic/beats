@@ -1,0 +1,41 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-elasticsearch]]
+== Elasticsearch Module
+
+This is the Elasticsearch Module. The Elasticsearch module contains a minimal set of metrics to enable monitoring of Elasticsearch across multiple versions. To monitor more Elasticsearch metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
+
+
+[float]
+=== Example Configuration
+
+The elasticsearch module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: elasticsearch
+  metricsets: ["node", "node_stats"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost:9200"]
+
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-elasticsearch-node,node>>
+
+* <<metricbeat-metricset-elasticsearch-node_stats,node_stats>>
+
+include::elasticsearch/node.asciidoc[]
+
+include::elasticsearch/node_stats.asciidoc[]
+

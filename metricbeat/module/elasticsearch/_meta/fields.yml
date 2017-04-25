@@ -1,0 +1,16 @@
+- key: elasticsearch
+  title: "elasticsearch"
+  description: >
+    []experimental
+
+    elasticsearch Module
+  short_config: false
+  fields:
+    - name: elasticsearch
+      type: group
+      description: >
+      fields:
+        - name: cluster.name
+          type: keyword
+          description: >
+            Elasticsearch cluster name.

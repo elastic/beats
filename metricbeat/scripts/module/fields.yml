@@ -1,6 +1,8 @@
 - key: {module}
   title: "{module}"
   description: >
+    []experimental
+
     {module} Module
   fields:
     - name: {module}

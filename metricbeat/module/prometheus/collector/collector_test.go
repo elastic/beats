@@ -5,71 +5,139 @@ package collector
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/common"
+
+	"github.com/golang/protobuf/proto"
+	dto "github.com/prometheus/client_model/go"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestDecodeLine(t *testing.T) {
+func TestGetPromEventsFromMetricFamily(t *testing.T) {
+	labels := common.MapStr{
+		"handler": "query",
+	}
 	tests := []struct {
-		Line  string
-		Event PromEvent
+		Family *dto.MetricFamily
+		Event  PromEvent
 	}{
 		{
-			Line: `http_request_duration_microseconds{handler="query",quantile="0.99"} 17`,
-			Event: PromEvent{
-				key:       "http_request_duration_microseconds",
-				value:     int64(17),
-				labelHash: `handler="query",quantile="0.99"`,
-				labels: common.MapStr{
-					"handler":  "query",
-					"quantile": 0.99,
+			Family: &dto.MetricFamily{
+				Name: proto.String("http_request_duration_microseconds"),
+				Help: proto.String("foo"),
+				Type: dto.MetricType_COUNTER.Enum(),
+				Metric: []*dto.Metric{
+					{
+						Label: []*dto.LabelPair{
+							{
+								Name:  proto.String("handler"),
+								Value: proto.String("query"),
+							},
+						},
+						Counter: &dto.Counter{
+							Value: proto.Float64(10),
+						},
+					},
 				},
+			},
+			Event: PromEvent{
+				key: "http_request_duration_microseconds",
+				value: common.MapStr{
+					"value": int64(10),
+				},
+				labelHash: labels.String(),
+				labels:    labels,
 			},
 		},
 		{
-			Line: `http_request_duration_microseconds{handler="query",quantile="0.99"} NaN`,
-			Event: PromEvent{
-				key:       "http_request_duration_microseconds",
-				value:     nil,
-				labelHash: `handler="query",quantile="0.99"`,
-				labels: common.MapStr{
-					"handler":  "query",
-					"quantile": 0.99,
+			Family: &dto.MetricFamily{
+				Name: proto.String("http_request_duration_microseconds"),
+				Help: proto.String("foo"),
+				Type: dto.MetricType_GAUGE.Enum(),
+				Metric: []*dto.Metric{
+					{
+						Gauge: &dto.Gauge{
+							Value: proto.Float64(10),
+						},
+					},
 				},
+			},
+			Event: PromEvent{
+				key: "http_request_duration_microseconds",
+				value: common.MapStr{
+					"value": float64(10),
+				},
+				labelHash: "#",
 			},
 		},
 		{
-			Line: `http_request_duration_microseconds{handler="query",quantile="0.99"} 13.2`,
-			Event: PromEvent{
-				key:       "http_request_duration_microseconds",
-				value:     13.2,
-				labelHash: `handler="query",quantile="0.99"`,
-				labels: common.MapStr{
-					"handler":  "query",
-					"quantile": 0.99,
+			Family: &dto.MetricFamily{
+				Name: proto.String("http_request_duration_microseconds"),
+				Help: proto.String("foo"),
+				Type: dto.MetricType_SUMMARY.Enum(),
+				Metric: []*dto.Metric{
+					{
+						Summary: &dto.Summary{
+							SampleCount: proto.Uint64(10),
+							SampleSum:   proto.Float64(10),
+							Quantile: []*dto.Quantile{
+								{
+									Quantile: proto.Float64(0.99),
+									Value:    proto.Float64(10),
+								},
+							},
+						},
+					},
 				},
+			},
+			Event: PromEvent{
+				key: "http_request_duration_microseconds",
+				value: common.MapStr{
+					"count": uint64(10),
+					"sum":   float64(10),
+					"percentile": common.MapStr{
+						"99": float64(10),
+					},
+				},
+				labelHash: "#",
 			},
 		},
 		{
-			Line: `apiserver_request_count{client="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",code="200",contentType="",resource="elasticsearchclusters",verb="LIST"} 1`,
-			Event: PromEvent{
-				key:       "apiserver_request_count",
-				value:     int64(1),
-				labelHash: `client="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",code="200",contentType="",resource="elasticsearchclusters",verb="LIST"`,
-				labels: common.MapStr{
-					"client":      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
-					"code":        int64(200),
-					"contentType": "",
-					"resource":    "elasticsearchclusters",
-					"verb":        "LIST",
+			Family: &dto.MetricFamily{
+				Name: proto.String("http_request_duration_microseconds"),
+				Help: proto.String("foo"),
+				Type: dto.MetricType_HISTOGRAM.Enum(),
+				Metric: []*dto.Metric{
+					{
+						Histogram: &dto.Histogram{
+							SampleCount: proto.Uint64(10),
+							SampleSum:   proto.Float64(10),
+							Bucket: []*dto.Bucket{
+								{
+									UpperBound:      proto.Float64(0.99),
+									CumulativeCount: proto.Uint64(10),
+								},
+							},
+						},
+					},
 				},
+			},
+			Event: PromEvent{
+				key: "http_request_duration_microseconds",
+				value: common.MapStr{
+					"count": uint64(10),
+					"sum":   float64(10),
+					"bucket": common.MapStr{
+						"0.99": uint64(10),
+					},
+				},
+				labelHash: "#",
 			},
 		},
 	}
 
 	for _, test := range tests {
-		event := NewPromEvent(test.Line)
-		assert.Equal(t, event, test.Event)
+		event := GetPromEventsFromMetricFamily(test.Family)
+		assert.Equal(t, len(event), 1)
+		assert.Equal(t, event[0], test.Event)
 	}
 }

@@ -52,9 +52,9 @@ collect-docs: python-env
 .PHONY: configs
 configs: python-env
 	cat ${ES_BEATS}/metricbeat/_meta/common.yml > _meta/beat.yml
-	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEAT_NAME} $(PWD) >> _meta/beat.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} $(PWD) >> _meta/beat.yml
 	cat ${ES_BEATS}/metricbeat/_meta/common.full.yml > _meta/beat.full.yml
-	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/metricbeat/scripts/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.full.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.full.yml
 
 # Generates imports for all modules and metricsets
 .PHONY: imports
@@ -87,3 +87,15 @@ create-metricset:
 .PHONY: generate-json
 generate-json: build-image
 	 ${DOCKER_COMPOSE} run beat go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data
+
+.PHONY: run-module
+run-module: ## @testing Runs the given module with exposing the port. Needs $MODULE and $PORT as param
+run-module:
+	${DOCKER_COMPOSE} build ${MODULE}
+	${DOCKER_COMPOSE} run -p ${PORT}:${PORT} ${MODULE}
+
+.PHONY: test-module
+test-module: ## @testing Tests the given module. Needs $MODULE as param an run-module must be started first.
+test-module: python-env
+	go test -tags=integration ${BEAT_PATH}/module/${MODULE}/... -v
+	. ${PYTHON_ENV}/bin/activate && INTEGRATION_TESTS=1 nosetests tests/system/test_${MODULE}.py

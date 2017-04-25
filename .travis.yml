@@ -13,7 +13,7 @@ env:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
     - DOCKER_COMPOSE_VERSION: 1.11.1
-    - &go_version 1.7.4
+    - &go_version 1.8.1
 
 matrix:
   include:

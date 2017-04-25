@@ -63,25 +63,25 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
-#- module: postgresql
-  #metricsets:
+- module: postgresql
+  metricsets:
     # Stats about every PostgreSQL database
-    #- database
+    - database
 
     # Stats about the background writer process's activity
-    #- bgwriter
+    - bgwriter
 
     # Stats about every PostgreSQL process
-    #- activity
+    - activity
 
-  #enabled: true
-  #period: 10s
+  enabled: false
+  period: 10s
 
   # The host must be passed as PostgreSQL URL. Example:
   # postgres://localhost:5432?sslmode=disable
   # The available parameters are documented here:
   # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
-  #hosts: ["postgres://localhost:5432"]
+  hosts: ["postgres://localhost:5432"]
 
   # Username to use when connecting to PostgreSQL. Empty by default.
   #username: user
