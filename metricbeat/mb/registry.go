@@ -45,10 +45,10 @@ type metricSetFactoryInfo struct {
 }
 
 // Register contains the factory functions for creating new Modules and new
-// MetricSets.
+// MetricSets. Registers are thread safe for concurrent usage.
 type Register struct {
-	//Lock to control concurrent read/writes
-	sync.RWMutex
+	// Lock to control concurrent read/writes
+	lock sync.RWMutex
 	// A map of module name to ModuleFactory.
 	modules map[string]ModuleFactory
 	// A map of module name to nested map of MetricSet name to metricSetFactoryInfo.
@@ -67,6 +67,9 @@ func NewRegister() *Register {
 // name is empty, factory is nil, or if a factory has already been registered
 // under the name.
 func (r *Register) AddModule(name string, factory ModuleFactory) error {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+
 	if name == "" {
 		return fmt.Errorf("module name is required")
 	}
@@ -92,6 +95,9 @@ func (r *Register) AddModule(name string, factory ModuleFactory) error {
 // returned if any parameter is empty or nil or if a factory has already been
 // registered under the name.
 func (r *Register) AddMetricSet(module string, name string, factory MetricSetFactory, hostParser ...HostParser) error {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+
 	if module == "" {
 		return fmt.Errorf("module name is required")
 	}
@@ -125,12 +131,18 @@ func (r *Register) AddMetricSet(module string, name string, factory MetricSetFac
 // moduleFactory returns the registered ModuleFactory associated with the
 // given name. It returns nil if no ModuleFactory is registered.
 func (r *Register) moduleFactory(name string) ModuleFactory {
+	r.lock.RLock()
+	defer r.lock.RUnlock()
+
 	return r.modules[strings.ToLower(name)]
 }
 
 // metricSetFactory returns the registered MetricSetFactory associated with the
 // given name. It returns an error if no MetricSetFactory is registered.
 func (r *Register) metricSetFactory(module, name string) (MetricSetFactory, HostParser, error) {
+	r.lock.RLock()
+	defer r.lock.RUnlock()
+
 	module = strings.ToLower(module)
 	name = strings.ToLower(name)
 
@@ -149,10 +161,10 @@ func (r *Register) metricSetFactory(module, name string) (MetricSetFactory, Host
 
 //Modules returns the list of module names that are registered
 func (r *Register) Modules() []string {
-	r.RLock()
-	defer r.RUnlock()
+	r.lock.RLock()
+	defer r.lock.RUnlock()
 
-	modules := []string{}
+	modules := make([]string, 0, len(r.modules))
 	for module := range r.modules {
 		modules = append(modules, module)
 	}
@@ -162,13 +174,14 @@ func (r *Register) Modules() []string {
 
 //MetricSets returns the list of metricsets registered for a given module
 func (r *Register) MetricSets(module string) []string {
-	r.RLock()
-	defer r.RUnlock()
+	r.lock.RLock()
+	defer r.lock.RUnlock()
 
-	metricsets := []string{}
+	var metricsets []string
 
 	sets, ok := r.metricSets[module]
 	if ok {
+		metricsets = make([]string, 0, len(sets))
 		for name := range sets {
 			metricsets = append(metricsets, name)
 		}
@@ -180,8 +193,8 @@ func (r *Register) MetricSets(module string) []string {
 // String return a string representation of the registered ModuleFactory's and
 // MetricSetFactory's.
 func (r *Register) String() string {
-	r.RLock()
-	defer r.RUnlock()
+	r.lock.RLock()
+	defer r.lock.RUnlock()
 
 	var modules []string
 	for module := range r.modules {
