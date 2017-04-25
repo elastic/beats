@@ -64,10 +64,12 @@
             },
             "start_time": "2017-04-03T10:01:56Z"
         },
+        "namespace": "ns",
+        "node": {
+          "name": "localhost"
+        },
         "pod": {
             "name": "nginx-3137573019-pcfzh",
-            "namespace": "ns",
-            "node": "localhost"
         }
     },
     "metricset": {

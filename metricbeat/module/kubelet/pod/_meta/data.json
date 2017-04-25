@@ -6,9 +6,12 @@
         "version": "6.0.0-alpha1"
     },
     "kubelet": {
+        "namespace": "ns",
+        "node": {
+          "name": "localhost",
+        },
         "pod": {
             "name": "nginx-3137573019-pcfzh",
-            "namespace": "ns",
             "network": {
                 "rx": {
                     "bytes": 18999261,
@@ -19,7 +22,6 @@
                     "errors": 0
                 }
             },
-            "node": "localhost",
             "start_time": "2017-04-06T12:09:05Z"
         }
     },

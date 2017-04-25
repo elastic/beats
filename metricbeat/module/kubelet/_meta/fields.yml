@@ -11,3 +11,7 @@
       description: >
         Information and statistics of pods managed by kubelet.
       fields:
+        - name: namespace
+          type: keyword
+          description: >
+            Kubernetes namespace.

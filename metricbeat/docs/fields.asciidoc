@@ -3888,6 +3888,14 @@ Information and statistics of pods managed by kubelet.
 
 
 [float]
+=== kubelet.namespace
+
+type: keyword
+
+Kubernetes namespace.
+
+
+[float]
 == container Fields
 
 kubelet container metrics
@@ -4318,14 +4326,6 @@ kubelet pod metrics
 type: keyword
 
 Pod name
-
-
-[float]
-=== kubelet.pod.namespace
-
-type: keyword
-
-Pod namespace
 
 
 [float]

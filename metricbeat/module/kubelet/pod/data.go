@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/kubelet"
 )
 
@@ -21,10 +22,13 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 
 	for _, pod := range summary.Pods {
 		podEvent := common.MapStr{
-			"name":      pod.PodRef.Name,
-			"namespace": pod.PodRef.Namespace,
-			"node":      node.NodeName,
-
+			mb.ModuleData: common.MapStr{
+				"namespace": pod.PodRef.Namespace,
+				"node": common.MapStr{
+					"name": node.NodeName,
+				},
+			},
+			"name":       pod.PodRef.Name,
 			"start_time": pod.StartTime,
 
 			"network": common.MapStr{

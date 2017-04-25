@@ -23,10 +23,12 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 		for _, container := range pod.Containers {
 			containerEvent := common.MapStr{
 				mb.ModuleData: common.MapStr{
+					"namespace": pod.PodRef.Namespace,
+					"node": common.MapStr{
+						"name": node.NodeName,
+					},
 					"pod": common.MapStr{
-						"name":      pod.PodRef.Name,
-						"namespace": pod.PodRef.Namespace,
-						"node":      node.NodeName,
+						"name": pod.PodRef.Name,
 					},
 				},
 

@@ -7,10 +7,6 @@
       type: keyword
       description: >
         Pod name
-    - name: namespace
-      type: keyword
-      description: >
-        Pod namespace
     - name: node
       type: keyword
       description: >
