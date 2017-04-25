@@ -16,6 +16,8 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
+* <<exported-fields-icinga>>
+* <<exported-fields-kubernetes>>
 * <<exported-fields-log>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
@@ -493,6 +495,37 @@ type: object
 Contains user configurable fields.
 
 
+[float]
+== error Fields
+
+Error fields containing additional info in case of errors.
+
+
+
+[float]
+=== error.message
+
+type: text
+
+Error message.
+
+
+[float]
+=== error.code
+
+type: long
+
+Error code.
+
+
+[float]
+=== error.type
+
+type: keyword
+
+Error type.
+
+
 [[exported-fields-cloud]]
 == Cloud Provider Metadata Fields
 
@@ -542,6 +575,159 @@ Name of the project in Google Cloud.
 === meta.cloud.region
 
 Region in which this host is running.
+
+
+[[exported-fields-icinga]]
+== Icinga Fields
+
+Icinga Module
+
+
+
+[float]
+== icinga Fields
+
+
+
+
+[float]
+== debug Fields
+
+Contains fields for the Icinga debug logs.
+
+
+
+[float]
+=== icinga.debug.facility
+
+type: keyword
+
+Specifies what component of Icinga logged the message.
+
+
+[float]
+=== icinga.debug.severity
+
+type: keyword
+
+Possible values are "debug", "notice", "information", "warning" or "critical".
+
+
+[float]
+=== icinga.debug.message
+
+type: text
+
+The logged message.
+
+
+[float]
+== main Fields
+
+Contains fields for the Icinga main logs.
+
+
+
+[float]
+=== icinga.main.facility
+
+type: keyword
+
+Specifies what component of Icinga logged the message.
+
+
+[float]
+=== icinga.main.severity
+
+type: keyword
+
+Possible values are "debug", "notice", "information", "warning" or "critical".
+
+
+[float]
+=== icinga.main.message
+
+type: text
+
+The logged message.
+
+
+[float]
+== startup Fields
+
+Contains fields for the Icinga startup logs.
+
+
+
+[float]
+=== icinga.startup.facility
+
+type: keyword
+
+Specifies what component of Icinga logged the message.
+
+
+[float]
+=== icinga.startup.severity
+
+type: keyword
+
+Possible values are "debug", "notice", "information", "warning" or "critical".
+
+
+[float]
+=== icinga.startup.message
+
+type: text
+
+The logged message.
+
+
+[[exported-fields-kubernetes]]
+== Kubernetes info Fields
+
+Kubernetes metadata added by the kubernetes processor
+
+
+
+[float]
+=== kubernetes.pod.name
+
+type: keyword
+
+Kubernetes pod name
+
+
+[float]
+=== kubernetes.namespace
+
+type: keyword
+
+Kubernetes namespace
+
+
+[float]
+=== kubernetes.labels
+
+type: object
+
+Kubernetes labels map
+
+
+[float]
+=== kubernetes.annotations
+
+type: object
+
+Kubernetes annotations map
+
+
+[float]
+=== kubernetes.container.name
+
+type: keyword
+
+Kubernetes container name
 
 
 [[exported-fields-log]]

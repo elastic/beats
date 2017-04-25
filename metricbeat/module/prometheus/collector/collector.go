@@ -1,11 +1,14 @@
 package collector
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/prometheus"
 )
 
 const (
@@ -53,36 +56,36 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
-	scanner, err := m.http.FetchScanner()
+	resp, err := m.http.FetchResponse()
+	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
+	families, err := prometheus.GetMetricFamiliesFromResponse(resp)
+
+	if err != nil {
+		return nil, fmt.Errorf("Unable to decode response from prometheus endpoint")
+	}
+
 	eventList := map[string]common.MapStr{}
 
-	// Iterate through all events to gather data
-	for scanner.Scan() {
-		line := scanner.Text()
-		// Skip comment lines
-		if line[0] == '#' {
-			continue
-		}
+	for _, family := range families {
+		promEvents := GetPromEventsFromMetricFamily(family)
 
-		promEvent := NewPromEvent(line)
-		if promEvent.value == nil {
-			continue
-		}
+		for _, promEvent := range promEvents {
+			if _, ok := eventList[promEvent.labelHash]; !ok {
+				eventList[promEvent.labelHash] = common.MapStr{}
 
-		// If MapString for this label group does not exist yet, it is created
-		if _, ok := eventList[promEvent.labelHash]; !ok {
-			eventList[promEvent.labelHash] = common.MapStr{}
+				// Add labels
+				if len(promEvent.labels) > 0 {
+					eventList[promEvent.labelHash]["label"] = promEvent.labels
+				}
 
-			// Add labels
-			if len(promEvent.labels) > 0 {
-				eventList[promEvent.labelHash]["label"] = promEvent.labels
 			}
 
+			eventList[promEvent.labelHash][promEvent.key] = promEvent.value
+
 		}
-		eventList[promEvent.labelHash][promEvent.key] = promEvent.value
 	}
 
 	// Converts hash list to slice

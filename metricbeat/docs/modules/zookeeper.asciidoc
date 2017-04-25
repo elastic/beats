@@ -23,11 +23,11 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
-#- module: zookeeper
-  #metricsets: ["mntr"]
-  #enabled: true
-  #period: 10s
-  #hosts: ["localhost:2181"]
+- module: zookeeper
+  metricsets: ["mntr"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost:2181"]
 ----
 
 [float]

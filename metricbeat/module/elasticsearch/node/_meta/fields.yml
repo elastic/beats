@@ -1,0 +1,22 @@
+- name: node
+  type: group
+  description: >
+    node
+  fields:
+    - name: jvm.memory.heap_init.bytes
+      type: long
+      format: bytes
+      description: >
+        Heap init used by the JVM in bytes.
+    - name: jvm.version
+      type: keyword
+      description: >
+        JVM version.
+    - name: name
+      type: keyword
+      description: >
+        Node name.
+    - name: version
+      type: keyword
+      description: >
+        Node version.

@@ -1,0 +1,19 @@
+{
+    "@timestamp": "2017-04-16T06:42:37.441Z",
+    "beat": {
+        "hostname": "beathost",
+        "name": "beathost",
+        "version": "6.0.0-alpha1"
+    },
+    "dropwizard": {
+        "test": {}
+    },
+    "metricset": {
+        "host": "localhost:8080",
+        "module": "dropwizard",
+        "name": "collector",
+        "namespace": "test",
+        "rtt": 8008
+    },
+    "type": "metricsets"
+}

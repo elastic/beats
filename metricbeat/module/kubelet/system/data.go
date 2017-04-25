@@ -1,8 +1,9 @@
-package node
+package system
 
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/kubelet"

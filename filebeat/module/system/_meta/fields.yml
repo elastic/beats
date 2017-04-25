@@ -2,6 +2,7 @@
   title: "System"
   description: >
     Module for parsing system log files.
+  short_config: true
   fields:
     - name: system
       type: group

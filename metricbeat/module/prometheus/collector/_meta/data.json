@@ -16,7 +16,9 @@
             "label": {
                 "type": "quarantine_completed"
             },
-            "prometheus_local_storage_series_ops_total": 0
+            "prometheus_local_storage_series_ops_total": {
+                "value": 0
+            }
         }
     },
     "type": "metricsets"

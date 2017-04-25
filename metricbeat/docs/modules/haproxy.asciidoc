@@ -32,7 +32,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: haproxy
   metricsets: ["info", "stat"]
-  enabled: true
+  enabled: false
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
 ----

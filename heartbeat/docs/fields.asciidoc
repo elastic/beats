@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-kubernetes>>
 
 --
 [[exported-fields-beat]]
@@ -74,6 +75,37 @@ Arbitrary tags that can be set per Beat and per transaction type.
 type: object
 
 Contains user configurable fields.
+
+
+[float]
+== error Fields
+
+Error fields containing additional info in case of errors.
+
+
+
+[float]
+=== error.message
+
+type: text
+
+Error message.
+
+
+[float]
+=== error.code
+
+type: long
+
+Error code.
+
+
+[float]
+=== error.type
+
+type: keyword
+
+Error type.
 
 
 [[exported-fields-cloud]]
@@ -186,7 +218,7 @@ Service url used by monitor.
 [float]
 === ip
 
-type: keyword
+type: ip
 
 IP of service being monitored. If service is monitored by hostname, the `ip` field contains the resolved ip address for the current host.
 
@@ -325,26 +357,50 @@ required: True
 Boolean indicator if monitor could validate the service to be available.
 
 
+[[exported-fields-kubernetes]]
+== Kubernetes info Fields
+
+Kubernetes metadata added by the kubernetes processor
+
+
+
 [float]
-== error Fields
-
-Reason monitor flagging a service as down.
-
-
-
-[float]
-=== error.type
+=== kubernetes.pod.name
 
 type: keyword
 
-Failure type. For example `io` or `validate`.
+Kubernetes pod name
 
 
 [float]
-=== error.message
+=== kubernetes.namespace
 
-type: text
+type: keyword
 
-Failure description.
+Kubernetes namespace
+
+
+[float]
+=== kubernetes.labels
+
+type: object
+
+Kubernetes labels map
+
+
+[float]
+=== kubernetes.annotations
+
+type: object
+
+Kubernetes annotations map
+
+
+[float]
+=== kubernetes.container.name
+
+type: keyword
+
+Kubernetes container name
 
 

@@ -1,0 +1,33 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-icinga]]
+== Icinga module
+
+This module parses the main, debug and startup log of https://www.icinga.com/products/icinga-2/[Icinga].
+
+[float]
+=== Compatibility
+
+The Icinga module was tested with Icinga >= 2.x on various Linux and Windows
+systems.
+
+This module is not available for macOS
+
+[float]
+=== Icinga fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.
+
+
+[float]
+=== Fields
+
+For a description of each field in the metricset, see the
+<<exported-fields-icinga,exported fields>> section.
+

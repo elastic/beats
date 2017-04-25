@@ -19,6 +19,7 @@ type HTTP struct {
 	base    mb.BaseMetricSet
 	client  *http.Client // HTTP client that is reused across requests.
 	headers map[string]string
+	uri     string
 	method  string
 	body    []byte
 }
@@ -62,6 +63,7 @@ func NewHTTP(base mb.BaseMetricSet) *HTTP {
 		},
 		headers: config.Headers,
 		method:  "GET",
+		uri:     base.HostData().SanitizedURI,
 		body:    nil,
 	}
 }
@@ -77,7 +79,7 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 		reader = bytes.NewReader(h.body)
 	}
 
-	req, err := http.NewRequest(h.method, h.base.HostData().SanitizedURI, reader)
+	req, err := http.NewRequest(h.method, h.uri, reader)
 	if h.base.HostData().User != "" || h.base.HostData().Password != "" {
 		req.SetBasicAuth(h.base.HostData().User, h.base.HostData().Password)
 	}
@@ -100,6 +102,10 @@ func (h *HTTP) SetHeader(key, value string) {
 
 func (h *HTTP) SetMethod(method string) {
 	h.method = method
+}
+
+func (h *HTTP) SetURI(uri string) {
+	h.uri = uri
 }
 
 func (h *HTTP) SetBody(body []byte) {

@@ -1,0 +1,36 @@
+[[beats-reference]]
+= Beats Developer Guide
+
+include::../../libbeat/docs/version.asciidoc[]
+
+:libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
+:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
+:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
+:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
+:heartbeat: http://www.elastic.co/guide/en/beats/heartbeat/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/x-pack/5.2
+:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
+:beatname_lc: beatname
+:beatname_uc: a Beat
+:security: X-Pack Security
+:ES-version: {stack-version}
+:LS-version: {stack-version}
+:Kibana-version: {stack-version}
+:dashboards: https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-{stack-version}.zip
+
+include::./contributing.asciidoc[]
+
+include::./newbeat.asciidoc[]
+
+include::./event-conventions.asciidoc[]
+
+include::./newdashboards.asciidoc[]
+
+include::./new_protocol.asciidoc[]
+
+include::./metricbeat-devguide.asciidoc[]
+
+include::./modules-dev-guide.asciidoc[]
+
+

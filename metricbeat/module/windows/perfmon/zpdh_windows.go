@@ -14,11 +14,14 @@ var _ unsafe.Pointer
 var (
 	modpdh = windows.NewLazySystemDLL("pdh.dll")
 
-	procPdhOpenQueryW               = modpdh.NewProc("PdhOpenQueryW")
-	procPdhAddEnglishCounterW       = modpdh.NewProc("PdhAddEnglishCounterW")
-	procPdhCollectQueryData         = modpdh.NewProc("PdhCollectQueryData")
-	procPdhGetFormattedCounterValue = modpdh.NewProc("PdhGetFormattedCounterValue")
-	procPdhCloseQuery               = modpdh.NewProc("PdhCloseQuery")
+	procPdhOpenQueryW                   = modpdh.NewProc("PdhOpenQueryW")
+	procPdhAddEnglishCounterW           = modpdh.NewProc("PdhAddEnglishCounterW")
+	procPdhCollectQueryData             = modpdh.NewProc("PdhCollectQueryData")
+	procPdhGetFormattedCounterValue     = modpdh.NewProc("PdhGetFormattedCounterValue")
+	procPdhGetRawCounterValue           = modpdh.NewProc("PdhGetRawCounterValue")
+	procPdhCalculateCounterFromRawValue = modpdh.NewProc("PdhCalculateCounterFromRawValue")
+	procPdhFormatFromRawValue           = modpdh.NewProc("PdhFormatFromRawValue")
+	procPdhCloseQuery                   = modpdh.NewProc("PdhCloseQuery")
 )
 
 func _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) {
@@ -56,6 +59,30 @@ func _PdhCollectQueryData(query PdhQueryHandle) (errcode error) {
 
 func _PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValue) (errcode error) {
 	r0, _, _ := syscall.Syscall6(procPdhGetFormattedCounterValue.Addr(), 4, uintptr(counter), uintptr(format), uintptr(unsafe.Pointer(counterType)), uintptr(unsafe.Pointer(value)), 0, 0)
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhGetRawCounterValue(counter PdhCounterHandle, counterType *uint32, value *PdhRawCounter) (errcode error) {
+	r0, _, _ := syscall.Syscall(procPdhGetRawCounterValue.Addr(), 3, uintptr(counter), uintptr(unsafe.Pointer(counterType)), uintptr(unsafe.Pointer(value)))
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) {
+	r0, _, _ := syscall.Syscall6(procPdhCalculateCounterFromRawValue.Addr(), 5, uintptr(counter), uintptr(format), uintptr(unsafe.Pointer(rawValue1)), uintptr(unsafe.Pointer(rawValue2)), uintptr(unsafe.Pointer(value)), 0)
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhFormatFromRawValue(counterType uint32, format PdhCounterFormat, timeBase *uint64, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) {
+	r0, _, _ := syscall.Syscall6(procPdhFormatFromRawValue.Addr(), 6, uintptr(counterType), uintptr(format), uintptr(unsafe.Pointer(timeBase)), uintptr(unsafe.Pointer(rawValue1)), uintptr(unsafe.Pointer(rawValue2)), uintptr(unsafe.Pointer(value)))
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}

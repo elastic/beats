@@ -1,83 +1,96 @@
 package collector
 
 import (
+	"math"
 	"strconv"
-	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
+
+	dto "github.com/prometheus/client_model/go"
 )
 
 type PromEvent struct {
 	key       string
-	value     interface{}
+	value     common.MapStr
 	labels    common.MapStr
 	labelHash string
 }
 
-// NewPromEvent creates a prometheus event based on the given string
-func NewPromEvent(line string) PromEvent {
-	// Separate key and value
-	splitPos := strings.LastIndex(line, " ")
-	split := []string{line[:splitPos], line[splitPos+1:]}
+func GetPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
+	var events []PromEvent
 
-	promEvent := PromEvent{
-		key:       split[0],
-		labelHash: "_", // _ represents empty labels
+	name := *mf.Name
+	metrics := mf.Metric
+	for _, metric := range metrics {
+		event := PromEvent{
+			key:       name,
+			labelHash: "#",
+		}
+		value := common.MapStr{}
+		labels := metric.Label
+
+		if len(labels) != 0 {
+			tagsMap := common.MapStr{}
+			for _, label := range labels {
+				if label.GetName() != "" && label.GetValue() != "" {
+					tagsMap[label.GetName()] = label.GetValue()
+				}
+			}
+			event.labels = tagsMap
+			event.labelHash = tagsMap.String()
+
+		}
+
+		counter := metric.GetCounter()
+		if counter != nil {
+			value["value"] = int64(counter.GetValue())
+		}
+
+		guage := metric.GetGauge()
+		if guage != nil {
+			value["value"] = guage.GetValue()
+		}
+
+		summary := metric.GetSummary()
+		if summary != nil {
+			value["sum"] = summary.GetSampleSum()
+			value["count"] = summary.GetSampleCount()
+
+			quantiles := summary.GetQuantile()
+
+			percentileMap := common.MapStr{}
+			for _, quantile := range quantiles {
+				key := strconv.FormatFloat((100 * quantile.GetQuantile()), 'f', -1, 64)
+
+				if math.IsNaN(quantile.GetValue()) == false {
+					percentileMap[key] = quantile.GetValue()
+				}
+
+			}
+
+			if len(percentileMap) != 0 {
+				value["percentile"] = percentileMap
+			}
+		}
+
+		histogram := metric.GetHistogram()
+		if histogram != nil {
+			value["sum"] = histogram.GetSampleSum()
+			value["count"] = histogram.GetSampleCount()
+			buckets := histogram.GetBucket()
+			bucketMap := common.MapStr{}
+			for _, bucket := range buckets {
+				key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
+				bucketMap[key] = bucket.GetCumulativeCount()
+			}
+
+			value["bucket"] = bucketMap
+		}
+
+		event.value = value
+
+		events = append(events, event)
+
 	}
-
-	// skip entries without a value
-	if split[1] == "NaN" {
-		promEvent.value = nil
-	} else {
-		promEvent.value = convertValue(split[1])
-	}
-
-	// Split key
-	startLabels := strings.Index(line, "{")
-	endLabels := strings.Index(line, "}")
-
-	// Handle labels
-	if startLabels != -1 {
-		// Overwrite key, as key contained labels until now too
-		promEvent.key = line[0:startLabels]
-		promEvent.labelHash = line[startLabels+1 : endLabels]
-		// Extract labels
-		promEvent.labels = extractLabels(promEvent.labelHash)
-	}
-
-	return promEvent
-}
-
-// extractLabels splits up a label string of format handler="alerts",quantile="0.5"
-// into a key / value list
-func extractLabels(labelsString string) common.MapStr {
-
-	keyValuePairs := common.MapStr{}
-
-	// Extract labels
-	labels := strings.Split(labelsString, "\",")
-	for _, label := range labels {
-		keyValue := strings.Split(label, "=")
-		// Remove " from value
-		keyValue[1] = strings.Trim(keyValue[1], "\"")
-
-		// Converts value to int or float if needed
-		keyValuePairs[keyValue[0]] = convertValue(keyValue[1])
-	}
-
-	return keyValuePairs
-}
-
-// convertValue takes the input string and converts it to int of float
-func convertValue(value string) interface{} {
-
-	if i, err := strconv.ParseInt(value, 10, 64); err == nil {
-		return i
-	}
-
-	if f, err := strconv.ParseFloat(value, 64); err == nil {
-		return f
-	}
-
-	return value
+	return events
 }

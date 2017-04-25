@@ -4,6 +4,8 @@ package perfmon
 
 import (
 	"testing"
+	"time"
+	"unsafe"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -81,7 +83,7 @@ func TestNonExistingCounter(t *testing.T) {
 func TestNonExistingObject(t *testing.T) {
 	config := make([]CounterConfig, 1)
 	config[0].Alias = "processor.time.total.pct"
-	config[0].Query = "\\non existing object\\% Processor Performance"
+	config[0].Query = "\\non existing object\\% Processor Time"
 	handle, err := NewPerfmonReader(config)
 	if assert.Error(t, err) {
 		assert.EqualValues(t, PDH_CSTATUS_NO_OBJECT, errors.Cause(err))
@@ -91,4 +93,56 @@ func TestNonExistingObject(t *testing.T) {
 		err = handle.query.Close()
 		assert.NoError(t, err)
 	}
+}
+
+func TestRawValues(t *testing.T) {
+	query, err := NewQuery("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer query.Close()
+
+	err = query.AddCounter(processorTimeCounter)
+	if err != nil && err != PDH_NO_MORE_DATA {
+		t.Fatal(err)
+	}
+
+	var values []float64
+
+	for i := 0; i < 2; i++ {
+
+		if err = query.Execute(); err != nil {
+			t.Fatal(err)
+		}
+
+		_, rawvalue1, err := PdhGetRawCounterValue(query.counters[processorTimeCounter])
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		time.Sleep(time.Millisecond * 1000)
+
+		if err = query.Execute(); err != nil {
+			t.Fatal(err)
+		}
+
+		_, rawvalue2, err := PdhGetRawCounterValue(query.counters[processorTimeCounter])
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		value, err := PdhCalculateCounterFromRawValue(query.counters[processorTimeCounter], PdhFmtDouble|PdhFmtNoCap100, rawvalue2, rawvalue1)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		values = append(values, *(*float64)(unsafe.Pointer(&value.LongValue)))
+
+	}
+
+	t.Log(values)
+
 }

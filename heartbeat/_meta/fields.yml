@@ -35,7 +35,7 @@
         Service url used by monitor.
 
     - name: ip
-      type: keyword
+      type: ip
       description: >
         IP of service being monitored. If service is monitored by hostname,
         the `ip` field contains the resolved ip address for the current host.
@@ -130,17 +130,3 @@
       description: >
         Boolean indicator if monitor could validate the service to be available.
 
-    - name: error
-      type: group
-      description: >
-        Reason monitor flagging a service as down.
-      fields:
-        - name: type
-          type: keyword
-          description: >
-            Failure type. For example `io` or `validate`.
-
-        - name: message
-          type: text
-          description: >
-            Failure description.
