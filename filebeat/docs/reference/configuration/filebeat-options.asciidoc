@@ -348,6 +348,10 @@ occur.
 [[multiline]]
 ===== multiline
 
+IMPORTANT: If you are sending multiline events to Logstash, use the options described here to handle multiline events
+before sending the event data to Logstash. Trying to implement multiline event handling in Logstash (for example, by
+using the Logstash multiline codec) may result in the mixing of streams and corrupted data.
+
 Options that control how Filebeat deals with log messages that span multiple lines. Multiline messages are common in files that contain Java stack traces.
 
 The following example shows how to configure Filebeat to handle a multiline message where the first line of the message begins with a bracket (`[`).
