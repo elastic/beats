@@ -82,6 +82,11 @@ filebeat.prospectors:
   # This is especially useful for multiline log messages which can get large.
   #max_bytes: 10485760
 
+  ### Recursive glob configuration
+
+  # Expand "**" patterns into regular glob patterns.
+  #recursive_glob.enabled: true
+
   ### JSON configuration
 
   # Decode JSON options. Enable this if your logs are structured in JSON.

@@ -13,6 +13,10 @@ import (
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
+const (
+	recursiveGlobDepth = 8
+)
+
 var (
 	filesRenamed   = monitoring.NewInt(nil, "filebeat.prospector.log.files.renamed")
 	filesTruncated = monitoring.NewInt(nil, "filebeat.prospector.log.files.truncated")
@@ -140,11 +144,14 @@ func (l *Log) getFiles() map[string]os.FileInfo {
 
 	paths := map[string]os.FileInfo{}
 
-	for _, glob := range l.config.Paths {
-		// Evaluate the path as a wildcards/shell glob
-		matches, err := filepath.Glob(glob)
+	for _, path := range l.config.Paths {
+		depth := uint8(0)
+		if l.config.recursiveGlob {
+			depth = recursiveGlobDepth
+		}
+		matches, err := file.Glob(path, depth)
 		if err != nil {
-			logp.Err("glob(%s) failed: %v", glob, err)
+			logp.Err("glob(%s) failed: %v", path, err)
 			continue
 		}
 

@@ -45,6 +45,7 @@ type prospectorConfig struct {
 	Module               string                  `config:"_module_name"`  // hidden option to set the module name
 	Fileset              string                  `config:"_fileset_name"` // hidden option to set the fileset name
 	Processors           processors.PluginConfig `config:"processors"`
+	recursiveGlob        bool                    `config:"recursive_glob.enabled"`
 }
 
 func (config *prospectorConfig) Validate() error {
