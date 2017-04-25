@@ -31,11 +31,6 @@ filebeat.modules:
   #access:
     #enabled: true
 
-    # Ingest Node pipeline to use. Options are `with_plugins` (default)
-    # and `no_plugins`. Use `no_plugins` if you don't have the geoip or
-    # the user agent Node ingest plugins installed.
-    #var.pipeline: with_plugins
-
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
@@ -139,11 +134,6 @@ filebeat.modules:
   #access:
     #enabled: true
 
-    # Ingest Node pipeline to use. Options are `with_plugins` (default)
-    # and `no_plugins`. Use `no_plugins` if you don't have the geoip or
-    # the user agent Node ingest plugins installed.
-    #var.pipeline: with_plugins
-
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
@@ -182,6 +172,9 @@ filebeat.prospectors:
 
 #------------------------------ Log prospector --------------------------------
 - input_type: log
+
+  # Change to true to enable this prospector configuration.
+  enabled: false
 
   # Paths that should be crawled and fetched. Glob based paths.
   # To fetch all ".log" files from a specific level of subdirectories
