@@ -3,9 +3,9 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-elasticsearch]]
-== elasticsearch Module
+== Elasticsearch Module
 
-This is the elasticsearch Module. The elasticsearch module contains a minimal set of metrics to enable monitoring of elasticsearch across multiple versions.
+This is the Elasticsearch Module. The Elasticsearch module contains a minimal set of metrics to enable monitoring of Elasticsearch across multiple versions. To monitor more Elasticsearch metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
 
 
 [float]

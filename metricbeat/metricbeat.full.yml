@@ -207,7 +207,6 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:5601"]
 
-
 #------------------------------- kubelet Module ------------------------------
 - module: kubelet
   metricsets: ["node","container","volume","pod","system"]
