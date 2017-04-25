@@ -124,7 +124,7 @@ func (l *Log) getFiles() map[string]os.FileInfo {
 
 	for _, path := range l.config.Paths {
 		depth := uint8(0)
-		if l.config.recursiveGlob.enabled {
+		if l.config.recursiveGlob {
 			depth = recursiveGlobDepth
 		}
 		matches, err := file.Glob(path, depth)

@@ -23,7 +23,6 @@ var (
 		HarvesterLimit: 0,
 		Symlinks:       false,
 		TailFiles:      false,
-		recursiveGlob:  &recursiveGlobConfig{},
 	}
 )
 
@@ -46,11 +45,7 @@ type prospectorConfig struct {
 	Module               string                  `config:"_module_name"`  // hidden option to set the module name
 	Fileset              string                  `config:"_fileset_name"` // hidden option to set the fileset name
 	Processors           processors.PluginConfig `config:"processors"`
-	recursiveGlob        *recursiveGlobConfig    `config:"recursive_glob"`
-}
-
-type recursiveGlobConfig struct {
-	enabled bool `config:"enabled"`
+	recursiveGlob        bool                    `config:"recursive_glob.enabled"`
 }
 
 func (config *prospectorConfig) Validate() error {
