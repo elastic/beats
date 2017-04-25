@@ -87,12 +87,12 @@ func (p *PodWatcher) watchPods() {
 			time.Sleep(time.Second)
 			continue
 		}
+
 		for {
 			_, pod, err := watcher.Next()
 			if err != nil {
-				logp.Err("kubernetes: Watching API eror %v", err)
-				time.Sleep(time.Second)
-				continue
+				logp.Err("kubernetes: Watching API error %v", err)
+				break
 			}
 
 			p.podQueue <- pod

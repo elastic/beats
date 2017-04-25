@@ -27,6 +27,7 @@ grouped in the following categories:
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubelet>>
+* <<exported-fields-kubernetes>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -4445,6 +4446,53 @@ Free inodes
 type: long
 
 Total inodes
+
+
+[[exported-fields-kubernetes]]
+== Kubernetes info Fields
+
+Kubernetes metadata added by the kubernetes processor
+
+
+
+[float]
+=== kubernetes.pod.name
+
+type: keyword
+
+Kubernetes pod name
+
+
+[float]
+=== kubernetes.namespace
+
+type: keyword
+
+Kubernetes namespace
+
+
+[float]
+=== kubernetes.labels
+
+type: object
+
+Kubernetes labels map
+
+
+[float]
+=== kubernetes.annotations
+
+type: object
+
+Kubernetes annotations map
+
+
+[float]
+=== kubernetes.container.name
+
+type: keyword
+
+Kubernetes container name
 
 
 [[exported-fields-memcached]]
