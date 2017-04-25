@@ -43,11 +43,12 @@ subdirectories, the following pattern can be used: `/var/log/*/*.log`. This
 fetches all `.log` files from the subfolders of `/var/log`. It does not
 fetch log files from the `/var/log` folder itself.
 It is possible to recursively fetch all files in all subdirectories of a directory
-using the optional <<recursive_glob_depth>> setting.
+using the optional <<recursive_glob>> settings.
 
 Filebeat starts a harvester for each file that it finds under the specified
 paths. You can specify one path per line. Each line begins with a dash (-).
 
+[[recursive_glob]]
 ===== recursive_glob
 
 *`enabled`*:: Enable expanding `**` into recursive glob patterns. With this feature enabled,
