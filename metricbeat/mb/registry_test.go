@@ -150,3 +150,27 @@ func TestMetricSetFactory(t *testing.T) {
 		assert.NotNil(t, hp) // Can't compare functions in Go so just check for non-nil.
 	})
 }
+
+func TestMetricSetQuery(t *testing.T) {
+	registry := NewRegister()
+	err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	metricsets := registry.MetricSets(moduleName)
+	assert.Equal(t, len(metricsets), 1)
+	assert.Equal(t, metricsets[0], metricSetName)
+
+	metricsets = registry.MetricSets("foo")
+	assert.Equal(t, len(metricsets), 0)
+}
+
+func TestModuleQuery(t *testing.T) {
+	registry := NewRegister()
+	registry.modules[moduleName] = fakeModuleFactory
+
+	modules := registry.Modules()
+	assert.Equal(t, len(modules), 1)
+	assert.Equal(t, modules[0], moduleName)
+}
