@@ -3,10 +3,9 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-kibana]]
-== kibana Module
+== Kibana Module
 
-This is the kibana Module.
-
+This is the Kibana Module and only tracks the high level metrics. To monitor more Kibana metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
 
 
 [float]
@@ -23,7 +22,6 @@ metricbeat.modules:
   enabled: false
   period: 10s
   hosts: ["localhost:5601"]
-
 ----
 
 [float]
