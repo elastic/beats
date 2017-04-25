@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-kubernetes>>
 
 --
 [[exported-fields-beat]]
@@ -354,5 +355,52 @@ type: boolean
 required: True
 
 Boolean indicator if monitor could validate the service to be available.
+
+
+[[exported-fields-kubernetes]]
+== Kubernetes info Fields
+
+Kubernetes metadata added by the kubernetes processor
+
+
+
+[float]
+=== kubernetes.pod.name
+
+type: keyword
+
+Kubernetes pod name
+
+
+[float]
+=== kubernetes.namespace
+
+type: keyword
+
+Kubernetes namespace
+
+
+[float]
+=== kubernetes.labels
+
+type: object
+
+Kubernetes labels map
+
+
+[float]
+=== kubernetes.annotations
+
+type: object
+
+Kubernetes annotations map
+
+
+[float]
+=== kubernetes.container.name
+
+type: keyword
+
+Kubernetes container name
 
 

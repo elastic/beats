@@ -1,0 +1,29 @@
+- key: kubernetes
+  title: Kubernetes info
+  description: >
+    Kubernetes metadata added by the kubernetes processor
+  fields:
+    - name: kubernetes.pod.name
+      type: keyword
+      description: >
+        Kubernetes pod name
+
+    - name: kubernetes.namespace
+      type: keyword
+      description: >
+        Kubernetes namespace
+
+    - name: kubernetes.labels
+      type: object
+      description: >
+        Kubernetes labels map
+
+    - name: kubernetes.annotations
+      type: object
+      description: >
+        Kubernetes annotations map
+
+    - name: kubernetes.container.name
+      type: keyword
+      description: >
+        Kubernetes container name

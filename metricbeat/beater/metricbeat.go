@@ -13,8 +13,8 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/pkg/errors"
 
-	//Add metricbeat specific processors
-	_ "github.com/elastic/beats/metricbeat/processor/annotate/kubernetes"
+	// Add metricbeat specific processors
+	_ "github.com/elastic/beats/metricbeat/processors/kubernetes"
 )
 
 // Metricbeat implements the Beater interface for metricbeat.
