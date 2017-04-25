@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v1.2.3...1.2[Check the HEAD diff]
 *Packetbeat*
 
 *Topbeat*
+- Fix high values of proc.cpu.user_p. {pull}1923[1923]
 
 *Filebeat*
 
