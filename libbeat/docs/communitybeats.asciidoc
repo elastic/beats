@@ -52,6 +52,7 @@ https://github.com/carlpett/prombeat[prombeat]:: Indexes https://prometheus.io[P
 https://github.com/voigt/redditbeat[redditbeat]:: Collects new Reddit Submissions of one or multiple Subreddits.
 https://github.com/chrsblck/redisbeat[redisbeat]:: Used for Redis monitoring.
 https://github.com/consulthys/retsbeat[retsbeat]:: Collects counts of http://www.reso.org[RETS] resource/class records from https://en.wikipedia.org/wiki/Multiple_listing_service[Multiple Listing Service] (MLS) servers.
+https://github.com/yourdream/rsbeat[rsbeat]:: Ships redis slow logs to elasticsearch and anlyze by Kibana.
 https://github.com/martinhoefling/saltbeat[saltbeat]:: Reads events from salt master event bus.
 https://github.com/consulthys/springbeat[springbeat]:: Collects health and metrics data from Spring Boot applications running with the actuator module.
 https://github.com/buehler/go-elastic-twitterbeat[twitterbeat]:: Reads tweets for specified screen names.
@@ -61,7 +62,6 @@ https://github.com/cleesmith/unifiedbeat[unifiedbeat]:: Reads records from Unifi
 network intrusion detection software and indexes the records in Elasticsearch.
 https://github.com/mrkschan/uwsgibeat[uwsgibeat]:: Reads stats from uWSGI.
 https://github.com/eskibars/wmibeat[wmibeat]:: Uses WMI to grab your favorite, configurable Windows metrics. 
-
 
 Have you created a Beat that's not listed? If so, add the name and description of your Beat to the source document for
 https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository] to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/annoucements[announce] your new Beat in the Elastic
