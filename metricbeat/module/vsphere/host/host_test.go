@@ -1,10 +1,67 @@
 package host
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/elastic/beats/libbeat/common"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/vmware/vic/pkg/vsphere/simulator"
+	"github.com/vmware/vic/pkg/vsphere/simulator/esx"
 )
 
 func TestFetchEventContents(t *testing.T) {
-	assert.EqualValues(t, 1, 1)
+
+	s := simulator.New(simulator.NewServiceInstance(esx.ServiceContent, esx.RootFolder))
+	ts := s.NewServer()
+	defer ts.Close()
+
+	urlSimulator := ts.URL.Scheme + ":// " + ts.URL.Host + ts.URL.Path
+
+	config := map[string]interface{}{
+		"module":     "vsphere",
+		"metricsets": []string{"host"},
+		"hosts":      []string{urlSimulator},
+		"username":   "user",
+		"password":   "pass",
+		"insecure":   true,
+	}
+
+	f := mbtest.NewEventsFetcher(t, config)
+
+	events, err := f.Fetch()
+
+	event := events[0]
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
+
+	assert.EqualValues(t, "ha-datacenter", event["datacenter"])
+	assert.EqualValues(t, "localhost.localdomain", event["name"])
+
+	cpu := event["cpu"].(common.MapStr)
+
+	cpuUsed := cpu["used"].(common.MapStr)
+	assert.EqualValues(t, 67, cpuUsed["bytes"])
+
+	cpuTotal := cpu["total"].(common.MapStr)
+	assert.EqualValues(t, 4588, cpuTotal["bytes"])
+
+	cpuFree := cpu["free"].(common.MapStr)
+	assert.EqualValues(t, 4521, cpuFree["bytes"])
+
+	memory := event["memory"].(common.MapStr)
+
+	memoryUsed := memory["used"].(common.MapStr)
+	assert.EqualValues(t, uint64(1472200704), memoryUsed["bytes"])
+
+	memoryTotal := memory["total"].(common.MapStr)
+	assert.EqualValues(t, uint64(4294430720), memoryTotal["bytes"])
+
+	memoryFree := memory["free"].(common.MapStr)
+	assert.EqualValues(t, uint64(2822230016), memoryFree["bytes"])
+
 }

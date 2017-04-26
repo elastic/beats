@@ -16,7 +16,10 @@ limitations under the License.
 
 package types
 
-import "reflect"
+import (
+	"reflect"
+	"strings"
+)
 
 var t = map[string]reflect.Type{}
 
@@ -29,6 +32,12 @@ type Func func(string) (reflect.Type, bool)
 func TypeFunc() Func {
 	return func(name string) (reflect.Type, bool) {
 		typ, ok := t[name]
+		if !ok {
+			// The /sdk endpoint does not prefix types with the namespace,
+			// but extension endpoints, such as /pbm/sdk do.
+			name = strings.TrimPrefix(name, "vim25:")
+			typ, ok = t[name]
+		}
 		return typ, ok
 	}
 }
