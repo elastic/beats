@@ -16,6 +16,9 @@ filebeat.prospectors:
 #------------------------------ Log prospector --------------------------------
 - input_type: log
 
+  # Change to true to enable this prospector configuration.
+  enabled: false
+
   # Paths that should be crawled and fetched. Glob based paths.
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
