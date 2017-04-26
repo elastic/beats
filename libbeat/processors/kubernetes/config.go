@@ -1,8 +1,9 @@
 package kubernetes
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type kubeAnnotatorConfig struct {

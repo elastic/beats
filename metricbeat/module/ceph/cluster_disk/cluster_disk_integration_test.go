@@ -2,9 +2,10 @@ package cluster_disk
 
 import (
 	"fmt"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"os"
 	"testing"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {

@@ -1,11 +1,12 @@
 package image
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/elastic/beats/metricbeat/module/docker"
-	dc "github.com/fsouza/go-dockerclient"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/module/docker"
+
+	dc "github.com/fsouza/go-dockerclient"
 )
 
 func eventsMapping(imagesList []dc.APIImages) []common.MapStr {

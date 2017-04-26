@@ -2,8 +2,9 @@ package golang
 
 import (
 	"bytes"
-	"github.com/elastic/beats/libbeat/logp"
 	"strings"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 /**
