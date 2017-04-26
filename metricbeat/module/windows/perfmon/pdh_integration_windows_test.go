@@ -4,6 +4,7 @@ package perfmon
 
 import (
 	"testing"
+	"unsafe"
 
 	"time"
 
@@ -173,7 +174,7 @@ func TestRawValues(t *testing.T) {
 	}
 	defer query.Close()
 
-	err = query.AddCounter(processorTimeCounter)
+	err = query.AddCounter(processorTimeCounter, FloatFlormat)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -186,7 +187,7 @@ func TestRawValues(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		_, rawvalue1, err := PdhGetRawCounterValue(query.counters[processorTimeCounter])
+		_, rawvalue1, err := PdhGetRawCounterValue(query.counters[processorTimeCounter].handle)
 
 		if err != nil {
 			t.Fatal(err)
@@ -198,13 +199,13 @@ func TestRawValues(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		_, rawvalue2, err := PdhGetRawCounterValue(query.counters[processorTimeCounter])
+		_, rawvalue2, err := PdhGetRawCounterValue(query.counters[processorTimeCounter].handle)
 
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		value, err := PdhCalculateCounterFromRawValue(query.counters[processorTimeCounter], PdhFmtDouble|PdhFmtNoCap100, rawvalue2, rawvalue1)
+		value, err := PdhCalculateCounterFromRawValue(query.counters[processorTimeCounter].handle, PdhFmtDouble|PdhFmtNoCap100, rawvalue2, rawvalue1)
 
 		if err != nil {
 			t.Fatal(err)
