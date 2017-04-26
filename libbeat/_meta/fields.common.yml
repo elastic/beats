@@ -15,6 +15,11 @@
       description: >
         The hostname as returned by the operating system on which the Beat is
         running.
+      metricbeat.format: url
+      metricbeat.params:
+        urlTemplate: "../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8?_a=(query:(query_string:(analyze_wildcard:!t,query:'beat.hostname:{{value}}')))"
+        labelTemplate: "{{value}}"
+
     - name: beat.timezone
       description: >
         The timezone as returned by the operating system on which the Beat is

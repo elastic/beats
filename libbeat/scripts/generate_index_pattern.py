@@ -17,7 +17,7 @@ import sys
 unique_fields = []
 
 
-def fields_to_json(section, path, output):
+def fields_to_json(section, path, output, beat_name):
 
     # Need in case there are no fields
     if section["fields"] is None:
@@ -30,12 +30,36 @@ def fields_to_json(section, path, output):
             newpath = path + "." + field["name"]
 
         if "type" in field and field["type"] == "group":
-            fields_to_json(field, newpath, output)
+            fields_to_json(field, newpath, output, beat_name)
         else:
-            field_to_json(field, newpath, output)
+            field_to_json(field, newpath, output, beat_name)
 
 
-def field_to_json(desc, path, output,
+#####
+# This functions eliminates from the description of a field, the options that are
+# defined for other Beats than beat_name
+# Example:
+#  name: beat.name
+#  metricbeat.format: url
+#  metricbeat.params: ...
+#####
+def filter_field_desc(desc, beat_name):
+
+    new_desc = {}
+
+    for key in desc:
+        namespaces = key.split('.')
+
+        if len(namespaces) > 1:
+            if namespaces[0] == beat_name:
+                new_desc[namespaces[1]] = desc[key]
+        else:
+            new_desc[key] = desc[key]
+
+    return new_desc
+
+
+def field_to_json(desc, path, output, beat_name,
                   indexed=True, analyzed=False, doc_values=True,
                   searchable=True, aggregatable=True):
 
@@ -47,6 +71,8 @@ def field_to_json(desc, path, output,
         sys.exit(1)
     else:
         unique_fields.append(path)
+
+    desc = filter_field_desc(desc, beat_name)
 
     field = {
         "name": path,
@@ -76,12 +102,16 @@ def field_to_json(desc, path, output,
     output["fields"].append(field)
 
     if "format" in desc:
-        output["fieldFormatMap"][path] = {
+        format = {
             "id": desc["format"],
         }
+        if "params" in desc:
+            format["params"] = desc["params"]
+
+        output["fieldFormatMap"][path] = format
 
 
-def fields_to_index_pattern(args, input):
+def fields_to_index_pattern(args, input, beat_name):
 
     docs = yaml.load(input)
 
@@ -98,23 +128,23 @@ def fields_to_index_pattern(args, input):
     }
 
     for k, section in enumerate(docs):
-        fields_to_json(section, "", output)
+        fields_to_json(section, "", output, beat_name)
 
     # add meta fields
 
-    field_to_json({"name": "_id", "type": "keyword"}, "_id", output,
+    field_to_json({"name": "_id", "type": "keyword"}, "_id", output, beat_name,
                   indexed=False, analyzed=False, doc_values=False,
                   searchable=False, aggregatable=False)
 
-    field_to_json({"name": "_type", "type": "keyword"}, "_type", output,
+    field_to_json({"name": "_type", "type": "keyword"}, "_type", output, beat_name,
                   indexed=False, analyzed=False, doc_values=False,
                   searchable=True, aggregatable=True)
 
-    field_to_json({"name": "_index", "type": "keyword"}, "_index", output,
+    field_to_json({"name": "_index", "type": "keyword"}, "_index", output, beat_name,
                   indexed=False, analyzed=False, doc_values=False,
                   searchable=False, aggregatable=False)
 
-    field_to_json({"name": "_score", "type": "integer"}, "_score", output,
+    field_to_json({"name": "_score", "type": "integer"}, "_score", output, beat_name,
                   indexed=False, analyzed=False, doc_values=False,
                   searchable=False, aggregatable=False)
 
@@ -140,13 +170,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     fields_yml = args.beat + "/fields.yml"
+    beat_name = os.path.basename(args.beat)
 
     # generate the index-pattern content
     with open(fields_yml, 'r') as f:
         fields = f.read()
 
         # with open(target, 'w') as output:
-        output = fields_to_index_pattern(args, fields)
+        output = fields_to_index_pattern(args, fields, beat_name)
 
     # dump output to a json file
     fileName = get_index_pattern_name(args.index)
