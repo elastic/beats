@@ -17,7 +17,7 @@ func TestFetchEventContents(t *testing.T) {
 	ts := s.NewServer()
 	defer ts.Close()
 
-	urlSimulator := ts.URL.Scheme + ":// " + ts.URL.Host + ts.URL.Path
+	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
 
 	config := map[string]interface{}{
 		"module":     "vsphere",
@@ -45,13 +45,13 @@ func TestFetchEventContents(t *testing.T) {
 	cpu := event["cpu"].(common.MapStr)
 
 	cpuUsed := cpu["used"].(common.MapStr)
-	assert.EqualValues(t, 67, cpuUsed["bytes"])
+	assert.EqualValues(t, 67, cpuUsed["mhz"])
 
 	cpuTotal := cpu["total"].(common.MapStr)
-	assert.EqualValues(t, 4588, cpuTotal["bytes"])
+	assert.EqualValues(t, 4588, cpuTotal["mhz"])
 
 	cpuFree := cpu["free"].(common.MapStr)
-	assert.EqualValues(t, 4521, cpuFree["bytes"])
+	assert.EqualValues(t, 4521, cpuFree["mhz"])
 
 	memory := event["memory"].(common.MapStr)
 

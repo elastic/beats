@@ -49,6 +49,6 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, 0, used["kb"])
 
 	available := stats["available"].(common.MapStr)
-	assert.EqualValues(t, 5003444224, available["bytes"])
+	assert.EqualValues(t, uint64(5003444224), available["bytes"])
 
 }
