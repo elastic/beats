@@ -2,13 +2,14 @@ package heap
 
 import (
 	"encoding/json"
+	"runtime"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/golang"
-	"runtime"
 )
 
 const (
