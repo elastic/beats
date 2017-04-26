@@ -2,12 +2,13 @@ package kubernetes
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors/annotate/kubernetes"
+	"github.com/elastic/beats/libbeat/processors/kubernetes"
 	corev1 "github.com/ericchiang/k8s/api/v1"
 	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var metagen = &kubernetes.GenDefaultMeta{}
@@ -45,7 +46,9 @@ func TestIpPortIndexer(t *testing.T) {
 	assert.Equal(t, len(indexers), 0)
 	assert.Equal(t, len(indices), 0)
 	expected := common.MapStr{
-		"pod":       "testpod",
+		"pod": common.MapStr{
+			"name": "testpod",
+		},
 		"namespace": "testns",
 		"labels": common.MapStr{
 			"labelkey": "labelvalue",
@@ -63,7 +66,7 @@ func TestIpPortIndexer(t *testing.T) {
 			},
 		},
 	}
-	expected["container"] = container
+	expected["container"] = common.MapStr{"name": container}
 
 	indexers = ipIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)

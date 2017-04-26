@@ -194,7 +194,9 @@ func (g *GenDefaultMeta) GenerateMetaData(pod *corev1.Pod) common.MapStr {
 	annotationsMap = generateMapSubset(pod.Metadata.Annotations, g.annotations)
 
 	meta := common.MapStr{
-		"pod":       pod.Metadata.GetName(),
+		"pod": common.MapStr{
+			"name": pod.Metadata.GetName(),
+		},
 		"namespace": pod.Metadata.GetNamespace(),
 	}
 
@@ -263,7 +265,9 @@ func (c *ContainerIndexer) GetMetadata(pod *corev1.Pod) []MetadataIndex {
 	var metadata []MetadataIndex
 	for i := 0; i < len(containers); i++ {
 		containerMeta := commonMeta.Clone()
-		containerMeta["container"] = pod.Status.ContainerStatuses[i].Name
+		containerMeta["container"] = common.MapStr{
+			"name": pod.Status.ContainerStatuses[i].Name,
+		}
 		metadata = append(metadata, MetadataIndex{
 			Index: containers[i],
 			Data:  containerMeta,

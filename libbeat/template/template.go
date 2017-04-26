@@ -117,7 +117,9 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 
 	if t.esVersion.IsMajor(2) || t.esVersion.IsMajor(5) {
 		basicStructure.Put("mappings._default_._all.norms.enabled", false)
-	} else {
+	}
+
+	if t.esVersion.major >= 5 {
 		// Metricbeat exceeds the default of 1000 fields
 		basicStructure.Put("settings.index.mapping.total_fields.limit", defaultTotalFieldsLimit)
 	}

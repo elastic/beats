@@ -30,6 +30,8 @@ COVERAGE_DIR=${BUILD_DIR}/coverage
 COVERAGE_TOOL=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 TESTIFY_TOOL_REPO=github.com/elastic/beats/vendor/github.com/stretchr/testify
+GOIMPORTS=goimports
+GOIMPORTS_REPO=golang.org/x/tools/cmd/goimports
 GOLINT=golint
 GOLINT_REPO=github.com/golang/lint/golint
 REVIEWDOG=reviewdog -conf ${ES_BEATS}/reviewdog.yml
@@ -93,13 +95,14 @@ crosscompile: $(GOFILES)
 
 .PHONY: check
 check: python-env ## @build Checks project and source code if everything is according to standard
-	@gofmt -l ${GOFILES_NOVENDOR} | (! grep . -q) || (echo "Code differs from gofmt's style" && false)
 	go vet ${GOPACKAGES}
+	@go get $(GOIMPORTS_REPO)
+	@goimports -l ${GOFILES_NOVENDOR} | (! grep . -q) || (echo "Code differs from goimports' style" && false)
 	${FIND} -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 
 .PHONY: fmt
-fmt: python-env ## @build Runs `gofmt -s -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
-	gofmt -s -l -w ${GOFILES_NOVENDOR}
+fmt: python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
+	goimports -l -w ${GOFILES_NOVENDOR}
 	${FIND} -name *.py -exec autopep8 --in-place --max-line-length 120  {} \;
 
 .PHONY: lint

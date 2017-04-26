@@ -12,6 +12,7 @@ include::../../libbeat/docs/version.asciidoc[]
 :beatname_lc: metricbeat
 :beatname_uc: Metricbeat
 :security: X-Pack Security
+:monitoringdoc: https://www.elastic.co/guide/en/x-pack/current
 
 include::./overview.asciidoc[]
 

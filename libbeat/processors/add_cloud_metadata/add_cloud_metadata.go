@@ -1,4 +1,4 @@
-package actions
+package add_cloud_metadata
 
 import (
 	"bytes"
@@ -13,8 +13,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-	s "github.com/elastic/beats/metricbeat/schema"
-	c "github.com/elastic/beats/metricbeat/schema/mapstriface"
 	"github.com/pkg/errors"
 )
 
@@ -23,72 +21,11 @@ const (
 	// use for their metadata service.
 	metadataHost = "169.254.169.254"
 
-	// AWS EC2 Metadata Service
-	ec2InstanceIdentityURI = "/2014-02-25/dynamic/instance-identity/document"
-
-	// DigitalOcean Metadata Service
-	doMetadataURI = "/metadata/v1.json"
-
-	// Google GCE Metadata Service
-	gceMetadataURI = "/computeMetadata/v1/?recursive=true&alt=json"
-
-	// Tencent Clound Metadata Service
-	qcloudMetadataHost          = "metadata.tencentyun.com"
-	qcloudMetadataInstanceIDURI = "/meta-data/instance-id"
-	qcloudMetadataRegionURI     = "/meta-data/placement/region"
-	qcloudMetadataZoneURI       = "/meta-data/placement/zone"
-
 	// Default config
 	defaultTimeOut = 3 * time.Second
 )
 
 var debugf = logp.MakeDebug("filters")
-
-// metadata schemas for all prividers.
-var (
-	ec2Schema = func(m map[string]interface{}) common.MapStr {
-		out, _ := s.Schema{
-			"instance_id":       c.Str("instanceId"),
-			"machine_type":      c.Str("instanceType"),
-			"region":            c.Str("region"),
-			"availability_zone": c.Str("availabilityZone"),
-		}.Apply(m)
-		return out
-	}
-
-	doSchema = func(m map[string]interface{}) common.MapStr {
-		out, _ := s.Schema{
-			"instance_id": c.StrFromNum("droplet_id"),
-			"region":      c.Str("region"),
-		}.Apply(m)
-		return out
-	}
-
-	gceHeaders = map[string]string{"Metadata-Flavor": "Google"}
-	gceSchema  = func(m map[string]interface{}) common.MapStr {
-		out := common.MapStr{}
-
-		if instance, ok := m["instance"].(map[string]interface{}); ok {
-			s.Schema{
-				"instance_id":       c.StrFromNum("id"),
-				"machine_type":      c.Str("machineType"),
-				"availability_zone": c.Str("zone"),
-			}.ApplyTo(out, instance)
-		}
-
-		if project, ok := m["project"].(map[string]interface{}); ok {
-			s.Schema{
-				"project_id": c.Str("projectId"),
-			}.ApplyTo(out, project)
-		}
-
-		return out
-	}
-
-	qcloudSchema = func(m map[string]interface{}) common.MapStr {
-		return common.MapStr(m)
-	}
-)
 
 // init registers the add_cloud_metadata processor.
 func init() {
@@ -296,50 +233,6 @@ func newMetadataFetcher(
 	}
 	responseHandlers := map[string]responseHandler{urls[0]: makeJSONPicker(provider)}
 	fetcher := &metadataFetcher{provider, headers, responseHandlers, conv}
-	return fetcher, nil
-}
-
-func newDoMetadataFetcher(c common.Config) (*metadataFetcher, error) {
-	fetcher, err := newMetadataFetcher(c, "digitalocean", nil, metadataHost, doSchema, doMetadataURI)
-	return fetcher, err
-}
-
-func newEc2MetadataFetcher(c common.Config) (*metadataFetcher, error) {
-	fetcher, err := newMetadataFetcher(c, "ec2", nil, metadataHost, ec2Schema, ec2InstanceIdentityURI)
-	return fetcher, err
-}
-
-func newGceMetadataFetcher(c common.Config) (*metadataFetcher, error) {
-	fetcher, err := newMetadataFetcher(c, "gce", gceHeaders, metadataHost, gceSchema, gceMetadataURI)
-	return fetcher, err
-}
-
-// newQcloudMetadataFetcher return the concrete metadata fetcher for qcloud provider
-// which requires more than one way to assemble the metadata.
-func newQcloudMetadataFetcher(c common.Config) (*metadataFetcher, error) {
-	urls, err := getMetadataURLs(c, qcloudMetadataHost, []string{
-		qcloudMetadataInstanceIDURI,
-		qcloudMetadataRegionURI,
-		qcloudMetadataZoneURI,
-	})
-	if err != nil {
-		return nil, err
-	}
-	responseHandlers := map[string]responseHandler{
-		urls[0]: func(all []byte, result *result) error {
-			result.metadata["instance_id"] = string(all)
-			return nil
-		},
-		urls[1]: func(all []byte, result *result) error {
-			result.metadata["region"] = string(all)
-			return nil
-		},
-		urls[2]: func(all []byte, result *result) error {
-			result.metadata["availability_zone"] = string(all)
-			return nil
-		},
-	}
-	fetcher := &metadataFetcher{"qcloud", nil, responseHandlers, qcloudSchema}
 	return fetcher, nil
 }
 

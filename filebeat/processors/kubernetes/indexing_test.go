@@ -2,9 +2,10 @@ package kubernetes
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestLogsPathMatcher(t *testing.T) {

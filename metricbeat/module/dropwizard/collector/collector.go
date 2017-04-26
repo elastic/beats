@@ -2,12 +2,13 @@ package collector
 
 import (
 	"encoding/json"
+	"strings"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-	"strings"
 )
 
 const (

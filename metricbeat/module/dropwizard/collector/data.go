@@ -1,9 +1,9 @@
 package collector
 
 import (
+	"encoding/json"
 	"strings"
 
-	"encoding/json"
 	"github.com/elastic/beats/libbeat/common"
 )
 

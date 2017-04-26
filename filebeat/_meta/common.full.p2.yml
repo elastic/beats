@@ -16,6 +16,9 @@ filebeat.prospectors:
 #------------------------------ Log prospector --------------------------------
 - input_type: log
 
+  # Change to true to enable this prospector configuration.
+  enabled: false
+
   # Paths that should be crawled and fetched. Glob based paths.
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
@@ -81,6 +84,11 @@ filebeat.prospectors:
   # All bytes after max_bytes are discarded and not sent. The default is 10MB.
   # This is especially useful for multiline log messages which can get large.
   #max_bytes: 10485760
+
+  ### Recursive glob configuration
+
+  # Expand "**" patterns into regular glob patterns.
+  #recursive_glob.enabled: true
 
   ### JSON configuration
 

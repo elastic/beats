@@ -6,7 +6,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors/annotate/kubernetes"
+	"github.com/elastic/beats/libbeat/processors/kubernetes"
 )
 
 func init() {
