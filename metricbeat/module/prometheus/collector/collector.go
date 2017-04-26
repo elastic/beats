@@ -57,10 +57,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	resp, err := m.http.FetchResponse()
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 	families, err := prometheus.GetMetricFamiliesFromResponse(resp)
 
 	if err != nil {
