@@ -11,6 +11,9 @@ filebeat.prospectors:
 
 - input_type: log
 
+  # Change to true to enable this prospector configuration.
+  enabled: false
+
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
     - /var/log/*.log
