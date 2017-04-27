@@ -105,12 +105,6 @@
 			"revisionTime": "2017-04-25T22:08:26Z"
 		},
 		{
-			"checksumSHA1": "eocox1dMrVGkrmOcA460XrzTq00=",
-			"path": "github.com/vmware/vic/pkg/vsphere/simulator/esx",
-			"revision": "a2b2afb419d70009cd4d0b58f37b1a095c58b526",
-			"revisionTime": "2017-04-25T22:08:26Z"
-		},
-		{
 			"checksumSHA1": "xvkaoDXBCGPLIsc4gkGzJpF6mGI=",
 			"path": "github.com/vmware/vic/pkg/vsphere/simulator/vc",
 			"revision": "a2b2afb419d70009cd4d0b58f37b1a095c58b526",
