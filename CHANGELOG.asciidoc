@@ -30,8 +30,6 @@ https://github.com/elastic/beats/compare/v5.3.1...master[Check the HEAD diff]
 *Affecting all Beats*
 
 *Filebeat*
-- Properly shut down crawler in case one prospector is misconfigured. {pull}4037[4037]
-- Fix panic in JSON decoding code if the input line is "null". {pull}4042[4042]
 
 *Heartbeat*
 
@@ -86,6 +84,18 @@ https://github.com/elastic/beats/compare/v5.3.1...master[Check the HEAD diff]
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.3.2]]
+=== Beats version 5.3.2
+https://github.com/elastic/beats/compare/v5.3.1...v5.3.2[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Properly shut down crawler in case one prospector is misconfigured. {pull}4037[4037]
+- Fix panic in JSON decoding code if the input line is "null". {pull}4042[4042]
+
 
 [[release-notes-5.3.1]]
 === Beats version 5.3.1
