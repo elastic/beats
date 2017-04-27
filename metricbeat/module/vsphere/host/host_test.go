@@ -8,13 +8,18 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/vic/pkg/vsphere/simulator"
-	"github.com/vmware/vic/pkg/vsphere/simulator/esx"
 )
 
 func TestFetchEventContents(t *testing.T) {
 
-	s := simulator.New(simulator.NewServiceInstance(esx.ServiceContent, esx.RootFolder))
-	ts := s.NewServer()
+	model := simulator.ESX()
+
+	err := model.Create()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	ts := model.Service.NewServer()
 	defer ts.Close()
 
 	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
