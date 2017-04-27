@@ -37,7 +37,6 @@ func TestGlobWatcher(t *testing.T) {
 	assert.True(t, changed)
 
 	files, changed, err = gcd.Scan()
-	files, changed, err = gcd.Scan()
 	assert.Equal(t, 2, len(files))
 	assert.NoError(t, err)
 	assert.False(t, changed)
