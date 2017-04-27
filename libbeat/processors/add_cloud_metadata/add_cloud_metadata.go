@@ -254,12 +254,17 @@ func setupFetchers(c common.Config) ([]*metadataFetcher, error) {
 	if err != nil {
 		return fetchers, err
 	}
+	ecsFetcher, err := newAlibabaCloudMetadataFetcher(c)
+	if err != nil {
+		return fetchers, err
+	}
 
 	fetchers = []*metadataFetcher{
 		doFetcher,
 		ec2Fetcher,
 		gceFetcher,
 		qcloudFetcher,
+		ecsFetcher,
 	}
 	return fetchers, nil
 }

@@ -273,6 +273,7 @@ The following cloud providers are supported:
 - Digital Ocean
 - Google Compute Engine (GCE)
 - https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
+- Alibaba Cloud (ECS)
 
 The simple configuration below enables the processor.
 
@@ -354,6 +355,24 @@ _Tencent Cloud_
       "instance_id": "ins-qcloudv5",
       "provider": "qcloud",
       "region": "china-south-gz"
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+_Alibaba Cloud_
+
+This metadata is only available when VPC is selected as the network type of the ECS instance.
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "meta": {
+    "cloud": {
+      "availability_zone": "cn-shenzhen",
+      "instance_id": "i-wz9g2hqiikg0aliyun2b",
+      "provider": "ecs",
+      "region": "cn-shenzhen-a"
     }
   }
 }
