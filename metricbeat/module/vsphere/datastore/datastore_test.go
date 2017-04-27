@@ -50,13 +50,14 @@ func TestFetchEventContents(t *testing.T) {
 
 	capacity := event["capacity"].(common.MapStr)
 
+	// values are random
 	capacityTotal := capacity["total"].(common.MapStr)
-	assert.True(t, (capacityTotal["bytes"].(int64) > 1410745958))
+	assert.True(t, (capacityTotal["bytes"].(int64) > 1000000))
 
 	capacityFree := capacity["free"].(common.MapStr)
-	assert.True(t, (capacityFree["bytes"].(int64) > 110715289))
+	assert.True(t, (capacityFree["bytes"].(int64) > 1000000))
 
 	capacityUsed := capacity["used"].(common.MapStr)
-	assert.True(t, (capacityUsed["bytes"].(int64) > 1299954892))
-	assert.EqualValues(t, 92, capacityUsed["pct"])
+	assert.True(t, (capacityUsed["bytes"].(int64) > 1000000))
+	assert.True(t, (capacityUsed["pct"].(int64) > 10))
 }
