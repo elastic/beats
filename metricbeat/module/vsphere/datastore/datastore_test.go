@@ -24,7 +24,7 @@ func TestFetchEventContents(t *testing.T) {
 	defer ts.Close()
 
 	// First create a local datastore to test metric
-	tmpDir :=createDatastore(ts, t)
+	tmpDir := createDatastore(ts, t)
 
 	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
 
@@ -67,57 +67,57 @@ func TestFetchEventContents(t *testing.T) {
 	os.RemoveAll(tmpDir)
 }
 
-func createDatastore(ts *simulator.Server, t *testing.T)  string {
-	
+func createDatastore(ts *simulator.Server, t *testing.T) string {
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	c, err := govmomi.NewClient(ctx, ts.URL, true)
 
-        if !assert.NoError(t, err) {
-                t.FailNow()
-        }
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
 
-        f := find.NewFinder(c.Client, true)
+	f := find.NewFinder(c.Client, true)
 
-        // Get all datacenters
-        dcs, err := f.DatacenterList(ctx, "*")
-        if !assert.NoError(t, err) {
-                t.FailNow()
-        }
+	// Get all datacenters
+	dcs, err := f.DatacenterList(ctx, "*")
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
 
-        var tempDir = func() (string, error) {
-                return ioutil.TempDir("", "govcsim-")
-        }
+	var tempDir = func() (string, error) {
+		return ioutil.TempDir("", "govcsim-")
+	}
 
 	dir := ""
 
 	for _, dc := range dcs {
-                f.SetDatacenter(dc)
+		f.SetDatacenter(dc)
 
-                hss, err := f.HostSystemList(ctx, "*")
-        	if !assert.NoError(t, err) {
-                	t.FailNow()
-        	}	
+		hss, err := f.HostSystemList(ctx, "*")
+		if !assert.NoError(t, err) {
+			t.FailNow()
+		}
 
-                dir, err = tempDir()
-                if !assert.NoError(t, err) {
-                        t.FailNow()
-                }
+		dir, err = tempDir()
+		if !assert.NoError(t, err) {
+			t.FailNow()
+		}
 
-                for _, hs := range hss {
-                        dss, err := hs.ConfigManager().DatastoreSystem(ctx)
-                        if !assert.NoError(t, err) {
-        	                t.FailNow()
-	                }
-        
-                        _, err = dss.CreateLocalDatastore(ctx, "test", dir)
+		for _, hs := range hss {
+			dss, err := hs.ConfigManager().DatastoreSystem(ctx)
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
-                	if !assert.NoError(t, err) {
-                        	t.FailNow()
-                	}
-                }
-        }
-	
+			_, err = dss.CreateLocalDatastore(ctx, "test", dir)
+
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
+		}
+	}
+
 	return dir
 }
