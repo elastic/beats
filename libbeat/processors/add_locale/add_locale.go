@@ -22,9 +22,9 @@ const (
 	Offset
 )
 
-var timezoneFormats = [...]string{
-	"abbrevation",
-	"offset",
+var timezoneFormats = map[TimezoneFormat]string{
+	Abbrevation: "abbrevation",
+	Offset:      "offset",
 }
 
 func (t TimezoneFormat) String() string {
