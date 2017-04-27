@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/config"
+	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/elastic/beats/filebeat/input"
@@ -321,9 +322,12 @@ func (h *Harvester) close() {
 		logp.Debug("harvester", "Closing file: %s", h.state.Source)
 		harvesterOpenFiles.Add(-1)
 
-		// On completion, push offset so we can continue where we left off if we relaunch on the same file
-		// Only send offset if file object was created successfully
-		h.SendStateUpdate()
+		// On shutdown it can be that the stdin reader is still open
+		if h.config.InputType != cfg.StdinInputType {
+			// On completion, push offset so we can continue where we left off if we relaunch on the same file
+			// Only send offset if file object was created successfully
+			h.SendStateUpdate()
+		}
 	} else {
 		logp.Warn("Stopping harvester, NOT closing file as file info not available: %s", h.state.Source)
 	}
