@@ -53,6 +53,12 @@ func (hr *harvesterRegistry) start(h *harvester.Harvester, r reader.Reader) {
 
 	hr.wg.Add(1)
 	hr.add(h)
+
+	// Update state before staring harvester
+	// This makes sure the states is set to Finished: false
+	// This is synchronous state update as part of the scan
+	h.SendStateUpdate()
+
 	go func() {
 		defer func() {
 			hr.remove(h)

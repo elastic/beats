@@ -3,13 +3,10 @@ package harvester
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"time"
-
-	"golang.org/x/text/transform"
-
-	"fmt"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/reader"
@@ -18,6 +15,8 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+
+	"golang.org/x/text/transform"
 )
 
 var (
@@ -171,7 +170,11 @@ func (h *Harvester) Stop() {
 // sendEvent sends event to the spooler channel
 // Return false if event was not sent
 func (h *Harvester) sendEvent(event *input.Event) bool {
-	return h.outlet.OnEventSignal(event)
+	if h.file.HasState() {
+		h.states.Update(event.State)
+	}
+	err := h.forwardEvent(event)
+	return err == nil
 }
 
 // sendStateUpdate send an empty event with the current state to update the registry
@@ -179,10 +182,19 @@ func (h *Harvester) sendEvent(event *input.Event) bool {
 // case the output is blocked the harvester will stay open to make sure no new harvester
 // is started. As soon as the output becomes available again, the finished state is written
 // and processing can continue.
-func (h *Harvester) sendStateUpdate() {
+func (h *Harvester) SendStateUpdate() {
+
+	if !h.file.HasState() {
+		return
+	}
+
 	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
+
 	event := input.NewEvent(h.state)
-	h.outlet.OnEvent(event)
+	h.states.Update(event.State)
+
+	data := event.GetData()
+	h.outlet.OnEvent(&data)
 }
 
 // shouldExportLine decides if the line is exported or not based on
@@ -317,7 +329,7 @@ func (h *Harvester) close() {
 
 		// On completion, push offset so we can continue where we left off if we relaunch on the same file
 		// Only send offset if file object was created successfully
-		h.sendStateUpdate()
+		h.SendStateUpdate()
 	} else {
 		logp.Warn("Stopping harvester, NOT closing file as file info not available: %s", h.state.Source)
 	}
