@@ -114,7 +114,7 @@ func createPingFactory(
 	return monitors.MakePingIPFactory(fields, func(ip *net.IPAddr) (common.MapStr, error) {
 		addr := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
 		d := &dialchain.DialerChain{
-			Net: dialchain.ConstAddrDialer("tcp_connect_rtt", addr, timeout),
+			Net: dialchain.ConstAddrDialer("tcp.rtt.connect", addr, timeout),
 		}
 		if isTLS {
 			d.AddLayer(dialchain.TLSLayer("tls_handshake_rtt", tls, timeout))

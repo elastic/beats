@@ -193,8 +193,10 @@ func MakeByHostJob(
 
 			dnsEnd := time.Now()
 			dnsRTT := dnsEnd.Sub(dnsStart)
-			event["resolve_rtt"] = look.RTT(dnsRTT)
-			event["ip"] = ip.String()
+			event["resolve"] = common.MapStr{
+				"rtt": look.RTT(dnsRTT),
+				"ip":  ip.String(),
+			}
 
 			return WithFields(event, pingFactory(ip)).Run()
 		}), nil
@@ -304,12 +306,47 @@ func annotated(start time.Time, typ string, fn func() (common.MapStr, []TaskRunn
 		}
 
 		if event != nil {
-			event.Update(common.MapStr{
+
+			monitor := common.MapStr{
+				"type":     typ,
+				"duration": look.RTT(time.Now().Sub(start)),
+				"status":   "down",
+			}
+
+			if err == nil {
+				monitor["status"] = "up"
+			}
+
+			if host, ok := event["host"]; ok {
+				monitor["host"] = host
+				delete(event, "host")
+			}
+
+			if ip, ok := event["ip"]; ok {
+				monitor["ip"] = ip
+				delete(event, "ip")
+			}
+
+			var resolve common.MapStr
+			if r, ok := event["resolve"]; ok {
+				resolve = r.(common.MapStr)
+				delete(event, "resolve")
+			}
+
+			if duration, ok := event["duration"]; ok {
+				monitor["duration"] = duration
+				delete(event, "duration")
+			}
+
+			event = common.MapStr{
 				"@timestamp": look.Timestamp(start),
-				"duration":   look.RTT(time.Now().Sub(start)),
-				"type":       typ,
-				"up":         err == nil,
-			})
+				"monitor":    monitor,
+				typ:          event,
+			}
+
+			if resolve != nil {
+				event["resolve"] = resolve
+			}
 		}
 
 		for i := range cont {

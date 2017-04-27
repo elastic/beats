@@ -133,7 +133,9 @@ func pingHost(
 
 	end := time.Now()
 	event := common.MapStr{
-		"validate_rtt": look.RTT(end.Sub(validateStart)),
+		"rtt": common.MapStr{
+			"validate": look.RTT(end.Sub(validateStart)),
+		},
 	}
 	if err != nil {
 		event["error"] = reason.FailValidate(err)
@@ -169,7 +171,7 @@ func buildDialerChain(
 	config *Config,
 ) (*dialchain.DialerChain, error) {
 	d := &dialchain.DialerChain{
-		Net: dialchain.TCPDialer("tcp_connect_rtt", config.Timeout),
+		Net: dialchain.TCPDialer("rtt.connect", config.Timeout),
 	}
 	if config.Socks5.URL != "" {
 		d.AddLayer(dialchain.SOCKS5Layer("socks5_connect_rtt", &config.Socks5))
@@ -203,7 +205,7 @@ func buildHostDialerChainFactory(
 		}
 
 		return &dialchain.DialerChain{
-			Net:    dialchain.ConstAddrDialer("tcp_connect_rtt", addr, config.Timeout),
+			Net:    dialchain.ConstAddrDialer("rtt.connect", addr, config.Timeout),
 			Layers: template.Layers,
 		}
 	}, nil

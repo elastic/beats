@@ -241,7 +241,8 @@ func createJobTask(
 		}
 
 		if event != nil {
-			event["monitor"] = name
+
+			event["monitor"].(common.MapStr)["name"] = name
 			client.PublishEvent(event)
 		}
 

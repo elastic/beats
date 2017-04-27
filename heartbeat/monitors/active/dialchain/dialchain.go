@@ -101,7 +101,7 @@ func (c *DialerChain) AddLayer(l Layer) {
 
 func measureEventRTT(event common.MapStr, name string) DialLayerCallback {
 	return &MeasureLayerRTTCB{Callback: func(start, end time.Time) {
-		event[name] = look.RTT(end.Sub(start))
+		event.Put(name, look.RTT(end.Sub(start)))
 	}}
 }
 
