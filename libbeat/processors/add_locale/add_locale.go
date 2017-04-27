@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -52,7 +51,7 @@ func newAddLocale(c common.Config) (processors.Processor, error) {
 	case "offset":
 		loc.TimezoneFormat = Offset
 	default:
-		return nil, errors.New("given format is not valid")
+		return nil, fmt.Errorf("'%s' is not a valid format option for processor add_locale. Valid options are 'abbrevation' and 'offset'", config.Format)
 
 	}
 	return loc, nil
@@ -72,7 +71,6 @@ func (l addLocale) Format() string {
 	case Abbrevation:
 		fmt, _ = tm.Zone()
 	case Offset:
-		//loc, _ := time.LoadLocation("America/Belize")
 		_, offset := tm.Zone()
 
 		offset = offset / 3600
