@@ -362,6 +362,8 @@ _Tencent Cloud_
 
 _Alibaba Cloud_
 
+This metadata is only available when VPC is selected as the network type of the ECS instance.
+
 [source,json]
 -------------------------------------------------------------------------------
 {
