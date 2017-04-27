@@ -32,17 +32,31 @@ type MetricSet struct {
 	cacheCmdLine bool
 }
 
+// includeTopConfig is the configuration for the "top N processes
+// filtering" feature
+type includeTopConfig struct {
+	Enabled  bool `config:"enabled"`
+	ByCPU    int  `config:"by_cpu"`
+	ByMemory int  `config:"by_memory"`
+}
+
 // New creates and returns a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
-		Procs        []string `config:"processes"`
-		Cgroups      *bool    `config:"process.cgroups.enabled"`
-		EnvWhitelist []string `config:"process.env.whitelist"`
-		CPUTicks     bool     `config:"cpu_ticks"`
-		CacheCmdLine bool     `config:"process.cmdline.cache.enabled"`
+		Procs        []string         `config:"processes"`
+		Cgroups      *bool            `config:"process.cgroups.enabled"`
+		EnvWhitelist []string         `config:"process.env.whitelist"`
+		CPUTicks     bool             `config:"cpu_ticks"`
+		CacheCmdLine bool             `config:"process.cmdline.cache.enabled"`
+		IncludeTop   includeTopConfig `config:"process.include_top_n"`
 	}{
 		Procs:        []string{".*"}, // collect all processes by default
 		CacheCmdLine: true,
+		IncludeTop: includeTopConfig{
+			Enabled:  true,
+			ByCPU:    0,
+			ByMemory: 0,
+		},
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -55,6 +69,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			EnvWhitelist: config.EnvWhitelist,
 			CpuTicks:     config.CPUTicks,
 			CacheCmdLine: config.CacheCmdLine,
+			IncludeTop:   config.IncludeTop,
 		},
 	}
 	err := m.stats.InitProcStats()

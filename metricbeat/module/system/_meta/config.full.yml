@@ -36,6 +36,23 @@
   # if true, exports the CPU usage in ticks, together with the percentage values
   #cpu_ticks: false
 
+  # These options allow you to filter out all processes that are not
+  # in the top N by CPU or memory, in order to reduce the number of documents created.
+  # If both the `by_cpu` and `by_memory` options are used, the reunion of the two tops
+  # is included.
+  #process.include_top_n:
+    #
+    # Set to false to disable this feature and include all processes
+    #enabled: true
+
+    # How many processes to include from the top by CPU. The processes are sorted
+    # by the `system.process.cpu.total.pct` field.
+    #by_cpu: 0
+
+    # How many processes to include from the top by memory. The processes are sorted
+    # by the `system.process.memory.rss.bytes` field.
+    #by_memory: 0
+
   # If false, cmdline of a process is not cached.
   #process.cmdline.cache.enabled: true
 
