@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -60,7 +59,7 @@ func (l *Log) LoadStates(states []file.State) error {
 			}
 
 			// Update prospector states and send new states to registry
-			err := l.Prospector.updateState(input.NewEvent(state))
+			err := l.Prospector.updateState(state)
 			if err != nil {
 				logp.Err("Problem putting initial state: %+v", err)
 				return err
@@ -131,7 +130,7 @@ func (l *Log) removeState(state file.State) {
 	}
 
 	state.TTL = 0
-	err := l.Prospector.updateState(input.NewEvent(state))
+	err := l.Prospector.updateState(state)
 	if err != nil {
 		logp.Err("File cleanup state update error: %s", err)
 	}
@@ -323,7 +322,7 @@ func (l *Log) harvestExistingFile(newState file.State, oldState file.State) {
 			logp.Debug("prospector", "Updating state for renamed file: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
 			// Update state because of file rotation
 			oldState.Source = newState.Source
-			err := l.Prospector.updateState(input.NewEvent(oldState))
+			err := l.Prospector.updateState(oldState)
 			if err != nil {
 				logp.Err("File rotation state update error: %s", err)
 			}
@@ -367,7 +366,7 @@ func (l *Log) handleIgnoreOlder(lastState, newState file.State) error {
 
 	// Write state for ignore_older file as none exists yet
 	newState.Finished = true
-	err := l.Prospector.updateState(input.NewEvent(newState))
+	err := l.Prospector.updateState(newState)
 	if err != nil {
 		return err
 	}
