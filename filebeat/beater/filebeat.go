@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 
+	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/crawler"
 	"github.com/elastic/beats/filebeat/fileset"
@@ -148,7 +149,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	crawler, err := crawler.New(newSpoolerOutlet(fb.done, spooler, wgEvents), config.Prospectors, fb.done, *once)
+	crawler, err := crawler.New(channel.NewOutlet(fb.done, spooler.Channel, wgEvents), config.Prospectors, fb.done, *once)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err
