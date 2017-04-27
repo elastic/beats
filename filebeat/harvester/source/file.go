@@ -7,3 +7,4 @@ type File struct {
 }
 
 func (File) Continuable() bool { return true }
+func (File) HasState() bool    { return true }

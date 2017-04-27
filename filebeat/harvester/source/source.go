@@ -14,4 +14,5 @@ type FileSource interface {
 	LogSource
 	Stat() (os.FileInfo, error)
 	Continuable() bool // can we continue processing after EOF?
+	HasState() bool    // does this source have a state?
 }
