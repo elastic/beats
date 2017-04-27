@@ -2,7 +2,8 @@ package add_cloud_metadata
 
 import "github.com/elastic/beats/libbeat/common"
 
-// Tenccent Cloud Metadata Service
+// Tencent Cloud Metadata Service
+// Document https://www.qcloud.com/document/product/213/4934
 func newQcloudMetadataFetcher(c common.Config) (*metadataFetcher, error) {
 	qcloudMetadataHost := "metadata.tencentyun.com"
 	qcloudMetadataInstanceIDURI := "/meta-data/instance-id"
