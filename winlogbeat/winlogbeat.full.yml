@@ -14,12 +14,6 @@
 # in the directory in which it was started.
 #winlogbeat.registry_file: .winlogbeat.yml
 
-# Diagnostic metrics that can retrieved through a web interface if a
-# bindaddress value (host:port) is specified. The web address will be
-# http://<bindaddress>/debug/vars
-#winlogbeat.metrics:
-#  bindaddress: 'localhost:8123'
-
 # event_logs specifies a list of event logs to monitor as well as any
 # accompanying options. The YAML data type of event_logs is a list of
 # dictionaries.

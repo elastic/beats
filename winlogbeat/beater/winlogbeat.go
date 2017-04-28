@@ -116,6 +116,7 @@ func (eb *Winlogbeat) setup(b *beat.Beat) error {
 	}
 
 	if config.Metrics.BindAddress != "" {
+		logp.Warn("DEPRECATED: Metrics endpoint is deprecated and will be removed in 6.0")
 		bindAddress := config.Metrics.BindAddress
 		sock, err := net.Listen("tcp", bindAddress)
 		if err != nil {

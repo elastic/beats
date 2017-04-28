@@ -80,8 +80,9 @@ https://github.com/elastic/beats/compare/v5.3.0...master[Check the HEAD diff]
 *Packetbeat*
 
 *Winlogbeat*
+- Deprecated metrics endpoint. It is superseded by a libbeat feature that can serve metrics on an HTTP endpoint. {pull}4145[4145]
 
-==== Knwon Issue
+==== Known Issue
 
 *Affecting all Beats*
 
