@@ -91,7 +91,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	// Converts hash list to slice
 	events := []common.MapStr{}
 	for _, e := range eventList {
-		e["_namespace"] = m.namespace
+		e[mb.NamespaceKey] = m.namespace
 		events = append(events, e)
 	}
 

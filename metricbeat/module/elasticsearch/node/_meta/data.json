@@ -17,15 +17,14 @@
                 },
                 "version": "1.8.0_121"
             },
-            "name": "fLk5w1-IR2a03fUrs5KbWA",
+            "name": "8zgOwJ24TMamDDH9amWINQ",
             "version": "6.0.0-alpha1"
         }
     },
     "metricset": {
-        "host": "elasticsearch:9200",
+        "host": "127.0.0.1:9200",
         "module": "elasticsearch",
         "name": "node",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }
