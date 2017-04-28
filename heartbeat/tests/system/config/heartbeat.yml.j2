@@ -1,7 +1,11 @@
 heartbeat.monitors:
-- type: icmp
-  hosts: ["localhost"]
-  schedule: '@every 10s'
+- type: http
+  urls: ["http://localhost:9200"]
+  schedule: '@every 1s'
+  tags: ["http_monitor_tags"]
+  fields_under_root: true
+  fields:
+    hello: world
 
 output.file:
   path: {{ output_file_path|default(beat.working_dir + "/output") }}
