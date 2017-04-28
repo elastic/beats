@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Warning\",\"type\":\"markdown\",\"params\":{\"markdown\":\"**This dashboard is only compatible with Kibana 5.4 and above. **\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Warning", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\"}},\"filter\":[]}"
+  }
+}
