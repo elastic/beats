@@ -78,6 +78,7 @@ func (c *console) PublishEvent(
 	}
 
 	op.SigCompleted(s)
+	return nil
 fail:
 	if opts.Guaranteed {
 		logp.Critical("Unable to publish events to console: %v", err)
