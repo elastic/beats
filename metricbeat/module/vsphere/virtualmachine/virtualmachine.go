@@ -78,7 +78,10 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	}
 
 	events := []common.MapStr{}
+	// to know when its finished
 	var wg sync.WaitGroup
+	// to prevent events be modified at same time
+	var mutex sync.Mutex
 
 	for _, dc := range dcs {
 
@@ -144,8 +147,10 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 						},
 					},
 				}
-
+				
+				mutex.Lock()
 				events = append(events, event)
+				mutex.Unlock()
 			}(vm)
 		}
 	}
