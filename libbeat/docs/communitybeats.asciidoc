@@ -1,8 +1,20 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content appears in both the Beats Platform Reference and the
+//// Beats Developer Guide.
+//////////////////////////////////////////////////////////////////////////
+
 [[community-beats]]
 == Community Beats
 
 The open source community has been hard at work developing new Beats. You can check
 out some of them here.
+
+Have a question about a community Beat? You can post questions and discuss issues in the
+https://discuss.elastic.co/c/beats/community-beats[Community Beats] category of the Beats discussion forum.
+
+Have you created a Beat that's not listed? If so, add the name and description of your Beat to the source document for
+https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository] to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/annoucements[announce] your new Beat in the Elastic
+discussion forum.
 
 NOTE: Elastic provides no warranty or support for community-sourced Beats.
 
@@ -62,15 +74,3 @@ https://github.com/cleesmith/unifiedbeat[unifiedbeat]:: Reads records from Unifi
 network intrusion detection software and indexes the records in Elasticsearch.
 https://github.com/mrkschan/uwsgibeat[uwsgibeat]:: Reads stats from uWSGI.
 https://github.com/eskibars/wmibeat[wmibeat]:: Uses WMI to grab your favorite, configurable Windows metrics. 
-
-Have you created a Beat that's not listed? If so, add the name and description of your Beat to the source document for
-https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository] to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/annoucements[announce] your new Beat in the Elastic
-discussion forum.
-
-[float]
-[[getting-help-community-beats]]
-=== Getting Help with Community Beats
-
-Have a question about a community Beat? You can post questions and discuss issues in the
-https://discuss.elastic.co/c/beats/community-beats[Community Beats] category of the Beats discussion forum.
-
