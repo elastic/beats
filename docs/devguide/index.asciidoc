@@ -21,6 +21,8 @@ include::../../libbeat/docs/version.asciidoc[]
 
 include::./contributing.asciidoc[]
 
+include::../../libbeat/docs/communitybeats.asciidoc[]
+
 include::./newbeat.asciidoc[]
 
 include::./event-conventions.asciidoc[]
