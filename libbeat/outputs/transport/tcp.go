@@ -29,6 +29,6 @@ func NetDialer(timeout time.Duration) Dialer {
 
 		// dial via host IP by randomized iteration of known IPs
 		dialer := &net.Dialer{Timeout: timeout}
-		return dialWith(dialer, network, host, addresses, port)
+		return DialWith(dialer, network, host, addresses, port)
 	})
 }

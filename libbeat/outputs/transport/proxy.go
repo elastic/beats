@@ -76,6 +76,6 @@ func ProxyDialer(config *ProxyConfig, forward Dialer) (Dialer, error) {
 		if err != nil {
 			return nil, err
 		}
-		return dialWith(dialer, network, host, addresses, port)
+		return DialWith(dialer, network, host, addresses, port)
 	}), nil
 }

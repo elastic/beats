@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"strconv"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -13,7 +12,7 @@ import (
 )
 
 type funcJob struct {
-	name, typ string
+	settings JobSettings
 	funcTask
 }
 
@@ -21,12 +20,31 @@ type funcTask struct {
 	run func() (common.MapStr, []TaskRunner, error)
 }
 
+// IPSettings provides common configuration settings for IP resolution and ping
+// mode.
 type IPSettings struct {
 	IPv4 bool     `config:"ipv4"`
 	IPv6 bool     `config:"ipv6"`
 	Mode PingMode `config:"mode"`
 }
 
+// JobSettings configures a Job name and global fields to be added to every
+// event.
+type JobSettings struct {
+	Name   string
+	Fields common.MapStr
+}
+
+// HostJobSettings configures a Job including Host lookups and global fields to be added
+// to every event.
+type HostJobSettings struct {
+	Name   string
+	Host   string
+	IP     IPSettings
+	Fields common.MapStr
+}
+
+// PingMode enumeration for configuring `any` or `all` IPs pinging.
 type PingMode uint8
 
 const (
@@ -35,12 +53,16 @@ const (
 	PingAll
 )
 
+// DefaultIPSettings provides an instance of default IPSettings to be copied
+// when unpacking settings from a common.Config object.
 var DefaultIPSettings = IPSettings{
 	IPv4: true,
 	IPv6: true,
 	Mode: PingAny,
 }
 
+// Network determines the Network type used for IP name resolution, based on the
+// provided settings.
 func (s IPSettings) Network() string {
 	switch {
 	case s.IPv4 && !s.IPv6:
@@ -53,23 +75,40 @@ func (s IPSettings) Network() string {
 	return ""
 }
 
-func MakeSimpleJob(name, typ string, f func() (common.MapStr, error)) Job {
-	return MakeJob(name, typ, func() (common.MapStr, []TaskRunner, error) {
+// MakeSimpleJob creates a new Job from a callback function. The callback should
+// return an valid event and can not create any sub-tasks to be executed after
+// completion.
+func MakeSimpleJob(settings JobSettings, f func() (common.MapStr, error)) Job {
+	return MakeJob(settings, func() (common.MapStr, []TaskRunner, error) {
 		event, err := f()
 		return event, nil, err
 	})
 }
 
-func MakeJob(name, typ string, f func() (common.MapStr, []TaskRunner, error)) Job {
-	return &funcJob{name, typ, funcTask{func() (common.MapStr, []TaskRunner, error) {
-		return annotated(time.Now(), typ, f).Run()
+// MakeJob create a new Job from a callback function. The callback can
+// optionally return an event to be published and a set of derived sub-tasks to be
+// scheduled. The sub-tasks will be run only once and removed from the scheduler
+// after completion.
+func MakeJob(settings JobSettings, f func() (common.MapStr, []TaskRunner, error)) Job {
+	settings.AddFields(common.MapStr{
+		"monitor": common.MapStr{
+			"id": settings.Name,
+		},
+	})
+
+	return &funcJob{settings, funcTask{func() (common.MapStr, []TaskRunner, error) {
+		return annotated(settings, time.Now(), f).Run()
 	}}}
 }
 
+// MakeCont wraps a function into an executable TaskRunner. The task being generated
+// can optionally return an event and/or sub-tasks.
 func MakeCont(f func() (common.MapStr, []TaskRunner, error)) TaskRunner {
 	return funcTask{f}
 }
 
+// MakeSimpleCont wraps a function into an executable TaskRunner. The task bein generated
+// should return an event to be reported.
 func MakeSimpleCont(f func() (common.MapStr, error)) TaskRunner {
 	return MakeCont(func() (common.MapStr, []TaskRunner, error) {
 		event, err := f()
@@ -77,44 +116,33 @@ func MakeSimpleCont(f func() (common.MapStr, error)) TaskRunner {
 	})
 }
 
+// MakePingIPFactory creates a factory for building a Task from a new IP address.
 func MakePingIPFactory(
-	fields common.MapStr,
 	f func(*net.IPAddr) (common.MapStr, error),
 ) func(*net.IPAddr) TaskRunner {
 	return func(ip *net.IPAddr) TaskRunner {
-		r := MakeSimpleCont(func() (common.MapStr, error) { return f(ip) })
-		if len(fields) > 0 {
-			r = WithFields(fields, r)
-		}
-		return r
+		return MakeSimpleCont(func() (common.MapStr, error) { return f(ip) })
 	}
 }
 
 var emptyTask = MakeSimpleCont(func() (common.MapStr, error) { return nil, nil })
 
+// MakePingAllIPFactory wraps a function for building a recursive Task Runner from function callbacks.
 func MakePingAllIPFactory(
-	fields common.MapStr,
 	f func(*net.IPAddr) []func() (common.MapStr, error),
 ) func(*net.IPAddr) TaskRunner {
-	makeTask := func(f func() (common.MapStr, error)) TaskRunner {
-		if len(fields) > 0 {
-			return WithFields(fields, MakeSimpleCont(f))
-		}
-		return MakeSimpleCont(f)
-	}
-
 	return func(ip *net.IPAddr) TaskRunner {
 		cont := f(ip)
 		switch len(cont) {
 		case 0:
 			return emptyTask
 		case 1:
-			return makeTask(cont[0])
+			return MakeSimpleCont(cont[0])
 		}
 
 		tasks := make([]TaskRunner, len(cont))
 		for i, c := range cont {
-			tasks[i] = makeTask(c)
+			tasks[i] = MakeSimpleCont(c)
 		}
 		return MakeCont(func() (common.MapStr, []TaskRunner, error) {
 			return nil, tasks, nil
@@ -122,39 +150,38 @@ func MakePingAllIPFactory(
 	}
 }
 
+// MakePingAllIPPortFactory builds a set of TaskRunner supporting a set of
+// IP/port-pairs.
 func MakePingAllIPPortFactory(
-	fields common.MapStr,
 	ports []uint16,
 	f func(*net.IPAddr, uint16) (common.MapStr, error),
 ) func(*net.IPAddr) TaskRunner {
 	if len(ports) == 1 {
 		port := ports[0]
-		fields := fields.Clone()
-		fields["port"] = strconv.Itoa(int(port))
-		return MakePingIPFactory(fields, func(ip *net.IPAddr) (common.MapStr, error) {
+		return MakePingIPFactory(func(ip *net.IPAddr) (common.MapStr, error) {
 			return f(ip, port)
 		})
 	}
 
-	return MakePingAllIPFactory(fields, func(ip *net.IPAddr) []func() (common.MapStr, error) {
+	return MakePingAllIPFactory(func(ip *net.IPAddr) []func() (common.MapStr, error) {
 		funcs := make([]func() (common.MapStr, error), len(ports))
 		for i := range ports {
 			port := ports[i]
 			funcs[i] = func() (common.MapStr, error) {
-				event, err := f(ip, port)
-				if event == nil {
-					event = common.MapStr{}
-				}
-				event["port"] = strconv.Itoa(int(port))
-				return event, err
+				return f(ip, port)
 			}
 		}
 		return funcs
 	})
 }
 
+// MakeByIPJob builds a new Job based on already known IP. Similar to
+// MakeByHostJob, the pingFactory will be used to build the tasks run by the job.
+//
+// A pingFactory instance is normally build with MakePingIPFactory,
+// MakePingAllIPFactory or MakePingAllIPPortFactory.
 func MakeByIPJob(
-	name, typ string,
+	settings JobSettings,
 	ip net.IP,
 	pingFactory func(ip *net.IPAddr) TaskRunner,
 ) (Job, error) {
@@ -165,86 +192,144 @@ func MakeByIPJob(
 		return nil, err
 	}
 
-	fields := common.MapStr{"ip": addr.String()}
-	return MakeJob(name, typ, WithFields(fields, pingFactory(addr)).Run), nil
+	fields := common.MapStr{
+		"monitor": common.MapStr{"ip": addr.String()},
+	}
+	return MakeJob(settings, WithFields(fields, pingFactory(addr)).Run), nil
 }
 
+// MakeByHostJob creates a new Job including host lookup. The pingFactory will be used to
+// build one or multiple Tasks after name lookup according to settings.
+//
+// A pingFactory instance is normally build with MakePingIPFactory,
+// MakePingAllIPFactory or MakePingAllIPPortFactory.
 func MakeByHostJob(
-	name, typ string,
-	host string,
-	settings IPSettings,
+	settings HostJobSettings,
 	pingFactory func(ip *net.IPAddr) TaskRunner,
 ) (Job, error) {
-	network := settings.Network()
+	host := settings.Host
+
+	if ip := net.ParseIP(host); ip != nil {
+		return MakeByIPJob(settings.jobSettings(), ip, pingFactory)
+	}
+
+	network := settings.IP.Network()
 	if network == "" {
 		return nil, errors.New("pinging hosts requires ipv4 or ipv6 mode enabled")
 	}
 
-	mode := settings.Mode
+	mode := settings.IP.Mode
+
+	settings.AddFields(common.MapStr{
+		"monitor": common.MapStr{
+			"host": host,
+		},
+	})
+
 	if mode == PingAny {
-		return MakeJob(name, typ, func() (common.MapStr, []TaskRunner, error) {
-			event := common.MapStr{"host": host}
-
-			dnsStart := time.Now()
-			ip, err := net.ResolveIPAddr(network, host)
-			if err != nil {
-				return event, nil, err
-			}
-
-			dnsEnd := time.Now()
-			dnsRTT := dnsEnd.Sub(dnsStart)
-			event["resolve_rtt"] = look.RTT(dnsRTT)
-			event["ip"] = ip.String()
-
-			return WithFields(event, pingFactory(ip)).Run()
-		}), nil
+		return makeByHostAnyIPJob(settings, host, pingFactory), nil
 	}
+	return makeByHostAllIPJob(settings, host, pingFactory), nil
+}
 
+func makeByHostAnyIPJob(
+	settings HostJobSettings,
+	host string,
+	pingFactory func(ip *net.IPAddr) TaskRunner,
+) Job {
+	network := settings.IP.Network()
+
+	return MakeJob(settings.jobSettings(), func() (common.MapStr, []TaskRunner, error) {
+		resolveStart := time.Now()
+		ip, err := net.ResolveIPAddr(network, host)
+		if err != nil {
+			return resolveErr(host, err)
+		}
+
+		resolveEnd := time.Now()
+		resolveRTT := resolveEnd.Sub(resolveStart)
+
+		event := resolveIPEvent(host, ip.String(), resolveRTT)
+		return WithFields(event, pingFactory(ip)).Run()
+	})
+}
+
+func makeByHostAllIPJob(
+	settings HostJobSettings,
+	host string,
+	pingFactory func(ip *net.IPAddr) TaskRunner,
+) Job {
+	network := settings.IP.Network()
 	filter := makeIPFilter(network)
-	return MakeJob(name, typ, func() (common.MapStr, []TaskRunner, error) {
-		event := common.MapStr{"host": host}
 
+	return MakeJob(settings.jobSettings(), func() (common.MapStr, []TaskRunner, error) {
 		// TODO: check for better DNS IP lookup support:
 		//         - The net.LookupIP drops ipv6 zone index
 		//
-		dnsStart := time.Now()
+		resolveStart := time.Now()
 		ips, err := net.LookupIP(host)
 		if err != nil {
-			return event, nil, err
+			return resolveErr(host, err)
 		}
 
-		dnsEnd := time.Now()
-		dnsRTT := dnsEnd.Sub(dnsStart)
+		resolveEnd := time.Now()
+		resolveRTT := resolveEnd.Sub(resolveStart)
 
-		event["resolve_rtt"] = look.RTT(dnsRTT)
 		if filter != nil {
 			ips = filterIPs(ips, filter)
 		}
 
 		if len(ips) == 0 {
 			err := fmt.Errorf("no %v address resolvable for host %v", network, host)
-			return event, nil, err
+			return resolveErr(host, err)
 		}
 
 		// create ip ping tasks
 		cont := make([]TaskRunner, len(ips))
 		for i, ip := range ips {
 			addr := &net.IPAddr{IP: ip}
-			fields := event.Clone()
-			fields["ip"] = ip.String()
-			cont[i] = WithFields(fields, pingFactory(addr))
+			event := resolveIPEvent(host, ip.String(), resolveRTT)
+			cont[i] = WithFields(event, pingFactory(addr))
 		}
 		return nil, cont, nil
-	}), nil
+	})
 }
 
+func resolveIPEvent(host, ip string, rtt time.Duration) common.MapStr {
+	return common.MapStr{
+		"monitor": common.MapStr{
+			"host": host,
+			"ip":   ip,
+		},
+		"resolve": common.MapStr{
+			"host": host,
+			"ip":   ip,
+			"rtt":  look.RTT(rtt),
+		},
+	}
+}
+
+func resolveErr(host string, err error) (common.MapStr, []TaskRunner, error) {
+	event := common.MapStr{
+		"monitor": common.MapStr{
+			"host": host,
+		},
+		"resolve": common.MapStr{
+			"host": host,
+		},
+	}
+	return event, nil, err
+}
+
+// WithFields wraps a TaskRunner, updating all events returned with the set of
+// fields configured.
 func WithFields(fields common.MapStr, r TaskRunner) TaskRunner {
 	return MakeCont(func() (common.MapStr, []TaskRunner, error) {
 		event, cont, err := r.Run()
 		if event == nil {
 			event = common.MapStr{}
 		}
-		event.Update(fields)
+		event.DeepUpdate(fields)
 
 		for i := range cont {
 			cont[i] = WithFields(fields, cont[i])
@@ -253,9 +338,11 @@ func WithFields(fields common.MapStr, r TaskRunner) TaskRunner {
 	})
 }
 
-func WithDuration(name string, r TaskRunner) TaskRunner {
+// WithDuration wraps a TaskRunner, measuring the duration between creation and
+// finish of the actual task and sub-tasks.
+func WithDuration(field string, r TaskRunner) TaskRunner {
 	return MakeCont(func() (common.MapStr, []TaskRunner, error) {
-		return withStart(name, time.Now(), r).Run()
+		return withStart(field, time.Now(), r).Run()
 	})
 }
 
@@ -263,7 +350,7 @@ func withStart(field string, start time.Time, r TaskRunner) TaskRunner {
 	return MakeCont(func() (common.MapStr, []TaskRunner, error) {
 		event, cont, err := r.Run()
 		if event != nil {
-			event[field] = look.RTT(time.Now().Sub(start))
+			event.Put(field, look.RTT(time.Since(start)))
 		}
 
 		for i := range cont {
@@ -273,14 +360,16 @@ func withStart(field string, start time.Time, r TaskRunner) TaskRunner {
 	})
 }
 
-func (f *funcJob) Name() string { return f.name }
+func (f *funcJob) Name() string { return f.settings.Name }
 
 func (f funcTask) Run() (common.MapStr, []TaskRunner, error) { return f.run() }
 
-func (f funcTask) annotated(start time.Time, typ string) TaskRunner {
-	return annotated(start, typ, f.run)
+func (f funcTask) annotated(settings JobSettings, start time.Time) TaskRunner {
+	return annotated(settings, start, f.run)
 }
 
+// Unpack sets PingMode from a constant string. Unpack will be called by common.Unpack when
+// unpacking into an IPSettings type.
 func (p *PingMode) Unpack(s string) error {
 	switch s {
 	case "all":
@@ -293,7 +382,11 @@ func (p *PingMode) Unpack(s string) error {
 	return nil
 }
 
-func annotated(start time.Time, typ string, fn func() (common.MapStr, []TaskRunner, error)) TaskRunner {
+func annotated(
+	settings JobSettings,
+	start time.Time,
+	fn func() (common.MapStr, []TaskRunner, error),
+) TaskRunner {
 	return MakeCont(func() (common.MapStr, []TaskRunner, error) {
 		event, cont, err := fn()
 		if err != nil {
@@ -304,19 +397,24 @@ func annotated(start time.Time, typ string, fn func() (common.MapStr, []TaskRunn
 		}
 
 		if event != nil {
-			event.Update(common.MapStr{
+			status := look.Status(err)
+			event.DeepUpdate(common.MapStr{
 				"@timestamp": look.Timestamp(start),
-				"duration":   look.RTT(time.Now().Sub(start)),
-				"type":       typ,
-				"up":         err == nil,
+				"monitor": common.MapStr{
+					"duration": look.RTT(time.Since(start)),
+					"status":   status,
+				},
 			})
+			if fields := settings.Fields; fields != nil {
+				event.DeepUpdate(fields)
+			}
 		}
 
 		for i := range cont {
 			if fcont, ok := cont[i].(funcTask); ok {
-				cont[i] = fcont.annotated(start, typ)
+				cont[i] = fcont.annotated(settings, start)
 			} else {
-				cont[i] = annotated(start, typ, cont[i].Run)
+				cont[i] = annotated(settings, start, cont[i].Run)
 			}
 		}
 		return event, cont, nil
@@ -341,4 +439,56 @@ func filterIPs(ips []net.IP, filt func(net.IP) bool) []net.IP {
 		}
 	}
 	return out
+}
+
+// MakeJobSetting creates a new JobSettings structure without any global event fields.
+func MakeJobSetting(name string) JobSettings {
+	return JobSettings{Name: name}
+}
+
+// WithFields adds new event fields to a Job. Existing fields will be
+// overwritten.
+// The fields map will be updated (no copy).
+func (s JobSettings) WithFields(m common.MapStr) JobSettings {
+	s.AddFields(m)
+	return s
+}
+
+// AddFields adds new event fields to a Job. Existing fields will be
+// overwritten.
+func (s *JobSettings) AddFields(m common.MapStr) { addFields(&s.Fields, m) }
+
+// MakeHostJobSettings creates a new HostJobSettings structure without any global
+// event fields.
+func MakeHostJobSettings(name, host string, ip IPSettings) HostJobSettings {
+	return HostJobSettings{Name: name, Host: host, IP: ip}
+}
+
+// WithFields adds new event fields to a Job. Existing fields will be
+// overwritten.
+// The fields map will be updated (no copy).
+func (s HostJobSettings) WithFields(m common.MapStr) HostJobSettings {
+	s.AddFields(m)
+	return s
+}
+
+// AddFields adds new event fields to a Job. Existing fields will be
+// overwritten.
+func (s *HostJobSettings) AddFields(m common.MapStr) { addFields(&s.Fields, m) }
+
+func addFields(to *common.MapStr, m common.MapStr) {
+	if m == nil {
+		return
+	}
+
+	fields := *to
+	if fields == nil {
+		fields = common.MapStr{}
+		*to = fields
+	}
+	fields.DeepUpdate(m)
+}
+
+func (s *HostJobSettings) jobSettings() JobSettings {
+	return JobSettings{Name: s.Name, Fields: s.Fields}
 }
