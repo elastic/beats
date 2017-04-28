@@ -15,7 +15,13 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-http>>
+* <<exported-fields-icmp>>
 * <<exported-fields-kubernetes>>
+* <<exported-fields-resolve>>
+* <<exported-fields-socks5>>
+* <<exported-fields-tcp>>
+* <<exported-fields-tls>>
 
 --
 [[exported-fields-beat]]
@@ -160,67 +166,40 @@ Region in which this host is running.
 
 
 [[exported-fields-common]]
-== Common monitoring fields Fields
+== Common Heartbeat Monitor Fields
 
 None
 
 
 [float]
-=== type
+== monitor Fields
+
+Common monitor fields.
+
+
+
+[float]
+=== monitor.type
 
 type: keyword
-
-required: True
 
 The monitor type.
 
 
 [float]
-=== monitor
+=== monitor.name
 
 type: keyword
 
-Monitor job name.
+The monitors configured name
 
 
 [float]
-=== scheme
+=== monitor.id
 
 type: keyword
 
-Address url scheme. For example `tcp`, `ssl`, `http`, and `https`.
-
-
-[float]
-=== host
-
-type: keyword
-
-Hostname of service being monitored. Can be missing, if service is monitored by IP.
-
-
-[float]
-=== port
-
-type: integer
-
-Service port number.
-
-
-[float]
-=== url
-
-type: text
-
-Service url used by monitor.
-
-
-[float]
-=== ip
-
-type: ip
-
-IP of service being monitored. If service is monitored by hostname, the `ip` field contains the resolved ip address for the current host.
+The monitors full job ID as used by heartbeat.
 
 
 [float]
@@ -230,107 +209,66 @@ total monitoring test duration
 
 
 [float]
-=== duration.us
+=== monitor.duration.us
 
 type: long
 
 Duration in microseconds
 
 [float]
-== resolve_rtt Fields
+=== monitor.scheme
 
-Duration required to resolve an IP from hostname.
+type: keyword
 
-
-[float]
-=== resolve_rtt.us
-
-type: long
-
-Duration in microseconds
-
-[float]
-== icmp_rtt Fields
-
-ICMP Echo Request and Reply round trip time
+Address url scheme. For example `tcp`, `tls`, `http`, and `https`.
 
 
 [float]
-=== icmp_rtt.us
+=== monitor.host
 
-type: long
+type: keyword
 
-Duration in microseconds
-
-[float]
-== tcp_connect_rtt Fields
-
-Duration required to establish a TCP connection based on already available IP address.
-
+Hostname of service being monitored. Can be missing, if service is monitored by IP.
 
 
 [float]
-=== tcp_connect_rtt.us
+=== monitor.ip
 
-type: long
+type: ip
 
-Duration in microseconds
-
-[float]
-== socks5_connect_rtt Fields
-
-Time required to establish a connection via SOCKS5 to endpoint based on available connection to SOCKS5 proxy.
-
+IP of service being monitored. If service is monitored by hostname, the `ip` field contains the resolved ip address for the current host.
 
 
 [float]
-=== socks5_connect_rtt.us
+=== monitor.status
 
-type: long
+type: keyword
 
-Duration in microseconds
+required: True
+
+Indicator if monitor could validate the service to be available.
+
+
+[[exported-fields-http]]
+== HTTP Monitor Fields
+
+None
+
 
 [float]
-== tls_handshake_rtt Fields
+== http Fields
 
-Time required to finish TLS handshake based on already available network connection.
+HTTP related fields.
 
 
 
 [float]
-=== tls_handshake_rtt.us
+=== http.url
 
-type: long
+type: text
 
-Duration in microseconds
+Service url used by monitor.
 
-[float]
-== http_rtt Fields
-
-Time required between sending the HTTP request and first by from HTTP response being read. Duration based on already available network connection.
-
-
-
-[float]
-=== http_rtt.us
-
-type: long
-
-Duration in microseconds
-
-[float]
-== validate_rtt Fields
-
-Time required for validating the connection if connection checks are configured.
-
-
-
-[float]
-=== validate_rtt.us
-
-type: long
-
-Duration in microseconds
 
 [float]
 == response Fields
@@ -340,7 +278,7 @@ Service response parameters.
 
 
 [float]
-=== response.status
+=== http.response.status
 
 type: integer
 
@@ -348,14 +286,129 @@ Response status code.
 
 
 [float]
-=== up
+== rtt Fields
 
-type: boolean
+HTTP layer round trip times.
 
-required: True
 
-Boolean indicator if monitor could validate the service to be available.
 
+[float]
+== validate Fields
+
+Duration between first byte of HTTP request being written and
+response being processed by validator. Duration based on already
+available network connection.
+
+Note: if validator is not reading body or only a prefix, this
+      number does not fully represent the total time needed
+      to read the body.
+
+
+
+[float]
+=== http.rtt.validate.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== validate_body Fields
+
+Duration of validator required to read and validate the response
+body.
+
+Note: if validator is not reading body or only a prefix, this
+      number does not fully represent the total time needed
+      to read the body.
+
+
+
+[float]
+=== http.rtt.validate_body.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== write_request Fields
+
+Duration of sending the complete HTTP request. Duration based on already available network connection.
+
+
+[float]
+=== http.rtt.write_request.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== response_header Fields
+
+Time required between sending the start of sending the HTTP request and first by from HTTP response being read. Duration based on already available network connection.
+
+
+[float]
+=== http.rtt.response_header.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== total Fields
+
+Duration required to process the HTTP transaction. Starts with
+the initial TCP connection attempt. Ends with after validator
+did check the response.
+
+Note: if validator is not reading body or only a prefix, this
+      number does not fully represent the total time needed.
+
+
+
+[float]
+=== http.rtt.total.us
+
+type: long
+
+Duration in microseconds
+
+[[exported-fields-icmp]]
+== ICMP Fields
+
+None
+
+
+[float]
+== icmp Fields
+
+IP ping fields.
+
+
+
+[float]
+=== icmp.requests
+
+type: integer
+
+Number if ICMP EchoRequests send.
+
+
+[float]
+== rtt Fields
+
+ICMP Echo Request and Reply round trip time
+
+
+[float]
+=== icmp.rtt.us
+
+type: long
+
+Duration in microseconds
 
 [[exported-fields-kubernetes]]
 == Kubernetes info Fields
@@ -403,4 +456,170 @@ type: keyword
 
 Kubernetes container name
 
+
+[[exported-fields-resolve]]
+== Host Lookup Fields
+
+None
+
+
+[float]
+== resolve Fields
+
+Host lookup fields.
+
+
+
+[float]
+=== resolve.host
+
+type: keyword
+
+Hostname of service being monitored.
+
+
+[float]
+=== resolve.ip
+
+type: ip
+
+IP address found for the given host.
+
+
+[float]
+== rtt Fields
+
+Duration required to resolve an IP from hostname.
+
+
+[float]
+=== resolve.rtt.us
+
+type: long
+
+Duration in microseconds
+
+[[exported-fields-socks5]]
+== SOCKS5 Proxy Fields
+
+None
+
+
+[float]
+== socks5 Fields
+
+SOCKS5 proxy related fields:
+
+
+
+[float]
+== rtt Fields
+
+TLS layer round trip times.
+
+
+
+[float]
+== connect Fields
+
+Time required to establish a connection via SOCKS5 to endpoint based on available connection to SOCKS5 proxy.
+
+
+
+[float]
+=== socks5.rtt.connect.us
+
+type: long
+
+Duration in microseconds
+
+[[exported-fields-tcp]]
+== TCP Layer Fields
+
+None
+
+
+[float]
+== tcp Fields
+
+TCP network layer related fields.
+
+
+
+[float]
+=== tcp.port
+
+type: integer
+
+Service port number.
+
+
+[float]
+== rtt Fields
+
+TCP layer round trip times.
+
+
+
+[float]
+== connect Fields
+
+Duration required to establish a TCP connection based on already available IP address.
+
+
+
+[float]
+=== tcp.rtt.connect.us
+
+type: long
+
+Duration in microseconds
+
+[float]
+== validate Fields
+
+Duration of validation step based on existing TCP connection.
+
+
+
+[float]
+=== tcp.rtt.validate.us
+
+type: long
+
+Duration in microseconds
+
+[[exported-fields-tls]]
+== TLS Encryption Layer Fields
+
+None
+
+
+[float]
+== tls Fields
+
+TLS layer related fields.
+
+
+
+[float]
+== rtt Fields
+
+TLS layer round trip times.
+
+
+
+[float]
+== handshake Fields
+
+Time required to finish TLS handshake based on already available network connection.
+
+
+
+[float]
+=== tls.rtt.handshake.us
+
+type: long
+
+Duration in microseconds
 

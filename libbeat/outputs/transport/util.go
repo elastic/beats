@@ -20,7 +20,10 @@ func fullAddress(host string, defaultPort int) string {
 	return fmt.Sprintf("%v:%v", host, defaultPort)
 }
 
-func dialWith(
+// DialWith randomly dials one of a number of addresses with a given dialer.
+//
+// Use this to select and dial one IP being known for one host name.
+func DialWith(
 	dialer Dialer,
 	network, host string,
 	addresses []string,

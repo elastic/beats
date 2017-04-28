@@ -253,7 +253,7 @@ func (l *icmpLoop) ping(
 	}
 
 	if !success {
-		return 0, 0, timeoutError{}
+		return 0, requests, timeoutError{}
 	}
 	return rtt, requests, nil
 }
