@@ -123,7 +123,8 @@ https://www.elastic.co/downloads/beats/heartbeat[downloads page].
 and select *Run As Administrator*). If you are running Windows XP, you may need
 to download and install PowerShell.
 
-. Run the following commands to install Heartbeat as a Windows service:
+. From the PowerShell prompt, run the following commands to install Heartbeat as
+a Windows service:
 +
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------

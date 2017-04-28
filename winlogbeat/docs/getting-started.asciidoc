@@ -32,7 +32,7 @@ https://www.elastic.co/downloads/beats/winlogbeat[downloads page].
 . Open a PowerShell prompt as an Administrator (right-click on the PowerShell
 icon and select Run As Administrator). If you are running Windows XP, you may
 need to download and install PowerShell.
-. Run the following commands to install the service.
+. From the PowerShell prompt, run the following commands to install the service.
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
