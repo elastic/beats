@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Add Icinga module. {pull}3904[3904]
 
 *Heartbeat*
+- Event format and field naming changes in Heartbeat and sample Dashboard. {pull}4091[4091]
 
 *Metricbeat*
 - Linux cgroup metrics are now enabled by default for the system process

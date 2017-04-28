@@ -26,6 +26,7 @@ type SimpleTransport struct {
 	DisableCompression bool
 
 	OnStartWrite func()
+	OnEndWrite   func()
 	OnStartRead  func()
 }
 
@@ -125,6 +126,7 @@ func (t *SimpleTransport) writeRequest(conn net.Conn, req *http.Request) error {
 	if err == nil {
 		err = writer.Flush()
 	}
+	t.sigEndWrite()
 	return err
 }
 
@@ -138,6 +140,7 @@ func (t *SimpleTransport) readResponse(
 	if err != nil {
 		return nil, err
 	}
+
 	t.sigStartRead()
 
 	if requestedGzip && resp.Header.Get("Content-Encoding") == gzipEncoding {
@@ -160,14 +163,12 @@ func (t *SimpleTransport) readResponse(
 	return resp, nil
 }
 
-func (t *SimpleTransport) sigStartRead() {
-	if f := t.OnStartRead; f != nil {
-		f()
-	}
-}
+func (t *SimpleTransport) sigStartRead()  { call(t.OnStartRead) }
+func (t *SimpleTransport) sigStartWrite() { call(t.OnStartWrite) }
+func (t *SimpleTransport) sigEndWrite()   { call(t.OnEndWrite) }
 
-func (t *SimpleTransport) sigStartWrite() {
-	if f := t.OnStartWrite; f != nil {
+func call(f func()) {
+	if f != nil {
 		f()
 	}
 }
