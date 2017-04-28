@@ -119,7 +119,7 @@ https://www.elastic.co/downloads/beats/packetbeat[downloads page].
 
 . Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*). If you are running Windows XP, you may need to download and install PowerShell.
 
-. Run the following commands to install Packetbeat as a Windows service:
+. From the PowerShell prompt, run the following commands to install Packetbeat as a Windows service:
 +
 [source,shell]
 ----------------------------------------------------------------------
