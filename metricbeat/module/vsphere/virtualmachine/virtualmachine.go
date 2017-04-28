@@ -147,7 +147,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 						},
 					},
 				}
-				
+
 				mutex.Lock()
 				events = append(events, event)
 				mutex.Unlock()

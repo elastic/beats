@@ -1,8 +1,8 @@
 package virtualmachine
 
 import (
-	"testing"
 	"strings"
+	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
@@ -46,7 +46,7 @@ func TestFetchEventContents(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
 	assert.EqualValues(t, "ha-datacenter", event["datacenter"])
-	assert.True(t, strings.Contains(event["name"].(string), "ha-host_VM") )
+	assert.True(t, strings.Contains(event["name"].(string), "ha-host_VM"))
 
 	cpu := event["cpu"].(common.MapStr)
 
