@@ -2,11 +2,13 @@ package json
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"encoding/json"
 )
 
 // init registers the MetricSet with the central registry.
@@ -23,10 +25,10 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	http    *helper.HTTP
-	headers map[string]string
-	method  string
-	body    string
+	namespace string
+	http      *helper.HTTP
+	method    string
+	body      string
 }
 
 // New create a new instance of the MetricSet
@@ -34,10 +36,12 @@ type MetricSet struct {
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
+	logp.Warn("The http json metricset is in beta.")
+
 	config := struct {
-		Method  string            `config:"method"`
-		Body    string            `config:"body"`
-		Headers map[string]string `config:"headers"`
+		Namespace string            `config:"namespace" validate:"required"`
+		Method    string            `config:"method"`
+		Body      string            `config:"body"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -46,15 +50,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	http := helper.NewHTTP(base)
 	http.SetMethod(config.Method)
-	http.SetBody([]byte(config.Body))
-	for key, value := range config.Headers {
-		http.SetHeader(key, value)
-	}
+//	http.SetBody([]byte(config.Body))
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		http:          http,
-		headers:       config.Headers,
+		namespace:     config.Namespace,
 		method:        config.Method,
 		body:          config.Body,
 	}, nil
@@ -71,15 +71,17 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 	defer response.Body.Close()
 
+	var raw map[string]interface{}
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
 	}
+	json.Unmarshal(responseBody, &raw)
 
 	event := common.MapStr{}
 
 	event["request"] = common.MapStr{
-		"headers": m.headers,
+		"headers": m.getHeaders(response.Request.Header),
 		"method":  m.method,
 		"body":    m.body,
 	}
@@ -87,8 +89,11 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	event["response"] = common.MapStr{
 		"status_code": response.StatusCode,
 		"headers":     m.getHeaders(response.Header),
-		"body":        responseBody,
+		"body":        raw,
 	}
+
+	// Set dynamic namespace
+	event["_namespace"] = m.namespace
 
 	return event, nil
 }

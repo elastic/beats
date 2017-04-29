@@ -2,5 +2,6 @@
   metricsets: ["json"]
   enabled: true
   period: 10s
-  hosts: ["localhost"]
-
+  hosts: ["http://httpbin.org"]
+  namespace: "test"
+  path: "/headers"
