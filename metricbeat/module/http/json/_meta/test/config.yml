@@ -8,10 +8,10 @@ metricbeat.modules:
   metricsets: ["json"]
   enabled: true
   period: 10s
-  namespace: "http_json"
-  hosts: ["http://httpbin.org"]
-  namespace: "test"
-  path: "/headers"
+  hosts: ["http://date.jsontest.com"]
+  namespace: "http_json_namespace"
+  headers:
+    Accept: application/json
 
 #================================ Outputs =====================================
 

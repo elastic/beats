@@ -2,6 +2,6 @@
   metricsets: ["json"]
   enabled: true
   period: 10s
-  hosts: ["http://httpbin.org"]
-  namespace: "test"
+  hosts: ["httpbin.org"]
+  namespace: "http_json_namespace"
   path: "/headers"

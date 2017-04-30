@@ -1,23 +1,41 @@
 package json
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"strings"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
-	"io/ioutil"
-	"net/http"
-	"strings"
-	"encoding/json"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 )
 
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("http", "json", New); err != nil {
+	if err := mb.Registry.AddMetricSet("http", "json", New, hostParser); err != nil {
 		panic(err)
 	}
 }
+
+const (
+	// defaultScheme is the default scheme to use when it is not specified in the host config.
+	defaultScheme = "http"
+
+	// defaultPath is the dto use when it is not specified in the host config.
+	defaultPath = ""
+)
+
+var (
+	hostParser = parse.URLHostParserBuilder{
+		DefaultScheme: defaultScheme,
+		PathConfigKey: "path",
+		DefaultPath:   defaultPath,
+	}.Build()
+)
 
 // MetricSet type defines all fields of the MetricSet
 // As a minimum it must inherit the mb.BaseMetricSet fields, but can be extended with
@@ -39,9 +57,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logp.Warn("The http json metricset is in beta.")
 
 	config := struct {
-		Namespace string            `config:"namespace" validate:"required"`
-		Method    string            `config:"method"`
-		Body      string            `config:"body"`
+		Namespace string `config:"namespace" validate:"required"`
+		Method    string `config:"method"`
+		Body      string `config:"body"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -50,13 +68,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	http := helper.NewHTTP(base)
 	http.SetMethod(config.Method)
-//	http.SetBody([]byte(config.Body))
+	http.SetBody([]byte(config.Body))
 
 	return &MetricSet{
 		BaseMetricSet: base,
 		namespace:     config.Namespace,
 		method:        config.Method,
 		body:          config.Body,
+		http:          http,
 	}, nil
 }
 
@@ -71,25 +90,31 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 	defer response.Body.Close()
 
-	var raw map[string]interface{}
-	responseBody, err := ioutil.ReadAll(response.Body)
+	var jsonBody map[string]interface{}
+
+	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
 	}
-	json.Unmarshal(responseBody, &raw)
 
-	event := common.MapStr{}
-
-	event["request"] = common.MapStr{
-		"headers": m.getHeaders(response.Request.Header),
-		"method":  m.method,
-		"body":    m.body,
+	err = json.Unmarshal(body, &jsonBody)
+	if err != nil {
+		return nil, err
 	}
 
-	event["response"] = common.MapStr{
-		"status_code": response.StatusCode,
-		"headers":     m.getHeaders(response.Header),
-		"body":        raw,
+	event := common.MapStr{
+		mb.ModuleData: common.MapStr{
+			"request": common.MapStr{
+				"headers": m.getHeaders(response.Request.Header),
+				"method":  response.Request.Method,
+				"body":    m.body,
+			},
+			"response": common.MapStr{
+				"status_code": response.StatusCode,
+				"headers":     m.getHeaders(response.Header),
+			},
+		},
+		"body": jsonBody,
 	}
 
 	// Set dynamic namespace
