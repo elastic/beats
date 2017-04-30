@@ -3459,13 +3459,6 @@ http Module
 
 
 [float]
-== json Fields
-
-json metricset
-
-
-
-[float]
 == request Fields
 
 HTTP request information
@@ -3473,7 +3466,7 @@ HTTP request information
 
 
 [float]
-=== http.json.request.header
+=== http.request.header
 
 type: nested
 
@@ -3481,7 +3474,7 @@ The HTTP headers sent
 
 
 [float]
-=== http.json.request.method
+=== http.request.method
 
 type: keyword
 
@@ -3489,7 +3482,7 @@ The HTTP method used
 
 
 [float]
-=== http.json.request.body
+=== http.request.body
 
 type: keyword
 
@@ -3504,7 +3497,7 @@ HTTP response information
 
 
 [float]
-=== http.json.response.header
+=== http.response.header
 
 type: nested
 
@@ -3512,7 +3505,7 @@ The HTTP headers received
 
 
 [float]
-=== http.json.response.status_code
+=== http.response.status_code
 
 type: keyword
 
@@ -3520,7 +3513,22 @@ The HTTP status code
 
 
 [float]
-=== http.json.response.body
+=== http.response.body
+
+type: keyword
+
+The HTTP payload received
+
+
+[float]
+== json Fields
+
+json metricset
+
+
+
+[float]
+=== http.json.body
 
 type: keyword
 

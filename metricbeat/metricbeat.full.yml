@@ -165,8 +165,9 @@ metricbeat.modules:
   metricsets: ["json"]
   enabled: true
   period: 10s
-  hosts: ["localhost"]
-
+  hosts: ["httpbin.org"]
+  namespace: "http_json_namespace"
+  path: "/headers"
 
 #------------------------------- Jolokia Module ------------------------------
 - module: jolokia
