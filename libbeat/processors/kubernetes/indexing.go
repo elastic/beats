@@ -67,20 +67,20 @@ type Matchers struct {
 // Register contains Indexer and Matchers to use on pod indexing and event matching
 type Register struct {
 	sync.RWMutex
-	indexers map[string]IndexConstructor
+	indexers map[string]IndexerConstructor
 	matchers map[string]MatcherConstructor
 
 	defaultIndexerConfigs map[string]common.Config
 	defaultMatcherConfigs map[string]common.Config
 }
 
-type IndexConstructor func(config common.Config, genMeta GenMeta) (Indexer, error)
+type IndexerConstructor func(config common.Config, genMeta GenMeta) (Indexer, error)
 type MatcherConstructor func(config common.Config) (Matcher, error)
 
 // NewRegister creates and returns a new Register.
 func NewRegister() *Register {
 	return &Register{
-		indexers: make(map[string]IndexConstructor, 0),
+		indexers: make(map[string]IndexerConstructor, 0),
 		matchers: make(map[string]MatcherConstructor, 0),
 
 		defaultIndexerConfigs: make(map[string]common.Config, 0),
@@ -89,7 +89,7 @@ func NewRegister() *Register {
 }
 
 // AddIndexer to the register
-func (r *Register) AddIndexer(name string, indexer IndexConstructor) {
+func (r *Register) AddIndexer(name string, indexer IndexerConstructor) {
 	r.RWMutex.Lock()
 	defer r.RWMutex.Unlock()
 	r.indexers[name] = indexer
@@ -113,7 +113,7 @@ func (r *Register) AddDefaultMatcherConfig(name string, config common.Config) {
 }
 
 // AddIndexer to the register
-func (r *Register) GetIndexer(name string) IndexConstructor {
+func (r *Register) GetIndexer(name string) IndexerConstructor {
 	indexer, ok := r.indexers[name]
 	if ok {
 		return indexer
