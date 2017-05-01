@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-elasticsearch>>
 * <<exported-fields-golang>>
 * <<exported-fields-haproxy>>
+* <<exported-fields-http>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
@@ -3442,6 +3443,96 @@ Configured queue limit (maxqueue) for the server, or nothing if the value of max
 type: integer
 
 The average queue time in ms over the last 1024 requests.
+
+
+[[exported-fields-http]]
+== http Fields
+
+http Module
+
+
+
+[float]
+== http Fields
+
+
+
+
+[float]
+== request Fields
+
+HTTP request information
+
+
+
+[float]
+=== http.request.header
+
+type: nested
+
+The HTTP headers sent
+
+
+[float]
+=== http.request.method
+
+type: keyword
+
+The HTTP method used
+
+
+[float]
+=== http.request.body
+
+type: keyword
+
+The HTTP payload sent
+
+
+[float]
+== response Fields
+
+HTTP response information
+
+
+
+[float]
+=== http.response.header
+
+type: nested
+
+The HTTP headers received
+
+
+[float]
+=== http.response.status_code
+
+type: keyword
+
+The HTTP status code
+
+
+[float]
+=== http.response.body
+
+type: keyword
+
+The HTTP payload received
+
+
+[float]
+== json Fields
+
+json metricset
+
+
+
+[float]
+=== http.json.body
+
+type: keyword
+
+The HTTP payload received
 
 
 [[exported-fields-jolokia]]

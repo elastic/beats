@@ -1,0 +1,7 @@
+- module: http
+  metricsets: ["json"]
+  enabled: true
+  period: 10s
+  hosts: ["httpbin.org"]
+  namespace: "http_json_namespace"
+  path: "/headers"
