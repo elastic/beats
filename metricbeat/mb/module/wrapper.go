@@ -255,8 +255,12 @@ func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher, reporter 
 func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher, reporter *eventReporter) {
 	reporter.startFetchTimer()
 	events, err := fetcher.Fetch()
-	for _, event := range events {
-		reporter.ErrorWith(err, event)
+	if len(events) == 0 {
+		reporter.ErrorWith(err, nil)
+	} else {
+		for _, event := range events {
+			reporter.ErrorWith(err, event)
+		}
 	}
 }
 
