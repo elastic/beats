@@ -1,3 +1,73 @@
 === http json MetricSet
 
 This is the json metricset of the module http.
+
+[float]
+=== Features and Configuration
+
+The JSON structure returned by the HTTP endpoint will be send added as the `body` field of the provided `namespace` field as showned in the following example:
+
+```json
+{
+  "@timestamp": "2017-05-01T06:06:31.787Z",
+  "beat": {
+    "hostname": "mbp",
+    "name": "mbp",
+    "version": "6.0.0-alpha1"
+  },
+  "http": {
+    "http_json_namespace": {
+      "body": {
+        "date": "05-01-2017",
+        "milliseconds_since_epoch": 1493618791986.000000,
+        "time": "06:06:31 AM"
+      }
+    },
+    "request": {
+      "body": "",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "method": "GET"
+    },
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Length": "100",
+        "Content-Type": "application/json; charset=ISO-8859-1",
+        "Date": "Mon, 01 May 2017 06:06:31 GMT",
+        "Server": "Google Frontend",
+        "X-Cloud-Trace-Context": "580c9e1993ffbe156fcf869c33b84b78"
+      },
+      "status_code": 200
+    }
+  },
+  "metricset": {
+    "host": "date.jsontest.com",
+    "module": "http",
+    "name": "json",
+    "namespace": "http_json_namespace",
+    "rtt": 257411
+  },
+  "type": "metricsets"
+}
+
+```
+
+Here the response from `date.jsontest.com` is returned in the configured `http_json_namespace` namespace in the `body` element as
+```json
+"http_json_namespace": {
+      "body": {
+        "date": "05-01-2017",
+        "milliseconds_since_epoch": 1493618791986.000000,
+        "time": "06:06:31 AM"
+      }
+    }
+```
+
+It is required to set a namespace in the general module config section.
+
+[float]
+=== Exposed fields, Dashboards, Indexes, etc.
+Since this is a general purpose module that can be tailored for any application that exposes a JSON structure, it
+comes with no exposed fields description, dashboards or index patterns.
