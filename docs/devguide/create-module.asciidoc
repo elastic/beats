@@ -15,7 +15,7 @@ metricset by running `make create-metricset`, default versions of these files ar
 * `docs.asciidoc`
 * `fields.yml`
 
-After updating any of these files, make sure you run `make collect` in your beat directory so all generated
+After updating any of these files, make sure you run `make update` in your beat directory so all generated
 files are updated.
 
 
