@@ -84,6 +84,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Fixing panic on prometheus collector when label has , {pull}3947[3947]
 - Fix MongoDB dbstats fields mapping. {pull}4025[4025]
 - Fixing prometheus collector to aggregate metrics based on metric family. {pull}4075[4075]
+- Fixing multiEventFetch error reporting when no events are returned {pull}4153[4153]
 
 *Packetbeat*
 
