@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/common/op"
@@ -30,10 +29,8 @@ func makeEvents(name string, n int) []*input.Data {
 	for i := 0; i < n; i++ {
 		event := &input.Event{
 			EventMeta: input.EventMeta{
-				ReadTime:     time.Now(),
-				InputType:    "log",
-				DocumentType: "log",
-				Bytes:        100,
+				InputType: "log",
+				Bytes:     100,
 			},
 		}
 
