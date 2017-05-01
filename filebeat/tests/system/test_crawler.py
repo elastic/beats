@@ -35,7 +35,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Processing 80 events"),
+                "publish 80 events"),
             max_timeout=15)
 
         # TODO: Find better solution when filebeat did crawl the file
@@ -180,7 +180,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Processing 5 events"),
+                "publish 5 events"),
             max_timeout=15)
 
         # Rename the file (no new file created)
@@ -200,7 +200,7 @@ class Test(TestCase):
         # expecting 6 more events
         self.wait_until(
             lambda: self.log_contains(
-                "Processing 6 events"),
+                "publish 6 events"),
             max_timeout=20)
 
         filebeat.kill_and_wait()
@@ -235,7 +235,7 @@ class Test(TestCase):
         # Let it read the file
         self.wait_until(
             lambda: self.log_contains(
-                "Processing 5 events"),
+                "publish 5 events"),
             max_timeout=15)
         os.remove(testfile)
 
@@ -250,10 +250,11 @@ class Test(TestCase):
 
         file.close()
 
+        time.sleep(5)
         # Let it read the file
         self.wait_until(
             lambda: self.log_contains(
-                "Processing 6 events"),
+                "publish 6 events"),
             max_timeout=15)
 
         filebeat.kill_and_wait()
@@ -411,7 +412,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Processing 1 events"),
+                "publish 1 events"),
             max_timeout=15)
 
         with open(testfile, 'a') as f:
@@ -421,7 +422,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Processing 2 events"),
+                "publish 2 events"),
             max_timeout=15)
 
         filebeat.kill_and_wait()
@@ -496,7 +497,7 @@ class Test(TestCase):
 
             self.wait_until(
                 lambda: self.log_contains(
-                    "Processing 1 events"),
+                    "publish 1 events"),
                 max_timeout=15)
 
             # now write another line
@@ -506,7 +507,7 @@ class Test(TestCase):
 
             self.wait_until(
                 lambda: self.log_contains(
-                    "Processing 2 events"),
+                    "publish 2 events"),
                 max_timeout=15)
 
         filebeat.kill_and_wait()
@@ -587,7 +588,7 @@ class Test(TestCase):
 
             self.wait_until(
                 lambda: self.log_contains(
-                    "Processing 1 events"),
+                    "publish 1 events"),
                 max_timeout=15)
 
         # Append utf-8 chars to check if it keeps reading
@@ -599,7 +600,7 @@ class Test(TestCase):
 
             self.wait_until(
                 lambda: self.log_contains(
-                    "Processing 2 events"),
+                    "publish 2 events"),
                 max_timeout=15)
 
         filebeat.kill_and_wait()

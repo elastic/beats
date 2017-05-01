@@ -96,12 +96,12 @@ func (r *Registrar) Run() {
 		case <-r.done:
 			logp.Info("Ending Registrar")
 			return
+		case events := <-r.Channel:
+			r.processEvents(events)
 		// Treats new log files to persist with higher priority then new events
 		case state := <-r.Persist:
 			r.setState(state)
 			logp.Debug("prospector", "Registrar will re-save state for %s", state.Source)
-		case events := <-r.Channel:
-			r.processEvents(events)
 		}
 
 		if e := r.writeRegistry(); e != nil {
@@ -164,7 +164,7 @@ func (r *Registrar) writeRegistry() error {
 	return SafeFileRotate(r.registryFile, tempfile)
 }
 
-func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bool) {
+func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (*input.FileState, bool) {
 
 	// Check if there is a state for this file
 	lastState, isFound := r.GetFileState(filePath)
@@ -175,7 +175,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		logp.Debug("registar", "Same file as before found. Fetch the state.")
 		// We're resuming - throw the last state back downstream so we resave it
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
-		return lastState.Offset, true
+		return lastState, true
 	}
 
 	if previous, err := r.getPreviousFile(filePath, fileInfo); err == nil {
@@ -185,7 +185,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		logp.Info("Detected rename of a previously harvested file: %s -> %s", previous, filePath)
 
 		lastState, _ := r.GetFileState(previous)
-		return lastState.Offset, true
+		return lastState, true
 	}
 
 	if isFound {
@@ -193,7 +193,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 	}
 
 	// New file so just start from an automatic position
-	return 0, false
+	return nil, false
 }
 
 // getPreviousFile checks in the registrar if there is the newFile already exist with a different name
@@ -222,6 +222,33 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 func (r *Registrar) setState(state *FileState) {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
+
+	prevState, ok := r.state[state.Source]
+
+	// If same state as before -> overwrite
+	if ok && prevState.FileStateOS.IsSame(state.FileStateOS) {
+		r.state[state.Source] = state
+		return
+	}
+
+	for source, s := range r.state {
+
+		if s.FileStateOS.IsSame(state.FileStateOS) {
+
+			if ok {
+				// Store previous state under old source
+				r.state[source] = prevState
+			} else {
+				// Remove old state if not needed anymore
+				delete(r.state, source)
+			}
+
+			r.state[state.Source] = state
+			return
+		}
+	}
+
+	// No previous state, just write it
 	r.state[state.Source] = state
 }
 

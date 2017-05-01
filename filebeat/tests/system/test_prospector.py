@@ -66,7 +66,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Processing 5 events"),
+                "publish 5 events"),
             max_timeout=10)
 
         proc.kill_and_wait()

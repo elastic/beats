@@ -87,14 +87,17 @@ func createLineReader(
 // Log harvester reads files line by line and sends events to the defined output
 func (h *Harvester) Harvest() {
 	defer func() {
+
 		// On completion, push offset so we can continue where we left off if we relaunch on the same file
 		if h.Stat != nil {
+			// On completion, push offset so we can continue where we left off if we relaunch on the same file
 			h.Stat.Return <- h.GetOffset()
 		}
 
 		// Make sure file is closed as soon as harvester exits
 		// If file was never properly opened, it can't be closed
 		if h.file != nil {
+
 			h.file.Close()
 			logp.Debug("harvester", "Closing file: %s", h.Path)
 		}
@@ -137,6 +140,16 @@ func (h *Harvester) Harvest() {
 		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
 		return
 	}
+
+	event := &input.FileEvent{
+		Source:    h.Path,
+		InputType: h.Config.InputType,
+		Offset:    h.GetOffset(),
+		Fileinfo:  &info,
+		Bytes:     0,
+	}
+
+	h.SpoolerChan <- event
 
 	for {
 		// Partial lines return error and are only read on completion
@@ -240,6 +253,21 @@ func (h *Harvester) openFile() (encoding.Encoding, error) {
 			file.Close()
 		}
 	}()
+
+	// Check we are not following a rabbit hole (symlinks, etc.)
+	if !input.IsRegularFile(file) {
+		return nil, errors.New("Given file is not a regular file.")
+	}
+
+	info, err := file.Stat()
+	if err != nil {
+		logp.Err("Failed getting stats for file %s: %s", h.Path, err)
+		return nil, err
+	}
+	// Compares the stat of the opened file to the state given by the prospector. Abort if not match.
+	if !os.SameFile(h.Stat.Fileinfo, info) {
+		return nil, errors.New("File info is not identical with opened file. Aborting harvesting and retrying file later again.")
+	}
 
 	// Check we are not following a rabbit hole (symlinks, etc.)
 	if !input.IsRegularFile(file) {
