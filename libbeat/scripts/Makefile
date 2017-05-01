@@ -256,6 +256,7 @@ update: python-env collect
 	echo "Update config file"
 	cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g" > ${BEAT_NAME}.yml
 	cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.full.yml | sed -e "s/beatname/${BEAT_NAME}/g" > ${BEAT_NAME}.full.yml
+	chmod go-w ${BEAT_NAME}.yml ${BEAT_NAME}.full.yml
 
 	# Check if also a full config exist (optional)
 	if [ -a _meta/beat.full.yml ] ; \
