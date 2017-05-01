@@ -29,6 +29,7 @@ One of the following input types:
 
     * log: Reads every line of the log file (default)
     * stdin: Reads the standard in
+    * redis: Reads slow log entries from redis (experimental)
 
 The value that you specify here is used as the `type` for each event published to Logstash and Elasticsearch.
 
