@@ -5,7 +5,6 @@ import (
 	"sync/atomic"
 
 	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/prospector"
 )
 
 // Outlet struct is used to be passed to an object which needs an outlet
@@ -90,6 +89,6 @@ func (o *Outlet) OnEventSignal(event *input.Data) bool {
 	}
 }
 
-func (o *Outlet) Copy() prospector.Outlet {
+func (o *Outlet) Copy() Outleter {
 	return NewOutlet(o.done, o.channel, o.wg)
 }

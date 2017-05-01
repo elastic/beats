@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common/match"
 
+	"github.com/elastic/beats/filebeat/channel"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -158,4 +159,4 @@ type TestOutlet struct{}
 func (o TestOutlet) OnEvent(event *input.Data) bool       { return true }
 func (o TestOutlet) OnEventSignal(event *input.Data) bool { return true }
 func (o TestOutlet) SetSignal(signal <-chan struct{})     {}
-func (o TestOutlet) Copy() Outlet                         { return o }
+func (o TestOutlet) Copy() channel.Outleter               { return o }

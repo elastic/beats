@@ -1,10 +1,12 @@
-package prospector
+package stdin
 
 import (
 	"fmt"
 
+	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -12,19 +14,23 @@ import (
 type Stdin struct {
 	harvester *harvester.Harvester
 	started   bool
+	cfg       *common.Config
+	outlet    channel.Outleter
 }
 
 // NewStdin creates a new stdin prospector
 // This prospector contains one harvester which is reading from stdin
-func NewStdin(p *Prospector) (*Stdin, error) {
+func NewProspector(cfg *common.Config, outlet channel.Outleter) (*Stdin, error) {
 
 	prospectorer := &Stdin{
 		started: false,
+		cfg:     cfg,
+		outlet:  outlet,
 	}
 
 	var err error
 
-	prospectorer.harvester, err = p.createHarvester(file.State{Source: "-"})
+	prospectorer.harvester, err = prospectorer.createHarvester(file.State{Source: "-"})
 	if err != nil {
 		return nil, fmt.Errorf("Error initializing stdin harvester: %v", err)
 	}
@@ -50,4 +56,19 @@ func (s *Stdin) Run() {
 		go s.harvester.Harvest(reader)
 		s.started = true
 	}
+}
+
+// createHarvester creates a new harvester instance from the given state
+func (s *Stdin) createHarvester(state file.State) (*harvester.Harvester, error) {
+
+	// Each harvester gets its own copy of the outlet
+	outlet := s.outlet.Copy()
+	h, err := harvester.NewHarvester(
+		s.cfg,
+		state,
+		nil,
+		outlet,
+	)
+
+	return h, err
 }
