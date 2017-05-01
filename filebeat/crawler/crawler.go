@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
@@ -15,14 +16,14 @@ import (
 type Crawler struct {
 	prospectors       map[uint64]*prospector.Prospector
 	prospectorConfigs []*common.Config
-	out               prospector.Outlet
+	out               channel.Outleter
 	wg                sync.WaitGroup
 	reloader          *cfgfile.Reloader
 	once              bool
 	beatDone          chan struct{}
 }
 
-func New(out prospector.Outlet, prospectorConfigs []*common.Config, beatDone chan struct{}, once bool) (*Crawler, error) {
+func New(out channel.Outleter, prospectorConfigs []*common.Config, beatDone chan struct{}, once bool) (*Crawler, error) {
 
 	return &Crawler{
 		out:               out,
