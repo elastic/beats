@@ -37,6 +37,9 @@ func NewEvent(state file.State) *Event {
 func (e *Event) ToMapStr() common.MapStr {
 
 	event := e.Data
+	if event == nil {
+		event = common.MapStr{}
+	}
 
 	if e.Fileset != "" && e.Module != "" {
 		event["fileset"] = common.MapStr{
