@@ -151,6 +151,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Add dropwizard module {pull}4022[4022]
 - Adding query APIs for metricsets and modules from metricbeat registry {pull}4102[4102]
 - Fixing nil pointer on prometheus collector when http response is nil {pull}4119[4119]
+- Add http module with json metricset. {pull}4092[4092]
 
 *Packetbeat*
 - Add `fields` and `fields_under_root` to packetbeat protocols configurations. {pull}3518[3518]
