@@ -7,7 +7,8 @@ This is the json metricset of the module http.
 
 The JSON structure returned by the HTTP endpoint will be added to the provided `namespace` field as shown in the following example:
 
-```json
+[source,json]
+----
 {
   "@timestamp": "2017-05-01T13:00:24.745Z",
   "beat": {
@@ -31,16 +32,18 @@ The JSON structure returned by the HTTP endpoint will be added to the provided `
   },
   "type": "metricsets"
 }
-```
+----
 
 Here the response from `date.jsontest.com` is returned in the configured `http_json_namespace` namespace:
-```json
+
+[source,json]
+----
 {
       "date": "05-01-2017",
       "milliseconds_since_epoch": 1493643625474.000000,
       "time": "01:00:25 PM"
 }
-```
+----
 
 It is required to set a namespace in the general module config section.
 
@@ -53,7 +56,9 @@ With this configuration enabled additional information about the request are inc
 * Body/Payload
 
 Example:
-```json
+
+[source,json]
+----
 {
   "@timestamp": "2017-05-01T13:00:24.745Z",
   "beat": {
@@ -84,7 +89,7 @@ Example:
   },
   "type": "metricsets"
 }
-```
+----
 
 [float]
 ==== response.enabled
@@ -94,7 +99,9 @@ With this configuration enabled additional information about the response are in
 * HTTP Status Code
 
 Example:
-```json
+
+[source,json]
+----
 {
   "@timestamp": "2017-05-01T13:00:24.745Z",
   "beat": {
@@ -129,7 +136,7 @@ Example:
   },
   "type": "metricsets"
 }
-```
+----
 
 
 [float]

@@ -64,7 +64,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Body            string `config:"body"`
 		RequestEnabled  bool   `config:"request.enabled"`
 		ResponseEnabled bool   `config:"response.enabled"`
-	}{}
+	}{
+		Method:          "GET",
+		Body:            "",
+		RequestEnabled:  false,
+		ResponseEnabled: false,
+	}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err

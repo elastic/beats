@@ -2,6 +2,10 @@
   metricsets: ["json"]
   enabled: false
   period: 10s
-  hosts: ["httpbin.org"]
-  namespace: "http_json_namespace"
-  path: "/headers"
+  hosts: ["localhost:80"]
+  namespace: "json_namespace"
+  path: "/"
+  #body: ""
+  #method: "GET"
+  #request.enabled: false
+  #response.enabled: false

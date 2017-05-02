@@ -33,13 +33,13 @@ func getConfig() map[string]interface{} {
 		"module":     "http",
 		"metricsets": []string{"json"},
 		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
-		"path":       "/jolokia/?ignoreErrors=true&canonicalNaming=false",
+		"path":       "/",
 		"namespace":  "testnamespace",
 	}
 }
 
 func getEnvHost() string {
-	host := os.Getenv("JOLOKIA_HOST")
+	host := os.Getenv("HTTP_HOST")
 
 	if len(host) == 0 {
 		host = "127.0.0.1"
@@ -48,10 +48,10 @@ func getEnvHost() string {
 }
 
 func getEnvPort() string {
-	port := os.Getenv("JOLOKIA_PORT")
+	port := os.Getenv("HTTP_PORT")
 
 	if len(port) == 0 {
-		port = "8778"
+		port = "8080"
 	}
 	return port
 }

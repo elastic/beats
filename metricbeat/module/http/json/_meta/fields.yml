@@ -3,7 +3,3 @@
   description: >
     json metricset
   fields:
-    - name: body
-      type: keyword
-      description: >
-        The HTTP payload received
