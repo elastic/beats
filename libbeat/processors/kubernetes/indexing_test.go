@@ -4,8 +4,6 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
-	corev1 "github.com/ericchiang/k8s/api/v1"
-	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,15 +17,15 @@ func TestPodIndexer(t *testing.T) {
 
 	podName := "testpod"
 	ns := "testns"
-	pod := corev1.Pod{
-		Metadata: &metav1.ObjectMeta{
-			Name:      &podName,
-			Namespace: &ns,
+	pod := Pod{
+		Metadata: ObjectMeta{
+			Name:      podName,
+			Namespace: ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Spec: &corev1.PodSpec{},
+		Spec: PodSpec{},
 	}
 
 	indexers := podIndexer.GetMetadata(&pod)
@@ -61,16 +59,16 @@ func TestContainerIndexer(t *testing.T) {
 	ns := "testns"
 	container := "container"
 
-	pod := corev1.Pod{
-		Metadata: &metav1.ObjectMeta{
-			Name:      &podName,
-			Namespace: &ns,
+	pod := Pod{
+		Metadata: ObjectMeta{
+			Name:      podName,
+			Namespace: ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Status: &corev1.PodStatus{
-			ContainerStatuses: make([]*corev1.ContainerStatus, 0),
+		Status: PodStatus{
+			ContainerStatuses: make([]PodContainerStatus, 0),
 		},
 	}
 
@@ -90,10 +88,10 @@ func TestContainerIndexer(t *testing.T) {
 
 	cid := "docker://abcde"
 
-	pod.Status.ContainerStatuses = []*corev1.ContainerStatus{
+	pod.Status.ContainerStatuses = []PodContainerStatus{
 		{
-			Name:        &container,
-			ContainerID: &cid,
+			Name:        container,
+			ContainerID: cid,
 		},
 	}
 	expected["container"] = common.MapStr{
@@ -152,10 +150,10 @@ func TestFilteredGenMeta(t *testing.T) {
 
 	podName := "testpod"
 	ns := "testns"
-	pod := corev1.Pod{
-		Metadata: &metav1.ObjectMeta{
-			Name:      &podName,
-			Namespace: &ns,
+	pod := Pod{
+		Metadata: ObjectMeta{
+			Name:      podName,
+			Namespace: ns,
 			Labels: map[string]string{
 				"foo": "bar",
 				"x":   "y",
@@ -165,7 +163,7 @@ func TestFilteredGenMeta(t *testing.T) {
 				"c": "d",
 			},
 		},
-		Spec: &corev1.PodSpec{},
+		Spec: PodSpec{},
 	}
 
 	indexers := podIndexer.GetMetadata(&pod)
