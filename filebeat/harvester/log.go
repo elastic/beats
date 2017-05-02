@@ -13,6 +13,8 @@ import (
 	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/jsontransform"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 
@@ -138,10 +140,31 @@ func (h *Harvester) Harvest(r reader.Reader) {
 
 		// Check if data should be added to event. Only export non empty events.
 		if !message.IsEmpty() && h.shouldExportLine(text) {
-			event.ReadTime = message.Ts
 			event.Bytes = message.Bytes
-			event.Text = &text
-			event.Data = message.Fields
+
+			event.Data = common.MapStr{
+				"@timestamp": common.Time(message.Ts),
+				"source":     h.state.Source,
+				"offset":     h.state.Offset, // Offset here is the offset before the starting char.
+				"type":       h.config.DocumentType,
+				"input_type": h.config.InputType,
+			}
+			event.Data.DeepUpdate(message.Fields)
+
+			// Check if json fields exist
+			var jsonFields common.MapStr
+			if fields, ok := event.Data["json"]; ok {
+				jsonFields = fields.(common.MapStr)
+			}
+
+			if h.config.JSON != nil && len(jsonFields) > 0 {
+				h.mergeJSONFields(event.Data, jsonFields, &text)
+			} else if &text != nil {
+				if event.Data == nil {
+					event.Data = common.MapStr{}
+				}
+				event.Data["message"] = text
+			}
 		}
 
 		// Always send event to update state, also if lines was skipped
@@ -382,4 +405,23 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	}
 
 	return reader.NewLimit(r, h.config.MaxBytes), nil
+}
+
+// mergeJSONFields writes the JSON fields in the event map,
+// respecting the KeysUnderRoot and OverwriteKeys configuration options.
+// If MessageKey is defined, the Text value from the event always
+// takes precedence.
+func (h *Harvester) mergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string) {
+
+	// The message key might have been modified by multiline
+	if len(h.config.JSON.MessageKey) > 0 && text != nil {
+		jsonFields[h.config.JSON.MessageKey] = *text
+	}
+
+	if h.config.JSON.KeysUnderRoot {
+		// Delete existing json key
+		delete(data, "json")
+
+		jsontransform.WriteJSONKeys(data, jsonFields, h.config.JSON.OverwriteKeys, reader.JsonErrorKey)
+	}
 }
