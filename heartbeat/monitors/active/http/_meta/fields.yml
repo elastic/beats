@@ -1,0 +1,91 @@
+- key: http
+  title: "HTTP Monitor"
+  description:
+  fields:
+    - name: http
+      type: group
+      description: >
+        HTTP related fields.
+      fields:
+        - name: url
+          type: text
+          description: >
+            Service url used by monitor.
+
+        - name: response
+          type: group
+          description: >
+            Service response parameters.
+          fields:
+            - name: status
+              type: integer
+              description: >
+                Response status code.
+        - name: rtt
+          type: group
+          description: >
+            HTTP layer round trip times.
+          fields:
+            - name: validate
+              type: group
+              description: |
+                Duration between first byte of HTTP request being written and
+                response being processed by validator. Duration based on already
+                available network connection.
+
+                Note: if validator is not reading body or only a prefix, this
+                      number does not fully represent the total time needed
+                      to read the body.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+
+            - name: validate_body
+              type: group
+              description: |
+                Duration of validator required to read and validate the response
+                body.
+
+                Note: if validator is not reading body or only a prefix, this
+                      number does not fully represent the total time needed
+                      to read the body.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+
+            - name: write_request
+              type: group
+              description:
+                Duration of sending the complete HTTP request. Duration based on
+                already available network connection.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+
+            - name: response_header
+              type: group
+              description:
+                Time required between sending the start of sending the HTTP
+                request and first by from HTTP response being read. Duration
+                based on already available network connection.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+
+            - name: total
+              type: group
+              description: |
+                Duration required to process the HTTP transaction. Starts with
+                the initial TCP connection attempt. Ends with after validator
+                did check the response.
+
+                Note: if validator is not reading body or only a prefix, this
+                      number does not fully represent the total time needed.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
