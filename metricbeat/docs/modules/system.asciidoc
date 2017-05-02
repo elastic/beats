@@ -30,7 +30,7 @@ metricbeat.modules:
 *`process.include_top_n`*:: These options allow you to filter out all processes
 that are not in the top N by CPU or memory, in order to reduce the number of
 documents created. If both the `by_cpu` and `by_memory` options are used, the
-reunion of the two tops is included.
+union of the two sets is included.
 
 *`process.include_top_n.enabled`*:: Set to false to disable the top N feature and
 include all processes, regardless of the other options. The default is `true`,
