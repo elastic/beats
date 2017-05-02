@@ -199,16 +199,16 @@ class Test(BaseTest):
         assert output[0]["@timestamp"] == "2016-04-05T18:47:18.444Z"
 
         assert output[1]["@timestamp"] != "invalid"
-        assert output[1]["json_error"] == \
+        assert output[1]["error.message"] == \
             "@timestamp not overwritten (parse error on invalid)"
 
-        assert output[2]["json_error"] == \
+        assert output[2]["error.message"] == \
             "@timestamp not overwritten (not string)"
 
-        assert "json_error" not in output[3]
+        assert "error" not in output[3]
         assert output[3]["@timestamp"] == "2016-04-05T18:47:18.444Z", output[3]["@timestamp"]
 
-        assert "json_error" not in output[4]
+        assert "error" not in output[4]
         assert output[4]["@timestamp"] == "2016-04-05T18:47:18.000Z", output[4]["@timestamp"]
 
     def test_type_in_message(self):
@@ -241,11 +241,11 @@ class Test(BaseTest):
         assert output[0]["type"] == "test"
 
         assert "type" not in output[1]
-        assert output[1]["json_error"] == \
+        assert output[1]["error.message"] == \
             "type not overwritten (not string)"
 
         assert "type" not in output[2]
-        assert output[2]["json_error"] == \
+        assert output[2]["error.message"] == \
             "type not overwritten (not string)"
 
     def test_with_generic_filtering(self):
