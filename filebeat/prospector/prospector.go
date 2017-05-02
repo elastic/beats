@@ -25,21 +25,17 @@ var (
 
 // Prospector contains the prospector
 type Prospector struct {
-	cfg           *common.Config // Raw config
-	config        prospectorConfig
-	prospectorer  Prospectorer
-	outlet        channel.Outleter
-	harvesterChan chan *input.Event
-	channelDone   chan struct{}
-	runDone       chan struct{}
-	runWg         *sync.WaitGroup
-	states        *file.States
-	wg            *sync.WaitGroup
-	id            uint64
-	Once          bool
-	registry      *harvesterRegistry
-	beatDone      chan struct{}
-	eventCounter  *sync.WaitGroup
+	cfg          *common.Config // Raw config
+	config       prospectorConfig
+	prospectorer Prospectorer
+	outlet       channel.Outleter
+	done         chan struct{}
+	states       *file.States
+	wg           *sync.WaitGroup
+	id           uint64
+	Once         bool
+	registry     *harvesterRegistry
+	beatDone     chan struct{}
 }
 
 // Prospectorer is the interface common to all prospectors
@@ -51,19 +47,15 @@ type Prospectorer interface {
 // NewProspector instantiates a new prospector
 func NewProspector(cfg *common.Config, outlet channel.Outleter, beatDone chan struct{}) (*Prospector, error) {
 	prospector := &Prospector{
-		cfg:           cfg,
-		config:        defaultConfig,
-		outlet:        outlet,
-		harvesterChan: make(chan *input.Event),
-		channelDone:   make(chan struct{}),
-		wg:            &sync.WaitGroup{},
-		runDone:       make(chan struct{}),
-		runWg:         &sync.WaitGroup{},
-		states:        &file.States{},
-		Once:          false,
-		registry:      newHarvesterRegistry(),
-		beatDone:      beatDone,
-		eventCounter:  &sync.WaitGroup{},
+		cfg:      cfg,
+		config:   defaultConfig,
+		outlet:   outlet,
+		wg:       &sync.WaitGroup{},
+		done:     make(chan struct{}),
+		states:   &file.States{},
+		Once:     false,
+		registry: newHarvesterRegistry(),
+		beatDone: beatDone,
 	}
 
 	var err error
@@ -122,17 +114,19 @@ func (p *Prospector) Start() {
 	p.wg.Add(1)
 	logp.Info("Starting prospector of type: %v; id: %v ", p.config.InputType, p.ID())
 
+	onceWg := sync.WaitGroup{}
 	if p.Once {
-		// Makes sure prospectors can complete first scan before stopped
-		defer p.runWg.Wait()
+		// Make sure start is only completed when Run did a complete first scan
+		defer onceWg.Wait()
 	}
 
+	onceWg.Add(1)
 	// Add waitgroup to make sure prospectors finished
-	p.runWg.Add(1)
 	go func() {
 		defer func() {
-			p.runWg.Done()
+			onceWg.Done()
 			p.stop()
+			p.wg.Done()
 		}()
 
 		p.Run()
@@ -153,7 +147,7 @@ func (p *Prospector) Run() {
 
 	for {
 		select {
-		case <-p.runDone:
+		case <-p.done:
 			logp.Info("Prospector ticker stopped")
 			return
 		case <-time.After(p.config.ScanFrequency):
@@ -195,24 +189,13 @@ func (p *Prospector) updateState(state file.State) error {
 }
 
 // Stop stops the prospector and with it all harvesters
-//
-// The shutdown order is as following
-// - stop run and scanning
-// - wait until last scan finishes to make sure no new harvesters are added
-// - stop harvesters
-// - wait until all harvester finished
-// - stop communication channel
-// - wait on internal waitgroup to make sure all prospector go routines are stopped
-// - wait until all events are forwarded to the spooler
 func (p *Prospector) Stop() {
 	// Stop scanning and wait for completion
-	close(p.runDone)
+	close(p.done)
 	p.wg.Wait()
 }
 
 func (p *Prospector) stop() {
-	defer p.wg.Done()
-
 	logp.Info("Stopping Prospector: %v", p.ID())
 
 	// In case of once, it will be waited until harvesters close itself
@@ -220,33 +203,10 @@ func (p *Prospector) stop() {
 		p.registry.waitForCompletion()
 	}
 
-	// Wait for finishing of the running prospectors
-	// This ensure no new harvesters are added.
-	p.runWg.Wait()
-
 	// Stop all harvesters
 	// In case the beatDone channel is closed, this will not wait for completion
 	// Otherwise Stop will wait until output is complete
 	p.registry.Stop()
-
-	// Waits on stopping all harvesters to make sure all events made it into the channel
-	p.waitEvents()
-}
-
-// Wait for completion of sending events
-func (p *Prospector) waitEvents() {
-
-	done := make(chan struct{})
-	go func() {
-		p.eventCounter.Wait()
-		close(done)
-	}()
-
-	select {
-	case <-done:
-		close(p.channelDone)
-	case <-p.beatDone:
-	}
 }
 
 // createHarvester creates a new harvester instance from the given state
