@@ -12,4 +12,12 @@ before-build:
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect:
+collect: fields
+
+
+# Collects all module and metricset fields
+.PHONY: fields
+fields: python-env
+	mkdir -p _meta/
+	cat ${ES_BEATS}/heartbeat/_meta/fields.common.yml > _meta/fields.generated.yml
+	cat ${ES_BEATS}/heartbeat/monitors/active/*/_meta/fields.yml >> _meta/fields.generated.yml

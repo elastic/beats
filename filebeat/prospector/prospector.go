@@ -8,10 +8,12 @@ import (
 
 	"github.com/mitchellh/hashstructure"
 
+	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/prospector/stdin"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -26,7 +28,7 @@ type Prospector struct {
 	cfg           *common.Config // Raw config
 	config        prospectorConfig
 	prospectorer  Prospectorer
-	outlet        Outlet
+	outlet        channel.Outleter
 	harvesterChan chan *input.Event
 	channelDone   chan struct{}
 	runDone       chan struct{}
@@ -46,16 +48,8 @@ type Prospectorer interface {
 	Run()
 }
 
-// Outlet is the outlet for a prospector
-type Outlet interface {
-	SetSignal(signal <-chan struct{})
-	OnEventSignal(event *input.Data) bool
-	OnEvent(event *input.Data) bool
-	Copy() Outlet
-}
-
 // NewProspector instantiates a new prospector
-func NewProspector(cfg *common.Config, outlet Outlet, beatDone chan struct{}) (*Prospector, error) {
+func NewProspector(cfg *common.Config, outlet channel.Outleter, beatDone chan struct{}) (*Prospector, error) {
 	prospector := &Prospector{
 		cfg:           cfg,
 		config:        defaultConfig,
@@ -97,7 +91,7 @@ func (p *Prospector) LoadStates(states []file.State) error {
 
 	switch p.config.InputType {
 	case cfg.StdinInputType:
-		prospectorer, err = NewStdin(p)
+		prospectorer, err = stdin.NewProspector(p.cfg, p.outlet)
 	case cfg.LogInputType:
 		prospectorer, err = NewLog(p)
 	default:

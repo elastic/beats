@@ -160,6 +160,15 @@ metricbeat.modules:
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
 
+#-------------------------------- http Module --------------------------------
+- module: http
+  metricsets: ["json"]
+  enabled: false
+  period: 10s
+  hosts: ["httpbin.org"]
+  namespace: "http_json_namespace"
+  path: "/headers"
+
 #------------------------------- Jolokia Module ------------------------------
 - module: jolokia
   metricsets: ["jmx"]

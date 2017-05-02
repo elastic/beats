@@ -1,6 +1,7 @@
 package prospector
 
 import (
+	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
@@ -9,13 +10,13 @@ import (
 
 // Factory is a factory for registrars
 type Factory struct {
-	outlet    Outlet
+	outlet    channel.Outleter
 	registrar *registrar.Registrar
 	beatDone  chan struct{}
 }
 
 // NewFactory instantiates a new Factory
-func NewFactory(outlet Outlet, registrar *registrar.Registrar, beatDone chan struct{}) *Factory {
+func NewFactory(outlet channel.Outleter, registrar *registrar.Registrar, beatDone chan struct{}) *Factory {
 	return &Factory{
 		outlet:    outlet,
 		registrar: registrar,

@@ -85,6 +85,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Fixing panic on prometheus collector when label has , {pull}3947[3947]
 - Fix MongoDB dbstats fields mapping. {pull}4025[4025]
 - Fixing prometheus collector to aggregate metrics based on metric family. {pull}4075[4075]
+- Fixing multiEventFetch error reporting when no events are returned {pull}4153[4153]
 
 *Packetbeat*
 
@@ -112,6 +113,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Add support for include_labels and include_annotations in kubernetes processor {pull}4043[4043]
 - Support new `index_patterns` field when loading templates for Elasticsearch >= 6.0 {pull}4056[4056]
 - Adding goimports support to make check and fmt {pull}4114[4114]
+- Make kubernetes indexers/matchers pluggable {pull}4151[4151]
 
 *Filebeat*
 
@@ -150,6 +152,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Add dropwizard module {pull}4022[4022]
 - Adding query APIs for metricsets and modules from metricbeat registry {pull}4102[4102]
 - Fixing nil pointer on prometheus collector when http response is nil {pull}4119[4119]
+- Add http module with json metricset. {pull}4092[4092]
 
 *Packetbeat*
 - Add `fields` and `fields_under_root` to packetbeat protocols configurations. {pull}3518[3518]

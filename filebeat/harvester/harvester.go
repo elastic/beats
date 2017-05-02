@@ -122,13 +122,14 @@ func (h *Harvester) open() error {
 func (h *Harvester) forwardEvent(event *input.Event) error {
 
 	// Add additional prospector meta data to the event
-	event.EventMetadata = h.config.EventMetadata
 	event.InputType = h.config.InputType
-	event.DocumentType = h.config.DocumentType
-	event.JSONConfig = h.config.JSON
 	event.Pipeline = h.config.Pipeline
 	event.Module = h.config.Module
 	event.Fileset = h.config.Fileset
+
+	if event.Data != nil {
+		event.Data[common.EventMetadataKey] = h.config.EventMetadata
+	}
 
 	eventHolder := event.GetData()
 	//run the filters before sending to spooler
