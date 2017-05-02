@@ -239,7 +239,7 @@ func (l *Log) scan() {
 	for path, info := range l.getFiles() {
 
 		select {
-		case <-l.Prospector.runDone:
+		case <-l.Prospector.done:
 			logp.Info("Scan aborted because prospector stopped.")
 			return
 		default:
