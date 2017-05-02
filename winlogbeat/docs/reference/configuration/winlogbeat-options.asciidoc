@@ -332,7 +332,7 @@ The hostname and port where the Beat will host an HTTP web service that provides
 metrics. This field is optional.
 
 The following example specifies that the metrics service is available at
-http://localhost:8128/debug/vars:
+http://localhost:8123/debug/vars:
 
 [source,yaml]
 --------------------------------------------------------------------------------
