@@ -4,7 +4,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/util"
 )
 
 // Outlet struct is used to be passed to an object which needs an outlet
@@ -19,13 +19,13 @@ type Outlet struct {
 	wg      *sync.WaitGroup // Use for counting active events
 	done    <-chan struct{}
 	signal  <-chan struct{}
-	channel chan *input.Data
+	channel chan *util.Data
 	isOpen  int32 // atomic indicator
 }
 
 func NewOutlet(
 	done <-chan struct{},
-	c chan *input.Data,
+	c chan *util.Data,
 	wg *sync.WaitGroup,
 ) *Outlet {
 	return &Outlet{
@@ -42,7 +42,7 @@ func (o *Outlet) SetSignal(signal <-chan struct{}) {
 	o.signal = signal
 }
 
-func (o *Outlet) OnEvent(event *input.Data) bool {
+func (o *Outlet) OnEvent(data *util.Data) bool {
 	open := atomic.LoadInt32(&o.isOpen) == 1
 	if !open {
 		return false
@@ -59,7 +59,7 @@ func (o *Outlet) OnEvent(event *input.Data) bool {
 		}
 		atomic.StoreInt32(&o.isOpen, 0)
 		return false
-	case o.channel <- event:
+	case o.channel <- data:
 		return true
 	}
 }
@@ -67,7 +67,7 @@ func (o *Outlet) OnEvent(event *input.Data) bool {
 // OnEventSignal can be stopped by the signal that is set with SetSignal
 // This does not close the outlet. Only OnEvent does close the outlet.
 // If OnEventSignal is used, it must be ensured that only one producer is used.
-func (o *Outlet) OnEventSignal(event *input.Data) bool {
+func (o *Outlet) OnEventSignal(data *util.Data) bool {
 	open := atomic.LoadInt32(&o.isOpen) == 1
 	if !open {
 		return false
@@ -84,7 +84,7 @@ func (o *Outlet) OnEventSignal(event *input.Data) bool {
 		}
 		o.signal = nil
 		return false
-	case o.channel <- event:
+	case o.channel <- data:
 		return true
 	}
 }

@@ -7,7 +7,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common/op"
 	pubtest "github.com/elastic/beats/libbeat/publisher/testing"
 	"github.com/stretchr/testify/assert"
@@ -15,27 +15,20 @@ import (
 
 type collectLogger struct {
 	wg     *sync.WaitGroup
-	events [][]*input.Data
+	events [][]*util.Data
 }
 
-func (l *collectLogger) Published(events []*input.Data) bool {
+func (l *collectLogger) Published(events []*util.Data) bool {
 	l.wg.Done()
 	l.events = append(l.events, events)
 	return true
 }
 
-func makeEvents(name string, n int) []*input.Data {
-	var events []*input.Data
+func makeEvents(name string, n int) []*util.Data {
+	var events []*util.Data
 	for i := 0; i < n; i++ {
-		event := &input.Event{
-			EventMeta: input.EventMeta{
-				InputType: "log",
-				Bytes:     100,
-			},
-		}
-
-		eventHolder := event.GetData()
-		events = append(events, &eventHolder)
+		data := util.NewData()
+		events = append(events, data)
 	}
 	return events
 }
@@ -56,7 +49,7 @@ func TestPublisherModes(t *testing.T) {
 
 		wg := sync.WaitGroup{}
 
-		pubChan := make(chan []*input.Data, len(test.order)+1)
+		pubChan := make(chan []*util.Data, len(test.order)+1)
 		collector := &collectLogger{&wg, nil}
 		client := pubtest.NewChanClient(0)
 
@@ -64,7 +57,7 @@ func TestPublisherModes(t *testing.T) {
 			pubtest.PublisherWithClient(client))
 		pub.Start()
 
-		var events [][]*input.Data
+		var events [][]*util.Data
 		for i := range test.order {
 			tmp := makeEvents(fmt.Sprintf("msg: %v", i), 1)
 			wg.Add(1)
