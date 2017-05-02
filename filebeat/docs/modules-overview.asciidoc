@@ -129,7 +129,7 @@ Or via the configuration file:
 filebeat.modules:
 - module: nginx
   access:
-    var.paths = ["/var/log/nginx/access.log*"]
+    var.paths: ["/var/log/nginx/access.log*"]
 ----------------------------------------------------------------------
 
 The Nginx `access` fileset also has a `pipeline` variables which allows
