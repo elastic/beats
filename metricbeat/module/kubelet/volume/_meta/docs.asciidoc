@@ -1,3 +1,0 @@
-=== kubelet volume MetricSet
-
-This is the volume metricset of the module kubelet.

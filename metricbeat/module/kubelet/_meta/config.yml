@@ -1,6 +1,0 @@
-- module: kubelet
-  metricsets: ["node","container","volume","pod","system"]
-  enabled: false
-  period: 10s
-  hosts: ["localhost:10255"]
-
