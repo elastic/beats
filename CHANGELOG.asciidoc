@@ -113,6 +113,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Support new `index_patterns` field when loading templates for Elasticsearch >= 6.0 {pull}4056[4056]
 - Adding goimports support to make check and fmt {pull}4114[4114]
 - Make kubernetes indexers/matchers pluggable {pull}4151[4151]
+- Abstracting pod interface in kubernetes plugin to enable easier vendoring {pull}4152[4152]
 
 *Filebeat*
 

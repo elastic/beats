@@ -6,7 +6,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors/kubernetes"
-	corev1 "github.com/ericchiang/k8s/api/v1"
 )
 
 const (
@@ -40,12 +39,12 @@ func newIpPortIndexer(_ common.Config, genMeta kubernetes.GenMeta) (kubernetes.I
 	return &IpPortIndexer{genMeta: genMeta}, nil
 }
 
-func (h *IpPortIndexer) GetMetadata(pod *corev1.Pod) []kubernetes.MetadataIndex {
+func (h *IpPortIndexer) GetMetadata(pod *kubernetes.Pod) []kubernetes.MetadataIndex {
 	commonMeta := h.genMeta.GenerateMetaData(pod)
 	hostPorts := h.GetIndexes(pod)
 	var metadata []kubernetes.MetadataIndex
 
-	if pod.Status.PodIP == nil {
+	if pod.Status.PodIP == "" {
 		return metadata
 	}
 	for i := 0; i < len(hostPorts); i++ {
@@ -55,10 +54,10 @@ func (h *IpPortIndexer) GetMetadata(pod *corev1.Pod) []kubernetes.MetadataIndex 
 			ports := container.Ports
 
 			for _, port := range ports {
-				if port.ContainerPort == nil {
+				if port.ContainerPort == int64(0) {
 					continue
 				}
-				if strings.Index(hostPorts[i], fmt.Sprintf("%s:%d", *pod.Status.PodIP, *port.ContainerPort)) != -1 {
+				if strings.Index(hostPorts[i], fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort)) != -1 {
 					containerMeta["container"] = common.MapStr{
 						"name": container.Name,
 					}
@@ -82,21 +81,21 @@ func (h *IpPortIndexer) GetMetadata(pod *corev1.Pod) []kubernetes.MetadataIndex 
 	return metadata
 }
 
-func (h *IpPortIndexer) GetIndexes(pod *corev1.Pod) []string {
+func (h *IpPortIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 	var hostPorts []string
 
 	ip := pod.Status.PodIP
-	if ip == nil {
+	if ip == "" {
 		return hostPorts
 	}
 	for _, container := range pod.Spec.Containers {
 		ports := container.Ports
 
 		for _, port := range ports {
-			if port.ContainerPort != nil {
-				hostPorts = append(hostPorts, fmt.Sprintf("%s:%d", *ip, *port.ContainerPort))
+			if port.ContainerPort != int64(0) {
+				hostPorts = append(hostPorts, fmt.Sprintf("%s:%d", ip, port.ContainerPort))
 			} else {
-				hostPorts = append(hostPorts, *ip)
+				hostPorts = append(hostPorts, ip)
 			}
 
 		}
