@@ -339,7 +339,7 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	processes := []Process{}
+	var processes []Process
 	newProcs := make(ProcsMap, len(pids))
 
 	for _, pid := range pids {
@@ -376,7 +376,7 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 	processes = procStats.includeTopProcesses(processes)
 	logp.Debug("processes", "Filtered top processes down to %d processes", len(processes))
 
-	procs := []common.MapStr{}
+	procs := make([]common.MapStr, 0, len(processes))
 	for _, process := range processes {
 		proc := procStats.getProcessEvent(&process)
 		procs = append(procs, proc)
@@ -393,7 +393,7 @@ func (procStats *ProcStats) includeTopProcesses(processes []Process) []Process {
 		return processes
 	}
 
-	result := []Process{}
+	var result []Process
 	if procStats.IncludeTop.ByCPU > 0 {
 		sort.Slice(processes, func(i, j int) bool {
 			return processes[i].cpuTotalPct > processes[j].cpuTotalPct
