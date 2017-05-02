@@ -13,7 +13,8 @@ For example: to get the "Uptime" attribute from the "java.lang:type=Runtime" MBe
 "uptime" (actually "jolokia.jmx.uptime", the prexif is added by beats framework) you have to configure following
 mapping:
 
-```
+[source,yaml]
+---
 - module: jolokia
   metricsets: ["jmx"]
   hosts: ["localhost:8778"]
@@ -23,7 +24,7 @@ mapping:
       attributes:
         - attr: Uptime
           field: uptime
-```
+---
 
 In case the underlying attribute is an object (e.g. see HeapMemoryUsage attribute in java.lang:type=Memory) it`s
 structure will be published to Elastic "as is".
