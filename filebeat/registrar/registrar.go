@@ -7,17 +7,16 @@ import (
 	"path/filepath"
 	"sync"
 
-	cfg "github.com/elastic/beats/filebeat/config"
-	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/publisher"
+	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
 type Registrar struct {
-	Channel      chan []*input.Data
+	Channel      chan []*util.Data
 	out          publisher.SuccessLogger
 	done         chan struct{}
 	registryFile string       // Path to the Registry File
@@ -38,7 +37,7 @@ func New(registryFile string, out publisher.SuccessLogger) (*Registrar, error) {
 		registryFile: registryFile,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
-		Channel:      make(chan []*input.Data, 1),
+		Channel:      make(chan []*util.Data, 1),
 		out:          out,
 		wg:           sync.WaitGroup{},
 	}
@@ -153,7 +152,7 @@ func (r *Registrar) Run() {
 	}()
 
 	for {
-		var events []*input.Data
+		var events []*util.Data
 
 		select {
 		case <-r.done:
@@ -183,17 +182,16 @@ func (r *Registrar) Run() {
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
-func (r *Registrar) processEventStates(events []*input.Data) {
+func (r *Registrar) processEventStates(events []*util.Data) {
 	logp.Debug("registrar", "Processing %d events", len(events))
 
-	// skip stdin
-	for _, event := range events {
+	for _, data := range events {
 
-		// skip stdin
-		if event.Metadata.InputType == cfg.StdinInputType {
+		// skip events without state
+		if !data.HasState() {
 			continue
 		}
-		r.states.Update(event.Metadata.State)
+		r.states.Update(data.GetState())
 		statesUpdate.Add(1)
 	}
 }

@@ -21,8 +21,8 @@ import (
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/harvester/source"
-	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
@@ -38,15 +38,14 @@ var (
 
 type Outlet interface {
 	SetSignal(signal <-chan struct{})
-	OnEventSignal(event *input.Data) bool
-	OnEvent(event *input.Data) bool
+	OnEventSignal(data *util.Data) bool
+	OnEvent(data *util.Data) bool
 }
 
 type Harvester struct {
 	config          harvesterConfig
 	state           file.State
 	states          *file.States
-	prospectorChan  chan *input.Event
 	file            source.FileSource /* the file being watched */
 	fileReader      *LogFile
 	encodingFactory encoding.EncodingFactory
@@ -119,29 +118,21 @@ func (h *Harvester) open() error {
 
 // updateState updates the prospector state and forwards the event to the spooler
 // All state updates done by the prospector itself are synchronous to make sure not states are overwritten
-func (h *Harvester) forwardEvent(event *input.Event) error {
+func (h *Harvester) forwardEvent(data *util.Data) error {
 
 	// Add additional prospector meta data to the event
-	event.InputType = h.config.InputType
-	event.Pipeline = h.config.Pipeline
-	event.Module = h.config.Module
-	event.Fileset = h.config.Fileset
+	data.Meta.Pipeline = h.config.Pipeline
+	data.Meta.Module = h.config.Module
+	data.Meta.Fileset = h.config.Fileset
 
-	if event.Data != nil {
-		event.Data[common.EventMetadataKey] = h.config.EventMetadata
+	if data.HasEvent() {
+		data.Event[common.EventMetadataKey] = h.config.EventMetadata
+
+		// run the filters before sending to spooler
+		data.Event = h.processors.Run(data.Event)
 	}
 
-	eventHolder := event.GetData()
-	//run the filters before sending to spooler
-	if event.Bytes > 0 {
-		eventHolder.Event = h.processors.Run(eventHolder.Event)
-	}
-
-	if eventHolder.Event == nil {
-		eventHolder.Metadata.Bytes = 0
-	}
-
-	ok := h.outlet.OnEventSignal(&eventHolder)
+	ok := h.outlet.OnEventSignal(data)
 
 	if !ok {
 		logp.Info("Prospector outlet closed")
