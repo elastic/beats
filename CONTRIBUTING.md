@@ -72,6 +72,10 @@ Packetbeat:
 Some of the Beats might have extra development requirements, in which case you'll find a
 CONTRIBUTING.md file in the Beat directory.
 
+We use an [EditorConfig](http://editorconfig.org/) file in the beats repository to standardise 
+how different editors handle whitespace, line endings, and other coding styles in our files. Most popular editors have a
+[plugin](http://editorconfig.org/#download) for EditorConfig and we strongly recommend that you install it.
+
 ## Update scripts
 
 The Beats use a variety of scripts based on Python to generate configuration files
