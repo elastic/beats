@@ -4,9 +4,9 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/filebeat/spooler"
+	"github.com/elastic/beats/filebeat/util"
 )
 
 type spoolerOutlet struct {
@@ -19,12 +19,12 @@ type spoolerOutlet struct {
 
 type publisherChannel struct {
 	done chan struct{}
-	ch   chan []*input.Data
+	ch   chan []*util.Data
 }
 
 type registrarLogger struct {
 	done chan struct{}
-	ch   chan<- []*input.Data
+	ch   chan<- []*util.Data
 }
 
 type finishedLogger struct {
@@ -44,7 +44,7 @@ func newSpoolerOutlet(
 	}
 }
 
-func (o *spoolerOutlet) OnEvent(event *input.Data) bool {
+func (o *spoolerOutlet) OnEvent(data *util.Data) bool {
 	open := atomic.LoadInt32(&o.isOpen) == 1
 	if !open {
 		return false
@@ -61,7 +61,7 @@ func (o *spoolerOutlet) OnEvent(event *input.Data) bool {
 		}
 		atomic.StoreInt32(&o.isOpen, 0)
 		return false
-	case o.spooler.Channel <- event:
+	case o.spooler.Channel <- data:
 		return true
 	}
 }
@@ -69,12 +69,12 @@ func (o *spoolerOutlet) OnEvent(event *input.Data) bool {
 func newPublisherChannel() *publisherChannel {
 	return &publisherChannel{
 		done: make(chan struct{}),
-		ch:   make(chan []*input.Data, 1),
+		ch:   make(chan []*util.Data, 1),
 	}
 }
 
 func (c *publisherChannel) Close() { close(c.done) }
-func (c *publisherChannel) Send(events []*input.Data) bool {
+func (c *publisherChannel) Send(events []*util.Data) bool {
 	select {
 	case <-c.done:
 		// set ch to nil, so no more events will be send after channel close signal
@@ -96,7 +96,7 @@ func newRegistrarLogger(reg *registrar.Registrar) *registrarLogger {
 }
 
 func (l *registrarLogger) Close() { close(l.done) }
-func (l *registrarLogger) Published(events []*input.Data) bool {
+func (l *registrarLogger) Published(events []*util.Data) bool {
 	select {
 	case <-l.done:
 		// set ch to nil, so no more events will be send after channel close signal
@@ -114,7 +114,7 @@ func newFinishedLogger(wg *sync.WaitGroup) *finishedLogger {
 	return &finishedLogger{wg}
 }
 
-func (l *finishedLogger) Published(events []*input.Data) bool {
+func (l *finishedLogger) Published(events []*util.Data) bool {
 	for range events {
 		l.wg.Done()
 	}

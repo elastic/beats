@@ -1,11 +1,11 @@
 package channel
 
-import "github.com/elastic/beats/filebeat/input"
+import "github.com/elastic/beats/filebeat/util"
 
 // Outleter is the outlet for a prospector
 type Outleter interface {
 	SetSignal(signal <-chan struct{})
-	OnEventSignal(event *input.Data) bool
-	OnEvent(event *input.Data) bool
+	OnEventSignal(data *util.Data) bool
+	OnEvent(data *util.Data) bool
 	Copy() Outleter
 }

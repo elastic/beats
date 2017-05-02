@@ -11,8 +11,8 @@ import (
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/harvester/source"
-	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/jsontransform"
 	"github.com/elastic/beats/libbeat/logp"
@@ -135,41 +135,44 @@ func (h *Harvester) Harvest(r reader.Reader) {
 		state := h.getState()
 
 		// Create state event
-		event := input.NewEvent(state)
+		data := util.NewData()
+		if h.file.HasState() {
+			data.SetState(state)
+		}
+
 		text := string(message.Content)
 
 		// Check if data should be added to event. Only export non empty events.
 		if !message.IsEmpty() && h.shouldExportLine(text) {
-			event.Bytes = message.Bytes
 
-			event.Data = common.MapStr{
+			data.Event = common.MapStr{
 				"@timestamp": common.Time(message.Ts),
 				"source":     h.state.Source,
 				"offset":     h.state.Offset, // Offset here is the offset before the starting char.
 				"type":       h.config.DocumentType,
 				"input_type": h.config.InputType,
 			}
-			event.Data.DeepUpdate(message.Fields)
+			data.Event.DeepUpdate(message.Fields)
 
 			// Check if json fields exist
 			var jsonFields common.MapStr
-			if fields, ok := event.Data["json"]; ok {
+			if fields, ok := data.Event["json"]; ok {
 				jsonFields = fields.(common.MapStr)
 			}
 
 			if h.config.JSON != nil && len(jsonFields) > 0 {
-				h.mergeJSONFields(event.Data, jsonFields, &text)
+				h.mergeJSONFields(data.Event, jsonFields, &text)
 			} else if &text != nil {
-				if event.Data == nil {
-					event.Data = common.MapStr{}
+				if data.Event == nil {
+					data.Event = common.MapStr{}
 				}
-				event.Data["message"] = text
+				data.Event["message"] = text
 			}
 		}
 
 		// Always send event to update state, also if lines was skipped
 		// Stop harvester in case of an error
-		if !h.sendEvent(event) {
+		if !h.sendEvent(data) {
 			return
 		}
 		// Update state of harvester as successfully sent
@@ -192,11 +195,11 @@ func (h *Harvester) Stop() {
 
 // sendEvent sends event to the spooler channel
 // Return false if event was not sent
-func (h *Harvester) sendEvent(event *input.Event) bool {
+func (h *Harvester) sendEvent(data *util.Data) bool {
 	if h.file.HasState() {
-		h.states.Update(event.State)
+		h.states.Update(h.state)
 	}
-	err := h.forwardEvent(event)
+	err := h.forwardEvent(data)
 	return err == nil
 }
 
@@ -212,12 +215,11 @@ func (h *Harvester) SendStateUpdate() {
 	}
 
 	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
+	h.states.Update(h.state)
 
-	event := input.NewEvent(h.state)
-	h.states.Update(event.State)
-
-	data := event.GetData()
-	h.outlet.OnEvent(&data)
+	d := util.NewData()
+	d.SetState(h.state)
+	h.outlet.OnEvent(d)
 }
 
 // shouldExportLine decides if the line is exported or not based on

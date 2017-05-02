@@ -11,9 +11,9 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector/stdin"
+	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -174,11 +174,10 @@ func (p *Prospector) updateState(state file.State) error {
 	// Update first internal state
 	p.states.Update(state)
 
-	eventHolder := input.NewEvent(state).GetData()
-	// Set to 0 as these are state updates only
-	eventHolder.Metadata.Bytes = 0
+	data := util.NewData()
+	data.SetState(state)
 
-	ok := p.outlet.OnEvent(&eventHolder)
+	ok := p.outlet.OnEvent(data)
 
 	if !ok {
 		logp.Info("Prospector outlet closed")
