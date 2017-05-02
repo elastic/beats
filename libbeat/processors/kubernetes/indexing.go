@@ -6,8 +6,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
-
-	corev1 "github.com/ericchiang/k8s/api/v1"
 )
 
 //Names of indexers and matchers that have been defined.
@@ -27,11 +25,11 @@ var Indexing = NewRegister()
 type Indexer interface {
 	// GetMetadata generates event metadata for the given pod, then returns the
 	// list of indexes to create, with the metadata to put on them
-	GetMetadata(pod *corev1.Pod) []MetadataIndex
+	GetMetadata(pod *Pod) []MetadataIndex
 
 	// GetIndexes return the list of indexes the given pod belongs to. This function
 	// must return the same indexes than GetMetadata
-	GetIndexes(pod *corev1.Pod) []string
+	GetIndexes(pod *Pod) []string
 }
 
 // MetadataIndex holds a pair of index -> metadata info
@@ -51,7 +49,7 @@ type Matcher interface {
 //GenMeta takes in pods to generate metadata for them
 type GenMeta interface {
 	//GenerateMetaData generates metadata by taking in a pod as an input
-	GenerateMetaData(pod *corev1.Pod) common.MapStr
+	GenerateMetaData(pod *Pod) common.MapStr
 }
 
 type Indexers struct {
@@ -133,7 +131,7 @@ func (r *Register) GetMatcher(name string) MatcherConstructor {
 }
 
 // GetMetadata returns the composed metadata list from all registered indexers
-func (i *Indexers) GetMetadata(pod *corev1.Pod) []MetadataIndex {
+func (i *Indexers) GetMetadata(pod *Pod) []MetadataIndex {
 	var metadata []MetadataIndex
 	i.RLock()
 	defer i.RUnlock()
@@ -146,7 +144,7 @@ func (i *Indexers) GetMetadata(pod *corev1.Pod) []MetadataIndex {
 }
 
 // GetIndexes returns the composed index list from all registered indexers
-func (i *Indexers) GetIndexes(pod *corev1.Pod) []string {
+func (i *Indexers) GetIndexes(pod *Pod) []string {
 	var indexes []string
 	i.RLock()
 	defer i.RUnlock()
@@ -179,7 +177,7 @@ type GenDefaultMeta struct {
 }
 
 // GenerateMetaData generates default metadata for the given pod taking to account certain filters
-func (g *GenDefaultMeta) GenerateMetaData(pod *corev1.Pod) common.MapStr {
+func (g *GenDefaultMeta) GenerateMetaData(pod *Pod) common.MapStr {
 	labelMap := common.MapStr{}
 	annotationsMap := common.MapStr{}
 
@@ -195,9 +193,9 @@ func (g *GenDefaultMeta) GenerateMetaData(pod *corev1.Pod) common.MapStr {
 
 	meta := common.MapStr{
 		"pod": common.MapStr{
-			"name": pod.Metadata.GetName(),
+			"name": pod.Metadata.Name,
 		},
-		"namespace": pod.Metadata.GetNamespace(),
+		"namespace": pod.Metadata.Namespace,
 	}
 
 	if len(labelMap) != 0 {
@@ -236,18 +234,18 @@ func NewPodNameIndexer(_ common.Config, genMeta GenMeta) (Indexer, error) {
 	return &PodNameIndexer{genMeta: genMeta}, nil
 }
 
-func (p *PodNameIndexer) GetMetadata(pod *corev1.Pod) []MetadataIndex {
+func (p *PodNameIndexer) GetMetadata(pod *Pod) []MetadataIndex {
 	data := p.genMeta.GenerateMetaData(pod)
 	return []MetadataIndex{
 		{
-			Index: pod.Metadata.GetName(),
+			Index: pod.Metadata.Name,
 			Data:  data,
 		},
 	}
 }
 
-func (p *PodNameIndexer) GetIndexes(pod *corev1.Pod) []string {
-	return []string{pod.Metadata.GetName()}
+func (p *PodNameIndexer) GetIndexes(pod *Pod) []string {
+	return []string{pod.Metadata.Name}
 }
 
 // ContainerIndexer indexes pods based on all their containers IDs
@@ -259,7 +257,7 @@ func NewContainerIndexer(_ common.Config, genMeta GenMeta) (Indexer, error) {
 	return &ContainerIndexer{genMeta: genMeta}, nil
 }
 
-func (c *ContainerIndexer) GetMetadata(pod *corev1.Pod) []MetadataIndex {
+func (c *ContainerIndexer) GetMetadata(pod *Pod) []MetadataIndex {
 	commonMeta := c.genMeta.GenerateMetaData(pod)
 	containers := c.GetIndexes(pod)
 	var metadata []MetadataIndex
@@ -277,10 +275,10 @@ func (c *ContainerIndexer) GetMetadata(pod *corev1.Pod) []MetadataIndex {
 	return metadata
 }
 
-func (c *ContainerIndexer) GetIndexes(pod *corev1.Pod) []string {
+func (c *ContainerIndexer) GetIndexes(pod *Pod) []string {
 	var containers []string
 	for _, status := range pod.Status.ContainerStatuses {
-		cID := status.GetContainerID()
+		cID := status.ContainerID
 		if cID != "" {
 			parts := strings.Split(cID, "//")
 			if len(parts) == 2 {

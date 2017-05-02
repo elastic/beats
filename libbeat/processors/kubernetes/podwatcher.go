@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"context"
+	"encoding/json"
 	"sync"
 	"time"
 
@@ -28,7 +29,7 @@ type PodWatcher struct {
 type annotationCache struct {
 	sync.Mutex
 	annotations map[string]common.MapStr
-	pods        map[string]*corev1.Pod // pod uid -> Pod
+	pods        map[string]*Pod // pod uid -> Pod
 }
 
 type NodeOption struct{}
@@ -48,7 +49,7 @@ func NewPodWatcher(kubeClient *k8s.Client, indexers *Indexers, syncPeriod time.D
 		stop:                cancel,
 		annotationCache: annotationCache{
 			annotations: make(map[string]common.MapStr),
-			pods:        make(map[string]*corev1.Pod),
+			pods:        make(map[string]*Pod),
 		},
 	}
 }
@@ -124,44 +125,63 @@ func (p *PodWatcher) Run() bool {
 	}
 }
 
-func (p *PodWatcher) onPodAdd(pod *corev1.Pod) {
+func (p *PodWatcher) onPodAdd(pod *Pod) {
 	metadata := p.indexers.GetMetadata(pod)
 	p.annotationCache.Lock()
 	defer p.annotationCache.Unlock()
 
-	p.annotationCache.pods[pod.Metadata.GetUid()] = pod
+	p.annotationCache.pods[pod.Metadata.UID] = pod
 
 	for _, m := range metadata {
 		p.annotationCache.annotations[m.Index] = m.Data
 	}
 }
 
-func (p *PodWatcher) onPodUpdate(pod *corev1.Pod) {
-	oldPod := p.GetPod(pod.Metadata.GetUid())
-	if oldPod.Metadata.GetResourceVersion() != pod.Metadata.GetResourceVersion() {
+func (p *PodWatcher) onPodUpdate(pod *Pod) {
+	oldPod := p.GetPod(pod.Metadata.UID)
+	if oldPod.Metadata.ResourceVersion != pod.Metadata.ResourceVersion {
 		//Process the new pod changes
 		p.onPodDelete(oldPod)
 		p.onPodAdd(pod)
 	}
 }
 
-func (p *PodWatcher) onPodDelete(pod *corev1.Pod) {
+func (p *PodWatcher) onPodDelete(pod *Pod) {
 	p.annotationCache.Lock()
 	defer p.annotationCache.Unlock()
 
-	delete(p.annotationCache.pods, pod.Metadata.GetUid())
+	delete(p.annotationCache.pods, pod.Metadata.UID)
 
 	for _, index := range p.indexers.GetIndexes(pod) {
 		delete(p.annotationCache.annotations, index)
 	}
 }
 
+func (p *PodWatcher) getPodMeta(pod *corev1.Pod) *Pod {
+	bytes, err := json.Marshal(pod)
+	if err != nil {
+		logp.Warn("Unable to marshal %v", pod.String())
+		return nil
+	}
+
+	po := &Pod{}
+	err = json.Unmarshal(bytes, po)
+	if err != nil {
+		logp.Warn("Unable to marshal %v", pod.String())
+		return nil
+	}
+
+	return po
+
+}
+
 func (p *PodWatcher) worker() {
-	for pod := range p.podQueue {
-		if pod.Metadata.GetDeletionTimestamp() != nil {
+	for po := range p.podQueue {
+		pod := p.getPodMeta(po)
+		if pod.Metadata.DeletionTimestamp != "" {
 			p.onPodDelete(pod)
 		} else {
-			existing := p.GetPod(pod.Metadata.GetUid())
+			existing := p.GetPod(pod.Metadata.UID)
 			if existing != nil {
 				p.onPodUpdate(pod)
 			} else {
@@ -181,7 +201,7 @@ func (p *PodWatcher) GetMetaData(arg string) common.MapStr {
 	return nil
 }
 
-func (p *PodWatcher) GetPod(uid string) *corev1.Pod {
+func (p *PodWatcher) GetPod(uid string) *Pod {
 	p.annotationCache.Lock()
 	defer p.annotationCache.Unlock()
 	return p.annotationCache.pods[uid]

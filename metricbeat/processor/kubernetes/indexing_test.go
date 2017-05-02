@@ -6,8 +6,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors/kubernetes"
-	corev1 "github.com/ericchiang/k8s/api/v1"
-	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,21 +21,21 @@ func TestIpPortIndexer(t *testing.T) {
 	ns := "testns"
 	container := "container"
 	ip := "1.2.3.4"
-	port := int32(80)
-	pod := corev1.Pod{
-		Metadata: &metav1.ObjectMeta{
-			Name:      &podName,
-			Namespace: &ns,
+	port := int64(80)
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
+			Name:      podName,
+			Namespace: ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Spec: &corev1.PodSpec{
-			Containers: make([]*corev1.Container, 0),
+		Spec: kubernetes.PodSpec{
+			Containers: make([]kubernetes.Container, 0),
 		},
 
-		Status: &corev1.PodStatus{
-			PodIP: &ip,
+		Status: kubernetes.PodStatus{
+			PodIP: ip,
 		},
 	}
 
@@ -55,13 +53,13 @@ func TestIpPortIndexer(t *testing.T) {
 		},
 	}
 
-	pod.Spec.Containers = []*corev1.Container{
+	pod.Spec.Containers = []kubernetes.Container{
 		{
-			Name: &container,
-			Ports: []*corev1.ContainerPort{
+			Name: container,
+			Ports: []kubernetes.ContainerPort{
 				{
-					Name:          &container,
-					ContainerPort: &port,
+					Name:          container,
+					ContainerPort: port,
 				},
 			},
 		},
