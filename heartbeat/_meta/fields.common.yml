@@ -1,0 +1,83 @@
+- key: common
+  title: "Common Heartbeat Monitor"
+  description:
+  fields:
+    - name: monitor
+      type: group
+      description: >
+        Common monitor fields.
+
+      fields:
+        - name: type
+          type: keyword
+          description: >
+            The monitor type.
+
+        - name: name
+          type: keyword
+          description: >
+            The monitors configured name
+
+        - name: id
+          type: keyword
+          description: >
+            The monitors full job ID as used by heartbeat.
+
+        - name: duration
+          type: group
+          description: total monitoring test duration
+          fields:
+            - name: us
+              type: long
+              description: Duration in microseconds
+
+        - name: scheme
+          type: keyword
+          description: >
+            Address url scheme. For example `tcp`, `tls`, `http`, and `https`.
+
+        - name: host
+          type: keyword
+          description: >
+            Hostname of service being monitored. Can be missing, if service is
+            monitored by IP.
+
+        - name: ip
+          type: ip
+          description: >
+            IP of service being monitored. If service is monitored by hostname,
+            the `ip` field contains the resolved ip address for the current host.
+
+        - name: status
+          required: true
+          type: keyword
+          description: >
+            Indicator if monitor could validate the service to be available.
+
+- key: resolve
+  title: "Host Lookup"
+  description:
+  fields:
+    - name: resolve
+      type: group
+      description: >
+        Host lookup fields.
+      fields:
+        - name: host
+          type: keyword
+          description: >
+            Hostname of service being monitored.
+
+        - name: ip
+          type: ip
+          description: >
+            IP address found for the given host.
+
+        - name: rtt
+          type: group
+          description: Duration required to resolve an IP from hostname.
+          fields:
+            - name: us
+              type: long
+              description: Duration in microseconds
+
