@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 
@@ -20,19 +21,20 @@ import (
 type ProcsMap map[int]*Process
 
 type Process struct {
-	Pid      int    `json:"pid"`
-	Ppid     int    `json:"ppid"`
-	Pgid     int    `json:"pgid"`
-	Name     string `json:"name"`
-	Username string `json:"username"`
-	State    string `json:"state"`
-	CmdLine  string `json:"cmdline"`
-	Cwd      string `json:"cwd"`
-	Mem      sigar.ProcMem
-	Cpu      sigar.ProcTime
-	Ctime    time.Time
-	FD       sigar.ProcFDUsage
-	Env      common.MapStr
+	Pid         int    `json:"pid"`
+	Ppid        int    `json:"ppid"`
+	Pgid        int    `json:"pgid"`
+	Name        string `json:"name"`
+	Username    string `json:"username"`
+	State       string `json:"state"`
+	CmdLine     string `json:"cmdline"`
+	Cwd         string `json:"cwd"`
+	Mem         sigar.ProcMem
+	Cpu         sigar.ProcTime
+	Ctime       time.Time
+	FD          sigar.ProcFDUsage
+	Env         common.MapStr
+	cpuTotalPct float64
 }
 
 type ProcStats struct {
@@ -41,6 +43,7 @@ type ProcStats struct {
 	CpuTicks     bool
 	EnvWhitelist []string
 	CacheCmdLine bool
+	IncludeTop   includeTopConfig
 
 	procRegexps []match.Matcher // List of regular expressions used to whitelist processes.
 	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
@@ -216,7 +219,7 @@ func getProcState(b byte) string {
 	return "unknown"
 }
 
-func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) common.MapStr {
+func (procStats *ProcStats) getProcessEvent(process *Process) common.MapStr {
 	proc := common.MapStr{
 		"pid":      process.Pid,
 		"ppid":     process.Ppid,
@@ -248,7 +251,7 @@ func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) com
 
 	proc["cpu"] = common.MapStr{
 		"total": common.MapStr{
-			"pct": GetProcCpuPercentage(last, process),
+			"pct": process.cpuTotalPct,
 		},
 		"start_time": unixTimeMsToTime(process.Cpu.StartTime),
 	}
@@ -336,7 +339,7 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	processes := []common.MapStr{}
+	processes := []Process{}
 	newProcs := make(ProcsMap, len(pids))
 
 	for _, pid := range pids {
@@ -363,16 +366,64 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 			}
 
 			newProcs[process.Pid] = process
-
 			last := procStats.ProcsMap[process.Pid]
-			proc := procStats.GetProcessEvent(process, last)
+			process.cpuTotalPct = GetProcCpuPercentage(last, process)
+			processes = append(processes, *process)
+		}
+	}
+	procStats.ProcsMap = newProcs
 
-			processes = append(processes, proc)
+	processes = procStats.includeTopProcesses(processes)
+	logp.Debug("processes", "Filtered top processes down to %d processes", len(processes))
+
+	procs := []common.MapStr{}
+	for _, process := range processes {
+		proc := procStats.getProcessEvent(&process)
+		procs = append(procs, proc)
+	}
+
+	return procs, nil
+}
+
+func (procStats *ProcStats) includeTopProcesses(processes []Process) []Process {
+
+	if !procStats.IncludeTop.Enabled ||
+		(procStats.IncludeTop.ByCPU == 0 && procStats.IncludeTop.ByMemory == 0) {
+
+		return processes
+	}
+
+	result := []Process{}
+	if procStats.IncludeTop.ByCPU > 0 {
+		sort.Slice(processes, func(i, j int) bool {
+			return processes[i].cpuTotalPct > processes[j].cpuTotalPct
+		})
+		result = append(result, processes[:procStats.IncludeTop.ByCPU]...)
+	}
+
+	if procStats.IncludeTop.ByMemory > 0 {
+		sort.Slice(processes, func(i, j int) bool {
+			return processes[i].Mem.Resident > processes[j].Mem.Resident
+		})
+		for _, proc := range processes[:procStats.IncludeTop.ByMemory] {
+			if !isProcessInSlice(result, &proc) {
+				result = append(result, proc)
+			}
 		}
 	}
 
-	procStats.ProcsMap = newProcs
-	return processes, nil
+	return result
+}
+
+// isProcessInSlice looks up proc in the processes slice and returns if
+// found or not
+func isProcessInSlice(processes []Process, proc *Process) bool {
+	for _, p := range processes {
+		if p.Pid == proc.Pid {
+			return true
+		}
+	}
+	return false
 }
 
 // isWhitelistedEnvVar returns true if the given variable name is a match for
