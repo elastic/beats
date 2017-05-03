@@ -28,6 +28,7 @@ https://github.com/elastic/beats/compare/v5.3.0...master[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Usage of field `_type` is now ignored and hardcoded to `doc`. {pull}3757[3757]
 
 *Filebeat*
 
