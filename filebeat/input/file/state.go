@@ -1,7 +1,6 @@
 package file
 
 import (
-	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -11,6 +10,7 @@ import (
 
 // State is used to communicate the reading state of a file
 type State struct {
+	Id          string        `json:"-"` // local unique id to make comparison more efficient
 	Finished    bool          `json:"-"` // harvester state
 	Fileinfo    os.FileInfo   `json:"-"` // the file info
 	Source      string        `json:"source"`
@@ -34,14 +34,18 @@ func NewState(fileInfo os.FileInfo, path string, t string) State {
 	}
 }
 
-// String returns a unique id for the state as a string
-func (s *State) String() string {
-	return s.FileStateOS.String()
+// ID returns a unique id for the state as a string
+func (s *State) ID() string {
+	// Generate id on first request. This is needed as id is not set when converting back from json
+	if s.Id == "" {
+		s.Id = s.FileStateOS.String()
+	}
+	return s.Id
 }
 
 // IsEqual compares the state to an other state supporing stringer based on the unique string
-func (s *State) IsEqual(c fmt.Stringer) bool {
-	return s.String() == c.String()
+func (s *State) IsEqual(c *State) bool {
+	return s.ID() == c.ID()
 }
 
 // IsEmpty returns true if the state is empty
