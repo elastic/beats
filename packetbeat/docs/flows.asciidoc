@@ -1,0 +1,104 @@
+[[flows]]
+== Configuring Flows to Monitor Network Traffic
+
+You can configure Packetbeat to collect and report statistics on network flows.
+A _flow_ is a group of packets sent over the same time period that share
+common properties, such as the same source and destination address and protocol.
+You can use this feature to analyze network traffic over specific protocols on
+your network.
+
+For each flow, Packetbeat reports the number of packets and the total number of
+bytes sent from the source to the destination. Each flow event also contains
+information about the source and destination hosts, such as their IP address and
+location. For bi-directional flows, Packetbeat reports statistics for the reverse
+flow.
+
+Packetbeat collects and reports statistics per flow on the following network
+layers:
+
+* IP/TCP
+* UDP
+* SSL
+
+//REVEIWER: Not sure this list is complete. should it also say Application? Anything else?
+
+Here's an example of flow events visualized in the Flows dashbaord:
+
+//REVIEWERS: Is it OK for me to show all these IP addresses (not sure what might be sensitive)? I don't worry about that as much as I should, but now that I know Mr. Robot is watching...perhaps I should be more careful. Do we have a better image to use? This one is actually from a v5.3.
+
+image:./images/flows.png[]
+
+To configure flows, use the `flows` option in the +{beatname_lc}.yml+ config file.
+Flows are enabled by default.
+
+[source,yaml]
+--------------------------------------------------------------------------------
+packetbeat.flows:
+  timeout: 30s
+  period: 10s
+--------------------------------------------------------------------------------
+
+See <<configuration-flows>> for more info about these configuration options.
+
+Here’s an example of a flow event sent by Packetbeat. See
+<<exported-fields-flows_event>> for a description of each field.
+
+//REVIEWERS: As always, I sit on the fence about whether to show the output event because it may change.
+
+["source","json",subs="attributes"]
+--------------------------------------------------------------------------------
+{
+  "_index": "packetbeat-2017.05.03",
+  "_type": "flow",
+  "_id": "AVvP1gAcqsX8rEl-yTHr",
+  "_version": 1,
+  "_score": null,
+  "_source": {
+    "@timestamp": "2017-05-03T19:42:40.003Z",
+    "beat": {
+      "hostname": "My-MacBook-Pro.local",
+      "name": "My-MacBook-Pro.local",
+      "version": "{stack-version}"
+    },
+    "connection_id": "AQAAAAAAAAA=",
+    "dest": {
+      "ip": "65.208.228.223",
+      "mac": "fe:ff:20:00:01:00",
+      "port": 80,
+      "stats": {
+        "net_bytes_total": 19236,
+        "net_packets_total": 16
+      }
+    },
+    "final": false,
+    "flow_id": "EQwA////DP//////FBgBAAEAAAEAAAD+/yAAAQCR/qDtQdDk3ywNUAABAAAAAAAAAA",
+    "last_time": "2017-05-03T19:42:24.151Z",
+    "source": {
+      "ip": "145.254.160.237",
+      "mac": "00:00:01:00:00:00",
+      "port": 3372,
+      "stats": {
+        "net_bytes_total": 1243,
+        "net_packets_total": 14
+      }
+    },
+    "start_time": "2017-05-03T19:42:24.151Z",
+    "transport": "tcp",
+    "type": "flow"
+  },
+  "fields": {
+    "start_time": [
+      1493840544151
+    ],
+    "last_time": [
+      1493840544151
+    ],
+    "@timestamp": [
+      1493840560003
+    ]
+  },
+  "sort": [
+    1493840560003
+  ]
+}
+--------------------------------------------------------------------------------
