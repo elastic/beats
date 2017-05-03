@@ -1,8 +1,23 @@
 [[running-in-container]]
 == Running Metricbeat in a Container
 
-Elastic does not provide any official container images for Metricbeat. The
-examples on this page assume you are using your own Metricbeat container image.
+ifeval::["{release-state}"=="released"]
+
+[NOTE]
+==================================================
+The https://github.com/elastic/beats-docker[official Docker images] for Beats
+are available from the Elastic Docker registry. To retrieve the images, simply
+issue the `docker pull` command:
+
++docker pull docker.elastic.co/beats/metricbeat:{stack-version}+.
+
+The images are currently under development and should be considered
+alpha-quality. We strongly recommend that you do not run these images
+in a production environment.
+
+==================================================
+
+endif::[]
 
 When executing Metricbeat in a container, there are some important
 things to be aware of if you want to monitor the host machine or other
@@ -17,14 +32,14 @@ This example highlights the changes required to make the system module
 work properly inside of a container. This enables Metricbeat to monitor the
 host machine from within the container.
 
-[source,sh]
+["source","sh",subs="attributes"]
 ----
 sudo docker run \
   --volume=/proc:/hostfs/proc:ro \ <1>
   --volume=/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro \ <2>
   --volume=/:/hostfs:ro \ <3>
   --net=host <4>
-  my/metricbeat:latest -system.hostfs=/hostfs
+  docker.elastic.co/beats/metricbeat:{stack-version} -system.hostfs=/hostfs
 ----
 
 <1> Metricbeat's <<metricbeat-module-system,system module>> collects much of its data through the Linux proc
@@ -54,12 +69,12 @@ to `/hostfs/proc` is not sufficient.
 Next let's look at an example of monitoring a containerized service from a
 Metricbeat container.
 
-[source,sh]
+["source","sh",subs="attributes"]
 ----
 sudo docker run \
   --link some-mysql:mysql \ <1>
   -e MYSQL_PASSWORD=secret \ <2>
-  my/metricbeat:latest
+  docker.elastic.co/beats/metricbeat:{stack-version} 
 ----
 
 <1> Linking the containers enables Metricbeat access the exposed ports of the
