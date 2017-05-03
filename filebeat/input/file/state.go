@@ -1,6 +1,7 @@
 package file
 
 import (
+	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -31,6 +32,16 @@ func NewState(fileInfo os.FileInfo, path string, t string) State {
 		TTL:         -1, // By default, state does have an infinite ttl
 		Type:        t,
 	}
+}
+
+// String returns a unique id for the state as a string
+func (s *State) String() string {
+	return s.FileStateOS.String()
+}
+
+// IsEqual compares the state to an other state supporing stringer based on the unique string
+func (s *State) IsEqual(c fmt.Stringer) bool {
+	return s.String() == c.String()
 }
 
 // IsEmpty returns true if the state is empty
@@ -81,7 +92,7 @@ func (s *States) findPrevious(newState State) (int, State) {
 	// TODO: This could be made potentially more performance by using an index (harvester id) and only use iteration as fall back
 	for index, oldState := range s.states {
 		// This is using the FileStateOS for comparison as FileInfo identifiers can only be fetched for existing files
-		if oldState.FileStateOS.IsSame(newState.FileStateOS) {
+		if oldState.IsEqual(&newState) {
 			return index, oldState
 		}
 	}
