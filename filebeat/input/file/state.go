@@ -10,17 +10,18 @@ import (
 
 // State is used to communicate the reading state of a file
 type State struct {
-	Source      string      `json:"source"`
-	Offset      int64       `json:"offset"`
-	Finished    bool        `json:"-"` // harvester state
-	Fileinfo    os.FileInfo `json:"-"` // the file info
-	FileStateOS StateOS
+	Finished    bool          `json:"-"` // harvester state
+	Fileinfo    os.FileInfo   `json:"-"` // the file info
+	Source      string        `json:"source"`
+	Offset      int64         `json:"offset"`
 	Timestamp   time.Time     `json:"timestamp"`
 	TTL         time.Duration `json:"ttl"`
+	Type        string        `json:"type"`
+	FileStateOS StateOS
 }
 
 // NewState creates a new file state
-func NewState(fileInfo os.FileInfo, path string) State {
+func NewState(fileInfo os.FileInfo, path string, t string) State {
 	return State{
 		Fileinfo:    fileInfo,
 		Source:      path,
@@ -28,6 +29,7 @@ func NewState(fileInfo os.FileInfo, path string) State {
 		FileStateOS: GetOSState(fileInfo),
 		Timestamp:   time.Now(),
 		TTL:         -1, // By default, state does have an infinite ttl
+		Type:        t,
 	}
 }
 
