@@ -111,7 +111,7 @@ func (l *Log) Run() {
 				}
 			} else {
 				// Check if existing source on disk and state are the same. Remove if not the case.
-				newState := file.NewState(stat, state.Source)
+				newState := file.NewState(stat, state.Source, l.config.InputType)
 				if !newState.FileStateOS.IsSame(state.FileStateOS) {
 					l.removeState(state)
 					logp.Debug("prospector", "Remove state for file as file removed or renamed: %s", state.Source)
@@ -253,7 +253,7 @@ func (l *Log) scan() {
 		logp.Debug("prospector", "Check file for harvesting: %s", path)
 
 		// Create new state for comparison
-		newState := file.NewState(info, path)
+		newState := file.NewState(info, path, l.config.InputType)
 
 		// Load last state
 		lastState := l.Prospector.states.FindPrevious(newState)
