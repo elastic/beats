@@ -32,10 +32,10 @@ func TestFetchEventContents(t *testing.T) {
 
 	f := mbtest.NewEventsFetcher(t, config)
 	events, err := f.Fetch()
-	event := events[0]
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	if err != nil {
+		t.Fatal(err)
 	}
+	event := events[0]
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
@@ -68,5 +68,4 @@ func TestFetchEventContents(t *testing.T) {
 
 	total = store_stats["total"].(common.MapStr)
 	assert.EqualValues(t, 8488943, total["bytes"])
-
 }
