@@ -13,4 +13,4 @@ processors:
     fields: ['beat']
 ----
 
-See <<configuration-processors>> for more information.
+include::../../libbeat/docs/processors-using.asciidoc[]

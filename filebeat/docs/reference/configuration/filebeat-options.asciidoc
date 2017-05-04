@@ -590,6 +590,8 @@ filebeat.shutdown_timeout: 5s
 
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
+include::../../../../libbeat/docs/processors-config.asciidoc[]
+
 include::./reload-configuration.asciidoc[]
 
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
@@ -599,5 +601,3 @@ include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 include::../../../../libbeat/docs/setup-config.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
-
-include::../../../../libbeat/docs/processors-config.asciidoc[]
