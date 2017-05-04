@@ -1,0 +1,28 @@
+{
+  "@timestamp": "2017-05-10T16:46:37.821Z",
+  "beat": {
+    "hostname": "X1",
+    "name": "X1",
+    "version": "6.0.0-alpha1"
+  },
+  "kubernetes": {
+    "namespace": "jenkins",
+    "replicaset": {
+      "name": "wise-lynx-jenkins-1616735317",
+      "replicas": {
+        "available": 1,
+        "desired": 1,
+        "labeled": 1,
+        "observed": 1,
+        "ready": 1
+      }
+    }
+  },
+  "metricset": {
+    "host": "192.168.99.100:18080",
+    "module": "kubernetes",
+    "name": "state_replicaset",
+    "namespace": "replicaset",
+    "rtt": 6719
+  }
+}

@@ -6295,6 +6295,340 @@ Tx errors
 
 
 [float]
+== container Fields
+
+kubernetes container metrics
+
+
+
+[float]
+== resource Fields
+
+Kubernetes container resource requests and limits
+
+
+
+
+[float]
+=== kubernetes.container.resource.status.phase
+
+type: keyword
+
+Container phase (running, waiting, terminated)
+
+
+[float]
+=== kubernetes.container.resource.status.ready
+
+type: boolean
+
+Container ready status
+
+
+[float]
+=== kubernetes.container.resource.status.restarts
+
+type: integer
+
+Container restarts count
+
+
+
+[float]
+=== kubernetes.container.resource.cpu.limit.nanocores
+
+type: long
+
+Container CPU nanocores limit
+
+
+[float]
+=== kubernetes.container.resource.cpu.request.nanocores
+
+type: long
+
+Container CPU requested nanocores
+
+
+
+[float]
+=== kubernetes.container.resource.memory.limit.bytes
+
+type: long
+
+format: bytes
+
+Container memory limit in bytes
+
+
+[float]
+=== kubernetes.container.resource.memory.request.bytes
+
+type: long
+
+format: bytes
+
+Container requested memory in bytes
+
+
+[float]
+== deployment Fields
+
+kubernetes deployment metrics
+
+
+
+[float]
+=== kubernetes.deployment.name
+
+type: keyword
+
+Kubernetes deployment name
+
+
+[float]
+=== kubernetes.deployment.paused
+
+type: boolean
+
+Kubernetes deployment paused status
+
+
+[float]
+== replicas Fields
+
+Kubernetes deployment replicas info
+
+
+
+[float]
+=== kubernetes.deployment.replicas.desired
+
+type: integer
+
+Deployment number of desired replicas (spec)
+
+
+[float]
+=== kubernetes.deployment.replicas.available
+
+type: integer
+
+Deployment available replicas
+
+
+[float]
+=== kubernetes.deployment.replicas.unavailable
+
+type: integer
+
+Deployment unavailable replicas
+
+
+[float]
+=== kubernetes.deployment.replicas.updated
+
+type: integer
+
+Deployment updated replicas
+
+
+[float]
+== node Fields
+
+kubernetes node metrics
+
+
+
+
+[float]
+=== kubernetes.node.status.ready
+
+type: keyword
+
+Node ready status (true, false or unknown)
+
+
+[float]
+=== kubernetes.node.status.unschedulable
+
+type: boolean
+
+Node unschedulable status
+
+
+
+[float]
+=== kubernetes.node.cpu.allocatable.cores
+
+type: long
+
+Node CPU allocatable cores
+
+
+[float]
+=== kubernetes.node.cpu.capacity.cores
+
+type: long
+
+Node CPU capacity cores
+
+
+
+[float]
+=== kubernetes.node.memory.allocatable.bytes
+
+type: long
+
+format: bytes
+
+Node allocatable memory in bytes
+
+
+[float]
+=== kubernetes.node.memory.capacity.bytes
+
+type: long
+
+format: bytes
+
+Node memory capacity in bytes
+
+
+
+[float]
+=== kubernetes.node.pod.allocatable.total
+
+type: long
+
+Node allocatable pods
+
+
+[float]
+=== kubernetes.node.pod.capacity.total
+
+type: long
+
+Node pod capacity
+
+
+[float]
+== pod Fields
+
+kubernetes pod metrics
+
+
+
+[float]
+=== kubernetes.pod.ip
+
+type: ip
+
+Kubernetes pod IP
+
+
+[float]
+=== kubernetes.pod.host_ip
+
+type: ip
+
+Kubernetes pod host IP
+
+
+[float]
+== status Fields
+
+Kubernetes pod status metrics
+
+
+
+[float]
+=== kubernetes.pod.status.phase
+
+type: keyword
+
+Kubernetes pod phase (Running, Pending...)
+
+
+[float]
+=== kubernetes.pod.status.ready
+
+type: keyword
+
+Kubernetes pod ready status (true, false or unknown)
+
+
+[float]
+=== kubernetes.pod.status.scheduled
+
+type: keyword
+
+Kubernetes pod scheduled status (true, false, unknown)
+
+
+[float]
+== replicaset Fields
+
+kubernetes replica set metrics
+
+
+
+[float]
+=== kubernetes.replicaset.name
+
+type: keyword
+
+Kubernetes replica set name
+
+
+[float]
+== replicas Fields
+
+Kubernetes replica set paused status
+
+
+
+[float]
+=== kubernetes.replicaset.replicas.available
+
+type: long
+
+The number of replicas per ReplicaSet
+
+
+[float]
+=== kubernetes.replicaset.replicas.desired
+
+type: long
+
+The number of replicas per ReplicaSet
+
+
+[float]
+=== kubernetes.replicaset.replicas.ready
+
+type: long
+
+The number of ready replicas per ReplicaSet
+
+
+[float]
+=== kubernetes.replicaset.replicas.observed
+
+type: long
+
+The generation observed by the ReplicaSet controller
+
+
+[float]
+=== kubernetes.replicaset.replicas.labeled
+
+type: long
+
+The number of fully labeled replicas per ReplicaSet
+
+
+[float]
 == system Fields
 
 kubernetes system containers metrics

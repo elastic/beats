@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Kubernetes overview", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"col\":7,\"id\":\"022a54c0-2bf5-11e7-859b-f78b612cde28\",\"panelIndex\":1,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"44f12b40-2bf4-11e7-859b-f78b612cde28\",\"panelIndex\":2,\"row\":7,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":4,\"id\":\"cd059410-2bfb-11e7-859b-f78b612cde28\",\"panelIndex\":5,\"row\":1,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"e1018b90-2bfb-11e7-859b-f78b612cde28\",\"panelIndex\":6,\"row\":4,\"size_x\":2,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"d6564360-2bfc-11e7-859b-f78b612cde28\",\"panelIndex\":7,\"row\":7,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"16fa4470-2bfd-11e7-859b-f78b612cde28\",\"panelIndex\":8,\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"294546b0-30d6-11e7-8df8-6d3604a72912\",\"panelIndex\":9,\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"408fccf0-30d6-11e7-8df8-6d3604a72912\",\"panelIndex\":10,\"row\":1,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"58e644f0-30d6-11e7-8df8-6d3604a72912\",\"panelIndex\":11,\"row\":13,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"a4c9d360-30df-11e7-8df8-6d3604a72912\",\"panelIndex\":12,\"row\":13,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":5,\"id\":\"174a6ad0-30e0-11e7-8df8-6d3604a72912\",\"panelIndex\":13,\"row\":4,\"size_x\":2,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"7aac4fd0-30e0-11e7-8df8-6d3604a72912\",\"panelIndex\":14,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":3,\"id\":\"da1ff7c0-30ed-11e7-b9e5-2b5b07213ab3\",\"panelIndex\":15,\"row\":4,\"size_x\":2,\"size_y\":3,\"type\":\"visualization\"}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}],\"highlightAll\":true,\"version\":true}"
+  }
+}
