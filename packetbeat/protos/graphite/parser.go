@@ -7,12 +7,14 @@ import (
 	"errors"
 	"time"
 	"strings"
+	"reflect"
+	"strconv"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
 	"github.com/hydrogen18/stalecucumber"
-	"reflect"
-	"strconv"
+
 //	"fmt"
 )
 

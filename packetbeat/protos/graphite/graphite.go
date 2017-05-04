@@ -5,7 +5,6 @@ package graphite
 
 import (
 	"time"
-//	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"

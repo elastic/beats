@@ -4,13 +4,10 @@
 package graphite
 
 import (
-
-	//"strings"
+	"strconv"
+	
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/packetbeat/publish"
-
-	"strconv"
-//	"fmt"
 )
 
 // Transaction Publisher.
