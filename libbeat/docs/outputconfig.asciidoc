@@ -240,59 +240,6 @@ output.elasticsearch:
         type: "normal"
 ------------------------------------------------------------------------------
 
-===== template
-
-The http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
-template] to use for setting mappings in Elasticsearch. By default, template loading is
-enabled.
-
-You can adjust the following settings to load your own template or overwrite an existing one:
-
-*`enabled`*:: Set to false to disable template loading. If set this to false,
-you must <<load-template-manually,load the template manually>>.
-
-*`name`*:: The name of the template. The default is +{beatname_lc}+.
-
-*`path`*:: The path to the template file. The default is +fields.yml+. If a relative
-path is set, it is considered relative to the config path. See the <<directory-layout>> section for
-details.
-
-*`overwrite`*:: A boolean that specifies whether to overwrite the existing template. The default
-is false.
-
-For example:
-
-["source","yaml",subs="attributes,callouts"]
-----------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["localhost:9200"]
-  template.name: "{beatname_lc}"
-  template.fields: "fields.yml"
-  template.overwrite: false
-----------------------------------------------------------------------
-
-===== template.versions
-
-In the default configuration, {beatname_uc} automatically checks the
-Elasticsearch version and loads the recommended template file for the particular
-version. This behaviour can be controlled from the following options:
-
-*`2x.path`*:: The path to the template file to load for
-Elasticsearch versions 2.x.y. The default is +{beatname_lc}.template-es2x.json+.
-
-*`2x.enabled`*:: If set to +false+, the +2x.path+ option is ignored and the
-default template is loaded regardless of the Elasticsearch version.
-
-For example:
-
-["source","yaml",subs="attributes,callouts"]
-----------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["localhost:9200"]
-  template.fields: "{beatname_lc}.template.json"
-  template.overwrite: false
-----------------------------------------------------------------------
-
 ===== max_retries
 
 The number of times to retry publishing an event after a publishing failure.
@@ -346,7 +293,7 @@ See <<configuration-output-ssl>> for more information.
 
 *Prerequisite:* To use Logstash as an output, you must
 {libbeat}/logstash-installation.html#logstash-setup[install and configure] the Beats input
-plugin for Logstash. 
+plugin for Logstash.
 
 The Logstash output sends the events directly to Logstash by using the lumberjack
 protocol, which runs over TCP. Logstash allows for additional processing and routing of
@@ -377,13 +324,13 @@ use in Logstash for indexing and filtering:
 ------------------------------------------------------------------------------
 <1> {beatname_uc} uses the `@metadata` field to send metadata to Logstash. The
 contents of the `@metadata` field only exist in Logstash and are not part of any
-events sent from Logstash. See the 
+events sent from Logstash. See the
 {logstashdoc}/event-dependent-configuration.html#metadata[Logstash documentation]
 for more about the `@metadata` field.
 <2> The default is {beatname_lc}. To change this value, set the
 <<logstash-index,`index`>> option in the {beatname_uc} config file.
-<3> The value of `type` varies depending on the event type. 
- 
+<3> The value of `type` varies depending on the event type.
+
 You can access this metadata from within the Logstash config file to set values
 dynamically based on the contents of the metadata.
 

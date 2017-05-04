@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -15,8 +14,6 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/libbeat/template"
 )
 
 type elasticsearchOutput struct {
@@ -26,8 +23,6 @@ type elasticsearchOutput struct {
 	clients  []mode.ProtocolClient
 
 	mode mode.ConnectionMode
-
-	templateMutex sync.Mutex
 }
 
 func init() {
@@ -48,6 +43,14 @@ var (
 	// ErrResponseRead indicates error parsing Elasticsearch response
 	ErrResponseRead = errors.New("bulk item status parse failed")
 )
+
+var connectCallbackRegistry connectCallback
+
+// RegisterConnectCallback registers a callback for the elasticsearch output
+// The callback is called each time the client connects to elasticsearch.
+func RegisterConnectCallback(callback connectCallback) {
+	connectCallbackRegistry = callback
+}
 
 // New instantiates a new output plugin instance publishing to elasticsearch.
 func New(beat common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
@@ -223,48 +226,6 @@ func (out *elasticsearchOutput) init(
 	return nil
 }
 
-// loadTemplate checks if the index mapping template should be loaded
-// In case the template is not already loaded or overwriting is enabled, the
-// template is written to index
-func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) error {
-	out.templateMutex.Lock()
-	defer out.templateMutex.Unlock()
-
-	logp.Info("Trying to load template for client: %s", client.Connection.URL)
-
-	// Check if template already exist or should be overwritten
-	exists := client.CheckTemplate(config.Name)
-	if !exists || config.Overwrite {
-
-		logp.Info("Loading template for elasticsearch version: %s", client.Connection.version)
-
-		if config.Overwrite {
-			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
-		}
-
-		tmpl, err := template.New(out.beat.Version, client.Connection.version, config.Name)
-		if err != nil {
-			return fmt.Errorf("error creating template instance: %v", err)
-		}
-
-		fieldsPath := paths.Resolve(paths.Config, config.Fields)
-
-		output, err := tmpl.Load(fieldsPath)
-		if err != nil {
-			return fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
-		}
-
-		err = client.LoadTemplate(tmpl.GetName(), output)
-		if err != nil {
-			return fmt.Errorf("could not load template: %v", err)
-		}
-	} else {
-		logp.Info("Template already exists and will not be overwritten.")
-	}
-
-	return nil
-}
-
 func makeClientFactory(
 	tls *transport.TLSConfig,
 	config *elasticsearchConfig,
@@ -292,19 +253,6 @@ func makeClientFactory(
 			params = nil
 		}
 
-		var onConnected connectCallback
-		// TODO: should we check if fields.yml exists?
-		if config.Template.Enabled {
-			// Set beat name as default if name not set
-			if config.Template.Name == "" {
-				config.Template.Name = out.beat.Beat
-			}
-			// define a callback to be called on connection
-			onConnected = func(client *Client) error {
-				return out.loadTemplate(config.Template, client)
-			}
-		}
-
 		return NewClient(ClientSettings{
 			URL:              esURL,
 			Index:            out.index,
@@ -317,7 +265,7 @@ func makeClientFactory(
 			Headers:          config.Headers,
 			Timeout:          config.Timeout,
 			CompressionLevel: config.CompressionLevel,
-		}, onConnected)
+		}, connectCallbackRegistry)
 	}
 }
 

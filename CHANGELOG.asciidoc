@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Change vendor manager from glide to govendor. {pull}3851[3851]
 - Rename `error` field to `error.message`. {pull}3987[3987]
 - Change `dashboards.*` config options to `setup.dashboards.*`. {pull}3921[3921]
+- Change `outputs.elasticsearch.template.* to `setup.template.*` {pull}4080[4080]
 
 *Filebeat*
 - Always use absolute path for event and registry. This can lead to issues when relative paths were used before. {pull}3328[3328]

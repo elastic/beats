@@ -5,7 +5,7 @@ The `heartbeat` section of the +heartbeat.yml+ config file specifies the
 list of `monitors` that Heartbeat uses to check your remote hosts to
 determine if they are available. Each `monitor` item begins with a dash (-) and
 specifies the type of monitor to use, the hosts to check, and other settings
-that control Heartbeat behavior. 
+that control Heartbeat behavior.
 
 The following example configures three monitors, `icmp`, `tcp`, and `http`, and
 demonstrates how to use TCP Echo and HTTP response verification:
@@ -35,7 +35,7 @@ heartbeat.scheduler:
 You can specify the following options in the `monitors` section of the
 +heartbeat.yml+ config file. These options are the same for all monitors.
 Each monitor type has additional configuration options that are specific to that
-monitor type. 
+monitor type.
 
 
 [[monitor-type]]
@@ -51,7 +51,7 @@ receiving a custom payload. See <<monitor-tcp-options>>.
 expected response. See <<monitor-http-options>>.
 
 The `tcp` and `http` monitor types both support SSL/TLS and some proxy
-settings. 
+settings.
 
 
 [[monitor-name]]
@@ -133,7 +133,7 @@ you can specify settings in the JSON file that overwrite the settings in
 the main config. In this way, the configuration that you specify for the
 monitor in the main Heartbeat config file acts like a default config that you
 can live-reconfigure by specifying additional configurations in the external
-JSON file. 
+JSON file.
 
 Example configuration:
 
@@ -148,7 +148,7 @@ heartbeat.monitors:
     interval: 5s
 -------------------------------------------------------------------------------
 
-*`path`*:: Specifies the path to the JSON file to check for updates. 
+*`path`*:: Specifies the path to the JSON file to check for updates.
 *`interval`*:: Specifies how often Heartbeat checks the file for changes.
 
 To reconfigure the settings specified in the example config, you could define
@@ -156,13 +156,13 @@ the following JSON objects in `dynamic.json`:
 
 [source, json]
 -------------------------------------------------------------------------------
-{"hosts": ["myhost:1234"], "schedule": "*/15 * * * * * *"} <1> 
+{"hosts": ["myhost:1234"], "schedule": "*/15 * * * * * *"} <1>
 {"hosts": ["tls://otherhost:479"], "ssl.certificate_authorities": ["path/to/ca/file.pem"]} <2>
 -------------------------------------------------------------------------------
 <1> Upon detecting the changes, Heartbeat stops the old monitor and then
 restarts it with a schedule of 15 seconds between checks.
 <2> Heartbeat starts a new monitor that uses a TLS-based connection with a
-custom CA certificate. 
+custom CA certificate.
 
 [[monitor-icmp-options]]
 ==== ICMP Options
@@ -222,7 +222,7 @@ Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------
-- type: tcp 
+- type: tcp
   schedule: '@every 5s'
   hosts: ["myhost"]
   ports: [80, 9200, 5044]
@@ -242,7 +242,7 @@ Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------
-- type: tcp 
+- type: tcp
   schedule: '@every 5s'
   hosts: ["myhost"]
   ports: [7]
@@ -255,7 +255,7 @@ Example configuration:
 ===== proxy_url
 
 The URL of the SOCKS5 proxy to use when connecting to the server. The value
-must be a URL with a scheme of socks5://. 
+must be a URL with a scheme of socks5://.
 
 If the SOCKS5 proxy server requires client authentication, then a username and
 password can be embedded in the URL as shown in the example.
@@ -289,7 +289,7 @@ Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------
-- type: tcp 
+- type: tcp
   schedule: '@every 5s'
   hosts: ["myhost"]
   ports: [80, 9200, 5044]
@@ -315,7 +315,7 @@ Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------
-- type: http 
+- type: http
   schedule: '@every 5s'
   urls: ["http://myhost:80"]
 -------------------------------------------------------------------------------
@@ -331,11 +331,11 @@ environment variable is used.
 ===== username
 
 The username for authenticating with the server. The credentials are passed
-with the request. This setting is optional. 
+with the request. This setting is optional.
 
 You need to specify credentials when your `check.response` settings require it.
 For example, you can check for a 403 response (`check.response.status: 403`)
-without setting credentials. 
+without setting credentials.
 
 [[monitor-http-password]]
 ===== password
@@ -346,32 +346,32 @@ The password for authenticating with the server. This setting is optional.
 ===== ssl
 
 The TLS/SSL connection settings for use with the HTTPS endpoint. If you don't
-specify settings, the system defaults are used. 
+specify settings, the system defaults are used.
 
 
 Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------
-- type: http 
+- type: http
   schedule: '@every 5s'
   urls: ["https://myhost:80"]
   ssl:
     certificate_authorities: ['/etc/ca.crt']
-    supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]  
+    supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
 -------------------------------------------------------------------------------
 
 
 [[monitor-http-check]]
 ===== check
 
-An optional `request` to send to the remote host and the expected `response`. 
+An optional `request` to send to the remote host and the expected `response`.
 
 Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------
-- type: http 
+- type: http
   schedule: '@every 5s'
   urls: ["http://myhost:80"]
   check.request.method: HEAD
@@ -389,8 +389,8 @@ Under `check.request`, specify these options:
 Under `check.response`, specify these options:
 
 *`status`*:: The expected status code. If this setting is not configured or
-it's set to 0, any status code other than 404 is accepted. 
-*`headers`*:: The required response headers. 
+it's set to 0, any status code other than 404 is accepted.
+*`headers`*:: The required response headers.
 *`body`*:: The required response body content.
 
 The following configuration shows how to check the response when the body
@@ -398,7 +398,7 @@ contains JSON:
 
 [source,yaml]
 -------------------------------------------------------------------------------
-- type: http 
+- type: http
   schedule: '@every 5s'
   urls: ["https://myhost:80"]
 check.request:
@@ -417,7 +417,7 @@ check.response:
 You specify options under `scheduler` to control the behavior of the task
 scheduler.
 
-Example configuration: 
+Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------
@@ -452,7 +452,7 @@ include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../../../libbeat/docs/shared-path-config.asciidoc[]
 
-include::../../../../libbeat/docs/dashboardsconfig.asciidoc[]
+include::../../../../libbeat/docs/setup-config.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 

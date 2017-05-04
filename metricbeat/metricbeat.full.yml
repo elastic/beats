@@ -551,24 +551,6 @@ output.elasticsearch:
   # requests are made.
   #flush_interval: 1s
 
-  # A template is used to set the mapping in Elasticsearch
-  # By default template loading is enabled and the template is loaded.
-  # These settings can be adjusted to load your own template or overwrite existing ones.
-
-  # Set to false to disable template loading.
-  #template.enabled: true
-
-  # Template name. By default the template name is metricbeat.
-  # The version of the beat will always be appended to the given name
-  # so the final name is metricbeat-%{[beat.version]}.
-  #template.name: "metricbeat"
-
-  # Path to fields.yml file to generate the template
-  #template.fields: "${path.config}/fields.yml"
-
-  # Overwrite existing template
-  #template.overwrite: false
-
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
 
@@ -994,6 +976,27 @@ output.elasticsearch:
 # The Elasticsearch index name. This overwrites the index name defined in the
 # dashboards and index pattern. Example: testbeat-*
 #setup.dashboards.index:
+
+#============================== Template =====================================
+
+# A template is used to set the mapping in Elasticsearch
+# By default template loading is enabled and the template is loaded.
+# These settings can be adjusted to load your own template or overwrite existing ones.
+
+# Set to false to disable template loading.
+#setup.template.enabled: true
+
+# Template name. By default the template name is metricbeat.
+# The version of the beat will always be appended to the given name
+# so the final name is metricbeat-%{[beat.version]}.
+#setup.template.name: "metricbeat"
+
+# Path to fields.yml file to generate the template
+#setup.template.fields: "${path.config}/fields.yml"
+
+# Overwrite existing template
+#setup.template.overwrite: false
+
 
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal data points through a http endpoint. For security
