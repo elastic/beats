@@ -1,3 +1,6 @@
+// Author: Sudhindra Sajjal <sudhindra.s@media.net> & Sumit Sulakhe <sumit.su@media.net>
+// Copyright: Media.net 2017
+
 package graphite
 
 import (
