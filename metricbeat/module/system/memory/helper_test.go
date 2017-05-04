@@ -7,30 +7,29 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/elastic/gosigar"
+	"github.com/shirou/gopsutil/mem"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetMemory(t *testing.T) {
-	mem, err := GetMemory()
+	stat, err := mem.VirtualMemory()
 
-	assert.NotNil(t, mem)
+	assert.NotNil(t, stat)
 	assert.Nil(t, err)
 
-	assert.True(t, (mem.Total > 0))
-	assert.True(t, (mem.Used > 0))
-	assert.True(t, (mem.Free >= 0))
-	assert.True(t, (mem.ActualFree >= 0))
-	assert.True(t, (mem.ActualUsed > 0))
+	assert.True(t, (stat.Total > 0))
+	assert.True(t, (stat.Used > 0))
+	assert.True(t, (stat.Free >= 0))
+	assert.True(t, (stat.Available >= 0))
 }
 
 func TestGetSwap(t *testing.T) {
 
 	if runtime.GOOS == "windows" {
-		return //no load data on windows
+		return //no swap data on windows
 	}
 
-	swap, err := GetSwap()
+	swap, err := mem.SwapMemory()
 
 	assert.NotNil(t, swap)
 	assert.Nil(t, err)
@@ -40,42 +39,8 @@ func TestGetSwap(t *testing.T) {
 	assert.True(t, (swap.Free >= 0))
 }
 
-func TestMemPercentage(t *testing.T) {
+func TestGetPercentage(t *testing.T) {
 
-	m := MemStat{
-		Mem: gosigar.Mem{
-			Total: 7,
-			Used:  5,
-			Free:  2,
-		},
-	}
-	AddMemPercentage(&m)
-	assert.Equal(t, m.UsedPercent, 0.7143)
-
-	m = MemStat{
-		Mem: gosigar.Mem{Total: 0},
-	}
-	AddMemPercentage(&m)
-	assert.Equal(t, m.UsedPercent, 0.0)
-}
-
-func TestActualMemPercentage(t *testing.T) {
-
-	m := MemStat{
-		Mem: gosigar.Mem{
-			Total:      7,
-			ActualUsed: 5,
-			ActualFree: 2,
-		},
-	}
-	AddMemPercentage(&m)
-	assert.Equal(t, m.ActualUsedPercent, 0.7143)
-
-	m = MemStat{
-		Mem: gosigar.Mem{
-			Total: 0,
-		},
-	}
-	AddMemPercentage(&m)
-	assert.Equal(t, m.ActualUsedPercent, 0.0)
+	assert.Equal(t, GetPercentage(5, 7), 0.7143)
+	assert.Equal(t, GetPercentage(5, 0), 0.0)
 }

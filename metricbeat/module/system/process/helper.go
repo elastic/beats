@@ -14,8 +14,8 @@ import (
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/system"
-	"github.com/elastic/beats/metricbeat/module/system/memory"
 	sigar "github.com/elastic/gosigar"
+	"github.com/shirou/gopsutil/mem"
 )
 
 type ProcsMap map[int]*Process
@@ -179,12 +179,12 @@ func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
 
 	// in unit tests, total_phymem is set to a value greater than zero
 	if totalPhyMem == 0 {
-		memStat, err := memory.GetMemory()
+		memStat, err := mem.VirtualMemory()
 		if err != nil {
 			logp.Warn("Getting memory details: %v", err)
 			return 0
 		}
-		totalPhyMem = memStat.Mem.Total
+		totalPhyMem = memStat.Total
 	}
 
 	perc := (float64(proc.Mem.Resident) / float64(totalPhyMem))
