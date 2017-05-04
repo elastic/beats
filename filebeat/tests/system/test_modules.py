@@ -108,9 +108,7 @@ class Test(BaseTest):
             assert obj["fileset"]["module"] == module, "expected fileset.module={} but got {}".format(
                 module, obj["fileset"]["module"])
 
-            if not (module == "mysql" and fileset == "slowlog") and not (module == "system" and fileset == "auth"):
-                # TODO: There are errors parsing the test logs from these modules.
-                assert "error" not in obj
+            assert "error" not in obj
 
             if module != "auditd" and fileset != "log":
                 # There are dynamic fields in audit logs that are not documented.
