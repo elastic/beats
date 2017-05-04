@@ -5,6 +5,7 @@ package fileset
 import (
 	"encoding/json"
 	"path/filepath"
+	"strconv"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
@@ -13,6 +14,10 @@ import (
 
 func TestLoadPipeline(t *testing.T) {
 	client := elasticsearch.GetTestingElasticsearch()
+	if !hasIngest(client) {
+		t.Skip("Skip tests because ingest is missing in this elasticsearch version: %s", client.GetVersion())
+	}
+
 	client.Request("DELETE", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
 
 	content := map[string]interface{}{
@@ -52,6 +57,10 @@ func TestLoadPipeline(t *testing.T) {
 
 func TestSetupNginx(t *testing.T) {
 	client := elasticsearch.GetTestingElasticsearch()
+	if !hasIngest(client) {
+		t.Skip("Skip tests because ingest is missing in this elasticsearch version: %s", client.GetVersion())
+	}
+
 	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-default", "", nil, nil)
 	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-error-pipeline", "", nil, nil)
 
@@ -80,7 +89,9 @@ func TestSetupNginx(t *testing.T) {
 
 func TestAvailableProcessors(t *testing.T) {
 	client := elasticsearch.GetTestingElasticsearch()
-
+	if !hasIngest(client) {
+		t.Skip("Skip tests because ingest is missing in this elasticsearch version: %s", client.GetVersion())
+	}
 	// these exists on our integration test setup
 	requiredProcessors := []ProcessorRequirement{
 		{Name: "user_agent", Plugin: "ingest-user-agent"},
@@ -100,4 +111,15 @@ func TestAvailableProcessors(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "ingest-test")
 	assert.Contains(t, err.Error(), "ingest-hello")
+}
+
+func hasIngest(client *elasticsearch.Client) bool {
+	v := client.GetVersion()
+	majorVersion := string(v[0])
+	version, err := strconv.Atoi(majorVersion)
+	if err != nil {
+		return true
+	}
+
+	return version >= 5
 }
