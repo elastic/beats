@@ -129,10 +129,11 @@ func (h *Harvester) Harvest(r reader.Reader) {
 			message.Content = bytes.Trim(message.Content, "\xef\xbb\xbf")
 		}
 
-		// Update offset
-		h.state.Offset += int64(message.Bytes)
-
+		// Get copy of state to work on
+		// This is important in case sending is not successful so on shutdown
+		// the old offset is reported
 		state := h.getState()
+		state.Offset += int64(message.Bytes)
 
 		// Create state event
 		data := util.NewData()
@@ -147,8 +148,8 @@ func (h *Harvester) Harvest(r reader.Reader) {
 
 			data.Event = common.MapStr{
 				"@timestamp": common.Time(message.Ts),
-				"source":     h.state.Source,
-				"offset":     h.state.Offset, // Offset here is the offset before the starting char.
+				"source":     state.Source,
+				"offset":     state.Offset, // Offset here is the offset before the starting char.
 				"type":       h.config.DocumentType,
 				"input_type": h.config.InputType,
 			}
@@ -197,7 +198,7 @@ func (h *Harvester) Stop() {
 // Return false if event was not sent
 func (h *Harvester) sendEvent(data *util.Data) bool {
 	if h.file.HasState() {
-		h.states.Update(h.state)
+		h.states.Update(data.GetState())
 	}
 	err := h.forwardEvent(data)
 	return err == nil
