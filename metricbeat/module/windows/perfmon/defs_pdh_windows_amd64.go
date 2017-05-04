@@ -188,15 +188,15 @@ type PdhCounterFormat uint32
 const (
 	PdhFmtDouble PdhCounterFormat = 0x200
 
-	PdhFmtLarge = 0x400
+	PdhFmtLarge PdhCounterFormat = 0x400
 
-	PdhFmtLong = 0x100
+	PdhFmtLong PdhCounterFormat = 0x100
 
-	PdhFmtNoScale = 0x1000
+	PdhFmtNoScale PdhCounterFormat = 0x1000
 
-	PdhFmtNoCap100 = 0x8000
+	PdhFmtNoCap100 PdhCounterFormat = 0x8000
 
-	PdhFmtMultiply1000 = 0x2000
+	PdhFmtMultiply1000 PdhCounterFormat = 0x2000
 )
 
 type PdhCounterValue struct {

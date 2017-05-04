@@ -115,10 +115,24 @@ func PdhCloseQuery(query PdhQueryHandle) error {
 	return nil
 }
 
+type Counter struct {
+	handle PdhCounterHandle
+	format PdhCounterFormat
+}
+
+type Counters map[string]*Counter
+
 type Query struct {
 	handle   PdhQueryHandle
-	counters map[string]PdhCounterHandle
+	counters Counters
 }
+
+type Format int
+
+const (
+	FloatFlormat Format = iota
+	LongFormat
+)
 
 func NewQuery(dataSource string) (*Query, error) {
 	h, err := PdhOpenQuery(dataSource, 0)
@@ -128,11 +142,11 @@ func NewQuery(dataSource string) (*Query, error) {
 
 	return &Query{
 		handle:   h,
-		counters: map[string]PdhCounterHandle{},
+		counters: make(Counters),
 	}, nil
 }
 
-func (q *Query) AddCounter(counterPath string) error {
+func (q *Query) AddCounter(counterPath string, format Format) error {
 	if _, found := q.counters[counterPath]; found {
 		return errors.New("counter already added")
 	}
@@ -142,7 +156,13 @@ func (q *Query) AddCounter(counterPath string) error {
 		return errors.Wrapf(err, `failed to add counter (path="%v")`, counterPath)
 	}
 
-	q.counters[counterPath] = h
+	q.counters[counterPath] = &Counter{handle: h}
+	switch format {
+	case FloatFlormat:
+		q.counters[counterPath].format = PdhFmtDouble
+	case LongFormat:
+		q.counters[counterPath].format = PdhFmtLarge
+	}
 	return nil
 }
 
@@ -151,20 +171,26 @@ func (q *Query) Execute() error {
 }
 
 type Value struct {
-	Num float64
+	Num interface{}
 	Err error
 }
 
 func (q *Query) Values() (map[string]Value, error) {
 	rtn := make(map[string]Value, len(q.counters))
-	for path, handle := range q.counters {
-		_, value, err := PdhGetFormattedCounterValue(handle, PdhFmtDouble|PdhFmtNoCap100)
+	for path, counter := range q.counters {
+		_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
 		if err != nil {
 			rtn[path] = Value{Err: err}
 			continue
 		}
 
-		rtn[path] = Value{Num: *(*float64)(unsafe.Pointer(&value.LongValue))}
+		switch counter.format {
+		case PdhFmtDouble:
+			rtn[path] = Value{Num: *(*float64)(unsafe.Pointer(&value.LongValue))}
+		case PdhFmtLarge:
+			rtn[path] = Value{Num: *(*int64)(unsafe.Pointer(&value.LongValue))}
+		}
+
 	}
 
 	return rtn, nil
@@ -193,7 +219,14 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 	}
 
 	for _, counter := range config {
-		if err := query.AddCounter(counter.Query); err != nil {
+		var format Format
+		switch counter.Format {
+		case "float":
+			format = FloatFlormat
+		case "long":
+			format = LongFormat
+		}
+		if err := query.AddCounter(counter.Query, format); err != nil {
 			query.Close()
 			return nil, err
 		}

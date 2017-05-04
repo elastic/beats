@@ -8,6 +8,8 @@ performance counters.
 
 You must configure queries for the Windows performance counters that you wish
 to collect. The example below collects processor time and disk writes.
+With `format` you can set the output format for a specific counter. Possible values are
+`float` and `long`. If nothing is selected the default value is `float`.
 
 [source,yaml]
 ----
@@ -19,4 +21,5 @@ to collect. The example below collects processor time and disk writes.
       query: '\Processor Information(_Total)\% Processor Time'
     - alias: "diskio.write.bytes"
       query: '\PhysicalDisk(_Total)\Disk Writes/sec'
+      format: "long"
 ----
