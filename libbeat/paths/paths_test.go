@@ -3,6 +3,7 @@ package paths
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,48 +13,51 @@ func TestHomePath(t *testing.T) {
 	type io struct {
 		Home       string // cli flag home setting
 		Path       string // requested path
-		Result     string // expected result
+		ResultHome string // expected home path
 		ResultData string // expected data path
 	}
 
 	binDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	tests := []io{
 		{
 			Home:       binDir,
 			Path:       "test",
-			Result:     filepath.Join(binDir, "test"),
+			ResultHome: filepath.Join(binDir, "test"),
 			ResultData: filepath.Join(binDir, "data", "test"),
 		},
 		{
-			Home:       "/tmp",
+			Home:       rootDir("/tmp"),
 			Path:       "test",
-			Result:     "/tmp/test",
-			ResultData: "/tmp/data/test",
+			ResultHome: rootDir("/tmp/test"),
+			ResultData: rootDir("/tmp/data/test"),
 		},
 		{
-			Home:       "/home/",
-			Path:       "/abc/test",
-			Result:     "/abc/test",
-			ResultData: "/abc/test",
+			Home:       rootDir("/home"),
+			Path:       rootDir("/abc/test"),
+			ResultHome: rootDir("/abc/test"),
+			ResultData: rootDir("/abc/test"),
 		},
 	}
 
 	for _, test := range tests {
-		t.Log("Executing test", test)
 		cfg := Path{Home: test.Home}
-		assert.NoError(t, Paths.initPaths(&cfg))
+		if err := Paths.initPaths(&cfg); err != nil {
+			t.Errorf("error on %+v: %v", test, err)
+			continue
+		}
 
-		assert.Equal(t, test.Result, Resolve(Home, test.Path))
+		assert.Equal(t, test.ResultHome, Resolve(Home, test.Path), "failed on %+v", test)
 
 		// config path same as home path
-		assert.Equal(t, test.Result, Resolve(Config, test.Path))
+		assert.Equal(t, test.ResultHome, Resolve(Config, test.Path), "failed on %+v", test)
 
 		// data path under home path
-		assert.Equal(t, test.ResultData, Resolve(Data, test.Path))
+		assert.Equal(t, test.ResultData, Resolve(Data, test.Path), "failed on %+v", test)
 	}
-
 }
 
 func TestDataPath(t *testing.T) {
@@ -65,7 +69,9 @@ func TestDataPath(t *testing.T) {
 	}
 
 	binDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	tests := []io{
 		{
@@ -75,25 +81,27 @@ func TestDataPath(t *testing.T) {
 			ResultData: filepath.Join(binDir, "data", "test"),
 		},
 		{
-			Home:       "/tmp/",
-			Data:       "/root/",
+			Home:       rootDir("/tmp"),
+			Data:       rootDir("/root"),
 			Path:       "test",
-			ResultData: "/root/test",
+			ResultData: rootDir("/root/test"),
 		},
 		{
-			Home:       "/tmp/",
-			Data:       "/root/",
-			Path:       "/var/data",
-			ResultData: "/var/data",
+			Home:       rootDir("/tmp"),
+			Data:       rootDir("root"),
+			Path:       rootDir("/var/data"),
+			ResultData: rootDir("/var/data"),
 		},
 	}
 
 	for _, test := range tests {
-		t.Log("Executing test", test)
 		cfg := Path{Home: test.Home, Data: test.Data}
-		assert.NoError(t, Paths.initPaths(&cfg))
+		if err := Paths.initPaths(&cfg); err != nil {
+			t.Errorf("error on %+v: %v", test, err)
+			continue
+		}
 
-		assert.Equal(t, test.ResultData, Resolve(Data, test.Path))
+		assert.Equal(t, test.ResultData, Resolve(Data, test.Path), "failed on %+v", test)
 	}
 
 }
@@ -107,7 +115,9 @@ func TestLogsPath(t *testing.T) {
 	}
 
 	binDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	tests := []io{
 		{
@@ -117,25 +127,35 @@ func TestLogsPath(t *testing.T) {
 			ResultLogs: filepath.Join(binDir, "logs", "test"),
 		},
 		{
-			Home:       "/tmp/",
-			Logs:       "/var/",
+			Home:       rootDir("/tmp"),
+			Logs:       rootDir("/var"),
 			Path:       "log",
-			ResultLogs: "/var/log",
+			ResultLogs: rootDir("/var/log"),
 		},
 		{
-			Home:       "/tmp/",
-			Logs:       "/root/",
-			Path:       "/var/log",
-			ResultLogs: "/var/log",
+			Home:       rootDir("tmp"),
+			Logs:       rootDir("root"),
+			Path:       rootDir("/var/log"),
+			ResultLogs: rootDir("/var/log"),
 		},
 	}
 
 	for _, test := range tests {
-		t.Log("Executing test", test)
 		cfg := Path{Home: test.Home, Logs: test.Logs}
-		assert.NoError(t, Paths.initPaths(&cfg))
+		if err := Paths.initPaths(&cfg); err != nil {
+			t.Errorf("error on %+v: %v", test, err)
+			continue
+		}
 
 		assert.Equal(t, test.ResultLogs, Resolve(Logs, test.Path))
 	}
 
+}
+
+// rootDir builds an OS specific absolute root directory.
+func rootDir(path string) string {
+	if runtime.GOOS == "windows" {
+		return filepath.Join(`c:\`, path)
+	}
+	return filepath.Join("/", path)
 }
