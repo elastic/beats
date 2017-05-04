@@ -351,7 +351,7 @@ writable by the owner but the permissions are "-rw-rw-r--" (to fix the
 permissions use: 'chmod go-w /etc/{beatname}/{beatname}.yml')
 --------------------------------------------------------------------------------
 
-To correct this problem, use `chown go-w /etc/{beatname}/{beatname}.yml` to
+To correct this problem, use `chmod go-w /etc/{beatname}/{beatname}.yml` to
 remove write privileges from anyone other than the owner.
 
 ==== Disabling Strict Permission Checks
