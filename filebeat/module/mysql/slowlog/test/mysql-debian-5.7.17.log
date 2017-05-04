@@ -1,5 +1,4 @@
-# Time: 2017-04-28T09:07:39.777791Z
-# User@Host: apphost[apphost] @ apphost [ip]  Id: 10997316
+# User@Host: apphost[apphost] @ apphost [1.1.1.1]  Id: 10997316
 # Query_time: 4.071491  Lock_time: 0.000212 Rows_sent: 1000  Rows_examined: 1489615
 SET timestamp=1493370459;
 SELECT mcu.mcu_guid, mcu.cus_guid, mcu.mcu_url, mcu.mcu_crawlelements, mcu.mcu_order, GROUP_CONCAT(mca.mca_guid SEPARATOR ";") as mca_guid
@@ -14,12 +13,12 @@ SELECT mcu.mcu_guid, mcu.cus_guid, mcu.mcu_url, mcu.mcu_crawlelements, mcu.mcu_o
                     ORDER BY mcu.mcu_order ASC
                     LIMIT 1000;
 # Time: 2017-04-28T09:16:30.738365Z
-# User@Host: apphost[apphost] @ apphost [ip]  Id: 10999834
+# User@Host: apphost[apphost] @ apphost [1.1.1.1]  Id: 10999834
 # Query_time: 10.346539  Lock_time: 0.000036 Rows_sent: 0  Rows_examined: 4751313
 SET timestamp=1493370990;
 call load_stats(1, '2017-04-28 00:00:00');
 # Time: 2017-04-28T09:31:31.133657Z
-# User@Host: apphost[apphost] @ apphost [ip]  Id: 11004208
+# User@Host: apphost[apphost] @ apphost [1.1.1.1]  Id: 11004208
 # Query_time: 10.508030  Lock_time: 0.000034 Rows_sent: 0  Rows_examined: 4754675
 SET timestamp=1493371891;
 call load_stats(1, '2017-04-28 00:00:00');
