@@ -3446,7 +3446,7 @@ The average queue time in ms over the last 1024 requests.
 
 
 [[exported-fields-http]]
-== http Fields
+== HTTP Fields
 
 http Module
 
@@ -3524,15 +3524,6 @@ The HTTP payload received
 == json Fields
 
 json metricset
-
-
-
-[float]
-=== http.json.body
-
-type: keyword
-
-The HTTP payload received
 
 
 [[exported-fields-jolokia]]

@@ -10,7 +10,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-elasticsearch,elasticsearch>>
   * <<metricbeat-module-golang,golang>>
   * <<metricbeat-module-haproxy,HAProxy>>
-  * <<metricbeat-module-http,http>>
+  * <<metricbeat-module-http,HTTP>>
   * <<metricbeat-module-jolokia,Jolokia>>
   * <<metricbeat-module-kafka,kafka>>
   * <<metricbeat-module-kibana,kibana>>
