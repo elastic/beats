@@ -464,7 +464,7 @@ package-dashboards: package-setup
 
 fix-permissions:
 	# Change ownership of all files inside /build folder from root/root to current user/group
-	docker run -v ${PWD}:/beat alpine:3.4 sh -c "find /beat -user 0 -exec chown $(shell id -u):$(shell id -g) {} \;"
+	docker run -v ${PWD}:/beat alpine:3.4 sh -c "find /beat -user 0 -exec chown -h $(shell id -u):$(shell id -g) {} \;"
 
 set_version: ## @packaging VERSION=x.y.z set the version of the beat to x.y.z
 	${ES_BEATS}/dev-tools/set_version ${VERSION}
