@@ -4,8 +4,9 @@ package perfmon
 
 import (
 	"testing"
-	"time"
 	"unsafe"
+
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +21,7 @@ func TestQuery(t *testing.T) {
 	}
 	defer q.Close()
 
-	err = q.AddCounter(processorTimeCounter)
+	err = q.AddCounter(processorTimeCounter, FloatFlormat)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,6 +52,7 @@ func TestExistingCounter(t *testing.T) {
 	config := make([]CounterConfig, 1)
 	config[0].Alias = "processor.time.total.pct"
 	config[0].Query = processorTimeCounter
+	config[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
 	if err != nil {
 		t.Fatal(err)
@@ -69,6 +71,7 @@ func TestNonExistingCounter(t *testing.T) {
 	config := make([]CounterConfig, 1)
 	config[0].Alias = "processor.time.total.pct"
 	config[0].Query = "\\Processor Information(_Total)\\not existing counter"
+	config[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
 	if assert.Error(t, err) {
 		assert.EqualValues(t, PDH_CSTATUS_NO_COUNTER, errors.Cause(err))
@@ -83,7 +86,8 @@ func TestNonExistingCounter(t *testing.T) {
 func TestNonExistingObject(t *testing.T) {
 	config := make([]CounterConfig, 1)
 	config[0].Alias = "processor.time.total.pct"
-	config[0].Query = "\\non existing object\\% Processor Time"
+	config[0].Query = "\\non existing object\\% Processor Performance"
+	config[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
 	if assert.Error(t, err) {
 		assert.EqualValues(t, PDH_CSTATUS_NO_OBJECT, errors.Cause(err))
@@ -95,6 +99,74 @@ func TestNonExistingObject(t *testing.T) {
 	}
 }
 
+func TestLongOutputFormat(t *testing.T) {
+	query, err := NewQuery("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer query.Close()
+
+	err = query.AddCounter(processorTimeCounter, LongFormat)
+	if err != nil && err != PDH_NO_MORE_DATA {
+		t.Fatal(err)
+	}
+
+	err = query.Execute()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	time.Sleep(time.Millisecond * 1000)
+
+	err = query.Execute()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	values, err := query.Values()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, okLong := values[processorTimeCounter].Num.(int64)
+
+	assert.True(t, okLong)
+}
+
+func TestFloatOutputFormat(t *testing.T) {
+	query, err := NewQuery("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer query.Close()
+
+	err = query.AddCounter(processorTimeCounter, FloatFlormat)
+	if err != nil && err != PDH_NO_MORE_DATA {
+		t.Fatal(err)
+	}
+
+	err = query.Execute()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	time.Sleep(time.Millisecond * 1000)
+
+	err = query.Execute()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	values, err := query.Values()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, okFloat := values[processorTimeCounter].Num.(float64)
+
+	assert.True(t, okFloat)
+}
+
 func TestRawValues(t *testing.T) {
 	query, err := NewQuery("")
 	if err != nil {
@@ -102,7 +174,7 @@ func TestRawValues(t *testing.T) {
 	}
 	defer query.Close()
 
-	err = query.AddCounter(processorTimeCounter)
+	err = query.AddCounter(processorTimeCounter, FloatFlormat)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -115,7 +187,7 @@ func TestRawValues(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		_, rawvalue1, err := PdhGetRawCounterValue(query.counters[processorTimeCounter])
+		_, rawvalue1, err := PdhGetRawCounterValue(query.counters[processorTimeCounter].handle)
 
 		if err != nil {
 			t.Fatal(err)
@@ -127,13 +199,13 @@ func TestRawValues(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		_, rawvalue2, err := PdhGetRawCounterValue(query.counters[processorTimeCounter])
+		_, rawvalue2, err := PdhGetRawCounterValue(query.counters[processorTimeCounter].handle)
 
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		value, err := PdhCalculateCounterFromRawValue(query.counters[processorTimeCounter], PdhFmtDouble|PdhFmtNoCap100, rawvalue2, rawvalue1)
+		value, err := PdhCalculateCounterFromRawValue(query.counters[processorTimeCounter].handle, PdhFmtDouble|PdhFmtNoCap100, rawvalue2, rawvalue1)
 
 		if err != nil {
 			t.Fatal(err)
@@ -144,5 +216,4 @@ func TestRawValues(t *testing.T) {
 	}
 
 	t.Log(values)
-
 }
