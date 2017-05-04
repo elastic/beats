@@ -1,0 +1,9 @@
+- key: vsphere
+  title: "vsphere"
+  description: >
+    vsphere Module
+  fields:
+    - name: vsphere
+      type: group
+      description: >
+      fields:

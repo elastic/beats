@@ -42,8 +42,8 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, 1428520960, used["bytes"])
 
 	total := event["total"].(common.MapStr)
-	assert.EqualValues(t, 6431965184, total["bytes"])
+	assert.EqualValues(t, uint64(6431965184), total["bytes"])
 
 	available := event["available"].(common.MapStr)
-	assert.EqualValues(t, 5003444224, available["bytes"])
+	assert.EqualValues(t, uint64(5003444224), available["bytes"])
 }

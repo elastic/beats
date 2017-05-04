@@ -1,0 +1,10 @@
+- module: vsphere
+  metricsets: ["datastore, host, virtualmachine"]
+  enabled: false
+  period: 10s
+  hosts: ["https://localhost/sdk"]
+
+  username: "user"
+  password: "password"
+  # If insecure is true, don't verify the server's certificate chain
+  insecure: false
