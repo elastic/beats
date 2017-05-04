@@ -6,13 +6,20 @@
 //// Use the appropriate variables defined in the index.asciidoc file to
 //// resolve Beat names: beatname_uc and beatname_lc.
 //// Use the following include to pull this content into a doc file:
+//// :standalone:
 //// include::../../libbeat/docs/shared-env-vars.asciidoc[]
+//// Specify :standalone: when this file is pulled into and index. When
+//// the file is embedded in another file, do no specify :standalone:
 //////////////////////////////////////////////////////////////////////////
+
+ifdef::standalone[]
 
 [[using-environ-vars]]
 == Using Environment Variables in the Configuration
 
-You can use environment variable references in the +{beatname_lc}.yml+ file to
+endif::[]
+
+You can use environment variable references in the config file to
 set values that need to be configurable during deployment. To do this, use:
 
 `${VAR}`
@@ -32,8 +39,19 @@ undefined.
 If you need to use a literal `${` in your configuration file then you can write
 `$${` to escape the expansion.
 
+// REVIEWERS: Is the following statement still true? "The `$` symbol can be used to escape othercharacters in the default_value like using `$}` in order to generate a `}` character without closing the variable expansion."
+
 After changing the value of an environment variable, you need to restart
-{beatname_uc} to pick up the new value.
+the Beat to pick up the new value.
+
+[NOTE]
+==================================
+You can also specify environment variables when you override a config
+setting from the command line by using the `-E` option. For example:
+
+`-E name=${NAME}`
+
+==================================
 
 [float]
 === Examples
@@ -49,3 +67,40 @@ and what each configuration looks like after replacement:
 |`name: ${NAME:beats}` |no setting            |`name: beats`
 |`name: ${NAME:beats}` |`export NAME=elastic` |`name: elastic`
 |==================================
+
+[float]
+=== Specifying Complex Objects in Environment Variables
+
+You can specify complex objects, such as lists or dictionaries, in environment
+variables by using a superset of JSON.
+
+//REVIEWERS: Not sure I like describing this as a "superset of JSON." Would it make sense to say "by using a JSON-like syntax"?
+
+For example, the following environment variable is set to an array:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+LOG_EXCLUDE_LINES='^A, ^B'
+-------------------------------------------------------------------------------
+
+You can reference this variable in the config file:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+exclude_lines: ${LOG_EXCLUDE_LINES}
+-------------------------------------------------------------------------------
+
+
+//REVIEWERS: Does anyone have a better example that is less Filebeat-specific?
+
+When the Beat loads the config file, it resolves the environment variable and
+replaces it with the specified array before reading the `exclude_lines` setting.
+
+When you specify complex objects in environment variables, keep the following
+in mind:
+
+* Strings can be unquoted, single-quoted, or double-quoted
+* Arrays at the top-level do not require brackets (`[]`). Instead, use commas (`,`) to
+separate the elements.
+
+NOTE: Do not use double-quotes (`"`) to wrap regular expressions, or the backslash (`\`) will be interpreted as an escape character.
