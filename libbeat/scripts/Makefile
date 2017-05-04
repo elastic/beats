@@ -411,7 +411,6 @@ prepare-package-cgo:
 		-e BEFORE_BUILD=before_build.sh \
 		-e SOURCE=/source \
 		-e TARGETS=${TARGETS_OLD} \
-		-e STATIC=true \
 		-e BUILDID=${BUILDID} \
 		-e ES_BEATS=${ES_BEATS} \
 		-e BEAT_PATH=${BEAT_PATH} \
