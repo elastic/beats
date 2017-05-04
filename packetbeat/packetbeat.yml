@@ -93,6 +93,11 @@ packetbeat.protocols:
   # the NFS protocol by commenting out the list of ports.
   ports: [2049]
 
+packetbeat.protocols.graphite:
+  # Configure the ports where to listen for Graphite traffic. You can disable
+  # the Graphite protocol by commenting out the list of ports.
+  ports: [2003]
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
