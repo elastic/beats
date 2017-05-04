@@ -22,6 +22,7 @@ services:
       - ${PWD}/module/dropwizard/_meta/env
       - ${PWD}/module/elasticsearch/_meta/env
       - ${PWD}/module/haproxy/_meta/env
+      - ${PWD}/module/http/_meta/env
       - ${PWD}/module/jolokia/_meta/env
       - ${PWD}/module/kafka/_meta/env
       - ${PWD}/module/kibana/_meta/env
@@ -46,6 +47,7 @@ services:
       dropwizard:     { condition: service_healthy }
       elasticsearch:  { condition: service_healthy }
       haproxy:        { condition: service_healthy }
+      http:           { condition: service_healthy }
       jolokia:        { condition: service_healthy }
       kafka:          { condition: service_healthy }
       kibana:         { condition: service_healthy }
@@ -79,6 +81,9 @@ services:
 
   haproxy:
     build: ${PWD}/module/haproxy/_meta
+
+  http:
+    build: ${PWD}/module/http/_meta
 
   jolokia:
     build: ${PWD}/module/jolokia/_meta

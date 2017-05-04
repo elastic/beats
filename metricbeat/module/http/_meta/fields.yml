@@ -1,5 +1,5 @@
 - key: http
-  title: "http"
+  title: "HTTP"
   description: >
     http Module
   fields:
