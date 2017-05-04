@@ -2,3 +2,5 @@
 == Filtering and Enhancing the Exported Data
 
 include::../../libbeat/docs/processors.asciidoc[]
+
+include::../../libbeat/docs/processors-using.asciidoc[]

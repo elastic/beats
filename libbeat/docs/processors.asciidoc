@@ -9,8 +9,9 @@
 //// include::../../libbeat/docs/processors.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
-You can define processors in your configuration to process events before they
-are sent to the configured output.The libbeat library provides processors for:
+You can <<defining-processors,define processors>> in your configuration to
+process events before they are sent to the configured output. The libbeat
+library provides processors for:
 
 * reducing the number of exported fields
 * enhancing events with additional metadata

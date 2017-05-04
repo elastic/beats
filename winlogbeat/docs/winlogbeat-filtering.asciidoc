@@ -12,4 +12,5 @@ processors:
       fields: [provider_guid, process_id, thread_id, version, event_data.ErrorSourceTable]
 -----------------------------------------------------
 
-See <<configuration-processors>> for more information.
+include::../../libbeat/docs/processors-using.asciidoc[]
+
