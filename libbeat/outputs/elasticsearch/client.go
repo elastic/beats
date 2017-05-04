@@ -590,21 +590,6 @@ func (client *Client) PublishEvent(data outputs.Data) error {
 	return nil
 }
 
-// LoadTemplate loads a template into Elasticsearch overwriting the existing
-// template if it exists. If you wish to not overwrite an existing template
-// then use CheckTemplate prior to calling this method.
-func (client *Client) LoadTemplate(templateName string, template map[string]interface{}) error {
-
-	logp.Info("load template: %s", templateName)
-	path := "/_template/" + templateName
-	body, err := client.LoadJSON(path, template)
-	if err != nil {
-		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, body)
-	}
-	logp.Info("Elasticsearch template with name '%s' loaded", templateName)
-	return nil
-}
-
 // LoadJSON creates a PUT request based on a JSON document.
 func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte, error) {
 	status, body, err := client.Request("PUT", path, "", nil, json)
@@ -618,17 +603,9 @@ func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte
 	return body, nil
 }
 
-// CheckTemplate checks if a given template already exist. It returns true if
-// and only if Elasticsearch returns with HTTP status code 200.
-func (client *Client) CheckTemplate(templateName string) bool {
-
-	status, _, _ := client.Request("HEAD", "/_template/"+templateName, "", nil, nil)
-
-	if status != 200 {
-		return false
-	}
-
-	return true
+// GetVersion returns the elasticsearch version the client is connected to
+func (client *Client) GetVersion() string {
+	return client.Connection.version
 }
 
 // Connect connects the client.

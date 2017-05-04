@@ -58,6 +58,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher"
 	svc "github.com/elastic/beats/libbeat/service"
+	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
 
 	// Register default processors.
@@ -113,6 +114,7 @@ type BeatConfig struct {
 	Processors processors.PluginConfig   `config:"processors"`
 	Path       paths.Path                `config:"path"`
 	Dashboards *common.Config            `config:"setup.dashboards"`
+	Template   *common.Config            `config:"setup.template"`
 	Http       *common.Config            `config:"http"`
 }
 
@@ -213,6 +215,11 @@ func (b *Beat) launch(bt Creator) error {
 	processors, err := processors.New(b.Config.Processors)
 	if err != nil {
 		return fmt.Errorf("error initializing processors: %v", err)
+	}
+
+	err = b.registerTemplateLoading()
+	if err != nil {
+		return err
 	}
 
 	debugf("Initializing output plugins")
@@ -442,6 +449,54 @@ func (b *Beat) loadDashboards() error {
 			return fmt.Errorf("Error importing Kibana dashboards: %v", err)
 		}
 		logp.Info("Kibana dashboards successfully loaded.")
+	}
+
+	return nil
+}
+
+// registerTemplateLoading registers the loading of the template as a callback with
+// the elasticsearch output. It is important the the registration happens before
+// the publisher is created.
+func (b *Beat) registerTemplateLoading() error {
+	if *setup {
+		// -setup implies template.enabled=true
+		if b.Config.Template == nil {
+			b.Config.Template = common.NewConfig()
+		}
+		err := b.Config.Template.SetBool("enabled", -1, true)
+		if err != nil {
+			return fmt.Errorf("Error setting template.enabled=true: %v", err)
+		}
+	}
+
+	esConfig := b.Config.Output["elasticsearch"]
+
+	// Loads template by default if esOutput is enabled
+	if (b.Config.Template == nil && esConfig.Enabled()) || (b.Config.Template != nil && b.Config.Template.Enabled()) {
+		if esConfig == nil || !esConfig.Enabled() {
+			return fmt.Errorf("Template loading requested but the Elasticsearch output is not configured/enabled")
+		}
+
+		// load template through callback to make sure it is also loaded
+		// on reconnecting
+		callback := func(esClient *elasticsearch.Client) error {
+
+			if b.Config.Template == nil {
+				b.Config.Template = common.NewConfig()
+			}
+
+			loader, err := template.NewLoader(b.Config.Template, esClient, b.Info)
+			if err != nil {
+				return fmt.Errorf("Error loading elasticsearch template: %v", err)
+			}
+
+			loader.Load()
+
+			logp.Info("ES template successfully loaded.")
+			return nil
+		}
+
+		elasticsearch.RegisterConnectCallback(callback)
 	}
 
 	return nil

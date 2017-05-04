@@ -1,0 +1,30 @@
+[[configuration-template]]
+
+=== Template
+
+The http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
+template] to use for setting mappings in Elasticsearch. By default, template loading is
+enabled.
+
+You can adjust the following settings to load your own template or overwrite an existing one:
+
+*`enabled`*:: Set to false to disable template loading. If set this to false,
+you must <<load-template-manually,load the template manually>>.
+
+*`name`*:: The name of the template. The default is +{beatname_lc}+.
+
+*`path`*:: The path to the template file. The default is +fields.yml+. If a relative
+path is set, it is considered relative to the config path. See the <<directory-layout>> section for
+details.
+
+*`overwrite`*:: A boolean that specifies whether to overwrite the existing template. The default
+is false.
+
+For example:
+
+["source","yaml",subs="attributes,callouts"]
+----------------------------------------------------------------------
+setup.template.name: "{beatname_lc}"
+setup.template.fields: "fields.yml"
+setup.template.overwrite: false
+----------------------------------------------------------------------
