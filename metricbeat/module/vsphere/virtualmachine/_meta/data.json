@@ -1,0 +1,19 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"vsphere",
+        "name":"virtualmachine",
+        "rtt":44269
+    },
+    "vsphere":{
+        "virtualmachine":{
+            "example": "virtualmachine"
+        }
+    },
+    "type":"metricsets"
+}

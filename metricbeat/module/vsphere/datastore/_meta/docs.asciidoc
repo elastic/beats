@@ -1,0 +1,3 @@
+=== vsphere datastore MetricSet
+
+This is the datastore metricset of the module vsphere.

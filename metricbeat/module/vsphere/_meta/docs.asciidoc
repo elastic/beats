@@ -1,0 +1,4 @@
+== vsphere Module
+
+This is the vsphere Module that uses the library Govmomi (https://github.com/vmware/govmomi) to collect metrics from any Vmware SDK URL (ESXi/VCenter). This library is built for and tested against ESXi and vCenter 5.5, 6.0 and 6.5.
+

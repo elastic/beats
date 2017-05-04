@@ -38,6 +38,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-vsphere>>
 * <<exported-fields-windows>>
 * <<exported-fields-zookeeper>>
 
@@ -8771,6 +8772,238 @@ UID of the user running the process.
 type: keyword
 
 Name of the user running the process.
+
+
+[[exported-fields-vsphere]]
+== vsphere Fields
+
+vsphere Module
+
+
+
+[float]
+== vsphere Fields
+
+
+
+
+[float]
+== datastore Fields
+
+datastore
+
+
+
+[float]
+=== vsphere.datastore.datacenter
+
+type: keyword
+
+Datacenter name
+
+
+[float]
+=== vsphere.datastore.name
+
+type: keyword
+
+Datastore name
+
+
+[float]
+=== vsphere.datastore.fstype
+
+type: keyword
+
+Filesystem type
+
+
+[float]
+=== vsphere.datastore.capacity.total.bytes
+
+type: long
+
+format: bytes
+
+Total bytes of the datastore
+
+
+[float]
+=== vsphere.datastore.capacity.free.bytes
+
+type: long
+
+format: bytes
+
+Free bytes of the datastore
+
+
+[float]
+=== vsphere.datastore.capacity.used.bytes
+
+type: long
+
+format: bytes
+
+Used bytes of the datastore
+
+
+[float]
+=== vsphere.datastore.capacity.used.pct
+
+type: long
+
+format: percent
+
+Used percent of the datastore
+
+
+[float]
+== host Fields
+
+host
+
+
+
+[float]
+=== vsphere.host.datacenter
+
+type: keyword
+
+Datacenter name
+
+
+[float]
+=== vsphere.host.name
+
+type: keyword
+
+Host name
+
+
+[float]
+=== vsphere.host.cpu.used.mhz
+
+type: long
+
+Used CPU in Mhz
+
+
+[float]
+=== vsphere.host.cpu.total.mhz
+
+type: long
+
+Total CPU in Mhz
+
+
+[float]
+=== vsphere.host.cpu.free.mhz
+
+type: long
+
+Free CPU in Mhz
+
+
+[float]
+=== vsphere.host.memory.used.bytes
+
+type: long
+
+format: bytes
+
+Used Memory in bytes
+
+
+[float]
+=== vsphere.host.memory.total.bytes
+
+type: long
+
+format: bytes
+
+Total Memory in bytes
+
+
+[float]
+=== vsphere.host.memory.free.bytes
+
+type: long
+
+format: bytes
+
+Free Memory in bytes
+
+
+[float]
+== virtualmachine Fields
+
+virtualmachine
+
+
+
+[float]
+=== vsphere.virtualmachine.datacenter
+
+type: keyword
+
+Datacenter name
+
+
+[float]
+=== vsphere.virtualmachine.name
+
+type: keyword
+
+Virtual Machine name
+
+
+[float]
+=== vsphere.virtualmachine.cpu.used.mhz
+
+type: long
+
+Used CPU in Mhz
+
+
+[float]
+=== vsphere.virtualmachine.memory.used.guest.bytes
+
+type: long
+
+format: bytes
+
+Used Memory of Guest in bytes
+
+
+[float]
+=== vsphere.virtualmachine.memory.used.host.bytes
+
+type: long
+
+format: bytes
+
+Used Memory of Host in bytes
+
+
+[float]
+=== vsphere.virtualmachine.memory.total.guest.bytes
+
+type: long
+
+format: bytes
+
+Total Memory of Guest in bytes
+
+
+[float]
+=== vsphere.virtualmachine.memory.free.guest.bytes
+
+type: long
+
+format: bytes
+
+Free Memory of Guest in bytes
 
 
 [[exported-fields-windows]]

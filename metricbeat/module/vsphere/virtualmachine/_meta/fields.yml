@@ -1,0 +1,37 @@
+- name: virtualmachine
+  type: group
+  description: >
+    virtualmachine
+  fields:
+    - name: datacenter
+      type: keyword
+      description: >
+        Datacenter name
+    - name: name
+      type: keyword
+      description: >
+        Virtual Machine name
+    - name: cpu.used.mhz
+      type: long
+      description: >
+        Used CPU in Mhz
+    - name: memory.used.guest.bytes
+      type: long
+      description: >
+        Used Memory of Guest in bytes
+      format: bytes
+    - name: memory.used.host.bytes
+      type: long
+      description: >
+        Used Memory of Host in bytes
+      format: bytes
+    - name: memory.total.guest.bytes
+      type: long
+      description: >
+        Total Memory of Guest in bytes
+      format: bytes
+    - name: memory.free.guest.bytes
+      type: long
+      description: >
+        Free Memory of Guest in bytes
+      format: bytes
