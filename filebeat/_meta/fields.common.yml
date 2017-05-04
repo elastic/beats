@@ -23,11 +23,6 @@
       description: >
         The content of the line read from the log file.
 
-    - name: type
-      required: true
-      description: >
-        The name of the log event. This field is set to the value specified for the `document_type` option in the prospector section of the Filebeat config file.
-
     - name: input_type
       required: true
       description: >

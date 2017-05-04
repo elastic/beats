@@ -11,7 +11,7 @@ import time
 import yaml
 from datetime import datetime, timedelta
 
-BEAT_REQUIRED_FIELDS = ["@timestamp", "type",
+BEAT_REQUIRED_FIELDS = ["@timestamp",
                         "beat.name", "beat.hostname", "beat.version"]
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)

@@ -768,14 +768,6 @@ The content of the line read from the log file.
 
 
 [float]
-=== type
-
-required: True
-
-The name of the log event. This field is set to the value specified for the `document_type` option in the prospector section of the Filebeat config file.
-
-
-[float]
 === input_type
 
 required: True

@@ -648,7 +648,7 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )[0]
         assert "offset" not in output
         assert "message" in output
@@ -673,7 +673,7 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )[0]
         assert "message" not in output
         assert "offset" in output
