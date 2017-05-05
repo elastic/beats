@@ -333,7 +333,15 @@ use this, for example, for setting defaults in a base configuration file, and
 overwrite settings via local configuration files.
 
 In addition to overwriting settings using multiple configuration files,
-individual settings can be overwritten using `-E <setting>=<value>`.
+individual settings can be overwritten using `-E <setting>=<value>`. The
+`<value>` can be either a single value or a complex object, such as a list or
+dictionary. For example, you can disable the Elasticsearch output and write all
+events to the console by setting:
+
+["source","sh"]
+--------------------------------------------------------------------------------
+-E output='{elasticsearch.enabled: false, console.pretty: true}'
+--------------------------------------------------------------------------------
 
 [[config-file-format-tips]]
 === YAML Tips and Gotchas

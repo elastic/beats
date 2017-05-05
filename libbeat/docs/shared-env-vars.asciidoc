@@ -39,8 +39,6 @@ undefined.
 If you need to use a literal `${` in your configuration file then you can write
 `$${` to escape the expansion.
 
-// REVIEWERS: Is the following statement still true? "The `$` symbol can be used to escape othercharacters in the default_value like using `$}` in order to generate a `}` character without closing the variable expansion."
-
 After changing the value of an environment variable, you need to restart
 the Beat to pick up the new value.
 
@@ -72,35 +70,33 @@ and what each configuration looks like after replacement:
 === Specifying Complex Objects in Environment Variables
 
 You can specify complex objects, such as lists or dictionaries, in environment
-variables by using a superset of JSON.
+variables by using a JSON-like syntax.
 
-//REVIEWERS: Not sure I like describing this as a "superset of JSON." Would it make sense to say "by using a JSON-like syntax"?
-
-For example, the following environment variable is set to an array:
+For example, the following environment variable is set to a list:
 
 [source,yaml]
 -------------------------------------------------------------------------------
-LOG_EXCLUDE_LINES='^A, ^B'
+ES_HOSTS="10.45.3.2:9220,10.45.3.1:9230"
 -------------------------------------------------------------------------------
 
 You can reference this variable in the config file:
 
 [source,yaml]
 -------------------------------------------------------------------------------
-exclude_lines: ${LOG_EXCLUDE_LINES}
+output.elasticsearch:
+  hosts: '${ES_HOSTS}'
 -------------------------------------------------------------------------------
 
-
-//REVIEWERS: Does anyone have a better example that is less Filebeat-specific?
-
 When the Beat loads the config file, it resolves the environment variable and
-replaces it with the specified array before reading the `exclude_lines` setting.
+replaces it with the specified list before reading the `hosts` setting.
 
 When you specify complex objects in environment variables, keep the following
 in mind:
 
-* Strings can be unquoted, single-quoted, or double-quoted
-* Arrays at the top-level do not require brackets (`[]`). Instead, use commas (`,`) to
-separate the elements.
+* Strings can be unquoted, single-quoted, or double-quoted, as a convenience for
+simple settings and to make it easier for you to mix quotation usage in the
+shell.
+* Arrays at the top-level do not require brackets (`[]`). For convenience, you
+can use commas (`,`) to separate the elements.
 
 NOTE: Do not use double-quotes (`"`) to wrap regular expressions, or the backslash (`\`) will be interpreted as an escape character.
