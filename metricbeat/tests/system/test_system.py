@@ -292,6 +292,38 @@ class Test(metricbeat.BaseTest):
             self.assertItemsEqual(self.de_dot(SYSTEM_NETWORK_FIELDS), network.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
+    def test_process_summary(self):
+        """
+        Test system/process_summary output.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["process_summary"],
+            "period": "5s",
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+
+        # Ensure no errors or warnings exist in the log.
+        log = self.get_log()
+        self.assertNotRegexpMatches(log, "ERR|WARN")
+
+        output = self.read_output_json()
+        self.assertGreater(len(output), 0)
+
+        for evt in output:
+            self.assert_fields_are_documented(evt)
+
+            summary = evt["system"]["process"]["summary"]
+            assert isinstance(summary["sleeping"], int)
+            assert isinstance(summary["running"], int)
+            assert isinstance(summary["idle"], int)
+            assert isinstance(summary["stopped"], int)
+            assert isinstance(summary["zombie"], int)
+            assert isinstance(summary["unknown"], int)
+
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
         """
         Test system/process output.

@@ -1,0 +1,24 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "module": "system",
+        "name": "process_summary",
+        "rtt": 115
+    },
+    "system": {
+        "process_summary": {
+            "idle": 0,
+            "running": 225,
+            "sleeping": 0,
+            "stopped": 0,
+            "total": 355,
+            "unknown": 130,
+            "zombie": 0
+        }
+    },
+    "type": "metricsets"
+}
