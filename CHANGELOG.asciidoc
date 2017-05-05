@@ -70,6 +70,7 @@ https://github.com/elastic/beats/compare/v5.1.1...master[Check the HEAD diff]
 - Fix panic in JSON decoding code if the input line is "null". {pull}4042[4042]
 - Properly shut down crawler in case one prospector is misconfigured. {pull}4037[4037]
 - Fix the Mysql slowlog parsing of IP addresses. {pull}4183[4183]
+- Fix issue that new prospector was not reloaded on conflict {pull}4128[4128]
 
 *Heartbeat*
 - Add default ports in HTTP monitor. {pull}3924[3924]
