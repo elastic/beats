@@ -3,7 +3,6 @@ package datastore
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,36 +10,30 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-
 	model := simulator.ESX()
-
-	err := model.Create()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	if err := model.Create(); err != nil {
+		t.Fatal(err)
 	}
 
 	ts := model.Service.NewServer()
 	defer ts.Close()
 
-	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
-
 	config := map[string]interface{}{
 		"module":     "vsphere",
 		"metricsets": []string{"datastore"},
-		"hosts":      []string{urlSimulator},
+		"hosts":      []string{ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path},
 		"username":   "user",
 		"password":   "pass",
 		"insecure":   true,
 	}
 
 	f := mbtest.NewEventsFetcher(t, config)
-
 	events, err := f.Fetch()
+	if err != nil {
+		t.Fatal("fetch error", err)
+	}
 
 	event := events[0]
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
@@ -48,16 +41,28 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, "LocalDS_0", event["name"])
 	assert.EqualValues(t, "local", event["fstype"])
 
-	capacity := event["capacity"].(common.MapStr)
+	// Values are based on the result 'df -k'.
+	fields := []string{"capacity.total.bytes", "capacity.free.bytes",
+		"capacity.used.bytes", "capacity.used.pct"}
+	for _, field := range fields {
+		value, err := event.GetValue(field)
+		if err != nil {
+			t.Error(err)
+		} else {
+			isNonNegativeInt64(t, field, value)
+		}
+	}
+}
 
-	// values are random
-	capacityTotal := capacity["total"].(common.MapStr)
-	assert.True(t, (capacityTotal["bytes"].(int64) > 1000000))
+func isNonNegativeInt64(t testing.TB, field string, v interface{}) {
+	i, ok := v.(int64)
+	if !ok {
+		t.Errorf("%v: got %T, but expected int64", field, v)
+		return
+	}
 
-	capacityFree := capacity["free"].(common.MapStr)
-	assert.True(t, (capacityFree["bytes"].(int64) > 1000000))
-
-	capacityUsed := capacity["used"].(common.MapStr)
-	assert.True(t, (capacityUsed["bytes"].(int64) > 1000000))
-	assert.True(t, (capacityUsed["pct"].(int64) > 10))
+	if i < 0 {
+		t.Errorf("%v: value is negative (%v)", field, i)
+		return
+	}
 }

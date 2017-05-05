@@ -2,13 +2,13 @@ package datastore
 
 import (
 	"context"
-	"errors"
 	"net/url"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 
+	"github.com/pkg/errors"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/property"
@@ -29,7 +29,6 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
 	logp.Warn("EXPERIMENTAL: The vsphere datastore metricset is experimental")
 
 	config := struct {
@@ -61,41 +60,35 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
 	f := find.NewFinder(m.Client, true)
-	if f == nil {
-		return nil, errors.New("Finder undefined for vsphere.")
-	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Get all datacenters
+	// Get all data centers.
 	dcs, err := f.DatacenterList(ctx, "*")
 	if err != nil {
 		return nil, err
 	}
 
-	events := []common.MapStr{}
-
+	var events []common.MapStr
 	for _, dc := range dcs {
-
 		f.SetDatacenter(dc)
 
 		dss, err := f.DatastoreList(ctx, "*")
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "failed to get datastore list")
 		}
 
 		pc := property.DefaultCollector(m.Client)
 
-		// Convert datastores into list of references
+		// Convert datastores into list of references.
 		var refs []types.ManagedObjectReference
 		for _, ds := range dss {
 			refs = append(refs, ds.Reference())
 		}
 
-		// Retrieve summary property
+		// Retrieve summary property.
 		var dst []mo.Datastore
 		err = pc.Retrieve(ctx, refs, []string{"summary"}, &dst)
 		if err != nil {
@@ -103,8 +96,10 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		}
 
 		for _, ds := range dst {
-
-			usedSpacePercent := 100 * (ds.Summary.Capacity - ds.Summary.FreeSpace) / ds.Summary.Capacity
+			var usedSpacePercent int64
+			if ds.Summary.Capacity > 0 {
+				usedSpacePercent = 100 * (ds.Summary.Capacity - ds.Summary.FreeSpace) / ds.Summary.Capacity
+			}
 			usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
 
 			event := common.MapStr{
