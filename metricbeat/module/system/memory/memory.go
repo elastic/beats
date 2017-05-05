@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/shirou/gopsutil/mem"
 
 	"github.com/pkg/errors"
 )
@@ -30,39 +31,37 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches memory metrics from the OS.
 func (m *MetricSet) Fetch() (event common.MapStr, err error) {
-	memStat, err := GetMemory()
+	memStat, err := mem.VirtualMemory()
 	if err != nil {
 		return nil, errors.Wrap(err, "memory")
 	}
-	AddMemPercentage(memStat)
-
-	swapStat, err := GetSwap()
-	if err != nil {
-		return nil, errors.Wrap(err, "swap")
-	}
-	AddSwapPercentage(swapStat)
 
 	memory := common.MapStr{
 		"total": memStat.Total,
 		"used": common.MapStr{
 			"bytes": memStat.Used,
-			"pct":   memStat.UsedPercent,
+			"pct":   GetPercentage(memStat.Used, memStat.Total),
 		},
 		"free": memStat.Free,
 		"actual": common.MapStr{
-			"free": memStat.ActualFree,
+			"free": memStat.Available,
 			"used": common.MapStr{
-				"pct":   memStat.ActualUsedPercent,
-				"bytes": memStat.ActualUsed,
+				"bytes": memStat.Total - memStat.Available,
+				"pct":   GetPercentage(memStat.Total-memStat.Available, memStat.Total),
 			},
 		},
+	}
+
+	swapStat, err := mem.SwapMemory()
+	if err != nil {
+		return nil, errors.Wrap(err, "swap")
 	}
 
 	swap := common.MapStr{
 		"total": swapStat.Total,
 		"used": common.MapStr{
 			"bytes": swapStat.Used,
-			"pct":   swapStat.UsedPercent,
+			"pct":   GetPercentage(swapStat.Used, swapStat.Total),
 		},
 		"free": swapStat.Free,
 	}

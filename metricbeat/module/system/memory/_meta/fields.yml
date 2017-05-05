@@ -45,7 +45,8 @@
           type: long
           format: bytes
           description: >
-            Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory
+            Available memory in bytes. It is calculated based on the OS. On Linux kernel 3.14+, it has the
+            MemAvailable value, and on older Linux kernel versions, it consists of the free memory
             plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal
             to `system.memory.free`.
 
