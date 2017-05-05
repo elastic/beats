@@ -1,7 +1,6 @@
 package prospector
 
 import (
-	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -10,10 +9,8 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
-	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector/stdin"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -25,12 +22,9 @@ var (
 
 // Prospector contains the prospector
 type Prospector struct {
-	cfg          *common.Config // Raw config
 	config       prospectorConfig
 	prospectorer Prospectorer
-	outlet       channel.Outleter
 	done         chan struct{}
-	states       *file.States
 	wg           *sync.WaitGroup
 	id           uint64
 	Once         bool
@@ -40,52 +34,50 @@ type Prospector struct {
 
 // Prospectorer is the interface common to all prospectors
 type Prospectorer interface {
-	LoadStates(states []file.State) error
 	Run()
 }
 
 // NewProspector instantiates a new prospector
-func NewProspector(cfg *common.Config, outlet channel.Outleter, beatDone chan struct{}) (*Prospector, error) {
+func NewProspector(conf *common.Config, outlet channel.Outleter, beatDone chan struct{}, states []file.State) (*Prospector, error) {
 	prospector := &Prospector{
-		cfg:      cfg,
 		config:   defaultConfig,
-		outlet:   outlet,
 		wg:       &sync.WaitGroup{},
 		done:     make(chan struct{}),
-		states:   &file.States{},
 		Once:     false,
 		registry: newHarvesterRegistry(),
 		beatDone: beatDone,
 	}
 
 	var err error
-	if err = cfg.Unpack(&prospector.config); err != nil {
+	if err = conf.Unpack(&prospector.config); err != nil {
 		return nil, err
 	}
 
 	var h map[string]interface{}
-	cfg.Unpack(&h)
+	conf.Unpack(&h)
 	prospector.id, err = hashstructure.Hash(h, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	logp.Debug("prospector", "File Configs: %v", prospector.config.Paths)
+	err = prospector.initProspectorer(outlet, states, conf)
+	if err != nil {
+		return prospector, err
+	}
 
 	return prospector, nil
 }
 
-// LoadStates sets up default config for prospector
-func (p *Prospector) LoadStates(states []file.State) error {
+func (p *Prospector) initProspectorer(outlet channel.Outleter, states []file.State, config *common.Config) error {
 
 	var prospectorer Prospectorer
 	var err error
 
 	switch p.config.InputType {
 	case cfg.StdinInputType:
-		prospectorer, err = stdin.NewProspector(p.cfg, p.outlet)
+		prospectorer, err = stdin.NewProspector(config, outlet)
 	case cfg.LogInputType:
-		prospectorer, err = NewLog(p)
+		prospectorer, err = NewLog(config, states, p.registry, outlet, p.done)
 	default:
 		return fmt.Errorf("Invalid input type: %v", p.config.InputType)
 	}
@@ -94,17 +86,7 @@ func (p *Prospector) LoadStates(states []file.State) error {
 		return err
 	}
 
-	err = prospectorer.LoadStates(states)
-	if err != nil {
-		return err
-	}
 	p.prospectorer = prospectorer
-
-	// Create empty harvester to check if configs are fine
-	_, err = p.createHarvester(file.State{})
-	if err != nil {
-		return err
-	}
 
 	return nil
 }
@@ -131,7 +113,6 @@ func (p *Prospector) Start() {
 
 		p.Run()
 	}()
-
 }
 
 // Run starts scanning through all the file paths and fetch the related files. Start a harvester for each file
@@ -162,31 +143,6 @@ func (p *Prospector) ID() uint64 {
 	return p.id
 }
 
-// updateState updates the prospector state and forwards the event to the spooler
-// All state updates done by the prospector itself are synchronous to make sure not states are overwritten
-func (p *Prospector) updateState(state file.State) error {
-
-	// Add ttl if cleanOlder is enabled and TTL is not already 0
-	if p.config.CleanInactive > 0 && state.TTL != 0 {
-		state.TTL = p.config.CleanInactive
-	}
-
-	// Update first internal state
-	p.states.Update(state)
-
-	data := util.NewData()
-	data.SetState(state)
-
-	ok := p.outlet.OnEvent(data)
-
-	if !ok {
-		logp.Info("Prospector outlet closed")
-		return errors.New("prospector outlet closed")
-	}
-
-	return nil
-}
-
 // Stop stops the prospector and with it all harvesters
 func (p *Prospector) Stop() {
 	// Stop scanning and wait for completion
@@ -206,48 +162,4 @@ func (p *Prospector) stop() {
 	// In case the beatDone channel is closed, this will not wait for completion
 	// Otherwise Stop will wait until output is complete
 	p.registry.Stop()
-}
-
-// createHarvester creates a new harvester instance from the given state
-func (p *Prospector) createHarvester(state file.State) (*harvester.Harvester, error) {
-
-	// Each harvester gets its own copy of the outlet
-	outlet := p.outlet.Copy()
-	h, err := harvester.NewHarvester(
-		p.cfg,
-		state,
-		p.states,
-		outlet,
-	)
-
-	return h, err
-}
-
-// startHarvester starts a new harvester with the given offset
-// In case the HarvesterLimit is reached, an error is returned
-func (p *Prospector) startHarvester(state file.State, offset int64) error {
-
-	if p.config.HarvesterLimit > 0 && p.registry.len() >= p.config.HarvesterLimit {
-		harvesterSkipped.Add(1)
-		return fmt.Errorf("Harvester limit reached")
-	}
-
-	// Set state to "not" finished to indicate that a harvester is running
-	state.Finished = false
-	state.Offset = offset
-
-	// Create harvester with state
-	h, err := p.createHarvester(state)
-	if err != nil {
-		return err
-	}
-
-	reader, err := h.Setup()
-	if err != nil {
-		return fmt.Errorf("Error setting up harvester: %s", err)
-	}
-
-	p.registry.start(h, reader)
-
-	return nil
 }

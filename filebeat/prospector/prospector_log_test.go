@@ -8,8 +8,21 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestProspectorFileExclude(t *testing.T) {
+
+	p := Log{
+		config: prospectorConfig{
+			ExcludeFiles: []match.Matcher{match.MustCompile(`\.gz$`)},
+		},
+	}
+
+	assert.True(t, p.isFileExcluded("/tmp/log/logw.gz"))
+	assert.False(t, p.isFileExcluded("/tmp/log/logw.log"))
+}
 
 var cleanInactiveTests = []struct {
 	cleanInactive time.Duration

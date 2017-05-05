@@ -27,16 +27,10 @@ func NewFactory(outlet channel.Outleter, registrar *registrar.Registrar, beatDon
 // Create creates a prospector based on a config
 func (r *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
 
-	p, err := NewProspector(c, r.outlet, r.beatDone)
+	p, err := NewProspector(c, r.outlet, r.beatDone, r.registrar.GetStates())
 	if err != nil {
 		logp.Err("Error creating prospector: %s", err)
-		return nil, err
-	}
-
-	err = p.LoadStates(r.registrar.GetStates())
-	if err != nil {
-		logp.Err("Error loading states for prospector %v: %v", p.ID(), err)
-		// In case of error with loading state, prospector is still returne
+		// In case of error with loading state, prospector is still returned
 		return p, err
 	}
 
