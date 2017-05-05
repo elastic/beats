@@ -73,7 +73,12 @@ func (imp Importer) Import() error {
 // some index properties which are needed as a workaround for:
 // https://github.com/elastic/beats-dashboards/issues/94
 func (imp Importer) CreateKibanaIndex() error {
-	imp.client.CreateIndex(imp.cfg.KibanaIndex, nil)
+	imp.client.CreateIndex(imp.cfg.KibanaIndex,
+		common.MapStr{
+			"settings": common.MapStr{
+				"index.mapping.single_type": false,
+			},
+		})
 	_, _, err := imp.client.CreateIndex(imp.cfg.KibanaIndex+"/_mapping/search",
 		common.MapStr{
 			"search": common.MapStr{
