@@ -1,4 +1,4 @@
-// +build freebsd linux windows
+// +build darwin,cgo freebsd linux windows
 
 package diskio
 
