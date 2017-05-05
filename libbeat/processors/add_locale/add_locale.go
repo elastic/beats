@@ -2,7 +2,6 @@ package actions
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -67,32 +66,32 @@ func (l addLocale) Run(event common.MapStr) (common.MapStr, error) {
 	return event, nil
 }
 
+const (
+	sec  = 1
+	min  = 60 * sec
+	hour = 60 * min
+)
+
 func (l addLocale) Format() string {
 	tm := time.Now()
-	var fmt string
+	var ft string
 	switch l.TimezoneFormat {
 	case Abbrevation:
-		fmt, _ = tm.Zone()
+		ft, _ = tm.Zone()
 	case Offset:
 		_, offset := tm.Zone()
 
-		offset = offset / 3600
-
+		sign := "+"
 		if offset < 0 {
-			offset = offset - (offset * 2)
-			fmt += "-"
-		} else {
-			fmt += "+"
+			sign = "-"
+			offset *= -1
 		}
 
-		if offset < 10 {
-			fmt += "0"
-		}
-
-		fmt += strconv.Itoa(offset)
-		fmt += ":00"
+		h := offset / hour
+		m := (offset - (h * hour)) / min
+		ft = fmt.Sprintf("%s%02d:%02d", sign, h, m)
 	}
-	return fmt
+	return ft
 }
 
 func (l addLocale) String() string {
