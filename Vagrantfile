@@ -92,6 +92,7 @@ Vagrant.configure(2) do |config|
     config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", :nfs => true, disabled: true
     #config.vm.network "private_network", ip: "192.168.135.18"
 
+    freebsd.vm.hostname = "beats-tester"
     freebsd.vm.provision "shell", inline: $unixProvision, privileged: false
   end
 
