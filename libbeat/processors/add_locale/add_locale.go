@@ -36,8 +36,11 @@ func init() {
 
 func newAddLocale(c common.Config) (processors.Processor, error) {
 	config := struct {
-		Format string `config:"format" validate:"required"`
-	}{}
+		Format string `config:"format"`
+	}{
+		Format: "offset",
+	}
+
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("fail to unpack the include_fields configuration: %s", err)
