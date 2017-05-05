@@ -201,3 +201,144 @@ class Test(BaseTest):
         assert output[1]["message"] == second_line
         # assert that fields are added
         assert output[1]["fields.hello"] == "world"
+
+    def test_load_configs(self):
+        """
+        Test loading separate prospectors configs
+        """
+        self.render_config_template(
+            reload_path=self.working_dir + "/configs/*.yml",
+            prospectors=False,
+        )
+
+        os.mkdir(self.working_dir + "/logs/")
+        logfile = self.working_dir + "/logs/test.log"
+        os.mkdir(self.working_dir + "/configs/")
+
+        first_line = "First log file"
+        second_line = "Second log file"
+
+        config = prospectorConfigTemplate.format(self.working_dir + "/logs/test.log")
+        config = config + """
+  close_eof: true
+"""
+        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
+            f.write(config)
+
+        with open(logfile, 'w') as f:
+            f.write(first_line + "\n")
+
+        proc = self.start_beat()
+
+        self.wait_until(lambda: self.output_lines() == 1)
+
+        # Update both log files, only 1 change should be picke dup
+        with open(logfile, 'a') as f:
+            f.write(second_line + "\n")
+
+        self.wait_until(lambda: self.output_lines() == 2)
+
+        proc.check_kill_and_wait()
+
+        output = self.read_output()
+
+        # Reloading stopped.
+        self.wait_until(
+            lambda: self.log_contains("Loading of config files completed."),
+            max_timeout=15)
+
+        # Make sure the correct lines were picked up
+        assert self.output_lines() == 2
+        assert output[0]["message"] == first_line
+        assert output[1]["message"] == second_line
+
+    def test_reload_same_config(self):
+        """
+        Test reload same config with same file but different config. Makes sure reloading also works on conflicts.
+        """
+        self.render_config_template(
+            reload=True,
+            reload_path=self.working_dir + "/configs/*.yml",
+            prospectors=False,
+        )
+
+        os.mkdir(self.working_dir + "/logs/")
+        logfile = self.working_dir + "/logs/test.log"
+        os.mkdir(self.working_dir + "/configs/")
+
+        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
+            f.write(prospectorConfigTemplate.format(self.working_dir + "/logs/*"))
+
+        proc = self.start_beat()
+
+        with open(logfile, 'w') as f:
+            f.write("Hello world1\n")
+
+        self.wait_until(lambda: self.output_lines() > 0)
+
+        # New config with same config file but a bit different to make it reload
+        # Add it intentionally when other prospector is still running to cause an error
+        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
+            f.write(prospectorConfigTemplate.format(self.working_dir + "/logs/test.log"))
+
+        # Make sure error shows up in log file
+        self.wait_until(
+            lambda: self.log_contains("Can only start a prospector when all related states are finished"),
+            max_timeout=15)
+
+        # Wait until old runner is stopped
+        self.wait_until(
+            lambda: self.log_contains("Runner stopped:"),
+            max_timeout=15)
+
+        # Add new log line and see if it is picked up = new prospector is running
+        with open(logfile, 'a') as f:
+            f.write("Hello world2\n")
+
+        self.wait_until(lambda: self.output_lines() > 1)
+
+        proc.check_kill_and_wait()
+
+    def test_reload_add(self):
+        """
+        Test adding a prospector and makes sure both are still running
+        """
+        self.render_config_template(
+            reload=True,
+            reload_path=self.working_dir + "/configs/*.yml",
+            prospectors=False,
+        )
+
+        os.mkdir(self.working_dir + "/logs/")
+        logfile1 = self.working_dir + "/logs/test1.log"
+        logfile2 = self.working_dir + "/logs/test2.log"
+        os.mkdir(self.working_dir + "/configs/")
+
+        with open(self.working_dir + "/configs/prospector1.yml", 'w') as f:
+            f.write(prospectorConfigTemplate.format(self.working_dir + "/logs/test1.log"))
+
+        proc = self.start_beat()
+
+        with open(logfile1, 'w') as f:
+            f.write("Hello world1\n")
+
+        self.wait_until(lambda: self.output_lines() > 0)
+
+        with open(self.working_dir + "/configs/prospector2.yml", 'w') as f:
+            f.write(prospectorConfigTemplate.format(self.working_dir + "/logs/test2.log"))
+
+        self.wait_until(
+            lambda: self.log_contains_count("New runner started") == 2,
+            max_timeout=15)
+
+        # Add new log line and see if it is picked up = new prospector is running
+        with open(logfile1, 'a') as f:
+            f.write("Hello world2\n")
+
+        # Add new log line and see if it is picked up = new prospector is running
+        with open(logfile2, 'a') as f:
+            f.write("Hello world3\n")
+
+        self.wait_until(lambda: self.output_lines() == 3)
+
+        proc.check_kill_and_wait()
