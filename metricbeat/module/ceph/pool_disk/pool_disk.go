@@ -32,7 +32,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The ceph pool_disk metricset is experimental")
+	logp.Experimental("The ceph pool_disk metricset is experimental")
 
 	http := helper.NewHTTP(base)
 	http.SetHeader("Accept", "application/json")
@@ -44,7 +44,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
 	content, err := m.HTTP.FetchContent()
 
 	if err != nil {

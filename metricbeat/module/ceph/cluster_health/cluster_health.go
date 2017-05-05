@@ -32,7 +32,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("BETA: The ceph cluster_health metricset is beta")
+	logp.Beta("The ceph cluster_health metricset is beta")
 
 	http := helper.NewHTTP(base)
 	http.SetHeader("Accept", "application/json")
@@ -44,7 +44,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		return nil, err

@@ -30,8 +30,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
-	logp.Warn("EXPERIMENTAL: The vsphere virtualmachine metricset is experimental")
+	logp.Experimental("The vsphere virtualmachine metricset is experimental")
 
 	config := struct {
 		Username string `config:"username"`
@@ -62,7 +61,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
 	f := find.NewFinder(m.Client, true)
 	if f == nil {
 		return nil, errors.New("Finder undefined for vsphere.")
